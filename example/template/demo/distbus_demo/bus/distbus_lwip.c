@@ -31,6 +31,13 @@
 #   define APP_DISTBUS_DEMO_CFG_LWIP_PORT           7086
 #endif
 
+#ifdef __WIN__
+// windows require a minial stack size of 8K(4K page + 4K guardian)
+#   define __APP_DISTBUS_DEMO_CFG_STACK_SZIE        8192
+#else
+#   define __APP_DISTBUS_DEMO_CFG_STACK_SZIE        1024
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -47,6 +54,9 @@ typedef struct __user_distbus_lwip_t {
     struct tcp_pcb *work_pcb;
 
     struct pbuf *pbuf_rx;
+
+    void *on_inited_param;
+    void (*on_inited)(void *p);
 
     void *buffer_to_send;
     uint32_t size_to_send;
@@ -144,8 +154,8 @@ static err_t __user_distbus_lwip_on_recv(void *arg, struct tcp_pcb *tpcb, struct
 
 static void __user_distbus_lwip_on_err(void *arg, err_t err)
 {
-//    __user_distbus_lwip_t *distbus_lwip = (__user_distbus_lwip_t *)arg;
-    // TODO:
+    __user_distbus_lwip_t *distbus_lwip = (__user_distbus_lwip_t *)arg;
+    __user_distbus_lwip_reset(distbus_lwip);
 }
 
 #if     APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED
@@ -167,6 +177,10 @@ static err_t __user_distbus_lwip_on_connected(void *arg, struct tcp_pcb *newpcb,
 #endif
     tcp_recv(newpcb, __user_distbus_lwip_on_recv);
     tcp_err(newpcb, __user_distbus_lwip_on_err);
+
+    if (distbus_lwip->on_inited != NULL) {
+        distbus_lwip->on_inited(distbus_lwip->on_inited_param);
+    }
     return ERR_OK;
 }
 
@@ -189,14 +203,15 @@ static void __user_distbus_lwip_thread(void *param)
             tcp_accept(distbus_lwip->listener_pcb, __user_distbus_lwip_on_accept);
         }
 #elif   APP_DISTBUS_DEMO_CFG_LWIP_CLIENT == ENABLED
+        struct tcp_pcb *tpcb = tcp_new();
         struct ip_addr ipaddr;
         // TODO: use configurable ipaddr
         IP_ADDR4(&ipaddr, 192, 168, 1, 6);
-        if (    (NULL != (distbus_lwip->work_pcb = tcp_new()))
-            &&  (ERR_OK == tcp_connect(distbus_lwip->work_pcb, &ipaddr, APP_DISTBUS_DEMO_CFG_LWIP_PORT,
+        if (    (NULL != tpcb)
+            &&  (ERR_OK == tcp_connect(tpcb, &ipaddr, APP_DISTBUS_DEMO_CFG_LWIP_PORT,
                                         __user_distbus_lwip_on_connected))) {
 
-            tcp_arg(distbus_lwip->work_pcb, distbus_lwip);
+            tcp_arg(tpcb, distbus_lwip);
         }
 #endif
     UNLOCK_TCPIP_CORE();
@@ -236,13 +251,17 @@ static void __user_distbus_lwip_thread(void *param)
     distbus_lwip->work_pcb = NULL;
 }
 
-void __user_distbus_init(void)
+bool __user_distbus_init(void *p, void (*on_inited)(void *p))
 {
     __user_distbus_lwip_t *distbus_lwip = &__user_distbus_lwip;
 
     distbus_lwip->is_to_exit = false;
+    distbus_lwip->on_inited_param = p;
+    distbus_lwip->on_inited = on_inited;
     distbus_lwip->thread = sys_thread_new("distbus_lwip",
-        __user_distbus_lwip_thread, &__user_distbus_lwip, 1024, TCPIP_THREAD_PRIO);
+                __user_distbus_lwip_thread, &__user_distbus_lwip,
+                __APP_DISTBUS_DEMO_CFG_STACK_SZIE, TCPIP_THREAD_PRIO);
+    return false;
 }
 
 bool __user_distbus_send(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_sent)(void *p))
@@ -264,9 +283,6 @@ bool __user_distbus_send(uint8_t *buffer, uint_fast32_t size, void *p, void (*on
 bool __user_distbus_recv(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_recv)(void *p))
 {
     __user_distbus_lwip_t *distbus_lwip = &__user_distbus_lwip;
-    if (NULL == distbus_lwip->work_pcb) {
-        return false;
-    }
     VSF_USB_ASSERT(0 == distbus_lwip->size_to_recv);
 
     vsf_protect_t orig = vsf_protect_int();

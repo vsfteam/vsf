@@ -57,7 +57,7 @@ static void __user_distbus_on_error(vsf_distbus_t *distbus);
 static void * __user_distbus_alloc_msg(uint_fast32_t size);
 static void __user_distbus_free_msg(void *msg);
 
-extern void __user_distbus_init(void);
+extern bool __user_distbus_init(void *p, void (*on_inited)(void *p));
 extern bool __user_distbus_send(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_sent)(void *p));
 extern bool __user_distbus_recv(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_recv)(void *p));
 

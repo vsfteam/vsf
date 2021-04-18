@@ -25,8 +25,36 @@
 #include "hal/arch/vsf_arch.h"
 #include "./vsf_distbus.h"
 
+#if VSF_DISTBUS_CFG_DEBUG == ENABLED
+#   include "../trace/vsf_trace.h"
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#if VSF_DISTBUS_CFG_DEBUG == ENABLED
+#   define __vsf_distbus_trace(...)                     vsf_trace_debug(__VA_ARGS__)
+#   define __vsf_distbus_trace_buffer(__ptr, __size)    vsf_trace_buffer(VSF_TRACE_DEBUG, (__ptr), (__size))
+#else
+#   define __vsf_distbus_trace(...)
+#   define __vsf_distbus_trace_buffer(__ptr, __size)
+#endif
+
+#if VSF_DISTBUS_CFG_DEBUG_MSG == ENABLED
+#   define __vsf_distbus_trace_msg(__msg, __dir)                                \
+        do {                                                                    \
+            __vsf_distbus_trace("distbus_msg_%s: addr = %d, payload = %d" VSF_TRACE_CFG_LINEEND,\
+                                (__dir), (__msg)->header.addr, (__msg)->header.datalen);\
+            __vsf_distbus_trace_buffer((uint8_t *)(__msg) + sizeof(vsf_distbus_msg_t), (__msg)->header.datalen);\
+        } while (0)
+#   define __vsf_distbus_trace_msg_rx(__msg)            __vsf_distbus_trace_msg((__msg), "rx")
+#   define __vsf_distbus_trace_msg_tx(__msg)            __vsf_distbus_trace_msg((__msg), "tx")
+#else
+#   define __vsf_distbus_trace_msg_rx(__msg)
+#   define __vsf_distbus_trace_msg_tx(__msg)
+#endif
+
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -38,11 +66,10 @@ static void __vsf_distbus_on_sent(void *p);
 
 vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t size, uint8_t **buf)
 {
-    VSF_SERVICE_ASSERT((distbus != NULL) && (size > 0));
-    size += sizeof(vsf_distbus_msg_t);
-    vsf_distbus_msg_t *msg = distbus->op.mem.alloc_msg(size);
+    VSF_SERVICE_ASSERT(distbus != NULL);
+    vsf_distbus_msg_t *msg = distbus->op.mem.alloc_msg(size + sizeof(vsf_distbus_msg_t));
     if (msg != NULL) {
-        msg->buffer_size = size;
+        msg->header.datalen = size;
         if (buf != NULL) {
             *buf = (uint8_t *)&msg->header + sizeof(msg->header);
         }
@@ -69,6 +96,7 @@ static bool __vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_msg_t *ms
 {
     VSF_SERVICE_ASSERT((distbus != NULL) && (msg != NULL));
     uint_fast32_t size = msg->header.datalen + sizeof(msg->header);
+    __vsf_distbus_trace_msg_tx(msg);
     return distbus->op.bus.send((uint8_t *)&msg->header, size, distbus, __vsf_distbus_on_sent);
 }
 
@@ -143,6 +171,7 @@ static void __vsf_distbus_on_recv(void *p)
             return;
         }
 
+        __vsf_distbus_trace_msg_rx(msg);
         __vsf_slist_foreach_unsafe(vsf_distbus_service_t, node, &distbus->service_list) {
             if ((msg->header.addr >= _->addr_start) && (msg->header.addr < (_->addr_start + _->info->addr_range))) {
                 msg->header.addr -= _->addr_start;
@@ -151,6 +180,7 @@ static void __vsf_distbus_on_recv(void *p)
                     VSF_SERVICE_ASSERT(msg != NULL);
                     distbus->msg_rx = msg;
                 }
+                break;
             }
         }
 
@@ -160,6 +190,19 @@ static void __vsf_distbus_on_recv(void *p)
         }
     } else {
         VSF_SERVICE_ASSERT(false);
+    }
+}
+
+static void __vsf_distbus_on_inited(void *p)
+{
+    vsf_distbus_t *distbus = (vsf_distbus_t *)p;
+    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus, distbus->mtu, NULL);
+    VSF_SERVICE_ASSERT(msg != NULL);
+
+    distbus->msg_rx = msg;
+    msg->pos = 0;
+    if (distbus->op.bus.recv((uint8_t *)&msg->header, sizeof(msg->header), distbus, __vsf_distbus_on_recv)) {
+        __vsf_distbus_on_recv(distbus);
     }
 }
 
@@ -184,17 +227,13 @@ vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus)
     VSF_SERVICE_ASSERT(distbus->mtu > 0);
 
     if (distbus->op.bus.init != NULL) {
-        distbus->op.bus.init();
+        if (distbus->op.bus.init(distbus, __vsf_distbus_on_inited)) {
+            __vsf_distbus_on_inited(distbus);
+        }
+    } else {
+        __vsf_distbus_on_inited(distbus);
     }
 
-    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus, distbus->mtu, NULL);
-    VSF_SERVICE_ASSERT(msg != NULL);
-
-    distbus->msg_rx = msg;
-    msg->pos = 0;
-    if (distbus->op.bus.recv((uint8_t *)&msg->header, sizeof(msg->header), distbus, __vsf_distbus_on_recv)) {
-        __vsf_distbus_on_recv(distbus);
-    }
     return VSF_ERR_NONE;
 }
 
