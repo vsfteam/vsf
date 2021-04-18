@@ -151,12 +151,14 @@ void vk_distbus_usbd_reset(vk_distbus_dcd_t *usbd, usb_dc_cfg_t *cfg)
     memset(usbd->ep, 0, sizeof(usbd->ep));
     usbd->address = 0;
 
-    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usbd->distbus, 0, NULL);
+    uint8_t *data;
+    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usbd->distbus, 1, &data);
     if (NULL == msg) {
         VSF_USB_ASSERT(false);
     }
 
     msg->header.addr = VSF_DISTBUS_DCD_CMD_RESET;
+    data[0] = cfg->speed;
     vsf_distbus_send_msg(usbd->distbus, &usbd->service, msg);
 }
 

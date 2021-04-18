@@ -121,7 +121,7 @@ static bool __user_distbus_usbd_service_msghandler(vsf_distbus_t *distbus,
     switch (msg->header.addr) {
     case VSF_DISTBUS_DCD_CMD_INIT: {
             usb_dc_cfg_t cfg = {
-                .speed          = USRAPP_CFG_USBD_SPEED,
+                .speed          = data[0],
                 .priority       = VSF_USBD_CFG_HW_PRIORITY,
                 .evthandler     = __user_usbd_evthandler,
                 .param          = distbus,
@@ -134,7 +134,7 @@ static bool __user_distbus_usbd_service_msghandler(vsf_distbus_t *distbus,
         break;
     case VSF_DISTBUS_DCD_CMD_RESET: {
             usb_dc_cfg_t cfg = {
-                .speed          = USRAPP_CFG_USBD_SPEED,
+                .speed          = data[0],
                 .priority       = VSF_USBD_CFG_HW_PRIORITY,
                 .evthandler     = __user_usbd_evthandler,
                 .param          = distbus,
@@ -182,7 +182,7 @@ static bool __user_distbus_usbd_service_msghandler(vsf_distbus_t *distbus,
         retain_msg = true;
         __user_distbus_usbd_service.msg[16 + (data[0] & 0x0F)] = msg;
         size = get_unaligned_le16(&data[1]);
-        VSF_USB_DC0.Ep.Transfer.Send(data[0], &data[4], size, data[2]);
+        VSF_USB_DC0.Ep.Transfer.Send(data[0], &data[4], size, data[3]);
         break;
     case VSF_DISTBUS_DCD_CMD_TRANSFER_RECV:
         retain_msg = true;
