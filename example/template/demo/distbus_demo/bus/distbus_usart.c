@@ -30,8 +30,9 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void __user_distbus_init(void)
+bool __user_distbus_init(void *p, void (*on_inited)(void *p))
 {
+    return true;
 }
 
 bool __user_distbus_send(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_sent)(void *p))
