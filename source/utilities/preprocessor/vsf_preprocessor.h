@@ -22,8 +22,9 @@
 
 #include "../vsf_utilities_cfg.h"
 
-#include "./vsf_connect.h"
-#include "./vsf_foreach.h"
+#include "./vsf_connect_macro.h"
+#include "./vsf_foreach_macro.h"
+#include "./vsf_repeat_macro.h"
 
 /*============================ MACROS ========================================*/
 

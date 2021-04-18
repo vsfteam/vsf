@@ -12457,16 +12457,19 @@
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\preprocessor\mf_u8_dec2str.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\preprocessor\vsf_connect.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\preprocessor\vsf_connect_macro.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\preprocessor\vsf_foreach.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\preprocessor\vsf_foreach_macro.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\preprocessor\vsf_macro_calc.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\preprocessor\vsf_preprocessor.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\preprocessor\vsf_repeat_macro.h</name>
                 </file>
             </group>
             <group>

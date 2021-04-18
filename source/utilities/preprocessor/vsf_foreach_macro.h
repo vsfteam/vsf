@@ -56,7 +56,7 @@ extern "C" {
 
 
 
-
+/*   elegant but toooooo slow
 #define ____VSF_MCHECK(__X, __SIZE, ...)        __SIZE
 #define __VSF_MCHECK(...)                       ____VSF_MCHECK(__VA_ARGS__, 0,)
 
@@ -87,6 +87,7 @@ extern "C" {
 #define VSF_MREPEAT(__COUNT, __MACRO, ...)                                      \
             __VSF_MEXPAND(__VSF_MREPEAT(__COUNT, __MACRO, __VA_ARGS__))
 #define VSF_MREPEAT_LIMIT                       VSF_MDEC_LIMIT
+*/
 
 #ifdef __cplusplus
 }

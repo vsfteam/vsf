@@ -616,10 +616,11 @@
     <ClInclude Include="..\..\..\..\source\utilities\language_extension\language_extension.h" />
     <ClInclude Include="..\..\..\..\source\utilities\ooc_class.h" />
     <ClInclude Include="..\..\..\..\source\utilities\preprocessor\mf_u8_dec2str.h" />
-    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_connect.h" />
-    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_foreach.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_connect_macro.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_foreach_macro.h" />
     <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_macro_calc.h" />
     <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_preprocessor.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_repeat_macro.h" />
     <ClInclude Include="..\..\..\..\source\utilities\template\template.h" />
     <ClInclude Include="..\..\..\..\source\utilities\template\vsf_bitmap.h" />
     <ClInclude Include="..\..\..\..\source\utilities\template\vsf_list.h" />

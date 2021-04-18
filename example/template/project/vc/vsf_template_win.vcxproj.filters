@@ -2169,9 +2169,6 @@
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.h">
       <Filter>vsf\component\ui\disp\driver\vga\m480</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_connect.h">
-      <Filter>vsf\utilities\preprocessor</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\utilities\compiler\compiler.h">
       <Filter>vsf\utilities\compiler</Filter>
     </ClInclude>
@@ -2462,9 +2459,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\lua\extension\oo\lua_oo.h">
       <Filter>vsf\component\3rd-party\lua\extension\oo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_foreach.h">
-      <Filter>vsf\utilities\preprocessor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\usb\device\class\HID\vsf_usbd_HID_desc.h">
       <Filter>vsf\component\usb\device\class\HID</Filter>
@@ -2900,6 +2894,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\usb\driver\dcd\distbus_dcd\vsf_distbus_dcd.h">
       <Filter>vsf\component\usb\driver\dcd\distbus_dcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_connect_macro.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_foreach_macro.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_repeat_macro.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
