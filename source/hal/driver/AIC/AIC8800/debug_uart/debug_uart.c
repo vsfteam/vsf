@@ -63,7 +63,7 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-static void __vsf_rx_stream_on_uart_rx(void)
+static void __vsf_debug_stream_on_rx(void)
 {
     uint_fast32_t rx_free_size = VSF_STREAM_GET_FREE_SIZE(&VSF_DEBUG_STREAM_RX);
     uint8_t ch;
@@ -78,7 +78,7 @@ static void __vsf_rx_stream_on_uart_rx(void)
 
 static void __VSF_DEBUG_STREAM_TX_INIT(void)
 {
-    register_stdio_uart_rx_function(__vsf_rx_stream_on_uart_rx);
+    register_stdio_uart_rx_function(__vsf_debug_stream_on_rx);
 }
 
 static void __VSF_DEBUG_STREAM_TX_WRITE_BLOCKED(uint8_t *buf, uint_fast32_t size)
