@@ -19,8 +19,8 @@
 
 #include "vsf.h"
 
-#if     VSF_USE_DISTBUS == ENABLED                                              \
-    &&  APP_USE_DISTBUS_DEMO == ENABLED && APP_DISTBUS_DEMO_CFG_LWIP == ENABLED
+#if     VSF_USE_DISTBUS == ENABLED &&  APP_USE_DISTBUS_DEMO == ENABLED          \
+    &&  (APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED || APP_DISTBUS_DEMO_CFG_LWIP_CLIENT == ENABLED)
 
 #include "lwip/tcpip.h"
 #include "lwip/tcp.h"
@@ -41,7 +41,9 @@ enum {
 typedef struct __user_distbus_lwip_t {
     sys_thread_t thread;
 
+#if APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED
     struct tcp_pcb *listener_pcb;
+#endif
     struct tcp_pcb *work_pcb;
 
     struct pbuf *pbuf_rx;
@@ -146,7 +148,11 @@ static void __user_distbus_lwip_on_err(void *arg, err_t err)
     // TODO:
 }
 
+#if     APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED
 static err_t __user_distbus_lwip_on_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
+#elif   APP_DISTBUS_DEMO_CFG_LWIP_CLIENT == ENABLED
+static err_t __user_distbus_lwip_on_connected(void *arg, struct tcp_pcb *newpcb, err_t err)
+#endif
 {
     __user_distbus_lwip_t *distbus_lwip = (__user_distbus_lwip_t *)arg;
 
@@ -156,7 +162,9 @@ static err_t __user_distbus_lwip_on_accept(void *arg, struct tcp_pcb *newpcb, er
 
     distbus_lwip->work_pcb = newpcb;
     tcp_arg(newpcb, distbus_lwip);
+#if     APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED
     tcp_accepted(newpcb);
+#endif
     tcp_recv(newpcb, __user_distbus_lwip_on_recv);
     tcp_err(newpcb, __user_distbus_lwip_on_err);
     return ERR_OK;
@@ -167,6 +175,7 @@ static void __user_distbus_lwip_thread(void *param)
     __user_distbus_lwip_t *distbus_lwip = (__user_distbus_lwip_t *)param;
 
     LOCK_TCPIP_CORE();
+#if     APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED
         if (    (NULL == (distbus_lwip->listener_pcb = tcp_new()))
             ||  (ERR_OK != tcp_bind(distbus_lwip->listener_pcb, IP_ADDR_ANY, APP_DISTBUS_DEMO_CFG_LWIP_PORT))
             ||  (NULL == (distbus_lwip->listener_pcb = tcp_listen_with_backlog(distbus_lwip->listener_pcb, 1)))) {
@@ -179,6 +188,17 @@ static void __user_distbus_lwip_thread(void *param)
             tcp_arg(distbus_lwip->listener_pcb, distbus_lwip);
             tcp_accept(distbus_lwip->listener_pcb, __user_distbus_lwip_on_accept);
         }
+#elif   APP_DISTBUS_DEMO_CFG_LWIP_CLIENT == ENABLED
+        struct ip_addr ipaddr;
+        // TODO: use configurable ipaddr
+        IP_ADDR4(&ipaddr, 192, 168, 1, 6);
+        if (    (NULL != (distbus_lwip->work_pcb = tcp_new()))
+            &&  (ERR_OK == tcp_connect(distbus_lwip->work_pcb, &ipaddr, APP_DISTBUS_DEMO_CFG_LWIP_PORT,
+                                        __user_distbus_lwip_on_connected))) {
+
+            tcp_arg(distbus_lwip->work_pcb, distbus_lwip);
+        }
+#endif
     UNLOCK_TCPIP_CORE();
 
     vsf_evt_t evt;

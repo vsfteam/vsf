@@ -33,12 +33,14 @@
 #   define APP_DISTBUS_DEMO_CFG_POOL_NUM    16
 #endif
 
+#define __APP_DISTBUS_DEMO_MTU              (APP_DISTBUS_DEMO_CFG_MTU + sizeof(vsf_distbus_msg_t))
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct __user_distbus_msg_t {
     implement(vsf_distbus_msg_t)
-    uint8_t buffer[APP_DISTBUS_DEMO_CFG_MTU];
+    uint8_t buffer[__APP_DISTBUS_DEMO_MTU];
 } __user_distbus_msg_t;
 
 dcl_vsf_pool(__user_distbus_msg_pool)
@@ -90,7 +92,7 @@ static void __user_distbus_on_error(vsf_distbus_t *distbus)
 
 static void * __user_distbus_alloc_msg(uint_fast32_t size)
 {
-    VSF_ASSERT(size <= APP_DISTBUS_DEMO_CFG_MTU);
+    VSF_ASSERT(size <= __APP_DISTBUS_DEMO_MTU);
     return VSF_POOL_ALLOC(__user_distbus_msg_pool, &__user_dustbus.msg_pool);
 }
 
@@ -113,9 +115,6 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
-    VSF_POOL_INIT(__user_distbus_msg_pool, &__user_dustbus.msg_pool, APP_DISTBUS_DEMO_CFG_POOL_NUM);
-    vsf_distbus_init(&__user_dustbus.distbus);
-
 #if     APP_USE_DISTBUS_USBD_SLAVE_DEMO == ENABLED
     extern void __user_distbus_usbd_service_init(vsf_distbus_t *distbus);
     __user_distbus_usbd_service_init(&__user_dustbus.distbus);
@@ -123,6 +122,9 @@ int VSF_USER_ENTRY(void)
     usrapp_usbd_common.distbus_dcd.distbus = &__user_dustbus.distbus;
     vk_distbus_usbd_register_service(&usrapp_usbd_common.distbus_dcd);
 #endif
+
+    VSF_POOL_INIT(__user_distbus_msg_pool, &__user_dustbus.msg_pool, APP_DISTBUS_DEMO_CFG_POOL_NUM);
+    vsf_distbus_init(&__user_dustbus.distbus);
 
 #if APP_USE_LINUX_DEMO != ENABLED
     while (1) {

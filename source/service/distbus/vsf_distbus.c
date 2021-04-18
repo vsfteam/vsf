@@ -181,6 +181,7 @@ vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus)
         VSF_SERVICE_ASSERT((_->info != NULL) && (_->info->mtu > 0));
         distbus->mtu += _->info->mtu;
     }
+    VSF_SERVICE_ASSERT(distbus->mtu > 0);
 
     if (distbus->op.bus.init != NULL) {
         distbus->op.bus.init();
