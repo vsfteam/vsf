@@ -66,8 +66,8 @@ static __user_distbus_usbd_service_t __user_distbus_usbd_service = {
 static void __user_usbd_evthandler(void *param, usb_evt_t evt, uint_fast8_t value)
 {
     vsf_distbus_t *distbus = (vsf_distbus_t *)param;
-    uint8_t *data;
     vsf_distbus_msg_t *msg;
+    uint8_t *data;
 
     if (USB_ON_OUT == evt) {
         msg = __user_distbus_usbd_service.msg[value & 0x0F];
@@ -89,7 +89,14 @@ static void __user_usbd_evthandler(void *param, usb_evt_t evt, uint_fast8_t valu
         }
     }
 
-    msg = vsf_distbus_alloc_msg(distbus, 2, &data);
+    if (USB_ON_SETUP == evt) {
+        msg = vsf_distbus_alloc_msg(distbus, 2 + 8, &data);
+        if (msg != NULL) {
+            VSF_USB_DC0.GetSetup(&data[2]);
+        }
+    } else {
+        msg = vsf_distbus_alloc_msg(distbus, 2, &data);
+    }
     if (NULL == msg) {
         VSF_ASSERT(false);
     }
@@ -114,7 +121,7 @@ static bool __user_distbus_usbd_service_msghandler(vsf_distbus_t *distbus,
     switch (msg->header.addr) {
     case VSF_DISTBUS_DCD_CMD_INIT: {
             usb_dc_cfg_t cfg = {
-                .speed          = USB_DC_SPEED_HIGH,
+                .speed          = USRAPP_CFG_USBD_SPEED,
                 .priority       = VSF_USBD_CFG_HW_PRIORITY,
                 .evthandler     = __user_usbd_evthandler,
                 .param          = distbus,
@@ -127,7 +134,7 @@ static bool __user_distbus_usbd_service_msghandler(vsf_distbus_t *distbus,
         break;
     case VSF_DISTBUS_DCD_CMD_RESET: {
             usb_dc_cfg_t cfg = {
-                .speed          = USB_DC_SPEED_HIGH,
+                .speed          = USRAPP_CFG_USBD_SPEED,
                 .priority       = VSF_USBD_CFG_HW_PRIORITY,
                 .evthandler     = __user_usbd_evthandler,
                 .param          = distbus,

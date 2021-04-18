@@ -233,6 +233,7 @@ static void __user_distbus_lwip_thread(void *param)
 
                 LOCK_TCPIP_CORE();
                     err = tcp_write(distbus_lwip->work_pcb, buffer, size, 1);
+                    err += tcp_output(distbus_lwip->work_pcb);
                 UNLOCK_TCPIP_CORE();
                 VSF_USB_ASSERT(ERR_OK == err);
 

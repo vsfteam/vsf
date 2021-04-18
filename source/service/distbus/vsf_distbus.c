@@ -195,6 +195,8 @@ static void __vsf_distbus_on_recv(void *p)
 
 static void __vsf_distbus_on_inited(void *p)
 {
+    __vsf_distbus_trace("distbus: connected" VSF_TRACE_CFG_LINEEND);
+
     vsf_distbus_t *distbus = (vsf_distbus_t *)p;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus, distbus->mtu, NULL);
     VSF_SERVICE_ASSERT(msg != NULL);
