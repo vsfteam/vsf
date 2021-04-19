@@ -823,6 +823,7 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\libpng\raw\pngwrite.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\libpng\raw\pngwtran.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\libpng\raw\pngwutil.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\port\lua_port.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lvgl\port\vsf_lvgl_port.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_disp.c" />

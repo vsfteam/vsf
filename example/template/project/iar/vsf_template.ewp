@@ -6922,6 +6922,12 @@
                         </group>
                     </group>
                     <group>
+                        <name>port</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\port\lua_port.c</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>raw</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\raw\lapi.c</name>

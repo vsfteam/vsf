@@ -976,6 +976,9 @@
     <Filter Include="usrapp\demo\distbus_demo\app">
       <UniqueIdentifier>{9e0a303d-c725-41f6-ba6a-d0cb174c5f87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\3rd-party\lua\port">
+      <UniqueIdentifier>{292b3732-6c3c-459f-b1e3-57307be0ef8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -4921,6 +4924,9 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\distbus_demo\app\distbus_usbd.c">
       <Filter>usrapp\demo\distbus_demo\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\port\lua_port.c">
+      <Filter>vsf\component\3rd-party\lua\port</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
