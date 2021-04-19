@@ -9864,6 +9864,15 @@
                             <group>
                                 <name>lwip</name>
                                 <group>
+                                    <name>dhcps</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\dhcps\dhcps.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\dhcps\dhcps.h</name>
+                                    </file>
+                                </group>
+                                <group>
                                     <name>lwip-STABLE-2_0_2</name>
                                     <group>
                                         <name>ports</name>

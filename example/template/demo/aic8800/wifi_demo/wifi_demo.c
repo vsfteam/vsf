@@ -54,10 +54,22 @@ struct rwnx_hw hw_env;
 #   error current demo need VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY, if it's not supported\
     please make sure wlan_start_sta is called in task with priority higher than(>) vsf_prio_2
 #endif
-extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *this_ptr, vsf_prio_t priority);
-extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *this_ptr);
 
 /*============================ IMPLEMENTATION ================================*/
+
+static int __wifi_ap_main(int argc, char *argv[])
+{
+    if (argc < 2) {
+        printf("format: %s BAND SSID [PASSWD]\r\n", argv[0]);
+        return -1;
+    }
+
+    uint8_t band = strtoul(argv[1], NULL, 10);
+    char *ssid = argv[2], *pass = argc >= 3 ? argv[3] : "";
+    wlan_start_ap(band, (uint8_t *)ssid, (uint8_t *)pass);
+    printf("wifi ap started.\r\n");
+    return 0;
+}
 
 static int __wifi_scan_main(int argc, char *argv[])
 {
@@ -73,7 +85,6 @@ static int __wifi_scan_main(int argc, char *argv[])
 
     fhost_vif = &fhost_env.vif[0];
 
-    //set_mac_address();
     ipc_host_cntrl_start();
 
     struct mm_add_if_cfm add_if_cfm;
@@ -118,33 +129,22 @@ static int __wifi_connect_main(int argc, char *argv[])
         return -1;
     }
 
-    if (!wlan_connected) {
-        char *ssid = argv[1], *pass = argc >= 3 ? argv[2] : "";
+    if (wlan_connected) {
+        printf("wlan already connected\r\n");
+        return -1;
+    }
 
-#if PLF_HW_PXP
-        rtos_task_suspend(5);   // wait for AP starting
-#endif
-
-        // wlan_start_sta MUST be called with higher priority than internal wpa(vsf_prio_0).
-        vsf_prio_t prio = vsf_thread_set_priority(vsf_prio_1);
+    char *ssid = argv[1], *pass = argc >= 3 ? argv[2] : "";
+    // wlan_start_sta MUST be called with higher priority than internal wpa(vsf_prio_0).
+    vsf_prio_t prio = vsf_thread_set_priority(vsf_prio_1);
         int ret = wlan_start_sta((uint8_t *)ssid, (uint8_t *)pass, 0);
-        vsf_thread_set_priority(prio);
-        wlan_connected = 0 == ret ? 1 : 0;
+    vsf_thread_set_priority(prio);
 
-#if CONFIG_SLEEP_LEVEL == 1
-        sleep_level_set(PM_LEVEL_LIGHT_SLEEP);
-#elif CONFIG_SLEEP_LEVEL == 2
-        sleep_level_set(PM_LEVEL_DEEP_SLEEP);
-#elif CONFIG_SLEEP_LEVEL == 3
-        sleep_level_set(PM_LEVEL_HIBERNATE);
-#endif
-        user_sleep_allow(1);
-
-        if (wlan_connected) {
-            printf("wifi connected.\r\n");
-        } else {
-            printf("fail to connect %s.\r\n", argv[1]);
-        }
+    wlan_connected = 0 == ret ? 1 : 0;
+    if (wlan_connected) {
+        printf("wifi connected.\r\n");
+    } else {
+        printf("fail to connect %s.\r\n", argv[1]);
     }
 
     return 0;
@@ -163,6 +163,7 @@ static int __iperf_main(int argc, char *argv[])
 
 int fhost_application_init(void)
 {
+    busybox_bind("/sbin/wifi_ap", __wifi_ap_main);
     busybox_bind("/sbin/wifi_scan", __wifi_scan_main);
     busybox_bind("/sbin/wifi_connect", __wifi_connect_main);
     busybox_bind("/sbin/iperf", __iperf_main);
