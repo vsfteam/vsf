@@ -21,7 +21,8 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED || VSF_USE_USB_HOST == ENABLED
+#if     (VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DWCOTG == ENABLED)   \
+    ||  (VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_DWCOTG == ENABLED)
 
 #include "hal/interface/vsf_interface_usb.h"
 

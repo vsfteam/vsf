@@ -25,6 +25,9 @@
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_USBIP == ENABLED
 
 #include "hal/vsf_hal.h"
+// usbip_dcd does not require usb hw, so maybe vsf_interface_usb.h is not
+//  included by including hal/vsf_hal.h
+#include "hal/interface/vsf_interface_usb.h"
 #include "component/usb/common/usb_common.h"
 #include "kernel/vsf_kernel.h"
 

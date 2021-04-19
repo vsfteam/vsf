@@ -28,6 +28,8 @@
 #include "../common/usb_desc.h"
 #include "kernel/vsf_kernel.h"
 #include "hal/vsf_hal.h"
+// maybe usb is implemented by usbip or distbus, which doesnot require a usb hw
+#include "hal/interface/vsf_interface_usb.h"
 
 #include "./extension/bos/vsf_usbd_bos.h"
 #include "./extension/winusb/vsf_usbd_winusb.h"
