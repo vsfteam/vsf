@@ -101,7 +101,7 @@ enum em_spi_mode_t {
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/interface/vsf_interface_spi.h"
+#include "hal/driver/common/template/vsf_template_spi.h"
 
 /*============================ TYPES =========================================*/
 struct spi_status_t {

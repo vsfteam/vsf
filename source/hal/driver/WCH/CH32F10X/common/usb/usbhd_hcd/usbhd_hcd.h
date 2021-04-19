@@ -32,7 +32,7 @@
 //#include "../../io/io.h"
 //#include "../../pm/pm.h"
 
-#include "hal/interface/vsf_interface_usb.h"
+#include "hal/driver/common/template/vsf_template_usb.h"
 
 #if     defined(CH32F10X_USBHD_HCD_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__

@@ -22,8 +22,8 @@
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
 
-//#include "hal/interface/vsf_interface_pm.h"
-#include "hal/interface/vsf_interface_usb.h"
+// TODO: include pm driver header
+#include "hal/driver/common/template/vsf_template_usb.h"
 
 // for vsf_dwcotg_hw_info_t
 #include "component/usb/driver/otg/dwcotg/vsf_dwcotg_hw.h"

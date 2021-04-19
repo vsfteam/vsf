@@ -24,7 +24,7 @@
 #if     (VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DWCOTG == ENABLED)   \
     ||  (VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_DWCOTG == ENABLED)
 
-#include "hal/interface/vsf_interface_usb.h"
+#include "hal/driver/common/template/vsf_template_usb.h"
 
 // for dedicated vk_dwcotg_hw_info_t
 #include "component/usb/driver/otg/dwcotg/vsf_dwcotg_hw.h"

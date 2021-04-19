@@ -39,7 +39,8 @@ struct pm_pll_cfg_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
-#include "hal/interface/vsf_interface_pm.h"
+
+#include "hal/driver/common/template/vsf_template_pm.h"
 
 /*============================ PROTOTYPES ====================================*/
 extern pm_power_status_t vsf_pm_power_get_status(pm_power_cfg_no_t index);

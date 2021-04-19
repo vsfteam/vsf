@@ -19,11 +19,11 @@
 #define __HAL_DRIVER_ALLWINNER_F1CX00S_USB_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
 
-// for usb_dc and usb_hc structures
-#include "hal/interface/vsf_interface_usb.h"
+#include "hal/driver/common/template/vsf_template_usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

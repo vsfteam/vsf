@@ -32,7 +32,6 @@
 
 #include "./device.h"
 #include "./uart/uart.h"
-#include "hal/interface/vsf_interface_usb.h"
 
 #ifdef __cplusplus
 extern "C" {

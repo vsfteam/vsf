@@ -28,7 +28,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 
-//#include "hal/interface/vsf_interface_usart.h"
+#include "hal/driver/common/template/vsf_template_usart.h"
 
 /*============================ PROTOTYPES ====================================*/
 

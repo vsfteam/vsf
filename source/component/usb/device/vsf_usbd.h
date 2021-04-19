@@ -27,13 +27,25 @@
 #include "../common/usb_common.h"
 #include "../common/usb_desc.h"
 #include "kernel/vsf_kernel.h"
-#include "hal/vsf_hal.h"
-// maybe usb is implemented by usbip or distbus, which doesnot require a usb hw
-#include "hal/interface/vsf_interface_usb.h"
 
 #include "./extension/bos/vsf_usbd_bos.h"
 #include "./extension/winusb/vsf_usbd_winusb.h"
 #include "./extension/webusb/vsf_usbd_webusb.h"
+
+// dcd driver layer
+#include "hal/vsf_hal.h"
+#if VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED
+#   include "../driver/otg/musb/fdrc/vsf_musb_fdrc_dcd.h"
+#endif
+#if VSF_USBD_USE_DCD_DWCOTG == ENABLED
+#   include "../driver/otg/dwcotg/vsf_dwcotg_dcd.h"
+#endif
+#if VSF_USBD_USE_DCD_USBIP == ENABLED
+#   include "../driver/dcd/usbip_dcd/vsf_usbip_dcd.h"
+#endif
+#if VSF_USBD_USE_DCD_DISTBUS == ENABLED
+#   include "../driver/dcd/distbus_dcd/vsf_distbus_dcd.h"
+#endif
 
 #if VSF_USBD_CFG_RAW_MODE == ENABLED
 // user want to do every thing, expose driver interface
@@ -619,19 +631,6 @@ void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *obj,
 #endif
 #if VSF_USBD_USE_MSC == ENABLED
 #   include "./class/MSC/vsf_usbd_MSC.h"
-#endif
-
-#if VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED
-#   include "../driver/otg/musb/fdrc/vsf_musb_fdrc_dcd.h"
-#endif
-#if VSF_USBD_USE_DCD_DWCOTG == ENABLED
-#   include "../driver/otg/dwcotg/vsf_dwcotg_dcd.h"
-#endif
-#if VSF_USBD_USE_DCD_USBIP == ENABLED
-#   include "../driver/dcd/usbip_dcd/vsf_usbip_dcd.h"
-#endif
-#if VSF_USBD_USE_DCD_DISTBUS == ENABLED
-#   include "../driver/dcd/distbus_dcd/vsf_distbus_dcd.h"
 #endif
 
 #if defined(VSF_USBD_CFG_DRV_LV0_OO) && defined(VSF_USBD_CFG_DRV_LV0_OO_OBJ_HEADER)

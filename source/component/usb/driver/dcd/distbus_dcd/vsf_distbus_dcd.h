@@ -24,7 +24,7 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DISTBUS == ENABLED
 
-#include "hal/vsf_hal.h"
+#include "hal/driver/common/template/vsf_template_usb.h"
 // for distbus
 #include "service/vsf_service.h"
 #include "component/usb/common/usb_common.h"

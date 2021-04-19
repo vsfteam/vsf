@@ -163,7 +163,8 @@ enum io_model_t{
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/
-#include "hal/interface/vsf_interface_io.h"
+
+#include "hal/driver/common/template/vsf_template_io.h"
 
 /*============================ PROTOTYPES ====================================*/
 

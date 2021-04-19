@@ -24,8 +24,8 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 #include "../__device.h"
-#include "hal/interface/vsf_interface_pm.h"
-#include "hal/interface/vsf_interface_usart.h"
+// TODO: include pm driver header
+#include "hal/driver/common/template/vsf_template_usart.h"
 
 // for dma
 #include "../driver.h"

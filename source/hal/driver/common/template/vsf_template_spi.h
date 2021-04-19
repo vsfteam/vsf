@@ -20,8 +20,8 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
-#include "vsf_interface_common.h"
+#include "./vsf_template_hal_driver.h"
+#include "hal/arch/vsf_arch.h"
 
 /*============================ MACROS ========================================*/
 

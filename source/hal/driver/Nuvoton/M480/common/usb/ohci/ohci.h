@@ -26,7 +26,7 @@
 #include "../../io/io.h"
 #include "../../pm/pm.h"
 
-#include "hal/interface/vsf_interface_usb.h"
+#include "hal/driver/common/template/vsf_template_usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

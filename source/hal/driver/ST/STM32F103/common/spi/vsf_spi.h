@@ -3,7 +3,7 @@
 
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
-#include "hal/interface/vsf_interface_spi.h"
+#include "hal/driver/common/template/vsf_template_spi.h"
 
 enum em_spi_mode_t {
     SPI_EN                      = 0x0040,

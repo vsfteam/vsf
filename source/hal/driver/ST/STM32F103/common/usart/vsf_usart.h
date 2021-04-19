@@ -22,7 +22,7 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 #include "../../__device.h"
-#include "hal/interface/vsf_interface_usart.h"
+#include "hal/driver/common/template/vsf_template_usart.h"
 
 enum em_clk_reg_rw_t {
     USART1_CLK_EN           = 0x04000U,

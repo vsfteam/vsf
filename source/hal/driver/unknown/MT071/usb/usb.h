@@ -26,8 +26,8 @@
 
 #include "../device.h"
 
-#include "hal/interface/vsf_interface_pm.h"
-#include "hal/interface/vsf_interface_usb.h"
+// TODO: include pm driver header
+#include "hal/driver/common/template/vsf_template_usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

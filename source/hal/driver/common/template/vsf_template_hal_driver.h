@@ -19,9 +19,7 @@
 #define __HAL_DRIVER_COMMON_INTERFACE_H__
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
 
-#include "hal/arch/vsf_arch.h"
 #include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus

@@ -31,8 +31,6 @@
 #include "service/vsf_service.h"
 
 #include "./device.h"
-#include "hal/interface/vsf_interface_usb.h"
-#include "hal/interface/vsf_interface_usart.h"
 
 #ifdef __cplusplus
 extern "C" {
