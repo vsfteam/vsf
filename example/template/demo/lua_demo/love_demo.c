@@ -114,6 +114,16 @@ xpcall(love.boot, love.errhand)
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if     __IS_COMPILER_IAR__                                                     \
+    &&  !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
+// loslib need rename in stdio.h, which is not available in iar libc, implement a substitute
+int rename(const char *old_filename, const char *new_filename)
+{
+    VSF_ASSERT(false);
+    return -1;
+}
+#endif
+
 int love_main(int argc, char *argv[])
 {
     if (NULL == usrapp_ui_common.disp) {

@@ -45,7 +45,7 @@ typedef unsigned long long  uint_fast64_t;
 typedef signed long long    int_fast64_t;
 
 #ifndef UINT64_MAX
-#   define UINT64_MAX          ((uint64_t)(-1))
+#   define UINT64_MAX       ((uint64_t)(-1))
 #endif
 
 typedef uint32_t            uintptr_t;
@@ -78,8 +78,8 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-#define __optimal_bit_sz        (sizeof(uintalu_t) * 8)
-#define __optimal_bit_msk       (__optimal_bit_sz - 1)
+#define __optimal_bit_sz    (sizeof(uintalu_t) * 8)
+#define __optimal_bit_msk   (__optimal_bit_sz - 1)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -98,3 +98,13 @@ typedef int_fast8_t         intalu_t;
 
 /*============================ Multiple-Entry ================================*/
 #include "../__common/__type.h"
+
+#if     __IS_COMPILER_IAR__                                                     \
+    &&  !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
+
+// iar has no 64-bit stdio APIs, if simple_stdio in simple_libc is not used,
+//  implement 64-but stdio APIs here
+#   define off64_t          int64_t
+#   define ftello64         ftell
+#   define fseeko64         fseek
+#endif

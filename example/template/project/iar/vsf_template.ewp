@@ -4546,7 +4546,6 @@
                     <state>CFG_IPERF</state>
                     <state>CFG_WIFI_ROM_VER=2</state>
                     <state>LWIP_NO_STDINT_H=1</state>
-                    <state>__vsf_linux_ctype=_ctype_</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
