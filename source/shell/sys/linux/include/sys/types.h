@@ -1,6 +1,9 @@
 #ifndef __LINUX_TYPES_H__
 #define __LINUX_TYPES_H__
 
+// for compiler
+#include "utilities/vsf_utilities.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
