@@ -7761,7 +7761,6 @@
                 <group>
                     <name>lwip</name>
                     <excluded>
-                        <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
@@ -11563,6 +11562,12 @@
                     </excluded>
                     <group>
                         <name>MT071</name>
+                        <group>
+                            <name>pm</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\unknown\MT071\pm\pm.h</name>
+                            </file>
+                        </group>
                         <group>
                             <name>usart</name>
                             <file>

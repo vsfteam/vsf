@@ -19,14 +19,17 @@
 #define __HAL_DRIVER_COMMON_USART_H__
 
 /*============================ INCLUDES ======================================*/
-#if VSF_HAL_USART_IMP_REQUEST_BY_FIFO == ENABLED
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
-#define vsf_hal_usart_def_req_by_fifo()                                         \
+
+#if VSF_HAL_USART_IMP_REQUEST_BY_FIFO == ENABLED
+#   define vsf_hal_usart_def_req_by_fifo()                                      \
             __vsf_usart_req_by_fifo_t   __req_by_fifo;
+#endif
 
 /*============================ TYPES =========================================*/
 
+#if VSF_HAL_USART_IMP_REQUEST_BY_FIFO == ENABLED
 typedef struct __vsf_usart_req_t {
     uint32_t max_count;
     uint32_t count;
