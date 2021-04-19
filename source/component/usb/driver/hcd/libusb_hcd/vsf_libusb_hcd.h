@@ -23,6 +23,7 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_LIBUSB == ENABLED
 
+#include "hal/driver/common/template/vsf_template_usb.h"
 #include "component/usb/host/vsf_usbh.h"
 #include "hal/vsf_hal.h"
 

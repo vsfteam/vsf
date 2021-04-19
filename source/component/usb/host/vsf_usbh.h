@@ -616,9 +616,21 @@ extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
 #include "./class/DFU/vsf_usbh_dfu.h"
 #include "./class/DL1x5/vsf_usbh_dl1x5.h"
 
-#include "../driver/hcd/ohci/vsf_ohci.h"
-#include "../driver/otg/dwcotg/vsf_dwcotg_hcd.h"
-#include "../driver/otg/musb/fdrc/vsf_musb_fdrc_hcd.h"
+#if VSF_USBH_USE_HCD_OHCI == ENABLED
+#   include "../driver/hcd/ohci/vsf_ohci.h"
+#endif
+#if VSF_USBH_USE_HCD_DWCOTG == ENABLED
+#   include "../driver/otg/dwcotg/vsf_dwcotg_hcd.h"
+#endif
+#if VSF_USBH_USE_HCD_MUSB_FDRC == ENABLED
+#   include "../driver/otg/musb/fdrc/vsf_musb_fdrc_hcd.h"
+#endif
+#if VSF_USBH_USE_HCD_LIBUSB == ENABLED
+#   include "../driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
+#endif
+#if VSF_USBH_USE_HCD_WINUSB == ENABLED
+#   include "../driver/hcd/winusb_hcd/vsf_winusb_hcd.h"
+#endif
 
 #undef __VSF_USBH_CLASS_IMPLEMENT
 #undef __VSF_USBH_CLASS_IMPLEMENT_CLASS__
