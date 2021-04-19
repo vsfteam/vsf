@@ -24,14 +24,9 @@
 #include "../../__device.h"
 
 #if VSF_HAL_USE_USART == ENABLED
-#include "hal/interface/vsf_interface_usart.h"
 
 #ifndef VSF_HAL_USART_IMP_REQUEST_BY_FIFO
 #   define VSF_HAL_USART_IMP_REQUEST_BY_FIFO    ENABLED
-#endif
-
-#if VSF_HAL_USART_IMP_REQUEST_BY_FIFO == ENABLED
-#   include "hal/driver/common/usart/__usart_common.h"
 #endif
 
 /*============================ MACROS ========================================*/
@@ -100,6 +95,15 @@ enum em_usart_irq_mask_t {
 #endif
 };
 
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/template/vsf_template_usart.h"
+#if VSF_HAL_USART_IMP_REQUEST_BY_FIFO == ENABLED
+#   include "hal/driver/common/usart/__usart_common.h"
+#endif
+
+/*============================ TYPES =========================================*/
+
 struct usart_status_t {
     union {
         inherit(peripheral_status_t)
@@ -120,7 +124,6 @@ struct vsf_usart_t {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
 
