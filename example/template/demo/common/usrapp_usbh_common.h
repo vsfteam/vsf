@@ -66,7 +66,7 @@ typedef struct usrapp_usbh_common_t {
 #endif
 #if VSF_USE_TCPIP == ENABLED && VSF_USBH_USE_ECM == ENABLED
     vk_usbh_class_t ecm;
-#   if VSF_USBH_USE_LIBUSB == ENABLED
+#   if VSF_USBH_USE_RTL8152 == ENABLED
     vk_usbh_class_t rtl8152;
 #   endif
 #endif

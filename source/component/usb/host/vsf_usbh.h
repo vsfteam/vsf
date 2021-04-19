@@ -600,22 +600,54 @@ extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
 
 /*============================ INCLUDES ======================================*/
 
-#include "./class/HUB/vsf_usbh_HUB.h"
-#include "./class/CDC/vsf_usbh_CDC.h"
-#include "./class/CDC/vsf_usbh_CDCECM.h"
-#include "./class/BTHCI/vsf_usbh_BTHCI.h"
-#include "./class/HID/vsf_usbh_HID.h"
-#include "./class/HID/vsf_usbh_ds4.h"
-#include "./class/HID/vsf_usbh_nspro.h"
-#include "./class/HID/vsf_usbh_xb360.h"
-#include "./class/XB1/vsf_usbh_xb1.h"
-#include "./class/libusb/vsf_usbh_libusb.h"
-#include "./class/MSC/vsf_usbh_msc.h"
-#include "./class/UAC/vsf_usbh_uac.h"
-#include "./class/rtl8152/vsf_usbh_rtl8152.h"
-#include "./class/DFU/vsf_usbh_dfu.h"
-#include "./class/DL1x5/vsf_usbh_dl1x5.h"
+// class drivers
+#if VSF_USBH_USE_HUB == ENABLED
+#   include "./class/HUB/vsf_usbh_HUB.h"
+#endif
+#if VSF_USBH_USE_CDC == ENABLED
+#   include "./class/CDC/vsf_usbh_CDC.h"
+#endif
+#if VSF_USBH_USE_ECM == ENABLED
+#   include "./class/CDC/vsf_usbh_CDCECM.h"
+#endif
+#if VSF_USBH_USE_BTHCI == ENABLED
+#   include "./class/BTHCI/vsf_usbh_BTHCI.h"
+#endif
+#if VSF_USBH_USE_HID == ENABLED
+#   include "./class/HID/vsf_usbh_HID.h"
+#endif
+#if VSF_USBH_USE_DS4 == ENABLED
+#   include "./class/HID/vsf_usbh_ds4.h"
+#endif
+#if VSF_USBH_USE_NSPRO == ENABLED
+#   include "./class/HID/vsf_usbh_nspro.h"
+#endif
+#if VSF_USBH_USE_XB360 == ENABLED
+#   include "./class/HID/vsf_usbh_xb360.h"
+#endif
+#if VSF_USBH_USE_XB1 == ENABLED
+#   include "./class/XB1/vsf_usbh_xb1.h"
+#endif
+#if VSF_USBH_USE_LIBUSB == ENABLED
+#   include "./class/libusb/vsf_usbh_libusb.h"
+#endif
+#if VSF_USBH_USE_MSC == ENABLED
+#   include "./class/MSC/vsf_usbh_msc.h"
+#endif
+#if VSF_USBH_USE_UAC == ENABLED
+#   include "./class/UAC/vsf_usbh_uac.h"
+#endif
+#if VSF_USBH_USE_RTL8152 == ENABLED
+#   include "./class/rtl8152/vsf_usbh_rtl8152.h"
+#endif
+#if VSF_USBH_USE_DFU == ENABLED
+#   include "./class/DFU/vsf_usbh_dfu.h"
+#endif
+#if VSF_USBH_USE_DL1X5 == ENABLED
+#   include "./class/DL1x5/vsf_usbh_dl1x5.h"
+#endif
 
+// hcd drivers
 #if VSF_USBH_USE_HCD_OHCI == ENABLED
 #   include "../driver/hcd/ohci/vsf_ohci.h"
 #endif

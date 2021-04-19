@@ -231,6 +231,7 @@
 #define VSF_USBH_USE_HUB                                DISABLED
 #define VSF_USBH_USE_DL1X5                              ENABLED
 #   define VSF_DISP_USE_DL1X5                           ENABLED
+#define VSF_USBH_USE_RTL8152                            ENABLED
 #ifdef __WIN7__
 // winusb seems fail on win7
 #   define VSF_USBH_USE_HCD_LIBUSB                      ENABLED

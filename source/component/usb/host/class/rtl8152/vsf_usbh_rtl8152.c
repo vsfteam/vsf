@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_RTL8152 == ENABLED
 
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #include "../../vsf_usbh.h"

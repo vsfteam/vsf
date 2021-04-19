@@ -83,7 +83,7 @@ usrapp_usbh_common_t usrapp_usbh_common = {
 #endif
 #if VSF_USE_TCPIP == ENABLED && VSF_USBH_USE_ECM == ENABLED
     .ecm.drv            = &vk_usbh_ecm_drv,
-#   if VSF_USBH_USE_LIBUSB == ENABLED
+#   if VSF_USBH_USE_RTL8152 == ENABLED
     .rtl8152.drv        = &vk_usbh_rtl8152_drv,
 #   endif
 #endif
