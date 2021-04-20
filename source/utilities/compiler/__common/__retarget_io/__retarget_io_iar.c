@@ -49,6 +49,10 @@ void __exit(int status)
 #       endif
 
 #       if !(VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
+
+//! statement is unreachable
+#pragma diag_suppress=pe111
+
 SECTION(".vsf.utilities.stdio.iar.remove")
 int remove(const char * pathname)
 {
