@@ -91,6 +91,7 @@ typedef enum vk_file_attr_t {
     VSF_FILE_ATTR_DIRECTORY     = 1 << 4,
     VSF_FILE_ATTR_DYN           = 1 << 7,
     VSF_FILE_ATTR_EXT           = 1 << 8,
+    VSF_FILE_ATTR_USER          = 1 << 9,
 } vk_file_attr_t;
 
 def_simple_class(vk_fs_fop_t) {

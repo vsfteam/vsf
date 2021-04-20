@@ -1297,6 +1297,9 @@ int stat(const char *pathname, struct stat *buf)
 
     memset(buf, 0, sizeof(*buf));
     buf->st_mode = file->attr;
+    if (!(file->attr & S_IFDIR)) {
+        buf->st_mode |= S_IFREG;
+    }
     buf->st_size = file->size;
     __vsf_linux_fs_close_do(file);
     return 0;

@@ -11,17 +11,22 @@
 #   include <time.h>
 #endif
 
+// for fs constants
+#include "component/vsf_component.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define stat            __vsf_linux_stat
 
-#define S_IFDIR         1
+#define S_IFDIR         VSF_FILE_ATTR_DIRECTORY
+#define S_IFREG         VSF_FILE_ATTR_USER
+#define S_IFMT          (S_IFDIR | S_IFREG)
 
 // TODO:
-#define S_ISREG(__MODE) !((__MODE) & VSF_FILE_ATTR_DIRECTORY)
-#define S_ISDIR(__MODE) ((__MODE) & VSF_FILE_ATTR_DIRECTORY)
+#define S_ISREG(__MODE) !((__MODE) & S_IFDIR)
+#define S_ISDIR(__MODE) ((__MODE) & S_IFDIR)
 
 struct stat {
     mode_t      st_mode;
