@@ -31,6 +31,7 @@
 #include "SDL_stdinc.h"
 #include "SDL_version.h"
 
+#include "SDL_keycode.h"
 #include "SDL_keyboard.h"
 #include "SDL_mouse.h"
 #include "SDL_surface.h"
@@ -531,131 +532,6 @@ typedef enum {
     SDL_USEREVENT               = 0x8000,
     SDL_LASTEVENT               = 0xFFFF
 } SDL_EventType;
-
-// events::keyboard
-typedef enum SDL_Keymod {
-    KMOD_NONE                   = 0,
-    KMOD_LSHIFT                 = 1 << 0,
-    KMOD_RSHIFT                 = 1 << 1,
-    KMOD_LCTRL                  = 1 << 2,
-    KMOD_RCTRL                  = 1 << 3,
-    KMOD_LALT                   = 1 << 4,
-    KMOD_RALT                   = 1 << 5,
-    KMOD_LGUI                   = 1 << 6,
-    KMOD_RGUI                   = 1 << 7,
-    KMOD_LMETA                  = 1 << 8,
-    KMOD_RMETA                  = 1 << 9,
-    KMOD_NUM                    = 1 << 12,
-    KMOD_CAPS                   = 1 << 13,
-    KMOD_MODE                   = 1 << 14,
-
-    KMOD_CTRL                   = (KMOD_LCTRL | KMOD_RCTRL),
-    KMOD_SHIFT                  = (KMOD_LSHIFT | KMOD_RSHIFT),
-    KMOD_ALT                    = (KMOD_LALT | KMOD_RALT),
-    KMOD_GUI                    = (KMOD_LGUI | KMOD_RGUI),
-    KMOD_META                   = (KMOD_LMETA | KMOD_RMETA),
-
-    KMOD_RESERVED               = 0x8000,
-} SDL_Keymod;
-typedef int32_t SDL_Keycode;
-enum {
-    SDLK_UNKNOWN                = 0,
-
-    SDLK_BACKSPACE              = '\b',
-    SDLK_RETURN                 = '\r',
-    SDLK_ESCAPE                 = '\033',
-    SDLK_SPACE                  = ' ',
-    SDLK_TAB                    = '\t',
-
-    SDLK_1                      = '1',
-    SDLK_2                      = '2',
-    SDLK_3                      = '3',
-    SDLK_4                      = '4',
-    SDLK_5                      = '5',
-    SDLK_6                      = '6',
-    SDLK_7                      = '7',
-    SDLK_8                      = '8',
-    SDLK_9                      = '9',
-
-    SDLK_COLON                  = ':',
-    SDLK_SEMICOLON              = ';',
-    SDLK_LESS                   = '<',
-    SDLK_EQUALS                 = '=',
-    SDLK_GREATER                = '>',
-    SDLK_QUESTION               = '?',
-    SDLK_AT                     = '@',
-
-    SDLK_a                      = 'a',
-    SDLK_b                      = 'b',
-    SDLK_c                      = 'c',
-    SDLK_d                      = 'd',
-    SDLK_e                      = 'e',
-    SDLK_f                      = 'f',
-    SDLK_g                      = 'g',
-    SDLK_h                      = 'h',
-    SDLK_i                      = 'i',
-    SDLK_j                      = 'j',
-    SDLK_k                      = 'k',
-    SDLK_l                      = 'l',
-    SDLK_m                      = 'm',
-    SDLK_n                      = 'n',
-    SDLK_o                      = 'o',
-    SDLK_p                      = 'p',
-    SDLK_q                      = 'q',
-    SDLK_r                      = 'r',
-    SDLK_s                      = 's',
-    SDLK_t                      = 't',
-    SDLK_u                      = 'u',
-    SDLK_v                      = 'v',
-    SDLK_w                      = 'w',
-    SDLK_x                      = 'x',
-    SDLK_y                      = 'y',
-    SDLK_z                      = 'z',
-
-    SDLK_KP0                    = 256,
-    SDLK_KP1                    = 257,
-    SDLK_KP2                    = 258,
-    SDLK_KP3                    = 259,
-    SDLK_KP4                    = 260,
-    SDLK_KP5                    = 261,
-    SDLK_KP6                    = 262,
-    SDLK_KP7                    = 263,
-    SDLK_KP8                    = 264,
-    SDLK_KP9                    = 265,
-    SDLK_KP_PERIOD              = 266,
-    SDLK_KP_DIVIDE              = 267,
-    SDLK_KP_MULTIPLY            = 268,
-    SDLK_KP_MINUS               = 269,
-    SDLK_KP_PLUS                = 270,
-    SDLK_KP_ENTER               = 271,
-    SDLK_KP_EQUALS              = 272,
-
-    SDLK_UP                     = 273,
-    SDLK_DOWN                   = 274,
-    SDLK_RIGHT                  = 275,
-    SDLK_LEFT                   = 276,
-    SDLK_INSERT                 = 277,
-    SDLK_HOME                   = 278,
-    SDLK_END                    = 279,
-    SDLK_PAGEUP                 = 280,
-    SDLK_PAGEDOWN               = 281,
-
-    SDLK_F1                     = 282,
-    SDLK_F2                     = 283,
-    SDLK_F3                     = 284,
-    SDLK_F4                     = 285,
-    SDLK_F5                     = 286,
-    SDLK_F6                     = 287,
-    SDLK_F7                     = 288,
-    SDLK_F8                     = 289,
-    SDLK_F9                     = 290,
-    SDLK_F10                    = 291,
-    SDLK_F11                    = 292,
-    SDLK_F12                    = 293,
-    SDLK_F13                    = 294,
-    SDLK_F14                    = 295,
-    SDLK_F15                    = 296,
-};
 
 enum {
     SDL_HAT_CENTERED            = 0x00,
