@@ -562,6 +562,7 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\dirent.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\errno.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\fcntl.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libgen.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libusb.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\limits.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\poll.h" />
@@ -1255,6 +1256,7 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdlib.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_string.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_time.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\libgen\vsf_linux_libgen.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\libusb\vsf_linux_libusb.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\port\busybox\busybox.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\port\busybox\shell\vsh.c" />

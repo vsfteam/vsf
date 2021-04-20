@@ -979,6 +979,9 @@
     <Filter Include="vsf\component\3rd-party\lua\port">
       <UniqueIdentifier>{292b3732-6c3c-459f-b1e3-57307be0ef8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\lib\libgen">
+      <UniqueIdentifier>{ef83993e-2d4d-4384-b4f6-aca89f84be43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -2906,6 +2909,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_repeat_macro.h">
       <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libgen.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -4927,6 +4933,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\port\lua_port.c">
       <Filter>vsf\component\3rd-party\lua\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\libgen\vsf_linux_libgen.c">
+      <Filter>vsf\shell\sys\linux\lib\libgen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
