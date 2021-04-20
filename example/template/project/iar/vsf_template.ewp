@@ -12429,6 +12429,15 @@
                 <name>compiler</name>
                 <group>
                     <name>__common</name>
+                    <group>
+                        <name>__retarget_io</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\__common\__retarget_io\__retarget_io_gcc_llvm.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\__common\__retarget_io\__retarget_io_iar.c</name>
+                        </file>
+                    </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\__common\__compiler.h</name>
                     </file>

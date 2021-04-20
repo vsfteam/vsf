@@ -34,19 +34,17 @@
 
 #include "arm_compiler.h"
 
-
-#if !__IS_COMPILER_IAR__ && !__IS_COMPILER_GCC__
-#include <rt_sys.h>
-#endif
-
 #ifndef UNUSED_PARAM
-# define UNUSED_PARAM(__VAL)    (__VAL) = (__VAL)
+#   define UNUSED_PARAM(__VAL)      (__VAL) = (__VAL)
 #endif
 
 #define __USE_COMMON_RETARGET_IO_C__
 #include "../__common/__retarget_io.c"
 
 #if __IS_COMPILER_ARM_COMPILER_5__ || __IS_COMPILER_ARM_COMPILER_6__
+
+#   include <rt_sys.h>
+
 #define RTE_Compiler_IO_STDOUT
 #define RTE_Compiler_IO_STDOUT_User
 #define RTE_Compiler_IO_STDIN
@@ -364,5 +362,4 @@ int _sys_read (FILEHANDLE fh, uint8_t *buf, uint32_t len, int mode) {
   return -1;
 }
 
-#endif
- 
+#endif      // __IS_COMPILER_ARM_COMPILER_5__ || __IS_COMPILER_ARM_COMPILER_6__
