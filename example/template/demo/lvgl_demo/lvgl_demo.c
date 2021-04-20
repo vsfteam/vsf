@@ -43,6 +43,24 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static lv_coord_t __lvgl_touchscreen_get_width(void)
+{
+#   ifndef LV_HOR_RES_MAX
+    return usrapp_ui_common.disp->param.width;
+#   else
+    return LV_HOR_RES_MAX;
+#   endif
+}
+
+static lv_coord_t __lvgl_touchscreen_get_height(void)
+{
+#   ifndef LV_VER_RES_MAX
+    return usrapp_ui_common.disp->param.height;
+#   else
+    return LV_VER_RES_MAX;
+#   endif
+}
+
 static void __lvgl_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
 {
     switch (type) {
@@ -89,24 +107,8 @@ static bool __lvgl_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *
     data->state = vsf_input_touchscreen_is_down(ts_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 
 #if APP_LVGL_DEMO_CFG_TOUCH_REMAP == ENABLED
-
-    lv_coord_t width, height;
-#   if !defined(LV_HOR_RES_MAX) || !defined(LV_VER_RES_MAX)
-    vk_disp_t *vsf_disp = usrapp_ui_common.disp;
-#   endif
-#   ifndef LV_HOR_RES_MAX
-    width = vsf_disp->param.width;
-#   else
-    width = LV_HOR_RES_MAX;
-#   endif
-#   ifndef LV_VER_RES_MAX
-    height = vsf_disp->param.height;
-#   else
-    height = LV_VER_RES_MAX;
-#   endif
-
-    data->point.x = vsf_input_touchscreen_get_x(ts_evt) * width / ts_evt->info.width;
-    data->point.y = vsf_input_touchscreen_get_y(ts_evt) * height / ts_evt->info.height;
+    data->point.x = vsf_input_touchscreen_get_x(ts_evt) * __lvgl_touchscreen_get_width() / ts_evt->info.width;
+    data->point.y = vsf_input_touchscreen_get_y(ts_evt) * __lvgl_touchscreen_get_height() / ts_evt->info.height;
 #else
     data->point.x = vsf_input_touchscreen_get_x(ts_evt);
     data->point.y = vsf_input_touchscreen_get_y(ts_evt);
@@ -308,16 +310,8 @@ int VSF_USER_ENTRY(void)
                         APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE);
     lv_disp_drv_init(&disp_drv);
 
-#ifndef LV_HOR_RES_MAX
-    disp_drv.hor_res = vsf_disp->param.width;
-#else
-    disp_drv.hor_res = LV_HOR_RES_MAX;
-#endif
-#ifndef LV_VER_RES_MAX
-    disp_drv.ver_res = vsf_disp->param.height;
-#else
-    disp_drv.ver_res = LV_VER_RES_MAX;
-#endif
+    disp_drv.hor_res = __lvgl_touchscreen_get_width();
+    disp_drv.ver_res = __lvgl_touchscreen_get_height();
     disp_drv.flush_cb = vsf_lvgl_disp_flush;
     disp_drv.buffer = &usrapp_ui_common.lvgl.disp_buf;
     disp = lv_disp_drv_register(&disp_drv);
