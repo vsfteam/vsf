@@ -144,7 +144,7 @@ static void __vk_disp_sdl2_flush_thread(void *arg)
 
     __vsf_arch_irq_set_background(irq_thread);
 
-    do {
+    while (true) {
         __vsf_arch_irq_start(irq_thread);
             vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
         __vsf_arch_irq_end(irq_thread, false);
@@ -155,7 +155,7 @@ static void __vk_disp_sdl2_flush_thread(void *arg)
         if (disp_sdl2->flush_delay_ms > 0) {
             __vsf_arch_irq_sleep(disp_sdl2->flush_delay_ms);
         }
-    } while (1);
+    }
 }
 
 static uint_fast16_t __vk_disp_sdl2_keycode_remap(SDL_Keycode keycode)

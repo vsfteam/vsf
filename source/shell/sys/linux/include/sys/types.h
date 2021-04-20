@@ -1,8 +1,9 @@
 #ifndef __LINUX_TYPES_H__
 #define __LINUX_TYPES_H__
 
-// for compiler
-#include "utilities/vsf_utilities.h"
+// do not include this for compiler, because type.h is actually belong to compiler layer,
+//  and compiler layer can not include vsf_utilities.h directly
+//#include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
 extern "C" {
