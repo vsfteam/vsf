@@ -1310,8 +1310,16 @@ int access(const char *pathname, int mode)
     int fd = open(pathname, mode);
     if (fd < 0) { return -1; }
 
+    int ret = 0;
+    vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
+    if (    ((mode & R_OK) && !(vfs_file->attr & VSF_FILE_ATTR_READ))
+        ||  ((mode & W_OK) && !(vfs_file->attr & VSF_FILE_ATTR_WRITE))
+        ||  ((mode & X_OK) && !(vfs_file->attr & VSF_FILE_ATTR_EXCUTE))) {
+        ret = -1;
+    }
+
     close(fd);
-    return 0;
+    return ret;
 }
 
 int unlink(const char *pathname)

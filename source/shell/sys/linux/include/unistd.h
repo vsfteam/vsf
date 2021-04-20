@@ -88,6 +88,10 @@ char *realpath(const char *path, char *resolved_path);
 
 int creat(const char *pathname, mode_t mode);
 int open(const char *pathname, int flags, ...);
+#define F_OK            (1 << 0)
+#define R_OK            (1 << 1)
+#define W_OK            (1 << 2)
+#define X_OK            (1 << 3)
 int access(const char *pathname, int mode);
 int unlink(const char *pathname);
 int remove(const char *pathname);
