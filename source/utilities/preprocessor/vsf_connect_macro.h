@@ -93,7 +93,7 @@ extern "C" {
 #define VSF_MCONNECT17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)       \
             __VSF_MCONNECT17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 //! overload VSF_MCONNECT
 #   define VSF_MCONNECT(...)     __PLOOC_EVAL(VSF_MCONNECT, __VA_ARGS__)(__VA_ARGS__)
 #endif
