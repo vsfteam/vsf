@@ -73,11 +73,16 @@ static void __vsf_lvgl_disp_on_ready(vk_disp_t *disp)
     lv_disp_flush_ready(disp_drv);
 }
 
+static void __vsf_lvgl_disp_on_inited(vk_disp_t *disp)
+{
+    disp->ui_on_ready = __vsf_lvgl_disp_on_ready;
+}
+
 void vsf_lvgl_disp_bind(vk_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv)
 {
     lvgl_disp_drv->user_data = disp;
     disp->ui_data = lvgl_disp_drv;
-    disp->ui_on_ready = __vsf_lvgl_disp_on_ready;
+    disp->ui_on_ready = __vsf_lvgl_disp_on_inited;
     vk_disp_init(disp);
 }
 
