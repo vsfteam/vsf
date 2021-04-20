@@ -1314,7 +1314,7 @@ int access(const char *pathname, int mode)
     vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
     if (    ((mode & R_OK) && !(vfs_file->attr & VSF_FILE_ATTR_READ))
         ||  ((mode & W_OK) && !(vfs_file->attr & VSF_FILE_ATTR_WRITE))
-        ||  ((mode & X_OK) && !(vfs_file->attr & VSF_FILE_ATTR_EXCUTE))) {
+        ||  ((mode & X_OK) && !(vfs_file->attr & VSF_FILE_ATTR_EXECUTE))) {
         ret = -1;
     }
 
