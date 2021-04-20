@@ -123,16 +123,19 @@ static bool __lvgl_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *
 static bool __lvgl_mouse_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
     vk_mouse_evt_t* mouse_evt = &usrapp_ui_common.lvgl.mouse_evt;
+    lv_indev_state_t* state = &usrapp_ui_common.lvgl.state;
 
-    // only support left key
-    if (0 == vk_input_mouse_evt_button_get(mouse_evt)) {
-        data->state = vk_input_mouse_evt_button_is_down(mouse_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
-    } else {
-        data->state = LV_INDEV_STATE_REL;
+    uint8_t id = vk_input_mouse_evt_get(mouse_evt);
+    if (id == VSF_INPUT_MOUSE_EVT_BUTTON) {
+        // only support left key
+        if (0 == vk_input_mouse_evt_button_get(mouse_evt)) {
+            *state = vk_input_mouse_evt_button_is_down(mouse_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+        }
     }
 
     data->point.x = vk_input_mouse_evt_get_x(mouse_evt);
     data->point.y = vk_input_mouse_evt_get_y(mouse_evt);
+    data->state = *state;
 
     return false;
 }

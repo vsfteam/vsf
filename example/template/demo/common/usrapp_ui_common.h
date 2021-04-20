@@ -83,6 +83,7 @@ typedef struct usrapp_ui_common_t {
         vk_touchscreen_evt_t ts_evt;
 #else
         vk_mouse_evt_t mouse_evt;
+        lv_indev_state_t state;
 #endif
 #if LV_USE_GROUP == ENABLED
         vk_keyboard_evt_t kb_evt;
