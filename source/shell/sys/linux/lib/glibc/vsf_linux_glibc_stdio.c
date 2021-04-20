@@ -343,4 +343,16 @@ int rename(const char *old_filename, const char *new_filename)
     return -1;
 }
 
+int remove(const char * pathname)
+{
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
+    // TODO: remove file by unlink, remove directory by rmdir
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO

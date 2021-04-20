@@ -980,19 +980,6 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
 }
 #endif
 
-// conflicts with remove in ucrt, so make sure remove is defined to __vsf_linux_remove
-int remove(const char * pathname)
-{
-    char fullpath[MAX_PATH];
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
-        return -1;
-    }
-
-    // TODO: remove file by unlink, remove directory by rmdir
-    VSF_LINUX_ASSERT(false);
-    return -1;
-}
-
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
     vsf_protect_t orig;
