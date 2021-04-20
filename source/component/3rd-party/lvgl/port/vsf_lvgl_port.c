@@ -44,7 +44,7 @@ void vsf_lvgl_printf(lv_log_level_t level, const char *file, uint32_t line, cons
 }
 #endif
 
-void vsf_lvgl_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
+void vsf_lvgl_flush_disp(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
 {
     lv_coord_t hres = disp_drv->rotated == 0 ? disp_drv->hor_res : disp_drv->ver_res;
     lv_coord_t vres = disp_drv->rotated == 0 ? disp_drv->ver_res : disp_drv->hor_res;
@@ -78,7 +78,7 @@ static void __vsf_lvgl_disp_on_inited(vk_disp_t *disp)
     disp->ui_on_ready = __vsf_lvgl_disp_on_ready;
 }
 
-void vsf_lvgl_disp_bind(vk_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv)
+void vsf_lvgl_bind_disp(vk_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv)
 {
     lvgl_disp_drv->user_data = disp;
     disp->ui_data = lvgl_disp_drv;
