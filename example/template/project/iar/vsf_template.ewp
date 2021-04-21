@@ -12297,6 +12297,9 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\fcntl.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libgen.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb.h</name>
                         </file>
                         <file>
@@ -12351,6 +12354,12 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_time.c</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>libgen</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\libgen\vsf_linux_libgen.c</name>
                             </file>
                         </group>
                         <group>
