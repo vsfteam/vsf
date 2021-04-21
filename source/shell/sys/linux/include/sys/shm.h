@@ -3,6 +3,8 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
+#if VSF_LINUX_CFG_SHM_NUM > 0
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../sys/types.h"
 #   include "../sys/ipc.h"
@@ -16,6 +18,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct shmid_ds {
+    struct ipc_perm         shm_perm;
+    int                     shm_segsz;
+    time_t                  shm_atime;
+    time_t                  shm_dtime;
+    time_t                  shm_ctime;
+    unsigned short          shm_cpid;
+    unsigned short          shm_lpid;
+    short                   shm_nattch;
+};
 
 #define shmget              __vsf_linux_shmget
 #define shmat               __vsf_linux_shmat
@@ -31,4 +44,5 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf);
 }
 #endif
 
-#endif
+#endif      // VSF_LINUX_CFG_SHM_NUM
+#endif      // __VSF_LINUX_SHM_H__

@@ -13,14 +13,16 @@
 extern "C" {
 #endif
 
+#define IPC_PRIVATE         ((key_t)0)
 enum {
-    IPC_PRIVATE             = 0,
-    IPC_CREAT               = 1,
-    IPC_EXCL                = 2,
-    IPC_NOEAIT              = 3,
-    IPC_RMID                = 4,
-    IPC_SET                 = 5,
-    IPC_STAT                = 6,
+    IPC_CREAT               = 1 << 12,
+    IPC_EXCL                = 2 << 12,
+    IPC_NOEAIT              = 4 << 12,
+};
+enum {
+    IPC_RMID,
+    IPC_SET,
+    IPC_STAT,
 };
 
 struct ipc_perm {
@@ -31,17 +33,6 @@ struct ipc_perm {
     gid_t                   cgid;
     unsigned short          mode;
     unsigned short          seq;
-};
-
-struct shmid_ds {
-    struct ipc_perm         shm_perm;
-    int                     shm_segsz;
-    time_t                  shm_atime;
-    time_t                  shm_dtime;
-    time_t                  shm_ctime;
-    unsigned short          shm_cpid;
-    unsigned short          shm_lpid;
-    short                   shm_nattch;
 };
 
 #define ftok                __vsf_linux_ftok

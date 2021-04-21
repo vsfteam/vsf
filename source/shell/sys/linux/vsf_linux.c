@@ -103,15 +103,33 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+#if VSF_LINUX_CFG_SHM_NUM > 0
+dcl_vsf_bitmap(vsf_linux_shm_bitmap, VSF_LINUX_CFG_SHM_NUM);
+typedef struct vsf_linux_shm_mem_t {
+    key_t key;
+    void *buffer;
+    uint32_t size;
+} vsf_linux_shm_mem_t;
+#endif
+
 typedef struct vsf_linux_t {
     int cur_tid;
     int cur_pid;
     vsf_dlist_t process_list;
 
     vsf_linux_process_t *kernel_process;
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
     int sig_pid;
+#endif
 
     vsf_linux_stdio_stream_t stdio_stream;
+
+#if VSF_LINUX_CFG_SHM_NUM > 0
+    struct {
+        vsf_bitmap(vsf_linux_shm_bitmap) bitmap;
+        vsf_linux_shm_mem_t mem[VSF_LINUX_CFG_SHM_NUM];
+    } shm;
+#endif
 } vsf_linux_t;
 
 typedef struct vsf_linux_main_priv_t {
@@ -1551,22 +1569,76 @@ key_t ftok(const char *pathname, int id)
     return -1;
 }
 
+#if VSF_LINUX_CFG_SHM_NUM > 0
 // shm.h
 int shmget(key_t key, size_t size, int shmflg)
 {
+    VSF_LINUX_ASSERT((IPC_PRIVATE == key) || (shmflg & IPC_CREAT));
+
+    vsf_protect_t orig = vsf_protect_sched();
+        key = vsf_bitmap_ffz(&__vsf_linux.shm.bitmap, VSF_LINUX_CFG_SHM_NUM);
+        if (key >= 0) {
+            vsf_bitmap_set(&__vsf_linux.shm.bitmap, key);
+        }
+    vsf_unprotect_sched(orig);
+
+    if (key < 0) {
+        return key;
+    }
+
+    vsf_linux_shm_mem_t *mem = &__vsf_linux.shm.mem[key++];
+    mem->size = size;
+    mem->key = key;
+    mem->buffer = malloc(size);
+    if (NULL == mem->buffer) {
+        shmctl(key, IPC_RMID, NULL);
+        return -1;
+    }
+
+    return key;
 }
 
 void * shmat(int shmid, const void *shmaddr, int shmflg)
 {
+    vsf_linux_shm_mem_t *mem = &__vsf_linux.shm.mem[shmid];
+    return mem->buffer;
 }
 
 int shmdt(const void *shmaddr)
 {
+    return 0;
 }
 
 int shmctl(int shmid, int cmd, struct shmid_ds *buf)
 {
+    shmid--;
+    VSF_LINUX_ASSERT(shmid < VSF_LINUX_CFG_SHM_NUM);
+
+    vsf_linux_shm_mem_t *mem = &__vsf_linux.shm.mem[shmid];
+    switch (cmd) {
+    case IPC_STAT:
+        memset(buf, 0, sizeof(*buf));
+        buf->shm_segsz = mem->size;
+        buf->shm_perm.key = mem->key;
+        break;
+    case IPC_SET:
+        VSF_LINUX_ASSERT(false);
+        break;
+    case IPC_RMID: {
+            if (mem->buffer != NULL) {
+                free(mem->buffer);
+                mem->buffer = NULL;
+            }
+
+            vsf_protect_t orig = vsf_protect_sched();
+                vsf_bitmap_clear(&__vsf_linux.shm.bitmap, shmid);
+            vsf_unprotect_sched(orig);
+        }
+        break;
+    }
+    return 0;
 }
+#endif      // VSF_LINUX_CFG_SHM_NUM
 
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop

@@ -34,6 +34,10 @@
 #   define VSF_LINUX_CFG_SUPPORT_SIG            DISABLED
 #endif
 
+#ifndef VSF_LINUX_CFG_SHM_NUM
+#   define VSF_LINUX_CFG_SHM_NUM                32
+#endif
+
 // to use simple libc
 //  1. enable VSF_LINUX_USE_SIMPLE_LIBC
 //  2. add "shell/sys/linux/include/simple_libc to include path
