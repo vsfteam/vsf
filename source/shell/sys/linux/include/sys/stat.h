@@ -1,5 +1,5 @@
-#ifndef __STAT_H__
-#define __STAT_H__
+#ifndef __VSF_LINUX_STAT_H__
+#define __VSF_LINUX_STAT_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

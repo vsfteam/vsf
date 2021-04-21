@@ -1,5 +1,5 @@
-#ifndef __POLL_H__
-#define __POLL_H__
+#ifndef __VSF_LINUX_POLL_H__
+#define __VSF_LINUX_POLL_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

@@ -1,5 +1,5 @@
-#ifndef __SIGNAL_H__
-#define __SIGNAL_H__
+#ifndef __VSF_LINUX_SIGNAL_H__
+#define __VSF_LINUX_SIGNAL_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

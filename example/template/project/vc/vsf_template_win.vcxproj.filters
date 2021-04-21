@@ -2913,6 +2913,12 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libgen.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\ipc.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\shm.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">

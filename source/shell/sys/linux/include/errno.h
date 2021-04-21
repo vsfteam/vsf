@@ -1,5 +1,5 @@
-#ifndef __ERRNO_H__
-#define __ERRNO_H__
+#ifndef __VSF_LINUX_ERRNO_H__
+#define __VSF_LINUX_ERRNO_H__
 
 #if defined(__clang__)
 #pragma clang diagnostic push

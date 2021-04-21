@@ -1,5 +1,5 @@
-#ifndef __UNISTD_H__
-#define __UNISTD_H__
+#ifndef __VSF_LINUX_UNISTD_H__
+#define __VSF_LINUX_UNISTD_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

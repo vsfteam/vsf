@@ -1,5 +1,5 @@
-#ifndef __TERMIOS_H__
-#define __TERMIOS_H__
+#ifndef __VSF_LINUX_TERMIOS_H__
+#define __VSF_LINUX_TERMIOS_H__
 
 #ifdef __cplusplus
 extern "C" {

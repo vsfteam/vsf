@@ -12275,7 +12275,13 @@
                         <group>
                             <name>sys</name>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\ipc.h</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\mount.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\shm.h</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\stat.h</name>

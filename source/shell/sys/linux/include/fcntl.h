@@ -1,5 +1,5 @@
-#ifndef __FCNTL_H__
-#define __FCNTL_H__
+#ifndef __VSF_LINUX_FCNTL_H__
+#define __VSF_LINUX_FCNTL_H__
 
 #ifdef __cplusplus
 extern "C" {

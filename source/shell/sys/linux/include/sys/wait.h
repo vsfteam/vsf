@@ -1,5 +1,5 @@
-#ifndef __WAIT_H__
-#define __WAIT_H__
+#ifndef __VSF_LINUX_WAIT_H__
+#define __VSF_LINUX_WAIT_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

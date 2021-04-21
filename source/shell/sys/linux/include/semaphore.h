@@ -1,5 +1,5 @@
-#ifndef __SEMAPHORE_H__
-#define __SEMAPHORE_H__
+#ifndef __VSF_LINUX_SEMAPHORE_H__
+#define __VSF_LINUX_SEMAPHORE_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 #include "kernel/vsf_kernel.h"

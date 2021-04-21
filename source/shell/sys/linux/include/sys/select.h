@@ -1,5 +1,5 @@
-#ifndef __SELECT_H__
-#define __SELECT_H__
+#ifndef __VSF_LINUX_SELECT_H__
+#define __VSF_LINUX_SELECT_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

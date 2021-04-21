@@ -1,5 +1,5 @@
-#ifndef __SYS_TIME_H__
-#define __SYS_TIME_H__
+#ifndef __VSF_LINUX_SYS_TIME_H__
+#define __VSF_LINUX_SYS_TIME_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

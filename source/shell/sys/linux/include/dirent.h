@@ -1,5 +1,5 @@
-#ifndef __DIRENT_H__
-#define __DIRENT_H__
+#ifndef __VSF_LINUX_DIRENT_H__
+#define __VSF_LINUX_DIRENT_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

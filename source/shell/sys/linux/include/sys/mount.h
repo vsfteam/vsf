@@ -1,5 +1,5 @@
-#ifndef __MOUNT_H__
-#define __MOUNT_H__
+#ifndef __VSF_LINUX_MOUNT_H__
+#define __VSF_LINUX_MOUNT_H__
 
 #ifdef __cplusplus
 extern "C" {

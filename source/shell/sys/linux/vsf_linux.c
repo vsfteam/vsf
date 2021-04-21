@@ -35,6 +35,8 @@
 #   include "./include/sys/select.h"
 #   include "./include/sys/wait.h"
 #   include "./include/sys/mount.h"
+#   include "./include/sys/ipc.h"
+#   include "./include/sys/shm.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -47,6 +49,8 @@
 #   include <sys/select.h>
 #   include <sys/wait.h>
 #   include <sys/mount.h>
+#   include <sys/ipc.h>
+#   include <sys/shm.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -1538,6 +1542,30 @@ unsigned sleep(unsigned sec)
 void * memalign(size_t alignment, size_t size)
 {
     return vsf_heap_malloc_aligned(size, alignment);
+}
+
+// ipc.h
+key_t ftok(const char *pathname, int id)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+// shm.h
+int shmget(key_t key, size_t size, int shmflg)
+{
+}
+
+void * shmat(int shmid, const void *shmaddr, int shmflg)
+{
+}
+
+int shmdt(const void *shmaddr)
+{
+}
+
+int shmctl(int shmid, int cmd, struct shmid_ds *buf)
+{
 }
 
 #if __IS_COMPILER_GCC__

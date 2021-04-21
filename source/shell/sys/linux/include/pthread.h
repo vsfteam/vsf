@@ -1,5 +1,5 @@
-#ifndef __PTHREAD_H__
-#define __PTHREAD_H__
+#ifndef __VSF_LINUX_PTHREAD_H__
+#define __VSF_LINUX_PTHREAD_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

@@ -576,8 +576,10 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\string.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\time.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\wchar.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\ipc.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\mount.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\select.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\shm.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\stat.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\time.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\types.h" />

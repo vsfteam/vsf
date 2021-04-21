@@ -1,5 +1,5 @@
-#ifndef __LINUX_TYPES_H__
-#define __LINUX_TYPES_H__
+#ifndef __VSF_LINUX_TYPES_H__
+#define __VSF_LINUX_TYPES_H__
 
 // do not include this for compiler, because type.h is actually belong to compiler layer,
 //  and compiler layer can not include vsf_utilities.h directly
@@ -22,6 +22,7 @@ typedef int                 ssize_t;
 typedef unsigned int        size_t;
 #endif
 
+typedef int                 key_t;
 typedef int                 pid_t;
 typedef int                 mode_t;
 typedef unsigned int        uid_t;

@@ -1,5 +1,5 @@
-#ifndef __LIBGEN_H__
-#define __LIBGEN_H__
+#ifndef __VSF_LINUX_LIBGEN_H__
+#define __VSF_LINUX_LIBGEN_H__
 
 #ifdef __cplusplus
 extern "C" {
