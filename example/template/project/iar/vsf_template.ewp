@@ -12051,6 +12051,15 @@
                     </file>
                 </group>
                 <group>
+                    <name>distbus_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.h</name>
+                    </file>
+                </group>
+                <group>
                     <name>fifo_stream</name>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\fifo_stream\vsf_fifo_stream.c</name>

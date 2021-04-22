@@ -57,7 +57,7 @@ typedef struct vsf_distbus_msgheader_t {
     uint16_t                                flag;
 } vsf_distbus_msgheader_t;
 def_simple_class(vsf_distbus_msg_t) {
-    private_member(
+    protected_member(
         union {
             uint32_t                        pos;
             vsf_slist_node_t                node;

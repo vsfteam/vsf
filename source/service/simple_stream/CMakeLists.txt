@@ -7,3 +7,4 @@ target_sources(${VSF_LIB_NAME} INTERFACE
 add_subdirectory(block_stream)
 add_subdirectory(fifo_stream)
 add_subdirectory(mem_stream)
+add_subdirectory(distbus_stream)

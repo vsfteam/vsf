@@ -982,6 +982,9 @@
     <Filter Include="vsf\shell\sys\linux\lib\libgen">
       <UniqueIdentifier>{ef83993e-2d4d-4384-b4f6-aca89f84be43}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\simple_stream\distbus_stream">
+      <UniqueIdentifier>{ba4d14ee-14bf-4dcb-a808-d75f56e31383}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -2918,6 +2921,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\shm.h">
       <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.h">
+      <Filter>vsf\service\simple_stream\distbus_stream</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -4942,6 +4948,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\libgen\vsf_linux_libgen.c">
       <Filter>vsf\shell\sys\linux\lib\libgen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.c">
+      <Filter>vsf\service\simple_stream\distbus_stream</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

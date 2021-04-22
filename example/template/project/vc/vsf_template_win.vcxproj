@@ -531,6 +531,7 @@
     <ClInclude Include="..\..\..\..\source\service\pbuf\vsf_pbuf_pool.h" />
     <ClInclude Include="..\..\..\..\source\service\pool\vsf_pool.h" />
     <ClInclude Include="..\..\..\..\source\service\simple_stream\block_stream\vsf_block_stream.h" />
+    <ClInclude Include="..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.h" />
     <ClInclude Include="..\..\..\..\source\service\simple_stream\fifo_stream\vsf_fifo_stream.h" />
     <ClInclude Include="..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.h" />
     <ClInclude Include="..\..\..\..\source\service\simple_stream\vsf_simple_stream.h" />
@@ -1221,6 +1222,7 @@
     <ClCompile Include="..\..\..\..\source\service\pbuf\vsf_pbuf_pool.c" />
     <ClCompile Include="..\..\..\..\source\service\pool\vsf_pool.c" />
     <ClCompile Include="..\..\..\..\source\service\simple_stream\block_stream\vsf_block_stream.c" />
+    <ClCompile Include="..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.c" />
     <ClCompile Include="..\..\..\..\source\service\simple_stream\fifo_stream\vsf_fifo_stream.c" />
     <ClCompile Include="..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.c" />
     <ClCompile Include="..\..\..\..\source\service\simple_stream\vsf_simple_stream.c" />

@@ -69,6 +69,8 @@ vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t 
     VSF_SERVICE_ASSERT(distbus != NULL);
     vsf_distbus_msg_t *msg = distbus->op.mem.alloc_msg(size + sizeof(vsf_distbus_msg_t));
     if (msg != NULL) {
+        msg->pos = 0;
+        vsf_slist_init_node(vsf_distbus_msg_t, node, msg);
         msg->header.datalen = size;
         if (buf != NULL) {
             *buf = (uint8_t *)&msg->header + sizeof(msg->header);
@@ -224,7 +226,9 @@ vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus)
     distbus->mtu = 0;
     __vsf_slist_foreach_unsafe(vsf_distbus_service_t, node, &distbus->service_list) {
         VSF_SERVICE_ASSERT((_->info != NULL) && (_->info->mtu > 0));
-        distbus->mtu += _->info->mtu;
+        if (_->info->mtu > distbus->mtu) {
+            distbus->mtu = _->info->mtu;
+        }
     }
     VSF_SERVICE_ASSERT(distbus->mtu > 0);
 

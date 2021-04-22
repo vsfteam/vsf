@@ -35,7 +35,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_stream_on_write(vsf_stream_t *stream)
+void __vsf_stream_on_write(vsf_stream_t *stream)
 {
     uint_fast32_t data_len = stream->op->get_data_length(stream);
 
@@ -54,7 +54,7 @@ static void __vsf_stream_on_write(vsf_stream_t *stream)
     }
 }
 
-static void __vsf_stream_on_read(vsf_stream_t *stream)
+void __vsf_stream_on_read(vsf_stream_t *stream)
 {
     uint_fast32_t avail_len = stream->op->get_avail_length(stream);
 

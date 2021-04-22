@@ -29,10 +29,8 @@
 
 #if     defined(__VSF_SIMPLE_STREAM_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
-#   undef __VSF_SIMPLE_STREAM_CLASS_IMPLEMENT
 #elif   defined(__VSF_SIMPLE_STREAM_CLASS_INHERIT__)
 #   define __PLOOC_CLASS_INHERIT__
-#   undef __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -166,15 +164,27 @@ extern void vsf_stream_disconnect_tx(vsf_stream_t *stream);
 extern bool vsf_stream_is_rx_connected(vsf_stream_t *stream);
 extern bool vsf_stream_is_tx_connected(vsf_stream_t *stream);
 
+#if     defined(__VSF_SIMPLE_STREAM_CLASS_IMPLEMENT)                            \
+    ||  defined(__VSF_SIMPLE_STREAM_CLASS_INHERIT__)
+extern void __vsf_stream_on_read(vsf_stream_t *stream);
+extern void __vsf_stream_on_write(vsf_stream_t *stream);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_SIMPLE_STREAM_CLASS_IMPLEMENT
+#undef __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 
 /*============================ INCLUDES ======================================*/
 
 #include "./fifo_stream/vsf_fifo_stream.h"
 #include "./mem_stream/vsf_mem_stream.h"
 #include "./block_stream/vsf_block_stream.h"
+#if VSF_USE_DISTBUS == ENABLED
+#   include "./distbus_stream/vsf_distbus_stream.h"
+#endif
 
 #endif      // VSF_USE_SIMPLE_STREAM
 #endif      // __VSF_SIMPLE_STREAM_H__
