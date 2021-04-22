@@ -619,6 +619,11 @@ static void __vsf_tgui_on_ready(vk_disp_t* disp)
 #endif
 }
 
+static void __vsf_tgui_on_inited(vk_disp_t* disp)
+{
+    disp->ui_on_ready = __vsf_tgui_on_ready;
+}
+
 #if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
 uint32_t vsf_tgui_port_get_refresh_rate(void)
 {
@@ -703,7 +708,7 @@ void vsf_tgui_bind_disp(vk_disp_t* disp, void* bitmap_data, size_t bitmap_size)
     __vsf_tgui_port.bitmap_size = bitmap_size;
 
     disp->ui_data = bitmap_data;
-    disp->ui_on_ready = __vsf_tgui_on_ready;
+    disp->ui_on_ready = __vsf_tgui_on_inited;
     vk_disp_init(disp);
 
     __vsf_tgui_port.is_ready = true;
