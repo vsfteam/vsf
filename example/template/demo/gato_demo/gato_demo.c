@@ -91,6 +91,9 @@ int VSF_USER_ENTRY(void)
     __usrapp_gato.notifier.on_evt = (vk_input_on_evt_t)__gato_on_evt;
     vk_input_notifier_register(&__usrapp_gato.notifier);
 
+    // Wait for vk_disp_init() to complete
+    vsf_thread_wfe(VSF_EVT_USER);
+
     while (1) {
         sample(&surface, fps);
         vk_disp_refresh(disp, NULL, pixels);
