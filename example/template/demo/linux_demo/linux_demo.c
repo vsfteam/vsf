@@ -149,6 +149,9 @@ int vsf_linux_create_fhs(void)
 #if APP_USE_LVGL_DEMO == ENABLED
     extern int lvgl_main(int argc, char *argv[]);
     busybox_bind("/sbin/lvgl", lvgl_main);
+#elif APP_USE_LVGL_TERMINAL_DEMO == ENABLED
+    extern int lvgl_main(int argc, char *argv[]);
+    lvgl_main(0, NULL);
 #endif
 #if APP_USE_TGUI_DEMO == ENABLED
     extern int tgui_main(int argc, char *argv[]);

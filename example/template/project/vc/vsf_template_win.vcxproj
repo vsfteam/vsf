@@ -1309,6 +1309,7 @@
     <ClCompile Include="..\..\demo\lua_demo\love_demo.c" />
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_application.c" />
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_demo.c" />
+    <ClCompile Include="..\..\demo\lvgl_demo\lvgl_terminal_application.c" />
     <ClCompile Include="..\..\demo\lwip_demo\lwip_demo.c" />
     <ClCompile Include="..\..\demo\nnom_demo\nnom_demo.c" />
     <ClCompile Include="..\..\demo\nuklear_demo\main.c" />

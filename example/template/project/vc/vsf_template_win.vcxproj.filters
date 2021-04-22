@@ -4952,6 +4952,9 @@
     <ClCompile Include="..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.c">
       <Filter>vsf\service\simple_stream\distbus_stream</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\demo\lvgl_demo\lvgl_terminal_application.c">
+      <Filter>usrapp\demo\lvgl_demo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\awtk\awtk_vsf.lib">

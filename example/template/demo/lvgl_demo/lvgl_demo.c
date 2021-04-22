@@ -18,7 +18,8 @@
 
 #include "vsf.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED && APP_USE_LVGL_DEMO == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED && \
+        ((APP_USE_LVGL_DEMO == ENABLED) || (APP_USE_LVGL_TERMINAL_DEMO == ENABLED))
 
 #include "../common/usrapp_common.h"
 
@@ -45,20 +46,12 @@
 
 static lv_coord_t __lvgl_touchscreen_get_width(void)
 {
-#   ifndef LV_HOR_RES_MAX
-    return usrapp_ui_common.disp->param.width;
-#   else
-    return LV_HOR_RES_MAX;
-#   endif
+    return min(LV_HOR_RES_MAX, usrapp_ui_common.disp->param.width);
 }
 
 static lv_coord_t __lvgl_touchscreen_get_height(void)
 {
-#   ifndef LV_VER_RES_MAX
-    return usrapp_ui_common.disp->param.height;
-#   else
-    return LV_VER_RES_MAX;
-#   endif
+    return min(LV_VER_RES_MAX, usrapp_ui_common.disp->param.height);
 }
 
 static void __lvgl_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
@@ -347,8 +340,13 @@ int VSF_USER_ENTRY(void)
     lv_freetype_init(APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES);
 #endif
 
+#if APP_USE_LVGL_DEMO == ENABLED
     extern void lvgl_application(uint_fast8_t);
     lvgl_application(gamepad_num);
+#elif APP_USE_LVGL_TERMINAL_DEMO == ENABLED
+    extern void lvgl_terminal_application(void);
+    lvgl_terminal_application();
+#endif
 
 #if APP_USE_LINUX_DEMO == ENABLED
     pthread_t thread;
