@@ -99,7 +99,15 @@ static void __vsf_distbus_stream_init(vsf_stream_t *stream)
     } else {
         vsf_slist_queue_init(&distbus_stream->msgq);
     }
+    if (NULL == distbus_stream->handler) {
+        distbus_stream->handler = __vsf_distbus_stream_msghandler;
+    }
     vsf_distbus_register_service(distbus_stream->distbus, &distbus_stream->use_as__vsf_distbus_service_t);
+
+    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus_stream->distbus, 0, NULL);
+    VSF_SERVICE_ASSERT(msg != NULL);
+    msg->header.addr = VSF_DISTBUS_STREAM_CMD_CONNECT;
+    vsf_distbus_send_msg(distbus_stream->distbus, &distbus_stream->use_as__vsf_distbus_service_t, msg);
 }
 
 static uint_fast32_t __vsf_distbus_stream_get_buff_length(vsf_stream_t *stream)

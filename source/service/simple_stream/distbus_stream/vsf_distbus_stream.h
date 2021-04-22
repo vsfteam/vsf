@@ -42,18 +42,17 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define __VSF_DISTBUS_STREAM_INIT(__NAME, __DISTBUS, __ADDR, __MTU, __IS_TX, __HANDLER)\
+#define __VSF_DISTBUS_STREAM_INIT(__NAME, __DISTBUS, __MTU, __IS_TX, __HANDLER) \
             .op                 = &vsf_distbus_stream_op,                       \
             .is_tx              = (__IS_TX),                                    \
             .distbus            = (__DISTBUS),                                  \
-            .addr               = (__ADDR),                                     \
             .mtu                = (__MTU),                                      \
             .addr_range         = VSF_DISTBUS_STREAM_ADDR_RANGE,                \
             .handler            = (__HANDLER),                                  \
             .info               = (const vsf_distbus_service_info_t *)          \
                                     &(__NAME).use_as__vsf_distbus_service_info_t,
-#define VSF_DISTBUS_STREAM_INIT(__NAME, __DISTBUS, __ADDR, __MTU, __IS_TX, __HANDLER)\
-            __VSF_DISTBUS_STREAM_INIT(__NAME, (__DISTBUS), (__ADDR), (__MTU), (__IS_TX), (__HANDLER))
+#define VSF_DISTBUS_STREAM_INIT(__NAME, __DISTBUS, __MTU, __IS_TX, __HANDLER)\
+            __VSF_DISTBUS_STREAM_INIT(__NAME, (__DISTBUS), (__MTU), (__IS_TX), (__HANDLER))
 
 #define __vsf_distbus_stream_type(__name)   __name##_distbus_stream_t
 #define vsf_distbus_stream_type(__name)     __vsf_distbus_stream_type(__name)
@@ -77,15 +76,15 @@ extern "C" {
 #define def_distbus_stream(__name)                                              \
             define_distbus_stream(__name)
 
-#define __describe_distbus_stream(__name, __distbus, __addr, __mtu, __is_tx, __handler)\
+#define __describe_distbus_stream(__name, __distbus, __mtu, __is_tx, __handler) \
             declare_distbus_stream(__name)                                      \
-            define_distbus_stream(__name, (__size))                             \
+            define_distbus_stream(__name)                                       \
             vsf_distbus_stream_type(__name) __name = {                          \
-                VSF_DISTBUS_STREAM_INIT(__name, (__distbus), (__addr), (__mtu), (__is_tx), (__handler))\
+                VSF_DISTBUS_STREAM_INIT(__name, (__distbus), (__mtu), (__is_tx), (__handler))\
             };
 
-#define describe_distbus_stream(__name, __distbus, __addr, __mtu, __is_tx, __handler)\
-            __describe_distbus_stream(__name, (__distbus), (__addr), (__mtu), (__is_tx), (__handler))
+#define describe_distbus_stream(__name, __distbus, __mtu, __is_tx, __handler)   \
+            __describe_distbus_stream(__name, (__distbus), (__mtu), (__is_tx), (__handler))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
