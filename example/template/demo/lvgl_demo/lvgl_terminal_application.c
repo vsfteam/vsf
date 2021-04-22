@@ -24,6 +24,7 @@
 
 // for stdlib.h
 #include "utilities/vsf_utilities.h"
+#include "../common/usrapp_common.h"
 #include "lvgl/lvgl.h"
 #include "lv_conf.h"
 
@@ -79,11 +80,12 @@ struct lvgl_termial_app_t {
         } tx;
 
         struct {
-            uint16_t ;
-            uint16_t offset;
             uint8_t buf[LV_TERMIAL_APP_STREAM_CFG_RX_BUF_SIZE];
+            uint16_t offset;
         } rx;
     } terminal;
+
+    vsf_callback_timer_t timer;
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -224,15 +226,26 @@ static void __lvgl_all_in_one_thread(vsf_eda_t* eda, vsf_evt_t evt)
 static void __lvgl_vsh_execute_cmd(char *cmd)
 {
     char ch = VSH_ENTER_CHAR;
-    vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, cmd, strlen(cmd));
-    vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, &ch, 1);
+    vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, (uint8_t *)cmd, strlen(cmd));
+    vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, (uint8_t *)&ch, 1);
+}
+
+static void __lvgl_terminal_on_timer(vsf_callback_timer_t *timer)
+{
+    if (usrapp_ui_common.disp != NULL) {
+        // run current lvgl demo
+        __lvgl_vsh_execute_cmd("lvgl");
+        return;
+    }
+    vsf_callback_timer_add_ms(timer, 100);
 }
 
 static void __lvgl_terminal_stream_init(vsf_stream_t* stream)
 {
     vsf_byte_fifo_init(&__demo.terminal.tx.fifo);
-    // run current lvgl demo
-    __lvgl_vsh_execute_cmd("lvgl");
+    vsf_callback_timer_init(&__demo.timer);
+    __demo.timer.on_timer = __lvgl_terminal_on_timer;
+    vsf_callback_timer_add_ms(&__demo.timer, 100);
 
     vsf_eda_cfg_t cfg = {
         .fn.evthandler = __lvgl_all_in_one_thread,
@@ -243,13 +256,12 @@ static void __lvgl_terminal_stream_init(vsf_stream_t* stream)
 }
 
 static uint_fast32_t __lvgl_terminal_stream_write(vsf_stream_t* stream,
-    uint8_t* buf,
-    uint_fast32_t size)
+    uint8_t* buf, uint_fast32_t size)
 {
-    uint_fast32_t write_size = vsf_byte_fifo_write(&__demo.terminal.tx.fifo, buf, size);
+    vsf_byte_fifo_write(&__demo.terminal.tx.fifo, buf, size);
     vsf_eda_post_evt(&__demo.apps.eda, VSF_EVT_USER);
 
-    return write_size;
+    return size;
 }
 
 static uint_fast32_t __lvgl_terminal_stream_get_data_length(vsf_stream_t* stream)
@@ -387,8 +399,8 @@ static void __apps_btnm_event_handler(lv_obj_t* obj, lv_event_t event)
         extern void __lvgl_stop_looping(void);
         __lvgl_stop_looping();
 
-        const char* text = lv_btnmatrix_get_active_btn_text(obj);
-        __lvgl_vsh_execute_cmd(text);
+        const char *text = lv_btnmatrix_get_active_btn_text(obj);
+        __lvgl_vsh_execute_cmd((char *)text);
         lv_tabview_set_tab_act(__demo.tabview, 0, LV_ANIM_ON);
     }
 }

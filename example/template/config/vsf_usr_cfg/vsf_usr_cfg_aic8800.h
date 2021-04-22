@@ -87,6 +87,9 @@
 #define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
+//#   define APP_LVGL_DEMO_USE_TERMINAL                   ENABLED
+//#   define APP_LVGL_DEMO_CFG_ANIMINATION                ENABLED
+
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
 #   define APP_LVGL_DEMO_CFG_FREETYPE                   ENABLED
@@ -208,11 +211,19 @@
 // VSF_HAL_USE_DEBUG_STREAM for hardware debug uart
 // VSF_DEBUGGER_CFG_CONSOLE for debug console from debugger
 // select one ONLY
-#define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
+
+// APP_LVGL_DEMO_USE_TERMINAL will overwrite DEBUG_STREAM, so DO NOT use hardware DEBUG_STREAM
+#if (APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_USE_TERMINAL == ENABLED)
+#   define VSF_CFG_DEBUG_STREAM_TX_T                    vsf_stream_t
+#   define VSF_CFG_DEBUG_STREAM_RX_T                    vsf_mem_stream_t
+#else
+#   define VSF_HAL_USE_DEBUG_STREAM                     ENABLED
+#endif
 //#define VSF_DEBUGGER_CFG_CONSOLE                        VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
 
 //#define VSF_ASSERT(...)
-#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
+#if     VSF_HAL_USE_DEBUG_STREAM == ENABLED                                     \
+    ||  (APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_USE_TERMINAL == ENABLED)
 #   ifndef VSF_ASSERT
 #       define VSF_ASSERT(...)                          if (!(__VA_ARGS__)) {while(1);}
 #   endif
@@ -293,6 +304,14 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #define VSF_LINUX_CFG_STACKSIZE                         (4 * 1024)
 #define VSF_TRACE_CFG_COLOR_EN                          ENABLED
 #define VSH_HAS_COLOR                                   1
+
+#if APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_USE_TERMINAL == ENABLED
+// TODO: lvgl terminal demo support color
+#	undef  VSF_TRACE_CFG_COLOR_EN
+#	define VSF_TRACE_CFG_COLOR_EN                       DISABLED
+#   undef VSH_HAS_COLOR
+#	define VSH_HAS_COLOR                                0
+#endif
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
