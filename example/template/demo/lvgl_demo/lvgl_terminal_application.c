@@ -221,11 +221,18 @@ static void __lvgl_all_in_one_thread(vsf_eda_t* eda, vsf_evt_t evt)
     }
 }
 
+static void __lvgl_vsh_execute_cmd(char *cmd)
+{
+    char ch = VSH_ENTER_CHAR;
+    vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, cmd, strlen(cmd));
+    vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, &ch, 1);
+}
+
 static void __lvgl_terminal_stream_init(vsf_stream_t* stream)
 {
     vsf_byte_fifo_init(&__demo.terminal.tx.fifo);
-    // run current demo
-    vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, "lvgl\r\n", 6);
+    // run current lvgl demo
+    __lvgl_vsh_execute_cmd("lvgl");
 
     vsf_eda_cfg_t cfg = {
         .fn.evthandler = __lvgl_all_in_one_thread,
@@ -377,11 +384,11 @@ lv_obj_t* __terminal_create(lv_obj_t* parent)
 static void __apps_btnm_event_handler(lv_obj_t* obj, lv_event_t event)
 {
     if (event == LV_EVENT_VALUE_CHANGED) {
-        const char* text = lv_btnmatrix_get_active_btn_text(obj);
-        uint8_t text_end = VSH_ENTER_CHAR;
-        vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, (uint8_t *)text, strlen(text));
-        vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, &text_end, 1);
+        extern void __lvgl_stop_looping(void);
+        __lvgl_stop_looping();
 
+        const char* text = lv_btnmatrix_get_active_btn_text(obj);
+        __lvgl_vsh_execute_cmd(text);
         lv_tabview_set_tab_act(__demo.tabview, 0, LV_ANIM_ON);
     }
 }

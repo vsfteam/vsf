@@ -41,6 +41,9 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static NO_INIT bool __lvgl_is_looping;
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -236,8 +239,12 @@ static void __lvgl_input_init(void)
     vk_input_notifier_register(&usrapp_ui_common.lvgl.notifier);
 }
 
-#if APP_USE_LINUX_DEMO == ENABLED
+void __lvgl_stop_looping(void)
+{
+    __lvgl_is_looping = false;
+}
 
+#if APP_USE_LINUX_DEMO == ENABLED
 void * __lvgl_thread(void *arg)
 {
 #if APP_LVGL_DEMO_CFG_ANIMINATION != ENABLED
@@ -246,7 +253,7 @@ void * __lvgl_thread(void *arg)
 
     __lvgl_input_init();
 
-    while (1) {
+    while (__lvgl_is_looping) {
         lv_task_handler();
 #if APP_LVGL_DEMO_CFG_ANIMINATION == ENABLED
         vsf_thread_delay_ms(10);
@@ -373,6 +380,7 @@ int VSF_USER_ENTRY(void)
     lvgl_application(gamepad_num);
 #endif
 
+    __lvgl_is_looping = true;
 #if APP_USE_LINUX_DEMO == ENABLED
     // wait for disp_on_inited
     vsf_thread_wfe(VSF_EVT_USER);
@@ -383,7 +391,7 @@ int VSF_USER_ENTRY(void)
     __lvgl_input_init();
 
     while (!__lvgl_is_disp_inited);
-    while (1) {
+    while (__lvgl_is_looping) {
         lv_task_handler();
     }
 #endif
