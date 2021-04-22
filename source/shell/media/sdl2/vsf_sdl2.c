@@ -474,9 +474,10 @@ int SDL_InitSubSystem(uint32_t flags)
     }
 
     if (flags & SDL_INIT_VIDEO) {
-        __vsf_sdl2.disp->ui_data = NULL;
+        __vsf_sdl2.disp->ui_data = vsf_eda_get_cur();
         __vsf_sdl2.disp->ui_on_ready = __vsf_sdl2_disp_on_ready;
         vk_disp_init(__vsf_sdl2.disp);
+        vsf_thread_wfe(VSF_EVT_RETURN);
     }
     return 0;
 }
