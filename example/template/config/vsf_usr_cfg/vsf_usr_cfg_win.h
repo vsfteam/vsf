@@ -80,7 +80,8 @@
 // nnom minst demo seems to be broken
 #define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
-#define APP_USE_LVGL_TERMINAL_DEMO                      DISABLED
+//#   define APP_LVGL_DEMO_USE_TERMINAL                   ENABLED
+//#   define APP_LVGL_DEMO_CFG_ANIMINATION                ENABLED
 // _vsnprintf of lvgl conflicts with ucrt
 #   define LV_SPRINTF_CUSTOM                            1
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
@@ -339,7 +340,7 @@
 #    define VSF_TRACE_CFG_COLOR_EN                      ENABLED
 #endif
 
-#if APP_USE_LVGL_TERMINAL_DEMO == ENABLED
+#if APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_USE_TERMINAL == ENABLED
 // TODO: lvgl terminal demo support color
 #	undef  VSF_TRACE_CFG_COLOR_EN
 #	define VSF_TRACE_CFG_COLOR_EN                       DISABLED

@@ -14,12 +14,12 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
+
 /*============================ INCLUDES ======================================*/
 
 #include "vsf.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED && \
-        ((APP_USE_LVGL_DEMO == ENABLED) || (APP_USE_LVGL_TERMINAL_DEMO == ENABLED))
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED && (APP_USE_LVGL_DEMO == ENABLED)
 
 #include "../common/usrapp_common.h"
 
@@ -240,13 +240,19 @@ static void __lvgl_input_init(void)
 
 void * __lvgl_thread(void *arg)
 {
+#if APP_LVGL_DEMO_CFG_ANIMINATION != ENABLED
     usrapp_ui_common.lvgl.eda_poll = vsf_eda_get_cur();
+#endif
 
     __lvgl_input_init();
 
     while (1) {
         lv_task_handler();
+#if APP_LVGL_DEMO_CFG_ANIMINATION == ENABLED
+        vsf_thread_delay_ms(10);
+#else
         vsf_thread_wfe(VSF_EVT_USER);
+#endif
     }
 }
 
@@ -359,12 +365,12 @@ int VSF_USER_ENTRY(void)
     lv_freetype_init(APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES);
 #endif
 
-#if APP_USE_LVGL_DEMO == ENABLED
-    extern void lvgl_application(uint_fast8_t);
-    lvgl_application(gamepad_num);
-#elif APP_USE_LVGL_TERMINAL_DEMO == ENABLED
+#if APP_LVGL_DEMO_USE_TERMINAL == ENABLED
     extern void lvgl_terminal_application(void);
     lvgl_terminal_application();
+#else
+    extern void lvgl_application(uint_fast8_t);
+    lvgl_application(gamepad_num);
 #endif
 
 #if APP_USE_LINUX_DEMO == ENABLED

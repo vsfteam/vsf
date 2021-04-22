@@ -14,13 +14,13 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
+
 /*============================ INCLUDES ======================================*/
 
 #define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
-
 #include "vsf.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED && APP_USE_LVGL_TERMINAL_DEMO == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED && APP_LVGL_DEMO_USE_TERMINAL == ENABLED
 
 // for stdlib.h
 #include "utilities/vsf_utilities.h"
@@ -30,15 +30,6 @@
 #include "shell/sys/linux/port/busybox/config.h"
 
 /*============================ MACROS ========================================*/
-#define APP_LVGL_ALL_IN_ONE_DEMO_APPLICATION \
-    "ls", "cd", "pwd", "cat", "\n",   \
-    "echo", "mkdir", "lsusb", "tgui", "\n", \
-    "play_audio",  "bt_scan", "usbd_cdc", "usbd_uvc", "\n", \
-    "usbd_msc", "usbd_user", "mount_file", "disp", "\n", \
-    "sdl2", "lwip", "eda_test", "fsm_test", "\n", \
-    "sem_test", "cross_task_test", "json", "usart", "\n", \
-    "stream_usart", "socket", "lua", "love", "\n", \
-    "coremark",
 
 #ifndef LV_TERMIAL_APP_STREAM_CFG_RX_BUF_SIZE
 #   define LV_TERMIAL_APP_STREAM_CFG_RX_BUF_SIZE            32
@@ -97,11 +88,14 @@ struct lvgl_termial_app_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
 static void __lvgl_terminal_stream_init(vsf_stream_t* stream);
 static uint_fast32_t __lvgl_terminal_stream_write(vsf_stream_t* stream, uint8_t* buf, uint_fast32_t size);
 static uint_fast32_t __lvgl_terminal_stream_get_data_length(vsf_stream_t* stream);
 static uint_fast32_t __lvgl_terminal_stream_get_avail_length(vsf_stream_t* stream);
+
 /*============================ LOCAL VARIABLES ===============================*/
+
 static const char* __keyboard_lower_map[] = {
     "1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
     "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
@@ -140,7 +134,9 @@ static const lv_btnmatrix_ctrl_t __keyboard_spec_ctrl_map[] = {
 };
 
 static const char* __demo_apps_name[] = {
-    APP_LVGL_ALL_IN_ONE_DEMO_APPLICATION
+#if APP_USE_LUA_DEMO == ENABLED
+    "love",
+#endif
     "",
 };
 
@@ -188,6 +184,7 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 };
 
 /*============================ IMPLEMENTATION ================================*/
+
 static bool __terminal_add_char(void)
 {
     lv_obj_t* textarea = __demo.terminal.textarea;
@@ -227,6 +224,8 @@ static void __lvgl_all_in_one_thread(vsf_eda_t* eda, vsf_evt_t evt)
 static void __lvgl_terminal_stream_init(vsf_stream_t* stream)
 {
     vsf_byte_fifo_init(&__demo.terminal.tx.fifo);
+    // run current demo
+    vsf_stream_write(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t, "lvgl\r\n", 6);
 
     vsf_eda_cfg_t cfg = {
         .fn.evthandler = __lvgl_all_in_one_thread,
