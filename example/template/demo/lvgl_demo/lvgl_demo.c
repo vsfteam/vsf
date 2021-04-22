@@ -250,6 +250,14 @@ void * __lvgl_thread(void *arg)
     }
 }
 
+static NO_INIT vsf_eda_t *__lvgl_demo_evt_to_notify;
+void __lvgl_on_disp_drv_inited(lv_disp_drv_t *disp_drv)
+{
+    if (__lvgl_demo_evt_to_notify != NULL) {
+        vsf_eda_post_evt(__lvgl_demo_evt_to_notify, VSF_EVT_USER);
+    }
+}
+
 int lvgl_main(int argc, char *argv[])
 {
     uint_fast8_t gamepad_num = 1;
@@ -265,6 +273,12 @@ int lvgl_main(int argc, char *argv[])
         return -1;
     }
 #else
+static NO_INIT bool __lvgl_is_disp_inited;
+void __lvgl_on_disp_drv_inited(lv_disp_drv_t *disp_drv)
+{
+    __lvgl_is_disp_inited = true;
+}
+
 int VSF_USER_ENTRY(void)
 {
     uint_fast8_t gamepad_num = 1;
@@ -312,7 +326,12 @@ int VSF_USER_ENTRY(void)
     disp_drv.buffer = &usrapp_ui_common.lvgl.disp_buf;
     disp = lv_disp_drv_register(&disp_drv);
 
-    vsf_lvgl_bind_disp(vsf_disp, &disp->driver);
+#if APP_USE_LINUX_DEMO == ENABLED
+    __lvgl_demo_evt_to_notify = vsf_eda_get_cur();
+#else
+    __lvgl_is_disp_inited = false;
+#endif
+    vsf_lvgl_bind_disp(vsf_disp, &disp->driver, __lvgl_on_disp_drv_inited);
 
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;
@@ -349,11 +368,15 @@ int VSF_USER_ENTRY(void)
 #endif
 
 #if APP_USE_LINUX_DEMO == ENABLED
+    // wait for disp_on_inited
+    vsf_thread_wfe(VSF_EVT_USER);
+
     pthread_t thread;
     pthread_create(&thread, NULL, __lvgl_thread, NULL);
 #else
     __lvgl_input_init();
 
+    while (!__lvgl_is_disp_inited);
     while (1) {
         lv_task_handler();
     }
