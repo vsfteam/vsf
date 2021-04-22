@@ -47,20 +47,20 @@
 typedef struct vsf_disp_sdl2_t {
     vsf_arch_irq_thread_t init_thread;
     bool is_init_called;
-    bool is_inited;
+    vk_disp_sdl2_t *disp;
 } vsf_disp_sdl2_t;
 
 /*============================ LOCAL VARIABLES ===============================*/
 
 static vsf_disp_sdl2_t __vk_disp_sdl2 = {
     .is_init_called = false,
-    .is_inited      = false,
 };
 
 /*============================ PROTOTYPES ====================================*/
 
 static vsf_err_t __vk_disp_sdl2_init(vk_disp_t *pthis);
 static vsf_err_t __vk_disp_sdl2_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+static void __vk_disp_sdl2_event_thread(void *arg);
 
 #if VSF_USE_INPUT == ENABLED
 extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
@@ -130,10 +130,18 @@ static void __vk_disp_sdl2_screen_update(vk_disp_sdl2_t *disp_sdl2)
 static void __vk_disp_sdl2_init_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
+    vk_disp_sdl2_t *disp_sdl2 = __vk_disp_sdl2.disp;
 
     __vsf_arch_irq_set_background(irq_thread);
         __vk_disp_sdl2_common_init();
-        __vk_disp_sdl2.is_inited = true;
+
+        __vsf_arch_irq_start(irq_thread);
+            vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
+        __vsf_arch_irq_end(irq_thread, false);
+
+        __vsf_arch_irq_request_init(&disp_sdl2->flush_request);
+        __vsf_arch_irq_init(&disp_sdl2->event_thread, "disp_sdl2_event", __vk_disp_sdl2_event_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY);
+
     __vsf_arch_irq_fini(irq_thread);
 }
 
@@ -145,16 +153,16 @@ static void __vk_disp_sdl2_flush_thread(void *arg)
     __vsf_arch_irq_set_background(irq_thread);
 
     while (true) {
-        __vsf_arch_irq_start(irq_thread);
-            vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
-        __vsf_arch_irq_end(irq_thread, false);
-
         __vsf_arch_irq_request_pend(&disp_sdl2->flush_request);
         __vk_disp_sdl2_screen_update(disp_sdl2);
 
         if (disp_sdl2->flush_delay_ms > 0) {
             __vsf_arch_irq_sleep(disp_sdl2->flush_delay_ms);
         }
+
+        __vsf_arch_irq_start(irq_thread);
+            vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
+        __vsf_arch_irq_end(irq_thread, false);
     }
 }
 
@@ -323,10 +331,6 @@ static void __vk_disp_sdl2_event_thread(void *arg)
 
     evt.dev = disp_sdl2;
 #endif
-
-    while (!__vk_disp_sdl2.is_inited) {
-        __vsf_arch_irq_sleep(100);
-    }
 
     __vsf_arch_irq_set_background(irq_thread);
         __vk_disp_sdl2_screen_init(disp_sdl2);
@@ -541,11 +545,11 @@ static vsf_err_t __vk_disp_sdl2_init(vk_disp_t *pthis)
 
     if (!__vk_disp_sdl2.is_init_called) {
         __vk_disp_sdl2.is_init_called = true;
+        __vk_disp_sdl2.disp = (vk_disp_sdl2_t *)pthis;
         __vsf_arch_irq_init(&__vk_disp_sdl2.init_thread, "disp_sdl2_init", __vk_disp_sdl2_init_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY);
+    } else {
+        vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
     }
-
-    __vsf_arch_irq_request_init(&disp_sdl2->flush_request);
-    __vsf_arch_irq_init(&disp_sdl2->event_thread, "disp_sdl2_event", __vk_disp_sdl2_event_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY);
     return VSF_ERR_NONE;
 }
 
