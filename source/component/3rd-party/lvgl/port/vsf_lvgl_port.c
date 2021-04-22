@@ -76,7 +76,8 @@ static void __vsf_lvgl_disp_on_ready(vk_disp_t *disp)
 static void __vsf_lvgl_disp_on_inited(vk_disp_t *disp)
 {
     lv_disp_drv_t *disp_drv = (lv_disp_drv_t *)disp->ui_data;
-    void (*on_inited)(lv_disp_drv_t *disp_drv) = disp_drv->user_data;
+    void (*on_inited)(lv_disp_drv_t *) =
+                    (void (*)(lv_disp_drv_t *))disp_drv->user_data;
 
     disp_drv->user_data = disp;
     disp->ui_on_ready = __vsf_lvgl_disp_on_ready;
@@ -89,7 +90,7 @@ static void __vsf_lvgl_disp_on_inited(vk_disp_t *disp)
 void vsf_lvgl_bind_disp(vk_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv,
             void (*on_inited)(lv_disp_drv_t *disp_drv))
 {
-    lvgl_disp_drv->user_data = on_inited;
+    lvgl_disp_drv->user_data = (void *)on_inited;
     disp->ui_data = lvgl_disp_drv;
     disp->ui_on_ready = __vsf_lvgl_disp_on_inited;
     vk_disp_init(disp);
