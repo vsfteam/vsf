@@ -48,6 +48,8 @@ vsf_err_t vk_disp_init(vk_disp_t *pthis)
 
     if (drv->init != NULL) {
         return drv->init(pthis);
+    } else {
+        vk_disp_on_ready(pthis);
     }
     return VSF_ERR_NONE;
 }
