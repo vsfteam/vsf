@@ -97,10 +97,10 @@
 // if using dl1x5(DL1X5 chips from DisplayLink), color_depth should be 16,
 //  and hor_res/ver_res should smaller than the hardware resolution
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                16
-#   define APP_LVGL_DEMO_CFG_HOR_RES                    480
-#   define APP_LVGL_DEMO_CFG_VER_RES                    320
-#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (16 * 1024)
-// double 16K 16-bit pixels buffer at 0x00100000
+#   define APP_LVGL_DEMO_CFG_HOR_RES                    1920
+#   define APP_LVGL_DEMO_CFG_VER_RES                    1080
+#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (80 * 1024)
+// double 80K 16-bit pixels buffer at 0x00100000
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR           0x00100000
 #   define APP_LVGL_DEMO_CFG_DOUBLE_BUFFER              ENABLED
 #define APP_USE_BTSTACK_DEMO                            ENABLED
@@ -306,6 +306,9 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #define VSH_HAS_COLOR                                   1
 
 #if APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_USE_TERMINAL == ENABLED
+// priority of debug stream should be higher than linux kernel(vsf_prio_0)
+#   define LV_TERMIAL_APP_STREAM_TX_PRIO                vsf_prio_1
+
 // TODO: lvgl terminal demo support color
 #	undef  VSF_TRACE_CFG_COLOR_EN
 #	define VSF_TRACE_CFG_COLOR_EN                       DISABLED
