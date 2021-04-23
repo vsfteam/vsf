@@ -324,7 +324,7 @@ extern "C" {
                                 __list_ptr,                                     \
                                 __item_ref_ptr)                                 \
     do {                                                                        \
-        vsf_dlist_t *__vsf_list_tmp_name(node) =                                \
+        vsf_dlist_node_t *__vsf_list_tmp_name(node) =                           \
                 __vsf_dlist_remove_tail_imp(__list_ptr);                        \
         __vsf_dlist_ref_safe(__host_type, __member,                             \
                 __vsf_list_tmp_name(node), (__item_ref_ptr));                   \
