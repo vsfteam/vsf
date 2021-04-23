@@ -51,15 +51,15 @@ struct lvgl_terminal_app_const_t {
     vsf_stream_op_t tx_op;
 
     struct {
-        const char** map;
-        const lv_btnmatrix_ctrl_t* const ctrl_map;
+        const char **map;
+        const lv_btnmatrix_ctrl_t *const ctrl_map;
     } keyboard_maps[3];
 
     const char **apps_btnm_map;
 };
 
 struct lvgl_termial_app_t {
-    lv_obj_t* tabview;
+    lv_obj_t *tabview;
 
     struct {
         lv_style_t tabview;
@@ -71,8 +71,8 @@ struct lvgl_termial_app_t {
     } apps;
 
     struct {
-        lv_obj_t* textarea;
-        lv_obj_t* keyboard;
+        lv_obj_t *textarea;
+        lv_obj_t *keyboard;
 
         struct {
             uint8_t buf[LV_TERMIAL_APP_STREAM_CFG_TX_BUF_SIZE];
@@ -91,14 +91,14 @@ struct lvgl_termial_app_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void __lvgl_terminal_stream_init(vsf_stream_t* stream);
-static uint_fast32_t __lvgl_terminal_stream_write(vsf_stream_t* stream, uint8_t* buf, uint_fast32_t size);
-static uint_fast32_t __lvgl_terminal_stream_get_data_length(vsf_stream_t* stream);
-static uint_fast32_t __lvgl_terminal_stream_get_avail_length(vsf_stream_t* stream);
+static void __lvgl_terminal_stream_init(vsf_stream_t *stream);
+static uint_fast32_t __lvgl_terminal_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+static uint_fast32_t __lvgl_terminal_stream_get_data_length(vsf_stream_t *stream);
+static uint_fast32_t __lvgl_terminal_stream_get_avail_length(vsf_stream_t *stream);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const char* __keyboard_lower_map[] = {
+static const char *__keyboard_lower_map[] = {
     "1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
     "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
     "_", "-", "z", "x", "c", "v", "b", "n", "m", " ", LV_SYMBOL_UP, " ", "\n",
@@ -110,7 +110,7 @@ static const lv_btnmatrix_ctrl_t __keyboard_lower_ctrl_map[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, LV_BTNMATRIX_CTRL_HIDDEN | 1, 1, LV_BTNMATRIX_CTRL_HIDDEN | 1,
     LV_KEYBOARD_CTRL_BTN_FLAGS | 2, 7, 1, 1, LV_KEYBOARD_CTRL_BTN_FLAGS | 1
 };
-static const char* __keyboard_up_map[] = {
+static const char *__keyboard_up_map[] = {
     "1#", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", LV_SYMBOL_BACKSPACE, "\n",
     "abc", "A", "S", "D", "F", "G", "H", "J", "K", "L", LV_SYMBOL_NEW_LINE, "\n",
     "_", "-", "Z", "X", "C", "V", "B", "N", "M", " ", LV_SYMBOL_UP, " ", "\n",
@@ -122,7 +122,7 @@ static const lv_btnmatrix_ctrl_t __keyboard_up_ctrl_map[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, LV_BTNMATRIX_CTRL_HIDDEN | 1, 1, LV_BTNMATRIX_CTRL_HIDDEN | 1,
     LV_KEYBOARD_CTRL_BTN_FLAGS | 2, 7, 1, 1, LV_KEYBOARD_CTRL_BTN_FLAGS | 1
 };
-static const char* __keyboard_spec_map[] = {
+static const char *__keyboard_spec_map[] = {
     "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", LV_SYMBOL_BACKSPACE, "\n",
     "abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
     "\\",  "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
@@ -135,7 +135,7 @@ static const lv_btnmatrix_ctrl_t __keyboard_spec_ctrl_map[] = {
     LV_KEYBOARD_CTRL_BTN_FLAGS | 2, 2, 6, 2, LV_KEYBOARD_CTRL_BTN_FLAGS | 2
 };
 
-static const char* __demo_apps_name[] = {
+static const char *__demo_apps_name[] = {
 #if APP_USE_LUA_DEMO == ENABLED
     "love",
 #endif
@@ -189,7 +189,7 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 
 static bool __terminal_add_char(void)
 {
-    lv_obj_t* textarea = __demo.terminal.textarea;
+    lv_obj_t *textarea = __demo.terminal.textarea;
     if (textarea == NULL) {
         return false;
     }
@@ -214,7 +214,7 @@ static bool __terminal_add_char(void)
     return true;
 }
 
-static void __lvgl_all_in_one_thread(vsf_eda_t* eda, vsf_evt_t evt)
+static void __lvgl_all_in_one_thread(vsf_eda_t *eda, vsf_evt_t evt)
 {
     switch (evt) {
     case VSF_EVT_INIT:
@@ -240,7 +240,7 @@ static void __lvgl_terminal_on_timer(vsf_callback_timer_t *timer)
     vsf_callback_timer_add_ms(timer, 100);
 }
 
-static void __lvgl_terminal_stream_init(vsf_stream_t* stream)
+static void __lvgl_terminal_stream_init(vsf_stream_t *stream)
 {
     vsf_byte_fifo_init(&__demo.terminal.tx.fifo);
     vsf_callback_timer_init(&__demo.timer);
@@ -255,8 +255,8 @@ static void __lvgl_terminal_stream_init(vsf_stream_t* stream)
     vsf_eda_start(&__demo.apps.eda, &cfg);
 }
 
-static uint_fast32_t __lvgl_terminal_stream_write(vsf_stream_t* stream,
-    uint8_t* buf, uint_fast32_t size)
+static uint_fast32_t __lvgl_terminal_stream_write(vsf_stream_t *stream,
+    uint8_t *buf, uint_fast32_t size)
 {
     vsf_byte_fifo_write(&__demo.terminal.tx.fifo, buf, size);
     vsf_eda_post_evt(&__demo.apps.eda, VSF_EVT_USER);
@@ -264,35 +264,39 @@ static uint_fast32_t __lvgl_terminal_stream_write(vsf_stream_t* stream,
     return size;
 }
 
-static uint_fast32_t __lvgl_terminal_stream_get_data_length(vsf_stream_t* stream)
+static uint_fast32_t __lvgl_terminal_stream_get_data_length(vsf_stream_t *stream)
 {
     return 0;
 }
 
-static uint_fast32_t __lvgl_terminal_stream_get_avail_length(vsf_stream_t* stream)
+static uint_fast32_t __lvgl_terminal_stream_get_avail_length(vsf_stream_t *stream)
 {
     return -1;
 }
 
-static void __keyboard_event_cb(lv_obj_t* keyboard, lv_event_t event)
+static void __keyboard_event_cb(lv_obj_t *keyboard, lv_event_t event)
 {
     //lv_keyboard_def_event_cb(keyboard, event);
 
     if (event != LV_EVENT_VALUE_CHANGED)
         return;
 
-    lv_keyboard_ext_t* ext = lv_obj_get_ext_attr(keyboard);
+    lv_keyboard_ext_t *ext = lv_obj_get_ext_attr(keyboard);
     uint16_t btn_id = lv_btnmatrix_get_active_btn(keyboard);
-    if (btn_id == LV_BTNMATRIX_BTN_NONE)
+    if (btn_id == LV_BTNMATRIX_BTN_NONE) {
         return;
-    if (lv_btnmatrix_get_btn_ctrl(keyboard, btn_id, LV_BTNMATRIX_CTRL_HIDDEN | LV_BTNMATRIX_CTRL_DISABLED))
+    }
+    if (lv_btnmatrix_get_btn_ctrl(keyboard, btn_id, LV_BTNMATRIX_CTRL_HIDDEN | LV_BTNMATRIX_CTRL_DISABLED)) {
         return;
-    if (lv_btnmatrix_get_btn_ctrl(keyboard, btn_id, LV_BTNMATRIX_CTRL_NO_REPEAT) && event == LV_EVENT_LONG_PRESSED_REPEAT)
+    }
+    if (lv_btnmatrix_get_btn_ctrl(keyboard, btn_id, LV_BTNMATRIX_CTRL_NO_REPEAT) && event == LV_EVENT_LONG_PRESSED_REPEAT) {
         return;
+    }
 
-    const char* txt = lv_btnmatrix_get_active_btn_text(keyboard);
-    if (txt == NULL)
+    const char *txt = lv_btnmatrix_get_active_btn_text(keyboard);
+    if (txt == NULL) {
         return;
+    }
 
     /*Do the corresponding action according to the text of the button*/
     if (strcmp(txt, "abc") == 0) {
@@ -312,13 +316,14 @@ static void __keyboard_event_cb(lv_obj_t* keyboard, lv_event_t event)
         return;
     } else if (strcmp(txt, LV_SYMBOL_CLOSE) == 0) {
         // TODO
+        return;
     } else if (strcmp(txt, LV_SYMBOL_OK) == 0) {
         // TODO
         return;
     }
 
     uint8_t ch;
-    uint8_t escape_code[] = {"\033[ "};
+    uint8_t escape_code[] = { "\033[ " };
     if (strcmp(txt, "Enter") == 0 || strcmp(txt, LV_SYMBOL_NEW_LINE) == 0) {
         ch = VSH_ENTER_CHAR;
     } else if (strcmp(txt, LV_SYMBOL_LEFT) == 0) {
@@ -348,12 +353,12 @@ static void __keyboard_event_cb(lv_obj_t* keyboard, lv_event_t event)
 
 static void __keyborad_create(void)
 {
-    lv_obj_t* textarea = __demo.terminal.textarea;
-    lv_obj_t* parent = lv_obj_get_parent(textarea);
+    lv_obj_t *textarea = __demo.terminal.textarea;
+    lv_obj_t *parent = lv_obj_get_parent(textarea);
 
     lv_coord_t height = lv_obj_get_height(parent);
 
-    lv_obj_t* keyboard = lv_keyboard_create(parent, NULL);
+    lv_obj_t *keyboard = lv_keyboard_create(parent, NULL);
     lv_keyboard_set_cursor_manage(keyboard, true);
 
     lv_obj_set_height(keyboard, height * 1 / 3);
@@ -366,7 +371,7 @@ static void __keyborad_create(void)
     __demo.terminal.keyboard = keyboard;
 }
 
-lv_obj_t* __terminal_create(lv_obj_t* parent)
+lv_obj_t *__terminal_create(lv_obj_t *parent)
 {
     lv_coord_t width = lv_obj_get_width(parent);
     lv_coord_t height = lv_obj_get_height(parent);
@@ -378,7 +383,7 @@ lv_obj_t* __terminal_create(lv_obj_t* parent)
     lv_style_set_bg_opa(&__demo.styles.terminal, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&__demo.styles.terminal, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
-    lv_obj_t* textarea = lv_textarea_create(parent, NULL);
+    lv_obj_t *textarea = lv_textarea_create(parent, NULL);
     lv_obj_add_style(textarea, LV_LABEL_PART_MAIN, &__demo.styles.terminal);
     lv_obj_set_size(textarea, width, height * 2 / 3);
     lv_obj_align(textarea, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
@@ -393,7 +398,7 @@ lv_obj_t* __terminal_create(lv_obj_t* parent)
     return textarea;
 }
 
-static void __apps_btnm_event_handler(lv_obj_t* obj, lv_event_t event)
+static void __apps_btnm_event_handler(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_VALUE_CHANGED) {
         extern void __lvgl_stop_looping(void);
@@ -405,12 +410,12 @@ static void __apps_btnm_event_handler(lv_obj_t* obj, lv_event_t event)
     }
 }
 
-static lv_obj_t* __apps_create(lv_obj_t* parent)
+static lv_obj_t *__apps_create(lv_obj_t *parent)
 {
     lv_coord_t height = lv_obj_get_height(parent);
-    lv_coord_t width  = lv_obj_get_width(parent);
+    lv_coord_t width = lv_obj_get_width(parent);
 
-    lv_obj_t* apps = lv_btnmatrix_create(parent, NULL);
+    lv_obj_t *apps = lv_btnmatrix_create(parent, NULL);
     lv_btnmatrix_set_map(apps, __demo_const.apps_btnm_map);
     lv_obj_align(apps, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
     lv_obj_set_size(apps, width, height);     /*Circular scroll*/
@@ -425,17 +430,17 @@ void lvgl_terminal_application(void)
     lv_style_set_pad_top(&__demo.styles.tabview, LV_STATE_DEFAULT, 2);
     lv_style_set_pad_bottom(&__demo.styles.tabview, LV_STATE_DEFAULT, 6);
 
-    lv_obj_t* tabview = lv_tabview_create(lv_scr_act(), NULL);
+    lv_obj_t *tabview = lv_tabview_create(lv_scr_act(), NULL);
     lv_obj_add_style(tabview, LV_TABVIEW_PART_TAB_BTN, &__demo.styles.tabview);
     lv_tabview_set_btns_pos(tabview, LV_TABVIEW_TAB_POS_TOP);
 
     __demo.tabview = tabview;
 
-    lv_obj_t* terminal_tab = lv_tabview_add_tab(tabview, "Terminal");
+    lv_obj_t *terminal_tab = lv_tabview_add_tab(tabview, "Terminal");
     lv_page_set_scrlbar_mode(terminal_tab, LV_SCROLLBAR_MODE_OFF);
     __terminal_create(terminal_tab);
 
-    lv_obj_t* applications = lv_tabview_add_tab(tabview, "Applications");
+    lv_obj_t *applications = lv_tabview_add_tab(tabview, "Applications");
     lv_page_set_scrlbar_mode(applications, LV_SCROLLBAR_MODE_OFF);
     __apps_create(applications);
 }
