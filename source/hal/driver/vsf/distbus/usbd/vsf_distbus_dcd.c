@@ -19,12 +19,14 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DISTBUS == ENABLED
+#if     VSF_USE_USB_DEVICE == ENABLED                                           \
+    &&  VSF_HAL_USE_DISTBUS == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_DISTBUS_CLASS_INHERIT__
 #define __VSF_DISTBUS_DCD_CLASS_IMPLEMENT
 
+#include "component/usb/common/usb_common.h"
 #include "kernel/vsf_kernel.h"
 #include "./vsf_distbus_dcd.h"
 

@@ -8909,15 +8909,6 @@
                     <group>
                         <name>dcd</name>
                         <group>
-                            <name>distbus_dcd</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\driver\dcd\distbus_dcd\vsf_distbus_dcd.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\driver\dcd\distbus_dcd\vsf_distbus_dcd.h</name>
-                            </file>
-                        </group>
-                        <group>
                             <name>usbip_dcd</name>
                             <group>
                                 <name>backend</name>
@@ -11651,6 +11642,30 @@
                     </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\unknown\driver.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>vsf</name>
+                    <group>
+                        <name>ditbus</name>
+                        <group>
+                            <name>usbd</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_distbus_dcd.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_distbus_dcd.h</name>
+                            </file>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\driver.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\vsf_distbus_driver.c</name>
+                        </file>
+                    </group>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\driver.h</name>
                     </file>
                 </group>
                 <group>

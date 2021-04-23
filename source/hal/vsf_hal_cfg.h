@@ -15,6 +15,7 @@
  *                                                                           *
  ****************************************************************************/
 
+/*============================ INCLUDES ======================================*/
 
 //! \note do not move this pre-processor statement to other places
 #include "vsf_cfg.h"
@@ -24,11 +25,10 @@
 
 //! all hal modules use this configuation file
 
-/*============================ INCLUDES ======================================*/
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L

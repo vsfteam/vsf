@@ -19,7 +19,8 @@
 
 #define __VSF_DISTBUS_CLASS_INHERIT__
 // for distbus_dcd constants
-#define VSF_USBD_USE_DCD_DISTBUS            ENABLED
+#define VSF_HAL_USE_DISTBUS                         ENABLED
+#   define VSF_HAL_USE_DISTBUS_USBD                 ENABLED
 #include "vsf.h"
 
 #if     VSF_USE_USB_DEVICE == ENABLED && VSF_USE_DISTBUS == ENABLED             \

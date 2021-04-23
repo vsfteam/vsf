@@ -23,7 +23,8 @@
     &&  (   VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED                               \
         ||  VSF_USBD_USE_DCD_DWCOTG == ENABLED                                  \
         ||  VSF_USBD_USE_DCD_USBIP == ENABLED                                   \
-        ||  VSF_USBD_USE_DCD_DISTBUS == ENABLED)
+        ||  (   VSF_HAL_USE_DISTBUS == ENABLED                                  \
+            &&  VSF_HAL_USE_DISTBUS_USBD == ENABLED))
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -76,7 +77,7 @@ usrapp_usbd_common_t usrapp_usbd_common = {
 #if VSF_USBD_USE_DCD_DWCOTG == ENABLED
     .dwcotg_dcd.param       = &usrapp_usbd_common_const.dwcotg_dcd_param,
 #endif
-#if VSF_USBD_USE_DCD_DISTBUS == ENABLED
+#if VSF_HAL_USE_DISTBUS == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
     .distbus_dcd.distbus    = NULL,
 #endif
 };
@@ -91,7 +92,7 @@ vsf_usb_dc_from_usbip_ip(0, usrapp_usbd_common.usbip_dcd, VSF_USB_DC0)
 vsf_usb_dc_from_musbfdrc_ip(0, usrapp_usbd_common.musb_fdrc_dcd, VSF_USB_DC0)
 #elif VSF_USBD_USE_DCD_DWCOTG == ENABLED
 vsf_usb_dc_from_dwcotg_ip(0, usrapp_usbd_common.dwcotg_dcd, VSF_USB_DC0)
-#elif VSF_USBD_USE_DCD_DISTBUS == ENABLED
+#elif VSF_HAL_USE_DISTBUS == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
 vsf_usb_dc_from_distbus_ip(0, usrapp_usbd_common.distbus_dcd, VSF_USB_DC0)
 #endif
 

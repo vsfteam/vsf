@@ -86,6 +86,9 @@
 #if !defined(__HAL_DRIVER_H__) && !defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 #define __HAL_DRIVER_H__
 
+//! software emulated hal drivers
+#include "./vsf/driver.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -43,9 +43,6 @@
 #if VSF_USBD_USE_DCD_USBIP == ENABLED
 #   include "../driver/dcd/usbip_dcd/vsf_usbip_dcd.h"
 #endif
-#if VSF_USBD_USE_DCD_DISTBUS == ENABLED
-#   include "../driver/dcd/distbus_dcd/vsf_distbus_dcd.h"
-#endif
 
 #if VSF_USBD_CFG_RAW_MODE == ENABLED
 // user want to do every thing, expose driver interface

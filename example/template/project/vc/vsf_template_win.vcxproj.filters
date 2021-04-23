@@ -961,9 +961,6 @@
     <Filter Include="vsf\component\3rd-party\lvgl\raw\src\lv_widgets">
       <UniqueIdentifier>{a71ed2e5-41c7-4134-aa7b-b4284a9ec1df}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\driver\dcd\distbus_dcd">
-      <UniqueIdentifier>{1db0d307-e539-4a31-8a26-9940a27d11d3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usrapp\demo\disp_demo">
       <UniqueIdentifier>{5109e45f-fcf2-478c-a788-0d2efb5fb7a2}</UniqueIdentifier>
     </Filter>
@@ -984,6 +981,15 @@
     </Filter>
     <Filter Include="vsf\service\simple_stream\distbus_stream">
       <UniqueIdentifier>{ba4d14ee-14bf-4dcb-a808-d75f56e31383}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\vsf">
+      <UniqueIdentifier>{0818f839-a9b7-4143-84d7-efed8f3f49a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\vsf\distbus">
+      <UniqueIdentifier>{2aa569c3-2a7b-479a-89af-d012c1aaa035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\vsf\distbus\usbd">
+      <UniqueIdentifier>{dd3cbac8-3d0d-4f45-9bdc-f2a7c066672d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -2901,9 +2907,6 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_decoder.h">
       <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\usb\driver\dcd\distbus_dcd\vsf_distbus_dcd.h">
-      <Filter>vsf\component\usb\driver\dcd\distbus_dcd</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_connect_macro.h">
       <Filter>vsf\utilities\preprocessor</Filter>
     </ClInclude>
@@ -2924,6 +2927,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.h">
       <Filter>vsf\service\simple_stream\distbus_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\vsf\driver.h">
+      <Filter>vsf\hal\driver\vsf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\driver.h">
+      <Filter>vsf\hal\driver\vsf\distbus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_distbus_dcd.h">
+      <Filter>vsf\hal\driver\vsf\distbus\usbd</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -4925,9 +4937,6 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_decoder.c">
       <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\usb\driver\dcd\distbus_dcd\vsf_distbus_dcd.c">
-      <Filter>vsf\component\usb\driver\dcd\distbus_dcd</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\demo\disp_demo\disp_demo.c">
       <Filter>usrapp\demo\disp_demo</Filter>
     </ClCompile>
@@ -4954,6 +4963,12 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_terminal_application.c">
       <Filter>usrapp\demo\lvgl_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\vsf_distbus_driver.c">
+      <Filter>vsf\hal\driver\vsf\distbus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_distbus_dcd.c">
+      <Filter>vsf\hal\driver\vsf\distbus\usbd</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

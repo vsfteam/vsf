@@ -22,12 +22,10 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DISTBUS == ENABLED
+#if     VSF_USE_USB_DEVICE == ENABLED                                           \
+    &&  VSF_HAL_USE_DISTBUS == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
 
 #include "hal/driver/common/template/vsf_template_usb.h"
-// for distbus
-#include "service/vsf_service.h"
-#include "component/usb/common/usb_common.h"
 
 #if     defined(__VSF_DISTBUS_DCD_CLASS_IMPLEMENT)
 #   undef __VSF_DISTBUS_DCD_CLASS_IMPLEMENT
@@ -101,7 +99,7 @@ vsf_class(vk_distbus_dcd_t) {
             };
             vk_distbus_dcd_ep_t     ep[32];
         };
-        struct usb_ctrlrequest_t    setup;
+        uint8_t                     setup[8];
         uint16_t                    frame_number;
         uint16_t                    mframe_number;
         uint8_t                     address;
