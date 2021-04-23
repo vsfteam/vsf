@@ -261,6 +261,7 @@ void * __lvgl_thread(void *arg)
         vsf_thread_wfe(VSF_EVT_USER);
 #endif
     }
+    return NULL;
 }
 
 static NO_INIT vsf_eda_t *__lvgl_demo_evt_to_notify;
