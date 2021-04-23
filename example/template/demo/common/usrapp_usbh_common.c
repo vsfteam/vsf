@@ -134,7 +134,7 @@ vsf_err_t usrapp_usbh_common_init(void)
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.libusb);
 #endif
 #if VSF_USE_TCPIP == ENABLED && VSF_USBH_USE_ECM == ENABLED
-#   if VSF_USBH_USE_LIBUSB == ENABLED
+#   if VSF_USBH_USE_RTL8152 == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.rtl8152);
 #   endif
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.ecm);
