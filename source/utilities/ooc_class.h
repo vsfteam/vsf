@@ -26,6 +26,14 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_declare_class(__name)           dcl_simple_class(__name)
+#define vsf_dcl_class                       vsf_declare_class
+
+#define vsf_class(__name)                                                       \
+                dcl_simple_class(__name)                                        \
+                def_simple_class(__name)
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
