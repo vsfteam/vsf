@@ -44,6 +44,7 @@
 #define APP_USE_TGUI_DESIGNER_DEMO                      DISABLED
 #define APP_USE_FREETYPE_DEMO                           ENABLED
 #define USRAPP_CFG_STDIO_EN                             ENABLED
+#define USRAPP_CFG_FAKEFAT32                            ENABLED
 
 // compiler configurations
 #if __IS_COMPILER_LLVM__
@@ -66,7 +67,11 @@
 
 #define VSF_USE_INPUT                                   ENABLED
 #define VSF_USE_UI                                      ENABLED
+#define VSF_USE_MAL                                     ENABLED
+#   define VSF_MAL_USE_FAKEFAT32_MAL                    ENABLED
 #define VSF_USE_FS                                      ENABLED
+#   define VSF_FS_USE_MEMFS                             ENABLED
+#   define VSF_FS_USE_FATFS                             ENABLED
 #define VSF_USE_TRACE                                   ENABLED
 #define VSF_USE_FIFO                                    ENABLED
 #define VSF_USE_SIMPLE_STREAM                           ENABLED

@@ -119,6 +119,10 @@
     <ClInclude Include="..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.h" />
     <ClInclude Include="..\..\..\..\source\component\input\vsf_input.h" />
     <ClInclude Include="..\..\..\..\source\component\input\vsf_input_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\driver\mim_mal\vsf_mim_mal.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\vsf_mal.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\vsf_mal_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\fb\vsf_disp_fb.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\sitronix\common\vsf_disp_sitronix_common.h" />
@@ -262,6 +266,7 @@
     <ClInclude Include="..\..\config\vsf_usr_cfg.h" />
     <ClInclude Include="..\..\demo\common\usrapp_common.h" />
     <ClInclude Include="..\..\demo\common\usrapp_ui_common.h" />
+    <ClInclude Include="..\..\demo\fakefat32.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images_data.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.h" />
@@ -321,6 +326,9 @@
     <ClCompile Include="..\..\..\..\source\component\input\driver\hid\vsf_input_hid.c" />
     <ClCompile Include="..\..\..\..\source\component\input\driver\nspro\vsf_input_nspro.c" />
     <ClCompile Include="..\..\..\..\source\component\input\vsf_input.c" />
+    <ClCompile Include="..\..\..\..\source\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c" />
+    <ClCompile Include="..\..\..\..\source\component\mal\driver\mim_mal\vsf_mim_mal.c" />
+    <ClCompile Include="..\..\..\..\source\component\mal\vsf_mal.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\fb\vsf_disp_fb.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\sitronix\common\vsf_disp_sitronix_common.c" />
@@ -405,6 +413,8 @@
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_queue.c" />
     <ClCompile Include="..\..\demo\common\usrapp_common.c" />
     <ClCompile Include="..\..\demo\common\usrapp_ui_common.c" />
+    <ClCompile Include="..\..\demo\fakefat32.c" />
+    <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.c" />
