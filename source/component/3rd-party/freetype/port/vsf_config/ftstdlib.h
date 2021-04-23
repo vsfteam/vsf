@@ -99,7 +99,7 @@
    */
 
 
-#include "component/mal/vsf_mal.h"
+#include "component/fs/vsf_fs.h"
 #include "utilities/vsf_utilities.h"
 #include "utilities/ooc_class.h"
 
