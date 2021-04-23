@@ -2934,7 +2934,7 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\driver.h">
       <Filter>vsf\hal\driver\vsf\distbus</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_distbus_dcd.h">
+    <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.h">
       <Filter>vsf\hal\driver\vsf\distbus\usbd</Filter>
     </ClInclude>
   </ItemGroup>
@@ -4949,9 +4949,6 @@
     <ClCompile Include="..\..\demo\distbus_demo\bus\distbus_usart.c">
       <Filter>usrapp\demo\distbus_demo\bus</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\demo\distbus_demo\app\distbus_usbd.c">
-      <Filter>usrapp\demo\distbus_demo\app</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\port\lua_port.c">
       <Filter>vsf\component\3rd-party\lua\port</Filter>
     </ClCompile>
@@ -4964,11 +4961,14 @@
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_terminal_application.c">
       <Filter>usrapp\demo\lvgl_demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\vsf_distbus_driver.c">
+    <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\vsf_hal_distbus.c">
       <Filter>vsf\hal\driver\vsf\distbus</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_distbus_dcd.c">
+    <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.c">
       <Filter>vsf\hal\driver\vsf\distbus\usbd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\distbus_demo\app\distbus_hal.c">
+      <Filter>usrapp\demo\distbus_demo\app</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

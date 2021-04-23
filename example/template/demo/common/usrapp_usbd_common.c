@@ -78,7 +78,7 @@ usrapp_usbd_common_t usrapp_usbd_common = {
     .dwcotg_dcd.param       = &usrapp_usbd_common_const.dwcotg_dcd_param,
 #endif
 #if VSF_HAL_USE_DISTBUS == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
-    .distbus_dcd.distbus    = NULL,
+    .hal_distbus.distbus    = NULL,
 #endif
 };
 
@@ -93,7 +93,7 @@ vsf_usb_dc_from_musbfdrc_ip(0, usrapp_usbd_common.musb_fdrc_dcd, VSF_USB_DC0)
 #elif VSF_USBD_USE_DCD_DWCOTG == ENABLED
 vsf_usb_dc_from_dwcotg_ip(0, usrapp_usbd_common.dwcotg_dcd, VSF_USB_DC0)
 #elif VSF_HAL_USE_DISTBUS == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
-vsf_usb_dc_from_distbus_ip(0, usrapp_usbd_common.distbus_dcd, VSF_USB_DC0)
+vsf_usb_dc_from_distbus_ip(0, usrapp_usbd_common.hal_distbus, VSF_USB_DC0)
 #endif
 
 

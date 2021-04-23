@@ -60,7 +60,7 @@ typedef struct usrapp_usbd_common_t {
     vk_dwcotg_dcd_t dwcotg_dcd;
 #endif
 #if VSF_HAL_USE_DISTBUS == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
-    vk_distbus_dcd_t distbus_dcd;
+    vsf_hal_distbus_t hal_distbus;
 #endif
 } usrapp_usbd_common_t;
 

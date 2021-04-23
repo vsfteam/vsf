@@ -116,7 +116,8 @@
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 //#define APP_USE_DISTBUS_DEMO                            ENABLED
-//#   define APP_USE_DISTBUS_USBD_SLAVE_DEMO              ENABLED
+//#   define APP_USE_DISTBUS_HAL_SLAVE_DEMO               ENABLED
+//#       define APP_USE_DISTBUS_HAL_USBD_SLAVE_DEMO      ENABLED
 //#   define APP_DISTBUS_DEMO_CFG_LWIP_SERVER             ENABLED
 
 // demo for AIC8800
@@ -241,12 +242,12 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #endif
 
 #if     APP_USE_USBD_DEMO == ENABLED                                            \
-    ||  (APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_SLAVE_DEMO == ENABLED)
+    ||  (APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_HAL_SLAVE_DEMO == ENABLED)
 #   define VSF_USE_USB_DEVICE                           ENABLED
-#   if      APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_MASTER_DEMO == ENABLED
+#   if      APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_HAL_MASTER_DEMO == ENABLED
 #       define VSF_HAL_USE_DISTBUS                      ENABLED
 #           define VSF_HAL_USE_DISTBUS_USBD             ENABLED
-#   elif    APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_SLAVE_DEMO == ENABLED
+#   elif    APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_HAL_SLAVE_DEMO == ENABLED
 #       define VSF_USBD_USE_DCD_DWCOTG                  ENABLED
 #           define USRAPP_USBD_DWCOTG_CFG_ULPI_EN       true
 #           define USRAPP_USBD_DWCOTG_CFG_UTMI_EN       false

@@ -5634,7 +5634,7 @@
                 <group>
                     <name>app</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\demo\distbus_demo\app\distbus_usbd.c</name>
+                        <name>$PROJ_DIR$\..\..\demo\distbus_demo\app\distbus_hal.c</name>
                     </file>
                 </group>
                 <group>
@@ -11651,17 +11651,17 @@
                         <group>
                             <name>usbd</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_distbus_dcd.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_distbus_dcd.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.h</name>
                             </file>
                         </group>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\driver.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\vsf_distbus_driver.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\vsf_hal_distbus.c</name>
                         </file>
                     </group>
                     <file>

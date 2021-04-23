@@ -115,12 +115,12 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
-#if     APP_USE_DISTBUS_USBD_SLAVE_DEMO == ENABLED
-    extern void __user_distbus_usbd_service_init(vsf_distbus_t *distbus);
-    __user_distbus_usbd_service_init(&__user_dustbus.distbus);
-#elif   APP_USE_DISTBUS_USBD_MASTER_DEMO == ENABLED
-    usrapp_usbd_common.distbus_dcd.distbus = &__user_dustbus.distbus;
-    vk_distbus_usbd_register_service(&usrapp_usbd_common.distbus_dcd);
+#if     APP_USE_DISTBUS_HAL_SLAVE_DEMO == ENABLED
+    extern void __user_distbus_hal_service_init(vsf_distbus_t *distbus);
+    __user_distbus_hal_service_init(&__user_dustbus.distbus);
+#elif   APP_USE_DISTBUS_HAL_MASTER_DEMO == ENABLED
+    usrapp_usbd_common.hal_distbus.distbus = &__user_dustbus.distbus;
+    vsf_hal_distbus_register_service(&usrapp_usbd_common.hal_distbus);
 #endif
 
     VSF_POOL_INIT(__user_distbus_msg_pool, &__user_dustbus.msg_pool, APP_DISTBUS_DEMO_CFG_POOL_NUM);

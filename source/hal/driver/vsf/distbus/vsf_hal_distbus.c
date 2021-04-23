@@ -19,12 +19,53 @@
 
 #include "hal/vsf_hal_cfg.h"
 
+#if VSF_HAL_USE_DISTBUS == ENABLED
+
+#define __VSF_HAL_DISTBUS_CLASS_IMPLEMENT
+#include "./driver.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *bus,
+                        vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
+
+/*============================ LOCAL VARIABLES ===============================*/
+
+static const vsf_distbus_service_info_t __vsf_hal_distbus_info = {
+    .mtu                = 8 + VSF_HAL_DISTBUS_CFG_MTU,
+    .type               = 0,
+    .addr_range         = VSF_HAL_DISTBUS_ADDR_RANGE,
+    .handler            = __vsf_hal_distbus_msghandler,
+};
+
 /*============================ IMPLEMENTATION ================================*/
 
+static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *bus,
+                        vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
+{
+    uint8_t addr = msg->header.addr;
+    bool retain_msg = false;
+
+#if VSF_HAL_USE_DISTBUS_USBD == ENABLED
+    if ((addr >= VSF_HAL_DISTBUS_USBD_CMD_BEGIN) && (addr <= VSF_HAL_DISTBUS_USBD_CMD_END)) {
+        extern bool __vsf_hal_distbus_usbd_msghandler(vsf_distbus_t *bus,
+                        vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
+        retain_msg = __vsf_hal_distbus_usbd_msghandler(bus, service, msg);
+    }
+#endif
+
+    return retain_msg;
+}
+
+void vsf_hal_distbus_register_service(vsf_hal_distbus_t *hal_distbus)
+{
+    hal_distbus->service.info = &__vsf_hal_distbus_info;
+    vsf_distbus_register_service(hal_distbus->distbus, &hal_distbus->service);
+}
+
+#endif
 /* EOF */

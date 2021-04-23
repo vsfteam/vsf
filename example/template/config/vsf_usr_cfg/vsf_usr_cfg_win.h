@@ -59,7 +59,8 @@
 #define APP_USE_STREAM_HAL_DEMO                         ENABLED
 #   define APP_USE_STREAM_USART_DEMO                    ENABLED
 //#define APP_USE_DISTBUS_DEMO                            ENABLED
-//#   define APP_USE_DISTBUS_USBD_MASTER_DEMO             ENABLED
+//#   define APP_USE_DISTBUS_HAL_MASTER_DEMO              ENABLED
+//#       define APP_USE_DISTBUS_HAL_USBD_MASTER_DEMO     ENABLED
 //#   define APP_DISTBUS_DEMO_CFG_LWIP_CLIENT             ENABLED
 
 #define APP_USE_CPP_DEMO                                DISABLED
@@ -212,9 +213,11 @@
 #define VSF_SYSTIMER_FREQ                               (0ul)
 
 #define VSF_USE_USB_DEVICE                              ENABLED
-#   if APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_MASTER_DEMO == ENABLED
+#   if APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_HAL_MASTER_DEMO == ENABLED
 #       define VSF_HAL_USE_DISTBUS                      ENABLED
+#       if APP_USE_DISTBUS_HAL_USBD_MASTER_DEMO == ENABLED
 #           define VSF_HAL_USE_DISTBUS_USBD             ENABLED
+#       endif
 #   else
 #       define VSF_USBD_USE_DCD_USBIP                   ENABLED
 #           define VSF_USBIP_SERVER_CFG_DEBUG           ENABLED
