@@ -114,9 +114,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_disp_ssd1306_t)
-
-def_simple_class(vk_disp_ssd1306_t) {
+vsf_class(vk_disp_ssd1306_t) {
     public_member(
         implement(vk_disp_t)
 

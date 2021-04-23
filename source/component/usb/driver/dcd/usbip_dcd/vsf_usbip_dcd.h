@@ -136,8 +136,6 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbip_dcd_t)
-
 typedef struct vk_usbip_dcd_param_t {
     uint16_t port;
 } vk_usbip_dcd_param_t;
@@ -157,7 +155,7 @@ typedef struct vk_usbip_dcd_ep_t {
     } transfer;
 } vk_usbip_dcd_ep_t;
 
-def_simple_class(vk_usbip_dcd_t) {
+vsf_class(vk_usbip_dcd_t) {
     public_member(
         vk_usbip_dcd_param_t const * const param;
     )

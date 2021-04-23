@@ -78,8 +78,8 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsfip_socket_t)
-dcl_simple_class(vsfip_netbuf_t)
+vsf_dcl_class(vsfip_socket_t)
+vsf_dcl_class(vsfip_netbuf_t)
 
 typedef vk_netdrv_addr_t vsfip_addr_t;
 typedef vk_netdrv_addr_t vsfip_ipaddr_t;
@@ -254,7 +254,7 @@ typedef struct vsfip_pcb_t {
 //    users can only access app data area
 //    If VSFIP_IPBUF_NO_AUTOFREE is set in flags while sending buffer,
 //        buffer will not be released after being sent.
-def_simple_class(vsfip_netbuf_t) {
+vsf_class(vsfip_netbuf_t) {
     vsf_dlist_node_t proto_node;
     vsf_slist_node_t netif_node;
     vsf_mem_t buf;
@@ -274,7 +274,7 @@ def_simple_class(vsfip_netbuf_t) {
     vsfip_netif_t *netif;
 };
 
-def_simple_class(vsfip_socket_t) {
+vsf_class(vsfip_socket_t) {
     vsf_slist_node_t node;
 
     vsfip_sock_familt_t family;

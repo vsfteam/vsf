@@ -43,9 +43,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_audio_dev_t)
-dcl_simple_class(vk_audio_drv_t)
-
 typedef struct vk_audio_play_drv_t {
     vsf_peda_evthandler_t volume;
     vsf_peda_evthandler_t mute;
@@ -60,7 +57,7 @@ typedef struct vk_audio_capture_drv_t {
     vsf_peda_evthandler_t stop;
 } vk_audio_capture_drv_t;
 
-def_simple_class(vk_audio_drv_t) {
+vsf_class(vk_audio_drv_t) {
     protected_member(
         vsf_peda_evthandler_t init;
 #if VSF_AUDIO_USE_PLAY == ENABLED
@@ -83,7 +80,7 @@ typedef struct vk_audio_stream_t {
     vsf_stream_t *stream;
 } vk_audio_stream_t;
 
-def_simple_class(vk_audio_dev_t) {
+vsf_class(vk_audio_dev_t) {
     public_member(
         const vk_audio_drv_t *drv;
         vsf_arch_prio_t hw_prio;

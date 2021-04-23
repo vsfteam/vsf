@@ -101,10 +101,10 @@ extern "C" {
 #define __vsf_fifo(__name)              __name##_fifo_t
 
 #define __declare_vsf_fifo(__name)                                              \
-            dcl_simple_class(vsf_fifo(__name))
+            vsf_dcl_class(vsf_fifo(__name))
 
 #define __define_vsf_fifo(__name, __item_type, __depth)                         \
-            def_simple_class(vsf_fifo(__name)) {                                \
+            vsf_class(vsf_fifo(__name)) {                                       \
                 private_member(                                                 \
                     implement(vsf_fifo_base_t)                                  \
                     __item_type mem[__depth];                                   \
@@ -169,10 +169,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsf_fifo_t)
-dcl_simple_class(vsf_fifo_base_t)
-
-def_simple_class(vsf_fifo_base_t) {
+vsf_class(vsf_fifo_base_t) {
     private_member(
         vsf_fifo_index_t head;
         vsf_fifo_index_t tail;
@@ -183,7 +180,7 @@ def_simple_class(vsf_fifo_base_t) {
 
 //! \name fifo
 //! @{
-def_simple_class(vsf_fifo_t) {
+vsf_class(vsf_fifo_t) {
     private_member(
         implement(vsf_fifo_base_t)
         uint32_t nodes[0];

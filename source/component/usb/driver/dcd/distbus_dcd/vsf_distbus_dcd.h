@@ -70,8 +70,6 @@ enum {
     VSF_DISTBUS_DCD_ADDR_RANGE,
 };
 
-dcl_simple_class(vk_distbus_dcd_t)
-
 typedef struct vk_distbus_dcd_ep_t {
     uint16_t                        size;
     uint8_t                         type : 2;
@@ -83,7 +81,7 @@ typedef struct vk_distbus_dcd_ep_t {
     vsf_distbus_msg_t               *msg;
 } vk_distbus_dcd_ep_t;
 
-def_simple_class(vk_distbus_dcd_t) {
+vsf_class(vk_distbus_dcd_t) {
     public_member(
         vsf_distbus_t               *distbus;
     )

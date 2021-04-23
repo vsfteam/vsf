@@ -39,8 +39,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_memfs_file_t)
-
 __vsf_component_peda_ifs(vk_memfs_callback_read,
     uint64_t        offset;
     uint32_t        size;
@@ -52,7 +50,7 @@ __vsf_component_peda_ifs(vk_memfs_callback_write,
     uint8_t         *buff;
 )
 
-def_simple_class(vk_memfs_file_t) {
+vsf_class(vk_memfs_file_t) {
     public_member(
         implement(vk_file_t)
 

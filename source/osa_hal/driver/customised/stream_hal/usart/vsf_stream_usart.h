@@ -47,9 +47,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_stream_usart_t)
-
-def_simple_class(vsf_stream_usart_t) {
+vsf_class(vsf_stream_usart_t) {
     public_member(
         vsf_usart_t *usart;
         vsf_stream_t *stream_tx;

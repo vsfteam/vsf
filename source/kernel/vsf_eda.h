@@ -592,16 +592,16 @@ enum {
     VSF_KERNEL_EVT_QUEUE_RECV_NOTIFY    = VSF_EVT_USER + 3,
 };
 
-dcl_simple_class(vsf_eda_t)
-dcl_simple_class(vsf_teda_t)
-dcl_simple_class(vsf_sync_t)
-dcl_simple_class(vsf_sync_owner_t)
-dcl_simple_class(vsf_bmpevt_t)
-dcl_simple_class(vsf_bmpevt_pender_t)
-dcl_simple_class(vsf_bmpevt_adapter_t)
-dcl_simple_class(vsf_bmpevt_adapter_eda_t)
-dcl_simple_class(vsf_eda_queue_t)
-dcl_simple_class(vsf_callback_timer_t)
+vsf_dcl_class(vsf_eda_t)
+vsf_dcl_class(vsf_teda_t)
+vsf_dcl_class(vsf_sync_t)
+vsf_dcl_class(vsf_sync_owner_t)
+vsf_dcl_class(vsf_bmpevt_t)
+vsf_dcl_class(vsf_bmpevt_pender_t)
+vsf_dcl_class(vsf_bmpevt_adapter_t)
+vsf_dcl_class(vsf_bmpevt_adapter_eda_t)
+vsf_dcl_class(vsf_eda_queue_t)
+vsf_dcl_class(vsf_callback_timer_t)
 
 typedef int16_t vsf_evt_t;
 
@@ -679,8 +679,8 @@ typedef struct __vsf_eda_frame_state_t {
     uint16_t                    local_size;
 } __vsf_eda_frame_state_t;
 
-dcl_simple_class(__vsf_eda_frame_t)
-def_simple_class(__vsf_eda_frame_t) {
+vsf_dcl_class(__vsf_eda_frame_t)
+vsf_class(__vsf_eda_frame_t) {
     protected_member (
         implement(vsf_slist_node_t)
         __vsf_eda_fn_t          fn;
@@ -704,7 +704,7 @@ typedef struct vsf_eda_cfg_t {
 
 //! \name eda
 //! @{
-def_simple_class(vsf_eda_t) {
+vsf_class(vsf_eda_t) {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     protected_member(
         vsf_eda_on_terminate_t  on_terminate;
@@ -763,7 +763,7 @@ def_simple_class(vsf_eda_t) {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 //! \name timed eda
 //! @{
-def_simple_class(vsf_teda_t)  {
+vsf_class(vsf_teda_t)  {
     which(
         implement(vsf_eda_t)
     )
@@ -777,7 +777,7 @@ def_simple_class(vsf_teda_t)  {
 #if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 //! \name callback_timer
 //! @{
-def_simple_class(vsf_callback_timer_t) {
+vsf_class(vsf_callback_timer_t) {
     public_member(
         void (*on_timer)(vsf_callback_timer_t *timer);
     )
@@ -793,7 +793,7 @@ def_simple_class(vsf_callback_timer_t) {
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 //! \name sync
 //! @{
-def_simple_class(vsf_sync_t) {
+vsf_class(vsf_sync_t) {
 
     protected_member(
         union {
@@ -818,7 +818,7 @@ def_simple_class(vsf_sync_t) {
 
 //! \name sync_with_owner
 //! @{
-def_simple_class(vsf_sync_owner_t) {
+vsf_class(vsf_sync_owner_t) {
     which(
         implement(vsf_sync_t)
     )
@@ -842,7 +842,7 @@ typedef struct vsf_bmpevt_adapter_op_t {
 
 //! \name bmpevt_adapter
 //! @{
-def_simple_class(vsf_bmpevt_adapter_t) {
+vsf_class(vsf_bmpevt_adapter_t) {
 
     public_member (
         const vsf_bmpevt_adapter_op_t   *op;
@@ -856,7 +856,7 @@ def_simple_class(vsf_bmpevt_adapter_t) {
 
 //! \name bmpevt_adapter_eda
 //! @{
-def_simple_class(vsf_bmpevt_adapter_eda_t) {
+vsf_class(vsf_bmpevt_adapter_eda_t) {
     which(
         implement(vsf_bmpevt_adapter_t)
     )
@@ -868,7 +868,7 @@ def_simple_class(vsf_bmpevt_adapter_eda_t) {
 
 //! \name bmpevt_pender
 //! @{
-def_simple_class(vsf_bmpevt_pender_t) {
+vsf_class(vsf_bmpevt_pender_t) {
 
     public_member (
         uint32_t                mask;
@@ -883,7 +883,7 @@ def_simple_class(vsf_bmpevt_pender_t) {
 
 //! \name bmpevt
 //! @{
-def_simple_class(vsf_bmpevt_t) {
+vsf_class(vsf_bmpevt_t) {
 
     public_member (
         uint32_t                auto_reset;
@@ -922,7 +922,7 @@ typedef struct vsf_eda_queue_op_t vsf_osa_queue_op_t;
 
 //! \name queue
 //! @{
-def_simple_class(vsf_eda_queue_t) {
+vsf_class(vsf_eda_queue_t) {
     union {
         implement(vsf_sync_t)
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED

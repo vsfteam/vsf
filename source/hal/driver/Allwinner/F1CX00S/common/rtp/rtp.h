@@ -37,8 +37,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsf_rtp_t)
-def_simple_class(vsf_rtp_t) {
+vsf_class(vsf_rtp_t) {
     public_member(
         // todo: inherit vsf_rtp_common_t, which include bitlen
         uint8_t bitlen;

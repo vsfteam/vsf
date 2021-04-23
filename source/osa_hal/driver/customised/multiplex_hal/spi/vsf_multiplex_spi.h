@@ -46,9 +46,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_multiplex_spi_t)
-
-def_simple_class(vsf_multiplex_spi_t) {
+vsf_class(vsf_multiplex_spi_t) {
     public_member(
         implement(vsf_io_spi_t)
     )

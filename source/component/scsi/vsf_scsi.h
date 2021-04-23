@@ -42,8 +42,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_scsi_t)
-dcl_simple_class(vk_scsi_drv_t)
+vsf_dcl_class(vk_scsi_t)
+vsf_dcl_class(vk_scsi_drv_t)
 
 typedef enum scsi_sensekey_t {
     SCSI_SENSEKEY_NO_SENSE                      = 0,
@@ -112,7 +112,7 @@ typedef struct scsi_inquiry_t {
     uint8_t revision[4];
 } PACKED scsi_inquiry_t;
 
-def_simple_class(vk_scsi_drv_t) {
+vsf_class(vk_scsi_drv_t) {
     protected_member(
         vsf_peda_evthandler_t init;
         vsf_peda_evthandler_t fini;
@@ -125,7 +125,7 @@ def_simple_class(vk_scsi_drv_t) {
 };
 
 
-def_simple_class(vk_scsi_t) {
+vsf_class(vk_scsi_t) {
     public_member(
         const vk_scsi_drv_t *drv;
         void *param;

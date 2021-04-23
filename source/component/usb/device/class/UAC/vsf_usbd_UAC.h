@@ -46,9 +46,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbd_uac_ac_t)
-dcl_simple_class(vk_usbd_uac_as_t)
-
 typedef struct vk_usbd_uac_control_t vk_usbd_uac_control_t;
 
 typedef struct vk_usbd_uac_control_info_t {
@@ -74,7 +71,7 @@ typedef struct vk_usbd_uac_entity_t {
 } vk_usbd_uac_entity_t;
 
 // audio control
-def_simple_class(vk_usbd_uac_ac_t) {
+vsf_class(vk_usbd_uac_ac_t) {
 
     public_member(
         uint8_t entity_num;
@@ -93,7 +90,7 @@ def_simple_class(vk_usbd_uac_ac_t) {
 };
 
 // audio stream
-def_simple_class(vk_usbd_uac_as_t) {
+vsf_class(vk_usbd_uac_as_t) {
     public_member(
         uint8_t ep;
         uint16_t packet_size;

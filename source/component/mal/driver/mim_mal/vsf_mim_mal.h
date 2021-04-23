@@ -39,9 +39,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_mim_mal_t)
-
-def_simple_class(vk_mim_mal_t) {
+vsf_class(vk_mim_mal_t) {
     implement(vk_mal_t)
 
     public_member(

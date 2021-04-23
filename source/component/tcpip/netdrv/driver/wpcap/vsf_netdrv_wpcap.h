@@ -39,9 +39,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_netdrv_wpcap_t)
-
-def_simple_class(vk_netdrv_wpcap_t) {
+vsf_class(vk_netdrv_wpcap_t) {
     public_member(
         implement(vk_netdrv_t)
         char *name;

@@ -71,9 +71,9 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsf_linux_process_t)
-dcl_simple_class(vsf_linux_thread_t)
-dcl_simple_class(vsf_linux_fd_t)
+vsf_dcl_class(vsf_linux_process_t)
+vsf_dcl_class(vsf_linux_thread_t)
+vsf_dcl_class(vsf_linux_fd_t)
 
 typedef struct vsf_linux_process_arg_t {
     int argc;
@@ -94,7 +94,7 @@ typedef struct vsf_linux_process_ctx_t {
     vsf_linux_main_entry_t entry;
 } vsf_linux_process_ctx_t;
 
-def_simple_class(vsf_linux_thread_t) {
+vsf_class(vsf_linux_thread_t) {
     public_member(
         implement(vsf_thread_t)
         implement(vsf_thread_cb_t)
@@ -128,7 +128,7 @@ typedef struct vsf_linux_stdio_stream_t {
     vsf_stream_t *err;
 } vsf_linux_stdio_stream_t;
 
-def_simple_class(vsf_linux_process_t) {
+vsf_class(vsf_linux_process_t) {
     public_member(
         vsf_linux_process_ctx_t ctx;
     )
@@ -169,7 +169,7 @@ typedef struct vsf_linux_fd_op_t {
     int (*fn_close)(vsf_linux_fd_t *sfd);
 } vsf_linux_fd_op_t;
 
-def_simple_class(vsf_linux_fd_t) {
+vsf_class(vsf_linux_fd_t) {
     protected_member(
         int fd;
         int flags;

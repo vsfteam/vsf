@@ -94,9 +94,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_disp_st7735_t)
-
-def_simple_class(vk_disp_st7735_t) {
+vsf_class(vk_disp_st7735_t) {
     public_member(
         implement(vk_disp_sitronix_t);
 

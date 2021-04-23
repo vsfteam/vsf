@@ -50,7 +50,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbd_cdc_t)
+vsf_dcl_class(vk_usbd_cdc_t)
 
 typedef union vk_usbd_cdc_ep_t {
     struct {
@@ -71,7 +71,7 @@ struct vk_usbd_cdc_encapsulate_t {
     };
 };
 
-def_simple_class(vk_usbd_cdc_t) {
+vsf_class(vk_usbd_cdc_t) {
 
     public_member(
         implement_ex(vk_usbd_cdc_ep_t, ep)

@@ -375,11 +375,11 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbd_dev_t)
-dcl_simple_class(vk_usbd_cfg_t)
-dcl_simple_class(vk_usbd_ifs_t)
-dcl_simple_class(vk_usbd_trans_t)
-dcl_simple_class(vk_usbd_class_op_t)
+vsf_dcl_class(vk_usbd_dev_t)
+vsf_dcl_class(vk_usbd_cfg_t)
+vsf_dcl_class(vk_usbd_ifs_t)
+vsf_dcl_class(vk_usbd_trans_t)
+vsf_dcl_class(vk_usbd_class_op_t)
 
 typedef enum vk_usbd_evt_t {
     USB_ON_INIT =   USB_USR_EVT + 0,
@@ -395,7 +395,7 @@ typedef struct vk_usbd_desc_t {
 } vk_usbd_desc_t;
 
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
-def_simple_class(vk_usbd_class_op_t) {
+vsf_class(vk_usbd_class_op_t) {
     protected_member(
         vk_usbd_desc_t * (*get_desc)(vk_usbd_dev_t *dev, uint_fast8_t type,
                 uint_fast8_t index, uint_fast16_t langid);
@@ -409,7 +409,7 @@ def_simple_class(vk_usbd_class_op_t) {
 };
 #endif
 
-def_simple_class(vk_usbd_trans_t) {
+vsf_class(vk_usbd_trans_t) {
     public_member(
         uint8_t ep;
         uint8_t feature;
@@ -442,7 +442,7 @@ typedef struct vk_usbd_ctrl_handler_t {
 } vk_usbd_ctrl_handler_t;
 
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
-def_simple_class(vk_usbd_ifs_t) {
+vsf_class(vk_usbd_ifs_t) {
 
     public_member(
         const vk_usbd_class_op_t *class_op;
@@ -455,7 +455,7 @@ def_simple_class(vk_usbd_ifs_t) {
     )
 };
 
-def_simple_class(vk_usbd_cfg_t) {
+vsf_class(vk_usbd_cfg_t) {
 
     public_member(
         vsf_err_t (*init)(vk_usbd_dev_t *dev);
@@ -472,7 +472,7 @@ def_simple_class(vk_usbd_cfg_t) {
 };
 #endif
 
-def_simple_class(vk_usbd_dev_t) {
+vsf_class(vk_usbd_dev_t) {
     public_member(
         usb_dc_speed_t speed;
 
@@ -515,8 +515,8 @@ def_simple_class(vk_usbd_dev_t) {
 
 #if VSF_USBD_CFG_STREAM_EN == ENABLED
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-dcl_simple_class(vk_usbd_ep_stream_t)
-def_simple_class(vk_usbd_ep_stream_t) {
+vsf_dcl_class(vk_usbd_ep_stream_t)
+vsf_class(vk_usbd_ep_stream_t) {
 
     public_member(
         vsf_stream_t *stream;

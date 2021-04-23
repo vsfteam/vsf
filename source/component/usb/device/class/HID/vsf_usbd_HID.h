@@ -48,10 +48,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbd_hid_t)
-dcl_simple_class(vk_usbd_hid_report_t)
-
-def_simple_class(vk_usbd_hid_report_t) {
+vsf_class(vk_usbd_hid_report_t) {
 
     public_member(
         usb_hid_report_type_t type;
@@ -66,7 +63,7 @@ def_simple_class(vk_usbd_hid_report_t) {
     )
 };
 
-def_simple_class(vk_usbd_hid_t) {
+vsf_class(vk_usbd_hid_t) {
 
     public_member(
         uint8_t ep_out;

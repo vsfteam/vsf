@@ -58,10 +58,10 @@ extern "C" {
 #define vsf_distbus_stream_type(__name)     __vsf_distbus_stream_type(__name)
 
 #define __declare_distbus_stream(__name)                                        \
-            dcl_simple_class(vsf_distbus_stream_type(__name))
+            vsf_dcl_class(vsf_distbus_stream_type(__name))
 
 #define __define_distbus_stream(__name)                                         \
-            def_simple_class(vsf_distbus_stream_type(__name)) {                 \
+            vsf_class(vsf_distbus_stream_type(__name)) {                        \
                 public_member(                                                  \
                     implement(vsf_distbus_stream_t)                             \
                 )                                                               \
@@ -95,9 +95,7 @@ enum {
     VSF_DISTBUS_STREAM_ADDR_RANGE,
 };
 
-dcl_simple_class(vsf_distbus_stream_t)
-
-def_simple_class(vsf_distbus_stream_t) {
+vsf_class(vsf_distbus_stream_t) {
     public_member(
         implement(vsf_stream_t)
         implement(vsf_distbus_service_info_t)

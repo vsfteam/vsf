@@ -43,8 +43,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_socket_win_t)
-
 typedef enum vk_socket_win_request_t {
     VSF_SOCKET_WIN_BIND,
     VSF_SOCKET_WIN_LISTEN,
@@ -55,7 +53,7 @@ typedef enum vk_socket_win_request_t {
     VSF_SOCKET_WIN_CLOSE,
 } vk_socket_win_request_t;
 
-def_simple_class(vk_socket_win_t) {
+vsf_class(vk_socket_win_t) {
     public_member(
         implement(vk_socket_t)
     )

@@ -55,10 +55,10 @@ extern "C" {
 #define vsf_fifo_stream_type(__name)        __vsf_fifo_stream_type(__name)
 
 #define __declare_fifo_stream(__name)                                           \
-            dcl_simple_class(vsf_fifo_stream_type(__name))
+            vsf_dcl_class(vsf_fifo_stream_type(__name))
 
 #define __define_fifo_stream(__name, __size)                                    \
-            def_simple_class(vsf_fifo_stream_type(__name)) {                    \
+            vsf_class(vsf_fifo_stream_type(__name)) {                           \
                 public_member(                                                  \
                     implement(vsf_fifo_stream_t)                                \
                     uint8_t __buffer[__size];                                   \
@@ -87,10 +87,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsf_byte_fifo_t)
-dcl_simple_class(vsf_fifo_stream_t)
-
-def_simple_class(vsf_byte_fifo_t) {
+vsf_class(vsf_byte_fifo_t) {
     public_member(
 	    uint8_t *buffer;
         vsf_fifo_stream_size_t size;
@@ -101,7 +98,7 @@ def_simple_class(vsf_byte_fifo_t) {
     )
 };
 
-def_simple_class(vsf_fifo_stream_t) {
+vsf_class(vsf_fifo_stream_t) {
     public_member(
         implement(vsf_stream_t)
         implement(vsf_byte_fifo_t)

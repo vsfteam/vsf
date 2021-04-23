@@ -49,9 +49,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_disp_usbd_uvc_t)
-
-def_simple_class(vk_disp_usbd_uvc_t) {
+vsf_class(vk_disp_usbd_uvc_t) {
     public_member(
         implement(vk_disp_t)
     )

@@ -72,16 +72,16 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_fs_t)
-dcl_simple_class(vk_file_t)
-dcl_simple_class(vk_vfs_file_t)
+vsf_dcl_class(vk_fs_t)
+vsf_dcl_class(vk_file_t)
+vsf_dcl_class(vk_vfs_file_t)
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-dcl_simple_class(vk_file_stream_t)
+vsf_dcl_class(vk_file_stream_t)
 #endif
 
-dcl_simple_class(vk_fs_fop_t)
-dcl_simple_class(vk_fs_dop_t)
-dcl_simple_class(vk_fs_op_t)
+vsf_dcl_class(vk_fs_fop_t)
+vsf_dcl_class(vk_fs_dop_t)
+vsf_dcl_class(vk_fs_op_t)
 
 typedef enum vk_file_attr_t {
     VSF_FILE_ATTR_READ          = 1 << 0,
@@ -94,7 +94,7 @@ typedef enum vk_file_attr_t {
     VSF_FILE_ATTR_USER          = 1 << 9,
 } vk_file_attr_t;
 
-def_simple_class(vk_fs_fop_t) {
+vsf_class(vk_fs_fop_t) {
     protected_member(
         uint8_t close_local_size;
         uint8_t read_local_size;
@@ -107,7 +107,7 @@ def_simple_class(vk_fs_fop_t) {
     )
 };
 
-def_simple_class(vk_fs_dop_t) {
+vsf_class(vk_fs_dop_t) {
     protected_member(
         uint8_t lookup_local_size;
         uint8_t create_local_size;
@@ -123,7 +123,7 @@ def_simple_class(vk_fs_dop_t) {
 };
 
 // TODO: remove fop and dop, put everything here for optimization
-def_simple_class(vk_fs_op_t) {
+vsf_class(vk_fs_op_t) {
     protected_member(
         // if succeed, VSF_VFS_FILE_ATTR_MOUNTED should be set in file->attr
         uint8_t mount_local_size;
@@ -148,7 +148,7 @@ typedef enum vk_file_name_coding_t {
     VSF_FILE_NAME_CODING_UCS2       = (2 << 6) | 1,
 } vk_file_name_coding_t;
 
-def_simple_class(vk_file_t) {
+vsf_class(vk_file_t) {
     public_member(
         vk_file_attr_t attr;
         vk_file_name_coding_t coding;
@@ -179,7 +179,7 @@ typedef enum vk_vfs_file_attr_t {
     VSF_VFS_FILE_ATTR_MOUNTED   = VSF_FILE_ATTR_EXT,
 } vk_vfs_file_attr_t;
 
-def_simple_class(vk_vfs_file_t) {
+vsf_class(vk_vfs_file_t) {
     implement(vk_file_t)
     implement(vsf_dlist_node_t)
 
@@ -206,7 +206,7 @@ def_simple_class(vk_vfs_file_t) {
 #endif
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-def_simple_class(vk_file_stream_t) {
+vsf_class(vk_file_stream_t) {
     public_member(
         vk_file_t *file;
     )

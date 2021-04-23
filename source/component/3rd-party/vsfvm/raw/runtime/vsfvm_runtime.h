@@ -39,10 +39,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsfvm_runtime_t)
-dcl_simple_class(vsfvm_runtime_script_t)
-dcl_simple_class(vsfvm_thread_t)
-dcl_simple_class(vsfvm_runtime_callback_t)
+vsf_dcl_class(vsfvm_runtime_t)
+vsf_dcl_class(vsfvm_runtime_script_t)
+vsf_dcl_class(vsfvm_thread_t)
+vsf_dcl_class(vsfvm_runtime_callback_t)
 
 typedef enum vsfvm_var_type_t {
     VSFVM_VAR_TYPE_VALUE = 0,
@@ -105,7 +105,7 @@ typedef struct vsfvm_runtime_func_ctx_t {
     uint32_t expression_sp;
 } vsfvm_runtime_func_ctx_t;
 
-def_simple_class(vsfvm_thread_t) {
+vsf_class(vsfvm_thread_t) {
     which (
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         implement(vsf_teda_t)
@@ -137,7 +137,7 @@ typedef enum vsfvm_runtime_state_t {
     VSFVM_SCRIPTSTAT_FINIED,
 } vsfvm_runtime_state_t;
 
-def_simple_class(vsfvm_runtime_script_t) {
+vsf_class(vsfvm_runtime_script_t) {
 
     public_member(
         const void *token;
@@ -159,7 +159,7 @@ def_simple_class(vsfvm_runtime_script_t) {
     )
 };
 
-def_simple_class(vsfvm_runtime_t) {
+vsf_class(vsfvm_runtime_t) {
     private_member(
         vsf_slist_t script_list;
         vsf_slist_t to_ready_list;
@@ -167,7 +167,7 @@ def_simple_class(vsfvm_runtime_t) {
     )
 };
 
-def_simple_class(vsfvm_runtime_callback_t) {
+vsf_class(vsfvm_runtime_callback_t) {
     private_member(
         vsfvm_runtime_t *runtime;
         vsfvm_runtime_script_t *script;

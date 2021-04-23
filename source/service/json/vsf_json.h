@@ -69,9 +69,6 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsf_json_enumerator_t)
-dcl_simple_class(vsf_json_constructor_t)
-
 enum vsf_json_type_t {
     VSF_JSON_TYPE_INVALID,
     VSF_JSON_TYPE_OBJECT,
@@ -83,7 +80,7 @@ enum vsf_json_type_t {
 };
 typedef enum vsf_json_type_t vsf_json_type_t;
 
-def_simple_class(vsf_json_enumerator_t) {
+vsf_class(vsf_json_enumerator_t) {
     private_member(
         char *ptr;
         vsf_json_type_t type;
@@ -91,7 +88,7 @@ def_simple_class(vsf_json_enumerator_t) {
     )
 };
 
-def_simple_class(vsf_json_constructor_t) {
+vsf_class(vsf_json_constructor_t) {
     public_member(
         union {
             void *param;

@@ -40,15 +40,15 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_virtual_scsi_t)
-dcl_simple_class(vk_virtual_scsi_drv_t)
+vsf_dcl_class(vk_virtual_scsi_t)
+vsf_dcl_class(vk_virtual_scsi_drv_t)
 
 typedef enum vsf_virtual_scsi_drv_type_t {
     VSF_VIRTUAL_SCSI_DRV_NORMAL,
     VSF_VIRTUAL_SCSI_DRV_PARAM_SUBCALL,
 } vsf_virtual_scsi_drv_type_t;
 
-def_simple_class(vk_virtual_scsi_drv_t) {
+vsf_class(vk_virtual_scsi_drv_t) {
     protected_member(
         uint8_t drv_type        : 4;
         uint8_t feature         : 4;
@@ -90,7 +90,7 @@ typedef struct vk_virtual_scsi_param_t {
     scsi_pdt_t type;
 } vk_virtual_scsi_param_t;
 
-def_simple_class(vk_virtual_scsi_t) {
+vsf_class(vk_virtual_scsi_t) {
     implement(vk_scsi_t)
     public_member(
         const vk_virtual_scsi_drv_t *virtual_scsi_drv;

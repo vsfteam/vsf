@@ -57,8 +57,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(hc32f10x_usbhd_hcd_t)
-
 #ifdef USB_HDC_HAS_CONST
 struct hc32f10x_usbhd_const_t {
     // information from device.h
@@ -80,7 +78,7 @@ enum hc32f10x_usbhd_hcd_state_t {
 };
 typedef enum hc32f10x_usbhd_hcd_state_t hc32f10x_usbhd_hcd_state_t;
 
-def_simple_class(hc32f10x_usbhd_hcd_t) {
+vsf_class(hc32f10x_usbhd_hcd_t) {
     public_member(
 #ifdef USB_HDC_HAS_CONST
         const hc32f10x_usbhd_const_t *param;

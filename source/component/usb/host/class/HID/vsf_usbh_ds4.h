@@ -59,9 +59,7 @@ typedef struct vk_input_ds4u_t {
 } vk_input_ds4u_t;
 #endif
 
-dcl_simple_class(vk_usbh_ds4_t)
-
-def_simple_class(vk_usbh_ds4_t) {
+vsf_class(vk_usbh_ds4_t) {
     implement(vk_usbh_hid_teda_t)
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_DS4 == ENABLED
     implement(vk_input_ds4u_t)

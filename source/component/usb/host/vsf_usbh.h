@@ -140,15 +140,15 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbh_hcd_t)
-dcl_simple_class(vk_usbh_hcd_drv_t)
-dcl_simple_class(vk_usbh_hcd_urb_t)
-dcl_simple_class(vk_usbh_hcd_dev_t)
+vsf_dcl_class(vk_usbh_hcd_t)
+vsf_dcl_class(vk_usbh_hcd_drv_t)
+vsf_dcl_class(vk_usbh_hcd_urb_t)
+vsf_dcl_class(vk_usbh_hcd_dev_t)
 
-dcl_simple_class(vk_usbh_class_drv_t)
-dcl_simple_class(vk_usbh_urb_t)
-dcl_simple_class(vk_usbh_dev_t)
-dcl_simple_class(vk_usbh_t)
+vsf_dcl_class(vk_usbh_class_drv_t)
+vsf_dcl_class(vk_usbh_urb_t)
+vsf_dcl_class(vk_usbh_dev_t)
+vsf_dcl_class(vk_usbh_t)
 
 enum {
     URB_OK                  = VSF_ERR_NONE,
@@ -243,7 +243,7 @@ typedef struct vk_usbh_dev_id_t {
 extern "C" {
 #endif
 
-def_simple_class(vk_usbh_class_drv_t) {
+vsf_class(vk_usbh_class_drv_t) {
     protected_member(
         const char *name;
         uint8_t dev_id_num;
@@ -289,7 +289,7 @@ typedef struct vk_usbh_pipe_t {
 extern "C" {
 #endif
 
-def_simple_class(vk_usbh_hcd_drv_t) {
+vsf_class(vk_usbh_hcd_drv_t) {
     private_member(
         vsf_err_t (*init_evthandler)(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd);
         vsf_err_t (*fini)(vk_usbh_hcd_t *hcd);
@@ -314,7 +314,7 @@ def_simple_class(vk_usbh_hcd_drv_t) {
     )
 };
 
-def_simple_class(vk_usbh_hcd_t) {
+vsf_class(vk_usbh_hcd_t) {
     public_member(
         const vk_usbh_hcd_drv_t *drv;
         void *param;
@@ -356,7 +356,7 @@ typedef struct vk_usbh_hcd_iso_packet_t {
 extern "C" {
 #endif
 
-def_simple_class(vk_usbh_hcd_dev_t) {
+vsf_class(vk_usbh_hcd_dev_t) {
     private_member(
         union {
             void *dev_priv;
@@ -366,7 +366,7 @@ def_simple_class(vk_usbh_hcd_dev_t) {
     )
 };
 
-def_simple_class(vk_usbh_hcd_urb_t) {
+vsf_class(vk_usbh_hcd_urb_t) {
 
     private_member(
         vk_usbh_hcd_dev_t *dev_hcd;
@@ -415,7 +415,7 @@ def_simple_class(vk_usbh_hcd_urb_t) {
 extern "C" {
 #endif
 
-def_simple_class(vk_usbh_urb_t) {
+vsf_class(vk_usbh_urb_t) {
     protected_member(
         union {
             vk_usbh_pipe_t pipe;
@@ -443,7 +443,7 @@ typedef struct vk_usbh_ep0_t {
     vk_usbh_urb_t urb;
 } vk_usbh_ep0_t;
 
-def_simple_class(vk_usbh_dev_t) {
+vsf_class(vk_usbh_dev_t) {
 
     public_member(
         implement(vk_usbh_hcd_dev_t)
@@ -488,7 +488,7 @@ extern "C" {
 
 vsf_declare_bitmap(vk_usbh_devnum_bitmap, VSF_USBH_CFG_MAX_DEVICE + 1);
 
-def_simple_class(vk_usbh_t) {
+vsf_class(vk_usbh_t) {
 
     public_member(
         implement(vk_usbh_hcd_t)

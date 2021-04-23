@@ -45,9 +45,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_multiplex_hal_t)
-
-def_simple_class(vsf_multiplex_hal_t) {
+vsf_class(vsf_multiplex_hal_t) {
     protected_member(
         vsf_mutex_t mutex;
         vsf_eda_t *notifier_eda;

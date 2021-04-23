@@ -42,7 +42,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbh_cdc_t)
+vsf_dcl_class(vk_usbh_cdc_t)
 
 typedef enum vk_usbh_cdc_evt_t {
     VSF_USBH_CDC_ON_INIT,
@@ -55,7 +55,7 @@ typedef enum vk_usbh_cdc_evt_t {
 typedef vsf_err_t (*vk_usbh_cdc_evthandler_t)(vk_usbh_cdc_t *cdc,
                 vk_usbh_cdc_evt_t evt, void *param);
 
-def_simple_class(vk_usbh_cdc_t) {
+vsf_class(vk_usbh_cdc_t) {
 
     protected_member(
         vk_usbh_t *usbh;

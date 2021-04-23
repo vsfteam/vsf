@@ -83,8 +83,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbd_msc_t)
-
 typedef union vk_usbd_msc_scsi_ctx_t {
     usb_msc_cbw_t cbw;
     struct {
@@ -96,7 +94,7 @@ typedef union vk_usbd_msc_scsi_ctx_t {
     };
 } vk_usbd_msc_scsi_ctx_t;
 
-def_simple_class(vk_usbd_msc_t) {
+vsf_class(vk_usbd_msc_t) {
 
     private_member(
         vsf_eda_t eda;

@@ -49,8 +49,6 @@ typedef struct vk_musb_fdrc_dcd_param_t {
     const i_usb_dc_ip_t *op;
 } vk_musb_fdrc_dcd_param_t;
 
-dcl_simple_class(vk_musb_fdrc_dcd_t)
-
 typedef enum vk_musb_fdrc_dcd_ep0state_t {
     MUSB_FDRC_USBD_EP0_IDLE,
     MUSB_FDRC_USBD_EP0_WAIT_SETUP,
@@ -59,7 +57,7 @@ typedef enum vk_musb_fdrc_dcd_ep0state_t {
     MUSB_FDRC_USBD_EP0_STATUS,
 } vk_musb_fdrc_dcd_ep0state_t;
 
-def_simple_class(vk_musb_fdrc_dcd_t) {
+vsf_class(vk_musb_fdrc_dcd_t) {
 
     public_member(
         vk_musb_fdrc_dcd_param_t const * const param;

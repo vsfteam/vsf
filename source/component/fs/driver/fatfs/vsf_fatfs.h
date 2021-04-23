@@ -60,8 +60,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_fatfs_file_t)
-dcl_simple_class(__vk_fatfs_info_t)
+vsf_dcl_class(vk_fatfs_file_t)
+vsf_dcl_class(__vk_fatfs_info_t)
 
 typedef enum vk_fat_type_t {
     VSF_FAT_NONE,
@@ -85,7 +85,7 @@ typedef struct vk_fatfs_dentry_parser_t {
     char *filename;
 } vk_fatfs_dentry_parser_t;
 
-def_simple_class(vk_fatfs_file_t) {
+vsf_class(vk_fatfs_file_t) {
     public_member(
         implement(__vk_malfs_file_t)
     )
@@ -114,7 +114,7 @@ def_simple_class(vk_fatfs_file_t) {
 //  |-----------------------|
 //  |   cache_buffer[num]   |
 //  |-----------------------|
-def_simple_class(__vk_fatfs_info_t) {
+vsf_class(__vk_fatfs_info_t) {
     private_member(
         vk_fatfs_file_t root;
         vk_fat_type_t type;

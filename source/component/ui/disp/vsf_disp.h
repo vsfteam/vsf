@@ -84,8 +84,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_disp_t)
-dcl_simple_class(vk_disp_drv_t)
+vsf_dcl_class(vk_disp_t)
+vsf_dcl_class(vk_disp_drv_t)
 
 typedef enum vk_disp_color_idx_t {
     VSF_DISP_COLOR_IDX_DEF(INVALID),
@@ -122,7 +122,7 @@ typedef struct vk_disp_area_t {
     vk_disp_point size;
 } vk_disp_area_t;
 
-def_simple_class(vk_disp_drv_t) {
+vsf_class(vk_disp_drv_t) {
     protected_member(
         vsf_err_t (*init)(vk_disp_t *pthis);
         vsf_err_t (*refresh)(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
@@ -159,7 +159,7 @@ typedef struct vk_disp_param_t {
 
 typedef void (*vk_disp_on_ready_t)(vk_disp_t *disp);
 
-def_simple_class(vk_disp_t) {
+vsf_class(vk_disp_t) {
     public_member(
         const vk_disp_param_t   param;
         void                    *ui_data;

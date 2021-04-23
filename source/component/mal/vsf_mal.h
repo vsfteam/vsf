@@ -47,12 +47,12 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_mal_t)
+vsf_dcl_class(vk_mal_t)
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-dcl_simple_class(vk_mal_stream_t)
+vsf_dcl_class(vk_mal_stream_t)
 #endif
 
-dcl_simple_class(vk_mal_drv_t)
+vsf_dcl_class(vk_mal_drv_t)
 
 typedef enum vsf_mal_op_t {
     VSF_MAL_OP_ERASE,
@@ -67,7 +67,7 @@ typedef enum vsf_mal_feature_t {
     VSF_MAL_NON_UNIFIED_BLOCK   = 1 << 3,
 } vsf_mal_feature_t;
 
-def_simple_class(vk_mal_drv_t) {
+vsf_class(vk_mal_drv_t) {
     protected_member(
         // blksz can be called after successfully initialized
         uint_fast32_t (*blksz)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
@@ -80,7 +80,7 @@ def_simple_class(vk_mal_drv_t) {
     )
 };
 
-def_simple_class(vk_mal_t) {
+vsf_class(vk_mal_t) {
     public_member(
         const vk_mal_drv_t *drv;
         void *param;
@@ -90,7 +90,7 @@ def_simple_class(vk_mal_t) {
 };
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-def_simple_class(vk_mal_stream_t) {
+vsf_class(vk_mal_stream_t) {
     public_member(
         vk_mal_t *mal;
     )

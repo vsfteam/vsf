@@ -53,8 +53,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsf_heap_t)
-def_simple_class(vsf_heap_t) {
+vsf_class(vsf_heap_t) {
     protected_member(
         vsf_dlist_t * (*get_freelist)(uint_fast32_t size);
     )

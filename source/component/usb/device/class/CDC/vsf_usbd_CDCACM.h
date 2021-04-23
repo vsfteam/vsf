@@ -98,9 +98,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbd_cdcacm_t)
-
-def_simple_class(vk_usbd_cdcacm_t) {
+vsf_class(vk_usbd_cdcacm_t) {
 
     public_member(
         implement(vk_usbd_cdc_t)

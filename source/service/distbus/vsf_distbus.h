@@ -41,9 +41,9 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsf_distbus_t)
-dcl_simple_class(vsf_distbus_service_t)
-dcl_simple_class(vsf_distbus_msg_t)
+vsf_dcl_class(vsf_distbus_t)
+vsf_dcl_class(vsf_distbus_service_t)
+vsf_dcl_class(vsf_distbus_msg_t)
 
 // returns true to hold msg
 typedef bool (*vsf_distbus_msghandler_t)(   vsf_distbus_t *bus,
@@ -56,7 +56,7 @@ typedef struct vsf_distbus_msgheader_t {
     uint16_t                                addr;
     uint16_t                                flag;
 } vsf_distbus_msgheader_t;
-def_simple_class(vsf_distbus_msg_t) {
+vsf_class(vsf_distbus_msg_t) {
     protected_member(
         union {
             uint32_t                        pos;
@@ -76,7 +76,7 @@ typedef struct vsf_distbus_service_info_t {
     vsf_distbus_msghandler_t                handler;
 } vsf_distbus_service_info_t;
 
-def_simple_class(vsf_distbus_service_t) {
+vsf_class(vsf_distbus_service_t) {
     private_member(
         vsf_slist_node_t                    node;
     )
@@ -108,7 +108,7 @@ typedef struct vsf_distbus_op_t {
     vsf_distbus_on_error_t                  on_error;
 } vsf_distbus_op_t;
 
-def_simple_class(vsf_distbus_t) {
+vsf_class(vsf_distbus_t) {
     public_member(
         const vsf_distbus_op_t              op;
     )

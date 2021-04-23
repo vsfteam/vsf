@@ -40,9 +40,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_disp_vga_m480_t)
-
-def_simple_class(vk_disp_vga_m480_t) {
+vsf_class(vk_disp_vga_m480_t) {
     public_member(
         implement(vk_disp_t)
     )

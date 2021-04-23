@@ -86,12 +86,9 @@ typedef enum vsf_arch_prio_t {
     vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
 } vsf_arch_prio_t;
 
-declare_simple_class(vsf_arch_irq_thread_t)
-declare_simple_class(vsf_arch_irq_request_t)
-
 typedef void (*vsf_arch_irq_entry_t)(void*);
 
-def_simple_class(vsf_arch_irq_request_t) {
+vsf_class(vsf_arch_irq_request_t) {
     private_member(
         int id;
         void *arch_thread;
@@ -108,7 +105,7 @@ typedef volatile bool vsf_gint_state_t;
 
 /*============================ TYPES =========================================*/
 
-def_simple_class(vsf_arch_irq_thread_t) {
+vsf_class(vsf_arch_irq_thread_t) {
     private_member(
         implement(vsf_arch_irq_thread_common_t)
     )

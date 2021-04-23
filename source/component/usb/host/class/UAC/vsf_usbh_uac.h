@@ -57,9 +57,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbh_uac_stream_t)
-
-def_simple_class(vk_usbh_uac_stream_t) {
+vsf_class(vk_usbh_uac_stream_t) {
     public_member(
         PUBLIC_CONST uint8_t is_in          : 1;
         PUBLIC_CONST uint8_t sample_size    : 3;

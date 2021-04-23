@@ -62,7 +62,7 @@ extern "C" {
 #define vsf_block_stream_type(__name)       __vsf_block_stream_type(__name)
 
 #define __declare_block_stream(__name)                                          \
-            dcl_simple_class(vsf_block_stream_type(__name))                     \
+            vsf_dcl_class(vsf_block_stream_type(__name))                        \
             dcl_vsf_fifo(__name)
 
 #define __define_block_stream(__name, __block_num, __block_size)                \
@@ -71,7 +71,7 @@ extern "C" {
                 uint32_t buffer[(__block_size + 3) >> 2];                       \
             } __name##_block_stream_item_t;                                     \
             def_vsf_fifo(__name, __name##_block_stream_item_t, (__block_num))   \
-            def_simple_class(vsf_block_stream_type(__name)) {                   \
+            vsf_class(vsf_block_stream_type(__name)) {                          \
                 public_member(                                                  \
                     implement(__vsf_block_stream_t)                             \
                 )                                                               \
@@ -102,10 +102,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(__vsf_block_stream_t)
-dcl_simple_class(__vsf_block_stream_base_t)
-
-def_simple_class(__vsf_block_stream_base_t) {
+vsf_class(__vsf_block_stream_base_t) {
     public_member(
         implement(vsf_stream_t)
         vsf_fifo_item_size_t block_size;
@@ -113,7 +110,7 @@ def_simple_class(__vsf_block_stream_base_t) {
     )
 };
 
-def_simple_class(__vsf_block_stream_t) {
+vsf_class(__vsf_block_stream_t) {
     public_member(
         implement(__vsf_block_stream_base_t)
         // implementation of virtual class vsf_fifo_t

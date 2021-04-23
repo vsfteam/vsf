@@ -67,10 +67,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbh_hid_base_t)
-dcl_simple_class(vk_usbh_hid_teda_t)
-
-def_simple_class(vk_usbh_hid_base_t) {
+vsf_class(vk_usbh_hid_base_t) {
 
     public_member(
         union {
@@ -93,7 +90,7 @@ def_simple_class(vk_usbh_hid_base_t) {
     )
 };
 
-def_simple_class(vk_usbh_hid_teda_t) {
+vsf_class(vk_usbh_hid_teda_t) {
     public_member(
         implement(vk_usbh_hid_base_t)
         implement(vsf_teda_t)

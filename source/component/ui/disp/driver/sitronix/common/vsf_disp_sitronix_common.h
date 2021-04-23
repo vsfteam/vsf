@@ -55,9 +55,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_disp_sitronix_t)
-
-def_simple_class(vk_disp_sitronix_t) {
+vsf_class(vk_disp_sitronix_t) {
     public_member(
         implement(vk_disp_t)
         struct {

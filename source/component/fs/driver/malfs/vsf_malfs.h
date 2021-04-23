@@ -49,10 +49,10 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(__vk_malfs_file_t)
-dcl_simple_class(__vk_malfs_info_t)
-dcl_simple_class(__vk_malfs_cache_t)
-dcl_simple_class(vk_malfs_mounter_t)
+vsf_dcl_class(__vk_malfs_file_t)
+vsf_dcl_class(__vk_malfs_info_t)
+vsf_dcl_class(__vk_malfs_cache_t)
+vsf_dcl_class(vk_malfs_mounter_t)
 
 typedef struct __vk_malfs_cache_node_t {
     uint64_t block_addr;
@@ -61,7 +61,7 @@ typedef struct __vk_malfs_cache_node_t {
     uint32_t is_alloced         : 1;
 } __vk_malfs_cache_node_t;
 
-def_simple_class(__vk_malfs_cache_t) {
+vsf_class(__vk_malfs_cache_t) {
     public_member(
         uint16_t number;
         __vk_malfs_cache_node_t *nodes;
@@ -72,7 +72,7 @@ def_simple_class(__vk_malfs_cache_t) {
     )
 };
 
-def_simple_class(__vk_malfs_file_t) {
+vsf_class(__vk_malfs_file_t) {
     public_member(
         implement(vk_file_t)
         void *info;
@@ -87,7 +87,7 @@ def_simple_class(__vk_malfs_file_t) {
 //  |-------------------------------|
 //  |       cache_buffer[num]       |
 //  |-------------------------------|
-def_simple_class(__vk_malfs_info_t) {
+vsf_class(__vk_malfs_info_t) {
     public_member(
         vk_mal_t *mal;
         uint32_t block_size;
@@ -119,7 +119,7 @@ typedef struct vk_malfs_mount_partition_t {
     vk_file_t *root;
 } vk_malfs_mount_partition_t;
 
-def_simple_class(vk_malfs_mounter_t) {
+vsf_class(vk_malfs_mounter_t) {
     public_member(
         vk_mal_t *mal;
         vk_file_t *dir;

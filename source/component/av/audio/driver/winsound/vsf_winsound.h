@@ -41,8 +41,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_winsound_dev_t)
-
 #if VSF_AUDIO_USE_PLAY == ENABLED
 
 // avoid to use windows.h, fix if any conflicts
@@ -81,7 +79,7 @@ typedef struct vk_winsound_play_ctx_t {
 #undef HWAVEOUT
 #endif
 
-def_simple_class(vk_winsound_dev_t) {
+vsf_class(vk_winsound_dev_t) {
     implement(vk_audio_dev_t)
 
     private_member(

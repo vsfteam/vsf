@@ -42,11 +42,11 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_netdrv_t)
-dcl_simple_class(vk_netlink_op_t)
-dcl_simple_class(vk_netdrv_adapter_op_t)
+vsf_dcl_class(vk_netdrv_t)
+vsf_dcl_class(vk_netlink_op_t)
+vsf_dcl_class(vk_netdrv_adapter_op_t)
 
-def_simple_class(vk_netlink_op_t) {
+vsf_class(vk_netlink_op_t) {
 #if defined(__VSF_NETDRV_CLASS_IMPLEMENT) || defined(__VSF_NETDRV_CLASS_INHERIT_NETLINK__)
     protected_member(
 #else
@@ -60,7 +60,7 @@ def_simple_class(vk_netlink_op_t) {
     )
 };
 
-def_simple_class(vk_netdrv_adapter_op_t) {
+vsf_class(vk_netdrv_adapter_op_t) {
 #if defined(__VSF_NETDRV_CLASS_IMPLEMENT) || defined(__VSF_NETDRV_CLASS_INHERIT_NETIF__)
     protected_member(
 #else
@@ -87,7 +87,7 @@ typedef struct vk_netdrv_addr_t {
     };
 } vk_netdrv_addr_t;
 
-def_simple_class(vk_netdrv_t) {
+vsf_class(vk_netdrv_t) {
 
     protected_member(
         vk_netdrv_addr_t macaddr;

@@ -50,10 +50,10 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_fakefat32_mal_t)
-dcl_simple_class(vk_fakefat32_file_t)
+vsf_dcl_class(vk_fakefat32_mal_t)
+vsf_dcl_class(vk_fakefat32_file_t)
 
-def_simple_class(vk_fakefat32_file_t) {
+vsf_class(vk_fakefat32_file_t) {
     public_member(
         implement(vk_memfs_file_t)
     )
@@ -77,7 +77,7 @@ def_simple_class(vk_fakefat32_file_t) {
 };
 
 
-def_simple_class(vk_fakefat32_mal_t) {
+vsf_class(vk_fakefat32_mal_t) {
     public_member(
         implement(vk_mal_t)
 

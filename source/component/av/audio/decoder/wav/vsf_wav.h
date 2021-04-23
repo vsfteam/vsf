@@ -41,8 +41,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_wav_t)
-
 typedef enum vk_wav_state_t {
     VSF_WAV_STATE_RIFF,
     VSF_WAV_STATE_FORMAT,
@@ -50,7 +48,7 @@ typedef enum vk_wav_state_t {
     VSF_WAV_STATE_PLAY,
 } vk_wav_state_t;
 
-def_simple_class(vk_wav_t) {
+vsf_class(vk_wav_t) {
     public_member(
         vk_audio_dev_t      *audio_dev;
         vsf_stream_t        *stream;

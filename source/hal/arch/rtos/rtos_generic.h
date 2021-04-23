@@ -126,8 +126,7 @@ extern "C" {
 
 typedef void (*vsf_arch_irq_thread_entry_t)(void*);
 
-dcl_simple_class(vsf_arch_irq_thread_with_stack_t)
-def_simple_class(vsf_arch_irq_thread_with_stack_t) {
+vsf_class(vsf_arch_irq_thread_with_stack_t) {
     private_member(
         implement(vsf_arch_irq_thread_t)
 

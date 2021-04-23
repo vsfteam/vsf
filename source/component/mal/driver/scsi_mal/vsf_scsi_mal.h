@@ -41,9 +41,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_scsi_mal_t)
-
-def_simple_class(vk_scsi_mal_t) {
+vsf_class(vk_scsi_mal_t) {
     public_member(
         implement(vk_mal_t)
         vk_scsi_t *scsi;

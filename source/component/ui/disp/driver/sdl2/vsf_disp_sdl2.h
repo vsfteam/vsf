@@ -52,9 +52,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_disp_sdl2_t)
-
-def_simple_class(vk_disp_sdl2_t) {
+vsf_class(vk_disp_sdl2_t) {
     public_member(
         implement(vk_disp_t)
         char                        * title;

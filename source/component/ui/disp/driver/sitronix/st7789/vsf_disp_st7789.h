@@ -40,9 +40,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_disp_st7789_t)
-
-def_simple_class(vk_disp_st7789_t) {
+vsf_class(vk_disp_st7789_t) {
     public_member(
         implement(vk_disp_t)
         implement_ex(vsf_disp_sitronix_hw_t, hw)

@@ -46,8 +46,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbd_uvc_t)
-
 typedef struct vk_usbd_uvc_control_t vk_usbd_uvc_control_t;
 
 typedef struct vk_usbd_uvc_control_info_t {
@@ -72,7 +70,7 @@ typedef struct vk_usbd_uvc_entity_t {
     vk_usbd_uvc_control_t *control;
 } vk_usbd_uvc_entity_t;
 
-def_simple_class(vk_usbd_uvc_t) {
+vsf_class(vk_usbd_uvc_t) {
 
     public_member(
         uint8_t ep_in;

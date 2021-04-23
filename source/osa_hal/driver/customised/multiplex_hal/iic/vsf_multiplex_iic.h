@@ -54,9 +54,7 @@
 
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_multiplex_iic_t)
-
-def_simple_class(vsf_multiplex_iic_t) {
+vsf_class(vsf_multiplex_iic_t) {
     public_member(
         implement(vsf_io_iic_t)
     )

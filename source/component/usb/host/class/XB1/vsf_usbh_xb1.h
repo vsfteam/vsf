@@ -59,10 +59,8 @@ typedef struct vk_input_xb1_t {
 } vk_input_xb1_t;
 #endif
 
-dcl_simple_class(vk_usbh_xb1_t)
-
 // xb1 controller is not HID class, but almost compatible with HID class
-def_simple_class(vk_usbh_xb1_t) {
+vsf_class(vk_usbh_xb1_t) {
 
     implement(vk_usbh_hid_teda_t)
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED

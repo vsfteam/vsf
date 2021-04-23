@@ -39,13 +39,11 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_winfs_file_t)
-
 typedef enum vk_winfs_file_attr_t {
     VSF_WINFS_FILE_ATTR_ARCHIVE = VSF_FILE_ATTR_EXT,
 } vk_winfs_file_attr_t;
 
-def_simple_class(vk_winfs_file_t) {
+vsf_class(vk_winfs_file_t) {
     public_member(
         implement(vk_file_t)
     )

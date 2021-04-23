@@ -60,9 +60,7 @@ extern "C" {
 
 #if __VSF_KERNEL_CFG_SUPPORT_EDA_SLIST_QUEUE == ENABLED
 
-dcl_simple_class(vsf_eda_slist_queue_t)
-
-def_simple_class(vsf_eda_slist_queue_t) {
+vsf_class(vsf_eda_slist_queue_t) {
     public_member(
         implement(vsf_eda_queue_t)
     )

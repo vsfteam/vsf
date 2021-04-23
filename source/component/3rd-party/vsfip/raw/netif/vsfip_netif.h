@@ -51,8 +51,8 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsfip_netif_t)
-dcl_simple_class(vsfip_netif_op_t)
+vsf_dcl_class(vsfip_netif_t)
+vsf_dcl_class(vsfip_netif_op_t)
 
 typedef enum vsfip_netif_proto_t {
     VSFIP_NETIF_PROTO_IP = 0x0800,
@@ -65,7 +65,7 @@ typedef struct vsfip_arp_entry_t {
     uint32_t time;
 } vsfip_arp_entry_t;
 
-def_simple_class(vsfip_netif_op_t) {
+vsf_class(vsfip_netif_op_t) {
     protected_member(
         vsf_err_t (*header)(vsfip_netbuf_t *netbuf, vsfip_netif_proto_t proto, const vsfip_macaddr_t *dest);
         bool (*can_output)(vsfip_netif_t *netif);
@@ -84,7 +84,7 @@ typedef struct vsfip_netif_arpc_t {
     uint32_t retry;
 } vsfip_netif_arpc_t;
 
-def_simple_class(vsfip_netif_t) {
+vsf_class(vsfip_netif_t) {
     vsf_slist_node_t node;
 
     const vsfip_netif_op_t *op;

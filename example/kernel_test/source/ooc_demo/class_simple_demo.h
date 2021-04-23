@@ -50,7 +50,7 @@ def_class(class_simple_base_t,
 )
 
 /* You can also use the STRUCTURE-OBVIOUSE syntax of ooc_class_simple */
-def_simple_class(class_simple_demo_t) {
+vsf_class(class_simple_demo_t) {
     which(
         implement(class_simple_base_t)
     )
@@ -70,7 +70,7 @@ struct xxxxx_cfg_t {
     uint32_t wNumber;
 };
 
-def_simple_class(xxxxx_t) {
+vsf_class(xxxxx_t) {
     
     private_member(
         implement(xxxxx_cfg_t)

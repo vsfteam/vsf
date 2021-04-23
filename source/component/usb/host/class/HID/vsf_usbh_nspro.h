@@ -48,8 +48,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vk_usbh_nspro_t)
-
 typedef enum vk_usbh_nspro_state_t {
     VSF_USBH_NSPRO_GET_INFO,
     VSF_USBH_NSPRO_HANDSHAKE,
@@ -62,7 +60,7 @@ typedef enum vk_usbh_nspro_type_t {
     NSPRO_BOTH      = 0x03,
 } vk_usbh_nspro_type_t;
 
-def_simple_class(vk_usbh_nspro_t) {
+vsf_class(vk_usbh_nspro_t) {
     implement(vk_usbh_hid_teda_t)
 
     private_member(

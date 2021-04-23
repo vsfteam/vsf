@@ -263,9 +263,7 @@ enum {
     MIPI_LCD_STATE_INIT_CPL,
 };
 
-dcl_simple_class(vk_disp_mipi_lcd_t)
-
-def_simple_class(vk_disp_mipi_lcd_t) {
+vsf_class(vk_disp_mipi_lcd_t) {
     public_member(
         implement(vk_disp_t)
         vsf_spi_t       *spi;

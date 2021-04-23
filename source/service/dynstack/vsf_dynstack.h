@@ -42,9 +42,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsf_dynstack_t)
-
-def_simple_class(vsf_dynstack_t) {
+vsf_class(vsf_dynstack_t) {
     public_member(
         implement(vsf_dynarr_t)
         uint32_t sp;

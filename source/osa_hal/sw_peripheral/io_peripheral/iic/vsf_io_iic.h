@@ -51,9 +51,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_io_iic_t)
-
-def_simple_class(vsf_io_iic_t) {
+vsf_class(vsf_io_iic_t) {
     public_member(
         struct {
             vsf_gpio_t *port;

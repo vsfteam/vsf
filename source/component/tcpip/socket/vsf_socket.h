@@ -60,8 +60,8 @@ enum {
     VSF_SOCKET_IPPROTO_UDP  = 17,
 };
 
-dcl_simple_class(vk_socket_t)
-dcl_simple_class(vk_socket_op_t)
+vsf_dcl_class(vk_socket_t)
+vsf_dcl_class(vk_socket_op_t)
 
 typedef enum vk_socket_feature_t {
     VSF_SOCKET_THREAD   = 1 << 0,   // support thread mode
@@ -74,7 +74,7 @@ typedef struct vk_socket_addr_t {
     vk_netdrv_addr_t addr;
 } vk_socket_addr_t;
 
-def_simple_class(vk_socket_op_t) {
+vsf_class(vk_socket_op_t) {
     protected_member(
         vk_socket_feature_t feature;
         vsf_err_t (*socket)(vk_socket_t *socket, int family, int protocol);
@@ -97,7 +97,7 @@ def_simple_class(vk_socket_op_t) {
     )
 };
 
-def_simple_class(vk_socket_t) {
+vsf_class(vk_socket_t) {
     public_member(
         PUBLIC_CONST vk_socket_op_t *op;
     )

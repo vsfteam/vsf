@@ -74,9 +74,9 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-dcl_simple_class(vsf_stream_t)
-dcl_simple_class(vsf_stream_terminal_t)
-dcl_simple_class(vsf_stream_op_t)
+vsf_dcl_class(vsf_stream_t)
+vsf_dcl_class(vsf_stream_terminal_t)
+vsf_dcl_class(vsf_stream_op_t)
 
 typedef enum vsf_stream_evt_t {
     VSF_STREAM_ON_CONNECT,
@@ -87,7 +87,7 @@ typedef enum vsf_stream_evt_t {
     VSF_STREAM_ON_TX = VSF_STREAM_ON_OUT,
 } vsf_stream_evt_t;
 
-def_simple_class(vsf_stream_op_t) {
+vsf_class(vsf_stream_op_t) {
     protected_member(
         void (*init)(vsf_stream_t *stream);
         void (*fini)(vsf_stream_t *stream);
@@ -104,7 +104,7 @@ def_simple_class(vsf_stream_op_t) {
     )
 };
 
-def_simple_class(vsf_stream_terminal_t) {
+vsf_class(vsf_stream_terminal_t) {
 
     public_member(
         void *param;
@@ -120,7 +120,7 @@ def_simple_class(vsf_stream_terminal_t) {
     )
 };
 
-def_simple_class(vsf_stream_t) {
+vsf_class(vsf_stream_t) {
 
     public_member(
         vsf_stream_op_t const *op;
