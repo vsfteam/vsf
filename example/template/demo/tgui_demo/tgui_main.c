@@ -66,6 +66,9 @@ int VSF_USER_ENTRY(void)
     vsf_stdio_init();
 #       endif
 #   endif
+
+    extern void freetype_demo_init(void);
+    freetype_demo_init();
 #endif
 
     usrapp_ui_common.tgui.notifier.mask =
