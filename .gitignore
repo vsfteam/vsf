@@ -32,6 +32,8 @@ example/spl/project/iar/.metadata
 example/spl/project/iar/settings
 example/spl/project/iar/spl
 
+example/tgui/project/vc/vsf_tgui_win
+
 example/template/project/mdk/lib
 example/template/project/mdk/Out
 example/template/project/iar/settings
