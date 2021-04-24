@@ -100,6 +100,7 @@ vsf_class(vsf_distbus_stream_t) {
         implement(vsf_distbus_service_info_t)
         implement(vsf_distbus_service_t)
         vsf_distbus_t *distbus;
+        // is distbus_stream tx terminal
         bool is_tx;
     )
     private_member(
