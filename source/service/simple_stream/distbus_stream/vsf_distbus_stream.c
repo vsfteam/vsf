@@ -67,14 +67,6 @@ bool __vsf_distbus_stream_msghandler(vsf_distbus_t *bus,
     bool retain_msg = false;
 
     switch (msg->header.addr) {
-    case VSF_DISTBUS_STREAM_CMD_CONNECT:
-        // connect remote side
-        if (distbus_stream->is_tx) {
-            vsf_stream_connect_rx(&distbus_stream->use_as__vsf_stream_t);
-        } else {
-            vsf_stream_connect_tx(&distbus_stream->use_as__vsf_stream_t);
-        }
-        break;
     case VSF_DISTBUS_STREAM_CMD_DATA: {
             VSF_SERVICE_ASSERT(!distbus_stream->is_tx);
             vsf_protect_t orig = vsf_protect_int();
@@ -96,18 +88,11 @@ static void __vsf_distbus_stream_init(vsf_stream_t *stream)
     vsf_distbus_stream_t *distbus_stream = (vsf_distbus_stream_t *)stream;
     if (distbus_stream->is_tx) {
         distbus_stream->msg = NULL;
+        vsf_stream_connect_tx(&distbus_stream->use_as__vsf_stream_t);
     } else {
         vsf_slist_queue_init(&distbus_stream->msgq);
+        vsf_stream_connect_rx(&distbus_stream->use_as__vsf_stream_t);
     }
-    if (NULL == distbus_stream->handler) {
-        distbus_stream->handler = __vsf_distbus_stream_msghandler;
-    }
-    vsf_distbus_register_service(distbus_stream->distbus, &distbus_stream->use_as__vsf_distbus_service_t);
-
-    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus_stream->distbus, 0, NULL);
-    VSF_SERVICE_ASSERT(msg != NULL);
-    msg->header.addr = VSF_DISTBUS_STREAM_CMD_CONNECT;
-    vsf_distbus_send_msg(distbus_stream->distbus, &distbus_stream->use_as__vsf_distbus_service_t, msg);
 }
 
 static uint_fast32_t __vsf_distbus_stream_get_buff_length(vsf_stream_t *stream)
@@ -136,7 +121,7 @@ static uint_fast32_t __vsf_distbus_stream_get_wbuf(vsf_stream_t *stream, uint8_t
     VSF_SERVICE_ASSERT(distbus_stream->is_tx);
     VSF_SERVICE_ASSERT(NULL == distbus_stream->msg);
     distbus_stream->msg = vsf_distbus_alloc_msg(distbus_stream->distbus, distbus_stream->mtu, ptr);
-    return distbus_stream->mtu;
+    return (NULL == distbus_stream->msg) ? 0 : distbus_stream->mtu;
 }
 
 static uint_fast32_t __vsf_distbus_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
@@ -166,6 +151,7 @@ static uint_fast32_t __vsf_distbus_stream_write(vsf_stream_t *stream, uint8_t *b
     if (buf != NULL) {
         uint8_t *ptr;
         msg = vsf_distbus_alloc_msg(distbus_stream->distbus, size, &ptr);
+        memcpy(ptr, buf, size);
     } else {
         msg = distbus_stream->msg;
     }
@@ -174,6 +160,7 @@ static uint_fast32_t __vsf_distbus_stream_write(vsf_stream_t *stream, uint8_t *b
     }
 
     msg->header.datalen = size;
+    msg->header.addr = VSF_DISTBUS_STREAM_CMD_DATA;
     vsf_distbus_send_msg(distbus_stream->distbus, &distbus_stream->use_as__vsf_distbus_service_t, msg);
     return size;
 }
@@ -217,6 +204,14 @@ static uint_fast32_t __vsf_distbus_stream_read(vsf_stream_t *stream, uint8_t *bu
         }
     }
     return realsize;
+}
+
+void vsf_distbus_stream_register_service(vsf_distbus_stream_t *distbus_stream)
+{
+    if (NULL == distbus_stream->handler) {
+        distbus_stream->handler = __vsf_distbus_stream_msghandler;
+    }
+    vsf_distbus_register_service(distbus_stream->distbus, &distbus_stream->use_as__vsf_distbus_service_t);
 }
 
 #endif      // VSF_USE_SIMPLE_STREAM && VSF_USE_DISTBUS

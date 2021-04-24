@@ -90,7 +90,6 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 enum {
-    VSF_DISTBUS_STREAM_CMD_CONNECT,
     VSF_DISTBUS_STREAM_CMD_DATA,
     VSF_DISTBUS_STREAM_ADDR_RANGE,
 };
@@ -120,6 +119,8 @@ vsf_class(vsf_distbus_stream_t) {
 extern const vsf_stream_op_t vsf_distbus_stream_op;
 
 /*============================ PROTOTYPES ====================================*/
+
+extern void vsf_distbus_stream_register_service(vsf_distbus_stream_t *distbus_stream);
 
 #if     defined(__VSF_DISTBUS_STREAM_CLASS_IMPLEMENT)                           \
     ||  defined(__VSF_DISTBUS_STREAM_CLASS_INHERIT__)
