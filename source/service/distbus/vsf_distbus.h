@@ -111,6 +111,7 @@ typedef struct vsf_distbus_op_t {
 vsf_class(vsf_distbus_t) {
     public_member(
         const vsf_distbus_op_t              op;
+        void (*on_connected)(vsf_distbus_t *distbus);
     )
     private_member(
         uint32_t                            mtu;
