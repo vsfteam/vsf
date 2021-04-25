@@ -36,14 +36,49 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 typedef enum usb_uac_req_t {
-    USB_UAC_REQ_CUR     = 1,
-    USB_UAC_REQ_MIN     = 2,
-    USB_UAC_REQ_MAX     = 3,
-    USB_UAC_REQ_RES     = 4,
-    USB_UAC_REQ_MEM     = 5,
-    USB_UAC_REQ_SET     = 0,
-    USB_UAC_REQ_GET     = 0x80,
+    USB_UAC_REQ_CUR             = 1,
+    USB_UAC_REQ_MIN             = 2,
+    USB_UAC_REQ_MAX             = 3,
+    USB_UAC_REQ_RES             = 4,
+    USB_UAC_REQ_MEM             = 5,
+    USB_UAC_REQ_SET             = 0,
+    USB_UAC_REQ_GET             = 0x80,
 } usb_uac_req_t;
+
+typedef enum usb_uac_terminal_types_t {
+    // USB Terminal Types
+    USB_UAC_UTT_UNDEFINED       = 0x0100,
+    USB_UAC_UTT_STREAMING       = 0x0101,
+    USB_UAC_UTT_VENDOR          = 0x01FF,
+    // Input Terminal Types
+    USB_UAC_ITT_UNDEFINED       = 0x0200,
+    USB_UAC_ITT_MIC             = 0x0201,
+    USB_UAC_ITT_DESKTOP_MIC     = 0x0202,
+    USB_UAC_ITT_PERSONAL_MIC    = 0x0203,
+    USB_UAC_ITT_MIC_ARRAY       = 0x0205,
+    // Output Terminal Types
+    USB_UAC_OTT_UNDEFINED       = 0x0300,
+    USB_UAC_OTT_SPEAKER         = 0x0301,
+    USB_UAC_OTT_DESKTOP_SPEAKER = 0x0304,
+    USB_UAC_OTT_ROOM_SPEAKER    = 0x0305,
+    // Bi-directional Terminal Types
+    USB_UAC_BTT_UNDEFINED       = 0x0400,
+    USB_UAC_BTT_HANDSET         = 0X0401,
+    USB_UAC_BTT_HEADSET         = 0x0402,
+    USB_UAC_BTT_SPEAKERPHONE    = 0x0403,
+    USB_UAC_BTT_SPEAKERPHONE_ES = 0x0404,
+    USB_UAC_BTT_SPEAKERPHONE_EC = 0x0405,
+    // Telephony Terminal Types
+    USB_UAC_TTT_UNDEFINED       = 0x0500,
+    USB_UAC_TTT_PHONE_LINE      = 0x0501,
+    USB_UAC_TTT_TELEPHONE       = 0x0502,
+    // External Terminal Types
+    // Embedded Function Terminal Types
+} usb_uac_terminal_types_t;
+
+typedef enum usb_uac_format_tag_t {
+    USB_UAC_FORMAT_PCM          = 0x0001,
+} usb_uac_format_tag_t;
 
 typedef struct usb_uac_ac_interface_header_desc_t usb_uac_ac_interface_header_desc_t;
 struct usb_uac_ac_interface_header_desc_t {
