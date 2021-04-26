@@ -98,6 +98,7 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
     {
         usb_dc_ip_cfg_t ip_cfg = {
             .priority       = cfg->priority,
+            .speed          = cfg->speed,
             .irqhandler     = (usb_ip_irqhandler_t)vk_dwcotg_dcd_irq,
             .param          = dwcotg_dcd,
         };

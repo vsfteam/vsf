@@ -397,6 +397,7 @@ end_def_interface(i_usb_dc_t)
 //! @{
 typedef struct usb_dc_ip_cfg_t {
     vsf_arch_prio_t         priority;       //!< interrupt priority
+    usb_dc_speed_t          speed;
     usb_ip_irqhandler_t     irqhandler;     //!< irqhandler function
     void                    *param;         //!< dcd related parameters
 } usb_dc_ip_cfg_t;

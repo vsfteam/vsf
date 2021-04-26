@@ -38,7 +38,8 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority, usb_ip_irqhandler_t handler, void *param)
+vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
+            usb_ip_irqhandler_t handler, bool ulpi, void *param)
 {
     usb->callback.irqhandler = handler;
     usb->callback.param = param;
@@ -63,14 +64,16 @@ vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority, usb_i
     }
     // clk en
     cpusysctrl_hclkme_set(CSC_HCLKME_USBC_EN_BIT);
-    cpusysctrl_oclkme_set(CSC_OCLKME_ULPI_EN_BIT);
 
-    if (cpusysctrl_ulpics_get()) {
-        // ULPI clock is stable, release ULPI/USBC RESETn
-        cpusysctrl_oclkrc_ulpiclr_setb();
-        cpusysctrl_hclkrc_usbcclr_setb();
-    } else {
-        return VSF_ERR_FAIL;
+    if (ulpi) {
+        cpusysctrl_oclkme_set(CSC_OCLKME_ULPI_EN_BIT);
+        if (cpusysctrl_ulpics_get()) {
+            // ULPI clock is stable, release ULPI/USBC RESETn
+            cpusysctrl_oclkrc_ulpiclr_setb();
+            cpusysctrl_hclkrc_usbcclr_setb();
+        } else {
+            return VSF_ERR_FAIL;
+        }
     }
 
     NVIC_SetPriority(USBDMA_IRQn, priority);
