@@ -68,13 +68,14 @@ vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
     if (ulpi) {
         cpusysctrl_oclkme_set(CSC_OCLKME_ULPI_EN_BIT);
         if (cpusysctrl_ulpics_get()) {
-            // ULPI clock is stable, release ULPI/USBC RESETn
+            // ULPI clock is stable, release ULPI RESETn
             cpusysctrl_oclkrc_ulpiclr_setb();
-            cpusysctrl_hclkrc_usbcclr_setb();
         } else {
             return VSF_ERR_FAIL;
         }
     }
+    // release USBC RESETn
+    cpusysctrl_hclkrc_usbcclr_setb();
 
     NVIC_SetPriority(USBDMA_IRQn, priority);
     NVIC_ClearPendingIRQ(USBDMA_IRQn);

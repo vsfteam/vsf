@@ -80,7 +80,7 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
     const vk_dwcotg_dcd_param_t *param = dwcotg_dcd->param;
     struct dwcotg_core_global_regs_t *global_regs;
     struct dwcotg_dev_global_regs_t *dev_global_regs;
-    vk_dwcotg_dc_ip_info_t info;
+    vk_dwcotg_dc_ip_info_t info = { 0 };
     param->op->GetInfo(&info.use_as__usb_dc_ip_info_t);
 
     __vk_dwcotg_dcd_init_regs(dwcotg_dcd, info.regbase, info.ep_num);
@@ -128,6 +128,9 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
         dev_global_regs->dcfg = USB_OTG_DCFG_NZLSOHSK | USB_OTG_DCFG_DSPD_0 | USB_OTG_DCFG_DSPD_1;
     }
 
+    if (info.vendor.phy_init != NULL) {
+        info.vendor.phy_init(info.vendor.param);
+    }
     // disconnect
     dev_global_regs->dctl |= USB_OTG_DCTL_SDIS;
 

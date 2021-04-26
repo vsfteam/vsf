@@ -53,6 +53,11 @@ typedef struct vk_dwcotg_dcd_param_t {
 typedef struct vk_dwcotg_dc_ip_info_t {
     implement(usb_dc_ip_info_t)
     implement(vk_dwcotg_hw_info_t)
+
+    struct {
+        void *param;
+        void (*phy_init)(void *param);
+    } vendor;
 } vk_dwcotg_dc_ip_info_t;
 
 vsf_class(vk_dwcotg_dcd_trans_t) {

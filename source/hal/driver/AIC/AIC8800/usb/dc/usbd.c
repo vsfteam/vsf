@@ -47,6 +47,17 @@ void aic8800_usbd_fini(aic8800_usb_t *dc)
 {
 }
 
+static void __aic8800_usbd_phy_init(void *param)
+{
+    aic8800_usb_t *dc = (aic8800_usb_t *)param;
+    uint32_t *reg_base = dc->param->reg;
+
+    // gpvndctl = 0x02440041;
+    // while (!(gpvndctl & (1 <<27)));
+    reg_base[13] = 0x02440041;
+    while (!(reg_base[13] & (1 <<27)));
+}
+
 void aic8800_usbd_get_info(aic8800_usb_t *dc, usb_dc_ip_info_t *info)
 {
     const aic8800_usb_const_t *param = dc->param;
@@ -57,6 +68,9 @@ void aic8800_usbd_get_info(aic8800_usb_t *dc, usb_dc_ip_info_t *info)
     dwcotg_info->ep_num = param->dc_ep_num;
     dwcotg_info->buffer_word_size = param->buffer_word_size;
     dwcotg_info->feature = param->feature;
+
+    dwcotg_info->vendor.param = dc;
+    dwcotg_info->vendor.phy_init = __aic8800_usbd_phy_init;
 }
 
 void aic8800_usbd_connect(aic8800_usb_t *dc)
