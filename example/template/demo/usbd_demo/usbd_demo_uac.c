@@ -370,6 +370,7 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             .control_info       = {
                 [0]             = {
                     .selector   = 0x01,     // Mute
+                    .channel    = 0,
                     .size       = 1,
                 },
                 [1]             = {
@@ -385,6 +386,7 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             .control_info       = {
                 [0]             = {
                     .selector   = 0x01,     // Mute
+                    .channel    = 0,
                     .size       = 1,
                 },
                 [1]             = {

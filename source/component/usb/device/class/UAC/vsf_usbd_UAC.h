@@ -43,6 +43,10 @@ extern "C" {
 #   error "VSF_USE_AUDIO MUST be enabled to use uac"
 #endif
 
+#ifndef VSF_USBD_UAC_WORKAROUND_CONTROL_OVERFLOW
+#   define VSF_USBD_UAC_WORKAROUND_CONTROL_OVERFLOW     ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -50,6 +54,7 @@ typedef struct vk_usbd_uac_control_t vk_usbd_uac_control_t;
 
 typedef struct vk_usbd_uac_control_info_t {
     uint8_t selector;
+    uint8_t channel;
     uint16_t size;
 
     vk_av_control_value_t min;
@@ -84,7 +89,10 @@ vsf_class(vk_usbd_uac_ac_t) {
         vk_usbd_dev_t *dev;
         vk_usbd_ifs_t *ifs;
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
-        uint_fast32_t cur_size;
+        uint32_t cur_size;
+#endif
+#if VSF_USBD_UAC_WORKAROUND_CONTROL_OVERFLOW == ENABLED
+        uint32_t control_value;
 #endif
     )
 };

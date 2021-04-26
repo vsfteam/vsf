@@ -127,8 +127,8 @@ void vsf_usbd_uac_start_stream(vk_usbd_uac_ac_t *uac_ac, uint_fast8_t ifs)
 }
 #endif
 
-static vk_usbd_uac_control_t *__vk_usbd_uac_get_control(
-        vk_usbd_uac_ac_t *uac_ac, uint_fast8_t id, uint_fast8_t selector)
+static vk_usbd_uac_control_t *__vk_usbd_uac_get_control(vk_usbd_uac_ac_t *uac_ac,
+        uint_fast8_t id, uint_fast8_t selector, uint_fast8_t channel)
 {
     vk_usbd_uac_entity_t *entity = uac_ac->entity;
     vk_usbd_uac_control_t *control;
@@ -138,7 +138,8 @@ static vk_usbd_uac_control_t *__vk_usbd_uac_get_control(
             control = entity->control;
             // TODO: if control_num is 1, cs from wValue maybe invalid
             for (int j = 0; j < entity->control_num; j++, control++) {
-                if (control->info->selector == selector) {
+                if (    (control->info->selector == selector)
+                    &&  (control->info->channel == channel)) {
                     return control;
                 }
             }
@@ -199,25 +200,31 @@ static vsf_err_t __vk_usbd_uac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
 //                uint_fast8_t ifs_ep = (request->wIndex >> 0) & 0xFF;
                 uint_fast8_t entity = (request->wIndex >> 8) & 0xFF;
                 uint_fast8_t cs = (request->wValue >> 8) & 0xFF;
+                uint_fast8_t channel = (request->wValue >> 0) & 0xFF;
 
-                control = __vk_usbd_uac_get_control(uac_ac, entity, cs);
+                control = __vk_usbd_uac_get_control(uac_ac, entity, cs, channel);
                 if (!control) { return VSF_ERR_FAIL; }
 
                 cinfo = control->info;
                 size = cinfo->size;
                 value = __vk_usbd_uac_get_value(control, request->bRequest);
 
+                buffer = size > sizeof(*value) ? value->buffer : (uint8_t *)value;
                 // TODO: code below only support little-endian
                 if (request->bRequest & USB_UAC_REQ_GET) {
                     VSF_USB_ASSERT(value != NULL);
-                    buffer = size > sizeof(*value) ? value->buffer : (uint8_t *)value;
                 } else {
                     if (request->bRequest != (USB_UAC_REQ_SET | USB_UAC_REQ_CUR)) {
                         return VSF_ERR_FAIL;
                     }
 
-                    size = cinfo->size;
-                    buffer = (uint8_t *)&control->cur;
+#if VSF_USBD_UAC_WORKAROUND_CONTROL_OVERFLOW == ENABLED
+                    if (request->wLength > size) {
+                        VSF_USB_ASSERT(request->wLength <= sizeof(uac_ac->control_value));
+                        size = request->wLength;
+                        buffer = (uint8_t *)&uac_ac->control_value;
+                    }
+#endif
                 }
             }
             break;
@@ -255,18 +262,27 @@ static vsf_err_t __vk_usbd_uac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t
                 break;
             }
             break;
-        case USB_TYPE_CLASS:
-            {
+        case USB_TYPE_CLASS: {
 //                uint_fast8_t ifs_ep = (request->wIndex >> 0) & 0xFF;
                 uint_fast8_t entity = (request->wIndex >> 8) & 0xFF;
                 uint_fast8_t cs = (request->wValue >> 8) & 0xFF;
+                uint_fast8_t channel = (request->wValue >> 0) & 0xFF;
 
-                control = __vk_usbd_uac_get_control(uac_ac, entity, cs);
+                control = __vk_usbd_uac_get_control(uac_ac, entity, cs, channel);
                 if (!control) { return VSF_ERR_FAIL; }
 
-                if (    (request->bRequest == (USB_UAC_REQ_SET | USB_UAC_REQ_CUR))
-                    &&  (control->info->on_set != NULL)) {
-                    control->info->on_set(control);
+                if (request->bRequest == (USB_UAC_REQ_SET | USB_UAC_REQ_CUR)) {
+#if VSF_USBD_UAC_WORKAROUND_CONTROL_OVERFLOW == ENABLED
+                    vk_av_control_value_t *value = __vk_usbd_uac_get_value(control, request->bRequest);
+                    uint_fast32_t size = control->info->size;
+                    if (request->wLength > size) {
+                        uint8_t *cbuffer = size > sizeof(*value) ? value->buffer : (uint8_t *)value;
+                        memcpy(cbuffer, &uac_ac->control_value, size);
+                    }
+#endif
+                    if (control->info->on_set != NULL) {
+                        control->info->on_set(control);
+                    }
                 }
                 break;
             }
