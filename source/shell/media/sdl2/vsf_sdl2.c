@@ -849,6 +849,7 @@ SDL_Renderer * SDL_CreateRenderer(SDL_Window *window, int index, uint32_t flags)
     if (renderer != NULL) {
         renderer->window    = window;
         renderer->flags     = flags;
+        SDL_RenderClear(renderer);
     }
     return renderer;
 }
@@ -865,8 +866,9 @@ int SDL_RenderClear(SDL_Renderer *renderer)
     SDL_Window *window = renderer->window;
     uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(window->format);
 
-    // TODO: set to default color instead of 0
-    memset(window->pixels, 0, pixel_size * window->area.w * window->area.h);
+    SDL_PixelFormat *format = (SDL_PixelFormat *)__SDL_GetFormatFromColor(window->format);
+    VSF_SDL2_ASSERT(format != NULL);
+    SDL_FillRect(&window->surface, NULL, format->Amask);
     return 0;
 }
 
