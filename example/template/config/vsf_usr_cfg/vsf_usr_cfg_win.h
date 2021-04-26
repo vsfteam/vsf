@@ -28,6 +28,7 @@
 //  simple implementation will not use ThreadSuspend and ThreadResume and has better CPU usage
 //  **** but preempt is not supported ****
 //  priority configurations are dependent on MACROs below, so put them here(at top)
+//  IMPORTANT: vsf_arch_sleep MUST be called in vsf_plug_in_on_kernel_idle
 //#define VSF_ARCH_PRI_NUM                                1
 //#define VSF_ARCH_SWI_NUM                                0
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
@@ -93,7 +94,10 @@
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    1920
 #   define APP_LVGL_DEMO_CFG_VER_RES                    1080
 #define APP_USE_BTSTACK_DEMO                            ENABLED
-#define APP_USE_VSFVM_DEMO                              ENABLED
+#if VSF_ARCH_SWI_NUM != 0
+// vsfvm will hold idle thread, so other irq can not be run
+#   define APP_USE_VSFVM_DEMO                              ENABLED
+#endif
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
 #define APP_USE_LWIP_DEMO                               ENABLED
