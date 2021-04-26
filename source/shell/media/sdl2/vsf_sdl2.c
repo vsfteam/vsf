@@ -685,8 +685,7 @@ SDL_Surface * __SDL_CreateRGBSurfaceWithFormat(int w, int h, int depth, uint32_t
 {
     SDL_Surface *surface = vsf_heap_malloc(sizeof(SDL_Surface) + pixel_size * w * h);
     if (surface != NULL) {
-        surface->__format.format    = format;
-        surface->format             = &surface->__format;
+        surface->format             = (SDL_PixelFormat *)__SDL_GetFormatFromColor(format);
         surface->w                  = w;
         surface->h                  = h;
     }
@@ -924,7 +923,7 @@ void SDL_RenderPresent(SDL_Renderer *renderer)
 SDL_Texture * SDL_CreateTexture(SDL_Renderer *renderer, uint32_t format, int access, int w, int h)
 {
     uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(format);
-    SDL_Texture *texture = vsf_heap_malloc(sizeof(struct SDL_Renderer) + pixel_size * w * h);
+    SDL_Texture *texture = vsf_heap_malloc(sizeof(struct SDL_Texture) + pixel_size * w * h);
     if (texture != NULL) {
         texture->format = (SDL_PixelFormat *)__SDL_GetFormatFromColor(format);
         VSF_SDL2_ASSERT(texture->format != NULL);
@@ -938,7 +937,7 @@ SDL_Texture * SDL_CreateTexture(SDL_Renderer *renderer, uint32_t format, int acc
 
 SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface)
 {
-    SDL_Texture *texture = vsf_heap_malloc(sizeof(struct SDL_Renderer));
+    SDL_Texture *texture = vsf_heap_malloc(sizeof(struct SDL_Texture));
     if (texture != NULL) {
         texture->format = surface->format;
         texture->w      = surface->w;
