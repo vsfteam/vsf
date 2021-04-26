@@ -38,6 +38,10 @@
 
 #include "vsf_cfg.h"
 
+#if defined(__WIN__) && defined(__VSF_X86_WIN_SINGLE_PRIORITY)
+#   define TCPIP_THREAD_PRIO       vsf_prio_0
+#endif
+
 #define TCPIP_THREAD_STACKSIZE     (32 * 1024)
 #define TCPIP_MBOX_SIZE            16
 
