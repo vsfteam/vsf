@@ -25,6 +25,21 @@
 #include "../common/usrapp_common.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef USRAPP_CFG_USBD_SPEED
+#   define USRAPP_CFG_USBD_SPEED                USB_SPEED_HIGH
+#endif
+
+#if     USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
+//! interval for high speed is number of micro-frames
+#   define __USRAPP_USBD_UAC_CFG_EP_INTERVAL    8
+#elif   USRAPP_CFG_USBD_SPEED == USB_SPEED_FULL
+//! interval for full speed is number of micro-frames
+#   define __USRAPP_USBD_UAC_CFG_EP_INTERVAL    1
+#else
+#   error TODO: add support to current USB speed
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -81,7 +96,7 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
         .dev_desc               = {
             USB_DT_DEVICE_SIZE,
             USB_DT_DEVICE,
-            0x00, 0x02,             // bcdUSB
+            USB_DESC_WORD(0x0200),  // bcdUSB
             0x00,                   // device class:
             0x00,                   // device sub class
             0x00,                   // device protocol
@@ -90,7 +105,7 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
                                     // vendor
             USB_DESC_WORD(APP_CFG_USBD_PID),
                                     // product
-            USB_DESC_WORD(0x2000),  // bcdDevice
+            USB_DESC_WORD(0x0100),  // bcdDevice
             1,                      // manu facturer
             2,                      // product
             0,                      // serial number
@@ -127,12 +142,16 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             0x01,                   // baInterfaceNr[1]: interface 1
             0x02,                   // baInterfaceNr[2]: interface 2
 
+/*          IT1(USB, 2CH)       --> FU2(Mute/Volume)    --> OT3(Speaker)
+            IT4(Headset, 1CH)   --> FU5(Mute/Volume)    --> OT6(USB)
+*/
             // Input Terminal Descriptor
             12,                     // bLength
             0x24,                   // bDescriptorType: CS_INTERFACE
             0x02,                   // bDescriptorSubtype: AC_INPUT_TERMINAL
             1,                      // bTerminalID
-            USB_DESC_WORD(0x0101),  // wTerminalType: ITT_STREAMING
+            USB_DESC_WORD(USB_UAC_UTT_STREAMING),
+                                    // wTerminalType: USB streaming
             0,                      // bAssocTerminal
             0x02,                   // bNrChannels
             USB_DESC_WORD(0x0003),  // wChannelConfig: left + right
@@ -156,8 +175,9 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             0x24,                   // bDescriptorType: CS_INTERFACE
             0x03,                   // bDescriptorSubType: AC_OUTPUT_TERMINAL
             3,                      // bTerminalID
-            USB_DESC_WORD(0x0103),  // wTerminalType:
-            0,                      // bAssocTerminal
+            USB_DESC_WORD(USB_UAC_OTT_SPEAKER),
+                                    // wTerminalType: Speakers
+            4,                      // bAssocTerminal
             2,                      // bSourceID
             0,                      // iTerminal
 
@@ -166,8 +186,9 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             0x24,                   // bDescriptorType: CS_INTERFACE
             0x02,                   // bDescriptorSubtype: AC_INPUT_TERMINAL
             4,                      // bTerminalID
-            USB_DESC_WORD(0x0102),  // wTerminalType:
-            0,                      // bAssocTerminal
+            USB_DESC_WORD(USB_UAC_BTT_HEADSET),
+                                    // wTerminalType: Headset
+            3,                      // bAssocTerminal
             1,                      // bNrChannels
             USB_DESC_WORD(0x0001),  // wChannelConfig: left
             0,                      // iChannelNames
@@ -189,8 +210,9 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             0x24,                   // bDescriptorType: CS_INTERFACE
             0x03,                   // bDescriptorSubType: AC_OUTPUT_TERMINAL
             6,                      // bTerminalID
-            USB_DESC_WORD(0x0101),  // wTerminalType:
-            0,                      // bAssocTerminal
+            USB_DESC_WORD(USB_UAC_UTT_STREAMING),
+                                    // wTerminalType: USB streaming
+            1,                      // bAssocTerminal
             5,                      // bSourceID
             0,                      // iTerminal
 
@@ -220,16 +242,17 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             7,                      // bLength
             0x24,                   // bDescriptorType: CS_INTERFACE
             0x01,                   // bDescriptorSubType: AS_GENERAL
-            6,                      // bTerminalLink
-            0,                      // bDelay
-            USB_DESC_WORD(0x0001),  // wFormatTag: PCM
+            1,                      // bTerminalLink
+            1,                      // bDelay
+            USB_DESC_WORD(USB_UAC_FORMAT_PCM),
+                                    // wFormatTag: PCM
 
             // Class-specific AS Format Type Descriptor
             11,                     // bLength
             0x24,                   // bDescriptorType: CS_INTERFACE
             0x02,                   // bDescriptorSubType: AS_FORMAT_TYPE
             0x01,                   // bFormatType: FORMAT_TYPE_I
-            1,                      // bNrChannels
+            2,                      // bNrChannels
             2,                      // bSubframeSize
             16,                     // bBitResolution
             0x01,                   // bSamFreqType
@@ -239,10 +262,11 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             USB_DT_ENDPOINT_AUDIO_SIZE,
                                     // bLength
             USB_DT_ENDPOINT,        // bDescriptorType
-            0x83,                   // bEndpointAddress: IN3
+            0x01,                   // bEndpointAddress: OUT1
             0x01,                   // bmAttributes
-            USB_DESC_WORD(96),      // wMaxPacketSize
-            1,                      // bInterval
+            USB_DESC_WORD(192),     // wMaxPacketSize
+            __USRAPP_USBD_UAC_CFG_EP_INTERVAL,
+                                    // bInterval
             0,                      // bRefresh
             0,                      // bSynchAddress
 
@@ -280,16 +304,17 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             7,                      // bLength
             0x24,                   // bDescriptorType: CS_INTERFACE
             0x01,                   // bDescriptorSubType: AS_GENERAL
-            1,                      // bTerminalLink
-            0,                      // bDelay
-            USB_DESC_WORD(0x0001),  // wFormatTag: PCM
+            6,                      // bTerminalLink
+            1,                      // bDelay
+            USB_DESC_WORD(USB_UAC_FORMAT_PCM),
+                                    // wFormatTag: PCM
 
             // Class-specific AS Format Type Descriptor
             11,                     // bLength
             0x24,                   // bDescriptorType: CS_INTERFACE
             0x02,                   // bDescriptorSubType: AS_FORMAT_TYPE
             0x01,                   // bFormatType: FORMAT_TYPE_I
-            2,                      // bNrChannels
+            1,                      // bNrChannels
             2,                      // bSubframeSize
             16,                     // bBitResolution
             0x01,                   // bSamFreqType
@@ -299,10 +324,11 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             USB_DT_ENDPOINT_AUDIO_SIZE,
                                     // bLength
             USB_DT_ENDPOINT,        // bDescriptorType
-            0x04,                   // bEndpointAddress: OUT4
+            0x82,                   // bEndpointAddress: IN2
             0x01,                   // bmAttributes
-            USB_DESC_WORD(192),     // wMaxPacketSize
-            1,                      // bInterval
+            USB_DESC_WORD(96),      // wMaxPacketSize
+            __USRAPP_USBD_UAC_CFG_EP_INTERVAL,
+                                    // bInterval
             0,                      // bRefresh
             0,                      // bSynchAddress
 
@@ -349,9 +375,9 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
                 [1]             = {
                     .selector   = 0x02,     // Volume
                     .size       = 2,
-                    .res.uval16 = 0x0001,
-                    .min.uval16 = 0x0000,
-                    .max.uval16 = 0xFFFF,
+                    .res.uval16 = 0x0100,
+                    .min.uval16 = 0x9C00,
+                    .max.uval16 = 0x0000,
                 },
             },
         },
@@ -364,9 +390,9 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
                 [1]             = {
                     .selector   = 0x02,     // Volume
                     .size       = 2,
-                    .res.uval16 = 0x0001,
+                    .res.uval16 = 0x007A,
                     .min.uval16 = 0x0000,
-                    .max.uval16 = 0xFFFF,
+                    .max.uval16 = 0x3000,
                 },
             },
         },
@@ -382,7 +408,7 @@ static usbd_uac_t __user_usbd_uac = {
             },
             [1]                 = {
                 .info           = &__user_usbd_uac_const.usbd.uac.line_in.control_info[1],
-                .cur.uval16     = 0x8000,
+                .cur.uval16     = 0x9C00,
             },
         },
         .uac.line_out.control   = {
@@ -392,7 +418,7 @@ static usbd_uac_t __user_usbd_uac = {
             },
             [1]                 = {
                 .info           = &__user_usbd_uac_const.usbd.uac.line_out.control_info[1],
-                .cur.uval16     = 0x8000,
+                .cur.uval16     = 0x0EE1,
             },
         },
 
@@ -457,7 +483,7 @@ static usbd_uac_t __user_usbd_uac = {
         .dev.config             = __user_usbd_uac.usbd.config,
         .dev.num_of_desc        = dimof(__user_usbd_uac_const.usbd.std_desc),
         .dev.desc               = (vk_usbd_desc_t *)__user_usbd_uac_const.usbd.std_desc,
-        .dev.speed              = USB_DC_SPEED_HIGH,
+        .dev.speed              = USRAPP_CFG_USBD_SPEED,
         .dev.drv                = &VSF_USB_DC0,
     },
 };
