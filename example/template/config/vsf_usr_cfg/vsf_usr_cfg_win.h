@@ -81,7 +81,10 @@
 #define APP_USE_AWTK_DEMO                               ENABLED
 // nnom minst demo seems to be broken
 #define APP_USE_NNOM_DEMO                               DISABLED
-#define APP_USE_LVGL_DEMO                               ENABLED
+#ifndef __VSF_X86_WIN_SINGLE_PRIORITY
+// lvgl will hold CPU, so other irq can not be run in single thread mode
+#   define APP_USE_LVGL_DEMO                            ENABLED
+#endif
 //#   define APP_LVGL_DEMO_USE_TERMINAL                   ENABLED
 //#   define APP_LVGL_DEMO_CFG_ANIMINATION                ENABLED
 // _vsnprintf of lvgl conflicts with ucrt
@@ -94,8 +97,8 @@
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    1920
 #   define APP_LVGL_DEMO_CFG_VER_RES                    1080
 #define APP_USE_BTSTACK_DEMO                            ENABLED
-#if VSF_ARCH_SWI_NUM != 0
-// vsfvm will hold idle thread, so other irq can not be run
+#ifndef __VSF_X86_WIN_SINGLE_PRIORITY
+// vsfvm will hold cpu, so other irq can not be run in single thread mode
 #   define APP_USE_VSFVM_DEMO                              ENABLED
 #endif
 // select one for tcpip stack
