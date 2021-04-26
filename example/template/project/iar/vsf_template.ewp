@@ -8813,6 +8813,12 @@
                             </file>
                         </group>
                         <group>
+                            <name>UAC</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\common\class\UAC\vsf_usb_UAC.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>UVC</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\usb\common\class\UVC\vsf_usb_UVC.h</name>
