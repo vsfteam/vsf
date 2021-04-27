@@ -85,7 +85,6 @@ vsf_class(vk_usbd_uac_ac_t) {
     )
 
     private_member(
-        vk_usbd_trans_t trans_in;
         vk_usbd_dev_t *dev;
         vk_usbd_ifs_t *ifs;
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
@@ -107,6 +106,9 @@ vsf_class(vk_usbd_uac_as_t) {
     )
     private_member(
         bool is_submitted;
+#if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
+        uint32_t cur_size;
+#endif
         vk_usbd_trans_t trans;
     )
 };

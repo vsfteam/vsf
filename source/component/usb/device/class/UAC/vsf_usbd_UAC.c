@@ -35,24 +35,29 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_usbd_uac_stop_stream(vk_usbd_uac_ac_t *uac_ac, uint_fast8_t ifs);
-extern void vsf_usbd_uac_start_stream(vk_usbd_uac_ac_t *uac_ac, uint_fast8_t ifs);
+extern void vsf_usbd_uac_stop_stream(vk_usbd_uac_as_t *uac_as, uint_fast8_t ifs);
+extern void vsf_usbd_uac_start_stream(vk_usbd_uac_as_t *uac_as, uint_fast8_t ifs);
 
-static vsf_err_t __vk_usbd_uac_vc_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t __vk_usbd_uac_vs_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t __vk_usbd_uac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t __vk_usbd_uac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_uac_ac_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_uac_ac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+
+static vsf_err_t __vk_usbd_uac_as_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_uac_as_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_usbd_class_op_t vk_usbd_uac_control_class = {
-    .request_prepare =      __vk_usbd_uac_request_prepare,
-    .request_process =      __vk_usbd_uac_request_process,
-    .init =                 __vk_usbd_uac_vc_class_init,
+    .request_prepare =      __vk_usbd_uac_ac_request_prepare,
+    .request_process =      __vk_usbd_uac_ac_request_process,
+    .init =                 __vk_usbd_uac_ac_class_init,
 };
 
 const vk_usbd_class_op_t vk_usbd_uac_stream_class = {
-    .init =                 __vk_usbd_uac_vs_class_init,
+    .request_prepare =      __vk_usbd_uac_as_request_prepare,
+    .request_process =      __vk_usbd_uac_as_request_process,
+    .init =                 __vk_usbd_uac_as_class_init,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -66,9 +71,6 @@ static char * __vk_usbd_uac_trace_get_request(uint_fast8_t request)
     case USB_UAC_REQ_MIN:   return "MIN";
     case USB_UAC_REQ_MAX:   return "MAX";
     case USB_UAC_REQ_RES:   return "RES";
-    case USB_UAC_REQ_LEN:   return "LEN";
-    case USB_UAC_REQ_INFO:  return "INFO";
-    case USB_UAC_REQ_DEF:   return "DEF";
     default:                return "UNKNOWN";
     }
 }
@@ -115,14 +117,14 @@ static void __vk_usbd_uac_trace_request_process(vk_usbd_ctrl_handler_t *ctrl_han
 
 #ifndef WEAK_VSF_USBD_UAC_STOP_STREAM
 WEAK(vsf_usbd_uac_stop_stream)
-void vsf_usbd_uac_stop_stream(vk_usbd_uac_ac_t *uac_ac, uint_fast8_t ifs)
+void vsf_usbd_uac_stop_stream(vk_usbd_uac_as_t *uac_as, uint_fast8_t ifs)
 {
 }
 #endif
 
 #ifndef WEAK_VSF_USBD_UAC_START_STREAM
 WEAK(vsf_usbd_uac_start_stream)
-void vsf_usbd_uac_start_stream(vk_usbd_uac_ac_t *uac_ac, uint_fast8_t ifs)
+void vsf_usbd_uac_start_stream(vk_usbd_uac_as_t *uac_as, uint_fast8_t ifs)
 {
 }
 #endif
@@ -163,7 +165,7 @@ static vk_av_control_value_t *__vk_usbd_uac_get_value(
     return value;
 }
 
-static vsf_err_t __vk_usbd_uac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_uac_ac_t *uac_ac = ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
@@ -177,25 +179,6 @@ static vsf_err_t __vk_usbd_uac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     switch (request->bRequestType & USB_RECIP_MASK) {
     case USB_RECIP_INTERFACE:
         switch (request->bRequestType & USB_TYPE_MASK) {
-        case USB_TYPE_STANDARD:
-            switch (request->bRequest) {
-            case USB_REQ_SET_INTERFACE:
-                if (0 == request->wValue) {
-                    // 0-bandwidth
-#if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
-                    vsf_trace_debug("uac: stop stream." VSF_TRACE_CFG_LINEEND);
-#endif
-                    vsf_usbd_uac_stop_stream(uac_ac, request->wValue);
-                } else {
-#if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
-                    vsf_trace_debug("uac: start stream %d." VSF_TRACE_CFG_LINEEND,
-                                request->wValue);
-#endif
-                    vsf_usbd_uac_start_stream(uac_ac, request->wValue);
-                }
-                break;
-            }
-            break;
         case USB_TYPE_CLASS: {
 //                uint_fast8_t ifs_ep = (request->wIndex >> 0) & 0xFF;
                 uint_fast8_t entity = (request->wIndex >> 8) & 0xFF;
@@ -230,19 +213,17 @@ static vsf_err_t __vk_usbd_uac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
             break;
         }
         break;
-    case USB_RECIP_ENDPOINT:
-        break;
     }
-    ctrl_handler->trans.use_as__vsf_mem_t.buffer = buffer;
-    ctrl_handler->trans.use_as__vsf_mem_t.size = size;
+    ctrl_handler->trans.buffer = buffer;
+    ctrl_handler->trans.size = size;
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
-    uac->cur_size = size;
+    uac_ac->cur_size = size;
     __vk_usbd_uac_trace_request_prepare(ctrl_handler);
 #endif
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vk_usbd_uac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+static vsf_err_t __vk_usbd_uac_ac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_uac_ac_t *uac_ac = ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
@@ -256,12 +237,6 @@ static vsf_err_t __vk_usbd_uac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     switch (request->bRequestType & USB_RECIP_MASK) {
     case USB_RECIP_INTERFACE:
         switch (request->bRequestType & USB_TYPE_MASK) {
-        case USB_TYPE_STANDARD:
-            switch (request->bRequest) {
-            case USB_REQ_SET_INTERFACE:
-                break;
-            }
-            break;
         case USB_TYPE_CLASS: {
 //                uint_fast8_t ifs_ep = (request->wIndex >> 0) & 0xFF;
                 uint_fast8_t entity = (request->wIndex >> 8) & 0xFF;
@@ -288,13 +263,11 @@ static vsf_err_t __vk_usbd_uac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t
             }
         }
         break;
-    case USB_RECIP_ENDPOINT:
-        break;
     }
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vk_usbd_uac_vc_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+static vsf_err_t __vk_usbd_uac_ac_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_uac_ac_t *uac_ac = ifs->class_param;
 
@@ -303,7 +276,7 @@ static vsf_err_t __vk_usbd_uac_vc_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *
     return VSF_ERR_NONE;
 }
 
-static void __vk_usbd_uac_vs_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_usbd_uac_as_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vk_usbd_uac_as_t *uac_as = param;
     vsf_stream_t *stream = uac_as->stream;
@@ -357,7 +330,7 @@ static void __vk_usbd_uac_vs_evthandler(void *param, vsf_stream_evt_t evt)
     }
 }
 
-static void __vk_usbd_uac_vs_on_finish(void *param)
+static void __vk_usbd_uac_as_on_finish(void *param)
 {
     vk_usbd_uac_as_t *uac_as = param;
     vsf_stream_t *stream = uac_as->stream;
@@ -371,7 +344,7 @@ static void __vk_usbd_uac_vs_on_finish(void *param)
         orig = vsf_protect_int();
             uac_as->is_submitted = false;
         vsf_unprotect_int(orig);
-        __vk_usbd_uac_vs_evthandler(uac_as, VSF_STREAM_ON_RX);
+        __vk_usbd_uac_as_evthandler(uac_as, VSF_STREAM_ON_RX);
     } else {
         if (!uac_as->trans.size) {
             vsf_stream_write(stream, NULL, uac_as->packet_size);
@@ -379,11 +352,81 @@ static void __vk_usbd_uac_vs_on_finish(void *param)
         orig = vsf_protect_int();
             uac_as->is_submitted = false;
         vsf_unprotect_int(orig);
-        __vk_usbd_uac_vs_evthandler(uac_as, VSF_STREAM_ON_TX);
+        __vk_usbd_uac_as_evthandler(uac_as, VSF_STREAM_ON_TX);
     }
 }
 
-static vsf_err_t __vk_usbd_uac_vs_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+static vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+{
+    vk_usbd_uac_as_t *uac_as = ifs->class_param;
+    vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
+    struct usb_ctrlrequest_t *request = &ctrl_handler->request;
+    uint8_t *buffer = NULL;
+    uint_fast32_t size = 0;
+
+    switch (request->bRequestType & USB_RECIP_MASK) {
+    case USB_RECIP_INTERFACE:
+        switch (request->bRequestType & USB_TYPE_MASK) {
+        case USB_TYPE_STANDARD:
+            switch (request->bRequest) {
+            case USB_REQ_SET_INTERFACE:
+                if (0 == request->wValue) {
+                    // 0-bandwidth
+#if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
+                    vsf_trace_debug("uac: stop stream." VSF_TRACE_CFG_LINEEND);
+#endif
+                    vsf_usbd_uac_stop_stream(uac_as, request->wValue);
+                } else {
+#if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
+                    vsf_trace_debug("uac: start stream %d." VSF_TRACE_CFG_LINEEND,
+                                request->wValue);
+#endif
+                    vsf_usbd_uac_start_stream(uac_as, request->wValue);
+                }
+                break;
+            }
+            break;
+        }
+    case USB_RECIP_ENDPOINT:
+        break;
+    }
+    ctrl_handler->trans.buffer = buffer;
+    ctrl_handler->trans.size = size;
+#if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
+    uac_as->cur_size = size;
+    __vk_usbd_uac_trace_request_prepare(ctrl_handler);
+#endif
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vk_usbd_uac_as_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+{
+    vk_usbd_uac_as_t *uac_as = ifs->class_param;
+    vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
+    struct usb_ctrlrequest_t *request = &ctrl_handler->request;
+
+#if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
+    ctrl_handler->trans.size = uac_as->cur_size;
+    __vk_usbd_uac_trace_request_process(ctrl_handler);
+#endif
+    switch (request->bRequestType & USB_RECIP_MASK) {
+    case USB_RECIP_INTERFACE:
+        switch (request->bRequestType & USB_TYPE_MASK) {
+        case USB_TYPE_STANDARD:
+            switch (request->bRequest) {
+            case USB_REQ_SET_INTERFACE:
+                break;
+            }
+            break;
+        }
+        break;
+    case USB_RECIP_ENDPOINT:
+        break;
+    }
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vk_usbd_uac_as_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_uac_as_t *uac_as = ifs->class_param;
     vk_usbd_trans_t *trans = &uac_as->trans;
@@ -393,7 +436,7 @@ static vsf_err_t __vk_usbd_uac_vs_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *
     trans->zlp = false;
     trans->notify_eda = false;
     trans->param = uac_as;
-    trans->on_finish = __vk_usbd_uac_vs_on_finish;
+    trans->on_finish = __vk_usbd_uac_as_on_finish;
 
     uac_as->is_submitted = false;
     if (uac_as->stream != NULL) {
@@ -408,11 +451,11 @@ void vk_usbd_uac_connect_stream(vk_usbd_uac_as_t *uac_as, vsf_stream_t *stream)
     uac_as->stream = stream;
     if (USB_DIR_IN == (uac_as->ep & USB_DIR_MASK)) {
         uac_as->stream->rx.param = uac_as;
-        uac_as->stream->rx.evthandler = __vk_usbd_uac_vs_evthandler;
+        uac_as->stream->rx.evthandler = __vk_usbd_uac_as_evthandler;
         vsf_stream_connect_rx(uac_as->stream);
     } else {
         uac_as->stream->tx.param = uac_as;
-        uac_as->stream->tx.evthandler = __vk_usbd_uac_vs_evthandler;
+        uac_as->stream->tx.evthandler = __vk_usbd_uac_as_evthandler;
         vsf_stream_connect_tx(uac_as->stream);
     }
 }

@@ -512,7 +512,6 @@ vsf_class(vk_usbd_dev_t) {
 
 #if VSF_USBD_CFG_STREAM_EN == ENABLED
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-vsf_dcl_class(vk_usbd_ep_stream_t)
 vsf_class(vk_usbd_ep_stream_t) {
 
     public_member(
