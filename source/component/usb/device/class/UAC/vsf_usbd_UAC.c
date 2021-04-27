@@ -82,15 +82,16 @@ static void __vk_usbd_uac_trace_request_prepare(vk_usbd_ctrl_handler_t *ctrl_han
     uint_fast8_t ifs_ep = (request->wIndex >> 0) & 0xFF;
     uint_fast8_t entity = (request->wIndex >> 8) & 0xFF;
     uint_fast8_t cs = (request->wValue >> 8) & 0xFF;
+    uint_fast8_t channel = (request->wValue >> 0) & 0xFF;
     bool is_get = req & USB_UAC_REQ_GET;
 
     if (    (USB_RECIP_INTERFACE == (request->bRequestType & USB_RECIP_MASK))
         &&  (USB_TYPE_CLASS == (request->bRequestType & USB_TYPE_MASK))) {
 
-        vsf_trace_debug("uac: %s%s ifs/ep=%d, entity=%d, cs=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("uac: %s%s ifs/ep=%d, entity=%d, cs=%d, channel=%d" VSF_TRACE_CFG_LINEEND,
                     is_get ? "GET_" : "SET_",
                     __vk_usbd_uac_trace_get_request(req & ~USB_UAC_REQ_GET),
-                    ifs_ep, entity, cs);
+                    ifs_ep, entity, cs, channel);
         if (is_get) {
             vsf_trace_buffer(VSF_TRACE_NONE, ctrl_handler->trans.buffer,
                     ctrl_handler->trans.size, VSF_TRACE_DF_DEFAULT);
