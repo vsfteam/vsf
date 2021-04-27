@@ -17,14 +17,16 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "vsf_cfg.h"
+
+#if     VSF_USE_USB_DEVICE == ENABLED && VSF_USE_DISTBUS == ENABLED             \
+    &&  APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_HAL_SLAVE_DEMO == ENABLED
+
 #define __VSF_DISTBUS_CLASS_INHERIT__
 // for distbus_dcd constants
 #define VSF_HAL_USE_DISTBUS                         ENABLED
 #   define VSF_HAL_USE_DISTBUS_USBD                 ENABLED
 #include "vsf.h"
-
-#if     VSF_USE_USB_DEVICE == ENABLED && VSF_USE_DISTBUS == ENABLED             \
-    &&  APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_HAL_SLAVE_DEMO == ENABLED
 
 #include "../../common/usrapp_common.h"
 
