@@ -459,13 +459,13 @@ static usbd_uac_t __user_usbd_uac = {
             .entity             = __user_usbd_uac.usbd.uac.entity,
         },
         .uac.as_param[0]        = {
-            .ep                 = 0x83,
+            .ep                 = 0x82,
             .packet_size        = 96,
             .uac_ac             = &__user_usbd_uac.usbd.uac.ac_param,
             .stream             = &__user_usbd_uac_tx_stream.use_as__vsf_stream_t,
         },
         .uac.as_param[1]        = {
-            .ep                 = 0x04,
+            .ep                 = 0x01,
             .packet_size        = 192,
             .uac_ac             = &__user_usbd_uac.usbd.uac.ac_param,
             .stream             = &__user_usbd_uac_rx_stream.use_as__vsf_stream_t,
