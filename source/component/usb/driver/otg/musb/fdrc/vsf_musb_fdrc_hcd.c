@@ -31,6 +31,12 @@
 #include "./__vsf_musb_fdrc_common.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_USBH_HCD_MUSB_FDRC_CFG_STABLE_DELAY_MS
+//  some devices need a crazying long delay for stable
+#   define VSF_USBH_HCD_MUSB_FDRC_CFG_STABLE_DELAY_MS       500
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -41,9 +47,11 @@ typedef struct vk_musb_fdrc_hcd_t {
         MUSB_FDRC_HCD_STATE_WAIE_CONNECT,
         MUSB_FDRC_HCD_STATE_WAIT_RESET,
         MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR,
+        MUSB_FDRC_HCD_STATE_WAIT_DEV_STABLE,
         MUSB_FDRC_HCD_STATE_CONNECTED,
     } state;
     uint8_t epnum;
+    uint8_t speed;
 
     // ep_in_mask and ep_out_mask is used to mask the ep_idx used
     uint16_t ep_in_mask;
@@ -195,9 +203,12 @@ static void __vk_musb_fdrc_hcd_interrupt(void *param)
 static void __vk_musb_fdrc_hcd_free_urb_do(vk_musb_fdrc_hcd_t *musb, vk_usbh_hcd_urb_t *urb)
 {
     vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
-    vsf_protect_t orig = vsf_protect_sched();
-        vsf_musb_fdrc_hcd_free_fifo(musb->hcd, musb_urb->fifo);
-    vsf_unprotect_sched(orig);
+
+    if (urb->pipe.endpoint != 0) {
+        vsf_protect_t orig = vsf_protect_sched();
+            vsf_musb_fdrc_hcd_free_fifo(musb->hcd, musb_urb->fifo);
+        vsf_unprotect_sched(orig);
+    }
 
     vk_usbh_hcd_urb_free_buffer(urb);
     vsf_usbh_free(urb);
@@ -389,24 +400,31 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         reg->Common.IntrUSBE = MUSB_INTRUSBE_CONN;
         break;
     case VSF_EVT_TIMER:
-        if (MUSB_FDRC_HCD_STATE_WAIT_RESET == musb->state) {
+        switch (musb->state) {
+        case MUSB_FDRC_HCD_STATE_WAIT_RESET:
             reg->Common.Power &= ~MUSB_POWER_RESET;
+        delay_another_100ms:
             vsf_teda_set_timer_ms(100);
             musb->state = MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR;
-        } else if (MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR == musb->state) {
-            enum usb_device_speed_t speed;
+            break;
+        case MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR:
             if (reg->Common.DevCtl & MUSB_DEVCTL_LSDEV) {
-                speed = USB_SPEED_LOW;
+                musb->speed = USB_SPEED_LOW;
             } else if (reg->Common.DevCtl & MUSB_DEVCTL_FSDEV) {
-                speed = USB_SPEED_FULL;
+                musb->speed = USB_SPEED_FULL;
             } else {
-                VSF_USB_ASSERT(false);
-                speed = USB_SPEED_UNKNOWN;
+                // some device need a really long delay
+                goto delay_another_100ms;
             }
 
+            musb->state = MUSB_FDRC_HCD_STATE_WAIT_DEV_STABLE;
+            vsf_teda_set_timer_ms(VSF_USBH_HCD_MUSB_FDRC_CFG_STABLE_DELAY_MS);
+            break;
+        case MUSB_FDRC_HCD_STATE_WAIT_DEV_STABLE:
             musb->state = MUSB_FDRC_HCD_STATE_CONNECTED;
-            musb->dev = vk_usbh_new_device((vk_usbh_t *)musb->hcd, speed, NULL, 0);
+            musb->dev = vk_usbh_new_device((vk_usbh_t *)musb->hcd, musb->speed, NULL, 0);
             reg->Common.IntrUSBE = MUSB_INTRUSBE_DISCON;
+            break;
         }
         break;
     case VSF_EVT_MESSAGE: {
