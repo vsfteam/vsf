@@ -31,6 +31,7 @@
 #endif
 
 #if     USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
+#warning ******** high speed usb will require UAC2, current UAC1 demo will not work on all hosts  ********
 //! interval(iso ep) for high speed is (2 exp (interval - 1)) micro-frames / 125 microseconds
 #   define __USRAPP_USBD_UAC_CFG_EP_INTERVAL    4
 #elif   USRAPP_CFG_USBD_SPEED == USB_SPEED_FULL
