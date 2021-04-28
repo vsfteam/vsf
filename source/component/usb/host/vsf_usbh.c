@@ -1058,6 +1058,9 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         goto parse_failed;
         break;
     case VSF_EVT_INIT:
+#if VSF_USBH_CFG_MAX_PROBE_RETRY > 0
+    __retry:
+#endif
         parser = vsf_usbh_malloc(sizeof(*parser));
         if (NULL == parser) { goto parse_failed; }
         memset(parser, 0, sizeof(*parser));
@@ -1151,6 +1154,19 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             err = vk_usbh_get_descriptor(usbh, dev, USB_DT_DEVICE, 0,
                     sizeof(*parser->desc_device));
             break;
+#if VSF_USBH_CFG_MAX_PROBE_RETRY > 0
+        case VSF_USBH_PROBE_RETRY: {
+                uint_fast8_t retry = parser->retry;
+                __vk_usbh_free_parser(usbh);
+
+                parser = vsf_usbh_malloc(sizeof(*parser));
+                if (NULL == parser) { goto parse_failed; }
+                memset(parser, 0, sizeof(*parser));
+                parser->retry = retry;
+                usbh->parser = parser;
+                goto __retry;
+            }
+#endif
         }
     }
     if (err < 0) {
@@ -1160,6 +1176,13 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     return;
 
 parse_failed:
+#if VSF_USBH_CFG_MAX_PROBE_RETRY > 0
+    if (++parser->retry <= VSF_USBH_CFG_MAX_PROBE_RETRY) {
+        parser->probe_state = VSF_USBH_PROBE_RETRY;
+        vsf_teda_set_timer_ms(100);
+        return;
+    }
+#endif
     if (dev != NULL) {
         __vk_usbh_clean_device(usbh, dev);
     }

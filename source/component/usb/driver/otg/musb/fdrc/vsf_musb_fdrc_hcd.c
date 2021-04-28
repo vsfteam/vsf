@@ -31,12 +31,6 @@
 #include "./__vsf_musb_fdrc_common.h"
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_USBH_HCD_MUSB_FDRC_CFG_STABLE_DELAY_MS
-//  some devices need a crazying long delay for stable
-#   define VSF_USBH_HCD_MUSB_FDRC_CFG_STABLE_DELAY_MS       500
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -47,7 +41,6 @@ typedef struct vk_musb_fdrc_hcd_t {
         MUSB_FDRC_HCD_STATE_WAIE_CONNECT,
         MUSB_FDRC_HCD_STATE_WAIT_RESET,
         MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR,
-        MUSB_FDRC_HCD_STATE_WAIT_DEV_STABLE,
         MUSB_FDRC_HCD_STATE_CONNECTED,
     } state;
     uint8_t epnum;
@@ -417,10 +410,6 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 goto delay_another_100ms;
             }
 
-            musb->state = MUSB_FDRC_HCD_STATE_WAIT_DEV_STABLE;
-            vsf_teda_set_timer_ms(VSF_USBH_HCD_MUSB_FDRC_CFG_STABLE_DELAY_MS);
-            break;
-        case MUSB_FDRC_HCD_STATE_WAIT_DEV_STABLE:
             musb->state = MUSB_FDRC_HCD_STATE_CONNECTED;
             musb->dev = vk_usbh_new_device((vk_usbh_t *)musb->hcd, musb->speed, NULL, 0);
             reg->Common.IntrUSBE = MUSB_INTRUSBE_DISCON;
