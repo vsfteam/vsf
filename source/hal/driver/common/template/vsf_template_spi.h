@@ -100,7 +100,6 @@ typedef struct vsf_spi_isr_t {
     void                        *target_ptr;
     vsf_arch_prio_t             prio;
 } vsf_spi_isr_t;
-#endif
 
 //! \name spi configuration for api
 //! @{
@@ -111,8 +110,10 @@ typedef struct spi_cfg_t {
 } spi_cfg_t;
 //! @}
 
+typedef struct i_spi_t i_spi_t;
+
 typedef void vsf_i_spi_isrhandler_t(void *target_ptr,
-                                    i_spi_t *i_spi_ptr,
+                                    const i_spi_t *i_spi_ptr,
                                     em_spi_irq_mask_t irq_mask);
 
 //! \name spi isr for interface
@@ -122,7 +123,7 @@ typedef struct vsf_i_spi_isr_t {
     void                        *target_ptr;
     vsf_arch_prio_t             prio;
 } vsf_i_spi_isr_t;
-#endif
+
 
 //! \name spi configuration for interface
 //! @{
