@@ -25,6 +25,7 @@
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
 #define ____vsf_hw_spi_imp_lv0(__N, __DONT_CARE)                               \
 vsf_spi_t vsf_spi##__N = {                                                     \
     .reg = SPI##__N,                                                           \
@@ -45,9 +46,13 @@ vsf_spi_t vsf_spi##__N = {                                                     \
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
 static volatile uint32_t __dummy;
+
 /*============================ PROTOTYPES ====================================*/
+
 static vsf_err_t __vsf_spi_dma_request(vsf_spi_t *spi_ptr);
+
 /*============================ IMPLEMENTATION ================================*/
 
 // TODO: support Slave mode
@@ -65,17 +70,26 @@ static void __vsf_spi_enable_clock(vsf_spi_t *spi_ptr)
 
     // spi clock select
     if (spi_ptr->reg == SPI0) {
+        CLK->APBCLK0 &= ~CLK_APBCLK0_SPI0CKEN_Msk;
         CLK->CLKSEL2 = (CLK->CLKSEL2 & (~CLK_CLKSEL2_SPI0SEL_Msk)) | (0x2UL << CLK_CLKSEL2_SPI0SEL_Pos);
         CLK->APBCLK0 |= CLK_APBCLK0_SPI0CKEN_Msk;
+        SYS->IPRST1 |= SYS_IPRST1_SPI0RST_Msk;
+        SYS->IPRST1 &= ~SYS_IPRST1_SPI0RST_Msk;
     } else if (spi_ptr->reg == SPI1) {
         CLK->CLKSEL2 = (CLK->CLKSEL2 & (~CLK_CLKSEL2_SPI1SEL_Msk)) | (0x2UL << CLK_CLKSEL2_SPI1SEL_Pos);
         CLK->APBCLK0 |= CLK_APBCLK0_SPI1CKEN_Msk;
+        SYS->IPRST1 |= SYS_IPRST1_SPI1RST_Msk;
+        SYS->IPRST1 &= ~SYS_IPRST1_SPI1RST_Msk;
     } else if (spi_ptr->reg == SPI2) {
         CLK->CLKSEL2 = (CLK->CLKSEL2 & (~CLK_CLKSEL2_SPI2SEL_Msk)) | (0x2UL << CLK_CLKSEL2_SPI2SEL_Pos);
         CLK->APBCLK0 |= CLK_APBCLK0_SPI2CKEN_Msk;
+        SYS->IPRST1 |= SYS_IPRST1_SPI2RST_Msk;
+        SYS->IPRST1 &= ~SYS_IPRST1_SPI2RST_Msk;
     } else if (spi_ptr->reg == SPI3) {
         CLK->CLKSEL2 = (CLK->CLKSEL2 & (~CLK_CLKSEL2_SPI3SEL_Msk)) | (0x2UL << CLK_CLKSEL2_SPI3SEL_Pos);
         CLK->APBCLK1 |= CLK_APBCLK1_SPI3CKEN_Msk;
+        SYS->IPRST2 |= SYS_IPRST2_SPI3RST_Msk;
+        SYS->IPRST2 &= ~SYS_IPRST2_SPI3RST_Msk;
     } else {
         VSF_HAL_ASSERT(0);
     }
@@ -125,7 +139,7 @@ static uint8_t __vsf_spi_get_data_byte_cnt(vsf_spi_t *spi_ptr)
     return (data_width + 7) / 8;
 }
 
-static vsf_err_t __vsf_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
+static vsf_err_t __vsf_spi_reg_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
 {
     uint32_t clock_source;
     SPI_T* reg;
@@ -165,7 +179,7 @@ vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
     __vsf_spi_enable_clock(spi_ptr);
 
     // spi init
-    result = __vsf_spi_init(spi_ptr, cfg_ptr);
+    result = __vsf_spi_reg_init(spi_ptr, cfg_ptr);
     if (VSF_ERR_NONE == result) {
         __vsf_spi_init_nvic(spi_ptr, &cfg_ptr->isr);
     }
@@ -202,7 +216,7 @@ void vsf_spi_irq_enable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
     VSF_HAL_ASSERT((irq_mask & ~(SPI_IRQ_MASK_TX_CPL | SPI_IRQ_MASK_CPL)) == 0);
 
-    spi_ptr->irq_mask = irq_mask;
+    spi_ptr->irq_mask |= irq_mask;
 }
 
 void vsf_spi_irq_disable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
@@ -283,9 +297,10 @@ void vsf_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
     VSF_HAL_ASSERT((spi_ptr->reg->SSCTL & SPI_SSCTL_AUTOSS_Msk) == 0);
-    VSF_HAL_ASSERT(index == 0);
 
-    spi_ptr->reg->SSCTL |= SPI_SSCTL_SS_Msk;
+    if (index == 0) {
+        spi_ptr->reg->SSCTL |= SPI_SSCTL_SS_Msk;
+    }
 }
 
 void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
@@ -293,9 +308,10 @@ void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
     VSF_HAL_ASSERT((spi_ptr->reg->SSCTL & SPI_SSCTL_AUTOSS_Msk) == 0);
-    VSF_HAL_ASSERT(index == 0);
 
-    spi_ptr->reg->SSCTL &= ~SPI_SSCTL_SS_Msk;
+    if (index == 0) {
+        spi_ptr->reg->SSCTL &= ~SPI_SSCTL_SS_Msk;
+    }
 }
 
 bool vsf_spi_fifo_flush(vsf_spi_t *spi_ptr)
@@ -457,6 +473,10 @@ __vsf_hw_spi_imp_lv0(6, NULL)
 #endif
 #if SPI_MAX_PORT >= 7 && VSF_HAL_USE_SPI7 == ENABLED && (SPI_PORT_MASK & (1 << 7))
 __vsf_hw_spi_imp_lv0(7, NULL)
+#endif
+
+#if VSF_HAL_SPI_IMP_INTERFACE == ENABLED
+#   include "hal/driver/common/spi/__spi_cs_common.inc"
 #endif
 
 #endif

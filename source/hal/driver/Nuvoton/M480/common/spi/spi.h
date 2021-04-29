@@ -35,6 +35,11 @@
                                      | SPI_SLAVE_SELECTION_ACTIVE_HIGH)
 
 #define SPI_SSCTL_POS               21
+
+#ifndef VSF_HAL_SPI_IMP_INTERFACE
+#   define VSF_HAL_SPI_IMP_INTERFACE        ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 enum em_spi_irq_mask_t {
@@ -93,8 +98,13 @@ enum em_spi_mode_t {
     SPI_RECEIVE_ONLY_MODE_ENABLED  = SPI_CTL_RXONLY_Msk,
 
     // SSCTL, [1 << 21 ~ 1 << 24]
+    SPI_AUTO_SLAVE_SELECTION     = SPI_SSCTL_AUTOSS_Pos + SPI_SSCTL_POS,
+    SPI_AUTO_SLAVE_SELECTION_MSK = 1 << (SPI_SSCTL_AUTOSS_Pos + SPI_SSCTL_POS),
+
     SPI_AUTO_SLAVE_SELECTION_DISABLE  = 0,
-    SPI_AUTO_SLAVE_SELECTION_ENABLE   = 1 << (SPI_SSCTL_AUTOSS_Pos + SPI_SSCTL_POS),
+    SPI_AUTO_SLAVE_SELECTION_ENABLE   = SPI_AUTO_SLAVE_SELECTION_MSK,
+
+
     SPI_SLAVE_SELECTION_ACTIVE_LOW    = 0,
     SPI_SLAVE_SELECTION_ACTIVE_HIGH   = 1 << (SPI_SSCTL_SSACTPOL_Pos + SPI_SSCTL_POS),
 };
@@ -136,36 +146,32 @@ struct vsf_spi_t {
 /*============================ PROTOTYPES ====================================*/
 
 #if SPI_MAX_PORT >= 0 && VSF_HAL_USE_SPI0 == ENABLED && (SPI_PORT_MASK & (1 << 0))
-extern const i_spi_t VSF_SPI0;
 extern vsf_spi_t vsf_spi0;
 #endif
 #if SPI_MAX_PORT >= 1 && VSF_HAL_USE_SPI1 == ENABLED && (SPI_PORT_MASK & (1 << 1))
-extern const i_spi_t VSF_SPI1;
 extern vsf_spi_t vsf_spi1;
 #endif
 #if SPI_MAX_PORT >= 2 && VSF_HAL_USE_SPI2 == ENABLED && (SPI_PORT_MASK & (1 << 2))
-extern const i_spi_t VSF_SPI2;
 extern vsf_spi_t vsf_spi2;
 #endif
 #if SPI_MAX_PORT >= 3 && VSF_HAL_USE_SPI3 == ENABLED && (SPI_PORT_MASK & (1 << 3))
-extern const i_spi_t VSF_SPI3;
 extern vsf_spi_t vsf_spi3;
 #endif
 #if SPI_MAX_PORT >= 4 && VSF_HAL_USE_SPI4 == ENABLED && (SPI_PORT_MASK & (1 << 4))
-extern const i_spi_t VSF_SPI4;
 extern vsf_spi_t vsf_spi4;
 #endif
 #if SPI_MAX_PORT >= 5 && VSF_HAL_USE_SPI5 == ENABLED && (SPI_PORT_MASK & (1 << 5))
-extern const i_spi_t VSF_SPI5;
 extern vsf_spi_t vsf_spi5;
 #endif
 #if SPI_MAX_PORT >= 6 && VSF_HAL_USE_SPI6 == ENABLED && (SPI_PORT_MASK & (1 << 6))
-extern const i_spi_t VSF_SPI6;
 extern vsf_spi_t vsf_spi6;
 #endif
 #if SPI_MAX_PORT >= 7 && VSF_HAL_USE_SPI7 == ENABLED && (SPI_PORT_MASK & (1 << 7))
-extern const i_spi_t VSF_SPI7;
 extern vsf_spi_t vsf_spi7;
+#endif
+
+#if VSF_HAL_SPI_IMP_INTERFACE == ENABLED
+#   include "hal/driver/common/spi/__spi_cs_common.h"
 #endif
 
 #endif

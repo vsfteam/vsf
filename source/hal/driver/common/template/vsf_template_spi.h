@@ -121,17 +121,19 @@ def_interface(i_spi_t)
     vsf_err_t                   (*Init)(spi_cfg_t *cfg_ptr);
 
     struct {
-        uintalu_t               (*Set)(uintalu_t tIndex);
-        uintalu_t               (*Clear)(uintalu_t tIndex);
+        void                    (*Set)(uintalu_t tIndex);
+        void                    (*Clear)(uintalu_t tIndex);
     } CS;
 
     struct {
         //!< read/write of fifo
-        uint_fast16_t           (*Transfer)(void *pOutput, void *pInput, uint_fast16_t nCount);
+        void                    (*Transfer)(void *pOutput,
+                                            uint_fast32_t* pOutCount,
+                                            void *pInput,
+                                            uint_fast32_t* pInCount);
         //!< flush fifo
         bool                    (*Flush)(void);
     } FIFO;
-
 
     struct {
         /*! \brief request a block exchaging access
@@ -153,6 +155,11 @@ def_interface(i_spi_t)
         /*! \brief get transfered count */
         int_fast32_t            (*GetTransferedCount)(void);
     } Block;
+
+    struct {
+        void                    (*Enable)(em_spi_irq_mask_t mask);
+        void                    (*Disable)(em_spi_irq_mask_t mask);
+    } IRQ;
 end_def_interface(i_spi_t)
 //! @}
 
