@@ -117,7 +117,11 @@ void vk_disp_mipi_te_line_isr_enable_once(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 #endif
 
 static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+                                           const i_spi_t *spi_ptr,
+#else
                                            vsf_spi_t *spi_ptr,
+#endif
                                            em_spi_irq_mask_t irq_mask)
 {
     if (irq_mask & SPI_IRQ_MASK_CPL) {
@@ -134,7 +138,11 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_lcd_t * disp_mipi_lcd,
 
     VSF_UI_ASSERT(disp_mipi_lcd->spi != NULL);
 
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+    i_spi_cfg_t spi_cfg = {
+#else
     spi_cfg_t spi_cfg = {
+#endif
         .mode = { MIPI_LCD_SPI_CFG },
         .clock_hz = clock_hz,
         .isr = {
