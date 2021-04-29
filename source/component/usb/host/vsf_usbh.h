@@ -83,11 +83,6 @@ extern "C" {
 #   define VSF_USBH_CFG_MAX_DEVICE      127
 #endif
 
-//! Some devices need a longer initializaion time, each retry will have a 100ms interval
-#ifndef VSF_USBH_CFG_MAX_PROBE_RETRY
-#   define VSF_USBH_CFG_MAX_PROBE_RETRY 5
-#endif
-
 #ifdef VSF_USBH_CFG_HEAP
 #   undef vsf_usbh_malloc
 #   undef vsf_usbh_malloc_aligned
@@ -196,7 +191,6 @@ typedef struct vk_usbh_dev_parser_t {
     vk_usbh_ifs_parser_t *parser_ifs;
     uint8_t num_of_ifs;
     uint8_t devnum_temp;
-    uint8_t retry;
     enum {
         VSF_USBH_PROBE_START,
         VSF_USBH_PROBE_WAIT_DEVICE_DESC,
@@ -207,7 +201,6 @@ typedef struct vk_usbh_dev_parser_t {
         VSF_USBH_PROBE_WAIT_CONFIG_DESC_SIZE,
         VSF_USBH_PROBE_WAIT_FULL_CONFIG_DESC,
         VSF_USBH_PROBE_WAIT_SET_CONFIG,
-        VSF_USBH_PROBE_RETRY,
     } probe_state;
 } vk_usbh_dev_parser_t;
 
