@@ -136,13 +136,6 @@
 #define VSF_USE_STREAM                                  DISABLED
 #define VSF_USE_SIMPLE_STREAM                           ENABLED
 
-
-#ifndef USRAPP_CFG_DCD_TYPE_DEFAULT
-#   define USRAPP_CFG_DCD_TYPE_DEFAULT                  0
-#   define USRAPP_CFG_DCD_TYPE_DWCOTG                   1
-#   define USRAPP_CFG_DCD_TYPE_MUSB_FDRC                2
-#endif
-
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
 extern void VSF_DEBUG_STREAM_POLL(void);
@@ -179,8 +172,6 @@ typedef int vsf_systimer_cnt_signed_t;
 #       define USRAPP_CFG_CDC_NUM                       1
 #       define USRAPP_CFG_CDC_TX_STREAM_SIZE            1024
 #       define USRAPP_CFG_CDC_RX_STREAM_SIZE            512
-#       define USRAPP_CFG_DCD_TYPE                      USRAPP_CFG_DCD_TYPE_DEFAULT
-#       define USRAPP_CFG_STREAM_ALIGN                  1
 #endif
 
 #if APP_USE_USBH_DEMO == ENABLED

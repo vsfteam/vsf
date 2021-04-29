@@ -140,13 +140,6 @@
 #define VSF_USE_STREAM                                  DISABLED
 #define VSF_USE_SIMPLE_STREAM                           ENABLED
 
-
-#ifndef USRAPP_CFG_DCD_TYPE_DEFAULT
-#   define USRAPP_CFG_DCD_TYPE_DEFAULT                  0
-#   define USRAPP_CFG_DCD_TYPE_DWCOTG                   1
-#   define USRAPP_CFG_DCD_TYPE_MUSB_FDRC                2
-#endif
-
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
 
