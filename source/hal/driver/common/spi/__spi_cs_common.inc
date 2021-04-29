@@ -51,7 +51,7 @@
 
 static vsf_err_t __vsf_multi_spi_low_init(vsf_spi_cs_t* spi_cs_ptr,
                                           uint8_t cs,
-                                          spi_cfg_t *cfg_ptr);
+                                          i_spi_cfg_t *cfg_ptr);
 
 void vsf_multi_spi_cs_active(vsf_spi_cs_t* spi_cs_ptr,
                              uint8_t cs,
@@ -87,38 +87,40 @@ static void __vsf_multi_spi_irq_handler(void *target_ptr,
     VSF_HAL_ASSERT(spi_cs_ptr->cur_cs != -1);
 
     vsf_spi_cs_one_t *spi_cs_one = &spi_cs_ptr->cfgs[spi_cs_ptr->cur_cs];
-    vsf_spi_isr_t *isr_ptr = &spi_cs_one->spi_cfg.isr;
+    vsf_i_spi_isr_t *isr_ptr = &spi_cs_one->spi_cfg.isr;
 
     em_spi_irq_mask_t one_irq_mask = irq_mask & spi_cs_one->irq_mask;
 
     if ((isr_ptr->handler_fn != NULL) && (one_irq_mask != 0)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, spi_ptr, one_irq_mask);
+        isr_ptr->handler_fn(isr_ptr->target_ptr, spi_cs_one->i_spi, one_irq_mask);
     }
 }
 
 static vsf_err_t __vsf_multi_spi_low_init(vsf_spi_cs_t* spi_cs_ptr,
                                           uint8_t cs,
-                                          spi_cfg_t *cfg_ptr)
+                                          i_spi_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
     VSF_HAL_ASSERT(spi_cs_ptr->spi != NULL);
     VSF_HAL_ASSERT(cfg_ptr != 0);
 
-    spi_cfg_t local_cfg = *cfg_ptr;
+    spi_cfg_t local_cfg;
+    local_cfg.mode = cfg_ptr->mode;
+    local_cfg.clock_hz = cfg_ptr->clock_hz;
+    local_cfg.isr.handler_fn = __vsf_multi_spi_irq_handler;
+    local_cfg.isr.target_ptr = spi_cs_ptr;
+
     if (cs > 0) {       // TODO: support multi hardware cs pin
         __vsf_spi_cfg_clean_auto_cs(&local_cfg);
     }
-
-    local_cfg.isr.handler_fn = __vsf_multi_spi_irq_handler;
-    local_cfg.isr.target_ptr = spi_cs_ptr;
 
     return vsf_spi_init(spi_cs_ptr->spi, &local_cfg);
 }
 
 static vsf_err_t __vsf_multi_spi_reconfig(vsf_spi_cs_t* spi_cs_ptr,
                                           uint8_t cs,
-                                          spi_cfg_t *cfg_ptr)
+                                          i_spi_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -127,7 +129,7 @@ static vsf_err_t __vsf_multi_spi_reconfig(vsf_spi_cs_t* spi_cs_ptr,
 
     vsf_err_t result;
     while (fsm_rt_cpl != vsf_spi_disable(spi_cs_ptr->spi));
-    result = vsf_spi_init(spi_cs_ptr->spi, cfg_ptr);
+    result = __vsf_multi_spi_low_init(spi_cs_ptr, cs, cfg_ptr);
     while (fsm_rt_cpl != vsf_spi_enable(spi_cs_ptr->spi));
 
     return result;
@@ -135,7 +137,7 @@ static vsf_err_t __vsf_multi_spi_reconfig(vsf_spi_cs_t* spi_cs_ptr,
 
 static vsf_err_t __vsf_multi_spi_init(vsf_spi_cs_t* spi_cs_ptr,
                                       uint8_t cs,
-                                      spi_cfg_t *cfg_ptr)
+                                      i_spi_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -450,8 +452,14 @@ static int_fast32_t __vsf_multi_spi_get_transfered_count(vsf_spi_cs_t* spi_cs_pt
     return spi_cs_ptr->cfgs[cs].transfered_count;
 }
 
+#define __MULTI_SPI_VAR_DEC(__N, __MSPI)                                       \
+const i_spi_t __MSPI##__N;
+
+#define __MULTI_SPI_VAR_INIT(__N, __MSPI)                                      \
+{.i_spi = &__MSPI##__N},
+
 #define __MULTI_SPI_BODY_EX(__N, __MSPI)                                        \
-static vsf_err_t __MSPI##__N##_init(spi_cfg_t *cfg_ptr)                         \
+static vsf_err_t __MSPI##__N##_init(i_spi_cfg_t *cfg_ptr)                       \
 {                                                                               \
     return __vsf_multi_spi_init(&__MSPI.spi_cs, __N, cfg_ptr);                  \
 }                                                                               \
@@ -557,6 +565,7 @@ const i_spi_t __MSPI##__N = {                                                   
 };
 
 #define __MULTI_SPI_FUNC_DEF(__MSPI, __SPI, __N)                                \
+VSF_MREPEAT(__N, __MULTI_SPI_VAR_DEC, __MSPI)                                   \
 typedef struct __MSPI##_t {                                                     \
     vsf_spi_cs_t spi_cs;                                                        \
     vsf_spi_cs_one_t ones[__N];                                                 \
@@ -568,6 +577,9 @@ static __MSPI##_t __MSPI = {                                                    
         .list.head = NULL,                                                      \
         .list.tail = NULL,                                                      \
     },                                                                          \
+    .ones = {                                                                   \
+        VSF_MREPEAT(__N, __MULTI_SPI_VAR_INIT, __MSPI)                          \
+    }                                                                           \
 };                                                                              \
 VSF_MREPEAT(__N, __MULTI_SPI_BODY_EX, __MSPI)
 

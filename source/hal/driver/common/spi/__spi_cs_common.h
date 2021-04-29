@@ -44,9 +44,10 @@ typedef struct vsf_spi_cs_request_t {
 typedef struct vsf_spi_cs_one_t {
     int_fast32_t            transfered_count;
     em_spi_irq_mask_t       irq_mask;
-    spi_cfg_t               spi_cfg;
+    i_spi_cfg_t             spi_cfg;
 
     vsf_spi_cs_request_t    request;
+    const i_spi_t          *i_spi;
 } vsf_spi_cs_one_t;
 
 typedef struct vsf_spi_cs_t {
