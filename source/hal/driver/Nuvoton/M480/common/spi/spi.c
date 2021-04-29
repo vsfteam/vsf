@@ -24,6 +24,12 @@
 #include "../dma/dma.h"
 
 /*============================ MACROS ========================================*/
+
+#if    (VSF_HAL_USE_SPI0 == DISABLED) && (VSF_HAL_USE_SPI0 == DISABLED) \
+    && (VSF_HAL_USE_SPI0 == DISABLED) && (VSF_HAL_USE_SPI0 == DISABLED)
+#   error "Please define at least one VSF_HAL_USE_SPIx"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define ____vsf_hw_spi_imp_lv0(__N, __DONT_CARE)                               \
@@ -69,28 +75,38 @@ static void __vsf_spi_enable_clock(vsf_spi_t *spi_ptr)
     bool state = m480_reg_unlock();
 
     // spi clock select
+#if VSF_HAL_USE_SPI0 == ENABLED
     if (spi_ptr->reg == SPI0) {
-        CLK->APBCLK0 &= ~CLK_APBCLK0_SPI0CKEN_Msk;
         CLK->CLKSEL2 = (CLK->CLKSEL2 & (~CLK_CLKSEL2_SPI0SEL_Msk)) | (0x2UL << CLK_CLKSEL2_SPI0SEL_Pos);
         CLK->APBCLK0 |= CLK_APBCLK0_SPI0CKEN_Msk;
         SYS->IPRST1 |= SYS_IPRST1_SPI0RST_Msk;
         SYS->IPRST1 &= ~SYS_IPRST1_SPI0RST_Msk;
-    } else if (spi_ptr->reg == SPI1) {
+    } else
+#endif
+#if VSF_HAL_USE_SPI1 == ENABLED
+    if (spi_ptr->reg == SPI1) {
         CLK->CLKSEL2 = (CLK->CLKSEL2 & (~CLK_CLKSEL2_SPI1SEL_Msk)) | (0x2UL << CLK_CLKSEL2_SPI1SEL_Pos);
         CLK->APBCLK0 |= CLK_APBCLK0_SPI1CKEN_Msk;
         SYS->IPRST1 |= SYS_IPRST1_SPI1RST_Msk;
         SYS->IPRST1 &= ~SYS_IPRST1_SPI1RST_Msk;
+#endif
+#if VSF_HAL_USE_SPI2 == ENABLED
     } else if (spi_ptr->reg == SPI2) {
         CLK->CLKSEL2 = (CLK->CLKSEL2 & (~CLK_CLKSEL2_SPI2SEL_Msk)) | (0x2UL << CLK_CLKSEL2_SPI2SEL_Pos);
         CLK->APBCLK0 |= CLK_APBCLK0_SPI2CKEN_Msk;
         SYS->IPRST1 |= SYS_IPRST1_SPI2RST_Msk;
         SYS->IPRST1 &= ~SYS_IPRST1_SPI2RST_Msk;
-    } else if (spi_ptr->reg == SPI3) {
+    } else
+#endif
+#if VSF_HAL_USE_SPI2 == ENABLED
+    if (spi_ptr->reg == SPI3) {
         CLK->CLKSEL2 = (CLK->CLKSEL2 & (~CLK_CLKSEL2_SPI3SEL_Msk)) | (0x2UL << CLK_CLKSEL2_SPI3SEL_Pos);
         CLK->APBCLK1 |= CLK_APBCLK1_SPI3CKEN_Msk;
         SYS->IPRST2 |= SYS_IPRST2_SPI3RST_Msk;
         SYS->IPRST2 &= ~SYS_IPRST2_SPI3RST_Msk;
-    } else {
+    } else
+#endif
+    {
         VSF_HAL_ASSERT(0);
     }
 
