@@ -46,6 +46,10 @@ extern "C" {
 #   error "need VSF_HAL_USE_SPI"
 #endif
 
+#ifndef VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE
+#   define VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE  ENABLED
+#endif
+
 #ifndef VSF_DISP_MIPI_LCD_CFG_WIDTH
 #   define VSF_DISP_MIPI_LCD_CFG_WIDTH          240
 #endif
@@ -266,7 +270,11 @@ enum {
 vsf_class(vk_disp_mipi_lcd_t) {
     public_member(
         implement(vk_disp_t)
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+        const i_spi_t   *spi;
+#else
         vsf_spi_t       *spi;
+#endif
         const uint8_t   *init_seq;
         const uint16_t  init_seq_len;
     )

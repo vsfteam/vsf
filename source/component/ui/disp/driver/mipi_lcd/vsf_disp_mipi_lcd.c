@@ -122,9 +122,6 @@ static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
 {
     if (irq_mask & SPI_IRQ_MASK_CPL) {
         vk_disp_mipi_lcd_t *disp_mipi_lcd = (vk_disp_mipi_lcd_t *)target_ptr;
-        VSF_UI_ASSERT(disp_mipi_lcd->seq.buf != NULL);
-        VSF_UI_ASSERT(disp_mipi_lcd->seq.max_cnt != 0);
-
         vsf_eda_post_evt(&disp_mipi_lcd->teda.use_as__vsf_eda_t, VSF_EVT_SPI_CPL);
     }
 }
@@ -134,6 +131,8 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_lcd_t * disp_mipi_lcd,
 {
     vsf_err_t init_result;
     fsm_rt_t enable_status;
+
+    VSF_UI_ASSERT(disp_mipi_lcd->spi != NULL);
 
     spi_cfg_t spi_cfg = {
         .mode = { MIPI_LCD_SPI_CFG },
@@ -145,16 +144,31 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_lcd_t * disp_mipi_lcd,
         }
     };
 
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+    VSF_UI_ASSERT(disp_mipi_lcd->spi->Init != NULL);
+    init_result = disp_mipi_lcd->spi->Init(&spi_cfg);
+#else
     init_result = vsf_spi_init(disp_mipi_lcd->spi, &spi_cfg);
+#endif
     if (init_result != VSF_ERR_NONE) {
         return init_result;
     }
 
     do {
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+        VSF_UI_ASSERT(disp_mipi_lcd->spi->Enable != NULL);
+        enable_status = disp_mipi_lcd->spi->Enable();
+#else
         enable_status = vsf_spi_enable(disp_mipi_lcd->spi);
+#endif
     } while (enable_status != fsm_rt_cpl);
 
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+    VSF_UI_ASSERT(disp_mipi_lcd->spi->IRQ.Enable != NULL);
+    disp_mipi_lcd->spi->IRQ.Enable(SPI_IRQ_MASK_CPL);
+#else
     vsf_spi_irq_enable(disp_mipi_lcd->spi, SPI_IRQ_MASK_CPL);
+#endif
 
     return VSF_ERR_NONE;
 }
@@ -198,24 +212,49 @@ static bool __lcd_get_next_command(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 
 static void __lcd_spi_request_cmd(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
+    VSF_UI_ASSERT(disp_mipi_lcd->spi != NULL);
+
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+    VSF_UI_ASSERT(disp_mipi_lcd->spi->CS.Set != NULL);
+    disp_mipi_lcd->spi->CS.Set(0);
+#else
     vsf_spi_cs_active(disp_mipi_lcd->spi, 0);
+#endif
 
     vk_disp_mipi_lcd_dcx_set(disp_mipi_lcd, 0);
+
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+    VSF_UI_ASSERT(disp_mipi_lcd->spi->Block.RequestTransfer != NULL);
+    disp_mipi_lcd->spi->Block.RequestTransfer(&disp_mipi_lcd->cmd.cmd, NULL, 1);
+#else
     vsf_spi_request_transfer(disp_mipi_lcd->spi, &disp_mipi_lcd->cmd.cmd, NULL, 1);
+#endif
 }
 
 static void __lcd_spi_request_data(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
+    VSF_UI_ASSERT(disp_mipi_lcd->spi != NULL);
+
     vk_disp_mipi_lcd_dcx_set(disp_mipi_lcd, 1);
+
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+    VSF_UI_ASSERT(disp_mipi_lcd->spi->Block.RequestTransfer != NULL);
+    disp_mipi_lcd->spi->Block.RequestTransfer(disp_mipi_lcd->cmd.param_buffer,
+                                              NULL,
+                                              disp_mipi_lcd->cmd.param_size);
+#else
     vsf_spi_request_transfer(disp_mipi_lcd->spi,
                              disp_mipi_lcd->cmd.param_buffer,
                              NULL, disp_mipi_lcd->cmd.param_size);
+#endif
+
 }
 
 static void __lcd_write_command_seq(vsf_eda_t *teda, vsf_evt_t evt)
 {
     VSF_UI_ASSERT(teda != NULL);
     vk_disp_mipi_lcd_t *disp_mipi_lcd = container_of(teda, vk_disp_mipi_lcd_t, teda);
+    VSF_UI_ASSERT(disp_mipi_lcd->spi != NULL);
     VSF_UI_ASSERT(disp_mipi_lcd->seq.buf != NULL);
     VSF_UI_ASSERT(disp_mipi_lcd->seq.max_cnt != 0);
 
@@ -237,7 +276,12 @@ static void __lcd_write_command_seq(vsf_eda_t *teda, vsf_evt_t evt)
                 __lcd_spi_request_data(disp_mipi_lcd);
                 disp_mipi_lcd->cmd.param_size = 0;
             } else {
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+                VSF_UI_ASSERT(disp_mipi_lcd->spi->CS.Clear != NULL);
+                disp_mipi_lcd->spi->CS.Clear(0);
+#else
                 vsf_spi_cs_inactive(disp_mipi_lcd->spi, 0);
+#endif
                 vsf_eda_post_evt(&disp_mipi_lcd->teda.use_as__vsf_eda_t, VSF_EVT_CMD_NEXT);
             }
             break;
