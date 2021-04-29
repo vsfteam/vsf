@@ -89,23 +89,48 @@ typedef enum em_spi_irq_mask_t em_spi_irq_mask_t;
 
 typedef struct vsf_spi_t vsf_spi_t;
 
-typedef void vsf_spi_isr_handler_t(void *target_ptr,
-                                   vsf_spi_t *spi_ptr,
-                                   em_spi_irq_mask_t irq_mask);
+typedef void vsf_spi_isrhandler_t(  void *target_ptr,
+                                    vsf_spi_t *spi_ptr,
+                                    em_spi_irq_mask_t irq_mask);
 
+//! \name spi isr for api
+//! @{
 typedef struct vsf_spi_isr_t {
-    vsf_spi_isr_handler_t       *handler_fn;
+    vsf_spi_isrhandler_t        *handler_fn;
     void                        *target_ptr;
     vsf_arch_prio_t             prio;
 } vsf_spi_isr_t;
+#endif
 
-//! \name spi configuration
+//! \name spi configuration for api
 //! @{
 typedef struct spi_cfg_t {
     uint32_t                    mode;               //!< spi working mode
     uint32_t                    clock_hz;
     vsf_spi_isr_t               isr;
 } spi_cfg_t;
+//! @}
+
+typedef void vsf_i_spi_isrhandler_t(void *target_ptr,
+                                    i_spi_t *i_spi_ptr,
+                                    em_spi_irq_mask_t irq_mask);
+
+//! \name spi isr for interface
+//! @{
+typedef struct vsf_i_spi_isr_t {
+    vsf_i_spi_isrhandler_t      *handler_fn;
+    void                        *target_ptr;
+    vsf_arch_prio_t             prio;
+} vsf_i_spi_isr_t;
+#endif
+
+//! \name spi configuration for interface
+//! @{
+typedef struct i_spi_cfg_t {
+    uint32_t                    mode;               //!< spi working mode
+    uint32_t                    clock_hz;
+    vsf_i_spi_isr_t             isr;
+} i_spi_cfg_t;
 //! @}
 
 //! \name class: spi_t
@@ -118,7 +143,7 @@ def_interface(i_spi_t)
             spi_capability_t    (*Capability)(void);
         } SPI;
     };
-    vsf_err_t                   (*Init)(spi_cfg_t *cfg_ptr);
+    vsf_err_t                   (*Init)(i_spi_cfg_t *cfg_ptr);
 
     struct {
         void                    (*Set)(uintalu_t tIndex);
