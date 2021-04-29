@@ -111,7 +111,11 @@ usrapp_ui_common_t usrapp_ui_common = {
             .drv                = &vk_disp_drv_mipi_lcd,
             .color              = APP_DISP_DEMO_COLOR,
         },
+#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
+        .spi                    = &VSF_SPI0_CS0,
+#else
         .spi                    = &vsf_spi0,
+#endif
         .init_seq               = (const uint8_t [])APP_DISP_DEMO_SEQ,
         .init_seq_len           = sizeof((const uint8_t [])APP_DISP_DEMO_SEQ),
 
