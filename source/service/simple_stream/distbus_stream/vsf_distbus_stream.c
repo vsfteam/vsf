@@ -139,9 +139,9 @@ static uint_fast32_t __vsf_distbus_stream_get_rbuf(vsf_stream_t *stream, uint8_t
         vsf_slist_queue_peek(vsf_distbus_msg_t, node, &distbus_stream->msgq, msg);
     vsf_unprotect_int(orig);
     if (ptr != NULL) {
-        *ptr = (uint8_t *)&msg->header + sizeof(msg->header) + msg->pos;
+        *ptr = (uint8_t *)&msg->header + msg->pos;
     }
-    return msg->header.datalen - msg->pos;
+    return msg->header.datalen - (msg->pos - sizeof(msg->header));
 }
 
 static uint_fast32_t __vsf_distbus_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
