@@ -58,10 +58,8 @@ typedef struct vsf_distbus_msgheader_t {
 } vsf_distbus_msgheader_t;
 vsf_class(vsf_distbus_msg_t) {
     protected_member(
-        union {
-            uint32_t                        pos;
-            vsf_slist_node_t                node;
-        };
+        uint32_t                            pos;
+        vsf_slist_node_t                    node;
     )
     public_member(
         vsf_distbus_msgheader_t             header;

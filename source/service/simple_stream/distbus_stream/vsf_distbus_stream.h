@@ -54,32 +54,8 @@ extern "C" {
 #define VSF_DISTBUS_STREAM_INIT(__NAME, __DISTBUS, __MTU, __IS_TX, __HANDLER)\
             __VSF_DISTBUS_STREAM_INIT(__NAME, (__DISTBUS), (__MTU), (__IS_TX), (__HANDLER))
 
-#define __vsf_distbus_stream_type(__name)   __name##_distbus_stream_t
-#define vsf_distbus_stream_type(__name)     __vsf_distbus_stream_type(__name)
-
-#define __declare_distbus_stream(__name)                                        \
-            vsf_dcl_class(vsf_distbus_stream_type(__name))
-
-#define __define_distbus_stream(__name)                                         \
-            vsf_class(vsf_distbus_stream_type(__name)) {                        \
-                public_member(                                                  \
-                    implement(vsf_distbus_stream_t)                             \
-                )                                                               \
-            };
-
-#define declare_distbus_stream(__name)                                          \
-            __declare_distbus_stream(__name)
-#define dcl_distbus_stream(__name)                                              \
-            declare_distbus_stream(__name)
-#define define_distbus_stream(__name)                                           \
-            __define_distbus_stream(__name)
-#define def_distbus_stream(__name)                                              \
-            define_distbus_stream(__name)
-
 #define __describe_distbus_stream(__name, __distbus, __mtu, __is_tx, __handler) \
-            declare_distbus_stream(__name)                                      \
-            define_distbus_stream(__name)                                       \
-            vsf_distbus_stream_type(__name) __name = {                          \
+            vsf_distbus_stream_t __name = {                                     \
                 VSF_DISTBUS_STREAM_INIT(__name, (__distbus), (__mtu), (__is_tx), (__handler))\
             };
 

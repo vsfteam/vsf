@@ -104,14 +104,15 @@ static uint_fast32_t __vsf_distbus_stream_get_buff_length(vsf_stream_t *stream)
 static uint_fast32_t __vsf_distbus_stream_get_data_length(vsf_stream_t *stream)
 {
     vsf_distbus_stream_t *distbus_stream = (vsf_distbus_stream_t *)stream;
-    VSF_SERVICE_ASSERT(distbus_stream->is_tx);
-    return distbus_stream->mtu;
+    if (distbus_stream->is_tx) {
+        return distbus_stream->mtu;
+    }
+    return 0;
 }
 
 static uint_fast32_t __vsf_distbus_stream_get_avail_length(vsf_stream_t *stream)
 {
     vsf_distbus_stream_t *distbus_stream = (vsf_distbus_stream_t *)stream;
-    VSF_SERVICE_ASSERT(!distbus_stream->is_tx);
     return distbus_stream->mtu;
 }
 
@@ -154,6 +155,7 @@ static uint_fast32_t __vsf_distbus_stream_write(vsf_stream_t *stream, uint8_t *b
         memcpy(ptr, buf, size);
     } else {
         msg = distbus_stream->msg;
+        distbus_stream->msg = NULL;
     }
     if (NULL == msg) {
         return 0;
@@ -192,10 +194,10 @@ static uint_fast32_t __vsf_distbus_stream_read(vsf_stream_t *stream, uint8_t *bu
             vsf_slist_queue_peek(vsf_distbus_msg_t, node, &distbus_stream->msgq, msg);
         vsf_unprotect_int(orig);
 
-        VSF_SERVICE_ASSERT(msg->pos + size <= msg->header.datalen);
+        VSF_SERVICE_ASSERT(msg->pos + size <= sizeof(msg->header) + msg->header.datalen);
         msg->pos += size;
         realsize = size;
-        if (msg->pos == msg->header.datalen) {
+        if (msg->pos == sizeof(msg->header) + msg->header.datalen) {
             orig = vsf_protect_int();
                 vsf_slist_queue_dequeue(vsf_distbus_msg_t, node, &distbus_stream->msgq, msg);
             vsf_unprotect_int(orig);
