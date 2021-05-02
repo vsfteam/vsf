@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __SDL_KEYCODE_H__
-#define __SDL_KEYCODE_H__
+#ifndef __VSF_SDL2_KEYCODE_H__
+#define __VSF_SDL2_KEYCODE_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -205,4 +205,4 @@ typedef enum SDL_Keymod {
 }
 #endif
 
-#endif
+#endif      // __VSF_SDL2_KEYCODE_H__

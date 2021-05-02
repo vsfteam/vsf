@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __SDL_H__
-#define __SDL_H__
+#ifndef __VSF_SDL2_H__
+#define __VSF_SDL2_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -31,9 +31,12 @@
 #include "SDL_stdinc.h"
 #include "SDL_version.h"
 
-#include "SDL_keycode.h"
+#include "SDL_rwops.h"
+
+#include "SDL_events.h"
 #include "SDL_keyboard.h"
 #include "SDL_mouse.h"
+
 #include "SDL_surface.h"
 
 #ifdef __cplusplus
@@ -62,14 +65,6 @@ extern "C" {
 #define SDL_SetError                    __vsf_sdl2_set_error
 #define SDL_GetError                    __vsf_sdl2_get_error
 #define SDL_SetHint(...)
-
-#define SDL_RWFromFile                  __vsf_sdl2_rw_from_file
-#define SDL_RWsize                      __vsf_sdl2_rw_size
-#define SDL_RWclose                     __vsf_sdl2_rw_close
-#define SDL_RWseek                      __vsf_sdl2_rw_seek
-#define SDL_RWtell                      __vsf_sdl2_rw_tell
-#define SDL_RWread                      __vsf_sdl2_rw_read
-#define SDL_RWwrite                     __vsf_sdl2_rw_write
 
 #define SDL_CreateWindow                __vsf_sdl2_create_window
 #define SDL_DestroyWindow               __vsf_sdl2_destroy_window
@@ -150,11 +145,6 @@ extern "C" {
 #define SDL_FreeCursor                  __vsf_sdl2_free_curser
 #define SDL_ShowCursor                  __vsf_sdl2_show_curser
 
-#define SDL_PollEvent                   __vsf_sdl2_poll_event
-#define SDL_WaitEventTimeout            __vsf_sdl2_wait_event_timeout
-#define SDL_FlushEvent                  __vsf_sdl2_flush_event
-#define SDL_EventState                  __vsf_sdl2_event_state
-
 #define SDL_GetKeyName                  __vsf_sdl2_get_key_name
 
 #define SDL_NumJoysticks                __vsf_sdl2_num_joysticks
@@ -199,58 +189,12 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 // basic types
-typedef enum SDL_bool {
-    SDL_FALSE = 0,
-    SDL_TRUE = 1
-} SDL_bool;
-
 typedef union SDL_Color {
     struct {
         uint8_t b, g, r, a;
     };
     uint32_t value;
 } SDL_Color;
-
-enum {
-    RW_SEEK_SET                 = SEEK_SET,
-    RW_SEEK_CUR                 = SEEK_CUR,
-    RW_SEEK_END                 = SEEK_END,
-};
-typedef FILE SDL_RWops;
-
-#define SDL_MAX_SINT8           INT8_MAX
-#define SDL_MIN_SINT8           INT8_MIN
-typedef int8_t Sint8;
-
-#define SDL_MAX_UINT8           UINT8_MAX
-#define SDL_MIN_UINT8           0
-typedef uint8_t Uint8;
-
-#define SDL_MAX_SINT16          INT16_MAX
-#define SDL_MIN_SINT16          INT16_MIN
-typedef int16_t Sint16;
-
-#define SDL_MAX_UINT16          UINT16_MAX
-#define SDL_MIN_UINT16          0
-typedef uint16_t Uint16;
-
-#define SDL_MAX_SINT32          INT32_MAX
-#define SDL_MIN_SINT32          INT32_MIN
-typedef int32_t Sint32;
-
-#define SDL_MAX_UINT32          UINT32_MAX
-#define SDL_MIN_UINT32          0
-typedef uint32_t Uint32;
-
-
-#define SDL_MAX_SINT64          INT64_MAX
-#define SDL_MIN_SINT64          INT64_MIN
-typedef int64_t Sint64;
-
-#define SDL_MAX_UINT64          UINT64_MAX
-#define SDL_MIN_UINT64          0
-typedef uint64_t Uint64;
-
 
 typedef struct SDL_Rect {
     int x, y;
@@ -471,252 +415,6 @@ typedef struct SDL_AudioSpec {
     void * userdata;
 } SDL_AudioSpec;
 
-// events
-enum {
-    SDL_QUERY                   = -1,
-    SDL_IGNORE                  = 0,
-    SDL_DISABLE                 = 0,
-    SDL_ENABLE                  = 1,
-    SDL_RELEASED                = 0,
-    SDL_PRESSED                 = 1,
-};
-
-typedef enum {
-    SDL_FIRSTEVENT              = 0,
-    SDL_QUIT                    = 0x100,
-
-    SDL_WINDOWEVENT             = 0x200,
-    SDL_SYSWMEVENT,
-
-    SDL_KEYDOWN                 = 0x300,
-    SDL_KEYUP,
-    SDL_TEXTEDITING,
-    SDL_TEXTINPUT,
-
-    SDL_MOUSEMOTION             = 0x400,
-    SDL_MOUSEBUTTONDOWN,
-    SDL_MOUSEBUTTONUP,
-    SDL_MOUSEWHEEL,
-
-    SDL_JOYAXISMOTION           = 0x600,
-    SDL_JOYBALLMOTION,
-    SDL_JOYHATMOTION,
-    SDL_JOYBUTTONDOWN,
-    SDL_JOYBUTTONUP,
-    SDL_JOYDEVICEADDED,
-    SDL_JOYDEVICEREMOVED,
-
-    SDL_CONTROLLERAXISMOTION    = 0x650,
-    SDL_CONTROLLERBUTTONDOWN,
-    SDL_CONTROLLERBUTTONUP,
-    SDL_CONTROLLERDEVICEADDED,
-    SDL_CONTROLLERDEVICEREMOVED,
-    SDL_CONTROLLERDEVICEREMAPPED,
-
-    SDL_FINGERDOWN              = 0x700,
-    SDL_FINGERUP,
-    SDL_FINGERMOTION,
-
-    SDL_DROPFILE                = 0x1000,
-    SDL_DROPTEXT,
-    SDL_DROPBEGIN,
-    SDL_DROPCOMPLETE,
-
-    SDL_AUDIODEVICEADDED        = 0x1100,
-    SDL_AUDIODEVICEREMOVED,
-
-#if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
-    SDL_ACTIVEEVENT             = 0x2000,
-#endif
-
-    SDL_USEREVENT               = 0x8000,
-    SDL_LASTEVENT               = 0xFFFF
-} SDL_EventType;
-
-enum {
-    SDL_HAT_CENTERED            = 0x00,
-    SDL_HAT_UP                  = 0x01,
-    SDL_HAT_RIGHT               = 0x02,
-    SDL_HAT_DOWN                = 0x04,
-    SDL_HAT_LEFT                = 0x08,
-    SDL_HAT_RIGHTUP             = (SDL_HAT_RIGHT | SDL_HAT_UP),
-    SDL_HAT_RIGHTDOWN           = (SDL_HAT_RIGHT | SDL_HAT_DOWN),
-    SDL_HAT_LEFTUP              = (SDL_HAT_LEFT | SDL_HAT_UP),
-    SDL_HAT_LEFTDOWN            = (SDL_HAT_LEFT | SDL_HAT_DOWN),
-};
-
-typedef struct SDL_Keysym {
-//    SDL_Scancode scancode;
-    SDL_Keycode sym;
-    uint16_t mod;
-    uint32_t unused;
-} SDL_Keysym;
-
-typedef struct SDL_KeyboardEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    uint32_t windowID;
-    SDL_Keysym keysym;
-    uint8_t state;
-    uint8_t repeat;
-} SDL_KeyboardEvent;
-
-typedef int SDL_JoystickID;
-typedef struct SDL_Joystick SDL_Joystick;
-typedef struct SDL_JoyHatEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    SDL_JoystickID which;
-    uint8_t hat;
-    uint8_t value;
-} SDL_JoyHatEvent;
-typedef struct SDL_JoyAxisEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    SDL_JoystickID which;
-    uint8_t axis;
-    int16_t value;
-} SDL_JoyAxisEvent;
-typedef struct SDL_JoyBallEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    SDL_JoystickID which;
-    uint8_t ball;
-    int16_t xrel;
-    int16_t yrel;
-} SDL_JoyBallEvent;
-typedef struct SDL_JoyButtonEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    SDL_JoystickID which;
-    uint8_t button;
-    uint8_t state;
-} SDL_JoyButtonEvent;
-typedef struct SDL_JoyDeviceEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    int32_t which;
-} SDL_JoyDeviceEvent;
-typedef struct SDL_MouseMotionEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    uint32_t windowID;
-    uint32_t which;
-    uint32_t state;
-    int32_t x;
-    int32_t y;
-    int32_t xrel;
-    int32_t yrel;
-} SDL_MouseMotionEvent;
-enum {
-    SDL_BUTTON_LEFT,
-    SDL_BUTTON_MIDDLE,
-    SDL_BUTTON_RIGHT,
-    SDL_BUTTON_X1,
-    SDL_BUTTON_X2,
-};
-typedef struct SDL_MouseButtonEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    uint32_t windowID;
-    uint32_t which;
-    uint8_t button;
-    uint8_t state;
-    uint8_t clicks;
-    int32_t x;
-    int32_t y;
-} SDL_MouseButtonEvent;
-typedef struct SDL_MouseWheelEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    uint32_t windowID;
-    uint32_t which;
-    int32_t x;
-    int32_t y;
-    uint32_t direction;
-} SDL_MouseWheelEvent;
-typedef enum {
-    SDL_WINDOWEVENT_NONE,
-    SDL_WINDOWEVENT_SHOWN,
-    SDL_WINDOWEVENT_HIDDEN,
-    SDL_WINDOWEVENT_EXPOSED,
-    SDL_WINDOWEVENT_MOVED,
-    SDL_WINDOWEVENT_RESIZED,
-    SDL_WINDOWEVENT_SIZE_CHANGED,
-    SDL_WINDOWEVENT_MINIMIZED,
-    SDL_WINDOWEVENT_MAXIMIZED,
-    SDL_WINDOWEVENT_RESTORED,
-    SDL_WINDOWEVENT_ENTER,
-    SDL_WINDOWEVENT_LEAVE,
-    SDL_WINDOWEVENT_FOCUS_GAINED,
-    SDL_WINDOWEVENT_FOCUS_LOST,
-    SDL_WINDOWEVENT_CLOSE,
-} SDL_WindowEventID;
-typedef struct SDL_WindowEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    uint32_t windowID;
-    uint8_t event;
-    int32_t data1;
-    int32_t data2;
-} SDL_WindowEvent;
-#define SDL_TEXTINPUTEVENT_TEXT_SIZE        32
-typedef struct SDL_TextInputEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    uint32_t windowID;
-    char text[SDL_TEXTINPUTEVENT_TEXT_SIZE];
-} SDL_TextInputEvent;
-typedef struct SDL_DropEvent {
-    uint32_t type;
-    uint32_t timestamp;
-    // file should be allocated by SDL_malloc
-    //  user should call SDL_free to free file
-    char *file;
-    uint32_t windowID;
-} SDL_DropEvent;
-
-typedef struct SDL_Cursor SDL_Cursor;
-typedef enum SDL_SystemCursor {
-    SDL_SYSTEM_CURSOR_ARROW,
-    SDL_NUM_SYSTEM_CURSORS,
-} SDL_SystemCursor;
-
-#if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
-enum {
-    SDL_APPMOUSEFOCUS           = 1 << 0,
-    SDL_APPINPUTFOCUS           = 1 << 1,
-    SDL_APPACTIVE               = 1 << 2,
-};
-typedef struct SDL_ActiveEvent {
-    uint8_t type;
-    uint8_t gain;
-    uint8_t state;
-} SDL_ActiveEvent;
-#endif
-
-typedef union SDL_Event {
-    uint32_t type;
-    SDL_KeyboardEvent key;
-
-    SDL_JoyAxisEvent jaxis;
-    SDL_JoyBallEvent jball;
-    SDL_JoyHatEvent jhat;
-    SDL_JoyButtonEvent jbutton;
-    SDL_JoyDeviceEvent jdevice;
-    SDL_MouseMotionEvent motion;
-    SDL_MouseButtonEvent button;
-    SDL_MouseWheelEvent wheel;
-
-    SDL_WindowEvent window;
-    SDL_TextInputEvent text;
-    SDL_DropEvent drop;
-
-#if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
-    SDL_ActiveEvent active;
-#endif
-} SDL_Event;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -731,14 +429,6 @@ extern const char * SDL_GetPlatform(void);
 extern void SDL_memset4(void *dst, int val, size_t dwords);
 extern const char * SDL_GetError(void);
 extern int SDL_SetError(const char* fmt, ...);
-
-extern SDL_RWops * SDL_RWFromFile(const char * file, const char * mode);
-extern int64_t SDL_RWsize(SDL_RWops * context);
-extern int SDL_RWclose(SDL_RWops * context);
-extern int64_t SDL_RWseek(SDL_RWops * context, int64_t offset, int whence);
-extern int64_t SDL_RWtell(SDL_RWops * context);
-extern size_t SDL_RWread(SDL_RWops * context, void * ptr, size_t size, size_t maxnum);
-extern size_t SDL_RWwrite(SDL_RWops * context, const void * ptr, size_t size, size_t num);
 
 extern SDL_Window * SDL_CreateWindow(const char * title, int x, int y, int w, int h, uint32_t flags);
 extern void SDL_DestroyWindow(SDL_Window * window);
@@ -808,11 +498,6 @@ extern void SDL_PauseAudio(int pause_on);
 extern SDL_AudioStatus SDL_GetAudioStatus(void);
 extern void SDL_CloseAudio(void);
 
-extern int SDL_PollEvent(SDL_Event * event);
-extern int SDL_WaitEventTimeout(SDL_Event * event, int timeout);
-extern void SDL_FlushEvent(uint32_t type);
-extern uint8_t SDL_EventState(uint32_t type, int state);
-
 extern const char * SDL_GetKeyName(SDL_Keycode key);
 
 extern SDL_Cursor * SDL_CreateCursor(const uint8_t * data, const uint8_t * mask,
@@ -854,4 +539,4 @@ extern void SDL_WM_SetCaption(const char * title, const char * icon);
 #endif
 
 #endif      // VSF_USE_SDL
-#endif      // __SDL_H__
+#endif      // __VSF_SDL2_H__

@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_SDL2_KEYBOARD_H__
-#define __VSF_SDL2_KEYBOARD_H__
+#ifndef __VSF_SDL2_RWOPS_H__
+#define __VSF_SDL2_RWOPS_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -25,7 +25,6 @@
 #if VSF_USE_SDL2 == ENABLED
 
 #include "SDL_stdinc.h"
-#include "SDL_keycode.h"
 
 #include "begin_code.h"
 
@@ -35,19 +34,35 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define SDL_RWFromFile                  __vsf_sdl2_rw_from_file
+#define SDL_RWsize                      __vsf_sdl2_rw_size
+#define SDL_RWclose                     __vsf_sdl2_rw_close
+#define SDL_RWseek                      __vsf_sdl2_rw_seek
+#define SDL_RWtell                      __vsf_sdl2_rw_tell
+#define SDL_RWread                      __vsf_sdl2_rw_read
+#define SDL_RWwrite                     __vsf_sdl2_rw_write
+
 /*============================ TYPES =========================================*/
 
-typedef struct SDL_Keysym {
-//    SDL_Scancode scancode;
-    SDL_Keycode sym;
-    uint16_t mod;
-    uint32_t unused;
-} SDL_Keysym;
+enum {
+    RW_SEEK_SET                         = SEEK_SET,
+    RW_SEEK_CUR                         = SEEK_CUR,
+    RW_SEEK_END                         = SEEK_END,
+};
+typedef FILE SDL_RWops;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern SDL_RWops * SDL_RWFromFile(const char * file, const char * mode);
+extern int64_t SDL_RWsize(SDL_RWops * context);
+extern int SDL_RWclose(SDL_RWops * context);
+extern int64_t SDL_RWseek(SDL_RWops * context, int64_t offset, int whence);
+extern int64_t SDL_RWtell(SDL_RWops * context);
+extern size_t SDL_RWread(SDL_RWops * context, void * ptr, size_t size, size_t maxnum);
+extern size_t SDL_RWwrite(SDL_RWops * context, const void * ptr, size_t size, size_t num);
 
 #ifdef __cplusplus
 }
@@ -55,5 +70,5 @@ typedef struct SDL_Keysym {
 #include "close_code.h"
 
 #endif      // VSF_USE_SDL2
-#endif      // __VSF_SDL2_KEYBOARD_H__
+#endif      // __VSF_SDL2_RWOPS_H__
 /* EOF */

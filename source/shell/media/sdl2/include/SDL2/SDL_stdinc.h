@@ -75,6 +75,45 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef enum SDL_bool {
+    SDL_FALSE = 0,
+    SDL_TRUE = 1
+} SDL_bool;
+
+#define SDL_MAX_SINT8                       INT8_MAX
+#define SDL_MIN_SINT8                       INT8_MIN
+typedef int8_t Sint8;
+
+#define SDL_MAX_UINT8                       UINT8_MAX
+#define SDL_MIN_UINT8                       0
+typedef uint8_t Uint8;
+
+#define SDL_MAX_SINT16                      INT16_MAX
+#define SDL_MIN_SINT16                      INT16_MIN
+typedef int16_t Sint16;
+
+#define SDL_MAX_UINT16                      UINT16_MAX
+#define SDL_MIN_UINT16                      0
+typedef uint16_t Uint16;
+
+#define SDL_MAX_SINT32                      INT32_MAX
+#define SDL_MIN_SINT32                      INT32_MIN
+typedef int32_t Sint32;
+
+#define SDL_MAX_UINT32                      UINT32_MAX
+#define SDL_MIN_UINT32                      0
+typedef uint32_t Uint32;
+
+
+#define SDL_MAX_SINT64                      INT64_MAX
+#define SDL_MIN_SINT64                      INT64_MIN
+typedef int64_t Sint64;
+
+#define SDL_MAX_UINT64                      UINT64_MAX
+#define SDL_MIN_UINT64                      0
+typedef uint64_t Uint64;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
