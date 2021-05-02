@@ -142,6 +142,26 @@ struct {
         },
     },
     {
+        .color              = SDL_PIXELFORMAT_RGBA8888,
+        .format             = {
+            .format         = SDL_PIXELFORMAT_RGBA8888,
+            .BitsPerPixel   = 32,
+            .BytesPerPixel  = 4,
+            .Rmask          = 0xFF000000,
+            .Gmask          = 0x00FF0000,
+            .Bmask          = 0x0000FF00,
+            .Amask          = 0x000000FF,
+            .Rshift         = 24,
+            .Gshift         = 16,
+            .Bshift         = 8,
+            .Ashift         = 0,
+            .Rloss          = 0,
+            .Gloss          = 0,
+            .Bloss          = 0,
+            .Aloss          = 0,
+        },
+    },
+    {
         .color              = SDL_PIXELFORMAT_RGB565,
         .format             = {
             .format         = SDL_PIXELFORMAT_RGB565,
@@ -179,6 +199,19 @@ struct {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
+
+void __SDL_LogMessage(SDL_LogPriority priority, int category, const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+        vsf_trace_arg((vsf_trace_level_t)priority, fmt, ap);
+    va_end(ap);
+
+    size_t len = SDL_strlen(fmt);
+    if ((fmt[len - 1] != '\r') && (fmt[len - 1] != '\n')) {
+        vsf_trace((vsf_trace_level_t)priority, VSF_TRACE_CFG_LINEEND);
+    }
+}
 
 static void __vsf_sdl2_fast_memcpy8(uint8_t *pdst, uint8_t *psrc, uint_fast32_t num)
 {

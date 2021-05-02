@@ -66,6 +66,7 @@ extern "C" {
 #define SDL_SetError                    __vsf_sdl2_set_error
 #define SDL_GetError                    __vsf_sdl2_get_error
 #define SDL_SetHint(...)
+#define SDL_ShowSimpleMessageBox(...)
 
 #define SDL_CreateWindow                __vsf_sdl2_create_window
 #define SDL_DestroyWindow               __vsf_sdl2_destroy_window
@@ -78,6 +79,9 @@ extern "C" {
 #define SDL_SetWindowIcon               __vsf_sdl2_set_window_icon
 #define SDL_SetWindowTitle              __vsf_sdl2_set_window_title
 #define SDL_SetWindowFullscreen         __vsf_sdl2_set_window_full_screen
+#define SDL_SetWindowSize(...)
+#define SDL_SetWindowMinimumSize(...)
+#define SDL_SetWindowMaximumSize(...)
 #define SDL_RestoreWindow               __vsf_sdl2_restore_window
 #define SDL_MaximizeWindow              __vsf_sdl2_maximize_window
 #define SDL_GetWindowFlags              __vsf_sdl2_get_window_flags
@@ -108,6 +112,7 @@ extern "C" {
 #define SDL_RenderClear                 __vsf_sdl2_render_clear
 #define SDL_RenderCopy                  __vsf_sdl2_render_copy
 #define SDL_RenderPresent               __vsf_sdl2_render_present
+#define SDL_RenderSetLogicalSize(...)
 
 #define SDL_CreateTexture               __vsf_sdl2_create_texture
 #define SDL_CreateTextureFromSurface    __vsf_sdl2_create_texture_from_surface
@@ -155,6 +160,7 @@ extern "C" {
 
 #define SDL_NumJoysticks                __vsf_sdl2_num_joysticks
 #define SDL_JoystickOpen                __vsf_sdl2_joystick_open
+#define SDL_JoystickClose               __vsf_sdl2_joystick_close
 #define SDL_JoystickNumButtons          __vsf_sdl2_joystick_num_buttons
 #define SDL_JoystickNumAxes             __vsf_sdl2_joystick_num_axes
 #define SDL_JoystickNumBalls            __vsf_sdl2_joystick_num_balls
@@ -523,6 +529,7 @@ extern int SDL_ShowCursor(int toggle);
 
 extern int SDL_NumJoysticks(void);
 extern SDL_Joystick * SDL_JoystickOpen(int device_index);
+extern void SDL_JoystickClose(SDL_Joystick *joystick);
 extern int SDL_JoystickEventState(int state);
 extern int SDL_JoystickNumButtons(SDL_Joystick * joystick);
 extern int SDL_JoystickNumAxes(SDL_Joystick * joystick);

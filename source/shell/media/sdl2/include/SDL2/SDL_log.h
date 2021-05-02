@@ -37,14 +37,8 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#if VSF_USE_TRACE == ENABLED
-#define __SDL_LogMessage(__prio, __category, __fmt, ...)                        \
-            vsf_trace((vsf_trace_level_t)(__prio), (__fmt), ##__VA_ARGS__)
-#else
-#define __SDL_LogMessage(__prio, __category, __fmt, ...)
-#endif
 #define SDL_LogMessage(__category, __prio, __fmt, ...)                          \
-            __SDL_LogMessage(__prio, (__category), (__fmt), ##__VA_ARGS__)
+                                        __SDL_LogMessage(__prio, (__category), (__fmt), ##__VA_ARGS__)
 #define SDL_Log(...)                    __SDL_LogMessage(SDL_LOG_PRIORITY_INFO, 0, __VA_ARGS__)
 #define SDL_LogInfo(...)                __SDL_LogMessage(SDL_LOG_PRIORITY_INFO, __VA_ARGS__)
 #define SDL_LogError(...)               __SDL_LogMessage(SDL_LOG_PRIORITY_ERROR, __VA_ARGS__)
@@ -80,6 +74,7 @@ typedef enum SDL_LogPriority {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern void __SDL_LogMessage(SDL_LogPriority priority, int category, const char *fmt, ...);
 
 #ifdef __cplusplus
 }

@@ -46,11 +46,11 @@
  *!         in the case when you want to disable it,
  *!         please use following macro:
  *!         #define VSF_TRACE_CFG_PROTECT_LEVEL none
- *!         
+ *!
  *!         in the case when you want to use interrupt-safe,
  *!         please use following macro:
  *!         #define VSF_TRACE_CFG_PROTECT_LEVEL interrupt
- *!         
+ *!
  *!         NOTE: This macro should be defined in vsf_usr_CFG.h
  */
 #   define VSF_TRACE_CFG_PROTECT_LEVEL      interrupt
@@ -127,14 +127,14 @@ void vsf_trace_fini(void)
     __vsf_trace.stream = NULL;
 }
 
-static void __vsf_trace_arg(const char *format, va_list *arg)
+static void __vsf_trace_arg(const char *format, va_list arg)
 {
     vsf_protect_t origlevel = vsf_trace_protect();
     //__vsf_sched_safe(
         uint_fast32_t size = vsnprintf( (char *)__vsf_trace.print_buffer,
                                         sizeof(__vsf_trace.print_buffer),
-                                        format, 
-                                        *arg);
+                                        format,
+                                        arg);
         __vsf_trace_output((const char *)__vsf_trace.print_buffer, size);
     //)
     vsf_trace_unprotect(origlevel);
@@ -144,11 +144,11 @@ static void __vsf_trace_arg(const char *format, va_list *arg)
 void __vsf_trace_init(vsf_stream_tx_t *ptTX)
 {
     //VSF_SERVICE_ASSERT(NULL != ptTX);
-    
+
     //! initialise stream source
     do {
         vsf_stream_src_cfg_t cfg = {
-            .ptTX = ptTX,                                       //!< connect stream TX 
+            .ptTX = ptTX,                                       //!< connect stream TX
         };
 
         vsf_stream_writer_init(&__vsf_trace, &cfg);
@@ -160,13 +160,13 @@ static uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
 {
     uint_fast16_t length = size;
     uint8_t *src = (uint8_t *)buff;
-    
+
     while(length) {
         uint_fast16_t written_size = vsf_stream_writer_write(
                                         &__vsf_trace,
                                         src,
                                         length);
-        
+
         length -= written_size;
         src += written_size;
 
@@ -178,9 +178,9 @@ static uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
     return size;
 }
 
-static void __vsf_trace_arg(const char *format, va_list *arg)
+static void __vsf_trace_arg(const char *format, va_list arg)
 {
-    vsf_pbuf_t *block = NULL; 
+    vsf_pbuf_t *block = NULL;
     __vsf_sched_safe(
     #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
         vsf_stream_tx_t *tx = vsf_stream_src_get_tx(&__vsf_trace.use_as__vsf_stream_src_t);
@@ -189,8 +189,8 @@ static void __vsf_trace_arg(const char *format, va_list *arg)
             return;
         }
     #endif
-        block = vsf_stream_src_new_pbuf(&__vsf_trace.use_as__vsf_stream_src_t, 
-                                        -1, 
+        block = vsf_stream_src_new_pbuf(&__vsf_trace.use_as__vsf_stream_src_t,
+                                        -1,
                                         -1);
         if (NULL == block) {
             //! no enough buffer
@@ -199,12 +199,12 @@ static void __vsf_trace_arg(const char *format, va_list *arg)
         }
         //vsf_pbuf_size_reset(block);
     )
-    
+
 
     uint_fast32_t size = vsnprintf( (char *)vsf_pbuf_buffer_get(block),
                                         vsf_pbuf_size_get(block),
-                                        format, 
-                                        *arg);
+                                        format,
+                                        arg);
     vsf_pbuf_size_set(block, size);
     vsf_stream_writer_send_pbuf(&__vsf_trace, block);
 }
@@ -230,9 +230,9 @@ void vsf_trace_string(vsf_trace_level_t level, const char *str)
 }
 
 SECTION(".text.vsf.trace.__vsf_trace_buffer")
-void __vsf_trace_buffer(  vsf_trace_level_t level, 
-                        void *buffer, 
-                        uint_fast16_t len, 
+void __vsf_trace_buffer(  vsf_trace_level_t level,
+                        void *buffer,
+                        uint_fast16_t len,
                         uint_fast32_t flag)
 {
     uint_fast8_t data_size = (flag >> 0) & 0xFF;
@@ -303,7 +303,7 @@ void __vsf_trace_buffer(  vsf_trace_level_t level,
 
 
 
-void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list *arg)
+void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list arg)
 {
     __vsf_trace_set_level(level);
     __vsf_trace_arg(format, arg);
@@ -315,7 +315,7 @@ void vsf_trace(vsf_trace_level_t level, const char *format, ...)
 
     __vsf_trace_set_level(level);
     va_start(ap, format);
-    __vsf_trace_arg(format, &ap);
+    __vsf_trace_arg(format, ap);
     va_end(ap);
 }
 
