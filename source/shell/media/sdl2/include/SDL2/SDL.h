@@ -31,6 +31,7 @@
 #include "SDL_stdinc.h"
 #include "SDL_version.h"
 
+#include "SDL_log.h"
 #include "SDL_rwops.h"
 
 #include "SDL_events.h"
@@ -97,6 +98,11 @@ extern "C" {
 #define SDL_BlitSurface                 __vsf_sdl2_blit_surface
 #define SDL_ConvertSurfaceFormat        __vsf_sdl2_convert_surface_format
 
+#define SDL_GetRendererInfo(__renderer, __info)                                 \
+            do {                                                                \
+                SDL_memset((__info), 0, sizeof(*(__info)));                     \
+                (__info)->name          = "vsf";                                \
+            } while (0)
 #define SDL_CreateRenderer              __vsf_sdl2_create_renderer
 #define SDL_DestroyRenderer             __vsf_sdl2_destroy_renderer
 #define SDL_RenderClear                 __vsf_sdl2_render_clear
@@ -244,6 +250,7 @@ typedef enum {
     SDL_PIXELFORMAT_BYMASK_IDX  = 0xFF,
 
     SDL_PIXELFORMAT_RGBA8888    = VSF_DISP_COLOR_RGBA8888,
+    SDL_PIXELFORMAT_RGBA32      = SDL_PIXELFORMAT_RGBA8888,
     SDL_PIXELFORMAT_ABGR8888    = VSF_DISP_COLOR_ABGR8888,
 
     SDL_PIXELFORMAT_ARGB8888    = VSF_DISP_COLOR_ARGB8888,
@@ -346,6 +353,10 @@ typedef enum {
     SDL_RENDERER_PRESENTVSYNC   = (1 << 2),
     SDL_RENDERER_TARGETTEXTURE  = (1 << 3),
 } SDL_RendererFlags;
+
+typedef struct SDL_RendererInfo {
+    const char                  *name;
+} SDL_RendererInfo;
 
 typedef struct SDL_Renderer SDL_Renderer;
 

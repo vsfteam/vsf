@@ -324,11 +324,11 @@ static void __SDL_BlendWithFormat(
     uint8_t dst_rshift  = dst_fmt->Rshift;
     uint8_t dst_gshift  = dst_fmt->Gshift;
     uint8_t dst_bshift  = dst_fmt->Bshift;
-    uint8_t dst_ashift  = dst_fmt->Ashift;
+//    uint8_t dst_ashift  = dst_fmt->Ashift;
     uint8_t dst_rloss  = dst_fmt->Rloss;
     uint8_t dst_gloss  = dst_fmt->Gloss;
     uint8_t dst_bloss  = dst_fmt->Bloss;
-    uint8_t dst_aloss  = dst_fmt->Aloss;
+//    uint8_t dst_aloss  = dst_fmt->Aloss;
     uint32_t dst_rmask  = dst_fmt->Rmask;
     uint32_t dst_gmask  = dst_fmt->Gmask;
     uint32_t dst_bmask  = dst_fmt->Bmask;
@@ -580,7 +580,6 @@ size_t SDL_RWwrite(SDL_RWops * context, const void * ptr, size_t size, size_t nu
 
 SDL_Window * SDL_CreateWindow(const char *title, int x, int y, int w, int h, uint32_t flags)
 {
-    uint_fast8_t pixel_bit_size = vsf_disp_get_pixel_bitsize(__vsf_sdl2.disp);
     uint_fast8_t pixel_byte_size = vsf_disp_get_pixel_bytesize(__vsf_sdl2.disp);
 
 #ifdef VSF_SDL_CFG_WINDOW_PTR
@@ -864,7 +863,6 @@ int SDL_RenderClear(SDL_Renderer *renderer)
 {
     VSF_SDL2_ASSERT(renderer != NULL);
     SDL_Window *window = renderer->window;
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(window->format);
 
     SDL_PixelFormat *format = (SDL_PixelFormat *)__SDL_GetFormatFromColor(window->format);
     VSF_SDL2_ASSERT(format != NULL);
