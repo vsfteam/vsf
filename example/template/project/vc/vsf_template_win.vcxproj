@@ -555,8 +555,12 @@
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_cpuinfo.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_endian.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_events.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_keyboard.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_keycode.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_log.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_mouse.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_rwops.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_stdinc.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_surface.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_timer.h" />
@@ -1255,6 +1259,8 @@
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_xxx.c" />
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf\SDL_ttf.c" />
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2.c" />
+    <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_event.c" />
+    <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_pixelformat.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c" />

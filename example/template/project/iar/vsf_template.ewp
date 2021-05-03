@@ -12267,6 +12267,12 @@
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\vsf_sdl2_cfg.h</name>
                     </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\vsf_sdl2_event.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\vsf_sdl2_pixelformat.c</name>
+                    </file>
                 </group>
             </group>
             <group>

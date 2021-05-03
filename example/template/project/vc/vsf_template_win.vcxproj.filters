@@ -2937,6 +2937,18 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.h">
       <Filter>vsf\hal\driver\vsf\distbus\usbd</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_events.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_rwops.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_keycode.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_log.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -4969,6 +4981,12 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\distbus_demo\app\distbus_hal.c">
       <Filter>usrapp\demo\distbus_demo\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_pixelformat.c">
+      <Filter>vsf\shell\media\sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_event.c">
+      <Filter>vsf\shell\media\sdl2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

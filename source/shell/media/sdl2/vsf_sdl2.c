@@ -98,7 +98,6 @@ typedef struct vsf_sdl2_t {
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
     SDL_Surface *sdl1_screen;
 #endif
-    vk_input_notifier_t notifier;
     struct {
         char *text;
     } clipboard;
@@ -113,89 +112,16 @@ extern void vsf_sdl2_pixel_fill(uint_fast16_t data_line_num, uint_fast32_t pixel
                                 uint8_t *pbuf, uint_fast32_t dst_pitch,
                                 uint32_t color, uint_fast8_t color_byte_size);
 
+extern uint32_t __SDL_GetColorFromMask(uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask);
+extern const SDL_PixelFormat * __SDL_GetFormatFromColor(uint32_t color);
+extern void __SDL_InitFormatMask(SDL_PixelFormat *format, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask);
+
+extern void __SDL_InitEvent(uint32_t flags);
+extern void __SDL_FiniEvent(void);
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 NO_INIT vsf_sdl2_t __vsf_sdl2;
-
-struct {
-    uint32_t color;
-    SDL_PixelFormat format;
-} static const __vsf_sdl2_color[] = {
-    {
-        .color              = SDL_PIXELFORMAT_ARGB8888,
-        .format             = {
-            .format         = SDL_PIXELFORMAT_ARGB8888,
-            .BitsPerPixel   = 32,
-            .BytesPerPixel  = 4,
-            .Rmask          = 0x00FF0000,
-            .Gmask          = 0x0000FF00,
-            .Bmask          = 0x000000FF,
-            .Amask          = 0xFF000000,
-            .Rshift         = 16,
-            .Gshift         = 8,
-            .Bshift         = 0,
-            .Ashift         = 24,
-            .Rloss          = 0,
-            .Gloss          = 0,
-            .Bloss          = 0,
-            .Aloss          = 0,
-        },
-    },
-    {
-        .color              = SDL_PIXELFORMAT_RGBA8888,
-        .format             = {
-            .format         = SDL_PIXELFORMAT_RGBA8888,
-            .BitsPerPixel   = 32,
-            .BytesPerPixel  = 4,
-            .Rmask          = 0xFF000000,
-            .Gmask          = 0x00FF0000,
-            .Bmask          = 0x0000FF00,
-            .Amask          = 0x000000FF,
-            .Rshift         = 24,
-            .Gshift         = 16,
-            .Bshift         = 8,
-            .Ashift         = 0,
-            .Rloss          = 0,
-            .Gloss          = 0,
-            .Bloss          = 0,
-            .Aloss          = 0,
-        },
-    },
-    {
-        .color              = SDL_PIXELFORMAT_RGB565,
-        .format             = {
-            .format         = SDL_PIXELFORMAT_RGB565,
-            .BitsPerPixel   = 16,
-            .BytesPerPixel  = 2,
-            .Rmask          = 0xF800,
-            .Gmask          = 0x07E0,
-            .Bmask          = 0x001F,
-            .Rshift         = 11,
-            .Gshift         = 5,
-            .Bshift         = 0,
-            .Rloss          = 3,
-            .Gloss          = 2,
-            .Bloss          = 3,
-        },
-    },
-    {
-        .color              = SDL_PIXELFORMAT_RGB24,
-        .format             = {
-            .format         = SDL_PIXELFORMAT_RGB24,
-            .BitsPerPixel   = 24,
-            .BytesPerPixel  = 3,
-            .Rmask          = 0x00FF0000,
-            .Gmask          = 0x0000FF00,
-            .Bmask          = 0x000000FF,
-            .Rshift         = 16,
-            .Gshift         = 8,
-            .Bshift         = 0,
-            .Rloss          = 0,
-            .Gloss          = 0,
-            .Bloss          = 0,
-        },
-    },
-};
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -280,69 +206,6 @@ void vsf_sdl2_pixel_fill(   uint_fast16_t data_line_num, uint_fast32_t pixel_lin
     }
 }
 #endif
-
-static uint32_t __SDL_GetColorFromMask(uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
-{
-    for (uint_fast16_t i = 0; i < dimof(__vsf_sdl2_color); i++) {
-        if (    __vsf_sdl2_color[i].format.Rmask == Rmask
-            &&  __vsf_sdl2_color[i].format.Gmask == Gmask
-            &&  __vsf_sdl2_color[i].format.Bmask == Bmask
-            &&  __vsf_sdl2_color[i].format.Amask == Amask) {
-            return __vsf_sdl2_color[i].color;
-        }
-    }
-
-    int_fast8_t pixel_bitlen = vsf_msb(Rmask | Gmask | Bmask | Amask);
-    if (pixel_bitlen < 0) {
-        return SDL_PIXELFORMAT_UNKNOWN;
-    }
-
-    uint_fast8_t pixel_bytelen = (++pixel_bitlen + 7) >> 3;
-    return VSF_DISP_COLOR_VALUE(SDL_PIXELFORMAT_BYMASK_IDX, pixel_bitlen, pixel_bytelen, Amask != 0);
-}
-
-static const SDL_PixelFormat * __SDL_GetFormatFromColor(uint32_t color)
-{
-    for (uint_fast16_t i = 0; i < dimof(__vsf_sdl2_color); i++) {
-        if (__vsf_sdl2_color[i].color == color) {
-            return &__vsf_sdl2_color[i].format;
-        }
-    }
-    return NULL;
-}
-
-static void __SDL_InitFormatMask(SDL_PixelFormat *format, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
-{
-    uint_fast8_t tmp8;
-    format->Rmask = Rmask;
-    format->Gmask = Gmask;
-    format->Bmask = Bmask;
-    format->Amask = Amask;
-
-    tmp8 = vsf_clz(Rmask);
-    Rmask <<= tmp8;
-    format->Rloss = vsf_clz(~Rmask);
-    format->Rshift = 32 - (tmp8 + format->Rloss);
-    format->Rloss = 8 - format->Rloss;
-
-    tmp8 = vsf_clz(Gmask);
-    Gmask <<= tmp8;
-    format->Gloss = vsf_clz(~Gmask);
-    format->Gshift = 32 - (tmp8 + format->Gloss);
-    format->Gloss = 8 - format->Gloss;
-
-    tmp8 = vsf_clz(Bmask);
-    Bmask <<= tmp8;
-    format->Bloss = vsf_clz(~Bmask);
-    format->Bshift = 32 - (tmp8 + format->Bloss);
-    format->Bloss = 8 - format->Bloss;
-
-    tmp8 = vsf_clz(Amask);
-    Amask <<= tmp8;
-    format->Aloss = vsf_clz(~Amask);
-    format->Ashift = 32 - (tmp8 + format->Aloss);
-    format->Aloss = 8 - format->Aloss;
-}
 
 static void __SDL_BlendWithFormat(
                             uint_fast16_t h, uint_fast32_t w,
@@ -444,10 +307,6 @@ const SDL_version * SDL_Linked_Version(void)
     return &__sdl2_version;
 }
 
-static void __vsf_sdl2_on_input(vk_input_type_t type, vk_input_evt_t *evt)
-{
-}
-
 static void __vsf_sdl2_disp_on_ready(vk_disp_t *disp)
 {
     vsf_eda_t *eda = __vsf_sdl2.disp->ui_data;
@@ -501,9 +360,7 @@ int SDL_InitSubSystem(uint32_t flags)
     flags &= ~__vsf_sdl2.init_flags;
     __vsf_sdl2.init_flags = flags;
     if (flags & SDL_INIT_EVENTS) {
-        __vsf_sdl2.notifier.mask = 1 << VSF_INPUT_TYPE_TOUCHSCREEN;
-        __vsf_sdl2.notifier.on_evt = (vk_input_on_evt_t)__vsf_sdl2_on_input;
-        vk_input_notifier_register(&__vsf_sdl2.notifier);
+        __SDL_InitEvent(flags);
     }
 
     if (flags & SDL_INIT_VIDEO) {
@@ -527,7 +384,7 @@ void SDL_Quit(void)
 {
     uint32_t flags = __vsf_sdl2.init_flags;
     if (flags & SDL_INIT_EVENTS) {
-        vk_input_notifier_unregister(&__vsf_sdl2.notifier);
+        __SDL_FiniEvent();
     }
 
     if (flags & SDL_INIT_VIDEO) {
@@ -1247,85 +1104,5 @@ void SDL_WM_SetCaption(const char *title, const char *icon)
 {
 }
 #endif
-
-
-// event
-// joysticks
-int SDL_NumJoysticks(void)
-{
-    return 0;
-}
-SDL_Joystick * SDL_JoystickOpen(int device_index)
-{
-    return NULL;
-}
-int SDL_JoystickEventState(int state)
-{
-    return -1;
-}
-int SDL_JoystickNumButtons(SDL_Joystick *joystick)
-{
-    return 0;
-}
-int SDL_JoystickNumAxes(SDL_Joystick *joystick)
-{
-    return 0;
-}
-int SDL_JoystickNumBalls(SDL_Joystick *joystick)
-{
-    return 0;
-}
-int SDL_JoystickNumHats(SDL_Joystick *joystick)
-{
-    return 0;
-}
-
-int SDL_CaptureMouse(SDL_bool enabled)
-{
-    return 0;
-}
-
-uint32_t SDL_GetGlobalMouseState(int * x, int * y)
-{
-    // TODO: get mouse position and button state
-    if (x != NULL) {
-        *x = 0;
-    }
-    if (y != NULL) {
-        *y = 0;
-    }
-    return 0;
-}
-
-int SDL_PollEvent(SDL_Event *event)
-{
-    VSF_SDL2_ASSERT(event != NULL);
-
-
-    return 0;
-}
-
-int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
-{
-    // todo:
-    vsf_thread_wfe(VSF_EVT_RETURN);
-    return 0;
-}
-
-void SDL_FlushEvent(uint32_t type)
-{
-
-}
-
-uint8_t SDL_EventState(uint32_t type, int state)
-{
-    // TODO: do any thing man
-    return SDL_DISABLE;
-}
-
-const char * SDL_GetKeyName(SDL_Keycode key)
-{
-    return "unknown";
-}
 
 #endif      // VSF_USE_SDL2
