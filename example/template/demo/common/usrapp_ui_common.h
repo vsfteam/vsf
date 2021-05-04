@@ -31,6 +31,10 @@
 #   include "component/3rd-party/lvgl/port/vsf_lvgl_port.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE
@@ -109,6 +113,10 @@ extern usrapp_ui_common_t usrapp_ui_common;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_UI
 #endif      // __USRAPP_UI_COMMON_H__

@@ -28,6 +28,10 @@
 #   include "component/av/audio/driver/winsound/vsf_winsound.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef APP_CFG_WINSOUND_PRIO
@@ -52,6 +56,10 @@ extern usrapp_audio_common_t usrapp_audio_common;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_AUDIO
 #endif      // __USRAPP_AUDIO_COMMON_H__

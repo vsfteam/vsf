@@ -49,6 +49,10 @@
 #   include USRAPP_FAKEFAT32_CFG_HEADER
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_FS_USE_MEMFS == ENABLED
@@ -113,6 +117,10 @@ extern usrapp_common_t usrapp_common;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // __USRAPP_COMMON_H__
 /* EOF */

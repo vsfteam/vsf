@@ -30,6 +30,10 @@
 #   include "component/usb/driver/hcd/winusb_hcd/vsf_winusb_hcd.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef APP_CFG_USBH_HW_PRIO
@@ -112,6 +116,10 @@ extern usrapp_usbh_common_t usrapp_usbh_common;
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t usrapp_usbh_common_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_USB_HOST
 #endif      // __USRAPP_USBH_COMMON_H__

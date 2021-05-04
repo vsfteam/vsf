@@ -29,6 +29,10 @@
         ||  (   VSF_HAL_USE_DISTBUS == ENABLED                                  \
             &&  VSF_HAL_USE_DISTBUS_USBD == ENABLED))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -77,6 +81,10 @@ extern const i_usb_dc_t VSF_USB_DC0;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_DCD_[IP]
 #endif      // __USRAPP_USBD_COMMON_H__

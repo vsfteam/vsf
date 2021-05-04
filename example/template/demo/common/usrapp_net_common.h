@@ -30,6 +30,10 @@
 #   include "component/3rd-party/vsfip/raw/vsfip.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -58,6 +62,10 @@ extern vsf_err_t usrapp_net_common_init(
     void
 #endif
 );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_TCPIP
 #endif      // __USRAPP_NET_COMMON_H__
