@@ -295,7 +295,11 @@ static void __SDL_BlendWithFormat(
             r = ((color & src_rmask) >> src_rshift) << src_rloss;
             g = ((color & src_gmask) >> src_gshift) << src_gloss;
             b = ((color & src_bmask) >> src_bshift) << src_bloss;
-            a = ((color & src_amask) >> src_ashift) << src_aloss;
+            if (src_amask) {
+                a = ((color & src_amask) >> src_ashift) << src_aloss;
+            } else {
+                a = 0xFF;
+            }
 
             switch (dst_pixel_size) {
             case 1: dcolor = *(uint8_t *)dst_tmp;                   break;
@@ -307,7 +311,11 @@ static void __SDL_BlendWithFormat(
             dr = ((dcolor & dst_rmask) >> dst_rshift) << dst_rloss;
             dg = ((dcolor & dst_gmask) >> dst_gshift) << dst_gloss;
             db = ((dcolor & dst_bmask) >> dst_bshift) << dst_bloss;
-            da = dcolor & dst_amask;
+            if (dst_amask) {
+                da = dcolor & dst_amask;
+            } else {
+                da = 0xFF;
+            }
 
             r = (r * a + dr * (255 - a)) / 255;
             g = (g * a + dg * (255 - a)) / 255;
