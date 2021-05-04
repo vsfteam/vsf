@@ -33,6 +33,7 @@
 
 #include "SDL_log.h"
 #include "SDL_rwops.h"
+#include "SDL_mutex.h"
 
 #include "SDL_events.h"
 #include "SDL_keyboard.h"
@@ -67,6 +68,7 @@ extern "C" {
 #define SDL_GetError                    __vsf_sdl2_get_error
 #define SDL_SetHint(...)
 #define SDL_ShowSimpleMessageBox(...)
+#define SDL_SaveBMP(...)
 
 #define SDL_CreateWindow                __vsf_sdl2_create_window
 #define SDL_DestroyWindow               __vsf_sdl2_destroy_window

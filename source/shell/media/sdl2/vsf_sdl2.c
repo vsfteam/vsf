@@ -140,6 +140,39 @@ void __SDL_LogMessage(SDL_LogPriority priority, int category, const char *fmt, .
     }
 }
 
+// mutex
+SDL_mutex* SDL_CreateMutex(void)
+{
+    SDL_mutex *mutex = SDL_malloc(sizeof(SDL_mutex));
+    if (mutex != NULL) {
+        vsf_mutex_init(mutex);
+    }
+    return mutex;
+}
+
+void SDL_DestroyMutex(SDL_mutex * mutex)
+{
+    SDL_free(mutex);
+}
+
+int SDL_TryLockMutex(SDL_mutex * mutex)
+{
+    vsf_sync_reason_t reason = vsf_thread_mutex_enter(mutex, 0);
+    return (reason == VSF_SYNC_GET) ? 0 : -1;
+}
+
+int SDL_LockMutex(SDL_mutex * mutex)
+{
+    vsf_sync_reason_t reason = vsf_thread_mutex_enter(mutex, -1);
+    return (reason == VSF_SYNC_GET) ? 0 : -1;
+}
+
+int SDL_UnlockMutex(SDL_mutex * mutex)
+{
+    vsf_thread_mutex_leave(mutex);
+    return 0;
+}
+
 static void __vsf_sdl2_fast_memcpy8(uint8_t *pdst, uint8_t *psrc, uint_fast32_t num)
 {
     __vsf_sdl2_fast_copy(pdst, psrc, num)
