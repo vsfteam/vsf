@@ -40,6 +40,7 @@
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
+#   include "./include/pwd.h"
 #else
 #   include <unistd.h>
 #   include <semaphore.h>
@@ -54,6 +55,7 @@
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
+#   include <pwd.h>
 #endif
 #include <stdarg.h>
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
@@ -143,6 +145,16 @@ typedef struct vsf_linux_stream_priv_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 int errno;
+
+const struct passwd __vsf_default_passwd = {
+    .pw_name            = "vsf",
+    .pw_passwd          = "vsf",
+    .pw_uid             = (uid_t)0,
+    .pw_gid             = (gid_t)0,
+    .pw_gecos           = "vsf",
+    .pw_dir             = "/home",
+    .pw_shell           = "vsh",
+};
 
 /*============================ PROTOTYPES ====================================*/
 
