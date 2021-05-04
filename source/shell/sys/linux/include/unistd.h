@@ -23,6 +23,7 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define usleep              __vsf_linux_usleep
 #define sleep               __vsf_linux_sleep
 #define getpid              __vsf_linux_getpid
@@ -47,6 +48,7 @@ extern "C" {
 #   define write            __vsf_linux_write
 #   define chdir            __vsf_linux_chdir
 #   define getcwd           __vsf_linux_getcwd
+#endif
 #endif
 
 #define STDIN_FILENO        0

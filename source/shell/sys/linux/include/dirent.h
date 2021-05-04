@@ -13,9 +13,11 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define opendir         __vsf_linux_opendir
 #define readdir         __vsf_linux_readdir
 #define closedir        __vsf_linux_closedir
+#endif
 
 struct dirent {
     long d_ino;

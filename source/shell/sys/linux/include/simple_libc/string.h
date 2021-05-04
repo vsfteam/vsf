@@ -23,7 +23,9 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_LIBC_CFG_FAKE_API == ENABLED
 #define strdup              __vsf_linux_strdup
+#endif
 
 void * memset(void *s, int ch, size_t n);
 size_t strlen(const char *str);

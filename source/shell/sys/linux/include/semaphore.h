@@ -14,6 +14,7 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define sem_init            __vsf_linux_sem_init
 #define sem_destory         __vsf_linux_sem_destory
 #define sem_wait            __vsf_linux_sem_wait
@@ -22,6 +23,7 @@ extern "C" {
 #   define sem_timedwait    __vsf_linux_sem_timedwait
 #endif
 #define sem_post            __vsf_linux_sem_post
+#endif
 
 typedef vsf_sem_t sem_t;
 

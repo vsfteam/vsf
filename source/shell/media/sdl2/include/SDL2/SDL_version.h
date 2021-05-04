@@ -47,7 +47,9 @@ extern "C" {
 
 
 
+#if VSF_SDL_CFG_FAKE_API == ENABLED
 #define SDL_Linked_Version                  __vsf_sdl2_linked_version
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

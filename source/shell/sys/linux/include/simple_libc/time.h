@@ -11,9 +11,11 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_LIBC_CFG_FAKE_API == ENABLED
 #define clock_gettime       __vsf_linux_clock_gettime
 #define nanosleep           __vsf_linux_nanosleep
 #define clock               __vsf_linux_clock
+#endif
 
 #ifndef __TIME_T
 #   define __TIME_T         long long

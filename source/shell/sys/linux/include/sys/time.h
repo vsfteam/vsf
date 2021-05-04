@@ -13,9 +13,11 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define getitimer           __vsf_linux_getitimer
 #define setitimer           __vsf_linux_setitimer
 #define gettimeofday        __vsf_linux_gettimeofday
+#endif
 
 #ifndef __SUSECONDS_T
 #   define __SUSECONDS_T    long int

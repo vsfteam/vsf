@@ -35,7 +35,9 @@ struct ipc_perm {
     unsigned short          seq;
 };
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define ftok                __vsf_linux_ftok
+#endif
 
 key_t ftok(const char *pathname, int id);
 

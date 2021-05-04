@@ -14,6 +14,7 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define pthread_self                __vsf_linux_pthread_self
 #define pthread_create              __vsf_linux_pthread_create
 #define pthread_join                __vsf_linux_pthread_join
@@ -36,6 +37,7 @@ extern "C" {
 #define pthread_cond_broadcast      __vsf_linux_pthread_cond_broadcast
 #define pthread_cond_wait           __vsf_linux_pthread_cond_wait
 #define pthread_cond_timedwait      __vsf_linux_pthread_cond_timedwait
+#endif
 
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
 #define PTHREAD_MUTEX_INITIALIZER   { .use_as__vsf_sync_t.max_union.max_value = 1 }

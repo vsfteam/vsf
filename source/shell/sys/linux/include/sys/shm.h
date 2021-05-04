@@ -30,10 +30,12 @@ struct shmid_ds {
     short                   shm_nattch;
 };
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define shmget              __vsf_linux_shmget
 #define shmat               __vsf_linux_shmat
 #define shmdt               __vsf_linux_shmdt
 #define shmctl              __vsf_linux_shmctl
+#endif
 
 int shmget(key_t key, size_t size, int shmflg);
 void * shmat(int shmid, const void *shmaddr, int shmflg);

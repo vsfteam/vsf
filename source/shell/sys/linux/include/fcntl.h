@@ -5,7 +5,9 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define fcntl           __vsf_linux_fcntl
+#endif
 
 #define O_RDONLY        0x0000
 #define O_WRONLY        0x0001

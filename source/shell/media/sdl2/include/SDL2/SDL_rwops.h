@@ -35,6 +35,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#if VSF_SDL_CFG_FAKE_API == ENABLED
 #define SDL_RWFromFile                  __vsf_sdl2_rw_from_file
 #define SDL_RWsize                      __vsf_sdl2_rw_size
 #define SDL_RWclose                     __vsf_sdl2_rw_close
@@ -42,6 +43,7 @@ extern "C" {
 #define SDL_RWtell                      __vsf_sdl2_rw_tell
 #define SDL_RWread                      __vsf_sdl2_rw_read
 #define SDL_RWwrite                     __vsf_sdl2_rw_write
+#endif
 
 /*============================ TYPES =========================================*/
 

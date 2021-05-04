@@ -20,6 +20,7 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_LIBUSB_CFG_FAKE_API == ENABLED
 #define libusb_init                                     __vsf_libusb_init
 #define libusb_exit                                     __vsf_libusb_exit
 #define libusb_set_debug                                __vsf_libusb_set_debug
@@ -73,6 +74,7 @@ extern "C" {
 #define libusb_get_device_speed                         __vsf_libusb_get_device_speed
 #define libusb_set_configuration                        __vsf_libusb_set_configuration
 #define libusb_get_configuration                        __vsf_libusb_get_configuration
+#endif
 
 #define LIBUSB_HOTPLUG_MATCH_ANY        -1
 

@@ -13,6 +13,7 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_LIBC_CFG_FAKE_API == ENABLED
 #define malloc              __vsf_linux_malloc
 #define realloc             __vsf_linux_realloc
 #define free                __vsf_linux_free
@@ -20,6 +21,7 @@ extern "C" {
 #define memalign            __vsf_linux_memalign
 #define exit                __vsf_linux_exit
 #define atexit              __vsf_linux_atexit
+#endif
 
 void * malloc(size_t size);
 void * realloc(void *p, size_t size);

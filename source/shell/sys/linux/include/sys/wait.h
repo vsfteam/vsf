@@ -13,7 +13,9 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define waitpid             __vsf_linux_waitpid
+#endif
 
 pid_t waitpid(pid_t pid, int *status, int options);
 

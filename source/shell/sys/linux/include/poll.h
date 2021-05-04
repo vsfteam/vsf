@@ -18,8 +18,10 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define poll            __vsf_linux_poll
 #define ppoll           __vsf_linux_ppoll
+#endif
 
 typedef int nfds_t;
 

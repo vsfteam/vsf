@@ -18,7 +18,9 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define stat            __vsf_linux_stat
+#endif
 
 #define S_IFDIR         VSF_FILE_ATTR_DIRECTORY
 #define S_IFREG         (VSF_FILE_ATTR_USER << 0)

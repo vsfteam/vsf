@@ -57,6 +57,7 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#if VSF_SDL_CFG_FAKE_API == ENABLED
 #define SDL_memset4                     __vsf_sdl2_memset4
 
 #define SDL_Init                        __vsf_sdl2_init
@@ -66,9 +67,6 @@ extern "C" {
 
 #define SDL_SetError                    __vsf_sdl2_set_error
 #define SDL_GetError                    __vsf_sdl2_get_error
-#define SDL_SetHint(...)
-#define SDL_ShowSimpleMessageBox(...)
-#define SDL_SaveBMP(...)
 
 #define SDL_CreateWindow                __vsf_sdl2_create_window
 #define SDL_DestroyWindow               __vsf_sdl2_destroy_window
@@ -81,9 +79,6 @@ extern "C" {
 #define SDL_SetWindowIcon               __vsf_sdl2_set_window_icon
 #define SDL_SetWindowTitle              __vsf_sdl2_set_window_title
 #define SDL_SetWindowFullscreen         __vsf_sdl2_set_window_full_screen
-#define SDL_SetWindowSize(...)
-#define SDL_SetWindowMinimumSize(...)
-#define SDL_SetWindowMaximumSize(...)
 #define SDL_RestoreWindow               __vsf_sdl2_restore_window
 #define SDL_MaximizeWindow              __vsf_sdl2_maximize_window
 #define SDL_GetWindowFlags              __vsf_sdl2_get_window_flags
@@ -104,11 +99,6 @@ extern "C" {
 #define SDL_BlitSurface                 __vsf_sdl2_blit_surface
 #define SDL_ConvertSurfaceFormat        __vsf_sdl2_convert_surface_format
 
-#define SDL_GetRendererInfo(__renderer, __info)                                 \
-            do {                                                                \
-                SDL_memset((__info), 0, sizeof(*(__info)));                     \
-                (__info)->name          = "vsf";                                \
-            } while (0)
 #define SDL_CreateRenderer              __vsf_sdl2_create_renderer
 #define SDL_DestroyRenderer             __vsf_sdl2_destroy_renderer
 #define SDL_RenderClear                 __vsf_sdl2_render_clear
@@ -130,9 +120,6 @@ extern "C" {
 
 #define SDL_CreateSemaphore             __vsf_sdl2_create_sem
 #define SDL_DestroySemaphore            __vsf_sdl2_destroy_sem
-#define SDL_SemWait(__sem)              __vsf_sdl2_sem_wait((__sem), -1)
-#define SDL_SemWaitTimeout(__sem, __ms) __vsf_sdl2_sem_wait((__sem), (__ms))
-#define SDL_SemTryWait(__sem)           __vsf_sdl2_sem_wait((__sem), 0)
 #define SDL_SemPost                     __vsf_sdl2_sem_post
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -188,6 +175,24 @@ extern "C" {
 
 #define SDL_WM_SetCaption               __vsf_sdl_wm_set_caption
 #endif
+#endif      // VSF_SDL_CFG_FAKE_API
+
+#define SDL_SemWait(__sem)              __vsf_sdl2_sem_wait((__sem), -1)
+#define SDL_SemWaitTimeout(__sem, __ms) __vsf_sdl2_sem_wait((__sem), (__ms))
+#define SDL_SemTryWait(__sem)           __vsf_sdl2_sem_wait((__sem), 0)
+
+#define SDL_SetHint(...)
+#define SDL_ShowSimpleMessageBox(...)
+#define SDL_SaveBMP(...)
+
+#define SDL_SetWindowSize(...)
+#define SDL_SetWindowMinimumSize(...)
+#define SDL_SetWindowMaximumSize(...)
+#define SDL_GetRendererInfo(__renderer, __info)                                 \
+            do {                                                                \
+                SDL_memset((__info), 0, sizeof(*(__info)));                     \
+                (__info)->name          = "vsf";                                \
+            } while (0)
 
 /*============================ MACROS ========================================*/
 

@@ -32,6 +32,7 @@ extern "C" {
 #endif
 
 // in cstdio, common macro overrides will be undefined
+#if VSF_LINUX_LIBC_CFG_FAKE_API == ENABLED
 #define ferror              __vsf_linux_ferror
 #define clearerr            __vsf_linux_clearerr
 #define feof                __vsf_linux_feof
@@ -70,6 +71,7 @@ extern "C" {
 #define stdin               __vsf_linux_stdin
 #define stdout              __vsf_linux_stdout
 #define stderr              __vsf_linux_stderr
+#endif
 
 typedef int FILE;
 extern FILE *stdin, *stdout, *stderr;

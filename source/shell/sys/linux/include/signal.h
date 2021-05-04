@@ -13,6 +13,7 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define kill                __vsf_linux_kill
 #define signal              __vsf_linux_signal
 #define sigprocmask         __vsf_linux_sigprocmask
@@ -23,6 +24,7 @@ extern "C" {
 #define sigdelsetmask       __vsf_linux_sigdelsetmask
 #define sigtestsetmask      __vsf_linux_sigtestsetmask
 #define pthread_sigmask     __vsf_linux_pthread_sigmask
+#endif
 
 #define _NSIG           32
 

@@ -5,8 +5,10 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define mount               __vsf_linux_mount
 #define umount              __vsf_linux_umount
+#endif
 
 // TODO: implement standard mount after device mapping is implemented
 //int mount(const char *source, const char *target,
