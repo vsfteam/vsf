@@ -112,12 +112,16 @@ extern "C" {
 #define SDL_RenderClear                 __vsf_sdl2_render_clear
 #define SDL_RenderCopy                  __vsf_sdl2_render_copy
 #define SDL_RenderPresent               __vsf_sdl2_render_present
+#define SDL_SetRenderDrawColor          __vsf_sdl2_set_render_draw_color
+#define SDL_RenderDrawPoint             __vsf_sdl2_render_point
 #define SDL_RenderSetLogicalSize(...)
 
 #define SDL_CreateTexture               __vsf_sdl2_create_texture
 #define SDL_CreateTextureFromSurface    __vsf_sdl2_create_texture_from_surface
 #define SDL_UpdateTexture               __vsf_sdl2_update_texture
 #define SDL_DestroyTexture              __vsf_sdl2_destroy_texture
+#define SDL_LockTexture                 __vsf_sdl2_lock_texture
+#define SDL_UnlockTexture               __vsf_sdl2_unlock_texture
 
 #define SDL_MapRGBA                     __vsf_sdl2_map_rgba
 #define SDL_MapRGB                      __vsf_sdl2_map_rgb
@@ -262,9 +266,11 @@ typedef enum {
     SDL_PIXELFORMAT_ARGB8888    = VSF_DISP_COLOR_ARGB8888,
     SDL_PIXELFORMAT_RGB565      = VSF_DISP_COLOR_RGB565,
     SDL_PIXELFORMAT_RGB666      = VSF_DISP_COLOR_RGB666_32,
+    SDL_PIXELFORMAT_RGB888      = VSF_DISP_COLOR_RGB888,
+    SDL_PIXELFORMAT_BGR888      = VSF_DISP_COLOR_BGR888,
 
-    SDL_PIXELFORMAT_RGB24       = VSF_DISP_COLOR_RGB24,
-    SDL_PIXELFORMAT_BGR24       = VSF_DISP_COLOR_BGR24,
+    SDL_PIXELFORMAT_RGB24       = SDL_PIXELFORMAT_RGB888,
+    SDL_PIXELFORMAT_BGR24       = SDL_PIXELFORMAT_BGR888,
 
     VSF_DISP_COLOR_IDX_DEF(INDEX8)  = 100,
     VSF_DISP_COLOR_DEF(INDEX8, 8, 1, 0),
@@ -483,11 +489,15 @@ extern void SDL_DestroyRenderer(SDL_Renderer * renderer);
 extern int SDL_RenderClear(SDL_Renderer * renderer);
 extern int SDL_RenderCopy(SDL_Renderer * renderer, SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect);
 extern void SDL_RenderPresent(SDL_Renderer * renderer);
+extern int SDL_SetRenderDrawColor(SDL_Renderer * renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+extern int SDL_RenderDrawPoint(SDL_Renderer * renderer, int x, int y);
 
 extern SDL_Texture * SDL_CreateTexture(SDL_Renderer * renderer, uint32_t format, int access, int w, int h);
 extern SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer * renderer, SDL_Surface * surface);
 extern void SDL_DestroyTexture(SDL_Texture * texture);
 extern int SDL_UpdateTexture(SDL_Texture * texture, const SDL_Rect * rect, const void * pixels, int pitch);
+extern int SDL_LockTexture(SDL_Texture * texture, const SDL_Rect * rect, void **pixels, int *pitch);
+extern void SDL_UnlockTexture(SDL_Texture * texture);
 
 extern uint32_t SDL_MapRGBA(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 extern uint32_t SDL_MapRGB(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b);

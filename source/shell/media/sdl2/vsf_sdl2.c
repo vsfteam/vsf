@@ -79,6 +79,7 @@ struct SDL_Window {
 struct SDL_Renderer {
     SDL_Window *window;
     uint32_t flags;
+    uint32_t color;
 };
 
 struct SDL_Texture {
@@ -809,6 +810,19 @@ void SDL_RenderPresent(SDL_Renderer *renderer)
     __vsf_sdl2_disp_refresh(&area, renderer->window->pixels);
 }
 
+int SDL_SetRenderDrawColor(SDL_Renderer * renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    renderer->color = SDL_MapRGBA(renderer->window->surface.format, r, g, b, a);
+    return 0;
+}
+
+int SDL_RenderDrawPoint(SDL_Renderer * renderer, int x, int y)
+{
+    const SDL_Rect rect = { .x = x, .y = y, .w = 1, .h = 1 };
+    SDL_FillRect(&renderer->window->surface, &rect, renderer->color);
+    return 0;
+}
+
 
 SDL_Texture * SDL_CreateTexture(SDL_Renderer *renderer, uint32_t format, int access, int w, int h)
 {
@@ -863,6 +877,15 @@ int SDL_UpdateTexture(SDL_Texture *texture, const SDL_Rect *rect, const void *pi
                 (uint8_t *)texture->pixels + pixel_size * (area.y * texture->w + area.x), pixel_size * texture->w,
                 (uint8_t *)pixels, pitch);
     return 0;
+}
+
+int SDL_LockTexture(SDL_Texture * texture, const SDL_Rect * rect, void **pixels, int *pitch)
+{
+    return 0;
+}
+
+void SDL_UnlockTexture(SDL_Texture * texture)
+{
 }
 
 

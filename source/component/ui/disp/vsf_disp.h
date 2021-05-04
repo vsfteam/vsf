@@ -94,8 +94,8 @@ typedef enum vk_disp_color_idx_t {
     VSF_DISP_COLOR_IDX_DEF(ARGB8888),
     VSF_DISP_COLOR_IDX_DEF(ABGR8888),
     VSF_DISP_COLOR_IDX_DEF(RGB666_32),
-    VSF_DISP_COLOR_IDX_DEF(RGB24),
-    VSF_DISP_COLOR_IDX_DEF(BGR24),
+    VSF_DISP_COLOR_IDX_DEF(RGB888),
+    VSF_DISP_COLOR_IDX_DEF(BGR888),
 } vk_disp_color_idx_t;
 
 typedef enum vk_disp_color_type_t {
@@ -108,8 +108,8 @@ typedef enum vk_disp_color_type_t {
     VSF_DISP_COLOR_DEF(ARGB8888, 32, 4, 1),
     VSF_DISP_COLOR_DEF(ABGR8888, 32, 4, 1),
     VSF_DISP_COLOR_DEF(RGB666_32, 18, 4, 0),
-    VSF_DISP_COLOR_DEF(RGB24, 24, 3, 0),
-    VSF_DISP_COLOR_DEF(BGR24, 24, 3, 0),
+    VSF_DISP_COLOR_DEF(RGB888, 24, 3, 0),
+    VSF_DISP_COLOR_DEF(BGR888, 24, 3, 0),
 } vk_disp_color_type_t;
 
 typedef struct vk_disp_point {
