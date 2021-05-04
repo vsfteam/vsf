@@ -329,6 +329,8 @@
 
 #if APP_USE_SDL2_DEMO == ENABLED
 #   define APP_SDL2_DEMO_CFG_COLOR_RGB565
+// VSF_SDL_CFG_FAKE_API is required on __WIN__ to avoid API conflicts
+#   define VSF_SDL_CFG_FAKE_API                         ENABLED
 #endif
 
 #define VSF_USE_WINSOUND                                ENABLED
