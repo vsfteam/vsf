@@ -914,6 +914,25 @@ int SDL_UpdateTexture(SDL_Texture *texture, const SDL_Rect *rect, const void *pi
 
 int SDL_LockTexture(SDL_Texture * texture, const SDL_Rect * rect, void **pixels, int *pitch)
 {
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(texture->format->format);
+    uint8_t *p = texture->pixels;
+    SDL_Rect area;
+
+    if (rect != NULL) {
+        area    = *rect;
+    } else {
+        area.x  = 0;
+        area.y  = 0;
+        area.w  = texture->w;
+        area.h  = texture->h;
+    }
+
+    if (pitch != NULL) {
+        *pitch = pixel_size * texture->w;
+    }
+    if (pixels != NULL) {
+        *pixels = (void *)&p[pixel_size * (area.y * texture->w + area.x)];
+    }
     return 0;
 }
 
