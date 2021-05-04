@@ -21,8 +21,14 @@ extern "C" {
 #define stat            __vsf_linux_stat
 
 #define S_IFDIR         VSF_FILE_ATTR_DIRECTORY
-#define S_IFREG         VSF_FILE_ATTR_USER
+#define S_IFREG         (VSF_FILE_ATTR_USER << 0)
 #define S_IFMT          (S_IFDIR | S_IFREG)
+
+#define S_IRUSR         (VSF_FILE_ATTR_USER << 1)
+#define S_IWUSR         (VSF_FILE_ATTR_USER << 2)
+#define S_IXUSR         (VSF_FILE_ATTR_USER << 3)
+#define S_IRGRP         (VSF_FILE_ATTR_USER << 4)
+#define S_IWGRP         (VSF_FILE_ATTR_USER << 5)
 
 // TODO:
 #define S_ISREG(__MODE) !((__MODE) & S_IFDIR)
