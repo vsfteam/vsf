@@ -674,6 +674,8 @@ int kill(pid_t pid, int sig)
     return -1;
 }
 
+#if !defined(__WIN__) || VSF_LINUX_CFG_FAKE_API == ENABLED
+// conflicts with signal in ucrt, need VSF_LINUX_CFG_FAKE_API
 sighandler_t signal(int signum, sighandler_t handler)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
@@ -682,6 +684,7 @@ sighandler_t signal(int signum, sighandler_t handler)
     return NULL;
 #endif
 }
+#endif
 
 pid_t waitpid(pid_t pid, int *status, int options)
 {
@@ -1005,7 +1008,7 @@ int vsf_linux_fd_rx_trigger(int fd)
     return 0;
 }
 
-#ifndef __WIN__
+#if !defined(__WIN__) || VSF_LINUX_CFG_FAKE_API == ENABLED
 // conflicts with select in winsock.h
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, struct timeval *timeout)
 {
