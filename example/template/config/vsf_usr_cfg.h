@@ -107,19 +107,6 @@
 #   define VSFVM_PARSER_DEBUG_EN                        DISABLED
 #   define VSFVM_COMPILER_DEBUG_EN                      DISABLED
 #endif
-#if APP_USE_JSON_DEMO == ENABLED
-#   define VSF_USE_JSON                                 ENABLED
-#endif
-
-// UI runs in vsf_prio_0, other modules runs above vsf_prio_0
-#if VSF_USE_UI == ENABLED
-#   ifndef VSF_USBH_CFG_EDA_PRIORITY
-#       define VSF_USBH_CFG_EDA_PRIORITY                vsf_prio_1
-#   endif
-#   ifndef APP_CFG_USBH_HW_PRIO
-#       define APP_CFG_USBH_HW_PRIO                     vsf_arch_prio_1
-#   endif
-#endif
 
 #if APP_USE_VSFIP_DEMO == ENABLED || APP_USE_LWIP_DEMO == ENABLED
 #   define VSF_USE_TCPIP                                ENABLED
