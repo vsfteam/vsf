@@ -66,8 +66,8 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-#define __optimal_bit_sz        (sizeof(uintalu_t) * 8)
-#define __optimal_bit_msk       (__optimal_bit_sz - 1)
+#define __optimal_bit_sz    (sizeof(uintalu_t) * 8)
+#define __optimal_bit_msk   (__optimal_bit_sz - 1)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -92,3 +92,17 @@ typedef int64_t             intalu_t;
 
 /*============================ Multiple-Entry ================================*/
 #include "../__common/__type.h"
+
+/*============================ Library Patch  ================================*/
+
+#ifdef __WIN__
+#   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
+// __WIN__ has no 64-bit stdio APIs, if simple_stdio in simple_libc is not used,
+//  implement 64-but stdio APIs here
+#       define off64_t      int64_t
+#       define ftello64     ftell
+#       define fseeko64     fseek
+#   endif
+
+extern size_t strlcpy(char *dst, const char *src, size_t dsize);
+#endif
