@@ -69,6 +69,8 @@
 #   define VSF_LINUX_CFG_PRINT_BUFF_SIZE                4096
 // if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+// VSF_LINUX_LIBC_CFG_FAKE_API is required on __WIN__ to avoid API confliction
+#   define VSF_LINUX_LIBC_CFG_FAKE_API                  ENABLED
 #   define VSF_USE_SIMPLE_SSCANF                        ENABLED
 #   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
 #else
@@ -329,7 +331,7 @@
 
 #if APP_USE_SDL2_DEMO == ENABLED
 #   define APP_SDL2_DEMO_CFG_COLOR_RGB565
-// VSF_SDL_CFG_FAKE_API is required on __WIN__ to avoid API conflicts
+// VSF_SDL_CFG_FAKE_API is required on __WIN__ to avoid API confliction
 #   define VSF_SDL_CFG_FAKE_API                         ENABLED
 #endif
 
