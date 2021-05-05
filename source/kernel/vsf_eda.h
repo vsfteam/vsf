@@ -1034,10 +1034,10 @@ SECTION(".text.vsf.kernel.teda")
 extern vsf_systimer_tick_t vsf_systimer_get_tick(void);
 
 SECTION(".text.vsf.kernel.vsf_systimer_get_duration")
-extern uint_fast32_t vsf_systimer_get_duration(vsf_systimer_tick_t from_time, vsf_systimer_tick_t to_time);
+extern vsf_systimer_tick_t vsf_systimer_get_duration(vsf_systimer_tick_t from_time, vsf_systimer_tick_t to_time);
 
 SECTION(".text.vsf.kernel.vsf_systimer_get_elapsed")
-extern uint_fast32_t vsf_systimer_get_elapsed(vsf_systimer_tick_t from_time);
+extern vsf_systimer_tick_t vsf_systimer_get_elapsed(vsf_systimer_tick_t from_time);
 
 #endif
 
