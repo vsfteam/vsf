@@ -81,6 +81,9 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
     // TODO: assert current context is vsf_thread
     vsf_systimer_tick_t tick =  vsf_systimer_ms_to_tick(requested_time->tv_sec *1000)
                             +   vsf_systimer_us_to_tick(requested_time->tv_nsec / 1000);
+    if (!tick) {
+        tick = vsf_systimer_us_to_tick(1);
+    }
     vsf_thread_delay(tick);
     if (remaining != NULL) {
         remaining->tv_nsec = 0;
