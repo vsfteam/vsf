@@ -95,14 +95,32 @@ typedef int64_t             intalu_t;
 
 /*============================ Library Patch  ================================*/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef __WIN__
 #   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
 // __WIN__ has no 64-bit stdio APIs, if simple_stdio in simple_libc is not used,
 //  implement 64-but stdio APIs here
-#       define off64_t      int64_t
+
+typedef long                off_t;
+typedef long long           off64_t;
+
 #       define ftello64     ftell
 #       define fseeko64     fseek
+#       define ftello       ftell
+#       define fseeko       fseek
 #   endif
 
+// __WIN__ uses stricmp instead of strcasecmp in strings.h
+#   define strcasecmp       stricmp
+#   define strncasecmp      strnicmp
+
+extern char * strsep(char **stringp, const char *delim);
 extern size_t strlcpy(char *dst, const char *src, size_t dsize);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
