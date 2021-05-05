@@ -510,7 +510,7 @@ extern uintptr_t vsf_thread_wait_for_msg(void);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 SECTION(".text.vsf.kernel.vsf_thread_delay")
-extern void vsf_thread_delay(uint_fast32_t tick);
+extern void vsf_thread_delay(vsf_systimer_tick_t tick);
 #endif
 
 SECTION(".text.vsf.kernel.vsf_thread_yield")

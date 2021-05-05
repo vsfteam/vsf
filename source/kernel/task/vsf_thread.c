@@ -570,7 +570,7 @@ vsf_err_t vsf_thread_start(vsf_thread_t *thread, vsf_prio_t priority)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 SECTION(".text.vsf.kernel.vsf_thread_delay")
-void vsf_thread_delay(uint_fast32_t tick)
+void vsf_thread_delay(vsf_systimer_tick_t tick)
 {
     vsf_teda_set_timer(tick);
     vsf_thread_wfe(VSF_EVT_TIMER);
