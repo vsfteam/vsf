@@ -513,6 +513,9 @@ SECTION(".text.vsf.kernel.vsf_thread_delay")
 extern void vsf_thread_delay(uint_fast32_t tick);
 #endif
 
+SECTION(".text.vsf.kernel.vsf_thread_yield")
+void vsf_thread_yield(void);
+
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
 SECTION(".text.vsf.kernel.vsf_thread_set_priority")
 extern vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority);

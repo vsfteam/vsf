@@ -460,17 +460,6 @@ int rtos_mutex_lock(rtos_mutex mutex, int timeout)
 int rtos_mutex_unlock(rtos_mutex mutex)
 {
     vsf_err_t err = vsf_thread_mutex_leave(mutex);
-
-#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
-    vsf_eda_t *eda_self = vsf_eda_get_cur();
-    // switch to original evtq right now if mutex boost priority of current task,
-    //  or current task will switch to the original priority after current event is processed and returned
-    if (eda_self->flag.state.is_new_prio) {
-        // send and wait a VSF_EVT_YIELD event will make current event processed and returned
-        vsf_eda_post_evt(eda_self, VSF_EVT_YIELD);
-        vsf_thread_wfe(VSF_EVT_YIELD);
-    }
-#endif
     return (VSF_ERR_NONE == err) ? 0 : -1;
 }
 
