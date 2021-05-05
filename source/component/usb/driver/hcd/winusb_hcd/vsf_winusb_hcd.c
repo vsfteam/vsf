@@ -566,7 +566,9 @@ static void __vk_winusb_hcd_init_thread(void *arg)
         vk_winusb_hcd_dev_t *winusb_dev = &__vk_winusb_hcd.devs[0];
         for (int i = 0; i < dimof(__vk_winusb_hcd.devs); i++, winusb_dev++) {
             if ((INVALID_HANDLE_VALUE == winusb_dev->hDev) && (0 == winusb_dev->evt_mask.value)) {
+#if VSF_WINUSB_CFG_INSTALL_DRIVER == ENABLED
                 __vk_winusb_ensure_driver(winusb_dev->vid, winusb_dev->pid, false);
+#endif
                 winusb_dev->hDev = __vk_winusb_open_device(winusb_dev->vid, winusb_dev->pid);
                 if (winusb_dev->hDev != INVALID_HANDLE_VALUE) {
                     if (WinUsb_Initialize(winusb_dev->hDev, &winusb_dev->hUsbIfs[0])) {
