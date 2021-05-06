@@ -145,13 +145,13 @@ static int __wifi_connect_main(int argc, char *argv[])
     return 0;
 }
 
-static rtos_task_handle __iperf_task_handle;
-struct fhost_iperf_settings __iperf_settings = {
+static int __iperf_main(int argc, char *argv[])
+{
+    static rtos_task_handle __iperf_task_handle;
+    struct fhost_iperf_settings __iperf_settings = {
         .flags.is_server        = 1,
         .port                   = 5001,
     };
-static int __iperf_main(int argc, char *argv[])
-{
     fhost_iperf_start(&__iperf_settings, &__iperf_task_handle);
     return 0;
 }
