@@ -52,22 +52,6 @@ void * memcpy(void *dest, const void *src, unsigned long long n);
 #   else
 void * memcpy(void *dest, const void *src, unsigned int n);
 #   endif
-// strcasecmp and strncasecmp are not implement in __WIN__
-static inline int strcasecmp(const char *s1, const char *s2)
-{
-    return stricmp(s1, s2);
-}
-static inline int strncasecmp(char *s1, char *s2, size_t n)
-{
-    return strnicmp(s1, s2, n);
-}
-// strlcpy is not implemented in __WIN__
-static inline size_t strlcpy(char *dest, const char *src, size_t n)
-{
-    strncpy(dest, src, n);
-    dest[n] = '\0';
-    return strlen(src);
-}
 
 const char * strstr(const char *str1, const char *str2);
 const char * strchr(const char *str, int c);
