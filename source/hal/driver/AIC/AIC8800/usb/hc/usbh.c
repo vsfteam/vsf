@@ -33,14 +33,14 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
-                usb_ip_irqhandler_t handler, void *param);
+                bool is_fs_phy, usb_ip_irqhandler_t handler, void *param);
 
 /*============================ IMPLEMENTATION ================================*/
 
 vsf_err_t aic8800_usbh_init(aic8800_usb_t *hc, usb_hc_ip_cfg_t *cfg)
 {
     hc->is_host = true;
-    return __aic8800_usb_init(hc, cfg->priority, cfg->irqhandler, cfg->param);
+    return __aic8800_usb_init(hc, cfg->priority, false, cfg->irqhandler, cfg->param);
 }
 
 void aic8800_usbh_get_info(aic8800_usb_t *hc, usb_hc_ip_info_t *info)

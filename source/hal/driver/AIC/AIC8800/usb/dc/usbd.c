@@ -32,14 +32,15 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
-                usb_ip_irqhandler_t handler, void *param);
+                bool is_fs_phy, usb_ip_irqhandler_t handler, void *param);
 
 /*============================ IMPLEMENTATION ================================*/
 
 vsf_err_t aic8800_usbd_init(aic8800_usb_t *dc, usb_dc_ip_cfg_t *cfg)
 {
+    bool is_fs_phy = cfg->speed == USB_DC_SPEED_FULL;
     dc->is_host = false;
-    return __aic8800_usb_init(dc, cfg->priority, cfg->irqhandler, cfg->param);
+    return __aic8800_usb_init(dc, cfg->priority, is_fs_phy, cfg->irqhandler, cfg->param);
 }
 
 void aic8800_usbd_fini(aic8800_usb_t *dc)

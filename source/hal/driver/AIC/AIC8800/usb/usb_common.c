@@ -39,7 +39,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
-            usb_ip_irqhandler_t handler, void *param)
+            bool is_fs_phy, usb_ip_irqhandler_t handler, void *param)
 {
     usb->callback.irqhandler = handler;
     usb->callback.param = param;
@@ -52,6 +52,17 @@ vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
             AIC1000LITE_ANALOG_REG_CFG_RTC_USBPLL_CLK_EN),
             (AIC1000LITE_ANALOG_REG_CFG_RTC_USB_PLL_PU | AIC1000LITE_ANALOG_REG_CFG_RTC_USB_PU |
             AIC1000LITE_ANALOG_REG_CFG_RTC_USBPLL_CLK_EN));
+
+        if (is_fs_phy) {
+            PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteAnalogReg->cfg_ana_usb_ctrl1),
+                AIC1000LITE_ANALOG_REG_CFG_ANA_USB_FSLS_DRV_BIT(3),
+                AIC1000LITE_ANALOG_REG_CFG_ANA_USB_FSLS_DRV_BIT(3));
+        } else {
+            // need to clear this bit for high speed phy?
+//            PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteAnalogReg->cfg_ana_usb_ctrl1),
+//                0,
+//                AIC1000LITE_ANALOG_REG_CFG_ANA_USB_FSLS_DRV_BIT(3));
+        }
     }
 #endif
     // power up mmsys
