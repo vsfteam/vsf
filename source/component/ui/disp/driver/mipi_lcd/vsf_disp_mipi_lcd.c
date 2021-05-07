@@ -320,7 +320,7 @@ static void __lcd_hardware_reset_pin(vsf_eda_t *teda, vsf_evt_t evt)
         vk_disp_mipi_lcd_io_init(disp_mipi_lcd);
         __mipi_lcd_spi_init(disp_mipi_lcd, MIPI_LCD_SPI_FREQ);
 
-        vk_disp_mipi_lcd_hw_reset(disp_mipi_lcd, true);
+        vk_disp_mipi_lcd_hw_reset(disp_mipi_lcd, false);
         disp_mipi_lcd->reset_state = 0;
         vsf_teda_set_timer_ms(MIPI_LCD_RESET_LOW_PULSE_TIME);
         break;
