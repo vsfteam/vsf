@@ -143,7 +143,6 @@ static void __vk_netdrv_wpcap_netlink_thread(void *arg)
 static vsf_err_t __vk_netdrv_wpcap_netlink_init(vk_netdrv_t *netdrv)
 {
     vk_netdrv_wpcap_t *wpcap_netdrv = (vk_netdrv_wpcap_t *)netdrv;
-    char errbuf[PCAP_ERRBUF_SIZE];
 
     wpcap_netdrv->fp = __vk_netdrv_wpcap_open(wpcap_netdrv->name);
     if (wpcap_netdrv->fp != NULL) {
@@ -151,7 +150,7 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_init(vk_netdrv_t *netdrv)
         return VSF_ERR_NONE;
     }
 
-    vsf_trace_error("%s" VSF_TRACE_CFG_LINEEND, errbuf);
+    vsf_trace_error("fail to open %s" VSF_TRACE_CFG_LINEEND, wpcap_netdrv->name);
     return VSF_ERR_FAIL;
 }
 
