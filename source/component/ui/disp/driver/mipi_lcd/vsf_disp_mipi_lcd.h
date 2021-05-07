@@ -174,7 +174,7 @@ extern "C" {
 #define LCD_REFRESH_LEFT_TO_RIGHT       (0 << 2)
 #define LCD_REFRESH_RIGHT_TO_LEFT       (1 << 2)
 #ifndef MIPI_LCD_ADDRESS_MODE_VALUE
-#   define MIPI_LCD_ADDRESS_MODE_VALUE  (GRAM_WRITE_RIGHT_TO_LEFT)
+#   define MIPI_LCD_ADDRESS_MODE_VALUE  (GRAM_WRITE_TOP_TO_BOTTOM | GRAM_WRITE_LEFT_TO_RIGHT | GRAM_WRITE_NORMAL_MODE)
 #endif
 
 #define TEAR_OUTPUT_V_BLANKING_ONLY             0
@@ -259,6 +259,28 @@ extern "C" {
 #endif
 
 #define VSF_DISP_MIPI_LCD_ILI9341  { VSF_DISP_MIPI_LCD_ILI9341_BASE VSF_DISP_MIPI_LCD_DEFAUT_INIT VSF_DISP_MIPI_LCD_ILI9341_EXTEND }
+
+#ifndef VSF_DISP_MIPI_LCD_ST7789V_BASE
+#   define VSF_DISP_MIPI_LCD_ST7789V_BASE \
+        VSF_DISP_MIPI_LCD_WRITE(0xB1,  3, 0x40, 0x7F, 0x14), /* RGB Interface Control */\
+        VSF_DISP_MIPI_LCD_WRITE(0xB2,  5, 0x0C, 0x0C, 0x00, 0x33, 0x33), /* Porch Setting */\
+        VSF_DISP_MIPI_LCD_WRITE(0xB7,  1, 0x35), /* Gate Control */\
+        VSF_DISP_MIPI_LCD_WRITE(0xBB,  1, 0x20), /* VCOM Setting */\
+        VSF_DISP_MIPI_LCD_WRITE(0xC0,  1, 0x2C), /* LCM Control  */\
+        VSF_DISP_MIPI_LCD_WRITE(0xC2,  1, 0x01), /* VDV and VRH Command Enable */\
+        VSF_DISP_MIPI_LCD_WRITE(0xC3,  1, 0x0B), /* VRH Set */\
+        VSF_DISP_MIPI_LCD_WRITE(0xC4,  1, 0x20), /* VDV Set */\
+        VSF_DISP_MIPI_LCD_WRITE(0xC6,  1, 0x1F), /* Frame Rate Control in Normal Mode, 1F: 39 */\
+        VSF_DISP_MIPI_LCD_WRITE(0xD0,  2, 0xA4, 0xA1), /* Power Control 1 */\
+        VSF_DISP_MIPI_LCD_WRITE(0xE0, 14, 0xD0, 0x03, 0x09, 0x0E, 0x11, 0x3D, 0x47, 0x55, 0x53, 0x1A, 0x16, 0x14, 0x1F, 0x22), /* Positive Voltage Gamma Control */\
+        VSF_DISP_MIPI_LCD_WRITE(0xE1, 14, 0xD0, 0x02, 0x08, 0x0D, 0x12, 0x2C, 0x43, 0x55, 0x53, 0x1E, 0x1B, 0x19, 0x20, 0x22), /* Negative Voltage Gamma Control */
+#endif
+
+#ifndef VSF_DISP_MIPI_LCD_ST7789V_EXTEND
+#   define VSF_DISP_MIPI_LCD_ST7789V_EXTEND
+#endif
+
+#define VSF_DISP_MIPI_LCD_ST7789V  { VSF_DISP_MIPI_LCD_ST7789V_BASE VSF_DISP_MIPI_LCD_DEFAUT_INIT VSF_DISP_MIPI_LCD_ST7789V_EXTEND }
 
 
 #ifndef VSF_DISP_MIPI_LCD_ST7796S_BASE
