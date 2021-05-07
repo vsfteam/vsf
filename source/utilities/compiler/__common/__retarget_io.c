@@ -113,7 +113,7 @@ size_t __vsf_stdio_read(int handle, unsigned char *buf, size_t buf_size)
 #   include "./__retarget_io/__retarget_io_iar.c"
 #elif   __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
 #   define __USE_COMMON_RETARGET_IO_GCC_LLVM_C__
-#   include ""./__retarget_io/__retarget_io_gcc_llvm.c"
+#   include "./__retarget_io/__retarget_io_gcc_llvm.c"
 #endif
 
 #endif      //__VSF_USE_COMMON_RETARGET_IO_C__
