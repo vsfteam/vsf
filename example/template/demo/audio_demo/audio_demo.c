@@ -37,6 +37,9 @@ int audio_play_main(int argc, char *argv[])
 
     // make sure current VSF_LINUX_CFG_STACKSIZE can hold the audio_mem_stream
     describe_mem_stream(audio_mem_stream, APP_CFG_AUDIO_BUFFER_SIZE)
+    audio_mem_stream.is_ticktock_read = true;
+    VSF_STREAM_INIT(&audio_mem_stream);
+
     vk_file_stream_t file_stream;
     uint_fast32_t delay_us;
     enum {
@@ -51,7 +54,6 @@ int audio_play_main(int argc, char *argv[])
     } ctx;
     int result = 0;
 
-    audio_mem_stream.is_ticktock_read = true;
     vk_audio_dev_t *audio_dev = usrapp_audio_common.default_dev;
     vk_audio_stream_t *audio_stream = NULL;
     vk_audio_init(audio_dev);
