@@ -11,7 +11,7 @@
 #endif
 
 #ifndef APP_CFG_AUDIO_BUFFER_SIZE
-#   define APP_CFG_AUDIO_BUFFER_SIZE        (8 *1024)
+#   define APP_CFG_AUDIO_BUFFER_SIZE        (8 * 1024)
 #endif
 
 static void print_help(char *exe_name)

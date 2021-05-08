@@ -89,7 +89,6 @@ vsf_class(vk_winsound_dev_t) {
     )
 
     public_member(
-        // vk_audio_dev_t MUST be the last member, because of 0-length array
         implement(vk_audio_dev_t)
         vk_audio_stream_t __stream[
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED && VSF_AUDIO_USE_CAPTURE == ENABLED
