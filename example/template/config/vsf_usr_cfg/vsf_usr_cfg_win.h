@@ -243,10 +243,10 @@
 #ifdef __WIN7__
 // winusb seems fail on win7
 #   define VSF_USBH_USE_HCD_LIBUSB                      ENABLED
-#       define VSF_LIBUSB_CFG_INSTALL_DRIVER            ENABLED
+#       define VSF_LIBUSB_CFG_INSTALL_DRIVER            DISABLED
 #else
 #   define VSF_USBH_USE_HCD_WINUSB                      ENABLED
-#       define VSF_WINUSB_CFG_INSTALL_DRIVER            ENABLED
+#       define VSF_WINUSB_CFG_INSTALL_DRIVER            DISABLED
 #endif
 
 #if VSF_USBH_USE_HCD_WINUSB == ENABLED
