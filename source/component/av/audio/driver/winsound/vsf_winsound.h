@@ -41,7 +41,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_AUDIO_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
 
 // avoid to use windows.h, fix if any conflicts
 #define HWAVEOUT                        HANDLE
@@ -57,36 +57,47 @@ typedef struct __wavehdr_tag {
     DWORD_PTR   reserved;               /* reserved for driver */
 } __WAVEHDR;
 
-typedef struct vk_winsound_play_buffer_t {
+typedef struct vk_winsound_playback_buffer_t {
     __WAVEHDR header;
     uint8_t *buffer;
-} vk_winsound_play_buffer_t;
+} vk_winsound_playback_buffer_t;
 
-typedef struct vk_winsound_play_ctx_t {
+typedef struct vk_winsound_playback_ctx_t {
     vsf_arch_irq_thread_t irq_thread;
+    vk_audio_stream_t *audio_stream;
 
     HWAVEOUT hwo;
     HANDLE hEvent;
 
-    vk_winsound_play_buffer_t buffer[2];
+    vk_winsound_playback_buffer_t buffer[2];
 
     bool is_playing;
     bool fill_ticktock;
     bool play_ticktock;
     uint8_t buffer_taken;
-} vk_winsound_play_ctx_t;
+} vk_winsound_playback_ctx_t;
 
 #undef HWAVEOUT
 #endif
 
 vsf_class(vk_winsound_dev_t) {
-    implement(vk_audio_dev_t)
-
     private_member(
         bool is_inited;
-#if VSF_AUDIO_USE_PLAY == ENABLED
-        vk_winsound_play_ctx_t play_ctx;
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+        vk_winsound_playback_ctx_t playback_ctx;
 #endif
+    )
+
+    public_member(
+        // vk_audio_dev_t MUST be the last member, because of 0-length array
+        implement(vk_audio_dev_t)
+        vk_audio_stream_t __stream[
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED && VSF_AUDIO_USE_CAPTURE == ENABLED
+            2
+#else
+            1
+#endif
+        ];
     )
 };
 

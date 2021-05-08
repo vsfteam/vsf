@@ -35,8 +35,8 @@ int audio_play_main(int argc, char *argv[])
         *tmp = tolower(*tmp);
     }
 
-    // make sure current VSF_LINUX_CFG_STACKSIZE can hold the audio_stream
-    describe_mem_stream(audio_stream, APP_CFG_AUDIO_BUFFER_SIZE)
+    // make sure current VSF_LINUX_CFG_STACKSIZE can hold the audio_mem_stream
+    describe_mem_stream(audio_mem_stream, APP_CFG_AUDIO_BUFFER_SIZE)
     vk_file_stream_t file_stream;
     uint_fast32_t delay_us;
     enum {
@@ -51,8 +51,21 @@ int audio_play_main(int argc, char *argv[])
     } ctx;
     int result = 0;
 
-    audio_stream.is_ticktock_read = true;
-    vk_audio_init(usrapp_audio_common.default_dev);
+    audio_mem_stream.is_ticktock_read = true;
+    vk_audio_dev_t *audio_dev = usrapp_audio_common.default_dev;
+    vk_audio_stream_t *audio_stream = NULL;
+    vk_audio_init(audio_dev);
+    for (uint_fast8_t i = 0; i < audio_dev->stream_num; i++) {
+        if (0 == audio_dev->stream[i].dir_in1out0) {
+            audio_stream = &audio_dev->stream[i];
+            break;
+        }
+    }
+    if (NULL == audio_stream) {
+        printf("no audio playback device found!\r\n");
+        return -1;
+    }
+
     if (!strcmp(ext, "pcm")) {
         file_format = FILE_FORMAT_PCM;
         if (argc != 5) {
@@ -68,7 +81,7 @@ int audio_play_main(int argc, char *argv[])
         delay_us =  1000000ULL
                 *   (APP_CFG_AUDIO_BUFFER_SIZE / ((ctx.format.sample_bit_width / 8) * ctx.format.channel_num))
                 /   ctx.format.sample_rate;
-        vk_audio_play_start(usrapp_audio_common.default_dev, &audio_stream.use_as__vsf_stream_t, &ctx.format);
+        vk_audio_start(audio_dev, audio_stream->stream_index, &audio_mem_stream.use_as__vsf_stream_t, &ctx.format);
     } else if (!strcmp(ext, "wav")) {
         file_format = FILE_FORMAT_WAV;
         if (argc != 2) {
@@ -77,10 +90,11 @@ int audio_play_main(int argc, char *argv[])
             goto cleanup;
         }
 
-        ctx.wav.audio_dev   = usrapp_audio_common.default_dev;
-        ctx.wav.stream      = &audio_stream.use_as__vsf_stream_t;
+        ctx.wav.audio_dev           = audio_dev;
+        ctx.wav.stream              = &audio_mem_stream.use_as__vsf_stream_t;
+        ctx.wav.audio_stream        = audio_stream->stream_index;
         delay_us = 1000000ULL * 1;
-        vk_wav_play_start(&ctx.wav);
+        vk_wav_playback_start(&ctx.wav);
     } else if (!strcmp(ext, "mp3")) {
         file_format = FILE_FORMAT_MP3;
         if (argc != 2) {
@@ -102,7 +116,8 @@ int audio_play_main(int argc, char *argv[])
         printf("fail to open %s\r\n", argv[1]);
         result = -1;
     } else {
-        vk_file_read_stream(&file_stream, 0, file_stream.file->size, &audio_stream.use_as__vsf_stream_t);
+        vk_file_read_stream(&file_stream, 0, file_stream.file->size,
+                &audio_mem_stream.use_as__vsf_stream_t);
         vk_file_close(file_stream.file);
 
         usleep(delay_us);
@@ -111,10 +126,10 @@ int audio_play_main(int argc, char *argv[])
 cleanup:
     switch (file_format) {
     case FILE_FORMAT_PCM:
-        vk_audio_play_stop(usrapp_audio_common.default_dev);
+        vk_audio_stop(audio_dev, audio_stream->stream_index);
         break;
     case FILE_FORMAT_WAV:
-        vk_wav_play_stop(&ctx.wav);
+        vk_wav_playback_stop(&ctx.wav);
         break;
     }
 

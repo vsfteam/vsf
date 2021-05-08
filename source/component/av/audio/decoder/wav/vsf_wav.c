@@ -27,7 +27,7 @@
 #define __VSF_WAV_CLASS_IMPLEMENT
 #define __VSF_EDA_CLASS_INHERIT__
 #include "kernel/vsf_kernel.h"
-#include "./vsf_wav.h"
+#include "component/av/vsf_av.h"
 
 /*============================ MACROS ========================================*/
 
@@ -73,7 +73,7 @@ typedef struct vk_wav_data_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vk_wav_play_stream_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_wav_playback_stream_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vk_wav_t *wav = param;
     uint32_t data_size;
@@ -124,13 +124,13 @@ static void __vk_wav_play_stream_evthandler(void *param, vsf_stream_evt_t evt)
                     if (strncmp(header.data.sub_chunk_id, "data", 4)) {
                         goto failed;
                     }
-                    wav->state = VSF_WAV_STATE_PLAY;
+                    wav->state = VSF_WAV_STATE_PLAYBACK;
                     wav->result = VSF_ERR_NONE;
                     vsf_eda_post_evt(&wav->eda, VSF_EVT_PARSE_DONE);
                     return;
                 }
                 break;
-            case VSF_WAV_STATE_PLAY:
+            case VSF_WAV_STATE_PLAYBACK:
                 return;
             }
         }
@@ -143,24 +143,24 @@ failed:
     vsf_eda_post_evt(&wav->eda, VSF_EVT_PARSE_DONE);
 }
 
-static void __vk_wav_play_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_wav_playback_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_wav_t *wav = container_of(eda, vk_wav_t, eda);
 
     switch (evt) {
     case VSF_EVT_INIT:
         wav->stream->rx.param = wav;
-        wav->stream->rx.evthandler = __vk_wav_play_stream_evthandler;
+        wav->stream->rx.evthandler = __vk_wav_playback_stream_evthandler;
         vsf_stream_connect_rx(wav->stream);
         break;
     case VSF_EVT_PARSE_DONE:
         vsf_stream_disconnect_rx(wav->stream);
-        vk_audio_play_start(wav->audio_dev, wav->stream, &wav->format);
+        vk_audio_start(wav->audio_dev, wav->audio_stream, wav->stream, &wav->format);
         break;
     }
 }
 
-vsf_err_t vk_wav_play_start(vk_wav_t *wav)
+vsf_err_t vk_wav_playback_start(vk_wav_t *wav)
 {
     VSF_AV_ASSERT(  (wav != NULL)
                 &&  (wav->audio_dev != NULL)
@@ -169,16 +169,16 @@ vsf_err_t vk_wav_play_start(vk_wav_t *wav)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     wav->eda.on_terminate = NULL;
 #endif
-    wav->eda.fn.evthandler = __vk_wav_play_evthandler;
+    wav->eda.fn.evthandler = __vk_wav_playback_evthandler;
     return vsf_eda_init(&wav->eda);
 }
 
-vsf_err_t vk_wav_play_stop(vk_wav_t *wav)
+vsf_err_t vk_wav_playback_stop(vk_wav_t *wav)
 {
     vsf_stream_disconnect_rx(wav->stream);
     vsf_eda_fini(&wav->eda);
-    if (VSF_WAV_STATE_PLAY == wav->state) {
-        vk_audio_play_stop(wav->audio_dev);
+    if (VSF_WAV_STATE_PLAYBACK == wav->state) {
+        vk_audio_stop(wav->audio_dev, wav->audio_stream);
     }
     return VSF_ERR_NONE;
 }

@@ -27,7 +27,7 @@
 #define __VSF_AUDIO_CLASS_IMPLEMENT
 
 #include "utilities/vsf_utilities.h"
-#include "component/vsf_component.h"
+#include "component/av/vsf_av.h"
 
 /*============================ MACROS ========================================*/
 
@@ -53,69 +53,65 @@ vsf_err_t vk_audio_init(vk_audio_dev_t *pthis)
                 &&  (pthis->drv != NULL)
                 &&  (pthis->drv->init != NULL));
 
+    for (uint_fast8_t i = 0; i < pthis->stream_num; i++) {
+        pthis->stream[i].stream_index = i;
+    }
     __vsf_component_call_peda_ifs(vk_audio_init, err, pthis->drv->init, 0, pthis);
     return err;
 }
 
-#if VSF_AUDIO_USE_PLAY == ENABLED
-vsf_err_t vk_audio_play_set_volume(vk_audio_dev_t *pthis, uint_fast16_t volume)
+vsf_err_t vk_audio_control(vk_audio_dev_t *pthis, uint_fast8_t stream_idx,
+                    vk_av_control_type_t type, vk_av_control_value_t value)
 {
     vsf_err_t err;
+    vk_audio_stream_t *audio_stream = &pthis->stream[stream_idx];
     VSF_AV_ASSERT(  (pthis != NULL)
-                &&  (pthis->drv != NULL)
-                &&  (pthis->drv->play_drv.volume != NULL));
+                &&  (pthis->stream_num >= stream_idx)
+                &&  (audio_stream->drv != NULL)
+                &&  (audio_stream->drv->control != NULL));
 
-    __vsf_component_call_peda_ifs(vk_audio_play_set_volume, err, pthis->drv->play_drv.volume, 0, pthis,
-        .volume = volume,
+    __vsf_component_call_peda_ifs(vk_audio_control, err, audio_stream->drv->control, 0, pthis,
+        .audio_stream   = audio_stream,
+        .type           = type,
+        .value          = value,
     );
     return err;
 }
 
-vsf_err_t vk_audio_play_set_mute(vk_audio_dev_t *pthis, bool mute)
+vsf_err_t vk_audio_start(vk_audio_dev_t *pthis, uint_fast8_t stream_idx,
+                    vsf_stream_t *stream, vk_audio_format_t *format)
 {
     vsf_err_t err;
-    VSF_AV_ASSERT(  (pthis != NULL)
-                &&  (pthis->drv != NULL)
-                &&  (pthis->drv->play_drv.mute != NULL));
-
-    __vsf_component_call_peda_ifs(vk_audio_play_set_mute, err, pthis->drv->play_drv.mute, 0, pthis,
-        .mute = mute,
-    );
-    return err;
-}
-
-vsf_err_t vk_audio_play_start(vk_audio_dev_t *pthis, vsf_stream_t *stream, vk_audio_format_t *format)
-{
-    vsf_err_t err;
+    vk_audio_stream_t *audio_stream = &pthis->stream[stream_idx];
     VSF_AV_ASSERT(  (pthis != NULL)
                 &&  (format != NULL)
                 &&  (stream != NULL)
-                &&  (pthis->drv != NULL)
-                &&  (pthis->drv->play_drv.play != NULL)
-                &&  (NULL == pthis->play.stream));
+                &&  (pthis->stream_num >= stream_idx)
+                &&  (audio_stream->drv != NULL)
+                &&  (audio_stream->drv->start != NULL)
+                &&  (NULL == audio_stream->stream));
 
-    pthis->play.stream = stream;
-    pthis->play.format = *format;
-    __vsf_component_call_peda_ifs(vk_audio_play_start, err, pthis->drv->play_drv.play, 0, pthis);
+    audio_stream->stream = stream;
+    audio_stream->format = *format;
+    __vsf_component_call_peda_ifs(vk_audio_start, err, audio_stream->drv->start, 0, pthis,
+        .audio_stream   = audio_stream,
+    );
     return err;
 }
 
-vsf_err_t vk_audio_play_pause(vk_audio_dev_t *pthis)
-{
-    // TODO:
-    return VSF_ERR_NOT_SUPPORT;
-}
-
-vsf_err_t vk_audio_play_stop(vk_audio_dev_t *pthis)
+vsf_err_t vk_audio_stop(vk_audio_dev_t *pthis, uint_fast8_t stream_idx)
 {
     vsf_err_t err;
+    vk_audio_stream_t *audio_stream = &pthis->stream[stream_idx];
     VSF_AV_ASSERT(  (pthis != NULL)
-                &&  (pthis->drv != NULL)
-                &&  (pthis->drv->play_drv.stop != NULL));
+                &&  (pthis->stream_num >= stream_idx)
+                &&  (audio_stream->drv != NULL)
+                &&  (audio_stream->drv->stop != NULL));
 
-    __vsf_component_call_peda_ifs(vk_audio_play_stop, err, pthis->drv->play_drv.stop, 0, pthis);
+    __vsf_component_call_peda_ifs(vk_audio_stop, err, audio_stream->drv->stop, 0, pthis,
+        .audio_stream   = audio_stream,
+    );
     return err;
 }
-#endif
 
 #endif

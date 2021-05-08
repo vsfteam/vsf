@@ -23,7 +23,6 @@
 #if VSF_AUDIO_USE_DECODER_WAV == ENABLED
 
 #include "kernel/vsf_kernel.h"
-#include "component/av/audio/vsf_audio.h"
 
 #if     defined(__VSF_WAV_CLASS_IMPLEMENT)
 #   undef __VSF_WAV_CLASS_IMPLEMENT
@@ -45,12 +44,13 @@ typedef enum vk_wav_state_t {
     VSF_WAV_STATE_RIFF,
     VSF_WAV_STATE_FORMAT,
     VSF_WAV_STATE_DATA,
-    VSF_WAV_STATE_PLAY,
+    VSF_WAV_STATE_PLAYBACK,
 } vk_wav_state_t;
 
 vsf_class(vk_wav_t) {
     public_member(
         vk_audio_dev_t      *audio_dev;
+        uint8_t             audio_stream;
         vsf_stream_t        *stream;
         vsf_err_t           result;
     )
@@ -64,8 +64,8 @@ vsf_class(vk_wav_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vk_wav_play_start(vk_wav_t *wav);
-extern vsf_err_t vk_wav_play_stop(vk_wav_t *wav);
+extern vsf_err_t vk_wav_playback_start(vk_wav_t *wav);
+extern vsf_err_t vk_wav_playback_stop(vk_wav_t *wav);
 
 #ifdef __cplusplus
 }

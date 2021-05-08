@@ -31,6 +31,11 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef enum vk_av_control_type_t {
+    VSF_AUDIO_CTRL_VOLUME,
+    VSF_AUDIO_CTRL_MUTE,
+} vk_av_control_type_t;
+
 typedef struct vk_av_control_value_t {
     union {
         void *buffer;
@@ -53,7 +58,9 @@ typedef struct vk_av_control_value_t {
 
 /*============================ INCLUDES ======================================*/
 
-#include "./audio/vsf_audio.h"
+#if VSF_USE_AUDIO == ENABLED
+#   include "./audio/vsf_audio.h"
+#endif
 
 #endif      // VSF_USE_AUDIO || VSF_USE_VIDEO
 #endif      // __VSF_AV_H__
