@@ -149,7 +149,7 @@ static bool __vk_winsound_playback_buffer(vk_winsound_dev_t *dev, uint8_t *buffe
         winsound_buffer->header.dwFlags = 0;
         waveOutPrepareHeader(playback_ctx->hwo, (LPWAVEHDR)&winsound_buffer->header, sizeof(WAVEHDR));
         if (MMSYSERR_NOERROR == waveOutWrite(playback_ctx->hwo, (LPWAVEHDR)&winsound_buffer->header, sizeof(WAVEHDR))) {
-            __vsf_winsound_trace(VSF_TRACE_DEBUG, "play stream: %d bytes %08X\r\n", size, winsound_buffer->buffer);
+            __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: play stream: %d bytes %08X\r\n", vsf_systimer_get_ms(), size, winsound_buffer->buffer);
         }
 
         return true;
@@ -170,7 +170,7 @@ static void __vk_winsound_playback_evthandler(void *param, vsf_stream_evt_t evt)
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_IN:
         while (playback_ctx->is_playing && (playback_ctx->buffer_taken < dimof(playback_ctx->buffer))) {
-            __vsf_winsound_trace(VSF_TRACE_DEBUG, "play stream evthandler\r\n");
+            __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: play stream evthandler\r\n", vsf_systimer_get_ms());
             datasize = vsf_stream_get_rbuf(audio_stream->stream, &buff);
             if (!datasize) { break; }
 
@@ -193,19 +193,16 @@ static void __vk_winsound_playback_irq_thread(void *arg)
 
         __vsf_arch_irq_start(irq_thread);
             if (playback_ctx->buffer_taken > 0) {
-//                vk_winsound_playback_buffer_t *winsound_buffer =
-//                    playback_ctx->play_ticktock ? &playback_ctx->buffer[0] : &playback_ctx->buffer[1];
-//                WAVEHDR *header = (WAVEHDR *)&winsound_buffer->header;
+                vk_winsound_playback_buffer_t *winsound_buffer =
+                    playback_ctx->play_ticktock ? &playback_ctx->buffer[0] : &playback_ctx->buffer[1];
+                WAVEHDR *header = (WAVEHDR *)&winsound_buffer->header;
                 playback_ctx->play_ticktock = !playback_ctx->play_ticktock;
-                __vsf_winsound_trace(VSF_TRACE_DEBUG, "winsound irq: %02X %d %08X\r\n", header->dwFlags, header->dwBufferLength, header->lpData);
-                // seems no need to wait WHDR_DONE
-//                if (header->dwFlags & WHDR_DONE) {
-                    vsf_protect_t orig = vsf_protect_int();
-                        playback_ctx->buffer_taken--;
-                    vsf_unprotect_int(orig);
-                    __vk_winsound_playback_evthandler(playback_ctx->audio_stream, VSF_STREAM_ON_IN);
-//                }
-                __vsf_winsound_trace(VSF_TRACE_DEBUG, "winsound irq end\r\n");
+
+                __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: playback evt %d\r\n", vsf_systimer_get_ms(), header->dwFlags);
+                vsf_protect_t orig = vsf_protect_int();
+                    playback_ctx->buffer_taken--;
+                vsf_unprotect_int(orig);
+                __vk_winsound_playback_evthandler(playback_ctx->audio_stream, VSF_STREAM_ON_IN);
             }
         __vsf_arch_irq_end(irq_thread, false);
     }
