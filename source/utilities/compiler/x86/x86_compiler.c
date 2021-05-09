@@ -92,5 +92,20 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
     return 0;
 }
 #       endif
+
+int clock_gettime(clockid_t clk_id, struct timespec *tp)
+{
+    switch (clk_id) {
+    case CLOCK_MONOTONIC: {
+            uint_fast32_t us = vsf_systimer_get_us();
+            tp->tv_sec = us / 1000000;
+            tp->tv_nsec = us * 1000;
+        }
+        return 0;
+    default:
+        return -1;
+    }
+}
+
 #   endif
 #endif
