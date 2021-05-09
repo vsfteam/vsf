@@ -73,15 +73,6 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
     }
 }
 
-int gettimeofday(struct timeval *tv, struct timezone *tz)
-{
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    tv->tv_sec = ts.tv_sec;
-    tv->tv_usec = ts.tv_nsec / 1000;
-    return 0;
-}
-
 #if __IS_COMPILER_LLVM__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wvisibility"

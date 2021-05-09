@@ -1584,6 +1584,16 @@ key_t ftok(const char *pathname, int id)
     return -1;
 }
 
+// sys/time.h
+int gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    tv->tv_sec = ts.tv_sec;
+    tv->tv_usec = ts.tv_nsec / 1000;
+    return 0;
+}
+
 #if VSF_LINUX_CFG_SHM_NUM > 0
 // shm.h
 int shmget(key_t key, size_t size, int shmflg)
