@@ -315,7 +315,14 @@ extern void               vsf_usart_irq_enable(     vsf_usart_t *usart_ptr,
 extern void               vsf_usart_irq_disable(    vsf_usart_t *usart_ptr,
                                                     em_usart_irq_mask_t irq_mask);
 
+#if __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
+#endif
 extern usart_status_t     vsf_usart_status(         vsf_usart_t *usart_ptr);
+#if __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 
 extern uint_fast16_t      vsf_usart_fifo_read(      vsf_usart_t *usart_ptr,
                                                     void *buffer_ptr,
