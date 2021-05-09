@@ -76,6 +76,7 @@ extern "C" {
 #define libusb_get_configuration                        __vsf_libusb_get_configuration
 #endif
 
+#define LIBUSB_CALL
 #define LIBUSB_HOTPLUG_MATCH_ANY        -1
 
 #define libusb_device_descriptor        usb_device_desc_t
@@ -208,7 +209,8 @@ typedef struct libusb_context libusb_context;
 
 struct libusb_device;
 typedef struct libusb_device libusb_device;
-typedef libusb_device libusb_device_handle;
+struct libusb_device_handle;
+typedef struct libusb_device_handle libusb_device_handle;
 
 typedef enum {
     LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED = 1 << 1,
