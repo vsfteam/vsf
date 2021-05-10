@@ -421,8 +421,9 @@ ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device *** list)
         }
         devlist[i] = NULL;
         *list = devlist;
+        return devnum;
     }
-    return devnum;
+    return LIBUSB_ERROR_NO_DEVICE;
 }
 
 void libusb_free_device_list(libusb_device **list, int unref_devices)
@@ -1071,7 +1072,7 @@ int usb_detach_kernel_driver_np(usb_dev_handle *dev, int interface)
 
 int usb_find_devices(void)
 {
-    return __vsf_libusb.devnum;
+    return __vsf_libusb.devnum > 0 ? __vsf_libusb.devnum : LIBUSB_ERROR_NO_DEVICE;
 }
 
 struct usb_bus *usb_get_busses(void)
