@@ -487,6 +487,15 @@ static vsf_err_t __vk_dwcotg_dcd_ep_out_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, ui
         out_regs->doepdma = (uint32_t)trans->buffer;
     }
 
+    // set odd/even frame for iso endpoint
+    if (1 == ((*ep_ctrl >> 18) & 0x03)) {
+        if (vk_dwcotg_dcd_get_frame_number(dwcotg_dcd) & 1) {
+            out_regs->doepctl |= USB_OTG_DOEPCTL_SD0PID_SEVNFRM;
+        } else {
+            out_regs->doepctl |= USB_OTG_DOEPCTL_SODDFRM;
+        }
+    }
+
     out_regs->doepctl |= USB_OTG_DOEPCTL_EPENA | USB_OTG_DOEPCTL_CNAK;
     return VSF_ERR_NONE;
 }
@@ -541,6 +550,19 @@ static vsf_err_t __vk_dwcotg_dcd_ep_in_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, uin
         pkt_cnt++;
     }
     in_regs->dieptsiz = (pkt_cnt << 19) | size;
+
+    // set odd/even frame and mulcnt for iso endpoint
+    // TODO: is code below necessary?
+    if (1 == ((*ep_ctrl >> 18) & 0x03)) {
+        in_regs->dieptsiz &= ~USB_OTG_DIEPTSIZ_MULCNT;
+        in_regs->dieptsiz |= 1 << 29;
+
+        if (vk_dwcotg_dcd_get_frame_number(dwcotg_dcd) & 1) {
+            in_regs->diepctl |= USB_OTG_DIEPCTL_SD0PID_SEVNFRM;
+        } else {
+            in_regs->diepctl |= USB_OTG_DIEPCTL_SODDFRM;
+        }
+    }
 
     if (trans->use_dma) {
         in_regs->diepdma = (uint32_t)trans->buffer;
