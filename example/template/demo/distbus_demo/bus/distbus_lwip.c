@@ -204,9 +204,9 @@ static void __user_distbus_lwip_thread(void *param)
         }
 #elif   APP_DISTBUS_DEMO_CFG_LWIP_CLIENT == ENABLED
         struct tcp_pcb *tpcb = tcp_new();
-        struct ip_addr ipaddr;
+        ip_addr_t ipaddr;
         // TODO: use configurable ipaddr
-        IP_ADDR4(&ipaddr, 192, 168, 1, 6);
+        IP_ADDR4(&ipaddr, 192, 168, 88, 1);
         if (    (NULL != tpcb)
             &&  (ERR_OK == tcp_connect(tpcb, &ipaddr, APP_DISTBUS_DEMO_CFG_LWIP_PORT,
                                         __user_distbus_lwip_on_connected))) {
