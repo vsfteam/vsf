@@ -165,26 +165,19 @@ void vsh_set_path(char **path)
 
 static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
 {
-    vsf_linux_process_t *process = vsf_linux_create_process(0);
-    if (NULL == process) { return -ENOMEM; }
-
-    vsf_linux_process_ctx_t *ctx = &process->ctx;
-    char *cur = cmd_ctx->cmd;
-    do {
-        ctx->arg.argv[ctx->arg.argc++] = cur;
-        while ((*cur != '\0') && !isspace(*cur)) { cur++; }
-        while ((*cur != '\0') && isspace(*cur)) { *cur++ = '\0'; }
-    } while (*cur != '\0');
-
-    char pathname[PATH_MAX];
+    char pathname[PATH_MAX], *cur = cmd_ctx->cmd;
     int exefd = -1, err;
     char **path = __vsh_path;
+    vsf_linux_main_entry_t entry;
+
+    while ((*cur != '\0') && !isspace(*cur)) { cur++; }
+    while ((*cur != '\0') && isspace(*cur)) { *cur++ = '\0'; }
 
     // search in path first if not absolute path
-    if (ctx->arg.argv[0][0] != '/') {
+    if (cmd_ctx->cmd[0] != '/') {
         while (*path != NULL) {
-            if (!vsf_linux_generate_path(pathname, sizeof(pathname), *path, (char *)ctx->arg.argv[0])) {
-                exefd = vsf_linux_fs_get_executable(pathname, &ctx->entry);
+            if (!vsf_linux_generate_path(pathname, sizeof(pathname), *path, (char *)cmd_ctx->cmd)) {
+                exefd = vsf_linux_fs_get_executable(pathname, &entry);
                 if (exefd >= 0) {
                     break;
                 }
@@ -195,13 +188,24 @@ static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
 
     // search in working_dir if not found in path
     if (exefd < 0) {
-        exefd = vsf_linux_fs_get_executable((char *)ctx->arg.argv[0], &ctx->entry);
+        exefd = vsf_linux_fs_get_executable((char *)cmd_ctx->cmd, &entry);
         if (exefd < 0) {
-            printf("%s not found" VSH_LINEEND, ctx->arg.argv[0]);
+            printf("%s not found" VSH_LINEEND, cmd_ctx->cmd);
             err = -ENOENT;
-            free(process);
             return err;
         }
+    }
+
+    vsf_linux_process_t *process = vsf_linux_create_process(0);
+    if (NULL == process) { return -ENOMEM; }
+
+    vsf_linux_process_ctx_t *ctx = &process->ctx;
+    ctx->entry = entry;
+    ctx->arg.argv[ctx->arg.argc++] = cmd_ctx->cmd;
+    while ((*cur != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
+        ctx->arg.argv[ctx->arg.argc++] = cur;
+        while ((*cur != '\0') && !isspace(*cur)) { cur++; }
+        while ((*cur != '\0') && isspace(*cur)) { *cur++ = '\0'; }
     }
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
