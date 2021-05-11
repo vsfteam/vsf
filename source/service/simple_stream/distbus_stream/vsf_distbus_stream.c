@@ -71,6 +71,7 @@ bool __vsf_distbus_stream_msghandler(vsf_distbus_t *bus,
             VSF_SERVICE_ASSERT(distbus_stream->is_tx);
             vsf_protect_t orig = vsf_protect_int();
                 vsf_slist_queue_enqueue(vsf_distbus_msg_t, node, &distbus_stream->msgq, msg);
+                distbus_stream->data_size += msg->header.datalen;
             vsf_unprotect_int(orig);
             retain_msg = true;
             __vsf_stream_on_write(&distbus_stream->use_as__vsf_stream_t);
@@ -86,6 +87,7 @@ bool __vsf_distbus_stream_msghandler(vsf_distbus_t *bus,
 static void __vsf_distbus_stream_init(vsf_stream_t *stream)
 {
     vsf_distbus_stream_t *distbus_stream = (vsf_distbus_stream_t *)stream;
+    distbus_stream->data_size = 0;
     if (distbus_stream->is_tx) {
         vsf_slist_queue_init(&distbus_stream->msgq);
         vsf_stream_connect_tx(&distbus_stream->use_as__vsf_stream_t);
@@ -104,10 +106,12 @@ static uint_fast32_t __vsf_distbus_stream_get_buff_length(vsf_stream_t *stream)
 static uint_fast32_t __vsf_distbus_stream_get_data_length(vsf_stream_t *stream)
 {
     vsf_distbus_stream_t *distbus_stream = (vsf_distbus_stream_t *)stream;
-    if (distbus_stream->is_tx) {
-        return distbus_stream->mtu;
-    }
-    return 0;
+    uint_fast32_t data_size;
+
+    vsf_protect_t orig = vsf_protect_int();
+        data_size = distbus_stream->data_size;
+    vsf_unprotect_int(orig);
+    return data_size;
 }
 
 static uint_fast32_t __vsf_distbus_stream_get_avail_length(vsf_stream_t *stream)
@@ -197,6 +201,9 @@ static uint_fast32_t __vsf_distbus_stream_read(vsf_stream_t *stream, uint8_t *bu
         VSF_SERVICE_ASSERT(msg->pos + size <= sizeof(msg->header) + msg->header.datalen);
         msg->pos += size;
         realsize = size;
+        orig = vsf_protect_int();
+            distbus_stream->data_size -= size;
+        vsf_unprotect_int(orig);
         if (msg->pos == sizeof(msg->header) + msg->header.datalen) {
             orig = vsf_protect_int();
                 vsf_slist_queue_dequeue(vsf_distbus_msg_t, node, &distbus_stream->msgq, msg);

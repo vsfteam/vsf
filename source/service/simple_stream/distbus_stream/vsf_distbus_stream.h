@@ -80,6 +80,7 @@ vsf_class(vsf_distbus_stream_t) {
         bool is_tx;
     )
     private_member(
+        uint32_t data_size;
         union {
             struct {
                 vsf_distbus_msg_t *msg;
