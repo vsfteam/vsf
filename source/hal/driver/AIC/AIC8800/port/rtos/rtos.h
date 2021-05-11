@@ -29,6 +29,49 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+enum {
+    TASK_PRIORITY_CONSOLE              = RTOS_TASK_PRIORITY(1),
+    TASK_PRIORITY_TEST                 = RTOS_TASK_PRIORITY(1),
+    TASK_PRIORITY_BT_TASK              = RTOS_TASK_PRIORITY(2),
+    TASK_PRIORITY_INTERSYS_TASK        = RTOS_TASK_PRIORITY(2),
+    TASK_PRIORITY_ASIO                 = RTOS_TASK_PRIORITY(3),
+    TASK_PRIORITY_AUDIO                = RTOS_TASK_PRIORITY(3),
+    TASK_PRIORITY_DSP                  = RTOS_TASK_PRIORITY(2),
+    TASK_PRIORITY_WIFI_VOICE           = RTOS_TASK_PRIORITY(1),
+    TASK_PRIORITY_WIFI_TCPIP           = RTOS_TASK_PRIORITY(3),
+    TASK_PRIORITY_WIFI_CNTRL           = RTOS_TASK_PRIORITY(2),
+    TASK_PRIORITY_WIFI_IPC             = RTOS_TASK_PRIORITY(4),
+    TASK_PRIORITY_WIFI_WPA             = RTOS_TASK_PRIORITY(1),
+    TASK_PRIORITY_WIFI_TG_SEND         = RTOS_TASK_PRIORITY(2),
+    TASK_PRIORITY_WIFI_PING_SEND       = RTOS_TASK_PRIORITY(1),
+    TASK_PRIORITY_WIFI_IPERF           = RTOS_TASK_PRIORITY(1),
+    TASK_PRIORITY_WIFI_SMARTCONF       = RTOS_TASK_PRIORITY(2),
+    TASK_PRIORITY_MAX                  = RTOS_TASK_PRIORITY(4),
+};
+
+/// Definitions of the different FHOST task stack size requirements
+enum {
+    TASK_STACK_SIZE_CONSOLE              = 512,
+    TASK_STACK_SIZE_TEST                 = 2048,
+    TASK_STACK_SIZE_BT_TASK              = 3072,
+    TASK_STACK_SIZE_ASIO                 = 2048,
+    TASK_STACK_SIZE_AUDIO                = 2048,
+    TASK_STACK_SIZE_BLE_TASK_ONLY        = 512,
+    TASK_STACK_SIZE_BT_BLE_TASK          = 4096,
+    TASK_STACK_SIZE_DSP                  = 512,
+    TASK_STACK_SIZE_WIFI_VOICE           = 512,
+    TASK_STACK_SIZE_WIFI_TCPIP           = 1024,
+    TASK_STACK_SIZE_WIFI_CNTRL           = 640,
+    TASK_STACK_SIZE_WIFI_IPC             = 512,
+    TASK_STACK_SIZE_WIFI_WPA             = 1024,
+    TASK_STACK_SIZE_WIFI_TG_SEND         = 1024,
+    TASK_STACK_SIZE_WIFI_PING_SEND       = 512,
+    TASK_STACK_SIZE_WIFI_IPERF           = 1024,
+    TASK_STACK_SIZE_WIFI_SMARTCONF       = 512,
+
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
