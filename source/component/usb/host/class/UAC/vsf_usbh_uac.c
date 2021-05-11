@@ -423,24 +423,20 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 break;
             case VSF_USBH_UAC_SUBEVT_STREAM: {
                     uint_fast16_t frame_size = uac_stream->channel_num * uac_stream->sample_size * uac_stream->sample_rate / 1000;
+                    uint_fast16_t stream_size;
                     int_fast8_t urb_idx;
 
-                    if (uac_stream->is_in) {
-                        if (vsf_stream_get_free_size(uac_stream->stream) < frame_size) {
-                            break;
+                    stream_size = uac_stream->is_in ?
+                                    vsf_stream_get_free_size(uac_stream->stream)
+                                :   vsf_stream_get_data_size(uac_stream->stream);
+                    if (stream_size >= frame_size) {
+                        urb_idx = vsf_ffz(uac_stream->urb_mask | ~((1 << sizeof(uac_stream->urb_mask)) - 1));
+                        if (urb_idx >= 0) {
+                            __vk_usbh_uac_submit_urb_iso(uac, uac_stream, urb_idx);
                         }
-                    } else {
-                        if (vsf_stream_get_data_size(uac_stream->stream) < frame_size) {
-                            break;
-                        }
-                    }
-
-                    urb_idx = vsf_ffz(uac_stream->urb_mask | ~((1 << sizeof(uac_stream->urb_mask)) - 1));
-                    if (urb_idx >= 0) {
-                        __vk_usbh_uac_submit_urb_iso(uac, uac_stream, urb_idx);
                     }
                 }
-                break;
+                return;
             case VSF_USBH_UAC_SUBEVT_SUBMIT_REQ:
                 break;
             }
