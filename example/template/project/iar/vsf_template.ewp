@@ -10176,7 +10176,7 @@
                                     <group>
                                         <name>lib</name>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\lib\armgcc_4_8\libdrv.a</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\lib\armgcc_4_8\libdrv_lite.a</name>
                                         </file>
                                     </group>
                                     <group>
