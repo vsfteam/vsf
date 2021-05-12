@@ -19,32 +19,29 @@
 
 #include "./intc.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
 typedef void (*__isr_t)(void);
 
 /*============================ GLOBAL VARIABLES ==============================*/
-extern 
-const __isr_t __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE;
+
+extern const __isr_t __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-ROOT 
+ROOT
 #if __IS_COMPILER_IAR__
-__irq __nested __arm 
+__irq __nested __arm
 #endif
 void IRQ_Handler(void)
 {
     __isr_t *isr_handler = NULL;
     int32_t irq_idx = 0;
-    
+
     do {
         //! fetch the vector from INTC
         isr_handler = (__isr_t *)F1CX00S_INTC.VECTOR;
@@ -58,7 +55,7 @@ void IRQ_Handler(void)
         //! clear corresponding pending bit
         F1CX00S_INTC.PENDING[irq_idx >> 5] = 1 << (irq_idx & 0x1F);             //!< clear pending bit
         F1CX00S_INTC.STIR[irq_idx >> 5] &= ~(1 << (irq_idx & 0x1F));            //!< clear STIR bit
-        F1CX00S_INTC.RESP[irq_idx >> 5] = (1 << (irq_idx & 0x1F));              //!< disable same level interrupt 
+        F1CX00S_INTC.RESP[irq_idx >> 5] = (1 << (irq_idx & 0x1F));              //!< disable same level interrupt
         isb();
         vsf_enable_interrupt();                                                 //!< enable preemption
 
@@ -118,8 +115,3 @@ __arm void intc_disable_irq(IRQn_Type IRQn)
     dsb();
     isb();
 }
-
-
-#ifdef __cplusplus
-}
-#endif
