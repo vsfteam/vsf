@@ -991,6 +991,30 @@
     <Filter Include="vsf\hal\driver\vsf\distbus\usbd">
       <UniqueIdentifier>{dd3cbac8-3d0d-4f45-9bdc-f2a7c066672d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\LingLongGui_demo">
+      <UniqueIdentifier>{18e70199-509b-462c-abaa-bb19677b1288}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\LingLongGui_demo\application">
+      <UniqueIdentifier>{40fcae73-dbdd-44c8-9a46-0099ce741bb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\LingLongGui_demo\application\Fonts">
+      <UniqueIdentifier>{22882236-6da1-48bc-9595-e73660bcda49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\LingLongGUI">
+      <UniqueIdentifier>{b9b38bf9-9318-4153-bb3f-5e7f1f9e8bdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\LingLongGUI\raw">
+      <UniqueIdentifier>{46fe314d-e6ea-4604-8f86-57cc67ed84ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\LingLongGUI\raw\Gui">
+      <UniqueIdentifier>{3c65b298-9871-449a-b604-272200d06c8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\LingLongGUI\raw\Misc">
+      <UniqueIdentifier>{7321cedd-7da0-4bec-8025-6293a9dccb04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\LingLongGUI\port">
+      <UniqueIdentifier>{76aa02d0-fd31-49db-acb0-8e0a3906a0b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -2948,6 +2972,108 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_log.h">
       <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Background.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Button.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ButtonEx.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_CheckBox.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ComboBox.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_DateTime.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Gauge.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_General.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Graph.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Handler.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_IconSlider.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Image.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Keyboard.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_LineEdit.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ProgressBar.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_QRCode.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Slider.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Text.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Window.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\asciiDefine.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Characters.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Font.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Lattice.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Linked_List.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Port.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Queue.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_String.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Timer.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\qrcodegen.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\LingLongGui_demo\application\Fonts\SimSun_9.h">
+      <Filter>usrapp\demo\LingLongGui_demo\application\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\LingLongGui_demo\application\LL_User.h">
+      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\LingLongGui_demo\application\ui_ll_application.h">
+      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\LingLongGui_demo\application\ui_ll_applicationLogic.h">
+      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\port\LL_Config.h">
+      <Filter>vsf\component\3rd-party\LingLongGUI\port</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -4990,6 +5116,108 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\utilities\compiler\x86\x86_compiler.c">
       <Filter>vsf\utilities\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Background.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Button.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ButtonEx.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_CheckBox.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ComboBox.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_DateTime.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Gauge.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_General.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Graph.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Handler.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_IconSlider.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Image.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Keyboard.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_LineEdit.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ProgressBar.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_QRCode.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Slider.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Text.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Window.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Characters.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Font.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Lattice.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Linked_List.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Port.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Queue.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_String.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Timer.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\qrcodegen.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\LingLongGui_demo\application\Fonts\SimSun_9.c">
+      <Filter>usrapp\demo\LingLongGui_demo\application\Fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\LingLongGui_demo\application\LL_User.c">
+      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\LingLongGui_demo\application\ui_ll_application.c">
+      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\LingLongGui_demo\application\ui_ll_applicationLogic.c">
+      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\LingLongGui_demo\llgui_demo.c">
+      <Filter>usrapp\demo\LingLongGui_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\port\LL_Config.c">
+      <Filter>vsf\component\3rd-party\LingLongGUI\port</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

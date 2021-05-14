@@ -49,3 +49,6 @@
 [submodule "evm"]
 	path = source/component/3rd-party/evm/raw
 	url = ../evm
+[submodule "source/component/3rd-party/LingLongGUI/raw"]
+	path = source/component/3rd-party/LingLongGUI/raw
+	url = ../LingLongGUI
