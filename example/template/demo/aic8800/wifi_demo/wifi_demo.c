@@ -62,16 +62,21 @@ extern void set_mac_address(uint8_t *addr);
 
 static int __wifi_ap_main(int argc, char *argv[])
 {
-    if (argc < 2) {
-        printf("format: %s SSID [PASSWD]\r\n", argv[0]);
+    if (argc < 3) {
+        printf("format: %s SSID PASSWD [CHANNEL]\r\n", argv[0]);
         return -1;
     }
 
-    char *ssid = argv[1], *pass = argc > 2 ? argv[2] : "";
+    char *ssid = argv[1], *pass = argv[2];
     is_ap = true;
     set_mac_address(NULL);
     int ret = wlan_start_ap(0, (uint8_t *)ssid, (uint8_t *)pass);
     if (!ret) {
+        if (argc > 3) {
+            uint8_t channel = strtoul(argv[3], NULL, 10);
+            VSF_ASSERT(channel <= 14);
+            wlan_ap_switch_channel(channel);
+        }
         printf("wifi ap started.\r\n");
     } else {
         printf("fail to start wifi ap.\r\n");
