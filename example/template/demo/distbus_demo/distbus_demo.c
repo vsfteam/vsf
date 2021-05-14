@@ -49,6 +49,7 @@ def_vsf_pool(__user_distbus_msg_pool, __user_distbus_msg_t)
 typedef struct __user_distbus_t {
     vsf_distbus_t                           distbus;
     vsf_pool(__user_distbus_msg_pool)       msg_pool;
+    bool                                    is_master;
 } __user_distbus_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -83,6 +84,11 @@ static __user_distbus_t __user_distbus = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+bool __user_distbus_is_master(void)
+{
+    return __user_distbus.is_master;
+}
+
 imp_vsf_pool(__user_distbus_msg_pool, __user_distbus_msg_t)
 
 static void __user_distbus_on_error(vsf_distbus_t *distbus)
@@ -101,36 +107,46 @@ static void __user_distbus_free_msg(void *msg)
     VSF_POOL_FREE(__user_distbus_msg_pool, &__user_distbus.msg_pool, msg);
 }
 
-#if APP_USE_LINUX_DEMO == ENABLED
+static void __user_distbus_on_connected(vsf_distbus_t *distbus)
+{
+    if (__user_distbus_is_master()) {
+    } else {
+    }
+}
+
 int distbus_main(int argc, char *argv[])
 {
-#else
-int VSF_USER_ENTRY(void)
-{
-#   if VSF_USE_TRACE == ENABLED
-    vsf_start_trace();
-#       if USRAPP_CFG_STDIO_EN == ENABLED
-    vsf_stdio_init();
-#       endif
-#   endif
-#endif
+    if ((argc < 2) || (argv[1][0] != '-')) {
+    print_help:
+        printf("format: %s -s/-m\r\n", argv[0]);
+        return -1;
+    }
+    switch (argv[1][1]) {
+    case 's':
+        __user_distbus.is_master = false;
+        break;
+    case 'm':
+        __user_distbus.is_master = true;
+        break;
+    default:
+        goto print_help;
+    }
 
-#if     APP_USE_DISTBUS_HAL_SLAVE_DEMO == ENABLED
-    extern void __user_distbus_hal_service_init(vsf_distbus_t *distbus);
-    __user_distbus_hal_service_init(&__user_distbus.distbus);
-#elif   APP_USE_DISTBUS_HAL_MASTER_DEMO == ENABLED
-    usrapp_usbd_common.hal_distbus.distbus = &__user_distbus.distbus;
-    vsf_hal_distbus_register_service(&usrapp_usbd_common.hal_distbus);
+    if (__user_distbus_is_master()) {
+#if APP_USE_DISTBUS_HAL_DEMO == ENABLED
+        usrapp_usbd_common.hal_distbus.distbus = &__user_distbus.distbus;
+        vsf_hal_distbus_register_service(&usrapp_usbd_common.hal_distbus);
 #endif
+    } else {
+#if APP_USE_DISTBUS_HAL_DEMO == ENABLED
+        extern void __user_distbus_hal_service_init(vsf_distbus_t *distbus);
+        __user_distbus_hal_service_init(&__user_distbus.distbus);
+#endif
+    }
 
     VSF_POOL_INIT(__user_distbus_msg_pool, &__user_distbus.msg_pool, APP_DISTBUS_DEMO_CFG_POOL_NUM);
+    __user_distbus.distbus.on_connected = __user_distbus_on_connected;
     vsf_distbus_init(&__user_distbus.distbus);
-
-#if APP_USE_LINUX_DEMO != ENABLED
-    while (1) {
-        vsf_arch_sleep(0);
-    }
-#endif
 
     return 0;
 }

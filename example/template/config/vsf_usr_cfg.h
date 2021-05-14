@@ -50,6 +50,7 @@
 #define VSF_USE_FIFO                                    ENABLED
 #define VSF_USE_JSON                                    ENABLED
 #define VSF_USE_DISTBUS                                 ENABLED
+#   define VSF_DISTBUS_CFG_DEBUG                        ENABLED
 #define VSF_USE_HASH                                    ENABLED
 #define VSF_HASH_USE_CRC                                ENABLED
 

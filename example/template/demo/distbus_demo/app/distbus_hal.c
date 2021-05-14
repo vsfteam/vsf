@@ -20,7 +20,7 @@
 #include "vsf_cfg.h"
 
 #if     VSF_USE_USB_DEVICE == ENABLED && VSF_USE_DISTBUS == ENABLED             \
-    &&  APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_HAL_SLAVE_DEMO == ENABLED
+    &&  APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_HAL_DEMO == ENABLED
 
 #define __VSF_DISTBUS_CLASS_INHERIT__
 // for distbus_dcd constants
@@ -37,7 +37,7 @@
 typedef struct __user_distbus_hal_service_t {
     vsf_distbus_service_t   service;
 
-#if APP_USE_DISTBUS_HAL_USBD_SLAVE_DEMO == ENABLED
+#if APP_USE_DISTBUS_HAL_USBD_DEMO == ENABLED
     struct {
         vsf_distbus_msg_t   *msg[32];
         bool                is_set_address;
@@ -68,7 +68,7 @@ static __user_distbus_hal_service_t __user_distbus_hal_service = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if APP_USE_DISTBUS_HAL_USBD_SLAVE_DEMO == ENABLED
+#if APP_USE_DISTBUS_HAL_USBD_DEMO == ENABLED
 static void __user_usbd_evthandler(void *param, usb_evt_t evt, uint_fast8_t value)
 {
     vsf_distbus_t *distbus = (vsf_distbus_t *)param;
@@ -227,7 +227,7 @@ static bool __user_distbus_hal_service_msghandler(vsf_distbus_t *distbus,
 #   pragma diag_suppress=pe186
 #endif
 
-#if APP_USE_DISTBUS_HAL_USBD_SLAVE_DEMO == ENABLED
+#if APP_USE_DISTBUS_HAL_USBD_DEMO == ENABLED
     if ((addr >= VSF_HAL_DISTBUS_USBD_CMD_BEGIN) && (addr <= VSF_HAL_DISTBUS_USBD_CMD_END)) {
         retain_msg = __user_distbus_usbd_service_msghandler(distbus, service, msg);
     }

@@ -20,7 +20,7 @@
 #include "vsf.h"
 
 #if     VSF_USE_DISTBUS == ENABLED &&  APP_USE_DISTBUS_DEMO == ENABLED          \
-    &&  (APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED || APP_DISTBUS_DEMO_CFG_LWIP_CLIENT == ENABLED)
+    &&  APP_DISTBUS_DEMO_CFG_LWIP == ENABLED
 
 #include "lwip/tcpip.h"
 #include "lwip/tcp.h"
@@ -48,11 +48,8 @@ enum {
 typedef struct __user_distbus_lwip_t {
     sys_thread_t thread;
 
-#if APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED
     struct tcp_pcb *listener_pcb;
-#endif
     struct tcp_pcb *work_pcb;
-
     struct pbuf *pbuf_rx;
 
     void *on_inited_param;
@@ -75,6 +72,7 @@ typedef struct __user_distbus_lwip_t {
 
 // extern pbuf_free_header, which is maybe not implemented in older lwip
 extern struct pbuf * pbuf_free_header(struct pbuf *q, u16_t size);
+extern bool __user_distbus_is_master(void);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -152,17 +150,19 @@ static err_t __user_distbus_lwip_on_recv(void *arg, struct tcp_pcb *tpcb, struct
     return ERR_OK;
 }
 
+static err_t __user_distbus_lwip_on_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
+{
+    __user_distbus_lwip_t *distbus_lwip = (__user_distbus_lwip_t *)arg;
+    return ERR_OK;
+}
+
 static void __user_distbus_lwip_on_err(void *arg, err_t err)
 {
     __user_distbus_lwip_t *distbus_lwip = (__user_distbus_lwip_t *)arg;
     __user_distbus_lwip_reset(distbus_lwip);
 }
 
-#if     APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED
-static err_t __user_distbus_lwip_on_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
-#elif   APP_DISTBUS_DEMO_CFG_LWIP_CLIENT == ENABLED
-static err_t __user_distbus_lwip_on_connected(void *arg, struct tcp_pcb *newpcb, err_t err)
-#endif
+static err_t __user_distbus_lwip_on_connected_or_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
 {
     __user_distbus_lwip_t *distbus_lwip = (__user_distbus_lwip_t *)arg;
 
@@ -172,11 +172,12 @@ static err_t __user_distbus_lwip_on_connected(void *arg, struct tcp_pcb *newpcb,
 
     distbus_lwip->work_pcb = newpcb;
     tcp_arg(newpcb, distbus_lwip);
-#if     APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED
-    tcp_accepted(newpcb);
-#endif
+    if (!__user_distbus_is_master()) {
+        tcp_accepted(newpcb);
+    }
     tcp_recv(newpcb, __user_distbus_lwip_on_recv);
     tcp_err(newpcb, __user_distbus_lwip_on_err);
+    tcp_sent(newpcb, __user_distbus_lwip_on_sent);
 
     if (distbus_lwip->on_inited != NULL) {
         distbus_lwip->on_inited(distbus_lwip->on_inited_param);
@@ -184,36 +185,46 @@ static err_t __user_distbus_lwip_on_connected(void *arg, struct tcp_pcb *newpcb,
     return ERR_OK;
 }
 
+static err_t __user_distbus_lwip_on_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
+{
+    return __user_distbus_lwip_on_connected_or_accept(arg, newpcb, err);
+}
+
+static err_t __user_distbus_lwip_on_connected(void *arg, struct tcp_pcb *newpcb, err_t err)
+{
+    return __user_distbus_lwip_on_connected_or_accept(arg, newpcb, err);
+}
+
 static void __user_distbus_lwip_thread(void *param)
 {
     __user_distbus_lwip_t *distbus_lwip = (__user_distbus_lwip_t *)param;
 
     LOCK_TCPIP_CORE();
-#if     APP_DISTBUS_DEMO_CFG_LWIP_SERVER == ENABLED
-        if (    (NULL == (distbus_lwip->listener_pcb = tcp_new()))
-            ||  (ERR_OK != tcp_bind(distbus_lwip->listener_pcb, IP_ADDR_ANY, APP_DISTBUS_DEMO_CFG_LWIP_PORT))
-            ||  (NULL == (distbus_lwip->listener_pcb = tcp_listen_with_backlog(distbus_lwip->listener_pcb, 1)))) {
+        if (__user_distbus_is_master()) {
+            struct tcp_pcb *tpcb = tcp_new();
+            ip_addr_t ipaddr;
+            // TODO: use configurable ipaddr
+            IP_ADDR4(&ipaddr, 192, 168, 88, 1);
+            if (    (NULL != tpcb)
+                &&  (ERR_OK == tcp_connect(tpcb, &ipaddr, APP_DISTBUS_DEMO_CFG_LWIP_PORT,
+                                            __user_distbus_lwip_on_connected))) {
 
-            if (distbus_lwip->listener_pcb != NULL) {
-                tcp_close(distbus_lwip->listener_pcb);
-                distbus_lwip->listener_pcb = NULL;
+                tcp_arg(tpcb, distbus_lwip);
             }
         } else {
-            tcp_arg(distbus_lwip->listener_pcb, distbus_lwip);
-            tcp_accept(distbus_lwip->listener_pcb, __user_distbus_lwip_on_accept);
-        }
-#elif   APP_DISTBUS_DEMO_CFG_LWIP_CLIENT == ENABLED
-        struct tcp_pcb *tpcb = tcp_new();
-        ip_addr_t ipaddr;
-        // TODO: use configurable ipaddr
-        IP_ADDR4(&ipaddr, 192, 168, 88, 1);
-        if (    (NULL != tpcb)
-            &&  (ERR_OK == tcp_connect(tpcb, &ipaddr, APP_DISTBUS_DEMO_CFG_LWIP_PORT,
-                                        __user_distbus_lwip_on_connected))) {
+            if (    (NULL == (distbus_lwip->listener_pcb = tcp_new()))
+                ||  (ERR_OK != tcp_bind(distbus_lwip->listener_pcb, IP_ADDR_ANY, APP_DISTBUS_DEMO_CFG_LWIP_PORT))
+                ||  (NULL == (distbus_lwip->listener_pcb = tcp_listen_with_backlog(distbus_lwip->listener_pcb, 1)))) {
 
-            tcp_arg(tpcb, distbus_lwip);
+                if (distbus_lwip->listener_pcb != NULL) {
+                    tcp_close(distbus_lwip->listener_pcb);
+                    distbus_lwip->listener_pcb = NULL;
+                }
+            } else {
+                tcp_arg(distbus_lwip->listener_pcb, distbus_lwip);
+                tcp_accept(distbus_lwip->listener_pcb, __user_distbus_lwip_on_accept);
+            }
         }
-#endif
     UNLOCK_TCPIP_CORE();
 
     vsf_evt_t evt;
@@ -232,10 +243,13 @@ static void __user_distbus_lwip_thread(void *param)
                 void (*on_sent)(void *p) = distbus_lwip->on_sent;
 
                 LOCK_TCPIP_CORE();
-                    err = tcp_write(distbus_lwip->work_pcb, buffer, size, 1);
-                    err += tcp_output(distbus_lwip->work_pcb);
+                    err = tcp_write(distbus_lwip->work_pcb, buffer, size, TCP_WRITE_FLAG_COPY);
+                    VSF_ASSERT(ERR_OK == err);
+                    if (ERR_OK == err) {
+                        err = tcp_output(distbus_lwip->work_pcb);
+                        VSF_ASSERT(ERR_OK == err);
+                    }
                 UNLOCK_TCPIP_CORE();
-                VSF_USB_ASSERT(ERR_OK == err);
 
                 distbus_lwip->size_to_send = 0;
                 if (on_sent != NULL) {
@@ -271,7 +285,7 @@ bool __user_distbus_send(uint8_t *buffer, uint_fast32_t size, void *p, void (*on
     if (NULL == distbus_lwip->work_pcb) {
         return false;
     }
-    VSF_USB_ASSERT(0 == distbus_lwip->size_to_send);
+    VSF_ASSERT(0 == distbus_lwip->size_to_send);
 
     distbus_lwip->on_sent_param = p;
     distbus_lwip->on_sent = on_sent;
@@ -284,7 +298,7 @@ bool __user_distbus_send(uint8_t *buffer, uint_fast32_t size, void *p, void (*on
 bool __user_distbus_recv(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_recv)(void *p))
 {
     __user_distbus_lwip_t *distbus_lwip = &__user_distbus_lwip;
-    VSF_USB_ASSERT(0 == distbus_lwip->size_to_recv);
+    VSF_ASSERT(0 == distbus_lwip->size_to_recv);
 
     vsf_protect_t orig = vsf_protect_int();
     uint_fast32_t read_len = __user_distbus_lwip_read(distbus_lwip, buffer, size);

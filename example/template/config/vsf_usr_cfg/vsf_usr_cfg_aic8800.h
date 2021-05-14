@@ -116,9 +116,9 @@
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 //#define APP_USE_DISTBUS_DEMO                            ENABLED
-//#   define APP_USE_DISTBUS_HAL_SLAVE_DEMO               ENABLED
-//#       define APP_USE_DISTBUS_HAL_USBD_SLAVE_DEMO      ENABLED
-//#   define APP_DISTBUS_DEMO_CFG_LWIP_SERVER             ENABLED
+//#   define APP_DISTBUS_DEMO_CFG_LWIP                    ENABLED
+//#   define APP_USE_DISTBUS_HAL_DEMO                     ENABLED
+//#       define APP_USE_DISTBUS_HAL_USBD_DEMO            ENABLED
 
 // demo for AIC8800
 #define AIC8800_APP_USE_WIFI_DEMO                       ENABLED

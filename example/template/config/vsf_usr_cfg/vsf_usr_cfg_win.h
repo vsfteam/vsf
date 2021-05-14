@@ -61,9 +61,9 @@
 #define APP_USE_STREAM_HAL_DEMO                         ENABLED
 #   define APP_USE_STREAM_USART_DEMO                    ENABLED
 //#define APP_USE_DISTBUS_DEMO                            ENABLED
-//#   define APP_USE_DISTBUS_HAL_MASTER_DEMO              ENABLED
-//#       define APP_USE_DISTBUS_HAL_USBD_MASTER_DEMO     ENABLED
-//#   define APP_DISTBUS_DEMO_CFG_LWIP_CLIENT             ENABLED
+//#   define APP_DISTBUS_DEMO_CFG_LWIP                    ENABLED
+//#   define APP_USE_DISTBUS_HAL_DEMO                     ENABLED
+//#       define APP_USE_DISTBUS_HAL_USBD_DEMO            ENABLED
 
 #define APP_USE_CPP_DEMO                                DISABLED
 #define VSF_LINUX_USE_SIMPLE_LIBC                       ENABLED
