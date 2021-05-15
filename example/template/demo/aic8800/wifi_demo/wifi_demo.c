@@ -68,15 +68,20 @@ static int __wifi_ap_main(int argc, char *argv[])
     }
 
     char *ssid = argv[1], *pass = argv[2];
+    uint8_t channel = 0;
     is_ap = true;
+    if (argc > 3) {
+        uint8_t channel = strtoul(argv[3], NULL, 10);
+        VSF_ASSERT(channel <= 14);
+
+        if (14 == channel) {
+            printf("warning: wifi 2.4G channel 14 is illegal in some countries.\r\n");
+        }
+    }
+    set_ap_channel_num(channel);
     set_mac_address(NULL);
     int ret = wlan_start_ap(0, (uint8_t *)ssid, (uint8_t *)pass);
     if (!ret) {
-        if (argc > 3) {
-            uint8_t channel = strtoul(argv[3], NULL, 10);
-            VSF_ASSERT(channel <= 14);
-            wlan_ap_switch_channel(channel);
-        }
         printf("wifi ap started.\r\n");
     } else {
         printf("fail to start wifi ap.\r\n");
