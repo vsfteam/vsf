@@ -26,19 +26,11 @@
 #include "./vsf_distbus.h"
 
 #if VSF_DISTBUS_CFG_DEBUG == ENABLED
-#   include "../trace/vsf_trace.h"
+#   include "service/trace/vsf_trace.h"
 #endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#if VSF_DISTBUS_CFG_DEBUG == ENABLED
-#   define __vsf_distbus_trace(...)                     vsf_trace_debug(__VA_ARGS__)
-#   define __vsf_distbus_trace_buffer(__ptr, __size)    vsf_trace_buffer(VSF_TRACE_DEBUG, (__ptr), (__size))
-#else
-#   define __vsf_distbus_trace(...)
-#   define __vsf_distbus_trace_buffer(__ptr, __size)
-#endif
 
 #if VSF_DISTBUS_CFG_DEBUG_MSG == ENABLED
 #   define __vsf_distbus_trace_msg(__msg, __dir)                                \
