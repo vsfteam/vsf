@@ -42,8 +42,9 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define __VSF_DISTBUS_STREAM_INIT(__NAME, __DISTBUS, __MTU, __IS_TX, __HANDLER) \
+#define __VSF_DISTBUS_STREAM_INIT(__NAME, __DISTBUS, __MTU, __IS_TX, __BUF_SIZE, __HANDLER) \
             .op                 = &vsf_distbus_stream_op,                       \
+            .buf_size           = (__BUF_SIZE),                                 \
             .is_tx              = (__IS_TX),                                    \
             .distbus            = (__DISTBUS),                                  \
             .mtu                = (__MTU),                                      \
@@ -51,22 +52,26 @@ extern "C" {
             .handler            = (__HANDLER),                                  \
             .info               = (const vsf_distbus_service_info_t *)          \
                                     &(__NAME).use_as__vsf_distbus_service_info_t,
-#define VSF_DISTBUS_STREAM_INIT(__NAME, __DISTBUS, __MTU, __IS_TX, __HANDLER)\
-            __VSF_DISTBUS_STREAM_INIT(__NAME, (__DISTBUS), (__MTU), (__IS_TX), (__HANDLER))
+#define VSF_DISTBUS_STREAM_INIT(__NAME, __DISTBUS, __MTU, __IS_TX, __BUF_SIZE, __HANDLER)\
+            __VSF_DISTBUS_STREAM_INIT(__NAME, (__DISTBUS), (__MTU), (__IS_TX), (__BUF_SIZE), (__HANDLER))
 
-#define __describe_distbus_stream(__name, __distbus, __mtu, __is_tx, __handler) \
+#define __describe_distbus_stream(__name, __distbus, __mtu, __is_tx, __buf_size, __handler) \
             vsf_distbus_stream_t __name = {                                     \
-                VSF_DISTBUS_STREAM_INIT(__name, (__distbus), (__mtu), (__is_tx), (__handler))\
+                VSF_DISTBUS_STREAM_INIT(__name, (__distbus), (__mtu), (__is_tx), (__buf_size), (__handler))\
             };
 
-#define describe_distbus_stream(__name, __distbus, __mtu, __is_tx, __handler)   \
-            __describe_distbus_stream(__name, (__distbus), (__mtu), (__is_tx), (__handler))
+#define describe_distbus_stream_tx(__name, __distbus, __mtu, __buf_size, __handler)\
+            __describe_distbus_stream(__name, (__distbus), (__mtu), true, (__buf_size), (__handler))
+#define describe_distbus_stream_rx(__name, __distbus, __mtu, __handler)         \
+            __describe_distbus_stream(__name, (__distbus), (__mtu), false, 0, (__handler))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 enum {
+    VSF_DISTBUS_STREAM_CMD_BUF_SIZE,
     VSF_DISTBUS_STREAM_CMD_DATA,
+    VSF_DISTBUS_STREAM_CMD_SIZE,
     VSF_DISTBUS_STREAM_ADDR_RANGE,
 };
 
@@ -76,6 +81,7 @@ vsf_class(vsf_distbus_stream_t) {
         implement(vsf_distbus_service_info_t)
         implement(vsf_distbus_service_t)
         vsf_distbus_t *distbus;
+        uint32_t buf_size;
         // is distbus_stream tx terminal
         bool is_tx;
     )
