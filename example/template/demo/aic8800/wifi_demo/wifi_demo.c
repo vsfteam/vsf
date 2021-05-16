@@ -71,7 +71,7 @@ static int __wifi_ap_main(int argc, char *argv[])
     uint8_t channel = 0;
     is_ap = true;
     if (argc > 3) {
-        uint8_t channel = strtoul(argv[3], NULL, 10);
+        channel = strtoul(argv[3], NULL, 10);
         VSF_ASSERT(channel <= 14);
 
         if (14 == channel) {
