@@ -190,6 +190,7 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
     vsf_sdl2_event_node_t *node = vsf_heap_malloc(sizeof(*node));
     if (node != NULL) {
         vsf_slist_init_node(vsf_sdl2_event_node_t, evt_node, node);
+        node->event = event;
 
         vsf_eda_t *eda_pending;
         vsf_protect_t orig = vsf_protect_int();
