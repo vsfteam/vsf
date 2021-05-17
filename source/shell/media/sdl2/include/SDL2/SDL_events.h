@@ -44,6 +44,7 @@ extern "C" {
 #if VSF_SDL_CFG_FAKE_API == ENABLED
 #define SDL_PollEvent                   __vsf_sdl2_poll_event
 #define SDL_WaitEventTimeout            __vsf_sdl2_wait_event_timeout
+#define SDL_WaitEvent                   __vsf_sdl2_wait_event
 #define SDL_FlushEvent                  __vsf_sdl2_flush_event
 #define SDL_EventState                  __vsf_sdl2_event_state
 #endif
@@ -294,6 +295,7 @@ typedef union SDL_Event {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern int SDL_PollEvent(SDL_Event * event);
 extern int SDL_PollEvent(SDL_Event * event);
 extern int SDL_WaitEventTimeout(SDL_Event * event, int timeout);
 extern void SDL_FlushEvent(uint32_t type);

@@ -27,9 +27,17 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef struct vsf_sdl2_event_node_t {
+    vsf_slist_node_t            evt_node;
+    SDL_Event                   event;
+} vsf_sdl2_event_node_t;
+
 typedef struct vsf_sdl2_event_t {
     uint32_t                    evtflags;
     vk_input_notifier_t         notifier;
+
+    vsf_slist_queue_t           evt_list;
+    vsf_eda_t                   *eda_pending;
 } vsf_sdl2_event_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -40,14 +48,171 @@ static NO_INIT vsf_sdl2_event_t __vsf_sdl2_event;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static SDL_Keycode __vsf_sdl2_kb_parse_keycode(uint_fast32_t code)
+{
+    bool is_ext = (code & VSF_KB_EXT) != 0;
+
+    code &= ~VSF_KB_EXT;
+    if ((code >= VSF_KB_a) && (code <= VSF_KB_z)) {
+        return SDLK_a + (code - VSF_KB_a);
+    } else if ((code >= VSF_KB_F1) && (code <= VSF_KB_F12)) {
+        return SDLK_F1 + (code - VSF_KB_F1);
+    } else if (code == VSF_KB_0) {
+        return SDLK_0;
+    } else if ((code >= VSF_KB_1) && (code <= VSF_KB_0)) {
+        return SDLK_1 + (code - VSF_KB_1);
+    } else if (code == VSF_KP_0) {
+        return SDLK_KP_0;
+    } else if ((code >= VSF_KP_1) && (code <= VSF_KP_0)) {
+        return SDLK_1 + (code - VSF_KP_1);
+    } else if (is_ext) {
+        switch (code | VSF_KB_EXT) {
+        case VSF_KB_EXCLAM:             return SDLK_EXCLAIM;
+        case VSF_KB_AT:                 return SDLK_AT;
+        case VSF_KB_POUND:              return SDLK_HASH;
+        case VSF_KB_DOLLAR:             return SDLK_DOLLAR;
+        case VSF_KB_PERCENT:            return SDLK_PERCENT;
+        case VSF_KB_CARET:              return SDLK_CARET;
+        case VSF_KB_AMPERSAND:          return SDLK_AMPERSAND;
+        case VSF_KB_ASTERISK:           return SDLK_ASTERISK;
+        case VSF_KB_LEFT_PAREN:         return SDLK_LEFTPAREN;
+        case VSF_KB_RIGHT_PAREN:        return SDLK_RIGHTPAREN;
+        case VSF_KB_UNDERSCORE:         return SDLK_UNDERSCORE;
+        case VSF_KB_PLUS:               return SDLK_PLUS;
+//        case VSF_KB_LEFT_BRACE:         return SDLK_LEFTBRACE;
+//        case VSF_KB_RIGHT_BRACE:        return SDLK_RIGHTBRACE;
+        case VSF_KB_COLON:              return SDLK_COLON;
+        case VSF_KB_DOUBLE_QUOTE:       return SDLK_QUOTEDBL;
+//        case VSF_KB_TIDE:               return SDLK_TIDE;
+        case VSF_KB_LESS:               return SDLK_LESS;
+        case VSF_KB_GREATER:            return SDLK_GREATER;
+        case VSF_KB_QUESTION:           return SDLK_QUESTION;
+        }
+    } else {
+        switch (code) {
+        case VSF_KB_ENTER:              return SDLK_RETURN;
+        case VSF_KB_ESCAPE:             return SDLK_ESCAPE;
+        case VSF_KB_BACKSPACE:          return SDLK_BACKSPACE;
+        case VSF_KB_TAB:                return SDLK_TAB;
+        case VSF_KB_SPACE:              return SDLK_SPACE;
+        case VSF_KB_MINUS:              return SDLK_MINUS;
+        case VSF_KB_EQUAL:              return SDLK_EQUALS;
+        case VSF_KB_LEFT_BRACKET:       return SDLK_LEFTBRACKET;
+        case VSF_KB_RIGHT_BRACKET:      return SDLK_RIGHTBRACKET;
+        case VSF_KB_BACKSLASH:          return SDLK_BACKSLASH;
+        case VSF_KB_SEMICOLON:          return SDLK_SEMICOLON;
+        case VSF_KB_SINGLE_QUOTE:       return SDLK_QUOTE;
+        case VSF_KB_GRAVE:              return SDLK_BACKQUOTE;
+        case VSF_KB_COMMA:              return SDLK_COMMA;
+        case VSF_KB_DOT:                return SDLK_PERIOD;
+        case VSF_KB_SLASH:              return SDLK_SLASH;
+        case VSF_KB_CAPSLOCK:           return SDLK_CAPSLOCK;
+//        case VSF_KB_PRINT_SCREEN:       return SDLK_PRINT_SCREEN;
+//        case VSF_KB_SCROLL_LOCK:        return SDLK_SCROOL_LOCK;
+        case VSF_KB_PAUSE:              return SDLK_PAUSE;
+        case VSF_KB_INSERT:             return SDLK_INSERT;
+        case VSF_KB_HOME:               return SDLK_HOME;
+        case VSF_KB_PAGE_UP:            return SDLK_PAGEUP;
+        case VSF_KB_DELETE:             return SDLK_DELETE;
+        case VSF_KB_END:                return SDLK_END;
+        case VSF_KB_PAGE_DOWN:          return SDLK_PAGEDOWN;
+        case VSF_KB_RIGHT:              return SDLK_RIGHT;
+        case VSF_KB_LEFT:               return SDLK_LEFT;
+        case VSF_KB_DOWN:               return SDLK_DOWN;
+        case VSF_KB_UP:                 return SDLK_UP;
+
+//        case VSF_KP_NUMLOCK:            return SDLK_NUMLOCKCLEAR;
+        case VSF_KP_DIVIDE:             return SDLK_KP_DIVIDE;
+        case VSF_KP_MULTIPLY:           return SDLK_KP_MULTIPLY;
+        case VSF_KP_MINUS:              return SDLK_KP_MINUS;
+        case VSF_KP_PLUS:               return SDLK_KP_PLUS;
+        case VSF_KP_ENTER:              return SDLK_KP_ENTER;
+        case VSF_KP_DOT:                return SDLK_KP_PERIOD;
+        case VSF_KP_EQUAL:              return SDLK_KP_EQUALS;
+        }
+    }
+    return SDLK_UNKNOWN;
+}
+
+static uint16_t __vsf_sdl2_kb_parse_keymod(uint_fast32_t mod)
+{
+    uint16_t sdl_mod = KMOD_NONE;
+
+    if (mod & VSF_KM_LEFT_SHIFT) {
+        sdl_mod |= KMOD_LSHIFT;
+    }
+    if (mod & VSF_KM_LEFT_CTRL) {
+        sdl_mod |= KMOD_LCTRL;
+    }
+    if (mod & VSF_KM_LEFT_ALT) {
+        sdl_mod |= KMOD_LALT;
+    }
+    if (mod & VSF_KM_LEFT_GUI) {
+        sdl_mod |= KMOD_LGUI;
+    }
+    if (mod & VSF_KM_RIGHT_SHIFT) {
+        sdl_mod |= KMOD_RSHIFT;
+    }
+    if (mod & VSF_KM_RIGHT_CTRL) {
+        sdl_mod |= KMOD_RCTRL;
+    }
+    if (mod & VSF_KM_RIGHT_ALT) {
+        sdl_mod |= KMOD_RALT;
+    }
+    if (mod & VSF_KM_RIGHT_GUI) {
+        sdl_mod |= KMOD_RGUI;
+    }
+    return sdl_mod;
+}
+
 static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
 {
+    SDL_Event event = { 0 };
+
+    switch (type) {
+    case VSF_INPUT_TYPE_KEYBOARD:
+        if (vsf_input_keyboard_is_down(evt)) {
+            event.type = SDL_KEYDOWN;
+        } else {
+            event.type = SDL_KEYUP;
+        }
+        event.key.keysym.sym = __vsf_sdl2_kb_parse_keycode(vsf_input_keyboard_get_keycode(evt));
+        event.key.keysym.mod = __vsf_sdl2_kb_parse_keymod(vsf_input_keyboard_get_keymod(evt));
+
+        if (SDLK_UNKNOWN == event.key.keysym.sym) {
+            return;
+        }
+        break;
+    default:
+        return;
+    }
+
+    vsf_sdl2_event_node_t *node = vsf_heap_malloc(sizeof(*node));
+    if (node != NULL) {
+        vsf_slist_init_node(vsf_sdl2_event_node_t, evt_node, node);
+
+        vsf_eda_t *eda_pending;
+        vsf_protect_t orig = vsf_protect_int();
+            vsf_slist_queue_enqueue(vsf_sdl2_event_node_t, evt_node, &__vsf_sdl2_event.evt_list, node);
+            eda_pending = __vsf_sdl2_event.eda_pending;
+            __vsf_sdl2_event.eda_pending = NULL;
+        vsf_unprotect_int(orig);
+
+        if (eda_pending != NULL) {
+            vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
+        }
+    }
 }
 
 void __SDL_InitEvent(uint32_t flags)
 {
     memset(&__vsf_sdl2_event, 0, sizeof(__vsf_sdl2_event));
-    __vsf_sdl2_event.notifier.mask = 1 << VSF_INPUT_TYPE_TOUCHSCREEN;
+
+    __vsf_sdl2_event.evtflags = flags;
+    vsf_slist_queue_init(&__vsf_sdl2_event.evt_list);
+
+    __vsf_sdl2_event.notifier.mask =    (1 << VSF_INPUT_TYPE_TOUCHSCREEN)
+                                    |   (1 << VSF_INPUT_TYPE_KEYBOARD);
     __vsf_sdl2_event.notifier.on_evt = (vk_input_on_evt_t)__vsf_sdl2_event_on_input;
     vk_input_notifier_register(&__vsf_sdl2_event.notifier);
 }
@@ -106,22 +271,64 @@ uint32_t SDL_GetGlobalMouseState(int * x, int * y)
 
 int SDL_PollEvent(SDL_Event *event)
 {
-    VSF_SDL2_ASSERT(event != NULL);
+    vsf_sdl2_event_node_t *node;
+    vsf_protect_t orig = vsf_protect_int();
+        vsf_slist_queue_dequeue(vsf_sdl2_event_node_t, evt_node, &__vsf_sdl2_event.evt_list, node);
+    vsf_unprotect_int(orig);
 
-
+    if (node != NULL) {
+        if (event != NULL) {
+            *event = node->event;
+        }
+        vsf_heap_free(node);
+        return 1;
+    }
     return 0;
 }
 
 int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
 {
-    // todo:
-    vsf_thread_wfe(VSF_EVT_RETURN);
-    return 0;
+    vsf_sdl2_event_node_t *node;
+    vsf_protect_t orig = vsf_protect_int();
+        vsf_slist_queue_dequeue(vsf_sdl2_event_node_t, evt_node, &__vsf_sdl2_event.evt_list, node);
+        if (NULL == node) {
+            __vsf_sdl2_event.eda_pending = vsf_eda_get_cur();
+        }
+    vsf_unprotect_int(orig);
+
+    if (NULL == node) {
+        if (timeout >= 0) {
+            // not supported now
+            VSF_SDL2_ASSERT(false);
+        }
+        vsf_thread_wfe(VSF_EVT_USER);
+        return SDL_PollEvent(event);
+    }
+
+    *event = node->event;
+    vsf_heap_free(node);
+    return 1;
+}
+
+int SDL_WaitEvent(SDL_Event * event)
+{
+    return SDL_WaitEventTimeout(event, -1);
 }
 
 void SDL_FlushEvent(uint32_t type)
 {
+    vsf_sdl2_event_node_t *node;
+    vsf_protect_t orig;
 
+    do {
+        orig = vsf_protect_int();
+            vsf_slist_queue_dequeue(vsf_sdl2_event_node_t, evt_node, &__vsf_sdl2_event.evt_list, node);
+        vsf_unprotect_int(orig);
+
+        if (node != NULL) {
+            vsf_heap_free(node);
+        }
+    } while (node != NULL);
 }
 
 uint8_t SDL_EventState(uint32_t type, int state)

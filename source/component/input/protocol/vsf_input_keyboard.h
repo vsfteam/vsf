@@ -148,6 +148,7 @@ enum {
     VSF_KP_9                = 97,
     VSF_KP_0                = 98,
     VSF_KP_DOT              = 99,
+    VSF_KP_EQUAL            = 100,
 
     VSF_KB_EXT              = 0x0100,
     // keycodes with SHIFT pressed
