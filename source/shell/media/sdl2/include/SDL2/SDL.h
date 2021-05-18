@@ -26,6 +26,14 @@
 
 #include "vsf.h"
 
+/*============================ MACROS ========================================*/
+
+#ifndef VSF_SDL_CFG_V1_COMPATIBLE
+#   define VSF_SDL_CFG_V1_COMPATIBLE    ENABLED
+#endif
+
+/*============================ INCLUDES ======================================*/
+
 #include "SDL_cpuinfo.h"
 #include "SDL_endian.h"
 #include "SDL_stdinc.h"
@@ -46,10 +54,6 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_SDL_CFG_V1_COMPATIBLE
-#   define VSF_SDL_CFG_V1_COMPATIBLE    ENABLED
-#endif
 
 #define DECLSPEC
 #define SDLCALL
