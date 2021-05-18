@@ -137,7 +137,7 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #   define VSF_KERNEL_USE_SIMPLE_SHELL                      ENABLED
 #endif
 
-#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_TASK     
+#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_TASK
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_TASK                  ENABLED
 #endif
 
@@ -325,25 +325,6 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
     &&  defined(VSF_ARCH_STACK_GUARDIAN_SIZE)
 #   define VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE        VSF_ARCH_STACK_GUARDIAN_SIZE
 #endif
-
-/*----------------------------------------------------------------------------*
- * Forced disabled features/modules when C89/90 is used                       *
- *----------------------------------------------------------------------------*/
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM == ENABLED
-#       warning VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM need c99
-#       undef VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM
-#       define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM        DISABLED
-#   endif
-
-#   if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
-#       warning VSF_KERNEL_CFG_SUPPORT_THREAD need c99
-#       undef VSF_KERNEL_CFG_SUPPORT_THREAD
-#       define VSF_KERNEL_CFG_SUPPORT_THREAD                DISABLED
-#   endif
-#endif
-
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
