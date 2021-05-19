@@ -58,6 +58,7 @@ static vsf_err_t __vsf_eda_update_priotiry(vsf_eda_t *this_ptr, vsf_prio_t prior
                 this_ptr);
 
         evtq = __vsf_os_evtq_get(priority);
+        VSF_KERNEL_ASSERT(evtq != NULL);
         vsf_dlist_queue_enqueue(vsf_eda_t, rdy_node,
                 &evtq->rdy_list,
                 this_ptr);
