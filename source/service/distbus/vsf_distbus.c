@@ -138,6 +138,7 @@ void vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_service_t *service
 static void __vsf_distbus_on_recv(void *p)
 {
     vsf_distbus_t *distbus = (vsf_distbus_t *)p;
+recv_next:
     VSF_SERVICE_ASSERT((distbus != NULL) && (distbus->msg_rx != NULL));
     vsf_distbus_msg_t *msg = distbus->msg_rx;
 
@@ -151,7 +152,7 @@ static void __vsf_distbus_on_recv(void *p)
 
         msg->pos = sizeof(msg->header);
         if (distbus->op.bus.recv((uint8_t *)&msg->header + msg->pos, msg->header.datalen, distbus, __vsf_distbus_on_recv)) {
-            __vsf_distbus_on_recv(distbus);
+            goto recv_next;
         }
     } else if (sizeof(msg->header) == msg->pos) {
         if (msg->header.hash_data != __vsf_distbus_hash((uint8_t *)&msg->header + msg->pos, msg->header.datalen)) {
@@ -180,7 +181,7 @@ static void __vsf_distbus_on_recv(void *p)
 
         msg->pos = 0;
         if (distbus->op.bus.recv((uint8_t *)&msg->header, sizeof(msg->header), distbus, __vsf_distbus_on_recv)) {
-            __vsf_distbus_on_recv(distbus);
+            goto recv_next;
         }
     } else {
         VSF_SERVICE_ASSERT(false);
