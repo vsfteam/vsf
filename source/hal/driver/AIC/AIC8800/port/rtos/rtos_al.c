@@ -245,7 +245,9 @@ int rtos_task_create(   rtos_task_fct func,
     strncpy(thread->name, name, sizeof(thread->name) - 1);
     thread->name[sizeof(thread->name) - 1] = '\0';
 
-    rtos_trace_task("%s: %s(%p) vsf_prio_%d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, name, thread, real_prio);
+    rtos_trace_task("%s: %s(%p) vsf_prio_%d stack(%p:%d)" VSF_TRACE_CFG_LINEEND,
+                        __FUNCTION__, name, thread, real_prio,
+                        &thread[1], (stack_depth << 2));
     init_vsf_thread_ex( vsf_rtos_thread_t,
                         thread,
                         real_prio,
