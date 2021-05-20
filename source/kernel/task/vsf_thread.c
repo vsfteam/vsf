@@ -67,6 +67,9 @@ void vsf_thread_exit(void)
 #endif
 
     VSF_KERNEL_ASSERT(NULL != pthis);
+#if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+    vsf_thread_stack_check();
+#endif
     vsf_eda_return();
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
     __vsf_arch_irq_request_send(pthis->rep);
@@ -108,6 +111,10 @@ static vsf_evt_t __vsf_thread_wait(vsf_thread_cb_t *cb)
 #   else
     jmp_buf pos;
 
+#       if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+    vsf_thread_stack_check();
+#       endif
+
     pthis->pos = &pos;
     curevt = setjmp(*(pthis->pos));
 
@@ -142,6 +149,10 @@ vsf_evt_t vsf_thread_wait(void)
     curevt = pthis->evt;
 #    else
     jmp_buf pos;
+
+#       if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+    vsf_thread_stack_check();
+#       endif
 
     pthis->pos = &pos;
     curevt = setjmp(*pthis->pos);
@@ -204,8 +215,7 @@ static void __vsf_thread_entry(void)
     class_internal(thread_obj, thread, vsf_thread_t);
 
     VSF_KERNEL_ASSERT(NULL != thread->fn.frame);
-    class_internal(thread->fn.frame->ptr.param,
-                    pthis, vsf_thread_cb_t);
+    class_internal(thread->fn.frame->ptr.param, pthis, vsf_thread_cb_t);
     VSF_KERNEL_ASSERT(NULL != pthis);
 
     pthis->entry((vsf_thread_cb_t *)thread->fn.frame->ptr.param);
@@ -216,6 +226,9 @@ static void __vsf_thread_entry(void)
     pthis->entry(thread_obj);
 #endif
 
+#if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+    vsf_thread_stack_check();
+#endif
     vsf_eda_return();
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
     __vsf_arch_irq_request_send(pthis->rep);
@@ -240,8 +253,45 @@ void __vsf_thread_host_thread(void *arg)
 }
 #endif
 
-SECTION(".text.vsf.kernel.vsf_thread")
+#if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+SECTION(".text.vsf.kernel.__vsf_thread_stack_check")
+static void __vsf_thread_stack_check(uintptr_t stack)
+{
+    vsf_thread_t *thread_obj = vsf_thread_get_cur();
+    VSF_KERNEL_ASSERT(thread_obj != NULL);
+
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+    class_internal(thread_obj, thread, vsf_thread_t);
+
+    VSF_KERNEL_ASSERT(NULL != thread->fn.frame);
+    class_internal(thread->fn.frame->ptr.param, pthis, vsf_thread_cb_t);
+    VSF_KERNEL_ASSERT(NULL != pthis);
+#   else
+    class_internal(thread_obj, pthis, vsf_thread_t);
+    VSF_KERNEL_ASSERT(NULL != pthis);
+#   endif
+
+    VSF_KERNEL_ASSERT(  (stack < (uintptr_t)&pthis->stack[(pthis->stack_size >> 3)])
+                    &&  (stack >= (uintptr_t)&pthis->stack[0]));
+}
+
+#   ifndef VSF_ARCH_LIMIT_NO_SET_STACK
+SECTION(".text.vsf.kernel.vsf_thread_stack_check")
+void vsf_thread_stack_check(void)
+{
+    uintptr_t stack = vsf_arch_get_stack();
+    __vsf_thread_stack_check(stack);
+}
+#   else
+SECTION(".text.vsf.kernel.vsf_thread_stack_check")
+void vsf_thread_stack_check(void)
+{
+}
+#   endif
+#endif
+
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+SECTION(".text.vsf.kernel.vsf_thread")
 //static void __vsf_thread_evthandler(vsf_thread_cb_t *target, vsf_evt_t evt)
 static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
 {
@@ -278,6 +328,9 @@ static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
             vsf_arch_set_stack((uintptr_t)(&pthis->stack[(pthis->stack_size >> 3)]));
             __vsf_thread_entry();
         } else {
+#if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+            __vsf_thread_stack_check(VSF_KERNEL_GET_STACK_FROM_JMPBUF(pthis->pos));
+#endif
             longjmp(*(pthis->pos), evt);
         }
     }
@@ -294,6 +347,7 @@ static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
 #pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
+SECTION(".text.vsf.kernel.vsf_thread")
 static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     class_internal((vsf_thread_t *)eda, pthis, vsf_thread_t);
@@ -327,6 +381,9 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_arch_set_stack((uintptr_t)(&pthis->stack[(pthis->stack_size >> 3)]));
             __vsf_thread_entry();
         } else {
+#if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+            __vsf_thread_stack_check(VSF_KERNEL_GET_STACK_FROM_JMPBUF(pthis->pos));
+#endif
             longjmp(*pthis->pos, evt);
         }
     }
@@ -470,6 +527,9 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
         if (VSF_ERR_NONE != vsf_eda_post_evt((vsf_eda_t *)thread_obj, VSF_EVT_INIT)) {
             VSF_KERNEL_ASSERT(false);
         }
+#endif
+#if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+        vsf_thread_stack_check();
 #endif
         longjmp(*(cb->ret), 0);
     }

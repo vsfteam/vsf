@@ -321,9 +321,14 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #   define VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE            VSF_ARCH_STACK_PAGE_SIZE
 #endif
 
+// on some arch, a stack guardian MUST be used, eg x86 on __WIN__
 #if     !defined(VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)                     \
     &&  defined(VSF_ARCH_STACK_GUARDIAN_SIZE)
 #   define VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE        VSF_ARCH_STACK_GUARDIAN_SIZE
+#endif
+
+#if     !defined(VSF_KERNEL_CFG_THREAD_STACK_CHECK)
+#   define VSF_KERNEL_CFG_THREAD_STACK_CHECK                ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

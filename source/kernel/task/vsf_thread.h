@@ -485,6 +485,11 @@ extern vsf_err_t vsf_thread_start(  vsf_thread_t *thread,
 extern vsf_err_t vsf_thread_start(vsf_thread_t *this_ptr, vsf_prio_t priority);
 #endif
 
+#if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+SECTION(".text.vsf.kernel.vsf_thread_stack_check")
+extern void vsf_thread_stack_check(void);
+#endif
+
 SECTION(".text.vsf.kernel.vsf_thread_exit")
 extern void vsf_thread_exit(void);
 
