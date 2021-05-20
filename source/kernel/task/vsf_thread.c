@@ -259,6 +259,7 @@ static void __vsf_thread_stack_check(uintptr_t stack)
 {
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     VSF_KERNEL_ASSERT(thread_obj != NULL);
+    VSF_KERNEL_ASSERT(thread_obj->flag.feature.is_stack_owner);
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     class_internal(thread_obj, thread, vsf_thread_t);
