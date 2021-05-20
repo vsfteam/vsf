@@ -328,7 +328,7 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #endif
 
 #if     !defined(VSF_KERNEL_CFG_THREAD_STACK_CHECK)
-#   define VSF_KERNEL_CFG_THREAD_STACK_CHECK                ENABLED
+#   define VSF_KERNEL_CFG_THREAD_STACK_CHECK                DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
