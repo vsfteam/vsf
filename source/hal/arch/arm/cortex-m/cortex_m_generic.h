@@ -105,9 +105,14 @@ typedef enum vsf_arch_prio_t {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
+static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {
     __set_MSP(stack);
+}
+
+static ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)
+{
+    return __get_MSP();
 }
 
 #ifdef __cplusplus
