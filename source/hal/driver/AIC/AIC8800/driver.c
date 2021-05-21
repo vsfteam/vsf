@@ -62,12 +62,6 @@ bool vsf_driver_init(void)
             PeripheralClock / 1000000, sysctrl_clock_get(PER_FLASH) / 1000000);
 
     aic_time_init(0, 0);
-
-    if (rtos_init()) {
-        // if assert failed here, review the check conditions in rtos_init
-        VSF_HAL_ASSERT(false);
-    }
-
     return true;
 }
 

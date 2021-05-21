@@ -21,6 +21,8 @@
 
 #ifdef __AIC8800__
 
+#include "rtos_al.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -31,6 +33,10 @@
 
 void aic8800_demo_init(void)
 {
+    if (rtos_init()) {
+        VSF_HAL_ASSERT(false);
+    }
+
 #if AIC8800_APP_USE_WIFI_DEMO == ENABLED
     extern void aic8800_wifi_start(void);
     aic8800_wifi_start();
