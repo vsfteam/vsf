@@ -54,7 +54,7 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#ifdef __AIC8800_OSAL_CFG_TRACE__
+#ifdef AIC8800_OSAL_CFG_TRACE
 #   define rtos_trace(...)                  vsf_trace_debug(__VA_ARGS__)
 #   define rtos_trace_buffer(...)           vsf_trace_buffer(VSF_TRACE_DEBUG, __VA_ARGS__)
 #else
@@ -62,13 +62,13 @@
 #   define rtos_trace_buffer(...)
 #endif
 
-#ifdef __AIC8800_OSAL_CFG_TRACE_TASK__
+#ifdef AIC8800_OSAL_CFG_TRACE_TASK
 #   define rtos_trace_task(...)             rtos_trace(__VA_ARGS__)
 #else
 #   define rtos_trace_task(...)
 #endif
 
-#ifdef __AIC8800_OSAL_CFG_TRACE_QUEUE__
+#ifdef AIC8800_OSAL_CFG_TRACE_QUEUE
 #   define rtos_trace_queue(...)            rtos_trace(__VA_ARGS__)
 #   define rtos_trace_queue_buffer(...)     rtos_trace_buffer(__VA_ARGS__)
 #else
@@ -76,13 +76,13 @@
 #   define rtos_trace_queue_buffer(...)
 #endif
 
-#ifdef __AIC8800_OSAL_CFG_TRACE_NOTIFY__
+#ifdef AIC8800_OSAL_CFG_TRACE_NOTIFY
 #   define rtos_trace_notify(...)           rtos_trace(__VA_ARGS__)
 #else
 #   define rtos_trace_notify(...)
 #endif
 
-#ifdef __AIC8800_OSAL_CFG_TRACE_TIMER__
+#ifdef AIC8800_OSAL_CFG_TRACE_TIMER
 #   define rtos_trace_timer(...)            rtos_trace(__VA_ARGS__)
 #else
 #   define rtos_trace_timer(...)
