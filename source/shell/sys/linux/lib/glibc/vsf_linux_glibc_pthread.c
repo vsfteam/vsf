@@ -147,35 +147,112 @@ int pthread_kill(pthread_t thread, int sig)
     return 0;
 }
 
-int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
+// pthread_mutex
+int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr)
 {
-    vsf_eda_mutex_init(mutex);
+    mutex->attr = (mattr != NULL) ? mattr->attr : 0;
+    vsf_eda_mutex_init(&mutex->use_as__vsf_mutex_t);
     return 0;
 }
 
 int pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
+    VSF_LINUX_ASSERT(NULL == mutex->eda_owner);
     vsf_eda_sync_cancel(&mutex->use_as__vsf_sync_t);
     return 0;
 }
 
 int pthread_mutex_lock(pthread_mutex_t *mutex)
 {
-    if (vsf_eda_mutex_enter(mutex)) {
+    if (mutex->attr & PTHREAD_MUTEX_RECURSIVE) {
+        if (vsf_eda_get_cur() == mutex->eda_owner) {
+            mutex->recursive_cnt++;
+            return 0;
+        }
+    }
+
+    if (vsf_eda_mutex_enter(&mutex->use_as__vsf_mutex_t)) {
         vsf_thread_wfe(VSF_EVT_SYNC);
+    }
+
+    mutex->recursive_cnt = 1;
+    return 0;
+}
+
+int pthread_mutex_trylock(pthread_mutex_t *mutex)
+{
+    if (vsf_eda_mutex_try_enter(&mutex->use_as__vsf_mutex_t, 0)) {
+        return EBUSY;
     }
     return 0;
 }
 
 int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
-    vsf_eda_mutex_leave(mutex);
+    if (!--mutex->recursive_cnt) {
+        vsf_eda_mutex_leave(&mutex->use_as__vsf_mutex_t);
+    }
     return 0;
+}
+
+int pthread_mutexattr_init(pthread_mutexattr_t *mattr)
+{
+    if (mattr != NULL) {
+        mattr->attr = 0;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_mutexattr_destroy(pthread_mutexattr_t *mattr)
+{
+    return (mattr != NULL) ? 0 : EINVAL;
+}
+
+int pthread_mutexattr_setpshared(pthread_mutexattr_t *mattr, int pshared)
+{
+    if (mattr != NULL) {
+        mattr->attr |= pshared;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_mutexattr_getpshared(pthread_mutexattr_t *mattr, int *pshared)
+{
+    if (mattr != NULL) {
+        if (pshared != NULL) {
+            *pshared = mattr->attr & (PTHREAD_PROCESS_PRIVATE | PTHREAD_PROCESS_SHARED);
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_mutexattr_settype(pthread_mutexattr_t *mattr , int type)
+{
+    if (mattr != NULL) {
+        mattr->attr |= type;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr , int *type)
+{
+    if (mattr != NULL) {
+        if (type != NULL) {
+            *type = mattr->attr & (PTHREAD_MUTEX_RECURSIVE | PTHREAD_MUTEX_NORMAL);
+        }
+        return 0;
+    }
+    return EINVAL;
 }
 
 
 
 
+// pthread_cond
 int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
     vsf_slist_init(cond);

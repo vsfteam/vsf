@@ -15,32 +15,39 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_FAKE_API == ENABLED
-#define pthread_self                __vsf_linux_pthread_self
-#define pthread_create              __vsf_linux_pthread_create
-#define pthread_join                __vsf_linux_pthread_join
-#define pthread_exit                __vsf_linux_pthread_exit
-#define pthread_cancel              __vsf_linux_pthread_cancel
-#define pthread_kill                __vsf_linux_pthread_kill
+#define pthread_self                    __vsf_linux_pthread_self
+#define pthread_create                  __vsf_linux_pthread_create
+#define pthread_join                    __vsf_linux_pthread_join
+#define pthread_exit                    __vsf_linux_pthread_exit
+#define pthread_cancel                  __vsf_linux_pthread_cancel
+#define pthread_kill                    __vsf_linux_pthread_kill
 
-#define pthread_key_create          __vsf_linux_pthread_key_create
-#define pthread_setspecific         __vsf_linux_pthread_setspecific
-#define pthread_getspecific         __vsf_linux_pthread_getspecific
+#define pthread_key_create              __vsf_linux_pthread_key_create
+#define pthread_setspecific             __vsf_linux_pthread_setspecific
+#define pthread_getspecific             __vsf_linux_pthread_getspecific
 
-#define pthread_mutex_init          __vsf_linux_pthread_mutex_init
-#define pthread_mutex_destroy       __vsf_linux_pthread_mutex_destroy
-#define pthread_mutex_lock          __vsf_linux_pthread_mutex_lock
-#define pthread_mutex_unlock        __vsf_linux_pthread_mutex_unlock
+#define pthread_mutex_init              __vsf_linux_pthread_mutex_init
+#define pthread_mutex_destroy           __vsf_linux_pthread_mutex_destroy
+#define pthread_mutex_lock              __vsf_linux_pthread_mutex_lock
+#define pthread_mutex_trylock           __vsf_linux_pthread_mutex_trylock
+#define pthread_mutex_unlock            __vsf_linux_pthread_mutex_unlock
+#define pthread_mutexattr_init          __vsf_linux_pthread_mutexattr_init
+#define pthread_mutexattr_destroy       __vsf_linux_pthread_mutexattr_destroy
+#define pthread_mutexattr_setpshared    __vsf_linux_pthread_mutexattr_setpshared
+#define pthread_mutexattr_getpshared    __vsf_linux_pthread_mutexattr_getpshared
+#define pthread_mutexattr_settype       __vsf_linux_pthread_mutexattr_settype
+#define pthread_mutexattr_gettype       __vsf_linux_pthread_mutexattr_gettype
 
-#define pthread_cond_init           __vsf_linux_pthread_cond_init
-#define pthread_cond_destroy        __vsf_linux_pthread_cond_destroy
-#define pthread_cond_signal         __vsf_linux_pthread_cond_signal
-#define pthread_cond_broadcast      __vsf_linux_pthread_cond_broadcast
-#define pthread_cond_wait           __vsf_linux_pthread_cond_wait
-#define pthread_cond_timedwait      __vsf_linux_pthread_cond_timedwait
+#define pthread_cond_init               __vsf_linux_pthread_cond_init
+#define pthread_cond_destroy            __vsf_linux_pthread_cond_destroy
+#define pthread_cond_signal             __vsf_linux_pthread_cond_signal
+#define pthread_cond_broadcast          __vsf_linux_pthread_cond_broadcast
+#define pthread_cond_wait               __vsf_linux_pthread_cond_wait
+#define pthread_cond_timedwait          __vsf_linux_pthread_cond_timedwait
 #endif
 
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
-#define PTHREAD_MUTEX_INITIALIZER   { .use_as__vsf_sync_t.max_union.max_value = 1 }
+#define PTHREAD_MUTEX_INITIALIZER       { .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 }
 
 typedef int pthread_t;
 typedef struct {
@@ -65,15 +72,37 @@ void *pthread_getspecific(pthread_key_t key);
 
 
 
-typedef vsf_mutex_t pthread_mutex_t;
-typedef struct {
-    int dummy;
-} pthread_mutexattr_t;
+enum {
+    PTHREAD_PROCESS_SHARED              = 0,
+    PTHREAD_PROCESS_PRIVATE             = 1 << 0,
 
-int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
+    PTHREAD_MUTEX_ERRORCHECK            = 1 << 1,
+
+    PTHREAD_MUTEX_RECURSIVE             = 1 << 2,
+    PTHREAD_MUTEX_NORMAL                = 0,
+
+    PTHREAD_MUTEX_DEFAULT               = 0,
+};
+typedef struct {
+    int attr;
+} pthread_mutexattr_t;
+typedef struct pthread_mutex_t {
+    implement(vsf_mutex_t)
+    int attr;
+    int recursive_cnt;
+} pthread_mutex_t;
+
+int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr);
 int pthread_mutex_destroy(pthread_mutex_t *mutex);
 int pthread_mutex_lock(pthread_mutex_t *mutex);
+int pthread_mutex_trylock(pthread_mutex_t *mutex);
 int pthread_mutex_unlock(pthread_mutex_t *mutex);
+int pthread_mutexattr_init(pthread_mutexattr_t *mattr);
+int pthread_mutexattr_destroy(pthread_mutexattr_t *mattr);
+int pthread_mutexattr_setpshared(pthread_mutexattr_t *mattr, int pshared);
+int pthread_mutexattr_getpshared(pthread_mutexattr_t *mattr, int *pshared);
+int pthread_mutexattr_settype(pthread_mutexattr_t *mattr , int type);
+int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr , int *type);
 
 
 
