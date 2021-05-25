@@ -311,6 +311,60 @@ int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
     return pthread_cond_wait(cond, mutex);
 }
 
+int pthread_condattr_init(pthread_condattr_t *cattr)
+{
+    if (cattr != NULL) {
+        cattr->attr = 0;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_condattr_destroy(pthread_condattr_t *cattr)
+{
+    return (cattr != NULL) ? 0 : EINVAL;
+}
+
+int pthread_condattr_setpshared(pthread_condattr_t *cattr, int pshared)
+{
+    if (cattr != NULL) {
+        cattr->attr |= pshared;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_condattr_getpshared(pthread_condattr_t *cattr, int *pshared)
+{
+    if (cattr != NULL) {
+        if (pshared != NULL) {
+            *pshared = cattr->attr & (PTHREAD_PROCESS_PRIVATE | PTHREAD_PROCESS_SHARED);
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_condattr_getclock(const pthread_condattr_t *cattr, clockid_t *clock_id)
+{
+    if (cattr != NULL) {
+        if (clock_id != NULL) {
+            *clock_id = cattr->clockid;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clock_id)
+{
+    if (cattr != NULL) {
+        cattr->clockid = clock_id;
+        return 0;
+    }
+    return EINVAL;
+}
+
 
 
 

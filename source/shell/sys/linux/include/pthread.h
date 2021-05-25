@@ -44,10 +44,17 @@ extern "C" {
 #define pthread_cond_broadcast          __vsf_linux_pthread_cond_broadcast
 #define pthread_cond_wait               __vsf_linux_pthread_cond_wait
 #define pthread_cond_timedwait          __vsf_linux_pthread_cond_timedwait
+#define pthread_condattr_init           __vsf_linux_pthread_condattr_init
+#define pthread_condattr_destroy        __vsf_linux_pthread_condattr_destroy
+#define pthread_condattr_setpshared     __vsf_linux_pthread_condattr_setpshared
+#define pthread_condattr_getpshared     __vsf_linux_pthread_condattr_getpshared
+#define pthread_condattr_setclock       __vsf_linux_pthread_condattr_setclock
+#define pthread_condattr_getclock       __vsf_linux_pthread_condattr_getclock
 #endif
 
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
 #define PTHREAD_MUTEX_INITIALIZER       { .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 }
+#define PTHREAD_COND_INITIALIZER        { 0 }
 
 typedef int pthread_t;
 typedef struct {
@@ -73,15 +80,17 @@ void *pthread_getspecific(pthread_key_t key);
 
 
 enum {
+    // pshared
     PTHREAD_PROCESS_SHARED              = 0,
     PTHREAD_PROCESS_PRIVATE             = 1 << 0,
 
+    // mutex
     PTHREAD_MUTEX_ERRORCHECK            = 1 << 1,
-
     PTHREAD_MUTEX_RECURSIVE             = 1 << 2,
     PTHREAD_MUTEX_NORMAL                = 0,
-
     PTHREAD_MUTEX_DEFAULT               = 0,
+
+    // cond
 };
 typedef struct {
     int attr;
@@ -108,7 +117,8 @@ int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr , int *type);
 
 typedef vsf_slist_t pthread_cond_t;
 typedef struct {
-    int dummy;
+    int attr;
+    clockid_t clockid;
 } pthread_condattr_t;
 
 int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
@@ -117,7 +127,13 @@ int pthread_cond_signal(pthread_cond_t *cond);
 int pthread_cond_broadcast(pthread_cond_t *cond);
 int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
 int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
-		const struct timespec *abstime);
+        const struct timespec *abstime);
+int pthread_condattr_init(pthread_condattr_t *cattr);
+int pthread_condattr_destroy(pthread_condattr_t *cattr);
+int pthread_condattr_setpshared(pthread_condattr_t *cattr, int pshared);
+int pthread_condattr_getpshared(pthread_condattr_t *cattr, int *pshared);
+int pthread_condattr_getclock(const pthread_condattr_t *cattr, clockid_t *clock_id);
+int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clock_id);
 
 #ifdef __cplusplus
 }
