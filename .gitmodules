@@ -52,3 +52,6 @@
 [submodule "source/component/3rd-party/LingLongGUI/raw"]
 	path = source/component/3rd-party/LingLongGUI/raw
 	url = ../LingLongGUI
+[submodule "source/utilities/3rd-party/PLOOC/raw"]
+	path = source/utilities/3rd-party/PLOOC/raw
+	url = ../PLOOC
