@@ -78,7 +78,7 @@ extern "C" {
             vsf_eda_sync_init(  &((__pmtx)->use_as__vsf_sync_t),                \
                                 1 | VSF_SYNC_HAS_OWNER,                         \
                                 1 | VSF_SYNC_AUTO_RST)
-#define vsf_eda_mutex_try_to_enter(__pmtx, __timeout)                           \
+#define vsf_eda_mutex_try_enter(__pmtx, __timeout)                              \
             vsf_eda_sync_decrease(&((__pmtx)->use_as__vsf_sync_t), (__timeout))
 
 #define vsf_eda_mutex_enter(__pmtx)                                             \
@@ -91,8 +91,8 @@ extern "C" {
 #define vsf_eda_crit_init(__pcrit)                                              \
             vsf_eda_mutex_init((__pcrit))
 
-#define vsf_eda_crit_try_to_enter(__pcrit, __timeout)                           \
-            vsf_eda_mutex_try_to_enter((__pcrit), (__timeout))
+#define vsf_eda_crit_try_enter(__pcrit, __timeout)                              \
+            vsf_eda_mutex_try_enter((__pcrit), (__timeout))
 
 #define vsf_eda_crit_enter(__pcrit)                                             \
             vsf_eda_mutex_enter((__pcrit))
@@ -117,7 +117,7 @@ extern "C" {
 #define __vsf_eda_crit_npb_init(__pcrit)                                        \
             vsf_eda_sync_init((__pcrit), 1, 1 | VSF_SYNC_AUTO_RST)
 
-#define __vsf_eda_crit_npb_try_to_enter(__pcrit, __timeout)                     \
+#define __vsf_eda_crit_npb_try_enter(__pcrit, __timeout)                        \
             vsf_eda_sync_decrease((__pcrit), (__timeout))
 
 #define __vsf_eda_crit_npb_enter(__pcrit)                                       \
@@ -819,10 +819,10 @@ vsf_class(vsf_sync_t) {
 //! \name sync_with_owner
 //! @{
 vsf_class(vsf_sync_owner_t) {
-    which(
+    public_member(
         implement(vsf_sync_t)
     )
-    private_member(
+    protected_member(
         vsf_eda_t               *eda_owner;
     )
 };

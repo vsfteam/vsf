@@ -477,7 +477,7 @@ vsf_err_t vk_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t 
 
     switch (type) {
     case BTHCI_PACKET_TYPE_CMD:
-        if (ocb->is_ep0_claimed || __vsf_eda_crit_npb_try_to_enter(&bthci->dev->ep0.crit, 0)) {
+        if (ocb->is_ep0_claimed || __vsf_eda_crit_npb_try_enter(&bthci->dev->ep0.crit, 0)) {
             return VSF_ERR_NOT_AVAILABLE;
         } else {
             struct usb_ctrlrequest_t req = {

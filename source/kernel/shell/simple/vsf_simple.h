@@ -95,21 +95,21 @@ extern "C" {
                 if ((reason =__vsf_mutex_enter((__mutex_addr),                  \
                     (-1)), reason == VSF_SYNC_GET))
 
-#   define vsf_mutex_try_to_enter_timeout(__mutex_addr, __timeout)              \
+#   define vsf_mutex_try_enter_timeout(__mutex_addr, __timeout)                 \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_mutex_enter((__mutex_addr),                  \
                     (__timeout)),                                               \
                     (reason == VSF_SYNC_GET || reason = VSF_SYNC_TIMEOUT)))
 
-#   define vsf_mutex_try_to_enter_timeout_ms(__mutex_addr, __timeout)           \
+#   define vsf_mutex_try_enter_timeout_ms(__mutex_addr, __timeout)              \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_mutex_enter((__mutex_addr),                  \
                     vsf_systimer_ms_to_tick(__timeout)),                        \
                     (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
-#   define vsf_mutex_try_to_enter_timeout_us(__mutex_addr, __timeout)           \
+#   define vsf_mutex_try_enter_timeout_us(__mutex_addr, __timeout)              \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_mutex_enter((__mutex_addr),                  \
@@ -128,21 +128,21 @@ extern "C" {
                 if ((reason =__vsf_mutex_enter((__crit_addr),                   \
                     (-1)), reason == VSF_SYNC_GET))
 
-#   define vsf_crit_try_to_enter_timeout(__crit_addr, __timeout)                \
+#   define vsf_crit_try_enter_timeout(__crit_addr, __timeout)                   \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_mutex_enter((__crit_addr),                   \
                     (__timeout)),                                               \
                     (reason == VSF_SYNC_GET || reason = VSF_SYNC_TIMEOUT)))
 
-#   define vsf_crit_try_to_enter_timeout_ms(__crit_addr, __timeout)             \
+#   define vsf_crit_try_enter_timeout_ms(__crit_addr, __timeout)                \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_mutex_enter((__crit_addr),                   \
                     vsf_systimer_ms_to_tick(__timeout)),                        \
                     (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
-#   define vsf_crit_try_to_enter_timeout_us(__crit_addr, __timeout)             \
+#   define vsf_crit_try_enter_timeout_us(__crit_addr, __timeout)                \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_mutex_enter((__crit_addr),                   \
