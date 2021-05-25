@@ -53,9 +53,9 @@ void * memcpy(void *dest, const void *src, unsigned long long n);
 void * memcpy(void *dest, const void *src, unsigned int n);
 #   endif
 
-const char * strstr(const char *str1, const char *str2);
-const char * strchr(const char *str, int c);
-const char * strrchr(const char *str, int c);
+char * strstr(const char *str1, const char *str2);
+char * strchr(const char *str, int c);
+char * strrchr(const char *str, int c);
 #else
 int strcasecmp(const char *s1, const char *s2);
 int strncasecmp(const char *s1, const char *s2, size_t n);
