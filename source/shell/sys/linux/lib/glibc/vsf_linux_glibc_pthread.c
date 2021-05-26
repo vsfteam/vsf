@@ -28,11 +28,13 @@
 #   include "../../include/simple_libc/time.h"
 #   include "../../include/pthread.h"
 #   include "../../include/signal.h"
+#   include "../../include/errno.h"
 #else
 #   include <unistd.h>
 #   include <time.h>
 #   include <pthread.h>
 #   include <signal.h>
+#   include <errno.h>
 #endif
 
 #if __IS_COMPILER_IAR__
