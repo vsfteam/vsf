@@ -17,13 +17,28 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_SOCKET_CFG_FAKE_API == ENABLED
+#define inet_addr           __vsf_linux_inet_addr
+#define inet_lnaof          __vsf_linux_inet_lnaof
+#define inet_makeaddr       __vsf_linux_inet_makeaddr
+#define inet_netof          __vsf_linux_inet_netof
+#define inet_network        __vsf_linux_inet_network
+#define inet_ntoa           __vsf_linux_inet_ntoa
+#define inet_ntop           __vsf_linux_inet_ntop
 #endif
 
 #define htonl               cpu_to_be32
 #define htons               cpu_to_be16
 #define ntohl               be32_to_cpu
 #define ntohs               be16_to_cpu
+
+in_addr_t inet_addr(const char *cp);
+in_addr_t inet_lnaof(struct in_addr in);
+struct in_addr inet_makeaddr(in_addr_t net, in_addr_t lna);
+in_addr_t inet_netof(struct in_addr in);
+in_addr_t inet_network(const char *cp);
+char * inet_ntoa(struct in_addr in);
+const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
 
 #ifdef __cplusplus
 }

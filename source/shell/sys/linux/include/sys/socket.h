@@ -40,8 +40,24 @@ struct sockaddr {
     char                sa_data[14];
 };
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_SOCKET_CFG_FAKE_API == ENABLED
 #define setsockopt      __vsf_linux_setsockopt
+#define getsockopt      __vsf_linux_getsockopt
+
+#define getpeername     __vsf_linux_getpeername
+#define getsockname     __vsf_linux_getsockname
+
+#define accept          __vsf_linux_accept
+#define bind            __vsf_linux_bind
+#define connect         __vsf_linux_connect
+#define listen          __vsf_linux_listen
+#define recv            __vsf_linux_recv
+#define recvfrom        __vsf_linux_recvfrom
+#define send            __vsf_linux_send
+#define sendto          __vsf_linux_sendto
+#define shutdown        __vsf_linux_shutdown
+#define socket          __vsf_linux_socket
+#define socketpair      __vsf_linux_socketpair
 #endif
 
 // level for setsockopt
@@ -51,8 +67,26 @@ struct sockaddr {
 #define SO_ACCEPTCONN   0x0002
 #define SO_KEEPALIVE    0x0008
 #define SO_BROADCAST    0x0020
-int setsockopt(int socket, int level, int option_name,
-       const void *option_value, socklen_t option_len);
+int setsockopt(int socket, int level, int option_name, const void *option_value,
+                    socklen_t option_len);
+
+int accept(int socket, struct sockaddr *address, socklen_t *address_len);
+int bind(int socket, const struct sockaddr *address, socklen_t address_len);
+int connect(int socket, const struct sockaddr *address, socklen_t address_len);
+int getpeername(int socket, struct sockaddr *address, socklen_t *address_len);
+int getsockname(int socket, struct sockaddr *address, socklen_t *address_len);
+int getsockopt(int socket, int level, int option_name, void *option_value,
+                    socklen_t *option_len);
+int listen(int socket, int backlog);
+ssize_t recv(int socket, void *buffer, size_t length, int flags);
+ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
+                    struct sockaddr *address, socklen_t *address_len);
+ssize_t send(int socket, const void *message, size_t length, int flags);
+ssize_t sendto(int socket, const void *message, size_t length, int flags,
+                    const struct sockaddr *dest_addr, socklen_t dest_len);
+int shutdown(int socket, int how);
+int socket(int domain, int type, int protocol);
+int socketpair(int domain, int type, int protocol, int socket_vector[2]);
 
 #ifdef __cplusplus
 }
