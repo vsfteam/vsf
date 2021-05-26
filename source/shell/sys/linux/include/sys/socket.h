@@ -27,6 +27,9 @@ extern "C" {
 #define SOCK_STREAM	    1
 #define SOCK_DGRAM      2
 
+#define INVALID_SOCKET  -1
+#define SOCKET_ERROR    -1
+
 enum {
     IPPROTO_TCP         = 6,
     IPPROTO_UDP         = 17,
@@ -84,6 +87,12 @@ ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
 ssize_t send(int socket, const void *message, size_t length, int flags);
 ssize_t sendto(int socket, const void *message, size_t length, int flags,
                     const struct sockaddr *dest_addr, socklen_t dest_len);
+// how for shutdown
+enum {
+    SHUT_RD             = 1 << 0,
+    SHUT_WR             = 1 << 1,
+    SHUT_RDWR           = SHUT_RD | SHUT_WR,
+};
 int shutdown(int socket, int how);
 int socket(int domain, int type, int protocol);
 int socketpair(int domain, int type, int protocol, int socket_vector[2]);
