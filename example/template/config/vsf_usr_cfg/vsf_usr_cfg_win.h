@@ -326,7 +326,12 @@
 
 #if APP_USE_VSFIP_DEMO == ENABLED || APP_USE_LWIP_DEMO == ENABLED
 #   define VSF_NETDRV_USE_WPCAP                         ENABLED
+// VSF_NETDRV_WPCAP_CFG_HW_PRIORITY should be higher than TCPIP_THREAD_PRIO
+#   ifdef __VSF_X86_WIN_SINGLE_PRIORITY
 #       define VSF_NETDRV_WPCAP_CFG_HW_PRIORITY         vsf_arch_prio_0
+#   else
+#       define VSF_NETDRV_WPCAP_CFG_HW_PRIORITY         vsf_arch_prio_2
+#   endif
 //  TODO: modify the virtual mac address
 #   define APP_NETDRV_WPCAP_CFG_MAC                     0xDC,0xFB,0x48,0x7B,0x9C,0x88
 #endif
