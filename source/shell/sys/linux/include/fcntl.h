@@ -20,6 +20,12 @@ extern "C" {
 #define O_TRUNC         0x0400
 #define O_EXCL          0x0800
 
+#define F_DUPFD         0
+#define F_GETFD         1
+#define F_SETFD         2
+#define F_GETFL         3
+#define F_SETFL         4
+
 int fcntl(int fd, int cmd, ...);
 
 #ifdef __cplusplus

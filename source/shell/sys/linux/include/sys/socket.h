@@ -66,20 +66,25 @@ struct sockaddr {
 // level for setsockopt
 #define SOL_SOCKET      0xFFFF
 // option_name for setsockopt
-#define SO_DEBUG        0x0001
-#define SO_ACCEPTCONN   0x0002
-#define SO_KEEPALIVE    0x0008
-#define SO_BROADCAST    0x0020
+enum {
+    SO_DEBUG            = 1,
+    SO_ERROR,
+    SO_ACCEPTCONN,
+    SO_KEEPALIVE,
+    SO_BROADCAST,
+    SO_RCVBUF,
+};
 int setsockopt(int socket, int level, int option_name, const void *option_value,
                     socklen_t option_len);
+int getsockopt(int socket, int level, int option_name, void *option_value,
+                    socklen_t *option_len);
+
+int getpeername(int socket, struct sockaddr *address, socklen_t *address_len);
+int getsockname(int socket, struct sockaddr *address, socklen_t *address_len);
 
 int accept(int socket, struct sockaddr *address, socklen_t *address_len);
 int bind(int socket, const struct sockaddr *address, socklen_t address_len);
 int connect(int socket, const struct sockaddr *address, socklen_t address_len);
-int getpeername(int socket, struct sockaddr *address, socklen_t *address_len);
-int getsockname(int socket, struct sockaddr *address, socklen_t *address_len);
-int getsockopt(int socket, int level, int option_name, void *option_value,
-                    socklen_t *option_len);
 int listen(int socket, int backlog);
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
 ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,

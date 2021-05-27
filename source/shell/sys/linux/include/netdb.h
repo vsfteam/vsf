@@ -53,7 +53,9 @@ struct servent {
 };
 
 #if VSF_LINUX_SOCKET_CFG_FAKE_API == ENABLED
+#define getnameinfo         __vsf_linux_getnameinfo
 #define gethostbyaddr       __vsf_linux_gethostbyaddr
+#define gai_strerror        __vsf_linux_gai_strerror
 #define gethostbyname       __vsf_linux_gethostbyname
 #define getaddrinfo         __vsf_linux_getaddrinfo
 #define freeaddrinfo        __vsf_linux_freeaddrinfo
@@ -62,6 +64,17 @@ struct servent {
 struct hostent * gethostbyaddr(const void *addr, size_t len, int type);
 struct hostent * gethostbyname(const char *name);
 
+const char * gai_strerror(int errcode);
+
+// flags for getnameinfo
+#define NI_NAMEREQD         (1 << 0)
+#define NI_DGRAM            (1 << 1)
+#define NI_NOFQDN           (1 << 2)
+#define NI_NUMERICHOST      (1 << 3)
+#define NI_NUMERICSERV      (1 << 4)
+int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
+                        char *host, socklen_t hostlen,
+                        char *serv, socklen_t servlen, int flags);
 int getaddrinfo(const char *node, const char *service, const struct addrinfo *hints,
                         struct addrinfo **res);
 void freeaddrinfo(struct addrinfo *res);

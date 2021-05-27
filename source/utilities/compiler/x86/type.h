@@ -66,6 +66,7 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
 #define __optimal_bit_sz    (sizeof(uintalu_t) * 8)
 #define __optimal_bit_msk   (__optimal_bit_sz - 1)
 

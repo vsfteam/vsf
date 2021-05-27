@@ -33,6 +33,7 @@ extern "C" {
 #define system              __vsf_linux_system
 #define realpath            __vsf_linux_realpath
 #define sysconf             __vsf_linux_sysconf
+#define pipe                __vsf_linux_pipe
 
 #if __IS_COMPILER_IAR__
 #else
@@ -87,6 +88,7 @@ enum {
 };
 long sysconf(int name);
 char *realpath(const char *path, char *resolved_path);
+int pipe(int pipefd[2]);
 
 int creat(const char *pathname, mode_t mode);
 int open(const char *pathname, int flags, ...);

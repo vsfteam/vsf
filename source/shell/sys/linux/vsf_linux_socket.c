@@ -330,6 +330,18 @@ int getsockopt(int socket, int level, int optname, void *optval, socklen_t *optl
     return 0;
 }
 
+int getpeername(int socket, struct sockaddr *address, socklen_t *address_len)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int getsockname(int socket, struct sockaddr *address, socklen_t *address_len)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
@@ -442,6 +454,9 @@ ssize_t recv(int socket, void *buffer, size_t size, int flags)
     struct netconn *conn = priv->conn;
 
     VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
+
+    VSF_LINUX_ASSERT(false);
+    return SOCKET_ERROR;
 }
 
 ssize_t send(int socket, const void *buffer, size_t size, int flags)
@@ -641,6 +656,11 @@ int socket(int domain, int type, int protocol)
 }
 
 // netdb
+const char * gai_strerror(int errcode)
+{
+    return (const char *)"unknown error";
+}
+
 struct hostent * gethostbyaddr(const void *addr, size_t len, int type)
 {
     VSF_LINUX_ASSERT(false);
@@ -651,6 +671,14 @@ struct hostent * gethostbyname(const char *name)
 {
     VSF_LINUX_ASSERT(false);
     return NULL;
+}
+
+int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
+                        char *host, socklen_t hostlen,
+                        char *serv, socklen_t servlen, int flags)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 int getaddrinfo(const char *node, const char *service, const struct addrinfo *hints,

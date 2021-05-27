@@ -650,6 +650,12 @@ char *realpath(const char *path, char *resolved_path)
     return NULL;
 }
 
+int pipe(int pipefd[2])
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 int kill(pid_t pid, int sig)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
@@ -1008,14 +1014,11 @@ int vsf_linux_fd_rx_trigger(int fd)
     return 0;
 }
 
-#if !defined(__WIN__) || VSF_LINUX_CFG_FAKE_API == ENABLED
-// conflicts with select in winsock.h
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, struct timeval *timeout)
 {
     VSF_LINUX_ASSERT(false);
     return -1;
 }
-#endif
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {

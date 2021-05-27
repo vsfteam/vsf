@@ -13,14 +13,17 @@
 extern "C" {
 #endif
 
-#ifndef __WIN__
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
 #   define select               __vsf_linux_select
 #endif
 
-#ifndef __WIN__
+#define FD_ZERO(set)            vsf_bitmap_reset(*(set), 1024)
+#define FD_SET(fd, set)         vsf_bitmap_set(*(set), (fd))
+#define FD_CLR(fd, set)         vsf_bitmap_clear(*(set), (fd))
+#define FD_ISSET(fd, set)       vsf_bitmap_get(*(set), (fd))
+
 __vsf_declare_bitmap_ex(fd_set, 1024)
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, struct timeval *timeout);
-#endif
 
 #ifdef __cplusplus
 }

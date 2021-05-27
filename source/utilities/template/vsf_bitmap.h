@@ -55,7 +55,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
+
 #define __vsf_bitmap(__name)        __name##_bitmap_t
 
 #define __vsf_declare_bitmap_ex(__name, __bit_size)                             \
@@ -67,10 +69,11 @@ extern "C" {
 
 
 
-#define __vsf_bitmap_get(__bitmap_ptr, __bit, __pbit_val)                       \
+#define __vsf_bitmap_get0(__bitmap_ptr, __bit)                                  \
+    (__bitmap_ptr[(__bit) / __optimal_bit_sz] & ((uintalu_t)1 << ((__bit) & __optimal_bit_msk)))
+#define __vsf_bitmap_get1(__bitmap_ptr, __bit, __pbit_val)                      \
     do {                                                                        \
-        *(&(__bit_val)) =   __bitmap_ptr[(__bit) / __optimal_bit_sz]            \
-                        &   ((uintalu_t)1 << ((__bit) & __optimal_bit_msk));    \
+        *(&(__bit_val)) = __vsf_bitmap_get0(__bitmap_ptr, __bit);               \
     } while (0)
 
 #define __vsf_bitmap_set(__bitmap_ptr, __bit)                                   \
@@ -98,8 +101,8 @@ extern "C" {
 #define declare_vsf_bitmap(__name, __bit_size)                                  \
             vsf_declare_bitmap(__name, __bit_size)
 
-#define vsf_bitmap_get(__bitmap_ptr, __bit, __pbit_val)                         \
-            __vsf_bitmap_get((uintalu_t *)(__bitmap_ptr), (__bit), (__pbit_val))
+#define vsf_bitmap_get(__bitmap_ptr, __bit, ...)                                \
+            __PLOOC_EVAL(__vsf_bitmap_get, __VA_ARGS__)((__bitmap_ptr), (__bit), ##__VA_ARGS__)
 
 #define vsf_bitmap_set(__bitmap_ptr, __bit)                                     \
             __vsf_bitmap_set((uintalu_t *)(__bitmap_ptr), (__bit))
