@@ -255,8 +255,15 @@ in_addr_t inet_network(const char *cp)
 
 const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
 {
-    VSF_LINUX_ASSERT(false);
-    return NULL;
+    switch (af) {
+    case AF_INET:
+        strlcpy(dst, inet_ntoa(*(struct in_addr *)src), size);
+        break;
+    case AF_INET6:
+        // TODO: add ipv6 support
+        return NULL;
+    }
+    return dst;
 }
 
 // socket

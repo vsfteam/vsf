@@ -1071,8 +1071,9 @@ int vsf_linux_fd_rx_trigger(int fd)
 
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, struct timeval *timeout)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    // TODO: will be implemented soon, simply avoid returning error
+//    VSF_LINUX_ASSERT(false);
+    return 0;
 }
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
