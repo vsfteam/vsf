@@ -68,6 +68,50 @@ static const vsf_linux_fd_op_t __vsf_linux_socket_fdop = {
 // helper
 static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t *port)
 {
+    if (AF_INET6 == sockaddr->sa_family) {
+        const struct sockaddr_in6 *sockaddr_in6 = (const struct sockaddr_in6 *)sockaddr;
+
+        ip_2_ip6(ipaddr)->addr[0] = sockaddr_in6->sin6_addr.s6_addr[0];
+        ip_2_ip6(ipaddr)->addr[1] = sockaddr_in6->sin6_addr.s6_addr[1];
+        ip_2_ip6(ipaddr)->addr[2] = sockaddr_in6->sin6_addr.s6_addr[2];
+        ip_2_ip6(ipaddr)->addr[3] = sockaddr_in6->sin6_addr.s6_addr[3];
+        ip6_addr_clear_zone(ip_2_ip6(ipaddr));
+
+        if (ip6_addr_has_scope(ip_2_ip6(ipaddr), IP6_UNKNOWN)) {
+            ip6_addr_set_zone(ip_2_ip6(ipaddr), (u8_t)(sockaddr_in6->sin6_scope_id));
+        }
+        *port = lwip_ntohs(sockaddr_in6->sin6_port);
+        ipaddr->type = IPADDR_TYPE_V6;
+    } else {
+        const struct sockaddr_in * sockaddr_in = (const struct sockaddr_in *)sockaddr;
+
+        ip4_addr_set_u32(ip_2_ip4(ipaddr), sockaddr_in->sin_addr.s_addr);
+        *port = lwip_ntohs(sockaddr_in->sin_port);
+        ipaddr->type = IPADDR_TYPE_V4;
+    }
+}
+
+static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t port)
+{
+    if (IP_IS_ANY_TYPE_VAL(*ipaddr) || IP_IS_V6_VAL(*ipaddr)) {
+        struct sockaddr_in6 *sockaddr_in6 = (struct sockaddr_in6 *)sockaddr;
+
+        sockaddr_in6->sin6_family = AF_INET6;
+        sockaddr_in6->sin6_port = lwip_htons((port));
+        sockaddr_in6->sin6_flowinfo = 0;
+        sockaddr_in6->sin6_addr.s6_addr[0] = ip_2_ip6(ipaddr)->addr[0];
+        sockaddr_in6->sin6_addr.s6_addr[1] = ip_2_ip6(ipaddr)->addr[1];
+        sockaddr_in6->sin6_addr.s6_addr[2] = ip_2_ip6(ipaddr)->addr[2];
+        sockaddr_in6->sin6_addr.s6_addr[3] = ip_2_ip6(ipaddr)->addr[3];
+        sockaddr_in6->sin6_scope_id = ip6_addr_zone(ip_2_ip6(ipaddr));
+    } else {
+        struct sockaddr_in * sockaddr_in = (struct sockaddr_in *)sockaddr;
+
+        sockaddr_in->sin_family = AF_INET;
+        sockaddr_in->sin_port = lwip_htons((port));
+        sockaddr_in->sin_addr.s_addr = ip4_addr_get_u32(ip_2_ip4(ipaddr));
+        memset(sockaddr_in->sin_zero, 0, SIN_ZERO_LEN);
+    }
 }
 
 // arpa/inet.h
@@ -86,6 +130,7 @@ int inet_aton(const char *cp, struct in_addr *addr)
         if ((*endp != '.') || (num_parts >= 4)) {
             break;
         }
+        cp = endp + 1;
     }
 
     uint32_t val = parts[num_parts - 1];
@@ -300,7 +345,7 @@ int listen(int socket, int backlog)
         backlog = 0xFF;
     }
 
-    err_t err = netconn_listen_with_backlog(conn, (uint8_t)backlog);
+    err_t err = netconn_listen_with_backlog(conn, (u8_t)backlog);
     return (ERR_OK == err) ? 0 : SOCKET_ERROR;
 }
 

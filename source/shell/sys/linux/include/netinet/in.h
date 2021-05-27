@@ -51,7 +51,8 @@ struct sockaddr_in {
     sa_family_t             sin_family;
     in_port_t               sin_port;
     struct in_addr          sin_addr;
-    char                    sin_zero[8];
+#define SIN_ZERO_LEN        8
+    char                    sin_zero[SIN_ZERO_LEN];
 };
 
 #define IN6ADDR_ANY_INIT    { 0 }
