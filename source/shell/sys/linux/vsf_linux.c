@@ -142,6 +142,10 @@ typedef struct vsf_linux_stream_priv_t {
     vsf_stream_t *stream;
 } vsf_linux_stream_priv_t;
 
+typedef struct vsf_linux_pipe_priv_t {
+    int *pipefds;
+} vsf_linux_pipe_priv_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 int errno;
@@ -176,6 +180,11 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
 
+static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
+static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
+
 static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
         vsf_linux_main_entry_t entry, vsf_prio_t prio);
 
@@ -203,6 +212,14 @@ static const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
     .fn_read            = __vsf_linux_stream_read,
     .fn_write           = __vsf_linux_stream_write,
     .fn_close           = __vsf_linux_stream_close,
+};
+
+static const vsf_linux_fd_op_t __vsf_linux_pipe_fdop = {
+    .priv_size          = sizeof(vsf_linux_pipe_priv_t),
+    .fn_fcntl           = __vsf_linux_pipe_fcntl,
+    .fn_read            = __vsf_linux_pipe_read,
+    .fn_write           = __vsf_linux_pipe_write,
+    .fn_close           = __vsf_linux_pipe_close,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -650,10 +667,48 @@ char *realpath(const char *path, char *resolved_path)
     return NULL;
 }
 
+// pipe
+static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+{
+    return 0;
+}
+
+static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    return 0;
+}
+
+static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    return 0;
+}
+
+static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
+{
+    return 0;
+}
+
 int pipe(int pipefd[2])
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_pipe_priv_t *priv;
+    vsf_linux_fd_t *sfd;
+
+    pipefd[0] = vsf_linux_create_fd(&sfd, &__vsf_linux_pipe_fdop);
+    if (pipefd[0] < 0) {
+        return -1;
+    }
+    priv = (vsf_linux_pipe_priv_t *)sfd->priv;
+    priv->pipefds = pipefd;
+
+    pipefd[1] = vsf_linux_create_fd(NULL, &__vsf_linux_pipe_fdop);
+    if (pipefd[1] < 0) {
+        close(pipefd[0]);
+        return -1;
+    }
+    priv = (vsf_linux_pipe_priv_t *)sfd->priv;
+    priv->pipefds = pipefd;
+
+    return 0;
 }
 
 int kill(pid_t pid, int sig)
