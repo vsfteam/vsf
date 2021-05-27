@@ -297,6 +297,10 @@ err_t sys_mbox_new(sys_mbox_t *mbox, int size)
     }
     mbox->head = mbox->tail = 0;
 
+    // vsf_eda_queue_init can accept a minimal size of 1
+    if (size <= 0) {
+        size = 1;
+    }
     mbox->use_as__vsf_eda_queue_t.op = __sys_mbox_queue_op;
     vsf_eda_queue_init(&mbox->use_as__vsf_eda_queue_t, size);
     return ERR_OK;

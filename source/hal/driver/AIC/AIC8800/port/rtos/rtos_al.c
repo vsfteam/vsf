@@ -496,6 +496,9 @@ int rtos_queue_create(int elt_size, int nb_elt, rtos_queue *queue)
     rtos_queue q = vsf_heap_malloc(sizeof(vsf_rtos_queue_t) + nb_elt * elt_size);
     if (q != NULL) {
         q->head = q->tail = 0;
+        if (nb_elt <= 0) {
+            nb_elt = 1;
+        }
         q->node_num = nb_elt;
         q->node_size = elt_size;
 
