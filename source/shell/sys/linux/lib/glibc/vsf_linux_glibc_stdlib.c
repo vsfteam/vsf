@@ -49,6 +49,11 @@ void * malloc(size_t size)
     return vsf_heap_malloc(size);
 }
 
+void * aligned_alloc(size_t alignment, size_t size)
+{
+    return vsf_heap_malloc_aligned(size, alignment);
+}
+
 void * realloc(void *p, size_t size)
 {
     if (NULL == p) {

@@ -21,6 +21,7 @@ extern "C" {
 #define pthread_exit                    __vsf_linux_pthread_exit
 #define pthread_cancel                  __vsf_linux_pthread_cancel
 #define pthread_kill                    __vsf_linux_pthread_kill
+#define pthread_once                    __vsf_linux_pthread_once
 
 #define pthread_key_create              __vsf_linux_pthread_key_create
 #define pthread_setspecific             __vsf_linux_pthread_setspecific
@@ -55,19 +56,6 @@ extern "C" {
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
 #define PTHREAD_MUTEX_INITIALIZER       { .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 }
 #define PTHREAD_COND_INITIALIZER        { 0 }
-
-typedef int pthread_t;
-typedef struct {
-    void *stackaddr;
-    size_t stacksize;
-} pthread_attr_t;
-
-pthread_t pthread_self(void);
-int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg);
-int pthread_join(pthread_t tid, void **retval);
-void pthread_exit(void *retval);
-int pthread_cancel(pthread_t thread);
-int pthread_kill(pthread_t thread, int sig);
 
 
 
@@ -134,6 +122,26 @@ int pthread_condattr_setpshared(pthread_condattr_t *cattr, int pshared);
 int pthread_condattr_getpshared(pthread_condattr_t *cattr, int *pshared);
 int pthread_condattr_getclock(const pthread_condattr_t *cattr, clockid_t *clock_id);
 int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clock_id);
+
+
+
+typedef int pthread_t;
+typedef struct pthread_once_t {
+    pthread_mutex_t mutex;
+    bool is_inited;
+} pthread_once_t;
+typedef struct {
+    void *stackaddr;
+    size_t stacksize;
+} pthread_attr_t;
+
+pthread_t pthread_self(void);
+int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg);
+int pthread_join(pthread_t tid, void **retval);
+void pthread_exit(void *retval);
+int pthread_cancel(pthread_t thread);
+int pthread_kill(pthread_t thread, int sig);
+int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 
 #ifdef __cplusplus
 }

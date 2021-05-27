@@ -149,6 +149,19 @@ int pthread_kill(pthread_t thread, int sig)
     return 0;
 }
 
+int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
+{
+    if (!once_control->is_inited) {
+        pthread_mutex_lock(&once_control->mutex);
+        if (once_control->is_inited) {
+            init_routine();
+            once_control->is_inited = true;
+        }
+        pthread_mutex_unlock(&(once_control->mutex));
+    }
+    return 0;
+}
+
 // pthread_mutex
 int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr)
 {

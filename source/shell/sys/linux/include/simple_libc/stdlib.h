@@ -15,6 +15,7 @@ extern "C" {
 
 #if VSF_LINUX_LIBC_CFG_FAKE_API == ENABLED
 #define malloc              __vsf_linux_malloc
+#define aligned_alloc       __vsf_linux_aligned_alloc
 #define realloc             __vsf_linux_realloc
 #define free                __vsf_linux_free
 #define calloc              __vsf_linux_calloc
@@ -24,6 +25,7 @@ extern "C" {
 #endif
 
 void * malloc(size_t size);
+void * aligned_alloc(size_t alignment, size_t size);
 void * realloc(void *p, size_t size);
 void free(void *p);
 void * calloc(size_t n, size_t size);
