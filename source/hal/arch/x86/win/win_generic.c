@@ -74,7 +74,7 @@
 #endif
 
 #undef vsf_arch_trace_irq
-#if VSF_ARCH_TRACE_IRQ_EN == ENABLED
+#if VSF_ARCH_CFG_TRACE_IRQ == ENABLED
 #   define vsf_arch_trace_irq(...)                                              \
         vsf_arch_trace(VSF_ARCH_TRACE_HEADER,                                   \
             __vsf_x86_trace_color[VSF_ARCH_TRACE_IRQ_COLOR], __VA_ARGS__)
