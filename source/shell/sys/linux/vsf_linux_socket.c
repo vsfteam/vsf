@@ -24,15 +24,18 @@
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./include/unistd.h"
+#   include "./include/errno.h"
 #   include "./include/arpa/inet.h"
 #   include "./include/netdb.h"
 #else
 #   include <unistd.h>
+#   include <errno.h>
 #   include <arpa/inet.h>
 #   include <netdb.h>
 #endif
 
 #include "lwip/api.h"
+#include "lwip/ip.h"
 
 /*============================ MACROS ========================================*/
 
@@ -112,6 +115,26 @@ static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipad
         sockaddr_in->sin_addr.s_addr = ip4_addr_get_u32(ip_2_ip4(ipaddr));
         memset(sockaddr_in->sin_zero, 0, SIN_ZERO_LEN);
     }
+}
+
+// copied from lwip_socket
+static int lwip_sockopt_to_ipopt(int optname)
+{
+  /* Map SO_* values to our internal SOF_* values
+   * We should not rely on #defines in socket.h
+   * being in sync with ip.h.
+   */
+  switch (optname) {
+  case SO_BROADCAST:
+    return SOF_BROADCAST;
+  case SO_KEEPALIVE:
+    return SOF_KEEPALIVE;
+//  case SO_REUSEADDR:
+//    return SOF_REUSEADDR;
+  default:
+    LWIP_ASSERT("Unknown socket option", 0);
+    return 0;
+  }
 }
 
 // arpa/inet.h
@@ -231,18 +254,74 @@ const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
 }
 
 // socket
-int setsockopt(int socket, int level, int option_name, const void *option_value,
-                    socklen_t option_len)
+int setsockopt(int socket, int level, int optname, const void *optval, socklen_t optlen)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    struct netconn *conn = priv->conn;
+
+    switch (level) {
+    case SOL_SOCKET:
+        switch (optname) {
+        case SO_BROADCAST:
+            if (NETCONNTYPE_GROUP(conn->type) != NETCONN_UDP) {
+                return ENOPROTOOPT;
+            }
+            // fall through
+        case SO_KEEPALIVE:
+            optname = lwip_sockopt_to_ipopt(optname);
+            if (*(const int *)optval) {
+                ip_set_option(conn->pcb.ip, optname);
+            } else {
+                ip_reset_option(conn->pcb.ip, optname);
+            }
+            break;
+        default:
+            // TODO: add support
+            VSF_LINUX_ASSERT(false);
+            break;
+        }
+        break;
+    default:
+        // TODO: add support
+        VSF_LINUX_ASSERT(false);
+        break;
+    }
+    return 0;
 }
 
-int getsockopt(int socket, int level, int option_name, void *option_value,
-                    socklen_t *option_len)
+int getsockopt(int socket, int level, int optname, void *optval, socklen_t *optlen)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    struct netconn *conn = priv->conn;
+
+    switch (level) {
+    case SOL_SOCKET:
+        switch (optname) {
+        case SO_BROADCAST:
+            if (NETCONNTYPE_GROUP(conn->type) != NETCONN_UDP) {
+                return ENOPROTOOPT;
+            }
+            // fall through
+        case SO_KEEPALIVE:
+            optname = lwip_sockopt_to_ipopt(optname);
+            *(int *)optval = ip_get_option(conn->pcb.ip, optname);
+            break;
+        default:
+            // TODO: add support
+            VSF_LINUX_ASSERT(false);
+            break;
+        }
+        break;
+    default:
+        // TODO: add support
+        VSF_LINUX_ASSERT(false);
+        break;
+    }
+    return 0;
 }
 
 int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
