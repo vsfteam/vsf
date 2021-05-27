@@ -71,43 +71,133 @@ static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t
 }
 
 // arpa/inet.h
+int inet_aton(const char *cp, struct in_addr *addr)
+{
+    uint32_t parts[4];
+    int num_parts = 0;
+    char *endp;
+
+    for (;;) {
+        parts[num_parts++] = strtoul(cp, &endp, 0);
+        if (cp == endp) {
+            return 0;
+        }
+
+        if ((*endp != '.') || (num_parts >= 4)) {
+            break;
+        }
+    }
+
+    uint32_t val = parts[num_parts - 1];
+    switch (num_parts) {
+    case 1:     // a        -- 32 bits
+        break;
+    case 2:     // a.b      -- 8.24 bits
+        if (val > 0xFFFFFF) {
+            return 0;
+        }
+        val |= parts[0] << 24;
+        break;
+    case 3:     // a.b.c    -- 8.8.16 bits
+        if (val > 0xFFFF) {
+            return 0;
+        }
+        val |= (parts[0] << 24) | (parts[1] << 16);
+        break;
+    case 4:     // a.b.c.d  -- 8.8.8.8 bits
+        if (val > 0xFF) {
+            return 0;
+        }
+        val |= (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8);
+    }
+    if (addr) {
+        addr->s_addr = htonl(val);
+    }
+    return 1;
+}
+
 in_addr_t inet_addr(const char *cp)
 {
+    struct in_addr addr;
+    if (!inet_aton(cp, &addr)) {
+        return INADDR_NONE;
+    }
+    return addr.s_addr;
 }
 
 in_addr_t inet_lnaof(struct in_addr in)
 {
+    uint32_t val = ntohl(in.s_addr);
+    if (IN_CLASSA(val)) {
+        return val & IN_CLASSA_HOST;
+    } else if (IN_CLASSB(val)) {
+        return val & IN_CLASSB_HOST;
+    } else {
+        return val & IN_CLASSC_HOST;
+    }
 }
 
 struct in_addr inet_makeaddr(in_addr_t net, in_addr_t lna)
 {
+    in_addr_t addr;
+
+	if (net < 128) {
+		addr = (net << IN_CLASSA_NSHIFT) | (lna & IN_CLASSA_HOST);
+    } else if (net < 0x10000) {
+		addr = (net << IN_CLASSB_NSHIFT) | (lna & IN_CLASSB_HOST);
+    } else if (net < 0x1000000L) {
+		addr = (net << IN_CLASSC_NSHIFT) | (lna & IN_CLASSC_HOST);
+    } else {
+		addr = net | lna;
+    }
+	addr = htonl(addr);
+	return (*(struct in_addr *)&addr);
 }
 
 in_addr_t inet_netof(struct in_addr in)
 {
-}
-
-in_addr_t inet_network(const char *cp)
-{
+    uint32_t val = ntohl(in.s_addr);
+    if (IN_CLASSA(val)) {
+        return (val & IN_CLASSA_NET) >> IN_CLASSA_NSHIFT;
+    } else if (IN_CLASSB(val)) {
+        return (val & IN_CLASSB_NET) >> IN_CLASSB_NSHIFT;
+    } else {
+        return (val & IN_CLASSC_NET) >> IN_CLASSC_NSHIFT;
+    }
 }
 
 char * inet_ntoa(struct in_addr in)
 {
+	static char __inet_ntoa_buf[16];
+	unsigned char *a = (void *)&in;
+	snprintf(__inet_ntoa_buf, sizeof(__inet_ntoa_buf), "%d.%d.%d.%d", a[0], a[1], a[2], a[3]);
+	return __inet_ntoa_buf;
 }
 
-const char *inet_ntop(int af, const void *src, char *dst, socklen_t size)
+in_addr_t inet_network(const char *cp)
 {
+    return ntohl(inet_addr(cp));
+}
+
+const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
 }
 
 // socket
 int setsockopt(int socket, int level, int option_name, const void *option_value,
                     socklen_t option_len)
 {
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 int getsockopt(int socket, int level, int option_name, void *option_value,
                     socklen_t *option_len)
 {
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
@@ -399,19 +489,26 @@ int socket(int domain, int type, int protocol)
 // netdb
 struct hostent * gethostbyaddr(const void *addr, size_t len, int type)
 {
+    VSF_LINUX_ASSERT(false);
+    return NULL;
 }
 
 struct hostent * gethostbyname(const char *name)
 {
+    VSF_LINUX_ASSERT(false);
+    return NULL;
 }
 
 int getaddrinfo(const char *node, const char *service, const struct addrinfo *hints,
                         struct addrinfo **res)
 {
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 void freeaddrinfo(struct addrinfo *res)
 {
+    free(res);
 }
 
 #endif

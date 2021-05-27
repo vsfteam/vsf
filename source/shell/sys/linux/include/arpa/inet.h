@@ -23,6 +23,7 @@ extern "C" {
 #define inet_makeaddr       __vsf_linux_inet_makeaddr
 #define inet_netof          __vsf_linux_inet_netof
 #define inet_network        __vsf_linux_inet_network
+#define inet_aton           __vsf_linux_inet_aton
 #define inet_ntoa           __vsf_linux_inet_ntoa
 #define inet_ntop           __vsf_linux_inet_ntop
 #endif
@@ -37,8 +38,9 @@ in_addr_t inet_lnaof(struct in_addr in);
 struct in_addr inet_makeaddr(in_addr_t net, in_addr_t lna);
 in_addr_t inet_netof(struct in_addr in);
 in_addr_t inet_network(const char *cp);
+int inet_aton(const char *cp, struct in_addr *addr);
 char * inet_ntoa(struct in_addr in);
-const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
+const char * inet_ntop(int af, const void *src, char *dst, socklen_t size);
 
 #ifdef __cplusplus
 }
