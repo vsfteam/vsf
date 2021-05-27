@@ -47,8 +47,14 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_linux_socket_priv_t {
-    struct netconn *conn;
+    struct netconn          *conn;
 } vsf_linux_socket_priv_t;
+
+typedef union vsf_linux_sockaddr_t {
+    struct sockaddr         sa;
+    struct sockaddr_in      in;
+    struct sockaddr_in6     in6;
+} vsf_linux_sockaddr_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -462,7 +468,31 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
 
     VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP);
 
+    struct netbuf *buf;
+    err_t err = netconn_recv_udp_raw_netbuf_flags(conn, &buf, 0);
+    if (err != ERR_OK) {
+        return SOCKET_ERROR;
+    }
 
+    u16_t len = min(buf->p->tot_len, size);
+    pbuf_copy_partial(buf->p, buffer, len, 0);
+
+    vsf_linux_sockaddr_t addr;
+    socklen_t addrlen;
+    __ipaddr_port_to_sockaddr(&addr.sa, netbuf_fromaddr(buf), netbuf_fromport(buf));
+    if (AF_INET == addr.sa.sa_family) {
+        addrlen = sizeof(addr.in);
+    } else {
+        addrlen = sizeof(addr.in6);
+    }
+
+    if (fromlen != NULL) {
+        *fromlen = addrlen;
+    }
+    if (from != NULL) {
+        memcpy(from, &addr, addrlen);
+    }
+    return len;
 }
 
 ssize_t sendto(int socket, const void *buffer, size_t size, int flags,
