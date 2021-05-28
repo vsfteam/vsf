@@ -667,7 +667,7 @@ vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority)
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 
 SECTION(".text.vsf.kernel.__vsf_thread_wait_for_sync")
-static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, int_fast32_t time_out)
+static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, vsf_timeout_tick_t time_out)
 {
     vsf_err_t err;
     vsf_sync_reason_t reason;
@@ -689,19 +689,19 @@ static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, int_fast32
 }
 
 SECTION(".text.vsf.kernel.__vsf_thread_wait_for_sync")
-vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t* sem, int_fast32_t timeout)
+vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t* sem, vsf_timeout_tick_t timeout)
 {
     return __vsf_thread_wait_for_sync(sem, timeout);
 }
 
 SECTION(".text.vsf.kernel.__vsf_thread_wait_for_sync")
-vsf_sync_reason_t vsf_thread_trig_pend(vsf_trig_t* trig, int_fast32_t timeout)
+vsf_sync_reason_t vsf_thread_trig_pend(vsf_trig_t* trig, vsf_timeout_tick_t timeout)
 {
     return __vsf_thread_wait_for_sync(trig, timeout);
 }
 
 SECTION(".text.vsf.kernel.vsf_thread_mutex")
-vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, int_fast32_t timeout)
+vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, vsf_timeout_tick_t timeout)
 {
     return __vsf_thread_wait_for_sync(&mtx->use_as__vsf_sync_t, timeout);
 }
@@ -735,7 +735,7 @@ SECTION(".text.vsf.kernel.vsf_thread_bmpevt_pend")
 vsf_sync_reason_t vsf_thread_bmpevt_pend(
                     vsf_bmpevt_t *bmpevt,
                     vsf_bmpevt_pender_t *pender,
-                    int_fast32_t timeout)
+                    vsf_timeout_tick_t timeout)
 {
     vsf_sync_reason_t reason;
     vsf_err_t err;
