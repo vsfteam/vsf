@@ -255,7 +255,7 @@ static void * __vsf_libusb_libusb_user_thread(void *param)
 
             for (int i = 0; i < dimof(__vsf_libusb.pollfd); i++) {
                 if (__vsf_libusb.pollfd[i].fd >= 0) {
-                    vsf_linux_fd_rx_trigger(__vsf_libusb.pollfd[i].fd);
+                    vsf_linux_fd_rx_trigger(vsf_linux_get_fd(__vsf_libusb.pollfd[i].fd), vsf_protect_sched());
                 }
             }
         }

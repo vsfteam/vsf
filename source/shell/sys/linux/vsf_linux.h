@@ -238,10 +238,13 @@ extern int vsf_linux_create_fd(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op
 extern vsf_linux_fd_t * vsf_linux_get_fd(int fd);
 
 extern void vsf_linux_delete_fd(int fd);
-extern int vsf_linux_fd_tx_pend(int fd);
-extern int vsf_linux_fd_rx_pend(int fd);
-extern int vsf_linux_fd_tx_trigger(int fd);
-extern int vsf_linux_fd_rx_trigger(int fd);
+
+extern void vsf_linux_fd_trigger_init(vsf_trig_t *trig);
+// vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
+extern int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
+extern int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
+extern int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
+extern int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 
 extern vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd);
 #endif

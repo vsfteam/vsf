@@ -142,9 +142,20 @@ typedef struct vsf_linux_stream_priv_t {
     vsf_stream_t *stream;
 } vsf_linux_stream_priv_t;
 
-typedef struct vsf_linux_pipe_priv_t {
-    int *pipefds;
-} vsf_linux_pipe_priv_t;
+typedef struct vsf_linux_pipe_buffer_t {
+    vsf_slist_node_t buffer_node;
+    size_t size;
+    size_t pos;
+} vsf_linux_pipe_buffer_t;
+
+typedef struct vsf_linux_pipe_rx_priv_t {
+    int fd_tx;
+    vsf_slist_queue_t buffer_queue;
+} vsf_linux_pipe_rx_priv_t;
+
+typedef struct vsf_linux_pipe_tx_priv_t {
+    int fd_rx;
+} vsf_linux_pipe_tx_priv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -214,10 +225,16 @@ static const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
     .fn_close           = __vsf_linux_stream_close,
 };
 
-static const vsf_linux_fd_op_t __vsf_linux_pipe_fdop = {
-    .priv_size          = sizeof(vsf_linux_pipe_priv_t),
+static const vsf_linux_fd_op_t __vsf_linux_pipe_rx_fdop = {
+    .priv_size          = sizeof(vsf_linux_pipe_rx_priv_t),
     .fn_fcntl           = __vsf_linux_pipe_fcntl,
     .fn_read            = __vsf_linux_pipe_read,
+    .fn_close           = __vsf_linux_pipe_close,
+};
+
+static const vsf_linux_fd_op_t __vsf_linux_pipe_tx_fdop = {
+    .priv_size          = sizeof(vsf_linux_pipe_tx_priv_t),
+    .fn_fcntl           = __vsf_linux_pipe_fcntl,
     .fn_write           = __vsf_linux_pipe_write,
     .fn_close           = __vsf_linux_pipe_close,
 };
@@ -673,42 +690,114 @@ static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
     return 0;
 }
 
-static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t count)
 {
-    return 0;
+    vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+    vsf_linux_pipe_buffer_t *buffer;
+    ssize_t read_cnt = 0, cur_size;
+
+    vsf_trig_t trig;
+    vsf_linux_fd_trigger_init(&trig);
+
+    vsf_protect_t orig;
+    while (true) {
+        orig = vsf_protect_sched();
+        while (!vsf_slist_queue_is_empty(&priv_rx->buffer_queue)) {
+            vsf_slist_queue_peek(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
+            vsf_unprotect_sched(orig);
+
+            cur_size = buffer->size - buffer->pos;
+            cur_size = min(cur_size, count);
+            memcpy(buf, &buffer[1], cur_size);
+            buf += cur_size;
+            count -= cur_size;
+
+            orig = vsf_protect_sched();
+            if (!count) {
+                break;
+            }
+        }
+
+        if (!read_cnt) {
+            vsf_linux_fd_rx_pend(sfd_rx, &trig, orig);
+            continue;
+        }
+        vsf_unprotect_sched(orig);
+        break;
+    }
+    return read_cnt;
 }
 
-static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd, void *buf, size_t count)
+static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd_tx, void *buf, size_t count)
 {
-    return 0;
+    vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
+    vsf_linux_fd_t *sfd_rx = vsf_linux_get_fd(priv_tx->fd_rx);
+    vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+
+    vsf_linux_pipe_buffer_t *buffer = malloc(sizeof(*buffer) + count);
+    if (NULL == buffer) {
+        return -1;
+    }
+    vsf_slist_init_node(vsf_linux_pipe_buffer_t, buffer_node, buffer);
+    buffer->pos = 0;
+    buffer->size = count;
+
+    vsf_protect_t orig = vsf_protect_sched();
+    bool is_empty = vsf_slist_queue_is_empty(&priv_rx->buffer_queue);
+    vsf_slist_queue_enqueue(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
+    if (is_empty) {
+        vsf_linux_fd_rx_trigger(sfd_rx, orig);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
+    return count;
 }
 
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
 {
+    if (&__vsf_linux_pipe_rx_fdop == sfd->op) {
+        vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd->priv;
+        vsf_linux_pipe_buffer_t *buffer;
+
+        vsf_protect_t orig = vsf_protect_sched();
+        while (!vsf_slist_queue_is_empty(&priv_rx->buffer_queue)) {
+            vsf_slist_queue_dequeue(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
+            vsf_unprotect_sched(orig);
+            free(buffer);
+            orig = vsf_protect_sched();
+        }
+        vsf_unprotect_sched(orig);
+    }
     return 0;
 }
 
 int pipe(int pipefd[2])
 {
-    vsf_linux_pipe_priv_t *priv;
-    vsf_linux_fd_t *sfd;
+    vsf_linux_fd_t *sfd_rx, *sfd_tx;
 
-    pipefd[0] = vsf_linux_create_fd(&sfd, &__vsf_linux_pipe_fdop);
-    if (pipefd[0] < 0) {
-        return -1;
+    pipefd[0] = vsf_linux_create_fd(&sfd_rx, &__vsf_linux_pipe_rx_fdop);
+    pipefd[1] = vsf_linux_create_fd(&sfd_tx, &__vsf_linux_pipe_tx_fdop);
+    if ((pipefd[0] < 0) || (pipefd[1] < 0)) {
+        goto hell;
     }
-    priv = (vsf_linux_pipe_priv_t *)sfd->priv;
-    priv->pipefds = pipefd;
 
-    pipefd[1] = vsf_linux_create_fd(NULL, &__vsf_linux_pipe_fdop);
-    if (pipefd[1] < 0) {
-        close(pipefd[0]);
-        return -1;
-    }
-    priv = (vsf_linux_pipe_priv_t *)sfd->priv;
-    priv->pipefds = pipefd;
+    vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+    vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
+
+    priv_rx->fd_tx = sfd_tx->fd;
+    vsf_slist_queue_init(&priv_rx->buffer_queue);
+    priv_tx->fd_rx = sfd_rx->fd;
 
     return 0;
+
+hell:
+    if (pipefd[0] >= 0) {
+        close(pipefd[0]);
+    }
+    if (pipefd[1] >= 0) {
+        close(pipefd[1]);
+    }
+    return -1;
 }
 
 int kill(pid_t pid, int sig)
@@ -999,47 +1088,40 @@ void vsf_linux_delete_fd(int fd)
     free(sfd);
 }
 
-int vsf_linux_fd_tx_pend(int fd)
+void vsf_linux_fd_trigger_init(vsf_trig_t *trig)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
-    vsf_trig_t trig;
+    vsf_eda_trig_init(trig, false, true);
+}
 
-    vsf_eda_trig_init(&trig, false, true);
-    vsf_protect_t orig = vsf_protect_sched();
+int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig)
+{
     if (sfd->txevt) {
         sfd->txevt = false;
         vsf_unprotect_sched(orig);
     } else {
-        sfd->txpend = &trig;
+        sfd->txpend = trig;
         vsf_unprotect_sched(orig);
-        vsf_thread_trig_pend(&trig, -1);
+        vsf_thread_trig_pend(trig, -1);
     }
     return 0;
 }
 
-int vsf_linux_fd_rx_pend(int fd)
+int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
-    vsf_trig_t trig;
-
-    vsf_eda_trig_init(&trig, false, true);
-    vsf_protect_t orig = vsf_protect_sched();
     if (sfd->rxevt) {
         sfd->rxevt = false;
         vsf_unprotect_sched(orig);
     } else {
-        sfd->rxpend = &trig;
+        sfd->rxpend = trig;
         vsf_unprotect_sched(orig);
-        vsf_thread_trig_pend(&trig, -1);
+        vsf_thread_trig_pend(trig, -1);
     }
     return 0;
 }
 
-int vsf_linux_fd_tx_trigger(int fd)
+// vsf_linux_fd_xx_trigger MUST be called scheduler protected
+int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
-
-    vsf_protect_t orig = vsf_protect_sched();
     if (sfd->txpend != NULL) {
         vsf_unprotect_sched(orig);
         vsf_trig_t *trig = sfd->txpend;
@@ -1052,11 +1134,8 @@ int vsf_linux_fd_tx_trigger(int fd)
     return 0;
 }
 
-int vsf_linux_fd_rx_trigger(int fd)
+int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
-
-    vsf_protect_t orig = vsf_protect_sched();
     if (sfd->rxpend != NULL) {
         vsf_unprotect_sched(orig);
         vsf_trig_t *trig = sfd->rxpend;
