@@ -589,6 +589,13 @@ int shutdown(int socket, int how)
 
 static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len)
 {
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(conn->socket);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    switch (evt) {
+    case NETCONN_EVT_RCVPLUS:
+        vsf_linux_fd_rx_trigger(sfd, vsf_protect_sched());
+        break;
+    }
 }
 
 // socket fd
@@ -659,6 +666,7 @@ int socket(int domain, int type, int protocol)
 
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     priv->conn = conn;
+    conn->socket = fd;
     return fd;
 }
 
