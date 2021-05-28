@@ -1069,14 +1069,7 @@ int vsf_linux_fd_rx_trigger(int fd)
     return 0;
 }
 
-int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, struct timeval *timeout)
-{
-    // TODO: will be implemented soon, simply avoid returning error
-//    VSF_LINUX_ASSERT(false);
-    return 0;
-}
-
-int poll(struct pollfd *fds, nfds_t nfds, int timeout)
+int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t timeout)
 {
     vsf_protect_t orig;
     vsf_linux_fd_t *sfd;
@@ -1100,7 +1093,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
                 }
             }
         }
-        if (ret) {
+        if (ret || (0 == timeout)) {
             return ret;
         }
 
@@ -1115,7 +1108,14 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
                 }
             vsf_unprotect_sched(orig);
         }
-        vsf_thread_trig_pend(&trig, -1);
+
+        vsf_sync_reason_t r = vsf_thread_trig_pend(&trig, timeout);
+        if (VSF_SYNC_TIMEOUT == r) {
+            return 0;
+        } else if (r != VSF_SYNC_GET) {
+            return -1;
+        }
+
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_get_fd(fds[i].fd);
             orig = vsf_protect_sched();
@@ -1139,13 +1139,87 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
     return 0;
 }
 
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, struct timeval *timeout)
+{
+    int fd_num = 0;
+
+    if (execeptfds != NULL) {
+        VSF_LINUX_ASSERT(false);
+        return -1;
+    }
+
+    fd_set mask;
+    FD_ZERO(&mask);
+    for (int i = 0; i < nfds; i++) {
+        if (    ((readfds != NULL) && (FD_ISSET(i, readfds)))
+            ||  ((writefds != NULL) && (FD_ISSET(i, writefds)))) {
+            FD_SET(i, &mask);
+            fd_num++;
+        }
+    }
+
+    struct pollfd *fds = NULL;
+    if (fd_num > 0) {
+        fds = malloc(fd_num * sizeof(struct pollfd));
+        if (NULL == fds) {
+            return -1;
+        }
+        memset(fds, 0, fd_num * sizeof(struct pollfd));
+
+        for (int i = 0; i < nfds; i++) {
+            if (FD_ISSET(i, &mask)) {
+                fds[i].fd = i;
+                if ((readfds != NULL) && (FD_ISSET(i, readfds))) {
+                    fds[i].events |= POLLIN;
+                }
+                if ((writefds != NULL) && (FD_ISSET(i, writefds))) {
+                    fds[i].events |= POLLOUT;
+                }
+            }
+        }
+
+        if (readfds != NULL) {
+            FD_ZERO(readfds);
+        }
+        if (writefds != NULL) {
+            FD_ZERO(writefds);
+        }
+    }
+
+    vsf_timeout_tick_t timeout_tick = -1;
+    if (timeout != NULL) {
+        timeout_tick = vsf_systimer_ms_to_tick(1000 * timeout->tv_sec);
+        timeout_tick += vsf_systimer_us_to_tick(timeout->tv_usec);
+    }
+    int ret = __vsf_linux_poll_tick(fds, fd_num, timeout_tick);
+    if (ret > 0) {
+        for (int i = 0; i < fd_num; i++) {
+            if (fds[i].revents & POLLIN) {
+                FD_SET(fds[i].fd, readfds);
+            }
+            if (fds[i].revents & POLLOUT) {
+                FD_SET(fds[i].fd, writefds);
+            }
+        }
+    }
+    if (fds != NULL) {
+        free(fds);
+    }
+    return ret;
+}
+
+int poll(struct pollfd *fds, nfds_t nfds, int timeout)
+{
+    vsf_timeout_tick_t timeout_tick = (timeout < 0) ? -1 : vsf_systimer_ms_to_tick(timeout);
+    return __vsf_linux_poll_tick(fds, nfds, timeout_tick);
+}
+
 int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask)
 {
     sigset_t origmask;
     int timeout, ready;
 
-    timeout = (timeout_ts == NULL) ? -1 :
-           (timeout_ts->tv_sec * 1000 + timeout_ts->tv_nsec / 1000000);
+    timeout = (timeout_ts == NULL) ? -1 : (timeout_ts->tv_sec * 1000 + timeout_ts->tv_nsec / 1000000);
     sigprocmask(SIG_SETMASK, sigmask, &origmask);
     ready = poll(fds, nfds, timeout);
     sigprocmask(SIG_SETMASK, &origmask, NULL);
