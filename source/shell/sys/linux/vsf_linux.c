@@ -1156,8 +1156,9 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
     nfds_t i;
     vsf_trig_t trig;
 
-    vsf_eda_trig_init(&trig, false, true);
+    vsf_linux_fd_trigger_init(&trig);
     while (1) {
+        orig = vsf_protect_sched();
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_get_fd(fds[i].fd);
             if (sfd->rxevt || sfd->txevt) {
@@ -1173,20 +1174,20 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             }
         }
         if (ret || (0 == timeout)) {
+            vsf_unprotect_sched(orig);
             return ret;
         }
 
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_get_fd(fds[i].fd);
-            orig = vsf_protect_sched();
-                if (fds[i].events & POLLIN) {
-                    sfd->rxpend = &trig;
-                }
-                if (fds[i].events & POLLOUT) {
-                    sfd->txpend = &trig;
-                }
-            vsf_unprotect_sched(orig);
+            if (fds[i].events & POLLIN) {
+                sfd->rxpend = &trig;
+            }
+            if (fds[i].events & POLLOUT) {
+                sfd->txpend = &trig;
+            }
         }
+        vsf_unprotect_sched(orig);
 
         vsf_sync_reason_t r = vsf_thread_trig_pend(&trig, timeout);
         if (VSF_SYNC_TIMEOUT == r) {
@@ -1245,15 +1246,16 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
         }
         memset(fds, 0, fd_num * sizeof(struct pollfd));
 
-        for (int i = 0; i < nfds; i++) {
+        for (int i = 0, idx = 0; i < nfds; i++) {
             if (FD_ISSET(i, &mask)) {
-                fds[i].fd = i;
+                fds[idx].fd = i;
                 if ((readfds != NULL) && (FD_ISSET(i, readfds))) {
-                    fds[i].events |= POLLIN;
+                    fds[idx].events |= POLLIN;
                 }
                 if ((writefds != NULL) && (FD_ISSET(i, writefds))) {
-                    fds[i].events |= POLLOUT;
+                    fds[idx].events |= POLLOUT;
                 }
+                idx++;
             }
         }
 

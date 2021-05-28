@@ -228,6 +228,7 @@ typedef int (*libusb_hotplug_callback_fn)(libusb_context *ctx,
 
 struct libusb_pollfd {
     struct pollfd;
+    vsf_linux_fd_t *sfd;
 };
 
 enum libusb_transfer_status {
