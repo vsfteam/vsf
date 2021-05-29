@@ -471,11 +471,14 @@ ssize_t send(int socket, const void *buffer, size_t size, int flags)
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
-    VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
-
-    size_t written = 0;
-    err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
-    return (ERR_OK == err) ? (ssize_t)written : SOCKET_ERROR;
+    if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
+        size_t written = 0;
+        err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
+        return (ERR_OK == err) ? (ssize_t)written : SOCKET_ERROR;
+    } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
+        return sendto(socket, buffer, size, flags, NULL, 0);
+    }
+    return SOCKET_ERROR;
 }
 
 ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
