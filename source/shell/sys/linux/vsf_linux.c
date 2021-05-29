@@ -426,7 +426,6 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
     vsf_linux_process_t *process = calloc(1, sizeof(vsf_linux_process_t));
     if (process != NULL) {
         process->prio = vsf_prio_inherit;
-        process->stdio_stream = __vsf_linux.stdio_stream;
 
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, stack_size, &__vsf_linux_main_op);
         if (NULL == thread) {
@@ -455,6 +454,7 @@ vsf_linux_process_t * vsf_linux_create_process(int stack_size)
         vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();
         VSF_LINUX_ASSERT(parent_process != NULL);
         process->working_dir = strdup(parent_process->working_dir);
+        process->stdio_stream = parent_process->stdio_stream;
         VSF_LINUX_ASSERT(process->working_dir != NULL);
     }
     return process;
@@ -477,6 +477,7 @@ static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
         process->prio = prio;
         process->ctx.entry = entry;
         process->working_dir = strdup("/");
+        process->stdio_stream = __vsf_linux.stdio_stream;
         VSF_LINUX_ASSERT(process->working_dir != NULL);
         vsf_linux_start_process(process);
     }
