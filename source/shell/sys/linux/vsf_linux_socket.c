@@ -590,10 +590,13 @@ int shutdown(int socket, int how)
 
 static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len)
 {
-    switch (evt) {
-    case NETCONN_EVT_RCVPLUS:
-        vsf_linux_fd_rx_trigger((vsf_linux_fd_t *)conn->socket, vsf_protect_sched());
-        break;
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)conn->socket;
+    if (sfd != NULL) {
+        switch (evt) {
+        case NETCONN_EVT_RCVPLUS:
+            vsf_linux_fd_rx_trigger(sfd, vsf_protect_sched());
+            break;
+        }
     }
 }
 
@@ -621,6 +624,7 @@ static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd)
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
+    conn->socket = 0;
     netconn_prepare_delete(conn);
     return 0;
 }
