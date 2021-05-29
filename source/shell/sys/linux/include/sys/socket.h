@@ -75,17 +75,17 @@ enum {
     SO_BROADCAST,
     SO_RCVBUF,
 };
-int setsockopt(int socket, int level, int option_name, const void *option_value,
-                    socklen_t option_len);
-int getsockopt(int socket, int level, int option_name, void *option_value,
-                    socklen_t *option_len);
+int setsockopt(int socket, int level, int optname, const void *optval,
+                    socklen_t optlen);
+int getsockopt(int socket, int level, int optname, void *optval,
+                    socklen_t *optlen);
 
-int getpeername(int socket, struct sockaddr *address, socklen_t *address_len);
-int getsockname(int socket, struct sockaddr *address, socklen_t *address_len);
+int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen);
+int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen);
 
-int accept(int socket, struct sockaddr *address, socklen_t *address_len);
-int bind(int socket, const struct sockaddr *address, socklen_t address_len);
-int connect(int socket, const struct sockaddr *address, socklen_t address_len);
+int accept(int socket, struct sockaddr *addr, socklen_t *addrlen);
+int bind(int socket, const struct sockaddr *addr, socklen_t addrlen);
+int connect(int socket, const struct sockaddr *addr, socklen_t addrlen);
 int listen(int socket, int backlog);
 
 // flags
@@ -96,10 +96,10 @@ enum {
 };
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
 ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
-                    struct sockaddr *address, socklen_t *address_len);
+                    struct sockaddr *src_addr, socklen_t *addrlen);
 ssize_t send(int socket, const void *message, size_t length, int flags);
 ssize_t sendto(int socket, const void *message, size_t length, int flags,
-                    const struct sockaddr *dest_addr, socklen_t dest_len);
+                    const struct sockaddr *dest_addr, socklen_t addrlen);
 // how for shutdown
 enum {
     SHUT_RD             = 1 << 0,

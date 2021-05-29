@@ -341,16 +341,32 @@ int getsockopt(int socket, int level, int optname, void *optval, socklen_t *optl
     return 0;
 }
 
-int getpeername(int socket, struct sockaddr *address, socklen_t *address_len)
+int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    struct netconn *conn = priv->conn;
+
+    ip_addr_t localaddr;
+    u16_t port;
+    netconn_peer(conn, &localaddr, &port);
+    __ipaddr_port_to_sockaddr(addr, &localaddr, port);
+    return 0;
 }
 
-int getsockname(int socket, struct sockaddr *address, socklen_t *address_len)
+int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    struct netconn *conn = priv->conn;
+
+    ip_addr_t localaddr;
+    u16_t port;
+    netconn_addr(conn, &localaddr, &port);
+    __ipaddr_port_to_sockaddr(addr, &localaddr, port);
+    return 0;
 }
 
 int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
@@ -478,7 +494,7 @@ ssize_t send(int socket, const void *buffer, size_t size, int flags)
 }
 
 ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
-                    struct sockaddr *from, socklen_t *fromlen)
+                    struct sockaddr *src_addr, socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
     VSF_LINUX_ASSERT(sfd != NULL);
@@ -541,19 +557,19 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
 
     if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
         vsf_linux_sockaddr_t addr;
-        socklen_t addrlen;
+        socklen_t src_addrlen;
         __ipaddr_port_to_sockaddr(&addr.sa, netbuf_fromaddr(priv->last.netbuf), netbuf_fromport(priv->last.netbuf));
         if (AF_INET == addr.sa.sa_family) {
-            addrlen = sizeof(addr.in);
+            src_addrlen = sizeof(addr.in);
         } else {
-            addrlen = sizeof(addr.in6);
+            src_addrlen = sizeof(addr.in6);
         }
 
-        if (fromlen != NULL) {
-            *fromlen = addrlen;
+        if (addrlen != NULL) {
+            *addrlen = src_addrlen;
         }
-        if (from != NULL) {
-            memcpy(from, &addr, addrlen);
+        if (src_addr != NULL) {
+            memcpy(src_addr, &addr, src_addrlen);
         }
         if (!(flags & MSG_PEEK)) {
             priv->last.netbuf = NULL;
@@ -565,7 +581,7 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
 }
 
 ssize_t sendto(int socket, const void *buffer, size_t size, int flags,
-                    const struct sockaddr *to, socklen_t tolen)
+                    const struct sockaddr *dst_addr, socklen_t addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
     VSF_LINUX_ASSERT(sfd != NULL);
@@ -580,8 +596,8 @@ ssize_t sendto(int socket, const void *buffer, size_t size, int flags,
 
     struct netbuf buf = { 0 };
     uint16_t remote_port;
-    if (to) {
-        __sockaddr_to_ipaddr_port(to, &buf.addr, &remote_port);
+    if (dst_addr) {
+        __sockaddr_to_ipaddr_port(dst_addr, &buf.addr, &remote_port);
     } else {
         remote_port = 0;
         ip_addr_set_any(NETCONNTYPE_ISIPV6(netconn_type(conn)), &buf.addr);
@@ -728,13 +744,11 @@ const char * gai_strerror(int errcode)
 
 struct hostent * gethostbyaddr(const void *addr, size_t len, int type)
 {
-    VSF_LINUX_ASSERT(false);
     return NULL;
 }
 
 struct hostent * gethostbyname(const char *name)
 {
-    VSF_LINUX_ASSERT(false);
     return NULL;
 }
 
@@ -742,7 +756,6 @@ int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
                         char *host, socklen_t hostlen,
                         char *serv, socklen_t servlen, int flags)
 {
-    VSF_LINUX_ASSERT(false);
     return -1;
 }
 
