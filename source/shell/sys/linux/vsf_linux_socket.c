@@ -418,8 +418,6 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
-    VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
-
     ip_addr_t remote_addr;
     uint16_t remote_port;
     __sockaddr_to_ipaddr_port(addr, &remote_addr, &remote_port);
