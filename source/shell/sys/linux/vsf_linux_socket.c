@@ -67,6 +67,7 @@ typedef union vsf_linux_sockaddr_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+static int __vsf_linux_socket_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static ssize_t __vsf_linux_socket_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_socket_write(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd);
@@ -75,6 +76,7 @@ static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd);
 
 static const vsf_linux_fd_op_t __vsf_linux_socket_fdop = {
     .priv_size          = sizeof(vsf_linux_socket_priv_t),
+    .fn_fcntl           = __vsf_linux_socket_fcntl,
     .fn_read            = __vsf_linux_socket_read,
     .fn_write           = __vsf_linux_socket_write,
     .fn_close           = __vsf_linux_socket_close,
@@ -667,6 +669,11 @@ static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netcon
 }
 
 // socket fd
+int __vsf_linux_socket_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+{
+    return 0;
+}
+
 static ssize_t __vsf_linux_socket_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
