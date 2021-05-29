@@ -20,6 +20,7 @@ extern "C" {
 #define AF_INET6        10
 
 // protocol families
+#define PF_UNSPEC       0
 #define PF_INET         AF_INET
 #define PF_INET6        AF_INET6
 

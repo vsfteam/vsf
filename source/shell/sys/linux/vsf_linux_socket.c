@@ -695,16 +695,82 @@ int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
     return -1;
 }
 
-int getaddrinfo(const char *node, const char *service, const struct addrinfo *hints,
-                        struct addrinfo **res)
+int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
+                        struct addrinfo **pai)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    static const struct addrinfo __default_hints = {
+        .ai_flags = AI_V4MAPPED | AI_ADDRCONFIG,
+        .ai_family = PF_UNSPEC,
+        .ai_socktype = 0,
+        .ai_protocol = 0,
+        .ai_addrlen = 0,
+        .ai_addr = NULL,
+        .ai_canonname = NULL,
+        .ai_next = NULL,
+    };
+
+    if (name != NULL && name[0] == '*' && name[1] == 0) {
+        name = NULL;
+    }
+    if (service != NULL && service[0] == '*' && service[1] == 0) {
+        service = NULL;
+    }
+    if (name == NULL && service == NULL) {
+        return EAI_NONAME;
+    }
+    if (hints == NULL) {
+        hints = &__default_hints;
+    }
+    if (hints->ai_flags
+        & ~(    AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_ADDRCONFIG
+            |   AI_V4MAPPED | AI_NUMERICSERV | AI_ALL)) {
+        return EAI_BADFLAGS;
+    }
+    if ((hints->ai_flags & AI_CANONNAME) && name == NULL) {
+        return EAI_BADFLAGS;
+    }
+
+    // TODO: re-implement
+    struct in_addr addr;
+    if (!inet_aton(name, &addr)) {
+        return EAI_NONAME;
+    }
+
+    struct __addrinfo {
+        struct addrinfo info;
+        union {
+            struct sockaddr sa;
+            struct sockaddr_in sa_in;
+            struct sockaddr_in6 sa_in6;
+        };
+    };
+    struct __addrinfo *ai = malloc(sizeof(struct __addrinfo));
+    if (NULL == ai) {
+        return EAI_MEMORY;
+    }
+    memset(ai, 0, sizeof(struct __addrinfo));
+
+    ai->info.ai_family      = AF_INET;
+    ai->info.ai_addr        = &ai->sa;
+    ai->sa_in.sin_family    = AF_INET;
+    ai->sa_in.sin_addr      = addr;
+    ai->info.ai_addrlen     = sizeof(ai->sa_in);
+    *pai = &ai->info;
+    return 0;
 }
 
-void freeaddrinfo(struct addrinfo *res)
+void freeaddrinfo(struct addrinfo *ai)
 {
-    free(res);
+    struct addrinfo *p;
+    while (ai != NULL) {
+        p = ai;
+        ai = ai->ai_next;
+
+        if (p->ai_canonname != NULL) {
+            free(p->ai_canonname);
+        }
+        free(p);
+    }
 }
 
 #endif
