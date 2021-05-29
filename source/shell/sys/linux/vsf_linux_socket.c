@@ -486,7 +486,6 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
     struct netconn *conn = priv->conn;
     u16_t len = 0, pos = 0;
 
-recv_more:
     struct pbuf *pbuf = priv->last.pbuf;
     if (NULL == pbuf) {
         err_t err;
@@ -514,7 +513,7 @@ recv_more:
         }
 
         if (err != ERR_OK) {
-            return SOCKET_ERROR;
+            return 0 == len ? -1 : len;
         }
         if (priv->last.netbuf != NULL) {
             priv->last.pbuf = priv->last.netbuf->p;
@@ -535,10 +534,6 @@ recv_more:
         }
         priv->last.pbuf = pbuf;
         pos = 0;
-    }
-    if (    (size > 0)
-        &&  (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP)) {
-        goto recv_more;
     }
 
     if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
