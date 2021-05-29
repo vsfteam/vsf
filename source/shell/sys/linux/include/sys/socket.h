@@ -90,7 +90,9 @@ int listen(int socket, int backlog);
 
 // flags
 enum {
-    MSG_PEEK            = 1 << 0,
+    MSG_OOB             = 1 << 0,
+    MSG_PEEK            = 1 << 1,
+    MSG_WAITALL         = 1 << 2,
 };
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
 ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
