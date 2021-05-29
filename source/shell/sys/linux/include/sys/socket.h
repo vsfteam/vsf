@@ -87,6 +87,11 @@ int accept(int socket, struct sockaddr *address, socklen_t *address_len);
 int bind(int socket, const struct sockaddr *address, socklen_t address_len);
 int connect(int socket, const struct sockaddr *address, socklen_t address_len);
 int listen(int socket, int backlog);
+
+// flags
+enum {
+    MSG_PEEK            = 1 << 0,
+};
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
 ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
                     struct sockaddr *address, socklen_t *address_len);

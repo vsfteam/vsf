@@ -48,6 +48,10 @@
 
 typedef struct vsf_linux_socket_priv_t {
     struct netconn          *conn;
+    struct {
+        struct netbuf       *netbuf;
+        struct pbuf         *pbuf;
+    } last;
 } vsf_linux_socket_priv_t;
 
 typedef union vsf_linux_sockaddr_t {
@@ -453,15 +457,7 @@ int listen(int socket, int backlog)
 
 ssize_t recv(int socket, void *buffer, size_t size, int flags)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-    struct netconn *conn = priv->conn;
-
-    VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
-
-    VSF_LINUX_ASSERT(false);
-    return SOCKET_ERROR;
+    return recvfrom(socket, buffer, size, flags, NULL, NULL);
 }
 
 ssize_t send(int socket, const void *buffer, size_t size, int flags)
@@ -488,32 +484,84 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
     VSF_LINUX_ASSERT(sfd != NULL);
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
+    u16_t len = 0, pos = 0;
 
-    VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP);
+recv_more:
+    struct pbuf *pbuf = priv->last.pbuf;
+    if (NULL == pbuf) {
+        err_t err;
 
-    struct netbuf *buf;
-    err_t err = netconn_recv_udp_raw_netbuf_flags(conn, &buf, 0);
-    if (err != ERR_OK) {
-        return SOCKET_ERROR;
+        if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
+            struct netbuf *netbuf;
+            err = netconn_recv_udp_raw_netbuf_flags(conn, &netbuf, flags);
+            if (ERR_OK == err) {
+                if (priv->last.netbuf != NULL) {
+                    netbuf_chain(priv->last.netbuf, netbuf);
+                } else {
+                    priv->last.netbuf = netbuf;
+                }
+            }
+        } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
+            struct pbuf *pbuf;
+            err = netconn_recv_tcp_pbuf_flags(conn, &pbuf, flags);
+            if (ERR_OK == err) {
+                if (priv->last.pbuf != NULL) {
+                    pbuf_chain(priv->last.pbuf, pbuf);
+                } else {
+                    priv->last.pbuf = pbuf;
+                }
+            }
+        }
+
+        if (err != ERR_OK) {
+            return SOCKET_ERROR;
+        }
+        if (priv->last.netbuf != NULL) {
+            priv->last.pbuf = priv->last.netbuf->p;
+        }
+        pbuf = priv->last.pbuf;
     }
 
-    u16_t len = min(buf->p->tot_len, size);
-    pbuf_copy_partial(buf->p, buffer, len, 0);
 
-    vsf_linux_sockaddr_t addr;
-    socklen_t addrlen;
-    __ipaddr_port_to_sockaddr(&addr.sa, netbuf_fromaddr(buf), netbuf_fromport(buf));
-    if (AF_INET == addr.sa.sa_family) {
-        addrlen = sizeof(addr.in);
-    } else {
-        addrlen = sizeof(addr.in6);
+    u16_t curlen = min(pbuf->tot_len, size);
+    pbuf_copy_partial(pbuf, buffer, curlen, pos);
+    len += curlen;
+    size -= curlen;
+    pos += curlen;
+    if (!(flags & MSG_PEEK)) {
+        pbuf = pbuf_free_header(pbuf, curlen);
+        if (priv->last.netbuf != NULL) {
+            priv->last.netbuf->ptr = priv->last.netbuf->p = pbuf;
+        }
+        priv->last.pbuf = pbuf;
+        pos = 0;
+    }
+    if (    (size > 0)
+        &&  (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP)) {
+        goto recv_more;
     }
 
-    if (fromlen != NULL) {
-        *fromlen = addrlen;
-    }
-    if (from != NULL) {
-        memcpy(from, &addr, addrlen);
+    if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
+        vsf_linux_sockaddr_t addr;
+        socklen_t addrlen;
+        __ipaddr_port_to_sockaddr(&addr.sa, netbuf_fromaddr(priv->last.netbuf), netbuf_fromport(priv->last.netbuf));
+        if (AF_INET == addr.sa.sa_family) {
+            addrlen = sizeof(addr.in);
+        } else {
+            addrlen = sizeof(addr.in6);
+        }
+
+        if (fromlen != NULL) {
+            *fromlen = addrlen;
+        }
+        if (from != NULL) {
+            memcpy(from, &addr, addrlen);
+        }
+        if (!(flags & MSG_PEEK)) {
+            priv->last.netbuf = NULL;
+            priv->last.pbuf = NULL;
+            netbuf_delete(priv->last.netbuf);
+        }
     }
     return len;
 }
