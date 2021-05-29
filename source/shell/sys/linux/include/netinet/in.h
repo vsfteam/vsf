@@ -67,6 +67,12 @@ struct sockaddr_in6 {
     uint32_t                sin6_scope_id;
 };
 
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../arpa/inet.h"
+#else
+#   include <arpa/inet.h>
+#endif
+
 #ifdef __cplusplus
 }
 #endif

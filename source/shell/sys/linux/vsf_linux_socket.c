@@ -25,11 +25,15 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./include/unistd.h"
 #   include "./include/errno.h"
+#   include "./include/sys/socket.h"
+#   include "./include/netinet/in.h"
 #   include "./include/arpa/inet.h"
 #   include "./include/netdb.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
+#   include <sys/socket.h>
+#   include <netinet/in.h>
 #   include <arpa/inet.h>
 #   include <netdb.h>
 #endif
