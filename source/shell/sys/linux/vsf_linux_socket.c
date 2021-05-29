@@ -705,7 +705,8 @@ int socket(int domain, int type, int protocol)
         break;
     case SOCK_STREAM:
         if (protocol != IPPROTO_TCP) {
-            return INVALID_SOCKET;
+            // some user code will call socket to create STREAM sock with protocol 0
+//            return INVALID_SOCKET;
         }
         conn_type = NETCONN_TCP;
         break;
