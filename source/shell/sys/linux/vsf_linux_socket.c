@@ -300,6 +300,9 @@ int setsockopt(int socket, int level, int optname, const void *optval, socklen_t
                 ip_reset_option(conn->pcb.ip, optname);
             }
             break;
+        case SO_RCVBUF:
+            netconn_set_recvbufsize(conn, *(const int *)optval);
+            break;
         default:
             // TODO: add support
             VSF_LINUX_ASSERT(false);
@@ -332,6 +335,9 @@ int getsockopt(int socket, int level, int optname, void *optval, socklen_t *optl
         case SO_KEEPALIVE:
             optname = lwip_sockopt_to_ipopt(optname);
             *(int *)optval = ip_get_option(conn->pcb.ip, optname);
+            break;
+        case SO_RCVBUF:
+            *(int *)optval = netconn_get_recvbufsize(conn);
             break;
         default:
             // TODO: add support
