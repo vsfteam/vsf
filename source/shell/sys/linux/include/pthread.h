@@ -103,7 +103,7 @@ int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr , int *type);
 
 
 
-typedef vsf_slist_t pthread_cond_t;
+typedef vsf_trig_t pthread_cond_t;
 typedef struct {
     int attr;
     clockid_t clockid;

@@ -62,7 +62,7 @@ vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout)
 }
 
 SECTION(".text.vsf.kernel.vsf_sync")
-static void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout)
+void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout)
 {
     eda = __vsf_eda_get_valid_eda(eda);
     VSF_KERNEL_ASSERT(eda != NULL);

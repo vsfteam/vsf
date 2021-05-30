@@ -55,6 +55,9 @@ typedef struct vsf_linux_pthread_priv_t {
 
 static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb);
 
+SECTION(".text.vsf.kernel.vsf_sync")
+void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout);
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -270,7 +273,7 @@ int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr , int *type)
 // pthread_cond
 int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
-    vsf_slist_init(cond);
+    vsf_eda_trig_init(cond, false, true);
     return 0;
 }
 
@@ -281,49 +284,56 @@ int pthread_cond_destroy(pthread_cond_t *cond)
 
 int pthread_cond_signal(pthread_cond_t *cond)
 {
-    vsf_eda_t *eda;
-    vsf_protect_t orig = vsf_protect_sched();
-        vsf_slist_remove_from_head(vsf_eda_t, pending_node, cond, eda);
-    vsf_unprotect_sched(orig);
-    if (eda != NULL) {
-        vsf_eda_post_evt(eda, VSF_EVT_USER);
-    }
+    vsf_eda_trig_set(cond);
     return 0;
 }
 
 int pthread_cond_broadcast(pthread_cond_t *cond)
 {
-    vsf_eda_t *eda;
-    vsf_protect_t orig;
-    while (1) {
-        orig = vsf_protect_sched();
-            vsf_slist_remove_from_head(vsf_eda_t, pending_node, cond, eda);
-        vsf_unprotect_sched(orig);
-        if (NULL == eda) {
-            break;
-        }
-        vsf_eda_post_evt(eda, VSF_EVT_USER);
-    }
+    vsf_eda_trig_set(cond, true);
+    vsf_eda_trig_reset(cond);
     return 0;
 }
 
 int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
-    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
-
-    vsf_protect_t orig = vsf_protect_sched();
-        vsf_slist_add_to_head(vsf_eda_t, pending_node, cond, &thread->use_as__vsf_eda_t);
-    vsf_unprotect_sched(orig);
-
-    pthread_mutex_unlock(mutex);
-    vsf_thread_wfe(VSF_EVT_USER);
-    return 0;
+    return pthread_cond_timedwait(cond, mutex, NULL);
 }
 
 int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
         const struct timespec *abstime)
 {
-    return pthread_cond_wait(cond, mutex);
+    if ((abstime != NULL) && (abstime->tv_nsec >= 1000000000UL)) {
+        return EINVAL;
+    }
+
+    vsf_timeout_tick_t timeout = -1;
+    if (abstime != NULL) {
+        struct timespec now, due = *abstime;
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        vsf_systimer_tick_t now_tick =  1000 * vsf_systimer_ms_to_tick(now.tv_sec)
+                                    +   vsf_systimer_us_to_tick(now.tv_nsec / 1000);
+        vsf_systimer_tick_t due_tick =  1000 * vsf_systimer_ms_to_tick(due.tv_sec)
+                                    +   vsf_systimer_us_to_tick(due.tv_nsec / 1000);
+        if (now_tick >= due_tick) {
+            return ETIMEDOUT;
+        }
+    }
+    __vsf_eda_sync_pend(cond, NULL, timeout);
+    pthread_mutex_unlock(mutex);
+
+    vsf_sync_reason_t reason;
+    int ret = -1;
+    do {
+        reason = vsf_eda_sync_get_reason(cond, vsf_thread_wait());
+    } while (reason == VSF_SYNC_PENDING);
+    switch (reason) {
+    case VSF_SYNC_TIMEOUT:  ret = ETIMEDOUT;    break;
+    case VSF_SYNC_GET:      ret = 0;            break;
+    }
+
+    pthread_mutex_lock(mutex);
+    return ret;
 }
 
 int pthread_condattr_init(pthread_condattr_t *cattr)
