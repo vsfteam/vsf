@@ -126,10 +126,10 @@ void __vsf_grouped_evts_init(vsf_bmpevt_t *this_ptr,
                     uint_fast32_t auto_reset)
 {
     VSF_KERNEL_ASSERT(NULL != this_ptr && NULL != adapters_pptr);
-    vsf_this.auto_reset = auto_reset;
+    this_ptr->auto_reset = auto_reset;
 
     if (adapter_count) {
-        vsf_this.adapters = adapters_pptr;
+        this_ptr->adapters = adapters_pptr;
     }
     vsf_eda_bmpevt_init(this_ptr, adapter_count);
 }
