@@ -311,9 +311,9 @@ int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
     if (abstime != NULL) {
         struct timespec now, due = *abstime;
         clock_gettime(CLOCK_MONOTONIC, &now);
-        vsf_systimer_tick_t now_tick =  1000 * vsf_systimer_ms_to_tick(now.tv_sec)
+        vsf_systimer_tick_t now_tick =  vsf_systimer_ms_to_tick(now.tv_sec * 1000)
                                     +   vsf_systimer_us_to_tick(now.tv_nsec / 1000);
-        vsf_systimer_tick_t due_tick =  1000 * vsf_systimer_ms_to_tick(due.tv_sec)
+        vsf_systimer_tick_t due_tick =  vsf_systimer_ms_to_tick(due.tv_sec * 1000)
                                     +   vsf_systimer_us_to_tick(due.tv_nsec / 1000);
         if (now_tick >= due_tick) {
             return ETIMEDOUT;
