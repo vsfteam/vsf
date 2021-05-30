@@ -318,6 +318,7 @@ int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
         if (now_tick >= due_tick) {
             return ETIMEDOUT;
         }
+        timeout = due_tick - now_tick;
     }
     __vsf_eda_sync_pend(cond, NULL, timeout);
     pthread_mutex_unlock(mutex);
