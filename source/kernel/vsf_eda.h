@@ -196,47 +196,47 @@ extern "C" {
 #   define declare_vsf_peda_methods1(__decoration, __name)                      \
             declare_vsf_peda_ctx(__name)                                        \
             __decoration                                                        \
-                         void vsf_peda_func(__name)(                            \
-                                        struct vsf_peda_local(__name) *pthis,   \
+                    void vsf_peda_func(__name)(                                 \
+                                        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);
 
 #   define declare_vsf_peda_methods2(__decoration, __name,  __func1)            \
             declare_vsf_peda_ctx(__name)                                        \
             __decoration                                                        \
                    void vsf_peda_func(__name)(                                  \
-                                        struct vsf_peda_local(__name) *pthis,   \
+                                        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func1(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func1(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);
 
 #   define declare_vsf_peda_methods3(__decoration, __name, __func1, __func2)    \
             declare_vsf_peda_ctx(__name)                                        \
             __decoration                                                        \
                    void vsf_peda_func(__name)(                                  \
-                                        struct vsf_peda_local(__name) *pthis,   \
+                                        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func1(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func1(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func2(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func2(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);
 
 #   define declare_vsf_peda_methods4(__name, __func1, __func2, __func3)         \
             declare_vsf_peda_ctx(__name)                                        \
             __decoration                                                        \
                    void vsf_peda_func(__name)(                                  \
-                                        struct vsf_peda_local(__name) *pthis,   \
+                                        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func1(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func1(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func2(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func2(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func3(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func3(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);
 
 #   define declare_vsf_peda_methods5(   __decoration, __name, __func1, __func2, \
@@ -244,19 +244,19 @@ extern "C" {
             declare_vsf_peda_ctx(__name)                                        \
             __decoration                                                        \
                    void vsf_peda_func(__name)(                                  \
-                                        struct vsf_peda_local(__name) *pthis,   \
+                                        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func1(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func1(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func2(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func2(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func3(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func3(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func4(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func4(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);
 
 
@@ -265,22 +265,22 @@ extern "C" {
             declare_vsf_peda_ctx(__name)                                        \
             __decoration                                                        \
                    void vsf_peda_func(__name)(                                  \
-                                        struct vsf_peda_local(__name) *pthis,   \
+                                        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func1(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func1(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func2(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func2(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func3(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func3(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func4(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func4(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func5(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func5(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);
 
 #   define declare_vsf_peda_methods7(   __decoration, __name, __func1, __func2, \
@@ -288,25 +288,25 @@ extern "C" {
             declare_vsf_peda_ctx(__name)                                        \
             __decoration                                                        \
                    void vsf_peda_func(__name)(                                  \
-                                        struct vsf_peda_local(__name) *pthis,   \
+                                        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func1(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func1(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func2(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func2(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func3(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func3(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func4(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func4(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func5(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func5(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func6(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func6(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);
 
 #   define declare_vsf_peda_methods8(   __decoration, __name, __func1, __func2, \
@@ -315,28 +315,28 @@ extern "C" {
             declare_vsf_peda_ctx(__name)                                        \
             __decoration                                                        \
                    void vsf_peda_func(__name)(                                  \
-                                        struct vsf_peda_local(__name) *pthis,   \
+                                        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func1(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func1(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func2(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func2(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func3(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func3(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func4(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func4(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func5(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func5(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func6(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func6(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);                         \
             __decoration                                                        \
-                   void __func7(        struct vsf_peda_local(__name) *pthis,   \
+                   void __func7(        struct vsf_peda_local(__name) *vsf_pthis,\
                                         vsf_evt_t evt);
 
 #define declare_vsf_peda_methods(__decoration, ...)                             \
@@ -514,22 +514,22 @@ extern "C" {
 
 
 #   define __implement_vsf_peda2(__name, __func_name)                           \
-        void __func_name(   struct vsf_peda_local(__name) *local_ptr,           \
+        void __func_name(   struct vsf_peda_local(__name) *vsf_plocal,          \
                             vsf_evt_t evt)                                      \
         {                                                                       \
-            vsf_peda_param(__name) *pthis =                                     \
+            vsf_peda_param(__name) *vsf_pthis =                                 \
                 *(vsf_peda_param(__name) **)                                    \
-                    ((uintptr_t)local_ptr - sizeof(uintptr_t));                 \
-            VSF_KERNEL_ASSERT(NULL != pthis || NULL != local_ptr);
+                    ((uintptr_t)vsf_plocal - sizeof(uintptr_t));                \
+            VSF_KERNEL_ASSERT(NULL != vsf_pthis || NULL != vsf_plocal);
 
 #   define __implement_vsf_peda1(__name)                                        \
-        void vsf_peda_func(__name)( struct vsf_peda_local(__name) *local_ptr,   \
+        void vsf_peda_func(__name)( struct vsf_peda_local(__name) *vsf_plocal,  \
                                     vsf_evt_t evt)                              \
         {                                                                       \
-            vsf_peda_param(__name) *pthis =                                     \
+            vsf_peda_param(__name) *vsf_pthis =                                 \
                 *(vsf_peda_param(__name) **)                                    \
-                    ((uintptr_t)local_ptr - sizeof(uintptr_t));                 \
-            VSF_KERNEL_ASSERT(NULL != pthis || NULL != local_ptr);
+                    ((uintptr_t)vsf_plocal - sizeof(uintptr_t));                \
+            VSF_KERNEL_ASSERT(NULL != vsf_pthis || NULL != vsf_plocal);
 
 #   define vsf_peda_begin()
 
@@ -547,10 +547,10 @@ extern "C" {
                                         (__param),                              \
                                         sizeof(vsf_peda_local(__name)))
 
-#   define vsf_local                    (*local_ptr)
+#   define vsf_local                    (*vsf_plocal)
 
 #endif
-#   define vsf_this                     (*pthis)
+#   define vsf_this                     (*vsf_pthis)
 
 /*============================ TYPES =========================================*/
 
