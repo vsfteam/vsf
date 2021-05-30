@@ -377,14 +377,14 @@ vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
     return tick;
 }
 
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
+vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     // not supported by freertos
     VSF_ARCH_ASSERT(false);
     return 0;
 }
 
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
+vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     return tick * portTICK_PERIOD_MS;
 }

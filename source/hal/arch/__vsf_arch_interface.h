@@ -126,8 +126,8 @@ extern bool vsf_systimer_set(vsf_systimer_tick_t due);
 
 extern vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
 extern vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);
-extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick);
-extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick);
+extern vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick);
+extern vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick);
 
 /*-------------------------------------------*
  * APIs to be used by target arch            *

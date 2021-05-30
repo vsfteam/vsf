@@ -198,20 +198,20 @@ bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
-    return (vsf_systimer_tick_t)(((uint64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
+    return (vsf_systimer_tick_t)(((vsf_systimer_tick_t64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
 }
 
 vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
-    return (vsf_systimer_tick_t)(((uint64_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
+    return (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
 }
 
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
+vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     return tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
 }
 
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
+vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     return tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
 }

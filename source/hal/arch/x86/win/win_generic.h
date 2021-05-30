@@ -108,19 +108,22 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 // avoid to use windows.h, fix if any conflicts
-typedef void *              HANDLE;
-typedef unsigned long       DWORD;
-typedef unsigned int        UINT;
-typedef unsigned char       BYTE;
-typedef char *              LPSTR;
+typedef void *                      HANDLE;
+typedef unsigned long               DWORD;
+typedef unsigned int                UINT;
+typedef unsigned char               BYTE;
+typedef char *                      LPSTR;
 #ifdef __CPU_X64__
-typedef unsigned long long  ULONG_PTR, *PULONG_PTR;
+typedef unsigned long long          ULONG_PTR, *PULONG_PTR;
 #else
-typedef unsigned long       ULONG_PTR, *PULONG_PTR;
+typedef unsigned long               ULONG_PTR, *PULONG_PTR;
 #endif
-typedef ULONG_PTR           DWORD_PTR, *PDWORD_PTR;
+typedef ULONG_PTR                   DWORD_PTR, *PDWORD_PTR;
 
-typedef uint64_t vsf_systimer_tick_t;
+#ifndef VSF_ARCH_SYSTIMER_TICK_T
+#   define VSF_ARCH_SYSTIMER_TICK_T uint64_t
+#endif
+typedef VSF_ARCH_SYSTIMER_TICK_T    vsf_systimer_tick_t;
 
 typedef enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_INVALID = -1,

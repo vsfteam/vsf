@@ -522,25 +522,26 @@ WEAK(vsf_systimer_us_to_tick)
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
     return ((vsf_systimer_tick_t)
-                (vsf_systimer_tick_t)time_us * 
+                (vsf_systimer_tick_t)time_us *
                 (vsf_systimer_tick_t)__systimer.unit);
 }
 
 WEAK(vsf_systimer_ms_to_tick)
 vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
-    return ((uintmax_t)((uintmax_t)time_ms * 
-                        (uintmax_t)__systimer.unit * 1000ul));
+    return ((vsf_systimer_tick_t)(
+                (vsf_systimer_tick_t)time_ms *
+                (vsf_systimer_tick_t)__systimer.unit * 1000));
 }
 
 WEAK(vsf_systimer_tick_to_us)
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
+vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
-    return (uint_fast32_t)(tick / __systimer.unit);
+    return tick / __systimer.unit;
 }
 
 WEAK(vsf_systimer_tick_to_ms)
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
+vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     return vsf_systimer_tick_to_us(tick) / 1000;
 }
@@ -610,7 +611,7 @@ vsf_err_t vsf_systimer_init(void)
         /*! assume that systimer frequency is at least 1MHz */
         __systimer.unit = 1;
     }
-    
+
     //__systimer.tick_freq = tick_res;
     __systimer.max_tick_per_round = ((uintmax_t)1 << __VSF_ARCH_SYSTIMER_BITS) - 1;
 

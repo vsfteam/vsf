@@ -882,7 +882,7 @@ bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
     vsf_arch_trace_function("%s(time_us: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_us);
-    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((uint64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
+    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
     vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
     return ret;
 }
@@ -890,23 +890,23 @@ vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
     vsf_arch_trace_function("%s(time_ms: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_ms);
-    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((uint64_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
+    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
     vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
     return ret;
 }
 
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
+vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
-    uint_fast32_t ret = tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
+    vsf_systimer_tick_t ret = tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
     vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
     return ret;
 }
 
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
+vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
-    uint_fast32_t ret = tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
+    vsf_systimer_tick_t ret = tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
     vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
     return ret;
 }
