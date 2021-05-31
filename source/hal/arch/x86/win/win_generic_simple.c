@@ -198,7 +198,7 @@ bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
-    return (vsf_systimer_tick_t)(((vsf_systimer_tick_t64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
+    return (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
 }
 
 vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
