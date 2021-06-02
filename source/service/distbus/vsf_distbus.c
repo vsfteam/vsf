@@ -98,14 +98,16 @@ static void __vsf_distbus_on_sent(void *p)
 {
     vsf_distbus_t *distbus = (vsf_distbus_t *)p;
     VSF_SERVICE_ASSERT((distbus != NULL) && (distbus->msg_tx != NULL));
-
+send_next:
     vsf_distbus_free_msg(distbus, distbus->msg_tx);
     vsf_protect_t orig = vsf_protect_int();
         vsf_slist_remove_from_head(vsf_distbus_msg_t, node, &distbus->msg_tx_list, distbus->msg_tx);
     vsf_unprotect_int(orig);
 
     if (distbus->msg_tx != NULL) {
-        __vsf_distbus_send_msg(distbus, distbus->msg_tx);
+        if (__vsf_distbus_send_msg(distbus, distbus->msg_tx)) {
+            goto send_next;
+        }
     }
 }
 
