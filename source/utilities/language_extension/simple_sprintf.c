@@ -34,10 +34,11 @@
 
 int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
-    if (!str || !format) {
+    if (!format) {
         return 0;
     }
 
+    int realsize = 0;
     char ch, *curpos = str;
     union {
         char ch;
@@ -46,11 +47,10 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
         unsigned long long uinteger;
     } arg;
 
-    if (!size) {
-        goto end;
-    }
-
-    size--;     // reserve for '\0' terminator
+    if (NULL == str) { size = 0; }
+    if (0 == size) { curpos = NULL; }
+    // reserve for '\0' terminator
+    if (size > 0) { size--; }
     while (*format != '\0') {
         ch = *format++;
         switch (ch) {
@@ -189,23 +189,27 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         width -= actual_width;
                         if (!flags.align_left) {
                             while (width-- > 0) {
-                                if (!size--) { goto end; }
-                                *curpos++ = flags.has_prefix0 ? '0' : ' ';
+                                if (++realsize <= size) {
+                                    *curpos++ = flags.has_prefix0 ? '0' : ' ';
+                                }
                             }
                         }
                         if (flags.has_plus_minus) {
-                            if (!size--) { goto end; }
-                            *curpos++ = flags.is_plus ? '+' : '-';
+                            if (++realsize <= size) {
+                                *curpos++ = flags.is_plus ? '+' : '-';
+                            }
                             actual_width--;
                         }
                         while (actual_width-- > 0) {
-                            if (!size--) { goto end; }
-                            *curpos++ = integer_buf[pos++];
+                            if (++realsize <= size) {
+                                *curpos++ = integer_buf[pos++];
+                            }
                         }
                         if (flags.align_left) {
                             while (width-- > 0) {
-                                if (!size--) { goto end; }
-                                *curpos++ = ' ';
+                                if (++realsize <= size) {
+                                    *curpos++ = ' ';
+                                }
                             }
                         }
                     }
@@ -213,8 +217,9 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 case 'c':
                 case 'C':
                     arg.ch = va_arg(ap, int);
-                    if (!size--) { goto end; }
-                    *curpos++ = arg.ch;
+                    if (++realsize <= size) {
+                        *curpos++ = arg.ch;
+                    }
                     break;
                 case 's':
                 case 'S':
@@ -230,18 +235,21 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     if (!flags.align_left) {
                         while (actual_width < width) {
                             width--;
-                            if (!size--) { goto end; }
-                            *curpos++ = ' ';
+                            if (++realsize <= size) {
+                                *curpos++ = ' ';
+                            }
                         }
                     }
                     while ((*arg.str != '\0') && (width-- > 0)) {
-                        if (!size--) { goto end; }
-                        *curpos++ = *arg.str++;
+                        if (++realsize <= size) {
+                            *curpos++ = *arg.str++;
+                        }
                     }
                     if (flags.align_left) {
                         while (width-- > 0) {
-                            if (!size--) { goto end; }
-                            *curpos++ = ' ';
+                            if (++realsize <= size) {
+                                *curpos++ = ' ';
+                            }
                         }
                     }
                     break;
@@ -251,14 +259,17 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
             }
             break;
         default:
-            if (!size--) { goto end; }
-            *curpos++ = ch;
+            if (++realsize <= size) {
+                *curpos++ = ch;
+            }
             break;
         }
     }
 end:
-    *curpos = '\0';
-    return curpos - str;
+    if (curpos != NULL) {
+        *curpos = '\0';
+    }
+    return realsize;
 }
 
 int snprintf(char *str, size_t size, const char *format, ...)

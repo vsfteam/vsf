@@ -268,7 +268,20 @@ int putchar(int c)
 static int __print_arg(FILE *f, const char *format, va_list ap)
 {
     char buff[VSF_LINUX_CFG_PRINT_BUFF_SIZE];
-    int size = vsnprintf(buff, sizeof(buff), format, ap);
+    size_t size = vsnprintf(buff, sizeof(buff), format, ap);
+    if (size >= sizeof(buff)) {
+        char *buff = malloc(size + 1);
+        if (NULL == buff) {
+            return -1;
+        }
+
+        size = vsnprintf(buff, size + 1, format, ap);
+        if (size > 0) {
+            size = fwrite(buff, size, 1, f);
+        }
+        free(buff);
+        return size;
+    }
     return fwrite(buff, size, 1, f);
 }
 
