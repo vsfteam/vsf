@@ -710,7 +710,7 @@ static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t c
             cur_size = buffer->size - buffer->pos;
             cur_size = min(cur_size, count);
             memcpy(buf, &buffer[1], cur_size);
-            buf += cur_size;
+            buf = (uint8_t *)buf + cur_size;
             count -= cur_size;
 
             orig = vsf_protect_sched();
@@ -771,6 +771,11 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
     }
     return 0;
 }
+
+#if __IS_COMPILER_IAR__
+//! transfer of control bypasses initialization
+#   pragma diag_suppress=pe546
+#endif
 
 int pipe(int pipefd[2])
 {
