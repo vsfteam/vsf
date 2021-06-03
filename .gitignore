@@ -3,6 +3,7 @@
 
 #basic compiler output
 *.o
+*.obj
 *.hex
 *.map
 
