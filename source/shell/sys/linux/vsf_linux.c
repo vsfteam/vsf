@@ -842,6 +842,12 @@ sighandler_t signal(int signum, sighandler_t handler)
 }
 #endif
 
+unsigned int alarm(unsigned int seconds)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 pid_t waitpid(pid_t pid, int *status, int options)
 {
     if (pid <= 0) {
@@ -1511,7 +1517,7 @@ ssize_t read(int fd, void *buf, size_t count)
     return sfd->op->fn_read(sfd, buf, count);
 }
 
-ssize_t write(int fd, void *buf, size_t count)
+ssize_t write(int fd, const void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
     if (!sfd || (sfd->flags & O_RDONLY)) { return -1; }

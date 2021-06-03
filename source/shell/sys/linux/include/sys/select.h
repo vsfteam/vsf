@@ -17,12 +17,13 @@ extern "C" {
 #   define select               __vsf_linux_select
 #endif
 
-#define FD_ZERO(set)            vsf_bitmap_reset(*(set), 1024)
+#define FD_SETSIZE              1024
+#define FD_ZERO(set)            vsf_bitmap_reset(*(set), FD_SETSIZE)
 #define FD_SET(fd, set)         vsf_bitmap_set(*(set), (fd))
 #define FD_CLR(fd, set)         vsf_bitmap_clear(*(set), (fd))
 #define FD_ISSET(fd, set)       vsf_bitmap_get(*(set), (fd))
 
-__vsf_declare_bitmap_ex(fd_set, 1024)
+__vsf_declare_bitmap_ex(fd_set, FD_SETSIZE)
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, struct timeval *timeout);
 
 #ifdef __cplusplus

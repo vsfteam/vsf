@@ -16,6 +16,7 @@ extern "C" {
 #endif
 
 // standard address families
+#define AF_UNSPEC       0
 #define AF_INET         2
 #define AF_INET6        10
 
@@ -41,6 +42,11 @@ typedef uint32_t        socklen_t;
 typedef uint16_t        sa_family_t;
 struct sockaddr {
     sa_family_t         sa_family;
+    char                sa_data[14];
+};
+struct sockaddr_storage {
+    sa_family_t         ss_family;
+    // TODO: need to be larger?
     char                sa_data[14];
 };
 
@@ -69,10 +75,14 @@ struct sockaddr {
 // option_name for setsockopt
 enum {
     SO_DEBUG            = 1,
-    SO_ERROR,
+    SO_REUSEADDR,
     SO_ACCEPTCONN,
     SO_KEEPALIVE,
     SO_BROADCAST,
+
+    SO_TYPE,
+    SO_ERROR,
+    SO_SNDBUF,
     SO_RCVBUF,
 };
 int setsockopt(int socket, int level, int optname, const void *optval,

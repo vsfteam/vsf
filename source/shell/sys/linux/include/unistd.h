@@ -6,6 +6,7 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./simple_libc/stddef.h"
 #   include "./linux/limits.h"
+#   include "./sys/select.h"
 
 // avoid compiler.h in vsf.h include c headers
 #   define __USE_LOCAL_LIBC__
@@ -13,6 +14,7 @@
 #else
 #   include <stddef.h>
 #   include <linux/limits.h>
+#   include <sys/select.h>
 #endif
 
 #include "vsf.h"
@@ -34,6 +36,7 @@ extern "C" {
 #define realpath            __vsf_linux_realpath
 #define sysconf             __vsf_linux_sysconf
 #define pipe                __vsf_linux_pipe
+#define alarm               __vsf_linux_alarm
 
 #if __IS_COMPILER_IAR__
 #else
@@ -71,6 +74,8 @@ enum {
 void usleep(int micro_seconds);
 unsigned sleep(unsigned seconds);
 
+unsigned int alarm(unsigned int seconds);
+
 pid_t getpid(void);
 pid_t getppid(void);
 
@@ -107,7 +112,7 @@ char * getcwd(char *buffer, size_t maxlen);
 int close(int fd);
 off_t lseek(int fd, off_t offset, int whence);
 ssize_t read(int fd, void *buf, size_t count);
-ssize_t write(int fd, void *buf, size_t count);
+ssize_t write(int fd, const void *buf, size_t count);
 
 #ifdef __cplusplus
 }
