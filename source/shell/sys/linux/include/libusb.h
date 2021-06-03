@@ -11,6 +11,8 @@
 #   include <sys/time.h>
 #endif
 
+// for vsf_linux_fd_t
+#include "shell/sys/linux/vsf_linux.h"
 // for USB constants
 #include "component/usb/common/usb_common.h"
 // for endian APIs

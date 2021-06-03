@@ -8,6 +8,8 @@
 #else
 #   include <sys/time.h>
 #endif
+// for bitmap
+#include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
 extern "C" {
