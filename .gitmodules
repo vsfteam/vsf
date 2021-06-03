@@ -55,3 +55,6 @@
 [submodule "source/utilities/3rd-party/PLOOC/raw"]
 	path = source/utilities/3rd-party/PLOOC/raw
 	url = ../PLOOC
+[submodule "source/component/3rd-party/mbedtls/raw"]
+	path = source/component/3rd-party/mbedtls/raw
+	url = ../mbedtls
