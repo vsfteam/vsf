@@ -321,6 +321,21 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\lwip\port\arch\sys_arch.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\lwip\port\lwippools.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\lwip\port\lwip_netdrv_adapter.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\check_crypto_config.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\common.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_core.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_driver_wrappers.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_ecp.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_invasive.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_its.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_random_impl.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_rsa.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_se.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_service_integration.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_slot_management.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_storage.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_invasive.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls13_keys.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\nnom\port\nnom_port.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\nuklear\raw\nuklear.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.h" />
@@ -596,14 +611,17 @@
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_timer.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_version.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\arpa\inet.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\dirent.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\errno.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\fcntl.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libgen.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libusb.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\limits.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netdb.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\poll.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\pthread.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\pwd.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\semaphore.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\signal.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\ctype.h" />
@@ -617,9 +635,11 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\mount.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\select.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\shm.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\socket.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\stat.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\time.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\types.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\uio.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\wait.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\termios.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\unistd.h" />
@@ -673,6 +693,7 @@
     <ClInclude Include="..\..\config\btstack_config.h" />
     <ClInclude Include="..\..\config\lv_conf.h" />
     <ClInclude Include="..\..\config\lwip\lwipopts.h" />
+    <ClInclude Include="..\..\config\mbedtls\config.h" />
     <ClInclude Include="..\..\config\vsf_tgui_cfg.h" />
     <ClInclude Include="..\..\config\vsf_tgui_designer_cfg.h" />
     <ClInclude Include="..\..\config\vsf_usr_cfg.h" />
@@ -1095,6 +1116,95 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\core\timeouts.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\core\udp.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\netif\ethernet.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aes.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aesni.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\arc4.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aria.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\asn1parse.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\asn1write.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\base64.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\bignum.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\blowfish.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\camellia.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ccm.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\certs.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\chacha20.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\chachapoly.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\cipher.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\cipher_wrap.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\cmac.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ctr_drbg.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\debug.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\des.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\dhm.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecdh.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecdsa.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecjpake.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecp.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecp_curves.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\entropy.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\entropy_poll.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\error.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\gcm.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\havege.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\hkdf.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\hmac_drbg.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md2.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md4.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md5.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\memory_buffer_alloc.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\net_sockets.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\nist_kw.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\oid.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\padlock.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pem.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pk.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkcs11.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkcs12.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkcs5.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkparse.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkwrite.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pk_wrap.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\platform.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\platform_util.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\poly1305.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_client.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_driver_wrappers.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_ecp.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_rsa.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_se.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_slot_management.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_storage.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_its_file.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ripemd160.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\rsa.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\rsa_internal.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\sha1.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\sha256.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\sha512.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_cache.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_ciphersuites.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_cli.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_cookie.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_msg.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_srv.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_ticket.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls13_keys.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\threading.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\timing.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\version.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\version_features.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509write_crt.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509write_csr.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_create.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_crl.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_crt.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_csr.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\xtea.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\nnom\raw\src\backends\nnom_local.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\nnom\raw\src\backends\nnom_local_q15.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\nnom\raw\src\core\nnom.c" />
@@ -1472,12 +1582,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;PREDEF_STANDARD_C_1999;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\lwip;$(ProjectDir)..\..\demo\LingLongGUI_demo\application;$(ProjectDir)..\..\demo\LingLongGUI_demo\application\Fonts;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\nuklear\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\lwip;$(ProjectDir)..\..\demo\LingLongGUI_demo\application;$(ProjectDir)..\..\demo\LingLongGUI_demo\application\Fonts;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\nuklear\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\mbedtls\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <OmitFramePointers>false</OmitFramePointers>
+      <AssemblerListingLocation>$(IntDir)/%(RelativeDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

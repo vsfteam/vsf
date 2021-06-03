@@ -1015,6 +1015,21 @@
     <Filter Include="vsf\component\3rd-party\LingLongGUI\port">
       <UniqueIdentifier>{76aa02d0-fd31-49db-acb0-8e0a3906a0b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\include\arpa">
+      <UniqueIdentifier>{c7db8d44-0203-4a44-bfc2-2b660011e86b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\mbedtls">
+      <UniqueIdentifier>{16dc2039-86a6-4bbc-a4b6-02bbb8ea466c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\mbedtls\raw">
+      <UniqueIdentifier>{6a63d4a1-bff0-44b1-b153-d04803360c1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\mbedtls\raw\library">
+      <UniqueIdentifier>{dcbdf083-c1fe-42be-8a7c-6676df169d55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\mbedtls">
+      <UniqueIdentifier>{2c5fc354-ef32-4804-aaca-4e24c41ab656}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3074,6 +3089,69 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\port\LL_Config.h">
       <Filter>vsf\component\3rd-party\LingLongGUI\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netdb.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\pwd.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\socket.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\uio.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\arpa\inet.h">
+      <Filter>vsf\shell\sys\linux\include\arpa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\check_crypto_config.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\common.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_core.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_driver_wrappers.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_ecp.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_invasive.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_its.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_random_impl.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_rsa.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_se.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_service_integration.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_slot_management.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_storage.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_invasive.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls13_keys.h">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\mbedtls\config.h">
+      <Filter>usrapp\config\mbedtls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5218,6 +5296,273 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\port\LL_Config.c">
       <Filter>vsf\component\3rd-party\LingLongGUI\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aes.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aesni.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\arc4.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aria.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\asn1parse.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\asn1write.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\base64.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\bignum.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\blowfish.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\camellia.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ccm.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\certs.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\chacha20.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\chachapoly.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\cipher.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\cipher_wrap.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\cmac.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ctr_drbg.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\debug.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\des.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\dhm.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecdh.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecdsa.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecjpake.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecp.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecp_curves.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\entropy.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\entropy_poll.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\error.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\gcm.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\havege.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\hkdf.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\hmac_drbg.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md2.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md4.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md5.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\memory_buffer_alloc.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\net_sockets.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\nist_kw.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\oid.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\padlock.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pem.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pk.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pk_wrap.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkcs5.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkcs11.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkcs12.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkparse.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkwrite.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\platform.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\platform_util.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\poly1305.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_client.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_driver_wrappers.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_ecp.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_rsa.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_se.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_slot_management.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_storage.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_its_file.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ripemd160.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\rsa.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\rsa_internal.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\sha1.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\sha256.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\sha512.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_cache.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_ciphersuites.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_cli.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_cookie.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_msg.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_srv.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_ticket.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls13_keys.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\threading.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\timing.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\version.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\version_features.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_create.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_crl.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_crt.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_csr.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509write_crt.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509write_csr.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\xtea.c">
+      <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
