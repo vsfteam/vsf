@@ -57,7 +57,7 @@ extern "C" {
         fsm_rt_t vsf_task_func(__name)( uintptr_t local,                        \
                                         vsf_evt_t evt)                          \
         {                                                                       \
-            vsf_task(__name) *this_ptr =                                          \
+            vsf_task(__name) *vsf_pthis =                                       \
                 *(vsf_task(__name) **)                                          \
                     ((uintptr_t)local - sizeof(uintptr_t));
 
@@ -66,18 +66,18 @@ extern "C" {
 #   define vsf_task_end()                                                       \
             } return fsm_rt_on_going;
 
-#   define vsf_task_state  (this_ptr->fsm_state)
+#   define vsf_task_state  (vsf_this.fsm_state)
 
 #else
 #   define __implement_vsf_task(__name)                                         \
-        void vsf_task_func(__name)(__name *obj_ptr, vsf_evt_t evt)                \
+        void vsf_task_func(__name)(__name *obj_ptr, vsf_evt_t evt)              \
         {                                                                       \
-            vsf_task(__name) *this_ptr = &(obj_ptr->param);
+            vsf_task(__name) *vsf_pthis = &(obj_ptr->param);
 
 #   define vsf_task_begin()
 #   define vsf_task_end()           } __vsf_eda_yield();
 
-#   define vsf_task_state  (this_ptr->fsm_state)
+#   define vsf_task_state  (vsf_this.fsm_state)
 #endif
 
 #define implement_vsf_task(__name)  __implement_vsf_task(__name)
@@ -112,7 +112,7 @@ extern "C" {
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__name, param);                              \
         } __name;                                                               \
-        extern void vsf_task_func_##__name(struct __name *this_ptr, vsf_evt_t evt);
+        extern void vsf_task_func_##__name(struct __name *vsf_pthis, vsf_evt_t evt);
 #endif
 
 #define def_vsf_task(__name,...)            __def_vsf_task(__name,__VA_ARGS__)

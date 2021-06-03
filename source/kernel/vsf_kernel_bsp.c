@@ -224,7 +224,7 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(app_main_thread_t)
 {
-    UNUSED_PARAM(this_ptr);
+    UNUSED_PARAM(vsf_pthis);
     VSF_USER_ENTRY();
 }
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \

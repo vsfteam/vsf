@@ -37,14 +37,14 @@ extern "C" {
 #   define __implement_vsf_pt(__name)                                           \
             __implement_vsf_pt_common(__name, uintptr_t local)                  \
             {                                                                   \
-                __vsf_pt_common(__name) *this_ptr =                             \
+                __vsf_pt_common(__name) *vsf_pthis =                            \
                     *(__vsf_pt_common(__name) **)                               \
                         ((uintptr_t)local - sizeof(uintptr_t));
 
 #   define __implement_vsf_pt_ex(__name, __func_name)                           \
             __implement_vsf_pt_common(  __func_name,  uintptr_t local)          \
             {                                                                   \
-                __vsf_pt_common(__name) *this_ptr =                             \
+                __vsf_pt_common(__name) *vsf_pthis =                            \
                     *(__vsf_pt_common(__name) **)                               \
                         ((uintptr_t)local - sizeof(uintptr_t));
 
@@ -52,14 +52,14 @@ extern "C" {
 
 #   define __implement_vsf_pt(__name)                                           \
             __implement_vsf_pt_common(__name, __name *obj_ptr) {                \
-                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);
+                __vsf_pt_common(__name) *vsf_pthis = &(obj_ptr->param);
 
 #   define __implement_vsf_pt_ex(__name, __func_name)                           \
             __implement_vsf_pt_common(__func_name, __name *obj_ptr) {           \
-                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);
+                __vsf_pt_common(__name) *vsf_pthis = &(obj_ptr->param);
 #endif
 
-#define __vsf_pt_state()         (this_ptr->fsm_state)
+#define __vsf_pt_state()         (vsf_this.fsm_state)
 #define __vsf_pt_end()           __vsf_pt_end_common()
 
 
@@ -204,7 +204,7 @@ extern "C" {
 #else
 #   define __declare_vsf_pt(__name)                                             \
             __declare_vsf_pt_common(__name)                                     \
-            __extern_vsf_pt_common(__name, __name *this_ptr)
+            __extern_vsf_pt_common(__name, __name *vsf_pthis)
 #endif
 
 #define declare_vsf_pt(__name)          __declare_vsf_pt(__name)

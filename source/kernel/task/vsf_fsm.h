@@ -57,7 +57,7 @@ extern "C" {
 
 
 #ifndef vsf_this
-#   define vsf_this    (*this_ptr)
+#   define vsf_this    (*vsf_pthis)
 #endif
 
 
@@ -137,8 +137,8 @@ extern "C" {
  */
  //! @{
 #define __extern_fsm_implementation_ex(__name,__type)                           \
-        fsm_rt_t __name(fsm(__type) *this_ptr, vsf_evt_t evt);                  \
-        typedef fsm_rt_t __name##_fn( vsf_fsm(__type) *this_ptr, vsf_evt_t evt );
+        fsm_rt_t __name(fsm(__type) *vsf_pthis, vsf_evt_t evt);                 \
+        typedef fsm_rt_t __name##_fn( vsf_fsm(__type) *vsf_pthis, vsf_evt_t evt );
 
 #define declare_vsf_fsm_implementation_ex(__name, __type)                       \
             __extern_fsm_implementation_ex(__name, __type)
@@ -167,7 +167,7 @@ extern "C" {
 #define on_start(...)                       {__VA_ARGS__;}
 
 
-#define reset_vsf_fsm()         do { this_ptr->fsm_state = 0; } while(0);
+#define reset_vsf_fsm()         do { vsf_this.fsm_state = 0; } while(0);
 #define vsf_fsm_cpl()           do {reset_vsf_fsm(); return fsm_rt_cpl;} while(0);
 #define vsf_fsm_report(__ERROR) do {reset_vsf_fsm(); return (fsm_rt_t)(__ERROR); } while(0);
 #define vsf_fsm_wait_for_obj()  return fsm_rt_wait_for_obj;
@@ -178,17 +178,17 @@ extern "C" {
 
 
 #define update_state_to(__state)                                                \
-        { this_ptr->fsm_state = (__state); goto __state_entry_##__state;}
+        { vsf_this.fsm_state = (__state); goto __state_entry_##__state;}
 
 #define transfer_to(__state)                                                    \
-         { this_ptr->fsm_state = (__state); vsf_fsm_on_going() }
+         { vsf_this.fsm_state = (__state); vsf_fsm_on_going() }
 
 
 #define __fsm_initialiser(__name, ...)                                          \
-        vsf_fsm(__name) *__name##_init(vsf_fsm(__name) *this_ptr __VA_ARGS__)   \
+        vsf_fsm(__name) *__name##_init(vsf_fsm(__name) *vsf_pthis __VA_ARGS__)  \
         {                                                                       \
-            VSF_KERNEL_ASSERT (NULL != this_ptr);                               \
-            this_ptr->fsm_state = 0;
+            VSF_KERNEL_ASSERT (NULL != vsf_pthis);                              \
+            vsf_this.fsm_state = 0;
 
 #define vsf_fsm_initialiser(__name, ...)                                        \
             __fsm_initialiser(__name, __VA_ARGS__)
@@ -198,7 +198,7 @@ extern "C" {
 
 #define vsf_fsm_init_body(...)                                                  \
             __VA_ARGS__                                                         \
-            return this_ptr;                                                    \
+            return &vsf_this;                                                   \
         }
 
 
@@ -218,14 +218,14 @@ extern "C" {
     implement_vsf_task(__name)                                                  \
     {                                                                           \
         vsf_task_begin();                                                       \
-        if (NULL == this_ptr) {                                                 \
+        if (NULL == vsf_pthis) {                                                \
             return fsm_rt_err;                                                  \
         }
 
 #define __body(...)                                                             \
-        switch (this_ptr->fsm_state) {                                          \
+        switch (vsf_this.fsm_state) {                                           \
             case 0:                                                             \
-                this_ptr->fsm_state++;                                          \
+                vsf_this.fsm_state++;                                           \
             __VA_ARGS__                                                         \
             break;                                                              \
             default:                                                            \
@@ -237,10 +237,10 @@ extern "C" {
 
 #define vsf_fsm_body(...)               __body(__VA_ARGS__)
 
-#define vsf_fsm_begin()                                                            \
-            switch (this_ptr->fsm_state) {                                      \
+#define vsf_fsm_begin()                                                         \
+            switch (vsf_this.fsm_state) {                                       \
                 case 0:                                                         \
-                    this_ptr->fsm_state++;
+                    vsf_this.fsm_state++;
 
 #define vsf_fsm_end()                                                              \
                 break;                                                          \
@@ -282,7 +282,7 @@ extern "C" {
                 do {                                                            \
                     ____state(__state, __VA_ARGS__)                             \
                 } while(0); /* add extra while(0) to catch the fsm_continue()*/ \
-                if (vsf_this.fsm_state != (__state)) {                              \
+                if (vsf_this.fsm_state != (__state)) {                          \
                     break;                                                      \
                 }                                                               \
             } while(1);
@@ -295,9 +295,9 @@ extern "C" {
 
 #define privilege_body(...)                                                     \
         do {                                                                    \
-            switch (this_ptr->fsm_state) {                                      \
+            switch (vsf_this.fsm_state) {                                       \
                 case 0:                                                         \
-                    this_ptr->fsm_state++;                                      \
+                    vsf_this.fsm_state++;                                       \
                 __VA_ARGS__                                                     \
             }                                                                   \
         while(1);                                                               \

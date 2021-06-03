@@ -41,8 +41,8 @@
 #include "vsf_msg_tree.h"
 /*============================ MACROS ========================================*/
 
-#undef this
-#define this                    (*this_ptr)
+#undef vsf_this
+#define vsf_this                (*this_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

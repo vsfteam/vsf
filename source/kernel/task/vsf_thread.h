@@ -96,39 +96,39 @@ extern "C" {
             extern void vsf_thread_##__name##_start(struct __name *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__name##_entry(                            \
-                            struct thread_cb_##__name##_t *this_ptr);
+                            struct thread_cb_##__name##_t *vsf_pthis);
 
 #   define __implement_vsf_thread(__name)                                       \
             void vsf_thread_##__name##_entry(                                   \
-                        struct thread_cb_##__name##_t *this_ptr);               \
+                        struct thread_cb_##__name##_t *vsf_pthis);              \
             void vsf_thread_##__name##_start( struct __name *task,              \
                                                 vsf_prio_t priority)            \
             {                                                                   \
                 VSF_KERNEL_ASSERT(NULL != task);                                \
-                thread_cb_##__name##_t *this_ptr =  &(task->param);             \
-                this_ptr->use_as__vsf_thread_cb_t.entry = (vsf_thread_entry_t *)\
+                thread_cb_##__name##_t *vsf_pthis =  &(task->param);            \
+                vsf_pthis->use_as__vsf_thread_cb_t.entry = (vsf_thread_entry_t *)\
                                     &vsf_thread_##__name##_entry;               \
-                this_ptr->use_as__vsf_thread_cb_t.stack = task->param.stack_arr;\
-                this_ptr->use_as__vsf_thread_cb_t.stack_size =                  \
+                vsf_pthis->use_as__vsf_thread_cb_t.stack = task->param.stack_arr;\
+                vsf_pthis->use_as__vsf_thread_cb_t.stack_size =                  \
                     sizeof(task->param.stack_arr);                              \
-                this_ptr->canary = 0xDEADBEEF;                                  \
+                vsf_pthis->canary = 0xDEADBEEF;                                 \
                 vsf_thread_start(   &(task->use_as__vsf_thread_t),              \
                                     &(task->param.use_as__vsf_thread_cb_t),     \
                                     priority);                                  \
             }                                                                   \
             void vsf_thread_##__name##_entry(                                   \
-                        struct thread_cb_##__name##_t *this_ptr)
+                        struct thread_cb_##__name##_t *vsf_pthis)
 
 #   define __vsf_eda_call_thread_prepare__(__name, __thread_cb)                 \
             do {                                                                \
-                thread_cb_##__name##_t *__this_ptr = (__thread_cb);             \
+                thread_cb_##__name##_t *__vsf_pthis = (__thread_cb);            \
                 const vsf_thread_prepare_cfg_t cfg = {                          \
                     .entry = (vsf_thread_entry_t *)                             \
                                     &vsf_thread_##__name##_entry,               \
                     .stack = (__thread_cb)->stack_arr,                          \
                     .stack_size = sizeof((__thread_cb)->stack_arr),             \
                 };                                                              \
-                vk_eda_call_thread_prepare(&(__this_ptr->use_as__vsf_thread_cb_t),\
+                vk_eda_call_thread_prepare(&(__vsf_pthis->use_as__vsf_thread_cb_t),\
                                               (vsf_thread_prepare_cfg_t *)&cfg);\
             } while(0)
 
@@ -153,29 +153,29 @@ extern "C" {
                                                 void *stack,                    \
                                                 uint_fast32_t size);            \
             extern void vsf_thread_##__name##_entry(                            \
-                            struct thread_cb_##__name##_t *this_ptr);
+                            struct thread_cb_##__name##_t *vsf_pthis);
 
 
 #   define __implement_vsf_thread_ex(__name)                                    \
             void vsf_thread_##__name##_entry(                                   \
-                        struct thread_cb_##__name##_t *this_ptr);               \
+                        struct thread_cb_##__name##_t *vsf_pthis);              \
             void vsf_thread_##__name##_start(   struct __name *task,            \
                                                 vsf_prio_t priority,            \
                                                 void *stack,                    \
                                                 uint_fast32_t size)             \
             {                                                                   \
                 VSF_KERNEL_ASSERT(NULL != task && 0 != size && NULL != stack);  \
-                thread_cb_##__name##_t *this_ptr =  &(task->param);             \
-                this_ptr->use_as__vsf_thread_cb_t.entry = (vsf_thread_entry_t *)\
+                thread_cb_##__name##_t *vsf_pthis =  &(task->param);            \
+                vsf_pthis->use_as__vsf_thread_cb_t.entry = (vsf_thread_entry_t *)\
                                     &vsf_thread_##__name##_entry;               \
-                this_ptr->use_as__vsf_thread_cb_t.stack = stack;                \
-                this_ptr->use_as__vsf_thread_cb_t.stack_size = size;            \
+                vsf_pthis->use_as__vsf_thread_cb_t.stack = stack;               \
+                vsf_pthis->use_as__vsf_thread_cb_t.stack_size = size;           \
                 vsf_thread_start(   &(task->use_as__vsf_thread_t),              \
                                     &(task->param.use_as__vsf_thread_cb_t),     \
                                     priority);                                  \
             }                                                                   \
             void vsf_thread_##__name##_entry(                                   \
-                        struct thread_cb_##__name##_t *this_ptr)
+                        struct thread_cb_##__name##_t *vsf_pthis)
 
 #   define __vsf_eda_call_thread_prepare_ex__(  __name,                         \
                                                 __thread_cb,                    \
@@ -183,14 +183,14 @@ extern "C" {
                                                 __size)                         \
             do {                                                                \
                 VSF_KERNEL_ASSERT((NULL != (__stack)) && (0 != (__size)))       \
-                thread_cb_##__name##_t *__this_ptr = (__thread_cb);             \
+                thread_cb_##__name##_t *__vsf_pthis = (__thread_cb);            \
                 const vsf_thread_prepare_cfg_t cfg = {                          \
                     .entry = (vsf_thread_entry_t *)                             \
                                     &vsf_thread_##__name##_entry,               \
                     .stack = (__stack),                                         \
                     .stack_size = (__size),                                     \
                 };                                                              \
-                vk_eda_call_thread_prepare(&(__this_ptr->use_as__vsf_thread_cb_t),\
+                vk_eda_call_thread_prepare(&(__vsf_pthis->use_as__vsf_thread_cb_t),\
                                               (vsf_thread_prepare_cfg_t *)&cfg);\
             } while(0)
 
@@ -221,25 +221,25 @@ extern "C" {
             extern void vsf_thread_##__name##_start(struct __name *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__name##_entry(                            \
-                        struct thread_cb_##__name##_t *this_ptr);
+                        struct thread_cb_##__name##_t *vsf_pthis);
 
 #   define __implement_vsf_thread(__name)                                       \
             void vsf_thread_##__name##_entry(                                   \
-                        struct thread_cb_##__name##_t *this_ptr);               \
+                        struct thread_cb_##__name##_t *vsf_pthis);              \
             void vsf_thread_##__name##_start( struct __name *task,              \
                                                 vsf_prio_t priority)            \
             {                                                                   \
                 VSF_KERNEL_ASSERT(NULL != task);                                \
-                vsf_thread_t *__this_ptr =                                      \
+                vsf_thread_t *__vsf_pthis =                                     \
                     &(task->param.use_as__vsf_thread_t);                        \
-                __this_ptr->entry = (vsf_thread_entry_t *)                      \
+                __vsf_pthis->entry = (vsf_thread_entry_t *)                     \
                                     &vsf_thread_##__name##_entry;               \
-                __this_ptr->stack = task->stack_arr;                            \
-                __this_ptr->stack_size = sizeof(task->stack_arr);               \
-                vsf_thread_start(__this_ptr, priority);                         \
+                __vsf_pthis->stack = task->stack_arr;                           \
+                __vsf_pthis->stack_size = sizeof(task->stack_arr);              \
+                vsf_thread_start(__vsf_pthis, priority);                        \
             }                                                                   \
             void vsf_thread_##__name##_entry(                                   \
-                        struct thread_cb_##__name##_t *this_ptr)
+                        struct thread_cb_##__name##_t *vsf_pthis)
 
 #   define __def_vsf_thread_ex(__name, ...)                                     \
             struct thread_cb_##__name##_t {                                     \
@@ -252,28 +252,28 @@ extern "C" {
             extern void vsf_thread_##__name##_start(struct __name *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__name##_entry(                            \
-                        struct thread_cb_##__name##_t *this_ptr);
+                        struct thread_cb_##__name##_t *vsf_pthis);
 
 
 #   define __implement_vsf_thread_ex(__name)                                    \
             void vsf_thread_##__name##_entry(                                   \
-                        struct thread_cb_##__name##_t *this_ptr);               \
+                        struct thread_cb_##__name##_t *vsf_pthis);              \
             void vsf_thread_##__name##_start(   struct __name *task,            \
                                                 vsf_prio_t priority,            \
                                                 void *stack,                    \
                                                 uint_fast32_t size)             \
             {                                                                   \
                 VSF_KERNEL_ASSERT(NULL != task && 0 != size && NULL != stack);  \
-                vsf_thread_t *__this_ptr =                                      \
+                vsf_thread_t *__vsf_pthis =                                     \
                     &(task->param.use_as__vsf_thread_t);                        \
-                __this_ptr->entry = (vsf_thread_entry_t *)                      \
+                __vsf_pthis->entry = (vsf_thread_entry_t *)                     \
                                     &vsf_thread_##__name##_entry;               \
-                __this_ptr->stack = stack;                                      \
-                __this_ptr->stack_size = size;                                  \
-                vsf_thread_start(__this_ptr, priority);                         \
+                __vsf_pthis->stack = stack;                                     \
+                __vsf_pthis->stack_size = size;                                 \
+                vsf_thread_start(__vsf_pthis, priority);                        \
             }                                                                   \
             void vsf_thread_##__name##_entry(                                   \
-                        struct thread_cb_##__name##_t *this_ptr)
+                        struct thread_cb_##__name##_t *vsf_pthis)
 
 #endif
 

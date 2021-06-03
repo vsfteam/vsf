@@ -137,7 +137,7 @@ static void __vsf_lwip_thread_on_terminate(vsf_eda_t *eda)
 
 implement_vsf_thread_ex(vsf_lwip_thread_t)
 {
-    this_ptr->lwip_thread(this_ptr->arg);
+    vsf_this.lwip_thread(vsf_this.arg);
 }
 /*
 static void __vsf_lwip_thread_entry(vsf_thread_t *thread)

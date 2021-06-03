@@ -130,7 +130,7 @@ imp_vsf_thread(user_thread_b_t)
 #endif
 
 
-private imp_vsf_pt(user_pt_sub_t)
+static imp_vsf_pt(user_pt_sub_t)
 {
     vsf_pt_begin();
 
@@ -142,7 +142,7 @@ private imp_vsf_pt(user_pt_sub_t)
 #define RESET_FSM()     do {vsf_task_state = 0;} while(0)
 
 #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-private imp_vsf_task(user_sub_task_t)
+static imp_vsf_task(user_sub_task_t)
 {
     vsf_task_begin();
     enum {
@@ -177,7 +177,7 @@ private imp_vsf_task(user_sub_task_t)
 }
 #endif
 
-private imp_vsf_pt(user_pt_task_t)
+static imp_vsf_pt(user_pt_task_t)
 {
     vsf_pt_begin();
 
@@ -218,7 +218,7 @@ private imp_vsf_pt(user_pt_task_t)
 
 #if     VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD                     \
     ||  VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
-private imp_vsf_pt(user_pt_task_b_t)
+static imp_vsf_pt(user_pt_task_b_t)
 {
     vsf_pt_begin();
 
