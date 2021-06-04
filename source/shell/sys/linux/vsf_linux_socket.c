@@ -47,6 +47,10 @@
 #   error current socket layer uses lwip as backend, please enable VSF_USE_LWIP
 #endif
 
+#if !LWIP_IPV4
+#   error ipv4 is a MUST, please enable LWIP_IPV4
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -72,6 +76,9 @@ static ssize_t __vsf_linux_socket_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 static ssize_t __vsf_linux_socket_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd);
 
+// APIs not implemented in older lwip
+extern struct pbuf * pbuf_free_header(struct pbuf *q, u16_t size);
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vsf_linux_fd_op_t __vsf_linux_socket_fdop = {
@@ -87,6 +94,7 @@ static const vsf_linux_fd_op_t __vsf_linux_socket_fdop = {
 // helper
 static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t *port)
 {
+#if LWIP_IPV6
     if (AF_INET6 == sockaddr->sa_family) {
         const struct sockaddr_in6 *sockaddr_in6 = (const struct sockaddr_in6 *)sockaddr;
 
@@ -101,17 +109,22 @@ static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t
         }
         *port = lwip_ntohs(sockaddr_in6->sin6_port);
         ipaddr->type = IPADDR_TYPE_V6;
-    } else {
+    } else
+#endif
+    {
         const struct sockaddr_in * sockaddr_in = (const struct sockaddr_in *)sockaddr;
 
         ip4_addr_set_u32(ip_2_ip4(ipaddr), sockaddr_in->sin_addr.s_addr);
         *port = lwip_ntohs(sockaddr_in->sin_port);
+#if LWIP_IPV6
         ipaddr->type = IPADDR_TYPE_V4;
+#endif
     }
 }
 
 static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t port)
 {
+#if LWIP_IPV6
     if (IP_IS_ANY_TYPE_VAL(*ipaddr) || IP_IS_V6_VAL(*ipaddr)) {
         struct sockaddr_in6 *sockaddr_in6 = (struct sockaddr_in6 *)sockaddr;
 
@@ -123,7 +136,9 @@ static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipad
         sockaddr_in6->sin6_addr.s6_addr[2] = ip_2_ip6(ipaddr)->addr[2];
         sockaddr_in6->sin6_addr.s6_addr[3] = ip_2_ip6(ipaddr)->addr[3];
         sockaddr_in6->sin6_scope_id = ip6_addr_zone(ip_2_ip6(ipaddr));
-    } else {
+    } else
+#endif
+    {
         struct sockaddr_in * sockaddr_in = (struct sockaddr_in *)sockaddr;
 
         sockaddr_in->sin_family = AF_INET;
