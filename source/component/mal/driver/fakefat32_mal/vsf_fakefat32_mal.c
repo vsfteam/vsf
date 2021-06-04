@@ -335,8 +335,8 @@ static vsf_err_t __vk_fakefat32_init_recursion(vk_fakefat32_mal_t *pthis, vk_fak
             clusters = __vk_fakefat32_calc_dir_clusters(pthis, file);
             file->size = clusters * cluster_size;
         }
-        file->callback.read = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_read);
-        file->callback.write = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_write);
+        file->callback.fn_read = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_read);
+        file->callback.fn_write = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_write);
     } else if (file->attr == (vk_file_attr_t)VSF_FAT_FILE_ATTR_VOLUMID) {
         clusters = 0;
     } else {
@@ -762,9 +762,9 @@ static vsf_err_t __vk_fakefat32_read(vk_fakefat32_mal_t *pthis, uint_fast64_t ad
 
             if ((file->f.buff != NULL) && !(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
                 memcpy(buff, &file->f.buff[addr_offset], page_size);
-            } else if (file->callback.read != NULL) {
+            } else if (file->callback.fn_read != NULL) {
                 vsf_err_t err;
-                __vsf_component_call_peda_ifs(vk_memfs_callback_read, err, file->callback.read, 0, file,
+                __vsf_component_call_peda_ifs(vk_memfs_callback_read, err, file->callback.fn_read, 0, file,
                     .offset     = addr_offset,
                     .size       = page_size,
                     .buff       = buff,
@@ -812,9 +812,9 @@ static vsf_err_t __vk_fakefat32_write(vk_fakefat32_mal_t *pthis, uint_fast64_t a
 
         if ((file->f.buff != NULL) && !(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
             memcpy(&file->f.buff[addr_offset], buff, page_size);
-        } else if (file->callback.write != NULL) {
+        } else if (file->callback.fn_write != NULL) {
             vsf_err_t err;
-            __vsf_component_call_peda_ifs(vk_memfs_callback_write, err, file->callback.write, 0, file,
+            __vsf_component_call_peda_ifs(vk_memfs_callback_write, err, file->callback.fn_write, 0, file,
                 .offset     = addr_offset,
                 .size       = page_size,
                 .buff       = buff,

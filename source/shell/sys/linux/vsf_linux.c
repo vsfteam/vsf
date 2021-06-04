@@ -1736,7 +1736,7 @@ int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *en
 
     // TODO: support other executable files?
     if (entry != NULL) {
-        *entry = (vsf_linux_main_entry_t)vfs_file->f.data;
+        *entry = (vsf_linux_main_entry_t)vfs_file->f.param;
     }
     return fd;
 }
@@ -1750,7 +1750,7 @@ int vsf_linux_fs_bind_target(int fd, void *target,
         return -1;
     }
 
-    vfs_file->f.data = target;
+    vfs_file->f.param = target;
     vfs_file->f.callback.fn_read = peda_read;
     vfs_file->f.callback.fn_write = peda_write;
     return 0;

@@ -64,6 +64,8 @@ dcl_vsf_peda_methods(static, __vk_vfs_unmount)
 dcl_vsf_peda_methods(static, __vk_vfs_lookup)
 dcl_vsf_peda_methods(static, __vk_vfs_create)
 dcl_vsf_peda_methods(static, __vk_vfs_unlink)
+dcl_vsf_peda_methods(static, __vk_vfs_read)
+dcl_vsf_peda_methods(static, __vk_vfs_write)
 
 static vsf_err_t __vk_file_lookup(vk_file_t *dir, const char *name, uint_fast16_t idx, vk_file_t **file);
 
@@ -85,8 +87,8 @@ vk_fs_op_t vk_vfs_op = {
 #endif
     .fop            = {
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
-        .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_read),
+        .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_write),
         .fn_resize  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
     .dop            = {
@@ -774,6 +776,62 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
             err = VSF_ERR_FAIL;
         }
         vsf_eda_return(err);
+        break;
+    }
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_vfs_read, vk_file_read)
+{
+    vsf_peda_begin();
+    vk_vfs_file_t *file = (vk_vfs_file_t *)&vsf_this;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (file->f.callback.fn_read != NULL) {
+            vsf_err_t err;
+            __vsf_component_call_peda_ifs(vk_vfs_callback_read, err, file->f.callback.fn_read, 0, file,
+                .offset     = vsf_local.offset,
+                .size       = vsf_local.size,
+                .buff       = vsf_local.buff,
+            );
+            if (VSF_ERR_NONE != err) {
+                vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
+            }
+        } else {
+            vsf_eda_return(VSF_ERR_NOT_ACCESSABLE);
+        }
+        break;
+    case VSF_EVT_RETURN:
+        vsf_eda_return(vsf_eda_get_return_value());
+        break;
+    }
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_vfs_write, vk_file_write)
+{
+    vsf_peda_begin();
+    vk_vfs_file_t *file = (vk_vfs_file_t *)&vsf_this;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (file->f.callback.fn_write != NULL) {
+            vsf_err_t err;
+            __vsf_component_call_peda_ifs(vk_vfs_callback_write, err, file->f.callback.fn_write, 0, file,
+                .offset     = vsf_local.offset,
+                .size       = vsf_local.size,
+                .buff       = vsf_local.buff,
+            );
+            if (VSF_ERR_NONE != err) {
+                vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
+            }
+        } else {
+            vsf_eda_return(VSF_ERR_NOT_ACCESSABLE);
+        }
+        break;
+    case VSF_EVT_RETURN:
+        vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
     vsf_peda_end();

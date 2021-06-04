@@ -151,9 +151,9 @@ __vsf_component_peda_ifs_entry(__vk_memfs_read, vk_file_read)
                 memcpy(buff, &file->f.buff[offset], rsize);
             }
             vsf_eda_return(rsize);
-        } else if (file->callback.read != NULL) {
+        } else if (file->callback.fn_read != NULL) {
             vsf_err_t err;
-            __vsf_component_call_peda_ifs(vk_memfs_callback_read, err, file->callback.read, 0, file,
+            __vsf_component_call_peda_ifs(vk_memfs_callback_read, err, file->callback.fn_read, 0, file,
                 .offset     = vsf_local.offset,
                 .size       = vsf_local.size,
                 .buff       = vsf_local.buff,
@@ -190,9 +190,9 @@ __vsf_component_peda_ifs_entry(__vk_memfs_write, vk_file_write)
                 memcpy(&file->f.buff[offset], buff, wsize);
             }
             vsf_eda_return(wsize);
-        } else if (file->callback.write != NULL) {
+        } else if (file->callback.fn_write != NULL) {
             vsf_err_t err;
-            __vsf_component_call_peda_ifs(vk_memfs_callback_write, err, file->callback.write, 0, file,
+            __vsf_component_call_peda_ifs(vk_memfs_callback_write, err, file->callback.fn_write, 0, file,
                 .offset     = vsf_local.offset,
                 .size       = vsf_local.size,
                 .buff       = vsf_local.buff,

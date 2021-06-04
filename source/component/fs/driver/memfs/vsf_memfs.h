@@ -65,8 +65,8 @@ vsf_class(vk_memfs_file_t) {
             } d;
         };
         struct {
-            void (*read)(uintptr_t target, vsf_evt_t evt);
-            void (*write)(uintptr_t target, vsf_evt_t evt);
+            void (*fn_read)(uintptr_t target, vsf_evt_t evt);
+            void (*fn_write)(uintptr_t target, vsf_evt_t evt);
         } callback;
     )
 };
