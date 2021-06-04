@@ -116,6 +116,9 @@ typedef int_fast8_t         intalu_t;
 #   define M_SQRT2          1.41421356237309504880   // sqrt(2)
 #   define M_SQRT1_2        0.707106781186547524401  // 1/sqrt(2)
 
+// iar has no strlcpy
+size_t strlcpy(char *dst, const char *src, size_t dsize);
+
 #if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
 // iar has no 64-bit stdio APIs, if simple_stdio in simple_libc is not used,
 //  implement 64-but stdio APIs here
