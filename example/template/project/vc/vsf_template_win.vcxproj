@@ -1076,7 +1076,9 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netbuf.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netdb.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netifapi.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\sockets.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\sockets.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\tcpip.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\core\altcp.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\core\altcp_alloc.c" />
