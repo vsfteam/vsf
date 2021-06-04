@@ -217,7 +217,7 @@ static void __vsf_rtos_thread_on_terminate(vsf_eda_t *eda)
 
 implement_vsf_thread_ex(vsf_rtos_thread_t)
 {
-    this_ptr->func(this_ptr->arg);
+    vsf_this.func(vsf_this.arg);
 }
 
 int rtos_task_create(   rtos_task_fct func,
