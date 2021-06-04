@@ -12283,6 +12283,12 @@
                     <group>
                         <name>include</name>
                         <group>
+                            <name>arpa</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\arpa\inet.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>linux</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\linux\limits.h</name>
@@ -12321,7 +12327,13 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\mount.h</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\select.h</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\shm.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\socket.h</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\stat.h</name>
@@ -12333,11 +12345,17 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\types.h</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\uio.h</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\wait.h</name>
                             </file>
                         </group>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\dirent.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\errno.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\fcntl.h</name>
@@ -12349,10 +12367,16 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\netdb.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\poll.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\pthread.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\pwd.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\semaphore.h</name>
@@ -12361,13 +12385,7 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\signal.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\stdio.h</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\termios.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\time.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\unistd.h</name>
@@ -12444,6 +12462,9 @@
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_cfg.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_devfs.c</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_socket.c</name>
