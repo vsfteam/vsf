@@ -28,12 +28,12 @@ typedef unsigned char       uint8_t;
 typedef signed char         int8_t;
 typedef unsigned int        uint_fast8_t;
 typedef signed int          int_fast8_t;
-    
+
 typedef unsigned short      uint16_t;
 typedef signed short        int16_t;
 typedef unsigned int        uint_fast16_t;
 typedef signed int          int_fast16_t;
-    
+
 typedef unsigned int        uint32_t;
 typedef signed int          int32_t;
 typedef unsigned int        uint_fast32_t;
@@ -84,7 +84,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 typedef uint_fast8_t        uintalu_t;
-typedef int_fast8_t         intalu_t;  
+typedef int_fast8_t         intalu_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -107,4 +107,14 @@ typedef int_fast8_t         intalu_t;
 #   define off64_t          int64_t
 #   define ftello64         ftell
 #   define fseeko64         fseek
+
+// iar has no clockid_t
+#   ifndef __IAR_TYPE_CLOCKID_T__
+#   define __IAR_TYPE_CLOCKID_T__
+typedef enum {
+    CLOCK_MONOTONIC,
+    CLOCK_REALTIME,
+} clockid_t;
+#   endif
+
 #endif
