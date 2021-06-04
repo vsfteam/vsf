@@ -4672,6 +4672,12 @@
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\config</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\rtos</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\net_al</state>
@@ -4706,12 +4712,6 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\wlan</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\macif</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\vsfvm\raw</state>
