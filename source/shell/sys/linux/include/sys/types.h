@@ -20,6 +20,9 @@ typedef unsigned long int   size_t;
 #else
 typedef int                 ssize_t;
 typedef unsigned int        size_t;
+#   ifndef SSIZE_MAX
+#       define SSIZE_MAX    INT_MAX
+#   endif
 #endif
 
 typedef int                 key_t;
