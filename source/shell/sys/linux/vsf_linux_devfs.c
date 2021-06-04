@@ -57,7 +57,10 @@ __vsf_component_peda_ifs_entry(__vk_devfs_rand_read, vk_file_read)
     uint_fast32_t size = vsf_local.size;
     uint8_t *buff = vsf_local.buff;
 
-    // TODO: call hal to generate random data
+    // TODO: use hal trng instead of rand
+    for (uint_fast32_t i = 0; i < size; i++) {
+        buff[i] = (uint8_t)rand();
+    }
     vsf_eda_return(size);
     vsf_peda_end();
 }
@@ -71,6 +74,7 @@ int vsf_linux_fs_bind_rand(char *path)
         if (!err) {
             vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
             vfs_file->attr = VSF_FILE_ATTR_READ;
+            printf("%s bound.\r\n", path);
         }
         close(fd);
     }
@@ -80,7 +84,14 @@ int vsf_linux_fs_bind_rand(char *path)
 
 int vsf_linux_devfs_init(void)
 {
+    int err = mkdir("/dev", 0);
+    if (err != 0) {
+        return err;
+    }
+
 #if VSF_LINUX_DEVFS_USE_RAND == ENABLED
+    // TODO: use hal trng instead of rand
+    srand(vsf_systimer_get_tick());
     vsf_linux_fs_bind_rand("/dev/random");
     vsf_linux_fs_bind_rand("/dev/urandom");
 #endif
