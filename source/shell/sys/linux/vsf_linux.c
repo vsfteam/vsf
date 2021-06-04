@@ -183,17 +183,17 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb);
 
 static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
-static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
-static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
-static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
 
 static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
@@ -729,7 +729,7 @@ static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t c
     return read_cnt;
 }
 
-static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd_tx, void *buf, size_t count)
+static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd_tx, const void *buf, size_t count)
 {
     vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
     vsf_linux_fd_t *sfd_rx = vsf_linux_get_fd(priv_tx->fd_rx);
@@ -917,7 +917,7 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
     return result;
 }
 
-static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, void *buf, size_t count)
+static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *file = priv->file;
@@ -1019,7 +1019,7 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
     return count;
 }
 
-static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, void *buf, size_t count)
+static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     vsf_stream_t *stream = ((vsf_linux_stream_priv_t *)sfd->priv)->stream;
@@ -1039,7 +1039,7 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, void *buf, size_t c
             vsf_unprotect_sched(orig);
         }
 
-        cursize = vsf_stream_write(stream, buf, size);
+        cursize = vsf_stream_write(stream, (uint8_t *)buf, size);
         size -= cursize;
         buf = (uint8_t *)buf + cursize;
     }

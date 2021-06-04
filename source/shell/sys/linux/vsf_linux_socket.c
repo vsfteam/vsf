@@ -69,7 +69,7 @@ typedef union vsf_linux_sockaddr_t {
 
 static int __vsf_linux_socket_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static ssize_t __vsf_linux_socket_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
-static ssize_t __vsf_linux_socket_write(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_socket_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd);
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -689,7 +689,7 @@ static ssize_t __vsf_linux_socket_read(vsf_linux_fd_t *sfd, void *buf, size_t co
     return recv(sfd->fd, buf, count, 0);
 }
 
-static ssize_t __vsf_linux_socket_write(vsf_linux_fd_t *sfd, void *buf, size_t count)
+static ssize_t __vsf_linux_socket_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;

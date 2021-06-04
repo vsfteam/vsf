@@ -165,7 +165,7 @@ typedef struct vsf_linux_fd_op_t {
     int priv_size;
     int (*fn_fcntl)(vsf_linux_fd_t *sfd, int cmd, long arg);
     ssize_t (*fn_read)(vsf_linux_fd_t *sfd, void *buf, size_t count);
-    ssize_t (*fn_write)(vsf_linux_fd_t *sfd, void *buf, size_t count);
+    ssize_t (*fn_write)(vsf_linux_fd_t *sfd, const void *buf, size_t count);
     int (*fn_close)(vsf_linux_fd_t *sfd);
 } vsf_linux_fd_op_t;
 
@@ -210,6 +210,10 @@ typedef struct vsf_linux_fs_priv_t {
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
+#if VSF_LINUX_DEVFS_USE_RAND == ENABLED
+extern int vsf_linux_devfs_init(void);
+#endif
+
 extern int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in);
 extern int vsf_linux_chdir(vsf_linux_process_t *process, char *working_dir);
 
