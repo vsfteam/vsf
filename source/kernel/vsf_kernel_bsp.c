@@ -295,12 +295,19 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
  to add memory buffers to heap."
     return (vsf_mem_t){0};
 #else
+#ifndef VSF_HEAP_ADDR
     NO_INIT static uint_fast8_t __heap_buffer[
         (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)];
+#endif
 
     return (vsf_mem_t){
+#ifdef VSF_HEAP_ADDR
+        .ptr.src_ptr = (uint8_t *)VSF_HEAP_ADDR,
+        .s32_size = VSF_HEAP_SIZE,
+#else
         .ptr.src_ptr = (uint8_t *)__heap_buffer,
-        .s32_size = sizeof(__heap_buffer)
+        .s32_size = sizeof(__heap_buffer),
+#endif
     };
 #endif
 }
