@@ -295,7 +295,10 @@ const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
 int setsockopt(int socket, int level, int optname, const void *optval, socklen_t optlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -335,7 +338,10 @@ int setsockopt(int socket, int level, int optname, const void *optval, socklen_t
 int getsockopt(int socket, int level, int optname, void *optval, socklen_t *optlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -371,7 +377,10 @@ int getsockopt(int socket, int level, int optname, void *optval, socklen_t *optl
 int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -385,7 +394,10 @@ int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
 int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -399,7 +411,10 @@ int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen)
 int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -439,7 +454,10 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -461,7 +479,10 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
 int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -482,7 +503,10 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
 int listen(int socket, int backlog)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -506,7 +530,10 @@ ssize_t recv(int socket, void *buffer, size_t size, int flags)
 ssize_t send(int socket, const void *buffer, size_t size, int flags)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -524,7 +551,10 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
     u16_t len = 0, pos = 0;
@@ -535,7 +565,9 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
     recv_next:
         if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
             struct netbuf *netbuf;
-            err = netconn_recv_udp_raw_netbuf_flags(conn, &netbuf, flags);
+            err = netconn_recv(conn, &netbuf);
+            // for the latest lwip, use netconn_recv_udp_raw_netbuf_flags
+//            err = netconn_recv_udp_raw_netbuf_flags(conn, &netbuf, flags);
             if (ERR_OK == err) {
                 if (priv->last.netbuf != NULL) {
                     netbuf_chain(priv->last.netbuf, netbuf);
@@ -545,7 +577,9 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
             }
         } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
             struct pbuf *pbuf;
-            err = netconn_recv_tcp_pbuf_flags(conn, &pbuf, flags);
+            err = netconn_recv_tcp_pbuf(conn, &pbuf);
+            // for the latest lwip, use netconn_recv_tcp_pbuf_flags
+//            err = netconn_recv_tcp_pbuf_flags(conn, &pbuf, flags);
             if (ERR_OK == err) {
                 if (priv->last.pbuf != NULL) {
                     pbuf_chain(priv->last.pbuf, pbuf);
@@ -611,7 +645,10 @@ ssize_t sendto(int socket, const void *buffer, size_t size, int flags,
                     const struct sockaddr *dst_addr, socklen_t addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -666,7 +703,10 @@ ssize_t sendto(int socket, const void *buffer, size_t size, int flags,
 int shutdown(int socket, int how)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    VSF_LINUX_ASSERT(sfd != NULL);
+    if (NULL == sfd) {
+        return SOCKET_ERROR;
+    }
+
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
@@ -719,7 +759,9 @@ static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd)
     struct netconn *conn = priv->conn;
 
     conn->socket = 0;
-    netconn_prepare_delete(conn);
+    // for the latest lwip, use netconn_prepare_delete
+//    netconn_prepare_delete(conn);
+    netconn_delete(conn);
     return 0;
 }
 
