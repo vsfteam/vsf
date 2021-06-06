@@ -1891,6 +1891,23 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf)
 }
 #endif      // VSF_LINUX_CFG_SHM_NUM
 
+// sched
+int sched_get_priority_max(int)
+{
+    return VSF_LINUX_CFG_PRIO_HIGHEST;
+}
+
+int sched_get_priority_min(int)
+{
+    return VSF_LINUX_CFG_PRIO_LOWEST;
+}
+
+int sched_yield(void)
+{
+    vsf_thread_yield();
+    return 0;
+}
+
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
 #endif

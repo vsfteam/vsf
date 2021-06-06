@@ -3153,6 +3153,9 @@
     <ClInclude Include="..\..\config\mbedtls\config.h">
       <Filter>usrapp\config\mbedtls</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sched.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">

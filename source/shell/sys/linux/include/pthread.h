@@ -6,8 +6,10 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED
 #   include "./simple_libc/time.h"
+#   include "./sched.h"
 #else
 #   include <time.h>
+#   include <sched.h>
 #endif
 
 #ifdef __cplusplus
@@ -22,6 +24,26 @@ extern "C" {
 #define pthread_cancel                  __vsf_linux_pthread_cancel
 #define pthread_kill                    __vsf_linux_pthread_kill
 #define pthread_once                    __vsf_linux_pthread_once
+#define pthread_attr_init               __vsf_linux_pthread_attr_init
+#define pthread_attr_destroy            __vsf_linux_pthread_attr_destroy
+#define pthread_attr_setstack           __vsf_linux_pthread_attr_setstack
+#define pthread_attr_getstack           __vsf_linux_pthread_attr_getstack
+#define pthread_attr_setstackaddr       __vsf_linux_pthread_attr_setstackaddr
+#define pthread_attr_getstackaddr       __vsf_linux_pthread_attr_getstackaddr
+#define pthread_attr_setstacksize       __vsf_linux_pthread_attr_setstacksize
+#define pthread_attr_getstacksize       __vsf_linux_pthread_attr_getstacksize
+#define pthread_attr_setguardsize       __vsf_linux_pthread_attr_setguardsize
+#define pthread_attr_getguardsize       __vsf_linux_pthread_attr_getguardsize
+#define pthread_attr_setdetachstate     __vsf_linux_pthread_attr_setdetachstate
+#define pthread_attr_getdetachstate     __vsf_linux_pthread_attr_getdetachstate
+#define pthread_attr_setinheritsched    __vsf_linux_pthread_attr_setinheritsched
+#define pthread_attr_getinheritsched    __vsf_linux_pthread_attr_getinheritsched
+#define pthread_attr_setschedparam      __vsf_linux_pthread_attr_setschedparam
+#define pthread_attr_getschedparam      __vsf_linux_pthread_attr_getschedparam
+#define pthread_attr_setschedpolicy     __vsf_linux_pthread_attr_setschedpolicy
+#define pthread_attr_getschedpolicy     __vsf_linux_pthread_attr_getschedpolicy
+#define pthread_attr_setscope           __vsf_linux_pthread_attr_setscope
+#define pthread_attr_getscope           __vsf_linux_pthread_attr_getscope
 
 #define pthread_key_create              __vsf_linux_pthread_key_create
 #define pthread_setspecific             __vsf_linux_pthread_setspecific
@@ -55,7 +77,7 @@ extern "C" {
 
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
 #define PTHREAD_MUTEX_INITIALIZER       { .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 }
-#define PTHREAD_COND_INITIALIZER        { 0 }
+#define PTHREAD_COND_INITIALIZER        { .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 | VSF_SYNC_AUTO_RST }
 
 
 
@@ -81,12 +103,12 @@ enum {
     // cond
 };
 typedef struct {
-    int attr;
+    int                                 attr;
 } pthread_mutexattr_t;
 typedef struct pthread_mutex_t {
     implement(vsf_mutex_t)
-    int attr;
-    int recursive_cnt;
+    int                                 attr;
+    int                                 recursive_cnt;
 } pthread_mutex_t;
 
 int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr);
@@ -105,8 +127,8 @@ int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr , int *type);
 
 typedef vsf_trig_t pthread_cond_t;
 typedef struct {
-    int attr;
-    clockid_t clockid;
+    int                                 attr;
+    clockid_t                           clockid;
 } pthread_condattr_t;
 
 int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
@@ -127,12 +149,18 @@ int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clock_id);
 
 typedef int pthread_t;
 typedef struct pthread_once_t {
-    pthread_mutex_t mutex;
-    bool is_inited;
+    pthread_mutex_t                     mutex;
+    bool                                is_inited;
 } pthread_once_t;
 typedef struct {
-    void *stackaddr;
-    size_t stacksize;
+    int                                 detachstate;
+    int                                 schedpolicy;
+    struct sched_param                  schedparam;
+    int                                 inheritsched;
+    int                                 scope;
+    size_t                              guardsize;
+    void                               *stackaddr;
+    size_t                              stacksize;
 } pthread_attr_t;
 
 pthread_t pthread_self(void);
@@ -142,6 +170,27 @@ void pthread_exit(void *retval);
 int pthread_cancel(pthread_t thread);
 int pthread_kill(pthread_t thread, int sig);
 int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
+int pthread_attr_init(pthread_attr_t *attr);
+int pthread_attr_destroy(pthread_attr_t *attr);
+int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksize);
+int pthread_attr_getstack(const pthread_attr_t *attr, void **stackaddr, size_t *stacksize);
+int pthread_attr_setstackaddr(pthread_attr_t *attr, void *stackaddr);
+int pthread_attr_getstackaddr(const pthread_attr_t *attr, void **stackaddr);
+int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
+int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize);
+int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize);
+int pthread_attr_getguardsize(const pthread_attr_t *attr, size_t *guardsize);
+int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
+int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
+int pthread_attr_setinheritsched(pthread_attr_t *attr, int inheritsched);
+int pthread_attr_getinheritsched(const pthread_attr_t *attr, int *inheritsched);
+int pthread_attr_setschedparam(pthread_attr_t *attr, const struct sched_param *param);
+int pthread_attr_getschedparam(pthread_attr_t *attr, struct sched_param *param);
+int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy);
+int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy);
+int pthread_attr_setscope(pthread_attr_t *attr, int contentionscope);
+int pthread_attr_getscope(const pthread_attr_t *attr, int *contentionscope);
+
 
 #ifdef __cplusplus
 }

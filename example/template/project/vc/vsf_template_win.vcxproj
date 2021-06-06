@@ -622,6 +622,7 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\poll.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\pthread.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\pwd.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sched.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\semaphore.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\signal.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\ctype.h" />
@@ -1538,7 +1539,7 @@
     <ProjectGuid>{A77D8512-2E1C-4A55-A1DE-218BF944D49B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>vsfusbhwin</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

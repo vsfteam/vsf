@@ -165,6 +165,204 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
     return 0;
 }
 
+int pthread_attr_init(pthread_attr_t *attr)
+{
+    if (attr != NULL) {
+        memset(attr, 0, sizeof(*attr));
+        attr->schedparam.sched_priority = vsf_prio_inherit;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_destroy(pthread_attr_t *attr)
+{
+    return (attr != NULL) ? 0 : EINVAL;
+}
+
+int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksize)
+{
+    if (attr != NULL) {
+        attr->stackaddr = stackaddr;
+        attr->stacksize = stacksize;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_getstack(const pthread_attr_t *attr, void **stackaddr, size_t *stacksize)
+{
+    if (attr != NULL) {
+        if (stackaddr != NULL) {
+            *stackaddr = attr->stackaddr;
+        }
+        if (stacksize != NULL) {
+            *stacksize = attr->stacksize;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_setstackaddr(pthread_attr_t *attr, void *stackaddr)
+{
+    if (attr != NULL) {
+        attr->stackaddr = stackaddr;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_getstackaddr(const pthread_attr_t *attr, void **stackaddr)
+{
+    if (attr != NULL) {
+        if (stackaddr != NULL) {
+            *stackaddr = attr->stackaddr;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize)
+{
+    if (attr != NULL) {
+        attr->stacksize = stacksize;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize)
+{
+    if (attr != NULL) {
+        if (stacksize != NULL) {
+            *stacksize = attr->stacksize;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize)
+{
+    if (attr != NULL) {
+        attr->guardsize = guardsize;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_getguardsize(const pthread_attr_t *attr, size_t *guardsize)
+{
+    if (attr != NULL) {
+        if (guardsize != NULL) {
+            *guardsize = attr->guardsize;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate)
+{
+    if (attr != NULL) {
+        attr->detachstate = detachstate;
+        return 0;
+    }
+    return EINVAL;
+}
+int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate)
+{
+    if (attr != NULL) {
+        if (detachstate != NULL) {
+            *detachstate = attr->detachstate;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_setinheritsched(pthread_attr_t *attr, int inheritsched)
+{
+    if (attr != NULL) {
+        attr->inheritsched = inheritsched;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_getinheritsched(const pthread_attr_t *attr, int *inheritsched)
+{
+    if (attr != NULL) {
+        if (inheritsched != NULL) {
+            *inheritsched = attr->inheritsched;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_setschedparam(pthread_attr_t *attr, const struct sched_param *param)
+{
+    if ((attr != NULL) && (param != NULL)) {
+        attr->schedparam = *param;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_getschedparam(pthread_attr_t *attr, struct sched_param *param)
+{
+    if (attr != NULL) {
+        if (param != NULL) {
+            *param = attr->schedparam;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy)
+{
+    if (attr != NULL) {
+        attr->schedpolicy = policy;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
+{
+    if (attr != NULL) {
+        if (policy != NULL) {
+            *policy = attr->schedpolicy;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_setscope(pthread_attr_t *attr, int contentionscope)
+{
+    if (attr != NULL) {
+        attr->scope = contentionscope;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_attr_getscope(const pthread_attr_t *attr, int *contentionscope)
+{
+    if (attr != NULL) {
+        if (contentionscope != NULL) {
+            *contentionscope = attr->scope;
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
 // pthread_mutex
 int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr)
 {
