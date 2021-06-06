@@ -229,8 +229,9 @@ extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
 
 extern vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
-        int stack_size, const vsf_linux_thread_op_t *op);
-extern int vsf_linux_start_thread(vsf_linux_thread_t *thread);
+            const vsf_linux_thread_op_t *op,
+            int stack_size, void *stack);
+extern int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority);
 
 extern void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread);
 extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);

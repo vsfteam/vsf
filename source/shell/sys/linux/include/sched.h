@@ -32,8 +32,8 @@ struct sched_param {
     int                             sched_priority;
 };
 
-int sched_get_priority_max(int);
-int sched_get_priority_min(int);
+int sched_get_priority_max(int policy);
+int sched_get_priority_min(int policy);
 int sched_getparam(pid_t pid, struct sched_param *param);
 int sched_getscheduler(pid_t pid);
 int sched_setparam(pid_t pid, const struct sched_param *param);

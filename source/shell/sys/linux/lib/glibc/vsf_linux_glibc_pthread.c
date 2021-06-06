@@ -123,8 +123,15 @@ pthread_t pthread_self(void)
 
 int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg)
 {
+    if (NULL == attr) {
+        static const pthread_attr_t __default_attr = {
+            .inheritsched   = 1,
+        };
+        attr = &__default_attr;
+    }
+
     vsf_linux_pthread_priv_t *priv;
-    vsf_linux_thread_t *thread = vsf_linux_create_thread(NULL, 0, &__vsf_linux_pthread_op);
+    vsf_linux_thread_t *thread = vsf_linux_create_thread(NULL, &__vsf_linux_pthread_op, attr->stacksize, attr->stackaddr);
     if (!thread) { return -1; }
 
     priv = vsf_linux_thread_get_priv(thread);
@@ -134,7 +141,9 @@ int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_r
     if (tidp != NULL) {
         *tidp = thread->tid;
     }
-    vsf_linux_start_thread(thread);
+
+    vsf_prio_t priority = attr->inheritsched ? vsf_prio_inherit : attr->schedparam.sched_priority;
+    vsf_linux_start_thread(thread, priority);
     return 0;
 }
 

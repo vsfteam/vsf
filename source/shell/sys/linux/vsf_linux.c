@@ -373,7 +373,9 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     return VSF_ERR_FAIL;
 }
 
-vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process, int stack_size, const vsf_linux_thread_op_t *op)
+vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
+            const vsf_linux_thread_op_t *op,
+            int stack_size, void *stack)
 {
     vsf_linux_thread_t *thread;
 
@@ -383,17 +385,24 @@ vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process, int s
     if (!stack_size) {
         stack_size = VSF_LINUX_CFG_STACKSIZE;
     }
-    stack_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
-    stack_size &= ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1);
 
     uint_fast32_t thread_size = op->priv_size + sizeof(*thread);
-    thread_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
-    thread_size &= ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1);
+    uint_fast32_t alignment;
+    uint_fast32_t all_size;
+    if (NULL == stack) {
+        stack_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
+        stack_size &= ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1);
+        thread_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
+        thread_size &= ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1);
+        all_size = thread_size + stack_size;
+        all_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
+        alignment = 1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT;
+    } else {
+        all_size = thread_size;
+        alignment = 0;
+    }
 
-    uint_fast32_t all_size = thread_size + stack_size;
-    all_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
-
-    thread = (vsf_linux_thread_t *)vsf_heap_malloc_aligned(all_size, 1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
+    thread = (vsf_linux_thread_t *)vsf_heap_malloc_aligned(all_size, alignment);
     if (thread != NULL) {
         memset(thread, 0, thread_size);
         thread->process = process;
@@ -404,7 +413,11 @@ vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process, int s
 
         // set stack
         thread->stack_size = stack_size;
-        thread->stack = (void *)((uintptr_t)thread + thread_size);
+        if (stack != NULL) {
+            thread->stack = stack;
+        } else {
+            thread->stack = (void *)((uintptr_t)thread + thread_size);
+        }
 
         vsf_protect_t orig = vsf_protect_sched();
             thread->tid = __vsf_linux.cur_tid++;
@@ -414,10 +427,12 @@ vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process, int s
     return thread;
 }
 
-int vsf_linux_start_thread(vsf_linux_thread_t *thread)
+int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority)
 {
-    vsf_thread_start(&thread->use_as__vsf_thread_t,
-        &thread->use_as__vsf_thread_cb_t, thread->process->prio);
+    if (vsf_prio_inherit == priority) {
+        priority = thread->process->prio;
+    }
+    vsf_thread_start(&thread->use_as__vsf_thread_t, &thread->use_as__vsf_thread_cb_t, priority);
     return 0;
 }
 
@@ -427,7 +442,7 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
     if (process != NULL) {
         process->prio = vsf_prio_inherit;
 
-        vsf_linux_thread_t *thread = vsf_linux_create_thread(process, stack_size, &__vsf_linux_main_op);
+        vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {
             free(process);
             return NULL;
@@ -465,7 +480,7 @@ int vsf_linux_start_process(vsf_linux_process_t *process)
     // TODO: check if already started
     vsf_linux_thread_t *thread;
     vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
-    return vsf_linux_start_thread(thread);
+    return vsf_linux_start_thread(thread, vsf_prio_inherit);
 }
 
 static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
@@ -1892,12 +1907,12 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf)
 #endif      // VSF_LINUX_CFG_SHM_NUM
 
 // sched
-int sched_get_priority_max(int)
+int sched_get_priority_max(int policy)
 {
     return VSF_LINUX_CFG_PRIO_HIGHEST;
 }
 
-int sched_get_priority_min(int)
+int sched_get_priority_min(int policy)
 {
     return VSF_LINUX_CFG_PRIO_LOWEST;
 }
