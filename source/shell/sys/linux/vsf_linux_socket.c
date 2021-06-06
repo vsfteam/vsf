@@ -51,6 +51,10 @@
 #   error ipv4 is a MUST, please enable LWIP_IPV4
 #endif
 
+#if !LWIP_SO_RCVBUF
+#   error LWIP_SO_RCVBUF MUST be enabled for SO_RCVBUF control in setsockopt/getsockopt
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
