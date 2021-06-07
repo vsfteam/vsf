@@ -17,7 +17,7 @@
 					<Add option="-D__CPU_X64__" />
 					<Add option="-D__LINUX__" />
 					<Add directory="../../../config" />
-					<Add directory="../../../../../vsf" />
+					<Add directory="../../../../../source" />
 				</Compiler>
 				<Linker>
 					<Add option="-lpthread" />
@@ -41,360 +41,357 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../../../../../vsf/component/fs/driver/fatfs/vsf_fatfs.c">
+		<Unit filename="../../../../../source/component/fs/driver/fatfs/vsf_fatfs.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/fs/driver/fatfs/vsf_fatfs.h" />
-		<Unit filename="../../../../../vsf/component/fs/driver/malfs/vsf_malfs.c">
+		<Unit filename="../../../../../source/component/fs/driver/fatfs/vsf_fatfs.h" />
+		<Unit filename="../../../../../source/component/fs/driver/malfs/vsf_malfs.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/fs/driver/malfs/vsf_malfs.h" />
-		<Unit filename="../../../../../vsf/component/fs/driver/memfs/vsf_memfs.c">
+		<Unit filename="../../../../../source/component/fs/driver/malfs/vsf_malfs.h" />
+		<Unit filename="../../../../../source/component/fs/driver/memfs/vsf_memfs.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/fs/driver/memfs/vsf_memfs.h" />
-		<Unit filename="../../../../../vsf/component/fs/driver/winfs/vsf_winfs.c">
+		<Unit filename="../../../../../source/component/fs/driver/memfs/vsf_memfs.h" />
+		<Unit filename="../../../../../source/component/fs/driver/winfs/vsf_winfs.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/fs/driver/winfs/vsf_winfs.h" />
-		<Unit filename="../../../../../vsf/component/fs/vsf_fs.c">
+		<Unit filename="../../../../../source/component/fs/driver/winfs/vsf_winfs.h" />
+		<Unit filename="../../../../../source/component/fs/vsf_fs.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/fs/vsf_fs.h" />
-		<Unit filename="../../../../../vsf/component/fs/vsf_fs_cfg.h" />
-		<Unit filename="../../../../../vsf/component/input/driver/hid/vsf_input_hid.c">
+		<Unit filename="../../../../../source/component/fs/vsf_fs.h" />
+		<Unit filename="../../../../../source/component/fs/vsf_fs_cfg.h" />
+		<Unit filename="../../../../../source/component/input/driver/hid/vsf_input_hid.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/input/driver/hid/vsf_input_hid.h" />
-		<Unit filename="../../../../../vsf/component/input/protocol/vsf_input_gamepad.h" />
-		<Unit filename="../../../../../vsf/component/input/protocol/vsf_input_keyboard.h" />
-		<Unit filename="../../../../../vsf/component/input/protocol/vsf_input_mouse.h" />
-		<Unit filename="../../../../../vsf/component/input/protocol/vsf_input_sensor.h" />
-		<Unit filename="../../../../../vsf/component/input/protocol/vsf_input_touchscreen.h" />
-		<Unit filename="../../../../../vsf/component/input/vsf_input.c">
+		<Unit filename="../../../../../source/component/input/driver/hid/vsf_input_hid.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_gamepad.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_keyboard.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_mouse.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_sensor.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_touchscreen.h" />
+		<Unit filename="../../../../../source/component/input/vsf_input.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/input/vsf_input.h" />
-		<Unit filename="../../../../../vsf/component/input/vsf_input_cfg.h" />
-		<Unit filename="../../../../../vsf/component/input/vsf_input_get_type.h" />
-		<Unit filename="../../../../../vsf/component/input/vsf_input_get_type_1bit.h" />
-		<Unit filename="../../../../../vsf/component/input/vsf_input_get_type_4bit.h" />
-		<Unit filename="../../../../../vsf/component/mal/driver/fakefat32_mal/vsf_fakefat32_mal.c">
+		<Unit filename="../../../../../source/component/input/vsf_input.h" />
+		<Unit filename="../../../../../source/component/input/vsf_input_cfg.h" />
+		<Unit filename="../../../../../source/component/input/vsf_input_get_type.h" />
+		<Unit filename="../../../../../source/component/input/vsf_input_get_type_1bit.h" />
+		<Unit filename="../../../../../source/component/input/vsf_input_get_type_4bit.h" />
+		<Unit filename="../../../../../source/component/mal/driver/fakefat32_mal/vsf_fakefat32_mal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/mal/driver/fakefat32_mal/vsf_fakefat32_mal.h" />
-		<Unit filename="../../../../../vsf/component/mal/driver/file_mal/vsf_file_mal.c">
+		<Unit filename="../../../../../source/component/mal/driver/fakefat32_mal/vsf_fakefat32_mal.h" />
+		<Unit filename="../../../../../source/component/mal/driver/file_mal/vsf_file_mal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/mal/driver/file_mal/vsf_file_mal.h" />
-		<Unit filename="../../../../../vsf/component/mal/driver/mem_mal/vsf_mem_mal.c">
+		<Unit filename="../../../../../source/component/mal/driver/file_mal/vsf_file_mal.h" />
+		<Unit filename="../../../../../source/component/mal/driver/mem_mal/vsf_mem_mal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/mal/driver/mem_mal/vsf_mem_mal.h" />
-		<Unit filename="../../../../../vsf/component/mal/driver/mim_mal/vsf_mim_mal.c">
+		<Unit filename="../../../../../source/component/mal/driver/mem_mal/vsf_mem_mal.h" />
+		<Unit filename="../../../../../source/component/mal/driver/mim_mal/vsf_mim_mal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/mal/driver/mim_mal/vsf_mim_mal.h" />
-		<Unit filename="../../../../../vsf/component/mal/driver/scsi_mal/vsf_scsi_mal.c">
+		<Unit filename="../../../../../source/component/mal/driver/mim_mal/vsf_mim_mal.h" />
+		<Unit filename="../../../../../source/component/mal/driver/scsi_mal/vsf_scsi_mal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/mal/driver/scsi_mal/vsf_scsi_mal.h" />
-		<Unit filename="../../../../../vsf/component/mal/vsf_mal.c">
+		<Unit filename="../../../../../source/component/mal/driver/scsi_mal/vsf_scsi_mal.h" />
+		<Unit filename="../../../../../source/component/mal/vsf_mal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/mal/vsf_mal.h" />
-		<Unit filename="../../../../../vsf/component/mal/vsf_mal_cfg.h" />
-		<Unit filename="../../../../../vsf/component/scsi/driver/mal_scsi/vsf_mal_scsi.c">
+		<Unit filename="../../../../../source/component/mal/vsf_mal.h" />
+		<Unit filename="../../../../../source/component/mal/vsf_mal_cfg.h" />
+		<Unit filename="../../../../../source/component/scsi/driver/mal_scsi/vsf_mal_scsi.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/scsi/driver/mal_scsi/vsf_mal_scsi.h" />
-		<Unit filename="../../../../../vsf/component/scsi/driver/virtual_scsi/vsf_virtual_scsi.c">
+		<Unit filename="../../../../../source/component/scsi/driver/mal_scsi/vsf_mal_scsi.h" />
+		<Unit filename="../../../../../source/component/scsi/driver/virtual_scsi/vsf_virtual_scsi.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/scsi/driver/virtual_scsi/vsf_virtual_scsi.h" />
-		<Unit filename="../../../../../vsf/component/scsi/vsf_scsi.c">
+		<Unit filename="../../../../../source/component/scsi/driver/virtual_scsi/vsf_virtual_scsi.h" />
+		<Unit filename="../../../../../source/component/scsi/vsf_scsi.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/scsi/vsf_scsi.h" />
-		<Unit filename="../../../../../vsf/component/scsi/vsf_scsi_cfg.h" />
-		<Unit filename="../../../../../vsf/component/ui/disp/driver/sdl2/vsf_disp_sdl2.c">
+		<Unit filename="../../../../../source/component/scsi/vsf_scsi.h" />
+		<Unit filename="../../../../../source/component/scsi/vsf_scsi_cfg.h" />
+		<Unit filename="../../../../../source/component/ui/disp/driver/sdl2/vsf_disp_sdl2.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/ui/disp/driver/sdl2/vsf_disp_sdl2.h" />
-		<Unit filename="../../../../../vsf/component/ui/disp/vsf_disp.c">
+		<Unit filename="../../../../../source/component/ui/disp/driver/sdl2/vsf_disp_sdl2.h" />
+		<Unit filename="../../../../../source/component/ui/disp/vsf_disp.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/ui/disp/vsf_disp.h" />
-		<Unit filename="../../../../../vsf/component/ui/vsf_ui.h" />
-		<Unit filename="../../../../../vsf/component/ui/vsf_ui_cfg.h" />
-		<Unit filename="../../../../../vsf/component/vsf_component.c">
+		<Unit filename="../../../../../source/component/ui/disp/vsf_disp.h" />
+		<Unit filename="../../../../../source/component/ui/vsf_ui.h" />
+		<Unit filename="../../../../../source/component/ui/vsf_ui_cfg.h" />
+		<Unit filename="../../../../../source/component/vsf_component.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/component/vsf_component.h" />
-		<Unit filename="../../../../../vsf/component/vsf_component_cfg.h" />
-		<Unit filename="../../../../../vsf/hal/arch/__vsf_arch_interface.h" />
-		<Unit filename="../../../../../vsf/hal/arch/vsf_arch.h" />
-		<Unit filename="../../../../../vsf/hal/arch/vsf_arch_abstraction.c">
+		<Unit filename="../../../../../source/component/vsf_component.h" />
+		<Unit filename="../../../../../source/component/vsf_component_cfg.h" />
+		<Unit filename="../../../../../source/hal/arch/__vsf_arch_interface.h" />
+		<Unit filename="../../../../../source/hal/arch/vsf_arch.h" />
+		<Unit filename="../../../../../source/hal/arch/vsf_arch_abstraction.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/hal/arch/vsf_arch_abstraction.h" />
-		<Unit filename="../../../../../vsf/hal/arch/x86/linux/linux_generic.c">
+		<Unit filename="../../../../../source/hal/arch/vsf_arch_abstraction.h" />
+		<Unit filename="../../../../../source/hal/arch/x86/linux/linux_generic.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/hal/arch/x86/linux/linux_generic.h" />
-		<Unit filename="../../../../../vsf/hal/driver/x86/linux/device.h" />
-		<Unit filename="../../../../../vsf/hal/driver/x86/linux/driver.c">
+		<Unit filename="../../../../../source/hal/arch/x86/linux/linux_generic.h" />
+		<Unit filename="../../../../../source/hal/driver/x86/linux/device.h" />
+		<Unit filename="../../../../../source/hal/driver/x86/linux/driver.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/hal/driver/x86/linux/driver.h" />
-		<Unit filename="../../../../../vsf/hal/vsf_hal.c">
+		<Unit filename="../../../../../source/hal/driver/x86/linux/driver.h" />
+		<Unit filename="../../../../../source/hal/vsf_hal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/hal/vsf_hal.h" />
-		<Unit filename="../../../../../vsf/hal/vsf_hal_cfg.h" />
-		<Unit filename="../../../../../vsf/kernel/__eda/vsf_eda_bmpevt.c">
+		<Unit filename="../../../../../source/hal/vsf_hal.h" />
+		<Unit filename="../../../../../source/hal/vsf_hal_cfg.h" />
+		<Unit filename="../../../../../source/kernel/__eda/vsf_eda_bmpevt.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/__eda/vsf_eda_queue.c">
+		<Unit filename="../../../../../source/kernel/__eda/vsf_eda_queue.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/__eda/vsf_eda_sync.c">
+		<Unit filename="../../../../../source/kernel/__eda/vsf_eda_sync.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/__eda/vsf_eda_timer.c">
+		<Unit filename="../../../../../source/kernel/__eda/vsf_eda_timer.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/lib/__kernel_lib_with_full_feature_set.h" />
-		<Unit filename="../../../../../vsf/kernel/shell/simple/vsf_simple.h" />
-		<Unit filename="../../../../../vsf/kernel/shell/simple/vsf_simple_bmpevt.c">
+		<Unit filename="../../../../../source/kernel/lib/__kernel_lib_with_full_feature_set.h" />
+		<Unit filename="../../../../../source/kernel/shell/simple/vsf_simple.h" />
+		<Unit filename="../../../../../source/kernel/shell/simple/vsf_simple_bmpevt.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/shell/simple/vsf_simple_bmpevt.h" />
-		<Unit filename="../../../../../vsf/kernel/shell/simple/vsf_simple_task.c">
+		<Unit filename="../../../../../source/kernel/shell/simple/vsf_simple_bmpevt.h" />
+		<Unit filename="../../../../../source/kernel/shell/simple/vsf_simple_task.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/shell/vsf_shell.c">
+		<Unit filename="../../../../../source/kernel/shell/vsf_shell.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/shell/vsf_shell.h" />
-		<Unit filename="../../../../../vsf/kernel/task/__vsf_task_common.h" />
-		<Unit filename="../../../../../vsf/kernel/task/vsf_fsm.h" />
-		<Unit filename="../../../../../vsf/kernel/task/vsf_pt.h" />
-		<Unit filename="../../../../../vsf/kernel/task/vsf_task.c">
+		<Unit filename="../../../../../source/kernel/shell/vsf_shell.h" />
+		<Unit filename="../../../../../source/kernel/task/__vsf_task_common.h" />
+		<Unit filename="../../../../../source/kernel/task/vsf_fsm.h" />
+		<Unit filename="../../../../../source/kernel/task/vsf_pt.h" />
+		<Unit filename="../../../../../source/kernel/task/vsf_task.h" />
+		<Unit filename="../../../../../source/kernel/task/vsf_thread.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/task/vsf_task.h" />
-		<Unit filename="../../../../../vsf/kernel/task/vsf_thread.c">
+		<Unit filename="../../../../../source/kernel/task/vsf_thread.h" />
+		<Unit filename="../../../../../source/kernel/vsf_eda.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/task/vsf_thread.h" />
-		<Unit filename="../../../../../vsf/kernel/vsf_eda.c">
+		<Unit filename="../../../../../source/kernel/vsf_eda.h" />
+		<Unit filename="../../../../../source/kernel/vsf_eda_slist_queue.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/vsf_eda.h" />
-		<Unit filename="../../../../../vsf/kernel/vsf_eda_slist_queue.c">
+		<Unit filename="../../../../../source/kernel/vsf_eda_slist_queue.h" />
+		<Unit filename="../../../../../source/kernel/vsf_evtq.h" />
+		<Unit filename="../../../../../source/kernel/vsf_evtq_array.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/vsf_eda_slist_queue.h" />
-		<Unit filename="../../../../../vsf/kernel/vsf_evtq.h" />
-		<Unit filename="../../../../../vsf/kernel/vsf_evtq_array.c">
+		<Unit filename="../../../../../source/kernel/vsf_evtq_list.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/vsf_evtq_list.c">
+		<Unit filename="../../../../../source/kernel/vsf_kernel.h" />
+		<Unit filename="../../../../../source/kernel/vsf_kernel_bsp.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/vsf_kernel.h" />
-		<Unit filename="../../../../../vsf/kernel/vsf_kernel_bsp.c">
+		<Unit filename="../../../../../source/kernel/vsf_kernel_cfg.h" />
+		<Unit filename="../../../../../source/kernel/vsf_kernel_common.h" />
+		<Unit filename="../../../../../source/kernel/vsf_os.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/vsf_kernel_cfg.h" />
-		<Unit filename="../../../../../vsf/kernel/vsf_kernel_common.h" />
-		<Unit filename="../../../../../vsf/kernel/vsf_os.c">
+		<Unit filename="../../../../../source/kernel/vsf_os.h" />
+		<Unit filename="../../../../../source/kernel/vsf_timq.h" />
+		<Unit filename="../../../../../source/kernel/vsf_timq_dlist.h" />
+		<Unit filename="../../../../../source/osa_hal/driver/device_specific/x86/linux/driver.h" />
+		<Unit filename="../../../../../source/osa_hal/vsf_osa_hal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/kernel/vsf_os.h" />
-		<Unit filename="../../../../../vsf/kernel/vsf_timq.h" />
-		<Unit filename="../../../../../vsf/kernel/vsf_timq_dlist.h" />
-		<Unit filename="../../../../../vsf/osa_hal/driver/device_specific/x86/linux/driver.h" />
-		<Unit filename="../../../../../vsf/osa_hal/vsf_osa_hal.c">
+		<Unit filename="../../../../../source/osa_hal/vsf_osa_hal.h" />
+		<Unit filename="../../../../../source/osa_hal/vsf_osa_hal_cfg.h" />
+		<Unit filename="../../../../../source/service/dynarr/vsf_dynarr.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/osa_hal/vsf_osa_hal.h" />
-		<Unit filename="../../../../../vsf/osa_hal/vsf_osa_hal_cfg.h" />
-		<Unit filename="../../../../../vsf/service/dynarr/vsf_dynarr.c">
+		<Unit filename="../../../../../source/service/dynarr/vsf_dynarr.h" />
+		<Unit filename="../../../../../source/service/dynstack/vsf_dynstack.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/dynarr/vsf_dynarr.h" />
-		<Unit filename="../../../../../vsf/service/dynstack/vsf_dynstack.c">
+		<Unit filename="../../../../../source/service/dynstack/vsf_dynstack.h" />
+		<Unit filename="../../../../../source/service/fifo/vsf_fifo.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/dynstack/vsf_dynstack.h" />
-		<Unit filename="../../../../../vsf/service/fifo/vsf_fifo.c">
+		<Unit filename="../../../../../source/service/fifo/vsf_fifo.h" />
+		<Unit filename="../../../../../source/service/heap/vsf_heap.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/fifo/vsf_fifo.h" />
-		<Unit filename="../../../../../vsf/service/heap/vsf_heap.c">
+		<Unit filename="../../../../../source/service/heap/vsf_heap.h" />
+		<Unit filename="../../../../../source/service/json/vsf_json.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/heap/vsf_heap.h" />
-		<Unit filename="../../../../../vsf/service/json/vsf_json.c">
+		<Unit filename="../../../../../source/service/json/vsf_json.h" />
+		<Unit filename="../../../../../source/service/pbuf/vsf_pbuf.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/json/vsf_json.h" />
-		<Unit filename="../../../../../vsf/service/pbuf/vsf_pbuf.c">
+		<Unit filename="../../../../../source/service/pbuf/vsf_pbuf.h" />
+		<Unit filename="../../../../../source/service/pbuf/vsf_pbuf_pool.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/pbuf/vsf_pbuf.h" />
-		<Unit filename="../../../../../vsf/service/pbuf/vsf_pbuf_pool.c">
+		<Unit filename="../../../../../source/service/pbuf/vsf_pbuf_pool.h" />
+		<Unit filename="../../../../../source/service/pool/vsf_pool.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/pbuf/vsf_pbuf_pool.h" />
-		<Unit filename="../../../../../vsf/service/pool/vsf_pool.c">
+		<Unit filename="../../../../../source/service/pool/vsf_pool.h" />
+		<Unit filename="../../../../../source/service/simple_stream/block_stream/vsf_block_stream.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/pool/vsf_pool.h" />
-		<Unit filename="../../../../../vsf/service/simple_stream/block_stream/vsf_block_stream.c">
+		<Unit filename="../../../../../source/service/simple_stream/block_stream/vsf_block_stream.h" />
+		<Unit filename="../../../../../source/service/simple_stream/fifo_stream/vsf_fifo_stream.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/simple_stream/block_stream/vsf_block_stream.h" />
-		<Unit filename="../../../../../vsf/service/simple_stream/fifo_stream/vsf_fifo_stream.c">
+		<Unit filename="../../../../../source/service/simple_stream/fifo_stream/vsf_fifo_stream.h" />
+		<Unit filename="../../../../../source/service/simple_stream/mem_stream/vsf_mem_stream.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/simple_stream/fifo_stream/vsf_fifo_stream.h" />
-		<Unit filename="../../../../../vsf/service/simple_stream/mem_stream/vsf_mem_stream.c">
+		<Unit filename="../../../../../source/service/simple_stream/mem_stream/vsf_mem_stream.h" />
+		<Unit filename="../../../../../source/service/simple_stream/vsf_simple_stream.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/simple_stream/mem_stream/vsf_mem_stream.h" />
-		<Unit filename="../../../../../vsf/service/simple_stream/vsf_simple_stream.c">
+		<Unit filename="../../../../../source/service/simple_stream/vsf_simple_stream.h" />
+		<Unit filename="../../../../../source/service/stream/interface.h" />
+		<Unit filename="../../../../../source/service/stream/pbuf_queue/vsf_pbuf_queue.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/simple_stream/vsf_simple_stream.h" />
-		<Unit filename="../../../../../vsf/service/stream/interface.h" />
-		<Unit filename="../../../../../vsf/service/stream/pbuf_queue/vsf_pbuf_queue.c">
+		<Unit filename="../../../../../source/service/stream/pbuf_queue/vsf_pbuf_queue.h" />
+		<Unit filename="../../../../../source/service/stream/vsf_stream.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/stream/pbuf_queue/vsf_pbuf_queue.h" />
-		<Unit filename="../../../../../vsf/service/stream/vsf_stream.c">
+		<Unit filename="../../../../../source/service/stream/vsf_stream.h" />
+		<Unit filename="../../../../../source/service/stream/vsf_stream_base.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/stream/vsf_stream.h" />
-		<Unit filename="../../../../../vsf/service/stream/vsf_stream_base.c">
+		<Unit filename="../../../../../source/service/stream/vsf_stream_base.h" />
+		<Unit filename="../../../../../source/service/stream/vsf_stream_reader.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/stream/vsf_stream_base.h" />
-		<Unit filename="../../../../../vsf/service/stream/vsf_stream_reader.c">
+		<Unit filename="../../../../../source/service/stream/vsf_stream_reader.h" />
+		<Unit filename="../../../../../source/service/stream/vsf_stream_writer.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/stream/vsf_stream_reader.h" />
-		<Unit filename="../../../../../vsf/service/stream/vsf_stream_writer.c">
+		<Unit filename="../../../../../source/service/stream/vsf_stream_writer.h" />
+		<Unit filename="../../../../../source/service/trace/vsf_trace.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/stream/vsf_stream_writer.h" />
-		<Unit filename="../../../../../vsf/service/trace/vsf_trace.c">
+		<Unit filename="../../../../../source/service/trace/vsf_trace.h" />
+		<Unit filename="../../../../../source/service/vsf_service.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/trace/vsf_trace.h" />
-		<Unit filename="../../../../../vsf/service/vsf_service.c">
+		<Unit filename="../../../../../source/service/vsf_service.h" />
+		<Unit filename="../../../../../source/service/vsf_service_cfg.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/dirent.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/errno.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/fcntl.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/libusb.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/linux/limits.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/poll.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/pthread.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/semaphore.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/signal.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/simple_libc/ctype.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/simple_libc/stddef.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/simple_libc/stdio.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/simple_libc/stdlib.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/simple_libc/string.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/simple_libc/time.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/simple_libc/wchar.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/sys/mount.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/sys/select.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/sys/stat.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/sys/time.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/sys/types.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/sys/wait.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/termios.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/include/unistd.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/lib/glibc/vsf_linux_glibc.c">
 			<Option compilerVar="CC" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/service/vsf_service.h" />
-		<Unit filename="../../../../../vsf/service/vsf_service_cfg.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/dirent.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/errno.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/fcntl.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/libusb.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/linux/limits.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/poll.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/pthread.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/semaphore.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/signal.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/simple_libc/ctype.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/simple_libc/stddef.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/simple_libc/stdio.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/simple_libc/stdlib.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/simple_libc/string.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/simple_libc/time.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/simple_libc/wchar.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/sys/mount.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/sys/select.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/sys/stat.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/sys/time.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/sys/types.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/sys/wait.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/termios.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/include/unistd.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/lib/glibc/vsf_linux_glibc.c">
+		<Unit filename="../../../../../source/shell/sys/linux/lib/glibc/vsf_linux_glibc_ctype.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/shell/sys/linux/lib/glibc/vsf_linux_glibc_ctype.c">
+		<Unit filename="../../../../../source/shell/sys/linux/lib/glibc/vsf_linux_glibc_pthread.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/shell/sys/linux/lib/glibc/vsf_linux_glibc_pthread.c">
+		<Unit filename="../../../../../source/shell/sys/linux/lib/glibc/vsf_linux_glibc_sem.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/shell/sys/linux/lib/glibc/vsf_linux_glibc_sem.c">
+		<Unit filename="../../../../../source/shell/sys/linux/lib/glibc/vsf_linux_glibc_stdio.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/shell/sys/linux/lib/glibc/vsf_linux_glibc_stdio.c">
+		<Unit filename="../../../../../source/shell/sys/linux/lib/glibc/vsf_linux_glibc_stdlib.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/shell/sys/linux/lib/glibc/vsf_linux_glibc_stdlib.c">
+		<Unit filename="../../../../../source/shell/sys/linux/lib/glibc/vsf_linux_glibc_string.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/shell/sys/linux/lib/glibc/vsf_linux_glibc_string.c">
+		<Unit filename="../../../../../source/shell/sys/linux/lib/glibc/vsf_linux_glibc_time.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/shell/sys/linux/lib/glibc/vsf_linux_glibc_time.c">
+		<Unit filename="../../../../../source/shell/sys/linux/vsf_linux.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/shell/sys/linux/vsf_linux.c">
+		<Unit filename="../../../../../source/shell/sys/linux/vsf_linux.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/vsf_linux_cfg.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/vsf_linux_socket.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/shell/sys/linux/vsf_linux.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/vsf_linux_cfg.h" />
-		<Unit filename="../../../../../vsf/shell/sys/linux/vsf_linux_socket.c">
+		<Unit filename="../../../../../source/utilities/compiler/x86/type.h" />
+		<Unit filename="../../../../../source/utilities/compiler/x86/x86_compiler.h" />
+		<Unit filename="../../../../../source/utilities/language_extension/code_region.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../vsf/shell/sys/linux/include -I ../../../../../vsf/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../../../../vsf/utilities/compiler/x86/type.h" />
-		<Unit filename="../../../../../vsf/utilities/compiler/x86/x86_compiler.h" />
-		<Unit filename="../../../../../vsf/utilities/language_extension/code_region.c">
+		<Unit filename="../../../../../source/utilities/language_extension/code_region.h" />
+		<Unit filename="../../../../../source/utilities/language_extension/delegate.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/utilities/language_extension/code_region.h" />
-		<Unit filename="../../../../../vsf/utilities/language_extension/delegate.c">
+		<Unit filename="../../../../../source/utilities/language_extension/delegate.h" />
+		<Unit filename="../../../../../source/utilities/language_extension/language_extension.h" />
+		<Unit filename="../../../../../source/utilities/language_extension/simple_sprintf.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/utilities/language_extension/delegate.h" />
-		<Unit filename="../../../../../vsf/utilities/language_extension/language_extension.h" />
-		<Unit filename="../../../../../vsf/utilities/language_extension/simple_sprintf.c">
+		<Unit filename="../../../../../source/utilities/language_extension/simple_sscanf.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/utilities/language_extension/simple_sscanf.c">
+		<Unit filename="../../../../../source/utilities/template/template.h" />
+		<Unit filename="../../../../../source/utilities/template/vsf_bitmap.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/utilities/template/template.h" />
-		<Unit filename="../../../../../vsf/utilities/template/vsf_bitmap.c">
+		<Unit filename="../../../../../source/utilities/template/vsf_bitmap.h" />
+		<Unit filename="../../../../../source/utilities/template/vsf_list.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/utilities/template/vsf_bitmap.h" />
-		<Unit filename="../../../../../vsf/utilities/template/vsf_list.c">
+		<Unit filename="../../../../../source/utilities/template/vsf_list.h" />
+		<Unit filename="../../../../../source/utilities/template/vsf_queue.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../../../vsf/utilities/template/vsf_list.h" />
-		<Unit filename="../../../../../vsf/utilities/template/vsf_queue.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../../../../vsf/utilities/template/vsf_queue.h" />
+		<Unit filename="../../../../../source/utilities/template/vsf_queue.h" />
 		<Unit filename="../../../config/awtk_config.h" />
 		<Unit filename="../../../config/btstack_config.h" />
 		<Unit filename="../../../config/lv_conf.h" />
