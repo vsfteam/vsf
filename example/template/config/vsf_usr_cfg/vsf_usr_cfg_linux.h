@@ -51,9 +51,17 @@
 // VSF_LINUX_USE_SIMPLE_LIBC conflicts with c++
 #define APP_USE_CPP_DEMO                                DISABLED
 #define VSF_LINUX_USE_SIMPLE_LIBC                       ENABLED
-// the sscanf and sprintf in libc maybe corrupt in linux
-#define VSF_USE_SIMPLE_SSCANF                           ENABLED
-#define VSF_USE_SIMPLE_SPRINTF                          ENABLED
+#define VSF_LINUX_USE_SIMPLE_LIBC                       ENABLED
+// if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
+#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+// VSF_LINUX_LIBC_CFG_FAKE_API is required on __LINUX__ to avoid API confliction
+#   define VSF_LINUX_LIBC_CFG_FAKE_API                  ENABLED
+#   define VSF_USE_SIMPLE_SSCANF                        ENABLED
+#   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
+#else
+#   define VSF_USE_SIMPLE_SSCANF                        DISABLED
+#   define VSF_USE_SIMPLE_SPRINTF                       DISABLED
+#endif
 
 // 3rd-party demos
 #define APP_USE_XBOOT_XUI_DEMO                          DISABLED
