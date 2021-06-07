@@ -1,8 +1,13 @@
 #ifndef __SIMPLE_LIBC_WCHAR_H__
 #define __SIMPLE_LIBC_WCHAR_H__
 
-#include <stdio.h>
-#include <time.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "./stdio.h"
+#   include "./time.h"
+#else
+#   include <stdio.h>
+#   include <time.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

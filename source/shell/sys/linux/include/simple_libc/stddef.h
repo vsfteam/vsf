@@ -8,6 +8,17 @@
 #else
 #   include <sys/types.h>
 #endif
+
+// define wchar_t and wint_t before include vsf_utilities.h
+// because vsf_utilities will include other c headers which will require wchar_t
+#if     !defined(__cplusplus)
+// TODO: it seems that IAR does not support wchar_t even if it's defined here
+#   if !__IS_COMPILER_IAR__
+typedef unsigned short  wchar_t;
+#   endif
+typedef unsigned short  wint_t;
+#endif
+
 #include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
@@ -43,20 +54,14 @@ typedef long int         ptrdiff_t;
 
 #ifdef __cplusplus
 }
-#endif
 
-#if     !defined(__cplusplus)
-// TODO: it seems that IAR does not support wchar_t even if it's defined here
-#   if !__IS_COMPILER_IAR__
-typedef unsigned short  wchar_t;
-#   endif
-typedef unsigned short  wint_t;
-#elif   defined(__WIN__)
+#   ifdef __WIN__
 namespace std {
     typedef decltype(__nullptr) nullptr_t;
 }
 
 using ::std::nullptr_t;
+#   endif
 #endif
 
 #endif
