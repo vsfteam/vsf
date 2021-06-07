@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
 #define VSF_DISP_MIPI_LCD_WRITE(__CMD, __PARAM_LEN, ...)                       \
             (__CMD), (__PARAM_LEN),  ##__VA_ARGS__
 
@@ -71,7 +72,7 @@ extern "C" {
 #endif
 
 #if VSF_DISP_MIPI_LCD_SPI_MODE ==  VSF_DISP_MIPI_LCD_SPI_9BITS_MODE
-#   error "TODO: support 9bit spi mode
+#   error "TODO: support 9bit spi mode"
 #endif
 
 #define VSF_DISP_MIPI_LCD_REFRESH_SEQ_LEN       \
