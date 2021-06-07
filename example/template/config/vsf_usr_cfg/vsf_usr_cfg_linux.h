@@ -107,6 +107,13 @@
 #   define VSF_USBD_USE_CDCACM                          ENABLED
 #   define VSF_USBD_USE_MSC                             ENABLED
 #   define VSF_USBD_USE_UVC                             ENABLED
+#   define VSF_USBD_USE_DCD_USBIP                       DISABLED
+#       define VSF_USBIP_SERVER_CFG_DEBUG               ENABLED
+#       define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC       DISABLED
+#       define VSF_USBIP_SERVER_CFG_DEBUG_URB           ENABLED
+#       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_0
+#       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_0
+#   define USRAPP_CFG_USBD_DEV                          VSF_USB_DC0
 #   define APP_CFG_USBD_VID                             0xA7A8
 #   define APP_CFG_USBD_PID                             0x2348
 
@@ -156,15 +163,6 @@
 #define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 
 #define VSF_SYSTIMER_FREQ                               (0ul)
-
-#define VSF_USE_USB_DEVICE                              ENABLED
-#   define VSF_USBD_USE_DCD_USBIP                       DISABLED
-#       define VSF_USBIP_SERVER_CFG_DEBUG               ENABLED
-#       define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC       DISABLED
-#       define VSF_USBIP_SERVER_CFG_DEBUG_URB           ENABLED
-#       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_0
-#       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_0
-#   define USRAPP_CFG_USBD_DEV                          VSF_USB_DC0
 
 #define VSF_USBH_CFG_ENABLE_ROOT_HUB                    DISABLED
 #define VSF_USBH_USE_HUB                                DISABLED
