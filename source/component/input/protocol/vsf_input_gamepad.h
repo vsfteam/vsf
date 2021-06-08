@@ -49,7 +49,7 @@ enum {
 //                         VIRTUAL_GAMEPAD
 //          LT                                      RT
 //          LB                                      RB
-//                MENU_LEFT   MENU_MAIN   MENU_LEFT
+//                MENU_LEFT   MENU_MAIN   MENU_RIGHT
 //          L_UP               SPECIAL              R_UP
 //  L_LEFT  LS/(LX,LY)  L_RIGHT             R_LEFT  RS/(RX,RY)  R_RIGHT
 //          L_DOWN                                  R_DOWN
