@@ -122,15 +122,16 @@ vsf_err_t vk_netdrv_connect(vk_netdrv_t *netdrv)
 {
     VSF_TCPIP_ASSERT(netdrv != NULL);
     if (!netdrv->is_connected) {
-        netdrv->is_connected = true;
+        vsf_err_t err = VSF_ERR_NONE;
         vsf_pnp_on_netdrv_connect(netdrv);
         if (netdrv->adapter.op != NULL) {
-            vsf_err_t err = netdrv->adapter.op->on_connect(netdrv->adapter.netif);
-            if (!err) {
-                vsf_pnp_on_netdrv_connected(netdrv);
-            }
-            return err;
+            err = netdrv->adapter.op->on_connect(netdrv->adapter.netif);
         }
+        if (VSF_ERR_NONE == err) {
+            netdrv->is_connected = true;
+            vsf_pnp_on_netdrv_connected(netdrv);
+        }
+        return err;
     }
     return VSF_ERR_NONE;
 }
