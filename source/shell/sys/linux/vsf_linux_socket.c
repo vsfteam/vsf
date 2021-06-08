@@ -637,9 +637,10 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
             memcpy(src_addr, &addr, src_addrlen);
         }
         if (!(flags & MSG_PEEK)) {
+            VSF_LINUX_ASSERT(priv->last.netbuf != NULL);
+            netbuf_delete(priv->last.netbuf);
             priv->last.netbuf = NULL;
             priv->last.pbuf = NULL;
-            netbuf_delete(priv->last.netbuf);
         }
     }
     return len;
