@@ -247,7 +247,7 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
 static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb,
                         uint_fast8_t dpid, bool dir_in1out0, uint8_t *buffer, uint_fast16_t size)
 {
-    const uint8_t eptype_to_dwctype[4] = {
+    static const uint8_t eptype_to_dwctype[4] = {
         [USB_ENDPOINT_XFER_CONTROL] = 0,
         [USB_ENDPOINT_XFER_ISOC]    = 1,
         [USB_ENDPOINT_XFER_BULK]    = 2,
