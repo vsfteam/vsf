@@ -96,8 +96,7 @@ typedef struct vsf_heap_mcb_t {
 
 typedef struct vsf_default_heap_t {
     implement(vsf_heap_t)
-    // one more as terminator
-    vsf_dlist_t freelist[VSF_HEAP_CFG_FREELIST_NUM + 1];
+    vsf_dlist_t freelist[VSF_HEAP_CFG_FREELIST_NUM];
 } vsf_default_heap_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -497,6 +496,9 @@ static vsf_dlist_t * __vsf_heap_get_freelist(uint_fast32_t size)
 void vsf_heap_init(void)
 {
     memset(&__vsf_heap, 0, sizeof(__vsf_heap));
+    for (uint_fast8_t i = 0; i < dimof(__vsf_heap.freelist); i++) {
+        vsf_dlist_init(&__vsf_heap.freelist[i]);
+    }
     __vsf_heap.get_freelist = __vsf_heap_get_freelist;
 }
 
