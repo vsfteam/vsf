@@ -66,6 +66,10 @@ int vsf_linux_create_fhs(void)
 {
     int fd;
 
+    // 0. devfs, busybox, etc
+#if VSF_LINUX_USE_DEVFS == ENABLED
+    vsf_linux_devfs_init();
+#endif
     busybox_install();
 
     // 1. hardware driver related demo
