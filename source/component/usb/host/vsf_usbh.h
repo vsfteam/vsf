@@ -93,12 +93,18 @@ extern "C" {
 #else
 #   ifndef vsf_usbh_malloc
 #       define vsf_usbh_malloc         vsf_heap_malloc
+#   else
+extern void * vsf_usbh_malloc(uint_fast32_t size);
 #   endif
 #   ifndef vsf_usbh_malloc_aligned
 #       define vsf_usbh_malloc_aligned vsf_heap_malloc_aligned
+#   else
+extern void * vsf_usbh_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
 #   endif
 #   ifndef vsf_usbh_free
 #       define vsf_usbh_free           vsf_heap_free
+#   else
+extern void vsf_usbh_free(void * buffer);
 #   endif
 #endif
 
