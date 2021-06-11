@@ -83,14 +83,13 @@ extern "C" {
 #   define VSF_USBH_CFG_MAX_DEVICE      127
 #endif
 
-#ifdef VSF_USBH_CFG_HEAP
+#ifdef VSF_USBH_CFG_HEAP_IFS
 #   undef vsf_usbh_malloc
 #   undef vsf_usbh_malloc_aligned
 #   undef vsf_usbh_free
-#   define vsf_usbh_malloc              VSF_USBH_CFG_HEAP.Malloc
-#   define vsf_usbh_malloc_aligned      VSF_USBH_CFG_HEAP.MallocAligned
-#   define vsf_usbh_free                VSF_USBH_CFG_HEAP.Free
-
+#   define vsf_usbh_malloc              VSF_USBH_CFG_HEAP_IFS.Malloc
+#   define vsf_usbh_malloc_aligned      VSF_USBH_CFG_HEAP_IFS.MallocAligned
+#   define vsf_usbh_free                VSF_USBH_CFG_HEAP_IFS.Free
 #else
 #   ifndef vsf_usbh_malloc
 #       define vsf_usbh_malloc         vsf_heap_malloc
