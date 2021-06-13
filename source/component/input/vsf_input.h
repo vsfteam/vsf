@@ -25,6 +25,8 @@
 
 #if VSF_USE_INPUT == ENABLED
 
+#include "./vsf_input_get_type.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +48,10 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+enum {
+    VSF_INPUT_TYPE_SYNC = VSF_INPUT_USER_TYPE,
+};
+
 typedef uint32_t vk_input_timestamp_t;
 
 typedef struct vk_input_item_info_t {
@@ -63,6 +69,7 @@ typedef union vk_input_value_t {
     uint32_t valu32;
     uint16_t valu16;
     uint8_t valu8;
+    int64_t val64;
     int32_t val32;
     int16_t val16;
     int8_t val8;

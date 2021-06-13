@@ -27,6 +27,10 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#define DS4_ACC_RANGE       4           // +-4      g
+#define DS4_GYRO_RANGE      2000        // +-2000   degrees/second
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -52,19 +56,22 @@ struct vsf_usb_ds4_gamepad_in_report_t {
     uint8_t r3:1;
     uint8_t menu_main:1;    // data 7 ps
     uint8_t touch_click:1;
-    uint8_t counter:6;
+    uint8_t timestamp:6;
     uint8_t l2;             // data 8
     uint8_t r2;             // data 9
-    uint8_t unknown1[2];    // data 10 - data 11
-    uint8_t battery;        // data 12
+    uint8_t unknown1[3];    // data 10 - data 12
     int16_t gyro_pitch;     // data 13 - data 14
     int16_t gyro_yaw;       // data 15 - data 16
     int16_t gyro_roll;      // data 17 - data 18
-    int16_t acc_y_nega;     // data 19 - data 20    1G = 0x2000
+    int16_t acc_y;          // data 19 - data 20    1G = 0x2000
     int16_t acc_z;          // data 21 - data 22
-    int16_t acc_x_nega;     // data 23 - data 24
+    int16_t acc_x;          // data 23 - data 24
     uint8_t unknown2[5];    // data 25 - data 29
-    uint8_t type;           // data 30              0: no audio, 0x60: audio
+    uint8_t battery:4;      // data 30
+    uint8_t plug_usb:1;
+    uint8_t plug_audio:1;
+    uint8_t plug_mic:1;
+    uint8_t zero:1;
     uint8_t unknown3[2];    // data 31 - data 32
     uint8_t touch[19];      // data 33 - data 51
     uint8_t unknown4[12];   // data 52 - data 63
@@ -75,16 +82,16 @@ struct vsf_usb_ds4_gamepad_out_report_t {
     uint8_t id;
     uint8_t dummyFF;
     uint8_t dummy1[2];
-    
+
     uint8_t rumble_r;       // 0 - 255
     uint8_t rumble_l;
     uint8_t led_r;
     uint8_t led_g;
     uint8_t led_b;
-    
+
     uint8_t flash_bright;   // 255 = 2.5 seconds
     uint8_t flash_dark;     // 255 = 2.5 seconds
-    
+
     uint8_t dummy2[21];
 } PACKED;
 

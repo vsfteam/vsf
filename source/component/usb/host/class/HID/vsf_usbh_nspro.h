@@ -83,7 +83,6 @@ vsf_class(vk_usbh_nspro_t) {
 
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
 extern const vk_input_item_info_t vk_nspro_usb_gamepad_item_info[GAMEPAD_ID_NUM];
-extern const vk_sensor_item_info_t vk_nspro_usb_sensor_item_info[6];
 #endif
 
 extern const vk_usbh_class_drv_t vk_usbh_nspro_drv;

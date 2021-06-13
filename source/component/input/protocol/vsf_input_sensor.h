@@ -31,12 +31,19 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define VSF_SENSOR_DEF_ITEM_INFO(__ID, __SUBID, __BITLEN)                       \
-            {                                                                   \
-                .id     = (__ID),                                               \
-                .subid  = (__SUBID),                                            \
-                .bitlen = (__BITLEN),                                           \
-            }
+#define vsf_input_sensor_set(__event, __type, __subtype, __min, __max, __res, __value)\
+            do {                                                                \
+                (__event)->id = ((uint64_t)(__type) << 0) | ((uint64_t)(__subtype) << 32);\
+                (__event)->info.minimum = (__min);                              \
+                (__event)->info.maximum = (__max);                              \
+                (__event)->info.resolution = (__res);                           \
+                (__event)->cur.val64 = (__value);                               \
+            } while (0)
+
+#define vsf_input_sensor_get_type(__event)                                      \
+            ((vk_sensor_type_t)(((__event)->id >> 0) & 0xFFFFFFFF))
+#define vsf_input_sensor_get_subtype(__event)                                   \
+            ((vk_sensor_subtype_t)(((__event)->id >> 32) & 0xFFFFFFFF))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -45,41 +52,35 @@ enum {
     VSF_INPUT_TYPE_SENSOR = VSF_INPUT_USER_TYPE,
 };
 
-typedef enum vk_sensor_id_t {
-    SENSOR_ID_ACC,
-    SENSOR_ID_GYRO,
-    SENSOR_ID_MAG,
+typedef enum vk_sensor_type_t {
+    SENSOR_TYPE_ACC,
+    SENSOR_TYPE_GYRO,
+    SENSOR_TYPE_MAG,
 
-    SENSOR_ID_USER,
-} vk_sensor_id_t;
+    SENSOR_TYPE_USER,
+} vk_sensor_type_t;
 
-typedef enum vk_sensor_subid_t {
-    SENSOR_SUBID_X,
-    SENSOR_SUBID_Y,
-    SENSOR_SUBID_Z,
+typedef enum vk_sensor_subtype_t {
+    SENSOR_SUBTYPE_X,
+    SENSOR_SUBTYPE_Y,
+    SENSOR_SUBTYPE_Z,
 
-    SENSOR_SUBID_PITCH,
-    SENSOR_SUBID_YAW,
-    SENSOR_SUBID_ROLL,
+    SENSOR_SUBTYPE_PITCH = SENSOR_SUBTYPE_X,
+    SENSOR_SUBTYPE_YAW = SENSOR_SUBTYPE_Y,
+    SENSOR_SUBTYPE_ROLL = SENSOR_SUBTYPE_Z,
 
-    SENSOR_SUBID_USER,
-} vk_sensor_subid_t;
+    SENSOR_SUBTYPE_USER,
+} vk_sensor_subtype_t;
 
-typedef struct vk_sensor_item_info_t {
-    vk_sensor_id_t id;
-    vk_sensor_subid_t subid;
-    uint8_t bitlen;
-} vk_sensor_item_info_t;
-
-typedef struct vk_sensor_desc_t {
-    uint8_t item_num;
-    vk_sensor_item_info_t *item_info;
-} vk_sensor_desc_t;
+typedef struct vk_sensor_info_t {
+    int32_t minimum;
+    int32_t maximum;
+    uint32_t resolution;
+} vk_sensor_info_t;
 
 typedef struct vk_sensor_evt_t {
     implement(vk_input_evt_t)
-    vk_sensor_desc_t desc;
-    void *data;
+    vk_sensor_info_t info;
 } vk_sensor_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/

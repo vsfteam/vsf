@@ -74,15 +74,6 @@ const vk_input_item_info_t vk_nspro_usb_gamepad_item_info[GAMEPAD_ID_NUM] = {
     VSF_GAMEPAD_DEF_ITEM_INFO(  L_LEFT,         43, 1,  false),
     VSF_GAMEPAD_DEF_ITEM_INFO(  L_RIGHT,        42, 1,  false),
 };
-
-const vk_sensor_item_info_t vk_nspro_usb_sensor_item_info[6] = {
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_ACC,  SENSOR_SUBID_X,     16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_ACC,  SENSOR_SUBID_Y,     16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_ACC,  SENSOR_SUBID_Z,     16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_GYRO, SENSOR_SUBID_ROLL,  16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_GYRO, SENSOR_SUBID_PITCH, 16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_GYRO, SENSOR_SUBID_YAW,   16),
-};
 #endif
 
 const vk_usbh_class_drv_t vk_usbh_nspro_drv = {
@@ -97,6 +88,7 @@ const vk_usbh_class_drv_t vk_usbh_nspro_drv = {
 
 extern void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report);
 extern void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro);
+extern void vsf_nspro_on_report_parsed(vk_input_evt_t *evt);
 extern void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro);
 extern void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro);
 
@@ -115,10 +107,11 @@ static void __vk_usbh_nspro_process_input(vk_usbh_nspro_t *dev, vsf_usb_nspro_ga
         struct {
             vk_sensor_evt_t evt;
         } sensor;
+        vk_input_evt_t evt;
     } parser;
 
-    parser.gamepad.evt.duration     = vk_input_update_timestamp(&dev->timestamp);
-    parser.gamepad.evt.dev          = dev;
+    parser.evt.duration             = vk_input_update_timestamp(&dev->timestamp);
+    parser.evt.dev                  = dev;
 
     parser.gamepad.event_sent       = false;
     parser.gamepad.parser.info      = (vk_input_item_info_t *)vk_nspro_usb_gamepad_item_info;
@@ -140,11 +133,12 @@ static void __vk_usbh_nspro_process_input(vk_usbh_nspro_t *dev, vsf_usb_nspro_ga
     }
 
     // sensor
-    parser.sensor.evt.desc.item_info    = (vk_sensor_item_info_t *)vk_nspro_usb_sensor_item_info;
-    parser.sensor.evt.desc.item_num     = dimof(vk_nspro_usb_sensor_item_info);
-    parser.sensor.evt.data              = (uint8_t *)&data->gyro_acc[0];
-    vsf_nspro_on_sensor(&parser.sensor.evt);
+//    parser.sensor.evt.desc.item_info    = (vk_sensor_item_info_t *)vk_nspro_usb_sensor_item_info;
+//    parser.sensor.evt.desc.item_num     = dimof(vk_nspro_usb_sensor_item_info);
+//    parser.sensor.evt.data              = (uint8_t *)&data->gyro_acc[0];
+//    vsf_nspro_on_sensor(&parser.sensor.evt);
 
+    vsf_nspro_on_report_parsed(&parser.evt);
     dev->data = *data;
 }
 #endif

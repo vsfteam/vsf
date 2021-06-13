@@ -91,15 +91,6 @@ const vk_input_item_info_t vk_ds4u_gamepad_item_info[GAMEPAD_ID_NUM] = {
     VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   RT,     72, 8,  false, false),
     VSF_GAMEPAD_DEF_ITEM_INFO(  DPAD,           40, 4,  false),
 };
-
-const vk_sensor_item_info_t vk_ds4u_sensor_item_info[6] = {
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_GYRO, SENSOR_SUBID_PITCH, 16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_GYRO, SENSOR_SUBID_YAW,   16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_GYRO, SENSOR_SUBID_ROLL,  16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_ACC,  SENSOR_SUBID_Y,     16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_ACC,  SENSOR_SUBID_Z,     16),
-    VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_ACC,  SENSOR_SUBID_X,     16),
-};
 #endif
 
 const vk_usbh_class_drv_t vk_usbh_ds4_drv = {
@@ -126,8 +117,9 @@ extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
 
 extern void vsf_ds4u_on_new_dev(vk_input_ds4u_t *dev);
 extern void vsf_ds4u_on_free_dev(vk_input_ds4u_t *dev);
+extern void vsf_ds4u_on_report_parsed(vk_input_evt_t *evt);
 extern void vsf_ds4u_on_sensor(vk_sensor_evt_t *sensor_evt);
-extern void vsf_ds4u_on_report_input(vk_gamepad_evt_t *gamepad_evt);
+extern void vsf_ds4u_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
@@ -149,9 +141,17 @@ void vsf_ds4u_on_free_dev(vk_input_ds4u_t *dev)
 }
 #endif
 
-#ifndef WEAK_VSF_DS4U_ON_REPORT_INPUT
-WEAK(vsf_ds4u_on_report_input)
-void vsf_ds4u_on_report_input(vk_gamepad_evt_t *gamepad_evt)
+#ifndef WEAK_VSF_DS4U_ON_REPORT_PARSED
+WEAK(vsf_ds4u_on_report_parsed)
+void vsf_ds4u_on_report_parsed(vk_input_evt_t *evt)
+{
+    vsf_input_on_evt(VSF_INPUT_TYPE_SYNC, evt);
+}
+#endif
+
+#ifndef WEAK_VSF_DS4U_ON_GAMEPAD
+WEAK(vsf_ds4u_on_gamepad)
+void vsf_ds4u_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     vsf_input_on_gamepad(gamepad_evt);
 }
@@ -191,10 +191,11 @@ void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t
         struct {
             vk_touchscreen_evt_t evt;
         } touch;
+        vk_input_evt_t evt;
     } parser;
 
-    parser.gamepad.evt.duration     = vk_input_update_timestamp(&dev->timestamp);
-    parser.gamepad.evt.dev          = dev;
+    parser.evt.duration             = vk_input_update_timestamp(&dev->timestamp);
+    parser.evt.dev                  = dev;
 
     parser.gamepad.event_sent       = false;
     parser.gamepad.parser.info      = (vk_input_item_info_t *)vk_ds4u_gamepad_item_info;
@@ -206,19 +207,27 @@ void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t
             parser.gamepad.evt.info = *parser.gamepad.info;
             parser.gamepad.evt.pre = parser.gamepad.parser.pre;
             parser.gamepad.evt.cur = parser.gamepad.parser.cur;
-            vsf_ds4u_on_report_input(&parser.gamepad.evt);
+            vsf_ds4u_on_gamepad(&parser.gamepad.evt);
             parser.gamepad.event_sent = true;
         }
     } while (parser.gamepad.info != NULL);
     if (parser.gamepad.event_sent) {
         parser.gamepad.evt.id = GAMEPAD_ID_DUMMY;
-        vsf_ds4u_on_report_input(&parser.gamepad.evt);
+        vsf_ds4u_on_gamepad(&parser.gamepad.evt);
     }
 
     // sensor
-    parser.sensor.evt.desc.item_info    = (vk_sensor_item_info_t *)vk_ds4u_sensor_item_info;
-    parser.sensor.evt.desc.item_num     = dimof(vk_ds4u_sensor_item_info);
-    parser.sensor.evt.data              = (uint8_t *)&data->gyro_pitch;
+    vsf_input_sensor_set(&parser.sensor.evt, SENSOR_TYPE_ACC, SENSOR_SUBTYPE_X, -32768, 32768, 32768 / DS4_ACC_RANGE, data->acc_x);
+    vsf_ds4u_on_sensor(&parser.sensor.evt);
+    vsf_input_sensor_set(&parser.sensor.evt, SENSOR_TYPE_ACC, SENSOR_SUBTYPE_Y, -32768, 32768, 32768 / DS4_ACC_RANGE, data->acc_y);
+    vsf_ds4u_on_sensor(&parser.sensor.evt);
+    vsf_input_sensor_set(&parser.sensor.evt, SENSOR_TYPE_ACC, SENSOR_SUBTYPE_Z, -32768, 32768, 32768 / DS4_ACC_RANGE, data->acc_z);
+    vsf_ds4u_on_sensor(&parser.sensor.evt);
+    vsf_input_sensor_set(&parser.sensor.evt, SENSOR_TYPE_GYRO, SENSOR_SUBTYPE_PITCH, -(32768 << 10), 32768 << 10, (32768 << 10) / DS4_GYRO_RANGE, data->gyro_pitch << 10);
+    vsf_ds4u_on_sensor(&parser.sensor.evt);
+    vsf_input_sensor_set(&parser.sensor.evt, SENSOR_TYPE_GYRO, SENSOR_SUBTYPE_YAW, -(32768 << 10), 32768 << 10, (32768 << 10) / DS4_GYRO_RANGE, data->gyro_yaw << 10);
+    vsf_ds4u_on_sensor(&parser.sensor.evt);
+    vsf_input_sensor_set(&parser.sensor.evt, SENSOR_TYPE_GYRO, SENSOR_SUBTYPE_ROLL, -(32768 << 10), 32768 << 10, (32768 << 10) / DS4_GYRO_RANGE, data->gyro_roll << 10);
     vsf_ds4u_on_sensor(&parser.sensor.evt);
 
     // touch
@@ -243,6 +252,7 @@ void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t
             vsf_input_on_touchscreen(&parser.touch.evt);
         }
     }
+    vsf_ds4u_on_report_parsed(&parser.evt);
 
     dev->data = *data;
 }
@@ -346,7 +356,7 @@ bool vk_usbh_ds4_can_output(vk_usbh_ds4_t *ds4)
     return ds4->out_idle;
 }
 
-static void __vk_usbd_ds4_output(vk_usbh_ds4_t *ds4)
+static void __vk_usbh_ds4_output(vk_usbh_ds4_t *ds4)
 {
     ds4->out_idle = false;
     vk_usbh_hid_send_report(&ds4->use_as__vk_usbh_hid_teda_t, (uint8_t *)&ds4->gamepad_out_buf, sizeof(ds4->gamepad_out_buf));
@@ -357,7 +367,7 @@ void vk_usbh_ds4_set_rumble(vk_usbh_ds4_t *ds4, uint_fast8_t left, uint_fast8_t 
     VSF_USB_ASSERT(ds4->out_idle);
     ds4->gamepad_out_buf.rumble_r = right;
     ds4->gamepad_out_buf.rumble_l = left;
-    __vk_usbd_ds4_output(ds4);
+    __vk_usbh_ds4_output(ds4);
 }
 
 void vk_usbh_ds4_set_led(vk_usbh_ds4_t *ds4, uint_fast8_t r, uint_fast8_t g, uint_fast8_t b)
@@ -366,7 +376,7 @@ void vk_usbh_ds4_set_led(vk_usbh_ds4_t *ds4, uint_fast8_t r, uint_fast8_t g, uin
     ds4->gamepad_out_buf.led_r = r;
     ds4->gamepad_out_buf.led_g = g;
     ds4->gamepad_out_buf.led_b = b;
-    __vk_usbd_ds4_output(ds4);
+    __vk_usbh_ds4_output(ds4);
 }
 
 #endif      // VSF_USE_USB_HOST && VSF_USBH_USE_DS4

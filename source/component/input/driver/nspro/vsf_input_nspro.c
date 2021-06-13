@@ -53,6 +53,14 @@ void vsf_nspro_on_free_dev(void *dev)
 }
 #endif
 
+#ifndef WEAK_VSF_NSPRO_ON_REPORT_PARSED
+WEAK(vsf_nspro_on_report_parsed)
+void vsf_nspro_on_report_parsed(vk_input_evt_t *evt)
+{
+    vsf_input_on_evt(VSF_INPUT_TYPE_SYNC, evt);
+}
+#endif
+
 #ifndef WEAK_VSF_NSPRO_ON_GAMEPAD
 WEAK(vsf_nspro_on_gamepad)
 void vsf_nspro_on_gamepad(vk_gamepad_evt_t *gamepad_evt)

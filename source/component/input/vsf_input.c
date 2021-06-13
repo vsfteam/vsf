@@ -255,6 +255,7 @@ uint_fast32_t vk_input_update_timestamp(vk_input_timestamp_t *timestamp)
 #if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 void vk_input_notifier_register(vk_input_notifier_t *notifier)
 {
+    notifier->mask |= 1 << VSF_INPUT_TYPE_SYNC;
     vsf_protect_t orig = vsf_input_protect();
         VSF_INPUT_ASSERT(!vsf_slist_is_in(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list, notifier));
         vsf_slist_add_to_head(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list, notifier);
