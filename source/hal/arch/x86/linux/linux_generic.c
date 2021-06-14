@@ -244,6 +244,7 @@ static vsf_err_t __vsf_arch_create_irq_thread(vsf_arch_irq_thread_t *irq_thread,
         thread = &__vsf_arch.thread.pool[idx];
         thread->param = irq_thread;
         irq_thread->entry = entry;
+        irq_thread->arch_thread = thread;
         vsf_arch_irq_trace("irq_thread_init %s\n", irq_thread->name);
         __vsf_arch_irq_request_send(&thread->start_request);
         return VSF_ERR_NONE;
@@ -315,6 +316,7 @@ vsf_err_t vsf_systimer_start(void)
 {
     __vsf_arch_irq_init(&__vsf_arch.systimer.use_as__vsf_arch_irq_thread_t,
                 "timer", __vsf_systimer_thread, vsf_arch_prio_0);
+    __vsf_arch.systimer.timer_request.arch_thread = __vsf_arch.systimer.arch_thread;
     return VSF_ERR_NONE;
 }
 

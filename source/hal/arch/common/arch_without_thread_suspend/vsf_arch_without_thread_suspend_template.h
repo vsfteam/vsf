@@ -23,6 +23,7 @@
 typedef struct vsf_arch_irq_thread_common_t {
     const char name[32];
     vsf_arch_irq_entry_t entry;
+    void *arch_thread;
 } vsf_arch_irq_thread_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
