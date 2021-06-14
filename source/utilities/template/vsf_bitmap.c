@@ -52,7 +52,7 @@ int_fast16_t __vsf_bitmap_ffz(uintalu_t *bitmap_ptr, int_fast16_t bit_size)
         int_fast16_t temp = __vsf_arch_ffz(bitmap_ptr[i]);
         if (temp >= 0) {
             index += temp;
-            return index;
+            return index >= bit_size ? -1 : index;
         }
         index += __optimal_bit_sz;
     }
