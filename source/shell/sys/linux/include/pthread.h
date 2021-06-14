@@ -6,9 +6,12 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED
 #   include "./simple_libc/time.h"
-#   include "./sched.h"
 #else
 #   include <time.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "./sched.h"
+#else
 #   include <sched.h>
 #endif
 
