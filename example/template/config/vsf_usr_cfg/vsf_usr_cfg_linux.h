@@ -28,8 +28,6 @@
 #define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
 // test configurations, remove later
 #define VSF_USE_UI                                      ENABLED
-#define VSF_ARCH_CFG_IRQ_TRACE_EN                       ENABLED
-#define VSF_ARCH_CFG_REQUEST_TRACE_EN                   ENABLED
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              DISABLED
