@@ -37,7 +37,11 @@
 #endif
 
 #ifndef VSF_ARCH_CFG_IRQ_REQUEST_NUM
-#   define VSF_ARCH_CFG_IRQ_REQUEST_NUM     32
+#   define VSF_ARCH_CFG_IRQ_REQUEST_NUM     (VSF_ARCH_CFG_THREAD_NUM + 32)
+#endif
+#if VSF_ARCH_CFG_IRQ_REQUEST_NUM <= VSF_ARCH_CFG_THREAD_NUM
+#   error VSF_ARCH_CFG_IRQ_REQUEST_NUM MUST be larger than VSF_ARCH_CFG_THREAD_NUM,\
+        because every thread has a start_request
 #endif
 
 #ifndef VSF_ARCH_CFG_TRACE_FUNC
