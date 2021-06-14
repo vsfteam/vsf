@@ -200,9 +200,9 @@ void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
     vsf_arch_request_trace("irq_request%d send\n", idx);
     pthread_mutex_lock(mutex);
         request->is_triggered = true;
+        pthread_cond_signal(cond);
         vsf_arch_request_trace("irq_request%d signal\n", idx);
     pthread_mutex_unlock(mutex);
-    pthread_cond_signal(cond);
     vsf_arch_request_trace("irq_request%d sent\n", idx);
 }
 
