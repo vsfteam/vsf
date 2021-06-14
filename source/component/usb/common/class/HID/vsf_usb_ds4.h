@@ -59,7 +59,7 @@ struct vsf_usb_ds4_gamepad_in_report_t {
     uint8_t timestamp6:6;
     uint8_t l2;             // data 8
     uint8_t r2;             // data 9
-    uint8_t timestamp16;    // data 10 - data 11    unit = 5.33us
+    uint16_t timestamp16;   // data 10 - data 11    unit = 5.33us
     uint8_t unknown1;       // data 12
     int16_t gyro_pitch;     // data 13 - data 14    +- 2000 degrees/second
     int16_t gyro_yaw;       // data 15 - data 16
