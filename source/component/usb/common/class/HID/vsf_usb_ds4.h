@@ -64,9 +64,9 @@ struct vsf_usb_ds4_gamepad_in_report_t {
     int16_t gyro_pitch;     // data 13 - data 14    +- 2000 degrees/second
     int16_t gyro_yaw;       // data 15 - data 16
     int16_t gyro_roll;      // data 17 - data 18
-    int16_t acc_y;          // data 19 - data 20    1g = 0x2000, +-4g
-    int16_t acc_z;          // data 21 - data 22
-    int16_t acc_x;          // data 23 - data 24
+    int16_t acc_x;          // data 19 - data 20    1g = 0x2000, +-4g
+    int16_t acc_y;          // data 21 - data 22
+    int16_t acc_z;          // data 23 - data 24
     uint8_t unknown2[5];    // data 25 - data 29
     uint8_t battery:4;      // data 30
     uint8_t plug_usb:1;
