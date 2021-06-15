@@ -469,7 +469,7 @@ int cat_main(int argc, char *argv[])
 
 int clear_main(int argc, char *argv[])
 {
-    printf("\033[2J");
+    printf("\033[2J\033[H");
     return 0;
 }
 
