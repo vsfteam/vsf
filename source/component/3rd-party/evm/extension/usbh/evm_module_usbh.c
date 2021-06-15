@@ -19,7 +19,7 @@
 
 #include "vsf_cfg.h"
 
-#if VSF_EVM_USE_USBH == ENABLED
+#if VSF_EVM_USE_USBH == ENABLED && VSF_USE_EVM == ENABLED
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"

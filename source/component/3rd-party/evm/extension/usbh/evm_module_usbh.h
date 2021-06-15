@@ -22,7 +22,7 @@
 
 #include "vsf_cfg.h"
 
-#if VSF_EVM_USE_USBH == ENABLED
+#if VSF_EVM_USE_USBH == ENABLED && VSF_USE_EVM == ENABLED
 
 #include "evm_oo.h"
 

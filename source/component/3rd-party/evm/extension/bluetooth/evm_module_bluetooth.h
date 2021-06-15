@@ -22,7 +22,7 @@
 
 #include "vsf_cfg.h"
 
-#if VSF_EVM_USE_BLUETOOTH == ENABLED
+#if VSF_EVM_USE_BLUETOOTH == ENABLED && VSF_USE_EVM == ENABLED
 
 #ifdef __cplusplus
 extern "C" {
