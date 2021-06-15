@@ -65,7 +65,7 @@
 #define APP_USE_XBOOT_XUI_DEMO                          DISABLED
 #define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               DISABLED
-#define APP_USE_LVGL_DEMO                               DISABLED
+#define APP_USE_LVGL_DEMO                               ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                DISABLED
 #   define APP_LVGL_DEMO_CFG_FREETYPE                   ENABLED
 #   define APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES         4
