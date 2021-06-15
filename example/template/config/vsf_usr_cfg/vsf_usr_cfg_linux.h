@@ -217,6 +217,8 @@
 
 #if APP_USE_SDL2_DEMO == ENABLED
 #   define APP_SDL2_DEMO_CFG_COLOR_RGB565
+// VSF_SDL_CFG_FAKE_API is required on __linux__ to avoid API confliction
+#   define VSF_SDL_CFG_FAKE_API                         ENABLED
 #endif
 
 #define VSF_LINUX_CFG_STACKSIZE                         (60 * 1024)
