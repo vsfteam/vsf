@@ -27,6 +27,7 @@
 #endif
 #include "hal/arch/vsf_arch.h"
 #include <unistd.h>
+#include <termios.h>
 
 /*============================ MACROS ========================================*/
 
