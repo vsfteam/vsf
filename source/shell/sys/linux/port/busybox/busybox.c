@@ -21,6 +21,7 @@ extern int pwd_main(int argc, char *argv[]);
 extern int cat_main(int argc, char *argv[]);
 extern int echo_main(int argc, char *argv[]);
 extern int mkdir_main(int argc, char *argv[]);
+extern int clear_main(int argc, char *argv[]);
 
 extern int vsf_linux_init_main(int argc, char *argv[]);
 
@@ -68,7 +69,8 @@ int busybox_install(void)
         ||  busybox_bind("/sbin/pwd", pwd_main) < 0
         ||  busybox_bind("/sbin/cat", cat_main) < 0
         ||  busybox_bind("/sbin/echo", echo_main) < 0
-        ||  busybox_bind("/sbin/mkdir", mkdir_main) < 0) {
+        ||  busybox_bind("/sbin/mkdir", mkdir_main) < 0
+        ||  busybox_bind("/sbin/clear", clear_main) < 0) {
         return -1;
     }
 #endif

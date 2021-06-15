@@ -467,4 +467,10 @@ int cat_main(int argc, char *argv[])
     return 0;
 }
 
+int clear_main(int argc, char *argv[])
+{
+    printf("\033[2J");
+    return 0;
+}
+
 #endif
