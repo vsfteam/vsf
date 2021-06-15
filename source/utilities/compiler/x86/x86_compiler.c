@@ -27,7 +27,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifdef __WIN__
+// strlcpy is from FreeBSD library, not available in libc
 size_t strlcpy(char *dst, const char *src, size_t dsize)
 {
     const char *osrc = src;
@@ -49,6 +49,7 @@ size_t strlcpy(char *dst, const char *src, size_t dsize)
     return(src - osrc - 1);     /* count does not include NUL */
 }
 
+#ifdef __WIN__
 char * strsep(char **stringp, const char *delim)
 {
     char *s;
