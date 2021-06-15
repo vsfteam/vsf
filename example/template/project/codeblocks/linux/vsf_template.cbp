@@ -34,11 +34,15 @@
 					<Add directory="../../../../../source/component/3rd-party/libpng/port" />
 					<Add directory="../../../../../source/component/3rd-party/libpng/raw" />
 					<Add directory="../../../../../source/component/3rd-party/zlib/raw" />
+					<Add directory="../../../../../source/component/3rd-party/evm/port" />
+					<Add directory="../../../../../source/component/3rd-party/evm/raw/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lpthread" />
 					<Add option="-lSDL2" />
 					<Add option="-lrt" />
+					<Add library="../../../../../source/component/3rd-party/evm/raw/lib/x86/linux/libecma.a" />
+					<Add library="../../../../../source/component/3rd-party/evm/raw/lib/x86/linux/libejs.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -57,6 +61,9 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/evm_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../../../source/component/3rd-party/freetype/port/ft2build.h" />
 		<Unit filename="../../../../../source/component/3rd-party/freetype/port/vsf_config/ftconfig.h" />
 		<Unit filename="../../../../../source/component/3rd-party/freetype/port/vsf_config/ftheader.h" />
