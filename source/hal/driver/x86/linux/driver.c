@@ -112,6 +112,14 @@ static void __vsf_x86_debug_stream_rx_irqhandler(void *arg)
     char ch;
 
     __vsf_arch_irq_set_background(thread);
+
+    struct termios term;
+    int ret = tcgetattr(STDIN_FILENO, &term);
+    VSF_HAL_ASSERT(0 == ret);
+    cfmakeraw(&term);
+    ret = tcsetattr(STDIN_FILENO, TCSANOW, &term);
+    VSF_HAL_ASSERT(0 == ret);
+
     while (1) {
         do {
             rsize = read(STDIN_FILENO, &ch, 1);

@@ -143,7 +143,6 @@
 #define VSF_USE_LINUX                                   ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
-#       define VSH_ENTER_CHAR                           '\n'
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
