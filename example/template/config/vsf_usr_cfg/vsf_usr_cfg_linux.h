@@ -30,7 +30,7 @@
 #define VSF_USE_UI                                      ENABLED
 
 // Application configure
-#define APP_USE_LINUX_DEMO                              DISABLED
+#define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    DISABLED
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
 #define APP_USE_USBH_DEMO                               DISABLED
@@ -39,7 +39,7 @@
 #   define APP_USE_USBD_CDC_DEMO                        DISABLED
 #   define APP_USE_USBD_MSC_DEMO                        DISABLED
 #   define APP_USE_USBD_UVC_DEMO                        DISABLED
-#define APP_USE_SCSI_DEMO                               DISABLED
+#define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
 #define APP_USE_TGUI_DEMO                               DISABLED
 #define APP_USE_SDL2_DEMO                               DISABLED
@@ -48,7 +48,6 @@
 
 // VSF_LINUX_USE_SIMPLE_LIBC conflicts with c++
 #define APP_USE_CPP_DEMO                                DISABLED
-#define VSF_LINUX_USE_SIMPLE_LIBC                       ENABLED
 #define VSF_LINUX_USE_SIMPLE_LIBC                       ENABLED
 // if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
@@ -74,12 +73,13 @@
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    256
 #   define APP_LVGL_DEMO_CFG_VER_RES                    256
 #define APP_USE_BTSTACK_DEMO                            DISABLED
-#define APP_USE_VSFVM_DEMO                              ENABLED
+#define APP_USE_VSFVM_DEMO                              DISABLED
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
 #define APP_USE_LWIP_DEMO                               DISABLED
 
-#if APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
+#if     APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED       \
+    ||  (APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_CFG_FREETYPE == ENABLED)
 #   define APP_USE_FREETYPE_DEMO                        ENABLED
 #endif
 
