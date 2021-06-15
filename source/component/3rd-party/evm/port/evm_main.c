@@ -6,6 +6,8 @@
 //#include <stdio.h>
 //#include <string.h>
 
+#if VSF_USE_EVM == ENABLED
+
 #include "evm_module.h"
 #include "ecma.h"
 
@@ -218,3 +220,5 @@ int evm_main(void)
 
     return evm_start(env);
 }
+
+#endif      // VSF_USE_EVM

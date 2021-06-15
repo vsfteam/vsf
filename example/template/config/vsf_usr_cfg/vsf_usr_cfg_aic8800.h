@@ -125,6 +125,11 @@
 #define AIC8800_APP_USE_BT_DEMO                         ENABLED
 
 
+// app configurations to vsf configurations
+#if APP_USE_EVM_DEMO == ENABLED
+#   define VSF_USE_EVM                                  ENABLED
+#endif
+
 #if     APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED       \
     ||  (APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_CFG_FREETYPE == ENABLED)
 #   define APP_USE_FREETYPE_DEMO                        ENABLED
