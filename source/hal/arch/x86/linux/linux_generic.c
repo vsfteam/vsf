@@ -216,17 +216,20 @@ static void * __vsf_arch_irq_entry(void *arg)
     int idx = __vsf_arch_get_thread_idx(thread);
 
     thread->start_request.arch_thread = thread;
-    __vsf_arch_irq_request_pend(&thread->start_request);
 
-    vsf_arch_irq_thread_t *irq_thread = thread->param;
-    vsf_arch_irq_trace("irq_thread_start %s\n", irq_thread->name);
-    if (irq_thread->entry != NULL) {
-        irq_thread->entry(irq_thread);
+    while (true) {
+        __vsf_arch_irq_request_pend(&thread->start_request);
+
+        vsf_arch_irq_thread_t *irq_thread = thread->param;
+        vsf_arch_irq_trace("irq_thread_start %s\n", irq_thread->name);
+        if (irq_thread->entry != NULL) {
+            irq_thread->entry(irq_thread);
+        }
+
+        __vsf_arch_crit_enter(__vsf_arch_common.lock);
+            vsf_bitmap_clear(&__vsf_arch.thread.bitmap, idx);
+        __vsf_arch_crit_leave(__vsf_arch_common.lock);
     }
-
-    __vsf_arch_crit_enter(__vsf_arch_common.lock);
-        vsf_bitmap_clear(&__vsf_arch.thread.bitmap, idx);
-    __vsf_arch_crit_leave(__vsf_arch_common.lock);
 
     pthread_detach(pthread_self());
     return NULL;
