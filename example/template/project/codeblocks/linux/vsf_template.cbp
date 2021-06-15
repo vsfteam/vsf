@@ -357,6 +357,14 @@
 			<Option compilerVar="CC" />
 			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
 		</Unit>
+		<Unit filename="../../../../../source/shell/sys/linux/port/busybox/busybox.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/shell/sys/linux/port/busybox/busybox.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/port/busybox/config.h" />
+		<Unit filename="../../../../../source/shell/sys/linux/port/busybox/shell/vsh.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../../../source/shell/sys/linux/vsf_linux.c">
 			<Option compilerVar="CC" />
 			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -I ../../../../../source/shell/sys/linux/include -I ../../../../../source/shell/sys/linux/include/simple_libc -c $file -o $object" />
@@ -407,6 +415,37 @@
 		<Unit filename="../../../config/vsf_tgui_cfg.h" />
 		<Unit filename="../../../config/vsf_usr_cfg.h" />
 		<Unit filename="../../../config/vsf_usr_cfg/vsf_usr_cfg_linux.h" />
+		<Unit filename="../../../demo/LingLongGUI_demo/application/Fonts/SimSun_9.h" />
+		<Unit filename="../../../demo/LingLongGUI_demo/application/LL_User.h" />
+		<Unit filename="../../../demo/LingLongGUI_demo/application/ui_ll_application.h" />
+		<Unit filename="../../../demo/LingLongGUI_demo/application/ui_ll_applicationLogic.h" />
+		<Unit filename="../../../demo/aic8800/aic8800_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/aic8800/bt_demo/bt_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/aic8800/wifi_demo/wifi_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/audio_demo/audio_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/awtk_demo/awtk_application.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/awtk_demo/awtk_assets.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/awtk_demo/awtk_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/btstack_demo/btstack_application.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/btstack_demo/btstack_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../demo/common/usrapp_audio_common.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -431,11 +470,164 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../demo/common/usrapp_usbh_common.h" />
+		<Unit filename="../../../demo/cpp_demo/cpp_demo.cpp" />
+		<Unit filename="../../../demo/disp_demo/disp_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/distbus_demo/app/distbus_hal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/distbus_demo/bus/distbus_lwip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/distbus_demo/bus/distbus_usart.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/distbus_demo/distbus_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/evm_demo/evm_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../demo/fakefat32.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../demo/fakefat32.h" />
-		<Unit filename="main.c">
+		<Unit filename="../../../demo/freetype_demo/freetype_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/gato_demo/gato_application.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/gato_demo/gato_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/hal_demo/usart_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/json_demo/json_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/kernel_test/cross_task_test.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/kernel_test/eda_test.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/kernel_test/fsm_test.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/kernel_test/sem_test.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/linux_demo/libusb_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/linux_demo/linux_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/linux_demo/mount_file_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/lua_demo/love_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/lvgl_demo/lvgl_application.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/lvgl_demo/lvgl_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/lvgl_demo/lvgl_terminal_application.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/lwip_demo/lwip_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/nnom_demo/model/mnist/image.h" />
+		<Unit filename="../../../demo/nnom_demo/model/mnist/weights.h" />
+		<Unit filename="../../../demo/nnom_demo/nnom_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/nuklear_demo/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/nuklear_demo/sdl2surface_rawfb.h" />
+		<Unit filename="../../../demo/scsi_demo/scsi_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/sdl2_demo/sdl2_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/socket_demo/socket_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/stream_hal_demo/stream_usart_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/images/demo_images.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/images/demo_images.h" />
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/images/demo_images_data.h" />
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/stopwatch/stopwatch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/stopwatch/stopwatch.h" />
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_custom.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_custom.h" />
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_designer/tgui_control_create.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_designer/tgui_control_create.h" />
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_designer/tgui_control_tree_dump.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_designer/tgui_control_tree_dump.h" />
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_designer/tgui_designer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_designer/tgui_designer.h" />
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_designer/tgui_designer_common.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_designer/tgui_designer_common.h" />
+		<Unit filename="../../../demo/tgui_demo/tgui_demo/tgui_port.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/tgui_demo/tgui_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/usbd_demo/usbd_demo_cdc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/usbd_demo/usbd_demo_msc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/usbd_demo/usbd_demo_uac.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/usbd_demo/usbd_demo_user.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/usbd_demo/usbd_demo_uvc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/usbh_demo/usbh_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/vsfip_demo/vsfip_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/vsfvm_demo/vsfvm_demo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../demo/xui_demo/xui_demo.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions />
