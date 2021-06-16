@@ -17,6 +17,7 @@
 # for cmake
 CMakeFiles
 CmakeCache.txt
+build
 
 # for iar
 .metadata
