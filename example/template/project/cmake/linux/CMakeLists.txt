@@ -9,6 +9,9 @@ endif()
 project(vsf_template)
 set(VSF_TARGET x64_linux)
 
+# compiler configurations
+# if compiler is not set, cmake will find one
+
 # VSF_USE configurations
 set(VSF_USE_LINUX 1)
 set(VSF_LINUX_USE_SIMPLE_LIBC 1)
