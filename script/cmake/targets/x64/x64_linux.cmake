@@ -3,4 +3,4 @@ set(VSF_ARCH_SERIES         x86)
 
 set(VSF_HOST_SYSTEM         linux)
 
-list(APPEND PROJ_COMPILE_DEFINITIONS "__LINUX__" "__CPU_X64__")
+target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC "__LINUX__" "__CPU_X64__")

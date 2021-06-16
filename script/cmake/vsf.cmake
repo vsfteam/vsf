@@ -9,23 +9,18 @@ set(VSF_CMAKE_ROOT ${VSF_PATH}/script/cmake)
 
 include(${VSF_CMAKE_ROOT}/extensions.cmake)
 
+set(VSF_LIB_NAME vsf)
+add_library(${VSF_LIB_NAME} INTERFACE)
+
+add_executable(${CMAKE_PROJECT_NAME} "")
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
+    ${VSF_LIB_NAME}
+)
+
 if(NOT (VSF_HAL_CHIP_VENDOR AND VSF_HAL_CHIP_NAME AND VSF_ARCH_SERIES AND VSF_ARCH_NAME))
     # parse VSF_HAL_CHIP_VENDOR/VSF_HAL_CHIP_NAME/VSF_ARCH_SERIES/VSF_ARCH_NAME
     include(${VSF_CMAKE_ROOT}/targets.cmake)
 endif()
 include(${VSF_CMAKE_ROOT}/compilers.cmake)
 
-set(VSF_LIB_NAME vsf)
-add_library(${VSF_LIB_NAME} INTERFACE)
-target_include_directories(${VSF_LIB_NAME} INTERFACE
-    ${VSF_PATH}/source
-)
 add_subdirectory(${VSF_PATH}/source ${CMAKE_CURRENT_BINARY_DIR}/vsf)
-
-add_executable(${CMAKE_PROJECT_NAME} "")
-target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
-    ${VSF_LIB_NAME}
-)
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-    ${VSF_PATH}/source
-)

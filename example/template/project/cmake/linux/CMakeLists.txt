@@ -10,7 +10,9 @@ project(vsf_template)
 set(VSF_TARGET x64_linux)
 
 # define 3rd-party libraries
-set(VSF_USE_LVGL)
+set(VSF_USE_LINUX 1)
+set(VSF_LINUX_USE_SIMPLE_LIBC 1)
+set(VSF_USE_LVGL 1)
 
 # include vsf cmake script
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
