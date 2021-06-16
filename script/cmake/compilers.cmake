@@ -1,0 +1,7 @@
+if(${VSF_ARCH_SERIES} STREQUAL "arm")
+    include(${VSF_CMAKE_ROOT}/compilers/gunarmemb.cmake)
+elseif(${VSF_ARCH_SERIES} STREQUAL "x86")
+elseif(${VSF_ARCH_SERIES} STREQUAL "x64")
+else()
+    message(FATAL_ERROR "ARCH ${VSF_ARCH_SERIES} not supported yet")
+endif()

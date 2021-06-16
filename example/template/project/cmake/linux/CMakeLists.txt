@@ -7,16 +7,14 @@ else()
 endif()
 
 project(vsf_template)
-add_executable(vsf_template)
 set(VSF_TARGET x64_linux)
 
-# add vsf configurations
+# define 3rd-party libraries
+set(VSF_USE_LVGL)
+
+# include vsf cmake script
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
 
 # add user application source code/include directories
-add_subdirectory(
-    ../../../demo
-)
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-    ../../../config
-)
+# add template directory
+add_subdirectory(../../.. ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME})
