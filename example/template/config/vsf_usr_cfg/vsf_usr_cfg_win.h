@@ -99,10 +99,7 @@
 #endif
 // nnom minst demo seems to be broken
 #define APP_USE_NNOM_DEMO                               DISABLED
-#ifndef __VSF_X86_WIN_SINGLE_PRIORITY
-// lvgl will hold CPU, so other irq can not be run in single thread mode
-#   define APP_USE_LVGL_DEMO                            ENABLED
-#endif
+#define APP_USE_LVGL_DEMO                               ENABLED
 //#   define APP_LVGL_DEMO_USE_TERMINAL                   ENABLED
 //#   define APP_LVGL_DEMO_CFG_ANIMINATION                ENABLED
 // _vsnprintf of lvgl conflicts with ucrt
@@ -114,6 +111,7 @@
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                16
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    1920
 #   define APP_LVGL_DEMO_CFG_VER_RES                    1080
+#   define VSF_LVGL_IMP_WAIT_CB                         ENABLED
 #define APP_USE_BTSTACK_DEMO                            ENABLED
 #ifndef __VSF_X86_WIN_SINGLE_PRIORITY
 // vsfvm will hold cpu, so other irq can not be run in single thread mode

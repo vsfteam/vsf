@@ -336,7 +336,6 @@ int VSF_USER_ENTRY(void)
 
     disp_drv.hor_res = __lvgl_touchscreen_get_width();
     disp_drv.ver_res = __lvgl_touchscreen_get_height();
-    disp_drv.flush_cb = vsf_lvgl_flush_disp;
     disp_drv.buffer = &usrapp_ui_common.lvgl.disp_buf;
     disp = lv_disp_drv_register(&disp_drv);
 

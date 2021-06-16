@@ -72,6 +72,7 @@
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                16
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    256
 #   define APP_LVGL_DEMO_CFG_VER_RES                    256
+#   define VSF_LVGL_IMP_WAIT_CB                         ENABLED
 #define APP_USE_BTSTACK_DEMO                            DISABLED
 #define APP_USE_VSFVM_DEMO                              DISABLED
 // select one for tcpip stack

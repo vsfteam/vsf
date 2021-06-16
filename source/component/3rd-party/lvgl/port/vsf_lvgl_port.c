@@ -27,13 +27,31 @@
 #include "lvgl/lvgl.h"
 #include "lv_conf.h"
 
+#if VSF_LVGL_IMP_WAIT_CB == ENABLED
+#   include "kernel/vsf_kernel.h"
+#endif
+
 /*============================ MACROS ========================================*/
+
+#if VSF_LVGL_IMP_WAIT_CB == ENABLED
+#   if VSF_USE_KERNEL != ENABLED || VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
+#       error VSF_LVGL_IMP_WAIT_CB need kernel and thread
+#   endif
+#   if LVGL_VERSION_MAJOR < 7
+#       error current lvgl does not support wait_cb
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
 
+#if VSF_LVGL_IMP_WAIT_CB == ENABLED
+NO_INIT static vsf_eda_t * eda_pending;
+#endif
+
+/*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 #if USE_LV_LOG
@@ -44,7 +62,7 @@ void vsf_lvgl_printf(lv_log_level_t level, const char *file, uint32_t line, cons
 }
 #endif
 
-void vsf_lvgl_flush_disp(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
+static void __vsf_lvgl_flush_disp(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
 {
     lv_coord_t hres = disp_drv->rotated == 0 ? disp_drv->hor_res : disp_drv->ver_res;
     lv_coord_t vres = disp_drv->rotated == 0 ? disp_drv->ver_res : disp_drv->hor_res;
@@ -60,6 +78,10 @@ void vsf_lvgl_flush_disp(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_colo
     VSF_UI_ASSERT(area->y2 >= area->y1);
     VSF_UI_ASSERT(area->x2 >= area->x1);
 
+#if VSF_LVGL_IMP_WAIT_CB == ENABLED
+    eda_pending = vsf_eda_get_cur();
+#endif
+
     disp_area.pos.x = area->x1;
     disp_area.pos.y = area->y1;
     disp_area.size.x = area->x2 + 1 - area->x1;
@@ -71,7 +93,18 @@ static void __vsf_lvgl_disp_on_ready(vk_disp_t *disp)
 {
     lv_disp_drv_t *disp_drv = (lv_disp_drv_t *)disp->ui_data;
     lv_disp_flush_ready(disp_drv);
+
+#if VSF_LVGL_IMP_WAIT_CB == ENABLED
+    vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
+#endif
 }
+
+#if VSF_LVGL_IMP_WAIT_CB == ENABLED
+static void __vsf_lvgl_disp_wait_cb(lv_disp_drv_t *disp_drv)
+{
+    vsf_thread_wfe(VSF_EVT_USER);
+}
+#endif
 
 static void __vsf_lvgl_disp_on_inited(vk_disp_t *disp)
 {
@@ -90,6 +123,11 @@ static void __vsf_lvgl_disp_on_inited(vk_disp_t *disp)
 void vsf_lvgl_bind_disp(vk_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv,
             void (*on_inited)(lv_disp_drv_t *disp_drv))
 {
+    lvgl_disp_drv->flush_cb = __vsf_lvgl_flush_disp;
+#if VSF_LVGL_IMP_WAIT_CB == ENABLED
+    lvgl_disp_drv->wait_cb = __vsf_lvgl_disp_wait_cb;
+    eda_pending = NULL;
+#endif
     lvgl_disp_drv->user_data = (void *)on_inited;
     disp->ui_data = lvgl_disp_drv;
     disp->ui_on_ready = __vsf_lvgl_disp_on_inited;
