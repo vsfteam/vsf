@@ -17,9 +17,15 @@ include(${VSF_CMAKE_ROOT}/compilers.cmake)
 
 set(VSF_LIB_NAME vsf)
 add_library(${VSF_LIB_NAME} INTERFACE)
-add_executable(${CMAKE_PROJECT_NAME} "")
-
 target_include_directories(${VSF_LIB_NAME} INTERFACE
     ${VSF_PATH}/source
 )
 add_subdirectory(${VSF_PATH}/source ${CMAKE_CURRENT_BINARY_DIR}/vsf)
+
+add_executable(${CMAKE_PROJECT_NAME} "")
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
+    ${VSF_LIB_NAME}
+)
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+    ${VSF_PATH}/source
+)
