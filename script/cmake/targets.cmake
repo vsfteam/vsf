@@ -26,8 +26,6 @@ if(VSF_HAL_CHIP_VENDOR AND VSF_ARCH_SERIES)
     endif()
     if(VSF_HOST_SYSTEM)
         message(STATUS "VSF_HOST_SYSTEM: ${VSF_HOST_SYSTEM}")
-        # DO NOT include host cmake here, because some will add link libraries before all other parts
-        # include(${VSF_CMAKE_ROOT}/hostos/${VSF_HOST_SYSTEM}.cmake)
     endif()
 else()
     message(FATAL_ERROR "${VSF_TARGET} not supported")
