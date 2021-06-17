@@ -4,6 +4,7 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vsf_service.c
 )
 
+add_subdirectory(distbus)
 add_subdirectory(dynarr)
 add_subdirectory(dynstack)
 add_subdirectory(fifo)
