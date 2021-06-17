@@ -14,7 +14,11 @@ if (VSF_LVGL_USE_FREETYPE)
     )
 endif()
 
-add_subdirectory(${VSF_LVGL_PATH} ${CMAKE_CURRENT_BINARY_DIR}/lvgl)
+add_subdirectory(${VSF_LVGL_PATH} ${CMAKE_CURRENT_BINARY_DIR}/lvgl_bin)
+link_directories(${CMAKE_CURRENT_BINARY_DIR}/lvgl_bin)
+target_link_libraries(${VSF_LIB_NAME} INTERFACE
+    lvgl
+)
 
 # add vsf configuration for lvgl
 target_compile_definitions(lvgl PUBLIC

@@ -24,4 +24,4 @@ include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
 
 # add user application source code/include directories
 # add template directory
-add_subdirectory(../../../demo ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME})
+add_subdirectory(../../../demo ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_bin)

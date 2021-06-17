@@ -31,24 +31,24 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
 
 if(VSF_HOST_SYSTEM)
     set(VSF_HOST_SYSTEM_LIB_NAME vsf_host_${VSF_HOST_SYSTEM})
-    add_library(${VSF_HOST_SYSTEM_LIB_NAME})
+    add_library(${VSF_HOST_SYSTEM_LIB_NAME} STATIC)
     target_include_directories(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
         ${VSF_CONFIG_PATH}
         ${VSF_SRC_PATH}
     )
-   target_compile_definitions(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
-       ${VSF_TARGET_DEFINITIONS}
-   )
-
-    target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
-        ${VSF_HOST_SYSTEM_LIB_NAME}
+    target_compile_definitions(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
+        ${VSF_TARGET_DEFINITIONS}
     )
+
+    link_directories(${CMAKE_CURRENT_BINARY_DIR})
+# TODO: how to link VSF_HOST_SYSTEM_LIB_NAME
+#    target_link_libraries(${VSF_LIB_NAME} INTERFACE
+#        ${VSF_HOST_SYSTEM_LIB_NAME}
+#    )
 endif()
 
 include(${VSF_CMAKE_ROOT}/compilers.cmake)
 include(${VSF_CMAKE_ROOT}/3rd-party.cmake)
 
-add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf)
-
-get_target_property(include_dir ${VSF_HOST_SYSTEM_LIB_NAME} INTERFACE_INCLUDE_DIRECTORIES)
-message(STATUS "include dir for host: ${include_dir}")
+add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
+link_directories(${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
