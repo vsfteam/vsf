@@ -11,7 +11,8 @@ target_sources(${CMAKE_PROJECT_NAME} PUBLIC
 )
 
 add_subdirectory(common)
+#add_subdirectory(evm_demo)
+add_subdirectory(freetype_demo)
 add_subdirectory(linux_demo)
 add_subdirectory(lvgl_demo)
-add_subdirectory(freetype_demo)
-#add_subdirectory(evm_demo)
+add_subdirectory(sdl2_demo)

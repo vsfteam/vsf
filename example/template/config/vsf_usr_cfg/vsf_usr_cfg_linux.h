@@ -42,7 +42,7 @@
 #define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
 #define APP_USE_TGUI_DEMO                               DISABLED
-#define APP_USE_SDL2_DEMO                               DISABLED
+#define APP_USE_SDL2_DEMO                               ENABLED
 #define APP_USE_KERNEL_TEST                             DISABLED
 #define APP_USE_JSON_DEMO                               DISABLED
 
