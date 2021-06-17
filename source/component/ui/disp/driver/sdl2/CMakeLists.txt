@@ -3,3 +3,8 @@
 target_sources(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
     vsf_disp_sdl2.c
 )
+
+# check libsdl2
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ${SDL2_LIBRARIES})

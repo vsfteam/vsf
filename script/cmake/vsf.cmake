@@ -1,4 +1,5 @@
 cmake_policy(SET CMP0076 NEW)
+cmake_policy(SET CMP0079 NEW)
 
 if(DEFINED ENV{VSF_PATH})
     set(VSF_SRC_PATH $ENV{VSF_PATH}/source)
