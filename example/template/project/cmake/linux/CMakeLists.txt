@@ -19,8 +19,9 @@ set(VSF_USE_LVGL 1)
     set(VSF_LVGL_USE_FREETYPE 1)
 
 # include vsf cmake script
+set(VSF_CONFIG_PATH ../../../config)
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
 
 # add user application source code/include directories
 # add template directory
-add_subdirectory(../../.. ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME})
+add_subdirectory(../../../demo ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME})
