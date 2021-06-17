@@ -41,11 +41,10 @@ if(VSF_HOST_SYSTEM)
         ${VSF_TARGET_DEFINITIONS}
     )
 
-    link_directories(${CMAKE_CURRENT_BINARY_DIR})
-# TODO: how to link VSF_HOST_SYSTEM_LIB_NAME
-#    target_link_libraries(${VSF_LIB_NAME} INTERFACE
-#        ${VSF_HOST_SYSTEM_LIB_NAME}
-#    )
+    # no idea why can not simply add ${VSF_HOST_SYSTEM_LIB_NAME}
+    target_link_libraries(${VSF_LIB_NAME} INTERFACE
+        ${CMAKE_CURRENT_BINARY_DIR}/lib${VSF_HOST_SYSTEM_LIB_NAME}.${CMAKE_STATIC_LIBRARY_SUFFIX}
+    )
 endif()
 
 include(${VSF_CMAKE_ROOT}/compilers.cmake)
