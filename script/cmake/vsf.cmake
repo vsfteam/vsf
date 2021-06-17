@@ -52,3 +52,8 @@ include(${VSF_CMAKE_ROOT}/3rd-party.cmake)
 
 add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
+
+if(VSF_HOST_SYSTEM)
+    # secure place to introduct hostos dependency, link libraries will be placed at the end
+    include(${VSF_CMAKE_ROOT}/hostos/${VSF_HOST_SYSTEM}.cmake)
+endif()
