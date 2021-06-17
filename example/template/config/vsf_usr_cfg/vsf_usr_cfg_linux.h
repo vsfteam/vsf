@@ -54,6 +54,7 @@
 // VSF_LINUX_LIBC_CFG_FAKE_API is required on __LINUX__ to avoid API confliction
 #   define VSF_LINUX_CFG_FAKE_API                       ENABLED
 #   define VSF_LINUX_LIBC_CFG_FAKE_API                  ENABLED
+#   define VSF_LINUX_LIBGEN_CFG_FAKE_API                ENABLED
 #   define VSF_USE_SIMPLE_SSCANF                        ENABLED
 #   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
 #else
