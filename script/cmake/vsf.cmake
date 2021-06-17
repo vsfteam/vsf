@@ -24,7 +24,31 @@ if(NOT (VSF_HAL_CHIP_VENDOR AND VSF_HAL_CHIP_NAME AND VSF_ARCH_SERIES AND VSF_AR
     # parse VSF_HAL_CHIP_VENDOR/VSF_HAL_CHIP_NAME/VSF_ARCH_SERIES/VSF_ARCH_NAME
     include(${VSF_CMAKE_ROOT}/targets.cmake)
 endif()
+
+target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
+    ${VSF_TARGET_DEFINITIONS}
+)
+
+if(VSF_HOST_SYSTEM)
+    set(VSF_HOST_SYSTEM_LIB_NAME vsf_host_${VSF_HOST_SYSTEM})
+    add_library(${VSF_HOST_SYSTEM_LIB_NAME})
+    target_include_directories(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
+        ${VSF_CONFIG_PATH}
+        ${VSF_SRC_PATH}
+    )
+   target_compile_definitions(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
+       ${VSF_TARGET_DEFINITIONS}
+   )
+
+    target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
+        ${VSF_HOST_SYSTEM_LIB_NAME}
+    )
+endif()
+
 include(${VSF_CMAKE_ROOT}/compilers.cmake)
 include(${VSF_CMAKE_ROOT}/3rd-party.cmake)
 
 add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf)
+
+get_target_property(include_dir ${VSF_HOST_SYSTEM_LIB_NAME} INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "include dir for host: ${include_dir}")
