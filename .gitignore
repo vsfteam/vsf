@@ -17,7 +17,6 @@
 # for cmake
 CMakeFiles
 CmakeCache.txt
-build
 
 # for iar
 .metadata
@@ -28,25 +27,3 @@ build
 *.lst
 *.iex
 *.scvd
-
-# for projects
-example/dfu/project/iar/settings
-example/dfu/project/iar/dfu_demo
-example/dfu/project/vc/dfu_demo
-
-example/spl/project/iar/.metadata
-example/spl/project/iar/settings
-example/spl/project/iar/spl
-
-example/tgui/project/vc/vsf_tgui_win
-
-example/template/project/mdk/lib
-example/template/project/mdk/Out
-example/template/project/iar/settings
-example/template/project/iar/vsf_template_f1c100s
-example/template/project/iar/vsf_template_m484
-example/template/project/iar/vsf_template_gd32e103
-example/template/project/iar/vsf_template_mt071
-example/template/project/iar/vsf_template_aic8800
-example/template/project/iar/vsf_template.dep
-example/template/project/vc/vsf_template_win
