@@ -409,7 +409,7 @@ fsm_rt_t vk_tgui_text_list_update(vsf_tgui_text_list_t* ptTextList)
     return result;
 }
 
-static fsm_rt_t vk_tgui_text_list_init(vsf_tgui_text_list_t* ptTextList)
+fsm_rt_t vk_tgui_text_list_init(vsf_tgui_text_list_t* ptTextList)
 {
 #if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
     vk_tgui_slider_init(&(ptTextList->tSlider),                     /*!< slider */
