@@ -481,7 +481,7 @@
       <PreprocessorDefinitions>__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;PREDEF_STANDARD_C_1999;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\config;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-fms-extensions -Werror=implicit-function-declaration %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
