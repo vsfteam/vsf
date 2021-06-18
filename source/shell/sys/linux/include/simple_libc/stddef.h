@@ -14,12 +14,13 @@
 #if     !defined(__cplusplus)
 // TODO: it seems that IAR does not support wchar_t even if it's defined here
 #   if !__IS_COMPILER_IAR__
-typedef unsigned short  wchar_t;
+typedef unsigned short              wchar_t;
 #   endif
-typedef unsigned short  wint_t;
+typedef unsigned short              wint_t;
 #endif
 
-#include "utilities/vsf_utilities.h"
+// TODO: utilities.h CANNOT be included here, if need something, re-implement here
+//#include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,27 +28,27 @@ extern "C" {
 
 #ifndef NULL
 #   ifdef __cplusplus
-#       define NULL     (0)
+#       define NULL                 (0)
 #   else
-#       define NULL     ((void *)0)
+#       define NULL                 ((void *)0)
 #   endif
 #endif
 
 #ifndef TRUE
-#   define TRUE         1
+#   define TRUE                     1
 #endif
 #ifndef FALSE
-#   define FALSE        0
+#   define FALSE                    0
 #endif
 
-#define offsetof        offset_of
+#define offsetof(__type, __member)  (uintptr_t)(&(((__type *)0)->__member))
 
 #ifndef __WIN__
 
 #   if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #   else
-typedef long int         ptrdiff_t;
+typedef long int                     ptrdiff_t;
 #   endif
 
 #endif
@@ -57,7 +58,7 @@ typedef long int         ptrdiff_t;
 
 #   ifdef __WIN__
 namespace std {
-    typedef decltype(__nullptr) nullptr_t;
+    typedef decltype(__nullptr)      nullptr_t;
 }
 
 using ::std::nullptr_t;
