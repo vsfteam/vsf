@@ -153,8 +153,8 @@ vk_fakefat32_file_t fakefat32_root[ 3
         .name               = "control.bin",
         .size               = 1,
         .attr               = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
-        .callback.read      = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_read),
-        .callback.write     = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_write),
+        .callback.fn_read   = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_read),
+        .callback.fn_write  = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_write),
     },
 #if APP_USE_VSFVM_DEMO == ENABLED
     {
