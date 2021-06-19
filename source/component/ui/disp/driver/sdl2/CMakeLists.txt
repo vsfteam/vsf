@@ -7,6 +7,8 @@ if(VSF_USE_DISP AND VSF_DISP_USE_SDL2)
 
     # check libsdl2
     find_package(SDL2 REQUIRED)
-    include_directories(${SDL2_INCLUDE_DIRS})
+    target_include_directories(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
+        ${SDL2_INCLUDE_DIRS}
+    )
     target_link_libraries(${VSF_LIB_NAME} INTERFACE ${SDL2_LIBRARIES})
 endif()
