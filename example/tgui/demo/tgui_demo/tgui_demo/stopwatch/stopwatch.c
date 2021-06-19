@@ -96,6 +96,8 @@ describe_tgui_msgmap(tStopWatchMSGMap,
 #endif
 )
 
+volatile const static uint32_t test = (0, VSF_TGUI_MSG_MSK);
+
 describe_tgui_msgmap(tLapMSGMap,
     tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK),
 )
