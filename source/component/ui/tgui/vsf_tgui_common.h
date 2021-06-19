@@ -119,7 +119,7 @@
 #   define tgui_background(...)                                                 \
                 __tgui_attribute(tBackground,           {__VA_ARGS__})
 #   define tgui_text(__NAME, __TEXT, __AUTOSIZE, ...)                           \
-                __tgui_text(__NAME, __TEXT, __AUTOSIZE, __VA_ARGS__)
+                __tgui_text(__NAME, __TEXT, __AUTOSIZE, ##__VA_ARGS__)
 #   define tgui_line_space(__NAME, __PIX)                                       \
                 __tgui_line_space(__NAME, (__PIX))
 
