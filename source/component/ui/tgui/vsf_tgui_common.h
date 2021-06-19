@@ -211,12 +211,12 @@
 #define tgui_msgmap(__MSGMAP)               __tgui_msgmap(__MSGMAP)
 
 #define tgui_msg_handler(__MSG, __FUNC, ...)                                    \
-            __tgui_msg_handler(__MSG, __FUNC, __VA_ARGS__)
+            __tgui_msg_handler(__MSG, __FUNC, ##__VA_ARGS__)
 
 
 
 #define tgui_msg_mux(__MSG, __FUNC, ...)                                        \
-            __tgui_msg_mux((__MSG), __FUNC, __VA_ARGS__)
+            __tgui_msg_mux((__MSG), __FUNC, ##__VA_ARGS__)
 
 /*============================ TYPES =========================================*/
 
