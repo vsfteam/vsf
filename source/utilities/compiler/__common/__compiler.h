@@ -226,6 +226,7 @@ extern "C" {
 #pragma GCC diagnostic ignored "-Wcomment"
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #pragma GCC diagnostic ignored "-Wnonnull-compare"
+#pragma GCC diagnostic ignored "-Woverflow"
 
 /*! \NOTE do not ignore following warning unless you take the risk by yourself */
 //#pragma GCC diagnostic ignored "-Wbitfield-constant-conversion"
