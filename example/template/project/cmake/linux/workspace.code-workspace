@@ -1,0 +1,35 @@
+{
+	"folders": [
+		{
+			"name": "project",
+			"path": "."
+		},
+		{
+			"name": "config",
+			"path": "../../../config"
+		},
+		{
+			"name": "demo",
+			"path": "../../../demo"
+		},
+		{
+			"name": "vsf",
+			"path": "${env:VSF_PATH}/source"
+		},
+	],
+	"settings": {
+		"C_Cpp.default.defines": [
+			"__LINUX__",
+			"__CPU_X64__"
+		],
+		"C_Cpp.default.cStandard": "c11",
+		"C_Cpp.default.cppStandard": "c++14",
+		"C_Cpp.default.includePath": [
+			"${workspaceFolder}/**",
+			"${env:VSF_PATH}/source",
+			"${workspaceFolder}/../../../config",
+			"${workspaceFolder}/../../../demo"
+		],
+		"files.associations": {},
+	}
+}
