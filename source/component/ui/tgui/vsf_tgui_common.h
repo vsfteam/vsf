@@ -178,7 +178,7 @@
                 .msg = (__MSG),                                                 \
                 .u2Type = VSF_MSGT_NODE_HANDLER_TYPE_CALLBACK,                  \
                 .FSM = (vsf_tgui_controal_fsm_t *)&__FUNC,                      \
-                .u10EvtMask = (0, ##__VA_ARGS__),                               \
+                .u10EvtMask = (0, VSF_TGUI_MSG_MSK),                            \
                 .handler_name_ptr = #__FUNC,                                    \
             }
 
