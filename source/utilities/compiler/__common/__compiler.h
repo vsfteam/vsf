@@ -227,6 +227,8 @@ extern "C" {
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #pragma GCC diagnostic ignored "-Wnonnull-compare"
 #pragma GCC diagnostic ignored "-Woverflow"
+#pragma GCC diagnostic ignored "-Wint-conversion"
+#pragma GCC diagnostic ignored "-Woverride-init-side-effects"
 
 /*! \NOTE do not ignore following warning unless you take the risk by yourself */
 //#pragma GCC diagnostic ignored "-Wbitfield-constant-conversion"
