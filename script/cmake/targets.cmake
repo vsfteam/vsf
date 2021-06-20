@@ -1,5 +1,5 @@
 if(VSF_TARGET)
-    file(GLOB_RECURSE __targets_cmake ${VSF_CMAKE_ROOT}/targets/*/${VSF_TARGET}.cmake)
+    file(GLOB_RECURSE __targets_cmake ${VSF_CMAKE_ROOT}/targets*/${VSF_TARGET}.cmake)
     foreach(__target_cmake ${__targets_cmake})
         if(NOT IS_DIRECTORY ${__target_cmake})
             message(STATUS "using target: ${__target_cmake}")

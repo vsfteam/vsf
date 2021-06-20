@@ -7,7 +7,7 @@ else()
 endif()
 
 project(vsf_template)
-set(VSF_TARGET x64_linux)
+set(VSF_TARGET x64/linux)
 
 # compiler configurations
 # if compiler is not set, cmake will find one
