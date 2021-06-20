@@ -41,10 +41,13 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     vendor/wifi/macif
 )
 
+get_filename_component(AIC8800_LIBDRV vendor/plf/aic8800/lib/armgcc_4_8/libdrv_lite.a ABSOLUTE)
+get_filename_component(AIC8800_LIBWIFI vendor/wifi/lib/armgcc_4_8/libwifi.a ABSOLUTE)
+get_filename_component(AIC8800_LIBWPA vendor/wpa_supplicant/lib/armgcc_4_8/libwpa.a ABSOLUTE)
 target_link_libraries(${VSF_LIB_NAME} INTERFACE
-    vendor/plf/aic8800/lib/libdrv_lite.a
-    vendor/wifi/lib/libwifi.a
-    vendor/wpa_supplicant/lib/libwpa.a
+    ${AIC8800_LIBWIFI}
+    ${AIC8800_LIBWPA}
+    ${AIC8800_LIBDRV}
 )
 
 target_sources(${VSF_LIB_NAME} INTERFACE
@@ -65,6 +68,7 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/core/ipv4/dhcp.c
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/core/ipv4/etharp.c
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/core/ipv4/icmp.c
+    vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/core/ipv4/igmp.c
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/core/ipv4/ip4.c
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/core/ipv4/ip4_addr.c
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/core/ipv4/ip4_frag.c
@@ -119,20 +123,8 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/plf/aic8800/src/driver/time/time_api.c
     vendor/plf/aic8800/src/driver/trans/arm_bitreversal2.S
     vendor/plf/aic8800/src/driver/trans/arm_cfft_q15.c
-    vendor/plf/aic8800/src/driver/trans/arm_cfft_radix4_q15.C
+    vendor/plf/aic8800/src/driver/trans/arm_cfft_radix4_q15.c
     vendor/plf/aic8800/src/driver/trng/trng_api.c
-    vendor/plf/aic8800/src/driver/uart/uart1_api.c
-    vendor/plf/aic8800/src/driver/uart/uart2_api.c
-    vendor/plf/aic8800/src/driver/usb_host/hal_hcd.c
-    vendor/plf/aic8800/src/driver/usb_host/hal_usbh.c
-    vendor/plf/aic8800/src/driver/usb_host/usbh_conf.c
-    vendor/plf/aic8800/src/driver/usb_host/usbh_core.c
-    vendor/plf/aic8800/src/driver/usb_host/usbh_ctlreq.c
-    vendor/plf/aic8800/src/driver/usb_host/usbh_ioreq.c
-    vendor/plf/aic8800/src/driver/usb_host/usbh_msc.c
-    vendor/plf/aic8800/src/driver/usb_host/usbh_msc_bot.c
-    vendor/plf/aic8800/src/driver/usb_host/usbh_msc_scsi.c
-    vendor/plf/aic8800/src/driver/usb_host/usbh_pipes.c
     vendor/plf/aic8800/src/driver/wdt/wdt_api.c
 
     vendor/wifi/fhost/fhost_config.c

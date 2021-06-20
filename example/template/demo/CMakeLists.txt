@@ -18,4 +18,6 @@ add_subdirectory(lvgl_demo)
 add_subdirectory(sdl2_demo)
 add_subdirectory(tgui_demo)
 
-add_subdirectory_ifdef(__AIC8800__ aic8800)
+if(VSF_HAL_CHIP_NAME STREQUAL "AIC8800M")
+    add_subdirectory(aic8800)
+endif()
