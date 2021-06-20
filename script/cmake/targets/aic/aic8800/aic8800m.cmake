@@ -1,5 +1,6 @@
 set(VSF_HAL_CHIP_VENDOR     AIC)
 set(VSF_HAL_CHIP_SERIES     AIC8800)
+set(VSF_HAL_CHIP_NAME       AIC8800M)
 set(VSF_ARCH_SERIES         arm)
 set(VSF_ARCH_NAME           cortex-m4)
 

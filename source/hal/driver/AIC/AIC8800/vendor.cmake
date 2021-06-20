@@ -5,9 +5,9 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     port/rtos
 
     vendor/lwip/net_al
-    vendor/lwip/2_0_2_RELEASE_VER/ports/rtos/include
-    vendor/lwip/2_0_2_RELEASE_VER/src/include
-    vendor/lwip/2_0_2_RELEASE_VER/src/include/lwip
+    vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/ports/rtos/include
+    vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/include
+    vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/include/lwip
 
     vendor/plf/aic8800/src/arch
     vendor/plf/aic8800/src/arch/boot
