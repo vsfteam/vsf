@@ -20,7 +20,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
 get_filename_component(VSF_CONFIG_PATH ${VSF_CONFIG_PATH} ABSOLUTE)
 
 include(${VSF_CMAKE_ROOT}/targets.cmake)
-message(STATUS "target_include: ${VSF_TARGET_INCLUDE_DIRECTORIES}")
 
 set(VSF_COMMON_INCLUDE_DIRECTORIES
     ${VSF_CONFIG_PATH}

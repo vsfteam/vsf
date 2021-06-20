@@ -25,7 +25,6 @@ target_compile_definitions(lvgl PUBLIC
     ${VSF_TARGET_DEFINITIONS}
 )
 get_property(lvgl_include_path TARGET ${CMAKE_PROJECT_NAME} PROPERTY INCLUDE_DIRECTORIES)
-message(STATUS "lib include path: ${lvgl_include_path}")
 target_include_directories(lvgl PUBLIC
     ${VSF_COMMON_INCLUDE_DIRECTORIES}
 )
