@@ -21,7 +21,7 @@
 
 #include "hal/vsf_hal.h"
 #include "./i_reg_uart.h"
-#include "hal/interface/vsf_interface_usart.h"
+#include "hal/driver/common/template/vsf_template_usart.h"
 /*============================ MACROS ========================================*/
 
 #ifndef USART_MAX_PORT
