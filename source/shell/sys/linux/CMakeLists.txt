@@ -13,6 +13,7 @@ if(VSF_USE_LINUX)
     target_sources(${VSF_LIB_NAME} INTERFACE
         vsf_linux.c
         vsf_linux_socket.c
+        vsf_linux_devfs.c
     )
 
     add_subdirectory(port)

@@ -210,7 +210,7 @@ typedef struct vsf_linux_fs_priv_t {
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
-#if VSF_LINUX_DEVFS_USE_RAND == ENABLED
+#if VSF_LINUX_USE_DEVFS == ENABLED
 extern int vsf_linux_devfs_init(void);
 #endif
 
