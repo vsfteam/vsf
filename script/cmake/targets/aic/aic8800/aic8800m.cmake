@@ -23,3 +23,5 @@ set(VSF_TARGET_DEFINITIONS
 #    "LWIP_NO_STDINT_H=1"
 #    "LWIP_SO_RCVBUF=1"
 )
+
+include(${VSF_CMAKE_ROOT}/targets/arm/__cortex_m4.cmake)
