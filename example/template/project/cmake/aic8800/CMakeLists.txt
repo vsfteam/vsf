@@ -10,7 +10,8 @@ project(vsf_template)
 set(VSF_TARGET aic8800m)
 
 # compiler configurations
-# if compiler is not set, cmake will find one
+# arm-none-eabi-gcc will not pass compiler checker of cmake
+include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
 
 # VSF_USE configurations
 set(VSF_USE_LINUX 1)
@@ -18,6 +19,7 @@ set(VSF_USE_LINUX 1)
 set(VSF_USE_LVGL 1)
     set(VSF_LVGL_USE_FREETYPE 1)
 set(VSF_USE_DISP 1)
+set(VSF_USE_SDL2 1)
 
 # include vsf cmake script
 set(VSF_CONFIG_PATH ../../../config)
