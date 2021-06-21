@@ -28,6 +28,12 @@ set(VSF_USE_LWIP 1)
 set(VSF_CONFIG_PATH ../../../config)
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
 
+# linker script
+target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
+    LINKER:-T${CMAKE_CURRENT_SOURCE_DIR}/linker.ld
+    LINKER:-Map=output.map
+)
+
 # add user application source code/include directories
 # add template directory
 add_subdirectory(../../../demo ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_bin)
