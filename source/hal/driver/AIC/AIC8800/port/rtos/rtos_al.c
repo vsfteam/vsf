@@ -317,6 +317,11 @@ int rtos_task_init_notification(rtos_task_handle task)
     return 0;
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 uint32_t rtos_task_wait_notification(int timeout)
 {
     // rtos_task_wait maybe called in user thread, not rtos_task
@@ -354,6 +359,7 @@ uint32_t rtos_task_wait_notification(int timeout)
 
     // private kernel API, can only be used here, so declear here
     extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
+    // -Wcast-align by gcc
     __vsf_teda_cancel_timer((vsf_teda_t *)eda);
     ret = vsf_eda_get_user_value();
     if (eda->flag.state.is_sync_got) {
@@ -366,6 +372,10 @@ uint32_t rtos_task_wait_notification(int timeout)
     rtos_trace_notify("%s: %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
     return ret;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
 {
