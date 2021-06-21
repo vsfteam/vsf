@@ -24,7 +24,6 @@
 #include <unistd.h>
 
 #include "fhost.h"
-#include "fhost_iperf.h"
 
 #include "rwnx_defs.h"
 #include "rwnx_msg_tx.h"
@@ -155,23 +154,11 @@ static int __wifi_connect_main(int argc, char *argv[])
     return 0;
 }
 
-static int __iperf_main(int argc, char *argv[])
-{
-    static rtos_task_handle __iperf_task_handle;
-    struct fhost_iperf_settings __iperf_settings = {
-        .flags.is_server        = 1,
-        .port                   = 5001,
-    };
-    fhost_iperf_start(&__iperf_settings, &__iperf_task_handle);
-    return 0;
-}
-
 int fhost_application_init(void)
 {
     busybox_bind("/sbin/wifi_ap", __wifi_ap_main);
     busybox_bind("/sbin/wifi_scan", __wifi_scan_main);
     busybox_bind("/sbin/wifi_connect", __wifi_connect_main);
-    busybox_bind("/sbin/iperf", __iperf_main);
     return 0;
 }
 
