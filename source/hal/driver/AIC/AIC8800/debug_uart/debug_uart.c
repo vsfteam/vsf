@@ -84,10 +84,10 @@ static void __VSF_DEBUG_STREAM_TX_INIT(void)
 
 static void __VSF_DEBUG_STREAM_TX_WRITE_BLOCKED(uint8_t *buf, uint_fast32_t size)
 {
-    while(!ipc_mutex_get(IPC_MUTEX_UART_OUTPUT));
-        for (uint_fast32_t i = 0; i < size; i++) {
-            stdio_uart_putc(*buf++);
-        }
+    while (!ipc_mutex_get(IPC_MUTEX_UART_OUTPUT));
+    for (uint_fast32_t i = 0; i < size; i++) {
+        stdio_uart_putc(*buf++);
+    }
     ipc_mutex_set(IPC_MUTEX_UART_OUTPUT, 1);
 }
 
