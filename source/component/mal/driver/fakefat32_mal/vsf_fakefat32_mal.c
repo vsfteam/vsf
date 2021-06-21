@@ -134,7 +134,7 @@ static char __vk_find_first_alphabet(const char *str)
         return 0;
     }
 
-    while ((*str != '\0') && !isalpha(*str)) {
+    while ((*str != '\0') && !isalpha((int)*str)) {
         str++;
     }
     return *str;
@@ -517,10 +517,10 @@ vsf_component_peda_ifs_entry(__vk_fakefat32_dir_read, vk_memfs_callback_read)
             buff[12] = 0;
             if (!is_lfn) {
                 char *ext = vk_file_getfileext(file->name);
-                if (islower(__vk_find_first_alphabet(file->name))) {
+                if (islower((int)__vk_find_first_alphabet(file->name))) {
                     buff[12] |= FAT32_NAMEATTR_NAMELOWERCASE;
                 }
-                if (islower(__vk_find_first_alphabet(ext))) {
+                if (islower((int)__vk_find_first_alphabet(ext))) {
                     buff[12] |= FAT32_NAMEATTR_EXTLOWERCASE;
                 }
             }
