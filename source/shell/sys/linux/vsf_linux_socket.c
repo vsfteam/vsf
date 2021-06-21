@@ -576,10 +576,11 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
     u16_t len = 0, pos = 0;
-    err_t err;
 
     struct pbuf *pbuf = priv->last.pbuf;
     if (NULL == pbuf) {
+        err_t err = ERR_OK;
+
     recv_next:
         if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
             struct netbuf *netbuf;
