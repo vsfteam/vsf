@@ -20,6 +20,7 @@ if(VSF_USE_LINUX)
         )
         target_compile_definitions(${VSF_LIB_NAME} INTERFACE
             "LWIP_SO_RCVBUF=1"
+            "LWIP_SOCKET=0"
         )
     endif()
 
