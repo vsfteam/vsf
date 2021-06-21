@@ -7,6 +7,8 @@ set(VSF_ARCH_NAME           cortex-m4)
 set(VSF_TARGET_DEFINITIONS
     "__AIC__"
     "__AIC8800__"
+#   vendor SDK require this
+    "__VECTOR_TABLE=__isr_vector"
 
 #   hw related definitions for aic8800m required by sdk
     "CFG_HW_PLATFORM=2"

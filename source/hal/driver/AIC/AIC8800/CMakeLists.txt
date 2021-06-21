@@ -2,6 +2,7 @@
 
 target_sources(${VSF_LIB_NAME} INTERFACE
     driver.c
+    startup_AIC8800.c
 )
 
 add_subdirectory(debug_uart)

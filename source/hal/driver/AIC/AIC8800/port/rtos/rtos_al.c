@@ -649,4 +649,25 @@ int rtos_init(void)
                 AIC8800_OSAL_CFG_TIMER_TASK_STACK_PRIORITY, &__rtos_timer_task);
 }
 
+void rtos_data_save(void)
+{
+    // TODO: implement
+#if 0
+    backup_xTickCount = rtos_now(false);
+    sleep_data_save();
+#if PLF_WIFI_STACK
+    #ifndef CFG_HOSTIF
+    fhost_data_save();
+    lwip_data_save();
+    wpas_data_save();
+    #endif
+#endif
+#endif
+}
+
+// ugly code, but really, vendor SDK is dependent on this even it has a working rtos_al
+void vTaskStepTick(TickType_t xTicksToJump)
+{
+}
+
 /* EOF */
