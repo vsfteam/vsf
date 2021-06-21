@@ -1,6 +1,6 @@
 # CMakeLists head
 
-target_include_directories(${VSF_LIB_NAME} PUBLIC
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     port
     port/rtos
 

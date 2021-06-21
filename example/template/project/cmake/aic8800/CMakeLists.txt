@@ -21,6 +21,8 @@ set(VSF_USE_LVGL 1)
 set(VSF_USE_FREETYPE 1)
 set(VSF_USE_DISP 1)
 set(VSF_USE_SDL2 1)
+set(VSF_USE_LWIP 1)
+    set(VSF_LWIP_VENDOR 1)
 
 # include vsf cmake script
 set(VSF_CONFIG_PATH ../../../config)
