@@ -36,6 +36,30 @@ off_t _lseek(int handle, off_t offset, int whence)
 {
     return lseek(handle, offset, whence);
 }
+
+SECTION(".vsf.utilities.stdio.gcc._kill")
+int _kill(pid_t pid, int sig)
+{
+    return kill(pid, sig);
+}
+
+SECTION(".vsf.utilities.stdio.gcc._getpid")
+pid_t _getpid(void)
+{
+    return getpid();
+}
+
+SECTION(".vsf.utilities.stdio.gcc._fstat")
+int _fstat(int fd, struct stat *buf)
+{
+    return fstat(fd, buf);
+}
+
+SECTION(".vsf.utilities.stdio.gcc._isatty")
+int _isatty(int fd)
+{
+    return 0;
+}
 #endif
 
 SECTION(".vsf.utilities.stdio.gcc._write")
@@ -49,5 +73,19 @@ int _read(int handle, char *buf, int buf_size)
 {
     return __vsf_stdio_read(handle, (unsigned char *)buf, buf_size);
 }
+
+SECTION(".vsf.utilities.stdio.gcc._sbrk")
+void * _sbrk(intptr_t increment)
+{
+    return NULL;
+}
+
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED && VSF_USE_KERNEL == ENABLED
+SECTION(".vsf.utilities.stdio.gcc._exit")
+void _exit(int status)
+{
+    vsf_thread_exit();
+}
+#endif
 
 #endif      // __USE_COMMON_RETARGET_IO_GCC_LLVM_C__
