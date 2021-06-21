@@ -33,6 +33,23 @@ typedef unsigned int        gid_t;
 typedef long                off_t;
 typedef long long           off64_t;
 
+#ifndef __TIME_T
+#   define __TIME_T         long long
+#endif
+typedef __TIME_T            time_t;
+
+#ifndef __CLOCK_T
+#   define __CLOCK_T        long
+#endif
+typedef __CLOCK_T           clock_t;
+
+typedef enum {
+    CLOCK_MONOTONIC,
+    CLOCK_REALTIME,
+} clockid_t;
+
+#define CLOCKS_PER_SEC      ((clock_t)1000)
+
 #if __IS_COMPILER_IAR__
 //! end of typedef name has already been declared (with same type)
 //#   pragma diag_suppress=pe301

@@ -17,18 +17,6 @@ extern "C" {
 #define clock               __vsf_linux_clock
 #endif
 
-#ifndef __TIME_T
-#   define __TIME_T         long long
-#endif
-typedef __TIME_T            time_t;
-
-#ifndef __CLOCK_T
-#   define __CLOCK_T        long
-#endif
-typedef __CLOCK_T           clock_t;
-
-#define CLOCKS_PER_SEC      ((clock_t)1000)
-
 struct tm {
     int tm_sec;
     int tm_min;
@@ -47,11 +35,6 @@ struct timespec {
     time_t  tv_sec;
     long    tv_nsec;
 };
-
-typedef enum {
-    CLOCK_MONOTONIC,
-    CLOCK_REALTIME,
-} clockid_t;
 
 clock_t clock(void);
 int clock_gettime(clockid_t clk_id, struct timespec *tp);
