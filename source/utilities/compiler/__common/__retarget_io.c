@@ -28,6 +28,7 @@
 
 #if VSF_USE_POSIX == ENABLED
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 void vsf_stdio_init(void)
