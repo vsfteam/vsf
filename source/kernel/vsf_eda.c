@@ -897,9 +897,7 @@ vsf_err_t vsf_eda_start(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg_ptr)
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
-#endif
-
-#if __IS_COMPILER_GCC__
+#elif __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
@@ -937,9 +935,7 @@ vsf_err_t vsf_eda_fini(vsf_eda_t *pthis)
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
-#endif
-
-#if __IS_COMPILER_GCC__
+#elif __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
 #endif
 
@@ -992,6 +988,9 @@ vsf_err_t vsf_eda_post_evt_msg(vsf_eda_t *pthis, vsf_evt_t evt, void *msg)
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
+#elif __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
 static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -1132,6 +1131,8 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
+#elif __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
 #endif
 
 #endif

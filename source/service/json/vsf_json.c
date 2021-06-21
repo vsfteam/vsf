@@ -35,7 +35,7 @@
 static bool vsf_json_token_match(const char *json, const char *value)
 {
     int n = strlen(value);
-    return !strncmp(json, value, n) && !isalnum(json[n]);
+    return !strncmp(json, value, n) && !isalnum((int)json[n]);
 }
 
 vsf_json_type_t vsf_json_get_type(const char *json)
@@ -61,7 +61,7 @@ vsf_json_type_t vsf_json_get_type(const char *json)
 
 static char * vsf_json_skip_space(const char *json)
 {
-    while ((*json != '\0') && isspace(*json)) {
+    while ((*json != '\0') && isspace((int)*json)) {
         json++;
     }
     return *json == '\0' ? NULL : (char *)json;

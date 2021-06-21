@@ -170,8 +170,8 @@ static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
     char **path = __vsh_path;
     vsf_linux_main_entry_t entry;
 
-    while ((*cur != '\0') && !isspace(*cur)) { cur++; }
-    while ((*cur != '\0') && isspace(*cur)) { *cur++ = '\0'; }
+    while ((*cur != '\0') && !isspace((int)*cur)) { cur++; }
+    while ((*cur != '\0') && isspace((int)*cur)) { *cur++ = '\0'; }
 
     // search in path first if not absolute path
     if (cmd_ctx->cmd[0] != '/') {
@@ -204,8 +204,8 @@ static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
     ctx->arg.argv[ctx->arg.argc++] = cmd_ctx->cmd;
     while ((*cur != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
         ctx->arg.argv[ctx->arg.argc++] = cur;
-        while ((*cur != '\0') && !isspace(*cur)) { cur++; }
-        while ((*cur != '\0') && isspace(*cur)) { *cur++ = '\0'; }
+        while ((*cur != '\0') && !isspace((int)*cur)) { cur++; }
+        while ((*cur != '\0') && isspace((int)*cur)) { *cur++ = '\0'; }
     }
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);

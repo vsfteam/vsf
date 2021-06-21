@@ -95,6 +95,14 @@ static const vsf_linux_fd_op_t __vsf_linux_socket_fdop = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#elif __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 // helper
 static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t *port)
 {
@@ -151,6 +159,12 @@ static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipad
         memset(sockaddr_in->sin_zero, 0, SIN_ZERO_LEN);
     }
 }
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#elif __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 // copied from lwip_socket
 static int lwip_sockopt_to_ipopt(int optname)

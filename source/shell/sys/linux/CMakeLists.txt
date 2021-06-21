@@ -20,7 +20,9 @@ if(VSF_USE_LINUX)
         )
         target_compile_definitions(${VSF_LIB_NAME} INTERFACE
             "LWIP_SO_RCVBUF=1"
-            "LWIP_SOCKET=0"
+#           enable LWIP_SOCKET so that struct netconn has socket member
+#           but note that DO NOT use lwip/socket.h in lwip
+            "LWIP_SOCKET=1"
         )
     endif()
 
