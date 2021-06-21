@@ -1561,26 +1561,34 @@ off_t lseek(int fd, off_t offset, int whence)
     return (off_t)new_pos;
 }
 
-int stat(const char *pathname, struct stat *buf)
+int fstat(int fd, struct stat *buf)
 {
-    char fullpath[MAX_PATH];
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
-        return -1;
-    }
-
-    vk_file_t *file = __vsf_linux_fs_get_file(fullpath);
-    if (NULL == file) {
-        return -1;
-    }
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
 
     memset(buf, 0, sizeof(*buf));
-    buf->st_mode = file->attr;
-    if (!(file->attr & S_IFDIR)) {
-        buf->st_mode |= S_IFREG;
+    if (&__vsf_linux_fs_fdop == sfd->op) {
+        vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+        vk_file_t *file = priv->file;
+
+        buf->st_mode = file->attr;
+        if (!(file->attr & S_IFDIR)) {
+            buf->st_mode |= S_IFREG;
+        }
+        buf->st_size = file->size;
+        return 0;
+    } else {
+        return -1;
     }
-    buf->st_size = file->size;
-    __vsf_linux_fs_close_do(file);
-    return 0;
+}
+
+int stat(const char *pathname, struct stat *buf)
+{
+    int fd = open(pathname, 0);
+    if (fd < 0) { return -1; }
+
+    int ret = fstat(fd, buf);
+    close(fd);
+    return ret;
 }
 
 int access(const char *pathname, int mode)

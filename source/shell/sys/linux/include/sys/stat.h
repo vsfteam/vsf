@@ -20,6 +20,7 @@ extern "C" {
 
 #if VSF_LINUX_CFG_FAKE_API == ENABLED
 #define stat            __vsf_linux_stat
+#define fstat           __vsf_linux_fstat
 #endif
 
 #define S_IFDIR         VSF_FILE_ATTR_DIRECTORY
@@ -45,6 +46,7 @@ struct stat {
 };
 
 int stat(const char *pathname, struct stat *buf);
+int fstat(int fd, struct stat *buf);
 
 #ifdef __cplusplus
 }
