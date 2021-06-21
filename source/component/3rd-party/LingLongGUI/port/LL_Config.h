@@ -24,6 +24,7 @@
 #include "vsf_cfg.h"
 
 #include <stdlib.h>
+#include <stdint.h>
 #include "stdbool.h"
 
 /***********************************控件内存占用定义*********************************************/
