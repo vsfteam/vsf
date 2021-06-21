@@ -6,12 +6,12 @@ else()
     message(STATUS "VSF_PATH: $ENV{VSF_PATH}")
 endif()
 
+# compiler configurations
+# arm-none-eabi-gcc will not pass compiler checker of cmake, so include before project
+include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
+
 project(vsf_template)
 set(VSF_TARGET aic8800m)
-
-# compiler configurations
-# arm-none-eabi-gcc will not pass compiler checker of cmake
-include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
 
 # VSF_USE configurations
 set(VSF_USE_LINUX 1)
