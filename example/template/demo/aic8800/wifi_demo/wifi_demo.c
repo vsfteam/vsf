@@ -42,8 +42,8 @@
 #endif
 
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY != ENABLED
-#   error current demo need VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY, if it's not supported\
-    please make sure wlan_start_sta is called in task with priority higher than(>) vsf_prio_2
+#   error "current demo need VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY, if it\'s not supported\
+    please make sure wlan_start_sta is called in task with priority higher than(>) vsf_prio_0"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
