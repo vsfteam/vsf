@@ -8,6 +8,15 @@ list(APPEND VSF_TARGET_INCLUDE_DIRECTORIES
     ${ARM_CMSIS_PATH}/CMSIS/NN/Include
 )
 
-list(APPEND VSF_TARGET_DEFINITIONS
-    "__ARM_ARCH_PROFILE='M'"
+set(CMAKE_C_FLAGS 
+    "-mcpu=cortex-m4 -mthumb ${CMAKE_C_FLAGS}"
+    CACHE STRING "c compiler flags"
+)
+set(CMAKE_CXX_FLAGS 
+    "-mcpu=cortex-m4 -mthumb ${CMAKE_CXX_FLAGS}"
+    CACHE STRING  "cxx compiler flags"
+)
+set(CMAKE_ASM_FLAGS
+    "-mthumb ${CMAKE_ASM_FLAGS}"
+    CACHE INTERNAL "asm compiler flags"
 )

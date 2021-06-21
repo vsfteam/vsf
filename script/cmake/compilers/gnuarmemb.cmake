@@ -12,14 +12,13 @@ set(CMAKE_OBJDUMP arm-none-eabi-objdump CACHE INTERNAL "objdump")
 set(CMAKE_SIZE arm-none-eabi-size CACHE INTERNAL "size")
 
 set(CMAKE_C_FLAGS 
-  "-mthumb  \
-    -std=gnu11 -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
-  CACHE STRING "c compiler flags")
+    "${CMAKE_C_FLAGS} -std=gnu11 -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
+    CACHE STRING "c compiler flags"
+)
 set(CMAKE_CXX_FLAGS 
-  "-mthumb \
-    -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
-  CACHE STRING  "cxx compiler flags")
-set(CMAKE_ASM_FLAGS "-mthumb" CACHE INTERNAL "asm compiler flags")
+    "${CMAKE_CXX_FLAGS} -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
+    CACHE STRING  "cxx compiler flags"
+)
 
 # Optimization Level
 #   -O0       None
