@@ -20,6 +20,7 @@ if(VSF_SDL2_USE_IMAGE)
         SDL_image/IMG_jpg.c
         SDL_image/IMG_lbm.c
         SDL_image/IMG_pcx.c
+        SDL_image/IMG_png.c
         SDL_image/IMG_pnm.c
         SDL_image/IMG_svg.c
         SDL_image/IMG_tga.c
