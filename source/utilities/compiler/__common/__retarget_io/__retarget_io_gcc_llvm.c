@@ -60,6 +60,24 @@ int _isatty(int fd)
 {
     return 0;
 }
+
+SECTION(".vsf.utilities.stdio.gcc._unlink")
+int _unlink(const char *pathname)
+{
+    return unlink(pathname);
+}
+
+SECTION(".vsf.utilities.stdio.gcc._link")
+int _link(const char *oldpath, const char *newpath)
+{
+    return link(oldpath, newpath);
+}
+
+SECTION(".vsf.utilities.stdio.gcc._gettimeofday")
+int _gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+    return gettimeofday(tv, tz);
+}
 #endif
 
 SECTION(".vsf.utilities.stdio.gcc._write")

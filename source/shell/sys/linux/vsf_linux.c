@@ -1608,6 +1608,11 @@ int access(const char *pathname, int mode)
     return ret;
 }
 
+int link(const char *oldpath, const char *newpath)
+{
+    return -1;
+}
+
 int unlink(const char *pathname)
 {
     char fullpath[MAX_PATH];

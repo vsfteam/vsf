@@ -44,6 +44,7 @@ extern "C" {
 #   define open             __vsf_linux_open
 #   define access           __vsf_linux_access
 #   define unlink           __vsf_linux_unlink
+#   define link             __vsf_linux_link
 #   define remove           __vsf_linux_remove
 #   define mkdir            __vsf_linux_mkdir
 #   define close            __vsf_linux_close
@@ -103,6 +104,7 @@ int open(const char *pathname, int flags, ...);
 #define X_OK            (1 << 3)
 int access(const char *pathname, int mode);
 int unlink(const char *pathname);
+int link(const char *oldpath, const char *newpath);
 int remove(const char *pathname);
 int mkdir(const char *pathname, mode_t mode);
 
