@@ -22,6 +22,8 @@ set(VSF_USE_DISP 1)
 set(VSF_USE_SDL2 1)
 set(VSF_USE_LWIP 1)
     set(VSF_LWIP_VENDOR 1)
+set(VSF_USE_BTSTACK 1)
+    set(VSF_BTSTACK_USE_LINKKEY_MEMORY 1)
 
 # include vsf cmake script
 set(VSF_CONFIG_PATH ../../../config)

@@ -10,6 +10,7 @@ target_sources(${CMAKE_PROJECT_NAME} PUBLIC
     fakefat32.c
 )
 
+add_subdirectory(btstack_demo)
 add_subdirectory(common)
 #add_subdirectory(evm_demo)
 add_subdirectory(freetype_demo)

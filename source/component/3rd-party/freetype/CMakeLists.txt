@@ -3,7 +3,7 @@ if(NOT VSF_FREETYPE_PATH)
 endif()
 
 target_include_directories(${VSF_LIB_NAME} INTERFACE
-    ${VSF_SRC_PATH}/component/3rd-party/freetype/port
+    port
     ${VSF_FREETYPE_PATH}/include
 )
 target_compile_definitions(${VSF_LIB_NAME} INTERFACE
