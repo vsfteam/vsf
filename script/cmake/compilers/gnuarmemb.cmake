@@ -13,11 +13,9 @@ set(CMAKE_SIZE arm-none-eabi-size CACHE INTERNAL "size")
 
 set(CMAKE_C_FLAGS 
     "${CMAKE_C_FLAGS} -std=gnu11 -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
-    CACHE STRING "c compiler flags"
 )
 set(CMAKE_CXX_FLAGS 
     "${CMAKE_CXX_FLAGS} -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
-    CACHE STRING  "cxx compiler flags"
 )
 
 # Optimization Level
