@@ -37,6 +37,10 @@
 #   include "./default/default_compiler.h"
 #endif
 
-#include "../preprocessor/vsf_preprocessor.h"
+#ifndef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
+#   include "../preprocessor/vsf_preprocessor.h"
+#else
+#   undef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
+#endif
 
 //#endif
