@@ -17,6 +17,8 @@ add_subdirectory(linux_demo)
 add_subdirectory(lvgl_demo)
 add_subdirectory(sdl2_demo)
 add_subdirectory(tgui_demo)
+add_subdirectory(usbd_demo)
+add_subdirectory(usbh_demo)
 
 if(VSF_HAL_CHIP_NAME STREQUAL "AIC8800M")
     add_subdirectory(aic8800)
