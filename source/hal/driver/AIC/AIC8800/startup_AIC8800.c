@@ -265,7 +265,7 @@ ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     (pFunc)0xFFFFFFFF,
 };
 
-static NO_INIT pFunc __VECTOR_TABLE_RAM[dimof(__VECTOR_TABLE) - 4] ALIGN(512);
+static NO_INIT pFunc __isr_vector[dimof(__VECTOR_TABLE) - 4] ALIGN(512);
 
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
@@ -286,8 +286,8 @@ void Reset_Handler(void)
     SCB->CPACR |= ((3U << 10U*2U) |           /* enable CP10 Full Access */
                    (3U << 11U*2U) );          /* enable CP11 Full Access */
 
-    memcpy(__VECTOR_TABLE_RAM, __VECTOR_TABLE, sizeof(__VECTOR_TABLE_RAM));
-    SCB->VTOR = (uint32_t)__VECTOR_TABLE_RAM;
+    memcpy(__isr_vector, __VECTOR_TABLE, sizeof(__isr_vector));
+    SCB->VTOR = (uint32_t)__isr_vector;
 
     __PROGRAM_START();                        /* Enter PreMain (C library entry point) */
 }
