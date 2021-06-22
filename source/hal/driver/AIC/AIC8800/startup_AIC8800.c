@@ -265,13 +265,13 @@ ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     (pFunc)0xFFFFFFFF,
 };
 
-static NO_INIT pFunc __VECTOR_TABLE_RAM[dimof(__VECTOR_TABLE) - 4] AT_ADDR(0x001A0000);
+static NO_INIT pFunc __VECTOR_TABLE_RAM[dimof(__VECTOR_TABLE) - 4] ALIGN(512);
 
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
 #endif
 
-WEAK(vsf_hal_pre_startup_init) 
+WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
 {}
 
@@ -285,9 +285,6 @@ void Reset_Handler(void)
     //! enable FPU
     SCB->CPACR |= ((3U << 10U*2U) |           /* enable CP10 Full Access */
                    (3U << 11U*2U) );          /* enable CP11 Full Access */
-
-    //! trap unaligned access
-    //SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
 
     memcpy(__VECTOR_TABLE_RAM, __VECTOR_TABLE, sizeof(__VECTOR_TABLE_RAM));
     SCB->VTOR = (uint32_t)__VECTOR_TABLE_RAM;
