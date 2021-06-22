@@ -62,6 +62,11 @@
 #   error VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE must be enabled
 #endif
 
+// workaround for pipe MACRO
+#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#   undef pipe
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
