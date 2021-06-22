@@ -206,11 +206,11 @@ static void __lvgl_input_on_gamepad(vk_input_type_t type, vk_gamepad_evt_t *game
                         1 * margin + (margin >> 1) - (int32_t)((float)radius * offset));
         break;
     case GAMEPAD_ID_LT:
-        sprintf(gamepad->lbl_lt_text, "%d", cur);
+        sprintf(gamepad->lbl_lt_text, "%d", (int)cur);
         lv_label_set_text(gamepad->lbl_lt, gamepad->lbl_lt_text);
         break;
     case GAMEPAD_ID_RT:
-        sprintf(gamepad->lbl_rt_text, "%d", cur);
+        sprintf(gamepad->lbl_rt_text, "%d", (int)cur);
         lv_label_set_text(gamepad->lbl_rt, gamepad->lbl_rt_text);
         break;
     case GAMEPAD_ID_DPAD: {
