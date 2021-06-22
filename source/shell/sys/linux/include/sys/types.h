@@ -1,9 +1,11 @@
 #ifndef __VSF_LINUX_TYPES_H__
 #define __VSF_LINUX_TYPES_H__
 
-// do not include this for compiler, because type.h is actually belong to compiler layer,
+// do not include vsf_utilities.h, because type.h is actually belong to compiler layer,
 //  and compiler layer can not include vsf_utilities.h directly
 //#include "utilities/vsf_utilities.h"
+#define __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
+#include "utilities/compiler/compiler.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +35,7 @@ typedef unsigned int        gid_t;
 typedef long                off_t;
 typedef long long           off64_t;
 
+#if (VSF_LINUX_USE_SIMPLE_LIBC == ENABLED) && (VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #ifndef __TIME_T
 #   define __TIME_T         long long
 #endif
@@ -49,6 +52,7 @@ typedef enum {
 } clockid_t;
 
 #define CLOCKS_PER_SEC      ((clock_t)1000)
+#endif
 
 #if __IS_COMPILER_IAR__
 //! end of typedef name has already been declared (with same type)
