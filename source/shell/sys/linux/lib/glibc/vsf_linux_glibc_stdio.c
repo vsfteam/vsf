@@ -320,14 +320,24 @@ void clearerr(FILE *f)
 {
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 int feof(FILE *f)
 {
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
     VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
+    // -Wcast-align by gcc
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
 
     return !(priv->file->size - priv->pos);
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 #if !__IS_COMPILER_IAR__
 void perror(const char *str)
