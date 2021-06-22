@@ -78,8 +78,6 @@ extern "C" {
 
 //! \brief none standard memory types
 #if __IS_COMPILER_LLVM__
-#   define ROM_FLASH            __attribute__(( __section__( ".rom.flash"))) const
-#   define ROM_EEPROM           __attribute__(( __section__( ".rom.eeprom"))) const
 #   define NO_INIT              __attribute__(( __section__( ".bss.noinit")))
 #   define ROOT                 __attribute__((__used__))
 #   define INLINE               __inline__
@@ -89,7 +87,7 @@ extern "C" {
 #   define RAMFUNC              __attribute__((__section__ (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((__aligned__(__N)))
-#   define __AT_ADDR(__ADDR)    __attribute__((__section__(".ARM.__at_" #__ADDR)))
+#   define __AT_ADDR(__ADDR)    Not Supported by LLVM
 #   define __SECTION(__SEC)     __attribute__((__section__(__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS)                                      \
                                 __asm__(".weak " #__ALIAS);                     \
@@ -104,8 +102,6 @@ extern "C" {
 #   define __ISR(__VEC)         void __VEC(void)
 
 #elif  __IS_COMPILER_GCC__
-#   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
-#   define ROM_EEPROM           __attribute__(( section( ".rom.eeprom"))) const
 #   define NO_INIT              __attribute__(( section( ".bss.noinit")))
 #   define ROOT                 __attribute__((used))
 #   define INLINE               inline
@@ -115,7 +111,7 @@ extern "C" {
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N)))
-#   define __AT_ADDR(__ADDR)    __section(".ARM.__at_" #__ADDR)
+#   define __AT_ADDR(__ADDR)    Not Supported by GCC
 #   define __SECTION(__SEC)     __attribute__((section (__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                 __attribute__((weakref(__STR(__ALIAS))))
