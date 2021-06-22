@@ -1,9 +1,8 @@
  source/component/3rd-party/btstack/raw/src/l2cap.c | 4 ++--
- source/component/3rd-party/coremark/raw/core_main.c | 2 +-
  source/component/3rd-party/lua/raw/lua.c | 2 +-
  source/component/3rd-party/zlib/raw/inftrees.c | 10 +++-------
  source/component/3rd-party/zlib/raw/zconf.h | 3 +++
- 5 file changed, 10 insertions(+), 11 deletions(-)
+ 4 file changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/source/component/3rd-party/btstack/raw/src/l2cap.c b/source/component/3rd-party/btstack/raw/src/l2cap.c
 index fe9f5ca8e..edac99c75 100644
@@ -27,20 +26,6 @@ index fe9f5ca8e..edac99c75 100644
      if (local_cid < 0x40u) return NULL;
      return (l2cap_channel_t*) l2cap_channel_item_by_cid(local_cid);
  }
-
-diff --git a/source/component/3rd-party/coremark/raw/core_main.c b/source/component/3rd-party/coremark/raw/core_main.c
-index 356f4e8..5f58366 100644
---- a/source/component/3rd-party/coremark/raw/core_main.c
-+++ b/source/component/3rd-party/coremark/raw/core_main.c
-@@ -112,7 +112,7 @@ main(void)
-     char *argv[1];
- #else
- MAIN_RETURN_TYPE
--main(int argc, char *argv[])
-+coremark_main(int argc, char *argv[])
- {
- #endif
-     ee_u16       i, j = 0, num_algorithms = 0;
 
 diff --git a/source/component/3rd-party/lua/raw/lua.c b/source/component/3rd-party/lua/raw/lua.c
 index b5b884b6..ee995e78 100644

@@ -18,6 +18,12 @@ Original Author: Shay Gal-on
 
 #ifndef CORE_PORTME_H
 #define CORE_PORTME_H
+
+#include "vsf.h"
+// rename main to coremark_main
+#undef main
+#define main coremark_main
+
 /************************/
 /* Data types and settings */
 /************************/
@@ -58,7 +64,6 @@ Original Author: Shay Gal-on
 /* Configuration: CORE_TICKS
         Define type of return from the timing functions.
  */
-#include "vsf.h"
 typedef vsf_systimer_tick_t CORE_TICKS;
 
 /* Definitions: COMPILER_VERSION, COMPILER_FLAGS, MEM_LOCATION
