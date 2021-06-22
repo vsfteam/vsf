@@ -8,6 +8,12 @@ endif()
 
 # compiler configurations
 # arm-none-eabi-gcc will not pass compiler checker of cmake, so include before project
+set(CMAKE_C_FLAGS 
+    "-Og -Ofast -g3"
+)
+set(CMAKE_CXX_FLAGS 
+    "-Og -Ofast -g3"
+)
 include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
 
 project(vsf_template)
