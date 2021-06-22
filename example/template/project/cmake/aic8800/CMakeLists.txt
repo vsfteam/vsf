@@ -15,7 +15,6 @@ set(VSF_TARGET aic8800m)
 
 # VSF_USE configurations
 set(VSF_USE_LINUX 1)
-    set(VSF_LINUX_USE_SIMPLE_LIBC 1)
 set(VSF_USE_LVGL 1)
     set(VSF_LVGL_USE_FREETYPE 1)
 set(VSF_USE_FREETYPE 1)
