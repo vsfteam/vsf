@@ -1,5 +1,5 @@
 if(NOT VSF_COREMARK_PATH)
-    set(VSF_COREMARK_PATH ${VSF_SRC_PATH}/component/3rd-party/COREMARK/raw)
+    set(VSF_COREMARK_PATH ${VSF_SRC_PATH}/component/3rd-party/coremark/raw)
 endif()
 
 target_include_directories(${VSF_LIB_NAME} INTERFACE
