@@ -10,4 +10,6 @@ if(VSF_USE_SDL2)
         vsf_sdl2_event.c
         vsf_sdl2_pixelformat.c
     )
+
+    add_subdirectory(3rd-party)
 endif()

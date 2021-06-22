@@ -1,0 +1,79 @@
+if(NOT VSF_LIBJPEG_TURBO_PATH)
+    set(VSF_LIBJPEG_TURBO_PATH ${VSF_SRC_PATH}/component/3rd-party/libjpeg-turbo/raw)
+endif()
+
+target_include_directories(${VSF_LIB_NAME} INTERFACE
+    port
+    ${VSF_LIBJPEG_TURBO_PATH}
+)
+#target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+#)
+
+target_sources(${VSF_LIB_NAME} INTERFACE
+    ${VSF_LIBJPEG_TURBO_PATH}/cdjpeg.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jaricom.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcapimin.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcapistd.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcarith.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jccoefct.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jccolor.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcdctmgr.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jchuff.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcicc.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcinit.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcmainct.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcmarker.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcmaster.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcomapi.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcparam.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcphuff.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcprepct.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jcsample.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jctrans.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdapimin.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdapistd.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdarith.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdatadst-tj.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdatadst.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdatasrc-tj.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdatasrc.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdcoefct.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdcolor.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jddctmgr.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdhuff.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdicc.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdinput.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdmainct.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdmarker.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdmaster.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdmerge.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdphuff.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdpostct.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdsample.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jdtrans.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jerror.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jfdctflt.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jfdctfst.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jfdctint.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jidctflt.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jidctfst.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jidctint.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jidctred.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jmemmgr.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jmemnobs.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jquant1.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jquant2.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jsimd_none.c
+    ${VSF_LIBJPEG_TURBO_PATH}/jutils.c
+    ${VSF_LIBJPEG_TURBO_PATH}/rdbmp.c
+    ${VSF_LIBJPEG_TURBO_PATH}/rdcolmap.c
+    ${VSF_LIBJPEG_TURBO_PATH}/rdgif.c
+    ${VSF_LIBJPEG_TURBO_PATH}/rdppm.c
+    ${VSF_LIBJPEG_TURBO_PATH}/rdswitch.c
+    ${VSF_LIBJPEG_TURBO_PATH}/rdtarga.c
+    ${VSF_LIBJPEG_TURBO_PATH}/transupp.c
+    ${VSF_LIBJPEG_TURBO_PATH}/wrbmp.c
+    ${VSF_LIBJPEG_TURBO_PATH}/wrgif.c
+    ${VSF_LIBJPEG_TURBO_PATH}/wrppm.c
+    ${VSF_LIBJPEG_TURBO_PATH}/wrtarga.c
+)
