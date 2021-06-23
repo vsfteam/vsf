@@ -18,6 +18,28 @@ include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
 
 project(vsf_template)
 set(VSF_TARGET aic8800m)
+set(VSF_TARGET_DEFINITIONS
+#   hw related definitions for aic8800m required by sdk
+#   hw_platform: pxp(0), fpga(1), asic(2)
+    "CFG_HW_PLATFORM=2"
+#   rf_mode: null(0), bt_only(1), bt_combo(2), btwifi_combo(3)
+    "CFG_RF_MODE=0"
+#   rom_ver
+    "CFG_WIFI_ROM_VER=2"
+#   dac: left(0), mute(1), right(2), lprd2(3), lmrd2(4)
+    "CFG_DACL_MIXER_MODE=1"
+    "CFG_DACR_MIXER_MODE=1"
+#   pmic
+    "CFG_PMIC"
+    "CFG_PMIC_VER_LITE"
+    "CFG_PMIC_ITF_ASDMA"
+#   wifi
+    "CFG_WIFI_STACK"
+    "CFG_RSSI_DATAPKT"
+#   misc
+    "CFG_DBG"
+    "CFG_IPERF"
+)
 
 # VSF_USE configurations
 set(VSF_USE_LINUX 1)

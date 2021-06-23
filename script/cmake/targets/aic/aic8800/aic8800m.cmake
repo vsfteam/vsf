@@ -8,17 +8,7 @@ set(VSF_TARGET_DEFINITIONS
     "__AIC__"
     "__AIC8800__"
 
-#   hw related definitions for aic8800m required by sdk
-    "CFG_HW_PLATFORM=2"
-    "CFG_RF_MODE=0"
-    "CFG_PMIC"
-    "CFG_PMIC_VER_LITE"
-    "CFG_PMIC_ITF_ASDMA"
-    "CFG_WIFI_STACK"
-    "CFG_RSSI_DATAPKT"
-    "CFG_DBG"
-    "CFG_IPERF"
-    "CFG_WIFI_ROM_VER=2"
+    ${VSF_TARGET_DEFINITIONS}
 )
 
 include(${VSF_CMAKE_ROOT}/targets/arm/__cortex_m4.cmake)
