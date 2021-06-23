@@ -33,10 +33,6 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     ${VSF_COMMON_INCLUDE_DIRECTORIES}
 )
-target_link_libraries(${VSF_LIB_NAME} INTERFACE
-#   -lm
-    m
-)
 
 if(VSF_HOST_SYSTEM)
     set(VSF_HOST_SYSTEM_LIB_NAME vsf_host_${VSF_HOST_SYSTEM})
@@ -58,3 +54,9 @@ include(${VSF_CMAKE_ROOT}/compilers.cmake)
 
 add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
+
+# libraries MUST be placed at the end
+target_link_libraries(${VSF_LIB_NAME} INTERFACE
+#   -lm
+    m
+)
