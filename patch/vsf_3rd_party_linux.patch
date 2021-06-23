@@ -1,6 +1,5 @@
  source/component/3rd-party/btstack/raw/src/l2cap.c | 4 ++--
- source/component/3rd-party/lua/raw/lua.c | 2 +-
- 2 file changed, 3 insertions(+), 3 deletions(-)
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/source/component/3rd-party/btstack/raw/src/l2cap.c b/source/component/3rd-party/btstack/raw/src/l2cap.c
 index fe9f5ca8e..edac99c75 100644
@@ -24,17 +23,3 @@ index fe9f5ca8e..edac99c75 100644
      if (local_cid < 0x40u) return NULL;
      return (l2cap_channel_t*) l2cap_channel_item_by_cid(local_cid);
  }
-
-diff --git a/source/component/3rd-party/lua/raw/lua.c b/source/component/3rd-party/lua/raw/lua.c
-index b5b884b6..ee995e78 100644
---- a/source/component/3rd-party/lua/raw/lua.c
-+++ b/source/component/3rd-party/lua/raw/lua.c
-@@ -620,7 +620,7 @@ static int pmain (lua_State *L) {
- }
- 
- 
--int main (int argc, char **argv) {
-+int lua_main (int argc, char **argv) {
-   int status, result;
-   lua_State *L = luaL_newstate();  /* create state */
-   if (L == NULL) {
