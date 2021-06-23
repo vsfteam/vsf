@@ -45,11 +45,11 @@ SECTIONS
 {
     .text :
     {
-        __code_start__ = .;
-        /* the address 0 must contain the boot vectors */
-        KEEP(*(.isr_vector))
-        __isr_vector_end__ = .;
-        *boot_startup.o(.text)
+        KEEP(*(.vectors))
+        __Vectors_End = .;
+        __Vectors_Size = __Vectors_End - __Vectors;
+        __end__ = .;
+
         *(.text*)
 
         *(.rodata*)
@@ -104,13 +104,6 @@ SECTIONS
     } > LPIRAM
 
     __etext = __etext_lpiram + (__lptext_end__ - __lptext_start__);
-
-    .vectors (ORIGIN(DRAM)) (NOLOAD):
-    {
-        __vectors_start__ = .;
-        . = (__isr_vector_end__ - __code_start__);
-        __vectors_end__ = .;
-    } > DRAM
 
     .data : AT (__etext)
     {
