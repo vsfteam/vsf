@@ -7,11 +7,13 @@ target_include_directories(${VSF_LIB_NAME} INTERFACE
     ${VSF_COREMARK_PATH}
 )
 
-if(${VSF_ARCH_SERIES} STREQUAL "x86" AND ${VSF_HOST_SYSTEM} STREQUAL "linux")
-#   seems bug in printf, remove this after fixed
-    target_compile_definitions(${VSF_LIB_NAME} INTERFACE
-        HAS_FLOAT=0
-    )
+if(${VSF_ARCH_SERIES} STREQUAL "x86")
+    if (${VSF_HOST_SYSTEM} STREQUAL "linux")
+#       seems bug in printf, remove this after fixed
+        target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+            HAS_FLOAT=0
+        )
+    endif()
 endif()
 
 target_sources(${VSF_LIB_NAME} INTERFACE
