@@ -1,0 +1,40 @@
+ source/component/3rd-party/btstack/raw/src/l2cap.c | 4 ++--
+ source/component/3rd-party/lua/raw/lua.c | 2 +-
+ 2 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/source/component/3rd-party/btstack/raw/src/l2cap.c b/source/component/3rd-party/btstack/raw/src/l2cap.c
+index fe9f5ca8e..edac99c75 100644
+--- a/source/component/3rd-party/btstack/raw/src/l2cap.c
++++ b/source/component/3rd-party/btstack/raw/src/l2cap.c
+@@ -164,7 +164,7 @@ static inline l2cap_service_t * l2cap_le_get_service(uint16_t psm);
+ #endif
+ #ifdef L2CAP_USES_CHANNELS
+ static uint16_t l2cap_next_local_cid(void);
+-static l2cap_channel_t * l2cap_get_channel_for_local_cid(uint16_t local_cid);
++l2cap_channel_t * l2cap_get_channel_for_local_cid(uint16_t local_cid);
+ static void l2cap_emit_simple_event_with_cid(l2cap_channel_t * channel, uint8_t event_code);
+ static void l2cap_dispatch_to_channel(l2cap_channel_t *channel, uint8_t type, uint8_t * data, uint16_t size);
+ static l2cap_channel_t * l2cap_create_channel_entry(btstack_packet_handler_t packet_handler, l2cap_channel_type_t channel_type, bd_addr_t address, bd_addr_type_t address_type,
+@@ -1135,7 +1135,7 @@ static l2cap_fixed_channel_t * l2cap_fixed_channel_for_channel_id(uint16_t local
+ 
+ // used for Classic Channels + LE Data Channels. local_cid >= 0x40
+ #ifdef L2CAP_USES_CHANNELS
+-static l2cap_channel_t * l2cap_get_channel_for_local_cid(uint16_t local_cid){
++l2cap_channel_t * l2cap_get_channel_for_local_cid(uint16_t local_cid){
+     if (local_cid < 0x40u) return NULL;
+     return (l2cap_channel_t*) l2cap_channel_item_by_cid(local_cid);
+ }
+
+diff --git a/source/component/3rd-party/lua/raw/lua.c b/source/component/3rd-party/lua/raw/lua.c
+index b5b884b6..ee995e78 100644
+--- a/source/component/3rd-party/lua/raw/lua.c
++++ b/source/component/3rd-party/lua/raw/lua.c
+@@ -620,7 +620,7 @@ static int pmain (lua_State *L) {
+ }
+ 
+ 
+-int main (int argc, char **argv) {
++int lua_main (int argc, char **argv) {
+   int status, result;
+   lua_State *L = luaL_newstate();  /* create state */
+   if (L == NULL) {
