@@ -51,9 +51,24 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     ${VSF_LUA_PATH}/ltablib.c
     ${VSF_LUA_PATH}/ltests.c
     ${VSF_LUA_PATH}/ltm.c
-    ${VSF_LUA_PATH}/lua.c
     ${VSF_LUA_PATH}/lundump.c
     ${VSF_LUA_PATH}/lutf8lib.c
     ${VSF_LUA_PATH}/lvm.c
     ${VSF_LUA_PATH}/lzio.c
+)
+
+add_library(lua_main STATIC
+    ${VSF_LUA_PATH}/lua.c
+)
+target_link_libraries(${VSF_LIB_NAME} INTERFACE
+    lua_main
+)
+
+# add vsf configuration for lua_main
+target_compile_definitions(lua_main PRIVATE
+    ${VSF_TARGET_DEFINITIONS}
+    "main=lua_main"
+)
+target_include_directories(lua_main PRIVATE
+    ${VSF_COMMON_INCLUDE_DIRECTORIES}
 )

@@ -37,10 +37,10 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
 if(VSF_HOST_SYSTEM)
     set(VSF_HOST_SYSTEM_LIB_NAME vsf_host_${VSF_HOST_SYSTEM})
     add_library(${VSF_HOST_SYSTEM_LIB_NAME} STATIC)
-    target_include_directories(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
+    target_include_directories(${VSF_HOST_SYSTEM_LIB_NAME} PRIVATE
         ${VSF_COMMON_INCLUDE_DIRECTORIES}
     )
-    target_compile_definitions(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
+    target_compile_definitions(${VSF_HOST_SYSTEM_LIB_NAME} PRIVATE
         ${VSF_TARGET_DEFINITIONS}
     )
 

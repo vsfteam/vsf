@@ -21,11 +21,10 @@ target_link_libraries(${VSF_LIB_NAME} INTERFACE
 )
 
 # add vsf configuration for lvgl
-target_compile_definitions(lvgl PUBLIC
+target_compile_definitions(lvgl PRIVATE
     ${VSF_TARGET_DEFINITIONS}
 )
-get_property(lvgl_include_path TARGET ${CMAKE_PROJECT_NAME} PROPERTY INCLUDE_DIRECTORIES)
-target_include_directories(lvgl PUBLIC
+target_include_directories(lvgl PRIVATE
     ${VSF_COMMON_INCLUDE_DIRECTORIES}
 )
 if(VSF_LVGL_CONFIG_PATH)
