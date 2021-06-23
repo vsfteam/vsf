@@ -20,31 +20,28 @@ target_sources(${VSF_LIB_NAME} INTERFACE
 if(${VSF_ARCH_SERIES} STREQUAL "x86")
     if(${VSF_HOST_SYSTEM} STREQUAL "linux")
         if(${VSF_HOST_SYSTEM32})
-            target_link_libraries(${VSF_LIB_NAME} INTERFACE
-                ${VSF_EVM_PATH}/lib/x86/linux32/libecma.a
-                ${VSF_EVM_PATH}/lib/x86/linux32/libejs.a
-            )
+            set(VSF_EVM_LIB_PATH ${VSF_EVM_PATH}/lib/x86/linux32)
         elseif(${VSF_HOST_SYSTEM64})
-            target_link_libraries(${VSF_LIB_NAME} INTERFACE
-                ${VSF_EVM_PATH}/lib/x86/linux/libecma.a
-                ${VSF_EVM_PATH}/lib/x86/linux/libejs.a
-            )
+            set(VSF_EVM_LIB_PATH ${VSF_EVM_PATH}/lib/x86/linux)
         endif()
-    else()
-        message(FATAL_ERROR "evm has no library for windows")
     endif()
 elseif(${VSF_ARCH_SERIES} STREQUAL "arm")
     if(${VSF_ARCH_NAME} STREQUAL "cortex-m3")
-        target_link_libraries(${VSF_LIB_NAME} INTERFACE
-            ${VSF_EVM_PATH}/lib/arm/cortex-m3/libecma.a
-            ${VSF_EVM_PATH}/lib/arm/cortex-m3/libejs.a
-        )
+        set(VSF_EVM_LIB_PATH ${VSF_EVM_PATH}/lib/arm/cortex-m3)
     elseif(${VSF_ARCH_NAME} STREQUAL "cortex-m4")
-        target_link_libraries(${VSF_LIB_NAME} INTERFACE
-            ${VSF_EVM_PATH}/lib/arm/cortex-m4/libecma.a
-            ${VSF_EVM_PATH}/lib/arm/cortex-m4/libejs.a
-        )
-    else()
-        message(FATAL_ERROR "evm has no library for ${VSF_ARCH_NAME}")
+        set(VSF_EVM_LIB_PATH ${VSF_EVM_PATH}/lib/arm/cortex-m4)
+    endif()
+endif()
+
+if(VSF_EVM_LIB_PATH)
+    file(GLOB VSF_EVM_LIBS ${VSF_EVM_LIB_PATH}/*)
+    target_link_libraries(${VSF_LIB_NAME} INTERFACE
+        ${VSF_EVM_LIBS}
+    )
+else()
+    if(${VSF_ARCH_NAME})
+        message(FATAL_ERROR "evm has no library for ${VSF_ARCH_SERIES}/${VSF_ARCH_NAME}")
+    elseif(${VSF_HOST_SYSTEM})
+        message(FATAL_ERROR "evm has no library for ${VSF_ARCH_SERIES}/${VSF_HOST_SYSTEM}")
     endif()
 endif()
