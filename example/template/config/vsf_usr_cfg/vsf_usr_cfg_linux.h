@@ -79,7 +79,10 @@
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
 #define APP_USE_LWIP_DEMO                               DISABLED
-#define APP_USE_EVM_DEMO                                DISABLED
+#define APP_USE_EVM_DEMO                                ENABLED
+#define APP_USE_EVM_DEMO                                ENABLED
+#define APP_USE_LUA_DEMO                                ENABLED
+#define APP_USE_COREMARK_DEMO                           ENABLED
 
 
 // app configurations to vsf configurations
