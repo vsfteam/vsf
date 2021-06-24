@@ -73,6 +73,10 @@ int vsf_linux_create_fhs(void)
     busybox_install();
 
     // 1. hardware driver related demo
+#ifdef __AIC8800__
+    extern void aic8800_demo_init(void);
+    aic8800_demo_init();
+#endif
 #if APP_USE_USBH_DEMO == ENABLED
     extern int usbh_main(int argc, char *argv[]);
     usbh_main(0, NULL);
@@ -279,10 +283,6 @@ int vsf_linux_create_fhs(void)
 #if APP_USE_DISTBUS_DEMO == ENABLED
     extern int distbus_main(int argc, char *argv[]);
     busybox_bind("/sbin/distbus", distbus_main);
-#endif
-#ifdef __AIC8800__
-    extern void aic8800_demo_init(void);
-    aic8800_demo_init();
 #endif
 
     return 0;

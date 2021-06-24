@@ -324,6 +324,11 @@ int VSF_USER_ENTRY(void)
     lv_indev_drv_t indev_drv;
     lv_disp_t *disp;
 
+#ifdef APP_LVGL_DEMO_CFG_PIXEL_BUFFER_HEAP
+    usrapp_ui_common.lvgl.color = vsf_heap_malloc(APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE *
+                ((APP_LVGL_DEMO_CFG_DOUBLE_BUFFER == ENABLED) ? 2 : 1));
+    VSF_ASSERT(usrapp_ui_common.lvgl.color != NULL);
+#endif
     lv_disp_buf_init(   &usrapp_ui_common.lvgl.disp_buf,
                         usrapp_ui_common.lvgl.color,
 #if APP_LVGL_DEMO_CFG_DOUBLE_BUFFER == ENABLED
@@ -387,6 +392,7 @@ int VSF_USER_ENTRY(void)
 
     pthread_t thread;
     pthread_create(&thread, NULL, __lvgl_thread, NULL);
+    pthread_join(thread, NULL);
 #else
     __lvgl_input_init();
 
@@ -394,6 +400,11 @@ int VSF_USER_ENTRY(void)
     while (__lvgl_is_looping) {
         lv_task_handler();
     }
+#endif
+
+#ifdef APP_LVGL_DEMO_CFG_PIXEL_BUFFER_HEAP
+    vsf_heap_free(usrapp_ui_common.lvgl.color);
+    usrapp_ui_common.lvgl.color = NULL;
 #endif
     return 0;
 }

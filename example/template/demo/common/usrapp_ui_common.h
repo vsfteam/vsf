@@ -100,7 +100,7 @@ typedef struct usrapp_ui_common_t {
 #endif
         lv_disp_buf_t disp_buf;
 // if APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR is defined, use defined buffer
-#ifdef APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR
+#if defined(APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR) || defined(APP_LVGL_DEMO_CFG_PIXEL_BUFFER_HEAP)
         lv_color_t *color;
 #elif APP_LVGL_DEMO_CFG_DOUBLE_BUFFER == ENABLED
         lv_color_t color[APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE * 2];
@@ -113,8 +113,7 @@ typedef struct usrapp_ui_common_t {
 
 #if VSF_USE_LLGUI == ENABLED
     struct {
-// if APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR is defined, use defined buffer
-#ifdef APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_PTR
+#if defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_PTR) || define(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_HEAP)
 #   error not supported now
         llColor *color;
 #elif USE_DOUBLE_BUFFERING

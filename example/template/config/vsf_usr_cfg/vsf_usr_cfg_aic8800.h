@@ -101,7 +101,7 @@
 #   define APP_LVGL_DEMO_CFG_VER_RES                    1080
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (80 * 1024)
 // double 80K 16-bit pixels buffer at 0x00100000
-#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR           0x00100000
+#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_HEAP
 #   define APP_LVGL_DEMO_CFG_DOUBLE_BUFFER              ENABLED
 #define APP_USE_BTSTACK_DEMO                            ENABLED
 // DO NOT use bthci, use on-chip bluetooth
@@ -134,7 +134,9 @@
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
-#   define VSF_HEAP_SIZE                                0x18000
+#   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   4
+#   define VSF_HEAP_ADDR                                0x00100000
+#   define VSF_HEAP_SIZE                                0x50000
 
 #define VSF_USE_VIDEO                                   ENABLED
 #define VSF_USE_AUDIO                                   ENABLED
@@ -266,6 +268,11 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #endif
 
 #if APP_USE_USBH_DEMO == ENABLED
+// usbh memory MUST be in 0x001A0000 - 0x001C7FFF
+#   define vsf_usbh_malloc                              __vsf_usbh_malloc
+#   define vsf_usbh_malloc_aligned                      __vsf_usbh_malloc_aligned
+#   define vsf_usbh_free                                __vsf_usbh_free
+
 #   define VSF_USBH_USE_HCD_DWCOTG                      ENABLED
 //  VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB is by default disabled, no need root_hub support
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
