@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_HEAP_CLASS_INHERIT__
 #include "vsf.h"
 
 #ifdef __AIC8800__
