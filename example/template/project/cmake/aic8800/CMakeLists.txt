@@ -75,6 +75,12 @@ target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
 # add template directory
 add_subdirectory(../../../demo ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_bin)
 
+# more compiler options/definitions
+target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
+    "VSF_LINUX_USE_SIMPLE_STDIO=DISABLED"
+    "VSF_LINUX_USE_SIMPLE_CTYPE=DISABLED"
+)
+
 # type conversion and show size
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
     SUFFIX ".elf"
