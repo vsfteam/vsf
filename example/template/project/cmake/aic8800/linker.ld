@@ -56,6 +56,11 @@ SECTIONS
         __code_end__ = .;
     } > FLASH
 
+    .ARM.extab :
+    {
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
+    } > FLASH
+
     .ARM.exidx :
     {
        __exidx_start = .;
@@ -72,10 +77,7 @@ SECTIONS
         __copy_table_start__ = .;
         LONG (__etext)
         LONG (__data_start__)
-        LONG (__data_end__ - __data_start__)
-        /* LONG (__etext2)
-        LONG (__data2_start__)
-        LONG (__data2_end__ - __data2_start__) */
+        LONG ((__data_end__ - __data_start__) >> 2)
         __copy_table_end__ = .;
     } > FLASH
 
@@ -87,9 +89,7 @@ SECTIONS
         . = ALIGN(4);
         __zero_table_start__ = .;
         LONG (__bss_start__)
-        LONG (__bss_end__ - __bss_start__)
-        /* LONG (__bss2_start__)
-        LONG (__bss2_end__ - __bss2_start__) */
+        LONG ((__bss_end__ - __bss_start__) >> 2)
         __zero_table_end__ = .;
     } > FLASH
 
@@ -108,9 +108,28 @@ SECTIONS
     .data : AT (__etext)
     {
         __data_start__ = .;
-        Image$$RW_IRAM1$$Base = .;
         *(vtable)
         *(.data*)
+
+        . = ALIGN(4);
+        /* preinit data */
+        PROVIDE_HIDDEN (__preinit_array_start = .);
+        KEEP(*(.preinit_array))
+        PROVIDE_HIDDEN (__preinit_array_end = .);
+
+        . = ALIGN(4);
+        /* init data */
+        PROVIDE_HIDDEN (__init_array_start = .);
+        KEEP(*(SORT(.init_array.*)))
+        KEEP(*(.init_array))
+        PROVIDE_HIDDEN (__init_array_end = .);
+
+        . = ALIGN(4);
+        /* finit data */
+        PROVIDE_HIDDEN (__fini_array_start = .);
+        KEEP(*(SORT(.fini_array.*)))
+        KEEP(*(.fini_array))
+        PROVIDE_HIDDEN (__fini_array_end = .);
 
         . = ALIGN(4);
         /* All data end */
@@ -120,6 +139,11 @@ SECTIONS
 
     __image_end__ = __etext + SIZEOF(.data);
 
+    .noinit (NOLOAD):
+    {
+        *(.bss.noinit* .noinit*)
+    } > DRAM
+
     .bss (NOLOAD):
     {
         __bss_start__ = .;
@@ -127,7 +151,6 @@ SECTIONS
         *(COMMON)
         __bss_end__ = .;
         *(SHAREDRAM)
-        Image$$RW_IRAM1$$ZI$$Limit = . ;
     } > DRAM
 
     .heap :
