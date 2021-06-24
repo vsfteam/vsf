@@ -52,8 +52,26 @@ SECTIONS
 
         *(.text*)
 
+        KEEP(*(.init))
+        KEEP(*(.fini))
+
+        /* .ctors */
+        *crtbegin.o(.ctors)
+        *crtbegin?.o(.ctors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+        *(SORT(.ctors.*))
+        *(.ctors)
+
+        /* .dtors */
+        *crtbegin.o(.dtors)
+        *crtbegin?.o(.dtors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+        *(SORT(.dtors.*))
+        *(.dtors)
+
         *(.rodata*)
-        __code_end__ = .;
+
+        KEEP(*(.eh_frame*))
     } > FLASH
 
     .ARM.extab :
