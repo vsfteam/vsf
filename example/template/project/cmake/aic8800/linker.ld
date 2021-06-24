@@ -4,6 +4,7 @@
 MEMORY
 {
     FLASH (rwx)     : ORIGIN = 0x08000000, LENGTH = (2048K - 16K)
+    EXRAM (rwx)     : ORIGIN = 0x00150000, LENGTH = 64K
     DRAM (rwx)      : ORIGIN = 0x001A0000, LENGTH = (160K - 0x100)
     LPIRAM (rwx)    : ORIGIN = 0x001C7F00, LENGTH = 0x100
     ipc_shared_memory (!rx) : ORIGIN = 0x00190000, len = 2K
@@ -166,8 +167,12 @@ SECTIONS
         *(.bss*)
         *(COMMON)
         __bss_end__ = .;
-        *(SHAREDRAM)
     } > DRAM
+
+    .sharedram (NOLOAD):
+    {
+        *(SHAREDRAM)
+    } > EXRAM
 
     .heap :
     {
@@ -184,7 +189,7 @@ SECTIONS
     .stack_dummy :
     {
         *(.stack)
-    } > DRAM
+    } > EXRAM
 
     /* Set stack top to end of IRAM, and stack limit move down by
      * size of stack_dummy section */
