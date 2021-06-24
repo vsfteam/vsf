@@ -189,11 +189,21 @@
 // simple_libc does not compatible with cpp, so if cpp is used, DO NOT use simple_libc
 //  make sure in inclue path, simple_libc is removed if cpp is used
 #       define VSF_LINUX_USE_SIMPLE_LIBC                ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STDIO           ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STRING          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_TIME            ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_CTYPE           ENABLED
+#           ifndef VSF_LINUX_USE_SIMPLE_STDIO
+#               define VSF_LINUX_USE_SIMPLE_STDIO       ENABLED
+#           endif
+#           ifndef VSF_LINUX_USE_SIMPLE_STRING
+#               define VSF_LINUX_USE_SIMPLE_STRING      ENABLED
+#           endif
+#           ifndef VSF_LINUX_USE_SIMPLE_TIME
+#               define VSF_LINUX_USE_SIMPLE_TIME        ENABLED
+#           endif
+#           ifndef VSF_LINUX_USE_SIMPLE_STDLIB
+#               define VSF_LINUX_USE_SIMPLE_STDLIB      ENABLED
+#           endif
+#           ifndef VSF_LINUX_USE_SIMPLE_CTYPE
+#               define VSF_LINUX_USE_SIMPLE_CTYPE       ENABLED
+#           endif
 #   endif
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
