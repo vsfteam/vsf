@@ -10,10 +10,13 @@ list(APPEND VSF_TARGET_INCLUDE_DIRECTORIES
 
 set(CMAKE_C_FLAGS 
     "-mcpu=cortex-m4 -mthumb ${CMAKE_C_FLAGS}"
+    CACHE INTERNAL "C compiler common flags"
 )
 set(CMAKE_CXX_FLAGS 
     "-mcpu=cortex-m4 -mthumb ${CMAKE_CXX_FLAGS}"
+    CACHE INTERNAL "C++ compiler common flags"
 )
 set(CMAKE_ASM_FLAGS
     "-mthumb ${CMAKE_ASM_FLAGS}"
+    CACHE INTERNAL "asm compiler common flags"
 )
