@@ -206,20 +206,31 @@ inline static em_usart_irq_mask_t __get_uart_irq_mask(vsf_usart_t *usart_ptr)
             return (em_usart_irq_mask_t)0;
     }
 }
-/*
-bool               vsf_usart_fifo_flush(     vsf_usart_t *usart_ptr);
 
-vsf_err_t          vsf_usart_request_rx(     vsf_usart_t *usart_ptr,
-                                                    void *buffer_ptr,
-                                                    uint_fast32_t count);
-vsf_err_t          vsf_usart_request_tx(     vsf_usart_t *usart_ptr,
-                                                    void *buffer_ptr,
-                                                    uint_fast32_t count);
-vsf_err_t          vsf_usart_cancel_rx(      vsf_usart_t *usart_ptr);
-vsf_err_t          vsf_usart_cancel_tx(      vsf_usart_t *usart_ptr);
-int_fast32_t       vsf_usart_get_rx_count(   vsf_usart_t *usart_ptr);
-int_fast32_t       vsf_usart_get_tx_count(   vsf_usart_t *usart_ptr);
-*/
+bool vsf_usart_fifo_flush(vsf_usart_t *usart_ptr)
+{
+    //todo:
+    VSF_HAL_ASSERT(false);
+}
+
+vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
+{
+    //todo:
+    VSF_HAL_ASSERT(false);
+}
+vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
+{
+    //todo:
+    VSF_HAL_ASSERT(false);
+}
+vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart_ptr)
+{
+
+    //todo:
+    VSF_HAL_ASSERT(false);}
+vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr);
+int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
+int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
 /*============================ IMPLEMENTATION ================================*/
 aic8800_uart_init(USART_MAX_PORT)
 

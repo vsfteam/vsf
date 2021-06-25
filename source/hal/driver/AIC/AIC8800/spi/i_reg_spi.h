@@ -33,12 +33,17 @@ extern "C" {
 #endif
 /*============================ MACROS ========================================*/
 
+#ifndef __AIC8800_SPI_USE_BIT_FIELD
+#   define __AIC8800_SPI_USE_BIT_FIELD              DISABLED
+#endif
+
 #define SPI0_BASE_ADDRESS                           (0X40105000ul)
 
 #define SPI0                                        ((spi_reg_t *)SPI0_BASE_ADDRESS)
+
 /* Define structure member permissions : ‘read only’ */
 #ifndef __IM
-#   define __IM                        const
+#   define __IM                                     const
 #endif
 
 /* Define structure member permissions : ‘write only’ */
@@ -51,10 +56,10 @@ extern "C" {
 #   define __IOM
 #endif
 
-#define __AIC8800_SPI_USE_BIT_FIELD     DISABLED
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
 #if __AIC8800_SPI_USE_BIT_FIELD == ENABLED
-#   define DEF_UART_REG(__NAME, __TOTAL_SIZE, ...)                              \
+#   define DEF_SPI_REG(__NAME, __TOTAL_SIZE, ...)                              \
     union {                                                                     \
         reg##__TOTAL_SIZE##_t VALUE;                                            \
         struct {                                                                \
@@ -62,28 +67,28 @@ extern "C" {
         };                                                                      \
     } __NAME
 #else
-#   define DEF_UART_REG(__NAME, __TOTAL_SIZE, ...)                              \
-        __VA_ARGS__ reg##__TOTAL_SIZE##_t __NAME;
+#   define DEF_SPI_REG(__NAME, __TOTAL_SIZE, ...)                              \
+        __VA_ARGS__ reg##__TOTAL_SIZE##_t __NAME
 #endif
 /*============================ TYPES =========================================*/
 
 typedef struct spi_reg_t {
     union {
         __IM            reg32_t         BASE_ADDR;
-        DEF_UART_REG(IOR, 32, __IOM);
+        DEF_SPI_REG(IOR, 32, __IOM);
     };
-    DEF_UART_REG(DR, 32, __IOM);
+    DEF_SPI_REG(DR, 32, __IOM);
     reg32_t CR[4];
-    REG_RSVD_U32N(7);
-    DEF_UART_REG(SR, 32, __IM);
-    REG_RSVD_U32N(5);
-    DEF_UART_REG(MR0, 32, __IOM);
-    REG_RSVD_U32;
-    DEF_UART_REG(MR1, 32, __IOM);
-    DEF_UART_REG(OCR, 32, __IOM);
-    REG_RSVD_U32;
-    DEF_UART_REG(ICR, 32, __IOM);
-    DEF_UART_REG(TCR, 32, __IOM);
+    REG_RSVD_U32N(7)
+    DEF_SPI_REG(SR, 32, __IM);
+    REG_RSVD_U32N(5)
+    DEF_SPI_REG(MR0, 32, __IOM);
+    REG_RSVD_U32
+    DEF_SPI_REG(MR1, 32, __IOM);
+    DEF_SPI_REG(OCR, 32, __IOM);
+    REG_RSVD_U32
+    DEF_SPI_REG(ICR, 32, __IOM);
+    DEF_SPI_REG(TCR, 32, __IOM);
 } spi_reg_t;
 
 #ifdef __cplusplus

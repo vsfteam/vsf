@@ -111,10 +111,37 @@ struct vsf_usart_t {
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-extern vsf_usart_t vsf_usart0;
-extern vsf_usart_t vsf_usart1;
-#define APP_USART_DEMO_CFG_MODE                      (USART_8_BIT_LENGTH | USART_1_STOPBIT | USART_NONE_PARITY | USART_DBUFEN_RST)
-#define APP_USART_DEMO_CFG_USART                     vsf_usart1
+#if (USART_MAX_PORT > 0) && (VSF_HAL_USE_USART0 == ENABLED)
+    extern vsf_usart_t vsf_usart0;
+#endif
+
+#if (USART_MAX_PORT > 1) && (VSF_HAL_USE_USART1 == ENABLED)
+    extern vsf_usart_t vsf_usart1;
+#endif
+
+#if (USART_MAX_PORT > 2) && (VSF_HAL_USE_USART2 == ENABLED)
+    extern vsf_usart_t vsf_usart2;
+#endif
+
+#if (USART_MAX_PORT > 3) && (VSF_HAL_USE_USART3 == ENABLED)
+#   error "No instance can be used"
+#endif
+
+#if (USART_MAX_PORT > 4) && (VSF_HAL_USE_USART4 == ENABLED)
+#   error "No instance can be used"
+#endif
+
+#if (USART_MAX_PORT > 5) && (VSF_HAL_USE_USART5 == ENABLED)
+#   error "No instance can be used"
+#endif
+
+#if (USART_MAX_PORT > 6) && (VSF_HAL_USE_USART6 == ENABLED)
+#   error "No instance can be used"
+#endif
+
+#if (USART_MAX_PORT > 7) && (VSF_HAL_USE_USART7 == ENABLED)
+#   error "No instance can be used"
+#endif
 
 #endif
 /* EOF */

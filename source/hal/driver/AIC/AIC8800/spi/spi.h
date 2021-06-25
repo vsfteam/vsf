@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_NUVOTON_M480_SPI_H__
-#define __HAL_DRIVER_NUVOTON_M480_SPI_H__
+#ifndef __HAL_DRIVER_AIC8800_SPI_H__
+#define __HAL_DRIVER_AIC8800_SPI_H__
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
@@ -24,11 +24,6 @@
 #include "./i_reg_spi.h"
 #if VSF_HAL_USE_SPI == ENABLED
 /*============================ MACROS ========================================*/
-
-#ifndef SPI_AUTO_SLAVE_SELECTION_ENABLE
-#   define SPI_AUTO_SLAVE_SELECTION_ENABLE                  DISABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 typedef enum em_spi_irq_mask_t {
@@ -37,8 +32,24 @@ typedef enum em_spi_irq_mask_t {
 } em_spi_irq_mask_t;
 
 typedef enum em_spi_mode_t {
-    SPI_SLAVE                   = 0x00,             //!< select master mode
-    SPI_MASTER                  = BIT(0),           //!< select slave mode
+    SPI_SLAVE                               = 0x00,     //!< select master mode
+    SPI_MASTER                              = BIT(0),   //!< select slave mode
+
+    SPI_MODE_0                              = 0,
+    SPI_MODE_1                              = BIT(1),
+    SPI_MODE_2                              = BIT(2),
+    SPI_MODE_3                              = SPI_MODE_1 | SPI_MODE_2,
+
+    SPI_DATASIZE_8                          = 0, //todo
+
+    SPI_MSB_FIRST                           = 0,
+    SPI_LSB_FIRST                           = BIT(3),
+
+    SPI_AUTO_SLAVE_SELECTION_DISABLE        = 0,
+    SPI_AUTO_SLAVE_SELECTION_ENABLE         = BIT(4),
+
+    SPI_SLAVE_SELECTION_ACTIVE_LOW          = 0,
+    SPI_SLAVE_SELECTION_ACTIVE_HIGH         = BIT(5),
 } em_spi_mode_t;
 /*============================ INCLUDES ======================================*/
 
@@ -56,9 +67,20 @@ typedef struct vsf_spi_t {
     spi_cfg_t                   cfg;
     em_spi_irq_mask_t           irq_msk;
     spi_status_t                status;
+    struct {
+        uint32_t                count;
+        uint32_t                off_set_64;
+        struct {
+            void                *out_buff;
+            void                *in_buff;
+        } buff;
+    } __off_set;
     bool                        is_able;
+    bool                        is_busy;
 } vsf_spi_t;
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern vsf_spi_t vsf_spi0;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

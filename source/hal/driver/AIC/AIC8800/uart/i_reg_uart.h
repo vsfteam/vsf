@@ -26,12 +26,16 @@
  *!       a. stdint.h exists
  *!       b. anonymouse structures and unions are supported
  */
-#include "./i_reg_uart_base.h"
+#include "./utilities/compiler/__common/__type.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*============================ MACROS ========================================*/
+
+#ifndef __AIC8800_UART_USE_BIT_FIELD
+#   define __AIC8800_UART_USE_BIT_FIELD             ENABLED
+#endif
 
 #define UART0_BASE_ADDRESS                          (0x40041000ul)
 #define UART1_BASE_ADDRESS                          (0x40042000ul)
@@ -230,13 +234,18 @@ extern "C" {
 #define UART_DIV2_MSK                               ((reg32_t)(0xff << UART_DIV2))
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define DEF_UART_REG(__NAME, __TOTAL_SIZE, ...)                                 \
+#if __AIC8800_UART_USE_BIT_FIELD == ENABLED
+#   define DEF_UART_REG(__NAME, __TOTAL_SIZE, ...)                              \
     union {                                                                     \
         struct {                                                                \
             __VA_ARGS__                                                         \
         };                                                                      \
         reg##__TOTAL_SIZE##_t VALUE;                                            \
     } __NAME
+#else
+#   define DEF_UART_REG(__NAME, __TOTAL_SIZE, ...)                              \
+    __VA_ARGS__ reg##__TOTAL_SIZE##_t __NAME
+#endif
 /*============================ TYPES =========================================*/
 
 typedef struct uart_reg_t {
