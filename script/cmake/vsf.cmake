@@ -53,7 +53,7 @@ endif()
 # wrappers
 if(VSF_USE_LINUX AND VSF_LINUX_USE_SIMPLE_LIBC)
     include(${VSF_CMAKE_ROOT}/wrapper/vsf_linux_libc_wrapper.cmake)
-endif
+endif()
 
 include(${VSF_CMAKE_ROOT}/compilers.cmake)
 
