@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define sched_get_priority_max      __vsf_linux_sched_get_priority_max
 #define sched_get_priority_min      __vsf_linux_sched_get_priority_min
 #define sched_getparam              __vsf_linux_sched_getparam

@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define usleep              __vsf_linux_usleep
 #define sleep               __vsf_linux_sleep
 #define getpid              __vsf_linux_getpid

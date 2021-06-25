@@ -3,10 +3,10 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "../sys/types.h"
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   include "./stddef.h"
 #else
-#   include <sys/types.h>
+#   include <stddef.h>
 #endif
 
 //! \note libc belongs to compiler layer in utilities, so only include compiler.h
@@ -23,8 +23,8 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_LIBC_CFG_FAKE_API == ENABLED
-#define strdup              __vsf_linux_strdup
+#if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
+#define strdup              VSF_LINUX_LIBC_WRAPPER(strdup)
 #endif
 
 void * memset(void *s, int ch, size_t n);

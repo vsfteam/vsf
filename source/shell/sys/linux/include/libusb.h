@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_LIBUSB_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_LIBUSB_CFG_WRAPPER == ENABLED
 #define libusb_init                                     __vsf_libusb_init
 #define libusb_exit                                     __vsf_libusb_exit
 #define libusb_set_debug                                __vsf_libusb_set_debug

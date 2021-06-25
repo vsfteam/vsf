@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_SOCKET_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_SOCKET_CFG_WRAPPER == ENABLED
 #define inet_addr           __vsf_linux_inet_addr
 #define inet_lnaof          __vsf_linux_inet_lnaof
 #define inet_makeaddr       __vsf_linux_inet_makeaddr

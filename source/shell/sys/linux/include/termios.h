@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define tcgetattr   __vsf_linux_tcgetattr
 #define tcsetattr   __vsf_linux_tcsetattr
 #endif

@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define pthread_self                    __vsf_linux_pthread_self
 #define pthread_create                  __vsf_linux_pthread_create
 #define pthread_join                    __vsf_linux_pthread_join

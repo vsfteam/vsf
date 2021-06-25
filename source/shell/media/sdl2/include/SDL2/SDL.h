@@ -61,7 +61,7 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#if VSF_SDL_CFG_FAKE_API == ENABLED
+#if VSF_SDL_CFG_WRAPPER == ENABLED
 #define SDL_memset4                     __vsf_sdl2_memset4
 
 #define SDL_Init                        __vsf_sdl2_init
@@ -179,7 +179,7 @@ extern "C" {
 
 #define SDL_WM_SetCaption               __vsf_sdl_wm_set_caption
 #endif
-#endif      // VSF_SDL_CFG_FAKE_API
+#endif      // VSF_SDL_CFG_WRAPPER
 
 #define SDL_SemWait(__sem)              __vsf_sdl2_sem_wait((__sem), -1)
 #define SDL_SemWaitTimeout(__sem, __ms) __vsf_sdl2_sem_wait((__sem), (__ms))

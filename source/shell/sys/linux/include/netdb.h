@@ -73,7 +73,7 @@ struct servent {
     char                   *s_proto;
 };
 
-#if VSF_LINUX_SOCKET_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_SOCKET_CFG_WRAPPER == ENABLED
 #define getnameinfo         __vsf_linux_getnameinfo
 #define gethostbyaddr       __vsf_linux_gethostbyaddr
 #define gai_strerror        __vsf_linux_gai_strerror

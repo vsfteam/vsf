@@ -50,7 +50,7 @@ struct sockaddr_storage {
     char                sa_data[14];
 };
 
-#if VSF_LINUX_SOCKET_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_SOCKET_CFG_WRAPPER == ENABLED
 #define setsockopt      __vsf_linux_setsockopt
 #define getsockopt      __vsf_linux_getsockopt
 

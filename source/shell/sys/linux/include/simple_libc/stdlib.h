@@ -13,15 +13,15 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_LIBC_CFG_FAKE_API == ENABLED
-#define malloc              __vsf_linux_malloc
-#define aligned_alloc       __vsf_linux_aligned_alloc
-#define realloc             __vsf_linux_realloc
-#define free                __vsf_linux_free
-#define calloc              __vsf_linux_calloc
-#define memalign            __vsf_linux_memalign
-#define exit                __vsf_linux_exit
-#define atexit              __vsf_linux_atexit
+#if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
+#define malloc              VSF_LINUX_LIBC_WRAPPER(malloc)
+#define aligned_alloc       VSF_LINUX_LIBC_WRAPPER(aligned_alloc)
+#define realloc             VSF_LINUX_LIBC_WRAPPER(realloc)
+#define free                VSF_LINUX_LIBC_WRAPPER(free)
+#define calloc              VSF_LINUX_LIBC_WRAPPER(calloc)
+#define memalign            VSF_LINUX_LIBC_WRAPPER(memalign)
+#define exit                VSF_LINUX_LIBC_WRAPPER(exit)
+#define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
 #endif
 
 void * malloc(size_t size);

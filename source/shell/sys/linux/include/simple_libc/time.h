@@ -11,10 +11,10 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_LIBC_CFG_FAKE_API == ENABLED
-#define clock_gettime       __vsf_linux_clock_gettime
-#define nanosleep           __vsf_linux_nanosleep
-#define clock               __vsf_linux_clock
+#if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
+#define clock_gettime       VSF_LINUX_LIBC_WRAPPER(clock_gettime)
+#define nanosleep           VSF_LINUX_LIBC_WRAPPER(nanosleep)
+#define clock               VSF_LINUX_LIBC_WRAPPER(clock)
 #endif
 
 struct tm {

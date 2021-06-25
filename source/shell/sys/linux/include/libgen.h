@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_LIBGEN_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_LIBGEN_CFG_WRAPPER == ENABLED
 #define basename            __vsf_linux_basename
 #define dirname             __vsf_linux_dirname
 #endif

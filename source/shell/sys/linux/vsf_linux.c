@@ -845,8 +845,8 @@ int kill(pid_t pid, int sig)
     return -1;
 }
 
-#if !defined(__WIN__) || VSF_LINUX_CFG_FAKE_API == ENABLED
-// conflicts with signal in ucrt, need VSF_LINUX_CFG_FAKE_API
+#if !defined(__WIN__) || VSF_LINUX_CFG_WRAPPER == ENABLED
+// conflicts with signal in ucrt, need VSF_LINUX_CFG_WRAPPER
 sighandler_t signal(int signum, sighandler_t handler)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED

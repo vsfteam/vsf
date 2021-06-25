@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #   define select               __vsf_linux_select
 #endif
 

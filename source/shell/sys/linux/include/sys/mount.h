@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define mount               __vsf_linux_mount
 #define umount              __vsf_linux_umount
 #endif

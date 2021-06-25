@@ -3,11 +3,6 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "../sys/types.h"
-#else
-#   include <sys/types.h>
-#endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 #   include "./stddef.h"
 #else
@@ -32,41 +27,41 @@ extern "C" {
 #endif
 
 // in cstdio, common macro overrides will be undefined
-#if VSF_LINUX_LIBC_CFG_FAKE_API == ENABLED
-#define ferror              __vsf_linux_ferror
-#define clearerr            __vsf_linux_clearerr
-#define feof                __vsf_linux_feof
-#define getc                __vsf_linux_getc
-#define getchar             __vsf_linux_getchar
-#define putc                __vsf_linux_putc
-#define putchar             __vsf_linux_putchar
+#if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
+#define ferror              VSF_LINUX_LIBC_WRAPPER(ferror)
+#define clearerr            VSF_LINUX_LIBC_WRAPPER(clearerr)
+#define feof                VSF_LINUX_LIBC_WRAPPER(feof)
+#define getc                VSF_LINUX_LIBC_WRAPPER(getc)
+#define getchar             VSF_LINUX_LIBC_WRAPPER(getchar)
+#define putc                VSF_LINUX_LIBC_WRAPPER(putc)
+#define putchar             VSF_LINUX_LIBC_WRAPPER(putchar)
 
 
-#define fopen               __vsf_linux_fopen
-#define freopen             __vsf_linux_freopen
-#define fclose              __vsf_linux_fclose
-#define fseek               __vsf_linux_fseek
-#define fseeko              __vsf_linux_fseeko
-#define ftell               __vsf_linux_ftell
-#define ftello              __vsf_linux_ftello
-#define ftello64            __vsf_linux_ftello64
-#define rewind              __vsf_linux_rewind
-#define fwrite              __vsf_linux_fwrite
-#define fread               __vsf_linux_fread
-#define fflush              __vsf_linux_fflush
-#define fgets               __vsf_linux_fgets
-#define gets                __vsf_linux_gets
-#define fputs               __vsf_linux_fputs
-#define puts                __vsf_linux_puts
-#define printf              __vsf_linux_printf
-#define fprintf             __vsf_linux_fprintf
-#define fscanf              __vsf_linux_fscanf
-#define perror              __vsf_linux_perror
-#define setvbuf             __vsf_linux_setvbuf
-#define rename              __vsf_linux_rename
+#define fopen               VSF_LINUX_LIBC_WRAPPER(fopen)
+#define freopen             VSF_LINUX_LIBC_WRAPPER(freopen)
+#define fclose              VSF_LINUX_LIBC_WRAPPER(fclose)
+#define fseek               VSF_LINUX_LIBC_WRAPPER(fseek)
+#define fseeko              VSF_LINUX_LIBC_WRAPPER(fseeko)
+#define ftell               VSF_LINUX_LIBC_WRAPPER(ftell)
+#define ftello              VSF_LINUX_LIBC_WRAPPER(ftello)
+#define ftello64            VSF_LINUX_LIBC_WRAPPER(ftello64)
+#define rewind              VSF_LINUX_LIBC_WRAPPER(rewind)
+#define fwrite              VSF_LINUX_LIBC_WRAPPER(fwrite)
+#define fread               VSF_LINUX_LIBC_WRAPPER(fread)
+#define fflush              VSF_LINUX_LIBC_WRAPPER(fflush)
+#define fgets               VSF_LINUX_LIBC_WRAPPER(fgets)
+#define gets                VSF_LINUX_LIBC_WRAPPER(gets)
+#define fputs               VSF_LINUX_LIBC_WRAPPER(fputs)
+#define puts                VSF_LINUX_LIBC_WRAPPER(puts)
+#define printf              VSF_LINUX_LIBC_WRAPPER(printf)
+#define fprintf             VSF_LINUX_LIBC_WRAPPER(fprintf)
+#define fscanf              VSF_LINUX_LIBC_WRAPPER(fscanf)
+#define perror              VSF_LINUX_LIBC_WRAPPER(perror)
+#define setvbuf             VSF_LINUX_LIBC_WRAPPER(setvbuf)
+#define rename              VSF_LINUX_LIBC_WRAPPER(rename)
 
-#define tmpfile             __vsf_linux_tmpfile
-#define tmpnam              __vsf_linux_tmpnam
+#define tmpfile             VSF_LINUX_LIBC_WRAPPER(tmpfile)
+#define tmpnam              VSF_LINUX_LIBC_WRAPPER(tmpnam)
 
 #define stdin               __vsf_linux_stdin
 #define stdout              __vsf_linux_stdout

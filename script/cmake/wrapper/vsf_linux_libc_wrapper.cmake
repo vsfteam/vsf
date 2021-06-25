@@ -1,0 +1,3 @@
+set(VSF_LINUX_LIBC_WRAPPER_LIST
+    ""
+)

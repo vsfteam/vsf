@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define stat            __vsf_linux_stat
 #define fstat           __vsf_linux_fstat
 #endif

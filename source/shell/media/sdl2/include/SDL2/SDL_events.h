@@ -41,7 +41,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#if VSF_SDL_CFG_FAKE_API == ENABLED
+#if VSF_SDL_CFG_WRAPPER == ENABLED
 #define SDL_PollEvent                   __vsf_sdl2_poll_event
 #define SDL_WaitEventTimeout            __vsf_sdl2_wait_event_timeout
 #define SDL_WaitEvent                   __vsf_sdl2_wait_event

@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define sem_init            __vsf_linux_sem_init
 #define sem_destory         __vsf_linux_sem_destory
 #define sem_wait            __vsf_linux_sem_wait

@@ -35,7 +35,7 @@ struct ipc_perm {
     unsigned short          seq;
 };
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define ftok                __vsf_linux_ftok
 #endif
 

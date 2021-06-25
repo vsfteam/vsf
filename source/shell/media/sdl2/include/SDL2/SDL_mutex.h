@@ -36,7 +36,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#if VSF_SDL_CFG_FAKE_API == ENABLED
+#if VSF_SDL_CFG_WRAPPER == ENABLED
 #define SDL_CreateMutex                 __vsf_sdl2_create_mutex
 #define SDL_DestroyMutex                __vsf_sdl2_destroy_mutex
 #define SDL_TryLockMutex                __vsf_sdl2_try_lock_mutex

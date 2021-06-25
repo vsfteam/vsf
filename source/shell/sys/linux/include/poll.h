@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_CFG_FAKE_API == ENABLED
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define poll            __vsf_linux_poll
 #define ppoll           __vsf_linux_ppoll
 #endif
