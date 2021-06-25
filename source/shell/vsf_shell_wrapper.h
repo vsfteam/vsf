@@ -15,35 +15,24 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __VSF_SHELL_WRAPPER_H__
+#define __VSF_SHELL_WRAPPER_H__
+
 /*============================ INCLUDES ======================================*/
-
-//! \note do not move this pre-processor statement to other places
-#include "vsf_cfg.h"
-
-#ifndef __VSF_SDL2_CFG_H__
-#define __VSF_SDL2_CFG_H__
-
-#include "shell/vsf_shell_wrapper.h"
-
 /*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
 
-#ifndef VSF_SDL2_ASSERT
-#   define VSF_SDL2_ASSERT              VSF_ASSERT
+#ifdef COMPILER_WRAPPER
+#   define VSF_SHELL_WRAPPER(__header, __api)       COMPILER_WRAPPER(__api)
+#else
+#   define __VSF_SHELL_API_NAME(__header, __api)    __ ## header ## _ ## __api
+#   define VSF_SHELL_WRAPPER(__header, __api)       __VSF_SHELL_API_NAME(__header, __api)
 #endif
 
-#define VSF_SDL_WRAPPER(__api)          VSF_SHELL_WRAPPER(vsf_sdl2, __api)
-
-// enable libpng support for SDL_image
-#define LOAD_PNG
-#define LOAD_JPG
-
-/*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-
-#endif
+#endif      // __VSF_SHELL_WRAPPER_H__
 /* EOF */

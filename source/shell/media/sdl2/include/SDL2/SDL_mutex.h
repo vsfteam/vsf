@@ -37,11 +37,11 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SDL_CFG_WRAPPER == ENABLED
-#define SDL_CreateMutex                 __vsf_sdl2_create_mutex
-#define SDL_DestroyMutex                __vsf_sdl2_destroy_mutex
-#define SDL_TryLockMutex                __vsf_sdl2_try_lock_mutex
-#define SDL_LockMutex                   __vsf_sdl2_lock_mutex
-#define SDL_UnlockMutex                 __vsf_sdl2_unlock_mutex
+#define SDL_CreateMutex                 VSF_SDL_WRAPPER(SDL_CreateMutex)
+#define SDL_DestroyMutex                VSF_SDL_WRAPPER(SDL_DestroyMutex)
+#define SDL_TryLockMutex                VSF_SDL_WRAPPER(SDL_TryLockMutex)
+#define SDL_LockMutex                   VSF_SDL_WRAPPER(SDL_LockMutex)
+#define SDL_UnlockMutex                 VSF_SDL_WRAPPER(SDL_UnlockMutex)
 #endif
 
 /*============================ TYPES =========================================*/

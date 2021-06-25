@@ -19,8 +19,8 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define poll            __vsf_linux_poll
-#define ppoll           __vsf_linux_ppoll
+#define poll            VSF_LINUX_WRAPPER(poll)
+#define ppoll           VSF_LINUX_WRAPPER(ppoll)
 #endif
 
 typedef int nfds_t;

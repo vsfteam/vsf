@@ -14,16 +14,16 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define kill                __vsf_linux_kill
-#define signal              __vsf_linux_signal
-#define sigprocmask         __vsf_linux_sigprocmask
+#define kill                VSF_LINUX_WRAPPER(kill)
+#define signal              VSF_LINUX_WRAPPER(signal)
+#define sigprocmask         VSF_LINUX_WRAPPER(sigprocmask)
 
-#define sigemptyset         __vsf_linux_sigemptyset
-#define sigfillset          __vsf_linux_sigfillset
-#define sigaddsetmask       __vsf_linux_sigaddsetmask
-#define sigdelsetmask       __vsf_linux_sigdelsetmask
-#define sigtestsetmask      __vsf_linux_sigtestsetmask
-#define pthread_sigmask     __vsf_linux_pthread_sigmask
+#define sigemptyset         VSF_LINUX_WRAPPER(sigemptyset)
+#define sigfillset          VSF_LINUX_WRAPPER(sigfillset)
+#define sigaddsetmask       VSF_LINUX_WRAPPER(sigaddsetmask)
+#define sigdelsetmask       VSF_LINUX_WRAPPER(sigdelsetmask)
+#define sigtestsetmask      VSF_LINUX_WRAPPER(sigtestsetmask)
+#define pthread_sigmask     VSF_LINUX_WRAPPER(pthread_sigmask)
 #endif
 
 #define _NSIG           32

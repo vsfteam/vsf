@@ -1,13 +1,15 @@
 #ifndef __VSF_LINUX_TERMIOS_H__
 #define __VSF_LINUX_TERMIOS_H__
 
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define tcgetattr   __vsf_linux_tcgetattr
-#define tcsetattr   __vsf_linux_tcsetattr
+#define tcgetattr   VSF_LINUX_WRAPPER(tcgetattr)
+#define tcsetattr   VSF_LINUX_WRAPPER(tcsetattr)
 #endif
 
 typedef unsigned int tcflag_t;

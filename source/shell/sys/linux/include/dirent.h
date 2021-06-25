@@ -14,9 +14,9 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define opendir         __vsf_linux_opendir
-#define readdir         __vsf_linux_readdir
-#define closedir        __vsf_linux_closedir
+#define opendir         VSF_LINUX_WRAPPER(opendir)
+#define readdir         VSF_LINUX_WRAPPER(readdir)
+#define closedir        VSF_LINUX_WRAPPER(closedir)
 #endif
 
 struct dirent {

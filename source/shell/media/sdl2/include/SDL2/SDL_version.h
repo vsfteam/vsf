@@ -48,7 +48,7 @@ extern "C" {
 
 
 #if VSF_SDL_CFG_WRAPPER == ENABLED
-#define SDL_Linked_Version                  __vsf_sdl2_linked_version
+#define SDL_Linked_Version                  VSF_SDL_WRAPPER(SDL_Linked_Version)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

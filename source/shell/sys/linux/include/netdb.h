@@ -74,12 +74,12 @@ struct servent {
 };
 
 #if VSF_LINUX_SOCKET_CFG_WRAPPER == ENABLED
-#define getnameinfo         __vsf_linux_getnameinfo
-#define gethostbyaddr       __vsf_linux_gethostbyaddr
-#define gai_strerror        __vsf_linux_gai_strerror
-#define gethostbyname       __vsf_linux_gethostbyname
-#define getaddrinfo         __vsf_linux_getaddrinfo
-#define freeaddrinfo        __vsf_linux_freeaddrinfo
+#define getnameinfo         VSF_LINUX_SOCKET_WRAPPER(getnameinfo)
+#define gethostbyaddr       VSF_LINUX_SOCKET_WRAPPER(gethostbyaddr)
+#define gai_strerror        VSF_LINUX_SOCKET_WRAPPER(gai_strerror)
+#define gethostbyname       VSF_LINUX_SOCKET_WRAPPER(gethostbyname)
+#define getaddrinfo         VSF_LINUX_SOCKET_WRAPPER(getaddrinfo)
+#define freeaddrinfo        VSF_LINUX_SOCKET_WRAPPER(freeaddrinfo)
 #endif
 
 struct hostent * gethostbyaddr(const void *addr, size_t len, int type);

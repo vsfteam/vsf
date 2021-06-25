@@ -1,12 +1,14 @@
 #ifndef __VSF_LINUX_FCNTL_H__
 #define __VSF_LINUX_FCNTL_H__
 
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define fcntl           __vsf_linux_fcntl
+#define fcntl           VSF_LINUX_WRAPPER(fcntl)
 #endif
 
 #define O_RDONLY        0x0000

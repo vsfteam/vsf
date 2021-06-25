@@ -9,6 +9,8 @@
 #   include <sys/types.h>
 #endif
 
+#define VSF_LINUX_LIBC_WRAPPER(__api)   VSF_SHELL_WRAPPER(vsf_linux_libc, __api)
+
 // define wchar_t and wint_t before include vsf_utilities.h
 // because vsf_utilities will include other c headers which will require wchar_t
 #if     !defined(__cplusplus)

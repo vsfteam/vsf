@@ -15,14 +15,14 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define sem_init            __vsf_linux_sem_init
-#define sem_destory         __vsf_linux_sem_destory
-#define sem_wait            __vsf_linux_sem_wait
-#define sem_trywait         __vsf_linux_sem_trywait
+#define sem_init            VSF_LINUX_WRAPPER(sem_init)
+#define sem_destory         VSF_LINUX_WRAPPER(sem_destory)
+#define sem_wait            VSF_LINUX_WRAPPER(sem_wait)
+#define sem_trywait         VSF_LINUX_WRAPPER(sem_trywait)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   define sem_timedwait    __vsf_linux_sem_timedwait
+#   define sem_timedwait    VSF_LINUX_WRAPPER(sem_timedwait)
 #endif
-#define sem_post            __vsf_linux_sem_post
+#define sem_post            VSF_LINUX_WRAPPER(sem_post)
 #endif
 
 typedef vsf_sem_t sem_t;

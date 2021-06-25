@@ -62,122 +62,122 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SDL_CFG_WRAPPER == ENABLED
-#define SDL_memset4                     __vsf_sdl2_memset4
+#define SDL_memset4                     VSF_SDL_WRAPPER(SDL_memset4)
 
-#define SDL_Init                        __vsf_sdl2_init
-#define SDL_InitSubSystem               __vsf_sdl2_init_subsystem
-#define SDL_Quit                        __vsf_sdl2_quit
-#define SDL_GetPlatform                 __vsf_sdl2_get_platform
+#define SDL_Init                        VSF_SDL_WRAPPER(SDL_Init)
+#define SDL_InitSubSystem               VSF_SDL_WRAPPER(SDL_InitSubSystem)
+#define SDL_Quit                        VSF_SDL_WRAPPER(SDL_Quit)
+#define SDL_GetPlatform                 VSF_SDL_WRAPPER(SDL_GetPlatform)
 
-#define SDL_SetError                    __vsf_sdl2_set_error
-#define SDL_GetError                    __vsf_sdl2_get_error
+#define SDL_SetError                    VSF_SDL_WRAPPER(SDL_SetError)
+#define SDL_GetError                    VSF_SDL_WRAPPER(SDL_GetError)
 
-#define SDL_CreateWindow                __vsf_sdl2_create_window
-#define SDL_DestroyWindow               __vsf_sdl2_destroy_window
-#define SDL_GetWindowPosition           __vsf_sdl2_get_window_position
-#define SDL_GetWindowSurface            __vsf_sdl2_get_window_surface
-#define SDL_GetWindowSize               __vsf_sdl2_get_window_size
-#define SDL_UpdateWindowSurface         __vsf_sdl2_update_window_surface
-#define SDL_UpdateWindowSurfaceRects    __vsf_sdl2_update_window_surface_rects
-#define SDL_ShowWindow                  __vsf_sdl2_show_window
-#define SDL_SetWindowIcon               __vsf_sdl2_set_window_icon
-#define SDL_SetWindowTitle              __vsf_sdl2_set_window_title
-#define SDL_SetWindowFullscreen         __vsf_sdl2_set_window_full_screen
-#define SDL_RestoreWindow               __vsf_sdl2_restore_window
-#define SDL_MaximizeWindow              __vsf_sdl2_maximize_window
-#define SDL_GetWindowFlags              __vsf_sdl2_get_window_flags
+#define SDL_CreateWindow                VSF_SDL_WRAPPER(SDL_CreateWindow)
+#define SDL_DestroyWindow               VSF_SDL_WRAPPER(SDL_DestroyWindow)
+#define SDL_GetWindowPosition           VSF_SDL_WRAPPER(SDL_GetWindowPosition)
+#define SDL_GetWindowSurface            VSF_SDL_WRAPPER(SDL_GetWindowSurface)
+#define SDL_GetWindowSize               VSF_SDL_WRAPPER(SDL_GetWindowSize)
+#define SDL_UpdateWindowSurface         VSF_SDL_WRAPPER(SDL_UpdateWindowSurface)
+#define SDL_UpdateWindowSurfaceRects    VSF_SDL_WRAPPER(SDL_UpdateWindowSurfaceRects)
+#define SDL_ShowWindow                  VSF_SDL_WRAPPER(SDL_ShowWindow)
+#define SDL_SetWindowIcon               VSF_SDL_WRAPPER(SDL_SetWindowIcon)
+#define SDL_SetWindowTitle              VSF_SDL_WRAPPER(SDL_SetWindowTitle)
+#define SDL_SetWindowFullscreen         VSF_SDL_WRAPPER(SDL_SetWindowFullscreen)
+#define SDL_RestoreWindow               VSF_SDL_WRAPPER(SDL_RestoreWindow)
+#define SDL_MaximizeWindow              VSF_SDL_WRAPPER(SDL_MaximizeWindow)
+#define SDL_GetWindowFlags              VSF_SDL_WRAPPER(SDL_GetWindowFlags)
 
-#define SDL_GetDesktopDisplayMode       __vsf_sdl2_get_desktop_display_mode
-#define SDL_GetCurrentDisplayMode       __vsf_sdl2_get_current_display_mode
+#define SDL_GetDesktopDisplayMode       VSF_SDL_WRAPPER(SDL_GetDesktopDisplayMode)
+#define SDL_GetCurrentDisplayMode       VSF_SDL_WRAPPER(SDL_GetCurrentDisplayMode)
 
-#define SDL_CreateRGBSurface                __vsf_sdl2_create_rgb_surface
-#define SDL_CreateRGBSurfaceWithFormat      __vsf_sdl2_create_rgb_surface_with_format
-#define SDL_CreateRGBSurfaceWithFormatFrom  __vsf_sdl2_create_rgb_surface_with_format_from
-#define SDL_CreateRGBSurfaceFrom        __vsf_sdl2_create_rgb_surface_from
-#define SDL_FreeSurface                 __vsf_sdl2_free_surface
-#define SDL_LockSurface                 __vsf_sdl2_lock_surface
-#define SDL_UnlockSurface               __vsf_sdl2_unlock_surface
-#define SDL_SetSurfaceBlendMode         __vsf_sdl2_set_surface_blend_mode
-#define SDL_SetColorKey                 __vsf_sdl2_set_color_key
-#define SDL_FillRect                    __vsf_sdl2_fill_rect
-#define SDL_BlitSurface                 __vsf_sdl2_blit_surface
-#define SDL_ConvertSurfaceFormat        __vsf_sdl2_convert_surface_format
+#define SDL_CreateRGBSurface                VSF_SDL_WRAPPER(SDL_CreateRGBSurface)
+#define SDL_CreateRGBSurfaceWithFormat      VSF_SDL_WRAPPER(SDL_CreateRGBSurfaceWithFormat)
+#define SDL_CreateRGBSurfaceWithFormatFrom  VSF_SDL_WRAPPER(SDL_CreateRGBSurfaceWithFormatFrom)
+#define SDL_CreateRGBSurfaceFrom        VSF_SDL_WRAPPER(SDL_CreateRGBSurfaceFrom)
+#define SDL_FreeSurface                 VSF_SDL_WRAPPER(SDL_FreeSurface)
+#define SDL_LockSurface                 VSF_SDL_WRAPPER(SDL_LockSurface)
+#define SDL_UnlockSurface               VSF_SDL_WRAPPER(SDL_UnlockSurface)
+#define SDL_SetSurfaceBlendMode         VSF_SDL_WRAPPER(SDL_SetSurfaceBlendMode)
+#define SDL_SetColorKey                 VSF_SDL_WRAPPER(SDL_SetColorKey)
+#define SDL_FillRect                    VSF_SDL_WRAPPER(SDL_FillRect)
+#define SDL_BlitSurface                 VSF_SDL_WRAPPER(SDL_BlitSurface)
+#define SDL_ConvertSurfaceFormat        VSF_SDL_WRAPPER(SDL_ConvertSurfaceFormat)
 
-#define SDL_CreateRenderer              __vsf_sdl2_create_renderer
-#define SDL_DestroyRenderer             __vsf_sdl2_destroy_renderer
-#define SDL_RenderClear                 __vsf_sdl2_render_clear
-#define SDL_RenderCopy                  __vsf_sdl2_render_copy
-#define SDL_RenderPresent               __vsf_sdl2_render_present
-#define SDL_SetRenderDrawColor          __vsf_sdl2_set_render_draw_color
-#define SDL_RenderDrawPoint             __vsf_sdl2_render_point
+#define SDL_CreateRenderer              VSF_SDL_WRAPPER(SDL_CreateRenderer)
+#define SDL_DestroyRenderer             VSF_SDL_WRAPPER(SDL_DestroyRenderer)
+#define SDL_RenderClear                 VSF_SDL_WRAPPER(SDL_RenderClear)
+#define SDL_RenderCopy                  VSF_SDL_WRAPPER(SDL_RenderCopy)
+#define SDL_RenderPresent               VSF_SDL_WRAPPER(SDL_RenderPresent)
+#define SDL_SetRenderDrawColor          VSF_SDL_WRAPPER(SDL_SetRenderDrawColor)
+#define SDL_RenderDrawPoint             VSF_SDL_WRAPPER(SDL_RenderDrawPoint)
 #define SDL_RenderSetLogicalSize(...)
 
-#define SDL_CreateTexture               __vsf_sdl2_create_texture
-#define SDL_CreateTextureFromSurface    __vsf_sdl2_create_texture_from_surface
-#define SDL_UpdateTexture               __vsf_sdl2_update_texture
-#define SDL_DestroyTexture              __vsf_sdl2_destroy_texture
-#define SDL_LockTexture                 __vsf_sdl2_lock_texture
-#define SDL_UnlockTexture               __vsf_sdl2_unlock_texture
+#define SDL_CreateTexture               VSF_SDL_WRAPPER(SDL_CreateTexture)
+#define SDL_CreateTextureFromSurface    VSF_SDL_WRAPPER(SDL_CreateTextureFromSurface)
+#define SDL_UpdateTexture               VSF_SDL_WRAPPER(SDL_UpdateTexture)
+#define SDL_DestroyTexture              VSF_SDL_WRAPPER(SDL_DestroyTexture)
+#define SDL_LockTexture                 VSF_SDL_WRAPPER(SDL_LockTexture)
+#define SDL_UnlockTexture               VSF_SDL_WRAPPER(SDL_UnlockTexture)
 
-#define SDL_MapRGBA                     __vsf_sdl2_map_rgba
-#define SDL_MapRGB                      __vsf_sdl2_map_rgb
+#define SDL_MapRGBA                     VSF_SDL_WRAPPER(SDL_MapRGBA)
+#define SDL_MapRGB                      VSF_SDL_WRAPPER(SDL_MapRGB)
 
-#define SDL_CreateSemaphore             __vsf_sdl2_create_sem
-#define SDL_DestroySemaphore            __vsf_sdl2_destroy_sem
-#define SDL_SemPost                     __vsf_sdl2_sem_post
+#define SDL_CreateSemaphore             VSF_SDL_WRAPPER(SDL_CreateSemaphore)
+#define SDL_DestroySemaphore            VSF_SDL_WRAPPER(SDL_DestroySemaphore)
+#define SDL_SemPost                     VSF_SDL_WRAPPER(SDL_SemPost)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   define SDL_Delay                    __vsf_sdl2_delay
-#   define SDL_GetTicks                 __vsf_sdl2_get_ticks
+#   define SDL_Delay                    VSF_SDL_WRAPPER(SDL_Delay)
+#   define SDL_GetTicks                 VSF_SDL_WRAPPER(SDL_GetTicks)
 #endif
 
-#define SDL_GetDisplayDPI               __vsf_sdl2_get_display_dpi
-#define SDL_EnableScreenSaver           __vsf_sdl2_enable_screen_saver
-#define SDL_HasClipboardText            __vsf_sdl2_has_clipboard_text
-#define SDL_GetClipboardText            __vsf_sdl2_get_clipboard_text
-#define SDL_SetClipboardText            __vsf_sdl2_set_clipboard_text
-#define SDL_GetPerformanceCounter       __vsf_sdl2_get_performance_counter
-#define SDL_GetPerformanceFrequency     __vsf_sdl2_get_performance_frequency
+#define SDL_GetDisplayDPI               VSF_SDL_WRAPPER(SDL_GetDisplayDPI)
+#define SDL_EnableScreenSaver           VSF_SDL_WRAPPER(SDL_EnableScreenSaver)
+#define SDL_HasClipboardText            VSF_SDL_WRAPPER(SDL_HasClipboardText)
+#define SDL_GetClipboardText            VSF_SDL_WRAPPER(SDL_GetClipboardText)
+#define SDL_SetClipboardText            VSF_SDL_WRAPPER(SDL_SetClipboardText)
+#define SDL_GetPerformanceCounter       VSF_SDL_WRAPPER(SDL_GetPerformanceCounter)
+#define SDL_GetPerformanceFrequency     VSF_SDL_WRAPPER(SDL_GetPerformanceFrequency)
 
-#define SDL_OpenAudio                   __vsf_sdl2_open_audio
-#define SDL_PauseAudio                  __vsf_sdl2_pause_audio
-#define SDL_GetAudioStatus              __vsf_sdl2_get_audio_status
-#define SDL_CloseAudio                  __vsf_sdl2_close_audio
+#define SDL_OpenAudio                   VSF_SDL_WRAPPER(SDL_OpenAudio)
+#define SDL_PauseAudio                  VSF_SDL_WRAPPER(SDL_PauseAudio)
+#define SDL_GetAudioStatus              VSF_SDL_WRAPPER(SDL_GetAudioStatus)
+#define SDL_CloseAudio                  VSF_SDL_WRAPPER(SDL_CloseAudio)
 
-#define SDL_CreateCursor                __vsf_sdl2_create_cursor
-#define SDL_CreateColorCursor           __vsf_sdl2_create_color_curosr
-#define SDL_CreateSystemCursor          __vsf_sdl2_create_system_cursor
-#define SDL_SetCursor                   __vsf_sdl2_set_curser
-#define SDL_GetCursor                   __vsf_sdl2_get_cursor
-#define SDL_GetDefaultCursor            __vsf_sdl2_get_default_cursor
-#define SDL_FreeCursor                  __vsf_sdl2_free_curser
-#define SDL_ShowCursor                  __vsf_sdl2_show_curser
+#define SDL_CreateCursor                VSF_SDL_WRAPPER(SDL_CreateCursor)
+#define SDL_CreateColorCursor           VSF_SDL_WRAPPER(SDL_CreateColorCursor)
+#define SDL_CreateSystemCursor          VSF_SDL_WRAPPER(SDL_CreateSystemCursor)
+#define SDL_SetCursor                   VSF_SDL_WRAPPER(SDL_SetCursor)
+#define SDL_GetCursor                   VSF_SDL_WRAPPER(SDL_GetCursor)
+#define SDL_GetDefaultCursor            VSF_SDL_WRAPPER(SDL_GetDefaultCursor)
+#define SDL_FreeCursor                  VSF_SDL_WRAPPER(SDL_FreeCursor)
+#define SDL_ShowCursor                  VSF_SDL_WRAPPER(SDL_ShowCursor)
 
-#define SDL_GetKeyName                  __vsf_sdl2_get_key_name
+#define SDL_GetKeyName                  VSF_SDL_WRAPPER(SDL_GetKeyName)
 
-#define SDL_NumJoysticks                __vsf_sdl2_num_joysticks
-#define SDL_JoystickOpen                __vsf_sdl2_joystick_open
-#define SDL_JoystickClose               __vsf_sdl2_joystick_close
-#define SDL_JoystickNumButtons          __vsf_sdl2_joystick_num_buttons
-#define SDL_JoystickNumAxes             __vsf_sdl2_joystick_num_axes
-#define SDL_JoystickNumBalls            __vsf_sdl2_joystick_num_balls
-#define SDL_JoystickNumHats             __vsf_sdl2_joystick_num_hats
-#define SDL_JoystickEventState          __vsf_sdl2_joystick_event_state
+#define SDL_NumJoysticks                VSF_SDL_WRAPPER(SDL_NumJoysticks)
+#define SDL_JoystickOpen                VSF_SDL_WRAPPER(SDL_JoystickOpen)
+#define SDL_JoystickClose               VSF_SDL_WRAPPER(SDL_JoystickClose)
+#define SDL_JoystickNumButtons          VSF_SDL_WRAPPER(SDL_JoystickNumButtons)
+#define SDL_JoystickNumAxes             VSF_SDL_WRAPPER(SDL_JoystickNumAxes)
+#define SDL_JoystickNumBalls            VSF_SDL_WRAPPER(SDL_JoystickNumBalls)
+#define SDL_JoystickNumHats             VSF_SDL_WRAPPER(SDL_JoystickNumHats)
+#define SDL_JoystickEventState          VSF_SDL_WRAPPER(SDL_JoystickEventState)
 
-#define SDL_CaptureMouse                __vsf_sdl2_capture_mouse
-#define SDL_GetGlobalMouseState         __vsf_sdl2_get_global_mouse_state
+#define SDL_CaptureMouse                VSF_SDL_WRAPPER(SDL_CaptureMouse)
+#define SDL_GetGlobalMouseState         VSF_SDL_WRAPPER(SDL_GetGlobalMouseState)
 
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
-#define SDL_CreateYUVOverlay            __vsf_sdl_create_yuv_overlay
-#define SDL_FreeYUVOverlay              __vsf_sdl_free_yuv_overlay
-#define SDL_LockYUVOverlay              __vsf_sdl_lock_yuv_overlay
-#define SDL_UnlockYUVOverlay            __vsf_sdl_unlock_yuv_overlay
-#define SDL_DisplayYUVOverlay           __vsf_sdl_display_yuv_overlay
+#define SDL_CreateYUVOverlay            VSF_SDL_WRAPPER(SDL_CreateYUVOverlay)
+#define SDL_FreeYUVOverlay              VSF_SDL_WRAPPER(SDL_FreeYUVOverlay)
+#define SDL_LockYUVOverlay              VSF_SDL_WRAPPER(SDL_LockYUVOverlay)
+#define SDL_UnlockYUVOverlay            VSF_SDL_WRAPPER(SDL_UnlockYUVOverlay)
+#define SDL_DisplayYUVOverlay           VSF_SDL_WRAPPER(SDL_DisplayYUVOverlay)
 
-#define SDL_SetVideoMode                __vsf_sdl_set_video_mode
-#define SDL_Flip                        __vsf_sdl_flip
+#define SDL_SetVideoMode                VSF_SDL_WRAPPER(SDL_SetVideoMode)
+#define SDL_Flip                        VSF_SDL_WRAPPER(SDL_Flip)
 
-#define SDL_WM_SetCaption               __vsf_sdl_wm_set_caption
+#define SDL_WM_SetCaption               VSF_SDL_WRAPPER(SDL_WM_SetCaption)
 #endif
 #endif      // VSF_SDL_CFG_WRAPPER
 

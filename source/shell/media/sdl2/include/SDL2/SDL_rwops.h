@@ -36,13 +36,13 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SDL_CFG_WRAPPER == ENABLED
-#define SDL_RWFromFile                  __vsf_sdl2_rw_from_file
-#define SDL_RWsize                      __vsf_sdl2_rw_size
-#define SDL_RWclose                     __vsf_sdl2_rw_close
-#define SDL_RWseek                      __vsf_sdl2_rw_seek
-#define SDL_RWtell                      __vsf_sdl2_rw_tell
-#define SDL_RWread                      __vsf_sdl2_rw_read
-#define SDL_RWwrite                     __vsf_sdl2_rw_write
+#define SDL_RWFromFile                  VSF_SDL_WRAPPER(SDL_RWFromFile)
+#define SDL_RWsize                      VSF_SDL_WRAPPER(SDL_RWsize)
+#define SDL_RWclose                     VSF_SDL_WRAPPER(SDL_RWclose)
+#define SDL_RWseek                      VSF_SDL_WRAPPER(SDL_RWseek)
+#define SDL_RWtell                      VSF_SDL_WRAPPER(SDL_RWtell)
+#define SDL_RWread                      VSF_SDL_WRAPPER(SDL_RWread)
+#define SDL_RWwrite                     VSF_SDL_WRAPPER(SDL_RWwrite)
 #endif
 
 /*============================ TYPES =========================================*/

@@ -42,11 +42,11 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SDL_CFG_WRAPPER == ENABLED
-#define SDL_PollEvent                   __vsf_sdl2_poll_event
-#define SDL_WaitEventTimeout            __vsf_sdl2_wait_event_timeout
-#define SDL_WaitEvent                   __vsf_sdl2_wait_event
-#define SDL_FlushEvent                  __vsf_sdl2_flush_event
-#define SDL_EventState                  __vsf_sdl2_event_state
+#define SDL_PollEvent                   VSF_SDL_WRAPPER(SDL_PollEvent)
+#define SDL_WaitEventTimeout            VSF_SDL_WRAPPER(SDL_WaitEventTimeout)
+#define SDL_WaitEvent                   VSF_SDL_WRAPPER(SDL_WaitEvent)
+#define SDL_FlushEvent                  VSF_SDL_WRAPPER(SDL_FlushEvent)
+#define SDL_EventState                  VSF_SDL_WRAPPER(SDL_EventState)
 #endif
 
 /*============================ MACROS ========================================*/

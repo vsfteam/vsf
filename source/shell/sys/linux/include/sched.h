@@ -15,12 +15,12 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define sched_get_priority_max      __vsf_linux_sched_get_priority_max
-#define sched_get_priority_min      __vsf_linux_sched_get_priority_min
-#define sched_getparam              __vsf_linux_sched_getparam
-#define sched_getscheduler          __vsf_linux_sched_getscheduler
-#define sched_setparam              __vsf_linux_sched_setparam
-#define sched_yield                 __vsf_linux_sched_yield
+#define sched_get_priority_max      VSF_LINUX_WRAPPER(sched_get_priority_max)
+#define sched_get_priority_min      VSF_LINUX_WRAPPER(sched_get_priority_min)
+#define sched_getparam              VSF_LINUX_WRAPPER(sched_getparam)
+#define sched_getscheduler          VSF_LINUX_WRAPPER(sched_getscheduler)
+#define sched_setparam              VSF_LINUX_WRAPPER(sched_setparam)
+#define sched_yield                 VSF_LINUX_WRAPPER(sched_yield)
 #endif
 
 enum {

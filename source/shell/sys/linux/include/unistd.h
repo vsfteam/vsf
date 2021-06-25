@@ -20,39 +20,40 @@
 #include "vsf.h"
 #include "../vsf_linux.h"
 #include "../port/busybox/busybox.h"
+#include "shell/sys/linux/vsf_linux_cfg.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define usleep              __vsf_linux_usleep
-#define sleep               __vsf_linux_sleep
-#define getpid              __vsf_linux_getpid
-#define getppid             __vsf_linux_getppid
-#define execl               __vsf_linux_execl
-#define execv               __vsf_linux_execv
-#define system              __vsf_linux_system
-#define realpath            __vsf_linux_realpath
-#define sysconf             __vsf_linux_sysconf
-#define pipe                __vsf_linux_pipe
-#define alarm               __vsf_linux_alarm
+#define usleep              VSF_LINUX_WRAPPER(usleep)
+#define sleep               VSF_LINUX_WRAPPER(sleep)
+#define getpid              VSF_LINUX_WRAPPER(getpid)
+#define getppid             VSF_LINUX_WRAPPER(getppid)
+#define execl               VSF_LINUX_WRAPPER(execl)
+#define execv               VSF_LINUX_WRAPPER(execv)
+#define system              VSF_LINUX_WRAPPER(system)
+#define realpath            VSF_LINUX_WRAPPER(realpath)
+#define sysconf             VSF_LINUX_WRAPPER(sysconf)
+#define pipe                VSF_LINUX_WRAPPER(pipe)
+#define alarm               VSF_LINUX_WRAPPER(alarm)
 
 #if __IS_COMPILER_IAR__
 #else
-#   define creat            __vsf_linux_creat
-#   define open             __vsf_linux_open
-#   define access           __vsf_linux_access
-#   define unlink           __vsf_linux_unlink
-#   define link             __vsf_linux_link
-#   define remove           __vsf_linux_remove
-#   define mkdir            __vsf_linux_mkdir
-#   define close            __vsf_linux_close
-#   define lseek            __vsf_linux_lseek
-#   define read             __vsf_linux_read
-#   define write            __vsf_linux_write
-#   define chdir            __vsf_linux_chdir
-#   define getcwd           __vsf_linux_getcwd
+#   define creat            VSF_LINUX_WRAPPER(creat)
+#   define open             VSF_LINUX_WRAPPER(open)
+#   define access           VSF_LINUX_WRAPPER(access)
+#   define unlink           VSF_LINUX_WRAPPER(unlink)
+#   define link             VSF_LINUX_WRAPPER(link)
+#   define remove           VSF_LINUX_WRAPPER(remove)
+#   define mkdir            VSF_LINUX_WRAPPER(mkdir)
+#   define close            VSF_LINUX_WRAPPER(close)
+#   define lseek            VSF_LINUX_WRAPPER(lseek)
+#   define read             VSF_LINUX_WRAPPER(read)
+#   define write            VSF_LINUX_WRAPPER(write)
+#   define chdir            VSF_LINUX_WRAPPER(chdir)
+#   define getcwd           VSF_LINUX_WRAPPER(getcwd)
 #endif
 #endif
 

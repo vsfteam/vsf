@@ -18,14 +18,14 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_SOCKET_CFG_WRAPPER == ENABLED
-#define inet_addr           __vsf_linux_inet_addr
-#define inet_lnaof          __vsf_linux_inet_lnaof
-#define inet_makeaddr       __vsf_linux_inet_makeaddr
-#define inet_netof          __vsf_linux_inet_netof
-#define inet_network        __vsf_linux_inet_network
-#define inet_aton           __vsf_linux_inet_aton
-#define inet_ntoa           __vsf_linux_inet_ntoa
-#define inet_ntop           __vsf_linux_inet_ntop
+#define inet_addr           VSF_LINUX_SOCKET_WRAPPER(inet_addr)
+#define inet_lnaof          VSF_LINUX_SOCKET_WRAPPER(inet_lnaof)
+#define inet_makeaddr       VSF_LINUX_SOCKET_WRAPPER(inet_makeaddr)
+#define inet_netof          VSF_LINUX_SOCKET_WRAPPER(inet_netof)
+#define inet_network        VSF_LINUX_SOCKET_WRAPPER(inet_network)
+#define inet_aton           VSF_LINUX_SOCKET_WRAPPER(inet_aton)
+#define inet_ntoa           VSF_LINUX_SOCKET_WRAPPER(inet_ntoa)
+#define inet_ntop           VSF_LINUX_SOCKET_WRAPPER(inet_ntop)
 #endif
 
 #define htonl               cpu_to_be32

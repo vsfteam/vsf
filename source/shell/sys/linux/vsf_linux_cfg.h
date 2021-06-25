@@ -23,11 +23,16 @@
 #ifndef __VSF_LINUX_CFG_H__
 #define __VSF_LINUX_CFG_H__
 
+#include "shell/vsf_shell_wrapper.h"
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_LINUX_ASSERT
 #   define VSF_LINUX_ASSERT                     VSF_ASSERT
 #endif
+
+#define VSF_LINUX_WRAPPER(__api)                VSF_SHELL_WRAPPER(vsf_linux, __api)
+#define VSF_LINUX_SOCKET_WRAPPER(__api)         VSF_SHELL_WRAPPER(vsf_linux_socket, __api)
 
 // signal support is not implemented
 #ifndef VSF_LINUX_CFG_SUPPORT_SIG
