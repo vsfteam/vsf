@@ -3156,6 +3156,9 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sched.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\vsf_shell_wrapper.h">
+      <Filter>vsf\shell</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">

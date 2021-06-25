@@ -12472,6 +12472,9 @@
                     </file>
                 </group>
             </group>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\source\shell\vsf_shell_wrapper.h</name>
+            </file>
         </group>
         <group>
             <name>utilities</name>

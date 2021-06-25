@@ -660,6 +660,7 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\xboot\window.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\xfs\xfs.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\xboot\vsf_xboot_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\shell\vsf_shell_wrapper.h" />
     <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc.h" />
     <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class.h" />
     <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_black_box.h" />
