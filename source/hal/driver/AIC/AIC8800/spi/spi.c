@@ -163,6 +163,7 @@ vsf_err_t __vsf_spi_request_write(vsf_spi_t *spi_ptr, void *out_buffer_ptr, uint
     return VSF_ERR_NONE;
 }
 
+// TODO: implement dma module and put DMA_IRQHandler in DMA moudle
 void DMA08_IRQHandler(void)
 {
     const int ch = SPI0_RXDMA_CH_IDX;

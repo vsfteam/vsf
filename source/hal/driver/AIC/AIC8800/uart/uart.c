@@ -40,6 +40,7 @@
         .irqn = UART##__count##_IRQn,                                       \
         .num = __count,                                                     \
     };                                                                      \
+    WEAK(UART##__count##_IRQHandler)                                        \
     void UART##__count##_IRQHandler(void)                                   \
     {                                                                       \
         if (NULL != vsf_usart##__count.cfg.isr.handler_fn) {                \
@@ -105,7 +106,7 @@ vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
     usart_ptr->param->DBUFTH_REG = (    (1 << UART_RXTRIGTH)
                                      |  (0 << UART_TXTRIGTH));
     usart_ptr->param->MDMCFG_REG |= UART_CLK_P_MSK;
-    if (0 == cfg_ptr->mode & USART_PARITY) {
+    if (0 == (cfg_ptr->mode & USART_PARITY)) {
         cfg_ptr->mode |= USART_NONE_PARITY;
     }
     usart_ptr->param->DFMTCFG_REG =     (       (cfg_ptr->mode & USART_BIT_LENGTH)
