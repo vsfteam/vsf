@@ -219,13 +219,8 @@ typedef volatile uint8_t            reg8_t;
 typedef volatile uint16_t           reg16_t;
 typedef volatile uint32_t           reg32_t;
 
-#if defined(__IAR_SYSTEMS_ICC__)                                                \
-    ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
-#   define __REG_CONNECT(__A, __B)  __A##__B
-#   define __REG_RSVD_NAME(__NAME)  __REG_CONNECT(__unused_, __NAME)
-#else
-#   define __REG_RSVD_NAME(__NAME)
-#endif
+#define __REG_CONNECT(__A, __B)     __A##__B
+#define __REG_RSVD_NAME(__NAME)     __REG_CONNECT(__unused_, __NAME)
 
 #define ____REG_RSVD(__NAME, __BIT)                                             \
         reg##__BIT##_t              __NAME : __BIT;

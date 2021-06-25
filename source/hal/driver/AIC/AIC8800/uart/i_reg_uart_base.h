@@ -21,17 +21,17 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-/* Define structure member permissions : ‘read only’ */
+/* Define structure member permissions : read only */
 #ifndef __IM
 #   define __IM                        const
 #endif
 
-/* Define structure member permissions : ‘write only’ */
+/* Define structure member permissions : write only */
 #ifndef __OM
 #   define __OM
 #endif
 
-/* Define structure member permissions : ‘read or write’ */
+/* Define structure member permissions : read or write */
 #ifndef __IOM
 #   define __IOM
 #endif
@@ -44,13 +44,8 @@
  *!       b. anonymouse structures and unions are supported
  */
 #include <stdint.h>
-#if defined(__IAR_SYSTEMS_ICC__)                                                \
-    ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
-#   define __REG_CONNECT(__A, __B)  __A##__B
-#   define __REG_RSVD_NAME(__NAME)  __REG_CONNECT(__unused_, __NAME)
-#else
-#   define __REG_RSVD_NAME(__NAME)
-#endif
+#define __REG_CONNECT(__A, __B)     __A##__B
+#define __REG_RSVD_NAME(__NAME)     __REG_CONNECT(__unused_, __NAME)
 
 #define ____REG_RSVD(__NAME, __BIT)                                             \
         reg##__BIT##_t              __NAME : __BIT;
