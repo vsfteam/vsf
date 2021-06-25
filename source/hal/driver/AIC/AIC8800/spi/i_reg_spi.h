@@ -59,7 +59,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if __AIC8800_SPI_USE_BIT_FIELD == ENABLED
-#   define DEF_SPI_REG(__NAME, __TOTAL_SIZE, ...)                              \
+#   define DEF_SPI_REG(__NAME, __TOTAL_SIZE, ...)                               \
     union {                                                                     \
         reg##__TOTAL_SIZE##_t VALUE;                                            \
         struct {                                                                \
@@ -67,7 +67,7 @@ extern "C" {
         };                                                                      \
     } __NAME
 #else
-#   define DEF_SPI_REG(__NAME, __TOTAL_SIZE, ...)                              \
+#   define DEF_SPI_REG(__NAME, __TOTAL_SIZE, ...)                               \
         __VA_ARGS__ reg##__TOTAL_SIZE##_t __NAME
 #endif
 /*============================ TYPES =========================================*/
@@ -75,20 +75,24 @@ extern "C" {
 typedef struct spi_reg_t {
     union {
         __IM            reg32_t         BASE_ADDR;
-        DEF_SPI_REG(IOR, 32, __IOM);
+        DEF_SPI_REG(IOR,    32, __IOM);
     };
-    DEF_SPI_REG(DR, 32, __IOM);
-    reg32_t CR[4];
-    REG_RSVD_U32N(7)
-    DEF_SPI_REG(SR, 32, __IM);
+    DEF_SPI_REG(DR,         32, __IOM);
+    reg32_t CR[6];
+    DEF_SPI_REG(IER,        32, __IOM);
+    DEF_SPI_REG(ICLR,       32, __IOM);
+    DEF_SPI_REG(IRSR,       32, __IM);
+    DEF_SPI_REG(IMSR,       32, __IM);
+    REG_RSVD_U32
+    DEF_SPI_REG(SR,         32, __IOM);
     REG_RSVD_U32N(5)
-    DEF_SPI_REG(MR0, 32, __IOM);
+    DEF_SPI_REG(MR0,        32, __IOM);
     REG_RSVD_U32
-    DEF_SPI_REG(MR1, 32, __IOM);
-    DEF_SPI_REG(OCR, 32, __IOM);
+    DEF_SPI_REG(MR1,        32, __IOM);
+    DEF_SPI_REG(OCR,        32, __IOM);
     REG_RSVD_U32
-    DEF_SPI_REG(ICR, 32, __IOM);
-    DEF_SPI_REG(TCR, 32, __IOM);
+    DEF_SPI_REG(ICR,        32, __IOM);
+    DEF_SPI_REG(TCR,        32, __IOM);
 } spi_reg_t;
 
 #ifdef __cplusplus
