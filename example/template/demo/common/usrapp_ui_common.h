@@ -113,7 +113,7 @@ typedef struct usrapp_ui_common_t {
 
 #if VSF_USE_LLGUI == ENABLED
     struct {
-#if defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_PTR) || define(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_HEAP)
+#if defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_PTR) || defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_HEAP)
 #   error not supported now
         llColor *color;
 #elif USE_DOUBLE_BUFFERING
