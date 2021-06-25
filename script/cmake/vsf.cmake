@@ -50,11 +50,6 @@ if(VSF_HOST_SYSTEM)
     )
 endif()
 
-# wrappers
-if(VSF_USE_LINUX AND VSF_LINUX_USE_SIMPLE_LIBC)
-    include(${VSF_CMAKE_ROOT}/wrapper/vsf_linux_libc_wrapper.cmake)
-endif()
-
 include(${VSF_CMAKE_ROOT}/compilers.cmake)
 
 add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)

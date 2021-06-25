@@ -66,7 +66,14 @@ set(VSF_USE_EVM 1)
 
 # include vsf cmake script
 set(VSF_CONFIG_PATH ../../../config)
+set(VSF_TARGET_WRAPPER_LIST "fprintf" "fflush")
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
+
+# user compiler definitions
+target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+    "fprintf=__wrap_fprintf"
+    "fflush=__wrap_fflush"
+)
 
 # linker script
 target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
