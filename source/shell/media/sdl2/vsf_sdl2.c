@@ -224,6 +224,11 @@ void vsf_sdl2_pixel_copy(   uint_fast16_t data_line_num, uint_fast32_t data_line
 }
 #endif
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 #ifndef WEAK_SDL2_PIXEL_FILL
 WEAK(vsf_sdl2_pixel_fill)
 void vsf_sdl2_pixel_fill(   uint_fast16_t data_line_num, uint_fast32_t pixel_line_size,
@@ -338,6 +343,10 @@ static void __SDL_BlendWithFormat(
         psrc += src_pitch;
     }
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 const SDL_version * SDL_Linked_Version(void)
 {
