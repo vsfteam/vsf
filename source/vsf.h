@@ -113,7 +113,7 @@ extern VSF_CFG_DEBUG_STREAM_RX_T VSF_DEBUG_STREAM_RX;
 
 /*============================ INCLUDES ======================================*/
 
-/*£¡\note If you have one or more private header files with which you want to
+/*!\note If you have one or more private header files with which you want to
  *!       cover all the range where vsf.h is included directly or indirectly, you
  *!       can define the macro VSF_CFG_USR_HEADER with a path string in
  *!       vsf_usr_cfg.h.
