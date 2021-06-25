@@ -794,7 +794,7 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
 
 int pipe(int pipefd[2])
 {
-    vsf_linux_fd_t *sfd_rx, *sfd_tx;
+    vsf_linux_fd_t *sfd_rx = NULL, *sfd_tx = NULL;
 
     pipefd[0] = vsf_linux_create_fd(&sfd_rx, &__vsf_linux_pipe_rx_fdop);
     pipefd[1] = vsf_linux_create_fd(&sfd_tx, &__vsf_linux_pipe_tx_fdop);
