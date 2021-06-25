@@ -9,7 +9,7 @@ endif()
 if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fms-extensions -fdiagnostics-color=always")
 
-    foreach(api VSF_LINUX_LIBC_WRAPPER_LIST)
+    foreach(api ${VSF_LINUX_LIBC_WRAPPER_LIST})
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--wrap=${api}")
     endforeach()
 endif()

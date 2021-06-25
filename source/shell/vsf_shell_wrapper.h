@@ -19,6 +19,11 @@
 #define __VSF_SHELL_WRAPPER_H__
 
 /*============================ INCLUDES ======================================*/
+
+// TODO: is it secure to include compiler info here?
+#define __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
+#include "utilities/compiler/compiler.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

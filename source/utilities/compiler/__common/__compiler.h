@@ -100,6 +100,7 @@ extern "C" {
 #   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
 #   define __ISR(__VEC)         void __VEC(void)
+#   define __COMPILER_WRAPPER(__API)    __wrap_ ## __API
 
 #elif  __IS_COMPILER_GCC__
 #   define NO_INIT              __attribute__(( section( ".bss.noinit")))
@@ -123,6 +124,7 @@ extern "C" {
 #   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
 #   define __ISR(__VEC)         void __VEC(void)
+#   define __COMPILER_WRAPPER(__API)    __wrap_ ## __API
 #endif
 
 #define WEAK_ALIAS(__ORIGIN, __ALIAS)                                           \
@@ -131,6 +133,9 @@ extern "C" {
 #define ALIGN(__N)              __ALIGN(__N)
 #define SECTION(__SEC)          __SECTION(__SEC)
 
+#ifdef __COMPILER_WRAPPER
+#   define COMPILER_WRAPPER(__API)      __COMPILER_WRAPPER(__API)
+#endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #define ALIGN_OF(__TYPE)        __ALIGN_OF(__TYPE)
