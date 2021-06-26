@@ -34,7 +34,7 @@
 int __l_image_new(lua_State *L)
 {
     const char *filename = luaL_checkstring(L, 1);
-    love_image_t *image = luaO_newinst(L, LOVE_CLASS(image));
+//    love_image_t *image = luaO_newinst(L, LOVE_CLASS(image));
 
     // TODO: setup image with filename
     printf("TODO: setup image %s\n", filename);

@@ -78,7 +78,9 @@ extern FILE *stdin, *stdout, *stderr;
 #define SEEK_CUR            1
 #define SEEK_END            2
 
-#define PATH_MAX            255
+#ifndef PATH_MAX
+#   define PATH_MAX         255
+#endif
 #define EOF                 0xFF
 
 #define fpos_t              uintmax_t

@@ -321,6 +321,11 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
     }
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
 #if VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB != ENABLED
@@ -361,6 +366,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             } else if ((hprt0 & USB_OTG_HPRT_PSPD) == USB_OTG_HPRT_PSPD_1) {
                 speed = USB_SPEED_LOW;
             }
+            // cast-align from gcc
             dwcotg_hcd->dev = vk_usbh_new_device((vk_usbh_t *)dwcotg_hcd->hcd, speed, NULL, 0);
         } else {
             dwcotg_hcd->is_reset_issued = false;
@@ -397,6 +403,10 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #endif
     }
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd)
 {
@@ -1141,8 +1151,8 @@ error:
 static vsf_err_t __vk_dwcotg_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     vk_dwcotg_hcd_t *dwcotg_hcd = hcd->priv;
-    vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
-    uint32_t hprt0 = *reg->host.hprt0 & ~USB_OTG_HPRT_W1C_MASK;
+//    vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
+//    uint32_t hprt0 = *reg->host.hprt0 & ~USB_OTG_HPRT_W1C_MASK;
 
     if (dwcotg_hcd->is_connected) {
         dwcotg_hcd->is_reset_issued = true;
