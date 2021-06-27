@@ -27,29 +27,29 @@
 #define VSF_SYSTIMER_FREQ                               (192000000ul)
 
 // Application configure
-#define APP_USE_LINUX_DEMO                              DISABLED
+#define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    DISABLED
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
-#define APP_USE_USBH_DEMO                               DISABLED
-#define APP_USE_USBD_DEMO                               DISABLED
+#define APP_USE_USBH_DEMO                               ENABLED
+#define APP_USE_USBD_DEMO                               ENABLED
 #   define APP_USE_USBD_CDC_DEMO                        ENABLED
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
 #   define APP_USE_USBD_UVC_DEMO                        ENABLED
-#define APP_USE_SCSI_DEMO                               DISABLED
+#define APP_USE_SCSI_DEMO                               ENABLED
 //  todo: implement audio driver for m484
 #define APP_USE_AUDIO_DEMO                              DISABLED
 //  current tgui demo depends on VSF_DISP_USE_SDL2, which is only available on __WIN__
 #define APP_USE_TGUI_DEMO                               DISABLED
 //  current M484 hardware has no display
 #define APP_USE_SDL2_DEMO                               DISABLED
-#define APP_USE_DISP_DEMO                               ENABLED
+#define APP_USE_DISP_DEMO                               DISABLED
 //  TODO: need test for c++ support
 //#define APP_USE_CPP_DEMO                                ENABLED
 #if APP_USE_CPP_DEMO == ENABLED
 #   define __VSF_WORKAROUND_IAR_CPP__
 #endif
 
-#define APP_USE_HAL_DEMO                                ENABLED
+#define APP_USE_HAL_DEMO                                DISABLED
 #define APP_USE_HAL_SPI_DEMO                            DISABLED
 
 // 3rd-party demos
@@ -71,7 +71,7 @@
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
 #define APP_USE_LWIP_DEMO                               DISABLED
-#define APP_USE_EVM_DEMO                                DISABLED
+#define APP_USE_EVM_DEMO                                ENABLED
 
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
@@ -130,11 +130,11 @@
 // simple_libc does not compatible with cpp, so if cpp is used, DO NOT use simple_libc
 //  make sure in inclue path, simple_libc is removed if cpp is used
 #       define VSF_LINUX_USE_SIMPLE_LIBC                ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STDIO           DISABLED
+#           define VSF_LINUX_USE_SIMPLE_STDIO           ENABLED
 #           define VSF_LINUX_USE_SIMPLE_STRING          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_TIME            DISABLED
+#           define VSF_LINUX_USE_SIMPLE_TIME            ENABLED
 #           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_CTYPE           DISABLED
+#           define VSF_LINUX_USE_SIMPLE_CTYPE           ENABLED
 #   endif
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM

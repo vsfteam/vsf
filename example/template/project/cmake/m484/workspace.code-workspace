@@ -1,0 +1,37 @@
+{
+	"folders": [
+		{
+			"name": "project",
+			"path": "."
+		},
+		{
+			"name": "config",
+			"path": "../../../config"
+		},
+		{
+			"name": "demo",
+			"path": "../../../demo"
+		},
+		{
+			"name": "vsf",
+//			it's good to support environment variable here, but vscode doesn't
+//			"path": "${env:VSF_PATH}/source"
+			"path": "../../../../../source"
+		},
+	],
+	"settings": {
+		"C_Cpp.default.defines": [
+			"__Nuvoton__",
+			"__M484__",
+		],
+		"C_Cpp.default.cStandard": "c11",
+		"C_Cpp.default.cppStandard": "c++14",
+		"C_Cpp.default.includePath": [
+			"${env:VSF_PATH}/source",
+			"${env:VSF_PATH}/source/component/3rd-party/lvgl/raw",
+			"../../../config",
+			"../../../demo",
+		],
+		"files.associations": {},
+	}
+}

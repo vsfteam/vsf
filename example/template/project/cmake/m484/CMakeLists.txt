@@ -19,49 +19,13 @@ set(CMAKE_CXX_FLAGS
 include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
 
 project(vsf_template)
-set(VSF_TARGET AIC8800M)
-set(VSF_TARGET_DEFINITIONS
-#   hw related definitions for AIC8800M required by sdk
-#   hw_platform: pxp(0), fpga(1), asic(2)
-    "CFG_HW_PLATFORM=2"
-#   rf_mode: null(0), bt_only(1), bt_combo(2), btwifi_combo(3)
-    "CFG_RF_MODE=0"
-#   rom_ver
-    "CFG_WIFI_ROM_VER=2"
-#   dac: left(0), mute(1), right(2), lprd2(3), lmrd2(4)
-    "CFG_DACL_MIXER_MODE=1"
-    "CFG_DACR_MIXER_MODE=1"
-#   pmic
-    "CFG_PMIC"
-    "CFG_PMIC_VER_LITE"
-    "CFG_PMIC_ITF_ASDMA"
-#   wifi
-    "CFG_WIFI_STACK"
-    "CFG_RSSI_DATAPKT"
-#   misc
-    "CFG_DBG"
-    "CFG_IPERF"
-)
+set(VSF_TARGET m484)
 
 # VSF_USE configurations
 set(VSF_USE_LINUX 1)
     set(VSF_LINUX_USE_SIMPLE_LIBC 1)
 set(VSF_USE_LVGL 1)
-    set(VSF_LVGL_USE_FREETYPE 1)
-set(VSF_USE_FREETYPE 1)
 set(VSF_USE_DISP 1)
-set(VSF_USE_SDL2 1)
-    set(VSF_SDL2_USE_TTF 1)
-    set(VSF_SDL2_USE_IMAGE 1)
-set(VSF_USE_LIBJPEG_TURBO 1)
-set(VSF_USE_LIBPNG 1)
-set(VSF_USE_ZLIB 1)
-set(VSF_USE_LWIP 1)
-    set(VSF_LWIP_VENDOR 1)
-set(VSF_USE_BTSTACK 1)
-    set(VSF_BTSTACK_USE_LINKKEY_MEMORY 1)
-set(VSF_USE_COREMARK 1)
-set(VSF_USE_LUA 1)
 set(VSF_USE_EVM 1)
 
 # include vsf cmake script
