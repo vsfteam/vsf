@@ -360,6 +360,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
