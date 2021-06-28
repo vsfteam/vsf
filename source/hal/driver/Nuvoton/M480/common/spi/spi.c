@@ -341,7 +341,6 @@ bool vsf_spi_fifo_flush(vsf_spi_t *spi_ptr)
 static void __m484_spi_tx_dma_done_handler(void *target_ptr, uint32_t dma_irq_mask)
 {
     vsf_spi_t *spi_ptr = (vsf_spi_t *)target_ptr;
-    vsf_spi_dma_t *spi_dma = &spi_ptr->tx_dma;
 
     if (spi_ptr->isr.handler_fn != NULL && (spi_ptr->irq_mask & SPI_IRQ_MASK_TX_CPL)) {
         spi_ptr->isr.handler_fn(spi_ptr->isr.target_ptr, spi_ptr, SPI_IRQ_MASK_TX_CPL);
@@ -351,7 +350,6 @@ static void __m484_spi_tx_dma_done_handler(void *target_ptr, uint32_t dma_irq_ma
 static void __m484_spi_rx_dma_done_handler(void *target_ptr, uint32_t dma_irq_mask)
 {
     vsf_spi_t *spi_ptr = (vsf_spi_t *)target_ptr;
-    vsf_spi_dma_t *spi_dma = &spi_ptr->rx_dma;
 
     spi_ptr->cur_cnt += M484_DMA_REQUEST_MAX_SIZE;
     if (spi_ptr->cur_cnt < spi_ptr->req_cnt) {
