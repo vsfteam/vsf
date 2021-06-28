@@ -1,5 +1,5 @@
 if(NOT VSF_NUCONSOLE_PATH)
-    set(VSF_NUCONSOLE_PATH ${VSF_SRC_PATH}/component/3rd-party/noconsole/raw)
+    set(VSF_NUCONSOLE_PATH ${VSF_SRC_PATH}/component/3rd-party/nuconsole/raw)
 endif()
 
 target_include_directories(${VSF_LIB_NAME} INTERFACE
