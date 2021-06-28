@@ -10,3 +10,6 @@ add_subdirectory_ifdef(VSF_USE_LIBJPEG_TURBO    libjpeg-turbo)
 add_subdirectory_ifdef(VSF_USE_LIBPNG           libpng)
 add_subdirectory_ifdef(VSF_USE_ZLIB             zlib)
 add_subdirectory_ifdef(VSF_USE_EVM              evm)
+
+# protected by configurations
+add_subdirectory(nuconsole)
