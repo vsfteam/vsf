@@ -19,7 +19,7 @@ set(CMAKE_CXX_FLAGS
 include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
 
 project(vsf_template)
-set(VSF_TARGET m484)
+set(VSF_TARGET M484)
 
 # VSF_USE configurations
 set(VSF_USE_LINUX 1)
