@@ -180,17 +180,18 @@
 #define VSF_TRACE_CFG_COLOR_EN                          DISABLED
 #define VSH_HAS_COLOR                                   0
 
-#define VSF_DISP_USE_MIPI_LCD                           ENABLED
-#   define WEAK_VK_DISP_MIPI_TE_LINE_ISR_ENABLE_ONCE
-#   define WEAK_VK_DISP_MIPI_LCD_IO_INIT
-#   define VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET      ENABLED
+#if APP_USE_DISP_DEMO == ENABLED
+#   define VSF_USE_UI                                      ENABLED
+#   define VSF_DISP_USE_MIPI_LCD                           ENABLED
+#      define WEAK_VK_DISP_MIPI_TE_LINE_ISR_ENABLE_ONCE
+#      define WEAK_VK_DISP_MIPI_LCD_IO_INIT
+#      define VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET      ENABLED
 
-#   define APP_DISP_DEMO_HEIGHT                         320
-#   define APP_DISP_DEMO_WIDTH                          480
-#   define APP_DISP_DEMO_COLOR                          VSF_DISP_COLOR_RGB565
-#   define APP_DISP_DEMO_SEQ                            VSF_DISP_MIPI_LCD_ST7796S
-
-#define VSF_USE_UI                                      ENABLED
+#      define APP_DISP_DEMO_HEIGHT                         320
+#      define APP_DISP_DEMO_WIDTH                          480
+#      define APP_DISP_DEMO_COLOR                          VSF_DISP_COLOR_RGB565
+#      define APP_DISP_DEMO_SEQ                            VSF_DISP_MIPI_LCD_ST7796S
+#endif
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
