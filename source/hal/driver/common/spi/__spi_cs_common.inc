@@ -189,8 +189,6 @@ static fsm_rt_t __vsf_multi_spi_disable(vsf_spi_cs_t* spi_cs_ptr,
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
     VSF_HAL_ASSERT(spi_cs_ptr->spi != NULL);
 
-    uint8_t cs_msk = (1 << cs);
-
     vsf_protect_t state = vsf_multi_spi_protect();
     spi_cs_ptr->en_mask &= ~(1 << cs);
     if (spi_cs_ptr->en_mask == 0) {
@@ -427,7 +425,6 @@ static vsf_err_t __vsf_multi_spi_cancel_transfer(vsf_spi_cs_t* spi_cs_ptr,
     VSF_HAL_ASSERT(spi_cs_ptr->spi != NULL);
 
     vsf_err_t result;
-    vsf_spi_cs_one_t *spi_cs_one_ptr = &spi_cs_ptr->cfgs[cs];
 
     vsf_protect_t state = vsf_multi_spi_protect();
     if (spi_cs_ptr->cur_cs == cs) { // current cs request
