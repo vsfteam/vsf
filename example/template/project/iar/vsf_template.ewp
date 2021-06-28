@@ -9834,6 +9834,30 @@
                             </file>
                         </group>
                         <group>
+                            <name>spi</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\spi\i_reg_spi.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\spi\spi.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\spi\spi.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>uart</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\uart\i_reg_uart.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\uart\uart.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\uart\uart.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>usb</name>
                             <group>
                                 <name>dc</name>
