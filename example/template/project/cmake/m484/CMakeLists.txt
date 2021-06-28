@@ -30,14 +30,16 @@ set(VSF_USE_EVM 1)
 
 # include vsf cmake script
 set(VSF_CONFIG_PATH ../../../config)
+# add APIs here if conflistc with libc
 set(VSF_TARGET_WRAPPER_LIST "fprintf" "fflush")
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
 
 # user compiler definitions
-target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
-    "fprintf=__wrap_fprintf"
-    "fflush=__wrap_fflush"
-)
+foreach(api ${VSF_TARGET_WRAPPER_LIST})
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+        "${api}=__wrap_${api}"
+    )
+endforeach()
 
 # linker script
 target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
