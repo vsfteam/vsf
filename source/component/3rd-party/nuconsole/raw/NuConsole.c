@@ -20,7 +20,7 @@
 	#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-NUCONSOLE_INFOBLOCK NuConsole_InfoBlock AT_ADDR(0x20000000);
+NUCONSOLE_INFOBLOCK NuConsole_InfoBlock;
 
 static uint8_t g_acTxBuffer[NUCOSOLE_TX_BUFFER_SIZE];
 static uint8_t g_acRxBuffer[NUCOSOLE_RX_BUFFER_SIZE];
