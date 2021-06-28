@@ -148,16 +148,6 @@ off64_t ftello64(FILE *f)
     return (off64_t)priv->pos;
 }
 
-off_t ftello(FILE *f)
-{
-    return (off_t)ftello64(f);
-}
-
-long ftell(FILE *f)
-{
-    return (long)ftello(f);
-}
-
 void rewind(FILE *f)
 {
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
@@ -170,6 +160,16 @@ void rewind(FILE *f)
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
 #endif
+
+off_t ftello(FILE *f)
+{
+    return (off_t)ftello64(f);
+}
+
+long ftell(FILE *f)
+{
+    return (long)ftello(f);
+}
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
 {
