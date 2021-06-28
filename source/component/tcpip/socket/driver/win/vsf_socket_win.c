@@ -19,7 +19,7 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_TCPIP_USE_WINSOCK == ENABLED
 
 #define __VSF_SOCKET_CLASS_INHERIT__
 #define __VSF_SOCKET_WIN_CLASS_IMPLEMENT

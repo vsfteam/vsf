@@ -1,4 +1,4 @@
 # CMakeLists head
 
-add_subdirectory(lwip)
-add_subdirectory(win)
+add_subdirectory_ifdef(VSF_USE_LWIP             lwip)
+add_subdirectory_ifdef(VSF_TCPIP_USE_WINSOCK    win)

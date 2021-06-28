@@ -134,7 +134,7 @@ extern vsf_err_t vk_dns_gethostbyname(const char *name, vk_netdrv_addr_t *addr);
 #if VSF_USE_LWIP == ENABLED
 #   include "./driver/lwip/vsf_socket_lwip.h"
 #endif
-#if defined(__WIN__)
+#if defined(__WIN__) && VSF_TCPIP_USE_WINSOCK == ENABLED
 #   include "./driver/win/vsf_socket_win.h"
 #endif
 
