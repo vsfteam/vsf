@@ -133,7 +133,10 @@
 #define VSF_ASSERT(...)                                     if (!(__VA_ARGS__)) {while(1);};
 //#define VSF_ASSERT(...)
 
-#define VSF_DEBUGGER_CFG_CONSOLE                        VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
+
+
+
+#define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 
 #if APP_USE_USBD_DEMO == ENABLED
 #   define VSF_USE_USB_DEVICE                           ENABLED

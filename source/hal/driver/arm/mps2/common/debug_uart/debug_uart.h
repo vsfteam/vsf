@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2020 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -15,32 +15,57 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_ARM_MPS2_COMMON_H__
-#define __HAL_DRIVER_ARM_MPS2_COMMON_H__
-
-/* \note __common.h should only be included by device.h */
+#ifndef __HAL_DRIVER_ARM_MPS2_DEBUG_UART_H__
+#define __HAL_DRIVER_ARM_MPS2_DEBUG_UART_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
-#include "hal/arch/vsf_arch.h"
-#include "./V2M-MPS2_CMx_BSP/1.7.0/Boards/ARM/V2M-MPS2/Common/Device.h"
-#include "./debug_uart/debug_uart.h"
+
+#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
+
+#if VSF_USE_SIMPLE_STREAM == ENABLED
+#   include "service/vsf_service.h"
+#elif VSF_USE_STREAM == ENABLED
+#   include "service/stream/vsf_stream.h"
+#endif
+
+#include "../../__device.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
+
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
+#   define VSF_DEBUG_STREAM_NEED_POLL
+#elif   VSF_USE_STREAM == ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
+extern vsf_mem_stream_t VSF_DEBUG_STREAM_TX;
+extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
+#elif   VSF_USE_STREAM == ENABLED
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-/* todo: should remove this but keep it for a while
-extern vsf_err_t vsf_drv_swi_init(  uint_fast8_t idx,
-                                    vsf_arch_prio_t priority,
-                                    vsf_swi_handler_t *handler,
-                                    void *pparam);
-extern void vsf_drv_swi_trigger(uint_fast8_t idx);
-*/
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
+extern void VSF_DEBUG_STREAM_POLL(void);
+#elif   VSF_USE_STREAM == ENABLED
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
 #endif
 /* EOF */
+
