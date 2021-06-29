@@ -446,6 +446,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>demo/mps2</GroupName>
+          <Files>
+            <File>
+              <FileName>user_retarget.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\mps2\user_retarget.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>demo/audio_demo</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -760,11 +770,6 @@
               <FileName>sem_test.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\demo\kernel_test\sem_test.c</FilePath>
-            </File>
-            <File>
-              <FileName>user_retarget.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\demo\kernel_test\user_retarget.c</FilePath>
             </File>
           </Files>
         </Group>
