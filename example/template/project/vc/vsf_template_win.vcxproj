@@ -1025,7 +1025,9 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\raw\ltable.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\raw\ltablib.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\raw\ltm.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\raw\lua.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\raw\lua.c">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/D "main=lua_main" %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\raw\lundump.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\raw\lutf8lib.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\raw\lvm.c" />

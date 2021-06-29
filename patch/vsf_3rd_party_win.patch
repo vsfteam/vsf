@@ -1,8 +1,6 @@
  source/component/3rd-party/btstack/raw/src/l2cap.c | 4 ++--
- source/component/3rd-party/lua/raw/lua.c | 2 +-
- source/component/3rd-party/zlib/raw/inftrees.c | 10 +++-------
  source/component/3rd-party/zlib/raw/zconf.h | 3 +++
- 4 file changed, 9 insertions(+), 10 deletions(-)
+ 2 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/source/component/3rd-party/btstack/raw/src/l2cap.c b/source/component/3rd-party/btstack/raw/src/l2cap.c
 index fe9f5ca8e..edac99c75 100644
@@ -26,42 +24,6 @@ index fe9f5ca8e..edac99c75 100644
      if (local_cid < 0x40u) return NULL;
      return (l2cap_channel_t*) l2cap_channel_item_by_cid(local_cid);
  }
-
-diff --git a/source/component/3rd-party/lua/raw/lua.c b/source/component/3rd-party/lua/raw/lua.c
-index b5b884b6..ee995e78 100644
---- a/source/component/3rd-party/lua/raw/lua.c
-+++ b/source/component/3rd-party/lua/raw/lua.c
-@@ -620,7 +620,7 @@ static int pmain (lua_State *L) {
- }
- 
- 
--int main (int argc, char **argv) {
-+int lua_main (int argc, char **argv) {
-   int status, result;
-   lua_State *L = luaL_newstate();  /* create state */
-   if (L == NULL) {
-
-diff --git source/component/3rd-party/zlib/raw/inftrees.c source/component/3rd-party/zlib/raw/inftrees.c
-index 2ea08fc..8685887 100644
---- source/component/3rd-party/zlib/raw/inftrees.c
-+++ source/component/3rd-party/zlib/raw/inftrees.c
-@@ -29,13 +29,9 @@ const char inflate_copyright[] =
-    table index bits.  It will differ if the request is greater than the
-    longest code or if it is less than the shortest code.
-  */
--int ZLIB_INTERNAL inflate_table(type, lens, codes, table, bits, work)
--codetype type;
--unsigned short FAR *lens;
--unsigned codes;
--code FAR * FAR *table;
--unsigned FAR *bits;
--unsigned short FAR *work;
-+int ZLIB_INTERNAL inflate_table (codetype type, unsigned short FAR *lens,
-+                             unsigned codes, code FAR * FAR *table,
-+                             unsigned FAR *bits, unsigned short FAR *work)
- {
-     unsigned len;               /* a code's length in bits */
-     unsigned sym;               /* index of code symbols */
 
 diff --git source/component/3rd-party/zlib/raw/zconf.h source/component/3rd-party/zlib/raw/zconf.h
 index 5e1d68a..c7524b0 100644

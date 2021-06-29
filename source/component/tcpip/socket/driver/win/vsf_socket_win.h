@@ -22,7 +22,7 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED && defined(__WIN__)
+#if VSF_USE_TCPIP == ENABLED && defined(__WIN__) && VSF_TCPIP_USE_WINSOCK == ENABLED
 
 #include "utilities/vsf_utilities.h"
 #include "hal/arch/vsf_arch.h"

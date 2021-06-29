@@ -440,6 +440,10 @@
 #   endif
 #endif
 
+#if APP_USE_SOCKET_DEMO == ENABLED
+#   define VSF_TCPIP_USE_WINSOCK                        ENABLED
+#endif
+
 #if VSF_USBH_USE_DL1X5 == ENABLED && VSF_DISP_USE_DL1X5 == ENABLED
 #   define WEAK_VSF_DL1X5_ON_NEW_DISP
 #endif
