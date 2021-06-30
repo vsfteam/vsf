@@ -15,7 +15,7 @@
         <TargetCommonOption>
           <Device>CMSDK_CM7_SP</Device>
           <Vendor>ARM</Vendor>
-          <PackID>Keil.V2M-MPS2_CMx_BSP.1.7.0</PackID>
+          <PackID>Keil.V2M-MPS2_CMx_BSP.1.7.1</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00400000) IROM(0x00000000,0x00400000) CPUTYPE("Cortex-M7") FPU3(SFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -285,16 +285,6 @@
               <FileName>user_retarget.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\user_retarget.c</FilePath>
-            </File>
-            <File>
-              <FileName>class_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\usrapp\template\ooc_demo\class_demo.c</FilePath>
-            </File>
-            <File>
-              <FileName>class_simple_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\usrapp\template\ooc_demo\class_simple_demo.c</FilePath>
             </File>
           </Files>
         </Group>
