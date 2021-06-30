@@ -9,11 +9,11 @@ endif()
 # compiler configurations
 # arm-none-eabi-gcc will not pass compiler checker of cmake, so include before project
 set(CMAKE_C_FLAGS
-    "-Og -Ofast -g3"
+    "-Ofast"
     CACHE INTERNAL "C compiler common flags"
 )
 set(CMAKE_CXX_FLAGS
-    "-Og -Ofast -g3"
+    "-Ofast"
     CACHE INTERNAL "C++ compiler common flags"
 )
 include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)

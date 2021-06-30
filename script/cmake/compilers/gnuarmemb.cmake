@@ -28,9 +28,9 @@ set(CMAKE_CXX_FLAGS
 #   -O3       Optimize most
 #   -Og       Optimize for debug
 #   -Ofast    Optimize for speed
-set(CMAKE_C_FLAGS_DEBUG "-Og -g3 -gstabs+" CACHE STRING "c debug compiler flags")
-set(CMAKE_CXX_FLAGS_DEBUG "-Og -g3 -gstabs+" CACHE STRING "cxx debug compiler flags")
-set(CMAKE_ASM_FLAGS_DEBUG "-g -gstabs+" CACHE INTERNAL "asm debug compiler flags")
+set(CMAKE_C_FLAGS_DEBUG "-Og -g3" CACHE STRING "c debug compiler flags")
+set(CMAKE_CXX_FLAGS_DEBUG "-Og -g3" CACHE STRING "cxx debug compiler flags")
+set(CMAKE_ASM_FLAGS_DEBUG "-g" CACHE INTERNAL "asm debug compiler flags")
 
 #set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections --specs=nosys.specs"
 #  CACHE INTERNAL "exe link flags")
