@@ -51,19 +51,22 @@
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
-#   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
+#   define APP_USE_LINUX_LIBUSB_DEMO                    DISABLED
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
-#define APP_USE_USBH_DEMO                               ENABLED
+#define APP_USE_USBH_DEMO                               DISABLED
 // Actually, usbd use usbip_dcd or distbus_dcd, no conflicts with hardware usb host
-#define APP_USE_USBD_DEMO                               ENABLED
+#define APP_USE_USBD_DEMO                               DISABLED
 #   define APP_USE_USBD_CDC_DEMO                        ENABLED
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
 #   define APP_USE_USBD_UVC_DEMO                        ENABLED
 #   define APP_USE_USBD_UAC_DEMO                        ENABLED
 #   define APP_USE_USBD_USER_DEMO                       ENABLED
-#define APP_USE_SCSI_DEMO                               ENABLED
+#define APP_USE_SCSI_DEMO                               DISABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
-#define APP_USE_SDL2_DEMO                               ENABLED
+#define APP_USE_SDL2_DEMO                               DISABLED
+#define APP_USE_DISP_DEMO                               DISABLED
+#define APP_USE_MS52x_DEMO                              DISABLED
+#define VSF_TEST_AIC8800_GPIO                           ENABLED
 // if using dl1x5, only RGB565 is supported
 #   define APP_SDL2_DEMO_CFG_COLOR_RGB565
 #   define APP_SDL2_DEMO_CFG_WIDTH                      256
@@ -86,7 +89,7 @@
 //  awtk is LGPL, not convenient to implement in MCU
 #define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               DISABLED
-#define APP_USE_LVGL_DEMO                               ENABLED
+#define APP_USE_LVGL_DEMO                               DISABLED
 //#   define APP_LVGL_DEMO_USE_TERMINAL                   ENABLED
 //#   define APP_LVGL_DEMO_CFG_ANIMINATION                ENABLED
 
@@ -101,9 +104,9 @@
 #   define APP_LVGL_DEMO_CFG_VER_RES                    1080
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (80 * 1024)
 // double 80K 16-bit pixels buffer at 0x00100000
-#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_HEAP
+#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR           0x00100000
 #   define APP_LVGL_DEMO_CFG_DOUBLE_BUFFER              ENABLED
-#define APP_USE_BTSTACK_DEMO                            ENABLED
+#define APP_USE_BTSTACK_DEMO                            DISABLED
 // DO NOT use bthci, use on-chip bluetooth
 #   define VSF_USBH_USE_BTHCI                           DISABLED
 #define APP_USE_VSFVM_DEMO                              DISABLED
@@ -112,8 +115,8 @@
 // lwip demo is not compatible with aic8800 sdk, but VSF_USE_LWIP should be defined
 #define APP_USE_LWIP_DEMO                               DISABLED
 #   define VSF_USE_LWIP                                 ENABLED
-#define APP_USE_EVM_DEMO                                ENABLED
-#define APP_USE_LUA_DEMO                                ENABLED
+#define APP_USE_EVM_DEMO                                DISABLED
+#define APP_USE_LUA_DEMO                                DISABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 //#define APP_USE_DISTBUS_DEMO                            ENABLED
 //#   define APP_DISTBUS_DEMO_CFG_LWIP                    ENABLED
@@ -121,11 +124,11 @@
 //#       define APP_USE_DISTBUS_HAL_USBD_DEMO            ENABLED
 
 // demo for AIC8800
-#define AIC8800_APP_USE_WIFI_DEMO                       ENABLED
-#define AIC8800_APP_USE_BT_DEMO                         ENABLED
+#define VSF_CFG_AIC8800_BASE_SPI_TEST                   DISABLED
+#define AIC8800_APP_USE_WIFI_DEMO                       DISABLED
+#define AIC8800_APP_USE_BT_DEMO                         DISABLED
 
 
-// app configurations to vsf configurations
 #if     APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED       \
     ||  (APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_CFG_FREETYPE == ENABLED)
 #   define APP_USE_FREETYPE_DEMO                        ENABLED
@@ -134,9 +137,7 @@
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
-#   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   4
-#   define VSF_HEAP_ADDR                                0x00100000
-#   define VSF_HEAP_SIZE                                0x50000
+#   define VSF_HEAP_SIZE                                0x1800
 
 #define VSF_USE_VIDEO                                   ENABLED
 #define VSF_USE_AUDIO                                   ENABLED
@@ -179,31 +180,18 @@
 #define USRAPP_CFG_STDIO_EN                             ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
-#   define VSF_LINUX_CFG_WRAPPER                        ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
-#   define VSF_LINUX_USE_SOCKET                         ENABLED
-#   define VSF_LINUX_USE_DEVFS                          ENABLED
 
 #   if APP_USE_CPP_DEMO != ENABLED
 // simple_libc does not compatible with cpp, so if cpp is used, DO NOT use simple_libc
 //  make sure in inclue path, simple_libc is removed if cpp is used
 #       define VSF_LINUX_USE_SIMPLE_LIBC                ENABLED
-#           ifndef VSF_LINUX_USE_SIMPLE_STDIO
-#               define VSF_LINUX_USE_SIMPLE_STDIO       ENABLED
-#           endif
-#           ifndef VSF_LINUX_USE_SIMPLE_STRING
-#               define VSF_LINUX_USE_SIMPLE_STRING      ENABLED
-#           endif
-#           ifndef VSF_LINUX_USE_SIMPLE_TIME
-#               define VSF_LINUX_USE_SIMPLE_TIME        ENABLED
-#           endif
-#           ifndef VSF_LINUX_USE_SIMPLE_STDLIB
-#               define VSF_LINUX_USE_SIMPLE_STDLIB      ENABLED
-#           endif
-#           ifndef VSF_LINUX_USE_SIMPLE_CTYPE
-#               define VSF_LINUX_USE_SIMPLE_CTYPE       ENABLED
-#           endif
+#           define VSF_LINUX_USE_SIMPLE_STDIO           ENABLED
+#           define VSF_LINUX_USE_SIMPLE_STRING          ENABLED
+#           define VSF_LINUX_USE_SIMPLE_TIME            ENABLED
+#           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
+#           define VSF_LINUX_USE_SIMPLE_CTYPE           ENABLED
 #   endif
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
@@ -278,11 +266,6 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #endif
 
 #if APP_USE_USBH_DEMO == ENABLED
-// usbh memory MUST be in 0x001A0000 - 0x001C7FFF
-#   define vsf_usbh_malloc                              __vsf_usbh_malloc
-#   define vsf_usbh_malloc_aligned                      __vsf_usbh_malloc_aligned
-#   define vsf_usbh_free                                __vsf_usbh_free
-
 #   define VSF_USBH_USE_HCD_DWCOTG                      ENABLED
 //  VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB is by default disabled, no need root_hub support
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
@@ -330,7 +313,22 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #   undef VSH_HAS_COLOR
 #	define VSH_HAS_COLOR                                0
 #endif
+#define VSF_DISP_USE_MIPI_LCD                           DISABLED
+#   define WEAK_VK_DISP_MIPI_TE_LINE_ISR_ENABLE_ONCE
+#   define WEAK_VK_DISP_MIPI_LCD_IO_INIT
+#   define VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET      ENABLED
 
+
+#   define APP_DISP_DEMO_COLOR                          VSF_DISP_COLOR_RGB565
+#   define APP_DISP_DEMO_HEIGHT                         160
+#   define APP_DISP_DEMO_WIDTH                          128
+//#   define APP_DISP_DEMO_SEQ                            VSF_DISP_MIPI_LCD_ILI9341
+#   define APP_DISP_DEMO_SEQ                            VSF_DISP_MIPI_LCD_ST7796S
+
+
+#define VSF_USE_UI                                      ENABLED
+
+#define VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE				DISABLED
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
