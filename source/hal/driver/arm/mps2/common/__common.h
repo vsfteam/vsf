@@ -24,7 +24,7 @@
 
 #include "hal/vsf_hal_cfg.h"
 #include "hal/arch/vsf_arch.h"
-#include "./V2M-MPS2_CMx_BSP/1.7.0/Boards/ARM/V2M-MPS2/Common/Device.h"
+#include "./V2M-MPS2_CMx_BSP/1.7.1/Boards/ARM/V2M-MPS2/Common/Device.h"
 #include "./debug_uart/debug_uart.h"
 
 /*============================ MACROS ========================================*/
