@@ -5,14 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Cortex Debug Attach (JLink)",
+            // Bugs:
+            //   Not implemented stop reason (assuming exception): undefined (https://github.com/Marus/cortex-debug/issues/399)
+            //   Input in QEMU mode (https://github.com/Marus/cortex-debug/issues/236)
+            "name": "Cortex Debug Attach (QEMU)",
             "cwd": "${workspaceRoot}",
             "executable": "./build/vsf_template.elf",
-            "request": "attach",
+            "request": "launch",
             "type": "cortex-debug",
-            "servertype": "jlink",
-            "interface": "swd",
-            "device": "Cortex-M4"
+            "servertype": "qemu",
+            "cpu":"cortex-m7",
+            "machine": "mps2-an500"
         }
     ]
 }
