@@ -103,7 +103,7 @@ static int __wifi_scan_main(int argc, char *argv[])
         fhost_cntrl_cfgrwnx_link_close(cntrl_link);
         printf("fail to set link type to sta\r\n");
         return -1;
-   }
+    }
 
     int nb_res = fhost_scan(cntrl_link, fhost_vif_idx, NULL);
     printf("%d scan results:\r\n", nb_res);
