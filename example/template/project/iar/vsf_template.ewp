@@ -9801,6 +9801,15 @@
                             </file>
                         </group>
                         <group>
+                            <name>gpio</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\gpio\gpio.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\gpio\gpio.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>port</name>
                             <group>
                                 <name>bt</name>
