@@ -37,7 +37,8 @@
 struct __usbh_heap_t {
     implement(vsf_heap_t)
     uint8_t memory[64 * 1024];
-    vsf_dlist_t freelist[1];
+    // one more as terminator
+    vsf_dlist_t freelist[2];
 } static __usbh_heap;
 
 static vsf_dlist_t * __usbh_heap_get_freelist(uint_fast32_t size)

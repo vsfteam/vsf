@@ -91,7 +91,7 @@ extern void __vsf_heap_free(vsf_heap_t *heap, void *buffer);
 extern void vsf_heap_init(void);
 /*!\note: vsf_heap_add_buffer and vsf_heap_add_memory cannot add misaligned memory spaces.
  *!\when a user needs to add memory space, the space provided each time must be aligned
- *!\according to the alignment defined by VSF_HEAP_CFG_MCB_ALIGN_BIT(4 if undefined).
+ *!\according to the alignment defined by VSF_HEAP_CFG_MCB_ALIGN_BIT(2 if undefined).
 */
 extern void vsf_heap_add_buffer(uint8_t *buffer, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);

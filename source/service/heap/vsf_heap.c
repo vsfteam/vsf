@@ -96,7 +96,8 @@ typedef struct vsf_heap_mcb_t {
 
 typedef struct vsf_default_heap_t {
     implement(vsf_heap_t)
-    vsf_dlist_t freelist[VSF_HEAP_CFG_FREELIST_NUM];
+    // one more as terminator
+    vsf_dlist_t freelist[VSF_HEAP_CFG_FREELIST_NUM + 1];
 } vsf_default_heap_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
