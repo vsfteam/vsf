@@ -162,6 +162,7 @@
 #define VSF_USE_SIMPLE_STREAM                           ENABLED
 
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
+#   define USRAPP_FAKEFAT32_CFG_FONT                    ENABLED
 
 
 #if __IS_COMPILER_LLVM__
