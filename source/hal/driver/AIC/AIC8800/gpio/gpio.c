@@ -24,6 +24,9 @@
 
 #define GPIO_OUTPUT                         (1)
 #define GPIO_INPUT                          (0)
+
+#define GPIO_PORT0                          GPIO_PORT_A
+#define GPIO_PORT1                          GPIO_PORT_B
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __vsf_hw_gpio_imp_lv0(__count, __dont_care)                             \
@@ -33,16 +36,17 @@
             .iomux = REG_IOMUX0,                                                \
         },                                                                      \
         .current_param = NULL,                                                  \
+        .port = GPIO_PORT##__count,                                             \
     };
 
-#define aic8800_gpio_def()                                                      \
-    __vsf_hw_gpio_imp_lv0(0, NULL)
+#define aic8800_gpio_def(__count)                                               \
+    VSF_MREPEAT(__count, __vsf_hw_gpio_imp_lv0, NULL)
 /*============================ TYPES =========================================*/
 
  typedef void (*target_fn_t)(int gpio_idx, void *target);
 /*============================ GLOBAL VARIABLES ==============================*/
 
- aic8800_gpio_def()
+ aic8800_gpio_def(GPIO_COUNT)
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

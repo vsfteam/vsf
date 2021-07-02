@@ -28,7 +28,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef GPIO_COUNT
-#   define GPIO_COUNT                       16
+#   define GPIO_COUNT                       2
 #endif
 
 #define GPIO_SET                            (1)
