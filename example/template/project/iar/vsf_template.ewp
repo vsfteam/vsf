@@ -6062,15 +6062,30 @@
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m3\libejs.a</name>
+                                    <excluded>
+                                        <configuration>vsf_template_aic8800</configuration>
+                                    </excluded>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m3\libelua.a</name>
                                 </file>
                             </group>
                             <group>
                                 <name>cortex-m4</name>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libecma.a</name>
+                                    <excluded>
+                                        <configuration>vsf_template_aic8800</configuration>
+                                    </excluded>
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libejs.a</name>
+                                    <excluded>
+                                        <configuration>vsf_template_aic8800</configuration>
+                                    </excluded>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libelua.a</name>
                                 </file>
                             </group>
                         </group>
@@ -6934,6 +6949,9 @@
                     </group>
                     <group>
                         <name>raw</name>
+                        <excluded>
+                            <configuration>vsf_template_aic8800</configuration>
+                        </excluded>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\raw\lapi.c</name>
                         </file>
