@@ -100,7 +100,6 @@
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    1920
 #   define APP_LVGL_DEMO_CFG_VER_RES                    1080
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (80 * 1024)
-// double 80K 16-bit pixels buffer at 0x00100000
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_HEAP
 #   define APP_LVGL_DEMO_CFG_DOUBLE_BUFFER              ENABLED
 #define APP_USE_BTSTACK_DEMO                            ENABLED
@@ -311,9 +310,8 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #endif
 
 #if APP_USE_SDL2_DEMO == ENABLED
-#   define VSF_SDL_CFG_WINDOW_PTR                       0x00100000
-#   define VSF_SDL_CFG_DISPLAY_HEIGHT                   320
-#   define VSF_SDL_CFG_DISPLAY_WIDTH                    480
+#   define VSF_SDL_CFG_DISPLAY_HEIGHT                   240
+#   define VSF_SDL_CFG_DISPLAY_WIDTH                    320
 #endif
 
 #define VSF_LINUX_CFG_STACKSIZE                         (4 * 1024)
