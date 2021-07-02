@@ -19,16 +19,19 @@
 #define __HAL_DRIVER_AIC8800_GPIO_H__
 /*============================ INCLUDES ======================================*/
 
-#include "vsf.h"
-#if VSF_HAL_USE_GPIO == ENABLED
+#include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/gpio/reg_gpio.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
+#if VSF_HAL_USE_GPIO == ENABLED
+#include "./i_reg_gpio.h"
+//#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/gpio/reg_gpio.h"
+//#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 /*============================ MACROS ========================================*/
 
 #ifndef GPIO_COUNT
 #   define GPIO_COUNT                       16
 #endif
+
+#define GPIO_SET                            (1)
 
 #define GPIO_PORT_A                         (BIT(0))
 #define GPIO_PORT_B                         (BIT(1))
@@ -114,8 +117,8 @@ enum io_pin_no_t {
 #include "hal/driver/common/template/vsf_template_io.h"
 
 typedef struct gpio_reg_t {
-    AIC_GPIO_TypeDef            *gpio;
-    AIC_IOMUX_TypeDef           *iomux;
+    GPIO_REG_T                  *gpio;
+    IOMUX_REG_T                 *iomux;
 } gpio_reg_t;
 
 typedef struct vsf_gpio_t {
@@ -127,6 +130,8 @@ typedef struct vsf_gpio_t {
 
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern vsf_gpio_t vsf_gpio0;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
