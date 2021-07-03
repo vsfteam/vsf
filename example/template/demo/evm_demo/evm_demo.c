@@ -33,6 +33,7 @@
 
 int evm_demo_main(int argc, char *argv[])
 {
+    extern int evm_main(void);
     return evm_main();
 }
 
