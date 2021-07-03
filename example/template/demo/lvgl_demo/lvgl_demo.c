@@ -325,8 +325,9 @@ int VSF_USER_ENTRY(void)
     lv_disp_t *disp;
 
 #ifdef APP_LVGL_DEMO_CFG_PIXEL_BUFFER_HEAP
-    usrapp_ui_common.lvgl.color = vsf_heap_malloc(APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE *
-                ((APP_LVGL_DEMO_CFG_DOUBLE_BUFFER == ENABLED) ? 2 : 1));
+    usrapp_ui_common.lvgl.color = vsf_heap_malloc(APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE
+            *   sizeof(usrapp_ui_common.lvgl.color[0])
+            *   ((APP_LVGL_DEMO_CFG_DOUBLE_BUFFER == ENABLED) ? 2 : 1));
     VSF_ASSERT(usrapp_ui_common.lvgl.color != NULL);
 #endif
     lv_disp_buf_init(   &usrapp_ui_common.lvgl.disp_buf,

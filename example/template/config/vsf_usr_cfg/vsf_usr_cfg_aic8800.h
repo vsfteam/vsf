@@ -99,9 +99,10 @@
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                16
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    1920
 #   define APP_LVGL_DEMO_CFG_VER_RES                    1080
-#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (80 * 1024)
+#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (40 * 1024)
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_HEAP
 #   define APP_LVGL_DEMO_CFG_DOUBLE_BUFFER              ENABLED
+#   define VSF_LVGL_IMP_WAIT_CB                         ENABLED
 #define APP_USE_BTSTACK_DEMO                            ENABLED
 // DO NOT use bthci, use on-chip bluetooth
 #   define VSF_USBH_USE_BTHCI                           DISABLED
