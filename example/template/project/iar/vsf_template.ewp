@@ -6043,8 +6043,14 @@
                     </group>
                     <group>
                         <name>port</name>
+                        <group>
+                            <name>iotjs</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\iotjs\evm_main.c</name>
+                            </file>
+                        </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\evm_main.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\evm_port.c</name>
                         </file>
                     </group>
                     <group>

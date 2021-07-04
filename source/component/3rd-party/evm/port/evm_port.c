@@ -9,7 +9,6 @@
 #if VSF_USE_EVM == ENABLED
 
 #include "evm_module.h"
-#include "ecma.h"
 
 // implement _ctype_ if not available in libc
 #if __IS_COMPILER_IAR__
@@ -62,31 +61,25 @@ enum FS_MODE {
 
 void * fs_open(char *name, int mode)
 {
-    char m[5];
-    memset(m, 0, 5);
+    char m[5] = { 0 };
+    int pos = 0;
 
     if (mode & FS_READ) {
-        sprintf(m, "%sr", m);
+        m[pos++] = 'r';
     }
 
     if (mode & FS_WRITE) {
-        sprintf(m, "%sw", m);
+        m[pos++] = 'w';
     }
 
     if (mode & FS_TEXT) {
-        sprintf(m, "%st", m);
-    }
-
-    if (mode & FS_BIN) {
-        sprintf(m, "%sb", m);
+        m[pos++] = 't';
+    } else if (mode & FS_BIN) {
+        m[pos++] = 'b';
     }
 
     if (mode & FS_APPEND) {
-        sprintf(m, "%sa", m);
-    }
-
-    if (mode & FS_TEXT) {
-        sprintf(m, "%st", m);
+        m[pos++] = 'a';
     }
 
     return fopen(name, m);
@@ -116,7 +109,7 @@ int fs_write(void *handle, char *buf, int len)
     return fwrite(buf, 1, len, (FILE *)handle);
 }
 
-char * evm_open(evm_t *e, char *filename)
+static char * __evm_open(evm_t *e, char *filename)
 {
     FILE *file;
     size_t result;
@@ -139,20 +132,20 @@ char * evm_open(evm_t *e, char *filename)
     return buffer;
 }
 
-#ifndef EVM_ROOT_PATH
-#   define EVM_ROOT_PATH            "/memfs/evm"
-#endif
-const char * vm_load(evm_t *e, char *path, int type)
+static const char * __vm_load(evm_t *e, char *path, int type)
 {
     char filename[EVM_FILE_NAME_LEN];
-    const char *format = (type == EVM_LOAD_MAIN) ? "%s/%s" : "%s/modules/%s";
+    extern evm_err_t vm_generate_path(evm_t *e, char *pathbuf, int pathbuf_size, char *path, int type);
+    evm_err_t err = vm_generate_path(e, (char *)&filename, EVM_FILE_NAME_LEN, path, type);
+    if (err != ec_ok) {
+        return NULL;
+    }
 
-    snprintf(filename, sizeof(filename), format, EVM_ROOT_PATH, path);
     strcpy(e->file_name, filename);
-    return evm_open(e, filename);
+    return __evm_open(e, filename);
 }
 
-void * vm_malloc(int size)
+static void * __vm_malloc(int size)
 {
     void *m = malloc(size);
     if (m != NULL) {
@@ -161,64 +154,28 @@ void * vm_malloc(int size)
     return m;
 }
 
-void vm_free(void *mem)
+static void __vm_free(void *mem)
 {
     if (mem != NULL) {
         free(mem);
     }
 }
 
-// evm_module_init here will try to add all modules supported by vsf,
-//  re-write it if necessary
-WEAK(evm_module_init)
-evm_err_t evm_module_init(evm_t *env)
+evm_t * evm_port_init(void)
 {
-    evm_err_t err = ec_ok;
-
-#if VSF_EVM_USE_USBH == ENABLED && VSF_USE_LINUX == ENABLED
-    extern evm_err_t evm_module_usbh(evm_t *e);
-    err = evm_module_usbh(env);
-    if (err != ec_ok) {
-        evm_print("Failed to create usbh module\r\n");
-        return err;
-    }
-#endif
-
-    return err;
-}
-
-int evm_main(void)
-{
-    evm_register_free((intptr_t)vm_free);
-    evm_register_malloc((intptr_t)vm_malloc);
+    evm_register_free((intptr_t)__vm_free);
+    evm_register_malloc((intptr_t)__vm_malloc);
     evm_register_print((intptr_t)printf);
-    evm_register_file_load((intptr_t)vm_load);
+    evm_register_file_load((intptr_t)__vm_load);
 
     evm_t *env = (evm_t *)evm_malloc(sizeof(evm_t));
     evm_err_t err = evm_init(env, EVM_HEAP_SIZE, EVM_STACK_SIZE, EVM_VAR_NAME_MAX_LEN, EVM_FILE_NAME_LEN);
-
-    err = ecma_module(env);
     if (err != ec_ok) {
-        evm_print("Failed to create ecma module\r\n");
-        return err;
+        evm_free(env);
+        env = NULL;
     }
 
-    err = evm_module_init(env);
-    if (err != ec_ok) {
-        return err;
-    }
-
-#ifdef EVM_LANG_ENABLE_REPL
-    evm_repl_run(env, 1000, EVM_LANG_JS);
-#endif
-
-    err = evm_boot(env, "main.js");
-    if (err == ec_no_file) {
-        evm_print("can't open file\r\n");
-        return err;
-    }
-
-    return evm_start(env);
+    return env;
 }
 
 #endif      // VSF_USE_EVM

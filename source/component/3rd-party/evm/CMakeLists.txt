@@ -14,7 +14,8 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     extension/oo/evm_oo.c
     extension/usbh/evm_module_usbh.c
 
-    port/evm_main.c
+    port/evm_port.c
+    port/iotjs/evm_main.c
 )
 
 if(${VSF_ARCH_SERIES} STREQUAL "x86")
