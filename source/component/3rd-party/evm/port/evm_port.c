@@ -145,7 +145,9 @@ static const char * __vm_load(evm_t *e, char *path, int type)
     return __evm_open(e, filename);
 }
 
-static void * __vm_malloc(int size)
+#ifndef WEAK_VM_MALLOC
+WEAK(vm_malloc)
+void * vm_malloc(int size)
 {
     void *m = malloc(size);
     if (m != NULL) {
@@ -153,18 +155,22 @@ static void * __vm_malloc(int size)
     }
     return m;
 }
+#endif
 
-static void __vm_free(void *mem)
+#ifndef WEAK_VM_FREE
+WEAK(vm_free)
+void vm_free(void *mem)
 {
     if (mem != NULL) {
         free(mem);
     }
 }
+#endif
 
 evm_t * evm_port_init(void)
 {
-    evm_register_free((intptr_t)__vm_free);
-    evm_register_malloc((intptr_t)__vm_malloc);
+    evm_register_free((intptr_t)vm_free);
+    evm_register_malloc((intptr_t)vm_malloc);
     evm_register_print((intptr_t)printf);
     evm_register_file_load((intptr_t)__vm_load);
 
