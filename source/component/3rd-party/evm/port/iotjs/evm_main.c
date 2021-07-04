@@ -11,6 +11,7 @@
 #include "evm_module.h"
 #include "ecma.h"
 
+#ifndef WEAK_EVM_MODULE_INIT
 // evm_module_init here will try to add all modules supported by vsf,
 //  re-write it if necessary
 WEAK(evm_module_init)
@@ -29,7 +30,10 @@ evm_err_t evm_module_init(evm_t *env)
 
     return err;
 }
+#endif
 
+#ifndef WEAK_EVM_MAIN
+WEAK(evm_main)
 int evm_main(void)
 {
     extern evm_t * evm_port_init(void);
@@ -58,5 +62,6 @@ int evm_main(void)
 
     return evm_start(env);
 }
+#endif
 
 #endif      // VSF_USE_EVM
