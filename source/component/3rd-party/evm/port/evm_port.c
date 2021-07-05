@@ -1,14 +1,49 @@
-// vsf configurations will be check, so include vsf.h here
-//  if user want to remove dependency on vsf, remove modules in evm_module_init,
-//  and include stdlib.h/stdio.h/string.h
+/*****************************************************************************
+ *   Copyright(C)2009-2019 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
+/*============================ INCLUDES ======================================*/
+
 #include "vsf.h"
-//#include <stdlib.h>
-//#include <stdio.h>
-//#include <string.h>
 
 #if VSF_USE_EVM == ENABLED
 
 #include "evm_module.h"
+
+#if     !defined(VSF_EVM_PORT_USE_LIBC) && !defined(VSF_EVM_PORT_USE_VSF)       \
+    &&  !defined(VSF_EVM_PORT_USE_POSIX)
+#   define VSF_EVM_PORT_USE_LIBC                ENABLED
+#endif
+
+#if VSF_EVM_PORT_USE_LIBC == ENABLED
+#   include "../template/port/evm_port_libc.inc"
+#elif VSF_EVM_PORT_USE_VSF == ENABLED
+#   include "../template/port/evm_port_vsf.inc"
+#elif VSF_EVM_PORT_USE_POSIX == ENABLED
+#   include "../template/port/evm_port_posix.inc"
+#else
+#   error SHOULD NOT error here, becasue default proting is based on libc
+#endif
+
+/*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+/*============================ PROTOTYPES ====================================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ GLOBAL VARIABLES ==============================*/
 
 // implement _ctype_ if not available in libc
 #if __IS_COMPILER_IAR__
@@ -43,20 +78,7 @@ const char _ctype_[1 + 256] = {
 };
 #endif
 
-#if     !defined(VSF_EVM_PORT_USE_LIBC) && !defined(VSF_EVM_PORT_USE_VSF)       \
-    &&  !defined(VSF_EVM_PORT_USE_POSIX)
-#   define VSF_EVM_PORT_USE_LIBC                ENABLED
-#endif
-
-#if VSF_EVM_PORT_USE_LIBC == ENABLED
-#   include "../template/port/evm_port_libc.inc"
-#elif VSF_EVM_PORT_USE_VSF == ENABLED
-#   include "../template/port/evm_port_vsf.inc"
-#elif VSF_EVM_PORT_USE_POSIX == ENABLED
-#   include "../template/port/evm_port_posix.inc"
-#else
-#   error SHOULD NOT error here, becasue default proting is based on libc
-#endif
+/*============================ IMPLEMENTATION ================================*/
 
 static char * __evm_open(evm_t *e, char *filename)
 {

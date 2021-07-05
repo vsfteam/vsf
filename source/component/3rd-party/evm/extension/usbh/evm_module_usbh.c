@@ -81,8 +81,8 @@ static const evm_class_vt_t __evm_class_usbh_dev_vt[] = {
 
 const evm_class_t evm_class_usbh_dev = {
     .name       = "usbh_dev",
-    .vt       = __evm_class_usbh_dev_vt,
-    .vt_len   = dimof(__evm_class_usbh_dev_vt),
+    .vt         = __evm_class_usbh_dev_vt,
+    .vt_len     = dimof(__evm_class_usbh_dev_vt),
 };
 
 /*============================ IMPLEMENTATION ================================*/

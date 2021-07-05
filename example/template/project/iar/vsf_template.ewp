@@ -6045,6 +6045,12 @@
                         <name>port</name>
                         <group>
                             <name>iotjs</name>
+                            <group>
+                                <name>modules</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\iotjs\modules\evm_module_hal.c</name>
+                                </file>
+                            </group>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\iotjs\evm_main.c</name>
                             </file>

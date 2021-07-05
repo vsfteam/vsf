@@ -16,6 +16,7 @@ target_sources(${VSF_LIB_NAME} INTERFACE
 
     port/evm_port.c
     port/iotjs/evm_main.c
+    port/iotjs/modules/evm_module_hal.c
 )
 
 if(${VSF_ARCH_SERIES} STREQUAL "x86")

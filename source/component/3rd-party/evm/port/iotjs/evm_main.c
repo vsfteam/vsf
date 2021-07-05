@@ -1,15 +1,36 @@
-// vsf configurations will be check, so include vsf.h here
-//  if user want to remove dependency on vsf, remove modules in evm_module_init,
-//  and include stdlib.h/stdio.h/string.h
+/*****************************************************************************
+ *   Copyright(C)2009-2019 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
+/*============================ INCLUDES ======================================*/
+
 #include "vsf.h"
-//#include <stdlib.h>
-//#include <stdio.h>
-//#include <string.h>
 
 #if VSF_USE_EVM == ENABLED
 
 #include "evm_module.h"
 #include "ecma.h"
+
+/*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+/*============================ PROTOTYPES ====================================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_EVM_MODULE_INIT
 // evm_module_init here will try to add all modules supported by vsf,
