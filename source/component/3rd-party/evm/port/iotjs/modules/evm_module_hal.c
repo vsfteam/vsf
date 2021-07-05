@@ -262,16 +262,27 @@ static evm_val_t evm_module_gpio_class_read(evm_t *e, evm_val_t *p, int argc, ev
     return EVM_VAL_UNDEFINED;
 }
 
-//gpiopin.close([callback])
-static evm_val_t evm_module_gpio_class_close(evm_t *e, evm_val_t *p, int argc, evm_val_t *v)
-{
-    return EVM_VAL_UNDEFINED;
-}
-
 //gpiopin.closeSync()
 static evm_val_t evm_module_gpio_class_closeSync(evm_t *e, evm_val_t *p, int argc, evm_val_t *v)
 {
+    evm_hal_gpio_dev_t *dev = (evm_hal_gpio_dev_t *)evm_object_get_ext_data(p);
+    if (NULL == dev) {
+        return EVM_VAL_UNDEFINED;
+    }
+
+    evm_hal_gpio_close(dev);
     return EVM_VAL_UNDEFINED;
+}
+
+//gpiopin.close([callback])
+static evm_val_t evm_module_gpio_class_close(evm_t *e, evm_val_t *p, int argc, evm_val_t *v)
+{
+    evm_val_t ret = evm_module_gpio_class_closeSync(e, p, argc, v);
+    if (argc > 0 && evm_is_script(v)) {
+        evm_val_t args = evm_mk_null();
+        evm_run_callback(e, v, NULL, &args, 1);
+    }
+    return ret;
 }
 
 evm_err_t evm_module_gpio(evm_t *e) {

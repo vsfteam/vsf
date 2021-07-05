@@ -11,6 +11,11 @@ int evm_hal_gpio_open(evm_hal_gpio_dev_t *gpio_dev)
     return 0;
 }
 
+void evm_hal_gpio_close(evm_hal_gpio_dev_t *gpio_dev)
+{
+
+}
+
 void evm_hal_gpio_direction(evm_hal_gpio_dev_t *gpio_dev)
 {
 
