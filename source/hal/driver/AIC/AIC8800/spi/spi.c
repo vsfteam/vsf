@@ -19,17 +19,23 @@
 #include "vsf.h"
 #include "spi.h"
 #include "sysctrl_api.h"
-#include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/dma/dma_api.h"
-#include "../vendor/plf/aic8800/src/driver/gpio/gpio_api.h"
-#include "./hal/driver/AIC/AIC8800/port/rtos/rtos_al.h"
 /*============================ MACROS ========================================*/
 
 #define SPI0_RXDMA_CH_IDX       DMA_CHANNEL_SPI0_RX
 #define SPI0_TXDMA_CH_IDX       DMA_CHANNEL_SPI0_TX
 #define SPI0_RXDMA_IRQ_IDX      DMA08_IRQn
 #define SPI0_TXDMA_IRQ_IDX      DMA09_IRQn
-#define SPI0_DMA_BYTE_CNT_MAX   (64)
+#define SPI0_DMA_CFG_BYTE_CNT_MAX   (64)
+
+#undef SPI0_USE_GPIO
+#define SPI0_USE_GPIO           vsf_gpio0
+
+#undef SPI0_USE_GPIO_PIN
+#define SPI0_USE_GPIO_PIN       (GPIO_PIN_11)
+
+#undef SPI0_CFG_GPIO_FEATURE
+#define SPI0_CFG_GPIO_FEATURE   (0ul)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define ____vsf_hw_spi_imp_lv0(__count, __dont_care)                            \
@@ -44,6 +50,12 @@
 
 #define aic8800_spi_def(__count)                                                \
     __vsf_hw_spi_imp_lv0(__count)
+
+#define __iomux_cfg_set(__gp_idx)                                               \
+        do {                                                                    \
+            uint32_t local_val = REG_IOMUX0->GPCFG[__gp_idx] & ~GPIO_SEL_MASK;  \
+            REG_IOMUX0->GPCFG[__gp_idx] = local_val | ((3 << GPIO_SEL) & GPIO_SEL_MASK);\
+        } while (0)
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -62,18 +74,16 @@ static vsf_err_t __vsf_spi_init(vsf_spi_t *spi_ptr)
     pclk = sysctrl_clock_get(SYS_PCLK);
     spi_dr_div_setf(pclk / 2 / spi_ptr->cfg.clock_hz - 1);
 
-    iomux_gpio_config_sel_setf(10, 3);
+    __iomux_cfg_set(10);
     if (spi_ptr->cfg.mode & SPI_AUTO_SLAVE_SELECTION_ENABLE) {
-        iomux_gpio_config_sel_setf(11, 3);
+        __iomux_cfg_set(11);
     } else {
-        //todo
-        gpio_init2(11);
-        gpio_dir_out(11);
-        gpio_set(11);
+        vsf_gpio_config_pin(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN, SPI0_CFG_GPIO_FEATURE);
+        vsf_gpio_set_output(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN);
+        vsf_gpio_set(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN);
     }
-
-    iomux_gpio_config_sel_setf(12, 3);
-    iomux_gpio_config_sel_setf(13, 3);
+    __iomux_cfg_set(12);
+    __iomux_cfg_set(13);
 
     if (SPI_MODE_0 == (spi_ptr->cfg.mode & SPI_MODE_3)) {
         cr0 = (0x01ul << 0) |(0x01ul << 1) | (0x00ul << 13);
@@ -94,12 +104,12 @@ static vsf_err_t __vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer
 {
     uint32_t cr0;
     int ch = SPI0_TXDMA_CH_IDX;
-    if (count > SPI0_DMA_BYTE_CNT_MAX) {
+    if (count > SPI0_DMA_CFG_BYTE_CNT_MAX) {
         spi_ptr->__off_set.count = count;
         spi_ptr->__off_set.off_set_64 = 0;
         spi_ptr->__off_set.buff.out_buff = out_buffer_ptr;
         spi_ptr->__off_set.buff.in_buff = out_buffer_ptr;
-        count = SPI0_DMA_BYTE_CNT_MAX;
+        count = SPI0_DMA_CFG_BYTE_CNT_MAX;
     } else {
         spi_ptr->__off_set.count = 0;
     }
@@ -177,14 +187,13 @@ void DMA08_IRQHandler(void)
     uint32_t cr0;
     dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
     if (0 != vsf_spi0.__off_set.count) {
-        vsf_spi0.__off_set.count -= SPI0_DMA_BYTE_CNT_MAX;
+        vsf_spi0.__off_set.count -= SPI0_DMA_CFG_BYTE_CNT_MAX;
         __vsf_spi_request_transfer(&vsf_spi0,
-                                   (void *)((uint8_t *)vsf_spi0.__off_set.buff.out_buff + SPI0_DMA_BYTE_CNT_MAX),
-                                   (void *)((uint8_t *)vsf_spi0.__off_set.buff.in_buff + SPI0_DMA_BYTE_CNT_MAX),
+                                   (void *)((uint8_t *)vsf_spi0.__off_set.buff.out_buff + SPI0_DMA_CFG_BYTE_CNT_MAX),
+                                   (void *)((uint8_t *)vsf_spi0.__off_set.buff.in_buff + SPI0_DMA_CFG_BYTE_CNT_MAX),
                                    vsf_spi0.__off_set.count);
         return;
     }
-    gpio_clr(15);
     if ((vsf_spi0.irq_msk & SPI_IRQ_MASK_CPL) && NULL != vsf_spi0.cfg.isr.handler_fn) {
         vsf_spi0.cfg.isr.handler_fn(vsf_spi0.cfg.isr.target_ptr, &vsf_spi0, SPI_IRQ_MASK_CPL);
     }
@@ -220,8 +229,6 @@ vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
     vsf_err_t ret;
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(cfg_ptr != NULL);
-    gpio_init2(15);
-    gpio_dir_out(15);
     spi_ptr->cfg = *cfg_ptr;
     ret = __vsf_spi_init(spi_ptr);
     spi_ptr->param->MR0 = (((spi_ptr->cfg.mode & SPI_MASTER) << 11) | (0x00ul <<  3));
@@ -282,7 +289,6 @@ vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr, voi
         return VSF_ERR_ALREADY_EXISTS;
     }
     spi_ptr->is_busy = true;
-    gpio_set(15);
     ret = __vsf_spi_request_transfer(spi_ptr, out_buffer_ptr, in_buffer_ptr, count);
     return (ret == VSF_ERR_NONE) ? VSF_ERR_NONE : VSF_ERR_NOT_READY;
 }
@@ -295,20 +301,24 @@ vsf_err_t vsf_spi_cancel_transfer(vsf_spi_t *spi_ptr)
 
 void vsf_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
-    //todo:
     if (spi_ptr->cfg.mode & SPI_AUTO_SLAVE_SELECTION_ENABLE) {
+        if (index > 1) {
+            VSF_HAL_ASSERT(false);
+        }
         return;
     }
-    gpio_clr(11);
+    vsf_gpio_clear(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN);
 }
 
 void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
-    //todo:
     if (spi_ptr->cfg.mode & SPI_AUTO_SLAVE_SELECTION_ENABLE) {
+        if (index > 1) {
+            VSF_HAL_ASSERT(false);
+        }
         return;
     }
-    gpio_set(11);
+    vsf_gpio_set(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN);
 }
 
 spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
