@@ -94,7 +94,7 @@ static const char *__vsf_trace_color[VSF_TRACE_LEVEL_NUM] = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-static uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
+uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
 {
     uint32_t ret = 0;
 
@@ -156,7 +156,7 @@ void __vsf_trace_init(vsf_stream_tx_t *ptTX)
     } while(0);
 }
 
-static uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
+uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
 {
     uint_fast16_t length = size;
     uint8_t *src = (uint8_t *)buff;

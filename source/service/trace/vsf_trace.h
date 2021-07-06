@@ -123,6 +123,8 @@ extern void vsf_trace_string(vsf_trace_level_t level, const char *str);
 extern void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list arg);
 extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 
+extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);
+
 #else
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #       define vsf_trace_init(__arg)
