@@ -7,8 +7,6 @@ target_include_directories(${VSF_LIB_NAME} INTERFACE
     extension/oo
     ${VSF_EVM_PATH}/include
 )
-#target_compile_definitions(${VSF_LIB_NAME} INTERFACE
-#)
 
 target_sources(${VSF_LIB_NAME} INTERFACE
     extension/oo/evm_oo.c
@@ -19,24 +17,45 @@ target_sources(${VSF_LIB_NAME} INTERFACE
 )
 
 if(VSF_EVM_USE_LUA)
+    target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+#       needed by webclient
+        __linux__
+    )
+
     target_include_directories(${VSF_LIB_NAME} INTERFACE
         ${VSF_EVM_PATH}/modules/eluaos/include
+        ${VSF_EVM_PATH}/components/webclient/inc
     )
 
     target_sources(${VSF_LIB_NAME} INTERFACE
         port/eluaos/luat_fs_vsf.c
+        port/eluaos/luat_gpio_vsf.c
+        port/eluaos/luat_http_vsf.c
         port/eluaos/luat_log_vsf.c
+        port/eluaos/luat_netclient_vsf.c
         port/eluaos/luat_malloc_vsf.c
         port/eluaos/luat_msgbus_vsf.c
+        port/eluaos/luat_socket_vsf.c
         port/eluaos/luat_timer_vsf.c
+        port/eluaos/luat_uart_vsf.c
         port/eluaos/luat_vsf_base.c
+
+#        ${VSF_EVM_PATH}/components/webclient/src/webclient.c
+#        ${VSF_EVM_PATH}/components/webclient/src/webclient_file.c
+#        ${VSF_EVM_PATH}/components/webclient/src/webclient_http.c
 
         ${VSF_EVM_PATH}/modules/eluaos/lualib/bget.c
         ${VSF_EVM_PATH}/modules/eluaos/lualib/lbaselib.c
         ${VSF_EVM_PATH}/modules/eluaos/lualib/linit.c
         ${VSF_EVM_PATH}/modules/eluaos/lualib/rotable.c
 
+        ${VSF_EVM_PATH}/modules/eluaos/modules/luat_lib_gpio.c
+#        ${VSF_EVM_PATH}/modules/eluaos/modules/luat_lib_http.c
+        ${VSF_EVM_PATH}/modules/eluaos/modules/luat_lib_log.c
         ${VSF_EVM_PATH}/modules/eluaos/modules/luat_lib_rtos.c
+        ${VSF_EVM_PATH}/modules/eluaos/modules/luat_lib_socket.c
+        ${VSF_EVM_PATH}/modules/eluaos/modules/luat_lib_timer.c
+        ${VSF_EVM_PATH}/modules/eluaos/modules/luat_lib_uart.c
         ${VSF_EVM_PATH}/modules/eluaos/modules/luat_luat_bin.c
         ${VSF_EVM_PATH}/modules/eluaos/modules/luat_main.c
         ${VSF_EVM_PATH}/modules/eluaos/modules/luat_malloc_weak.c

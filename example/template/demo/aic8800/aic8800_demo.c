@@ -36,7 +36,7 @@
 // redefine usbh memory allocation, memory MUST be in 0x001A0000 - 0x001C7FFF
 struct __usbh_heap_t {
     implement(vsf_heap_t)
-    uint8_t memory[64 * 1024];
+    uint8_t memory[32 * 1024];
     // one more as terminator
     vsf_dlist_t freelist[2];
 } static __usbh_heap;

@@ -84,6 +84,8 @@ enum {
     SO_ERROR,
     SO_SNDBUF,
     SO_RCVBUF,
+    SO_RCVTIMEO,
+    SO_SNDTIMEO,
 };
 int setsockopt(int socket, int level, int optname, const void *optval,
                     socklen_t optlen);

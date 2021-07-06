@@ -6053,6 +6053,9 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_fs_vsf.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_gpio_vsf.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_log_vsf.c</name>
                             </file>
                             <file>
@@ -6062,7 +6065,16 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_msgbus_vsf.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_netclient_vsf.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_socket_vsf.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_timer_vsf.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_uart_vsf.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_vsf_base.c</name>
@@ -6142,7 +6154,25 @@
                                 <group>
                                     <name>modules</name>
                                     <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_gpio.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_http.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_log.c</name>
+                                    </file>
+                                    <file>
                                         <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_rtos.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_socket.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_timer.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_uart.c</name>
                                     </file>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_luat_bin.c</name>

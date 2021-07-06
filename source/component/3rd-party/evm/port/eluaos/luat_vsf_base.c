@@ -12,14 +12,14 @@
 
 static const luaL_Reg loadedlibs[] = {
     {"_G", luaopen_base},
-//    {"rtos", luaopen_rtos},
-//    {"log", luaopen_log},
+    {"rtos", luaopen_rtos},
+    {"log", luaopen_log},
 //    {"wlan", luaopen_wlan},
-//    {"socket", luaopen_socket},
-//    {"timer", luaopen_timer},
-//    {"gpio", luaopen_gpio},
+    {"socket", luaopen_socket},
+    {"timer", luaopen_timer},
+    {"gpio", luaopen_gpio},
 //    {"pwm", luaopen_pwm},
-//    {"uart", luaopen_uart},
+    {"uart", luaopen_uart},
 //    {"http", luaopen_http},
     {NULL, NULL},
 };
