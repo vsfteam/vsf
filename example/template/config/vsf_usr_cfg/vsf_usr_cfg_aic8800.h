@@ -113,7 +113,7 @@
 #define APP_USE_LWIP_DEMO                               DISABLED
 #   define VSF_USE_LWIP                                 ENABLED
 #define APP_USE_EVM_DEMO                                ENABLED
-#define APP_USE_LUA_DEMO                                DISABLED
+#define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 //#define APP_USE_DISTBUS_DEMO                            ENABLED
 //#   define APP_DISTBUS_DEMO_CFG_LWIP                    ENABLED

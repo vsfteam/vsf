@@ -44,6 +44,9 @@ void luat_openlibs(lua_State *L)
 
 LUA_API lua_State * lua_newstate(lua_Alloc f, void *args)
 {
+    if (NULL == f) {
+        f = luat_heap_alloc;
+    }
     evm_lua_set_allocf(f, args);
 
     extern evm_t * evm_port_init(void);
@@ -58,6 +61,12 @@ LUA_API lua_State * lua_newstate(lua_Alloc f, void *args)
     }
 
     return evm_lua_new_state(env, EVM_LUA_SIZE_OF_GLOBALS);
+}
+
+// patch for un-implemented lua APIs
+void lua_close (lua_State *L)
+{
+
 }
 
 #endif

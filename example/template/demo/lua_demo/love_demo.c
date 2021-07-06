@@ -124,7 +124,7 @@ int love_main(int argc, char *argv[])
     vsf_sdl2_init(usrapp_ui_common.disp);
 
     // TODO: process on_exit to call lua_close(L);
-    lua_State *L = luaL_newstate();
+    lua_State *L = lua_newstate(NULL, NULL);
     luaL_openlibs(L);
     luaL_requiref(L, "love", luaopen_love, 1);
 
