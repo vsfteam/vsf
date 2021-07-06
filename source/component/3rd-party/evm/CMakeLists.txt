@@ -30,7 +30,7 @@ if(VSF_EVM_USE_LUA)
     target_sources(${VSF_LIB_NAME} INTERFACE
         port/eluaos/luat_fs_vsf.c
         port/eluaos/luat_gpio_vsf.c
-        port/eluaos/luat_http_vsf.c
+#        port/eluaos/luat_http_vsf.c
         port/eluaos/luat_log_vsf.c
         port/eluaos/luat_netclient_vsf.c
         port/eluaos/luat_malloc_vsf.c
