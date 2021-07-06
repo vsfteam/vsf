@@ -5,6 +5,7 @@
 #include "luat_base.h"
 #include "luat_malloc.h"
 #include "luat_msgbus.h"
+#include "luat_timer.h"
 
 #include "ecma.h"
 #include "evm_lua_conf.h"
