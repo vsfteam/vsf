@@ -72,4 +72,11 @@ int luat_timer_mdelay(size_t ms) {
     return 0;
 }
 
+void luat_timer_us_delay(size_t us)
+{
+    if (us > 0) {
+        vsf_thread_delay_us(us);
+    }
+}
+
 #endif      // VSF_USE_EVM && VSF_EVM_USE_LUA
