@@ -130,6 +130,9 @@
 
 #if APP_USE_EVM_DEMO == ENABLED
 #   define VSF_USE_EVM                                  ENABLED
+#   if APP_USE_LUA_DEMO == ENABLED
+#       define VSF_EVM_USE_LUA                          ENABLED
+#   endif
 #   if !defined(VSF_EVM_USE_USBH) && VSF_USE_USB_HOST == ENABLED
 #       define VSF_EVM_USE_USBH                         ENABLED
 #   endif

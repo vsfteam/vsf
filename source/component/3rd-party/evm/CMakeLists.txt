@@ -6,6 +6,7 @@ target_include_directories(${VSF_LIB_NAME} INTERFACE
     port
     extension/oo
     ${VSF_EVM_PATH}/include
+    ${VSF_EVM_PATH}/modules/eluaos/include
 )
 #target_compile_definitions(${VSF_LIB_NAME} INTERFACE
 #)
@@ -16,7 +17,19 @@ target_sources(${VSF_LIB_NAME} INTERFACE
 
     port/evm_port.c
     port/iotjs/evm_main.c
-    port/iotjs/modules/evm_module_hal.c
+    port/eluaos/luat_fs_vsf.c
+    port/eluaos/luat_log_vsf.c
+    port/eluaos/luat_malloc_vsf.c
+    port/eluaos/luat_msgbus_vsf.c
+    port/eluaos/luat_vsf_base.c
+
+    ${VSF_EVM_PATH}/modules/eluaos/lualib/bget.c
+    ${VSF_EVM_PATH}/modules/eluaos/lualib/lbaselib.c
+    ${VSF_EVM_PATH}/modules/eluaos/lualib/linit.c
+
+    ${VSF_EVM_PATH}/modules/eluaos/modules/luat_lib_rtos.c
+    ${VSF_EVM_PATH}/modules/eluaos/modules/luat_main.c
+    ${VSF_EVM_PATH}/modules/eluaos/modules/luat_malloc_weak.c
 )
 
 if(${VSF_ARCH_SERIES} STREQUAL "x86")

@@ -124,6 +124,11 @@ evm_t * evm_port_init(void)
     evm_register_file_load((intptr_t)__vm_load);
 
     evm_t *env = (evm_t *)evm_malloc(sizeof(evm_t));
+    if (NULL == env) {
+        return NULL;
+    }
+
+    memset(env, 0, sizeof(evm_t));
     evm_err_t err = evm_init(env, EVM_HEAP_SIZE, EVM_STACK_SIZE, EVM_VAR_NAME_MAX_LEN, EVM_FILE_NAME_LEN);
     if (err != ec_ok) {
         evm_free(env);

@@ -23,6 +23,11 @@
 
 #include "evm_module.h"
 
+#if VSF_EVM_USE_LUA == ENABLED
+#   include "luat_log.h"
+#   include "luat_base.h"
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef EVM_ROOT_PATH
@@ -49,5 +54,15 @@ int evm_demo_main(int argc, char *argv[])
     extern int evm_main(void);
     return evm_main();
 }
+
+#if VSF_EVM_USE_LUA == ENABLED
+int evm_demo_luat_main(int argc, char *argv[])
+{
+    luat_log_set_uart_port(0);
+    luat_main();
+    vsf_thread_wfe(VSF_EVT_YIELD);
+    return 0;
+}
+#endif
 
 #endif

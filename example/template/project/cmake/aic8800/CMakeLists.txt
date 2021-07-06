@@ -63,6 +63,7 @@ set(VSF_USE_BTSTACK 1)
 set(VSF_USE_COREMARK 1)
 set(VSF_USE_LUA 1)
 set(VSF_USE_EVM 1)
+    set(VSF_EVM_USE_LUA 1)
 
 # include vsf cmake script
 set(VSF_CONFIG_PATH ../../../config)

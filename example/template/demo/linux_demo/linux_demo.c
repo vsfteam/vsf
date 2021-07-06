@@ -97,7 +97,7 @@ int vsf_linux_create_fhs(void)
         mount(NULL, "fatfs", NULL, 0, &usrapp_common.mal.fakefat32.use_as__vk_mal_t);
     }
 #   else
-    #       warning fat with non - 512 sector size, current driver is not supported
+#       warning fat with non - 512 sector size, current driver is not supported
 #   endif
 #endif
 
@@ -269,10 +269,14 @@ int vsf_linux_create_fhs(void)
 #if APP_USE_EVM_DEMO == ENABLED
     extern int evm_demo_main(int argc, char *argv[]);
     busybox_bind("/sbin/evm", evm_demo_main);
+    extern int evm_demo_luat_main(int argc, char *argv[]);
+    busybox_bind("/sbin/evm_lua", evm_demo_luat_main);
 #endif
 #if APP_USE_LUA_DEMO == ENABLED
+#   if VSF_EVM_USE_LUA != ENABLED
     extern int lua_main(int argc, char* argv[]);
     busybox_bind("/sbin/lua", lua_main);
+#   endif
     extern int love_main(int argc, char *argv[]);
     busybox_bind("/sbin/love", love_main);
 #endif
