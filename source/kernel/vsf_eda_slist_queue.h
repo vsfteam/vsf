@@ -58,7 +58,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if __VSF_KERNEL_CFG_SUPPORT_EDA_SLIST_QUEUE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_SLIST_QUEUE == ENABLED
 
 vsf_class(vsf_eda_slist_queue_t) {
     public_member(
@@ -74,7 +74,7 @@ vsf_class(vsf_eda_slist_queue_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if __VSF_KERNEL_CFG_SUPPORT_EDA_SLIST_QUEUE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_SLIST_QUEUE == ENABLED
 extern vsf_err_t vsf_eda_slist_queue_init(vsf_eda_slist_queue_t *this_ptr, uint_fast16_t max);
 #endif
 
