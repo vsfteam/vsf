@@ -330,6 +330,11 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #	define VSH_HAS_COLOR                                0
 #endif
 
+// use lua module in evm if lua_demo is enabled while evm is enabled
+#if APP_USE_LUA_DEMO == ENABLED && APP_USE_EVM_DEMO == ENABLED
+#   define VSF_EVM_USE_LUA                              ENABLED
+#endif
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

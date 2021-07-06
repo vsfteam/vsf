@@ -269,8 +269,10 @@ int vsf_linux_create_fhs(void)
 #if APP_USE_EVM_DEMO == ENABLED
     extern int evm_demo_main(int argc, char *argv[]);
     busybox_bind("/sbin/evm", evm_demo_main);
+#   if VSF_EVM_USE_LUA == ENABLED
     extern int evm_demo_luat_main(int argc, char *argv[]);
     busybox_bind("/sbin/evm_lua", evm_demo_luat_main);
+#   endif
 #endif
 #if APP_USE_LUA_DEMO == ENABLED
 #   if VSF_EVM_USE_LUA != ENABLED
