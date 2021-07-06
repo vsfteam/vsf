@@ -43,7 +43,7 @@
 
 evm_err_t vm_generate_path(evm_t *e, char *pathbuf, int pathbuf_size, char *path, int type)
 {
-    const char *format = (type == EVM_LOAD_MAIN) ? "%s/%s" : "%s/modules/%s";
+    const char *format = (type == EVM_LOAD_MAIN) || !strncmp(path, "main.", 5) ? "%s/%s" : "%s/modules/%s";
     int len = snprintf(pathbuf, pathbuf_size - 1, format, EVM_ROOT_PATH, path);
     pathbuf[len] = '\0';
     return ec_ok;

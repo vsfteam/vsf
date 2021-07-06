@@ -315,7 +315,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #   define VSF_SDL_CFG_DISPLAY_WIDTH                    320
 #endif
 
-#define VSF_LINUX_CFG_STACKSIZE                         (4 * 1024)
+#define VSF_LINUX_CFG_STACKSIZE                         (8 * 1024)
 #define VSF_TRACE_CFG_COLOR_EN                          ENABLED
 #define VSH_HAS_COLOR                                   1
 

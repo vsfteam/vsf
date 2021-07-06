@@ -56,12 +56,13 @@ void luat_log_log(int level, const char* tag, const char* _fmt, ...) {
         break;
     }
 
-    vsf_trace(trace_level, "%d/%s ", prefix, tag);
+    vsf_trace(trace_level, "%c/%s ", prefix, tag);
 
     va_list args;
     va_start(args, _fmt);
         vsf_trace_arg(trace_level, _fmt, args);
     va_end(args);
+    vsf_trace(trace_level, VSF_TRACE_CFG_LINEEND);
 }
 
 #endif      // VSF_USE_EVM && VSF_EVM_USE_LUA
