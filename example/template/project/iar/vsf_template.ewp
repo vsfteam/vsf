@@ -5550,6 +5550,9 @@
                 <group>
                     <name>wifi_demo</name>
                     <file>
+                        <name>$PROJ_DIR$\..\..\demo\aic8800\wifi_demo\luat_wlan_aic8800.c</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\..\demo\aic8800\wifi_demo\wifi_demo.c</name>
                     </file>
                 </group>

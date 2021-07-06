@@ -14,7 +14,9 @@ static const luaL_Reg loadedlibs[] = {
     {"_G", luaopen_base},
     {"rtos", luaopen_rtos},
     {"log", luaopen_log},
-//    {"wlan", luaopen_wlan},
+#if VSF_USE_WIFI == ENABLED
+    {"wlan", luaopen_wlan},
+#endif
     {"socket", luaopen_socket},
     {"timer", luaopen_timer},
     {"gpio", luaopen_gpio},
@@ -32,7 +34,7 @@ const char * luat_os_bsp(void) {
 #endif
 
 void luat_os_reboot(int code) {
-    
+
 }
 
 void luat_os_standy(int timeout) {

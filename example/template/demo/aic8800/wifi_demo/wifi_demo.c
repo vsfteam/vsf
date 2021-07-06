@@ -23,6 +23,7 @@
 
 #include <unistd.h>
 
+#include "fhost_config.h"
 #include "fhost.h"
 
 #include "rwnx_defs.h"
@@ -50,13 +51,9 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 
 struct rwnx_hw hw_env;
-uint8_t is_ap;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
-extern void set_mac_address(uint8_t *addr);
-
 /*============================ IMPLEMENTATION ================================*/
 
 static int __wifi_ap_main(int argc, char *argv[])
@@ -68,7 +65,6 @@ static int __wifi_ap_main(int argc, char *argv[])
 
     char *ssid = argv[1], *pass = argv[2];
     uint8_t channel = 0;
-    is_ap = true;
     if (argc > 3) {
         channel = strtoul(argv[3], NULL, 10);
         VSF_ASSERT(channel <= 14);
@@ -137,7 +133,6 @@ static int __wifi_connect_main(int argc, char *argv[])
     }
 
     char *ssid = argv[1], *pass = argc >= 3 ? argv[2] : "";
-    is_ap = false;
     set_mac_address(NULL);
     // wlan_start_sta MUST be called with higher priority than internal wpa(vsf_prio_0).
     vsf_prio_t prio = vsf_thread_set_priority(vsf_prio_1);
