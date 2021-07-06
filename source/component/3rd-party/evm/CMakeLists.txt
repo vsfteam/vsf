@@ -28,13 +28,16 @@ if(VSF_EVM_USE_LUA)
         port/eluaos/luat_log_vsf.c
         port/eluaos/luat_malloc_vsf.c
         port/eluaos/luat_msgbus_vsf.c
+        port/eluaos/luat_timer_vsf.c
         port/eluaos/luat_vsf_base.c
 
         ${VSF_EVM_PATH}/modules/eluaos/lualib/bget.c
         ${VSF_EVM_PATH}/modules/eluaos/lualib/lbaselib.c
         ${VSF_EVM_PATH}/modules/eluaos/lualib/linit.c
+        ${VSF_EVM_PATH}/modules/eluaos/lualib/rotable.c
 
         ${VSF_EVM_PATH}/modules/eluaos/modules/luat_lib_rtos.c
+        ${VSF_EVM_PATH}/modules/eluaos/modules/luat_luat_bin.c
         ${VSF_EVM_PATH}/modules/eluaos/modules/luat_main.c
         ${VSF_EVM_PATH}/modules/eluaos/modules/luat_malloc_weak.c
     )

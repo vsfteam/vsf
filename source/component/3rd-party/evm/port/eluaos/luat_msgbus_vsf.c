@@ -55,7 +55,7 @@ void luat_msgbus_init(void) {
 }
 
 uint32_t luat_msgbus_put(rtos_msg_t *msg, size_t timeout) {
-    vsf_err_t err = vsf_eda_queue_send(&luat_msgbus.use_as__vsf_eda_queue_t, msg, timeout);
+    vsf_err_t err = vsf_eda_queue_send_isr(&luat_msgbus.use_as__vsf_eda_queue_t, msg);
     return VSF_ERR_NONE == err ? 0 : 1;
 }
 

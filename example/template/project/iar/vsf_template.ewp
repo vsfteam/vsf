@@ -6062,6 +6062,9 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_msgbus_vsf.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_timer_vsf.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_vsf_base.c</name>
                             </file>
                         </group>
@@ -6132,11 +6135,17 @@
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\lualib\linit.c</name>
                                     </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\lualib\rotable.c</name>
+                                    </file>
                                 </group>
                                 <group>
                                     <name>modules</name>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_rtos.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_luat_bin.c</name>
                                     </file>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_main.c</name>

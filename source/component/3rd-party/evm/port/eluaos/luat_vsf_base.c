@@ -25,14 +25,20 @@ static const luaL_Reg loadedlibs[] = {
 
 #ifndef WEAK_LUAT_OS_BSP
 WEAK(luat_os_bsp)
-const char * luat_os_bsp(void)
-{
+const char * luat_os_bsp(void) {
     return "vsf";
 }
 #endif
 
-void luat_openlibs(lua_State *L)
-{
+void luat_os_reboot(int code) {
+    
+}
+
+void luat_os_standy(int timeout) {
+    luat_timer_mdelay(timeout);
+}
+
+void luat_openlibs(lua_State *L) {
     luat_msgbus_init();
 
     const luaL_Reg *lib;
@@ -42,8 +48,7 @@ void luat_openlibs(lua_State *L)
     }
 }
 
-LUA_API lua_State * lua_newstate(lua_Alloc f, void *args)
-{
+LUA_API lua_State * lua_newstate(lua_Alloc f, void *args) {
     if (NULL == f) {
         f = luat_heap_alloc;
     }
@@ -64,8 +69,7 @@ LUA_API lua_State * lua_newstate(lua_Alloc f, void *args)
 }
 
 // patch for un-implemented lua APIs
-void lua_close (lua_State *L)
-{
+void lua_close (lua_State *L) {
 
 }
 
