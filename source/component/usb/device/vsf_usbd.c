@@ -815,8 +815,8 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
                 break;
             }
 
-            if (ctrl_handler->trans.use_as__vsf_mem_t.size > request->wLength) {
-                ctrl_handler->trans.use_as__vsf_mem_t.size = request->wLength;
+            if (trans->use_as__vsf_mem_t.size > request->wLength) {
+                trans->use_as__vsf_mem_t.size = request->wLength;
             }
 
             if ((request->bRequestType & USB_DIR_MASK) == USB_DIR_OUT) {
@@ -828,7 +828,8 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
                 }
             } else {
                 trans->on_finish = __vk_usbd_setup_status_callback;
-                trans->zlp = ctrl_handler->trans.use_as__vsf_mem_t.size < request->wLength;
+                trans->zlp =    (trans->use_as__vsf_mem_t.size > 0)
+                            &&  (trans->use_as__vsf_mem_t.size < request->wLength);
                 vk_usbd_ep_send(dev, trans);
             }
             break;

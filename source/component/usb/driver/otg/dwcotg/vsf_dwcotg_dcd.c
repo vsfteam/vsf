@@ -667,7 +667,7 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
                         } else if (trans->zlp) {
                             // OTG Programmer's Guild, 8.4:
                             // To transmit a few maximum-packet-size packets and a zero-length
-                            //  data packet at the end of thetransfer, the application must split
+                            //  data packet at the end of the transfer, the application must split
                             //  the transfer in two parts. The first sends maximum-packet-sizedata
                             //  packets and the second sends the zero-length data packet alone.
                             trans->zlp = false;
