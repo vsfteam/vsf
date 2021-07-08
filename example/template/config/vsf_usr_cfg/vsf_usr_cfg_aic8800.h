@@ -49,6 +49,8 @@
 #define SWI2_IRQHandler                                 WDT1_IRQHandler
 #define SWI3_IRQHandler                                 I2CS_IRQHandler
 
+#define VSF_HAL_GPIO_USE_74HC165                        ENABLED
+
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED

@@ -11824,6 +11824,18 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\distbus\vsf_hal_distbus.c</name>
                         </file>
                     </group>
+                    <group>
+                        <name>gpio</name>
+                        <group>
+                            <name>74hc165</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\gpio\74hc165\vsf_gpio_74hc165.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\gpio\74hc165\vsf_gpio_74hc165.h</name>
+                            </file>
+                        </group>
+                    </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\driver.h</name>
                     </file>
