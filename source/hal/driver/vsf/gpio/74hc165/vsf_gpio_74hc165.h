@@ -43,7 +43,7 @@ typedef struct vsf_gpio_74hc165_op_t {
     void (*pl_control)(void *param, uint_fast8_t bit);
     void (*cp_control)(void *param, uint_fast8_t bit);
     uint_fast8_t (*data_input)(void *param);
-};
+} vsf_gpio_74hc165_op_t;
 
 vsf_class(vsf_gpio_74hc165_t) {
     public_member(

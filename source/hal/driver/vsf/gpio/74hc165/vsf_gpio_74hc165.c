@@ -21,7 +21,8 @@
 
 #if VSF_HAL_GPIO_USE_74HC165 == ENABLED
 
-#include "./vsf_gpio_74hc165.h"
+#define __VSF_HAL_GPIO_74HC164_CLASS_IMPLEMENT
+#include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -33,16 +34,16 @@
 
 void vsf_gpio_74hc165_config_pin(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
 {
-    VSF_HAL_ASSERT( (gpio_ptr != NULL) && (pthis->op != NULL)
-                &&  (pthis->op->pl_control ！= NULL)
-                &&  (pthis->op->cp_control != NULL)
-                &&  (pthis->op->data_input != NULL));
+    VSF_HAL_ASSERT( (gpio_ptr != NULL) && (gpio_ptr->op != NULL)
+                &&  (gpio_ptr->op->pl_control != NULL)
+                &&  (gpio_ptr->op->cp_control != NULL)
+                &&  (gpio_ptr->op->data_input != NULL));
 
-    if (pthis->op->ce_control != NULL) {
-        pthis->op->ce_control(pthis->param, 1);
+    if (gpio_ptr->op->ce_control != NULL) {
+        gpio_ptr->op->ce_control(gpio_ptr->param, 1);
     }
-    pthis->op->pl_control(this->param, 1);
-    pthis->op->cp_control(this->param, 0);
+    gpio_ptr->op->pl_control(gpio_ptr->param, 1);
+    gpio_ptr->op->cp_control(gpio_ptr->param, 0);
 }
 
 void vsf_gpio_74hc165_set_direction(vsf_gpio_74hc165_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
