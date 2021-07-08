@@ -1,7 +1,5 @@
 # CMakeLists head
 
 target_sources(${VSF_LIB_NAME} INTERFACE
-    vsf_hal_distbus.c
+    vsf_gpio_74hc165.c
 )
-
-add_subdirectory(usbd)
