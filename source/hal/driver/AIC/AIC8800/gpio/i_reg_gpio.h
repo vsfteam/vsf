@@ -31,6 +31,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef __AIC8800_GPIO_USE_BIT_FIELD
@@ -50,7 +51,8 @@ extern "C" {
 #define REG_GPIO0                                   ((GPIO_REG_T *)GPIO_BASE_ADDRESS)
 
 #define IOMUX_BASE_ADDRESS                          (0X40503000UL)
-#define REG_IOMUX0                                  ((IOMUX_REG_T *)IOMUX_BASE_ADDRESS)
+#define REG_IOMUX0                                  ((AIC_IOMUX_TypeDef *)IOMUX_BASE_ADDRESS)
+
 /* Define structure member permissions : ‘read only’ */
 #ifndef __IM
 #   define __IM                                     const
@@ -80,6 +82,7 @@ extern "C" {
 #   define DEF_GPIO_REG(__NAME, __TOTAL_SIZE, ...)                               \
         __VA_ARGS__ reg##__TOTAL_SIZE##_t __NAME
 #endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct GPIO_REG_T {
@@ -96,11 +99,6 @@ typedef struct GPIO_REG_T {
     DEF_GPIO_REG(TIR    , 32, __IOM);
     DEF_GPIO_REG(FR     , 32, __IOM);
 } GPIO_REG_T;
-
-typedef struct IOMUX_REG_T {
-    __IOM   reg32_t     GPCFG[16];
-    __IOM   reg32_t     AGPCFG[16];
-} IOMUX_REG_T;
 
 #ifdef __cplusplus
 }
