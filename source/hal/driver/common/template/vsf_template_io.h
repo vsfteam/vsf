@@ -121,7 +121,7 @@ extern "C" {
 */
 
 
-/*! \brief following macros are used to define/declare the body of interfaces, 
+/*! \brief following macros are used to define/declare the body of interfaces,
  *!        and initialise gpio interface
  *!          __GPIO_FUNC_DEF()  __GPIO_INTERFACE_DEF()  __GPIO_INTERFACE()
  *!          __GPIO_FUNC_BODY()
@@ -140,7 +140,7 @@ extern "C" {
         };
 
         VSF_MREPEAT(GPIO_COUNT, __GPIO_FUNC_BODY, NULL) // api function body
-        
+
  */
 
 #define __GPIO_FUNC_DEF(__N,__VALUE)                                            \
@@ -153,7 +153,7 @@ static uint32_t    gpio##__N##_read(void);                                      
 static void        gpio##__N##_write(uint32_t value, uint32_t pin_mask);        \
 static void        gpio##__N##_set(uint32_t pin_mask);                          \
 static void        gpio##__N##_clear(uint32_t pin_mask);                        \
-static void        gpio##__N##_toggle(uint32_t pin_mask);                       
+static void        gpio##__N##_toggle(uint32_t pin_mask);
 
 #define __GPIO_INTERFACE_DEF(__N, __VALUE)                                      \
             {                                                                   \
@@ -224,7 +224,7 @@ static void gpio##__N##_clear(uint32_t pin_mask)                                
 static void gpio##__N##_toggle(uint32_t pin_mask)                               \
 {                                                                               \
     GSP_GPIO##__N.OUTTOG = pin_mask;                                            \
-}                                                                 
+}
 */
 
 /*============================ TYPES =========================================*/
@@ -248,7 +248,7 @@ static void gpio##__N##_toggle(uint32_t pin_mask)                               
 #define __IO_PINC_MSK(__N, __OFFSET)        PC##__N##_msk = (1ul<<(__N)),
 #define __IO_PIND_MSK(__N, __OFFSET)        PD##__N##_msk = (1ul<<(__N)),
 
-//! \name PIN name 
+//! \name PIN name
 //! @{
 enum io_pin_no_t {
 #if defined(PIO_PORTA)
@@ -266,7 +266,7 @@ enum io_pin_no_t {
 }em_io_pin_no_t;
 //! @}
 
-//! \name PIN name 
+//! \name PIN name
 //! @{
 enum io_pin_msk_t{
 #if defined(PIO_PORTA)
@@ -313,14 +313,14 @@ enum io_model_t{
     IO_OPEN_DRAIN           = (1<<10),          //!< enable open-drain mode
 
     IO_DISABLE_INPUT        = (1<<7),          //!< disable input
-    IO_INVERT_INPUT         = (1<<6),          //!< invert the input pin level 
+    IO_INVERT_INPUT         = (1<<6),          //!< invert the input pin level
 
 
     IO_FILTER_BYPASS        = (0<<11),           //!< filter is bypassed
     IO_FILTER_2CLK          = (1<<11),           //!< levels should keep 2 clks
     IO_FILTER_4CLK          = (2<<11),           //!< levels should keep 4 clks
     IO_FILTER_8CLK          = (3<<11),           //!< levels should keep 8 clks
-    
+
     IO_FILTER_CLK_SRC0      = (0<<13),           //!< select clock src 0 for filter
     IO_FILTER_CLK_SRC1      = (1<<13),           //!< select clock src 1 for filter
     IO_FILTER_CLK_SRC2      = (2<<13),           //!< select clock src 2 for filter
@@ -365,13 +365,13 @@ def_interface(i_gpio_t)
     //! config pin mode
     void            (*ConfigPin)        (uint32_t pin_mask,
                                          uint_fast32_t feature);
-    
+
     //! set pin directions with pin-mask
-    void            (*SetDirection)     (uint_fast32_t dir_bitmap, 
+    void            (*SetDirection)     (uint_fast32_t dir_bitmap,
                                          uint32_t pin_mask);
     //! get pin direction with pin-mask
     uint_fast32_t   (*GetDirection)     (uint32_t pin_mask);
-    //! Set specified pin direction to input 
+    //! Set specified pin direction to input
     void            (*SetInput)         (uint32_t pin_mask);
     //! Set specified pin direction to output
     void            (*SetOutput)        (uint32_t pin_mask);
@@ -381,9 +381,9 @@ def_interface(i_gpio_t)
     uint32_t        (*Read)             (void);
     //! write pin value with pin-mask
     void            (*Write)            (uint_fast32_t value, uint32_t pin_mask);
-    //! set specified pins 
+    //! set specified pins
     void            (*Set)              (uint32_t pin_mask);
-    //! clear specified pins 
+    //! clear specified pins
     void            (*Clear)            (uint32_t pin_mask);
     //! toggle specified pins
     void            (*Toggle)           (uint32_t pin_mask);
@@ -416,7 +416,7 @@ extern const i_io_t VSF_IO;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-/*! \brief gpio batch configuration 
+/*! \brief gpio batch configuration
            an implementation example:
 
 static bool vsf_gpio_config( io_cfg_t *cfg_ptr, uint_fast8_t count )
@@ -433,7 +433,7 @@ static bool vsf_gpio_config( io_cfg_t *cfg_ptr, uint_fast8_t count )
 
         //! get pin feature and make sure pin-input is enabled by default
         //! this is an example to enable some feature to be default.
-        uint_fast8_t feature = cfg_ptr->feature ^ IOCTRL_PIN_IE_MSK;   
+        uint_fast8_t feature = cfg_ptr->feature ^ IOCTRL_PIN_IE_MSK;
 
         //! set pin feature: this is the most optimal solution
         GSP_IOCTRL.PIN[pin_index].Value = feature;
@@ -452,9 +452,9 @@ static bool vsf_gpio_config( io_cfg_t *cfg_ptr, uint_fast8_t count )
         ...
 
         //! I know this is ugly, but some times, the two methods aforementioned
-        //! can be combined. So you should fully use the 32 bit of the 
+        //! can be combined. So you should fully use the 32 bit of the
         //! cfg_ptr->feature
-                
+
         //! set pin function selection
         IOCTRL_FUNCTION_SELECT(pin_index, function);
 
@@ -472,7 +472,7 @@ extern vsf_err_t vsf_gpio_config(io_cfg_t *cfg_ptr, uint_fast8_t count);
 
 extern void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
                                 uint32_t pin_mask,
-                                uint_fast32_t feature);
+                                uint32_t feature);
 
 /*! \brief set the specified pins to corresponding directions
  *!        pseudo code:
@@ -482,15 +482,17 @@ extern void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
  *!
  *! \param gpio_ptr the address of target vsf_gpio_t object (given port)
  *! \param direction_bitmap direction bitmap which will be ANDDed with pin_mask
+ *!          direction value is 1 for output
+ *!          direction value is 0 for input
  *! \param pin_mask pin mask to mark the target pin within a given port
- *! \return none 
+ *! \return none
  */
 extern void vsf_gpio_set_direction( vsf_gpio_t *gpio_ptr,
-                                    uint_fast32_t direction_mask,
+                                    uint32_t direction_mask,
                                     uint32_t pin_mask);
 
-extern uint_fast32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr,
-                                            uint32_t pin_mask);
+extern uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr,
+                                       uint32_t pin_mask);
 
 extern void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
 
@@ -498,7 +500,7 @@ extern void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
 
 extern void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
 
-extern uint_fast32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
+extern uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
 
 /*! \brief set the specified pins to corresponding value
  *!        pseudo code:
@@ -508,10 +510,10 @@ extern uint_fast32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
  *! \param gpio_ptr the address of target vsf_gpio_t object (given port)
  *! \param value value bitmap which will be ANDDed with pin_mask
  *! \param pin_mask pin mask to mark the target pin within a given port
- *! \return none 
+ *! \return none
  */
 extern void vsf_gpio_write( vsf_gpio_t *gpio_ptr,
-                                uint_fast32_t value,
+                                uint32_t value,
                                 uint32_t pin_mask);
 
 extern void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
