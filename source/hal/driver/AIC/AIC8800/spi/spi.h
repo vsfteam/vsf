@@ -17,23 +17,26 @@
 
 #ifndef __HAL_DRIVER_AIC8800_SPI_H__
 #define __HAL_DRIVER_AIC8800_SPI_H__
+
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
-#include "../../__device.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/spi/reg_spi.h"
-#include "./i_reg_spi.h"
 #if VSF_HAL_USE_SPI == ENABLED
+#include "./i_reg_spi.h"
+#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
 typedef enum em_spi_irq_mask_t {
     SPI_IRQ_MASK_TX_CPL = BIT(0),
-    SPI_IRQ_MASK_CPL    = BIT(1),   // SPI completed recepiton and transmission
+    SPI_IRQ_MASK_CPL    = BIT(1),
 } em_spi_irq_mask_t;
 
 typedef enum em_spi_mode_t {
-    SPI_SLAVE                               = 0x00,     //!< select master mode
-    SPI_MASTER                              = BIT(0),   //!< select slave mode
+    SPI_SLAVE                               = 0x00,
+    SPI_MASTER                              = BIT(0),
 
     SPI_MODE_0                              = 0,
     SPI_MODE_1                              = BIT(1),
@@ -63,7 +66,7 @@ struct spi_status_t {
 };
 
 typedef struct vsf_spi_t {
-    spi_reg_t                   *param;
+    REG_SPI_T                   *param;
     spi_cfg_t                   cfg;
     em_spi_irq_mask_t           irq_msk;
     spi_status_t                status;
@@ -78,9 +81,11 @@ typedef struct vsf_spi_t {
     bool                        is_able;
     bool                        is_busy;
 } vsf_spi_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern vsf_spi_t vsf_spi0;
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

@@ -16,33 +16,33 @@
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
 
-#include "vsf.h"
 #include "spi.h"
 #include "sysctrl_api.h"
 #include "../vendor/plf/aic8800/src/driver/dma/dma_api.h"
+#include "../gpio/gpio.h"
+
 /*============================ MACROS ========================================*/
 
-#define SPI0_RXDMA_CH_IDX       DMA_CHANNEL_SPI0_RX
-#define SPI0_TXDMA_CH_IDX       DMA_CHANNEL_SPI0_TX
-#define SPI0_RXDMA_IRQ_IDX      DMA08_IRQn
-#define SPI0_TXDMA_IRQ_IDX      DMA09_IRQn
-#define SPI0_DMA_CFG_BYTE_CNT_MAX   (64)
+#define SPI0_RXDMA_CH_IDX               DMA_CHANNEL_SPI0_RX
+#define SPI0_TXDMA_CH_IDX               DMA_CHANNEL_SPI0_TX
+#define SPI0_RXDMA_IRQ_IDX              DMA08_IRQn
+#define SPI0_TXDMA_IRQ_IDX              DMA09_IRQn
+#define SPI0_DMA_CFG_BYTE_CNT_MAX       (64)
 
 #undef SPI0_USE_GPIO
-#define SPI0_USE_GPIO           vsf_gpio0
+#define SPI0_USE_GPIO                   vsf_gpio0
 
 #undef SPI0_USE_GPIO_PIN
-#define SPI0_USE_GPIO_PIN       (GPIO_PIN_11)
+#define SPI0_USE_GPIO_PIN               (1 << 11)
 
 #undef SPI0_CFG_GPIO_FEATURE
-#define SPI0_CFG_GPIO_FEATURE   (0ul)
+#define SPI0_CFG_GPIO_FEATURE           (0ul)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define ____vsf_hw_spi_imp_lv0(__count, __dont_care)                            \
     vsf_spi_t vsf_spi##__count = {                                              \
-        .param = SPI##__count,                                                  \
+        .param = REG_SPI##__count,                                              \
         .is_able = false,                                                       \
-        .cfg = NULL,                                                            \
     };
 
 #define __vsf_hw_spi_imp_lv0(__count)                                           \

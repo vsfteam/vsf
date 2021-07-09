@@ -39,7 +39,7 @@ extern "C" {
 
 #define SPI0_BASE_ADDRESS                           (0X40105000ul)
 
-#define SPI0                                        ((spi_reg_t *)SPI0_BASE_ADDRESS)
+#define REG_SPI0                                    ((REG_SPI_T *)SPI0_BASE_ADDRESS)
 
 /* Define structure member permissions : ‘read only’ */
 #ifndef __IM
@@ -72,7 +72,7 @@ extern "C" {
 #endif
 /*============================ TYPES =========================================*/
 
-typedef struct spi_reg_t {
+typedef struct REG_SPI_T {
     union {
         __IM            reg32_t         BASE_ADDR;
         DEF_SPI_REG(IOR,    32, __IOM);
@@ -93,7 +93,7 @@ typedef struct spi_reg_t {
     REG_RSVD_U32
     DEF_SPI_REG(ICR,        32, __IOM);
     DEF_SPI_REG(TCR,        32, __IOM);
-} spi_reg_t;
+} REG_SPI_T;
 
 #ifdef __cplusplus
 }
