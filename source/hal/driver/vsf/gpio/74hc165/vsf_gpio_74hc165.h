@@ -40,9 +40,9 @@ extern "C" {
 
 typedef struct vsf_gpio_74hc165_op_t {
     void (*ce_control)(void *param, uint_fast8_t bit);
-    void (*pl_control)(void *param, uint_fast8_t bit);
-    void (*cp_control)(void *param, uint_fast8_t bit);
-    uint_fast8_t (*data_input)(void *param);
+    void (*load_control)(void *param, uint_fast8_t bit);
+    void (*clock_control)(void *param, uint_fast8_t bit);
+    uint_fast8_t (*serial_input)(void *param);
 } vsf_gpio_74hc165_op_t;
 
 vsf_class(vsf_gpio_74hc165_t) {

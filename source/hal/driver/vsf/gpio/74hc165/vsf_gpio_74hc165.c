@@ -35,15 +35,16 @@
 void vsf_gpio_74hc165_config_pin(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
 {
     VSF_HAL_ASSERT( (gpio_ptr != NULL) && (gpio_ptr->op != NULL)
-                &&  (gpio_ptr->op->pl_control != NULL)
-                &&  (gpio_ptr->op->cp_control != NULL)
-                &&  (gpio_ptr->op->data_input != NULL));
+                &&  (gpio_ptr->op->load_control != NULL)
+                &&  (gpio_ptr->op->clock_control != NULL)
+                &&  (gpio_ptr->op->serial_input != NULL)
+                &&  (gpio_ptr->cascade_num <= 4) && (gpio_ptr->cascade_num >= 1));
 
     if (gpio_ptr->op->ce_control != NULL) {
         gpio_ptr->op->ce_control(gpio_ptr->param, 1);
     }
-    gpio_ptr->op->pl_control(gpio_ptr->param, 1);
-    gpio_ptr->op->cp_control(gpio_ptr->param, 0);
+    gpio_ptr->op->load_control(gpio_ptr->param, 1);
+    gpio_ptr->op->clock_control(gpio_ptr->param, 1);
 }
 
 void vsf_gpio_74hc165_set_direction(vsf_gpio_74hc165_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
@@ -76,9 +77,26 @@ void vsf_gpio_74hc165_switch_direction(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pi
 
 uint32_t vsf_gpio_74hc165_read(vsf_gpio_74hc165_t *gpio_ptr)
 {
+    uint32_t value = 0;
+
     VSF_HAL_ASSERT(gpio_ptr != NULL);
-    // TODO:
-    return 0;
+    gpio_ptr->op->load_control(gpio_ptr->param, 0);
+    gpio_ptr->op->load_control(gpio_ptr->param, 1);
+
+    if (gpio_ptr->op->ce_control != NULL) {
+        gpio_ptr->op->ce_control(gpio_ptr->param, 0);
+    }
+
+    for (uint_fast8_t i = 0; i < (gpio_ptr->cascade_num << 3); i++) {
+        value = (value << 1) | (gpio_ptr->op->serial_input(gpio_ptr->param) ? 1 : 0);
+        gpio_ptr->op->clock_control(gpio_ptr->param, 0);
+        gpio_ptr->op->clock_control(gpio_ptr->param, 1);
+    }
+
+    if (gpio_ptr->op->ce_control != NULL) {
+        gpio_ptr->op->ce_control(gpio_ptr->param, 1);
+    }
+    return value;
 }
 
 void vsf_gpio_74hc165_write(vsf_gpio_74hc165_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
