@@ -57,14 +57,14 @@ static uint_fast8_t vsf_gpio_get_idx(GPIO_T *reg)
 
 void vsf_gpio_config_pin(       vsf_gpio_t *pthis,
                                 uint32_t pin_mask,
-                                uint_fast32_t feature)
+                                uint32_t feature)
 {
     GPIO_T *reg = pthis->reg;
     uint_fast8_t mode_setting = (feature >> 0) & 0x03;
     uint_fast8_t pull_setting = (feature >> 4) & 0x03;
     uint32_t pin_mask_tmp;
 
-    uint_fast32_t mode = 0, pull = 0, mask = 0;
+    uint32_t mode = 0, pull = 0, mask = 0;
     uint_fast8_t offset = 32, tmp8;
 
     VSF_HAL_ASSERT(!(pin_mask >> 16));
@@ -99,13 +99,13 @@ void vsf_gpio_config_pin(       vsf_gpio_t *pthis,
 }
 
 void vsf_gpio_set_direction(    vsf_gpio_t *pthis,
-                                uint_fast32_t direction_mask,
+                                uint32_t direction_mask,
                                 uint32_t pin_mask)
 {
     GPIO_T *reg = pthis->reg;
     uint_fast8_t port_idx = vsf_gpio_get_idx(reg);
 
-    uint_fast32_t mode = 0, mask = 0;
+    uint32_t mode = 0, mask = 0;
     uint_fast8_t offset = 32, tmp8;
 
     VSF_HAL_ASSERT(!(pin_mask >> 16));
@@ -118,7 +118,7 @@ void vsf_gpio_set_direction(    vsf_gpio_t *pthis,
 
         if (direction_mask & (1 << offset)) {
             // set saved output mode
-            uint_fast32_t mode_orig = __vsf_gpio.output_mode[port_idx] & (0x03 << offset);
+            uint32_t mode_orig = __vsf_gpio.output_mode[port_idx] & (0x03 << offset);
             if (mode_orig) {
                 mode |= mode_orig;
             } else {
@@ -134,11 +134,11 @@ void vsf_gpio_set_direction(    vsf_gpio_t *pthis,
     vsf_gpio_unprotect(state);
 }
 
-uint_fast32_t vsf_gpio_get_direction(vsf_gpio_t *pthis, uint32_t pin_mask)
+uint32_t vsf_gpio_get_direction(vsf_gpio_t *pthis, uint32_t pin_mask)
 {
     GPIO_T *reg = pthis->reg;
 
-    uint_fast32_t mode = 0;
+    uint32_t mode = 0;
     uint_fast8_t offset = 32, tmp8;
 
     VSF_HAL_ASSERT(!(pin_mask >> 16));
@@ -168,31 +168,31 @@ void vsf_gpio_set_output(vsf_gpio_t *pthis, uint32_t pin_mask)
 
 void vsf_gpio_switch_direction(vsf_gpio_t *pthis, uint32_t pin_mask)
 {
-    uint_fast32_t direction = vsf_gpio_get_direction(pthis, pin_mask);
+    uint32_t direction = vsf_gpio_get_direction(pthis, pin_mask);
     vsf_gpio_set_direction(pthis, pin_mask ^ direction, pin_mask);
 }
 
-uint_fast32_t vsf_gpio_read(vsf_gpio_t *pthis)
+uint32_t vsf_gpio_read(vsf_gpio_t *pthis)
 {
     GPIO_T *reg = pthis->reg;
     return reg->PIN;
 }
 
-void vsf_gpio_write(vsf_gpio_t *pthis, uint_fast32_t value, uint32_t pin_mask)
+void vsf_gpio_write(vsf_gpio_t *pthis, uint32_t value, uint32_t pin_mask)
 {
     GPIO_T *reg = pthis->reg;
-    uint_fast32_t mask = reg->DATMSK;
+    uint32_t mask = reg->DATMSK;
     vsf_protect_t state = vsf_gpio_protect();
         reg->DATMSK = ~pin_mask;
         reg->DOUT = value;
         reg->DATMSK = mask;
     vsf_gpio_unprotect(state);
 }
-     
+
 void vsf_gpio_set(vsf_gpio_t *pthis, uint32_t pin_mask)
 {
     GPIO_T *reg = pthis->reg;
-    uint_fast32_t mask = reg->DATMSK;
+    uint32_t mask = reg->DATMSK;
     vsf_protect_t state = vsf_gpio_protect();
         reg->DATMSK = ~pin_mask;
         reg->DOUT = pin_mask;
@@ -203,7 +203,7 @@ void vsf_gpio_set(vsf_gpio_t *pthis, uint32_t pin_mask)
 void vsf_gpio_clear(vsf_gpio_t *pthis, uint32_t pin_mask)
 {
     GPIO_T *reg = pthis->reg;
-    uint_fast32_t mask = reg->DATMSK;
+    uint32_t mask = reg->DATMSK;
     vsf_protect_t state = vsf_gpio_protect();
         reg->DATMSK = ~pin_mask;
         reg->DOUT = 0;
@@ -214,7 +214,7 @@ void vsf_gpio_clear(vsf_gpio_t *pthis, uint32_t pin_mask)
 void vsf_gpio_toggle(vsf_gpio_t *pthis, uint32_t pin_mask)
 {
     GPIO_T *reg = pthis->reg;
-    uint_fast32_t mask = reg->DATMSK;
+    uint32_t mask = reg->DATMSK;
     vsf_protect_t state = vsf_gpio_protect();
         reg->DATMSK = ~pin_mask;
         reg->DOUT ^= pin_mask;
@@ -222,7 +222,7 @@ void vsf_gpio_toggle(vsf_gpio_t *pthis, uint32_t pin_mask)
     vsf_gpio_unprotect(state);
 }
 
-/*! \brief gpio batch configuration 
+/*! \brief gpio batch configuration
            an implementation example:
 
 static bool vsf_gpio_config( io_cfg_t *cfg_ptr, uint_fast8_t count )
@@ -239,7 +239,7 @@ static bool vsf_gpio_config( io_cfg_t *cfg_ptr, uint_fast8_t count )
 
         //! get pin feature and make sure pin-input is enabled by default
         //! this is an example to enable some feature to be default.
-        uint_fast8_t feature = cfg_ptr->feature ^ IOCTRL_PIN_IE_MSK;   
+        uint_fast8_t feature = cfg_ptr->feature ^ IOCTRL_PIN_IE_MSK;
 
         //! set pin feature: this is the most optimal solution
         GSP_IOCTRL.PIN[pin_index].Value = feature;
@@ -258,9 +258,9 @@ static bool vsf_gpio_config( io_cfg_t *cfg_ptr, uint_fast8_t count )
         ...
 
         //! I know this is ugly, but some times, the two methods aforementioned
-        //! can be combined. So you should fully use the 32 bit of the 
+        //! can be combined. So you should fully use the 32 bit of the
         //! cfg_ptr->feature
-                
+
         //! set pin function selection
         IOCTRL_FUNCTION_SELECT(pin_index, function);
 
