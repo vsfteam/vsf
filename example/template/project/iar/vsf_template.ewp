@@ -4546,6 +4546,8 @@
                     <state>CFG_DBG</state>
                     <state>CFG_IPERF</state>
                     <state>CFG_WIFI_ROM_VER=2</state>
+                    <state>CFG_DACL_MIXER_MODE=0</state>
+                    <state>CFG_DACR_MIXER_MODE=0</state>
                     <state>LWIP_NO_STDINT_H=1</state>
                     <state>LWIP_SO_RCVBUF=1</state>
                 </option>
