@@ -82,7 +82,7 @@ typedef struct vk_dwcotg_reg_t {
             } ep;
         } dev;
     };
-    uint32_t * dfifo[VSF_DWCOTG_DCD_CFG_EP_NUM];
+    volatile uint32_t * dfifo[VSF_DWCOTG_DCD_CFG_EP_NUM];
 } vk_dwcotg_reg_t;
 
 typedef struct vk_dwcotg_t {
