@@ -767,9 +767,9 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
         pktsts = (rx_status & USB_OTG_GRXSTSP_PKTSTS) >> 17;
 
         switch (pktsts) {
-        case 1:
-        case 3:
-        case 4:
+        case 1: // RXSTAT_GOUT_NAK
+        case 3: // RXSTAT_XFER_COMP
+        case 4: // RXSTAT_SETUP_COMP
             break;
         case 6: //RXSTAT_SETUP_UPDT:
             if (!ep_idx && (8 == size) && (0/*DPID_DATA0*/ == pid)) {
@@ -781,8 +781,6 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
         case 2: //RXSTAT_DATA_UPDT:
             __vk_dwcotg_dcd_ep_read(dwcotg_dcd, ep_idx, size);
             break;
-        //case RXSTAT_GOUT_NAK:
-        //case RXSTAT_SETUP_COMP:
         default:
             VSF_HAL_ASSERT(false);
             break;
