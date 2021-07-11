@@ -45,7 +45,7 @@ extern "C" {
 
 #define __describe_gpio_74hc165(__name, __cascade_num, __param, __load_control, \
                                 __clock_control, __serial_input)                \
-            static vsf_gpio_74hc165_op_t VSF_MCONNECT3(__, __name, _op) = {     \
+            static const vsf_gpio_74hc165_op_t VSF_MCONNECT3(__, __name, _op) = {\
                 .load_control   = (__load_control),                             \
                 .clock_control  = (__clock_control),                            \
                 .serial_input   = (__serial_input),                             \
