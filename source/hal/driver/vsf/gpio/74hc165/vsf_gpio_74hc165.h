@@ -35,6 +35,31 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#define __VSF_GPIO_74HC165_INIT(__CASCADE_NUM, __OP, __PARAM)                   \
+            .op                 = (__OP),                                       \
+            .param              = (__PARAM),                                    \
+            .cascade_num        = (__CASCADE_NUM),
+#define VSF_GPIO_74HC165_INIT(__CASCADE_NUM, __OP, __PARAM)                     \
+            __VSF_GPIO_74HC165_INIT((__CASCADE_NUM), (__OP), (__PARAM))
+
+#define __describe_gpio_74hc165(__name, __cascade_num, __param, __load_control, \
+                                __clock_control, __serial_input)                \
+            static vsf_gpio_74hc165_op_t VSF_MCONNECT3(__, __name, _op) = {     \
+                .load_control   = (__load_control),                             \
+                .clock_control  = (__clock_control),                            \
+                .serial_input   = (__serial_input),                             \
+            };                                                                  \
+            vsf_gpio_74hc165_t __name = {                                       \
+                __VSF_GPIO_74HC165_INIT((__cascade_num),                        \
+                                &VSF_MCONNECT3(__, __name, _op), (__param))     \
+            };
+
+#define describe_gpio_74hc165(__name, __cascade_num, __param, __load_control,   \
+                                __clock_control, __serial_input)                \
+            __describe_gpio_74hc165(__name, (__cascade_num), (__param),         \
+                                (__load_control), (__clock_control), (__serial_input))
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
