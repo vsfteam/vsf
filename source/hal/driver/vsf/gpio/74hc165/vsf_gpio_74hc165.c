@@ -49,7 +49,7 @@ void vsf_gpio_74hc165_config_pin(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask
 
 void vsf_gpio_74hc165_set_direction(vsf_gpio_74hc165_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
 {
-    VSF_HAL_ASSERT((gpio_ptr != NULL) && (direction_mask & pin_mask == 0));
+    VSF_HAL_ASSERT((gpio_ptr != NULL) && ((direction_mask & pin_mask) == 0));
 }
 
 uint32_t vsf_gpio_74hc165_get_direction(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask)

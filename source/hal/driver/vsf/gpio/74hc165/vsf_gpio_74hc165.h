@@ -37,7 +37,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #define __VSF_GPIO_74HC165_INIT(__CASCADE_NUM, __OP, __PARAM)                   \
-            .op                 = (__OP),                                       \
+            .op                 = (vsf_gpio_74hc165_op_t *)(__OP),              \
             .param              = (__PARAM),                                    \
             .cascade_num        = (__CASCADE_NUM),
 #define VSF_GPIO_74HC165_INIT(__CASCADE_NUM, __OP, __PARAM)                     \
