@@ -5,3 +5,4 @@ target_sources(${VSF_LIB_NAME} INTERFACE
 )
 
 add_subdirectory(driver)
+add_subdirectory(protocol)

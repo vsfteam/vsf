@@ -93,6 +93,9 @@ typedef struct vk_gamepad_evt_t {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern void vk_gamepad_input_parse(void *dev, vk_input_item_info_t *item_info,
+                        uint8_t *pre, uint8_t *cur);
+
 #ifdef __cplusplus
 }
 #endif

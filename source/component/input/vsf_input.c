@@ -63,10 +63,6 @@ static vsf_input_t __vsf_input;
 #endif
 
 /*============================ PROTOTYPES ====================================*/
-
-extern void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
-extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
-
 /*============================ IMPLEMENTATION ================================*/
 
 void vk_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len)
@@ -158,56 +154,6 @@ vk_input_item_info_t * vk_input_parse(vk_input_parser_t *parser, uint8_t *pre, u
     }
     return NULL;
 }
-
-#ifndef WEAK_VSF_INPUT_ON_SENSOR
-WEAK(vsf_input_on_sensor)
-void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt)
-{
-    vsf_input_on_evt(VSF_INPUT_TYPE_SENSOR, &sensor_evt->use_as__vk_input_evt_t);
-}
-#endif
-
-#ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
-WEAK(vsf_input_on_touchscreen)
-void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
-{
-#if VSF_INPUT_TOUCH_SCREEN_CFG_TRACE == ENABLED
-    if (vsf_input_touchscreen_is_down(ts_evt)) {
-        vsf_trace_debug("touch_screen(%d): (%d, %d) %d" VSF_TRACE_CFG_LINEEND,
-            vsf_input_touchscreen_get_id(ts_evt), vsf_input_touchscreen_get_x(ts_evt),
-            vsf_input_touchscreen_get_y(ts_evt), vsf_input_touchscreen_get_pressure(ts_evt));
-    } else {
-        vsf_trace_debug("touch_screen(%d): (-1, -1) 0" VSF_TRACE_CFG_LINEEND,
-            vsf_input_touchscreen_get_id(ts_evt));
-    }
-#endif
-    vsf_input_on_evt(VSF_INPUT_TYPE_TOUCHSCREEN, &ts_evt->use_as__vk_input_evt_t);
-}
-#endif
-
-#ifndef WEAK_VSF_INPUT_ON_GAMEPAD
-WEAK(vsf_input_on_gamepad)
-void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
-{
-    vsf_input_on_evt(VSF_INPUT_TYPE_GAMEPAD, &gamepad_evt->use_as__vk_input_evt_t);
-}
-#endif
-
-#ifndef WEAK_VSF_INPUT_ON_MOUSE
-WEAK(vsf_input_on_mouse)
-void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt)
-{
-    vsf_input_on_evt(VSF_INPUT_TYPE_MOUSE, &mouse_evt->use_as__vk_input_evt_t);
-}
-#endif
-
-#ifndef WEAK_VSF_INPUT_ON_KEYBOARD
-WEAK(vsf_input_on_keyboard)
-void vsf_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt)
-{
-    vsf_input_on_evt(VSF_INPUT_TYPE_KEYBOARD, &keyboard_evt->use_as__vk_input_evt_t);
-}
-#endif
 
 #ifndef WEAK_VSF_INPUT_ON_NEW_DEV
 WEAK(vsf_input_on_new_dev)

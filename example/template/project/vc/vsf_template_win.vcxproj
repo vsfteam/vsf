@@ -1287,6 +1287,11 @@
     <ClCompile Include="..\..\..\..\source\component\fs\vsf_fs.c" />
     <ClCompile Include="..\..\..\..\source\component\input\driver\hid\vsf_input_hid.c" />
     <ClCompile Include="..\..\..\..\source\component\input\driver\nspro\vsf_input_nspro.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_gamepad.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_keyboard.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_mouse.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_sensor.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.c" />
     <ClCompile Include="..\..\..\..\source\component\input\vsf_input.c" />
     <ClCompile Include="..\..\..\..\source\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c" />
     <ClCompile Include="..\..\..\..\source\component\mal\driver\file_mal\vsf_file_mal.c" />

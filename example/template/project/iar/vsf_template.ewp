@@ -8715,16 +8715,31 @@
                 <group>
                     <name>protocol</name>
                     <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_gamepad.c</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_gamepad.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_keyboard.c</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_keyboard.h</name>
                     </file>
                     <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_mouse.c</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_mouse.h</name>
                     </file>
                     <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_sensor.c</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_sensor.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.c</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.h</name>

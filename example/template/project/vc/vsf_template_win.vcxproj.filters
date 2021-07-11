@@ -5570,6 +5570,21 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\xtea.c">
       <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_gamepad.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_keyboard.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_mouse.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_sensor.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\awtk\awtk_vsf.lib">
