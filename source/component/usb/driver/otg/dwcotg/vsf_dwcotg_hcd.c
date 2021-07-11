@@ -316,7 +316,7 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
 
     if (!dwcotg_hcd->dma_en && !dir_in1out0 && (dwcotg_urb->current_size > 0)) {
         // TODO: check FIFO space
-        uint32_t *fifo_reg = dwcotg_hcd->reg.dfifo[dwcotg_urb->channel_idx];
+        uint32_t *fifo_reg = (uint32_t *)dwcotg_hcd->reg.dfifo[dwcotg_urb->channel_idx];
         for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
             *fifo_reg = get_unaligned_le32(buffer);
         }
