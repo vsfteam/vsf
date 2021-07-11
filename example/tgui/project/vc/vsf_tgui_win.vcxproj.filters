@@ -1535,6 +1535,21 @@
     <ClCompile Include="..\..\..\..\source\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c">
       <Filter>vsf\component\mal\driver\fakefat32_mal</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_gamepad.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_keyboard.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_mouse.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_sensor.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.c">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">
