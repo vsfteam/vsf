@@ -10,5 +10,6 @@ add_subdirectory(port)
 add_subdirectory(spi)
 add_subdirectory(uart)
 add_subdirectory(usb)
+add_subdirectory(gpio)
 
 include(vendor.cmake)
