@@ -36,13 +36,18 @@
 					<Add directory="../../../../../source/component/3rd-party/zlib/raw" />
 					<Add directory="../../../../../source/component/3rd-party/evm/port" />
 					<Add directory="../../../../../source/component/3rd-party/evm/raw/include" />
+					<Add directory="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/include" />
+					<Add directory="../../../../../source/component/3rd-party/lua/extension/oo" />
+					<Add directory="../../../../../source/component/3rd-party/lua/extension/lovevsf" />
+					<Add directory="../../../../../source/component/3rd-party/evm/raw/components/webclient/inc" />
+					<Add directory="../../../../../source/component/3rd-party/coremark/port" />
+					<Add directory="../../../../../source/component/3rd-party/coremark/raw" />
 				</Compiler>
 				<Linker>
 					<Add option="-lpthread" />
 					<Add option="-lSDL2" />
 					<Add option="-lrt" />
-					<Add library="../../../../../source/component/3rd-party/evm/raw/lib/x86/linux/libecma.a" />
-					<Add library="../../../../../source/component/3rd-party/evm/raw/lib/x86/linux/libejs.a" />
+					<Add library="../../../../../source/component/3rd-party/evm/raw/lib/x86/linux/libelua.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -61,7 +66,115 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../../../../../source/component/3rd-party/evm/port/evm_main.c">
+		<Unit filename="../../../../../source/component/3rd-party/coremark/port/core_portme.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/coremark/port/core_portme.h" />
+		<Unit filename="../../../../../source/component/3rd-party/coremark/raw/core_list_join.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/coremark/raw/core_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/coremark/raw/core_matrix.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/coremark/raw/core_state.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/coremark/raw/core_util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/coremark/raw/coremark.h" />
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_fs_vsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_gpio_vsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_log_vsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_malloc_vsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_msgbus_vsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_netclient_vsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_socket_vsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_timer_vsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_uart_vsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/eluaos/luat_vsf_base.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/evm_port.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/port/iotjs/evm_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/components/webclient/inc/webclient.h" />
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/lualib/bget.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/lualib/lbaselib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/lualib/linit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/lualib/liolib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/lualib/lmathlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/lualib/loslib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/lualib/ltablib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/lualib/printf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/lualib/rotable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/modules/luat_lib_gpio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/modules/luat_lib_log.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/modules/luat_lib_rtos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/modules/luat_lib_socket.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/modules/luat_lib_timer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/modules/luat_lib_uart.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/modules/luat_luat_bin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/modules/luat_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/evm/raw/modules/eluaos/modules/luat_malloc_weak.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../../source/component/3rd-party/freetype/port/ft2build.h" />
@@ -709,6 +822,29 @@
 		<Unit filename="../../../../../source/component/3rd-party/libpng/raw/pngwutil.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/lua/extension/lovevsf/lovevsf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/lua/extension/lovevsf/lovevsf.h" />
+		<Unit filename="../../../../../source/component/3rd-party/lua/extension/lovevsf/modules/l_filesystem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/lua/extension/lovevsf/modules/l_font.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/lua/extension/lovevsf/modules/l_graphics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/lua/extension/lovevsf/modules/l_image.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/lua/extension/lovevsf/modules/l_timer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/lua/extension/oo/lua_oo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../../../source/component/3rd-party/lua/extension/oo/lua_oo.h" />
 		<Unit filename="../../../../../source/component/3rd-party/lvgl/extension/lv_lib_freetype/raw/lv_freetype.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -1225,10 +1361,25 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../../../source/component/input/driver/hid/vsf_input_hid.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_gamepad.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../../../source/component/input/protocol/vsf_input_gamepad.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_keyboard.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../../../source/component/input/protocol/vsf_input_keyboard.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_mouse.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../../../source/component/input/protocol/vsf_input_mouse.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_sensor.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../../../source/component/input/protocol/vsf_input_sensor.h" />
+		<Unit filename="../../../../../source/component/input/protocol/vsf_input_touchscreen.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../../../source/component/input/protocol/vsf_input_touchscreen.h" />
 		<Unit filename="../../../../../source/component/input/vsf_input.c">
 			<Option compilerVar="CC" />
