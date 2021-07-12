@@ -1030,6 +1030,9 @@
     <Filter Include="usrapp\config\mbedtls">
       <UniqueIdentifier>{2c5fc354-ef32-4804-aaca-4e24c41ab656}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\guilite_demo">
+      <UniqueIdentifier>{1f226288-bb4b-4c84-a0f7-20f566c484e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -5584,6 +5587,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.c">
       <Filter>vsf\component\input\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\guilite_demo\UIcode.cpp">
+      <Filter>usrapp\demo\guilite_demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

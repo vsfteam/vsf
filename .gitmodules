@@ -58,3 +58,6 @@
 [submodule "source/component/3rd-party/mbedtls/raw"]
 	path = source/component/3rd-party/mbedtls/raw
 	url = ../mbedtls
+[submodule "source/component/3rd-party/GuiLite/raw"]
+	path = source/component/3rd-party/GuiLite/raw
+	url = ../GuiLite
