@@ -177,6 +177,10 @@ int vsf_linux_create_fhs(void)
     extern int llgui_main(int argc, char *argv[]);
     busybox_bind("/sbin/llgui", llgui_main);
 #endif
+#if APP_USE_GUILITE_DEMO == ENABLED
+    extern int guilite_main(int argc, char *argv[]);
+    busybox_bind("/sbin/guilite", guilite_main);
+#endif
 #if APP_USE_AUDIO_DEMO == ENABLED
     extern int audio_play_main(int argc, char *argv[]);
     busybox_bind("/sbin/play_audio", audio_play_main);

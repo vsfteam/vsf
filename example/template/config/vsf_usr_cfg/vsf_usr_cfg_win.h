@@ -147,7 +147,9 @@
 #   define VSF_AUDIO_USE_CATURE                         DISABLED
 
 // UI runs in vsf_prio_0, other modules runs above vsf_prio_1
-#if APP_USE_AWTK_DEMO == ENABLED || APP_USE_LVGL_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_USE_TGUI_DEMO == ENABLED
+#if     APP_USE_AWTK_DEMO == ENABLED || APP_USE_LVGL_DEMO == ENABLED            \
+    ||  APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_USE_TGUI_DEMO == ENABLED       \
+    ||  APP_USE_GUILITE_DEMO == ENABLED
 #   ifdef __VSF_X86_WIN_SINGLE_PRIORITY
 #       define VSF_USBH_CFG_EDA_PRIORITY                vsf_prio_0
 #       define APP_CFG_USBH_HW_PRIO                     vsf_arch_prio_0

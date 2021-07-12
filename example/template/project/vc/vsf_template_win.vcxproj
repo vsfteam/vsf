@@ -1491,6 +1491,7 @@
     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
     <ClCompile Include="..\..\demo\gato_demo\gato_application.c" />
     <ClCompile Include="..\..\demo\gato_demo\gato_demo.c" />
+    <ClCompile Include="..\..\demo\guilite_demo\guilite_demo.c" />
     <ClCompile Include="..\..\demo\guilite_demo\UIcode.cpp" />
     <ClCompile Include="..\..\demo\hal_demo\usart_demo.c" />
     <ClCompile Include="..\..\demo\json_demo\json_demo.c" />
