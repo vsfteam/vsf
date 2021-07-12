@@ -53,8 +53,8 @@
 
 #define __iomux_cfg_set(__gp_idx)                                               \
         do {                                                                    \
-            uint32_t local_val = REG_IOMUX0->GPCFG[__gp_idx] & ~GPIO_SEL_MASK;  \
-            REG_IOMUX0->GPCFG[__gp_idx] = local_val | ((3 << GPIO_SEL) & GPIO_SEL_MASK);\
+            uint32_t local_val = ((AIC_IOMUX_TypeDef *)AIC_IOMUX_BASE)->GPCFG[__gp_idx] & ~IOMUX_GPIO_CONFIG_SEL_MASK;  \
+            ((AIC_IOMUX_TypeDef *)AIC_IOMUX_BASE)->GPCFG[__gp_idx] = local_val | ((3 << IOMUX_GPIO_CONFIG_SEL_LSB) & IOMUX_GPIO_CONFIG_SEL_MASK);\
         } while (0)
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -72,7 +72,7 @@ static vsf_err_t __vsf_spi_init(vsf_spi_t *spi_ptr)
     cpusysctrl_hclkme_set(CSC_HCLKME_DMA_EN_BIT);
 
     pclk = sysctrl_clock_get(SYS_PCLK);
-    spi_dr_div_setf(pclk / 2 / spi_ptr->cfg.clock_hz - 1);
+    spi_ptr->param->DR |= (pclk / 2 / spi_ptr->cfg.clock_hz - 1);
 
     __iomux_cfg_set(10);
     if (spi_ptr->cfg.mode & SPI_AUTO_SLAVE_SELECTION_ENABLE) {

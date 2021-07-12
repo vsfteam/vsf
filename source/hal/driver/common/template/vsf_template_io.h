@@ -305,10 +305,10 @@ enum io_port_no_t{
 //! @}
 */
 
-/*! \note em_io_model_t should be defined by io.h of the target device driver
-//! \name IO model
+/*! \note em_io_feature_t should be defined by io.h of the target device driver
+//! \name IO feature
 //! @{
-enum io_model_t{
+enum io_feature_t{
     IO_PULL_UP              = (1<<4),           //!< enable pull-up resistor
     IO_OPEN_DRAIN           = (1<<10),          //!< enable open-drain mode
 
@@ -339,7 +339,7 @@ enum io_model_t{
 
 #ifndef __cplusplus
 typedef enum io_pin_no_t    io_pin_no_t;
-typedef enum io_model_t     io_model_t;
+typedef enum io_feature_t   io_feature_t;
 typedef enum io_port_no_t   io_port_no_t;
 typedef enum io_pin_msk_t   io_pin_msk_t;
 typedef struct gpio_reg_t   gpio_reg_t;

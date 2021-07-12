@@ -38,32 +38,20 @@ extern "C" {
 #   define __AIC8800_GPIO_USE_BIT_FIELD             DISABLED
 #endif
 
-#define GPIO_SEL                                    (0)
-#define GPIO_SEL_MASK                               (0xf << GPIO_SEL)
-
-#define GPIO_PULL_DOWN                              (8)
-#define GPIO_PULL_DOWN_MASK                         (1 << GPIO_PULL_DOWN)
-
-#define GPIO_PULL_UP                                (9)
-#define GPIO_PULL_UP_MASK                           (1 << GPIO_PULL_DOWN)
-
 #define GPIO_BASE_ADDRESS                           (0X40504000UL)
 #define REG_GPIO0                                   ((GPIO_REG_T *)GPIO_BASE_ADDRESS)
 
-#define IOMUX_BASE_ADDRESS                          (0X40503000UL)
-#define REG_IOMUX0                                  ((AIC_IOMUX_TypeDef *)IOMUX_BASE_ADDRESS)
-
-/* Define structure member permissions : ‘read only’ */
+/* Define structure member permissions : 'read only' */
 #ifndef __IM
 #   define __IM                                     const
 #endif
 
-/* Define structure member permissions : ‘write only’ */
+/* Define structure member permissions : 'write only' */
 #ifndef __OM
 #   define __OM
 #endif
 
-/* Define structure member permissions : ‘read or write’ */
+/* Define structure member permissions : 'read or write' */
 #ifndef __IOM
 #   define __IOM
 #endif

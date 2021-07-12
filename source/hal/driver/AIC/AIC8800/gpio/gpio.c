@@ -26,7 +26,7 @@
     vsf_gpio_t vsf_gpio##__count = {                                            \
         .REG = {                                                                \
             .GPIO = REG_GPIO0,                                                  \
-            .IOMUX = REG_IOMUX0,                                                \
+            .IOMUX = ((AIC_IOMUX_TypeDef *)AIC_IOMUX_BASE),                     \
         },                                                                      \
     };
 
@@ -48,23 +48,24 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t featu
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     for (i = 0; i < 32; i++) {
         if (pin_mask & (1 << i)) {
-            if (feature & (1 << i)) {
-                gpio_ptr->REG.IOMUX->GPCFG[i] |= GPIO_PULL_UP_MASK;
+            if (feature & IO_PULL_UP) {
+                gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_UP_MASK;
             } else {
-                gpio_ptr->REG.IOMUX->GPCFG[i] |= GPIO_PULL_DOWN_MASK;
+                gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_DN_MASK;
             }
         }
     }
-    gpio_ptr->REG.GPIO->MR |=  pin_mask;
 }
 
-void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, uint32_t  direction_mask, uint32_t pin_mask)
+void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
 {
+    uint32_t temp_value;
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    gpio_ptr->REG.GPIO->DR = direction_mask & pin_mask;
+    temp_value = gpio_ptr->REG.GPIO->DR;
+    gpio_ptr->REG.GPIO->DR = (temp_value & (~pin_mask)) | (direction_mask & pin_mask);
 }
 
-uint32_t  vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     return gpio_ptr->REG.GPIO->DR & pin_mask;
@@ -82,22 +83,29 @@ void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 
 void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
-    uint32_t  ret = ~vsf_gpio_get_direction(gpio_ptr, pin_mask);
+    uint32_t ret = ~vsf_gpio_get_direction(gpio_ptr, pin_mask);
     vsf_gpio_set_direction(gpio_ptr, ret, pin_mask);
 }
 
-uint32_t  vsf_gpio_read(vsf_gpio_t *gpio_ptr)
+uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr)
 {
+    uint32_t temp_value, temp_ret;
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    return (gpio_ptr->REG.GPIO->VR & ~(uint32_t )0);
+    temp_value = gpio_ptr->REG.GPIO->MR;
+    gpio_ptr->REG.GPIO->MR = ~(uint32_t)0;
+    temp_ret = gpio_ptr->REG.GPIO->VR & ~(uint32_t )0;
+    gpio_ptr->REG.GPIO->MR = temp_value;
+    return temp_ret;
 }
 
-void vsf_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t  value, uint32_t pin_mask)
+void vsf_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
 {
     uint32_t temp_value;
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    temp_value = gpio_ptr->REG.GPIO->VR;
-    gpio_ptr->REG.GPIO->VR = (temp_value & (~pin_mask)) | (value & pin_mask);
+    temp_value = gpio_ptr->REG.GPIO->MR;
+    gpio_ptr->REG.GPIO->MR = pin_mask;
+    gpio_ptr->REG.GPIO->VR = value;
+    gpio_ptr->REG.GPIO->MR = temp_value;
 }
 
 void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
@@ -112,6 +120,6 @@ void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 
 void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
-    uint32_t  ret = ~vsf_gpio_read(gpio_ptr);
+    uint32_t ret = ~vsf_gpio_read(gpio_ptr);
     vsf_gpio_write(gpio_ptr, ret, pin_mask);
 }
