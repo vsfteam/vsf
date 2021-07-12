@@ -76,10 +76,6 @@ vsf_class(vsf_gpio_74hc165_t) {
         void *param;
         uint8_t cascade_num;
     )
-
-    private_member(
-        uint32_t data;
-    )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
