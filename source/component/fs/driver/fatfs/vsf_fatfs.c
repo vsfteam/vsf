@@ -811,7 +811,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_close, vk_file_close)
     if (fatfs_file->name != NULL) {
         vsf_heap_free(fatfs_file->name);
     }
-    vk_file_free(&fatfs_file->use_as__vk_file_t);
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
