@@ -167,7 +167,7 @@ vk_fakefat32_file_t fakefat32_root[ 3
 #if USRAPP_FAKEFAT32_CFG_FONT == ENABLED
     {
         .name               = "font",
-        .attr               = VSF_FILE_ATTR_DIRECTORY,
+        .attr               = VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ,
         .d.child            = (vk_memfs_file_t *)__fakefat32_font,
         .d.child_num        = dimof(__fakefat32_font),
     },
@@ -175,7 +175,7 @@ vk_fakefat32_file_t fakefat32_root[ 3
 #if APP_USE_EVM_DEMO == ENABLED
     {
         .name               = "evm",
-        .attr               = VSF_FILE_ATTR_DIRECTORY,
+        .attr               = VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ,
         .d.child            = (vk_memfs_file_t *)__evm_root,
         .d.child_num        = dimof(__evm_root),
     },
