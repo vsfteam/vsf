@@ -735,7 +735,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                             memcpy(fatfs_file->name, dparser->filename, filename_len);
 
                             dentry = (fatfs_dentry_t *)dparser->entry;
-                            fatfs_file->attr = (vk_file_attr_t)__vk_fatfs_parse_file_attr(dentry->fat.Attr);
+                            fatfs_file->attr |= (vk_file_attr_t)__vk_fatfs_parse_file_attr(dentry->fat.Attr);
                             fatfs_file->coding = dparser->is_unicode ? VSF_FILE_NAME_CODING_UCS2 : VSF_FILE_NAME_CODING_UNKNOWN;
                             fatfs_file->fsop = &vk_fatfs_op;
                             fatfs_file->size = dentry->fat.FileSize;
