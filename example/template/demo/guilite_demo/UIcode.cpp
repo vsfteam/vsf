@@ -1,3 +1,6 @@
+#include "vsf.h"
+#if APP_USE_GUILITE_DEMO == ENABLED
+
 #define GUILITE_ON  //Do not define this macro once more!!!
 
 // undefine platform MACROs to use vsf
@@ -112,3 +115,5 @@ void* getUiOfHelloStar(int* width, int* height, bool force_update)
 	}
 	return NULL;
 }
+
+#endif		// APP_USE_GUILITE_DEMO

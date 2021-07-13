@@ -127,7 +127,7 @@
 #   define VSF_EVM_USE_BLUETOOTH                        DISABLED
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
-#define APP_USE_GUILITE_DEMO                            ENABLED
+#define APP_USE_GUILITE_DEMO                            DISABLED
 
 #if     APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED       \
     ||  (APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_CFG_FREETYPE == ENABLED)
