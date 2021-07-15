@@ -34,8 +34,7 @@ extern "C" {
 typedef struct vsf_ad_t vsf_ad_t;
 
 typedef void vsf_ad_isr_handler_t(void *target_ptr,
-                                  vsf_ad_t *ad_ptr,
-                                  uint32_t channel);
+                                  vsf_ad_t *ad_ptr);
 
 typedef struct vsf_ad_isr_t {
     vsf_ad_isr_handler_t   *handler_fn;

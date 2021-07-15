@@ -56,6 +56,10 @@ extern "C" {
 #   define VSF_HAL_USE_DMA              ENABLED
 #endif
 
+#ifndef VSF_HAL_USE_AD
+#   define VSF_HAL_USE_AD               ENABLED
+#endif
+
 /*----------------------------------------------------------------------------*
  * USART Switch                                                               *
  *----------------------------------------------------------------------------*/
