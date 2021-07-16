@@ -18,6 +18,14 @@
 #ifndef __VSF_SERVICE_H__
 #define __VSF_SERVICE_H__
 
+/** @ingroup vsf
+ *  @{
+ */
+
+/** @defgroup vsf_service vsf service
+ *  @{
+ */
+
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
@@ -51,6 +59,9 @@ extern void vsf_service_init(void);
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */ // vsf service group
+/** @} */ // vsf group
 
 #endif
 /* EOF */

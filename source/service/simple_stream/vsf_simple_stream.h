@@ -17,6 +17,21 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+/**
+ * \file vsf_simple_stream.h
+ * \brief vsf simple stream
+ *
+ * provides a simple stream implementation
+ */
+
+/** @ingroup vsf_service
+ *  @{
+ */
+
+/** @defgroup vsf_simple_stream vsf simple stream
+ *  @{
+ */
+
 #ifndef __VSF_SIMPLE_STREAM_H__
 #define __VSF_SIMPLE_STREAM_H__
 
@@ -41,10 +56,28 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+/**
+ *  \~english
+ *  vsf stream ticktock configuration, can be ENABLED or DISABLE.
+ *  Default value is ENABLED, it can be predefined in vsf_usr_cfg*.h
+ *
+ *  \~chinese
+ *  vsf stream ticktock 配置, 可以是 ENABLED 或者 DISABLE。
+ *  默认值是ENABLED，可以在 vsf_usr_cfg*.h 里预定义
+ */
 #ifndef VSF_STREAM_CFG_TICKTOCK
 #   define VSF_STREAM_CFG_TICKTOCK                      ENABLED
 #endif
 
+/**
+ *  \~english
+ *  vsf stream threshold configuration, can be ENABLED or DISABLE.
+ *  Default value is ENABLED, it can be predefined in vsf_usr_cfg*.h
+ *
+ *  \~chinese
+ *  vsf stream阈值配置, 可以是 ENABLED 或者 DISABLE。
+ *  默认值是ENABLED，可以在 vsf_usr_cfg*.h 里预定义
+ */
 #ifndef VSF_STREAM_CFG_THRESHOLD
 #   define VSF_STREAM_CFG_THRESHOLD                     ENABLED
 #endif
@@ -78,22 +111,69 @@ vsf_dcl_class(vsf_stream_t)
 vsf_dcl_class(vsf_stream_terminal_t)
 vsf_dcl_class(vsf_stream_op_t)
 
+/**
+ *  \~english
+ *  vsf stream event
+ *
+ *  \~chinese
+ *  vsf stream 事件
+ */
 typedef enum vsf_stream_evt_t {
-    VSF_STREAM_ON_CONNECT,
-    VSF_STREAM_ON_DISCONNECT,
-    VSF_STREAM_ON_IN,
-    VSF_STREAM_ON_RX = VSF_STREAM_ON_IN,
-    VSF_STREAM_ON_OUT,
-    VSF_STREAM_ON_TX = VSF_STREAM_ON_OUT,
+    VSF_STREAM_ON_CONNECT,                  /**< stream on connect event    */
+    VSF_STREAM_ON_DISCONNECT,               /**< stream on disconnect event */
+    VSF_STREAM_ON_IN,                       /**< stream on in event         */
+    VSF_STREAM_ON_RX = VSF_STREAM_ON_IN,    /**< stream on rx event         */
+    VSF_STREAM_ON_OUT,                      /**< stream on out event        */
+    VSF_STREAM_ON_TX = VSF_STREAM_ON_OUT,   /**< stream on tx event         */
 } vsf_stream_evt_t;
 
+/**
+ * \~english vsf steam operating functions
+ * @note TODO
+ *
+ * \~chinese vsf steam 操作函数
+ * @note TODO
+ */
 vsf_class(vsf_stream_op_t) {
     protected_member(
+        /**
+         \~english initialization function, must be called before other API.
+         @param stream stream instance, cannot be NULL.
+         @return None.
+
+         \~chinese 初始化函数，必须在其他API之前调用。
+         @param stream 流实例, 不能是空指针
+         @return 无返回值。
+         */
         void (*init)(vsf_stream_t *stream);
         void (*fini)(vsf_stream_t *stream);
         // for read/write, if buffer->buffer is NULL,
         //         then do dummy read/write of buffer->size
+
+        /**
+         \~english write function, must be called after init.
+         @param stream stream instance, cannot be NULL.
+         @param buf buffer pointer, poin to a buffer or NULL
+         @param size write size(bytes), if buffer is NULL, then do dummy write.
+
+         \~chinese 初始化函数，必须在其他API之前调用。
+         @param stream 流实例, 不能是空指针
+         @param buf 缓冲指针, 指向一块缓冲或者是NULL
+         @param size 写大小(字节单位), 如果缓冲区是NULL, 将写给定大小的虚假数据
+         */
         uint_fast32_t (*write)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+
+        /**
+         \~english read function, must be called after init.
+         @param stream stream instance, cannot be NULL.
+         @param buf buffer pointer, poin to a buffer or NULL
+         @param size read size(bytes), if buffer is NULL, then do dummy read.
+
+         \~chinese 初始化函数，必须在其他API之前调用。
+         @param stream 流实例, 不能是空指针
+         @param buf 缓冲指针, 指向一块缓冲或者是NULL
+         @param size 读大小(字节单位), 如果缓冲区是NULL, 将读给定大小的虚假数据
+         */
         uint_fast32_t (*read)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
         uint_fast32_t (*get_buff_length)(vsf_stream_t *stream);
         uint_fast32_t (*get_data_length)(vsf_stream_t *stream);
@@ -144,8 +224,26 @@ vsf_class(vsf_stream_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+/**
+ * \~english initialization function, must be called before other API.
+ * @param stream stream instance, cannot be NULL.
+ *
+ * \~chinese 初始化函数，必须在其他API之前调用。
+ * @param stream 流实例, 不能是空指针
+ */
 extern vsf_err_t vsf_stream_init(vsf_stream_t *stream);
 extern vsf_err_t vsf_stream_fini(vsf_stream_t *stream);
+/**
+ * \~english read function, must be called after init.
+ * @param stream stream instance, cannot be NULL.
+ * @param buf buffer pointer, poin to a buffer or NULL
+ * @param size read size(bytes), if buffer is NULL, then do dummy read.
+ *
+ * \~chinese 初始化函数，必须在其他API之前调用。
+ * @param stream 流实例, 不能是空指针
+ * @param buf 缓冲指针, 指向一块缓冲或者是NULL
+ * @param size 读大小(字节单位), 如果缓冲区是NULL, 将读给定大小的虚假数据
+ */
 extern uint_fast32_t vsf_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
 extern uint_fast32_t vsf_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
 #if VSF_STREAM_CFG_THRESHOLD == ENABLED
@@ -185,6 +283,9 @@ extern void __vsf_stream_on_write(vsf_stream_t *stream);
 #if VSF_USE_DISTBUS == ENABLED
 #   include "./distbus_stream/vsf_distbus_stream.h"
 #endif
+
+/** @} */   // vsf_simple_stream
+/** @} */   // vsf_service
 
 #endif      // VSF_USE_SIMPLE_STREAM
 #endif      // __VSF_SIMPLE_STREAM_H__

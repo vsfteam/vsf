@@ -22,6 +22,10 @@
 #ifndef __VSF_H__
 #define __VSF_H__
 
+/** @defgroup vsf vsf
+ *  @{
+ */
+
 #if defined(__cplusplus) && !defined(__IAR_SYSTEMS_ICC__)
 #   define __STDC_VERSION__   201112L
 #endif
@@ -131,5 +135,8 @@ extern VSF_CFG_DEBUG_STREAM_RX_T VSF_DEBUG_STREAM_RX;
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */ //vsf group
+
 #endif
 /* EOF */
