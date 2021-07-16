@@ -16,19 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: doxygen
+      - name: doxygen-en
         uses: mattnotmitt/doxygen-action@v1
         with:
           doxyfile-path: 'doxygen/vsf_doxygen_en.conf'
-      
-      - name: test
-        run: |
-          tree .
+
+      - name: doxygen-zh
+        uses: mattnotmitt/doxygen-action@v1
+        with:
+          doxyfile-path: 'doxygen/vsf_doxygen_zh.conf'
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Default Doxyfile build documentation to html directory. 
-          # Change the directory if changes in Doxyfile
-          publish_dir: English/html
+          publish_dir: doxygen
