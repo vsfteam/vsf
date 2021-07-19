@@ -31,16 +31,16 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_ad_t vsf_ad_t;
+typedef struct vsf_adc_t vsf_adc_t;
 
-typedef void vsf_ad_isr_handler_t(void *target_ptr,
-                                  vsf_ad_t *ad_ptr);
+typedef void vsf_adc_isr_handler_t(void *target_ptr,
+                                  vsf_adc_t *ad_ptr);
 
-typedef struct vsf_ad_isr_t {
-    vsf_ad_isr_handler_t   *handler_fn;
+typedef struct vsf_adc_isr_t {
+    vsf_adc_isr_handler_t   *handler_fn;
     void                   *target_ptr;
     vsf_arch_prio_t         prio;
-} vsf_ad_isr_t;
+} vsf_adc_isr_t;
 
 /*
 //! \name ad feature
@@ -64,10 +64,10 @@ enum ad_feature_t{
 //! @{
 typedef struct ad_cfg_t ad_cfg_t;
 struct ad_cfg_t {
-    uint32_t     feature;
-    uint32_t     clock;
-    uint32_t     resolution;
-    vsf_ad_isr_t isr;
+    uint32_t      feature;
+    uint32_t      clock;
+    uint32_t      resolution;
+    vsf_adc_isr_t isr;
 };
 //! @}
 
@@ -126,21 +126,21 @@ end_def_interface(i_ad_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_ad_init(vsf_ad_t *ad_ptr, ad_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_adc_init(vsf_adc_t *ad_ptr, ad_cfg_t *cfg_ptr);
 
-extern vsf_err_t vsf_ad_enable(vsf_ad_t *ad_ptr);
-extern vsf_err_t vsf_ad_disable(vsf_ad_t *ad_ptr);
+extern vsf_err_t vsf_adc_enable(vsf_adc_t *ad_ptr);
+extern vsf_err_t vsf_adc_disable(vsf_adc_t *ad_ptr);
 
-extern void vsf_ad_irq_enable(vsf_ad_t *ad_ptr);
-extern void vsf_ad_irq_disable(vsf_ad_t *ad_ptr);
+extern void vsf_adc_irq_enable(vsf_adc_t *ad_ptr);
+extern void vsf_adc_irq_disable(vsf_adc_t *ad_ptr);
 
-extern vsf_err_t vsf_ad_channel_config(vsf_ad_t *ad_ptr,
-                                       ad_channel_cfg_t *channel_cfgs_ptr,
-                                       uint32_t channel_cfgs_cnt);
+extern vsf_err_t vsf_adc_channel_config(vsf_adc_t *ad_ptr,
+                                        ad_channel_cfg_t *channel_cfgs_ptr,
+                                        uint32_t channel_cfgs_cnt);
 
-extern vsf_err_t vsf_ad_channel_request(vsf_ad_t *ad_ptr,
-                                        void *buffer_ptr,
-                                        uint_fast32_t count);
+extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *ad_ptr,
+                                         void *buffer_ptr,
+                                         uint_fast32_t count);
 
 
 #ifdef __cplusplus

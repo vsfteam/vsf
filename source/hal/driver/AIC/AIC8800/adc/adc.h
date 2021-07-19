@@ -63,7 +63,7 @@ enum ad_feature_t{
 
 /*============================ TYPES =========================================*/
 
-vsf_class(vsf_ad_t) {
+vsf_class(vsf_adc_t) {
     public_member(
         void                    *data;
     )
@@ -86,7 +86,7 @@ vsf_class(vsf_ad_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern vsf_ad_t vsf_ad0;
+extern vsf_adc_t vsf_ad0;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
