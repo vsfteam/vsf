@@ -22,7 +22,7 @@
 
 #include "./kernel/vsf_kernel.h"
 #include "hal/vsf_hal_cfg.h"
-#if VSF_HAL_USE_AD == ENABLED
+#if VSF_HAL_USE_ADC == ENABLED
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/gpadc/gpadc_api.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_msadc.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_analog_reg.h"
@@ -37,8 +37,8 @@
 #   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
-#ifndef VSF_AD_CFG_CALLBACK_TIME_US
-#   define VSF_AD_CFG_CALLBACK_TIME_US                          1000
+#ifndef VSF_ADC_CFG_CALLBACK_TIME_US
+#   define VSF_ADC_CFG_CALLBACK_TIME_US                             1000
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -69,8 +69,8 @@ vsf_class(vsf_adc_t) {
     )
     private_member(
         vsf_callback_timer_t    callback_timer;
-        ad_channel_cfg_t        *cfg_channel;
-        ad_cfg_t                cfg;
+        adc_channel_cfg_t       *cfg_channel;
+        adc_cfg_t               cfg;
         uint_fast32_t           data_count;
         uint_fast32_t           data_index;
         uint_fast32_t           channel_count;
@@ -86,7 +86,7 @@ vsf_class(vsf_adc_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern vsf_adc_t vsf_ad0;
+extern vsf_adc_t vsf_adc0;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

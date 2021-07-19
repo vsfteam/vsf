@@ -18,14 +18,14 @@
 /*============================ INCLUDES ======================================*/
 
 #include "./adc.h"
-#if VSF_HAL_USE_AD == ENABLED
+#if VSF_HAL_USE_ADC == ENABLED
 #include "../gpio/gpio.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __vsf_hw_ad_imp_lv0(__count, __dont_care)                               \
-    vsf_adc_t vsf_adc##__count = {                                              \
+#define __VSF_HW_ADC_IMP_LV0(__COUNT, __dont_care)                              \
+    vsf_adc_t vsf_adc##__COUNT = {                                              \
         .data = NULL,                                                           \
         .data_count = 0,                                                        \
         .data_index = 0,                                                        \
@@ -40,8 +40,7 @@
     };
 
 #define aic8800_adc_def(__count)                                                \
-    VSF_MREPEAT(__count, __vsf_hw_ad_imp_lv0, NULL)
-
+    VSF_MREPEAT(__count, __VSF_HW_ADC_IMP_LV0, NULL)
 
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
@@ -54,13 +53,13 @@ aic8800_adc_def(1)
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_adc_init(vsf_adc_t *ad_ptr, ad_cfg_t *cfg_ptr)
+static void __vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
 {
     //todo:cfg_ptr
-    vsf_callback_timer_init(&ad_ptr->callback_timer);
+    vsf_callback_timer_init(&adc_ptr->callback_timer);
 }
 
-static void __vsf_adc_channel_config(vsf_adc_t *ad_ptr, ad_channel_cfg_t *channel_cfgs_ptr)
+static void __vsf_adc_channel_config(vsf_adc_t *adc_ptr, adc_channel_cfg_t *channel_cfgs_ptr)
 {
     if (channel_cfgs_ptr->channel <= 7) {
         PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_mode), 0);
@@ -76,11 +75,11 @@ static void __vsf_adc_channel_config(vsf_adc_t *ad_ptr, ad_channel_cfg_t *channe
     }
 }
 
-vsf_err_t __vsf_adc_channel_request(vsf_adc_t *ad_ptr)
+vsf_err_t __vsf_adc_channel_request(vsf_adc_t *adc_ptr)
 {
-    if (ad_ptr->cfg_channel[ad_ptr->channel_index].channel <= 7) {
-        int neg_flag = ad_ptr->cfg_channel[ad_ptr->channel_index].channel & 0x01;
-        unsigned int mux_bit = 7 - (ad_ptr->cfg_channel[ad_ptr->channel_index].channel >> 1);
+    if (adc_ptr->cfg_channel[adc_ptr->channel_index].channel <= 7) {
+        int neg_flag = adc_ptr->cfg_channel[adc_ptr->channel_index].channel & 0x01;
+        unsigned int mux_bit = 7 - (adc_ptr->cfg_channel[adc_ptr->channel_index].channel >> 1);
         PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_ana_ctrl0),
             (neg_flag ? 0 : AIC1000LITE_MSADC_CFG_ANA_MSADC_CHNP_SEL),
             AIC1000LITE_MSADC_CFG_ANA_MSADC_CHNP_SEL);
@@ -90,7 +89,7 @@ vsf_err_t __vsf_adc_channel_request(vsf_adc_t *ad_ptr)
         PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl0),
             AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
 
-        vsf_callback_timer_add_us(&ad_ptr->callback_timer, VSF_AD_CFG_CALLBACK_TIME_US);
+        vsf_callback_timer_add_us(&adc_ptr->callback_timer, VSF_ADC_CFG_CALLBACK_TIME_US);
         return VSF_ERR_NONE;
     }
     return VSF_ERR_INVALID_RANGE;
@@ -98,109 +97,110 @@ vsf_err_t __vsf_adc_channel_request(vsf_adc_t *ad_ptr)
 
 void __vk_ad_on_time(vsf_callback_timer_t *timer)
 {
-    vsf_adc_t *ad_ptr = container_of(timer, vsf_adc_t, callback_timer);
-    unsigned int gpmsk = 0x01UL << ad_ptr->cfg_channel[ad_ptr->channel_index].channel;
+    vsf_adc_t *adc_ptr = container_of(timer, vsf_adc_t, callback_timer);
+    unsigned int gpmsk = 0x01UL << adc_ptr->cfg_channel[adc_ptr->channel_index].channel;
     uint32_t temp_value;
-    int neg_flag = ad_ptr->cfg_channel[ad_ptr->channel_index].channel & 0x01;
+    int neg_flag = adc_ptr->cfg_channel[adc_ptr->channel_index].channel & 0x01;
     if(0x1 != PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw))) {//can not
-        vsf_callback_timer_add_us(&ad_ptr->callback_timer, VSF_AD_CFG_CALLBACK_TIME_US);
+        vsf_callback_timer_add_us(&adc_ptr->callback_timer, VSF_ADC_CFG_CALLBACK_TIME_US);
         return;
     }
     PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw), 0x1);
     temp_value = vsf_gpio0.REG.GPIO->MR;
     vsf_gpio0.REG.GPIO->MR = gpmsk;
-    *((int *)(ad_ptr->data) + ad_ptr->data_index + (ad_ptr->data_count * ad_ptr->channel_index)) =
+    *((int *)(adc_ptr->data) + adc_ptr->data_index + (adc_ptr->data_count * adc_ptr->channel_index)) =
         PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_ro_acc)) * (neg_flag ? -1 : 1);
     vsf_gpio0.REG.GPIO->MR = temp_value;
-    if (ad_ptr->data_index < ad_ptr->data_count) {
-        ad_ptr->data_index++;
-        __vsf_adc_channel_request(ad_ptr);
+    if (adc_ptr->data_index < adc_ptr->data_count) {
+        adc_ptr->data_index++;
+        __vsf_adc_channel_request(adc_ptr);
         return;
-    } else if (ad_ptr->channel_index < ad_ptr->channel_count) {
-        ad_ptr->channel_index++;
-        ad_ptr->data_index = 0;
-        __vsf_adc_channel_request(ad_ptr);
+    } else if (adc_ptr->channel_index < adc_ptr->channel_count) {
+        adc_ptr->channel_index++;
+        adc_ptr->data_index = 0;
+        __vsf_adc_channel_request(adc_ptr);
         return;
     }
-    ad_ptr->status.is_busy = false;
-    if (NULL != ad_ptr->cfg.isr.handler_fn) {
-        ad_ptr->cfg.isr.handler_fn( ad_ptr->cfg.isr.target_ptr, ad_ptr);
+    adc_ptr->status.is_busy = false;
+    if (NULL != adc_ptr->cfg.isr.handler_fn) {
+        adc_ptr->cfg.isr.handler_fn( adc_ptr->cfg.isr.target_ptr, adc_ptr);
     }
 }
 
-vsf_err_t vsf_adc_init(vsf_adc_t *ad_ptr, ad_cfg_t *cfg_ptr)
+vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
 {
-    VSF_HAL_ASSERT((NULL != ad_ptr) && (NULL != cfg_ptr));
-    VSF_HAL_ASSERT(NULL != &(ad_ptr->callback_timer));
-    ad_ptr->cfg = *cfg_ptr;
-    __vsf_adc_init(ad_ptr, cfg_ptr);
+    VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != cfg_ptr));
+    VSF_HAL_ASSERT(NULL != &(adc_ptr->callback_timer));
+    adc_ptr->cfg = *cfg_ptr;
+    __vsf_adc_init(adc_ptr, cfg_ptr);
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_adc_enable(vsf_adc_t *ad_ptr)
+vsf_err_t vsf_adc_enable(vsf_adc_t *adc_ptr)
 {
-    VSF_HAL_ASSERT(NULL != ad_ptr);
-    ad_ptr->status.is_enable = true;
+    VSF_HAL_ASSERT(NULL != adc_ptr);
+    adc_ptr->status.is_enable = true;
     return VSF_ERR_NONE;
 }
 
 
-vsf_err_t vsf_adc_disable(vsf_adc_t *ad_ptr)
+vsf_err_t vsf_adc_disable(vsf_adc_t *adc_ptr)
 {
-    VSF_HAL_ASSERT(NULL != ad_ptr);
-    ad_ptr->status.is_enable = false;
+    VSF_HAL_ASSERT(NULL != adc_ptr);
+    adc_ptr->status.is_enable = false;
     return VSF_ERR_NONE;
 }
 
-void vsf_adc_irq_enable(vsf_adc_t *ad_ptr)
+void vsf_adc_irq_enable(vsf_adc_t *adc_ptr)
 {
-    VSF_HAL_ASSERT(NULL != ad_ptr);
-    ad_ptr->status.is_irq = true;
-}
-void vsf_adc_irq_disable(vsf_adc_t *ad_ptr)
-{
-    VSF_HAL_ASSERT(NULL != ad_ptr);
-    ad_ptr->status.is_irq = false;
+    VSF_HAL_ASSERT(NULL != adc_ptr);
+    adc_ptr->status.is_irq = true;
 }
 
-vsf_err_t vsf_adc_channel_config(vsf_adc_t *ad_ptr, ad_channel_cfg_t channel_cfgs_ptr[], uint32_t channel_cfgs_cnt)
+void vsf_adc_irq_disable(vsf_adc_t *adc_ptr)
+{
+    VSF_HAL_ASSERT(NULL != adc_ptr);
+    adc_ptr->status.is_irq = false;
+}
+
+vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr, adc_channel_cfg_t channel_cfgs_ptr[], uint32_t channel_cfgs_cnt)
 {
     uint32_t i;
-    VSF_HAL_ASSERT((NULL != ad_ptr) && (NULL != channel_cfgs_ptr));
+    VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != channel_cfgs_ptr));
     VSF_HAL_ASSERT(0 != channel_cfgs_cnt);
-    if (false == ad_ptr->status.is_enable) {
+    if (false == adc_ptr->status.is_enable) {
         return VSF_ERR_NOT_READY;
     }
     for (i = 0; i < channel_cfgs_cnt; i++) {
         VSF_HAL_ASSERT(NULL != (channel_cfgs_ptr + i));
-        __vsf_adc_channel_config(ad_ptr, channel_cfgs_ptr + i);
+        __vsf_adc_channel_config(adc_ptr, channel_cfgs_ptr + i);
     }
-    ad_ptr->channel_count = channel_cfgs_cnt - 1;
-    if (NULL != ad_ptr->cfg_channel) {
-        free((void *)ad_ptr->cfg_channel);
+    adc_ptr->channel_count = channel_cfgs_cnt - 1;
+    if (NULL != adc_ptr->cfg_channel) {
+        free((void *)adc_ptr->cfg_channel);
     }
-    ad_ptr->cfg_channel = (ad_channel_cfg_t *)malloc(sizeof(ad_channel_cfg_t) * channel_cfgs_cnt);
-    memcpy(ad_ptr->cfg_channel, channel_cfgs_ptr, sizeof(ad_channel_cfg_t) * channel_cfgs_cnt);
+    adc_ptr->cfg_channel = (adc_channel_cfg_t *)malloc(sizeof(adc_channel_cfg_t) * channel_cfgs_cnt);
+    memcpy(adc_ptr->cfg_channel, channel_cfgs_ptr, sizeof(adc_channel_cfg_t) * channel_cfgs_cnt);
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_adc_channel_request(vsf_adc_t *ad_ptr, void *buffer_ptr, uint_fast32_t count)
+vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr, void *buffer_ptr, uint_fast32_t count)
 {
-    VSF_HAL_ASSERT((NULL != ad_ptr) && (NULL != buffer_ptr));
+    VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != buffer_ptr));
     VSF_HAL_ASSERT(0 != count);
-    if (false == ad_ptr->status.is_enable) {
+    if (false == adc_ptr->status.is_enable) {
         return VSF_ERR_NOT_READY;
     }
-    if (true == ad_ptr->status.is_busy) {
+    if (true == adc_ptr->status.is_busy) {
         return VSF_ERR_ALREADY_EXISTS;
     }
-    ad_ptr->status.is_busy = true;
-    ad_ptr->data_count = count;
-    ad_ptr->data_index = 0;
-    ad_ptr->channel_index = 0;
-    ad_ptr->data = buffer_ptr;
-    ad_ptr->callback_timer.on_timer = __vk_ad_on_time;
-    return __vsf_adc_channel_request(ad_ptr);
+    adc_ptr->status.is_busy = true;
+    adc_ptr->data_count = count;
+    adc_ptr->data_index = 0;
+    adc_ptr->channel_index = 0;
+    adc_ptr->data = buffer_ptr;
+    adc_ptr->callback_timer.on_timer = __vk_ad_on_time;
+    return __vsf_adc_channel_request(adc_ptr);
 }
 #endif /* VSF_HAL_USE_AD */
 

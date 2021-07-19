@@ -34,7 +34,7 @@ extern "C" {
 typedef struct vsf_adc_t vsf_adc_t;
 
 typedef void vsf_adc_isr_handler_t(void *target_ptr,
-                                  vsf_adc_t *ad_ptr);
+                                  vsf_adc_t *adc_ptr);
 
 typedef struct vsf_adc_isr_t {
     vsf_adc_isr_handler_t   *handler_fn;
@@ -62,8 +62,8 @@ enum ad_feature_t{
 
 //! \name ad configuration
 //! @{
-typedef struct ad_cfg_t ad_cfg_t;
-struct ad_cfg_t {
+typedef struct adc_cfg_t adc_cfg_t;
+struct adc_cfg_t {
     uint32_t      feature;
     uint32_t      clock;
     uint32_t      resolution;
@@ -92,8 +92,8 @@ enum ad_channel_feature_t{
 
 //! \name ad channel configuration
 //! @{
-typedef struct ad_channel_cfg_t ad_channel_cfg_t;
-struct ad_channel_cfg_t {
+typedef struct adc_channel_cfg_t adc_channel_cfg_t;
+struct adc_channel_cfg_t {
     uint32_t channel;       // Channel Index
     uint32_t feature;       // Channle Feature
     uint32_t rank;
@@ -103,10 +103,10 @@ struct ad_channel_cfg_t {
 
 //! \name class: ad_t
 //! @{
-def_interface(i_ad_t)
+def_interface(i_adc_t)
     implement(i_peripheral_t);
 
-    vsf_err_t (*Init)(ad_cfg_t *pCfg);
+    vsf_err_t (*Init)(adc_cfg_t *pCfg);
 
     //! Irq
     struct {
@@ -116,29 +116,29 @@ def_interface(i_ad_t)
 
     //! Channel
     struct {
-        vsf_err_t (*Config)(ad_channel_cfg_t *ptChannelCfgs, uint32_t nCount);
+        vsf_err_t (*Config)(adc_channel_cfg_t *ptChannelCfgs, uint32_t nCount);
         vsf_err_t (*Request)(void *pBuffer, uint32_t nCount);
     } Channel;
 
-end_def_interface(i_ad_t)
+end_def_interface(i_adc_t)
 //! @}
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_adc_init(vsf_adc_t *ad_ptr, ad_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr);
 
-extern vsf_err_t vsf_adc_enable(vsf_adc_t *ad_ptr);
-extern vsf_err_t vsf_adc_disable(vsf_adc_t *ad_ptr);
+extern vsf_err_t vsf_adc_enable(vsf_adc_t *adc_ptr);
+extern vsf_err_t vsf_adc_disable(vsf_adc_t *adc_ptr);
 
-extern void vsf_adc_irq_enable(vsf_adc_t *ad_ptr);
-extern void vsf_adc_irq_disable(vsf_adc_t *ad_ptr);
+extern void vsf_adc_irq_enable(vsf_adc_t *adc_ptr);
+extern void vsf_adc_irq_disable(vsf_adc_t *adc_ptr);
 
-extern vsf_err_t vsf_adc_channel_config(vsf_adc_t *ad_ptr,
-                                        ad_channel_cfg_t *channel_cfgs_ptr,
+extern vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
+                                        adc_channel_cfg_t *channel_cfgs_ptr,
                                         uint32_t channel_cfgs_cnt);
 
-extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *ad_ptr,
+extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
                                          void *buffer_ptr,
                                          uint_fast32_t count);
 

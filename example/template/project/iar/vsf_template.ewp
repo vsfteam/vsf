@@ -9927,6 +9927,15 @@
                     <group>
                         <name>AIC8800</name>
                         <group>
+                            <name>adc</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\adc\adc.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\adc\adc.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>debug_uart</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\debug_uart\debug_uart.c</name>
@@ -10998,6 +11007,9 @@
                     </group>
                     <group>
                         <name>template</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_adc.h</name>
+                        </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_hal_driver.h</name>
                         </file>
