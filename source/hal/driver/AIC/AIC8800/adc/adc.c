@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "./ad.h"
+#include "./adc.h"
 #if VSF_HAL_USE_AD == ENABLED
 #include "../gpio/gpio.h"
 

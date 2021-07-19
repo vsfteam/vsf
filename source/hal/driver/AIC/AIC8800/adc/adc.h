@@ -59,7 +59,7 @@ enum ad_feature_t{
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/template/vsf_template_ad.h"
+#include "hal/driver/common/template/vsf_template_adc.h"
 
 /*============================ TYPES =========================================*/
 
