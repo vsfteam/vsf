@@ -29,8 +29,9 @@
 #define SPI0_TXDMA_IRQ_IDX              DMA09_IRQn
 #define SPI0_DMA_CFG_BYTE_CNT_MAX       (64)
 
-#undef SPI0_USE_GPIO
-#define SPI0_USE_GPIO                   vsf_gpio0
+#ifndef SPI0_USE_GPIO
+#   define SPI0_USE_GPIO                vsf_gpio0
+#endif
 
 #undef SPI0_USE_GPIO_PIN
 #define SPI0_USE_GPIO_PIN               (1 << 11)
@@ -39,29 +40,23 @@
 #define SPI0_CFG_GPIO_FEATURE           (0ul)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define ____vsf_hw_spi_imp_lv0(__count, __dont_care)                            \
+#define __VSF_HW_SPI_IMP_LV0(__count, __dont_care)                              \
     vsf_spi_t vsf_spi##__count = {                                              \
         .param = REG_SPI##__count,                                              \
         .is_able = false,                                                       \
     };
 
-#define __vsf_hw_spi_imp_lv0(__count)                                           \
-    VSF_MREPEAT(__count, ____vsf_hw_spi_imp_lv0, __count)
-
 #define aic8800_spi_def(__count)                                                \
-    __vsf_hw_spi_imp_lv0(__count)
+    VSF_MREPEAT(__count, __VSF_HW_SPI_IMP_LV0, __count)
 
-#define __iomux_cfg_set(__gp_idx)                                               \
-        do {                                                                    \
-            uint32_t local_val = ((AIC_IOMUX_TypeDef *)AIC_IOMUX_BASE)->GPCFG[__gp_idx] & ~IOMUX_GPIO_CONFIG_SEL_MASK;  \
-            ((AIC_IOMUX_TypeDef *)AIC_IOMUX_BASE)->GPCFG[__gp_idx] = local_val | ((3 << IOMUX_GPIO_CONFIG_SEL_LSB) & IOMUX_GPIO_CONFIG_SEL_MASK);\
-        } while (0)
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 
 aic8800_spi_def(1)
+
+/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
 static vsf_err_t __vsf_spi_init(vsf_spi_t *spi_ptr)
 {
@@ -73,17 +68,6 @@ static vsf_err_t __vsf_spi_init(vsf_spi_t *spi_ptr)
 
     pclk = sysctrl_clock_get(SYS_PCLK);
     spi_ptr->param->DR |= (pclk / 2 / spi_ptr->cfg.clock_hz - 1);
-
-    __iomux_cfg_set(10);
-    if (spi_ptr->cfg.mode & SPI_AUTO_SLAVE_SELECTION_ENABLE) {
-        __iomux_cfg_set(11);
-    } else {
-        vsf_gpio_config_pin(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN, SPI0_CFG_GPIO_FEATURE);
-        vsf_gpio_set_output(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN);
-        vsf_gpio_set(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN);
-    }
-    __iomux_cfg_set(12);
-    __iomux_cfg_set(13);
 
     if (SPI_MODE_0 == (spi_ptr->cfg.mode & SPI_MODE_3)) {
         cr0 = (0x01ul << 0) |(0x01ul << 1) | (0x00ul << 13);
@@ -302,23 +286,17 @@ vsf_err_t vsf_spi_cancel_transfer(vsf_spi_t *spi_ptr)
 void vsf_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
     if (spi_ptr->cfg.mode & SPI_AUTO_SLAVE_SELECTION_ENABLE) {
-        if (index > 1) {
-            VSF_HAL_ASSERT(false);
-        }
         return;
     }
-    vsf_gpio_clear(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN);
+    vsf_gpio_clear(&SPI0_USE_GPIO, 1 << index);
 }
 
 void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
     if (spi_ptr->cfg.mode & SPI_AUTO_SLAVE_SELECTION_ENABLE) {
-        if (index > 1) {
-            VSF_HAL_ASSERT(false);
-        }
         return;
     }
-    vsf_gpio_set(&SPI0_USE_GPIO, SPI0_USE_GPIO_PIN);
+    vsf_gpio_set(&SPI0_USE_GPIO, 1 << index);
 }
 
 spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
@@ -343,4 +321,4 @@ int_fast32_t vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr)
     //todo:
     VSF_HAL_ASSERT(false);
 }
-/*============================ IMPLEMENTATION ================================*/
+

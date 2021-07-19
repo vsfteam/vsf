@@ -22,8 +22,8 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __vsf_hw_gpio_imp_lv0(__count, __dont_care)                             \
-    vsf_gpio_t vsf_gpio##__count = {                                            \
+#define __VSF_HW_GPIO_IPM_LV0(__COUNT, __DONT_CARE)                             \
+    vsf_gpio_t vsf_gpio##__COUNT = {                                            \
         .REG = {                                                                \
             .GPIO = REG_GPIO0,                                                  \
             .IOMUX = ((AIC_IOMUX_TypeDef *)AIC_IOMUX_BASE),                     \
@@ -31,7 +31,7 @@
     };
 
 #define aic8800_gpio_def(__count)                                               \
-    VSF_MREPEAT(__count, __vsf_hw_gpio_imp_lv0, NULL)
+    VSF_MREPEAT(__count, __VSF_HW_GPIO_IPM_LV0, NULL)
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -50,7 +50,8 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t featu
         if (pin_mask & (1 << i)) {
             if (feature & IO_PULL_UP) {
                 gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_UP_MASK;
-            } else {
+            }
+            if (feature & IO_PULL_DOWN){
                 gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_DN_MASK;
             }
         }

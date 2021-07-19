@@ -31,30 +31,27 @@
 /*============================ TYPES =========================================*/
 
 enum io_feature_t {
-    IO_PULL_UP              = (1<<4),           //!< enable pull-up resistor
-    IO_OPEN_DRAIN           = (1<<10),          //!< enable open-drain mode
-
-    IO_DISABLE_INPUT        = (1<<7),          //!< disable input
-    IO_INVERT_INPUT         = (1<<6),          //!< invert the input pin level
-
-
-    IO_FILTER_BYPASS        = (0<<11),           //!< filter is bypassed
-    IO_FILTER_2CLK          = (1<<11),           //!< levels should keep 2 clks
-    IO_FILTER_4CLK          = (2<<11),           //!< levels should keep 4 clks
-    IO_FILTER_8CLK          = (3<<11),           //!< levels should keep 8 clks
-
-    IO_FILTER_CLK_SRC0      = (0<<13),           //!< select clock src 0 for filter
-    IO_FILTER_CLK_SRC1      = (1<<13),           //!< select clock src 1 for filter
-    IO_FILTER_CLK_SRC2      = (2<<13),           //!< select clock src 2 for filter
-    IO_FILTER_CLK_SRC3      = (3<<13),           //!< select clock src 3 for filter
-    IO_FILTER_CLK_SRC4      = (4<<13),           //!< select clock src 4 for filter
-    IO_FILTER_CLK_SRC5      = (5<<13),           //!< select clock src 5 for filter
-    IO_FILTER_CLK_SRC6      = (6<<13),           //!< select clock src 6 for filter
-    IO_FILTER_CLK_SRC7      = (7<<13),           //!< select clock src 7 for filter
-
-    IO_HIGH_DRV             = (1<<9),           //!< enable high drive strength
-    IO_HIGH_DRIVE           = (1<<9),           //!< enable high drive strength
-    IO_HIGH_DRIVE_STRENGTH  = (1<<9),           //!< enable high drive strength
+    IO_PULL_UP              = (1<<0),           //!< enable pull-up resistor
+    IO_PULL_DOWN            = (1<<1),           //!< enable pull-down resistor
+//todo:
+    IO_OPEN_DRAIN           = 0,
+    IO_DISABLE_INPUT        = 0,
+    IO_INVERT_INPUT         = 0,
+    IO_FILTER_BYPASS        = 0,
+    IO_FILTER_2CLK          = 0,
+    IO_FILTER_4CLK          = 0,
+    IO_FILTER_8CLK          = 0,
+    IO_FILTER_CLK_SRC0      = 0,
+    IO_FILTER_CLK_SRC1      = 0,
+    IO_FILTER_CLK_SRC2      = 0,
+    IO_FILTER_CLK_SRC3      = 0,
+    IO_FILTER_CLK_SRC4      = 0,
+    IO_FILTER_CLK_SRC5      = 0,
+    IO_FILTER_CLK_SRC6      = 0,
+    IO_FILTER_CLK_SRC7      = 0,
+    IO_HIGH_DRV             = 0,
+    IO_HIGH_DRIVE           = 0,
+    IO_HIGH_DRIVE_STRENGTH  = 0,
 };
 
 //todo: remove
