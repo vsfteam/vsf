@@ -10410,10 +10410,13 @@
                                             <group>
                                                 <name>bt</name>
                                                 <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_customer_driver.h</name>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_common_config.c</name>
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_hci.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_user_driver.h</name>
                                                 </file>
                                             </group>
                                             <group>
@@ -10501,6 +10504,12 @@
                                                 <name>pmic</name>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic\pmic_api.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic\pwrkey_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic\pwrkey_api.h</name>
                                                 </file>
                                             </group>
                                             <group>

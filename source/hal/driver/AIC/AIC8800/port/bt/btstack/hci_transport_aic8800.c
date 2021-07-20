@@ -29,7 +29,7 @@
 
 #include "hal/vsf_hal.h"
 
-#include "bt_customer_driver.h"
+#include "bt_user_driver.h"
 #include "bt_hci.h"
 
 #include "btstack_config.h"

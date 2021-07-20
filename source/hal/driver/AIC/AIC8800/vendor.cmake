@@ -111,8 +111,10 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/modules/dbg/src/dbg_print.c
 
     vendor/plf/aic8800/src/arch/ll/ll.c
+    vendor/plf/aic8800/src/driver/bt/bt_common_config.c
     vendor/plf/aic8800/src/driver/flash/flash_api.c
     vendor/plf/aic8800/src/driver/gpio/gpio_api.c
+    vendor/plf/aic8800/src/driver/pmic/pwrkey_api.c
     vendor/plf/aic8800/src/driver/sdmmc/sdmmc_api.c
     vendor/plf/aic8800/src/driver/stdio_uart/stdio_uart.c
     vendor/plf/aic8800/src/driver/ticker/lp_ticker.c
