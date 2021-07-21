@@ -34,10 +34,10 @@ extern "C" {
 typedef struct vsf_adc_t vsf_adc_t;
 
 typedef void vsf_adc_isr_handler_t(void *target_ptr,
-                                  vsf_adc_t *adc_ptr);
+                                   vsf_adc_t *ad_ptr);
 
 typedef struct vsf_adc_isr_t {
-    vsf_adc_isr_handler_t   *handler_fn;
+    vsf_adc_isr_handler_t  *handler_fn;
     void                   *target_ptr;
     vsf_arch_prio_t         prio;
 } vsf_adc_isr_t;
@@ -137,6 +137,9 @@ extern void vsf_adc_irq_disable(vsf_adc_t *adc_ptr);
 extern vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
                                         adc_channel_cfg_t *channel_cfgs_ptr,
                                         uint32_t channel_cfgs_cnt);
+
+extern vsf_err_t vsf_adc_channel_request_one(vsf_adc_t *adc_ptr,
+                                             void *buffer_ptr);
 
 extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
                                          void *buffer_ptr,
