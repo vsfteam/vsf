@@ -94,10 +94,9 @@ enum ad_channel_feature_t{
 //! @{
 typedef struct adc_channel_cfg_t adc_channel_cfg_t;
 struct adc_channel_cfg_t {
-    uint32_t channel;       // Channel Index
+    uint8_t  channel;       // Channel Index
+    uint16_t sample_time;
     uint32_t feature;       // Channle Feature
-    uint32_t rank;
-    uint32_t sample_time;
 };
 //! @}
 
@@ -134,17 +133,17 @@ extern vsf_err_t vsf_adc_disable(vsf_adc_t *adc_ptr);
 extern void vsf_adc_irq_enable(vsf_adc_t *adc_ptr);
 extern void vsf_adc_irq_disable(vsf_adc_t *adc_ptr);
 
+extern vsf_err_t vsf_adc_channel_request_one(vsf_adc_t *adc_ptr,
+                                             adc_channel_cfg_t *channel_cfg,
+                                             void *buffer_ptr);
+
 extern vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
                                         adc_channel_cfg_t *channel_cfgs_ptr,
                                         uint32_t channel_cfgs_cnt);
 
-extern vsf_err_t vsf_adc_channel_request_one(vsf_adc_t *adc_ptr,
-                                             void *buffer_ptr);
-
 extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
                                          void *buffer_ptr,
                                          uint_fast32_t count);
-
 
 #ifdef __cplusplus
 }
