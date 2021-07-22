@@ -2,6 +2,7 @@
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     port
+    port/arch/ll
     port/rtos
 
     vendor/lwip/net_al
@@ -11,7 +12,6 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
 
     vendor/plf/aic8800/src/arch
     vendor/plf/aic8800/src/arch/boot
-    vendor/plf/aic8800/src/arch/ll
     vendor/plf/aic8800/src/arch/cmsis
 
     vendor/plf/aic8800/src/driver
@@ -110,7 +110,6 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/modules/dbg/src/dbg_assert.c
     vendor/modules/dbg/src/dbg_print.c
 
-    vendor/plf/aic8800/src/arch/ll/ll.c
     vendor/plf/aic8800/src/driver/bt/bt_common_config.c
     vendor/plf/aic8800/src/driver/flash/flash_api.c
     vendor/plf/aic8800/src/driver/gpio/gpio_api.c
