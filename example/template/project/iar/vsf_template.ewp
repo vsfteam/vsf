@@ -4683,6 +4683,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\arch\ll</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\rtos</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\net_al</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\include</state>
@@ -4690,7 +4691,6 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\include\lwip</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\ll</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common</state>
@@ -9956,6 +9956,18 @@
                         <group>
                             <name>port</name>
                             <group>
+                                <name>arch</name>
+                                <group>
+                                    <name>ll</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\arch\ll\ll.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\arch\ll\ll.h</name>
+                                    </file>
+                                </group>
+                            </group>
+                            <group>
                                 <name>bt</name>
                                 <group>
                                     <name>btstack</name>
@@ -10362,15 +10374,6 @@
                                         <name>src</name>
                                         <group>
                                             <name>arch</name>
-                                            <group>
-                                                <name>ll</name>
-                                                <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\ll\ll.c</name>
-                                                </file>
-                                                <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\ll\ll.h</name>
-                                                </file>
-                                            </group>
                                             <file>
                                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\arch.h</name>
                                             </file>
