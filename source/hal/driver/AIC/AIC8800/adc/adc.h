@@ -20,20 +20,19 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "./kernel/vsf_kernel.h"
 #include "hal/vsf_hal_cfg.h"
 #if VSF_HAL_USE_ADC == ENABLED
+#include "./kernel/vsf_kernel.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/gpadc/gpadc_api.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_msadc.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_analog_reg.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_rtc_core.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
-#include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
 
-#if     defined(__VSF_AD_CLASS_IMPLEMENT)
-#   undef __VSF_AD_CLASS_IMPLEMENT
+#if     defined(__VSF_ADC_CLASS_IMPLEMENT)
+#   undef __VSF_ADC_CLASS_IMPLEMENT
 #   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
@@ -45,20 +44,41 @@
 /*============================ TYPES =========================================*/
 
 enum ad_feature_t{
-    DATA_ALIGN_RIGHT        = (0 << 0),  //!< ADC data alignment to right
-    DATA_ALIGN_LEFT         = (1 << 0),  //!< ADC data alignment to left
+    DATA_ALIGN_RIGHT        = 0,                //Not activated
+    DATA_ALIGN_LEFT         = 0,                //Not activated
+    SCAN_CONV_SINGLE_MODE   = 0,                //Not activated
+    SCAN_CONV_SEQUENCE_MODE = 0,                //Not activated
+    EXTERN_TRIGGER_0        = 0,                //Not activated
+    EXTERN_TRIGGER_1        = 0,                //Not activated
+    EXTERN_TRIGGER_2        = 0,                //Not activated
+};
 
-    SCAN_CONV_SINGLE_MODE   = (0 << 1),  //!< Conversion is performed in single mode
-    SCAN_CONV_SEQUENCE_MODE = (1 << 1),  //!< Conversions are performed in sequence mode
+enum ad_channel_feature_t {
+    ADC_TYPE_VBAT = 0,
+    ADC_TYPE_VIO,
+    ADC_TYPE_TEMP0,
 
-    //! Selects the external event used to trigger the conversion
-    EXTERN_TRIGGER_0        = (0 << 2),
-    EXTERN_TRIGGER_1        = (1 << 2),
-    EXTERN_TRIGGER_2        = (2 << 2),
+    ADC_SAMPLERATE_DFLT     = 0x02,
+    ADC_SAMPLERATE_HIGH     = 0x40,
+    ADC_SAMPLERATE_MID      = 0x80,
+    ADC_SAMPLERATE_LOW      = 0xF0,
+
+    ADC_GAIN_1_6            = 0,                //Not activated
+    ADC_GAIN_1_5            = 0,                //Not activated
+    ADC_GAIN_1_4            = 0,                //Not activated
+    ADC_GAIN_1_3            = 0,                //Not activated
+    ADC_GAIN_1_2            = 0,                //Not activated
+    ADC_GAIN_1              = 0,                //Not activated
+
+    ADC_REF_VDD_1           = 0,                //Not activated
+    ADC_REF_VDD_1_2         = 0,                //Not activated
+    ADC_REF_VDD_1_3         = 0,                //Not activated
+    ADC_REF_VDD_1_4         = 0,                //Not activated
 };
 
 /*============================ INCLUDES ======================================*/
 
+#include "utilities/ooc_class.h"
 #include "hal/driver/common/template/vsf_template_adc.h"
 
 /*============================ TYPES =========================================*/
@@ -76,10 +96,11 @@ vsf_class(vsf_adc_t) {
         uint_fast32_t           channel_count;
         uint_fast32_t           channel_index;
         struct {
-            uint32_t            is_enable   : 1;
-            uint32_t            is_busy     : 1;
-            uint32_t            is_irq      : 1;
-            uint32_t                        : 29;
+            uint32_t            is_enable       : 1;
+            uint32_t            is_busy         : 1;
+            uint32_t            is_irq          : 1;
+            uint32_t            is_complicated  : 1;
+            uint32_t                            : 29;
         } status;
     )
 };
