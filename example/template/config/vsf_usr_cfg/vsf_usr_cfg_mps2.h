@@ -140,7 +140,7 @@
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
 #define VSH_ENTER_CHAR                                  '\n'
-#define VSF_ASSERT(...)                                 if (!(__VA_ARGS__)) { __breakpoint(0); while(1);};
+#define VSF_ASSERT(...)                                 if (!(__VA_ARGS__)) {while(1);};
 //#define VSF_ASSERT(...)
 
 
