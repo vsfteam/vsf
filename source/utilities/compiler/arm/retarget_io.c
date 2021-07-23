@@ -34,6 +34,9 @@
 
 #include "arm_compiler.h"
 
+// Need to know if VSF_LINUX_USE_SIMPLE_LIBC is enabled
+#include "utilities/vsf_utilities.h"
+
 #ifndef UNUSED_PARAM
 #   define UNUSED_PARAM(__VAL)      (__VAL) = (__VAL)
 #endif
@@ -42,6 +45,7 @@
 #include "../__common/__retarget_io.c"
 
 #if __IS_COMPILER_ARM_COMPILER_5__ || __IS_COMPILER_ARM_COMPILER_6__
+#ifndef VSF_LINUX_USE_SIMPLE_LIBC
 
 #   include <rt_sys.h>
 
@@ -215,7 +219,7 @@ void abort(void) {
   \param[in] name     File name
   \param[in] openmode Mode specification bitmap
  
-  \return    The return value is ¨C1 if an error occurs.
+  \return    The return value is 0 if an error occurs.
 */
 
 //__attribute__((weak))
@@ -360,6 +364,13 @@ int _sys_read (FILEHANDLE fh, uint8_t *buf, uint32_t len, int mode) {
   }
   
   return -1;
+}
+#endif      // VSF_LINUX_USE_SIMPLE_LIBC
+
+void _sys_exit(int return_code)
+{
+    (void)return_code;
+    while (1);
 }
 
 #endif      // __IS_COMPILER_ARM_COMPILER_5__ || __IS_COMPILER_ARM_COMPILER_6__
