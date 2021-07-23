@@ -283,31 +283,34 @@ vsf_err_t vsf_adc_channel_request_one(vsf_adc_t *adc_ptr, adc_channel_cfg_t *cha
 
 vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr, void *buffer_ptr, uint_fast32_t count)
 {
-    VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != buffer_ptr));
-    VSF_HAL_ASSERT(0 != count);
-    if (false == adc_ptr->status.is_enable) {
-        return VSF_ERR_NOT_READY;
-    }
-    if (true == adc_ptr->status.is_busy) {
-        return VSF_ERR_ALREADY_EXISTS;
-    }
-    adc_ptr->status.is_busy = true;
-    adc_ptr->data_count = count;
-    adc_ptr->status.is_complicated = true;
-    adc_ptr->callback_timer.on_timer = __vk_ad_on_time_one;
-    return __vsf_adc_channel_request(adc_ptr, adc_ptr->cfg_channel);
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_NONE;
+    //todo:
+//    VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != buffer_ptr));
+//    VSF_HAL_ASSERT(0 != count);
+//    if (false == adc_ptr->status.is_enable) {
+//        return VSF_ERR_NOT_READY;
+//    }
+//    if (true == adc_ptr->status.is_busy) {
+//        return VSF_ERR_ALREADY_EXISTS;
+//    }
+//    adc_ptr->status.is_busy = true;
+//    adc_ptr->data_count = count;
+//    adc_ptr->status.is_complicated = true;
+//    adc_ptr->callback_timer.on_timer = __vk_ad_on_time_one;
+//    return __vsf_adc_channel_request(adc_ptr, adc_ptr->cfg_channel);
 }
-
-void __adc_isr_handler(void *target_ptr, vsf_adc_t *adc_ptr)
-{
-    int i;
-    for (i = 0; i < 1; i++) {
-        vsf_trace(VSF_TRACE_INFO, "[%d] = %d\t", adc_ptr->cfg_channel->channel, *((int *)adc_ptr->data + i));
-        if (adc_ptr->cfg_channel->channel == 7) {
-            vsf_trace(VSF_TRACE_INFO, "\n");
-        }
-        *((int *)adc_ptr->data + i) = 0;
-    }
-}
+//todo:
+//void __adc_isr_handler(void *target_ptr, vsf_adc_t *adc_ptr)
+//{
+//    int i;
+//    for (i = 0; i < 1; i++) {
+//        vsf_trace(VSF_TRACE_INFO, "[%d] = %d\t", adc_ptr->cfg_channel->channel, *((int *)adc_ptr->data + i));
+//        if (adc_ptr->cfg_channel->channel == 7) {
+//            vsf_trace(VSF_TRACE_INFO, "\n");
+//        }
+//        *((int *)adc_ptr->data + i) = 0;
+//    }
+//}
 
 #endif /* VSF_HAL_USE_AD */
