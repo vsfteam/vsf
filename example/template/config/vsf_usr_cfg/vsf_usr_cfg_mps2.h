@@ -61,10 +61,12 @@
 #   define APP_USE_VSFIP_DEMO                           DISABLED
 #   define APP_USE_LWIP_DEMO                            DISABLED
 
+#   define APP_USE_FREETYPE_DEMO                        ENABLED
+
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
-#   define VSF_HEAP_SIZE                                0x2000
+#   define VSF_HEAP_SIZE                                (128 * 1024)
 #   define VSF_SYSTIMER_FREQ                            (25000000ul)
 
 #define VSF_USE_VIDEO                                   DISABLED
@@ -115,8 +117,15 @@
 #   define VSF_LINUX_CFG_WRAPPER                        ENABLED
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
+#   define VSF_LINUX_USE_SIMPLE_TIME                    ENABLED
 #   define VSF_LINUX_CFG_RELATIVE_PATH                  ENABLED
 
+#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+// WRAPPERs are required on __LINUX__ to avoid API confliction
+#   define VSF_LINUX_CFG_WRAPPER                        ENABLED
+#   define VSF_LINUX_LIBC_CFG_WRAPPER                   ENABLED
+#   define VSF_LINUX_LIBGEN_CFG_WRAPPER                 ENABLED
+#endif
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
@@ -130,10 +139,9 @@
 
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
-#define VSF_ASSERT(...)                                     if (!(__VA_ARGS__)) {while(1);};
+#define VSH_ENTER_CHAR                                  '\n'
+#define VSF_ASSERT(...)                                 if (!(__VA_ARGS__)) { __breakpoint(0); while(1);};
 //#define VSF_ASSERT(...)
-
-
 
 
 #define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
@@ -155,7 +163,7 @@
 
 #define USRAPP_CFG_USBD_DEV                             VSF_USB_DC0
 
-#define VSF_LINUX_CFG_STACKSIZE                         2048
+#define VSF_LINUX_CFG_STACKSIZE                         (8 * 1024)
 #define VSF_TRACE_CFG_COLOR_EN                          DISABLED
 #define VSH_HAS_COLOR                                   0
 
