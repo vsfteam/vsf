@@ -382,7 +382,7 @@ void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
     VSF_ASSERT(!(value & ~((1 << VSF_KERNEL_CFG_EDA_USER_BITLEN) - 1)));
     VSF_ASSERT(task_handle != NULL);
     vsf_protect_t orig = vsf_protect_int();
-        vsf_eda_set_user_value(value);
+        task_handle->flag.feature.user_bits = value;
         if (!task_handle->flag.state.is_limitted) {
             vsf_unprotect_int(orig);
             return;
@@ -399,10 +399,14 @@ void rtos_task_notify_setbits(rtos_task_handle task_handle, uint32_t value, bool
     VSF_ASSERT(!(value & ~((1 << VSF_KERNEL_CFG_EDA_USER_BITLEN) - 1)));
     VSF_ASSERT(task_handle != NULL);
 
+#ifdef AIC8800_OSAL_CFG_TRACE_NOTIFY
     uint8_t notification;
+#endif
     vsf_protect_t orig = vsf_protect_int();
-        notification = vsf_eda_get_user_value() | value;
-        vsf_eda_set_user_value(notification);
+        task_handle->flag.feature.user_bits |= value;
+#ifdef AIC8800_OSAL_CFG_TRACE_NOTIFY
+        notification = task_handle->flag.feature.user_bits;
+#endif
         if (!task_handle->flag.state.is_limitted) {
             vsf_unprotect_int(orig);
             return;
