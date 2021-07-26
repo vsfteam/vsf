@@ -31,22 +31,12 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
   
-//! \name ad configuration
+
+//! \name flash channel configuration
 //! @{
 typedef struct flash_cfg_t flash_cfg_t;
 struct flash_cfg_t {
-    uint32_t      start_address;
-    uint32_t      end_address;
-};
-//! @}
-
-//! \name ad channel configuration
-//! @{
-typedef struct flash_channel_cfg_t flash_channel_cfg_t;
-struct flash_channel_cfg_t {
-    uint8_t  channel;       // Channel Index
-    uint16_t sample_time;
-    uint32_t feature;       // Channle Feature
+    uint32_t feature;       // flash Feature
 };
 //! @}
 
@@ -113,10 +103,13 @@ extern vsf_err_t vsf_flash_read(vsf_flash_t *flash_ptr,
                                 uint32_fast_t offset,
                                 uint32_fast_t size);
 
-/** TODO: information query API, include:
+/** TODO: 
+ * information query API, include:
  * - minimum erase size
  * - minimum write size
  * - whether to allow random read
+ *
+ * interrupt support
  */
 
 #ifdef __cplusplus
