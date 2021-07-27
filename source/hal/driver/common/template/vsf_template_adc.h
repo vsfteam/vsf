@@ -33,11 +33,11 @@ extern "C" {
 
 typedef struct vsf_adc_t vsf_adc_t;
 
-typedef void vsf_adc_isr_handler_t(void *target_ptr,
-                                   vsf_adc_t *ad_ptr);
+typedef void vsf_adc_isrhandler_t(  void *target_ptr,
+                                    vsf_adc_t *ad_ptr);
 
 typedef struct vsf_adc_isr_t {
-    vsf_adc_isr_handler_t  *handler_fn;
+    vsf_adc_isrhandler_t   *handler_fn;
     void                   *target_ptr;
     vsf_arch_prio_t         prio;
 } vsf_adc_isr_t;
