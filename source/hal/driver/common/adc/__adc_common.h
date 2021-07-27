@@ -20,11 +20,30 @@
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HAL_ADC_REQUEST_CFG_ISR
+#   define VSF_HAL_ADC_REQUEST_CFG_ISR                      cfg.isr
+#endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#if VSF_HAL_ADC_IMP_REQUEST_MULTI == ENABLED
+#   define vsf_hal_adc_def_req_by_once()                                        \
+        __vsf_adc_req_by_once_t     __req_by_once
+#else
+#   define vsf_hal_adc_def_req_by_once()
+#endif
+
 /*============================ TYPES =========================================*/
 
 #if VSF_HAL_ADC_IMP_REQUEST_MULTI == ENABLED
-
+typedef struct __vsf_adc_req_by_once_t {
+    struct {
+        uint_fast32_t   max_count;
+        uint_fast32_t   count;
+        void            *buffer;
+    } info;
+    vsf_adc_isr_t       isr;
+} __vsf_adc_req_by_once_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

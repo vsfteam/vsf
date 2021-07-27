@@ -19,8 +19,6 @@
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
-
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -28,6 +26,62 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static void __adc_req_init(vsf_adc_t *adc_ptr, void *buffer_ptr, uint_fast32_t count)
+{
+    adc_ptr->__req_by_once.info.buffer = buffer_ptr;
+    adc_ptr->__req_by_once.info.max_count = count;
+    adc_ptr->__req_by_once.info.count = 0;
+}
+
+static void __adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr)
+{
+    int i;
+    if (adc_ptr->__req_by_once.info.count < adc_ptr->__req_by_once.info.max_count) {
+        vsf_adc_channel_request_one(adc_ptr,
+            &adc_ptr->cfg_channel[adc_ptr->channel_index],
+            (void *)((uint16_t *)adc_ptr->__req_by_once.info.buffer + adc_ptr->__req_by_once.info.count));
+        if (adc_ptr->channel_index < adc_ptr->channel_count) {
+            adc_ptr->channel_index++;
+        } else {
+            adc_ptr->channel_index = 0;
+        }
+        adc_ptr->__req_by_once.info.count++;
+        return;
+    }
+    adc_ptr->status.is_busy = false;
+    vsf_adc_irq_disable(adc_ptr);
+    vsf_adc_isr_t *isr = &adc_ptr->__req_by_once.isr;
+    adc_ptr->data = adc_ptr->__req_by_once.info.buffer;
+    if (NULL != isr->handler_fn) {
+        isr->handler_fn(isr->target_ptr, adc_ptr);
+    }
+    vsf_adc_irq_enable(adc_ptr);
+}
+
+static void __adc_req_isr_init(vsf_adc_t *adc_ptr)
+{
+    if (    (adc_ptr->VSF_HAL_ADC_REQUEST_CFG_ISR.handler_fn != NULL)
+        &&  (adc_ptr->VSF_HAL_ADC_REQUEST_CFG_ISR.handler_fn != __adc_request_isr_handler)) {
+        adc_ptr->__req_by_once.isr = adc_ptr->VSF_HAL_ADC_REQUEST_CFG_ISR;
+        adc_ptr->VSF_HAL_ADC_REQUEST_CFG_ISR.handler_fn = __adc_request_isr_handler;
+    }
+}
+
+vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr, void *buffer_ptr, uint_fast32_t count)
+{
+    VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != buffer_ptr) && (count > 0));
+    if (false == adc_ptr->status.is_enable) {
+        return VSF_ERR_NOT_READY;//todo
+    }
+    if (true == adc_ptr->status.is_busy) {
+        return VSF_ERR_ALREADY_EXISTS;//todo
+    }
+    __adc_req_init(adc_ptr, buffer_ptr, count);
+    __adc_req_isr_init(adc_ptr);
+    vsf_protect_t orig = vsf_protect(interrupt)();
+    __adc_request_isr_handler(NULL, adc_ptr);
+    vsf_unprotect(interrupt)(orig);
+}
 
 #endif
 

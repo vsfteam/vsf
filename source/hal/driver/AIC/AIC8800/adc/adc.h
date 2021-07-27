@@ -36,8 +36,12 @@
 #   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
-#ifndef VSF_ADC_CFG_CALLBACK_TIME_US
-#   define VSF_ADC_CFG_CALLBACK_TIME_US                             1000
+#ifndef VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US
+#   define VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US                    100
+#endif
+
+#ifndef VSF_ADC_CFG_CHANNEL_COUNT
+#   define VSF_ADC_CFG_CHANNEL_COUNT                                8
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -54,14 +58,9 @@ enum ad_feature_t{
 };
 
 enum ad_channel_feature_t {
-    ADC_TYPE_VBAT = 0,
-    ADC_TYPE_VIO,
+    ADC_TYPE_VBAT           = 0,
+    ADC_TYPE_VIO,                               //Not activated
     ADC_TYPE_TEMP0,
-
-    ADC_SAMPLERATE_DFLT     = 0x02,
-    ADC_SAMPLERATE_HIGH     = 0x40,
-    ADC_SAMPLERATE_MID      = 0x80,
-    ADC_SAMPLERATE_LOW      = 0xF0,
 
     ADC_GAIN_1_6            = 0,                //Not activated
     ADC_GAIN_1_5            = 0,                //Not activated
@@ -81,6 +80,7 @@ enum ad_channel_feature_t {
 #include "utilities/ooc_class.h"
 #include "hal/driver/common/template/vsf_template_adc.h"
 
+#include "hal/driver/common/adc/__adc_common.h"
 /*============================ TYPES =========================================*/
 
 vsf_class(vsf_adc_t) {
@@ -89,17 +89,16 @@ vsf_class(vsf_adc_t) {
     )
     private_member(
         vsf_callback_timer_t    callback_timer;
-        adc_channel_cfg_t       *cfg_channel;
+        adc_channel_cfg_t       *current_channel;
+        adc_channel_cfg_t       cfg_channel[VSF_ADC_CFG_CHANNEL_COUNT];
         adc_cfg_t               cfg;
-        uint_fast32_t           data_count;
-        uint_fast32_t           data_index;
         uint_fast32_t           channel_count;
         uint_fast32_t           channel_index;
+        vsf_hal_adc_def_req_by_once();
         struct {
             uint32_t            is_enable       : 1;
             uint32_t            is_busy         : 1;
             uint32_t            is_irq          : 1;
-            uint32_t            is_complicated  : 1;
             uint32_t                            : 29;
         } status;
     )

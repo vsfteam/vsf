@@ -95,7 +95,7 @@ enum ad_channel_feature_t{
 typedef struct adc_channel_cfg_t adc_channel_cfg_t;
 struct adc_channel_cfg_t {
     uint8_t  channel;       // Channel Index
-    uint16_t sample_time;
+    uint16_t sample_cycles;
     uint32_t feature;       // Channle Feature
 };
 //! @}
