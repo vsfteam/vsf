@@ -133,9 +133,9 @@ extern vsf_err_t vsf_adc_disable(vsf_adc_t *adc_ptr);
 extern void vsf_adc_irq_enable(vsf_adc_t *adc_ptr);
 extern void vsf_adc_irq_disable(vsf_adc_t *adc_ptr);
 
-extern vsf_err_t vsf_adc_channel_request_one(vsf_adc_t *adc_ptr,
-                                             adc_channel_cfg_t *channel_cfg,
-                                             void *buffer_ptr);
+extern vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr,
+                                         adc_channel_cfg_t *channel_cfg,
+                                         void *buffer_ptr);
 
 extern vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
                                         adc_channel_cfg_t *channel_cfgs_ptr,
