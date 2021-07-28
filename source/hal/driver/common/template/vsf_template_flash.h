@@ -35,6 +35,8 @@ typedef enum vsf_flash_irq_type_t{
     VSF_FLASH_IRQ_ERASE_MASK = (1 << 0),
     VSF_FLASH_IRQ_WRITE_MASK = (1 << 1),
     VSF_FLASH_IRQ_READ_MASK  = (1 << 2),
+    
+    VSF_FLASH_IRQ_ERROR_MASK = (1 << 3),
 } vsf_flash_irq_type_t;
 
 typedef struct vsf_flash_t vsf_flash_t;
@@ -65,9 +67,9 @@ def_interface(i_flash_t)
 
     vsf_err_t (*Init)(flash_cfg_t *pCfg);
 
-    vsf_err_t (*Erase)(uint_fast32_t address_ptr, uint_fast32_t size);
-    vsf_err_t (*Write)(uint_fast32_t address_ptr, uint_fast32_t size);
-    vsf_err_t (*Read)(uint_fast32_t address_ptr, uint_fast32_t size);
+    vsf_err_t (*Erase)(uint_fast32_t address, uint_fast32_t size);
+    vsf_err_t (*Write)(uint_fast32_t address, uint8_t* buffer, uint_fast32_t size);
+    vsf_err_t (*Read)(uint_fast32_t address, uint8_t* buffer, uint_fast32_t size);
 
 end_def_interface(i_flash_t)
 //! @}
@@ -102,10 +104,12 @@ extern vsf_err_t vsf_flash_erase(vsf_flash_t *flash_ptr,
  *
  * @param[in] flash_ptr flash instance
  * @param[in] offset flash address offset
+ * @param[out] buffer flash data to write
  * @param[in] size flash write size(bytes)
  */
 extern vsf_err_t vsf_flash_write(vsf_flash_t *flash_ptr,
                                  uint_fast32_t offset,
+                                 uint8_t* buffer, 
                                  uint_fast32_t size);
 
 /**
@@ -115,10 +119,12 @@ extern vsf_err_t vsf_flash_write(vsf_flash_t *flash_ptr,
  *
  * @param[in] flash_ptr flash instance
  * @param[in] offset flash address offset
+ * @param[in] buffer flash data to read
  * @param[in] size flash write size(bytes)
  */
 extern vsf_err_t vsf_flash_read(vsf_flash_t *flash_ptr,
                                 uint_fast32_t offset,
+                                uint8_t* buffer, 
                                 uint_fast32_t size);
 
 /** TODO: 
