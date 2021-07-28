@@ -42,8 +42,8 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef AIC8800_CFG_USBH_SPEED
-#   define AIC8800_CFG_USBH_SPEED   USB_SPEED_HIGH
+#ifndef VSF_HAL_AIC8800_USBH_CFG_SPEED
+#   define VSF_HAL_AIC8800_USBH_CFG_SPEED           USB_SPEED_HIGH
 #endif
 
 #define USB_OTG_COUNT               1
@@ -57,7 +57,7 @@
             .reg                    = (void *)AIC_USB_BASE,                     \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size   = 1024 >> 2,                                \
-                .speed              = AIC8800_CFG_USBH_SPEED,                   \
+                .speed              = VSF_HAL_AIC8800_USBH_CFG_SPEED,           \
                 .dma_en             = true,                                     \
                 .ulpi_en            = true,                                     \
                 .utmi_en            = false,                                    \
