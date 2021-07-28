@@ -30,26 +30,44 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-  
+
+typedef enum vsf_flash_irq_type_t{
+    VSF_FLASH_IRQ_ERASE_MASK = (1 << 0),
+    VSF_FLASH_IRQ_WRITE_MASK = (1 << 1),
+    VSF_FLASH_IRQ_READ_MASK  = (1 << 2),
+} vsf_flash_irq_type_t;
+
+typedef struct vsf_flash_t vsf_flash_t;
+
+typedef void vsf_flash_isr_handler_t(void *target_ptr,
+                                     vsf_flash_irq_type_t type,
+                                     vsf_flash_t *ad_ptr);
+
+
+typedef struct vsf_flash_isr_t {
+    vsf_flash_isr_handler_t  *handler_fn;
+    void                     *target_ptr;
+    vsf_arch_prio_t           prio;
+} vsf_flash_isr_t;
 
 //! \name flash channel configuration
 //! @{
 typedef struct flash_cfg_t flash_cfg_t;
 struct flash_cfg_t {
-    uint32_t feature;       // flash Feature
+    vsf_flash_isr_t isr;
 };
 //! @}
 
-//! \name class: ad_t
+//! \name class: flash_t
 //! @{
 def_interface(i_flash_t)
     implement(i_peripheral_t);
 
     vsf_err_t (*Init)(flash_cfg_t *pCfg);
 
-    vsf_err_t (*Erase)(uint32_fast_taddress_ptr, uint32_fast_t size);
-    vsf_err_t (*Write)(uint32_fast_taddress_ptr, uint32_fast_t size);
-    vsf_err_t (*Read)(uint32_fast_taddress_ptr, uint32_fast_t size);
+    vsf_err_t (*Erase)(uint_fast32_t address_ptr, uint_fast32_t size);
+    vsf_err_t (*Write)(uint_fast32_t address_ptr, uint_fast32_t size);
+    vsf_err_t (*Read)(uint_fast32_t address_ptr, uint_fast32_t size);
 
 end_def_interface(i_flash_t)
 //! @}
@@ -73,8 +91,8 @@ extern vsf_err_t vsf_flash_disable(vsf_flash_t *flash_ptr);
  * @param[in] size flash erase size(bytes)
  */
 extern vsf_err_t vsf_flash_erase(vsf_flash_t *flash_ptr,
-                                 uint32_fast_t offset,
-                                 uint32_fast_t size);
+                                 uint_fast32_t offset,
+                                 uint_fast32_t size);
 
 /**
  * flash write a continuous range
@@ -87,8 +105,8 @@ extern vsf_err_t vsf_flash_erase(vsf_flash_t *flash_ptr,
  * @param[in] size flash write size(bytes)
  */
 extern vsf_err_t vsf_flash_write(vsf_flash_t *flash_ptr,
-                                 uint32_fast_t offset,
-                                 uint32_fast_t size);
+                                 uint_fast32_t offset,
+                                 uint_fast32_t size);
 
 /**
  * flash read a continuous range
@@ -100,16 +118,14 @@ extern vsf_err_t vsf_flash_write(vsf_flash_t *flash_ptr,
  * @param[in] size flash write size(bytes)
  */
 extern vsf_err_t vsf_flash_read(vsf_flash_t *flash_ptr,
-                                uint32_fast_t offset,
-                                uint32_fast_t size);
+                                uint_fast32_t offset,
+                                uint_fast32_t size);
 
 /** TODO: 
  * information query API, include:
  * - minimum erase size
  * - minimum write size
  * - whether to allow random read
- *
- * interrupt support
  */
 
 #ifdef __cplusplus
