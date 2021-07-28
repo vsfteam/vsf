@@ -24,6 +24,7 @@
 #ifndef VSF_HAL_ADC_REQUEST_CFG_ISR
 #   define VSF_HAL_ADC_REQUEST_CFG_ISR                      cfg.isr
 #endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_HAL_ADC_IMP_REQUEST_MULTI == ENABLED

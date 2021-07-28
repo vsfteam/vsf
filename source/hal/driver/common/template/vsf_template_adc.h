@@ -34,7 +34,7 @@ extern "C" {
 typedef struct vsf_adc_t vsf_adc_t;
 
 typedef void vsf_adc_isrhandler_t(  void *target_ptr,
-                                    vsf_adc_t *ad_ptr);
+                                    vsf_adc_t *adc_ptr);
 
 typedef struct vsf_adc_isr_t {
     vsf_adc_isrhandler_t   *handler_fn;
@@ -43,9 +43,9 @@ typedef struct vsf_adc_isr_t {
 } vsf_adc_isr_t;
 
 /*
-//! \name ad feature
+//! \name adc feature
 //! @{
-enum ad_feature_t{
+enum adc_feature_t{
     DATA_ALIGN_RIGHT        = (0 << 0),  //!< ADC data alignment to right
     DATA_ALIGN_LEFT         = (1 << 0),  //!< ADC data alignment to left
 
@@ -60,19 +60,18 @@ enum ad_feature_t{
 //! @}
 */
 
-//! \name ad configuration
+//! \name adc configuration
 //! @{
 typedef struct adc_cfg_t adc_cfg_t;
 struct adc_cfg_t {
     uint32_t      feature;
-    uint32_t      clock;
-    uint32_t      resolution;
+    uint32_t      clock_freq;
     vsf_adc_isr_t isr;
 };
 //! @}
 
 /*
-//! \name ad channel feature
+//! \name adc channel feature
 //! @{
 enum ad_channel_feature_t{
     ADC_GAIN_1_6        = (0 << 0),
@@ -90,7 +89,7 @@ enum ad_channel_feature_t{
 //! @}
 */
 
-//! \name ad channel configuration
+//! \name adc channel configuration
 //! @{
 typedef struct adc_channel_cfg_t adc_channel_cfg_t;
 struct adc_channel_cfg_t {
@@ -100,7 +99,7 @@ struct adc_channel_cfg_t {
 };
 //! @}
 
-//! \name class: ad_t
+//! \name class: adc_t
 //! @{
 def_interface(i_adc_t)
     implement(i_peripheral_t);

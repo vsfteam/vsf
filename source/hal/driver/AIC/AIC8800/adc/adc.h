@@ -37,12 +37,14 @@
 #endif
 
 #ifndef VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US
-#   define VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US                    100
+#   define VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US                    10
 #endif
 
 #ifndef VSF_ADC_CFG_CHANNEL_COUNT
 #   define VSF_ADC_CFG_CHANNEL_COUNT                                8
 #endif
+
+#define VSF_HAL_ADC_IMP_REQUEST_MULTI                               ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -79,8 +81,8 @@ enum ad_channel_feature_t {
 
 #include "utilities/ooc_class.h"
 #include "hal/driver/common/template/vsf_template_adc.h"
-
 #include "hal/driver/common/adc/__adc_common.h"
+
 /*============================ TYPES =========================================*/
 
 vsf_class(vsf_adc_t) {

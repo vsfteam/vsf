@@ -29,8 +29,15 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_AIC8800_ADC_CFG_BIT_COUNT
-#   define VSF_AIC8800_ADC_CFG_BIT_COUNT                        10
+#   define VSF_AIC8800_ADC_CFG_BIT_COUNT                        12
 #endif
+
+#undef VSF_AIC8800_ADC_FALSE
+#define VSF_AIC8800_ADC_FALSE                                   0
+
+#undef VSF_AIC8800_ADC_TRUE
+#define VSF_AIC8800_ADC_TRUE                                    1
+
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -41,9 +48,9 @@
         .channel_index = 0,                                                     \
         .current_channel = NULL,                                                \
         .status = {                                                             \
-            .is_enable = false,                                                 \
-            .is_busy = false,                                                   \
-            .is_irq = false,                                                    \
+            .is_enable = VSF_AIC8800_ADC_FALSE,                                 \
+            .is_busy = VSF_AIC8800_ADC_FALSE,                                   \
+            .is_irq = VSF_AIC8800_ADC_FALSE,                                    \
         },                                                                      \
     };
 
@@ -63,13 +70,21 @@ aic8800_adc_def(1)
 
 static uint_fast32_t __vsf_adc_get_callback_time_us(vsf_adc_t *adc_ptr)
 {
-    return adc_ptr->cfg.clock * 20 + 6 + VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US;
-
+    return 26000000 / adc_ptr->cfg.clock_freq * 20 + 6 + VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US;
 }
 
 static void __vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
 {
+    uint32_t temp_clock_div;
     //todo:cfg_ptr
+#if PLF_PMIC_VER_LITE
+    if (0 != (26000000 % adc_ptr->cfg.clock_freq) || ((26000000 / adc_ptr->cfg.clock_freq) > 0xff)) {
+        return;
+    }
+    PMIC_MEM_WRITE((unsigned int)(&aic1000liteSysctrl->msadc_clk_div),
+            AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_DENOM((26000000 / adc_ptr->cfg.clock_freq))
+        |   AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_UPDATE);
+#endif
     vsf_callback_timer_init(&adc_ptr->callback_timer);
 }
 
@@ -130,7 +145,7 @@ static void __vsf_adc_measure(int type)
             AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
 #endif
     } else if (type == GPADC_TYPE_VIO) {
-        VSF_HAL_ASSERT(false); //TODO:
+        VSF_HAL_ASSERT(VSF_AIC8800_ADC_FALSE); //TODO:
     } else if (type == GPADC_TYPE_TEMP0) {
 #if PLF_PMIC_VER_LITE
         PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl1),
@@ -154,15 +169,6 @@ static void __vsf_adc_measure(int type)
 
 static vsf_err_t __vsf_adc_channel_request(vsf_adc_t *adc_ptr, adc_channel_cfg_t *channel_cfg_ptr)
 {
-#if PLF_PMIC_VER_LITE
-    if (adc_ptr->cfg.clock > 0xff) {
-        return VSF_ERR_INVALID_PARAMETER;
-    }
-    PMIC_MEM_WRITE((unsigned int)(&aic1000liteSysctrl->msadc_clk_div),
-            AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_DENOM(adc_ptr->cfg.clock)
-        |   AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_UPDATE);
-#endif
-
     __vsf_adc_measure(channel_cfg_ptr->feature);
 
     if (channel_cfg_ptr->channel <= 7) {
@@ -200,7 +206,7 @@ static void __vk_adc_on_time_one(vsf_callback_timer_t *timer)
 {
     vsf_adc_t *adc_ptr = container_of(timer, vsf_adc_t, callback_timer);
     unsigned int gpmsk = 0x01UL << adc_ptr->current_channel->channel;
-    uint32_t temp_value, gpio_mask;
+    uint32_t temp_value;
 
     if(0x1 != PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw))) {
         vsf_callback_timer_add_us(&adc_ptr->callback_timer, __vsf_adc_get_callback_time_us(adc_ptr));
@@ -209,29 +215,33 @@ static void __vk_adc_on_time_one(vsf_callback_timer_t *timer)
 
     PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw), 0x1);
 
-    gpio_mask = vsf_gpio0.REG.GPIO->MR;
+    temp_value = vsf_gpio0.REG.GPIO->MR;
     vsf_gpio0.REG.GPIO->MR = gpmsk;
-    temp_value = PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_ro_acc));
-    vsf_gpio0.REG.GPIO->MR = gpio_mask;
+    *((uint16_t *)(adc_ptr->data)) =
+        PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_ro_acc));
+    vsf_gpio0.REG.GPIO->MR = temp_value;
 
-    temp_value = temp_value * 1175 / 32896 - 1175;
-    if (adc_ptr->current_channel->channel & 0x01) {
-        temp_value = -temp_value;
+    temp_value =
+        ((uint16_t)(*((uint16_t *)(adc_ptr->data))) * 1175 / 32896 - 1175)
+                            * (((adc_ptr->current_channel->channel
+                            & 0x01)) ? -1 : 1);
+    if (temp_value > 1175) {
+        temp_value = 0;//todo:
     }
-    VSF_HAL_ASSERT(temp_value <= 1175);
-    *(uint16_t *)adc_ptr->data = temp_value * (1 << VSF_AIC8800_ADC_CFG_BIT_COUNT) / 1175;
+    *((uint16_t *)(adc_ptr->data)) =
+        (temp_value * (1 << VSF_AIC8800_ADC_CFG_BIT_COUNT) / 1175);
 
-    adc_ptr->status.is_busy = false;
+    adc_ptr->status.is_busy = VSF_AIC8800_ADC_FALSE;
     if (    (NULL != adc_ptr->cfg.isr.handler_fn)
-        &&  adc_ptr->status.is_irq) {
-        adc_ptr->cfg.isr.handler_fn(adc_ptr->cfg.isr.target_ptr, adc_ptr);
+        &&  (VSF_AIC8800_ADC_FALSE != adc_ptr->status.is_irq)) {
+        adc_ptr->cfg.isr.handler_fn( adc_ptr->cfg.isr.target_ptr, adc_ptr);
     }
 }
 
 static vsf_err_t __vsf_adc_channel_request_base(vsf_adc_t *adc_ptr,
                                                 void *buffer_ptr)
 {
-    adc_ptr->status.is_busy = true;
+    adc_ptr->status.is_busy = VSF_AIC8800_ADC_TRUE;
     adc_ptr->data = buffer_ptr;
     adc_ptr->callback_timer.on_timer = __vk_adc_on_time_one;
     return __vsf_adc_channel_request(adc_ptr, adc_ptr->current_channel);
@@ -249,27 +259,27 @@ vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
 vsf_err_t vsf_adc_enable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(NULL != adc_ptr);
-    adc_ptr->status.is_enable = true;
+    adc_ptr->status.is_enable = VSF_AIC8800_ADC_TRUE;
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_adc_disable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(NULL != adc_ptr);
-    adc_ptr->status.is_enable = false;
+    adc_ptr->status.is_enable = VSF_AIC8800_ADC_FALSE;
     return VSF_ERR_NONE;
 }
 
 void vsf_adc_irq_enable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(NULL != adc_ptr);
-    adc_ptr->status.is_irq = true;
+    adc_ptr->status.is_irq = VSF_AIC8800_ADC_TRUE;
 }
 
 void vsf_adc_irq_disable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(NULL != adc_ptr);
-    adc_ptr->status.is_irq = false;
+    adc_ptr->status.is_irq = VSF_AIC8800_ADC_FALSE;
 }
 
 vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
@@ -279,7 +289,7 @@ vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
     uint32_t i;
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != channel_cfgs_ptr));
     VSF_HAL_ASSERT(0 != channel_cfgs_cnt);
-    if (!adc_ptr->status.is_enable) {
+    if (VSF_AIC8800_ADC_FALSE == adc_ptr->status.is_enable) {
         return VSF_ERR_NOT_READY;//todo
     }
 
@@ -293,17 +303,18 @@ vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr,
+vsf_err_t vsf_adc_channel_request_one(vsf_adc_t *adc_ptr,
                                       adc_channel_cfg_t *channel_cfg_ptr,
                                       void *buffer_ptr)
 {
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != buffer_ptr));
-    if (!adc_ptr->status.is_enable) {
+    if (VSF_AIC8800_ADC_FALSE == adc_ptr->status.is_enable) {
         return VSF_ERR_NOT_READY;//todo
     }
-    if (adc_ptr->status.is_busy) {
+    if (VSF_AIC8800_ADC_FALSE != adc_ptr->status.is_busy) {
         return VSF_ERR_ALREADY_EXISTS;//todo
     }
+    adc_ptr->status.is_busy = VSF_AIC8800_ADC_TRUE;
     __vsf_adc_channel_config(adc_ptr, channel_cfg_ptr);
     adc_ptr->current_channel = channel_cfg_ptr;
     return __vsf_adc_channel_request_base(adc_ptr, buffer_ptr);
@@ -312,4 +323,5 @@ vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr,
 #if VSF_HAL_ADC_IMP_REQUEST_MULTI == ENABLED
 #   include "hal/driver/common/adc/__adc_common.inc"
 #endif
-#endif /* VSF_HAL_USE_ADC */
+
+#endif /* VSF_HAL_USE_AD */

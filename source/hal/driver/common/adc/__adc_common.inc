@@ -19,6 +19,13 @@
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#undef VSF_AIC8800_ADC_COMMON_FALSE
+#define VSF_AIC8800_ADC_COMMON_FALSE                                0
+
+#undef VSF_AIC8800_ADC_COMMON_TRUE
+#define VSF_AIC8800_ADC_COMMON_TRUE                                 1
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -39,7 +46,8 @@ static void __adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr)
     if (adc_ptr->__req_by_once.info.count < adc_ptr->__req_by_once.info.max_count) {
         vsf_adc_channel_request_one(adc_ptr,
             &adc_ptr->cfg_channel[adc_ptr->channel_index],
-            (void *)((uint16_t *)adc_ptr->__req_by_once.info.buffer + adc_ptr->__req_by_once.info.count));
+            (void *)((uint16_t *)adc_ptr->__req_by_once.info.buffer
+                + adc_ptr->__req_by_once.info.count));
         if (adc_ptr->channel_index < adc_ptr->channel_count) {
             adc_ptr->channel_index++;
         } else {
@@ -48,7 +56,7 @@ static void __adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr)
         adc_ptr->__req_by_once.info.count++;
         return;
     }
-    adc_ptr->status.is_busy = false;
+    adc_ptr->status.is_busy = VSF_AIC8800_ADC_COMMON_FALSE;
     vsf_adc_irq_disable(adc_ptr);
     vsf_adc_isr_t *isr = &adc_ptr->__req_by_once.isr;
     adc_ptr->data = adc_ptr->__req_by_once.info.buffer;
@@ -70,10 +78,10 @@ static void __adc_req_isr_init(vsf_adc_t *adc_ptr)
 vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != buffer_ptr) && (count > 0));
-    if (false == adc_ptr->status.is_enable) {
+    if (VSF_AIC8800_ADC_COMMON_FALSE == adc_ptr->status.is_enable) {
         return VSF_ERR_NOT_READY;//todo
     }
-    if (true == adc_ptr->status.is_busy) {
+    if (VSF_AIC8800_ADC_COMMON_FALSE != adc_ptr->status.is_busy) {
         return VSF_ERR_ALREADY_EXISTS;//todo
     }
     __adc_req_init(adc_ptr, buffer_ptr, count);
