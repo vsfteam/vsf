@@ -42,6 +42,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef AIC8800_CFG_USBH_SPEED
+#   define AIC8800_CFG_USBH_SPEED   USB_SPEED_HIGH
+#endif
+
 #define USB_OTG_COUNT               1
 // required by dwcotg, define the max ep number of dwcotg include ep0
 #define USB_DWCOTG_MAX_EP_NUM       16
@@ -53,7 +57,7 @@
             .reg                    = (void *)AIC_USB_BASE,                     \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size   = 1024 >> 2,                                \
-                .speed              = USB_SPEED_HIGH,                           \
+                .speed              = AIC8800_CFG_USBH_SPEED,                   \
                 .dma_en             = true,                                     \
                 .ulpi_en            = true,                                     \
                 .utmi_en            = false,                                    \
