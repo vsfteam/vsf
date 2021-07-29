@@ -655,6 +655,7 @@ int rtos_init(void)
     volatile struct timeval time;
     if (    (8 != sizeof(time.tv_sec))
         ||  (4 != sizeof(time.tv_usec))) {
+        VSF_ASSERT(false);
         return -1;
     }
 
