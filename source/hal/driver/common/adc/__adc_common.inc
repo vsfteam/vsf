@@ -43,7 +43,6 @@ static void __adc_req_init(vsf_adc_t *adc_ptr, void *buffer_ptr, uint_fast32_t c
 
 static void __adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr)
 {
-    int i;
     if (adc_ptr->__req_by_once.info.count < adc_ptr->__req_by_once.info.max_count) {
         vsf_adc_channel_request_once(adc_ptr,
             &adc_ptr->cfg_channel[adc_ptr->channel_index],
@@ -90,6 +89,7 @@ vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr, void *buffer_ptr, uint_fas
     vsf_protect_t orig = vsf_protect(interrupt)();
     __adc_request_isr_handler(NULL, adc_ptr);
     vsf_unprotect(interrupt)(orig);
+    return VSF_ERR_NONE;
 }
 
 #endif

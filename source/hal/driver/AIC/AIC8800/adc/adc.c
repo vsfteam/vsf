@@ -32,13 +32,6 @@
 #   define VSF_AIC8800_ADC_CFG_BIT_COUNT                        10
 #endif
 
-#undef VSF_AIC8800_ADC_FALSE
-#define VSF_AIC8800_ADC_FALSE                                   0
-
-#undef VSF_AIC8800_ADC_TRUE
-#define VSF_AIC8800_ADC_TRUE                                    1
-
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_HW_ADC_IMP_LV0(__COUNT, __dont_care)                              \
@@ -48,9 +41,9 @@
         .channel_index = 0,                                                     \
         .current_channel = NULL,                                                \
         .status = {                                                             \
-            .is_enable = VSF_AIC8800_ADC_FALSE,                                 \
-            .is_busy = VSF_AIC8800_ADC_FALSE,                                   \
-            .is_irq = VSF_AIC8800_ADC_FALSE,                                    \
+            .is_enable = false,                                                 \
+            .is_busy = false,                                                   \
+            .is_irq = false,                                                    \
         },                                                                      \
     };
 
@@ -75,7 +68,6 @@ static uint_fast32_t __vsf_adc_get_callback_time_us(vsf_adc_t *adc_ptr)
 
 static void __vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
 {
-    uint32_t temp_clock_div;
     //todo:cfg_ptr
 #if PLF_PMIC_VER_LITE
     if (0 != (26000000 % adc_ptr->cfg.clock_freq) || ((26000000 / adc_ptr->cfg.clock_freq) > 0xff)) {
@@ -145,7 +137,7 @@ static void __vsf_adc_measure(int type)
             AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
 #endif
     } else if (type == GPADC_TYPE_VIO) {
-        VSF_HAL_ASSERT(VSF_AIC8800_ADC_FALSE); //TODO:
+        VSF_HAL_ASSERT(false); //TODO:
     } else if (type == GPADC_TYPE_TEMP0) {
 #if PLF_PMIC_VER_LITE
         PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl1),
@@ -230,7 +222,7 @@ static void __vk_adc_on_time(vsf_callback_timer_t *timer)
     VSF_HAL_ASSERT(temp_value <= 1175);
     *(uint16_t *)adc_ptr->data = temp_value * (1 << VSF_AIC8800_ADC_CFG_BIT_COUNT) / 1175;
 
-    adc_ptr->status.is_busy = VSF_AIC8800_ADC_FALSE;
+    adc_ptr->status.is_busy = false;
     if (    (NULL != adc_ptr->cfg.isr.handler_fn)
         &&  adc_ptr->status.is_irq) {
         adc_ptr->cfg.isr.handler_fn( adc_ptr->cfg.isr.target_ptr, adc_ptr);
@@ -240,7 +232,7 @@ static void __vk_adc_on_time(vsf_callback_timer_t *timer)
 static vsf_err_t __vsf_adc_channel_request_base(vsf_adc_t *adc_ptr,
                                                 void *buffer_ptr)
 {
-    adc_ptr->status.is_busy = VSF_AIC8800_ADC_TRUE;
+    adc_ptr->status.is_busy = true;
     adc_ptr->data = buffer_ptr;
     adc_ptr->callback_timer.on_timer = __vk_adc_on_time;
     return __vsf_adc_channel_request(adc_ptr, adc_ptr->current_channel);
@@ -258,27 +250,27 @@ vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
 vsf_err_t vsf_adc_enable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(NULL != adc_ptr);
-    adc_ptr->status.is_enable = VSF_AIC8800_ADC_TRUE;
+    adc_ptr->status.is_enable = true;
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_adc_disable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(NULL != adc_ptr);
-    adc_ptr->status.is_enable = VSF_AIC8800_ADC_FALSE;
+    adc_ptr->status.is_enable = false;
     return VSF_ERR_NONE;
 }
 
 void vsf_adc_irq_enable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(NULL != adc_ptr);
-    adc_ptr->status.is_irq = VSF_AIC8800_ADC_TRUE;
+    adc_ptr->status.is_irq = true;
 }
 
 void vsf_adc_irq_disable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(NULL != adc_ptr);
-    adc_ptr->status.is_irq = VSF_AIC8800_ADC_FALSE;
+    adc_ptr->status.is_irq = false;
 }
 
 vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
@@ -313,7 +305,7 @@ vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr,
     if (adc_ptr->status.is_busy) {
         return VSF_ERR_ALREADY_EXISTS;//todo
     }
-    adc_ptr->status.is_busy = VSF_AIC8800_ADC_TRUE;
+    adc_ptr->status.is_busy = true;
     __vsf_adc_channel_config(adc_ptr, channel_cfg_ptr);
     adc_ptr->current_channel = channel_cfg_ptr;
     return __vsf_adc_channel_request_base(adc_ptr, buffer_ptr);
