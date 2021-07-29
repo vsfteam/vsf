@@ -136,9 +136,9 @@ static void __vsf_adc_measure(int type)
         PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl0),
             AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
 #endif
-    } else if (type == GPADC_TYPE_VIO) {
+    } else if (type == ADC_TYPE_VIO) {
         VSF_HAL_ASSERT(false); //TODO:
-    } else if (type == GPADC_TYPE_TEMP0) {
+    } else if (type == ADC_TYPE_TEMP0) {
 #if PLF_PMIC_VER_LITE
         PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl1),
             (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0x0)
