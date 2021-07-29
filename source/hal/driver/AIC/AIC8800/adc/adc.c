@@ -66,15 +66,73 @@ static uint_fast32_t __vsf_adc_get_callback_time_us(vsf_adc_t *adc_ptr)
     return 26000000 / adc_ptr->cfg.clock_freq * 20 + 6 + VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US;
 }
 
+static void __vsf_adc_measure(int type)
+{
+    if (type == ADC_REF_VDD_1) {
+#if PLF_PMIC_VER_LITE
+        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteRtcCore->rtc_rg_por_ctrl_cfg1),
+            (AIC1000LITE_RTC_CORE_RTC_RG_PU_VRTC_SENSE
+                |   AIC1000LITE_RTC_CORE_RTC_RG_PU_VBAT_SENSE),
+            (AIC1000LITE_RTC_CORE_RTC_RG_PU_VRTC_SENSE
+                |   AIC1000LITE_RTC_CORE_RTC_RG_PU_VBAT_SENSE));
+
+        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl1),
+            (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0xD)
+                |   AIC1000LITE_MSADC_CFG_MSADC_SW_DIFF_MODE),
+            (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0xF)
+                |   AIC1000LITE_MSADC_CFG_MSADC_SW_DIFF_MODE));
+
+        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_ana_ctrl0),
+            (0  |   0
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_MODE
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_GAIN_BIT
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_ADC_FF_EN),
+            (AIC1000LITE_MSADC_CFG_ANA_MSADC_CHNP_SEL
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_TS_MODE
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_MODE
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_GAIN_BIT
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_ADC_FF_EN));
+
+        PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl0),
+            AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
+#endif
+    } else if (type == ADC_REF_VDD_1_2) {
+        VSF_HAL_ASSERT(false); //TODO:
+    } else if (type == ADC_REF_VDD_1_3) {
+#if PLF_PMIC_VER_LITE
+        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl1),
+            (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0x0)
+                |   AIC1000LITE_MSADC_CFG_MSADC_SW_DIFF_MODE),
+            (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0xF)
+                |   AIC1000LITE_MSADC_CFG_MSADC_SW_DIFF_MODE));
+        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_ana_ctrl0),
+            (0 | AIC1000LITE_MSADC_CFG_ANA_MSADC_TS_MODE | 0 | 0 | 0),
+            (AIC1000LITE_MSADC_CFG_ANA_MSADC_CHNP_SEL
+                | AIC1000LITE_MSADC_CFG_ANA_MSADC_TS_MODE
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_MODE
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_GAIN_BIT
+                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_ADC_FF_EN));
+
+        PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl0),
+            AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
+#endif
+    }
+}
+
 static void __vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
 {
+    uint32_t temp_clock_div;
     //todo:cfg_ptr
+    __vsf_adc_measure(adc_ptr->cfg.feature & ADC_REF_VDD);
 #if PLF_PMIC_VER_LITE
-    if (0 != (26000000 % adc_ptr->cfg.clock_freq) || ((26000000 / adc_ptr->cfg.clock_freq) > 0xff)) {
-        return;
+    if (101960 > adc_ptr->cfg.clock_freq) {
+        adc_ptr->cfg.clock_freq = 101960;
+    }else if(13000000 < adc_ptr->cfg.clock_freq) {
+        adc_ptr->cfg.clock_freq = 13000000;
     }
+    temp_clock_div = 26000000 / adc_ptr->cfg.clock_freq;
     PMIC_MEM_WRITE((unsigned int)(&aic1000liteSysctrl->msadc_clk_div),
-            AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_DENOM((26000000 / adc_ptr->cfg.clock_freq))
+            AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_DENOM(temp_clock_div)
         |   AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_UPDATE);
 #endif
     vsf_callback_timer_init(&adc_ptr->callback_timer);
@@ -106,63 +164,8 @@ static void __vsf_adc_channel_config(vsf_adc_t *adc_ptr, adc_channel_cfg_t *chan
     }
 }
 
-static void __vsf_adc_measure(int type)
-{
-    if (type == ADC_TYPE_VBAT) {
-#if PLF_PMIC_VER_LITE
-        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteRtcCore->rtc_rg_por_ctrl_cfg1),
-            (AIC1000LITE_RTC_CORE_RTC_RG_PU_VRTC_SENSE
-                |   AIC1000LITE_RTC_CORE_RTC_RG_PU_VBAT_SENSE),
-            (AIC1000LITE_RTC_CORE_RTC_RG_PU_VRTC_SENSE
-                |   AIC1000LITE_RTC_CORE_RTC_RG_PU_VBAT_SENSE));
-
-        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl1),
-            (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0xD)
-                |   AIC1000LITE_MSADC_CFG_MSADC_SW_DIFF_MODE),
-            (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0xF)
-                |   AIC1000LITE_MSADC_CFG_MSADC_SW_DIFF_MODE));
-
-        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_ana_ctrl0),
-            (0  |   0
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_MODE
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_GAIN_BIT
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_ADC_FF_EN),
-            (AIC1000LITE_MSADC_CFG_ANA_MSADC_CHNP_SEL
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_TS_MODE
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_MODE
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_GAIN_BIT
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_ADC_FF_EN));
-
-        PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl0),
-            AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
-#endif
-    } else if (type == ADC_TYPE_VIO) {
-        VSF_HAL_ASSERT(false); //TODO:
-    } else if (type == ADC_TYPE_TEMP0) {
-#if PLF_PMIC_VER_LITE
-        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl1),
-            (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0x0)
-                |   AIC1000LITE_MSADC_CFG_MSADC_SW_DIFF_MODE),
-            (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0xF)
-                |   AIC1000LITE_MSADC_CFG_MSADC_SW_DIFF_MODE));
-        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_ana_ctrl0),
-            (0 | AIC1000LITE_MSADC_CFG_ANA_MSADC_TS_MODE | 0 | 0 | 0),
-            (AIC1000LITE_MSADC_CFG_ANA_MSADC_CHNP_SEL
-                | AIC1000LITE_MSADC_CFG_ANA_MSADC_TS_MODE
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_MODE
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_SDM_GAIN_BIT
-                |   AIC1000LITE_MSADC_CFG_ANA_MSADC_ADC_FF_EN));
-
-        PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl0),
-            AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
-#endif
-    }
-}
-
 static vsf_err_t __vsf_adc_channel_request(vsf_adc_t *adc_ptr, adc_channel_cfg_t *channel_cfg_ptr)
 {
-    __vsf_adc_measure(channel_cfg_ptr->feature);
-
     if (channel_cfg_ptr->channel <= 7) {
 #if PLF_PMIC_VER_LITE
         int neg_flag = channel_cfg_ptr->channel & 0x01;

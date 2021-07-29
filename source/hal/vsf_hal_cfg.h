@@ -163,6 +163,10 @@ extern "C" {
 #   define VSF_HAL_USE_USBH             VSF_USE_USB_HOST
 #endif
 
+#ifndef VSF_HAL_USE_FLASH
+#   define VSF_HAL_USE_FLASH            ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -50,6 +50,11 @@
 /*============================ TYPES =========================================*/
 
 enum ad_feature_t{
+    ADC_REF_VDD_1           = 0,                //ADC_TYPE_VBAT
+    ADC_REF_VDD_1_2,                            //Not activated
+    ADC_REF_VDD_1_3,                            //ADC_TYPE_TEMP0
+    ADC_REF_VDD             = ADC_REF_VDD_1 | ADC_REF_VDD_1_2 | ADC_REF_VDD_1_3,
+
     DATA_ALIGN_RIGHT        = 0,                //Not activated
     DATA_ALIGN_LEFT         = 0,                //Not activated
     SCAN_CONV_SINGLE_MODE   = 0,                //Not activated
@@ -60,21 +65,17 @@ enum ad_feature_t{
 };
 
 enum ad_channel_feature_t {
-    ADC_TYPE_VBAT           = 0,
-    ADC_TYPE_VIO,                               //Not activated
-    ADC_TYPE_TEMP0,
+    ADC_CHANNEL_GAIN_1_6    = (0 << 0),         //Not activated
+    ADC_CHANNEL_GAIN_1_5    = (1 << 0),         //Not activated
+    ADC_CHANNEL_GAIN_1_4    = (2 << 0),         //Not activated
+    ADC_CHANNEL_GAIN_1_3    = (3 << 0),         //Not activated
+    ADC_CHANNEL_GAIN_1_2    = (4 << 0),         //Not activated
+    ADC_CHANNEL_GAIN_1      = (5 << 0),         //Not activated
 
-    ADC_GAIN_1_6            = 0,                //Not activated
-    ADC_GAIN_1_5            = 0,                //Not activated
-    ADC_GAIN_1_4            = 0,                //Not activated
-    ADC_GAIN_1_3            = 0,                //Not activated
-    ADC_GAIN_1_2            = 0,                //Not activated
-    ADC_GAIN_1              = 0,                //Not activated
-
-    ADC_REF_VDD_1           = 0,                //Not activated
-    ADC_REF_VDD_1_2         = 0,                //Not activated
-    ADC_REF_VDD_1_3         = 0,                //Not activated
-    ADC_REF_VDD_1_4         = 0,                //Not activated
+    ADC_CHANNEL_REF_VDD_1   = (0 << 4),         //Not activated
+    ADC_CHANNEL_REF_VDD_1_2 = (1 << 4),         //Not activated
+    ADC_CHANNEL_REF_VDD_1_3 = (2 << 4),         //Not activated
+    ADC_CHANNEL_REF_VDD_1_4 = (3 << 4),         //Not activated
 };
 
 /*============================ INCLUDES ======================================*/

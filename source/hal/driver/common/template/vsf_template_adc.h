@@ -56,6 +56,11 @@ enum adc_feature_t{
     EXTERN_TRIGGER_0        = (0 << 2),
     EXTERN_TRIGGER_1        = (1 << 2),
     EXTERN_TRIGGER_2        = (2 << 2),
+
+    ADC_REF_VDD_1           = (0 << 4),
+    ADC_REF_VDD_1_2         = (1 << 4),
+    ADC_REF_VDD_1_3         = (2 << 4),
+    ADC_REF_VDD_1_4         = (3 << 4),
 };
 //! @}
 */
@@ -74,17 +79,17 @@ struct adc_cfg_t {
 //! \name adc channel feature
 //! @{
 enum ad_channel_feature_t{
-    ADC_GAIN_1_6        = (0 << 0),
-    ADC_GAIN_1_5        = (1 << 0),
-    ADC_GAIN_1_4        = (2 << 0),
-    ADC_GAIN_1_3        = (3 << 0),
-    ADC_GAIN_1_2        = (4 << 0),
-    ADC_GAIN_1          = (5 << 0),
+    ADC_CHANNEL_GAIN_1_6    = (0 << 0),
+    ADC_CHANNEL_GAIN_1_5    = (1 << 0),
+    ADC_CHANNEL_GAIN_1_4    = (2 << 0),
+    ADC_CHANNEL_GAIN_1_3    = (3 << 0),
+    ADC_CHANNEL_GAIN_1_2    = (4 << 0),
+    ADC_CHANNEL_GAIN_1      = (5 << 0),
 
-    ADC_REF_VDD_1       = (0 << 4),
-    ADC_REF_VDD_1_2     = (1 << 4),
-    ADC_REF_VDD_1_3     = (2 << 4),
-    ADC_REF_VDD_1_4     = (3 << 4),
+    ADC_CHANNEL_REF_VDD_1   = (0 << 4),
+    ADC_CHANNEL_REF_VDD_1_2 = (1 << 4),
+    ADC_CHANNEL_REF_VDD_1_3 = (2 << 4),
+    ADC_CHANNEL_REF_VDD_1_4 = (3 << 4),
 };
 //! @}
 */
