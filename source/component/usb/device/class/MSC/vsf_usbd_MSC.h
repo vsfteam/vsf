@@ -43,6 +43,9 @@ extern "C" {
 #if VSF_USE_SCSI != ENABLED
 #   error msc uses scsi!!!
 #endif
+#if VSF_USBD_CFG_STREAM_EN != ENABLED
+#   error msc need stream
+#endif
 
 
 
