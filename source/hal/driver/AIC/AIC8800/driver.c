@@ -25,7 +25,7 @@
 #include "stdio_uart.h"
 #include "sysctrl_api.h"
 
-#include "rtos_al.h"
+#include "dbg.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

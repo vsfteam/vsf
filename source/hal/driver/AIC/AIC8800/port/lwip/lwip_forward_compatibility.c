@@ -1,4 +1,9 @@
-// remove after vendor supports lwip 2.1.2
+// remove this file after vendor supports lwip 2.1.2
+
+#include "vsf_cfg.h"
+
+#if VSF_USE_LWIP == ENABLED
+
 #include "lwip/arch.h"
 #include "lwip/pbuf.h"
 
@@ -57,3 +62,5 @@ pbuf_free_header(struct pbuf *q, u16_t size)
   }
   return p;
 }
+
+#endif      // VSF_USE_LWIP
