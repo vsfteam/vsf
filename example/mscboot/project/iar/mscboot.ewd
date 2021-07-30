@@ -2,7 +2,7 @@
 <project>
     <fileVersion>3</fileVersion>
     <configuration>
-        <name>vsf_template_aic8800</name>
+        <name>mscboot_aic8800</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>

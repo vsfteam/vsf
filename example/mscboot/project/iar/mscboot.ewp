@@ -2,7 +2,7 @@
 <project>
     <fileVersion>3</fileVersion>
     <configuration>
-        <name>vsf_template_aic8800</name>
+        <name>mscboot_aic8800</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>
@@ -16,15 +16,15 @@
                 <debug>1</debug>
                 <option>
                     <name>ExePath</name>
-                    <state>vsf_template_aic8800\Exe</state>
+                    <state>mscboot_aic8800\Exe</state>
                 </option>
                 <option>
                     <name>ObjPath</name>
-                    <state>vsf_template_aic8800\Obj</state>
+                    <state>mscboot_aic8800\Obj</state>
                 </option>
                 <option>
                     <name>ListPath</name>
-                    <state>vsf_template_aic8800\List</state>
+                    <state>mscboot_aic8800\List</state>
                 </option>
                 <option>
                     <name>GEndianMode</name>
@@ -233,7 +233,7 @@
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCPreprocComments</name>
@@ -387,7 +387,6 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\wlan</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\macif</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -691,7 +690,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>vsf_template.bin</state>
+                    <state>mscboot.bin</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -746,7 +745,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>vsf_template_aic8800.out</state>
+                    <state>mscboot_aic8800.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -1140,7 +1139,7 @@
             <group>
                 <name>3rd-party</name>
                 <excluded>
-                    <configuration>vsf_template_aic8800</configuration>
+                    <configuration>mscboot_aic8800</configuration>
                 </excluded>
                 <group>
                     <name>btstack</name>
@@ -1296,7 +1295,7 @@
                         <group>
                             <name>bluetooth</name>
                             <excluded>
-                                <configuration>vsf_template_aic8800</configuration>
+                                <configuration>mscboot_aic8800</configuration>
                             </excluded>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\bluetooth\evm_module_bluetooth.c</name>
@@ -1376,7 +1375,7 @@
                             <group>
                                 <name>cortex-m3</name>
                                 <excluded>
-                                    <configuration>vsf_template_aic8800</configuration>
+                                    <configuration>mscboot_aic8800</configuration>
                                 </excluded>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m3\libecma.a</name>
@@ -1384,7 +1383,7 @@
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m3\libejs.a</name>
                                     <excluded>
-                                        <configuration>vsf_template_aic8800</configuration>
+                                        <configuration>mscboot_aic8800</configuration>
                                     </excluded>
                                 </file>
                                 <file>
@@ -1396,13 +1395,13 @@
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libecma.a</name>
                                     <excluded>
-                                        <configuration>vsf_template_aic8800</configuration>
+                                        <configuration>mscboot_aic8800</configuration>
                                     </excluded>
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libejs.a</name>
                                     <excluded>
-                                        <configuration>vsf_template_aic8800</configuration>
+                                        <configuration>mscboot_aic8800</configuration>
                                     </excluded>
                                 </file>
                                 <file>
@@ -2305,7 +2304,7 @@
                     <group>
                         <name>raw</name>
                         <excluded>
-                            <configuration>vsf_template_aic8800</configuration>
+                            <configuration>mscboot_aic8800</configuration>
                         </excluded>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\raw\lapi.c</name>
@@ -3142,7 +3141,7 @@
                     <group>
                         <name>port</name>
                         <excluded>
-                            <configuration>vsf_template_aic8800</configuration>
+                            <configuration>mscboot_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>arch</name>
@@ -4510,7 +4509,7 @@
                     <group>
                         <name>arm9</name>
                         <excluded>
-                            <configuration>vsf_template_aic8800</configuration>
+                            <configuration>mscboot_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>startup</name>
@@ -4521,7 +4520,7 @@
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\arm9\arm9_generic.c</name>
                             <configuration>
-                                <name>vsf_template_aic8800</name>
+                                <name>mscboot_aic8800</name>
                                 <settings>
                                     <name>ICCARM</name>
                                     <data>
@@ -4801,7 +4800,7 @@
                     <group>
                         <name>cortex-a</name>
                         <excluded>
-                            <configuration>vsf_template_aic8800</configuration>
+                            <configuration>mscboot_aic8800</configuration>
                         </excluded>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-a\cortex_a_generic.c</name>
@@ -4925,7 +4924,7 @@
                             <group>
                                 <name>rtos</name>
                                 <excluded>
-                                    <configuration>vsf_template_aic8800</configuration>
+                                    <configuration>mscboot_aic8800</configuration>
                                 </excluded>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\rtos\rtos.h</name>
@@ -5003,7 +5002,7 @@
                             <group>
                                 <name>lwip</name>
                                 <excluded>
-                                    <configuration>vsf_template_aic8800</configuration>
+                                    <configuration>mscboot_aic8800</configuration>
                                 </excluded>
                                 <group>
                                     <name>dhcps</name>
@@ -5645,7 +5644,7 @@
                             <group>
                                 <name>wifi</name>
                                 <excluded>
-                                    <configuration>vsf_template_aic8800</configuration>
+                                    <configuration>mscboot_aic8800</configuration>
                                 </excluded>
                                 <group>
                                     <name>fhost</name>
@@ -5696,7 +5695,7 @@
                             <group>
                                 <name>wpa_supplicant</name>
                                 <excluded>
-                                    <configuration>vsf_template_aic8800</configuration>
+                                    <configuration>mscboot_aic8800</configuration>
                                 </excluded>
                                 <group>
                                     <name>lib</name>
@@ -5732,7 +5731,7 @@
                 <group>
                     <name>Allwinner</name>
                     <excluded>
-                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>mscboot_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>F1CX00S</name>
@@ -5894,7 +5893,7 @@
                 <group>
                     <name>arm</name>
                     <excluded>
-                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>mscboot_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>mps2</name>
@@ -6008,7 +6007,7 @@
                 <group>
                     <name>GigaDevice</name>
                     <excluded>
-                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>mscboot_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>GD32E10X</name>
@@ -6155,7 +6154,7 @@
                 <group>
                     <name>Nuvoton</name>
                     <excluded>
-                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>mscboot_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>M480</name>
@@ -6381,7 +6380,7 @@
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\startup\IAR\startup_M480.s.template</name>
                                         <excluded>
-                                            <configuration>vsf_template_aic8800</configuration>
+                                            <configuration>mscboot_aic8800</configuration>
                                         </excluded>
                                     </file>
                                 </group>
@@ -6421,7 +6420,7 @@
                     <group>
                         <name>NUC500</name>
                         <excluded>
-                            <configuration>vsf_template_aic8800</configuration>
+                            <configuration>mscboot_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>common</name>
@@ -6482,7 +6481,7 @@
                 <group>
                     <name>ST</name>
                     <excluded>
-                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>mscboot_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>STM32F103</name>
@@ -6551,7 +6550,7 @@
                 <group>
                     <name>template</name>
                     <excluded>
-                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>mscboot_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>__series_name__</name>
@@ -6581,7 +6580,7 @@
                 <group>
                     <name>TI</name>
                     <excluded>
-                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>mscboot_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>AM335X</name>
@@ -6608,7 +6607,7 @@
                 <group>
                     <name>unknown</name>
                     <excluded>
-                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>mscboot_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>MT071</name>
@@ -6734,7 +6733,7 @@
                 <group>
                     <name>WinnerMicro</name>
                     <excluded>
-                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>mscboot_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>W60X</name>
@@ -7222,7 +7221,7 @@
         <group>
             <name>shell</name>
             <excluded>
-                <configuration>vsf_template_aic8800</configuration>
+                <configuration>mscboot_aic8800</configuration>
             </excluded>
             <group>
                 <name>media</name>

@@ -103,8 +103,14 @@ end_describe_usbd(__user_usbd_msc, VSF_USB_DC0)
 
 int VSF_USER_ENTRY(void)
 {
-    vk_usbd_init(&__user_usbd_msc);
-    vk_usbd_connect(&__user_usbd_msc);
+    mscboot_init();
+    if (mscboot_check()) {
+        vk_usbd_init(&__user_usbd_msc);
+        vk_usbd_connect(&__user_usbd_msc);
+    } else {
+        mscboot_fini();
+        mscboot_boot();
+    }
     return 0;
 }
 

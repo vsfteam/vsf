@@ -42,7 +42,7 @@ dcl_vsf_peda_methods(static, __mscbot_on_firmware_write)
 
 vk_fakefat32_file_t fakefat32_root[2] = {
     {
-        .name               = "FAKEFAT32",
+        .name               = "mscboot",
         .attr               = (vk_file_attr_t)VSF_FAT_FILE_ATTR_VOLUMID,
     },
     {
