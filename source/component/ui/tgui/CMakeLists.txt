@@ -3,6 +3,7 @@
 target_sources(${VSF_LIB_NAME} INTERFACE
     vsf_tgui.c
     vsf_tgui_common.c
+    vsf_tgui_input.c
 )
 
 add_subdirectory(controls)
