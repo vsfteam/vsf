@@ -154,15 +154,17 @@
             __describe_tgui_msgmap(__NAME, __VA_ARGS__)
 
 
+#define __tgui_msgmap(...)                                                      \
+                .tMSGMap = {                                                    \
+                    .ptItems =  (const vsf_tgui_user_evt_handler []) {          \
+                                    __VA_ARGS__                                 \
+                                },                                              \
+                    .chCount = sizeof((const vsf_tgui_user_evt_handler []) {    \
+                                    __VA_ARGS__                                 \
+                                }) / sizeof(vsf_tgui_user_evt_handler),         \
+                }
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
-
-#   define __tgui_msgmap(__MSGMAP)                                              \
-                .tMSGMap = {                                                    \
-                    .ptItems = __MSGMAP,                                        \
-                    .chCount = UBOUND(__MSGMAP),                                \
-                    .name_ptr = #__MSGMAP,                                      \
-                }
 
 #   define __tgui_msg_handler(__MSG, __FUNC, ...)                               \
             {                                                                   \
@@ -184,12 +186,6 @@
 
 #else
 
-#   define __tgui_msgmap(__MSGMAP)                                              \
-                .tMSGMap = {                                                    \
-                    .ptItems = __MSGMAP,                                        \
-                    .chCount = UBOUND(__MSGMAP),                                \
-                }
-
 #   define __tgui_msg_handler(__MSG, __FUNC, ...)                               \
             {                                                                   \
                 .msg = (__MSG),                                                 \
@@ -208,7 +204,7 @@
 #endif
 
 
-#define tgui_msgmap(__MSGMAP)               __tgui_msgmap(__MSGMAP)
+#define tgui_msgmap(...)               __tgui_msgmap(__VA_ARGS__)
 
 #define tgui_msg_handler(__MSG, __FUNC, ...)                                    \
             __tgui_msg_handler(__MSG, __FUNC, ##__VA_ARGS__)

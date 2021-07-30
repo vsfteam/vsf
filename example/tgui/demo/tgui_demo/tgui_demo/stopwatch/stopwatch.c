@@ -69,37 +69,6 @@ static fsm_rt_t __on_list_sliding_stopped( vsf_tgui_list_t* ptList,
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-describe_tgui_msgmap(tStartStopMSGMap,
-    tgui_msg_handler(VSF_TGUI_EVT_POINTER_CLICK,        __on_button_start_stop_click),
-    tgui_msg_handler(VSF_TGUI_EVT_KEY_PRESSED,          __on_button_start_stop_ok),
-)
-
-#if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-describe_tgui_msgmap(tTextListMGSMap,
-    tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH,         __on_text_list_post_refresh),
-)
-#endif
-
-#if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-describe_tgui_msgmap(tListMGSMap,
-    tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH,         __on_list_post_refresh),
-    tgui_msg_handler(VSF_TGUI_EVT_LIST_SLIDING_STARTED, __on_list_sliding_started),
-    tgui_msg_handler(VSF_TGUI_EVT_LIST_SLIDING_STOPPED, __on_list_sliding_stopped),
-)
-#endif
-
-describe_tgui_msgmap(tStopWatchMSGMap,
-    tgui_msg_handler(VSF_TGUI_EVT_ON_LOAD,              __on_top_panel_load),
-    tgui_msg_handler(VSF_TGUI_EVT_ON_DEPOSE,            __on_top_panel_depose),
-#if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
-    tgui_msg_handler(VSF_TGUI_EVT_ON_TIME,              __on_top_panel_time),
-#endif
-)
-
-describe_tgui_msgmap(tLapMSGMap,
-    tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK),
-)
-
 stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 {
     do {
@@ -112,7 +81,14 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
             tgui_text(tTitle, "My Stopwatch", false),
             tgui_padding(16,16,16,16),
 
-            tgui_msgmap(tStopWatchMSGMap),
+            tgui_msgmap(
+                tgui_msg_handler(VSF_TGUI_EVT_ON_LOAD,              __on_top_panel_load),
+                tgui_msg_handler(VSF_TGUI_EVT_ON_DEPOSE,            __on_top_panel_depose),
+            #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
+                tgui_msg_handler(VSF_TGUI_EVT_ON_TIME,              __on_top_panel_time),
+            #endif
+            ),
+
             tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_VERTICAL),
 
             tgui_container(tLeftContainer, ptPanel, tLeftContainer, tRightPanel,
@@ -143,17 +119,20 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                         tgui_text(tLabel, "START", true),
                         tgui_attribute(bIsCheckButton, true),
 
-                        tgui_msgmap(tStartStopMSGMap),
+                        tgui_msgmap(    
+                            tgui_msg_handler(VSF_TGUI_EVT_POINTER_CLICK,        __on_button_start_stop_click),
+                            tgui_msg_handler(VSF_TGUI_EVT_KEY_PRESSED,          __on_button_start_stop_ok),
+                        ),
                     ),
 
                     tgui_button(tLap, &(ptPanel->tLeftContainer), tStartStop, tContainerA,
                         tgui_size( 64, 32),
                         tgui_margin(104, 4, 0, 4),
                         tgui_text(tLabel, "LAP", false),
-                        tgui_msgmap(tLapMSGMap),
+                        tgui_msgmap(
+                            tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK),
+                        ),
                     ),
-
-
 
                     tgui_container(tContainerA, &(ptPanel->tLeftContainer), tSetting, tContainerA,
 
@@ -173,7 +152,9 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                             #if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABELD
                                 //tgui_attribute(tSlider, 400),
                             #endif
-                                tgui_msgmap(tTextListMGSMap),
+                                tgui_msgmap(
+                                    tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH,         __on_text_list_post_refresh),
+                                ),
 
                                 tgui_text_list_content(
 
@@ -203,7 +184,11 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                                 tgui_margin(8, 0, 0, 0),
                                 //tgui_attribute(u2WorkMode, VSF_TGUI_LIST_MODE_ITEM_SELECTION),
                                 tgui_padding(0,0,0,0),
-                                tgui_msgmap(tListMGSMap),
+                                tgui_msgmap(
+                                    tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH,         __on_list_post_refresh),
+                                    tgui_msg_handler(VSF_TGUI_EVT_LIST_SLIDING_STARTED, __on_list_sliding_started),
+                                    tgui_msg_handler(VSF_TGUI_EVT_LIST_SLIDING_STOPPED, __on_list_sliding_stopped),
+                                ),
 
                                 tgui_list_items(
                                     tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL),
