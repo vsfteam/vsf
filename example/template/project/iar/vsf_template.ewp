@@ -7247,6 +7247,7 @@
                     <excluded>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>extension</name>

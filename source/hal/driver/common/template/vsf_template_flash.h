@@ -32,18 +32,20 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_flash_irq_type_t{
-    VSF_FLASH_IRQ_ERASE_MASK = (1 << 0),
-    VSF_FLASH_IRQ_WRITE_MASK = (1 << 1),
-    VSF_FLASH_IRQ_READ_MASK  = (1 << 2),
-    
-    VSF_FLASH_IRQ_ERROR_MASK = (1 << 3),
+    VSF_FLASH_IRQ_ERASE_MASK        = (1 << 0),
+    VSF_FLASH_IRQ_WRITE_MASK        = (1 << 1),
+    VSF_FLASH_IRQ_READ_MASK         = (1 << 2),
+
+    VSF_FLASH_IRQ_ERASE_ERROR_MASK  = (1 << 3),
+    VSF_FLASH_IRQ_WRITE_ERROR_MASK  = (1 << 4),
+    VSF_FLASH_IRQ_READ_ERROR_MASK   = (1 << 5),
 } vsf_flash_irq_type_t;
 
 typedef struct vsf_flash_t vsf_flash_t;
 
 typedef void vsf_flash_isr_handler_t(void *target_ptr,
                                      vsf_flash_irq_type_t type,
-                                     vsf_flash_t *ad_ptr);
+                                     vsf_flash_t *flash_ptr);
 
 
 typedef struct vsf_flash_isr_t {
@@ -84,8 +86,8 @@ extern vsf_err_t vsf_flash_disable(vsf_flash_t *flash_ptr);
 
 /**
  * flash erase a continuous range
- * @note offset must be aligend to the start address 
- *       of the erase sector. size must be an integer 
+ * @note offset must be aligend to the start address
+ *       of the erase sector. size must be an integer
  *       multiple of the minimum erase size
  *
  * @param[in] flash_ptr flash instance
@@ -98,8 +100,8 @@ extern vsf_err_t vsf_flash_erase(vsf_flash_t *flash_ptr,
 
 /**
  * flash write a continuous range
- * @note offset must be aligend to the start address 
- *       of the write sector. size must be an integer 
+ * @note offset must be aligend to the start address
+ *       of the write sector. size must be an integer
  *       multiple of the minimum write size
  *
  * @param[in] flash_ptr flash instance
@@ -109,12 +111,12 @@ extern vsf_err_t vsf_flash_erase(vsf_flash_t *flash_ptr,
  */
 extern vsf_err_t vsf_flash_write(vsf_flash_t *flash_ptr,
                                  uint_fast32_t offset,
-                                 uint8_t* buffer, 
+                                 uint8_t* buffer,
                                  uint_fast32_t size);
 
 /**
  * flash read a continuous range
- * @note if the flash hardware does not support random read, 
+ * @note if the flash hardware does not support random read,
  *       the unaligned range should be returned as a failure.
  *
  * @param[in] flash_ptr flash instance
@@ -124,10 +126,10 @@ extern vsf_err_t vsf_flash_write(vsf_flash_t *flash_ptr,
  */
 extern vsf_err_t vsf_flash_read(vsf_flash_t *flash_ptr,
                                 uint_fast32_t offset,
-                                uint8_t* buffer, 
+                                uint8_t* buffer,
                                 uint_fast32_t size);
 
-/** TODO: 
+/** TODO:
  * information query API, include:
  * - minimum erase size
  * - minimum write size
