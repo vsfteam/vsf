@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ master ]
 
+  workflow_dispatch:
 
 jobs:
   windows-msbuild:
@@ -21,7 +22,6 @@ jobs:
     - name: Checkout With Submodule
       uses: actions/checkout@v2
       with:
-        repository: vsfteam/vsf
         submodules: recursive
       continue-on-error: true     # allow faild because evm has gitee repositories
 
@@ -50,7 +50,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        repository: vsfteam/vsf
         submodules: recursive
       continue-on-error: true     # allow faild because evm has gitee repositories
 
@@ -95,7 +94,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        repository: vsfteam/vsf
         submodules: recursive
       continue-on-error: true     # allow faild because evm has gitee repositories
 
