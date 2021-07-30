@@ -21,8 +21,8 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
-#include "../../__device.h"
 #if VSF_HAL_USE_GPIO == ENABLED
+#include "../__device.h"
 #include "./i_reg_gpio.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 

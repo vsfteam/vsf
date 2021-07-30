@@ -23,6 +23,7 @@
 #include "hal/vsf_hal_cfg.h"
 #include "chip.h"
 #include "plf.h"
+#include "hal/arch/vsf_arch.h"
 
 // CMSIS headers which will not be included in core_xxx.h
 //  and arm_math.h CAN ONLY be included after core_xxx.h
