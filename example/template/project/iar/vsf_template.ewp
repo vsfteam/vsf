@@ -7247,7 +7247,6 @@
                     <excluded>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
-                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>extension</name>
@@ -9946,6 +9945,15 @@
                             </file>
                         </group>
                         <group>
+                            <name>flash</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\flash\flash.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\flash\flash.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>gpio</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\gpio\gpio.c</name>
@@ -11022,6 +11030,9 @@
                         <name>template</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_adc.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_flash.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_hal_driver.h</name>

@@ -126,7 +126,12 @@ vsf_err_t vsf_flash_erase(  vsf_flash_t *flash_ptr,
     vsf_protect_t org = __aic8800_flash_protect();
     ret = ROM_FlashErase(__aic8800_flash_address_get(offset), size);//offset:4k * n
     __aic8800_flash_unprotect(org);
-
+    if (NULL != flash_ptr->cfg.isr.handler_fn) {
+        flash_ptr->cfg.isr.handler_fn(
+                            flash_ptr->cfg.isr.target_ptr,
+                            0 == ret ? VSF_FLASH_IRQ_ERASE_MASK : VSF_FLASH_IRQ_ERASE_ERROR_MASK,
+                            flash_ptr);
+    }
     return VSF_ERR_NONE;
 }
 
@@ -149,15 +154,10 @@ vsf_err_t vsf_flash_write(  vsf_flash_t *flash_ptr,
     ret = ROM_FlashWrite(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
     __aic8800_flash_unprotect(org);
     if (NULL != flash_ptr->cfg.isr.handler_fn) {
-        if (0 == ret) {
-            flash_ptr->cfg.isr.handler_fn(flash_ptr->cfg.isr.target_ptr,
-                                          VSF_FLASH_IRQ_WRITE_MASK,
-                                          flash_ptr);
-        } else {
-            flash_ptr->cfg.isr.handler_fn(flash_ptr->cfg.isr.target_ptr,
-                                          VSF_FLASH_IRQ_ERROR_MASK,
-                                          flash_ptr);
-        }
+        flash_ptr->cfg.isr.handler_fn(
+                            flash_ptr->cfg.isr.target_ptr,
+                            0 == ret ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK,
+                            flash_ptr);
     }
     return VSF_ERR_NONE;
 }
@@ -180,15 +180,10 @@ vsf_err_t vsf_flash_read(   vsf_flash_t *flash_ptr,
     __aic8800_flash_unprotect(org);
 
     if (NULL != flash_ptr->cfg.isr.handler_fn) {
-        if (0 == ret) {
-            flash_ptr->cfg.isr.handler_fn(flash_ptr->cfg.isr.target_ptr,
-                                          VSF_FLASH_IRQ_READ_MASK,
-                                          flash_ptr);
-        } else {
-            flash_ptr->cfg.isr.handler_fn(flash_ptr->cfg.isr.target_ptr,
-                                          VSF_FLASH_IRQ_ERROR_MASK,
-                                          flash_ptr);
-        }
+        flash_ptr->cfg.isr.handler_fn(
+                            flash_ptr->cfg.isr.target_ptr,
+                            0 == ret ? VSF_FLASH_IRQ_READ_MASK : VSF_FLASH_IRQ_READ_ERROR_MASK,
+                            flash_ptr);
     }
     return VSF_ERR_NONE;
 }
