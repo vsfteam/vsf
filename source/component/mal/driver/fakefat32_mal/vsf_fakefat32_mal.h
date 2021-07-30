@@ -43,8 +43,8 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_FS != ENABLED || VSF_FS_USE_MEMFS != ENABLED
-#   error FAKEFAT32 need memfs
+#if VSF_USE_FS != ENABLED || VSF_FS_USE_MEMFS != ENABLED || VSF_FS_USE_FATFS != ENABLED
+#   error FAKEFAT32 need memfs and fatfs
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
