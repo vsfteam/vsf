@@ -110,7 +110,7 @@ typedef struct spi_cfg_t {
 } spi_cfg_t;
 //! @}
 
-typedef struct i_spi_t i_spi_t;
+dcl_interface(i_spi_t)
 
 typedef void vsf_i_spi_isrhandler_t(void *target_ptr,
                                     const i_spi_t *i_spi_ptr,

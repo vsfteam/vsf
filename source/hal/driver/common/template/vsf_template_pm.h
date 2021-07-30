@@ -95,7 +95,7 @@ typedef uint_fast32_t pm_power_status_t;
 
 //! \name power
 //! @{
-declare_interface(i_pm_power_t)
+dcl_interface(i_pm_power_t)
 def_interface(i_pm_power_t)
     //! \brief Enable specific power domains with masks defined in
     //!        em_power_cfg_msk_t
@@ -141,7 +141,7 @@ typedef struct {
 } pm_sleep_cfg_t;
 //! @}
 
-declare_interface(i_pm_wakeup_t)
+dcl_interface(i_pm_wakeup_t)
 
 /*! \note i_pm_wakeup_t should be defined in device specific header file
           pm.h.
@@ -178,7 +178,7 @@ declare_interface(i_pm_wakeup_t)
         ...
     end_def_interface( i_pm_wakeup_t )
 */
-declare_interface(i_pm_sleep_t)
+dcl_interface(i_pm_sleep_t)
 def_interface(i_pm_sleep_t)
     vsf_err_t   (*TryToSleep)       (pm_sleep_cfg_t *cfg_ptr);
     i_pm_wakeup_t WakeUp;
@@ -221,7 +221,7 @@ typedef struct pm_pclk_cfg_t pm_pclk_cfg_t;
 
 //! \name pclk
 //! @{
-declare_interface(i_pm_pclk_t)
+dcl_interface(i_pm_pclk_t)
 def_interface(i_pm_pclk_t)
     pm_pclk_status_t(*Config)       (pm_pclk_no_t index, pm_pclk_cfg_t *cfg_ptr);
     uint_fast32_t   (*GetClock)     (pm_pclk_no_t index);
@@ -278,7 +278,7 @@ typedef uint_fast32_t pm_sclk_status_t;
 
 //! \name AHB Clock Management
 //! @{
-declare_interface(i_pm_sclk_t)
+dcl_interface(i_pm_sclk_t)
 def_interface(i_pm_sclk_t)
     pm_sclk_status_t(*Enable)       (pm_sclk_no_t index);
     pm_sclk_status_t(*Disable)      (pm_sclk_no_t index);
@@ -379,7 +379,7 @@ enum pm_mclk_no_t {
 
 //! \name main clock struct type
 //! @{
-declare_interface(i_pm_mclk_t)
+dcl_interface(i_pm_mclk_t)
 def_interface(i_pm_mclk_t)
     fsm_rt_t        (*Init)         (pm_mclk_cfg_t *cfg_ptr);
     uint_fast32_t   (*GetClock)     (pm_mclk_no_t sel);
@@ -438,7 +438,7 @@ enum pm_pll_post_div_t {
 
 //! \name pll struct type
 //! @{
-declare_interface(i_pm_pll_t)
+dcl_interface(i_pm_pll_t)
 def_interface(i_pm_pll_t)
     //! Pll config
     fsm_rt_t        (*Init)         (pm_pll_sel_t pll, pm_pll_cfg_t *cfg_ptr);
@@ -487,7 +487,7 @@ typedef struct pm_lposc_cfg_t pm_lposc_cfg_t;
 
 //! \name low power oscillator
 //! @{
-declare_interface(i_pm_lposc_t)
+dcl_interface(i_pm_lposc_t)
 def_interface(i_pm_lposc_t)
     vsf_err_t       (*Init)         (pm_lposc_sel_t lposc, pm_lposc_cfg_t *cfg_ptr);
     void            (*Enable)       (pm_lposc_sel_t lposc);
@@ -510,7 +510,7 @@ typedef struct {
 } pm_clock_out_cfg_t;
 //! @}
 
-declare_interface(i_pm_clk_t)
+dcl_interface(i_pm_clk_t)
 def_interface(i_pm_clk_t)
 
     /*! \note Main here is used to set dividers for CPU, sync-clocks (ahb, axi,
@@ -557,7 +557,7 @@ end_def_interface(i_pm_clk_t)
 
 //! \name pmu struct
 //! @{
-declare_interface(i_pm_t)
+dcl_interface(i_pm_t)
 def_interface(i_pm_t)
     //! \brief set the clock auto . the main clock frequency and the div is needed
     fsm_rt_t        (*AutoClock)(   pm_clk_src_sel_t clk_src,
