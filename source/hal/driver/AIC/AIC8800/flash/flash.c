@@ -55,6 +55,9 @@
 #define ROM_FlashRead                                                           \
     ((int (*)(unsigned int adr, unsigned int len, unsigned int buf))ROM_APITBL_BASE[6])
 
+#define ROM_FlashCacheInvalidRange                                              \
+    ((void (*)(unsigned int adr, unsigned int len))ROM_APITBL_BASE[8])
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -123,9 +126,12 @@ vsf_err_t vsf_flash_erase(  vsf_flash_t *flash_ptr,
     if (offset + size > flash_ptr->info.flash_size) {
         return VSF_ERR_INVALID_PARAMETER;
     }
+
     vsf_protect_t org = __aic8800_flash_protect();
     ret = ROM_FlashErase(__aic8800_flash_address_get(offset), size);//offset:4k * n
     __aic8800_flash_unprotect(org);
+    ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
+
     if (NULL != flash_ptr->cfg.isr.handler_fn) {
         flash_ptr->cfg.isr.handler_fn(
                             flash_ptr->cfg.isr.target_ptr,
@@ -150,9 +156,12 @@ vsf_err_t vsf_flash_write(  vsf_flash_t *flash_ptr,
     if (offset + size > flash_ptr->info.flash_size) {
         return VSF_ERR_INVALID_PARAMETER;
     }
+
     vsf_protect_t org = __aic8800_flash_protect();
     ret = ROM_FlashWrite(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
     __aic8800_flash_unprotect(org);
+    ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
+
     if (NULL != flash_ptr->cfg.isr.handler_fn) {
         flash_ptr->cfg.isr.handler_fn(
                             flash_ptr->cfg.isr.target_ptr,
