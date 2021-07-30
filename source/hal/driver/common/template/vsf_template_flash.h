@@ -43,15 +43,15 @@ typedef enum vsf_flash_irq_type_t{
 
 typedef struct vsf_flash_t vsf_flash_t;
 
-typedef void vsf_flash_isr_handler_t(void *target_ptr,
-                                     vsf_flash_irq_type_t type,
-                                     vsf_flash_t *flash_ptr);
+typedef void vsf_flash_isrhandler_t(void *target_ptr,
+                                    vsf_flash_irq_type_t type,
+                                    vsf_flash_t *flash_ptr);
 
 
 typedef struct vsf_flash_isr_t {
-    vsf_flash_isr_handler_t  *handler_fn;
-    void                     *target_ptr;
-    vsf_arch_prio_t           prio;
+    vsf_flash_isrhandler_t *handler_fn;
+    void                   *target_ptr;
+    vsf_arch_prio_t         prio;
 } vsf_flash_isr_t;
 
 //! \name flash channel configuration
