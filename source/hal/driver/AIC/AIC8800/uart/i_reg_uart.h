@@ -37,6 +37,21 @@ extern "C" {
 #   define __AIC8800_UART_USE_BIT_FIELD             ENABLED
 #endif
 
+/* Define structure member permissions : ‘read only?*/
+#ifndef __IM
+#   define __IM                                     const
+#endif
+
+/* Define structure member permissions : ‘write only?*/
+#ifndef __OM
+#   define __OM
+#endif
+
+/* Define structure member permissions : ‘read or write?*/
+#ifndef __IOM
+#   define __IOM
+#endif
+
 #define UART0_BASE_ADDRESS                          (0x40041000ul)
 #define UART1_BASE_ADDRESS                          (0x40042000ul)
 #define UART2_BASE_ADDRESS                          (0x40043000ul)

@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "./gpio.h"
+#if VSF_HAL_USE_GPIO == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -124,3 +125,5 @@ void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     uint32_t ret = ~vsf_gpio_read(gpio_ptr);
     vsf_gpio_write(gpio_ptr, ret, pin_mask);
 }
+
+#endif      // VSF_HAL_USE_GPIO

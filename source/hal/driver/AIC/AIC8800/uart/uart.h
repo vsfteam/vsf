@@ -19,7 +19,9 @@
 #define __HAL_DRIVER_AIC_8800_UART_H__
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal.h"
+#include "hal/vsf_hal_cfg.h"
+#if VSF_HAL_USE_USART == ENABLED
+#include "../__device.h"
 #include "./i_reg_uart.h"
 #include "hal/driver/common/template/vsf_template_usart.h"
 /*============================ MACROS ========================================*/
@@ -143,5 +145,6 @@ struct vsf_usart_t {
 #   error "No instance can be used"
 #endif
 
+#endif
 #endif
 /* EOF */

@@ -17,6 +17,8 @@
 /*============================ INCLUDES ======================================*/
 
 #include "./uart.h"
+#if VSF_HAL_USE_USART == ENABLED
+
 #include "../vendor/plf/aic8800/src/driver/uart/reg_uart1.h"
 #include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/ipc/reg_ipc_comreg.h"
@@ -225,12 +227,16 @@ vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fa
 }
 vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart_ptr)
 {
-
     //todo:
-    VSF_HAL_ASSERT(false);}
+    VSF_HAL_ASSERT(false);
+}
+
 vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr);
 int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
 int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
+
 /*============================ IMPLEMENTATION ================================*/
+
 aic8800_uart_init(USART_MAX_PORT)
 
+#endif      // VSF_HAL_USE_USART

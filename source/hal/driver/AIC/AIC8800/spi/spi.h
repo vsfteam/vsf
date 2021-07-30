@@ -22,6 +22,7 @@
 
 #include "hal/vsf_hal_cfg.h"
 #if VSF_HAL_USE_SPI == ENABLED
+#include "../__device.h"
 #include "./i_reg_spi.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 

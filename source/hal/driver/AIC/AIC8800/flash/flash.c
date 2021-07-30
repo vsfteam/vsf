@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "./flash.h"
+#if VSF_HAL_USE_FLASH == ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -196,3 +197,5 @@ vsf_err_t vsf_flash_read(   vsf_flash_t *flash_ptr,
     }
     return VSF_ERR_NONE;
 }
+
+#endif      // VSF_HAL_USE_FLASH

@@ -17,6 +17,8 @@
 /*============================ INCLUDES ======================================*/
 
 #include "spi.h"
+#if VSF_HAL_USE_SPI == ENABLED
+
 #include "sysctrl_api.h"
 #include "../vendor/plf/aic8800/src/driver/dma/dma_api.h"
 #include "../gpio/gpio.h"
@@ -322,3 +324,4 @@ int_fast32_t vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr)
     VSF_HAL_ASSERT(false);
 }
 
+#endif      // VSF_HAL_USE_SPI
