@@ -173,7 +173,12 @@ long ftell(FILE *f)
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
 {
+    ssize_t bytes_requested = size * nmemb;
     ssize_t ret;
+    if (0 == bytes_requested) {
+        return 0;
+    }
+
     int fd = __get_fd(f);
     if (fd < 0) {
         return EOF;
@@ -183,12 +188,17 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
     if (ret < 0) {
         ret = 0;
     }
-    return (size_t)ret;
+    return (size_t)(bytes_requested == ret ? nmemb : ret / size);
 }
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
 {
+    ssize_t bytes_requested = size * nmemb;
     ssize_t ret;
+    if (0 == bytes_requested) {
+        return 0;
+    }
+
     int fd = __get_fd(f);
     if (fd < 0) {
         return EOF;
@@ -198,7 +208,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
     if (ret < 0) {
         ret = 0;
     }
-    return (size_t)ret;
+    return (size_t)(bytes_requested == ret ? nmemb : ret / size);
 }
 
 int fflush(FILE *f)
