@@ -23,6 +23,8 @@
 #ifdef __AIC8800__
 
 #include "rtos_al.h"
+#include "sysctrl_api.h"
+#include "dbg.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -74,6 +76,10 @@ void __vsf_usbh_free(void *buffer)
 
 void aic8800_demo_init(void)
 {
+    dbg("\r\n    dsp_clock: %dM, sys_clock: %dM, pclk: %dM, flash_clock: %dM\r\n",
+            DSPSysCoreClock / 1000000, SystemCoreClock / 1000000,
+            PeripheralClock / 1000000, sysctrl_clock_get(PER_FLASH) / 1000000);
+
     if (rtos_init()) {
         VSF_HAL_ASSERT(false);
     }
