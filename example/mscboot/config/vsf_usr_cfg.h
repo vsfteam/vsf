@@ -50,6 +50,10 @@
 #   define VSF_ASSERT(...)                              if (!(__VA_ARGS__)) {while(1);}
 #endif
 
+// tasks runs in idle only, avoid jumping to app in swi isrhandler
+#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
+#define VSF_OS_CFG_PRIORITY_NUM                         1
+
 #define VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT      DISABLED
 #define VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY         DISABLED
 

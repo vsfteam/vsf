@@ -51,7 +51,7 @@ vk_fakefat32_file_t fakefat32_root[2] = {
     },
     {
         .name               = "firmware.bin",
-        .size               = MSCBOT_CFG_FW_SIZE,
+        .size               = MSCBOOT_CFG_FW_SIZE,
         .attr               = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
         .callback.fn_read   = (vsf_peda_evthandler_t)vsf_peda_func(__mscboot_on_firmware_read),
         .callback.fn_write  = (vsf_peda_evthandler_t)vsf_peda_func(__mscboot_on_firmware_write),

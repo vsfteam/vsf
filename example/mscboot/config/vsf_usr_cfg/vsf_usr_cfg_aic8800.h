@@ -29,7 +29,9 @@
 /*============================ MACROS ========================================*/
 
 //extern uint32_t SystemCoreClock;
-// seems systick runs at 240MHz instead of SystemCoreClock
+// DO NOT use SystemCoreClock for VSF_SYSTIMER_FREQ, because systimer is initialized
+//  in vsf_arch_init, which is eariler than initialization of SystemCoreClock in
+//  vsf_driver_init.
 #define VSF_SYSTIMER_FREQ                               (240UL * 1000 * 1000)
 #define VSF_POOL_CFG_FEED_ON_HEAP                       DISABLED
 
@@ -54,7 +56,12 @@
 #define mscboot_init()
 #define mscboot_check()                                 true
 #define mscboot_fini()
-#define mscboot_boot()
+#define mscboot_boot()                                                          \
+    do {                                                                        \
+        uint32_t *image = (uint32_t *)(0x08000000 + MSCBOOT_CFG_FW_ADDR);       \
+        vsf_arch_set_stack(image[0]);                                           \
+        ((void (*)(void))(image[1]))();                                         \
+    } while (0)
 
 #define VSF_USBD_USE_DCD_DWCOTG                         ENABLED
 #   define USRAPP_USBD_DWCOTG_CFG_ULPI_EN               true

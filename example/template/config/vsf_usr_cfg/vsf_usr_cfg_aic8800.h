@@ -29,7 +29,9 @@
 /*============================ MACROS ========================================*/
 
 //extern uint32_t SystemCoreClock;
-// seems systick runs at 240MHz instead of SystemCoreClock
+// DO NOT use SystemCoreClock for VSF_SYSTIMER_FREQ, because systimer is initialized
+//  in vsf_arch_init, which is eariler than initialization of SystemCoreClock in
+//  vsf_driver_init.
 #define VSF_SYSTIMER_FREQ                               (240UL * 1000 * 1000)
 // lwip APIs are protected by a mutex, so priority boost SHOULD be supported
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
