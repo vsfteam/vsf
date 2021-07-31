@@ -24,13 +24,13 @@
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 
-#if VSF_USE_SIMPLE_STREAM == ENABLED 
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 #   include "service/vsf_service.h"
 #elif VSF_USE_STREAM == ENABLED
 #   include "service/stream/vsf_stream.h"
 #endif
 
-#include "../../__device.h"
+#include "../__device.h"
 
 #ifdef __cplusplus
 extern "C" {
