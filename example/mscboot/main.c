@@ -20,6 +20,10 @@
 #include "vsf.h"
 #include "usrapp_common.h"
 
+#ifdef MSCBOOT_CFG_INCLUDE
+#   include MSCBOOT_CFG_INCLUDE
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef USRAPP_CFG_USBD_SPEED
@@ -100,6 +104,10 @@ end_describe_usbd(__user_usbd_msc, VSF_USB_DC0)
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#ifdef mscboot_implement
+mscboot_implement()
+#endif
 
 int VSF_USER_ENTRY(void)
 {
