@@ -102,6 +102,7 @@ vsf_component_peda_ifs_entry(__mscboot_on_firmware_read, vk_memfs_callback_read)
         // fall through
     case VSF_EVT_USER:
         if (!vsf_local.size) {
+            __eda = NULL;
             vsf_eda_return(vsf_local.rsize);
             break;
         }
@@ -142,6 +143,7 @@ vsf_component_peda_ifs_entry(__mscboot_on_firmware_write, vk_memfs_callback_writ
         // fall through
     case VSF_EVT_USER:
         if (!vsf_local.size) {
+            __eda = NULL;
             vsf_eda_return(vsf_local.wsize);
             break;
         }
