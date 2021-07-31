@@ -36,10 +36,17 @@
 #define VSF_HAL_USE_GPIO                                ENABLED
 
 // Application configure
-#define __MSCBOT_BOOTLOADER_SIZE                        (64 * 1024)
-// reserve __MSCBOT_BOOTLOADER_SIZE and 16K reserved configuration area for wifi
-#define MSCBOT_CFG_FW_SIZE                              ((2 * 1024 * 1024) - __MSCBOT_BOOTLOADER_SIZE - (16 * 1024))
-#define MSCBOT_CFG_FW_ADDR                              __MSCBOT_BOOTLOADER_SIZE
+#define __MSCBOOT_BOOTLOADER_SIZE                       (64 * 1024)
+// reserve __MSCBOOT_BOOTLOADER_SIZE and 16K reserved configuration area for wifi
+#define MSCBOOT_CFG_FW_SIZE                             ((2 * 1024 * 1024) - __MSCBOOT_BOOTLOADER_SIZE - (16 * 1024))
+#define MSCBOOT_CFG_FW_ADDR                             __MSCBOOT_BOOTLOADER_SIZE
+#define MSCBOOT_CFG_FLASH                               vsf_flash0
+#define MSCBOOT_CFG_ERASE_ALIGN                         (4 * 1024)
+#define MSCBOOT_CFG_ERASE_BLOCK_SIZE                    (4 * 1024)
+#define MSCBOOT_CFG_WRITE_ALIGN                         (256)
+#define MSCBOOT_CFG_WRITE_BLOCK_SIZE                    (0)
+#define MSCBOOT_CFG_READ_ALIGN                          (0)
+#define MSCBOOT_CFG_READ_BLOCK_SIZE                     (0)
 
 #define APP_CFG_USBD_VID                                0xA7A8
 #define APP_CFG_USBD_PID                                0x2348

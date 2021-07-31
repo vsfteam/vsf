@@ -103,6 +103,10 @@ end_describe_usbd(__user_usbd_msc, VSF_USB_DC0)
 
 int VSF_USER_ENTRY(void)
 {
+#if VSF_USE_TRACE == ENABLED
+    vsf_start_trace();
+#endif
+
     mscboot_init();
     if (mscboot_check()) {
         vk_usbd_init(&__user_usbd_msc);
