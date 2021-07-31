@@ -43,11 +43,13 @@ __vsf_component_peda_ifs(vk_memfs_callback_read,
     uint64_t        offset;
     uint32_t        size;
     uint8_t         *buff;
+    uint32_t        rsize;
 )
 __vsf_component_peda_ifs(vk_memfs_callback_write,
     uint64_t        offset;
     uint32_t        size;
     uint8_t         *buff;
+    uint32_t        wsize;
 )
 
 vsf_class(vk_memfs_file_t) {
