@@ -63,6 +63,11 @@
         ((void (*)(void))(image[1]))();                                         \
     } while (0)
 
+
+// vsf configurations
+//#define VSF_USE_TRACE                                   ENABLED
+//#   define VSF_HAL_USE_DEBUG_STREAM                     ENABLED
+
 #define VSF_USBD_USE_DCD_DWCOTG                         ENABLED
 #   define USRAPP_USBD_DWCOTG_CFG_ULPI_EN               true
 #   define USRAPP_USBD_DWCOTG_CFG_UTMI_EN               false
