@@ -51,6 +51,16 @@
 #   endif
 #endif
 
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
+#   ifndef VSF_SYSTIMER_RESOLUTION
+#       define VSF_SYSTIMER_RESOLUTION      (1000)    /*! using default 1us */
+#   endif
+#else
+#   ifndef VSF_SYSTIMER_RESOLUTION
+#       define VSF_SYSTIMER_RESOLUTION      (1000000)    /*! using default 1us */
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

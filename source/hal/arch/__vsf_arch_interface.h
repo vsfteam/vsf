@@ -37,6 +37,7 @@ extern "C" {
 #define VSF_SYSTIMER_IMPL_REQUEST_RESPONSE                      0
 #define VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER                     1
 #define VSF_SYSTIMER_IMPL_WITH_COMP_TIMER                       2
+#define VSF_SYSTIMER_IMPL_TICK_MODE                             3
 //!@}
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -61,7 +62,6 @@ extern bool vsf_arch_low_level_init(void);
 /*----------------------------------------------------------------------------*
  * System Timer : Implement with Normal Timer (Count down or Count up)        *
  *----------------------------------------------------------------------------*/
-#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
 /*-------------------------------------------*
  * APIs to be implemented by target arch     *
@@ -105,7 +105,13 @@ extern vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void);
  *!        vsf_systimer_low_level_disable().
  */
 extern void vsf_systimer_ovf_evt_hanlder(void);
-#   endif
+
+/*! \brief systimer timeout event handler which is called by request response
+ *!        service.
+ */
+extern void vsf_systimer_timeout_evt_hanlder(vsf_systimer_tick_t tick);
+extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
+extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
 
 /*----------------------------------------------------------------------------*
  * System Timer : Implement with request / response model                     *
@@ -128,16 +134,6 @@ extern vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
 extern vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);
 extern vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick);
 extern vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick);
-
-/*-------------------------------------------*
- * APIs to be used by target arch            *
- *-------------------------------------------*/
-/*! \brief systimer timeout event handler which is called by request response
- *!        service.
- */
-extern void vsf_systimer_timeout_evt_hanlder(vsf_systimer_tick_t tick);
-extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
-extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
 #   endif
 #endif      // VSF_SYSTIMER_CFG_IMPL_MODE
 

@@ -73,7 +73,7 @@ bool vsf_arch_low_level_init(void)
  * System Timer Implementation                                                *
  *----------------------------------------------------------------------------*/
 
-#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+//#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
 vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
@@ -156,7 +156,7 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
     NVIC_SetPriority(SysTick_IRQn, priority);
 }
 
-#endif
+//#endif
 
 /*----------------------------------------------------------------------------*
  * SWI / PendSV                                                               *

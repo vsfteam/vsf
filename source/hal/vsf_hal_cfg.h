@@ -41,10 +41,6 @@ extern "C" {
 #endif
 #endif
 
-#ifndef VSF_SYSTIMER_RESOLUTION
-#   define VSF_SYSTIMER_RESOLUTION      (1000000)    /*! using default 1us */
-#endif
-
 #ifndef VSF_HAL_USE_GPIO
 #   define VSF_HAL_USE_GPIO             ENABLED
 #endif

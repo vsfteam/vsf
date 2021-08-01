@@ -167,6 +167,8 @@
 #define VSF_TRACE_CFG_COLOR_EN                          DISABLED
 #define VSH_HAS_COLOR                                   0
 
+//#define VSF_SYSTIMER_CFG_IMPL_MODE                      VSF_SYSTIMER_IMPL_TICK_MODE
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

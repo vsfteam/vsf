@@ -63,7 +63,11 @@ extern "C" {
 
 // software interrupt provided by arch
 #define VSF_ARCH_SWI_NUM                1
-#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+
+#ifndef VSF_SYSTIMER_CFG_IMPL_MODE
+//! \note by default, use tickless mode
+#   define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+#endif
 #define __VSF_ARCH_SYSTIMER_BITS        24
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
