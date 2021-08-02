@@ -22,6 +22,7 @@
 
 #include "hal/vsf_hal_cfg.h"
 #if VSF_HAL_USE_FLASH == ENABLED
+#include "../__device.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
