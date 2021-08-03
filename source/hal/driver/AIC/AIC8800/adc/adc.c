@@ -140,24 +140,25 @@ static void __vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
 
 static void __vsf_adc_channel_config(vsf_adc_t *adc_ptr, adc_channel_cfg_t *channel_cfgs_ptr)
 {
-    if (channel_cfgs_ptr->channel <= 7) {
+    uint8_t channel = channel_cfgs_ptr->channel;
+    if (channel <= 7) {
 #if PLF_PMIC_VER_LITE
         PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_mode), 0);
-        if ((channel_cfgs_ptr->channel <= 1) || (channel_cfgs_ptr->channel == 13)) {
+        if ((channel <= 1) || (channel == 13)) {
             PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteAnalogReg->gpio_ctrl1),
-                (0x01 << channel_cfgs_ptr->channel), (0x01 << channel_cfgs_ptr->channel));
+                (0x01 << channel), (0x01 << channel));
         } else {
             PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteRtcCore->rtc_rg_por_ctrl_cfg2),
-                AIC1000LITE_RTC_CORE_RTC_RG_GPIO27_MUX0_EN(0x01 << (channel_cfgs_ptr->channel - 2)),
-                AIC1000LITE_RTC_CORE_RTC_RG_GPIO27_MUX0_EN(0x01 << (channel_cfgs_ptr->channel - 2)));
+                AIC1000LITE_RTC_CORE_RTC_RG_GPIO27_MUX0_EN(0x01 << (channel - 2)),
+                AIC1000LITE_RTC_CORE_RTC_RG_GPIO27_MUX0_EN(0x01 << (channel - 2)));
         }
 #endif
 
-        vsf_gpio_config_pin(&vsf_gpio0, 1 << (channel_cfgs_ptr->channel + 16), 0);
-        vsf_gpio_set_input(&vsf_gpio0, 1 << (channel_cfgs_ptr->channel + 16));
+        vsf_gpio_config_pin(&vsf_gpio0, 1 << (channel + 16), 0);
+        vsf_gpio_set_input(&vsf_gpio0, 1 << (channel + 16));
 
 #if PLF_PMIC_VER_LITE
-        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[channel_cfgs_ptr->channel]),
+        PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[channel]),
             (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC),
             (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC));
 #endif

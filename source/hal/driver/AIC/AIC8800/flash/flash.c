@@ -22,25 +22,31 @@
 
 /*============================ MACROS ========================================*/
 
-#undef VSF_AIC8800_FLASH_USE_PROTECT
-#define VSF_AIC8800_FLASH_USE_PROTECT           interrupt
+#undef VSF_AIC8800_FLASH_CFG_PROTECT
+#define VSF_AIC8800_FLASH_CFG_PROTECT                   interrupt
 
 #undef VSF_AIC8800_FLASH_BASE_ADDRESS
-#define VSF_AIC8800_FLASH_BASE_ADDRESS          0x8000000
+#define VSF_AIC8800_FLASH_BASE_ADDRESS                  0x8000000
 
-#undef VSF_AIC8800_FLASH_ALIGNMENT_SIZE
-#define VSF_AIC8800_FLASH_ALIGNMENT_SIZE        0x1
+#undef VSF_AIC8800_FLASH_ALIGNMENT_ERASE_SIZE
+#define VSF_AIC8800_FLASH_ALIGNMENT_ERASE_SIZE          0x1000
+
+#undef VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE
+#define VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE          0x100
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #undef __aic8800_flash_protect
-#define __aic8800_flash_protect                 vsf_protect(VSF_AIC8800_FLASH_USE_PROTECT)
+#define __aic8800_flash_protect                                                 \
+    vsf_protect(VSF_AIC8800_FLASH_CFG_PROTECT)
 
 #undef __aic8800_flash_unprotect
-#define __aic8800_flash_unprotect               vsf_unprotect(VSF_AIC8800_FLASH_USE_PROTECT)
+#define __aic8800_flash_unprotect                                               \
+    vsf_unprotect(VSF_AIC8800_FLASH_CFG_PROTECT)
 
 #undef __aic8800_flash_address_get
-#define __aic8800_flash_address_get(__offset)   ((unsigned int)(VSF_AIC8800_FLASH_BASE_ADDRESS + (uint32_t)__offset))
+#define __aic8800_flash_address_get(__offset)                                   \
+    ((unsigned int)(VSF_AIC8800_FLASH_BASE_ADDRESS + (uint32_t)__offset))
 
 #define ROM_APITBL_BASE                         ((unsigned int *)0x00000180UL)
 
@@ -72,24 +78,12 @@ vsf_flash_t vsf_flash0 = {
     .info = {
         .flash_size = 0,
     },
-    .status_bool = {
-        .is_enable = 0,
-    },
+    .is_enabled = 0,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-
-INLINE static int __check(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint_fast32_t size)
-{
-    if (    (offset + size > flash_ptr->info.flash_size)
-        ||  (0 != (offset % VSF_AIC8800_FLASH_ALIGNMENT_SIZE))
-        ||  (0 != (flash_ptr->info.flash_size % VSF_AIC8800_FLASH_ALIGNMENT_SIZE))  ) {
-        return 0;
-    }
-    return 1;
-}
 
 vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, flash_cfg_t *cfg_ptr)
 {
@@ -103,13 +97,13 @@ vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, flash_cfg_t *cfg_ptr)
 
 vsf_err_t vsf_flash_enable(vsf_flash_t *flash_ptr)
 {
-    flash_ptr->status_bool.is_enable = 1;
+    flash_ptr->is_enabled = 1;
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_flash_disable(vsf_flash_t *flash_ptr)
 {
-    flash_ptr->status_bool.is_enable = 0;
+    flash_ptr->is_enabled = 0;
     return VSF_ERR_NONE;
 }
 
@@ -118,13 +112,14 @@ vsf_err_t vsf_flash_erase(  vsf_flash_t *flash_ptr,
                             uint_fast32_t size)
 {
     uint_fast32_t ret;
-    if (!flash_ptr->status_bool.is_enable) {
+    if (!flash_ptr->is_enabled) {
         return VSF_ERR_NOT_READY;
     }
-    if (!__check(flash_ptr, offset, size)) {
-        return VSF_ERR_NOT_ACCESSABLE;
-    }
     if (offset + size > flash_ptr->info.flash_size) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    if (    (0 != (offset % VSF_AIC8800_FLASH_ALIGNMENT_ERASE_SIZE))
+        ||  (0 != (size % VSF_AIC8800_FLASH_ALIGNMENT_ERASE_SIZE))  ) {
         return VSF_ERR_INVALID_PARAMETER;
     }
 
@@ -148,13 +143,13 @@ vsf_err_t vsf_flash_write(  vsf_flash_t *flash_ptr,
                             uint_fast32_t size)
 {
     uint_fast32_t ret;
-    if (!flash_ptr->status_bool.is_enable) {
+    if (!flash_ptr->is_enabled) {
         return VSF_ERR_NOT_READY;
     }
-    if (!__check(flash_ptr, offset, size)) {
-        return VSF_ERR_NOT_ACCESSABLE;
-    }
     if (offset + size > flash_ptr->info.flash_size) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    if (0 != (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE)) {
         return VSF_ERR_INVALID_PARAMETER;
     }
 
@@ -178,11 +173,12 @@ vsf_err_t vsf_flash_read(   vsf_flash_t *flash_ptr,
                             uint_fast32_t size)
 {
     uint_fast32_t ret;
-    if (!flash_ptr->status_bool.is_enable) {
+    VSF_HAL_ASSERT((NULL != flash_ptr) && (NULL != buffer));
+    if (!flash_ptr->is_enabled) {
         return VSF_ERR_NOT_READY;
     }
-    if (!__check(flash_ptr, offset, size)) {
-        return VSF_ERR_NOT_ACCESSABLE;
+    if (offset + size > flash_ptr->info.flash_size) {
+        return VSF_ERR_INVALID_PARAMETER;
     }
 
     vsf_protect_t org = __aic8800_flash_protect();

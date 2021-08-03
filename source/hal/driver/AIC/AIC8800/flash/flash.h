@@ -39,10 +39,7 @@ typedef struct aic8800_flash_info_t {
 struct vsf_flash_t {
     flash_cfg_t             cfg;
     aic8800_flash_info_t    info;
-    struct {
-        uint32_t            is_enable       : 1;
-        uint32_t                            : 31;
-    } status_bool;
+    bool                    is_enabled;
 };
 
 /*============================ INCLUDES ======================================*/
