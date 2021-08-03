@@ -22,6 +22,7 @@ extern "C" {
 #define memalign            VSF_LINUX_LIBC_WRAPPER(memalign)
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
+#define system              VSF_LINUX_LIBC_WRAPPER(system)
 #endif
 
 void * malloc(size_t size);

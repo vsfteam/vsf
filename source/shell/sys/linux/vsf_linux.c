@@ -681,12 +681,6 @@ int execl(const char *pathname, const char *arg, ...)
     return 0;
 }
 
-int system(const char * cmd)
-{
-    VSF_LINUX_ASSERT(false);
-    return 0;
-}
-
 long sysconf(int name)
 {
     switch (name) {
@@ -869,14 +863,22 @@ pid_t waitpid(pid_t pid, int *status, int options)
         VSF_LINUX_ASSERT(false);
         return -1;
     }
+    if (options != 0) {
+        VSF_LINUX_ASSERT(false);
+        return -1;
+    }
 
     vsf_linux_process_t *process = vsf_linux_get_process(pid);
     if (NULL == process) {
         return -1;
     }
 
-    process->thread_pending = vsf_linux_get_cur_thread();
+    vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
+    process->thread_pending = cur_thread;
     vsf_thread_wfe(VSF_EVT_USER);
+    if (status != NULL) {
+        *status = cur_thread->retval << 8;
+    }
     return pid;
 }
 

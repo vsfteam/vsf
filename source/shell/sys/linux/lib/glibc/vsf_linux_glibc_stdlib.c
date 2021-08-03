@@ -97,6 +97,19 @@ int atexit(void (*func)(void))
     return 0;
 }
 
+int system(const char * cmd)
+{
+    char *cmd_in_ram = strdup(cmd);
+    if (NULL == cmd_in_ram) {
+        return -1;
+    }
+
+    extern int __vsh_run_cmd(char *cmd);
+    int result = __vsh_run_cmd(cmd_in_ram);
+    free(cmd_in_ram);
+    return result;
+}
+
 char * itoa(int num, char *str, int radix)
 {
     char index[] = "0123456789ABCDEF";

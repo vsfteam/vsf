@@ -163,9 +163,9 @@ void vsh_set_path(char **path)
     __vsh_path = path;
 }
 
-static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
+int __vsh_run_cmd(char *cmd)
 {
-    char pathname[PATH_MAX], *cur = cmd_ctx->cmd;
+    char pathname[PATH_MAX], *cur = cmd;
     int exefd = -1, err;
     char **path = __vsh_path;
     vsf_linux_main_entry_t entry;
@@ -174,9 +174,9 @@ static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
     while ((*cur != '\0') && isspace((int)*cur)) { *cur++ = '\0'; }
 
     // search in path first if not absolute path
-    if (cmd_ctx->cmd[0] != '/') {
+    if (cmd[0] != '/') {
         while (*path != NULL) {
-            if (!vsf_linux_generate_path(pathname, sizeof(pathname), *path, (char *)cmd_ctx->cmd)) {
+            if (!vsf_linux_generate_path(pathname, sizeof(pathname), *path, cmd)) {
                 exefd = vsf_linux_fs_get_executable(pathname, &entry);
                 if (exefd >= 0) {
                     break;
@@ -188,9 +188,9 @@ static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
 
     // search in working_dir if not found in path
     if (exefd < 0) {
-        exefd = vsf_linux_fs_get_executable((char *)cmd_ctx->cmd, &entry);
+        exefd = vsf_linux_fs_get_executable(cmd, &entry);
         if (exefd < 0) {
-            printf("%s not found" VSH_LINEEND, cmd_ctx->cmd);
+            printf("%s not found" VSH_LINEEND, cmd);
             err = -ENOENT;
             return err;
         }
@@ -201,7 +201,7 @@ static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
 
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     ctx->entry = entry;
-    ctx->arg.argv[ctx->arg.argc++] = cmd_ctx->cmd;
+    ctx->arg.argv[ctx->arg.argc++] = cmd;
     while ((*cur != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
         ctx->arg.argv[ctx->arg.argc++] = cur;
         while ((*cur != '\0') && !isspace((int)*cur)) { cur++; }
@@ -210,9 +210,10 @@ static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
     vsf_linux_start_process(process);
-    waitpid(process->id.pid, NULL, 0);
+    int result;
+    waitpid(process->id.pid, &result, 0);
     close(exefd);
-    return 0;
+    return result;
 }
 
 #if __IS_COMPILER_IAR__
@@ -239,7 +240,7 @@ int vsh_main(int argc, char *argv[])
         }
 
         strcpy(ctx.cmd, argv[2]);
-        return __vsh_run_cmd(&ctx);
+        return __vsh_run_cmd(ctx.cmd);
     }
 
     while (1) {
@@ -297,7 +298,7 @@ int vsh_main(int argc, char *argv[])
                         }
                         ctx.history.cur_disp_entry = ctx.history.cur_save_entry;
 #endif
-                        if (__vsh_run_cmd(&ctx) < 0) {
+                        if (__vsh_run_cmd(ctx.cmd) < 0) {
                             printf("fail to execute %s" VSH_LINEEND, ctx.cmd);
                         }
                     }
