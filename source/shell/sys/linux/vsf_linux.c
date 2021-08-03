@@ -597,6 +597,7 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         vsf_unprotect_sched(orig);
 
         if (process->thread_pending != NULL) {
+            process->thread_pending->retval = thread->retval;
             vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
         }
         if (process->working_dir != NULL) {
