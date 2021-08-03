@@ -142,11 +142,11 @@ static int __wifi_connect_main(int argc, char *argv[])
     wlan_connected = 0 == ret ? 1 : 0;
     if (wlan_connected) {
         printf("wifi connected.\r\n");
+        return 0;
     } else {
         printf("fail to connect %s.\r\n", argv[1]);
+        return -1;
     }
-
-    return 0;
 }
 
 int fhost_application_init(void)
