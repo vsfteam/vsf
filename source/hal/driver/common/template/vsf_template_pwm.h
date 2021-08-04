@@ -60,6 +60,8 @@ end_def_interface(i_pwm_t)
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_pwm_init(vsf_pwm_t *pwm_ptr, pwm_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_pwm_enable(vsf_flash_t *pwm_ptr);
+extern vsf_err_t vsf_pwm_disable(vsf_flash_t *pwm_ptr);
 
 /**
  *  Set the period width and pluse width for a channel
@@ -74,6 +76,42 @@ extern vsf_err_t vsf_pwm_set(vsf_pwm_t *pwm_ptr,
                              uint32_t   pulse);
 
 /**
+ *  Set the period width(ms) and pluse width(ms) for a channel
+ *
+ * @param[in] pwm_ptr pwm instance
+ * @param[in] period pwm period width (in milli-second)
+ * @param[in] pulse pwm pluse width (in milli-second)
+ */
+extern vsf_err_t vsf_pwm_set_ms(vsf_pwm_t *pwm_ptr,
+                                uint8_t    channel,
+                                uint32_t   period,
+                                uint32_t   pulse);
+
+/**
+ *  Set the period width(us) and pluse width(us) for a channel
+ *
+ * @param[in] pwm_ptr pwm instance
+ * @param[in] period pwm period width (in micro-seconds)
+ * @param[in] pulse pwm pluse width (in micro-seconds)
+ */
+extern vsf_err_t vsf_pwm_set_us(vsf_pwm_t *pwm_ptr,
+                                uint8_t    channel,
+                                uint32_t   period,
+                                uint32_t   pulse);
+
+/**
+ *  Set the period width(ns) and pluse width(ns) for a channel
+ *
+ * @param[in] pwm_ptr pwm instance
+ * @param[in] period pwm period width (in nano second)
+ * @param[in] pulse pwm pluse width (in nano second)
+ */
+extern vsf_err_t vsf_pwm_set_ns(vsf_pwm_t *pwm_ptr,
+                                uint8_t    channel,
+                                uint32_t   period,
+                                uint32_t   pulse);
+
+/**
  * Get cycles per second
  *
  * @param[in] pwm_ptr pwm instance
@@ -82,7 +120,7 @@ extern vsf_err_t vsf_pwm_set(vsf_pwm_t *pwm_ptr,
 extern uint32_t vsf_pwm_get_cycles_per_sec(vsf_pwm_t *pwm_ptr);
 
 /**
- *  TODO: API for query 
+ *  TODO: API for query pwm channels
  */
 
 #ifdef __cplusplus
