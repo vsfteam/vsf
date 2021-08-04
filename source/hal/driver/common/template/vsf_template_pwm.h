@@ -35,8 +35,7 @@ extern "C" {
 //! @{
 typedef struct pwm_cfg_t pwm_cfg_t;
 struct pwm_cfg_t {
-    //! The minimum clock cycles per second required by user
-    uint32_t mini_cycles_per_sec;
+    uint32_t mini_clock_freq;    //!< The minimum clock frequency, in Hz
 };
 //! @}
 
@@ -60,15 +59,15 @@ end_def_interface(i_pwm_t)
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_pwm_init(vsf_pwm_t *pwm_ptr, pwm_cfg_t *cfg_ptr);
-extern vsf_err_t vsf_pwm_enable(vsf_flash_t *pwm_ptr);
-extern vsf_err_t vsf_pwm_disable(vsf_flash_t *pwm_ptr);
+extern fsm_rt_t vsf_pwm_enable(vsf_pwm_t *pwm_ptr);
+extern fsm_rt_t vsf_pwm_disable(vsf_pwm_t *pwm_ptr);
 
 /**
  *  Set the period width and pluse width for a channel
  *
  * @param[in] pwm_ptr pwm instance
- * @param[in] period pwm period width (in clock cycles)
- * @param[in] pulse pwm pluse width (in clock cycles)
+ * @param[in] period pwm period width (in clock counter)
+ * @param[in] pulse pwm pluse width (in clock counter)
  */
 extern vsf_err_t vsf_pwm_set(vsf_pwm_t *pwm_ptr,
                              uint8_t    channel,
@@ -112,15 +111,15 @@ extern vsf_err_t vsf_pwm_set_ns(vsf_pwm_t *pwm_ptr,
                                 uint32_t   pulse);
 
 /**
- * Get cycles per second
+ * Get clock frequency
  *
  * @param[in] pwm_ptr pwm instance
- * @return cycles per second
+ * @return clock frequency (in Hz)
  */
-extern uint32_t vsf_pwm_get_cycles_per_sec(vsf_pwm_t *pwm_ptr);
+extern uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr);
 
 /**
- *  TODO: API for query pwm channels
+ *  TODO: API for query number of pwm channels
  */
 
 #ifdef __cplusplus
