@@ -81,8 +81,8 @@ end_def_interface(i_flash_t)
 
 extern vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, flash_cfg_t *cfg_ptr);
 
-extern vsf_err_t vsf_flash_enable(vsf_flash_t *flash_ptr);
-extern vsf_err_t vsf_flash_disable(vsf_flash_t *flash_ptr);
+extern fsm_rt_t vsf_flash_enable(vsf_flash_t *flash_ptr);
+extern fsm_rt_t vsf_flash_disable(vsf_flash_t *flash_ptr);
 
 /**
  * flash erase a continuous range
