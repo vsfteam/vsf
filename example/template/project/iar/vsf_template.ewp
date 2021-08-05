@@ -7948,13 +7948,7 @@
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netbuf.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netdb.c</name>
-                                </file>
-                                <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netifapi.c</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\api\sockets.c</name>
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\api\tcpip.c</name>
