@@ -163,6 +163,10 @@ extern "C" {
 #   define VSF_HAL_USE_FLASH            ENABLED
 #endif
 
+#ifndef VSF_HAL_USE_PWM
+#   define VSF_HAL_USE_PWM              ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

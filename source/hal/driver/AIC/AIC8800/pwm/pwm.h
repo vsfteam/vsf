@@ -11,43 +11,47 @@
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
  *  See the License for the specific language governing permissions and      *
- *  limitations under the License.                                           *
+ *  limitations under the License.                                           *x
  *                                                                           *
  ****************************************************************************/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-
-#   include "__device.h"
-
-#else
-
-#   ifndef __HAL_DRIVER_AIC_AIC8800_H__
-#       define __HAL_DRIVER_AIC_AIC8800_H__
+#ifndef __HAL_DRIVER_AIC8800_PWM_H__
+#define __HAL_DRIVER_AIC8800_PWM_H__
 
 /*============================ INCLUDES ======================================*/
 
-#       include "hal/vsf_hal_cfg.h"
-#       include "./device.h"
-
-#       include "system.h"
-
-#       include "hal/driver/common/swi/vsf_swi_template.h"
-#       include "./usb/usb.h"
-#       include "./debug_uart/debug_uart.h"
-#       include "./spi/spi.h"
-#       include "./uart/uart.h"
-#       include "./gpio/gpio.h"
-#       include "./adc/adc.h"
-#       include "./flash/flash.h"
-#       include "./pwm/pwm.h"
+#include "hal/vsf_hal_cfg.h"
+#if VSF_HAL_USE_PWM == ENABLED
+#include "../__device.h"
+#include "./i_reg_pwm.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HAL_PWM_IMP_TIME_SETTING
+#   define VSF_HAL_PWM_IMP_TIME_SETTING                 ENABLED
+#endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/template/vsf_template_pwm.h"
+
+/*============================ TYPES =========================================*/
+
+struct vsf_pwm_t {
+    PWM_REG_T           *PARAM;
+    pwm_cfg_t           cfg;
+    bool                is_enabled;
+};
+
+/*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern vsf_pwm_t vsf_pwm0;
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
-#   endif   // __HAL_DRIVER_AIC_AIC8800_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-/* EOF */
+#endif /* VSF_HAL_USE_PWM */
+#endif /* EOF */
