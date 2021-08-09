@@ -75,11 +75,20 @@ typedef struct vsf_gpio_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 /**
- ** port definition:
- **     High 16 bits is port B
- **     Low 16 bits is port A
- **/
+ \~english
+    GPIOA instance
+ \~chinese
+    GPIOA 实例
+ */
 extern vsf_gpio_t vsf_gpio0;
+
+/**
+ \~english
+    GPIOB instance
+ \~chinese
+    GPIOB 实例
+ */
+extern vsf_gpio_t vsf_gpio1;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

@@ -63,7 +63,7 @@
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
 
-#define GPIO_COUNT                  1
+#define GPIO_COUNT                  2
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
