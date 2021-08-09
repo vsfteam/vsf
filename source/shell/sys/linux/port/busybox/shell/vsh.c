@@ -80,7 +80,6 @@ typedef enum vsh_shell_state_t {
 } vsh_shell_state_t;
 
 static char **__vsh_path;
-vsf_linux_process_t *__vsh_process;
 
 #if VSH_HISTORY_NUM > 0
 static void __vsh_history_apply(vsh_cmd_ctx_t *ctx, uint8_t history_entry)
@@ -200,6 +199,8 @@ int __vsh_run_cmd(char *cmd)
     if (NULL == process) { return -ENOMEM; }
 
     vsf_linux_process_ctx_t *ctx = &process->ctx;
+    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    process->shell_process = cur_process->shell_process;
     ctx->entry = entry;
     ctx->arg.argv[ctx->arg.argc++] = cmd;
     while ((*cur != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
@@ -227,7 +228,6 @@ int vsh_main(int argc, char *argv[])
     char ch;
     vsh_shell_state_t state;
 
-    __vsh_process = vsf_linux_get_cur_process();
 
 #if VSH_HAS_COLOR
     printf(VSH_COLOR_NORMAL);
@@ -357,7 +357,8 @@ int cd_main(int argc, char *argv[])
     }
     closedir(dir);
 
-    if (vsf_linux_chdir(__vsh_process, argv[1])) {
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (vsf_linux_chdir(process->shell_process, argv[1])) {
         goto cd_main_dir_not_exists;
     }
     return 0;

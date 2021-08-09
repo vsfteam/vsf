@@ -441,6 +441,7 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
     vsf_linux_process_t *process = calloc(1, sizeof(vsf_linux_process_t));
     if (process != NULL) {
         process->prio = vsf_prio_inherit;
+        process->shell_process = process;
 
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {

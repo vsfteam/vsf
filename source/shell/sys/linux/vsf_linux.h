@@ -134,6 +134,7 @@ vsf_class(vsf_linux_process_t) {
     )
 
     protected_member(
+        vsf_linux_process_t *shell_process;
         struct {
             pid_t pid;
             pid_t ppid;

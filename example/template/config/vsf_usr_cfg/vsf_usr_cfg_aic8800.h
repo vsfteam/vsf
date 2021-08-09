@@ -189,6 +189,7 @@
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #   define VSF_LINUX_USE_SOCKET                         ENABLED
 #   define VSF_LINUX_USE_DEVFS                          ENABLED
+#       define VSF_LINUX_DEVFS_USE_RAND                 ENABLED
 
 #   if APP_USE_CPP_DEMO != ENABLED
 // simple_libc does not compatible with cpp, so if cpp is used, DO NOT use simple_libc
