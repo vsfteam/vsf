@@ -462,17 +462,26 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
     return process;
 }
 
-vsf_linux_process_t * vsf_linux_create_process(int stack_size)
+vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_stream_t *stdio_stream, char *working_dir)
 {
+    VSF_LINUX_ASSERT(stdio_stream != NULL);
+    VSF_LINUX_ASSERT(working_dir != NULL);
+
     vsf_linux_process_t *process = __vsf_linux_create_process(stack_size);
     if (process != NULL) {
-        vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();
-        VSF_LINUX_ASSERT(parent_process != NULL);
-        process->working_dir = strdup(parent_process->working_dir);
-        process->stdio_stream = parent_process->stdio_stream;
+        process->working_dir = strdup(working_dir);
+        process->stdio_stream = *stdio_stream;
         VSF_LINUX_ASSERT(process->working_dir != NULL);
     }
     return process;
+}
+
+vsf_linux_process_t * vsf_linux_create_process(int stack_size)
+{
+    vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(parent_process != NULL);
+
+    return vsf_linux_create_process_ex(stack_size, &parent_process->stdio_stream, parent_process->working_dir);
 }
 
 int vsf_linux_start_process(vsf_linux_process_t *process)

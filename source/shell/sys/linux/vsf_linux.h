@@ -141,13 +141,14 @@ vsf_class(vsf_linux_process_t) {
     )
 
     private_member(
+        vsf_linux_stdio_stream_t stdio_stream;
+        char *working_dir;
+
         vsf_dlist_node_t process_node;
         vsf_dlist_t thread_list;
         vsf_dlist_t fd_list;
         int cur_fd;
         vsf_linux_thread_t *thread_pending;
-        vsf_linux_stdio_stream_t stdio_stream;
-        char *working_dir;
 
         struct {
             sigset_t pending;
@@ -225,6 +226,7 @@ extern int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry);
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
+extern vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_stream_t *stdio_stream, char *working_dir);
 extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
 
