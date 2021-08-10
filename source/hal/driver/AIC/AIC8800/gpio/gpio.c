@@ -163,7 +163,6 @@ uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr)
     } else {
         VSF_HAL_ASSERT(false);
     }
-    vsf_trace(VSF_TRACE_WARNING, "readed: %d\n", temp_ret);
     return temp_ret;
 }
 
