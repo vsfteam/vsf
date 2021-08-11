@@ -888,9 +888,6 @@ static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr,
         event.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t *)top_ptr;
     }
 
-    //! send message
-    __vk_tgui_send_dfs_msg(this.msg_tree_ptr, (const vsf_msgt_node_t *)top_ptr, evt_ptr);
-
     //! remove reference to tGUI obj
     do {
         top_ptr->gui_ptr = NULL;
@@ -898,6 +895,11 @@ static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr,
             this.root_node_ptr = NULL;
         }
     } while(0);
+
+    //! send message
+    __vk_tgui_send_dfs_msg(this.msg_tree_ptr, (const vsf_msgt_node_t *)top_ptr, evt_ptr);
+
+    
 }
 
 

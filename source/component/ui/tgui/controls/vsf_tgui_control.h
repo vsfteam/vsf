@@ -140,7 +140,7 @@
                         __PREVIOUS,                                             \
                         __NEXT,                                                 \
                         ...)                                                    \
-            .__NAME = (__TYPE) {                                                \
+            .__NAME = (const __TYPE) {                                          \
                 .parent_ptr = (vsf_msgt_container_t *)                          \
                                 &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
                 .id = (__ID),                                                   \
@@ -157,7 +157,7 @@
                                         __ID,                                   \
                                         __TYPE,                                 \
                                         ...)                                    \
-            __VAR = (__TYPE) {                                                  \
+            __VAR = (const __TYPE) {                                            \
                 .id = (__ID),                                                   \
                 __tgui_name_string_tag(__VAR, __TYPE)                           \
                 .bIsEnabled = true,                                             \
