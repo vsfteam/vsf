@@ -247,20 +247,12 @@ typedef enum {
                                 | VSF_TGUI_ALIGN_BOTTOM,
 
     VSF_TGUI_ALIGN_MID_TOP      = VSF_TGUI_ALIGN_TOP,
-                                //| VSF_TGUI_ALIGN_LEFT
-                                //| VSF_TGUI_ALIGN_RIGHT,
                                 
     VSF_TGUI_ALIGN_MID_BOTTOM   = VSF_TGUI_ALIGN_BOTTOM,
-                                //| VSF_TGUI_ALIGN_LEFT
-                                //| VSF_TGUI_ALIGN_RIGHT,
 
     VSF_TGUI_ALIGN_MID_LEFT     = VSF_TGUI_ALIGN_LEFT,
-                                //| VSF_TGUI_ALIGN_TOP
-                                //| VSF_TGUI_ALIGN_BOTTOM,
 
     VSF_TGUI_ALIGN_MID_RIGHT    = VSF_TGUI_ALIGN_RIGHT,
-                                //| VSF_TGUI_ALIGN_TOP
-                                //| VSF_TGUI_ALIGN_BOTTOM,
 
     VSF_TGUI_ALIGN_TOP_LEFT     = VSF_TGUI_ALIGN_LEFT
                                 | VSF_TGUI_ALIGN_TOP,
