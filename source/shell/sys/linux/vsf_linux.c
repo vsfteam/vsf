@@ -594,14 +594,14 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     }
 
     vsf_linux_process_t *process = thread->process;
-    vsf_linux_thread_t *thread_main;
-    vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread_main);
+    bool is_to_free_process;
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
+        is_to_free_process = vsf_dlist_is_empty(&process->thread_list);
     vsf_unprotect_sched(orig);
     vsf_heap_free(thread);
 
-    if (thread == thread_main) {
+    if (is_to_free_process) {
         vsf_protect_t orig = vsf_protect_sched();
             vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
         vsf_unprotect_sched(orig);
