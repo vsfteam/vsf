@@ -148,14 +148,14 @@ popup_t * popup_init(popup_t * ptPanel, vsf_tgui_t *gui_ptr)
 
             tgui_msgmap(tPopupMSGMap),
 
-            tgui_label(tInformation, ((popup_t *)0), tInformation, tOK,
+            tgui_label(tInformation, tgui_null_parent(popup_t), tInformation, tOK,
                 tgui_text(tLabel, "This is a popup messsage. \nPlease click the OK button to close", false, VSF_TGUI_ALIGN_MID_LEFT),
                 tgui_region(0,56,400, 80),
                 tgui_sv_tile_show_corner(false),
                 tgui_sv_font_color(VSF_TGUI_COLOR_BLACK),
             ),
 
-            tgui_button(tOK, ((popup_t *)0), tInformation, tOK,
+            tgui_button(tOK, tgui_null_parent(popup_t), tInformation, tOK,
                 tgui_location(170,140),
 
                 tgui_text(tLabel, "OK", true),
@@ -191,7 +191,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 
             tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_VERTICAL),
 
-            tgui_container(tLeftContainer, ((stopwatch_t *)0), tLeftContainer, tRightPanel,
+            tgui_container(tLeftContainer, tgui_null_parent(stopwatch_t), tLeftContainer, tRightPanel,
 
                 tgui_size(300, 0),
                 tgui_margin(0, 48, 0, 0),
@@ -199,7 +199,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 
                 tgui_contains(
             
-                    tgui_label(tTime, &(((stopwatch_t *)0)->tLeftContainer), tTime, tSetting,
+                    tgui_label(tTime, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tTime, tSetting,
                         tgui_size(228, 32),
                         tgui_margin(0, 0, 0, 4),
                         tgui_text(tLabel, "", false),
@@ -207,7 +207,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                         tgui_background((vsf_tgui_tile_t*)&ic_settings_phone_RGBA, VSF_TGUI_ALIGN_LEFT),
                     ),
 
-                    tgui_button(tSetting, &(((stopwatch_t *)0)->tLeftContainer), tTime, tStartStop,
+                    tgui_button(tSetting, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tTime, tStartStop,
                         tgui_size(32, 32),
                         tgui_margin(8, 0, 0, 4),
                         tgui_background((vsf_tgui_tile_t*)&ic_build_black_18dp_RGBA, VSF_TGUI_ALIGN_CENTER),
@@ -215,7 +215,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                         tgui_msgmap(tSettingMSGMap),
                     ),
 
-                    tgui_button(tStartStop, &(((stopwatch_t *)0)->tLeftContainer), tSetting, tLap,
+                    tgui_button(tStartStop, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tSetting, tLap,
                         tgui_location(0, 32),
                         tgui_margin(0, 4, 4, 4),
                         tgui_text(tLabel, "START", true),
@@ -224,14 +224,14 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                         tgui_msgmap( tStartStopMSGMap),
                     ),
 
-                    tgui_button(tLap, &(((stopwatch_t *)0)->tLeftContainer), tStartStop, tLap,
+                    tgui_button(tLap, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tStartStop, tLap,
                         tgui_size( 64, 32),
                         tgui_margin(104, 4, 0, 4),
                         tgui_text(tLabel, "LAP", false),
                         tgui_msgmap(tLapMSGMap),
                     ),
                 #if 0
-                    tgui_container(tContainerA, &(((stopwatch_t *)0)->tLeftContainer), tLap, tContainerA,
+                    tgui_container(tContainerA, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tLap, tContainerA,
 
                         tgui_margin(0, 4, 0, 0),
 
@@ -243,7 +243,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                         tgui_contains(
 
         #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-                            tgui_text_list(tNumberList, &(((stopwatch_t *)0)->tLeftContainer.tContainerA), tNumberList, tVContainer,
+                            tgui_text_list(tNumberList, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA), tNumberList, tVContainer,
                                 tgui_size(100, 100),
                                 tgui_margin(0, 0, 8, 0),
                             #if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABELD
@@ -267,11 +267,11 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                             ),
 
         #   if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-                            tgui_list(tVContainer, &(((stopwatch_t *)0)->tLeftContainer.tContainerA), tNumberList, tVContainer,
+                            tgui_list(tVContainer, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA), tNumberList, tVContainer,
         #   endif
         #else
         #   if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-                            tgui_list(tVContainer, &(((stopwatch_t *)0)->tLeftContainer.tContainerA), tVContainer, tVContainer,
+                            tgui_list(tVContainer, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA), tVContainer, tVContainer,
         #   endif
         #endif
         #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
@@ -284,20 +284,20 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                                 tgui_list_items(
                                     tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL),
 
-                                    tgui_button(tButton1, &(((stopwatch_t *)0)->tLeftContainer.tContainerA.tVContainer.list), tButton1, tButton2,
+                                    tgui_button(tButton1, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tButton1, tButton2,
                                         tgui_size(150, 32),
                                         tgui_text(tLabel, "tButton1", false),
                                         tgui_sv_font_color(VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
                                            tgui_margin(0, 2, 0, 2),
                                     ),
 
-                                    tgui_button(tButton2,&(((stopwatch_t *)0)->tLeftContainer.tContainerA.tVContainer.list), tButton1, tHContainer,
+                                    tgui_button(tButton2,&(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tButton1, tHContainer,
                                         tgui_size(150, 32),
                                         tgui_text(tLabel, "tButton2", false),
                                         tgui_margin(0, 2, 0, 2),
                                     ),
 
-                                    tgui_list(tHContainer, &(((stopwatch_t *)0)->tLeftContainer.tContainerA.tVContainer.list), tButton2, tHistory,
+                                    tgui_list(tHContainer, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tButton2, tHistory,
                                         tgui_size(150, 32),
                                         tgui_margin(0, 2, 0, 2),
                                     #if VSF_TGUI_CFG_LIST_SUPPORT_SLIDE == ENABELD
@@ -309,17 +309,17 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                                         tgui_list_items(
                                             tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL),
 
-                                            tgui_button(tButtonA, &(((stopwatch_t *)0)->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonA, tButtonB,
+                                            tgui_button(tButtonA, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonA, tButtonB,
                                                 tgui_size(80, 32),
                                                 tgui_text(tLabel, "A", false),
                                                 tgui_margin(2, 0, 2, 0),
                                             ),
-                                            tgui_button(tButtonB, &(((stopwatch_t *)0)->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonA, tButtonC,
+                                            tgui_button(tButtonB, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonA, tButtonC,
                                                 tgui_size(80, 32),
                                                 tgui_text(tLabel, "B", false),
                                                 tgui_margin(2, 0, 2, 0),
                                             ),
-                                            tgui_button(tButtonC, &(((stopwatch_t *)0)->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonB, tButtonC,
+                                            tgui_button(tButtonC, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonB, tButtonC,
                                                 tgui_size(80, 32),
                                                 tgui_text(tLabel, "C", false),
                                                 tgui_margin(2, 0, 2, 0),
@@ -327,7 +327,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                                         )
                                     ),
 
-                                    tgui_label(tHistory, &(((stopwatch_t *)0)->tLeftContainer.tContainerA.tVContainer.list), tHContainer, tHistory,
+                                    tgui_label(tHistory, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tHContainer, tHistory,
                                         tgui_text(tLabel, "tHistory\n1234\nABCDEF", false),
                                         tgui_size(150, 128),
                                         tgui_sv_tile_show_corner(false),
@@ -340,14 +340,14 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 
                             ),
         #else
-                            tgui_button(tButton1, &(((stopwatch_t *)0)->tContainerA), tButton1, tButton2,
+                            tgui_button(tButton1, &(tgui_null_parent(stopwatch_t)->tContainerA), tButton1, tButton2,
                                 tgui_size(150, 32),
                                 tgui_text(tLabel, "tButton1", false),
                                 tgui_attribute(tFontColor, VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
                                 tgui_margin(0, 2, 0, 2),
                             ),
 
-                            tgui_button(tButton2, &(((stopwatch_t *)0)->tContainerA), tButton1, tHistory,
+                            tgui_button(tButton2, &(tgui_null_parent(stopwatch_t)->tContainerA), tButton1, tHistory,
 
                             #if VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER != ENABLED
                                 tgui_location(50, 42),
@@ -357,7 +357,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                                 tgui_margin(0, 2, 0, 2),
                             ),
 
-                            tgui_label(tHistory, &(((stopwatch_t *)0)->tContainerA), tButton2, tHistory,
+                            tgui_label(tHistory, &(tgui_null_parent(stopwatch_t)->tContainerA), tButton2, tHistory,
                             #if VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER != ENABLED
                                 tgui_location(100, 84),
                             #endif
@@ -376,7 +376,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 
             ),
 
-            tgui_panel(tRightPanel, ((stopwatch_t *)0), tLeftContainer, tRightPanel,
+            tgui_panel(tRightPanel, tgui_null_parent(stopwatch_t), tLeftContainer, tRightPanel,
                 tgui_size(140, 0),
                 tgui_padding(10,10,10,10),
                 tgui_margin(0, 48, 0, 0),
@@ -389,7 +389,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 
 
 #define __key(__num, __pre, __next, ...)                                                    \
-            tgui_button(tKey[__num], &(((stopwatch_t *)0)->tRightPanel), tKey[__pre], tKey[__next],    \
+            tgui_button(tKey[__num], &(tgui_null_parent(stopwatch_t)->tRightPanel), tKey[__pre], tKey[__next],    \
                 tgui_size(32, 32),                                                          \
                 tgui_margin(4, 4, 4, 4),                                                    \
                 tgui_text(tLabel, #__num, false),                                           \

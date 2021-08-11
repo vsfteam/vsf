@@ -52,6 +52,8 @@
 
 #   define tgui_contains(...)          __VA_ARGS__
 
+#   define tgui_null_parent(__type)     ((__type *)0)
+
 #   define __tgui_attribute(__NAME, ...)  .__NAME = __VA_ARGS__
 #   define tgui_attribute(__NAME, ...)     __tgui_attribute(__NAME, __VA_ARGS__)
 
