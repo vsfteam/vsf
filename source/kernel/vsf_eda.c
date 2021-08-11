@@ -849,6 +849,9 @@ vsf_err_t vsf_eda_start(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg_ptr)
                     &&  (uintptr_t)NULL != cfg_ptr->fn.func);
 
     pthis->fn.evthandler = cfg_ptr->fn.evthandler;
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    pthis->on_terminate = cfg_ptr->on_terminate;
+#endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     if (    cfg_ptr->target
@@ -875,11 +878,6 @@ vsf_err_t vsf_eda_start(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg_ptr)
     frame->ptr.target = cfg_ptr->target;
     frame->state.feature = cfg_ptr->feature;
 #endif
-
-#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
-    pthis->on_terminate = cfg_ptr->on_terminate;
-#endif
-
 
     __vsf_eda_init_member(pthis, cfg_ptr->priority, cfg_ptr->feature);
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
