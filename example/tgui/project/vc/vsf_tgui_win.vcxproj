@@ -421,7 +421,9 @@
     <ClCompile Include="..\..\demo\fakefat32.c" />
     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.c" />
-    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.c">
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</LanguageStandard>
+    </ClCompile>
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_demo.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_create.c" />
@@ -491,6 +493,7 @@
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <OmitFramePointers>false</OmitFramePointers>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

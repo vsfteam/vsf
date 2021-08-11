@@ -66,12 +66,15 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_tgui_t s_tTGUIDemo;
+NO_INIT vsf_tgui_t g_tTGUIDemo;
 
 #if APP_USE_TGUI_DESIGNER_DEMO == ENABLED
 static NO_INIT tgui_designer_t s_tDesigner;
 #else
-static NO_INIT stopwatch_t s_tMyStopwatch;
+NO_INIT union {
+    stopwatch_t stopwatch;
+    popup_t popup;
+} panels;
 #endif
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -79,7 +82,7 @@ static NO_INIT stopwatch_t s_tMyStopwatch;
 
 void vsf_tgui_low_level_on_ready_to_refresh(void)
 {
-    vsf_tgui_low_level_refresh_ready(&s_tTGUIDemo);
+    vsf_tgui_low_level_refresh_ready(&g_tTGUIDemo);
 }
 
 vsf_err_t tgui_demo_init(void)
@@ -103,14 +106,16 @@ vsf_err_t tgui_demo_init(void)
 #endif
     };
 
-    vsf_err_t err = vk_tgui_init(&s_tTGUIDemo, &cfg);
+    vsf_err_t err = vk_tgui_init(&g_tTGUIDemo, &cfg);
 
 #if APP_USE_TGUI_DESIGNER_DEMO == ENABLED
     tgui_designer_init(&s_tDesigner, &s_tTGUIDemo);
     vk_tgui_set_root_container(&s_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tDesigner, true);
 #else
-    my_stopwatch_init(&s_tMyStopwatch, &s_tTGUIDemo);
-    vk_tgui_set_root_container(&s_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tMyStopwatch, true);
+    //my_stopwatch_init(&g_tMyStopwatch, &g_tTGUIDemo);
+    popup_init(&panels.popup, &g_tTGUIDemo);
+
+    vk_tgui_set_root_container(&g_tTGUIDemo, (vsf_tgui_root_container_t *)&panels.popup, true);
 #endif
 
     return err;
@@ -128,11 +133,11 @@ void vsf_tgui_on_keyboard_evt(vk_keyboard_evt_t* evt)
         },
     };
 
-    vk_tgui_send_message(&s_tTGUIDemo, event);
+    vk_tgui_send_message(&g_tTGUIDemo, event);
 
     if (!vsf_input_keyboard_is_down(evt)) {
         event.tKeyEvt.msg = VSF_TGUI_EVT_KEY_PRESSED;
-        vk_tgui_send_message(&s_tTGUIDemo, event);
+        vk_tgui_send_message(&g_tTGUIDemo, event);
     }
 }
 
@@ -141,7 +146,7 @@ void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
 {
     //! this block of code is used for test purpose only
     vsf_err_t result =
-        vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+        vsf_tgui_send_touch_evt(&g_tTGUIDemo,
                                 0,  /* only one finger is used for now*/
                                 (vsf_tgui_location_t) {
                                     vsf_input_touchscreen_get_x(ts_evt),
@@ -187,7 +192,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
         case VSF_INPUT_MOUSE_EVT_BUTTON: {
 
             result =
-                vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+                vsf_tgui_send_touch_evt(&g_tTGUIDemo,
                                         button_id,
                                         (vsf_tgui_location_t) {
                                             vk_input_mouse_evt_get_x(mouse_evt),
@@ -211,7 +216,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
             if (0 == __button_status) {
                 //! pure mouse move
                 result =
-                    vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+                    vsf_tgui_send_touch_evt(&g_tTGUIDemo,
                                             button_id,
                                             (vsf_tgui_location_t) {
                                                 vk_input_mouse_evt_get_x(mouse_evt),
@@ -223,7 +228,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                 if (__button_status & BIT(0)) {
                     //! simulate finger 0 move
                     result =
-                    vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+                    vsf_tgui_send_touch_evt(&g_tTGUIDemo,
                                             0,
                                             (vsf_tgui_location_t) {
                                                 vk_input_mouse_evt_get_x(mouse_evt),
@@ -235,7 +240,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                 if (__button_status & BIT(1)) {
                     //! simulate finger 1 move
                     result =
-                    vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+                    vsf_tgui_send_touch_evt(&g_tTGUIDemo,
                                             1,
                                             (vsf_tgui_location_t) {
                                                 vk_input_mouse_evt_get_x(mouse_evt),
@@ -262,8 +267,8 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                     },
                 };
 
-                vsf_tgui_control_set_active(vsf_tgui_pointed_control_get(&s_tTGUIDemo));
-                vk_tgui_send_message(&s_tTGUIDemo, event);
+                vsf_tgui_control_set_active(vsf_tgui_pointed_control_get(&g_tTGUIDemo));
+                vk_tgui_send_message(&g_tTGUIDemo, event);
                 break;
             }
 

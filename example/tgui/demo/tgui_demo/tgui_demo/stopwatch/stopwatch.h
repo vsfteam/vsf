@@ -34,6 +34,15 @@ def_vsf_pt(tgui_demo_t,
 end_def_vsf_pt(tgui_demo_t)
 #endif
 
+declare_tgui_panel(popup_t)
+
+def_tgui_panel(popup_t,
+    tgui_contains(
+        vsf_tgui_label_t     tInformation;
+        vsf_tgui_button_t    tOK;
+    ))
+end_def_tgui_panel(popup_t)
+
 declare_tgui_panel(stopwatch_t)
 
 def_tgui_panel(stopwatch_t,
@@ -104,6 +113,9 @@ end_def_tgui_panel(stopwatch_t)
 
 extern
 stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr);
+
+extern
+popup_t * popup_init(popup_t * ptPanel, vsf_tgui_t *gui_ptr);
 
 #endif
 #endif
