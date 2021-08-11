@@ -37,9 +37,10 @@
 
 #include "hal/driver/common/swi/arm/vsf_swi_template.inc"
 
-int __low_level_init(void)
+int vsf_hal_pre_startup_init(void)
 {
-    // avoid systick interrupt before os started while running in ram
+    // seems systick is not reset on hw reset of aic8800
+    // avoid systick interrupt before os started
     SysTick->CTRL = 0;
     return 1;
 }
