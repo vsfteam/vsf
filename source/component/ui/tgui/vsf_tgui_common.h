@@ -236,15 +236,42 @@ typedef struct vsf_tgui_region_t {
 
 
 typedef enum {
-    VSF_TGUI_ALIGN_CENTER   = 0,
-    VSF_TGUI_ALIGN_LEFT     = BIT(0),
-    VSF_TGUI_ALIGN_RIGHT    = BIT(1),
-    VSF_TGUI_ALIGN_TOP      = BIT(2),
-    VSF_TGUI_ALIGN_BOTTOM   = BIT(3),
-    VSF_TGUI_ALIGN_FILL     = VSF_TGUI_ALIGN_LEFT
-                            | VSF_TGUI_ALIGN_RIGHT
-                            | VSF_TGUI_ALIGN_TOP
-                            | VSF_TGUI_ALIGN_BOTTOM,
+    VSF_TGUI_ALIGN_CENTER       = 0,
+    VSF_TGUI_ALIGN_LEFT         = BIT(0),
+    VSF_TGUI_ALIGN_RIGHT        = BIT(1),
+    VSF_TGUI_ALIGN_TOP          = BIT(2),
+    VSF_TGUI_ALIGN_BOTTOM       = BIT(3),
+    VSF_TGUI_ALIGN_FILL         = VSF_TGUI_ALIGN_LEFT
+                                | VSF_TGUI_ALIGN_RIGHT
+                                | VSF_TGUI_ALIGN_TOP
+                                | VSF_TGUI_ALIGN_BOTTOM,
+    VSF_TGUI_ALIGN_MID_TOP      = VSF_TGUI_ALIGN_LEFT
+                                | VSF_TGUI_ALIGN_RIGHT
+                                | VSF_TGUI_ALIGN_TOP,
+    VSF_TGUI_ALIGN_MID_BOTTOM   = VSF_TGUI_ALIGN_LEFT
+                                | VSF_TGUI_ALIGN_RIGHT
+                                | VSF_TGUI_ALIGN_BOTTOM,
+
+    VSF_TGUI_ALIGN_MID_LEFT     = VSF_TGUI_ALIGN_LEFT
+                                | VSF_TGUI_ALIGN_TOP
+                                | VSF_TGUI_ALIGN_BOTTOM,
+
+    VSF_TGUI_ALIGN_MID_RIGHT    = VSF_TGUI_ALIGN_RIGHT
+                                | VSF_TGUI_ALIGN_TOP
+                                | VSF_TGUI_ALIGN_BOTTOM,
+
+    VSF_TGUI_ALIGN_TOP_LEFT     = VSF_TGUI_ALIGN_LEFT
+                                | VSF_TGUI_ALIGN_TOP,
+
+    VSF_TGUI_ALIGN_TOP_RIGHT    = VSF_TGUI_ALIGN_RIGHT
+                                | VSF_TGUI_ALIGN_TOP,
+
+    VSF_TGUI_ALIGN_BOTTOM_LEFT  = VSF_TGUI_ALIGN_LEFT
+                                | VSF_TGUI_ALIGN_BOTTOM,
+
+    VSF_TGUI_ALIGN_BOTTOM_RIGHT = VSF_TGUI_ALIGN_RIGHT
+                                | VSF_TGUI_ALIGN_BOTTOM,
+
 }vsf_tgui_align_mode_t;
 
 typedef enum {
