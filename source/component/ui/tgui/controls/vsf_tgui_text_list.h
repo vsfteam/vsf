@@ -81,33 +81,23 @@
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
                 VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT                        \
-                                                                                \
-                tgui_container( tList, &((__PARENT_ADDR)->__NAME), tList, tList,\
-                    __tgui_name_string_tag(__NAME.tList, vsf_tgui_text_list_t)  \
-                ),                                                              \
-                                                                                \
                 VSF_TGUI_V_TEXT_LIST_STATIC_INIT_DEFAULT                        \
                 __VA_ARGS__                                                     \
                 VSF_TGUI_V_TEXT_LIST_STATIC_INIT_OVERRIDE                       \
-                .tList.tContent.parent_ptr = (vsf_msgt_container_t *)           \
-                                &((__PARENT_ADDR)->__NAME.tList),               \
-                .tList.tContent.id = VSF_TGUI_COMPONENT_ID_LABEL,               \
-                .tList.tContent.Offset = {                                      \
-                    .next =  sizeof(vsf_tgui_label_t),                          \
-                },                                                              \
-                .tList.tContent                                                 \
-                    __tgui_name_string_tag(tContent, vsf_tgui_label_t)          \
-                .tList.tContent.bIsEnabled = true,                              \
-                .tList.tContent.bIsVisible = true,                              \
-                .tList.tContent.tLabel.bIsAutoSize = true,                      \
-                                                                                \
+                .tList.is_container = true,                                     \
+                .tList.node_ptr = (vsf_msgt_node_t*)                            \
+                    &((&((__PARENT_ADDR)->__NAME))->tList.tList##_FirstNode),   \
+                .tList.parent_ptr = (vsf_msgt_container_t *)                    \
+                    &(((vsf_tgui_container_t *)(&((__PARENT_ADDR)->__NAME)))->use_as__vsf_msgt_node_t),    \
+                .tList.id = (VSF_TGUI_COMPONENT_ID_CONTAINER),                  \
+                .tList                                                          \
+                    __tgui_name_string_tag(__NAME.tList, vsf_tgui_text_list_t)  \
                 .tList.is_control_transparent = true,                           \
                 .tList.bIsEnabled = true,                                       \
                 .tList.bIsVisible = true,                                       \
                 .tList.ContainerAttribute                                       \
                     .u5Type = VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL,     \
-                .tList.ContainerAttribute                                       \
-                    .bIsAutoSize = true,                                        \
+                .tList.ContainerAttribute.bIsAutoSize = true,                   \
                 .is_container = true,                                           \
                 .node_ptr =                                                     \
                     (vsf_msgt_node_t*)                                          \
@@ -127,10 +117,20 @@
                             __VA_ARGS__)
 
 #   define tgui_text_list_content(...)                                          \
-                .tList.tContent = {                                             \
+                .tList.tContent = (vsf_tgui_label_t){                           \
                     VSF_TGUI_V_LABEL_STATIC_INIT_DEFAULT                        \
+                    VSF_TGUI_V_TEXT_LIST_CONTENT_INIT_DEFAULT                   \
                     __VA_ARGS__                                                 \
                     VSF_TGUI_V_LABEL_STATIC_INIT_OVERRIDE                       \
+                    VSF_TGUI_V_TEXT_LIST_CONTENT_INIT_OVERRIDE                  \
+                     .id = VSF_TGUI_COMPONENT_ID_LABEL,                         \
+                    .Offset = {                                                 \
+                        .next =  sizeof(vsf_tgui_label_t),                      \
+                    },                                                          \
+                     __tgui_name_string_tag(tContent, vsf_tgui_label_t)         \
+                    .bIsEnabled = true,                                         \
+                    .bIsVisible = true,                                         \
+                    .tLabel.bIsAutoSize = true,                                 \
                 },
 
 /*============================ TYPES =========================================*/

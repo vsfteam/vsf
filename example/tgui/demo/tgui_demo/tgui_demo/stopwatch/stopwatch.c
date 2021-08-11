@@ -181,7 +181,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
         if (NULL == ptPanel && NULL != gui_ptr) {
             break;
         }
-
+#if 1
         describ_tgui_panel(stopwatch_t, *ptPanel,
             tgui_region( 100, 100, 0, 0),
             tgui_text(tTitle, "My Stopwatch", false),
@@ -418,7 +418,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
         #endif
 
         );
-
+#endif
         vsf_msgt_offset_tree_init((const vsf_msgt_container_t *)ptPanel);
 
         //tgui_text(ptPanel->tLeftContainer.tTime.tLabel, ptPanel->chTimeBuffer, false);

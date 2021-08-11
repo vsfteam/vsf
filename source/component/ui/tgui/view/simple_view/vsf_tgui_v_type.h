@@ -168,23 +168,31 @@
 #define VSF_TGUI_V_LIST_STATIC_INIT_OVERRIDE
 
 #if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
-#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_BACKGROUND_CLOLOR_OVERRIDE                             \
-            .tList.tContent.background_color = VSF_TGUI_COLOR_RGBA(0x00, 0x00, 0x00, 0x00),     \
+#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_BACKGROUND_CLOLOR_OVERRIDE             \
             .tList.background_color = VSF_TGUI_COLOR_RGBA(0x00, 0x00, 0x00, 0x00),
 #else
 #define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_BACKGROUND_CLOLOR_OVERRIDE
 #endif
 
 #if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
-#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_TILE_OVERRIDE                                          \
-            .tList.tContent.show_corner_tile = true,
+#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_TILE_OVERRIDE                          \
+            .show_corner_tile = true,
 #else
 #define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_TILE_OVERRIDE
 #endif
 
-#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_OVERRIDE                                               \
-            VSF_TGUI_V_TEXT_LIST_STATIC_INIT_BACKGROUND_CLOLOR_OVERRIDE                         \
+#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_OVERRIDE                               \
+            VSF_TGUI_V_TEXT_LIST_STATIC_INIT_BACKGROUND_CLOLOR_OVERRIDE         
+
+#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+#   define VSF_TGUI_V_TEXT_LIST_CONTENT_INIT_OVERRIDE                           \
+            .background_color = VSF_TGUI_COLOR_RGBA(0x00, 0x00, 0x00, 0x00),    \
             VSF_TGUI_V_TEXT_LIST_STATIC_INIT_TILE_OVERRIDE
+#else
+#   define VSF_TGUI_V_TEXT_LIST_CONTENT_INIT_OVERRIDE 
+#endif   
+
+#define VSF_TGUI_V_TEXT_LIST_CONTENT_INIT_DEFAULT
 
 #define VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE
 

@@ -585,33 +585,41 @@ void vsf_msgt_offset_tree_init(const vsf_msgt_container_t * root_ptr)
         return ;
     }
 
-    vsf_msgt_container_t *node_ptr = (vsf_msgt_container_t *)root_ptr;
-    
+    vsf_msgt_container_t *node_ptr = (vsf_msgt_node_t *)root_ptr;
+    vsf_msgt_container_t *parent_ptr = node_ptr;
+
     while(NULL != node_ptr) {
         
         //! go deep
         do {
             if (!node_ptr->Attribute._.is_container) {
                 break;
-            } else if (NULL == node_ptr->node_ptr) {
+            } else if (NULL == ((vsf_msgt_container_t *)node_ptr)->node_ptr) {
                 //! this is an empty container
                 break;
             } else {
+                //! visit node
+                if (root_ptr != (vsf_msgt_container_t *)node_ptr) {
+                    //! update parent
+                    node_ptr->parent_ptr = parent_ptr;
+                }
+
+                parent_ptr = node_ptr;
                 //! update node list pointer
-                (*(intptr_t *)&(node_ptr->node_ptr)) += (intptr_t)root_ptr;
-                node_ptr = (vsf_msgt_container_t *)node_ptr->node_ptr;
+                (*(intptr_t *)&(((vsf_msgt_container_t *)node_ptr)->node_ptr)) += (intptr_t)root_ptr;
+                node_ptr = ((vsf_msgt_container_t *)node_ptr)->node_ptr;
             }
         } while(true);
 
-visit_node:
+
         //! visit node
         if (root_ptr != node_ptr) {
             //! update parent
-            (*(intptr_t *)&(node_ptr->parent_ptr)) += (intptr_t)root_ptr;
+            node_ptr->parent_ptr = parent_ptr;
         }
 
 
-
+visit_node:
         do {
 
             const vsf_msgt_node_t* temp_ptr = NULL;
@@ -636,6 +644,8 @@ visit_node:
                     THIS_FSM_STATE = VISIT_ITEM;
                     break;
                 } */
+                parent_ptr = node_ptr->parent_ptr;
+
                 goto visit_node;
             } while(0);
 
