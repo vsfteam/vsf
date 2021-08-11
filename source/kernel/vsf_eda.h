@@ -555,7 +555,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   ifndef VSF_KERNEL_TIMEOUT_T
+#   ifndef VSF_KERNEL_TIMEOUT_TICK_T
 #       define VSF_KERNEL_TIMEOUT_TICK_T    int_fast64_t
 #   endif
 typedef VSF_KERNEL_TIMEOUT_TICK_T           vsf_timeout_tick_t;
