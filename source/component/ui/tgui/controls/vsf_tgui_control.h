@@ -122,7 +122,7 @@
                         ...)                                                    \
             .__NAME =  {                                                        \
                 .parent_ptr = (vsf_msgt_container_t *)                          \
-                                &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
+                    &(((__TYPE *)(__PARENT_ADDR))->use_as__vsf_msgt_node_t),    \
                 .id = (__ID),                                                   \
                 __tgui_node_list_init(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT)\
                 __tgui_name_string_tag(__NAME, __TYPE)                          \
@@ -157,7 +157,7 @@
                                         __ID,                                   \
                                         __TYPE,                                 \
                                         ...)                                    \
-            __VAR = (const __TYPE) {                                            \
+            static const __TYPE VSF_MACRO_SAFE_NAME(__DESCRIPTOR) = {           \
                 .id = (__ID),                                                   \
                 __tgui_name_string_tag(__VAR, __TYPE)                           \
                 .bIsEnabled = true,                                             \
@@ -165,7 +165,8 @@
                 VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
                 VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
-            }
+            };                                                                  \
+            __VAR = VSF_MACRO_SAFE_NAME(__DESCRIPTOR);
 
 #define __describe_tgui_container_base( __VAR,                                  \
                                         __ID,                                   \
@@ -179,7 +180,7 @@
                     .ContainerAttribute.bIsAutoSize = true,                     \
                     .node_ptr =                                                 \
                         (vsf_msgt_node_t*)                                      \
-                        &((__VAR).__TYPE##_FirstNode),                          \
+                        &((*(__TYPE *)0).__TYPE##_FirstNode),                   \
                     VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT                    \
                     __VA_ARGS__                                                 \
                     VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE                   \

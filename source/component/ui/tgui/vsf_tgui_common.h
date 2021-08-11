@@ -154,14 +154,22 @@
             __describe_tgui_msgmap(__NAME, __VA_ARGS__)
 
 
-#define __tgui_msgmap(...)                                                      \
+#define __tgui_handlers(...)                                                    \
                 .tMSGMap = {                                                    \
-                    .ptItems =  (const vsf_tgui_user_evt_handler []) {          \
-                                    __VA_ARGS__                                 \
-                                },                                              \
+                    .ptItems =  ((const vsf_tgui_user_evt_handler *)({          \
+                        static const vsf_tgui_user_evt_handler                  \
+                            VSF_MACRO_SAFE_NAME(MessageMap)[] = {__VA_ARGS__};  \
+                        VSF_MACRO_SAFE_NAME(MessageMap);})),                    \
                     .chCount = sizeof((const vsf_tgui_user_evt_handler []) {    \
                                     __VA_ARGS__                                 \
                                 }) / sizeof(vsf_tgui_user_evt_handler),         \
+                }
+
+
+#define __tgui_msgmap(__MSGMAP)                                                 \
+                .tMSGMap = {                                                    \
+                    .ptItems =  __MSGMAP,                                       \
+                    .chCount = dimof(__MSGMAP),                                 \
                 }
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
@@ -203,6 +211,7 @@
             }
 #endif
 
+#define tgui_handlers(...)             __tgui_handlers(__VA_ARGS__)
 
 #define tgui_msgmap(...)               __tgui_msgmap(__VA_ARGS__)
 

@@ -277,6 +277,10 @@ const vsf_msgt_node_t *vsf_msgt_backward_propagate_msg_get_last_node(
                                                             vsf_msgt_t* obj_ptr);
 
 
+SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_offset_tree_init")
+extern
+void vsf_msgt_offset_tree_init(const vsf_msgt_container_t * root_ptr);
+
 SECTION(".text.vsf.osa_service.msg_tree"
         ".vsf_msgt_forward_propagate_msg_pre_order_traversal_init")
 extern

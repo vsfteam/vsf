@@ -165,6 +165,27 @@ vsf_err_t vk_tgui_set_root_container(vsf_tgui_t* gui_ptr,
     return VSF_ERR_NOT_ENOUGH_RESOURCES;
 }
 
+vsf_err_t vk_tgui_close_root_container(vsf_tgui_t* gui_ptr)
+{
+    VSF_TGUI_ASSERT(NULL != gui_ptr);
+
+    if (NULL == gui_ptr->consumer.param.root_node_ptr) {
+        return VSF_ERR_NONE;
+    }
+
+    if (vk_tgui_send_message(gui_ptr,
+        (vsf_tgui_evt_t) {
+            .msg = VSF_TGUI_EVT_ON_DEPOSE,
+            .target_ptr = (vsf_tgui_control_t*)gui_ptr->consumer.param.root_node_ptr,
+    })) {
+        return VSF_ERR_NONE;
+    }
+
+    return VSF_ERR_NOT_ENOUGH_RESOURCES;
+}
+
+
+
 /*! \brief tgui msg queue producer */
 
 bool vk_tgui_send_message(vsf_tgui_t* gui_ptr, vsf_tgui_evt_t event)
@@ -565,7 +586,8 @@ loop_start:
                         vsf_this.root_node_ptr = NULL;
                         vsf_this.Activated.current_ptr = NULL;
                         vsf_this.Activated.previous_ptr = NULL;
-
+                        vsf_this.pointer_above.current_ptr = NULL;
+                        vsf_this.pointer_above.previous_ptr = NULL;
                         do {
                             if (NULL == vsf_this.event.use_as__vsf_tgui_msg_t.target_ptr) {
                                 break;
@@ -575,6 +597,8 @@ loop_start:
 
                             //! set new top container
                             vsf_this.Activated.current_ptr = (const vsf_tgui_control_t *)vsf_this.node_ptr;
+                            vsf_this.pointer_above.current_ptr =  (const vsf_tgui_control_t *)vsf_this.node_ptr;
+
                             vsf_this.root_node_ptr = (const vsf_tgui_root_container_t *)vsf_this.node_ptr;
                             ((vsf_tgui_root_container_t *)vsf_this.root_node_ptr)->gui_ptr = gui_ptr;
 

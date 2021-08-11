@@ -576,6 +576,74 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_pre_order_traversal(
     return fsm_rt_on_going;
 }
 
+
+SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_offset_tree_init")
+void vsf_msgt_offset_tree_init(const vsf_msgt_container_t * root_ptr)
+{
+    bool ignore_item = false;
+    if (NULL == root_ptr) {
+        return ;
+    }
+
+    vsf_msgt_container_t *node_ptr = (vsf_msgt_container_t *)root_ptr;
+    
+    while(NULL != node_ptr) {
+        
+        //! go deep
+        do {
+            if (!node_ptr->Attribute._.is_container) {
+                break;
+            } else if (NULL == node_ptr->node_ptr) {
+                //! this is an empty container
+                break;
+            } else {
+                //! update node list pointer
+                (*(intptr_t *)&(node_ptr->node_ptr)) += (intptr_t)root_ptr;
+                node_ptr = (vsf_msgt_container_t *)node_ptr->node_ptr;
+            }
+        } while(true);
+
+visit_node:
+        //! visit node
+        if (root_ptr != node_ptr) {
+            //! update parent
+            (*(intptr_t *)&(node_ptr->parent_ptr)) += (intptr_t)root_ptr;
+        }
+
+
+
+        do {
+
+            const vsf_msgt_node_t* temp_ptr = NULL;
+            if (node_ptr == root_ptr) {
+                //! visited the entry node
+                return ;
+            }
+            do {
+                temp_ptr = vsf_msgt_get_next_node_within_container((vsf_msgt_node_t *)node_ptr);
+                if (NULL != temp_ptr) {
+                    node_ptr = (vsf_msgt_container_t *)temp_ptr;
+                    break;
+                }
+                //! it is the last item in the container
+                node_ptr = (vsf_msgt_container_t *)node_ptr->parent_ptr;
+
+                if (NULL == node_ptr) {
+                    //! it is the top container
+                    return ;
+                } /*else if (node_ptr == root_ptr) {
+                    //! it is the last item
+                    THIS_FSM_STATE = VISIT_ITEM;
+                    break;
+                } */
+                goto visit_node;
+            } while(0);
+
+        } while(0);
+    }
+}
+
+
 /*----------------------------------------------------------------------------*
  * Forward Message Propagation using DFS algorithm                            *
  *----------------------------------------------------------------------------*/

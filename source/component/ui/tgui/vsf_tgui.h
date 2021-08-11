@@ -148,6 +148,9 @@ vsf_err_t vk_tgui_set_root_container(vsf_tgui_t* gui_ptr,
                                     vsf_tgui_root_container_t *root_node_ptr,
                                     bool req_first_refresh);
 
+extern
+vsf_err_t vk_tgui_close_root_container(vsf_tgui_t* gui_ptr);
+
 extern 
 bool vk_tgui_send_message(vsf_tgui_t *gui_ptr, vsf_tgui_evt_t event);
 
