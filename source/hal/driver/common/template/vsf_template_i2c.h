@@ -254,50 +254,30 @@ typedef struct i2c_cfg_t {
 /**
  \~english
  @brief flags of i2c tranfer messages
- @note em_i2c_msg_flags_t is implemented by specific driver.
+ @note em_i2c_cmd_t is implemented by specific driver.
 
  \~chinese
  @brief i2c 传输的标志
- @note em_i2c_msg_flags_t 由具体驱动实现。
+ @note em_i2c_cmd_t 由具体驱动实现。
 
  \~
  \code {.c}
-    typedef enum em_i2c_msg_flags_t {
-        I2C_MSG_DATA_MASK        = (0xFFul <<  0),
+    typedef enum em_i2c_cmd_t {
+        I2C_CMD_WRITE      = (0x00ul << 0),
+        I2C_CMD_READ       = (0x01ul << 0),
+        I2C_CMD_RW_MASK    = (0x01ul <<  8),
 
-        I2C_MSG_FLAGS_WRITE      = (0x00ul <<  8),
-        I2C_MSG_FLAGS_READ       = (0x01ul <<  8),
-        I2C_MSG_FLAGS_RW_MASK    = (0x01ul <<  8),
+        I2C_CMD_START      = (0x01ul << 1),
+        I2C_CMD_STOP       = (0x01ul << 1),
+        I2C_CMD_RESTAR     = (0x01ul << 1),
 
-        I2C_MSG_FLAGS_START      = (0x01ul <<  9),
-        I2C_MSG_FLAGS_STOP       = (0x01ul << 10),
-        I2C_MSG_FLAGS_RESTAR     = (0x01ul << 11),
-
-        I2C_MSG_FLAGS_7_BITS     = (0x00ul << 12),
-        I2C_MSG_FLAGS_10_BITS    = (0x01ul << 12),
-        I2C_MSG_FLAGS_BITS_MASK  = (0x01ul << 12),
-    } em_i2c_msg_flags_t;
+        I2C_CMD_7_BITS     = (0x00ul << 2),
+        I2C_CMD_10_BITS    = (0x01ul << 2),
+        I2C_CMD_BITS_MASK  = (0x01ul << 2),
+    } em_i2c_cmd_t;
  \endcode
  */
-typedef enum em_i2c_msg_flags_t em_i2c_msg_flags_t;
-
-/**
- \~english
- @brief i2c transfer message
-
- \~chinese
- @brief i2c 传输消息
- */
-typedef struct i2c_msg_t {
-    uint16_t flags;         //!< \~english i2c flags, \ref em_i2c_msg_flags_t
-                            //!< \~chinese i2c 标志, \ref em_i2c_msg_flags_t
-
-    uint16_t count;         //!< \~english i2c transfer buffer count (in byte)
-                            //!< \~chinese i2c 传输缓冲区长度 (单位：字节)
-
-    uint8_t * buffer_ptr;   //!< \~english i2c transfer buffer
-                            //!< \~chinese i2c 传输缓冲区
-} i2c_msg_t;
+typedef enum em_i2c_cmd_t em_i2c_cmd_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -404,7 +384,9 @@ extern i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
  @note i2c_msg_ptr can be a local variable.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  @param[in] address: address of i2c transfer
- @param[in] i2c_msg_ptr: a pointer to structure @ref i2c_msg_t
+ @param[in] cmd: i2c cmd
+ @param[in] count: i2c transfer buffer count (in byte)
+ @param[in] buffer_ptr: i2c transfer buffer
  @return i2c_status_t: return all status of current i2c
 
  \~chinese
@@ -412,38 +394,39 @@ extern i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
  @note i2c_msg_ptr可以是局部变量。
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
  @param[in] address: i2c 传输的地址
- @param[in] i2c_msg_ptr: 指向 @ref i2c_msg_t 的指针
+ @param[in] cmd: i2c 命令
+ @param[in] count: i2c 传输缓冲区长度 (单位：字节)
+ @param[in] buffer_ptr: i2c 传输缓冲区
  @return i2c_status_t: 返回当前i2c的所有状态
  */
 extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
-                                        uint16_t address,
-                                        i2c_msg_t* i2c_msg_ptr);
+                                        uint16_t   address,
+                                        uint8_t    cmd,
+                                        uint16_t   count
+                                        uint8_t*   buffer_ptr);
 
 /**
- \~english
- @brief i2c instance as master mode request multiple transfer
- @note I2c_msg_ptr: points to an array with a length of msg_count,
-       which needs to be valid until the transfer is completed.
- @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @param[in] address: address of i2c transfer
- @param[in] i2c_msg_ptr: number of request transfer
- @return i2c_status_t: return all status of current i2c
-
- \~chinese
- @brief i2c主机请求多次传输
- @note i2c_msg_ptr 指向一个长度为msg_count的 i2c_msg_t 数组，
-       在传输结束之前这个数组需要一直有效。
- @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- @param[in] address: i2c 传输的地址
- @param[in] i2c_msg_ptr: 指向 @ref i2c_msg_t 的指针
- @param[in] msg_count: 发起传输的数量
- @return i2c_status_t: 返回当前i2c的所有状态
+ * \~chinese
+ * @brief i2c低级函数，发送一个消息给硬件
+ *        配合模板快速实现 I2C 驱动
+ *
+ * @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
+ * @param[in] data : 将要发送的数据
+ * @param[in] command : 将要发送的命令，参考 @ref em_i2c_cmd_t
+ * @return vsf_err_t : 不支持的消息将会返回负数
  */
-extern vsf_err_t vsf_i2c_master_request_multi(vsf_i2c_t *i2c_ptr,
-                                              uint16_t address,
-                                              i2c_msg_t* i2c_msg_ptr
-                                              uint8_fast_t msg_count);
+extern vsf_err_t __vsf_i2c_send_cmd(vsf_i2c_t *i2c_ptr, uint8_t data, em_i2c_cmd_t command);
 
+/**
+ * \~chinese
+ * @brief i2c 低级函数，接收到中断(em_i2c_irq_mask_t的组合)，
+ *            配合模板快速实现 I2C 驱动
+ *
+ * @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
+ * @param[in] interrupt_mask : 将要发送的消息
+ * @return vsf_err_t : 不支持的消息将会返回负数
+ */
+extern vsf_err_t __vsf_i2c_receive_isr(vsf_i2c_t *i2c_ptr, uint32_t interrupt_mask);
 
 #endif
 

@@ -26,24 +26,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-/**
- * \~chinese
- * @brief i2c低级函数，发送一个消息(em_i2c_msg_flags_t的组合)给硬件
- *
- * @param message : 将要发送的消息
- * @return vsf_err_t : 不支持的消息将会返回负数
- */
-extern vsf_err_t __vsf_i2c_send_msg(uint32_t message);
-
-/**
- * \~chinese
- * @brief i2c低级函数，接收到中断(em_i2c_irq_mask_t的组合)
- *
- * @param interrupt_mask : 将要发送的消息
- * @return vsf_err_t : 不支持的消息将会返回负数
- */
-extern vsf_err_t __vsf_i2c_receive_isr(uint32_t interrupt_mask);
-
 /*============================ IMPLEMENTATION ================================*/
 
 
