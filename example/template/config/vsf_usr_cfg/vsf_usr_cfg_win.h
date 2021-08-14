@@ -50,7 +50,7 @@
 #define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              ENABLED
 #   define APP_CFG_AUDIO_BUFFER_SIZE                    (VSF_LINUX_CFG_STACKSIZE - (4 * 1024))
-#define APP_USE_TGUI_DEMO                               ENABLED
+#define APP_USE_TGUI_DEMO                               DISABLED
 #define APP_USE_TGUI_DESIGNER_DEMO                      DISABLED
 #define APP_USE_SDL2_DEMO                               ENABLED
 #define APP_USE_DISP_DEMO                               ENABLED
