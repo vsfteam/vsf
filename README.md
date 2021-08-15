@@ -2,7 +2,7 @@
 [![GitHub](https://img.shields.io/github/license/vsfteam/vsf.svg)](https://github.com/vsfteam/vsf/blob/master/LICENSE)
 [![Build Status](https://github.com/vsfteam/vsf/actions/workflows/vsf-actions.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/vsf-actions.yml)
 
-[中文页](README_zh.md) |
+[中文](README_zh.md) |
 
 Full name of VSF is "Versaloon Software Framework". VSF is a open-source software framework for embedded applications based on Apache2. VSF includes hal, a pre-emptive multi-thread kernel and many services or components. VSF is implemented by C language, and using object-oriented programming methods.
 
@@ -91,6 +91,7 @@ To use applications from other system, shell can be used.
 
 - SDL -- to use application code based on SDL
 - linux -- to use application code based on linux
+  - posix
   - devfs
   - socket
   - console

@@ -89,6 +89,7 @@ VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开�
 
 - SDL -- 可以直接使用一些基于SDL的应用层代码
 - linux -- 可以直接使用一些基于linux的应用层代码
+  - posix
   - devfs
   - socket
   - console
