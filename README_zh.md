@@ -2,6 +2,8 @@
 [![GitHub](https://img.shields.io/github/license/vsfteam/vsf.svg)](https://github.com/vsfteam/vsf/blob/master/LICENSE)
 [![Build Status](https://github.com/vsfteam/vsf/actions/workflows/vsf-actions.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/vsf-actions.yml)
 
+[English](README.md) |
+
 VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开源嵌入式软件平台框架。包含了从底层硬件的hal驱动、抢占式多任务内核、各种服务和组件。全部代码使用C语言，以及面向对象的方式实现。
 
 ## 整体框架
