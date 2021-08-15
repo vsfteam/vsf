@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
-#if VSF_USE_SIMPLE_STREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED && VSF_USE_FIFO == ENABLED
 
 #define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #define __VSF_BLOCK_STREAM_CLASS_IMPLEMENT

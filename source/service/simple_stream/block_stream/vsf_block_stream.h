@@ -24,7 +24,7 @@
 
 #include "service/vsf_service_cfg.h"
 
-#if VSF_USE_SIMPLE_STREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED && VSF_USE_FIFO == ENABLED
 
 #include "../../fifo/vsf_fifo.h"
 #include "utilities/vsf_utilities.h"
