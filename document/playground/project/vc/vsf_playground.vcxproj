@@ -1,0 +1,616 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\source\component\av\audio\decoder\wav\vsf_wav.h" />
+    <ClInclude Include="..\..\..\..\source\component\av\audio\driver\winsound\vsf_winsound.h" />
+    <ClInclude Include="..\..\..\..\source\component\av\audio\vsf_audio.h" />
+    <ClInclude Include="..\..\..\..\source\component\av\vsf_av.h" />
+    <ClInclude Include="..\..\..\..\source\component\av\vsf_av_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\crypto\hash\crc\vsf_crc.h" />
+    <ClInclude Include="..\..\..\..\source\component\crypto\hash\vsf_hash.h" />
+    <ClInclude Include="..\..\..\..\source\component\crypto\vsf_crypto.h" />
+    <ClInclude Include="..\..\..\..\source\component\crypto\vsf_crypto_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\debugger\nulink\NuConsole_stream.h" />
+    <ClInclude Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.h" />
+    <ClInclude Include="..\..\..\..\source\component\debugger\vsf_debugger.h" />
+    <ClInclude Include="..\..\..\..\source\component\debugger\vsf_debugger_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\fs\driver\fatfs\vsf_fatfs.h" />
+    <ClInclude Include="..\..\..\..\source\component\fs\driver\malfs\vsf_malfs.h" />
+    <ClInclude Include="..\..\..\..\source\component\fs\driver\memfs\vsf_memfs.h" />
+    <ClInclude Include="..\..\..\..\source\component\fs\driver\winfs\vsf_winfs.h" />
+    <ClInclude Include="..\..\..\..\source\component\fs\vsf_fs.h" />
+    <ClInclude Include="..\..\..\..\source\component\fs\vsf_fs_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\input\driver\hid\vsf_input_hid.h" />
+    <ClInclude Include="..\..\..\..\source\component\input\driver\nspro\vsf_input_nspro.h" />
+    <ClInclude Include="..\..\..\..\source\component\input\protocol\vsf_input_gamepad.h" />
+    <ClInclude Include="..\..\..\..\source\component\input\protocol\vsf_input_keyboard.h" />
+    <ClInclude Include="..\..\..\..\source\component\input\protocol\vsf_input_mouse.h" />
+    <ClInclude Include="..\..\..\..\source\component\input\protocol\vsf_input_sensor.h" />
+    <ClInclude Include="..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.h" />
+    <ClInclude Include="..\..\..\..\source\component\input\vsf_input.h" />
+    <ClInclude Include="..\..\..\..\source\component\input\vsf_input_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\driver\file_mal\vsf_file_mal.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\driver\mem_mal\vsf_mem_mal.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\driver\mim_mal\vsf_mim_mal.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\driver\scsi_mal\vsf_scsi_mal.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\vsf_mal.h" />
+    <ClInclude Include="..\..\..\..\source\component\mal\vsf_mal_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\scsi\driver\mal_scsi\vsf_mal_scsi.h" />
+    <ClInclude Include="..\..\..\..\source\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.h" />
+    <ClInclude Include="..\..\..\..\source\component\scsi\vsf_scsi.h" />
+    <ClInclude Include="..\..\..\..\source\component\scsi\vsf_scsi_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\tcpip\netdrv\driver\wpcap\vsf_netdrv_wpcap.h" />
+    <ClInclude Include="..\..\..\..\source\component\tcpip\netdrv\vsf_netdrv.h" />
+    <ClInclude Include="..\..\..\..\source\component\tcpip\socket\driver\lwip\vsf_socket_lwip.h" />
+    <ClInclude Include="..\..\..\..\source\component\tcpip\socket\driver\win\vsf_socket_win.h" />
+    <ClInclude Include="..\..\..\..\source\component\tcpip\socket\vsf_socket.h" />
+    <ClInclude Include="..\..\..\..\source\component\tcpip\vsf_tcpip.h" />
+    <ClInclude Include="..\..\..\..\source\component\tcpip\vsf_tcpip_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\fb\vsf_disp_fb.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\sitronix\common\vsf_disp_sitronix_common.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\sitronix\st7735\vsf_disp_st7735.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\sitronix\st7789\vsf_disp_st7789.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\solomon-systech\common\vsf_disp_solomon_systech_common.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\solomon-systech\ssd1306\vsf_disp_ssd1306.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\usbd_uvc\vsf_disp_usbd_uvc.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\vsf_disp.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_msg_tree_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_button.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_control.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_controls.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_label.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_list.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_panel.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_text_list.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\__vk_tgui_slider.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\__vsf_tgui_controls_common.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\utilities\vsf_tgui_text.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_port.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_style.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_text_list.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_v_type.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_button.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_container.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_control.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_label.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_panel.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_type.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\vsf_tgui_v.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\vsf_tgui.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\vsf_tgui_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\vsf_tgui_common.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\vsf_ui.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\vsf_ui_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\CDC\vsf_usb_CDC.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\CDC\vsf_usb_CDCACM.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\DFU\vsf_usb_dfu.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\HID\vsf_usb_ds4.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\HID\vsf_usb_HID.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\HID\vsf_usb_nspro.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\HID\vsf_usb_xb360.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\MSC\vsf_usb_MSC.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\UVC\vsf_usb_UVC.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\class\XB1\vsf_usb_xb1.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\common\usb_common.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\device\class\CDC\vsf_usbd_CDC.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\device\class\CDC\vsf_usbd_CDCACM.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\device\class\CDC\vsf_usbd_CDCACM_desc.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\device\class\HID\vsf_usbd_HID.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\device\class\HID\vsf_usbd_HID_desc.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\device\class\MSC\vsf_usbd_MSC.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\device\class\MSC\vsf_usbd_MSC_desc.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\device\class\UVC\vsf_usbd_UVC.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\device\vsf_usbd.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\hcd\ohci\vsf_ohci.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\otg\dwcotg\dwcotg_regs.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_common.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_dcd.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_hcd.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_hw.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc_dcd.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\driver\otg\musb\fdrc\__vsf_musb_fdrc_common.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\CDC\vsf_usbh_CDC.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\CDC\vsf_usbh_CDCECM.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\DFU\vsf_usbh_dfu.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\DL1x5\vsf_usbh_dl1x5.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\HID\vsf_usbh_ds4.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\HID\vsf_usbh_HID.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\HID\vsf_usbh_nspro.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\HID\vsf_usbh_xb360.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\HUB\vsf_usbh_HUB.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\libusb\vsf_usbh_libusb.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\MSC\vsf_usbh_msc.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\UAC\vsf_usbh_uac.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\class\XB1\vsf_usbh_xb1.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\host\vsf_usbh.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\vsf_usb.h" />
+    <ClInclude Include="..\..\..\..\source\component\usb\vsf_usb_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\vsf_component.h" />
+    <ClInclude Include="..\..\..\..\source\component\vsf_component_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\arch\vsf_arch.h" />
+    <ClInclude Include="..\..\..\..\source\hal\arch\vsf_arch_abstraction.h" />
+    <ClInclude Include="..\..\..\..\source\hal\arch\x86\win\win_generic.h" />
+    <ClInclude Include="..\..\..\..\source\hal\arch\__vsf_arch_interface.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\common.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\driver.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\driver.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\vsf\driver.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\driver.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\device.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\driver.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.h" />
+    <ClInclude Include="..\..\..\..\source\hal\vsf_hal.h" />
+    <ClInclude Include="..\..\..\..\source\hal\vsf_hal_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\shell\simple\vsf_simple.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_bmpevt.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\shell\vsf_shell.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\task\vsf_fsm.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\task\vsf_pt.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\task\vsf_task.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\task\vsf_thread.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\task\__vsf_task_common.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\vsf_eda.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\vsf_eda_slist_queue.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\vsf_evtq.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\vsf_kernel.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\vsf_kernel_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\vsf_kernel_common.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\vsf_os.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\vsf_timq.h" />
+    <ClInclude Include="..\..\..\..\source\kernel\vsf_timq_dlist.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\driver\customised\driver.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\driver.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\driver\device_specific\driver.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\sw_periperhal_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\sw_peripheral.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal.h" />
+    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.h" />
+    <ClInclude Include="..\..\..\..\source\osa_service\vsf_osa_service.h" />
+    <ClInclude Include="..\..\..\..\source\osa_service\vsf_osa_service_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\service\distbus\vsf_distbus.h" />
+    <ClInclude Include="..\..\..\..\source\service\dynarr\vsf_dynarr.h" />
+    <ClInclude Include="..\..\..\..\source\service\dynstack\vsf_dynstack.h" />
+    <ClInclude Include="..\..\..\..\source\service\fifo\vsf_fifo.h" />
+    <ClInclude Include="..\..\..\..\source\service\heap\vsf_heap.h" />
+    <ClInclude Include="..\..\..\..\source\service\json\vsf_json.h" />
+    <ClInclude Include="..\..\..\..\source\service\pbuf\vsf_pbuf.h" />
+    <ClInclude Include="..\..\..\..\source\service\pbuf\vsf_pbuf_pool.h" />
+    <ClInclude Include="..\..\..\..\source\service\pool\vsf_pool.h" />
+    <ClInclude Include="..\..\..\..\source\service\simple_stream\block_stream\vsf_block_stream.h" />
+    <ClInclude Include="..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.h" />
+    <ClInclude Include="..\..\..\..\source\service\simple_stream\fifo_stream\vsf_fifo_stream.h" />
+    <ClInclude Include="..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.h" />
+    <ClInclude Include="..\..\..\..\source\service\simple_stream\vsf_simple_stream.h" />
+    <ClInclude Include="..\..\..\..\source\service\stream\interface.h" />
+    <ClInclude Include="..\..\..\..\source\service\stream\pbuf_queue\vsf_pbuf_queue.h" />
+    <ClInclude Include="..\..\..\..\source\service\stream\vsf_stream.h" />
+    <ClInclude Include="..\..\..\..\source\service\stream\vsf_stream_base.h" />
+    <ClInclude Include="..\..\..\..\source\service\stream\vsf_stream_reader.h" />
+    <ClInclude Include="..\..\..\..\source\service\stream\vsf_stream_writer.h" />
+    <ClInclude Include="..\..\..\..\source\service\trace\vsf_trace.h" />
+    <ClInclude Include="..\..\..\..\source\service\vsf_service.h" />
+    <ClInclude Include="..\..\..\..\source\service\vsf_service_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\begin_code.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\close_code.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_cpuinfo.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_endian.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_events.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_keyboard.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_keycode.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_log.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_mouse.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_rwops.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_stdinc.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_surface.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_timer.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_version.h" />
+    <ClInclude Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\arpa\inet.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\dirent.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\errno.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\fcntl.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libgen.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libusb.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\limits.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netdb.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\poll.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\pthread.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\pwd.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sched.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\semaphore.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\signal.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\ctype.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\stddef.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\stdio.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\stdlib.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\string.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\time.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\wchar.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\ipc.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\mount.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\select.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\shm.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\socket.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\stat.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\time.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\types.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\uio.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\wait.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\termios.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\unistd.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\port\busybox\busybox.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\port\busybox\config.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\vsf_linux.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\vsf_linux_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\arch\atomic.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\arch\barrier.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\arch\endian.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\arch\irqflags.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\arch\spinlock.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\io.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\stddef.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\types.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\xboot.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\xboot\window.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\include\xfs\xfs.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\xboot\vsf_xboot_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\shell\vsf_shell_wrapper.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_black_box.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_simple.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_simple_c90.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_strict.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\communicate.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\compiler\compiler.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\compiler\x86\type.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\compiler\x86\x86_compiler.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\compiler\__common\__compiler.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\compiler\__common\__type.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\language_extension\code_region.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\language_extension\delegate.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\language_extension\language_extension.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\ooc_class.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\mf_u8_dec2str.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_connect_macro.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_foreach_macro.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_macro_calc.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_preprocessor.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\preprocessor\vsf_repeat_macro.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\template\template.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\template\vsf_bitmap.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\template\vsf_list.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\template\vsf_queue.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\vsf_utilities.h" />
+    <ClInclude Include="..\..\..\..\source\utilities\vsf_utilities_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\vsf.h" />
+    <ClInclude Include="..\..\..\..\source\vsf_cfg.h" />
+    <ClInclude Include="..\..\config\arch\vsf_usr_cfg_win.h" />
+    <ClInclude Include="..\..\config\vsf_usr_cfg_arch.h" />
+    <ClInclude Include="..\..\config\vsf_usr_cfg_weak.h" />
+    <ClInclude Include="..\..\vsf_usr_cfg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\source\component\av\audio\decoder\wav\vsf_wav.c" />
+    <ClCompile Include="..\..\..\..\source\component\av\audio\driver\winsound\vsf_winsound.c" />
+    <ClCompile Include="..\..\..\..\source\component\av\audio\vsf_audio.c" />
+    <ClCompile Include="..\..\..\..\source\component\crypto\hash\crc\vsf_crc.c" />
+    <ClCompile Include="..\..\..\..\source\component\debugger\nulink\NuConsole_stream.c" />
+    <ClCompile Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.c" />
+    <ClCompile Include="..\..\..\..\source\component\fs\driver\fatfs\vsf_fatfs.c" />
+    <ClCompile Include="..\..\..\..\source\component\fs\driver\malfs\vsf_malfs.c" />
+    <ClCompile Include="..\..\..\..\source\component\fs\driver\memfs\vsf_memfs.c" />
+    <ClCompile Include="..\..\..\..\source\component\fs\driver\winfs\vsf_winfs.c" />
+    <ClCompile Include="..\..\..\..\source\component\fs\vsf_fs.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\driver\hid\vsf_input_hid.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\driver\nspro\vsf_input_nspro.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_gamepad.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_keyboard.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_mouse.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_sensor.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.c" />
+    <ClCompile Include="..\..\..\..\source\component\input\vsf_input.c" />
+    <ClCompile Include="..\..\..\..\source\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c" />
+    <ClCompile Include="..\..\..\..\source\component\mal\driver\file_mal\vsf_file_mal.c" />
+    <ClCompile Include="..\..\..\..\source\component\mal\driver\mem_mal\vsf_mem_mal.c" />
+    <ClCompile Include="..\..\..\..\source\component\mal\driver\mim_mal\vsf_mim_mal.c" />
+    <ClCompile Include="..\..\..\..\source\component\mal\driver\scsi_mal\vsf_scsi_mal.c" />
+    <ClCompile Include="..\..\..\..\source\component\mal\vsf_mal.c" />
+    <ClCompile Include="..\..\..\..\source\component\scsi\driver\mal_scsi\vsf_mal_scsi.c" />
+    <ClCompile Include="..\..\..\..\source\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.c" />
+    <ClCompile Include="..\..\..\..\source\component\scsi\vsf_scsi.c" />
+    <ClCompile Include="..\..\..\..\source\component\tcpip\netdrv\driver\wpcap\vsf_netdrv_wpcap.c" />
+    <ClCompile Include="..\..\..\..\source\component\tcpip\netdrv\vsf_netdrv.c" />
+    <ClCompile Include="..\..\..\..\source\component\tcpip\socket\driver\lwip\vsf_socket_lwip.c" />
+    <ClCompile Include="..\..\..\..\source\component\tcpip\socket\driver\win\vsf_socket_win.c" />
+    <ClCompile Include="..\..\..\..\source\component\tcpip\socket\vsf_socket.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\fb\vsf_disp_fb.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\sitronix\common\vsf_disp_sitronix_common.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\sitronix\st7735\vsf_disp_st7735.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\sitronix\st7789\vsf_disp_st7789.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\solomon-systech\common\vsf_disp_solomon_systech_common.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\solomon-systech\ssd1306\vsf_disp_ssd1306.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\usbd_uvc\vsf_disp_usbd_uvc.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\vsf_disp.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_button.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_control.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_controls_common.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_label.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_list.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_panel.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_text_list.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\__vk_tgui_slider.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\utilities\vsf_tgui_text.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_style.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_text_list.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_button.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_container.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_control.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_label.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_panel.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\vsf_tgui_v.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\vsf_tgui.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\vsf_tgui_common.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\vsf_tgui_input.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\device\class\CDC\vsf_usbd_CDC.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\device\class\CDC\vsf_usbd_CDCACM.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\device\class\HID\vsf_usbd_HID.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\device\class\MSC\vsf_usbd_MSC.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\device\class\UVC\vsf_usbd_UVC.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\device\vsf_usbd.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\backend\vsf_usbip_dcd_lwip.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\backend\vsf_usbip_dcd_win.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\hcd\ohci\vsf_ohci.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_common.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_dcd.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\otg\dwcotg\vsf_dwcotg_hcd.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc_dcd.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\driver\otg\musb\fdrc\__vsf_musb_fdrc_common.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\CDC\vsf_usbh_CDC.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\CDC\vsf_usbh_CDCECM.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\DFU\vsf_usbh_dfu.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\DL1x5\vsf_usbh_dl1x5.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\HID\vsf_usbh_ds4.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\HID\vsf_usbh_HID.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\HID\vsf_usbh_nspro.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\HID\vsf_usbh_xb360.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\HUB\vsf_usbh_HUB.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\libusb\vsf_usbh_libusb.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\MSC\vsf_usbh_msc.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\UAC\vsf_usbh_uac.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\class\XB1\vsf_usbh_xb1.c" />
+    <ClCompile Include="..\..\..\..\source\component\usb\host\vsf_usbh.c" />
+    <ClCompile Include="..\..\..\..\source\component\vsf_component.c" />
+    <ClCompile Include="..\..\..\..\source\hal\arch\vsf_arch_abstraction.c" />
+    <ClCompile Include="..\..\..\..\source\hal\arch\x86\win\win_generic.c" />
+    <ClCompile Include="..\..\..\..\source\hal\arch\x86\win\win_generic_simple.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\vsf_hal_distbus.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\driver.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.c" />
+    <ClCompile Include="..\..\..\..\source\hal\vsf_hal.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_bmpevt.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_task.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\shell\vsf_shell.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\task\vsf_thread.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\vsf_eda.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\vsf_eda_slist_queue.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\vsf_evtq_array.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\vsf_evtq_list.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\vsf_kernel_bsp.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\vsf_os.c" />
+    <ClCompile Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.c" />
+    <ClCompile Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c" />
+    <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c" />
+    <ClCompile Include="..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.c" />
+    <ClCompile Include="..\..\..\..\source\osa_service\vsf_osa_service.c" />
+    <ClCompile Include="..\..\..\..\source\service\distbus\vsf_distbus.c" />
+    <ClCompile Include="..\..\..\..\source\service\dynarr\vsf_dynarr.c" />
+    <ClCompile Include="..\..\..\..\source\service\dynstack\vsf_dynstack.c" />
+    <ClCompile Include="..\..\..\..\source\service\fifo\vsf_fifo.c" />
+    <ClCompile Include="..\..\..\..\source\service\heap\vsf_heap.c" />
+    <ClCompile Include="..\..\..\..\source\service\json\vsf_json.c" />
+    <ClCompile Include="..\..\..\..\source\service\pbuf\vsf_pbuf.c" />
+    <ClCompile Include="..\..\..\..\source\service\pbuf\vsf_pbuf_pool.c" />
+    <ClCompile Include="..\..\..\..\source\service\pool\vsf_pool.c" />
+    <ClCompile Include="..\..\..\..\source\service\simple_stream\block_stream\vsf_block_stream.c" />
+    <ClCompile Include="..\..\..\..\source\service\simple_stream\distbus_stream\vsf_distbus_stream.c" />
+    <ClCompile Include="..\..\..\..\source\service\simple_stream\fifo_stream\vsf_fifo_stream.c" />
+    <ClCompile Include="..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.c" />
+    <ClCompile Include="..\..\..\..\source\service\simple_stream\vsf_simple_stream.c" />
+    <ClCompile Include="..\..\..\..\source\service\stream\pbuf_queue\vsf_pbuf_queue.c" />
+    <ClCompile Include="..\..\..\..\source\service\stream\vsf_stream.c" />
+    <ClCompile Include="..\..\..\..\source\service\stream\vsf_stream_base.c" />
+    <ClCompile Include="..\..\..\..\source\service\stream\vsf_stream_reader.c" />
+    <ClCompile Include="..\..\..\..\source\service\stream\vsf_stream_writer.c" />
+    <ClCompile Include="..\..\..\..\source\service\trace\vsf_trace.c" />
+    <ClCompile Include="..\..\..\..\source\service\vsf_service.c" />
+    <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2.c" />
+    <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_event.c" />
+    <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_pixelformat.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_sem.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdio.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdlib.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_string.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_time.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\libgen\vsf_linux_libgen.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\libusb\vsf_linux_libusb.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\port\busybox\busybox.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\port\busybox\shell\vsh.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux_socket.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\xboot\vsf_xboot.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\compiler\x86\x86_compiler.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\compiler\__common\__retarget_io.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\language_extension\code_region.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\language_extension\delegate.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\language_extension\simple_sprintf.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\language_extension\simple_sscanf.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\template\vsf_list.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\template\vsf_queue.c" />
+    <ClCompile Include="..\..\main.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc" />
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\string" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{A77D8512-2E1C-4A55-A1DE-218BF944D49B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>vsfusbhwin</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <UseMultiToolTask>true</UseMultiToolTask>
+    <OutDir>$(SolutionDir)\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;__COMPILER_DOES_NOT_SUPPORT_WEAK__;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\config;$(ProjectDir)..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <OmitFramePointers>false</OmitFramePointers>
+      <AssemblerListingLocation>$(IntDir)/%(RelativeDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <UACExecutionLevel>
+      </UACExecutionLevel>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;__COMPILER_DOES_NOT_SUPPORT_WEAK__;__OOC_RELEASE__;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\config;$(ProjectDir)..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
