@@ -27,3 +27,7 @@ CmakeCache.txt
 *.lst
 *.iex
 *.scvd
+
+# for vscode
+.cortex-debug.registers.state.json
+.cortex-debug.peripherals.state.json
