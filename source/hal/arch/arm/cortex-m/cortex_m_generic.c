@@ -211,7 +211,7 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
 void vsf_arch_swi_trigger(uint_fast8_t idx)
 {
     if (0 == idx) {
-    //! todo: the code is simplified, we need to verify its reilability 
+    //! todo: the code is simplified, we need to verify its reilability
     #if __ARM_ARCH >= 7 || __TARGET_ARCH_THUMB == 4
         SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
     #elif __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
@@ -241,19 +241,19 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 
     VSF_ARCH_ASSERT(priority >= 0);
 
-    /*! \note When BASEPRI = 0, the CPU execution priority level is not raised 
-     *!       to 0 as one may think (this would have the effect of masking all 
-     *!       interrupts). 
-     *!       Instead, with BASEPRI = 0 all masking is disabled.  With masking 
-     *!        disabled, any interrupt even with the max priority level can 
+    /*! \note When BASEPRI = 0, the CPU execution priority level is not raised
+     *!       to 0 as one may think (this would have the effect of masking all
+     *!       interrupts).
+     *!       Instead, with BASEPRI = 0 all masking is disabled.  With masking
+     *!        disabled, any interrupt even with the max priority level can
      *!        interrupt the core. On reset, BASEPRI = 0.
      *!
-     *!        The only way to raise the CPU execution priority level to 0 is 
+     *!        The only way to raise the CPU execution priority level to 0 is
      *!        through PRIMASK.
      */
     DISABLE_GLOBAL_INTERRUPT();                                             //! do this first for atomicity
-    
-    if (0 == priority) {          
+
+    if (0 == priority) {
         //DISABLE_GLOBAL_INTERRUPT();
         __vsf_cm.basepri = 0;
         //__set_BASEPRI(0);
@@ -273,17 +273,17 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 
     vsf_arch_prio_t origlevel = __vsf_cm.basepri;
     VSF_ARCH_ASSERT(priority >= 0);
-    
+
     DISABLE_GLOBAL_INTERRUPT();
 
-    
+
     if (priority) {
         if (priority >= 0x100) {
             __vsf_cm.basepri = 0x100;
         }
-        
+
         __vsf_cm.basepri = priority;
-        
+
         if (priority > NVIC_GetPriority(PendSV_IRQn)) {
             __vsf_cm.pendsv.enabled = true;
             if (__vsf_cm.pendsv.sw_pending_bit) {
@@ -294,14 +294,14 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
             __vsf_cm.pendsv.enabled = false;
             __vsf_cm.pendsv.sw_pending_bit = 0;
         }
-        
+
         ENABLE_GLOBAL_INTERRUPT();
     } else /* if (0 == priority) */{
         __vsf_cm.basepri = 0;
     }
-    
+
     return (vsf_arch_prio_t)origlevel;
-    
+
 #else
     VSF_ARCH_ASSERT(false);
 #endif
@@ -312,27 +312,27 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  *----------------------------------------------------------------------------*/
 
 WEAK(vsf_get_interrupt)
-vsf_arch_prio_t vsf_get_interrupt(void)
+vsf_gint_state_t vsf_get_interrupt(void)
 {
-    return vsf_get_base_priority();
+    return (vsf_gint_state_t)vsf_get_base_priority();
 }
 
 WEAK(vsf_set_interrupt)
-vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t prio)
+vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t prio)
 {
-    return vsf_set_base_priority(prio);
+    return (vsf_gint_state_t)vsf_set_base_priority(prio);
 }
 
 WEAK(vsf_disable_interrupt)
-vsf_arch_prio_t vsf_disable_interrupt(void)
+vsf_gint_state_t vsf_disable_interrupt(void)
 {
-    return vsf_set_base_priority(0);
+    return (vsf_gint_state_t)vsf_set_base_priority(vsf_arch_prio_disable_all);
 }
 
 WEAK(vsf_enable_interrupt)
-vsf_arch_prio_t vsf_enable_interrupt(void)
+vsf_gint_state_t vsf_enable_interrupt(void)
 {
-    return vsf_set_base_priority(0x100);
+    return (vsf_gint_state_t)vsf_set_base_priority(vsf_arch_prio_enable_all);
 }
 
 

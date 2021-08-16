@@ -100,6 +100,11 @@ typedef enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_INVALID           = -1,
     vsf_arch_prio_invalid           = -1,
 
+    VSF_ARCH_PRIO_ENABLE_ALL        = 0x100,
+    vsf_arch_prio_enable_all        = 0x100,
+    VSF_ARCH_PRIO_DISABLE_ALL       = 0,
+    vsf_arch_prio_disable_all       = 0,
+
     VSF_MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
 
     vsf_arch_prio_highest           = ((VSF_ARCH_PRI_NUM - 1 - (__vsf_arch_prio_index_number - 1))) & 0xFF ,
