@@ -32,7 +32,7 @@ typedef struct vsf_arch_common_t {
     vsf_arch_crit_t irq_lock;
 
     uint32_t irq_ready_cnt;
-    vsf_arch_prio_t gint_state;
+    vsf_gint_state_t gint_state;
     bool irq_end_from_por;
 } vsf_arch_common_t;
 
@@ -173,14 +173,14 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 }
 
 
-vsf_arch_prio_t vsf_get_interrupt(void)
+vsf_gint_state_t vsf_get_interrupt(void)
 {
     return __vsf_arch_common.gint_state;
 }
 
-vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t level)
+vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level)
 {
-    vsf_arch_prio_t orig = __vsf_arch_common.gint_state;
+    vsf_gint_state_t orig = __vsf_arch_common.gint_state;
     if (orig != level) {
         __vsf_arch_common.gint_state = level;
 #if VSF_ARCH_BG_TRACE_EN == ENABLED
@@ -192,9 +192,9 @@ vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t level)
     return orig;
 }
 
-vsf_arch_prio_t vsf_disable_interrupt(void)
+vsf_gint_state_t vsf_disable_interrupt(void)
 {
-    vsf_arch_prio_t orig = __vsf_arch_common.gint_state;
+    vsf_gint_state_t orig = __vsf_arch_common.gint_state;
     if (orig != false) {
         __vsf_arch_common.gint_state = false;
 #if VSF_ARCH_BG_TRACE_EN == ENABLED
@@ -206,7 +206,7 @@ vsf_arch_prio_t vsf_disable_interrupt(void)
     return orig;
 }
 
-vsf_arch_prio_t vsf_enable_interrupt(void)
+vsf_gint_state_t vsf_enable_interrupt(void)
 {
     return vsf_set_interrupt(true);
 }
