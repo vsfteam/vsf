@@ -402,7 +402,7 @@ extern i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
 extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
                                         uint16_t   address,
                                         uint8_t    cmd,
-                                        uint16_t   count
+                                        uint16_t   count,
                                         uint8_t*   buffer_ptr);
 
 /**
@@ -419,14 +419,14 @@ extern vsf_err_t __vsf_i2c_send_cmd(vsf_i2c_t *i2c_ptr, uint8_t data, em_i2c_cmd
 
 /**
  * \~chinese
- * @brief i2c 低级函数，接收到中断(em_i2c_irq_mask_t的组合)，
+ * @brief i2c 低级函数，I2C 主机中断回调函数
  *            配合模板快速实现 I2C 驱动
  *
  * @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- * @param[in] interrupt_mask : 将要发送的消息
- * @return vsf_err_t : 不支持的消息将会返回负数
+ * @param[in] interrupt_mask : 一个或者多个中断的组合
+ * @return none
  */
-extern vsf_err_t __vsf_i2c_receive_isr(vsf_i2c_t *i2c_ptr, uint32_t interrupt_mask);
+extern void __vsf_i2c_master_irq_handler(vsf_i2c_t *i2c_ptr, uint32_t interrupt_mask);
 
 #endif
 
