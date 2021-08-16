@@ -568,8 +568,6 @@
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <OmitFramePointers>false</OmitFramePointers>
-      <AssemblerListingLocation>$(IntDir)/%(RelativeDir)</AssemblerListingLocation>
-      <ObjectFileName>$(IntDir)/%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
