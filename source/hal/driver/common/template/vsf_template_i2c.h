@@ -139,10 +139,10 @@ typedef struct i2c_capability_t i2c_capability_t;
         I2C_IRQ_MASK_MASTER_TX_EMPTY                = (0x1ul <<  6),
         I2C_IRQ_MASK_MASTER_ERROR                   = (0x1ul <<  7),
 
-        I2C_MSG_MASK_MASTER_TRANSFER_COMPLETE       = (0x1ul <<  8),
-        I2C_MSG_MASK_MASTER_ARBITRATION_LOST        = (0x1ul <<  9),
-        I2C_MSG_MASK_MASTER_ADDRESS_NACK            = (0x1ul << 10),
-        I2C_MSG_MASK_MASTER_ERROR                   = (0x1ul << 11),
+        I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE       = (0x1ul <<  8),
+        I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul <<  9),
+        I2C_IRQ_MASK_MASTER_ADDRESS_NACK            = (0x1ul << 10),
+        I2C_IRQ_MASK_MASTER_ERROR                   = (0x1ul << 11),
 
         // TODO: add slave interrupt
     };
@@ -265,7 +265,7 @@ typedef struct i2c_cfg_t {
     typedef enum em_i2c_cmd_t {
         I2C_CMD_WRITE      = (0x00ul << 0),
         I2C_CMD_READ       = (0x01ul << 0),
-        I2C_CMD_RW_MASK    = (0x01ul <<  8),
+        I2C_CMD_RW_MASK    = (0x01ul << 1),
 
         I2C_CMD_START      = (0x01ul << 1),
         I2C_CMD_STOP       = (0x01ul << 1),
@@ -404,29 +404,6 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
                                         uint8_t    cmd,
                                         uint16_t   count,
                                         uint8_t*   buffer_ptr);
-
-/**
- * \~chinese
- * @brief i2c低级函数，发送一个消息给硬件
- *        配合模板快速实现 I2C 驱动
- *
- * @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- * @param[in] data : 将要发送的数据
- * @param[in] command : 将要发送的命令，参考 @ref em_i2c_cmd_t
- * @return vsf_err_t : 不支持的消息将会返回负数
- */
-extern vsf_err_t __vsf_i2c_send_cmd(vsf_i2c_t *i2c_ptr, uint8_t data, em_i2c_cmd_t command);
-
-/**
- * \~chinese
- * @brief i2c 低级函数，I2C 主机中断回调函数
- *            配合模板快速实现 I2C 驱动
- *
- * @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- * @param[in] interrupt_mask : 一个或者多个中断的组合
- * @return none
- */
-extern void __vsf_i2c_master_irq_handler(vsf_i2c_t *i2c_ptr, uint32_t interrupt_mask);
 
 #endif
 
