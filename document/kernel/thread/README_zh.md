@@ -63,6 +63,7 @@ int main(void)
         /* 启动thread_a任务 */
         init_vsf_thread(user_thread_a_t, &thread_a, vsf_prio_0);
     }
+    return 0;
 }
 ```
 
@@ -100,21 +101,171 @@ int main(void)
         thread_a.param.count1 = 10;
         init_vsf_thread(user_thread_a_t, &thread_a, vsf_prio_0);
     }
+    return 0;
 }
 ```
 
 ## 4. thread任务的IPC
 
 ### 4.1 信号量
-&emsp;&emsp;相关API，具体参数和返回值，可以参考内核文档中的信号量的章节，意义完全一样
-- vsf_err_t vsf_thread_sem_post(vsf_sem_t *sem); -- 发送信号量
+&emsp;&emsp;相关API。具体参数和返回值，可以参考内核文档中的信号量的章节，意义完全一样
+- vsf_err_t vsf_thread_sem_post(vsf_sem_t *sem); -- 发送信号量，等价于vsf_eda_sem_post
 - vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *sem, vsf_timeout_tick_t timeout); -- 等待信号量
 
+```c
+#include "vsf.h"
+
+/* 申明用户thread任务类型 user_thread_a_t */
+declare_vsf_thread(user_thread_a_t)
+
+/* 定义用户任务类型 user_thread_a_t */
+define_vsf_thread(user_thread_a_t, 1024,
+    vsf_sem_t *sem;
+)
+
+/* 实现用户定义的任务类型的任务函数 */
+implement_vsf_thread(user_thread_a_t)
+{
+    while (1) {
+        vsf_thread_sem_pend(vsf_this.sem, -1);
+        vsf_trace_info("Hello World!\r\n");
+    }
+}
+
+int main(void)
+{
+    vsf_start_trace();
+
+    static vsf_sem_t sem;
+    vsf_eda_sem_init(&sem, 0);
+
+    /* 使用大括号是为了让实例化的thread_a任务对外不可见 */
+    {
+        /* 实例化 user_thread_a_t，用前面的类型，定义一个变量，注意这里是static的变量 */
+        static user_thread_a_t thread_a;
+        thread_a.param.sem = &sem;
+
+        /* 启动thread_a任务 */
+        init_vsf_thread(user_thread_a_t, &thread_a, vsf_prio_0);
+    }
+
+    while (1) {
+        vsf_thread_delay_ms(1000);
+        vsf_thread_sem_post(&sem);
+    }
+    return 0;
+}
+```
+
 ### 4.2 互斥量
+&emsp;&emsp;相关API。具体参数和返回值，可以参考内核文档中的互斥量的章节，意义完全一样
+- vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, vsf_timeout_tick_t timeout);
+- vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx);
+
+```c
+#include "vsf.h"
+
+/* 申明用户thread任务类型 user_thread_a_t */
+declare_vsf_thread(user_thread_a_t)
+
+/* 定义用户任务类型 user_thread_a_t */
+define_vsf_thread(user_thread_a_t, 1024,
+    int id;
+    vsf_mutex_t *mutex;
+)
+
+/* 实现用户定义的任务类型的任务函数 */
+implement_vsf_thread(user_thread_a_t)
+{
+    while (1) {
+        vsf_thread_mutex_enter(vsf_this.mutex, -1);
+            vsf_trace_info("Hello World! from %d\r\n", vsf_this.id);
+        vsf_thread_mutex_leave(vsf_this.mutex);
+        vsf_thread_delay_ms(100 * (vsf_this.id + 1));
+    }
+}
+
+int main(void)
+{
+    vsf_start_trace();
+
+    static vsf_mutex_t mutex;
+    vsf_eda_mutex_init(&mutex);
+
+    /* 使用大括号是为了让实例化的thread_a任务对外不可见 */
+    {
+        /* 实例化 user_thread_a_t，用前面的类型，定义一个变量，注意这里是static的变量 */
+        static user_thread_a_t thread_a[10];
+        for (int i = 0; i < dimof(thread_a); i++) {
+            thread_a[i].param.id = i;
+            thread_a[i].param.mutex = &mutex;
+
+            /* 启动thread_a任务 */
+            init_vsf_thread(user_thread_a_t, &thread_a[i], vsf_prio_0);
+        }
+    }
+    return 0;
+}
+```
 
 ### 4.3 临界代码段
+&emsp;&emsp;使用互斥量实现。
 
 ### 4.4 触发器
+&emsp;&emsp;相关API。
+- vsf_err_t vsf_thread_trig_set(vsf_trig_t *trig);
+- vsf_err_t vsf_thread_trig_set(vsf_trig_t *trig, bool is_manual_reset);
+- void vsf_thread_trig_reset(vsf_trig_t *trig);
+- vsf_sync_reason_t vsf_thread_trig_pend(vsf_trig_t *trig, vsf_timeout_tick_t timeout);
+
+```c
+#include "vsf.h"
+
+/* 申明用户thread任务类型 user_thread_a_t */
+declare_vsf_thread(user_thread_a_t)
+
+/* 定义用户任务类型 user_thread_a_t */
+define_vsf_thread(user_thread_a_t, 1024,
+    int id;
+    vsf_trig_t *trig;
+)
+
+/* 实现用户定义的任务类型的任务函数 */
+implement_vsf_thread(user_thread_a_t)
+{
+    while (1) {
+        vsf_thread_trig_pend(vsf_this.trig, -1);
+        vsf_trace_info("Hello World! from %d.\r\n", vsf_this.id);
+    }
+}
+
+int main(void)
+{
+    vsf_start_trace();
+
+    static vsf_trig_t trig;
+    vsf_eda_trig_init(&trig, false, true);
+
+    /* 使用大括号是为了让实例化的thread_a任务对外不可见 */
+    {
+        /* 实例化 user_thread_a_t，用前面的类型，定义一个变量，注意这里是static的变量 */
+        static user_thread_a_t thread_a[10];
+        for (int i = 0; i < dimof(thread_a); i++) {
+            thread_a[i].param.id = i;
+            thread_a[i].param.trig = &trig;
+
+            /* 启动thread_a任务 */
+            init_vsf_thread(user_thread_a_t, &thread_a[i], vsf_prio_0);
+        }
+    }
+
+    while (1) {
+        vsf_thread_delay_ms(1000);
+        vsf_thread_trig_set(&trig);
+    }
+    return 0;
+}
+```
 
 ## 5. thread任务调用其他形式的任务
 TBD
