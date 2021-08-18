@@ -10,23 +10,23 @@ VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开�
 
 
 ## 目录
-| 目录名         | 描述                                                    |
-| -------------- | ------------------------------------------------------- |
-| document       | 文档                                                    |
-| doxygen        | doxygen配置                                             |
-| example        | 示例代码                                                |
-| hardware       | VSF开发板硬件资料                                       |
-| patch          | 一些补丁（第三方库补丁等等）                            |
-| script         | 一些工具脚本                                            |
-|  - cmake       | cmake工具脚本                                           |
-| source         | VSF源代码                                               |
-|  - component   | 组件（文件系统、协议栈、UI、外部芯片驱动）              |
-|  - hal         | 硬件抽象层（芯片arch支持、芯片驱动）                    |
-|  - kernel      | 内核                                                    |
-|  - osa_service | 依赖内核的软件服务组件                                  |
-|  - service     | 软件服务组件                                            |
-|  - shell       | “皮肤”                                                  |
-|  - utilities   | 基础软件工具（一些预处理功能、编译器支持、列表等等）    |
+| 目录名             | 描述                                                    |
+| ------------------ | ------------------------------------------------------- |
+| document           | 文档                                                    |
+| doxygen            | doxygen配置                                             |
+| example            | 示例代码                                                |
+| hardware           | VSF开发板硬件资料                                       |
+| patch              | 一些补丁（第三方库补丁等等）                            |
+| script             | 一些工具脚本                                            |
+|  &emsp;cmake       | cmake工具脚本                                           |
+| source             | VSF源代码                                               |
+|  &emsp;component   | 组件（文件系统、协议栈、UI、外部芯片驱动）              |
+|  &emsp;hal         | 硬件抽象层（芯片arch支持、芯片驱动）                    |
+|  &emsp;kernel      | 内核                                                    |
+|  &emsp;osa_service | 依赖内核的软件服务组件                                  |
+|  &emsp;service     | 软件服务组件                                            |
+|  &emsp;shell       | “皮肤”                                                  |
+|  &emsp;utilities   | 基础软件工具（一些预处理功能、编译器支持、列表等等）    |
 
 ## 内核
 基于事件驱动的抢占式多任务内核，支持51、8bit MCU、32/64 bit arm、riscv、x86等等各种构架的芯片。

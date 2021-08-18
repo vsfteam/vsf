@@ -10,23 +10,23 @@ Full name of VSF is "Versaloon Software Framework". VSF is a open-source softwar
 
 
 ## Catalogue
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| document       | document                                                  |
-| doxygen        | configuration of doxygen                                  |
-| example        | demo codes                                                |
-| hardware       | hardware of VSF development boards                        |
-| patch          | some patches(for 3rd-party components, etc)               |
-| script         |                                                           |
-|  - cmake       | cmake scripts                                             |
-| source         | source code of VSF                                        |
-|  - component   | component(filesystem, stacks, UI, drivers, etc)           |
-|  - hal         | hardware abstraction layer(ARCH support, chip drivers)    |
-|  - kernel      | VSF pre-emptive/collaborative kernel                      |
-|  - osa_service | software services based on kernel                         |
-|  - service     | software services                                         |
-|  - shell       | shell to use application softwares for other systems      |
-|  - utilities   | base software utilities(preprocessor, compiler, list, etc)|
+| Name               | Description                                               |
+| ------------------ | --------------------------------------------------------- |
+| document           | document                                                  |
+| doxygen            | configuration of doxygen                                  |
+| example            | demo codes                                                |
+| hardware           | hardware of VSF development boards                        |
+| patch              | some patches(for 3rd-party components, etc)               |
+| script             |                                                           |
+|  &emsp;cmake       | cmake scripts                                             |
+| source             | source code of VSF                                        |
+|  &emsp;component   | component(filesystem, stacks, UI, drivers, etc)           |
+|  &emsp;hal         | hardware abstraction layer(ARCH support, chip drivers)    |
+|  &emsp;kernel      | VSF pre-emptive/collaborative kernel                      |
+|  &emsp;osa_service | software services based on kernel                         |
+|  &emsp;service     | software services                                         |
+|  &emsp;shell       | shell to use application softwares for other systems      |
+|  &emsp;utilities   | base software utilities(preprocessor, compiler, list, etc)|
 
 ## Kernel
 Pre-emptive kernel based on event-driven architecture, supporting mcs51, 8bit MCU, 32/64 bit ARM, riscv, x86, etc.
