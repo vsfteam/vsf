@@ -55,7 +55,7 @@ int main(void)
 {
     vsf_start_trace();
 
-    /* 使用大括号是为了让实例化的thread_a任务对外不可见 */
+    /* 使用大括号是为了限制实例化的thread_a的作用域 */
     {
         /* 实例化 user_thread_a_t，用前面的类型，定义一个变量，注意这里是static的变量 */
         static user_thread_a_t thread_a;
@@ -91,7 +91,7 @@ int main(void)
 {
     vsf_start_trace();
 
-    /* 使用大括号是为了让实例化的thread_a任务对外不可见 */
+    /* 使用大括号是为了限制实例化的thread_a的作用域 */
     {
         /* 实例化 user_thread_a_t，用前面的类型，定义一个变量，注意这里是static的变量 */
         static user_thread_a_t thread_a;
@@ -109,6 +109,7 @@ int main(void)
 
 ### 4.1 信号量
 &emsp;&emsp;相关API。具体参数和返回值，可以参考内核文档中的信号量的章节，意义完全一样
+- vsf_err_t vsf_eda_sem_init(vsf_sem_t *sem, uint_fast16_t count = 0, uint_fast16_t max_count = VSF_SYNC_MAX);
 - vsf_err_t vsf_thread_sem_post(vsf_sem_t *sem); -- 发送信号量，等价于vsf_eda_sem_post
 - vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *sem, vsf_timeout_tick_t timeout); -- 等待信号量
 
@@ -139,7 +140,7 @@ int main(void)
     static vsf_sem_t sem;
     vsf_eda_sem_init(&sem, 0);
 
-    /* 使用大括号是为了让实例化的thread_a任务对外不可见 */
+    /* 使用大括号是为了限制实例化的thread_a的作用域 */
     {
         /* 实例化 user_thread_a_t，用前面的类型，定义一个变量，注意这里是static的变量 */
         static user_thread_a_t thread_a;
@@ -159,6 +160,7 @@ int main(void)
 
 ### 4.2 互斥量
 &emsp;&emsp;相关API。具体参数和返回值，可以参考内核文档中的互斥量的章节，意义完全一样
+- vsf_err_t vsf_eda_mutex_init(vsf_mutex_t *mutex);
 - vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, vsf_timeout_tick_t timeout);
 - vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx);
 
@@ -192,7 +194,7 @@ int main(void)
     static vsf_mutex_t mutex;
     vsf_eda_mutex_init(&mutex);
 
-    /* 使用大括号是为了让实例化的thread_a任务对外不可见 */
+    /* 使用大括号是为了限制实例化的thread_a的作用域 */
     {
         /* 实例化 user_thread_a_t，用前面的类型，定义一个变量，注意这里是static的变量 */
         static user_thread_a_t thread_a[10];
@@ -212,7 +214,8 @@ int main(void)
 &emsp;&emsp;使用互斥量实现。
 
 ### 4.4 触发器
-&emsp;&emsp;相关API。
+&emsp;&emsp;相关API。具体参数和返回值，可以参考内核文档中的触发器的章节，意义完全一样
+- vsf_err_t vsf_eda_trig_init(*vsf_trig_t *trig, bool is_set, bool is_auto_reset);
 - vsf_err_t vsf_thread_trig_set(vsf_trig_t *trig);
 - vsf_err_t vsf_thread_trig_set(vsf_trig_t *trig, bool is_manual_reset);
 - void vsf_thread_trig_reset(vsf_trig_t *trig);
@@ -246,7 +249,7 @@ int main(void)
     static vsf_trig_t trig;
     vsf_eda_trig_init(&trig, false, true);
 
-    /* 使用大括号是为了让实例化的thread_a任务对外不可见 */
+    /* 使用大括号是为了限制实例化的thread_a的作用域 */
     {
         /* 实例化 user_thread_a_t，用前面的类型，定义一个变量，注意这里是static的变量 */
         static user_thread_a_t thread_a[10];
