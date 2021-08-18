@@ -728,12 +728,6 @@ vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx)
     return err;
 }
 
-SECTION(".text.vsf.kernel.vsf_thread_sem_post")
-vsf_err_t vsf_thread_sem_post(vsf_sem_t *sem)
-{
-    return vsf_eda_sem_post(sem);
-}
-
 #if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
 
 SECTION(".text.vsf.kernel.vsf_thread_bmpevt_pend")
