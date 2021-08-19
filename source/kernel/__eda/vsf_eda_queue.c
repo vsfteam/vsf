@@ -26,22 +26,20 @@
 
 #if VSF_EDA_QUEUE_CFG_REGION != ENABLED
 #   if VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED
-#       define __vsf_eda_queue_protect          vsf_protect(interrupt)
-#       define __vsf_eda_queue_unprotect        vsf_unprotect(interrupt)
+#       define __vsf_eda_queue_protect              vsf_protect(interrupt)
+#       define __vsf_eda_queue_unprotect            vsf_unprotect(interrupt)
 #   else
-#       define __vsf_eda_queue_protect          vsf_protect(scheduler)
-#       define __vsf_eda_queue_unprotect        vsf_unprotect(scheduler)
+#       define __vsf_eda_queue_protect              vsf_protect(scheduler)
+#       define __vsf_eda_queue_unprotect            vsf_unprotect(scheduler)
 #   endif
 #else
-#   define __vsf_eda_queue_protect              vsf_protect(eda_queue_region)
-#   define __vsf_eda_queue_unprotect            vsf_unprotect(eda_queue_region)
+#   define vsf_protect_eda_queue_region()           pthis->region->enter()
+#   define vsf_unprotect_eda_queue_region(__orig)   pthis->region->leave(__orig)
+#   define __vsf_eda_queue_protect                  vsf_protect(eda_queue_region)
+#   define __vsf_eda_queue_unprotect                vsf_unprotect(eda_queue_region)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define vsf_protect_eda_queue_region()          pthis->region->enter()
-#define vsf_unprotect_eda_queue_region(__orig)  pthis->region->leave(__orig)
-
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
