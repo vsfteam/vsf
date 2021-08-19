@@ -355,14 +355,19 @@ extern "C" {
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   define vsf_thread_delay_ms(__ms)            vsf_thread_delay(vsf_systimer_ms_to_tick(__ms))
-#   define vsf_thread_delay_us(__us)            vsf_thread_delay(vsf_systimer_us_to_tick(__us))
+#   define vsf_thread_delay_ms(__ms)                vsf_thread_delay(vsf_systimer_ms_to_tick(__ms))
+#   define vsf_thread_delay_us(__us)                vsf_thread_delay(vsf_systimer_us_to_tick(__us))
 #endif
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-#   define vsf_thread_sem_post(__sem)           vsf_eda_sem_post(__sem)
-#   define vsf_thread_trig_set(__trig, ...)     vsf_eda_trig_set(__trig, ##__VA_ARGS__)
-#   define vsf_thread_trig_reset(__trig)        vsf_eda_trig_reset(__trig)
+#   define vsf_thread_sem_post(__sem)               vsf_eda_sem_post(__sem)
+#   define vsf_thread_sem_pend(__sem, timeout)      __vsf_thread_wait_for_sync(__sem, timeout)
+
+#   define vsf_thread_trig_set(__trig, ...)         vsf_eda_trig_set(__trig, ##__VA_ARGS__)
+#   define vsf_thread_trig_reset(__trig)            vsf_eda_trig_reset(__trig)
+#   define vsf_thread_trig_pend(__trig, timeout)    __vsf_thread_wait_for_sync(__trig, timeout)
+
+#   define vsf_thread_mutex_enter(__mtx, timeout)   __vsf_thread_wait_for_sync(&(__mtx)->use_as__vsf_sync_t, timeout)
 #endif
 
 /*============================ TYPES =========================================*/
@@ -533,17 +538,11 @@ extern vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority);
 #endif
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-SECTION(".text.vsf.kernel.vsf_thread_mutex")
-extern vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, vsf_timeout_tick_t timeout);
+SECTION(".text.vsf.kernel.__vsf_thread_wait_for_sync")
+vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, vsf_timeout_tick_t time_out);
 
 SECTION(".text.vsf.kernel.vsf_thread_mutex")
 extern vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx);
-
-SECTION(".text.vsf.kernel.__vsf_thread_wait_for_sync")
-extern vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *sem, vsf_timeout_tick_t timeout);
-
-SECTION(".text.vsf.kernel.__vsf_thread_wait_for_sync")
-extern vsf_sync_reason_t vsf_thread_trig_pend(vsf_trig_t *trig, vsf_timeout_tick_t timeout);
 
 #   if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
 SECTION(".text.vsf.kernel.vsf_thread_bmpevt_pend")
