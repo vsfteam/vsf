@@ -1601,8 +1601,8 @@
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <OmitFramePointers>false</OmitFramePointers>
-      <AssemblerListingLocation>$(IntDir)/%(RelativeDir)</AssemblerListingLocation>
-      <ObjectFileName>$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <AssemblerListingLocation>$(IntDir)/__sub0/__sub1/__sub2/__sub3/%(RelativeDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/__sub0/__sub1/__sub2/__sub3/%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -1628,6 +1628,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\littlevgl\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\2.1.2\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\nuklear\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AssemblerListingLocation>$(IntDir)/__sub0/__sub1/__sub2/__sub3/%(RelativeDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/__sub0/__sub1/__sub2/__sub3/%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
