@@ -544,6 +544,12 @@ vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, vsf_timeout_tick_
 SECTION(".text.vsf.kernel.vsf_thread_mutex")
 extern vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx);
 
+SECTION(".text.vsf.kernel.vsf_thread_queue")
+vsf_sync_reason_t vsf_thread_queue_send(vsf_eda_queue_t *queue, void *node, vsf_timeout_tick_t timeout);
+
+SECTION(".text.vsf.kernel.vsf_thread_queue")
+vsf_sync_reason_t vsf_thread_queue_recv(vsf_eda_queue_t *queue, void **node, vsf_timeout_tick_t timeout);
+
 #   if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
 SECTION(".text.vsf.kernel.vsf_thread_bmpevt_pend")
 extern vsf_sync_reason_t vsf_thread_bmpevt_pend(

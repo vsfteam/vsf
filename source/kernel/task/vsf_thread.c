@@ -710,6 +710,40 @@ vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx)
     return err;
 }
 
+SECTION(".text.vsf.kernel.vsf_thread_queue")
+vsf_sync_reason_t vsf_thread_queue_send(vsf_eda_queue_t *queue, void *node, vsf_timeout_tick_t timeout)
+{
+    vsf_err_t err = vsf_eda_queue_send(queue, node, timeout);
+    if (VSF_ERR_NONE == err) {
+        return VSF_SYNC_GET;
+    } else if (0 == timeout) {
+        return VSF_SYNC_TIMEOUT;
+    }
+
+    vsf_sync_reason_t reason;
+    do {
+        reason = vsf_eda_queue_send_get_reason(queue, vsf_thread_wait(), node);
+    } while (reason == VSF_SYNC_PENDING);
+    return reason;
+}
+
+SECTION(".text.vsf.kernel.vsf_thread_queue")
+vsf_sync_reason_t vsf_thread_queue_recv(vsf_eda_queue_t *queue, void **node, vsf_timeout_tick_t timeout)
+{
+    vsf_err_t err = vsf_eda_queue_recv(queue, node, timeout);
+    if (VSF_ERR_NONE == err) {
+        return VSF_SYNC_GET;
+    } else if (0 == timeout) {
+        return VSF_SYNC_TIMEOUT;
+    }
+
+    vsf_sync_reason_t reason;
+    do {
+        reason = vsf_eda_queue_recv_get_reason(queue, vsf_thread_wait(), node);
+    } while (reason == VSF_SYNC_PENDING);
+    return reason;
+}
+
 #if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
 
 SECTION(".text.vsf.kernel.vsf_thread_bmpevt_pend")
