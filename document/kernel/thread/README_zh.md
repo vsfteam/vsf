@@ -270,6 +270,11 @@ int main(void)
 }
 ```
 
+### 4.5 队列
+&emsp;&emsp;相关API。具体参数和返回值，可以参考内核文档中的队列的章节，意义完全一样
+- vsf_sync_reason_t vsf_thread_queue_send(vsf_eda_queue_t *queue, void *node, vsf_timeout_tick_t timeout);
+- vsf_sync_reason_t vsf_thread_queue_recv(vsf_eda_queue_t *queue, void **node, vsf_timeout_tick_t timeout);
+
 ## 5. thread任务调用其他形式的任务
 TBD
 
