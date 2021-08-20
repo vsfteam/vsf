@@ -167,6 +167,10 @@ extern "C" {
 #   define VSF_HAL_USE_PWM              ENABLED
 #endif
 
+
+#ifndef VSF_HAL_USE_I2C_GPIO
+#   define VSF_HAL_USE_I2C_GPIO         ENABLED
+#endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -61,8 +61,9 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t featu
     for (i = 0; i < 32; i++) {
         if (pin_mask & (1 << i)) {
             if (&vsf_gpio0 == gpio_ptr) {
-                gpio_ptr->REG.IOMUX->GPCFG[i] &= ~IOMUX_GPIO_CONFIG_PULL_UP_MASK;
-                gpio_ptr->REG.IOMUX->GPCFG[i] &= ~IOMUX_GPIO_CONFIG_PULL_DN_MASK;
+                gpio_ptr->REG.IOMUX->GPCFG[i] &= ~(     IOMUX_GPIO_CONFIG_PULL_FRC_MASK
+                                                    |   IOMUX_GPIO_CONFIG_PULL_UP_MASK
+                                                    |   IOMUX_GPIO_CONFIG_PULL_DN_MASK);
             } else if (&vsf_gpio1 == gpio_ptr) {
                 PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[i]),
                                     0,
@@ -75,7 +76,8 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t featu
             if (feature & IO_PULL_UP) {
                 if (&vsf_gpio0 == gpio_ptr) {
                     gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_UP_MASK;
-                } else {
+                    gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_FRC_MASK;
+                } else if (&vsf_gpio1 == gpio_ptr) {
                     PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[i]),
                                         (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC
                                         |   0
@@ -83,11 +85,14 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t featu
                                         (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC
                                         |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_UP
                                         |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_DN));
+                } else {
+                    VSF_HAL_ASSERT(false);
                 }
             }
             if (feature & IO_PULL_DOWN){
                 if (&vsf_gpio0 == gpio_ptr) {
                     gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_DN_MASK;
+                    gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_FRC_MASK;
                 } else if (&vsf_gpio1 == gpio_ptr) {
                     PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[i]),
                                         (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC

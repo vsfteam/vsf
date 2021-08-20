@@ -31,8 +31,8 @@
 /*============================ TYPES =========================================*/
 
 enum io_feature_t {
-    IO_PULL_UP              = (1<<0),           //!< enable pull-up resistor
-    IO_PULL_DOWN            = (1<<1),           //!< enable pull-down resistor
+    IO_PULL_UP              = (1 << 0),           //!< enable pull-up resistor
+    IO_PULL_DOWN            = (1 << 1),           //!< enable pull-down resistor
 //todo:
     IO_OPEN_DRAIN           = 0,
     IO_DISABLE_INPUT        = 0,
