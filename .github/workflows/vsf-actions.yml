@@ -86,7 +86,7 @@ jobs:
       fail-fast: false
       matrix:
         target: [m484, mps2]
-        cc: ['10-2020-q4', '9-2020-q2', '9-2019-q4']
+        cc: ['10-2021.07', '10-2020-q4', '9-2019-q4']
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{matrix.os}}
