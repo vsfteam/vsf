@@ -227,6 +227,8 @@ extern vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream);
 extern vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream);
 
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
+extern void vsf_linux_set_dominant_process(void);
+
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
 extern vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_stream_t *stdio_stream, char *working_dir);

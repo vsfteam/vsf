@@ -214,6 +214,7 @@ int __vsh_run_cmd(char *cmd)
     int result;
     waitpid(process->id.pid, &result, 0);
     close(exefd);
+    vsf_linux_set_dominant_process();
     return result;
 }
 

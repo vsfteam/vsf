@@ -550,6 +550,15 @@ vsf_linux_process_t * vsf_linux_get_cur_process(void)
                 process : __vsf_linux.kernel_process;
 }
 
+void vsf_linux_set_dominant_process(void)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(0);
+    if ((sfd != NULL) && (sfd->op == &__vsf_linux_stream_fdop)) {
+        vsf_linux_stream_priv_t *stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
+        stream_priv->stream->rx.param = sfd;
+    }
+}
+
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
