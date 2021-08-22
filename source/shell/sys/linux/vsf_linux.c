@@ -1250,9 +1250,15 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             sfd = vsf_linux_get_fd(fds[i].fd);
             if (sfd->rxrdy || sfd->txrdy) {
                 if ((fds[i].events & POLLIN) && sfd->rxrdy) {
+                    if (sfd->auto_reset) {
+                        sfd->rxrdy = false;
+                    }
                     fds[i].revents |= POLLIN;
                 }
                 if ((fds[i].events & POLLOUT) && sfd->txrdy) {
+                    if (sfd->auto_reset) {
+                        sfd->txrdy = false;
+                    }
                     fds[i].revents |= POLLOUT;
                 }
                 if (fds[i].revents) {
@@ -1287,10 +1293,18 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             sfd = vsf_linux_get_fd(fds[i].fd);
             orig = vsf_protect_sched();
                 if (fds[i].events & POLLIN) {
-                    sfd->rxpend = NULL;
+                    if (NULL == sfd->rxpend) {
+                        sfd->rxrdy = true;
+                    } else {
+                        sfd->rxpend = NULL;
+                    }
                 }
                 if (fds[i].events & POLLOUT) {
-                    sfd->txpend = NULL;
+                    if (NULL == sfd->txpend) {
+                        sfd->txrdy = true;
+                    } else {
+                        sfd->txpend = NULL;
+                    }
                 }
             vsf_unprotect_sched(orig);
         }
