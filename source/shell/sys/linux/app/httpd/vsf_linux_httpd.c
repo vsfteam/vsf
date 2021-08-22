@@ -86,6 +86,9 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
 #endif
 
     if (session != NULL) {
+        vsf_dlist_init_node(vsf_linux_httpd_session_t, session_node, session);
+        session->fd_socket = session->fd_stream_out = -1;
+        session->request.urihandler = NULL;
         vsf_dlist_add_to_head(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
     }
     return session;
@@ -97,7 +100,9 @@ static int __vsf_linux_httpd_set_fds(vsf_linux_httpd_t *httpd, fd_set *rset, fd_
     int fd_max = -1;
     __vsf_dlist_foreach_unsafe(vsf_linux_httpd_session_t, session_node, &httpd->session_list) {
         FD_SET(_->fd_socket, rset);
-        FD_SET(_->fd_socket, wset);
+        if (_->request.urihandler != NULL) {
+            FD_SET(_->fd_socket, wset);
+        }
         if (_->fd_socket > fd_max) {
             fd_max = _->fd_socket;
         }
@@ -180,15 +185,28 @@ static void * __vsf_linux_httpd_thread(void *param)
                 break;
             }
 
+            VSF_LINUX_ASSERT(_->fd_socket >= 0);
             if (FD_ISSET(_->fd_socket, &rfds)) {
                 fd_num--;
 
                 // can read from socket
+                if (NULL == _->request.urihandler) {
+                    // urihandler not set, recive header
+                } else {
+                    // urihandler set, 
+                    if (NULL == _->request.stream_in) {
+                        VSF_LINUX_ASSERT(false);
+                        // TODO: read all data out
+                        continue;
+                    } else {
+                        // read socket data and write to stream_in
+                    }
+                }
             }
             if (FD_ISSET(_->fd_socket, &wfds)) {
                 fd_num--;
 
-                // has written to socket
+                // can write to socket
             }
             if ((_->fd_stream_out >= 0) && FD_ISSET(_->fd_stream_out, &rfds)) {
                 fd_num--;

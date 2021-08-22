@@ -658,6 +658,13 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
             priv->last.pbuf = NULL;
         }
     }
+
+    vsf_protect_t orig = vsf_protect_sched();
+    if (priv->last.netbuf != NULL) {
+        vsf_linux_fd_rx_trigger(sfd, orig);
+    } else {
+        vsf_linux_fd_rx_untrigger(sfd, orig);
+    }
     return len;
 }
 

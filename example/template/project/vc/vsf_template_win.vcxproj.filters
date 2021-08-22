@@ -1042,7 +1042,7 @@
     <Filter Include="vsf\shell\sys\linux\app\httpd\urihandler">
       <UniqueIdentifier>{1b15642c-a0f6-4614-ac41-ed5e07bdd050}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\shell\sys\linux\app\httpd\file">
+    <Filter Include="vsf\shell\sys\linux\app\httpd\urihandler\file">
       <UniqueIdentifier>{db4d93ae-56a4-4006-93c1-82939993e973}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -3178,7 +3178,7 @@
       <Filter>vsf\shell\sys\linux\app\httpd</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.h">
-      <Filter>vsf\shell\sys\linux\app\httpd\file</Filter>
+      <Filter>vsf\shell\sys\linux\app\httpd\urihandler\file</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3301,9 +3301,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\libusb\vsf_usbh_libusb.c">
       <Filter>vsf\component\usb\host\class\libusb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux.c">
-      <Filter>vsf\shell\sys\linux</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c">
       <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
@@ -5615,6 +5612,9 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c">
       <Filter>vsf\shell\sys\linux\app\httpd</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux.c">
+      <Filter>vsf\shell\sys\linux</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\awtk\awtk_vsf.lib">
@@ -5629,7 +5629,7 @@
       <Filter>vsf\hal\arch\common\arch_without_thread_suspend</Filter>
     </None>
     <None Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.inc">
-      <Filter>vsf\shell\sys\linux\app\httpd\file</Filter>
+      <Filter>vsf\shell\sys\linux\app\httpd\urihandler\file</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -48,8 +48,8 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_LINUX_HTTPD_CFG_SESSION_BUFSIZE
-#   define VSF_LINUX_HTTPD_CFG_SESSION_BUFSIZE          1024
+#ifndef VSF_LINUX_HTTPD_CFG_REQUEST_BUFSIZE
+#   define VSF_LINUX_HTTPD_CFG_REQUEST_BUFSIZE          1024
 #endif
 #ifndef VSF_LINUX_HTTPD_CFG_PRIV_SIZE
 #   define VSF_LINUX_HTTPD_CFG_PRIV_SIZE                256
@@ -108,11 +108,35 @@ typedef enum vsf_linux_https_request_result_t {
 } vsf_linux_https_request_result_t;
 
 vsf_dcl_class(vsf_linux_httpd_request_t)
+
 typedef struct vsf_linux_httpd_urihandler_op_t {
     vsf_err_t (*init_fn)(vsf_linux_httpd_request_t *req, vsf_stream_t *in, vsf_stream_t *out);
     vsf_err_t (*fini_fn)(vsf_linux_httpd_request_t *req);
     vsf_err_t (*serve_fn)(vsf_linux_httpd_request_t *req);
 } vsf_linux_httpd_urihandler_op_t;
+
+typedef enum vsf_linux_httpd_urihandler_match_t {
+    VSF_LINUX_HTTPD_URI_MATCH_EXT = 1 << 0,
+    VSF_LINUX_HTTPD_URI_MATCH_URI = 1 << 1,
+    VSF_LINUX_HTTPD_URI_MATCH_ANY = 1 << 2,
+} vsf_linux_httpd_urihandler_match_t;
+typedef enum vsf_linux_httpd_urihandler_type_t {
+    VSF_LINUX_HTTPD_URI_OP = 0,
+    VSF_LINUX_HTTPD_URI_REMAP,
+} vsf_linux_httpd_urihandler_type_t;
+
+typedef struct vsf_linux_httpd_urihandler_t {
+    vsf_linux_httpd_urihandler_match_t match;
+    vsf_linux_httpd_urihandler_type_t type;
+
+    char *ext;
+    char *uri;
+
+    union {
+        const vsf_linux_httpd_urihandler_op_t *op;
+        char *target_uri;
+    };
+} vsf_linux_httpd_urihandler_t;
 
 /*============================ INCLUDES ======================================*/
 
@@ -139,8 +163,13 @@ vsf_class(vsf_linux_httpd_request_t) {
         char *uri;
         char *query;
 
+        const vsf_linux_httpd_urihandler_t *urihandler;
         vsf_stream_t *stream_in, *stream_out;
-        uint16_t result;
+        vsf_linux_https_request_result_t result;
+
+        uint8_t buffer[VSF_LINUX_HTTPD_CFG_REQUEST_BUFSIZE];
+        uint16_t buffer_pos;
+        uint16_t buffer_length;
 
         union {
 #if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
@@ -151,29 +180,6 @@ vsf_class(vsf_linux_httpd_request_t) {
     )
 };
 
-typedef enum vsf_linux_httpd_urihandler_match_t {
-    VSF_LINUX_HTTPD_URI_MATCH_EXT = 1 << 0,
-    VSF_LINUX_HTTPD_URI_MATCH_URI = 1 << 1,
-    VSF_LINUX_HTTPD_URI_MATCH_ANY = 1 << 2,
-} vsf_linux_httpd_urihandler_match_t;
-typedef enum vsf_linux_httpd_urihandler_type_t {
-    VSF_LINUX_HTTPD_URI_OP = 0,
-    VSF_LINUX_HTTPD_URI_REMAP,
-} vsf_linux_httpd_urihandler_type_t;
-
-typedef struct vsf_linux_httpd_urihandler_t {
-    vsf_linux_httpd_urihandler_match_t match;
-    vsf_linux_httpd_urihandler_type_t type;
-
-    char *ext;
-    char *uri;
-
-    union {
-        const vsf_linux_httpd_urihandler_op_t *op;
-        char *target_uri;
-    };
-} vsf_linux_httpd_urihandler_t;
-
 vsf_class(vsf_linux_httpd_session_t) {
     private_member(
         vsf_dlist_node_t session_node;
@@ -182,10 +188,6 @@ vsf_class(vsf_linux_httpd_session_t) {
         int fd_socket;
         int fd_stream_out;
         struct sockaddr_in client_addr;
-
-        uint8_t buffer[VSF_LINUX_HTTPD_CFG_SESSION_BUFSIZE];
-        uint16_t buffer_pos;
-        uint16_t buffer_length;
     )
 };
 
