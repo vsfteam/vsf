@@ -115,6 +115,9 @@ extern "C" {
 
 #define vsf_bitmap_ffz(__bitmap_ptr, __bit_size)                                \
             __vsf_bitmap_ffz((uintalu_t *)(__bitmap_ptr), (__bit_size))
+
+#define vsf_bitmap_ffs(__bitmap_ptr, __bit_size)                                \
+            __vsf_bitmap_ffs((uintalu_t *)(__bitmap_ptr), (__bit_size))
 //! @}
 
 /*============================ TYPES =========================================*/
@@ -123,6 +126,7 @@ extern "C" {
 
 extern void __vsf_bitmap_reset(uintalu_t * this_ptr, int_fast16_t bit_size);
 extern int_fast16_t __vsf_bitmap_ffz(uintalu_t * bitmap_ptr, int_fast16_t bit_size);
+extern int_fast16_t __vsf_bitmap_ffs(uintalu_t * bitmap_ptr, int_fast16_t bit_size);
 
 #ifdef __cplusplus
 }

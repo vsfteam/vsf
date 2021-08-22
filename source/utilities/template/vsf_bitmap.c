@@ -16,6 +16,7 @@
 ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
+
 #include "utilities/vsf_utilities_cfg.h"
 #include "../compiler/compiler.h"
 #include "vsf_bitmap.h"
@@ -26,7 +27,9 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
 extern int_fast8_t __vsf_arch_ffz(uintalu_t);
+extern int_fast8_t __vsf_arch_ffs(uintalu_t);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -59,4 +62,20 @@ int_fast16_t __vsf_bitmap_ffz(uintalu_t *bitmap_ptr, int_fast16_t bit_size)
     return -1;
 }
 
+int_fast16_t __vsf_bitmap_ffs(uintalu_t *bitmap_ptr, int_fast16_t bit_size)
+{
+    int_fast16_t word_size =    (bit_size + (int_fast16_t)__optimal_bit_sz - 1) 
+                            /   (int_fast16_t)__optimal_bit_sz;
+    int_fast16_t index = 0, i = 0;
+
+    for (; i < word_size; i++) {
+        int_fast16_t temp = __vsf_arch_ffs(bitmap_ptr[i]);
+        if (temp >= 0) {
+            index += temp;
+            return index >= bit_size ? -1 : index;
+        }
+        index += __optimal_bit_sz;
+    }
+    return -1;
+}
 
