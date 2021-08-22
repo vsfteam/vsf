@@ -140,6 +140,7 @@ typedef struct vsf_linux_main_priv_t {
 
 typedef struct vsf_linux_stream_priv_t {
     vsf_stream_t *stream;
+    vsf_mutex_t mutex;
 } vsf_linux_stream_priv_t;
 
 typedef struct vsf_linux_pipe_buffer_t {
@@ -557,14 +558,23 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     vsf_linux_process_ctx_t *ctx = priv->ctx;
     vsf_linux_fd_t *sfd;
 
-    sfd = vsf_linux_rx_stream(thread->process->stdio_stream.in);
-    sfd->flags = O_RDONLY;
+    sfd = vsf_linux_get_fd(0);
+    if (NULL == sfd) {
+        sfd = vsf_linux_rx_stream(thread->process->stdio_stream.in);
+        sfd->flags = O_RDONLY;
+    }
 
-    sfd = vsf_linux_tx_stream(thread->process->stdio_stream.out);
-    sfd->flags = O_WRONLY;
+    sfd = vsf_linux_get_fd(1);
+    if (NULL == sfd) {
+        sfd = vsf_linux_tx_stream(thread->process->stdio_stream.out);
+        sfd->flags = O_WRONLY;
+    }
 
-    sfd = vsf_linux_tx_stream(thread->process->stdio_stream.err);
-    sfd->flags = O_WRONLY;
+    sfd = vsf_linux_get_fd(2);
+    if (NULL == sfd) {
+        sfd = vsf_linux_tx_stream(thread->process->stdio_stream.err);
+        sfd->flags = O_WRONLY;
+    }
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
     thread->retval = ctx->entry(ctx->arg.argc, (char **)ctx->arg.argv);
@@ -1003,11 +1013,12 @@ static void __vsf_linux_stream_evthandler(void *param, vsf_stream_evt_t evt)
 
 static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
-    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
-    vsf_stream_t *stream = ((vsf_linux_stream_priv_t *)sfd->priv)->stream;
+    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    vsf_stream_t *stream = priv->stream;
     uint_fast32_t size = count, cursize;
     vsf_protect_t orig;
 
+    vsf_thread_mutex_enter(&priv->mutex, -1);
     while (size > 0) {
         orig = vsf_protect_sched();
         if (!sfd->rxrdy) {
@@ -1051,16 +1062,18 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
     } else {
         vsf_unprotect_sched(orig);
     }
+    vsf_thread_mutex_leave(&priv->mutex);
     return count;
 }
 
 static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
-    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
-    vsf_stream_t *stream = ((vsf_linux_stream_priv_t *)sfd->priv)->stream;
+    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    vsf_stream_t *stream = priv->stream;
     uint_fast32_t size = count, cursize;
     vsf_protect_t orig;
 
+    vsf_thread_mutex_enter(&priv->mutex, -1);
     while (size > 0) {
         orig = vsf_protect_sched();
         if (!sfd->txrdy) {
@@ -1083,6 +1096,7 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
     } else {
         vsf_unprotect_sched(orig);
     }
+    vsf_thread_mutex_leave(&priv->mutex);
     return count;
 }
 
@@ -1099,6 +1113,7 @@ static vsf_linux_fd_t * __vsf_linux_stream(vsf_stream_t *stream)
     if (vsf_linux_create_fd(&sfd, &__vsf_linux_stream_fdop) >= 0) {
         stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
         stream_priv->stream = stream;
+        vsf_eda_mutex_init(&stream_priv->mutex);
     }
     return sfd;
 }
@@ -1124,7 +1139,7 @@ vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream)
 
         vsf_protect_t orig = vsf_protect_sched();
         if (vsf_stream_get_free_size(stream)) {
-            vsf_linux_fd_tx_trigger(sfd, vsf_protect_sched());
+            vsf_linux_fd_tx_trigger(sfd, orig);
         } else {
             vsf_unprotect_sched(orig);
         }
@@ -1272,6 +1287,7 @@ int vsf_linux_fd_rx_untrigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
         sfd->rxrdy = false;
     }
     vsf_unprotect_sched(orig);
+    return 0;
 }
 
 int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t timeout)

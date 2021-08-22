@@ -208,6 +208,7 @@ typedef struct vsf_linux_fs_priv_t {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+// IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 #if VSF_LINUX_USE_DEVFS == ENABLED
 extern int vsf_linux_devfs_init(void);
@@ -221,6 +222,7 @@ extern int vsf_linux_fs_bind_target(int fd, void *target,
         vsf_param_eda_evthandler_t peda_write);
 extern int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry);
 
+// IMPORTANT: priority of stream MUST be within scheduler priorities
 extern vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream);
 extern vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream);
 
