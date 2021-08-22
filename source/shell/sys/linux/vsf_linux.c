@@ -753,6 +753,7 @@ static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t c
             continue;
         }
 
+        VSF_LINUX_ASSERT(NULL == sfd_rx->rxpend);
         if (vsf_slist_queue_is_empty(&priv_rx->buffer_queue)) {
             vsf_linux_fd_rx_untrigger(sfd_rx, orig);
         } else {

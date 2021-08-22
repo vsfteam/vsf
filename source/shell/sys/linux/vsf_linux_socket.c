@@ -660,6 +660,7 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
     }
 
     vsf_protect_t orig = vsf_protect_sched();
+    VSF_LINUX_ASSERT(NULL == sfd->rxpend);
     if (priv->last.netbuf != NULL) {
         vsf_linux_fd_rx_trigger(sfd, orig);
     } else {
