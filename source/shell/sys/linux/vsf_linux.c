@@ -756,8 +756,6 @@ static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t c
         VSF_LINUX_ASSERT(NULL == sfd_rx->rxpend);
         if (vsf_slist_queue_is_empty(&priv_rx->buffer_queue)) {
             vsf_linux_fd_rx_untrigger(sfd_rx, orig);
-        } else {
-            vsf_linux_fd_rx_trigger(sfd_rx, orig);
         }
         break;
     }
@@ -1151,8 +1149,10 @@ void vsf_linux_fd_trigger_init(vsf_trig_t *trig)
 
 int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig)
 {
-    if (sfd->txevt) {
-        sfd->txevt = false;
+    if (sfd->txrdy) {
+        if (sfd->auto_reset) {
+            sfd->txrdy = false;
+        }
         vsf_unprotect_sched(orig);
     } else {
         sfd->txpend = trig;
@@ -1164,8 +1164,10 @@ int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t or
 
 int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig)
 {
-    if (sfd->rxevt) {
-        sfd->rxevt = false;
+    if (sfd->rxrdy) {
+        if (sfd->auto_reset) {
+            sfd->rxrdy = false;
+        }
         vsf_unprotect_sched(orig);
     } else {
         sfd->rxpend = trig;
@@ -1184,7 +1186,7 @@ int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
         sfd->txpend = NULL;
         vsf_eda_trig_set(trig);
     } else {
-        sfd->txevt = true;
+        sfd->txrdy = true;
         vsf_unprotect_sched(orig);
     }
     return 0;
@@ -1198,7 +1200,7 @@ int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
         sfd->rxpend = NULL;
         vsf_eda_trig_set(trig);
     } else {
-        sfd->rxevt = true;
+        sfd->rxrdy = true;
         vsf_unprotect_sched(orig);
     }
     return 0;
@@ -1209,7 +1211,7 @@ int vsf_linux_fd_tx_untrigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
     if (sfd->txpend != NULL) {
         VSF_LINUX_ASSERT(false);
     } else {
-        sfd->txevt = false;
+        sfd->txrdy = false;
     }
     vsf_unprotect_sched(orig);
     return 0;
@@ -1220,7 +1222,7 @@ int vsf_linux_fd_rx_untrigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
     if (sfd->rxpend != NULL) {
         VSF_LINUX_ASSERT(false);
     } else {
-        sfd->rxevt = false;
+        sfd->rxrdy = false;
     }
     vsf_unprotect_sched(orig);
 }
@@ -1238,11 +1240,11 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
         orig = vsf_protect_sched();
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_get_fd(fds[i].fd);
-            if (sfd->rxevt || sfd->txevt) {
-                if ((fds[i].events & POLLIN) && sfd->rxevt) {
+            if (sfd->rxrdy || sfd->txrdy) {
+                if ((fds[i].events & POLLIN) && sfd->rxrdy) {
                     fds[i].revents |= POLLIN;
                 }
-                if ((fds[i].events & POLLOUT) && sfd->txevt) {
+                if ((fds[i].events & POLLOUT) && sfd->txrdy) {
                     fds[i].revents |= POLLOUT;
                 }
                 if (fds[i].revents) {
@@ -1278,14 +1280,14 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             orig = vsf_protect_sched();
                 if (fds[i].events & POLLIN) {
                     if (NULL == sfd->rxpend) {
-                        sfd->rxevt = true;
+                        sfd->rxrdy = true;
                     } else {
                         sfd->rxpend = NULL;
                     }
                 }
                 if (fds[i].events & POLLOUT) {
                     if (NULL == sfd->txpend) {
-                        sfd->txevt = true;
+                        sfd->txrdy = true;
                     } else {
                         sfd->txpend = NULL;
                     }

@@ -556,9 +556,6 @@ ssize_t send(int socket, const void *buffer, size_t size, int flags)
     struct netconn *conn = priv->conn;
 
     if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
-        VSF_LINUX_ASSERT(NULL == sfd->txpend);
-        vsf_linux_fd_tx_trigger(sfd, vsf_protect_sched());
-
         size_t written = 0;
         err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
         return (ERR_OK == err) ? (ssize_t)written : SOCKET_ERROR;
@@ -664,10 +661,10 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
 
     vsf_protect_t orig = vsf_protect_sched();
     VSF_LINUX_ASSERT(NULL == sfd->rxpend);
-    if (priv->last.netbuf != NULL) {
-        vsf_linux_fd_rx_trigger(sfd, orig);
-    } else {
+    if (NULL == priv->last.netbuf) {
         vsf_linux_fd_rx_untrigger(sfd, orig);
+    } else {
+        vsf_unprotect_sched(orig);
     }
     return len;
 }
@@ -684,8 +681,6 @@ ssize_t sendto(int socket, const void *buffer, size_t size, int flags,
     struct netconn *conn = priv->conn;
 
     VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP);
-    VSF_LINUX_ASSERT(NULL == sfd->txpend);
-    vsf_linux_fd_tx_trigger(sfd, vsf_protect_sched());
 
     if (size > LWIP_MIN(0xFFFF, SSIZE_MAX)) {
         return SOCKET_ERROR;

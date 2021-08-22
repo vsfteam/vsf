@@ -178,9 +178,9 @@ vsf_class(vsf_linux_fd_t) {
         const vsf_linux_fd_op_t *op;
 
         vsf_trig_t *txpend, *rxpend;
-        uint_fast8_t txevt      : 1;
-        uint_fast8_t rxevt      : 1;
-        uint_fast8_t locked     : 1;
+        uint_fast8_t txrdy      : 1;
+        uint_fast8_t rxrdy      : 1;
+        uint_fast8_t auto_reset : 1;
     )
 
     private_member(
