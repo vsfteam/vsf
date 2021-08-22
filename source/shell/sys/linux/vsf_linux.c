@@ -729,10 +729,18 @@ static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t c
 
             cur_size = buffer->size - buffer->pos;
             cur_size = min(cur_size, count);
-            memcpy(buf, &buffer[1], cur_size);
+            memcpy(buf, (uint8_t *)&buffer[1] + buffer->pos, cur_size);
             buf = (uint8_t *)buf + cur_size;
             count -= cur_size;
             read_cnt += cur_size;
+            buffer->pos += cur_size;
+            if (buffer->pos >= buffer->size) {
+                orig = vsf_protect_sched();
+                    vsf_slist_queue_dequeue(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
+                vsf_unprotect_sched(orig);
+
+                free(buffer);
+            }
 
             orig = vsf_protect_sched();
             if (!count) {
@@ -763,6 +771,7 @@ static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd_tx, const void *buf, s
     vsf_slist_init_node(vsf_linux_pipe_buffer_t, buffer_node, buffer);
     buffer->pos = 0;
     buffer->size = count;
+    memcpy(&buffer[1], buf, count);
 
     vsf_protect_t orig = vsf_protect_sched();
     bool is_empty = vsf_slist_queue_is_empty(&priv_rx->buffer_queue);
