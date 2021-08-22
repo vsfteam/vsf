@@ -552,10 +552,24 @@ vsf_linux_process_t * vsf_linux_get_cur_process(void)
 
 void vsf_linux_set_dominant_process(void)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(0);
+    vsf_linux_fd_t *sfd;
+
+    sfd = vsf_linux_get_fd(0);
     if ((sfd != NULL) && (sfd->op == &__vsf_linux_stream_fdop)) {
         vsf_linux_stream_priv_t *stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
         stream_priv->stream->rx.param = sfd;
+    }
+
+    sfd = vsf_linux_get_fd(1);
+    if ((sfd != NULL) && (sfd->op == &__vsf_linux_stream_fdop)) {
+        vsf_linux_stream_priv_t *stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
+        stream_priv->stream->tx.param = sfd;
+    }
+
+    sfd = vsf_linux_get_fd(2);
+    if ((sfd != NULL) && (sfd->op == &__vsf_linux_stream_fdop)) {
+        vsf_linux_stream_priv_t *stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
+        stream_priv->stream->tx.param = sfd;
     }
 }
 
@@ -1134,6 +1148,13 @@ vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream)
         stream->rx.evthandler = __vsf_linux_stream_evthandler;
         stream->rx.param = sfd;
         vsf_stream_connect_rx(stream);
+
+        vsf_protect_t orig = vsf_protect_sched();
+        if (vsf_stream_get_data_size(stream)) {
+            vsf_linux_fd_tx_trigger(sfd, orig);
+        } else {
+            vsf_unprotect_sched(orig);
+        }
     }
     return sfd;
 }
