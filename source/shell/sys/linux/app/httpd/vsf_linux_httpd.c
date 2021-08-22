@@ -89,6 +89,7 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
         vsf_dlist_init_node(vsf_linux_httpd_session_t, session_node, session);
         session->fd_socket = session->fd_stream_out = -1;
         session->request.urihandler = NULL;
+        session->request.stream_in = session->request.stream_out = NULL;
         vsf_dlist_add_to_head(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
     }
     return session;
@@ -100,7 +101,7 @@ static int __vsf_linux_httpd_set_fds(vsf_linux_httpd_t *httpd, fd_set *rset, fd_
     int fd_max = -1;
     __vsf_dlist_foreach_unsafe(vsf_linux_httpd_session_t, session_node, &httpd->session_list) {
         FD_SET(_->fd_socket, rset);
-        if (_->request.urihandler != NULL) {
+        if (_->request.stream_out != NULL) {
             FD_SET(_->fd_socket, wset);
         }
         if (_->fd_socket > fd_max) {
