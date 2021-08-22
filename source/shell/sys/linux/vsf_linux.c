@@ -1180,13 +1180,13 @@ int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t or
 // vsf_linux_fd_xx_trigger MUST be called scheduler protected
 int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
+    sfd->txrdy = true;
     if (sfd->txpend != NULL) {
         vsf_unprotect_sched(orig);
         vsf_trig_t *trig = sfd->txpend;
         sfd->txpend = NULL;
         vsf_eda_trig_set(trig);
     } else {
-        sfd->txrdy = true;
         vsf_unprotect_sched(orig);
     }
     return 0;
@@ -1194,13 +1194,13 @@ int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 
 int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
+    sfd->rxrdy = true;
     if (sfd->rxpend != NULL) {
         vsf_unprotect_sched(orig);
         vsf_trig_t *trig = sfd->rxpend;
         sfd->rxpend = NULL;
         vsf_eda_trig_set(trig);
     } else {
-        sfd->rxrdy = true;
         vsf_unprotect_sched(orig);
     }
     return 0;
@@ -1279,18 +1279,10 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             sfd = vsf_linux_get_fd(fds[i].fd);
             orig = vsf_protect_sched();
                 if (fds[i].events & POLLIN) {
-                    if (NULL == sfd->rxpend) {
-                        sfd->rxrdy = true;
-                    } else {
-                        sfd->rxpend = NULL;
-                    }
+                    sfd->rxpend = NULL;
                 }
                 if (fds[i].events & POLLOUT) {
-                    if (NULL == sfd->txpend) {
-                        sfd->txrdy = true;
-                    } else {
-                        sfd->txpend = NULL;
-                    }
+                    sfd->txpend = NULL;
                 }
             vsf_unprotect_sched(orig);
         }
