@@ -555,23 +555,15 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     vsf_linux_process_t *process = thread->process;
     vsf_linux_main_priv_t *priv = vsf_linux_thread_get_priv(thread);
     vsf_linux_process_ctx_t *ctx = priv->ctx;
-
     vsf_linux_fd_t *sfd;
-    vsf_linux_stream_priv_t *stream_priv;
 
-    vsf_linux_create_fd(&sfd, &__vsf_linux_stream_fdop);
-    stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
-    stream_priv->stream = thread->process->stdio_stream.in;
+    sfd = vsf_linux_rx_stream(thread->process->stdio_stream.in);
     sfd->flags = O_RDONLY;
 
-    vsf_linux_create_fd(&sfd, &__vsf_linux_stream_fdop);
-    stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
-    stream_priv->stream = thread->process->stdio_stream.out;
+    sfd = vsf_linux_tx_stream(thread->process->stdio_stream.out);
     sfd->flags = O_WRONLY;
 
-    vsf_linux_create_fd(&sfd, &__vsf_linux_stream_fdop);
-    stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
-    stream_priv->stream = thread->process->stdio_stream.err;
+    sfd = vsf_linux_tx_stream(thread->process->stdio_stream.err);
     sfd->flags = O_WRONLY;
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
@@ -998,17 +990,13 @@ static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
 
 static void __vsf_linux_stream_evthandler(void *param, vsf_stream_evt_t evt)
 {
-    vsf_linux_thread_t *thread = param;
+    vsf_linux_fd_t *sfd = param;
     switch (evt) {
     case VSF_STREAM_ON_RX:
-        vsf_stream_disconnect_rx(thread->pending.stream);
-        thread->pending.stream = NULL;
-        vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_USER);
+        vsf_linux_fd_rx_trigger(sfd, vsf_protect_sched());
         break;
     case VSF_STREAM_ON_TX:
-        vsf_stream_disconnect_tx(thread->pending.stream);
-        thread->pending.stream = NULL;
-        vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_USER);
+        vsf_linux_fd_tx_trigger(sfd, vsf_protect_sched());
         break;
     }
 }
@@ -1018,17 +1006,14 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     vsf_stream_t *stream = ((vsf_linux_stream_priv_t *)sfd->priv)->stream;
     uint_fast32_t size = count, cursize;
+    vsf_protect_t orig;
 
     while (size > 0) {
-        vsf_protect_t orig = vsf_protect_sched();
-        if (!vsf_stream_get_data_size(stream)) {
-            stream->rx.evthandler = __vsf_linux_stream_evthandler;
-            stream->rx.param = thread;
-            thread->pending.stream = stream;
-            vsf_stream_connect_rx(stream);
-            vsf_unprotect_sched(orig);
-
-            vsf_thread_wfe(VSF_EVT_USER);
+        orig = vsf_protect_sched();
+        if (!sfd->rxrdy) {
+            vsf_trig_t trig;
+            vsf_linux_fd_trigger_init(&trig);
+            vsf_linux_fd_rx_pend(sfd, &trig, orig);
         } else {
             vsf_unprotect_sched(orig);
         }
@@ -1058,6 +1043,14 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
         size -= cursize;
         buf = (uint8_t *)buf + cursize;
     }
+
+    orig = vsf_protect_sched();
+    VSF_LINUX_ASSERT(NULL == sfd->rxpend);
+    if (!vsf_stream_get_data_size(stream)) {
+        vsf_linux_fd_rx_untrigger(sfd, orig);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
     return count;
 }
 
@@ -1066,17 +1059,14 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     vsf_stream_t *stream = ((vsf_linux_stream_priv_t *)sfd->priv)->stream;
     uint_fast32_t size = count, cursize;
+    vsf_protect_t orig;
 
     while (size > 0) {
-        vsf_protect_t orig = vsf_protect_sched();
-        if (!vsf_stream_get_free_size(stream)) {
-            stream->tx.evthandler = __vsf_linux_stream_evthandler;
-            stream->tx.param = thread;
-            thread->pending.stream = stream;
-            vsf_stream_connect_tx(stream);
-            vsf_unprotect_sched(orig);
-
-            vsf_thread_wfe(VSF_EVT_USER);
+        orig = vsf_protect_sched();
+        if (!sfd->txrdy) {
+            vsf_trig_t trig;
+            vsf_linux_fd_trigger_init(&trig);
+            vsf_linux_fd_tx_pend(sfd, &trig, orig);
         } else {
             vsf_unprotect_sched(orig);
         }
@@ -1085,12 +1075,61 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
         size -= cursize;
         buf = (uint8_t *)buf + cursize;
     }
+
+    orig = vsf_protect_sched();
+    VSF_LINUX_ASSERT(NULL == sfd->txpend);
+    if (!vsf_stream_get_free_size(stream)) {
+        vsf_linux_fd_tx_untrigger(sfd, orig);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
     return count;
 }
 
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd)
 {
     return 0;
+}
+
+static vsf_linux_fd_t * __vsf_linux_stream(vsf_stream_t *stream)
+{
+    vsf_linux_fd_t *sfd = NULL;
+    vsf_linux_stream_priv_t *stream_priv;
+
+    if (vsf_linux_create_fd(&sfd, &__vsf_linux_stream_fdop) >= 0) {
+        stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
+        stream_priv->stream = stream;
+    }
+    return sfd;
+}
+
+vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream)
+{
+    vsf_linux_fd_t *sfd = __vsf_linux_stream(stream);
+    if (sfd != NULL) {
+        stream->rx.evthandler = __vsf_linux_stream_evthandler;
+        stream->rx.param = sfd;
+        vsf_stream_connect_rx(stream);
+    }
+    return sfd;
+}
+
+vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream)
+{
+    vsf_linux_fd_t *sfd = __vsf_linux_stream(stream);
+    if (sfd != NULL) {
+        stream->tx.evthandler = __vsf_linux_stream_evthandler;
+        stream->tx.param = sfd;
+        vsf_stream_connect_tx(stream);
+
+        vsf_protect_t orig = vsf_protect_sched();
+        if (vsf_stream_get_free_size(stream)) {
+            vsf_linux_fd_tx_trigger(sfd, vsf_protect_sched());
+        } else {
+            vsf_unprotect_sched(orig);
+        }
+    }
+    return sfd;
 }
 
 vsf_linux_fd_t * vsf_linux_get_fd(int fd)

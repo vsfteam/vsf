@@ -110,9 +110,6 @@ vsf_class(vsf_linux_thread_t) {
     private_member(
         vsf_linux_process_t *process;
         vsf_dlist_node_t thread_node;
-        union {
-            vsf_stream_t *stream;
-        } pending;
     )
 };
 
@@ -223,6 +220,9 @@ extern int vsf_linux_fs_bind_target(int fd, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write);
 extern int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry);
+
+extern vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream);
+extern vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream);
 
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
