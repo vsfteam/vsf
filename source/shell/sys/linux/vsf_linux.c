@@ -732,6 +732,7 @@ static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t c
             memcpy(buf, &buffer[1], cur_size);
             buf = (uint8_t *)buf + cur_size;
             count -= cur_size;
+            read_cnt += cur_size;
 
             orig = vsf_protect_sched();
             if (!count) {
@@ -1186,6 +1187,27 @@ int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
         vsf_unprotect_sched(orig);
     }
     return 0;
+}
+
+int vsf_linux_fd_tx_untrigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
+{
+    if (sfd->txpend != NULL) {
+        VSF_LINUX_ASSERT(false);
+    } else {
+        sfd->txevt = false;
+    }
+    vsf_unprotect_sched(orig);
+    return 0;
+}
+
+int vsf_linux_fd_rx_untrigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
+{
+    if (sfd->rxpend != NULL) {
+        VSF_LINUX_ASSERT(false);
+    } else {
+        sfd->rxevt = false;
+    }
+    vsf_unprotect_sched(orig);
 }
 
 int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t timeout)

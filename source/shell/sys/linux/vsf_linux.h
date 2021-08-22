@@ -253,6 +253,8 @@ extern int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_prote
 extern int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
 extern int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 extern int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
+extern int vsf_linux_fd_tx_untrigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
+extern int vsf_linux_fd_rx_untrigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 
 extern vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd);
 #endif
