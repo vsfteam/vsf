@@ -1180,28 +1180,36 @@ int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t or
 // vsf_linux_fd_xx_trigger MUST be called scheduler protected
 int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
+    vsf_trig_t *trig = sfd->txpend;
     sfd->txrdy = true;
-    if (sfd->txpend != NULL) {
-        vsf_unprotect_sched(orig);
-        vsf_trig_t *trig = sfd->txpend;
+    if (trig != NULL) {
         sfd->txpend = NULL;
+        if (sfd->auto_reset) {
+            sfd->txrdy = false;
+        }
+    }
+    vsf_unprotect_sched(orig);
+
+    if (trig != NULL) {
         vsf_eda_trig_set(trig);
-    } else {
-        vsf_unprotect_sched(orig);
     }
     return 0;
 }
 
 int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
+    vsf_trig_t *trig = sfd->rxpend;
     sfd->rxrdy = true;
-    if (sfd->rxpend != NULL) {
-        vsf_unprotect_sched(orig);
-        vsf_trig_t *trig = sfd->rxpend;
+    if (trig != NULL) {
         sfd->rxpend = NULL;
+        if (sfd->auto_reset) {
+            sfd->rxrdy = false;
+        }
+    }
+    vsf_unprotect_sched(orig);
+
+    if (trig != NULL) {
         vsf_eda_trig_set(trig);
-    } else {
-        vsf_unprotect_sched(orig);
     }
     return 0;
 }
