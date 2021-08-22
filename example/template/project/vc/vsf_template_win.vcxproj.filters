@@ -1033,6 +1033,18 @@
     <Filter Include="usrapp\demo\guilite_demo">
       <UniqueIdentifier>{1f226288-bb4b-4c84-a0f7-20f566c484e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\app">
+      <UniqueIdentifier>{956b6f38-c687-4a7a-86d2-bf37d4e71d23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\app\httpd">
+      <UniqueIdentifier>{5429d481-1f28-4dc6-9084-2689eb91664b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\app\httpd\urihandler">
+      <UniqueIdentifier>{1b15642c-a0f6-4614-ac41-ed5e07bdd050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\app\httpd\file">
+      <UniqueIdentifier>{db4d93ae-56a4-4006-93c1-82939993e973}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3161,6 +3173,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\vsf_shell_wrapper.h">
       <Filter>vsf\shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.h">
+      <Filter>vsf\shell\sys\linux\app\httpd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.h">
+      <Filter>vsf\shell\sys\linux\app\httpd\file</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5594,6 +5612,9 @@
     <ClCompile Include="..\..\demo\guilite_demo\guilite_demo.c">
       <Filter>usrapp\demo\guilite_demo</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c">
+      <Filter>vsf\shell\sys\linux\app\httpd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\awtk\awtk_vsf.lib">
@@ -5606,6 +5627,9 @@
     </None>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">
       <Filter>vsf\hal\arch\common\arch_without_thread_suspend</Filter>
+    </None>
+    <None Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.inc">
+      <Filter>vsf\shell\sys\linux\app\httpd\file</Filter>
     </None>
   </ItemGroup>
 </Project>

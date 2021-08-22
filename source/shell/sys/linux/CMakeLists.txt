@@ -28,4 +28,5 @@ if(VSF_USE_LINUX)
 
     add_subdirectory(port)
     add_subdirectory(lib)
+    add_subdirectory(app)
 endif()
