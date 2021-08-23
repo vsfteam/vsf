@@ -107,7 +107,7 @@ static vsf_linux_httpd_urihandler_t * __vsf_linux_httpd_parse_uri(vsf_linux_http
 
 #ifdef __VSF_LINUX_HTTPD_USE_DEFAULT_URIHANDLER
     if (NULL == urihandler) {
-        urihandler = __vsf_linux_httpe_parse_uri_in_list(__vsf_linux_httpd_urihandler, sizeof(__vsf_linux_httpd_urihandler), uri);
+        urihandler = __vsf_linux_httpe_parse_uri_in_list((vsf_linux_httpd_urihandler_t *)__vsf_linux_httpd_urihandler, dimof(__vsf_linux_httpd_urihandler), uri);
     }
 #endif
 
