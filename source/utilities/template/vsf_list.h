@@ -436,9 +436,21 @@ extern "C" {
     for (   __host_type *_ = NULL == (__list_ptr)->head ? NULL :                \
                 __vsf_dlist_get_host(__host_type, __member, (__list_ptr)->head);\
             _ != NULL;                                                          \
-            _ = NULL == _->__member.next ? NULL:                                \
+            _ = NULL == _->__member.next ? NULL :                               \
                 __vsf_dlist_get_host(__host_type, __member, _->__member.next))
 
+#define __vsf_dlist_foreach_next_unsafe(                                        \
+                            __host_type,    /* the type of the host type */     \
+                            __member,       /* the member name of the list */   \
+                            __list_ptr)     /* the address of the list */       \
+    for (   __host_type                                                         \
+                *_ = NULL == (__list_ptr)->head ? NULL :                        \
+                    __vsf_dlist_get_host(__host_type, __member, (__list_ptr)->head),\
+                *__ = NULL == _->__member.next ? NULL :                         \
+                    __vsf_dlist_get_host(__host_type, __member, _->__member.next);\
+            _ != NULL;                                                          \
+            _ = __, __ = NULL == _->__member.next ? NULL :                      \
+                    __vsf_dlist_get_host(__host_type, __member, _->__member.next))
 
 /*-----------------------------------------------------------------------------*
  * Single Chain List                                                           *

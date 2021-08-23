@@ -42,6 +42,11 @@
 
 #define MODULE_NAME                             "httpd"
 
+#if VSF_LINUX_HTTPD_CFG_REQUEST_BUFSIZE < 1024
+#   warning VSF_LINUX_HTTPD_CFG_REQUEST_BUFSIZE MUST be large enough to hold all \
+        http request header and http response header.
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -122,12 +127,12 @@ static vsf_linux_httpd_urihandler_t * __vsf_linux_httpd_parse_uri(vsf_linux_http
 imp_vsf_pool(vsf_linux_httpd_session_pool, vsf_linux_httpd_session_t)
 #endif
 
-// this event handler is called in httpd thread, so can use all linux APIs
 static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vsf_linux_httpd_session_t *session = param;
     switch (evt) {
     case VSF_STREAM_ON_RX:
+        // stream_write is called in httpd thread, so can use all linux APIs here
         if (VSF_ERR_NONE == __vsf_linux_httpd_parse_request(session)) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
             uint8_t *ptr;
@@ -145,6 +150,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             while (true) {
                 urihandler = __vsf_linux_httpd_parse_uri(session, uri);
                 if (NULL == urihandler) {
+                    vsf_trace_error(MODULE_NAME ": fail to parse uri." VSF_TRACE_CFG_LINEEND);
                     // TODO: error handler
                 }
                 if (VSF_LINUX_HTTPD_URI_REMAP == urihandler->type) {
@@ -156,6 +162,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
 
             session->request.urihandler = urihandler;
             if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
+                vsf_trace_error(MODULE_NAME ": fail to initialize urihandler." VSF_TRACE_CFG_LINEEND);
                 // TODO: error handler
             }
 
@@ -163,6 +170,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             if (session->request.stream_in != NULL) {
                 sfd = vsf_linux_rx_stream(session->request.stream_in);
                 if (NULL == sfd) {
+                    vsf_trace_error(MODULE_NAME ": fail to create fd for stream_in." VSF_TRACE_CFG_LINEEND);
                     // TODO: error handler
                 }
                 session->fd_stream_in = sfd->fd;
@@ -170,13 +178,40 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             if (session->request.stream_out != NULL) {
                 sfd = vsf_linux_tx_stream(session->request.stream_out);
                 if (NULL == sfd) {
+                    vsf_trace_error(MODULE_NAME ": fail to create fd for stream_out." VSF_TRACE_CFG_LINEEND);
                     // TODO: error handler
                 }
                 session->fd_stream_out = sfd->fd;
             }
+
+            if (VSF_ERR_NONE != urihandler->op->serve_fn(&session->request)) {
+                vsf_trace_error(MODULE_NAME ": fail to serve urihandler." VSF_TRACE_CFG_LINEEND);
+                // SHOULD not error here because init_fn succeeded.
+                VSF_LINUX_ASSERT(false);
+            }
         }
         break;
     }
+}
+
+static void __vsf_linux_httpd_session_delete(vsf_linux_httpd_t *httpd, vsf_linux_httpd_session_t *session)
+{
+    if (session->fd_stream_in >= 0) {
+        close(session->fd_stream_in);
+    }
+    if (session->fd_stream_out >= 0) {
+        close(session->fd_stream_out);
+    }
+    if (session->fd_socket >= 0) {
+        close(session->fd_socket);
+    }
+
+    vsf_dlist_remove(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
+#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
+    VSF_POOL_FREE(vsf_linux_httpd_session_pool, &httpd->session_pool, session);
+#else
+    free(session);
+#endif
 }
 
 static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd_t *httpd)
@@ -265,6 +300,7 @@ static void * __vsf_linux_httpd_thread(void *param)
     int fd_listen, fd_num, fd_socket;
     fd_set rfds, wfds;
     struct sockaddr_in host_addr;
+    vsf_stream_t *stream;
 
 #if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
     VSF_POOL_PREPARE(vsf_linux_httpd_session_pool, &httpd->session_pool);
@@ -273,7 +309,7 @@ static void * __vsf_linux_httpd_thread(void *param)
 
     fd_listen = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (fd_listen < 0) {
-        vsf_trace_error(MODULE_NAME ": fail to cerate listen socket.");
+        vsf_trace_error(MODULE_NAME ": fail to cerate listen socket." VSF_TRACE_CFG_LINEEND);
         goto __exit;
     }
 
@@ -281,12 +317,12 @@ static void * __vsf_linux_httpd_thread(void *param)
     host_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     host_addr.sin_port = htons(httpd->port);
     if (bind(fd_listen, (struct sockaddr *)&host_addr, sizeof(host_addr))) {
-        vsf_trace_error(MODULE_NAME ": fail to bind socket to port %d.", httpd->port);
+        vsf_trace_error(MODULE_NAME ": fail to bind socket to port %d." VSF_TRACE_CFG_LINEEND, httpd->port);
         goto __close_fd_and_exit;
     }
 
     if (listen(fd_listen, httpd->backlog)) {
-        vsf_trace_error(MODULE_NAME ": fail to listen.");
+        vsf_trace_error(MODULE_NAME ": fail to listen." VSF_TRACE_CFG_LINEEND);
         goto __close_fd_and_exit;
     }
 
@@ -297,7 +333,7 @@ static void * __vsf_linux_httpd_thread(void *param)
         fd_num = __vsf_linux_httpd_set_fds(httpd, &rfds, &wfds);
         fd_num = select(fd_num, &rfds, &wfds, NULL, NULL);
         if (fd_num < 0) {
-            vsf_trace_error(MODULE_NAME ": fail to select.");
+            vsf_trace_error(MODULE_NAME ": fail to select." VSF_TRACE_CFG_LINEEND);
             goto __close_session_fd_and_exit;
         } else if (0 == fd_num) {
             continue;
@@ -321,7 +357,7 @@ static void * __vsf_linux_httpd_thread(void *param)
             }
         }
 
-        __vsf_dlist_foreach_unsafe(vsf_linux_httpd_session_t, session_node, &httpd->session_list) {
+        __vsf_dlist_foreach_next_unsafe(vsf_linux_httpd_session_t, session_node, &httpd->session_list) {
             VSF_LINUX_ASSERT(fd_num >= 0);
             if (0 == fd_num) {
                 break;
@@ -332,20 +368,22 @@ static void * __vsf_linux_httpd_thread(void *param)
             // can write to stream_in or can read from socket, mutual exclusive events
             bool is_socket_readable = FD_ISSET(_->fd_socket, &rfds);
             bool is_stream_writable = (_->fd_stream_in >= 0) && FD_ISSET(_->fd_stream_in, &rfds);
+            stream = _->request.stream_in;
             VSF_LINUX_ASSERT((is_socket_readable && !is_stream_writable) || (!is_socket_readable && is_stream_writable));
             if (is_socket_readable || is_stream_writable) {
                 fd_num--;
 
-                VSF_LINUX_ASSERT(_->request.stream_in != NULL);
+                VSF_LINUX_ASSERT(stream != NULL);
 
                 uint8_t *ptr;
-                uint_fast32_t size = vsf_stream_get_wbuf(_->request.stream_in, &ptr);
+                uint_fast32_t size = vsf_stream_get_wbuf(stream, &ptr);
                 if (size > 0) {
                     ssize_t realsize = read(_->fd_socket, ptr, size);
                     if (realsize < 0) {
+                        vsf_trace_error(MODULE_NAME ": fail to read socket." VSF_TRACE_CFG_LINEEND);
                         // TODO: process socket error
                     }
-                    vsf_stream_write(_->request.stream_in, NULL, realsize);
+                    vsf_stream_write(stream, NULL, realsize);
                     _->wait_stream_in = false;
                 } else {
                     VSF_LINUX_ASSERT(!is_stream_writable);
@@ -356,24 +394,33 @@ static void * __vsf_linux_httpd_thread(void *param)
             // can read from stream_out or can write to socket, mutual exclusive events
             bool is_socket_writable = FD_ISSET(_->fd_socket, &rfds);
             bool is_stream_readable = (_->fd_stream_out >= 0) && FD_ISSET(_->fd_stream_out, &rfds);
+            stream = _->request.stream_out;
             VSF_LINUX_ASSERT((is_socket_writable && !is_stream_readable) || (!is_socket_writable && is_stream_readable));
             if (is_socket_writable || is_stream_readable) {
                 fd_num--;
 
-                VSF_LINUX_ASSERT(_->request.stream_out != NULL);
+                VSF_LINUX_ASSERT(stream != NULL);
 
                 uint8_t *ptr;
-                uint_fast32_t size = vsf_stream_get_rbuf(_->request.stream_out, &ptr);
+                uint_fast32_t size = vsf_stream_get_rbuf(stream, &ptr);
                 if (size > 0) {
                     ssize_t realsize = write(_->fd_socket, ptr, size);
                     if (realsize < 0) {
+                        vsf_trace_error(MODULE_NAME ": fail to write socket." VSF_TRACE_CFG_LINEEND);
                         // TODO: process socket error
                     }
-                    vsf_stream_read(_->request.stream_out, NULL, realsize);
+                    vsf_stream_read(stream, NULL, realsize);
                     _->wait_stream_out = false;
                 } else {
                     VSF_LINUX_ASSERT(!is_stream_readable);
-                    _->wait_stream_out = true;
+
+                    if (vsf_stream_is_tx_connected(stream)) {
+                        _->wait_stream_out = true;
+                    } else {
+                        // tx side of stream_out is disconnected, session end
+                        _->request.urihandler->op->fini_fn(&_->request);
+                        __vsf_linux_httpd_session_delete(httpd, _);
+                    }
                 }
             }
         }
