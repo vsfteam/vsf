@@ -86,10 +86,27 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
 #endif
 
     if (session != NULL) {
+        // setup context for handling http header
+        vsf_mem_stream_t *stream = &session->request.urihandler_ctx.header.stream;
+        stream->op = &vsf_mem_stream_op;
+        stream->buffer = session->request.buffer;
+        stream->size = sizeof(session->request.buffer);
+        stream->align = 0;
+        VSF_STREAM_INIT(stream);
+
+        vsf_linux_fd_t *sfd = vsf_linux_rx_stream(&stream->use_as__vsf_stream_t);
+        if (NULL == sfd) {
+            free(session);
+            return NULL;
+        }
+
         vsf_dlist_init_node(vsf_linux_httpd_session_t, session_node, session);
         session->fd_socket = session->fd_stream_out = -1;
+        session->wait_stream_out = session->wait_stream_in = false;
         session->request.urihandler = NULL;
-        session->request.stream_in = session->request.stream_out = NULL;
+        session->request.stream_out = NULL;
+        session->request.stream_in = &stream->use_as__vsf_stream_t;
+        session->fd_stream_in = sfd->fd;
         vsf_dlist_add_to_head(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
     }
     return session;
@@ -100,19 +117,35 @@ static int __vsf_linux_httpd_set_fds(vsf_linux_httpd_t *httpd, fd_set *rset, fd_
 {
     int fd_max = -1;
     __vsf_dlist_foreach_unsafe(vsf_linux_httpd_session_t, session_node, &httpd->session_list) {
-        FD_SET(_->fd_socket, rset);
         if (_->request.stream_out != NULL) {
-            FD_SET(_->fd_socket, wset);
-        }
-        if (_->fd_socket > fd_max) {
-            fd_max = _->fd_socket;
-        }
+            VSF_LINUX_ASSERT(_->fd_stream_out >= 0);
 
-        if (_->fd_stream_out >= 0) {
-            if (_->fd_stream_out > fd_max) {
-                fd_max = _->fd_stream_out;
+            if (!_->wait_stream_out) {
+                if (_->fd_socket > fd_max) {
+                    fd_max = _->fd_socket;
+                }
+                FD_SET(_->fd_socket, wset);
+            } else {
+                if (_->fd_stream_out > fd_max) {
+                    fd_max = _->fd_stream_out;
+                }
+                FD_SET(_->fd_stream_out, rset);
             }
-            FD_SET(_->fd_stream_out, rset);
+        }
+        if (_->request.stream_in != NULL) {
+            VSF_LINUX_ASSERT(_->fd_stream_in >= 0);
+
+            if (!_->wait_stream_in) {
+                if (_->fd_socket > fd_max) {
+                    fd_max = _->fd_socket;
+                }
+                FD_SET(_->fd_socket, rset);
+            } else {
+                if (_->fd_stream_in > fd_max) {
+                    fd_max = _->fd_stream_in;
+                }
+                FD_SET(_->fd_stream_in, wset);
+            }
         }
     }
     return fd_max;
@@ -187,32 +220,45 @@ static void * __vsf_linux_httpd_thread(void *param)
             }
 
             VSF_LINUX_ASSERT(_->fd_socket >= 0);
-            if (FD_ISSET(_->fd_socket, &rfds)) {
+
+            // can write to stream_in or can read from socket, mutual exclusive events
+            bool is_socket_readable = FD_ISSET(_->fd_socket, &rfds);
+            bool is_stream_writable = (_->fd_stream_in >= 0) && FD_ISSET(_->fd_stream_in, &rfds);
+            VSF_LINUX_ASSERT((is_socket_readable && !is_stream_writable) || (!is_socket_readable && is_stream_writable));
+            if (is_socket_readable || is_stream_writable) {
                 fd_num--;
 
-                // can read from socket
-                if (NULL == _->request.urihandler) {
-                    // urihandler not set, recive header
+                VSF_LINUX_ASSERT(_->request.stream_in != NULL);
+
+                uint8_t *ptr;
+                uint_fast32_t size = vsf_stream_get_wbuf(_->request.stream_in, &ptr);
+                if (size > 0) {
+                    ssize_t realsize = read(_->fd_socket, ptr, size);
+                    vsf_stream_write(_->request.stream_in, NULL, realsize);
                 } else {
-                    // urihandler set, 
-                    if (NULL == _->request.stream_in) {
-                        VSF_LINUX_ASSERT(false);
-                        // TODO: read all data out
-                        continue;
-                    } else {
-                        // read socket data and write to stream_in
-                    }
+                    VSF_LINUX_ASSERT(!is_stream_writable);
+                    _->wait_stream_in = true;
                 }
             }
-            if (FD_ISSET(_->fd_socket, &wfds)) {
+
+            // can read from stream_out or can write to socket, mutual exclusive events
+            bool is_socket_writable = FD_ISSET(_->fd_socket, &rfds);
+            bool is_stream_readable = (_->fd_stream_out >= 0) && FD_ISSET(_->fd_stream_out, &rfds);
+            VSF_LINUX_ASSERT((is_socket_writable && !is_stream_readable) || (!is_socket_writable && is_stream_readable));
+            if (is_socket_writable || is_stream_readable) {
                 fd_num--;
 
-                // can write to socket
-            }
-            if ((_->fd_stream_out >= 0) && FD_ISSET(_->fd_stream_out, &rfds)) {
-                fd_num--;
+                VSF_LINUX_ASSERT(_->request.stream_out != NULL);
 
-                // can read from stream_out
+                uint8_t *ptr;
+                uint_fast32_t size = vsf_stream_get_rbuf(_->request.stream_out, &ptr);
+                if (size > 0) {
+                    ssize_t realsize = write(_->fd_socket, ptr, size);
+                    vsf_stream_read(_->request.stream_out, NULL, realsize);
+                } else {
+                    VSF_LINUX_ASSERT(!is_stream_readable);
+                    _->wait_stream_out = true;
+                }
             }
         }
     }

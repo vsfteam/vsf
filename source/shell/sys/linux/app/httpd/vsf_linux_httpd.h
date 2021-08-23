@@ -154,6 +154,10 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
+typedef struct vsf_linux_httpd_urihandler_header_t {
+    vsf_mem_stream_t stream;
+} vsf_linux_httpd_urihandler_header_t;
+
 vsf_class(vsf_linux_httpd_request_t) {
     protected_member(
         vsf_linux_httpd_request_method_t method;
@@ -175,6 +179,7 @@ vsf_class(vsf_linux_httpd_request_t) {
 #if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
             vsf_linux_httpd_urihandler_file_t file;
 #endif
+            vsf_linux_httpd_urihandler_header_t header;
             uint8_t priv[VSF_LINUX_HTTPD_CFG_PRIV_SIZE];
         } urihandler_ctx;
     )
@@ -186,7 +191,10 @@ vsf_class(vsf_linux_httpd_session_t) {
         vsf_linux_httpd_request_t request;
 
         int fd_socket;
-        int fd_stream_out;
+        int fd_stream_out, fd_stream_in;
+
+        bool wait_stream_out, wait_stream_in;
+
         struct sockaddr_in client_addr;
     )
 };
