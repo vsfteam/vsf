@@ -1,0 +1,56 @@
+name: all_in_one
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout with submodule
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          submodules: true # ignore evm submodules
+
+      - name: Deinit all submodule
+        run: |
+          submodules=$(git submodule | cut --delimiter ' ' --fields 3)
+          for sub in $submodules; do
+            mv "$sub" tmp && rm tmp/.git
+            git submodule deinit "$sub" && git rm "$sub"
+            mv tmp "$sub" && git add "$sub"
+          done
+
+      - name: Commit changes
+        run: |
+          git lfs uninstall
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          last_sha1=$(git rev-parse HEAD)
+          git commit -am "deinit all submodule for $last_sha1"
+
+      - name: Fetch upstream
+        run: |
+          git remote add aio_repo https://github.com/${{ github.actor }}/vsf-all-in-one.git
+          git fetch aio_repo
+
+      - name: Merge
+        run: |
+          git remote -v
+          git branch -v
+          git merge --strategy=ours --allow-unrelated-histories aio_repo/master
+
+      - name: Push
+        uses: ad-m/github-push-action@master
+        with:
+          repository: ${{ github.actor }}/vsf-all-in-one
+          github_token: ${{ secrets.VSF_AIO }}
+          branch: master
