@@ -435,7 +435,12 @@ static void * __vsf_linux_httpd_thread(void *param)
     }
 
 __close_session_fd_and_exit:
-    // TODO: close all sessions
+    __vsf_dlist_foreach_next_unsafe(vsf_linux_httpd_session_t, session_node, &httpd->session_list) {
+        if (_->request.urihandler != NULL) {
+            _->request.urihandler->op->fini_fn(&_->request);
+        }
+        __vsf_linux_httpd_session_delete(httpd, _);
+    }
 __close_fd_and_exit:
     if (fd_listen >= 0) {
         close(fd_listen);
