@@ -21,6 +21,7 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED
 
+#define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h
@@ -50,10 +51,12 @@
 
 // urihandler
 #if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
-#   include "./urihandler/file/__vsf_linux_urihandler_file.inc"
-#endif
+
+/*============================ MACROS ========================================*/
 
 #if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
+#   include "./urihandler/file/__vsf_linux_urihandler_file.inc"
+#endif
 
 /*============================ MACROS ========================================*/
 
