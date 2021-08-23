@@ -39,7 +39,7 @@ jobs:
 
       - name: Fetch upstream
         run: |
-          git remote add aio_repo https://github.com/${{ github.actor }}/vsf-all-in-one.git
+          git remote add aio_repo https://github.com/${{ github.repository_owner }}/vsf-all-in-one.git
           git fetch aio_repo
 
       - name: Merge
@@ -51,6 +51,6 @@ jobs:
       - name: Push
         uses: ad-m/github-push-action@master
         with:
-          repository: ${{ github.actor }}/vsf-all-in-one
+          repository: ${{ github.repository_owner }}/vsf-all-in-one
           github_token: ${{ secrets.VSF_AIO }}
           branch: master
