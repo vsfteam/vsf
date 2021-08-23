@@ -83,9 +83,16 @@ static const vsf_linux_httpd_urihandler_t __vsf_linux_httpd_urihandler[] = {
 
 // request
 
-static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_session_t *session)
+static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *request)
 {
-    return VSF_ERR_NOT_READY;
+    // add NULL terminator to request->buffer, one more byte has already been reserved
+    uint_fast32_t size = vsf_stream_get_data_size(request->stream_in);
+    request->buffer[size] = '\0';
+    if (NULL == strstr((const char *)request->buffer, "\r\n\r\n")) {
+        return VSF_ERR_NOT_READY;
+    }
+
+    return VSF_ERR_NONE;
 }
 
 static vsf_linux_httpd_urihandler_t * __vsf_linux_httpe_parse_uri_in_list(
@@ -133,7 +140,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
     switch (evt) {
     case VSF_STREAM_ON_RX:
         // stream_write is called in httpd thread, so can use all linux APIs here
-        if (VSF_ERR_NONE == __vsf_linux_httpd_parse_request(session)) {
+        if (VSF_ERR_NONE == __vsf_linux_httpd_parse_request(&session->request)) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
             uint8_t *ptr;
             uint_fast32_t size = vsf_stream_get_rbuf(session->request.stream_in, &ptr);
@@ -228,7 +235,8 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
         vsf_mem_stream_t *stream = &session->request.urihandler_ctx.header.stream;
         stream->op = &vsf_mem_stream_op;
         stream->buffer = session->request.buffer;
-        stream->size = sizeof(session->request.buffer);
+        // reserve one byte for NULL terminator
+        stream->size = sizeof(session->request.buffer) - 1;
         stream->align = 0;
         VSF_STREAM_INIT(stream);
 
