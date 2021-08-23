@@ -71,10 +71,68 @@ static const vsf_linux_httpd_urihandler_t __vsf_linux_httpd_urihandler[] = {
 
 // request
 
+static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_session_t *session)
+{
+    return VSF_ERR_NOT_READY;
+}
+
+static vsf_linux_httpd_urihandler_t * __vsf_linux_httpd_parse_uri(vsf_linux_httpd_session_t *session)
+{
+    return NULL;
+}
+
 // session
 #if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
 imp_vsf_pool(vsf_linux_httpd_session_pool, vsf_linux_httpd_session_t)
 #endif
+
+// this event handler is called in httpd thread, so can use all linux APIs
+static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t evt)
+{
+    vsf_linux_httpd_session_t *session = param;
+    switch (evt) {
+    case VSF_STREAM_ON_RX:
+        if (VSF_ERR_NONE == __vsf_linux_httpd_parse_request(session)) {
+            // request parsed, close stream_in(note that there maybe data in stream_in)
+            uint8_t *ptr;
+            uint_fast32_t size = vsf_stream_get_rbuf(session->request.stream_in, &ptr);
+
+            VSF_LINUX_ASSERT(session->fd_stream_out >= 0);
+            close(session->fd_stream_in);
+            session->fd_stream_out = -1;
+            session->request.stream_in = NULL;
+            session->wait_stream_in = false;
+
+            // find a suitable urihandler, and pass ptr/size to urihandler init
+            vsf_linux_httpd_urihandler_t *urihandler = __vsf_linux_httpd_parse_uri(session);
+            if (NULL == urihandler) {
+                // TODO: error handler
+            }
+
+            session->request.urihandler = urihandler;
+            if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
+                // TODO: error handler
+            }
+
+            vsf_linux_fd_t *sfd;
+            if (session->request.stream_in != NULL) {
+                sfd = vsf_linux_rx_stream(session->request.stream_in);
+                if (NULL == sfd) {
+                    // TODO: error handler
+                }
+                session->fd_stream_in = sfd->fd;
+            }
+            if (session->request.stream_out != NULL) {
+                sfd = vsf_linux_tx_stream(session->request.stream_out);
+                if (NULL == sfd) {
+                    // TODO: error handler
+                }
+                session->fd_stream_out = sfd->fd;
+            }
+        }
+        break;
+    }
+}
 
 static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd_t *httpd)
 {
@@ -99,6 +157,10 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
             free(session);
             return NULL;
         }
+
+        stream->rx.evthandler = __vsf_linux_httpd_stream_evthandler;
+        stream->rx.param = session;
+        VSF_STREAM_CONNECT_RX(stream);
 
         vsf_dlist_init_node(vsf_linux_httpd_session_t, session_node, session);
         session->fd_socket = session->fd_stream_out = -1;
@@ -234,7 +296,11 @@ static void * __vsf_linux_httpd_thread(void *param)
                 uint_fast32_t size = vsf_stream_get_wbuf(_->request.stream_in, &ptr);
                 if (size > 0) {
                     ssize_t realsize = read(_->fd_socket, ptr, size);
+                    if (realsize < 0) {
+                        // TODO: process socket error
+                    }
                     vsf_stream_write(_->request.stream_in, NULL, realsize);
+                    _->wait_stream_in = false;
                 } else {
                     VSF_LINUX_ASSERT(!is_stream_writable);
                     _->wait_stream_in = true;
@@ -254,7 +320,11 @@ static void * __vsf_linux_httpd_thread(void *param)
                 uint_fast32_t size = vsf_stream_get_rbuf(_->request.stream_out, &ptr);
                 if (size > 0) {
                     ssize_t realsize = write(_->fd_socket, ptr, size);
+                    if (realsize < 0) {
+                        // TODO: process socket error
+                    }
                     vsf_stream_read(_->request.stream_out, NULL, realsize);
+                    _->wait_stream_out = false;
                 } else {
                     VSF_LINUX_ASSERT(!is_stream_readable);
                     _->wait_stream_out = true;

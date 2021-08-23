@@ -110,7 +110,7 @@ typedef enum vsf_linux_https_request_result_t {
 vsf_dcl_class(vsf_linux_httpd_request_t)
 
 typedef struct vsf_linux_httpd_urihandler_op_t {
-    vsf_err_t (*init_fn)(vsf_linux_httpd_request_t *req, vsf_stream_t *in, vsf_stream_t *out);
+    vsf_err_t (*init_fn)(vsf_linux_httpd_request_t *req, uint8_t *data, uint_fast32_t size);
     vsf_err_t (*fini_fn)(vsf_linux_httpd_request_t *req);
     vsf_err_t (*serve_fn)(vsf_linux_httpd_request_t *req);
 } vsf_linux_httpd_urihandler_op_t;
