@@ -55,6 +55,10 @@
 
 #if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
 
+/*============================ MACROS ========================================*/
+
+#define __VSF_LINUX_HTTPD_USE_DEFAULT_URIHANDLER
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vsf_linux_httpd_urihandler_t __vsf_linux_httpd_urihandler[] = {
@@ -76,9 +80,38 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_session_t *sess
     return VSF_ERR_NOT_READY;
 }
 
-static vsf_linux_httpd_urihandler_t * __vsf_linux_httpd_parse_uri(vsf_linux_httpd_session_t *session)
+static vsf_linux_httpd_urihandler_t * __vsf_linux_httpe_parse_uri_in_list(
+                    vsf_linux_httpd_urihandler_t *urihandler,
+                    uint_fast16_t num_of_handler,
+                    char *uri)
 {
+    char *ext = strrchr(uri, '.');
+    if (ext != NULL) {
+        ext++;
+    }
+
+    for (uint_fast16_t i = 0; i < num_of_handler; i++, urihandler++) {
+        if (    ((urihandler->match & VSF_LINUX_HTTPD_URI_MATCH_EXT) && (ext != NULL) && !strcmp(ext, urihandler->ext))
+            ||  ((urihandler->match & VSF_LINUX_HTTPD_URI_MATCH_URI) && !strcmp(uri, urihandler->uri))
+            ||  (urihandler->match & VSF_LINUX_HTTPD_URI_MATCH_ANY)) {
+            return urihandler;
+        }
+    }
     return NULL;
+}
+
+static vsf_linux_httpd_urihandler_t * __vsf_linux_httpd_parse_uri(vsf_linux_httpd_session_t *session, char *uri)
+{
+    vsf_linux_httpd_t *httpd = session->httpd;
+    vsf_linux_httpd_urihandler_t * urihandler = __vsf_linux_httpe_parse_uri_in_list(httpd->urihandler, httpd->num_of_urihandler, uri);
+
+#ifdef __VSF_LINUX_HTTPD_USE_DEFAULT_URIHANDLER
+    if (NULL == urihandler) {
+        urihandler = __vsf_linux_httpe_parse_uri_in_list(__vsf_linux_httpd_urihandler, sizeof(__vsf_linux_httpd_urihandler), uri);
+    }
+#endif
+
+    return urihandler;
 }
 
 // session
@@ -104,9 +137,18 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             session->wait_stream_in = false;
 
             // find a suitable urihandler, and pass ptr/size to urihandler init
-            vsf_linux_httpd_urihandler_t *urihandler = __vsf_linux_httpd_parse_uri(session);
-            if (NULL == urihandler) {
-                // TODO: error handler
+            vsf_linux_httpd_urihandler_t *urihandler;
+            char *uri = session->request.uri;
+            while (true) {
+                urihandler = __vsf_linux_httpd_parse_uri(session, uri);
+                if (NULL == urihandler) {
+                    // TODO: error handler
+                }
+                if (VSF_LINUX_HTTPD_URI_REMAP == urihandler->type) {
+                    uri = urihandler->target_uri;
+                    continue;
+                }
+                break;
             }
 
             session->request.urihandler = urihandler;
@@ -169,6 +211,7 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
         session->request.stream_out = NULL;
         session->request.stream_in = &stream->use_as__vsf_stream_t;
         session->fd_stream_in = sfd->fd;
+        session->httpd = httpd;
         vsf_dlist_add_to_head(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
     }
     return session;

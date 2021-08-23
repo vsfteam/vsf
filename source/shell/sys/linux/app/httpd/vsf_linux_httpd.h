@@ -62,6 +62,9 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+vsf_dcl_class(vsf_linux_httpd_request_t)
+vsf_dcl_class(vsf_linux_httpd_t)
+
 typedef enum vsf_linux_httpd_request_method_t {
     VSF_LINUX_HTTPD_GET,
     VSF_LINUX_HTTPD_POST,
@@ -106,8 +109,6 @@ typedef enum vsf_linux_https_request_result_t {
     VSF_LINUX_HTTPD_GATEWAY_TIME_OUT,
     VSF_LINUX_HTTPD_HTTP_VERSION_NOT_SUPPORTED,
 } vsf_linux_https_request_result_t;
-
-vsf_dcl_class(vsf_linux_httpd_request_t)
 
 typedef struct vsf_linux_httpd_urihandler_op_t {
     vsf_err_t (*init_fn)(vsf_linux_httpd_request_t *req, uint8_t *data, uint_fast32_t size);
@@ -196,6 +197,7 @@ vsf_class(vsf_linux_httpd_session_t) {
         bool wait_stream_out, wait_stream_in;
 
         struct sockaddr_in client_addr;
+        vsf_linux_httpd_t *httpd;
     )
 };
 
