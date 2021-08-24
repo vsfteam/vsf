@@ -67,7 +67,16 @@ vsf_dcl_class(vsf_linux_httpd_t)
 
 typedef enum vsf_linux_httpd_request_method_t {
     VSF_LINUX_HTTPD_GET,
+    VSF_LINUX_HTTPD_HEAD,
     VSF_LINUX_HTTPD_POST,
+
+    // not supported below
+    VSF_LINUX_HTTPD_PUT,
+    VSF_LINUX_HTTPD_DELETE,
+    VSF_LINUX_HTTPD_CONNECT,
+    VSF_LINUX_HTTPD_OPTIONS,
+    VSF_LINUX_HTTPD_TRACE,
+    VSF_LINUX_HTTPD_PATCH,
 } vsf_linux_httpd_request_method_t;
 
 typedef enum vsf_linux_httpd_content_type_t {
@@ -127,6 +136,7 @@ typedef enum vsf_linux_httpd_urihandler_type_t {
 } vsf_linux_httpd_urihandler_type_t;
 
 typedef struct vsf_linux_httpd_urihandler_t {
+    // ored value of vsf_linux_httpd_urihandler_match_t
     vsf_linux_httpd_urihandler_match_t match;
     vsf_linux_httpd_urihandler_type_t type;
 
@@ -135,7 +145,14 @@ typedef struct vsf_linux_httpd_urihandler_t {
 
     union {
         const vsf_linux_httpd_urihandler_op_t *op;
+        // for remap urihandler
         char *target_uri;
+    };
+
+    union {
+        // something only author of specified urihandler knows
+        void *priv_ptr;
+        int priv_int;
     };
 } vsf_linux_httpd_urihandler_t;
 
@@ -167,6 +184,7 @@ vsf_class(vsf_linux_httpd_request_t) {
         uint32_t content_length;
         char *uri;
         char *query;
+        bool keep_alive;
 
         const vsf_linux_httpd_urihandler_t *urihandler;
         vsf_stream_t *stream_in, *stream_out;

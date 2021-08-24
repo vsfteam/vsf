@@ -52,6 +52,15 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static const char * __vsf_linux_httpd_method[] = {
+    [VSF_LINUX_HTTPD_GET]       = "GET ",
+    [VSF_LINUX_HTTPD_HEAD]      = "HEAD ",
+    [VSF_LINUX_HTTPD_POST]      = "POST ",
+    // last NULL terminator
+    [VSF_LINUX_HTTPD_POST + 1]  = NULL,
+};
+
 /*============================ IMPLEMENTATION ================================*/
 
 // urihandler
@@ -85,13 +94,125 @@ static const vsf_linux_httpd_urihandler_t __vsf_linux_httpd_urihandler[] = {
 
 static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *request)
 {
-    // add NULL terminator to request->buffer, one more byte has already been reserved
+    // add NULL terminator to request->buffer
+    char *cur_ptr = (char *)request->buffer, *end_ptr, *tmp_ptr, *tmp_end_ptr;
     uint_fast32_t size = vsf_stream_get_data_size(request->stream_in);
-    request->buffer[size] = '\0';
-    if (NULL == strstr((const char *)request->buffer, "\r\n\r\n")) {
+
+    // one more byte has already been reserved
+    VSF_LINUX_ASSERT(size <= (sizeof(request->buffer) - 1));
+    // append last NULL terminator, so no need to check overflow later
+    cur_ptr[size] = '\0';
+    end_ptr = strstr((const char *)cur_ptr, "\r\n\r\n");
+    if (NULL == end_ptr) {
         return VSF_ERR_NOT_READY;
     }
+    end_ptr += 4;
+    size = end_ptr - cur_ptr;
 
+    vsf_trace_debug(MODULE_NAME ": parse http request." VSF_TRACE_CFG_LINEEND);
+
+    // http request header ready, parse into request
+    // 1. http request method/uri/query/protocol
+    // 1.1 http request method
+    for (int i = 0; i < dimof(__vsf_linux_httpd_method); i++) {
+        if (NULL == __vsf_linux_httpd_method[i]) {
+        __not_implement:
+            request->result = VSF_LINUX_HTTPD_NOT_IMPLEMENT;
+            return VSF_ERR_FAIL;
+        }
+        if (!strcasecmp((const char *)cur_ptr, __vsf_linux_httpd_method[i])) {
+            cur_ptr += strlen(__vsf_linux_httpd_method[i]);
+            while (' ' == *cur_ptr) {
+                cur_ptr++;
+            }
+            request->method = i;
+            break;
+        }
+    }
+    // 1.2 http request uri
+    request->uri = cur_ptr;
+    cur_ptr = strchr((const char *)cur_ptr, ' ');
+    if (NULL == cur_ptr) {
+    __bad_request:
+        request->result = VSF_LINUX_HTTPD_NOT_IMPLEMENT;
+        return VSF_ERR_FAIL;
+    }
+    // 1.3 http uri query
+    tmp_ptr = strchr((const char *)request->uri, '?');
+    if (tmp_ptr != NULL) {
+        *tmp_ptr++ = '\0';
+        while (' ' == *tmp_ptr) {
+            tmp_ptr++;
+        }
+    }
+    request->query = tmp_ptr;
+    cur_ptr = strchr((const char *)cur_ptr, ' ');
+    if (NULL == cur_ptr) {
+        goto __bad_request;
+    }
+    *cur_ptr++ = '\0';
+    while (' ' == *cur_ptr) {
+        cur_ptr++;
+    }
+    // 1.4 http request protocol
+    if (!strcasecmp((const char *)cur_ptr, "HTTP/1.")) {
+        goto __not_implement;
+    }
+    cur_ptr = strstr((const char *)cur_ptr, "\r\n");
+    if (NULL == cur_ptr) {
+        goto __bad_request;
+    }
+    cur_ptr += 2;
+
+    // 2. htte request header
+    while (cur_ptr < end_ptr) {
+        tmp_end_ptr = strstr((const char *)cur_ptr, "\r\n");
+        if (tmp_end_ptr == cur_ptr) {
+            // end of request
+            cur_ptr += 2;
+            break;
+        } else if (NULL == tmp_end_ptr) {
+            goto __bad_request;
+        }
+        *tmp_end_ptr = '\0';
+        tmp_end_ptr += 2;
+
+        vsf_trace_debug(MODULE_NAME ": %S" VSF_TRACE_CFG_LINEEND, cur_ptr);
+
+        tmp_ptr = cur_ptr;
+        cur_ptr = strchr((const char *)cur_ptr, ':');
+        if (NULL == cur_ptr) {
+            goto __bad_request;
+        }
+        while (' ' == *cur_ptr) {
+            cur_ptr++;
+        }
+
+        if (!strcasecmp((const char *)tmp_ptr, "Content-Length")) {
+            request->content_length = atoi(cur_ptr);
+        } else if (!strcasecmp((const char *)tmp_ptr, "Range")) {
+            goto __not_implement;
+        } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Encoding")) {
+            goto __not_implement;
+        } else if (!strcasecmp((const char *)tmp_ptr, "Connection")) {
+            if (!strcasecmp((const char *)cur_ptr, "close")) {
+                // no need to set to false, becasue it's default value
+            } else if (!strcasecmp((const char *)cur_ptr, "Keep-Alive")) {
+                request->keep_alive = true;
+            } else {
+                goto __bad_request;
+            }
+        } else if (!strcasecmp((const char *)tmp_ptr, "Content-Type")) {
+        } else if (!strcasecmp((const char *)tmp_ptr, "Host")) {
+        } else if (!strcasecmp((const char *)tmp_ptr, "User-Agent")) {
+        } else if (!strcasecmp((const char *)tmp_ptr, "Refer")) {
+        }
+
+        cur_ptr = tmp_end_ptr;
+    }
+
+    // read http request header out of stream_in
+    vsf_stream_read(request->stream_in, NULL, size);
     return VSF_ERR_NONE;
 }
 
@@ -137,10 +258,14 @@ imp_vsf_pool(vsf_linux_httpd_session_pool, vsf_linux_httpd_session_t)
 static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vsf_linux_httpd_session_t *session = param;
+    vsf_err_t err;
     switch (evt) {
     case VSF_STREAM_ON_RX:
         // stream_write is called in httpd thread, so can use all linux APIs here
-        if (VSF_ERR_NONE == __vsf_linux_httpd_parse_request(&session->request)) {
+        err = __vsf_linux_httpd_parse_request(&session->request);
+        if (err < 0) {
+            // TODO: return request->result
+        } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
             uint8_t *ptr;
             uint_fast32_t size = vsf_stream_get_rbuf(session->request.stream_in, &ptr);
@@ -231,6 +356,8 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
 #endif
 
     if (session != NULL) {
+        memset(session, 0, sizeof(*session));
+
         // setup context for handling http header
         vsf_mem_stream_t *stream = &session->request.urihandler_ctx.header.stream;
         stream->op = &vsf_mem_stream_op;
