@@ -1507,6 +1507,7 @@
     <ClCompile Include="..\..\demo\LingLongGUI_demo\application\ui_ll_application.c" />
     <ClCompile Include="..\..\demo\LingLongGUI_demo\application\ui_ll_applicationLogic.c" />
     <ClCompile Include="..\..\demo\LingLongGUI_demo\llgui_demo.c" />
+    <ClCompile Include="..\..\demo\linux_demo\httpd_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\libusb_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\linux_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\mount_file_demo.c" />

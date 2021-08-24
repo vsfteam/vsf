@@ -5615,6 +5615,9 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux.c">
       <Filter>vsf\shell\sys\linux</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\demo\linux_demo\httpd_demo.c">
+      <Filter>usrapp\demo\linux_demo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\awtk\awtk_vsf.lib">

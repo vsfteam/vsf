@@ -40,6 +40,7 @@
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                ENABLED
+#   define APP_USE_LINUX_HTTPD_DEMO                     ENABLED
 #define APP_USE_USBH_DEMO                               ENABLED
 #   define APP_USE_DFU_HOST_DEMO                        ENABLED
 #define APP_USE_USBD_DEMO                               ENABLED

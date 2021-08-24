@@ -219,6 +219,10 @@ int vsf_linux_create_fhs(void)
     extern int mount_file_main(int argc, char *argv[]);
     busybox_bind("/sbin/mount_file", mount_file_main);
 #endif
+#if APP_USE_LINUX_HTTPD_DEMO == ENABLED
+    extern int httpd_main(int argc, char *argv[]);
+    busybox_bind("/sbin/httpd", httpd_main);
+#endif
 #if APP_USE_CPP_DEMO == ENABLED
     extern int cpp_main(int argc, char *argv[]);
     busybox_bind("/sbin/cpp_test", cpp_main);
