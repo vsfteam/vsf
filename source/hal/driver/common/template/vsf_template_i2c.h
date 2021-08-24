@@ -140,9 +140,8 @@ typedef struct i2c_capability_t i2c_capability_t;
         I2C_IRQ_MASK_MASTER_ERROR                   = (0x1ul <<  7),
 
         I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE       = (0x1ul <<  8),
-        I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul <<  9),
-        I2C_IRQ_MASK_MASTER_ADDRESS_NACK            = (0x1ul << 10),
-        I2C_IRQ_MASK_MASTER_ERROR                   = (0x1ul << 11),
+        I2C_IRQ_MASK_MASTER_ADDRESS_NACK            = (0x1ul <<  9),
+        I2C_IRQ_MASK_MASTER_ERROR                   = (0x1ul << 10),
 
         // TODO: add slave interrupt
     };
@@ -397,7 +396,7 @@ extern i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
  @param[in] cmd: i2c 命令
  @param[in] count: i2c 传输缓冲区长度 (单位：字节)
  @param[in] buffer_ptr: i2c 传输缓冲区
- @return i2c_status_t: 返回当前i2c的所有状态
+ @return vsf_err_t: 返回当前i2c的所有状态
  */
 extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
                                         uint16_t   address,
