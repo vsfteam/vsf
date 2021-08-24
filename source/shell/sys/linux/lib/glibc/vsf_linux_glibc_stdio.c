@@ -72,7 +72,6 @@ static int __get_fd(FILE *f)
         return STDERR_FILENO;
     } else {
         vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
-        VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
         return sfd->fd;
     }
 }
@@ -257,7 +256,7 @@ char * gets(char *str)
 
 int fputs(const char *str, FILE *f)
 {
-    return fwrite(str, strlen(str), 1, f);
+    return fwrite(str, 1, strlen(str), f);
 }
 
 int puts(const char *str)
@@ -287,12 +286,12 @@ static int __print_arg(FILE *f, const char *format, va_list ap)
 
         size = vsnprintf(buff, size + 1, format, ap);
         if (size > 0) {
-            size = fwrite(buff, size, 1, f);
+            size = fwrite(buff, 1, size, f);
         }
         free(buff);
         return size;
     }
-    return fwrite(buff, size, 1, f);
+    return fwrite(buff, 1, size, f);
 }
 
 int printf(const char *format, ...)

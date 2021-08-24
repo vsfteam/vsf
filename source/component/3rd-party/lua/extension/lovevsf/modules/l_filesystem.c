@@ -51,7 +51,7 @@ static int __l_filesystem_read_file(lua_State *L, const char *filename, void ** 
     }
 
     fseek(f, 0, SEEK_SET);
-    if (size != fread(buffer, size, 1, f)) {
+    if (size != fread(buffer, 1, size, f)) {
         free(buffer);
         fclose(f);
         return -1;
