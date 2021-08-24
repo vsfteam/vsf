@@ -75,7 +75,10 @@ static const __vsf_linux_httpd_response_t __vsf_linux_httpd_response[] = {
     {   .response = (__response),   .str = (__str) }
 
     __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_OK, "OK"),
+
     __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_BAD_REQUEST, "Bad Request"),
+    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_NOT_FOUND, "Not Found"),
+
     __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_NOT_IMPLEMENT, "Not Implemented"),
 };
 
@@ -345,6 +348,36 @@ static void __vsf_linux_httpd_session_delete(vsf_linux_httpd_session_t *session)
 #endif
 }
 
+static void __vsf_linux_httpd_send_response(vsf_linux_httpd_session_t *session)
+{
+    VSF_LINUX_ASSERT(session->fd_stream_out >= 0);
+#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
+    FILE *f = (FILE *)vsf_linux_get_fd(session->fd_stream_out);
+    VSF_LINUX_ASSERT(f != NULL);
+    // code here uses simple_libc FILE, which is vsf_linux_fd_t
+
+    fprintf(f, "HTTP/1.1 %d %s\r\nServer: vsf_linux_httpd\r\n",
+                    session->request.response,
+                    __vsf_linux_httpd_get_response_str(session->request.response));
+    if (VSF_LINUX_HTTPD_OK == session->request.response) {
+        if (session->request.content_type != VSF_LINUX_HTTPD_CONTEXT_INVALID) {
+            fprintf(f, "Content-Type: %s",
+                    __vsf_linux_httpd_get_content_type_str(session->request.content_type));
+            if (session->request.charset != VSF_LINUX_HTTPD_CHARSET_INVALID) {
+                fprintf(f, "; charset=%s",
+                    __vsf_linux_httpd_get_charset_str(session->request.charset));
+            }
+            fprintf(f, "\r\n");
+        }
+        fprintf(f, "Content-Length: %d\r\n", session->request.content_length);
+        // TODO: add other headers here
+    }
+    fprintf(f, "\r\n");
+#else
+# error TODO: add implementation without stdio in simple_libc
+#endif
+}
+
 static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vsf_linux_httpd_session_t *session = param;
@@ -355,7 +388,24 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
         // stream_write is called in httpd thread, so can use all linux APIs here
         err = __vsf_linux_httpd_parse_request(&session->request);
         if (err < 0) {
-            __vsf_linux_httpd_session_delete(session);
+            vsf_mem_stream_t *stream;
+        __error:
+            stream = &session->request.urihandler_ctx.header.stream;
+            stream->op = &vsf_mem_stream_op;
+            stream->buffer = session->request.buffer;
+            stream->size = sizeof(session->request.buffer);
+            stream->align = 0;
+            VSF_STREAM_INIT(stream);
+
+            vsf_linux_fd_t *sfd = vsf_linux_tx_stream(&stream->use_as__vsf_stream_t);
+            if (NULL == sfd) {
+                session->fatal_error = true;
+                break;
+            }
+
+            session->request.stream_out = &stream->use_as__vsf_stream_t;
+            session->fd_stream_out = sfd->fd;
+            __vsf_linux_httpd_send_response(session);
         } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
             uint8_t *ptr;
@@ -373,8 +423,8 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             while (true) {
                 urihandler = __vsf_linux_httpd_parse_uri(session, uri);
                 if (NULL == urihandler) {
-                    vsf_trace_error(MODULE_NAME ": fail to parse uri." VSF_TRACE_CFG_LINEEND);
-                    // TODO: error handler
+                    session->request.response = VSF_LINUX_HTTPD_NOT_FOUND;
+                    goto __error;
                 }
                 if (VSF_LINUX_HTTPD_URI_REMAP == urihandler->type) {
                     uri = urihandler->target_uri;
@@ -385,8 +435,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
 
             session->request.urihandler = urihandler;
             if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
-                vsf_trace_error(MODULE_NAME ": fail to initialize urihandler." VSF_TRACE_CFG_LINEEND);
-                // TODO: error handler
+                goto __error;
             }
 
             vsf_linux_fd_t *sfd;
@@ -397,7 +446,8 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                 sfd = vsf_linux_rx_stream(stream);
                 if (NULL == sfd) {
                     vsf_trace_error(MODULE_NAME ": fail to create fd for stream_in." VSF_TRACE_CFG_LINEEND);
-                    // TODO: error handler
+                    session->fatal_error = true;
+                    break;
                 }
                 session->fd_stream_in = sfd->fd;
             }
@@ -407,37 +457,18 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             sfd = vsf_linux_tx_stream(stream);
             if (NULL == sfd) {
                 vsf_trace_error(MODULE_NAME ": fail to create fd for stream_out." VSF_TRACE_CFG_LINEEND);
-                // TODO: error handler
+                session->fatal_error = true;
+                break;
             }
             session->fd_stream_out = sfd->fd;
 
             // write response header to stream_out
-#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
-            // code here uses simple_libc FILE, which is vsf_linux_fd_t
-            FILE *f = (FILE *)sfd;
-            fprintf(f, "HTTP/1.1 %d %s\r\nServer: vsf_linux_httpd\r\n",
-                session->request.response,
-                __vsf_linux_httpd_get_response_str(session->request.response));
-            if (session->request.content_type != VSF_LINUX_HTTPD_CONTEXT_INVALID) {
-                fprintf(f, "Content-Type: %s",
-                    __vsf_linux_httpd_get_content_type_str(session->request.content_type));
-                if (session->request.charset != VSF_LINUX_HTTPD_CHARSET_INVALID) {
-                    fprintf(f, "; charset=%s",
-                        __vsf_linux_httpd_get_charset_str(session->request.charset));
-                }
-                fprintf(f, "\r\n");
-            }
-            fprintf(f, "Content-Length: %d\r\n", session->request.content_length);
-            // TODO: add other headers here
-            fprintf(f, "\r\n");
-#else
-# error TODO: add implementation without stdio in simple_libc
-#endif
+            __vsf_linux_httpd_send_response(session);
 
             if (VSF_ERR_NONE != urihandler->op->serve_fn(&session->request)) {
                 vsf_trace_error(MODULE_NAME ": fail to serve urihandler." VSF_TRACE_CFG_LINEEND);
-                // SHOULD not error here because init_fn succeeded.
-                VSF_LINUX_ASSERT(false);
+                vsf_stream_disconnect_tx(session->request.stream_out);
+                break;
             }
         }
         break;
@@ -616,9 +647,14 @@ static void * __vsf_linux_httpd_thread(void *param)
                     ssize_t realsize = read(_->fd_socket, ptr, size);
                     if (realsize < 0) {
                         vsf_trace_error(MODULE_NAME ": fail to read socket." VSF_TRACE_CFG_LINEEND);
-                        // TODO: process socket error
+                        __vsf_linux_httpd_session_delete(_);
+                        continue;
                     }
                     vsf_stream_write(stream, NULL, realsize);
+                    if (_->fatal_error) {
+                        __vsf_linux_httpd_session_delete(_);
+                        continue;
+                    }
                     _->wait_stream_in = false;
                 } else {
                     VSF_LINUX_ASSERT(!is_stream_writable);
@@ -643,7 +679,8 @@ static void * __vsf_linux_httpd_thread(void *param)
                     ssize_t realsize = write(_->fd_socket, ptr, size);
                     if (realsize < 0) {
                         vsf_trace_error(MODULE_NAME ": fail to write socket." VSF_TRACE_CFG_LINEEND);
-                        // TODO: process socket error
+                        __vsf_linux_httpd_session_delete(_);
+                        continue;
                     }
                     vsf_stream_read(stream, NULL, realsize);
                     _->wait_stream_out = false;

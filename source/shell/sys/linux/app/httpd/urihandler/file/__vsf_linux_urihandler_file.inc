@@ -59,14 +59,18 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
     vsf_linux_httpd_urihandler_file_t *urihandler_file = &req->urihandler_ctx.file;
     char *uri = req->uri, *root_path = session->httpd->root_path;
 
+    if (NULL == root_path) {
+    __not_found:
+        req->response = VSF_LINUX_HTTPD_NOT_FOUND;
+        return VSF_ERR_FAIL;
+    }
+
     // get root file
     vk_file_t *root_dir = NULL, *uri_file;
     if (root_path != NULL) {
         vk_file_open(NULL, root_path, 0, &root_dir);
         if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
-        __not_found:
-            req->response = VSF_LINUX_HTTPD_NOT_FOUND;
-            return VSF_ERR_FAIL;
+            goto __not_found;
         }
     }
 
@@ -75,7 +79,6 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
     }
     vk_file_open(root_dir, uri, 0, &uri_file);
     if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
-        vk_file_close(root_dir);
         goto __not_found;
     }
     vk_file_close(root_dir);

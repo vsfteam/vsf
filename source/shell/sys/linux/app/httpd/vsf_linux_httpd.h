@@ -226,6 +226,7 @@ vsf_class(vsf_linux_httpd_session_t) {
         int fd_stream_out, fd_stream_in;
 
         bool wait_stream_out, wait_stream_in;
+        bool fatal_error;
 
         struct sockaddr_in client_addr;
         vsf_linux_httpd_t *httpd;
