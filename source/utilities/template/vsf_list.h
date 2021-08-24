@@ -446,10 +446,10 @@ extern "C" {
     for (   __host_type                                                         \
                 *_ = NULL == (__list_ptr)->head ? NULL :                        \
                     __vsf_dlist_get_host(__host_type, __member, (__list_ptr)->head),\
-                *__ = NULL == _->__member.next ? NULL :                         \
+                *__ = (NULL == _ || NULL == _->__member.next) ? NULL :          \
                     __vsf_dlist_get_host(__host_type, __member, _->__member.next);\
             _ != NULL;                                                          \
-            _ = __, __ = NULL == _->__member.next ? NULL :                      \
+            _ = __, __ = (NULL == _ || NULL == _->__member.next) ? NULL :       \
                     __vsf_dlist_get_host(__host_type, __member, _->__member.next))
 
 /*-----------------------------------------------------------------------------*
