@@ -39,10 +39,12 @@ static const vsf_linux_httpd_urihandler_op_t __vsf_linux_httpd_urihandler_file_o
 static void __vsf_linux_httpd_urihandler_file_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vsf_linux_httpd_urihandler_file_t *urihandler_file = container_of(eda, vsf_linux_httpd_urihandler_file_t, eda);
+    vsf_linux_httpd_request_t *request = container_of(urihandler_file, vsf_linux_httpd_request_t, urihandler_ctx);
     vk_file_stream_t *file_stream = &urihandler_file->file_stream;
+
     switch (evt) {
     case VSF_EVT_INIT:
-        vk_file_read_stream(file_stream, 0, file_stream->file->size, &urihandler_file->stream.use_as__vsf_stream_t);
+        vk_file_read_stream(file_stream, 0, request->content_length, &urihandler_file->stream.use_as__vsf_stream_t);
         break;
     case VSF_EVT_RETURN:
         break;
@@ -57,15 +59,13 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
     vsf_linux_httpd_urihandler_file_t *urihandler_file = &req->urihandler_ctx.file;
     char *uri = req->uri, *root_path = session->httpd->root_path;
 
-    // TODO: parse headers and fill response header in req->buffer with req->buffer_length
-
     // get root file
     vk_file_t *root_dir = NULL, *uri_file;
     if (root_path != NULL) {
         vk_file_open(NULL, root_path, 0, &root_dir);
         if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
         __not_found:
-            req->result = VSF_LINUX_HTTPD_NOT_FOUND;
+            req->response = VSF_LINUX_HTTPD_NOT_FOUND;
             return VSF_ERR_FAIL;
         }
     }
@@ -94,6 +94,9 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
         uri_file = html_file;
     }
     urihandler_file->file_stream.file = uri_file;
+    if (req->content_length > uri_file->size) {
+        req->content_length = uri_file->size;
+    }
 
     vsf_mem_stream_t *stream = &urihandler_file->stream;
     stream->op = &vsf_mem_stream_op;
@@ -103,7 +106,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
     VSF_STREAM_INIT(stream);
     req->stream_out = &stream->use_as__vsf_stream_t;
 
-    // TODO: write response header to stream here or in caller?
+    req->response = VSF_LINUX_HTTPD_OK;
 
     return VSF_ERR_NONE;
 }

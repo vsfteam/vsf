@@ -40,6 +40,10 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_USE_SIMPLE_STREAM != ENABLED
+#   error VSF_USE_SIMPLE_STREAM is needed
+#endif
+
 #define MODULE_NAME                             "httpd"
 
 #if VSF_LINUX_HTTPD_CFG_REQUEST_BUFSIZE < 1024
@@ -49,16 +53,40 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef struct __vsf_linux_httpd_response_t {
+    vsf_linux_https_response_t response;
+    const char *str;
+} __vsf_linux_httpd_response_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const char * __vsf_linux_httpd_method[] = {
-    [VSF_LINUX_HTTPD_GET]       = "GET ",
-    [VSF_LINUX_HTTPD_HEAD]      = "HEAD ",
-    [VSF_LINUX_HTTPD_POST]      = "POST ",
+static const char * __vsf_linux_httpd_method[VSF_LINUX_HTTPD_METHOD_NUM + 1] = {
+    [VSF_LINUX_HTTPD_GET]                   = "GET ",
+    [VSF_LINUX_HTTPD_POST]                  = "POST ",
     // last NULL terminator
-    [VSF_LINUX_HTTPD_POST + 1]  = NULL,
+    [VSF_LINUX_HTTPD_METHOD_NUM]            = NULL,
+};
+
+static const __vsf_linux_httpd_response_t __vsf_linux_httpd_response[] = {
+#define __vsf_linux_httpd_def_response(__response, __str)                       \
+    {   .response = (__response),   .str = (__str) }
+
+    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_OK, "OK"),
+    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_BAD_REQUEST, "Bad Request"),
+    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_NOT_IMPLEMENT, "Not Implemented"),
+};
+
+// valid vsf_linux_httpd_content_type_t starts from 1, so minus 1 as index
+static const char * __vsf_linux_httpd_content_type[VSF_LINUX_HTTPD_CONTENT_NUM] = {
+    [VSF_LINUX_HTTPD_CONTENT_TEXT_XML - 1]  = "text/xml",
+};
+
+// valid vsf_linux_httpd_charset_t starts from 1, so minus 1 as index
+static const char * __vsf_linux_httpd_charset[VSF_LINUX_HTTPD_CHARSET_NUM] = {
+    [VSF_LINUX_HTTPD_CHARSET_UTF8 - 1]      = "utf8",
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -90,6 +118,44 @@ static const vsf_linux_httpd_urihandler_t __vsf_linux_httpd_urihandler[] = {
 
 #endif
 
+// response
+
+const char * __vsf_linux_httpd_get_response_str(vsf_linux_https_response_t response)
+{
+    for (int i = 0; i < dimof(__vsf_linux_httpd_response); i++) {
+        if (__vsf_linux_httpd_response[i].response == response) {
+            return __vsf_linux_httpd_response[i].str;
+        }
+    }
+    // if assert here, add corresponding response to __vsf_linux_httpd_response
+    VSF_LINUX_ASSERT(false);
+    return "UNKNOWN";
+}
+
+const char * __vsf_linux_httpd_get_content_type_str(vsf_linux_httpd_content_type_t type)
+{
+    // skip VSF_LINUX_HTTPD_CONTEXT_INVALID
+    if (    (type > VSF_LINUX_HTTPD_CONTEXT_INVALID)
+        &&  (type <= dimof(__vsf_linux_httpd_content_type))) {
+        return __vsf_linux_httpd_content_type[type - 1];
+    }
+    // if assert here, add corresponding content_type to __vsf_linux_httpd_content_type
+    VSF_LINUX_ASSERT(false);
+    return "UNKNOWN";
+}
+
+const char * __vsf_linux_httpd_get_charset_str(vsf_linux_httpd_charset_t charset)
+{
+    // skip VSF_LINUX_HTTPD_CHARSET_INVALID
+    if (    (charset > VSF_LINUX_HTTPD_CHARSET_INVALID)
+        &&  (charset <= dimof(__vsf_linux_httpd_charset))) {
+        return __vsf_linux_httpd_charset[charset - 1];
+    }
+    // if assert here, add corresponding charset to __vsf_linux_httpd_charset
+    VSF_LINUX_ASSERT(false);
+    return "UNKNOWN";
+}
+
 // request
 
 static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *request)
@@ -117,7 +183,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
     for (int i = 0; i < dimof(__vsf_linux_httpd_method); i++) {
         if (NULL == __vsf_linux_httpd_method[i]) {
         __not_implement:
-            request->result = VSF_LINUX_HTTPD_NOT_IMPLEMENT;
+            request->response = VSF_LINUX_HTTPD_NOT_IMPLEMENT;
             return VSF_ERR_FAIL;
         }
         if (!strcasecmp((const char *)cur_ptr, __vsf_linux_httpd_method[i])) {
@@ -134,7 +200,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
     cur_ptr = strchr((const char *)cur_ptr, ' ');
     if (NULL == cur_ptr) {
     __bad_request:
-        request->result = VSF_LINUX_HTTPD_NOT_IMPLEMENT;
+        request->response = VSF_LINUX_HTTPD_NOT_IMPLEMENT;
         return VSF_ERR_FAIL;
     }
     // 1.3 http uri query
@@ -192,8 +258,6 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
             request->content_length = atoi(cur_ptr);
         } else if (!strcasecmp((const char *)tmp_ptr, "Range")) {
             goto __not_implement;
-        } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Encoding")) {
-            goto __not_implement;
         } else if (!strcasecmp((const char *)tmp_ptr, "Connection")) {
             if (!strcasecmp((const char *)cur_ptr, "close")) {
                 // no need to set to false, becasue it's default value
@@ -205,7 +269,13 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
         } else if (!strcasecmp((const char *)tmp_ptr, "Content-Type")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Host")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "User-Agent")) {
+        } else if (!strcasecmp((const char *)tmp_ptr, "Cookie")) {
+        } else if (!strcasecmp((const char *)tmp_ptr, "Accept")) {
+        } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Encoding")) {
+        } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Charset")) {
+        } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Language")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Refer")) {
+        } else if (!strcasecmp((const char *)tmp_ptr, "Authorization")) {
         }
 
         cur_ptr = tmp_end_ptr;
@@ -259,12 +329,13 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
 {
     vsf_linux_httpd_session_t *session = param;
     vsf_err_t err;
+
     switch (evt) {
     case VSF_STREAM_ON_RX:
         // stream_write is called in httpd thread, so can use all linux APIs here
         err = __vsf_linux_httpd_parse_request(&session->request);
         if (err < 0) {
-            // TODO: return request->result
+            // TODO: return request->response
         } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
             uint8_t *ptr;
@@ -299,22 +370,49 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             }
 
             vsf_linux_fd_t *sfd;
-            if (session->request.stream_in != NULL) {
-                sfd = vsf_linux_rx_stream(session->request.stream_in);
+            vsf_stream_t *stream;
+
+            stream = session->request.stream_in;
+            if (stream != NULL) {
+                sfd = vsf_linux_rx_stream(stream);
                 if (NULL == sfd) {
                     vsf_trace_error(MODULE_NAME ": fail to create fd for stream_in." VSF_TRACE_CFG_LINEEND);
                     // TODO: error handler
                 }
                 session->fd_stream_in = sfd->fd;
             }
-            if (session->request.stream_out != NULL) {
-                sfd = vsf_linux_tx_stream(session->request.stream_out);
-                if (NULL == sfd) {
-                    vsf_trace_error(MODULE_NAME ": fail to create fd for stream_out." VSF_TRACE_CFG_LINEEND);
-                    // TODO: error handler
-                }
-                session->fd_stream_out = sfd->fd;
+
+            stream = session->request.stream_out;
+            VSF_LINUX_ASSERT(stream != NULL);
+            sfd = vsf_linux_tx_stream(stream);
+            if (NULL == sfd) {
+                vsf_trace_error(MODULE_NAME ": fail to create fd for stream_out." VSF_TRACE_CFG_LINEEND);
+                // TODO: error handler
             }
+            session->fd_stream_out = sfd->fd;
+
+            // write response header to stream_out
+#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
+            // code here uses simple_libc FILE, which is vsf_linux_fd_t
+            FILE *f = (FILE *)sfd;
+            fprintf(f, "HTTP/1.1 %d %s\r\nServer: vsf_linux_httpd\r\n",
+                session->request.response,
+                __vsf_linux_httpd_get_response_str(session->request.response));
+            if (session->request.content_type != VSF_LINUX_HTTPD_CONTEXT_INVALID) {
+                fprintf(f, "Content-Type: %s",
+                    __vsf_linux_httpd_get_content_type_str(session->request.content_type));
+                if (session->request.charset != VSF_LINUX_HTTPD_CHARSET_INVALID) {
+                    fprintf(f, "; charset=%s",
+                        __vsf_linux_httpd_get_charset_str(session->request.charset));
+                }
+                fprintf(f, "\r\n");
+            }
+            fprintf(f, "Content-Length: %d\r\n", session->request.content_length);
+            // TODO: add other headers here
+            fprintf(f, "\r\n");
+#else
+# error TODO: add implementation without stdio in simple_libc
+#endif
 
             if (VSF_ERR_NONE != urihandler->op->serve_fn(&session->request)) {
                 vsf_trace_error(MODULE_NAME ": fail to serve urihandler." VSF_TRACE_CFG_LINEEND);

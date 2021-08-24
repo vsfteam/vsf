@@ -67,10 +67,11 @@ vsf_dcl_class(vsf_linux_httpd_t)
 
 typedef enum vsf_linux_httpd_request_method_t {
     VSF_LINUX_HTTPD_GET,
-    VSF_LINUX_HTTPD_HEAD,
     VSF_LINUX_HTTPD_POST,
+    VSF_LINUX_HTTPD_METHOD_NUM,
 
-    // not supported below
+    // not supported below, DO NOT USE
+    VSF_LINUX_HTTPD_HEAD,
     VSF_LINUX_HTTPD_PUT,
     VSF_LINUX_HTTPD_DELETE,
     VSF_LINUX_HTTPD_CONNECT,
@@ -80,14 +81,25 @@ typedef enum vsf_linux_httpd_request_method_t {
 } vsf_linux_httpd_request_method_t;
 
 typedef enum vsf_linux_httpd_content_type_t {
-    VSF_LINUX_HTTPD_TEXT_XML,
+    VSF_LINUX_HTTPD_CONTEXT_INVALID = 0,
+    VSF_LINUX_HTTPD_CONTENT_TEXT_XML,
+    VSF_LINUX_HTTPD_CONTENT_NUM = VSF_LINUX_HTTPD_CONTENT_TEXT_XML,
 } vsf_linux_httpd_content_type_t;
 
+typedef enum vsf_linux_httpd_charset_t {
+    VSF_LINUX_HTTPD_CHARSET_INVALID = 0,
+    VSF_LINUX_HTTPD_CHARSET_UTF8,
+    VSF_LINUX_HTTPD_CHARSET_NUM = VSF_LINUX_HTTPD_CHARSET_UTF8,
+} vsf_linux_httpd_charset_t;
+
 typedef enum vsf_linux_httpd_language_t {
+    VSF_LINUX_HTTPD_LANGUAGE_INVALID = 0,
     VSF_LINUX_HTTPD_ENGLISH,
 } vsf_linux_httpd_language_t;
 
-typedef enum vsf_linux_https_request_result_t {
+typedef enum vsf_linux_https_response_t {
+    VSF_LINUX_HTTPD_CONTINUE = 100,
+
     VSF_LINUX_HTTPD_OK = 200,
 
     VSF_LINUX_HTTPD_MULTIPLE_CHOICES = 300,
@@ -117,7 +129,7 @@ typedef enum vsf_linux_https_request_result_t {
     VSF_LINUX_HTTPD_SERVICE_UNAVAILABLE,
     VSF_LINUX_HTTPD_GATEWAY_TIME_OUT,
     VSF_LINUX_HTTPD_HTTP_VERSION_NOT_SUPPORTED,
-} vsf_linux_https_request_result_t;
+} vsf_linux_https_response_t;
 
 typedef struct vsf_linux_httpd_urihandler_op_t {
     vsf_err_t (*init_fn)(vsf_linux_httpd_request_t *req, uint8_t *data, uint_fast32_t size);
@@ -180,6 +192,7 @@ vsf_class(vsf_linux_httpd_request_t) {
     protected_member(
         vsf_linux_httpd_request_method_t method;
         vsf_linux_httpd_content_type_t content_type;
+        vsf_linux_httpd_charset_t charset;
         vsf_linux_httpd_language_t language;
         uint32_t content_length;
         char *uri;
@@ -188,7 +201,7 @@ vsf_class(vsf_linux_httpd_request_t) {
 
         const vsf_linux_httpd_urihandler_t *urihandler;
         vsf_stream_t *stream_in, *stream_out;
-        vsf_linux_https_request_result_t result;
+        vsf_linux_https_response_t response;
 
         uint8_t buffer[VSF_LINUX_HTTPD_CFG_REQUEST_BUFSIZE];
         uint16_t buffer_pos;
