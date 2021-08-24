@@ -601,12 +601,13 @@ static void * __vsf_linux_httpd_thread(void *param)
 
             // can write to stream_in or can read from socket, mutual exclusive events
             bool is_socket_readable = FD_ISSET(_->fd_socket, &rfds);
-            bool is_stream_writable = (_->fd_stream_in >= 0) && FD_ISSET(_->fd_stream_in, &rfds);
-            stream = _->request.stream_in;
-            VSF_LINUX_ASSERT((is_socket_readable && !is_stream_writable) || (!is_socket_readable && is_stream_writable));
+            bool is_stream_writable = (_->fd_stream_in >= 0) && FD_ISSET(_->fd_stream_in, &wfds);
             if (is_socket_readable || is_stream_writable) {
+                VSF_LINUX_ASSERT(   (is_socket_readable && !is_stream_writable)
+                                ||  (!is_socket_readable && is_stream_writable));
                 fd_num--;
 
+                stream = _->request.stream_in;
                 VSF_LINUX_ASSERT(stream != NULL);
 
                 uint8_t *ptr;
@@ -626,13 +627,14 @@ static void * __vsf_linux_httpd_thread(void *param)
             }
 
             // can read from stream_out or can write to socket, mutual exclusive events
-            bool is_socket_writable = FD_ISSET(_->fd_socket, &rfds);
+            bool is_socket_writable = FD_ISSET(_->fd_socket, &wfds);
             bool is_stream_readable = (_->fd_stream_out >= 0) && FD_ISSET(_->fd_stream_out, &rfds);
-            stream = _->request.stream_out;
-            VSF_LINUX_ASSERT((is_socket_writable && !is_stream_readable) || (!is_socket_writable && is_stream_readable));
             if (is_socket_writable || is_stream_readable) {
+                VSF_LINUX_ASSERT(   (is_socket_writable && !is_stream_readable)
+                                ||  (!is_socket_writable && is_stream_readable));
                 fd_num--;
 
+                stream = _->request.stream_out;
                 VSF_LINUX_ASSERT(stream != NULL);
 
                 uint8_t *ptr;

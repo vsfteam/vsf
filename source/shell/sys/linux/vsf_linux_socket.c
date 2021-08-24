@@ -482,6 +482,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
     } else {
         vsf_unprotect_sched(orig);
     }
+    vsf_linux_fd_tx_trigger(sfd, vsf_protect_sched());
     return newsock;
 }
 

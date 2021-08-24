@@ -50,6 +50,7 @@ static vsf_err_t __user_httpd_serve(vsf_linux_httpd_request_t *req)
 {
     __user_httpd_urihandler_t *urihandler = (__user_httpd_urihandler_t *)&req->urihandler_ctx.priv;
     VSF_STREAM_WRITE(&urihandler->stream, (uint8_t *)__user_httpd_index, strlen(__user_httpd_index));
+    VSF_STREAM_DISCONNECT_TX(&urihandler->stream);
     return VSF_ERR_NONE;
 }
 
