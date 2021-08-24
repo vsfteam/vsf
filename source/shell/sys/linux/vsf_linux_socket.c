@@ -83,6 +83,8 @@ static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd);
 // APIs not implemented in older lwip
 extern struct pbuf * pbuf_free_header(struct pbuf *q, u16_t size);
 
+static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len);
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vsf_linux_fd_op_t __vsf_linux_socket_fdop = {
@@ -466,6 +468,8 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 //        __ipaddr_port_to_sockaddr(, &naddr, port);
 //        if (*addrlen >
     }
+    newconn->socket = (int)newsock;
+    newconn->callback = __vsf_linux_socket_lwip_evthandler;
     return newsock;
 }
 
@@ -747,6 +751,10 @@ int shutdown(int socket, int how)
 
 static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len)
 {
+    if (-1 == conn->socket) {
+        return;
+    }
+
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)conn->socket;
     if (sfd != NULL) {
         switch (evt) {
