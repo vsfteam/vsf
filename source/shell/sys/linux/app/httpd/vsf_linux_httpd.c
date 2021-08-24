@@ -186,7 +186,8 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
             request->response = VSF_LINUX_HTTPD_NOT_IMPLEMENT;
             return VSF_ERR_FAIL;
         }
-        if (!strcasecmp((const char *)cur_ptr, __vsf_linux_httpd_method[i])) {
+        if (!strncasecmp((const char *)cur_ptr, __vsf_linux_httpd_method[i],
+                            strlen(__vsf_linux_httpd_method[i]))) {
             cur_ptr += strlen(__vsf_linux_httpd_method[i]);
             while (' ' == *cur_ptr) {
                 cur_ptr++;
@@ -200,8 +201,12 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
     cur_ptr = strchr((const char *)cur_ptr, ' ');
     if (NULL == cur_ptr) {
     __bad_request:
-        request->response = VSF_LINUX_HTTPD_NOT_IMPLEMENT;
+        request->response = VSF_LINUX_HTTPD_BAD_REQUEST;
         return VSF_ERR_FAIL;
+    }
+    *cur_ptr++ = '\0';
+    while (' ' == *cur_ptr) {
+        cur_ptr++;
     }
     // 1.3 http uri query
     tmp_ptr = strchr((const char *)request->uri, '?');
@@ -212,16 +217,8 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
         }
     }
     request->query = tmp_ptr;
-    cur_ptr = strchr((const char *)cur_ptr, ' ');
-    if (NULL == cur_ptr) {
-        goto __bad_request;
-    }
-    *cur_ptr++ = '\0';
-    while (' ' == *cur_ptr) {
-        cur_ptr++;
-    }
     // 1.4 http request protocol
-    if (!strcasecmp((const char *)cur_ptr, "HTTP/1.")) {
+    if (strncasecmp((const char *)cur_ptr, "HTTP/1.", sizeof("HTTP/1.") - 1)) {
         goto __not_implement;
     }
     cur_ptr = strstr((const char *)cur_ptr, "\r\n");
@@ -250,6 +247,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
         if (NULL == cur_ptr) {
             goto __bad_request;
         }
+        *cur_ptr++ = '\0';
         while (' ' == *cur_ptr) {
             cur_ptr++;
         }
@@ -325,6 +323,28 @@ static vsf_linux_httpd_urihandler_t * __vsf_linux_httpd_parse_uri(vsf_linux_http
 imp_vsf_pool(vsf_linux_httpd_session_pool, vsf_linux_httpd_session_t)
 #endif
 
+static void __vsf_linux_httpd_session_delete(vsf_linux_httpd_session_t *session)
+{
+    vsf_linux_httpd_t *httpd = session->httpd;
+
+    if (session->fd_stream_in >= 0) {
+        close(session->fd_stream_in);
+    }
+    if (session->fd_stream_out >= 0) {
+        close(session->fd_stream_out);
+    }
+    if (session->fd_socket >= 0) {
+        close(session->fd_socket);
+    }
+
+    vsf_dlist_remove(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
+#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
+    VSF_POOL_FREE(vsf_linux_httpd_session_pool, &httpd->session_pool, session);
+#else
+    free(session);
+#endif
+}
+
 static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vsf_linux_httpd_session_t *session = param;
@@ -335,15 +355,15 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
         // stream_write is called in httpd thread, so can use all linux APIs here
         err = __vsf_linux_httpd_parse_request(&session->request);
         if (err < 0) {
-            // TODO: return request->response
+            __vsf_linux_httpd_session_delete(session);
         } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
             uint8_t *ptr;
             uint_fast32_t size = vsf_stream_get_rbuf(session->request.stream_in, &ptr);
 
-            VSF_LINUX_ASSERT(session->fd_stream_out >= 0);
+            VSF_LINUX_ASSERT(session->fd_stream_in >= 0);
             close(session->fd_stream_in);
-            session->fd_stream_out = -1;
+            session->fd_stream_in = -1;
             session->request.stream_in = NULL;
             session->wait_stream_in = false;
 
@@ -422,26 +442,6 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
         }
         break;
     }
-}
-
-static void __vsf_linux_httpd_session_delete(vsf_linux_httpd_t *httpd, vsf_linux_httpd_session_t *session)
-{
-    if (session->fd_stream_in >= 0) {
-        close(session->fd_stream_in);
-    }
-    if (session->fd_stream_out >= 0) {
-        close(session->fd_stream_out);
-    }
-    if (session->fd_socket >= 0) {
-        close(session->fd_socket);
-    }
-
-    vsf_dlist_remove(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
-#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
-    VSF_POOL_FREE(vsf_linux_httpd_session_pool, &httpd->session_pool, session);
-#else
-    free(session);
-#endif
 }
 
 static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd_t *httpd)
@@ -653,7 +653,7 @@ static void * __vsf_linux_httpd_thread(void *param)
                     } else {
                         // tx side of stream_out is disconnected, session end
                         _->request.urihandler->op->fini_fn(&_->request);
-                        __vsf_linux_httpd_session_delete(httpd, _);
+                        __vsf_linux_httpd_session_delete(_);
                     }
                 }
             }
@@ -665,7 +665,7 @@ __close_session_fd_and_exit:
         if (_->request.urihandler != NULL) {
             _->request.urihandler->op->fini_fn(&_->request);
         }
-        __vsf_linux_httpd_session_delete(httpd, _);
+        __vsf_linux_httpd_session_delete(_);
     }
 __close_fd_and_exit:
     if (fd_listen >= 0) {
