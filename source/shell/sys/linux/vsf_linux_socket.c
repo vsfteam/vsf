@@ -468,8 +468,20 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 //        __ipaddr_port_to_sockaddr(, &naddr, port);
 //        if (*addrlen >
     }
-    newconn->socket = (int)newsock;
+
+    newconn->socket = (int)sfd;
     newconn->callback = __vsf_linux_socket_lwip_evthandler;
+
+    // maybe callback is already issued(and ignored becase of invalid newconn->socket),
+    //  so try trigger if recv data available
+    vsf_protect_t orig = vsf_protect_sched();
+    int recv_avail;
+    SYS_ARCH_GET(newconn->recv_avail, recv_avail);
+    if (recv_avail > 0) {
+        vsf_linux_fd_rx_trigger(sfd, orig);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
     return newsock;
 }
 
@@ -663,13 +675,6 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
         }
     }
 
-    vsf_protect_t orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT(NULL == sfd->rxpend);
-    if (NULL == priv->last.netbuf) {
-        vsf_linux_fd_rx_untrigger(sfd, orig);
-    } else {
-        vsf_unprotect_sched(orig);
-    }
     return len;
 }
 
@@ -760,6 +765,9 @@ static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netcon
         switch (evt) {
         case NETCONN_EVT_RCVPLUS:
             vsf_linux_fd_rx_trigger(sfd, vsf_protect_sched());
+            break;
+        case NETCONN_EVT_RCVMINUS:
+            vsf_linux_fd_rx_untrigger(sfd, vsf_protect_sched());
             break;
         case NETCONN_EVT_SENDPLUS:
             vsf_linux_fd_tx_trigger(sfd, vsf_protect_sched());
