@@ -178,7 +178,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
     end_ptr += 4;
     size = end_ptr - cur_ptr;
 
-    vsf_trace_debug(MODULE_NAME ": parse http request." VSF_TRACE_CFG_LINEEND);
+    vsf_trace_debug("****************************** HTTP REQUEST ******************************" VSF_TRACE_CFG_LINEEND);
 
     // http request header ready, parse into request
     // 1. http request method/uri/query/protocol
@@ -230,6 +230,11 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
     }
     cur_ptr += 2;
 
+    vsf_trace_debug("uri: %s" VSF_TRACE_CFG_LINEEND, request->uri);
+    if (request->query != NULL) {
+        vsf_trace_debug("    query: %s" VSF_TRACE_CFG_LINEEND, request->query);
+    }
+
     // 2. htte request header
     while (cur_ptr < end_ptr) {
         tmp_end_ptr = strstr((const char *)cur_ptr, "\r\n");
@@ -243,7 +248,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
         *tmp_end_ptr = '\0';
         tmp_end_ptr += 2;
 
-        vsf_trace_debug(MODULE_NAME ": %S" VSF_TRACE_CFG_LINEEND, cur_ptr);
+        vsf_trace_debug("%S" VSF_TRACE_CFG_LINEEND, cur_ptr);
 
         tmp_ptr = cur_ptr;
         cur_ptr = strchr((const char *)cur_ptr, ':');
