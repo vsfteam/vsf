@@ -41,10 +41,13 @@ static void __vsf_linux_httpd_urihandler_file_evthandler(vsf_eda_t *eda, vsf_evt
     vsf_linux_httpd_urihandler_file_t *urihandler_file = container_of(eda, vsf_linux_httpd_urihandler_file_t, eda);
     vsf_linux_httpd_request_t *request = container_of(urihandler_file, vsf_linux_httpd_request_t, urihandler_ctx);
     vk_file_stream_t *file_stream = &urihandler_file->file_stream;
+    vsf_stream_t *stream = &urihandler_file->stream.use_as__vsf_stream_t;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vk_file_read_stream(file_stream, 0, request->content_length, &urihandler_file->stream.use_as__vsf_stream_t);
+        // disconnect tx terminal of stream_out, will be connected to file stream reader
+        vsf_stream_disconnect_tx(stream);
+        vk_file_read_stream(file_stream, 0, request->content_length, stream);
         break;
     case VSF_EVT_RETURN:
         break;
@@ -94,6 +97,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
                 goto __not_found;
             }
         }
+        vk_file_close(uri_file);
         uri_file = html_file;
     }
     urihandler_file->file_stream.file = uri_file;
@@ -125,7 +129,6 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_fini(vsf_linux_httpd_request_
 static vsf_err_t __vsf_linux_httpd_urihandler_file_serve(vsf_linux_httpd_request_t *req)
 {
     vsf_linux_httpd_urihandler_file_t *urihandler_file = &req->urihandler_ctx.file;
-
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     urihandler_file->eda.on_terminate = NULL;
 #endif
