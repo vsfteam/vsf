@@ -355,32 +355,44 @@ static void __vsf_linux_httpd_session_delete(vsf_linux_httpd_session_t *session)
 
 static void __vsf_linux_httpd_send_response(vsf_linux_httpd_session_t *session)
 {
-    VSF_LINUX_ASSERT(session->fd_stream_out >= 0);
-#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
-    FILE *f = (FILE *)vsf_linux_get_fd(session->fd_stream_out);
-    VSF_LINUX_ASSERT(f != NULL);
-    // code here uses simple_libc FILE, which is vsf_linux_fd_t
+    vsf_stream_t *stream = session->request.stream_out;
 
-    fprintf(f, "HTTP/1.1 %d %s\r\nServer: vsf_linux_httpd\r\n",
-                    session->request.response,
+#define vsf_stream_write_str(__stream, __str)                                   \
+            do {                                                                \
+                vsf_stream_write((__stream), (uint8_t *)(__str), strlen(__str));\
+            } while (false)
+#define vsf_stream_write_int(__stream, __int)                                   \
+            do {                                                                \
+                char __int_buffer[16];                                          \
+                itoa((__int), __int_buffer, 10);                                \
+                vsf_stream_write((__stream), (uint8_t *)(__int_buffer),         \
+                    strlen(__int_buffer));                                      \
+            } while (false)
+
+    vsf_stream_write_str(stream, "HTTP/1.1 ");
+    vsf_stream_write_int(stream, session->request.response);
+    vsf_stream_write_str(stream, " ");
+    vsf_stream_write_str(stream,
                     __vsf_linux_httpd_get_response_str(session->request.response));
+    vsf_stream_write_str(stream, "\r\n");
+
     if (VSF_LINUX_HTTPD_OK == session->request.response) {
         if (session->request.content_type != VSF_LINUX_HTTPD_CONTEXT_INVALID) {
-            fprintf(f, "Content-Type: %s",
+            vsf_stream_write_str(stream, "Content-Type: ");
+            vsf_stream_write_str(stream,
                     __vsf_linux_httpd_get_content_type_str(session->request.content_type));
             if (session->request.charset != VSF_LINUX_HTTPD_CHARSET_INVALID) {
-                fprintf(f, "; charset=%s",
+                vsf_stream_write_str(stream, "; charset=");
+                vsf_stream_write_str(stream,
                     __vsf_linux_httpd_get_charset_str(session->request.charset));
             }
-            fprintf(f, "\r\n");
+            vsf_stream_write_str(stream, "\r\n");
         }
-        fprintf(f, "Content-Length: %d\r\n", session->request.content_length);
-        // TODO: add other headers here
+        vsf_stream_write_str(stream, "Content-Length: ");
+        vsf_stream_write_int(stream, session->request.content_length);
+        vsf_stream_write_str(stream, "\r\n");
     }
-    fprintf(f, "\r\n");
-#else
-# error TODO: add implementation without stdio in simple_libc
-#endif
+    vsf_stream_write_str(stream, "\r\n");
 }
 
 static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t evt)
@@ -448,24 +460,28 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
 
             stream = session->request.stream_in;
             if (stream != NULL) {
-                sfd = vsf_linux_rx_stream(stream);
+                sfd = vsf_linux_tx_stream(stream);
                 if (NULL == sfd) {
                     vsf_trace_error(MODULE_NAME ": fail to create fd for stream_in." VSF_TRACE_CFG_LINEEND);
                     session->fatal_error = true;
                     break;
                 }
                 session->fd_stream_in = sfd->fd;
+                // ready to send data to stream_in
+                vsf_stream_connect_tx(stream);
             }
 
             stream = session->request.stream_out;
             VSF_LINUX_ASSERT(stream != NULL);
-            sfd = vsf_linux_tx_stream(stream);
+            sfd = vsf_linux_rx_stream(stream);
             if (NULL == sfd) {
                 vsf_trace_error(MODULE_NAME ": fail to create fd for stream_out." VSF_TRACE_CFG_LINEEND);
                 session->fatal_error = true;
                 break;
             }
             session->fd_stream_out = sfd->fd;
+            // ready to recv data from stream_out
+            vsf_stream_connect_rx(stream);
 
             // write response header to stream_out
             __vsf_linux_httpd_send_response(session);
