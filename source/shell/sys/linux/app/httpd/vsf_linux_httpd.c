@@ -493,6 +493,37 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
     }
 }
 
+static void __vsf_linux_httpd_session_reset_reuqest(vsf_linux_httpd_session_t *session)
+{
+    if (session->fd_stream_in >= 0) {
+        close(session->fd_stream_in);
+        session->fd_stream_in = -1;
+    }
+    if (session->fd_stream_out >= 0) {
+        close(session->fd_stream_out);
+        session->fd_stream_out = -1;
+    }
+
+    // setup context for handling http header
+    vsf_mem_stream_t *stream = &session->request.urihandler_ctx.header.stream;
+    stream->op = &vsf_mem_stream_op;
+    stream->buffer = session->request.buffer;
+    // reserve one byte for NULL terminator
+    stream->size = sizeof(session->request.buffer) - 1;
+    stream->align = 0;
+    stream->rx.evthandler = __vsf_linux_httpd_stream_evthandler;
+    stream->rx.param = session;
+    VSF_STREAM_INIT(stream);
+    VSF_STREAM_CONNECT_RX(stream);
+
+    session->wait_stream_out = session->wait_stream_in = false;
+    session->request.urihandler = NULL;
+    session->request.stream_out = NULL;
+    session->request.stream_in = &stream->use_as__vsf_stream_t;
+    session->request.keep_alive = false;
+    session->request.is_serving = false;
+}
+
 static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd_t *httpd)
 {
     vsf_linux_httpd_session_t *session;
@@ -504,26 +535,11 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
 
     if (session != NULL) {
         memset(session, 0, sizeof(*session));
-
-        // setup context for handling http header
-        vsf_mem_stream_t *stream = &session->request.urihandler_ctx.header.stream;
-        stream->op = &vsf_mem_stream_op;
-        stream->buffer = session->request.buffer;
-        // reserve one byte for NULL terminator
-        stream->size = sizeof(session->request.buffer) - 1;
-        stream->align = 0;
-        stream->rx.evthandler = __vsf_linux_httpd_stream_evthandler;
-        stream->rx.param = session;
-        VSF_STREAM_INIT(stream);
-        VSF_STREAM_CONNECT_RX(stream);
-
-        vsf_dlist_init_node(vsf_linux_httpd_session_t, session_node, session);
-        session->fd_socket = session->fd_stream_out = session->fd_stream_in = -1;
-        session->wait_stream_out = session->wait_stream_in = false;
-        session->request.urihandler = NULL;
-        session->request.stream_out = NULL;
-        session->request.stream_in = &stream->use_as__vsf_stream_t;
+        session->fd_stream_out = session->fd_stream_in = -1;
+        __vsf_linux_httpd_session_reset_reuqest(session);
+        session->fd_socket = -1;
         session->httpd = httpd;
+        vsf_dlist_init_node(vsf_linux_httpd_session_t, session_node, session);
         vsf_dlist_add_to_head(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
     }
     return session;
@@ -636,19 +652,22 @@ static void * __vsf_linux_httpd_thread(void *param)
 
             VSF_LINUX_ASSERT(_->fd_socket >= 0);
 
+            uint8_t *ptr;
+            uint_fast32_t size;
+            bool is_socket_accessable, is_stream_accessable;
+
             // can write to stream_in or can read from socket, mutual exclusive events
-            bool is_socket_readable = FD_ISSET(_->fd_socket, &rfds);
-            bool is_stream_writable = (_->fd_stream_in >= 0) && FD_ISSET(_->fd_stream_in, &wfds);
-            if (is_socket_readable || is_stream_writable) {
-                VSF_LINUX_ASSERT(   (is_socket_readable && !is_stream_writable)
-                                ||  (!is_socket_readable && is_stream_writable));
+            is_socket_accessable = FD_ISSET(_->fd_socket, &rfds);
+            is_stream_accessable = (_->fd_stream_in >= 0) && FD_ISSET(_->fd_stream_in, &wfds);
+            if (is_socket_accessable || is_stream_accessable) {
+                VSF_LINUX_ASSERT(   (is_socket_accessable && !is_stream_accessable)
+                                ||  (!is_socket_accessable && is_stream_accessable));
                 fd_num--;
 
                 stream = _->request.stream_in;
                 VSF_LINUX_ASSERT(stream != NULL);
 
-                uint8_t *ptr;
-                uint_fast32_t size = vsf_stream_get_wbuf(stream, &ptr);
+                size = vsf_stream_get_wbuf(stream, &ptr);
                 if (size > 0) {
                     ssize_t realsize = read(_->fd_socket, ptr, size);
                     if (realsize < 0) {
@@ -659,33 +678,32 @@ static void * __vsf_linux_httpd_thread(void *param)
                     if (_->fd_stream_in < 0) {
                         // no fd_stream_in while waiting for http request
                         vsf_stream_write(stream, NULL, realsize);
+                        if (_->fatal_error) {
+                            __vsf_linux_httpd_session_delete(_);
+                            continue;
+                        }
                     } else {
                         write(_->fd_stream_in, ptr, realsize);
                     }
-                    if (_->fatal_error) {
-                        __vsf_linux_httpd_session_delete(_);
-                        continue;
-                    }
                     _->wait_stream_in = false;
                 } else {
-                    VSF_LINUX_ASSERT(!is_stream_writable);
+                    VSF_LINUX_ASSERT(!is_stream_accessable);
                     _->wait_stream_in = true;
                 }
             }
 
             // can read from stream_out or can write to socket, mutual exclusive events
-            bool is_socket_writable = FD_ISSET(_->fd_socket, &wfds);
-            bool is_stream_readable = (_->fd_stream_out >= 0) && FD_ISSET(_->fd_stream_out, &rfds);
-            if (is_socket_writable || is_stream_readable) {
-                VSF_LINUX_ASSERT(   (is_socket_writable && !is_stream_readable)
-                                ||  (!is_socket_writable && is_stream_readable));
+            is_socket_accessable = FD_ISSET(_->fd_socket, &wfds);
+            is_stream_accessable = (_->fd_stream_out >= 0) && FD_ISSET(_->fd_stream_out, &rfds);
+            if (is_socket_accessable || is_stream_accessable) {
+                VSF_LINUX_ASSERT(   (is_socket_accessable && !is_stream_accessable)
+                                ||  (!is_socket_accessable && is_stream_accessable));
                 fd_num--;
 
                 stream = _->request.stream_out;
                 VSF_LINUX_ASSERT(stream != NULL);
 
-                uint8_t *ptr;
-                uint_fast32_t size = vsf_stream_get_rbuf(stream, &ptr);
+                size = vsf_stream_get_rbuf(stream, &ptr);
                 if (size > 0) {
                     ssize_t realsize = write(_->fd_socket, ptr, size);
                     if (realsize < 0) {
@@ -697,14 +715,19 @@ static void * __vsf_linux_httpd_thread(void *param)
                     read(_->fd_stream_out, ptr, realsize);
                     _->wait_stream_out = false;
                 } else {
-                    VSF_LINUX_ASSERT(!is_stream_readable);
+                    VSF_LINUX_ASSERT(!is_stream_accessable);
 
                     if (!_->request.is_serving || vsf_stream_is_tx_connected(stream)) {
                         _->wait_stream_out = true;
                     } else {
                         // tx side of stream_out is disconnected, session end
                         _->request.urihandler->op->fini_fn(&_->request);
-                        __vsf_linux_httpd_session_delete(_);
+
+                        if (_->request.keep_alive) {
+                            __vsf_linux_httpd_session_reset_reuqest(_);
+                        } else {
+                            __vsf_linux_httpd_session_delete(_);
+                        }
                     }
                 }
             }
