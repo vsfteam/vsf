@@ -572,6 +572,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                         for (int i = 0; i < dimof(__vsf_linux_httpd_encoding_mapper); i++) {
                             if (!strcasecmp(__vsf_linux_httpd_encoding_mapper[i].str, ext)) {
                                 session->request.encoding = __vsf_linux_httpd_encoding_mapper[i].encoding;
+                                break;
                             }
                         }
                     }
@@ -641,25 +642,21 @@ static void __vsf_linux_httpd_session_reset_reuqest(vsf_linux_httpd_session_t *s
         session->fd_stream_out = -1;
     }
 
+    memset(&session->request, 0, sizeof(session->request));
+
     // setup context for handling http header
     vsf_mem_stream_t *stream = &session->request.urihandler_ctx.header.stream;
     stream->op = &vsf_mem_stream_op;
     stream->buffer = session->request.buffer;
     // reserve one byte for NULL terminator
     stream->size = sizeof(session->request.buffer) - 1;
-    stream->align = 0;
     stream->rx.evthandler = __vsf_linux_httpd_stream_evthandler;
     stream->rx.param = session;
     VSF_STREAM_INIT(stream);
     VSF_STREAM_CONNECT_RX(stream);
 
     session->wait_stream_out = session->wait_stream_in = false;
-    session->request.urihandler = NULL;
-    session->request.stream_out = NULL;
     session->request.stream_in = &stream->use_as__vsf_stream_t;
-    session->request.keep_alive = false;
-    session->request.is_stream_out_started = false;
-    vsf_bitmap_reset(&session->request.mime_map, VSF_LINUX_HTTPD_MIME_NUM);
 }
 
 static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd_t *httpd)
@@ -672,7 +669,6 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
 #endif
 
     if (session != NULL) {
-        memset(session, 0, sizeof(*session));
         session->fd_stream_out = session->fd_stream_in = -1;
         __vsf_linux_httpd_session_reset_reuqest(session);
         session->fd_socket = -1;
