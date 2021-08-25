@@ -324,7 +324,8 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
             if (!strcasecmp((const char *)cur_ptr, "close")) {
                 // no need to set to false, becasue it's default value
             } else if (!strcasecmp((const char *)cur_ptr, "Keep-Alive")) {
-                request->keep_alive = true;
+                // close event seems to be not supported by current lwip socker layer
+//                request->keep_alive = true;
             } else {
                 goto __bad_request;
             }
@@ -469,7 +470,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             stream->align = 0;
             VSF_STREAM_INIT(stream);
 
-            vsf_linux_fd_t *sfd = vsf_linux_tx_stream(&stream->use_as__vsf_stream_t);
+            vsf_linux_fd_t *sfd = vsf_linux_rx_stream(&stream->use_as__vsf_stream_t);
             if (NULL == sfd) {
                 session->fatal_error = true;
                 break;
@@ -478,6 +479,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             session->request.stream_out = &stream->use_as__vsf_stream_t;
             session->fd_stream_out = sfd->fd;
             __vsf_linux_httpd_send_response(session);
+            session->request.is_serving = true;
         } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
             uint8_t *ptr;
@@ -506,10 +508,10 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             if (ext != NULL) {
                 session->request.mime = __vsf_linux_httpd_get_mime_by_ext(ext);
             }
-            session->request.urihandler = urihandler;
             if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
                 goto __error;
             }
+            session->request.urihandler = urihandler;
 
             vsf_linux_fd_t *sfd;
             vsf_stream_t *stream;
@@ -729,7 +731,11 @@ static void * __vsf_linux_httpd_thread(void *param)
                 size = vsf_stream_get_wbuf(stream, &ptr);
                 if (size > 0) {
                     ssize_t realsize = read(_->fd_socket, ptr, size);
-                    if (realsize < 0) {
+                    if (0 == realsize) {
+                        // socket closed by remote, seems to be not supported by current lwip socker layer
+                        __vsf_linux_httpd_session_delete(_);
+                        continue;
+                    } else if (realsize < 0) {
                         vsf_trace_error(MODULE_NAME ": fail to read socket." VSF_TRACE_CFG_LINEEND);
                         __vsf_linux_httpd_session_delete(_);
                         continue;
@@ -780,7 +786,9 @@ static void * __vsf_linux_httpd_thread(void *param)
                         _->wait_stream_out = true;
                     } else {
                         // tx side of stream_out is disconnected, session end
-                        _->request.urihandler->op->fini_fn(&_->request);
+                        if (_->request.urihandler != NULL) {
+                            _->request.urihandler->op->fini_fn(&_->request);
+                        }
 
                         if (_->request.keep_alive) {
                             __vsf_linux_httpd_session_reset_reuqest(_);
