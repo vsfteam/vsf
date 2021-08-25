@@ -428,9 +428,6 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             uint8_t *ptr;
             uint_fast32_t size = vsf_stream_get_rbuf(session->request.stream_in, &ptr);
 
-            VSF_LINUX_ASSERT(session->fd_stream_in >= 0);
-            close(session->fd_stream_in);
-            session->fd_stream_in = -1;
             session->request.stream_in = NULL;
             session->wait_stream_in = false;
 
@@ -515,25 +512,17 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
         // reserve one byte for NULL terminator
         stream->size = sizeof(session->request.buffer) - 1;
         stream->align = 0;
-        VSF_STREAM_INIT(stream);
-
-        vsf_linux_fd_t *sfd = vsf_linux_rx_stream(&stream->use_as__vsf_stream_t);
-        if (NULL == sfd) {
-            free(session);
-            return NULL;
-        }
-
         stream->rx.evthandler = __vsf_linux_httpd_stream_evthandler;
         stream->rx.param = session;
+        VSF_STREAM_INIT(stream);
         VSF_STREAM_CONNECT_RX(stream);
 
         vsf_dlist_init_node(vsf_linux_httpd_session_t, session_node, session);
-        session->fd_socket = session->fd_stream_out = -1;
+        session->fd_socket = session->fd_stream_out = session->fd_stream_in = -1;
         session->wait_stream_out = session->wait_stream_in = false;
         session->request.urihandler = NULL;
         session->request.stream_out = NULL;
         session->request.stream_in = &stream->use_as__vsf_stream_t;
-        session->fd_stream_in = sfd->fd;
         session->httpd = httpd;
         vsf_dlist_add_to_head(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
     }
@@ -546,14 +535,12 @@ static int __vsf_linux_httpd_set_fds(vsf_linux_httpd_t *httpd, fd_set *rset, fd_
     int fd_max = -1;
     __vsf_dlist_foreach_unsafe(vsf_linux_httpd_session_t, session_node, &httpd->session_list) {
         if (_->request.stream_out != NULL) {
-            VSF_LINUX_ASSERT(_->fd_stream_out >= 0);
-
             if (!_->wait_stream_out) {
                 if (_->fd_socket > fd_max) {
                     fd_max = _->fd_socket;
                 }
                 FD_SET(_->fd_socket, wset);
-            } else {
+            } else if(_->fd_stream_out >= 0) {
                 if (_->fd_stream_out > fd_max) {
                     fd_max = _->fd_stream_out;
                 }
@@ -561,14 +548,12 @@ static int __vsf_linux_httpd_set_fds(vsf_linux_httpd_t *httpd, fd_set *rset, fd_
             }
         }
         if (_->request.stream_in != NULL) {
-            VSF_LINUX_ASSERT(_->fd_stream_in >= 0);
-
             if (!_->wait_stream_in) {
                 if (_->fd_socket > fd_max) {
                     fd_max = _->fd_socket;
                 }
                 FD_SET(_->fd_socket, rset);
-            } else {
+            } else if(_->fd_stream_in >= 0) {
                 if (_->fd_stream_in > fd_max) {
                     fd_max = _->fd_stream_in;
                 }
@@ -671,7 +656,12 @@ static void * __vsf_linux_httpd_thread(void *param)
                         __vsf_linux_httpd_session_delete(_);
                         continue;
                     }
-                    vsf_stream_write(stream, NULL, realsize);
+                    if (_->fd_stream_in < 0) {
+                        // no fd_stream_in while waiting for http request
+                        vsf_stream_write(stream, NULL, realsize);
+                    } else {
+                        write(_->fd_stream_in, ptr, realsize);
+                    }
                     if (_->fatal_error) {
                         __vsf_linux_httpd_session_delete(_);
                         continue;
@@ -703,12 +693,13 @@ static void * __vsf_linux_httpd_thread(void *param)
                         __vsf_linux_httpd_session_delete(_);
                         continue;
                     }
-                    vsf_stream_read(stream, NULL, realsize);
+                    VSF_LINUX_ASSERT(_->fd_stream_out >= 0);
+                    read(_->fd_stream_out, ptr, realsize);
                     _->wait_stream_out = false;
                 } else {
                     VSF_LINUX_ASSERT(!is_stream_readable);
 
-                    if (vsf_stream_is_tx_connected(stream)) {
+                    if (!_->request.is_serving || vsf_stream_is_tx_connected(stream)) {
                         _->wait_stream_out = true;
                     } else {
                         // tx side of stream_out is disconnected, session end

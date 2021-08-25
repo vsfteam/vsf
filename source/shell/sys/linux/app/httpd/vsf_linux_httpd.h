@@ -198,6 +198,7 @@ vsf_class(vsf_linux_httpd_request_t) {
         char *uri;
         char *query;
         bool keep_alive;
+        bool is_serving;
 
         const vsf_linux_httpd_urihandler_t *urihandler;
         vsf_stream_t *stream_in, *stream_out;
