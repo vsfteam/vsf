@@ -23,6 +23,10 @@
 #include "kernel/vsf_kernel.h"
 #include "component/vsf_component.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -36,5 +40,8 @@ typedef struct vsf_linux_httpd_urihandler_file_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 /* EOF */
