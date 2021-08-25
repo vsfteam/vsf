@@ -58,6 +58,7 @@ typedef struct __vsf_linux_httpd_strmapper_t {
     union {
         vsf_linux_httpd_response_t response;
         vsf_linux_httpd_mime_t mime;
+        vsf_linux_httpd_encoding_t encoding;
     };
     const char *str;
 } __vsf_linux_httpd_strmapper_t;
@@ -109,6 +110,17 @@ static const __vsf_linux_httpd_strmapper_t __vsf_linux_httpd_mime_mapper[] = {
     __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_TAR,        "tar"),
     __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_ZIP,        "zip"),
     __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_JSON,       "json"),
+};
+
+static const __vsf_linux_httpd_strmapper_t __vsf_linux_httpd_encoding_mapper[] = {
+#define __vsf_linux_httpd_def_encoding(__encoding, __ext)                       \
+    {   .encoding = (__encoding),   .str = (__ext) }
+
+    __vsf_linux_httpd_def_encoding(VSF_LINUX_HTTPD_ENCODING_GZIP,   "gzip"),
+};
+
+static const char * __vsf_linux_httpd_encoding[VSF_LINUX_HTTPD_ENCODING_NUM] = {
+    [VSF_LINUX_HTTPD_ENCODING_GZIP - 1]     = "gzip",
 };
 
 // valid vsf_linux_httpd_mime_t starts from 1, so minus 1 as index
@@ -215,7 +227,44 @@ static const char * __vsf_linux_httpd_get_charset_str(vsf_linux_httpd_charset_t 
     return "UNKNOWN";
 }
 
+static const char * __vsf_linux_httpd_get_encoding_str(vsf_linux_httpd_encoding_t encoding)
+{
+    // skip VSF_LINUX_HTTPD_INVALID_INVALID
+    if (    (encoding > VSF_LINUX_HTTPD_ENCODING_INVALID)
+        &&  (encoding <= dimof(__vsf_linux_httpd_encoding))) {
+        return __vsf_linux_httpd_encoding[encoding - 1];
+    }
+    // if assert here, add corresponding charset to __vsf_linux_httpd_encoding
+    VSF_LINUX_ASSERT(false);
+    return "UNKNOWN";
+}
+
 // request
+
+static void __vsf_linux_httpd_parse_header_item(char *items,
+                uintalu_t *bitmap, uint_fast16_t bitsize,
+                const char *item_arr[], uint_fast16_t item_arr_size)
+{
+    char ch, *tmp_ptr;
+    for (int i = 0; i < item_arr_size; i++) {
+        tmp_ptr = strstr(items, item_arr[i]);
+        if (tmp_ptr != NULL) {
+            ch = tmp_ptr[strlen(item_arr[i])];
+            if ((ch != ',') && (ch != ' ') && (ch != ';') && (ch != '\0')) {
+                break;
+            }
+            if (tmp_ptr != items) {
+                ch = tmp_ptr[-1];
+                if ((ch != ',') && (ch != ' ') && (ch != ';')) {
+                    break;
+                }
+            }
+
+            // valid mime start from 1
+            vsf_bitmap_set(bitmap, i + 1);
+        }
+    }
+}
 
 static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *request)
 {
@@ -330,29 +379,16 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
                 goto __bad_request;
             }
         } else if (!strcasecmp((const char *)tmp_ptr, "Accept")) {
-            char ch;
-            for (int i = 0; i < dimof(__vsf_linux_httpd_mime); i++) {
-                tmp_ptr = strstr(cur_ptr, __vsf_linux_httpd_mime[i]);
-                if (tmp_ptr != NULL) {
-                    ch = tmp_ptr[strlen(__vsf_linux_httpd_mime[i])];
-                    if ((ch != ',') && (ch != ' ') && (ch != ';') && (ch != '\0')) {
-                        break;
-                    }
-                    if (tmp_ptr != cur_ptr) {
-                        ch = tmp_ptr[-1];
-                        if ((ch != ',') && (ch != ' ') && (ch != ';')) {
-                            break;
-                        }
-                    }
-
-                    // valid mime start from 1
-                    vsf_bitmap_set(request->mime_map, i + 1);
-                }
-            }
+            __vsf_linux_httpd_parse_header_item(cur_ptr,
+                        request->mime_map, VSF_LINUX_HTTPD_MIME_NUM,
+                        __vsf_linux_httpd_mime, dimof(__vsf_linux_httpd_mime));
+        } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Encoding")) {
+            __vsf_linux_httpd_parse_header_item(cur_ptr,
+                        request->encoding_map, VSF_LINUX_HTTPD_ENCODING_NUM,
+                        __vsf_linux_httpd_encoding, dimof(__vsf_linux_httpd_encoding));
         } else if (!strcasecmp((const char *)tmp_ptr, "Host")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "User-Agent")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Cookie")) {
-        } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Encoding")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Charset")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Language")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Refer")) {
@@ -462,6 +498,11 @@ static void __vsf_linux_httpd_send_response(vsf_linux_httpd_session_t *session)
         }
         vsf_stream_write_str(stream, "\r\n");
     }
+    if (session->request.encoding != VSF_LINUX_HTTPD_ENCODING_INVALID) {
+        vsf_stream_write_str(stream, "Content-Encoding: ");
+        vsf_stream_write_str(stream,
+                    __vsf_linux_httpd_get_encoding_str(session->request.encoding));
+    }
     if (VSF_LINUX_HTTPD_OK == session->request.response) {
         vsf_stream_write_str(stream, "Content-Length: ");
         vsf_stream_write_int(stream, session->request.content_length);
@@ -501,11 +542,17 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             session->request.is_stream_out_started = true;
         } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
+            char *ext;
             uint8_t *ptr;
             uint_fast32_t size = vsf_stream_get_rbuf(session->request.stream_in, &ptr);
 
             session->request.stream_in = NULL;
             session->wait_stream_in = false;
+
+            ext = strrchr(session->request.uri, '.');
+            if (ext != NULL) {
+                session->request.mime = __vsf_linux_httpd_get_mime_by_ext(ext);
+            }
 
             // find a suitable urihandler, and pass ptr/size to urihandler init
             vsf_linux_httpd_urihandler_t *urihandler;
@@ -518,15 +565,21 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                 }
                 if (VSF_LINUX_HTTPD_URI_REMAP == urihandler->type) {
                     uri = urihandler->target_uri;
+                    ext = strrchr(uri, '.');
+
+                    // if remap to a compressed format, check and set content-encoding
+                    if (ext != NULL) {
+                        for (int i = 0; i < dimof(__vsf_linux_httpd_encoding_mapper); i++) {
+                            if (!strcasecmp(__vsf_linux_httpd_encoding_mapper[i].str, ext)) {
+                                session->request.encoding = __vsf_linux_httpd_encoding_mapper[i].encoding;
+                            }
+                        }
+                    }
                     continue;
                 }
                 break;
             }
 
-            char *ext = strrchr(session->request.uri, '.');
-            if (ext != NULL) {
-                session->request.mime = __vsf_linux_httpd_get_mime_by_ext(ext);
-            }
             if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
                 goto __error;
             }

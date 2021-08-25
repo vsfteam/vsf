@@ -105,6 +105,15 @@ typedef enum vsf_linux_httpd_mime_t {
 
 dcl_vsf_bitmap(vsf_linux_httpd_mime_map_t, VSF_LINUX_HTTPD_MIME_NUM)
 
+typedef enum vsf_linux_httpd_encoding_t {
+    VSF_LINUX_HTTPD_ENCODING_INVALID = 0,
+    VSF_LINUX_HTTPD_ENCODING_IDENTITY = VSF_LINUX_HTTPD_ENCODING_INVALID,
+    VSF_LINUX_HTTPD_ENCODING_GZIP,
+    VSF_LINUX_HTTPD_ENCODING_NUM = VSF_LINUX_HTTPD_ENCODING_GZIP,
+} vsf_linux_httpd_encoding_t;
+
+dcl_vsf_bitmap(vsf_linux_httpd_encoding_map_t, VSF_LINUX_HTTPD_ENCODING_NUM)
+
 typedef enum vsf_linux_httpd_charset_t {
     VSF_LINUX_HTTPD_CHARSET_INVALID = 0,
     VSF_LINUX_HTTPD_CHARSET_UTF8,
@@ -213,8 +222,10 @@ vsf_class(vsf_linux_httpd_request_t) {
         vsf_linux_httpd_request_method_t method;
         vsf_linux_httpd_mime_t mime;
         vsf_linux_httpd_charset_t charset;
+        vsf_linux_httpd_encoding_t encoding;
         vsf_linux_httpd_language_t language;
         vsf_bitmap(vsf_linux_httpd_mime_map_t) mime_map;
+        vsf_bitmap(vsf_linux_httpd_encoding_map_t) encoding_map;
         uint32_t content_length;
         char *uri;
         char *query;

@@ -36,7 +36,7 @@ static vsf_err_t __user_httpd_init(vsf_linux_httpd_request_t *req, uint8_t *data
     req->stream_out = &stream->use_as__vsf_stream_t;
 
     req->content_length = strlen(__user_httpd_index);
-    req->content_type = VSF_LINUX_HTTPD_CONTENT_TEXT_XML,
+    req->mime = VSF_LINUX_HTTPD_MIME_TEXT_HTML,
     req->response = VSF_LINUX_HTTPD_OK;
     return VSF_ERR_NONE;
 }
