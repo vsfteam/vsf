@@ -407,7 +407,8 @@ int VSF_USER_ENTRY(int argc, char *argv[])
         .out    = stream_tx,
         .err    = stream_tx,
     };
-    vsf_linux_init(&stream);
+    vsf_err_t err = vsf_linux_init(&stream);
+    VSF_ASSERT(VSF_ERR_NONE == err);
     return 0;
 }
 
