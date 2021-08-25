@@ -329,10 +329,29 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
             } else {
                 goto __bad_request;
             }
+        } else if (!strcasecmp((const char *)tmp_ptr, "Accept")) {
+            char ch;
+            for (int i = 0; i < dimof(__vsf_linux_httpd_mime); i++) {
+                tmp_ptr = strstr(cur_ptr, __vsf_linux_httpd_mime[i]);
+                if (tmp_ptr != NULL) {
+                    ch = tmp_ptr[strlen(__vsf_linux_httpd_mime[i])];
+                    if ((ch != ',') && (ch != ' ') && (ch != ';') && (ch != '\0')) {
+                        break;
+                    }
+                    if (tmp_ptr != cur_ptr) {
+                        ch = tmp_ptr[-1];
+                        if ((ch != ',') && (ch != ' ') && (ch != ';')) {
+                            break;
+                        }
+                    }
+
+                    // valid mime start from 1
+                    vsf_bitmap_set(request->mime_map, i + 1);
+                }
+            }
         } else if (!strcasecmp((const char *)tmp_ptr, "Host")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "User-Agent")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Cookie")) {
-        } else if (!strcasecmp((const char *)tmp_ptr, "Accept")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Encoding")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Charset")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Accept-Language")) {
@@ -432,18 +451,18 @@ static void __vsf_linux_httpd_send_response(vsf_linux_httpd_session_t *session)
                     __vsf_linux_httpd_get_response_str(session->request.response));
     vsf_stream_write_str(stream, "\r\n");
 
-    if (VSF_LINUX_HTTPD_OK == session->request.response) {
-        if (session->request.mime != VSF_LINUX_HTTPD_MIME_INVALID) {
-            vsf_stream_write_str(stream, "Content-Type: ");
-            vsf_stream_write_str(stream,
+    if (session->request.mime != VSF_LINUX_HTTPD_MIME_INVALID) {
+        vsf_stream_write_str(stream, "Content-Type: ");
+        vsf_stream_write_str(stream,
                     __vsf_linux_httpd_get_mime_str(session->request.mime));
-            if (session->request.charset != VSF_LINUX_HTTPD_CHARSET_INVALID) {
-                vsf_stream_write_str(stream, "; charset=");
-                vsf_stream_write_str(stream,
+        if (session->request.charset != VSF_LINUX_HTTPD_CHARSET_INVALID) {
+            vsf_stream_write_str(stream, "; charset=");
+            vsf_stream_write_str(stream,
                     __vsf_linux_httpd_get_charset_str(session->request.charset));
-            }
-            vsf_stream_write_str(stream, "\r\n");
         }
+        vsf_stream_write_str(stream, "\r\n");
+    }
+    if (VSF_LINUX_HTTPD_OK == session->request.response) {
         vsf_stream_write_str(stream, "Content-Length: ");
         vsf_stream_write_int(stream, session->request.content_length);
         vsf_stream_write_str(stream, "\r\n");
@@ -510,6 +529,10 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             }
             if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
                 goto __error;
+            }
+            if (    (session->request.mime != VSF_LINUX_HTTPD_MIME_INVALID)
+                &&  !vsf_bitmap_get(session->request.mime_map, session->request.mime)) {
+                session->request.response = VSF_LINUX_HTTPD_NOT_ACCEPTABLE;
             }
             session->request.urihandler = urihandler;
 
@@ -583,6 +606,7 @@ static void __vsf_linux_httpd_session_reset_reuqest(vsf_linux_httpd_session_t *s
     session->request.stream_in = &stream->use_as__vsf_stream_t;
     session->request.keep_alive = false;
     session->request.is_stream_out_started = false;
+    vsf_bitmap_reset(&session->request.mime_map, VSF_LINUX_HTTPD_MIME_NUM);
 }
 
 static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd_t *httpd)

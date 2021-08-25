@@ -103,6 +103,8 @@ typedef enum vsf_linux_httpd_mime_t {
     VSF_LINUX_HTTPD_MIME_NUM = VSF_LINUX_HTTPD_MIME_APP_JSON,
 } vsf_linux_httpd_mime_t;
 
+dcl_vsf_bitmap(vsf_linux_httpd_mime_map_t, VSF_LINUX_HTTPD_MIME_NUM)
+
 typedef enum vsf_linux_httpd_charset_t {
     VSF_LINUX_HTTPD_CHARSET_INVALID = 0,
     VSF_LINUX_HTTPD_CHARSET_UTF8,
@@ -159,6 +161,7 @@ typedef enum vsf_linux_httpd_urihandler_match_t {
     VSF_LINUX_HTTPD_URI_MATCH_URI = 1 << 1,
     VSF_LINUX_HTTPD_URI_MATCH_ANY = 1 << 2,
 } vsf_linux_httpd_urihandler_match_t;
+
 typedef enum vsf_linux_httpd_urihandler_type_t {
     VSF_LINUX_HTTPD_URI_OP = 0,
     VSF_LINUX_HTTPD_URI_REMAP,
@@ -211,6 +214,7 @@ vsf_class(vsf_linux_httpd_request_t) {
         vsf_linux_httpd_mime_t mime;
         vsf_linux_httpd_charset_t charset;
         vsf_linux_httpd_language_t language;
+        vsf_bitmap(vsf_linux_httpd_mime_map_t) mime_map;
         uint32_t content_length;
         char *uri;
         char *query;
