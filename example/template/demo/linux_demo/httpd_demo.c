@@ -5,7 +5,7 @@
 #include "shell/sys/linux/app/httpd/vsf_linux_httpd.h"
 
 #if VSF_USE_LINUX == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
-
+#ifndef APP_LINUX_HTTPD_DEMO_CFG_ROOT
 static const char *__user_httpd_index = STR(
   <html>
     <head>
@@ -68,14 +68,17 @@ static vsf_linux_httpd_urihandler_t __user_httpd_urihandler[] = {
         .op             = &__user_httpd_urihandler_op,
     },
 };
+#endif
 
 static vsf_linux_httpd_t __user_httpd = {
-    .root_path          = NULL,
-    .port               = 80,
-    .backlog            = 2,
-
+#ifdef APP_LINUX_HTTPD_DEMO_CFG_ROOT
+    .root_path          = APP_LINUX_HTTPD_DEMO_CFG_ROOT,
+#else
     .num_of_urihandler  = dimof(__user_httpd_urihandler),
     .urihandler         = __user_httpd_urihandler,
+#endif
+    .port               = 80,
+    .backlog            = 1,
 };
 
 int httpd_main(int argc, char *argv[])
