@@ -101,9 +101,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
         uri_file = html_file;
     }
     urihandler_file->file_stream.file = uri_file;
-    if (req->content_length > uri_file->size) {
-        req->content_length = uri_file->size;
-    }
+    req->content_length = uri_file->size;
 
     vsf_mem_stream_t *stream = &urihandler_file->stream;
     stream->op = &vsf_mem_stream_op;
