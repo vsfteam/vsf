@@ -46,7 +46,7 @@ static void __vsf_linux_httpd_urihandler_file_evthandler(vsf_eda_t *eda, vsf_evt
     switch (evt) {
     case VSF_EVT_INIT:
         vk_file_read_stream(file_stream, 0, request->content_length, stream);
-        request->is_serving = true;
+        request->is_stream_out_started = true;
         break;
     case VSF_EVT_RETURN:
         break;

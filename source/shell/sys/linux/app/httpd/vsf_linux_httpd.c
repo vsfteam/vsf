@@ -479,7 +479,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             session->request.stream_out = &stream->use_as__vsf_stream_t;
             session->fd_stream_out = sfd->fd;
             __vsf_linux_httpd_send_response(session);
-            session->request.is_serving = true;
+            session->request.is_stream_out_started = true;
         } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
             uint8_t *ptr;
@@ -582,7 +582,7 @@ static void __vsf_linux_httpd_session_reset_reuqest(vsf_linux_httpd_session_t *s
     session->request.stream_out = NULL;
     session->request.stream_in = &stream->use_as__vsf_stream_t;
     session->request.keep_alive = false;
-    session->request.is_serving = false;
+    session->request.is_stream_out_started = false;
 }
 
 static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd_t *httpd)
@@ -782,7 +782,7 @@ static void * __vsf_linux_httpd_thread(void *param)
                 } else {
                     VSF_LINUX_ASSERT(!is_stream_accessable);
 
-                    if (!_->request.is_serving || vsf_stream_is_tx_connected(stream)) {
+                    if (!_->request.is_stream_out_started || vsf_stream_is_tx_connected(stream)) {
                         _->wait_stream_out = true;
                     } else {
                         // tx side of stream_out is disconnected, session end
