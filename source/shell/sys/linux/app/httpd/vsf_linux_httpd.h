@@ -80,11 +80,28 @@ typedef enum vsf_linux_httpd_request_method_t {
     VSF_LINUX_HTTPD_PATCH,
 } vsf_linux_httpd_request_method_t;
 
-typedef enum vsf_linux_httpd_content_type_t {
-    VSF_LINUX_HTTPD_CONTEXT_INVALID = 0,
-    VSF_LINUX_HTTPD_CONTENT_TEXT_XML,
-    VSF_LINUX_HTTPD_CONTENT_NUM = VSF_LINUX_HTTPD_CONTENT_TEXT_XML,
-} vsf_linux_httpd_content_type_t;
+typedef enum vsf_linux_httpd_mime_t {
+    VSF_LINUX_HTTPD_MIME_INVALID = 0,
+    VSF_LINUX_HTTPD_MIME_TEXT_HTML,
+    VSF_LINUX_HTTPD_MIME_TEXT_XML,
+    VSF_LINUX_HTTPD_MIME_TEXT_CSS,
+    VSF_LINUX_HTTPD_MIME_TEXT_PLAIN,
+    VSF_LINUX_HTTPD_MIME_IMAGE_GIF,
+    VSF_LINUX_HTTPD_MIME_IMAGE_PNG,
+    VSF_LINUX_HTTPD_MIME_IMAGE_JPEG,
+    VSF_LINUX_HTTPD_MIME_IMAGE_SVG,
+    VSF_LINUX_HTTPD_MIME_IMAGE_ICON,
+    VSF_LINUX_HTTPD_MIME_VIDEO_AVI,
+    VSF_LINUX_HTTPD_MIME_AUDIO_MPEG,
+    VSF_LINUX_HTTPD_MIME_AUDIO_WAV,
+    VSF_LINUX_HTTPD_MIME_AUDIO_OGG,
+    VSF_LINUX_HTTPD_MIME_APP_PDF,
+    VSF_LINUX_HTTPD_MIME_APP_JS,
+    VSF_LINUX_HTTPD_MIME_APP_TAR,
+    VSF_LINUX_HTTPD_MIME_APP_ZIP,
+    VSF_LINUX_HTTPD_MIME_APP_JSON,
+    VSF_LINUX_HTTPD_MIME_NUM = VSF_LINUX_HTTPD_MIME_APP_JSON,
+} vsf_linux_httpd_mime_t;
 
 typedef enum vsf_linux_httpd_charset_t {
     VSF_LINUX_HTTPD_CHARSET_INVALID = 0,
@@ -97,7 +114,7 @@ typedef enum vsf_linux_httpd_language_t {
     VSF_LINUX_HTTPD_ENGLISH,
 } vsf_linux_httpd_language_t;
 
-typedef enum vsf_linux_https_response_t {
+typedef enum vsf_linux_httpd_response_t {
     VSF_LINUX_HTTPD_CONTINUE = 100,
 
     VSF_LINUX_HTTPD_OK = 200,
@@ -129,7 +146,7 @@ typedef enum vsf_linux_https_response_t {
     VSF_LINUX_HTTPD_SERVICE_UNAVAILABLE,
     VSF_LINUX_HTTPD_GATEWAY_TIME_OUT,
     VSF_LINUX_HTTPD_HTTP_VERSION_NOT_SUPPORTED,
-} vsf_linux_https_response_t;
+} vsf_linux_httpd_response_t;
 
 typedef struct vsf_linux_httpd_urihandler_op_t {
     vsf_err_t (*init_fn)(vsf_linux_httpd_request_t *req, uint8_t *data, uint_fast32_t size);
@@ -191,7 +208,7 @@ typedef struct vsf_linux_httpd_urihandler_header_t {
 vsf_class(vsf_linux_httpd_request_t) {
     protected_member(
         vsf_linux_httpd_request_method_t method;
-        vsf_linux_httpd_content_type_t content_type;
+        vsf_linux_httpd_mime_t mime;
         vsf_linux_httpd_charset_t charset;
         vsf_linux_httpd_language_t language;
         uint32_t content_length;
@@ -202,7 +219,7 @@ vsf_class(vsf_linux_httpd_request_t) {
 
         const vsf_linux_httpd_urihandler_t *urihandler;
         vsf_stream_t *stream_in, *stream_out;
-        vsf_linux_https_response_t response;
+        vsf_linux_httpd_response_t response;
 
         uint8_t buffer[VSF_LINUX_HTTPD_CFG_REQUEST_BUFSIZE];
         uint16_t buffer_pos;

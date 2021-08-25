@@ -54,10 +54,13 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct __vsf_linux_httpd_response_t {
-    vsf_linux_https_response_t response;
+typedef struct __vsf_linux_httpd_strmapper_t {
+    union {
+        vsf_linux_httpd_response_t response;
+        vsf_linux_httpd_mime_t mime;
+    };
     const char *str;
-} __vsf_linux_httpd_response_t;
+} __vsf_linux_httpd_strmapper_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -70,21 +73,64 @@ static const char * __vsf_linux_httpd_method[VSF_LINUX_HTTPD_METHOD_NUM + 1] = {
     [VSF_LINUX_HTTPD_METHOD_NUM]            = NULL,
 };
 
-static const __vsf_linux_httpd_response_t __vsf_linux_httpd_response[] = {
+static const __vsf_linux_httpd_strmapper_t __vsf_linux_httpd_response_mapper[] = {
 #define __vsf_linux_httpd_def_response(__response, __str)                       \
     {   .response = (__response),   .str = (__str) }
 
-    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_OK, "OK"),
+    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_OK,              "OK"),
 
-    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_BAD_REQUEST, "Bad Request"),
-    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_NOT_FOUND, "Not Found"),
+    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_BAD_REQUEST,     "Bad Request"),
+    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_NOT_FOUND,       "Not Found"),
 
-    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_NOT_IMPLEMENT, "Not Implemented"),
+    __vsf_linux_httpd_def_response(VSF_LINUX_HTTPD_NOT_IMPLEMENT,   "Not Implemented"),
 };
 
-// valid vsf_linux_httpd_content_type_t starts from 1, so minus 1 as index
-static const char * __vsf_linux_httpd_content_type[VSF_LINUX_HTTPD_CONTENT_NUM] = {
-    [VSF_LINUX_HTTPD_CONTENT_TEXT_XML - 1]  = "text/xml",
+static const __vsf_linux_httpd_strmapper_t __vsf_linux_httpd_mime_mapper[] = {
+#define __vsf_linux_httpd_def_mime(__mime, __ext)                               \
+    {   .mime = (__mime),           .str = (__ext) }
+
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_TEXT_HTML,      "html"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_TEXT_HTML,      "htm"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_TEXT_XML,       "xml"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_TEXT_CSS,       "css"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_TEXT_PLAIN,     "txt"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_IMAGE_GIF,      "gif"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_IMAGE_PNG,      "png"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_IMAGE_JPEG,     "jpeg"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_IMAGE_JPEG,     "jpg"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_IMAGE_SVG,      "svg"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_IMAGE_ICON,     "ico"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_VIDEO_AVI,      "avi"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_AUDIO_MPEG,     "mp3"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_AUDIO_WAV,      "wav"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_AUDIO_OGG,      "ogg"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_PDF,        "pdf"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_JS,         "js"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_TAR,        "tar"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_ZIP,        "zip"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_JSON,       "json"),
+};
+
+// valid vsf_linux_httpd_mime_t starts from 1, so minus 1 as index
+static const char * __vsf_linux_httpd_mime[VSF_LINUX_HTTPD_MIME_NUM] = {
+    [VSF_LINUX_HTTPD_MIME_TEXT_HTML - 1]    = "text/html",
+    [VSF_LINUX_HTTPD_MIME_TEXT_XML - 1]     = "text/xml",
+    [VSF_LINUX_HTTPD_MIME_TEXT_CSS - 1]     = "text/css",
+    [VSF_LINUX_HTTPD_MIME_TEXT_PLAIN - 1]   = "text/plain",
+    [VSF_LINUX_HTTPD_MIME_IMAGE_GIF - 1]    = "image/gif",
+    [VSF_LINUX_HTTPD_MIME_IMAGE_PNG - 1]    = "image/png",
+    [VSF_LINUX_HTTPD_MIME_IMAGE_JPEG - 1]   = "image/jpeg",
+    [VSF_LINUX_HTTPD_MIME_IMAGE_SVG - 1]    = "image/svg+xml",
+    [VSF_LINUX_HTTPD_MIME_IMAGE_ICON - 1]   = "image/x-icon",
+    [VSF_LINUX_HTTPD_MIME_VIDEO_AVI - 1]    = "video/x-msvideo",
+    [VSF_LINUX_HTTPD_MIME_AUDIO_MPEG - 1]   = "audio/mpeg",
+    [VSF_LINUX_HTTPD_MIME_AUDIO_WAV - 1]    = "audio/x-wav",
+    [VSF_LINUX_HTTPD_MIME_AUDIO_OGG - 1]    = "audio/x-oggvoribs",
+    [VSF_LINUX_HTTPD_MIME_APP_PDF - 1]      = "application/pdf",
+    [VSF_LINUX_HTTPD_MIME_APP_JS - 1]       = "application/x-javascript",
+    [VSF_LINUX_HTTPD_MIME_APP_TAR - 1]      = "application/x-tar",
+    [VSF_LINUX_HTTPD_MIME_APP_ZIP - 1]      = "application/zip",
+    [VSF_LINUX_HTTPD_MIME_APP_JSON - 1]     = "application/json",
 };
 
 // valid vsf_linux_httpd_charset_t starts from 1, so minus 1 as index
@@ -123,31 +169,41 @@ static const vsf_linux_httpd_urihandler_t __vsf_linux_httpd_urihandler[] = {
 
 // response
 
-const char * __vsf_linux_httpd_get_response_str(vsf_linux_https_response_t response)
+static const char * __vsf_linux_httpd_get_response_str(vsf_linux_httpd_response_t response)
 {
-    for (int i = 0; i < dimof(__vsf_linux_httpd_response); i++) {
-        if (__vsf_linux_httpd_response[i].response == response) {
-            return __vsf_linux_httpd_response[i].str;
+    for (int i = 0; i < dimof(__vsf_linux_httpd_response_mapper); i++) {
+        if (__vsf_linux_httpd_response_mapper[i].response == response) {
+            return __vsf_linux_httpd_response_mapper[i].str;
         }
     }
-    // if assert here, add corresponding response to __vsf_linux_httpd_response
+    // if assert here, add corresponding response to __vsf_linux_httpd_response_mapper
     VSF_LINUX_ASSERT(false);
     return "UNKNOWN";
 }
 
-const char * __vsf_linux_httpd_get_content_type_str(vsf_linux_httpd_content_type_t type)
+static vsf_linux_httpd_mime_t __vsf_linux_httpd_get_mime_by_ext(char *ext)
 {
-    // skip VSF_LINUX_HTTPD_CONTEXT_INVALID
-    if (    (type > VSF_LINUX_HTTPD_CONTEXT_INVALID)
-        &&  (type <= dimof(__vsf_linux_httpd_content_type))) {
-        return __vsf_linux_httpd_content_type[type - 1];
+    for (int i = 0; i < dimof(__vsf_linux_httpd_mime_mapper); i++) {
+        if (!strcasecmp(__vsf_linux_httpd_mime_mapper[i].str, ext)) {
+            return __vsf_linux_httpd_mime_mapper[i].mime;
+        }
     }
-    // if assert here, add corresponding content_type to __vsf_linux_httpd_content_type
+    return VSF_LINUX_HTTPD_MIME_INVALID;
+}
+
+static const char * __vsf_linux_httpd_get_mime_str(vsf_linux_httpd_mime_t type)
+{
+    // skip VSF_LINUX_HTTPD_MIME_INVALID
+    if (    (type > VSF_LINUX_HTTPD_MIME_INVALID)
+        &&  (type <= dimof(__vsf_linux_httpd_mime))) {
+        return __vsf_linux_httpd_mime[type - 1];
+    }
+    // if assert here, add corresponding mime to __vsf_linux_httpd_mime
     VSF_LINUX_ASSERT(false);
     return "UNKNOWN";
 }
 
-const char * __vsf_linux_httpd_get_charset_str(vsf_linux_httpd_charset_t charset)
+static const char * __vsf_linux_httpd_get_charset_str(vsf_linux_httpd_charset_t charset)
 {
     // skip VSF_LINUX_HTTPD_CHARSET_INVALID
     if (    (charset > VSF_LINUX_HTTPD_CHARSET_INVALID)
@@ -272,7 +328,6 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
             } else {
                 goto __bad_request;
             }
-        } else if (!strcasecmp((const char *)tmp_ptr, "Content-Type")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Host")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "User-Agent")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Cookie")) {
@@ -377,10 +432,10 @@ static void __vsf_linux_httpd_send_response(vsf_linux_httpd_session_t *session)
     vsf_stream_write_str(stream, "\r\n");
 
     if (VSF_LINUX_HTTPD_OK == session->request.response) {
-        if (session->request.content_type != VSF_LINUX_HTTPD_CONTEXT_INVALID) {
+        if (session->request.mime != VSF_LINUX_HTTPD_MIME_INVALID) {
             vsf_stream_write_str(stream, "Content-Type: ");
             vsf_stream_write_str(stream,
-                    __vsf_linux_httpd_get_content_type_str(session->request.content_type));
+                    __vsf_linux_httpd_get_mime_str(session->request.mime));
             if (session->request.charset != VSF_LINUX_HTTPD_CHARSET_INVALID) {
                 vsf_stream_write_str(stream, "; charset=");
                 vsf_stream_write_str(stream,
@@ -447,6 +502,10 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                 break;
             }
 
+            char *ext = strrchr(session->request.uri, '.');
+            if (ext != NULL) {
+                session->request.mime = __vsf_linux_httpd_get_mime_by_ext(ext);
+            }
             session->request.urihandler = urihandler;
             if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
                 goto __error;

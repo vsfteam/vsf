@@ -98,6 +98,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
         }
         vk_file_close(uri_file);
         uri_file = html_file;
+        req->mime = VSF_LINUX_HTTPD_MIME_TEXT_HTML;
     }
     urihandler_file->file_stream.file = uri_file;
     req->content_length = uri_file->size;
