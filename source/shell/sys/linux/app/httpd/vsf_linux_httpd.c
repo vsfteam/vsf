@@ -387,7 +387,6 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
             if (!strcasecmp((const char *)cur_ptr, "close")) {
                 // no need to set to false, becasue it's default value
             } else if (!strcasecmp((const char *)cur_ptr, "Keep-Alive")) {
-                // close event seems to be not supported by current lwip socker layer
                 request->keep_alive = true;
             } else {
                 goto __bad_request;
@@ -834,9 +833,13 @@ static void * __vsf_linux_httpd_thread(void *param)
                 size = vsf_stream_get_wbuf(stream, &ptr);
                 if (size > 0) {
                     ssize_t realsize = read(_->fd_socket, ptr, size);
-                    if (realsize <= 0) {
+                    if (0 == realsize) {
+                        // socket closed by remote
                         vsf_linux_httpd_trace_event(MODULE_NAME ": socket disconnect event." VSF_TRACE_CFG_LINEEND);
-                        // socket closed by remote, seems to be not supported by current lwip socker layer
+                        __vsf_linux_httpd_session_delete(_);
+                        continue;
+                    } else if (realsize < 0) {
+                        vsf_trace_error(MODULE_NAME ": fail to read socket." VSF_TRACE_CFG_LINEEND);
                         __vsf_linux_httpd_session_delete(_);
                         continue;
                     }

@@ -622,6 +622,9 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
                 } else {
                     priv->last.pbuf = pbuf;
                 }
+            } else if (ERR_CLSD == err) {
+                // remote closed, return 0
+                return 0;
             }
         }
 
