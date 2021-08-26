@@ -18,8 +18,8 @@
 
 //! \note User Level Application Configuration
 
-#ifndef __VSF_USR_CFG_GD32E103_H__
-#define __VSF_USR_CFG_GD32E103_H__
+#ifndef __VSF_USR_CFG_MPS2_H__
+#define __VSF_USR_CFG_MPS2_H__
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
@@ -175,5 +175,5 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif      // __VSF_USR_CFG_GD32E103_H__
+#endif      // __VSF_USR_CFG_MPS2_H__
 /* EOF */
