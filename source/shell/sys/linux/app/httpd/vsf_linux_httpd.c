@@ -51,6 +51,18 @@
         http request header and http response header.
 #endif
 
+#if VSF_LINUX_HTTPD_CFG_TRACE_REQUEST == ENABLED
+#   define vsf_linux_httpd_trace_request(...)   vsf_trace_debug(__VA_ARGS__)
+#else
+#   define vsf_linux_httpd_trace_request(...)
+#endif
+
+#if VSF_LINUX_HTTPD_CFG_TRACE_EVNET == ENABLED
+#   define vsf_linux_httpd_trace_event(...)     vsf_trace_debug(__VA_ARGS__)
+#else
+#   define vsf_linux_httpd_trace_event(...)
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -283,7 +295,9 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
     end_ptr += 4;
     size = end_ptr - cur_ptr;
 
-    vsf_trace_debug("****************************** HTTP REQUEST ******************************" VSF_TRACE_CFG_LINEEND);
+    vsf_linux_httpd_trace_request(                                              \
+        "****************************** HTTP REQUEST ******************************"\
+        VSF_TRACE_CFG_LINEEND);
 
     // http request header ready, parse into request
     // 1. http request method/uri/query/protocol
@@ -335,9 +349,9 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
     }
     cur_ptr += 2;
 
-    vsf_trace_debug("uri: %s" VSF_TRACE_CFG_LINEEND, request->uri);
+    vsf_linux_httpd_trace_request("uri: %s" VSF_TRACE_CFG_LINEEND, request->uri);
     if (request->query != NULL) {
-        vsf_trace_debug("    query: %s" VSF_TRACE_CFG_LINEEND, request->query);
+        vsf_linux_httpd_trace_request("    query: %s" VSF_TRACE_CFG_LINEEND, request->query);
     }
 
     // 2. htte request header
@@ -353,7 +367,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
         *tmp_end_ptr = '\0';
         tmp_end_ptr += 2;
 
-        vsf_trace_debug("%S" VSF_TRACE_CFG_LINEEND, cur_ptr);
+        vsf_linux_httpd_trace_request("%S" VSF_TRACE_CFG_LINEEND, cur_ptr);
 
         tmp_ptr = cur_ptr;
         cur_ptr = strchr((const char *)cur_ptr, ':');
@@ -374,7 +388,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
                 // no need to set to false, becasue it's default value
             } else if (!strcasecmp((const char *)cur_ptr, "Keep-Alive")) {
                 // close event seems to be not supported by current lwip socker layer
-//                request->keep_alive = true;
+                request->keep_alive = true;
             } else {
                 goto __bad_request;
             }
@@ -773,6 +787,8 @@ static void * __vsf_linux_httpd_thread(void *param)
             FD_CLR(fd_listen, &rfds);
             fd_num--;
 
+            vsf_linux_httpd_trace_event(MODULE_NAME ": connect event." VSF_TRACE_CFG_LINEEND);
+
             struct sockaddr_in client_addr;
             socklen_t client_addr_len;
             fd_socket = accept(fd_listen, (struct sockaddr *)&client_addr, &client_addr_len);
@@ -805,6 +821,11 @@ static void * __vsf_linux_httpd_thread(void *param)
             if (is_socket_accessable || is_stream_accessable) {
                 VSF_LINUX_ASSERT(   (is_socket_accessable && !is_stream_accessable)
                                 ||  (!is_socket_accessable && is_stream_accessable));
+                if (is_socket_accessable) {
+                    vsf_linux_httpd_trace_event(MODULE_NAME ": socket rx event." VSF_TRACE_CFG_LINEEND);
+                } else {
+                    vsf_linux_httpd_trace_event(MODULE_NAME ": stream tx event." VSF_TRACE_CFG_LINEEND);
+                }
                 fd_num--;
 
                 stream = _->request.stream_in;
@@ -813,15 +834,15 @@ static void * __vsf_linux_httpd_thread(void *param)
                 size = vsf_stream_get_wbuf(stream, &ptr);
                 if (size > 0) {
                     ssize_t realsize = read(_->fd_socket, ptr, size);
-                    if (0 == realsize) {
+                    if (realsize <= 0) {
+                        vsf_linux_httpd_trace_event(MODULE_NAME ": socket disconnect event." VSF_TRACE_CFG_LINEEND);
                         // socket closed by remote, seems to be not supported by current lwip socker layer
                         __vsf_linux_httpd_session_delete(_);
                         continue;
-                    } else if (realsize < 0) {
-                        vsf_trace_error(MODULE_NAME ": fail to read socket." VSF_TRACE_CFG_LINEEND);
-                        __vsf_linux_httpd_session_delete(_);
-                        continue;
                     }
+#if VSF_LINUX_HTTPD_CFG_TRACE_EVNET == ENABLED
+                    vsf_trace_buffer(VSF_TRACE_DEBUG, ptr, realsize);
+#endif
                     if (_->fd_stream_in < 0) {
                         // no fd_stream_in while waiting for http request
                         vsf_stream_write(stream, NULL, realsize);
@@ -845,6 +866,11 @@ static void * __vsf_linux_httpd_thread(void *param)
             if (is_socket_accessable || is_stream_accessable) {
                 VSF_LINUX_ASSERT(   (is_socket_accessable && !is_stream_accessable)
                                 ||  (!is_socket_accessable && is_stream_accessable));
+                if (is_socket_accessable) {
+                    vsf_linux_httpd_trace_event(MODULE_NAME ": socket tx event." VSF_TRACE_CFG_LINEEND);
+                } else {
+                    vsf_linux_httpd_trace_event(MODULE_NAME ": stream rx event." VSF_TRACE_CFG_LINEEND);
+                }
                 fd_num--;
 
                 stream = _->request.stream_out;
@@ -858,6 +884,9 @@ static void * __vsf_linux_httpd_thread(void *param)
                         __vsf_linux_httpd_session_delete(_);
                         continue;
                     }
+#if VSF_LINUX_HTTPD_CFG_TRACE_EVNET == ENABLED
+                    vsf_trace_buffer(VSF_TRACE_DEBUG, ptr, realsize);
+#endif
                     VSF_LINUX_ASSERT(_->fd_stream_out >= 0);
                     read(_->fd_stream_out, ptr, realsize);
                     _->wait_stream_out = false;
@@ -875,6 +904,7 @@ static void * __vsf_linux_httpd_thread(void *param)
                         if (_->request.keep_alive) {
                             __vsf_linux_httpd_session_reset_reuqest(_);
                         } else {
+                            vsf_linux_httpd_trace_event(MODULE_NAME ": socket disconnect event." VSF_TRACE_CFG_LINEEND);
                             __vsf_linux_httpd_session_delete(_);
                         }
                     }
