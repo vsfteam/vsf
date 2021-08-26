@@ -164,11 +164,18 @@ void vsh_set_path(char **path)
 
 int __vsh_run_cmd(char *cmd)
 {
-    char pathname[PATH_MAX], *cur = cmd;
+    char pathname[PATH_MAX], *cur;
     int exefd = -1, err;
     char **path = __vsh_path;
     vsf_linux_main_entry_t entry;
 
+    while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
+    cur = &cmd[strlen(cmd) - 1];
+    while (isspace((int)*cur)) { *cur-- = '\0'; }
+    bool is_background = *cur == '&';
+    if (is_background) { *cur = '\0'; }
+
+    cur = cmd;
     while ((*cur != '\0') && !isspace((int)*cur)) { cur++; }
     while ((*cur != '\0') && isspace((int)*cur)) { *cur++ = '\0'; }
 
@@ -211,11 +218,19 @@ int __vsh_run_cmd(char *cmd)
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
     vsf_linux_start_process(process);
-    int result;
-    waitpid(process->id.pid, &result, 0);
-    close(exefd);
-    vsf_linux_set_dominant_process();
-    return result;
+
+    if (is_background) {
+        // yield to run new process, and then set current process dominant
+        vsf_thread_yield();
+        vsf_linux_set_dominant_process();
+        return 0;
+    } else {
+        int result;
+        waitpid(process->id.pid, &result, 0);
+        close(exefd);
+        vsf_linux_set_dominant_process();
+        return result;
+    }
 }
 
 #if __IS_COMPILER_IAR__
