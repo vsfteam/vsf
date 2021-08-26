@@ -127,11 +127,6 @@ static int __wifi_connect_main(int argc, char *argv[])
         return -1;
     }
 
-    if (wlan_connected) {
-        printf("wlan already connected\r\n");
-        return -1;
-    }
-
     char *ssid = argv[1], *pass = argc >= 3 ? argv[2] : "";
     set_mac_address(NULL);
     // wlan_start_sta MUST be called with higher priority than internal wpa(vsf_prio_0).
@@ -139,8 +134,7 @@ static int __wifi_connect_main(int argc, char *argv[])
         int ret = wlan_start_sta((uint8_t *)ssid, (uint8_t *)pass, 0);
     vsf_thread_set_priority(prio);
 
-    wlan_connected = 0 == ret ? 1 : 0;
-    if (wlan_connected) {
+    if (wlan_get_connect_status()) {
         printf("wifi connected.\r\n");
         return 0;
     } else {
