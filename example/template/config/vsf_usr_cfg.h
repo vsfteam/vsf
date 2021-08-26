@@ -44,6 +44,8 @@
 #   include "./vsf_usr_cfg/vsf_usr_cfg_esp32s2.h"
 #elif   defined(__AIC8800__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_aic8800.h"
+#elif   defined(__CMEM7__)
+#   include "./vsf_usr_cfg/vsf_usr_cfg_cmem7.h"
 #endif
 
 // software independent components, if not used, compiler will optimize
