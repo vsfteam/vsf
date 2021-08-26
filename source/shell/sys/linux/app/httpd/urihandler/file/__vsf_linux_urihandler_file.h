@@ -33,7 +33,7 @@ extern "C" {
 
 typedef struct vsf_linux_httpd_urihandler_file_t {
     vsf_eda_t eda;
-    vsf_mem_stream_t stream;
+    vsf_fifo_stream_t stream;
     vk_file_stream_t file_stream;
 } vsf_linux_httpd_urihandler_file_t;
 

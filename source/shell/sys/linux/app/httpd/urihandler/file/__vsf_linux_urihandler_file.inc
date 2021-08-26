@@ -103,11 +103,10 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
     urihandler_file->file_stream.file = uri_file;
     req->content_length = uri_file->size;
 
-    vsf_mem_stream_t *stream = &urihandler_file->stream;
-    stream->op = &vsf_mem_stream_op;
+    vsf_fifo_stream_t *stream = &urihandler_file->stream;
+    stream->op = &vsf_fifo_stream_op;
     stream->buffer = req->buffer;
     stream->size = sizeof(req->buffer);
-    stream->align = 0;
     VSF_STREAM_INIT(stream);
     req->stream_out = &stream->use_as__vsf_stream_t;
 

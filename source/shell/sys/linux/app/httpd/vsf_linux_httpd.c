@@ -545,18 +545,18 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             char *ext;
             uint8_t *ptr;
             uint_fast32_t size = vsf_stream_get_rbuf(session->request.stream_in, &ptr);
+            char *uri = session->request.uri;
 
             session->request.stream_in = NULL;
             session->wait_stream_in = false;
 
-            ext = strrchr(session->request.uri, '.');
+            ext = strrchr(uri, '.');
             if (ext != NULL) {
                 session->request.mime = __vsf_linux_httpd_get_mime_by_ext(ext);
             }
 
             // find a suitable urihandler, and pass ptr/size to urihandler init
             vsf_linux_httpd_urihandler_t *urihandler;
-            char *uri = session->request.uri;
             while (true) {
                 urihandler = __vsf_linux_httpd_parse_uri(session, uri);
                 if (NULL == urihandler) {
@@ -565,9 +565,9 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                 }
                 if (VSF_LINUX_HTTPD_URI_REMAP == urihandler->type) {
                     uri = urihandler->target_uri;
-                    ext = strrchr(uri, '.');
 
                     // if remap to a compressed format, check and set content-encoding
+                    ext = strrchr(uri, '.');
                     if (ext != NULL) {
                         for (int i = 0; i < dimof(__vsf_linux_httpd_encoding_mapper); i++) {
                             if (!strcasecmp(__vsf_linux_httpd_encoding_mapper[i].str, ext)) {
@@ -579,6 +579,15 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                     continue;
                 }
                 break;
+            }
+            session->request.uri = uri;
+
+            // try to parse mime again if not parsed before, maybe remapped to a real uri
+            if (VSF_LINUX_HTTPD_MIME_INVALID == session->request.mime) {
+                ext = strrchr(uri, '.');
+                if (ext != NULL) {
+                    session->request.mime = __vsf_linux_httpd_get_mime_by_ext(ext);
+                }
             }
 
             if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
