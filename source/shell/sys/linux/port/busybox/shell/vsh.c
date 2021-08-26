@@ -170,6 +170,8 @@ int __vsh_run_cmd(char *cmd)
     vsf_linux_main_entry_t entry;
 
     while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
+    if ('\0' == *cmd) { return 0; }
+
     cur = &cmd[strlen(cmd) - 1];
     while (isspace((int)*cur)) { *cur-- = '\0'; }
     bool is_background = *cur == '&';
