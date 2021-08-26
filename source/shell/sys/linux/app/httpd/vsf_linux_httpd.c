@@ -565,6 +565,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
 
             ext = strrchr(uri, '.');
             if (ext != NULL) {
+                ext++;
                 session->request.mime = __vsf_linux_httpd_get_mime_by_ext(ext);
             }
 
@@ -582,6 +583,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                     // if remap to a compressed format, check and set content-encoding
                     ext = strrchr(uri, '.');
                     if (ext != NULL) {
+                        ext++;
                         for (int i = 0; i < dimof(__vsf_linux_httpd_encoding_mapper); i++) {
                             if (!strcasecmp(__vsf_linux_httpd_encoding_mapper[i].str, ext)) {
                                 session->request.encoding = __vsf_linux_httpd_encoding_mapper[i].encoding;
