@@ -177,7 +177,7 @@ int lwip_main(int argc, char *argv[])
     mdns_resp_init();
     if (ERR_OK == mdns_resp_add_netif(&__usrapp_lwip.netif, "vsf", 1)) {
 #if APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
-        mdns_resp_add_service(&__usrapp_lwip.netif, "vsf_local", "_http",
+        mdns_resp_add_service(&__usrapp_lwip.netif, "vsfweb", "_http",
             DNSSD_PROTO_TCP, 80, 3600, __mdns_httpd_srv_txt, NULL);
 #endif
     }
