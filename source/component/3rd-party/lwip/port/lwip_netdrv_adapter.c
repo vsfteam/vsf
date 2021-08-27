@@ -145,7 +145,7 @@ err_t ethernetif_init(struct netif *netif)
     netif->hwaddr_len = netdrv->macaddr.size;
     memcpy(netif->hwaddr, netdrv->macaddr.addr_buf, netif->hwaddr_len);
     netif->mtu = netdrv->mtu;
-    netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_LINK_UP;
+    netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_LINK_UP | NETIF_FLAG_IGMP;
 
     return ERR_OK;
 }
@@ -158,13 +158,16 @@ static vsf_err_t __lwip_netdrv_adapter_on_connect(void *netif)
 
     lwip_req___addr___from_user(&ipaddr, &netmask, &gateway);
 
+    LOCK_TCPIP_CORE();
     lwip_netif = netif_add(lwip_netif, &ipaddr.u_addr.ip4, &netmask.u_addr.ip4,
                 &gateway.u_addr.ip4, lwip_netif->state,
                 ethernetif_init, tcpip_input);
     if (lwip_netif != NULL) {
         netif_set_default(lwip_netif);
+        UNLOCK_TCPIP_CORE();
         return VSF_ERR_NONE;
     } else {
+        UNLOCK_TCPIP_CORE();
         return VSF_ERR_FAIL;
     }
 }

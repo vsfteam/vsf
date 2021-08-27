@@ -1045,6 +1045,9 @@
     <Filter Include="vsf\shell\sys\linux\app\httpd\urihandler\file">
       <UniqueIdentifier>{db4d93ae-56a4-4006-93c1-82939993e973}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\raw\src\apps\mdns">
+      <UniqueIdentifier>{3e1d822c-7261-46f8-8faa-fa16f78304fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -5617,6 +5620,9 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\linux_demo\httpd_demo.c">
       <Filter>usrapp\demo\linux_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\apps\mdns\mdns.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\apps\mdns</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

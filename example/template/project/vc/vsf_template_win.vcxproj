@@ -1086,6 +1086,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\tcpip.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\apps\mdns\mdns.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\core\altcp.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\core\altcp_alloc.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\core\altcp_tcp.c" />

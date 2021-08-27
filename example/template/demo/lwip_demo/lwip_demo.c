@@ -49,6 +49,7 @@
 /* lwIP netif includes */
 #include "lwip/etharp.h"
 #include "netif/ethernet.h"
+#include "lwip/apps/mdns.h"
 
 /* applications includes */
 
@@ -75,16 +76,6 @@ static usrapp_lwip_t __usrapp_lwip;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void lwip_init_done(void * arg)
-{
-    usrapp_lwip_t *usrapp_lwip = arg;
-    dhcp_set_struct(netif_default, &usrapp_lwip->netif_dhcp);
-    netif_set_up(netif_default);
-
-    vsf_trace(VSF_TRACE_INFO, "dhcpc: start" VSF_TRACE_CFG_LINEEND);
-    dhcp_start(netif_default);
-}
-
 void vsf_pnp_on_netdrv_connect(vk_netdrv_t *netdrv)
 {
     lwip_netif_set_netdrv(&__usrapp_lwip.netif, netdrv);
@@ -92,7 +83,13 @@ void vsf_pnp_on_netdrv_connect(vk_netdrv_t *netdrv)
 
 void vsf_pnp_on_netdrv_connected(vk_netdrv_t *netdrv)
 {
-    tcpip_init(lwip_init_done, &__usrapp_lwip);
+    LOCK_TCPIP_CORE();
+    dhcp_set_struct(netif_default, &__usrapp_lwip.netif_dhcp);
+    netif_set_up(netif_default);
+
+    dhcp_start(netif_default);
+    UNLOCK_TCPIP_CORE();
+    vsf_trace(VSF_TRACE_INFO, "dhcpc: start" VSF_TRACE_CFG_LINEEND);
 }
 
 static int __lwip_ping(int argc, char *argv[])
@@ -136,6 +133,13 @@ static int __lwip_nslookup(int argc, char *argv[])
     return 0;
 }
 
+#if APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
+static void __mdns_httpd_srv_txt(struct mdns_service *service, void *txt_usrdata)
+{
+    mdns_resp_add_service_txtitem(service, "path=/", sizeof("path=/") - 1);
+}
+#endif
+
 int lwip_main(int argc, char *argv[])
 {
     struct dhcp *dhcp = &__usrapp_lwip.netif_dhcp;
@@ -144,6 +148,13 @@ int lwip_main(int argc, char *argv[])
         printf("format: %s NETDRV_NAME\r\n", argv[0]);
         return -1;
     }
+#endif
+
+    // tcpip_init MUST be called first,
+    //  bacause netdrv callback will need buffer inistialized by tcpip_init.
+    tcpip_init(NULL, NULL);
+
+#if VSF_NETDRV_USE_WPCAP == ENABLED
     vsf_err_t err = usrapp_net_common_init(argv[1]);
 #else
     vsf_err_t err = usrapp_net_common_init();
@@ -160,6 +171,17 @@ int lwip_main(int argc, char *argv[])
     while (dhcp->state != DHCP_STATE_BOUND) {
         vsf_thread_delay_ms(10);
     }
+
+    // setup mdns
+    LOCK_TCPIP_CORE();
+    mdns_resp_init();
+    if (ERR_OK == mdns_resp_add_netif(&__usrapp_lwip.netif, "vsf", 1)) {
+#if APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
+        mdns_resp_add_service(&__usrapp_lwip.netif, "vsf.host", "_http",
+            DNSSD_PROTO_TCP, 80, 3600, __mdns_httpd_srv_txt, NULL);
+#endif
+    }
+    UNLOCK_TCPIP_CORE();
 
     printf( "dhcpc:" VSF_TRACE_CFG_LINEEND
                 "\tipaddr: %d.%d.%d.%d" VSF_TRACE_CFG_LINEEND
