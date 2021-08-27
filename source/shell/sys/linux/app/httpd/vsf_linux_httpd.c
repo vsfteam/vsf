@@ -699,6 +699,7 @@ static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd
         __vsf_linux_httpd_session_reset_reuqest(session);
         session->fd_socket = -1;
         session->httpd = httpd;
+        session->fatal_error = false;
         vsf_dlist_init_node(vsf_linux_httpd_session_t, session_node, session);
         vsf_dlist_add_to_head(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
     }
