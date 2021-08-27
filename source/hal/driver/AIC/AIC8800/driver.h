@@ -40,7 +40,7 @@
 #       include "./adc/adc.h"
 #       include "./flash/flash.h"
 #       include "./pwm/pwm.h"
-#       include "i2c_gpio/i2c_gpio.h"
+#       include "./i2c/i2c.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

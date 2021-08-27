@@ -67,9 +67,9 @@ typedef struct gpio_reg_t {
     AIC_IOMUX_TypeDef           *IOMUX;
 } gpio_reg_t;
 
-typedef struct vsf_gpio_t {
+struct vsf_gpio_t {
     gpio_reg_t                  REG;
-} vsf_gpio_t;
+};
 
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
