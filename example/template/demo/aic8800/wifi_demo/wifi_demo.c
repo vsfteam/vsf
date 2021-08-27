@@ -25,6 +25,7 @@
 
 #include "fhost_config.h"
 #include "fhost.h"
+#include "fhost_mdns.h"
 
 #include "rwnx_defs.h"
 #include "rwnx_msg_tx.h"
@@ -127,6 +128,12 @@ static int __wifi_connect_main(int argc, char *argv[])
         return -1;
     }
 
+    if (wlan_get_connect_status()) {
+#if APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
+//        fhost_mdns_stop();
+#endif
+    }
+
     char *ssid = argv[1], *pass = argc >= 3 ? argv[2] : "";
     set_mac_address(NULL);
     // wlan_start_sta MUST be called with higher priority than internal wpa(vsf_prio_0).
@@ -136,6 +143,12 @@ static int __wifi_connect_main(int argc, char *argv[])
 
     if (wlan_get_connect_status()) {
         printf("wifi connected.\r\n");
+
+#if APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
+        // start mdns, not ready
+//        fhost_mdns_set_param("vsf_local", "_http", 80);
+//        fhost_mdns_start();
+#endif
         return 0;
     } else {
         printf("fail to connect %s.\r\n", argv[1]);

@@ -57,6 +57,8 @@
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
+#   define APP_USE_LINUX_HTTPD_DEMO                     ENABLED
+#       define APP_LINUX_HTTPD_DEMO_CFG_ROOT            "/memfs/webroot"
 #define APP_USE_USBH_DEMO                               ENABLED
 // Actually, usbd use usbip_dcd or distbus_dcd, no conflicts with hardware usb host
 #define APP_USE_USBD_DEMO                               ENABLED

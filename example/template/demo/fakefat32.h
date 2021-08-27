@@ -47,6 +47,7 @@ extern vk_fakefat32_file_t fakefat32_root[ 3
                                 +   (APP_USE_VSFVM_DEMO == ENABLED ? 1 : 0)
                                 +   (USRAPP_FAKEFAT32_CFG_FONT == ENABLED ? 1 : 0)
                                 +   (APP_USE_EVM_DEMO == ENABLED ? 1 : 0)
+                                +   ((APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED) ? 1 : 0)
                                 ];
 
 #endif

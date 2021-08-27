@@ -127,6 +127,38 @@ static vk_fakefat32_file_t __fakefat32_font[3] = {
 };
 #endif
 
+#if APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
+const char __webroot_index_html[] = STR(
+<html>
+  <head>
+    <title>
+      Hello World
+    </title>
+  </head>
+  <body>
+    Hello World
+  </body>
+</html>
+);
+
+static vk_fakefat32_file_t __webroot_root[3] = {
+    {
+        .name               = ".",
+        .attr               = VSF_FILE_ATTR_DIRECTORY,
+    },
+    {
+        .name               = "..",
+        .attr               = VSF_FILE_ATTR_DIRECTORY,
+    },
+    {
+        .name               = "index.html",
+        .size               = sizeof(__webroot_index_html),
+        .attr               = VSF_FILE_ATTR_READ,
+        .f.buff             = (uint8_t *)__webroot_index_html,
+    },
+};
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if     __IS_COMPILER_GCC__
@@ -138,6 +170,7 @@ vk_fakefat32_file_t fakefat32_root[ 3
                                 +   (APP_USE_VSFVM_DEMO == ENABLED ? 1 : 0)
                                 +   (USRAPP_FAKEFAT32_CFG_FONT == ENABLED ? 1 : 0)
                                 +   (APP_USE_EVM_DEMO == ENABLED ? 1 : 0)
+                                +   ((APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED) ? 1 : 0)
                                 ] = {
     {
         .name               = "FAKEFAT32",
@@ -178,6 +211,14 @@ vk_fakefat32_file_t fakefat32_root[ 3
         .attr               = VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ,
         .d.child            = (vk_memfs_file_t *)__evm_root,
         .d.child_num        = dimof(__evm_root),
+    },
+#endif
+#if APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
+    {
+        .name               = "webroot",
+        .attr               = VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ,
+        .d.child            = (vk_memfs_file_t *)__webroot_root,
+        .d.child_num        = dimof(__webroot_root),
     },
 #endif
 };

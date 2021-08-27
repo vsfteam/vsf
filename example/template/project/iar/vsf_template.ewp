@@ -5693,6 +5693,9 @@
             <group>
                 <name>linux_demo</name>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\linux_demo\httpd_demo.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\linux_demo\libusb_demo.c</name>
                 </file>
                 <file>
@@ -10133,6 +10136,15 @@
                                             </file>
                                         </group>
                                         <group>
+                                            <name>apps</name>
+                                            <group>
+                                                <name>mdns</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\apps\mdns\mdns.c</name>
+                                                </file>
+                                            </group>
+                                        </group>
+                                        <group>
                                             <name>core</name>
                                             <group>
                                                 <name>ipv4</name>
@@ -12423,6 +12435,18 @@
                 <name>sys</name>
                 <group>
                     <name>linux</name>
+                    <group>
+                        <name>app</name>
+                        <group>
+                            <name>httpd</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.h</name>
+                            </file>
+                        </group>
+                    </group>
                     <group>
                         <name>include</name>
                         <group>
