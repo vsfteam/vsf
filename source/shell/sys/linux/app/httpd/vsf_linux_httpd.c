@@ -21,6 +21,7 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED
 
+#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
@@ -367,7 +368,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
         *tmp_end_ptr = '\0';
         tmp_end_ptr += 2;
 
-        vsf_linux_httpd_trace_request("%S" VSF_TRACE_CFG_LINEEND, cur_ptr);
+        vsf_linux_httpd_trace_request("%s" VSF_TRACE_CFG_LINEEND, cur_ptr);
 
         tmp_ptr = cur_ptr;
         cur_ptr = strchr((const char *)cur_ptr, ':');
@@ -576,6 +577,7 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                 urihandler = __vsf_linux_httpd_parse_uri(session, uri);
                 if (NULL == urihandler) {
                     session->request.response = VSF_LINUX_HTTPD_NOT_FOUND;
+                    vsf_trace_error(MODULE_NAME ": handler for uri not found: %s" VSF_TRACE_CFG_LINEEND, uri);
                     goto __error;
                 }
                 if (VSF_LINUX_HTTPD_URI_REMAP == urihandler->type) {
@@ -604,6 +606,8 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
             session->request.uri = uri;
 
             if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
+                vsf_trace_error(MODULE_NAME ": fail to initialize request for %s, %s" VSF_TRACE_CFG_LINEEND,
+                                    uri, __vsf_linux_httpd_get_response_str(session->request.response));
                 goto __error;
             }
             if (    (session->request.mime != VSF_LINUX_HTTPD_MIME_INVALID)
