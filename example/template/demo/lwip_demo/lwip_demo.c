@@ -181,7 +181,7 @@ int lwip_main(int argc, char *argv[])
     // setup mdns
     LOCK_TCPIP_CORE();
     mdns_resp_init();
-    if (ERR_OK == mdns_resp_add_netif(&__usrapp_lwip.netif, "vsf", 1)) {
+    if (ERR_OK == mdns_resp_add_netif(&__usrapp_lwip.netif, "vsf", 60 * 10)) {
 #if APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
         mdns_resp_add_service(&__usrapp_lwip.netif, "vsfweb", "_http",
             DNSSD_PROTO_TCP, 80, 3600, __mdns_httpd_srv_txt, NULL);
