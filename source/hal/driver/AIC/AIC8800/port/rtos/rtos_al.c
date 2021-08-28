@@ -236,6 +236,13 @@ int rtos_task_create(   rtos_task_fct func,
 #else
     rtos_prio real_prio = prio;
 #endif
+
+    // patch
+    // 1. IPC cntrl task will stackoverflow if using some protocols, eg: mdns
+    if (!strcmp(name, "IPC cntrl task")) {
+        *(uint16_t *)&stack_depth <<= 1;
+    }
+
     // default alignment is ok for cortex-m4
     vsf_rtos_thread_t *thread = vsf_heap_malloc(sizeof(vsf_rtos_thread_t) + (stack_depth << 2));
     if (NULL == thread) {
