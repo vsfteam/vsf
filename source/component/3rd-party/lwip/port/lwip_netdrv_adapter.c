@@ -159,9 +159,15 @@ static vsf_err_t __lwip_netdrv_adapter_on_connect(void *netif)
     lwip_req___addr___from_user(&ipaddr, &netmask, &gateway);
 
     LOCK_TCPIP_CORE();
+#if LWIP_IPV4 && LWIP_IPV6
     lwip_netif = netif_add(lwip_netif, &ipaddr.u_addr.ip4, &netmask.u_addr.ip4,
                 &gateway.u_addr.ip4, lwip_netif->state,
                 ethernetif_init, tcpip_input);
+#elif LWIP_IPV4
+    lwip_netif = netif_add(lwip_netif, &ipaddr, &netmask,
+                &gateway, lwip_netif->state,
+                ethernetif_init, tcpip_input);
+#endif
     if (lwip_netif != NULL) {
         netif_set_default(lwip_netif);
         UNLOCK_TCPIP_CORE();

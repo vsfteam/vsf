@@ -101,9 +101,15 @@ static int __lwip_ping(int argc, char *argv[])
 static void dns_found(const char *name, const ip_addr_t *addr, void *arg)
 {
     if (addr != NULL) {
+#if LWIP_IPV4 && LWIP_IPV6
         vsf_trace(VSF_TRACE_INFO, "address: %d.%d.%d.%d\n",
             (addr->u_addr.ip4.addr >> 0) & 0xFF, (addr->u_addr.ip4.addr >> 8) & 0xFF,
             (addr->u_addr.ip4.addr >> 16) & 0xFF, (addr->u_addr.ip4.addr >> 24) & 0xFF);
+#elif LWIP_IPV4
+        vsf_trace(VSF_TRACE_INFO, "address: %d.%d.%d.%d\n",
+            (addr->addr >> 0) & 0xFF, (addr->addr >> 8) & 0xFF,
+            (addr->addr >> 16) & 0xFF, (addr->addr >> 24) & 0xFF);
+#endif
     } else {
         vsf_trace(VSF_TRACE_INFO, "fail to get ip for %s\n", name);
     }
