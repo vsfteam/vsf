@@ -575,7 +575,7 @@ ssize_t send(int socket, const void *buffer, size_t size, int flags)
     if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
         size_t written = 0;
         err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
-        vsf_linux_fd_tx_try_trigger(sfd);
+        vsf_linux_fd_tx_update(sfd);
         return (ERR_OK == err) ? (ssize_t)written : SOCKET_ERROR;
     } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
         return sendto(socket, buffer, size, flags, NULL, 0);
@@ -680,7 +680,7 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
         }
     }
 
-    vsf_linux_fd_rx_try_trigger(sfd);
+    vsf_linux_fd_rx_update(sfd);
     return len;
 }
 
@@ -740,7 +740,7 @@ ssize_t sendto(int socket, const void *buffer, size_t size, int flags,
 
     err_t err = netconn_send(conn, &buf);
     netbuf_free(&buf);
-    vsf_linux_fd_tx_try_trigger(sfd);
+    vsf_linux_fd_tx_update(sfd);
     return (ERR_OK == err) ? size : SOCKET_ERROR;
 }
 

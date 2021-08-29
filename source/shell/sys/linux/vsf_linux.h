@@ -256,8 +256,8 @@ extern void vsf_linux_fd_trigger_init(vsf_trig_t *trig);
 // vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
 extern int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
 extern int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
-extern int vsf_linux_fd_tx_try_trigger(vsf_linux_fd_t *sfd);
-extern int vsf_linux_fd_rx_try_trigger(vsf_linux_fd_t *sfd);
+extern int vsf_linux_fd_tx_update(vsf_linux_fd_t *sfd);
+extern int vsf_linux_fd_rx_update(vsf_linux_fd_t *sfd);
 extern int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 extern int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 extern int vsf_linux_fd_tx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig);

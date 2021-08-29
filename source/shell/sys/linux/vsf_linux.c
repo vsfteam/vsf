@@ -1280,23 +1280,23 @@ int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
     return 0;
 }
 
-int vsf_linux_fd_tx_try_trigger(vsf_linux_fd_t *sfd)
+int vsf_linux_fd_tx_update(vsf_linux_fd_t *sfd)
 {
     vsf_protect_t orig = vsf_protect_sched();
-        if (sfd->txrdy) {
-            return vsf_linux_fd_tx_trigger(sfd, orig);
-        }
-    vsf_unprotect_sched(orig);
+    if (sfd->txrdy) {
+        return vsf_linux_fd_tx_trigger(sfd, orig);
+    }
+    vsf_linux_fd_tx_busy(sfd, orig);
     return 0;
 }
 
-int vsf_linux_fd_rx_try_trigger(vsf_linux_fd_t *sfd)
+int vsf_linux_fd_rx_update(vsf_linux_fd_t *sfd)
 {
     vsf_protect_t orig = vsf_protect_sched();
-        if (sfd->rxrdy) {
-            return vsf_linux_fd_rx_trigger(sfd, orig);
-        }
-    vsf_unprotect_sched(orig);
+    if (sfd->rxrdy) {
+        return vsf_linux_fd_rx_trigger(sfd, orig);
+    }
+    vsf_linux_fd_rx_busy(sfd, orig);
     return 0;
 }
 
