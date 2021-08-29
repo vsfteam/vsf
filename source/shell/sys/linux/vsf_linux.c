@@ -1286,7 +1286,8 @@ int vsf_linux_fd_tx_update(vsf_linux_fd_t *sfd)
     if (sfd->txrdy) {
         return vsf_linux_fd_tx_trigger(sfd, orig);
     }
-    vsf_linux_fd_tx_busy(sfd, orig);
+    sfd->txevt = false;
+    vsf_unprotect_sched(orig);
     return 0;
 }
 
@@ -1296,7 +1297,8 @@ int vsf_linux_fd_rx_update(vsf_linux_fd_t *sfd)
     if (sfd->rxrdy) {
         return vsf_linux_fd_rx_trigger(sfd, orig);
     }
-    vsf_linux_fd_rx_busy(sfd, orig);
+    sfd->rxevt = false;
+    vsf_unprotect_sched(orig);
     return 0;
 }
 
