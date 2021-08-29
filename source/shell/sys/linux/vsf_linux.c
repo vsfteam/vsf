@@ -1081,7 +1081,7 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
     if (!vsf_stream_get_data_size(stream)) {
         vsf_linux_fd_rx_busy(sfd, orig);
     } else {
-        vsf_unprotect_sched(orig);
+        vsf_linux_fd_rx_trigger(sfd, orig);
     }
     return count;
 }
@@ -1113,7 +1113,7 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
     if (!vsf_stream_get_free_size(stream)) {
         vsf_linux_fd_tx_busy(sfd, orig);
     } else {
-        vsf_unprotect_sched(orig);
+        vsf_linux_fd_tx_trigger(sfd, orig);
     }
     return count;
 }
@@ -1328,6 +1328,7 @@ void vsf_linux_fd_tx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig)
         VSF_LINUX_ASSERT(false);
     } else {
         sfd->txrdy = false;
+        sfd->txevt = false;
     }
     vsf_unprotect_sched(orig);
 }
@@ -1338,6 +1339,7 @@ void vsf_linux_fd_rx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig)
         VSF_LINUX_ASSERT(false);
     } else {
         sfd->rxrdy = false;
+        sfd->rxevt = false;
     }
     vsf_unprotect_sched(orig);
 }
@@ -1357,9 +1359,11 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             sfd = vsf_linux_get_fd(fds[i].fd);
             if (sfd->rxevt || sfd->txevt) {
                 if ((fds[i].events & POLLIN) && sfd->rxevt) {
+                    sfd->rxevt = false;
                     fds[i].revents |= POLLIN;
                 }
                 if ((fds[i].events & POLLOUT) && sfd->txevt) {
+                    sfd->txevt = false;
                     fds[i].revents |= POLLOUT;
                 }
                 if (fds[i].revents) {

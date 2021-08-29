@@ -628,8 +628,6 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                     break;
                 }
                 session->fd_stream_in = sfd->fd;
-                // ready to send data to stream_in
-                vsf_stream_connect_tx(stream);
             }
 
             stream = session->request.stream_out;
@@ -641,8 +639,6 @@ static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t ev
                 break;
             }
             session->fd_stream_out = sfd->fd;
-            // ready to recv data from stream_out
-            vsf_stream_connect_rx(stream);
 
             // write response header to stream_out
             __vsf_linux_httpd_send_response(session);
