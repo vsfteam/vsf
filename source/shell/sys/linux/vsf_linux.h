@@ -176,8 +176,9 @@ vsf_class(vsf_linux_fd_t) {
 
         vsf_trig_t *txpend, *rxpend;
         bool txrdy;
+        bool txevt;
         bool rxrdy;
-        bool auto_reset;
+        bool rxevt;
     )
 
     private_member(
@@ -255,10 +256,14 @@ extern void vsf_linux_fd_trigger_init(vsf_trig_t *trig);
 // vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
 extern int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
 extern int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
+extern int vsf_linux_fd_tx_try_trigger(vsf_linux_fd_t *sfd);
+extern int vsf_linux_fd_rx_try_trigger(vsf_linux_fd_t *sfd);
 extern int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 extern int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern int vsf_linux_fd_tx_untrigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern int vsf_linux_fd_rx_untrigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
+extern int vsf_linux_fd_tx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig);
+extern int vsf_linux_fd_rx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig);
+extern void vsf_linux_fd_tx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
+extern void vsf_linux_fd_rx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 
 extern vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd);
 #endif

@@ -303,7 +303,6 @@ int libusb_init(libusb_context **context)
     if (__vsf_libusb.fd < 0) {
         return LIBUSB_ERROR_NO_MEM;
     }
-    sfd->auto_reset = true;
     __vsf_libusb.pollfd[0].fd = __vsf_libusb.fd;
     __vsf_libusb.pollfd[0].sfd = sfd;
     __vsf_libusb.pollfd[0].events = POLLIN;
