@@ -35,6 +35,12 @@
 #ifndef APP_USE_EVM_DEMO
 #   define APP_USE_EVM_DEMO                     DISABLED
 #endif
+#ifndef APP_USE_LINUX_DEMO
+#   define APP_USE_LINUX_DEMO                   DISABLED
+#endif
+#ifndef APP_USE_LINUX_HTTPD_DEMO
+#   define APP_USE_LINUX_HTTPD_DEMO             DISABLED
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
