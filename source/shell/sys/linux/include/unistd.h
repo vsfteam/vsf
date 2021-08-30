@@ -33,7 +33,6 @@ extern "C" {
 #define getppid             VSF_LINUX_WRAPPER(getppid)
 #define execl               VSF_LINUX_WRAPPER(execl)
 #define execv               VSF_LINUX_WRAPPER(execv)
-#define system              VSF_LINUX_WRAPPER(system)
 #define realpath            VSF_LINUX_WRAPPER(realpath)
 #define sysconf             VSF_LINUX_WRAPPER(sysconf)
 #define pipe                VSF_LINUX_WRAPPER(pipe)
