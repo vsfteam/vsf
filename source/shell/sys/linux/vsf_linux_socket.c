@@ -64,6 +64,7 @@ typedef struct vsf_linux_socket_priv_t {
         struct netbuf       *netbuf;
         struct pbuf         *pbuf;
     } last;
+    uint16_t                rxcnt;
 } vsf_linux_socket_priv_t;
 
 typedef union vsf_linux_sockaddr_t {
@@ -469,19 +470,16 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 //        if (*addrlen >
     }
 
+    int rcvplus = -1 -  newconn->socket;
     newconn->socket = (int)sfd;
     newconn->callback = __vsf_linux_socket_lwip_evthandler;
 
-    // maybe callback is already issued(and ignored becase of invalid newconn->socket),
-    //  so try trigger if recv data available
-    vsf_protect_t orig = vsf_protect_sched();
-    int recv_avail;
-    SYS_ARCH_GET(newconn->recv_avail, recv_avail);
-    if (recv_avail > 0) {
-        vsf_linux_fd_rx_ready(sfd, orig);
-    } else {
-        vsf_unprotect_sched(orig);
-    }
+    LOCK_TCPIP_CORE();
+        while (rcvplus > 0) {
+            rcvplus--;
+            newconn->callback(newconn, NETCONN_EVT_RCVPLUS, 0);
+        }
+    UNLOCK_TCPIP_CORE();
     vsf_linux_fd_tx_ready(sfd, vsf_protect_sched());
     return newsock;
 }
@@ -680,7 +678,11 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
         }
     }
 
-    vsf_linux_fd_rx_update(sfd);
+    if (priv->last.pbuf != NULL) {
+        vsf_linux_fd_rx_trigger(sfd, vsf_protect_sched());
+    } else {
+        vsf_linux_fd_rx_update(sfd);
+    }
     return len;
 }
 
@@ -763,18 +765,31 @@ int shutdown(int socket, int how)
 
 static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len)
 {
-    if (-1 == conn->socket) {
+    VSF_LINUX_ASSERT(conn != NULL);
+    SYS_ARCH_DECL_PROTECT(lev);
+    int s = conn->socket;
+
+    // warning: before fd is created, conn can receive up to 256 NETCONN_EVT_RCVPLUS
+    if ((s < 0) && (s >= (-1 - 256))) {
+        if (evt == NETCONN_EVT_RCVPLUS) {
+            conn->socket--;
+        }
         return;
     }
 
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)conn->socket;
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     if (sfd != NULL) {
         switch (evt) {
         case NETCONN_EVT_RCVPLUS:
-            vsf_linux_fd_rx_ready(sfd, vsf_protect_sched());
+            if (0 == priv->rxcnt++) {
+                vsf_linux_fd_rx_ready(sfd, vsf_protect_sched());
+            }
             break;
         case NETCONN_EVT_RCVMINUS:
-            vsf_linux_fd_rx_busy(sfd, vsf_protect_sched());
+            if (0 == --priv->rxcnt) {
+                vsf_linux_fd_rx_busy(sfd, vsf_protect_sched());
+            }
             break;
         case NETCONN_EVT_SENDPLUS:
             vsf_linux_fd_tx_ready(sfd, vsf_protect_sched());
