@@ -76,7 +76,7 @@ static uint_fast32_t __vk_file_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
@@ -131,7 +131,7 @@ __vsf_component_peda_ifs_entry(__vk_file_mal_write, vk_mal_write)
 
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
 

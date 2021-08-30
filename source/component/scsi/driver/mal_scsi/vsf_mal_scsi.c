@@ -65,7 +65,7 @@ const vk_virtual_scsi_drv_t vk_mal_virtual_scsi_drv = {
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
@@ -158,7 +158,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_write, vk_virtual_scsi_write)
 
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
 

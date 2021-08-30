@@ -86,7 +86,7 @@ static void __vk_memfs_init(vk_memfs_info_t *info, vk_memfs_file_t *file)
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
@@ -213,7 +213,7 @@ __vsf_component_peda_ifs_entry(__vk_memfs_write, vk_file_write)
 
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
 

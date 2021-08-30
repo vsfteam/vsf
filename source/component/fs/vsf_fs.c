@@ -248,7 +248,7 @@ void vk_fs_init(void)
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
@@ -397,7 +397,7 @@ __vsf_component_peda_private_entry(__vk_file_close)
 
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
 
@@ -617,7 +617,7 @@ static vk_vfs_file_t * __vk_vfs_lookup_imp(vk_vfs_file_t *dir, const char *name,
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
@@ -865,7 +865,7 @@ uint_fast16_t vk_file_get_name_length(vk_file_t *file)
 
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
 
@@ -905,7 +905,7 @@ static void __vk_file_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
@@ -986,7 +986,7 @@ __vsf_component_peda_private_entry(__vk_file_write_stream)
 
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
 

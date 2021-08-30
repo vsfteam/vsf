@@ -332,6 +332,11 @@ vsf_err_t vk_dwcotg_dcd_ep_set_stall(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t e
     VSF_USB_ASSERT(ep < dwcotg_dcd->ep_num);
 
     *ep_ctrl |= USB_OTG_DIEPCTL_STALL;
+
+    if (ep == 0) {
+        dwcotg_dcd->ctrl_transfer_state = DWCOTG_SETUP_STAGE;
+    }
+
     return VSF_ERR_NONE;
 }
 
@@ -722,7 +727,7 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
                         trans = &dwcotg_dcd->trans[ep_idx];
                         if (!trans->zlp) {
                             __vk_dwcotg_dcd_ep_out_transfer(dwcotg_dcd, ep_idx);
-                        } else {
+                        } else if (!(int_status & USB_OTG_DOEPINT_STSPHSERCVD)) {
                             __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_OUT, ep_idx);
                         }
                     }

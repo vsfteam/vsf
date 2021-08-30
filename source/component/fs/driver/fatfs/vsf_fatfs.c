@@ -391,7 +391,7 @@ static bool __vk_fatfs_fat_entry_is_eof(__vk_fatfs_info_t *fsinfo, uint_fast32_t
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
@@ -974,7 +974,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write)
 
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
 

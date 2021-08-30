@@ -136,6 +136,9 @@ int fseek(FILE *f, long offset, int fromwhere)
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
+#elif __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
 off64_t ftello64(FILE *f)
@@ -158,6 +161,8 @@ void rewind(FILE *f)
 
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
+#elif __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
 #endif
 
 off_t ftello(FILE *f)
@@ -332,6 +337,9 @@ void clearerr(FILE *f)
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
+#elif __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
 int feof(FILE *f)
@@ -346,6 +354,8 @@ int feof(FILE *f)
 
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
+#elif __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
 #endif
 
 #if !__IS_COMPILER_IAR__
