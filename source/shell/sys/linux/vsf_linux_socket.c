@@ -471,11 +471,11 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
 //        if (*addrlen >
     }
 
-    int rcvplus = -1 -  newconn->socket;
-    newconn->socket = (int)sfd;
-    newconn->callback = __vsf_linux_socket_lwip_evthandler;
 
+    newconn->callback = __vsf_linux_socket_lwip_evthandler;
     LOCK_TCPIP_CORE();
+        int rcvplus = -1 -  newconn->socket;
+        newconn->socket = (int)sfd;
         while (rcvplus > 0) {
             rcvplus--;
             newconn->callback(newconn, NETCONN_EVT_RCVPLUS, 0);
