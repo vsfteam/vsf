@@ -28,5 +28,7 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          personal_token: ${{ secrets.VSF_AIO }}
+          external_repository: vsfteam/vsfteam.github.io
           publish_dir: doxygen
+          publish_branch: master
