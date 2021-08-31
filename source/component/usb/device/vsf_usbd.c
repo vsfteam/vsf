@@ -60,7 +60,7 @@
 #   define __vsf_usbd_trace_evt(__evt, __value)                                 \
         do {                                                                    \
             __vsf_usbd_trace("%d: usbd_evt: %s %d" VSF_TRACE_CFG_LINEEND,       \
-                vsf_systimer_get_ms(), __vsf_usbd_trace_evts[(__evt)], (__value));\
+                (int)vsf_systimer_get_ms(), __vsf_usbd_trace_evts[(__evt)], (__value));\
         } while (0)
 #else
 #   define __vsf_usbd_trace_evt(__evt, __value)
