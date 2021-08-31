@@ -480,8 +480,8 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
             rcvplus--;
             newconn->callback(newconn, NETCONN_EVT_RCVPLUS, 0);
         }
+        newconn->callback(newconn, NETCONN_EVT_SENDPLUS, 0);
     UNLOCK_TCPIP_CORE();
-    vsf_linux_fd_tx_ready(sfd, vsf_protect_sched());
     return newsock;
 }
 
