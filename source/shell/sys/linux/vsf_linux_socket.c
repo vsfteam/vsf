@@ -38,6 +38,7 @@
 #   include <netdb.h>
 #endif
 
+#include "lwip/tcpip.h"
 #include "lwip/api.h"
 #include "lwip/ip.h"
 
