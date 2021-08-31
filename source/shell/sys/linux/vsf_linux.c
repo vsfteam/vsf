@@ -1280,22 +1280,6 @@ int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
     return 0;
 }
 
-void vsf_linux_fd_tx_update(vsf_linux_fd_t *sfd)
-{
-    vsf_protect_t orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT(NULL == sfd->txpend);
-    sfd->txevt = sfd->txrdy;
-    vsf_unprotect_sched(orig);
-}
-
-void vsf_linux_fd_rx_update(vsf_linux_fd_t *sfd)
-{
-    vsf_protect_t orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT(NULL == sfd->rxpend);
-    sfd->rxevt = sfd->rxrdy;
-    vsf_unprotect_sched(orig);
-}
-
 int vsf_linux_fd_tx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
     if (!sfd->txrdy) {

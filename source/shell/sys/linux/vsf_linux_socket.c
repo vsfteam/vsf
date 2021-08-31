@@ -574,7 +574,6 @@ ssize_t send(int socket, const void *buffer, size_t size, int flags)
     if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
         size_t written = 0;
         err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
-        vsf_linux_fd_tx_update(sfd);
         return (ERR_OK == err) ? (ssize_t)written : SOCKET_ERROR;
     } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
         return sendto(socket, buffer, size, flags, NULL, 0);
@@ -631,6 +630,9 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
         if (err != ERR_OK) {
             return 0 == len ? -1 : len;
         }
+        LOCK_TCPIP_CORE();
+            conn->callback(conn, NETCONN_EVT_RCVPLUS, 0);
+        UNLOCK_TCPIP_CORE();
         if (priv->last.netbuf != NULL) {
             priv->last.pbuf = priv->last.netbuf->p;
         }
@@ -649,6 +651,11 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
             priv->last.netbuf->ptr = priv->last.netbuf->p = pbuf;
         }
         priv->last.pbuf = pbuf;
+        if (NULL == priv->last.pbuf) {
+            LOCK_TCPIP_CORE();
+                conn->callback(conn, NETCONN_EVT_RCVMINUS, 0);
+            UNLOCK_TCPIP_CORE();
+        }
         pos = 0;
     }
     if ((flags & MSG_WAITALL) && (size > 0)) {
@@ -676,14 +683,13 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
             netbuf_delete(priv->last.netbuf);
             priv->last.netbuf = NULL;
             priv->last.pbuf = NULL;
+
+            LOCK_TCPIP_CORE();
+                conn->callback(conn, NETCONN_EVT_RCVMINUS, 0);
+            UNLOCK_TCPIP_CORE();
         }
     }
 
-    if (priv->last.pbuf != NULL) {
-        vsf_linux_fd_rx_trigger(sfd, vsf_protect_sched());
-    } else {
-        vsf_linux_fd_rx_update(sfd);
-    }
     return len;
 }
 
@@ -743,7 +749,6 @@ ssize_t sendto(int socket, const void *buffer, size_t size, int flags,
 
     err_t err = netconn_send(conn, &buf);
     netbuf_free(&buf);
-    vsf_linux_fd_tx_update(sfd);
     return (ERR_OK == err) ? size : SOCKET_ERROR;
 }
 
