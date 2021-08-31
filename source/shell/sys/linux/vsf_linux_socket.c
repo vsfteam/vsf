@@ -682,11 +682,13 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
             VSF_LINUX_ASSERT(priv->last.netbuf != NULL);
             netbuf_delete(priv->last.netbuf);
             priv->last.netbuf = NULL;
-            priv->last.pbuf = NULL;
 
-            LOCK_TCPIP_CORE();
-                conn->callback(conn, NETCONN_EVT_RCVMINUS, 0);
-            UNLOCK_TCPIP_CORE();
+            if (priv->last.pbuf != NULL) {
+                priv->last.pbuf = NULL;
+                LOCK_TCPIP_CORE();
+                    conn->callback(conn, NETCONN_EVT_RCVMINUS, 0);
+                UNLOCK_TCPIP_CORE();
+            }
         }
     }
 
