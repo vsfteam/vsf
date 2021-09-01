@@ -37,9 +37,21 @@ vsf_i2c_t vsf_i2c0 = {
 
 void I2CM_IRQHandler(void)
 {
-    AIC_I2CM0->SR &= ~SR_INT_BIT;
-    AIC_I2CM0->CR  = 0;
-    AIC_I2CM0->RR = RR_RST_BIT;
+    em_i2c_irq_mask_t irq_mask = 0;
+    for (int i = 0; i < vsf_i2c0.data_length; i++) {
+        vsf_i2c0.data[i] = (vsf_i2c0.REG_PARAM->IR & 0xff);
+    }
+    if (0 != vsf_i2c0.REG_PARAM->LR) {
+        irq_mask |= I2C_IRQ_MASK_MASTER_ADDRESS_NACK;
+    } else {
+        irq_mask |= I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+    }
+    vsf_i2c0.REG_PARAM->SR &= ~SR_INT_BIT;
+    vsf_i2c0.REG_PARAM->CR  = 0;
+    vsf_i2c0.REG_PARAM->RR = RR_RST_BIT;
+    if (NULL != vsf_i2c0.cfg.isr.handler_fn) {
+        vsf_i2c0.cfg.isr.handler_fn(vsf_i2c0.cfg.isr.target_ptr, &vsf_i2c0, irq_mask);
+    }
 }
 
 vsf_err_t __vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
@@ -71,7 +83,6 @@ vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
 void vsf_i2c_fini(vsf_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
-    VSF_HAL_ASSERT(false);
     cpusysctrl_pclkmd_set(CSC_PCLKME_I2CM_EN_BIT);
     //todo:
 }
@@ -93,7 +104,8 @@ fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr)
 void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
-    i2c_ptr->REG_PARAM->CR |= (irq_mask & I2C_IRQ_MASK_MASTER_ALL);
+    i2c_ptr->status.status_bool.irq_enabled = true;
+//    i2c_ptr->REG_PARAM->CR |= (irq_mask & I2C_IRQ_MASK_MASTER_ALL);
     NVIC_EnableIRQ(I2CM_IRQn);
     //todo
 }
@@ -101,7 +113,8 @@ void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
 void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
-    i2c_ptr->REG_PARAM->CR &= ~(irq_mask & I2C_IRQ_MASK_MASTER_ALL);
+    i2c_ptr->status.status_bool.irq_enabled = false;
+//    i2c_ptr->REG_PARAM->CR &= ~(irq_mask & I2C_IRQ_MASK_MASTER_ALL);
     if (I2C_IRQ_MASK_MASTER_ALL == irq_mask) {
         NVIC_DisableIRQ(I2CM_IRQn);
     }
@@ -115,28 +128,46 @@ i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr)
 
 vsf_err_t vsf_i2c_master_request(   vsf_i2c_t *i2c_ptr,
                                     uint16_t address,
-                                    uint8_t cmd,
+                                    em_i2c_cmd_t cmd,
                                     uint16_t count,
                                     uint8_t *buffer_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
 //    VSF_HAL_ASSERT(count);//TODO: max count
+    if (16 < count) {
+        return VSF_ERR_OVERRUN;
+    }
     if (!i2c_ptr->status.status_bool.is_enabled) {
         return VSF_ERR_INVALID_PARAMETER;
     }
+    if (    (!(cmd & I2C_CMD_START))
+        ||      ((!(cmd & I2C_CMD_STOP))
+            &&  (!(cmd & I2C_CMD_RESTAR)))) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    cmd &= ((~I2C_CMD_START) | (~I2C_CMD_STOP));
 
+    i2c_ptr->data = buffer_ptr;
     i2c_ptr->REG_PARAM->SR &= ~(0x01UL << 1);
     i2c_ptr->REG_PARAM->SAR = SAR_SLAVE_ADDR_FILED(address);
-    for (int i = 0; i < count; i++) {
-        i2c_ptr->REG_PARAM->OR = buffer_ptr[i];
+
+
+    if (!(cmd & I2C_CMD_READ)) {
+        for (int i = 0; i < count; i++) {
+            i2c_ptr->REG_PARAM->OR = buffer_ptr[i];
+        }
+        i2c_ptr->data_length = 0;
+    } else {
+        i2c_ptr->data_length = count;
     }
     i2c_ptr->REG_PARAM->LR  = count;
-    i2c_ptr->REG_PARAM->CR  =       CR_INT_ENABLE_BIT
-//                                |   CR_OMO_ENABLE_BIT
+    i2c_ptr->REG_PARAM->CR  =       (i2c_ptr->status.status_bool.irq_enabled << 1)
+                                |   CR_OMO_ENABLE_BIT
                                 |   CR_START_BIT
                                 |   CR_ENABLE_BIT
                                 |   CR_DE_TH_FILED(0x1)
-                                |   CR_DF_TH_FILED(0x1);
+                                |   CR_DF_TH_FILED(0x1)
+                                |   (cmd & I2C_ALL_CMD);
 }
 
 #endif /* VSF_HAL_USE_I2C */

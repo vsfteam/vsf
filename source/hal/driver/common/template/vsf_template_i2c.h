@@ -386,7 +386,7 @@ extern i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
  @param[in] cmd: i2c cmd
  @param[in] count: i2c transfer buffer count (in byte)
  @param[in] buffer_ptr: i2c transfer buffer
- @return i2c_status_t: return all status of current i2c
+ @return vsf_err_t: VSF_ERR_NONE if i2c was initialized, or a negative error code
 
  \~chinese
  @brief i2c主机请求一次传输
@@ -396,13 +396,13 @@ extern i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
  @param[in] cmd: i2c 命令
  @param[in] count: i2c 传输缓冲区长度 (单位：字节)
  @param[in] buffer_ptr: i2c 传输缓冲区
- @return vsf_err_t: 返回当前i2c的所有状态
+ @return vsf_err_t: 如果 i2c 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
-                                        uint16_t   address,
-                                        uint8_t    cmd,
-                                        uint16_t   count,
-                                        uint8_t*   buffer_ptr);
+                                        uint16_t address,
+                                        em_i2c_cmd_t cmd,
+                                        uint16_t count,
+                                        uint8_t *buffer_ptr);
 
 #endif
 

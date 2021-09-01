@@ -75,7 +75,7 @@ enum em_i2c_cmd_t {
     I2C_CMD_RW_MASK                             = (0x01ul << 3),
 
     I2C_CMD_START                               = (0x01ul << 0),
-    I2C_CMD_STOP                                = (0x00ul << 0),
+    I2C_CMD_STOP                                = (0x01ul << 2),
     I2C_CMD_RESTAR                              = (0x01ul << 21),
     I2C_CMD_ADDRESS                             = I2C_CMD_START
                                                 | I2C_CMD_STOP
@@ -102,7 +102,8 @@ struct i2c_status_t {
         struct {
             uint32_t                            : 1;
             uint32_t                is_enabled  : 1;
-            uint32_t                            : 30;
+            uint32_t                irq_enabled : 1;
+            uint32_t                            : 29;
         } status_bool;
     };
 };
@@ -113,11 +114,13 @@ struct i2c_capability_t {
 };
 
 struct vsf_i2c_t {
-    AIC_I2CM_TypeDef                *REG_PARAM;//0x40102000
+    AIC_I2CM_TypeDef                *REG_PARAM;
     i2c_cfg_t                       cfg;
     i2c_capability_t                capability;
     i2c_status_t                    status;
     em_i2c_irq_mask_t               irq_mask;
+    uint16_t                        data_length;
+    uint8_t                         *data;
 };
 
 /*============================ INCLUDES ======================================*/
