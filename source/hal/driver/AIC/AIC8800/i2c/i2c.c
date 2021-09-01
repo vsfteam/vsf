@@ -50,7 +50,9 @@ void I2CM_IRQHandler(void)
     vsf_i2c0.REG_PARAM->CR  = 0;
     vsf_i2c0.REG_PARAM->RR = RR_RST_BIT;
     if (NULL != vsf_i2c0.cfg.isr.handler_fn) {
-        vsf_i2c0.cfg.isr.handler_fn(vsf_i2c0.cfg.isr.target_ptr, &vsf_i2c0, irq_mask);
+        vsf_i2c0.cfg.isr.handler_fn(vsf_i2c0.cfg.isr.target_ptr,
+                                    &vsf_i2c0,
+                                    irq_mask & vsf_i2c0.irq_mask);
     }
 }
 
@@ -104,18 +106,19 @@ fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr)
 void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
-    i2c_ptr->status.status_bool.irq_enabled = true;
-//    i2c_ptr->REG_PARAM->CR |= (irq_mask & I2C_IRQ_MASK_MASTER_ALL);
-    NVIC_EnableIRQ(I2CM_IRQn);
-    //todo
+    if (irq_mask & I2C_IRQ_MASK_MASTER_ALL) {
+        i2c_ptr->irq_mask = irq_mask & I2C_IRQ_MASK_MASTER_ALL;
+        i2c_ptr->status.status_bool.irq_enabled = true;
+        NVIC_EnableIRQ(I2CM_IRQn);
+    }
 }
 
 void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
-    i2c_ptr->status.status_bool.irq_enabled = false;
-//    i2c_ptr->REG_PARAM->CR &= ~(irq_mask & I2C_IRQ_MASK_MASTER_ALL);
-    if (I2C_IRQ_MASK_MASTER_ALL == irq_mask) {
+    i2c_ptr->irq_mask &= ~(irq_mask & I2C_IRQ_MASK_MASTER_ALL);
+    if (I2C_IRQ_MASK_MASTER_ALL == (irq_mask & I2C_IRQ_MASK_MASTER_ALL)) {
+        i2c_ptr->status.status_bool.irq_enabled = false;
         NVIC_DisableIRQ(I2CM_IRQn);
     }
 }
