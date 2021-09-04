@@ -434,7 +434,7 @@ static void __user_eda_b_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vsf_trace_info("user eda_b started...\r\n");
     __pend_next:
         if (VSF_ERR_NONE != vsf_eda_trig_wait(&__user_trig)) {
-            // 没有得到信号量，退出并且等待VSF_EVT_SYNC事件
+            // 没有得到触发的事件，退出并且等待VSF_EVT_SYNC事件
             break;
         }
         evt = VSF_EVT_SYNC;
@@ -491,4 +491,7 @@ int main(void)
 - vsf_err_t vsf_eda_queue_send_isr(vsf_eda_queue_t *pthis, void *node);
 - vsf_err_t vsf_eda_queue_recv_isr(vsf_eda_queue_t *pthis, void **node);
 
-## 5. eda任务的其他API
+## 5. eda任务调用其他形式的任务
+TBD
+
+## 6. eda任务的其他API
