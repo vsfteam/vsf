@@ -255,7 +255,7 @@ vsf_err_t __vk_usbh_dfu_operate(void *dfu_ptr, uint8_t *buffer, uint_fast32_t si
     vk_usbh_dfu_t *dfu = dfu_ptr;
     vk_usbh_dev_t *dev = dfu->dev;
 
-    if (VSF_ERR_NONE != __vsf_eda_crit_npb_try_enter(&dev->ep0.crit, 0)) {
+    if (VSF_ERR_NONE != __vsf_eda_crit_npb_enter(&dev->ep0.crit, 0)) {
         return VSF_ERR_NOT_AVAILABLE;
     }
 
