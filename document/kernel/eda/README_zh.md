@@ -38,7 +38,9 @@ void user_task(vsf_eda_t *eda, vsf_evt_t evt)
 
 // 内核定时器模式，可以设置为VSF_KERNEL_CFG_TIMER_MODE_TICK或者VSF_KERNEL_CFG_TIMER_MODE_TICKLESS模式。
 // VSF_KERNEL_CFG_TIMER_MODE_TICK模式下，定时器基于固定的周期。除了一些特殊情况外（比如资源极其有限），vsf一般不会使用tick模式。
+//      vsf_systimer_tick_t以及vsf_timeout_tick_t的单位都是系统定时器的溢出周期
 // VSF_KERNEL_CFG_TIMER_MODE_TICKLESS模式下，系统不需要被周期性的中断唤醒，并且高层API完全兼容，支持极小延迟的定时器。
+//      vsf_systimer_tick_t以及vsf_timeout_tick_t的单位都是这个系统定时器的计数周期
 // 不同模式下，用户API完全兼容，只是行为上会有略微差异。在TICK模式下，小于TICK周期的延迟，会被拉长到TICK周期。
 // 默认为VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 #define VSF_KERNEL_CFG_TIMER_MODE                       VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
@@ -55,11 +57,11 @@ void user_task(vsf_eda_t *eda, vsf_evt_t evt)
 // 默认使能
 #   define VSF_SYNC_CFG_SUPPORT_ISR                     ENABLED
 
-// 不依赖特定内存数据结构的队列。
+// 不依赖特定内存数据结构的内核队列。
 // 默认使能
 #define VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE                ENABLED
 
-// 动态优先级支持，使能的话，mutex具备放优先级翻转能力。并且可以使用__vsf_eda_set_priority设置eda任务优先级，不过不会马上生效，需要在下一次事件处理的时候才生效。
+// 动态优先级支持，使能的话，mutex具备防止优先级反转的能力。并且可以使用__vsf_eda_set_priority设置eda任务优先级，不过不会马上生效，需要在下一次事件处理的时候才生效。
 // 默认使能
 #define VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY         ENABLED
 
@@ -203,10 +205,29 @@ int main(void)
 ```
 
 ## 4. **eda任务**的IPC
+&emsp;&emsp;VSF的信号量、互斥量、临界代码段、触发器等等，都是通过vsf_sync_t实现。VSF的内核队列，都是通过vsf_eda_queue_t实现。
+
+- vsf_sync_reason_t
+```c
+typedef enum vsf_sync_reason_t {
+    VSF_SYNC_FAIL,              // IPC同步出错
+    VSF_SYNC_TIMEOUT,           // IPC超时
+    VSF_SYNC_PENDING,           // IPC还在等待
+    VSF_SYNC_GET,               // 已经获得IPC
+    VSF_SYNC_CANCEL,            // IPC已经被取消
+} vsf_sync_reason_t;
+```
+- vsf_sync_reason_t vsf_eda_sync_get_reason(vsf_sync_t *pthis, vsf_evt_t evt); -- 根据事件得到sync的事件
+- vsf_timeout_tick_t -- 超时tick，tick模式下，为系统定时器的溢出周期；tickless模式下，为系统定时器的计数周期
+  - 负数，一般使用-1 -- 不超时（永远等待）
+  - 0 -- 不使用超时（不等待）
+  - 大于0 -- 使用超时，超时时间为对应的tick数
+
 ### 4.1 信号量
 - vsf_err_t vsf_eda_sem_init(vsf_sem_t *sem, uint_fast16_t count = 0, uint_fast16_t max_count = VSF_SYNC_MAX);
 - vsf_err_t vsf_eda_sem_post(vsf_sem_t *sem);
-- vsf_err_t vsf_eda_sem_pend(vsf_sem_t *sem, vsf_timeout_tick_t timeout);
+- vsf_err_t vsf_eda_sem_pend(vsf_sem_t *sem, vsf_timeout_tick_t timeout = -1);
+- vsf_err_t vsf_eda_sem_post_isr(vsf_sem_t *sem);
 
 ```c
 #include "vsf.h"
@@ -232,13 +253,23 @@ static void __user_eda_b_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_INIT:
         vsf_trace_info("user eda_b started...\r\n");
     __pend_next:
-        if (VSF_ERR_NONE != vsf_eda_sem_pend(&__user_sem, -1)) {
+        if (VSF_ERR_NONE != vsf_eda_sem_pend(&__user_sem)) {
+            // 没有得到信号量，退出并且等待VSF_EVT_SYNC事件
             break;
         }
+        evt = VSF_EVT_SYNC;
         // fallthrough
-    case VSF_EVT_SYNC:
-        vsf_trace_info("eda_b get sem\r\n");
-        goto __pend_next;
+        // 实际不会取消信号量，也不会超时，只可能发生VSF_EVT_SYNC事件
+    case VSF_EVT_TIMEOUT:
+    case VSF_EVT_SYNC_CANCEL:
+    case VSF_EVT_SYNC: {
+            // 实际不会取消信号量，也不会超时，可以默认就是VSF_SYNC_GET
+            vsf_sync_reason_t reason = vsf_eda_sync_get_reason((vsf_sync_t *)&__user_sem, evt);
+            if (VSF_SYNC_GET == reason) {
+                vsf_trace_info("eda_b got sem\r\n");
+                goto __pend_next;
+            }
+        }
     }
 }
 
@@ -268,3 +299,196 @@ int main(void)
     return 0;
 }
 ```
+
+### 4.2 互斥量
+- vsf_err_t vsf_eda_mutex_init(vsf_mutex_t *mutex);
+- vsf_err_t vsf_eda_mutex_enter(vsf_mutex_t *mutex, vsf_timeout_tick_t timeout = -1);
+- vsf_err_t vsf_eda_mutex_leave(vsf_mutex_t *mutex);
+
+```c
+#include "vsf.h"
+
+static NO_INIT vsf_mutex_t __user_mutex;
+
+static void __user_teda_a_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    switch (evt) {
+    case VSF_EVT_INIT:
+        vsf_trace_info("user teda_a started...\r\n");
+    __try_get_mutex:
+        if (VSF_ERR_NONE != vsf_eda_mutex_enter(&__user_mutex)) {
+            // 没有得到互斥量，退出并且等待VSF_EVT_SYNC事件
+            break;
+        }
+        evt = VSF_EVT_SYNC;
+        // fallthrough
+        // 实际不会取消互斥量，也不会超时，只可能发生VSF_EVT_SYNC事件
+    case VSF_EVT_SYNC_CANCEL:
+    case VSF_EVT_SYNC: {
+            // 实际不会取消互斥量，也不会超时，可以默认就是VSF_SYNC_GET
+            vsf_sync_reason_t reason = vsf_eda_sync_get_reason((vsf_sync_t *)&__user_mutex, evt);
+            if (VSF_SYNC_GET == reason) {
+                vsf_trace_info("teda_a got mutex\r\n");
+                vsf_teda_set_timer_ms(1000);
+            }
+            break;
+        }
+    case VSF_EVT_TIMER:
+        vsf_eda_mutex_leave(&__user_mutex);
+        vsf_trace_info("teda_a released mutex\r\n");
+        goto __try_get_mutex;
+    }
+}
+
+static void __user_teda_b_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    switch (evt) {
+    case VSF_EVT_INIT:
+        vsf_trace_info("user teda_b started...\r\n");
+    __try_get_mutex:
+        if (VSF_ERR_NONE != vsf_eda_mutex_enter(&__user_mutex)) {
+            // 没有得到互斥量，退出并且等待VSF_EVT_SYNC事件
+            break;
+        }
+        evt = VSF_EVT_SYNC;
+        // fallthrough
+    case VSF_EVT_SYNC_CANCEL:
+    case VSF_EVT_SYNC: {
+            vsf_sync_reason_t reason = vsf_eda_sync_get_reason((vsf_sync_t *)&__user_mutex, evt);
+            if (VSF_SYNC_GET == reason) {
+                vsf_trace_info("teda_b got mutex\r\n");
+                vsf_teda_set_timer_ms(700);
+            }
+            break;
+        }
+    case VSF_EVT_TIMER:
+        vsf_eda_mutex_leave(&__user_mutex);
+        vsf_trace_info("teda_b released mutex\r\n");
+        goto __try_get_mutex;
+    }
+}
+
+int main(void)
+{
+    vsf_start_trace();
+
+    vsf_eda_mutex_init(&__user_mutex);
+
+    {
+        static NO_INIT vsf_teda_t __teda_a;
+        const vsf_eda_cfg_t cfg = {
+            .fn.evthandler  = __user_teda_a_evthandler,
+            .priority       = vsf_prio_0,
+        };
+        vsf_teda_start(&__teda_a, (vsf_eda_cfg_t *)&cfg);
+    }
+    {
+        static NO_INIT vsf_teda_t __teda_b;
+        const vsf_eda_cfg_t cfg = {
+            .fn.evthandler  = __user_teda_b_evthandler,
+            .priority       = vsf_prio_0,
+        };
+
+        vsf_teda_start(&__teda_b, (vsf_eda_cfg_t *)&cfg);
+    }
+    return 0;
+}
+```
+
+### 4.3 临界代码段
+&emsp;&emsp;等价于互斥量。
+
+- vsf_err_t vsf_eda_crit_init(vsf_crit_t *crit);
+- vsf_err_t vsf_eda_crit_enter(vsf_crit_t *crit, vsf_timeout_tick_t timeout = -1);
+- vsf_err_t vsf_eda_crit_leave(vsf_crit_t *crit);
+
+### 4.4 触发器
+- vsf_err_t vsf_eda_trig_init(vsf_trig_t *trig, bool is_set, bool is_auto_reset);
+- vsf_err_t vsf_eda_trig_set(vsf_trig_t *trig, bool is_manual_reset = false); -- if is_manual_reset is false, use reset setting in vsf_eda_trig_init
+- vsf_err_t vsf_eda_trig_reset(vsf_trig_t *trig);
+- vsf_err_t vsf_eda_trig_wait(vsf_trig_t *trig, vsf_timeout_tick_t timeout = -1);
+- vsf_err_t vsf_eda_trig_set_isr(vsf_trig_t *trig);
+
+```c
+#include "vsf.h"
+
+static NO_INIT vsf_trig_t __user_trig;
+
+static void __user_teda_a_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    switch (evt) {
+    case VSF_EVT_INIT:
+        vsf_trace_info("user teda_a started...\r\n");
+        // fallthrough
+    case VSF_EVT_TIMER:
+        vsf_eda_trig_set(&__user_trig);
+        vsf_teda_set_timer_ms(1000);
+        break;
+    }
+}
+
+static void __user_eda_b_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    switch (evt) {
+    case VSF_EVT_INIT:
+        vsf_trace_info("user eda_b started...\r\n");
+    __pend_next:
+        if (VSF_ERR_NONE != vsf_eda_trig_wait(&__user_trig)) {
+            // 没有得到信号量，退出并且等待VSF_EVT_SYNC事件
+            break;
+        }
+        evt = VSF_EVT_SYNC;
+        // fallthrough
+        // 实际不会取消触发器，也不会超时，只可能发生VSF_EVT_SYNC事件
+    case VSF_EVT_TIMEOUT:
+    case VSF_EVT_SYNC_CANCEL:
+    case VSF_EVT_SYNC: {
+            // 实际不会取消触发器，也不会超时，可以默认就是VSF_SYNC_GET
+            vsf_sync_reason_t reason = vsf_eda_sync_get_reason(&__user_trig, evt);
+            if (VSF_SYNC_GET == reason) {
+                vsf_trace_info("eda_b triggered\r\n");
+                goto __pend_next;
+            }
+        }
+    }
+}
+
+int main(void)
+{
+    vsf_start_trace();
+
+    vsf_eda_trig_init(&__user_trig, false, true);
+
+    {
+        static NO_INIT vsf_teda_t __teda_a;
+        const vsf_eda_cfg_t cfg = {
+            .fn.evthandler  = __user_teda_a_evthandler,
+            .priority       = vsf_prio_0,
+        };
+        vsf_teda_start(&__teda_a, (vsf_eda_cfg_t *)&cfg);
+    }
+    {
+        static NO_INIT vsf_eda_t __eda_b;
+        const vsf_eda_cfg_t cfg = {
+            .fn.evthandler  = __user_eda_b_evthandler,
+            .priority       = vsf_prio_0,
+        };
+
+        vsf_eda_start(&__eda_b, (vsf_eda_cfg_t *)&cfg);
+    }
+    return 0;
+}
+```
+
+### 4.5 队列
+- vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *pthis, uint_fast16_t max);
+- vsf_err_t vsf_eda_queue_send(vsf_eda_queue_t *pthis, void *node, vsf_timeout_tick_t timeout);
+- vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_eda_queue_t *pthis, vsf_evt_t evt, void *node);
+- vsf_err_t vsf_eda_queue_recv(vsf_eda_queue_t *pthis, void **node, vsf_timeout_tick_t timeout);
+- vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *pthis, vsf_evt_t evt, void **node);
+- uint_fast16_t vsf_eda_queue_get_cnt(vsf_eda_queue_t *pthis);
+- void vsf_eda_queue_cancel(vsf_eda_queue_t *pthis);
+- vsf_err_t vsf_eda_queue_send_isr(vsf_eda_queue_t *pthis, void *node);
+- vsf_err_t vsf_eda_queue_recv_isr(vsf_eda_queue_t *pthis, void **node);
+
+## 5. eda任务的其他API
