@@ -7,7 +7,7 @@
 
 ## 2. 目录
 - [IPC（任务间通信）](ipc/README_zh.md)
-- 事件驱动任务
+- [事件驱动](eda/README_zh.md)
 - [独立堆栈线程任务](thread/README_zh.md)
 - pt/task任务
 - fsm任务

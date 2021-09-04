@@ -22,7 +22,7 @@
 ### 2.1 [测试环境搭建](playground/README_zh.md)
 ### 2.2 [内核](kernel/README_zh.md)
 - [IPC（任务间通信）](kernel/ipc/README_zh.md)
-- 事件驱动
+- [事件驱动](kernel/eda/README_zh.md)
 - [独立堆栈线程任务](kernel/thread/README_zh.md)
 - pt/task任务
 - fsm任务
