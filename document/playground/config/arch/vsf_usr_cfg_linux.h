@@ -34,6 +34,10 @@
 #define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 #define VSF_SYSTIMER_FREQ                               (0ul)
 
+// necessary to avoid segment fault
+#define VSF_USE_SIMPLE_SSCANF                           ENABLED
+#define VSF_USE_SIMPLE_SPRINTF                          ENABLED
+
 // Application configure
 
 // app configurations to vsf configurations
