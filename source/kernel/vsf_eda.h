@@ -66,9 +66,15 @@ extern "C" {
             __vsf_eda_sem_init1((__psem), 0)
 // prototype: vsf_err_t vsf_eda_sem_init(vsf_sem_t *sem, uint_fast16_t init_cnt = 0, uint_fast16_t max_cnt = VSF_SYNC_MAX);
 #define vsf_eda_sem_init(__psem, ...)                                           \
-            __PLOOC_EVAL(__vsf_eda_sem_init, __VA_ARGS__)((__psem), __VA_ARGS__)
+            __PLOOC_EVAL(__vsf_eda_sem_init, __VA_ARGS__)((__psem), ##__VA_ARGS__)
+
 #define vsf_eda_sem_post(__psem)            vsf_eda_sync_increase((__psem))
-#define vsf_eda_sem_pend(__psem, __timeout) vsf_eda_sync_decrease((__psem), (__timeout))
+
+#define __vsf_eda_sem_pend1(__psem, __timeout)  vsf_eda_sync_decrease((__psem), (__timeout))
+#define __vsf_eda_sem_pend0(__psem)         __vsf_eda_sem_pend1((__psem), -1)
+#define vsf_eda_sem_pend(__psem, ...)                                           \
+            __PLOOC_EVAL(__vsf_eda_sem_pend, __VA_ARGS__)((__psem), ##__VA_ARGS__)
+
 #if VSF_SYNC_CFG_SUPPORT_ISR == ENABLED
 #   define vsf_eda_sem_post_isr(__psem)     vsf_eda_sync_increase_isr((__psem))
 #endif
@@ -78,11 +84,12 @@ extern "C" {
             vsf_eda_sync_init(  &((__pmtx)->use_as__vsf_sync_t),                \
                                 1 | VSF_SYNC_HAS_OWNER,                         \
                                 1 | VSF_SYNC_AUTO_RST)
-#define vsf_eda_mutex_try_enter(__pmtx, __timeout)                              \
-            vsf_eda_sync_decrease(&((__pmtx)->use_as__vsf_sync_t), (__timeout))
 
-#define vsf_eda_mutex_enter(__pmtx)                                             \
-            vsf_eda_sync_decrease(&((__pmtx)->use_as__vsf_sync_t), -1)
+#define __vsf_eda_mutex_enter1(__pmtx, __timeout)                               \
+            vsf_eda_sync_decrease(&((__pmtx)->use_as__vsf_sync_t), (__timeout))
+#define __vsf_eda_mutex_enter0(__pmtx)      __vsf_eda_mutex_enter1((__pmtx), -1)
+#define vsf_eda_mutex_enter(__pmtx, ...)                                        \
+            __PLOOC_EVAL(__vsf_eda_mutex_enter, __VA_ARGS__)((__pmtx), ##__VA_ARGS__)
 
 #define vsf_eda_mutex_leave(__pmtx)                                             \
             vsf_eda_sync_increase(&((__pmtx)->use_as__vsf_sync_t))
@@ -91,11 +98,11 @@ extern "C" {
 #define vsf_eda_crit_init(__pcrit)                                              \
             vsf_eda_mutex_init((__pcrit))
 
-#define vsf_eda_crit_try_enter(__pcrit, __timeout)                              \
-            vsf_eda_mutex_try_enter((__pcrit), (__timeout))
-
-#define vsf_eda_crit_enter(__pcrit)                                             \
-            vsf_eda_mutex_enter((__pcrit))
+#define __vsf_eda_crit_enter1(__pcrit, __timeout)                               \
+            vsf_eda_mutex_enter((__pcrit), (__timeout))
+#define __vsf_eda_crit_enter0(__pcrit)      __vsf_eda_crit_enter1((__pcrit), -1)
+#define vsf_eda_crit_enter(__pcrit, ...)                                        \
+            __PLOOC_EVAL(__vsf_eda_crit_enter, __VA_ARGS__)((__pcrit), ##__VA_ARGS__)
 
 #define vsf_eda_crit_leave(__pcrit)                                             \
             vsf_eda_mutex_leave((__pcrit))
@@ -104,14 +111,21 @@ extern "C" {
 #define vsf_eda_trig_init(__pevt, __set, __auto_rst)                            \
             vsf_eda_sync_init((__pevt), (__set),                                \
                     1 | ((__auto_rst) ? VSF_SYNC_AUTO_RST : VSF_SYNC_MANUAL_RST))
+
 #define vsf_eda_trig_set0(__pevt)           vsf_eda_sync_increase((__pevt))
 #define vsf_eda_trig_set1(__pevt, __manual)                                     \
             __vsf_eda_sync_increase_ex((__pevt), NULL, (__manual))
 #define vsf_eda_trig_set(__pevt, ...)                                           \
             __PLOOC_EVAL(vsf_eda_trig_set, __VA_ARGS__)((__pevt), ##__VA_ARGS__)
+
 #define vsf_eda_trig_reset(__pevt)          vsf_eda_sync_force_reset((__pevt))
-#define vsf_eda_trig_wait(__pevt, __timeout)                                    \
+
+#define __vsf_eda_trig_wait1(__pevt, __timeout)                                 \
             vsf_eda_sync_decrease((__pevt), (__timeout))
+#define __vsf_eda_trig_wait0(__pevt)        __vsf_eda_trig_wait1((__pevt), -1)
+#define vsf_eda_trig_wait(__pevt, ...)                                          \
+            __PLOOC_EVAL(__vsf_eda_trig_wait, __VA_ARGS__)((__pevt), ##__VA_ARGS__)
+
 #if VSF_SYNC_CFG_SUPPORT_ISR == ENABLED
 #   define vsf_eda_trig_set_isr(__pevt)     vsf_eda_sync_increase_isr((__pevt))
 #endif
@@ -121,11 +135,11 @@ extern "C" {
 #define __vsf_eda_crit_npb_init(__pcrit)                                        \
             vsf_eda_sync_init((__pcrit), 1, 1 | VSF_SYNC_AUTO_RST)
 
-#define __vsf_eda_crit_npb_try_enter(__pcrit, __timeout)                        \
+#define __vsf_eda_crit_npb_enter1(__pcrit, __timeout)                           \
             vsf_eda_sync_decrease((__pcrit), (__timeout))
-
-#define __vsf_eda_crit_npb_enter(__pcrit)                                       \
-            vsf_eda_sync_decrease((__pcrit), -1)
+#define __vsf_eda_crit_npb_enter0(__pcrit)  __vsf_eda_crit_npb_enter1((__pcrit), -1)
+#define __vsf_eda_crit_npb_enter(__pcrit, ...)                                  \
+            __PLOOC_EVAL(__vsf_eda_crit_npb_enter, __VA_ARGS__)((__pcrit), ##__VA_ARGS__)
 
 #define __vsf_eda_crit_npb_leave(__pcrit)                                       \
             vsf_eda_sync_increase((__pcrit))
@@ -551,6 +565,10 @@ extern "C" {
 
 #endif
 #   define vsf_this                     (*vsf_pthis)
+
+// backward compatibility, do not use in new design
+#define vsf_eda_mutex_try_enter         vsf_eda_mutex_enter
+#define vsf_eda_crit_try_enter          vsf_eda_crit_enter
 
 /*============================ TYPES =========================================*/
 
