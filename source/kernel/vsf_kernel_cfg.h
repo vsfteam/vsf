@@ -161,18 +161,10 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #define VSF_OS_CFG_MAIN_MODE_IDLE                           3
 
 #ifndef VSF_OS_CFG_MAIN_MODE
-#   define VSF_OS_CFG_MAIN_MODE                             VSF_OS_CFG_MAIN_MODE_THREAD
-#endif
-
-#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
-//#   ifndef VSF_OS_CFG_MAIN_STACK_SIZE
-//#       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, define to 4K by default
-//#       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
-//#   endif
-#   ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
-#       define VSF_KERNEL_CFG_SUPPORT_THREAD                ENABLED
-#   elif VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
-#       error VSF_KERNEL_CFG_SUPPORT_THREAD MUST be enabled to use VSF_OS_CFG_MAIN_MODE_THREAD
+#   if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#       define VSF_OS_CFG_MAIN_MODE                         VSF_OS_CFG_MAIN_MODE_THREAD
+#   else
+#       define VSF_OS_CFG_MAIN_MODE                         VSF_OS_CFG_MAIN_MODE_IDLE
 #   endif
 #endif
 
