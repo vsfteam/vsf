@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/vsf_template",
+            "program": "${workspaceFolder}/build/vsf_playground",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
