@@ -21,19 +21,19 @@
 /*============================ INCLUDES ======================================*/
 
 #if     defined(__M484__)
-#   include "./arch/vsf_usr_cfg_m484.h"
+#   include "./arch_config/vsf_usr_cfg_m484.h"
 #elif   defined(__F1C100S__)
-#   include "./arch/vsf_usr_cfg_f1c100s.h"
+#   include "./arch_config/vsf_usr_cfg_f1c100s.h"
 #elif   defined(__WIN__)
-#   include "./arch/vsf_usr_cfg_win.h"
+#   include "./arch_config/vsf_usr_cfg_win.h"
 #elif   defined(__LINUX__)
-#   include "./arch/vsf_usr_cfg_linux.h"
+#   include "./arch_config/vsf_usr_cfg_linux.h"
 #elif   defined(__GD32E103__)
-#   include "./arch/vsf_usr_cfg_gd32e103.h"
+#   include "./arch_config/vsf_usr_cfg_gd32e103.h"
 #elif   defined(__MPS2__)
-#   include "./arch/vsf_usr_cfg_mps2.h"
+#   include "./arch_config/vsf_usr_cfg_mps2.h"
 #elif   defined(__AIC8800__)
-#   include "./arch/vsf_usr_cfg_aic8800.h"
+#   include "./arch_config/vsf_usr_cfg_aic8800.h"
 #endif
 
 /*============================ MACROS ========================================*/
