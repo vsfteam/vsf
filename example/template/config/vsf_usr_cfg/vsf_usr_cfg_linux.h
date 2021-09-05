@@ -55,12 +55,10 @@
 #   define VSF_LINUX_CFG_WRAPPER                        ENABLED
 #   define VSF_LINUX_LIBC_CFG_WRAPPER                   ENABLED
 #   define VSF_LINUX_LIBGEN_CFG_WRAPPER                 ENABLED
-#   define VSF_USE_SIMPLE_SSCANF                        ENABLED
-#   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
-#else
-#   define VSF_USE_SIMPLE_SSCANF                        DISABLED
-#   define VSF_USE_SIMPLE_SPRINTF                       DISABLED
 #endif
+// SIMPLE_SPRINTF MUST be enabled, or segment fault
+#define VSF_USE_SIMPLE_SSCANF                           ENABLED
+#define VSF_USE_SIMPLE_SPRINTF                          ENABLED
 
 // 3rd-party demos
 #define APP_USE_XBOOT_XUI_DEMO                          DISABLED
