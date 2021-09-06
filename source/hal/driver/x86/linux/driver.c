@@ -126,6 +126,12 @@ static void __vsf_x86_debug_stream_rx_irqhandler(void *arg)
             rsize = read(STDIN_FILENO, &ch, 1);
         } while (rsize <= 0);
 
+        // check special inputs
+        if ('\003' == ch) {
+            // EXT
+            exit(0);
+        }
+
         __vsf_arch_irq_start(thread);
             VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, (uint8_t *)&ch, 1);
         __vsf_arch_irq_end(thread, false);
