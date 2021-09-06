@@ -18,14 +18,20 @@
 #ifndef __VSF_USR_CFG_WEAK_H__
 #define __VSF_USR_CFG_WEAK_H__
 
+#ifdef __COMPILER_DOES_NOT_SUPPORT_WEAK__
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
 #define WEAK_VSF_KERNEL_ERR_REPORT
 #define WEAK___POST_VSF_KERNEL_INIT
-#define WEAK_VSF_SYSTIMER_EVTHANDLER
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   define WEAK_VSF_SYSTIMER_EVTHANDLER
+#   define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
+#   define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
+#endif
+
 #define WEAK_VSF_DRIVER_INIT
 #define WEAK_VSF_HEAP_MALLOC_ALIGNED
 
@@ -34,4 +40,5 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif
+#endif      // __COMPILER_DOES_NOT_SUPPORT_WEAK__
+#endif      // __VSF_USR_CFG_WEAK_H__

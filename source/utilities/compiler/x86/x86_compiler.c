@@ -76,7 +76,8 @@ char * strsep(char **stringp, const char *delim)
 }
 
 #   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
-#       if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#           if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
 {
     // TODO: assert current context is vsf_thread
@@ -92,7 +93,7 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
     }
     return 0;
 }
-#       endif
+#           endif       // VSF_KERNEL_CFG_SUPPORT_THREAD
 
 int clock_gettime(clockid_t clk_id, struct timespec *tp)
 {
@@ -107,6 +108,6 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
         return -1;
     }
 }
-
+#       endif           // VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
 #   endif
 #endif

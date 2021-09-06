@@ -104,13 +104,12 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason( vsf_sync_t *sync,
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
     vsf_sync_reason_t reason = VSF_SYNC_FAIL;
-    vsf_protect_t origlevel;
 
     VSF_KERNEL_ASSERT((sync != NULL) && (eda != NULL));
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     if (evt == VSF_EVT_TIMER) {
-        origlevel = vsf_protect_sched();
+        vsf_protect_t origlevel = vsf_protect_sched();
         if (eda->flag.state.is_sync_got) {
             vsf_unprotect_sched(origlevel);
             return VSF_SYNC_PENDING;
