@@ -1989,6 +1989,7 @@ key_t ftok(const char *pathname, int id)
 }
 
 // sys/time.h
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
     struct timespec ts;
@@ -1997,6 +1998,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
     tv->tv_usec = ts.tv_nsec / 1000;
     return 0;
 }
+#endif
 
 #if VSF_LINUX_CFG_SHM_NUM > 0
 // shm.h

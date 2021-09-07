@@ -502,6 +502,7 @@ int pthread_cond_broadcast(pthread_cond_t *cond)
     return 0;
 }
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
     return pthread_cond_timedwait(cond, mutex, NULL);
@@ -543,6 +544,7 @@ int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
     pthread_mutex_lock(mutex);
     return ret;
 }
+#endif
 
 int pthread_condattr_init(pthread_condattr_t *cattr)
 {
