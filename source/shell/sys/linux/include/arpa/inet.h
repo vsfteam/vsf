@@ -8,7 +8,6 @@
 #else
 #   include <netinet/in.h>
 #endif
-#include <inttypes.h>
 
 // for endian APIs
 #include "hal/arch/vsf_arch.h"
