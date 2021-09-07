@@ -182,6 +182,7 @@ vsf_class(vsf_arch_irq_thread_t) {
     )
 };
 #endif
+#undef PUBLIC_CONST
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

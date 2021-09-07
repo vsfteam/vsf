@@ -30,6 +30,7 @@
 #   include <netinet/in.h>
 #endif
 
+#undef PUBLIC_CONST
 #if     defined(__VSF_LINUX_HTTPD_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
 #   define PUBLIC_CONST
