@@ -25,7 +25,7 @@
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "../../include/unistd.h
+#   include "../../include/unistd.h"
 #   include "../../include/arpa/inet.h"
 #   include "../../include/pthread.h"
 #   include "../../include/sys/select.h"
