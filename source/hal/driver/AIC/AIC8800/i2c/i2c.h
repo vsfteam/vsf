@@ -111,7 +111,7 @@ struct i2c_status_t {
 
 //Not used yet
 struct i2c_capability_t {
-    uint32_t __reserved:32;
+    uint32_t                        __reserved  : 32;
     // TODO
 };
 
@@ -122,6 +122,12 @@ struct vsf_i2c_t {
     i2c_status_t                    status;
     em_i2c_irq_mask_t               irq_mask;
     uint16_t                        data_length;
+    struct {
+        uint16_t                    address;
+        uint16_t                    data_size;
+        uint16_t                    data_offset;
+        em_i2c_cmd_t                cmd;
+    } recall_info;
     uint8_t                         *data;
 };
 

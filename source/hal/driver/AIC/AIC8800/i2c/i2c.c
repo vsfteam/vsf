@@ -33,6 +33,9 @@
 
 vsf_i2c_t vsf_i2c0 = {
     .REG_PARAM = (AIC_I2CM_TypeDef *)(0x40102000),
+    .recall_info = {
+        .data_offset = 0,
+    },
 };
 
 void I2CM_IRQHandler(void)
@@ -49,14 +52,23 @@ void I2CM_IRQHandler(void)
     vsf_i2c0.REG_PARAM->SR &= ~SR_INT_BIT;
     vsf_i2c0.REG_PARAM->CR  = 0;
     vsf_i2c0.REG_PARAM->RR = RR_RST_BIT;
-    if (NULL != vsf_i2c0.cfg.isr.handler_fn) {
-        vsf_i2c0.cfg.isr.handler_fn(vsf_i2c0.cfg.isr.target_ptr,
-                                    &vsf_i2c0,
-                                    irq_mask & vsf_i2c0.irq_mask);
+    if (16 >= vsf_i2c0.recall_info.data_size) {
+        vsf_i2c0.recall_info.data_offset = 0;
+        if (NULL != vsf_i2c0.cfg.isr.handler_fn) {
+            vsf_i2c0.cfg.isr.handler_fn(vsf_i2c0.cfg.isr.target_ptr,
+                                        &vsf_i2c0,
+                                        irq_mask & vsf_i2c0.irq_mask);
+        }
+    } else {
+        vsf_i2c_master_request(&vsf_i2c0,
+                               vsf_i2c0.recall_info.address,
+                               vsf_i2c0.recall_info.cmd,
+                               vsf_i2c0.recall_info.data_size - 16,
+                               vsf_i2c0.data + 16);
     }
 }
 
-vsf_err_t __vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
+static vsf_err_t __vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
 {
     uint32_t pclk, div, div0, div1;
 
@@ -86,7 +98,6 @@ void vsf_i2c_fini(vsf_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     cpusysctrl_pclkmd_set(CSC_PCLKME_I2CM_EN_BIT);
-    //todo:
 }
 
 fsm_rt_t vsf_i2c_enable(vsf_i2c_t *i2c_ptr)
@@ -136,10 +147,7 @@ vsf_err_t vsf_i2c_master_request(   vsf_i2c_t *i2c_ptr,
                                     uint8_t *buffer_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
-//    VSF_HAL_ASSERT(count);//TODO: max count
-    if (16 < count) {
-        return VSF_ERR_OVERRUN;
-    }
+    VSF_HAL_ASSERT(0 != count);//Chip hardware does not support
     if (!i2c_ptr->status.status_bool.is_enabled) {
         return VSF_ERR_INVALID_PARAMETER;
     }
@@ -154,16 +162,30 @@ vsf_err_t vsf_i2c_master_request(   vsf_i2c_t *i2c_ptr,
     i2c_ptr->REG_PARAM->SR &= ~(0x01UL << 1);
     i2c_ptr->REG_PARAM->SAR = SAR_SLAVE_ADDR_FILED(address);
 
+    i2c_ptr->recall_info.data_size = count;
+    i2c_ptr->recall_info.address = address;
+    i2c_ptr->recall_info.cmd = cmd;
+    i2c_ptr->recall_info.data_offset += 16;
 
     if (!(cmd & I2C_CMD_READ)) {
         for (int i = 0; i < count; i++) {
             i2c_ptr->REG_PARAM->OR = buffer_ptr[i];
         }
         i2c_ptr->data_length = 0;
-    } else {
-        i2c_ptr->data_length = count;
     }
-    i2c_ptr->REG_PARAM->LR  = count;
+    if (16 < count) {//Chip hardware does not support
+        cmd = cmd | I2C_CMD_RESTAR;
+        i2c_ptr->REG_PARAM->LR  = 16;
+        if (cmd & I2C_CMD_READ) {
+            i2c_ptr->data_length = 16;
+        }
+    } else {
+        i2c_ptr->REG_PARAM->LR  = count;
+        if (cmd & I2C_CMD_READ) {
+            i2c_ptr->data_length = count;
+        }
+    }
+
     i2c_ptr->REG_PARAM->CR  =       (i2c_ptr->status.status_bool.irq_enabled << 1)
                                 |   CR_OMO_ENABLE_BIT
                                 |   CR_START_BIT
@@ -171,6 +193,7 @@ vsf_err_t vsf_i2c_master_request(   vsf_i2c_t *i2c_ptr,
                                 |   CR_DE_TH_FILED(0x1)
                                 |   CR_DF_TH_FILED(0x1)
                                 |   (cmd & I2C_ALL_CMD);
+    return VSF_ERR_NONE;
 }
 
 #endif /* VSF_HAL_USE_I2C */
