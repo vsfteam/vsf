@@ -54,6 +54,8 @@
 #   define VSF_ARCH_CFG_REQUEST_TRACE_EN    DISABLED
 #endif
 
+#define __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL    ENABLED
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_ARCH_CFG_IRQ_TRACE_EN == ENABLED
@@ -271,7 +273,11 @@ void __vsf_arch_irq_sleep(uint32_t ms)
 
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
 
+#if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
+static void __vsf_systimer_on_notify(int signal)
+#else
 static void __vsf_systimer_on_notify(union sigval s)
+#endif
 {
     vsf_arch_systimer_ctx_t *ctx = &__vsf_arch.systimer;
 
@@ -290,10 +296,17 @@ static void __vsf_systimer_thread(void *arg)
     __vsf_arch_irq_set_background(&ctx->use_as__vsf_arch_irq_thread_t);
 
     struct sigevent evp = {
+#if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
+        .sigev_notify = SIGEV_SIGNAL,
+        .sigev_signo = SIGUSR1,
+#else
         .sigev_notify = SIGEV_THREAD,
         .sigev_notify_function = __vsf_systimer_on_notify,
-        .sigev_notify_attributes = NULL,
+#endif
     };
+#if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
+    signal(SIGUSR1, __vsf_systimer_on_notify);
+#endif
     struct itimerspec its = { 0 };
     timer_t timer;
     if (timer_create(CLOCK_MONOTONIC, &evp, &timer)) {
