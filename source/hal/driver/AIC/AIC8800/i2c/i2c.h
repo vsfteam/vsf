@@ -29,17 +29,18 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+// TODO: Temporarily disabled
 enum em_i2c_feature_t {
-    I2C_MODE_MASTER                             = (0x1ul << 0),  // select master mode
+    I2C_MODE_MASTER                             = (0x0ul << 0),  // select master mode
     I2C_MODE_SLAVE                              = (0x0ul << 0),  // select slave mode
-    I2C_MODE_MASK                               = (0x1ul << 0),
+    I2C_MODE_MASK                               = (0x0ul << 0),
 
     // TODO: Ultra Fast-mode I2C-bus protocol
-    I2C_SPEED_STANDARD_MODE                     = (0x0ul << 1),  // up to 100 kbit/s
-    I2C_SPEED_FAST_MODE                         = (0x1ul << 1),  // up to 400 kbit/s
-    I2C_SPEED_FAST_MODE_PLUS                    = (0x2ul << 1),  // up to 1 Mbit/s
-    I2C_SPEED_HIGH_SPEED_MODE                   = (0x3ul << 1),  // up to 3.4 Mbit/s
-    I2C_SPEED_MASK                              = (0x3ul << 1),
+    I2C_SPEED_STANDARD_MODE                     = (0x0ul << 0),  // up to 100 kbit/s
+    I2C_SPEED_FAST_MODE                         = (0x0ul << 0),  // up to 400 kbit/s
+    I2C_SPEED_FAST_MODE_PLUS                    = (0x0ul << 0),  // up to 1 Mbit/s
+    I2C_SPEED_HIGH_SPEED_MODE                   = (0x0ul << 0),  // up to 3.4 Mbit/s
+    I2C_SPEED_MASK                              = (0x0ul << 0),
 };
 
 // use enumeration implementation
@@ -108,8 +109,9 @@ struct i2c_status_t {
     };
 };
 
+//Not used yet
 struct i2c_capability_t {
-    uint32_t                                :32;
+    uint32_t __reserved:32;
     // TODO
 };
 
