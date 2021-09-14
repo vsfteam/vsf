@@ -25,10 +25,25 @@
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#ifndef VSF_I2C_CFG_PROTECT_LEVEL
+#   define VSF_I2C_CFG_PROTECT_LEVEL        interrupt
+#endif
+
+#define __vsf_i2c_protect                   vsf_protect(VSF_I2C_CFG_PROTECT_LEVEL)
+#define __vsf_i2c_unprotect                 vsf_unprotect(VSF_I2C_CFG_PROTECT_LEVEL)
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+static uint16_t __vsf_i2c_get_send_cmd_data(vsf_i2c_t *i2c_ptr)
+{
+    __i2c_req_by_cmd_t *req_by_cmd = &i2c_ptr->__req_by_cmd;
+    uint16_t ret_data = (uint16_t)(req_by_cmd->buffer_ptr[req_by_cmd->idx - 1]);
+    return ret_data;
+}
 
 /**
  * \~chinese
@@ -53,9 +68,62 @@ static vsf_err_t __vsf_i2c_send_cmd(vsf_i2c_t *i2c_ptr,
  * @param[in] interrupt_mask : 一个或者多个中断的组合
  * @return none
  */
-static void __vsf_i2c_master_irq_handler(vsf_i2c_t *i2c_ptr,
-                                         uint32_t interrupt_mask,
-                                         uint32_t param);
+static void __vsf_i2c_master_irq_handler(vsf_i2c_t *i2c_ptr, uint32_t interrupt_mask, uint32_t param)
+{
+    i2c_cfg_t *cfg = &i2c_ptr->cfg;
+    __i2c_req_by_cmd_t *req_by_cmd = &i2c_ptr->__req_by_cmd;
+    if (interrupt_mask & I2C_IRQ_MASK_MASTER_NACK_DETECT) {
+        if (NULL != cfg->isr.handler_fn) {
+            cfg->isr.handler_fn(cfg->isr.target_ptr, (vsf_i2c_t *)i2c_ptr, interrupt_mask);
+        }
+        return;
+    }
+    req_by_cmd->idx++;
+    if (req_by_cmd->idx > req_by_cmd->count) {
+        if (NULL != cfg->isr.handler_fn) {
+            cfg->isr.handler_fn(cfg->isr.target_ptr, (vsf_i2c_t *)i2c_ptr, interrupt_mask);
+        }
+        //todo: has no function
+    } else {
+        em_i2c_cmd_t temp_cmd;
+        if (req_by_cmd->idx == req_by_cmd->count) {
+            temp_cmd = req_by_cmd->cmd;
+        } else {
+            temp_cmd = req_by_cmd->cmd & ~I2C_CMD_STOP;
+        }
+        temp_cmd &= ~(I2C_CMD_START | I2C_CMD_RESTAR);
+        vsf_err_t ret = __vsf_i2c_send_cmd(i2c_ptr, __vsf_i2c_get_send_cmd_data(i2c_ptr), temp_cmd);
+    }
+}
+
+static void __vsf_i2c_master_request_init(vsf_i2c_t *i2c_ptr,
+                                          uint16_t address,
+                                          em_i2c_cmd_t cmd,
+                                          uint16_t count,
+                                          uint8_t *buffer_ptr)
+{
+    i2c_ptr->__req_by_cmd.address = address;
+    i2c_ptr->__req_by_cmd.cmd = cmd;
+    i2c_ptr->__req_by_cmd.count = count;
+    i2c_ptr->__req_by_cmd.idx = 0;
+    i2c_ptr->__req_by_cmd.buffer_ptr = buffer_ptr;
+}
+
+vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
+                                 uint16_t address,
+                                 em_i2c_cmd_t cmd,
+                                 uint16_t count,
+                                 uint8_t *buffer_ptr)
+{
+    __vsf_i2c_master_request_init(i2c_ptr, address, cmd, count, buffer_ptr);
+    if (count > 0) {
+        cmd = cmd & ~I2C_CMD_STOP;
+    }
+    vsf_protect_t orig = __vsf_i2c_protect();
+    vsf_err_t ret = __vsf_i2c_send_cmd(i2c_ptr, address, cmd);
+    __vsf_i2c_unprotect(orig);
+    return ret;
+}
 
 /*============================ IMPLEMENTATION ================================*/
 

@@ -18,16 +18,34 @@
 #ifndef __HAL_DRIVER_COMMON_VSF_HAL_I2C_CS_H__
 #define __HAL_DRIVER_COMMON_VSF_HAL_I2C_CS_H__
 
+#if VSF_HAL_I2C_IMP_REQUEST_BY_CMD == ENABLED
+
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#define vsf_hal_i2c_def_req_by_cmd()                                            \
+        __i2c_req_by_cmd_t     __req_by_cmd;
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_i2c_master_irq_handler
+
 /*============================ TYPES =========================================*/
+
+typedef struct __i2c_req_by_cmd_t {
+    uint16_t            address;
+    em_i2c_cmd_t        cmd;
+    uint16_t            count;
+    uint16_t            idx;
+    uint8_t             *buffer_ptr;
+} __i2c_req_by_cmd_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
 /*============================ IMPLEMENTATION ================================*/
 
 
-
+#endif // VSF_HAL_I2C_IMP_REQUEST_BY_CMD
 #endif
