@@ -43,50 +43,46 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t __vsf_multi_spi_low_init(vsf_spi_cs_t* spi_cs_ptr,
+static vsf_err_t __vsf_multi_spi_low_init(vsf_spi_cs_t *spi_cs_ptr,
                                           uint8_t cs,
                                           i_spi_cfg_t *cfg_ptr);
 
-void vsf_multi_spi_cs_active(vsf_spi_cs_t* spi_cs_ptr,
+void vsf_multi_spi_cs_active(vsf_spi_cs_t *spi_cs_ptr,
                              uint8_t cs,
                              uint_fast8_t index);
 
-void vsf_multi_spi_cs_inactive(vsf_spi_cs_t* spi_cs_ptr,
+void vsf_multi_spi_cs_inactive(vsf_spi_cs_t *spi_cs_ptr,
                                uint8_t cs,
                                uint_fast8_t index);
 /*============================ IMPLEMENTATION ================================*/
 
 // TODO: support dync change prio
 
-static void __vsf_spi_cfg_clean_auto_cs(spi_cfg_t * cfg_ptr)
+static void __vsf_spi_cfg_clean_auto_cs(spi_cfg_t  *cfg_ptr)
 {
     cfg_ptr->mode =   (cfg_ptr->mode & ~SPI_AUTO_SLAVE_SELECTION_MSK)
                     | SPI_AUTO_SLAVE_SELECTION_DISABLE;
 }
 
-static void __vsf_spi_request_transfer_push(vsf_spi_cs_t* spi_cs_ptr,
-                                            vsf_spi_cs_request_t * request)
+static void __vsf_spi_request_transfer_push(vsf_spi_cs_t *spi_cs_ptr, vsf_spi_cs_request_t *request)
 {
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
     VSF_HAL_ASSERT(request != NULL);
     vsf_dlist_add_to_head(vsf_spi_cs_request_t, node, &spi_cs_ptr->list, request);
 }
 
-static void __vsf_multi_spi_irq_handler(void *target_ptr,
-                                        vsf_spi_t *spi_ptr,
-                                        em_spi_irq_mask_t irq_mask)
+static void __vsf_multi_spi_irq_handler(void *target_ptr, vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
 {
     vsf_spi_cs_t *spi_cs_ptr = (vsf_spi_cs_t *)target_ptr;
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
     VSF_HAL_ASSERT(spi_cs_ptr->cur_cs != -1);
 
     vsf_spi_cs_one_t *spi_cs_one = &spi_cs_ptr->cfgs[spi_cs_ptr->cur_cs];
-    vsf_i_spi_isr_t *isr_ptr = &spi_cs_one->spi_cfg.isr;
+    vsf_i_spi_isr_t *isr_ptr     = &spi_cs_one->spi_cfg.isr;
 
     em_spi_irq_mask_t one_irq_mask = irq_mask & spi_cs_one->irq_mask;
 
@@ -95,9 +91,7 @@ static void __vsf_multi_spi_irq_handler(void *target_ptr,
     }
 }
 
-static vsf_err_t __vsf_multi_spi_low_init(vsf_spi_cs_t* spi_cs_ptr,
-                                          uint8_t cs,
-                                          i_spi_cfg_t *cfg_ptr)
+static vsf_err_t __vsf_multi_spi_low_init(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, i_spi_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -105,21 +99,19 @@ static vsf_err_t __vsf_multi_spi_low_init(vsf_spi_cs_t* spi_cs_ptr,
     VSF_HAL_ASSERT(cfg_ptr != 0);
 
     spi_cfg_t local_cfg;
-    local_cfg.mode = cfg_ptr->mode;
-    local_cfg.clock_hz = cfg_ptr->clock_hz;
+    local_cfg.mode           = cfg_ptr->mode;
+    local_cfg.clock_hz       = cfg_ptr->clock_hz;
     local_cfg.isr.handler_fn = __vsf_multi_spi_irq_handler;
     local_cfg.isr.target_ptr = spi_cs_ptr;
 
-    if (cs > 0) {       // TODO: support multi hardware cs pin
+    if (cs > 0) {  // TODO: support multi hardware cs pin
         __vsf_spi_cfg_clean_auto_cs(&local_cfg);
     }
 
     return vsf_spi_init(spi_cs_ptr->spi, &local_cfg);
 }
 
-static vsf_err_t __vsf_multi_spi_reconfig(vsf_spi_cs_t* spi_cs_ptr,
-                                          uint8_t cs,
-                                          i_spi_cfg_t *cfg_ptr)
+static vsf_err_t __vsf_multi_spi_reconfig(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, i_spi_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -134,9 +126,7 @@ static vsf_err_t __vsf_multi_spi_reconfig(vsf_spi_cs_t* spi_cs_ptr,
     return result;
 }
 
-static vsf_err_t __vsf_multi_spi_init(vsf_spi_cs_t* spi_cs_ptr,
-                                      uint8_t cs,
-                                      i_spi_cfg_t *cfg_ptr)
+static vsf_err_t __vsf_multi_spi_init(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, i_spi_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -164,8 +154,7 @@ static vsf_err_t __vsf_multi_spi_init(vsf_spi_cs_t* spi_cs_ptr,
     return result;
 }
 
-static fsm_rt_t __vsf_multi_spi_enable(vsf_spi_cs_t* spi_cs_ptr,
-                                       uint8_t cs)
+static fsm_rt_t __vsf_multi_spi_enable(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -182,8 +171,7 @@ static fsm_rt_t __vsf_multi_spi_enable(vsf_spi_cs_t* spi_cs_ptr,
     return fsm_rt_cpl;
 }
 
-static fsm_rt_t __vsf_multi_spi_disable(vsf_spi_cs_t* spi_cs_ptr,
-                                        uint8_t cs)
+static fsm_rt_t __vsf_multi_spi_disable(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -201,9 +189,7 @@ static fsm_rt_t __vsf_multi_spi_disable(vsf_spi_cs_t* spi_cs_ptr,
     return fsm_rt_cpl;
 }
 
-static void __vsf_multi_spi_irq_enable(vsf_spi_cs_t* spi_cs_ptr,
-                                       uint8_t cs,
-                                       em_spi_irq_mask_t irq_mask)
+static void __vsf_multi_spi_irq_enable(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, em_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -213,15 +199,13 @@ static void __vsf_multi_spi_irq_enable(vsf_spi_cs_t* spi_cs_ptr,
 
     vsf_protect_t state = vsf_multi_spi_protect();
     spi_cs_one_ptr->irq_mask |= irq_mask;
-    spi_cs_ptr->irq_mask     |= irq_mask;
+    spi_cs_ptr->irq_mask |= irq_mask;
     vsf_multi_spi_unprotect(state);
 
     vsf_spi_irq_enable(spi_cs_ptr->spi, irq_mask);
 }
 
-static void __vsf_multi_spi_irq_disable(vsf_spi_cs_t* spi_cs_ptr,
-                                        uint8_t cs,
-                                        em_spi_irq_mask_t irq_mask)
+static void __vsf_multi_spi_irq_disable(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, em_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -231,8 +215,7 @@ static void __vsf_multi_spi_irq_disable(vsf_spi_cs_t* spi_cs_ptr,
     vsf_multi_spi_unprotect(state);
 }
 
-static spi_status_t __vsf_multi_spi_status(vsf_spi_cs_t* spi_cs_ptr,
-                                           uint8_t cs)
+static spi_status_t __vsf_multi_spi_status(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs)
 {
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
     VSF_HAL_ASSERT(spi_cs_ptr->spi != NULL);
@@ -241,12 +224,9 @@ static spi_status_t __vsf_multi_spi_status(vsf_spi_cs_t* spi_cs_ptr,
     return vsf_spi_status(spi_cs_ptr->spi);
 }
 
-static void __vsf_multi_spi_fifo_transfer(vsf_spi_cs_t* spi_cs_ptr,
-                                          uint8_t cs,
-                                          void *out_buffer_ptr,
-                                          uint_fast32_t* out_count_ptr,
-                                          void *in_buffer_ptr,
-                                          uint_fast32_t* in_count_ptr)
+static void __vsf_multi_spi_fifo_transfer(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, void *out_buffer_ptr,
+                                          uint_fast32_t *out_count_ptr, void *in_buffer_ptr,
+                                          uint_fast32_t *in_count_ptr)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -256,8 +236,7 @@ static void __vsf_multi_spi_fifo_transfer(vsf_spi_cs_t* spi_cs_ptr,
     VSF_HAL_ASSERT(0);
 }
 
-static bool __vsf_multi_spi_fifo_flush(vsf_spi_cs_t* spi_cs_ptr,
-                                       uint8_t cs)
+static bool __vsf_multi_spi_fifo_flush(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -268,9 +247,7 @@ static bool __vsf_multi_spi_fifo_flush(vsf_spi_cs_t* spi_cs_ptr,
 
 #ifndef WEAK_VSF_MULTI_SPI_CS_ACTIVE
 WEAK(vsf_multi_spi_cs_active)
-void vsf_multi_spi_cs_active(vsf_spi_cs_t* spi_cs_ptr,
-                             uint8_t cs,
-                             uint_fast8_t index)
+void vsf_multi_spi_cs_active(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -281,9 +258,7 @@ void vsf_multi_spi_cs_active(vsf_spi_cs_t* spi_cs_ptr,
 }
 #endif
 
-static void __vsf_multi_spi_cs_active(vsf_spi_cs_t* spi_cs_ptr,
-                                      uint8_t cs,
-                                      uint_fast8_t index)
+static void __vsf_multi_spi_cs_active(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -309,9 +284,7 @@ static void __vsf_multi_spi_cs_active(vsf_spi_cs_t* spi_cs_ptr,
     if (spi_cs_ptr->init_mask != (1 << cs)) {
         spi_cs_ptr->init_mask = (1 << cs);
 
-        __vsf_multi_spi_reconfig(spi_cs_ptr,
-                                 cs,
-                                 &spi_cs_ptr->cfgs[cs].spi_cfg);
+        __vsf_multi_spi_reconfig(spi_cs_ptr, cs, &spi_cs_ptr->cfgs[cs].spi_cfg);
     }
 
     vsf_multi_spi_cs_active(spi_cs_ptr, cs, index);
@@ -319,22 +292,18 @@ static void __vsf_multi_spi_cs_active(vsf_spi_cs_t* spi_cs_ptr,
 
 #ifndef WEAK_VSF_MULTI_SPI_CS_INACTIVE
 WEAK(vsf_multi_spi_cs_inactive)
-void vsf_multi_spi_cs_inactive(vsf_spi_cs_t* spi_cs_ptr,
-                               uint8_t cs,
-                               uint_fast8_t index)
+void vsf_multi_spi_cs_inactive(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
     VSF_HAL_ASSERT(spi_cs_ptr->spi != NULL);
     VSF_HAL_ASSERT(index == 0);
 
-    vsf_spi_cs_inactive(spi_cs_ptr->spi , index);
+    vsf_spi_cs_inactive(spi_cs_ptr->spi, index);
 }
 #endif
 
-static void __vsf_multi_spi_cs_inactive(vsf_spi_cs_t* spi_cs_ptr,
-                                        uint8_t cs,
-                                        uint_fast8_t index)
+static void __vsf_multi_spi_cs_inactive(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -349,8 +318,7 @@ static void __vsf_multi_spi_cs_inactive(vsf_spi_cs_t* spi_cs_ptr,
     spi_cs_ptr->cs_mask &= ~cs_mask;
     is_cs_need = (spi_cs_ptr->cur_cs == cs);
     if (!vsf_dlist_is_empty(&spi_cs_ptr->list)) {
-        vsf_dlist_remove_tail(vsf_spi_cs_request_t, node,
-                              &spi_cs_ptr->list, request_ptr);
+        vsf_dlist_remove_tail(vsf_spi_cs_request_t, node, &spi_cs_ptr->list, request_ptr);
         VSF_ASSERT(spi_cs_ptr->cs_mask & (1 << request_ptr->cs));
         spi_cs_ptr->init_mask = 1 << request_ptr->cs;
         spi_cs_ptr->cur_cs = request_ptr->cs;
@@ -369,25 +337,18 @@ static void __vsf_multi_spi_cs_inactive(vsf_spi_cs_t* spi_cs_ptr,
 
     VSF_ASSERT(request_ptr->cs != cs);
 
-    __vsf_multi_spi_reconfig(spi_cs_ptr,
-                             request_ptr->cs,
-                             &spi_cs_ptr->cfgs[request_ptr->cs].spi_cfg);
+    __vsf_multi_spi_reconfig(spi_cs_ptr, request_ptr->cs, &spi_cs_ptr->cfgs[request_ptr->cs].spi_cfg);
 
     vsf_multi_spi_cs_active(spi_cs_ptr, request_ptr->cs, index);
 
-    vsf_err_t result = vsf_spi_request_transfer(spi_cs_ptr->spi,
-                                                request_ptr->out_buffer_ptr,
-                                                request_ptr->in_buffer_ptr,
-                                                request_ptr->count);
+    vsf_err_t result = vsf_spi_request_transfer(spi_cs_ptr->spi, request_ptr->out_buffer_ptr,
+                                                request_ptr->in_buffer_ptr, request_ptr->count);
     (void)result;
     VSF_HAL_ASSERT(result == VSF_ERR_NONE);
 }
 
-static vsf_err_t __vsf_multi_spi_request_transfer(vsf_spi_cs_t* spi_cs_ptr,
-                                                  uint8_t cs,
-                                                  void *out_buffer_ptr,
-                                                  void *in_buffer_ptr,
-                                                  uint_fast32_t count)
+static vsf_err_t __vsf_multi_spi_request_transfer(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs, void *out_buffer_ptr,
+                                                  void *in_buffer_ptr, uint_fast32_t count)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -398,27 +359,22 @@ static vsf_err_t __vsf_multi_spi_request_transfer(vsf_spi_cs_t* spi_cs_ptr,
 
     if (spi_cs_ptr->cur_cs == cs) {
         spi_cs_ptr->cfgs[cs].transfered_count = 0;
-        return vsf_spi_request_transfer(spi_cs_ptr->spi,
-                                        out_buffer_ptr,
-                                        in_buffer_ptr,
-                                        count);
+        return vsf_spi_request_transfer(spi_cs_ptr->spi, out_buffer_ptr, in_buffer_ptr, count);
     } else {
-        vsf_spi_cs_request_t * request = &spi_cs_ptr->cfgs[cs].request;
-        request->out_buffer_ptr = out_buffer_ptr;
-        request->in_buffer_ptr  = in_buffer_ptr;
-        request->count          = count;
-        request->cs             = cs;
+        vsf_spi_cs_request_t *request = &spi_cs_ptr->cfgs[cs].request;
+        request->out_buffer_ptr       = out_buffer_ptr;
+        request->in_buffer_ptr        = in_buffer_ptr;
+        request->count                = count;
+        request->cs                   = cs;
 
         vsf_protect_t state = vsf_multi_spi_protect();
-        vsf_dlist_add_to_head(vsf_spi_cs_request_t,
-                              node, &spi_cs_ptr->list, request);
+        vsf_dlist_add_to_head(vsf_spi_cs_request_t, node, &spi_cs_ptr->list, request);
         vsf_multi_spi_unprotect(state);
         return VSF_ERR_NONE;
     }
 }
 
-static vsf_err_t __vsf_multi_spi_cancel_transfer(vsf_spi_cs_t* spi_cs_ptr,
-                                                 uint8_t cs)
+static vsf_err_t __vsf_multi_spi_cancel_transfer(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -427,11 +383,11 @@ static vsf_err_t __vsf_multi_spi_cancel_transfer(vsf_spi_cs_t* spi_cs_ptr,
     vsf_err_t result;
 
     vsf_protect_t state = vsf_multi_spi_protect();
-    if (spi_cs_ptr->cur_cs == cs) { // current cs request
+    if (spi_cs_ptr->cur_cs == cs) {  // current cs request
         spi_cs_ptr->cur_cs = -1;
         result = vsf_spi_cancel_transfer(spi_cs_ptr->spi);
         spi_cs_ptr->cfgs[cs].transfered_count = vsf_spi_get_transfered_count(spi_cs_ptr->spi);
-    } else {                        // other cs request
+    } else {  // other cs request
         result = VSF_ERR_FAIL;
     }
     vsf_multi_spi_unprotect(state);
@@ -439,8 +395,7 @@ static vsf_err_t __vsf_multi_spi_cancel_transfer(vsf_spi_cs_t* spi_cs_ptr,
     return result;
 }
 
-static int_fast32_t __vsf_multi_spi_get_transfered_count(vsf_spi_cs_t* spi_cs_ptr,
-                                                         uint8_t cs)
+static int_fast32_t __vsf_multi_spi_get_transfered_count(vsf_spi_cs_t *spi_cs_ptr, uint8_t cs)
 {
     VSF_HAL_ASSERT(cs < VSF_MULTI_SPI_MAX_CS);
     VSF_HAL_ASSERT(spi_cs_ptr != NULL);
@@ -482,8 +437,8 @@ static spi_status_t __MSPI##__N##_status(void)                                  
     return __vsf_multi_spi_status(&__MSPI.spi_cs, __N);                         \
 }                                                                               \
 static void __MSPI##__N##_fifo_transfer(void *out_buffer_ptr,                   \
-        uint_fast32_t* out_count_ptr, void *in_buffer_ptr,                      \
-        uint_fast32_t* in_count_ptr)                                            \
+        uint_fast32_t *out_count_ptr, void *in_buffer_ptr,                      \
+        uint_fast32_t *in_count_ptr)                                            \
 {                                                                               \
     __vsf_multi_spi_fifo_transfer(&__MSPI.spi_cs,                               \
                                   __N,                                          \
