@@ -36,7 +36,7 @@
 #       define APP_USE_USBD_CDC_DEMO                    ENABLED
 #       define APP_USE_USBD_MSC_DEMO                    ENABLED
 #       define APP_USE_USBD_UVC_DEMO                    DISABLED
-#       define APP_USE_USBD_UAC_DEMO                    DISABLED
+#       define APP_USE_USBD_UAC_DEMO                    ENABLED
 #   define APP_USE_SCSI_DEMO                            DISABLED
 #   define APP_USE_AUDIO_DEMO                           DISABLED
 //  current tgui demo depends on VSF_DISP_USE_SDL2, which is only available on __WIN__
@@ -159,7 +159,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_0
 #       define VSF_USBD_CFG_TRACE                       DISABLED
 #       define VSF_USBD_CFG_TRACE_EVT                   DISABLED
-#       define USRAPP_CFG_USBD_SPEED                    USB_DC_SPEED_FULL
+#       define USRAPP_CFG_USBD_SPEED                    USB_SPEED_FULL
 #       define USRAPP_CFG_CDC_NUM                       1
 #       define USRAPP_CFG_CDC_TX_STREAM_SIZE            1024
 #       define USRAPP_CFG_CDC_RX_STREAM_SIZE            512
