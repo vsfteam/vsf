@@ -237,6 +237,10 @@ int rtos_task_create(   rtos_task_fct func,
     rtos_prio real_prio = prio;
 #endif
 
+#ifdef AIC8800_OSAL_CFG_PRIORITY_BASE
+    real_prio += AIC8800_OSAL_CFG_PRIORITY_BASE;
+#endif
+
     // patch
     // 1. IPC cntrl task will stackoverflow if using some protocols, eg: mdns
     if (!strcmp(name, "IPC cntrl task")) {
