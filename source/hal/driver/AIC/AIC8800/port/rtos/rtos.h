@@ -27,6 +27,11 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef AIC8800_OSAL_CFG_PRIORITY_BASE
+#   define AIC8800_OSAL_CFG_PRIORITY_BASE       vsf_prio_1
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -69,7 +74,6 @@ enum {
     TASK_STACK_SIZE_WIFI_PING_SEND       = 512,
     TASK_STACK_SIZE_WIFI_IPERF           = 1024,
     TASK_STACK_SIZE_WIFI_SMARTCONF       = 512,
-
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
