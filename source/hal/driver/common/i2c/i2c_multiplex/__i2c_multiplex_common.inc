@@ -20,31 +20,20 @@
 
 #define __VSF_I2C_MULTIPLEX_CLASS_IMPLEMENT
 
-#include "hal/vsf_hal.h"
+#if VSF_HAL_I2C_IMP_MULTIPLEX_I2C == ENABLED
 
-#define I2C_MAX_PORT                        1
-#define I2C_PORT_MASK                       0x0f
-#define VSF_HAL_I2C_IMP_MULTIPLEX_I2C       ENABLED
-#define VSF_HAL_USE_I2C0                    ENABLED
-#define VSF_HAL_I2C0_MULTIPLEX_CNT          16
-
-#if 1//todo
-#include "./__i2c_multi_common.h"
-
-
-//for debug
-#include "vsf.h"
+#include "./__i2c_multiplex_common.h"
 
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_MULTIPLEX_I2C_PROTECT_LEVEL
 #   define VSF_MULTIPLEX_I2C_PROTECT_LEVEL  interrupt
 #endif
-#define vsf_multi_i2c_protect               vsf_protect(VSF_MULTIPLEX_I2C_PROTECT_LEVEL)
-#define vsf_multi_i2c_unprotect             vsf_unprotect(VSF_MULTIPLEX_I2C_PROTECT_LEVEL)
+#define vsf_multiplex_i2c_protect           vsf_protect(VSF_MULTIPLEX_I2C_PROTECT_LEVEL)
+#define vsf_multiplex_i2c_unprotect         vsf_unprotect(VSF_MULTIPLEX_I2C_PROTECT_LEVEL)
 
 #ifndef I2C_MULTIPLEX_CFG_DEBUG
-#   define I2C_MULTIPLEX_CFG_DEBUG          ENABLED
+#   define I2C_MULTIPLEX_CFG_DEBUG          DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -60,8 +49,6 @@
             },                                                                  \
         },                                                                      \
         .i2c_ptr = &vsf_i2c##__N,                                               \
-        .is_slist_queue_empty = true,                                           \
-        .is_restar = false,                                                     \
     };
 
 #define __VSF_MULTIPLEX_I2C_DEF(__N, __MI2C)                                    \
@@ -78,52 +65,26 @@
                 },                                                              \
             },                                                                  \
             .buffer_ptr = NULL,                                                 \
-            .status_bool = {                                                    \
+            .status = {                                                         \
                     .is_enabled = false,                                        \
-                    .is_busy = false,                                           \
                     .is_irq_enabled = false,                                    \
             },                                                                  \
         },                                                                      \
     };
 
-#define vsf_i2c_multi_request(i2c_multiplex_ptr, request_info_ptr)              \
-    vsf_i2c_master_request(i2c_multiplex_ptr,                                   \
-                           (request_info_ptr)->address,                         \
-                           (request_info_ptr)->cmd,                             \
-                           (request_info_ptr)->count,                           \
-                           (request_info_ptr)->buffer_ptr)
-
-#define __list_find_by_member_value(__host_type,                                \
-                                    __member,                                   \
-                                    __queue_ptr,                                \
-                                    __value,                                    \
-                                    __item_ref_ptr)                             \
-    do {                                                                        \
-        __host_type * __vsf_list_tmp_name(host_tail) =                          \
-                (__host_type *)(__queue_ptr);                                   \
-        while (NULL != __vsf_list_tmp_name(host_tail)) {                        \
-            if (__vsf_list_tmp_name(host_tail)->address == (__value)->address) {\
-                __item_ref_ptr = __vsf_list_tmp_name(host_tail);                \
-                vsf_slist_remove(__host_type,                                   \
-                                 __member,                                      \
-                                 (vsf_slist_t *)&((&i2c_multiplex->use_as__request_info_t)->request_node),\
-                                 __vsf_list_tmp_name(host_tail));               \
-                break;                                                          \
-            }                                                                   \
-            __vsf_list_tmp_name(host_tail) = __vsf_list_tmp_name(host_tail)->__member.next;\
-        }                                                                       \
-    } while(0)
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void static vsf_i2c_multiplex_isrhandler(  void *target_ptr,
-                                           vsf_i2c_t *i2c_ptr,
-                                           uint32_t irq_mask)
+static vsf_err_t __vsf_i2c_master_multiplex_request(vsf_i2c_multiplex_t *i2c_multiplex, request_info_t *request);
+
+static void vsf_i2c_multiplex_isrhandler(void *target_ptr,
+                                         vsf_i2c_t *i2c_ptr,
+                                         uint32_t irq_mask)
 {
-//    vsf_i2c_multiplex_t *i2c_multiplex = (vsf_i2c_multiplex_t *)target_ptr;
+    VSF_HAL_ASSERT(NULL != target_ptr)
     vsf_err_t err;
     request_info_t *request = NULL;
     vsf_slist_queue_peek(request_info_t,
@@ -131,61 +92,45 @@ void static vsf_i2c_multiplex_isrhandler(  void *target_ptr,
                          &((vsf_i2c_multiplex_t *)(target_ptr))->multiplexer->request_slist,
                          request);
     vsf_i2c_multiplex_t *i2c_multiplex = container_of(request, vsf_i2c_multiplex_t, use_as__request_info_t);
-//    do {
-//        request_info_t *host_tail132 = (request_info_t *)(&i2c_multiplex->use_as__request_info_t);
-//        while (0 != host_tail132) {
-//            vsf_trace(VSF_TRACE_WARNING, "[%p][%d]--->", host_tail132, host_tail132->count);
-//            host_tail132 = host_tail132->request_node.next;
-//        }
-//        vsf_trace(VSF_TRACE_WARNING, "[%p]\n", host_tail132);
-//    } while (0);
 
-    if (i2c_multiplex->status_bool.is_sended) {
-        i2c_multiplex->status_bool.is_sended = false;
-        i2c_multiplex->status_bool.is_busy = false;
-        if (request->cmd & I2C_CMD_RESTAR) {
-            i2c_multiplex->multiplexer->current_request = request;
-            i2c_multiplex->multiplexer->is_restar = true;
-            if (i2c_multiplex->cfg.isr.handler_fn != NULL) {
-                i2c_multiplex->cfg.isr.handler_fn(i2c_multiplex->cfg.isr.target_ptr,
-                                                      i2c_ptr, irq_mask);
-            }
-            return;
-        }
-        if (i2c_multiplex->cfg.isr.handler_fn != NULL) {
-            i2c_multiplex->cfg.isr.handler_fn(i2c_multiplex->cfg.isr.target_ptr,
-                                                  i2c_ptr, irq_mask);
-        }
-        vsf_slist_queue_dequeue(request_info_t,
-                                request_node,
-                                &i2c_multiplex->multiplexer->request_slist,
-                                request);
-        if (vsf_slist_queue_is_empty(&i2c_multiplex->multiplexer->request_slist)) {
-            i2c_multiplex->multiplexer->is_slist_queue_empty = true;
-            i2c_multiplex->multiplexer->is_restar = false;
-            vsf_slist_queue_init(&i2c_multiplex->multiplexer->request_slist);
-            return;
-        }
-        vsf_slist_queue_peek(request_info_t,
-                             request_node,
-                             &((vsf_i2c_multiplex_t *)(target_ptr))->multiplexer->request_slist,
-                             request);
-        i2c_multiplex = container_of(request, vsf_i2c_multiplex_t, use_as__request_info_t);
+    i2c_multiplex->status.is_in_queue = false;
+    i2c_multiplex->status.is_busy = false;
+
+    (i2c_multiplex->cmd & I2C_CMD_STOP) ?
+        (i2c_multiplex->status.is_restar = false) :
+         (i2c_multiplex->status.is_restar = true);
+    if (i2c_multiplex->cfg.isr.handler_fn != NULL) {
+        i2c_multiplex->cfg.isr.handler_fn(i2c_multiplex->cfg.isr.target_ptr,
+                                          i2c_ptr, irq_mask);
     }
-    if (vsf_slist_queue_is_empty(&i2c_multiplex->multiplexer->request_slist)) {
-        i2c_multiplex->status_bool.is_sended = false;
-        i2c_multiplex->status_bool.is_busy = false;
-        i2c_multiplex->multiplexer->is_slist_queue_empty = true;
-        i2c_multiplex->multiplexer->is_restar = false;
-        vsf_slist_queue_init(&i2c_multiplex->multiplexer->request_slist);
+    if (!(i2c_multiplex->cmd & I2C_CMD_STOP)) {
+        i2c_multiplex->status.is_in_queue = true;
         return;
     }
-    i2c_multiplex->status_bool.is_sended = true;
-    err = vsf_i2c_master_request(i2c_multiplex->multiplexer->i2c_ptr,
-                                 request->address,
-                                 request->cmd,
-                                 request->count,
-                                 request->buffer_ptr);
+    vsf_slist_queue_dequeue(request_info_t,
+                            request_node,
+                            &i2c_multiplex->multiplexer->request_slist,
+                            request);
+    if (vsf_slist_queue_is_empty(&i2c_multiplex->multiplexer->request_slist)) {
+        i2c_multiplex->multiplexer->is_busy = false;
+        return;
+    }
+    vsf_slist_queue_peek(request_info_t,
+                         request_node,
+                         &((vsf_i2c_multiplex_t *)(target_ptr))->multiplexer->request_slist,
+                         request);
+    i2c_multiplex = container_of(request, vsf_i2c_multiplex_t, use_as__request_info_t);
+
+    i2c_multiplex->status.is_in_queue = false;
+    i2c_multiplex->status.is_busy = false;
+    err = __vsf_i2c_master_multiplex_request(i2c_multiplex, request);
+    if (VSF_ERR_NONE != err) {
+        //todo
+        if (i2c_multiplex->cfg.isr.handler_fn != NULL) {
+            i2c_multiplex->cfg.isr.handler_fn(i2c_multiplex->cfg.isr.target_ptr,
+                                              i2c_ptr, I2C_IRQ_MASK_MASTER_ERROR);
+        }
+    }
 }
 
 vsf_err_t vsf_i2c_multiplex_init(vsf_i2c_multiplex_t *i2c_multiplex, i2c_cfg_t *cfg_ptr)
@@ -194,6 +139,7 @@ vsf_err_t vsf_i2c_multiplex_init(vsf_i2c_multiplex_t *i2c_multiplex, i2c_cfg_t *
     VSF_HAL_ASSERT(NULL != cfg_ptr);
     VSF_HAL_ASSERT(NULL != i2c_multiplex->multiplexer);
 
+    i2c_multiplex->status.is_init = true;
     i2c_multiplex->cfg = *cfg_ptr;
     cfg_ptr->isr.handler_fn = vsf_i2c_multiplex_isrhandler;
     cfg_ptr->isr.target_ptr = i2c_multiplex;
@@ -205,6 +151,7 @@ void vsf_i2c_multiplex_fini(vsf_i2c_multiplex_t *i2c_multiplex)
     VSF_HAL_ASSERT(NULL != i2c_multiplex);
     VSF_HAL_ASSERT(NULL != i2c_multiplex->multiplexer);
 
+    i2c_multiplex->status.is_init = false;
     vsf_i2c_fini(i2c_multiplex->multiplexer->i2c_ptr);
 }
 
@@ -212,8 +159,10 @@ fsm_rt_t vsf_i2c_multiplex_enable(vsf_i2c_multiplex_t *i2c_multiplex)
 {
     VSF_HAL_ASSERT(NULL != i2c_multiplex);
     VSF_HAL_ASSERT(NULL != i2c_multiplex->multiplexer);
-
-    i2c_multiplex->status_bool.is_enabled = true;
+    if (!i2c_multiplex->status.is_init) {
+        return fsm_rt_err;
+    }
+    i2c_multiplex->status.is_enabled = true;
     return vsf_i2c_enable(i2c_multiplex->multiplexer->i2c_ptr);
 }
 
@@ -221,7 +170,10 @@ fsm_rt_t vsf_i2c_multiplex_disable(vsf_i2c_multiplex_t *i2c_multiplex)
 {
     VSF_HAL_ASSERT(NULL != i2c_multiplex);
     VSF_HAL_ASSERT(NULL != i2c_multiplex->multiplexer);
-    i2c_multiplex->status_bool.is_enabled = false;
+    if (!i2c_multiplex->status.is_init) {
+        return fsm_rt_err;
+    }
+    i2c_multiplex->status.is_enabled = false;
     return vsf_i2c_disable(i2c_multiplex->multiplexer->i2c_ptr);
 }
 
@@ -230,7 +182,11 @@ void vsf_i2c_multiplex_irq_enable(vsf_i2c_multiplex_t *i2c_multiplex, em_i2c_irq
     VSF_HAL_ASSERT(NULL != i2c_multiplex);
     VSF_HAL_ASSERT(NULL != i2c_multiplex->multiplexer);
 
-    i2c_multiplex->status_bool.is_irq_enabled = true;
+    if (!i2c_multiplex->status.is_init) {
+        return;
+    }
+    i2c_multiplex->status.is_irq_enabled = true;
+    i2c_multiplex->irq_mask = irq_mask;
     vsf_i2c_irq_enable(i2c_multiplex->multiplexer->i2c_ptr, irq_mask);
 }
 
@@ -239,7 +195,10 @@ void vsf_i2c_multiplex_irq_disable(vsf_i2c_multiplex_t *i2c_multiplex, em_i2c_ir
     VSF_HAL_ASSERT(NULL != i2c_multiplex);
     VSF_HAL_ASSERT(NULL != i2c_multiplex->multiplexer);
 
-    i2c_multiplex->status_bool.is_irq_enabled = false;
+    if (!i2c_multiplex->status.is_init) {
+        return;
+    }
+    i2c_multiplex->status.is_irq_enabled = false;
     vsf_i2c_irq_disable(i2c_multiplex->multiplexer->i2c_ptr, irq_mask);
 }
 
@@ -248,7 +207,35 @@ i2c_status_t vsf_i2c_multiplex_status(vsf_i2c_multiplex_t *i2c_multiplex)
     VSF_HAL_ASSERT(NULL != i2c_multiplex);
     VSF_HAL_ASSERT(NULL != i2c_multiplex->multiplexer);
 
+    if (!i2c_multiplex->status.is_init) {
+        return (i2c_status_t){0};
+    }
     return vsf_i2c_status(i2c_multiplex->multiplexer->i2c_ptr);
+}
+
+static vsf_err_t __vsf_i2c_master_multiplex_request(vsf_i2c_multiplex_t *i2c_multiplex, request_info_t *request)
+{
+    vsf_err_t err;
+    fsm_rt_t fsm;
+    i2c_cfg_t cfg = i2c_multiplex->cfg;
+    fsm = vsf_i2c_multiplex_disable(i2c_multiplex);
+    if (fsm_rt_cpl != fsm) {
+        return VSF_ERR_FAIL;
+    }
+    err = vsf_i2c_multiplex_init(i2c_multiplex, &cfg);
+    if (VSF_ERR_NONE != err) {
+        return err;
+    }
+    fsm = vsf_i2c_multiplex_enable(i2c_multiplex);
+    if (fsm_rt_cpl != fsm) {
+        return VSF_ERR_FAIL;
+    }
+    vsf_i2c_multiplex_irq_enable(i2c_multiplex, i2c_multiplex->irq_mask);
+    return vsf_i2c_master_request(i2c_multiplex->multiplexer->i2c_ptr,
+                                  request->address,
+                                  request->cmd,
+                                  request->count,
+                                  request->buffer_ptr);
 }
 
 vsf_err_t vsf_i2c_master_multiplex_request( vsf_i2c_multiplex_t *i2c_multiplex,
@@ -260,48 +247,27 @@ vsf_err_t vsf_i2c_master_multiplex_request( vsf_i2c_multiplex_t *i2c_multiplex,
     VSF_HAL_ASSERT(NULL != i2c_multiplex);
     VSF_HAL_ASSERT(NULL != i2c_multiplex->multiplexer);
 
-    if (i2c_multiplex->status_bool.is_busy) {
-        VSF_HAL_ASSERT(false);
+    vsf_i2c_multiplexer_t *multiplexer = i2c_multiplex->multiplexer;
+    request_info_t *request = &i2c_multiplex->use_as__request_info_t;
+    vsf_err_t err = VSF_ERR_NONE;
+
+    if (    (i2c_multiplex->status.is_busy)
+        ||  (NULL == buffer_ptr)) {
+        VSF_HAL_ASSERT(false);//todo
         return VSF_ERR_FAIL;
     }
-    if (!i2c_multiplex->status_bool.is_enabled) {
+    if (!i2c_multiplex->status.is_enabled) {
         return VSF_ERR_INVALID_PARAMETER;
     }
 
-    i2c_multiplex->status_bool.is_busy = true;
-    request_info_t *request = &i2c_multiplex->use_as__request_info_t;
+    i2c_multiplex->status.is_busy = true;
     request->cmd = cmd;
     request->address = address;
     request->count = count;
     request->buffer_ptr = buffer_ptr;
 
-    vsf_protect_t state = vsf_multi_i2c_protect();
-
-    if (i2c_multiplex->multiplexer->is_slist_queue_empty) {
-        i2c_multiplex->multiplexer->is_slist_queue_empty = false;
-        vsf_slist_queue_add_to_head(request_info_t,
-                                    request_node,
-                                    &i2c_multiplex->multiplexer->request_slist,
-                                    request);
-        i2c_multiplex->multiplexer->is_request_func = true;
-        i2c_multiplex->status_bool.is_sended = false;
-        vsf_i2c_multiplex_isrhandler((void *)i2c_multiplex,
-                                     i2c_multiplex->multiplexer->i2c_ptr,
-                                     0);
-    } else {
-        if (i2c_multiplex->multiplexer->is_restar) {
-            if (&i2c_multiplex->use_as__request_info_t == i2c_multiplex->multiplexer->current_request) {
-                i2c_multiplex->multiplexer->is_request_func = true;
-                i2c_multiplex->status_bool.is_sended = false;
-                vsf_i2c_multiplex_isrhandler((void *)i2c_multiplex,
-                                             i2c_multiplex->multiplexer->i2c_ptr,
-                                             0);
-                goto label_return;
-            }
-        }
-        //todo:check address
 #if I2C_MULTIPLEX_CFG_DEBUG == ENABLED
-        request_info_t *temp_req_info = (request_info_t *)(&i2c_multiplex->multiplexer->request_slist.head);
+        request_info_t *temp_req_info = (request_info_t *)(&multiplexer->request_slist.head)->request_node.next;
         while (NULL != temp_req_info) {
             if (temp_req_info->address == address) {
                 VSF_HAL_ASSERT(false);
@@ -310,14 +276,28 @@ vsf_err_t vsf_i2c_master_multiplex_request( vsf_i2c_multiplex_t *i2c_multiplex,
             temp_req_info = temp_req_info->request_node.next;
         }
 #endif
+
+    vsf_protect_t state = vsf_multiplex_i2c_protect();
+
+    if (!i2c_multiplex->status.is_in_queue) {
+        i2c_multiplex->status.is_in_queue = true;
+
         vsf_slist_queue_enqueue(request_info_t,
                                 request_node,
-                                &i2c_multiplex->multiplexer->request_slist,
+                                &multiplexer->request_slist,
                                 request);
+        if (i2c_multiplex->multiplexer->is_busy) {//real hardware is busy
+            vsf_multiplex_i2c_unprotect(state);
+            return err;
+        }
+    } else if (!i2c_multiplex->status.is_restar) {
+        VSF_HAL_ASSERT(false);//todo
+        return VSF_ERR_FAIL;
     }
-label_return:
-    vsf_multi_i2c_unprotect(state);
-    return VSF_ERR_NONE;
+    i2c_multiplex->multiplexer->is_busy = true;
+    err = __vsf_i2c_master_multiplex_request(i2c_multiplex, request);
+    vsf_multiplex_i2c_unprotect(state);
+    return err;
 }
 
 #if I2C_MAX_PORT >= 0 && VSF_HAL_USE_I2C0 == ENABLED && (I2C_PORT_MASK & (1 << 0))
@@ -400,4 +380,4 @@ __MULTIPLEXER_I2C_DEF(7)
 VSF_MREPEAT(VSF_HAL_I2C7_MULTIPLEX_CNT, __VSF_MULTIPLEX_I2C_DEF, VSF_I2C7_MULTIPLEX)
 #endif
 
-#endif //
+#endif //!VSF_HAL_I2C_IMP_MULTIPLEX_I2C

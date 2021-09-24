@@ -195,5 +195,7 @@ vsf_err_t vsf_i2c_master_request(   vsf_i2c_t *i2c_ptr,
                                 |   (cmd & I2C_ALL_CMD);
     return VSF_ERR_NONE;
 }
-
+#if VSF_HAL_I2C_IMP_MULTIPLEX_I2C == ENABLED
+#   include "hal/driver/common/i2c/i2c_multiplex/__i2c_multiplex_common.inc"
+#endif
 #endif /* VSF_HAL_USE_I2C */

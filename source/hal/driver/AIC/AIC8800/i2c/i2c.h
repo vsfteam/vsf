@@ -132,6 +132,11 @@ struct vsf_i2c_t {
 };
 
 /*============================ INCLUDES ======================================*/
+
+#if VSF_HAL_I2C_IMP_MULTIPLEX_I2C == ENABLED
+#   include "hal/driver/common/i2c/i2c_multiplex/__i2c_multiplex_common.h"
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern vsf_i2c_t vsf_i2c0;

@@ -65,6 +65,10 @@
 
 #define GPIO_COUNT                  2
 
+#define I2C_MAX_PORT                1
+#define VSF_HAL_I2C0_MULTIPLEX_CNT  2
+#define I2C_PORT_MASK               0x3
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

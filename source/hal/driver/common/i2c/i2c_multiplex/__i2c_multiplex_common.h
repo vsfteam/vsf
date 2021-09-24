@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_COMMON_I2C_MULTI_H__
-#define __HAL_DRIVER_COMMON_I2C_MULTI_H__
+#ifndef __HAL_DRIVER_COMMON_I2C_MULTIPLEX_H__
+#define __HAL_DRIVER_COMMON_I2C_MULTIPLEX_H__
 
 #if VSF_HAL_I2C_IMP_MULTIPLEX_I2C == ENABLED
 
@@ -31,9 +31,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __MULTI_I2C_DEF(__N, __MI2C)                                            \
+#define __MULTIPLEX_I2C_DEF(__N, __MI2C)                                            \
     extern vsf_i2c_multiplex_t __MI2C##__N;
-
 
 /*============================ INCLUDES ======================================*/
 
@@ -50,22 +49,21 @@ typedef struct request_info_t{
     uint16_t                        address;
     uint16_t                        count;
     struct {
+        uint32_t                    is_init             : 1;
         uint32_t                    is_enabled          : 1;
-        uint32_t                    is_busy             : 1;
         uint32_t                    is_irq_enabled      : 1;
-        uint32_t                    is_sended           : 1;
-        uint32_t                                        : 28;
-    } status_bool;
+        uint32_t                    is_busy             : 1;
+        uint32_t                    is_in_queue         : 1;
+        uint32_t                    is_restar           : 1;
+        uint32_t                                        : 26;
+    } status;
 } request_info_t;
 
 vsf_class(vsf_i2c_multiplexer_t) {
     private_member(
         vsf_slist_queue_t           request_slist;
         vsf_i2c_t                   *i2c_ptr;
-        request_info_t              *current_request;
-        bool                        is_slist_queue_empty;
-        bool                        is_restar;
-        bool                        is_request_func;
+        bool                        is_busy;
     )
 };
 
@@ -76,66 +74,65 @@ vsf_class(vsf_i2c_multiplex_t) {
     )
 };
 
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 #if I2C_MAX_PORT >= 0 && VSF_HAL_USE_I2C0 == ENABLED && (I2C_PORT_MASK & (1 << 0))
-#   ifndef VSF_HAL_I2C0_MULTI_CNT
-#       define VSF_HAL_I2C0_MULTI_CNT 2
+#   ifndef VSF_HAL_I2C0_MULTIPLEX_CNT
+#       define VSF_HAL_I2C0_MULTIPLEX_CNT 2
 #   endif
-VSF_MREPEAT(VSF_HAL_I2C0_MULTI_CNT, __MULTI_I2C_DEF, VSF_I2C0_MULTIPLEX)
+VSF_MREPEAT(VSF_HAL_I2C0_MULTIPLEX_CNT, __MULTIPLEX_I2C_DEF, VSF_I2C0_MULTIPLEX)
 #endif
 
 #if I2C_MAX_PORT >= 0 && VSF_HAL_USE_I2C1 == ENABLED && (I2C_PORT_MASK & (1 << 1))
-#   ifndef VSF_HAL_I2C1_MULTI_CNT
-#       define VSF_HAL_I2C1_MULTI_CNT 1
+#   ifndef VSF_HAL_I2C1_MULTIPLEX_CNT
+#       define VSF_HAL_I2C1_MULTIPLEX_CNT 1
 #   endif
-VSF_MREPEAT(VSF_HAL_I2C1_MULTI_CNT, __MULTI_I2C_DEF, VSF_I2C1_MULTIPLEX)
+VSF_MREPEAT(VSF_HAL_I2C1_MULTIPLEX_CNT, __MULTIPLEX_I2C_DEF, VSF_I2C1_MULTIPLEX)
 #endif
 
 #if I2C_MAX_PORT >= 0 && VSF_HAL_USE_I2C2 == ENABLED && (I2C_PORT_MASK & (1 << 2))
-#   ifndef VSF_HAL_I2C2_MULTI_CNT
-#       define VSF_HAL_I2C2_MULTI_CNT 1
+#   ifndef VSF_HAL_I2C2_MULTIPLEX_CNT
+#       define VSF_HAL_I2C2_MULTIPLEX_CNT 1
 #   endif
-VSF_MREPEAT(VSF_HAL_I2C2_MULTI_CNT, __MULTI_I2C_DEF, VSF_I2C2_MULTIPLEX)
+VSF_MREPEAT(VSF_HAL_I2C2_MULTIPLEX_CNT, __MULTIPLEX_I2C_DEF, VSF_I2C2_MULTIPLEX)
 #endif
 
 #if I2C_MAX_PORT >= 0 && VSF_HAL_USE_I2C3 == ENABLED && (I2C_PORT_MASK & (1 << 3))
-#   ifndef VSF_HAL_I2C3_MULTI_CNT
-#       define VSF_HAL_I2C3_MULTI_CNT 1
+#   ifndef VSF_HAL_I2C3_MULTIPLEX_CNT
+#       define VSF_HAL_I2C3_MULTIPLEX_CNT 1
 #   endif
-VSF_MREPEAT(VSF_HAL_I2C3_MULTI_CNT, __MULTI_I2C_DEF, VSF_I2C3_MULTIPLEX)
+VSF_MREPEAT(VSF_HAL_I2C3_MULTIPLEX_CNT, __MULTIPLEX_I2C_DEF, VSF_I2C3_MULTIPLEX)
 #endif
 
 #if I2C_MAX_PORT >= 0 && VSF_HAL_USE_I2C4 == ENABLED && (I2C_PORT_MASK & (1 << 4))
-#   ifndef VSF_HAL_I2C4_MULTI_CNT
-#       define VSF_HAL_I2C4_MULTI_CNT 1
+#   ifndef VSF_HAL_I2C4_MULTIPLEX_CNT
+#       define VSF_HAL_I2C4_MULTIPLEX_CNT 1
 #   endif
-VSF_MREPEAT(VSF_HAL_I2C4_MULTI_CNT, __MULTI_I2C_DEF, VSF_I2C4_MULTIPLEX)
+VSF_MREPEAT(VSF_HAL_I2C4_MULTIPLEX_CNT, __MULTIPLEX_I2C_DEF, VSF_I2C4_MULTIPLEX)
 #endif
 
 #if I2C_MAX_PORT >= 0 && VSF_HAL_USE_I2C5 == ENABLED && (I2C_PORT_MASK & (1 << 5))
-#   ifndef VSF_HAL_I2C5_MULTI_CNT
-#       define VSF_HAL_I2C5_MULTI_CNT 1
+#   ifndef VSF_HAL_I2C5_MULTIPLEX_CNT
+#       define VSF_HAL_I2C5_MULTIPLEX_CNT 1
 #   endif
-VSF_MREPEAT(VSF_HAL_I2C5_MULTI_CNT, __MULTI_I2C_DEF, VSF_I2C5_MULTIPLEX)
+VSF_MREPEAT(VSF_HAL_I2C5_MULTIPLEX_CNT, __MULTIPLEX_I2C_DEF, VSF_I2C5_MULTIPLEX)
 #endif
 
 #if I2C_MAX_PORT >= 0 && VSF_HAL_USE_I2C6 == ENABLED && (I2C_PORT_MASK & (1 << 6))
-#   ifndef VSF_HAL_I2C6_MULTI_CNT
-#       define VSF_HAL_I2C6_MULTI_CNT 1
+#   ifndef VSF_HAL_I2C6_MULTIPLEX_CNT
+#       define VSF_HAL_I2C6_MULTIPLEX_CNT 1
 #   endif
-VSF_MREPEAT(VSF_HAL_I2C6_MULTI_CNT, __MULTI_I2C_DEF, VSF_I2C6_MULTIPLEX)
+VSF_MREPEAT(VSF_HAL_I2C6_MULTIPLEX_CNT, __MULTIPLEX_I2C_DEF, VSF_I2C6_MULTIPLEX)
 #endif
 
 #if I2C_MAX_PORT >= 0 && VSF_HAL_USE_I2C7 == ENABLED && (I2C_PORT_MASK & (1 << 7))
-#   ifndef VSF_HAL_I2C7_MULTI_CNT
-#       define VSF_HAL_I2C7_MULTI_CNT 1
+#   ifndef VSF_HAL_I2C7_MULTIPLEX_CNT
+#       define VSF_HAL_I2C7_MULTIPLEX_CNT 1
 #   endif
-VSF_MREPEAT(VSF_HAL_I2C7_MULTI_CNT, __MULTI_I2C_DEF, VSF_I2C7_MULTIPLEX)
+VSF_MREPEAT(VSF_HAL_I2C7_MULTIPLEX_CNT, __MULTIPLEX_I2C_DEF, VSF_I2C7_MULTIPLEX)
 #endif
 
 #endif // VSF_HAL_I2C_IMP_REQUEST_BY_CMD
