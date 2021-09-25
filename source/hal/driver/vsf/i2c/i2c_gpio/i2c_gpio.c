@@ -47,28 +47,28 @@ enum {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-vsf_i2c_t vsf_i2c0 = {
+i2c_type_ptr vsf_gpio_i2c0 = {
     .time_fn = VSF_I2C_GPIO_USE_CALL_BACK_TIME_FN,
 };
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_i2c_master_irq_handler(vsf_i2c_t *i2c_ptr, uint32_t interrupt_mask, uint32_t param);
+static void __vsf_i2c_master_irq_handler(i2c_type_ptr *i2c_ptr, uint32_t interrupt_mask, uint32_t param);
 
-static vsf_err_t __vsf_i2c_master_irq_handler_base(vsf_i2c_t *i2c_ptr, uint32_t interrupt_mask, uint32_t param)
+static vsf_err_t __vsf_i2c_master_irq_handler_base(i2c_type_ptr *i2c_ptr, uint32_t interrupt_mask, uint32_t param)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     i2c_cfg_t *cfg = &i2c_ptr->cfg;
     i2c_ptr->status.use_as__peripheral_status_t.is_busy = false;
     i2c_ptr->irq_mask = 0;
-    __vsf_i2c_master_irq_handler((vsf_i2c_t *)i2c_ptr, interrupt_mask, param);
+    __vsf_i2c_master_irq_handler((i2c_type_ptr *)i2c_ptr, interrupt_mask, param);
     return VSF_ERR_NONE;
 }
 
 static void __i2c_gpio_callback(VSF_I2C_GPIO_USE_CALL_BACK_TIMER *on_timer)
 {
-    vsf_i2c_t *i2c_ptr = container_of(on_timer, vsf_i2c_t, callback_timer);
+    i2c_type_ptr *i2c_ptr = container_of(on_timer, i2c_type_ptr, callback_timer);
 
     if (i2c_ptr->irq_mask & I2C_IRQ_MASK_MASTER_NACK_DETECT) {
         if (i2c_ptr->cmd & I2C_CMD_STOP) {
@@ -226,13 +226,13 @@ static void __i2c_gpio_callback(VSF_I2C_GPIO_USE_CALL_BACK_TIMER *on_timer)
     }
 }
 
-void i2c_gpio_callback(vsf_i2c_t *i2c_ptr)
+void i2c_gpio_callback(i2c_type_ptr *i2c_ptr)
 {
 //    i2c_ptr->i2c_gpio_cmd |= I2C_GPIO_CMD_SCL_FALLING_EDGE;
     __i2c_gpio_callback(&i2c_ptr->callback_timer);
 }
 
-static vsf_err_t __vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
+static vsf_err_t __vsf_i2c_init(i2c_type_ptr *i2c_ptr, i2c_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr->gpio_info.gpio);
     vsf_gpio_config_pin(i2c_ptr->gpio_info.gpio,
@@ -245,17 +245,17 @@ static vsf_err_t __vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
+vsf_err_t i2c_driver_init(i2c_type_ptr *i2c_ptr, i2c_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT((NULL != i2c_ptr) && (NULL != cfg_ptr));
     if (cfg_ptr->clock_hz > VSF_I2C_GPIO_MAX_CLOCK_HZ) {
         return VSF_ERR_INVALID_PARAMETER;
     }
     i2c_ptr->cfg = *cfg_ptr;
-    return __vsf_i2c_init((vsf_i2c_t *)i2c_ptr, cfg_ptr);
+    return __vsf_i2c_init((i2c_type_ptr *)i2c_ptr, cfg_ptr);
 }
 
-void vsf_i2c_fini(vsf_i2c_t *i2c_ptr)
+void i2c_driver_fini(i2c_type_ptr *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     if (i2c_ptr->status.status_bool.is_enabled) {
@@ -264,39 +264,39 @@ void vsf_i2c_fini(vsf_i2c_t *i2c_ptr)
     //todo:
 }
 
-fsm_rt_t vsf_i2c_enable(vsf_i2c_t *i2c_ptr)
+fsm_rt_t i2c_driver_enable(i2c_type_ptr *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     i2c_ptr->status.status_bool.is_enabled = true;
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr)
+fsm_rt_t i2c_driver_disable(i2c_type_ptr *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     i2c_ptr->status.status_bool.is_enabled = false;
     return fsm_rt_cpl;
 }
 
-void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void i2c_driver_irq_enable(i2c_type_ptr *i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     i2c_ptr->enabled_irq_mask = irq_mask;
 }
 
-void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void i2c_driver_irq_disable(i2c_type_ptr *i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     i2c_ptr->enabled_irq_mask &= ~irq_mask;
 }
 
-i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr)
+i2c_type_status i2c_driver_status(i2c_type_ptr *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     return i2c_ptr->status;
 }
 
-vsf_err_t __vsf_i2c_send_cmd(vsf_i2c_t *i2c_ptr, uint16_t data, em_i2c_cmd_t command)
+vsf_err_t __vsf_i2c_send_cmd(i2c_type_ptr *i2c_ptr, uint16_t data, em_i2c_cmd_t command)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     if (!i2c_ptr->status.status_bool.is_enabled) {

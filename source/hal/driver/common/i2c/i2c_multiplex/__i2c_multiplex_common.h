@@ -31,7 +31,7 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __MULTIPLEX_I2C_DEF(__N, __MI2C)                                            \
+#define __MULTIPLEX_I2C_DEF(__N, __MI2C)                                        \
     extern vsf_i2c_multiplex_t __MI2C##__N;
 
 /*============================ INCLUDES ======================================*/
@@ -62,7 +62,7 @@ typedef struct request_info_t{
 vsf_class(vsf_i2c_multiplexer_t) {
     private_member(
         vsf_slist_queue_t           request_slist;
-        vsf_i2c_t                   *i2c_ptr;
+        i2c_type_ptr                *i2c_ptr;
         bool                        is_busy;
     )
 };

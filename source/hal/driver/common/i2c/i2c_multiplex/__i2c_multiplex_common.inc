@@ -48,7 +48,7 @@
                 .next = NULL,                                                   \
             },                                                                  \
         },                                                                      \
-        .i2c_ptr = &vsf_i2c##__N,                                               \
+        .i2c_ptr = &i2c_instance(__N)                                           \
     };
 
 #define __VSF_MULTIPLEX_I2C_DEF(__N, __MI2C)                                    \
@@ -202,13 +202,13 @@ void vsf_i2c_multiplex_irq_disable(vsf_i2c_multiplex_t *i2c_multiplex, em_i2c_ir
     vsf_i2c_irq_disable(i2c_multiplex->multiplexer->i2c_ptr, irq_mask);
 }
 
-i2c_status_t vsf_i2c_multiplex_status(vsf_i2c_multiplex_t *i2c_multiplex)
+i2c_type_status vsf_i2c_multiplex_status(vsf_i2c_multiplex_t *i2c_multiplex)
 {
     VSF_HAL_ASSERT(NULL != i2c_multiplex);
     VSF_HAL_ASSERT(NULL != i2c_multiplex->multiplexer);
 
     if (!i2c_multiplex->status.is_init) {
-        return (i2c_status_t){0};
+        return (i2c_type_status){0};
     }
     return vsf_i2c_status(i2c_multiplex->multiplexer->i2c_ptr);
 }

@@ -180,7 +180,7 @@ extern "C" {
 #endif
 
 #ifndef VSF_HAL_USE_I2C_GPIO
-#   define VSF_HAL_USE_I2C_GPIO         DISABLED
+#   define VSF_HAL_USE_I2C_GPIO         ENABLED
 #endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

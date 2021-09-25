@@ -31,44 +31,45 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_i2c_t vsf_i2c0 = {
+i2c_type_ptr vsf_hw_i2c0 = {
     .REG_PARAM = (AIC_I2CM_TypeDef *)(0x40102000),
     .recall_info = {
         .data_offset = 0,
     },
+    VSF_I2C_LV1_INTERFACE_INIT
 };
 
 void I2CM_IRQHandler(void)
 {
     em_i2c_irq_mask_t irq_mask = 0;
-    for (int i = 0; i < vsf_i2c0.data_length; i++) {
-        vsf_i2c0.data[i] = (vsf_i2c0.REG_PARAM->IR & 0xff);
+    for (int i = 0; i < vsf_hw_i2c0.data_length; i++) {
+        vsf_hw_i2c0.data[i] = (vsf_hw_i2c0.REG_PARAM->IR & 0xff);
     }
-    if (0 != vsf_i2c0.REG_PARAM->LR) {
+    if (0 != vsf_hw_i2c0.REG_PARAM->LR) {
         irq_mask |= I2C_IRQ_MASK_MASTER_ADDRESS_NACK;
     } else {
         irq_mask |= I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
     }
-    vsf_i2c0.REG_PARAM->SR &= ~SR_INT_BIT;
-    vsf_i2c0.REG_PARAM->CR  = 0;
-    vsf_i2c0.REG_PARAM->RR = RR_RST_BIT;
-    if (16 >= vsf_i2c0.recall_info.data_size) {
-        vsf_i2c0.recall_info.data_offset = 0;
-        if (NULL != vsf_i2c0.cfg.isr.handler_fn) {
-            vsf_i2c0.cfg.isr.handler_fn(vsf_i2c0.cfg.isr.target_ptr,
-                                        &vsf_i2c0,
-                                        irq_mask & vsf_i2c0.irq_mask);
+    vsf_hw_i2c0.REG_PARAM->SR &= ~SR_INT_BIT;
+    vsf_hw_i2c0.REG_PARAM->CR  = 0;
+    vsf_hw_i2c0.REG_PARAM->RR = RR_RST_BIT;
+    if (16 >= vsf_hw_i2c0.recall_info.data_size) {
+        vsf_hw_i2c0.recall_info.data_offset = 0;
+        if (NULL != vsf_hw_i2c0.cfg.isr.handler_fn) {
+            vsf_hw_i2c0.cfg.isr.handler_fn(vsf_hw_i2c0.cfg.isr.target_ptr,
+                                        &vsf_hw_i2c0,
+                                        irq_mask & vsf_hw_i2c0.irq_mask);
         }
     } else {
-        vsf_i2c_master_request(&vsf_i2c0,
-                               vsf_i2c0.recall_info.address,
-                               vsf_i2c0.recall_info.cmd,
-                               vsf_i2c0.recall_info.data_size - 16,
-                               vsf_i2c0.data + 16);
+        i2c_driver_master_request(&vsf_hw_i2c0,
+                               vsf_hw_i2c0.recall_info.address,
+                               vsf_hw_i2c0.recall_info.cmd,
+                               vsf_hw_i2c0.recall_info.data_size - 16,
+                               vsf_hw_i2c0.data + 16);
     }
 }
 
-static vsf_err_t __vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
+static vsf_err_t __vsf_i2c_init(i2c_type_ptr *i2c_ptr, i2c_cfg_t *cfg_ptr)
 {
     uint32_t pclk, div, div0, div1;
 
@@ -87,34 +88,34 @@ static vsf_err_t __vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
+vsf_err_t i2c_driver_init(i2c_type_ptr *i2c_ptr, i2c_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT((NULL != i2c_ptr) && (NULL != cfg_ptr));
     i2c_ptr->cfg = *cfg_ptr;
     return __vsf_i2c_init(i2c_ptr, cfg_ptr);
 }
 
-void vsf_i2c_fini(vsf_i2c_t *i2c_ptr)
+void i2c_driver_fini(i2c_type_ptr *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     cpusysctrl_pclkmd_set(CSC_PCLKME_I2CM_EN_BIT);
 }
 
-fsm_rt_t vsf_i2c_enable(vsf_i2c_t *i2c_ptr)
+fsm_rt_t i2c_driver_enable(i2c_type_ptr *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     i2c_ptr->status.status_bool.is_enabled = true;
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr)
+fsm_rt_t i2c_driver_disable(i2c_type_ptr *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     i2c_ptr->status.status_bool.is_enabled = false;
     return fsm_rt_cpl;
 }
 
-void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void i2c_driver_irq_enable(i2c_type_ptr *i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     if (irq_mask & I2C_IRQ_MASK_MASTER_ALL) {
@@ -124,7 +125,7 @@ void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
     }
 }
 
-void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void i2c_driver_irq_disable(i2c_type_ptr *i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     i2c_ptr->irq_mask &= ~(irq_mask & I2C_IRQ_MASK_MASTER_ALL);
@@ -134,13 +135,13 @@ void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
     }
 }
 
-i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr)
+i2c_type_status i2c_driver_status(i2c_type_ptr *i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     return i2c_ptr->status;
 }
 
-vsf_err_t vsf_i2c_master_request(   vsf_i2c_t *i2c_ptr,
+vsf_err_t i2c_driver_master_request(i2c_type_ptr *i2c_ptr,
                                     uint16_t address,
                                     em_i2c_cmd_t cmd,
                                     uint16_t count,
@@ -195,6 +196,10 @@ vsf_err_t vsf_i2c_master_request(   vsf_i2c_t *i2c_ptr,
                                 |   (cmd & I2C_ALL_CMD);
     return VSF_ERR_NONE;
 }
+
+//todo:I'm not sure where to put it
+VSF_I2C_INTTERFACE_BODY
+
 #if VSF_HAL_I2C_IMP_MULTIPLEX_I2C == ENABLED
 #   include "hal/driver/common/i2c/i2c_multiplex/__i2c_multiplex_common.inc"
 #endif
