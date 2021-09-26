@@ -106,6 +106,11 @@ vsf_err_t vk_netdrv_fini(vk_netdrv_t *netdrv)
     return netdrv->netlink.op->fini(netdrv);
 }
 
+void * vk_netdrv_get_netif(vk_netdrv_t *netdrv)
+{
+    return netdrv->adapter.netif;
+}
+
 uint8_t * vk_netdrv_header(vk_netdrv_t *netdrv, void *netbuf, int32_t len)
 {
     VSF_TCPIP_ASSERT((netdrv != NULL) && (netdrv->adapter.op != NULL) && (netbuf != NULL));

@@ -83,11 +83,13 @@ void vsf_pnp_on_netdrv_connect(vk_netdrv_t *netdrv)
 
 void vsf_pnp_on_netdrv_connected(vk_netdrv_t *netdrv)
 {
-    LOCK_TCPIP_CORE();
-    dhcp_set_struct(netif_default, &__usrapp_lwip.netif_dhcp);
-    netif_set_up(netif_default);
+    struct netif *netif = vk_netdrv_get_netif(netdrv);
 
-    dhcp_start(netif_default);
+    LOCK_TCPIP_CORE();
+    dhcp_set_struct(netif, &__usrapp_lwip.netif_dhcp);
+    netif_set_up(netif);
+
+    dhcp_start(netif);
     UNLOCK_TCPIP_CORE();
     vsf_trace(VSF_TRACE_INFO, "dhcpc: start" VSF_TRACE_CFG_LINEEND);
 }

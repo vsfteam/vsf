@@ -135,6 +135,7 @@ void vsf_pnp_on_netdrv_disconnect(vk_netdrv_t *netdrv);
 extern vsf_err_t vk_netdrv_connect(vk_netdrv_t *netdrv);
 extern void vk_netdrv_disconnect(vk_netdrv_t *netdrv);
 extern void vk_netdrv_set_netlink_op(vk_netdrv_t *netdrv, const vk_netlink_op_t *netlink_op, void *param);
+extern void * vk_netdrv_get_netif(vk_netdrv_t *netdrv);
 
 #if defined(__VSF_NETDRV_CLASS_IMPLEMENT) || defined(__VSF_NETDRV_CLASS_INHERIT_NETLINK__)
 extern uint8_t * vk_netdrv_header(vk_netdrv_t *netdrv, void *netbuf, int32_t len);
