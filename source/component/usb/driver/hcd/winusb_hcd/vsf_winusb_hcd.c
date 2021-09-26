@@ -120,10 +120,9 @@ typedef struct vk_winusb_hcd_urb_t {
         VSF_WINUSB_HCD_URB_STATE_IDLE,
         VSF_WINUSB_HCD_URB_STATE_QUEUED,
         VSF_WINUSB_HCD_URB_STATE_SUBMITTING,
-        VSF_WINUSB_HCD_URB_STATE_WAIT_TO_FREE,
-        VSF_WINUSB_HCD_URB_STATE_TO_FREE,
     } state;
 
+    bool is_to_free;
     bool is_irq_enabled;
     bool is_msg_processed;
 
@@ -525,7 +524,7 @@ static void __vk_winusb_hcd_urb_thread(void *arg)
             Sleep(1);
         }
 
-        is_to_free = VSF_WINUSB_HCD_URB_STATE_TO_FREE == winusb_urb->state;
+        is_to_free = winusb_urb->is_to_free;
         if (!is_to_free) {
             actual_length = __vk_winusb_hcd_submit_urb_do(urb);
             if (actual_length < 0) {
@@ -624,7 +623,7 @@ static bool __vk_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
     vk_winusb_hcd_urb_t *winusb_urb = (vk_winusb_hcd_urb_t *)urb->priv;
     if (winusb_urb->is_irq_enabled) {
-        VSF_USB_ASSERT(VSF_WINUSB_HCD_URB_STATE_TO_FREE == winusb_urb->state);
+        VSF_USB_ASSERT(winusb_urb->is_to_free);
         __vsf_arch_irq_request_send(&winusb_urb->irq_request);
         return false;
     } else {
@@ -659,7 +658,7 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (winusb_urb != NULL) {
                 vk_usbh_hcd_urb_t *urb = container_of(winusb_urb, vk_usbh_hcd_urb_t, priv);
 
-                if (VSF_WINUSB_HCD_URB_STATE_TO_FREE == winusb_urb->state) {
+                if (winusb_urb->is_to_free) {
                     __vk_winusb_hcd_free_urb_do(urb);
                 } else {
                     vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
@@ -734,19 +733,25 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     if (NULL == winusb_dev) { break; }
                     vk_winusb_hcd_urb_t *winusb_urb_head;
 
-                    if (VSF_WINUSB_HCD_DEV_STATE_ATTACHED == winusb_dev->state) {
-                        vsf_dlist_remove_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
-                        VSF_USB_ASSERT(winusb_urb_head == winusb_urb);
-                        vsf_dlist_peek_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
-                        if (winusb_urb_head != NULL) {
-                            winusb_urb_head->state = VSF_WINUSB_HCD_URB_STATE_SUBMITTING;
-                            __vsf_arch_irq_request_send(&winusb_urb_head->irq_request);
+                    if (VSF_WINUSB_HCD_URB_STATE_QUEUED == winusb_urb->state) {
+                        if (vsf_dlist_is_in(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb)) {
+                            vsf_dlist_remove_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
+                            vsf_dlist_peek_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
+                            if (winusb_urb_head != NULL) {
+                                winusb_urb_head->state = VSF_WINUSB_HCD_URB_STATE_SUBMITTING;
+                                __vsf_arch_irq_request_send(&winusb_urb_head->irq_request);
+                            }
                         }
                     }
                 }
             } while (0);
 
-            if (VSF_WINUSB_HCD_URB_STATE_TO_FREE == winusb_urb->state) {
+            if (winusb_urb->is_to_free) {
+                vsf_protect_t orig = vsf_protect_sched();
+                    if (vsf_dlist_is_in(vk_winusb_hcd_urb_t, urb_pending_node, &__vk_winusb_hcd.urb_list, winusb_urb)) {
+                        vsf_dlist_remove(vk_winusb_hcd_urb_t, urb_pending_node, &__vk_winusb_hcd.urb_list, winusb_urb);
+                    }
+                vsf_unprotect_sched(orig);
                 if (!__vk_winusb_hcd_free_urb_do(urb)) {
                     winusb_urb->is_msg_processed = true;
                 }
@@ -860,15 +865,12 @@ static vk_usbh_hcd_urb_t * __vk_winusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 static void __vk_winusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     vk_winusb_hcd_urb_t *winusb_urb = (vk_winusb_hcd_urb_t *)urb->priv;
-    if (VSF_WINUSB_HCD_URB_STATE_TO_FREE != winusb_urb->state) {
-        vsf_protect_t orig = vsf_protect_int();
-            winusb_urb->state = VSF_WINUSB_HCD_URB_STATE_TO_FREE;
+    if (!winusb_urb->is_to_free) {
+        winusb_urb->is_to_free = true;
         if (winusb_urb->is_irq_enabled) {
-            vsf_unprotect_int(orig);
             __vsf_arch_irq_request_send(&winusb_urb->irq_request);
             return;
         }
-        vsf_unprotect_int(orig);
     }
 }
 

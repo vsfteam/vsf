@@ -392,6 +392,7 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         // fall through
     case VSF_EVT_SYNC:
         if (NULL == vk_usbh_urb_alloc_buffer(urb, VSF_USBH_ECM_MAC_STRING_SIZE)) {
+            err = VSF_ERR_FAIL;
             break;
         }
 
@@ -399,12 +400,14 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_MESSAGE:
         if (vk_usbh_urb_get_status(urb) != URB_OK) {
+            err = VSF_ERR_FAIL;
             break;
         }
 
         switch (ecm->init_state) {
         case VSF_USBH_ECM_INIT_WAIT_MAC:
             if (vk_usbh_urb_get_actual_length(urb) != VSF_USBH_ECM_MAC_STRING_SIZE) {
+                err = VSF_ERR_FAIL;
                 break;
             }
 
