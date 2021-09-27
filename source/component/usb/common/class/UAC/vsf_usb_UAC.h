@@ -43,6 +43,10 @@ typedef enum usb_uac_req_t {
     USB_UAC_REQ_MEM             = 5,
     USB_UAC_REQ_SET             = 0,
     USB_UAC_REQ_GET             = 0x80,
+    
+    USB_UAC2_REQ_CUR            = 1,
+    USB_UAC2_REQ_RANGE          = 2,
+    USB_UAC2_REQ_MEM            = 3,
 } usb_uac_req_t;
 
 typedef enum usb_uac_terminal_types_t {

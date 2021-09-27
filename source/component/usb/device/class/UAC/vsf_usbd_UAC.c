@@ -63,34 +63,69 @@ const vk_usbd_class_op_t vk_usbd_uac_stream_class = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
-static char * __vk_usbd_uac_trace_get_request(uint_fast8_t request)
+static bool __vk_usbd_uac_is_get(vk_usbd_uac_ac_t *uac_ac, vk_usbd_ctrl_handler_t *ctrl_handler)
 {
-    switch (request) {
-    case USB_UAC_REQ_CUR:   return "CUR";
-    case USB_UAC_REQ_MIN:   return "MIN";
-    case USB_UAC_REQ_MAX:   return "MAX";
-    case USB_UAC_REQ_RES:   return "RES";
-    default:                return "UNKNOWN";
+    struct usb_ctrlrequest_t *request = &ctrl_handler->request;
+#if VSF_USBD_UAC_CFG_UAC1_EN == ENABLED
+    if (uac_ac->version == VK_USB_UAC1) {
+        return request->bRequest & USB_UAC_REQ_GET;
+    } else 
+#endif
+#if VSF_USBD_UAC_CFG_UAC2_EN == ENABLED
+    if (uac_ac->version == VK_USB_UAC2) {
+        return (request->bRequestType & USB_DIR_MASK) == USB_DIR_IN;
+    } 
+#endif    
+    else {
+        VSF_USB_ASSERT(0);
+        return false;
     }
 }
 
-static void __vk_usbd_uac_trace_request_prepare(vk_usbd_ctrl_handler_t *ctrl_handler)
+#if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
+static char * __vk_usbd_uac_trace_get_request(vk_usbd_uac_ac_t *uac_ac, uint_fast8_t request)
+{
+#if VSF_USBD_UAC_CFG_UAC1_EN == ENABLED
+    if (uac_ac->version == VK_USB_UAC1) {
+        switch (request & ~USB_UAC_REQ_GET) {
+        case USB_UAC_REQ_CUR:   return "CUR";
+        case USB_UAC_REQ_MIN:   return "MIN";
+        case USB_UAC_REQ_MAX:   return "MAX";
+        case USB_UAC_REQ_RES:   return "RES";
+        }
+    } else 
+#endif
+#if VSF_USBD_UAC_CFG_UAC2_EN == ENABLED
+    if (uac_ac->version == VK_USB_UAC2) {
+        switch (request) {
+        case USB_UAC2_REQ_CUR:      return "CUR";
+        case USB_UAC2_REQ_RANGE:    return "RANGE";
+        case USB_UAC2_REQ_MEM:      return "MEM";
+        }
+    } 
+#endif
+    else {
+        VSF_USB_ASSERT(0);
+    }
+
+    return "UNKNOWN";
+}
+
+static void __vk_usbd_uac_trace_request_prepare(vk_usbd_uac_ac_t *uac_ac, vk_usbd_ctrl_handler_t *ctrl_handler)
 {
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
-    uint_fast8_t req = request->bRequest;
     uint_fast8_t ifs_ep = (request->wIndex >> 0) & 0xFF;
     uint_fast8_t entity = (request->wIndex >> 8) & 0xFF;
     uint_fast8_t cs = (request->wValue >> 8) & 0xFF;
     uint_fast8_t channel = (request->wValue >> 0) & 0xFF;
-    bool is_get = req & USB_UAC_REQ_GET;
+	bool is_get = __vk_usbd_uac_is_get(uac_ac, ctrl_handler);
 
     if (    (USB_RECIP_INTERFACE == (request->bRequestType & USB_RECIP_MASK))
         &&  (USB_TYPE_CLASS == (request->bRequestType & USB_TYPE_MASK))) {
 
         vsf_trace_debug("uac: %s%s ifs/ep=%d, entity=%d, cs=%d, channel=%d" VSF_TRACE_CFG_LINEEND,
                     is_get ? "GET_" : "SET_",
-                    __vk_usbd_uac_trace_get_request(req & ~USB_UAC_REQ_GET),
+                    __vk_usbd_uac_trace_get_request(uac_ac, request->bRequest),
                     ifs_ep, entity, cs, channel);
         if (is_get) {
             vsf_trace_buffer(VSF_TRACE_NONE, ctrl_handler->trans.buffer,
@@ -99,11 +134,10 @@ static void __vk_usbd_uac_trace_request_prepare(vk_usbd_ctrl_handler_t *ctrl_han
     }
 }
 
-static void __vk_usbd_uac_trace_request_process(vk_usbd_ctrl_handler_t *ctrl_handler)
+static void __vk_usbd_uac_trace_request_process(vk_usbd_uac_ac_t *uac_ac, vk_usbd_ctrl_handler_t *ctrl_handler)
 {
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
-    uint_fast8_t req = request->bRequest;
-    bool is_get = req & USB_UAC_REQ_GET;
+    bool is_get = __vk_usbd_uac_is_get(uac_ac, ctrl_handler);
 
     if (    (USB_RECIP_INTERFACE == (request->bRequestType & USB_RECIP_MASK))
         &&  (USB_TYPE_CLASS == (request->bRequestType & USB_TYPE_MASK))) {
@@ -152,16 +186,32 @@ static vk_usbd_uac_control_t *__vk_usbd_uac_get_control(vk_usbd_uac_ac_t *uac_ac
     return NULL;
 }
 
-static vk_av_control_value_t *__vk_usbd_uac_get_value(
+static vk_av_control_value_t *__vk_usbd_uac_get_value(vk_usbd_uac_ac_t *uac_ac,
         vk_usbd_uac_control_t *control, uint_fast8_t request)
 {
     vk_av_control_value_t *value = NULL;
     request = request & ~USB_UAC_REQ_GET;
-    switch (request) {
-    case USB_UAC_REQ_CUR:   value = &control->cur; break;
-    case USB_UAC_REQ_MIN:   value = (vk_av_control_value_t *)&control->info->min; break;
-    case USB_UAC_REQ_MAX:   value = (vk_av_control_value_t *)&control->info->max; break;
-    case USB_UAC_REQ_RES:   value = (vk_av_control_value_t *)&control->info->res; break;
+#if VSF_USBD_UAC_CFG_UAC1_EN == ENABLED
+    if (uac_ac->version == VK_USB_UAC1) {
+        switch (request) {
+        case USB_UAC_REQ_CUR:   value = &control->cur; break;
+        case USB_UAC_REQ_MIN:   value = (vk_av_control_value_t *)&control->info->min; break;
+        case USB_UAC_REQ_MAX:   value = (vk_av_control_value_t *)&control->info->max; break;
+        case USB_UAC_REQ_RES:   value = (vk_av_control_value_t *)&control->info->res; break;
+        }
+    } else
+#endif
+#if VSF_USBD_UAC_CFG_UAC2_EN == ENABLED
+    if (uac_ac->version == VK_USB_UAC2) {
+        switch (request) {
+        case USB_UAC2_REQ_CUR:   value = &control->cur; break;
+        case USB_UAC2_REQ_RANGE: value = (vk_av_control_value_t *)&control->info->res; break;
+        case USB_UAC2_REQ_MEM:   VSF_USB_ASSERT(0); break;  // TODO: support req memory
+        }
+    } 
+#endif
+    else {
+        VSF_USB_ASSERT(0);
     }
     return value;
 }
@@ -171,7 +221,6 @@ static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
     vk_usbd_uac_ac_t *uac_ac = ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
-    const vk_usbd_uac_control_info_t *cinfo;
     vk_usbd_uac_control_t *control;
     vk_av_control_value_t *value;
     uint8_t *buffer = NULL;
@@ -189,26 +238,57 @@ static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
                 control = __vk_usbd_uac_get_control(uac_ac, entity, cs, channel);
                 if (!control) { return VSF_ERR_FAIL; }
 
-                cinfo = control->info;
-                size = cinfo->size;
-                value = __vk_usbd_uac_get_value(control, request->bRequest);
+#if VSF_USBD_UAC_CFG_UAC1_EN == ENABLED
+                if (uac_ac->version == VK_USB_UAC1) {
+                    size = control->info->size;
+                    value = __vk_usbd_uac_get_value(uac_ac, control, request->bRequest);
+                    buffer = size > sizeof(*value) ? value->buffer : (uint8_t *)value;
+                    // TODO: code below only support little-endian
 
-                buffer = size > sizeof(*value) ? value->buffer : (uint8_t *)value;
-                // TODO: code below only support little-endian
-                if (request->bRequest & USB_UAC_REQ_GET) {
-                    VSF_USB_ASSERT(value != NULL);
-                } else {
-                    if (request->bRequest != (USB_UAC_REQ_SET | USB_UAC_REQ_CUR)) {
-                        return VSF_ERR_FAIL;
-                    }
+                    if (request->bRequest & USB_UAC_REQ_GET) {
+                        VSF_USB_ASSERT(value != NULL);
+                    } else {
+                        if (request->bRequest != (USB_UAC_REQ_SET | USB_UAC_REQ_CUR)) {
+                            return VSF_ERR_FAIL;
+                        }
 
 #if VSF_USBD_UAC_WORKAROUND_CONTROL_OVERFLOW == ENABLED
-                    if (request->wLength > size) {
-                        VSF_USB_ASSERT(request->wLength <= sizeof(uac_ac->control_value));
-                        size = request->wLength;
-                        buffer = (uint8_t *)&uac_ac->control_value;
-                    }
+                        if (request->wLength > size) {
+                            VSF_USB_ASSERT(request->wLength <= sizeof(uac_ac->control_value));
+                            size = request->wLength;
+                            buffer = (uint8_t *)&uac_ac->control_value;
+                        }
 #endif
+                    }
+                } else 
+#endif
+#if VSF_USBD_UAC_CFG_UAC2_EN == ENABLED
+                if (uac_ac->version == VK_USB_UAC2) {
+                    const vk_usbd_uac2_control_info_t *info2 = control->info2;
+                    const vk_usbd_uac2_range_t * range = info2->range;
+                    VSF_USB_ASSERT(range != NULL);
+                    size = info2->size;
+                    
+                    switch (request->bRequest) {
+                    case USB_UAC2_REQ_CUR:
+                        buffer = (uint8_t *)&control->cur;
+                        break;
+                    case USB_UAC2_REQ_RANGE:
+                        // Audio20 final.pdf 5.2.3 Offset 0: wNumSubRanges
+                        buffer = (uint8_t *)&range->number;     
+                        // 3: MIN(n), MAX(n), RES(n)
+                        size = sizeof(info2->range->number) + size * info2->range->number * 3; 
+                        break;
+                    case USB_UAC2_REQ_MEM:	//TODO: support request memory
+                    default:
+                        VSF_USB_ASSERT(0);
+                        return VSF_ERR_FAIL;
+                    }
+                } 
+#endif
+                else {
+                    VSF_USB_ASSERT(0);
+                    return VSF_ERR_FAIL;
                 }
             }
             break;
@@ -219,7 +299,7 @@ static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
     ctrl_handler->trans.size = size;
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
     uac_ac->cur_size = size;
-    __vk_usbd_uac_trace_request_prepare(ctrl_handler);
+    __vk_usbd_uac_trace_request_prepare(uac_ac, ctrl_handler);
 #endif
     return VSF_ERR_NONE;
 }
@@ -233,7 +313,7 @@ static vsf_err_t __vk_usbd_uac_ac_request_process(vk_usbd_dev_t *dev, vk_usbd_if
 
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
     ctrl_handler->trans.size = uac_ac->cur_size;
-    __vk_usbd_uac_trace_request_process(ctrl_handler);
+    __vk_usbd_uac_trace_request_process(uac_ac, ctrl_handler);
 #endif
     switch (request->bRequestType & USB_RECIP_MASK) {
     case USB_RECIP_INTERFACE:
@@ -247,18 +327,30 @@ static vsf_err_t __vk_usbd_uac_ac_request_process(vk_usbd_dev_t *dev, vk_usbd_if
                 control = __vk_usbd_uac_get_control(uac_ac, entity, cs, channel);
                 if (!control) { return VSF_ERR_FAIL; }
 
-                if (request->bRequest == (USB_UAC_REQ_SET | USB_UAC_REQ_CUR)) {
-#if VSF_USBD_UAC_WORKAROUND_CONTROL_OVERFLOW == ENABLED
-                    vk_av_control_value_t *value = __vk_usbd_uac_get_value(control, request->bRequest);
-                    uint_fast32_t size = control->info->size;
-                    if (request->wLength > size) {
-                        uint8_t *cbuffer = size > sizeof(*value) ? value->buffer : (uint8_t *)value;
-                        memcpy(cbuffer, &uac_ac->control_value, size);
+                if (uac_ac->version == VK_USB_UAC1) {
+                    if (request->bRequest == (USB_UAC_REQ_SET | USB_UAC_REQ_CUR)) {
+    #if VSF_USBD_UAC_WORKAROUND_CONTROL_OVERFLOW == ENABLED
+                        vk_av_control_value_t *value = __vk_usbd_uac_get_value(uac_ac, control, request->bRequest);
+                        uint_fast32_t size = control->info->size;
+                        if (request->wLength > size) {
+                            uint8_t *cbuffer = size > sizeof(*value) ? value->buffer : (uint8_t *)value;
+                            memcpy(cbuffer, &uac_ac->control_value, size);
+                        }
+    #endif
+                        if (control->info->on_set != NULL) {
+                            control->info->on_set(control);
+                        }
                     }
-#endif
-                    if (control->info->on_set != NULL) {
-                        control->info->on_set(control);
+                } else if (uac_ac->version == VK_USB_UAC2) {
+                    if (   __vk_usbd_uac_is_get(uac_ac, ctrl_handler)
+                        && (request->bRequest == USB_UAC2_REQ_CUR)) {
+                        if (control->info2->on_set != NULL) {
+                            control->info2->on_set(control);
+                        }
                     }
+                } else {
+                    VSF_USB_ASSERT(0);
+                    return VSF_ERR_FAIL;
                 }
                 break;
             }
@@ -274,6 +366,24 @@ static vsf_err_t __vk_usbd_uac_ac_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *
 
     uac_ac->ifs = ifs;
     uac_ac->dev = dev;
+
+#if (VSF_USBD_UAC_CFG_UAC1_EN == ENABLED) && (VSF_USBD_UAC_CFG_UAC2_EN == ENABLED)
+    vk_usbd_desc_t *desc = vk_usbd_get_descriptor(dev->desc, dev->num_of_desc, USB_DT_DEVICE, 0, 0);
+    VSF_USB_ASSERT(desc != NULL);
+    struct usb_device_desc_t *desc_dev = (struct usb_device_desc_t *)desc->buffer;
+    if (        (desc_dev->bDeviceClass    == 0xEF)
+             && (desc_dev->bDeviceSubClass == 0x02)
+             && (desc_dev->bDeviceProtocol == 0x01)) {      // Audio20 final.pdf 4.2 Device Descriptor
+        uac_ac->version = VK_USB_UAC2;
+    } else if ( (desc_dev->bDeviceClass    == 0x00)
+             && (desc_dev->bDeviceSubClass == 0x00)
+             && (desc_dev->bDeviceProtocol == 0x00)) {      // audio10.pdf 4.1 Device Descriptor
+        uac_ac->version = VK_USB_UAC1;
+    } else {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+#endif
+
     return VSF_ERR_NONE;
 }
 
@@ -395,7 +505,7 @@ static vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
     ctrl_handler->trans.size = size;
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
     uac_as->cur_size = size;
-    __vk_usbd_uac_trace_request_prepare(ctrl_handler);
+    __vk_usbd_uac_trace_request_prepare(uac_as->uac_ac, ctrl_handler);
 #endif
     return VSF_ERR_NONE;
 }
@@ -408,7 +518,7 @@ static vsf_err_t __vk_usbd_uac_as_request_process(vk_usbd_dev_t *dev, vk_usbd_if
 
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
     ctrl_handler->trans.size = uac_as->cur_size;
-    __vk_usbd_uac_trace_request_process(ctrl_handler);
+    __vk_usbd_uac_trace_request_process(uac_as->uac_ac, ctrl_handler);
 #endif
     switch (request->bRequestType & USB_RECIP_MASK) {
     case USB_RECIP_INTERFACE:
