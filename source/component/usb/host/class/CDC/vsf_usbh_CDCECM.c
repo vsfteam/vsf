@@ -210,21 +210,27 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *netbuf)
     vk_usbh_ecm_t *ecm = container_of(netdrv, vk_usbh_ecm_t, netdrv);
     vk_usbh_ecm_ocb_t *ocb = __vk_usbh_ecm_get_idle_ocb(ecm);
     vsf_err_t err = VSF_ERR_FAIL;
+#if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
+    uint_fast16_t pos = 0;
+#endif
     vsf_mem_t mem;
 
     VSF_USB_ASSERT(ocb != NULL);
     ocb->netbuf = netbuf;
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
-    if ((netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem)) != NULL) {
-        uint_fast16_t pos = 0;
-        do {
-            VSF_USB_ASSERT((mem.size + pos) <= sizeof(ocb->buffer));
-            memcpy(&ocb->buffer[pos], mem.buffer, mem.size);
-            pos += mem.size;
-        } while ((netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem)) != NULL);
-        mem.buffer = ocb->buffer;
-        mem.size = pos;
+    netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem);
+    while (true) {
+        VSF_USB_ASSERT((mem.size + pos) <= sizeof(ocb->buffer));
+        memcpy(&ocb->buffer[pos], mem.buffer, mem.size);
+        pos += mem.size;
+
+        if (NULL == netbuf) {
+            break;
+        }
+        netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem);
     }
+    mem.buffer = ocb->buffer;
+    mem.size = pos;
 #else
     if (vk_netdrv_read_buf(netdrv, netbuf, &mem) != NULL) {
         VSF_USB_ASSERT(false);
