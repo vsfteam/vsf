@@ -99,6 +99,10 @@ typedef struct vk_dwcotg_hcd_urb_t {
     uint16_t is_split       : 1;
 
     uint16_t current_size;
+
+#ifdef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
+    uint32_t buffer[VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE / sizeof(uint32_t)];
+#endif
 } vk_dwcotg_hcd_urb_t;
 
 typedef struct vk_dwcotg_hcd_t {
@@ -302,8 +306,18 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
     channel_regs->hcsplt = hcsplt;
 
     if (dwcotg_hcd->dma_en) {
+#ifndef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
         VSF_USB_ASSERT(!((uintptr_t)buffer & 0x03));
         channel_regs->hcdma = (uint32_t)buffer;
+#else
+        if ((uintptr_t)buffer & 0x03) {
+            VSF_USB_ASSERT(size <= sizeof(dwcotg_urb->buffer));
+            memcpy(&dwcotg_urb->buffer, buffer, size);
+            channel_regs->hcdma = (uint32_t)dwcotg_urb->buffer;
+        } else {
+            channel_regs->hcdma = (uint32_t)buffer;
+        }
+#endif
     }
 
     channel_regs->hcchar |= ((dwcotg_hcd->reg.host.global_regs->hfnum & 1) ^ 1) << 29;
