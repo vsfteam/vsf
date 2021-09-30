@@ -212,6 +212,7 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *netbuf)
     vsf_err_t err = VSF_ERR_FAIL;
     vsf_mem_t mem;
 
+    VSF_USB_ASSERT(ocb != NULL);
     ocb->netbuf = netbuf;
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
     if ((netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem)) != NULL) {
@@ -344,6 +345,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
     case VSF_USBH_CDC_ON_TX: {
             int_fast32_t size;
             vk_usbh_ecm_ocb_t *ocb = __vk_usbh_ecm_get_ocb(ecm, (vk_usbh_urb_t *)param);
+            void *netbuf;
 
             if (URB_OK != vk_usbh_urb_get_status(&ocb->urb)) {
                 size = -1;
@@ -351,8 +353,9 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
                 size = vk_usbh_urb_get_actual_length(&ocb->urb);
             }
 
-            vk_netdrv_on_outputted(&ecm->netdrv, ocb->netbuf, size);
+            netbuf = ocb->netbuf;
             ocb->netbuf = NULL;
+            vk_netdrv_on_outputted(&ecm->netdrv, netbuf, size);
         }
         break;
     }
