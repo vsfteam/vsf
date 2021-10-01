@@ -76,7 +76,7 @@ static usrapp_lwip_t __usrapp_lwip;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_pnp_on_netdrv_connect(vk_netdrv_t *netdrv)
+void vsf_pnp_on_netdrv_prepare(vk_netdrv_t *netdrv)
 {
     lwip_netif_set_netdrv(&__usrapp_lwip.netif, netdrv);
 }
