@@ -139,7 +139,7 @@ void vk_netdrv_prepare(vk_netdrv_t *netdrv)
 {
     VSF_TCPIP_ASSERT(!netdrv->is_connected);
     vsf_pnp_on_netdrv_prepare(netdrv);
-    VSF_TCPIP_ASSERT(&& netdrv->adapter.op != NULL);
+    VSF_TCPIP_ASSERT(netdrv->adapter.op != NULL);
 }
 
 vsf_err_t vk_netdrv_connect(vk_netdrv_t *netdrv)
