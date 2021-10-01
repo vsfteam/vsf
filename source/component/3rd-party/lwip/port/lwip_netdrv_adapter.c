@@ -57,6 +57,9 @@ static uint8_t * __lwip_netdrv_adapter_header(void *netbuf, int32_t len);
 static void __lwip_netdrv_adapter_on_outputted(void *netif, void *netbuf, vsf_err_t err);
 static void __lwip_netdrv_adapter_on_inputted(void *netif, void *netbuf, uint_fast32_t size);
 
+static vk_netdrv_feature_t __lwip_netdrv_adapter_feature(void);
+static void * __lwip_netdrv_adapter_thread(void (*entry)(void *param), void *param);
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vk_netdrv_adapter_op_t __lwip_netdrv_adapter_op = {
@@ -70,6 +73,9 @@ static const vk_netdrv_adapter_op_t __lwip_netdrv_adapter_op = {
     .header         = __lwip_netdrv_adapter_header,
     .on_outputted   = __lwip_netdrv_adapter_on_outputted,
     .on_inputted    = __lwip_netdrv_adapter_on_inputted,
+
+    .feature        = __lwip_netdrv_adapter_feature,
+    .thread         = __lwip_netdrv_adapter_thread,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -153,6 +159,7 @@ err_t ethernetif_init(struct netif *netif)
 // adapter
 static vsf_err_t __lwip_netdrv_adapter_on_connect(void *netif)
 {
+    VSF_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     struct netif *lwip_netif = netif;
     ip_addr_t ipaddr = { 0 }, netmask = { 0 }, gateway = { 0 };
 
@@ -180,6 +187,7 @@ static vsf_err_t __lwip_netdrv_adapter_on_connect(void *netif)
 
 static void __lwip_netdrv_adapter_on_disconnect(void *netif)
 {
+    VSF_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     LOCK_TCPIP_CORE();
         // TODO: make sure netif_remove does not depend on thread environment
         netif_remove((struct netif *)netif);
@@ -188,6 +196,7 @@ static void __lwip_netdrv_adapter_on_disconnect(void *netif)
 
 static void __lwip_netdrv_adapter_on_outputted(void *netif, void *netbuf, vsf_err_t err)
 {
+    VSF_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     struct netif *lwip_netif = netif;
     vk_netdrv_t *netdrv = lwip_netif->state;
 
@@ -207,6 +216,7 @@ static void __lwip_netdrv_adapter_on_outputted(void *netif, void *netbuf, vsf_er
 
 static void __lwip_netdrv_adapter_on_inputted(void *netif, void *netbuf, uint_fast32_t size)
 {
+    VSF_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     struct netif *lwip_netif = netif;
     struct pbuf *pbuf = netbuf;
     struct eth_hdr *ethhdr;
@@ -225,7 +235,7 @@ static void __lwip_netdrv_adapter_on_inputted(void *netif, void *netbuf, uint_fa
     case ETHTYPE_PPPOE:
 #endif /* PPPOE_SUPPORT */
     /* full packet send to tcpip_thread to process */
-    if (lwip_netif->input(pbuf, lwip_netif)!=ERR_OK) {
+    if (lwip_netif->input(pbuf, lwip_netif) != ERR_OK) {
         LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
         pbuf_free(pbuf);
         pbuf = NULL;
@@ -249,6 +259,7 @@ static uint8_t * __lwip_netdrv_adapter_header(void *netbuf, int32_t len)
 
 static void * __lwip_netdrv_adapter_alloc_buf(void *netif, uint_fast32_t size)
 {
+    VSF_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     void *netbuf;
 
 #if ETH_PAD_SIZE
@@ -275,7 +286,18 @@ static void * __lwip_netdrv_adapter_read_buf(void *netbuf, vsf_mem_t *mem)
 
 static void __lwip_netdrv_adapter_free_buf(void *netbuf)
 {
+    VSF_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     pbuf_free((struct pbuf *)netbuf);
+}
+
+static vk_netdrv_feature_t __lwip_netdrv_adapter_feature(void)
+{
+    return VSF_NETDRV_FEATURE_THREAD;
+}
+
+static void * __lwip_netdrv_adapter_thread(void (*entry)(void *param), void *param)
+{
+    return sys_thread_new("netdrv_thread", entry, param, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
 }
 
 void lwip_netif_set_netdrv(struct netif *netif, vk_netdrv_t *netdrv)

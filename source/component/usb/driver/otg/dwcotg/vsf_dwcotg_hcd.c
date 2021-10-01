@@ -736,10 +736,15 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
             bool is_stall = channel_intsts & USB_OTG_HCINT_STALL;
 
-            bool is_in = channel_regs->hcchar & USB_OTG_HCCHAR_EPDIR;
-            if (is_in && (VSF_DWCOTG_HCD_PHASE_DATA == dwcotg_urb->phase)) {
-                dwcotg_urb->current_size -= channel_regs->hctsiz & USB_OTG_HCTSIZ_XFRSIZ;
-                urb->actual_length += dwcotg_urb->current_size;
+            if (VSF_DWCOTG_HCD_PHASE_DATA == dwcotg_urb->phase) {
+                bool is_in = channel_regs->hcchar & USB_OTG_HCCHAR_EPDIR;
+
+                if (is_in) {
+                    dwcotg_urb->current_size -= channel_regs->hctsiz & USB_OTG_HCTSIZ_XFRSIZ;
+                    urb->actual_length += dwcotg_urb->current_size;
+                } else {
+                    urb->actual_length += dwcotg_urb->current_size;
+                }
             }
 
             if (    !is_stall && is_split

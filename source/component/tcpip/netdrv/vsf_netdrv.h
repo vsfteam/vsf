@@ -46,6 +46,10 @@ vsf_dcl_class(vk_netdrv_t)
 vsf_dcl_class(vk_netlink_op_t)
 vsf_dcl_class(vk_netdrv_adapter_op_t)
 
+typedef enum vk_netdrv_feature_t {
+    VSF_NETDRV_FEATURE_THREAD      = 1 << 0,
+} vk_netdrv_feature_t;
+
 vsf_class(vk_netlink_op_t) {
 #if defined(__VSF_NETDRV_CLASS_IMPLEMENT) || defined(__VSF_NETDRV_CLASS_INHERIT_NETLINK__)
     protected_member(
@@ -75,6 +79,9 @@ vsf_class(vk_netdrv_adapter_op_t) {
         void (*free_buf)(void *netbuf);
         void * (*read_buf)(void *netbuf, vsf_mem_t *mem);
         uint8_t * (*header)(void *netbuf, int32_t len);
+
+        vk_netdrv_feature_t (*feature)(void);
+        void * (*thread)(void (*entry)(void *param), void *param);
     )
 };
 
@@ -128,9 +135,12 @@ vsf_class(vk_netdrv_t) {
 
 void vsf_pnp_on_netdrv_new(vk_netdrv_t *netdrv);
 void vsf_pnp_on_netdrv_del(vk_netdrv_t *netdrv);
-void vsf_pnp_on_netdrv_connect(vk_netdrv_t *netdrv);
+void vsf_pnp_on_netdrv_prepare(vk_netdrv_t *netdrv);
 void vsf_pnp_on_netdrv_connected(vk_netdrv_t *netdrv);
 void vsf_pnp_on_netdrv_disconnect(vk_netdrv_t *netdrv);
+
+extern void vk_netdrv_prepare(vk_netdrv_t *netdrv);
+extern vk_netdrv_feature_t vk_netdrv_feature(vk_netdrv_t *netdrv);
 
 extern vsf_err_t vk_netdrv_connect(vk_netdrv_t *netdrv);
 extern void vk_netdrv_disconnect(vk_netdrv_t *netdrv);
@@ -144,6 +154,8 @@ extern void * vk_netdrv_read_buf(vk_netdrv_t *netdrv, void *netbuf, vsf_mem_t *m
 extern void * vk_netdrv_alloc_buf(vk_netdrv_t *netdrv);
 extern void vk_netdrv_on_outputted(vk_netdrv_t *netdrv, void *netbuf, int_fast32_t size);
 extern void vk_netdrv_on_inputted(vk_netdrv_t *netdrv, void *netbuf, int_fast32_t size);
+
+extern void * vk_netdrv_thread(vk_netdrv_t *netdrv,void (*entry)(void *), void *param);
 #endif
 
 #if defined(__VSF_NETDRV_CLASS_IMPLEMENT) || defined(__VSF_NETDRV_CLASS_INHERIT_NETIF__)

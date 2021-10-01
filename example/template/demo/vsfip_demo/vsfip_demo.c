@@ -88,7 +88,7 @@ void vsfip_mem_netbuf_free(vsfip_netbuf_t *netbuf)
     vsf_heap_free(netbuf);
 }
 
-void vsf_pnp_on_netdrv_connect(vk_netdrv_t *netdrv)
+void vsf_pnp_on_netdrv_prepare(vk_netdrv_t *netdrv)
 {
     __usrapp_vsfip.netif.op = &vsfip_eth_op;
     vsfip_netif_set_netdrv(&__usrapp_vsfip.netif, netdrv);
@@ -103,7 +103,7 @@ void vsf_pnp_on_netdrv_connected(vk_netdrv_t *netdrv)
 void vsfip_dhcpc_on_finish(vsfip_dhcpc_t *dhcpc)
 {
     if (dhcpc->ready) {
-        vsf_trace(VSF_TRACE_INFO, 
+        vsf_trace(VSF_TRACE_INFO,
                     "dhcpc:" VSF_TRACE_CFG_LINEEND
                         "\tipaddr: %d.%d.%d.%d" VSF_TRACE_CFG_LINEEND
                         "\tnetmask: %d.%d.%d.%d" VSF_TRACE_CFG_LINEEND

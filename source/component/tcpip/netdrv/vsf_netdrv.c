@@ -31,7 +31,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_pnp_on_netdrv_connect(vk_netdrv_t *netdrv);
+extern void vsf_pnp_on_netdrv_prepare(vk_netdrv_t *netdrv);
 extern void vsf_pnp_on_netdrv_connected(vk_netdrv_t *netdrv);
 extern void vsf_pnp_on_netdrv_disconnect(vk_netdrv_t *netdrv);
 
@@ -47,9 +47,9 @@ WEAK(vsf_pnp_on_netdrv_del)
 void vsf_pnp_on_netdrv_del(vk_netdrv_t *netdrv) {}
 #endif
 
-#ifndef WEAK_VSF_PNP_ON_NETDRV_CONNECT
-WEAK(vsf_pnp_on_netdrv_connect)
-void vsf_pnp_on_netdrv_connect(vk_netdrv_t *netdrv) {}
+#ifndef WEAK_VSF_PNP_ON_NETDRV_PREPARE
+WEAK(vsf_pnp_on_netdrv_prepare)
+void vsf_pnp_on_netdrv_prepare(vk_netdrv_t *netdrv) {}
 #endif
 
 #ifndef WEAK_VSF_PNP_ON_NETDRV_CONNECTED
@@ -94,6 +94,18 @@ void * vk_netdrv_alloc_buf(vk_netdrv_t *netdrv)
     return NULL;
 }
 
+vk_netdrv_feature_t vk_netdrv_feature(vk_netdrv_t *netdrv)
+{
+    VSF_TCPIP_ASSERT((netdrv != NULL) && (netdrv->adapter.op != NULL) && (netdrv->adapter.op->feature != NULL));
+    return netdrv->adapter.op->feature();
+}
+
+void * vk_netdrv_thread(vk_netdrv_t *netdrv, void (*entry)(void *), void *param)
+{
+    VSF_TCPIP_ASSERT((netdrv != NULL) && (netdrv->adapter.op != NULL) && (netdrv->adapter.op->thread != NULL));
+    return netdrv->adapter.op->thread(entry, param);
+}
+
 vsf_err_t vk_netdrv_init(vk_netdrv_t *netdrv)
 {
     VSF_TCPIP_ASSERT((netdrv != NULL) && (netdrv->netlink.op != NULL));
@@ -123,12 +135,18 @@ void * vk_netdrv_read_buf(vk_netdrv_t *netdrv, void *netbuf, vsf_mem_t *mem)
     return netdrv->adapter.op->read_buf(netbuf, mem);
 }
 
+void vk_netdrv_prepare(vk_netdrv_t *netdrv)
+{
+    VSF_TCPIP_ASSERT(!netdrv->is_connected);
+    vsf_pnp_on_netdrv_prepare(netdrv);
+    VSF_TCPIP_ASSERT(&& netdrv->adapter.op != NULL);
+}
+
 vsf_err_t vk_netdrv_connect(vk_netdrv_t *netdrv)
 {
     VSF_TCPIP_ASSERT(netdrv != NULL);
     if (!netdrv->is_connected) {
         vsf_err_t err = VSF_ERR_NONE;
-        vsf_pnp_on_netdrv_connect(netdrv);
         if (netdrv->adapter.op != NULL) {
             err = netdrv->adapter.op->on_connect(netdrv->adapter.netif);
         }
