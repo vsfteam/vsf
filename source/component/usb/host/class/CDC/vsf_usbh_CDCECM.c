@@ -315,8 +315,10 @@ static void __vk_usbh_ecm_netdrv_thread(void *param)
         evt -= VSF_EVT_USER;
 
         __vk_usbh_ecm_netdrv_evthandler(ecm, (vk_usbh_ecm_evt_t)evt, vsf_eda_get_cur_msg());
-
-        // TODO: check exit
+        if (VSF_USBH_CDCECM_ON_DISCONNECT == evt) {
+            ecm->thread = NULL;
+            break;
+        }
     }
 }
 
@@ -553,7 +555,12 @@ static void __vk_usbh_ecm_on_eda_terminate(vsf_eda_t *eda)
 
     netdrv->is_to_free = true;
     if (vk_netdrv_is_connected(netdrv)) {
-        vk_netdrv_disconnect(netdrv);
+        if (vk_netdrv_feature(netdrv) & VSF_NETDRV_FEATURE_THREAD) {
+            VSF_USB_ASSERT(ecm->thread != NULL);
+            vsf_eda_post_evt_msg(ecm->thread, VSF_EVT_USER + VSF_USBH_CDCECM_ON_DISCONNECT, NULL);
+        } else {
+            __vk_usbh_ecm_netdrv_evthandler(ecm, VSF_USBH_CDCECM_ON_DISCONNECT, NULL);
+        }
     } else {
         __vk_usbh_ecm_netlink_fini(netdrv);
     }
