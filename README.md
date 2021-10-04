@@ -4,7 +4,7 @@
 
 [中文](README_zh.md) |
 
-Full name of VSF is "Versaloon Software Framework". VSF is a open-source software framework for embedded applications based on Apache2. VSF includes hal, a pre-emptive multi-thread kernel and many services or components. VSF is implemented by C language, and using object-oriented programming methods.
+Full name of VSF is "Versaloon Software Framework". VSF is an open-source software framework for embedded applications based on Apache2 license. VSF includes hal, a pre-emptive multi-thread kernel, many services and components. VSF is implemented by C language, and using object-oriented programming methods.
 
 ## Overall Framework
 
