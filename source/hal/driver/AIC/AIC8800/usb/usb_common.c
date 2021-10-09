@@ -62,24 +62,23 @@ vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
 //            PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteAnalogReg->cfg_ana_usb_ctrl1),
 //                0,
 //                AIC1000LITE_ANALOG_REG_CFG_ANA_USB_FSLS_DRV_BIT(3));
+            PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteAnalogReg->cfg_ana_usb_ctrl0),
+                (AIC1000LITE_ANALOG_REG_CFG_ANA_USB_ISET_HS_DISCONNECT(6)),
+                (AIC1000LITE_ANALOG_REG_CFG_ANA_USB_ISET_HS_DISCONNECT(7)));
         }
     }
 #endif
     // power up mmsys
-    if (pwrctrl_mmsys_poff_getb() || (!pwrctrl_mmsys_pon_getb())) {
-        pwrctrl_mmsys_poff_clrb();
-        pwrctrl_mmsys_pon_setb();
-        // wait for stable state of mmsys
-        while ( (pwrctrl_state2_poff_stable_mmsys_getb() != 0)
-            ||  (pwrctrl_state2_pon_stable_mmsys_getb() == 0));
-    }
-
+    pwrctrl_mmsys_set(PWRCTRL_POWERUP);
     // clk en
     cpusysctrl_hclkme_set(CSC_HCLKME_USBC_EN_BIT);
     cpusysctrl_oclkme_set(CSC_OCLKME_ULPI_EN_BIT);
+
     if (cpusysctrl_ulpics_get()) {
         // ULPI clock is stable, release ULPI & USBC RESETn
-        cpusysctrl_oclkrc_ulpiclr_setb();
+        cpusysctrl_oclkrs_ulpiset_setb(); // RESETn set
+        cpusysctrl_hclkrs_usbcset_setb();
+        cpusysctrl_oclkrc_ulpiclr_setb(); // RESETn clr
         cpusysctrl_hclkrc_usbcclr_setb();
     } else {
         return VSF_ERR_FAIL;
