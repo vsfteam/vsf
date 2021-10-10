@@ -13,4 +13,4 @@ add_subdirectory_ifdef(VSF_USE_EVM              evm)
 
 # protected by configurations
 add_subdirectory(nuconsole)
-add_subdirectory(segger_rtt)
+add_subdirectory(segger)
