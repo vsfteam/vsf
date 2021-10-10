@@ -47,27 +47,14 @@
 **********************************************************************
 -------------------------- END-OF-HEADER -----------------------------
 
-File    : SEGGER_SYSVIEW_Conf.h
-Purpose : SEGGER SystemView configuration file.
-          Set defines which deviate from the defaults (see SEGGER_SYSVIEW_ConfDefaults.h) here.
-Revision: $Rev: 21292 $
-
-Additional information:
-  Required defines which must be set are:
-    SEGGER_SYSVIEW_GET_TIMESTAMP
-    SEGGER_SYSVIEW_GET_INTERRUPT_ID
-  For known compilers and cores, these might be set to good defaults
-  in SEGGER_SYSVIEW_ConfDefaults.h.
-
-  SystemView needs a (nestable) locking mechanism.
-  If not defined, the RTT locking mechanism is used,
-  which then needs to be properly configured.
+File        : SEGGER_SYSVIEW_Config_VSF.c
+Purpose     : Sample setup configuration of SystemView with VSF.
+Revision: $Rev: 9599 $
 */
-
-#ifndef SEGGER_SYSVIEW_CONF_H
-#define SEGGER_SYSVIEW_CONF_H
-
+#include "SEGGER_SYSVIEW.h"
 #include "kernel/vsf_kernel.h"
+
+extern const SEGGER_SYSVIEW_OS_API SYSVIEW_VSF_TraceAPI;
 
 /*********************************************************************
 *
@@ -76,16 +63,26 @@ Additional information:
 **********************************************************************
 */
 
-//#define SEGGER_SYSVIEW_DEVICE_NAME
-//#define SEGGER_SYSVIEW_APP_NAME
+/*********************************************************************
+*
+*       _cbSendSystemDesc()
+*
+*  Function description
+*    Sends SystemView description strings.
+*/
+static void _cbSendSystemDesc(void) {
+  SEGGER_SYSVIEW_SendSysDesc("N="SEGGER_SYSVIEW_APP_NAME",D="SEGGER_SYSVIEW_DEVICE_NAME",O=VSF");
+}
 
-#define SEGGER_SYSVIEW_GET_TIMESTAMP()          vsf_systimer_get_tick()
-#define SEGGER_SYSVIEW_TIMESTAMP_BITS           64
-#define SEGGER_SYSVIEW_TIMESTAMP_FREQ           VSF_SYSTIMER_FREQ
-
-#define SEGGER_SYSVIEW_GET_INTERRUPT_ID()       vsf_get_interrupt_id()
-
-
-#endif  // SEGGER_SYSVIEW_CONF_H
+/*********************************************************************
+*
+*       Global functions
+*
+**********************************************************************
+*/
+void SEGGER_SYSVIEW_Conf(void) {
+  SEGGER_SYSVIEW_Init(SEGGER_SYSVIEW_TIMESTAMP_FREQ, 0,
+                      &SYSVIEW_VSF_TraceAPI, _cbSendSystemDesc);
+}
 
 /*************************** End of file ****************************/

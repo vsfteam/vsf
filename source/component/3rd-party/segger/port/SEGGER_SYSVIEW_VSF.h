@@ -46,46 +46,44 @@
 *                                                                    *
 **********************************************************************
 -------------------------- END-OF-HEADER -----------------------------
-
-File    : SEGGER_SYSVIEW_Conf.h
-Purpose : SEGGER SystemView configuration file.
-          Set defines which deviate from the defaults (see SEGGER_SYSVIEW_ConfDefaults.h) here.
+File    : SEGGER_SYSVIEW_VSF.h
+Purpose : VSF Porting.
 Revision: $Rev: 21292 $
-
-Additional information:
-  Required defines which must be set are:
-    SEGGER_SYSVIEW_GET_TIMESTAMP
-    SEGGER_SYSVIEW_GET_INTERRUPT_ID
-  For known compilers and cores, these might be set to good defaults
-  in SEGGER_SYSVIEW_ConfDefaults.h.
-
-  SystemView needs a (nestable) locking mechanism.
-  If not defined, the RTT locking mechanism is used,
-  which then needs to be properly configured.
 */
 
-#ifndef SEGGER_SYSVIEW_CONF_H
-#define SEGGER_SYSVIEW_CONF_H
-
-#include "kernel/vsf_kernel.h"
+#ifndef SEGGER_SYSVIEW_VSF_H
+#define SEGGER_SYSVIEW_VSF_H
 
 /*********************************************************************
 *
-*       Defines, configurable
+*       #include Section
 *
 **********************************************************************
 */
 
-//#define SEGGER_SYSVIEW_DEVICE_NAME
-//#define SEGGER_SYSVIEW_APP_NAME
+#include "kernel/vsf_kernel.h"
 
-#define SEGGER_SYSVIEW_GET_TIMESTAMP()          vsf_systimer_get_tick()
-#define SEGGER_SYSVIEW_TIMESTAMP_BITS           64
-#define SEGGER_SYSVIEW_TIMESTAMP_FREQ           VSF_SYSTIMER_FREQ
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define SEGGER_SYSVIEW_GET_INTERRUPT_ID()       vsf_get_interrupt_id()
+/*********************************************************************
+*
+*       VSF Kernel Trace APIs
+*/
+void vsf_kernel_trace_init                          (void);
+void vsf_kernel_trace_eda_init                      (vsf_eda_t *eda);
+void vsf_kernel_trace_eda_fini                      (vsf_eda_t *eda);
+void vsf_kernel_trace_eda_ready                     (vsf_eda_t *eda);
+void vsf_kernel_trace_eda_idle                      (vsf_eda_t *eda);
+void vsf_kernel_trace_eda_evt_begin                 (vsf_eda_t *eda, vsf_evt_t evt);
+void vsf_kernel_trace_eda_evt_end                   (vsf_eda_t *eda, vsf_evt_t evt);
+void vsf_kernel_trace_idle                          (void);
 
+#ifdef __cplusplus
+}
+#endif
 
-#endif  // SEGGER_SYSVIEW_CONF_H
+#endif
 
 /*************************** End of file ****************************/

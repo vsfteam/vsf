@@ -66,6 +66,8 @@ Revision: $Rev: 21386 $
 **********************************************************************
 */
 
+#define RTT_USE_ASM                                 0
+
 //
 // Take in and set to correct values for Cortex-A systems with CPU cache
 //
@@ -150,12 +152,12 @@ Revision: $Rev: 21386 $
 */
 
 #define SEGGER_RTT_LOCK()                                                       \
-            {                                                                   \
+            do {                                                                \
                 vsf_protect_t __orig = vsf_protect_int();
 
 #define SEGGER_RTT_UNLOCK()                                                     \
                 vsf_unprotect_int(__orig);                                      \
-            }
+            } while (false);
 
 #endif
 /*************************** End of file ****************************/

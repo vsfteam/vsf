@@ -47,45 +47,91 @@
 **********************************************************************
 -------------------------- END-OF-HEADER -----------------------------
 
-File    : SEGGER_SYSVIEW_Conf.h
-Purpose : SEGGER SystemView configuration file.
-          Set defines which deviate from the defaults (see SEGGER_SYSVIEW_ConfDefaults.h) here.
-Revision: $Rev: 21292 $
-
-Additional information:
-  Required defines which must be set are:
-    SEGGER_SYSVIEW_GET_TIMESTAMP
-    SEGGER_SYSVIEW_GET_INTERRUPT_ID
-  For known compilers and cores, these might be set to good defaults
-  in SEGGER_SYSVIEW_ConfDefaults.h.
-
-  SystemView needs a (nestable) locking mechanism.
-  If not defined, the RTT locking mechanism is used,
-  which then needs to be properly configured.
+File    : SEGGER_SYSVIEW_VSF.c
+Purpose : Interface between VSF and SystemView.
 */
 
-#ifndef SEGGER_SYSVIEW_CONF_H
-#define SEGGER_SYSVIEW_CONF_H
-
+#include "SEGGER_SYSVIEW.h"
 #include "kernel/vsf_kernel.h"
 
 /*********************************************************************
 *
-*       Defines, configurable
+*       _cbSendTaskList()
+*
+*  Function description
+*    This function is part of the link between VSF and SYSVIEW.
+*    Called from SystemView when asked by the host, it uses SYSVIEW
+*    functions to send the entire task list to the host.
+*/
+//static void _cbSendTaskList(void) {
+//}
+
+/*********************************************************************
+*
+*       _cbGetTime()
+*
+*  Function description
+*    This function is part of the link between VSF and SYSVIEW.
+*    Called from SystemView when asked by the host, returns the
+*    current system time in micro seconds.
+*/
+static U64 _cbGetTime(void) {
+  return SEGGER_SYSVIEW_GET_TIMESTAMP();
+}
+
+/*********************************************************************
+*
+*       Global functions
 *
 **********************************************************************
 */
 
-//#define SEGGER_SYSVIEW_DEVICE_NAME
-//#define SEGGER_SYSVIEW_APP_NAME
+void vsf_kernel_trace_init(void) {
+  SEGGER_SYSVIEW_Conf();
+}
 
-#define SEGGER_SYSVIEW_GET_TIMESTAMP()          vsf_systimer_get_tick()
-#define SEGGER_SYSVIEW_TIMESTAMP_BITS           64
-#define SEGGER_SYSVIEW_TIMESTAMP_FREQ           VSF_SYSTIMER_FREQ
+void vsf_kernel_trace_eda_init(vsf_eda_t *eda) {
+  SEGGER_SYSVIEW_TASKINFO TaskInfo = { 0 };
 
-#define SEGGER_SYSVIEW_GET_INTERRUPT_ID()       vsf_get_interrupt_id()
+  TaskInfo.TaskID     = (U32)eda;
+  TaskInfo.Prio       = eda->cur_priority;
+  SEGGER_SYSVIEW_SendTaskInfo(&TaskInfo);
+  SEGGER_SYSVIEW_OnTaskCreate((U32)eda);
+}
 
+void vsf_kernel_trace_eda_fini(vsf_eda_t *eda) {
+  SEGGER_SYSVIEW_OnTaskTerminate((U32)eda);
+}
 
-#endif  // SEGGER_SYSVIEW_CONF_H
+void vsf_kernel_trace_eda_ready(vsf_eda_t *eda) {
+  SEGGER_SYSVIEW_OnTaskStartReady((U32)eda);
+}
+
+void vsf_kernel_trace_eda_idle(vsf_eda_t *eda) {
+  SEGGER_SYSVIEW_OnTaskStopReady((U32)eda, 0);
+}
+
+void vsf_kernel_trace_eda_evt_begin(vsf_eda_t *eda, vsf_evt_t evt) {
+  SEGGER_SYSVIEW_OnTaskStartExec((U32)eda);
+  SEGGER_SYSVIEW_RecordU32(SYSVIEW_EVTID_EX, evt);
+}
+
+void vsf_kernel_trace_eda_evt_end(vsf_eda_t *eda, vsf_evt_t evt) {
+}
+
+void vsf_kernel_trace_idle(void) {
+  SEGGER_SYSVIEW_OnIdle();
+}
+
+/*********************************************************************
+*
+*       Public API structures
+*
+**********************************************************************
+*/
+const SEGGER_SYSVIEW_OS_API SYSVIEW_VSF_TraceAPI = {
+  _cbGetTime,
+  NULL,
+};
 
 /*************************** End of file ****************************/

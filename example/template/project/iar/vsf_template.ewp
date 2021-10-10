@@ -8264,7 +8264,16 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_SYSVIEW_Conf.h</name>
                             </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_SYSVIEW_Config_VSF.c</name>
+                            </file>
                         </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\SEGGER_SYSVIEW_VSF.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\SEGGER_SYSVIEW_VSF.h</name>
+                        </file>
                     </group>
                     <group>
                         <name>raw</name>
@@ -8282,6 +8291,9 @@
                         </group>
                         <group>
                             <name>SystemView</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER.h</name>
+                            </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW.c</name>
                             </file>
