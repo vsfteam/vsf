@@ -380,7 +380,7 @@
     <ClInclude Include="..\..\..\..\source\component\crypto\vsf_crypto.h" />
     <ClInclude Include="..\..\..\..\source\component\crypto\vsf_crypto_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\debugger\nulink\NuConsole_stream.h" />
-    <ClInclude Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.h" />
+    <ClInclude Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.h" />
     <ClInclude Include="..\..\..\..\source\component\debugger\vsf_debugger.h" />
     <ClInclude Include="..\..\..\..\source\component\debugger\vsf_debugger_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\fs\driver\fatfs\vsf_fatfs.h" />
@@ -1282,7 +1282,7 @@
     <ClCompile Include="..\..\..\..\source\component\av\audio\vsf_audio.c" />
     <ClCompile Include="..\..\..\..\source\component\crypto\hash\crc\vsf_crc.c" />
     <ClCompile Include="..\..\..\..\source\component\debugger\nulink\NuConsole_stream.c" />
-    <ClCompile Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.c" />
+    <ClCompile Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\fatfs\vsf_fatfs.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\malfs\vsf_malfs.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\memfs\vsf_memfs.c" />

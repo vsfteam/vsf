@@ -766,9 +766,6 @@
     <Filter Include="vsf\service\json">
       <UniqueIdentifier>{7b0f1556-80e8-4e18-8669-a817438a73b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\debugger\segger_rtt">
-      <UniqueIdentifier>{d42ea5e5-b341-45be-b5d9-74b32e93eeaf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usrapp\demo\hal_demo">
       <UniqueIdentifier>{4b85f110-bac8-47f4-9db7-9949521981bd}</UniqueIdentifier>
     </Filter>
@@ -1047,6 +1044,9 @@
     </Filter>
     <Filter Include="vsf\component\3rd-party\lwip\raw\src\apps\mdns">
       <UniqueIdentifier>{3e1d822c-7261-46f8-8faa-fa16f78304fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\debugger\segger">
+      <UniqueIdentifier>{d42ea5e5-b341-45be-b5d9-74b32e93eeaf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -2292,9 +2292,6 @@
     <ClInclude Include="..\..\..\..\source\service\json\vsf_json.h">
       <Filter>vsf\service\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.h">
-      <Filter>vsf\component\debugger\segger_rtt</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\utilities\vsf_utilities.h">
       <Filter>vsf\utilities</Filter>
     </ClInclude>
@@ -3182,6 +3179,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.h">
       <Filter>vsf\shell\sys\linux\app\httpd\urihandler\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.h">
+      <Filter>vsf\component\debugger\segger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -4123,9 +4123,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\service\json\vsf_json.c">
       <Filter>vsf\service\json</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.c">
-      <Filter>vsf\component\debugger\segger_rtt</Filter>
     </ClCompile>
     <ClCompile Include="..\..\demo\hal_demo\usart_demo.c">
       <Filter>usrapp\demo\hal_demo</Filter>
@@ -5623,6 +5620,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\apps\mdns\mdns.c">
       <Filter>vsf\component\3rd-party\lwip\raw\src\apps\mdns</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.c">
+      <Filter>vsf\component\debugger\segger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
