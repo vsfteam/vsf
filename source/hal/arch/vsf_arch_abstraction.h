@@ -310,6 +310,7 @@ extern vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick);
 extern vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority);
 extern vsf_arch_prio_t vsf_get_base_priority(void);
 
+extern int vsf_get_interrupt_id(void);
 extern vsf_gint_state_t vsf_get_interrupt(void);
 extern vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level);
 extern vsf_gint_state_t vsf_disable_interrupt(void);

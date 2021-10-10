@@ -335,6 +335,11 @@ vsf_gint_state_t vsf_enable_interrupt(void)
     return (vsf_gint_state_t)vsf_set_base_priority(vsf_arch_prio_enable_all);
 }
 
+WEAK(vsf_get_interrupt_id)
+int vsf_get_interrupt_id(void)
+{
+    return ((SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) >> SCB_ICSR_VECTACTIVE_Pos);
+}
 
 /*----------------------------------------------------------------------------*
  * Others: sleep, reset, etc                                                  *
