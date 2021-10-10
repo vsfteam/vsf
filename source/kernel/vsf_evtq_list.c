@@ -28,6 +28,12 @@
 
 #include "./vsf_os.h"
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 #ifdef __VSF_OS_CFG_EVTQ_LIST
 
 /*============================ MACROS ========================================*/
@@ -198,6 +204,9 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
         vsf_dlist_queue_enqueue(vsf_eda_t, rdy_node,
                     &evtq->rdy_list,
                     eda);
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+        vsf_kernel_trace_eda_ready(eda);
+#endif
     }
     err = __vsf_os_evtq_activate(evtq);
     vsf_unprotect_int(orig);
@@ -346,14 +355,17 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
             orig = vsf_protect_int();
             node_eda = eda->rdy_node.next;
 
-            // remove current eda, and will enqueue again if more events pending
-            // so the eda will always have an opportunity to run
+            // remove current eda, and will enqueue again if more events pending,
+            //  so that the current eda will be in the end of the queue.
             vsf_dlist_remove(
                     vsf_eda_t, rdy_node,
                     &pthis->rdy_list,
                     eda);
             if (NULL == eda->evt_list.head.next) {
                 eda->flag.state.is_ready = false;
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+                vsf_kernel_trace_eda_idle(eda);
+#endif
             } else {
                 vsf_dlist_queue_enqueue(
                     vsf_eda_t, rdy_node,

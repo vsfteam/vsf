@@ -32,6 +32,12 @@
 // for vsf_hal_init
 #include "hal/vsf_hal.h"
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -428,6 +434,9 @@ void vsf_sleep(void)
 WEAK(vsf_plug_in_on_kernel_idle)
 void vsf_plug_in_on_kernel_idle(void)
 {
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_idle();
+#endif
     vsf_sleep();
 }
 #endif

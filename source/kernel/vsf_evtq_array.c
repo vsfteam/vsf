@@ -29,6 +29,12 @@
 
 #include "./vsf_os.h"
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 #ifdef __VSF_OS_CFG_EVTQ_ARRAY
 
 /*============================ MACROS ========================================*/
@@ -120,6 +126,13 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
 #else
     evtq->node[tail].evt_union.value = value;
 #endif
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    if (!eda->evt_cnt) {
+        vsf_kernel_trace_eda_ready(eda);
+    }
+#endif
+
     eda->evt_cnt++;
     vsf_unprotect_int(orig);
 
@@ -242,6 +255,11 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                 pthis->cur.evt = VSF_EVT_INVALID;
                 pthis->cur.msg = (uintptr_t)NULL;
                 eda->evt_cnt--;
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+                if (!eda->evt_cnt) {
+                    vsf_kernel_trace_eda_idle(eda);
+                }
+#endif
             vsf_unprotect_int(orig);
 
             if (eda->flag.state.is_to_exit) {

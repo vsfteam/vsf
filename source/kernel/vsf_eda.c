@@ -29,6 +29,12 @@
 #include "./vsf_os.h"
 #include "./vsf_timq.h"
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -124,6 +130,9 @@ extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
 SECTION(".text.vsf.kernel.eda")
 void __vsf_eda_on_terminate(vsf_eda_t *pthis)
 {
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_fini(pthis);
+#endif
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     if (pthis->on_terminate != NULL) {
         pthis->on_terminate(pthis);
@@ -199,7 +208,7 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
     VSF_KERNEL_ASSERT(pthis != NULL);
 
 #if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_eda_trace(pthis, evt);
+    vsf_kernel_trace_eda_evt_begin(pthis, evt);
 #endif
 
 #   if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
@@ -239,6 +248,10 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
     }
 #else
     pthis->fn.evthandler(pthis, evt);
+#endif
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_evt_end(pthis, evt);
 #endif
 }
 
@@ -823,6 +836,10 @@ static void __vsf_eda_init_member(
 #endif
 
     vsf_evtq_on_eda_init(pthis);
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_init(pthis);
+#endif
 }
 
 SECTION(".text.vsf.kernel.eda")
@@ -1137,6 +1154,10 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 vsf_err_t vsf_kernel_start(void)
 {
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_init();
+#endif
+
 #ifdef __VSF_KERNEL_TASK
     vsf_err_t err;
 
