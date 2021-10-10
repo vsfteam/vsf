@@ -418,6 +418,10 @@ const code_region_t VSF_FORCED_SCHED_SAFE_CODE_REGION = {
 // vsf_sleep can only be called in vsf_plug_in_on_kernel_idle
 void vsf_sleep(void)
 {
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_idle();
+#endif
+
 #   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED && __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     vsf_disable_interrupt();
     if (vsf_evtq_is_empty(&__vsf_os.res_ptr->evt_queue.queue_array[0])) {
@@ -434,9 +438,6 @@ void vsf_sleep(void)
 WEAK(vsf_plug_in_on_kernel_idle)
 void vsf_plug_in_on_kernel_idle(void)
 {
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_kernel_trace_idle();
-#endif
     vsf_sleep();
 }
 #endif

@@ -52,6 +52,7 @@ Purpose : Interface between VSF and SystemView.
 */
 
 #include "SEGGER_SYSVIEW.h"
+#include "./SEGGER_SYSVIEW_VSF.h"
 #include "kernel/vsf_kernel.h"
 
 /*********************************************************************
@@ -90,12 +91,19 @@ void vsf_kernel_trace_init(void) {
   SEGGER_SYSVIEW_Conf();
 }
 
-void vsf_kernel_trace_eda_init(vsf_eda_t *eda) {
-  SEGGER_SYSVIEW_TASKINFO TaskInfo = { 0 };
+void vsf_kernel_trace_eda_info(vsf_eda_t *eda, char *name, void *stack, uint32_t stack_size) {
+  SEGGER_SYSVIEW_TASKINFO TaskInfo = {
+      .TaskID       = (U32)eda,
+      .sName        = name,
+      .Prio         = (U32)eda->cur_priority,
+      .StackBase    = (U32)stack,
+      .StackSize    = (U32)stack_size,
+  };
 
-  TaskInfo.TaskID     = (U32)eda;
-  TaskInfo.Prio       = eda->cur_priority;
   SEGGER_SYSVIEW_SendTaskInfo(&TaskInfo);
+}
+
+void vsf_kernel_trace_eda_init(vsf_eda_t *eda) {
   SEGGER_SYSVIEW_OnTaskCreate((U32)eda);
 }
 
@@ -105,6 +113,7 @@ void vsf_kernel_trace_eda_fini(vsf_eda_t *eda) {
 
 void vsf_kernel_trace_eda_ready(vsf_eda_t *eda) {
   SEGGER_SYSVIEW_OnTaskStartReady((U32)eda);
+  SEGGER_SYSVIEW_OnTaskStartExec((U32)eda);
 }
 
 void vsf_kernel_trace_eda_idle(vsf_eda_t *eda) {
@@ -112,15 +121,23 @@ void vsf_kernel_trace_eda_idle(vsf_eda_t *eda) {
 }
 
 void vsf_kernel_trace_eda_evt_begin(vsf_eda_t *eda, vsf_evt_t evt) {
-  SEGGER_SYSVIEW_OnTaskStartExec((U32)eda);
-  SEGGER_SYSVIEW_RecordU32(SYSVIEW_EVTID_EX, evt);
+  SEGGER_SYSVIEW_MarkStart(evt);
 }
 
 void vsf_kernel_trace_eda_evt_end(vsf_eda_t *eda, vsf_evt_t evt) {
+  SEGGER_SYSVIEW_MarkStop(evt);
 }
 
 void vsf_kernel_trace_idle(void) {
   SEGGER_SYSVIEW_OnIdle();
+}
+
+void vsf_isr_trace_enter(int id) {
+  SEGGER_SYSVIEW_RecordEnterISR();
+}
+
+void vsf_isr_trace_leave(int id) {
+  SEGGER_SYSVIEW_RecordExitISR();
 }
 
 /*********************************************************************

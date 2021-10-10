@@ -22,7 +22,7 @@
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
 
-#include "RTT/SEGGER_RTT.h"
+#include "SEGGER_RTT.h"
 
 #include "utilities/vsf_utilities.h"
 
@@ -39,19 +39,19 @@
 /*============================ PROTOTYPES ====================================*/
 #if     VSF_USE_SIMPLE_STREAM == ENABLED
 static void __vsf_segger_rtt_stream_init(vsf_stream_t *stream);
-static uint_fast32_t __vsf_segger_rtt_stream_write(   vsf_stream_t *stream, 
-                                                    uint8_t *buf, 
+static uint_fast32_t __vsf_segger_rtt_stream_write(   vsf_stream_t *stream,
+                                                    uint8_t *buf,
                                                     uint_fast32_t size);
 static uint_fast32_t __vsf_segger_rtt_stream_get_data_length(vsf_stream_t *stream);
 static uint_fast32_t __vsf_segger_rtt_stream_get_avail_length(vsf_stream_t *stream);
 #elif   VSF_USE_STREAM == ENABLED
-static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr, 
+static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
                                                     vsf_pbuf_t *pblock);
-static 
+static
 vsf_stream_status_t __vsf_segger_rtt_stream_tx_get_status(vsf_stream_tx_t *obj_ptr);
 
-static vsf_err_t __vsf_segger_rtt_stream_tx_dat_drn_evt_reg(  
-                                            vsf_stream_tx_t *obj_ptr, 
+static vsf_err_t __vsf_segger_rtt_stream_tx_dat_drn_evt_reg(
+                                            vsf_stream_tx_t *obj_ptr,
                                             vsf_stream_dat_drn_evt_t event);
 #endif
 
@@ -125,8 +125,8 @@ static void __vsf_segger_rtt_stream_init(vsf_stream_t *stream)
     __vsf_segger_rtt_stream_init_imp();
 }
 
-static uint_fast32_t __vsf_segger_rtt_stream_write(vsf_stream_t *stream, 
-                                                    uint8_t *buf, 
+static uint_fast32_t __vsf_segger_rtt_stream_write(vsf_stream_t *stream,
+                                                    uint8_t *buf,
                                                     uint_fast32_t size)
 {
     __vsf_segger_rtt_stream_init_imp();
@@ -145,7 +145,7 @@ uint_fast32_t __vsf_segger_rtt_stream_get_avail_length(vsf_stream_t *stream)
 
 #elif   VSF_USE_STREAM == ENABLED
 
-static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr, 
+static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
                                                     vsf_pbuf_t *block_ptr)
 {
     vsf_err_t result = VSF_ERR_NONE;
@@ -159,13 +159,13 @@ static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
             //! no direct access: todo add support
             result = VSF_ERR_NOT_ACCESSABLE;
             break;
-        } else 
+        } else
     #endif
         {
-            SEGGER_RTT_Write(0, (const void *)vsf_pbuf_buffer_get(block_ptr), 
+            SEGGER_RTT_Write(0, (const void *)vsf_pbuf_buffer_get(block_ptr),
                             vsf_pbuf_size_get(block_ptr));
         }
-        
+
     } while(0);
 
     vsf_pbuf_free(block_ptr);
@@ -173,14 +173,14 @@ static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
     return result;
 }
 
-static 
+static
 vsf_stream_status_t __vsf_segger_rtt_stream_tx_get_status(vsf_stream_tx_t *obj_ptr)
 {
     return (vsf_stream_status_t){0};//s_tNuStream.Status;
 }
 
-static vsf_err_t __vsf_segger_rtt_stream_tx_dat_drn_evt_reg(  
-                                            vsf_stream_tx_t *obj_ptr, 
+static vsf_err_t __vsf_segger_rtt_stream_tx_dat_drn_evt_reg(
+                                            vsf_stream_tx_t *obj_ptr,
                                             vsf_stream_dat_drn_evt_t event)
 {
     //s_tNuStream.event = event;

@@ -27,7 +27,7 @@
 #include "service/vsf_service.h"
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
-#   include "./segger_rtt/segger_rtt_stream.h"
+#   include "./segger/segger_rtt_stream.h"
 #elif VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 #   include "./nulink/NuConsole_stream.h"
 #elif VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_USER

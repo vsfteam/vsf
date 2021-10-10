@@ -838,6 +838,7 @@ static void __vsf_eda_init_member(
     vsf_evtq_on_eda_init(pthis);
 
 #if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(pthis, NULL, NULL, 0);
     vsf_kernel_trace_eda_init(pthis);
 #endif
 }
@@ -1150,6 +1151,13 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #   pragma GCC diagnostic pop
 #endif
 
+#endif
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+void vsf_kernel_on_trace_connected(void)
+{
+    vsf_kernel_trace_eda_info((vsf_eda_t *)&__vsf_eda.task, "kernel_task", NULL, 0);
+}
 #endif
 
 vsf_err_t vsf_kernel_start(void)
