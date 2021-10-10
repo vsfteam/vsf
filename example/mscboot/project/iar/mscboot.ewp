@@ -3485,22 +3485,22 @@
                     </group>
                 </group>
                 <group>
-                    <name>segger_rtt</name>
+                    <name>segger</name>
                     <group>
                         <name>raw</name>
                         <group>
                             <name>RTT</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw\RTT\SEGGER_RTT.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw\RTT\SEGGER_RTT.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw\RTT\SEGGER_RTT_Conf.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT_Conf.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw\RTT\SEGGER_RTT_printf.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT_printf.c</name>
                             </file>
                         </group>
                     </group>
@@ -3842,12 +3842,12 @@
                     </file>
                 </group>
                 <group>
-                    <name>segger_rtt</name>
+                    <name>segger</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\component\debugger\segger\segger_rtt_stream.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\component\debugger\segger\segger_rtt_stream.h</name>
                     </file>
                 </group>
                 <file>
