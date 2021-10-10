@@ -8,9 +8,9 @@ endif()
 target_include_directories(${VSF_LIB_NAME} INTERFACE
     ${VSF_SEGGER_RTT_PATH}
     ${VSF_SEGGER_SYSTEMVIEW_PATH}
-    ${VSF_SRC_PATH}/component/3rd-party/segger/port
+    ${VSF_SRC_PATH}/component/3rd-party/segger/port/Config
 )
 
 target_sources(${VSF_LIB_NAME} INTERFACE
-    ${VSF_NUCONSOLE_PATH}/RTT/SEGGER_RTT.c
+    ${VSF_SEGGER_RTT_PATH}/SEGGER_RTT.c
 )
