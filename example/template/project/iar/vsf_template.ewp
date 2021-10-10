@@ -4724,7 +4724,9 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\raw\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\include</state>
@@ -8250,6 +8252,21 @@
                 <group>
                     <name>segger</name>
                     <group>
+                        <name>port</name>
+                        <group>
+                            <name>Config</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config\Global.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_RTT_Conf.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_SYSVIEW_Conf.h</name>
+                            </file>
+                        </group>
+                    </group>
+                    <group>
                         <name>raw</name>
                         <group>
                             <name>RTT</name>
@@ -8260,10 +8277,22 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT_Conf.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT_printf.c</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>SystemView</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT_printf.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW_ConfDefaults.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW_Int.h</name>
                             </file>
                         </group>
                     </group>
