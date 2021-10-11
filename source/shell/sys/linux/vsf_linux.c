@@ -74,6 +74,12 @@
 #   include <stdio.h>
 #endif
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_suppress=pe111
@@ -301,6 +307,12 @@ static int __vsf_linux_init_thread(int argc, char *argv[])
 
 static int __vsf_linux_kernel_thread(int argc, char *argv[])
 {
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, "linux_kernel_thread",
+                                thread->stack, thread->stack_size);
+#endif
+
     __vsf_linux.kernel_process = vsf_linux_get_cur_process();
 
 #if VSF_LINUX_CFG_SUPPORT_SIG != ENABLED

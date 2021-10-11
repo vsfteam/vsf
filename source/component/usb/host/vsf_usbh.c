@@ -27,6 +27,12 @@
 #include "./vsf_usbh.h"
 #include "hal/vsf_hal.h"
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define USB_DEFAULT_TIMEOUT         50    // 50ms
@@ -1205,7 +1211,13 @@ vsf_err_t vk_usbh_init(vk_usbh_t *usbh)
     usbh->teda.on_terminate = NULL;
 #endif
     usbh->teda.fn.evthandler = __vk_usbh_init_evthandler;
-    return vsf_teda_init(&usbh->teda, VSF_USBH_CFG_EDA_PRIORITY);
+    vsf_err_t err = vsf_teda_init(&usbh->teda, VSF_USBH_CFG_EDA_PRIORITY);
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&usbh->teda.use_as__vsf_eda_t, "usbh_task", NULL, 0);
+#endif
+
+    return err;
 }
 
 vsf_err_t vk_usbh_fini(vk_usbh_t *usbh)

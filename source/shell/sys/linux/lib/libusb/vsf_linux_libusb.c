@@ -56,6 +56,12 @@
 #   include <string.h>
 #endif
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE != ENABLED
@@ -280,6 +286,11 @@ void vsf_linux_libusb_startup(void)
 
         pthread_t pthread;
         pthread_create(&pthread, NULL, __vsf_libusb_libusb_core_thread, NULL);
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+        vsf_linux_thread_t *thread = vsf_linux_get_thread(pthread);
+        vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, "libusb_core_task",
+                thread->stack, thread->stack_size);
+#endif
         __vsf_libusb.core_thread = vsf_linux_get_thread(pthread);
     }
 }
@@ -311,6 +322,11 @@ int libusb_init(libusb_context **context)
     vsf_eda_trig_init(&__vsf_libusb.trans_trig, false, true);
     pthread_t pthread;
     pthread_create(&pthread, NULL, __vsf_libusb_libusb_user_thread, NULL);
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+        vsf_linux_thread_t *thread = vsf_linux_get_thread(pthread);
+        vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, "libusb_user_task",
+                thread->stack, thread->stack_size);
+#endif
     __vsf_libusb.user_thread = vsf_linux_get_thread(pthread);
     return LIBUSB_SUCCESS;
 }

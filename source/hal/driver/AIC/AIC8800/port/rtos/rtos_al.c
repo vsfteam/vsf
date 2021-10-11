@@ -277,7 +277,7 @@ int rtos_task_create(   rtos_task_fct func,
                         (stack_depth << 2));
 
 #   if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, name, &thread[1], stack_depth);
+    vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, (char *)name, &thread[1], stack_depth);
 #   endif
 
     if (task_handle) {

@@ -94,7 +94,7 @@ void vsf_kernel_trace_init(void) {
   while (!SEGGER_SYSVIEW_IsStarted());
 }
 
-void vsf_kernel_trace_eda_info(vsf_eda_t *eda, char *name, void *stack, uint32_t stack_size) {
+void vsf_kernel_trace_eda_info(vsf_eda_t *eda, char *name, void *stack, uint_fast32_t stack_size) {
   SEGGER_SYSVIEW_TASKINFO TaskInfo = {
       .TaskID       = (U32)eda,
       .sName        = name,

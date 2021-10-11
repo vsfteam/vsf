@@ -588,6 +588,9 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
 
             dwcotg_hcd->task.fn.evthandler = __vk_dwcotg_hcd_evthandler;
             vsf_teda_init(&dwcotg_hcd->task);
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+            vsf_kernel_trace_eda_info(&dwcotg_hcd->task.use_as__vsf_eda_t, "dwcotg_hcd_task", NULL, 0);
+#endif
             return VSF_ERR_NONE;
         }
     }

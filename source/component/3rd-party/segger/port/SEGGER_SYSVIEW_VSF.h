@@ -80,6 +80,7 @@ extern "C" {
 */
 void vsf_kernel_trace_init                          (void);
 void vsf_kernel_trace_eda_init                      (vsf_eda_t *eda);
+void vsf_kernel_trace_eda_info                      (vsf_eda_t *eda, char *name, void *stack, uint_fast32_t stack_size);
 void vsf_kernel_trace_eda_fini                      (vsf_eda_t *eda);
 void vsf_kernel_trace_eda_ready                     (vsf_eda_t *eda);
 void vsf_kernel_trace_eda_idle                      (vsf_eda_t *eda);

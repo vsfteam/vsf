@@ -28,6 +28,12 @@
 #include "./vsf_os.h"
 #include "utilities/vsf_utilities.h"
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 /*============================ MACROS ========================================*/
 
 // for __RTOS__ arch, VSF_KERNEL_CFG_NON_STANDALONE MUST be enabled
@@ -66,7 +72,7 @@
 
 #if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
-declare_vsf_thread(app_main_thread_t)
+dcl_vsf_thread(app_main_thread_t)
 def_vsf_thread(app_main_thread_t, VSF_OS_CFG_MAIN_STACK_SIZE)
 #endif
 
@@ -262,6 +268,10 @@ ROOT void __post_vsf_kernel_init(void)
                 .on_terminate = NULL;
 #   endif
     init_vsf_thread(app_main_thread_t, &__app_main, vsf_prio_0);
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&__app_main.use_as__vsf_eda_t, "main_task",
+                __app_main.stack_arr, sizeof(__app_main.stack_arr));
+#   endif
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
     ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
         &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
@@ -282,6 +292,9 @@ ROOT void __post_vsf_kernel_init(void)
     __app_main  .on_terminate = NULL;
 #       endif
     vsf_eda_start(&__app_main, (vsf_eda_cfg_t *)&cfg);
+#   endif
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info((vsf_eda_t *)&__app_main, "main_task", NULL, 0);
 #   endif
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE
     VSF_USER_ENTRY();

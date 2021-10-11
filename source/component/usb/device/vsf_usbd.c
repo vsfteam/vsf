@@ -35,6 +35,12 @@
 #include "./vsf_usbd.h"
 #include "./vsf_usbd_drv_ifs.h"
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -975,6 +981,9 @@ void vk_usbd_init(vk_usbd_dev_t *dev)
     dev->eda.on_terminate = NULL;
 #   endif
     vsf_eda_init(&dev->eda, VSF_USBD_CFG_EDA_PRIORITY);
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&dev->eda, "usbd_task", NULL, 0);
+#   endif
 #endif
 
     __vk_usbd_hw_init_reset(dev, false);
