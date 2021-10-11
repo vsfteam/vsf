@@ -245,6 +245,10 @@ static void __vsf_kernel_os_init(void)
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 static void __vsf_os_evtq_swi_handler(void *p)
 {
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_isr_trace_enter(vsf_get_interrupt_id());
+#endif
+
     vsf_evtq_t *pcur, *pold;
 
     VSF_KERNEL_ASSERT(p != NULL);
@@ -253,6 +257,10 @@ static void __vsf_os_evtq_swi_handler(void *p)
     pold = __vsf_set_cur_evtq(pcur);
     vsf_evtq_poll(pcur);
     __vsf_set_cur_evtq(pold);
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_isr_trace_leave(vsf_get_interrupt_id());
+#endif
 }
 
 vsf_evtq_t *__vsf_os_evtq_get(vsf_prio_t priority)

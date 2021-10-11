@@ -117,8 +117,16 @@ static void __vsf_systimer_start(void)
 // DO NOT add section on vsf_systimer_evthandler, it's a weak function in arch
 void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 {
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_isr_trace_enter(vsf_get_interrupt_id());
+#endif
+
     UNUSED_PARAM(tick);
     __vsf_systimer_wakeup();
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_isr_trace_leave(vsf_get_interrupt_id());
+#endif
 }
 
 SECTION(".text.vsf.kernel.teda")
