@@ -445,11 +445,18 @@ vsf_err_t vsf_thread_start( vsf_thread_t *thread,
         return VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED;
     }
 
+    vsf_err_t err;
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-    return vsf_teda_start(&pthis->use_as__vsf_teda_t, &cfg);
+    err = vsf_teda_start(&pthis->use_as__vsf_teda_t, &cfg);
 #   else
-    return vsf_eda_start(&pthis->use_as__vsf_eda_t, &cfg);
+    err = vsf_eda_start(&pthis->use_as__vsf_eda_t, &cfg);
 #   endif
+
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, NULL, thread_cb->stack, thread_cb->stack_size);
+#   endif
+
+    return err;
 }
 
 #if __IS_COMPILER_IAR__
@@ -628,11 +635,18 @@ vsf_err_t vsf_thread_start(vsf_thread_t *thread, vsf_prio_t priority)
         return VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED;
     }
 
+    vsf_err_t err;
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-    return vsf_teda_init(&pthis->use_as__vsf_teda_t, priority);
+    err = vsf_teda_init(&pthis->use_as__vsf_teda_t, priority);
 #   else
-    return vsf_eda_init(&pthis->use_as__vsf_eda_t, priority);
+    err = vsf_eda_init(&pthis->use_as__vsf_eda_t, priority);
 #   endif
+
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, NULL, pthis->stack, pthis->stack_size);
+#   endif
+
+    return err;
 }
 #endif
 

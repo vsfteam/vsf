@@ -20,6 +20,12 @@
 #define __VSF_EDA_CLASS_INHERIT__
 #include "vsf.h"
 
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 #include "rtos_al.h"
 
 // library from vendor depends on this header,
@@ -269,6 +275,10 @@ int rtos_task_create(   rtos_task_fct func,
                         real_prio,
                         (uint64_t *)&thread[1], // no need to align to 64-bit
                         (stack_depth << 2));
+
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, name, &thread[1], stack_depth);
+#   endif
 
     if (task_handle) {
         *task_handle = thread;

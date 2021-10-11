@@ -228,8 +228,10 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
         } else {
             if (    ((uintptr_t)NULL == frame->ptr.target)     //!< no param
                 &&  (0 == frame->state.local_size)) {       //!< no local
+                VSF_KERNEL_ASSERT(frame->fn.evthandler != NULL);
                 frame->fn.evthandler(pthis, evt);        //!< this is a pure eda
             } else {
+                VSF_KERNEL_ASSERT(frame->fn.param_evthandler != NULL);
                 //frame->fn.param_evthandler(frame->ptr.target, evt);
                 frame->fn.param_evthandler((uintptr_t)(frame + 1), evt);
             }
@@ -237,16 +239,20 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
 #   else
         if (    ((uintptr_t)NULL == frame->ptr.target)         //!< no param
                 &&  (0 == frame->state.local_size)) {       //!< no local
+                VSF_KERNEL_ASSERT(frame->fn.evthandler != NULL);
                 frame->fn.evthandler(pthis, evt);        //!< this is a pure eda
         } else {
+            VSF_KERNEL_ASSERT(frame->fn.param_evthandler != NULL);
             //frame->fn.param_evthandler(frame->ptr.target, evt);
             frame->fn.param_evthandler((uintptr_t)(frame + 1), evt);
         }
 #   endif
     } else {
+        VSF_KERNEL_ASSERT(pthis->fn.evthandler != NULL);
         pthis->fn.evthandler(pthis, evt);
     }
 #else
+    VSF_KERNEL_ASSERT(pthis->fn.evthandler != NULL);
     pthis->fn.evthandler(pthis, evt);
 #endif
 
@@ -1153,19 +1159,8 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 #endif
 
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-void vsf_kernel_on_trace_connected(void)
-{
-    vsf_kernel_trace_eda_info((vsf_eda_t *)&__vsf_eda.task, "kernel_task", NULL, 0);
-}
-#endif
-
 vsf_err_t vsf_kernel_start(void)
 {
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_kernel_trace_init();
-#endif
-
 #ifdef __VSF_KERNEL_TASK
     vsf_err_t err;
 
@@ -1181,8 +1176,17 @@ vsf_err_t vsf_kernel_start(void)
         __vsf_systimer_start();
     }
 #   endif
+
+    // trace will require systimer, call vsf_kernel_trace_init after systimer_start
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_init();
+    vsf_kernel_trace_eda_info((vsf_eda_t *)&__vsf_eda.task, "kernel_task", NULL, 0);
+#   endif
     return err;
 #else
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_init();
+#   endif
     return VSF_ERR_NONE;
 #endif
 }

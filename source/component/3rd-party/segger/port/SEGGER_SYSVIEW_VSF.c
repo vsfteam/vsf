@@ -89,6 +89,9 @@ static U64 _cbGetTime(void) {
 
 void vsf_kernel_trace_init(void) {
   SEGGER_SYSVIEW_Conf();
+
+  // poll for started
+  while (!SEGGER_SYSVIEW_IsStarted());
 }
 
 void vsf_kernel_trace_eda_info(vsf_eda_t *eda, char *name, void *stack, uint32_t stack_size) {

@@ -89,9 +89,6 @@ static void _cbSendSystemDesc(void) {
   SEGGER_SYSVIEW_VSF_EVT(VSF_EVT_SYNC_POLL);
   SEGGER_SYSVIEW_VSF_EVT(VSF_EVT_MESSAGE);
   SEGGER_SYSVIEW_VSF_EVT(VSF_EVT_USER);
-
-  extern void vsf_kernel_on_trace_connected(void);
-  vsf_kernel_on_trace_connected();
 #endif
 }
 
