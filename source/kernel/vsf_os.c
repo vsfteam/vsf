@@ -32,12 +32,6 @@
 // for vsf_hal_init
 #include "hal/vsf_hal.h"
 
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
-#       include VSF_KERNEL_CFG_TRACE_HEADER
-#   endif
-#endif
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

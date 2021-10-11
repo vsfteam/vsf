@@ -1376,5 +1376,13 @@ extern vsf_err_t vsf_eda_queue_recv_isr(vsf_eda_queue_t *pthis, void **node);
 #undef __VSF_EDA_CLASS_INHERIT__
 #undef __VSF_EDA_CLASS_IMPLEMENT
 
+/*============================ INCLUDES ======================================*/
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
+#       include VSF_KERNEL_CFG_TRACE_HEADER
+#   endif
+#endif
+
 #endif
 #endif      // __VSF_EDA_H__

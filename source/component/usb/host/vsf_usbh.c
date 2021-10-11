@@ -27,12 +27,6 @@
 #include "./vsf_usbh.h"
 #include "hal/vsf_hal.h"
 
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
-#       include VSF_KERNEL_CFG_TRACE_HEADER
-#   endif
-#endif
-
 /*============================ MACROS ========================================*/
 
 #define USB_DEFAULT_TIMEOUT         50    // 50ms

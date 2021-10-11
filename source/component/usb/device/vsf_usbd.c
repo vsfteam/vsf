@@ -35,12 +35,6 @@
 #include "./vsf_usbd.h"
 #include "./vsf_usbd_drv_ifs.h"
 
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
-#       include VSF_KERNEL_CFG_TRACE_HEADER
-#   endif
-#endif
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

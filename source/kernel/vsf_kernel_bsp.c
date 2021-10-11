@@ -28,12 +28,6 @@
 #include "./vsf_os.h"
 #include "utilities/vsf_utilities.h"
 
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
-#       include VSF_KERNEL_CFG_TRACE_HEADER
-#   endif
-#endif
-
 /*============================ MACROS ========================================*/
 
 // for __RTOS__ arch, VSF_KERNEL_CFG_NON_STANDALONE MUST be enabled

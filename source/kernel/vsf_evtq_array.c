@@ -29,12 +29,6 @@
 
 #include "./vsf_os.h"
 
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
-#       include VSF_KERNEL_CFG_TRACE_HEADER
-#   endif
-#endif
-
 #ifdef __VSF_OS_CFG_EVTQ_ARRAY
 
 /*============================ MACROS ========================================*/

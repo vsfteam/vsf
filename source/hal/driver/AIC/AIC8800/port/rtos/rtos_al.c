@@ -20,12 +20,6 @@
 #define __VSF_EDA_CLASS_INHERIT__
 #include "vsf.h"
 
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
-#       include VSF_KERNEL_CFG_TRACE_HEADER
-#   endif
-#endif
-
 #include "rtos_al.h"
 
 // library from vendor depends on this header,

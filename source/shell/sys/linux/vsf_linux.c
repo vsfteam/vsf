@@ -74,12 +74,6 @@
 #   include <stdio.h>
 #endif
 
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
-#       include VSF_KERNEL_CFG_TRACE_HEADER
-#   endif
-#endif
-
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_suppress=pe111

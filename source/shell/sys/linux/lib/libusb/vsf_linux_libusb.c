@@ -56,12 +56,6 @@
 #   include <string.h>
 #endif
 
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-#   ifdef VSF_KERNEL_CFG_TRACE_HEADER
-#       include VSF_KERNEL_CFG_TRACE_HEADER
-#   endif
-#endif
-
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE != ENABLED
