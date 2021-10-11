@@ -118,14 +118,18 @@ static void __vsf_systimer_start(void)
 void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 {
 #if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_isr_trace_enter(vsf_get_interrupt_id());
+    if (!__vsf_eda.timer.is_isr_info_sent) {
+        __vsf_eda.timer.is_isr_info_sent = true;
+        vsf_kernel_trace_isr_info(vsf_get_interrupt_id(), "systimer");
+    }
+    vsf_kernel_trace_isr_enter(vsf_get_interrupt_id());
 #endif
 
     UNUSED_PARAM(tick);
     __vsf_systimer_wakeup();
 
 #if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_isr_trace_leave(vsf_get_interrupt_id());
+    vsf_kernel_trace_isr_leave(vsf_get_interrupt_id());
 #endif
 }
 

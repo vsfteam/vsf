@@ -78,6 +78,10 @@ typedef struct vsf_local_t {
 #   else
         vsf_systimer_tick_t cur_tick;
 #   endif
+
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+        bool                is_isr_info_sent;
+#   endif
     } timer;
 #endif
 } vsf_local_t;
@@ -1181,6 +1185,9 @@ vsf_err_t vsf_kernel_start(void)
 #   if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_kernel_trace_init();
     vsf_kernel_trace_eda_info((vsf_eda_t *)&__vsf_eda.task, "kernel_task", NULL, 0);
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    __vsf_eda.timer.is_isr_info_sent = false;
+#       endif
 #   endif
     return err;
 #else

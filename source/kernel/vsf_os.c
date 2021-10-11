@@ -245,21 +245,31 @@ static void __vsf_kernel_os_init(void)
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 static void __vsf_os_evtq_swi_handler(void *p)
 {
-#if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_isr_trace_enter(vsf_get_interrupt_id());
-#endif
-
     vsf_evtq_t *pcur, *pold;
 
     VSF_KERNEL_ASSERT(p != NULL);
 
     pcur = (vsf_evtq_t *)p;
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    if (!pcur->is_isr_info_sent) {
+        pcur->is_isr_info_sent = true;
+
+        char name[3 + 4 + 1] = "swi";
+        int swi_idx = pcur - __vsf_os.res_ptr->evt_queue.queue_array;
+        VSF_KERNEL_ASSERT(swi_idx < __vsf_os.res_ptr->evt_queue.queue_cnt);
+        itoa(swi_idx, &name[3], 10);
+        vsf_kernel_trace_isr_info(vsf_get_interrupt_id(), name);
+    }
+    vsf_kernel_trace_isr_enter(vsf_get_interrupt_id());
+#endif
+
     pold = __vsf_set_cur_evtq(pcur);
     vsf_evtq_poll(pcur);
     __vsf_set_cur_evtq(pold);
 
 #if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_isr_trace_leave(vsf_get_interrupt_id());
+    vsf_kernel_trace_isr_leave(vsf_get_interrupt_id());
 #endif
 }
 
@@ -527,12 +537,30 @@ void __vsf_kernel_os_start(void)
             pevtq->bitsize = node_size;
 #   endif
             vsf_evtq_init(pevtq);
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+            pevtq->is_isr_info_sent = true;
+#   endif
         }
         __vsf_set_cur_evtq(NULL);
     }
 #endif
 
     vsf_kernel_start();
+
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+    {
+        vsf_evtq_t *pevtq = &__vsf_os.res_ptr->evt_queue.queue_array[0];
+        uint_fast16_t i;
+
+        for (i = 0;
+            i < __vsf_os.res_ptr->evt_queue.queue_cnt;
+            i++, pevtq++) {
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+            pevtq->is_isr_info_sent = false;
+#   endif
+        }
+    }
+#endif
 
     vsf_osa_hal_init();
     __post_vsf_kernel_init();

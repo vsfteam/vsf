@@ -47,20 +47,23 @@ typedef struct vsf_evtq_t vsf_evtq_t;
 struct vsf_evtq_t {
     vsf_dlist_t rdy_list;
     vsf_evtq_ctx_t cur;
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    bool is_isr_info_sent;
+#   endif
 };
 
 struct vsf_evt_node_t {
     implement(vsf_slist_node_t)
 
-#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
     vsf_evt_t evt;
     void *msg;
-#else
+#   else
     union {
         uintptr_t value;
         void *msg;
     } evt_union;
-#endif
+#   endif
 };
 
 #else
@@ -68,15 +71,15 @@ struct vsf_evt_node_t {
 struct vsf_evt_node_t {
     vsf_eda_t *eda;
 
-#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
     vsf_evt_t evt;
     void *msg;
-#else
+#   else
     union {
         uintptr_t value;
         void *msg;
     } evt_union;
-#endif
+#   endif
 };
 
 struct vsf_evtq_t {
@@ -87,6 +90,10 @@ struct vsf_evtq_t {
     uint8_t head;
     uint8_t tail;
     vsf_evtq_ctx_t cur;
+
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    bool is_isr_info_sent;
+#   endif
 };
 
 #endif

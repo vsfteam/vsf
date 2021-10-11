@@ -125,7 +125,7 @@ void vsf_kernel_trace_eda_idle(vsf_eda_t *eda) {
 void vsf_kernel_trace_eda_evt_begin(vsf_eda_t *eda, vsf_evt_t evt) {
   SEGGER_SYSVIEW_OnTaskStartReady((U32)eda);
   SEGGER_SYSVIEW_OnTaskStartExec((U32)eda);
-  SEGGER_SYSVIEW_RecordU32(VSF_APIID_EDA_BUSY, (U32)evt);
+  SEGGER_SYSVIEW_Mark((U32)evt);
 }
 
 void vsf_kernel_trace_eda_evt_end(vsf_eda_t *eda, vsf_evt_t evt) {
@@ -136,11 +136,24 @@ void vsf_kernel_trace_idle(void) {
   SEGGER_SYSVIEW_OnIdle();
 }
 
-void vsf_isr_trace_enter(int id) {
+void vsf_kernel_trace_isr_info(int id, char *name)
+{
+  size_t len;
+  char desc[256] = "I#";
+  itoa(id, &desc[2], 10);
+  len = strlen(desc);
+  desc[len] = '=';
+  VSF_ASSERT((sizeof(desc) - len - 2) > strlen(name));
+  strcpy(&desc[len + 1], name);
+
+  SEGGER_SYSVIEW_SendSysDesc(desc);
+}
+
+void vsf_kernel_trace_isr_enter(int id) {
   SEGGER_SYSVIEW_RecordEnterISR();
 }
 
-void vsf_isr_trace_leave(int id) {
+void vsf_kernel_trace_isr_leave(int id) {
   SEGGER_SYSVIEW_RecordExitISR();
 }
 

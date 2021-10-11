@@ -118,7 +118,7 @@ typedef struct vsf_kernel_resource_t {
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     struct {
-        vsf_evtq_t *queue_array;
+        vsf_evtq_t                          *queue_array;
 #   if defined(__VSF_OS_CFG_EVTQ_ARRAY)
         vsf_evt_node_t                      **nodes;
         uint8_t                             node_bit_sz;

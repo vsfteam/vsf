@@ -91,8 +91,9 @@ void vsf_kernel_trace_eda_evt_begin                 (vsf_eda_t *eda, vsf_evt_t e
 void vsf_kernel_trace_eda_evt_end                   (vsf_eda_t *eda, vsf_evt_t evt);
 void vsf_kernel_trace_idle                          (void);
 
-void vsf_isr_trace_enter                            (int id);
-void vsf_isr_trace_leave                            (int id);
+void vsf_kernel_trace_isr_info                      (int id, char *name);
+void vsf_kernel_trace_isr_enter                     (int id);
+void vsf_kernel_trace_isr_leave                     (int id);
 
 #ifdef __cplusplus
 }
