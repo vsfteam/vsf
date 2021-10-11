@@ -115,20 +115,22 @@ void vsf_kernel_trace_eda_fini(vsf_eda_t *eda) {
 }
 
 void vsf_kernel_trace_eda_ready(vsf_eda_t *eda) {
-  SEGGER_SYSVIEW_OnTaskStartReady((U32)eda);
-  SEGGER_SYSVIEW_OnTaskStartExec((U32)eda);
+  SEGGER_SYSVIEW_RecordU32(VSF_APIID_EDA_READY, (U32)eda);
 }
 
 void vsf_kernel_trace_eda_idle(vsf_eda_t *eda) {
-  SEGGER_SYSVIEW_OnTaskStopReady((U32)eda, 0);
+  SEGGER_SYSVIEW_RecordEndCall(VSF_APIID_EDA_READY);
 }
 
 void vsf_kernel_trace_eda_evt_begin(vsf_eda_t *eda, vsf_evt_t evt) {
-  SEGGER_SYSVIEW_MarkStart(evt);
+  SEGGER_SYSVIEW_OnTaskStartReady((U32)eda);
+  SEGGER_SYSVIEW_OnTaskStartExec((U32)eda);
+  SEGGER_SYSVIEW_RecordU32x2(VSF_APIID_EDA_BUSY, (U32)eda, (U32)evt);
 }
 
 void vsf_kernel_trace_eda_evt_end(vsf_eda_t *eda, vsf_evt_t evt) {
-  SEGGER_SYSVIEW_MarkStop(evt);
+  SEGGER_SYSVIEW_RecordEndCall(VSF_APIID_EDA_BUSY);
+  SEGGER_SYSVIEW_OnTaskStopReady((U32)eda, 0);
 }
 
 void vsf_kernel_trace_idle(void) {

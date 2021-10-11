@@ -73,6 +73,9 @@ extern "C" {
 *
 **********************************************************************
 */
+#define VSF_APIID_START                             32
+#define VSF_APIID_EDA_READY                         (VSF_APIID_START + 0)
+#define VSF_APIID_EDA_BUSY                          (VSF_APIID_START + 1)
 
 /*********************************************************************
 *
