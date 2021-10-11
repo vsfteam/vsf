@@ -121,30 +121,6 @@ Revision: $Rev: 21386 $
 #ifndef   SEGGER_RTT_MEMCPY_USE_BYTELOOP
   #define SEGGER_RTT_MEMCPY_USE_BYTELOOP              0 // 0: Use memcpy/SEGGER_RTT_MEMCPY, 1: Use a simple byte-loop
 #endif
-//
-// Example definition of SEGGER_RTT_MEMCPY to external memcpy with GCC toolchains and Cortex-A targets
-//
-//#if ((defined __SES_ARM) || (defined __CROSSWORKS_ARM) || (defined __GNUC__)) && (defined (__ARM_ARCH_7A__))
-//  #define SEGGER_RTT_MEMCPY(pDest, pSrc, NumBytes)      SEGGER_memcpy((pDest), (pSrc), (NumBytes))
-//#endif
-
-//
-// Target is not allowed to perform other RTT operations while string still has not been stored completely.
-// Otherwise we would probably end up with a mixed string in the buffer.
-// If using  RTT from within interrupts, multiple tasks or multi processors, define the SEGGER_RTT_LOCK() and SEGGER_RTT_UNLOCK() function here.
-//
-// SEGGER_RTT_MAX_INTERRUPT_PRIORITY can be used in the sample lock routines on Cortex-M3/4.
-// Make sure to mask all interrupts which can send RTT data, i.e. generate SystemView events, or cause task switches.
-// When high-priority interrupts must not be masked while sending RTT data, SEGGER_RTT_MAX_INTERRUPT_PRIORITY needs to be adjusted accordingly.
-// (Higher priority = lower priority number)
-// Default value for embOS: 128u
-// Default configuration in FreeRTOS: configMAX_SYSCALL_INTERRUPT_PRIORITY: ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
-// In case of doubt mask all interrupts: 1 << (8 - BASEPRI_PRIO_BITS) i.e. 1 << 5 when 3 bits are implemented in NVIC
-// or define SEGGER_RTT_LOCK() to completely disable interrupts.
-//
-#ifndef   SEGGER_RTT_MAX_INTERRUPT_PRIORITY
-  #define SEGGER_RTT_MAX_INTERRUPT_PRIORITY         (0x20)   // Interrupt priority to lock on SEGGER_RTT_LOCK on Cortex-M3/4 (Default: 0x20)
-#endif
 
 /*********************************************************************
 *
