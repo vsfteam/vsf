@@ -457,7 +457,7 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
 
     switch (evt) {
     case VSF_EVT_INIT: {
-            vk_dwcotg_hc_ip_info_t info;
+            vk_dwcotg_hc_ip_info_t info = { 0 };
             param->op->GetInfo(&info.use_as__usb_hc_ip_info_t);
             VSF_USB_ASSERT(info.dma_en);
 
