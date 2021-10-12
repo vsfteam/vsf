@@ -28,14 +28,29 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
                 bool is_fs_phy, usb_ip_irqhandler_t handler, void *param);
 
+static uint_fast32_t __aic8800_usbh_workaround_reset_port(void *param);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
+
+static const vk_dwcotg_hcd_workaround_t __aic8800_usbh_workaround = {
+    .param          = NULL,
+    .reset_port     = __aic8800_usbh_workaround_reset_port,
+};
+
 /*============================ IMPLEMENTATION ================================*/
+
+static uint_fast32_t __aic8800_usbh_workaround_reset_port(void *param)
+{
+    PMIC_MEM_WRITE(0X50010118, 0x400);
+    PMIC_MEM_WRITE(0X5001011c, 0x400);
+    return 10;
+}
 
 vsf_err_t aic8800_usbh_init(aic8800_usb_t *hc, usb_hc_ip_cfg_t *cfg)
 {
@@ -54,6 +69,7 @@ void aic8800_usbh_get_info(aic8800_usb_t *hc, usb_hc_ip_info_t *info)
     dwcotg_info->ep_num = hc->param->hc_ep_num;
     dwcotg_info->is_dma = true;
     dwcotg_info->use_as__vk_dwcotg_hw_info_t = param->use_as__vk_dwcotg_hw_info_t;
+    dwcotg_info->workaround = (vk_dwcotg_hcd_workaround_t *)&__aic8800_usbh_workaround;
 }
 
 void aic8800_usbh_irq(aic8800_usb_t *hc)

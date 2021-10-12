@@ -121,6 +121,7 @@ typedef struct vk_dwcotg_hcd_t {
     uint8_t is_port_changed : 1;
     uint8_t is_connected    : 1;
     uint8_t is_reset_issued : 1;
+    uint8_t is_reset_pending: 1;
     uint16_t ep_mask;
     volatile uint32_t softick;
 
@@ -129,6 +130,8 @@ typedef struct vk_dwcotg_hcd_t {
     vk_usbh_dev_t *dev;
     vsf_slist_queue_t ready_queue;
     vsf_slist_queue_t pending_queue;
+
+    vk_dwcotg_hcd_workaround_t *workaround;
 
     vk_usbh_hcd_urb_t *urb[0];
 } vk_dwcotg_hcd_t;
@@ -372,7 +375,14 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (!(hprt0 & USB_OTG_HPRT_PCSTS)) {
             break;
         }
-        if (hprt0 & USB_OTG_HPRT_PRST) {
+    __do_reset_port:
+        if (dwcotg_hcd->is_reset_pending) {
+            dwcotg_hcd->is_reset_pending = false;
+            *reg->host.hprt0 = hprt0 | USB_OTG_HPRT_PRST;
+            vsf_teda_set_timer_ms(20);
+        } else if (hprt0 & USB_OTG_HPRT_PRST) {
+            // ASSERT line status is low in reset, report to vendor if assert here
+            VSF_USB_ASSERT(!(*reg->host.hprt0 & USB_OTG_HPRT_PLSTS));
             *reg->host.hprt0 &= ~(USB_OTG_HPRT_PRST | USB_OTG_HPRT_W1C_MASK);
             vsf_teda_set_timer_ms(20);
         } else if (NULL == dwcotg_hcd->dev) {
@@ -399,9 +409,17 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if ((hprt0 & USB_OTG_HPRT_PRST) || !(hprt0 & USB_OTG_HPRT_PCSTS)) {
             break;
         }
-        *reg->host.hprt0 = hprt0 | USB_OTG_HPRT_PRST;
-        vsf_teda_set_timer_ms(20);
-        break;
+
+        dwcotg_hcd->is_reset_pending = true;
+        if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port != NULL)) {
+            uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround->param);
+            if (delay_ms > 0) {
+                vsf_teda_set_timer_ms(delay_ms);
+                break;
+            }
+        }
+
+        goto __do_reset_port;
     case VSF_DWCOTG_HCD_EVT_DISC:
         if (dwcotg_hcd->is_connected) {
             vk_usbh_dev_t *dev = dwcotg_hcd->dev;
@@ -451,6 +469,7 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             }
             memset(dwcotg_hcd, 0, dwcotg_size);
             dwcotg_hcd->hcd = hcd;
+            dwcotg_hcd->workaround = info.workaround;
 
             {
                 usb_hc_ip_cfg_t cfg = {
