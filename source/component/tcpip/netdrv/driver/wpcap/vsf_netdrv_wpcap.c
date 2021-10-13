@@ -77,7 +77,44 @@ static void * __vk_netdrv_wpcap_open(char *name)
     return fp;
 }
 
-static void __vk_netdrv_wpcap_netlink_thread(void *arg)
+static void __vk_netdrv_wpcap_on_input(vk_netdrv_wpcap_t *wpcap_netdrv, uint8_t *buffer, uint32_t len)
+{
+    void *netbuf = vk_netdrv_alloc_buf(&wpcap_netdrv->use_as__vk_netdrv_t);
+    if (netbuf != NULL) {
+        vsf_mem_t mem;
+        void *netbuf_cur = netbuf;
+        uint32_t cur_len = len;
+        size_t cur_size;
+
+        do {
+            netbuf_cur = vk_netdrv_read_buf(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf_cur, &mem);
+            cur_size = min(mem.size, cur_len);
+            memcpy(mem.buffer, buffer, cur_size);
+            cur_len -= cur_size;
+            buffer += cur_size;
+        } while ((netbuf_cur != NULL) && (cur_len > 0));
+
+        vk_netdrv_on_inputted(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf, len);
+    }
+}
+
+static void __vk_netdrv_wpcap_netlink_thread(void *param)
+{
+    vk_netdrv_wpcap_t *wpcap_netdrv = param;
+    vsf_evt_t evt;
+
+    while (true) {
+        evt = vsf_thread_wait();
+        VSF_TCPIP_ASSERT(VSF_EVT_USER == evt);
+
+        __vk_netdrv_wpcap_on_input(wpcap_netdrv, wpcap_netdrv->cur_buffer, wpcap_netdrv->cur_size);
+
+        wpcap_netdrv->cur_buffer = NULL;
+        __vsf_arch_irq_request_send(&wpcap_netdrv->irq_request);
+    }
+}
+
+static void __vk_netdrv_wpcap_netlink_irqthread(void *arg)
 {
     const uint8_t bcast_addr[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
     const uint8_t ipv4mcast_addr[] = {0x01, 0x00, 0x5e};
@@ -87,7 +124,6 @@ static void __vk_netdrv_wpcap_netlink_thread(void *arg)
     vk_netdrv_wpcap_t *wpcap_netdrv = container_of(irq_thread, vk_netdrv_wpcap_t, irq_thread);
     struct pcap_pkthdr pkt_header;
     const u_char *pkt_data;
-    void *netbuf;
 
     __vsf_arch_irq_set_background(irq_thread);
 
@@ -113,28 +149,22 @@ static void __vk_netdrv_wpcap_netlink_thread(void *arg)
         __vsf_arch_irq_start(irq_thread);
 
 #if VSF_NETDRV_WPCAP_CFG_TRACE == ENABLED
-            vsf_trace_debug("wpcap_rx:" VSF_TRACE_CFG_LINEEND);
-            vsf_trace_buffer(VSF_TRACE_DEBUG, (void *)pkt_data, pkt_header.len);
+        vsf_trace_debug("wpcap_rx:" VSF_TRACE_CFG_LINEEND);
+        vsf_trace_buffer(VSF_TRACE_DEBUG, (void *)pkt_data, pkt_header.len);
 #endif
 
-            netbuf = vk_netdrv_alloc_buf(&wpcap_netdrv->use_as__vk_netdrv_t);
-            if (netbuf != NULL) {
-                vsf_mem_t mem;
-                void *netbuf_cur = netbuf;
-                int_fast32_t len = pkt_header.len;
-                size_t cur_size;
+        if (vk_netdrv_feature(&wpcap_netdrv->use_as__vk_netdrv_t) & VSF_NETDRV_FEATURE_THREAD) {
+            VSF_TCPIP_ASSERT(NULL == wpcap_netdrv->cur_buffer);
+            wpcap_netdrv->cur_buffer = (uint8_t *)pkt_data;
+            wpcap_netdrv->cur_size = (uint32_t)pkt_header.len;
+            vsf_eda_post_evt(wpcap_netdrv->thread, VSF_EVT_USER);
+            __vsf_arch_irq_end(irq_thread, false);
 
-                do {
-                    netbuf_cur = vk_netdrv_read_buf(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf_cur, &mem);
-                    cur_size = min(mem.size, len);
-                    memcpy(mem.buffer, pkt_data, cur_size);
-                    len -= cur_size;
-                    pkt_data += cur_size;
-                } while ((netbuf_cur != NULL) && (len > 0));
-
-                vk_netdrv_on_inputted(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf, pkt_header.len);
-            }
-        __vsf_arch_irq_end(irq_thread, false);
+            __vsf_arch_irq_request_pend(&wpcap_netdrv->irq_request);
+        } else {
+            __vk_netdrv_wpcap_on_input(wpcap_netdrv, (uint8_t *)pkt_data, (uint32_t)pkt_header.len);
+            __vsf_arch_irq_end(irq_thread, false);
+        }
     }
 
     __vsf_arch_irq_fini(irq_thread);
@@ -146,7 +176,13 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_init(vk_netdrv_t *netdrv)
 
     wpcap_netdrv->fp = __vk_netdrv_wpcap_open(wpcap_netdrv->name);
     if (wpcap_netdrv->fp != NULL) {
-        __vsf_arch_irq_init(&wpcap_netdrv->irq_thread, "netdrv_wpcap", __vk_netdrv_wpcap_netlink_thread, VSF_NETDRV_WPCAP_CFG_HW_PRIORITY);
+        __vsf_arch_irq_request_init(&wpcap_netdrv->irq_request);
+        if (vk_netdrv_feature(netdrv) & VSF_NETDRV_FEATURE_THREAD) {
+            VSF_TCPIP_ASSERT(NULL == wpcap_netdrv->thread);
+            wpcap_netdrv->thread = vk_netdrv_thread(netdrv, __vk_netdrv_wpcap_netlink_thread, wpcap_netdrv);
+            VSF_TCPIP_ASSERT(wpcap_netdrv->thread != NULL);
+        }
+        __vsf_arch_irq_init(&wpcap_netdrv->irq_thread, "netdrv_wpcap", __vk_netdrv_wpcap_netlink_irqthread, VSF_NETDRV_WPCAP_CFG_HW_PRIORITY);
         return VSF_ERR_NONE;
     }
 

@@ -46,7 +46,11 @@ vsf_class(vk_netdrv_wpcap_t) {
     )
     private_member(
         vsf_arch_irq_thread_t irq_thread;
+        vsf_arch_irq_request_t irq_request;
+        vsf_eda_t *thread;
         void *fp;               // actually pcap_t *
+        uint8_t *cur_buffer;
+        uint32_t cur_size;
     )
 };
 
