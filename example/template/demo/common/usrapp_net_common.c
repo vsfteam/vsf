@@ -62,6 +62,7 @@ vsf_err_t usrapp_net_common_init(
     vk_netdrv_set_netlink_op((vk_netdrv_t *)&usrapp_net_common.netdrv, &vk_netdrv_wpcap_netlink_op, NULL);
 #   endif
 
+    vk_netdrv_prepare((vk_netdrv_t *)&usrapp_net_common.netdrv);
     err = vk_netdrv_connect((vk_netdrv_t *)&usrapp_net_common.netdrv);
 
 #endif
