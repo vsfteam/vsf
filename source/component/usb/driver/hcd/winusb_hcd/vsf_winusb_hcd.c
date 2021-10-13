@@ -424,7 +424,7 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
             struct usb_ctrlrequest_t *setup = &urb->setup_packet;
 
             if (USB_REQ_SET_INTERFACE == setup->bRequest) {
-                VSF_USB_ASSERT(setup->wIndex < winusb_dev->ifs_num);
+                VSF_USB_ASSERT((setup->wIndex < winusb_dev->ifs_num) && (winusb_dev->hUsbIfs[setup->wIndex] != NULL));
                 if (!WinUsb_SetCurrentAlternateSetting(winusb_dev->hUsbIfs[setup->wIndex], setup->wValue)) {
                     return -GetLastError();
                 }
@@ -456,7 +456,7 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
     case USB_ENDPOINT_XFER_INT: {
             uint8_t ep_idx = pipe.endpoint | (pipe.dir_in1out0 ? 0x10 : 0);
             int8_t ifs_idx = winusb_dev->ep[ep_idx].ep2ifs;
-            VSF_USB_ASSERT(ifs_idx >= 0);
+            VSF_USB_ASSERT((ifs_idx >= 0) && (winusb_dev->hUsbIfs[ifs_idx] != NULL));
             WINUSB_INTERFACE_HANDLE handle = winusb_dev->hUsbIfs[ifs_idx];
 
             if (!__vk_winusb_hcd_sumbit_urb_epnz(urb, handle, &real_size)) {
