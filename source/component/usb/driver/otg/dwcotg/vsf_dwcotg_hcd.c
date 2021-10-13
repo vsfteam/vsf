@@ -46,6 +46,10 @@
 #   error VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB support is not ready now
 #endif
 
+#ifndef VSF_DWCOTG_HCD_CFG_TRACE_PORT
+#   define VSF_DWCOTG_HCD_CFG_TRACE_PORT                DISABLED
+#endif
+
 #define USB_OTG_HPRT_W1C_MASK                                                   \
         (USB_OTG_HPRT_PENA | USB_OTG_HPRT_PCDET | USB_OTG_HPRT_PENCHNG | USB_OTG_HPRT_POCCHNG)
 
@@ -381,9 +385,12 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             *reg->host.hprt0 = hprt0 | USB_OTG_HPRT_PRST;
             vsf_teda_set_timer_ms(20);
         } else if (hprt0 & USB_OTG_HPRT_PRST) {
-            // ASSERT line status is low in reset, report to vendor if assert here
-            VSF_USB_ASSERT(!(*reg->host.hprt0 & USB_OTG_HPRT_PLSTS));
             *reg->host.hprt0 &= ~(USB_OTG_HPRT_PRST | USB_OTG_HPRT_W1C_MASK);
+            // ASSERT line status is low in reset, report to vendor if assert here
+            if (hprt0 & USB_OTG_HPRT_PLSTS) {
+                vsf_trace_warning("dwcotg_hcd: reset failed, retry" VSF_TRACE_CFG_LINEEND);
+                goto __do_reset_issue;
+            }
             vsf_teda_set_timer_ms(20);
         } else if (NULL == dwcotg_hcd->dev) {
             enum usb_device_speed_t speed = USB_SPEED_FULL;
@@ -403,13 +410,14 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         }
         dwcotg_hcd->is_connected = true;
-        vsf_trace_debug("dwcotg: dev connected" VSF_TRACE_CFG_LINEEND);
+        vsf_trace_debug("dwcotg_hcd: dev connected" VSF_TRACE_CFG_LINEEND);
         // fall through
     case VSF_DWCOTG_HCD_EVT_RST:
         if ((hprt0 & USB_OTG_HPRT_PRST) || !(hprt0 & USB_OTG_HPRT_PCSTS)) {
             break;
         }
 
+    __do_reset_issue:
         dwcotg_hcd->is_reset_pending = true;
         if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port != NULL)) {
             uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround->param);
@@ -428,7 +436,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             *reg->host.hprt0 &= ~(USB_OTG_HPRT_PRST | USB_OTG_HPRT_W1C_MASK);
 
             vsf_teda_cancel_timer();
-            vsf_trace_debug("dwcotg: dev disconnected" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_debug("dwcotg_hcd: dev disconnected" VSF_TRACE_CFG_LINEEND);
             if (dev != NULL) {
                 vk_usbh_disconnect_device((vk_usbh_t *)dwcotg_hcd->hcd, dev);
             }
@@ -969,6 +977,9 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
     if (intsts & USB_OTG_GINTSTS_HPRTINT) {
         uint32_t hprt0 = *dwcotg_hcd->reg.host.hprt0;
         uint32_t hprt0_masked = hprt0 & ~USB_OTG_HPRT_W1C_MASK;
+#   if VSF_DWCOTG_HCD_CFG_TRACE_PORT == ENABLED
+        vsf_trace_debug("dwcotg_hprt_isr: %08X" VSF_TRACE_CFG_LINEEND, hprt0);
+#   endif
         if (hprt0 & USB_OTG_HPRT_PCDET) {
             *dwcotg_hcd->reg.host.hprt0 = hprt0_masked | USB_OTG_HPRT_PCDET;
             vsf_eda_post_evt((vsf_eda_t *)&dwcotg_hcd->task, VSF_DWCOTG_HCD_EVT_CONN);
@@ -996,6 +1007,9 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
         uint_fast32_t haint = dwcotg_hcd->reg.host.global_regs->haint;
         haint &= dwcotg_hcd->reg.host.global_regs->haintmsk;
 
+#if VSF_DWCOTG_HCD_CFG_TRACE_PORT == ENABLED
+        vsf_trace_debug("dwcotg_hc_isr: %08X" VSF_TRACE_CFG_LINEEND, *dwcotg_hcd->reg.host.hprt0);
+#endif
         for (uint_fast8_t i = 0; i < dwcotg_hcd->ep_num; i++) {
             if (haint & (1UL << i)) {
                 __vk_dwcotg_hcd_channel_interrupt(dwcotg_hcd, i);
