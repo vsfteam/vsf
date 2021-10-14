@@ -158,9 +158,15 @@ int lwip_main(int argc, char *argv[])
     }
 #endif
 
-    // tcpip_init MUST be called first,
-    //  bacause netdrv callback will need buffer inistialized by tcpip_init.
-    tcpip_init(NULL, NULL);
+    {
+        static bool __is_lwip_inited = false;
+        // tcpip_init MUST be called first,
+        //  bacause netdrv callback will need buffer inistialized by tcpip_init.
+        if (!__is_lwip_inited) {
+            __is_lwip_inited = true;
+            tcpip_init(NULL, NULL);
+        }
+    }
 
 #if VSF_NETDRV_USE_WPCAP == ENABLED
     vsf_err_t err = usrapp_net_common_init(argv[1]);
