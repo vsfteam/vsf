@@ -733,14 +733,12 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     if (NULL == winusb_dev) { break; }
                     vk_winusb_hcd_urb_t *winusb_urb_head;
 
-                    if (VSF_WINUSB_HCD_URB_STATE_QUEUED == winusb_urb->state) {
-                        if (vsf_dlist_is_in(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb)) {
-                            vsf_dlist_remove_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
-                            vsf_dlist_peek_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
-                            if (winusb_urb_head != NULL) {
-                                winusb_urb_head->state = VSF_WINUSB_HCD_URB_STATE_SUBMITTING;
-                                __vsf_arch_irq_request_send(&winusb_urb_head->irq_request);
-                            }
+                    if (vsf_dlist_is_in(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb)) {
+                        vsf_dlist_remove_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
+                        vsf_dlist_peek_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
+                        if (winusb_urb_head != NULL) {
+                            winusb_urb_head->state = VSF_WINUSB_HCD_URB_STATE_SUBMITTING;
+                            __vsf_arch_irq_request_send(&winusb_urb_head->irq_request);
                         }
                     }
                 }

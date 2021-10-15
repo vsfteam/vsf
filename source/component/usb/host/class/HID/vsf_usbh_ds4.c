@@ -297,7 +297,8 @@ void vsf_usbh_ds4_on_free(vk_usbh_ds4_t *ds4)
 
 static void __vk_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_ds4_t *ds4 = (vk_usbh_ds4_t *)container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
+    vk_usbh_hid_teda_t *hid = container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
+    vk_usbh_ds4_t *ds4 = container_of(hid, vk_usbh_ds4_t, use_as__vk_usbh_hid_teda_t);
 
     switch (evt) {
     case VSF_EVT_INIT: {
@@ -305,7 +306,7 @@ static void __vk_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vk_usbh_urb_t *urb = &ep0->urb;
 
             vk_usbh_urb_free_buffer(urb);
-            vk_usbh_hid_set_idle(ds4, 0, 0);
+            vk_usbh_hid_set_idle(&ds4->use_as__vk_usbh_hid_teda_t, 0, 0);
         }
         break;
     case VSF_EVT_MESSAGE: {
@@ -331,6 +332,9 @@ static void __vk_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             }
         }
         break;
+    case VSF_EVT_USER:
+        vk_usbh_hid_send_report(&ds4->use_as__vk_usbh_hid_teda_t, (uint8_t *)&ds4->gamepad_out_buf, sizeof(ds4->gamepad_out_buf));
+        break;
     }
 }
 
@@ -338,17 +342,19 @@ static void * __vk_usbh_ds4_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
 {
     vk_usbh_ds4_t *ds4 = vk_usbh_hid_probe(usbh, dev, parser_ifs, sizeof(vk_usbh_ds4_t), true);
     if (ds4 != NULL) {
+        ds4->out_idle = true;
         ds4->gamepad_out_buf.id = 0x05;
         ds4->gamepad_out_buf.dummyFF = 0xff;
         ds4->user_evthandler = __vk_usbh_ds4_evthandler;
     }
-    return ds4;
+    return &ds4->use_as__vk_usbh_hid_teda_t;
 }
 
 static void __vk_usbh_ds4_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
-    vsf_usbh_ds4_on_free((vk_usbh_ds4_t *)param);
-    vk_usbh_hid_disconnect((vk_usbh_hid_teda_t *)param);
+    vk_usbh_ds4_t *ds4 = param;
+    vsf_usbh_ds4_on_free(ds4);
+    vk_usbh_hid_disconnect(&ds4->use_as__vk_usbh_hid_teda_t);
 }
 
 bool vk_usbh_ds4_can_output(vk_usbh_ds4_t *ds4)
@@ -359,10 +365,10 @@ bool vk_usbh_ds4_can_output(vk_usbh_ds4_t *ds4)
 static void __vk_usbh_ds4_output(vk_usbh_ds4_t *ds4)
 {
     ds4->out_idle = false;
-    vk_usbh_hid_send_report(&ds4->use_as__vk_usbh_hid_teda_t, (uint8_t *)&ds4->gamepad_out_buf, sizeof(ds4->gamepad_out_buf));
+    vsf_eda_post_evt(&ds4->use_as__vsf_eda_t, VSF_EVT_USER);
 }
 
-void vk_usbh_ds4_set_rumble(vk_usbh_ds4_t *ds4, uint_fast8_t left, uint_fast8_t right)
+void vk_usbh_ds4_set_rumble(vk_usbh_ds4_t *ds4, uint8_t left, uint8_t right)
 {
     VSF_USB_ASSERT(ds4->out_idle);
     ds4->gamepad_out_buf.rumble_r = right;
@@ -370,7 +376,7 @@ void vk_usbh_ds4_set_rumble(vk_usbh_ds4_t *ds4, uint_fast8_t left, uint_fast8_t 
     __vk_usbh_ds4_output(ds4);
 }
 
-void vk_usbh_ds4_set_led(vk_usbh_ds4_t *ds4, uint_fast8_t r, uint_fast8_t g, uint_fast8_t b)
+void vk_usbh_ds4_set_led(vk_usbh_ds4_t *ds4, uint8_t r, uint8_t g, uint8_t b)
 {
     VSF_USB_ASSERT(ds4->out_idle);
     ds4->gamepad_out_buf.led_r = r;

@@ -89,8 +89,8 @@ extern void vk_ds4u_free_dev(vk_input_ds4u_t *dev);
 #endif
 
 extern bool vk_usbh_ds4_can_output(vk_usbh_ds4_t *ds4);
-extern void vk_usbh_ds4_set_rumble(vk_usbh_ds4_t *ds4, uint_fast8_t left, uint_fast8_t right);
-extern void vk_usbh_ds4_set_led(vk_usbh_ds4_t *ds4, uint_fast8_t r, uint_fast8_t g, uint_fast8_t b);
+extern void vk_usbh_ds4_set_rumble(vk_usbh_ds4_t *ds4, uint8_t left, uint8_t right);
+extern void vk_usbh_ds4_set_led(vk_usbh_ds4_t *ds4, uint8_t r, uint8_t g, uint8_t b);
 
 #ifdef __cplusplus
 }
