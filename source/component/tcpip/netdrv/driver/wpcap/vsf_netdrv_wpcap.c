@@ -27,6 +27,12 @@
 
 #include "pcap.h"
 
+#ifdef __WIN__
+#   define BPF_MAJOR_VERSION
+#   include <Packet32.h>
+#   include <Ntddndis.h>
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_NETDRV_WPCAP_CFG_TRACE
@@ -176,6 +182,13 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_init(vk_netdrv_t *netdrv)
 
     wpcap_netdrv->fp = __vk_netdrv_wpcap_open(wpcap_netdrv->name);
     if (wpcap_netdrv->fp != NULL) {
+#ifdef __WIN__
+        // get mac address for WIN
+        netdrv->macaddr.size = 6;
+        int status = pcap_oid_get_request((pcap_t *)wpcap_netdrv->fp, OID_802_3_CURRENT_ADDRESS, &netdrv->macaddr.addr_buf, &netdrv->macaddr.size);
+        VSF_TCPIP_ASSERT(!status && (6 == netdrv->macaddr.size));
+#endif
+
         __vsf_arch_irq_request_init(&wpcap_netdrv->irq_request);
         if (vk_netdrv_feature(netdrv) & VSF_NETDRV_FEATURE_THREAD) {
             VSF_TCPIP_ASSERT(NULL == wpcap_netdrv->thread);

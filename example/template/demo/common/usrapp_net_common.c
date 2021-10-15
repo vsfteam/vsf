@@ -32,7 +32,10 @@ usrapp_net_common_t usrapp_net_common = {
 #   if VSF_NETDRV_USE_WPCAP == ENABLED
     .netdrv                 = {
         .macaddr.size       = TCPIP_ETH_ADDRLEN,
+        // for __WIN__ mac is initialized by pcap_oid_get_request
+#       ifdef APP_NETDRV_WPCAP_CFG_MAC
         .macaddr.addr_buf   = {APP_NETDRV_WPCAP_CFG_MAC},
+#       endif
         .mac_header_size    = TCPIP_ETH_HEADSIZE,
         .mtu                = 1500 + TCPIP_ETH_HEADSIZE,
         .hwtype             = TCPIP_ETH_HWTYPE,

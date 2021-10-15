@@ -337,8 +337,6 @@
 #   else
 #       define VSF_NETDRV_WPCAP_CFG_HW_PRIORITY         vsf_arch_prio_2
 #   endif
-//  TODO: modify the virtual mac address
-#   define APP_NETDRV_WPCAP_CFG_MAC                     0xDC,0xFB,0x48,0x7B,0x9C,0x88
 #endif
 
 #define VSF_DISP_USE_SDL2                               ENABLED
