@@ -785,7 +785,17 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         }
 
         channel_intsts &= ~USB_OTG_HCINT_CHH;
-        if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
+        // IMPORTANT: process error first, because maybe some other flags will be set at the same time and errors ignored
+        if (channel_intsts & (USB_OTG_HCINT_TXERR | USB_OTG_HCINT_BBERR | USB_OTG_HCINT_DTERR)) {
+            // data toggle error, babble error, usb bus error
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+            vsf_trace_error("dwcotg_hcd.channel%d: failed" VSF_TRACE_CFG_LINEEND, channel_idx);
+#endif
+        urb_fail:
+            urb->status = URB_FAIL;
+        urb_done:
+            vsf_eda_post_msg(urb->eda_caller, urb);
+        } else if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
             bool is_stall = channel_intsts & USB_OTG_HCINT_STALL;
 
             if (VSF_DWCOTG_HCD_PHASE_DATA == dwcotg_urb->phase) {
@@ -878,12 +888,6 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 vsf_unprotect_int(orig);
             }
             return;
-        } else if (channel_intsts & (USB_OTG_HCINT_TXERR | USB_OTG_HCINT_BBERR | USB_OTG_HCINT_DTERR)) {
-            // data toggle error, babble error, usb bus error
-        urb_fail:
-            urb->status = URB_FAIL;
-        urb_done:
-            vsf_eda_post_msg(urb->eda_caller, urb);
         } else if (channel_intsts & USB_OTG_HCINT_FRMOR) {
             // frame error
             // TODO: update err_cnt
@@ -891,10 +895,14 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         } else {
             // no idea why no event
 //            VSF_USB_ASSERT(false);
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+            vsf_trace_error("dwcotg_hcd.channel%d: no event" VSF_TRACE_CFG_LINEEND, channel_idx);
+#endif
             goto urb_fail;
         }
 
     free_channel: {
+            vk_usbh_hcd_urb_t *urb_orig = urb;
             bool is_discarded;
 
             orig = vsf_protect_int();
@@ -917,7 +925,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             vsf_trace_debug("dwcotg_hcd.channel%d: free" VSF_TRACE_CFG_LINEEND, channel_idx);
 #endif
             if (is_discarded) {
-                vsf_eda_post_msg((vsf_eda_t *)&dwcotg_hcd->task, urb);
+                vsf_eda_post_msg((vsf_eda_t *)&dwcotg_hcd->task, urb_orig);
             }
             if (dwcotg_urb != NULL) {
                 __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
