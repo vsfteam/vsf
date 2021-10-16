@@ -49,6 +49,9 @@
 #ifndef VSF_DWCOTG_HCD_CFG_TRACE_PORT
 #   define VSF_DWCOTG_HCD_CFG_TRACE_PORT                DISABLED
 #endif
+#ifndef VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL
+#   define VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL             DISABLED
+#endif
 
 #define USB_OTG_HPRT_W1C_MASK                                                   \
         (USB_OTG_HPRT_PENA | USB_OTG_HPRT_PCDET | USB_OTG_HPRT_PENCHNG | USB_OTG_HPRT_POCCHNG)
@@ -330,6 +333,11 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
     channel_regs->hcchar |= ((dwcotg_hcd->reg.host.global_regs->hfnum & 1) ^ 1) << 29;
     channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
 
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+    vsf_trace_debug("dwcotg_hcd.channel%d: submit for urb %p" VSF_TRACE_CFG_LINEEND,
+                        dwcotg_urb->channel_idx, urb);
+#endif
+
     channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM;
     vsf_protect_t orig = vsf_protect_int();
         dwcotg_hcd->reg.host.global_regs->haintmsk |= 1 << dwcotg_urb->channel_idx;
@@ -386,11 +394,12 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_teda_set_timer_ms(20);
         } else if (hprt0 & USB_OTG_HPRT_PRST) {
             *reg->host.hprt0 &= ~(USB_OTG_HPRT_PRST | USB_OTG_HPRT_W1C_MASK);
-            // ASSERT line status is low in reset, report to vendor if assert here
-            if (hprt0 & USB_OTG_HPRT_PLSTS) {
-                vsf_trace_warning("dwcotg_hcd: reset failed, retry" VSF_TRACE_CFG_LINEEND);
-                goto __do_reset_issue;
-            }
+            // 2021.10.16: seems that PLSTS in hprt0 maybe different to the actual signal,
+            //  remove the check and retry below.
+//            if (hprt0 & USB_OTG_HPRT_PLSTS) {
+//                vsf_trace_warning("dwcotg_hcd: reset failed, retry" VSF_TRACE_CFG_LINEEND);
+//                goto __do_reset_issue;
+//            }
             vsf_teda_set_timer_ms(20);
         } else if (NULL == dwcotg_hcd->dev) {
             enum usb_device_speed_t speed = USB_SPEED_FULL;
@@ -417,7 +426,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         }
 
-    __do_reset_issue:
+//    __do_reset_issue:
         dwcotg_hcd->is_reset_pending = true;
         if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port != NULL)) {
             uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround->param);
@@ -706,6 +715,9 @@ static void __vk_dwcotg_hcd_urb_fsm(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb
         if (index < 0) {
             return;
         }
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+        vsf_trace_debug("dwcotg_hcd.channel%d: alloc for urb %p" VSF_TRACE_CFG_LINEEND, index, urb);
+#endif
     }
 
     switch (dwcotg_urb->phase) {
@@ -746,6 +758,9 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
     struct dwcotg_hc_regs_t *channel_regs = &dwcotg_hcd->reg.host.hc_regs[channel_idx];
     uint_fast32_t channel_intsts = channel_regs->hcint;
 
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+    vsf_trace_debug("dwcotg_hcd.channel%d: interrupt %08X" VSF_TRACE_CFG_LINEEND, channel_idx, channel_intsts);
+#endif
     if (channel_intsts & USB_OTG_HCINT_CHH) {
         vk_usbh_hcd_urb_t *urb = dwcotg_hcd->urb[channel_idx];
         vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
@@ -891,6 +906,9 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 }
             vsf_unprotect_int(orig);
 
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+            vsf_trace_debug("dwcotg_hcd.channel%d: free" VSF_TRACE_CFG_LINEEND, channel_idx);
+#endif
             if (is_discarded) {
                 vsf_eda_post_msg((vsf_eda_t *)&dwcotg_hcd->task, urb);
             }
@@ -978,7 +996,7 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
         uint32_t hprt0 = *dwcotg_hcd->reg.host.hprt0;
         uint32_t hprt0_masked = hprt0 & ~USB_OTG_HPRT_W1C_MASK;
 #   if VSF_DWCOTG_HCD_CFG_TRACE_PORT == ENABLED
-        vsf_trace_debug("dwcotg_hprt_isr: %08X" VSF_TRACE_CFG_LINEEND, hprt0);
+        vsf_trace_debug("dwcotg_hcd.hprt_isr: %08X" VSF_TRACE_CFG_LINEEND, hprt0);
 #   endif
         if (hprt0 & USB_OTG_HPRT_PCDET) {
             *dwcotg_hcd->reg.host.hprt0 = hprt0_masked | USB_OTG_HPRT_PCDET;
@@ -1008,7 +1026,7 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
         haint &= dwcotg_hcd->reg.host.global_regs->haintmsk;
 
 #if VSF_DWCOTG_HCD_CFG_TRACE_PORT == ENABLED
-        vsf_trace_debug("dwcotg_hc_isr: %08X" VSF_TRACE_CFG_LINEEND, *dwcotg_hcd->reg.host.hprt0);
+        vsf_trace_debug("dwcotg_hcd.channel_isr: hprt %08X" VSF_TRACE_CFG_LINEEND, *dwcotg_hcd->reg.host.hprt0);
 #endif
         for (uint_fast8_t i = 0; i < dwcotg_hcd->ep_num; i++) {
             if (haint & (1UL << i)) {
