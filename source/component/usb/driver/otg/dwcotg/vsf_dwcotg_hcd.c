@@ -53,6 +53,10 @@
 #   define VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL             DISABLED
 #endif
 
+#ifndef __VSF_DWCOTG_HCD_CFG_PORT_RESET_CHECK
+#   define __VSF_DWCOTG_HCD_CFG_PORT_RESET_CHECK        DISABLED
+#endif
+
 #define USB_OTG_HPRT_W1C_MASK                                                   \
         (USB_OTG_HPRT_PENA | USB_OTG_HPRT_PCDET | USB_OTG_HPRT_PENCHNG | USB_OTG_HPRT_POCCHNG)
 
@@ -394,12 +398,13 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_teda_set_timer_ms(20);
         } else if (hprt0 & USB_OTG_HPRT_PRST) {
             *reg->host.hprt0 &= ~(USB_OTG_HPRT_PRST | USB_OTG_HPRT_W1C_MASK);
-            // 2021.10.16: seems that PLSTS in hprt0 maybe different to the actual signal,
-            //  remove the check and retry below.
-//            if (hprt0 & USB_OTG_HPRT_PLSTS) {
-//                vsf_trace_warning("dwcotg_hcd: reset failed, retry" VSF_TRACE_CFG_LINEEND);
-//                goto __do_reset_issue;
-//            }
+            // 2021.10.16: seems that PLSTS in hprt0 maybe different to the actual signal
+            if (hprt0 & USB_OTG_HPRT_PLSTS) {
+                vsf_trace_warning("dwcotg_hcd: reset failed, retry" VSF_TRACE_CFG_LINEEND);
+#if __VSF_DWCOTG_HCD_CFG_PORT_RESET_CHECK == ENABLED
+                goto __do_reset_issue;
+#endif
+            }
             vsf_teda_set_timer_ms(20);
         } else if (NULL == dwcotg_hcd->dev) {
             enum usb_device_speed_t speed = USB_SPEED_FULL;
@@ -426,7 +431,9 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         }
 
-//    __do_reset_issue:
+#if __VSF_DWCOTG_HCD_CFG_PORT_RESET_CHECK == ENABLED
+    __do_reset_issue:
+#endif
         dwcotg_hcd->is_reset_pending = true;
         if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port != NULL)) {
             uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround->param);
