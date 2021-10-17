@@ -723,7 +723,7 @@ static vk_usbh_urb_t * __vk_usbh_control_msg_common(vk_usbh_t *usbh, vk_usbh_dev
     }
 
     urb_hcd->pipe.dir_in1out0 = (req->bRequestType & USB_DIR_IN) > 0;
-    urb_hcd->timeout = 200;
+    urb_hcd->timeout = 2000;
 
     urb_hcd->setup_packet = *req;
     return urb;

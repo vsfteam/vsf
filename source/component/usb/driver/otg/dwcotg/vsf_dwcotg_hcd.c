@@ -244,6 +244,9 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
     vk_usbh_hcd_urb_t *urb = dwcotg_hcd->urb[channel_idx];
     VSF_USB_ASSERT(urb != NULL);
 
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+    vsf_trace_debug("dwcotg_hcd.channel%d: halted" VSF_TRACE_CFG_LINEEND, channel_idx);
+#endif
     channel_regs->hcchar |= USB_OTG_HCCHAR_CHDIS;
     if (    (urb->pipe.type == USB_ENDPOINT_XFER_BULK)
         ||  (urb->pipe.type == USB_ENDPOINT_XFER_INT)) {
@@ -977,9 +980,17 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
                 VSF_USB_ASSERT(dwcotg_hcd->urb[i] != NULL);
                 vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&dwcotg_hcd->urb[i]->priv;
                 if (dwcotg_urb->is_discarded) {
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+                    vsf_trace_debug("dwcotg_hcd.sof.channel%d: discard" VSF_TRACE_CFG_LINEEND, i);
+#endif
                     __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, i);
-                } else if (dwcotg_urb->timeout == dwcotg_hcd->softick) {
+                } else if (dwcotg_urb->is_timeout_en && (dwcotg_urb->timeout == dwcotg_hcd->softick)) {
+                    dwcotg_urb->is_timeout_en = false;
                     dwcotg_urb->is_timeout = true;
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+                    vsf_trace_debug("dwcotg_hcd.sof.channel%d: timeout" VSF_TRACE_CFG_LINEEND, i);
+#endif
+                    __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, i);
                 }
             }
         }
