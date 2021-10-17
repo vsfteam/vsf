@@ -787,6 +787,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         channel_regs->hcintmsk = 0;
         channel_regs->hcint = channel_regs->hcint;
 
+        // is_discarded MUST be handled first, because discard operatoin will use timeout as mark
         if (dwcotg_urb->is_discarded) {
             goto free_channel;
         }
@@ -974,16 +975,25 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
         vsf_unprotect_int(orig);
 
         // after device connecting to roothub is removed, there is possibility that the channel
-        //  can not be halted, so check in SOF, if the channel need to be halted
+        //  can not be halted, so check in SOF, if the channel need to be halted or timeouted
         for (uint_fast8_t i = 0; (dwcotg_hcd->ep_mask != 0) && (i < dwcotg_hcd->ep_num); i++) {
             if (dwcotg_hcd->ep_mask & (1 << i)) {
                 VSF_USB_ASSERT(dwcotg_hcd->urb[i] != NULL);
                 vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&dwcotg_hcd->urb[i]->priv;
-                if (dwcotg_urb->is_discarded) {
+                if (dwcotg_urb->is_timeout) {
+                    // channel is still active after timeout, need to read GRXSTSP according to
+                    //  <DesignWare Cores USB 2.0 Hi-Speed On-The-Go(OTG)> Section 3.5:
+                    //  Host Programming Overview -- Halting a Channel
+                    // The core generates a RxFLv1 interrupt when there is an entry in the queue.
+                    // The application must read/pop the GRXSTSP register to generate the Channel Halted interrupt.
+                    volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
+                } else if (dwcotg_urb->is_discarded) {
 #if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
                     vsf_trace_debug("dwcotg_hcd.sof.channel%d: discard" VSF_TRACE_CFG_LINEEND, i);
 #endif
                     __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, i);
+                    // use timeout to check grxstsp
+                    dwcotg_urb->is_timeout = true;
                 } else if (dwcotg_urb->is_timeout_en && (dwcotg_urb->timeout == dwcotg_hcd->softick)) {
                     dwcotg_urb->is_timeout_en = false;
                     dwcotg_urb->is_timeout = true;
