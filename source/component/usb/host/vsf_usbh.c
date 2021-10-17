@@ -1065,6 +1065,8 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
         __vsf_eda_crit_npb_init(&dev->ep0.crit);
         parser->devnum_temp = dev->devnum;
+
+    device_probe_retry:
         parser->probe_state = VSF_USBH_PROBE_START;
         dev->devnum = 0;
 
@@ -1072,7 +1074,13 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         err = vk_usbh_get_descriptor(usbh, dev, USB_DT_DEVICE, 0, 64);
         break;
     case VSF_EVT_MESSAGE:
-        if (vk_usbh_urb_get_status(urb) != URB_OK) { goto parse_failed; }
+        if (vk_usbh_urb_get_status(urb) != URB_OK) {
+            // TODO: add retry cnt?
+            parser->is_to_retry = true;
+            parser->probe_state = VSF_USBH_PROBE_WAIT_DEVICE_RESET;
+            vk_usbh_reset_dev(usbh, dev);
+            goto device_reset_wait;
+        }
 
         switch (parser->probe_state) {
         case VSF_USBH_PROBE_WAIT_DEVICE_DESC:
@@ -1083,7 +1091,7 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 vk_usbh_reset_dev(usbh, dev);
                 goto device_reset_wait;
             } else {
-            __set_address:
+            set_address:
                 dev->devnum = parser->devnum_temp;
                 err = vk_usbh_set_address(usbh, dev);
             }
@@ -1141,7 +1149,12 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 vsf_teda_set_timer_ms(20);
                 return;
             } else {
-                goto __set_address;
+                if (parser->is_to_retry) {
+                    parser->is_to_retry = false;
+                    goto device_probe_retry;
+                } else {
+                    goto set_address;
+                }
             }
             break;
         case VSF_USBH_PROBE_WAIT_ADDRESS_STABLE:

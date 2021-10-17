@@ -60,7 +60,8 @@ typedef enum {
     VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT
                                             =-17,   //!< the resource provided by user is not sufficient
     VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED
-                                            =-18    //!< the provided resource is not aligned to certain size (2^N)
+                                            =-18,   //!< the provided resource is not aligned to certain size (2^N)
+    VSF_ERR_TIMEOUT                         =-19,
 } vsf_err_t;
 //! @}
 

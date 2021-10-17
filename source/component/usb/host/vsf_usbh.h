@@ -159,6 +159,7 @@ enum {
     URB_OK                  = VSF_ERR_NONE,
     URB_FAIL                = VSF_ERR_FAIL,
     URB_PENDING             = VSF_ERR_NOT_READY,
+    URB_TIMEOUT             = VSF_ERR_TIMEOUT,
 };
 
 // struct vsf_hcd_urb_t.transfer_flags
@@ -196,6 +197,7 @@ typedef struct vk_usbh_dev_parser_t {
     vk_usbh_ifs_parser_t *parser_ifs;
     uint8_t num_of_ifs;
     uint8_t devnum_temp;
+    uint8_t is_to_retry;
     enum {
         VSF_USBH_PROBE_START,
         VSF_USBH_PROBE_WAIT_DEVICE_DESC,

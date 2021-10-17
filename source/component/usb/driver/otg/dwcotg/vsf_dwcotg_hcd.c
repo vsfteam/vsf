@@ -108,8 +108,12 @@ typedef struct vk_dwcotg_hcd_urb_t {
     uint16_t toggle         : 1;
     uint16_t do_ping        : 1;
     uint16_t is_split       : 1;
+    uint16_t is_timeout_en  : 1;
+    uint16_t is_timeout     : 1;
 
     uint16_t current_size;
+
+    uint32_t timeout;
 
 #ifdef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
     uint32_t buffer[VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE / sizeof(uint32_t)];
@@ -783,6 +787,13 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         if (dwcotg_urb->is_discarded) {
             goto free_channel;
         }
+        if (dwcotg_urb->is_timeout) {
+#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
+            vsf_trace_error("dwcotg_hcd.channel%d: timeout" VSF_TRACE_CFG_LINEEND, channel_idx);
+#endif
+            urb->status = URB_TIMEOUT;
+            goto urb_done;
+        }
 
         channel_intsts &= ~USB_OTG_HCINT_CHH;
         // IMPORTANT: process error first, because maybe some other flags will be set at the same time and errors ignored
@@ -967,6 +978,8 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
                 vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&dwcotg_hcd->urb[i]->priv;
                 if (dwcotg_urb->is_discarded) {
                     __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, i);
+                } else if (dwcotg_urb->timeout == dwcotg_hcd->softick) {
+                    dwcotg_urb->is_timeout = true;
                 }
             }
         }
@@ -1062,6 +1075,10 @@ static vsf_err_t __vk_dwcotg_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_
     }
 
     memset(dwcotg_urb, 0, sizeof(*dwcotg_urb));
+    if (urb->timeout > 0) {
+        dwcotg_urb->is_timeout_en = true;
+        dwcotg_urb->timeout = urb->timeout + dwcotg_hcd->softick;
+    }
     switch (pipe.type) {
     case USB_ENDPOINT_XFER_CONTROL:
         dwcotg_urb->phase = VSF_DWCOTG_HCD_PHASE_SETUP;
