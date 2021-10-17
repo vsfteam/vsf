@@ -987,10 +987,12 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
                     // The core generates a RxFLv1 interrupt when there is an entry in the queue.
                     // The application must read/pop the GRXSTSP register to generate the Channel Halted interrupt.
 
-                    // read rx queue first, if pktsts is CH_HALTED, then pop it
-                    uint32_t pktsts = (dwcotg_hcd->reg.global_regs->grxstsr & USB_OTG_GRXSTSP_PKTSTS) >> 17;
-                    if (pktsts == 7) {      // RXSTAT_CH_HALTED
-                        volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
+                    if (dwcotg_hcd->reg.global_regs->grxfsiz > 0) {
+                        // read rx queue first, if pktsts is CH_HALTED, then pop it
+                        uint32_t pktsts = (dwcotg_hcd->reg.global_regs->grxstsr & USB_OTG_GRXSTSP_PKTSTS) >> 17;
+                        if (pktsts == 7) {      // RXSTAT_CH_HALTED
+                            volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
+                        }
                     }
                 } else if (dwcotg_urb->is_discarded) {
 #if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
