@@ -402,6 +402,8 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (dwcotg_hcd->is_reset_pending) {
             dwcotg_hcd->is_reset_pending = false;
             *reg->host.hprt0 = hprt0 | USB_OTG_HPRT_PRST;
+            // flush fifo
+            reg->global_regs->grstctl = USB_OTG_GRSTCTL_TXFFLSH | USB_OTG_GRSTCTL_TXFNUM_4 | USB_OTG_GRSTCTL_TXFFLSH;
             vsf_teda_set_timer_ms(20);
         } else if (hprt0 & USB_OTG_HPRT_PRST) {
             *reg->host.hprt0 &= ~(USB_OTG_HPRT_PRST | USB_OTG_HPRT_W1C_MASK);
