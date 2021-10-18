@@ -464,6 +464,26 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_trace_debug("dwcotg_hcd: dev disconnected" VSF_TRACE_CFG_LINEEND);
             if (dev != NULL) {
                 vk_usbh_disconnect_device((vk_usbh_t *)dwcotg_hcd->hcd, dev);
+
+                reg->global_regs->gintmsk &= ~USB_OTG_GINTMSK_SOFM;
+
+                // halt all channel
+                for (uint_fast8_t i = 0; (dwcotg_hcd->ep_mask != 0) && (i < dwcotg_hcd->ep_num); i++) {
+                    if (dwcotg_hcd->ep_mask & (1 << i)) {
+                        VSF_USB_ASSERT(dwcotg_hcd->urb[i] != NULL);
+                        vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&dwcotg_hcd->urb[i]->priv;
+                        // mark for halted
+                        dwcotg_urb->is_timeout = true;
+                        __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, i);
+                        // but afterwards, maybe OSF is not interrupted, how to clear CH_HALTED in rx queue?
+                    }
+                }
+
+                // reset pending queue, urb in pending_queue SHOULD be already free by __vk_dwcotg_hcd_free_urb
+                vsf_slist_queue_init(&dwcotg_hcd->pending_queue);
+
+                // enable USB_OTG_GINTMSK_RXFLVLM to process CH_HALTED event in rx queue, whill be disabled in VSF_DWCOTG_HCD_EVT_CONN
+                reg->global_regs->gintmsk |= USB_OTG_GINTMSK_SOFM | USB_OTG_GINTMSK_RXFLVLM;
             }
         }
         break;
@@ -892,9 +912,8 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 // re-activate the channel, no need to halt and re-submit
                 channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHDIS;
                 channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
-                break;
+                return;
             }
-            return;
         } else if (channel_intsts & (USB_OTG_HCINT_ACK | USB_OTG_HCINT_NYET)) {
             if (is_split) {
                 channel_regs->hcsplt |= USB_OTG_HCSPLT_COMPLSPLT;
@@ -1045,6 +1064,9 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
     }
     if (intsts & USB_OTG_GINTSTS_RXFLVL) {
         *intsts_reg = USB_OTG_GINTSTS_RXFLVL;
+        while (dwcotg_hcd->reg.global_regs->grxfsiz > 0) {
+            volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
+        }
     }
     if (intsts & USB_OTG_GINTSTS_NPTXFE) {
         *intsts_reg = USB_OTG_GINTSTS_NPTXFE;
@@ -1058,6 +1080,8 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
 #   endif
         if (hprt0 & USB_OTG_HPRT_PCDET) {
             *dwcotg_hcd->reg.host.hprt0 = hprt0_masked | USB_OTG_HPRT_PCDET;
+            // disable rx queue interrupt which is used to clear CH_HALTED while device disconnected
+            dwcotg_hcd->reg.global_regs->gintmsk &= ~USB_OTG_GINTMSK_RXFLVLM;
             vsf_eda_post_evt((vsf_eda_t *)&dwcotg_hcd->task, VSF_DWCOTG_HCD_EVT_CONN);
         }
         if (hprt0 & USB_OTG_HPRT_PENCHNG) {
