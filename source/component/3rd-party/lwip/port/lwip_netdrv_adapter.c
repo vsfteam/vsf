@@ -54,7 +54,8 @@ static void * __lwip_netdrv_adapter_alloc_buf(void *netif, uint_fast32_t size);
 static void __lwip_netdrv_adapter_free_buf(void *netbuf);
 static void * __lwip_netdrv_adapter_read_buf(void *netbuf, vsf_mem_t *mem);
 static uint8_t * __lwip_netdrv_adapter_header(void *netbuf, int32_t len);
-static void __lwip_netdrv_adapter_on_outputted(void *netif, void *netbuf, vsf_err_t err);
+static void __lwip_netdrv_adapter_on_netbuf_outputted(void *netif, void *netbuf);
+static void __lwip_netdrv_adapter_on_netlink_outputted(void *netif, vsf_err_t err);
 static void __lwip_netdrv_adapter_on_inputted(void *netif, void *netbuf, uint_fast32_t size);
 
 static vk_netdrv_feature_t __lwip_netdrv_adapter_feature(void);
@@ -63,19 +64,20 @@ static void * __lwip_netdrv_adapter_thread(void (*entry)(void *param), void *par
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vk_netdrv_adapter_op_t __lwip_netdrv_adapter_op = {
-    .on_connect     = __lwip_netdrv_adapter_on_connect,
-    .on_disconnect  = __lwip_netdrv_adapter_on_disconnect,
+    .on_connect             = __lwip_netdrv_adapter_on_connect,
+    .on_disconnect          = __lwip_netdrv_adapter_on_disconnect,
 
-    .alloc_buf      = __lwip_netdrv_adapter_alloc_buf,
-    .free_buf       = __lwip_netdrv_adapter_free_buf,
-    .read_buf       = __lwip_netdrv_adapter_read_buf,
+    .alloc_buf              = __lwip_netdrv_adapter_alloc_buf,
+    .free_buf               = __lwip_netdrv_adapter_free_buf,
+    .read_buf               = __lwip_netdrv_adapter_read_buf,
 
-    .header         = __lwip_netdrv_adapter_header,
-    .on_outputted   = __lwip_netdrv_adapter_on_outputted,
-    .on_inputted    = __lwip_netdrv_adapter_on_inputted,
+    .header                 = __lwip_netdrv_adapter_header,
+    .on_netbuf_outputted    = __lwip_netdrv_adapter_on_netbuf_outputted,
+    .on_netlink_outputted   = __lwip_netdrv_adapter_on_netlink_outputted,
+    .on_inputted            = __lwip_netdrv_adapter_on_inputted,
 
-    .feature        = __lwip_netdrv_adapter_feature,
-    .thread         = __lwip_netdrv_adapter_thread,
+    .feature                = __lwip_netdrv_adapter_feature,
+    .thread                 = __lwip_netdrv_adapter_thread,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -194,23 +196,29 @@ static void __lwip_netdrv_adapter_on_disconnect(void *netif)
     UNLOCK_TCPIP_CORE();
 }
 
-static void __lwip_netdrv_adapter_on_outputted(void *netif, void *netbuf, vsf_err_t err)
+static void __lwip_netdrv_adapter_on_netbuf_outputted(void *netif, void *netbuf)
 {
     VSF_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
-    struct netif *lwip_netif = netif;
-    vk_netdrv_t *netdrv = lwip_netif->state;
 
 #if ETH_PAD_SIZE
     pbuf_header((struct pbuf *)netbuf, ETH_PAD_SIZE); /* reclaim the padding word */
 #endif
     pbuf_free((struct pbuf *)netbuf);
     LINK_STATS_INC(link.xmit);
+}
 
+static void __lwip_netdrv_adapter_on_netlink_outputted(void *netif, vsf_err_t err)
+{
+    struct netif *lwip_netif = netif;
+    vk_netdrv_t *netdrv = lwip_netif->state;
+
+    vsf_protect_t orig = vsf_protect_sched();
     vsf_eda_t *eda = netdrv->adapter.eda_pending;
+    netdrv->adapter.eda_pending = NULL;
+    vsf_unprotect_sched(orig);
+
     if (eda != NULL) {
-        netdrv->adapter.eda_pending = NULL;
         vsf_eda_post_evt(eda, VSF_EVT_USER);
-        return;
     }
 }
 

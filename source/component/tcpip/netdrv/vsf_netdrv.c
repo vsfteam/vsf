@@ -62,16 +62,30 @@ WEAK(vsf_pnp_on_netdrv_disconnect)
 void vsf_pnp_on_netdrv_disconnect(vk_netdrv_t *netdrv) {}
 #endif
 
-void vk_netdrv_on_outputted(vk_netdrv_t *netdrv, void *netbuf, int_fast32_t size)
+void vk_netdrv_on_netbuf_outputted(vk_netdrv_t *netdrv, void *netbuf)
 {
-    VSF_TCPIP_ASSERT((netdrv != NULL) && (netdrv->adapter.op != NULL));
-
+    VSF_TCPIP_ASSERT(   (netdrv != NULL) && (netdrv->adapter.op != NULL)
+                     && (netdrv->adapter.op->on_netbuf_outputted != NULL)
+                     && (netbuf != NULL));
     if (netdrv->is_connected) {
-        vsf_err_t err = size < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE;
-        netdrv->adapter.op->on_outputted(netdrv->adapter.netif, netbuf, err);
+        netdrv->adapter.op->on_netbuf_outputted(netdrv->adapter.netif, netbuf);
     } else {
         netdrv->adapter.op->free_buf(netbuf);
     }
+}
+
+void vk_netdrv_on_netlink_outputted(vk_netdrv_t *netdrv, vsf_err_t err)
+{
+    VSF_TCPIP_ASSERT(   (netdrv != NULL) && (netdrv->adapter.op != NULL)
+                     && (netdrv->adapter.op->on_netlink_outputted != NULL));
+    netdrv->adapter.op->on_netlink_outputted(netdrv->adapter.netif, err);
+}
+
+void vk_netdrv_on_outputted(vk_netdrv_t *netdrv, void *netbuf, vsf_err_t err)
+{
+    VSF_TCPIP_ASSERT((netdrv != NULL) && (netbuf != NULL));
+    vk_netdrv_on_netbuf_outputted(netdrv, netbuf);
+    vk_netdrv_on_netlink_outputted(netdrv, err);
 }
 
 void vk_netdrv_on_inputted(vk_netdrv_t *netdrv, void *netbuf, int_fast32_t size)
@@ -197,7 +211,7 @@ vsf_err_t vk_netdrv_output(vk_netdrv_t *netdrv, void *netbuf)
     }
 
     if (err) {
-        netdrv->adapter.op->on_outputted(netdrv->adapter.netif, netbuf, err);
+        vk_netdrv_on_outputted(netdrv, netbuf, err);
     }
     return err;
 }

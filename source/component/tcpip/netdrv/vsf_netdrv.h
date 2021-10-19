@@ -72,7 +72,8 @@ vsf_class(vk_netdrv_adapter_op_t) {
 #endif
         vsf_err_t (*on_connect)(void *netif);
         void (*on_disconnect)(void *netif);
-        void (*on_outputted)(void *netif, void *netbuf, vsf_err_t err);
+        void (*on_netbuf_outputted)(void *netif, void *netbuf);
+        void (*on_netlink_outputted)(void *netif, vsf_err_t err);
         void (*on_inputted)(void *netif, void *netbuf, uint_fast32_t size);
 
         void * (*alloc_buf)(void *netif, uint_fast16_t len);
@@ -152,7 +153,9 @@ extern uint8_t * vk_netdrv_header(vk_netdrv_t *netdrv, void *netbuf, int32_t len
 extern bool vk_netdrv_is_connected(vk_netdrv_t *netdrv);
 extern void * vk_netdrv_read_buf(vk_netdrv_t *netdrv, void *netbuf, vsf_mem_t *mem);
 extern void * vk_netdrv_alloc_buf(vk_netdrv_t *netdrv);
-extern void vk_netdrv_on_outputted(vk_netdrv_t *netdrv, void *netbuf, int_fast32_t size);
+extern void vk_netdrv_on_netbuf_outputted(vk_netdrv_t *netdrv, void *netbuf);
+extern void vk_netdrv_on_netlink_outputted(vk_netdrv_t *netdrv, vsf_err_t err);
+extern void vk_netdrv_on_outputted(vk_netdrv_t *netdrv, void *netbuf, vsf_err_t err);
 extern void vk_netdrv_on_inputted(vk_netdrv_t *netdrv, void *netbuf, int_fast32_t size);
 
 extern void * vk_netdrv_thread(vk_netdrv_t *netdrv,void (*entry)(void *), void *param);

@@ -66,7 +66,6 @@
 typedef enum vk_usbh_ecm_evt_t {
     VSF_USBH_CDCECM_ON_CONNECT,
     VSF_USBH_CDCECM_ON_DISCONNECT,
-    VSF_USBH_CDCECM_ON_TX,
     VSF_USBH_CDCECM_ON_RX,
 } vk_usbh_ecm_evt_t;
 
@@ -258,6 +257,8 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *netbuf)
     err = vk_usbh_cdc_submit_urb(&ecm->use_as__vk_usbh_cdc_t, &ocb->urb);
     if (err != VSF_ERR_NONE) {
         ocb->netbuf = NULL;
+    } else {
+        vk_netdrv_on_netbuf_outputted(netdrv, ocb->netbuf);
     }
     return err;
 }
@@ -289,15 +290,6 @@ static void __vk_usbh_ecm_netdrv_evthandler(vk_usbh_ecm_t *ecm, vk_usbh_ecm_evt_
             if (vk_netdrv_is_connected(netdrv)) {
                 __vk_usbh_ecm_recv(ecm, icb);
             }
-            break;
-        }
-    case VSF_USBH_CDCECM_ON_TX: {
-            vk_usbh_ecm_ocb_t *ocb = param;
-            void *netbuf = ocb->netbuf;
-            size = ocb->size;
-            ocb->netbuf = NULL;
-
-            vk_netdrv_on_outputted(netdrv, netbuf, size);
             break;
         }
     }
@@ -434,21 +426,10 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
         break;
     case VSF_USBH_CDC_ON_TX: {
             vk_usbh_ecm_ocb_t *ocb = __vk_usbh_ecm_get_ocb(ecm, (vk_usbh_urb_t *)param);
-            int_fast32_t size;
+            vsf_err_t err = (URB_OK != vk_usbh_urb_get_status(&ocb->urb)) ? VSF_ERR_FAIL : VSF_ERR_NONE;
 
-            if (URB_OK != vk_usbh_urb_get_status(&ocb->urb)) {
-                size = -1;
-            } else {
-                size = vk_usbh_urb_get_actual_length(&ocb->urb);
-            }
-
-            ocb->size = size;
-            if (vk_netdrv_feature(netdrv) & VSF_NETDRV_FEATURE_THREAD) {
-                VSF_USB_ASSERT(ecm->thread != NULL);
-                vsf_eda_post_evt_msg(ecm->thread, VSF_EVT_USER + VSF_USBH_CDCECM_ON_TX, ocb);
-            } else {
-                __vk_usbh_ecm_netdrv_evthandler(ecm, VSF_USBH_CDCECM_ON_TX, ocb);
-            }
+            ocb->netbuf = NULL;
+            vk_netdrv_on_netlink_outputted(netdrv, err);
         }
         break;
     }
@@ -557,7 +538,7 @@ static void __vk_usbh_ecm_on_eda_terminate(vsf_eda_t *eda)
     if (vk_netdrv_is_connected(netdrv)) {
         if (vk_netdrv_feature(netdrv) & VSF_NETDRV_FEATURE_THREAD) {
             VSF_USB_ASSERT(ecm->thread != NULL);
-            vsf_eda_post_evt_msg(ecm->thread, VSF_EVT_USER + VSF_USBH_CDCECM_ON_DISCONNECT, NULL);
+            vsf_eda_post_evt(ecm->thread, VSF_EVT_USER + VSF_USBH_CDCECM_ON_DISCONNECT);
         } else {
             __vk_usbh_ecm_netdrv_evthandler(ecm, VSF_USBH_CDCECM_ON_DISCONNECT, NULL);
         }
