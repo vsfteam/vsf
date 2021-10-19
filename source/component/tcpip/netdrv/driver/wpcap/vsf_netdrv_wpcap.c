@@ -241,7 +241,7 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_output(vk_netdrv_t *netdrv, void *net
 #endif
 
     pcap_sendpacket(wpcap_netdrv->fp, buffer, tot_size);
-    vk_netdrv_on_outputted(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf, tot_size);
+    vk_netdrv_on_outputted(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf, VSF_ERR_NONE);
     return VSF_ERR_NONE;
 }
 
