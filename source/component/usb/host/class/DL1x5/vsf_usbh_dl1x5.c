@@ -153,6 +153,7 @@ extern void vsf_dl1x5_on_dev_ready(void *dev);
 
 static const vk_usbh_dev_id_t __vk_usbh_dl1x5_id[] = {
     { VSF_USBH_MATCH_VID_PID(0x17E9, 0x019E) },
+    { VSF_USBH_MATCH_VID_PID(0x17E9, 0x03CD) },
 };
 
 static const uint8_t __dl1x5_std_channel_seq[] = {
@@ -283,12 +284,22 @@ static bool __vga_parse_edid(edid_t *edid, vga_timing_t *timing)
     timing->h.front_porch       = detailed_timing->h_sync_offset_low + (detailed_timing->h_sync_offset_high << 8);
     timing->h.sync              = detailed_timing->h_sync_width_low + (detailed_timing->h_sync_width_high << 8);
     timing->h.back_porch        = blanking - timing->h.front_porch - timing->h.sync;
+    if (blanking < (timing->h.front_porch + timing->h.sync)) {
+        vsf_trace_debug("DL1X5: invalid detailed timing" VSF_TRACE_CFG_LINEEND);
+        timing->pixel_clock_10khz = 0;
+        return true;
+    }
     timing->h.sync_positive     = detailed_timing->h_sync_positive;
     timing->v.active            = detailed_timing->v_active_low + (detailed_timing->v_active_high << 8);
     blanking                    = detailed_timing->v_blanking_low + (detailed_timing->v_blanking_high << 8);
     timing->v.front_porch       = detailed_timing->v_sync_offset_low + (detailed_timing->v_sync_offset_high << 8);
     timing->v.sync              = detailed_timing->v_sync_width_low + (detailed_timing->v_sync_width_high << 8);
     timing->v.back_porch        = blanking - timing->v.front_porch - timing->v.sync;
+    if (blanking < (timing->v.front_porch + timing->v.sync)) {
+        vsf_trace_debug("DL1X5: invalid detailed timing" VSF_TRACE_CFG_LINEEND);
+        timing->pixel_clock_10khz = 0;
+        return true;
+    }
     timing->v.sync_positive     = detailed_timing->v_sync_positive;
     return true;
 }
