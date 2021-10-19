@@ -265,7 +265,13 @@ static void * __lwip_netdrv_adapter_alloc_buf(void *netif, uint_fast32_t size)
 #if ETH_PAD_SIZE
     size += ETH_PAD_SIZE; /* allow room for Ethernet padding */
 #endif
+
+#if PBUF_POOL_SIZE > 0
     netbuf = pbuf_alloc(PBUF_RAW, size, PBUF_POOL);
+#else
+    netbuf = pbuf_alloc(PBUF_RAW, size, PBUF_RAM);
+#endif
+
     if (netbuf != NULL) {
 #if ETH_PAD_SIZE
         pbuf_header(p, -ETH_PAD_SIZE); /* drop the padding word */
