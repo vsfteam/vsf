@@ -670,9 +670,6 @@
     <Filter Include="vsf\component\3rd-party\lwip\port">
       <UniqueIdentifier>{7e6a67f8-43ac-4d42-a5d3-9ebb1ec7ca4c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\port\arch">
-      <UniqueIdentifier>{8fc42111-22c6-4f6f-98ea-2e7d2f6720aa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usrapp\demo\lwip_demo">
       <UniqueIdentifier>{1156c2e5-9595-4816-9ea7-5e9ba5c4caa4}</UniqueIdentifier>
     </Filter>
@@ -1047,6 +1044,12 @@
     </Filter>
     <Filter Include="vsf\component\debugger\segger">
       <UniqueIdentifier>{d42ea5e5-b341-45be-b5d9-74b32e93eeaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\port\vsf">
+      <UniqueIdentifier>{d23aa601-6aaa-49a0-a956-b56ba3ff0137}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\port\vsf\arch">
+      <UniqueIdentifier>{8fc42111-22c6-4f6f-98ea-2e7d2f6720aa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -2181,9 +2184,6 @@
     <ClInclude Include="..\..\config\vsf_usr_cfg\vsf_usr_cfg_win.h">
       <Filter>usrapp\config\vsf_usr_cfg</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\lwip\port\arch\sys_arch.h">
-      <Filter>vsf\component\3rd-party\lwip\port\arch</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h">
       <Filter>vsf\component\usb\host\class\rtl8152</Filter>
     </ClInclude>
@@ -2672,9 +2672,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\libjpeg-turbo\port\jconfigint.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\port</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\lwip\port\arch\cc.h">
-      <Filter>vsf\component\3rd-party\lwip\port\arch</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.h">
       <Filter>vsf\component\3rd-party\lvgl\extension\lv_lib_freetype\raw</Filter>
@@ -3182,6 +3179,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.h">
       <Filter>vsf\component\debugger\segger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\cc.h">
+      <Filter>vsf\component\3rd-party\lwip\port\vsf\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\perf.h">
+      <Filter>vsf\component\3rd-party\lwip\port\vsf\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\sys_arch.h">
+      <Filter>vsf\component\3rd-party\lwip\port\vsf\arch</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -4799,9 +4805,6 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\nnom\raw\src\layers\nnom_zero_padding.c">
       <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\port\arch\sys_arch.c">
-      <Filter>vsf\component\3rd-party\lwip\port\arch</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.c">
       <Filter>vsf\component\3rd-party\lvgl\extension\lv_lib_freetype\raw</Filter>
     </ClCompile>
@@ -5623,6 +5626,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.c">
       <Filter>vsf\component\debugger\segger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\sys_arch.c">
+      <Filter>vsf\component\3rd-party\lwip\port\vsf\arch</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

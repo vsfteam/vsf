@@ -371,6 +371,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\raw\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
@@ -1454,6 +1455,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\raw\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
@@ -7899,7 +7901,6 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
-                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -7907,19 +7908,22 @@
                             <configuration>vsf_template_aic8800</configuration>
                         </excluded>
                         <group>
-                            <name>arch</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\arch\cc.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\arch\perf.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\arch\sys_arch.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\arch\sys_arch.h</name>
-                            </file>
+                            <name>vsf</name>
+                            <group>
+                                <name>arch</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\cc.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\perf.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\sys_arch.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\sys_arch.h</name>
+                                </file>
+                            </group>
                         </group>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\lwip_netdrv_adapter.c</name>
