@@ -158,6 +158,8 @@ int lwip_main(int argc, char *argv[])
     }
 #endif
 
+    // for AIC8800, tcpip init is called in aic8800_demo_init by API from SDK
+#ifndef __AIC8800__
     {
         static bool __is_lwip_inited = false;
         // tcpip_init MUST be called first,
@@ -167,6 +169,7 @@ int lwip_main(int argc, char *argv[])
             tcpip_init(NULL, NULL);
         }
     }
+#endif
 
 #if VSF_NETDRV_USE_WPCAP == ENABLED
     vsf_err_t err = usrapp_net_common_init(argv[1]);
