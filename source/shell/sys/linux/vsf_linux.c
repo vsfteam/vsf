@@ -1264,7 +1264,7 @@ int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
     if (trig != NULL) {
         vsf_unprotect_sched(orig);
         sfd->txpend = NULL;
-        vsf_eda_trig_set(trig);
+        vsf_eda_trig_set_isr(trig);
     } else {
         sfd->txevt = true;
         vsf_unprotect_sched(orig);
@@ -1278,7 +1278,7 @@ int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
     if (trig != NULL) {
         vsf_unprotect_sched(orig);
         sfd->rxpend = NULL;
-        vsf_eda_trig_set(trig);
+        vsf_eda_trig_set_isr(trig);
     } else {
         sfd->rxevt = true;
         vsf_unprotect_sched(orig);
