@@ -7904,11 +7904,11 @@
                     </excluded>
                     <group>
                         <name>port</name>
-                        <excluded>
-                            <configuration>vsf_template_aic8800</configuration>
-                        </excluded>
                         <group>
                             <name>vsf</name>
+                            <excluded>
+                                <configuration>vsf_template_aic8800</configuration>
+                            </excluded>
                             <group>
                                 <name>arch</name>
                                 <file>
@@ -7937,6 +7937,9 @@
                     </group>
                     <group>
                         <name>raw</name>
+                        <excluded>
+                            <configuration>vsf_template_aic8800</configuration>
+                        </excluded>
                         <group>
                             <name>src</name>
                             <group>

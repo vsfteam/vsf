@@ -116,7 +116,7 @@
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
 // lwip demo is not compatible with aic8800 sdk, but VSF_USE_LWIP should be defined
-#define APP_USE_LWIP_DEMO                               DISABLED
+#define APP_USE_LWIP_DEMO                               ENABLED
 #   define VSF_USE_LWIP                                 ENABLED
 #define APP_USE_EVM_DEMO                                ENABLED
 #define APP_USE_LUA_DEMO                                ENABLED
