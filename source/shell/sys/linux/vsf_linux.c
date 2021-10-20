@@ -28,6 +28,7 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./include/unistd.h"
+#   include "./include/sched.h"
 #   include "./include/semaphore.h"
 #   include "./include/signal.h"
 #   include "./include/poll.h"
@@ -43,6 +44,7 @@
 #   include "./include/pwd.h"
 #else
 #   include <unistd.h>
+#   include <sched.h>
 #   include <semaphore.h>
 #   include <signal.h>
 #   include <poll.h>
