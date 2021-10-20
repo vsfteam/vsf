@@ -145,7 +145,8 @@ static const struct vk_netlink_op_t __vk_usbh_ecm_netlink_op =
 
 #if VSF_USBH_USE_LIBUSB == ENABLED
 static const vk_usbh_dev_id_t __vk_usbh_ecm_block_libusb_dev_id[] = {
-    { VSF_USBH_MATCH_VID_PID(0x0BDA, 0x8152) },
+    { VSF_USBH_MATCH_VID_PID(0x0BDA, 0x8152) },     // RTL8152 series
+    { VSF_USBH_MATCH_VID_PID(0x0FE6, 0x9900) },     // SR9900 series
 };
 #endif
 
