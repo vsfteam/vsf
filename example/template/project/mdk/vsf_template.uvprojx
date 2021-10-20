@@ -28676,27 +28676,92 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>source/component/3rd-party/segger_rtt/raw/RTT</GroupName>
+          <GroupName>source/component/3rd-party/segger/port</GroupName>
           <Files>
             <File>
-              <FileName>SEGGER_RTT.c</FileName>
+              <FileName>SEGGER_SYSVIEW_VSF.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/segger_rtt/raw/RTT/SEGGER_RTT.c</FilePath>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\SEGGER_SYSVIEW_VSF.c</FilePath>
             </File>
             <File>
-              <FileName>SEGGER_RTT.h</FileName>
+              <FileName>SEGGER_SYSVIEW_VSF.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/segger_rtt/raw/RTT/SEGGER_RTT.h</FilePath>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\SEGGER_SYSVIEW_VSF.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/component/3rd-party/segger/port/Config</GroupName>
+          <Files>
+            <File>
+              <FileName>Global.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\Config\Global.h</FilePath>
             </File>
             <File>
               <FileName>SEGGER_RTT_Conf.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/segger_rtt/raw/RTT/SEGGER_RTT_Conf.h</FilePath>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_RTT_Conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW_Conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_SYSVIEW_Conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW_Config_VSF.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_SYSVIEW_Config_VSF.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/component/3rd-party/segger/raw/RTT</GroupName>
+          <Files>
+            <File>
+              <FileName>SEGGER_RTT.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT.h</FilePath>
             </File>
             <File>
               <FileName>SEGGER_RTT_printf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/segger_rtt/raw/RTT/SEGGER_RTT_printf.c</FilePath>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT_printf.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/component/3rd-party/segger/raw/SystemView</GroupName>
+          <Files>
+            <File>
+              <FileName>SEGGER.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW_ConfDefaults.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW_ConfDefaults.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW_Int.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW_Int.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -30854,17 +30919,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>source/component/debugger/segger_rtt</GroupName>
+          <GroupName>source/component/debugger/segger</GroupName>
           <Files>
             <File>
               <FileName>segger_rtt_stream.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../source/component/debugger/segger_rtt/segger_rtt_stream.c</FilePath>
+              <FilePath>..\..\..\..\source\component\debugger\segger\segger_rtt_stream.c</FilePath>
             </File>
             <File>
               <FileName>segger_rtt_stream.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../source/component/debugger/segger_rtt/segger_rtt_stream.h</FilePath>
+              <FilePath>..\..\..\..\source\component\debugger\segger\segger_rtt_stream.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -32475,21 +32540,6 @@
               <FileName>vsf_usbh_libusb.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../source/component/usb/host/class/libusb/vsf_usbh_libusb.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/usb/host/class/rtl8152</GroupName>
-          <Files>
-            <File>
-              <FileName>vsf_usbh_rtl8152.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/usb/host/class/rtl8152/vsf_usbh_rtl8152.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_usbh_rtl8152.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../source/component/usb/host/class/rtl8152/vsf_usbh_rtl8152.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -36748,7 +36798,7 @@
             <AdsLven>1</AdsLven>
             <AdsLsxf>1</AdsLsxf>
             <RvctClst>0</RvctClst>
-            <GenPPlst>1</GenPPlst>
+            <GenPPlst>0</GenPPlst>
             <AdsCpuType>"Cortex-M3"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
             <mOS>0</mOS>
@@ -36914,7 +36964,7 @@
               <MiscControls>-fms-extensions  -Wno-enum-conversion -Wno-empty-body  -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
               <Define>__Hercules__, __CMEM7__, __M7M12N5__, PRINT_UART=UART0, __OOC_CPP__, LV_CONF_INCLUDE_SIMPLE, FT2_BUILD_LIBRARY</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\config;..\..\..\..\source;..\..\..\..\source\shell\sys\linux\include;..\..\..\..\source\shell\sys\linux\include\simple_libc;..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;..\..\..\..\source\component\3rd-party\nnom\raw\inc;..\..\..\..\source\component\3rd-party\vsfvm\raw;..\..\..\..\source\component\3rd-party\lvgl\raw;..\..\..\..\source\component\3rd-party\segger_rtt\raw;..\..\..\..\source\component\3rd-party\LingLongGUI\port;..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;..\..\..\..\source\component\3rd-party\freetype\port;..\..\..\..\source\component\3rd-party\freetype\raw\include;..\..\..\..\source\component\3rd-party\coremark\port;..\..\..\..\source\component\3rd-party\coremark\raw;..\..\..\..\source\component\3rd-party\lua\extension\oo;..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;..\..\..\..\source\component\3rd-party\lua\raw;..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;..\..\..\..\source\component\3rd-party\libpng\port;..\..\..\..\source\component\3rd-party\libpng\raw;..\..\..\..\source\component\3rd-party\zlib\raw;..\..\..\..\source\hal\driver\hercules\cmem7\common\Vendor\Driver\inc;..\..\..\..\source\component\usb\driver\otg\dwcotg</IncludePath>
+              <IncludePath>..\..\config;..\..\..\..\source;..\..\..\..\source\shell\sys\linux\include;..\..\..\..\source\shell\sys\linux\include\simple_libc;..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;..\..\..\..\source\component\3rd-party\nnom\raw\inc;..\..\..\..\source\component\3rd-party\vsfvm\raw;..\..\..\..\source\component\3rd-party\lvgl\raw;..\..\..\..\source\component\3rd-party\segger_rtt\raw;..\..\..\..\source\component\3rd-party\LingLongGUI\port;..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;..\..\..\..\source\component\3rd-party\freetype\port;..\..\..\..\source\component\3rd-party\freetype\raw\include;..\..\..\..\source\component\3rd-party\coremark\port;..\..\..\..\source\component\3rd-party\coremark\raw;..\..\..\..\source\component\3rd-party\lua\extension\oo;..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;..\..\..\..\source\component\3rd-party\lua\raw;..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;..\..\..\..\source\component\3rd-party\libpng\port;..\..\..\..\source\component\3rd-party\libpng\raw;..\..\..\..\source\component\3rd-party\segger\port\Config;..\..\..\..\source\component\3rd-party\segger\raw\RTT;..\..\..\..\source\component\3rd-party\segger\raw\SystemView;..\..\..\..\source\component\3rd-party\zlib\raw;..\..\..\..\source\hal\driver\hercules\cmem7\common\Vendor\Driver\inc;..\..\..\..\source\component\usb\driver\otg\dwcotg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -65320,27 +65370,92 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>source/component/3rd-party/segger_rtt/raw/RTT</GroupName>
+          <GroupName>source/component/3rd-party/segger/port</GroupName>
           <Files>
             <File>
-              <FileName>SEGGER_RTT.c</FileName>
+              <FileName>SEGGER_SYSVIEW_VSF.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/segger_rtt/raw/RTT/SEGGER_RTT.c</FilePath>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\SEGGER_SYSVIEW_VSF.c</FilePath>
             </File>
             <File>
-              <FileName>SEGGER_RTT.h</FileName>
+              <FileName>SEGGER_SYSVIEW_VSF.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/segger_rtt/raw/RTT/SEGGER_RTT.h</FilePath>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\SEGGER_SYSVIEW_VSF.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/component/3rd-party/segger/port/Config</GroupName>
+          <Files>
+            <File>
+              <FileName>Global.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\Config\Global.h</FilePath>
             </File>
             <File>
               <FileName>SEGGER_RTT_Conf.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/segger_rtt/raw/RTT/SEGGER_RTT_Conf.h</FilePath>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_RTT_Conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW_Conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_SYSVIEW_Conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW_Config_VSF.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\port\Config\SEGGER_SYSVIEW_Config_VSF.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/component/3rd-party/segger/raw/RTT</GroupName>
+          <Files>
+            <File>
+              <FileName>SEGGER_RTT.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT.h</FilePath>
             </File>
             <File>
               <FileName>SEGGER_RTT_printf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/segger_rtt/raw/RTT/SEGGER_RTT_printf.c</FilePath>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\RTT\SEGGER_RTT_printf.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/component/3rd-party/segger/raw/SystemView</GroupName>
+          <Files>
+            <File>
+              <FileName>SEGGER.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW_ConfDefaults.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW_ConfDefaults.h</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_SYSVIEW_Int.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\component\3rd-party\segger\raw\SystemView\SEGGER_SYSVIEW_Int.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -67498,17 +67613,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>source/component/debugger/segger_rtt</GroupName>
+          <GroupName>source/component/debugger/segger</GroupName>
           <Files>
             <File>
               <FileName>segger_rtt_stream.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../source/component/debugger/segger_rtt/segger_rtt_stream.c</FilePath>
+              <FilePath>..\..\..\..\source\component\debugger\segger\segger_rtt_stream.c</FilePath>
             </File>
             <File>
               <FileName>segger_rtt_stream.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../source/component/debugger/segger_rtt/segger_rtt_stream.h</FilePath>
+              <FilePath>..\..\..\..\source\component\debugger\segger\segger_rtt_stream.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -69119,21 +69234,6 @@
               <FileName>vsf_usbh_libusb.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../source/component/usb/host/class/libusb/vsf_usbh_libusb.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/usb/host/class/rtl8152</GroupName>
-          <Files>
-            <File>
-              <FileName>vsf_usbh_rtl8152.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/usb/host/class/rtl8152/vsf_usbh_rtl8152.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_usbh_rtl8152.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../source/component/usb/host/class/rtl8152/vsf_usbh_rtl8152.h</FilePath>
             </File>
           </Files>
         </Group>
