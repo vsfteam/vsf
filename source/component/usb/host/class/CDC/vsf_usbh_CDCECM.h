@@ -37,6 +37,10 @@ extern "C" {
 
 extern const vk_usbh_class_drv_t vk_usbh_ecm_drv;
 
+#if VSF_USBH_USE_LIBUSB == ENABLED
+extern const vk_usbh_class_drv_t vk_usbh_ecm_block_libusb_drv;
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef __cplusplus

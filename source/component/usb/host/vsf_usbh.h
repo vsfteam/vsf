@@ -644,9 +644,6 @@ extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
 #if VSF_USBH_USE_UAC == ENABLED
 #   include "./class/UAC/vsf_usbh_uac.h"
 #endif
-#if VSF_USBH_USE_RTL8152 == ENABLED
-#   include "./class/rtl8152/vsf_usbh_rtl8152.h"
-#endif
 #if VSF_USBH_USE_DFU == ENABLED
 #   include "./class/DFU/vsf_usbh_dfu.h"
 #endif

@@ -673,9 +673,6 @@
     <Filter Include="usrapp\demo\lwip_demo">
       <UniqueIdentifier>{1156c2e5-9595-4816-9ea7-5e9ba5c4caa4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\host\class\rtl8152">
-      <UniqueIdentifier>{845012a4-c61f-448d-b552-3b7375dae544}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\crypto">
       <UniqueIdentifier>{270587e0-572c-4c46-9608-b3b54844bb21}</UniqueIdentifier>
     </Filter>
@@ -2183,9 +2180,6 @@
     </ClInclude>
     <ClInclude Include="..\..\config\vsf_usr_cfg\vsf_usr_cfg_win.h">
       <Filter>usrapp\config\vsf_usr_cfg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h">
-      <Filter>vsf\component\usb\host\class\rtl8152</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\usb\vsf_usb.h">
       <Filter>vsf\component\usb</Filter>
@@ -4066,9 +4060,6 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\lwip_demo\lwip_demo.c">
       <Filter>usrapp\demo\lwip_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.c">
-      <Filter>vsf\component\usb\host\class\rtl8152</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\crypto\hash\crc\vsf_crc.c">
       <Filter>vsf\component\crypto\hash\crc</Filter>

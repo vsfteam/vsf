@@ -124,6 +124,11 @@ static vsf_err_t __vk_usbh_ecm_netlink_fini(vk_netdrv_t *netdrv);
 static bool __vk_usbh_ecm_netlink_can_output(vk_netdrv_t *netdrv);
 static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *netbuf);
 
+#if VSF_USBH_USE_LIBUSB == ENABLED
+static void *__vk_usbh_ecm_block_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
+extern void __vk_usbh_libusb_block_dev(vk_usbh_dev_t *dev);
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vk_usbh_dev_id_t __vk_usbh_ecm_dev_id[] = {
@@ -138,6 +143,12 @@ static const struct vk_netlink_op_t __vk_usbh_ecm_netlink_op =
     .output     = __vk_usbh_ecm_netlink_output,
 };
 
+#if VSF_USBH_USE_LIBUSB == ENABLED
+static const vk_usbh_dev_id_t __vk_usbh_ecm_block_libusb_dev_id[] = {
+    { VSF_USBH_MATCH_VID_PID(0x0BDA, 0x8152) },
+};
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_usbh_class_drv_t vk_usbh_ecm_drv = {
@@ -148,8 +159,25 @@ const vk_usbh_class_drv_t vk_usbh_ecm_drv = {
     .disconnect = __vk_usbh_ecm_disconnect,
 };
 
+#if VSF_USBH_USE_LIBUSB == ENABLED
+const vk_usbh_class_drv_t vk_usbh_ecm_block_libusb_drv = {
+    .name       = "cdc_ecm_block_libusb",
+    .dev_id_num = dimof(__vk_usbh_ecm_block_libusb_dev_id),
+    .dev_ids    = __vk_usbh_ecm_block_libusb_dev_id,
+    .probe      = __vk_usbh_ecm_block_libusb_probe,
+};
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_USBH_USE_LIBUSB == ENABLED
+static void *__vk_usbh_ecm_block_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
+{
+    __vk_usbh_libusb_block_dev(dev);
+    return NULL;
+}
+#endif
 
 static vk_usbh_ecm_icb_t * __vk_usbh_ecm_get_icb(vk_usbh_ecm_t *ecm, vk_usbh_urb_t *urb)
 {

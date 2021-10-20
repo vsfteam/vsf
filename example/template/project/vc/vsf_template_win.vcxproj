@@ -508,7 +508,6 @@
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\HUB\vsf_usbh_HUB.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\libusb\vsf_usbh_libusb.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\MSC\vsf_usbh_msc.h" />
-    <ClInclude Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\UAC\vsf_usbh_uac.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\XB1\vsf_usbh_xb1.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\vsf_usbh.h" />
@@ -1379,7 +1378,6 @@
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\HUB\vsf_usbh_HUB.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\libusb\vsf_usbh_libusb.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\MSC\vsf_usbh_msc.c" />
-    <ClCompile Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\UAC\vsf_usbh_uac.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\XB1\vsf_usbh_xb1.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\vsf_usbh.c" />

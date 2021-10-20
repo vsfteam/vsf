@@ -83,8 +83,8 @@ usrapp_usbh_common_t usrapp_usbh_common = {
 #endif
 #if VSF_USE_TCPIP == ENABLED && VSF_USBH_USE_ECM == ENABLED
     .ecm.drv            = &vk_usbh_ecm_drv,
-#   if VSF_USBH_USE_RTL8152 == ENABLED
-    .rtl8152.drv        = &vk_usbh_rtl8152_drv,
+#   if VSF_USBH_USE_LIBUSB == ENABLED
+    .ecm_block_libusb.drv  = &vk_usbh_ecm_block_libusb_drv,
 #   endif
 #endif
 #   if VSF_USBH_USE_MSC == ENABLED
@@ -134,8 +134,8 @@ vsf_err_t usrapp_usbh_common_init(void)
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.libusb);
 #endif
 #if VSF_USE_TCPIP == ENABLED && VSF_USBH_USE_ECM == ENABLED
-#   if VSF_USBH_USE_RTL8152 == ENABLED
-    vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.rtl8152);
+#   if VSF_USBH_USE_LIBUSB == ENABLED
+    vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.ecm_block_libusb);
 #   endif
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.ecm);
 #endif

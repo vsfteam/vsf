@@ -9275,15 +9275,6 @@
                             </file>
                         </group>
                         <group>
-                            <name>rtl8152</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h</name>
-                            </file>
-                        </group>
-                        <group>
                             <name>UAC</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\usb\host\class\UAC\vsf_usbh_uac.c</name>
