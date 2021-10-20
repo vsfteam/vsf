@@ -303,8 +303,8 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #endif
 
 #if APP_USE_LWIP_DEMO == ENABLED
-// fix priority for lwip
-#   define TCPIP_THREAD_PRIO                            vsf_prio_0
+// already defined in 8800 SDK
+//#   define TCPIP_THREAD_PRIO                            vsf_prio_0
 #endif
 
 #define USRAPP_CFG_USBD_DEV                             VSF_USB_DC0
