@@ -718,7 +718,7 @@ static void __vk_dwcotg_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 
 static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb)
 {
-    uint_fast32_t interval = urb->interval;
+    uint_fast32_t interval = urb->pipe.interval;
     if (!interval) {
         return true;
     }

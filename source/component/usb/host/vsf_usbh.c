@@ -151,18 +151,22 @@ void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
 #endif
 
 vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
-            uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size)
+        uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size, uint_fast8_t interval)
 {
     uint_fast8_t direction = endpoint & USB_DIR_MASK;
     vk_usbh_pipe_t pipe;
 
     endpoint &= 0x0F;
-    pipe.value =   1|   (size << 2)             /* 10-bit size */
-                    |   (endpoint << 13)        /* 4-bit endpoint */
-                    |   (type << 17)            /* 2-bit type */
-                    |   (dev->speed << 19)      /* 2-bit speed */
-                    |   (dev->devnum << 21)     /* 7-bit address */
-                    |   (direction << 21);      /* 1-bit direction */
+    // only support 4-bit interval
+    VSF_USB_ASSERT(!(interval & ~(0x0F)));
+    pipe.value =   1|   (size << 1)             /* 11-bit size */
+                    |   (endpoint << 12)        /* 4-bit endpoint */
+                    |   (type << 16)            /* 2-bit type */
+                    |   (dev->speed << 18)      /* 2-bit speed */
+                    |   (dev->devnum << 20)     /* 7-bit address */
+                    |   (direction << 20)       /* 1-bit direction */
+                    |   ((interval & ((1 << VSF_USBH_CFG_EP_INTERNAL_BITS) - 1))) << 28;
+                                                /* VSF_USBH_CFG_EP_INTERNAL_BITS-bit interval */
     return pipe;
 }
 
@@ -170,11 +174,10 @@ vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep)
 {
     return vk_usbh_get_pipe(dev, desc_ep->bEndpointAddress,
-            desc_ep->bmAttributes, le16_to_cpu(desc_ep->wMaxPacketSize));
+            desc_ep->bmAttributes, le16_to_cpu(desc_ep->wMaxPacketSize), desc_ep->bInterval);
 }
 
-void vk_usbh_urb_prepare_by_pipe(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev,
-            vk_usbh_pipe_t pipe)
+void vk_usbh_urb_prepare_by_pipe(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev, vk_usbh_pipe_t pipe)
 {
     VSF_USB_ASSERT((urb != NULL) && (dev != NULL));
     urb->pipe = pipe;
@@ -643,6 +646,7 @@ static vsf_err_t __vk_usbh_submit_urb_imp(vk_usbh_t *usbh, vk_usbh_urb_t *urb, v
     }
 #endif
 
+#define is_submitted            is_pipe
     if (    (   (urb_hcd->pipe.type != USB_ENDPOINT_XFER_INT)
             &&  (urb_hcd->pipe.type != USB_ENDPOINT_XFER_ISOC))
         ||  !urb_hcd->pipe.is_submitted) {

@@ -82,6 +82,12 @@ extern "C" {
 #ifndef VSF_USBH_CFG_MAX_DEVICE
 #   define VSF_USBH_CFG_MAX_DEVICE      127
 #endif
+#ifndef VSF_USBH_CFG_EP_INTERNAL_BITS
+#   define VSF_USBH_CFG_EP_INTERNAL_BITS    8
+#endif
+#if (VSF_USBH_CFG_EP_INTERNAL_BITS < 0) || (VSF_USBH_CFG_EP_INTERNAL_BITS > 8)
+#   error invalid VSF_USBH_CFG_EP_INTERNAL_BITS
+#endif
 
 #ifdef VSF_USBH_CFG_HEAP_IFS
 #   undef vsf_usbh_malloc
@@ -92,7 +98,7 @@ extern "C" {
 #   define vsf_usbh_free                VSF_USBH_CFG_HEAP_IFS.Free
 #else
 #   ifndef vsf_usbh_malloc
-#       define vsf_usbh_malloc         vsf_heap_malloc
+#       define vsf_usbh_malloc          vsf_heap_malloc
 #   else
 extern void * vsf_usbh_malloc(uint_fast32_t size);
 #   endif
@@ -102,7 +108,7 @@ extern void * vsf_usbh_malloc(uint_fast32_t size);
 extern void * vsf_usbh_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
 #   endif
 #   ifndef vsf_usbh_free
-#       define vsf_usbh_free           vsf_heap_free
+#       define vsf_usbh_free            vsf_heap_free
 #   else
 extern void vsf_usbh_free(void * buffer);
 #   endif
@@ -268,17 +274,23 @@ typedef struct vk_usbh_class_t {
 
 typedef struct vk_usbh_pipe_t {
     union {
+#if VSF_USBH_CFG_EP_INTERNAL_BITS > 4
+#   define __VSF_USBH_PIPE_T                uint64_t
+#else
+#   define __VSF_USBH_PIPE_T                uint32_t
+#endif
         struct {
-            uint32_t is_pipe        : 1;
-            uint32_t is_submitted   : 1;
-            uint32_t size           : 11;
-            uint32_t endpoint       : 4;
-            uint32_t type           : 2;
-            uint32_t speed          : 2;
-            uint32_t address        : 7;
-            uint32_t dir_in1out0    : 1;
+            // is_pipe is also used as is_submitted in hcd_urb
+            __VSF_USBH_PIPE_T is_pipe       : 1;
+            __VSF_USBH_PIPE_T size          : 11;
+            __VSF_USBH_PIPE_T endpoint      : 4;
+            __VSF_USBH_PIPE_T type          : 2;
+            __VSF_USBH_PIPE_T speed         : 2;
+            __VSF_USBH_PIPE_T address       : 7;
+            __VSF_USBH_PIPE_T dir_in1out0   : 1;
+            __VSF_USBH_PIPE_T interval      : VSF_USBH_CFG_EP_INTERNAL_BITS;
         };
-        uint32_t value;
+        __VSF_USBH_PIPE_T value;
     };
 } vk_usbh_pipe_t;
 
@@ -383,7 +395,6 @@ vsf_class(vk_usbh_hcd_urb_t) {
         uint32_t actual_length;
         uint16_t timeout;
         uint16_t transfer_flags;    /*!< USB_DISABLE_SPD | USB_ISO_ASAP | etc. */
-        uint16_t interval;          /*!< polling interval (iso/irq only)    */
         int16_t status;             /*!< returned status                    */
 
         void *buffer;
@@ -542,8 +553,13 @@ extern void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
 #if defined(__VSF_USBH_CLASS_IMPLEMENT) || defined(__VSF_USBH_CLASS_IMPLEMENT_CLASS__)
 // APIs to be called by class drivers
 extern uint_fast16_t vk_usbh_get_frame(vk_usbh_t *usbh);
-extern vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
-            uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size);
+
+#define __vk_usbh_get_pipe5(...)        __vk_usbh_get_pipe(__VA_ARGS__)
+#define __vk_usbh_get_pipe4(...)        __vk_usbh_get_pipe5(__VA_ARGS__, 0)
+#define vk_usbh_get_pipe(...)                                                   \
+            __PLOOC_EVAL(__vk_usbh_get_pipe, __VA_ARGS__)(__VA_ARGS__)
+extern vk_usbh_pipe_t __vk_usbh_get_pipe(vk_usbh_dev_t *dev,
+            uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size, uint_fast8_t interval);
 extern vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep);
 extern void vk_usbh_urb_prepare_by_pipe(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev,
