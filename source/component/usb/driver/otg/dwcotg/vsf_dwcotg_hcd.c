@@ -916,7 +916,26 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             }
         } else if (channel_intsts & (USB_OTG_HCINT_ACK | USB_OTG_HCINT_NYET)) {
             if (is_split) {
-                channel_regs->hcsplt |= USB_OTG_HCSPLT_COMPLSPLT;
+                if (channel_intsts & USB_OTG_HCINT_ACK) {
+                    channel_regs->hcsplt |= USB_OTG_HCSPLT_COMPLSPLT;
+                } else {
+                    switch (urb->pipe.type) {
+                    case USB_ENDPOINT_XFER_CONTROL:
+                    case USB_ENDPOINT_XFER_BULK:
+                        // retry complete split
+                        channel_regs->hcsplt |= USB_OTG_HCSPLT_COMPLSPLT;
+                        break;
+                    case USB_ENDPOINT_XFER_INT:
+                        // TODO: add retry count
+                        // for last transaction, retry start split
+                        //  for non-last transaction, retry complete split
+                        channel_regs->hcsplt &= ~USB_OTG_HCSPLT_COMPLSPLT;
+                        break;
+                    case USB_ENDPOINT_XFER_ISOC:
+                        // TODO:
+                        VSF_USB_ASSERT(false);
+                    }
+                }
 
             do_split_next:
                 orig = vsf_protect_int();
