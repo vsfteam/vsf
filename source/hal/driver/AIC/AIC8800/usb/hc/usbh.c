@@ -34,13 +34,15 @@ extern vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority
                 bool is_fs_phy, usb_ip_irqhandler_t handler, void *param);
 
 static uint_fast32_t __aic8800_usbh_workaround_reset_port(void *param);
+static uint_fast32_t __aic8800_usbh_workaround_enable_port(void *param, uint8_t speed);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vk_dwcotg_hcd_workaround_t __aic8800_usbh_workaround = {
-    .param          = NULL,
+    .param          = (void *)AIC_USB_BASE,
     .reset_port     = __aic8800_usbh_workaround_reset_port,
+    .enable_port    = __aic8800_usbh_workaround_enable_port,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -50,6 +52,16 @@ static uint_fast32_t __aic8800_usbh_workaround_reset_port(void *param)
     PMIC_MEM_WRITE(0X50010118, 0x400);
     PMIC_MEM_WRITE(0X5001011c, 0x400);
     return 10;
+}
+
+static uint_fast32_t __aic8800_usbh_workaround_enable_port(void *param, uint8_t speed)
+{
+    uint32_t *reg = param;
+    if (USB_SPEED_FULL == speed) {
+        // host.global_regs.hfir = 60000;
+        reg[0x101] = 60000;
+    }
+    return 20;
 }
 
 vsf_err_t aic8800_usbh_init(aic8800_usb_t *hc, usb_hc_ip_cfg_t *cfg)

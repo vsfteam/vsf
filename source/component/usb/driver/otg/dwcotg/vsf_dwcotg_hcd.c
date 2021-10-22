@@ -368,6 +368,17 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
 #   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
+static enum usb_device_speed_t __vk_dwcotg_hcd_get_port_speed(uint32_t hprt0)
+{
+    enum usb_device_speed_t speed = USB_SPEED_FULL;
+    if ((hprt0 & USB_OTG_HPRT_PSPD) == 0) {
+        speed = USB_SPEED_HIGH;
+    } else if ((hprt0 & USB_OTG_HPRT_PSPD) == USB_OTG_HPRT_PSPD_1) {
+        speed = USB_SPEED_LOW;
+    }
+    return speed;
+}
+
 static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
 #if VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB != ENABLED
@@ -414,14 +425,15 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 goto __do_reset_issue;
 #endif
             }
-            vsf_teda_set_timer_ms(20);
-        } else if (NULL == dwcotg_hcd->dev) {
-            enum usb_device_speed_t speed = USB_SPEED_FULL;
-            if ((hprt0 & USB_OTG_HPRT_PSPD) == 0) {
-                speed = USB_SPEED_HIGH;
-            } else if ((hprt0 & USB_OTG_HPRT_PSPD) == USB_OTG_HPRT_PSPD_1) {
-                speed = USB_SPEED_LOW;
+
+            enum usb_device_speed_t speed = __vk_dwcotg_hcd_get_port_speed(hprt0);
+            uint_fast32_t delay_ms = 20;
+            if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->enable_port != NULL)) {
+                delay_ms = dwcotg_hcd->workaround->enable_port(dwcotg_hcd->workaround->param, speed);
             }
+            vsf_teda_set_timer_ms(delay_ms);
+        } else if (NULL == dwcotg_hcd->dev) {
+            enum usb_device_speed_t speed = __vk_dwcotg_hcd_get_port_speed(hprt0);
             // cast-align from gcc
             dwcotg_hcd->dev = vk_usbh_new_device((vk_usbh_t *)dwcotg_hcd->hcd, speed, NULL, 0);
         } else {
@@ -604,7 +616,6 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             } else {
                 VSF_USB_ASSERT(false);
             }
-            // TODO: set reg->host.global_regs->hfir if SOF interval is not 1ms
 
             // Flush FIFO
             reg->global_regs->grstctl = USB_OTG_GRSTCTL_TXFFLSH | USB_OTG_GRSTCTL_TXFNUM_4;
