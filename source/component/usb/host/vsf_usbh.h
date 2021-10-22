@@ -395,6 +395,7 @@ vsf_class(vk_usbh_hcd_urb_t) {
         uint32_t actual_length;
         uint16_t timeout;
         uint16_t transfer_flags;    /*!< USB_DISABLE_SPD | USB_ISO_ASAP | etc. */
+        uint16_t interval;          /*!< polling interval (iso/irq only)    */
         int16_t status;             /*!< returned status                    */
 
         void *buffer;
