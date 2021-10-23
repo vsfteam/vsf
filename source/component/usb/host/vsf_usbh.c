@@ -151,22 +151,21 @@ void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
 #endif
 
 vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
-        uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size, uint_fast8_t interval)
+        uint8_t endpoint, uint8_t type, uint16_t size, uint8_t interval)
 {
     uint_fast8_t direction = endpoint & USB_DIR_MASK;
-    vk_usbh_pipe_t pipe;
+    vk_usbh_pipe_t pipe = { 0 };
 
     endpoint &= 0x0F;
     // only support 4-bit interval
     VSF_USB_ASSERT(!(interval & ~(0x0F)));
-    pipe.value =   1|   (size << 1)             /* 11-bit size */
+    pipe.bits =    1|   (size << 1)             /* 11-bit size */
                     |   (endpoint << 12)        /* 4-bit endpoint */
                     |   (type << 16)            /* 2-bit type */
                     |   (dev->speed << 18)      /* 2-bit speed */
                     |   (dev->devnum << 20)     /* 7-bit address */
-                    |   (direction << 20)       /* 1-bit direction */
-                    |   ((interval & ((1 << VSF_USBH_CFG_EP_INTERNAL_BITS) - 1))) << 28;
-                                                /* VSF_USBH_CFG_EP_INTERNAL_BITS-bit interval */
+                    |   (direction << 20);      /* 1-bit direction */
+    pipe.interval = interval;
     return pipe;
 }
 

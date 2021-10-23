@@ -105,7 +105,6 @@ typedef struct vk_dwcotg_hcd_urb_t {
     uint16_t is_discarded   : 1;
     uint16_t err_cnt        : 2;
     uint16_t phase          : 3;
-    uint16_t toggle         : 1;
     uint16_t do_ping        : 1;
     uint16_t is_split       : 1;
     uint16_t is_timeout_en  : 1;
@@ -785,7 +784,7 @@ static void __vk_dwcotg_hcd_urb_fsm(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb
                 break;
             case USB_ENDPOINT_XFER_BULK:
             case USB_ENDPOINT_XFER_INT:
-                dpid = dwcotg_urb->toggle ? DWCOTG_HCD_DPIP_DATA1 : DWCOTG_HCD_DPIP_DATA0;
+                dpid = pipe.toggle ? DWCOTG_HCD_DPIP_DATA1 : DWCOTG_HCD_DPIP_DATA0;
                 break;
             }
             __vk_dwcotg_hcd_commit_urb(dwcotg_hcd, urb, dpid, pipe.dir_in1out0, (uint8_t *)urb->buffer, urb->transfer_length);
@@ -895,7 +894,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                     case 0: toggle = 0; break;  // DATA0
                     case 2: toggle = 1; break;  // DATA1
                     }
-                    usb_settoggle(urb->dev_hcd, urb->pipe.endpoint, !urb->pipe.dir_in1out0, toggle);
+                    urb->pipe.toggle = toggle;
                 }
                 // fall through
             case USB_ENDPOINT_XFER_ISOC:
@@ -1181,7 +1180,6 @@ static vsf_err_t __vk_dwcotg_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_
             urb->pipe.type = USB_ENDPOINT_XFER_BULK;
         }
     init_toggle:
-        dwcotg_urb->toggle = usb_gettoggle(urb->dev_hcd, pipe.endpoint, !pipe.dir_in1out0);
         dwcotg_urb->do_ping = dwcotg_hcd->dma_en ? false : (pipe.speed == USB_SPEED_HIGH);
         break;
     case USB_ENDPOINT_XFER_ISOC:

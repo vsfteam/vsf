@@ -82,12 +82,6 @@ extern "C" {
 #ifndef VSF_USBH_CFG_MAX_DEVICE
 #   define VSF_USBH_CFG_MAX_DEVICE      127
 #endif
-#ifndef VSF_USBH_CFG_EP_INTERNAL_BITS
-#   define VSF_USBH_CFG_EP_INTERNAL_BITS    8
-#endif
-#if (VSF_USBH_CFG_EP_INTERNAL_BITS < 0) || (VSF_USBH_CFG_EP_INTERNAL_BITS > 8)
-#   error invalid VSF_USBH_CFG_EP_INTERNAL_BITS
-#endif
 
 #ifdef VSF_USBH_CFG_HEAP_IFS
 #   undef vsf_usbh_malloc
@@ -140,15 +134,6 @@ extern void vsf_usbh_free(void * buffer);
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#ifdef __VSF_USBH_CLASS_IMPLEMENT_HCD__
-// available for hcd only if alloc_device is not implemented
-#   define usb_gettoggle(__dev, __ep, __out)    (((__dev)->toggle[__out] >> (__ep)) & 1)
-#   define usb_dotoggle(__dev, __ep, __out)     ((__dev)->toggle[__out] ^= (1 << (__ep)))
-#   define usb_settoggle(__dev, __ep, __out, __bit)                             \
-        ((__dev)->toggle[__out] = ((__dev)->toggle[__out] & ~(1 << (__ep))) | ((__bit) << (__ep)))
-#endif
-
 /*============================ TYPES =========================================*/
 
 vsf_dcl_class(vk_usbh_hcd_t)
@@ -274,23 +259,25 @@ typedef struct vk_usbh_class_t {
 
 typedef struct vk_usbh_pipe_t {
     union {
-#if VSF_USBH_CFG_EP_INTERNAL_BITS > 4
-#   define __VSF_USBH_PIPE_T                uint64_t
-#else
-#   define __VSF_USBH_PIPE_T                uint32_t
-#endif
         struct {
-            // is_pipe is also used as is_submitted in hcd_urb
-            __VSF_USBH_PIPE_T is_pipe       : 1;
-            __VSF_USBH_PIPE_T size          : 11;
-            __VSF_USBH_PIPE_T endpoint      : 4;
-            __VSF_USBH_PIPE_T type          : 2;
-            __VSF_USBH_PIPE_T speed         : 2;
-            __VSF_USBH_PIPE_T address       : 7;
-            __VSF_USBH_PIPE_T dir_in1out0   : 1;
-            __VSF_USBH_PIPE_T interval      : VSF_USBH_CFG_EP_INTERNAL_BITS;
+            union {
+                struct {
+                    // is_pipe is also used as is_submitted in hcd_urb
+                    uint32_t is_pipe        : 1;
+                    uint32_t size           : 11;
+                    uint32_t endpoint       : 4;
+                    uint32_t type           : 2;
+                    uint32_t speed          : 2;
+                    uint32_t address        : 7;
+                    uint32_t dir_in1out0    : 1;
+                    uint32_t toggle         : 1;
+                };
+                uint32_t bits;
+            };
+            uint16_t interval;
+            uint16_t last_frame;
         };
-        __VSF_USBH_PIPE_T value;
+        uint64_t value;
     };
 } vk_usbh_pipe_t;
 
@@ -377,11 +364,7 @@ extern "C" {
 
 vsf_class(vk_usbh_hcd_dev_t) {
     private_member(
-        union {
-            void *dev_priv;
-            uint32_t value;
-            uint16_t toggle[2];
-        };
+        void *dev_priv;
     )
 };
 
@@ -560,7 +543,7 @@ extern uint_fast16_t vk_usbh_get_frame(vk_usbh_t *usbh);
 #define vk_usbh_get_pipe(...)                                                   \
             __PLOOC_EVAL(__vk_usbh_get_pipe, __VA_ARGS__)(__VA_ARGS__)
 extern vk_usbh_pipe_t __vk_usbh_get_pipe(vk_usbh_dev_t *dev,
-            uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size, uint_fast8_t interval);
+            uint8_t endpoint, uint8_t type, uint16_t size, uint8_t interval);
 extern vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep);
 extern void vk_usbh_urb_prepare_by_pipe(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev,
