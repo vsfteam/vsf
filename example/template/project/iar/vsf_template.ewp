@@ -373,7 +373,9 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\include</state>
@@ -1457,7 +1459,9 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw</state>
@@ -3606,7 +3610,9 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\raw\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
                 </option>
                 <option>
