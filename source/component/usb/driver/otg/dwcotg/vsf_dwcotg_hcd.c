@@ -728,11 +728,17 @@ static void __vk_dwcotg_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 
 static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb)
 {
-    uint_fast32_t interval = urb->pipe.interval;
+    vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
+    uint32_t interval = urb->pipe.interval;
     if (!interval) {
         return true;
     }
-    if (USB_SPEED_HIGH == dwcotg_hcd->speed) {
+
+    if ((reg->host.global_regs->hfnum & 0xFFFF) == urb->pipe.last_frame) {
+        return false;
+    }
+
+    if ((USB_SPEED_HIGH == dwcotg_hcd->speed) && (urb->pipe.speed < USB_SPEED_HIGH)) {
         interval <<= 3;
     }
     return dwcotg_hcd->softick % interval == 0;
@@ -841,6 +847,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         urb_fail:
             urb->status = URB_FAIL;
         urb_done:
+            urb->pipe.last_frame = dwcotg_hcd->reg.host.global_regs->hfnum & 0xFFFF;
             vsf_eda_post_msg(urb->eda_caller, urb);
         } else if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
             bool is_stall = channel_intsts & USB_OTG_HCINT_STALL;
