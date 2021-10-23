@@ -165,7 +165,16 @@ vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
                     |   (dev->speed << 18)      /* 2-bit speed */
                     |   (dev->devnum << 20)     /* 7-bit address */
                     |   (direction << 20);      /* 1-bit direction */
-    pipe.interval = interval;
+
+    if (    (USB_ENDPOINT_XFER_ISOC == type)
+        ||  ((USB_ENDPOINT_XFER_INT == type) && (dev->speed >= USB_SPEED_HIGH))) {
+        // interval is 2 exp (interval - 1), interval at [1, 16]
+        VSF_USB_ASSERT((interval >= 1) && (interval <= 16));
+        pipe.interval = 1 << (interval - 1);
+    } else if (USB_ENDPOINT_XFER_INT == type) {
+        VSF_USB_ASSERT(interval >= 1);
+        pipe.interval = interval;
+    }
     return pipe;
 }
 
