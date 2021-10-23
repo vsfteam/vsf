@@ -595,7 +595,7 @@ static vsf_err_t __ohci_ed_init(ohci_urb_t *urb_ohci, vk_usbh_hcd_urb_t *urb)
     ed->hwHeadP = ed->hwTailP;
 
     pipe = urb->pipe;
-    if (usb_gettoggle(urb->dev_hcd, pipe.endpoint, !pipe.dir_in1out0)) {
+    if (pipe.toggle) {
         ed->hwHeadP |= ED_C;
     }
     ed->type = pipe.type;
@@ -842,8 +842,7 @@ static void __ohci_finish_unlinks(vk_ohci_t *ohci)
             urb_ohci = ed->td_dummy->urb_ohci;
             urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
 
-            usb_settoggle(urb->dev_hcd, urb->pipe.endpoint,
-                        !urb->pipe.dir_in1out0, (ed->hwHeadP & ED_C) >> 1);
+            urb->pipe.toggle = (ed->hwHeadP & ED_C) >> 1;
             if (urb_ohci->state & URB_PRIV_WAIT_DELETE) {
                 vsf_slist_peek_next(ohci_td_t, node, &ed->node, *ed_last);
                 vsf_slist_init_node(ohci_ed_t, node, ed);
@@ -1490,7 +1489,7 @@ void vk_ohci_init(void)
 #if defined(VSF_OHCI_CFG_MAX_TD_NUM)
     VSF_POOL_INIT_EX(ohci_td_pool, &__vk_ohci_td_pool, VSF_OHCI_CFG_MAX_TD_NUM, 32,
         .target_ptr = NULL,
-        .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_none, 
+        .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_none,
     );
 #else
     VSF_POOL_PREPARE_EX(ohci_td_pool, &__vk_ohci_td_pool, 32,

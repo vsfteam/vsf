@@ -92,7 +92,6 @@ typedef struct f1cx00s_usbh_hcd_dev_t {
         };
         int8_t ep_idx[32];
     };
-    uint16_t toggle[2];
 } f1cx00s_usbh_hcd_dev_t;
 
 enum {
@@ -275,7 +274,7 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
                     }
 
                     MUSB_BASE->Index.HC.EPN.RxCSRL |= MUSBH_RxCSRL_FlushFIFO;
-                    if (musb_dev->toggle[1] & (1 << pipe.endpoint)) {
+                    if (pipe.toggle) {
                         MUSB_BASE->Index.HC.EPN.RxCSRH = (MUSB_BASE->Index.HC.EPN.RxCSRH | MUSBH_RxCSRH_DataToggle) | MUSBH_RxCSRH_DataToggleWrEnable;
                     } else {
                         MUSB_BASE->Index.HC.EPN.RxCSRH = (MUSB_BASE->Index.HC.EPN.RxCSRH & ~MUSBH_RxCSRH_DataToggle) | MUSBH_RxCSRH_DataToggleWrEnable;
@@ -291,7 +290,7 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
                     }
 
                     MUSB_BASE->Index.HC.EPN.TxCSRL |= MUSBH_TxCSRL_FlushFIFO;
-                    if (musb_dev->toggle[0] & (1 << pipe.endpoint)) {
+                    if (pipe.toggle) {
                         MUSB_BASE->Index.HC.EPN.TxCSRH = (MUSB_BASE->Index.HC.EPN.TxCSRH | MUSBH_TxCSRH_DataToggle) | MUSBH_TxCSRH_DataToggleWrEnable;
                     } else {
                         MUSB_BASE->Index.HC.EPN.TxCSRH = (MUSB_BASE->Index.HC.EPN.TxCSRH & ~MUSBH_TxCSRH_DataToggle) | MUSBH_TxCSRH_DataToggleWrEnable;
@@ -349,9 +348,9 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
             // NAKTimeout is not error, on NAKTimer, urb will be enqueue again
             if (is_in) {
                 if (MUSB_BASE->Index.HC.EPN.RxCSRH & MUSBH_RxCSRH_DataToggle) {
-                    musb_dev->toggle[1] |= 1 << pipe.endpoint;
+                    urb->pipe.toggle = 1;
                 } else {
-                    musb_dev->toggle[1] &= ~(1 << pipe.endpoint);
+                    urb->pipe.toggle = 0;
                 }
 
                 if (MUSB_BASE->Index.HC.EPN.RxCSRL & (MUSBH_RxCSRL_RxStall | MUSBH_RxCSRL_Error)) {
@@ -368,9 +367,9 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
                 }
             } else {
                 if (MUSB_BASE->Index.HC.EPN.TxCSRH & MUSBH_TxCSRH_DataToggle) {
-                    musb_dev->toggle[0] |= 1 << pipe.endpoint;
+                    urb->pipe.toggle = 1;
                 } else {
-                    musb_dev->toggle[0] &= ~(1 << pipe.endpoint);
+                    urb->pipe.toggle = 0;
                 }
 
                 if (MUSB_BASE->Index.HC.EPN.TxCSRL & (MUSBH_TxCSRL_RxStall | MUSBH_TxCSRL_Error)) {
@@ -656,8 +655,6 @@ static vsf_err_t __f1cx00s_usbh_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd
     // IN0 and OUT0 uses shared ep0
     musb_dev->ep_in_idx[0] = 0;
     musb_dev->ep_out_idx[0] = 0;
-    musb_dev->toggle[0] = 0;
-    musb_dev->toggle[1] = 0;
     dev->dev_priv = musb_dev;
     return VSF_ERR_NONE;
 }
