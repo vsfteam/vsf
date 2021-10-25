@@ -184,7 +184,7 @@ vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep)
 {
     return vk_usbh_get_pipe(dev, desc_ep->bEndpointAddress,
-            desc_ep->bmAttributes, le16_to_cpu(desc_ep->wMaxPacketSize), desc_ep->bInterval);
+            desc_ep->bmAttributes & 3, le16_to_cpu(desc_ep->wMaxPacketSize), desc_ep->bInterval);
 }
 
 void vk_usbh_urb_prepare_by_pipe(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev, vk_usbh_pipe_t pipe)
