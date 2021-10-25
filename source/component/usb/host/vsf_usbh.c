@@ -376,7 +376,8 @@ vsf_err_t vk_usbh_alloc_urb(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_urb_t *
     pipe = urb->pipe;
     urb->urb_hcd = usbh->drv->alloc_urb(&usbh->use_as__vk_usbh_hcd_t);
     if (urb->urb_hcd != NULL) {
-        urb->urb_hcd->pipe.value = pipe.value & ~1;     // clear is_pipe, used as is_submitted in urb_hcd
+        urb->urb_hcd->pipe.value = pipe.value;
+        VSF_USB_ASSERT(!urb->urb_hcd->pipe.is_submitted);
         urb->urb_hcd->dev_hcd = &dev->use_as__vk_usbh_hcd_dev_t;
         return VSF_ERR_NONE;
     } else {
@@ -392,9 +393,8 @@ void vk_usbh_free_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb)
 
     if (vk_usbh_urb_is_alloced(urb)) {
         vk_usbh_pipe_t pipe = urb->urb_hcd->pipe;
-        // assert is_submitted is cleared
-        VSF_USB_ASSERT(!(pipe.value & 1));
         usbh->drv->free_urb(&usbh->use_as__vk_usbh_hcd_t, urb->urb_hcd);
+        pipe.is_submitted = false;
         urb->pipe = pipe;
     }
 }
@@ -497,7 +497,9 @@ void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
     VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
 
 #if VSF_USBH_USE_HUB == ENABLED
-    vsf_slist_remove(vk_usbh_dev_t, child_node, &dev->dev_parent->children_list, dev);
+    if (dev->dev_parent != NULL) {
+        vsf_slist_remove(vk_usbh_dev_t, child_node, &dev->dev_parent->children_list, dev);
+    }
 #endif
     vsf_trace_info("usbh: device disconnected" VSF_TRACE_CFG_LINEEND);
     if (dev->num_of_ifs && (dev->ifs != NULL)) {
@@ -656,8 +658,6 @@ static vsf_err_t __vk_usbh_submit_urb_imp(vk_usbh_t *usbh, vk_usbh_urb_t *urb, v
     }
 #endif
 
-// is_pipe is used as is_submitted in urb_hcd
-#define is_submitted            is_pipe
     if (    (   (urb_hcd->pipe.type != USB_ENDPOINT_XFER_INT)
             &&  (urb_hcd->pipe.type != USB_ENDPOINT_XFER_ISOC))
         ||  !urb_hcd->pipe.is_submitted) {

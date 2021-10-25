@@ -262,7 +262,6 @@ typedef struct vk_usbh_pipe_t {
         struct {
             union {
                 struct {
-                    // is_pipe is also used as is_submitted in hcd_urb
                     uint32_t is_pipe        : 1;
                     uint32_t size           : 11;
                     uint32_t endpoint       : 4;
@@ -271,6 +270,7 @@ typedef struct vk_usbh_pipe_t {
                     uint32_t address        : 7;
                     uint32_t dir_in1out0    : 1;
                     uint32_t toggle         : 1;
+                    uint32_t is_submitted   : 1;
                 };
                 uint32_t bits;
             };
