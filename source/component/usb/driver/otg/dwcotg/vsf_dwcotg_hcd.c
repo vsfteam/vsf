@@ -425,16 +425,15 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #endif
             }
 
-            enum usb_device_speed_t speed = __vk_dwcotg_hcd_get_port_speed(hprt0);
+            dwcotg_hcd->speed = __vk_dwcotg_hcd_get_port_speed(hprt0);
             uint_fast32_t delay_ms = 20;
             if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->enable_port != NULL)) {
-                delay_ms = dwcotg_hcd->workaround->enable_port(dwcotg_hcd->workaround->param, speed);
+                delay_ms = dwcotg_hcd->workaround->enable_port(dwcotg_hcd->workaround->param, dwcotg_hcd->speed);
             }
             vsf_teda_set_timer_ms(delay_ms);
         } else if (NULL == dwcotg_hcd->dev) {
-            enum usb_device_speed_t speed = __vk_dwcotg_hcd_get_port_speed(hprt0);
             // cast-align from gcc
-            dwcotg_hcd->dev = vk_usbh_new_device((vk_usbh_t *)dwcotg_hcd->hcd, speed, NULL, 0);
+            dwcotg_hcd->dev = vk_usbh_new_device((vk_usbh_t *)dwcotg_hcd->hcd, dwcotg_hcd->speed, NULL, 0);
         } else {
             dwcotg_hcd->is_reset_issued = false;
         }
