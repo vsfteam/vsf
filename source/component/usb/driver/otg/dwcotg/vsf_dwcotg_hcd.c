@@ -852,13 +852,16 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             vsf_eda_post_msg(urb->eda_caller, urb);
         } else if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
             bool is_stall = channel_intsts & USB_OTG_HCINT_STALL;
+            bool is_in = channel_regs->hcchar & USB_OTG_HCCHAR_EPDIR;
 
             if (VSF_DWCOTG_HCD_PHASE_DATA == dwcotg_urb->phase) {
-                bool is_in = channel_regs->hcchar & USB_OTG_HCCHAR_EPDIR;
-
                 if (is_in) {
-                    dwcotg_urb->current_size -= channel_regs->hctsiz & USB_OTG_HCTSIZ_XFRSIZ;
+                    uint16_t remain_size = channel_regs->hctsiz & USB_OTG_HCTSIZ_XFRSIZ;
+                    dwcotg_urb->current_size -= remain_size;
                     urb->actual_length += dwcotg_urb->current_size;
+                    if (is_split) {
+                        dwcotg_urb->current_size = remain_size;
+                    }
                 } else {
                     urb->actual_length += dwcotg_urb->current_size;
                 }
@@ -892,6 +895,9 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 } else {
                 urb_done_check_stall:
                     urb->status = is_stall ? URB_FAIL : URB_OK;
+                    if (is_split && !is_in) {
+                        urb->actual_length = urb->transfer_length;
+                    }
                     goto urb_done;
                 }
                 break;
@@ -1013,7 +1019,6 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
     uint_fast32_t intsts = dwcotg_hcd->reg.global_regs->gintmsk;
     volatile uint32_t *intsts_reg = &dwcotg_hcd->reg.global_regs->gintsts;
     intsts &= *intsts_reg;
-    vsf_protect_t orig;
 
     if (!intsts) {
         VSF_USB_ASSERT(false);
@@ -1022,22 +1027,18 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
 
     if (intsts & USB_OTG_GINTSTS_SOF) {
         vk_usbh_hcd_urb_t *urb;
-        vsf_slist_t queue;
+        vk_dwcotg_hcd_urb_t *dwcotg_urb;
 
         *intsts_reg = USB_OTG_GINTSTS_SOF;
         dwcotg_hcd->softick++;
-
-        orig = vsf_protect_int();
-            queue.head = dwcotg_hcd->pending_queue.head.next;
-            vsf_slist_queue_init(&dwcotg_hcd->pending_queue);
-        vsf_unprotect_int(orig);
 
         // after device connecting to roothub is removed, there is possibility that the channel
         //  can not be halted, so check in SOF, if the channel need to be halted or timeouted
         for (uint_fast8_t i = 0; (dwcotg_hcd->ep_mask != 0) && (i < dwcotg_hcd->ep_num); i++) {
             if (dwcotg_hcd->ep_mask & (1 << i)) {
-                VSF_USB_ASSERT(dwcotg_hcd->urb[i] != NULL);
-                vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&dwcotg_hcd->urb[i]->priv;
+                urb = dwcotg_hcd->urb[i];
+                VSF_USB_ASSERT(urb != NULL);
+                dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
                 if (dwcotg_urb->is_timeout) {
                     // channel is still active after timeout, need to read GRXSTSP according to
                     //  <DesignWare Cores USB 2.0 Hi-Speed On-The-Go(OTG)> Section 3.5:
@@ -1070,8 +1071,12 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
             }
         }
 
+        vsf_slist_t queue;
+        vsf_protect_t orig = vsf_protect_int();
+            queue.head = dwcotg_hcd->pending_queue.head.next;
+            vsf_slist_queue_init(&dwcotg_hcd->pending_queue);
+        vsf_unprotect_int(orig);
         struct dwcotg_hc_regs_t *channel_regs;
-        vk_dwcotg_hcd_urb_t *dwcotg_urb;
         __vsf_slist_foreach_next_unsafe(vk_dwcotg_hcd_urb_t, node, &queue) {
             urb = container_of(_, vk_usbh_hcd_urb_t, priv);
             dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
