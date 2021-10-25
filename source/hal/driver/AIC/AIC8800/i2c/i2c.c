@@ -50,7 +50,7 @@ void I2CM_IRQHandler(void)
     } else {
         irq_mask |= I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
     }
-    vsf_hw_i2c0.REG_PARAM->SR &= ~SR_INT_BIT;
+    vsf_hw_i2c0.REG_PARAM->SR &= ~SR_BUSY_BIT;
     vsf_hw_i2c0.REG_PARAM->CR  = 0;
     vsf_hw_i2c0.REG_PARAM->RR = RR_RST_BIT;
     if (16 >= vsf_hw_i2c0.recall_info.data_size) {
