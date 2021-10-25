@@ -249,7 +249,8 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
     channel_regs->hcchar |= USB_OTG_HCCHAR_CHDIS;
     if (    (urb->pipe.type == USB_ENDPOINT_XFER_BULK)
         ||  (urb->pipe.type == USB_ENDPOINT_XFER_CONTROL)) {
-        if (dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) {
+        // int DMA mode, no need to check request queue
+        if (!dwcotg_hcd->dma_en && dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) {
             channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
             channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
             channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
@@ -258,7 +259,8 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
             channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
         }
     } else {
-        if (dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) {
+        // int DMA mode, no need to check request queue
+        if (!dwcotg_hcd->dma_en && dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) {
             channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
             channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
             channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
