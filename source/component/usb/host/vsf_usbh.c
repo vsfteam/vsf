@@ -161,7 +161,7 @@ vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
     endpoint &= 0x0F;
     // only support 4-bit interval
     VSF_USB_ASSERT(!(interval & ~(0x0F)));
-    pipe.bits =    1|   (size << 1)             /* 11-bit size */
+    pipe.value =   1|   (size << 1)             /* 11-bit size */
                     |   (endpoint << 12)        /* 4-bit endpoint */
                     |   (type << 16)            /* 2-bit type */
                     |   (dev->speed << 18)      /* 2-bit speed */
@@ -378,7 +378,7 @@ vsf_err_t vk_usbh_alloc_urb(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_urb_t *
     pipe = urb->pipe;
     urb->urb_hcd = usbh->drv->alloc_urb(&usbh->use_as__vk_usbh_hcd_t);
     if (urb->urb_hcd != NULL) {
-        urb->urb_hcd->pipe.value = pipe.value;
+        urb->urb_hcd->pipe = pipe;
         VSF_USB_ASSERT(!urb->urb_hcd->pipe.is_submitted);
         urb->urb_hcd->dev_hcd = &dev->use_as__vk_usbh_hcd_dev_t;
         return VSF_ERR_NONE;

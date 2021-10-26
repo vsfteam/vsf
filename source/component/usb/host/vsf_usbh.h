@@ -260,25 +260,20 @@ typedef struct vk_usbh_class_t {
 typedef struct vk_usbh_pipe_t {
     union {
         struct {
-            union {
-                struct {
-                    uint32_t is_pipe        : 1;
-                    uint32_t size           : 11;
-                    uint32_t endpoint       : 4;
-                    uint32_t type           : 2;
-                    uint32_t speed          : 2;
-                    uint32_t address        : 7;
-                    uint32_t dir_in1out0    : 1;
-                    uint32_t toggle         : 1;
-                    uint32_t is_submitted   : 1;
-                };
-                uint32_t bits;
-            };
-            uint16_t interval;
-            uint16_t last_frame;
+            uint32_t is_pipe        : 1;
+            uint32_t size           : 11;
+            uint32_t endpoint       : 4;
+            uint32_t type           : 2;
+            uint32_t speed          : 2;
+            uint32_t address        : 7;
+            uint32_t dir_in1out0    : 1;
+            uint32_t toggle         : 1;
+            uint32_t is_submitted   : 1;
         };
-        uint64_t value;
+        uint32_t value;
     };
+    uint16_t interval;
+    uint16_t last_frame;
 } vk_usbh_pipe_t;
 
 #ifdef __cplusplus
