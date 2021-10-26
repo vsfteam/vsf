@@ -642,6 +642,9 @@ static void *__vk_usbh_dl1x5_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 #else
     vsf_eda_init(&dl1x5->task);
 #endif
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info((vsf_eda_t *)&dl1x5->task, "usbh_dl1x5_task", NULL, 0);
+#endif
     return dl1x5;
 }
 

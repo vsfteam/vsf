@@ -433,6 +433,9 @@ static void * __vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
     bthci->eda.fn.evthandler = __vk_usbh_bthci_evthandler;
     bthci->eda.on_terminate = __vk_usbh_bthci_on_eda_terminate;
     vsf_eda_init(&bthci->eda);
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&bthci->eda, "usbh_bthci_task", NULL, 0);
+#endif
     return bthci;
 
 free_all:

@@ -136,6 +136,9 @@ typedef struct vk_dwcotg_hcd_t {
     uint8_t is_connected    : 1;
     uint8_t is_reset_issued : 1;
     uint8_t is_reset_pending: 1;
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    uint8_t is_isr_info_sent: 1;
+#endif
     uint16_t ep_mask;
     volatile uint32_t softick;
 
@@ -973,10 +976,10 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             goto urb_retry;
         } else {
             // no idea why no event
-//            VSF_USB_ASSERT(false);
 #if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
             vsf_trace_error("dwcotg_hcd.channel%d: no event" VSF_TRACE_CFG_LINEEND, channel_idx);
 #endif
+            VSF_USB_ASSERT(false);
             goto urb_fail;
         }
 
@@ -1019,6 +1022,16 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
     uint_fast32_t intsts = dwcotg_hcd->reg.global_regs->gintmsk;
     volatile uint32_t *intsts_reg = &dwcotg_hcd->reg.global_regs->gintsts;
     intsts &= *intsts_reg;
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    if (!dwcotg_hcd->is_isr_info_sent) {
+        dwcotg_hcd->is_isr_info_sent = true;
+        vsf_kernel_trace_isr_info(vsf_get_interrupt_id(), "dwcotg_hcd");
+    }
+    if (intsts & (USB_OTG_GINTSTS_HCINT | USB_OTG_GINTSTS_HPRTINT)) {
+        vsf_kernel_trace_isr_enter(vsf_get_interrupt_id());
+    }
+#endif
 
     if (!intsts) {
         VSF_USB_ASSERT(false);
@@ -1158,6 +1171,12 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
             }
         }
     }
+
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    if (intsts & (USB_OTG_GINTSTS_HCINT | USB_OTG_GINTSTS_HPRTINT)) {
+        vsf_kernel_trace_isr_leave(vsf_get_interrupt_id());
+    }
+#endif
 }
 
 static vsf_err_t __vk_dwcotg_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)

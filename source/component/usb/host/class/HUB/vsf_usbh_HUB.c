@@ -270,7 +270,6 @@ static void __vk_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 }
             } else if (++hub->retry > 3) {
                 // todo: reset failed
-                
             } else {
                 // delay 200ms for next retry
                 vsf_teda_set_timer_ms(200);
@@ -481,7 +480,9 @@ static void *__vk_usbh_hub_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
     hub->teda.fn.evthandler = __vk_usbh_hub_evthandler;
     hub->teda.on_terminate = __vk_usbh_hub_on_eda_terminate;
     vsf_teda_init(&hub->teda);
-
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&hub->teda.use_as__vsf_eda_t, "usbh_hub_task", NULL, 0);
+#endif
     return hub;
 }
 

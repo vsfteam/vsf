@@ -626,6 +626,9 @@ static void *__vk_usbh_ecm_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
             cdc->eda.fn.evthandler = __vk_usbh_ecm_evthandler;
             cdc->eda.on_terminate = __vk_usbh_ecm_on_eda_terminate;
             vsf_eda_init(&cdc->eda);
+#if VSF_KERNEL_CFG_TRACE == ENABLED
+            vsf_kernel_trace_eda_info(&cdc->eda, "usbh_ecm_task", NULL, 0);
+#endif
         }
     }
     return ecm;
