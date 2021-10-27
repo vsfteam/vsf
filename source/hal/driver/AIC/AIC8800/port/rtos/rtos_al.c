@@ -347,7 +347,7 @@ uint32_t rtos_task_wait_notification(int timeout)
 
     vsf_protect_t orig = vsf_protect_int();
         if (0 == timeout) {
-            ret = vsf_eda_get_user_value();
+            ret = eda->flag.feature.user_bits;
             vsf_unprotect_int(orig);
 
             rtos_trace_notify("%s: %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
@@ -356,7 +356,7 @@ uint32_t rtos_task_wait_notification(int timeout)
 
         eda->flag.state.is_sync_got = false;
         eda->flag.state.is_limitted = true;
-        vsf_eda_set_user_value(1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1));
+        eda->flag.feature.user_bits |= 1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1);
 
         // private kernel API, can only be used here, so declear here
         extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_systimer_tick_t timeout);
@@ -379,12 +379,12 @@ uint32_t rtos_task_wait_notification(int timeout)
     extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
     // -Wcast-align by gcc
     __vsf_teda_cancel_timer((vsf_teda_t *)eda);
-    ret = vsf_eda_get_user_value() & ~(1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1));
+    ret = eda->flag.feature.user_bits & ~(1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1));
     if (eda->flag.state.is_sync_got) {
         eda->flag.state.is_sync_got = false;
-        vsf_eda_set_user_value(0);
+        eda->flag.feature.user_bits = 0;
     } else {
-        vsf_eda_set_user_value(ret);
+        eda->flag.feature.user_bits = ret;
     }
     eda->flag.state.is_limitted = false;
     vsf_unprotect_int(orig);
