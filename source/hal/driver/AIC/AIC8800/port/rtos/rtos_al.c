@@ -20,6 +20,7 @@
 #define __VSF_EDA_CLASS_INHERIT__
 #include "vsf.h"
 
+#include "rtos.h"
 #include "rtos_al.h"
 
 // library from vendor depends on this header,
@@ -239,6 +240,7 @@ int rtos_task_create(   rtos_task_fct func,
 
 #ifdef AIC8800_OSAL_CFG_PRIORITY_BASE
     real_prio += AIC8800_OSAL_CFG_PRIORITY_BASE;
+    VSF_ASSERT(real_prio <= vsf_prio_highest);
 #endif
 
     // patch
@@ -354,6 +356,7 @@ uint32_t rtos_task_wait_notification(int timeout)
 
         eda->flag.state.is_sync_got = false;
         eda->flag.state.is_limitted = true;
+        vsf_eda_set_user_value(1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1));
 
         // private kernel API, can only be used here, so declear here
         extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_systimer_tick_t timeout);
@@ -376,10 +379,12 @@ uint32_t rtos_task_wait_notification(int timeout)
     extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
     // -Wcast-align by gcc
     __vsf_teda_cancel_timer((vsf_teda_t *)eda);
-    ret = vsf_eda_get_user_value();
+    ret = vsf_eda_get_user_value() & ~(1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1));
     if (eda->flag.state.is_sync_got) {
         eda->flag.state.is_sync_got = false;
         vsf_eda_set_user_value(0);
+    } else {
+        vsf_eda_set_user_value(ret);
     }
     eda->flag.state.is_limitted = false;
     vsf_unprotect_int(orig);
@@ -394,11 +399,14 @@ uint32_t rtos_task_wait_notification(int timeout)
 
 void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
 {
-    VSF_ASSERT(!(value & ~((1 << VSF_KERNEL_CFG_EDA_USER_BITLEN) - 1)));
+    VSF_ASSERT(!(value & ~((1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1)) - 1)));
     VSF_ASSERT(task_handle != NULL);
+    uint32_t value_orig;
     vsf_protect_t orig = vsf_protect_int();
+        value_orig = task_handle->flag.feature.user_bits;
         task_handle->flag.feature.user_bits = value;
-        if (!task_handle->flag.state.is_limitted) {
+//        task_handle->flag.feature.user_bits &= ~(1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1));
+        if (!(value_orig & (1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1)))) {
             vsf_unprotect_int(orig);
             return;
         }
@@ -411,18 +419,21 @@ void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
 
 void rtos_task_notify_setbits(rtos_task_handle task_handle, uint32_t value, bool isr)
 {
-    VSF_ASSERT(!(value & ~((1 << VSF_KERNEL_CFG_EDA_USER_BITLEN) - 1)));
+    VSF_ASSERT(!(value & ~((1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1)) - 1)));
     VSF_ASSERT(task_handle != NULL);
 
 #ifdef AIC8800_OSAL_CFG_TRACE_NOTIFY
-    uint8_t notification;
+    uint32_t notification;
 #endif
+    uint32_t value_orig;
     vsf_protect_t orig = vsf_protect_int();
+        value_orig = task_handle->flag.feature.user_bits;
         task_handle->flag.feature.user_bits |= value;
+        task_handle->flag.feature.user_bits &= ~(1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1));
 #ifdef AIC8800_OSAL_CFG_TRACE_NOTIFY
         notification = task_handle->flag.feature.user_bits;
 #endif
-        if (!task_handle->flag.state.is_limitted) {
+        if (!(value_orig & (1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1)))) {
             vsf_unprotect_int(orig);
             return;
         }
@@ -698,6 +709,34 @@ void rtos_data_save(void)
 // ugly code, but really, vendor SDK is dependent on this even it has a working rtos_al
 void vTaskStepTick(TickType_t xTicksToJump)
 {
+}
+
+typedef struct {
+    int priority;
+    int stack_size;
+} rtos_task_cfg_st;
+rtos_task_cfg_st get_task_cfg(uint8_t task_id)
+{
+    rtos_task_cfg_st cfg = {0, 0};
+
+    switch (task_id) {
+        case IPC_CNTRL_TASK:
+            cfg.priority   = TASK_PRIORITY_WIFI_IPC;
+            cfg.stack_size = TASK_STACK_SIZE_WIFI_IPC;
+            break;
+        case SUPPLICANT_TASK:
+            cfg.priority   = TASK_PRIORITY_WIFI_WPA;
+            cfg.stack_size = TASK_STACK_SIZE_WIFI_WPA;
+            break;
+        case CONTROL_TASK:
+            cfg.priority   = TASK_PRIORITY_WIFI_CNTRL;
+            cfg.stack_size = TASK_STACK_SIZE_WIFI_CNTRL;
+            break;
+        default:
+            break;
+    }
+
+    return cfg;
 }
 
 /* EOF */
