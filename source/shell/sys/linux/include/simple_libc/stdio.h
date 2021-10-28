@@ -54,6 +54,7 @@ extern "C" {
 #define fputs               VSF_LINUX_LIBC_WRAPPER(fputs)
 #define puts                VSF_LINUX_LIBC_WRAPPER(puts)
 #define printf              VSF_LINUX_LIBC_WRAPPER(printf)
+#define vfprintf            VSF_LINUX_LIBC_WRAPPER(vfprintf)
 #define fprintf             VSF_LINUX_LIBC_WRAPPER(fprintf)
 #define fscanf              VSF_LINUX_LIBC_WRAPPER(fscanf)
 #define perror              VSF_LINUX_LIBC_WRAPPER(perror)
@@ -104,6 +105,7 @@ int vfscanf(FILE *f, const char *format, va_list ap);
 int vscanf(const char *format, va_list ap);
 
 int printf(const char *format, ...);
+int vfprintf(FILE *f, const char *format, va_list ap);
 int fprintf(FILE *f, const char *format, ...);
 int vfprintf(FILE *f, const char *format, va_list ap);
 int vprintf(const char *format, va_list arg);

@@ -279,7 +279,7 @@ int putchar(int c)
     return putc(c, stdout);
 }
 
-static int vfprintf(FILE *f, const char *format, va_list ap)
+int vfprintf(FILE *f, const char *format, va_list ap)
 {
     char buff[VSF_LINUX_CFG_PRINT_BUFF_SIZE];
     size_t size = vsnprintf(buff, sizeof(buff), format, ap);
