@@ -30,7 +30,6 @@ extern "C" {
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
 #define ferror              VSF_LINUX_LIBC_WRAPPER(ferror)
 #define clearerr            VSF_LINUX_LIBC_WRAPPER(clearerr)
-#define feof                VSF_LINUX_LIBC_WRAPPER(feof)
 #define getc                VSF_LINUX_LIBC_WRAPPER(getc)
 #define getchar             VSF_LINUX_LIBC_WRAPPER(getchar)
 #define putc                VSF_LINUX_LIBC_WRAPPER(putc)
@@ -39,6 +38,7 @@ extern "C" {
 
 #define fopen               VSF_LINUX_LIBC_WRAPPER(fopen)
 #define freopen             VSF_LINUX_LIBC_WRAPPER(freopen)
+#define feof                VSF_LINUX_LIBC_WRAPPER(feof)
 #define fclose              VSF_LINUX_LIBC_WRAPPER(fclose)
 #define fseek               VSF_LINUX_LIBC_WRAPPER(fseek)
 #define fseeko              VSF_LINUX_LIBC_WRAPPER(fseeko)
@@ -46,11 +46,15 @@ extern "C" {
 #define ftello              VSF_LINUX_LIBC_WRAPPER(ftello)
 #define ftello64            VSF_LINUX_LIBC_WRAPPER(ftello64)
 #define rewind              VSF_LINUX_LIBC_WRAPPER(rewind)
+#define fgetpos             VSF_LINUX_LIBC_WRAPPER(fgetpos)
+#define fsetpos             VSF_LINUX_LIBC_WRAPPER(fsetpos)
 #define fwrite              VSF_LINUX_LIBC_WRAPPER(fwrite)
 #define fread               VSF_LINUX_LIBC_WRAPPER(fread)
 #define fflush              VSF_LINUX_LIBC_WRAPPER(fflush)
+#define fgetc               VSF_LINUX_LIBC_WRAPPER(fgetc)
 #define fgets               VSF_LINUX_LIBC_WRAPPER(fgets)
 #define gets                VSF_LINUX_LIBC_WRAPPER(gets)
+#define fputc               VSF_LINUX_LIBC_WRAPPER(fputc)
 #define fputs               VSF_LINUX_LIBC_WRAPPER(fputs)
 #define puts                VSF_LINUX_LIBC_WRAPPER(puts)
 #define printf              VSF_LINUX_LIBC_WRAPPER(printf)
@@ -67,6 +71,31 @@ extern "C" {
 #define stdin               __vsf_linux_stdin
 #define stdout              __vsf_linux_stdout
 #define stderr              __vsf_linux_stderr
+
+#   ifdef __WIN__
+// to be compatible with CPP in windows, undef below, can be removed if no requirement for CPP
+#       undef clearerr
+#       undef feof
+#       undef ferror
+#       undef getc
+#       undef getchar
+#       undef putc
+#       undef putchar
+#   endif
+#endif
+
+#ifdef __WIN__
+#   define sprintf_s        snprintf
+#   define _scprintf        printf
+
+static inline unsigned char swprintf_s(const wchar_t *c, ...)
+{
+    return 0;
+}
+static inline unsigned char _scwprintf(const wchar_t *c, ...)
+{
+    return 0;
+}
 #endif
 
 typedef int FILE;

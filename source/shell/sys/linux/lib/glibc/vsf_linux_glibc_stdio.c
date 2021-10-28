@@ -175,6 +175,19 @@ long ftell(FILE *f)
     return (long)ftello(f);
 }
 
+int fgetpos(FILE *f, fpos_t *pos)
+{
+    if (pos != NULL) {
+        *pos = ftell(f);
+    }
+    return 0;
+}
+
+int fsetpos(FILE *f, const fpos_t *pos)
+{
+    return fseek(f, *pos, SEEK_SET); 
+}
+
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
 {
     ssize_t bytes_requested = size * nmemb;
@@ -190,7 +203,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
 
     ret = write(fd, (void *)ptr, size * nmemb);
     if (ret < 0) {
-        ret = 0;
+        return EOF;
     }
     return (size_t)(bytes_requested == ret ? nmemb : ret / size);
 }
@@ -210,7 +223,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
 
     ret = read(fd, (void *)ptr, size * nmemb);
     if (ret < 0) {
-        ret = 0;
+        return EOF;
     }
     return (size_t)(bytes_requested == ret ? nmemb : ret / size);
 }
@@ -218,6 +231,15 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
 int fflush(FILE *f)
 {
     return 0;
+}
+
+int fgetc(FILE *f)
+{
+    int ch;
+    if (1 != fread(&ch, 1, 1, f)) {
+        return EOF;
+    }
+    return ch;
 }
 
 char * fgets(char *str, int n, FILE *f)
@@ -257,6 +279,11 @@ char * gets(char *str)
 {
     VSF_LINUX_ASSERT(false);
     return NULL;
+}
+
+int fputc(int ch, FILE *f)
+{
+    return fwrite(&ch, 1, 1, f);
 }
 
 int fputs(const char *str, FILE *f)

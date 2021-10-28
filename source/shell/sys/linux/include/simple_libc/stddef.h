@@ -48,9 +48,9 @@ extern "C" {
 #ifndef __WIN__
 
 #   if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
-typedef __PTRDIFF_TYPE__ ptrdiff_t;
+typedef __PTRDIFF_TYPE__            ptrdiff_t;
 #   else
-typedef long int                     ptrdiff_t;
+typedef long int                    ptrdiff_t;
 #   endif
 
 #endif
@@ -60,7 +60,7 @@ typedef long int                     ptrdiff_t;
 
 #   ifdef __WIN__
 namespace std {
-    typedef decltype(__nullptr)      nullptr_t;
+    typedef decltype(__nullptr)     nullptr_t;
 }
 
 using ::std::nullptr_t;
