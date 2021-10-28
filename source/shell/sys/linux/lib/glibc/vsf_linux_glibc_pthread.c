@@ -82,6 +82,11 @@ static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
     thread->retval = (int)priv->entry(priv->param);
 }
 
+int pthread_detach(pthread_t thread)
+{
+    return 0;
+}
+
 int pthread_join(pthread_t tid, void **retval)
 {
     vsf_protect_t orig = vsf_protect_sched();

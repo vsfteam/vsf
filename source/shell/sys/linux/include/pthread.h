@@ -23,6 +23,7 @@ extern "C" {
 #define pthread_self                    VSF_LINUX_WRAPPER(pthread_self)
 #define pthread_create                  VSF_LINUX_WRAPPER(pthread_create)
 #define pthread_join                    VSF_LINUX_WRAPPER(pthread_join)
+#define pthread_detach                  VSF_LINUX_WRAPPER(pthread_detach)
 #define pthread_exit                    VSF_LINUX_WRAPPER(pthread_exit)
 #define pthread_cancel                  VSF_LINUX_WRAPPER(pthread_cancel)
 #define pthread_kill                    VSF_LINUX_WRAPPER(pthread_kill)
@@ -169,6 +170,7 @@ typedef struct {
 pthread_t pthread_self(void);
 int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg);
 int pthread_join(pthread_t tid, void **retval);
+int pthread_detach(pthread_t thread);
 void pthread_exit(void *retval);
 int pthread_cancel(pthread_t thread);
 int pthread_kill(pthread_t thread, int sig);
