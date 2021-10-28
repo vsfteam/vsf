@@ -23,6 +23,8 @@
 
 #include <unistd.h>
 
+#include "net_al.h"
+
 #include "fhost_config.h"
 #include "fhost.h"
 
@@ -186,7 +188,12 @@ int fhost_application_init(void)
 void aic8800_wifi_start(void)
 {
 #if PLF_WIFI_STACK
+#   ifdef CONFIG_RWNX_LWIP
+#       ifndef CFG_WIFI_RAM_VER
+    wifi_patch_prepare();
+#       endif
     rwnx_ipc_init(&hw_env, &ipc_shared_env);
+#   endif
     net_init();
 
     {

@@ -4553,9 +4553,11 @@
                     <state>CFG_RSSI_DATAPKT</state>
                     <state>CFG_DBG</state>
                     <state>CFG_IPERF</state>
-                    <state>CFG_WIFI_ROM_VER=2</state>
+                    <state>CFG_ROM_VER=255</state>
                     <state>CFG_DACL_MIXER_MODE=0</state>
                     <state>CFG_DACR_MIXER_MODE=0</state>
+                    <state>CFG_AIC1000_MIC_MATRIX=0</state>
+                    <state>CONFIG_RWNX_LWIP</state>
                     <state>LWIP_NO_STDINT_H=1</state>
                     <state>LWIP_SO_RCVBUF=1</state>
                 </option>
