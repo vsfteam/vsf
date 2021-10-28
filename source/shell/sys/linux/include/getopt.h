@@ -37,7 +37,9 @@
  */
 #ifndef _GETOPT_H_
 #define _GETOPT_H_
-#include <sys/cdefs.h>
+//#include <sys/cdefs.h>
+#define __BEGIN_DECLS
+#define __END_DECLS
 /*
  * GNU-like getopt_long() and 4.4BSD getsubopt()/optreset extensions
  */
