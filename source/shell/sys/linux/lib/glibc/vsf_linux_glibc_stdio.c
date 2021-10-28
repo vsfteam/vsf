@@ -279,7 +279,7 @@ int putchar(int c)
     return putc(c, stdout);
 }
 
-static int __print_arg(FILE *f, const char *format, va_list ap)
+static int vfprintf(FILE *f, const char *format, va_list ap)
 {
     char buff[VSF_LINUX_CFG_PRINT_BUFF_SIZE];
     size_t size = vsnprintf(buff, sizeof(buff), format, ap);
@@ -304,7 +304,7 @@ int printf(const char *format, ...)
     int size;
     va_list ap;
     va_start(ap, format);
-        size = __print_arg(stdout, format, ap);
+        size = vfprintf(stdout, format, ap);
     va_end(ap);
     return size;
 }
@@ -314,7 +314,7 @@ int fprintf(FILE *file, const char *format, ...)
     int size;
     va_list ap;
     va_start(ap, format);
-        size = __print_arg(file, format, ap);
+        size = vfprintf(file, format, ap);
     va_end(ap);
     return size;
 }
