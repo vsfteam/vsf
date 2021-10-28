@@ -326,6 +326,11 @@ int vfprintf(FILE *f, const char *format, va_list ap)
     return fwrite(buff, 1, size, f);
 }
 
+int vprintf(const char *format, va_list arg)
+{
+    return vfprintf(stdout, format, arg);
+}
+
 int printf(const char *format, ...)
 {
     int size;
