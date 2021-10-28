@@ -73,7 +73,7 @@ extern "C" {
 #define stdout              __vsf_linux_stdout
 #define stderr              __vsf_linux_stderr
 
-#   ifdef __WIN__
+#   if defined(__WIN__) && (VSF_LINUX_LIBC_CFG_CPP == ENABLED)
 // to be compatible with CPP in windows, undef below, can be removed if no requirement for CPP
 #       undef clearerr
 #       undef feof
