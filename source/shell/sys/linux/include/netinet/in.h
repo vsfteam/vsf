@@ -44,6 +44,55 @@ typedef uint32_t            in_addr_t;
 #define IN_MULTICAST(a)     IN_CLASSD(a)
 #define IN_MULTICAST_NET    0xe0000000
 
+#define IN6_IS_ADDR_MULTICAST(a)    (((const uint8_t *) (a))[0] == 0xff)
+
+#define IN6_IS_ADDR_MC_NODELOCAL(a)                                             \
+        (IN6_IS_ADDR_MULTICAST(a)                                               \
+         && ((((const uint8_t *) (a))[1] & 0xf) == 0x1))
+#define IN6_IS_ADDR_MC_LINKLOCAL(a)                                             \
+        (IN6_IS_ADDR_MULTICAST(a)                                               \
+         && ((((const uint8_t *) (a))[1] & 0xf) == 0x2))
+#define IN6_IS_ADDR_MC_SITELOCAL(a)                                             \
+        (IN6_IS_ADDR_MULTICAST(a)                                               \
+         && ((((const uint8_t *) (a))[1] & 0xf) == 0x5))
+#define IN6_IS_ADDR_MC_ORGLOCAL(a)                                              \
+        (IN6_IS_ADDR_MULTICAST(a)                                               \
+         && ((((const uint8_t *) (a))[1] & 0xf) == 0x8))
+#define IN6_IS_ADDR_MC_GLOBAL(a)                                                \
+        (IN6_IS_ADDR_MULTICAST(a)                                               \
+         && ((((const uint8_t *) (a))[1] & 0xf) == 0xe))
+
+#define IN6_IS_ADDR_UNSPECIFIED(a)                                              \
+        (((const uint32_t *) (a))[0] == 0                                       \
+         && ((const uint32_t *) (a))[1] == 0                                    \
+         && ((const uint32_t *) (a))[2] == 0                                    \
+         && ((const uint32_t *) (a))[3] == 0)
+#define IN6_IS_ADDR_LOOPBACK(a)                                                 \
+        (((const uint32_t *) (a))[0] == 0                                       \
+         && ((const uint32_t *) (a))[1] == 0                                    \
+         && ((const uint32_t *) (a))[2] == 0                                    \
+         && ((const uint32_t *) (a))[3] == htonl (1))
+#define IN6_IS_ADDR_LINKLOCAL(a)                                                \
+        ((((const uint32_t *) (a))[0] & htonl (0xffc00000))                     \
+         == htonl (0xfe800000))
+#define IN6_IS_ADDR_SITELOCAL(a)                                                \
+        ((((const uint32_t *) (a))[0] & htonl (0xffc00000))                     \
+         == htonl (0xfec00000))
+#define IN6_IS_ADDR_V4MAPPED(a)                                                 \
+        ((((const uint32_t *) (a))[0] == 0)                                     \
+         && (((const uint32_t *) (a))[1] == 0)                                  \
+         && (((const uint32_t *) (a))[2] == htonl (0xffff)))
+#define IN6_IS_ADDR_V4COMPAT(a)                                                 \
+        ((((const uint32_t *) (a))[0] == 0)                                     \
+         && (((const uint32_t *) (a))[1] == 0)                                  \
+         && (((const uint32_t *) (a))[2] == 0)                                  \
+         && (ntohl (((const uint32_t *) (a))[3]) > 1))
+#define IN6_ARE_ADDR_EQUAL(a,b)                                                 \
+        ((((const uint32_t *) (a))[0] == ((const uint32_t *) (b))[0])           \
+         && (((const uint32_t *) (a))[1] == ((const uint32_t *) (b))[1])        \
+         && (((const uint32_t *) (a))[2] == ((const uint32_t *) (b))[2])        \
+         && (((const uint32_t *) (a))[3] == ((const uint32_t *) (b))[3]))
+
 struct in_addr {
     in_addr_t               s_addr;
 };
