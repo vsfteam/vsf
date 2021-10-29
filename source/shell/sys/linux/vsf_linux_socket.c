@@ -29,6 +29,7 @@
 #   include "./include/netinet/in.h"
 #   include "./include/arpa/inet.h"
 #   include "./include/netdb.h"
+#   include "./include/ifaddrs.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -36,6 +37,7 @@
 #   include <netinet/in.h>
 #   include <arpa/inet.h>
 #   include <netdb.h>
+#   include <ifaddrs.h>
 #endif
 
 #include "lwip/tcpip.h"
@@ -990,6 +992,14 @@ void freeaddrinfo(struct addrinfo *ai)
         }
         free(p);
     }
+}
+
+int getifaddrs(struct ifaddrs **ifaddrs)
+{
+}
+
+void freeifaddrs(struct ifaddrs *ifaddrs)
+{
 }
 
 #endif
