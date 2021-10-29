@@ -16,9 +16,9 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define getitimer           __vsf_linux_getitimer
-#define setitimer           __vsf_linux_setitimer
-#define gettimeofday        __vsf_linux_gettimeofday
+#define getitimer           VSF_LINUX_WRAPPER(getitimer)
+#define setitimer           VSF_LINUX_WRAPPER(setitimer)
+#define gettimeofday        VSF_LINUX_WRAPPER(gettimeofday)
 #endif
 
 #ifndef __SUSECONDS_T

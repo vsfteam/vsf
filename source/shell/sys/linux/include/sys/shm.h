@@ -31,10 +31,10 @@ struct shmid_ds {
 };
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define shmget              __vsf_linux_shmget
-#define shmat               __vsf_linux_shmat
-#define shmdt               __vsf_linux_shmdt
-#define shmctl              __vsf_linux_shmctl
+#define shmget              VSF_LINUX_WRAPPER(shmget)
+#define shmat               VSF_LINUX_WRAPPER(shmat)
+#define shmdt               VSF_LINUX_WRAPPER(shmdt)
+#define shmctl              VSF_LINUX_WRAPPER(shmctl)
 #endif
 
 int shmget(key_t key, size_t size, int shmflg);

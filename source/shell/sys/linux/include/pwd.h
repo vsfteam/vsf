@@ -13,8 +13,11 @@
 extern "C" {
 #endif
 
+#define setuid(__uid)       (0)
 #define getuid()            ((uid_t)0)
+#define geteuid()           ((uid_t)0)
 #define getpwuid(__uid)     ((struct passwd *)&__vsf_default_passwd)
+#define getpwnam(__name)    ((struct passwd *)&__vsf_default_passwd)
 
 struct passwd {
     char *pw_name;

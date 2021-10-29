@@ -19,8 +19,8 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define stat            __vsf_linux_stat
-#define fstat           __vsf_linux_fstat
+#define stat            VSF_LINUX_WRAPPER(stat)
+#define fstat           VSF_LINUX_WRAPPER(fstat)
 #endif
 
 #define S_IFDIR         VSF_FILE_ATTR_DIRECTORY

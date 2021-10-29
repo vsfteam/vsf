@@ -27,6 +27,19 @@ extern "C" {
 #define F_SETFD         2
 #define F_GETFL         3
 #define F_SETFL         4
+#define F_RDLCK         5
+#define F_WRLCK         6
+#define F_UNLCK         7
+#define F_GETLK         8
+#define F_SETLK         9
+
+struct flock {
+    off_t   l_start;
+    off_t   l_len;
+    pid_t   l_pid;
+    short   l_type;
+    short   l_whence;
+};
 
 int fcntl(int fd, int cmd, ...);
 

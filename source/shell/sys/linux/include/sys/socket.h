@@ -17,13 +17,17 @@ extern "C" {
 
 // standard address families
 #define AF_UNSPEC       0
+#define AF_UNIX         1
 #define AF_INET         2
 #define AF_INET6        10
+#define AF_PACKET       17
 
 // protocol families
 #define PF_UNSPEC       0
+#define PF_UNIX         AF_UNIX
 #define PF_INET         AF_INET
 #define PF_INET6        AF_INET6
+#define PF_PACKET       AF_PACKET
 
 // socket types
 #define SOCK_STREAM	    1
@@ -51,23 +55,25 @@ struct sockaddr_storage {
 };
 
 #if VSF_LINUX_SOCKET_CFG_WRAPPER == ENABLED
-#define setsockopt      __vsf_linux_setsockopt
-#define getsockopt      __vsf_linux_getsockopt
+#define VSF_LINUX_SOCKET_WRAPPER(__api)     VSF_SHELL_WRAPPER(vsf_linux_socket, __api)
 
-#define getpeername     __vsf_linux_getpeername
-#define getsockname     __vsf_linux_getsockname
+#define setsockopt      VSF_LINUX_SOCKET_WRAPPER(setsockopt)
+#define getsockopt      VSF_LINUX_SOCKET_WRAPPER(getsockopt)
 
-#define accept          __vsf_linux_accept
-#define bind            __vsf_linux_bind
-#define connect         __vsf_linux_connect
-#define listen          __vsf_linux_listen
-#define recv            __vsf_linux_recv
-#define recvfrom        __vsf_linux_recvfrom
-#define send            __vsf_linux_send
-#define sendto          __vsf_linux_sendto
-#define shutdown        __vsf_linux_shutdown
-#define socket          __vsf_linux_socket
-#define socketpair      __vsf_linux_socketpair
+#define getpeername     VSF_LINUX_SOCKET_WRAPPER(getpeername)
+#define getsockname     VSF_LINUX_SOCKET_WRAPPER(getsockname)
+
+#define accept          VSF_LINUX_SOCKET_WRAPPER(accept)
+#define bind            VSF_LINUX_SOCKET_WRAPPER(bind)
+#define connect         VSF_LINUX_SOCKET_WRAPPER(connect)
+#define listen          VSF_LINUX_SOCKET_WRAPPER(listen)
+#define recv            VSF_LINUX_SOCKET_WRAPPER(recv)
+#define recvfrom        VSF_LINUX_SOCKET_WRAPPER(recvfrom)
+#define send            VSF_LINUX_SOCKET_WRAPPER(send)
+#define sendto          VSF_LINUX_SOCKET_WRAPPER(sendto)
+#define shutdown        VSF_LINUX_SOCKET_WRAPPER(shutdown)
+#define socket          VSF_LINUX_SOCKET_WRAPPER(socket)
+#define socketpair      VSF_LINUX_SOCKET_WRAPPER(socketpair)
 #endif
 
 // level for setsockopt

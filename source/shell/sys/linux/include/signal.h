@@ -41,6 +41,14 @@ typedef struct {
     int si_code;
 } siginfo_t;
 
+struct sigaction {
+    void (*sa_handler)(int);
+    void (*sa_sigaction)(int, siginfo_t *, void *);
+    sigset_t sa_mask;
+    int sa_flags;
+    void (*sa_restorer)(void);
+};
+
 #define SIGHUP          1   // hang up              terminate
 #define SIGINT          2   // interrupt            terminate
 #define SIGQUIT         3   // quit                 coredump
@@ -92,6 +100,18 @@ static inline void sigfillset(sigset_t *set)
     set->sig[0] = -1;
 }
 
+static inline int sigaddset(sigset_t *set, int signo)
+{
+    set->sig[0] |= 1 << signo;
+    return 0;
+}
+
+static inline int sigdelset(sigset_t *set, int signo)
+{
+    set->sig[0] &= ~(1 << signo);
+    return 0;
+}
+
 static inline void sigaddsetmask(sigset_t *set, unsigned long mask)
 {
     set->sig[0] |= mask;
@@ -112,6 +132,11 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 sighandler_t signal(int signum, sighandler_t handler);
 
 int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
+
+static inline int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
+{
+    return 0;
+}
 
 #ifdef __cplusplus
 }

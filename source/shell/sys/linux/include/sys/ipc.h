@@ -36,7 +36,7 @@ struct ipc_perm {
 };
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define ftok                __vsf_linux_ftok
+#define ftok                VSF_LINUX_WRAPPER(ftok)
 #endif
 
 key_t ftok(const char *pathname, int id);

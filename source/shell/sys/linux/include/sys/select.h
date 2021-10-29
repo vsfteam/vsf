@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#   define select               __vsf_linux_select
+#   define select               VSF_LINUX_WRAPPER(select)
 #endif
 
 #define FD_SETSIZE              1024

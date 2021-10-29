@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define waitpid                 __vsf_linux_waitpid
+#define waitpid                 VSF_LINUX_WRAPPER(waitpid)
 #endif
 
 #define WIFEXITED(__STATUS)     !((__STATUS) & 0xFF)
