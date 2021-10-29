@@ -127,6 +127,7 @@ size_t strlcpy(char *dst, const char *src, size_t dsize);
 #   define fseeko64         fseek
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO)
 
+#include <time.h>
 #if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 // iar has no clockid_t
 #   ifndef __IAR_TYPE_CLOCKID_T__
@@ -135,6 +136,7 @@ typedef enum {
     CLOCK_MONOTONIC,
     CLOCK_REALTIME,
 } clockid_t;
+extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
 #   endif
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_TIME)
 

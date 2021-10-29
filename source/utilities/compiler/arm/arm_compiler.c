@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "kernel/vsf_kernel.h"
 #include "utilities/compiler/compiler.h"
 
 /*============================ MACROS ========================================*/
@@ -48,4 +49,22 @@ size_t strlcpy(char *dst, const char *src, size_t dsize)
     }
     return(src - osrc - 1);     /* count does not include NUL */
 }
+
+#   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+int clock_gettime(clockid_t clk_id, struct timespec *tp)
+{
+    switch (clk_id) {
+    case CLOCK_MONOTONIC: {
+            uint_fast32_t us = vsf_systimer_get_us();
+            tp->tv_sec = us / 1000000;
+            tp->tv_nsec = us * 1000;
+        }
+        return 0;
+    default:
+        return -1;
+    }
+}
+#       endif           // VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#   endif
 #endif
