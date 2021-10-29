@@ -21,6 +21,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "./vsf_linux_cfg.h"
+#include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_USE_LINUX == ENABLED
 
