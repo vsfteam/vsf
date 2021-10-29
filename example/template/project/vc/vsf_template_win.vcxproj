@@ -617,10 +617,17 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\dirent.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\errno.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\fcntl.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\grp.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\ifaddrs.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libgen.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libusb.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\limits.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netdb.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netinet\in.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netinet\ip.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netinet\tcp.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netpacket\packet.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\net\if.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\poll.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\pthread.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\pwd.h" />
@@ -634,8 +641,10 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\string.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\time.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\wchar.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\syslog.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\ipc.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\mount.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\resource.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\select.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\shm.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\socket.h" />
@@ -643,6 +652,7 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\time.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\types.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\uio.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\un.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\wait.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\termios.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\unistd.h" />
@@ -1448,6 +1458,7 @@
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_event.c" />
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_pixelformat.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\3rd-party\getopt_long.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c" />
@@ -1547,7 +1558,6 @@
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc" />
     <None Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.inc" />
-    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\string" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

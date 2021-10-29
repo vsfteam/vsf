@@ -1048,6 +1048,15 @@
     <Filter Include="vsf\component\3rd-party\lwip\port\vsf\arch">
       <UniqueIdentifier>{8fc42111-22c6-4f6f-98ea-2e7d2f6720aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\include\netinet">
+      <UniqueIdentifier>{d801a6c7-2b10-488c-a835-6d8643c6f558}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\include\net">
+      <UniqueIdentifier>{0d93e206-be77-4e71-b8a5-dc89342fe223}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\include\netpacket">
+      <UniqueIdentifier>{5d3c1521-ecc0-48fd-be4a-9d82b3808a7e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3182,6 +3191,36 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\sys_arch.h">
       <Filter>vsf\component\3rd-party\lwip\port\vsf\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\un.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netinet\in.h">
+      <Filter>vsf\shell\sys\linux\include\netinet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netinet\ip.h">
+      <Filter>vsf\shell\sys\linux\include\netinet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\net\if.h">
+      <Filter>vsf\shell\sys\linux\include\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netinet\tcp.h">
+      <Filter>vsf\shell\sys\linux\include\netinet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netpacket\packet.h">
+      <Filter>vsf\shell\sys\linux\include\netpacket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\syslog.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\resource.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\grp.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\ifaddrs.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5621,6 +5660,9 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\sys_arch.c">
       <Filter>vsf\component\3rd-party\lwip\port\vsf\arch</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\3rd-party\getopt_long.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc\3rd-party</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\awtk\awtk_vsf.lib">
@@ -5628,9 +5670,6 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\string">
-      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
-    </None>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">
       <Filter>vsf\hal\arch\common\arch_without_thread_suspend</Filter>
     </None>
