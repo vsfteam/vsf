@@ -52,6 +52,7 @@ extern "C" {
 #define libusb_interrupt_transfer                       VSF_LINUX_LIBUSB_WRAPPER(libusb_interrupt_transfer)
 #define libusb_get_string_descriptor_ascii              VSF_LINUX_LIBUSB_WRAPPER(libusb_get_string_descriptor_ascii)
 #define libusb_get_config_descriptor                    VSF_LINUX_LIBUSB_WRAPPER(libusb_get_config_descriptor)
+#define libusb_get_config_descriptor_by_value           VSF_LINUX_LIBUSB_WRAPPER(libusb_get_config_descriptor_by_value)
 #define libusb_get_active_config_descriptor             VSF_LINUX_LIBUSB_WRAPPER(libusb_get_active_config_descriptor)
 #define libusb_free_config_descriptor                   VSF_LINUX_LIBUSB_WRAPPER(libusb_free_config_descriptor)
 #define libusb_get_descriptor                           VSF_LINUX_LIBUSB_WRAPPER(libusb_get_descriptor)
@@ -361,6 +362,24 @@ static inline void libusb_fill_control_transfer(
     transfer->callback = callback;
 }
 
+static inline void libusb_fill_control_setup(unsigned char *buffer,
+	uint8_t bRequestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex,
+	uint16_t wLength)
+{
+	struct libusb_control_setup *setup = (struct libusb_control_setup *)(void *)buffer;
+	setup->bRequestType = bRequestType;
+	setup->bRequest = bRequest;
+	setup->wValue = cpu_to_le16(wValue);
+	setup->wIndex = cpu_to_le16(wIndex);
+	setup->wLength = cpu_to_le16(wLength);
+}
+
+static inline unsigned char *libusb_control_transfer_get_data(
+	struct libusb_transfer *transfer)
+{
+	return transfer->buffer + LIBUSB_CONTROL_SETUP_SIZE;
+}
+
 static inline void libusb_fill_bulk_transfer(struct libusb_transfer *transfer,
     libusb_device_handle *dev_handle, unsigned char endpoint,
     unsigned char *buffer, int length, libusb_transfer_cb_fn callback,
@@ -410,6 +429,8 @@ static inline void libusb_fill_iso_transfer(struct libusb_transfer *transfer,
 int libusb_get_string_descriptor_ascii(libusb_device_handle *dev_handle,
     uint8_t desc_index, unsigned char *data, int length);
 int libusb_get_config_descriptor(libusb_device *dev, uint8_t config_index,
+        struct libusb_config_descriptor **config);
+int libusb_get_config_descriptor_by_value(libusb_device *dev, uint8_t value,
         struct libusb_config_descriptor **config);
 int libusb_get_active_config_descriptor(libusb_device *dev,
         struct libusb_config_descriptor **config);

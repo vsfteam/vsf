@@ -924,6 +924,13 @@ int libusb_get_config_descriptor(libusb_device *dev, uint8_t config_index,
     return err;
 }
 
+int libusb_get_config_descriptor_by_value(libusb_device *dev, uint8_t value,
+        struct libusb_config_descriptor **config)
+{
+    // TODO: add implementation
+    return LIBUSB_ERROR_IO;
+}
+
 void libusb_free_ss_endpoint_companion_descriptor(
 	struct libusb_ss_endpoint_companion_descriptor *ep_comp)
 {
