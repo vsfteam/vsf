@@ -31,7 +31,7 @@ set(VSF_USE_EVM 1)
 # include vsf cmake script
 set(VSF_CONFIG_PATH ../../../config)
 # add APIs here if conflistc with libc
-set(VSF_TARGET_WRAPPER_LIST "fprintf" "fflush")
+set(VSF_TARGET_WRAPPER_LIST "vfprintf" "fprintf" "fflush")
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
 
 # user compiler definitions
