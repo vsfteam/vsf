@@ -6,13 +6,13 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./poll.h"
 #   include "./sys/time.h"
+#   include "./unistd.h"
 #else
 #   include <poll.h>
 #   include <sys/time.h>
+#   include <unistd.h>
 #endif
 
-// for vsf_linux_fd_t
-#include "shell/sys/linux/vsf_linux.h"
 // for USB constants
 #include "component/usb/common/usb_common.h"
 // for endian APIs
@@ -22,12 +22,14 @@
 extern "C" {
 #endif
 
-#define VSF_LINUX_LIBUSB_WRAPPER(__api)         VSF_SHELL_WRAPPER(vsf_linux_libusb, __api)
-
 #if VSF_LINUX_LIBUSB_CFG_WRAPPER == ENABLED
+#define VSF_LINUX_LIBUSB_WRAPPER(__api)                 VSF_SHELL_WRAPPER(vsf_linux_libusb, __api)
+
+#define libusb_get_version                              VSF_LINUX_LIBUSB_WRAPPER(libusb_get_version)
 #define libusb_init                                     VSF_LINUX_LIBUSB_WRAPPER(libusb_init)
 #define libusb_exit                                     VSF_LINUX_LIBUSB_WRAPPER(libusb_exit)
 #define libusb_set_debug                                VSF_LINUX_LIBUSB_WRAPPER(libusb_set_debug)
+#define libusb_error_name                               VSF_LINUX_LIBUSB_WRAPPER(libusb_error_name)
 #define libusb_get_device_list                          VSF_LINUX_LIBUSB_WRAPPER(libusb_get_device_list)
 #define libusb_free_device_list                         VSF_LINUX_LIBUSB_WRAPPER(libusb_free_device_list)
 #define libusb_open                                     VSF_LINUX_LIBUSB_WRAPPER(libusb_open)
@@ -169,6 +171,23 @@ enum libusb_descriptor_size {
     LIBUSB_DT_ENDPOINT_AUDIO_SIZE       = USB_DT_ENDPOINT_AUDIO_SIZE,
 };
 
+enum libusb_log_level {
+    LIBUSB_LOG_LEVEL_NONE = 0,
+    LIBUSB_LOG_LEVEL_ERROR = 1,
+    LIBUSB_LOG_LEVEL_WARNING = 2,
+    LIBUSB_LOG_LEVEL_INFO = 3,
+    LIBUSB_LOG_LEVEL_DEBUG = 4
+};
+
+struct libusb_version {
+    const uint16_t major;
+    const uint16_t minor;
+    const uint16_t micro;
+    const uint16_t nano;
+    const char *rc;
+    const char *describe;
+};
+
 struct libusb_endpoint_descriptor {
     implement(usb_endpoint_desc_t)
 
@@ -252,6 +271,13 @@ enum libusb_transfer_type {
     LIBUSB_TRANSFER_TYPE_INTERRUPT = 3,
 };
 
+enum libusb_transfer_flags {
+    LIBUSB_TRANSFER_SHORT_NOT_OK = (1U << 0),
+    LIBUSB_TRANSFER_FREE_BUFFER = (1U << 1),
+    LIBUSB_TRANSFER_FREE_TRANSFER = (1U << 2),
+    LIBUSB_TRANSFER_ADD_ZERO_PACKET = (1U << 3),
+};
+
 struct libusb_iso_packet_descriptor {
     unsigned int length;
     unsigned int actual_length;
@@ -276,9 +302,11 @@ struct libusb_transfer {
     struct libusb_iso_packet_descriptor iso_packet_desc[0];
 };
 
+const struct libusb_version * libusb_get_version(void);
 int libusb_init(libusb_context **context);
 void libusb_exit(libusb_context *ctx);
 void libusb_set_debug(libusb_context *ctx, int level);
+const char * libusb_error_name(int errcode);
 ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device *** list);
 void libusb_free_device_list(libusb_device **list, int unref_devices);
 int libusb_get_device_descriptor(libusb_device *dev, struct libusb_device_descriptor *desc);
@@ -458,6 +486,7 @@ void libusb_free_pollfds(const struct libusb_pollfd **pollfds);
 void vsf_linux_libusb_startup(void);
 
 // libusb 0.1 compatibility
+#if VSF_LINUX_LIBUSB_CFG_01_COMPATIBLE == ENABLED
 #define usb_dev_handle                  libusb_device_handle
 #define USB_ENDPOINT_IN                 LIBUSB_ENDPOINT_IN
 #define USB_ENDPOINT_OUT                LIBUSB_ENDPOINT_OUT
@@ -517,6 +546,7 @@ int usb_bulk_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeou
 
 int usb_interrupt_write(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
 int usb_interrupt_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+#endif      // VSF_LINUX_LIBUSB_CFG_01_COMPATIBLE
 
 #ifdef __cplusplus
 }

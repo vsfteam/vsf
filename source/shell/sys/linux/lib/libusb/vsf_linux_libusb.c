@@ -296,6 +296,15 @@ static int __vsf_linux_libusb_fd_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
+const struct libusb_version * libusb_get_version(void)
+{
+    static const struct libusb_version __version = {
+        .major      = 1,
+        .minor      = 0,
+    };
+    return &__version;
+}
+
 int libusb_init(libusb_context **context)
 {
     if (__vsf_libusb.fd != 0) {
@@ -342,6 +351,11 @@ void libusb_exit(libusb_context *ctx)
 void libusb_set_debug(libusb_context *ctx, int level)
 {
     // do nothing
+}
+
+const char * libusb_error_name(int errcode)
+{
+    return "unknown";
 }
 
 #if __IS_COMPILER_IAR__
@@ -1080,6 +1094,7 @@ void libusb_free_pollfds(const struct libusb_pollfd **pollfds)
 }
 
 // libusb 0.1 compatibility
+#if VSF_LINUX_LIBUSB_CFG_01_COMPATIBLE == ENABLED
 int usb_get_driver_np(usb_dev_handle *dev, int interface, char *name, unsigned int namelen)
 {
     return 0;
@@ -1181,5 +1196,6 @@ int usb_interrupt_read(usb_dev_handle *dev, int ep, char *bytes, int size, int t
     libusb_interrupt_transfer((libusb_device_handle *)dev, ep, (unsigned char *)bytes, size, &actual_length, timeout);
     return actual_length;
 }
+#endif      // VSF_LINUX_LIBUSB_CFG_01_COMPATIBLE
 
 #endif      // VSF_USE_LINUX
