@@ -116,6 +116,7 @@ typedef struct vk_dwcotg_hcd_urb_t {
 
 #ifdef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
     uint32_t buffer[VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE / sizeof(uint32_t)];
+    void *orig_buffer;
 #endif
 } vk_dwcotg_hcd_urb_t;
 
@@ -330,14 +331,24 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
     }
     channel_regs->hcsplt = hcsplt;
 
-    if (dwcotg_hcd->dma_en) {
+    if (dwcotg_hcd->dma_en && (size > 0)) {
+        bool is_addr_valid;
+        if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->check_dma_addr != NULL)) {
+            is_addr_valid = dwcotg_hcd->workaround->check_dma_addr(dwcotg_hcd->workaround->param, (uintptr_t)buffer);
+        } else {
+            is_addr_valid = true;
+        }
 #ifndef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
         VSF_USB_ASSERT(!((uintptr_t)buffer & 0x03));
+        VSF_USB_ASSERT(is_addr_valid);
         channel_regs->hcdma = (uint32_t)buffer;
 #else
-        if ((uintptr_t)buffer & 0x03) {
+        if (((uintptr_t)buffer & 0x03) || !is_addr_valid) {
             VSF_USB_ASSERT(size <= sizeof(dwcotg_urb->buffer));
-            memcpy(&dwcotg_urb->buffer, buffer, size);
+            if (!pipe.dir_in1out0) {
+                memcpy(&dwcotg_urb->buffer, buffer, size);
+            }
+            dwcotg_urb->orig_buffer = buffer;
             channel_regs->hcdma = (uint32_t)dwcotg_urb->buffer;
         } else {
             channel_regs->hcdma = (uint32_t)buffer;
@@ -851,6 +862,10 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         urb_fail:
             urb->status = URB_FAIL;
         urb_done:
+            if (urb->pipe.dir_in1out0 && (dwcotg_urb->orig_buffer != NULL)) {
+                memcpy(dwcotg_urb->orig_buffer, dwcotg_urb->buffer, urb->transfer_length);
+                dwcotg_urb->orig_buffer = NULL;
+            }
             urb->pipe.last_frame = dwcotg_hcd->reg.host.global_regs->hfnum & 0xFFFF;
             vsf_eda_post_msg(urb->eda_caller, urb);
         } else if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
@@ -1014,6 +1029,8 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             }
         }
     } else if (channel_intsts & USB_OTG_HCINT_AHBERR) {
+        // for ABH error, make sure vendor provide check_dma_addr workaround.
+        //  set VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE to use buffer in urb
         vsf_trace_error("dwcotg_hcd.channel%d: ahb fatal error" VSF_TRACE_CFG_LINEEND, channel_idx);
         VSF_USB_ASSERT(false);
     }

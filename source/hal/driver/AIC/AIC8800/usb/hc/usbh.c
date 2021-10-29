@@ -35,6 +35,7 @@ extern vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority
 
 static uint_fast32_t __aic8800_usbh_workaround_reset_port(void *param);
 static uint_fast32_t __aic8800_usbh_workaround_enable_port(void *param, uint8_t speed);
+static bool __aic8800_usbh_workaround_check_dma_addr(void *param, uintptr_t addr);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -43,6 +44,7 @@ static const vk_dwcotg_hcd_workaround_t __aic8800_usbh_workaround = {
     .param          = (void *)AIC_USB_BASE,
     .reset_port     = __aic8800_usbh_workaround_reset_port,
     .enable_port    = __aic8800_usbh_workaround_enable_port,
+    .check_dma_addr = __aic8800_usbh_workaround_check_dma_addr,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -62,6 +64,11 @@ static uint_fast32_t __aic8800_usbh_workaround_enable_port(void *param, uint8_t 
         reg[0x101] = 60000;
     }
     return 20;
+}
+
+bool __aic8800_usbh_workaround_check_dma_addr(void *param, uintptr_t addr)
+{
+    return (addr >= 0x001A0000) && (addr < 0x001C8000);
 }
 
 vsf_err_t aic8800_usbh_init(aic8800_usb_t *hc, usb_hc_ip_cfg_t *cfg)
