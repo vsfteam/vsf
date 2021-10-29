@@ -353,7 +353,7 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
                         dwcotg_urb->channel_idx, urb);
 #endif
 
-    channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM;
+    channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
     vsf_protect_t orig = vsf_protect_int();
         dwcotg_hcd->reg.host.global_regs->haintmsk |= 1 << dwcotg_urb->channel_idx;
     vsf_unprotect_int(orig);
@@ -1013,6 +1013,9 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
             }
         }
+    } else if (channel_intsts & USB_OTG_HCINT_AHBERR) {
+        vsf_trace_error("dwcotg_hcd.channel%d: ahb fatal error" VSF_TRACE_CFG_LINEEND, channel_idx);
+        VSF_USB_ASSERT(false);
     }
 }
 
@@ -1098,7 +1101,7 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
             vsf_slist_init_node(vk_dwcotg_hcd_urb_t, node, _);
             if (dwcotg_urb->is_split) {
                 channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
-                channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM;
+                channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
 
                 vsf_protect_t orig = vsf_protect_int();
                     dwcotg_hcd->reg.host.global_regs->haintmsk |= 1 << dwcotg_urb->channel_idx;
@@ -1192,7 +1195,11 @@ static vsf_err_t __vk_dwcotg_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_
     memset(dwcotg_urb, 0, sizeof(*dwcotg_urb));
     if (urb->timeout > 0) {
         dwcotg_urb->is_timeout_en = true;
-        dwcotg_urb->timeout = urb->timeout + dwcotg_hcd->softick;
+        if (dwcotg_hcd->speed == USB_SPEED_HIGH) {
+            dwcotg_urb->timeout = (urb->timeout << 3) + dwcotg_hcd->softick;
+        } else {
+            dwcotg_urb->timeout = urb->timeout + dwcotg_hcd->softick;
+        }
     }
     switch (pipe.type) {
     case USB_ENDPOINT_XFER_CONTROL:
