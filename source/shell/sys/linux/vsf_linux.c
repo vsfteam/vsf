@@ -1343,6 +1343,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
         orig = vsf_protect_sched();
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_get_fd(fds[i].fd);
+            VSF_LINUX_ASSERT(sfd != NULL);
             if (sfd->rxevt || sfd->txevt) {
                 if ((fds[i].events & POLLIN) && sfd->rxevt) {
                     sfd->rxevt = sfd->rxrdy;
