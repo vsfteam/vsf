@@ -862,10 +862,12 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         urb_fail:
             urb->status = URB_FAIL;
         urb_done:
+#ifdef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
             if (urb->pipe.dir_in1out0 && (dwcotg_urb->orig_buffer != NULL)) {
                 memcpy(dwcotg_urb->orig_buffer, dwcotg_urb->buffer, urb->transfer_length);
                 dwcotg_urb->orig_buffer = NULL;
             }
+#endif
             urb->pipe.last_frame = dwcotg_hcd->reg.host.global_regs->hfnum & 0xFFFF;
             vsf_eda_post_msg(urb->eda_caller, urb);
         } else if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
