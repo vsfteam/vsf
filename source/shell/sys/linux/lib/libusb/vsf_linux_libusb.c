@@ -1007,6 +1007,7 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
             urb->urb_hcd->setup_packet = *request;
             urb->urb_hcd->buffer = (uint8_t *)urb->urb_hcd->buffer + sizeof(struct usb_ctrlrequest_t);
             urb->urb_hcd->transfer_length -= sizeof(struct usb_ctrlrequest_t);
+            urb->urb_hcd->pipe.dir_in1out0 = (request->bRequestType & USB_DIR_IN) > 0;
         }
         break;
     case LIBUSB_TRANSFER_TYPE_ISOCHRONOUS:
@@ -1045,7 +1046,9 @@ int libusb_cancel_transfer(struct libusb_transfer *transfer)
 void libusb_free_transfer(struct libusb_transfer *transfer)
 {
     if (transfer != NULL) {
-        free(transfer);
+        vsf_linux_libusb_transfer_t *ltransfer = container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
+        VSF_LINUX_ASSERT(!vk_usbh_urb_is_alloced(&ltransfer->urb));
+        free(ltransfer);
     }
 }
 
