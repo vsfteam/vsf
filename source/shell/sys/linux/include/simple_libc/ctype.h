@@ -26,66 +26,66 @@ extern "C" {
 extern const char __vsf_linux_ctype[1 + 256];
 #define __ismask(__x)       (__vsf_linux_ctype[(int)(unsigned char)(__x) + 1])
 
-static inline unsigned char isalnum(unsigned char c)
+static inline unsigned char isalnum(int c)
 {
     return ((__ismask(c) & (CTYPE_U|CTYPE_L|CTYPE_N)) != 0);
 }
 
-static inline unsigned char isalpha(unsigned char c)
+static inline unsigned char isalpha(int c)
 {
     return ((__ismask(c) & (CTYPE_U|CTYPE_L)) != 0);
 }
-static inline unsigned char iscntrl(unsigned char c)
+static inline unsigned char iscntrl(int c)
 {
     return ((__ismask(c) & (CTYPE_C)) != 0);
 }
-static inline unsigned char isdigit(unsigned char c)
+static inline unsigned char isdigit(int c)
 {
     return ((__ismask(c) & (CTYPE_N)) != 0);
 }
-static inline unsigned char isgraph(unsigned char c)
+static inline unsigned char isgraph(int c)
 {
     return ((__ismask(c) & (CTYPE_P|CTYPE_U|CTYPE_L|CTYPE_N)) != 0);
 }
-static inline unsigned char islower(unsigned char c)
+static inline unsigned char islower(int c)
 {
     return ((__ismask(c) & (CTYPE_L)) != 0);
 }
-static inline unsigned char isprint(unsigned char c)
+static inline unsigned char isprint(int c)
 {
     return ((__ismask(c) & (CTYPE_P|CTYPE_U|CTYPE_L|CTYPE_N|CTYPE_SP)) != 0);
 }
-static inline unsigned char ispunct(unsigned char c)
+static inline unsigned char ispunct(int c)
 {
     return ((__ismask(c) & (CTYPE_P)) != 0);
 }
-static inline unsigned char isspace(unsigned char c)
+static inline unsigned char isspace(int c)
 {
     return ((__ismask(c) & (CTYPE_S)) != 0);
 }
-static inline unsigned char isupper(unsigned char c)
+static inline unsigned char isupper(int c)
 {
     return ((__ismask(c) & (CTYPE_U)) != 0);
 }
-static inline unsigned char isxdigit(unsigned char c)
+static inline unsigned char isxdigit(int c)
 {
     return ((__ismask(c) & (CTYPE_N|CTYPE_X)) != 0);
 }
-static inline unsigned char isblank(unsigned char c)
+static inline unsigned char isblank(int c)
 {
     return ((__ismask(c) & (CTYPE_B)) != 0);
 }
 
-static inline unsigned char isascii(unsigned char c)
+static inline unsigned char isascii(int c)
 {
     return (((unsigned char)(c))<=0x7f);
 }
-static inline unsigned char toascii(unsigned char c)
+static inline unsigned char toascii(int c)
 {
     return (((unsigned char)(c))&0x7f);
 }
 
-static inline unsigned char tolower(unsigned char c)
+static inline unsigned char tolower(int c)
 {
     if (isupper(c)) {
         c -= 'A'-'a';
@@ -93,7 +93,7 @@ static inline unsigned char tolower(unsigned char c)
     return c;
 }
 
-static inline unsigned char toupper(unsigned char c)
+static inline unsigned char toupper(int c)
 {
     if (islower(c)) {
         c -= 'a'-'A';
