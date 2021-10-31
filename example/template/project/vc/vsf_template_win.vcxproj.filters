@@ -1075,6 +1075,9 @@
     <Filter Include="vsf\shell\sys\linux\kernel\fs\devfs">
       <UniqueIdentifier>{490bbed7-2977-45a3-895f-0080c32f3fdd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\lib\glibc\3rd-party">
+      <UniqueIdentifier>{15158a93-39d2-4015-bdf2-063d78c7f496}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -5690,9 +5693,6 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\port\vsf\arch\sys_arch.c">
       <Filter>vsf\component\3rd-party\lwip\port\vsf\arch</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\3rd-party\getopt_long.c">
-      <Filter>vsf\shell\sys\linux\lib\glibc\3rd-party</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c">
       <Filter>vsf\shell\sys\linux\kernel\socket</Filter>
     </ClCompile>
@@ -5707,6 +5707,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.c">
       <Filter>vsf\shell\sys\linux\kernel\fs\devfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\3rd-party\getopt_long.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc\3rd-party</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
