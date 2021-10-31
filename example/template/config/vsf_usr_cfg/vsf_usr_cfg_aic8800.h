@@ -76,11 +76,9 @@
 #   define APP_SDL2_DEMO_CFG_HEIGHT                     256
 //  current tgui demo depends on VSF_DISP_USE_SDL2, which is only available on __WIN__
 #define APP_USE_TGUI_DEMO                               DISABLED
-//  TODO: need test for c++ support
+//  TODO: CPP support is not ready in hal
 #define APP_USE_CPP_DEMO                                DISABLED
-#if APP_USE_CPP_DEMO == ENABLED
 #   define __VSF_WORKAROUND_IAR_CPP__
-#endif
 #define APP_USE_HAL_DEMO                                DISABLED
 #   define APP_USE_HAL_USART_DEMO                       DISABLED
 #       define APP_USART_DEMO_CFG_REQUEST_TEST              DISABLED
@@ -190,28 +188,38 @@
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #   define VSF_LINUX_USE_SOCKET                         ENABLED
+#       define VSF_LINUX_SOCKET_USE_INET                VSF_USE_LWIP
 #   define VSF_LINUX_USE_DEVFS                          ENABLED
 #       define VSF_LINUX_DEVFS_USE_RAND                 ENABLED
 
+#   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
 #   if APP_USE_CPP_DEMO != ENABLED
 // simple_libc does not compatible with cpp, so if cpp is used, DO NOT use simple_libc
 //  make sure in inclue path, simple_libc is removed if cpp is used
-#       define VSF_LINUX_USE_SIMPLE_LIBC                ENABLED
-#           ifndef VSF_LINUX_USE_SIMPLE_STDIO
-#               define VSF_LINUX_USE_SIMPLE_STDIO       ENABLED
-#           endif
-#           ifndef VSF_LINUX_USE_SIMPLE_STRING
-#               define VSF_LINUX_USE_SIMPLE_STRING      ENABLED
-#           endif
-#           ifndef VSF_LINUX_USE_SIMPLE_TIME
-#               define VSF_LINUX_USE_SIMPLE_TIME        ENABLED
-#           endif
-#           ifndef VSF_LINUX_USE_SIMPLE_STDLIB
-#               define VSF_LINUX_USE_SIMPLE_STDLIB      ENABLED
-#           endif
-#           ifndef VSF_LINUX_USE_SIMPLE_CTYPE
-#               define VSF_LINUX_USE_SIMPLE_CTYPE       ENABLED
-#           endif
+#       ifndef VSF_LINUX_USE_SIMPLE_STDIO
+#           define VSF_LINUX_USE_SIMPLE_STDIO           ENABLED
+#       endif
+#       ifndef VSF_LINUX_USE_SIMPLE_STRING
+#           define VSF_LINUX_USE_SIMPLE_STRING          ENABLED
+#       endif
+#       ifndef VSF_LINUX_USE_SIMPLE_TIME
+#           define VSF_LINUX_USE_SIMPLE_TIME            ENABLED
+#       endif
+#       ifndef VSF_LINUX_USE_SIMPLE_STDLIB
+#           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
+#       endif
+#       ifndef VSF_LINUX_USE_SIMPLE_CTYPE
+#           define VSF_LINUX_USE_SIMPLE_CTYPE           ENABLED
+#       endif
+#   else
+// to support CPP in linux-subsystem, define MACFOs below, and don't include the simple_libc path
+//  Note that __VSF_WORKAROUND_IAR_CPP__ MUST also be defined to support CPP
+#       define VSF_LINUX_LIBC_CFG_CPP                   ENABLED
+#           define VSF_LINUX_USE_SIMPLE_STDIO           DISABLED
+#           define VSF_LINUX_USE_SIMPLE_STRING          DISABLED
+#           define VSF_LINUX_USE_SIMPLE_TIME            DISABLED
+#           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
+#           define VSF_LINUX_USE_SIMPLE_CTYPE           DISABLED
 #   endif
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM

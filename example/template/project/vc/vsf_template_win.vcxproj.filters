@@ -1057,6 +1057,24 @@
     <Filter Include="vsf\shell\sys\linux\include\netpacket">
       <UniqueIdentifier>{5d3c1521-ecc0-48fd-be4a-9d82b3808a7e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel">
+      <UniqueIdentifier>{754b4ae6-9bf7-440f-9f15-883c1f74a5cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\fs">
+      <UniqueIdentifier>{60ef3521-4121-4a28-9073-967b12da739c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\socket">
+      <UniqueIdentifier>{7639e6ba-276f-4299-888c-529e07679c7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\socket\inet">
+      <UniqueIdentifier>{72cf41d4-2ff9-4284-8c63-387d2dda41ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\socket\unix">
+      <UniqueIdentifier>{b4aafc7e-3552-4b52-89d7-6d411052cf54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\fs\devfs">
+      <UniqueIdentifier>{490bbed7-2977-45a3-895f-0080c32f3fdd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3222,6 +3240,21 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\ifaddrs.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.h">
+      <Filter>vsf\shell\sys\linux\kernel\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.h">
+      <Filter>vsf\shell\sys\linux\kernel\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.h">
+      <Filter>vsf\shell\sys\linux\kernel\fs\devfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\getopt.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\err.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -3379,9 +3412,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_string.c">
       <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux_socket.c">
-      <Filter>vsf\shell\sys\linux</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
       <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
@@ -5662,6 +5692,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\3rd-party\getopt_long.c">
       <Filter>vsf\shell\sys\linux\lib\glibc\3rd-party</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c">
+      <Filter>vsf\shell\sys\linux\kernel\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_lwip.c">
+      <Filter>vsf\shell\sys\linux\kernel\socket\inet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c">
+      <Filter>vsf\shell\sys\linux\kernel\socket\unix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c">
+      <Filter>vsf\shell\sys\linux\kernel\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.c">
+      <Filter>vsf\shell\sys\linux\kernel\fs\devfs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

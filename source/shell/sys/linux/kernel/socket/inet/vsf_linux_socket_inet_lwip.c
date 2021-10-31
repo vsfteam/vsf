@@ -17,28 +17,29 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "./vsf_linux_cfg.h"
+#include "shell/sys/linux/vsf_linux_cfg.h"
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED
 
+#define __VSF_LINUX_FS_CLASS_INHERIT__
+#define __VSF_LINUX_SOCKET_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "./include/unistd.h"
-#   include "./include/errno.h"
-#   include "./include/sys/socket.h"
-#   include "./include/netinet/in.h"
-#   include "./include/arpa/inet.h"
-#   include "./include/netdb.h"
-#   include "./include/ifaddrs.h"
+#   include "../../include/unistd.h"
+#   include "../../include/errno.h"
+#   include "../../include/sys/socket.h"
+#   include "../../include/netinet/in.h"
+#   include "../../include/arpa/inet.h"
+#   include "../../include/ifaddrs.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
 #   include <sys/socket.h>
 #   include <netinet/in.h>
 #   include <arpa/inet.h>
-#   include <netdb.h>
 #   include <ifaddrs.h>
 #endif
+#include "../vsf_linux_socket.h"
 
 #include "lwip/tcpip.h"
 #include "lwip/api.h"
@@ -61,14 +62,16 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_linux_socket_priv_t {
+typedef struct vsf_linux_socket_inet_priv_t {
+    implement(vsf_linux_socket_priv_t)
+
     struct netconn          *conn;
     struct {
         struct netbuf       *netbuf;
         struct pbuf         *pbuf;
     } last;
     uint16_t                rxcnt;
-} vsf_linux_socket_priv_t;
+} vsf_linux_socket_inet_priv_t;
 
 typedef union vsf_linux_sockaddr_t {
     struct sockaddr         sa;
@@ -79,24 +82,48 @@ typedef union vsf_linux_sockaddr_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static int __vsf_linux_socket_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
-static ssize_t __vsf_linux_socket_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
-static ssize_t __vsf_linux_socket_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
-static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd);
+static int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
+static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
+static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd);
 
 // APIs not implemented in older lwip
 extern struct pbuf * pbuf_free_header(struct pbuf *q, u16_t size);
 
-static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len);
+static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len);
+
+static int __vsf_linux_socket_inet_init(vsf_linux_socket_priv_t *priv);
+static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, int how);
+static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *priv, const struct sockaddr *addr, socklen_t addrlen);
+static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *priv, int backlog);
+static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *priv, struct sockaddr *addr, socklen_t *addr_len);
+static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *priv, const struct sockaddr *addr, socklen_t addrlen);
+static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *priv, int level, int optname, void *optval, socklen_t *optlen);
+static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *priv, int level, int optname,const void *optval, socklen_t optlen);
+static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen);
+static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const vsf_linux_fd_op_t __vsf_linux_socket_fdop = {
-    .priv_size          = sizeof(vsf_linux_socket_priv_t),
-    .fn_fcntl           = __vsf_linux_socket_fcntl,
-    .fn_read            = __vsf_linux_socket_read,
-    .fn_write           = __vsf_linux_socket_write,
-    .fn_close           = __vsf_linux_socket_close,
+const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
+    .fdop               = {
+        .priv_size      = sizeof(vsf_linux_socket_inet_priv_t),
+        .fn_fcntl       = __vsf_linux_socket_inet_fcntl,
+        .fn_read        = __vsf_linux_socket_inet_read,
+        .fn_write       = __vsf_linux_socket_inet_write,
+        .fn_close       = __vsf_linux_socket_inet_close,
+    },
+
+    .fn_init            = __vsf_linux_socket_inet_init,
+    .fn_fini            = __vsf_linux_socket_inet_fini,
+    .fn_connect         = __vsf_linux_socket_inet_connect,
+    .fn_listen          = __vsf_linux_socket_inet_listen,
+    .fn_accept          = __vsf_linux_socket_inet_accept,
+    .fn_bind            = __vsf_linux_socket_inet_bind,
+    .fn_getsockopt      = __vsf_linux_socket_inet_getsockopt,
+    .fn_setsockopt      = __vsf_linux_socket_inet_setsockopt,
+    .fn_getpeername     = __vsf_linux_socket_inet_getpeername,
+    .fn_getsockname     = __vsf_linux_socket_inet_getsockname,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -192,138 +219,61 @@ static int lwip_sockopt_to_ipopt(int optname)
   }
 }
 
-// arpa/inet.h
-int inet_aton(const char *cp, struct in_addr *addr)
-{
-    uint32_t parts[4];
-    int num_parts = 0;
-    char *endp;
-
-    for (;;) {
-        parts[num_parts++] = strtoul(cp, &endp, 0);
-        if (cp == endp) {
-            return 0;
-        }
-
-        if ((*endp != '.') || (num_parts >= 4)) {
-            break;
-        }
-        cp = endp + 1;
-    }
-
-    uint32_t val = parts[num_parts - 1];
-    switch (num_parts) {
-    case 1:     // a        -- 32 bits
-        break;
-    case 2:     // a.b      -- 8.24 bits
-        if (val > 0xFFFFFF) {
-            return 0;
-        }
-        val |= parts[0] << 24;
-        break;
-    case 3:     // a.b.c    -- 8.8.16 bits
-        if (val > 0xFFFF) {
-            return 0;
-        }
-        val |= (parts[0] << 24) | (parts[1] << 16);
-        break;
-    case 4:     // a.b.c.d  -- 8.8.8.8 bits
-        if (val > 0xFF) {
-            return 0;
-        }
-        val |= (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8);
-    }
-    if (addr) {
-        addr->s_addr = htonl(val);
-    }
-    return 1;
-}
-
-in_addr_t inet_addr(const char *cp)
-{
-    struct in_addr addr;
-    if (!inet_aton(cp, &addr)) {
-        return INADDR_NONE;
-    }
-    return addr.s_addr;
-}
-
-in_addr_t inet_lnaof(struct in_addr in)
-{
-    uint32_t val = ntohl(in.s_addr);
-    if (IN_CLASSA(val)) {
-        return val & IN_CLASSA_HOST;
-    } else if (IN_CLASSB(val)) {
-        return val & IN_CLASSB_HOST;
-    } else {
-        return val & IN_CLASSC_HOST;
-    }
-}
-
-struct in_addr inet_makeaddr(in_addr_t net, in_addr_t lna)
-{
-    in_addr_t addr;
-
-	if (net < 128) {
-		addr = (net << IN_CLASSA_NSHIFT) | (lna & IN_CLASSA_HOST);
-    } else if (net < 0x10000) {
-		addr = (net << IN_CLASSB_NSHIFT) | (lna & IN_CLASSB_HOST);
-    } else if (net < 0x1000000L) {
-		addr = (net << IN_CLASSC_NSHIFT) | (lna & IN_CLASSC_HOST);
-    } else {
-		addr = net | lna;
-    }
-	addr = htonl(addr);
-	return (*(struct in_addr *)&addr);
-}
-
-in_addr_t inet_netof(struct in_addr in)
-{
-    uint32_t val = ntohl(in.s_addr);
-    if (IN_CLASSA(val)) {
-        return (val & IN_CLASSA_NET) >> IN_CLASSA_NSHIFT;
-    } else if (IN_CLASSB(val)) {
-        return (val & IN_CLASSB_NET) >> IN_CLASSB_NSHIFT;
-    } else {
-        return (val & IN_CLASSC_NET) >> IN_CLASSC_NSHIFT;
-    }
-}
-
-char * inet_ntoa(struct in_addr in)
-{
-	static char __inet_ntoa_buf[16];
-	unsigned char *a = (void *)&in;
-	snprintf(__inet_ntoa_buf, sizeof(__inet_ntoa_buf), "%d.%d.%d.%d", a[0], a[1], a[2], a[3]);
-	return __inet_ntoa_buf;
-}
-
-in_addr_t inet_network(const char *cp)
-{
-    return ntohl(inet_addr(cp));
-}
-
-const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
-{
-    switch (af) {
-    case AF_INET:
-        strlcpy(dst, inet_ntoa(*(struct in_addr *)src), size);
-        break;
-    case AF_INET6:
-        // TODO: add ipv6 support
-        return NULL;
-    }
-    return dst;
-}
-
 // socket
-int setsockopt(int socket, int level, int optname, const void *optval, socklen_t optlen)
+static int __vsf_linux_socket_inet_init(vsf_linux_socket_priv_t *socket_priv)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
+    struct netconn *conn;
+    enum netconn_type conn_type;
 
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    switch (socket_priv->type) {
+    case SOCK_DGRAM:
+        if (socket_priv->protocol != IPPROTO_UDP) {
+            return INVALID_SOCKET;
+        }
+        conn_type = NETCONN_UDP;
+        break;
+    case SOCK_STREAM:
+        if (socket_priv->protocol != IPPROTO_TCP) {
+            // some user code will call socket to create STREAM sock with protocol 0
+//            return INVALID_SOCKET;
+        }
+        conn_type = NETCONN_TCP;
+        break;
+    default:
+        return INVALID_SOCKET;
+    }
+    conn = netconn_new_with_callback(conn_type, __vsf_linux_socket_inet_lwip_evthandler);
+    if (NULL == conn) {
+        return INVALID_SOCKET;
+    }
+#if LWIP_NETBUF_RECVINFO
+    else {
+        conn->flags &= ~NETCONN_FLAG_PKTINFO;
+    }
+#endif
+
+    priv->conn = conn;
+    VSF_LINUX_ASSERT(sizeof(conn->socket) >= sizeof(vsf_linux_fd_t *));
+    conn->socket = (int)container_of(priv, vsf_linux_fd_t, priv);
+    return 0;
+}
+
+static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, int how)
+{
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
+    struct netconn *conn = priv->conn;
+
+    VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
+    VSF_LINUX_ASSERT((how & SHUT_RDWR) != 0);
+
+    err_t err = netconn_shutdown(conn, how & SHUT_RD, how & SHUT_WR);
+    return (ERR_OK == err) ? 0 : -1;
+}
+
+static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, const void *optval, socklen_t optlen)
+{
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn = priv->conn;
 
     switch (level) {
@@ -359,14 +309,9 @@ int setsockopt(int socket, int level, int optname, const void *optval, socklen_t
     return 0;
 }
 
-int getsockopt(int socket, int level, int optname, void *optval, socklen_t *optlen)
+static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, void *optval, socklen_t *optlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn = priv->conn;
 
     switch (level) {
@@ -398,14 +343,9 @@ int getsockopt(int socket, int level, int optname, void *optval, socklen_t *optl
     return 0;
 }
 
-int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
+static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn = priv->conn;
 
     ip_addr_t localaddr;
@@ -415,14 +355,9 @@ int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen)
     return 0;
 }
 
-int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen)
+static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn = priv->conn;
 
     ip_addr_t localaddr;
@@ -432,14 +367,9 @@ int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen)
     return 0;
 }
 
-int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
+static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn = priv->conn;
 
     VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
@@ -450,13 +380,14 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
         return SOCKET_ERROR;
     }
 
-    int newsock = vsf_linux_create_fd(&sfd, &__vsf_linux_socket_fdop);
+    int newsock = socket(socket_priv->domain, socket_priv->type, socket_priv->protocol);
     if (newsock < 0) {
         netconn_delete(newconn);
         return INVALID_SOCKET;
     }
 
-    priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(newsock);
+    priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
     priv->conn = newconn;
 
     if ((addr != NULL) && (addrlen != NULL)) {
@@ -474,7 +405,7 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
     }
 
 
-    newconn->callback = __vsf_linux_socket_lwip_evthandler;
+    newconn->callback = __vsf_linux_socket_inet_lwip_evthandler;
     LOCK_TCPIP_CORE();
         int rcvplus = -1 -  newconn->socket;
         newconn->socket = (int)sfd;
@@ -487,14 +418,9 @@ int accept(int socket, struct sockaddr *addr, socklen_t *addrlen)
     return newsock;
 }
 
-int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
+static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn = priv->conn;
 
     ip_addr_t local_addr;
@@ -512,14 +438,9 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen)
     return (ERR_OK == err) ? 0 : SOCKET_ERROR;
 }
 
-int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
+static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn = priv->conn;
 
     ip_addr_t remote_addr;
@@ -536,14 +457,9 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen)
     return (ERR_OK == err) ? 0 : SOCKET_ERROR;
 }
 
-int listen(int socket, int backlog)
+static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, int backlog)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn = priv->conn;
 
     VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
@@ -558,19 +474,9 @@ int listen(int socket, int backlog)
     return (ERR_OK == err) ? 0 : SOCKET_ERROR;
 }
 
-ssize_t recv(int socket, void *buffer, size_t size, int flags)
+static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, const void *buffer, size_t size, int flags,
+                    const struct sockaddr *dst_addr, socklen_t addrlen)
 {
-    return recvfrom(socket, buffer, size, flags, NULL, NULL);
-}
-
-ssize_t send(int socket, const void *buffer, size_t size, int flags)
-{
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
     if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
@@ -578,20 +484,57 @@ ssize_t send(int socket, const void *buffer, size_t size, int flags)
         err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
         return (ERR_OK == err) ? (ssize_t)written : SOCKET_ERROR;
     } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
-        return sendto(socket, buffer, size, flags, NULL, 0);
+        if (size > LWIP_MIN(0xFFFF, SSIZE_MAX)) {
+            return SOCKET_ERROR;
+        }
+
+        struct netbuf buf = { 0 };
+        uint16_t remote_port;
+        if (dst_addr) {
+            __sockaddr_to_ipaddr_port(dst_addr, &buf.addr, &remote_port);
+        } else {
+            remote_port = 0;
+            ip_addr_set_any(NETCONNTYPE_ISIPV6(netconn_type(conn)), &buf.addr);
+        }
+        netbuf_fromport(&buf) = remote_port;
+
+#if LWIP_NETIF_TX_SINGLE_PBUF
+        if (NULL == netbuf_alloc(&buf, short_size)) {
+            return SOCKET_ERROR;
+        }
+#   if LWIP_CHECKSUM_ON_COPY
+        if (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_RAW) {
+            uint16_t chksum = LWIP_CHKSUM_COPY(buf.p->payload, buffer, size);
+            netbuf_set_chksum(&buf, chksum);
+        } else
+#   endif
+        {
+            memcpy(buf.p->payload, data, size);
+        }
+#else
+        if (ERR_OK != netbuf_ref(&buf, buffer, size)) {
+            return SOCKET_ERROR;
+        }
+#endif
+
+#if LWIP_IPV4 && LWIP_IPV6
+        /* Dual-stack: Unmap IPv4 mapped IPv6 addresses */
+        if (IP_IS_V6_VAL(buf.addr) && ip6_addr_isipv4mappedipv6(ip_2_ip6(&buf.addr))) {
+            unmap_ipv4_mapped_ipv6(ip_2_ip4(&buf.addr), ip_2_ip6(&buf.addr));
+            IP_SET_TYPE_VAL(buf.addr, IPADDR_TYPE_V4);
+        }
+#endif
+
+        err_t err = netconn_send(conn, &buf);
+        netbuf_free(&buf);
+        return (ERR_OK == err) ? size : SOCKET_ERROR;
     }
     return SOCKET_ERROR;
 }
 
-ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
+static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, void *buffer, size_t size, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
     u16_t len = 0, pos = 0;
 
@@ -697,86 +640,10 @@ ssize_t recvfrom(int socket, void *buffer, size_t size, int flags,
     return len;
 }
 
-ssize_t sendto(int socket, const void *buffer, size_t size, int flags,
-                    const struct sockaddr *dst_addr, socklen_t addrlen)
-{
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-    struct netconn *conn = priv->conn;
-
-    VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP);
-
-    if (size > LWIP_MIN(0xFFFF, SSIZE_MAX)) {
-        return SOCKET_ERROR;
-    }
-
-    struct netbuf buf = { 0 };
-    uint16_t remote_port;
-    if (dst_addr) {
-        __sockaddr_to_ipaddr_port(dst_addr, &buf.addr, &remote_port);
-    } else {
-        remote_port = 0;
-        ip_addr_set_any(NETCONNTYPE_ISIPV6(netconn_type(conn)), &buf.addr);
-    }
-    netbuf_fromport(&buf) = remote_port;
-
-#if LWIP_NETIF_TX_SINGLE_PBUF
-    if (NULL == netbuf_alloc(&buf, short_size)) {
-        return SOCKET_ERROR;
-    }
-#   if LWIP_CHECKSUM_ON_COPY
-    if (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_RAW) {
-        uint16_t chksum = LWIP_CHKSUM_COPY(buf.p->payload, buffer, size);
-        netbuf_set_chksum(&buf, chksum);
-    } else
-#   endif
-    {
-      memcpy(buf.p->payload, data, size);
-    }
-#else
-    if (ERR_OK != netbuf_ref(&buf, buffer, size)) {
-        return SOCKET_ERROR;
-    }
-#endif
-
-#if LWIP_IPV4 && LWIP_IPV6
-    /* Dual-stack: Unmap IPv4 mapped IPv6 addresses */
-    if (IP_IS_V6_VAL(buf.addr) && ip6_addr_isipv4mappedipv6(ip_2_ip6(&buf.addr))) {
-      unmap_ipv4_mapped_ipv6(ip_2_ip4(&buf.addr), ip_2_ip6(&buf.addr));
-      IP_SET_TYPE_VAL(buf.addr, IPADDR_TYPE_V4);
-    }
-#endif
-
-    err_t err = netconn_send(conn, &buf);
-    netbuf_free(&buf);
-    return (ERR_OK == err) ? size : SOCKET_ERROR;
-}
-
-int shutdown(int socket, int how)
-{
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(socket);
-    if (NULL == sfd) {
-        return SOCKET_ERROR;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-    struct netconn *conn = priv->conn;
-
-    VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
-    VSF_LINUX_ASSERT((how & SHUT_RDWR) != 0);
-
-    err_t err = netconn_shutdown(conn, how & SHUT_RD, how & SHUT_WR);
-    return (ERR_OK == err) ? 0 : -1;
-}
-
-static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len)
+static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len)
 {
     VSF_LINUX_ASSERT(conn != NULL);
-    SYS_ARCH_DECL_PROTECT(lev);
+//    SYS_ARCH_DECL_PROTECT(lev);
     int s = conn->socket;
 
     // warning: before fd is created, conn can receive up to 256 NETCONN_EVT_RCVPLUS
@@ -788,7 +655,7 @@ static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netcon
     }
 
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)conn->socket;
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
     if (sfd != NULL) {
         switch (evt) {
         case NETCONN_EVT_RCVPLUS:
@@ -812,32 +679,32 @@ static void __vsf_linux_socket_lwip_evthandler(struct netconn *conn, enum netcon
 }
 
 // socket fd
-int __vsf_linux_socket_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
 {
     return 0;
 }
 
-static ssize_t __vsf_linux_socket_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
     VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
-    return recv(sfd->fd, buf, count, 0);
+    return __vsf_linux_socket_inet_recv(priv, buf, count, 0, NULL, NULL);
 }
 
-static ssize_t __vsf_linux_socket_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
     VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
-    return send(sfd->fd, buf, count, 0);
+    return __vsf_linux_socket_inet_send(priv, buf, count, 0, NULL, 0);
 }
 
-static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd)
+static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
 {
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
     conn->socket = 0;
@@ -847,155 +714,35 @@ static int __vsf_linux_socket_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
-int socket(int domain, int type, int protocol)
+// sendto & recvfrom
+ssize_t sendto(int sockfd, const void *buffer, size_t size, int flags,
+                    const struct sockaddr *dst_addr, socklen_t addrlen)
 {
-    struct netconn *conn;
-    enum netconn_type conn_type;
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+	if (!sfd) {
+		return -1;
+	}
 
-    switch (type) {
-    case SOCK_DGRAM:
-        if (protocol != IPPROTO_UDP) {
-            return INVALID_SOCKET;
-        }
-        conn_type = NETCONN_UDP;
-        break;
-    case SOCK_STREAM:
-        if (protocol != IPPROTO_TCP) {
-            // some user code will call socket to create STREAM sock with protocol 0
-//            return INVALID_SOCKET;
-        }
-        conn_type = NETCONN_TCP;
-        break;
-    default:
-        return INVALID_SOCKET;
-    }
-    conn = netconn_new_with_callback(conn_type, __vsf_linux_socket_lwip_evthandler);
-    if (NULL == conn) {
-        return INVALID_SOCKET;
-    }
-#if LWIP_NETBUF_RECVINFO
-    else {
-        conn->flags &= ~NETCONN_FLAG_PKTINFO;
-    }
-#endif
-
-    vsf_linux_fd_t *sfd;
-    int fd = vsf_linux_create_fd(&sfd, &__vsf_linux_socket_fdop);
-    if (fd < 0) {
-        netconn_delete(conn);
-        return INVALID_SOCKET;
-    }
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-    priv->conn = conn;
-    VSF_LINUX_ASSERT(sizeof(conn->socket) >= sizeof(sfd));
-    conn->socket = (int)sfd;
-    return fd;
+    return __vsf_linux_socket_inet_send((vsf_linux_socket_inet_priv_t *)sfd->priv,
+                    buffer, size, flags, dst_addr, addrlen);
 }
 
-// netdb
-const char * gai_strerror(int errcode)
+ssize_t recvfrom(int sockfd, void *buffer, size_t size, int flags,
+                    struct sockaddr *src_addr, socklen_t *addrlen)
 {
-    return (const char *)"unknown error";
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+	if (!sfd) {
+		return -1;
+	}
+
+    return __vsf_linux_socket_inet_recv((vsf_linux_socket_inet_priv_t *)sfd->priv,
+                    buffer, size, flags, src_addr, addrlen);
 }
 
-struct hostent * gethostbyaddr(const void *addr, size_t len, int type)
-{
-    return NULL;
-}
-
-struct hostent * gethostbyname(const char *name)
-{
-    return NULL;
-}
-
-int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
-                        char *host, socklen_t hostlen,
-                        char *serv, socklen_t servlen, int flags)
-{
-    return -1;
-}
-
-int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
-                        struct addrinfo **pai)
-{
-    static const struct addrinfo __default_hints = {
-        .ai_flags = AI_V4MAPPED | AI_ADDRCONFIG,
-        .ai_family = PF_UNSPEC,
-        .ai_socktype = 0,
-        .ai_protocol = 0,
-        .ai_addrlen = 0,
-        .ai_addr = NULL,
-        .ai_canonname = NULL,
-        .ai_next = NULL,
-    };
-
-    if (name != NULL && name[0] == '*' && name[1] == 0) {
-        name = NULL;
-    }
-    if (service != NULL && service[0] == '*' && service[1] == 0) {
-        service = NULL;
-    }
-    if (name == NULL && service == NULL) {
-        return EAI_NONAME;
-    }
-    if (hints == NULL) {
-        hints = &__default_hints;
-    }
-    if (hints->ai_flags
-        & ~(    AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_ADDRCONFIG
-            |   AI_V4MAPPED | AI_NUMERICSERV | AI_ALL)) {
-        return EAI_BADFLAGS;
-    }
-    if ((hints->ai_flags & AI_CANONNAME) && name == NULL) {
-        return EAI_BADFLAGS;
-    }
-
-    // TODO: re-implement
-    struct in_addr addr;
-    if (!inet_aton(name, &addr)) {
-        return EAI_NONAME;
-    }
-
-    struct __addrinfo {
-        struct addrinfo info;
-        union {
-            struct sockaddr sa;
-            struct sockaddr_in sa_in;
-            struct sockaddr_in6 sa_in6;
-        };
-    };
-    struct __addrinfo *ai = malloc(sizeof(struct __addrinfo));
-    if (NULL == ai) {
-        return EAI_MEMORY;
-    }
-    memset(ai, 0, sizeof(struct __addrinfo));
-
-    ai->info.ai_family      = AF_INET;
-    ai->info.ai_addr        = &ai->sa;
-    ai->sa_in.sin_family    = AF_INET;
-    ai->sa_in.sin_addr      = addr;
-    ai->info.ai_addrlen     = sizeof(ai->sa_in);
-    *pai = &ai->info;
-    return 0;
-}
-
-void freeaddrinfo(struct addrinfo *ai)
-{
-    struct addrinfo *p;
-    while (ai != NULL) {
-        p = ai;
-        ai = ai->ai_next;
-
-        if (p->ai_canonname != NULL) {
-            free(p->ai_canonname);
-        }
-        free(p);
-    }
-}
-
+// ifaddrs.h
 int getifaddrs(struct ifaddrs **ifaddrs)
 {
+    return 0;
 }
 
 void freeifaddrs(struct ifaddrs *ifaddrs)

@@ -23,6 +23,7 @@
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__
+#define __VSF_LINUX_FS_CLASS_INHERIT__
 
 // libusb is another upper layer for usb host, so it need to access some private members
 // for vk_usbh_get_pipe and urb private members

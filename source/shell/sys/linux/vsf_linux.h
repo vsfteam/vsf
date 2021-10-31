@@ -15,13 +15,13 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_LINUX_H__
-#define __VSF_LINUX_H__
+#ifndef __VSF_LINUX_INTERNAL_H__
+#define __VSF_LINUX_INTERNAL_H__
 
 /*============================ INCLUDES ======================================*/
 
+#include "vsf.h"
 #include "./vsf_linux_cfg.h"
-#include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_USE_LINUX == ENABLED
 
@@ -32,6 +32,8 @@
 #   include <signal.h>
 #   include <dirent.h>
 #endif
+
+#include "./kernel/fs/vsf_linux_fs.h"
 
 #if     defined(__VSF_LINUX_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
@@ -74,7 +76,6 @@ extern "C" {
 
 vsf_dcl_class(vsf_linux_process_t)
 vsf_dcl_class(vsf_linux_thread_t)
-vsf_dcl_class(vsf_linux_fd_t)
 
 typedef struct vsf_linux_process_arg_t {
     int argc;
@@ -161,72 +162,17 @@ vsf_class(vsf_linux_process_t) {
     )
 };
 
-typedef struct vsf_linux_fd_op_t {
-    int priv_size;
-    int (*fn_fcntl)(vsf_linux_fd_t *sfd, int cmd, long arg);
-    ssize_t (*fn_read)(vsf_linux_fd_t *sfd, void *buf, size_t count);
-    ssize_t (*fn_write)(vsf_linux_fd_t *sfd, const void *buf, size_t count);
-    int (*fn_close)(vsf_linux_fd_t *sfd);
-} vsf_linux_fd_op_t;
-
-vsf_class(vsf_linux_fd_t) {
-    protected_member(
-        int fd;
-        int flags;
-        const vsf_linux_fd_op_t *op;
-
-        vsf_trig_t *txpend, *rxpend;
-        bool txrdy;
-        bool txevt;
-        bool rxrdy;
-        bool rxevt;
-    )
-
-    private_member(
-        vsf_dlist_node_t fd_node;
-    )
-
-    protected_member(
-#if __IS_COMPILER_IAR__
-        // make compiler happy by waisting 4 bytes
-        int priv[1];
-#else
-        int priv[0];
-#endif
-    )
-};
-
-#if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
-typedef struct vsf_linux_fs_priv_t {
-    vk_file_t *file;
-    uint64_t pos;
-
-    struct dirent dir;
-    vk_file_t *child;
-} vsf_linux_fs_priv_t;
-#endif
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
-#if VSF_LINUX_USE_DEVFS == ENABLED
-extern int vsf_linux_devfs_init(void);
-#endif
 
 extern int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in);
 extern int vsf_linux_chdir(vsf_linux_process_t *process, char *working_dir);
 
-extern int vsf_linux_fs_bind_target(int fd, void *target,
-        vsf_param_eda_evthandler_t peda_read,
-        vsf_param_eda_evthandler_t peda_write);
 extern int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry);
-
-// IMPORTANT: priority of stream MUST be within scheduler priorities
-extern vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream);
-extern vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream);
 
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
 extern void vsf_linux_set_dominant_process(void);
@@ -247,24 +193,6 @@ extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);
 extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
 extern vsf_linux_thread_t * vsf_linux_get_thread(int tid);
 extern vsf_linux_process_t * vsf_linux_get_process(pid_t pid);
-
-extern int vsf_linux_create_fd(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
-extern vsf_linux_fd_t * vsf_linux_get_fd(int fd);
-
-extern void vsf_linux_delete_fd(int fd);
-
-extern void vsf_linux_fd_trigger_init(vsf_trig_t *trig);
-// vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
-extern int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
-extern int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
-extern int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern int vsf_linux_fd_tx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern int vsf_linux_fd_rx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern void vsf_linux_fd_tx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern void vsf_linux_fd_rx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-
-extern vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd);
 #endif
 
 #ifdef __cplusplus
@@ -275,5 +203,5 @@ extern vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd);
 #undef __VSF_LINUX_CLASS_INHERIT__
 
 #endif      // VSF_USE_LINUX
-#endif      // __VSF_LINUX_H__
+#endif      // __VSF_LINUX_INTERNAL_H__
 /* EOF */

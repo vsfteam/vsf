@@ -4687,7 +4687,7 @@
                     <state>$PROJ_DIR$\..\..\config</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>//$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
@@ -4752,6 +4752,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\zlib\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -5210,7 +5211,7 @@
                 </option>
                 <option>
                     <name>IlinkExtraOptions</name>
-                    <state>--no_entry</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>IlinkLowLevelInterfaceSlave</name>
@@ -8100,6 +8101,327 @@
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\netif\ethernet.c</name>
                                 </file>
                             </group>
+                        </group>
+                    </group>
+                </group>
+                <group>
+                    <name>mbedtls</name>
+                    <group>
+                        <name>raw</name>
+                        <group>
+                            <name>library</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aes.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aesni.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\arc4.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aria.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\asn1parse.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\asn1write.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\base64.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\bignum.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\blowfish.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\camellia.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ccm.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\certs.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\chacha20.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\chachapoly.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\check_crypto_config.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\cipher.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\cipher_wrap.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\cmac.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\common.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ctr_drbg.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\debug.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\des.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\dhm.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecdh.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecdsa.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecjpake.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecp.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecp_curves.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\entropy.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\entropy_poll.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\error.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\gcm.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\havege.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\hkdf.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\hmac_drbg.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md2.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md4.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\md5.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\memory_buffer_alloc.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\net_sockets.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\nist_kw.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\oid.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\padlock.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pem.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pk.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pk_wrap.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkcs11.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkcs12.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkcs5.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkparse.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\pkwrite.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\platform.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\platform_util.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\poly1305.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_client.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_core.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_driver_wrappers.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_driver_wrappers.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_ecp.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_ecp.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_invasive.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_its.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_random_impl.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_rsa.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_rsa.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_se.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_se.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_service_integration.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_slot_management.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_slot_management.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_storage.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_storage.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_its_file.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ripemd160.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\rsa.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\rsa_internal.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\sha1.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\sha256.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\sha512.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_cache.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_ciphersuites.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_cli.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_cookie.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_invasive.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_msg.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_srv.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_ticket.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls13_keys.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls13_keys.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\threading.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\timing.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\version.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\version_features.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_create.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_crl.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_crt.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509_csr.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509write_crt.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\x509write_csr.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\library\xtea.c</name>
+                            </file>
                         </group>
                     </group>
                 </group>
@@ -12509,6 +12831,30 @@
                             </file>
                         </group>
                         <group>
+                            <name>net</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\net\if.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>netinet</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\netinet\in.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\netinet\ip.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\netinet\tcp.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>netpacket</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\netpacket\packet.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>simple_libc</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc\ctype.h</name>
@@ -12541,6 +12887,9 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\mount.h</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\resource.h</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\select.h</name>
                             </file>
                             <file>
@@ -12562,6 +12911,9 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\uio.h</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\un.h</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\wait.h</name>
                             </file>
                         </group>
@@ -12569,10 +12921,22 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\dirent.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\err.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\errno.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\fcntl.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\getopt.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\grp.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\ifaddrs.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libgen.h</name>
@@ -12593,10 +12957,16 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\pwd.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sched.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\semaphore.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\signal.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\syslog.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\termios.h</name>
@@ -12606,9 +12976,57 @@
                         </file>
                     </group>
                     <group>
+                        <name>kernel</name>
+                        <group>
+                            <name>fs</name>
+                            <group>
+                                <name>devfs</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.h</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>socket</name>
+                            <group>
+                                <name>inet</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_lwip.c</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>unix</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.h</name>
+                            </file>
+                        </group>
+                    </group>
+                    <group>
                         <name>lib</name>
                         <group>
                             <name>glibc</name>
+                            <group>
+                                <name>3rd-party</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\3rd-party\getopt_long.c</name>
+                                </file>
+                            </group>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c</name>
                             </file>
@@ -12677,12 +13095,6 @@
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_cfg.h</name>
                     </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_devfs.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_socket.c</name>
-                    </file>
                 </group>
             </group>
             <file>
@@ -12741,6 +13153,9 @@
                         <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\__common\__type.h</name>
                     </file>
                 </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\arm_compiler.c</name>
+                </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\arm_compiler.h</name>
                 </file>

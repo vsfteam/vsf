@@ -72,6 +72,7 @@
 #   define VSF_LINUX_CFG_PRINT_BUFF_SIZE                4096
 // if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   define VSF_LINUX_LIBC_CFG_CPP                       ENABLED
 // VSF_LINUX_LIBC_CFG_WRAPPER is required on __WIN__ to avoid API confliction
 #   define VSF_LINUX_LIBC_CFG_WRAPPER                   ENABLED
 #   define VSF_USE_SIMPLE_SSCANF                        ENABLED
@@ -195,7 +196,8 @@
 #define USRAPP_CFG_STDIO_EN                             ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
-#   define VSF_LINUX_USE_SOCKET                         VSF_USE_LWIP
+#   define VSF_LINUX_USE_SOCKET                         ENABLED
+#       define VSF_LINUX_SOCKET_USE_INET                VSF_USE_LWIP
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #if APP_USE_EVM_DEMO == ENABLED

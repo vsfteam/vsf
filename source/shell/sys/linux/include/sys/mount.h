@@ -1,6 +1,8 @@
 #ifndef __VSF_LINUX_MOUNT_H__
 #define __VSF_LINUX_MOUNT_H__
 
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
