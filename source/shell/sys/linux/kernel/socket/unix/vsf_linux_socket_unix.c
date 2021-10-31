@@ -164,9 +164,8 @@ static int __vsf_linux_socket_unix_fini(vsf_linux_socket_priv_t *socket_priv, in
     if (priv->is_listening) {
         // TODO: close all child socket?
     } else if (priv->rw.listener != NULL) {
-        priv->rw.listener->listener.backlog++;
-
         vsf_protect_t orig = vsf_protect_sched();
+        priv->rw.listener->listener.backlog++;
         vsf_dlist_remove(vsf_linux_socket_unix_priv_t, sock_node, &priv->rw.listener->listener.child_list, priv);
         vsf_unprotect_sched(orig);
     }
@@ -256,7 +255,6 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
 {
     vsf_linux_socket_unix_priv_t *priv = (vsf_linux_socket_unix_priv_t *)socket_priv;
     VSF_LINUX_ASSERT(priv->is_listening);
-    int sockfd_new = -1;
 
     if (priv->listener.backlog > 0) {
         vsf_linux_fd_t *sfd_local = container_of(socket_priv, vsf_linux_fd_t, priv);
@@ -282,7 +280,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
         }
         VSF_LINUX_ASSERT(priv_remote != NULL);
 
-        sockfd_new = socket(socket_priv->domain, socket_priv->type, socket_priv->protocol);
+        int sockfd_new = socket(socket_priv->domain, socket_priv->type, socket_priv->protocol);
         if (sockfd_new < 0) {
         fail:
             priv_remote->remote = NULL;
@@ -292,10 +290,6 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
         } else {
             vsf_linux_fd_t *sfd_new = vsf_linux_get_fd(sockfd_new);
             vsf_linux_socket_unix_priv_t *priv_new = (vsf_linux_socket_unix_priv_t *)sfd_new->priv;
-
-            orig = vsf_protect_sched();
-            vsf_dlist_add_to_tail(vsf_linux_socket_unix_priv_t, sock_node, &priv->listener.child_list, priv_new);
-            vsf_unprotect_sched(orig);
 
             priv_new->rw.listener = priv;
             priv_remote->remote = priv_new;
@@ -327,6 +321,10 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
             vsf_thread_trig_pend(&trig, -1);
             if (priv->remote != NULL) {
                 // success
+                orig = vsf_protect_sched();
+                priv->listener.backlog--;
+                vsf_dlist_add_to_tail(vsf_linux_socket_unix_priv_t, sock_node, &priv->listener.child_list, priv_new);
+                vsf_linux_fd_tx_ready(sfd_new, orig);
                 priv->remote = NULL;
                 return sockfd_new;
             } else {
@@ -335,7 +333,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
             }
         }
     }
-    return sockfd_new;
+    return -1;
 }
 
 static int __vsf_linux_socket_unix_bind(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen)
