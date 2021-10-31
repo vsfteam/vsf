@@ -1072,11 +1072,14 @@
     <Filter Include="vsf\shell\sys\linux\kernel\socket\unix">
       <UniqueIdentifier>{b4aafc7e-3552-4b52-89d7-6d411052cf54}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\shell\sys\linux\kernel\fs\devfs">
-      <UniqueIdentifier>{490bbed7-2977-45a3-895f-0080c32f3fdd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\shell\sys\linux\lib\glibc\3rd-party">
       <UniqueIdentifier>{15158a93-39d2-4015-bdf2-063d78c7f496}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\fs\vfs">
+      <UniqueIdentifier>{0913cb33-3d9c-4909-bbe6-4d8870fe17c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\fs\vfs\devfs">
+      <UniqueIdentifier>{490bbed7-2977-45a3-895f-0080c32f3fdd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -3249,14 +3252,17 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.h">
       <Filter>vsf\shell\sys\linux\kernel\fs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.h">
-      <Filter>vsf\shell\sys\linux\kernel\fs\devfs</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\getopt.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\err.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.h">
+      <Filter>vsf\shell\sys\linux\kernel\fs\vfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.h">
+      <Filter>vsf\shell\sys\linux\kernel\fs\vfs\devfs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5705,11 +5711,14 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c">
       <Filter>vsf\shell\sys\linux\kernel\fs</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.c">
-      <Filter>vsf\shell\sys\linux\kernel\fs\devfs</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\3rd-party\getopt_long.c">
       <Filter>vsf\shell\sys\linux\lib\glibc\3rd-party</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c">
+      <Filter>vsf\shell\sys\linux\kernel\fs\vfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c">
+      <Filter>vsf\shell\sys\linux\kernel\fs\vfs\devfs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

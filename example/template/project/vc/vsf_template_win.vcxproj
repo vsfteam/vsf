@@ -658,7 +658,8 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\wait.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\termios.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\unistd.h" />
-    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\port\busybox\busybox.h" />
@@ -1463,7 +1464,8 @@
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_event.c" />
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_pixelformat.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c" />
-    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_lwip.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c" />

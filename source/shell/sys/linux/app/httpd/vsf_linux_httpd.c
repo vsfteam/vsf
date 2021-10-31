@@ -280,6 +280,11 @@ static void __vsf_linux_httpd_parse_header_item(char *items,
     }
 }
 
+#if __IS_COMPILER_IAR__
+//! transfer of control bypasses initialization
+#   pragma diag_suppress=pe546
+#endif
+
 static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *request)
 {
     // add NULL terminator to request->buffer
@@ -343,6 +348,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
     request->query = tmp_ptr;
     // 1.4 http request protocol
     if (strncasecmp((const char *)cur_ptr, "HTTP/1.", sizeof("HTTP/1.") - 1)) {
+        // PE546 in IAR: transfer of control bypasses initialization of: i
         goto __not_implement;
     }
     cur_ptr = strstr((const char *)cur_ptr, "\r\n");
@@ -384,6 +390,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
         if (!strcasecmp((const char *)tmp_ptr, "Content-Length")) {
             request->content_length = atoi(cur_ptr);
         } else if (!strcasecmp((const char *)tmp_ptr, "Range")) {
+            // PE546 in IAR: transfer of control bypasses initialization of: i
             goto __not_implement;
         } else if (!strcasecmp((const char *)tmp_ptr, "Connection")) {
             if (!strcasecmp((const char *)cur_ptr, "close")) {

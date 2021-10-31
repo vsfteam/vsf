@@ -78,6 +78,21 @@ vsf_class(vsf_linux_fd_t) {
 };
 
 #if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
+typedef void (*vsf_linux_pipe_on_rx_ready_t)(vsf_linux_fd_t *sfd, vsf_protect_t orig);
+
+vsf_class(vsf_linux_pipe_rx_priv_t) {
+    private_member(
+        vsf_slist_queue_t buffer_queue;
+        vsf_linux_pipe_on_rx_ready_t on_ready;
+    )
+};
+
+vsf_class(vsf_linux_pipe_tx_priv_t) {
+    private_member(
+        vsf_linux_fd_t *sfd_rx;
+    )
+};
+
 typedef struct vsf_linux_fs_priv_t {
     vk_file_t *file;
     uint64_t pos;
@@ -88,6 +103,13 @@ typedef struct vsf_linux_fs_priv_t {
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
+extern const vsf_linux_fd_op_t __vsf_linux_fs_fdop;
+extern const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop;
+extern const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop;
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
@@ -114,13 +136,20 @@ extern void vsf_linux_fd_rx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 
 extern vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd);
 
+// stream
 // IMPORTANT: priority of stream MUST be within scheduler priorities
 extern vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream);
 extern vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream);
+extern vsf_stream_t * vsf_linux_get_stream(vsf_linux_fd_t *sfd);
+
+// pipe
+extern vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_linux_pipe_on_rx_ready_t on_ready);
+extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_fd_t *sfd_rx);
 #endif
 
 /*============================ INCLUDES ======================================*/
-#include "./devfs/vsf_linux_devfs.h"
+
+#include "./vfs/vsf_linux_vfs.h"
 
 #endif      // VSF_USE_LINUX
 #endif      // __VSF_LINUX_FS_INTERNAL_H__

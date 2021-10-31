@@ -25,11 +25,11 @@
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #define __VSF_LINUX_SOCKET_CLASS_IMPLEMENT
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "../include/unistd.h"
+#   include "../../include/unistd.h"
 #   if VSF_LINUX_SOCKET_USE_INET == ENABLED
-#       include "../include/netinet/in.h"
-#       include "../include/arpa/inet.h"
-#       include "../include/netdb.h"
+#       include "../../include/netinet/in.h"
+#       include "../../include/arpa/inet.h"
+#       include "../../include/netdb.h"
 #   endif
 #else
 #   include <unistd.h>

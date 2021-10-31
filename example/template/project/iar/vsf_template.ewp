@@ -12980,12 +12980,21 @@
                         <group>
                             <name>fs</name>
                             <group>
-                                <name>devfs</name>
+                                <name>vfs</name>
+                                <group>
+                                    <name>devfs</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.h</name>
+                                    </file>
+                                </group>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\devfs\vsf_linux_devfs.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.h</name>
                                 </file>
                             </group>
                             <file>

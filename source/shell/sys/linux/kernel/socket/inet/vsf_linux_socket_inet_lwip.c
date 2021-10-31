@@ -25,12 +25,12 @@
 #define __VSF_LINUX_SOCKET_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "../../include/unistd.h"
-#   include "../../include/errno.h"
-#   include "../../include/sys/socket.h"
-#   include "../../include/netinet/in.h"
-#   include "../../include/arpa/inet.h"
-#   include "../../include/ifaddrs.h"
+#   include "../../../include/unistd.h"
+#   include "../../../include/errno.h"
+#   include "../../../include/sys/socket.h"
+#   include "../../../include/netinet/in.h"
+#   include "../../../include/arpa/inet.h"
+#   include "../../../include/ifaddrs.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -104,6 +104,7 @@ static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_p
 static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen);
 
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
     .fdop               = {
@@ -532,6 +533,11 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
     return SOCKET_ERROR;
 }
 
+#if __IS_COMPILER_IAR__
+//! transfer of control bypasses initialization
+#   pragma diag_suppress=pe546
+#endif
+
 static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, void *buffer, size_t size, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen)
 {
@@ -604,6 +610,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
         pos = 0;
     }
     if ((flags & MSG_WAITALL) && (size > 0)) {
+        // PE546 in IAR: transfer of control by0passes initialization of: err
         goto recv_next;
     }
 

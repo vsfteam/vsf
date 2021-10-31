@@ -25,7 +25,7 @@
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #define __VSF_FS_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "./include/unistd.h"
+#   include "../../../../include/unistd.h"
 #else
 #   include <unistd.h>
 #endif

@@ -1,7 +1,7 @@
 # CMakeLists head
 
 target_sources(${VSF_LIB_NAME} INTERFACE
-    vsf_linux_fs.c
+    vsf_linux_vfs.c
 )
 
-add_subdirectory(vfs)
+add_subdirectory(devfs)

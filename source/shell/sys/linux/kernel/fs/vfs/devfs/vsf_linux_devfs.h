@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "../../vsf_linux_cfg.h"
+#include "../../../../vsf_linux_cfg.h"
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_DEVFS == ENABLED
 
