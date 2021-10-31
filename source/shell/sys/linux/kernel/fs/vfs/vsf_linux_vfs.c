@@ -28,7 +28,10 @@
 #else
 #   include <unistd.h>
 #endif
-#include "./devfs/vsf_linux_devfs.h"
+
+#if VSF_LINUX_USE_DEVFS == ENABLED
+#   include "./devfs/vsf_linux_devfs.h"
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -57,7 +60,14 @@ int vsf_linux_vfs_init(void)
         return err;
     }
 
-    return vsf_linux_devfs_init();
+#if VSF_LINUX_USE_DEVFS == ENABLED
+    err = vsf_linux_devfs_init();
+    if (err != 0) {
+        return err;
+    }
+#endif
+
+    return 0;
 }
 
 #endif

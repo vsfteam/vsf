@@ -83,13 +83,19 @@ typedef void (*vsf_linux_pipe_on_rx_ready_t)(vsf_linux_fd_t *sfd, vsf_protect_t 
 vsf_class(vsf_linux_pipe_rx_priv_t) {
     private_member(
         vsf_slist_queue_t buffer_queue;
+    )
+    protected_member(
         vsf_linux_pipe_on_rx_ready_t on_ready;
+        void *target;
     )
 };
 
 vsf_class(vsf_linux_pipe_tx_priv_t) {
     private_member(
         vsf_linux_fd_t *sfd_rx;
+    )
+    protected_member(
+        void *target;
     )
 };
 
@@ -117,6 +123,7 @@ extern const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop;
 extern int vsf_linux_fs_bind_target(int fd, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write);
+extern int vsf_linux_fs_get_target(const char *pathname, void **target);
 
 extern int vsf_linux_create_fd(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
 extern vsf_linux_fd_t * vsf_linux_get_fd(int fd);
@@ -143,7 +150,7 @@ extern vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream);
 extern vsf_stream_t * vsf_linux_get_stream(vsf_linux_fd_t *sfd);
 
 // pipe
-extern vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_linux_pipe_on_rx_ready_t on_ready);
+extern vsf_linux_fd_t * vsf_linux_rx_pipe(void);
 extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_fd_t *sfd_rx);
 #endif
 

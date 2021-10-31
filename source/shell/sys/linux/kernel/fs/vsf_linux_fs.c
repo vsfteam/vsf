@@ -910,6 +910,24 @@ vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd)
     return (vk_vfs_file_t *)file;
 }
 
+int vsf_linux_fs_get_target(const char *pathname, void **target)
+{
+    int fd = open(pathname, 0);
+    if (fd < 0) {
+        return -1;
+    }
+
+    vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
+    if ((NULL == vfs_file) || (vfs_file->attr & VSF_FILE_ATTR_DIRECTORY)) {
+        return -1;
+    }
+
+    if (target != NULL) {
+        *target = vfs_file->f.param;
+    }
+    return 0;
+}
+
 int vsf_linux_fs_bind_target(int fd, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write)
@@ -1202,13 +1220,12 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
-vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_linux_pipe_on_rx_ready_t on_ready)
+vsf_linux_fd_t * vsf_linux_rx_pipe(void)
 {
     vsf_linux_fd_t *sfd_rx;
     if (vsf_linux_create_fd(&sfd_rx, &vsf_linux_pipe_rx_fdop) >= 0) {
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
         vsf_slist_queue_init(&priv_rx->buffer_queue);
-        priv_rx->on_ready = on_ready;
     }
     return sfd_rx;
 }

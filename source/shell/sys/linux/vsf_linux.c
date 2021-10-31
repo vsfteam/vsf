@@ -686,7 +686,7 @@ int pipe(int pipefd[2])
 {
     vsf_linux_fd_t *sfd_rx = NULL, *sfd_tx = NULL;
 
-    sfd_rx = vsf_linux_rx_pipe(NULL);
+    sfd_rx = vsf_linux_rx_pipe();
     if (NULL == sfd_rx) {
         return -1;
     }
