@@ -265,7 +265,6 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
 
         vsf_trig_t trig;
         vsf_linux_fd_trigger_init(&trig);
-        priv->trig = &trig;
 
     wait_next:
         // 1. wait for connection request
@@ -294,8 +293,9 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
             vsf_linux_socket_unix_priv_t *priv_new = (vsf_linux_socket_unix_priv_t *)sfd_new->priv;
 
             priv_new->rw.listener = priv;
-            priv_remote->remote = priv_new;
+            priv_new->trig = &trig;
             priv_new->remote = priv_remote;
+            priv_remote->remote = priv_new;
 
             // 2. provide sfd_rx and trigger remote
             vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe(priv_remote->rw.sfd_rx);
@@ -321,13 +321,16 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
 
             // 3. pend for connection complete
             vsf_thread_trig_pend(&trig, -1);
-            if (priv->remote != NULL) {
+            if (priv_new->remote != NULL) {
                 // success
+                priv_new->remote = NULL;
+                priv_new->rw.sfd_rx = sfd_rx;
+                priv_new->rw.sfd_tx = sfd_tx;
+
                 orig = vsf_protect_sched();
                 priv->listener.backlog--;
                 vsf_dlist_add_to_tail(vsf_linux_socket_unix_priv_t, sock_node, &priv->listener.child_list, priv_new);
                 vsf_linux_fd_tx_ready(sfd_new, orig);
-                priv->remote = NULL;
                 return sockfd_new;
             } else {
                 vsf_linux_fd_delete(sfd_rx->fd);
