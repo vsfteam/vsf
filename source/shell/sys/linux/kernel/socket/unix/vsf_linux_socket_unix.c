@@ -187,15 +187,6 @@ static int __vsf_linux_socket_unix_fini(vsf_linux_socket_priv_t *socket_priv, in
         vsf_unprotect_sched(orig);
     }
 
-    if (priv->rw.sfd_rx != NULL) {
-        close(priv->rw.sfd_rx->fd);
-        priv->rw.sfd_rx = NULL;
-    }
-    if (priv->rw.sfd_tx != NULL) {
-        close(priv->rw.sfd_tx->fd);
-        priv->rw.sfd_tx = NULL;
-    }
-
     vsf_protect_t orig = vsf_protect_sched();
     if (priv->remote != NULL) {
         vsf_linux_fd_t *sfd_remote = container_of(priv->remote, vsf_linux_fd_t, priv);
@@ -203,6 +194,15 @@ static int __vsf_linux_socket_unix_fini(vsf_linux_socket_priv_t *socket_priv, in
         vsf_linux_fd_rx_trigger(sfd_remote, orig);
     } else {
         vsf_unprotect_sched(orig);
+    }
+
+    if (priv->rw.sfd_rx != NULL) {
+        close(priv->rw.sfd_rx->fd);
+        priv->rw.sfd_rx = NULL;
+    }
+    if (priv->rw.sfd_tx != NULL) {
+        close(priv->rw.sfd_tx->fd);
+        priv->rw.sfd_tx = NULL;
     }
     return 0;
 }
