@@ -55,6 +55,11 @@ int vsf_linux_vfs_init(void)
         return err;
     }
 
+    err = mkdir("/var/lib", 0);
+    if (err != 0) {
+        return err;
+    }
+
     err = mkdir("/run", 0);
     if (err != 0) {
         return err;

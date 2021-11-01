@@ -419,7 +419,10 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
         orig = vsf_protect_sched();
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_fd_get(fds[i].fd);
-            VSF_LINUX_ASSERT(sfd != NULL);
+            // fd maybe closed by other thread while being polled
+            if (NULL == sfd) {
+                continue;
+            }
             if (sfd->rxevt || sfd->txevt) {
                 if ((fds[i].events & POLLIN) && sfd->rxevt) {
                     sfd->rxevt = sfd->rxrdy;
@@ -459,6 +462,10 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
 
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_fd_get(fds[i].fd);
+            // fd maybe closed by other thread while being polled
+            if (NULL == sfd) {
+                continue;
+            }
             orig = vsf_protect_sched();
                 if (fds[i].events & POLLIN) {
                     if (NULL == sfd->rxpend) {

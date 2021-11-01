@@ -42,6 +42,7 @@
 
 char * basename(char *path)
 {
+    VSF_LINUX_ASSERT(path != NULL);
     char *base = strrchr(path, '/');
     return base ? base + 1 : path;
 }
@@ -53,7 +54,14 @@ char * basename(char *path)
 
 char * dirname(char *path)
 {
-    VSF_LINUX_ASSERT(false);
+    VSF_LINUX_ASSERT(path != NULL);
+
+    char *base = basename(path);
+    if (base != path) {
+        VSF_LINUX_ASSERT(base[-1] == '/');
+        base[-1] = '\0';
+        return path;
+    }
     return NULL;
 }
 
