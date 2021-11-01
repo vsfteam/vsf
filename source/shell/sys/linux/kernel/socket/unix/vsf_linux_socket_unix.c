@@ -138,12 +138,7 @@ static ssize_t __vsf_linux_socket_unix_read(vsf_linux_fd_t *sfd, void *buf, size
         return -1;
     }
 
-    ssize_t ret = read(priv->rw.sfd_rx->fd, buf, count);
-    if (ret > 0) {
-        vsf_trace_debug("%s: %p\r\n", __FUNCTION__, sfd);
-        vsf_trace_buffer(VSF_TRACE_DEBUG, buf, count);
-    }
-    return ret;
+    return read(priv->rw.sfd_rx->fd, buf, count);
 }
 
 static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
@@ -155,8 +150,6 @@ static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *bu
         return -1;
     }
 
-    vsf_trace_debug("%s: %p\r\n", __FUNCTION__, sfd);
-    vsf_trace_buffer(VSF_TRACE_DEBUG, (void *)buf, count);
     return write(priv->rw.sfd_tx->fd, buf, count);
 }
 
