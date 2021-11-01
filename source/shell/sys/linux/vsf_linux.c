@@ -495,7 +495,7 @@ void vsf_linux_set_dominant_process(void)
     vsf_linux_fd_t *sfd;
     vsf_stream_t *stream;
 
-    sfd = vsf_linux_get_fd(0);
+    sfd = vsf_linux_fd_get(0);
     if (sfd != NULL) {
         stream = vsf_linux_get_stream(sfd);
         if (stream != NULL) {
@@ -503,7 +503,7 @@ void vsf_linux_set_dominant_process(void)
         }
     }
 
-    sfd = vsf_linux_get_fd(1);
+    sfd = vsf_linux_fd_get(1);
     if (sfd != NULL) {
         stream = vsf_linux_get_stream(sfd);
         if (stream != NULL) {
@@ -511,7 +511,7 @@ void vsf_linux_set_dominant_process(void)
         }
     }
 
-    sfd = vsf_linux_get_fd(2);
+    sfd = vsf_linux_fd_get(2);
     if (sfd != NULL) {
         stream = vsf_linux_get_stream(sfd);
         if (stream != NULL) {
@@ -528,19 +528,19 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     vsf_linux_process_ctx_t *ctx = priv->ctx;
     vsf_linux_fd_t *sfd;
 
-    sfd = vsf_linux_get_fd(0);
+    sfd = vsf_linux_fd_get(0);
     if (NULL == sfd) {
         sfd = vsf_linux_rx_stream(thread->process->stdio_stream.in);
         sfd->flags = O_RDONLY;
     }
 
-    sfd = vsf_linux_get_fd(1);
+    sfd = vsf_linux_fd_get(1);
     if (NULL == sfd) {
         sfd = vsf_linux_tx_stream(thread->process->stdio_stream.out);
         sfd->flags = O_WRONLY;
     }
 
-    sfd = vsf_linux_get_fd(2);
+    sfd = vsf_linux_fd_get(2);
     if (NULL == sfd) {
         sfd = vsf_linux_tx_stream(thread->process->stdio_stream.err);
         sfd->flags = O_WRONLY;
@@ -816,24 +816,24 @@ int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *en
         return -1;
     }
 
-    vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
-    if ((NULL == vfs_file) || !(vfs_file->attr & VSF_FILE_ATTR_EXECUTE)) {
+    uint_fast32_t feature;
+    if ((vsf_linux_fd_get_feature(fd, &feature) < 0) || !(feature & VSF_FILE_ATTR_EXECUTE)) {
+        close(fd);
         return -1;
     }
 
     // TODO: support other executable files?
     if (entry != NULL) {
-        *entry = (vsf_linux_main_entry_t)vfs_file->f.param;
+        vsf_linux_fd_get_target(fd, (void **)entry);
     }
     return fd;
 }
 
-int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry)
+int vsf_linux_fd_bind_executable(int fd, vsf_linux_main_entry_t entry)
 {
-    int err = vsf_linux_fs_bind_target(fd, (void *)entry, NULL, NULL);
+    int err = vsf_linux_fd_bind_target(fd, (void *)entry, NULL, NULL);
     if (!err) {
-        vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
-        vfs_file->attr |= VSF_FILE_ATTR_EXECUTE;
+        return vsf_linux_fd_add_feature(fd, VSF_FILE_ATTR_EXECUTE);
     }
     return err;
 }

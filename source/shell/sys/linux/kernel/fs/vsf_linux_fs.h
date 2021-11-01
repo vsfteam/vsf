@@ -120,15 +120,19 @@ extern const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop;
 /*============================ PROTOTYPES ====================================*/
 
 #if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
-extern int vsf_linux_fs_bind_target(int fd, void *target,
+extern int vsf_linux_fd_bind_target(int fd, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write);
+extern int vsf_linux_fd_get_target(int fd, void **target);
 extern int vsf_linux_fs_get_target(const char *pathname, void **target);
 
-extern int vsf_linux_create_fd(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
-extern vsf_linux_fd_t * vsf_linux_get_fd(int fd);
+extern int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
+extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
+extern void vsf_linux_fd_delete(int fd);
 
-extern void vsf_linux_delete_fd(int fd);
+extern int vsf_linux_fd_get_feature(int fd, uint_fast32_t *feature);
+extern int vsf_linux_fd_set_feature(int fd, uint_fast32_t feature);
+extern int vsf_linux_fd_add_feature(int fd, uint_fast32_t feature);
 
 extern void vsf_linux_fd_trigger_init(vsf_trig_t *trig);
 // vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
@@ -140,8 +144,6 @@ extern int vsf_linux_fd_tx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 extern int vsf_linux_fd_rx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 extern void vsf_linux_fd_tx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 extern void vsf_linux_fd_rx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-
-extern vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd);
 
 // stream
 // IMPORTANT: priority of stream MUST be within scheduler priorities

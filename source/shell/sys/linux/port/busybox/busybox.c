@@ -49,7 +49,7 @@ int busybox_bind(char *path, vsf_linux_main_entry_t entry)
         }
     }
     if (fd >= 0) {
-        vsf_linux_fs_bind_executable(fd, entry);
+        vsf_linux_fd_bind_executable(fd, entry);
         close(fd);
     }
     printf("%s installed.\r\n", path);

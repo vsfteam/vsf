@@ -210,7 +210,7 @@ static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
-vsf_linux_fd_t * vsf_linux_get_fd(int fd)
+vsf_linux_fd_t * vsf_linux_fd_get(int fd)
 {
     vsf_dlist_t *fd_list = &vsf_linux_get_cur_process()->fd_list;
     vsf_protect_t orig = vsf_protect_sched();
@@ -224,7 +224,52 @@ vsf_linux_fd_t * vsf_linux_get_fd(int fd)
     return NULL;
 }
 
-int vsf_linux_create_fd(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
+static vk_vfs_file_t * __vsf_linux_get_vfs(int fd)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    if ((NULL == sfd) || (sfd->op != &__vsf_linux_fs_fdop)) {
+        return NULL;
+    }
+
+    vk_file_t *file = ((vsf_linux_fs_priv_t *)sfd->priv)->file;
+    if ((file->fsop != &vk_vfs_op) || (file->attr & VSF_FILE_ATTR_DIRECTORY)) {
+        return NULL;
+    }
+    return (vk_vfs_file_t *)file;
+}
+
+int vsf_linux_fd_get_feature(int fd, uint_fast32_t *feature)
+{
+    vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
+    if (vfs_file != NULL) {
+        if (feature != NULL) {
+            *feature = vfs_file->attr;
+        }
+        return 0;
+    }
+    return -1;
+}
+
+int vsf_linux_fd_set_feature(int fd, uint_fast32_t feature)
+{
+    vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
+    if (vfs_file != NULL) {
+        vfs_file->attr = feature;
+        return 0;
+    }
+    return -1;
+}
+
+int vsf_linux_fd_add_feature(int fd, uint_fast32_t feature)
+{
+    uint32_t orig_feature;
+    if (vsf_linux_fd_get_feature(fd, &orig_feature) < 0) {
+        return -1;
+    }
+    return vsf_linux_fd_set_feature(fd, orig_feature | feature);
+}
+
+int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     int priv_size = (op != NULL) ? op->priv_size : 0;
@@ -248,9 +293,9 @@ int vsf_linux_create_fd(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
     return new_sfd->fd;
 }
 
-void vsf_linux_delete_fd(int fd)
+void vsf_linux_fd_delete(int fd)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -373,7 +418,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
     while (1) {
         orig = vsf_protect_sched();
         for (i = 0; i < nfds; i++) {
-            sfd = vsf_linux_get_fd(fds[i].fd);
+            sfd = vsf_linux_fd_get(fds[i].fd);
             VSF_LINUX_ASSERT(sfd != NULL);
             if (sfd->rxevt || sfd->txevt) {
                 if ((fds[i].events & POLLIN) && sfd->rxevt) {
@@ -395,7 +440,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
         }
 
         for (i = 0; i < nfds; i++) {
-            sfd = vsf_linux_get_fd(fds[i].fd);
+            sfd = vsf_linux_fd_get(fds[i].fd);
             if (fds[i].events & POLLIN) {
                 sfd->rxpend = &trig;
             }
@@ -413,7 +458,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
         }
 
         for (i = 0; i < nfds; i++) {
-            sfd = vsf_linux_get_fd(fds[i].fd);
+            sfd = vsf_linux_fd_get(fds[i].fd);
             orig = vsf_protect_sched();
                 if (fds[i].events & POLLIN) {
                     if (NULL == sfd->rxpend) {
@@ -648,7 +693,7 @@ int open(const char *pathname, int flags, ...)
         return -1;
     }
 
-    fd = vsf_linux_create_fd(&sfd, &__vsf_linux_fs_fdop);
+    fd = vsf_linux_fd_create(&sfd, &__vsf_linux_fs_fdop);
     if (fd < 0) {
         __vsf_linux_fs_close_do(file);
     } else {
@@ -664,17 +709,17 @@ int open(const char *pathname, int flags, ...)
 
 int close(int fd)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if (!sfd) { return -1; }
 
     int err = sfd->op->fn_close(sfd);
-    vsf_linux_delete_fd(fd);
+    vsf_linux_fd_delete(fd);
     return err;
 }
 
 int fcntl(int fd, int cmd, ...)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     va_list ap;
     long arg;
 
@@ -687,21 +732,21 @@ int fcntl(int fd, int cmd, ...)
 
 ssize_t read(int fd, void *buf, size_t count)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if (!sfd || (sfd->flags & O_WRONLY)) { return -1; }
     return sfd->op->fn_read(sfd, buf, count);
 }
 
 ssize_t write(int fd, const void *buf, size_t count)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if (!sfd || (sfd->flags & O_RDONLY)) { return -1; }
     return sfd->op->fn_write(sfd, buf, count);
 }
 
 off_t lseek(int fd, off_t offset, int whence)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     VSF_LINUX_ASSERT(sfd->op == &__vsf_linux_fs_fdop);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     uint_fast64_t new_pos;
@@ -723,7 +768,7 @@ off_t lseek(int fd, off_t offset, int whence)
 
 int fstat(int fd, struct stat *buf)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
 
     memset(buf, 0, sizeof(*buf));
     if (&__vsf_linux_fs_fdop == sfd->op) {
@@ -757,7 +802,7 @@ int access(const char *pathname, int mode)
     if (fd < 0) { return -1; }
 
     int ret = 0;
-    vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
+    vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
     if (    ((mode & R_OK) && !(vfs_file->attr & VSF_FILE_ATTR_READ))
         ||  ((mode & W_OK) && !(vfs_file->attr & VSF_FILE_ATTR_WRITE))
         ||  ((mode & X_OK) && !(vfs_file->attr & VSF_FILE_ATTR_EXECUTE))) {
@@ -804,7 +849,7 @@ DIR * opendir(const char *name)
         return NULL;
     }
 
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     if (!(priv->file->attr & VSF_FILE_ATTR_DIRECTORY)) {
         close(fd);
@@ -853,7 +898,7 @@ int mount(const char *source, const char *target,
     int fd = open(target, 0);
     if (fd < 0) { return fd; }
 
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *dir = priv->file;
     vsf_err_t err;
@@ -885,7 +930,7 @@ int umount(const char *target)
     int fd = open(target, 0);
     if (fd < 0) { return fd; }
 
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *dir = priv->file;
     vk_fs_unmount(dir);
@@ -896,28 +941,9 @@ int umount(const char *target)
     return 0;
 }
 
-vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd)
+int vsf_linux_fd_get_target(int fd, void **target)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
-    if ((NULL == sfd) || (sfd->op != &__vsf_linux_fs_fdop)) {
-        return NULL;
-    }
-
-    vk_file_t *file = ((vsf_linux_fs_priv_t *)sfd->priv)->file;
-    if ((file->fsop != &vk_vfs_op) || (file->attr & VSF_FILE_ATTR_DIRECTORY)) {
-        return NULL;
-    }
-    return (vk_vfs_file_t *)file;
-}
-
-int vsf_linux_fs_get_target(const char *pathname, void **target)
-{
-    int fd = open(pathname, 0);
-    if (fd < 0) {
-        return -1;
-    }
-
-    vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
+    vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
     if ((NULL == vfs_file) || (vfs_file->attr & VSF_FILE_ATTR_DIRECTORY)) {
         return -1;
     }
@@ -928,11 +954,23 @@ int vsf_linux_fs_get_target(const char *pathname, void **target)
     return 0;
 }
 
-int vsf_linux_fs_bind_target(int fd, void *target,
+int vsf_linux_fs_get_target(const char *pathname, void **target)
+{
+    int fd = open(pathname, 0);
+    if (fd < 0) {
+        return -1;
+    }
+
+    int err = vsf_linux_fd_get_target(fd, target);
+    close(fd);
+    return err;
+}
+
+int vsf_linux_fd_bind_target(int fd, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write)
 {
-    vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
+    vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
     if (NULL == vfs_file) {
         return -1;
     }
@@ -1058,7 +1096,7 @@ static vsf_linux_fd_t * __vsf_linux_stream(vsf_stream_t *stream)
     vsf_linux_fd_t *sfd = NULL;
     vsf_linux_stream_priv_t *stream_priv;
 
-    if (vsf_linux_create_fd(&sfd, &__vsf_linux_stream_fdop) >= 0) {
+    if (vsf_linux_fd_create(&sfd, &__vsf_linux_stream_fdop) >= 0) {
         stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
         stream_priv->stream = stream;
     }
@@ -1223,7 +1261,7 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
 vsf_linux_fd_t * vsf_linux_rx_pipe(void)
 {
     vsf_linux_fd_t *sfd_rx;
-    if (vsf_linux_create_fd(&sfd_rx, &vsf_linux_pipe_rx_fdop) >= 0) {
+    if (vsf_linux_fd_create(&sfd_rx, &vsf_linux_pipe_rx_fdop) >= 0) {
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
         vsf_slist_queue_init(&priv_rx->buffer_queue);
     }
@@ -1233,7 +1271,7 @@ vsf_linux_fd_t * vsf_linux_rx_pipe(void)
 vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_fd_t *sfd_rx)
 {
     vsf_linux_fd_t *sfd_tx;
-    if (vsf_linux_create_fd(&sfd_tx, &vsf_linux_pipe_tx_fdop) >= 0) {
+    if (vsf_linux_fd_create(&sfd_tx, &vsf_linux_pipe_tx_fdop) >= 0) {
         vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
         priv_tx->sfd_rx = sfd_rx;
     }

@@ -387,7 +387,7 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv, 
         return INVALID_SOCKET;
     }
 
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(newsock);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(newsock);
     priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
     priv->conn = newconn;
 
@@ -396,7 +396,7 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv, 
         uint16_t port = 0;
         err = netconn_peer(newconn, &naddr, &port);
         if (ERR_OK != err) {
-            vsf_linux_delete_fd(newsock);
+            vsf_linux_fd_delete(newsock);
             return SOCKET_ERROR;
         }
 
@@ -725,7 +725,7 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
 ssize_t sendto(int sockfd, const void *buffer, size_t size, int flags,
                     const struct sockaddr *dst_addr, socklen_t addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
@@ -737,7 +737,7 @@ ssize_t sendto(int sockfd, const void *buffer, size_t size, int flags,
 ssize_t recvfrom(int sockfd, void *buffer, size_t size, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}

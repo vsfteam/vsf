@@ -27,11 +27,13 @@
 #   include "../../../include/errno.h"
 #   include "../../../include/fcntl.h"
 #   include "../../../include/sys/un.h"
+#   include "../../../include/sys/stat.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
 #   include <fcntl.h>
 #   include <sys/un.h>
+#   include <sys/stat.h>
 #endif
 #include "../vsf_linux_socket.h"
 
@@ -222,7 +224,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     vsf_thread_trig_pend(&trig, -1);
     if (NULL == priv->remote) {
     delete_sfd_rx_and_fail:
-        vsf_linux_delete_fd(sfd_rx->fd);
+        vsf_linux_fd_delete(sfd_rx->fd);
         return -1;
     }
     VSF_LINUX_ASSERT(priv->remote->trig != NULL);
@@ -288,7 +290,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
             vsf_eda_trig_set(priv_remote->trig);
             goto wait_next;
         } else {
-            vsf_linux_fd_t *sfd_new = vsf_linux_get_fd(sockfd_new);
+            vsf_linux_fd_t *sfd_new = vsf_linux_fd_get(sockfd_new);
             vsf_linux_socket_unix_priv_t *priv_new = (vsf_linux_socket_unix_priv_t *)sfd_new->priv;
 
             priv_new->rw.listener = priv;
@@ -305,7 +307,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
             vsf_linux_fd_t *sfd_rx = vsf_linux_rx_pipe();
             if (NULL == sfd_rx) {
             free_sfd_tx_and_close_sockfd_new_and_fail:
-                vsf_linux_delete_fd(sfd_tx->fd);
+                vsf_linux_fd_delete(sfd_tx->fd);
                 goto close_sockfd_new_and_fail;
             }
             vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
@@ -328,7 +330,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
                 priv->remote = NULL;
                 return sockfd_new;
             } else {
-                vsf_linux_delete_fd(sfd_rx->fd);
+                vsf_linux_fd_delete(sfd_rx->fd);
                 goto free_sfd_tx_and_close_sockfd_new_and_fail;
             }
         }
@@ -344,10 +346,12 @@ static int __vsf_linux_socket_unix_bind(vsf_linux_socket_priv_t *socket_priv, co
         return -1;
     }
 
-    if (vsf_linux_fs_bind_target(fd, socket_priv, NULL, NULL) != 0) {
+    if (vsf_linux_fd_bind_target(fd, socket_priv, NULL, NULL) != 0) {
         close(fd);
         return -1;
     }
+
+    vsf_linux_fd_add_feature(fd, S_IFSOCK);
     return 0;
 }
 

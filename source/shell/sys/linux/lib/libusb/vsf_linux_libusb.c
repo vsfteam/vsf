@@ -314,7 +314,7 @@ int libusb_init(libusb_context **context)
     }
 
     vsf_linux_fd_t *sfd;
-    __vsf_libusb.fd = vsf_linux_create_fd(&sfd, &__vsf_linux_libusb_fdop);
+    __vsf_libusb.fd = vsf_linux_fd_create(&sfd, &__vsf_linux_libusb_fdop);
     if (__vsf_libusb.fd < 0) {
         return LIBUSB_ERROR_NO_MEM;
     }
@@ -345,7 +345,7 @@ void libusb_exit(libusb_context *ctx)
 
         int fd = __vsf_libusb.fd;
         __vsf_libusb.fd = 0;
-        vsf_linux_delete_fd(fd);
+        vsf_linux_fd_delete(fd);
     }
 }
 

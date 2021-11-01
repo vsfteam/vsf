@@ -172,7 +172,7 @@ extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 extern int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in);
 extern int vsf_linux_chdir(vsf_linux_process_t *process, char *working_dir);
 
-extern int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry);
+extern int vsf_linux_fd_bind_executable(int fd, vsf_linux_main_entry_t entry);
 
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
 extern void vsf_linux_set_dominant_process(void);

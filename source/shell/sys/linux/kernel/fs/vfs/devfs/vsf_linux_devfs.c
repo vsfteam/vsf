@@ -71,10 +71,9 @@ int vsf_linux_fs_bind_rand(char *path)
     int fd = __vsf_linux_create_open_path(path);
     int err = VSF_ERR_FAIL;
     if (fd >= 0) {
-        int err = vsf_linux_fs_bind_target(fd, NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_rand_read), NULL);
+        int err = vsf_linux_fd_bind_target(fd, NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_rand_read), NULL);
         if (!err) {
-            vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
-            vfs_file->attr = VSF_FILE_ATTR_READ;
+            vsf_linux_fd_set_feature(fd, VSF_FILE_ATTR_READ);
             printf("%s bound.\r\n", path);
         }
         close(fd);

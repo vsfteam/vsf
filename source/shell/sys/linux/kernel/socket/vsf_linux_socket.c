@@ -301,7 +301,7 @@ int socket(int domain, int type, int protocol)
     default: return -1;
     }
 
-    fd = vsf_linux_create_fd(&sfd, &sockop->fdop);
+    fd = vsf_linux_fd_create(&sfd, &sockop->fdop);
     if (fd >= 0) {
         vsf_linux_socket_priv_t *priv = (struct vsf_linux_socket_priv_t *)sfd->priv;
         priv->sockop = sockop;
@@ -311,7 +311,7 @@ int socket(int domain, int type, int protocol)
 
         if (sockop->fn_init != NULL) {
             if (sockop->fn_init(priv) != 0) {
-                vsf_linux_delete_fd(fd);
+                vsf_linux_fd_delete(fd);
                 return -1;
             }
         }
@@ -321,7 +321,7 @@ int socket(int domain, int type, int protocol)
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
@@ -333,7 +333,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
 int listen(int sockfd, int backlog)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
@@ -345,7 +345,7 @@ int listen(int sockfd, int backlog)
 
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
@@ -357,7 +357,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
@@ -369,7 +369,7 @@ int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
 int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
@@ -381,7 +381,7 @@ int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optl
 
 int setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t optlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
@@ -393,7 +393,7 @@ int setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t 
 
 int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
@@ -405,7 +405,7 @@ int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
@@ -417,7 +417,7 @@ int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 int shutdown(int sockfd, int how)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_get_fd(sockfd);
+	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
 		return -1;
 	}
