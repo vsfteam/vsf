@@ -95,16 +95,22 @@ typedef struct vsf_linux_libusb_transfer_t {
     struct libusb_transfer transfer;
 } vsf_linux_libusb_transfer_t;
 
+typedef struct vsf_linux_libusb_pipe_t {
+    vk_usbh_pipe_t pipe;
+    vsf_dlist_t translist;
+    bool is_submitted;
+} vsf_linux_libusb_pipe_t;
+
 typedef struct vsf_linux_libusb_dev_t {
     vsf_dlist_node_t devnode;
     vk_usbh_libusb_dev_t *libusb_dev;
     bool is_in_newlist;
     union {
         struct {
-            vk_usbh_pipe_t pipe_in[16];
-            vk_usbh_pipe_t pipe_out[16];
+            vsf_linux_libusb_pipe_t pipe_in[16];
+            vsf_linux_libusb_pipe_t pipe_out[16];
         };
-        vk_usbh_pipe_t pipe[32];
+        vsf_linux_libusb_pipe_t pipe[32];
     };
 } vsf_linux_libusb_dev_t;
 
@@ -152,10 +158,11 @@ static void __vsf_linux_libusb_on_event(void *param, vk_usbh_libusb_dev_t *dev, 
         vk_usbh_libusb_open(dev);
         ldev = malloc(sizeof(vsf_linux_libusb_dev_t));
         if (ldev != NULL) {
+            memset(ldev, 0, sizeof(*ldev));
             ldev->libusb_dev = dev;
             ldev->is_in_newlist = true;
-            ldev->pipe_in[0] = vk_usbh_get_pipe(dev->dev, 0x80, USB_ENDPOINT_XFER_CONTROL, dev->ep0size);
-            ldev->pipe_out[0] = vk_usbh_get_pipe(dev->dev, 0x00, USB_ENDPOINT_XFER_CONTROL, dev->ep0size);
+            ldev->pipe_in[0].pipe = vk_usbh_get_pipe(dev->dev, 0x80, USB_ENDPOINT_XFER_CONTROL, dev->ep0size);
+            ldev->pipe_out[0].pipe = vk_usbh_get_pipe(dev->dev, 0x00, USB_ENDPOINT_XFER_CONTROL, dev->ep0size);
             dev->user_data = ldev;
             orig = vsf_protect_sched();
                 vsf_dlist_add_to_tail(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist_new, ldev);
@@ -515,7 +522,7 @@ uint8_t libusb_get_device_address(libusb_device *dev)
     return ldev->libusb_dev->address;
 }
 
-static vk_usbh_pipe_t * __vsf_libusb_get_pipe(vsf_linux_libusb_dev_t *ldev, unsigned char endpoint)
+static vsf_linux_libusb_pipe_t * __vsf_libusb_get_pipe(vsf_linux_libusb_dev_t *ldev, unsigned char endpoint)
 {
     unsigned char epaddr = endpoint & 0x7F;
     return ((endpoint & USB_DIR_MASK) == USB_DIR_IN) ? &ldev->pipe_in[epaddr] : &ldev->pipe_out[epaddr];
@@ -524,8 +531,8 @@ static vk_usbh_pipe_t * __vsf_libusb_get_pipe(vsf_linux_libusb_dev_t *ldev, unsi
 int libusb_get_max_packet_size(libusb_device *dev, unsigned char endpoint)
 {
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev;
-    vk_usbh_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, endpoint);
-    return pipe->size;
+    vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, endpoint);
+    return pipe->pipe.size;
 }
 
 int libusb_get_device_speed(libusb_device *dev)
@@ -576,9 +583,9 @@ int libusb_control_transfer(libusb_device_handle *dev_handle,
     int err;
 
     if ((bRequestType & USB_DIR_MASK) == USB_DIR_IN) {
-        vk_usbh_urb_set_pipe(urb, ldev->pipe_in[0]);
+        vk_usbh_urb_set_pipe(urb, ldev->pipe_in[0].pipe);
     } else {
-        vk_usbh_urb_set_pipe(urb, ldev->pipe_out[0]);
+        vk_usbh_urb_set_pipe(urb, ldev->pipe_out[0].pipe);
     }
     urb->urb_hcd->setup_packet.bRequestType = bRequestType;
     urb->urb_hcd->setup_packet.bRequest = bRequest;
@@ -598,17 +605,17 @@ int libusb_bulk_transfer(libusb_device_handle *dev_handle,
     int *actual_length, unsigned int timeout)
 {
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev_handle;
-    vk_usbh_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, endpoint);
+    vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, endpoint);
     vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
     int ret;
 
-    vk_usbh_urb_set_pipe(urb, *pipe);
+    vk_usbh_urb_set_pipe(urb, pipe->pipe);
     urb->urb_hcd->buffer = data;
     urb->urb_hcd->transfer_length = length;
     urb->urb_hcd->timeout = timeout;
 
     ret = __vsf_libusb_submit_urb(ldev);
-    *pipe = urb->urb_hcd->pipe;
+    pipe->pipe = urb->urb_hcd->pipe;
     if (!ret && (actual_length != NULL)) {
         *actual_length = vk_usbh_urb_get_actual_length(urb);
     }
@@ -620,17 +627,17 @@ int libusb_interrupt_transfer(libusb_device_handle *dev_handle,
     int *actual_length, unsigned int timeout)
 {
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev_handle;
-    vk_usbh_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, endpoint);
+    vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, endpoint);
     vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
     int ret;
 
-    vk_usbh_urb_set_pipe(urb, *pipe);
+    vk_usbh_urb_set_pipe(urb, pipe->pipe);
     urb->urb_hcd->buffer = data;
     urb->urb_hcd->transfer_length = length;
     urb->urb_hcd->timeout = timeout;
 
     ret = __vsf_libusb_submit_urb(ldev);
-    *pipe = urb->urb_hcd->pipe;
+    pipe->pipe = urb->urb_hcd->pipe;
     if (!ret && (actual_length != NULL))
         *actual_length = vk_usbh_urb_get_actual_length(urb);
     return ret;
@@ -836,10 +843,10 @@ static int __raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf
             if (endpoint_desc) {
                 endpoint_desc->use_as__usb_endpoint_desc_t = *(struct usb_endpoint_desc_t *)desc_header;
                 if ((endpoint_desc->bEndpointAddress & USB_DIR_MASK) == USB_DIR_IN) {
-                    ldev->pipe_in[endpoint_desc->bEndpointAddress & 0x0F] =
+                    ldev->pipe_in[endpoint_desc->bEndpointAddress & 0x0F].pipe =
                         vk_usbh_get_pipe_from_ep_desc(ldev->libusb_dev->dev, (struct usb_endpoint_desc_t *)&endpoint_desc->use_as__usb_endpoint_desc_t);
                 } else {
-                    ldev->pipe_out[endpoint_desc->bEndpointAddress & 0x0F] =
+                    ldev->pipe_out[endpoint_desc->bEndpointAddress & 0x0F].pipe =
                         vk_usbh_get_pipe_from_ep_desc(ldev->libusb_dev->dev, (struct usb_endpoint_desc_t *)&endpoint_desc->use_as__usb_endpoint_desc_t);
                 }
                 endpoint_desc++;
@@ -957,17 +964,52 @@ struct libusb_transfer * libusb_alloc_transfer(int iso_packets)
     return NULL;
 }
 
+static void __vsf_linux_libusb_submit_transfer_next(vsf_linux_libusb_pipe_t *pipe)
+{
+    vsf_linux_libusb_transfer_t *ltransfer;
+
+    vsf_protect_t orig = vsf_protect_sched();
+    vsf_dlist_remove_head(vsf_linux_libusb_transfer_t, transnode, &pipe->translist, ltransfer);
+    if (NULL == ltransfer) {
+        pipe->is_submitted = false;
+    }
+    vsf_unprotect_sched(orig);
+
+    if (ltransfer != NULL) {
+        vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)ltransfer->transfer.dev_handle;
+        vk_usbh_urb_t *urb = &ltransfer->urb;
+        struct libusb_transfer *transfer = &ltransfer->transfer;
+
+        vk_usbh_urb_set_pipe(urb, pipe->pipe);
+        switch (transfer->type) {
+        case LIBUSB_TRANSFER_TYPE_CONTROL: {
+                struct usb_ctrlrequest_t *request = (struct usb_ctrlrequest_t *)transfer->buffer;
+                urb->urb_hcd->pipe.dir_in1out0 = (request->bRequestType & USB_DIR_IN) > 0;
+            }
+            break;
+        }
+
+        if (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda)) {
+            transfer->actual_length = 0;
+            transfer->status = LIBUSB_TRANSFER_ERROR;
+            vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
+
+            vsf_eda_fini(&ltransfer->eda);
+        }
+    }
+}
+
 static void __vsf_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vsf_linux_libusb_transfer_t *ltransfer = container_of(eda, vsf_linux_libusb_transfer_t, eda);
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)ltransfer->transfer.dev_handle;
-    vk_usbh_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
+    vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
     vk_usbh_urb_t *urb = &ltransfer->urb;
 //    vsf_protect_t orig;
 
     switch (evt) {
     case VSF_EVT_MESSAGE:
-        *pipe = urb->urb_hcd->pipe;
+        pipe->pipe = urb->urb_hcd->pipe;
         ltransfer->transfer.actual_length = vk_usbh_urb_get_actual_length(urb);
         ltransfer->transfer.status = vk_usbh_urb_get_status(urb) == URB_OK ?
                 LIBUSB_TRANSFER_COMPLETED : LIBUSB_TRANSFER_ERROR;
@@ -979,6 +1021,8 @@ static void __vsf_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
 //        vsf_unprotect_sched(orig);
         vsf_eda_trig_set(&__vsf_libusb.trans_trig);
+
+        __vsf_linux_libusb_submit_transfer_next(pipe);
         break;
     }
 }
@@ -987,9 +1031,7 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
 {
     vsf_linux_libusb_transfer_t *ltransfer = container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
-    vk_usbh_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
     vk_usbh_urb_t *urb = &ltransfer->urb;
-    int err = LIBUSB_SUCCESS;
 
     if (!vk_usbh_urb_is_alloced(urb)) {
         if (VSF_ERR_NONE != vk_usbh_alloc_urb(ldev->libusb_dev->usbh, ldev->libusb_dev->dev, urb)) {
@@ -999,7 +1041,6 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
     urb->urb_hcd->buffer = transfer->buffer;
     urb->urb_hcd->transfer_length = transfer->length;
     urb->urb_hcd->timeout = transfer->timeout;
-    vk_usbh_urb_set_pipe(urb, *pipe);
 
     switch (transfer->type) {
     case LIBUSB_TRANSFER_TYPE_CONTROL: {
@@ -1007,7 +1048,6 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
             urb->urb_hcd->setup_packet = *request;
             urb->urb_hcd->buffer = (uint8_t *)urb->urb_hcd->buffer + sizeof(struct usb_ctrlrequest_t);
             urb->urb_hcd->transfer_length -= sizeof(struct usb_ctrlrequest_t);
-            urb->urb_hcd->pipe.dir_in1out0 = (request->bRequestType & USB_DIR_IN) > 0;
         }
         break;
     case LIBUSB_TRANSFER_TYPE_ISOCHRONOUS:
@@ -1025,11 +1065,17 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
     ltransfer->eda.fn.evthandler = __vsf_libusb_transfer_evthandler;
     vsf_eda_init(&ltransfer->eda);
 
-    if (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda)) {
-        err = LIBUSB_ERROR_IO;
-        vsf_eda_fini(&ltransfer->eda);
+    vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
+    vsf_protect_t orig = vsf_protect_sched();
+    bool is_submitted = pipe->is_submitted;
+    pipe->is_submitted = true;
+    vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &pipe->translist, ltransfer);
+    vsf_unprotect_sched(orig);
+
+    if (!is_submitted) {
+        __vsf_linux_libusb_submit_transfer_next(pipe);
     }
-    return err;
+    return LIBUSB_SUCCESS;
 }
 
 int libusb_cancel_transfer(struct libusb_transfer *transfer)
