@@ -1197,7 +1197,17 @@ static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t c
 
         VSF_LINUX_ASSERT(NULL == sfd_rx->rxpend);
         if (vsf_slist_queue_is_empty(&priv_rx->buffer_queue)) {
-            vsf_linux_fd_rx_busy(sfd_rx, orig);
+            if (priv_rx->on_evt != NULL) {
+                priv_rx->on_evt(sfd_rx, orig, false);
+            } else {
+                vsf_linux_fd_rx_busy(sfd_rx, orig);
+            }
+        } else {
+            if (priv_rx->on_evt != NULL) {
+                priv_rx->on_evt(sfd_rx, orig, true);
+            } else {
+                vsf_linux_fd_rx_ready(sfd_rx, orig);
+            }
         }
         break;
     }
@@ -1229,8 +1239,8 @@ static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd_tx, const void *buf, s
     bool is_empty = vsf_slist_queue_is_empty(&priv_rx->buffer_queue);
     vsf_slist_queue_enqueue(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
     if (is_empty) {
-        if (priv_rx->on_ready != NULL) {
-            priv_rx->on_ready(sfd_rx, orig);
+        if (priv_rx->on_evt != NULL) {
+            priv_rx->on_evt(sfd_rx, orig, true);
         } else {
             vsf_linux_fd_rx_ready(sfd_rx, orig);
         }
