@@ -776,7 +776,7 @@ int fstat(int fd, struct stat *buf)
         vk_file_t *file = priv->file;
 
         buf->st_mode = file->attr;
-        if (!(file->attr & S_IFDIR)) {
+        if (!(file->attr & S_IFMT)) {
             buf->st_mode |= S_IFREG;
         }
         buf->st_size = file->size;

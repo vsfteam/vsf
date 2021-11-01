@@ -92,6 +92,12 @@ typedef enum vk_file_attr_t {
     VSF_FILE_ATTR_DYN           = 1 << 7,
     VSF_FILE_ATTR_EXT           = 1 << 8,
     VSF_FILE_ATTR_USER          = 1 << 9,
+
+    // TODO: for linux, file attr need to be 32-bit for vfs special files
+#if VSF_USE_LINUX == ENABLED
+    // make file attr 32-bit
+    __VSF_FILE_ATTR_ALL_SET     = 0xFFFFFFFF,
+#endif
 } vk_file_attr_t;
 
 vsf_class(vk_fs_fop_t) {
