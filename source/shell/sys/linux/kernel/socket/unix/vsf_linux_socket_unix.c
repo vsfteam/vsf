@@ -196,10 +196,13 @@ static int __vsf_linux_socket_unix_fini(vsf_linux_socket_priv_t *socket_priv, in
         priv->rw.sfd_tx = NULL;
     }
 
+    vsf_protect_t orig = vsf_protect_sched();
     if (priv->remote != NULL) {
         vsf_linux_fd_t *sfd_remote = container_of(priv->remote, vsf_linux_fd_t, priv);
         priv->remote->remote = NULL;
-        vsf_linux_fd_rx_trigger(sfd_remote, vsf_protect_sched());
+        vsf_linux_fd_rx_trigger(sfd_remote, orig);
+    } else {
+        vsf_unprotect_sched(orig);
     }
     return 0;
 }
