@@ -366,8 +366,7 @@ const char * libusb_error_name(int errcode)
 
 int libusb_get_next_timeout(libusb_context *ctx, struct timeval *tv)
 {
-    VSF_LINUX_ASSERT(false);
-    return 0;
+    return LIBUSB_ERROR_NOT_SUPPORTED;
 }
 
 #if __IS_COMPILER_IAR__
@@ -458,7 +457,7 @@ ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device *** list)
         *list = devlist;
         return devnum;
     }
-    return LIBUSB_ERROR_NO_DEVICE;
+    return 0;
 }
 
 void libusb_free_device_list(libusb_device **list, int unref_devices)
@@ -1118,7 +1117,7 @@ int usb_detach_kernel_driver_np(usb_dev_handle *dev, int interface)
 
 int usb_find_devices(void)
 {
-    return __vsf_libusb.devnum > 0 ? __vsf_libusb.devnum : LIBUSB_ERROR_NO_DEVICE;
+    return __vsf_libusb.devnum;
 }
 
 struct usb_bus *usb_get_busses(void)
