@@ -100,7 +100,7 @@ FILE * fopen(const char *filename, const char *mode)
     if (fd < 0) {
         return NULL;
     }
-    return (FILE *)vsf_linux_get_fd(fd);
+    return (FILE *)vsf_linux_fd_get(fd);
 }
 
 FILE * freopen(const char *filename, const char *mode, FILE *f)
