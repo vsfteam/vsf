@@ -47,6 +47,7 @@ extern "C" {
 #   define link             VSF_LINUX_WRAPPER(link)
 #   define remove           VSF_LINUX_WRAPPER(remove)
 #   define mkdir            VSF_LINUX_WRAPPER(mkdir)
+#   define rmdir            VSF_LINUX_WRAPPER(rmdir)
 #   define close            VSF_LINUX_WRAPPER(close)
 #   define lseek            VSF_LINUX_WRAPPER(lseek)
 #   define read             VSF_LINUX_WRAPPER(read)
@@ -107,6 +108,7 @@ int unlink(const char *pathname);
 int link(const char *oldpath, const char *newpath);
 int remove(const char *pathname);
 int mkdir(const char *pathname, mode_t mode);
+int rmdir(const char *pathname);
 
 int chdir(const char *pathname);
 char * getcwd(char *buffer, size_t maxlen);

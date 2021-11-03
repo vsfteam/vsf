@@ -620,12 +620,18 @@ int mkdir(const char* pathname, mode_t mode)
         return -1;
     }
 
-    int fd = __vsf_linux_fs_create(fullpath, mode, VSF_FILE_ATTR_DIRECTORY, 0);
+    int fd = __vsf_linux_fs_create(fullpath, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
     if (fd >= 0) {
         close(fd);
         fd = 0;
     }
     return fd;
+}
+
+int rmdir(const char* pathname)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
@@ -671,7 +677,7 @@ int creat(const char *pathname, mode_t mode)
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
     }
-    return __vsf_linux_fs_create(fullpath, mode, 0, 0);
+    return __vsf_linux_fs_create(fullpath, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
 
 int open(const char *pathname, int flags, ...)
@@ -835,6 +841,10 @@ int unlink(const char *pathname)
     vk_file_t *file = __vsf_linux_fs_get_file(fullpath), *dir;
     if (!file) {
         errno = ENOENT;
+        return -1;
+    }
+    if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
+        // how to set errno while trying to unlink a directory
         return -1;
     }
 

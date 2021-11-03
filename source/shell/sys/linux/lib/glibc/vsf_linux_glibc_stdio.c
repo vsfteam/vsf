@@ -185,7 +185,7 @@ int fgetpos(FILE *f, fpos_t *pos)
 
 int fsetpos(FILE *f, const fpos_t *pos)
 {
-    return fseek(f, *pos, SEEK_SET); 
+    return fseek(f, *pos, SEEK_SET);
 }
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
@@ -421,14 +421,17 @@ int rename(const char *old_filename, const char *new_filename)
 
 int remove(const char * pathname)
 {
-    char fullpath[MAX_PATH];
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+    int fd = open(pathname, 0);
+    if (fd < 0) {
         return -1;
     }
+    close(fd);
 
-    // TODO: remove file by unlink, remove directory by rmdir
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    if (    (unlink(pathname) != 0)
+        &&  (rmdir(pathname) != 0)) {
+        return -1;
+    }
+    return 0;
 }
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO

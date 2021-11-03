@@ -56,8 +56,17 @@ void __exit(int status)
 SECTION(".vsf.utilities.stdio.iar.remove")
 int remove(const char * pathname)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    int fd = open(pathname, 0);
+    if (fd < 0) {
+        return -1;
+    }
+    close(fd);
+
+    if (    (unlink(pathname) != 0)
+        &&  (rmdir(pathname) != 0)) {
+        return -1;
+    }
+    return 0;
 }
 
 SECTION(".vsf.utilities.stdio.iar.rename")
