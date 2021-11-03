@@ -19,9 +19,7 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if     VSF_USE_LINUX == ENABLED                                                \
-    &&  (   VSF_LINUX_USE_DEVFS == ENABLED                                      \
-        )
+#if VSF_USE_LINUX == ENABLED
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../include/unistd.h"
