@@ -64,6 +64,7 @@ dcl_vsf_peda_methods(static, __vk_vfs_unmount)
 dcl_vsf_peda_methods(static, __vk_vfs_lookup)
 dcl_vsf_peda_methods(static, __vk_vfs_create)
 dcl_vsf_peda_methods(static, __vk_vfs_unlink)
+dcl_vsf_peda_methods(static, __vk_vfs_close)
 dcl_vsf_peda_methods(static, __vk_vfs_read)
 dcl_vsf_peda_methods(static, __vk_vfs_write)
 
@@ -86,7 +87,7 @@ vk_fs_op_t vk_vfs_op = {
     .fn_sync        = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
 #endif
     .fop            = {
-        .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+        .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_close),
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_write),
         .fn_resize  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
@@ -781,6 +782,22 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
     vsf_peda_end();
 }
 
+__vsf_component_peda_ifs_entry(__vk_vfs_close, vk_file_close)
+{
+    vsf_peda_begin();
+    vk_vfs_file_t *file = (vk_vfs_file_t *)&vsf_this;
+
+    if (    (NULL == file->f.callback.fn_read)
+        &&  (NULL== file->f.callback.fn_write)
+        &&  (NULL != file->f.param)) {
+        vsf_heap_free(file->f.param);
+        file->f.param = NULL;
+    }
+
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
+}
+
 __vsf_component_peda_ifs_entry(__vk_vfs_read, vk_file_read)
 {
     vsf_peda_begin();
@@ -798,6 +815,18 @@ __vsf_component_peda_ifs_entry(__vk_vfs_read, vk_file_read)
             if (VSF_ERR_NONE != err) {
                 vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
             }
+        } else if (NULL == file->f.callback.fn_write) {
+            uint_fast64_t offset = vsf_local.offset;
+            uint_fast32_t size = vsf_local.size;
+            uint8_t *buff = vsf_local.buff;
+            int_fast32_t rsize = 0;
+
+            if (offset < file->size) {
+                rsize = min(size, file->size - offset);
+                VSF_FS_ASSERT(file->f.param != NULL);
+                memcpy(buff, &((uint8_t *)file->f.param)[offset], rsize);
+            }
+            vsf_eda_return(rsize);
         } else {
             vsf_eda_return(VSF_ERR_NOT_ACCESSABLE);
         }
@@ -826,6 +855,27 @@ __vsf_component_peda_ifs_entry(__vk_vfs_write, vk_file_write)
             if (VSF_ERR_NONE != err) {
                 vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
             }
+        } else if (NULL == file->f.callback.fn_read) {
+            uint_fast64_t offset = vsf_local.offset;
+            uint_fast32_t size = vsf_local.size;
+            uint8_t *buff = vsf_local.buff;
+            int_fast32_t wsize = 0;
+
+            if ((offset + size) > file->size) {
+                file->size = offset + size;
+                file->f.param = vsf_heap_realloc(file->f.param, file->size);
+                if (NULL == file->f.param) {
+                    file->size = 0;
+                    vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
+                    return;
+                }
+            }
+
+            if (offset < file->size) {
+                wsize = min(size, file->size - offset);
+                memcpy(&((uint8_t *)file->f.param)[offset], buff, wsize);
+            }
+            vsf_eda_return(wsize);
         } else {
             vsf_eda_return(VSF_ERR_NOT_ACCESSABLE);
         }
