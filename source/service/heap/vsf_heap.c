@@ -409,6 +409,7 @@ void * __vsf_heap_malloc_aligned(vsf_heap_t *heap, uint_fast32_t size, uint_fast
         }
         freelist++;
     }
+    vsf_trace_error("fail to allocate %d bytes with %d alignment" VSF_TRACE_CFG_LINEEND, size, alignment);
     return NULL;
 }
 
@@ -525,6 +526,17 @@ void * vsf_heap_malloc(uint_fast32_t size)
 
 void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t alignment)
 {
+    if (NULL == buffer) {
+        if (size > 0) {
+            return vsf_heap_malloc_aligned(size, alignment);
+        }
+        return NULL;
+    } else if (0 == size) {
+        if (buffer != NULL) {
+            vsf_heap_free(buffer);
+        }
+        return NULL;
+    }
     return __vsf_heap_realloc_aligned(&__vsf_heap.use_as__vsf_heap_t, buffer, size, alignment);
 }
 
