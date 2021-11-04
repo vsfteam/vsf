@@ -475,6 +475,9 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
 
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_fd_get(fds[i].fd);
+            if (NULL == sfd) {
+                continue;
+            }
             if (fds[i].events & POLLIN) {
                 sfd->rxpend = &trig;
             }
