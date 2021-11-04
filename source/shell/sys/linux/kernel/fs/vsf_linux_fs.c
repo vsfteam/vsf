@@ -269,28 +269,48 @@ int vsf_linux_fd_add_feature(int fd, uint_fast32_t feature)
     return vsf_linux_fd_set_feature(fd, orig_feature | feature);
 }
 
-int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
+int vsf_linux_fd_add(vsf_linux_fd_t *sfd)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
+
+    sfd->rxpend = sfd->txpend = NULL;
+
+    vsf_protect_t orig = vsf_protect_sched();
+        sfd->fd = process->cur_fd++;
+        vsf_dlist_add_to_tail(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
+    vsf_unprotect_sched(orig);
+
+    return sfd->fd;
+}
+
+int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
+{
     int priv_size = (op != NULL) ? op->priv_size : 0;
-    vsf_linux_fd_t *new_sfd = calloc(1, sizeof(vsf_linux_fd_t) + priv_size);
+    vsf_linux_fd_t *new_sfd;
+#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (process->cur_fd <= 2) {
+        new_sfd = vsf_heap_malloc(sizeof(vsf_linux_fd_t) + priv_size);
+        if (new_sfd != NULL) {
+            memset(new_sfd, 0, sizeof(vsf_linux_fd_t) + priv_size);
+        }
+    } else {
+        new_sfd = calloc(1, sizeof(vsf_linux_fd_t) + priv_size);
+    }
+#else
+    new_sfd = calloc(1, sizeof(vsf_linux_fd_t) + priv_size);
+#endif
     if (!new_sfd) {
         errno = ENOMEM;
         return -1;
     }
-
     new_sfd->op = op;
-    new_sfd->rxpend = new_sfd->txpend = NULL;
-    new_sfd->fd = process->cur_fd++;
-
-    vsf_protect_t orig = vsf_protect_sched();
-        vsf_dlist_add_to_tail(vsf_linux_fd_t, fd_node, &process->fd_list, new_sfd);
-    vsf_unprotect_sched(orig);
 
     if (sfd != NULL) {
         *sfd = new_sfd;
     }
-    return new_sfd->fd;
+    return vsf_linux_fd_add(new_sfd);
 }
 
 void vsf_linux_fd_delete(int fd)
@@ -301,7 +321,18 @@ void vsf_linux_fd_delete(int fd)
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_remove(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
     vsf_unprotect_sched(orig);
+
+#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+    extern const vsf_linux_fd_op_t __vsf_linux_heap_fdop;
+    if (sfd->op == &__vsf_linux_heap_fdop) {
+        vsf_heap_free(sfd);
+    } else {
+        free(sfd);
+    }
+#else
     free(sfd);
+#endif
 }
 
 void vsf_linux_fd_trigger_init(vsf_trig_t *trig)

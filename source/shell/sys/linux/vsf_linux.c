@@ -379,14 +379,15 @@ int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority)
 
 static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
 {
-    vsf_linux_process_t *process = calloc(1, sizeof(vsf_linux_process_t));
+    vsf_linux_process_t *process = vsf_heap_malloc(sizeof(vsf_linux_process_t));
     if (process != NULL) {
+        memset(process, 0, sizeof(*process));
         process->prio = vsf_prio_inherit;
         process->shell_process = process;
 
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {
-            free(process);
+            vsf_heap_free(process);
             return NULL;
         }
 
@@ -411,7 +412,12 @@ vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdi
 
     vsf_linux_process_t *process = __vsf_linux_create_process(stack_size);
     if (process != NULL) {
-        process->working_dir = strdup(working_dir);
+        process->working_dir = vsf_heap_malloc(strlen(working_dir) + 1);
+        if (NULL == process->working_dir) {
+            vsf_trace_warning("linux: fail to allocate working_dir, maybe error if working_dir is used", VSF_TRACE_CFG_LINEEND);
+        } else {
+            strcpy(process->working_dir, working_dir);
+        }
         process->stdio_stream = *stdio_stream;
         VSF_LINUX_ASSERT(process->working_dir != NULL);
     }
@@ -442,7 +448,12 @@ static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
     if (process != NULL) {
         process->prio = prio;
         process->ctx.entry = entry;
-        process->working_dir = strdup("/");
+        process->working_dir = vsf_heap_malloc(2);
+        if (NULL == process->working_dir) {
+            vsf_trace_warning("linux: fail to allocate working_dir, maybe error if working_dir is used", VSF_TRACE_CFG_LINEEND);
+        } else {
+            strcpy(process->working_dir, "/");
+        }
         process->stdio_stream = __vsf_linux.stdio_stream;
         VSF_LINUX_ASSERT(process->working_dir != NULL);
         vsf_linux_start_process(process);
@@ -553,6 +564,14 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     do {
         vsf_dlist_peek_head(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
         if (sfd != NULL) {
+#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+            extern const vsf_linux_fd_op_t __vsf_linux_heap_fdop;
+            if (sfd->op == &__vsf_linux_heap_fdop) {
+                vsf_trace_warning("memory leak %p detected in process %p" VSF_TRACE_CFG_LINEEND,
+                        &sfd[1], process);
+            }
+#endif
             close(sfd->fd);
         }
     } while (sfd != NULL);
@@ -583,9 +602,9 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
             vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
         }
         if (process->working_dir != NULL) {
-            free(process->working_dir);
+            vsf_heap_free(process->working_dir);
         }
-        free(process);
+        vsf_heap_free(process);
     }
 }
 

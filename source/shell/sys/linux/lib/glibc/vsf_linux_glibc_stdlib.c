@@ -21,6 +21,10 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#   define __VSF_LINUX_FS_CLASS_INHERIT__
+#endif
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/simple_libc/stdlib.h"
@@ -40,29 +44,90 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+static int __vsf_linux_heap_close(vsf_linux_fd_t *sfd);
+#endif
+
+/*============================ LOCAL VARIABLES ===============================*/
+
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+const vsf_linux_fd_op_t __vsf_linux_heap_fdop = {
+    .fn_close           = __vsf_linux_heap_close,
+};
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+static int __vsf_linux_heap_close(vsf_linux_fd_t *sfd)
+{
+    return 0;
+}
+#endif
 
 void * malloc(size_t size)
 {
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+    size += sizeof(vsf_linux_fd_t);
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)vsf_heap_malloc(size);
+    if (sfd != NULL) {
+        memset(sfd, 0, sizeof(*sfd));
+        sfd->op = &__vsf_linux_heap_fdop;
+        vsf_linux_fd_add(sfd);
+        return (void *)&sfd[1];
+    }
+    return NULL;
+#else
     return vsf_heap_malloc(size);
+#endif
 }
 
 void * aligned_alloc(size_t alignment, size_t size)
 {
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+    VSF_LINUX_ASSERT(false);
+#else
     return vsf_heap_malloc_aligned(size, alignment);
+#endif
 }
 
 void * realloc(void *p, size_t size)
 {
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+    if (NULL == p) {
+        if (size > 0) {
+            return malloc(size);
+        }
+        return NULL;
+    } else if (0 == size) {
+        if (p != NULL) {
+            free(p);
+        }
+        return NULL;
+    } else {
+        void *new_buff = malloc(size);
+        if (new_buff != NULL) {
+            memcpy(new_buff, p, size);
+        }
+        free(p);
+        return new_buff;
+    }
+#else
     return vsf_heap_realloc(p, size);
+#endif
 }
 
 void free(void *p)
 {
     if (p != NULL) {
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+        vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)p - 1;
+        close(sfd->fd);
+#else
         vsf_heap_free(p);
+#endif
     }
 }
 
