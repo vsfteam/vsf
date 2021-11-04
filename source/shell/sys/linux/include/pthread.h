@@ -80,7 +80,10 @@ extern "C" {
 #endif
 
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
-#define PTHREAD_MUTEX_INITIALIZER       { .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 }
+#define PTHREAD_MUTEX_INITIALIZER       {                                       \
+                                            .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 | VSF_SYNC_AUTO_RST,\
+                                            .use_as__vsf_mutex_t.use_as__vsf_sync_t.cur_union.bits.cur = 1 | VSF_SYNC_HAS_OWNER,\
+                                        }
 #define PTHREAD_COND_INITIALIZER        { .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 | VSF_SYNC_AUTO_RST }
 
 
@@ -156,6 +159,11 @@ typedef struct pthread_once_t {
     pthread_mutex_t                     mutex;
     bool                                is_inited;
 } pthread_once_t;
+#define PTHREAD_ONCE_INIT               {                                       \
+                                            .mutex.max_union.max_value = 1 | VSF_SYNC_AUTO_RST,\
+                                            .mutex.cur_union.cur_value = 1 | VSF_SYNC_HAS_OWNER,\
+                                            .is_inited = false,                 \
+                                        }
 typedef struct {
     int                                 detachstate;
     int                                 schedpolicy;
