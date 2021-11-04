@@ -60,6 +60,12 @@ VSF_HEAP_CFG_PROTECT_LEVEL MUST be set to interrupt, and interrupt latency will 
 #   endif
 #endif
 
+/*============================ INCLUDES ======================================*/
+
+#if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
+#   include "../heap/vsf_heap.h"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 //! \name protected class __vsf_pool_node_t
@@ -115,9 +121,6 @@ static struct {
 #endif
 
 /*============================ PROTOTYPES ====================================*/
-
-extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t align);
-
 /*============================ IMPLEMENTATION ================================*/
 
 
@@ -219,32 +222,6 @@ bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *obj_ptr)
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_warning=pe111
-#endif
-
-
-#ifndef WEAK_VSF_HEAP_MALLOC_ALIGNED
-WEAK(vsf_heap_malloc_aligned)
-void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t align)
-{
-    UNUSED_PARAM(size);
-    UNUSED_PARAM(align);
-
-    /*! \note if vsf_heap is enabled in your project, this function will be
-     *        replaced by the function with the same name in vsf_heap. Otherwise
-     *        the posix_memalign will be used by default. You can also implement
-     *        this function by yourself
-     */
-    void *memory_ptr = NULL;
-#if     defined(_POSIX_VERSION)                                                 \
-    ||  (__IS_COMPILER_ARM_COMPILER_6 && !defined(__STRICT_ANSI__))
-extern int posix_memalign(  void ** /*ret*/,
-                            size_t /*alignment*/,
-                            size_t /*size*/);
-
-    posix_memalign(&memory_ptr, size, align);
-#endif
-    return memory_ptr;
-}
 #endif
 
 /*! \brief try to fetch a memory block from the target pool
