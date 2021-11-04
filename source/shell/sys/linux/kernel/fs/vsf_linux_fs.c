@@ -1027,7 +1027,7 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 
     while (size > 0) {
         orig = vsf_protect_sched();
-        if (!sfd->rxrdy) {
+        if (!sfd->rxrdy && (0 == vsf_stream_get_rbuf(stream, NULL))) {
             vsf_trig_t trig;
             vsf_linux_fd_trigger_init(&trig);
             vsf_linux_fd_rx_pend(sfd, &trig, orig);
