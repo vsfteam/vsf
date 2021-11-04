@@ -106,11 +106,11 @@ const i_heap_t VSF_HEAP = {
     .Init           = &vsf_heap_init,
     .AddBuffer      = &vsf_heap_add_buffer,
     .AddMemory      = &vsf_heap_add_memory,
-    .MallocAligned  = &vsf_heap_malloc_aligned,
-    .Malloc         = &vsf_heap_malloc,
-    .ReallocAligned = &vsf_heap_realloc_aligned,
-    .Realloc        = &vsf_heap_realloc,
-    .Free           = &vsf_heap_free,
+    .MallocAligned  = &vsf_heap_malloc_aligned_imp,
+    .Malloc         = &vsf_heap_malloc_imp,
+    .ReallocAligned = &vsf_heap_realloc_aligned_imp,
+    .Realloc        = &vsf_heap_realloc_imp,
+    .Free           = &vsf_heap_free_imp,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -514,17 +514,17 @@ void vsf_heap_add_memory(vsf_mem_t mem)
     vsf_heap_add_buffer(mem.buffer, (uint_fast32_t)mem.size);
 }
 
-void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment)
+void * vsf_heap_malloc_aligned_imp(uint_fast32_t size, uint_fast32_t alignment)
 {
     return __vsf_heap_malloc_aligned(&__vsf_heap.use_as__vsf_heap_t, size, alignment);
 }
 
-void * vsf_heap_malloc(uint_fast32_t size)
+void * vsf_heap_malloc_imp(uint_fast32_t size)
 {
     return vsf_heap_malloc_aligned(size, 0);
 }
 
-void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t alignment)
+void * vsf_heap_realloc_aligned_imp(void *buffer, uint_fast32_t size, uint_fast32_t alignment)
 {
     if (NULL == buffer) {
         if (size > 0) {
@@ -541,12 +541,12 @@ void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t 
 }
 
 //Adjust the allocated memory size(aligned to sizeof(uintalu_t))
-void * vsf_heap_realloc(void *buffer, uint_fast32_t size)
+void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size)
 {
     return vsf_heap_realloc_aligned(buffer, size, sizeof(uintalu_t));
 }
 
-void vsf_heap_free(void *buffer)
+void vsf_heap_free_imp(void *buffer)
 {
     __vsf_heap_free(&__vsf_heap.use_as__vsf_heap_t, buffer);
 }

@@ -25,6 +25,10 @@
 
 #include "utilities/vsf_utilities.h"
 
+#if VSF_HEAP_CFG_TRACE == ENABLED
+#   include "service/trace/vsf_trace.h"
+#endif
+
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file
  *!        included in this file
@@ -49,6 +53,44 @@ extern "C" {
 #ifndef VSF_HEAP_SIZE
 #   warning VSF_HEAP_SIZE is not defined, use 128K as default
 #   define VSF_HEAP_SIZE    (128 * 1024)
+#endif
+
+#if VSF_HEAP_CFG_TRACE == ENABLED
+#   define vsf_heap_malloc_aligned(...)                                         \
+    ({                                                                          \
+        void * ptr = vsf_heap_malloc_aligned_imp(__VA_ARGS__);                  \
+        vsf_trace_debug("%s: malloc_align 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        ptr;                                                                    \
+    })
+#   define vsf_heap_malloc(...)                                                 \
+    ({                                                                          \
+        void * ptr = vsf_heap_malloc_imp(__VA_ARGS__);                          \
+        vsf_trace_debug("%s: malloc 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        ptr;                                                                    \
+    })
+#   define vsf_heap_realloc_aligned(...)                                        \
+    ({                                                                          \
+        void * ptr = vsf_heap_realloc_aligned_imp(__VA_ARGS__);                 \
+        vsf_trace_debug("%s: realloc_align 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        ptr;                                                                    \
+    })
+#   define vsf_heap_realloc(...)                                                \
+    ({                                                                          \
+        void * ptr = vsf_heap_realloc_imp(__VA_ARGS__);                         \
+        vsf_trace_debug("%s: realloc 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        ptr;                                                                    \
+    })
+#   define vsf_heap_free(__ptr)                                                 \
+    ({                                                                          \
+        vsf_trace_debug("%s: free 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, __ptr);\
+        vsf_heap_free_imp(__ptr);                                               \
+    })
+#else
+#   define vsf_heap_malloc_aligned          vsf_heap_malloc_aligned_imp
+#   define vsf_heap_malloc                  vsf_heap_malloc_imp
+#   define vsf_heap_realloc_aligned         vsf_heap_realloc_aligned_imp
+#   define vsf_heap_realloc                 vsf_heap_realloc_imp
+#   define vsf_heap_free                    vsf_heap_free_imp
 #endif
 
 /*============================ TYPES =========================================*/
@@ -95,11 +137,11 @@ extern void vsf_heap_init(void);
 */
 extern void vsf_heap_add_buffer(uint8_t *buffer, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);
-extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
-extern void * vsf_heap_malloc(uint_fast32_t size);
-extern void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t alignment);
-extern void * vsf_heap_realloc(void *buffer, uint_fast32_t size);
-extern void vsf_heap_free(void *buffer);
+extern void * vsf_heap_malloc_aligned_imp(uint_fast32_t size, uint_fast32_t alignment);
+extern void * vsf_heap_malloc_imp(uint_fast32_t size);
+extern void * vsf_heap_realloc_aligned_imp(void *buffer, uint_fast32_t size, uint_fast32_t alignment);
+extern void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size);
+extern void vsf_heap_free_imp(void *buffer);
 
 #endif
 
