@@ -135,7 +135,7 @@ static ssize_t __vsf_linux_socket_unix_read(vsf_linux_fd_t *sfd, void *buf, size
     VSF_LINUX_ASSERT(!priv->is_listening);
 
     if ((NULL == priv->rw.sfd_rx) || (NULL == priv->remote)) {
-        return -1;
+        return 0;
     }
 
     return read(priv->rw.sfd_rx->fd, buf, count);
@@ -147,7 +147,7 @@ static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *bu
     VSF_LINUX_ASSERT(!priv->is_listening);
 
     if ((NULL == priv->rw.sfd_tx) || (NULL == priv->remote)) {
-        return -1;
+        return 0;
     }
 
     return write(priv->rw.sfd_tx->fd, buf, count);
