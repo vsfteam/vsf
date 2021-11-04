@@ -568,7 +568,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
             extern const vsf_linux_fd_op_t __vsf_linux_heap_fdop;
             if (sfd->op == &__vsf_linux_heap_fdop) {
-                vsf_trace_warning("memory leak %p detected in process %p" VSF_TRACE_CFG_LINEEND,
+                vsf_trace_warning("memory leak 0x%p detected in process 0x%p" VSF_TRACE_CFG_LINEEND,
                         &sfd[1], process);
             }
 #endif

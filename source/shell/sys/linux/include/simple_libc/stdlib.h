@@ -25,10 +25,39 @@ extern "C" {
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
 #endif
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
+#   undef malloc
+#   define malloc(...)                                                          \
+    ({                                                                          \
+        void * ptr = __malloc(__VA_ARGS__);                                     \
+        vsf_trace_debug("%s: malloc 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        ptr;                                                                    \
+    })
+#   undef realloc
+#   define realloc(...)                                                         \
+    ({                                                                          \
+        void * ptr = __realloc(__VA_ARGS__);                                   \
+        vsf_trace_debug("%s: realloc 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        ptr;                                                                    \
+    })
+#   undef free
+#   define free(__ptr)                                                          \
+    ({                                                                          \
+        vsf_trace_debug("%s: free 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (__ptr));\
+        __free(__VA_ARGS__);                                                    \
+    })
+#endif
+
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
+void * __malloc(size_t size);
+void * __realloc(void *p, size_t size);
+void __free(void *p);
+#else
 void * malloc(size_t size);
-void * aligned_alloc(size_t alignment, size_t size);
 void * realloc(void *p, size_t size);
 void free(void *p);
+#endif
+void * aligned_alloc(size_t alignment, size_t size);
 void * calloc(size_t n, size_t size);
 void * memalign(size_t alignment, size_t size);
 

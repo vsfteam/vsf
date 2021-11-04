@@ -82,7 +82,7 @@ extern "C" {
     })
 #   define vsf_heap_free(__ptr)                                                 \
     ({                                                                          \
-        vsf_trace_debug("%s: free 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, __ptr);\
+        vsf_trace_debug("%s: free 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (__ptr));\
         vsf_heap_free_imp(__ptr);                                               \
     })
 #else

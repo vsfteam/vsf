@@ -67,7 +67,11 @@ static int __vsf_linux_heap_close(vsf_linux_fd_t *sfd)
 }
 #endif
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
+void * __malloc(size_t size)
+#else
 void * malloc(size_t size)
+#endif
 {
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
     size += sizeof(vsf_linux_fd_t);
@@ -93,7 +97,11 @@ void * aligned_alloc(size_t alignment, size_t size)
 #endif
 }
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
+void * __realloc(void *p, size_t size)
+#else
 void * realloc(void *p, size_t size)
+#endif
 {
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
     if (NULL == p) {
@@ -119,7 +127,11 @@ void * realloc(void *p, size_t size)
 #endif
 }
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
+void __free(void *p)
+#else
 void free(void *p)
+#endif
 {
     if (p != NULL) {
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED

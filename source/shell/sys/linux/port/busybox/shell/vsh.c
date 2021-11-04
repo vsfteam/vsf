@@ -194,7 +194,6 @@ int __vsh_run_cmd(char *cmd)
         }
     }
 
-    // search in working_dir if not found in path
     if (exefd < 0) {
         exefd = vsf_linux_fs_get_executable(cmd, &entry);
         if (exefd < 0) {

@@ -325,7 +325,7 @@ void vsf_linux_fd_delete(int fd)
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
     extern const vsf_linux_fd_op_t __vsf_linux_heap_fdop;
-    if (sfd->op == &__vsf_linux_heap_fdop) {
+    if ((sfd->op == &__vsf_linux_heap_fdop) || (fd <= 2)) {
         vsf_heap_free(sfd);
     } else {
         free(sfd);
@@ -690,10 +690,14 @@ int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
         return -1;
     }
 
-    free(process->working_dir);
-    process->working_dir = strdup(fullpath);
+    vsf_heap_free(process->working_dir);
+    process->working_dir = vsf_heap_malloc(strlen(fullpath) + 1);
+    if (process->working_dir != NULL) {
+        strcpy(process->working_dir, fullpath);
+        return 0;
+    }
     VSF_LINUX_ASSERT(process->working_dir != NULL);
-    return 0;
+    return -1;
 }
 
 int chdir(const char *pathname)
@@ -1229,7 +1233,7 @@ static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t c
                     vsf_slist_queue_dequeue(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
                 vsf_unprotect_sched(orig);
 
-                free(buffer);
+                vsf_heap_free(buffer);
             }
 
             orig = vsf_protect_sched();
@@ -1274,7 +1278,7 @@ static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd_tx, const void *buf, s
 
     priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
 
-    vsf_linux_pipe_buffer_t *buffer = malloc(sizeof(*buffer) + count);
+    vsf_linux_pipe_buffer_t *buffer = vsf_heap_malloc(sizeof(*buffer) + count);
     if (NULL == buffer) {
         return -1;
     }
@@ -1308,7 +1312,7 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
         while (!vsf_slist_queue_is_empty(&priv_rx->buffer_queue)) {
             vsf_slist_queue_dequeue(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
             vsf_unprotect_sched(orig);
-            free(buffer);
+            vsf_heap_free(buffer);
             orig = vsf_protect_sched();
         }
         vsf_unprotect_sched(orig);
