@@ -294,7 +294,7 @@ int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
     int priv_size = (op != NULL) ? op->priv_size : 0;
     vsf_linux_fd_t *new_sfd;
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     if (process->cur_fd <= 2) {
         new_sfd = vsf_heap_malloc(sizeof(vsf_linux_fd_t) + priv_size);
@@ -332,7 +332,7 @@ void vsf_linux_fd_delete(int fd)
     vsf_unprotect_sched(orig);
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
     extern const vsf_linux_fd_op_t __vsf_linux_heap_fdop;
     if ((sfd->op == &__vsf_linux_heap_fdop) || (fd <= 2)) {
         vsf_heap_free(sfd);

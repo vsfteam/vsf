@@ -562,7 +562,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
         vsf_dlist_peek_head(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
         if (sfd != NULL) {
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
             extern const vsf_linux_fd_op_t __vsf_linux_heap_fdop;
             if (sfd->op == &__vsf_linux_heap_fdop) {
                 vsf_trace_warning("memory leak 0x%p detected in process 0x%p" VSF_TRACE_CFG_LINEEND,
@@ -601,6 +601,13 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         if (process->working_dir != NULL) {
             vsf_heap_free(process->working_dir);
         }
+#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+        if(process->heap_usage != 0) {
+            vsf_trace_warning("memory leak %d bytes detected in process 0x%p" VSF_TRACE_CFG_LINEEND,
+                        process->heap_usage, process);
+        }
+#endif
         vsf_heap_free(process);
     }
 }

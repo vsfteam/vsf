@@ -21,8 +21,11 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
 #   define __VSF_LINUX_FS_CLASS_INHERIT__
+#endif
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#   define __VSF_LINUX_CLASS_INHERIT__
 #endif
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
@@ -46,13 +49,13 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
 static int __vsf_linux_heap_close(vsf_linux_fd_t *sfd);
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
 const vsf_linux_fd_op_t __vsf_linux_heap_fdop = {
     .fn_close           = __vsf_linux_heap_close,
 };
@@ -60,10 +63,30 @@ const vsf_linux_fd_op_t __vsf_linux_heap_fdop = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
 static int __vsf_linux_heap_close(vsf_linux_fd_t *sfd)
 {
     return 0;
+}
+#endif
+
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+static void __vsf_linux_heap_check_malloc(size_t size)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    vsf_protect_t orig = vsf_protect_sched();
+        process->heap_usage += size;
+    vsf_unprotect_sched(orig);
+}
+
+static void __vsf_linux_heap_check_free(size_t size)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    vsf_protect_t orig = vsf_protect_sched();
+        process->heap_usage -= size;
+    vsf_unprotect_sched(orig);
 }
 #endif
 
@@ -73,7 +96,7 @@ void * __malloc(size_t size)
 void * malloc(size_t size)
 #endif
 {
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
     size += sizeof(vsf_linux_fd_t);
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)vsf_heap_malloc(size);
     if (sfd != NULL) {
@@ -83,6 +106,15 @@ void * malloc(size_t size)
         return (void *)&sfd[1];
     }
     return NULL;
+#elif VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+    size += sizeof(size_t);
+    size_t *ret = vsf_heap_malloc(size);
+    if (ret != NULL) {
+        *ret = size;
+        __vsf_linux_heap_check_malloc(size);
+        return (void *)(ret + 1);
+    }
+    return NULL;
 #else
     return vsf_heap_malloc(size);
 #endif
@@ -90,7 +122,8 @@ void * malloc(size_t size)
 
 void * aligned_alloc(size_t alignment, size_t size)
 {
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED                          \
+    ||  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
     VSF_LINUX_ASSERT(false);
 #else
     return vsf_heap_malloc_aligned(size, alignment);
@@ -103,7 +136,8 @@ void * __realloc(void *p, size_t size)
 void * realloc(void *p, size_t size)
 #endif
 {
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED                          \
+    ||  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
     if (NULL == p) {
         if (size > 0) {
             return malloc(size);
@@ -134,9 +168,13 @@ void free(void *p)
 #endif
 {
     if (p != NULL) {
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
         vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)p - 1;
         close(sfd->fd);
+#elif VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+        size_t *size = (size_t *)p - 1;
+        __vsf_linux_heap_check_free(*size);
+        vsf_heap_free(size);
 #else
         vsf_heap_free(p);
 #endif
