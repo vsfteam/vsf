@@ -156,9 +156,7 @@ static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *bu
 static int __vsf_linux_socket_unix_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_socket_unix_priv_t *priv = (vsf_linux_socket_unix_priv_t *)sfd->priv;
-    if (priv->remote != NULL) {
-        shutdown(sfd->fd, 0);
-    }
+    shutdown(sfd->fd, 0);
     return 0;
 }
 
@@ -378,6 +376,7 @@ static int __vsf_linux_socket_unix_bind(vsf_linux_socket_priv_t *socket_priv, co
     }
 
     vsf_linux_fd_add_feature(fd, S_IFSOCK);
+    close(fd);
     return 0;
 }
 
