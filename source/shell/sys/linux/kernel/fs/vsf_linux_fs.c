@@ -276,7 +276,13 @@ int vsf_linux_fd_add(vsf_linux_fd_t *sfd)
     sfd->rxpend = sfd->txpend = NULL;
 
     vsf_protect_t orig = vsf_protect_sched();
+#ifdef VSF_LINUX_CFG_FD_BITMAP_SIZE
+        sfd->fd = vsf_bitmap_ffz(&process->fd_bitmap, VSF_LINUX_CFG_FD_BITMAP_SIZE);
+        VSF_LINUX_ASSERT(sfd->fd >= 0);
+        vsf_bitmap_set(&process->fd_bitmap, sfd->fd);
+#else
         sfd->fd = process->cur_fd++;
+#endif
         vsf_dlist_add_to_tail(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
     vsf_unprotect_sched(orig);
 
@@ -320,6 +326,9 @@ void vsf_linux_fd_delete(int fd)
 
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_remove(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
+#ifdef VSF_LINUX_CFG_FD_BITMAP_SIZE
+        vsf_bitmap_clear(&process->fd_bitmap, sfd->fd);
+#endif
     vsf_unprotect_sched(orig);
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\

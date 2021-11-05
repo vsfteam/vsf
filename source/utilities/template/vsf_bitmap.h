@@ -41,8 +41,8 @@
         // 4. Clear bit in bitmap
         vsf_bitmap_clear(&usr_xxxx_bitmap, 12);
         // 5. TODO: Find First Set/Zero bit in bitmap
-        vsf_bitmap_ffs(&usr_xxxx_bitmap);
-        vsf_bitmap_ffz(&usr_xxxx_bitmap);
+        vsf_bitmap_ffs(&usr_xxxx_bitmap, 32);
+        vsf_bitmap_ffz(&usr_xxxx_bitmap, 32);
 
         ......
     }
