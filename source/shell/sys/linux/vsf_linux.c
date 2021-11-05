@@ -604,8 +604,8 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
         if(process->heap_usage != 0) {
-            vsf_trace_warning("memory leak %d bytes detected in process 0x%p" VSF_TRACE_CFG_LINEEND,
-                        process->heap_usage, process);
+            vsf_trace_warning("memory leak %d bytes detected in process 0x%p, balance = %d" VSF_TRACE_CFG_LINEEND,
+                        process->heap_usage, process, process->heap_balance);
         }
 #endif
         vsf_heap_free(process);

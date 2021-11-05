@@ -77,6 +77,7 @@ static void __vsf_linux_heap_check_malloc(size_t size)
     VSF_LINUX_ASSERT(process != NULL);
     vsf_protect_t orig = vsf_protect_sched();
         process->heap_usage += size;
+        process->heap_balance++;
     vsf_unprotect_sched(orig);
 }
 
@@ -86,6 +87,7 @@ static void __vsf_linux_heap_check_free(size_t size)
     VSF_LINUX_ASSERT(process != NULL);
     vsf_protect_t orig = vsf_protect_sched();
         process->heap_usage -= size;
+        process->heap_balance--;
     vsf_unprotect_sched(orig);
 }
 #endif
