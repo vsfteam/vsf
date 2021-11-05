@@ -19,7 +19,9 @@ extern "C" {
 #   define select               VSF_LINUX_WRAPPER(select)
 #endif
 
-#define FD_SETSIZE              1024
+#ifndef FD_SETSIZE
+#   define FD_SETSIZE           1024
+#endif
 #define FD_ZERO(set)            vsf_bitmap_reset(*(set), FD_SETSIZE)
 #define FD_SET(fd, set)         vsf_bitmap_set(*(set), (fd))
 #define FD_CLR(fd, set)         vsf_bitmap_clear(*(set), (fd))

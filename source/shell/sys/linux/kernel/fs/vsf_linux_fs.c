@@ -525,7 +525,7 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
 {
     int fd_num = 0;
 
-    VSF_LINUX_ASSERT(nfds > 0);
+    VSF_LINUX_ASSERT((nfds > 0) && (nfds < FD_SETSIZE));
     if (execeptfds != NULL) {
         VSF_LINUX_ASSERT(false);
         return -1;

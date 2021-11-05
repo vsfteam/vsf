@@ -32,7 +32,6 @@
 #   include "./include/sched.h"
 #   include "./include/semaphore.h"
 #   include "./include/signal.h"
-#   include "./include/sys/select.h"
 #   include "./include/sys/wait.h"
 #   include "./include/sys/ipc.h"
 #   include "./include/sys/shm.h"
@@ -45,8 +44,6 @@
 #   include <sched.h>
 #   include <semaphore.h>
 #   include <signal.h>
-#   include <poll.h>
-#   include <sys/select.h>
 #   include <sys/wait.h>
 #   include <sys/ipc.h>
 #   include <sys/shm.h>
