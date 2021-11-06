@@ -550,7 +550,8 @@ static int __vsf_libusb_submit_urb(vsf_linux_libusb_dev_t *ldev)
 {
     vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
 
-    if (VSF_ERR_NONE != vk_usbh_submit_urb(ldev->libusb_dev->usbh, urb)) {
+    if (    ldev->is_to_free
+        ||  (VSF_ERR_NONE != vk_usbh_submit_urb(ldev->libusb_dev->usbh, urb))) {
         return LIBUSB_ERROR_IO;
     }
     vsf_thread_wfe(VSF_EVT_MESSAGE);
@@ -996,7 +997,8 @@ try_next:
             break;
         }
 
-        if (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda)) {
+        if (    ldev->is_to_free
+            ||  (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda))) {
             transfer->actual_length = 0;
             transfer->status = LIBUSB_TRANSFER_ERROR;
             vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
