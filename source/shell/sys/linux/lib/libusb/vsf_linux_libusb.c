@@ -212,6 +212,15 @@ static void __vsf_linux_libusb_process_cb(vsf_linux_libusb_dev_t *ldev, vk_usbh_
     }
 }
 
+static void __vsf_linux_libusb_fd_trigger(void)
+{
+    for (int i = 0; i < dimof(__vsf_libusb.pollfd); i++) {
+        if (__vsf_libusb.pollfd[i].fd >= 0) {
+            vsf_linux_fd_rx_trigger(__vsf_libusb.pollfd[i].sfd, vsf_protect_sched());
+        }
+    }
+}
+
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_suppress=pe111
@@ -249,6 +258,7 @@ static void * __vsf_libusb_libusb_core_thread(void *param)
             __vsf_libusb.devnum++;
             __vsf_linux_libusb_process_cb(ldev, VSF_USBH_LIBUSB_EVT_ON_ARRIVED);
         }
+        __vsf_linux_libusb_fd_trigger();
     }
     return NULL;
 }
@@ -271,11 +281,7 @@ static void * __vsf_libusb_libusb_user_thread(void *param)
                 ltransfer->transfer.callback(&ltransfer->transfer);
             }
 
-            for (int i = 0; i < dimof(__vsf_libusb.pollfd); i++) {
-                if (__vsf_libusb.pollfd[i].fd >= 0) {
-                    vsf_linux_fd_rx_trigger(__vsf_libusb.pollfd[i].sfd, vsf_protect_sched());
-                }
-            }
+            __vsf_linux_libusb_fd_trigger();
         }
 
         if (__vsf_libusb.is_to_exit) {
