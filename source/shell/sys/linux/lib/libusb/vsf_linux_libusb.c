@@ -1105,10 +1105,7 @@ int libusb_cancel_transfer(struct libusb_transfer *transfer)
     vk_usbh_urb_t *urb = &ltransfer->urb;
     bool is_in_queue;
 
-    if (vk_usbh_urb_is_alloced(urb)) {
-        vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
-    }
-
+    vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
     transfer->actual_length = 0;
     transfer->status = LIBUSB_TRANSFER_CANCELLED;
 
