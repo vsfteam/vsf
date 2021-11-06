@@ -156,7 +156,7 @@ static void __vsf_linux_libusb_on_event(void *param, vk_usbh_libusb_dev_t *dev, 
 
     if (VSF_USBH_LIBUSB_EVT_ON_ARRIVED == evt) {
         vk_usbh_libusb_open(dev);
-        ldev = malloc(sizeof(vsf_linux_libusb_dev_t));
+        ldev = vsf_heap_malloc(sizeof(vsf_linux_libusb_dev_t));
         if (ldev != NULL) {
             memset(ldev, 0, sizeof(*ldev));
             ldev->libusb_dev = dev;
@@ -231,7 +231,7 @@ static void * __vsf_libusb_libusb_core_thread(void *param)
             __vsf_libusb.devnum--;
             __vsf_linux_libusb_process_cb(ldev, VSF_USBH_LIBUSB_EVT_ON_LEFT);
             vk_usbh_libusb_close(ldev->libusb_dev);
-            free(ldev);
+            vsf_heap_free(ldev);
         }
         while (!vsf_dlist_is_empty(&__vsf_libusb.devlist_new)) {
             orig = vsf_protect_sched();
