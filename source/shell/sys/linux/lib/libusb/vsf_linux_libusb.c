@@ -104,7 +104,9 @@ typedef struct vsf_linux_libusb_pipe_t {
 typedef struct vsf_linux_libusb_dev_t {
     vsf_dlist_node_t devnode;
     vk_usbh_libusb_dev_t *libusb_dev;
+    uint16_t refcnt;
     bool is_in_newlist;
+    bool is_to_free;
     union {
         struct {
             vsf_linux_libusb_pipe_t pipe_in[16];
@@ -230,8 +232,12 @@ static void * __vsf_libusb_libusb_core_thread(void *param)
 
             __vsf_libusb.devnum--;
             __vsf_linux_libusb_process_cb(ldev, VSF_USBH_LIBUSB_EVT_ON_LEFT);
-            vk_usbh_libusb_close(ldev->libusb_dev);
-            vsf_heap_free(ldev);
+
+            ldev->is_to_free = true;
+            if (!ldev->refcnt) {
+                vk_usbh_libusb_close(ldev->libusb_dev);
+                vsf_heap_free(ldev);
+            }
         }
         while (!vsf_dlist_is_empty(&__vsf_libusb.devlist_new)) {
             orig = vsf_protect_sched();
@@ -250,17 +256,16 @@ static void * __vsf_libusb_libusb_core_thread(void *param)
 static void * __vsf_libusb_libusb_user_thread(void *param)
 {
     vsf_linux_libusb_transfer_t *ltransfer;
-//    vsf_protect_t orig;
+    vsf_protect_t orig;
 
     while (1) {
         vsf_thread_trig_pend(&__vsf_libusb.trans_trig, -1);
 
         while (!vsf_dlist_is_empty(&__vsf_libusb.translist_done)) {
-            // all thread running under same priority as processor priority
-            //  so no need to protect
-//            orig = vsf_protect_sched();
+            orig = vsf_protect_sched();
                 vsf_dlist_remove_head(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
-//            vsf_unprotect_sched(orig);
+                ((vsf_linux_libusb_dev_t *)(ltransfer->transfer.dev_handle))->refcnt--;
+            vsf_unprotect_sched(orig);
 
             if (ltransfer->transfer.callback != NULL) {
                 ltransfer->transfer.callback(&ltransfer->transfer);
@@ -967,8 +972,10 @@ struct libusb_transfer * libusb_alloc_transfer(int iso_packets)
 static void __vsf_linux_libusb_submit_transfer_next(vsf_linux_libusb_pipe_t *pipe)
 {
     vsf_linux_libusb_transfer_t *ltransfer;
+    vsf_protect_t orig;
 
-    vsf_protect_t orig = vsf_protect_sched();
+try_next:
+    orig = vsf_protect_sched();
     vsf_dlist_remove_head(vsf_linux_libusb_transfer_t, transnode, &pipe->translist, ltransfer);
     if (NULL == ltransfer) {
         pipe->is_submitted = false;
@@ -976,9 +983,9 @@ static void __vsf_linux_libusb_submit_transfer_next(vsf_linux_libusb_pipe_t *pip
     vsf_unprotect_sched(orig);
 
     if (ltransfer != NULL) {
-        vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)ltransfer->transfer.dev_handle;
         vk_usbh_urb_t *urb = &ltransfer->urb;
         struct libusb_transfer *transfer = &ltransfer->transfer;
+        vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
 
         vk_usbh_urb_set_pipe(urb, pipe->pipe);
         switch (transfer->type) {
@@ -992,9 +999,15 @@ static void __vsf_linux_libusb_submit_transfer_next(vsf_linux_libusb_pipe_t *pip
         if (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda)) {
             transfer->actual_length = 0;
             transfer->status = LIBUSB_TRANSFER_ERROR;
-            vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
+            vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
+            orig = vsf_protect_sched();
+                vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
+            vsf_unprotect_sched(orig);
+            vsf_eda_trig_set(&__vsf_libusb.trans_trig);
 
             vsf_eda_fini(&ltransfer->eda);
+
+            goto try_next;
         }
     }
 }
@@ -1005,7 +1018,7 @@ static void __vsf_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)ltransfer->transfer.dev_handle;
     vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
     vk_usbh_urb_t *urb = &ltransfer->urb;
-//    vsf_protect_t orig;
+    vsf_protect_t orig;
 
     switch (evt) {
     case VSF_EVT_MESSAGE:
@@ -1015,11 +1028,9 @@ static void __vsf_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 LIBUSB_TRANSFER_COMPLETED : LIBUSB_TRANSFER_ERROR;
         vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
 
-        // all thread running under same priority as processor priority
-        //  so no need to protect
-//        orig = vsf_protect_sched();
+        orig = vsf_protect_sched();
             vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
-//        vsf_unprotect_sched(orig);
+        vsf_unprotect_sched(orig);
         vsf_eda_trig_set(&__vsf_libusb.trans_trig);
 
         __vsf_linux_libusb_submit_transfer_next(pipe);
@@ -1070,6 +1081,7 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
     bool is_submitted = pipe->is_submitted;
     pipe->is_submitted = true;
     vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &pipe->translist, ltransfer);
+    ldev->refcnt++;
     vsf_unprotect_sched(orig);
 
     if (!is_submitted) {
@@ -1082,9 +1094,31 @@ int libusb_cancel_transfer(struct libusb_transfer *transfer)
 {
     vsf_linux_libusb_transfer_t *ltransfer = container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
+    vk_usbh_urb_t *urb = &ltransfer->urb;
+    bool is_in_queue;
 
-    if (vk_usbh_urb_is_alloced(&ltransfer->urb)) {
-        vk_usbh_free_urb(ldev->libusb_dev->usbh, &ltransfer->urb);
+    if (vk_usbh_urb_is_alloced(urb)) {
+        vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
+    }
+
+    transfer->actual_length = 0;
+    transfer->status = LIBUSB_TRANSFER_CANCELLED;
+
+    vk_usbh_pipe_t usbh_pipe = vk_usbh_urb_get_pipe(urb);
+    unsigned char endpoint = usbh_pipe.endpoint | (usbh_pipe.dir_in1out0 ? USB_DIR_IN : USB_DIR_OUT);
+    vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, endpoint);
+
+    vsf_protect_t orig = vsf_protect_sched();
+        is_in_queue = vsf_dlist_is_in(vsf_linux_libusb_transfer_t, transnode, &pipe->translist, ltransfer);
+        if (is_in_queue) {
+            vsf_dlist_remove(vsf_linux_libusb_transfer_t, transnode, &pipe->translist, ltransfer);
+        }
+        vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
+    vsf_unprotect_sched(orig);
+    vsf_eda_trig_set(&__vsf_libusb.trans_trig);
+
+    if (!is_in_queue) {
+        __vsf_linux_libusb_submit_transfer_next(pipe);
     }
     return LIBUSB_SUCCESS;
 }
@@ -1095,6 +1129,14 @@ void libusb_free_transfer(struct libusb_transfer *transfer)
         vsf_linux_libusb_transfer_t *ltransfer = container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
         VSF_LINUX_ASSERT(!vk_usbh_urb_is_alloced(&ltransfer->urb));
         free(ltransfer);
+
+        vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
+        if (ldev->is_to_free) {
+            if (!ldev->refcnt) {
+                vk_usbh_libusb_close(ldev->libusb_dev);
+                vsf_heap_free(ldev);
+            }
+        }
     }
 }
 
