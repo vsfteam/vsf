@@ -996,7 +996,8 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
 #if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
             vsf_trace_error("dwcotg_hcd.channel%d: no event" VSF_TRACE_CFG_LINEEND, channel_idx);
 #endif
-            VSF_USB_ASSERT(false);
+            // seems disconnect dievice while urb commited will maybe run here
+//            VSF_USB_ASSERT(false);
             goto urb_fail;
         }
 

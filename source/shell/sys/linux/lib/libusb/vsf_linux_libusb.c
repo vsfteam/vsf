@@ -244,6 +244,7 @@ static void * __vsf_libusb_libusb_core_thread(void *param)
 
             ldev->is_to_free = true;
             if (!ldev->refcnt) {
+                vk_usbh_free_urb(ldev->libusb_dev->usbh, &ldev->libusb_dev->urb);
                 vk_usbh_libusb_close(ldev->libusb_dev);
                 vsf_heap_free(ldev);
             }
@@ -594,6 +595,10 @@ int libusb_control_transfer(libusb_device_handle *dev_handle,
     vk_usbh_urb_t *urb = __vsf_libusb_get_urb(ldev);
     int err;
 
+    if (NULL == urb) {
+        return LIBUSB_ERROR_NO_MEM;
+    }
+
     if ((bRequestType & USB_DIR_MASK) == USB_DIR_IN) {
         vk_usbh_urb_set_pipe(urb, ldev->pipe_in[0].pipe);
     } else {
@@ -618,8 +623,12 @@ int libusb_bulk_transfer(libusb_device_handle *dev_handle,
 {
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev_handle;
     vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, endpoint);
-    vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
+    vk_usbh_urb_t *urb = __vsf_libusb_get_urb(ldev);
     int ret;
+
+    if (NULL == urb) {
+        return LIBUSB_ERROR_NO_MEM;
+    }
 
     vk_usbh_urb_set_pipe(urb, pipe->pipe);
     urb->urb_hcd->buffer = data;
@@ -640,8 +649,12 @@ int libusb_interrupt_transfer(libusb_device_handle *dev_handle,
 {
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev_handle;
     vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, endpoint);
-    vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
+    vk_usbh_urb_t *urb = __vsf_libusb_get_urb(ldev);
     int ret;
+
+    if (NULL == urb) {
+        return LIBUSB_ERROR_NO_MEM;
+    }
 
     vk_usbh_urb_set_pipe(urb, pipe->pipe);
     urb->urb_hcd->buffer = data;
@@ -1138,6 +1151,7 @@ void libusb_free_transfer(struct libusb_transfer *transfer)
         vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
         if (ldev->is_to_free) {
             if (!ldev->refcnt) {
+                vk_usbh_free_urb(ldev->libusb_dev->usbh, &ldev->libusb_dev->urb);
                 vk_usbh_libusb_close(ldev->libusb_dev);
                 vsf_heap_free(ldev);
             }
