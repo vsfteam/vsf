@@ -639,6 +639,12 @@ static int __vsf_linux_fs_create(const char* pathname, mode_t mode, vk_file_attr
     // TODO: name is allocated, so if created file is removed
     //  how to free name?
     name = strdup(name_tmp);
+    if (NULL == name) {
+        __vsf_linux_fs_close_do(dir);
+        return -1;
+    }
+
+    vsf_trace_warning("%s: filename string(%s) will not be freed later" VSF_TRACE_CFG_LINEEND, __FUNCTION__, name);
     vk_file_create(dir, name, attr, size);
     if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
         err = -1;
