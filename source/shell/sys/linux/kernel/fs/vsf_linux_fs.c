@@ -619,33 +619,23 @@ int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, co
     return ready;
 }
 
-static int __vsf_linux_fs_create(const char* pathname, mode_t mode, vk_file_attr_t attr, uint_fast64_t size)
+static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr_t attr, uint_fast64_t size)
 {
+    char fullpath[MAX_PATH], *name_tmp;
     int err = 0;
-    char *path = strdup(pathname), *name = NULL, *name_tmp;
-    if (!path) {
-        errno = ENOENT;
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
+    name_tmp = vk_file_getfilename((char *)fullpath);
+    fullpath[name_tmp - fullpath] = '\0';
+    vk_file_t *dir = __vsf_linux_fs_get_file(fullpath);
+    if (!dir) {
         return -1;
     }
 
     name_tmp = vk_file_getfilename((char *)pathname);
-    path[name_tmp - pathname] = '\0';
-    vk_file_t *dir = __vsf_linux_fs_get_file(path);
-    if (!dir) {
-        err = -1;
-        goto do_return;
-    }
-
-    // TODO: name is allocated, so if created file is removed
-    //  how to free name?
-    name = strdup(name_tmp);
-    if (NULL == name) {
-        __vsf_linux_fs_close_do(dir);
-        return -1;
-    }
-
-    vsf_trace_warning("%s: filename string(%s) will not be freed later" VSF_TRACE_CFG_LINEEND, __FUNCTION__, name);
-    vk_file_create(dir, name, attr, size);
+    vk_file_create(dir, name_tmp, attr, size);
     if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
         err = -1;
     }
@@ -654,22 +644,47 @@ static int __vsf_linux_fs_create(const char* pathname, mode_t mode, vk_file_attr
         err = open(pathname, 0);
     }
 
-do_return:
-    if ((err < 0) && (name != NULL)) {
-        free(name);
-    }
-    free(path);
     return err;
 }
 
-int mkdir(const char* pathname, mode_t mode)
+static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
 {
     char fullpath[MAX_PATH];
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
     }
 
-    int fd = __vsf_linux_fs_create(fullpath, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+    vk_file_t *file = __vsf_linux_fs_get_file(fullpath), *dir;
+    if (!file) {
+        errno = ENOENT;
+        return -1;
+    }
+
+    // check file attr
+    int fattr = file->attr & S_IFMT;
+    if (0 == fattr) {
+        fattr |= S_IFREG;
+    }
+    if (0 == attr) {
+        attr |= S_IFREG;
+    }
+    if (!(fattr & attr)) {
+        return -1;
+    }
+
+    dir = vk_file_get_parent(file);
+    __vsf_linux_fs_close_do(file);
+
+    pathname = vk_file_getfilename((char *)pathname);
+    vk_file_unlink(dir, pathname);
+    vsf_err_t err = (vsf_err_t)vsf_eda_get_return_value();
+    __vsf_linux_fs_close_do(dir);
+    return VSF_ERR_NONE == err ? 0 : -1;
+}
+
+int mkdir(const char *pathname, mode_t mode)
+{
+    int fd = __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
     if (fd >= 0) {
         close(fd);
         fd = 0;
@@ -677,10 +692,9 @@ int mkdir(const char* pathname, mode_t mode)
     return fd;
 }
 
-int rmdir(const char* pathname)
+int rmdir(const char *pathname)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    return __vsf_linux_fs_remove(pathname, VSF_FILE_ATTR_DIRECTORY);
 }
 
 int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
@@ -726,11 +740,7 @@ int chdir(const char *pathname)
 
 int creat(const char *pathname, mode_t mode)
 {
-    char fullpath[MAX_PATH];
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
-        return -1;
-    }
-    return __vsf_linux_fs_create(fullpath, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+    return __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
 
 int open(const char *pathname, int flags, ...)
@@ -886,30 +896,7 @@ int link(const char *oldpath, const char *newpath)
 
 int unlink(const char *pathname)
 {
-    char fullpath[MAX_PATH];
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
-        return -1;
-    }
-
-    vk_file_t *file = __vsf_linux_fs_get_file(fullpath), *dir;
-    if (!file) {
-        errno = ENOENT;
-        return -1;
-    }
-    if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
-        // how to set errno while trying to unlink a directory
-        return -1;
-    }
-
-    pathname = &fullpath[strlen(fullpath) - strlen(file->name)];
-    dir = vk_file_get_parent(file);
-    __vsf_linux_fs_close_do(file);
-
-    vk_file_unlink(dir, pathname);
-
-    vsf_err_t err = (vsf_err_t)vsf_eda_get_return_value();
-    __vsf_linux_fs_close_do(dir);
-    return VSF_ERR_NONE == err ? 0 : -1;
+    return __vsf_linux_fs_remove(pathname, S_IFMT & ~S_IFDIR);
 }
 
 DIR * opendir(const char *name)
