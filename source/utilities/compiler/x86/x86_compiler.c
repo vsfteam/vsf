@@ -99,7 +99,7 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
 {
     switch (clk_id) {
     case CLOCK_MONOTONIC: {
-            uint_fast32_t us = vsf_systimer_get_us();
+            vsf_systimer_tick_t us = vsf_systimer_get_us();
             tp->tv_sec = us / 1000000;
             tp->tv_nsec = us * 1000;
         }
