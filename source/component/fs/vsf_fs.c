@@ -716,13 +716,14 @@ __vsf_component_peda_ifs_entry(__vk_vfs_create, vk_file_create)
         goto do_return;
     }
 
-    new_file = (vk_vfs_file_t *)vk_file_alloc(sizeof(vk_vfs_file_t));
+    new_file = (vk_vfs_file_t *)vk_file_alloc(sizeof(vk_vfs_file_t) + strlen(vsf_local.name) + 1);
     if (NULL == new_file) {
         err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         goto do_return;
     }
 
-    new_file->name = (char *)vsf_local.name;
+    strcpy((char *)&new_file[1], vsf_local.name);
+    new_file->name = (char *)&new_file[1];
     new_file->attr |= vsf_local.attr;
     new_file->fsop = &vk_vfs_op;
 
