@@ -143,7 +143,10 @@ static int __vsf_linux_libusb_fd_close(vsf_linux_fd_t *sfd);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static vsf_linux_libusb_t __vsf_libusb = { 0 };
+static vsf_linux_libusb_t __vsf_libusb = {
+    .fd                 = -1,
+    .pollfd[0].fd       = -1,
+};
 
 static const vsf_linux_fd_op_t __vsf_linux_libusb_fdop = {
     .fn_close           = __vsf_linux_libusb_fd_close,
