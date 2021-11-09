@@ -37,6 +37,10 @@ extern "C" {
 
 extern int vsf_linux_vfs_init(void);
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif      // VSF_USE_LINUX && (VSF_LINUX_USE_DEVFS)
 #endif      // __VSF_LINUX_FS_VFS_INTERNAL_H__
 /* EOF */

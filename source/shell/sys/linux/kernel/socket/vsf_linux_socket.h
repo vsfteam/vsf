@@ -78,6 +78,10 @@ vsf_class(vsf_linux_socket_priv_t) {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SOCKET
 #endif      // __VSF_LINUX_SOCKET_INTERNAL_H__
 /* EOF */

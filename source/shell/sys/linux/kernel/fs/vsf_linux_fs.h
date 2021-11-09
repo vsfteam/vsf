@@ -159,6 +159,10 @@ extern vsf_linux_fd_t * vsf_linux_rx_pipe(void);
 extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_fd_t *sfd_rx);
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+
 /*============================ INCLUDES ======================================*/
 
 #include "./vfs/vsf_linux_vfs.h"
