@@ -361,6 +361,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
@@ -1444,6 +1445,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\CMSIS\Core_Legacy\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
@@ -2530,6 +2532,8 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
@@ -3599,6 +3603,8 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
@@ -4688,6 +4694,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
                     <state>//$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
@@ -12825,6 +12832,12 @@
                             </file>
                         </group>
                         <group>
+                            <name>libusb</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb\libusb.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>linux</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\linux\limits.h</name>
@@ -12940,9 +12953,6 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libgen.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\netdb.h</name>

@@ -1081,6 +1081,9 @@
     <Filter Include="vsf\shell\sys\linux\kernel\fs\vfs\devfs">
       <UniqueIdentifier>{490bbed7-2977-45a3-895f-0080c32f3fdd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\include\libusb">
+      <UniqueIdentifier>{784b5957-573e-44c4-9a61-b945c0abc23d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -1417,9 +1420,6 @@
       <Filter>vsf\shell\sys\linux\include\sys</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\dirent.h">
-      <Filter>vsf\shell\sys\linux\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libusb.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\limits.h">
@@ -3263,6 +3263,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.h">
       <Filter>vsf\shell\sys\linux\kernel\fs\vfs\devfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libusb\libusb.h">
+      <Filter>vsf\shell\sys\linux\include\libusb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
