@@ -237,9 +237,25 @@ static HANDLE __vk_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
         }
 
         deviceInterfaceData.cbSize = sizeof(SP_INTERFACE_DEVICE_DATA);
-        const GUID GUID_DEVINTERFACE_USB_DEVICE = {0xA5DCBF10, 0x6530, 0x11D2, {0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED}};
-        if (!SetupDiEnumDeviceInterfaces(hDeviceInfo, &DeviceInfoData, &GUID_DEVINTERFACE_USB_DEVICE, 0, &deviceInterfaceData)) {
-            continue;
+        if (0 == pid) {
+            const GUID GUID_DEVINTERFACE_CLASS_DEVICE[] = {
+                {0xF72FE0D4, 0xCBCB, 0x407d, {0x88, 0x14, 0x9E, 0xD6, 0x73, 0xD0, 0xDD, 0x6B}},         // ADB: Android Debug Bridge
+            };
+
+            bool is_match = false;
+            for (int i = 0; i < dimof(GUID_DEVINTERFACE_CLASS_DEVICE); i++) {
+                if (SetupDiEnumDeviceInterfaces(hDeviceInfo, &DeviceInfoData, &GUID_DEVINTERFACE_CLASS_DEVICE[i], 0, &deviceInterfaceData)) {
+                    is_match = true;
+                }
+            }
+            if (!is_match) {
+                continue;
+            }
+        } else {
+            const GUID GUID_DEVINTERFACE_USB_DEVICE = {0xA5DCBF10, 0x6530, 0x11D2, {0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED}};
+            if (!SetupDiEnumDeviceInterfaces(hDeviceInfo, &DeviceInfoData, &GUID_DEVINTERFACE_USB_DEVICE, 0, &deviceInterfaceData)) {
+                continue;
+            }
         }
 
         if (!SetupDiGetDeviceInterfaceDetailA(hDeviceInfo, &deviceInterfaceData, NULL, 0, &requiredLength, NULL)) {
@@ -263,7 +279,7 @@ static HANDLE __vk_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
         sprintf(str_tmp, "vid_%04x", vid);
         if (NULL != strstr(pInterfaceDetailData->DevicePath, str_tmp)) {
             sprintf(str_tmp, "pid_%04x", pid);
-            if (NULL != strstr(pInterfaceDetailData->DevicePath, str_tmp)) {
+            if ((0 == pid) || (NULL != strstr(pInterfaceDetailData->DevicePath, str_tmp))) {
                 vsf_trace_debug("Device path: %s" VSF_TRACE_CFG_LINEEND, pInterfaceDetailData->DevicePath);
                 hDev = CreateFileA(pInterfaceDetailData->DevicePath, GENERIC_READ | GENERIC_WRITE,
                         FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
