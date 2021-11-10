@@ -216,6 +216,18 @@ static bool __vk_winusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool
 }
 #endif
 
+static void __vk_winusb_print_last_error(char *header)
+{
+    DWORD errcode = GetLastError();
+    LPSTR lpError = NULL;
+    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL, errcode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpError, 0, NULL);
+    vsf_trace_error("%s: %d %s" VSF_TRACE_CFG_LINEEND, header, errcode, lpError);
+    if (lpError != NULL) {
+        LocalFree(lpError);
+    }
+}
+
 static HANDLE __vk_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
 {
     HANDLE hDev = INVALID_HANDLE_VALUE;
@@ -286,6 +298,8 @@ static HANDLE __vk_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
                 if (hDev != INVALID_HANDLE_VALUE) {
                     goto done;
                 }
+
+                __vk_winusb_print_last_error("Fail to open device");
             }
         }
     }
@@ -604,6 +618,7 @@ static void __vk_winusb_hcd_init_thread(void *arg)
                         }
                         __vk_winusb_hcd_on_arrived(winusb_dev);
                     } else {
+                        __vk_winusb_print_last_error("Fail to initialize winusb");
                         CloseHandle(winusb_dev->hDev);
                         winusb_dev->hDev = INVALID_HANDLE_VALUE;
 
