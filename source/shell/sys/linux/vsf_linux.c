@@ -131,10 +131,6 @@ typedef struct vsf_linux_t {
 #endif
 } vsf_linux_t;
 
-typedef struct vsf_linux_main_priv_t {
-    vsf_linux_process_ctx_t *ctx;
-} vsf_linux_main_priv_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 
 int errno;
@@ -166,7 +162,7 @@ static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
 static NO_INIT vsf_linux_t __vsf_linux;
 
 static const vsf_linux_thread_op_t __vsf_linux_main_op = {
-    .priv_size          = sizeof(vsf_linux_main_priv_t),
+    .priv_size          = 0,
     .on_run             = __vsf_linux_main_on_run,
     .on_terminate       = vsf_linux_thread_on_terminate,
 };
@@ -388,9 +384,6 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
             return NULL;
         }
 
-        vsf_linux_main_priv_t *priv = vsf_linux_thread_get_priv(thread);
-        priv->ctx = &process->ctx;
-
         vsf_protect_t orig = vsf_protect_sched();
             process->id.pid = __vsf_linux.cur_pid++;
             vsf_dlist_add_to_tail(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
@@ -532,8 +525,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_process_t *process = thread->process;
-    vsf_linux_main_priv_t *priv = vsf_linux_thread_get_priv(thread);
-    vsf_linux_process_ctx_t *ctx = priv->ctx;
+    vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_fd_t *sfd;
 
     sfd = vsf_linux_fd_get(0);
