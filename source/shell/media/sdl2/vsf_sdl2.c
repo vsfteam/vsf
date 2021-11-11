@@ -423,6 +423,10 @@ int SDL_InitSubSystem(uint32_t flags)
     return 0;
 }
 
+void SDL_QuitSubSystem(uint32_t flags)
+{
+}
+
 int SDL_Init(uint32_t flags)
 {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -1189,6 +1193,16 @@ int SDL_Flip(SDL_Surface *screen)
         .size.y = screen->h,
     };
     __vsf_sdl2_disp_refresh(&area, screen->pixels);
+    return 0;
+}
+
+int SDL_EnableUNICODE(int enable)
+{
+    return 0;
+}
+
+int SDL_EnableKeyRepeat(int delay, int interval)
+{
     return 0;
 }
 

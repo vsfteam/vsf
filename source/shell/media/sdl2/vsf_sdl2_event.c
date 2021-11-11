@@ -338,6 +338,10 @@ uint8_t SDL_EventState(uint32_t type, int state)
     return SDL_DISABLE;
 }
 
+void SDL_PumpEvents(void)
+{
+}
+
 const char * SDL_GetKeyName(SDL_Keycode key)
 {
     return "unknown";

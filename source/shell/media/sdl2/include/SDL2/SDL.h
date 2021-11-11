@@ -66,6 +66,7 @@ extern "C" {
 
 #define SDL_Init                        VSF_SDL_WRAPPER(SDL_Init)
 #define SDL_InitSubSystem               VSF_SDL_WRAPPER(SDL_InitSubSystem)
+#define SDL_QuitSubSystem               VSF_SDL_WRAPPER(SDL_QuitSubSystem)
 #define SDL_Quit                        VSF_SDL_WRAPPER(SDL_Quit)
 #define SDL_GetPlatform                 VSF_SDL_WRAPPER(SDL_GetPlatform)
 
@@ -176,6 +177,9 @@ extern "C" {
 
 #define SDL_SetVideoMode                VSF_SDL_WRAPPER(SDL_SetVideoMode)
 #define SDL_Flip                        VSF_SDL_WRAPPER(SDL_Flip)
+
+#define SDL_EnableUNICODE               VSF_SDL_WRAPPER(SDL_EnableUNICODE)
+#define SDL_EnableKeyRepeat             VSF_SDL_WRAPPER(SDL_EnableKeyRepeat)
 
 #define SDL_WM_SetCaption               VSF_SDL_WRAPPER(SDL_WM_SetCaption)
 #endif
@@ -445,6 +449,7 @@ typedef struct SDL_AudioSpec {
     uint32_t freq;
     SDL_AudioFormat format;
     uint8_t channels;
+    uint8_t silence;
     uint16_t samples;
     uint32_t size;
     SDL_AudioCallback callback;
@@ -459,6 +464,7 @@ extern void vsf_sdl2_init(vk_disp_t * disp);
 
 extern int SDL_Init(uint32_t flags);
 extern int SDL_InitSubSystem(uint32_t flags);
+extern void SDL_QuitSubSystem(uint32_t flags);
 extern void SDL_Quit(void);
 extern const char * SDL_GetPlatform(void);
 
@@ -571,6 +577,9 @@ extern int SDL_DisplayYUVOverlay(SDL_Overlay * overlay, SDL_Rect * dstrect);
 
 extern SDL_Surface * SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags);
 extern int SDL_Flip(SDL_Surface * screen);
+
+extern int SDL_EnableUNICODE(int enable);
+extern int SDL_EnableKeyRepeat(int delay, int interval);
 
 extern void SDL_WM_SetCaption(const char * title, const char * icon);
 #endif

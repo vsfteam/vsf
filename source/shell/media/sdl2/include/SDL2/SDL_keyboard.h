@@ -41,7 +41,7 @@ typedef struct SDL_Keysym {
 //    SDL_Scancode scancode;
     SDL_Keycode sym;
     uint16_t mod;
-    uint32_t unused;
+    uint16_t unicode;
 } SDL_Keysym;
 
 /*============================ GLOBAL VARIABLES ==============================*/

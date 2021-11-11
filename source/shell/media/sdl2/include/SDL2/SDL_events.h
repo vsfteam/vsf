@@ -47,6 +47,7 @@ extern "C" {
 #define SDL_WaitEvent                   VSF_SDL_WRAPPER(SDL_WaitEvent)
 #define SDL_FlushEvent                  VSF_SDL_WRAPPER(SDL_FlushEvent)
 #define SDL_EventState                  VSF_SDL_WRAPPER(SDL_EventState)
+#define SDL_PumpEvents                  VSF_SDL_WRAPPER(SDL_PumpEvents)
 #endif
 
 /*============================ MACROS ========================================*/
@@ -300,6 +301,7 @@ extern int SDL_PollEvent(SDL_Event * event);
 extern int SDL_WaitEventTimeout(SDL_Event * event, int timeout);
 extern void SDL_FlushEvent(uint32_t type);
 extern uint8_t SDL_EventState(uint32_t type, int state);
+extern void SDL_PumpEvents(void);
 
 #ifdef __cplusplus
 }
