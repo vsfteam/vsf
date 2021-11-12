@@ -33,6 +33,7 @@
 #   include "../../include/poll.h"
 #   include "../../include/fcntl.h"
 #   include "../../include/errno.h"
+#   include "../../include/termios.h"
 #else
 #   include <unistd.h>
 #   include <sys/stat.h>
@@ -40,6 +41,7 @@
 #   include <poll.h>
 #   include <fcntl.h>
 #   include <errno.h>
+#   include <termios.h>
 #endif
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
@@ -342,6 +344,19 @@ void vsf_linux_fd_delete(int fd)
 #else
     free(sfd);
 #endif
+}
+
+bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_process_t *process;
+    if (sfd->fd == STDIN_FILENO) {
+        process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(process != NULL);
+        struct termios *term = &process->term[STDIN_FILENO];
+        return term->c_cc[VMIN] > 0;
+    }
+    // TODO: check sfd->flags
+    return true;
 }
 
 void vsf_linux_fd_trigger_init(vsf_trig_t *trig)
@@ -1068,31 +1083,43 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
     while (size > 0) {
         orig = vsf_protect_sched();
         if (!sfd->rxrdy && (0 == vsf_stream_get_rbuf(stream, NULL))) {
-            vsf_trig_t trig;
-            vsf_linux_fd_trigger_init(&trig);
-            vsf_linux_fd_rx_pend(sfd, &trig, orig);
+            if (vsf_linux_fd_is_block(sfd)) {
+                vsf_trig_t trig;
+                vsf_linux_fd_trigger_init(&trig);
+                vsf_linux_fd_rx_pend(sfd, &trig, orig);
+            } else {
+                vsf_unprotect_sched(orig);
+                return 0;
+            }
         } else {
             vsf_unprotect_sched(orig);
         }
 
         cursize = vsf_stream_read(stream, buf, size);
         if (sfd->fd == STDIN_FILENO) {
-            static int skip_echo = 0;
-            char ch;
-            for (uint_fast32_t i = 0; i < cursize; i++) {
-                ch = ((char *)buf)[i];
-                switch (ch) {
-                case '\033':skip_echo = 2;                      break;
-                case '\r':  write(STDOUT_FILENO, "\r\n", 2);    break;
-                case 0x7F:
-                case '\b':  write(STDOUT_FILENO, "\b \b", 3);   break;
-                default:
-                    if (skip_echo) {
-                        skip_echo--;
+            vsf_linux_process_t *process = vsf_linux_get_cur_process();
+            VSF_LINUX_ASSERT(process != NULL);
+            struct termios *term = &process->term[STDIN_FILENO];
+
+            if (term->c_lflag & ECHO) {
+                // TODO: do not use static value here for multi process support
+                static int skip_echo = 0;
+                char ch;
+                for (uint_fast32_t i = 0; i < cursize; i++) {
+                    ch = ((char *)buf)[i];
+                    switch (ch) {
+                    case '\033':skip_echo = 2;                      break;
+                    case '\r':  write(STDOUT_FILENO, "\r\n", 2);    break;
+                    case 0x7F:
+                    case '\b':  write(STDOUT_FILENO, "\b \b", 3);   break;
+                    default:
+                        if (skip_echo) {
+                            skip_echo--;
+                            break;
+                        }
+                        write(STDOUT_FILENO, &ch, 1);
                         break;
                     }
-                    write(STDOUT_FILENO, &ch, 1);
-                    break;
                 }
             }
         }

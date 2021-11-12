@@ -28,9 +28,11 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./include/signal.h"
 #   include "./include/dirent.h"
+#   include "./include/termios.h"
 #else
 #   include <signal.h>
 #   include <dirent.h>
+#   include <termios.h>
 #endif
 
 #include "./kernel/fs/vsf_linux_fs.h"
@@ -142,6 +144,8 @@ vsf_class(vsf_linux_process_t) {
             pid_t pid;
             pid_t ppid;
         } id;
+        struct termios term[3];
+
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
         size_t heap_usage;
@@ -168,8 +172,6 @@ vsf_class(vsf_linux_process_t) {
             sigset_t mask;
             vsf_dlist_t handler_list;
         } sig;
-
-//        struct termios term;
 
         vsf_prio_t prio;
     )

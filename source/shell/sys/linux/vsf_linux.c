@@ -378,6 +378,10 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
         process->prio = vsf_prio_inherit;
         process->shell_process = process;
 
+        // termios, TODO: support other termios flags & settings
+        process->term[STDIN_FILENO].c_lflag = ECHO;
+        process->term[STDIN_FILENO].c_cc[VMIN] = 1;
+
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {
             vsf_heap_free(process);
@@ -855,11 +859,25 @@ int vsf_linux_fd_bind_executable(int fd, vsf_linux_main_entry_t entry)
 
 int tcgetattr(int fd, struct termios *termios)
 {
+    if ((fd >= 3) || (NULL == termios)) {
+        return -1;
+    }
+
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    *termios = process->term[fd];
     return 0;
 }
 
 int tcsetattr(int fd, int optional_actions, const struct termios *termios)
 {
+    if ((fd >= 3) || (NULL == termios)) {
+        return -1;
+    }
+
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    process->term[fd] = *termios;
     return 0;
 }
 

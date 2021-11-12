@@ -132,6 +132,7 @@ extern int vsf_linux_fd_add(vsf_linux_fd_t *sfd);
 extern int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
 extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
 extern void vsf_linux_fd_delete(int fd);
+extern bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd);
 
 extern int vsf_linux_fd_get_feature(int fd, uint_fast32_t *feature);
 extern int vsf_linux_fd_set_feature(int fd, uint_fast32_t feature);
