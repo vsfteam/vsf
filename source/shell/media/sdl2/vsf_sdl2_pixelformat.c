@@ -122,6 +122,23 @@ struct {
             .Bloss          = 0,
         },
     },
+    {
+        .color              = SDL_PIXELFORMAT_RGB332,
+        .format             = {
+            .format         = SDL_PIXELFORMAT_RGB332,
+            .BitsPerPixel   = 8,
+            .BytesPerPixel  = 1,
+            .Rmask          = 0xE0,
+            .Gmask          = 0x1C,
+            .Bmask          = 0x3,
+            .Rshift         = 5,
+            .Gshift         = 2,
+            .Bshift         = 0,
+            .Rloss          = 5,
+            .Gloss          = 5,
+            .Bloss          = 6,
+        },
+    },
 };
 
 /*============================ PROTOTYPES ====================================*/

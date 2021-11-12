@@ -92,6 +92,7 @@ static Uint32 __vk_disp_sdl2_get_format(vk_disp_sdl2_t *disp_sdl2)
 {
     switch (disp_sdl2->param.color) {
     default:
+    case VSF_DISP_COLOR_RGB332:     return SDL_PIXELFORMAT_RGB332;
     case VSF_DISP_COLOR_RGB565:     return SDL_PIXELFORMAT_RGB565;
     case VSF_DISP_COLOR_ARGB8888:   return SDL_PIXELFORMAT_ARGB8888;
     }

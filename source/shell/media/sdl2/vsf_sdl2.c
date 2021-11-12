@@ -1158,21 +1158,17 @@ SDL_Surface * SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags)
         surface->w = width;
         surface->h = height;
         surface->pitch = width * bytes_per_pixel;
+        surface->pixels = &surface->__pixels;
 
-        surface->__format.BitsPerPixel = bits_per_pixel;
-        surface->__format.BytesPerPixel = bytes_per_pixel;
-        switch (vsf_disp_get_pixel_format(__vsf_sdl2.disp)) {
+        vk_disp_color_type_t color_type = vsf_disp_get_pixel_format(__vsf_sdl2.disp);
+        switch (color_type) {
+        case VSF_DISP_COLOR_RGB332:
         case VSF_DISP_COLOR_RGB565:
-            surface->__format.Rmask = ((1UL << 5) - 1) << 0;
-            surface->__format.Gmask = ((1UL << 6) - 1) << 5;
-            surface->__format.Bmask = ((1UL << 5) - 1) << 11;
-            surface->__format.Amask = 0;
-            break;
-        case VSF_DISP_COLOR_ARGB8888:
-            surface->__format.Rmask = ((1UL << 8) - 1) << 0;
-            surface->__format.Gmask = ((1UL << 8) - 1) << 8;
-            surface->__format.Bmask = ((1UL << 8) - 1) << 16;
-            surface->__format.Amask = ((1UL << 8) - 1) << 24;
+        case VSF_DISP_COLOR_ARGB8888: {
+                SDL_PixelFormat *format = __SDL_GetFormatFromColor(color_type);
+                VSF_SDL2_ASSERT(format != NULL);
+                surface->__format = *format;
+            }
             break;
         default:
             VSF_SDL2_ASSERT(false);
