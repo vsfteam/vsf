@@ -322,9 +322,9 @@ static void __SDL_BlendWithFormat(
                 da = 0xFF;
             }
 
-            r = (r * a + dr * (255 - a)) / 255;
-            g = (g * a + dg * (255 - a)) / 255;
-            b = (b * a + db * (255 - a)) / 255;
+            r = (((r - dr) * a) >> 8) + dr;
+            g = (((g - dg) * a) >> 8) + dg;
+            b = (((b - db) * a) >> 8) + db;
             color =     ((r >> dst_rloss) << dst_rshift)
                     |   ((g >> dst_gloss) << dst_gshift)
                     |   ((b >> dst_bloss) << dst_bshift)
