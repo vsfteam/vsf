@@ -156,7 +156,6 @@ static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *bu
 
 static int __vsf_linux_socket_unix_close(vsf_linux_fd_t *sfd)
 {
-    vsf_linux_socket_unix_priv_t *priv = (vsf_linux_socket_unix_priv_t *)sfd->priv;
     shutdown(sfd->fd, 0);
     return 0;
 }
