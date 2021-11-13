@@ -844,9 +844,6 @@
     <Filter Include="vsf\component\3rd-party\btstack\raw\src\ble\gatt-service">
       <UniqueIdentifier>{a01fd0a6-3a93-43c1-a130-f498fde80ebc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="usrapp\config\lwip">
-      <UniqueIdentifier>{08d86521-019e-4eb0-b298-1958dd39c32e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\usb\host\class\DL1x5">
       <UniqueIdentifier>{fa67f0ca-ebf6-4b81-b34d-ee86ded3b199}</UniqueIdentifier>
     </Filter>
@@ -1018,9 +1015,6 @@
     <Filter Include="vsf\component\3rd-party\mbedtls\raw\library">
       <UniqueIdentifier>{dcbdf083-c1fe-42be-8a7c-6676df169d55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="usrapp\config\mbedtls">
-      <UniqueIdentifier>{2c5fc354-ef32-4804-aaca-4e24c41ab656}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usrapp\demo\guilite_demo">
       <UniqueIdentifier>{1f226288-bb4b-4c84-a0f7-20f566c484e8}</UniqueIdentifier>
     </Filter>
@@ -1083,6 +1077,27 @@
     </Filter>
     <Filter Include="vsf\shell\sys\linux\include\libusb">
       <UniqueIdentifier>{784b5957-573e-44c4-9a61-b945c0abc23d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\3rd-party">
+      <UniqueIdentifier>{987c7786-77e3-43c5-961b-54a41d805489}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\3rd-party\awtk">
+      <UniqueIdentifier>{72935978-253c-4d7b-a321-3501a2e7a6a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\3rd-party\btstack">
+      <UniqueIdentifier>{8157881a-c4a0-433c-b56b-c9bc823a2229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\3rd-party\evm">
+      <UniqueIdentifier>{b73b80c7-6bd2-4f78-95b6-353f5a9c17f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\3rd-party\lvgl">
+      <UniqueIdentifier>{372a4708-4e39-4c11-a376-a1799cad713c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\3rd-party\lwip">
+      <UniqueIdentifier>{595e8eaa-e6b8-4395-9838-6d18b477f1c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\3rd-party\mbedtls">
+      <UniqueIdentifier>{47d10ce8-51f0-4894-9c5e-7350065676d7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1436,15 +1451,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\mal\driver\mim_mal\vsf_mim_mal.h">
       <Filter>vsf\component\mal\driver\mim_mal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\config\awtk_config.h">
-      <Filter>usrapp\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\config\btstack_config.h">
-      <Filter>usrapp\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\config\lv_conf.h">
-      <Filter>usrapp\config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\config\vsf_usr_cfg.h">
       <Filter>usrapp\config</Filter>
@@ -2454,9 +2460,6 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\btstack_tlv.h">
       <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\config\lwip\lwipopts.h">
-      <Filter>usrapp\config\lwip</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\DL1x5\vsf_usbh_dl1x5.h">
       <Filter>vsf\component\usb\host\class\DL1x5</Filter>
     </ClInclude>
@@ -3189,9 +3192,6 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls13_keys.h">
       <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\config\mbedtls\config.h">
-      <Filter>usrapp\config\mbedtls</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sched.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
@@ -3266,6 +3266,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libusb\libusb.h">
       <Filter>vsf\shell\sys\linux\include\libusb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\3rd-party\awtk\awtk_config.h">
+      <Filter>usrapp\config\3rd-party\awtk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\3rd-party\btstack\btstack_config.h">
+      <Filter>usrapp\config\3rd-party\btstack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\3rd-party\evm\evm_lua_conf.h">
+      <Filter>usrapp\config\3rd-party\evm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\3rd-party\lvgl\lv_conf.h">
+      <Filter>usrapp\config\3rd-party\lvgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\3rd-party\lwip\lwipopts.h">
+      <Filter>usrapp\config\3rd-party\lwip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\3rd-party\mbedtls\config.h">
+      <Filter>usrapp\config\3rd-party\mbedtls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

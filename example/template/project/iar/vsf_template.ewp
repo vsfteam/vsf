@@ -353,7 +353,12 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\config</state>
-                    <state>$PROJ_DIR$\..\..\config\lwip</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\awtk</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\btstack</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\evm</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\lwip</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
                     <state>$PROJ_DIR$\..\..\demo\evm_demo</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include</state>
@@ -1440,7 +1445,12 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\config</state>
-                    <state>$PROJ_DIR$\..\..\config\lwip</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\awtk</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\btstack</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\evm</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\lwip</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\CMSIS\Core_Legacy\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
@@ -4691,6 +4701,11 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\config</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\awtk</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\btstack</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\evm</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
                     <state>//$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
@@ -5471,10 +5486,43 @@
         <group>
             <name>config</name>
             <group>
-                <name>lwip</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\config\lwip\lwipopts.h</name>
-                </file>
+                <name>3rd-party</name>
+                <group>
+                    <name>awtk</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\config\3rd-party\awtk\awtk_config.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>btstack</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\config\3rd-party\btstack\btstack_config.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>evm</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\config\3rd-party\evm\evm_lua_conf.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>lvgl</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\config\3rd-party\lvgl\lv_conf.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>lwip</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\config\3rd-party\lwip\lwipopts.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>mbedtls</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\config\3rd-party\mbedtls\config.h</name>
+                    </file>
+                </group>
             </group>
             <group>
                 <name>vsf_usr_cfg</name>
@@ -5534,18 +5582,6 @@
                     </excluded>
                 </file>
             </group>
-            <file>
-                <name>$PROJ_DIR$\..\..\config\awtk_config.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\config\btstack_config.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\config\evm_lua_conf.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\config\lv_conf.h</name>
-            </file>
             <file>
                 <name>$PROJ_DIR$\..\..\config\vsf_tgui_cfg.h</name>
             </file>
