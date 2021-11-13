@@ -1165,7 +1165,7 @@ SDL_Surface * SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags)
         case VSF_DISP_COLOR_RGB332:
         case VSF_DISP_COLOR_RGB565:
         case VSF_DISP_COLOR_ARGB8888: {
-                SDL_PixelFormat *format = __SDL_GetFormatFromColor(color_type);
+                SDL_PixelFormat *format = (SDL_PixelFormat *)__SDL_GetFormatFromColor(color_type);
                 VSF_SDL2_ASSERT(format != NULL);
                 surface->__format = *format;
             }
