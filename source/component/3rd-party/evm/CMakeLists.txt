@@ -8,6 +8,13 @@ target_include_directories(${VSF_LIB_NAME} INTERFACE
     ${VSF_EVM_PATH}/include
 )
 
+if(VSF_EVM_CONFIG_PATH)
+    message(STATUS "VSF_EVM_CONFIG_PATH: ${VSF_EVM_CONFIG_PATH}")
+    target_include_directories(${VSF_LIB_NAME} INTERFACE
+        ${VSF_EVM_CONFIG_PATH}
+    )
+endif()
+
 target_sources(${VSF_LIB_NAME} INTERFACE
     extension/oo/evm_oo.c
     extension/usbh/evm_module_usbh.c

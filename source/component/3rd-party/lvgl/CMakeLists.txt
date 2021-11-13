@@ -28,6 +28,7 @@ target_include_directories(lvgl PRIVATE
     ${VSF_COMMON_INCLUDE_DIRECTORIES}
 )
 if(VSF_LVGL_CONFIG_PATH)
+    message(STATUS "VSF_LVGL_CONFIG_PATH: ${VSF_LVGL_CONFIG_PATH}")
     target_include_directories(lvgl PUBLIC
         ${VSF_LVGL_CONFIG_PATH}
     )
