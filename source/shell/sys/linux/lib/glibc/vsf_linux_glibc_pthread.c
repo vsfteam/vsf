@@ -498,7 +498,9 @@ int pthread_cond_destroy(pthread_cond_t *cond)
 
 int pthread_cond_signal(pthread_cond_t *cond)
 {
+    // TODO: is it secure to reset signal without sched protected?
     vsf_eda_trig_set(cond);
+    vsf_eda_trig_reset(cond);
     return 0;
 }
 
