@@ -194,34 +194,14 @@
 #       define VSF_LINUX_DEVFS_USE_RAND                 ENABLED
 
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
-#   if APP_USE_CPP_DEMO != ENABLED
-// simple_libc does not compatible with cpp, so if cpp is used, DO NOT use simple_libc
-//  make sure in inclue path, simple_libc is removed if cpp is used
-#       ifndef VSF_LINUX_USE_SIMPLE_STDIO
-#           define VSF_LINUX_USE_SIMPLE_STDIO           ENABLED
-#       endif
-#       ifndef VSF_LINUX_USE_SIMPLE_STRING
-#           define VSF_LINUX_USE_SIMPLE_STRING          ENABLED
-#       endif
-#       ifndef VSF_LINUX_USE_SIMPLE_TIME
-#           define VSF_LINUX_USE_SIMPLE_TIME            ENABLED
-#       endif
-#       ifndef VSF_LINUX_USE_SIMPLE_STDLIB
-#           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
-#       endif
-#       ifndef VSF_LINUX_USE_SIMPLE_CTYPE
-#           define VSF_LINUX_USE_SIMPLE_CTYPE           ENABLED
-#       endif
-#   else
-// to support CPP in linux-subsystem, define MACFOs below, and don't include the simple_libc path
+// IAR: to support CPP in linux-subsystem, define MACFOs below, and don't include the simple_libc path
 //  Note that __VSF_WORKAROUND_IAR_CPP__ MUST also be defined to support CPP
 #       define VSF_LINUX_LIBC_CFG_CPP                   ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STDIO           DISABLED
-#           define VSF_LINUX_USE_SIMPLE_STRING          DISABLED
-#           define VSF_LINUX_USE_SIMPLE_TIME            DISABLED
-#           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_CTYPE           DISABLED
-#   endif
+#       define VSF_LINUX_USE_SIMPLE_STDIO               DISABLED
+#       define VSF_LINUX_USE_SIMPLE_STRING              DISABLED
+#       define VSF_LINUX_USE_SIMPLE_TIME                DISABLED
+#       define VSF_LINUX_USE_SIMPLE_STDLIB              ENABLED
+#       define VSF_LINUX_USE_SIMPLE_CTYPE               DISABLED
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
