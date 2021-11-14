@@ -70,6 +70,14 @@ extern "C" {
 #   error invalid VSF_LINUX_CFG_STACKSIZE
 #endif
 
+#ifndef VSF_LINUX_CFG_PRIO_LOWEST
+#   define VSF_LINUX_CFG_PRIO_LOWEST        vsf_prio_0
+#endif
+
+#ifndef VSF_LINUX_CFG_PRIO_HIGHEST
+#   define VSF_LINUX_CFG_PRIO_HIGHEST       vsf_prio_0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_linux_thread_get_priv(__thread)         (void *)(&(((vsf_linux_thread_t *)(__thread))[1]))

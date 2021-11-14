@@ -91,14 +91,6 @@
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL MUST be enabled
 #endif
 
-#ifndef VSF_LINUX_CFG_PRIO_LOWEST
-#   define VSF_LINUX_CFG_PRIO_LOWEST        vsf_prio_0
-#endif
-
-#ifndef VSF_LINUX_CFG_PRIO_HIGHEST
-#   define VSF_LINUX_CFG_PRIO_HIGHEST       vsf_prio_0
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
