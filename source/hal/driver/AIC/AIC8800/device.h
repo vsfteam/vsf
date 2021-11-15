@@ -52,11 +52,11 @@
 
 #define USB_OTG0_IRQHandler         USBDMA_IRQHandler
 #define USB_OTG0_CONFIG                                                         \
-            .dc_ep_num              = 7 << 1,                                   \
-            .hc_ep_num              = 8,                                        \
+            .dc_ep_num              = 4 << 1,                                   \
+            .hc_ep_num              = 5,                                        \
             .reg                    = (void *)AIC_USB_BASE,                     \
             /* vk_dwcotg_hw_info_t */                                           \
-                .buffer_word_size   = 1024 >> 2,                                \
+                .buffer_word_size   = 948,                                      \
                 .speed              = VSF_AIC8800_USB_CFG_SPEED,                \
                 .dma_en             = true,                                     \
                 .ulpi_en            = true,                                     \
