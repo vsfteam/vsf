@@ -1,0 +1,6 @@
+# for kicad
+fp-info-cache
+*-cache.lib
+*.sch-bak
+*.bck
+*.dcm
