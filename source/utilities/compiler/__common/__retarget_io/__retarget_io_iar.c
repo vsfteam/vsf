@@ -22,7 +22,10 @@
 SECTION(".vsf.utilities.stdio.iar.__open")
 int __open(const char *path_name, int flags, mode_t mode)
 {
-    return open(path_name, flags, mode);
+    int fd = open(path_name, flags, mode);
+    // iar uses signed char to save fd, assert it's same as original fd
+    VSF_LINUX_ASSERT(fd == (signed char)fd);
+    return fd;
 }
 
 SECTION(".vsf.utilities.stdio.iar.__close")
