@@ -631,8 +631,6 @@ SWCLK
 Wire Wire Line
 	9375 5925 9775 5925
 Text Label 10475 6025 2    50   ~ 0
-TX
-Text Label 10475 6125 2    50   ~ 0
 RX
 Wire Wire Line
 	7825 2925 7625 2925
@@ -923,4 +921,6 @@ Wire Wire Line
 	5925 5250 6150 5250
 Wire Wire Line
 	6200 5750 6450 5750
+Text Label 10475 6125 2    50   ~ 0
+TX
 $EndSCHEMATC
