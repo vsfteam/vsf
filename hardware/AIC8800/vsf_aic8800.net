@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source Z:\vsf\hardware\AIC8800\vsf_aic8800.sch)
-    (date "2021/11/17 16:24:25")
+    (date "2021/11/17 16:46:28")
     (tool "Eeschema (5.1.12)-1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -170,6 +170,7 @@
       (tstamp 61A00BC0))
     (comp (ref J3)
       (value Conn_02x05_Counter_Clockwise)
+      (footprint Connector_PinSocket_2.54mm:PinSocket_2x05_P2.54mm_Vertical_SMD)
       (datasheet ~)
       (libsource (lib Connector_Generic) (part Conn_02x05_Counter_Clockwise) (description "Generic connector, double row, 02x05, counter clockwise pin numbering scheme (similar to DIP packge numbering), script generated (kicad-library-utils/schlib/autogen/connector/)"))
       (sheetpath (names /) (tstamps /))

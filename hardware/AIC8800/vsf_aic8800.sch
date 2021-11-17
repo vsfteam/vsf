@@ -556,7 +556,7 @@ U 1 1 61A5A6BD
 P 9975 5925
 F 0 "J3" H 10025 6342 50  0000 C CNN
 F 1 "Conn_02x05_Counter_Clockwise" H 10025 6251 50  0000 C CNN
-F 2 "" H 9975 5925 50  0001 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x05_P2.54mm_Vertical_SMD" H 9975 5925 50  0001 C CNN
 F 3 "~" H 9975 5925 50  0001 C CNN
 	1    9975 5925
 	1    0    0    -1  
