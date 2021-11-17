@@ -281,6 +281,8 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #   define vsf_usbh_free                                __vsf_usbh_free
 
 #   define VSF_USBH_USE_HCD_DWCOTG                      ENABLED
+//      AIC8800 need this
+#       define VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE  4096
 //  VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB is by default disabled, no need root_hub support
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
 #   define VSF_USBH_USE_DL1X5                           ENABLED
