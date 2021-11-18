@@ -42,12 +42,14 @@ static void __vsf_led_scan_on_timer(vsf_callback_timer_t *timer)
     vsf_led_scan_t *scan = container_of(timer, vsf_led_scan_t, timer);
     const vsf_io_mapper_t *io_mapper = scan->hw->io_mapper;
     const vsf_led_scan_pin_t *pin = &scan->hw->pins[scan->cur_pin];
+    vsf_protect_t orig;
 
     // set current pin FLOATING
     vsf_io_mapper_set_input(io_mapper, pin->pin_set);
     vsf_io_mapper_set_input(io_mapper, pin->pin_set);
 
-    vsf_protect_t orig = vsf_protect_int();
+next_led:
+    orig = vsf_protect_int();
     if (0 == scan->value) {
         scan->is_running = false;
         vsf_unprotect_int(orig);
@@ -55,6 +57,10 @@ static void __vsf_led_scan_on_timer(vsf_callback_timer_t *timer)
         vsf_unprotect_int(orig);
         if (++scan->cur_pin >= scan->hw->led_num) {
             scan->cur_pin = 0;
+        }
+
+        if (!(scan->value & (1 << scan->cur_pin))) {
+            goto next_led;
         }
 
         pin = &scan->hw->pins[scan->cur_pin];
