@@ -52,7 +52,7 @@ extern "C" {
         vsf_led_scan_pin_t __pins[(__led_num)];                                 \
     } VSF_MCONNECT(__, __name, _hw_t);                                          \
     const VSF_MCONNECT(__, __name, _hw_t) VSF_MCONNECT(__, __name, _hw) = {     \
-        .io_mapper      = (__io_mapper),                                        \
+        .io_mapper      = (const vsf_io_mapper_t *)(__io_mapper),               \
         .led_num        = (__led_num),                                          \
         .__pins         = {                                                     \
             __VA_ARGS__                                                         \
@@ -90,6 +90,7 @@ vsf_class(vsf_led_scan_t) {
         uint32_t value;
         uint8_t cur_pin;
         bool is_inited;
+        bool is_running;
         vsf_callback_timer_t timer;
     )
 };

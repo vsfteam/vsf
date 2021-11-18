@@ -28,6 +28,9 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+// default is 2^5 = 32-bit IO
+#define VSF_HW_IO_MAPPER_PORT_BITS_LOG2         5
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_IO_MAPPER_INIT(__PORT_NUM, __PORT_BITS_LOG2)                      \
@@ -124,6 +127,10 @@ extern "C" {
         VSF_HAL_ASSERT(port_idx < (__io_mapper)->port_num);                     \
         vsf_gpio_toggle((__io_mapper)->io[port_idx], 1 << pin_idx);             \
     })
+
+
+#define vsf_hw_io_mapper_pin(__port_idx, __pin_idx)                             \
+    ((__pin_idx) | ((__port_idx) << VSF_HW_IO_MAPPER_PORT_BITS_LOG2))
 
 /*============================ TYPES =========================================*/
 

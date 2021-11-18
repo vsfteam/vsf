@@ -47,17 +47,36 @@ static void __vsf_led_scan_on_timer(vsf_callback_timer_t *timer)
     vsf_io_mapper_set_input(io_mapper, pin->pin_set);
     vsf_io_mapper_set_input(io_mapper, pin->pin_set);
 
-    if (++scan->cur_pin >= scan->hw->led_num) {
-        scan->cur_pin = 0;
+    vsf_protect_t orig = vsf_protect_int();
+    if (0 == scan->value) {
+        scan->is_running = false;
+        vsf_unprotect_int(orig);
+    } else {
+        vsf_unprotect_int(orig);
+        if (++scan->cur_pin >= scan->hw->led_num) {
+            scan->cur_pin = 0;
+        }
+
+        pin = &scan->hw->pins[scan->cur_pin];
+        vsf_io_mapper_set(io_mapper, pin->pin_set);
+        vsf_io_mapper_clear(io_mapper, pin->pin_clr);
+        vsf_io_mapper_set_output(io_mapper, pin->pin_set);
+        vsf_io_mapper_set_output(io_mapper, pin->pin_clr);
+
+        vsf_callback_timer_add_ms(timer, VSF_LED_SCAN_CFG_INTERVAL_MS);
     }
+}
 
-    pin = &scan->hw->pins[scan->cur_pin];
-    vsf_io_mapper_set(io_mapper, pin->pin_set);
-    vsf_io_mapper_clear(io_mapper, pin->pin_clr);
-    vsf_io_mapper_set_output(io_mapper, pin->pin_set);
-    vsf_io_mapper_set_output(io_mapper, pin->pin_clr);
-
-    vsf_callback_timer_add_ms(timer, VSF_LED_SCAN_CFG_INTERVAL_MS);
+static void __vsf_led_scan_check_start(vsf_led_scan_t *scan)
+{
+    vsf_protect_t orig = vsf_protect_int();
+    if ((scan->value != 0) && !scan->is_running) {
+        scan->is_running = true;
+        vsf_unprotect_int(orig);
+        vsf_callback_timer_add_ms(&scan->timer, VSF_LED_SCAN_CFG_INTERVAL_MS);
+    } else {
+        vsf_unprotect_int(orig);
+    }
 }
 
 void vsf_led_scan_config_pin(vsf_led_scan_t *scan, uint32_t pin_mask, uint32_t feature)
@@ -79,7 +98,6 @@ void vsf_led_scan_set_direction(vsf_led_scan_t *scan, uint32_t direction_mask, u
 
         vsf_callback_timer_init(&scan->timer);
         scan->timer.on_timer = __vsf_led_scan_on_timer;
-        vsf_callback_timer_add_ms(&scan->timer, VSF_LED_SCAN_CFG_INTERVAL_MS);
     }
 }
 
@@ -112,11 +130,13 @@ void vsf_led_scan_write(vsf_led_scan_t *scan, uint32_t value, uint32_t pin_mask)
 {
     scan->value &= ~pin_mask;
     scan->value |= value & pin_mask;
+    __vsf_led_scan_check_start(scan);
 }
 
 void vsf_led_scan_set(vsf_led_scan_t *scan, uint32_t pin_mask)
 {
     scan->value |= pin_mask;
+    __vsf_led_scan_check_start(scan);
 }
 
 void vsf_led_scan_clear(vsf_led_scan_t *scan, uint32_t pin_mask)
@@ -127,6 +147,7 @@ void vsf_led_scan_clear(vsf_led_scan_t *scan, uint32_t pin_mask)
 void vsf_led_scan_toggle(vsf_led_scan_t *scan, uint32_t pin_mask)
 {
     scan->value ^= pin_mask;
+    __vsf_led_scan_check_start(scan);
 }
 
 #endif      // VSF_USE_LED_SCAN
