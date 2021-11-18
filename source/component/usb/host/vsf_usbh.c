@@ -159,8 +159,6 @@ vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
     vk_usbh_pipe_t pipe = { 0 };
 
     endpoint &= 0x0F;
-    // only support 4-bit interval
-    VSF_USB_ASSERT(!(interval & ~(0x0F)));
     pipe.value =   1|   (size << 1)             /* 11-bit size */
                     |   (endpoint << 12)        /* 4-bit endpoint */
                     |   (type << 16)            /* 2-bit type */

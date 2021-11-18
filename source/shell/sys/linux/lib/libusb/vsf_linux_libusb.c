@@ -314,7 +314,7 @@ void vsf_linux_libusb_startup(void)
 
 static int __vsf_linux_libusb_fd_close(vsf_linux_fd_t *sfd)
 {
-    __vsf_libusb.fd = 0;
+    __vsf_libusb.fd = -1;
     // TODO: call fini
     return 0;
 }
@@ -330,7 +330,7 @@ const struct libusb_version * libusb_get_version(void)
 
 int libusb_init(libusb_context **context)
 {
-    if (__vsf_libusb.fd != 0) {
+    if (__vsf_libusb.fd >= 0) {
         // already initialized
         return LIBUSB_SUCCESS;
     }
@@ -366,7 +366,7 @@ void libusb_exit(libusb_context *ctx)
         __vsf_libusb.user_thread = NULL;
 
         int fd = __vsf_libusb.fd;
-        __vsf_libusb.fd = 0;
+        __vsf_libusb.fd = -1;
         vsf_linux_fd_delete(fd);
     }
 }
