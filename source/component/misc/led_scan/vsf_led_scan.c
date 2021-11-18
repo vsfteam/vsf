@@ -46,7 +46,7 @@ static void __vsf_led_scan_on_timer(vsf_callback_timer_t *timer)
 
     // set current pin FLOATING
     vsf_io_mapper_set_input(io_mapper, pin->pin_set);
-    vsf_io_mapper_set_input(io_mapper, pin->pin_set);
+    vsf_io_mapper_set_input(io_mapper, pin->pin_clr);
 
 next_led:
     orig = vsf_protect_int();
@@ -64,10 +64,10 @@ next_led:
         }
 
         pin = &scan->hw->pins[scan->cur_pin];
-        vsf_io_mapper_set(io_mapper, pin->pin_set);
-        vsf_io_mapper_clear(io_mapper, pin->pin_clr);
         vsf_io_mapper_set_output(io_mapper, pin->pin_set);
         vsf_io_mapper_set_output(io_mapper, pin->pin_clr);
+        vsf_io_mapper_set(io_mapper, pin->pin_set);
+        vsf_io_mapper_clear(io_mapper, pin->pin_clr);
 
         vsf_callback_timer_add_ms(timer, VSF_LED_SCAN_CFG_INTERVAL_MS);
     }
