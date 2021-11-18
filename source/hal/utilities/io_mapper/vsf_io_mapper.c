@@ -17,7 +17,6 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSF_IO_MAPPER_CLASS_IMPLEMENT
 #include "hal/vsf_hal.h"
 
 #if GPIO_COUNT > 0
@@ -30,7 +29,7 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper = {
+const vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper = {
     VSF_IO_MAPPER_INIT(GPIO_COUNT, 5)       // use 32-bit io
 
     .__io = {

@@ -22,13 +22,6 @@
 
 #if GPIO_COUNT > 0
 
-#if     defined(__VSF_IO_MAPPER_CLASS_IMPLEMENT)
-#   undef __VSF_IO_MAPPER_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT__
-#endif
-
-#include "utilities/ooc_class.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,7 +33,6 @@ extern "C" {
 #define __VSF_IO_MAPPER_INIT(__PORT_NUM, __PORT_BITS_LOG2)                      \
             .port_num           = (__PORT_NUM),                                 \
             .port_bits_log2     = (__PORT_BITS_LOG2),                           \
-            .port_mask          = ~((1 << (__PORT_BITS_LOG2)) - 1),             \
             .pin_mask           = (1 << (__PORT_BITS_LOG2)) - 1,
 #define VSF_IO_MAPPER_INIT(__PORT_NUM, __PORT_BITS_LOG2)                        \
             __VSF_IO_MAPPER_INIT((__PORT_NUM), (__PORT_BITS_LOG2))
@@ -49,12 +41,12 @@ extern "C" {
 #define vsf_io_mapper_type(__name)              __vsf_io_mapper_type(__name)
 
 #define __define_io_mapper(__name, __port_num)                                  \
-    vsf_class(vsf_io_mapper_type(__name)) {                                     \
+    typedef struct vsf_io_mapper_type(__name) {                                 \
         public_member(                                                          \
             implement(vsf_io_mapper_t)                                          \
             void * __io[(__port_num)];                                          \
         )                                                                       \
-    };
+    } vsf_io_mapper_type(__name);
 #define define_io_mapper(__name, __port_num)    __define_io_mapper(__name, __port_num)
 #define def_io_mapper(__name, __port_num)       define_io_mapper(__name, __port_num)
 
@@ -135,22 +127,18 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-vsf_class(vsf_io_mapper_t) {
-    public_member(
-        uint8_t         port_num;       // num of ports
-        uint8_t         port_bits_log2; // num of io bits per port in log2
-
-        uint8_t         port_mask;
-        uint8_t         pin_mask;
-        void           *io[0];
-    )
-};
+typedef struct vsf_io_mapper_t {
+    uint8_t         port_num;       // num of ports
+    uint8_t         port_bits_log2; // num of io bits per port in log2
+    uint8_t         pin_mask;
+    void           *io[0];
+} vsf_io_mapper_t;
 
 define_io_mapper(vsf_hw, GPIO_COUNT)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper;
+extern const vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper;
 
 /*============================ PROTOTYPES ====================================*/
 
