@@ -48,7 +48,8 @@ extern "C" {
 
 #define __describe_led_scan_hw(__name, __io_mapper, __led_num, ...)             \
     typedef struct VSF_MCONNECT(__, __name, _hw_t) {                            \
-        implement(vsf_led_scan_hw_t)                                            \
+        const vsf_io_mapper_t *io_mapper;                                       \
+        uint8_t led_num;                                                        \
         vsf_led_scan_pin_t __pins[(__led_num)];                                 \
     } VSF_MCONNECT(__, __name, _hw_t);                                          \
     const VSF_MCONNECT(__, __name, _hw_t) VSF_MCONNECT(__, __name, _hw) = {     \
@@ -64,7 +65,7 @@ extern "C" {
 #define __describe_led_scan(__name, __io_mapper, __led_num, ...)                \
     describe_led_scan_hw(__name, (__io_mapper), (__led_num), __VA_ARGS__)       \
     vsf_led_scan_t __name = {                                                   \
-        .hw             = &VSF_MCONNECT(__, __name, _hw).use_as__vsf_led_scan_hw_t,\
+        .hw             = (const vsf_led_scan_hw_t *)&VSF_MCONNECT(__, __name, _hw),\
     };
 #define describe_led_scan(__name, __io_mapper, __led_num, ...)                  \
     __describe_led_scan(__name, (__io_mapper), (__led_num), __VA_ARGS__)

@@ -46,7 +46,9 @@ extern "C" {
 #define __define_io_mapper(__name, __port_num)                                  \
     typedef struct vsf_io_mapper_type(__name) {                                 \
         public_member(                                                          \
-            implement(vsf_io_mapper_t)                                          \
+            uint8_t         port_num;       /* num of ports */                  \
+            uint8_t         port_bits_log2; /* num of io bits per port in log2 */\
+            uint8_t         pin_mask;                                           \
             void * __io[(__port_num)];                                          \
         )                                                                       \
     } vsf_io_mapper_type(__name);
