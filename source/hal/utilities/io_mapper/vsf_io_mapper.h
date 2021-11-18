@@ -63,9 +63,9 @@ extern "C" {
 
 
 #define vsf_io_mapper_pin(__io_mapper, __port_idx, __pin_idx)                   \
-    ((__pin_idx) | ((__port_idx) << (__io_mapper)->__port_bits_log2))
+    ((__pin_idx) | ((__port_idx) << (__io_mapper)->port_bits_log2))
 #define vsf_io_mapper_get_port(__io_mapper, __pin)                              \
-    ((__pin) >> (__io_mapper)->__port_bits_log2)
+    ((__pin) >> (__io_mapper)->port_bits_log2)
 #define vsf_io_mapper_get_pin(__io_mapper, __pin)                               \
     ((__pin) & (__io_mapper)->pin_mask)
 

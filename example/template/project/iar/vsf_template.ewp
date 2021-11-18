@@ -9234,6 +9234,18 @@
                 </file>
             </group>
             <group>
+                <name>misc</name>
+                <group>
+                    <name>led_scan</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\component\misc\led_scan\vsf_led_scan.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\component\misc\led_scan\vsf_led_scan.h</name>
+                    </file>
+                </group>
+            </group>
+            <group>
                 <name>scsi</name>
                 <group>
                     <name>driver</name>
