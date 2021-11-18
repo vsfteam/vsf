@@ -12331,6 +12331,18 @@
                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\driver.h</name>
                 </file>
             </group>
+            <group>
+                <name>utilities</name>
+                <group>
+                    <name>io_mapper</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\io_mapper\vsf_io_mapper.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\io_mapper\vsf_io_mapper.h</name>
+                    </file>
+                </group>
+            </group>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\source\hal\vsf_hal.c</name>
             </file>

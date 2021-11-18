@@ -17,52 +17,29 @@
 
 /*============================ INCLUDES ======================================*/
 
-#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#define __VSF_IO_MAPPER_CLASS_IMPLEMENT
+#include "hal/vsf_hal.h"
 
-#   include "./driver/driver.h"
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-
-#else
-
-#   ifndef __VSF_HAL_H__
-#   define __VSF_HAL_H__
-
-#   include "hal/vsf_hal_cfg.h"
-#   include "./arch/vsf_arch.h"
-#   include "./driver/driver.h"
-#   include "./driver/common/common.h"
-
-#   include "./utilities/io_mapper/vsf_io_mapper.h"
-
-#   ifdef __cplusplus
-extern "C" {
-#   endif
+#if GPIO_COUNT > 0
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __VSF_IO_MAPPER_HW(__N, __BIT)      &VSF_MCONNECT(vsf_gpio, __N),
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper = {
+    VSF_IO_MAPPER_INIT(GPIO_COUNT, 5)       // use 32-bit io
+
+    .__io = {
+        VSF_MREPEAT(GPIO_COUNT, __VSF_IO_MAPPER_HW, 0)
+    }
+};
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
-/*! \note initialize level 0/1 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_hal_init(void);
-
-/*! \note initialize level 2 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_osa_hal_init(void);
-
-#   ifdef __cplusplus
-}
-#   endif
-
-#endif      // __VSF_HAL_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-/* EOF */
+#endif      // GPIO_COUNT > 0
