@@ -15,40 +15,22 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_COMPONENT_H__
-#define __VSF_COMPONENT_H__
+#ifndef __VSF_COMPONENT_MISC_H__
+#define __VSF_COMPONENT_MISC_H__
 
 /*============================ INCLUDES ======================================*/
 
-#include "./vsf_component_cfg.h"
+#include "../vsf_component_cfg.h"
 
-#include "./crypto/vsf_crypto.h"
-#include "./mal/vsf_mal.h"
-#include "./scsi/vsf_scsi.h"
-#include "./fs/vsf_fs.h"
-#include "./av/vsf_av.h"
-#include "./input/vsf_input.h"
-#include "./usb/vsf_usb.h"
-#include "./tcpip/vsf_tcpip.h"
-#include "./ui/vsf_ui.h"
-#include "./debugger/vsf_debugger.h"
-#include "./misc/vsf_component_misc.h"
-
-#ifdef __cplusplus
-extern "C" {
+#if VSF_USE_LED_SCAN == ENABLED
+#   include "./led_scan/vsf_led_scan.h"
 #endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_component_init(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
-/* EOF */
+#endif      // __VSF_COMPONENT_MISC_H__

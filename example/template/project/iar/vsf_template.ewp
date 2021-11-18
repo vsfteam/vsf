@@ -9244,6 +9244,9 @@
                         <name>$PROJ_DIR$\..\..\..\..\source\component\misc\led_scan\vsf_led_scan.h</name>
                     </file>
                 </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\component\misc\vsf_component_misc.h</name>
+                </file>
             </group>
             <group>
                 <name>scsi</name>
