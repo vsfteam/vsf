@@ -89,6 +89,9 @@ void aic8800_demo_init(void)
 #endif
 
 #if AIC8800_APP_USE_WIFI_DEMO == ENABLED
+    if (rtos_init()) {
+        VSF_HAL_ASSERT(false);
+    }
     extern void aic8800_wifi_start(void);
     aic8800_wifi_start();
 #endif

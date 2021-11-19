@@ -675,7 +675,7 @@ static void __rtos_timer_thread(void *param)
 
 int rtos_init(void)
 {
-// library from vendor depends on <sys/timer.h>,
+// wifi library from vendor depends on <sys/timer.h>,
 //  and tv_sec in timeval structure MUST BE 64-bit,
 //  assert if current environment is OK
     volatile struct timeval time;
