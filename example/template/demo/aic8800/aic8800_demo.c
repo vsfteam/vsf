@@ -80,10 +80,6 @@ void aic8800_demo_init(void)
             DSPSysCoreClock / 1000000, SystemCoreClock / 1000000,
             PeripheralClock / 1000000, sysctrl_clock_get(PER_FLASH) / 1000000);
 
-    if (rtos_init()) {
-        VSF_HAL_ASSERT(false);
-    }
-
 #if VSF_USE_USB_HOST
     __usbh_heap_init();
 #endif
