@@ -5743,6 +5743,9 @@
             <group>
                 <name>hal_demo</name>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\gpio_demo.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\usart_demo.c</name>
                 </file>
             </group>
