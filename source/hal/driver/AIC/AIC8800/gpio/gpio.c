@@ -32,27 +32,49 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_GPIO_IPM_LV0(__COUNT, __DONT_CARE)                             \
+#define __VSF_HW_GPIO_IPM_LV0(__COUNT, IS_PMIC)                                 \
     vsf_gpio_t vsf_gpio##__COUNT = {                                            \
         .REG = {                                                                \
         .GPIO = REG_GPIO##__COUNT,                                              \
             .IOMUX = ((AIC_IOMUX_TypeDef *)REG_GPIO_IOMUX##__COUNT),            \
         },                                                                      \
+        .is_pmic = IS_PMIC,                                                     \
     };
-
-#define aic8800_gpio_def(__count)                                               \
-    VSF_MREPEAT(__count, __VSF_HW_GPIO_IPM_LV0, NULL)
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
- aic8800_gpio_def(GPIO_COUNT)
+__VSF_HW_GPIO_IPM_LV0(0, false)
+__VSF_HW_GPIO_IPM_LV0(1, true)
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static bool __gpio_is_pmic_mem(vsf_gpio_t *gpio_ptr)
+{
+    return gpio_ptr->is_pmic;
+}
 
+static uint32_t __gpio_reg_read(vsf_gpio_t *gpio_ptr, volatile uint32_t *reg)
+{
+    if (!__gpio_is_pmic_mem(gpio_ptr)) {
+        return *reg;
+    } else {
+        return PMIC_MEM_READ((unsigned int)reg);
+    }
+}
+
+static void __gpio_reg_mask_write(vsf_gpio_t *gpio_ptr,
+                                  volatile uint32_t *reg,
+                                  uint32_t wdata, uint32_t wmask)
+{
+    if (!__gpio_is_pmic_mem(gpio_ptr)) {
+        *reg = (*reg & wmask) | wdata;
+    } else {
+        PMIC_MEM_MASK_WRITE((unsigned int)reg, wdata, wmask);
+    }
+}
 
 void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t feature)
 {
@@ -60,51 +82,19 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t featu
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     for (i = 0; i < 32; i++) {
         if (pin_mask & (1 << i)) {
-            if (&vsf_gpio0 == gpio_ptr) {
-                gpio_ptr->REG.IOMUX->GPCFG[i] &= ~(     IOMUX_GPIO_CONFIG_PULL_FRC_MASK
-                                                    |   IOMUX_GPIO_CONFIG_PULL_UP_MASK
-                                                    |   IOMUX_GPIO_CONFIG_PULL_DN_MASK);
-            } else if (&vsf_gpio1 == gpio_ptr) {
-                PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[i]),
-                                    0,
-                                    (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC
-                                    |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_UP
-                                    |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_DN));
-            } else {
-                    VSF_HAL_ASSERT(false);
-            }
+            uint32_t pin_value = IOMUX_GPIO_CONFIG_PULL_FRC_MASK;
             if (feature & IO_PULL_UP) {
-                if (&vsf_gpio0 == gpio_ptr) {
-                    gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_UP_MASK;
-                    gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_FRC_MASK;
-                } else if (&vsf_gpio1 == gpio_ptr) {
-                    PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[i]),
-                                        (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC
-                                        |   0
-                                        |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_DN),
-                                        (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC
-                                        |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_UP
-                                        |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_DN));
-                } else {
-                    VSF_HAL_ASSERT(false);
-                }
+                pin_value |= IOMUX_GPIO_CONFIG_PULL_UP_MASK;
             }
-            if (feature & IO_PULL_DOWN){
-                if (&vsf_gpio0 == gpio_ptr) {
-                    gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_DN_MASK;
-                    gpio_ptr->REG.IOMUX->GPCFG[i] |= IOMUX_GPIO_CONFIG_PULL_FRC_MASK;
-                } else if (&vsf_gpio1 == gpio_ptr) {
-                    PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[i]),
-                                        (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC
-                                        |   0
-                                        |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_DN),
-                                        (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC
-                                        |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_UP
-                                        |   AIC1000LITE_IOMUX_PAD_GPIO_PULL_DN));
-                } else {
-                    VSF_HAL_ASSERT(false);
-                }
+            if (feature & IO_PULL_DOWN) {
+                pin_value |= IOMUX_GPIO_CONFIG_PULL_DN_MASK;
             }
+            // TODO: add more feature
+            __gpio_reg_mask_write(gpio_ptr, &gpio_ptr->REG.IOMUX->GPCFG[i],
+                                  pin_value,
+                                  (  IOMUX_GPIO_CONFIG_PULL_FRC_MASK
+                                   | IOMUX_GPIO_CONFIG_PULL_UP_MASK
+                                   | IOMUX_GPIO_CONFIG_PULL_DN_MASK));
         }
     }
 }
@@ -112,27 +102,13 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t featu
 void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    if (&vsf_gpio0 == gpio_ptr) {
-        uint32_t temp_value;
-        temp_value = gpio_ptr->REG.GPIO->DR;
-        gpio_ptr->REG.GPIO->DR = (temp_value & (~pin_mask)) | (direction_mask & pin_mask);
-    } else if (&vsf_gpio1 == gpio_ptr) {
-        PMIC_MEM_MASK_WRITE((unsigned int)(&gpio_ptr->REG.GPIO->DR), direction_mask, pin_mask);
-    } else {
-        VSF_HAL_ASSERT(false);
-    }
+    __gpio_reg_mask_write(gpio_ptr, &gpio_ptr->REG.GPIO->DR, direction_mask, pin_mask);
 }
 
 uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    if (&vsf_gpio0 == gpio_ptr) {
-        return gpio_ptr->REG.GPIO->DR & pin_mask;
-    } else if (&vsf_gpio1 == gpio_ptr) {
-        return PMIC_MEM_READ((unsigned int)(gpio_ptr->REG.GPIO->DR)) & pin_mask;
-    } else {
-        VSF_HAL_ASSERT(false);
-    }
+    return __gpio_reg_read(gpio_ptr, &gpio_ptr->REG.GPIO->DR) & pin_mask;
 }
 
 void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
@@ -154,20 +130,12 @@ void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr)
 {
     uint32_t temp_value, temp_ret;
-    VSF_HAL_ASSERT(NULL != gpio_ptr);
-    if (&vsf_gpio0 == gpio_ptr) {
-        temp_value = gpio_ptr->REG.GPIO->MR;
-        gpio_ptr->REG.GPIO->MR = ~(uint32_t)0;
-        temp_ret = gpio_ptr->REG.GPIO->VR & ~(uint32_t )0;
-        gpio_ptr->REG.GPIO->MR = temp_value;
-    } else if (&vsf_gpio1 == gpio_ptr) {
-        temp_value = PMIC_MEM_READ((unsigned int)(&gpio_ptr->REG.GPIO->MR));
-        PMIC_MEM_MASK_WRITE((unsigned int)(&gpio_ptr->REG.GPIO->MR), ~(uint32_t)0, ~(uint32_t)0);
-        temp_ret = PMIC_MEM_READ((unsigned int)(&gpio_ptr->REG.GPIO->VR)) & ~(uint32_t )0;
-        PMIC_MEM_MASK_WRITE((unsigned int)(&gpio_ptr->REG.GPIO->MR), temp_value, ~(uint32_t)0);
-    } else {
-        VSF_HAL_ASSERT(false);
-    }
+
+    temp_value = __gpio_reg_read(gpio_ptr, &gpio_ptr->REG.GPIO->MR);
+    __gpio_reg_mask_write(gpio_ptr, &gpio_ptr->REG.GPIO->MR, ~(uint32_t)0, ~(uint32_t)0);
+    temp_ret = __gpio_reg_read(gpio_ptr, &gpio_ptr->REG.GPIO->VR);
+    __gpio_reg_mask_write(gpio_ptr, &gpio_ptr->REG.GPIO->MR, temp_value, ~(uint32_t)0);
+
     return temp_ret;
 }
 
@@ -175,19 +143,11 @@ void vsf_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
 {
     uint32_t temp_value;
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    if (&vsf_gpio0 == gpio_ptr) {
-        temp_value = gpio_ptr->REG.GPIO->MR;
-        gpio_ptr->REG.GPIO->MR = pin_mask;
-        gpio_ptr->REG.GPIO->VR = value;
-        gpio_ptr->REG.GPIO->MR = temp_value;
-    } else if (&vsf_gpio1 == gpio_ptr) {
-        temp_value = PMIC_MEM_READ((unsigned int)(&gpio_ptr->REG.GPIO->MR));
-        PMIC_MEM_MASK_WRITE((unsigned int)(&gpio_ptr->REG.GPIO->MR), pin_mask, ~(uint32_t)0);
-        PMIC_MEM_MASK_WRITE((unsigned int)(&gpio_ptr->REG.GPIO->VR), value, pin_mask);
-        PMIC_MEM_MASK_WRITE((unsigned int)(&gpio_ptr->REG.GPIO->MR), temp_value, ~(uint32_t)0);
-    } else {
-        VSF_HAL_ASSERT(false);
-    }
+
+    temp_value = __gpio_reg_read(gpio_ptr, &gpio_ptr->REG.GPIO->MR);
+    __gpio_reg_mask_write(gpio_ptr, &gpio_ptr->REG.GPIO->MR, ~(uint32_t)0, ~(uint32_t)0);
+    __gpio_reg_mask_write(gpio_ptr, &gpio_ptr->REG.GPIO->VR, value, pin_mask);
+    __gpio_reg_mask_write(gpio_ptr, &gpio_ptr->REG.GPIO->MR, temp_value, ~(uint32_t)0);
 }
 
 void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)

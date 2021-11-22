@@ -63,12 +63,13 @@ enum io_pin_no_t {
 #include "hal/driver/common/template/vsf_template_io.h"
 
 typedef struct gpio_reg_t {
-    GPIO_REG_T                  *GPIO;
-    AIC_IOMUX_TypeDef           *IOMUX;
+    GPIO_REG_T *GPIO;
+    AIC_IOMUX_TypeDef *IOMUX;
 } gpio_reg_t;
 
 struct vsf_gpio_t {
-    gpio_reg_t                  REG;
+    gpio_reg_t REG;
+    bool is_pmic;
 };
 
 /*============================ INCLUDES ======================================*/
