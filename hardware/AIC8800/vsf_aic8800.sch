@@ -820,10 +820,8 @@ Text Label 7625 3825 0    50   ~ 0
 PKEY
 Text Label 7625 3925 0    50   ~ 0
 V13
-Text Label 7625 4025 0    50   ~ 0
+Text Label 7625 4825 0    50   ~ 0
 VSYS
-Text Label 7625 4125 0    50   ~ 0
-V18
 Text Label 7625 4225 0    50   ~ 0
 VCC
 Text Label 7625 4325 0    50   ~ 0
@@ -870,17 +868,15 @@ Text Label 7625 4625 0    50   ~ 0
 B6
 Text Label 7625 4725 0    50   ~ 0
 B7
-Text Label 7625 4825 0    50   ~ 0
-V09
 Wire Wire Line
 	10475 5825 10275 5825
 Text Label 10275 5825 0    50   ~ 0
 GND
 Text Label 10275 5925 0    50   ~ 0
 DL
-Text Label 10800 4800 2    50   ~ 0
-DL
 Text Label 10800 4700 2    50   ~ 0
+DL
+Text Label 10800 4800 2    50   ~ 0
 PRST
 Text Label 10800 4600 2    50   ~ 0
 GND
@@ -923,4 +919,8 @@ Wire Wire Line
 	6200 5750 6450 5750
 Text Label 10475 6125 2    50   ~ 0
 TX
+Text Label 7625 4025 0    50   ~ 0
+V18
+Text Label 7625 4125 0    50   ~ 0
+V09
 $EndSCHEMATC
