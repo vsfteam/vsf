@@ -27,49 +27,43 @@
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HAL_GPIO_PIN_MAX
+#   define VSF_HAL_GPIO_PIN_MAX    16
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 enum io_feature_t {
-    IO_PULL_UP              = (1 << 0),           //!< enable pull-up resistor
-    IO_PULL_DOWN            = (1 << 1),           //!< enable pull-down resistor
-//todo:
-    IO_OPEN_DRAIN           = 0,
-    IO_DISABLE_INPUT        = 0,
-    IO_INVERT_INPUT         = 0,
-    IO_FILTER_BYPASS        = 0,
-    IO_FILTER_2CLK          = 0,
-    IO_FILTER_4CLK          = 0,
-    IO_FILTER_8CLK          = 0,
-    IO_FILTER_CLK_SRC0      = 0,
-    IO_FILTER_CLK_SRC1      = 0,
-    IO_FILTER_CLK_SRC2      = 0,
-    IO_FILTER_CLK_SRC3      = 0,
-    IO_FILTER_CLK_SRC4      = 0,
-    IO_FILTER_CLK_SRC5      = 0,
-    IO_FILTER_CLK_SRC6      = 0,
-    IO_FILTER_CLK_SRC7      = 0,
-    IO_HIGH_DRV             = 0,
-    IO_HIGH_DRIVE           = 0,
-    IO_HIGH_DRIVE_STRENGTH  = 0,
+    //! no-pull resistor
+    IO_NOT_PULL             =  (0 << IOMUX_GPIO_CONFIG_PULL_FRC_LSB),
+    //! pull-up resistor
+    IO_PULL_UP              = ((1 << IOMUX_AGPIO_CONFIG_PULL_FRC_LSB) | (1 << IOMUX_AGPIO_CONFIG_PULL_UP_LSB)),
+    //! pull-down resistor
+    IO_PULL_DOWN            = ((1 << IOMUX_AGPIO_CONFIG_PULL_FRC_LSB) | (1 << IOMUX_AGPIO_CONFIG_PULL_DN_LSB)),
+    __IO_PULL_MASK          = IOMUX_AGPIO_CONFIG_PULL_FRC_MASK | IOMUX_AGPIO_CONFIG_PULL_DN_MASK | IOMUX_AGPIO_CONFIG_PULL_UP_MASK,
+
+
+    __IO_FEATURE_MASK       = __IO_PULL_MASK | IOMUX_GPIO_CONFIG_SEL_MASK,
 };
 
 //todo: remove
 enum io_pin_no_t {
     TODO_REMOVE,
 };
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/driver/common/template/vsf_template_io.h"
 
-typedef struct gpio_reg_t {
-    GPIO_REG_T *GPIO;
-    AIC_IOMUX_TypeDef *IOMUX;
-} gpio_reg_t;
-
 struct vsf_gpio_t {
-    gpio_reg_t REG;
+    GPIO_REG_T *GPIO;
     bool is_pmic;
+
+    // TODO: move to io
+    AIC_IOMUX_TypeDef *IOMUX;
+    uint8_t pin_sel[VSF_HAL_GPIO_PIN_MAX];
 };
 
 /*============================ INCLUDES ======================================*/
