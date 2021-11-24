@@ -460,11 +460,8 @@ void libusb_hotplug_deregister_callback(libusb_context *ctx,
 
 ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device *** list)
 {
-    VSF_LINUX_ASSERT(list != NULL);
     ssize_t devnum = __vsf_libusb.devnum;
-
-    *list = NULL;
-    if (devnum > 0) {
+    if ((devnum > 0) && (list != NULL)) {
         ssize_t i;
         libusb_device **devlist = (libusb_device **)malloc((devnum + 1) * sizeof(libusb_device *));
         if (!devlist) { return 0; }
@@ -477,9 +474,8 @@ ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device *** list)
         }
         devlist[i] = NULL;
         *list = devlist;
-        return devnum;
     }
-    return 0;
+    return devnum;
 }
 
 void libusb_free_device_list(libusb_device **list, int unref_devices)
