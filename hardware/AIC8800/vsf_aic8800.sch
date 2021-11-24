@@ -789,8 +789,6 @@ Wire Wire Line
 	8575 6175 8675 6175
 Wire Wire Line
 	8675 6175 8675 6000
-Wire Wire Line
-	8675 6000 8775 6000
 Connection ~ 8775 6000
 Wire Wire Line
 	8575 5575 8675 5575
@@ -923,4 +921,22 @@ Text Label 7625 4025 0    50   ~ 0
 V18
 Text Label 7625 4125 0    50   ~ 0
 V09
+$Comp
+L Device:CP1 C3
+U 1 1 619E2333
+P 9000 5850
+F 0 "C3" H 9000 5925 50  0000 L CNN
+F 1 "100uF" H 9025 5750 50  0000 L CNN
+F 2 "Capacitor_SMD:C_1206_3216Metric" H 9000 5850 50  0001 C CNN
+F 3 "~" H 9000 5850 50  0001 C CNN
+	1    9000 5850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9000 5700 8775 5700
+Connection ~ 8775 5700
+Wire Wire Line
+	8675 6000 8775 6000
+Wire Wire Line
+	9000 6000 8775 6000
 $EndSCHEMATC
