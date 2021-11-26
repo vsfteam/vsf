@@ -15,16 +15,22 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_AIC8800_GPIO_H__
-#define __HAL_DRIVER_AIC8800_GPIO_H__
+#ifndef __HAL_DRIVER_AIC8800_HW_GPIO_H__
+#define __HAL_DRIVER_AIC8800_HW_GPIO_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
+
 #if VSF_HAL_USE_GPIO == ENABLED
-#include "../__device.h"
-#include "./i_reg_gpio.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
+#   include "../__device.h"
+#   include "./i_reg_gpio.h"
+#   include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
+
+#if     defined(__VSF_HW_GPIO_CLASS_IMPLEMENT)
+#   undef __VSF_HW_GPIO_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -44,7 +50,6 @@ enum io_feature_t {
     IO_PULL_DOWN            = ((1 << IOMUX_AGPIO_CONFIG_PULL_FRC_LSB) | (1 << IOMUX_AGPIO_CONFIG_PULL_DN_LSB)),
     __IO_PULL_MASK          = IOMUX_AGPIO_CONFIG_PULL_FRC_MASK | IOMUX_AGPIO_CONFIG_PULL_DN_MASK | IOMUX_AGPIO_CONFIG_PULL_UP_MASK,
 
-
     __IO_FEATURE_MASK       = __IO_PULL_MASK | IOMUX_GPIO_CONFIG_SEL_MASK,
 };
 
@@ -57,13 +62,23 @@ enum io_pin_no_t {
 
 #include "hal/driver/common/template/vsf_template_io.h"
 
-struct vsf_gpio_t {
-    GPIO_REG_T *GPIO;
-    bool is_pmic;
+/*============================ TYPES =========================================*/
 
-    // TODO: move to io
-    AIC_IOMUX_TypeDef *IOMUX;
-    uint8_t pin_sel[VSF_HAL_GPIO_PIN_MAX];
+vsf_class(vsf_hw_gpio_t) {
+#if VSF_HAL_GPIO_CFG_MULTI_INSTANCES == ENABLED
+    public_member(
+        implement(vsf_gpio_t)
+    )
+#endif
+
+    private_member(
+        GPIO_REG_T *GPIO;
+        bool is_pmic;
+
+        // TODO: move to io
+        AIC_IOMUX_TypeDef *IOMUX;
+        uint8_t pin_sel[VSF_HAL_GPIO_PIN_MAX];
+    )
 };
 
 /*============================ INCLUDES ======================================*/
@@ -75,7 +90,7 @@ struct vsf_gpio_t {
  \~chinese
     GPIOA 实例
  */
-extern vsf_gpio_t vsf_gpio0;
+extern vsf_hw_gpio_t vsf_gpio0;
 
 /**
  \~english
@@ -83,11 +98,11 @@ extern vsf_gpio_t vsf_gpio0;
  \~chinese
     GPIOB 实例
  */
-extern vsf_gpio_t vsf_gpio1;
+extern vsf_hw_gpio_t vsf_gpio1;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 #endif /* VSF_HAL_USE_GPIO */
-#endif /* EOF */
+#endif /* __HAL_DRIVER_AIC8800_HW_GPIO_H__ */

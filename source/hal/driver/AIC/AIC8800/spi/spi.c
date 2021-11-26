@@ -290,7 +290,7 @@ void vsf_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
     if (spi_ptr->cfg.mode & SPI_AUTO_SLAVE_SELECTION_ENABLE) {
         return;
     }
-    vsf_gpio_clear(&SPI0_USE_GPIO, 1 << index);
+    vsf_gpio_clear((vsf_gpio_t *)&SPI0_USE_GPIO, 1 << index);
 }
 
 void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
@@ -298,7 +298,7 @@ void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
     if (spi_ptr->cfg.mode & SPI_AUTO_SLAVE_SELECTION_ENABLE) {
         return;
     }
-    vsf_gpio_set(&SPI0_USE_GPIO, 1 << index);
+    vsf_gpio_set((vsf_gpio_t *)&SPI0_USE_GPIO, 1 << index);
 }
 
 spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
