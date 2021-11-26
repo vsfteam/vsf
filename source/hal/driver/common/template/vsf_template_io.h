@@ -25,7 +25,35 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HAL_GPIO_CFG_MULTI_INSTANCES
+#   define VSF_HAL_GPIO_CFG_MULTI_INSTANCES ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define VSF_GPIO_CONFIG_PIN(__GPIO, __PIN_MASK, __FEATURE)                      \
+    vsf_gpio_config_pin((vsf_gpio_t *)__GPIO, __PIN_MASK, __FEATURE)
+#define VSF_GPIO_SET_DIRECTION(__GPIO, DIRECTION_MASK, __PIN_MASK)              \
+    vsf_gpio_set_direction((vsf_gpio_t *)__GPIO, DIRECTION_MASK, __PIN_MASK)
+#define VSF_GPIO_GET_DIRECTION(__GPIO, __PIN_MASK)                              \
+    vsf_gpio_get_direction((vsf_gpio_t *)__GPIO, __PIN_MASK)
+#define VSF_GPIO_SET_INPUT(__GPIO, __PIN_MASK)                                  \
+    vsf_gpio_set_input((vsf_gpio_t *)__GPIO, __PIN_MASK)
+#define VSF_GPIO_SET_OUTPUT(__GPIO, __PIN_MASK)                                 \
+    vsf_gpio_set_output((vsf_gpio_t *)__GPIO, __PIN_MASK)
+#define VSF_GPIO_SWITCH_DIRECTION(__GPIO, __PIN_MASK)                           \
+    vsf_gpio_switch_direction((vsf_gpio_t *)__GPIO, __PIN_MASK)
+#define VSF_GPIO_READ(__GPIO)                                                   \
+    vsf_gpio_read((vsf_gpio_t *)__GPIO)
+#define VSF_GPIO_WRITE(__GPIO, __VALUE, __PIN_MASK)                             \
+    vsf_gpio_write((vsf_gpio_t *)__GPIO, __VALUE, __PIN_MASK)
+#define VSF_GPIO_SET(__GPIO, __PIN_MASK)                                        \
+    vsf_gpio_set((vsf_gpio_t *)__GPIO, __PIN_MASK)
+#define VSF_GPIO_CLEAR(__GPIO, __PIN_MASK)                                      \
+    vsf_gpio_clear((vsf_gpio_t *)__GPIO, __PIN_MASK)
+#define VSF_GPIO_TOGGLE(__GPIO, __PIN_MASK)                                     \
+    vsf_gpio_toggle((vsf_gpio_t *)__GPIO, __PIN_MASK)
 
 /*! \note device driver should define this macros
  *
@@ -356,6 +384,30 @@ typedef struct {
 
 typedef struct vsf_gpio_t vsf_gpio_t;
 
+#if VSF_HAL_GPIO_CFG_MULTI_INSTANCES == ENABLED
+//! \name gpio multiplex
+//! @{
+typedef struct vsf_gpio_op_t {
+    void            (*config_pin)       (vsf_gpio_t * gpio_ptr, uint32_t pin_mask, uint_fast32_t feature);
+    void            (*set_direction)    (vsf_gpio_t * gpio_ptr, uint32_t dir_bitmap, uint32_t pin_mask);
+    uint32_t        (*get_direction)    (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*set_input)        (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*set_output)       (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*switch_direction) (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    uint32_t        (*read)             (vsf_gpio_t * gpio_ptr);
+    void            (*write)            (vsf_gpio_t * gpio_ptr, uint32_t value, uint32_t pin_mask);
+    void            (*set)              (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*clear)            (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*toggle)           (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+} vsf_gpio_op_t;
+//! @}
+
+vsf_class(vsf_gpio_t)  {
+    public_member(
+        const vsf_gpio_op_t * op;
+    )
+};
+#endif
 
 //! \name gpio control interface
 //! @{
@@ -367,10 +419,10 @@ def_interface(i_gpio_t)
                                          uint_fast32_t feature);
 
     //! set pin directions with pin-mask
-    void            (*SetDirection)     (uint_fast32_t dir_bitmap,
+    void            (*SetDirection)     (uint32_t dir_bitmap,
                                          uint32_t pin_mask);
     //! get pin direction with pin-mask
-    uint_fast32_t   (*GetDirection)     (uint32_t pin_mask);
+    uint32_t        (*GetDirection)     (uint32_t pin_mask);
     //! Set specified pin direction to input
     void            (*SetInput)         (uint32_t pin_mask);
     //! Set specified pin direction to output
@@ -380,7 +432,7 @@ def_interface(i_gpio_t)
     //! get pin value on specified port
     uint32_t        (*Read)             (void);
     //! write pin value with pin-mask
-    void            (*Write)            (uint_fast32_t value, uint32_t pin_mask);
+    void            (*Write)            (uint32_t value, uint32_t pin_mask);
     //! set specified pins
     void            (*Set)              (uint32_t pin_mask);
     //! clear specified pins
