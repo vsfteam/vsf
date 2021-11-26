@@ -80,8 +80,6 @@ static app_gpio_demo_t __app_gpio_demo;
 
 static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_gpio_t * input_gpio = &APP_GPIO_DEMO_CFG_INPUT_GPIO;
-    vsf_gpio_t * output_gpio = &APP_GPIO_DEMO_CFG_OUTPUT_GPIO;
 #if APP_GPIO_DEMO_CFG_INPUT_TEST == ENABLED
     uint32_t read_pins = 0;
 #endif
@@ -89,26 +87,29 @@ static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_INIT:
 #if APP_GPIO_DEMO_CFG_INPUT_TEST == ENABLED
-        vsf_gpio_config_pin(input_gpio,
+        VSF_GPIO_CONFIG_PIN(&APP_GPIO_DEMO_CFG_INPUT_GPIO,
                             APP_GPIO_DEMO_CFG_INPUT_PIN_MASK,
                             APP_GPIO_DEMO_CFG_INPUT_FEATURE);
-        vsf_gpio_set_input(input_gpio, APP_GPIO_DEMO_CFG_INPUT_PIN_MASK);
+        VSF_GPIO_SET_INPUT(&APP_GPIO_DEMO_CFG_INPUT_GPIO,
+                           APP_GPIO_DEMO_CFG_INPUT_PIN_MASK);
 #endif
 #if APP_GPIO_DEMO_CFG_OUTPUT_TEST == ENABLED
-        vsf_gpio_config_pin(output_gpio,
+        VSF_GPIO_CONFIG_PIN(&APP_GPIO_DEMO_CFG_OUTPUT_GPIO,
                             APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK,
                             APP_GPIO_DEMO_CFG_OUTPUT_FEATURE);
-        vsf_gpio_set_output(output_gpio, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
+        VSF_GPIO_SET_OUTPUT(&APP_GPIO_DEMO_CFG_OUTPUT_GPIO,
+                            APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
 #endif
 
     case VSF_EVT_TIMER:
 #if APP_GPIO_DEMO_CFG_INPUT_TEST == ENABLED
-        read_pins = vsf_gpio_read(input_gpio) & APP_GPIO_DEMO_CFG_INPUT_PIN_MASK;
+        read_pins  = VSF_GPIO_READ(&APP_GPIO_DEMO_CFG_INPUT_GPIO);
+        read_pins &= APP_GPIO_DEMO_CFG_INPUT_PIN_MASK;
         vsf_trace_debug("read pin value: 0x%08x" VSF_TRACE_CFG_LINEEND, read_pins);
 #endif
 
 #if APP_GPIO_DEMO_CFG_OUTPUT_TEST == ENABLED
-        vsf_gpio_toggle(output_gpio, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
+        VSF_GPIO_TOGGLE(&APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
 #endif
         vsf_teda_set_timer_ms(APP_GPIO_DEMO_DELAY_MS);
         break;

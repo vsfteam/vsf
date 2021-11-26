@@ -11451,6 +11451,15 @@
                 <group>
                     <name>common</name>
                     <group>
+                        <name>multi_instances</name>
+                        <group>
+                            <name>gpio</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_multiple_instances.c</name>
+                            </file>
+                        </group>
+                    </group>
+                    <group>
                         <name>swi</name>
                         <group>
                             <name>arm</name>
