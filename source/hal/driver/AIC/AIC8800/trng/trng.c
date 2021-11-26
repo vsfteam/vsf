@@ -37,7 +37,7 @@
     vsf_hw_rng_t VSF_MCONNECT(vsf_rng, __COUNT) = {                             \
         VSF_MCONNECT(RNG, __COUNT, _CONFIG)                                     \
     };                                                                          \
-    void VSF_MCONNECT(TRNG, __COUNT, _IRQHandler)(void)                         \
+    void VSF_MCONNECT(RNG, __COUNT, _IRQHandler)(void)                          \
     {                                                                           \
         vsf_hw_rng_t *rng = &VSF_MCONNECT(vsf_rng, __COUNT);                    \
         AIC_TRNG_TypeDef *reg = rng->reg;                                       \

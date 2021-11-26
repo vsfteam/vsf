@@ -67,6 +67,7 @@
 
 #define RNG_COUNT                   1
 #define RNG_BITLEN                  32
+#define RNG0_IRQHandler             TRNG_IRQHandler
 #define RNG0_CONFIG                                                             \
             .reg                    = (void *)AIC_TRNG_BASE,                    \
             .pclk                   = CSC_PCLKME_TRNG_EN_BIT,
