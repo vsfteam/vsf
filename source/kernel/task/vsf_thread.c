@@ -46,7 +46,11 @@
 SECTION(".text.vsf.kernel.vsf_thread_get_cur")
 vsf_thread_t *vsf_thread_get_cur(void)
 {
-    return (vsf_thread_t *)vsf_eda_get_cur();
+    vsf_thread_t *thread_obj = (vsf_thread_t *)vsf_eda_get_cur();
+#   if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
+    VSF_KERNEL_ASSERT(thread_obj->flag.feature.is_stack_owner);
+#   endif
+    return thread_obj;
 }
 
 #if __IS_COMPILER_ARM_COMPILER_6__
@@ -263,10 +267,6 @@ SECTION(".text.vsf.kernel.__vsf_thread_stack_check")
 static void __vsf_thread_stack_check(uintptr_t stack)
 {
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
-    VSF_KERNEL_ASSERT(thread_obj != NULL);
-#   if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
-    VSF_KERNEL_ASSERT(thread_obj->flag.feature.is_stack_owner);
-#   endif
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     class_internal(thread_obj, thread, vsf_thread_t);
