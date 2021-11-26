@@ -22,6 +22,7 @@
 #if VSF_USE_MBEDTLS == ENABLED
 
 #include "service/vsf_service.h"
+#include "kernel/vsf_kernel.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

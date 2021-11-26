@@ -126,6 +126,7 @@
 
 // demo for AIC8800
 #define VSF_USE_WIFI                                    ENABLED
+#define VSF_USE_MBEDTLS                                 ENABLED
 #define AIC8800_APP_USE_WIFI_DEMO                       ENABLED
 #define AIC8800_APP_USE_BT_DEMO                         ENABLED
 

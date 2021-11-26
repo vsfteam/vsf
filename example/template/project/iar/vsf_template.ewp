@@ -4558,6 +4558,7 @@
                     <state>__AIC__</state>
                     <state>__AIC8800__</state>
                     <state>__OOC_CPP__</state>
+                    <state>MBEDTLS_USER_CONFIG_FILE="component/3rd-party/mbedtls/port/platform_vsf.h"</state>
                     <state>LV_CONF_INCLUDE_SIMPLE</state>
                     <state>FT2_BUILD_LIBRARY</state>
                     <state>CFG_HW_PLATFORM=2</state>
@@ -8152,6 +8153,15 @@
                 </group>
                 <group>
                     <name>mbedtls</name>
+                    <group>
+                        <name>port</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\port\platform_vsf.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\port\platform_vsf.h</name>
+                        </file>
+                    </group>
                     <group>
                         <name>raw</name>
                         <group>
