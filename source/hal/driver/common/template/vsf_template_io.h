@@ -27,7 +27,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HAL_GPIO_CFG_MULTI_INSTANCES
-#   define VSF_HAL_GPIO_CFG_MULTI_INSTANCES ENABLED
+#   define VSF_HAL_GPIO_CFG_MULTI_INSTANCES DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
