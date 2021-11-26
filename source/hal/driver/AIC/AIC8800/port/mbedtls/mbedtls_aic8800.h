@@ -15,43 +15,39 @@
  *                                                                           *
  ****************************************************************************/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-
-#   include "__device.h"
-
-#else
-
-#   ifndef __HAL_DRIVER_AIC_AIC8800_H__
-#       define __HAL_DRIVER_AIC_AIC8800_H__
+#ifndef __MBEDTLS_AIC8800_H__
+#define __MBEDTLS_AIC8800_H__
 
 /*============================ INCLUDES ======================================*/
 
-#       include "hal/vsf_hal_cfg.h"
-#       include "./device.h"
+#include "component/vsf_component_cfg.h"
 
-#       include "system.h"
-
-#       include "hal/driver/common/swi/vsf_swi_template.h"
-#       include "./usb/usb.h"
-#       include "./debug_uart/debug_uart.h"
-#       include "./spi/spi.h"
-#       include "./uart/uart.h"
-#       include "./gpio/gpio.h"
-#       include "./adc/adc.h"
-#       include "./flash/flash.h"
-#       include "./pwm/pwm.h"
-#       include "./i2c/i2c.h"
-
-// mbedtls configurations ONLY in mbedtls_aic8800.h
-#       include "./port/mbedtls/mbedtls_aic8800.h"
+#if VSF_USE_MBEDTLS == ENABLED && VSF_AIC8800_USE_MBEDTLS_ACCELERATOR == ENABLED
 
 /*============================ MACROS ========================================*/
+
+#ifdef CONFIG_RWNX
+#   define MBEDTLS_AES_SETKEY_ENC_ALT
+#   define MBEDTLS_AES_SETKEY_DEC_ALT
+#   define MBEDTLS_AES_ENCRYPT_ECB_ALT
+#   define MBEDTLS_AES_ENCRYPT_CBC_ALT
+#   define MBEDTLS_AES_ENCRYPT_GCM_ALT
+
+#   define MBEDTLS_SHA256_COMPUTE_ALT
+#   define MBEDTLS_RSA_EXPMOD_ALT
+#   define MBEDTLS_ECC_MULCPMB_ALT
+#   define MBEDTLS_DRBG_ALT
+#endif
+
+#undef MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
+#define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
+#undef MBEDTLS_NO_PLATFORM_ENTROPY
+#define MBEDTLS_NO_PLATFORM_ENTROPY
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#   endif   // __HAL_DRIVER_AIC_AIC8800_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-/* EOF */
+#endif      // VSF_USE_MBEDTLS
+#endif      // __MBEDTLS_AIC8800_H__
