@@ -57,6 +57,10 @@
 #   undef MBEDTLS_HAVE_TIME_DATE
 #endif
 
+#if RNG_COUNT > 0
+#   define MBEDTLS_ENTROPY_HARDWARE_ALT
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

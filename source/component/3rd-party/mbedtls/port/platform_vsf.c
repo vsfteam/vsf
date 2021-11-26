@@ -23,6 +23,9 @@
 
 #include "service/vsf_service.h"
 #include "kernel/vsf_kernel.h"
+#include "hal/vsf_hal.h"
+
+#include "mbedtls/config.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -51,5 +54,32 @@ void __vsf_mbedtls_exit(int status)
 {
     vsf_thread_exit();
 }
+
+#if RNG_COUNT > 0
+WEAK(mbedtls_hardware_poll)
+int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen)
+{
+    static bool __is_inited = false;
+    size_t cur_len = 0;
+
+    VSF_ASSERT(!(len % (RNG_BITLEN >> 3)));
+
+    if (!__is_inited) {
+        __is_inited = true;
+        vsf_hw_rng_init(&vsf_rng0);
+    }
+
+    while (cur_len < len) {
+        if (VSF_ERR_NONE != vsf_hw_rng_generate(&vsf_rng0, (uint32_t *)output)) {
+            break;
+        }
+
+        cur_len += RNG_BITLEN >> 3;
+        output += RNG_BITLEN >> 3;
+    }
+    *olen = cur_len;
+    return 0;
+}
+#endif
 
 #endif      // VSF_USE_MBEDTLS
