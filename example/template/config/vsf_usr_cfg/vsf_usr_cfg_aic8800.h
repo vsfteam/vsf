@@ -52,6 +52,7 @@
 #define SWI3_IRQHandler                                 I2CS_IRQHandler
 
 #define VSF_HAL_GPIO_USE_74HC165                        ENABLED
+#define VSF_HAL_USE_RNG                                 ENABLED
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED

@@ -65,6 +65,12 @@
 
 #define GPIO_COUNT                  2
 
+#define RNG_COUNT                   1
+#define RNG_BITLEN                  32
+#define RNG0_CONFIG                                                             \
+            .reg                    = (void *)AIC_TRNG_BASE,                    \
+            .pclk                   = CSC_PCLKME_TRNG_EN_BIT,
+
 #define I2C_MAX_PORT                1
 #define VSF_HAL_I2C0_MULTIPLEX_CNT  2
 #define I2C_PORT_MASK               0x3

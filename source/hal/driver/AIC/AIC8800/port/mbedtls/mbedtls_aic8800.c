@@ -24,7 +24,7 @@
 #include "mbedtls/aes.h"
 #include "mbedtls/sha256.h"
 
-#include "dma_ce_api0.h"
+#include "ce_api.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
