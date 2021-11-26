@@ -84,10 +84,12 @@ void aic8800_demo_init(void)
     __usbh_heap_init();
 #endif
 
-#if AIC8800_APP_USE_WIFI_DEMO == ENABLED
+    // currently known dependency on rtos_al: lwip from vendor
     if (rtos_init()) {
         VSF_HAL_ASSERT(false);
     }
+
+#if AIC8800_APP_USE_WIFI_DEMO == ENABLED
     extern void aic8800_wifi_start(void);
     aic8800_wifi_start();
 #endif

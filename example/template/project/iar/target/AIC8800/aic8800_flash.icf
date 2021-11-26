@@ -186,8 +186,8 @@ define block host_rxbuf_block { readwrite section HOST_RXBUF };
 place in host_rxbuf_region { block host_rxbuf_block };
 
 /* Sections for BT */
-define symbol __shared_host_start__         = 0x001E5000;
-define symbol __shared_host_end__           = 0x001E57FF;
+define symbol __shared_host_start__          = 0x001E5000;
+define symbol __shared_host_end__            = 0x001E57FF;
 define region shared_host_region = mem:[from __shared_host_start__ to __shared_host_end__];
 define block shared_host_block { readwrite section SHAREDMEM_HOST_* };
 place in shared_host_region { block shared_host_block };

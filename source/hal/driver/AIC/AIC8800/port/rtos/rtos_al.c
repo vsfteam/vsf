@@ -675,15 +675,16 @@ static void __rtos_timer_thread(void *param)
 
 int rtos_init(void)
 {
+// IMPORTANT: use the latest lib from vendor, there is no timeval dependency
 // wifi library from vendor depends on <sys/timer.h>,
 //  and tv_sec in timeval structure MUST BE 64-bit,
 //  assert if current environment is OK
-    volatile struct timeval time;
-    if (    (8 != sizeof(time.tv_sec))
-        ||  (4 != sizeof(time.tv_usec))) {
-        VSF_ASSERT(false);
-        return -1;
-    }
+//    volatile struct timeval time;
+//    if (    (8 != sizeof(time.tv_sec))
+//        ||  (4 != sizeof(time.tv_usec))) {
+//        VSF_ASSERT(false);
+//        return -1;
+//    }
 
     return rtos_task_create(__rtos_timer_thread, "rtos_timer", 0,
                 AIC8800_OSAL_CFG_TIMER_TASK_STACK_DEPTH, NULL,
