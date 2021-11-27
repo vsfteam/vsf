@@ -211,10 +211,10 @@ static void __vk_adc_on_time(vsf_callback_timer_t *timer)
 
     PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw), 0x1);
 
-    temp_mask = vsf_gpio0.GPIO->MR;
-    vsf_gpio0.GPIO->MR = gpmsk;
+    temp_mask = REG_GPIO0->MR;
+    REG_GPIO0->MR = gpmsk;
     temp_value = PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_ro_acc));
-    vsf_gpio0.GPIO->MR = temp_mask;
+    REG_GPIO0->MR = temp_mask;
 
     temp_value = temp_value * 1175 / 32896 - 1175;
     if (adc_ptr->current_channel->channel & 0x01) {

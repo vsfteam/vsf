@@ -40,7 +40,7 @@
 #define __VSF_HW_GPIO_IS_VAILID_FEATURE(__F)                                    \
     ((__F & ~(uint32_t)__IO_FEATURE_MASK) == 0)
 
-/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_HW_GPIO_IPM_LV0(__COUNT, __dont_care)                             \
     vsf_hw_gpio_t vsf_gpio##__COUNT = {                                         \
@@ -48,15 +48,39 @@
         .GPIO = REG_GPIO##__COUNT,                                              \
         .IOMUX = ((AIC_IOMUX_TypeDef *)GPIO##__COUNT##_IOMUX_REG_BASE),         \
         .is_pmic = GPIO##__COUNT##_IS_PMIC,                                     \
-        .pin_sel = GPIO##__COUNT##_PIN_SEL                                      \
+        .pin_sel = GPIO##__COUNT##_PIN_SEL,                                     \
+        .output_reg = 0,                                                        \
     };
+
+/*============================ PROTOTYPES ====================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#ifndef VSF_HW_GPIO_CFG_PROTECT_LEVEL
+#   define VSF_HW_GPIO_CFG_PROTECT_LEVEL    interrupt
+#endif
+
+#define __vsf_hw_gpio_protect               vsf_protect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
+#define __vsf_hw_gpio_unprotect             vsf_unprotect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
+/*============================ TYPES =========================================*/
+
+typedef struct vsf_hw_gpio_t {
+#if VSF_HAL_GPIO_CFG_MULTI_INSTANCES == ENABLED
+    vsf_gpio_t vsf_gpio;
+#endif
+
+    GPIO_REG_T *GPIO;
+    uint32_t output_reg;
+    bool is_pmic;
+
+    // TODO: move to IO module
+    AIC_IOMUX_TypeDef *IOMUX;
+    uint8_t pin_sel[GPIO_PIN_MAX];
+} vsf_hw_gpio_t;
+
+/*============================ GLOBAL VARIABLES ==============================*/
 
 VSF_MREPEAT(GPIO_COUNT, __VSF_HW_GPIO_IPM_LV0, NULL)
 
-/*============================ PROTOTYPES ====================================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ TYPES =========================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 static bool __gpio_is_pmic_mem(vsf_hw_gpio_t *hw_gpio_ptr)
@@ -94,8 +118,8 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t 
 
     for (int i = 0; i < GPIO_PIN_MAX; i++) {
         if (pin_mask & (1 << i)) {
+            // TODO: move to IO module
             uint32_t wdata = feature | hw_gpio_ptr->pin_sel[i];
-            // TODO: move to IO
             __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->IOMUX->GPCFG[i],
                                   wdata, __IO_FEATURE_MASK);
         }
@@ -151,14 +175,19 @@ void vsf_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
     __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->GPIO->MR, pin_mask, ~(uint32_t)0);
     __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->GPIO->VR, value, pin_mask);
     __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->GPIO->MR, temp_value, ~(uint32_t)0);
+
+    vsf_protect_t orig = __vsf_hw_gpio_protect();
+    hw_gpio_ptr->output_reg &= ~pin_mask;
+    hw_gpio_ptr->output_reg |= (value & pin_mask);
+    __vsf_hw_gpio_unprotect(orig);
 }
 
 void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
+    vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
-    uint32_t ret = ~vsf_gpio_read(gpio_ptr); // TODO: make sure read value from regiester
-    vsf_gpio_write(gpio_ptr, ret, pin_mask);
+    vsf_gpio_write(gpio_ptr, ~hw_gpio_ptr->output_reg, pin_mask);
 }
 
 #endif      // VSF_HAL_USE_GPIO

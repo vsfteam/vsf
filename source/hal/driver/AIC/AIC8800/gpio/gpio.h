@@ -59,22 +59,7 @@ enum io_pin_no_t {
 
 /*============================ TYPES =========================================*/
 
-vsf_class(vsf_hw_gpio_t) {
-#if VSF_HAL_GPIO_CFG_MULTI_INSTANCES == ENABLED
-    public_member(
-        implement(vsf_gpio_t)
-    )
-#endif
-
-    private_member(
-        GPIO_REG_T *GPIO;
-        bool is_pmic;
-
-        // TODO: move to io
-        AIC_IOMUX_TypeDef *IOMUX;
-        uint8_t pin_sel[GPIO_PIN_MAX];
-    )
-};
+typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
 
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
