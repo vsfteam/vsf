@@ -53,8 +53,12 @@
                     if (rng->request.on_ready != NULL) {                        \
                         rng->request.on_ready(rng->request.param, buffer, rng->request.num);\
                     }                                                           \
+                } else {                                                        \
+                    reg->trng_en = TRNG_STRNGENQ | TRNG_STRNGIEQ;               \
                 }                                                               \
             }                                                                   \
+        } else {                                                                \
+            reg->trng_en = TRNG_STRNGENQ | TRNG_STRNGIEQ;                       \
         }                                                                       \
     }
 
@@ -86,11 +90,22 @@ VSF_MREPEAT(RNG_COUNT, __VSF_HW_RNG_IMP_LV0, NULL)
 vsf_err_t vsf_hw_rng_init(vsf_hw_rng_t *rng)
 {
     cpusysctrl_pclkme_set(rng->pclk);
+
+    AIC_TRNG_TypeDef *reg = rng->reg;
+    reg->trng_en = 0;
+
+    NVIC_SetPriority(TRNG_IRQn, vsf_arch_prio_0);
+    NVIC_EnableIRQ(TRNG_IRQn);
     return VSF_ERR_NONE;
 }
 
 void vsf_hw_rng_fini(vsf_hw_rng_t *rng)
 {
+    NVIC_DisableIRQ(TRNG_IRQn);
+
+    AIC_TRNG_TypeDef *reg = rng->reg;
+    reg->trng_en = 0;
+
     cpusysctrl_hclkmd_set(rng->pclk);
 }
 
@@ -106,25 +121,7 @@ vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint3
     rng->request.num = num;
     rng->request.cur_num = 0;
 
-    reg->trng_en |= TRNG_STRNGENQ | TRNG_STRNGIEQ;
-    return VSF_ERR_NONE;
-}
-
-vsf_err_t vsf_hw_rng_generate(vsf_hw_rng_t *rng, uint32_t *value)
-{
-    AIC_TRNG_TypeDef *reg = rng->reg;
-
-    if (!(reg->trng_en & TRNG_STRNGENQ)) {
-        reg->trng_en |= TRNG_STRNGENQ | TRNG_STRNGIEQ;
-        return VSF_ERR_NOT_READY;
-    }
-    if (!(reg->trng_status & TRNG_SDRDYQ)) {
-        return VSF_ERR_NOT_READY;
-    }
-
-    if (value != NULL) {
-        *value = reg->trng_data;
-    }
+    reg->trng_en = TRNG_STRNGENQ | TRNG_STRNGIEQ;
     return VSF_ERR_NONE;
 }
 

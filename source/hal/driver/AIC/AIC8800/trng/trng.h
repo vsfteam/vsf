@@ -44,7 +44,6 @@ extern vsf_err_t vsf_hw_rng_init(vsf_hw_rng_t *rng);
 extern void vsf_hw_rng_fini(vsf_hw_rng_t *rng);
 extern vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint32_t num,
             void *param, void (*on_ready)(void *param, uint32_t *buffer, uint32_t num));
-extern vsf_err_t vsf_hw_rng_generate(vsf_hw_rng_t *rng, uint32_t *value);
 
 #endif /* VSF_HAL_USE_RNG */
 #endif /* __HAL_DRIVER_AIC8800_TRNG_H__ */
