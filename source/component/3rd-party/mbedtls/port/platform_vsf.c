@@ -47,7 +47,9 @@ void * __vsf_mbedtls_calloc(size_t n, size_t size)
 
 void __vsf_mbedtls_free(void *ptr)
 {
-    vsf_heap_free(ptr);
+    if (ptr != NULL) {
+        vsf_heap_free(ptr);
+    }
 }
 
 void __vsf_mbedtls_exit(int status)
