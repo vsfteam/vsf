@@ -27,22 +27,18 @@
 /*============================ MACROS ========================================*/
 
 #ifdef CONFIG_RWNX
-#   define MBEDTLS_AES_SETKEY_ENC_ALT
-#   define MBEDTLS_AES_SETKEY_DEC_ALT
-#   define MBEDTLS_AES_ENCRYPT_ECB_ALT
-#   define MBEDTLS_AES_ENCRYPT_CBC_ALT
-#   define MBEDTLS_AES_ENCRYPT_GCM_ALT
+//#   define MBEDTLS_AES_SETKEY_ENC_ALT
+//#   define MBEDTLS_AES_SETKEY_DEC_ALT
+//#   define MBEDTLS_AES_ENCRYPT_ALT
+//#   define MBEDTLS_AES_DECRYPT_ALT
+//#   define MBEDTLS_ECC_MULCPMB_ALT
 
-#   define MBEDTLS_SHA256_COMPUTE_ALT
-#   define MBEDTLS_RSA_EXPMOD_ALT
-#   define MBEDTLS_ECC_MULCPMB_ALT
-#   define MBEDTLS_DRBG_ALT
+//#   define MBEDTLS_AES_ENCRYPT_ECB_ALT
+//#   define MBEDTLS_AES_ENCRYPT_CBC_ALT
+//#   define MBEDTLS_AES_ENCRYPT_GCM_ALT
+//#   define MBEDTLS_SHA256_COMPUTE_ALT
+//#   define MBEDTLS_RSA_EXPMOD_ALT
 #endif
-
-#undef MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
-#define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
-#undef MBEDTLS_NO_PLATFORM_ENTROPY
-#define MBEDTLS_NO_PLATFORM_ENTROPY
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

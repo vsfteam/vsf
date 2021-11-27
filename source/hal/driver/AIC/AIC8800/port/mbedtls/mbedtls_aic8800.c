@@ -38,6 +38,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#ifdef MBEDTLS_AES_SETKEY_ENC_ALT
 int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
                     unsigned int keybits )
 {
@@ -54,7 +55,9 @@ int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
 
     return( 0 );
 }
+#endif
 
+#ifdef MBEDTLS_AES_SETKEY_DEC_ALT
 int mbedtls_aes_setkey_dec( mbedtls_aes_context *ctx, const unsigned char *key,
                     unsigned int keybits )
 {
@@ -71,11 +74,14 @@ int mbedtls_aes_setkey_dec( mbedtls_aes_context *ctx, const unsigned char *key,
 
     return( 0 );
 }
+#endif
 
-int mbedtls_aes_crypt_ecb( mbedtls_aes_context *ctx,
-                    int mode,
-                    const unsigned char input[16],
-                    unsigned char output[16] )
+#if     defined(MBEDTLS_AES_ENCRYPT_ALT) || defined(MBEDTLS_AES_DECRYPT_ALT)    \
+    ||  defined(MBEDTLS_AES_ENCRYPT_ECB_ALT)
+static int __mbedtls_aes_crypto(  mbedtls_aes_context *ctx,
+                                  int mode,
+                                  const unsigned char input[16],
+                                  unsigned char output[16] )
 {
     dma_cypt_t dma_cypt_obj = {0};
     aes_state_t aes_obj = {0};
@@ -111,7 +117,37 @@ int mbedtls_aes_crypt_ecb( mbedtls_aes_context *ctx,
 
     return( 0 );
 }
+#endif
 
+#ifdef MBEDTLS_AES_ENCRYPT_ALT
+int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
+                                  const unsigned char input[16],
+                                  unsigned char output[16] )
+{
+    return __mbedtls_aes_crypto(ctx, MBEDTLS_AES_ENCRYPT, input, output);
+}
+#endif
+
+#ifdef MBEDTLS_AES_DECRYPT_ALT
+int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
+                                  const unsigned char input[16],
+                                  unsigned char output[16] )
+{
+    return __mbedtls_aes_crypto(ctx, MBEDTLS_AES_DECRYPT, input, output);
+}
+#endif
+
+#ifdef MBEDTLS_AES_ENCRYPT_ECB_ALT
+int mbedtls_aes_crypt_ecb( mbedtls_aes_context *ctx,
+                    int mode,
+                    const unsigned char input[16],
+                    unsigned char output[16] )
+{
+    return __mbedtls_aes_crypto(ctx, mode, input, output);
+}
+#endif
+
+#ifdef MBEDTLS_AES_ENCRYPT_CBC_ALT
 int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
                     int mode,
                     size_t length,
@@ -162,7 +198,9 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
 
     return ret;
 }
+#endif
 
+#ifdef MBEDTLS_AES_ENCRYPT_GCM_ALT
 int mbedtls_gcm_crypt_and_tag( mbedtls_gcm_context *ctx,
                        int mode,
                        size_t length,
@@ -233,7 +271,9 @@ int mbedtls_gcm_crypt_and_tag( mbedtls_gcm_context *ctx,
 
     return( 0 );
 }
+#endif
 
+#ifdef MBEDTLS_SHA256_COMPUTE_ALT
 void mbedtls_sha256( const unsigned char *input, size_t ilen,
              unsigned char output[32], int is224 )
 {
@@ -254,7 +294,9 @@ void mbedtls_sha256( const unsigned char *input, size_t ilen,
     sha256_obj.length_byte = ilen;
     hash_proc_512bit(&dma_cypt_obj, &sha256_obj, (unsigned int *)output);
 }
+#endif
 
+#ifdef MBEDTLS_RSA_EXPMOD_ALT
 int mbedtls_mpi_exp_mod( mbedtls_mpi *X, const mbedtls_mpi *A, const mbedtls_mpi *E, const mbedtls_mpi *N, mbedtls_mpi *_RR )
 {
     dma_cypt_t dma_cypt_obj = {0};
@@ -277,7 +319,9 @@ int mbedtls_mpi_exp_mod( mbedtls_mpi *X, const mbedtls_mpi *A, const mbedtls_mpi
 
     return 0;
 }
+#endif
 
+#ifdef MBEDTLS_ECC_MULCPMB_ALT
 static int ecp_mul_comb( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
                          const mbedtls_mpi *m, const mbedtls_ecp_point *P,
                          int (*f_rng)(void *, unsigned char *, size_t),
@@ -325,5 +369,6 @@ static int ecp_mul_comb( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
 
     return 0;
 }
+#endif
 
 #endif      // VSF_USE_MBEDTLS
