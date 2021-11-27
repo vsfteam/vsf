@@ -461,6 +461,9 @@ void libusb_hotplug_deregister_callback(libusb_context *ctx,
 ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device *** list)
 {
     ssize_t devnum = __vsf_libusb.devnum;
+    if (list != NULL) {
+        *list = NULL;
+    }
     if ((devnum > 0) && (list != NULL)) {
         ssize_t i;
         libusb_device **devlist = (libusb_device **)malloc((devnum + 1) * sizeof(libusb_device *));
