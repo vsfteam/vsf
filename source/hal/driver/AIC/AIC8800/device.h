@@ -64,6 +64,19 @@
                 .vbus_en            = false,
 
 #define GPIO_COUNT                  2
+#define GPIO_PIN_MAX                16
+#define GPIO0_IOMUX_REG_BASE        (0x40503000)
+#define GPIO0_IS_PMIC               false
+#define GPIO0_PIN_SEL              {                                            \
+        1, 1, 0, 0, 0, 0, 0, 0,                                                 \
+        1, 1, 0, 0, 0, 0, 0, 0,                                                 \
+    }
+#define GPIO1_IOMUX_REG_BASE        (0x50012000)
+#define GPIO1_IS_PMIC               true
+#define GPIO1_PIN_SEL {                                                         \
+        1, 1, 0, 0, 0, 0, 0, 0,                                                 \
+        0, 0, 0, 0, 0, 0, 0, 0,                                                 \
+    }
 
 #define RNG_COUNT                   1
 #define RNG_BITLEN                  32

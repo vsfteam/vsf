@@ -40,16 +40,12 @@
 #   define VSF_GPIO_CFG_REIMPLEMENT_CLEAR DISABLED
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_TOGGLE
-#   define VSF_GPIO_CFG_REIMPLEMENT_TOGGLE DISABLED
-#endif
-
 #if VSF_HAL_GPIO_CFG_MULTI_INSTANCES == DISABLED
 #   define VSF_HAL_GPIO_MULTI_OP
 #else
 
-#   ifndef VSF_HAL_GPIO_CFG_INSTANCE_NAME
-#       define VSF_HAL_GPIO_CFG_INSTANCE_NAME vsf_hw_
+#   ifndef VSF_HAL_GPIO_CFG_INSTANCE_PREFIX
+#       define VSF_HAL_GPIO_CFG_INSTANCE_PREFIX vsf_hw_
 #   endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -57,19 +53,19 @@
 #   define VSF_GPIO_WRAPPER(__header, __api)    __VSF_GPIO_WRAPPER(__header, __api)
 #   define __VSF_GPIO_WRAPPER(__header, __api)  __header ## __api
 
-#   define vsf_gpio_config_pin                  VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_config_pin)
-#   define vsf_gpio_set_direction               VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_set_direction)
-#   define vsf_gpio_get_direction               VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_get_direction)
-#   define vsf_gpio_set_input                   VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_set_input)
-#   define vsf_gpio_set_output                  VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_set_output)
-#   define vsf_gpio_switch_direction            VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_switch_direction)
-#   define vsf_gpio_read                        VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_read)
-#   define vsf_gpio_write                       VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_write)
-#   define vsf_gpio_set                         VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_set)
-#   define vsf_gpio_clear                       VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_clear)
-#   define vsf_gpio_toggle                      VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_toggle)
+#   define vsf_gpio_config_pin          VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_config_pin)
+#   define vsf_gpio_set_direction       VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_set_direction)
+#   define vsf_gpio_get_direction       VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_get_direction)
+#   define vsf_gpio_set_input           VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_set_input)
+#   define vsf_gpio_set_output          VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_set_output)
+#   define vsf_gpio_switch_direction    VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_switch_direction)
+#   define vsf_gpio_read                VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_read)
+#   define vsf_gpio_write               VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_write)
+#   define vsf_gpio_set                 VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_set)
+#   define vsf_gpio_clear               VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_clear)
+#   define vsf_gpio_toggle              VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_toggle)
 
-#   define VSF_HAL_GPIO_MULTI_OP                .op = &VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_NAME, gpio_op),
+#   define VSF_HAL_GPIO_MULTI_OP        .op = &VSF_GPIO_WRAPPER(VSF_HAL_GPIO_CFG_INSTANCE_PREFIX, gpio_op),
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -114,7 +110,7 @@ void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
-    vsf_gpio_set_direction(gpio_ptr, (uint32_t )0, pin_mask);
+    vsf_gpio_set_direction(gpio_ptr, 0, pin_mask);
 }
 #endif
 
@@ -123,7 +119,7 @@ void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
-    vsf_gpio_set_direction(gpio_ptr, ~(uint32_t )0, pin_mask);
+    vsf_gpio_set_direction(gpio_ptr, pin_mask, pin_mask);
 }
 #endif
 
@@ -142,7 +138,7 @@ void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
-    vsf_gpio_write(gpio_ptr, ~(uint32_t)0, pin_mask);
+    vsf_gpio_write(gpio_ptr, pin_mask, pin_mask);
 }
 #endif
 
@@ -151,17 +147,7 @@ void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
-    vsf_gpio_write(gpio_ptr, (uint32_t)0, pin_mask);
-}
-#endif
-
-#if VSF_GPIO_CFG_REIMPLEMENT_TOGGLE == DISALBED
-void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
-{
-    VSF_HAL_ASSERT(NULL != gpio_ptr);
-
-    uint32_t ret = ~vsf_gpio_read(gpio_ptr);
-    vsf_gpio_write(gpio_ptr, ret, pin_mask);
+    vsf_gpio_write(gpio_ptr, pin_mask, pin_mask);
 }
 #endif
 

@@ -33,11 +33,6 @@
 #endif
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_HAL_GPIO_PIN_MAX
-#   define VSF_HAL_GPIO_PIN_MAX    16
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -77,7 +72,7 @@ vsf_class(vsf_hw_gpio_t) {
 
         // TODO: move to io
         AIC_IOMUX_TypeDef *IOMUX;
-        uint8_t pin_sel[VSF_HAL_GPIO_PIN_MAX];
+        uint8_t pin_sel[GPIO_PIN_MAX];
     )
 };
 
