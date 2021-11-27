@@ -58,11 +58,18 @@ void __vsf_mbedtls_exit(int status)
 }
 
 #if RNG_COUNT > 0
+static void __vsf_mbedtls_hardware_poll_on_ready(void *param, uint32_t *buffer, uint32_t num)
+{
+    vsf_eda_t *eda = param;
+    if (eda != NULL) {
+        vsf_eda_post_evt(eda, VSF_EVT_USER);
+    }
+}
+
 WEAK(mbedtls_hardware_poll)
 int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen)
 {
     static bool __is_inited = false;
-    size_t cur_len = 0;
 
     VSF_ASSERT(!(len % (RNG_BITLEN >> 3)));
 
@@ -71,15 +78,10 @@ int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t 
         vsf_hw_rng_init(&vsf_rng0);
     }
 
-    while (cur_len < len) {
-        if (VSF_ERR_NONE != vsf_hw_rng_generate(&vsf_rng0, (uint32_t *)output)) {
-            break;
-        }
-
-        cur_len += RNG_BITLEN >> 3;
-        output += RNG_BITLEN >> 3;
-    }
-    *olen = cur_len;
+    vsf_hw_rng_generate_request(&vsf_rng0, (uint32_t *)output, len / (RNG_BITLEN >> 3),
+            vsf_thread_get_cur(), __vsf_mbedtls_hardware_poll_on_ready);
+    vsf_thread_wfe(VSF_EVT_USER);
+    *olen = len;
     return 0;
 }
 #endif
