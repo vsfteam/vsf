@@ -21,8 +21,12 @@
 
 #if VSF_USE_MBEDTLS == ENABLED && VSF_AIC8800_USE_MBEDTLS_ACCELERATOR == ENABLED
 
+#include "mbedtls/bignum.h"
+
 #include "mbedtls/aes.h"
 #include "mbedtls/sha256.h"
+#include "mbedtls/gcm.h"
+#include "mbedtls/ecp.h"
 
 #include "ce_api.h"
 
@@ -174,7 +178,6 @@ int mbedtls_gcm_crypt_and_tag( mbedtls_gcm_context *ctx,
     int i;
     uint32_t auth_pad_len = 0;
     dma_cypt_t dma_cypt_obj = {0};
-    aes_state_t aes_obj = {0};
     aes_gcm_state_t aes_gcm_obj = {0};
     mbedtls_aes_context *aes_ctx = (mbedtls_aes_context *)(ctx->cipher_ctx.cipher_ctx);
 
@@ -219,14 +222,14 @@ int mbedtls_gcm_crypt_and_tag( mbedtls_gcm_context *ctx,
         auth_pad_len = aes_gcm_obj.auth_dat_len_byte;
     }
     aes_gcm_obj.auth_dat_pad_len_byte = auth_pad_len;
-    aes_gcm_obj.auth_data = add;//padding
+    aes_gcm_obj.auth_data = (uint32_t *)add;//padding
     aes_gcm_obj.cipher_dat_len_byte = length;
-    aes_gcm_obj.aes_data = input;
+    aes_gcm_obj.aes_data = (uint32_t *)input;
     dma_cypt_obj.aes_a_len = aes_gcm_obj.auth_dat_len_byte * 8;//bit
     dma_cypt_obj.aes_plain_len = aes_gcm_obj.cipher_dat_len_byte * 8;//bit
 
     dma_cypt_init(&dma_cypt_obj);
-    aes_gcm_calc(&dma_cypt_obj, &aes_gcm_obj, output, tag);
+    aes_gcm_calc(&dma_cypt_obj, &aes_gcm_obj, (uint32_t *)output, (uint32_t *)tag);
 
     return( 0 );
 }
@@ -247,7 +250,7 @@ void mbedtls_sha256( const unsigned char *input, size_t ilen,
     }
     dma_cypt_obj.hash_pad_sel = HASH_HW_PAD;
     dma_cypt_init(&dma_cypt_obj);
-    sha256_obj.buf = input;
+    sha256_obj.buf = (uint8_t *)input;
     sha256_obj.length_byte = ilen;
     hash_proc_512bit(&dma_cypt_obj, &sha256_obj, (unsigned int *)output);
 }
