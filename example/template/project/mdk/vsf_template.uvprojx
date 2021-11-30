@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>CMSDK_CM7</Device>
           <Vendor>ARM</Vendor>
-          <PackID>Keil.V2M-MPS2_CMx_BSP.1.7.1</PackID>
+          <PackID>Keil.V2M-MPS2_CMx_BSP.1.7.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00400000) IROM(0x00000000,0x00400000) CPUTYPE("Cortex-M7") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -384,26 +384,6 @@
           <GroupName>example/template/config</GroupName>
           <Files>
             <File>
-              <FileName>awtk_config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/awtk_config.h</FilePath>
-            </File>
-            <File>
-              <FileName>btstack_config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/btstack_config.h</FilePath>
-            </File>
-            <File>
-              <FileName>evm_lua_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/evm_lua_conf.h</FilePath>
-            </File>
-            <File>
-              <FileName>lv_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/lv_conf.h</FilePath>
-            </File>
-            <File>
               <FileName>vsf_tgui_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../example/template/config/vsf_tgui_cfg.h</FilePath>
@@ -421,22 +401,62 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/config/lwip</GroupName>
+          <GroupName>example/template/config/3rd-party/awtk</GroupName>
           <Files>
             <File>
-              <FileName>lwipopts.h</FileName>
+              <FileName>awtk_config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/lwip/lwipopts.h</FilePath>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\awtk\awtk_config.h</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/config/mbedtls</GroupName>
+          <GroupName>example/template/config/3rd-party/btstack</GroupName>
+          <Files>
+            <File>
+              <FileName>btstack_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\btstack\btstack_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>example/template/config/3rd-party/evm</GroupName>
+          <Files>
+            <File>
+              <FileName>evm_lua_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\evm\evm_lua_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>example/template/config/3rd-party/lvgl</GroupName>
+          <Files>
+            <File>
+              <FileName>lv_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\lvgl\lv_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>example/template/config/3rd-party/lwip</GroupName>
+          <Files>
+            <File>
+              <FileName>lwipopts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\lwip\lwipopts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>example/template/config/3rd-party/mbedtls</GroupName>
           <Files>
             <File>
               <FileName>config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/mbedtls/config.h</FilePath>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\mbedtls\config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -35295,16 +35315,6 @@
               <FileType>5</FileType>
               <FilePath>../../../../source/shell/sys/linux/vsf_linux_cfg.h</FilePath>
             </File>
-            <File>
-              <FileName>vsf_linux_devfs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/shell/sys/linux/vsf_linux_devfs.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_linux_socket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/shell/sys/linux/vsf_linux_socket.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -35509,6 +35519,86 @@
               <FileName>wait.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../source/shell/sys/linux/include/sys/wait.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/fs</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_fs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_linux_fs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/fs/vfs</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_vfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_linux_vfs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/fs/vfs/devfs</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_devfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_linux_devfs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/socket</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_socket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_linux_socket.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/socket/inet</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_socket_inet_lwip.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_lwip.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/socket/unix</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_socket_unix.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -36964,7 +37054,7 @@
               <MiscControls>-fms-extensions  -Wno-enum-conversion -Wno-empty-body  -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
               <Define>__Hercules__, __CMEM7__, __M7M12N5__, PRINT_UART=UART0, __OOC_CPP__, LV_CONF_INCLUDE_SIMPLE, FT2_BUILD_LIBRARY</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\config;..\..\..\..\source;..\..\..\..\source\shell\sys\linux\include;..\..\..\..\source\shell\sys\linux\include\simple_libc;..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;..\..\..\..\source\component\3rd-party\nnom\raw\inc;..\..\..\..\source\component\3rd-party\vsfvm\raw;..\..\..\..\source\component\3rd-party\lvgl\raw;..\..\..\..\source\component\3rd-party\segger_rtt\raw;..\..\..\..\source\component\3rd-party\LingLongGUI\port;..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;..\..\..\..\source\component\3rd-party\freetype\port;..\..\..\..\source\component\3rd-party\freetype\raw\include;..\..\..\..\source\component\3rd-party\coremark\port;..\..\..\..\source\component\3rd-party\coremark\raw;..\..\..\..\source\component\3rd-party\lua\extension\oo;..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;..\..\..\..\source\component\3rd-party\lua\raw;..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;..\..\..\..\source\component\3rd-party\libpng\port;..\..\..\..\source\component\3rd-party\libpng\raw;..\..\..\..\source\component\3rd-party\segger\port\Config;..\..\..\..\source\component\3rd-party\segger\raw\RTT;..\..\..\..\source\component\3rd-party\segger\raw\SystemView;..\..\..\..\source\component\3rd-party\zlib\raw;..\..\..\..\source\hal\driver\hercules\cmem7\common\Vendor\Driver\inc;..\..\..\..\source\component\usb\driver\otg\dwcotg</IncludePath>
+              <IncludePath>..\..\config;..\..\config\3rd-party\lvgl;..\..\..\..\source;..\..\..\..\source\shell\sys\linux\include;..\..\..\..\source\shell\sys\linux\include\simple_libc;..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;..\..\..\..\source\component\3rd-party\nnom\raw\inc;..\..\..\..\source\component\3rd-party\vsfvm\raw;..\..\..\..\source\component\3rd-party\lvgl\raw;..\..\..\..\source\component\3rd-party\segger_rtt\raw;..\..\..\..\source\component\3rd-party\LingLongGUI\port;..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;..\..\..\..\source\component\3rd-party\freetype\port;..\..\..\..\source\component\3rd-party\freetype\raw\include;..\..\..\..\source\component\3rd-party\coremark\port;..\..\..\..\source\component\3rd-party\coremark\raw;..\..\..\..\source\component\3rd-party\lua\extension\oo;..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;..\..\..\..\source\component\3rd-party\lua\raw;..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;..\..\..\..\source\component\3rd-party\libpng\port;..\..\..\..\source\component\3rd-party\libpng\raw;..\..\..\..\source\component\3rd-party\segger\port\Config;..\..\..\..\source\component\3rd-party\segger\raw\RTT;..\..\..\..\source\component\3rd-party\segger\raw\SystemView;..\..\..\..\source\component\3rd-party\zlib\raw;..\..\..\..\source\hal\driver\hercules\cmem7\common\Vendor\Driver\inc;..\..\..\..\source\component\usb\driver\otg\dwcotg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -37009,26 +37099,6 @@
           <GroupName>example/template/config</GroupName>
           <Files>
             <File>
-              <FileName>awtk_config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/awtk_config.h</FilePath>
-            </File>
-            <File>
-              <FileName>btstack_config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/btstack_config.h</FilePath>
-            </File>
-            <File>
-              <FileName>evm_lua_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/evm_lua_conf.h</FilePath>
-            </File>
-            <File>
-              <FileName>lv_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/lv_conf.h</FilePath>
-            </File>
-            <File>
               <FileName>vsf_tgui_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../example/template/config/vsf_tgui_cfg.h</FilePath>
@@ -37046,22 +37116,62 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/config/lwip</GroupName>
+          <GroupName>example/template/config/3rd-party/awtk</GroupName>
           <Files>
             <File>
-              <FileName>lwipopts.h</FileName>
+              <FileName>awtk_config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/lwip/lwipopts.h</FilePath>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\awtk\awtk_config.h</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/config/mbedtls</GroupName>
+          <GroupName>example/template/config/3rd-party/btstack</GroupName>
+          <Files>
+            <File>
+              <FileName>btstack_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\btstack\btstack_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>example/template/config/3rd-party/evm</GroupName>
+          <Files>
+            <File>
+              <FileName>evm_lua_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\evm\evm_lua_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>example/template/config/3rd-party/lvgl</GroupName>
+          <Files>
+            <File>
+              <FileName>lv_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\lvgl\lv_conf.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>example/template/config/3rd-party/lwip</GroupName>
+          <Files>
+            <File>
+              <FileName>lwipopts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\lwip\lwipopts.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>example/template/config/3rd-party/mbedtls</GroupName>
           <Files>
             <File>
               <FileName>config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../example/template/config/mbedtls/config.h</FilePath>
+              <FilePath>..\..\..\..\..\vsf-all-in-one\example\template\config\3rd-party\mbedtls\config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -71782,16 +71892,6 @@
               <FileType>5</FileType>
               <FilePath>../../../../source/shell/sys/linux/vsf_linux_cfg.h</FilePath>
             </File>
-            <File>
-              <FileName>vsf_linux_devfs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/shell/sys/linux/vsf_linux_devfs.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_linux_socket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/shell/sys/linux/vsf_linux_socket.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -71996,6 +72096,86 @@
               <FileName>wait.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../source/shell/sys/linux/include/sys/wait.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/fs</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_fs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_linux_fs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/fs/vfs</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_vfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_linux_vfs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/fs/vfs/devfs</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_devfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_linux_devfs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/socket</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_socket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_linux_socket.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/socket/inet</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_socket_inet_lwip.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_lwip.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/shell/sys/linux/kernel/socket/unix</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_linux_socket_unix.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c</FilePath>
             </File>
           </Files>
         </Group>
