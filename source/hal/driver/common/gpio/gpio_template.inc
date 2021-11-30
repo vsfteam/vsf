@@ -21,23 +21,31 @@
 #if VSF_HAL_USE_GPIO == ENABLED
 
 #if VSF_GPIO_CFG_REIMPLEMENT_SET_INPUT
-#   define VSF_GPIO_CFG_REIMPLEMENT_SET_INPUT DISABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_SET_INPUT           DISABLED
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_SET_OUTPUT
-#   define VSF_GPIO_CFG_REIMPLEMENT_SET_OUTPUT DISABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_SET_OUTPUT          DISABLED
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_SWITCH_DIRECTION
-#   define VSF_GPIO_CFG_REIMPLEMENT_SWITCH_DIRECTION DISABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_SWITCH_DIRECTION    DISABLED
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_SET
-#   define VSF_GPIO_CFG_REIMPLEMENT_SET DISABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_SET                 DISABLED
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_CLEAR
-#   define VSF_GPIO_CFG_REIMPLEMENT_CLEAR DISABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_CLEAR               DISABLED
+#endif
+
+#if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET
+#   define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET      DISABLED
+#endif
+
+#if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_CLEAR
+#   define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_CLEAR    DISABLED
 #endif
 
 #if VSF_HAL_GPIO_CFG_MULTI_INSTANCES == DISABLED
@@ -148,6 +156,26 @@ void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
     vsf_gpio_write(gpio_ptr, pin_mask, pin_mask);
+}
+#endif
+
+#if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET == DISALBED
+void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+{
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+
+    vsf_gpio_set(gpio_ptr, pin_mask);
+    vsf_gpio_set_direction(gpio_ptr, pin_mask, pin_mask);
+}
+#endif
+
+#if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_CLEAR == DISALBED
+void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+{
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+
+    vsf_gpio_clear(gpio_ptr, pin_mask);
+    vsf_gpio_set_direction(gpio_ptr, pin_mask, pin_mask);
 }
 #endif
 

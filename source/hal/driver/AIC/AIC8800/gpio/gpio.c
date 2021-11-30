@@ -25,7 +25,10 @@
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
 
-#define VSF_HAL_GPIO_CFG_INSTANCE_PREFIX              vsf_hw_
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET
+#   define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET      ENABLED
+#endif
+#define VSF_HAL_GPIO_CFG_INSTANCE_PREFIX                vsf_hw_
 #include "hal/driver/common/gpio/gpio_template.inc"
 
 /*============================ MACROS ========================================*/
@@ -189,5 +192,28 @@ void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 
     vsf_gpio_write(gpio_ptr, ~hw_gpio_ptr->output_reg, pin_mask);
 }
+
+#if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET == ENABLED
+void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+{
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+
+    uint32_t feature = __gpio_reg_read(hw_gpio_ptr, &hw_gpio_ptr->IOMUX->GPCFG[i]);
+    bool is_update = (feature & __IO_PULL_MASK != IO_PULL_UP);
+
+    if (is_update) {
+        __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->IOMUX->GPCFG[i],
+                                  IO_PULL_UP, __IO_PULL_MASK);
+    }
+
+    vsf_gpio_set_direction(gpio_ptr, pin_mask, pin_mask);
+    vsf_gpio_set(gpio_ptr, pin_mask);
+
+    if (is_update) {
+        __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->IOMUX->GPCFG[i],
+                                  feature, __IO_PULL_MASK);
+    }
+}
+#endif
 
 #endif      // VSF_HAL_USE_GPIO
