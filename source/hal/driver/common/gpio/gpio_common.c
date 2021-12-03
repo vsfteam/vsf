@@ -20,9 +20,7 @@
 
 #include "hal/driver/driver.h"
 
-#if VSF_HAL_USE_GPIO == ENABLED
-
-#if VSF_HAL_GPIO_CFG_MULTI_INSTANCES == ENABLED
+#if VSF_HAL_USE_GPIO == ENABLED && VSF_GPIO_CFG_MULTI_INSTANCES == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -133,5 +131,22 @@ void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     gpio_ptr->op->toggle(gpio_ptr, pin_mask);
 }
 
-#endif
+void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->toggle != NULL);
+
+    gpio_ptr->op->output_and_set(gpio_ptr, pin_mask);
+}
+
+void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->toggle != NULL);
+
+    gpio_ptr->op->output_and_clear(gpio_ptr, pin_mask);
+}
+
 #endif

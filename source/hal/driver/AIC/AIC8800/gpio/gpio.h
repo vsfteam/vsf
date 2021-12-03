@@ -27,11 +27,6 @@
 #   include "./i_reg_gpio.h"
 #   include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 
-#if     defined(__VSF_HW_GPIO_CLASS_IMPLEMENT)
-#   undef __VSF_HW_GPIO_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT__
-#endif
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

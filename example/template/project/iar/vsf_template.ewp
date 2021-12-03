@@ -11483,7 +11483,13 @@
                     <group>
                         <name>gpio</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_multiple_instances.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_common.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_template.inc</name>
                         </file>
                     </group>
                     <group>
