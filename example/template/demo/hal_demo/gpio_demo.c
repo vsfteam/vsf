@@ -23,6 +23,18 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef APP_GPIO_DEMO_CFG_INPUT_TEST
+#   define APP_GPIO_DEMO_CFG_INPUT_TEST                 ENABLED
+#endif
+
+#ifndef APP_GPIO_DEMO_CFG_OUTPUT_TEST
+#   define APP_GPIO_DEMO_CFG_OUTPUT_TEST                ENABLED
+#endif
+
+#ifndef APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_TEST
+#   define APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_TEST         ENABLED
+#endif
+
 #ifndef APP_GPIO_DEMO_CFG_INPUT_GPIO
 #   define APP_GPIO_DEMO_CFG_INPUT_GPIO                 vsf_gpio0
 #endif
@@ -31,28 +43,32 @@
 #   define APP_GPIO_DEMO_CFG_OUTPUT_GPIO                vsf_gpio1
 #endif
 
-#ifndef APP_GPIO_DEMO_CFG_INPUT_TEST
-#   define APP_GPIO_DEMO_CFG_INPUT_TEST                 ENABLED
+#ifndef APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_GPIO
+#   define APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_GPIO         vsf_gpio1
 #endif
 
 #ifndef APP_GPIO_DEMO_CFG_INPUT_PIN_MASK
 #   define APP_GPIO_DEMO_CFG_INPUT_PIN_MASK             (1 << 10)
 #endif
 
-#ifndef APP_GPIO_DEMO_CFG_INPUT_FEATURE
-#   define APP_GPIO_DEMO_CFG_INPUT_FEATURE              (IO_PULL_UP)
-#endif
-
-#ifndef APP_GPIO_DEMO_CFG_OUTPUT_TEST
-#   define APP_GPIO_DEMO_CFG_OUTPUT_TEST                ENABLED
-#endif
-
 #ifndef APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK
 #   define APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK            (1 << 3)
 #endif
 
+#ifndef APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_PIN_MASK
+#   define APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_PIN_MASK     (1 << 2)
+#endif
+
+#ifndef APP_GPIO_DEMO_CFG_INPUT_FEATURE
+#   define APP_GPIO_DEMO_CFG_INPUT_FEATURE              (IO_PULL_UP)
+#endif
+
 #ifndef APP_GPIO_DEMO_CFG_OUTPUT_FEATURE
 #   define APP_GPIO_DEMO_CFG_OUTPUT_FEATURE             (IO_PULL_UP)
+#endif
+
+#ifndef APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_FEATURE
+#   define APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_FEATURE      (IO_PULL_UP)
 #endif
 
 #ifndef APP_GPIO_DEMO_PRIO
@@ -83,6 +99,9 @@ static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #if APP_GPIO_DEMO_CFG_INPUT_TEST == ENABLED
     uint32_t read_pins = 0;
 #endif
+#if APP_GPIO_DEMO_CFG_OUTPUT_TEST == ENABLED
+    static bool state = true;
+#endif
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -100,6 +119,13 @@ static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         VSF_GPIO_SET_OUTPUT(&APP_GPIO_DEMO_CFG_OUTPUT_GPIO,
                             APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
 #endif
+#if APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_TEST == ENABLED
+        VSF_GPIO_CONFIG_PIN(&APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_GPIO,
+                            APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_PIN_MASK,
+                            APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_FEATURE);
+        VSF_GPIO_SET_OUTPUT(&APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_GPIO,
+                            APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_PIN_MASK);
+#endif
 
     case VSF_EVT_TIMER:
 #if APP_GPIO_DEMO_CFG_INPUT_TEST == ENABLED
@@ -109,7 +135,16 @@ static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #endif
 
 #if APP_GPIO_DEMO_CFG_OUTPUT_TEST == ENABLED
-        VSF_GPIO_TOGGLE(&APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
+        if (state) {
+            VSF_GPIO_SET(&APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
+        } else {
+            VSF_GPIO_CLEAR(&APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
+        }
+        state = !state;
+#endif
+
+#if APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_TEST == ENABLED
+        VSF_GPIO_TOGGLE(&APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_PIN_MASK);
 #endif
         vsf_teda_set_timer_ms(APP_GPIO_DEMO_DELAY_MS);
         break;
