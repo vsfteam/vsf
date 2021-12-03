@@ -47,7 +47,7 @@
 
 #define __VSF_HW_GPIO_IPM_LV0(__COUNT, __dont_care)                             \
     vsf_hw_gpio_t vsf_gpio##__COUNT = {                                         \
-        VSF_HAL_GPIO_MULTI_OP                                                   \
+        VSF_HAL_GPIO_OP                                                         \
         .GPIO = REG_GPIO##__COUNT,                                              \
         .IOMUX = ((AIC_IOMUX_TypeDef *)GPIO##__COUNT##_IOMUX_REG_BASE),         \
         .is_pmic = GPIO##__COUNT##_IS_PMIC,                                     \
@@ -196,23 +196,8 @@ void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 #if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET == ENABLED
 void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
-    VSF_HAL_ASSERT(NULL != gpio_ptr);
-
-    uint32_t feature = __gpio_reg_read(hw_gpio_ptr, &hw_gpio_ptr->IOMUX->GPCFG[i]);
-    bool is_update = (feature & __IO_PULL_MASK != IO_PULL_UP);
-
-    if (is_update) {
-        __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->IOMUX->GPCFG[i],
-                                  IO_PULL_UP, __IO_PULL_MASK);
-    }
-
-    vsf_gpio_set_direction(gpio_ptr, pin_mask, pin_mask);
-    vsf_gpio_set(gpio_ptr, pin_mask);
-
-    if (is_update) {
-        __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->IOMUX->GPCFG[i],
-                                  feature, __IO_PULL_MASK);
-    }
+    // TODO
+    VSF_HAL_ASSERT(0);
 }
 #endif
 
