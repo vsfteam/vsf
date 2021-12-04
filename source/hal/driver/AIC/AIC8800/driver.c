@@ -37,6 +37,18 @@
 int __data_start__ = 0x00100000;
 int _shrbram = 0x00100000;
 
+syscfg_predefined_t const syscfg_predefined = {
+    #if PLF_PMIC_LDO_VCORE
+    .pmic_vcore_dcdc_off = 1,
+    #elif PLF_PMIC_DCDC_VCORE
+    .pmic_vcore_ldo_off  = 1,
+    #endif
+    .pmic_vrtc09_ldo_off = 0,
+    #if PLF_LPO_512K
+    .pmic_lpo_512k_sel = 1,
+    #endif
+};
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

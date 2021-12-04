@@ -4744,6 +4744,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ce</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\modules\common\api</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\fhost</state>
@@ -10887,6 +10888,36 @@
                                             </group>
                                             <group>
                                                 <name>bt</name>
+                                                <group>
+                                                    <name>patch</name>
+                                                    <group>
+                                                        <name>mcu</name>
+                                                        <file>
+                                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_table_u02.c</name>
+                                                        </file>
+                                                        <file>
+                                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_table_u02.h</name>
+                                                        </file>
+                                                        <file>
+                                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_table_u03.c</name>
+                                                        </file>
+                                                        <file>
+                                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_table_u03.h</name>
+                                                        </file>
+                                                        <file>
+                                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_u02.c</name>
+                                                        </file>
+                                                        <file>
+                                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_u02.h</name>
+                                                        </file>
+                                                        <file>
+                                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_u03.c</name>
+                                                        </file>
+                                                        <file>
+                                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu\fw_patch_u03.h</name>
+                                                        </file>
+                                                    </group>
+                                                </group>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_common_config.c</name>
                                                 </file>

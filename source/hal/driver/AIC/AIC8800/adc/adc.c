@@ -154,8 +154,8 @@ static void __vsf_adc_channel_config(vsf_adc_t *adc_ptr, adc_channel_cfg_t *chan
         }
 #endif
 
-        vsf_gpio_config_pin((vsf_gpio_t *)&vsf_gpio0, 1 << (channel + 16), 0);
-        vsf_gpio_set_input((vsf_gpio_t *)&vsf_gpio0, 1 << (channel + 16));
+        vsf_hw_gpio_config_pin((vsf_gpio_t *)&vsf_gpio0, 1 << (channel + 16), 0);
+        vsf_hw_gpio_set_input((vsf_gpio_t *)&vsf_gpio0, 1 << (channel + 16));
 
 #if PLF_PMIC_VER_LITE
         PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[channel]),
