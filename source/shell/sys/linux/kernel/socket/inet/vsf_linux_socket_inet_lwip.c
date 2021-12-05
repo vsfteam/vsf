@@ -694,18 +694,12 @@ int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
-    struct netconn *conn = priv->conn;
-
-    VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
     return __vsf_linux_socket_inet_recv(priv, buf, count, 0, NULL, NULL);
 }
 
 static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
-    struct netconn *conn = priv->conn;
-
-    VSF_LINUX_ASSERT(NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP);
     return __vsf_linux_socket_inet_send(priv, buf, count, 0, NULL, 0);
 }
 
@@ -738,9 +732,9 @@ ssize_t recvfrom(int sockfd, void *buffer, size_t size, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    if (!sfd) {
+        return -1;
+    }
 
     return __vsf_linux_socket_inet_recv((vsf_linux_socket_inet_priv_t *)sfd->priv,
                     buffer, size, flags, src_addr, addrlen);
