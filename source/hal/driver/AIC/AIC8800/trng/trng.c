@@ -33,7 +33,7 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_RNG_IMP_LV0(__COUNT, __dont_care)                              \
+#define __VSF_HW_RNG_IMP_LV0(__COUNT, __DONT_CARE)                              \
     vsf_hw_rng_t VSF_MCONNECT(vsf_rng, __COUNT) = {                             \
         VSF_MCONNECT(RNG, __COUNT, _CONFIG)                                     \
     };                                                                          \

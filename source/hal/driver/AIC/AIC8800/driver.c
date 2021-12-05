@@ -29,6 +29,10 @@
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __VSF_HW_RNG_INIT(__COUNT, __DONT_CARE)                                 \
+    vsf_hw_rng_init(&VSF_MCONNECT(vsf_rng, __COUNT));
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -78,6 +82,11 @@ bool vsf_driver_init(void)
     dbg_init();
 
     aic_time_init(0, 0);
+
+#if VSF_HAL_USE_RNG == ENABLED
+    VSF_MREPEAT(RNG_COUNT, __VSF_HW_RNG_INIT, NULL)
+#endif
+
     return true;
 }
 
