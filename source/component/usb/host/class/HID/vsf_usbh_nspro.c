@@ -180,7 +180,7 @@ void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
 }
 #endif
 
-static void __vk_usbh_nspro_send_usb_cmd(vk_usbh_nspro_t *nspro, uint_fast8_t cmd)
+static void __vk_usbh_nspro_send_cmd(vk_usbh_nspro_t *nspro, uint_fast8_t cmd)
 {
     nspro->gamepad_out_buf.buffer[0] = 0x80;
     nspro->gamepad_out_buf.buffer[1] = cmd;
@@ -209,7 +209,8 @@ static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 nspro->start_state = VSF_USBH_NSPRO_GET_INFO;
                 __vsf_eda_crit_npb_leave(&nspro->dev->ep0.crit);
                 vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
-                __vk_usbh_nspro_send_usb_cmd(nspro, 1);
+// no need to send GET_CONNECTION_STATUS command now, controller will send it on startup
+//                __vk_usbh_nspro_send_cmd(nspro, 1);
             } else /* if (USB_ENDPOINT_XFER_INT == pipe.type) */ {
                 if (pipe.dir_in1out0) {
                     uint8_t *buffer = vk_usbh_urb_peek_buffer(&urb);
@@ -225,7 +226,7 @@ static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                             memcpy(nspro->mac, &buffer[4], 6);
 
                             nspro->start_state++;
-                            __vk_usbh_nspro_send_usb_cmd(nspro, 2);
+                            __vk_usbh_nspro_send_cmd(nspro, 2);
                             break;
                         case VSF_USBH_NSPRO_HANDSHAKE:
                             if (    (URB_OK != vk_usbh_urb_get_status(&urb))
@@ -233,7 +234,7 @@ static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                                 break;
                             }
                             nspro->start_state++;
-                            __vk_usbh_nspro_send_usb_cmd(nspro, 4);
+                            __vk_usbh_nspro_send_cmd(nspro, 4);
                             break;
                         case VSF_USBH_NSPRO_RUNNING:
                             if (URB_OK == vk_usbh_urb_get_status(&urb)) {
