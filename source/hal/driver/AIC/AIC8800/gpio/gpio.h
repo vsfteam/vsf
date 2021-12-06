@@ -29,6 +29,10 @@
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+#define __VSF_HW_GPIO_DEC_LV0(__COUNT, __dont_care)                             \
+    extern vsf_hw_gpio_t vsf_gpio##__COUNT;
+
+
 /*============================ TYPES =========================================*/
 
 enum io_feature_t {
@@ -59,21 +63,7 @@ typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-/**
- \~english
-    GPIOA instance
- \~chinese
-    GPIOA 实例
- */
-extern vsf_hw_gpio_t vsf_gpio0;
-
-/**
- \~english
-    GPIOB instance
- \~chinese
-    GPIOB 实例
- */
-extern vsf_hw_gpio_t vsf_gpio1;
+VSF_MREPEAT(GPIO_COUNT, __VSF_HW_GPIO_DEC_LV0, NULL)
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
