@@ -61,3 +61,6 @@
 [submodule "source/component/3rd-party/GuiLite/raw"]
 	path = source/component/3rd-party/GuiLite/raw
 	url = ../GuiLite
+[submodule "source/hal/driver/AIC/AIC8800/vendor"]
+	path = source/hal/driver/AIC/AIC8800/vendor
+	url = ../AIC8800M_SDK_vsf
