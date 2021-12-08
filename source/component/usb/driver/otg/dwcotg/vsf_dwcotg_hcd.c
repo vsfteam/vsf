@@ -980,7 +980,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                     __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
                     break;
                 }
-                // fall through
+                goto __reactivate_channel;
             case USB_ENDPOINT_XFER_BULK:
 #if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
                 VSF_USB_ASSERT(urb->pipe.dir_in1out0);
@@ -992,6 +992,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 } else
 #endif
                 {
+                __reactivate_channel:
                     channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHDIS;
                     channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
                 }
@@ -1032,8 +1033,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                     dwcotg_hcd->reg.host.global_regs->haintmsk |= 1 << channel_idx;
                 vsf_unprotect_int(orig);
 
-                channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHDIS;
-                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+                goto __reactivate_channel;
             }
 #endif
             return;
