@@ -46,6 +46,15 @@
 #   error VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB support is not ready now
 #endif
 
+// If high speed bulk in transaction alway NAK, it will take all the USB bandwidth.
+//  Define VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF to hold off these transactions.
+#ifndef VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF
+#   define VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF        7
+#endif
+#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 7
+#   error VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF MUST be in range [0 .. 7]
+#endif
+
 #ifndef VSF_DWCOTG_HCD_CFG_TRACE_PORT
 #   define VSF_DWCOTG_HCD_CFG_TRACE_PORT                DISABLED
 #endif
@@ -103,12 +112,14 @@ typedef struct vk_dwcotg_hcd_urb_t {
     uint16_t channel_idx    : 4;
     uint16_t is_alloced     : 1;
     uint16_t is_discarded   : 1;
-    uint16_t err_cnt        : 2;
     uint16_t phase          : 3;
     uint16_t do_ping        : 1;
     uint16_t is_split       : 1;
     uint16_t is_timeout_en  : 1;
     uint16_t is_timeout     : 1;
+#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+    uint16_t holdoff_cnt    : 3;
+#endif
 
     uint16_t current_size;
 
@@ -309,9 +320,11 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
         pkt_num = 1;
     }
 
-    if (dir_in1out0) {
-        size = pipe.size * pkt_num;
-    }
+    // not secure to increase size, beacuae the buffer provided by user maybe not fit
+//    if (dir_in1out0) {
+//        size = pipe.size * pkt_num;
+//    }
+
     dwcotg_urb->current_size = size;
     channel_regs->hctsiz = ((pkt_num << 19) & USB_OTG_HCTSIZ_PKTCNT) | ((uint32_t)dpid << 29) | size;
 
@@ -325,7 +338,7 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
 #endif
         &&  (USB_SPEED_HIGH == dev_parent->speed) && (dev_parent->speed > dev->speed)) {
         dwcotg_urb->is_split = true;
-        hcsplt = USB_OTG_HCSPLT_SPLITEN | (dev_parent->devnum << 7) | (dev_parent->index + 1);
+        hcsplt = USB_OTG_HCSPLT_SPLITEN | (dev_parent->devnum << 7) | (dev->index + 1);
     } else {
         hcsplt = 0;
     }
@@ -365,6 +378,13 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
 #endif
 
     channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
+#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+    if (pipe.dir_in1out0 && (USB_ENDPOINT_XFER_BULK == pipe.type) && (pipe.speed == USB_SPEED_HIGH)) {
+        dwcotg_urb->holdoff_cnt = 0;
+        channel_regs->hcintmsk |= USB_OTG_HCINTMSK_NAKM;
+    }
+#endif
+
     vsf_protect_t orig = vsf_protect_int();
         dwcotg_hcd->reg.host.global_regs->haintmsk |= 1 << dwcotg_urb->channel_idx;
     vsf_unprotect_int(orig);
@@ -746,7 +766,13 @@ static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_h
     vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
     uint32_t interval = urb->pipe.interval;
     if (!interval) {
-        return true;
+        vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+        if (dwcotg_urb->holdoff_cnt) {
+            dwcotg_urb->holdoff_cnt--;
+            return false;
+        } else {
+            return true;
+        }
     }
 
     if ((reg->host.global_regs->hfnum & 0xFFFF) == urb->pipe.last_frame) {
@@ -824,15 +850,14 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
 {
     struct dwcotg_hc_regs_t *channel_regs = &dwcotg_hcd->reg.host.hc_regs[channel_idx];
     uint_fast32_t channel_intsts = channel_regs->hcint;
+    vk_usbh_hcd_urb_t *urb = dwcotg_hcd->urb[channel_idx];
+    vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+    bool is_split = dwcotg_urb->is_split;
 
 #if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
     vsf_trace_debug("dwcotg_hcd.channel%d: interrupt %08X" VSF_TRACE_CFG_LINEEND, channel_idx, channel_intsts);
 #endif
     if (channel_intsts & USB_OTG_HCINT_CHH) {
-        vk_usbh_hcd_urb_t *urb = dwcotg_hcd->urb[channel_idx];
-        vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
-        bool is_split = dwcotg_urb->is_split;
-
         vsf_protect_t orig = vsf_protect_int();
             dwcotg_hcd->reg.host.global_regs->haintmsk &= ~(1 << channel_idx);
         vsf_unprotect_int(orig);
@@ -953,9 +978,19 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 }
                 // fall through
             case USB_ENDPOINT_XFER_BULK:
-                // re-activate the channel, no need to halt and re-submit
-                channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHDIS;
-                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+                VSF_USB_ASSERT(urb->pipe.dir_in1out0);
+                if (USB_SPEED_HIGH == urb->pipe.speed) {
+                    channel_regs->hcchar |= USB_OTG_HCCHAR_EPDIR;
+                    orig = vsf_protect_int();
+                        vsf_slist_queue_enqueue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->pending_queue, dwcotg_urb);
+                    vsf_unprotect_int(orig);
+                } else
+#endif
+                {
+                    channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHDIS;
+                    channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+                }
                 return;
             }
         } else if (channel_intsts & (USB_OTG_HCINT_ACK | USB_OTG_HCINT_NYET)) {
@@ -1036,6 +1071,22 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         //  set VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE to use buffer in urb
         vsf_trace_error("dwcotg_hcd.channel%d: ahb fatal error" VSF_TRACE_CFG_LINEEND, channel_idx);
         VSF_USB_ASSERT(false);
+    } else {
+#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+        channel_intsts &= channel_regs->hcintmsk;
+        if (channel_intsts & USB_OTG_HCINT_NAK) {
+            switch (urb->pipe.type) {
+            case USB_ENDPOINT_XFER_BULK:
+                VSF_USB_ASSERT(urb->pipe.dir_in1out0);
+                if (++dwcotg_urb->holdoff_cnt >= 3) {
+                    channel_regs->hcintmsk &= ~USB_OTG_HCINT_NAK;
+                    dwcotg_urb->holdoff_cnt = VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF;
+                    __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
+                }
+                break;
+            }
+        }
+#endif
     }
 }
 
