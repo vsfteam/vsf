@@ -766,6 +766,7 @@ static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_h
     vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
     uint32_t interval = urb->pipe.interval;
     if (!interval) {
+#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
         vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
         if (dwcotg_urb->holdoff_cnt) {
             dwcotg_urb->holdoff_cnt--;
@@ -773,6 +774,9 @@ static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_h
         } else {
             return true;
         }
+#else
+        return true;
+#endif
     }
 
     if ((reg->host.global_regs->hfnum & 0xFFFF) == urb->pipe.last_frame) {
