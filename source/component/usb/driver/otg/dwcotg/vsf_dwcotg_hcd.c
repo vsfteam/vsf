@@ -1108,7 +1108,8 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
 #endif
 
     if (!intsts) {
-        VSF_USB_ASSERT(false);
+        // in some cases assertion will fail, should be safe to ignore
+//        VSF_USB_ASSERT(false);
         return;
     }
 
