@@ -177,14 +177,8 @@ static vsf_err_t __lwip_netdrv_adapter_on_connect(void *netif)
                 &gateway, lwip_netif->state,
                 ethernetif_init, tcpip_input);
 #endif
-    if (lwip_netif != NULL) {
-        netif_set_default(lwip_netif);
-        UNLOCK_TCPIP_CORE();
-        return VSF_ERR_NONE;
-    } else {
-        UNLOCK_TCPIP_CORE();
-        return VSF_ERR_FAIL;
-    }
+    UNLOCK_TCPIP_CORE();
+    return lwip_netif != NULL ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
 static void __lwip_netdrv_adapter_on_disconnect(void *netif)
