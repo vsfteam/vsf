@@ -1025,6 +1025,17 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                     vsf_slist_queue_enqueue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->pending_queue, dwcotg_urb);
                 vsf_unprotect_int(orig);
             }
+#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+            else if (dwcotg_urb->holdoff_cnt != 0) {
+                channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
+                vsf_protect_t orig = vsf_protect_int();
+                    dwcotg_hcd->reg.host.global_regs->haintmsk |= 1 << channel_idx;
+                vsf_unprotect_int(orig);
+
+                channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHDIS;
+                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            }
+#endif
             return;
         } else if (channel_intsts & USB_OTG_HCINT_FRMOR) {
             // frame error
