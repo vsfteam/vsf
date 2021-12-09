@@ -264,24 +264,30 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
     channel_regs->hcchar |= USB_OTG_HCCHAR_CHDIS;
     if (    (urb->pipe.type == USB_ENDPOINT_XFER_BULK)
         ||  (urb->pipe.type == USB_ENDPOINT_XFER_CONTROL)) {
-        // int DMA mode, no need to check request queue
+        // in DMA mode, no need to check request queue
         if (!dwcotg_hcd->dma_en && dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) {
             channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
             channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
             channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
             // skip delay
         } else {
-            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            // DO NOT enable channel, set CHDIS in DMA mode is enough to halt a channel.
+            //  If CHENA is set here, there is possibility that the channel is enabled after halt,
+            //  especially when VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF is enabled.
+//            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
         }
     } else {
-        // int DMA mode, no need to check request queue
+        // in DMA mode, no need to check request queue
         if (!dwcotg_hcd->dma_en && dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) {
             channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
             channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
             channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
             // skip delay
         } else {
-            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            // DO NOT enable channel, set CHDIS in DMA mode is enough to halt a channel.
+            //  If CHENA is set here, there is possibility that the channel is enabled after halt,
+            //  especially when VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF is enabled.
+//            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
         }
     }
 }
@@ -528,7 +534,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 // reset pending queue, urb in pending_queue SHOULD be already free by __vk_dwcotg_hcd_free_urb
                 vsf_slist_queue_init(&dwcotg_hcd->pending_queue);
 
-                // enable USB_OTG_GINTMSK_RXFLVLM to process CH_HALTED event in rx queue, whill be disabled in VSF_DWCOTG_HCD_EVT_CONN
+                // enable USB_OTG_GINTMSK_RXFLVLM to process CH_HALTED event in rx queue, will be disabled in VSF_DWCOTG_HCD_EVT_CONN
                 reg->global_regs->gintmsk |= USB_OTG_GINTMSK_SOFM | USB_OTG_GINTMSK_RXFLVLM;
             }
         }
@@ -1094,7 +1100,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             case USB_ENDPOINT_XFER_BULK:
                 VSF_USB_ASSERT(urb->pipe.dir_in1out0);
                 if (++dwcotg_urb->holdoff_cnt >= 3) {
-                    channel_regs->hcintmsk &= ~USB_OTG_HCINT_NAK;
+                    channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_NAKM;
                     dwcotg_urb->holdoff_cnt = VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF;
                     __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
                 }
