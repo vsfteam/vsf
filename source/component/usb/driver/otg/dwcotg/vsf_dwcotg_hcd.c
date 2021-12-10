@@ -891,9 +891,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         // IMPORTANT: process error first, because maybe some other flags will be set at the same time and errors ignored
         if (channel_intsts & (USB_OTG_HCINT_TXERR | USB_OTG_HCINT_BBERR | USB_OTG_HCINT_DTERR)) {
             // data toggle error, babble error, usb bus error
-#if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
-            vsf_trace_error("dwcotg_hcd.channel%d: failed" VSF_TRACE_CFG_LINEEND, channel_idx);
-#endif
+            vsf_trace_error("dwcotg_hcd.channel%d: failed 0x%08X" VSF_TRACE_CFG_LINEEND, channel_idx, channel_intsts);
         urb_fail:
             urb->status = URB_FAIL;
         urb_done:
@@ -1099,11 +1097,9 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             switch (urb->pipe.type) {
             case USB_ENDPOINT_XFER_BULK:
                 VSF_USB_ASSERT(urb->pipe.dir_in1out0);
-                if (++dwcotg_urb->holdoff_cnt >= 3) {
                     channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_NAKM;
                     dwcotg_urb->holdoff_cnt = VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF;
                     __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
-                }
                 break;
             }
         }
