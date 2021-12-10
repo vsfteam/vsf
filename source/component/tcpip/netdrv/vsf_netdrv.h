@@ -59,8 +59,9 @@ vsf_class(vk_netlink_op_t) {
         vsf_err_t (*init)(vk_netdrv_t *netdrv);
         vsf_err_t (*fini)(vk_netdrv_t *netdrv);
 
-        bool (*can_output)(vk_netdrv_t *netdrv);
-        vsf_err_t (*output)(vk_netdrv_t *netdrv, void *netbuf);
+        // can_output returns slot pointer which will be passed to output
+        void * (*can_output)(vk_netdrv_t *netdrv);
+        vsf_err_t (*output)(vk_netdrv_t *netdrv, void *slot, void *netbuf);
     )
 };
 
@@ -115,7 +116,7 @@ vsf_class(vk_netdrv_t) {
         struct {
             void *netif;
             const vk_netdrv_adapter_op_t *op;
-            vsf_eda_t *eda_pending;
+            vsf_dlist_t eda_pending_list;
         } adapter;
     )
 
@@ -164,8 +165,9 @@ extern void * vk_netdrv_thread(vk_netdrv_t *netdrv,void (*entry)(void *), void *
 #if defined(__VSF_NETDRV_CLASS_IMPLEMENT) || defined(__VSF_NETDRV_CLASS_INHERIT_NETIF__)
 extern vsf_err_t vk_netdrv_init(vk_netdrv_t *netdrv);
 extern vsf_err_t vk_netdrv_fini(vk_netdrv_t *netdrv);
-extern bool vk_netdrv_can_output(vk_netdrv_t *netdrv);
-extern vsf_err_t vk_netdrv_output(vk_netdrv_t *netdrv, void *netbuf);
+// vk_netdrv_can_output returns a slot pointer, which will be passed to vk_netdrv_output
+extern void * vk_netdrv_can_output(vk_netdrv_t *netdrv);
+extern vsf_err_t vk_netdrv_output(vk_netdrv_t *netdrv, void *slot, void *netbuf);
 #endif
 
 // for link driver

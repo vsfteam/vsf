@@ -21,6 +21,10 @@
 
 #if VSF_USE_TCPIP == ENABLED && VSF_USE_LWIP == ENABLED
 
+// for protected member vsf_eda_t.pending_node
+#define __VSF_EDA_CLASS_INHERIT__
+#include "kernel/vsf_kernel.h"
+
 #define __VSF_NETDRV_CLASS_INHERIT_NETIF__
 #include "component/tcpip/vsf_tcpip.h"
 
@@ -36,6 +40,10 @@
 #include "lwip/tcpip.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_KERNEL_CFG_SUPPORT_SYNC != ENABLED
+#   error VSF_KERNEL_CFG_SUPPORT_SYNC MUST be enabled to use the pending_node in eda
+#endif
 
 #ifndef TCPIP_CFG_HOSTNAME
 #   define TCPIP_CFG_HOSTNAME           "lwip"
@@ -100,18 +108,22 @@ static err_t __ethernetif_low_level_output(struct netif *netif, struct pbuf *p)
 
     pbuf_ref(p);
 
+    void *slot;
     vsf_protect_t orig = vsf_protect_sched();
-    if (!vk_netdrv_can_output(netdrv)) {
+    while ((slot = vk_netdrv_can_output(netdrv)) == NULL) {
         vsf_eda_t *eda = vsf_eda_get_cur();
-        VSF_ASSERT((NULL == netdrv->adapter.eda_pending) && vsf_eda_is_stack_owner(eda));
-        netdrv->adapter.eda_pending = eda;
+        VSF_ASSERT(vsf_eda_is_stack_owner(eda));
+        vsf_dlist_queue_enqueue(
+            vsf_eda_t, pending_node,
+            &netdrv->adapter.eda_pending_list,
+            eda);
         vsf_unprotect_sched(orig);
         vsf_thread_wfe(VSF_EVT_USER);
-    } else {
-        vsf_unprotect_sched(orig);
+        orig = vsf_protect_sched();
     }
+    vsf_unprotect_sched(orig);
 
-    vk_netdrv_output(netdrv, p);
+    vk_netdrv_output(netdrv, slot, p);
     return ERR_OK;
 }
 
@@ -206,9 +218,12 @@ static void __lwip_netdrv_adapter_on_netlink_outputted(void *netif, vsf_err_t er
     struct netif *lwip_netif = netif;
     vk_netdrv_t *netdrv = lwip_netif->state;
 
+    vsf_eda_t *eda;
     vsf_protect_t orig = vsf_protect_sched();
-    vsf_eda_t *eda = netdrv->adapter.eda_pending;
-    netdrv->adapter.eda_pending = NULL;
+        vsf_dlist_queue_dequeue(
+            vsf_eda_t, pending_node,
+            &netdrv->adapter.eda_pending_list,
+            eda);
     vsf_unprotect_sched(orig);
 
     if (eda != NULL) {

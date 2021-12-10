@@ -197,17 +197,18 @@ bool vk_netdrv_is_connected(vk_netdrv_t *netdrv)
     return netdrv->is_connected;
 }
 
-bool vk_netdrv_can_output(vk_netdrv_t *netdrv)
+void * vk_netdrv_can_output(vk_netdrv_t *netdrv)
 {
     return netdrv->netlink.op->can_output(netdrv);
 }
 
-vsf_err_t vk_netdrv_output(vk_netdrv_t *netdrv, void *netbuf)
+vsf_err_t vk_netdrv_output(vk_netdrv_t *netdrv, void *slot, void *netbuf)
 {
-    VSF_TCPIP_ASSERT((netdrv != NULL) && (netdrv->netlink.op != NULL) && (netdrv->adapter.op != NULL) && (netbuf != NULL));
+    VSF_TCPIP_ASSERT(   (netdrv != NULL) && (slot != NULL) && (netdrv->netlink.op != NULL)
+                    &&  (netdrv->adapter.op != NULL) && (netbuf != NULL));
     vsf_err_t err = VSF_ERR_FAIL;
     if (netdrv->is_connected) {
-        err = netdrv->netlink.op->output(netdrv, netbuf);
+        err = netdrv->netlink.op->output(netdrv, slot, netbuf);
     }
 
     if (err) {

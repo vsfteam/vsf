@@ -45,6 +45,8 @@
 #   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
 #endif
 
+// only for usb hcd supporting hardware transfer queue for one ep,
+//  VSF_USBH_CDCECM_CFG_NUM_OF_OCB/VSF_USBH_CDCECM_CFG_NUM_OF_ICB can be larger than 1
 #ifndef VSF_USBH_CDCECM_CFG_NUM_OF_OCB
 #   define VSF_USBH_CDCECM_CFG_NUM_OF_OCB   1
 #endif
@@ -121,8 +123,8 @@ static void __vk_usbh_ecm_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *
 
 static vsf_err_t __vk_usbh_ecm_netlink_init(vk_netdrv_t *netdrv);
 static vsf_err_t __vk_usbh_ecm_netlink_fini(vk_netdrv_t *netdrv);
-static bool __vk_usbh_ecm_netlink_can_output(vk_netdrv_t *netdrv);
-static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *netbuf);
+static void * __vk_usbh_ecm_netlink_can_output(vk_netdrv_t *netdrv);
+static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *slot, void *netbuf);
 
 #if VSF_USBH_USE_LIBUSB == ENABLED
 static void *__vk_usbh_ecm_block_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
@@ -254,16 +256,20 @@ static vsf_err_t __vk_usbh_ecm_netlink_fini(vk_netdrv_t *netdrv)
     return VSF_ERR_NONE;
 }
 
-static bool __vk_usbh_ecm_netlink_can_output(vk_netdrv_t *netdrv)
-{
-    vk_usbh_ecm_t *ecm = container_of(netdrv, vk_usbh_ecm_t, netdrv);
-    return NULL != __vk_usbh_ecm_get_idle_ocb(ecm);
-}
-
-static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *netbuf)
+static void * __vk_usbh_ecm_netlink_can_output(vk_netdrv_t *netdrv)
 {
     vk_usbh_ecm_t *ecm = container_of(netdrv, vk_usbh_ecm_t, netdrv);
     vk_usbh_ecm_ocb_t *ocb = __vk_usbh_ecm_get_idle_ocb(ecm);
+    if (ocb != NULL) {
+        ocb->netbuf = (void *)1;
+    }
+    return ocb;
+}
+
+static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *slot, void *netbuf)
+{
+    vk_usbh_ecm_t *ecm = container_of(netdrv, vk_usbh_ecm_t, netdrv);
+    vk_usbh_ecm_ocb_t *ocb = slot;
     vsf_err_t err = VSF_ERR_FAIL;
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
     uint_fast16_t pos = 0;
