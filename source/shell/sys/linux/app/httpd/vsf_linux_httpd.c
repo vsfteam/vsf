@@ -194,6 +194,10 @@ static const vsf_linux_httpd_urihandler_t __vsf_linux_httpd_urihandler[] = {
 #endif
 
 // response
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
 
 static const char * __vsf_linux_httpd_get_response_str(vsf_linux_httpd_response_t response)
 {
@@ -204,17 +208,8 @@ static const char * __vsf_linux_httpd_get_response_str(vsf_linux_httpd_response_
     }
     // if assert here, add corresponding response to __vsf_linux_httpd_response_mapper
     VSF_LINUX_ASSERT(false);
+    // statement is unreachable in IAR
     return "UNKNOWN";
-}
-
-static vsf_linux_httpd_mime_t __vsf_linux_httpd_get_mime_by_ext(char *ext)
-{
-    for (int i = 0; i < dimof(__vsf_linux_httpd_mime_mapper); i++) {
-        if (!strcasecmp(__vsf_linux_httpd_mime_mapper[i].str, ext)) {
-            return __vsf_linux_httpd_mime_mapper[i].mime;
-        }
-    }
-    return VSF_LINUX_HTTPD_MIME_INVALID;
 }
 
 static const char * __vsf_linux_httpd_get_mime_str(vsf_linux_httpd_mime_t type)
@@ -226,6 +221,7 @@ static const char * __vsf_linux_httpd_get_mime_str(vsf_linux_httpd_mime_t type)
     }
     // if assert here, add corresponding mime to __vsf_linux_httpd_mime
     VSF_LINUX_ASSERT(false);
+    // statement is unreachable in IAR
     return "UNKNOWN";
 }
 
@@ -238,6 +234,7 @@ static const char * __vsf_linux_httpd_get_charset_str(vsf_linux_httpd_charset_t 
     }
     // if assert here, add corresponding charset to __vsf_linux_httpd_charset
     VSF_LINUX_ASSERT(false);
+    // statement is unreachable in IAR
     return "UNKNOWN";
 }
 
@@ -250,7 +247,18 @@ static const char * __vsf_linux_httpd_get_encoding_str(vsf_linux_httpd_encoding_
     }
     // if assert here, add corresponding charset to __vsf_linux_httpd_encoding
     VSF_LINUX_ASSERT(false);
+    // statement is unreachable in IAR
     return "UNKNOWN";
+}
+
+static vsf_linux_httpd_mime_t __vsf_linux_httpd_get_mime_by_ext(char *ext)
+{
+    for (int i = 0; i < dimof(__vsf_linux_httpd_mime_mapper); i++) {
+        if (!strcasecmp(__vsf_linux_httpd_mime_mapper[i].str, ext)) {
+            return __vsf_linux_httpd_mime_mapper[i].mime;
+        }
+    }
+    return VSF_LINUX_HTTPD_MIME_INVALID;
 }
 
 // request
