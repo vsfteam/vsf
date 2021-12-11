@@ -47,12 +47,12 @@
 #endif
 
 // If high speed bulk in transaction alway NAK, it will take all the USB bandwidth.
-//  Define VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF to hold off these transactions.
-#ifndef VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF
-#   define VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF        7
+//  Define VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF to hold off these transactions.
+#ifndef VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF
+#   define VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF    7
 #endif
-#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 7
-#   error VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF MUST be in range [0 .. 7]
+#if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 7
+#   error VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF MUST be in range [0 .. 7]
 #endif
 
 #ifndef VSF_DWCOTG_HCD_CFG_TRACE_PORT
@@ -117,7 +117,7 @@ typedef struct vk_dwcotg_hcd_urb_t {
     uint16_t is_split       : 1;
     uint16_t is_timeout_en  : 1;
     uint16_t is_timeout     : 1;
-#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+#if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
     uint16_t holdoff_cnt    : 3;
 #endif
 
@@ -273,7 +273,7 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
         } else {
             // DO NOT enable channel, set CHDIS in DMA mode is enough to halt a channel.
             //  If CHENA is set here, there is possibility that the channel is enabled after halt,
-            //  especially when VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF is enabled.
+            //  especially when VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF is enabled.
 //            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
         }
     } else {
@@ -286,7 +286,7 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
         } else {
             // DO NOT enable channel, set CHDIS in DMA mode is enough to halt a channel.
             //  If CHENA is set here, there is possibility that the channel is enabled after halt,
-            //  especially when VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF is enabled.
+            //  especially when VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF is enabled.
 //            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
         }
     }
@@ -384,7 +384,7 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
 #endif
 
     channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
-#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+#if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
     if (pipe.dir_in1out0 && (USB_ENDPOINT_XFER_BULK == pipe.type) && (pipe.speed == USB_SPEED_HIGH)) {
         dwcotg_urb->holdoff_cnt = 0;
         channel_regs->hcintmsk |= USB_OTG_HCINTMSK_NAKM;
@@ -772,7 +772,7 @@ static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_h
     vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
     uint32_t interval = urb->pipe.interval;
     if (!interval) {
-#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+#if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
         vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
         if (dwcotg_urb->holdoff_cnt) {
             dwcotg_urb->holdoff_cnt--;
@@ -986,7 +986,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 }
                 goto __reactivate_channel;
             case USB_ENDPOINT_XFER_BULK:
-#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+#if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
                 VSF_USB_ASSERT(urb->pipe.dir_in1out0);
                 if (USB_SPEED_HIGH == urb->pipe.speed) {
                     channel_regs->hcchar |= USB_OTG_HCCHAR_EPDIR;
@@ -1030,7 +1030,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                     vsf_slist_queue_enqueue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->pending_queue, dwcotg_urb);
                 vsf_unprotect_int(orig);
             }
-#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+#if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
             else if (dwcotg_urb->holdoff_cnt != 0) {
                 channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
                 vsf_protect_t orig = vsf_protect_int();
@@ -1091,15 +1091,15 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         vsf_trace_error("dwcotg_hcd.channel%d: ahb fatal error" VSF_TRACE_CFG_LINEEND, channel_idx);
         VSF_USB_ASSERT(false);
     } else {
-#if VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF > 0
+#if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
         channel_intsts &= channel_regs->hcintmsk;
         if (channel_intsts & USB_OTG_HCINT_NAK) {
             switch (urb->pipe.type) {
             case USB_ENDPOINT_XFER_BULK:
                 VSF_USB_ASSERT(urb->pipe.dir_in1out0);
-                    channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_NAKM;
-                    dwcotg_urb->holdoff_cnt = VSF_DWCOTG_HCD_HS_BULK_IN_NAK_HOLDOFF;
-                    __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
+                channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_NAKM;
+                dwcotg_urb->holdoff_cnt = VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF;
+                __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
                 break;
             }
         }
