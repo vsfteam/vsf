@@ -281,7 +281,7 @@ void vsf_evtq_clean_evt(vsf_evt_t evt)
                 }
             }
 #endif
-            if (node_evt == evt) {
+            if ((VSF_EVT_NONE == evt) || (node_evt == evt)) {
                 orig = vsf_protect_int();
                     if (node_pre != NULL) {
                         vsf_slist_remove_after(vsf_evt_node_t, use_as__vsf_slist_node_t, node_pre, node);

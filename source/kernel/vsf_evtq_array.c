@@ -197,7 +197,7 @@ void vsf_evtq_clean_evt(vsf_evt_t evt)
             }
         }
 #endif
-        if ((node->eda == eda) && (node_evt == evt)) {
+        if ((node->eda == eda) && ((VSF_EVT_NONE == evt) || (node_evt == evt))) {
             node->eda = NULL;
         }
         head_idx = (head_idx + 1) & (size - 1);
