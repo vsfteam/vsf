@@ -230,6 +230,9 @@ extern "C" {
         }                                                                       \
     } while (0)
 
+#define __vsf_slist_queue_is_in(__host_type, __member, __queue_ptr, __item_ptr) \
+    vsf_slist_is_in(__host_type, __member, (vsf_slist_t *)&(__queue_ptr)->head, (__item_ptr))
+
 #define __vsf_slist_queue_peek( __host_type,                                    \
                                 __member,                                       \
                                 __queue_ptr,                                    \
@@ -654,6 +657,13 @@ extern "C" {
                                 __item_ref_ptr)/* the pointer of host type */   \
             __vsf_slist_queue_dequeue(                                          \
                     __host_type, __member, (__queue_ptr), (__item_ref_ptr))
+
+#define vsf_slist_queue_is_in(  __host_type,/* the type of the host type */     \
+                                __member,   /* the member name of the list*/    \
+                                __queue_ptr,/* the address of the queue */      \
+                                __item_ptr) /* the address of the target item */\
+            __vsf_slist_queue_is_in(                                            \
+                    __host_type, __member, (__queue_ptr), (__item_ptr))
 
 #define vsf_slist_queue_peek(   __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list*/    \

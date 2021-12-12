@@ -755,9 +755,12 @@ static vk_usbh_hcd_urb_t * __vk_dwcotg_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 
 static void __vk_dwcotg_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
+    vk_dwcotg_hcd_t *dwcotg_hcd = hcd->priv;
     vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
     vsf_protect_t orig = vsf_protect_int();
-    if (dwcotg_urb->is_alloced) {
+    if (    dwcotg_urb->is_alloced
+        ||  vsf_slist_queue_is_in(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->pending_queue, dwcotg_urb)
+        ||  vsf_slist_queue_is_in(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->ready_queue, dwcotg_urb)) {
         dwcotg_urb->is_discarded = true;
         vsf_unprotect_int(orig);
 //        __vk_dwcotg_hcd_halt_channel((vk_dwcotg_hcd_t *)hcd->priv, dwcotg_urb->channel_idx);
@@ -1082,7 +1085,11 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 vsf_eda_post_msg((vsf_eda_t *)&dwcotg_hcd->task, urb_orig);
             }
             if (dwcotg_urb != NULL) {
-                __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
+                if (dwcotg_urb->is_discarded) {
+                    goto free_channel;
+                } else {
+                    __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
+                }
             }
         }
     } else if (channel_intsts & USB_OTG_HCINT_AHBERR) {
