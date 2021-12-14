@@ -47,7 +47,7 @@ void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (vk_usbh_urb_is_alloced(urb)) {
             vk_usbh_urb_set_buffer(urb, pthis->evt_buffer, pthis->evt_size);
             if (VSF_ERR_NONE != vk_usbh_submit_urb(usbh, urb)) {
-                goto failed;
+                vk_usbh_remove_interface(usbh, pthis->dev, pthis->ifs);
             }
         }
         break;
@@ -56,14 +56,11 @@ void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
 
             if (USB_ENDPOINT_XFER_INT == pipe.type) {
-                if (vk_usbh_urb_get_status(&urb) != URB_OK) {
-                    goto failed;
-                } else if (pthis->evthandler != NULL) {
+                if (    (URB_OK == vk_usbh_urb_get_status(&urb))
+                    &&  (pthis->evthandler != NULL)) {
                     pthis->evthandler(pthis, VSF_USBH_CDC_ON_EVENT, NULL);
-                    if (VSF_ERR_NONE != vk_usbh_submit_urb(usbh, &urb)) {
-                        goto failed;
-                    }
                 }
+                vk_usbh_submit_urb(usbh, &urb);
             } else /* if (USB_ENDPOINT_XFER_BULK == pipe.type) */ {
                 if (pipe.dir_in1out0) {
                     if (pthis->evthandler != NULL) {
@@ -78,10 +75,6 @@ void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         break;
     }
-
-    return;
-failed:
-    vk_usbh_remove_interface(usbh, pthis->dev, pthis->ifs);
 }
 
 static void __vk_usbh_cdc_parse_ep(vk_usbh_cdc_t *pthis, struct usb_endpoint_desc_t *desc_ep)
