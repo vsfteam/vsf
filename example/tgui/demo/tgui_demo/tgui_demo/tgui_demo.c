@@ -113,7 +113,7 @@ vsf_err_t tgui_demo_init(void)
     vk_tgui_set_root_container(&s_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tDesigner, true);
 #else
     //my_stopwatch_init(&g_tMyStopwatch, &g_tTGUIDemo);
-    popup_init(&panels.popup, &g_tTGUIDemo);
+    popup_init(&panels.popup);
 
     vk_tgui_set_root_container(&g_tTGUIDemo, (vsf_tgui_root_container_t *)&panels.popup, true);
 #endif

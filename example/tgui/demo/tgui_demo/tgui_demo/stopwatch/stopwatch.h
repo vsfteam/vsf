@@ -112,10 +112,10 @@ end_def_tgui_panel(stopwatch_t)
 /*============================ IMPLEMENTATION ================================*/
 
 extern
-stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr);
+stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel);
 
 extern
-popup_t * popup_init(popup_t * ptPanel, vsf_tgui_t *gui_ptr);
+popup_t * popup_init(popup_t * ptPanel);
 
 #endif
 #endif

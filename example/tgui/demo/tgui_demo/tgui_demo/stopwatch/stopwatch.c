@@ -134,10 +134,10 @@ describe_tgui_msgmap(tOKMSGMap,
     tgui_msg_handler(VSF_TGUI_EVT_POINTER_CLICK,    __on_button_ok_click),
 )
 
-popup_t * popup_init(popup_t * ptPanel, vsf_tgui_t *gui_ptr)
+popup_t * popup_init(popup_t * ptPanel)
 {
     do {
-        if (NULL == ptPanel && NULL != gui_ptr) {
+        if (NULL == ptPanel) {
             break;
         }
 
@@ -175,10 +175,10 @@ popup_t * popup_init(popup_t * ptPanel, vsf_tgui_t *gui_ptr)
 }
 
 
-stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
+stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel)
 {
     do {
-        if (NULL == ptPanel && NULL != gui_ptr) {
+        if (NULL == ptPanel) {
             break;
         }
 #if 1
@@ -480,7 +480,7 @@ static fsm_rt_t __on_top_panel_depose(vsf_tgui_control_t* node_ptr,
 
     vsf_tgui_timer_disable(&panels.stopwatch.tTimer);
 
-    popup_init(&panels.popup, &g_tTGUIDemo);
+    popup_init(&panels.popup);
     vk_tgui_set_root_container(&g_tTGUIDemo, (vsf_tgui_root_container_t *)&panels.popup, true);
 
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
@@ -489,7 +489,7 @@ static fsm_rt_t __on_top_panel_depose(vsf_tgui_control_t* node_ptr,
 static fsm_rt_t __on_popup_panel_depose(vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG)
 {
-    my_stopwatch_init(&panels.stopwatch, &g_tTGUIDemo);
+    my_stopwatch_init(&panels.stopwatch);
     vk_tgui_set_root_container(&g_tTGUIDemo, (vsf_tgui_root_container_t *)&panels.stopwatch, true);
 
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
