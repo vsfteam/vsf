@@ -580,12 +580,12 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_pre_order_traversal(
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_offset_tree_init")
 void vsf_msgt_offset_tree_init(const vsf_msgt_container_t * root_ptr)
 {
-    bool ignore_item = false;
+    //bool ignore_item = false;
     if (NULL == root_ptr) {
         return ;
     }
 
-    vsf_msgt_container_t *node_ptr = (vsf_msgt_node_t *)root_ptr;
+    vsf_msgt_container_t *node_ptr = (vsf_msgt_container_t *)root_ptr;
     vsf_msgt_container_t *parent_ptr = node_ptr;
 
     while(NULL != node_ptr) {
@@ -607,7 +607,7 @@ void vsf_msgt_offset_tree_init(const vsf_msgt_container_t * root_ptr)
                 parent_ptr = node_ptr;
                 //! update node list pointer
                 (*(intptr_t *)&(((vsf_msgt_container_t *)node_ptr)->node_ptr)) += (intptr_t)root_ptr;
-                node_ptr = ((vsf_msgt_container_t *)node_ptr)->node_ptr;
+                node_ptr = (vsf_msgt_container_t *)(((vsf_msgt_container_t *)node_ptr)->node_ptr);
             }
         } while(true);
 
