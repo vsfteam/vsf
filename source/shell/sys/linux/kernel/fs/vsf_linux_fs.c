@@ -264,7 +264,7 @@ int vsf_linux_fd_set_feature(int fd, uint_fast32_t feature)
 
 int vsf_linux_fd_add_feature(int fd, uint_fast32_t feature)
 {
-    uint32_t orig_feature;
+    uint_fast32_t orig_feature;
     if (vsf_linux_fd_get_feature(fd, &orig_feature) < 0) {
         return -1;
     }
