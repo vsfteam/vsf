@@ -376,8 +376,14 @@ static void __vk_usbh_ecm_netdrv_thread(void *param)
 }
 #endif
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t evt, void *param)
 {
+    // cast increases requiredalignment of target type in GCC
     vk_usbh_ecm_t *ecm = (vk_usbh_ecm_t *)cdc;
     vk_netdrv_t *netdrv = &ecm->netdrv;
 
@@ -503,6 +509,10 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
     }
     return VSF_ERR_NONE;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 // TODO: move hex_to_bin to misc
 int hex_to_bin(char ch)

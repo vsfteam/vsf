@@ -151,7 +151,7 @@ static int __wifi_connect_main(int argc, char *argv[])
     set_mac_address(NULL);
     // wlan_start_sta MUST be called with higher priority than internal wpa(AIC8800_OSAL_CFG_PRIORITY_BASE).
     vsf_prio_t prio = vsf_thread_set_priority(AIC8800_OSAL_CFG_PRIORITY_BASE + 1);
-        int ret = wlan_start_sta((uint8_t *)ssid, (uint8_t *)pass, 0);
+        wlan_start_sta((uint8_t *)ssid, (uint8_t *)pass, 0);
     vsf_thread_set_priority(prio);
 
     if (wlan_get_connect_status()) {

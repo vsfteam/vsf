@@ -1354,7 +1354,7 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
 
 vsf_linux_fd_t * vsf_linux_rx_pipe(void)
 {
-    vsf_linux_fd_t *sfd_rx;
+    vsf_linux_fd_t *sfd_rx = NULL;
     if (vsf_linux_fd_create(&sfd_rx, &vsf_linux_pipe_rx_fdop) >= 0) {
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
         vsf_slist_queue_init(&priv_rx->buffer_queue);
@@ -1364,7 +1364,7 @@ vsf_linux_fd_t * vsf_linux_rx_pipe(void)
 
 vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_fd_t *sfd_rx)
 {
-    vsf_linux_fd_t *sfd_tx;
+    vsf_linux_fd_t *sfd_tx = NULL;
     if (vsf_linux_fd_create(&sfd_tx, &vsf_linux_pipe_tx_fdop) >= 0) {
         vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
         priv_tx->sfd_rx = sfd_rx;

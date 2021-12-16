@@ -1162,7 +1162,9 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
                         // read rx queue first, if pktsts is CH_HALTED, then pop it
                         uint32_t pktsts = (dwcotg_hcd->reg.global_regs->grxstsr & USB_OTG_GRXSTSP_PKTSTS) >> 17;
                         if (pktsts == 7) {      // RXSTAT_CH_HALTED
+                            // just do a read
                             volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
+                            UNUSED_PARAM(grxstsp);
                         }
                     }
                 } else if (dwcotg_urb->is_discarded) {
@@ -1219,7 +1221,9 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
     if (intsts & USB_OTG_GINTSTS_RXFLVL) {
         *intsts_reg = USB_OTG_GINTSTS_RXFLVL;
         while (dwcotg_hcd->reg.global_regs->grxfsiz > 0) {
+            // just do a read
             volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
+            UNUSED_PARAM(grxstsp);
         }
     }
     if (intsts & USB_OTG_GINTSTS_NPTXFE) {

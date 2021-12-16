@@ -46,7 +46,7 @@ static void __evm_instance_create(evm_t *e, evm_val_t *obj, const evm_class_t *c
     if (c != NULL) {
         const evm_class_vt_t *vt = c->vt;
         if (vt != NULL) {
-            evm_val_t val;
+            evm_val_t val = 0;
             for (uint32_t i = 0; i < c->vt_len; i++, vt++) {
                 if (NULL == evm_prop_get(e, obj, vt->name, 0)) {
                     switch (vt->type) {
