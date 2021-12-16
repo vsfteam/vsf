@@ -12,5 +12,6 @@ add_subdirectory(uart)
 add_subdirectory(usb)
 add_subdirectory(gpio)
 add_subdirectory(adc)
+add_subdirectory(trng)
 
 include(vendor.cmake)

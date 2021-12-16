@@ -31,6 +31,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     vendor/plf/aic8800/src/driver/trng
     vendor/plf/aic8800/src/driver/time
     vendor/plf/aic8800/src/driver/bt
+    vendor/plf/aic8800/src/driver/bt/patch/mcu
 
     vendor/modules/common/api
     vendor/modules/dbg/api
@@ -56,6 +57,7 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/lwip/net_al/net_iperf_al.c
     vendor/lwip/net_al/net_tg_al.c
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/ports/rtos/sys_arch.c
+    vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/apps/mdns/mdns.c
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/api/api_lib.c
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/api/api_msg.c
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/api/err.c
@@ -111,6 +113,10 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/modules/dbg/src/dbg_print.c
 
     vendor/plf/aic8800/src/driver/bt/bt_common_config.c
+    vendor/plf/aic8800/src/driver/bt/patch/mcu/fw_patch_table_u02.c
+    vendor/plf/aic8800/src/driver/bt/patch/mcu/fw_patch_table_u03.c
+    vendor/plf/aic8800/src/driver/bt/patch/mcu/fw_patch_u02.c
+    vendor/plf/aic8800/src/driver/bt/patch/mcu/fw_patch_u03.c
     vendor/plf/aic8800/src/driver/flash/flash_api.c
     vendor/plf/aic8800/src/driver/gpio/gpio_api.c
     vendor/plf/aic8800/src/driver/pmic/pwrkey_api.c
