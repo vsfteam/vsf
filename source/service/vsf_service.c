@@ -16,11 +16,16 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
+
 #include "service/vsf_service_cfg.h"
 
 #include "./vsf_service.h"
 
+#define __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
+#include "utilities/compiler/compiler.h"
+
 /*============================ MACROS ========================================*/
+
 #if !defined(VSF_PBUF_ADAPTERS) && VSF_USE_STREAM == ENABLED
 #warning No defined VSF_PBUF_ADAPTERS, all allocated pbuf objects need to be \
 free-ed explicitly to their origins or General PBUF Pool should be Enabled.
@@ -49,7 +54,7 @@ WEAK(vsf_service_init)
 void vsf_service_init(void)
 {
 #if VSF_USE_HEAP == ENABLED
-#   ifndef __VSF_WORKAROUND_IAR_CPP__
+#   if !__IS_COMPILER_IAR__ || !defined(__VSF_WORKAROUND_IAR_CPP__)
     vsf_heap_init();
     vsf_heap_add_memory(vsf_service_req___heap_memory_buffer___from_usr());
 #   endif
