@@ -75,7 +75,7 @@ get_filename_component(VSF_LVGL_CONFIG_PATH ${VSF_CONFIG_PATH}/3rd-party/lvgl AB
 get_filename_component(VSF_EVM_CONFIG_PATH ${VSF_CONFIG_PATH}/3rd-party/evm ABSOLUTE)
 get_filename_component(VSF_BTSTACK_CONFIG_PATH ${VSF_CONFIG_PATH}/3rd-party/btstack ABSOLUTE)
 # add APIs here if conflistc with libc
-set(VSF_TARGET_WRAPPER_LIST "fprintf" "fflush")
+set(VSF_TARGET_WRAPPER_LIST "fprintf" "fflush" "vfprintf")
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
 
 # user compiler definitions
