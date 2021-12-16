@@ -23,7 +23,7 @@
 #include "hal/vsf_hal_cfg.h"
 #if VSF_HAL_USE_I2C == ENABLED
 #include "../__device.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/I2CM/reg_i2cm.h"
+#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/i2cm/reg_i2cm.h"
 
 /*============================ MACROS ========================================*/
 
