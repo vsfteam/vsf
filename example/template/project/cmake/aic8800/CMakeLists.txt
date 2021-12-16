@@ -27,7 +27,7 @@ set(VSF_TARGET_DEFINITIONS
 #   rf_mode: null(0), bt_only(1), bt_combo(2), btwifi_combo(3)
     "CFG_RF_MODE=0"
 #   rom_ver
-    "CFG_WIFI_ROM_VER=2"
+    "CFG_ROM_VER=255"
 #   dac: left(0), mute(1), right(2), lprd2(3), lmrd2(4)
     "CFG_DACL_MIXER_MODE=1"
     "CFG_DACR_MIXER_MODE=1"
@@ -38,9 +38,13 @@ set(VSF_TARGET_DEFINITIONS
 #   wifi
     "CFG_WIFI_STACK"
     "CFG_RSSI_DATAPKT"
+    "CONFIG_RWNX"
+    "CONFIG_RWNX_LWIP"
 #   misc
     "CFG_DBG"
     "CFG_IPERF"
+#   mic matrix
+    "CFG_AIC1000_MIC_MATRIX=0"
 )
 
 # VSF_USE configurations
