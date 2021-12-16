@@ -52,3 +52,10 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     ${VSF_BTSTACK_PATH}/src/l2cap.c
     ${VSF_BTSTACK_PATH}/src/l2cap_signaling.c
 )
+
+if(VSF_BTSTACK_CONFIG_PATH)
+    message(STATUS "VSF_BTSTACK_CONFIG_PATH: ${VSF_BTSTACK_CONFIG_PATH}")
+    target_include_directories(${VSF_LIB_NAME} INTERFACE
+        ${VSF_BTSTACK_CONFIG_PATH}
+    )
+endif()
