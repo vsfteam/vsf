@@ -144,8 +144,8 @@ extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
 
 #if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
 // arm-none-eabi-gcc has no 64-bit stdio APIs, if simple_stdio in simple_libc is not used,
-//  implement 64-but stdio APIs here
-#   define off64_t          int64_t
+//  implement 64-bit stdio APIs here, currently simply redirect to 32-bit version
+#   define off64_t          off_t
 #   define ftello64         ftell
 #   define fseeko64         fseek
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO)
