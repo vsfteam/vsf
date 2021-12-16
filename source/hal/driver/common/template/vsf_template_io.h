@@ -554,7 +554,7 @@ extern vsf_err_t vsf_gpio_config(io_cfg_t *cfg_ptr, uint_fast8_t count);
 
 extern void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
                                 uint32_t pin_mask,
-                                uint32_t feature);
+                                uint_fast32_t feature);
 
 /*! \brief set the specified pins to corresponding directions
  *!        pseudo code:
