@@ -628,6 +628,8 @@ static btstack_chipset_result_t __btstack_chipset_aic8800_next_command(uint8_t *
         hci_cmd_buffer[2] = sizeof(aon_debug_level);
         memcpy(&hci_cmd_buffer[3], &aon_debug_level, sizeof(aon_debug_level));
     } else if (init_script_offset < 2 + rf_mdm_regs_table_len) {
+        init_script_offset -= 2;
+
         // wr_rf_mdm_regs
         uint32_t reg_addr = rf_mdm_regs_table[init_script_offset][0];
         uint32_t reg_val = rf_mdm_regs_table[init_script_offset][1];
