@@ -4562,7 +4562,7 @@
                     <state>LV_CONF_INCLUDE_SIMPLE</state>
                     <state>FT2_BUILD_LIBRARY</state>
                     <state>CFG_HW_PLATFORM=2</state>
-                    <state>CFG_RF_MODE=0</state>
+                    <state>CFG_RF_MODE=3</state>
                     <state>CFG_PMIC</state>
                     <state>CFG_PMIC_VER_LITE</state>
                     <state>CFG_PMIC_ITF_ASDMA</state>
@@ -10923,6 +10923,12 @@
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_hci.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_patch_table.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_patch_table.h</name>
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_user_driver.h</name>
