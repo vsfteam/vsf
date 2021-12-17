@@ -113,6 +113,7 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/modules/dbg/src/dbg_print.c
 
     vendor/plf/aic8800/src/driver/bt/bt_common_config.c
+    vendor/plf/aic8800/src/driver/bt/bt_patch_table.c
     vendor/plf/aic8800/src/driver/bt/patch/mcu/fw_patch_table_u02.c
     vendor/plf/aic8800/src/driver/bt/patch/mcu/fw_patch_table_u03.c
     vendor/plf/aic8800/src/driver/bt/patch/mcu/fw_patch_u02.c
