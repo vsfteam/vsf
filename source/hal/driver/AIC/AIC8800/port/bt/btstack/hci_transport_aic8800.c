@@ -679,7 +679,7 @@ static btstack_chipset_result_t __btstack_chipset_aic8800_next_command(uint8_t *
     } else if (init_script_offset == (5 + rf_mdm_regs_table_len)) {
         // bt_lp_level
         const uint8_t hci_cmd_set_bt_lp_level[] = {
-            0x51, 0xFC, 0x01, (uint8_t)bt_lp_level,
+            0x50, 0xFC, 0x01, (uint8_t)bt_lp_level,
         };
         memcpy(hci_cmd_buffer, hci_cmd_set_bt_lp_level, sizeof(hci_cmd_set_bt_lp_level));
     } else {
