@@ -49,7 +49,7 @@
 // If high speed bulk in transaction alway NAK, it will take all the USB bandwidth.
 //  Define VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF to hold off these transactions.
 #ifndef VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF
-#   define VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF    7
+#   define VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF    0
 #endif
 #if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 7
 #   error VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF MUST be in range [0 .. 7]
@@ -315,9 +315,6 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
                             ((USB_SPEED_LOW == pipe.speed) << 17) |
                             ((uint32_t)eptype_to_dwctype[pipe.type] << 18) |
                             (pipe.size & USB_OTG_HCCHAR_MPSIZ);
-    if (pipe.type == USB_ENDPOINT_XFER_INT) {
-        channel_regs->hcchar |= USB_OTG_HCCHAR_ODDFRM;
-    }
 
     if (size > 0) {
         pkt_num = (size + pipe.size - 1) / pipe.size;
