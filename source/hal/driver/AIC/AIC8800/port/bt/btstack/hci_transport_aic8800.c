@@ -98,89 +98,13 @@ static hci_transport_aic8800_param_t __hci_transport_aic8800_param;
 
 /*============================ IMPLEMENTATION ================================*/
 
-//implement_vsf_pool(hci_transport_aic8800_buffer_pool, hci_transport_aic8800_buffer_t)
-#define __name hci_transport_aic8800_buffer_pool
-#define __type hci_transport_aic8800_buffer_t
-#include "service/pool/impl_vsf_pool.inc"
-
-static uint32_t __hci_transport_aic8800_rx_handler(const uint8_t *data, uint32_t len)
-{
-    VSF_HAL_ASSERT((__hci_transport_aic8800_param.packet_handler != NULL) && (len > 0));
-    __hci_transport_aic8800_param.packet_handler(data[0], (uint8_t *)&data[1], len - 1);
-
-    bt_hci_rx_done(BT_HCI_CH_0);
-    return len;
-}
-
-static void __hci_transport_aic8800_tx_handler(const uint8_t *data, uint32_t len)
-{
-    VSF_POOL_FREE(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool,
-                    (hci_transport_aic8800_buffer_t *)data);
-
-    const uint8_t event[] = { HCI_EVENT_TRANSPORT_PACKET_SENT, 0 };
-    VSF_HAL_ASSERT(__hci_transport_aic8800_param.packet_handler != NULL);
-    __hci_transport_aic8800_param.packet_handler(HCI_EVENT_PACKET, (uint8_t *)event, sizeof(event));
-}
-
-static int __hci_transport_aic8800_open(void)
-{
-    bt_hci_open(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART,
-            __hci_transport_aic8800_rx_handler, __hci_transport_aic8800_tx_handler, true);
-    bt_hci_rx_start(BT_HCI_CH_0);
-    return 0;
-}
-
-static int __hci_transport_aic8800_close(void)
-{
-    bt_hci_rx_stop(BT_HCI_CH_0);
-    bt_hci_close(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART);
-    return 0;
-}
-
-static void __hci_transport_aic8800_register_packet_handler(
-        void (*handler)(uint8_t packet_type, uint8_t *packet, uint16_t size))
-{
-    __hci_transport_aic8800_param.packet_handler = handler;
-}
-
-static int __hci_transport_aic8800_can_send_packet_now(uint8_t packet_type)
-{
-    return bt_hci_tx_available(BT_HCI_CH_0);
-}
-
-static int __hci_transport_aic8800_send_packet(uint8_t packet_type, uint8_t *packet, int size)
-{
-    uint8_t *buffer = (uint8_t *)VSF_POOL_ALLOC(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool);
-    VSF_HAL_ASSERT((buffer != NULL) && (size < 256));
-    buffer[0] = packet_type;
-    memcpy(&buffer[1], packet, size);
-    size++;
-
-    return bt_hci_tx(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART, buffer, size);
-}
-
-static void __hci_transport_aic8800_init(const void *transport_config)
-{
-    VSF_POOL_INIT(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool, 8,
-        .region_ptr     = (vsf_protect_region_t *)&vsf_protect_region_int,
-    );
-    bt_launch();
-
-    hci_set_chipset(&__btstack_chipset_aic8800);
-}
-
-const hci_transport_t * hci_transport_aic8800_instance(void)
-{
-    return &__hci_transport_aic8800;
-}
-
-// chipset driver implementation
 /*******************************************************************************
  * code copied from bt_aic8800_driver.c in vendor SDK
 *******************************************************************************/
 
 #include "compiler.h"
 #include "bt_patch_table.h"
+#include "dbg.h"
 
 #define BT_POWERON            1
 #define BT_POWEROFF           0
@@ -588,16 +512,98 @@ void bt_drv_lp_level_set(uint8_t level)
 
 uint32_t host_power_on_mode(void)
 {
-    return 0;
+    uint32_t value = *(uint32_t *)0x4050605C;
+    dbg_test_print("AON:host_pwr_on_mode = %d\n", value & 3);
+    return (value >> 1) & 1;
 }
 
 /*******************************************************************************
  * end of code copied from bt_aic8800_driver.c in vendor SDK
 *******************************************************************************/
 
+//implement_vsf_pool(hci_transport_aic8800_buffer_pool, hci_transport_aic8800_buffer_t)
+#define __name hci_transport_aic8800_buffer_pool
+#define __type hci_transport_aic8800_buffer_t
+#include "service/pool/impl_vsf_pool.inc"
+
+static uint32_t __hci_transport_aic8800_rx_handler(const uint8_t *data, uint32_t len)
+{
+    VSF_HAL_ASSERT((__hci_transport_aic8800_param.packet_handler != NULL) && (len > 0));
+    __hci_transport_aic8800_param.packet_handler(data[0], (uint8_t *)&data[1], len - 1);
+
+    bt_hci_rx_done(BT_HCI_CH_0);
+    return len;
+}
+
+static void __hci_transport_aic8800_tx_handler(const uint8_t *data, uint32_t len)
+{
+    VSF_POOL_FREE(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool,
+                    (hci_transport_aic8800_buffer_t *)data);
+
+    const uint8_t event[] = { HCI_EVENT_TRANSPORT_PACKET_SENT, 0 };
+    VSF_HAL_ASSERT(__hci_transport_aic8800_param.packet_handler != NULL);
+    __hci_transport_aic8800_param.packet_handler(HCI_EVENT_PACKET, (uint8_t *)event, sizeof(event));
+}
+
+static int __hci_transport_aic8800_open(void)
+{
+    extern void aic_bt_start(void);
+
+    bt_hci_open(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART,
+            __hci_transport_aic8800_rx_handler, __hci_transport_aic8800_tx_handler, true);
+    bt_hci_rx_start(BT_HCI_CH_0);
+    return 0;
+}
+
+static int __hci_transport_aic8800_close(void)
+{
+    bt_hci_rx_stop(BT_HCI_CH_0);
+    bt_hci_close(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART);
+    return 0;
+}
+
+static void __hci_transport_aic8800_register_packet_handler(
+        void (*handler)(uint8_t packet_type, uint8_t *packet, uint16_t size))
+{
+    __hci_transport_aic8800_param.packet_handler = handler;
+}
+
+static int __hci_transport_aic8800_can_send_packet_now(uint8_t packet_type)
+{
+    return bt_hci_tx_available(BT_HCI_CH_0);
+}
+
+static int __hci_transport_aic8800_send_packet(uint8_t packet_type, uint8_t *packet, int size)
+{
+    uint8_t *buffer = (uint8_t *)VSF_POOL_ALLOC(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool);
+    VSF_HAL_ASSERT((buffer != NULL) && (size < 256));
+    buffer[0] = packet_type;
+    memcpy(&buffer[1], packet, size);
+    size++;
+
+    return bt_hci_tx(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART, buffer, size);
+}
+
+static void __hci_transport_aic8800_init(const void *transport_config)
+{
+    VSF_POOL_INIT(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool, 8,
+        .region_ptr     = (vsf_protect_region_t *)&vsf_protect_region_int,
+    );
+
+    aic_bt_start();
+    bt_launch();
+
+    hci_set_chipset(&__btstack_chipset_aic8800);
+}
+
+const hci_transport_t * hci_transport_aic8800_instance(void)
+{
+    return &__hci_transport_aic8800;
+}
+
+// chipset driver implementation
 static void __btstack_chipset_aic8800_init(const void * config)
 {
-    aic_bt_start();
     __hci_transport_aic8800_param.init_script_offset = 0;
 }
 
