@@ -770,7 +770,8 @@ static void __vk_dwcotg_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb)
 {
     vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
-    uint32_t interval = urb->pipe.interval;
+    vk_usbh_pipe_t pipe = urb->pipe;
+    uint32_t interval = pipe.interval;
     if (!interval) {
 #if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
         vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
@@ -785,13 +786,21 @@ static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_h
 #endif
     }
 
-    if ((reg->host.global_regs->hfnum & 0xFFFF) == urb->pipe.last_frame) {
+    if ((USB_SPEED_HIGH == dwcotg_hcd->speed) && (pipe.speed < USB_SPEED_HIGH)) {
+        interval <<= 3;
+    }
+
+    // corrent me:
+    // interrupt transaction will be queued at the next sof by hardware,
+    //  so if interval is 1, issue hit instantly
+    if ((USB_ENDPOINT_XFER_INT == pipe.type) && (1 == interval)) {
+        return true;
+    }
+
+    if ((reg->host.global_regs->hfnum & 0xFFFF) == pipe.last_frame) {
         return false;
     }
 
-    if ((USB_SPEED_HIGH == dwcotg_hcd->speed) && (urb->pipe.speed < USB_SPEED_HIGH)) {
-        interval <<= 3;
-    }
     return dwcotg_hcd->softick % interval == 0;
 }
 
