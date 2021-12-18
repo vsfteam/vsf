@@ -138,6 +138,8 @@ extern int vsf_linux_fd_get_feature(int fd, uint_fast32_t *feature);
 extern int vsf_linux_fd_set_feature(int fd, uint_fast32_t feature);
 extern int vsf_linux_fd_add_feature(int fd, uint_fast32_t feature);
 
+extern int vsf_linux_fd_set_size(int fd, uint64_t size);
+
 extern void vsf_linux_fd_trigger_init(vsf_trig_t *trig);
 // vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
 extern int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);

@@ -271,6 +271,16 @@ int vsf_linux_fd_add_feature(int fd, uint_fast32_t feature)
     return vsf_linux_fd_set_feature(fd, orig_feature | feature);
 }
 
+int vsf_linux_fd_set_size(int fd, uint64_t size)
+{
+    vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
+    if (vfs_file != NULL) {
+        vfs_file->size = size;
+        return 0;
+    }
+    return -1;
+}
+
 int vsf_linux_fd_add(vsf_linux_fd_t *sfd)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
