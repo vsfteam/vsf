@@ -19,7 +19,6 @@ void critical_section_start(void)
 {
     if (0U == critical_sect_count) {
         critical_ctxt_saved = vsf_disable_interrupt();
-        __disable_irq();
     }
     critical_sect_count++;
 }
