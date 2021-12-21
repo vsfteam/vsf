@@ -111,6 +111,10 @@ void __vsf_trace_init(vsf_stream_t *stream)
     __vsf_trace.stream = stream;
     if (stream) {
         vsf_stream_connect_tx(stream);
+#if VSF_TRACE_CFG_COLOR_EN == ENABLED
+        extern void vsf_trace_output_string(const char* str);
+        vsf_trace_output_string("\033[40m");
+#endif
     }
 }
 
