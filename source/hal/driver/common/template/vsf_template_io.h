@@ -432,11 +432,9 @@ typedef struct vsf_gpio_op_t {
 } vsf_gpio_op_t;
 //! @}
 
-vsf_class(vsf_gpio_t)  {
-    public_member(
-        const vsf_gpio_op_t * op;
-    )
-};
+typedef struct vsf_gpio_t  {
+    const vsf_gpio_op_t * op;
+} vsf_gpio_t;
 #endif
 
 //! \name gpio control interface

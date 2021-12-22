@@ -226,11 +226,9 @@ typedef struct vsf_usart_op_t {
 } vsf_usart_op_t;
 //! @}
 
-vsf_class(vsf_usart_t)  {
-    public_member(
+typedef struct vsf_usart_t  {
         const vsf_usart_op_t * op;
-    )
-};
+} vsf_usart_t;
 #endif
 
 /* usart_capability_t should implement peripheral_capability_t */
