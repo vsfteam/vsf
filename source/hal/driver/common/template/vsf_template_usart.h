@@ -29,7 +29,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USART_CFG_MULTI_INSTANCES
-#   define VSF_USART_CFG_MULTI_INSTANCES ENABLED //DISABLED
+#   define VSF_USART_CFG_MULTI_INSTANCES DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
