@@ -32,7 +32,7 @@
 #endif
 
 #ifndef APP_USART_DEMO_CFG_USART
-#   define APP_USART_DEMO_CFG_USART                     vsf_usart0
+#   define APP_USART_DEMO_CFG_USART                     (vsf_usart_t *)&vsf_usart0
 #endif
 
 #ifndef APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST
@@ -350,13 +350,13 @@ int VSF_USER_ENTRY(void)
 #endif
 
 #if APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST == ENABLED
-    __usart_echo_demo_read_with_isr(&APP_USART_DEMO_CFG_USART);
+    __usart_echo_demo_read_with_isr(APP_USART_DEMO_CFG_USART);
 #elif APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST == ENABLED
-    __usart_echo_demo_write_with_isr(&APP_USART_DEMO_CFG_USART);
+    __usart_echo_demo_write_with_isr(APP_USART_DEMO_CFG_USART);
 #elif APP_USART_DEMO_CFG_FIFO_ECHO_TEST == ENABLED
-    __usart_echo_demo_by_fifo(&APP_USART_DEMO_CFG_USART);
+    __usart_echo_demo_by_fifo(APP_USART_DEMO_CFG_USART);
 #elif APP_USART_DEMO_CFG_REQUEST_TEST == ENABLED
-    __usart_echo_demo_by_request(&APP_USART_DEMO_CFG_USART);
+    __usart_echo_demo_by_request(APP_USART_DEMO_CFG_USART);
 #endif
 
     return 0;
