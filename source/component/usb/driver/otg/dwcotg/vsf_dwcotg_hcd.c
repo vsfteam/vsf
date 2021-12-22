@@ -521,7 +521,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     if (dwcotg_hcd->ep_mask & (1 << i)) {
                         VSF_USB_ASSERT(dwcotg_hcd->urb[i] != NULL);
                         vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&dwcotg_hcd->urb[i]->priv;
-                        // mark for halted
+                        // mark for halted, checked in SOF handler
                         dwcotg_urb->is_timeout = true;
                         __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, i);
                         // but afterwards, maybe OSF is not interrupted, how to clear CH_HALTED in rx queue?
@@ -870,7 +870,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
     vk_usbh_hcd_urb_t *urb = dwcotg_hcd->urb[channel_idx];
     VSF_USB_ASSERT(urb != NULL);
     vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
-    bool is_split = dwcotg_urb->is_split;
+    bool is_split = dwcotg_urb->is_split, is_to_notify = false;
 
 #if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
     vsf_trace_debug("dwcotg_hcd.channel%d: interrupt %08X" VSF_TRACE_CFG_LINEEND, channel_idx, channel_intsts);
@@ -910,7 +910,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             }
 #endif
             urb->pipe.last_frame = dwcotg_hcd->reg.host.global_regs->hfnum & 0xFFFF;
-            vsf_eda_post_msg(urb->eda_caller, urb);
+            is_to_notify = true;
         } else if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
             bool is_stall = channel_intsts & USB_OTG_HCINT_STALL;
             bool is_in = channel_regs->hcchar & USB_OTG_HCCHAR_EPDIR;
@@ -1088,6 +1088,8 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
 #endif
             if (is_discarded) {
                 vsf_eda_post_msg((vsf_eda_t *)&dwcotg_hcd->task, urb_orig);
+            } else if (is_to_notify) {
+                vsf_eda_post_msg(urb_orig->eda_caller, urb_orig);
             }
             if (dwcotg_urb != NULL) {
                 if (dwcotg_urb->is_discarded) {
