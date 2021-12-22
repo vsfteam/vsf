@@ -125,6 +125,15 @@ static const vsf_gpio_op_t vsf_hw_gpio_op = {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_GPIO_CFG_REIMPLEMENT_SET_INPUT == DISALBED
+VSF_GPIO_FN_SET_INPUT(VSF_GPIO_CFG_INSTANCE_PREFIX)
+{
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+
+    vsf_gpio_set_direction(gpio_ptr, 0, pin_mask);
+}
+#endif
+
 #if VSF_GPIO_CFG_REIMPLEMENT_SET_OUTPUT == DISALBED
 VSF_GPIO_FN_SET_OUTPUT(VSF_GPIO_CFG_INSTANCE_PREFIX)
 {
