@@ -812,19 +812,17 @@ static void __vk_dwcotg_hcd_urb_fsm(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb
     if (!dwcotg_urb->is_alloced) {
         int_fast8_t index;
         vsf_protect_t orig = vsf_protect_int();
-            index = vsf_ffz(dwcotg_hcd->ep_mask);
-            if (index >= 0) {
-                dwcotg_hcd->ep_mask |= 1 << index;
-                dwcotg_urb->is_alloced = true;
-                dwcotg_urb->is_split = false;
-                dwcotg_hcd->urb[index] = urb;
-                dwcotg_urb->channel_idx = index;
-            } else {
-                vsf_slist_queue_enqueue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->ready_queue, dwcotg_urb);
-            }
-        vsf_unprotect_int(orig);
-
-        if (index < 0) {
+        index = vsf_ffz(dwcotg_hcd->ep_mask);
+        if ((index >= 0) && (index < 16)) {
+            dwcotg_hcd->ep_mask |= 1 << index;
+            dwcotg_urb->is_alloced = true;
+            dwcotg_urb->is_split = false;
+            dwcotg_hcd->urb[index] = urb;
+            dwcotg_urb->channel_idx = index;
+            vsf_unprotect_int(orig);
+        } else {
+            vsf_slist_queue_enqueue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->ready_queue, dwcotg_urb);
+            vsf_unprotect_int(orig);
             return;
         }
 #if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
@@ -870,6 +868,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
     struct dwcotg_hc_regs_t *channel_regs = &dwcotg_hcd->reg.host.hc_regs[channel_idx];
     uint_fast32_t channel_intsts = channel_regs->hcint;
     vk_usbh_hcd_urb_t *urb = dwcotg_hcd->urb[channel_idx];
+    VSF_USB_ASSERT(urb != NULL);
     vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
     bool is_split = dwcotg_urb->is_split;
 
