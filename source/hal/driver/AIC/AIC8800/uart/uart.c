@@ -250,8 +250,6 @@ vsf_err_t vsf_hw_usart_cancel_rx(vsf_usart_t *usart_ptr)
 vsf_err_t vsf_hw_usart_cancel_tx(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op->cancel_tx != NULL);
 
     return VSF_ERR_NONE;
 }
@@ -259,8 +257,6 @@ vsf_err_t vsf_hw_usart_cancel_tx(vsf_usart_t *usart_ptr)
 int_fast32_t vsf_hw_usart_get_rx_count(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op->get_rx_count != NULL);
 
     return 0;
 }
@@ -268,8 +264,6 @@ int_fast32_t vsf_hw_usart_get_rx_count(vsf_usart_t *usart_ptr)
 int_fast32_t vsf_hw_usart_get_tx_count(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op->get_tx_count != NULL);
 
     return 0;
 }
