@@ -42,7 +42,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define  __VSF_USART_FN(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_DEFINE(__prefix_name, __return, __name, __VA_ARGS__)
+    VSF_TEMPLATE_HAL_API_DEFINE(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
 
 #define VSF_USART_FN_INIT(__prefix_name)         __VSF_USART_FN(__prefix_name, vsf_err_t,      init,         vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
 #define VSF_USART_FN_ENABLE(__prefix_name)       __VSF_USART_FN(__prefix_name, fsm_rt_t,       enable,       vsf_usart_t *usart_ptr)
@@ -81,7 +81,7 @@
 
 #undef   __VSF_USART_API
 #define  __VSF_USART_API(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, __return, __name, __VA_ARGS__)
+    VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
 
 __VSF_USART_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
 
@@ -92,7 +92,7 @@ static const vsf_usart_op_t vsf_hw_usart_op = {
 
 #undef   __VSF_USART_API
 #define  __VSF_USART_API(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_OP(__prefix_name, __return, __name, __VA_ARGS__)
+    VSF_TEMPLATE_HAL_API_OP(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
 
     __VSF_USART_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
 };

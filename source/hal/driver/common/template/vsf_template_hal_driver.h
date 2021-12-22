@@ -28,14 +28,14 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
     
-#define VSF_TEMPLATE_HAL_API_OP(__prefix_name, __return, __name, ...)           \
-    .__name = & __prefix_name ## _usart_ ## __name,
+#define VSF_TEMPLATE_HAL_API_OP(__prefix_name, __module__, __return, __name, ...)           \
+    .__name = & __prefix_name ## __module__ ## __name,
 
-#define VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, __return, __name, ...)       \
-    extern __return __prefix_name ## _usart_ ## __name ( __VA_ARGS__ );
+#define VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, __module__, __return, __name, ...)       \
+    extern __return __prefix_name ## __module__ ## __name ( __VA_ARGS__ );
 
-#define VSF_TEMPLATE_HAL_API_DEFINE(__prefix_name, __return, __name, ...)       \
-    __return __prefix_name ## _usart_ ## __name ( __VA_ARGS__ )
+#define VSF_TEMPLATE_HAL_API_DEFINE(__prefix_name, __module__, __return, __name, ...)       \
+    __return __prefix_name ## __module__ ## __name ( __VA_ARGS__ )
     
 /*============================ TYPES =========================================*/
 

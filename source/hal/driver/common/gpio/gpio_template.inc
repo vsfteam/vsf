@@ -70,7 +70,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define  __VSF_GPIO_FN(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_DEFINE(__prefix_name, __return, __name, __VA_ARGS__)
+    VSF_TEMPLATE_HAL_API_DEFINE(__prefix_name, _gpio_, __return, __name, __VA_ARGS__)
 
 #define VSF_GPIO_FN_CONFIG_PIN(__prefix_name)        __VSF_GPIO_FN(__prefix_name, void, config_pin, vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
 #define VSF_GPIO_FN_SET_DIRECTION(__prefix_name)     __VSF_GPIO_FN(__prefix_name, void,     set_direction,    vsf_gpio_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
@@ -105,7 +105,7 @@
 
 #undef   __VSF_GPIO_API
 #define  __VSF_GPIO_API(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, __return, __name, __VA_ARGS__)
+    VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, _gpio_, __return, __name, __VA_ARGS__)
 
 __VSF_GPIO_APIS(VSF_GPIO_CFG_INSTANCE_PREFIX)
 
@@ -116,7 +116,7 @@ static const vsf_gpio_op_t vsf_hw_gpio_op = {
 
 #undef   __VSF_GPIO_API
 #define  __VSF_GPIO_API(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_OP(__prefix_name, __return, __name, __VA_ARGS__)
+    VSF_TEMPLATE_HAL_API_OP(__prefix_name, _gpio_, __return, __name, __VA_ARGS__)
 
     __VSF_GPIO_APIS(VSF_GPIO_CFG_INSTANCE_PREFIX)
 };
