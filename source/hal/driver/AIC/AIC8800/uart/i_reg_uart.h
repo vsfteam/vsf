@@ -37,17 +37,17 @@ extern "C" {
 #   define __AIC8800_UART_USE_BIT_FIELD             ENABLED
 #endif
 
-/* Define structure member permissions : ‘read only?*/
+/* Define structure member permissions : read only? */
 #ifndef __IM
 #   define __IM                                     const
 #endif
 
-/* Define structure member permissions : ‘write only?*/
+/* Define structure member permissions : write only? */
 #ifndef __OM
 #   define __OM
 #endif
 
-/* Define structure member permissions : ‘read or write?*/
+/* Define structure member permissions : read or write? */
 #ifndef __IOM
 #   define __IOM
 #endif
