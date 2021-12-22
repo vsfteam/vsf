@@ -29,6 +29,7 @@
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
 #define __VSF_HW_GPIO_DEC_LV0(__COUNT, __dont_care)                             \
     extern vsf_hw_gpio_t vsf_gpio##__COUNT;
 

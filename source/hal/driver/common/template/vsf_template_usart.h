@@ -27,130 +27,72 @@
 extern "C" {
 #endif
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_USART_CFG_MULTI_INSTANCES
+#   define VSF_USART_CFG_MULTI_INSTANCES ENABLED //DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-/********************************VSF_USART_FUNC_BODY*****************************/
-#define ____VSF_USART_LV1_INTTERFACE_BODY(__N, __VALUE)                         \
-                                                                                \
-/*usart_init*/                                                                  \
-static                                                                          \
-vsf_err_t vsf_usart##__N##_init(usart_cfg_t *usart_cfg)                         \
-{                                                                               \
-    return vsf_usart_init(&vsf_usart##__N, usart_cfg);                          \
-}                                                                               \
-                                                                                \
-/*usart_enable*/                                                                \
-static                                                                          \
-fsm_rt_t vsf_usart##__N##_enable(void)                                          \
-{                                                                               \
-    return vsf_usart_enable(&vsf_usart##__N);                                   \
-}                                                                               \
-                                                                                \
-/*usart_disable*/                                                               \
-static                                                                          \
-fsm_rt_t vsf_usart##__N##_disable(void)                                         \
-{                                                                               \
-    return vsf_usart_disable(&vsf_usart##__N);                                  \
-}                                                                               \
-                                                                                \
-/*usart_status*/                                                                \
-static                                                                          \
-usart_status_t vsf_usart##__N##_status(void)                                    \
-{                                                                               \
-    return vsf_usart_status(&vsf_usart##__N);                                   \
-}                                                                               \
-                                                                                \
-/*usart_fifo_read*/                                                             \
-static                                                                          \
-uint_fast16_t vsf_usart##__N##_fifo_read(void *buffer_ptr, uint_fast16_t count) \
-{                                                                               \
-    return vsf_usart_fifo_read(&vsf_usart##__N, buffer_ptr, count);             \
-}                                                                               \
-                                                                                \
-/*usart_fifo_write*/                                                            \
-static                                                                          \
-uint_fast16_t vsf_usart##__N##_fifo_write(void *buffer_ptr, uint_fast16_t count)\
-{                                                                               \
-    return vsf_usart_fifo_write(&vsf_usart##__N, buffer_ptr, count);            \
-}                                                                               \
-                                                                                \
-/*usart_fifo_flush*/                                                            \
-static                                                                          \
-bool vsf_usart##__N##_fifo_flush(void)                                          \
-{                                                                               \
-    return vsf_usart_fifo_flush(&vsf_usart##__N);                               \
-}                                                                               \
-                                                                                \
-/*usart_request_read*/                                                          \
-static                                                                          \
-fsm_rt_t vsf_usart##__N##_request_read(uint8_t *buffer_ptr, uint_fast32_t count)\
-{                                                                               \
-    return vsf_usart_request_read(&vsf_usart##__N, buffer_ptr, count);          \
-}                                                                               \
-                                                                                \
-/*usart_request_write*/                                                         \
-static                                                                          \
-fsm_rt_t vsf_usart##__N##_request_write(uint8_t *buffer_ptr, uint_fast32_t count)\
-{                                                                               \
-    return vsf_usart_request_write(&vsf_usart##__N, buffer_ptr, count);         \
-}                                                                               \
-                                                                                \
-/*usart_irq_enable*/                                                            \
-static                                                                          \
-void vsf_usart##__N##_irq_enable(em_usart_irq_mask_t irq_mask)                  \
-{                                                                               \
-    vsf_usart_irq_enable(&vsf_usart##__N, irq_mask);                            \
-}                                                                               \
-                                                                                \
-/*usart_evt_enbale*/                                                            \
-static                                                                          \
-void vsf_usart##__N##_irq_disable(em_usart_irq_mask_t irq_mask)                 \
-{                                                                               \
-    vsf_usart_irq_disable(&vsf_usart##__N, irq_mask);                           \
-}
 
-#define __VSF_USART_LV1_INTTERFACE_BODY(__N, __VALUE)                           \
-            ____VSF_USART_LV1_INTTERFACE_BODY(__N, __VALUE)                     \
+#if VSF_USART_CFG_MULTI_INSTANCES == DISABLED
+#   ifndef VSF_USART_CFG_PREFIX
+#       define VSF_USART_CFG_PREFIX vsf_hw
+#   endif
+#   define ____VSF_USART_WRAPPER(__header, __api)   __header ## _ ## __api
+#   define __VSF_USART_WRAPPER(__header, __api)     ____VSF_USART_WRAPPER(__header, __api)
+#   define vsf_usart_init           __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_init)
+#   define vsf_usart_enable         __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_enable)
+#   define vsf_usart_disable        __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_disable)
+#   define vsf_usart_irq_enable     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_irq_enable)
+#   define vsf_usart_irq_disable    __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_irq_disable)
+#   define vsf_usart_status         __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_status)
+#   define vsf_usart_fifo_read      __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_fifo_read)
+#   define vsf_usart_fifo_write     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_fifo_write)
+#   define vsf_usart_fifo_flush     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_fifo_flush)
+#   define vsf_usart_request_rx     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_request_rx)
+#   define vsf_usart_request_tx     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_request_tx)
+#   define vsf_usart_cancel_rx      __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_cancel_rx)
+#   define vsf_usart_cancel_tx      __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_cancel_tx)
+#   define vsf_usart_get_rx_count   __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_get_rx_count)
+#   define vsf_usart_get_tx_count   __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_get_tx_count)
+#endif
 
-/********************************VSF_USART_FUNC_BODY*****************************/
-#define ____VSF_USART_LV1_INTERFACE_INIT(__N, __VALUE)                          \
-    {                                                                           \
-        .Init               = &vsf_usart##__N##_init,                           \
-        .Enable             = &vsf_usart##__N##_enable,                         \
-        .Disable            = &vsf_usart##__N##_disable,                        \
-        .Status             = (peripheral_status_t (*)(void))vsf_usart##__N##_status,\
-        .Irq = {                                                                \
-            .Enable         = &vsf_usart##__N##_irq_enable,                     \
-            .Disable        = &vsf_usart##__N##_irq_disable,                    \
-        },                                                                      \
-        .FIFO = {                                                               \
-            .Read           = &vsf_usart##__N##_fifo_read,                      \
-            .Write          = &vsf_usart##__N##_fifo_write,                     \
-            .Flush          = &vsf_usart##__N##_fifo_flush,                     \
-        },                                                                      \
-        .Block = {                                                              \
-            .Read.Request  = &vsf_usart##__N##_request_read,                    \
-            .Write.Request = &vsf_usart##__N##_request_write,                   \
-        },                                                                      \
-    }
-
-/*! \note __VSF_USART_LV1_INTERFACE_INIT is designated to be used with
- *!       MACRO_REPEATE, a "," is attached to ____VSF_USART_LV1_INTERFACE_INIT
- */
-#define __VSF_USART_LV1_INTERFACE_INIT(__N, __VALUE)                            \
-            ____VSF_USART_LV1_INTERFACE_INIT(__N, __VALUE),
-
-
-#define __VSF_USART_LV1_IMPL(__USART_INDEX)                                     \
-                                                                                \
-____VSF_USART_LV1_INTTERFACE_BODY(__USART_INDEX, NULL)                          \
-                                                                                \
-const i_usart_t VSF_MCONNECT(VSF_USART, __USART_INDEX) =                        \
-        ____VSF_USART_LV1_INTERFACE_INIT(__USART_INDEX, NULL);
+#define VSF_USART_INIT(usart_ptr, cfg_ptr)                                      \
+    vsf_usart_init((vsf_usart_t *)usart_ptr, cfg_ptr)
+#define VSF_USART_ENABLE(usart_ptr)                                             \
+    vsf_usart_enable((vsf_usart_t *)usart_ptr)
+#define VSF_USART_DISABLE(usart_ptr)                                            \
+    vsf_usart_disable((vsf_usart_t *)usart_ptr)
+#define VSF_USART_IRQ_ENABLE(usart_ptr, irq_mask)                               \
+    vsf_usart_irq_enable((vsf_usart_t *)usart_ptr, irq_mask)
+#define VSF_USART_IRQ_DISABLE(usart_ptr, irq_mask)                              \
+    vsf_usart_irq_disable((vsf_usart_t *)usart_ptr, irq_mask)
+#define VSF_USART_STATUS(usart_ptr)                                             \
+    vsf_usart_status((vsf_usart_t *)usart_ptr)
+#define VSF_USART_FIFO_READ(usart_ptr, buffer_ptr, count)                       \
+    vsf_usart_fifo_read((vsf_usart_t *)usart_ptr, buffer_ptr, count)
+#define VSF_USART_FIFO_WRITE(usart_ptr, buffer_ptr, count)                      \
+    vsf_usart_fifo_write((vsf_usart_t *)usart_ptr, buffer_ptr, count)
+#define VSF_USART_FIFO_FLUSH(usart_ptr)                                         \
+    vsf_usart_fifo_flush((vsf_usart_t *)usart_ptr)
+#define VSF_USART_REQUEST_RX(usart_ptr, buffer_ptr, count)                      \
+    vsf_usart_request_rx((vsf_usart_t *)usart_ptr, buffer_ptr, count)
+#define VSF_USART_REQUEST_TX(usart_ptr, buffer_ptr, count)                      \
+    vsf_usart_request_tx((vsf_usart_t *)usart_ptr, buffer_ptr, count)
+#define VSF_USART_CANCEL_RX(usart_ptr)                                          \
+    vsf_usart_cancel_rx((vsf_usart_t *)usart_ptr)
+#define VSF_USART_CANCEL_TX(usart_ptr)                                          \
+    vsf_usart_cancel_tx((vsf_usart_t *)usart_ptr)
+#define VSF_USART_GET_RX_COUNT(usart_ptr)                                       \
+    vsf_usart_get_rx_count((vsf_usart_t *)usart_ptr)
+#define VSF_USART_GET_TX_COUNT(usart_ptr)                                       \
+    vsf_usart_get_tx_count((vsf_usart_t *)usart_ptr)
 
 /*============================ TYPES =========================================*/
 
 typedef enum em_usart_mode_t em_usart_mode_t;
+
 /*! \name usart working mode
  *! \note if your peripheral has any customised configuration, please add it by yourself
  *!       when implementing em_usart_mode_t
@@ -216,14 +158,14 @@ typedef enum em_usart_irq_mask_t em_usart_irq_mask_t;
 
 typedef struct vsf_usart_t vsf_usart_t;
 
-typedef void vsf_usart_isr_handler_t(   void *target_ptr,
-                                        vsf_usart_t *usart_ptr,
-                                        em_usart_irq_mask_t irq_mask);
+typedef void vsf_usart_isr_handler_t(void *target_ptr,
+                                     vsf_usart_t *usart_ptr,
+                                     em_usart_irq_mask_t irq_mask);
 
 typedef struct vsf_usart_isr_t {
     vsf_usart_isr_handler_t *handler_fn;
     void                    *target_ptr;
-    vsf_arch_prio_t         prio;
+    vsf_arch_prio_t          prio;
 } vsf_usart_isr_t;
 
 //! \name usart configuration
@@ -261,6 +203,35 @@ struct usart_cfg_t {
  *!       then the bIsRXTimeOut bit should be cleared.
 */
 typedef struct usart_status_t usart_status_t;
+
+#if VSF_USART_CFG_MULTI_INSTANCES == ENABLED
+//! \name usart multiplex
+//! @{
+typedef struct vsf_usart_op_t {
+    vsf_err_t       (*init)         (vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
+    fsm_rt_t        (*enable)       (vsf_usart_t *usart_ptr);
+    fsm_rt_t        (*disable)      (vsf_usart_t *usart_ptr);
+    void            (*irq_enable)   (vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
+    void            (*irq_disable)  (vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
+    usart_status_t  (*status)       (vsf_usart_t *usart_ptr);
+    uint_fast16_t   (*fifo_read)    (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
+    uint_fast16_t   (*fifo_write)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
+    bool            (*fifo_flush)   (vsf_usart_t *usart_ptr);
+    vsf_err_t       (*request_rx)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
+    vsf_err_t       (*request_tx)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
+    vsf_err_t       (*cancel_rx)    (vsf_usart_t *usart_ptr);
+    vsf_err_t       (*cancel_tx)    (vsf_usart_t *usart_ptr);
+    int_fast32_t    (*get_rx_count) (vsf_usart_t *usart_ptr);
+    int_fast32_t    (*get_tx_count) (vsf_usart_t *usart_ptr);
+} vsf_usart_op_t;
+//! @}
+
+vsf_class(vsf_usart_t)  {
+    public_member(
+        const vsf_usart_op_t * op;
+    )
+};
+#endif
 
 /* usart_capability_t should implement peripheral_capability_t */
 typedef struct usart_capability_t usart_capability_t;

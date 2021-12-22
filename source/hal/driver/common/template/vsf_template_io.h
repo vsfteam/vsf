@@ -27,7 +27,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_GPIO_CFG_MULTI_INSTANCES
-#   define VSF_GPIO_CFG_MULTI_INSTANCES DISABLED
+#   define VSF_GPIO_CFG_MULTI_INSTANCES ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -40,19 +40,19 @@ extern "C" {
 
 #   define ____VSF_GPIO_WRAPPER(__header, __api)    __header ## _ ## __api
 #   define __VSF_GPIO_WRAPPER(__header, __api)      ____VSF_GPIO_WRAPPER(__header, __api)
-#   define vsf_gpio_config_pin                      __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_config_pin)
-#   define vsf_gpio_set_direction                   __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_set_direction)
-#   define vsf_gpio_get_direction                   __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_get_direction)
-#   define vsf_gpio_set_input                       __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_set_input)
-#   define vsf_gpio_set_output                      __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_set_output)
-#   define vsf_gpio_switch_direction                __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_switch_direction)
-#   define vsf_gpio_read                            __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_read)
-#   define vsf_gpio_write                           __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_write)
-#   define vsf_gpio_set                             __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_set)
-#   define vsf_gpio_clear                           __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_clear)
-#   define vsf_gpio_output_and_set                  __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_output_and_set)
-#   define vsf_gpio_output_and_clear                __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_output_and_clear)
-#   define vsf_gpio_toggle                          __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_toggle)
+#   define vsf_gpio_config_pin       __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_config_pin)
+#   define vsf_gpio_set_direction    __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_set_direction)
+#   define vsf_gpio_get_direction    __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_get_direction)
+#   define vsf_gpio_set_input        __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_set_input)
+#   define vsf_gpio_set_output       __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_set_output)
+#   define vsf_gpio_switch_direction __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_switch_direction)
+#   define vsf_gpio_read             __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_read)
+#   define vsf_gpio_write            __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_write)
+#   define vsf_gpio_set              __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_set)
+#   define vsf_gpio_clear            __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_clear)
+#   define vsf_gpio_output_and_set   __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_output_and_set)
+#   define vsf_gpio_output_and_clear __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_output_and_clear)
+#   define vsf_gpio_toggle           __VSF_GPIO_WRAPPER(VSF_GPIO_CFG_PREFIX, gpio_toggle)
 #endif
 
 #define VSF_GPIO_CONFIG_PIN(__GPIO, __PIN_MASK, __FEATURE)                      \
