@@ -63,7 +63,7 @@ vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
 //                0,
 //                AIC1000LITE_ANALOG_REG_CFG_ANA_USB_FSLS_DRV_BIT(3));
             PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteAnalogReg->cfg_ana_usb_ctrl0),
-                (AIC1000LITE_ANALOG_REG_CFG_ANA_USB_ISET_HS_DISCONNECT(6)),
+                (AIC1000LITE_ANALOG_REG_CFG_ANA_USB_ISET_HS_DISCONNECT(7)),
                 (AIC1000LITE_ANALOG_REG_CFG_ANA_USB_ISET_HS_DISCONNECT(7)));
         }
     }
