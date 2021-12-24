@@ -240,14 +240,14 @@ void vsf_usbh_xb1_on_free(vk_usbh_xb1_t *xb1)
 }
 #endif
 
-static void vk_usbh_xb1_output(vk_usbh_xb1_t *xb1, uint_fast8_t len)
+static void __vk_usbh_xb1_output(vk_usbh_xb1_t *xb1, uint_fast8_t len)
 {
     VSF_USB_ASSERT(xb1->out_idle);
     xb1->out_idle = false;
     vk_usbh_hid_send_report(&xb1->use_as__vk_usbh_hid_teda_t, (uint8_t *)&xb1->gamepad_out_buf, len);
 }
 
-static void vk_usbh_xb1_submit_cmd(vk_usbh_xb1_t *xb1, uint_fast8_t cmd, uint_fast8_t sub_cmd, uint_fast8_t seq, const uint8_t *data, uint8_t len)
+static void __vk_usbh_xb1_submit_cmd(vk_usbh_xb1_t *xb1, uint_fast8_t cmd, uint_fast8_t sub_cmd, uint_fast8_t seq, const uint8_t *data, uint8_t len)
 {
     VSF_USB_ASSERT(xb1->out_idle && ((4 + len) < sizeof(xb1->gamepad_out_buf)));
     xb1->gamepad_out_buf.buffer[0] = cmd;
@@ -255,24 +255,24 @@ static void vk_usbh_xb1_submit_cmd(vk_usbh_xb1_t *xb1, uint_fast8_t cmd, uint_fa
     xb1->gamepad_out_buf.buffer[2] = seq;
     xb1->gamepad_out_buf.buffer[3] = len;
     memcpy(&xb1->gamepad_out_buf.buffer[4], data, len);
-    vk_usbh_xb1_output(xb1, 4 + len);
+    __vk_usbh_xb1_output(xb1, 4 + len);
 }
 
-static void vk_usbh_xb1_ack_home(vk_usbh_xb1_t *xb1)
+static void __vk_usbh_xb1_ack_home(vk_usbh_xb1_t *xb1)
 {
     const uint8_t ack_home_reply[] = {
         0x00, 0x07, 0x20, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
     };
-    vk_usbh_xb1_submit_cmd(xb1, 0x01, 0x20, xb1->home_seq, ack_home_reply, sizeof(ack_home_reply));
+    __vk_usbh_xb1_submit_cmd(xb1, 0x01, 0x20, xb1->home_seq, ack_home_reply, sizeof(ack_home_reply));
 }
 
-static void vk_usbh_xb1_start(vk_usbh_xb1_t *xb1)
+static void __vk_usbh_xb1_start(vk_usbh_xb1_t *xb1)
 {
     const uint8_t start[] = { 0x00 };
-    vk_usbh_xb1_submit_cmd(xb1, 0x05, 0x20, 0x00, start, sizeof(start));
+    __vk_usbh_xb1_submit_cmd(xb1, 0x05, 0x20, 0x00, start, sizeof(start));
 }
 
-static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_usbh_xb1_t *xb1 = (vk_usbh_xb1_t *)container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
 
@@ -297,12 +297,12 @@ static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     if (0 == len) {
                     } else if ((32 == len) && (data[0] == 0x02) && (data[1] == 0x20)) {
                         // Pairing request
-                        vk_usbh_xb1_start(xb1);
+                        __vk_usbh_xb1_start(xb1);
                     } else if ((6 == len) && (data[0] == 0x07) && (data[1] == 0x30)) {
                         xb1->home_got = true;
                         xb1->home_seq = data[2];
                         if (xb1->out_idle) {
-                            vk_usbh_xb1_ack_home(xb1);
+                            __vk_usbh_xb1_ack_home(xb1);
                         }
                     } else if ((data[0] == 0x20) && (data[1] == 0x00)) {
                         if (len >= sizeof(vsf_usb_xb1_gamepad_in_report_t)) {
@@ -314,7 +314,7 @@ static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             } else {
                 xb1->out_idle = true;
                 if (xb1->home_got) {
-                    vk_usbh_xb1_ack_home(xb1);
+                    __vk_usbh_xb1_ack_home(xb1);
                 } else {
                     vsf_usbh_xb1_on_report_output(xb1);
                 }
@@ -334,7 +334,7 @@ static void *__vk_usbh_xb1_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
     if (0 == desc_ifs->bInterfaceNumber) {
         vk_usbh_xb1_t *xb1 = vk_usbh_hid_probe(usbh, dev, parser_ifs, sizeof(vk_usbh_xb1_t), false);
         if (xb1 != NULL) {
-            xb1->user_evthandler = vk_usbh_xb1_evthandler;
+            xb1->user_evthandler = __vk_usbh_xb1_evthandler;
             vsf_usbh_xb1_on_new(xb1);
         }
         return xb1;
