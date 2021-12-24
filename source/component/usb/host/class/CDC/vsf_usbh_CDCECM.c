@@ -111,8 +111,8 @@ typedef struct vk_usbh_ecm_t {
         VSF_USBH_ECM_INIT_START,
         VSF_USBH_ECM_INIT_WAIT_CRIT,
         VSF_USBH_ECM_INIT_WAIT_MAC,
-        VSF_USBH_ECM_INIT_WAIT_SET_IF0,
         VSF_USBH_ECM_INIT_WAIT_SET_IF1,
+        VSF_USBH_ECM_INIT_WAIT_SET_FILTER,
     } init_state;
 } vk_usbh_ecm_t;
 
@@ -527,6 +527,18 @@ int hex_to_bin(char ch)
     return -1;
 }
 
+static vsf_err_t __vk_usbh_ecm_set_filter(vk_usbh_ecm_t *ecm, uint_fast16_t filter)
+{
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT,
+        .bRequest        =  0x43,       // SET_ETHERNET_PACKET_FILTER
+        .wValue          =  filter,
+        .wIndex          =  ecm->ifs->no,
+        .wLength         =  0,
+    };
+    return vk_usbh_control_msg(ecm->usbh, ecm->dev, &req);
+}
+
 static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_usbh_cdc_t *cdc = container_of(eda, vk_usbh_cdc_t, eda);
@@ -580,12 +592,12 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     ecm->netdrv.macaddr.addr_buf[2], ecm->netdrv.macaddr.addr_buf[3],
                     ecm->netdrv.macaddr.addr_buf[4], ecm->netdrv.macaddr.addr_buf[5]);
 
-            err = vk_usbh_set_interface(usbh, dev, cdc->data_ifs, 0);
-            break;
-        case VSF_USBH_ECM_INIT_WAIT_SET_IF0:
             err = vk_usbh_set_interface(usbh, dev, cdc->data_ifs, 1);
             break;
         case VSF_USBH_ECM_INIT_WAIT_SET_IF1:
+            err = __vk_usbh_ecm_set_filter(ecm, 0x0E);
+            break;
+        case VSF_USBH_ECM_INIT_WAIT_SET_FILTER:
             __vsf_eda_crit_npb_leave(&dev->ep0.crit);
 
             ecm->netdrv.netlink.op = &__vk_usbh_ecm_netlink_op;
