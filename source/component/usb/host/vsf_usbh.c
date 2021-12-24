@@ -1079,6 +1079,7 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         usbh->parser = parser;
 
         __vsf_eda_crit_npb_init(&dev->ep0.crit);
+        __vsf_eda_crit_npb_enter(&dev->ep0.crit);
         parser->devnum_temp = dev->devnum;
 
     device_probe_retry:
@@ -1144,15 +1145,17 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             __vk_usbh_free_buffer(parser->desc_config);
             parser->desc_config = vk_usbh_urb_take_buffer(urb);
-            err = vk_usbh_set_configuration(usbh, dev, parser->desc_config->bConfigurationValue);
-            break;
-        case VSF_USBH_PROBE_WAIT_SET_CONFIG:
+
             if (__vk_usbh_parse_config(usbh, parser) < 0) {
                 __vk_usbh_reset_parser(parser);
                 dev->cur_config++;
                 goto parse_next_config;
             }
 
+            err = vk_usbh_set_configuration(usbh, dev, parser->desc_config->bConfigurationValue);
+            break;
+        case VSF_USBH_PROBE_WAIT_SET_CONFIG:
+            __vsf_eda_crit_npb_leave(&dev->ep0.crit);
             goto parse_ok;
         }
         break;

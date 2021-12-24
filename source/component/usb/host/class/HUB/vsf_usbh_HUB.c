@@ -214,6 +214,12 @@ static void __vk_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        err = __vsf_eda_crit_npb_enter(&dev->ep0.crit);
+        if (err != VSF_ERR_NONE) {
+            break;
+        }
+        // fall through
+    case VSF_EVT_SYNC:
         hub->state = HUB_STAT_ENUM_START;
         vk_usbh_urb_set_buffer(urb, &hub->desc_hub, 4);
         err = __vk_usbh_hub_get_descriptor(hub->usbh, dev, 4);
