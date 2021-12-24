@@ -188,7 +188,8 @@ typedef struct vk_usbh_dev_parser_t {
     vk_usbh_ifs_parser_t *parser_ifs;
     uint8_t num_of_ifs;
     uint8_t devnum_temp;
-    uint8_t is_to_retry;
+    uint8_t is_to_retry             : 1;
+    uint8_t no_set_configuration    : 1;
     enum {
         VSF_USBH_PROBE_START,
         VSF_USBH_PROBE_WAIT_DEVICE_DESC,

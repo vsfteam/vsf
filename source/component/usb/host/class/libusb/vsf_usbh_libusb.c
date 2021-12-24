@@ -109,6 +109,7 @@ static void *__vk_usbh_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
                     ldev,
                     VSF_USBH_LIBUSB_EVT_ON_ARRIVED);
     }
+    usbh->parser->no_set_configuration = true;
     return ldev;
 }
 

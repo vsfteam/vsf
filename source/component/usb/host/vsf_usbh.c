@@ -1152,8 +1152,11 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 goto parse_next_config;
             }
 
-            err = vk_usbh_set_configuration(usbh, dev, parser->desc_config->bConfigurationValue);
-            break;
+            if (!parser->no_set_configuration) {
+                err = vk_usbh_set_configuration(usbh, dev, parser->desc_config->bConfigurationValue);
+                break;
+            }
+            // fall through
         case VSF_USBH_PROBE_WAIT_SET_CONFIG:
             __vsf_eda_crit_npb_leave(&dev->ep0.crit);
             goto parse_ok;
