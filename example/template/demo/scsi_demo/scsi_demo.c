@@ -61,11 +61,12 @@ void __user_scsi_mounter(vsf_eda_t *eda, vsf_evt_t evt)
         vk_mal_init(&mounter->use_as__vk_mal_t);
         break;
     case VSF_EVT_RETURN:
+        if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
+            vsf_trace_error("fail to mount scsi drive" VSF_TRACE_CFG_LINEEND);
+            break;
+        }
         switch (mounter->state) {
         case STATE_INIT:
-            if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
-                break;
-            }
             mounter->state = STATE_OPEN_DIR;
             vk_file_open(NULL, "/scsi", 0, &mounter->dir);
             break;

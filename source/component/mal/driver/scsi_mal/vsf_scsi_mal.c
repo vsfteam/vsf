@@ -102,6 +102,7 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
         STATE_CAPACITY,
     };
     vk_scsi_mal_t *pthis = (vk_scsi_mal_t *)&vsf_this;
+    vsf_err_t err;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -110,6 +111,12 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
         vk_scsi_init(pthis->scsi);
         break;
     case VSF_EVT_RETURN:
+        err = vsf_eda_get_return_value();
+        if (err != VSF_ERR_NONE){
+            vsf_trace_error("fail to initialize scsi device or execute scsi command" VSF_TRACE_CFG_LINEEND);
+            vsf_eda_return(err);
+            return;
+        }
         memset(pthis->cbd, 0, sizeof(pthis->cbd));
         switch (vsf_eda_get_user_value()) {
         case STATE_INIT:
