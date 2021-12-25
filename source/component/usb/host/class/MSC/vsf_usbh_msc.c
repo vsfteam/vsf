@@ -185,9 +185,22 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
         break;
     case VSF_EVT_MESSAGE: {
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            if (URB_OK != vk_usbh_urb_get_status(&urb)) {
+            vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
+
+            if (0 == pipe.endpoint) {
+                // MUST be clear endpoint halt
+            return_fail:
                 vsf_eda_return(VSF_ERR_FAIL);
-                break;
+                return;
+            }
+            if (URB_OK != vk_usbh_urb_get_status(&urb)) {
+                if (pipe.dir_in1out0) {
+                    // IN error, clear halt
+                    vk_usbh_clear_endpoint_halt(msc->usbh, msc->dev, pipe.endpoint | USB_DIR_IN);
+                    break;
+                } else {
+                    goto return_fail;
+                }
             }
 
             switch (msc->state) {

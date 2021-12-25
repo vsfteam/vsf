@@ -112,14 +112,15 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
         break;
     case VSF_EVT_RETURN:
         err = vsf_eda_get_return_value();
-        if (err != VSF_ERR_NONE){
-            vsf_trace_error("fail to initialize scsi device or execute scsi command" VSF_TRACE_CFG_LINEEND);
-            vsf_eda_return(err);
-            return;
-        }
         memset(pthis->cbd, 0, sizeof(pthis->cbd));
         switch (vsf_eda_get_user_value()) {
         case STATE_INIT:
+            if (err < 0){
+            __return:
+                vsf_eda_return(err);
+                return;
+            }
+
             pthis->cbd[0] = 0x12;
             pthis->cbd[4] = 0x24;
             pthis->mem.buffer = (uint8_t *)&pthis->buffer.inquiry;
@@ -128,9 +129,14 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
             vk_scsi_execute(pthis->scsi, pthis->cbd, &pthis->mem);
             break;
         case STATE_INQUIRY:
+            if (err < 0){
+                goto __return;
+            }
+
             vsf_trace_info("scsi_mal: vendor %8s, product %16s, revision %4s" VSF_TRACE_CFG_LINEEND,
                     pthis->buffer.inquiry.vendor, pthis->buffer.inquiry.product, pthis->buffer.inquiry.revision);
 
+        retry_read_capacity:
             pthis->cbd[0] = 0x25;
             pthis->mem.buffer = (uint8_t *)&pthis->buffer.capacity;
             pthis->mem.size = sizeof(pthis->buffer.capacity);
@@ -138,6 +144,10 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
             vk_scsi_execute(pthis->scsi, pthis->cbd, &pthis->mem);
             break;
         case STATE_CAPACITY:
+            if (err < 0){
+                goto retry_read_capacity;
+            }
+
             pthis->block_size = be32_to_cpu(pthis->buffer.capacity.block_size);
             vsf_eda_return(VSF_ERR_NONE);
             break;
