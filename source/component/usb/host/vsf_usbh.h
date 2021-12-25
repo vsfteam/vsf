@@ -589,6 +589,12 @@ extern vsf_err_t vk_usbh_set_configuration(vk_usbh_t *usbh,
         vk_usbh_dev_t *dev, uint_fast8_t configuration);
 extern vsf_err_t vk_usbh_set_interface(vk_usbh_t *usbh,
         vk_usbh_dev_t *dev, uint_fast8_t ifnum, uint_fast8_t alternate);
+extern vsf_err_t vk_usbh_clear_interface_feature(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+            uint_fast8_t ifs, uint_fast8_t feature);
+extern vsf_err_t vk_usbh_clear_endpoint_feature(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+            uint_fast8_t endpoint, uint_fast8_t feature);
+extern vsf_err_t vk_usbh_clear_endpoint_halt(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+            uint_fast8_t endpoint);
 
 extern vsf_err_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
         uint_fast8_t type, void **ptr);

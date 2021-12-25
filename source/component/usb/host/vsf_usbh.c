@@ -829,6 +829,37 @@ vsf_err_t vk_usbh_set_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     };
     return vk_usbh_control_msg(usbh, dev, &req);
 }
+vsf_err_t vk_usbh_clear_interface_feature(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+            uint_fast8_t ifs, uint_fast8_t feature)
+{
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_RECIP_INTERFACE | USB_DIR_OUT,
+        .bRequest        =  USB_REQ_CLEAR_FEATURE,
+        .wValue          =  feature,
+        .wIndex          =  ifs,
+        .wLength         =  0,
+    };
+    return vk_usbh_control_msg(usbh, dev, &req);
+}
+vsf_err_t vk_usbh_clear_endpoint_feature(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+            uint_fast8_t endpoint, uint_fast8_t feature)
+{
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_RECIP_ENDPOINT | USB_DIR_OUT,
+        .bRequest        =  USB_REQ_CLEAR_FEATURE,
+        .wValue          =  feature,
+        .wIndex          =  endpoint,
+        .wLength         =  0,
+    };
+    return vk_usbh_control_msg(usbh, dev, &req);
+}
+vsf_err_t vk_usbh_clear_endpoint_halt(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+            uint_fast8_t endpoint)
+{
+    return vk_usbh_clear_endpoint_feature(usbh, dev, endpoint, USB_ENDPOINT_HALT);
+}
 
 static bool __vk_usbh_match_id(vk_usbh_dev_parser_t *parser,
         vk_usbh_ifs_parser_t *parser_ifs, const vk_usbh_dev_id_t *dev_id)
