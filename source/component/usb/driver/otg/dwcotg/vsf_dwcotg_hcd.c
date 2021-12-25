@@ -95,17 +95,6 @@ enum vk_dwcotg_hcd_urb_channel_phase_t {
     VSF_DWCOTG_HCD_PHASE_DONE,
 } vk_dwcotg_hcd_urb_channel_phase_t;
 
-enum vk_dwcotg_hcd_urb_channel_result_t {
-    VSF_DWCOTG_HCD_CHANNEL_DONE = 0,
-    VSF_DWCOTG_HCD_CHANNEL_NAK,
-    VSF_DWCOTG_HCD_CHANNEL_NYET,
-    VSF_DWCOTG_HCD_CHANNEL_ERROR,
-    VSF_DWCOTG_HCD_CHANNEL_STALL,
-    VSF_DWCOTG_HCD_CHANNEL_TOGGLE_ERROR,
-    VSF_DWCOTG_HCD_CHANNEL_FRAME_ERROR,
-    VSF_DWCOTG_HCD_CHANNEL_TRANSACT_ERROR,
-} vk_dwcotg_hcd_urb_channel_result_t;
-
 typedef struct vk_dwcotg_hcd_urb_t {
     vsf_slist_node_t node;
 
