@@ -64,6 +64,7 @@ typedef struct vk_usbh_msc_t {
     enum {
         VSF_USBH_MSC_STATE_COMMAND,
         VSF_USBH_MSC_STATE_DATA,
+        VSF_USBH_MSC_STATE_CLEAR_STALL,
         VSF_USBH_MSC_STATE_REPLY,
     } state;
 } vk_usbh_msc_t;
@@ -187,20 +188,15 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
             vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
 
-            if (0 == pipe.endpoint) {
-                // MUST be clear endpoint halt
-            return_fail:
-                vsf_eda_return(VSF_ERR_FAIL);
-                return;
-            }
             if (URB_OK != vk_usbh_urb_get_status(&urb)) {
-                if (pipe.dir_in1out0) {
-                    // IN error, clear halt
-                    vk_usbh_clear_endpoint_halt(msc->usbh, msc->dev, pipe.endpoint | USB_DIR_IN);
-                    break;
+                if (VSF_USBH_MSC_STATE_DATA == msc->state) {
+                    msc->state = VSF_USBH_MSC_STATE_CLEAR_STALL;
+                    vk_usbh_clear_endpoint_halt(msc->usbh, msc->dev,
+                        pipe.endpoint | (pipe.dir_in1out0 ? USB_DIR_IN : USB_DIR_OUT));
                 } else {
-                    goto return_fail;
+                    vsf_eda_return(VSF_ERR_FAIL);
                 }
+                break;
             }
 
             switch (msc->state) {
@@ -225,10 +221,9 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
                 break;
             case VSF_USBH_MSC_STATE_DATA: {
                     uint_fast32_t actual_length = vk_usbh_urb_get_actual_length(&urb);
-                    vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
 
                     VSF_USB_ASSERT(msc->remain_size >= actual_length);
-                    msc->remain_size -= vk_usbh_urb_get_actual_length(&urb);
+                    msc->remain_size -= actual_length;
                     actual_length %= pipe.size;
                     if (!msc->remain_size || ((actual_length > 0) && (actual_length < pipe.size))) {
                     reply_stage:
@@ -247,6 +242,8 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
                     VSF_USB_ASSERT(false);
                 }
                 break;
+            case VSF_USBH_MSC_STATE_CLEAR_STALL:
+                goto reply_stage;
             case VSF_USBH_MSC_STATE_REPLY:
                 vsf_eda_return(msc->buffer.csw.dCSWStatus == 0 ? msc->total_size - msc->remain_size : VSF_ERR_FAIL);
                 break;
