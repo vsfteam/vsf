@@ -32,7 +32,7 @@
 const vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper = {
     VSF_IO_MAPPER_INIT(GPIO_COUNT, VSF_HW_IO_MAPPER_PORT_BITS_LOG2)
 
-    .__io = {
+    .io = {
         VSF_MREPEAT(GPIO_COUNT, __VSF_IO_MAPPER_HW, 0)
     }
 };
