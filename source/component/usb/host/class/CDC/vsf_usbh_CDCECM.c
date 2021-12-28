@@ -279,16 +279,16 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *slot, v
     VSF_USB_ASSERT(ocb != NULL);
     ocb->netbuf = netbuf;
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
-    netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem);
+    void *netbuf_tmp = vk_netdrv_read_buf(netdrv, netbuf, &mem);
     while (true) {
         VSF_USB_ASSERT((mem.size + pos) <= sizeof(ocb->buffer));
         memcpy(&ocb->buffer[pos], mem.buffer, mem.size);
         pos += mem.size;
 
-        if (NULL == netbuf) {
+        if (NULL == netbuf_tmp) {
             break;
         }
-        netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem);
+        netbuf_tmp = vk_netdrv_read_buf(netdrv, netbuf_tmp, &mem);
     }
     mem.buffer = ocb->buffer;
     mem.size = pos;
@@ -307,7 +307,10 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *slot, v
     if (err != VSF_ERR_NONE) {
         ocb->netbuf = NULL;
     } else {
-        vk_netdrv_on_netbuf_outputted(netdrv, ocb->netbuf);
+        // IMPORTANT: DO NOT use ocb->netbuf here, becase there is racing condition
+        //  in __vk_usbh_ecm_on_cdc_evt, maybe ocb->netbuf is cleared here
+//        vk_netdrv_on_netbuf_outputted(netdrv, ocb->netbuf);
+        vk_netdrv_on_netbuf_outputted(netdrv, netbuf);
     }
     return err;
 }
