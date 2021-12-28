@@ -22,8 +22,7 @@ jobs:
     - name: Checkout With Submodule
       uses: actions/checkout@v2
       with:
-        submodules: recursive
-      continue-on-error: true     # allow faild because evm has gitee repositories
+        submodules: true # without recursive
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
@@ -50,8 +49,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        submodules: recursive
-      continue-on-error: true     # allow faild because evm has gitee repositories
+        submodules: true # without recursive
 
     - name: install depends
       run: |
@@ -94,8 +92,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        submodules: recursive
-      continue-on-error: true     # allow faild because evm has gitee repositories
+        submodules: true # without recursive
 
     - name: get latest cmake and ninja
       uses: lukka/get-cmake@latest
