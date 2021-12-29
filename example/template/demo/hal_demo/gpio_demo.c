@@ -95,7 +95,7 @@ static app_gpio_demo_t __app_gpio_demo;
 /*============================ IMPLEMENTATION ================================*/
 
 static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
-{    
+{
 #if APP_GPIO_DEMO_CFG_INPUT_TEST == ENABLED
     vsf_gpio_t *input_gpio = APP_GPIO_DEMO_CFG_INPUT_GPIO;
     uint32_t input_pin_mask = APP_GPIO_DEMO_CFG_INPUT_PIN_MASK;
