@@ -26,41 +26,62 @@
 #   define VSF_USART_CFG_IMPLEMENT_OP                   DISABLED
 #endif
 
+#ifndef VSF_USART_CFG_INSTANCE_PREFIX
+#   define VSF_USART_CFG_INSTANCE_PREFIX                vsf_hw
+#endif
+
+#define VSF_USART_CFG_FIFO2REQ_PREFIX                   vsf_fifo2req
+
 #if VSF_USART_CFG_MULTI_INSTANCES == DISABLED
-#   undef VSF_USART_CFG_INSTANCE_PREFIX
-#   define VSF_USART_CFG_INSTANCE_PREFIX                vsf
 #   define VSF_USART_OP
+#   define VSF_USART_FIFO2REQ_OP
 #else
-#   ifndef VSF_USART_CFG_INSTANCE_PREFIX
-#       define VSF_USART_CFG_INSTANCE_PREFIX            vsf_hw
-#   endif
-#   define ____VSF_USART_OP(__p) .vsf_usart.op = & __p ## _usart_op,
-#   define __VSF_USART_OP(__p)   ____VSF_USART_OP(__p)
-#   define VSF_USART_OP          __VSF_USART_OP(VSF_USART_CFG_INSTANCE_PREFIX)
+#   define ____VSF_USART_OP(__p)                        .vsf_usart.op = & __ ## __p ## _usart_op,
+#   define __VSF_USART_OP(__p)                          ____VSF_USART_OP(__p)
+#   define VSF_USART_OP                                 __VSF_USART_OP(VSF_USART_CFG_INSTANCE_PREFIX)
+#   define VSF_USART_FIFO2REQ_OP                        __VSF_USART_OP(VSF_USART_CFG_FIFO2REQ_PREFIX)
+
+#   define ____VSF_USART_OP_VAR(__p)                    __ ## __p ## _usart_op
+#   define __VSF_USART_OP_VAR(__p)                      ____VSF_USART_OP_VAR(__p)
+#   define VSF_USART_OP_VAR                             __VSF_USART_OP_VAR(VSF_USART_CFG_INSTANCE_PREFIX)
+#   define VSF_USART_FIFO2REQ_OP_VAR                    __VSF_USART_OP_VAR(VSF_USART_CFG_FIFO2REQ_PREFIX)
+#endif
+
+#ifndef VSF_USART_CFG_IMPLEMENT_REQUEST_BY_FIFO
+#   define VSF_USART_CFG_IMPLEMENT_REQUEST_BY_FIFO      DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define  __VSF_USART_FN(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_DEFINE(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
+#define VSF_USART_FN_INIT               VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_init)
+#define VSF_USART_FN_ENABLE             VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_enable)
+#define VSF_USART_FN_DISABLE            VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_disable)
+#define VSF_USART_FN_IRQ_ENABLE         VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_irq_enable)
+#define VSF_USART_FN_IRQ_DISABLE        VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_irq_disable)
+#define VSF_USART_FN_STATUS             VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_status)
+#define VSF_USART_FN_FIFO_READ          VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_fifo_read)
+#define VSF_USART_FN_FIFO_WRITE         VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_fifo_write)
+#define VSF_USART_FN_REQUEST_RX         VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_request_rx)
+#define VSF_USART_FN_REQUEST_TX         VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_request_tx)
+#define VSF_USART_FN_CANCEL_RX          VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_cancel_rx)
+#define VSF_USART_FN_CANCEL_TX          VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_cancel_tx)
+#define VSF_USART_FN_GET_RX_COUNT       VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_get_rx_count)
+#define VSF_USART_FN_GET_TX_COUNT       VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_get_tx_count)
+#define VSF_USART_FN_GET_DATA_LENGTH    VSF_MCONNECT(VSF_USART_CFG_INSTANCE_PREFIX, _usart_get_data_length)
 
-#define VSF_USART_FN_INIT(__prefix_name)         __VSF_USART_FN(__prefix_name, vsf_err_t,      init,         vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
-#define VSF_USART_FN_ENABLE(__prefix_name)       __VSF_USART_FN(__prefix_name, fsm_rt_t,       enable,       vsf_usart_t *usart_ptr)
-#define VSF_USART_FN_DISABLE(__prefix_name)      __VSF_USART_FN(__prefix_name, fsm_rt_t,       disable,      vsf_usart_t *usart_ptr)
-#define VSF_USART_FN_IRQ_ENABLE(__prefix_name)   __VSF_USART_FN(__prefix_name, void,           irq_enable,   vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
-#define VSF_USART_FN_IRQ_DISABLE(__prefix_name)  __VSF_USART_FN(__prefix_name, void,           irq_disable,  vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
-#define VSF_USART_FN_STATUS(__prefix_name)       __VSF_USART_FN(__prefix_name, usart_status_t, status,       vsf_usart_t *usart_ptr)
-#define VSF_USART_FN_FIFO_READ(__prefix_name)    __VSF_USART_FN(__prefix_name, uint_fast16_t,  fifo_read,    vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
-#define VSF_USART_FN_FIFO_WRITE(__prefix_name)   __VSF_USART_FN(__prefix_name, uint_fast16_t,  fifo_write,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
-#define VSF_USART_FN_FIFO_FLUSH(__prefix_name)   __VSF_USART_FN(__prefix_name, bool,           fifo_flush,   vsf_usart_t *usart_ptr)
-#define VSF_USART_FN_REQUEST_RX(__prefix_name)   __VSF_USART_FN(__prefix_name, vsf_err_t,      request_rx,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
-#define VSF_USART_FN_REQUEST_TX(__prefix_name)   __VSF_USART_FN(__prefix_name, vsf_err_t,      request_tx,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
-#define VSF_USART_FN_CANCEL_RX(__prefix_name)    __VSF_USART_FN(__prefix_name, vsf_err_t,      cancel_rx,    vsf_usart_t *usart_ptr)
-#define VSF_USART_FN_CANCEL_TX(__prefix_name)    __VSF_USART_FN(__prefix_name, vsf_err_t,      cancel_tx,    vsf_usart_t *usart_ptr)
-#define VSF_USART_FN_GET_RX_COUNT(__prefix_name) __VSF_USART_FN(__prefix_name, int_fast32_t,   get_rx_count, vsf_usart_t *usart_ptr)
-#define VSF_USART_FN_GET_TX_COUNT(__prefix_name) __VSF_USART_FN(__prefix_name, int_fast32_t,   get_tx_count, vsf_usart_t *usart_ptr)
+#define __VSF_USART_BASE_APIS(__prefix_name)                                                                                   \
+    __VSF_USART_API(__prefix_name, vsf_err_t,      init,         vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)                 \
+    __VSF_USART_API(__prefix_name, fsm_rt_t,       enable,       vsf_usart_t *usart_ptr)                                       \
+    __VSF_USART_API(__prefix_name, fsm_rt_t,       disable,      vsf_usart_t *usart_ptr)                                       \
+    __VSF_USART_API(__prefix_name, void,           irq_enable,   vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)         \
+    __VSF_USART_API(__prefix_name, void,           irq_disable,  vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)         \
+    __VSF_USART_API(__prefix_name, usart_status_t, status,       vsf_usart_t *usart_ptr)
 
-#define __VSF_USART_APIS(__prefix_name)                                                                                        \
+#define __VSF_USART_FIFO_APIS(__prefix_name)                                                                                   \
+    __VSF_USART_API(__prefix_name, uint_fast16_t,  fifo_read,    vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)\
+    __VSF_USART_API(__prefix_name, uint_fast16_t,  fifo_write,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+
+#define __VSF_USART_REQUEST_APIS(__prefix_name)                                                                                \
     __VSF_USART_API(__prefix_name, vsf_err_t,      init,         vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)                 \
     __VSF_USART_API(__prefix_name, fsm_rt_t,       enable,       vsf_usart_t *usart_ptr)                                       \
     __VSF_USART_API(__prefix_name, fsm_rt_t,       disable,      vsf_usart_t *usart_ptr)                                       \
@@ -69,7 +90,6 @@
     __VSF_USART_API(__prefix_name, usart_status_t, status,       vsf_usart_t *usart_ptr)                                       \
     __VSF_USART_API(__prefix_name, uint_fast16_t,  fifo_read,    vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)\
     __VSF_USART_API(__prefix_name, uint_fast16_t,  fifo_write,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)\
-    __VSF_USART_API(__prefix_name, bool,           fifo_flush,   vsf_usart_t *usart_ptr)                                       \
     __VSF_USART_API(__prefix_name, vsf_err_t,      request_rx,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)\
     __VSF_USART_API(__prefix_name, vsf_err_t,      request_tx,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)\
     __VSF_USART_API(__prefix_name, vsf_err_t,      cancel_rx,    vsf_usart_t *usart_ptr)                                       \
@@ -77,25 +97,48 @@
     __VSF_USART_API(__prefix_name, int_fast32_t,   get_rx_count, vsf_usart_t *usart_ptr)                                       \
     __VSF_USART_API(__prefix_name, int_fast32_t,   get_tx_count, vsf_usart_t *usart_ptr)
 
+#define __VSF_USART_FULL_APIS(__prefix_name)                                                                                   \
+    __VSF_USART_BASE_APIS(__prefix_name)                                                                                       \
+    __VSF_USART_FIFO_APIS(__prefix_name)                                                                                       \
+    __VSF_USART_REQUEST_APIS(__prefix_name)
+
 /*============================ PROTOTYPES ====================================*/
 
 #undef   __VSF_USART_API
 #define  __VSF_USART_API(__prefix_name, __return, __name, ...)                   \
     VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
 
-__VSF_USART_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
+
+#if VSF_USART_CFG_IMPLEMENT_REQUEST_BY_FIFO == DISABLED
+    __VSF_USART_FULL_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
+#else
+    __VSF_USART_BASE_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
+    __VSF_USART_FIFO_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
+    __VSF_USART_FULL_APIS(VSF_USART_CFG_FIFO2REQ_PREFIX)
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 
 #if VSF_USART_CFG_MULTI_INSTANCES == ENABLED && VSF_USART_CFG_IMPLEMENT_OP == ENABLED
-static const vsf_usart_op_t vsf_hw_usart_op = {
 
-#undef   __VSF_USART_API
-#define  __VSF_USART_API(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_OP(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
+#   undef   __VSF_USART_API
+#   define  __VSF_USART_API(__prefix_name, __return, __name, ...)                   \
+        VSF_TEMPLATE_HAL_API_OP(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
 
-    __VSF_USART_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
+
+#if VSF_USART_CFG_IMPLEMENT_REQUEST_BY_FIFO == DISABLED
+static const vsf_usart_op_t VSF_USART_OP_VAR = {
+    __VSF_USART_FULL_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
 };
+#else
+static const vsf_usart_op_t VSF_USART_OP_VAR = {
+    __VSF_USART_BASE_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
+    __VSF_USART_FIFO_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
+};
+static const vsf_usart_op_t VSF_USART_FIFO2REQ_OP_VAR = {
+    __VSF_USART_FULL_APIS(VSF_USART_CFG_FIFO2REQ_PREFIX)
+};
+#endif
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -103,6 +146,8 @@ static const vsf_usart_op_t vsf_hw_usart_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+/*============================ INCLUDES ======================================*/
 /*============================ IMPLEMENTATION ================================*/
+
 
 #endif // VSF_HAL_USE_USART == ENABLED

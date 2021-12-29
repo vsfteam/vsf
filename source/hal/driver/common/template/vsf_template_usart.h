@@ -29,33 +29,60 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USART_CFG_MULTI_INSTANCES
-#   define VSF_USART_CFG_MULTI_INSTANCES DISABLED
+#   define VSF_USART_CFG_MULTI_INSTANCES        DISABLED
+#endif
+
+#ifndef VSF_USART_CFG_FIFO_TO_REQUEST
+#   define VSF_USART_CFG_FIFO_TO_REQUEST        DISABLED
+#endif
+
+#ifndef VSF_USART_REIMPLEMENT_MODE
+#   define VSF_USART_REIMPLEMENT_MODE           DISABLED
+#endif
+
+#ifndef VSF_USART_REIMPLEMENT_IRQ_MASK
+#   define VSF_USART_REIMPLEMENT_IRQ_MASK       DISABLED
+#endif
+
+#ifndef VSF_USART_REIMPLEMENT_STATUS
+#   define VSF_USART_REIMPLEMENT_STATUS         DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-
 #if VSF_USART_CFG_MULTI_INSTANCES == DISABLED
 #   ifndef VSF_USART_CFG_PREFIX
-#       define VSF_USART_CFG_PREFIX vsf_hw
+#       define VSF_USART_CFG_PREFIX             vsf_hw
 #   endif
+#   ifndef VSF_USART_CFG_FIFO2REQ_PREFIX
+#       define VSF_USART_CFG_FIFO2REQ_PREFIX    vsf_fifo2req
+#   endif
+
+#   ifndef VSF_USART_CFG_REAL_PREFIX
+#       if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
+#           define VSF_USART_CFG_REAL_PREFIX    VSF_USART_CFG_FIFO2REQ_PREFIX
+#       else
+#           define VSF_USART_CFG_REAL_PREFIX    VSF_USART_CFG_PREFIX
+#       endif
+#   endif
+
 #   define ____VSF_USART_WRAPPER(__header, __api)   __header ## _ ## __api
 #   define __VSF_USART_WRAPPER(__header, __api)     ____VSF_USART_WRAPPER(__header, __api)
-#   define vsf_usart_init           __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_init)
-#   define vsf_usart_enable         __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_enable)
-#   define vsf_usart_disable        __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_disable)
-#   define vsf_usart_irq_enable     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_irq_enable)
-#   define vsf_usart_irq_disable    __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_irq_disable)
-#   define vsf_usart_status         __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_status)
-#   define vsf_usart_fifo_read      __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_fifo_read)
-#   define vsf_usart_fifo_write     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_fifo_write)
-#   define vsf_usart_fifo_flush     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_fifo_flush)
-#   define vsf_usart_request_rx     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_request_rx)
-#   define vsf_usart_request_tx     __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_request_tx)
-#   define vsf_usart_cancel_rx      __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_cancel_rx)
-#   define vsf_usart_cancel_tx      __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_cancel_tx)
-#   define vsf_usart_get_rx_count   __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_get_rx_count)
-#   define vsf_usart_get_tx_count   __VSF_USART_WRAPPER(VSF_USART_CFG_PREFIX, usart_get_tx_count)
+#   define vsf_usart_init           __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_init)
+#   define vsf_usart_enable         __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_enable)
+#   define vsf_usart_disable        __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_disable)
+#   define vsf_usart_irq_enable     __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_irq_enable)
+#   define vsf_usart_irq_disable    __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_irq_disable)
+#   define vsf_usart_status         __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_status)
+#   define vsf_usart_fifo_read      __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_fifo_read)
+#   define vsf_usart_fifo_write     __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_fifo_write)
+#   define vsf_usart_fifo_flush     __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_fifo_flush)
+#   define vsf_usart_request_rx     __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_request_rx)
+#   define vsf_usart_request_tx     __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_request_tx)
+#   define vsf_usart_cancel_rx      __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_cancel_rx)
+#   define vsf_usart_cancel_tx      __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_cancel_tx)
+#   define vsf_usart_get_rx_count   __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_get_rx_count)
+#   define vsf_usart_get_tx_count   __VSF_USART_WRAPPER(VSF_USART_CFG_REAL_PREFIX, usart_get_tx_count)
 #endif
 
 #define VSF_USART_INIT(usart_ptr, cfg_ptr)                                      \
@@ -93,68 +120,61 @@ extern "C" {
 
 typedef enum em_usart_mode_t em_usart_mode_t;
 
+#if VSF_USART_REIMPLEMENT_MODE == DISABLED
 /*! \name usart working mode
- *! \note if your peripheral has any customised configuration, please add it by yourself
- *!       when implementing em_usart_mode_t
- *!
-//! @{
+ *! \note if your peripheral has any customised configuration, please reimplement
+ *!       em_usart_mode_t
+ */
 enum em_usart_mode_t {
-    USART_NO_PARITY         = 0x00,
-    USART_EVEN_PARITY       = 0x18,
-    USART_ODD_PARITY        = 0x08,
-    USART_1_STOPBIT         = 0x00,
-    USART_2_STOPBIT         = 0x40,
-    USART_X_BIT_LENGTH      = 0x00,
-    USART_SYNC_MODE         = 0x0400,
-    USART_ASYNC_MODE        = 0x0000,
-    USART_SYNC_CLKOUT_EN    = 0,
-    USART_TX_EN             = 0,
-    USART_RX_EN             = 0,
-    USART_RTS_EN            = 0,
-    USART_CTS_EN            = 0,
+    USART_NO_PARITY         = (0x0ul << 0),
+    USART_EVEN_PARITY       = (0x1ul << 0),
+    USART_ODD_PARITY        = (0x2ul << 0),
+    USART_PARITY_MASK       = (0x3ul << 0),
 
-    // customised functionality
-    USART_NO_AUTO_BAUD      = 0x00,
-    USART_AUTO_BAUD_MODE0   = 0x01,
-    USART_AUTO_BAUD_MODE1   = 0x03,
-    USART_AUTO_RESTART      = 0x04,
-    USART_NO_AUTO_RESTART   = 0x00,
-    USART_FORCE_1_PARITY    = 0x28,
-    USART_FORCE_0_PARITY    = 0x38,
-    USART_ENABLE_FIFO       = 0x00,
-    USART_DISABLE_FIFO      = 0x80,
+    USART_1_STOPBIT         = (0x0ul << 2),
+    USART_1_5_STOPBIT       = (0x1ul << 2),
+    USART_2_STOPBIT         = (0x2ul << 2),
+    USART_STOPBIT_MASK      = (0x3ul << 2),
+
+    USART_5_BIT_LENGTH      = (0x0ul << 4),
+    USART_6_BIT_LENGTH      = (0x1ul << 4),
+    USART_7_BIT_LENGTH      = (0x2ul << 4),
+    USART_8_BIT_LENGTH      = (0x3ul << 4),
+    USART_9_BIT_LENGTH      = (0x4ul << 4),
+    USART_BIT_LENGTH_MASK   = (0x7ul << 4),
+
+    USART_TX_EN             = (0x1ul << 7),
+    USART_RX_EN             = (0x1ul << 8),
+    USART_RTS_EN            = (0x1ul << 9),
+    USART_CTS_EN            = (0x1ul << 10),
+    USART_EN_MASK           = (0xFul << 7),
 };
-//! @}
-*/
+#endif
 
+typedef enum em_usart_irq_mask_t em_usart_irq_mask_t;
+
+#if VSF_USART_REIMPLEMENT_IRQ_MASK == DISABLED
 /*! \brief em_usart_irq_mask_t
  *! \note em_usart_irq_mask_t should provide irq masks
-//! @{
+ */
 enum em_usart_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
-    USART_IRQ_MASK_TX,
-    USART_IRQ_MASK_RX,
+    USART_IRQ_MASK_TX               = (0x1ul << 0),
+    USART_IRQ_MASK_RX               = (0x1ul << 1),
 
     // request_rx/request_tx complete
-    USART_IRQ_MASK_TX_CPL,
-    USART_IRQ_MASK_RX_CPL,
+    USART_IRQ_MASK_TX_CPL           = (0x1ul << 2),
+    USART_IRQ_MASK_RX_CPL           = (0x1ul << 3),
 
     // optional
     // error
-    USART_IRQ_MASK_FRAME_ERR,
-    USART_IRQ_MASK_PARITY_ERR,
-    USART_IRQ_MASK_BREAK_ERR,
-    USART_IRQ_MASK_OVERFLOW_ERR,
-    USART_IRQ_MASK_ERR      = ALL_ERROR_MASK,
-
-    // FIFO
-    USART_IRQ_MASK_RX_FIFO_NOT_EMPTY,
-    USART_IRQ_MASK_RX_FIFO_FULL,
-    USART_IRQ_MASK_TX_FIFO_EMPTY,
+    USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 4),
+    USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 5),
+    USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 6),
+    USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 7),
+    USART_IRQ_MASK_ERR              = (0xFul << 4),
 };
-//! @}
- */
-typedef enum em_usart_irq_mask_t em_usart_irq_mask_t;
+#endif
 
 typedef struct vsf_usart_t vsf_usart_t;
 
@@ -177,9 +197,9 @@ struct usart_cfg_t {
     uint32_t                rx_timeout;
     vsf_usart_isr_t         isr;
 };
-
 //! @}
 
+typedef struct usart_status_t usart_status_t;
 /*! \brief usart_status_t should implement peripheral_status_t
  *! \note uart_status_t should provide dedicated bits for
  *!       indicating whether a read or write timeout event is detected
@@ -201,38 +221,44 @@ struct usart_cfg_t {
  *!       Those bits will not be cleared until corresponding transmission
  *!       operation is request. E.g. When a Block.Read.Request is called,
  *!       then the bIsRXTimeOut bit should be cleared.
-*/
-typedef struct usart_status_t usart_status_t;
-
-#if VSF_USART_CFG_MULTI_INSTANCES == ENABLED
-//! \name usart multiplex
-//! @{
-typedef struct vsf_usart_op_t {
-    vsf_err_t       (*init)         (vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
-    fsm_rt_t        (*enable)       (vsf_usart_t *usart_ptr);
-    fsm_rt_t        (*disable)      (vsf_usart_t *usart_ptr);
-    void            (*irq_enable)   (vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
-    void            (*irq_disable)  (vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
-    usart_status_t  (*status)       (vsf_usart_t *usart_ptr);
-    uint_fast16_t   (*fifo_read)    (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
-    uint_fast16_t   (*fifo_write)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
-    bool            (*fifo_flush)   (vsf_usart_t *usart_ptr);
-    vsf_err_t       (*request_rx)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
-    vsf_err_t       (*request_tx)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
-    vsf_err_t       (*cancel_rx)    (vsf_usart_t *usart_ptr);
-    vsf_err_t       (*cancel_tx)    (vsf_usart_t *usart_ptr);
-    int_fast32_t    (*get_rx_count) (vsf_usart_t *usart_ptr);
-    int_fast32_t    (*get_tx_count) (vsf_usart_t *usart_ptr);
-} vsf_usart_op_t;
-//! @}
-
-typedef struct vsf_usart_t  {
-        const vsf_usart_op_t * op;
-} vsf_usart_t;
+ */
+#if VSF_USART_REIMPLEMENT_STATUS == DISABLED
+struct usart_status_t {
+    union {
+        inherit(peripheral_status_t)
+        struct {
+            uint32_t is_busy : 1;
+        };
+    };
+};
 #endif
 
 /* usart_capability_t should implement peripheral_capability_t */
 typedef struct usart_capability_t usart_capability_t;
+
+typedef struct vsf_usart_op_t {
+    vsf_err_t          (*init)         (vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
+    fsm_rt_t           (*enable)       (vsf_usart_t *usart_ptr);
+    fsm_rt_t           (*disable)      (vsf_usart_t *usart_ptr);
+    void               (*irq_enable)   (vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
+    void               (*irq_disable)  (vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
+    usart_status_t     (*status)       (vsf_usart_t *usart_ptr);
+    usart_capability_t (*capability)   (vsf_usart_t *usart_ptr);
+    uint_fast16_t      (*fifo_read)    (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
+    uint_fast16_t      (*fifo_write)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
+    vsf_err_t          (*request_rx)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
+    vsf_err_t          (*request_tx)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
+    vsf_err_t          (*cancel_rx)    (vsf_usart_t *usart_ptr);
+    vsf_err_t          (*cancel_tx)    (vsf_usart_t *usart_ptr);
+    int_fast32_t       (*get_rx_count) (vsf_usart_t *usart_ptr);
+    int_fast32_t       (*get_tx_count) (vsf_usart_t *usart_ptr);
+} vsf_usart_op_t;
+
+#if VSF_USART_CFG_MULTI_INSTANCES == ENABLED
+typedef struct vsf_usart_t  {
+        const vsf_usart_op_t * op;
+} vsf_usart_t;
+#endif
 
 //! \name class: usart_t
 //! @{
@@ -289,6 +315,7 @@ extern void               vsf_usart_irq_disable(    vsf_usart_t *usart_ptr,
 #   pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 #endif
 extern usart_status_t     vsf_usart_status(         vsf_usart_t *usart_ptr);
+extern usart_capability_t vsf_usart_capability(     vsf_usart_t *usart_ptr);
 #if __IS_COMPILER_LLVM__
 #   pragma clang diagnostic pop
 #endif
@@ -299,7 +326,6 @@ extern uint_fast16_t      vsf_usart_fifo_read(      vsf_usart_t *usart_ptr,
 extern uint_fast16_t      vsf_usart_fifo_write(     vsf_usart_t *usart_ptr,
                                                     void *buffer_ptr,
                                                     uint_fast16_t count);
-extern bool               vsf_usart_fifo_flush(     vsf_usart_t *usart_ptr);
 
 extern vsf_err_t          vsf_usart_request_rx(     vsf_usart_t *usart_ptr,
                                                     void *buffer_ptr,
