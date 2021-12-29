@@ -20,7 +20,7 @@
 
 #include "hal/driver/driver.h"
 
-#if VSF_HAL_USE_USART == ENABLED && VSF_USART_CFG_MULTI_INSTANCES == ENABLED
+#if VSF_HAL_USE_USART == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -30,6 +30,8 @@
 /*============================ PROTOTYPES ====================================*/
 
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_USART_CFG_MULTI_INSTANCES == ENABLED
 
 vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
 {
@@ -103,15 +105,6 @@ uint_fast16_t vsf_usart_fifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uin
     return usart_ptr->op->fifo_write(usart_ptr, buffer_ptr, count);
 }
 
-bool vsf_usart_fifo_flush(vsf_usart_t *usart_ptr)
-{
-    VSF_HAL_ASSERT(usart_ptr != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op->fifo_flush != NULL);
-
-    return usart_ptr->op->fifo_flush(usart_ptr);
-}
-
 vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
@@ -166,4 +159,5 @@ int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr)
     return usart_ptr->op->get_tx_count(usart_ptr);
 }
 
-#endif
+#endif /* VSF_USART_CFG_MULTI_INSTANCES == ENABLED */
+#endif /* VSF_HAL_USE_USART == ENABLED */
