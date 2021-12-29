@@ -86,7 +86,7 @@
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGBufferedTerminalOutput</name>
@@ -117,7 +117,7 @@
                 <option>
                     <name>GBECoreSlave</name>
                     <version>27</version>
-                    <state>39</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
@@ -5620,6 +5620,9 @@
                 </group>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\aic8800\aic8800_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\aic8800\aic8800_driver_init.c</name>
                 </file>
             </group>
             <group>
@@ -11523,9 +11526,6 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_common.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_common.h</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_template.inc</name>
                         </file>
                     </group>
@@ -11571,13 +11571,13 @@
                     <group>
                         <name>usart</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\__usart_common.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\__usart_common.inc</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_request.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_request.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_template.inc</name>
@@ -12861,6 +12861,7 @@
                             <configuration>vsf_template_m484</configuration>
                             <configuration>vsf_template_gd32e103</configuration>
                             <configuration>vsf_template_mt071</configuration>
+                            <configuration>vsf_template_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>SDL_image</name>
