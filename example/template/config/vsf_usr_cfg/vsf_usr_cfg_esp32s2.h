@@ -57,9 +57,9 @@
 #define APP_USE_CPP_DEMO                                DISABLED
 #define APP_USE_HAL_DEMO                                DISABLED
 #   define APP_USE_HAL_USART_DEMO                       DISABLED
-#       define APP_USART_DEMO_CFG_REQUEST_TEST              DISABLED
-#       define APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST  DISABLED
-#       define APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST   DISABLED
+#       define APP_USART_DEMO_CFG_REQUEST_ECHO_TEST              DISABLED
+#       define APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST  DISABLED
+#       define APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST   DISABLED
 #       define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            ENABLED
 
 // 3rd-party demos

@@ -45,9 +45,9 @@
 #define APP_USE_HAL_DEMO                                ENABLED
 #   define APP_USE_HAL_USART_DEMO                       ENABLED
 // TODO: USART DMA is implemented in f1c100s, so REQUEST_TEST is not supported
-#       define APP_USART_DEMO_CFG_REQUEST_TEST              DISABLED
-#       define APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST  DISABLED
-#       define APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST   DISABLED
+#       define APP_USART_DEMO_CFG_REQUEST_ECHO_TEST              DISABLED
+#       define APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST  DISABLED
+#       define APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST   DISABLED
 #       define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            ENABLED
 
 // 3rd-party demos
