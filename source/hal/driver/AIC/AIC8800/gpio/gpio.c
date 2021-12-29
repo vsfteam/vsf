@@ -64,8 +64,8 @@
 #   define VSF_HW_GPIO_CFG_PROTECT_LEVEL    interrupt
 #endif
 
-#define __vsf_hw_gpio_protect               vsf_protect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
-#define __vsf_hw_gpio_unprotect             vsf_unprotect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
+#define __vsf_gpio_protect               vsf_protect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
+#define __vsf_gpio_unprotect             vsf_unprotect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_gpio_t {
@@ -181,10 +181,10 @@ void vsf_hw_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
     __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->GPIO->VR, value, pin_mask);
     __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->GPIO->MR, temp_value, ~(uint32_t)0);
 
-    vsf_protect_t orig = __vsf_hw_gpio_protect();
+    vsf_protect_t orig = __vsf_gpio_protect();
     hw_gpio_ptr->output_reg &= ~pin_mask;
     hw_gpio_ptr->output_reg |= (value & pin_mask);
-    __vsf_hw_gpio_unprotect(orig);
+    __vsf_gpio_unprotect(orig);
 }
 
 void vsf_hw_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
