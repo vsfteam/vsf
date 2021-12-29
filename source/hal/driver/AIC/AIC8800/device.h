@@ -85,8 +85,9 @@
             .reg                    = (void *)AIC_TRNG_BASE,                    \
             .pclk                   = CSC_PCLKME_TRNG_EN_BIT,
 
-#define USART_COUNT                 3
-            
+// uart0 is already used in the library(include interrupt) and debug_uart
+#define USART_MASK                  ((1 << 1) | (1 << 2))
+
 #define I2C_MAX_PORT                1
 #define VSF_HAL_I2C0_MULTIPLEX_CNT  2
 #define I2C_PORT_MASK               0x3
