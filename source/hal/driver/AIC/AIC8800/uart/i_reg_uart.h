@@ -111,24 +111,12 @@ extern "C" {
 
 #define UART_IRQTYP                                 0       /* 0x0000000F */
 #define UART_IRQTYP_MSK                             ((reg32_t)(0xf << UART_IRQTYP))
-
-#define UART_MODEM_INT                              0       /* 0x00 */
-#define UART_MODEM_INT_MSK                          ((reg32_t)(0x00 << UART_MODEM_INT))
-
-#define UART_NO_INT                                 0       /* 0x01 */
-#define UART_NO_INT_MSK                             ((reg32_t)(0x01 << UART_NO_INT))
-
-#define UART_TX_INT                                 1       /* 0x02 */
-#define UART_TX_INT_MSK                             ((reg32_t)(0x01 << UART_TX_INT))
-
-#define UART_RX_INT                                 2       /* 0x04 */
-#define UART_RX_INT_MSK                             ((reg32_t)(0x01 << UART_RX_INT))
-
-#define UART_RX_ERROR_INT                           1       /* 0x06 */
-#define UART_RX_ERROR_INT_MSK                       ((reg32_t)(0x11 << UART_RX_ERROR_INT))
-
-#define UART_TIMEOUT_INT                            2       /* 0x0c */
-#define UART_TIMEOUT_INT_MSK                        ((reg32_t)(0x11 << UART_TIMEOUT_INT))
+#define UART_IRQTYP_MODEM_INT                       0x00
+#define UART_IRQTYP_NO_INT                          0x01
+#define UART_IRQTYP_TX_INT                          0x02
+#define UART_IRQTYP_RX_INT                          0x04
+#define UART_IRQTYP_RX_ERROR_INT                    0x06
+#define UART_IRQTYP_TIMEOUT_INT                     0x0c
 
 /* -------------------- DBUFCFG register ------------------------------------ */
 

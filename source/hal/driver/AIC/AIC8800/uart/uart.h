@@ -25,13 +25,21 @@
 #include "../__device.h"
 #include "./i_reg_uart.h"
 
-#include "hal/driver/common/template/vsf_template_usart.h"
-
 /*============================ MACROS ========================================*/
+
+#define VSF_USART_CFG_FIFO_TO_REQUEST       ENABLED
+#define VSF_USART_REIMPLEMENT_MODE          ENABLED
+#define VSF_USART_REIMPLEMENT_IRQ_MASK      ENABLED
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_USART_DEC_LV0(__COUNT, __dont_care)                             \
-    extern vsf_hw_usart_t vsf_usart##__COUNT;
+#define __VSF_HW_USART_DEC_LV0(__COUNT, __dont_care)                            \
+    typedef struct vsf_usart_request_t vsf_usart_request_t;                     \
+    extern vsf_usart_request_t vsf_usart##__COUNT;
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/template/vsf_template_usart.h"
 
 /*============================ TYPES =========================================*/
 
@@ -49,7 +57,7 @@ enum em_usart_mode_t {
     USART_2_STOPBIT                 = 4ul,
     USART_STOPBIT_MASK              =   USART_1_STOPBIT
                                       | USART_2_STOPBIT,
-                                        
+
     USART_NO_PARITY                 = 0x0ul,
     USART_ODD_PARITY                = 0x8ul,
     USART_EVEN_PARITY               = 0x18ul,
@@ -63,49 +71,51 @@ enum em_usart_mode_t {
     USART_DBUFCFG_MASK              =       USART_DBUFEN_RST
                                         |   USART_TXDRST_RST
                                         |   USART_RXDRST_RST,
-                                        
+
     USART_TX_EN                     = 0x00,
     USART_RX_EN                     = 0x00,
 };
 
-typedef enum em_usart_irq_mask_t {
+enum em_usart_irq_mask_t {
+    // usart fifo interrupt
     USART_IRQ_MASK_RX               =  UART_RXIRQEN_MSK, /* 0 */
     USART_IRQ_MASK_TX               =  UART_TXIRQEN_MSK, /* 1 */
+    USART_IRQ_MASK_TIMEOUT          =  BIT(4),
     USART_IRQ_MASK_LS               =  UART_LSIRQEN_MSK, /* 2 */
     USART_IRQ_MASK_MS               =  UART_MSIRQEN_MSK, /* 3 */
     USART_IRQ_MASK_PT               =  UART_PTIRQEN_MSK, /* 7 */
-    USART_IRQ_MASK_TIMEOUT          =  BIT(4),
 
-    USART_IRQ_MASK_SOURCE           =  USART_IRQ_MASK_RX
-                                     | USART_IRQ_MASK_TX
-                                     | USART_IRQ_MASK_LS
-                                     | USART_IRQ_MASK_MS
+    USART_IRQ_MASK_FIFO             =  USART_IRQ_MASK_RX | USART_IRQ_MASK_TX
+                                     | USART_IRQ_MASK_LS | USART_IRQ_MASK_MS
                                      | USART_IRQ_MASK_PT,
 
-    USART_IRQ_MASK_RX_ERR           =  BIT(5),
-    USART_IRQ_MASK_TX_ERR           =  BIT(6),
-    USART_IRQ_MASK_ERR              =  USART_IRQ_MASK_RX_ERR
-                                     | USART_IRQ_MASK_TX_ERR,
+    // usart error interrupt
+    USART_IRQ_MASK_RX_ERROR         =  BIT(5),
+    USART_IRQ_MASK_TX_ERROR         =  BIT(6),
+    USART_IRQ_MASK_ERROR            =  USART_IRQ_MASK_RX_ERROR | USART_IRQ_MASK_TX_ERROR,
 
-    USART_IRQ_MASK                  =  USART_IRQ_MASK_SOURCE
-                                     | USART_IRQ_MASK_ERR,
-} em_usart_irq_mask_t;
+    // usart request interrupt
+    USART_IRQ_MASK_RX_CPL           = USART_IRQ_MASK_RX      << 8,
+    USART_IRQ_MASK_TX_CPL           = USART_IRQ_MASK_TX      << 8,
+    USART_IRQ_MASK_RX_TIMEOUT       = USART_IRQ_MASK_TIMEOUT << 8,
+    USART_IRQ_MASK_REQUEST          = USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL | USART_IRQ_MASK_RX_TIMEOUT,
 
-struct usart_status_t {
-    union {
-        inherit(peripheral_status_t)
-        struct {
-            uint32_t is_busy : 1;
-            uint32_t is_enabled : 1;
-        };
-    };
+    USART_IRQ_MASK                  =  USART_IRQ_MASK_FIFO
+                                     | USART_IRQ_MASK_ERROR
+                                     | USART_IRQ_MASK_REQUEST,
 };
-
-typedef struct vsf_hw_usart_t vsf_hw_usart_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-VSF_MREPEAT(USART_COUNT, __VSF_HW_USART_DEC_LV0, NULL)
+#if USART_MASK & (1 << 0)
+__VSF_HW_USART_DEC_LV0(0, NULL)
+#endif
+#if USART_MASK & (1 << 1)
+__VSF_HW_USART_DEC_LV0(1, NULL)
+#endif
+#if USART_MASK & (1 << 2)
+__VSF_HW_USART_DEC_LV0(2, NULL)
+#endif
 
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
