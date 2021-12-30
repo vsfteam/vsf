@@ -26,6 +26,9 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/driver/driver.h"
+
+#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
+
 #include "usart_request.h"
 
 /*============================ MACROS ========================================*/
@@ -298,5 +301,7 @@ void vsf_fifo2req_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t 
         vsf_usart_irq_disable(request_ptr->real_usart_ptr, others_irq_mask);
     }
 }
+
+#endif      // VSF_USART_CFG_FIFO_TO_REQUEST
 
 #endif      // VSF_HAL_USE_USART
