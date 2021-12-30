@@ -44,36 +44,35 @@
 /*============================ TYPES =========================================*/
 
 enum em_usart_mode_t {
-    USART_8_BIT_LENGTH              = 3ul,
-    USART_7_BIT_LENGTH              = 2ul,
-    USART_6_BIT_LENGTH              = 1ul,
-    USART_5_BIT_LENGTH              = 0ul,
+    USART_8_BIT_LENGTH              = (0x3ul << 0),
+    USART_7_BIT_LENGTH              = (0x2ul << 0),
+    USART_6_BIT_LENGTH              = (0x1ul << 0),
+    USART_5_BIT_LENGTH              = (0x0ul << 0),
     USART_BIT_LENGTH_MASK           =   USART_8_BIT_LENGTH
                                       | USART_7_BIT_LENGTH
                                       | USART_6_BIT_LENGTH
                                       | USART_5_BIT_LENGTH,
 
-    USART_1_STOPBIT                 = 0ul,
-    USART_2_STOPBIT                 = 4ul,
+    USART_1_STOPBIT                 = (0x0ul << 2),
+    USART_2_STOPBIT                 = (0x1ul << 2),
     USART_STOPBIT_MASK              =   USART_1_STOPBIT
                                       | USART_2_STOPBIT,
 
-    USART_NO_PARITY                 = 0x0ul,
-    USART_ODD_PARITY                = 0x8ul,
-    USART_EVEN_PARITY               = 0x18ul,
+    USART_NO_PARITY                 = (0x0ul << 3),
+    USART_ODD_PARITY                = (0x1ul << 3),
+    USART_EVEN_PARITY               = (0x2ul << 3),
     USART_PARITY_MASK               =       USART_NO_PARITY
                                         |   USART_ODD_PARITY
                                         |   USART_EVEN_PARITY,
 
-    USART_DBUFEN_RST                = 0x40ul,
-    USART_RXDRST_RST                = 0x80ul,
-    USART_TXDRST_RST                = 0x100ul,
-    USART_DBUFCFG_MASK              =       USART_DBUFEN_RST
-                                        |   USART_TXDRST_RST
-                                        |   USART_RXDRST_RST,
+    __USART_AIC8800_MASK            =   USART_BIT_LENGTH_MASK
+                                      | USART_STOPBIT_MASK
+                                      | USART_PARITY_MASK,
 
-    USART_TX_EN                     = 0x00,
-    USART_RX_EN                     = 0x00,
+    // Not hardware, just keep for build
+    USART_TX_EN                     = (0x1ul << 8),
+    USART_RX_EN                     = (0x2ul << 8),
+    USART_EN_MASK                   = (0x3ul << 8),
 };
 
 enum em_usart_irq_mask_t {
