@@ -129,25 +129,34 @@ enum em_usart_mode_t {
     USART_NO_PARITY         = (0x0ul << 0),
     USART_EVEN_PARITY       = (0x1ul << 0),
     USART_ODD_PARITY        = (0x2ul << 0),
-    USART_PARITY_MASK       = (0x3ul << 0),
+    USART_PARITY_MASK       = USART_NO_PARITY | USART_EVEN_PARITY | USART_ODD_PARITY,
 
     USART_1_STOPBIT         = (0x0ul << 2),
     USART_1_5_STOPBIT       = (0x1ul << 2),
     USART_2_STOPBIT         = (0x2ul << 2),
-    USART_STOPBIT_MASK      = (0x3ul << 2),
+    USART_STOPBIT_MASK      = USART_1_STOPBIT | USART_1_5_STOPBIT | USART_2_STOPBIT,
 
     USART_5_BIT_LENGTH      = (0x0ul << 4),
     USART_6_BIT_LENGTH      = (0x1ul << 4),
     USART_7_BIT_LENGTH      = (0x2ul << 4),
     USART_8_BIT_LENGTH      = (0x3ul << 4),
     USART_9_BIT_LENGTH      = (0x4ul << 4),
-    USART_BIT_LENGTH_MASK   = (0x7ul << 4),
+    USART_BIT_LENGTH_MASK   =  USART_5_BIT_LENGTH | USART_6_BIT_LENGTH
+                             | USART_7_BIT_LENGTH | USART_8_BIT_LENGTH
+                             | USART_9_BIT_LENGTH,
+
+    USART_NO_HWCONTROL      = 0x0000ul,
+    USART_RTS_HWCONTROL     = 0x0100ul,
+    USART_CTS_HWCONTROL     = 0x0200ul,
+    USART_RTS_CTS_HWCONTROL = 0x0300ul,
+    USART_HWCONTROL_MASK    =   USART_NO_HWCONTROL
+                              | USART_RTS_HWCONTROL
+                              | USART_CTS_HWCONTROL
+                              | USART_RTS_CTS_HWCONTROL,
 
     USART_TX_EN             = (0x1ul << 7),
     USART_RX_EN             = (0x1ul << 8),
-    USART_RTS_EN            = (0x1ul << 9),
-    USART_CTS_EN            = (0x1ul << 10),
-    USART_EN_MASK           = (0xFul << 7),
+    USART_EN_MASK           = USART_TX_EN | USART_RX_EN,
 };
 #endif
 
