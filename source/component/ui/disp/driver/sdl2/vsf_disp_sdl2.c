@@ -140,7 +140,6 @@ static void __vk_disp_sdl2_init_thread(void *arg)
             vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
         __vsf_arch_irq_end(irq_thread, false);
 
-        __vsf_arch_irq_request_init(&disp_sdl2->flush_request);
         __vsf_arch_irq_init(&disp_sdl2->event_thread, "disp_sdl2_event", __vk_disp_sdl2_event_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY);
 
     __vsf_arch_irq_fini(irq_thread);
@@ -547,6 +546,7 @@ static vsf_err_t __vk_disp_sdl2_init(vk_disp_t *pthis)
     if (!__vk_disp_sdl2.is_init_called) {
         __vk_disp_sdl2.is_init_called = true;
         __vk_disp_sdl2.disp = (vk_disp_sdl2_t *)pthis;
+        __vsf_arch_irq_request_init(&disp_sdl2->flush_request);
         __vsf_arch_irq_init(&__vk_disp_sdl2.init_thread, "disp_sdl2_init", __vk_disp_sdl2_init_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY);
     } else {
         vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
