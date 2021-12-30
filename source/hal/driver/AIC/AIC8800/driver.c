@@ -59,14 +59,6 @@ syscfg_predefined_t const syscfg_predefined = {
 
 #include "hal/driver/common/swi/arm/vsf_swi_template.inc"
 
-#ifndef WEAK_VSF_DRIVER_AIC8800_INIT
-WEAK(vsf_driver_aic8800_init)
-bool vsf_driver_aic8800_init(void)
-{
-    return true;
-}
-#endif
-
 int vsf_hal_pre_startup_init(void)
 {
     // seems systick is not reset on hw reset of aic8800
@@ -95,7 +87,7 @@ bool vsf_driver_init(void)
     VSF_MREPEAT(RNG_COUNT, __VSF_HW_RNG_INIT, NULL)
 #endif
 
-    return vsf_driver_aic8800_init();
+    return true;
 }
 
 

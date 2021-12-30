@@ -36,7 +36,15 @@ extern bool vsf_driver_init(void);
 
 #ifndef WEAK_VSF_DRIVER_INIT
 WEAK(vsf_driver_init)
-bool vsf_driver_init(void) 
+bool vsf_driver_init(void)
+{
+    return true;
+}
+#endif
+
+#ifndef WEAK_VSF_APP_DRIVER_INIT
+WEAK(vsf_app_driver_init)
+bool vsf_app_driver_init(void)
 {
     return true;
 }
@@ -54,12 +62,17 @@ bool vsf_driver_poll(void)
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
- */  
+ */
 bool vsf_hal_init( void )
 {
-    
+
     if (!vsf_driver_init()) {
-        
+
+        return false;
+    }
+
+    if (!vsf_app_driver_init()) {
+
         return false;
     }
 
