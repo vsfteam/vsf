@@ -84,7 +84,7 @@ static void __vsf_usart_request_isr_handler(void *target,
 
     em_usart_irq_mask_t current_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX | USART_IRQ_MASK_TX);
 
-    if (irq_mask & USART_IRQ_MASK_RX) {
+    if (irq_mask & (USART_IRQ_MASK_RX | USART_IRQ_MASK_RX_TIMEOUT)) {
         if (__vsf_usart_request_process(usart_ptr, &request_ptr->rx, vsf_usart_fifo_read)) {
             vsf_usart_irq_disable(usart_ptr, USART_IRQ_MASK_RX);
             current_irq_mask |= USART_IRQ_MASK_RX_CPL;
