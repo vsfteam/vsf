@@ -18,9 +18,9 @@
 #ifndef __OSA_HAL_X86_WIN_USART_H__
 #define __OSA_HAL_X86_WIN_USART_H__
 
- /*============================ INCLUDES ======================================*/
+/*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/template/vsf_template_usart.h"
+#include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_USART == ENABLED
 
@@ -30,29 +30,42 @@
 #   define VSF_USART_CFG_PORT_NUM                   8
 #endif
 
+#define VSF_USART_REIMPLEMENT_MODE                  ENABLED
+#define VSF_USART_REIMPLEMENT_IRQ_MASK              ENABLED
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/template/vsf_template_usart.h"
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 #define __VSF_USART_EXTERN_REPEAD(__N, __DONT_CARE)                             \
                                   extern vsf_usart_t vsf_usart##__N;
 /*============================ TYPES =========================================*/
 
 enum em_usart_mode_t {
-    USART_8_BIT_LENGTH              = 0X0000U,
-    USART_9_BIT_LENGTH              = 0X1000U,
+    USART_8_BIT_LENGTH              = 0x0000ul,
+    USART_9_BIT_LENGTH              = 0x1000ul,
+    USART_BIT_LENGTH_MASK           = USART_8_BIT_LENGTH | USART_9_BIT_LENGTH,
 
-    USART_1_STOPBIT                 = 0X0000U,
-    USART_2_STOPBIT                 = 0X2000U,
+    USART_1_STOPBIT                 = 0x0000ul,
+    USART_2_STOPBIT                 = 0x2000ul,
+    USART_STOPBIT_MASK              = USART_1_STOPBIT | USART_2_STOPBIT,
 
-    USART_NO_PARITY                 = 0X0000U,
-    USART_EVEN_PARITY               = 0X0400U,
-    USART_ODD_PARITY                = 0X0600U,
+    USART_NO_PARITY                 = 0x0000ul,
+    USART_EVEN_PARITY               = 0x0400ul,
+    USART_ODD_PARITY                = 0x0600ul,
+    USART_PARITY_MASK               = USART_NO_PARITY | USART_EVEN_PARITY | USART_ODD_PARITY,
 
-    USART_NO_HWCONTROL              = 0X0000U,
-    USART_RTS_HWCONTROL             = 0X0100U,
-    USART_CTS_HWCONTROL             = 0X0200U,
-    USART_RTS_CTS_HWCONTROL         = 0X0300U,
+    USART_NO_HWCONTROL              = 0x0000ul,
+    USART_RTS_HWCONTROL             = 0x0100ul,
+    USART_CTS_HWCONTROL             = 0x0200ul,
+    USART_RTS_CTS_HWCONTROL         = 0x0300ul,
+    USART_HWCONTROL_MASK            =  USART_NO_HWCONTROL  | USART_RTS_HWCONTROL
+                                     | USART_CTS_HWCONTROL | USART_RTS_CTS_HWCONTROL,
 
-    USART_TX_EN                     = 0X0000U,
-    USART_RX_EN                     = 0X0000U,
+    USART_TX_EN                     = 0x0010ul,
+    USART_RX_EN                     = 0x0020ul,
+    USART_EN_MASK                   = USART_TX_EN | USART_RX_EN,
 };
 
 enum em_usart_irq_mask_t {
@@ -65,15 +78,10 @@ enum em_usart_irq_mask_t {
     USART_IRQ_MASK_RX_ERR           = BIT(4),
     USART_IRQ_MASK_TX_ERR           = BIT(5),
     USART_IRQ_MASK_ERR              = USART_IRQ_MASK_RX_ERR | USART_IRQ_MASK_TX_ERR,
-};
 
-struct usart_status_t {
-    union {
-        inherit(peripheral_status_t)
-            struct {
-            uint32_t is_busy : 1;
-        };
-    };
+    USART_IRQ_MASK                  =   USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
+                                      | USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL
+                                      | USART_IRQ_MASK_ERR,
 };
 
 typedef struct vsf_usart_win_expression_t {
