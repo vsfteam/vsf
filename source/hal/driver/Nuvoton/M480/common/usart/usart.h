@@ -40,6 +40,11 @@
 #ifndef USART_MAX_PORT
 #   define USART_MAX_PORT                                   5
 #endif
+
+#define VSF_USART_REIMPLEMENT_MODE                          ENABLED
+#define VSF_USART_REIMPLEMENT_IRQ_MASK                      ENABLED
+#define VSF_USART_REIMPLEMENT_STATUS                        ENABLED
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __extern_m480_usart(__count, __dont_care)                           \
