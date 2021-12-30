@@ -11181,6 +11181,9 @@
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart1_api.c</name>
+                                                    <excluded>
+                                                        <configuration>vsf_template_aic8800</configuration>
+                                                    </excluded>
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart1_api.h</name>
