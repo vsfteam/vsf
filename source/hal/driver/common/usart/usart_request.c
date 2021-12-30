@@ -28,7 +28,13 @@
 #include "hal/driver/driver.h"
 #include "usart_request.h"
 
+/*============================ MACROS ========================================*/
+
+#define USART_IRQ_MASK_REQUEST      \
+    (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL | USART_IRQ_MASK_RX_TIMEOUT)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
 
 #ifndef VSF_FIFO2REQ_USART_CFG_PROTECT_LEVEL
 #   define VSF_FIFO2REQ_USART_CFG_PROTECT_LEVEL interrupt
