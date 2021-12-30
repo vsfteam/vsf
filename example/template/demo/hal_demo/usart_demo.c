@@ -27,8 +27,8 @@
 #   define APP_USART_DEMO_CFG_DEBUG                     ENABLED
 #endif
 
-// If the buffer is small (64 bytes) and the baudrate is big (921600), 
-// then it may only need to be sent once 
+// If the buffer is small (64 bytes) and the baudrate is big (921600),
+// then it may only need to be sent once
 #ifndef APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE
 #   define APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE      256
 #endif
@@ -53,15 +53,16 @@
 #   define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            DISABLED
 #endif
 
+#ifndef APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ
+#   define APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ      DISABLED
+#endif
+
 #ifndef APP_USART_DEMO_CFG_REQUEST_ECHO_TEST
 #   define APP_USART_DEMO_CFG_REQUEST_ECHO_TEST         ENABLED
 #endif
 
-#ifndef APP_USART_DEMO_CFG_TXRX
-// if APP_USART_DEMO_CFG_TXRX is enabled, txbuff is initialized, and is used for tx
-//  then rxbuff is used for rx
-// if APP_USART_DEMO_CFG_TXRX is disabled, rxbuff is used for rx and then for tx
-#   define APP_USART_DEMO_CFG_TXRX                      ENABLED
+#ifndef APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ
+#   define APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ   DISABLED
 #endif
 
 #ifndef APP_USART_DEMO_CFG_BAUDRATE
@@ -69,7 +70,7 @@
 #endif
 
 #ifndef APP_USART_DEMO_CFG_MODE
-#   define APP_USART_DEMO_CFG_MODE                      (USART_8_BIT_LENGTH | USART_1_STOPBIT | USART_NO_PARITY | USART_TX_EN | USART_RX_EN)
+#   define APP_USART_DEMO_CFG_MODE                      (USART_8_BIT_LENGTH | USART_1_STOPBIT | USART_NO_PARITY | USART_TX_ENABLE | USART_RX_ENABLE)
 #endif
 
 #ifndef APP_USART_DEMO_IRQ_PRIO
@@ -85,7 +86,8 @@ typedef struct app_usart_demo_t {
         uint8_t txbuff[APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE];
     };
 
-#if APP_USART_DEMO_CFG_TXRX == ENABLED
+#if    (APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ == ENABLED) \
+    || (APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ == ENABLED)
     uint8_t rxbuff[APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE];
 #endif
 
@@ -276,7 +278,27 @@ static void __usart_fifo_echo(vsf_usart_t * usart)
     VSF_ASSERT(err == VSF_ERR_NONE);
 
     while (!demo->is_to_exit) {
-#   if APP_USART_DEMO_CFG_TXRX == ENABLED
+        cur_size = vsf_usart_fifo_read(usart, demo->buff, sizeof(demo->buff));
+        for (uint_fast16_t i = 0; i < cur_size;) {
+            i += vsf_usart_fifo_write(usart, &demo->buff[i], cur_size - i);
+        }
+    }
+
+    __usart_demo_disable(usart, 0);
+}
+#endif
+
+#if APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ == ENABLED
+static void __usart_fifo_write_then_read(vsf_usart_t * usart)
+{
+    uint_fast16_t cur_size = 0;
+    VSF_ASSERT(usart != NULL);
+    app_usart_demo_t * demo = (app_usart_demo_t *)&__app_usart_demo;
+
+    vsf_err_t err = __usart_demo_init(usart, NULL, NULL, APP_USART_DEMO_IRQ_PRIO, 0);
+    VSF_ASSERT(err == VSF_ERR_NONE);
+
+    while (!demo->is_to_exit) {
         cur_size = vsf_usart_fifo_write(usart, demo->txbuff, sizeof(demo->txbuff));
         for (uint_fast16_t i = 0; i < cur_size;) {
             i += vsf_usart_fifo_read(usart, &demo->rxbuff[i], cur_size - i);
@@ -286,12 +308,6 @@ static void __usart_fifo_echo(vsf_usart_t * usart)
                 VSF_ASSERT(false);
             }
         }
-#   else
-        cur_size = vsf_usart_fifo_read(usart, demo->buff, sizeof(demo->buff));
-        for (uint_fast16_t i = 0; i < cur_size;) {
-            i += vsf_usart_fifo_write(usart, &demo->buff[i], cur_size - i);
-        }
-#   endif
     }
 
     __usart_demo_disable(usart, 0);
@@ -305,35 +321,25 @@ static void __usart_isr_handler(void *target,
 {
     vsf_err_t err;
     app_usart_demo_t * demo = (app_usart_demo_t *)target;
+    int_fast32_t count;
 
     VSF_ASSERT(demo != NULL);
     VSF_ASSERT(usart != NULL);
 
-    if (irq_mask & USART_IRQ_MASK_RX_CPL) {
-#if APP_USART_DEMO_CFG_TXRX == ENABLED
-        for (uint_fast16_t i = 0; i < sizeof(demo->rxbuff); i++) {
-            if (demo->rxbuff[i] != demo->txbuff[i]) {
-                VSF_ASSERT(false);
-            }
+    if (irq_mask & (USART_IRQ_MASK_RX_TIMEOUT | USART_IRQ_MASK_RX_CPL)) {
+        count = vsf_usart_get_rx_count(usart);
+        if (count != 0) {
+            err = vsf_usart_request_tx(usart, demo->buff, sizeof(demo->buff));
+            VSF_ASSERT(VSF_ERR_NONE == err);
         }
-
-        err = vsf_usart_request_rx(usart, demo->rxbuff, sizeof(demo->rxbuff));
-        VSF_ASSERT(VSF_ERR_NONE == err);
-        err = vsf_usart_request_tx(usart, demo->txbuff, sizeof(demo->txbuff));
-        VSF_ASSERT(VSF_ERR_NONE == err);
-#else
-        err = vsf_usart_request_tx(usart, demo->buff, sizeof(demo->buff));
-        VSF_ASSERT(VSF_ERR_NONE == err);
-#endif
     }
+
     if (irq_mask & USART_IRQ_MASK_TX_CPL) {
         if (demo->is_to_exit) {
             __usart_demo_disable(usart, USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
         } else {
-#if APP_USART_DEMO_CFG_TXRX != ENABLED
             err = vsf_usart_request_rx(usart, demo->buff, sizeof(demo->buff));
             VSF_ASSERT(VSF_ERR_NONE == err);
-#endif
         }
     }
 }
@@ -347,18 +353,60 @@ static void __usart_request_echo(vsf_usart_t * usart)
     VSF_ASSERT(usart != NULL);
 
     err = __usart_demo_init(usart, __usart_isr_handler, demo, APP_USART_DEMO_IRQ_PRIO,
+                            USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_RX_TIMEOUT | USART_IRQ_MASK_TX_CPL);
+    VSF_ASSERT(VSF_ERR_NONE == err);
+
+    __usart_isr_handler(demo, usart, USART_IRQ_MASK_TX_CPL);
+}
+#endif
+
+#if APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ_TEST == ENABLED
+static void __usart_isr_handler(void *target,
+                                vsf_usart_t *usart,
+                                em_usart_irq_mask_t irq_mask)
+{
+    vsf_err_t err;
+    app_usart_demo_t * demo = (app_usart_demo_t *)target;
+
+    VSF_ASSERT(demo != NULL);
+    VSF_ASSERT(usart != NULL);
+
+    if (irq_mask & USART_IRQ_MASK_RX_CPL) {
+        for (uint_fast16_t i = 0; i < sizeof(demo->rxbuff); i++) {
+            if (demo->rxbuff[i] != demo->txbuff[i]) {
+                VSF_ASSERT(false);
+            }
+        }
+
+        err = vsf_usart_request_rx(usart, demo->rxbuff, sizeof(demo->rxbuff));
+        VSF_ASSERT(VSF_ERR_NONE == err);
+        err = vsf_usart_request_tx(usart, demo->txbuff, sizeof(demo->txbuff));
+        VSF_ASSERT(VSF_ERR_NONE == err);
+    }
+    if (irq_mask & USART_IRQ_MASK_TX_CPL) {
+        if (demo->is_to_exit) {
+            __usart_demo_disable(usart, USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+        }
+    }
+}
+
+static void __usart_request_write_then_read(vsf_usart_t * usart)
+{
+    vsf_err_t err;
+    app_usart_demo_t * demo = (app_usart_demo_t *)&__app_usart_demo;
+
+    VSF_ASSERT(demo != NULL);
+    VSF_ASSERT(usart != NULL);
+
+    err = __usart_demo_init(usart, __usart_isr_handler, demo, APP_USART_DEMO_IRQ_PRIO,
                             USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
     VSF_ASSERT(VSF_ERR_NONE == err);
 
-#if APP_USART_DEMO_CFG_TXRX == ENABLED
     // generate fake rx data to bypass check
     for (uint_fast16_t i = 0; i < sizeof(demo->rxbuff); i++) {
         demo->rxbuff[i] = demo->txbuff[i];
     }
-    __usart_isr_handler(demo, usart, USART_IRQ_MASK_RX_CPL);
-#else
     __usart_isr_handler(demo, usart, USART_IRQ_MASK_TX_CPL);
-#endif
 }
 #endif
 
@@ -392,8 +440,14 @@ int VSF_USER_ENTRY(void)
 #if APP_USART_DEMO_CFG_FIFO_ECHO_TEST == ENABLED
     __usart_fifo_echo(APP_USART_DEMO_CFG_USART);
 #endif
+#if APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ_TEST == ENABLED
+    __usart_fifo_write_then_read(APP_USART_DEMO_CFG_USART);
+#endif
 #if APP_USART_DEMO_CFG_REQUEST_ECHO_TEST == ENABLED
     __usart_request_echo(APP_USART_DEMO_CFG_USART);
+#endif
+#if APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ_TEST == ENABLED
+    __usart_request_write_then_read(APP_USART_DEMO_CFG_USART);
 #endif
 
     return 0;
