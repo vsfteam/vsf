@@ -31,7 +31,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-bool vsf_driver_aic8800_init(void)
+bool vsf_app_driver_init(void)
 {
     iomux_gpio_config_sel_setf(10, 0x01); // PA10 as uart1 rx
     iomux_gpio_config_sel_setf(11, 0x01); // PA11 as uart1 tx
