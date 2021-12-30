@@ -70,9 +70,9 @@ enum em_usart_mode_t {
                                       | USART_PARITY_MASK,
 
     // Not hardware, just keep for build
-    USART_TX_EN                     = (0x1ul << 8),
-    USART_RX_EN                     = (0x2ul << 8),
-    USART_EN_MASK                   = (0x3ul << 8),
+    USART_TX_ENABLE                     = (0x1ul << 8),
+    USART_RX_ENABLE                     = (0x2ul << 8),
+    USART_ENABLE_MASK                   = (0x3ul << 8),
 };
 
 enum em_usart_irq_mask_t {

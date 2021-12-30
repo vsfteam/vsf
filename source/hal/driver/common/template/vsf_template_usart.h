@@ -154,9 +154,9 @@ enum em_usart_mode_t {
                               | USART_CTS_HWCONTROL
                               | USART_RTS_CTS_HWCONTROL,
 
-    USART_TX_EN             = (0x1ul << 7),
-    USART_RX_EN             = (0x1ul << 8),
-    USART_EN_MASK           = USART_TX_EN | USART_RX_EN,
+    USART_TX_ENABLE             = (0x1ul << 7),
+    USART_RX_ENABLE             = (0x1ul << 8),
+    USART_ENABLE_MASK           = USART_TX_ENABLE | USART_RX_ENABLE,
 };
 #endif
 
@@ -170,18 +170,22 @@ enum em_usart_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     USART_IRQ_MASK_TX               = (0x1ul << 0),
     USART_IRQ_MASK_RX               = (0x1ul << 1),
+    USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 2),
 
     // request_rx/request_tx complete
-    USART_IRQ_MASK_TX_CPL           = (0x1ul << 2),
-    USART_IRQ_MASK_RX_CPL           = (0x1ul << 3),
+    USART_IRQ_MASK_TX_CPL           = (0x1ul << 3),
+    USART_IRQ_MASK_RX_CPL           = (0x1ul << 4),
 
     // optional
     // error
-    USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 4),
-    USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 5),
-    USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 6),
-    USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 7),
-    USART_IRQ_MASK_ERR              = (0xFul << 4),
+    USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 5),
+    USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 6),
+    USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 7),
+    USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 8),
+    USART_IRQ_MASK_ERR              =   USART_IRQ_MASK_FRAME_ERR
+                                      | USART_IRQ_MASK_PARITY_ERR
+                                      | USART_IRQ_MASK_BREAK_ERR
+                                      | USART_IRQ_MASK_OVERFLOW_ERR,
 };
 #endif
 
