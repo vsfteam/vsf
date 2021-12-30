@@ -55,8 +55,8 @@ enum em_usart_mode_t {
     USART_FORCE_1_PARITY        = USART_LINECTRL_PEN | USART_LINECTRL_SPS,
 
     // CTRL2: bit8 - 23
-    USART_TX_EN                 = USART_CTRL2_TXE,
-    USART_RX_EN                 = USART_CTRL2_RXE,
+    USART_TX_ENABLE                 = USART_CTRL2_TXE,
+    USART_RX_ENABLE                 = USART_CTRL2_RXE,
     USART_RTS_EN                = USART_CTRL2_RTSEN,
     USART_CTS_EN                = USART_CTRL2_CTSEN,
 

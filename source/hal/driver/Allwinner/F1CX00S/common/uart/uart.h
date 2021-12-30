@@ -81,8 +81,8 @@ enum em_usart_mode_t {
     USART_RX_FIFO_THRES_2_LESS  = FCR_RT_2_LESS   << 16,
 
     // TODO:
-    USART_TX_EN             = 0,
-    USART_RX_EN             = 0,
+    USART_TX_ENABLE             = 0,
+    USART_RX_ENABLE             = 0,
 };
 
 enum em_usart_irq_mask_t {

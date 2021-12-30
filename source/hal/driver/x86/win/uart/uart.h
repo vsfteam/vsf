@@ -63,9 +63,9 @@ enum em_usart_mode_t {
     USART_HWCONTROL_MASK            =  USART_NO_HWCONTROL  | USART_RTS_HWCONTROL
                                      | USART_CTS_HWCONTROL | USART_RTS_CTS_HWCONTROL,
 
-    USART_TX_EN                     = 0x0010ul,
-    USART_RX_EN                     = 0x0020ul,
-    USART_EN_MASK                   = USART_TX_EN | USART_RX_EN,
+    USART_TX_ENABLE                     = 0x0010ul,
+    USART_RX_ENABLE                     = 0x0020ul,
+    USART_ENABLE_MASK                   = USART_TX_ENABLE | USART_RX_ENABLE,
 };
 
 enum em_usart_irq_mask_t {
