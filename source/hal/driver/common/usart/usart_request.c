@@ -34,7 +34,7 @@
 /*============================ MACROS ========================================*/
 
 #define USART_IRQ_MASK_REQUEST      \
-    (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL | USART_IRQ_MASK_RX_TIMEOUT)
+    (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

@@ -291,10 +291,10 @@ void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
 //    if (irq_mask & USART_IRQ_MASK_TX_CPL) {
 //
 //    }
-//    if (irq_mask & USART_IRQ_MASK_RX_ERR) {
+//    if (irq_mask & USART_IRQ_MASK_RX_ERROR) {
 //
 //    }
-//    if (irq_mask & USART_IRQ_MASK_TX_ERR) {
+//    if (irq_mask & USART_IRQ_MASK_TX_ERROR) {
 //
 //    }
 }
