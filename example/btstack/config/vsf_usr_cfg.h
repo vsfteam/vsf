@@ -63,6 +63,10 @@
 
 #if VSF_USE_BTSTACK == ENABLED
 #   define HCI_RESET_RESEND_TIMEOUT_MS                  2000
+#   define BTSTACK_OO_USE_HOST                          ENABLED
+#       define BTSTACK_OO_USE_HOST_HID                  ENABLED
+#           define BTSTACK_OO_USE_HOST_JOYCON           ENABLED
+#   define BTSTACK_OO_USE_DEVICE                        DISABLED
 #endif
 
 /*============================ TYPES =========================================*/

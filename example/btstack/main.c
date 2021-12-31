@@ -25,66 +25,118 @@
 #include "csr/btstack_chipset_csr.h"
 #include "bcm/btstack_chipset_bcm.h"
 #include "btstack_run_loop.h"
+
 #include "component/3rd-party/btstack/port/btstack_run_loop_vsf.h"
+#include "component/3rd-party/btstack/extension/btstack_oo/btstack_oo.h"
 
 #include "usrapp_usbh_common.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef union btstack_host_dev_all_t {
+    btstack_host_dev_t          dev;
+#   if BTSTACK_OO_USE_HOST_HID == ENABLED && BTSTACK_OO_USE_HOST_JOYCON == ENABLED
+    btstack_host_joycon_t       joycon;
+#   endif
+} btstack_host_dev_all_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static btstack_packet_callback_registration_t __hci_event_callback_registration;
+#if BTSTACK_OS_USE_DEVICE == ENABLED
+static btstack_device_nspro_t btstack_dev = {
+    .op = &btstack_device_xxxx_drv.use_as__btstack_drv_op_t,
+};
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __btstack_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size)
+btstack_host_dev_t * btstack_host_malloc_dev(void)
 {
-    uint8_t event = hci_event_packet_get_type(packet);
-    bd_addr_t addr;
+    return vsf_heap_malloc(sizeof(btstack_host_dev_all_t));
+}
 
-    switch (event) {
-    case BTSTACK_EVENT_STATE:
-        if (btstack_event_state_get_state(packet) == HCI_STATE_WORKING) {
-            vsf_trace_info("Starting inquiry scan.." VSF_TRACE_CFG_LINEEND);
-            gap_inquiry_start(5);
+void btstack_host_free_dev(btstack_host_dev_t *dev)
+{
+    return vsf_heap_free(dev);
+}
+
+int btstack_evthandler(btstack_evt_t evt, void *param)
+{
+    switch (evt) {
+    case BTSTACK_HOST_ON_INQUIRY_RESULT:
+        // return true to connect
+        return btstack_host_is_dev_supported((btstack_host_dev_t *)param);
+    case BTSTACK_ON_CONNECTION_COMPLETE: {
+            btstack_dev_t *dev = param;
+            if (!dev->is_device && !btstack_is_dev_connected(dev)) {
+                btstack_host_remove_dev((btstack_host_dev_t *)dev, NULL);
+            }
+        }
+        // fall through
+    case BTSTACK_HOST_ON_INQUIRY_COMPLETE: {
+            btstack_dev_t *dev;
+            btstack_linked_list_iterator_t it;
+            btstack_get_devs(&it);
+            while (btstack_linked_list_iterator_has_next(&it)) {
+                dev = (btstack_dev_t *)btstack_linked_list_iterator_next(&it);
+                if (!dev->is_device && !btstack_is_dev_connected(dev)) {
+                    btstack_host_connect_dev((btstack_host_dev_t *)dev);
+                    break;
+                }
+            }
+        }
+        if (BTSTACK_HOST_ON_INQUIRY_COMPLETE == evt) {
+            btstack_host_scan(1);
         }
         break;
-    case GAP_EVENT_INQUIRY_RESULT:
-        gap_event_inquiry_result_get_bd_addr(packet, addr);
-
-        vsf_trace_info("Device found: %s ",  bd_addr_to_str(addr));
-        vsf_trace_info("with COD: 0x%06x, ", (unsigned int)gap_event_inquiry_result_get_class_of_device(packet));
-        vsf_trace_info("pageScan %d, ",      gap_event_inquiry_result_get_page_scan_repetition_mode(packet));
-        vsf_trace_info("clock offset 0x%04x",gap_event_inquiry_result_get_clock_offset(packet));
-
-        if (gap_event_inquiry_result_get_rssi_available(packet)) {
-            vsf_trace_info(", rssi %d dBm", (int8_t) gap_event_inquiry_result_get_rssi(packet));
+    case BTSTACK_ON_INITIALIZED:
+#if BTSTACK_OO_USE_HOST == ENABLED
+        btstack_host_scan(1);
+#endif
+#if BTSTACK_OO_USE_DEVICE == ENABLED
+        if (is_paired) {
+            btstack_set_timer(200);
+        } else {
+            btstack_device_try_pair(&btstack_dev.use_as__btstack_device_dev_t);
         }
-        if (gap_event_inquiry_result_get_name_available(packet)) {
-            char name_buffer[240];
-            int name_len = gap_event_inquiry_result_get_name_len(packet);
-            memcpy(name_buffer, gap_event_inquiry_result_get_name(packet), name_len);
-            name_buffer[name_len] = 0;
-            vsf_trace_info(", name '%s'", name_buffer);
+#endif
+        break;
+#if BTSTACK_OO_USE_DEVICE == ENABLED
+    case BTSTACK_ON_TIMER:
+        if (is_paired) {
+            btstack_connect_dev(&btstack_dev.use_as__btstack_dev_t);
         }
-        vsf_trace_info(VSF_TRACE_CFG_LINEEND);
         break;
-    case GAP_EVENT_INQUIRY_COMPLETE:
-        break;
-    default:
-        break;
+#endif
     }
+    return 0;
 }
 
 int btstack_main(int argc, const char * argv[])
 {
-    hci_set_inquiry_mode(INQUIRY_MODE_RSSI_AND_EIR);
-    __hci_event_callback_registration.callback = &__btstack_packet_handler;
-    hci_add_event_handler(&__hci_event_callback_registration);
-    hci_power_control(HCI_POWER_ON);
+    btstack_init((bd_addr_t){0});
+#if BTSTACK_OO_USE_HOST == ENABLED
+        btstack_host_init();
+#   if BTSTACK_OO_USE_HOST_HID == ENABLED && BTSTACK_OO_USE_HOST_JOYCON == ENABLED
+            static btstack_host_drv_t joycon_left_drv = {
+                .op = &btstack_host_joycon_left_drv,
+            };
+            static btstack_host_drv_t joycon_right_drv = {
+                .op = &btstack_host_joycon_right_drv,
+            };
+            btstack_host_register_drv(&joycon_left_drv);
+            btstack_host_register_drv(&joycon_right_drv);
+#   endif
+#endif
+#if BTSTACK_OO_USE_DEVICE == ENABLED
+        btstack_device_init(&btstack_dev.use_as__btstack_device_dev_t);
+#endif
+    btstack_start();
+
     return 0;
 }
 
@@ -114,6 +166,7 @@ int main(void)
     vsf_start_trace();
 #   endif
 
+    // usbh init
     usrapp_usbh_common_init();
     return 0;
 }
