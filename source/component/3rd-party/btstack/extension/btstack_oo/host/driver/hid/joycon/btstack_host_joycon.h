@@ -15,9 +15,7 @@
 
 #include "utilities/ooc_class.h"
 
-declare_simple_class(btstack_host_joycon_t)
-
-def_simple_class(btstack_host_joycon_t) {
+vsf_class(btstack_host_joycon_t) {
     public_member(
         implement(btstack_host_hid_base_t)
     )

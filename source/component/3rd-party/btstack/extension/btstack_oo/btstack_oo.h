@@ -15,7 +15,7 @@
 
 #include "utilities/ooc_class.h"
 
-declare_simple_class(btstack_dev_t)
+vsf_declare_class(btstack_dev_t)
 
 enum btstack_evt_t {
     BTSTACK_ON_TIMER,
@@ -49,7 +49,7 @@ typedef struct btstack_drv_op_t btstack_drv_op_t;
 #   define PUBLIC_CONST             const
 #endif
 
-def_simple_class(btstack_dev_t) {
+vsf_class(btstack_dev_t) {
     public_member(
         PUBLIC_CONST btstack_linked_item_t dev_node;
         PUBLIC_CONST bd_addr_t remote_addr;

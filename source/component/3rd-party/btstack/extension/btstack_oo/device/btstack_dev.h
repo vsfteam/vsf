@@ -25,8 +25,6 @@ enum btstack_dev_state_t {
 };
 typedef enum btstack_dev_state_t btstack_dev_state_t;
 
-declare_simple_class(btstack_device_dev_t)
-
 struct btstack_device_drv_op_t {
     implement(btstack_drv_op_t)
 
@@ -47,7 +45,7 @@ struct btstack_dev_callback_t {
 };
 typedef struct btstack_dev_callback_t btstack_dev_callback_t;
 
-def_simple_class(btstack_device_dev_t) {
+vsf_class(btstack_device_dev_t) {
     public_member(
         implement(btstack_dev_t)
         bd_addr_t mac;

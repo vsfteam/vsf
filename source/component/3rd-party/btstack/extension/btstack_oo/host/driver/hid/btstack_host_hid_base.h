@@ -17,9 +17,7 @@
 
 #define BTSTACK_HOST_HID_TRACE(...)         BTSTACK_HOST_TRACE("hid: " __VA_ARGS__)
 
-declare_simple_class(btstack_host_hid_base_t)
-
-def_simple_class(btstack_host_hid_base_t) {
+vsf_class(btstack_host_hid_base_t) {
 #if BTSTACK_HOST_CFG_DEV_INHERIT == ENABLED
     public_member(
         implement(btstack_host_dev_t)

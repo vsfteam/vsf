@@ -25,8 +25,6 @@
 #   define btstack_host_get_priv_dev(__dev)         (__dev)
 #endif
 
-declare_simple_class(btstack_host_dev_t)
-
 struct btstack_host_drv_op_t {
     implement(btstack_drv_op_t)
 };
@@ -45,7 +43,7 @@ typedef struct btstack_host_drv_t btstack_host_drv_t;
 #   define PUBLIC_CONST             const
 #endif
 
-def_simple_class(btstack_host_dev_t) {
+vsf_class(btstack_host_dev_t) {
     public_member(
         implement(btstack_dev_t)
 
