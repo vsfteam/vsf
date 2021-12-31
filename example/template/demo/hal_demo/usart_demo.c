@@ -326,7 +326,7 @@ static void __usart_isr_handler(void *target,
     VSF_ASSERT(demo != NULL);
     VSF_ASSERT(usart != NULL);
 
-    if (irq_mask & (USART_IRQ_MASK_RX_TIMEOUT | USART_IRQ_MASK_RX_CPL)) {
+    if (irq_mask & USART_IRQ_MASK_RX_CPL) {
         count = vsf_usart_get_rx_count(usart);
         if (count != 0) {
             err = vsf_usart_request_tx(usart, demo->buff, sizeof(demo->buff));
@@ -353,7 +353,7 @@ static void __usart_request_echo(vsf_usart_t * usart)
     VSF_ASSERT(usart != NULL);
 
     err = __usart_demo_init(usart, __usart_isr_handler, demo, APP_USART_DEMO_IRQ_PRIO,
-                            USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_RX_TIMEOUT | USART_IRQ_MASK_TX_CPL);
+                            USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
     VSF_ASSERT(VSF_ERR_NONE == err);
 
     __usart_isr_handler(demo, usart, USART_IRQ_MASK_TX_CPL);
