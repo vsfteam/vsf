@@ -32,10 +32,10 @@
 
 #undef PUBLIC_CONST
 #if     defined(__VSF_LINUX_HTTPD_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #   define PUBLIC_CONST
 #elif   defined(__VSF_LINUX_HTTPD_CLASS_INHERIT__)
-#   define __PLOOC_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
 #   define PUBLIC_CONST
 #else
 #   define PUBLIC_CONST                                 const

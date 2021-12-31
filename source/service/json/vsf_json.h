@@ -26,10 +26,10 @@
 #include "utilities/vsf_utilities.h"
 
 #if     defined(__VSF_JSON_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #   undef __VSF_JSON_CLASS_IMPLEMENT
 #elif   defined(__VSF_JSON_CLASS_INHERIT__)
-#   define __PLOOC_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
 #   undef __VSF_JSON_CLASS_INHERIT__
 #endif
 

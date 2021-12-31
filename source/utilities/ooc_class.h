@@ -18,6 +18,17 @@
 
 /*============================ INCLUDES ======================================*/
 
+#if defined(__VSF_CLASS_IMPLEMENT) || defined(__VSF_CLASS_IMPLEMENT__)
+#   undef __VSF_CLASS_IMPLEMENT
+#   undef __VSF_CLASS_IMPLEMENT__
+#   define __PLOOC_CLASS_IMPLEMENT
+#endif
+#if defined(__VSF_CLASS_INHERIT) || defined(__VSF_CLASS_INHERIT__)
+#   undef __VSF_CLASS_INHERIT
+#   undef __VSF_CLASS_INHERIT__
+#   define __PLOOC_CLASS_INHERIT
+#endif
+
 #include "./3rd-party/PLOOC/raw/plooc_class.h"
 
 #ifdef __cplusplus

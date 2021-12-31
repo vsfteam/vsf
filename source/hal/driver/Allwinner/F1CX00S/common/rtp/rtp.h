@@ -23,7 +23,7 @@
 #include "hal/vsf_hal.h"
 
 #if     defined(__VSF_RTP_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #   undef __VSF_RTP_CLASS_IMPLEMENT
 #endif
 

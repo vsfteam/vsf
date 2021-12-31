@@ -8,9 +8,9 @@
 #include "../../btstack_dev.h"
 
 #if     defined(__BTSTACK_DEVICE_HID_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __VSF_CLASS_IMPLEMENT
 #elif   defined(__BTSTACK_DEVICE_HID_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __VSF_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"

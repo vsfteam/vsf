@@ -26,10 +26,10 @@
 
 #if     defined(__VSFIP_NETIF_CLASS_IMPLEMENT)
 #   undef __VSFIP_NETIF_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSFIP_NETIF_CLASS_INHERIT__)
 #   undef __VSFIP_NETIF_CLASS_INHERIT__
-#   define __PLOOC_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"

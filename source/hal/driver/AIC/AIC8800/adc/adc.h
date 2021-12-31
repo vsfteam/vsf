@@ -33,7 +33,7 @@
 
 #if     defined(__VSF_ADC_CLASS_IMPLEMENT)
 #   undef __VSF_ADC_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 
 #ifndef VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US

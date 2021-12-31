@@ -26,7 +26,7 @@
 
 #undef PUBLIC_CONST
 #if     defined(__VSF_ARCH_WIN_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #   define PUBLIC_CONST
 #else
 #   define PUBLIC_CONST                 const

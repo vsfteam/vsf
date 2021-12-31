@@ -26,7 +26,7 @@
 
 #if     defined(__VSF_I2C_MULTIPLEX_CLASS_IMPLEMENT)
 #   undef __VSF_I2C_MULTIPLEX_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

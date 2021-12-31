@@ -27,7 +27,7 @@
 
 #if     defined(__VSF_DISP_ST7789_CLASS_IMPLEMENT)
 #   undef __VSF_DISP_ST7789_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"

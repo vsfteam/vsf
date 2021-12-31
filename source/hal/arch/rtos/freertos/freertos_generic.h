@@ -23,7 +23,7 @@
 #include "hal/vsf_hal_cfg.h"
 
 #if     defined(__VSF_ARCH_RTOS_MODEL_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"

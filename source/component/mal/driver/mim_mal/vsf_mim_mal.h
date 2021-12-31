@@ -26,7 +26,7 @@
 
 #if     defined(__VSF_MIM_MAL_CLASS_IMPLEMENT)
 #   undef __VSF_MIM_MAL_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"

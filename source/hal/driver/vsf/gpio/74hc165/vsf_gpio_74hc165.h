@@ -25,7 +25,7 @@
 #if VSF_HAL_GPIO_USE_74HC165 == ENABLED
 
 #if defined(__VSF_HAL_GPIO_74HC164_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"

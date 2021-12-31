@@ -234,7 +234,7 @@ typedef struct vk_usbh_dev_id_t {
 #endif
 
 #if     defined(__VSF_USBH_CLASS_IMPLEMENT_CLASS__)
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -283,7 +283,7 @@ typedef struct vk_usbh_pipe_t {
 
 #if     defined(__VSF_USBH_CLASS_IMPLEMENT_vk_usbh_hcd_t)
 #   undef __VSF_USBH_CLASS_IMPLEMENT_vk_usbh_hcd_t
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -350,7 +350,7 @@ typedef struct vk_usbh_hcd_iso_packet_t {
 
 #if     defined(__VSF_USBH_CLASS_IMPLEMENT_vk_usbh_hcd_urb_t)
 #   undef __VSF_USBH_CLASS_IMPLEMENT_vk_usbh_hcd_urb_t
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -402,10 +402,10 @@ vsf_class(vk_usbh_hcd_urb_t) {
 
 #if     defined(__VSF_USBH_CLASS_IMPLEMENT_vk_usbh_urb_t)
 #   undef __VSF_USBH_CLASS_IMPLEMENT_vk_usbh_urb_t
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_USBH_CLASS_INHERIT_vk_usbh_urb_t)
 #   undef __VSF_USBH_CLASS_INHERIT_vk_usbh_urb_t
-#   define __PLOOC_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -428,7 +428,7 @@ vsf_class(vk_usbh_urb_t) {
 
 #if     defined(__VSF_USBH_CLASS_IMPLEMENT_vk_usbh_dev_t)
 #   undef __VSF_USBH_CLASS_IMPLEMENT_vk_usbh_dev_t
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -473,10 +473,10 @@ vsf_class(vk_usbh_dev_t) {
 
 #if     defined(__VSF_USBH_CLASS_IMPLEMENT_vk_usbh_t)
 #   undef __VSF_USBH_CLASS_IMPLEMENT_vk_usbh_t
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_USBH_CLASS_INHERIT_vk_usbh_t)
 #   undef __VSF_USBH_CLASS_INHERIT_vk_usbh_t
-#   define __PLOOC_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
 #endif
 #include "utilities/ooc_class.h"
 

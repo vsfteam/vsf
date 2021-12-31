@@ -25,10 +25,10 @@
 #if VSF_USE_DYNARR == ENABLED
 
 #if     defined(__VSF_DYNARR_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #   undef __VSF_DYNARR_CLASS_IMPLEMENT
 #elif   defined(__VSF_DYNARR_CLASS_INHERIT__)
-#   define __PLOOC_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
 #   undef __VSF_DYNARR_CLASS_INHERIT__
 #endif
 

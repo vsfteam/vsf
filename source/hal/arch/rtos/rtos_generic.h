@@ -103,7 +103,7 @@ typedef enum vsf_arch_prio_t {
 #include VSF_ARCH_RTOS_MODEL_HEADER
 
 #if     defined(__VSF_ARCH_RTOS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT__
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
