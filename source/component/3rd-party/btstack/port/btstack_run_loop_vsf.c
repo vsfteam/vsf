@@ -68,6 +68,15 @@ static const btstack_run_loop_t __btstack_run_loop_vsf = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+#ifdef ENABLE_BTSTACK_ASSERT
+WEAK(btstack_assert_failed)
+void btstack_assert_failed(const char * file, uint16_t line_nr)
+{
+    vsf_trace_error("Assert: file %s, line %u\n", file, line_nr);
+    VSF_ASSERT(false);
+}
+#endif
+
 static uint32_t __btstack_run_loop_vsf_get_time_ms(void)
 {
     return vsf_systimer_get_ms();
