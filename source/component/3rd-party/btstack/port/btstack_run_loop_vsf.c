@@ -72,7 +72,9 @@ static const btstack_run_loop_t __btstack_run_loop_vsf = {
 WEAK(btstack_assert_failed)
 void btstack_assert_failed(const char * file, uint16_t line_nr)
 {
+#if VSF_USE_TRACE == ENABLED
     vsf_trace_error("Assert: file %s, line %u\n", file, line_nr);
+#endif
     VSF_ASSERT(false);
 }
 #endif
