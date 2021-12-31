@@ -79,7 +79,6 @@ enum em_usart_irq_mask_t {
     // usart fifo interrupt
     USART_IRQ_MASK_RX               =  UART_RXIRQEN_MSK, /* 0 */
     USART_IRQ_MASK_TX               =  UART_TXIRQEN_MSK, /* 1 */
-    USART_IRQ_MASK_TIMEOUT          =  BIT(4),
     USART_IRQ_MASK_LS               =  UART_LSIRQEN_MSK, /* 2 */
     USART_IRQ_MASK_MS               =  UART_MSIRQEN_MSK, /* 3 */
     USART_IRQ_MASK_PT               =  UART_PTIRQEN_MSK, /* 7 */
@@ -89,19 +88,21 @@ enum em_usart_irq_mask_t {
                                      | USART_IRQ_MASK_PT,
 
     // usart error interrupt
-    USART_IRQ_MASK_RX_ERROR         =  BIT(5),
-    USART_IRQ_MASK_TX_ERROR         =  BIT(6),
+    USART_IRQ_MASK_RX_ERROR         =  0x1 << 8,
+    USART_IRQ_MASK_TX_ERROR         =  0x1 << 9,
     USART_IRQ_MASK_ERROR            =  USART_IRQ_MASK_RX_ERROR | USART_IRQ_MASK_TX_ERROR,
 
     // usart request interrupt
-    USART_IRQ_MASK_RX_CPL           = USART_IRQ_MASK_RX      << 8,
-    USART_IRQ_MASK_TX_CPL           = USART_IRQ_MASK_TX      << 8,
-    USART_IRQ_MASK_RX_TIMEOUT       = USART_IRQ_MASK_TIMEOUT << 8,
-    USART_IRQ_MASK_REQUEST          = USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL | USART_IRQ_MASK_RX_TIMEOUT,
+    USART_IRQ_MASK_RX_CPL           = 0x1 << 10,
+    USART_IRQ_MASK_TX_CPL           = 0x1 << 11,
+    USART_IRQ_MASK_REQUEST          = USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL,
+
+    USART_IRQ_MASK_RX_TIMEOUT       =  0x1 << 12,
 
     USART_IRQ_MASK                  =  USART_IRQ_MASK_FIFO
-                                     | USART_IRQ_MASK_ERROR
-                                     | USART_IRQ_MASK_REQUEST,
+                                     | USART_IRQ_MASK_REQUEST
+                                     | USART_IRQ_MASK_RX_TIMEOUT
+                                     | USART_IRQ_MASK_ERROR,
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/

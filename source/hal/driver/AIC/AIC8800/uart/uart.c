@@ -157,8 +157,7 @@ void vsf_hw_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mas
     vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     VSF_HAL_ASSERT(NULL != hw_usart_ptr->reg);
-    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK) == 0);
-    VSF_HAL_ASSERT((irq_mask & (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL)) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK_FIFO) == 0);
 
     hw_usart_ptr->reg->IRQCTL_REG |= irq_mask;
 }
@@ -168,8 +167,7 @@ void vsf_hw_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_ma
     vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     VSF_HAL_ASSERT(NULL != hw_usart_ptr->reg);
-    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK) == 0);
-    VSF_HAL_ASSERT((irq_mask & (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL)) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK_FIFO) == 0);
 
     hw_usart_ptr->reg->IRQCTL_REG &= ~irq_mask;
 }
@@ -259,7 +257,7 @@ static em_usart_irq_mask_t __get_uart_irq_mask(vsf_hw_usart_t *hw_usart_ptr)
             return USART_IRQ_MASK_RX;
 
         case UART_IRQTYP_TIMEOUT_INT:
-            return USART_IRQ_MASK_TIMEOUT;  // TODO: check if data is received when using DMA
+            return 0;
 
         case UART_IRQTYP_TX_INT:
             return USART_IRQ_MASK_TX;
