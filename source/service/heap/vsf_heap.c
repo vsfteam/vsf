@@ -77,8 +77,8 @@ so set heap protection level to interrupt, and interrupt lantancy will be increa
 #define __vsf_heap_protect                  vsf_protect(VSF_HEAP_CFG_PROTECT_LEVEL)
 #define __vsf_heap_unprotect                vsf_unprotect(VSF_HEAP_CFG_PROTECT_LEVEL)
 
-#define __vsf_mcb_get_size(__mcb)           ((__mcb)->linear.next << VSF_HEAP_CFG_MCB_ALIGN_BIT)
-#define __vsf_mcb_get_prev_size(__mcb)      ((__mcb)->linear.prev << VSF_HEAP_CFG_MCB_ALIGN_BIT)
+#define __vsf_heap_mcb_get_size(__mcb)      ((__mcb)->linear.next << VSF_HEAP_CFG_MCB_ALIGN_BIT)
+#define __vsf_heap_mcb_get_prev_size(__mcb) ((__mcb)->linear.prev << VSF_HEAP_CFG_MCB_ALIGN_BIT)
 
 /*============================ TYPES =========================================*/
 
@@ -111,6 +111,9 @@ const i_heap_t VSF_HEAP = {
     .ReallocAligned = &vsf_heap_realloc_aligned_imp,
     .Realloc        = &vsf_heap_realloc_imp,
     .Free           = &vsf_heap_free_imp,
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+    .Statistics     = &vsf_heap_statistics,
+#endif
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -157,7 +160,7 @@ static vsf_heap_mcb_t * __vsf_heap_mcb_get_next(vsf_heap_mcb_t *mcb)
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
     VSF_SERVICE_ASSERT(mcb->magic == VSF_HEAP_MCB_MAGIC);
 #endif
-    vsf_heap_mcb_t *mcb_next = (vsf_heap_mcb_t *)((uint8_t *)mcb + __vsf_mcb_get_size(mcb));
+    vsf_heap_mcb_t *mcb_next = (vsf_heap_mcb_t *)((uint8_t *)mcb + __vsf_heap_mcb_get_size(mcb));
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
     VSF_SERVICE_ASSERT(mcb_next->magic == VSF_HEAP_MCB_MAGIC);
 #endif
@@ -169,7 +172,7 @@ static vsf_heap_mcb_t * __vsf_heap_mcb_get_prev(vsf_heap_mcb_t *mcb)
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
     VSF_SERVICE_ASSERT(mcb->magic == VSF_HEAP_MCB_MAGIC);
 #endif
-    vsf_heap_mcb_t *mcb_prev = (vsf_heap_mcb_t *)((uint8_t *)mcb - __vsf_mcb_get_prev_size(mcb));
+    vsf_heap_mcb_t *mcb_prev = (vsf_heap_mcb_t *)((uint8_t *)mcb - __vsf_heap_mcb_get_prev_size(mcb));
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
     VSF_SERVICE_ASSERT(mcb_prev->magic == VSF_HEAP_MCB_MAGIC);
 #endif
@@ -178,7 +181,7 @@ static vsf_heap_mcb_t * __vsf_heap_mcb_get_prev(vsf_heap_mcb_t *mcb)
 
 static bool __vsf_heap_mcb_is_allocated(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 {
-    uint_fast32_t size = __vsf_mcb_get_size(mcb);
+    uint_fast32_t size = __vsf_heap_mcb_get_size(mcb);
     vsf_dlist_t *freelist = heap->get_freelist(size);
 
     return !vsf_dlist_is_in(vsf_heap_mcb_t, list, freelist, mcb);
@@ -186,7 +189,7 @@ static bool __vsf_heap_mcb_is_allocated(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 
 static void __vsf_heap_mcb_remove_from_freelist(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 {
-    uint_fast32_t size = __vsf_mcb_get_size(mcb);
+    uint_fast32_t size = __vsf_heap_mcb_get_size(mcb);
     vsf_dlist_t *freelist = heap->get_freelist(size);
 
     vsf_dlist_remove(vsf_heap_mcb_t, list, freelist, mcb);
@@ -194,7 +197,7 @@ static void __vsf_heap_mcb_remove_from_freelist(vsf_heap_t *heap, vsf_heap_mcb_t
 
 static void __vsf_heap_mcb_add_to_freelist(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 {
-    uint_fast32_t size = __vsf_mcb_get_size(mcb);
+    uint_fast32_t size = __vsf_heap_mcb_get_size(mcb);
     vsf_dlist_t *freelist = heap->get_freelist(size);
 
     vsf_dlist_add_to_head(vsf_heap_mcb_t, list, freelist, mcb);
@@ -212,7 +215,7 @@ static vsf_heap_mcb_t * __vsf_heap_get_mcb(uint8_t *buffer)
 
 static void __vsf_heap_mcb_truncate(vsf_heap_t *heap, vsf_heap_mcb_t *mcb, uintptr_t buf_end)
 {
-    uintptr_t margin_size = (uintptr_t)mcb + __vsf_mcb_get_size(mcb);
+    uintptr_t margin_size = (uintptr_t)mcb + __vsf_heap_mcb_get_size(mcb);
 
     buf_end += VSF_HEAP_CFG_MCB_ALIGN - 1;
     buf_end &= ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
@@ -240,7 +243,7 @@ static void * __vsf_heap_mcb_malloc(vsf_heap_t *heap, vsf_heap_mcb_t *mcb,
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
     VSF_SERVICE_ASSERT(mcb->magic == VSF_HEAP_MCB_MAGIC);
 #endif
-    uint_fast32_t buffer_size = __vsf_mcb_get_size(mcb);
+    uint_fast32_t buffer_size = __vsf_heap_mcb_get_size(mcb);
     uint8_t *buffer = (uint8_t *)&mcb[1];
     uint_fast32_t unaligned_size;
 
@@ -285,6 +288,9 @@ static void * __vsf_heap_mcb_malloc(vsf_heap_t *heap, vsf_heap_mcb_t *mcb,
         mcb->linear.prev = mcb_new->linear.next;
 
         __vsf_heap_mcb_truncate(heap, mcb_new, (uintptr_t)buffer + size);
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+        heap->statistics.used_size += __vsf_heap_mcb_get_size(mcb_new);
+#endif
         return buffer;
     }
 
@@ -298,6 +304,9 @@ static void __vsf_heap_mcb_free(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 #endif
     vsf_heap_mcb_t *mcb_tmp;
     vsf_protect_t state;
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+    uint_fast32_t mcb_size = __vsf_heap_mcb_get_size(mcb);
+#endif
 
     if (mcb->linear.next != 0) {
         state = __vsf_heap_protect();
@@ -334,6 +343,9 @@ static void __vsf_heap_mcb_free(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 
     state = __vsf_heap_protect();
         __vsf_heap_mcb_add_to_freelist(heap, mcb);
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+        heap->statistics.used_size -= mcb_size;
+#endif
     __vsf_heap_unprotect(state);
 }
 
@@ -389,6 +401,9 @@ void __vsf_heap_add_buffer(vsf_heap_t *heap, uint8_t *buffer, uint_fast32_t size
                             heap->get_freelist(offset),
                             mcb);
 
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+    heap->statistics.all_size += size;
+#endif
     __vsf_heap_unprotect(state);
 }
 
@@ -416,7 +431,7 @@ void * __vsf_heap_malloc_aligned(vsf_heap_t *heap, uint_fast32_t size, uint_fast
 void * __vsf_heap_realloc_aligned(vsf_heap_t *heap, void *buffer, uint_fast32_t size, uint_fast32_t alignment)
 {
     vsf_heap_mcb_t *mcb;
-    uint_fast32_t memory_size;
+    uint_fast32_t memory_size, mcb_size;
 
     VSF_SERVICE_ASSERT((buffer != NULL) && (alignment >= 4) && !(alignment & (alignment - 1)));
     VSF_SERVICE_ASSERT(!((uintptr_t)buffer & (alignment - 1)));
@@ -426,19 +441,23 @@ void * __vsf_heap_realloc_aligned(vsf_heap_t *heap, void *buffer, uint_fast32_t 
     VSF_SERVICE_ASSERT(mcb->magic == VSF_HEAP_MCB_MAGIC);
 #endif
 
-    memory_size = (uint_fast32_t)__vsf_mcb_get_size(mcb);
-    memory_size -= (uint8_t *)buffer - (uint8_t *)mcb;
+    mcb_size = (uint_fast32_t)__vsf_heap_mcb_get_size(mcb);
+    memory_size = mcb_size - ((uint8_t *)buffer - (uint8_t *)mcb);
 
     if (memory_size >= size) {
         vsf_protect_t state = __vsf_heap_protect();
         __vsf_heap_mcb_truncate(heap, mcb, (uintptr_t)buffer + size);
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+        heap->statistics.used_size -= mcb_size;
+        heap->statistics.used_size += __vsf_heap_mcb_get_size(mcb);
+#endif
         __vsf_heap_unprotect(state);
         return buffer;
     } else {
         vsf_heap_mcb_t *mcb_next = __vsf_heap_mcb_get_next(mcb);
         vsf_protect_t state = __vsf_heap_protect();
 
-        uint_fast32_t next_size = __vsf_mcb_get_size(mcb_next);
+        uint_fast32_t next_size = __vsf_heap_mcb_get_size(mcb_next);
         if (__vsf_heap_mcb_is_allocated(heap, mcb_next) || ((memory_size + next_size) < size)) {
             __vsf_heap_unprotect(state);
 
@@ -456,6 +475,10 @@ void * __vsf_heap_realloc_aligned(vsf_heap_t *heap, void *buffer, uint_fast32_t 
             mcb_next->linear.prev = mcb->linear.next;
 
             __vsf_heap_mcb_truncate(heap, mcb, (uintptr_t)buffer + size);
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+        heap->statistics.used_size -= mcb_size;
+        heap->statistics.used_size += __vsf_heap_mcb_get_size(mcb);
+#endif
             __vsf_heap_unprotect(state);
             return buffer;
         }
@@ -475,6 +498,17 @@ void __vsf_heap_free(vsf_heap_t *heap, void *buffer)
     );
     __vsf_heap_mcb_free(heap, mcb);
 }
+
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+void __vsf_heap_statistics(vsf_heap_t *heap, vsf_heap_statistics_t *statistics)
+{
+    if (statistics != NULL) {
+        vsf_protect_t state = __vsf_heap_protect();
+            *statistics = heap->statistics;
+        __vsf_heap_unprotect(state);
+    }
+}
+#endif
 
 // default heap
 #ifndef WEAK_VSF_HEAP_GET_FREELIST
@@ -549,6 +583,11 @@ void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size)
 void vsf_heap_free_imp(void *buffer)
 {
     __vsf_heap_free(&__vsf_heap.use_as__vsf_heap_t, buffer);
+}
+
+void vsf_heap_statistics(vsf_heap_statistics_t *statistics)
+{
+    __vsf_heap_statistics(&__vsf_heap.use_as__vsf_heap_t, statistics);
 }
 
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__

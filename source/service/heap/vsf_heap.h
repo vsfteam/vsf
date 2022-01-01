@@ -93,12 +93,28 @@ extern "C" {
 #   define vsf_heap_free                    vsf_heap_free_imp
 #endif
 
+#ifndef VSF_HEAP_CFG_STATISTICS
+#   define VSF_HEAP_CFG_STATISTICS          ENABLED
+#endif
+
 /*============================ TYPES =========================================*/
+
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+typedef struct vsf_heap_statistics_t {
+    uint32_t all_size;
+    uint32_t used_size;
+} vsf_heap_statistics_t;
+#endif
 
 vsf_class(vsf_heap_t) {
     protected_member(
         vsf_dlist_t * (*get_freelist)(uint_fast32_t size);
     )
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+    private_member(
+        vsf_heap_statistics_t statistics;
+    )
+#endif
 };
 
 declare_interface(i_heap_t)
@@ -114,6 +130,9 @@ def_interface(i_heap_t)
     void *(*ReallocAligned) (void *buffer, uint_fast32_t size, uint_fast32_t alignment);
     void *(*Realloc)        (void *buffer, uint_fast32_t size);
     void (*Free)            (void *buffer);
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+    void (*Statistics)      (vsf_heap_statistics_t *statistics);
+#endif
 end_def_interface(i_heap_t)
 //! @}
 
@@ -128,6 +147,9 @@ extern void __vsf_heap_add_buffer(vsf_heap_t *heap, uint8_t *buffer, uint_fast32
 extern void * __vsf_heap_malloc_aligned(vsf_heap_t *heap, uint_fast32_t size, uint_fast32_t alignment);
 extern void * __vsf_heap_realloc_aligned(vsf_heap_t *heap, void *buffer, uint_fast32_t size, uint_fast32_t alignment);
 extern void __vsf_heap_free(vsf_heap_t *heap, void *buffer);
+#if VSF_HEAP_CFG_STATISTICS == ENABLED
+extern void __vsf_heap_statistics(vsf_heap_t *heap, vsf_heap_statistics_t *statistics);
+#endif
 
 // default heap
 extern void vsf_heap_init(void);
@@ -142,6 +164,7 @@ extern void * vsf_heap_malloc_imp(uint_fast32_t size);
 extern void * vsf_heap_realloc_aligned_imp(void *buffer, uint_fast32_t size, uint_fast32_t alignment);
 extern void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size);
 extern void vsf_heap_free_imp(void *buffer);
+extern void vsf_heap_statistics(vsf_heap_statistics_t *statistics);
 
 #endif
 
