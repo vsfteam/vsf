@@ -638,9 +638,17 @@ static void *__vk_usbh_dl1x5_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     dl1x5->task.fn.evthandler = __vk_usbh_dl1x5_evthandler;
     dl1x5->task.on_terminate = __vk_usbh_dl1x5_on_eda_terminate;
 #if VSF_USBH_DL1X5_CFG_READ_EDID == ENABLED
+#   ifdef VSF_USBH_DL1X5_CFG_PRIORITY
+    vsf_teda_init(&dl1x5->task, VSF_USBH_DL1X5_CFG_PRIORITY);
+#   else
     vsf_teda_init(&dl1x5->task);
+#   endif
 #else
+#   ifdef VSF_USBH_DL1X5_CFG_PRIORITY
+    vsf_eda_init(&dl1x5->task, VSF_USBH_DL1X5_CFG_PRIORITY);
+#   else
     vsf_eda_init(&dl1x5->task);
+#   endif
 #endif
 #if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_kernel_trace_eda_info((vsf_eda_t *)&dl1x5->task, "usbh_dl1x5_task", NULL, 0);

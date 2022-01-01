@@ -186,7 +186,11 @@ void * vk_usbh_hid_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 
     hid->fn.evthandler = __vk_usbh_hid_evthandler;
     hid->on_terminate = __vk_usbh_hid_on_eda_terminate;
+#ifdef VSF_USBH_HID_CFG_PRIORITY
+    vsf_eda_init(&hid->use_as__vsf_eda_t, VSF_USBH_HID_CFG_PRIORITY);
+#else
     vsf_eda_init(&hid->use_as__vsf_eda_t);
+#endif
 #if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_kernel_trace_eda_info(&hid->use_as__vsf_eda_t, "usbh_hid_task", NULL, 0);
 #endif

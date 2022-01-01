@@ -485,7 +485,11 @@ static void *__vk_usbh_hub_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
 
     hub->teda.fn.evthandler = __vk_usbh_hub_evthandler;
     hub->teda.on_terminate = __vk_usbh_hub_on_eda_terminate;
+#ifdef VSF_USBH_HUB_CFG_PRIORITY
+    vsf_teda_init(&hub->teda, VSF_USBH_HUB_CFG_PRIORITY);
+#else
     vsf_teda_init(&hub->teda);
+#endif
 #if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_kernel_trace_eda_info(&hub->teda.use_as__vsf_eda_t, "usbh_hub_task", NULL, 0);
 #endif

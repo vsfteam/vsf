@@ -592,7 +592,11 @@ static void * __vk_usbh_uac_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
 
     uac->task.fn.evthandler = __vk_usbh_uac_evthandler;
     uac->task.on_terminate = __vk_usbh_uac_on_eda_terminate;
+#ifdef VSF_USBH_UAC_CFG_PRIORITY
+    vsf_eda_init((vsf_eda_t *)&uac->task, VSF_USBH_UAC_CFG_PRIORITY);
+#else
     vsf_eda_init((vsf_eda_t *)&uac->task);
+#endif
 #if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_kernel_trace_eda_info((vsf_eda_t *)&uac->task, "usbh_uac_task", NULL, 0);
 #endif

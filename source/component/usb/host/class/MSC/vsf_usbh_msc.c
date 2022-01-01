@@ -370,7 +370,11 @@ static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
     msc->scsi.drv = &__vk_usbh_msc_scsi_drv;
     msc->eda.fn.evthandler = __vk_usbh_msc_evthandler;
     msc->eda.on_terminate = __vk_usbh_msc_on_eda_terminate;
+#ifdef VSF_USBH_MSC_CFG_PRIORITY
+    vsf_eda_init(&msc->eda, VSF_USBH_MSC_CFG_PRIORITY);
+#else
     vsf_eda_init(&msc->eda);
+#endif
 #if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_kernel_trace_eda_info(&msc->eda, "usbh_msc_task", NULL, 0);
 #endif
