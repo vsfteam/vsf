@@ -220,18 +220,22 @@ static void __vk_usbh_ecm_recv(vk_usbh_ecm_t *ecm, vk_usbh_ecm_icb_t *icb)
 {
     if (NULL == icb->netbuf) {
         icb->netbuf = vk_netdrv_alloc_buf(&ecm->netdrv);
-        if (icb->netbuf != NULL) {
+        if (NULL == icb->netbuf) {
+            vsf_trace_error("ecm: fail to allocate netbuf" VSF_TRACE_CFG_LINEEND);
+            VSF_USB_ASSERT(false);
+            return;
+        }
+
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
-            vk_usbh_urb_set_buffer(&icb->urb, icb->buffer, sizeof(icb->buffer));
+        vk_usbh_urb_set_buffer(&icb->urb, icb->buffer, sizeof(icb->buffer));
 #else
-            vsf_mem_t mem;
-            void *netbuf = vk_netdrv_read_buf(&ecm->netdrv, icb->netbuf, &mem);
-            VSF_USB_ASSERT(netbuf == NULL);
-            vk_usbh_urb_set_buffer(&icb->urb, mem.buffer, mem.size);
+        vsf_mem_t mem;
+        void *netbuf = vk_netdrv_read_buf(&ecm->netdrv, icb->netbuf, &mem);
+        VSF_USB_ASSERT(netbuf == NULL);
+        vk_usbh_urb_set_buffer(&icb->urb, mem.buffer, mem.size);
 #endif
-            if (VSF_ERR_NONE != vk_usbh_cdc_submit_urb(&ecm->use_as__vk_usbh_cdc_t, &icb->urb)) {
-                vk_netdrv_on_inputted(&ecm->netdrv, icb->netbuf, 0);
-            }
+        if (VSF_ERR_NONE != vk_usbh_cdc_submit_urb(&ecm->use_as__vk_usbh_cdc_t, &icb->urb)) {
+            vk_netdrv_on_inputted(&ecm->netdrv, icb->netbuf, 0);
         }
     }
 }
