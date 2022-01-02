@@ -210,7 +210,7 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
 #endif
 
 #if     VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED                   \
-    ||  VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+    ||  VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
     vsf_protect_t origlevel;
 #endif
 
@@ -220,7 +220,7 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
     vsf_unprotect_int(origlevel);
 #endif
 
-#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
     vsf_systimer_tick_t start_tick = vsf_systimer_get_tick();
 #endif
 
@@ -263,7 +263,7 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
     pthis->fn.evthandler(pthis, evt);
 #endif
 
-#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
     origlevel = vsf_protect_int();
         if (pthis->usage.ctx != NULL) {
             pthis->usage.ctx->ticks += vsf_systimer_get_elapsed(start_tick);
@@ -856,7 +856,7 @@ static void __vsf_eda_init_member(
     pthis->fsm_return_state = fsm_rt_on_going;
 #endif
 
-#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
     pthis->usage.ticks = 0;
     pthis->usage.ctx = NULL;
 #endif
@@ -1023,7 +1023,7 @@ vsf_err_t vsf_eda_post_evt_msg(vsf_eda_t *pthis, vsf_evt_t evt, void *msg)
 }
 #endif
 
-#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
 void vsf_eda_cpu_usage_start(vsf_eda_t *pthis, vsf_cpu_usage_ctx_t *ctx)
 {
     pthis = __vsf_eda_get_valid_eda(pthis);

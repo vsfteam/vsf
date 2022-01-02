@@ -55,6 +55,14 @@ extern "C" {
 #   define VSF_KERNEL_CFG_EDA_USER_BITLEN   5
 #endif
 
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
+#   if VSF_KERNEL_CFG_CPU_USAGE != ENABLED
+#       warning VSF_KERNEL_CFG_CPU_USAGE MUST be enabled for VSF_KERNEL_CFG_EDA_CPU_USAGE
+#       undef VSF_KERNEL_CFG_CPU_USAGE
+#       define VSF_KERNEL_CFG_CPU_USAGE     ENABLED
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 // SEMAPHORE
@@ -789,7 +797,7 @@ vsf_class(vsf_eda_t) {
         __vsf_eda_flag_t        flag;
     )
 
-#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
     private_member(
         vsf_cpu_usage_t         usage;
     )
@@ -1131,7 +1139,7 @@ extern uintptr_t vsf_eda_get_return_value(void);
 SECTION(".text.vsf.kernel.__vsf_eda_yield")
 extern void __vsf_eda_yield(void);
 
-#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
 // user should provide vsf_cpu_usage_ctx_t memory, and maintain this memory until stop
 //  the ticks used returned is actually including ticks from all higher priority tasks and interrupt
 extern void vsf_eda_cpu_usage_start(vsf_eda_t *pthis, vsf_cpu_usage_ctx_t *ctx);
