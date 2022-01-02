@@ -1099,6 +1099,9 @@
     <Filter Include="usrapp\config\3rd-party\mbedtls">
       <UniqueIdentifier>{47d10ce8-51f0-4894-9c5e-7350065676d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\cpu_usage_demo">
+      <UniqueIdentifier>{4260269b-d44e-4cb2-8b6d-99e136d2841c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -5740,6 +5743,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c">
       <Filter>vsf\shell\sys\linux\kernel\fs\vfs\devfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\cpu_usage_demo\cpu_usage_demo.c">
+      <Filter>usrapp\demo\cpu_usage_demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

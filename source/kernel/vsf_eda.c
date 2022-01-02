@@ -209,11 +209,15 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
     vsf_kernel_trace_eda_evt_begin(pthis, evt);
 #endif
 
-#   if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
+#if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
     vsf_protect_t origlevel = vsf_protect_int();
         pthis->is_evt_incoming = false;
     vsf_unprotect_int(origlevel);
-#   endif
+#endif
+
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+    vsf_systimer_tick_t start_tick = vsf_systimer_get_tick();
+#endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     if (pthis->flag.feature.is_use_frame) {
@@ -252,6 +256,14 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
 #else
     VSF_KERNEL_ASSERT(pthis->fn.evthandler != NULL);
     pthis->fn.evthandler(pthis, evt);
+#endif
+
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+    origlevel = vsf_protect_int();
+        if (pthis->usage.ctx != NULL) {
+            pthis->usage.ctx->ticks += vsf_systimer_get_elapsed(start_tick);
+        }
+    vsf_unprotect_int(origlevel);
 #endif
 
 #if VSF_KERNEL_CFG_TRACE == ENABLED
@@ -839,6 +851,11 @@ static void __vsf_eda_init_member(
     pthis->fsm_return_state = fsm_rt_on_going;
 #endif
 
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+    pthis->usage.ticks = 0;
+    pthis->usage.ctx = NULL;
+#endif
+
     vsf_evtq_on_eda_init(pthis);
 
 #if VSF_KERNEL_CFG_TRACE == ENABLED
@@ -1001,7 +1018,33 @@ vsf_err_t vsf_eda_post_evt_msg(vsf_eda_t *pthis, vsf_evt_t evt, void *msg)
 }
 #endif
 
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+void vsf_eda_cpu_usage_start(vsf_eda_t *pthis, vsf_cpu_usage_ctx_t *ctx)
+{
+    pthis = __vsf_eda_get_valid_eda(pthis);
 
+    vsf_protect_t origlevel = vsf_protect_int();
+        ctx->ticks = 0;
+        ctx->duration = vsf_systimer_get_tick();
+
+        VSF_KERNEL_ASSERT(NULL != pthis->usage.ctx);
+        pthis->usage.ctx = ctx;
+    vsf_unprotect_int(origlevel);
+}
+
+void vsf_eda_cpu_usage_stop(vsf_eda_t *pthis)
+{
+    pthis = __vsf_eda_get_valid_eda(pthis);
+
+    vsf_protect_t origlevel = vsf_protect_int();
+        vsf_cpu_usage_ctx_t  *ctx = pthis->usage.ctx;
+        VSF_KERNEL_ASSERT(NULL != ctx);
+        pthis->usage.ctx = NULL;
+
+        ctx->duration = vsf_systimer_get_elapsed(ctx->duration);
+    vsf_unprotect_int(origlevel);
+}
+#endif
 
 #ifdef __VSF_KERNEL_TASK
 

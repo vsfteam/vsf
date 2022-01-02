@@ -612,6 +612,17 @@ enum {
     VSF_KERNEL_EVT_QUEUE_RECV_NOTIFY    = VSF_EVT_USER + 3,
 };
 
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+typedef struct vsf_cpu_usage_ctx_t {
+    vsf_systimer_tick_t         ticks;
+    vsf_systimer_tick_t         duration;
+} vsf_cpu_usage_ctx_t;
+typedef struct vsf_cpu_usage_t {
+    vsf_systimer_tick_t         ticks;
+    vsf_cpu_usage_ctx_t         *ctx;
+} vsf_cpu_usage_t;
+#endif
+
 vsf_dcl_class(vsf_eda_t)
 vsf_dcl_class(vsf_teda_t)
 vsf_dcl_class(vsf_sync_t)
@@ -777,6 +788,12 @@ vsf_class(vsf_eda_t) {
 #   endif
         __vsf_eda_flag_t        flag;
     )
+
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+    private_member(
+        vsf_cpu_usage_t         usage;
+    )
+#endif
 };
 //! @}
 
@@ -1113,6 +1130,13 @@ extern uintptr_t vsf_eda_get_return_value(void);
 
 SECTION(".text.vsf.kernel.__vsf_eda_yield")
 extern void __vsf_eda_yield(void);
+
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+// user should provide vsf_cpu_usage_ctx_t memory, and maintain this memory until stop
+//  the ticks used returned is actually including ticks from all higher priority tasks and interrupt
+extern void vsf_eda_cpu_usage_start(vsf_eda_t *pthis, vsf_cpu_usage_ctx_t *ctx);
+extern void vsf_eda_cpu_usage_stop(vsf_eda_t *pthis);
+#endif
 
 #if defined(__VSF_EDA_CLASS_INHERIT__) || defined(__VSF_EDA_CLASS_IMPLEMENT)
 /* vsf_eda_fini() enables you to kill other eda tasks.

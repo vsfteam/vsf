@@ -45,6 +45,9 @@ typedef struct vsf_os_t {
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
     vsf_pool(vsf_eda_frame_pool) eda_frame_pool;
 #endif
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+    vsf_cpu_usage_t usage;
+#endif
     const vsf_kernel_resource_t *res_ptr;
 } vsf_os_t;
 
@@ -434,17 +437,56 @@ void vsf_sleep(void)
     vsf_kernel_trace_idle();
 #endif
 
-#   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED && __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+#if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED && __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     vsf_disable_interrupt();
     if (vsf_evtq_is_empty(&__vsf_os.res_ptr->evt_queue.queue_array[0])) {
+#endif
+
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+        vsf_systimer_tick_t start = vsf_systimer_get_tick();
+#endif
+
         // vsf_arch_sleep will enable interrupt
         vsf_arch_sleep(0);
+
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+        start = vsf_systimer_get_elapsed(start);
+        __vsf_os.usage.ticks += start;
+        if (__vsf_os.usage.ctx != NULL) {
+            __vsf_os.usage.ctx->ticks += start;
+        }
+#endif
+
+#if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED && __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+    } else {
+        vsf_enable_interrupt();
     }
-    vsf_enable_interrupt();
-#   else
-    vsf_arch_sleep(0);
-#   endif
+#endif
 }
+
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+void vsf_cpu_usage_start(vsf_cpu_usage_ctx_t *ctx)
+{
+    vsf_protect_t origlevel = vsf_protect_int();
+        ctx->ticks = 0;
+        ctx->duration = vsf_systimer_get_tick();
+
+        VSF_KERNEL_ASSERT(NULL == __vsf_os.usage.ctx);
+        __vsf_os.usage.ctx = ctx;
+    vsf_unprotect_int(origlevel);
+}
+void vsf_cpu_usage_stop(void)
+{
+    vsf_protect_t origlevel = vsf_protect_int();
+        vsf_cpu_usage_ctx_t  *ctx = __vsf_os.usage.ctx;
+        VSF_KERNEL_ASSERT(NULL != ctx);
+        __vsf_os.usage.ctx = NULL;
+
+        ctx->duration = vsf_systimer_get_elapsed(ctx->duration);
+        ctx->ticks = ctx->duration - ctx->ticks;
+    vsf_unprotect_int(origlevel);
+}
+#endif
 
 #ifndef WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE
 WEAK(vsf_plug_in_on_kernel_idle)

@@ -1509,6 +1509,7 @@
     <ClCompile Include="..\..\demo\common\usrapp_usbd_common.c" />
     <ClCompile Include="..\..\demo\common\usrapp_usbh_common.c" />
     <ClCompile Include="..\..\demo\cpp_demo\cpp_demo.cpp" />
+    <ClCompile Include="..\..\demo\cpu_usage_demo\cpu_usage_demo.c" />
     <ClCompile Include="..\..\demo\disp_demo\disp_demo.c" />
     <ClCompile Include="..\..\demo\distbus_demo\app\distbus_hal.c" />
     <ClCompile Include="..\..\demo\distbus_demo\bus\distbus_lwip.c" />

@@ -140,6 +140,11 @@ int vsf_linux_create_fhs(void)
     vsf_linux_libusb_startup();
 #endif
 
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+    extern int cpu_usage_main(int argc, char *argv[]);
+    busybox_bind("/sbin/cpu", cpu_usage_main);
+#endif
+
 #if APP_USE_NNOM_DEMO == ENABLED
     extern int nnom_main(int argc, char *argv[]);
     busybox_bind("/sbin/nnom", nnom_main);

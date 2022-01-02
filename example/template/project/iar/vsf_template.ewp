@@ -5698,6 +5698,12 @@
                 </file>
             </group>
             <group>
+                <name>cpu_usage_demo</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\cpu_usage_demo\cpu_usage_demo.c</name>
+                </file>
+            </group>
+            <group>
                 <name>disp</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\disp_demo\disp_demo.c</name>
@@ -12867,7 +12873,6 @@
                             <configuration>vsf_template_m484</configuration>
                             <configuration>vsf_template_gd32e103</configuration>
                             <configuration>vsf_template_mt071</configuration>
-                            <configuration>vsf_template_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>SDL_image</name>

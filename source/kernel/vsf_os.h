@@ -158,6 +158,11 @@ extern void __vsf_kernel_os_run_priority(vsf_prio_t priority);
 extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
 #endif
 
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+extern void vsf_cpu_usage_start(vsf_cpu_usage_ctx_t *ctx);
+extern void vsf_cpu_usage_stop(void);
+#endif
+
 #if __VSF_OS_SWI_NUM > 0
 extern vsf_sched_lock_status_t vsf_forced_sched_lock(void);
 extern void vsf_forced_sched_unlock(vsf_sched_lock_status_t origlevel);
