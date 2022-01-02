@@ -209,8 +209,13 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
     vsf_kernel_trace_eda_evt_begin(pthis, evt);
 #endif
 
+#if     VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED                   \
+    ||  VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+    vsf_protect_t origlevel;
+#endif
+
 #if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
-    vsf_protect_t origlevel = vsf_protect_int();
+    origlevel = vsf_protect_int();
         pthis->is_evt_incoming = false;
     vsf_unprotect_int(origlevel);
 #endif
