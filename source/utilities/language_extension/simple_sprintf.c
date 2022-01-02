@@ -52,6 +52,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
     // reserve for '\0' terminator
     if (size > 0) { size--; }
     while (*format != '\0') {
+    next_char:
         ch = *format++;
         switch (ch) {
         case '%': {
@@ -82,6 +83,12 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 case '+':   flags.has_plus_minus = 1;   format++;   break;
                 case ' ':                               format++;   break;
                 case '#':   flags.has_prefix = 1;       format++;   break;
+                case '%':
+                    if (++realsize <= size) {
+                        *curpos++ = '%';
+                    }
+                    format++;
+                    goto next_char;
                 }
                 width = strtoull(format, &format_tmp, 0);
                 if (format == format_tmp) {
