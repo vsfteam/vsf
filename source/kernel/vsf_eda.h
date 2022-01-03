@@ -55,14 +55,6 @@ extern "C" {
 #   define VSF_KERNEL_CFG_EDA_USER_BITLEN   5
 #endif
 
-#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
-#   if VSF_KERNEL_CFG_CPU_USAGE != ENABLED
-#       warning VSF_KERNEL_CFG_CPU_USAGE MUST be enabled for VSF_KERNEL_CFG_EDA_CPU_USAGE
-#       undef VSF_KERNEL_CFG_CPU_USAGE
-#       define VSF_KERNEL_CFG_CPU_USAGE     ENABLED
-#   endif
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 // SEMAPHORE
@@ -620,7 +612,7 @@ enum {
     VSF_KERNEL_EVT_QUEUE_RECV_NOTIFY    = VSF_EVT_USER + 3,
 };
 
-#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+#if VSF_KERNEL_CFG_CPU_USAGE == ENABLED || VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
 typedef struct vsf_cpu_usage_ctx_t {
     vsf_systimer_tick_t         ticks;
     vsf_systimer_tick_t         duration;

@@ -323,6 +323,14 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #   define VSF_KERNEL_CFG_THREAD_STACK_CHECK                DISABLED
 #endif
 
+#if     !defined(VSF_KERNEL_CFG_CPU_USAGE)
+#   define VSF_KERNEL_CFG_CPU_USAGE                         ENABLED
+#endif
+
+#if  !defined(VSF_KERNEL_CFG_EDA_CPU_USAGE)
+#   define VSF_KERNEL_CFG_EDA_CPU_USAGE                     ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
