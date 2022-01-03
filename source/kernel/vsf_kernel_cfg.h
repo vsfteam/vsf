@@ -89,16 +89,7 @@
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL              ENABLED
 #endif
 
-/*! \note VSF_KERNEL_CFG_EDA_SUPPORT_FSM is deprecated. It will be removed
- *!       soon. Please do not use it.
- *!       TODO: Remove VSF_KERNEL_CFG_EDA_SUPPORT_FSM in the future
- */
-
-#if defined(VSF_KERNEL_CFG_EDA_SUPPORT_FSM)
-#   define VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE                          \
-                VSF_KERNEL_CFG_EDA_SUPPORT_FSM
-#endif
-
+// currently, only vsf_task(VSF_KERNEL_CFG_EDA_SUPPORT_TASK) can optionally use VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE
 #ifndef VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE
 #   define VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE      VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 #endif
