@@ -82,6 +82,7 @@ typedef struct vsf_local_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
 static NO_INIT vsf_local_t __vsf_eda;
 
 /*============================ PROTOTYPES ====================================*/
@@ -114,6 +115,9 @@ SECTION(".text.vsf.kernel.vsf_eda_free_frame")
 extern void vsf_eda_free_frame(__vsf_eda_frame_t *frame);
 
 extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
+
+SECTION(".text.vsf.kernel.__vsf_evtq_ctx_t")
+static vsf_evtq_ctx_t * __vsf_evtq_get_cur_ctx(void);
 
 /*============================ INCLUDES ======================================*/
 #define __EDA_GADGET__
@@ -211,17 +215,22 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
 
 #if     VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED                   \
     ||  VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
-    vsf_protect_t origlevel;
-#endif
+    vsf_protect_t origlevel = vsf_protect_int();
 
-#if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
-    origlevel = vsf_protect_int();
+#   if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
         pthis->is_evt_incoming = false;
-    vsf_unprotect_int(origlevel);
-#endif
+#   endif
 
-#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
-    vsf_systimer_tick_t start_tick = vsf_systimer_get_tick();
+#   if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
+        vsf_systimer_tick_t start_tick = vsf_systimer_get_tick();
+#       if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+        vsf_evtq_ctx_t *evtq_ctx = __vsf_evtq_get_cur_ctx();
+        evtq_ctx->is_timing = true;
+        evtq_ctx->preempted_ticks = 0;
+#       endif
+#   endif
+
+    vsf_unprotect_int(origlevel);
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
@@ -267,7 +276,13 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
     origlevel = vsf_protect_int();
         if (pthis->usage.ctx != NULL) {
             pthis->usage.ctx->ticks += vsf_systimer_get_elapsed(start_tick);
+#   if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+            pthis->usage.ctx->ticks -= evtq_ctx->preempted_ticks;
+#   endif
         }
+#   if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+        evtq_ctx->is_timing = false;
+#   endif
     vsf_unprotect_int(origlevel);
 #endif
 

@@ -35,6 +35,10 @@ typedef struct vsf_evtq_ctx_t {
     vsf_eda_t *eda;
     vsf_evt_t evt;
     uintptr_t msg;
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
+    vsf_systimer_tick_t preempted_ticks;
+    bool is_timing;
+#endif
 } vsf_evtq_ctx_t;
 
 #if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
@@ -89,11 +93,10 @@ struct vsf_evtq_t {
     // private
     uint8_t head;
     uint8_t tail;
-    vsf_evtq_ctx_t cur;
-
 #   if VSF_KERNEL_CFG_TRACE == ENABLED
     bool is_isr_info_sent;
 #   endif
+    vsf_evtq_ctx_t cur;
 };
 
 #endif

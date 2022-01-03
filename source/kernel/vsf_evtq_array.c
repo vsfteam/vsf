@@ -76,6 +76,9 @@ vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis)
     pthis->cur.eda = NULL;
     pthis->cur.evt = VSF_EVT_INVALID;
     pthis->cur.msg = (uintptr_t)NULL;
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
+    pthis->cur.is_timing = false;
+#endif
     pthis->head = 0;
     pthis->tail = 0;
     return __vsf_os_evtq_init(pthis);

@@ -262,7 +262,27 @@ static void __vsf_os_evtq_swi_handler(void *p)
 #endif
 
     pold = __vsf_set_cur_evtq(pcur);
+
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
+    // fixme: NO NEED to protect, because pold->cur.eda will not preempt current context
+    vsf_systimer_tick_t start_tick;
+    if (pold != NULL) {
+        if (pold->cur.is_timing) {
+            start_tick = vsf_systimer_get_tick();
+        }
+    }
+#endif
+
     vsf_evtq_poll(pcur);
+
+#if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
+    if (pold != NULL) {
+        if (pold->cur.is_timing) {
+            pold->cur.preempted_ticks += vsf_systimer_get_elapsed(start_tick);
+        }
+    }
+#endif
+
     __vsf_set_cur_evtq(pold);
 
 #if VSF_KERNEL_CFG_TRACE == ENABLED
