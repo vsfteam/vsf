@@ -140,8 +140,7 @@ void vsf_kernel_trace_idle(void) {
   SEGGER_SYSVIEW_OnIdle();
 }
 
-void vsf_kernel_trace_isr_info(int id, char *name)
-{
+void vsf_kernel_trace_isr_info(int id, char *name) {
   size_t len;
   char desc[256] = "I#";
   itoa(id, &desc[2], 10);
