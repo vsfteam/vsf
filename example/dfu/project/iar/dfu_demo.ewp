@@ -353,6 +353,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\DSP\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\NN\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
                 </option>
                 <option>
@@ -3419,6 +3420,9 @@
                     <name>$PROJ_DIR$\..\..\..\..\source\kernel\task\vsf_pt.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\kernel\task\vsf_task.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\kernel\task\vsf_task.h</name>
                 </file>
                 <file>
@@ -3654,6 +3658,42 @@
                 </file>
             </group>
             <group>
+                <name>simple_stream</name>
+                <group>
+                    <name>block_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\block_stream\vsf_block_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\block_stream\vsf_block_stream.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>fifo_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\fifo_stream\vsf_fifo_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\fifo_stream\vsf_fifo_stream.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>mem_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\vsf_simple_stream.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\vsf_simple_stream.h</name>
+                </file>
+            </group>
+            <group>
                 <name>stream</name>
                 <group>
                     <name>pbuf_queue</name>
@@ -3699,42 +3739,6 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\service\trace\vsf_trace.h</name>
-                </file>
-            </group>
-            <group>
-                <name>simple_stream</name>
-                <group>
-                    <name>block_stream</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\block_stream\vsf_block_stream.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\block_stream\vsf_block_stream.h</name>
-                    </file>
-                </group>
-                <group>
-                    <name>fifo_stream</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\fifo_stream\vsf_fifo_stream.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\fifo_stream\vsf_fifo_stream.h</name>
-                    </file>
-                </group>
-                <group>
-                    <name>mem_stream</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.h</name>
-                    </file>
-                </group>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\vsf_simple_stream.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\vsf_simple_stream.h</name>
                 </file>
             </group>
             <file>
@@ -3814,6 +3818,57 @@
                         </file>
                     </group>
                     <group>
+                        <name>kernel</name>
+                        <group>
+                            <name>fs</name>
+                            <group>
+                                <name>vfs</name>
+                                <group>
+                                    <name>devfs</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.h</name>
+                                    </file>
+                                </group>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.h</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>socket</name>
+                            <group>
+                                <name>inet</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_lwip.c</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>unix</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.h</name>
+                            </file>
+                        </group>
+                    </group>
+                    <group>
                         <name>lib</name>
                         <group>
                             <name>glibc</name>
@@ -3875,9 +3930,6 @@
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_cfg.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_socket.c</name>
                     </file>
                 </group>
             </group>

@@ -383,6 +383,7 @@
     <ClCompile Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_bmpevt.c" />
     <ClCompile Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_task.c" />
     <ClCompile Include="..\..\..\..\source\kernel\shell\vsf_shell.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c" />
     <ClCompile Include="..\..\..\..\source\kernel\task\vsf_thread.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_eda.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_eda_slist_queue.c" />

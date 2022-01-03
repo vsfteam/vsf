@@ -228,8 +228,10 @@
                     <state>CFG_PMIC_VER_LITE</state>
                     <state>CFG_PMIC_ITF_ASDMA</state>
                     <state>CFG_DBG</state>
+                    <state>CFG_ROM_VER=255</state>
                     <state>CFG_DACL_MIXER_MODE=0</state>
                     <state>CFG_DACR_MIXER_MODE=0</state>
+                    <state>CFG_AIC1000_MIC_MATRIX=0</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -380,6 +382,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\modules\common\api</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\fhost</state>
@@ -4449,15 +4452,6 @@
                             </file>
                         </group>
                         <group>
-                            <name>rtl8152</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h</name>
-                            </file>
-                        </group>
-                        <group>
                             <name>UAC</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\usb\host\class\UAC\vsf_usbh_uac.c</name>
@@ -5599,27 +5593,6 @@
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng\trng_api.h</name>
-                                                </file>
-                                            </group>
-                                            <group>
-                                                <name>uart</name>
-                                                <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\reg_uart1.h</name>
-                                                </file>
-                                                <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\reg_uart2.h</name>
-                                                </file>
-                                                <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart1_api.c</name>
-                                                </file>
-                                                <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart1_api.h</name>
-                                                </file>
-                                                <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart2_api.c</name>
-                                                </file>
-                                                <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart2_api.h</name>
                                                 </file>
                                             </group>
                                             <group>
@@ -6872,6 +6845,9 @@
                     <name>$PROJ_DIR$\..\..\..\..\source\kernel\task\vsf_pt.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\kernel\task\vsf_task.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\kernel\task\vsf_task.h</name>
                 </file>
                 <file>
@@ -7216,312 +7192,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\source\service\vsf_service_cfg.h</name>
-            </file>
-        </group>
-        <group>
-            <name>shell</name>
-            <excluded>
-                <configuration>mscboot_aic8800</configuration>
-            </excluded>
-            <group>
-                <name>media</name>
-                <group>
-                    <name>sdl2</name>
-                    <group>
-                        <name>3rd-party</name>
-                        <group>
-                            <name>SDL_image</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_bmp.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_gif.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_jpg.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_lbm.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_pcx.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_png.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_pnm.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_svg.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_tga.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_tif.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_webp.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_WIC.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_xcf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_xpm.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_xv.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\IMG_xxx.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\miniz.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\nanosvg.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\nanosvgrast.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image\SDL_image.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>SDL_ttf</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf\SDL_ttf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf\SDL_ttf.h</name>
-                            </file>
-                        </group>
-                    </group>
-                    <group>
-                        <name>include</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL.h</name>
-                        </file>
-                    </group>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\vsf_sdl2.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\vsf_sdl2_cfg.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\vsf_sdl2_event.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\vsf_sdl2_pixelformat.c</name>
-                    </file>
-                </group>
-            </group>
-            <group>
-                <name>sys</name>
-                <group>
-                    <name>linux</name>
-                    <group>
-                        <name>include</name>
-                        <group>
-                            <name>arpa</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\arpa\inet.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>linux</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\linux\limits.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>simple_libc</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc\ctype.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc\stddef.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc\stdio.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc\stdlib.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc\string.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc\time.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc\wchar.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>sys</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\ipc.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\mount.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\select.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\shm.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\socket.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\stat.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\time.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\types.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\uio.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\sys\wait.h</name>
-                            </file>
-                        </group>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\dirent.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\errno.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\fcntl.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libgen.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\netdb.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\poll.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\pthread.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\pwd.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\semaphore.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\signal.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\termios.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\unistd.h</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>lib</name>
-                        <group>
-                            <name>glibc</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_sem.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdio.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdlib.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_string.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_time.c</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>libgen</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\libgen\vsf_linux_libgen.c</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>libusb</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\libusb\vsf_linux_libusb.c</name>
-                            </file>
-                        </group>
-                    </group>
-                    <group>
-                        <name>port</name>
-                        <group>
-                            <name>busybox</name>
-                            <group>
-                                <name>shell</name>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\port\busybox\shell\vsh.c</name>
-                                </file>
-                            </group>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\port\busybox\busybox.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\port\busybox\busybox.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\port\busybox\config.h</name>
-                            </file>
-                        </group>
-                    </group>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_cfg.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_devfs.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\vsf_linux_socket.c</name>
-                    </file>
-                </group>
-            </group>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\source\shell\vsf_shell_wrapper.h</name>
             </file>
         </group>
         <group>

@@ -1550,6 +1550,9 @@
     <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.c">
       <Filter>vsf\component\input\protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
+      <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">

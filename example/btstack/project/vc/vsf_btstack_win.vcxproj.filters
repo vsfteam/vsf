@@ -1136,6 +1136,9 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.c">
       <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
+      <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">

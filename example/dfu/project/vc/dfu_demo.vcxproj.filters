@@ -865,5 +865,8 @@
     <ClCompile Include="..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\backend\vsf_usbip_dcd_win.c">
       <Filter>vsf\component\usb\driver\dcd\usbip_dcd\backend</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
+      <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
