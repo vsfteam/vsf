@@ -116,7 +116,7 @@ extern void vsf_eda_free_frame(__vsf_eda_frame_t *frame);
 
 extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
 
-SECTION(".text.vsf.kernel.__vsf_evtq_ctx_t")
+SECTION(".text.vsf.kernel.__vsf_evtq_get_cur_ctx")
 static vsf_evtq_ctx_t * __vsf_evtq_get_cur_ctx(void);
 
 /*============================ INCLUDES ======================================*/

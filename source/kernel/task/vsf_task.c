@@ -79,7 +79,7 @@ void __vsf_eda_task_evthandler_process_return_value(vsf_eda_t *pthis, vsf_evt_t 
     fsm_rt_t ret;
     VSF_KERNEL_ASSERT(     pthis != NULL
             &&  NULL != pthis->fn.frame
-            &&  NULL != pthis->fn.frame->fn.func);
+            &&  (uintptr_t)NULL != pthis->fn.frame->fn.func);
 
     uintptr_t param = pthis->fn.frame->ptr.target;
     if  (   ((uintptr_t)NULL == param)                             //!< no param
