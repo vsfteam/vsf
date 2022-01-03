@@ -386,6 +386,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\ecma\zephyr</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
