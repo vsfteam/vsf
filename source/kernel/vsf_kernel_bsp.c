@@ -26,6 +26,12 @@
 #include "./vsf_eda.h"
 #include "./vsf_evtq.h"
 #include "./vsf_os.h"
+
+#if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
+    &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#   include "./task/vsf_thread.h"
+#endif
+
 #include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/

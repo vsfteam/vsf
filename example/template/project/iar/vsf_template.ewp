@@ -12516,6 +12516,9 @@
                     <name>$PROJ_DIR$\..\..\..\..\source\kernel\task\vsf_pt.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\kernel\task\vsf_task.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\kernel\task\vsf_task.h</name>
                 </file>
                 <file>

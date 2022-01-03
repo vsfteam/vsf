@@ -26,6 +26,9 @@
 #include "hal/arch/vsf_arch.h"
 #include "service/vsf_service.h"
 
+// for vsf_prio_t
+#include "./vsf_kernel_common.h"
+
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file
  *!        included in this file
@@ -638,7 +641,6 @@ typedef int16_t vsf_evt_t;
 
 typedef void (*vsf_eda_evthandler_t)(vsf_eda_t *eda, vsf_evt_t evt);
 typedef void (*vsf_eda_on_terminate_t)(vsf_eda_t *eda);
-typedef fsm_rt_t (*vsf_fsm_entry_t)(uintptr_t target, vsf_evt_t evt);
 typedef void (*vsf_param_eda_evthandler_t)(uintptr_t target, vsf_evt_t evt);
 
 typedef union vsf_eda_feature_t {
@@ -702,7 +704,6 @@ typedef union __vsf_eda_fn_t {
     uintptr_t                   func;
     vsf_eda_evthandler_t        evthandler;
     vsf_param_eda_evthandler_t  param_evthandler;
-    vsf_fsm_entry_t             fsm_entry;
 } __vsf_eda_fn_t;
 
 typedef struct __vsf_eda_frame_state_t {
@@ -781,7 +782,7 @@ vsf_class(vsf_eda_t) {
 
 #   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         /* value holder for enum fsm_rt_t */
-        int8_t                  fsm_return_state;
+        int8_t                  subcall_return_value;
 #   endif
 #   if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
         bool                    is_evt_incoming;
@@ -1206,13 +1207,6 @@ extern vsf_err_t vsf_eda_target_set(uintptr_t param);
 
 SECTION(".text.vsf.kernel.vsf_eda_target_get")
 extern uintptr_t vsf_eda_target_get(void);
-
-#if     VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-SECTION(".text.vsf.kernel.eda_fsm")
-extern fsm_rt_t __vsf_eda_call_fsm( vsf_fsm_entry_t entry,
-                                    uintptr_t param,
-                                    size_t local_size);
-#   endif      // VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE
 
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 

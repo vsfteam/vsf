@@ -235,20 +235,20 @@ extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
     }
 }
 
-#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-SECTION(".text.vsf.kernel.__vsf_call_fsm")
-fsm_rt_t __vsf_call_fsm(vsf_fsm_entry_t entry, uintptr_t param, size_t local_size)
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
+SECTION(".text.vsf.kernel.__vsf_call_task")
+fsm_rt_t __vsf_call_task(vsf_task_entry_t entry, uintptr_t param, size_t local_size)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
     VSF_KERNEL_ASSERT(NULL != eda);
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     if (vsf_eda_is_stack_owner(eda)) {
-        return vk_thread_call_fsm(entry, param, local_size);
+        return vk_thread_call_task(entry, param, local_size);
     } else
 #endif
     {
-        return __vsf_eda_call_fsm(entry, param, local_size);
+        return __vsf_eda_call_task(entry, param, local_size);
     }
 }
 #endif

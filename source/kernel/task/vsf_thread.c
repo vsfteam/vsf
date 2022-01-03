@@ -591,9 +591,9 @@ vsf_err_t vk_thread_call_thread(vsf_thread_cb_t *thread_cb,
                                     (uintptr_t)thread_cb, state, 0, (uintptr_t)NULL);
 }
 
-#   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-SECTION(".text.vsf.kernel.vk_thread_call_fsm")
-fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param, size_t local_size)
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
+SECTION(".text.vsf.kernel.vk_thread_call_task")
+fsm_rt_t vk_thread_call_task(vsf_task_entry_t task_handler, uintptr_t param, size_t local_size)
 {
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     class_internal(thread_obj, thread, vsf_thread_t);
@@ -605,7 +605,7 @@ fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param, size_t
     fsm_rt_t ret;
 
     while (1) {
-        ret = __vsf_eda_call_fsm(eda_handler, param, local_size);
+        ret = __vsf_eda_call_task(task_handler, param, local_size);
         if (fsm_rt_on_going == ret) {
             __vsf_eda_yield();
         } else {

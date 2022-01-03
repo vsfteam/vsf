@@ -24,6 +24,9 @@
 #if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
 #include "../../vsf_eda.h"
 #include "./vsf_simple_bmpevt.h"
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED
+#   include "../../task/vsf_task.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -312,10 +315,12 @@ extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
                                 size_t local_buff_size,
                                 uintptr_t local_buff);
 
-SECTION(".text.vsf.kernel.__vsf_call_fsm")
-extern fsm_rt_t __vsf_call_fsm( vsf_fsm_entry_t entry,
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
+SECTION(".text.vsf.kernel.__vsf_call_task")
+extern fsm_rt_t __vsf_call_task(vsf_task_entry_t entry,
                                 uintptr_t param,
                                 size_t local_size);
+#   endif
 
 #ifdef __cplusplus
 }

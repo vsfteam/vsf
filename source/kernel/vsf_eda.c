@@ -96,8 +96,8 @@ extern vsf_prio_t __vsf_os_evtq_get_priority(vsf_evtq_t *pthis);
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-SECTION(".text.vsf.kernel.eda_fsm")
-static void __vsf_eda_fsm_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
+SECTION(".text.vsf.kernel.eda_task")
+extern void __vsf_eda_task_evthandler_process_return_value(vsf_eda_t *eda, vsf_evt_t evt);
 #endif
 
 SECTION(".text.vsf.kernel.__vsf_eda_get_valid_eda")
@@ -240,7 +240,7 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
 
 #   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         if (pthis->flag.feature.is_subcall_has_return_value) {
-            __vsf_eda_fsm_evthandler(pthis, evt);
+            __vsf_eda_task_evthandler_process_return_value(pthis, evt);
         } else {
             if (    ((uintptr_t)NULL == frame->ptr.target)     //!< no param
                 &&  (0 == frame->state.local_size)) {       //!< no local
@@ -733,80 +733,6 @@ vsf_err_t __vsf_eda_call_eda(   uintptr_t evthandler,
     return __vsf_eda_call_eda_ex(evthandler, param, state, true);
 }
 
-#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-SECTION(".text.vsf.kernel.eda_fsm")
-fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry,
-                            uintptr_t param,
-                            size_t local_size)
-{
-    vsf_eda_t *pthis = vsf_eda_get_cur();
-
-    fsm_rt_t fsm_return_state = pthis->fsm_return_state;
-    __vsf_eda_frame_state_t state   = {
-        .feature.is_subcall_has_return_value    = true,
-        .local_size                             = local_size,
-    };
-    switch(fsm_return_state) {
-        case fsm_rt_on_going:
-        case fsm_rt_wait_for_obj:
-        //case fsm_rt_asyn:
-            break;
-        default:
-            pthis->fsm_return_state = fsm_rt_on_going;
-            return fsm_return_state;
-    }
-
-
-    __vsf_eda_call_eda_ex((uintptr_t)entry, param, state, true);
-
-    /*! \note
-     *  - if VSF_ERR_NOT_ENOUGH_RESOURCES is detected, yield and try it again
-     *  (automatically). For tasks sharing the same frame pool, if the pool is
-     *  too small, only task performance will be affected, and all sub-task call
-     *  will work when frame is allocated.
-     *  - if the frame is allocated and pushed to the stack, we should yield to
-     *  let the sub-task run.
-     *
-     *  Since in either way, we will yield, no need to handle the return
-     *  value of vsf_eda_call().
-     */
-    return fsm_rt_yield;
-}
-
-SECTION(".text.vsf.kernel.eda_fsm")
-static void __vsf_eda_fsm_evthandler(vsf_eda_t *pthis, vsf_evt_t evt)
-{
-    fsm_rt_t ret;
-    VSF_KERNEL_ASSERT(     pthis != NULL
-            &&  NULL != pthis->fn.frame
-            &&  NULL != pthis->fn.frame->fn.fsm_entry);
-
-    uintptr_t param = pthis->fn.frame->ptr.target;
-    if  (   ((uintptr_t)NULL == param)                             //!< no param
-        &&  (0 == pthis->fn.frame->state.local_size)) {      //!< no local
-        param = (uintptr_t )pthis;                           //!< it is a pure eda
-    }
-
-    ret = pthis->fn.frame->fn.fsm_entry((uintptr_t)(pthis->fn.frame + 1), evt);
-    pthis->fsm_return_state = ret;
-    switch(ret) {
-        default:            //! return fsm_rt_err
-        case fsm_rt_asyn:   //! call sub fsm later
-        case fsm_rt_cpl:
-            if (vsf_eda_return()) {
-                return ;
-            }
-            break ;
-        case fsm_rt_wait_for_evt:
-            //! delay, wait_for, mutex_pend, sem_pend and etc...
-            return ;
-        case fsm_rt_yield:
-            __vsf_eda_yield();
-            return;
-    }
-}
-
-#endif      // VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 
 
@@ -868,7 +794,7 @@ static void __vsf_eda_init_member(
     pthis->flag.value = 0;
     pthis->flag.feature = feature;
 #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-    pthis->fsm_return_state = fsm_rt_on_going;
+    pthis->subcall_return_value = fsm_rt_on_going;
 #endif
 
 #if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
@@ -933,7 +859,7 @@ vsf_err_t vsf_eda_start(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg_ptr)
     }
     //frame->flag = 0;                  //!< clear all flags (Done with memset)
 
-    frame->fn.fsm_entry = cfg_ptr->fn.fsm_entry;
+    frame->fn.func = cfg_ptr->fn.func;
     frame->ptr.target = cfg_ptr->target;
     frame->state.feature = cfg_ptr->feature;
 #endif

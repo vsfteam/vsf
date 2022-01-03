@@ -19,11 +19,15 @@
 #define __VSF_THREAD_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED && VSF_USE_KERNEL == ENABLED
 #include "../vsf_eda.h"
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED
+#   include "./vsf_task.h"
+#endif
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file
@@ -344,14 +348,9 @@ extern "C" {
 
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-
-#   define vsf_thread_call_fsm(__name, __target, ...)                           \
-                vk_thread_call_fsm(  (vsf_fsm_entry_t)(__name),                 \
-                                        (uintptr_t)(__target), (0, ##__VA_ARGS__))
-
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 #   define vsf_thread_call_task(__name, __target, ...)                          \
-                vsf_thread_call_fsm(vsf_task_func(__name), __target, (0, ##__VA_ARGS__))
+                vk_thread_call_task(vsf_task_func(__name), __target, (0, ##__VA_ARGS__))
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -468,9 +467,11 @@ extern vsf_err_t vk_eda_call_thread_prepare( vsf_thread_cb_t *thread_cb,
 SECTION(".text.vsf.kernel.vk_eda_call_thread")
 extern vsf_err_t vk_eda_call_thread(vsf_thread_cb_t *thread_cb);
 
-SECTION(".text.vsf.kernel.vk_thread_call_fsm")
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
+SECTION(".text.vsf.kernel.vk_thread_call_task")
 extern
-fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param, size_t local_size);
+fsm_rt_t vk_thread_call_task(vsf_task_entry_t task_handler, uintptr_t param, size_t local_size);
+#endif
 
 SECTION(".text.vsf.kernel.vk_thread_call_eda")
 extern

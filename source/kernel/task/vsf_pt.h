@@ -137,30 +137,27 @@ extern "C" {
             __vsf_pt_call_sub(vsf_pt_func(__name), (__target))
 
 #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-#   define __vsf_pt_call_fsm(__name, __target, ...)                             \
-            __vsf_eda_call_fsm( (vsf_fsm_entry_t)(__name),                      \
+#   define __vsf_pt_call_task(__name, __target, ...)                            \
+            __vsf_eda_call_task((vsf_task_entry_t)(__name),                     \
                                 (uintptr_t)(__target),                          \
                                 (0, ##__VA_ARGS__))
 
 
-#   define vsf_pt_call_fsm(__name, __target, __ret_addr, ...)                   \
+#   define vsf_pt_call_task(__name, __target, __ret_addr, ...)                  \
         do {                                                                    \
-            fsm_rt_t VSF_MCONNECT3(__vsf_pt_call_fsm,__LINE__,tReturn);         \
+            fsm_rt_t VSF_MCONNECT3(__vsf_pt_call_task,__LINE__,tReturn);        \
             vsf_pt_entry();                                                     \
-            VSF_MCONNECT3(__vsf_pt_call_fsm,__LINE__,tReturn) =                 \
-                __vsf_pt_call_fsm(__name, (__target), (0, ##__VA_ARGS__));      \
+            VSF_MCONNECT3(__vsf_pt_call_task,__LINE__,tReturn) =                \
+                __vsf_pt_call_task(vsf_task_func(__name), (__target), (0, ##__VA_ARGS__));\
             if (fsm_rt_on_going ==                                              \
-                VSF_MCONNECT3(__vsf_pt_call_fsm,__LINE__,tReturn)) {            \
+                VSF_MCONNECT3(__vsf_pt_call_task,__LINE__,tReturn)) {           \
                 return ;                                                        \
             }                                                                   \
             if (NULL != (__ret_addr)) {                                         \
                 *(__ret_addr) =                                                 \
-                    VSF_MCONNECT3(__vsf_pt_call_fsm,__LINE__,tReturn);          \
+                    VSF_MCONNECT3(__vsf_pt_call_task,__LINE__,tReturn);         \
             }                                                                   \
         } while(0)
-
-#   define vsf_pt_call_task(__name, __target, __ret_addr, ...)                  \
-        vsf_pt_call_fsm(vsf_task_func(__name), __target, __ret_addr, (0, ##__VA_ARGS__))
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
