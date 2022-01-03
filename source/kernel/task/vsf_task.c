@@ -21,6 +21,7 @@
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_USE_KERNEL == ENABLED
 
+#define __VSF_EDA_CLASS_INHERIT__
 #include "./vsf_task.h"
 
 /*============================ MACROS ========================================*/
