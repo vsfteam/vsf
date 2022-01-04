@@ -64,3 +64,6 @@
 [submodule "source/hal/driver/AIC/AIC8800/vendor"]
 	path = source/hal/driver/AIC/AIC8800/vendor
 	url = ../AIC8800M_SDK_vsf
+[submodule "source/component/3rd-party/littlefs/raw"]
+	path = source/component/3rd-party/littlefs/raw
+	url = https://github.com/littlefs-project/littlefs.git
