@@ -303,8 +303,6 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #       define VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE  4096
 //  VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB is by default disabled, no need root_hub support
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
-// some version of AIC8800 has problem with disconnect level, use port disable as a replacement
-#   define VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT ENABLED
 #   define VSF_USBH_USE_DL1X5                           ENABLED
 #       define VSF_DISP_USE_DL1X5                       ENABLED
 //  enable VSF_USBH_DL1X5_CFG_READ_EDID only if EDID is not available,

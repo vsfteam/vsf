@@ -50,6 +50,9 @@
 // required by dwcotg, define the max ep number of dwcotg include ep0
 #define USB_DWCOTG_MAX_EP_NUM       16
 
+// AIC8800 has problem with usbh disconnect detecting level, use port disable as a replacement
+#define VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT    ENABLED
+
 #define USB_OTG0_IRQHandler         USBDMA_IRQHandler
 #define USB_OTG0_CONFIG                                                         \
             .dc_ep_num              = 4 << 1,                                   \
