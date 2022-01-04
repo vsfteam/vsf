@@ -242,6 +242,7 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
         if (pthis->flag.feature.is_subcall_has_return_value) {
             __vsf_eda_task_evthandler_process_return_value(pthis, evt);
         } else {
+#   endif
             if (    ((uintptr_t)NULL == frame->ptr.target)     //!< no param
                 &&  (0 == frame->state.local_size)) {       //!< no local
                 VSF_KERNEL_ASSERT(frame->fn.evthandler != NULL);
@@ -251,16 +252,7 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
                 //frame->fn.param_evthandler(frame->ptr.target, evt);
                 frame->fn.param_evthandler((uintptr_t)(frame + 1), evt);
             }
-        }
-#   else
-        if (    ((uintptr_t)NULL == frame->ptr.target)         //!< no param
-                &&  (0 == frame->state.local_size)) {       //!< no local
-                VSF_KERNEL_ASSERT(frame->fn.evthandler != NULL);
-                frame->fn.evthandler(pthis, evt);        //!< this is a pure eda
-        } else {
-            VSF_KERNEL_ASSERT(frame->fn.param_evthandler != NULL);
-            //frame->fn.param_evthandler(frame->ptr.target, evt);
-            frame->fn.param_evthandler((uintptr_t)(frame + 1), evt);
+#   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         }
 #   endif
     } else {
