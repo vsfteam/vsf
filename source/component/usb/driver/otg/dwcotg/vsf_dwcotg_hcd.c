@@ -1264,6 +1264,13 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
             *dwcotg_hcd->reg.host.hprt0 = hprt0_masked | USB_OTG_HPRT_PCDET;
             // disable rx queue interrupt which is used to clear CH_HALTED while device disconnected
             dwcotg_hcd->reg.global_regs->gintmsk &= ~USB_OTG_GINTMSK_RXFLVLM;
+#   if VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT == ENABLED
+            // if disconnect is not enabled, below timing will not be supported, so simply send a disconnect event first
+            //  PCDET       -- connected
+            //  DISCONNECT  -- disconnect, not detected, because port is not disabled
+            //  PCDET       -- connected again, because previous disconnect event is missing, current connect event will not be processed
+            vsf_eda_post_evt((vsf_eda_t *)&dwcotg_hcd->task, VSF_DWCOTG_HCD_EVT_DISC);
+#   endif
             vsf_eda_post_evt((vsf_eda_t *)&dwcotg_hcd->task, VSF_DWCOTG_HCD_EVT_CONN);
         }
         if (hprt0 & USB_OTG_HPRT_PENCHNG) {
