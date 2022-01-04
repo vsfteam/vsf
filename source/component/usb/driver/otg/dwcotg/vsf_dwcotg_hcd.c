@@ -66,6 +66,10 @@
 #   define __VSF_DWCOTG_HCD_CFG_PORT_RESET_CHECK        DISABLED
 #endif
 
+// VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT:
+// use port disable as disconnect event, some MCU will falsely detect device
+//  disconnect event, but port disable event is stable.
+
 #define USB_OTG_HPRT_W1C_MASK                                                   \
         (USB_OTG_HPRT_PENA | USB_OTG_HPRT_PCDET | USB_OTG_HPRT_PENCHNG | USB_OTG_HPRT_POCCHNG)
 
@@ -693,7 +697,10 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             // TODO: add back USB_OTG_GINTMSK_PXFRM_IISOOXFRM if know how to process
             reg->global_regs->gintmsk |= USB_OTG_GINTMSK_HCIM | USB_OTG_GINTMSK_SOFM
 #if VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB != ENABLED
-                                        | USB_OTG_GINTMSK_PRTIM | USB_OTG_GINTMSK_DISCINT
+                                        | USB_OTG_GINTMSK_PRTIM
+#   if VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT != ENABLED
+                                        | USB_OTG_GINTMSK_DISCINT
+#   endif
 #endif
                                         ;
             reg->global_regs->gahbcfg |= USB_OTG_GAHBCFG_GINT;
@@ -1261,16 +1268,23 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
         }
         if (hprt0 & USB_OTG_HPRT_PENCHNG) {
             *dwcotg_hcd->reg.host.hprt0 = hprt0_masked | USB_OTG_HPRT_PENCHNG;
+#   if VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT == ENABLED
+            if (!(hprt0 & USB_OTG_HPRT_PENA)) {
+                vsf_eda_post_evt((vsf_eda_t *)&dwcotg_hcd->task, VSF_DWCOTG_HCD_EVT_DISC);
+            }
+#   endif
         }
         if (hprt0 & USB_OTG_HPRT_POCCHNG) {
             *dwcotg_hcd->reg.host.hprt0 = hprt0_masked | USB_OTG_HPRT_POCCHNG;
         }
         *intsts_reg = USB_OTG_GINTSTS_HPRTINT;
     }
+#   if VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT != ENABLED
     if (intsts & USB_OTG_GINTSTS_DISCINT) {
         *intsts_reg = USB_OTG_GINTSTS_DISCINT;
         vsf_eda_post_evt((vsf_eda_t *)&dwcotg_hcd->task, VSF_DWCOTG_HCD_EVT_DISC);
     }
+#   endif
 #endif
     if (intsts & USB_OTG_GINTSTS_PTXFE) {
         *intsts_reg = USB_OTG_GINTSTS_PTXFE;
