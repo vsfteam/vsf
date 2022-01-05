@@ -85,7 +85,7 @@ vsf_class(vk_lfs_info_t) {
         int op;
         union {
             struct {
-                lfs_dir_t *dir;
+                vk_file_t *dir;
                 const char *name;
                 uint_fast32_t idx;
             } open;
@@ -112,8 +112,7 @@ vsf_class(vk_lfs_info_t) {
             int ret;
             union {
                 struct {
-                    lfs_file_t *file;
-                    lfs_dir_t *dir;
+                    vk_lfs_file_t *file;
                 } open;
                 struct {
                     lfs_ssize_t size;

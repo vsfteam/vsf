@@ -9,11 +9,26 @@ extern "C"
 {
 #endif
 
+#ifndef PRId8
+#   define PRId8            "d"
+#endif
+#ifndef PRId16
+#   define PRId16           "d"
+#endif
+#ifndef PRId32
+#   define PRId32           "d"
+#endif
+#ifndef PRIu8
+#   define PRIu8            "u"
+#endif
 #ifndef PRIu16
 #   define PRIu16           "u"
 #endif
 #ifndef PRIu32
 #   define PRIu32           "u"
+#endif
+#ifndef PRIx8
+#   define PRIx8            "x"
 #endif
 #ifndef PRIx16
 #   define PRIx16           "x"
