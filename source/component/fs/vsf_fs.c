@@ -637,7 +637,10 @@ __vsf_component_peda_ifs_entry(__vk_vfs_mount, vk_fs_mount)
         }
 
         err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+        vsf_eda_return(err);
+        break;
     case VSF_EVT_RETURN:
+        err = vsf_eda_get_return_value();
         if (VSF_ERR_NONE == err) {
             vk_file_t *root = dir->subfs.root;
             dir->attr |= VSF_VFS_FILE_ATTR_MOUNTED;

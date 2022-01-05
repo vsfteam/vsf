@@ -330,9 +330,18 @@ extern vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, uint_fast64_t add
 
 /*============================ INCLUDES ======================================*/
 
-#include "./driver/fatfs/vsf_fatfs.h"
-#include "./driver/memfs/vsf_memfs.h"
-#include "./driver/winfs/vsf_winfs.h"
+#if VSF_FS_USE_FATFS == ENABLED
+#   include "./driver/fatfs/vsf_fatfs.h"
+#endif
+#if VSF_FS_USE_MEMFS == ENABLED
+#   include "./driver/memfs/vsf_memfs.h"
+#endif
+#if VSF_FS_USE_WINFS == ENABLED
+#   include "./driver/winfs/vsf_winfs.h"
+#endif
+#if VSF_FS_USE_LITTLEFS == ENABLED
+#   include "./driver/littlefs/vsf_littlefs.h"
+#endif
 
 #undef __VSF_FS_CLASS_IMPLEMENT
 #undef __VSF_FS_CLASS_INHERIT__
