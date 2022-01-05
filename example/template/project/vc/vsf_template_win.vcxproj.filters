@@ -1102,6 +1102,18 @@
     <Filter Include="usrapp\demo\cpu_usage_demo">
       <UniqueIdentifier>{4260269b-d44e-4cb2-8b6d-99e136d2841c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\3rd-party\littlefs">
+      <UniqueIdentifier>{71b224d1-eabc-43b2-ab2d-b0be0e5aa21f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlefs\raw">
+      <UniqueIdentifier>{cecd242d-f4e1-46ac-82b8-101fa36ae9e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\fs\driver\littlefs">
+      <UniqueIdentifier>{09f370db-8d80-4f10-8e98-2bf01f33a621}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlefs\port">
+      <UniqueIdentifier>{2d6fb79c-5483-4650-bc27-5f6985d91405}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3287,6 +3299,18 @@
     </ClInclude>
     <ClInclude Include="..\..\config\3rd-party\mbedtls\config.h">
       <Filter>usrapp\config\3rd-party\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\littlefs\raw\lfs.h">
+      <Filter>vsf\component\3rd-party\littlefs\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\fs\driver\littlefs\vsf_littlefs.h">
+      <Filter>vsf\component\fs\driver\littlefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\littlefs\port\lfs_port.h">
+      <Filter>vsf\component\3rd-party\littlefs\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\littlefs\port\lfs_util_vsf.h">
+      <Filter>vsf\component\3rd-party\littlefs\port</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5749,6 +5773,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
       <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\littlefs\raw\lfs.c">
+      <Filter>vsf\component\3rd-party\littlefs\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\fs\driver\littlefs\vsf_littlefs.c">
+      <Filter>vsf\component\fs\driver\littlefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\littlefs\port\lfs_port.c">
+      <Filter>vsf\component\3rd-party\littlefs\port</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
