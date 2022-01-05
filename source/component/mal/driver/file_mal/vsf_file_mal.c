@@ -86,6 +86,7 @@ __vsf_component_peda_ifs_entry(__vk_file_mal_init, vk_mal_init)
     vsf_peda_begin();
     vk_file_mal_t *pthis = (vk_file_mal_t *)&vsf_this;
     VSF_MAL_ASSERT((pthis != NULL) && (pthis->file != NULL) && (pthis->block_size > 0));
+    pthis->size = pthis->file->size - (pthis->file->size % pthis->block_size);
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
