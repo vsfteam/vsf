@@ -185,6 +185,12 @@ __vsf_component_peda_ifs_entry(__vk_lfs_mount, vk_fs_mount)
         vsf_thread_start(&fsinfo->thread, &fsinfo->thread_cb, vsf_prio_inherit);
         break;
     case VSF_EVT_RETURN:
+        if (0 == fsinfo->result.ret) {
+            fsinfo->root.attr = VSF_FILE_ATTR_DIRECTORY;
+            fsinfo->root.name = NULL;
+            fsinfo->root.info = fsinfo;
+            dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
+        }
         vsf_eda_return(fsinfo->result.ret < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE);
         break;
     }

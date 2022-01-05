@@ -52,6 +52,21 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+vsf_dcl_class(vk_lfs_info_t)
+
+vsf_class(vk_lfs_file_t) {
+    public_member(
+        implement(vk_file_t)
+    )
+    private_member(
+        union {
+            lfs_file_t lfs_file;
+            lfs_dir_t lfs_dir;
+        };
+        vk_lfs_info_t *info;
+    )
+};
+
 vsf_class(vk_lfs_info_t) {
     public_member(
         struct lfs_config config;
@@ -109,19 +124,8 @@ vsf_class(vk_lfs_info_t) {
             };
         } result;
         vsf_eda_t *caller;
-    )
-};
 
-vsf_class(vk_lfs_file_t) {
-    public_member(
-        implement(vk_file_t)
-    )
-    private_member(
-        union {
-            lfs_file_t lfs_file;
-            lfs_dir_t lfs_dir;
-        };
-        vk_lfs_info_t *info;
+        vk_lfs_file_t root;
     )
 };
 

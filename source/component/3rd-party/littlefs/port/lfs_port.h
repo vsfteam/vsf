@@ -35,5 +35,7 @@ extern int vsf_lfs_mal_read(const struct lfs_config *c, lfs_block_t block,
             lfs_off_t off, void *buffer, lfs_size_t size);
 extern int vsf_lfs_mal_prog(const struct lfs_config *c, lfs_block_t block,
             lfs_off_t off, const void *buffer, lfs_size_t size);
+extern int vsf_lfs_mal_erase(const struct lfs_config *c, lfs_block_t block);
+extern int vsf_lfs_mal_sync(const struct lfs_config *c);
 
 #endif      // VSF_USE_LITTLEFS
