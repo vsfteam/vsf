@@ -67,11 +67,18 @@ int	 getopt_long_only(int, char * const *, const char *,
 #ifndef _GETOPT_DEFINED_
 #define _GETOPT_DEFINED_
 int	 getopt(int, char * const *, const char *);
-extern   char *optarg;                  /* getopt(3) external variables */
-extern   int opterr;
-extern   int optind;
-extern   int optopt;
-extern   int optreset;
+// for vsf linux, put these variable in process context and implement them as macro
+#include "shell/sys/linux/vsf_linux.h"
+#define opterr			vsf_linux_get_cur_process()->__opterr
+#define optind			vsf_linux_get_cur_process()->__optind
+#define optopt			vsf_linux_get_cur_process()->__optopt
+#define optarg			vsf_linux_get_cur_process()->__optarg
+#define optreset		vsf_linux_get_cur_process()->__optreset
+//extern   char *optarg;                  /* getopt(3) external variables */
+//extern   int opterr;
+//extern   int optind;
+//extern   int optopt;
+//extern   int optreset;
 #if 0 /* MISSING FROM BIONIC */
 int       getsubopt(char **, char * const *, char **);
 extern   char *suboptarg;               /* getsubopt(3) external variable */

@@ -62,12 +62,13 @@
 #include <stdio.h>
 #define	REPLACE_GETOPT		/* use this getopt as the system getopt(3) */
 #ifdef REPLACE_GETOPT
-int	opterr = 1;		/* if error message should be printed */
-int	optind = 1;		/* index into parent argv vector */
-int	optopt = '?';		/* character checked for validity */
-char    *optarg;		/* argument associated with option */
+// for vsf linux, put these variable in process context and implement them as macro
+//int	opterr = 1;		/* if error message should be printed */
+//int	optind = 1;		/* index into parent argv vector */
+//int	optopt = '?';		/* character checked for validity */
+//char    *optarg;		/* argument associated with option */
 #endif
-int	optreset;		/* reset getopt */
+//int	optreset;		/* reset getopt */
 #define PRINT_ERROR	((opterr) && (*options != ':'))
 #define FLAG_PERMUTE	0x01	/* permute non-options to the end of argv */
 #define FLAG_ALLARGS	0x02	/* treat non-options as args to option "-1" */

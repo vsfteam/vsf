@@ -144,6 +144,13 @@ dcl_vsf_bitmap(vsf_linux_fd_bitmap, VSF_LINUX_CFG_FD_BITMAP_SIZE);
 vsf_class(vsf_linux_process_t) {
     public_member(
         vsf_linux_process_ctx_t ctx;
+
+        // for getopt
+        int __opterr;
+        int __optind;
+        int __optopt;
+        char *__optarg;
+        int __optreset;
     )
 
     protected_member(
@@ -213,10 +220,12 @@ extern int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priorit
 
 extern void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread);
 extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);
-extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
 extern vsf_linux_thread_t * vsf_linux_get_thread(int tid);
 extern vsf_linux_process_t * vsf_linux_get_process(pid_t pid);
 #endif
+
+// open vsf_linux_get_cur_process for getopt variables
+extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
 
 #ifdef __cplusplus
 }

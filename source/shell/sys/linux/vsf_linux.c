@@ -374,6 +374,11 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
         process->term[STDIN_FILENO].c_lflag = ECHO;
         process->term[STDIN_FILENO].c_cc[VMIN] = 1;
 
+        // getopt
+        process->__opterr = 1;
+        process->__optind = 1;
+        process->__optopt = '?';
+
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {
             vsf_heap_free(process);
