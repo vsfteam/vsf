@@ -166,7 +166,7 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                     }
                     output_file->name = vsf_heap_malloc(strlen(name) + 1);
                     if (NULL == output_file) {
-                        vk_file_free(output_file);
+                        vk_file_free(&output_file->use_as__vk_file_t);
                         ret = -1;
                         break;
                     }
@@ -181,7 +181,7 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                         break;
                     case LFS_TYPE_DIR:
                         output_file->attr = VSF_FILE_ATTR_DIRECTORY;
-                        lfs_file_open(lfs, &output_file->lfs_dir, path, LFS_O_RDWR);
+                        lfs_dir_open(lfs, &output_file->lfs_dir, path);
                         break;
                     }
 
