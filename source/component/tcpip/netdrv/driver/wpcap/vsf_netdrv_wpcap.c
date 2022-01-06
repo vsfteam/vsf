@@ -46,8 +46,8 @@
 
 static vsf_err_t __vk_netdrv_wpcap_netlink_init(vk_netdrv_t *netdrv);
 static vsf_err_t __vk_netdrv_wpcap_netlink_fini(vk_netdrv_t *netdrv);
-static bool __vk_netdrv_wpcap_netlink_can_output(vk_netdrv_t *netdrv);
-static vsf_err_t __vk_netdrv_wpcap_netlink_output(vk_netdrv_t *netdrv, void *netbuf);
+static void * __vk_netdrv_wpcap_netlink_can_output(vk_netdrv_t *netdrv);
+static vsf_err_t __vk_netdrv_wpcap_netlink_output(vk_netdrv_t *netdrv, void *slot, void *netbuf);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -215,12 +215,12 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_fini(vk_netdrv_t *netdrv)
     return VSF_ERR_NONE;
 }
 
-static bool __vk_netdrv_wpcap_netlink_can_output(vk_netdrv_t *netdrv)
+static void * __vk_netdrv_wpcap_netlink_can_output(vk_netdrv_t *netdrv)
 {
-    return true;
+    return (void *)1;
 }
 
-static vsf_err_t __vk_netdrv_wpcap_netlink_output(vk_netdrv_t *netdrv, void *netbuf)
+static vsf_err_t __vk_netdrv_wpcap_netlink_output(vk_netdrv_t *netdrv, void *slot, void *netbuf)
 {
     vk_netdrv_wpcap_t *wpcap_netdrv = (vk_netdrv_wpcap_t *)netdrv;
     uint8_t buffer[wpcap_netdrv->mtu];
