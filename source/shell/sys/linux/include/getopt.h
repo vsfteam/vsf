@@ -33,7 +33,14 @@
 #ifndef _GETOPT_H_
 #define _GETOPT_H_
 
-#include <sys/cdefs.h>
+//#include <sys/cdefs.h>
+#ifdef __cplusplus
+#   define __BEGIN_DECLS    extern "C" {
+#   define __END_DECLS      }
+#else
+#   define __BEGIN_DECLS
+#   define __END_DECLS
+#endif
 
 /*
  * GNU-like getopt_long()

@@ -9,4 +9,9 @@
 #   define __END_DECLS
 #endif
 
+#define __THROW
+#define __THROWNL
+#define __NTH(Fct)          fct
+#define __NTHNL(fct)        fct
+
 #endif      // __VSF_LINUX_CDEFS_H__
