@@ -77,6 +77,9 @@ static void __cleanup_winfs_fsdata(void *fsdata)
 {
     vk_winfs_info_t *fsinfo = fsdata;
     if (fsinfo != NULL) {
+        if (fsinfo->root.name != NULL) {
+            free(fsinfo->root.name);
+        }
         free(fsinfo);
     }
 }
@@ -97,6 +100,9 @@ static void __cleanup_linfs_fsdata(void *fsdata)
 {
     vk_linfs_info_t *fsinfo = fsdata;
     if (fsinfo != NULL) {
+        if (fsinfo->root.name != NULL) {
+            free(fsinfo->root.name);
+        }
         free(fsinfo);
     }
 }

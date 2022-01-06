@@ -58,9 +58,6 @@ extern "C" {
 #if VSF_FS_USE_MEMFS == ENABLED
 #   define USRAPP_CFG_MEMFS_ROOT                fakefat32_root
 #endif
-#if VSF_FS_USE_WINFS == ENABLED
-#   define USRAPP_CFG_WINFS_ROOT                "winfs_root"
-#endif
 
 #if USRAPP_CFG_FAKEFAT32 == ENABLED
 #   ifndef USRAPP_CFG_FAKEFAT32_SECTOR_SIZE
@@ -79,8 +76,7 @@ extern "C" {
 
 #if     VSF_USE_FS == ENABLED                                                   \
     &&  (   VSF_MAL_USE_FAKEFAT32_MAL == ENABLED                                \
-        ||  VSF_FS_USE_MEMFS == ENABLED                                         \
-        ||  VSF_FS_USE_WINFS == ENABLED)
+        ||  VSF_FS_USE_MEMFS == ENABLED)
 
 typedef struct usrapp_common_t {
 #   if      VSF_USE_MAL == ENABLED                                              \
@@ -93,13 +89,10 @@ typedef struct usrapp_common_t {
 #   endif
 
 #   if      VSF_USE_FS == ENABLED                                               \
-        &&  (VSF_FS_USE_MEMFS == ENABLED || VSF_FS_USE_WINFS == ENABLED)
+        &&  (VSF_FS_USE_MEMFS == ENABLED)
     struct {
 #       if VSF_FS_USE_MEMFS == ENABLED
         vk_memfs_info_t memfs_info;
-#       endif
-#       if VSF_FS_USE_WINFS == ENABLED
-        vk_winfs_info_t winfs_info;
 #       endif
     } fs;
 #   endif
@@ -110,8 +103,7 @@ typedef struct usrapp_common_t {
 
 #if     VSF_USE_FS == ENABLED                                                   \
     &&  (   VSF_MAL_USE_FAKEFAT32_MAL == ENABLED                                \
-        ||  VSF_FS_USE_MEMFS == ENABLED                                         \
-        ||  VSF_FS_USE_WINFS == ENABLED)
+        ||  VSF_FS_USE_MEMFS == ENABLED)
 extern usrapp_common_t usrapp_common;
 #endif
 

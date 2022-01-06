@@ -110,17 +110,6 @@ int vsf_linux_create_fhs(void)
     }
 #endif
 
-#if VSF_USE_FS == ENABLED && VSF_FS_USE_WINFS == ENABLED
-    if (mkdir("/winfs", 0)) {
-        return -1;
-    }
-    fd = open("/winfs", 0);
-    if (fd >= 0) {
-        close(fd);
-        mount(NULL, "/winfs", &vk_winfs_op, 0, &usrapp_common.fs.winfs_info);
-    }
-#endif
-
 #if APP_USE_SCSI_DEMO == ENABLED
     if (mkdir("/scsi", 0)) {
         return -1;
