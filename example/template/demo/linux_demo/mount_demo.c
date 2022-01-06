@@ -119,7 +119,7 @@ static __fs_type_t __fs_types[] = {
 #if VSF_FS_USE_FATFS == ENABLED
     {
         .fs                 = "fatfs",
-        .fsop               = &vk_fatfs_op,
+        .fsop               = NULL,
         .prepare_fsdata     = __prepare_file_mal_fsdata,
         .cleanup_fsdata     = __cleanup_file_mal_fsdata,
         .need_block_size    = true,
@@ -226,7 +226,7 @@ int mount_main(int argc, char *argv[])
         }
     }
     // last 2 parameters are device and dir
-    if ((argc < 3) || (optind + 2 < argc)) {
+    if ((argc < 3) || (optind + 2 != argc)) {
         goto print_help;
     }
 
