@@ -1,5 +1,6 @@
-/*	$OpenBSD: getopt.h,v 1.1 2002/12/03 20:24:29 millert Exp $	*/
+/*	$OpenBSD: getopt.h,v 1.3 2013/11/22 21:32:49 millert Exp $	*/
 /*	$NetBSD: getopt.h,v 1.4 2000/07/07 10:43:54 ad Exp $	*/
+
 /*-
  * Copyright (c) 2000 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -15,13 +16,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *        This product includes software developed by the NetBSD
- *        Foundation, Inc. and its contributors.
- * 4. Neither the name of The NetBSD Foundation nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -35,17 +29,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef _GETOPT_H_
 #define _GETOPT_H_
-//#include <sys/cdefs.h>
-#define __BEGIN_DECLS
-#define __END_DECLS
+
+#include <sys/cdefs.h>
+
 /*
- * GNU-like getopt_long() and 4.4BSD getsubopt()/optreset extensions
+ * GNU-like getopt_long()
  */
 #define no_argument        0
 #define required_argument  1
 #define optional_argument  2
+
 struct option {
 	/* name of long option */
 	const char *name;
@@ -59,6 +55,7 @@ struct option {
 	/* if flag not NULL, value to set *flag to; else return value */
 	int val;
 };
+
 __BEGIN_DECLS
 int	 getopt_long(int, char * const *, const char *,
 	    const struct option *, int *);
@@ -79,10 +76,6 @@ int	 getopt(int, char * const *, const char *);
 //extern   int optind;
 //extern   int optopt;
 //extern   int optreset;
-#if 0 /* MISSING FROM BIONIC */
-int       getsubopt(char **, char * const *, char **);
-extern   char *suboptarg;               /* getsubopt(3) external variable */
-#endif /* MISSING */
 #endif
 __END_DECLS
  

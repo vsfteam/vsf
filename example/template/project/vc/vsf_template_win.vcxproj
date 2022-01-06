@@ -648,6 +648,7 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\time.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\wchar.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\syslog.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\cdefs.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\ipc.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\mount.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\resource.h" />

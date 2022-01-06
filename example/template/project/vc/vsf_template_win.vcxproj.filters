@@ -3312,6 +3312,9 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\littlefs\port\lfs_util_vsf.h">
       <Filter>vsf\component\3rd-party\littlefs\port</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\cdefs.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
