@@ -3830,9 +3830,6 @@
     <ClCompile Include="..\..\..\..\source\component\mal\driver\file_mal\vsf_file_mal.c">
       <Filter>vsf\component\mal\driver\file_mal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\demo\linux_demo\mount_file_demo.c">
-      <Filter>usrapp\demo\linux_demo</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\vsf_tgui_v.c">
       <Filter>vsf\component\ui\tgui\view</Filter>
     </ClCompile>
@@ -5782,6 +5779,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\littlefs\port\lfs_port.c">
       <Filter>vsf\component\3rd-party\littlefs\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\linux_demo\mount_demo.c">
+      <Filter>usrapp\demo\linux_demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

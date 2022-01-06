@@ -41,7 +41,7 @@
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    DISABLED
-#   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
+#   define APP_USE_LINUX_MOUNT_DEMO                     DISABLED
 #define APP_USE_USBH_DEMO                               DISABLED
 #define APP_USE_USBD_DEMO                               DISABLED
 #   define APP_USE_USBD_CDC_DEMO                        ENABLED

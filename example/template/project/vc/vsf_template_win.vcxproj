@@ -1543,7 +1543,7 @@
     <ClCompile Include="..\..\demo\linux_demo\httpd_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\libusb_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\linux_demo.c" />
-    <ClCompile Include="..\..\demo\linux_demo\mount_file_demo.c" />
+    <ClCompile Include="..\..\demo\linux_demo\mount_demo.c" />
     <ClCompile Include="..\..\demo\lua_demo\love_demo.c" />
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_application.c" />
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_demo.c" />

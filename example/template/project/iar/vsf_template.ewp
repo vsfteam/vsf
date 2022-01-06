@@ -5775,7 +5775,7 @@
                     <name>$PROJ_DIR$\..\..\demo\linux_demo\linux_demo.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\demo\linux_demo\mount_file_demo.c</name>
+                    <name>$PROJ_DIR$\..\..\demo\linux_demo\mount_demo.c</name>
                 </file>
             </group>
             <group>

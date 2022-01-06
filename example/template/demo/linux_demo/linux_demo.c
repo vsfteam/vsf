@@ -218,9 +218,9 @@ int vsf_linux_create_fhs(void)
     busybox_bind("/sbin/usbd_user", usbd_user_main);
 #   endif
 #endif
-#if APP_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
-    extern int mount_file_main(int argc, char *argv[]);
-    busybox_bind("/sbin/mount_file", mount_file_main);
+#if APP_USE_LINUX_MOUNT_DEMO == ENABLED
+    extern int mount_main(int argc, char *argv[]);
+    busybox_bind("/sbin/mount", mount_main);
 #endif
 #if APP_USE_LINUX_HTTPD_DEMO == ENABLED
     extern int httpd_main(int argc, char *argv[]);

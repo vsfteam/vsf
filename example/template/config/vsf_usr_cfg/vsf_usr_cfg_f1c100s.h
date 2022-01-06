@@ -27,7 +27,7 @@
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
-#   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
+#   define APP_USE_LINUX_MOUNT_DEMO                     DISABLED
 //  todo: implement drivers for f1c100s
 #define APP_USE_USBH_DEMO                               ENABLED
 #define APP_USE_USBD_DEMO                               DISABLED

@@ -39,7 +39,7 @@
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
-#   define APP_USE_LINUX_MOUNT_FILE_DEMO                ENABLED
+#   define APP_USE_LINUX_MOUNT_DEMO                     ENABLED
 #   define APP_USE_LINUX_HTTPD_DEMO                     ENABLED
 #       define APP_LINUX_HTTPD_DEMO_CFG_ROOT            "/winfs/webroot"
 #define APP_USE_USBH_DEMO                               ENABLED
