@@ -128,5 +128,6 @@ VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开�
 | AIC8800M_SDK      | source/hal/driver/AIC/AIC8800/vendor                          | aic        | http://www.aicsemi.com/                        |
 | awtk              |                                                               | LGPL 2.1   | https://www.zlg.cn/index/pub/awtk.html         |
 | littlefs          | source/component/3rd-party/littlefs/raw                       | BSD        | https://github.com/littlefs-project/littlefs   |
+| getopt_long       | source/shell/sys/linux/lib/glibc/3rd-party                    | OpenBSD    | https://github.com/openbsd/src                 |
 
 ## [文档](document/README_zh.md)
