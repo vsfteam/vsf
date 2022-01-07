@@ -36,6 +36,7 @@ set(VSF_USE_MBEDTLS 1)
 set(VSF_CONFIG_PATH ../../../config)
 get_filename_component(VSF_LVGL_CONFIG_PATH ${VSF_CONFIG_PATH}/3rd-party/lvgl ABSOLUTE)
 get_filename_component(VSF_EVM_CONFIG_PATH ${VSF_CONFIG_PATH}/3rd-party/evm ABSOLUTE)
+get_filename_component(VSF_MBEDTLS_CONFIG_PATH ${VSF_CONFIG_PATH}/3rd-party/mbedtls ABSOLUTE)
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
 
 # add user application source code/include directories
