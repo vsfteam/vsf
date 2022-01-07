@@ -1114,6 +1114,9 @@
     <Filter Include="vsf\component\3rd-party\littlefs\port">
       <UniqueIdentifier>{2d6fb79c-5483-4650-bc27-5f6985d91405}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\3rd-party\mbedtls\port">
+      <UniqueIdentifier>{e04c0e90-ba9e-4f32-8b4f-ed64d25ead65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3311,6 +3314,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\littlefs\port\lfs_util_vsf.h">
       <Filter>vsf\component\3rd-party\littlefs\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\port\platform_vsf.h">
+      <Filter>vsf\component\3rd-party\mbedtls\port</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5782,6 +5788,9 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\linux_demo\mount_demo.c">
       <Filter>usrapp\demo\linux_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\port\platform_vsf.c">
+      <Filter>vsf\component\3rd-party\mbedtls\port</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,10 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     ${VSF_SRC_PATH}/component/3rd-party/lvgl/port/vsf_lvgl_port.c
 )
 target_include_directories(${VSF_LIB_NAME} INTERFACE
+    # some app will include lvgl/lvgl.h
     ${VSF_SRC_PATH}/component/3rd-party/lvgl/raw
+    # some app will include lvgl.h
+    ${VSF_SRC_PATH}/component/3rd-party/lvgl/raw/lvgl
 )
 if (VSF_LVGL_USE_FREETYPE)
     target_sources(${VSF_LIB_NAME} INTERFACE

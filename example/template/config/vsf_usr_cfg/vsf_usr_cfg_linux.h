@@ -26,8 +26,8 @@
 
 // linux support does not support preemption, so need evtq in idle
 #define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
-// test configurations, remove later
 #define VSF_USE_UI                                      ENABLED
+#define VSF_USE_MBEDTLS                                 ENABLED 
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
