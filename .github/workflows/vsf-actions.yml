@@ -1,4 +1,4 @@
-name: vsf-build-actions
+name: build
 
 on:
   push:
