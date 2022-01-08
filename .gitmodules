@@ -66,4 +66,4 @@
 	url = ../AIC8800M_SDK_vsf
 [submodule "source/component/3rd-party/littlefs/raw"]
 	path = source/component/3rd-party/littlefs/raw
-	url = https://github.com/littlefs-project/littlefs.git
+	url = ../littlefs
