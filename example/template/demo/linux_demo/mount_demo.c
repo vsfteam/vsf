@@ -10,6 +10,9 @@
 
 #if VSF_USE_LINUX == ENABLED && APP_USE_LINUX_MOUNT_DEMO == ENABLED
 
+// maybe read is a macro from linux subsystem in vsf
+#undef read
+
 typedef struct __fs_param_t {
     char *device;
     uint32_t block_size;

@@ -32,7 +32,7 @@
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    DISABLED
-#   define APP_USE_LINUX_MOUNT_DEMO                     DISABLED
+#   define APP_USE_LINUX_MOUNT_DEMO                     ENABLED
 #define APP_USE_USBH_DEMO                               DISABLED
 #   define APP_USE_DFU_HOST_DEMO                        DISABLED
 #define APP_USE_USBD_DEMO                               DISABLED
@@ -141,6 +141,8 @@
 #define VSF_USE_FS                                      ENABLED
 #   define VSF_FS_USE_MEMFS                             ENABLED
 #   define VSF_FS_USE_FATFS                             ENABLED
+#   define VSF_USE_LITTLEFS                             ENABLED
+#       define VSF_FS_USE_LITTLEFS                      ENABLED
 
 #define VSF_USE_TRACE                                   ENABLED
 #define USRAPP_CFG_STDIO_EN                             ENABLED
