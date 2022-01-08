@@ -633,6 +633,7 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
                         if (LIBUSB_SUCCESS == libusb_get_config_descriptor_by_value(
                                     libusb_get_device(libusb_dev->handle), config, &config_desc)) {
                             for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
+                                libusb_detach_kernel_driver(libusb_dev->handle, i);
                                 libusb_claim_interface(libusb_dev->handle, i);
                             }
                             libusb_free_config_descriptor(config_desc);
