@@ -110,7 +110,7 @@ static uint_fast16_t __vk_winfs_file_get_path(vk_file_t *file, char *path, uint_
     return real_len;
 }
 
-static bool __vk_winfs_set_pos(vk_winfs_file_t *file, uint_fast64_t pos)
+static vsf_err_t __vk_winfs_set_pos(vk_winfs_file_t *file, uint_fast64_t pos)
 {
     LARGE_INTEGER li;
     li.QuadPart = pos;
