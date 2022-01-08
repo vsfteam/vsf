@@ -88,7 +88,7 @@ extern "C"
 
 #define lfs_max             max
 #define lfs_min             min
-#define lfs_npw2(__a)       (32 - vsf_clz(__a))
+#define lfs_npw2(__a)       (32 - vsf_clz32(__a))
 #define lfs_ctz(__a)        (lfs_npw2(((__a) & -(__a)) + 1) - 1)
 #define lfs_fromle32        le32_to_cpu
 #define lfs_tole32          cpu_to_le32

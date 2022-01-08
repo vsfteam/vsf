@@ -812,7 +812,7 @@ static void __vk_dwcotg_hcd_urb_fsm(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb
     if (!dwcotg_urb->is_alloced) {
         int_fast8_t index;
         vsf_protect_t orig = vsf_protect_int();
-        index = vsf_ffz(dwcotg_hcd->ep_mask);
+        index = vsf_ffz32(dwcotg_hcd->ep_mask);
         if ((index >= 0) && (index < 16)) {
             dwcotg_hcd->ep_mask |= 1 << index;
             dwcotg_urb->is_alloced = true;

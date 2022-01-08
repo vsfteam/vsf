@@ -82,7 +82,7 @@ ROOT ISR(SWI_Handler)
     while (!__vsf_arm9_swi.swi_mask_bit) {
         //! find the highest enabled pending swi
         uint32_t mask = __vsf_arm9_swi.pending & __vsf_arm9_swi.enable;
-        int_fast8_t idx = vsf_ffz(~(    mask 
+        int_fast8_t idx = vsf_ffz32(~(    mask 
                                     &   ~((1 << __vsf_arm9_swi.base) - 1)));
         if (idx >= 0) {
             if (__vsf_arm9_swi.vectors[idx].handler != NULL) {

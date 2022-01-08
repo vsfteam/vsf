@@ -750,7 +750,7 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (__vk_winusb_hcd.new_mask != 0) {
             vk_usbh_t *usbh = (vk_usbh_t *)winusb->hcd;
             if (NULL == usbh->dev_new) {
-                int idx = ffz(~__vk_winusb_hcd.new_mask);
+                int idx = vsf_ffz32(~__vk_winusb_hcd.new_mask);
                 VSF_USB_ASSERT(idx < dimof(__vk_winusb_hcd.devs));
                 vk_winusb_hcd_dev_t *winusb_dev = &__vk_winusb_hcd.devs[idx];
                 VSF_USB_ASSERT(vsf_dlist_is_empty(&winusb_dev->urb_pending_list));

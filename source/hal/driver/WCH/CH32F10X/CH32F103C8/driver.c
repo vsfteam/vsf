@@ -57,17 +57,17 @@ bool vsf_driver_init(void)
     }
 
     // configure AHB/APB1/APB2
-    tmp32 = ffz(~(CH32F10X_SYS_FREQ_HZ / CH32F10X_AHB_FREQ_HZ));
+    tmp32 = vsf_ffz32(~(CH32F10X_SYS_FREQ_HZ / CH32F10X_AHB_FREQ_HZ));
     if (tmp32) {
         // set HPRE, TODO: use offset MACRO when available
         RCC->CFGR0 |= (0x08 | (tmp32 - 1)) << 4;
     }
-    tmp32 = ffz(~(CH32F10X_AHB_FREQ_HZ / CH32F10X_APB1_FREQ_HZ));
+    tmp32 = vsf_ffz32(~(CH32F10X_AHB_FREQ_HZ / CH32F10X_APB1_FREQ_HZ));
     if (tmp32) {
         // set PPRE1, TODO: use offset MACRO when available
         RCC->CFGR0 |= (0x04 | (tmp32 - 1)) << 8;
     }
-    tmp32 = ffz(~(CH32F10X_AHB_FREQ_HZ / CH32F10X_APB2_FREQ_HZ));
+    tmp32 = vsf_ffz32(~(CH32F10X_AHB_FREQ_HZ / CH32F10X_APB2_FREQ_HZ));
     if (tmp32) {
         // set PPRE2, TODO: use offset MACRO when available
         RCC->CFGR0 |= (0x04 | (tmp32 - 1)) << 11;

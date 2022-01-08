@@ -253,31 +253,6 @@ uint_fast8_t __vsf_arch_clz(uintalu_t a)
 }
 #endif
 
-#ifndef VSF_CLZ
-WEAK(vsf_clz)
-uint_fast8_t vsf_clz(uint_fast32_t a)
-{
-    int_fast8_t word_size = (32 + __optimal_bit_sz - 1) / __optimal_bit_sz;
-    uint_fast8_t num = 0, temp;
-    uintalu_t* src = (uintalu_t*)&a + (word_size - 1);
-
-    do {
-#ifndef __VSF_ARCH_CLZ
-        temp = __vsf_arch_clz(*src--);
-#else
-        temp = __VSF_ARCH_CLZ(*src--);
-#endif
-        if (temp < __optimal_bit_sz) {
-            num += temp;
-            break;
-        }
-        num += __optimal_bit_sz;
-    } while (--word_size);
-
-    return num;
-}
-#endif
-
 
 #ifndef __VSF_ARCH_MSB
 WEAK(__vsf_arch_msb)
@@ -289,31 +264,6 @@ int_fast8_t __vsf_arch_msb(uintalu_t a)
         a >>= 1;
     }
     return c;
-}
-#endif
-
-#ifndef VSF_MSB
-WEAK(vsf_msb)
-int_fast8_t vsf_msb(uint_fast32_t a)
-{
-    int_fast8_t word_size = (32 + __optimal_bit_sz - 1) / __optimal_bit_sz;
-    int_fast8_t index = 31, temp;
-    uintalu_t* src = (uintalu_t*)&a + (word_size - 1);
-
-    do {
-#ifndef __VSF_ARCH_MSB
-        temp = __vsf_arch_msb(*src--);
-#else
-        temp = __VSF_ARCH_MSB(*src--);
-#endif
-        index -= __optimal_bit_sz;
-        if (temp >= 0) {
-            index += temp+1;
-            break;
-        }
-    } while(--word_size);
-
-    return index;
 }
 #endif
 
@@ -341,40 +291,118 @@ int_fast8_t __vsf_arch_ffz(uintalu_t a)
 }
 #endif
 
-
-#ifndef VSF_FFS
-WEAK(vsf_ffs)
-int_fast8_t vsf_ffs(uint_fast32_t a)
+#ifndef VSF_CLZ32
+WEAK(vsf_clz32)
+uint_fast8_t vsf_clz32(uint_fast32_t a)
 {
-    int_fast16_t word_size = (32 + __optimal_bit_sz - 1) / __optimal_bit_sz;
-    int_fast16_t index = 0, temp;
-    uintalu_t* src = (uintalu_t*)&a;
+    uint_fast8_t num = 0;
+    if (__optimal_bit_sz >= 32) {
+#ifndef __VSF_ARCH_CLZ
+        num = __vsf_arch_clz((uintalu_t)a);
+#else
+        num = __VSF_ARCH_CLZ((uintalu_t)a);
+#endif
+        VSF_ARCH_ASSERT(num >= (__optimal_bit_sz - 32));
+        return num - (__optimal_bit_sz - 32);
+    } else {
+        int_fast8_t word_size = (32 + __optimal_bit_sz - 1) / __optimal_bit_sz;
+        uint_fast8_t temp;
+        uintalu_t* src = (uintalu_t*)&a + (word_size - 1);
 
-    do {
-#   ifndef __VSF_ARCH_FFZ
-        temp = __vsf_arch_ffs(*src++);
-#   else
-        temp = __VSF_ARCH_FFs(*src++);
-#   endif
-        if (temp >= 0) {
-            index += temp;
-            return index;
-        }
-        index += __optimal_bit_sz;
-    } while (--word_size);
-
-    return -1;
+        do {
+#ifndef __VSF_ARCH_CLZ
+            temp = __vsf_arch_clz(*src--);
+#else
+            temp = __VSF_ARCH_CLZ(*src--);
+#endif
+            if (temp < __optimal_bit_sz) {
+                num += temp;
+                break;
+            }
+            num += __optimal_bit_sz;
+        } while (--word_size);
+    }
+    return num;
 }
 #endif
 
-#ifndef VSF_FFZ
-WEAK(vsf_ffz)
-int_fast8_t vsf_ffz(uint_fast32_t a)
+#ifndef VSF_MSB32
+WEAK(vsf_msb32)
+int_fast8_t vsf_msb32(uint_fast32_t a)
 {
-#   ifndef VSF_FFS
-    return vsf_ffs(~a);
+    if (__optimal_bit_sz >= 32) {
+#ifndef __VSF_ARCH_MSB
+        int_fast8_t index = __vsf_arch_msb(a);
+#else
+        int_fast8_t index = __VSF_ARCH_MSB(a);
+#endif
+        VSF_ARCH_ASSERT(index < 32);
+        return index;
+    } else {
+        int_fast8_t word_size = (32 + __optimal_bit_sz - 1) / __optimal_bit_sz;
+        int_fast8_t index = 31, temp;
+        uintalu_t* src = (uintalu_t*)&a + (word_size - 1);
+
+        do {
+#ifndef __VSF_ARCH_MSB
+            temp = __vsf_arch_msb(*src--);
+#else
+            temp = __VSF_ARCH_MSB(*src--);
+#endif
+            index -= __optimal_bit_sz;
+            if (temp >= 0) {
+                index += temp+1;
+                break;
+            }
+        } while(--word_size);
+        return index;
+    }
+}
+#endif
+
+#ifndef VSF_FFS32
+WEAK(vsf_ffs32)
+int_fast8_t vsf_ffs32(uint_fast32_t a)
+{
+    if (__optimal_bit_sz >= 32) {
+#ifndef __VSF_ARCH_FFS
+        int_fast8_t temp = __vsf_arch_ffs(a);
+#else
+        int_fast8_t temp = __VSF_ARCH_FFs(a);
+#endif
+        VSF_ARCH_ASSERT(temp < 32);
+        return temp;
+    } else {
+        int_fast16_t word_size = (32 + __optimal_bit_sz - 1) / __optimal_bit_sz;
+        int_fast16_t index = 0, temp;
+        uintalu_t* src = (uintalu_t*)&a;
+
+        do {
+#ifndef __VSF_ARCH_FFS
+            temp = __vsf_arch_ffs(*src++);
+#else
+            temp = __VSF_ARCH_FFS(*src++);
+#endif
+            if (temp >= 0) {
+                index += temp;
+                return index;
+            }
+            index += __optimal_bit_sz;
+        } while (--word_size);
+
+        return -1;
+    }
+}
+#endif
+
+#ifndef VSF_FFZ32
+WEAK(vsf_ffz32)
+int_fast8_t vsf_ffz32(uint_fast32_t a)
+{
+#   ifndef VSF_FFS32
+    return vsf_ffs32(~a);
 #   else
-    return VSF_FFS(~a);
+    return VSF_FFS32(~a);
 #   endif
 }
 #endif

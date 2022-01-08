@@ -120,7 +120,7 @@ s64_t xfs_seek(struct xfs_file_t * file, s64_t offset)
 // arch algo
 int fls(int x)
 {
-    return x ? sizeof(x) * 8 - vsf_clz(x) : 0;
+    return x ? sizeof(x) * 8 - vsf_clz32(x) : 0;
 }
 
 // misc

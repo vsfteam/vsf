@@ -740,7 +740,7 @@ static vsf_err_t __f1cx00s_usbh_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_u
 
     if (!__f1cx00s_usbh_hcd_urb_for_queue(urb) && pipe.dir_in1out0) {
         // int and iso IN transfers are not put in queue
-        uint_fast8_t ep_idx = ffz(musb_hcd->unchained_ep_in_mask);
+        uint_fast8_t ep_idx = vsf_ffz32(musb_hcd->unchained_ep_in_mask);
         if (ep_idx <= __f1cx00s_usb_get_ep_num(musb_hcd->otg)) {
             vsf_protect_t orig = vsf_protect_sched();
                 ep_idx_arr[pipe.endpoint] = ep_idx;
@@ -809,7 +809,7 @@ static void __f1cx00s_usbh_hcd_isr(f1cx00s_usbh_hcd_t *musb_hcd)
     // EP interrupt
     status = MUSB_BASE->Common.IntrTx & MUSB_BASE->Common.IntrTxE;
     while (status) {
-        uint_fast8_t ep_idx = ffz(~status);
+        uint_fast8_t ep_idx = vsf_ffz32(~status);
         status &= ~(1 << ep_idx);
         MUSB_BASE->Common.IntrTx = 1 << ep_idx;
         vsf_eda_post_evt(&musb_hcd->teda.use_as__vsf_eda_t, HCD_EVT_EP + ep_idx);
@@ -817,7 +817,7 @@ static void __f1cx00s_usbh_hcd_isr(f1cx00s_usbh_hcd_t *musb_hcd)
 
     status = MUSB_BASE->Common.IntrRx & MUSB_BASE->Common.IntrRxE;
     while (status) {
-        uint_fast8_t ep_idx = ffz(~status);
+        uint_fast8_t ep_idx = vsf_ffz32(~status);
         status &= ~(1 << ep_idx);
         MUSB_BASE->Common.IntrRx = 1 << ep_idx;
         vsf_eda_post_evt(&musb_hcd->teda.use_as__vsf_eda_t, HCD_EVT_EP + ep_idx + 0x80);

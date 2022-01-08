@@ -249,7 +249,7 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
         process = vsf_eda_get_cur_msg();
         sig_mask = process->sig.pending.sig[0] & ~process->sig.mask.sig[0];
         while (sig_mask) {
-            sig = ffz(~sig_mask);
+            sig = vsf_ffz32(~sig_mask);
             sig_mask &= ~(1 << sig);
 
             found_handler = false;

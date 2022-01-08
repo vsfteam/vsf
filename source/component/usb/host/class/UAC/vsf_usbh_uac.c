@@ -430,7 +430,7 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                                     vsf_stream_get_free_size(uac_stream->stream)
                                 :   vsf_stream_get_data_size(uac_stream->stream);
                     if (stream_size >= frame_size) {
-                        urb_idx = vsf_ffz(uac_stream->urb_mask | ~((1 << sizeof(uac_stream->urb_mask)) - 1));
+                        urb_idx = vsf_ffz32(uac_stream->urb_mask | ~((1 << sizeof(uac_stream->urb_mask)) - 1));
                         if (urb_idx >= 0) {
                             __vk_usbh_uac_submit_urb_iso(uac, uac_stream, urb_idx);
                         }

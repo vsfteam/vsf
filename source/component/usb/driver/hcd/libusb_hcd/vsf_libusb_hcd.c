@@ -823,7 +823,7 @@ static void __vk_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (__vk_libusb_hcd.new_mask != 0) {
             vk_usbh_t *usbh = (vk_usbh_t *)libusb->hcd;
             if (NULL == usbh->dev_new) {
-                int idx = ffz(~__vk_libusb_hcd.new_mask);
+                int idx = vsf_ffz32(~__vk_libusb_hcd.new_mask);
                 VSF_USB_ASSERT(idx < dimof(__vk_libusb_hcd.devs));
                 vk_libusb_hcd_dev_t *libusb_dev = &__vk_libusb_hcd.devs[idx];
                 VSF_USB_ASSERT(vsf_dlist_is_empty(&libusb_dev->urb_pending_list));

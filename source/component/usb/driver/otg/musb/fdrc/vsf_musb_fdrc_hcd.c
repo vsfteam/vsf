@@ -187,7 +187,7 @@ static void __vk_musb_fdrc_hcd_interrupt(void *param)
             |   (vk_musb_fdrc_get_mask(&reg->Common.IntrRx1E) << 16);
 
     while (status > 0) {
-        uint_fast8_t ep = ffs(status);
+        uint_fast8_t ep = vsf_ffs32(status);
         status &= ~(1 << ep);
         vsf_eda_post_evt(&musb->teda.use_as__vsf_eda_t, VSF_MUSB_FDRC_HCD_EVT_EP + ep);
     }
@@ -561,12 +561,12 @@ static void __vk_musb_fdrc_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t
 
     vsf_protect_t orig = vsf_protect_sched();
         while ((musb->ep_in_mask & epmask) != 0) {
-            idx = ffs(musb->ep_in_mask);
+            idx = vsf_ffs32(musb->ep_in_mask);
             vk_musb_fdrc_clear_mask(&reg->Common.IntrRx1E, idx);
             musb->ep_in_mask &= ~(1 << idx);
         }
         while ((musb->ep_out_mask & epmask) != 0) {
-            idx = ffs(musb->ep_out_mask);
+            idx = vsf_ffs32(musb->ep_out_mask);
             vk_musb_fdrc_clear_mask(&reg->Common.IntrTx1E, idx);
             musb->ep_out_mask &= ~(1 << idx);
         }
@@ -643,7 +643,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_u
 
         // allocate new ep
         vsf_protect_t orig = vsf_protect_sched();
-            idx = ffz(*ep_mask);
+            idx = vsf_ffz32(*ep_mask);
             if (idx < 16) {
                 *ep_mask |= 1 << idx;
                 vk_musb_fdrc_set_mask(ep_inten, idx);

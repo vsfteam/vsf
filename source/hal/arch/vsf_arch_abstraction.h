@@ -149,17 +149,17 @@ extern void put_unaligned_le##__bitlen(uint_fast##__bitlen##_t, void *);        
 extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 
 
-#ifndef ffs
-#   define ffs(__n)                         vsf_ffs(__n)
+#ifndef ffs32
+#   define ffs32(__n)                       vsf_ffs32(__n)
 #endif
-#ifndef ffz
-#   define ffz(__n)                         vsf_ffz(__n)
+#ifndef ffz32
+#   define ffz32(__n)                       vsf_ffz32(__n)
 #endif
-#ifndef msb
-#   define msb(__n)                         vsf_msb(__n)
+#ifndef msb32
+#   define msb32(__n)                       vsf_msb32(__n)
 #endif
-#ifndef clz
-#   define clz(__n)                         vsf_clz(__n)
+#ifndef clz32
+#   define clz32(__n)                       vsf_clz32(__n)
 #endif
 
 #define __vsf_protect_region(__region)                                          \
@@ -249,20 +249,20 @@ extern uint_fast32_t bswap_32(uint_fast32_t);
 extern uint_fast64_t bswap_64(uint_fast64_t);
 #endif
 
-#ifndef VSF_FFS
-extern int_fast8_t vsf_ffs(uint_fast32_t);
+#ifndef VSF_FFS32
+extern int_fast8_t vsf_ffs32(uint_fast32_t);
 #endif
 
-#ifndef VSF_FFZ
-extern int_fast8_t vsf_ffz(uint_fast32_t);
+#ifndef VSF_FFZ32
+extern int_fast8_t vsf_ffz32(uint_fast32_t);
 #endif
 
-#ifndef VSF_MSB
-extern int_fast8_t vsf_msb(uint_fast32_t);
+#ifndef VSF_MSB32
+extern int_fast8_t vsf_msb32(uint_fast32_t);
 #endif
 
-#ifndef VSF_CLZ
-extern uint_fast8_t vsf_clz(uint_fast32_t);
+#ifndef VSF_CLZ32
+extern uint_fast8_t vsf_clz32(uint_fast32_t);
 #endif
 
 DECLARE_ENDIAN_FUNC(16)

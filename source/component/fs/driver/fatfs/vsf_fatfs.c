@@ -259,8 +259,8 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
         uint_fast16_t reserved_size, root_entry;
 
         sector_size = le16_to_cpu(dbr->bpb.BytsPerSec);
-        info->sector_size_bits = msb(sector_size);
-        info->cluster_size_bits = msb(dbr->bpb.SecPerClus);
+        info->sector_size_bits = vsf_msb32(sector_size);
+        info->cluster_size_bits = vsf_msb32(dbr->bpb.SecPerClus);
         reserved_size = le16_to_cpu(dbr->bpb.RsvdSecCnt);
         info->fat_num = dbr->bpb.NumFATs;
         sector_num = le16_to_cpu(dbr->bpb.TotSec16);

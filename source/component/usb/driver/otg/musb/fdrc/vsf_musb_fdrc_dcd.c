@@ -159,7 +159,7 @@ vsf_err_t vk_musb_fdrc_usbd_ep_add(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, us
     if (size == 1023) { size = 1024; }
     VSF_USB_ASSERT(!(size & 7) && (size >= 8) && (size <= 1024));
 
-    size_msk = msb(size);
+    size_msk = vsf_msb32(size);
     if (size & ~(1 << size_msk)) {
         size_msk++;
     }
@@ -511,7 +511,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
     // EPN interrupt
     status_rx &= ~1;
     while (status_rx) {
-        uint_fast8_t ep = ffz(~status_rx);
+        uint_fast8_t ep = vsf_ffz32(~status_rx);
         status_rx &= ~(1 << ep);
 
         ep_orig = vk_musb_fdrc_set_ep(reg, ep);
@@ -539,7 +539,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
     }
 
     while (status_tx) {
-        uint_fast8_t ep = ffz(~status_tx);
+        uint_fast8_t ep = vsf_ffz32(~status_tx);
         status_tx &= ~(1 << ep);
 
         ep_orig = vk_musb_fdrc_set_ep(reg, ep);

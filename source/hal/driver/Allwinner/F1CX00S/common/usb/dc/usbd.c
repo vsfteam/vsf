@@ -241,7 +241,7 @@ vsf_err_t f1cx00s_usbd_ep_add(f1cx00s_usb_dcd_t *usbd, uint_fast8_t ep, usb_ep_t
     VSF_HAL_ASSERT(size <= 1024);
 
     // log2(size_align_to_512) - 3
-    size_log2 = vsf_ffz(~vsf_usbd_get_fifo_size(ep, type, fifo_size)) - 3;
+    size_log2 = vsf_ffz32(~vsf_usbd_get_fifo_size(ep, type, fifo_size)) - 3;
 
     ep &= 0x0F;
     ep_orig = __f1cx00s_usb_set_ep(usbd->otg, ep);
@@ -624,7 +624,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
     status_rx &= ~1;
     status_rx &= usbd->out_enable;
     while (status_rx) {
-        uint_fast8_t ep_idx = ffz(~status_rx);
+        uint_fast8_t ep_idx = vsf_ffz32(~status_rx);
         status_rx &= ~(1 << ep_idx);
         MUSB_BASE->Common.IntrRx = 1 << ep_idx;
 
@@ -647,7 +647,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
     }
 
     while (status_tx) {
-        uint_fast8_t ep_idx = ffz(~status_tx);
+        uint_fast8_t ep_idx = vsf_ffz32(~status_tx);
         status_tx &= ~(1 << ep_idx);
         MUSB_BASE->Common.IntrTx = 1 << ep_idx;
 

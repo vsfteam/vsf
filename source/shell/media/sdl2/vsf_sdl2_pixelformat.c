@@ -157,7 +157,7 @@ uint32_t __SDL_GetColorFromMask(uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, 
         }
     }
 
-    int_fast8_t pixel_bitlen = vsf_msb(Rmask | Gmask | Bmask | Amask);
+    int_fast8_t pixel_bitlen = vsf_msb32(Rmask | Gmask | Bmask | Amask);
     if (pixel_bitlen < 0) {
         return SDL_PIXELFORMAT_UNKNOWN;
     }
@@ -184,27 +184,27 @@ void __SDL_InitFormatMask(SDL_PixelFormat *format, uint32_t Rmask, uint32_t Gmas
     format->Bmask = Bmask;
     format->Amask = Amask;
 
-    tmp8 = vsf_clz(Rmask);
+    tmp8 = vsf_clz32(Rmask);
     Rmask <<= tmp8;
-    format->Rloss = vsf_clz(~Rmask);
+    format->Rloss = vsf_clz32(~Rmask);
     format->Rshift = 32 - (tmp8 + format->Rloss);
     format->Rloss = 8 - format->Rloss;
 
-    tmp8 = vsf_clz(Gmask);
+    tmp8 = vsf_clz32(Gmask);
     Gmask <<= tmp8;
-    format->Gloss = vsf_clz(~Gmask);
+    format->Gloss = vsf_clz32(~Gmask);
     format->Gshift = 32 - (tmp8 + format->Gloss);
     format->Gloss = 8 - format->Gloss;
 
-    tmp8 = vsf_clz(Bmask);
+    tmp8 = vsf_clz32(Bmask);
     Bmask <<= tmp8;
-    format->Bloss = vsf_clz(~Bmask);
+    format->Bloss = vsf_clz32(~Bmask);
     format->Bshift = 32 - (tmp8 + format->Bloss);
     format->Bloss = 8 - format->Bloss;
 
-    tmp8 = vsf_clz(Amask);
+    tmp8 = vsf_clz32(Amask);
     Amask <<= tmp8;
-    format->Aloss = vsf_clz(~Amask);
+    format->Aloss = vsf_clz32(~Amask);
     format->Ashift = 32 - (tmp8 + format->Aloss);
     format->Aloss = 8 - format->Aloss;
 }
