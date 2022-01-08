@@ -33,7 +33,7 @@
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    DISABLED
 #   define APP_USE_LINUX_MOUNT_DEMO                     ENABLED
-#define APP_USE_USBH_DEMO                               DISABLED
+#define APP_USE_USBH_DEMO                               ENABLED
 #   define APP_USE_DFU_HOST_DEMO                        DISABLED
 #define APP_USE_USBD_DEMO                               DISABLED
 #   define APP_USE_USBD_CDC_DEMO                        DISABLED
@@ -55,6 +55,7 @@
 #   define VSF_LINUX_CFG_WRAPPER                        ENABLED
 #   define VSF_LINUX_LIBC_CFG_WRAPPER                   ENABLED
 #   define VSF_LINUX_LIBGEN_CFG_WRAPPER                 ENABLED
+#   define VSF_LINUX_LIBUSB_CFG_WRAPPER                 ENABLED
 #endif
 // SIMPLE_SPRINTF MUST be enabled, or segment fault
 #define VSF_USE_SIMPLE_SSCANF                           ENABLED
@@ -184,7 +185,8 @@
 #define VSF_USBH_USE_HCD_LIBUSB                         ENABLED
 
 #if VSF_USBH_USE_HCD_LIBUSB == ENABLED
-#   define VSF_LIBUSB_CFG_INCLUDE                       "lib\libusb\libusb.h"
+// VSF_LIBUSB_CFG_INCLUDE will be defined in cmake
+//#   define VSF_LIBUSB_CFG_INCLUDE                       "lib\libusb\libusb.h"
 #   define VSF_LIBUSB_HCD_CFG_DEV_NUM                   2
 #   define VSF_LIBUSB_HCD_DEV0_VID                      0x0A12      // CSR8510 bthci
 #   define VSF_LIBUSB_HCD_DEV0_PID                      0x0001

@@ -595,7 +595,7 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
         __vsf_arch_irq_request_pend(irq_request);
 
         while (!libusb_urb->is_msg_processed) {
-            Sleep(1);
+            __vsf_arch_irq_sleep(1);
         }
 
         is_to_free = VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state;
@@ -703,7 +703,7 @@ static void __vk_libusb_hcd_init_thread(void *arg)
                 }
             }
         }
-        Sleep(100);
+        __vsf_arch_irq_sleep(100);
     }
 #if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
     __vsf_arch_irq_start(irq_thread);

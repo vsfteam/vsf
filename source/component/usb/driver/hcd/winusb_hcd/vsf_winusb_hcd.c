@@ -551,7 +551,7 @@ static void __vk_winusb_hcd_urb_thread(void *arg)
         __vsf_arch_irq_request_pend(irq_request);
 
         while (!winusb_urb->is_msg_processed) {
-            Sleep(1);
+            __vsf_arch_irq_sleep(1);
         }
 
         is_to_free = winusb_urb->is_to_free;
@@ -640,7 +640,7 @@ static void __vk_winusb_hcd_init_thread(void *arg)
                 }
             }
         }
-        Sleep(100);
+        __vsf_arch_irq_sleep(100);
     }
     __vsf_arch_irq_fini(irq_thread);
 }
