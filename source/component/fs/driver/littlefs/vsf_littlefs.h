@@ -27,8 +27,8 @@
 #include "kernel/vsf_kernel.h"
 #include "lfs.h"
 
-#if     defined(__VSF_LITTLSFS_CLASS_IMPLEMENT)
-#   undef __VSF_LITTLSFS_CLASS_IMPLEMENT
+#if     defined(__VSF_LITTLEFS_CLASS_IMPLEMENT)
+#   undef __VSF_LITTLEFS_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #endif
 
