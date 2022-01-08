@@ -21,6 +21,8 @@
 
 #if VSF_USE_LITTLEFS == ENABLED
 
+// to access protected member in mal->drv
+#define __VSF_MAL_CLASS_INHERIT__
 #include "component/fs/vsf_fs.h"
 
 /*============================ MACROS ========================================*/
