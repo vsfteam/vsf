@@ -55,7 +55,7 @@ jobs:
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
           sudo apt-get update
-          sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libusb-dev
+          sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libusb-dev libusb-1.0
           echo "CMAKE_PATH=linux" >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "macOS" ]; then
           brew install gcc llvm sdl2
