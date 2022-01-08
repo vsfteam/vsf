@@ -460,6 +460,18 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
                 }
                 __vk_winusb_hcd_assign_endpoints(winusb_dev, setup->wIndex, setup->wValue);
                 return 0;
+            } else if ( (USB_RECIP_ENDPOINT | USB_DIR_OUT == setup->bRequestType)
+                    &&  (USB_REQ_CLEAR_FEATURE == setup->bRequest)
+                    &&  (USB_ENDPOINT_HALT == setup->wValue)) {
+                // clear endpoint halt, should call WinUsb_ResetPipe
+                uint8_t endpoint = setup->wIndex;
+                VSF_USB_ASSERT((endpoint & 0x7F) != 0);
+                uint8_t ep_idx = (endpoint & 0x0F) | (((endpoint & USB_DIR_MASK) == USB_DIR_IN) ? 0x10 : 0);
+                int8_t ifs_idx = winusb_dev->ep[ep_idx].ep2ifs;
+                VSF_USB_ASSERT((ifs_idx >= 0) && (winusb_dev->hUsbIfs[ifs_idx] != NULL));
+                WINUSB_INTERFACE_HANDLE handle = winusb_dev->hUsbIfs[ifs_idx];
+                WinUsb_ResetPipe(handle, endpoint);
+                return 0;
             } else {
                 WINUSB_SETUP_PACKET SetupPacket = {
                     .RequestType    = setup->bRequestType,
