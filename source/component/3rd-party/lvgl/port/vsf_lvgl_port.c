@@ -48,6 +48,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 
 #if VSF_LVGL_IMP_WAIT_CB == ENABLED
+// TODO: support multiple displays
 NO_INIT static vsf_eda_t * eda_pending;
 #endif
 
@@ -67,6 +68,7 @@ static void __vsf_lvgl_flush_disp(lv_disp_drv_t *disp_drv, const lv_area_t *area
     lv_coord_t hres = disp_drv->rotated == 0 ? disp_drv->hor_res : disp_drv->ver_res;
     lv_coord_t vres = disp_drv->rotated == 0 ? disp_drv->ver_res : disp_drv->hor_res;
 
+    VSF_UI_ASSERT(disp_drv->user_data != NULL);
     vk_disp_t *disp = disp_drv->user_data;
     vk_disp_area_t disp_area;
 
@@ -86,6 +88,9 @@ static void __vsf_lvgl_flush_disp(lv_disp_drv_t *disp_drv, const lv_area_t *area
     disp_area.pos.y = area->y1;
     disp_area.size.x = area->x2 + 1 - area->x1;
     disp_area.size.y = area->y2 + 1 - area->y1;
+#if VSF_LVGL_IMP_WAIT_CB == ENABLED
+    disp_drv->user_data = NULL;
+#endif
     vk_disp_refresh(disp, &disp_area, color_p);
 }
 
@@ -95,14 +100,29 @@ static void __vsf_lvgl_disp_on_ready(vk_disp_t *disp)
     lv_disp_flush_ready(disp_drv);
 
 #if VSF_LVGL_IMP_WAIT_CB == ENABLED
-    vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
+    vsf_protect_t orig = vsf_protect_int();
+        void *user_data = disp_drv->user_data;
+        disp_drv->user_data = disp;
+    vsf_unprotect_int(orig);
+
+    if (user_data != NULL) {
+        vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
+    }
 #endif
 }
 
 #if VSF_LVGL_IMP_WAIT_CB == ENABLED
 static void __vsf_lvgl_disp_wait_cb(lv_disp_drv_t *disp_drv)
 {
-    vsf_thread_wfe(VSF_EVT_USER);
+    vsf_protect_t orig = vsf_protect_int();
+    if (NULL == disp_drv->user_data) {
+        disp_drv->user_data = (void *)-1;
+        vsf_unprotect_int(orig);
+
+        vsf_thread_wfe(VSF_EVT_USER);
+    } else {
+        vsf_unprotect_int(orig);
+    }
 }
 #endif
 
