@@ -311,14 +311,18 @@ int putchar(int c)
 int vfprintf(FILE *f, const char *format, va_list ap)
 {
     char buff[VSF_LINUX_CFG_PRINT_BUFF_SIZE];
-    size_t size = vsnprintf(buff, sizeof(buff), format, ap);
+    va_list ap_temp;
+    size_t size;
+
+    va_copy(ap_temp, ap);
+    size = vsnprintf(buff, sizeof(buff), format, ap);
     if (size >= sizeof(buff)) {
         char *buff = malloc(size + 1);
         if (NULL == buff) {
             return -1;
         }
 
-        size = vsnprintf(buff, size + 1, format, ap);
+        size = vsnprintf(buff, size + 1, format, ap_temp);
         if (size > 0) {
             size = fwrite(buff, 1, size, f);
         }
