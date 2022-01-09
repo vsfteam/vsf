@@ -64,7 +64,15 @@
 #   define vsf_arch_irq_trace(...)
 #endif
 #if VSF_ARCH_CFG_REQUEST_TRACE_EN == ENABLED
-#   define vsf_arch_request_trace(...)      VSF_ARCH_CFG_TRACE_FUNC(__VA_ARGS__)
+#   define vsf_arch_request_trace(__request, __event)                           \
+    do {                                                                        \
+        int idx = __vsf_arch_get_thread_idx((__request)->arch_thread);          \
+        if (idx >= 0) {                                                         \
+            VSF_ARCH_CFG_TRACE_FUNC("irq_request%d %p " __event "\n", idx, (__request));\
+        } else {                                                                \
+            VSF_ARCH_CFG_TRACE_FUNC("irq_request %p " __event "\n", (__request));\
+        }                                                                       \
+    } while (false)
 #else
 #   define vsf_arch_request_trace(...)
 #endif
@@ -183,17 +191,16 @@ void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request)
     VSF_HAL_ASSERT(request->is_inited);
     pthread_cond_t *cond = &__vsf_arch.irq_request.pool[request->id].cond;
     pthread_mutex_t *mutex = &__vsf_arch.irq_request.pool[request->id].mutex;
-    int idx = __vsf_arch_get_thread_idx(request->arch_thread);
 
-    vsf_arch_request_trace("irq_request%d pend\n", idx);
+    vsf_arch_request_trace(request, "pend");
     pthread_mutex_lock(mutex);
         while (!request->is_triggered) {
-            vsf_arch_request_trace("irq_request%d wait\n", idx);
+            vsf_arch_request_trace(request, "wait");
             pthread_cond_wait(cond, mutex);
         }
         request->is_triggered = false;
     pthread_mutex_unlock(mutex);
-    vsf_arch_request_trace("irq_request%d got\n", idx);
+    vsf_arch_request_trace(request, "got");
 }
 
 void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
@@ -201,15 +208,14 @@ void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
     VSF_HAL_ASSERT(request->is_inited);
     pthread_cond_t *cond = &__vsf_arch.irq_request.pool[request->id].cond;
     pthread_mutex_t *mutex = &__vsf_arch.irq_request.pool[request->id].mutex;
-    int idx = __vsf_arch_get_thread_idx(request->arch_thread);
 
-    vsf_arch_request_trace("irq_request%d send\n", idx);
+    vsf_arch_request_trace(request, "send");
     pthread_mutex_lock(mutex);
         request->is_triggered = true;
         pthread_cond_signal(cond);
-        vsf_arch_request_trace("irq_request%d signal\n", idx);
+        vsf_arch_request_trace(request, "signal");
     pthread_mutex_unlock(mutex);
-    vsf_arch_request_trace("irq_request%d sent\n", idx);
+    vsf_arch_request_trace(request, "sent");
 }
 
 static void * __vsf_arch_irq_entry(void *arg)
