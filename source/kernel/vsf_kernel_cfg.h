@@ -110,9 +110,8 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #   ifndef __VSF_KERNEL_CFG_EDA_FRAME_POOL
 #       define __VSF_KERNEL_CFG_EDA_FRAME_POOL              ENABLED
 #   endif
-//  VSF_KERNEL_CFG_EDA_FAST_SUB_CALL will be disabled by default after stable
 #   ifndef VSF_KERNEL_CFG_EDA_FAST_SUB_CALL
-#       define VSF_KERNEL_CFG_EDA_FAST_SUB_CALL             ENABLED
+#       define VSF_KERNEL_CFG_EDA_FAST_SUB_CALL             DISABLED
 #   endif
 #endif
 
