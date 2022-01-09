@@ -118,6 +118,7 @@ static void __vsf_x86_debug_stream_rx_irqhandler(void *arg)
     int ret = tcgetattr(STDIN_FILENO, &term);
     VSF_HAL_ASSERT(0 == ret);
     cfmakeraw(&term);
+    term.c_oflag |= ONLCR | OPOST;
     ret = tcsetattr(STDIN_FILENO, TCSANOW, &term);
     VSF_HAL_ASSERT(0 == ret);
 
