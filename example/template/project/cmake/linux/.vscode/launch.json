@@ -20,6 +20,16 @@
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
+                },
+                {
+                    "description": "Pass SIGUSR1(used for timer) for gdb",
+                    "text": "handle SIGUSR1 nostop noprint pass",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Pass SIGTTIN(used for terminal) for gdb",
+                    "text": "handle SIGTTIN nostop noprint pass",
+                    "ignoreFailures": true
                 }
             ]
         }
