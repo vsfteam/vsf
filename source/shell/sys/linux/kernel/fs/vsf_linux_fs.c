@@ -1023,6 +1023,18 @@ int umount(const char *target)
     return 0;
 }
 
+int __vsf_linux_create_open_path(char *path)
+{
+    int fd = open(path, 0);
+    if (fd < 0) {
+        fd = creat(path, 0);
+        if (fd < 0) {
+            printf("fail to create %s.\r\n", path);
+        }
+    }
+    return fd;
+}
+
 int vsf_linux_fd_get_target(int fd, void **target)
 {
     vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
@@ -1034,18 +1046,6 @@ int vsf_linux_fd_get_target(int fd, void **target)
         *target = vfs_file->f.param;
     }
     return 0;
-}
-
-int vsf_linux_fs_get_target(const char *pathname, void **target)
-{
-    int fd = open(pathname, 0);
-    if (fd < 0) {
-        return -1;
-    }
-
-    int err = vsf_linux_fd_get_target(fd, target);
-    close(fd);
-    return err;
 }
 
 int vsf_linux_fd_bind_target(int fd, void *target,
@@ -1061,6 +1061,34 @@ int vsf_linux_fd_bind_target(int fd, void *target,
     vfs_file->f.callback.fn_read = peda_read;
     vfs_file->f.callback.fn_write = peda_write;
     return 0;
+}
+
+int vsf_linux_fs_get_target(const char *pathname, void **target)
+{
+    int fd = open(pathname, 0);
+    if (fd < 0) {
+        return -1;
+    }
+
+    int err = vsf_linux_fd_get_target(fd, target);
+    close(fd);
+    return err;
+}
+
+int vsf_linux_fs_bind_target(const char *pathname, void *target,
+        vsf_param_eda_evthandler_t peda_read,
+        vsf_param_eda_evthandler_t peda_write)
+{
+    int fd = __vsf_linux_create_open_path(pathname);
+    if (fd >= 0) {
+        int err = vsf_linux_fd_bind_target(fd, target, peda_read, peda_write);
+        if (!err) {
+            printf("%s bound.\r\n", pathname);
+        }
+        close(fd);
+        return err;
+    }
+    return -1;
 }
 
 // stream

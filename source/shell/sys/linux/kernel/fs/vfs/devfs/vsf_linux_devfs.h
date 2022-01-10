@@ -35,6 +35,7 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal);
 extern int vsf_linux_devfs_init(void);
 
 #ifdef __cplusplus
