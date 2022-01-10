@@ -34,6 +34,18 @@ int vsf_linux_init_main(int argc, char *argv[])
         NULL,
     };
     vsh_set_path((char **)__path);
+
+    // run init scripts first
+#ifdef VSF_LINUX_CFG_INIT_SCRIPTS
+    static const char * __init_scripts[] = {
+        VSF_LINUX_CFG_INIT_SCRIPTS
+    };
+    for (int i = 0; i < dimof(__init_scripts); i++) {
+        printf("execute init scripts: %s\r\n", __init_scripts[i]);
+        system(__init_scripts[i]);
+    }
+#endif
+
     return vsh_main(argc, argv);
 }
 #endif
