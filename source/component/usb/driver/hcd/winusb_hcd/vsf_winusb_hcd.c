@@ -460,7 +460,7 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
                 }
                 __vk_winusb_hcd_assign_endpoints(winusb_dev, setup->wIndex, setup->wValue);
                 return 0;
-            } else if ( (USB_RECIP_ENDPOINT | USB_DIR_OUT == setup->bRequestType)
+            } else if ( ((USB_RECIP_ENDPOINT | USB_DIR_OUT) == setup->bRequestType)
                     &&  (USB_REQ_CLEAR_FEATURE == setup->bRequest)
                     &&  (USB_ENDPOINT_HALT == setup->wValue)) {
                 // clear endpoint halt, should call WinUsb_ResetPipe
