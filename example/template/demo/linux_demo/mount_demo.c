@@ -1,3 +1,5 @@
+// inherit linux fs class for bind related APIs
+#define __VSF_LINUX_FS_CLASS_INHERIT__
 #include <unistd.h>
 #include <sys/mount.h>
 #include <getopt.h>
@@ -30,6 +32,20 @@ struct __fs_type_t {
 
 static void * __prepare_file_mal_fsdata(__fs_type_t *fstype, __fs_param_t *param);
 static void __cleanup_file_mal_fsdata(void *fsdata);
+#if VSF_FS_USE_MEMFS == ENABLED
+static void * __prepare_memfs_fsdata(__fs_type_t *fstype, __fs_param_t *param)
+{
+    void * fsinfo;
+    if (vsf_linux_fs_get_target(param->device, &fsinfo) < 0) {
+        return NULL;
+    }
+    return fsinfo;
+}
+
+static void __cleanup_memfs_fsdata(void *fsdata)
+{
+}
+#endif
 #if VSF_FS_USE_LITTLEFS == ENABLED
 static void * __prepare_lfs_fsdata(__fs_type_t *fstype, __fs_param_t *param)
 {
@@ -119,6 +135,15 @@ static __fs_type_t __fs_types[] = {
         .cleanup_fsdata     = __cleanup_file_mal_fsdata,
         .need_block_size    = true,
     },
+#if VSF_FS_USE_MEMFS == ENABLED
+    {
+        .fs                 = "memfs",
+        .fsop               = &vk_memfs_op,
+        .prepare_fsdata     = __prepare_memfs_fsdata,
+        .cleanup_fsdata     = __cleanup_memfs_fsdata,
+        .need_block_size    = false,
+    },
+#endif
 #if VSF_FS_USE_FATFS == ENABLED
     {
         .fs                 = "fatfs",
