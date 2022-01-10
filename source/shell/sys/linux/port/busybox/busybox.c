@@ -41,7 +41,7 @@ int vsf_linux_init_main(int argc, char *argv[])
         VSF_LINUX_CFG_INIT_SCRIPTS
     };
     for (int i = 0; i < dimof(__init_scripts); i++) {
-        printf("execute init scripts: %s\r\n", __init_scripts[i]);
+        printf("execute init script: %s\r\n", __init_scripts[i]);
         system(__init_scripts[i]);
     }
 #endif
