@@ -454,6 +454,7 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
                         while (*uchar != 0) {
                             *ptr++ = *uchar++;
                         }
+                        *ptr++ = '\0';
                     }
 
                     parser->lfn = 0;
