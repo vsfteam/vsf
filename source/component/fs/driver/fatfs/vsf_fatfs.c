@@ -32,7 +32,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_FATFS_CFG_MAX_FILENAME
-#   define VSF_FATFS_CFG_MAX_FILENAME   128
+#   define VSF_FATFS_CFG_MAX_FILENAME   (31 * 13 + 1)
 #endif
 
 #define FAT_ATTR_LFN                    0x0F
