@@ -72,7 +72,7 @@ const vk_mal_drv_t vk_scsi_mal_drv = {
 
 static uint_fast32_t __vk_scsi_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op)
 {
-    return( (vk_scsi_mal_t *)mal)->block_size;
+    return ((vk_scsi_mal_t *)mal)->block_size;
 }
 
 static bool __vk_scsi_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
@@ -149,6 +149,7 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
             }
 
             pthis->block_size = be32_to_cpu(pthis->buffer.capacity.block_size);
+            pthis->size = pthis->block_size * be32_to_cpu(pthis->buffer.capacity.block_number);
             vsf_eda_return(VSF_ERR_NONE);
             break;
         }
