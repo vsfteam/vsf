@@ -201,6 +201,7 @@
 #   define VSF_LINUX_USE_SOCKET                         ENABLED
 #       define VSF_LINUX_SOCKET_USE_INET                VSF_USE_LWIP
 #       define VSF_LINUX_SOCKET_USE_UNIX                ENABLED
+#   define VSF_LINUX_USE_DEVFS                          ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #if APP_USE_EVM_DEMO == ENABLED
