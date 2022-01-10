@@ -709,7 +709,14 @@ static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
 
 int mkdir(const char *pathname, mode_t mode)
 {
-    int fd = __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+    char fullpath[MAX_PATH];
+    int fd;
+
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
+    fd = __vsf_linux_fs_create(fullpath, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
     if (fd >= 0) {
         close(fd);
         fd = 0;
