@@ -73,6 +73,7 @@ int vsf_linux_fs_bind_rand(char *path)
 }
 #endif
 
+#if VSF_USE_MAL == ENABLED
 __vsf_component_peda_ifs_entry(__vk_devfs_mal_read, vk_file_read)
 {
     vsf_peda_begin();
@@ -107,6 +108,7 @@ int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal)
     }
     return -1;
 }
+#endif
 
 int vsf_linux_devfs_init(void)
 {
