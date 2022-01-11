@@ -278,9 +278,8 @@ extern void __vsf_stream_on_write(vsf_stream_t *stream);
 #include "./fifo_stream/vsf_fifo_stream.h"
 #include "./mem_stream/vsf_mem_stream.h"
 #include "./block_stream/vsf_block_stream.h"
-#if VSF_USE_DISTBUS == ENABLED
-#   include "./distbus_stream/vsf_distbus_stream.h"
-#endif
+#include "./distbus_stream/vsf_distbus_stream.h"
+#include "./queue_stream/vsf_queue_stream.h"
 
 /** @} */   // vsf_simple_stream
 /** @} */   // vsf_service
