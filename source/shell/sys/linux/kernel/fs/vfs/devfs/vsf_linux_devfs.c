@@ -110,11 +110,53 @@ int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal)
 }
 #endif
 
+__vsf_component_peda_ifs_entry(__vk_devfs_null_write, vk_file_write)
+{
+    vsf_peda_begin();
+    vsf_eda_return(vsf_local.size);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_devfs_zero_read, vk_file_read)
+{
+    vsf_peda_begin();
+    memset(vsf_local.buff, 0, vsf_local.size);
+    vsf_eda_return(vsf_local.size);
+    vsf_peda_end();
+}
+
 int vsf_linux_devfs_init(void)
 {
     int err = mkdir("/dev", 0);
     if (err != 0) {
+        fprintf(stderr, "fail to mkdir /dev\r\n");
         return err;
+    }
+
+    int fd = __vsf_linux_create_open_path("/dev/null");
+    if (fd >= 0) {
+        err = vsf_linux_fd_bind_target(fd, NULL, NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_null_write));
+        if (!err) {
+            vsf_linux_fd_set_feature(fd, VSF_FILE_ATTR_WRITE);
+            printf("%s bound.\r\n", "/dev/null");
+        }
+        close(fd);
+    } else {
+        fprintf(stderr, "fail to create /dev/null\r\n");
+        return -1;
+    }
+
+    fd = __vsf_linux_create_open_path("/dev/zero");
+    if (fd >= 0) {
+        err = vsf_linux_fd_bind_target(fd, NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_zero_read), NULL);
+        if (!err) {
+            vsf_linux_fd_set_feature(fd, VSF_FILE_ATTR_READ);
+            printf("%s bound.\r\n", "/dev/zero");
+        }
+        close(fd);
+    } else {
+        fprintf(stderr, "fail to create /dev/zero\r\n");
+        return -1;
     }
 
 #if VSF_LINUX_DEVFS_USE_RAND == ENABLED
