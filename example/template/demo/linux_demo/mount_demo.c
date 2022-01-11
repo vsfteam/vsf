@@ -83,12 +83,13 @@ static void __cleanup_lfs_fsdata(void *fsdata)
 #if VSF_FS_USE_WINFS == ENABLED
 static void * __prepare_winfs_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
-    vk_winfs_info_t *fsinfo = malloc(sizeof(vk_winfs_info_t));
+    vk_winfs_info_t *fsinfo = malloc(sizeof(vk_winfs_info_t) + strlen(param->device) + 1);
     if (NULL == fsinfo) {
         return NULL;
     }
 
-    fsinfo->root.name = strdup(param->device);
+    strcpy((char *)&fsinfo[1], param->device);
+    fsinfo->root.name = (char *)&fsinfo[1];
     return fsinfo;
 }
 
@@ -96,9 +97,6 @@ static void __cleanup_winfs_fsdata(void *fsdata)
 {
     vk_winfs_info_t *fsinfo = fsdata;
     if (fsinfo != NULL) {
-        if (fsinfo->root.name != NULL) {
-            free(fsinfo->root.name);
-        }
         free(fsinfo);
     }
 }
@@ -106,12 +104,13 @@ static void __cleanup_winfs_fsdata(void *fsdata)
 #if VSF_FS_USE_LINFS == ENABLED
 static void * __prepare_linfs_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
-    vk_linfs_info_t *fsinfo = malloc(sizeof(vk_linfs_info_t));
+    vk_linfs_info_t *fsinfo = malloc(sizeof(vk_linfs_info_t) + strlen(param->device) + 1);
     if (NULL == fsinfo) {
         return NULL;
     }
 
-    fsinfo->root.name = strdup(param->device);
+    strcpy((char *)&fsinfo[1], param->device);
+    fsinfo->root.name = (char *)&fsinfo[1];
     return fsinfo;
 }
 
@@ -119,9 +118,6 @@ static void __cleanup_linfs_fsdata(void *fsdata)
 {
     vk_linfs_info_t *fsinfo = fsdata;
     if (fsinfo != NULL) {
-        if (fsinfo->root.name != NULL) {
-            free(fsinfo->root.name);
-        }
         free(fsinfo);
     }
 }
