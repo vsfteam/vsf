@@ -93,20 +93,31 @@ __vsf_component_peda_ifs_entry(__vk_devfs_mal_read, vk_file_read)
     vsf_peda_end();
 }
 
+__vsf_component_peda_ifs_entry(__vk_devfs_mal_write, vk_file_write)
+{
+    vsf_peda_begin();
+
+    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)&vsf_this;
+    vk_mal_t *mal = vfs_file->f.param;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        vk_mal_write(mal, vsf_local.offset, vsf_local.size, vsf_local.buff);
+        break;
+    case VSF_EVT_RETURN:
+        vsf_eda_return(vsf_eda_get_return_value());
+        break;
+    }
+
+    vsf_peda_end();
+}
+
 int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal)
 {
-    int fd = __vsf_linux_create_open_path(path);
-    if (fd >= 0) {
-        int err = vsf_linux_fd_bind_target(fd, mal, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_read), NULL);
-        if (!err) {
-            vsf_linux_fd_set_feature(fd, VSF_FILE_ATTR_READ);
-            vsf_linux_fd_set_size(fd, mal->size);
-            printf("%s bound.\r\n", path);
-        }
-        close(fd);
-        return err;
-    }
-    return -1;
+    return vsf_linux_fs_bind_target_ex(path, mal,
+                (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_read),
+                (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_write),
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, mal->size);
 }
 #endif
 
