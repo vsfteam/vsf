@@ -142,6 +142,7 @@ __vsf_component_peda_ifs_entry(__vk_linfs_mount, vk_fs_mount)
         return;
     }
 
+    fsinfo->root.parent = NULL;
     dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
@@ -194,17 +195,19 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
     } else {
         DIR *dir = opendir(path);
         if (dir != NULL) {
-            closedir(dir);
-
             struct dirent *entry;
             while ((entry = readdir(dir)) != NULL) {
                 if (    !strcmp(entry->d_name, ".")
                     ||  !strcmp(entry->d_name, "..")) {
                     idx++;
                 }
-                if (!idx) {
+                if (!idx--) {
                     break;
                 }
+            }
+            if (NULL == entry) {
+                closedir(dir);
+                goto do_not_available;
             }
 
             namelen = strlen(entry->d_name);
@@ -213,7 +216,9 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
                 goto do_return;
             }
             path[len] = '\0';
+            strcat(path, "/");
             strcat(path, entry->d_name);
+            closedir(dir);
         } else {
             goto do_not_available;
         }

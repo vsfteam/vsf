@@ -148,6 +148,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_mount, vk_fs_mount)
     }
     FindClose(hFind);
 
+    fsinfo->root.parent = NULL;
     dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
