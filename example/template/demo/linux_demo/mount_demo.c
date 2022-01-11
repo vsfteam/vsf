@@ -24,16 +24,16 @@ typedef struct __fs_type_t __fs_type_t;
 struct __fs_type_t {
     char *fs;
     const vk_fs_op_t *fsop;
-    void * (*prepare_fsdata)(__fs_type_t *fstype, __fs_param_t *param);
+    void * (*prepare_fsdata)(const __fs_type_t *fstype, __fs_param_t *param);
     void (*cleanup_fsdata)(void *fsdata);
 
     bool need_block_size;
 };
 
-static void * __prepare_file_mal_fsdata(__fs_type_t *fstype, __fs_param_t *param);
+static void * __prepare_file_mal_fsdata(const __fs_type_t *fstype, __fs_param_t *param);
 static void __cleanup_file_mal_fsdata(void *fsdata);
 #if VSF_FS_USE_MEMFS == ENABLED
-static void * __prepare_memfs_fsdata(__fs_type_t *fstype, __fs_param_t *param)
+static void * __prepare_memfs_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
     void * fsinfo;
     if (vsf_linux_fs_get_target(param->device, &fsinfo) < 0) {
@@ -47,7 +47,7 @@ static void __cleanup_memfs_fsdata(void *fsdata)
 }
 #endif
 #if VSF_FS_USE_LITTLEFS == ENABLED
-static void * __prepare_lfs_fsdata(__fs_type_t *fstype, __fs_param_t *param)
+static void * __prepare_lfs_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
     vk_file_mal_t *file_mal = __prepare_file_mal_fsdata(fstype, param);
     vk_lfs_info_t *fsinfo = malloc(sizeof(vk_lfs_info_t));
@@ -81,7 +81,7 @@ static void __cleanup_lfs_fsdata(void *fsdata)
 }
 #endif
 #if VSF_FS_USE_WINFS == ENABLED
-static void * __prepare_winfs_fsdata(__fs_type_t *fstype, __fs_param_t *param)
+static void * __prepare_winfs_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
     vk_winfs_info_t *fsinfo = malloc(sizeof(vk_winfs_info_t));
     if (NULL == fsinfo) {
@@ -104,7 +104,7 @@ static void __cleanup_winfs_fsdata(void *fsdata)
 }
 #endif
 #if VSF_FS_USE_LINFS == ENABLED
-static void * __prepare_linfs_fsdata(__fs_type_t *fstype, __fs_param_t *param)
+static void * __prepare_linfs_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
     vk_linfs_info_t *fsinfo = malloc(sizeof(vk_linfs_info_t));
     if (NULL == fsinfo) {
@@ -127,7 +127,7 @@ static void __cleanup_linfs_fsdata(void *fsdata)
 }
 #endif
 
-static __fs_type_t __fs_types[] = {
+static const __fs_type_t __fs_types[] = {
     {
         .fs                 = "auto",
         .fsop               = NULL,
@@ -182,7 +182,7 @@ static __fs_type_t __fs_types[] = {
 #endif
 };
 
-static void * __prepare_file_mal_fsdata(__fs_type_t *fstype, __fs_param_t *param)
+static void * __prepare_file_mal_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
     vk_file_mal_t *file_mal = malloc(sizeof(*file_mal));
     if (NULL == file_mal) {
@@ -217,7 +217,7 @@ static void __cleanup_file_mal_fsdata(void *fsdata)
 
 int mount_main(int argc, char *argv[])
 {
-    __fs_type_t *fs_type = &__fs_types[0];
+    const __fs_type_t *fs_type = &__fs_types[0];
     __fs_param_t param = { 0 };
     void *fsdata = NULL;
 
