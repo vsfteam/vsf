@@ -127,6 +127,10 @@ extern int vsf_linux_fd_get_target(int fd, void **target);
 extern int vsf_linux_fs_bind_target(const char *pathname, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write);
+int vsf_linux_fs_bind_target_ex(const char *pathname, void *target,
+        vsf_param_eda_evthandler_t peda_read,
+        vsf_param_eda_evthandler_t peda_write,
+        uint_fast32_t feature, uint64_t size);
 extern int vsf_linux_fs_get_target(const char *pathname, void **target);
 
 // sfd is allocated and initialized by user(clear memory, and set op),

@@ -1082,20 +1082,30 @@ int vsf_linux_fs_get_target(const char *pathname, void **target)
     return err;
 }
 
-int vsf_linux_fs_bind_target(const char *pathname, void *target,
+int vsf_linux_fs_bind_target_ex(const char *pathname, void *target,
         vsf_param_eda_evthandler_t peda_read,
-        vsf_param_eda_evthandler_t peda_write)
+        vsf_param_eda_evthandler_t peda_write,
+        uint_fast32_t feature, uint64_t size)
 {
-    int fd = __vsf_linux_create_open_path((char *)pathname);
+    int fd = __vsf_linux_create_open_path(pathname);
     if (fd >= 0) {
         int err = vsf_linux_fd_bind_target(fd, target, peda_read, peda_write);
         if (!err) {
+            vsf_linux_fd_set_feature(fd, feature);
+            vsf_linux_fd_set_size(fd, size);
             printf("%s bound.\r\n", pathname);
         }
         close(fd);
         return err;
     }
     return -1;
+}
+
+int vsf_linux_fs_bind_target(const char *pathname, void *target,
+        vsf_param_eda_evthandler_t peda_read,
+        vsf_param_eda_evthandler_t peda_write)
+{
+    return vsf_linux_fs_bind_target_ex(pathname, target, peda_read, peda_write, 0, 0);
 }
 
 // stream

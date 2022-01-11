@@ -133,30 +133,20 @@ int vsf_linux_devfs_init(void)
         return err;
     }
 
-    int fd = __vsf_linux_create_open_path("/dev/null");
-    if (fd >= 0) {
-        err = vsf_linux_fd_bind_target(fd, NULL, NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_null_write));
-        if (!err) {
-            vsf_linux_fd_set_feature(fd, VSF_FILE_ATTR_WRITE);
-            printf("%s bound.\r\n", "/dev/null");
-        }
-        close(fd);
-    } else {
-        fprintf(stderr, "fail to create /dev/null\r\n");
-        return -1;
+    err = vsf_linux_fs_bind_target_ex("dev/null", NULL,
+                NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_null_write),
+                VSF_FILE_ATTR_WRITE, 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to bind /dev/null\r\n");
+        return err;
     }
 
-    fd = __vsf_linux_create_open_path("/dev/zero");
-    if (fd >= 0) {
-        err = vsf_linux_fd_bind_target(fd, NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_zero_read), NULL);
-        if (!err) {
-            vsf_linux_fd_set_feature(fd, VSF_FILE_ATTR_READ);
-            printf("%s bound.\r\n", "/dev/zero");
-        }
-        close(fd);
-    } else {
-        fprintf(stderr, "fail to create /dev/zero\r\n");
-        return -1;
+    err = vsf_linux_fs_bind_target_ex("dev/zero", NULL,
+                (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_zero_read), NULL,
+                VSF_FILE_ATTR_READ, 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to bind /dev/zero\r\n");
+        return err;
     }
 
 #if VSF_LINUX_DEVFS_USE_RAND == ENABLED
