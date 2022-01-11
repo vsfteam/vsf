@@ -1087,7 +1087,7 @@ int vsf_linux_fs_bind_target_ex(const char *pathname, void *target,
         vsf_param_eda_evthandler_t peda_write,
         uint_fast32_t feature, uint64_t size)
 {
-    int fd = __vsf_linux_create_open_path(pathname);
+    int fd = __vsf_linux_create_open_path((char *)pathname);
     if (fd >= 0) {
         int err = vsf_linux_fd_bind_target(fd, target, peda_read, peda_write);
         if (!err) {
