@@ -5763,6 +5763,9 @@
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\gpio_demo.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\spi_demo.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\usart_demo.c</name>
                 </file>
             </group>
@@ -11540,6 +11543,15 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>spi</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_template.inc</name>
                         </file>
                     </group>
                     <group>
