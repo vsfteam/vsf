@@ -1117,6 +1117,9 @@
     <Filter Include="vsf\component\3rd-party\mbedtls\port">
       <UniqueIdentifier>{e04c0e90-ba9e-4f32-8b4f-ed64d25ead65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\simple_stream\queue_stream">
+      <UniqueIdentifier>{e1aea818-5269-4bc9-9099-8f139667452b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3317,6 +3320,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\port\platform_vsf.h">
       <Filter>vsf\component\3rd-party\mbedtls\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.h">
+      <Filter>vsf\service\simple_stream\queue_stream</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5791,6 +5797,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\port\platform_vsf.c">
       <Filter>vsf\component\3rd-party\mbedtls\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.c">
+      <Filter>vsf\service\simple_stream\queue_stream</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

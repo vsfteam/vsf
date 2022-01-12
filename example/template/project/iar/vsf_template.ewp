@@ -12800,6 +12800,15 @@
                         <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.h</name>
                     </file>
                 </group>
+                <group>
+                    <name>queue_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.h</name>
+                    </file>
+                </group>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\service\simple_stream\vsf_simple_stream.c</name>
                 </file>
