@@ -14,12 +14,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: doxygen-en
-        uses: mattnotmitt/doxygen-action@v1
+        uses: mattnotmitt/doxygen-action@v1.9.2
         with:
           doxyfile-path: 'doxygen/vsf_doxygen_en.conf'
 
       - name: doxygen-zh
-        uses: mattnotmitt/doxygen-action@v1
+        uses: mattnotmitt/doxygen-action@v1.9.2
         with:
           doxyfile-path: 'doxygen/vsf_doxygen_zh.conf'
 
