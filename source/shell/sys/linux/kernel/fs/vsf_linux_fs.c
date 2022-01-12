@@ -75,17 +75,6 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-typedef struct vsf_linux_stream_priv_t {
-    vsf_stream_t *stream;
-} vsf_linux_stream_priv_t;
-
-typedef struct vsf_linux_pipe_buffer_t {
-    vsf_slist_node_t buffer_node;
-    size_t size;
-    size_t pos;
-} vsf_linux_pipe_buffer_t;
-
 /*============================ PROTOTYPES ====================================*/
 
 static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
@@ -99,8 +88,6 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
-static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
-static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -126,14 +113,14 @@ static const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
 const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop = {
     .priv_size          = sizeof(vsf_linux_pipe_rx_priv_t),
     .fn_fcntl           = __vsf_linux_pipe_fcntl,
-    .fn_read            = __vsf_linux_pipe_read,
+    .fn_read            = __vsf_linux_stream_read,
     .fn_close           = __vsf_linux_pipe_close,
 };
 
 const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
     .priv_size          = sizeof(vsf_linux_pipe_tx_priv_t),
     .fn_fcntl           = __vsf_linux_pipe_fcntl,
-    .fn_write           = __vsf_linux_pipe_write,
+    .fn_write           = __vsf_linux_stream_write,
     .fn_close           = __vsf_linux_pipe_close,
 };
 
@@ -1115,15 +1102,36 @@ static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
     return 0;
 }
 
+static void __vsf_linux_stream_evt(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool is_rx, bool is_ready)
+{
+    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+        if (priv->on_evt != NULL) {
+            priv->on_evt(sfd, orig, is_ready);
+        } else if (is_ready) {
+            if (is_rx) {
+                vsf_linux_fd_rx_ready(sfd, orig);
+            } else {
+                vsf_linux_fd_tx_ready(sfd, orig);
+            }
+        } else {
+            if (is_rx) {
+                vsf_linux_fd_rx_busy(sfd, orig);
+            } else {
+                vsf_linux_fd_tx_busy(sfd, orig);
+            }
+        }
+    vsf_unprotect_sched(orig);
+}
+
 static void __vsf_linux_stream_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vsf_linux_fd_t *sfd = param;
     switch (evt) {
     case VSF_STREAM_ON_RX:
-        vsf_linux_fd_rx_ready(sfd, vsf_protect_sched());
+        __vsf_linux_stream_evt(sfd, vsf_protect_sched(), true, true);
         break;
     case VSF_STREAM_ON_TX:
-        vsf_linux_fd_tx_ready(sfd, vsf_protect_sched());
+        __vsf_linux_stream_evt(sfd, vsf_protect_sched(), false, true);
         break;
     }
 }
@@ -1186,7 +1194,7 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
     orig = vsf_protect_sched();
     VSF_LINUX_ASSERT(NULL == sfd->rxpend);
     if (!vsf_stream_get_data_size(stream)) {
-        vsf_linux_fd_rx_busy(sfd, orig);
+        __vsf_linux_stream_evt(sfd, orig, true, false);
     } else {
         vsf_linux_fd_rx_trigger(sfd, orig);
     }
@@ -1218,7 +1226,7 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
     orig = vsf_protect_sched();
     VSF_LINUX_ASSERT(NULL == sfd->txpend);
     if (!vsf_stream_get_free_size(stream)) {
-        vsf_linux_fd_tx_busy(sfd, orig);
+        __vsf_linux_stream_evt(sfd, orig, false, false);
     } else {
         vsf_linux_fd_tx_trigger(sfd, orig);
     }
@@ -1292,117 +1300,11 @@ static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
     return 0;
 }
 
-static ssize_t __vsf_linux_pipe_read(vsf_linux_fd_t *sfd_rx, void *buf, size_t count)
-{
-    vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
-    vsf_linux_pipe_buffer_t *buffer;
-    ssize_t read_cnt = 0, cur_size;
-
-    vsf_trig_t trig;
-    vsf_linux_fd_trigger_init(&trig);
-
-    vsf_protect_t orig;
-    while (true) {
-        orig = vsf_protect_sched();
-        while (!vsf_slist_queue_is_empty(&priv_rx->buffer_queue)) {
-            vsf_slist_queue_peek(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
-            vsf_unprotect_sched(orig);
-
-            cur_size = buffer->size - buffer->pos;
-            cur_size = min(cur_size, count);
-            memcpy(buf, (uint8_t *)&buffer[1] + buffer->pos, cur_size);
-            buf = (uint8_t *)buf + cur_size;
-            count -= cur_size;
-            read_cnt += cur_size;
-            buffer->pos += cur_size;
-            if (buffer->pos >= buffer->size) {
-                orig = vsf_protect_sched();
-                    vsf_slist_queue_dequeue(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
-                vsf_unprotect_sched(orig);
-
-                vsf_heap_free(buffer);
-            }
-
-            orig = vsf_protect_sched();
-            if (!count) {
-                break;
-            }
-        }
-
-        if (!read_cnt) {
-            vsf_linux_fd_rx_pend(sfd_rx, &trig, orig);
-            continue;
-        }
-
-        VSF_LINUX_ASSERT(NULL == sfd_rx->rxpend);
-        if (vsf_slist_queue_is_empty(&priv_rx->buffer_queue)) {
-            if (priv_rx->on_evt != NULL) {
-                priv_rx->on_evt(sfd_rx, orig, false);
-            } else {
-                vsf_linux_fd_rx_busy(sfd_rx, orig);
-            }
-        } else {
-            if (priv_rx->on_evt != NULL) {
-                priv_rx->on_evt(sfd_rx, orig, true);
-            } else {
-                vsf_linux_fd_rx_ready(sfd_rx, orig);
-            }
-        }
-        break;
-    }
-    return read_cnt;
-}
-
-static ssize_t __vsf_linux_pipe_write(vsf_linux_fd_t *sfd_tx, const void *buf, size_t count)
-{
-    vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
-    vsf_linux_fd_t *sfd_rx = priv_tx->sfd_rx;
-    vsf_linux_pipe_rx_priv_t *priv_rx;
-
-    if (NULL == sfd_rx) {
-        return -1;
-    }
-
-    priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
-
-    vsf_linux_pipe_buffer_t *buffer = vsf_heap_malloc(sizeof(*buffer) + count);
-    if (NULL == buffer) {
-        return -1;
-    }
-    vsf_slist_init_node(vsf_linux_pipe_buffer_t, buffer_node, buffer);
-    buffer->pos = 0;
-    buffer->size = count;
-    memcpy(&buffer[1], buf, count);
-
-    vsf_protect_t orig = vsf_protect_sched();
-    bool is_empty = vsf_slist_queue_is_empty(&priv_rx->buffer_queue);
-    vsf_slist_queue_enqueue(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
-    if (is_empty) {
-        if (priv_rx->on_evt != NULL) {
-            priv_rx->on_evt(sfd_rx, orig, true);
-        } else {
-            vsf_linux_fd_rx_ready(sfd_rx, orig);
-        }
-    } else {
-        vsf_unprotect_sched(orig);
-    }
-    return count;
-}
-
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
 {
     if (&vsf_linux_pipe_rx_fdop == sfd->op) {
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd->priv;
-        vsf_linux_pipe_buffer_t *buffer;
-
-        vsf_protect_t orig = vsf_protect_sched();
-        while (!vsf_slist_queue_is_empty(&priv_rx->buffer_queue)) {
-            vsf_slist_queue_dequeue(vsf_linux_pipe_buffer_t, buffer_node, &priv_rx->buffer_queue, buffer);
-            vsf_unprotect_sched(orig);
-            vsf_heap_free(buffer);
-            orig = vsf_protect_sched();
-        }
-        vsf_unprotect_sched(orig);
+        VSF_STREAM_READ(priv_rx->stream, NULL, 0xFFFFFFFF);
     }
     return 0;
 }
@@ -1412,7 +1314,11 @@ vsf_linux_fd_t * vsf_linux_rx_pipe(void)
     vsf_linux_fd_t *sfd_rx = NULL;
     if (vsf_linux_fd_create(&sfd_rx, &vsf_linux_pipe_rx_fdop) >= 0) {
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
-        vsf_slist_queue_init(&priv_rx->buffer_queue);
+
+        priv_rx->queue_stream.max_buffer_size = -1;
+        priv_rx->queue_stream.op = &vsf_queue_stream_op;
+        priv_rx->stream = &priv_rx->queue_stream.use_as__vsf_stream_t;
+        vsf_stream_init(priv_rx->stream);
     }
     return sfd_rx;
 }
@@ -1422,7 +1328,8 @@ vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_fd_t *sfd_rx)
     vsf_linux_fd_t *sfd_tx = NULL;
     if (vsf_linux_fd_create(&sfd_tx, &vsf_linux_pipe_tx_fdop) >= 0) {
         vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
-        priv_tx->sfd_rx = sfd_rx;
+        vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+        priv_tx->stream = priv_rx->stream;
     }
     return sfd_tx;
 }

@@ -78,23 +78,30 @@ vsf_class(vsf_linux_fd_t) {
 };
 
 #if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
-typedef void (*vsf_linux_pipe_on_rx_evt_t)(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool is_ready);
+typedef void (*vsf_linux_stream_on_evt_t)(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool is_ready);
 
-vsf_class(vsf_linux_pipe_rx_priv_t) {
+vsf_class(vsf_linux_stream_priv_t) {
     private_member(
-        vsf_slist_queue_t buffer_queue;
+        vsf_stream_t *stream;
     )
     protected_member(
-        vsf_linux_pipe_on_rx_evt_t on_evt;
+        vsf_linux_stream_on_evt_t on_evt;
+    )
+};
+
+vsf_class(vsf_linux_pipe_rx_priv_t) {
+    protected_member(
+        implement(vsf_linux_stream_priv_t)
         void *target;
+    )
+    private_member(
+        vsf_queue_stream_t queue_stream;
     )
 };
 
 vsf_class(vsf_linux_pipe_tx_priv_t) {
-    private_member(
-        vsf_linux_fd_t *sfd_rx;
-    )
     protected_member(
+        implement(vsf_linux_stream_priv_t)
         void *target;
     )
 };
