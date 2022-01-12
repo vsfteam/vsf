@@ -27,78 +27,200 @@
 
 #define SPI_DATASIZE(__N)       VSF_MCONNECT2(SPI_MODE_DATASIZE_, __N)
 
+#ifndef VSF_SPI_CFG_MULTI_INSTANCES
+#   define VSF_SPI_CFG_MULTI_INSTANCES        DISABLED
+#endif
+
+#ifndef VSF_SPI_REIMPLEMENT_MODE
+#   define VSF_SPI_REIMPLEMENT_MODE           DISABLED
+#endif
+
+#ifndef VSF_SPI_REIMPLEMENT_IRQ_MASK
+#   define VSF_SPI_REIMPLEMENT_IRQ_MASK       DISABLED
+#endif
+
+#ifndef VSF_SPI_REIMPLEMENT_STATUS
+#   define VSF_SPI_REIMPLEMENT_STATUS         DISABLED
+#endif
+
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+
+#if VSF_SPI_CFG_MULTI_INSTANCES == DISABLED
+#   ifndef VSF_SPI_CFG_PREFIX
+#       define VSF_SPI_CFG_PREFIX             vsf_hw
+#   endif
+
+#   define ____VSF_SPI_WRAPPER(__header, __api)   __header ## _ ## __api
+#   define __VSF_SPI_WRAPPER(__header, __api)     ____VSF_SPI_WRAPPER(__header, __api)
+#   define vsf_spi_init                 __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_init)
+#   define vsf_spi_enable               __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_enable)
+#   define vsf_spi_disable              __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_disable)
+#   define vsf_spi_irq_enable           __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_irq_enable)
+#   define vsf_spi_irq_disable          __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_irq_disable)
+#   define vsf_spi_status               __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_status)
+#   define vsf_spi_cs_active            __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_fifo_read)
+#   define vsf_spi_cs_inactive          __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cs_inactive)
+#   define vsf_spi_fifo_transfer        __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_fifo_transfer)
+#   define vsf_spi_fifo_flush           __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_fifo_flush)
+#   define vsf_spi_request_transfer     __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_request_transfer)
+#   define vsf_spi_cancel_transfer      __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cancel_transfer)
+#   define vsf_spi_get_transfered_count __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_get_transfered_count)
+#endif
+
+#define VSF_SPI_INIT(spi_ptr, cfg_ptr)                                          \
+    vsf_spi_init((vsf_spi_t *)spi_ptr, cfg_ptr)
+#define VSF_SPI_ENABLE(spi_ptr)                                                 \
+    vsf_spi_enable((vsf_spi_t *)spi_ptr)
+#define VSF_SPI_DISABLE(spi_ptr)                                                \
+    vsf_spi_disable((vsf_spi_t *)spi_ptr)
+#define VSF_SPI_IRQ_ENABLE(spi_ptr, irq_mask)                                   \
+    vsf_spi_irq_enable((vsf_spi_t *)spi_ptr, irq_mask)
+#define VSF_SPI_IRQ_DISABLE(spi_ptr, irq_mask)                                  \
+    vsf_spi_irq_disable((vsf_spi_t *)spi_ptr, irq_mask)
+#define VSF_SPI_STATUS(spi_ptr)                                                 \
+    vsf_spi_status((vsf_spi_t *)spi_ptr)
+#define VSF_SPI_CS_ACTIVE(spi_ptr, index)                                       \
+    vsf_spi_cs_active((vsf_spi_t *)spi_ptr, index)
+#define VSF_SPI_CS_INACTIVE(spi_ptr, index)                                     \
+    vsf_spi_cs_inactive((vsf_spi_t *)spi_ptr, index)
+#define VSF_SPI_FIFO_TRANSFER(spi_ptr, out_buffer_ptr, out_count_ptr,           \
+                              in_buffer_ptr, in_count_ptr)                      \
+    vsf_spi_fifo_transfer((vsf_spi_t *)spi_ptr, out_buffer_ptr,                 \
+                          out_count_ptr, in_buffer_ptr, in_count_ptr)
+#define VSF_SPI_FIFO_FLUSH(spi_ptr)                                             \
+    vsf_spi_fifo_flush((vsf_spi_t *)spi_ptr)
+#define VSF_SPI_REQUEST_TRANSFER(spi_ptr, out_buffer_ptr,                       \
+                                 in_buffer_ptr, count)                          \
+    vsf_spi_request_transfer((vsf_spi_t *)spi_ptr, out_buffer_ptr,              \
+                             in_buffer_ptr, count)
+#define VSF_SPI_CANCEL_TRANSFER(spi_ptr)                                        \
+    vsf_spi_cancel_transfer((vsf_spi_t *)spi_ptr)
+#define VSF_SPI_GET_TRANSFERED_COUNT(spi_ptr)                                   \
+    vsf_spi_get_transfered_count((vsf_spi_t *)spi_ptr)
+
+
 /*============================ TYPES =========================================*/
 
 typedef enum em_spi_mode_t em_spi_mode_t;
-/*
+
+#if VSF_SPI_REIMPLEMENT_MODE == DISABLED
 //! \name spi working mode
 //! @{
 enum em_spi_mode_t {
-    SPI_MASTER                  = 0x00,             //!< select master mode
-    SPI_SLAVE                   = BIT(0),           //!< select slave mode
+    SPI_MASTER                  = 0x00ul << 0,      //!< select master mode
+    SPI_SLAVE                   = 0x01ul << 0,      //!< select slave mode
+    SPI_DIR_MODE_MASK           = 0x01ul << 0,
 
-    SPI_MSB_FIRST               = 0x00,             //!< default enable MSB
-    SPI_LSB_FIRST               = BIT(7)            //!< transfer LSB first
+    SPI_MSB_FIRST               = 0x00ul << 1,      //!< default enable MSB
+    SPI_LSB_FIRST               = 0x01ul << 1,      //!< transfer LSB first
+    SPI_BIT_ORDER_MASK          = 0x01ul << 1,
 
-    SPI_CPOL_HIGH               = BIT(3),           //!< SCK clock polarity is high
-    SPI_CPOL_LOW                = 0x00,             //!< SCK clock polarity is low
-    SPI_CPHA_HIGH               = 0x00,             //!< SCK clock phase is high
-    SPI_CPHA_LOW                = BIT(4),           //!< SCK clock phase is low
+    SPI_CPOL_LOW                = 0x00ul << 2,      //!< SCK clock polarity is low
+    SPI_CPOL_HIGH               = 0x01ul << 2,      //!< SCK clock polarity is high
+    SPI_CPHA_LOW                = 0x00ul << 3,      //!< SCK clock phase is low
+    SPI_CPHA_HIGH               = 0x01ul << 3,      //!< SCK clock phase is high
+    SPI_CLOCK_MODE_0            = SPI_CPOL_LOW  | SPI_CPHA_LOW,
+    SPI_CLOCK_MODE_1            = SPI_CPOL_LOW  | SPI_CPHA_HIGH,
+    SPI_CLOCK_MODE_2            = SPI_CPOL_HIGH | SPI_CPHA_LOW,
+    SPI_CLOCK_MODE_3            = SPI_CPOL_HIGH | SPI_CPHA_HIGH,
+    SPI_CLOCK_MODE_MASK         = SPI_CLOCK_MODE_3,
 
-    SPI_MODE_SPI                = 0x00,             //!< the driver should at least support standard spi frame
+    SPI_DATASIZE_8              = 0x07ul << 4,      //!< datasize is 8 bits
+    SPI_DATASIZE_9              = 0x08ul << 4,
+    SPI_DATASIZE_10             = 0x09ul << 4,
+    SPI_DATASIZE_11             = 0x0Aul << 4,
+    SPI_DATASIZE_12             = 0x0Bul << 4,
+    SPI_DATASIZE_13             = 0x0Cul << 4,
+    SPI_DATASIZE_14             = 0x0Dul << 4,
+    SPI_DATASIZE_15             = 0x0Eul << 4,
+    SPI_DATASIZE_16             = 0x0Ful << 4,
+    SPI_DATASIZE_17             = 0x10ul << 4,
+    SPI_DATASIZE_18             = 0x11ul << 4,
+    SPI_DATASIZE_19             = 0x12ul << 4,
+    SPI_DATASIZE_20             = 0x13ul << 4,
+    SPI_DATASIZE_21             = 0x14ul << 4,
+    SPI_DATASIZE_22             = 0x15ul << 4,
+    SPI_DATASIZE_23             = 0x16ul << 4,
+    SPI_DATASIZE_24             = 0x17ul << 4,
+    SPI_DATASIZE_25             = 0x18ul << 4,
+    SPI_DATASIZE_26             = 0x19ul << 4,
+    SPI_DATASIZE_27             = 0x1Aul << 4,
+    SPI_DATASIZE_28             = 0x1Bul << 4,
+    SPI_DATASIZE_29             = 0x1Cul << 4,
+    SPI_DATASIZE_30             = 0x1Dul << 4,
+    SPI_DATASIZE_31             = 0x1Eul << 4,
+    SPI_DATASIZE_32             = 0x1Ful << 4,
+    SPI_DATASIZE_MASK           = 0x1Ful << 4,
 
-    SPI_DATASIZE_8              = 0x7,              //!< datasize is 8 bits
+    SPI_AUTO_CS_DISABLE         = 0x00ul << 9,
+    SPI_AUTO_CS_ENABLE          = 0x01ul << 9,
+    SPI_AUTO_CS_MASK            = 0x01ul << 9,
 
-    // device specific settings
-    SPI_MODE_TI                 = BIT(1),
-    SPI_MODE_MICROWIRE          = BIT(2),
-
-    SPI_LOOP_BACK               = BIT(5),           //!< enable loop back
+    SPI_LOOP_BACK               = 0x01ul << 10,     //!< enable loop back
 };
 //! @}
-*/
+#endif
 
+typedef enum em_spi_irq_mask_t em_spi_irq_mask_t;
+
+#if VSF_SPI_REIMPLEMENT_IRQ_MASK == DISABLED
 /*! \brief em_spi_irq_mask_t
  *! \note em_spi_irq_mask_t should provide irq masks
-//! @{
+ */
 enum em_spi_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
-    SPI_IRQ_MASK_TX,
-    SPI_IRQ_MASK_RX,
+    SPI_IRQ_MASK_TX             = 0x01ul << 0,
+    SPI_IRQ_MASK_RX             = 0x01ul << 1,
 
     // request_rx/request_tx complete
-    SPI_IRQ_MASK_TX_CPL,
-    SPI_IRQ_MASK_RX_CPL,
+    SPI_IRQ_MASK_TX_CPL         = 0x01ul << 2,
+    SPI_IRQ_MASK_CPL            = 0x01ul << 3,
 
     // optional
     // FIFO
-    SPI_IRQ_MASK_RX_FIFO_FULL,
-    SPI_IRQ_MASK_TX_FIFO_EMPTY,
+    SPI_IRQ_MASK_RX_FIFO_FULL   = 0x01ul << 4,
+    SPI_IRQ_MASK_TX_FIFO_EMPTY  = 0x01ul << 5,
+
+    SPI_IRQ_MASK                =  SPI_IRQ_MASK_TX
+                                 | SPI_IRQ_MASK_RX
+                                 | SPI_IRQ_MASK_TX_CPL
+                                 | SPI_IRQ_MASK_CPL
+                                 | SPI_IRQ_MASK_RX_FIFO_FULL
+                                 | SPI_IRQ_MASK_TX_FIFO_EMPTY,
 };
-//! @}
- */
+#endif
 
 /* spi_status_t should implement peripheral_status_t */
 typedef struct spi_status_t spi_status_t;
 
+#if VSF_SPI_REIMPLEMENT_STATUS == DISABLED
+struct spi_status_t {
+    union {
+        inherit(peripheral_status_t)
+        struct {
+            uint32_t is_busy : 1;
+        };
+    };
+};
+#endif
+
 /* spi_capability_t should implement peripheral_capability_t */
 typedef struct spi_capability_t spi_capability_t;
 
-typedef enum em_spi_irq_mask_t em_spi_irq_mask_t;
-
 typedef struct vsf_spi_t vsf_spi_t;
 
-typedef void vsf_spi_isrhandler_t(  void *target_ptr,
-                                    vsf_spi_t *spi_ptr,
-                                    em_spi_irq_mask_t irq_mask);
+typedef void vsf_spi_isr_handler_t(void *target_ptr,
+                                   vsf_spi_t *spi_ptr,
+                                   em_spi_irq_mask_t irq_mask);
 
 //! \name spi isr for api
 //! @{
 typedef struct vsf_spi_isr_t {
-    vsf_spi_isrhandler_t        *handler_fn;
-    void                        *target_ptr;
-    vsf_arch_prio_t             prio;
+    vsf_spi_isr_handler_t *handler_fn;
+    void                  *target_ptr;
+    vsf_arch_prio_t        prio;
 } vsf_spi_isr_t;
 
 //! \name spi configuration for api
@@ -109,6 +231,32 @@ typedef struct spi_cfg_t {
     vsf_spi_isr_t               isr;
 } spi_cfg_t;
 //! @}
+
+typedef struct vsf_spi_op_t {
+    vsf_err_t          (*init)                (vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr);
+    fsm_rt_t           (*enable)              (vsf_spi_t *spi_ptr);
+    fsm_rt_t           (*disable)             (vsf_spi_t *spi_ptr);
+    void               (*irq_enable)          (vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask);
+    void               (*irq_disable)         (vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask);
+    spi_status_t       (*status)              (vsf_spi_t *spi_ptr);
+    spi_capability_t   (*capability)          (vsf_spi_t *spi_ptr);
+    void               (*cs_active)           (vsf_spi_t *spi_ptr, uint_fast8_t index);
+    void               (*cs_inactive)         (vsf_spi_t *spi_ptr, uint_fast8_t index);
+    void               (*fifo_transfer)       (vsf_spi_t *spi_ptr, void *out_buffer_ptr,
+                                               uint_fast32_t *out_count_ptr, void *in_buffer_ptr,
+                                               uint_fast32_t *in_count_ptr);
+    bool               (*fifo_flush)          (vsf_spi_t *spi_ptr);
+    vsf_err_t          (*request_transfer)    (vsf_spi_t *spi_ptr, void *out_buffer_ptr,
+                                               void *in_buffer_ptr, uint_fast32_t count);
+    vsf_err_t          (*cancel_transfer)     (vsf_spi_t *spi_ptr);
+    int_fast32_t       (*get_transfered_count)(vsf_spi_t *spi_ptr);
+} vsf_spi_op_t;
+
+#if VSF_SPI_CFG_MULTI_INSTANCES == ENABLED
+struct vsf_spi_t  {
+    const vsf_spi_op_t * op;
+};
+#endif
 
 dcl_interface(i_spi_t)
 
