@@ -93,9 +93,7 @@ vsf_class(vsf_linux_pipe_rx_priv_t) {
     protected_member(
         implement(vsf_linux_stream_priv_t)
         void *target;
-    )
-    private_member(
-        vsf_queue_stream_t queue_stream;
+        bool is_to_free_stream;
     )
 };
 
@@ -172,8 +170,8 @@ extern vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream);
 extern vsf_stream_t * vsf_linux_get_stream(vsf_linux_fd_t *sfd);
 
 // pipe
-extern vsf_linux_fd_t * vsf_linux_rx_pipe(void);
-extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_fd_t *sfd_rx);
+extern vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream);
+extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_queue_stream_t *queue_stream);
 #endif
 
 #ifdef __cplusplus

@@ -223,7 +223,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     VSF_LINUX_ASSERT(priv->remote->is_listening);
     vsf_linux_fd_t *sfd_remote = container_of(priv->remote, vsf_linux_fd_t, priv);
 
-    vsf_linux_fd_t *sfd_rx = vsf_linux_rx_pipe();
+    vsf_linux_fd_t *sfd_rx = vsf_linux_rx_pipe(NULL);
     if (NULL == sfd_rx) {
         return -1;
     }
@@ -251,7 +251,9 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     }
     VSF_LINUX_ASSERT(priv->remote->trig != NULL);
 
-    vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe(priv->rw.sfd_tx);
+    vsf_linux_pipe_rx_priv_t *pipe_priv = priv->rw.sfd_tx->priv;
+    vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)pipe_priv->stream;
+    vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe(queue_stream);
     if (NULL == sfd_rx) {
         priv->remote->remote = NULL;
         vsf_eda_trig_set(priv->remote->trig);
@@ -320,13 +322,15 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
             priv_remote->remote = priv_new;
 
             // 2. provide sfd_rx and trigger remote
-            vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe(priv_remote->rw.sfd_rx);
+            vsf_linux_pipe_rx_priv_t *pipe_priv = priv_remote->rw.sfd_rx->priv;
+            vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)pipe_priv->stream;
+            vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe(queue_stream);
             if (NULL == sfd_tx) {
             close_sockfd_new_and_fail:
                 close(sockfd_new);
                 goto fail;
             }
-            vsf_linux_fd_t *sfd_rx = vsf_linux_rx_pipe();
+            vsf_linux_fd_t *sfd_rx = vsf_linux_rx_pipe(NULL);
             if (NULL == sfd_rx) {
             free_sfd_tx_and_close_sockfd_new_and_fail:
                 vsf_linux_fd_delete(sfd_tx->fd);

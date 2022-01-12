@@ -1305,31 +1305,43 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
     if (&vsf_linux_pipe_rx_fdop == sfd->op) {
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd->priv;
         VSF_STREAM_READ(priv_rx->stream, NULL, 0xFFFFFFFF);
+        if (priv_rx->is_to_free_stream) {
+            free(priv_rx->stream);
+        }
     }
     return 0;
 }
 
-vsf_linux_fd_t * vsf_linux_rx_pipe(void)
+vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream)
 {
     vsf_linux_fd_t *sfd_rx = NULL;
     if (vsf_linux_fd_create(&sfd_rx, &vsf_linux_pipe_rx_fdop) >= 0) {
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
 
-        priv_rx->queue_stream.max_buffer_size = -1;
-        priv_rx->queue_stream.op = &vsf_queue_stream_op;
-        priv_rx->stream = &priv_rx->queue_stream.use_as__vsf_stream_t;
+        if (NULL == queue_stream) {
+            queue_stream = malloc(sizeof(vsf_queue_stream_t));
+            if (NULL == queue_stream) {
+                vsf_linux_fd_delete(sfd_rx->fd);
+                return NULL;
+            }
+            priv_rx->is_to_free_stream = true;
+        }
+
+        queue_stream->max_buffer_size = -1;
+        queue_stream->op = &vsf_queue_stream_op;
+        priv_rx->stream = &queue_stream->use_as__vsf_stream_t;
         vsf_stream_init(priv_rx->stream);
     }
     return sfd_rx;
 }
 
-vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_fd_t *sfd_rx)
+vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_queue_stream_t *queue_stream)
 {
+    VSF_LINUX_ASSERT(queue_stream != NULL);
     vsf_linux_fd_t *sfd_tx = NULL;
     if (vsf_linux_fd_create(&sfd_tx, &vsf_linux_pipe_tx_fdop) >= 0) {
         vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
-        vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
-        priv_tx->stream = priv_rx->stream;
+        priv_tx->stream = &queue_stream->use_as__vsf_stream_t;
     }
     return sfd_tx;
 }

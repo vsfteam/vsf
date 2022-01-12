@@ -702,12 +702,14 @@ int pipe(int pipefd[2])
 {
     vsf_linux_fd_t *sfd_rx = NULL, *sfd_tx = NULL;
 
-    sfd_rx = vsf_linux_rx_pipe();
+    sfd_rx = vsf_linux_rx_pipe(NULL);
     if (NULL == sfd_rx) {
         return -1;
     }
 
-    sfd_tx = vsf_linux_tx_pipe(sfd_rx);
+    vsf_linux_pipe_rx_priv_t *pipe_priv = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+    vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)pipe_priv->stream;
+    sfd_tx = vsf_linux_tx_pipe(queue_stream);
     if (NULL == sfd_tx) {
         close(sfd_rx->fd);
         return -1;
