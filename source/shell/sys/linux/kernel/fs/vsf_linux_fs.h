@@ -81,10 +81,8 @@ vsf_class(vsf_linux_fd_t) {
 typedef void (*vsf_linux_stream_on_evt_t)(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool is_ready);
 
 vsf_class(vsf_linux_stream_priv_t) {
-    private_member(
-        vsf_stream_t *stream;
-    )
     protected_member(
+        vsf_stream_t *stream;
         vsf_linux_stream_on_evt_t on_evt;
     )
 };
