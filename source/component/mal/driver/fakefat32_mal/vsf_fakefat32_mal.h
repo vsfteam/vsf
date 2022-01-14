@@ -81,8 +81,8 @@ vsf_class(vk_fakefat32_mal_t) {
     public_member(
         implement(vk_mal_t)
 
+        uint32_t sector_number;
         uint16_t sector_size;
-        uint16_t sector_number;
         uint8_t sectors_per_cluster;
 
         uint32_t volume_id;
