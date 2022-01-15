@@ -68,7 +68,7 @@
 
 // VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT:
 // use port disable as disconnect event, some MCU will falsely detect device
-//  disconnect event, but port disable event is stable.
+//  disconnect event IN HIGH SPEED MODE, but port disable event is stable.
 
 #define USB_OTG_HPRT_W1C_MASK                                                   \
         (USB_OTG_HPRT_PENA | USB_OTG_HPRT_PCDET | USB_OTG_HPRT_PENCHNG | USB_OTG_HPRT_POCCHNG)
