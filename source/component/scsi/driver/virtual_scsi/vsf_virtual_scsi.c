@@ -307,6 +307,9 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                 case SCSI_CMDCODE_WRITE:
                     __vk_virtual_scsi_rw(pthis, scsi_cmd, &vsf_local.mem);
                     return;
+                case SCSI_CMDCODE_SYNC_CACHE10:
+                    reply_len = 0;
+                    break;
                 default:
                     goto exit_invalid_cmd;
                 }
@@ -327,6 +330,9 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                 case SCSI_CMDCODE_WRITE:
                     __vk_virtual_scsi_rw(pthis, scsi_cmd, &vsf_local.mem);
                     return;
+                case SCSI_CMDCODE_SYNC_CACHE16:
+                    reply_len = 0;
+                    break;
                 default:
                     goto exit_invalid_cmd;
                 }

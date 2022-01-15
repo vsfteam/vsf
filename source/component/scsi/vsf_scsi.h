@@ -92,8 +92,10 @@ typedef enum scsi_cmd_code_t {
     SCSI_CMDCODE_WRITE                          = 0x0A,
     SCSI_CMDCODE_GET_EVENT_STATUS_NOTIFY        = 0x0A, // SCSI_GROUPCODE10_2
     SCSI_CMDCODE_VERIFY                         = 0x0F,
+    SCSI_CMDCODE_SYNC_CACHE16                   = 0x11, // SCSI_GROUPCODE16
     SCSI_CMDCODE_INQUIRY                        = 0x12,
-    SCSI_CMDCODE_MODE_SELECT                    = 0x15,
+    SCSI_CMDCODE_MODE_SELECT                    = 0x15, // SCSI_GROUPCODE6 & SCSI_GROUPCODE10_2
+    SCSI_CMDCODE_SYNC_CACHE10                   = 0x15, // SCSI_GROUPCODE10_1
     SCSI_CMDCODE_MODE_SENSE                     = 0x1A,
     SCSI_CMDCODE_START_STOP_UNIT                = 0x1B,
     SCSI_CMDCODE_SEND_DIAGNOSTIC                = 0x1D,
