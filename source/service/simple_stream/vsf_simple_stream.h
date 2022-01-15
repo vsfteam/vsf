@@ -99,6 +99,7 @@ extern "C" {
 #define VSF_STREAM_IS_RX_CONNECTED(__stream)            vsf_stream_is_rx_connected((vsf_stream_t *)(__stream))
 #define VSF_STREAM_IS_TX_CONNECTED(__stream)            vsf_stream_is_tx_connected((vsf_stream_t *)(__stream))
 #if VSF_STREAM_CFG_THRESHOLD == ENABLED
+// set threshold CAN ONLY be called after stream_init
 #define VSF_STREAM_SET_RX_THRESHOLD(__stream, __thres)  vsf_stream_set_rx_threshold((vsf_stream_t *)(__stream), (__thres))
 #define VSF_STREAM_SET_TX_THRESHOLD(__stream, __thres)  vsf_stream_set_tx_threshold((vsf_stream_t *)(__stream), (__thres))
 #endif
@@ -245,6 +246,7 @@ extern vsf_err_t vsf_stream_fini(vsf_stream_t *stream);
 extern uint_fast32_t vsf_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
 extern uint_fast32_t vsf_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
 #if VSF_STREAM_CFG_THRESHOLD == ENABLED
+// set threshold CAN ONLY be called after stream_init
 extern void vsf_stream_set_tx_threshold(vsf_stream_t *stream, uint_fast32_t threshold);
 extern void vsf_stream_set_rx_threshold(vsf_stream_t *stream, uint_fast32_t threshold);
 #endif
