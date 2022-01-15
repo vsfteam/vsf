@@ -218,7 +218,9 @@ vsf_err_t vsf_stream_init(vsf_stream_t *stream)
 {
     VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL));
     stream->tx.ready = false;
+    stream->tx.data_notified = false;
     stream->rx.ready = false;
+    stream->rx.data_notified = false;
     if (stream->op->init != NULL) {
         stream->op->init(stream);
     }
