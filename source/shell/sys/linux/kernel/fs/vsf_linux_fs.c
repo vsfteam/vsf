@@ -1355,8 +1355,8 @@ vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream)
         queue_stream->op = &vsf_queue_stream_op;
         priv_rx->stream = &queue_stream->use_as__vsf_stream_t;
 #if VSF_STREAM_CFG_THRESHOLD == ENABLED
-        priv_rx->stream->rx.threshold = 0;
-        priv_rx->stream->tx.threshold = 0;
+        vsf_stream_set_tx_threshold(priv_rx->stream, 0);
+        vsf_stream_set_rx_threshold(priv_rx->stream, 0);
 #endif
         vsf_stream_init(priv_rx->stream);
 
