@@ -108,6 +108,10 @@ static uint_fast32_t __vsf_queue_stream_get_rbuf(vsf_stream_t *stream, uint8_t *
     vsf_queue_stream_buffer_node_t *buffer_node;
     vsf_slist_queue_peek(vsf_queue_stream_buffer_node_t, buffer_node, &queue_stream->buffer_queue, buffer_node);
 
+    if (NULL == buffer_node) {
+        return 0;
+    }
+
     if (ptr != NULL) {
         *ptr = (uint8_t *)&buffer_node[1] + buffer_node->pos;
     }
@@ -131,7 +135,7 @@ static uint_fast32_t __vsf_queue_stream_write(vsf_stream_t *stream, uint8_t *buf
     memcpy(&buffer_node[1], buf, size);
 
     vsf_protect_t orig = __vsf_queue_stream_protect();
-        buffer_node->size += size;
+        queue_stream->size += size;
         vsf_slist_queue_enqueue(vsf_queue_stream_buffer_node_t, buffer_node, &queue_stream->buffer_queue, buffer_node);
     __vsf_queue_stream_unprotect(orig);
 
@@ -146,31 +150,32 @@ static uint_fast32_t __vsf_queue_stream_read(vsf_stream_t *stream, uint8_t *buf,
 
     while (remain_size > 0) {
         vsf_slist_queue_peek(vsf_queue_stream_buffer_node_t, buffer_node, &queue_stream->buffer_queue, buffer_node);
-        if (buffer_node != NULL) {
-            cur_size = buffer_node->size - buffer_node->pos;
-            cur_size = min(cur_size, remain_size);
-            if (buf != NULL) {
-                memcpy(buf, (uint8_t *)&buffer_node[1] + buffer_node->pos, cur_size);
-            }
-            buffer_node->size -= cur_size;
-            buffer_node->pos += cur_size;
-            rsize += cur_size;
-            remain_size -= cur_size;
+        if (NULL == buffer_node) {
+            break;
+        }
 
-            if (buffer_node->size != 0) {
-                buffer_node = NULL;
-            }
+        cur_size = buffer_node->size - buffer_node->pos;
+        cur_size = min(cur_size, remain_size);
+        if (buf != NULL) {
+            memcpy(buf, (uint8_t *)&buffer_node[1] + buffer_node->pos, cur_size);
+        }
+        buffer_node->pos += cur_size;
+        rsize += cur_size;
+        remain_size -= cur_size;
 
-            vsf_protect_t orig = __vsf_queue_stream_protect();
-                queue_stream->size -= cur_size;
-                if (buffer_node != NULL) {
-                    vsf_slist_queue_dequeue(vsf_queue_stream_buffer_node_t, buffer_node, &queue_stream->buffer_queue, buffer_node);
-                }
-            __vsf_queue_stream_unprotect(orig);
+        if (buffer_node->pos < buffer_node->size) {
+            buffer_node = NULL;
+        }
 
+        vsf_protect_t orig = __vsf_queue_stream_protect();
+            queue_stream->size -= cur_size;
             if (buffer_node != NULL) {
-                vsf_heap_free(buffer_node);
+                vsf_slist_queue_dequeue(vsf_queue_stream_buffer_node_t, buffer_node, &queue_stream->buffer_queue, buffer_node);
             }
+        __vsf_queue_stream_unprotect(orig);
+
+        if (buffer_node != NULL) {
+            vsf_heap_free(buffer_node);
         }
     }
 
