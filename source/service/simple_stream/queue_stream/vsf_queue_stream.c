@@ -158,6 +158,7 @@ static uint_fast32_t __vsf_queue_stream_read(vsf_stream_t *stream, uint8_t *buf,
         cur_size = min(cur_size, remain_size);
         if (buf != NULL) {
             memcpy(buf, (uint8_t *)&buffer_node[1] + buffer_node->pos, cur_size);
+            buf += cur_size;
         }
         buffer_node->pos += cur_size;
         rsize += cur_size;
