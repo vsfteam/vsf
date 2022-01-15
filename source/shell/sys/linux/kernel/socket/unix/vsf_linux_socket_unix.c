@@ -112,18 +112,18 @@ const vsf_linux_socket_op_t vsf_linux_socket_unix_op = {
 
 static int __vsf_linux_socket_unix_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
 {
+    vsf_linux_socket_unix_priv_t *priv = (vsf_linux_socket_unix_priv_t *)sfd->priv;
     switch (cmd) {
-    case F_GETFL:
-        return sfd->flags;
-        break;
-    case F_SETFL: {
-            int diff = arg ^ sfd->flags;
-            if (diff & O_NONBLOCK) {
-                // TODO:
+    case F_SETFL:
+        if (arg & O_NONBLOCK) {
+            if (priv->rw.sfd_rx != NULL) {
+                fcntl(priv->rw.sfd_rx->fd, F_SETFL, O_NONBLOCK);
             }
-            sfd->flags = arg;
-            return 0;
+            if (priv->rw.sfd_tx != NULL) {
+                fcntl(priv->rw.sfd_tx->fd, F_SETFL, O_NONBLOCK);
+            }
         }
+        return 0;
     default:
         return -1;
     }
@@ -227,6 +227,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     if (NULL == sfd_rx) {
         return -1;
     }
+    fcntl(sfd_rx->fd, F_SETFL, sfd_local->flags);
     vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
     priv_rx->on_evt = __vsf_linux_socket_unix_pipe_on_rx_evt;
     priv_rx->target = sfd_local;
@@ -254,11 +255,12 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     vsf_linux_pipe_rx_priv_t *pipe_priv = (vsf_linux_pipe_rx_priv_t *)priv->rw.sfd_tx->priv;
     vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)pipe_priv->stream;
     vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe(queue_stream);
-    if (NULL == sfd_rx) {
+    if (NULL == sfd_tx) {
         priv->remote->remote = NULL;
         vsf_eda_trig_set(priv->remote->trig);
         goto delete_sfd_rx_and_fail;
     }
+    fcntl(sfd_tx->fd, F_SETFL, sfd_local->flags);
     priv->rw.sfd_tx = sfd_tx;
 
     // 3. trigger remote again to complete conection
