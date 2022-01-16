@@ -44,11 +44,6 @@
 #endif
 //! @}
 
-//! \note disable microsoft c detection
-#ifdef _MSC_VER
-#   undef _MSC_VER
-#endif
-
 #endif /* end of __USE_X86_COMPILER_H_PART_1__ */
 
 
