@@ -635,4 +635,14 @@ int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset)
     return 0;
 }
 
+int pthread_setcancelstate(int state, int *oldstate)
+{
+    return 0;
+}
+
+int pthread_setcanceltype(int type, int *oldtype)
+{
+    return 0;
+}
+
 #endif      // VSF_USE_LINUX

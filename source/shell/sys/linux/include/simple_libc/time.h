@@ -40,11 +40,20 @@ clock_t clock(void);
 int clock_gettime(clockid_t clk_id, struct timespec *tp);
 
 time_t time(time_t *t);
-char *asctime(const struct tm *tm);
-char *ctime(const time_t *t);
 double difftime(time_t time1, time_t time2);
+
+char *asctime(const struct tm *tm);
+char *asctime_r(const struct tm *tm, char *buf);
+
+char *ctime(const time_t *t);
+char *ctime_r(const time_t *t, char *buf);
+
 struct tm *gmtime(const time_t *t);
+struct tm *gmtime_r(const time_t *t, struct tm *result);
+
 struct tm *localtime(const time_t *t);
+struct tm *localtime_r(const time_t *t, struct tm *result);
+
 time_t mktime(struct tm *tm);
 size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm);
 

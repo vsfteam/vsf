@@ -28,6 +28,8 @@ extern "C" {
 #define pthread_cancel                  VSF_LINUX_WRAPPER(pthread_cancel)
 #define pthread_kill                    VSF_LINUX_WRAPPER(pthread_kill)
 #define pthread_once                    VSF_LINUX_WRAPPER(pthread_once)
+#define pthread_setcancelstate          VSF_LINUX_WRAPPER(pthread_setcancelstate)
+#define pthread_setcanceltype           VSF_LINUX_WRAPPER(pthread_setcanceltype)
 #define pthread_attr_init               VSF_LINUX_WRAPPER(pthread_attr_init)
 #define pthread_attr_destroy            VSF_LINUX_WRAPPER(pthread_attr_destroy)
 #define pthread_attr_setstack           VSF_LINUX_WRAPPER(pthread_attr_setstack)
@@ -175,6 +177,15 @@ typedef struct {
     size_t                              stacksize;
 } pthread_attr_t;
 
+enum {
+    PTHREAD_CANCEL_ENABLE,
+    PTHREAD_CANCEL_DISABLE,
+};
+enum {
+  PTHREAD_CANCEL_DEFERRED,
+  PTHREAD_CANCEL_ASYNCHRONOUS,
+};
+
 pthread_t pthread_self(void);
 int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg);
 int pthread_join(pthread_t tid, void **retval);
@@ -183,6 +194,9 @@ void pthread_exit(void *retval);
 int pthread_cancel(pthread_t thread);
 int pthread_kill(pthread_t thread, int sig);
 int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
+int pthread_setcancelstate(int state, int *oldstate);
+int pthread_setcanceltype(int type, int *oldtype);
+
 int pthread_attr_init(pthread_attr_t *attr);
 int pthread_attr_destroy(pthread_attr_t *attr);
 int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksize);

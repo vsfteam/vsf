@@ -19,6 +19,9 @@ extern "C" {
 
 #define WIFEXITED(__STATUS)     !((__STATUS) & 0xFF)
 #define WEXITSTATUS(__STATUS)   ((__STATUS) >> 8)
+// TODO: implement WIFSIGNALED
+#define WIFSIGNALED(__STATUS)   0
+#define WTERMSIG(__STATUS)      ((__STATUS) & 0x7F)
 
 pid_t waitpid(pid_t pid, int *status, int options);
 

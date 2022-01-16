@@ -9,11 +9,7 @@ struct utsname {
     char sysname[4];     // "vsf\0"
 };
 
-//extern int uname(struct utsname *);
-#define uname(__utsname)                                                        \
-    do {                                                                        \
-        strcpy((__utsname)->sysname, "vsf");                                    \
-    } while (false)
+extern int uname(struct utsname *name);
 
 #ifdef __cplusplus
 }

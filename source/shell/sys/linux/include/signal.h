@@ -90,14 +90,16 @@ struct sigaction {
 #define SIG_DFL         (sighandler_t)0
 #define SIG_IGN         (sighandler_t)-1
 
-static inline void sigemptyset(sigset_t *set)
+static inline int sigemptyset(sigset_t *set)
 {
     set->sig[0] = 0;
+    return 0;
 }
 
-static inline void sigfillset(sigset_t *set)
+static inline int sigfillset(sigset_t *set)
 {
     set->sig[0] = -1;
+    return 0;
 }
 
 static inline int sigaddset(sigset_t *set, int signo)
@@ -110,21 +112,6 @@ static inline int sigdelset(sigset_t *set, int signo)
 {
     set->sig[0] &= ~(1 << signo);
     return 0;
-}
-
-static inline void sigaddsetmask(sigset_t *set, unsigned long mask)
-{
-    set->sig[0] |= mask;
-}
-
-static inline void sigdelsetmask(sigset_t *set, unsigned long mask)
-{
-    set->sig[0] &= ~mask;
-}
-
-static inline int sigtestsetmask(sigset_t *set, unsigned long mask)
-{
-    return (set->sig[0] & mask) != 0;
 }
 
 int kill(pid_t pid, int sig);

@@ -39,6 +39,7 @@
 #   include "./include/errno.h"
 #   include "./include/termios.h"
 #   include "./include/pwd.h"
+#   include "./include/sys/utsname.h"
 #else
 #   include <unistd.h>
 #   include <sched.h>
@@ -51,6 +52,7 @@
 #   include <errno.h>
 #   include <termios.h>
 #   include <pwd.h>
+#   include <sys/utsname.h>
 #endif
 #include <stdarg.h>
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
@@ -1012,6 +1014,22 @@ int sched_yield(void)
 {
     vsf_thread_yield();
     return 0;
+}
+
+int uname(struct utsname *name)
+{
+    static const struct utsname __name = {
+        .sysname        = "vsf",
+    };
+    if (name != NULL) {
+        *name = __name;
+    }
+    return 0;
+}
+
+size_t getpagesize(void)
+{
+    return 1;
 }
 
 #if __IS_COMPILER_GCC__

@@ -33,6 +33,8 @@ extern "C" {
 #define F_GETLK         8
 #define F_SETLK         9
 
+#define FD_CLOEXEC      1
+
 struct flock {
     off_t   l_start;
     off_t   l_len;

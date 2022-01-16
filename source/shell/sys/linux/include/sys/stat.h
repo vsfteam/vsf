@@ -22,6 +22,7 @@ extern "C" {
 #define stat            VSF_LINUX_WRAPPER(stat)
 #define fstat           VSF_LINUX_WRAPPER(fstat)
 #endif
+#define lstat           stat
 
 #define S_IFDIR         VSF_FILE_ATTR_DIRECTORY
 #define S_IFREG         (VSF_FILE_ATTR_USER << 0)
@@ -43,11 +44,19 @@ extern "C" {
 #define S_ISSOCK(__MODE)(((__MODE) & S_IFMT) == S_IFSOCK)
 
 struct stat {
-    mode_t      st_mode;
-    off_t       st_size;
-    time_t      st_atime;
-    time_t      st_mtime;
-    time_t      st_ctime;
+    dev_t           st_dev;
+    ino_t           st_ino;
+    mode_t          st_mode;
+    uid_t           st_uid;
+    gid_t           st_gid;
+    off_t           st_size;
+
+    struct timespec st_atim;
+    struct timespec st_mtim;
+    struct timespec st_ctim;
+#define st_atime    st_atim.tv_sec
+#define st_mtime    st_mtim.tv_sec
+#define st_ctime    st_ctim.tv_sec
 };
 
 int stat(const char *pathname, struct stat *buf);

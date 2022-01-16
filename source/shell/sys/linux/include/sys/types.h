@@ -31,11 +31,13 @@ typedef unsigned int        size_t;
 
 typedef int                 key_t;
 typedef int                 pid_t;
-typedef int                 mode_t;
+typedef unsigned int        mode_t;
 typedef unsigned int        uid_t;
 typedef unsigned int        gid_t;
 typedef long                off_t;
 typedef long long           off64_t;
+typedef unsigned long       dev_t;
+typedef unsigned long       ino_t;
 
 #if (VSF_LINUX_USE_SIMPLE_LIBC == ENABLED) && (VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #ifndef __TIME_T

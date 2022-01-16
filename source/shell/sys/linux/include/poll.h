@@ -27,6 +27,9 @@ typedef int nfds_t;
 
 #define POLLIN          (1 << 0)
 #define POLLOUT         (1 << 1)
+#define POLLHUP         (1 << 2)
+#define POLLERR         (1 << 3)
+#define POLLNVAL        (1 << 4)
 
 struct pollfd {
     int fd;
