@@ -70,11 +70,11 @@ void * memalign(size_t alignment, size_t size);
 
 int setenv(const char *name, const char *value, int overwrite);
 int unsetenv(const char *name);
-int mkstemp(char *template);
-int mkostemp(char *template, int flags);
-int mkstemps(char *template, int suffixlen);
-int mkostemps(char *template, int suffixlen, int flags);
-char * mkdtemp(char *template);
+int mkstemp(char *template_str);
+int mkostemp(char *template_str, int flags);
+int mkstemps(char *template_str, int suffixlen);
+int mkostemps(char *template_str, int suffixlen, int flags);
+char * mkdtemp(char *template_str);
 
 int abs(int x);
 typedef struct {
