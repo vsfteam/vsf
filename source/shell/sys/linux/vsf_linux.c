@@ -1049,6 +1049,16 @@ size_t getpagesize(void)
     return 1;
 }
 
+int gethostname(char *name, size_t len)
+{
+    return -1;
+}
+
+int sethostname(const char *name, size_t len)
+{
+    return -1;
+}
+
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
 #endif

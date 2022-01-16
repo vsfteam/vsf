@@ -46,6 +46,8 @@ extern "C" {
 #define tcgetpgrp           VSF_LINUX_WRAPPER(tcgetpgrp)
 #define tcsetpgrp           VSF_LINUX_WRAPPER(tcsetpgrp)
 #define getpass             VSF_LINUX_WRAPPER(getpass)
+#define gethostname         VSF_LINUX_WRAPPER(gethostname)
+#define sethostname         VSF_LINUX_WRAPPER(sethostname)
 
 #if __IS_COMPILER_IAR__
 #else
@@ -143,6 +145,8 @@ ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
 pid_t tcgetpgrp(int fd);
 int tcsetpgrp(int fd, pid_t pgrp);
 char * getpass(const char *prompt);
+int gethostname(char *name, size_t len);
+int sethostname(const char *name, size_t len);
 
 #ifdef __cplusplus
 }
