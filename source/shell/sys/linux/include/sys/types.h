@@ -38,6 +38,8 @@ typedef long                off_t;
 typedef long long           off64_t;
 typedef unsigned long       dev_t;
 typedef unsigned long       ino_t;
+typedef unsigned int        blksiz_t;
+typedef unsigned long long  blkcnt_t;
 
 #if (VSF_LINUX_USE_SIMPLE_LIBC == ENABLED) && (VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #ifndef __TIME_T

@@ -17,6 +17,10 @@ extern "C" {
 #define waitpid                 VSF_LINUX_WRAPPER(waitpid)
 #endif
 
+// options of waitpid
+#define WNOHANG                 1
+#define WUNTRACED               2
+
 #define WIFEXITED(__STATUS)     !((__STATUS) & 0xFF)
 #define WEXITSTATUS(__STATUS)   ((__STATUS) >> 8)
 // TODO: implement WIFSIGNALED

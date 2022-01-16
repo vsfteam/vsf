@@ -82,13 +82,22 @@ struct sigaction {
 #define SIGIO           29  //                      terminate
 #define SIGPWR          30  //                      terminate
 #define SIGSYS          31  //                      coredump
+#define NSIG            32
 
 #define SIG_BLOCK       0
 #define SIG_UNBLOCK     1
 #define SIG_SETMASK     2
 
 #define SIG_DFL         (sighandler_t)0
-#define SIG_IGN         (sighandler_t)-1
+#define SIG_IGN         (sighandler_t)1
+#define SIG_ERR         (sighandler_t)-1
+
+// sa_flags
+#define SA_NOCLDSTOP    1
+#define SA_NOCLDWAIT    2
+#define SA_SIGINFO      4
+#define SA_RESTART      0x10000000
+#define SA_NODEFER      0x40000000
 
 static inline int sigemptyset(sigset_t *set)
 {
@@ -112,6 +121,21 @@ static inline int sigdelset(sigset_t *set, int signo)
 {
     set->sig[0] &= ~(1 << signo);
     return 0;
+}
+
+static inline void sigaddsetmask(sigset_t *set, unsigned long mask)
+{
+    set->sig[0] |= mask;
+}
+
+static inline void sigdelsetmask(sigset_t *set, unsigned long mask)
+{
+    set->sig[0] &= ~mask;
+}
+
+static inline int sigtestsetmask(sigset_t *set, unsigned long mask)
+{
+    return (set->sig[0] & mask) != 0;
 }
 
 int kill(pid_t pid, int sig);

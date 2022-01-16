@@ -26,16 +26,25 @@ extern "C" {
 
 #define S_IFDIR         VSF_FILE_ATTR_DIRECTORY
 #define S_IFREG         (VSF_FILE_ATTR_USER << 0)
-#define S_IFLNK         (VSF_FILE_ATTR_USER << 8)
-#define S_IFIFO         (VSF_FILE_ATTR_USER << 9)
-#define S_IFSOCK        (VSF_FILE_ATTR_USER << 10)
+#define S_IFLNK         (VSF_FILE_ATTR_USER << 10)
+#define S_IFIFO         (VSF_FILE_ATTR_USER << 11)
+#define S_IFSOCK        (VSF_FILE_ATTR_USER << 12)
 #define S_IFMT          (S_IFDIR | S_IFREG | S_IFLNK | S_IFIFO | S_IFSOCK)
 
 #define S_IRUSR         (VSF_FILE_ATTR_USER << 1)
 #define S_IWUSR         (VSF_FILE_ATTR_USER << 2)
 #define S_IXUSR         (VSF_FILE_ATTR_USER << 3)
-#define S_IRGRP         (VSF_FILE_ATTR_USER << 4)
-#define S_IWGRP         (VSF_FILE_ATTR_USER << 5)
+#define S_IRWXU         (S_IRUSR | S_IWUSR | S_IXUSR)
+#define S_IRGRP         (S_IRUSR << 3)
+#define S_IWGRP         (S_IWUSR << 3)
+#define S_IXGRP         (S_IXUSR << 3)
+#define S_IROTH         (S_IRGRP << 3)
+#define S_IWOTH         (S_IWGRP << 3)
+#define S_IXOTH         (S_IXGRP << 3)
+
+// protection bits
+#define S_ISUID         (VSF_FILE_ATTR_USER << 13)
+#define S_ISGID         (VSF_FILE_ATTR_USER << 14)
 
 #define S_ISLNK(__MODE) (((__MODE) & S_IFMT) == S_IFLNK)
 #define S_ISREG(__MODE) (((__MODE) & S_IFMT) == S_IFREG)
@@ -50,6 +59,8 @@ struct stat {
     uid_t           st_uid;
     gid_t           st_gid;
     off_t           st_size;
+    blksiz_t        st_blksize;
+    blkcnt_t        st_blocks;
 
     struct timespec st_atim;
     struct timespec st_mtim;

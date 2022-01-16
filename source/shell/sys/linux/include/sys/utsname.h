@@ -7,6 +7,9 @@ extern "C" {
 
 struct utsname {
     char sysname[4];     // "vsf\0"
+    char release[1];
+    char version[1];
+    char machine[1];
 };
 
 extern int uname(struct utsname *name);

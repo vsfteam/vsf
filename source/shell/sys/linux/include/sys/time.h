@@ -26,6 +26,12 @@ extern "C" {
 #endif
 typedef __SUSECONDS_T       suseconds_t;
 
+enum {
+    ITIMER_REAL     = 0,
+    ITIMER_VIRTUAL  = 1,
+    ITIMER_PROF     = 2,
+};
+
 struct timeval {
     time_t          tv_sec;
     suseconds_t     tv_usec;
