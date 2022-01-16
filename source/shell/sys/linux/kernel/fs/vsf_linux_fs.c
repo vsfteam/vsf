@@ -852,6 +852,24 @@ ssize_t write(int fd, const void *buf, size_t count)
     return sfd->op->fn_write(sfd, buf, count);
 }
 
+ssize_t pread(int fd, void *buf, size_t count, off_t offset)
+{
+    off_t orig = lseek(fd, 0, SEEK_CUR);
+    lseek(fd, offset, SEEK_SET);
+    ssize_t size = read(fd, buf, count);
+    lseek(fd, orig, SEEK_SET);
+    return size;
+}
+
+ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
+{
+    off_t orig = lseek(fd, 0, SEEK_CUR);
+    lseek(fd, offset, SEEK_SET);
+    ssize_t size = write(fd, buf, count);
+    lseek(fd, orig, SEEK_SET);
+    return size;
+}
+
 off_t lseek(int fd, off_t offset, int whence)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
@@ -872,6 +890,16 @@ off_t lseek(int fd, off_t offset, int whence)
     }
     priv->pos = new_pos;
     return (off_t)new_pos;
+}
+
+int fsync(int fd)
+{
+    return 0;
+}
+
+int fdatasync(int fd)
+{
+    return 0;
 }
 
 int fstat(int fd, struct stat *buf)

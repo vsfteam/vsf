@@ -126,6 +126,11 @@ pthread_t pthread_self(void)
     return (NULL == thread) ? 0 : thread->tid;
 }
 
+int pthread_equal(pthread_t t1, pthread_t t2)
+{
+    return t1 == t2;
+}
+
 int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg)
 {
     if (NULL == attr) {
@@ -613,6 +618,12 @@ int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clock_id)
 
 
 int pthread_key_create(pthread_key_t *key, void (*destructor)(void*))
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int pthread_key_delete(pthread_key_t key)
 {
     VSF_LINUX_ASSERT(false);
     return -1;

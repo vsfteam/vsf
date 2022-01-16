@@ -882,6 +882,23 @@ int tcsetattr(int fd, int optional_actions, const struct termios *termios)
     return 0;
 }
 
+char * getpass(const char *prompt)
+{
+    fprintf(stdout, "%s", prompt);
+
+    struct termios orig, t;
+    tcgetattr(STDIN_FILENO, &orig);
+    t = orig;
+    t.c_lflag &= ~(ECHO | ISIG);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &t);
+
+    // TODO: read passwd
+
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig);
+
+    return NULL;
+}
+
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 void usleep(int usec)
 {

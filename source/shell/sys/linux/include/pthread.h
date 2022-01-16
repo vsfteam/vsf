@@ -21,6 +21,7 @@ extern "C" {
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define pthread_self                    VSF_LINUX_WRAPPER(pthread_self)
+#define pthread_equal                   VSF_LINUX_WRAPPER(pthread_equal)
 #define pthread_create                  VSF_LINUX_WRAPPER(pthread_create)
 #define pthread_join                    VSF_LINUX_WRAPPER(pthread_join)
 #define pthread_detach                  VSF_LINUX_WRAPPER(pthread_detach)
@@ -52,6 +53,7 @@ extern "C" {
 #define pthread_attr_getscope           VSF_LINUX_WRAPPER(pthread_attr_getscope)
 
 #define pthread_key_create              VSF_LINUX_WRAPPER(pthread_key_create)
+#define pthread_key_delete              VSF_LINUX_WRAPPER(pthread_key_delete)
 #define pthread_setspecific             VSF_LINUX_WRAPPER(pthread_setspecific)
 #define pthread_getspecific             VSF_LINUX_WRAPPER(pthread_getspecific)
 
@@ -93,6 +95,7 @@ extern "C" {
 typedef int pthread_key_t;
 
 int pthread_key_create(pthread_key_t *key, void (*destructor)(void*));
+int pthread_key_delete(pthread_key_t key);
 int pthread_setspecific(pthread_key_t key, const void *value);
 void *pthread_getspecific(pthread_key_t key);
 
@@ -187,6 +190,7 @@ enum {
 };
 
 pthread_t pthread_self(void);
+int pthread_equal(pthread_t t1, pthread_t t2);
 int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg);
 int pthread_join(pthread_t tid, void **retval);
 int pthread_detach(pthread_t thread);

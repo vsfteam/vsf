@@ -31,12 +31,21 @@ extern "C" {
 #define sleep               VSF_LINUX_WRAPPER(sleep)
 #define getpid              VSF_LINUX_WRAPPER(getpid)
 #define getppid             VSF_LINUX_WRAPPER(getppid)
+#define getpgid             VSF_LINUX_WRAPPER(getpgid)
 #define execl               VSF_LINUX_WRAPPER(execl)
 #define execv               VSF_LINUX_WRAPPER(execv)
 #define realpath            VSF_LINUX_WRAPPER(realpath)
 #define sysconf             VSF_LINUX_WRAPPER(sysconf)
 #define pipe                VSF_LINUX_WRAPPER(pipe)
 #define alarm               VSF_LINUX_WRAPPER(alarm)
+
+#define symlink             VSF_LINUX_WRAPPER(symlink)
+#define getpagesize         VSF_LINUX_WRAPPER(getpagesize)
+#define ftruncate           VSF_LINUX_WRAPPER(ftruncate)
+#define readlink            VSF_LINUX_WRAPPER(readlink)
+#define tcgetpgrp           VSF_LINUX_WRAPPER(tcgetpgrp)
+#define tcsetpgrp           VSF_LINUX_WRAPPER(tcsetpgrp)
+#define getpass             VSF_LINUX_WRAPPER(getpass)
 
 #if __IS_COMPILER_IAR__
 #else
@@ -52,8 +61,12 @@ extern "C" {
 #   define lseek            VSF_LINUX_WRAPPER(lseek)
 #   define read             VSF_LINUX_WRAPPER(read)
 #   define write            VSF_LINUX_WRAPPER(write)
+#   define pread            VSF_LINUX_WRAPPER(pread)
+#   define pwrite           VSF_LINUX_WRAPPER(pwrite)
 #   define chdir            VSF_LINUX_WRAPPER(chdir)
 #   define getcwd           VSF_LINUX_WRAPPER(getcwd)
+#   define fsync            VSF_LINUX_WRAPPER(fsync)
+#   define fdatasync        VSF_LINUX_WRAPPER(fdatasync)
 #endif
 #endif
 
@@ -80,6 +93,7 @@ unsigned int alarm(unsigned int seconds);
 
 pid_t getpid(void);
 pid_t getppid(void);
+pid_t getpgid(pid_t pid);
 
 #if defined(__WIN__) && defined(__CPU_X64__)
 intptr_t execl(const char *pathname, const char *arg, ...);
@@ -117,8 +131,18 @@ int close(int fd);
 off_t lseek(int fd, off_t offset, int whence);
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);
+ssize_t pread(int fd, void *buf, size_t count, off_t offset);
+ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
+int fsync(int fd);
+int fdatasync(int fd);
 
 size_t getpagesize(void);
+int symlink(const char *target, const char *linkpath);
+int ftruncate(int fildes, off_t length);
+ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
+pid_t tcgetpgrp(int fd);
+int tcsetpgrp(int fd, pid_t pgrp);
+char * getpass(const char *prompt);
 
 #ifdef __cplusplus
 }

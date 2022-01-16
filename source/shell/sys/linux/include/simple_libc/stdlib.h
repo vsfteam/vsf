@@ -23,6 +23,13 @@ extern "C" {
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
+#define setenv              VSF_LINUX_LIBC_WRAPPER(setenv)
+#define unsetenv            VSF_LINUX_LIBC_WRAPPER(unsetenv)
+#define mkstemp             VSF_LINUX_LIBC_WRAPPER(mkstemp)
+#define mkostemp            VSF_LINUX_LIBC_WRAPPER(mkostemp)
+#define mkstemps            VSF_LINUX_LIBC_WRAPPER(mkstemps)
+#define mkostemps           VSF_LINUX_LIBC_WRAPPER(mkostemps)
+#define mkdtemp             VSF_LINUX_LIBC_WRAPPER(mkdtemp)
 #endif
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
@@ -60,6 +67,14 @@ void free(void *p);
 void * aligned_alloc(size_t alignment, size_t size);
 void * calloc(size_t n, size_t size);
 void * memalign(size_t alignment, size_t size);
+
+int setenv(const char *name, const char *value, int overwrite);
+int unsetenv(const char *name);
+int mkstemp(char *template);
+int mkostemp(char *template, int flags);
+int mkstemps(char *template, int suffixlen);
+int mkostemps(char *template, int suffixlen, int flags);
+char * mkdtemp(char *template);
 
 int abs(int x);
 typedef struct {
