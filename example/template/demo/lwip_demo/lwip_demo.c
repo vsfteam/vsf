@@ -151,12 +151,6 @@ static void __mdns_httpd_srv_txt(struct mdns_service *service, void *txt_usrdata
 int lwip_main(int argc, char *argv[])
 {
     struct dhcp *dhcp = &__usrapp_lwip.netif_dhcp;
-#if VSF_NETDRV_USE_WPCAP == ENABLED
-    if (argc != 2) {
-        printf("format: %s NETDRV_NAME\r\n", argv[0]);
-        return -1;
-    }
-#endif
 
     // for AIC8800, tcpip init is called in aic8800_demo_init by API from SDK
 #ifndef __AIC8800__
@@ -172,7 +166,7 @@ int lwip_main(int argc, char *argv[])
 #endif
 
 #if VSF_NETDRV_USE_WPCAP == ENABLED
-    vsf_err_t err = usrapp_net_common_init(argv[1]);
+    vsf_err_t err = usrapp_net_common_init(argc >= 2 ? argv[1] : NULL);
 #else
     vsf_err_t err = usrapp_net_common_init();
 #endif

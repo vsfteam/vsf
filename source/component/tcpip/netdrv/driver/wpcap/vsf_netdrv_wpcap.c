@@ -70,13 +70,26 @@ static void * __vk_netdrv_wpcap_open(char *name)
     if (pcap_findalldevs_ex("rpcap://", NULL, &alldevs, errbuf) == -1) {
         vsf_trace_error("Error in pcap_findalldevs: %s\n", errbuf);
     } else {
+        pcap_if_t *dev_to_connect = NULL;
         for (pcap_if_t *d = alldevs; d != NULL; d = d->next) {
-            if (    strstr(d->description, name)
-                ||  strstr(d->name, name)) {
-                vsf_trace_info("wpcap: try to open %s at %s"VSF_TRACE_CFG_LINEEND, d->description, d->name);
-                fp = pcap_open_live(d->name, 65536, 1, 1, errbuf);
-                break;
+            if (NULL == name) {
+                if (    !(d->flags & PCAP_IF_LOOPBACK)
+                    &&  (d->flags & PCAP_IF_UP) && (d->flags & PCAP_IF_RUNNING)
+                    &&  ((d->flags & PCAP_IF_CONNECTION_STATUS) == PCAP_IF_CONNECTION_STATUS_CONNECTED)
+                    &&  (d->addresses != NULL)) {
+                    dev_to_connect = d;
+                    break;
+                }
+            } else {
+                if (strstr(d->description, name) || strstr(d->name, name)) {
+                    dev_to_connect = d;
+                    break;
+                }
             }
+        }
+        if (dev_to_connect != NULL) {
+            vsf_trace_info("wpcap: try to open %s at %s"VSF_TRACE_CFG_LINEEND, dev_to_connect->description, dev_to_connect->name);
+            fp = pcap_open_live(dev_to_connect->name, 65536, 1, 1, errbuf);
         }
     }
     pcap_freealldevs(alldevs);
