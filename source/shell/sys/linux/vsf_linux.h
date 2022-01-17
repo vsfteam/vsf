@@ -145,12 +145,13 @@ vsf_class(vsf_linux_process_t) {
     public_member(
         vsf_linux_process_ctx_t ctx;
 
-        // for getopt
+#if VSF_LINUX_USE_GETOPT == ENABLED
         int __opterr;
         int __optind;
         int __optopt;
         char *__optarg;
         int __optreset;
+#endif
     )
 
     protected_member(

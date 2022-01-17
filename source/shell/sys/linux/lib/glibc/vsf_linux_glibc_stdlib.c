@@ -218,6 +218,33 @@ int system(const char * cmd)
     return result;
 }
 
+char * mktemp(char *template_str)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
+int mkostemps(char *template, int suffixlen, int flags)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int mkostemp(char *template, int flags)
+{
+    return mkostemps(template, 0, flags);
+}
+
+int mkstemps(char *template, int suffixlen)
+{
+    return mkostemps(template, suffixlen, 0);
+}
+
+int mkstemp(char *template)
+{
+    return mkostemps(template, 0, 0);
+}
+
 char * itoa(int num, char *str, int radix)
 {
     char index[] = "0123456789ABCDEF";

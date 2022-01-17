@@ -23,13 +23,15 @@ extern "C" {
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
-#define setenv              VSF_LINUX_LIBC_WRAPPER(setenv)
-#define unsetenv            VSF_LINUX_LIBC_WRAPPER(unsetenv)
+#   if VSF_LINUX_USE_ENVIRON
+#define getenv              VSF_LINUX_LIBC_WRAPPER(getenv)
+#define putenv              VSF_LINUX_LIBC_WRAPPER(putenv)
+#   endif
+#define mktemp              VSF_LINUX_LIBC_WRAPPER(mktemp)
 #define mkstemp             VSF_LINUX_LIBC_WRAPPER(mkstemp)
 #define mkostemp            VSF_LINUX_LIBC_WRAPPER(mkostemp)
 #define mkstemps            VSF_LINUX_LIBC_WRAPPER(mkstemps)
 #define mkostemps           VSF_LINUX_LIBC_WRAPPER(mkostemps)
-#define mkdtemp             VSF_LINUX_LIBC_WRAPPER(mkdtemp)
 #endif
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
@@ -68,13 +70,15 @@ void * aligned_alloc(size_t alignment, size_t size);
 void * calloc(size_t n, size_t size);
 void * memalign(size_t alignment, size_t size);
 
-int setenv(const char *name, const char *value, int overwrite);
-int unsetenv(const char *name);
+#if VSF_LINUX_USE_ENVIRON
+int putenv(char *string);
+char * getenv(const char *name);
+#endif
+char * mktemp(char *template_str);
 int mkstemp(char *template_str);
 int mkostemp(char *template_str, int flags);
 int mkstemps(char *template_str, int suffixlen);
 int mkostemps(char *template_str, int suffixlen, int flags);
-char * mkdtemp(char *template_str);
 
 int abs(int x);
 typedef struct {
@@ -141,6 +145,11 @@ int atexit(void (*func)(void));
 void _Exit(int exit_code);
 int at_quick_exit(void (*func)(void));
 void quick_exit(int status);
+
+int abs(int j);
+long labs(long j);
+long long llabs(long long j);
+intmax_t imaxabs(intmax_t j);
 
 #ifdef __cplusplus
 }

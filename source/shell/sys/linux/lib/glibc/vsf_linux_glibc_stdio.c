@@ -96,10 +96,16 @@ int getchar(void)
 
 FILE * fopen(const char *filename, const char *mode)
 {
+    // TODO: support mode
     int fd = open(filename, 0);
     if (fd < 0) {
         return NULL;
     }
+    return (FILE *)vsf_linux_fd_get(fd);
+}
+
+FILE * fdopen(int fd, const char *mode)
+{
     return (FILE *)vsf_linux_fd_get(fd);
 }
 
@@ -117,6 +123,12 @@ int fclose(FILE *f)
 
     int err = close(fd);
     return err != 0 ? EOF : 0;
+}
+
+int fileno(FILE *stream)
+{
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)stream;
+    return sfd->fd;
 }
 
 int fseeko(FILE *f, off_t offset, int fromwhere)

@@ -37,9 +37,11 @@ extern "C" {
 
 
 #define fopen               VSF_LINUX_LIBC_WRAPPER(fopen)
+#define fdopen              VSF_LINUX_LIBC_WRAPPER(fdopen)
 #define freopen             VSF_LINUX_LIBC_WRAPPER(freopen)
 #define feof                VSF_LINUX_LIBC_WRAPPER(feof)
 #define fclose              VSF_LINUX_LIBC_WRAPPER(fclose)
+#define fileno              VSF_LINUX_LIBC_WRAPPER(fileno)
 #define fseek               VSF_LINUX_LIBC_WRAPPER(fseek)
 #define fseeko              VSF_LINUX_LIBC_WRAPPER(fseeko)
 #define ftell               VSF_LINUX_LIBC_WRAPPER(ftell)
@@ -140,8 +142,10 @@ int vfprintf(FILE *f, const char *format, va_list ap);
 int vprintf(const char *format, va_list arg);
 
 FILE * fopen(const char *filename, const char *mode);
+FILE * fdopen(int fildes, const char *mode);
 FILE * freopen(const char *filename, const char *mode, FILE *f);
 int fclose(FILE *f);
+int fileno(FILE *stream);
 int fseek(FILE *f, long offset, int fromwhere);
 int fseeko(FILE *f, off_t offset, int fromwhere);
 long ftell(FILE *f);

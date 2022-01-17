@@ -33,12 +33,15 @@ extern "C" {
 #define getppid             VSF_LINUX_WRAPPER(getppid)
 #define getpgid             VSF_LINUX_WRAPPER(getpgid)
 #define execl               VSF_LINUX_WRAPPER(execl)
+#define execlp              VSF_LINUX_WRAPPER(execlp)
 #define execv               VSF_LINUX_WRAPPER(execv)
+#define execvp              VSF_LINUX_WRAPPER(execvp)
 #define realpath            VSF_LINUX_WRAPPER(realpath)
 #define sysconf             VSF_LINUX_WRAPPER(sysconf)
 #define pipe                VSF_LINUX_WRAPPER(pipe)
 #define alarm               VSF_LINUX_WRAPPER(alarm)
 
+#define isatty              VSF_LINUX_WRAPPER(isatty)
 #define symlink             VSF_LINUX_WRAPPER(symlink)
 #define getpagesize         VSF_LINUX_WRAPPER(getpagesize)
 #define ftruncate           VSF_LINUX_WRAPPER(ftruncate)
@@ -98,12 +101,14 @@ pid_t getppid(void);
 pid_t getpgid(pid_t pid);
 
 #if defined(__WIN__) && defined(__CPU_X64__)
-intptr_t execl(const char *pathname, const char *arg, ...);
-intptr_t execv(const char *pathname, char const* const* argv);
+#   define exec_ret_t           intptr_t
 #else
-int execl(const char *pathname, const char *arg, ...);
-int execv(const char *pathname, char const * const * argv);
+#   define exec_ret_t           int
 #endif
+exec_ret_t execl(const char *pathname, const char *arg, ...);
+exec_ret_t execlp(const char *file, const char *arg, ...);
+exec_ret_t execv(const char *pathname, char const * const * argv);
+exec_ret_t execvp(const char *file, char const * const * argv);
 
 int system(const char *cmd);
 enum {
@@ -125,6 +130,8 @@ int link(const char *oldpath, const char *newpath);
 int remove(const char *pathname);
 int mkdir(const char *pathname, mode_t mode);
 int rmdir(const char *pathname);
+int dup(int oldfd);
+int dup2(int oldfd, int newfd);
 
 int chdir(const char *pathname);
 char * getcwd(char *buffer, size_t maxlen);
@@ -138,6 +145,7 @@ ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
 int fsync(int fd);
 int fdatasync(int fd);
 
+int isatty(int fd);
 size_t getpagesize(void);
 int symlink(const char *target, const char *linkpath);
 int ftruncate(int fildes, off_t length);

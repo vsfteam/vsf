@@ -33,6 +33,7 @@
 #ifndef _GETOPT_H_
 #define _GETOPT_H_
 
+#include "shell/sys/linux/vsf_linux_cfg.h"
 //#include <sys/cdefs.h>
 #ifdef __cplusplus
 #   define __BEGIN_DECLS    extern "C" {
@@ -71,18 +72,22 @@ int	 getopt_long_only(int, char * const *, const char *,
 #ifndef _GETOPT_DEFINED_
 #define _GETOPT_DEFINED_
 int	 getopt(int, char * const *, const char *);
+
+#	if VSF_LINUX_USE_GETOPT == ENABLED
 // for vsf linux, put these variable in process context and implement them as macro
-#include "shell/sys/linux/vsf_linux.h"
-#define opterr			vsf_linux_get_cur_process()->__opterr
-#define optind			vsf_linux_get_cur_process()->__optind
-#define optopt			vsf_linux_get_cur_process()->__optopt
-#define optarg			vsf_linux_get_cur_process()->__optarg
-#define optreset		vsf_linux_get_cur_process()->__optreset
-//extern   char *optarg;                  /* getopt(3) external variables */
-//extern   int opterr;
-//extern   int optind;
-//extern   int optopt;
-//extern   int optreset;
+#		include "shell/sys/linux/vsf_linux.h"
+#		define opterr			vsf_linux_get_cur_process()->__opterr
+#		define optind			vsf_linux_get_cur_process()->__optind
+#		define optopt			vsf_linux_get_cur_process()->__optopt
+#		define optarg			vsf_linux_get_cur_process()->__optarg
+#		define optreset		vsf_linux_get_cur_process()->__optreset
+#	else
+extern   char *optarg;                  /* getopt(3) external variables */
+extern   int opterr;
+extern   int optind;
+extern   int optopt;
+extern   int optreset;
+#	endif
 #endif
 __END_DECLS
  

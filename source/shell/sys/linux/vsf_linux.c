@@ -301,6 +301,17 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     return VSF_ERR_FAIL;
 }
 
+int isatty(int fd)
+{
+    // terminal is __vsf_linux.stdio_stream
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    vsf_stream_t *stream = vsf_linux_get_stream(sfd);
+    return  (stream == __vsf_linux.stdio_stream.in)
+        ||  (stream == __vsf_linux.stdio_stream.out)
+        ||  (stream == __vsf_linux.stdio_stream.err);
+}
+
 vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
             const vsf_linux_thread_op_t *op,
             int stack_size, void *stack)
@@ -376,10 +387,11 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
         process->term[STDIN_FILENO].c_lflag = ECHO;
         process->term[STDIN_FILENO].c_cc[VMIN] = 1;
 
-        // getopt
+#if VSF_LINUX_USE_GETOPT == ENABLED
         process->__opterr = 1;
         process->__optind = 1;
         process->__optopt = '?';
+#endif
 
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {
@@ -607,20 +619,11 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     }
 }
 
-#if defined(__WIN__) && defined(__CPU_X64__)
-intptr_t execv(const char *pathname, char const* const* argv)
-#else
-int execv(const char *pathname, char const* const* argv)
-#endif
+exec_ret_t execvp(const char *pathname, char const* const* argv)
 {
-    char fullpath[MAX_PATH];
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
-        return -1;
-    }
-
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
-    int fd = vsf_linux_fs_get_executable(fullpath, &entry);
+    int fd = vsf_linux_fs_get_executable(pathname, &entry);
     if (fd < 0) {
         return -1;
     }
@@ -641,20 +644,21 @@ int execv(const char *pathname, char const* const* argv)
     return 0;
 }
 
-#if defined(__WIN__) && defined(__CPU_X64__)
-intptr_t execl(const char *pathname, const char *arg, ...)
-#else
-int execl(const char *pathname, const char *arg, ...)
-#endif
+exec_ret_t execv(const char *pathname, char const* const* argv)
 {
     char fullpath[MAX_PATH];
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
     }
 
+    return execvp(fullpath, argv);
+}
+
+static exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
+{
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
-    int fd = vsf_linux_fs_get_executable(fullpath, &entry);
+    int fd = vsf_linux_fs_get_executable(pathname, &entry);
     if (fd < 0) {
         return -1;
     }
@@ -663,23 +667,47 @@ int execl(const char *pathname, const char *arg, ...)
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_thread_t *thread;
     const char *args;
-    va_list ap;
 
     ctx->arg.argc = 1;
     ctx->arg.argv[0] = arg;
-    va_start(ap, arg);
+    args = va_arg(ap, const char *);
+    while ((args != NULL) && (ctx->arg.argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
+        ctx->arg.argv[ctx->arg.argc++] = args;
         args = va_arg(ap, const char *);
-        while ((args != NULL) && (ctx->arg.argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
-            ctx->arg.argv[ctx->arg.argc++] = args;
-            args = va_arg(ap, const char *);
-        }
-    va_end(ap);
+    }
     ctx->entry = entry;
 
     vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
     vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_INIT);
     vsf_thread_wfe(VSF_EVT_INVALID);
     return 0;
+}
+
+exec_ret_t execlp(const char *pathname, const char *arg, ...)
+{
+    exec_ret_t ret;
+
+    va_list ap;
+    va_start(ap, arg);
+        ret = __execlp_va(pathname, arg, ap);
+    va_end(ap);
+    return ret;
+}
+
+exec_ret_t execl(const char *pathname, const char *arg, ...)
+{
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
+    exec_ret_t ret;
+
+    va_list ap;
+    va_start(ap, arg);
+        ret = __execlp_va(pathname, arg, ap);
+    va_end(ap);
+    return ret;
 }
 
 long sysconf(int name)

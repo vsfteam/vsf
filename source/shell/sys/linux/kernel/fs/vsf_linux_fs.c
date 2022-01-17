@@ -715,6 +715,18 @@ int rmdir(const char *pathname)
     return __vsf_linux_fs_remove(pathname, VSF_FILE_ATTR_DIRECTORY);
 }
 
+int dup(int oldfd)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int dup2(int oldfd, int newfd)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
 {
     VSF_LINUX_ASSERT(process != NULL);
@@ -930,6 +942,21 @@ int stat(const char *pathname, struct stat *buf)
     int ret = fstat(fd, buf);
     close(fd);
     return ret;
+}
+
+int chmod(const char *pathname, mode_t mode)
+{
+    return 0;
+}
+
+int fchmod(int fd, mode_t mode)
+{
+    return 0;
+}
+
+mode_t umask(mode_t mask)
+{
+    return 0777;
 }
 
 int access(const char *pathname, int mode)

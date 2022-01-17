@@ -53,4 +53,24 @@ char * nl_langinfo(nl_item item)
     }
 }
 
+int abs(int j)
+{
+    return (j < 0 ? -j : j);
+}
+
+long labs(long j)
+{
+    return (j < 0 ? -j : j);
+}
+
+long long llabs(long long j)
+{
+    return (j < 0 ? -j : j);
+}
+
+intmax_t imaxabs(intmax_t j)
+{
+    return (j < 0 ? -j : j);
+}
+
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC

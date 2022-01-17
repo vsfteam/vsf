@@ -128,6 +128,7 @@
 
 #if VSF_USE_LINUX == ENABLED
 #   define VSF_USE_POSIX                                ENABLED
+#   define VSF_LINUX_USE_GETOPT                         ENABLED
 #endif
 
 #if APP_USE_EVM_DEMO == ENABLED

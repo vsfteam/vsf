@@ -55,12 +55,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-// for vsf linux, put these variable in process context and implement them as macro
-//int	opterr = 1;		/* if error message should be printed */
-//int	optind = 1;		/* index into parent argv vector */
-//int	optopt = '?';		/* character checked for validity */
-//int	optreset;		/* reset getopt */
-//char    *optarg;		/* argument associated with option */
+#if VSF_LINUX_USE_GETOPT != ENABLED
+int	opterr = 1;		/* if error message should be printed */
+int	optind = 1;		/* index into parent argv vector */
+int	optopt = '?';		/* character checked for validity */
+int	optreset;		/* reset getopt */
+char    *optarg;		/* argument associated with option */
+#endif
 
 #if 0
 /* DEF_* only work on initialized (non-COMMON) variables */

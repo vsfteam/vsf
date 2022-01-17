@@ -21,6 +21,7 @@ extern "C" {
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define stat            VSF_LINUX_WRAPPER(stat)
 #define fstat           VSF_LINUX_WRAPPER(fstat)
+#define umask           VSF_LINUX_WRAPPER(umask)
 #endif
 #define lstat           stat
 
@@ -70,8 +71,11 @@ struct stat {
 #define st_ctime    st_ctim.tv_sec
 };
 
+mode_t umask(mode_t mask);
 int stat(const char *pathname, struct stat *buf);
 int fstat(int fd, struct stat *buf);
+int chmod(const char *pathname, mode_t mode);
+int fchmod(int fd, mode_t mode);
 
 #ifdef __cplusplus
 }
