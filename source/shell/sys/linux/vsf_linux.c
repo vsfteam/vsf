@@ -827,6 +827,11 @@ pid_t getppid(void)
     return vsf_linux_get_cur_process()->id.ppid;
 }
 
+pid_t getpgid(pid_t pid)
+{
+    return pid;
+}
+
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
