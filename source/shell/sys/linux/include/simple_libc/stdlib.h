@@ -24,9 +24,11 @@ extern "C" {
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
-#   if VSF_LINUX_USE_ENVIRON
+#   if VSF_LINUX_LIBC_USE_ENVIRON
 #define getenv              VSF_LINUX_LIBC_WRAPPER(getenv)
 #define putenv              VSF_LINUX_LIBC_WRAPPER(putenv)
+#define setenv              VSF_LINUX_LIBC_WRAPPER(setenv)
+#define unsetenv            VSF_LINUX_LIBC_WRAPPER(unsetenv)
 #   endif
 #define mktemp              VSF_LINUX_LIBC_WRAPPER(mktemp)
 #define mkstemp             VSF_LINUX_LIBC_WRAPPER(mkstemp)
@@ -71,9 +73,11 @@ void * aligned_alloc(size_t alignment, size_t size);
 void * calloc(size_t n, size_t size);
 void * memalign(size_t alignment, size_t size);
 
-#if VSF_LINUX_USE_ENVIRON
+#if VSF_LINUX_LIBC_USE_ENVIRON
 int putenv(char *string);
 char * getenv(const char *name);
+int setenv(const char *name, const char *value, int replace);
+int unsetenv(const char *name);
 #endif
 char * mktemp(char *template_str);
 int mkstemp(char *template_str);

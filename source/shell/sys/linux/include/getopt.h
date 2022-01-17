@@ -80,7 +80,7 @@ int	 getopt(int, char * const *, const char *);
 #		define optind			vsf_linux_get_cur_process()->__optind
 #		define optopt			vsf_linux_get_cur_process()->__optopt
 #		define optarg			vsf_linux_get_cur_process()->__optarg
-#		define optreset		vsf_linux_get_cur_process()->__optreset
+#		define optreset			vsf_linux_get_cur_process()->__optreset
 #	else
 extern   char *optarg;                  /* getopt(3) external variables */
 extern   int opterr;

@@ -63,6 +63,15 @@
 #   ifndef VSF_LINUX_USE_SIMPLE_CTYPE
 #       define VSF_LINUX_USE_SIMPLE_CTYPE       ENABLED
 #   endif
+
+#   if VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
+#       ifndef VSF_LINUX_LIBC_USE_ENVIRON
+#           define VSF_LINUX_LIBC_USE_ENVIRON   ENABLED
+#       endif
+#   endif
+#   ifndef VSF_LINUX_USE_GETOPT
+#       define VSF_LINUX_USE_GETOPT             ENABLED
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

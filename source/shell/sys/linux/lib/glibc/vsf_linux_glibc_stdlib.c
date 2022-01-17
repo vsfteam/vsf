@@ -47,6 +47,11 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+char **environ = NULL;
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
@@ -278,5 +283,92 @@ char * itoa(int num, char *str, int radix)
     }
     return str;
 }
+
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+int putenv(char *string)
+{
+    const char * str = strchr(string, '=');
+    bool is_to_set = str != NULL;
+    size_t namelen = is_to_set ? str - string : strlen(string);
+    size_t size = 0;
+    bool is_match = false;
+
+    char **env = environ, **env_removed = NULL;
+    if (env != NULL) {
+        for (char **env_tmp = env; *env_tmp != NULL; env_tmp++, size++) {
+            if (    !strncmp(string, *env_tmp, namelen)
+                &&  ((*env_tmp)[namelen] == '=')) {
+                is_match = true;
+                free(*env_tmp);
+                if (is_to_set) {
+                    *env_tmp = string;
+                    VSF_LINUX_ASSERT(*env_tmp != NULL);
+                    return 0;
+                } else {
+                    env_removed = env_tmp;
+                    *env_tmp = NULL;
+                }
+            }
+        }
+    }
+
+    if (is_to_set) {
+        VSF_LINUX_ASSERT(!is_match);
+        environ = env = (char **)realloc(env, (size + 2) * sizeof(char *));
+        if (NULL == env) {
+            return -1;
+        }
+        env[size] = string;
+        env[size + 1] = NULL;
+    } else if (env_removed != NULL) {
+        *env_removed = env[size - 1];
+        env[size - 1] = NULL;
+    }
+    return 0;
+}
+
+char * getenv(const char *name)
+{
+    size_t namelen = strlen(name);
+    char **env = environ;
+
+    if (NULL == env) {
+        return NULL;
+    }
+
+    for (; *env != NULL; env++) {
+        if (    !strncmp(name, *env, namelen)
+            &&  ((*env)[namelen] == '=')) {
+            return *env + namelen + 1;
+        }
+    }
+    return NULL;
+}
+
+int setenv(const char *name, const char *value, int replace)
+{
+    size_t namelen = strlen(name), valuelen = strlen(value);
+    if (!replace) {
+        if (getenv(name) != NULL) {
+            return 0;
+        }
+    }
+
+    char *env_str = malloc(namelen + valuelen + 2);
+    if (NULL == env_str) {
+        return -1;
+    }
+    memcpy(env_str, name, namelen);
+    env_str[namelen] = '=';
+    memcpy(envstr + namelen + 1, value, valuelen);
+    env_str[namelen + valuelen + 1] = '\0';
+    return putenv(env_str);
+}
+
+int unsetenv(const char *name)
+{
+    return putenv(name);
+}
+#endif
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDLIB
