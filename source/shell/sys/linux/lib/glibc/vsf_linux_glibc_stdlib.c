@@ -360,14 +360,14 @@ int setenv(const char *name, const char *value, int replace)
     }
     memcpy(env_str, name, namelen);
     env_str[namelen] = '=';
-    memcpy(envstr + namelen + 1, value, valuelen);
+    memcpy(env_str + namelen + 1, value, valuelen);
     env_str[namelen + valuelen + 1] = '\0';
     return putenv(env_str);
 }
 
 int unsetenv(const char *name)
 {
-    return putenv(name);
+    return putenv((char *)name);
 }
 #endif
 
