@@ -367,7 +367,7 @@ void libusb_exit(libusb_context *ctx)
 
         int fd = __vsf_libusb.fd;
         __vsf_libusb.fd = -1;
-        vsf_linux_fd_delete(fd);
+        close(fd);
     }
 }
 

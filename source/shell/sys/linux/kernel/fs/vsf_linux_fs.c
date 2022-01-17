@@ -304,47 +304,31 @@ int vsf_linux_fd_add(vsf_linux_fd_t *sfd, int fd_desired)
 
 int vsf_linux_fd_create_ex(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op, int fd_desired)
 {
-    int priv_size = (op != NULL) ? op->priv_size : 0;
+    int priv_size = (op != NULL) ? op->priv_size : sizeof(vsf_linux_fd_priv_t);
+    int ret;
     vsf_linux_fd_t *new_sfd;
-#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    bool is_heap_alloc;
-    if (process->cur_fd <= 2) {
-        is_heap_alloc = true;
-        new_sfd = vsf_heap_malloc(sizeof(vsf_linux_fd_t) + priv_size);
-        if (new_sfd != NULL) {
-            memset(new_sfd, 0, sizeof(vsf_linux_fd_t) + priv_size);
-        }
-    } else {
-        is_heap_alloc = false;
-        new_sfd = calloc(1, sizeof(vsf_linux_fd_t) + priv_size);
-    }
-#else
-    new_sfd = calloc(1, sizeof(vsf_linux_fd_t) + priv_size);
-#endif
+
+    new_sfd = calloc(1, sizeof(vsf_linux_fd_t));
     if (!new_sfd) {
         errno = ENOMEM;
         return -1;
     }
     new_sfd->op = op;
+    new_sfd->priv = calloc(1, priv_size);
+    if (!new_sfd->priv) {
+        ret = -1;
+        goto free_sfd_and_exit;
+    }
+    ((vsf_linux_fd_priv_t *)new_sfd->priv)->ref = 1;
 
     if (sfd != NULL) {
         *sfd = new_sfd;
     }
 
-    int ret = vsf_linux_fd_add(new_sfd, fd_desired);
+    ret = vsf_linux_fd_add(new_sfd, fd_desired);
     if (ret < 0) {
-#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
-        if (is_heap_alloc) {
-            vsf_heap_free(new_sfd);
-        } else {
-            free(new_sfd);
-        }
-#else
+free_sfd_and_exit:
         free(new_sfd);
-#endif
     }
     return ret;
 }
@@ -366,17 +350,7 @@ void vsf_linux_fd_delete(int fd)
 #endif
     vsf_unprotect_sched(orig);
 
-#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
-    extern const vsf_linux_fd_op_t __vsf_linux_heap_fdop;
-    if ((sfd->op == &__vsf_linux_heap_fdop) || (fd <= 2)) {
-        vsf_heap_free(sfd);
-    } else {
-        free(sfd);
-    }
-#else
     free(sfd);
-#endif
 }
 
 bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
@@ -753,7 +727,7 @@ int rmdir(const char *pathname)
 
 int dup(int oldfd)
 {
-    return fcntl(oldfd, F_DUPFD, 0);
+    return fcntl(oldfd, F_DUPFD, -1);
 }
 
 int dup2(int oldfd, int newfd)
@@ -853,7 +827,16 @@ int close(int fd)
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if (!sfd) { return -1; }
 
-    int err = sfd->op->fn_close(sfd);
+    vsf_linux_fd_priv_t *priv = sfd->priv;
+    vsf_protect_t orig = vsf_protect_sched();
+        bool is_to_close = --priv->ref == 0;
+    vsf_unprotect_sched(orig);
+
+    int err = 0;
+    if (is_to_close) {
+        err = sfd->op->fn_close(sfd);
+        free(sfd->priv);
+    }
     vsf_linux_fd_delete(fd);
     return err;
 }
@@ -871,8 +854,21 @@ int fcntl(int fd, int cmd, ...)
 
     // process generic commands
     switch (cmd) {
-    case F_DUPFD:
-        VSF_LINUX_ASSERT(false);
+    case F_DUPFD: {
+            vsf_linux_fd_t *sfd_new;
+            int ret = vsf_linux_fd_create_ex(&sfd_new, sfd->op, arg);
+            if (ret < 0) {
+                return ret;
+            }
+            free(sfd_new->priv);
+
+            vsf_linux_fd_priv_t *priv = sfd->priv;
+            vsf_protect_t orig = vsf_protect_sched();
+                priv->ref++;
+            vsf_unprotect_sched(orig);
+            sfd_new->priv = priv;
+            return ret;
+        }
         break;
     case F_GETFL:
         return sfd->flags;

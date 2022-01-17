@@ -50,6 +50,12 @@ typedef struct vsf_linux_fd_op_t {
     int (*fn_close)(vsf_linux_fd_t *sfd);
 } vsf_linux_fd_op_t;
 
+vsf_class(vsf_linux_fd_priv_t) {
+    private_member(
+        int ref;
+    )
+};
+
 vsf_class(vsf_linux_fd_t) {
     protected_member(
         int fd;
@@ -68,12 +74,7 @@ vsf_class(vsf_linux_fd_t) {
     )
 
     protected_member(
-#if __IS_COMPILER_IAR__
-        // make compiler happy by waisting 4 bytes
-        int priv[1];
-#else
-        int priv[0];
-#endif
+        void *priv;
     )
 };
 
@@ -81,6 +82,9 @@ vsf_class(vsf_linux_fd_t) {
 typedef void (*vsf_linux_stream_on_evt_t)(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool is_ready);
 
 vsf_class(vsf_linux_stream_priv_t) {
+    public_member(
+        implement(vsf_linux_fd_priv_t)
+    )
     protected_member(
         vsf_stream_t *stream;
         vsf_linux_stream_on_evt_t on_evt;
@@ -103,6 +107,7 @@ vsf_class(vsf_linux_pipe_tx_priv_t) {
 };
 
 typedef struct vsf_linux_fs_priv_t {
+    implement(vsf_linux_fd_priv_t)
     vk_file_t *file;
     uint64_t pos;
 
