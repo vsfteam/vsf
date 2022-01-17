@@ -146,14 +146,12 @@ int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
 
 static inline int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
 {
-    VSF_LINUX_ASSERT(false);
-    return 0;
+    return -1;
 }
 
 static inline int raise(int sig)
 {
-    VSF_LINUX_ASSERT(false);
-    return 0;
+    return -1;
 }
 
 #ifdef __cplusplus
