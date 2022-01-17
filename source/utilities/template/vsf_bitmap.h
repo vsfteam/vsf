@@ -70,7 +70,7 @@ extern "C" {
 
 
 #define __vsf_bitmap_get0(__bitmap_ptr, __bit)                                  \
-    (__bitmap_ptr[(__bit) / __optimal_bit_sz] & ((uintalu_t)1 << ((__bit) & __optimal_bit_msk)))
+    (((uintalu_t *)__bitmap_ptr)[(__bit) / __optimal_bit_sz] & ((uintalu_t)1 << ((__bit) & __optimal_bit_msk)))
 #define __vsf_bitmap_get1(__bitmap_ptr, __bit, __pbit_val)                      \
     do {                                                                        \
         *(&(__bit_val)) = __vsf_bitmap_get0(__bitmap_ptr, __bit);               \
