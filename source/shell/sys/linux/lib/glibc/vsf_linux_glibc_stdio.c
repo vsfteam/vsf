@@ -300,12 +300,12 @@ int fputc(int ch, FILE *f)
 
 int fputs(const char *str, FILE *f)
 {
-    return fwrite(str, 1, strlen(str), f);
+    return fprintf(f, "%s\n", str);
 }
 
 int puts(const char *str)
 {
-    return fputs(str, stdout);
+    return printf("%s\n", str);
 }
 
 #if !(defined(__WIN__) && (VSF_LINUX_LIBC_CFG_CPP == ENABLED))
