@@ -268,39 +268,56 @@ int vsf_linux_fd_set_size(int fd, uint64_t size)
     return -1;
 }
 
-int vsf_linux_fd_add(vsf_linux_fd_t *sfd)
+int vsf_linux_fd_add(vsf_linux_fd_t *sfd, int fd_desired)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
 
     sfd->rxpend = sfd->txpend = NULL;
 
     vsf_protect_t orig = vsf_protect_sched();
+        if (fd_desired >= 0) {
 #ifdef VSF_LINUX_CFG_FD_BITMAP_SIZE
-        sfd->fd = vsf_bitmap_ffz(&process->fd_bitmap, VSF_LINUX_CFG_FD_BITMAP_SIZE);
-        VSF_LINUX_ASSERT(sfd->fd >= 0);
-        vsf_bitmap_set(&process->fd_bitmap, sfd->fd);
+            if (vsf_bitmap_get(&process->fd_bitmap, fd_desired)) {
+                vsf_unprotect_sched(orig);
+                return -1;
+            }
+            vsf_bitmap_set(&process->fd_bitmap, fd_desired);
+            sfd->fd = fd_desired;
 #else
-        sfd->fd = process->cur_fd++;
+            vsf_unprotect_sched(orig);
+            return -1;
 #endif
+        } else {
+#ifdef VSF_LINUX_CFG_FD_BITMAP_SIZE
+            sfd->fd = vsf_bitmap_ffz(&process->fd_bitmap, VSF_LINUX_CFG_FD_BITMAP_SIZE);
+            VSF_LINUX_ASSERT(sfd->fd >= 0);
+            vsf_bitmap_set(&process->fd_bitmap, sfd->fd);
+#else
+            sfd->fd = process->cur_fd++;
+#endif
+        }
         vsf_dlist_add_to_tail(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
     vsf_unprotect_sched(orig);
 
     return sfd->fd;
 }
 
-int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
+int vsf_linux_fd_create_ex(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op, int fd_desired)
 {
     int priv_size = (op != NULL) ? op->priv_size : 0;
     vsf_linux_fd_t *new_sfd;
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    bool is_heap_alloc;
     if (process->cur_fd <= 2) {
+        is_heap_alloc = true;
         new_sfd = vsf_heap_malloc(sizeof(vsf_linux_fd_t) + priv_size);
         if (new_sfd != NULL) {
             memset(new_sfd, 0, sizeof(vsf_linux_fd_t) + priv_size);
         }
     } else {
+        is_heap_alloc = false;
         new_sfd = calloc(1, sizeof(vsf_linux_fd_t) + priv_size);
     }
 #else
@@ -315,7 +332,26 @@ int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
     if (sfd != NULL) {
         *sfd = new_sfd;
     }
-    return vsf_linux_fd_add(new_sfd);
+
+    int ret = vsf_linux_fd_add(new_sfd, fd_desired);
+    if (ret < 0) {
+#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_FD == ENABLED
+        if (is_heap_alloc) {
+            vsf_heap_free(new_sfd);
+        } else {
+            free(new_sfd);
+        }
+#else
+        free(new_sfd);
+#endif
+    }
+    return ret;
+}
+
+int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
+{
+    return vsf_linux_fd_create_ex(sfd, op, -1);
 }
 
 void vsf_linux_fd_delete(int fd)
@@ -717,14 +753,13 @@ int rmdir(const char *pathname)
 
 int dup(int oldfd)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    return fcntl(oldfd, F_DUPFD, 0);
 }
 
 int dup2(int oldfd, int newfd)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    close(newfd);
+    return fcntl(oldfd, F_DUPFD, newfd);
 }
 
 int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
@@ -836,6 +871,9 @@ int fcntl(int fd, int cmd, ...)
 
     // process generic commands
     switch (cmd) {
+    case F_DUPFD:
+        VSF_LINUX_ASSERT(false);
+        break;
     case F_GETFL:
         return sfd->flags;
         break;

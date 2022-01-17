@@ -109,7 +109,7 @@ void * malloc(size_t size)
     if (sfd != NULL) {
         memset(sfd, 0, sizeof(*sfd));
         sfd->op = &__vsf_linux_heap_fdop;
-        vsf_linux_fd_add(sfd);
+        vsf_linux_fd_add(sfd, -1);
         return (void *)&sfd[1];
     }
     return NULL;

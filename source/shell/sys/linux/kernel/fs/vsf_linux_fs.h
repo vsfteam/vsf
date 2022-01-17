@@ -138,8 +138,9 @@ extern int vsf_linux_fs_get_target(const char *pathname, void **target);
 
 // sfd is allocated and initialized by user(clear memory, and set op),
 //  vsf_linux_fd_add will add sfd to current process
-extern int vsf_linux_fd_add(vsf_linux_fd_t *sfd);
+extern int vsf_linux_fd_add(vsf_linux_fd_t *sfd, int fd_desired);
 extern int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
+extern int vsf_linux_fd_create_ex(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op, int fd_desired);
 extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
 extern void vsf_linux_fd_delete(int fd);
 extern bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd);
