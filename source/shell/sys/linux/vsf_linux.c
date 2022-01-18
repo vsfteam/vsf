@@ -1370,6 +1370,7 @@ int posix_spawn_file_actions_addfchdir_np(posix_spawn_file_actions_t *actions, i
 }
 
 // termios.h
+#if VSF_LINUX_USE_TERMIOS == ENABLED
 int tcgetattr(int fd, struct termios *termios)
 {
     if ((fd >= 3) || (NULL == termios)) {
@@ -1442,6 +1443,7 @@ int cfsetspeed(struct termios *termios_p, speed_t speed)
 {
     return 0;
 }
+#endif      // VSF_LINUX_USE_TERMIOS
 
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop

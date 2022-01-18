@@ -70,6 +70,25 @@ int vsf_linux_vfs_init(void)
     }
 #endif
 
+#if VSF_LINUX_USE_TERMIOS == ENABLED
+    err = mkdir("/usr", 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to mkdir /usr\r\n");
+        return err;
+    }
+
+    err = mkdir("/usr/share", 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to mkdir /usr/share\r\n");
+        return err;
+    }
+#endif
+
+#if VSF_LINUX_USE_TERMIOS == ENABLED
+    putenv("TERM=xtem");
+    // TODO: implement terminfo at /usr/share/terminfo
+#endif
+
     return 0;
 }
 
