@@ -308,7 +308,6 @@ int puts(const char *str)
     return printf("%s\n", str);
 }
 
-#if !(defined(__WIN__) && (VSF_LINUX_LIBC_CFG_CPP == ENABLED))
 int putc(int c, FILE* f)
 {
     return fwrite(&c, 1, 1, f);;
@@ -318,7 +317,6 @@ int putchar(int c)
 {
     return putc(c, stdout);
 }
-#endif
 
 int vfprintf(FILE *f, const char *format, va_list ap)
 {
