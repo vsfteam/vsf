@@ -179,8 +179,8 @@ int vsfip_main(int argc, char *argv[])
     usrapp_net_common_init();
 #endif
 
-    busybox_bind("/sbin/ping", __vsfip_ping);
-    busybox_bind("/sbin/nslookup", __vsfip_nslookup);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/ping", __vsfip_ping);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/nslookup", __vsfip_nslookup);
 
     // wait for dhcp ready
     vsf_thread_wfe(VSF_EVT_USER);

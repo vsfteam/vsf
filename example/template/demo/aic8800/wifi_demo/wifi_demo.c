@@ -179,9 +179,9 @@ static int __wifi_connect_main(int argc, char *argv[])
 
 int fhost_application_init(void)
 {
-    busybox_bind("/sbin/wifi_ap", __wifi_ap_main);
-    busybox_bind("/sbin/wifi_scan", __wifi_scan_main);
-    busybox_bind("/sbin/wifi_connect", __wifi_connect_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/wifi_ap", __wifi_ap_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/wifi_scan", __wifi_scan_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/wifi_connect", __wifi_connect_main);
     return 0;
 }
 

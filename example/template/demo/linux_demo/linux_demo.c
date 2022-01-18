@@ -125,57 +125,57 @@ int vsf_linux_create_fhs(void)
     // 4. install executables
 #if VSF_LINUX_USE_LIBUSB == ENABLED && APP_USE_LINUX_LIBUSB_DEMO == ENABLED
     extern int lsusb_main(int argc, char *argv[]);
-    busybox_bind("/sbin/lsusb", lsusb_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/lsusb", lsusb_main);
     vsf_linux_libusb_startup();
 #endif
 
 #if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
     extern int cpu_usage_main(int argc, char *argv[]);
-    busybox_bind("/sbin/cpu", cpu_usage_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/cpu", cpu_usage_main);
 #endif
 
 #if APP_USE_NNOM_DEMO == ENABLED
     extern int nnom_main(int argc, char *argv[]);
-    busybox_bind("/sbin/nnom", nnom_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/nnom", nnom_main);
 #endif
 #if APP_USE_XBOOT_XUI_DEMO == ENABLED
     extern int xui_main(int argc, char **argv);
-    busybox_bind("/sbin/xui", xui_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/xui", xui_main);
 #endif
 #if APP_USE_AWTK_DEMO == ENABLED
     extern int awtk_main(int argc, char *argv[]);
-    busybox_bind("/sbin/awtk", awtk_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/awtk", awtk_main);
 #endif
 #if APP_USE_LVGL_DEMO == ENABLED
     extern int lvgl_main(int argc, char *argv[]);
-    busybox_bind("/sbin/lvgl", lvgl_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/lvgl", lvgl_main);
 #elif APP_USE_LVGL_TERMINAL_DEMO == ENABLED
     extern int lvgl_main(int argc, char *argv[]);
     lvgl_main(0, NULL);
 #endif
 #if APP_USE_TGUI_DEMO == ENABLED
     extern int tgui_main(int argc, char *argv[]);
-    busybox_bind("/sbin/tgui", tgui_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/tgui", tgui_main);
 #endif
 #if APP_USE_GATO_DEMO == ENABLED
     extern int gato_main(int argc, char *argv[]);
-    busybox_bind("/sbin/gato", gato_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/gato", gato_main);
 #endif
 #if APP_USE_NUKLEAR_DEMO == ENABLED
     extern int nuklear_main(int argc, char *argv[]);
-    busybox_bind("/sbin/nuklear", nuklear_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/nuklear", nuklear_main);
 #endif
 #if APP_USE_LLGUI_DEMO == ENABLED
     extern int llgui_main(int argc, char *argv[]);
-    busybox_bind("/sbin/llgui", llgui_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/llgui", llgui_main);
 #endif
 #if APP_USE_GUILITE_DEMO == ENABLED
     extern int guilite_main(int argc, char *argv[]);
-    busybox_bind("/sbin/guilite", guilite_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/guilite", guilite_main);
 #endif
 #if APP_USE_AUDIO_DEMO == ENABLED
     extern int audio_play_main(int argc, char *argv[]);
-    busybox_bind("/sbin/play_audio", audio_play_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/play_audio", audio_play_main);
 #endif
 #if APP_USE_BTSTACK_DEMO == ENABLED
     extern void btstack_install(void);
@@ -183,116 +183,116 @@ int vsf_linux_create_fhs(void)
 #endif
 #if APP_USE_LINUX_DEMO == ENABLED && APP_USE_VSFVM_DEMO == ENABLED
     extern int vsfvm_main(int argc, char *argv[]);
-    busybox_bind("/sbin/vsfvm", vsfvm_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/vsfvm", vsfvm_main);
 #endif
 #if APP_USE_USBD_DEMO == ENABLED
 #   if APP_USE_USBD_CDC_DEMO == ENABLED
     extern int usbd_cdc_main(int argc, char *argv[]);
-    busybox_bind("/sbin/usbd_cdc", usbd_cdc_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/usbd_cdc", usbd_cdc_main);
 #   endif
 #   if APP_USE_USBD_UVC_DEMO == ENABLED
     extern int usbd_uvc_main(int argc, char *argv[]);
-    busybox_bind("/sbin/usbd_uvc", usbd_uvc_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/usbd_uvc", usbd_uvc_main);
 #   endif
 #   if APP_USE_USBD_UAC_DEMO == ENABLED
     extern int usbd_uac_main(int argc, char *argv[]);
-    busybox_bind("/sbin/usbd_uac", usbd_uac_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/usbd_uac", usbd_uac_main);
 #   endif
 #   if APP_USE_USBD_MSC_DEMO == ENABLED
     extern int usbd_msc_main(int argc, char *argv[]);
-    busybox_bind("/sbin/usbd_msc", usbd_msc_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/usbd_msc", usbd_msc_main);
 #   endif
 #   if APP_USE_USBD_USER_DEMO == ENABLED
     extern int usbd_user_main(int argc, char *argv[]);
-    busybox_bind("/sbin/usbd_user", usbd_user_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/usbd_user", usbd_user_main);
 #   endif
 #endif
 #if APP_USE_LINUX_MOUNT_DEMO == ENABLED
     extern int mount_main(int argc, char *argv[]);
-    busybox_bind("/sbin/mount", mount_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/mount", mount_main);
 #endif
 #if APP_USE_LINUX_HTTPD_DEMO == ENABLED
     extern int httpd_main(int argc, char *argv[]);
-    busybox_bind("/sbin/httpd", httpd_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/httpd", httpd_main);
 #endif
 #if APP_USE_CPP_DEMO == ENABLED
     extern int cpp_main(int argc, char *argv[]);
-    busybox_bind("/sbin/cpp_test", cpp_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/cpp_test", cpp_main);
 #endif
 
 #if APP_USE_DISP_DEMO == ENABLED
     extern int disp_main(int argc, char *argv[]);
-    busybox_bind("/sbin/disp", disp_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/disp", disp_main);
 #endif
 #if APP_USE_SDL2_DEMO == ENABLED
     extern int sdl2_main(int argc, char *argv[]);
-    busybox_bind("/sbin/sdl2", sdl2_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/sdl2", sdl2_main);
 #endif
 #if APP_USE_VSFIP_DEMO == ENABLED && VSF_USE_VSFIP == ENABLED
     extern int vsfip_main(int argc, char *argv[]);
-    busybox_bind("/sbin/vsfip", vsfip_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/vsfip", vsfip_main);
 #endif
 #if APP_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
     extern int lwip_main(int argc, char *argv[]);
-    busybox_bind("/sbin/lwip", lwip_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/lwip", lwip_main);
 #endif
 #if APP_USE_KERNEL_TEST == ENABLED
     extern int kernel_eda_test_main(int argc, char *argv[]);
     extern int kernel_fsm_test_main(int argc, char *argv[]);
     extern int kernel_sem_test_main(int argc, char *argv[]);
     extern int kernel_cross_task_test_main(int argc, char *argv[]);
-    busybox_bind("/sbin/eda_test", kernel_eda_test_main);
-    busybox_bind("/sbin/fsm_test", kernel_fsm_test_main);
-    busybox_bind("/sbin/sem_test", kernel_sem_test_main);
-    busybox_bind("/sbin/cross_task_test", kernel_cross_task_test_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/eda_test", kernel_eda_test_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/fsm_test", kernel_fsm_test_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/sem_test", kernel_sem_test_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/cross_task_test", kernel_cross_task_test_main);
 #endif
 #if APP_USE_JSON_DEMO == ENABLED
     extern int json_main(int argc, char *argv[]);
-    busybox_bind("/sbin/json", json_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/json", json_main);
 #endif
 #if APP_USE_HAL_DEMO == ENABLED
 #   if APP_USE_HAL_USART_DEMO == ENABLED && VSF_HAL_USE_USART == ENABLED
     extern int usart_main(int argc, char *argv[]);
-    busybox_bind("/sbin/usart", usart_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/usart", usart_main);
 #   endif
 #   if APP_USE_HAL_GPIO_DEMO == ENABLED && VSF_HAL_USE_GPIO == ENABLED
     extern int gpio_main(int argc, char *argv[]);
-    busybox_bind("/sbin/gpio", gpio_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/gpio", gpio_main);
 #   endif
 #endif
 #if APP_USE_STREAM_HAL_DEMO == ENABLED
 #   if APP_USE_STREAM_USART_DEMO == ENABLED
     extern int stream_usart_main(int argc, char *argv[]);
-    busybox_bind("/sbin/stream_usart", stream_usart_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/stream_usart", stream_usart_main);
 #   endif
 #endif
 #if APP_USE_SOCKET_DEMO == ENABLED && VSF_USE_TCPIP == ENABLED
     extern int socket_main(int argc, char *argv[]);
-    busybox_bind("/sbin/socket", socket_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/socket", socket_main);
 #endif
 #if APP_USE_EVM_DEMO == ENABLED
     extern int evm_demo_main(int argc, char *argv[]);
-    busybox_bind("/sbin/evm", evm_demo_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/evm", evm_demo_main);
 #   if VSF_EVM_USE_LUA == ENABLED
     extern int evm_demo_luat_main(int argc, char *argv[]);
-    busybox_bind("/sbin/evm_lua", evm_demo_luat_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/evm_lua", evm_demo_luat_main);
 #   endif
 #endif
 #if APP_USE_LUA_DEMO == ENABLED
 #   if VSF_EVM_USE_LUA != ENABLED
     extern int lua_main(int argc, char* argv[]);
-    busybox_bind("/sbin/lua", lua_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/lua", lua_main);
 #   endif
     extern int love_main(int argc, char *argv[]);
-    busybox_bind("/sbin/love", love_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/love", love_main);
 #endif
 #if APP_USE_COREMARK_DEMO == ENABLED
     extern int coremark_main(int argc, char *argv[]);
-    busybox_bind("/sbin/coremark", coremark_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/coremark", coremark_main);
 #endif
 #if APP_USE_DISTBUS_DEMO == ENABLED
     extern int distbus_main(int argc, char *argv[]);
-    busybox_bind("/sbin/distbus", distbus_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/distbus", distbus_main);
 #endif
 
     return 0;

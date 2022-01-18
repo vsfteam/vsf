@@ -30,7 +30,7 @@ WEAK(vsf_linux_init_main)
 int vsf_linux_init_main(int argc, char *argv[])
 {
     static const char *__path[] = {
-        "/sbin/",
+        VSF_LINUX_CFG_BIN_PATH "/",
         NULL,
     };
     vsh_set_path((char **)__path);
@@ -70,19 +70,19 @@ int busybox_bind(char *path, vsf_linux_main_entry_t entry)
 
 int busybox_install(void)
 {
-    if (    mkdir("/sbin", 0)
-        ||  busybox_bind("/sbin/init", vsf_linux_init_main) < 0) {
+    if (    mkdir(VSF_LINUX_CFG_BIN_PATH, 0)
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/init", vsf_linux_init_main) < 0) {
         return -1;
     }
 
 #if VSF_LINUX_USE_BUSYBOX == ENABLED
-    if (    busybox_bind("/sbin/ls", ls_main) < 0
-        ||  busybox_bind("/sbin/cd", cd_main) < 0
-        ||  busybox_bind("/sbin/pwd", pwd_main) < 0
-        ||  busybox_bind("/sbin/cat", cat_main) < 0
-        ||  busybox_bind("/sbin/echo", echo_main) < 0
-        ||  busybox_bind("/sbin/mkdir", mkdir_main) < 0
-        ||  busybox_bind("/sbin/clear", clear_main) < 0) {
+    if (    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/ls", ls_main) < 0
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/cd", cd_main) < 0
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/pwd", pwd_main) < 0
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/cat", cat_main) < 0
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/echo", echo_main) < 0
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/mkdir", mkdir_main) < 0
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/clear", clear_main) < 0) {
         return -1;
     }
 #endif

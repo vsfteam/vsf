@@ -114,7 +114,7 @@ int btstack_scan_main(int argc, char *argv[])
 
 void btstack_install(void)
 {
-    busybox_bind("/sbin/bt_scan", btstack_scan_main);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/bt_scan", btstack_scan_main);
 }
 #endif
 

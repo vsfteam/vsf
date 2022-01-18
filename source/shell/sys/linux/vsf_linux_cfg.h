@@ -43,6 +43,10 @@
 #   define VSF_LINUX_CFG_SHM_NUM                32
 #endif
 
+#ifndef VSF_LINUX_CFG_BIN_PATH
+#   define VSF_LINUX_CFG_BIN_PATH               "/bin"
+#endif
+
 // to use simple libc
 //  1. enable VSF_LINUX_USE_SIMPLE_LIBC
 //  2. add "shell/sys/linux/include/simple_libc to include path
