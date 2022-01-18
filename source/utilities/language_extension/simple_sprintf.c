@@ -74,6 +74,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 char *format_tmp;
                 int radix;
                 int width;
+                int precision = 0;
                 int actual_width;
 
                 flags.all = 0;
@@ -90,11 +91,28 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     format++;
                     goto next_char;
                 }
-                width = strtoull(format, &format_tmp, 0);
-                if (format == format_tmp) {
-                    width = -1;
+
+                if ('*' == *format) {
+                    width = va_arg(ap, int);
+                    format++;
+                } else {
+                    width = strtoull(format, &format_tmp, 0);
+                    format = format_tmp;
                 }
-                format = format_tmp;
+                if (width < 0) {
+                    width = -width;
+                    flags.align_left = 1;
+                }
+                if ('.' == *format) {
+                    format++;
+                    if ('*' == *format) {
+                        precision = va_arg(ap, int);
+                        format++;
+                    } else {
+                        precision = strtoull(format, &format_tmp, 0);
+                        format = format_tmp;
+                    }
+                }
 
             next:
                 ch = *format++;
@@ -136,9 +154,6 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     flags.is_signed = 0;
                     radix = 16;
                     goto print_integer;
-                case '*':
-                    width = va_arg(ap, int);
-                    goto next;
 
                 // TODO: support %llx etc
                 print_integer:
@@ -236,8 +251,11 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     }
 
                     actual_width = strlen(arg.str);
-                    if (width < 0) {
+                    if (width < actual_width) {
                         width = actual_width;
+                    }
+                    if ((precision != 0) && (width > precision)) {
+                        width = precision;
                     }
                     if (!flags.align_left) {
                         while (actual_width < width) {
