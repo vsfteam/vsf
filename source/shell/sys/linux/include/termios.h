@@ -91,6 +91,36 @@ typedef unsigned int speed_t;
 #define VLNEXT      15
 #define VEOL2       16
 
+// baudrate
+#define CBAUD       0x100F
+#define B0          0
+#define B50         1
+#define B75         2
+#define B110        3
+#define B134        4
+#define B150        5
+#define B200        6
+#define B300        7
+#define B600        8
+#define B1200       9
+#define B1800       10
+#define B2400       11
+#define B4800       12
+#define B9600       13
+#define B19200      14
+#define B38400      15
+
+#define CSIZE       0x0030
+#define CS5         0x0000
+#define CS6         0x0010
+#define CS7         0x0020
+#define CS8         0x0030
+
+#define CSTOPB      0x0040
+#define CREAD       0x0080
+#define PARENB      0x0100
+#define PARODD      0x0200
+
 struct termios {
     tcflag_t c_iflag;
     tcflag_t c_oflag;
@@ -103,6 +133,16 @@ struct termios {
 
 int tcgetattr(int fd, struct termios *termios);
 int tcsetattr(int fd, int optional_actions, const struct termios *termios);
+int tcsendbreak(int fd, int duration);
+int tcdrain(int fd);
+int tcflush(int fd, int queue_selector);
+int tcflow(int fd, int action);
+void cfmakeraw(struct termios *termios_p);
+speed_t cfgetispeed(const struct termios *termios_p);
+speed_t cfgetospeed(const struct termios *termios_p);
+int cfsetispeed(struct termios *termios_p, speed_t speed);
+int cfsetospeed(struct termios *termios_p, speed_t speed);
+int cfsetspeed(struct termios *termios_p, speed_t speed);
 
 #ifdef __cplusplus
 }

@@ -891,30 +891,6 @@ int vsf_linux_fd_bind_executable(int fd, vsf_linux_main_entry_t entry)
     return err;
 }
 
-int tcgetattr(int fd, struct termios *termios)
-{
-    if ((fd >= 3) || (NULL == termios)) {
-        return -1;
-    }
-
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    *termios = process->term[fd];
-    return 0;
-}
-
-int tcsetattr(int fd, int optional_actions, const struct termios *termios)
-{
-    if ((fd >= 3) || (NULL == termios)) {
-        return -1;
-    }
-
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    process->term[fd] = *termios;
-    return 0;
-}
-
 char * getpass(const char *prompt)
 {
     fprintf(stdout, "%s", prompt);
@@ -1390,6 +1366,80 @@ int posix_spawn_file_actions_addfchdir_np(posix_spawn_file_actions_t *actions, i
 
     action->tag = spawn_do_fchdir;
     action->action.fchdir_action.fd = fd;
+    return 0;
+}
+
+// termios.h
+int tcgetattr(int fd, struct termios *termios)
+{
+    if ((fd >= 3) || (NULL == termios)) {
+        return -1;
+    }
+
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    *termios = process->term[fd];
+    return 0;
+}
+
+int tcsetattr(int fd, int optional_actions, const struct termios *termios)
+{
+    if ((fd >= 3) || (NULL == termios)) {
+        return -1;
+    }
+
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    process->term[fd] = *termios;
+    return 0;
+}
+
+int tcsendbreak(int fd, int duration)
+{
+    return 0;
+}
+
+int tcdrain(int fd)
+{
+    return 0;
+}
+
+int tcflush(int fd, int queue_selector)
+{
+    return 0;
+}
+
+int tcflow(int fd, int action)
+{
+    return 0;
+}
+
+void cfmakeraw(struct termios *termios_p)
+{
+}
+
+speed_t cfgetispeed(const struct termios *termios_p)
+{
+    return 0;
+}
+
+speed_t cfgetospeed(const struct termios *termios_p)
+{
+    return 0;
+}
+
+int cfsetispeed(struct termios *termios_p, speed_t speed)
+{
+    return 0;
+}
+
+int cfsetospeed(struct termios *termios_p, speed_t speed)
+{
+    return 0;
+}
+
+int cfsetspeed(struct termios *termios_p, speed_t speed)
+{
     return 0;
 }
 
