@@ -23,7 +23,7 @@
 
 #define __VSF_NETDRV_CLASS_INHERIT_NETLINK__
 #define __VSF_NETDRV_WPCAP_CLASS_IMPLEMENT
-#include "../../vsf_netdrv.h"
+#include "component/tcpip/vsf_tcpip.h"
 
 #include "pcap.h"
 
@@ -201,6 +201,9 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_init(vk_netdrv_t *netdrv)
         int status = pcap_oid_get_request((pcap_t *)wpcap_netdrv->fp, OID_802_3_CURRENT_ADDRESS, &netdrv->macaddr.addr_buf, &netdrv->macaddr.size);
         VSF_TCPIP_ASSERT(!status && (6 == netdrv->macaddr.size));
 #endif
+        netdrv->mac_header_size = TCPIP_ETH_HEADSIZE;
+        netdrv->hwtype = TCPIP_ETH_HWTYPE;
+        netdrv->mtu = 1500 + TCPIP_ETH_HEADSIZE;
 
         __vsf_arch_irq_request_init(&wpcap_netdrv->irq_request);
         if (vk_netdrv_feature(netdrv) & VSF_NETDRV_FEATURE_THREAD) {
