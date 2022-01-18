@@ -199,9 +199,13 @@ static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
-vsf_linux_fd_t * vsf_linux_fd_get(int fd)
+vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd)
 {
-    vsf_dlist_t *fd_list = &vsf_linux_get_cur_process()->fd_list;
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+
+    vsf_dlist_t *fd_list = &process->fd_list;
     vsf_protect_t orig = vsf_protect_sched();
     __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, fd_list) {
         if (_->fd == fd) {
@@ -213,15 +217,25 @@ vsf_linux_fd_t * vsf_linux_fd_get(int fd)
     return NULL;
 }
 
-static vk_vfs_file_t * __vsf_linux_get_vfs(int fd)
+vsf_linux_fd_t * vsf_linux_fd_get(int fd)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    return __vsf_linux_fd_get_ex(NULL, fd);
+}
+
+vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd)
+{
+    vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
     if ((NULL == sfd) || (sfd->op != &__vsf_linux_fs_fdop)) {
         return NULL;
     }
 
-    vk_file_t *file = ((vsf_linux_fs_priv_t *)sfd->priv)->file;
-    if ((file->fsop != &vk_vfs_op) || (file->attr & VSF_FILE_ATTR_DIRECTORY)) {
+    return ((vsf_linux_fs_priv_t *)sfd->priv)->file;
+}
+
+vk_vfs_file_t * __vsf_linux_get_vfs(int fd)
+{
+    vk_file_t *file = __vsf_linux_get_fs_ex(NULL, fd);
+    if (file->fsop != &vk_vfs_op) {
         return NULL;
     }
     return (vk_vfs_file_t *)file;
@@ -268,9 +282,11 @@ int vsf_linux_fd_set_size(int fd, uint64_t size)
     return -1;
 }
 
-int vsf_linux_fd_add(vsf_linux_fd_t *sfd, int fd_desired)
+static int __vsf_linux_fd_add(vsf_linux_process_t *process, vsf_linux_fd_t *sfd, int fd_desired)
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
 
     sfd->rxpend = sfd->txpend = NULL;
 
@@ -302,7 +318,8 @@ int vsf_linux_fd_add(vsf_linux_fd_t *sfd, int fd_desired)
     return sfd->fd;
 }
 
-int vsf_linux_fd_create_ex(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op, int fd_desired)
+int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
+        const vsf_linux_fd_op_t *op, int fd_desired, bool allocate_priv)
 {
     int priv_size = (op != NULL) ? op->priv_size : sizeof(vsf_linux_fd_priv_t);
     int ret;
@@ -314,18 +331,20 @@ int vsf_linux_fd_create_ex(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op, in
         return -1;
     }
     new_sfd->op = op;
-    new_sfd->priv = calloc(1, priv_size);
-    if (!new_sfd->priv) {
-        ret = -1;
-        goto free_sfd_and_exit;
+    if (allocate_priv) {
+        new_sfd->priv = calloc(1, priv_size);
+        if (!new_sfd->priv) {
+            ret = -1;
+            goto free_sfd_and_exit;
+        }
+        ((vsf_linux_fd_priv_t *)new_sfd->priv)->ref = 1;
     }
-    ((vsf_linux_fd_priv_t *)new_sfd->priv)->ref = 1;
 
     if (sfd != NULL) {
         *sfd = new_sfd;
     }
 
-    ret = vsf_linux_fd_add(new_sfd, fd_desired);
+    ret = __vsf_linux_fd_add(process, new_sfd, fd_desired);
     if (ret < 0) {
 free_sfd_and_exit:
         free(new_sfd);
@@ -335,13 +354,15 @@ free_sfd_and_exit:
 
 int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
 {
-    return vsf_linux_fd_create_ex(sfd, op, -1);
+    return __vsf_linux_fd_create_ex(NULL, sfd, op, -1, true);
 }
 
-void vsf_linux_fd_delete(int fd)
+void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
 
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_remove(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
@@ -351,6 +372,11 @@ void vsf_linux_fd_delete(int fd)
     vsf_unprotect_sched(orig);
 
     free(sfd);
+}
+
+void vsf_linux_fd_delete(int fd)
+{
+    return __vsf_linux_fd_delete_ex(NULL, fd);
 }
 
 bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
@@ -856,11 +882,10 @@ int fcntl(int fd, int cmd, ...)
     switch (cmd) {
     case F_DUPFD: {
             vsf_linux_fd_t *sfd_new;
-            int ret = vsf_linux_fd_create_ex(&sfd_new, sfd->op, arg);
+            int ret = __vsf_linux_fd_create_ex(NULL, &sfd_new, sfd->op, arg, false);
             if (ret < 0) {
                 return ret;
             }
-            free(sfd_new->priv);
 
             vsf_linux_fd_priv_t *priv = sfd->priv;
             vsf_protect_t orig = vsf_protect_sched();

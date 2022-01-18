@@ -40,6 +40,7 @@
 #   include "./include/termios.h"
 #   include "./include/pwd.h"
 #   include "./include/sys/utsname.h"
+#   include "./include/spawn.h"
 #else
 #   include <unistd.h>
 #   include <sched.h>
@@ -53,6 +54,7 @@
 #   include <termios.h>
 #   include <pwd.h>
 #   include <sys/utsname.h>
+#   include <spawn.h>
 #endif
 #include <stdarg.h>
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
@@ -1082,6 +1084,296 @@ int gethostname(char *name, size_t len)
 int sethostname(const char *name, size_t len)
 {
     return -1;
+}
+
+// spawn.h
+int posix_spawnp(pid_t *pid, const char *file,
+                const posix_spawn_file_actions_t *actions,
+                const posix_spawnattr_t *attr,
+                char * const argv[], char * const env[])
+{
+    extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
+                const vsf_linux_fd_op_t *op, int fd_desired, bool allocate_priv);
+    extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
+    extern void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd);
+    extern vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd);
+
+    // fd will be closed after entry return
+    vsf_linux_main_entry_t entry;
+    int fd = vsf_linux_fs_get_executable(file, &entry);
+    if (fd < 0) {
+        return -1;
+    }
+    VSF_LINUX_ASSERT(entry != NULL);
+
+    vsf_linux_process_t *process = vsf_linux_create_process(0);
+    if (NULL == process) { return -ENOMEM; }
+    vsf_linux_process_ctx_t *ctx = &process->ctx;
+    process->shell_process = process;
+    ctx->entry = entry;
+    while ((*argv != NULL) && (ctx->arg.argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
+        ctx->arg.argv[ctx->arg.argc++] = *argv++;
+    }
+
+    // dup fds
+    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    vsf_linux_fd_t *sfd, *sfd_new;
+    vsf_protect_t orig;
+    __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
+        if (!(_->flags & FD_CLOEXEC)) {
+            if (__vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, false) == _->fd) {
+                sfd->priv = _->priv;
+
+                orig = vsf_protect_sched();
+                    ((vsf_linux_fd_priv_t *)_->priv)->ref++;
+                vsf_unprotect_sched(orig);
+            }
+        }
+    }
+
+    // apply actions
+    if (actions != NULL) {
+        char fullpath[MAX_PATH];
+        struct spawn_action *a = actions->actions;
+        for (int i = 0; i < actions->used; i++, a++) {
+            switch (a->tag) {
+            case spawn_do_close:
+                sfd = __vsf_linux_fd_get_ex(process, a->action.close_action.fd);
+                if (sfd != NULL) {
+                    orig = vsf_protect_sched();
+                        ((vsf_linux_fd_priv_t *)sfd->priv)->ref--;
+                    vsf_unprotect_sched(orig);
+                    __vsf_linux_fd_delete_ex(process, sfd->fd);
+                }
+                break;
+            case spawn_do_dup2:
+                sfd = __vsf_linux_fd_get_ex(process, a->action.dup2_action.fd);
+                if (sfd != NULL) {
+                    int ret = __vsf_linux_fd_create_ex(process, &sfd_new, sfd->op, a->action.dup2_action.newfd, false);
+                    if (!ret) {
+                        vsf_linux_fd_priv_t *priv = sfd->priv;
+                        orig = vsf_protect_sched();
+                            priv->ref++;
+                        vsf_unprotect_sched(orig);
+                        sfd_new->priv = priv;
+                    }
+                }
+                break;
+            case spawn_do_open:
+                VSF_LINUX_ASSERT(false);
+                break;
+            case spawn_do_fchdir: {
+                    vk_file_t *file = __vsf_linux_get_fs_ex(process, a->action.fchdir_action.fd);
+                    if (NULL == file) {
+                        continue;
+                    }
+
+                    char *ptr = &fullpath[sizeof(fullpath) - 1];
+                    size_t namelen;
+                    *ptr-- = '\0';
+                    while (file != NULL) {
+                        namelen = strlen(file->name);
+                        ptr -= strlen(file->name);
+                        if (ptr < fullpath) {
+                            ptr = NULL;
+                            break;
+                        }
+                        memcpy(ptr, file->name, namelen);
+                        file = file->parent;
+                    }
+
+                    if (NULL == ptr) {
+                        continue;
+                    }
+                    a->action.chdir_action.path = ptr;
+                }
+                // fall through
+            case spawn_do_chdir:
+                vsf_linux_chdir(process, a->action.chdir_action.path);
+                break;
+            }
+        }
+    }
+
+    vsf_linux_start_process(process);
+    return process->id.pid;
+}
+
+int posix_spawn(pid_t *pid, const char *path,
+                const posix_spawn_file_actions_t *actions,
+                const posix_spawnattr_t *attr,
+                char * const argv[], char * const env[])
+{
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)path)) {
+        return -1;
+    }
+    return posix_spawnp(pid, fullpath, actions, attr, argv, env);
+}
+
+int posix_spawnattr_init(posix_spawnattr_t *attr)
+{
+    memset(attr, 0, sizeof(*attr));
+    return 0;
+}
+
+int posix_spawnattr_destroy(posix_spawnattr_t *attr)
+{
+    return 0;
+}
+
+int posix_spawnattr_getsigdefault(const posix_spawnattr_t *attr, sigset_t *sigdefault)
+{
+    return 0;
+}
+
+int posix_spawnattr_setsigdefault(posix_spawnattr_t *attr, const sigset_t *sigdefault)
+{
+    return 0;
+}
+
+int posix_spawnattr_getsigmask(const posix_spawnattr_t *attr, sigset_t *sigmask)
+{
+    return 0;
+}
+
+int posix_spawnattr_setsigmask(posix_spawnattr_t *attr, const sigset_t *sigmask)
+{
+    return 0;
+}
+
+int posix_spawnattr_getflags(const posix_spawnattr_t *attr, short int *flags)
+{
+    return 0;
+}
+
+int posix_spawnattr_setflags(posix_spawnattr_t *attr, short int flags)
+{
+    return 0;
+}
+
+int posix_spawnattr_getpgroup(const posix_spawnattr_t *attr, pid_t *pgroup)
+{
+    return 0;
+}
+
+int posix_spawnattr_setpgroup(posix_spawnattr_t *attr, pid_t pgroup)
+{
+    return 0;
+}
+
+int posix_spawnattr_getschedpolicy(const posix_spawnattr_t *attr, int *schedpolicy)
+{
+    return 0;
+}
+
+int posix_spawnattr_setschedpolicy(posix_spawnattr_t *attr, int schedpolicy)
+{
+    return 0;
+}
+
+int posix_spawnattr_getschedparam(const posix_spawnattr_t *attr, struct sched_param *schedparam)
+{
+    return 0;
+}
+
+int posix_spawnattr_setschedparam(posix_spawnattr_t *attr, const struct sched_param *schedparam)
+{
+    return 0;
+}
+
+static struct spawn_action * __posix_spawn_file_actions_add(posix_spawn_file_actions_t *actions)
+{
+    if (actions->used == actions->allocated) {
+        actions->allocated += 8;
+        actions->actions = realloc(actions->actions, actions->allocated * sizeof(struct spawn_action));
+    }
+    if (NULL == actions->actions) {
+        return NULL;
+    }
+
+    return &actions->actions[actions->used++];
+}
+
+int posix_spawn_file_actions_init(posix_spawn_file_actions_t *actions)
+{
+    memset(actions, 0, sizeof(*actions));
+    return 0;
+}
+
+int posix_spawn_file_actions_destroy(posix_spawn_file_actions_t *actions)
+{
+    if (actions->actions != NULL) {
+        free(actions->actions);
+    }
+    return 0;
+}
+
+int posix_spawn_file_actions_addopen(
+                posix_spawn_file_actions_t *actions,
+                int fd, const char *path,
+                int oflag, mode_t mode)
+{
+    struct spawn_action * action = __posix_spawn_file_actions_add(actions);
+    if (NULL == action) {
+        return -1;
+    }
+
+    action->tag = spawn_do_open;
+    action->action.open_action.fd = fd;
+    action->action.open_action.path = (char *)path;
+    action->action.open_action.oflag = oflag;
+    action->action.open_action.mode = mode;
+    return 0;
+}
+
+int posix_spawn_file_actions_addclose(posix_spawn_file_actions_t *actions, int fd)
+{
+    struct spawn_action * action = __posix_spawn_file_actions_add(actions);
+    if (NULL == action) {
+        return -1;
+    }
+
+    action->tag = spawn_do_close;
+    action->action.close_action.fd = fd;
+    return 0;
+}
+
+int posix_spawn_file_actions_adddup2(posix_spawn_file_actions_t *actions, int fd, int newfd)
+{
+    struct spawn_action * action = __posix_spawn_file_actions_add(actions);
+    if (NULL == action) {
+        return -1;
+    }
+
+    action->tag = spawn_do_dup2;
+    action->action.dup2_action.fd = fd;
+    action->action.dup2_action.newfd = newfd;
+    return 0;
+}
+
+int posix_spawn_file_actions_addchdir_np(posix_spawn_file_actions_t *actions, const char *path)
+{
+    struct spawn_action * action = __posix_spawn_file_actions_add(actions);
+    if (NULL == action) {
+        return -1;
+    }
+
+    action->tag = spawn_do_chdir;
+    action->action.chdir_action.path = (char *)path;
+    return 0;
+}
+
+int posix_spawn_file_actions_addfchdir_np(posix_spawn_file_actions_t *actions, int fd)
+{
+    struct spawn_action * action = __posix_spawn_file_actions_add(actions);
+    if (NULL == action) {
+        return -1;
+    }
+
+    action->tag = spawn_do_fchdir;
+    action->action.fchdir_action.fd = fd;
+    return 0;
 }
 
 #if __IS_COMPILER_GCC__
