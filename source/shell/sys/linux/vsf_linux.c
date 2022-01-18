@@ -152,6 +152,8 @@ extern void vsf_linux_glibc_init(void);
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb);
 static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
         vsf_linux_main_entry_t entry, vsf_prio_t prio);
+extern int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd,
+        vsf_linux_main_entry_t *entry);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -220,7 +222,7 @@ static int __vsf_linux_init_thread(int argc, char *argv[])
 {
     int err = vsf_linux_create_fhs();
     if (err) { return err; }
-    return execl("/sbin/init", "init", NULL);
+    return execlp("/sbin/init", "init", NULL);
 }
 
 static int __vsf_linux_kernel_thread(int argc, char *argv[])
@@ -641,9 +643,11 @@ exec_ret_t execvp(const char *pathname, char const* const* argv)
 exec_ret_t execv(const char *pathname, char const* const* argv)
 {
     char fullpath[MAX_PATH];
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), pathname, NULL);
+    if (fd < 0) {
         return -1;
     }
+    close(fd);
 
     return execvp(fullpath, argv);
 }
@@ -691,9 +695,11 @@ exec_ret_t execlp(const char *pathname, const char *arg, ...)
 exec_ret_t execl(const char *pathname, const char *arg, ...)
 {
     char fullpath[MAX_PATH];
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), pathname, NULL);
+    if (fd < 0) {
         return -1;
     }
+    close(fd);
 
     exec_ret_t ret;
 
@@ -1102,6 +1108,9 @@ int posix_spawnp(pid_t *pid, const char *file,
     vsf_linux_main_entry_t entry;
     int fd = vsf_linux_fs_get_executable(file, &entry);
     if (fd < 0) {
+        if (pid != NULL) {
+            *pid = -1;
+        }
         return -1;
     }
     VSF_LINUX_ASSERT(entry != NULL);
@@ -1195,8 +1204,10 @@ int posix_spawnp(pid_t *pid, const char *file,
         }
     }
 
-    vsf_linux_start_process(process);
-    return process->id.pid;
+    if (pid != NULL) {
+        *pid = process->id.pid;
+    }
+    return vsf_linux_start_process(process);
 }
 
 int posix_spawn(pid_t *pid, const char *path,
@@ -1205,9 +1216,15 @@ int posix_spawn(pid_t *pid, const char *path,
                 char * const argv[], char * const env[])
 {
     char fullpath[MAX_PATH];
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)path)) {
+    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), path, NULL);
+    if (fd < 0) {
+        if (pid != NULL) {
+            *pid = -1;
+        }
         return -1;
     }
+    close(fd);
+
     return posix_spawnp(pid, fullpath, actions, attr, argv, env);
 }
 

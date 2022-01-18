@@ -162,11 +162,32 @@ void vsh_set_path(char **path)
     __vsh_path = path;
 }
 
+int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd, vsf_linux_main_entry_t *entry)
+{
+    char pathname_local[PATH_MAX], **path = __vsh_path;
+    int exefd = 1;
+
+    if (NULL == pathname) {
+        pathname = pathname_local;
+        path_out_lenlen = sizeof(pathname_local);
+    }
+
+    while (*path != NULL) {
+        if (!vsf_linux_generate_path(pathname, path_out_lenlen, *path, cmd)) {
+            exefd = vsf_linux_fs_get_executable(pathname, entry);
+            if (exefd >= 0) {
+                break;
+            }
+        }
+        path++;
+    }
+    return exefd;
+}
+
 int __vsh_run_cmd(char *cmd)
 {
-    char pathname[PATH_MAX], *cur;
+    char *cur;
     int exefd = -1, err;
-    char **path = __vsh_path;
     vsf_linux_main_entry_t entry;
 
     while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
@@ -183,15 +204,7 @@ int __vsh_run_cmd(char *cmd)
 
     // search in path first if not absolute path
     if (cmd[0] != '/') {
-        while (*path != NULL) {
-            if (!vsf_linux_generate_path(pathname, sizeof(pathname), *path, cmd)) {
-                exefd = vsf_linux_fs_get_executable(pathname, &entry);
-                if (exefd >= 0) {
-                    break;
-                }
-            }
-            path++;
-        }
+        exefd = __vsh_get_exe(NULL, 0, cmd, &entry);
     }
 
     if (exefd < 0) {
