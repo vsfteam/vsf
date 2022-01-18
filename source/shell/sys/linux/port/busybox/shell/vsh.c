@@ -79,7 +79,9 @@ typedef enum vsh_shell_state_t {
     SHELL_STATE_RIS,
 } vsh_shell_state_t;
 
-static char **__vsh_path;
+#if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
+static char *__vsh_path;
+#endif
 
 #if VSH_HISTORY_NUM > 0
 static void __vsh_history_apply(vsh_cmd_ctx_t *ctx, uint8_t history_entry)
@@ -157,29 +159,51 @@ static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx, vsh_shell_stat
 #   pragma diag_warning=pe111
 #endif
 
-void vsh_set_path(char **path)
+void vsh_set_path(char *path)
 {
+#if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
     __vsh_path = path;
+#else
+    setenv("PATH", path, true);
+#endif
 }
 
 int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd, vsf_linux_main_entry_t *entry)
 {
-    char pathname_local[PATH_MAX], **path = __vsh_path;
-    int exefd = 1;
+    char pathname_local[PATH_MAX], pathname_dir[PATH_MAX], *path, *path_end;
+    int exefd = 1, pathlen;
+
+#if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
+    path = __vsh_path;
+#else
+    path = getenv("PATH");
+#endif
+    VSF_LINUX_ASSERT(path != NULL);
 
     if (NULL == pathname) {
         pathname = pathname_local;
         path_out_lenlen = sizeof(pathname_local);
     }
 
-    while (*path != NULL) {
-        if (!vsf_linux_generate_path(pathname, path_out_lenlen, *path, cmd)) {
+    while (*path != '\0') {
+        path_end = strchr(path, ':');
+        if (path_end != NULL) {
+            pathlen = path_end - path;
+            memcpy(pathname_dir, path, pathlen);
+            pathname_dir[pathlen] = '\0';
+            pathlen++;
+        } else {
+            pathlen = strlen(path);
+            strcpy(pathname_dir, path);
+        }
+        path += pathlen;
+
+        if (!vsf_linux_generate_path(pathname, path_out_lenlen, pathname_dir, cmd)) {
             exefd = vsf_linux_fs_get_executable(pathname, entry);
             if (exefd >= 0) {
                 break;
             }
         }
-        path++;
     }
     return exefd;
 }
@@ -262,7 +286,13 @@ int vsh_main(int argc, char *argv[])
 #if VSH_HAS_COLOR
     printf(VSH_COLOR_NORMAL);
 #endif
-    printf("path: %s" VSH_LINEEND, *__vsh_path);
+    printf("path: %s" VSH_LINEEND,
+#if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
+        __vsh_path
+#else
+        getenv("PATH")
+#endif
+    );
 
     if ((argc > 2) && !strcmp(argv[1], "-c")) {
         if (strlen(argv[2]) >= VSH_CMD_SIZE) {
