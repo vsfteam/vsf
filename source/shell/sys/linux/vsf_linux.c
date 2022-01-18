@@ -643,7 +643,7 @@ exec_ret_t execvp(const char *pathname, char const* const* argv)
 exec_ret_t execv(const char *pathname, char const* const* argv)
 {
     char fullpath[MAX_PATH];
-    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), pathname, NULL);
+    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), (char *)pathname, NULL);
     if (fd < 0) {
         return -1;
     }
@@ -695,7 +695,7 @@ exec_ret_t execlp(const char *pathname, const char *arg, ...)
 exec_ret_t execl(const char *pathname, const char *arg, ...)
 {
     char fullpath[MAX_PATH];
-    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), pathname, NULL);
+    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), (char *)pathname, NULL);
     if (fd < 0) {
         return -1;
     }
@@ -1216,7 +1216,7 @@ int posix_spawn(pid_t *pid, const char *path,
                 char * const argv[], char * const env[])
 {
     char fullpath[MAX_PATH];
-    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), path, NULL);
+    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), (char *)path, NULL);
     if (fd < 0) {
         if (pid != NULL) {
             *pid = -1;
