@@ -731,14 +731,11 @@ static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
 
 int mkdir(const char *pathname, mode_t mode)
 {
-    char fullpath[MAX_PATH];
-    int fd;
-
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+    if ((NULL == pathname) || ('\0' == *pathname)) {
         return -1;
     }
 
-    fd = __vsf_linux_fs_create(fullpath, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+    int fd = __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
     if (fd >= 0) {
         close(fd);
         fd = 0;
@@ -746,8 +743,40 @@ int mkdir(const char *pathname, mode_t mode)
     return fd;
 }
 
+int mkdirs(const char *pathname, mode_t mode)
+{
+    char *path_in_ram;
+    if ((NULL == pathname) || ('\0' == *pathname)) {
+        return -1;
+    }
+    path_in_ram = strdup(pathname);
+    if (NULL == path_in_ram) {
+        return -1;
+    }
+
+    int ret = -1;
+    struct stat statbuf;
+    for (   char *tmp = path_in_ram + (*pathname == '/' ? 1 : 0), *end;
+            (end = strchr(tmp, '/')) != NULL;
+            tmp = end + 1) {
+        *end = '\0';
+        if (    (stat(path_in_ram, &statbuf) < 0)
+            &&  (mkdir(path_in_ram, mode) < 0)) {
+            goto _exit_failure;
+        }
+        *end = '/';
+    }
+    ret = mkdir(path_in_ram, mode);
+_exit_failure:
+    free(path_in_ram);
+    return ret;
+}
+
 int rmdir(const char *pathname)
 {
+    if ((NULL == pathname) || ('\0' == *pathname)) {
+        return -1;
+    }
     return __vsf_linux_fs_remove(pathname, VSF_FILE_ATTR_DIRECTORY);
 }
 
@@ -799,12 +828,18 @@ int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
 
 int chdir(const char *pathname)
 {
+    if ((NULL == pathname) || ('\0' == *pathname)) {
+        return -1;
+    }
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     return vsf_linux_chdir(process, (char *)pathname);
 }
 
 int creat(const char *pathname, mode_t mode)
 {
+    if ((NULL == pathname) || ('\0' == *pathname)) {
+        return -1;
+    }
     return __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
 
@@ -815,6 +850,9 @@ int open(const char *pathname, int flags, ...)
     char fullpath[MAX_PATH];
     int fd;
 
+    if ((NULL == pathname) || ('\0' == *pathname)) {
+        return -1;
+    }
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
     }
@@ -995,6 +1033,10 @@ int fstat(int fd, struct stat *buf)
 
 int stat(const char *pathname, struct stat *buf)
 {
+    if ((NULL == pathname) || ('\0' == *pathname)) {
+        return -1;
+    }
+
     int fd = open(pathname, 0);
     if (fd < 0) { return -1; }
 

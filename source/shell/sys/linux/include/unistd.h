@@ -129,6 +129,7 @@ int unlink(const char *pathname);
 int link(const char *oldpath, const char *newpath);
 int remove(const char *pathname);
 int mkdir(const char *pathname, mode_t mode);
+int mkdirs(const char *pathname, mode_t mode);
 int rmdir(const char *pathname);
 int dup(int oldfd);
 int dup2(int oldfd, int newfd);

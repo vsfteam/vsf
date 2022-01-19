@@ -39,13 +39,7 @@ int vsf_linux_vfs_init(void)
 {
     int err;
 
-    err = mkdir("/var", 0);
-    if (err != 0) {
-        fprintf(stderr, "fail to mkdir /var\r\n");
-        return err;
-    }
-
-    err = mkdir("/var/run", 0);
+    err = mkdirs("/var/run", 0);
     if (err != 0) {
         fprintf(stderr, "fail to mkdir /var/run\r\n");
         return err;
@@ -71,22 +65,15 @@ int vsf_linux_vfs_init(void)
 #endif
 
 #if VSF_LINUX_USE_TERMIOS == ENABLED
-    err = mkdir("/usr", 0);
+    err = mkdirs(VSF_LINUX_CFG_TERMINFO_PATH "/x", 0);
     if (err != 0) {
-        fprintf(stderr, "fail to mkdir /usr\r\n");
+        fprintf(stderr, "fail to mkdir %s\r\n", VSF_LINUX_CFG_TERMINFO_PATH "/x");
         return err;
     }
 
-    err = mkdir("/usr/share", 0);
-    if (err != 0) {
-        fprintf(stderr, "fail to mkdir /usr/share\r\n");
-        return err;
-    }
-#endif
-
-#if VSF_LINUX_USE_TERMIOS == ENABLED
+#   if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
     putenv("TERM=xtem");
-    // TODO: implement terminfo at /usr/share/terminfo
+#   endif
 #endif
 
     return 0;

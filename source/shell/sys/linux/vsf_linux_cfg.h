@@ -46,6 +46,9 @@
 #ifndef VSF_LINUX_CFG_BIN_PATH
 #   define VSF_LINUX_CFG_BIN_PATH               "/bin"
 #endif
+#ifndef VSF_LINUX_CFG_TERMINFO_PATH
+#   define VSF_LINUX_CFG_TERMINFO_PATH          "/usr/share/terminfo"
+#endif
 
 // to use simple libc
 //  1. enable VSF_LINUX_USE_SIMPLE_LIBC

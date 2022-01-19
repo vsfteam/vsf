@@ -66,7 +66,7 @@ int busybox_bind(char *path, vsf_linux_main_entry_t entry)
 
 int busybox_install(void)
 {
-    if (    mkdir(VSF_LINUX_CFG_BIN_PATH, 0)
+    if (    mkdirs(VSF_LINUX_CFG_BIN_PATH, 0)
         ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/init", vsf_linux_init_main) < 0) {
         return -1;
     }
