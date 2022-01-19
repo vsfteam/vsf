@@ -356,9 +356,34 @@ int vsh_main(int argc, char *argv[])
                         }
                         ctx.history.cur_disp_entry = ctx.history.cur_save_entry;
 #endif
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+                        char *cmd = NULL;
+                        if (strchr(ctx.cmd, '$') != NULL) {
+                            int cmdlen = vsf_linux_expandenv(ctx.cmd, NULL, 0);
+                            if (cmdlen < 0) {
+                                printf("fail to parse command %s" VSH_LINEEND, ctx.cmd);
+                                goto input_cmd;
+                            }
+                            cmd = malloc(cmdlen + 1);
+                            if (NULL == cmd) {
+                                printf("fail to allocate buffer to parse command %s" VSH_LINEEND, ctx.cmd);
+                                goto input_cmd;
+                            }
+                            vsf_linux_expandenv(ctx.cmd, cmd, cmdlen + 1);
+                        } else {
+                            cmd = ctx.cmd;
+                        }
+                        if (__vsh_run_cmd(cmd) < 0) {
+                            printf("fail to execute %s" VSH_LINEEND, ctx.cmd);
+                        }
+                        if (cmd != ctx.cmd) {
+                            free(cmd);
+                        }
+#else
                         if (__vsh_run_cmd(ctx.cmd) < 0) {
                             printf("fail to execute %s" VSH_LINEEND, ctx.cmd);
                         }
+#endif
                     }
                     goto input_cmd;
 #if     VSH_ENTER_CHAR == '\r'
@@ -566,7 +591,7 @@ int export_main(int argc, char *argv[])
 
     // env_str not belong to us after putenv
     int ret = putenv(env_str);
-    if (ret < 0) {
+    if (ret) {
         free(env_str);
     }
     return ret;

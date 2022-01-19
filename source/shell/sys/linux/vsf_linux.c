@@ -1448,6 +1448,80 @@ int cfsetspeed(struct termios *termios_p, speed_t speed)
 }
 #endif      // VSF_LINUX_USE_TERMIOS
 
+int vsf_linux_expandenv(const char *str, char *output, size_t bufflen)
+{
+    size_t envlen = 0, copylen, tmplen, namelen;
+    char ch, *env_start, *env_end, *name_start, *name_end, *env_value;
+
+#define __copy2output(__str_from, __copylen)                                    \
+        do {                                                                    \
+            if (output != NULL) {                                               \
+                tmplen = min(bufflen, __copylen);                               \
+                if (tmplen > 0) {                                               \
+                    memcpy(output, __str_from, tmplen);                         \
+                    output += tmplen;                                           \
+                }                                                               \
+            }                                                                   \
+            envlen += __copylen;                                                \
+        } while (false)
+
+    bufflen--;      // reserve one byte for '\0'
+    while (true) {
+        env_start = strchr(str, '$');
+        if (NULL == env_start) {
+            copylen = strlen(str);
+            __copy2output(str, copylen);
+            if (output != NULL) {
+                *output = '\0';
+            }
+            return envlen;
+        }
+        copylen = env_start - str;
+        __copy2output(str, copylen);
+
+        if ('{' == env_start[1]) {
+            name_start = env_end = env_start + 2;
+        } else {
+            name_start = env_end = env_start + 1;
+        }
+        while (true) {
+            ch = *env_end;
+            if (!(  (ch == '_')
+                ||  ((ch >= '0') && (ch <= '9'))
+                ||  ((ch >= 'a') && (ch <= 'z'))
+                ||  ((ch >= 'A') && (ch <= 'Z')))) {
+                break;
+            }
+            env_end++;
+        }
+        if ('{' == env_start[1]) {
+            if ('}' != *env_end) {
+                return -1;
+            }
+            name_end = env_end++ - 1;
+        } else {
+            name_end = env_end - 1;
+        }
+        if (name_end <= name_start) {
+            return -1;
+        }
+
+        namelen = name_end - name_start + 1;
+        char env_name[namelen + 1];
+        memcpy(env_name, name_start, namelen);
+        env_name[namelen] = '\0';
+        env_value = getenv(env_name);
+        if (env_value != NULL) {
+            copylen = strlen(env_value);
+            __copy2output(env_value, copylen);
+        }
+
+        str = env_end;
+    }
+
+    return envlen;
+}
+
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
 #endif

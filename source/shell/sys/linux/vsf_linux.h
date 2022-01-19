@@ -205,6 +205,8 @@ extern int vsf_linux_chdir(vsf_linux_process_t *process, char *working_dir);
 
 extern int vsf_linux_fd_bind_executable(int fd, vsf_linux_main_entry_t entry);
 
+extern int vsf_linux_expandenv(const char *str, char *output, size_t bufflen);
+
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
 extern void vsf_linux_set_dominant_process(void);
 
