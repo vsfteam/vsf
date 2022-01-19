@@ -189,10 +189,13 @@ int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char
         }
         strcpy(path_out, path_in);
     } else {
-        if (strlen(dir) + strlen(path_in) >= path_out_lenlen) {
+        if (strlen(dir) + strlen(path_in) + 1 >= path_out_lenlen) {
             return -ENOMEM;
         }
         strcpy(path_out, dir);
+        if (dir[strlen(dir) - 1] != '/') {
+            strcat(path_out, "/");
+        }
         strcat(path_out, path_in);
     }
 

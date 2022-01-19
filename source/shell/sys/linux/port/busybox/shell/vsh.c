@@ -428,7 +428,7 @@ int ls_main(int argc, char *argv[])
     char **dirnames;
 
     if (1 == argc) {
-        argv[0] = "";
+        argv[0] = ".";
         dirnum = 1;
         dirnames = &argv[0];
     } else {
@@ -532,5 +532,25 @@ int clear_main(int argc, char *argv[])
     printf("\033[2J\033[H");
     return 0;
 }
+
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+int export_main(int argc, char *argv[])
+{
+    if (1 == argc) {
+        extern char **environ;
+        char **env = environ;
+        if (NULL == env) {
+            return 0;
+        }
+
+        while (*env != NULL) {
+            printf("%s\n", *env);
+            env++;
+        }
+    }
+
+    return 0;
+}
+#endif
 
 #endif
