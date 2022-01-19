@@ -6,9 +6,11 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./sys/types.h"
 #   include "./signal.h"
+#   include "./sched.h"
 #else
 #   include <sys/types.h>
 #   include <signal.h>
+#   include <sched.h>
 #endif
 
 #ifdef __cplusplus
