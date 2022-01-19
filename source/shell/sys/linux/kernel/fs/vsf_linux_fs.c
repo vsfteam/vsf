@@ -949,6 +949,11 @@ int fcntl(int fd, int cmd, ...)
 
 ssize_t read(int fd, void *buf, size_t count)
 {
+    if (2 == fd) {
+        // read from fd2(stderr) is redirected to fd0(stdin)
+        fd = 0;
+    }
+
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if (!sfd || (sfd->flags & O_WRONLY)) { return -1; }
     return sfd->op->fn_read(sfd, buf, count);
