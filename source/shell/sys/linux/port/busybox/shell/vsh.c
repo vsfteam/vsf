@@ -544,12 +544,23 @@ int export_main(int argc, char *argv[])
         }
 
         while (*env != NULL) {
-            printf("%s\n", *env);
+            printf("%s" VSH_LINEEND, *env);
             env++;
         }
+        return 0;
     }
 
-    return 0;
+    if (strchr(argv[1], '=') == NULL) {
+        printf("format: %s ENV_NAME=<ENV_VALUE>" VSH_LINEEND, argv[0]);
+        return 0;
+    }
+    if (strchr(argv[1], '$') != NULL) {
+        printf("$ not supported" VSH_LINEEND);
+        return 0;
+    }
+
+    // env_in_ram not belong to us after putenv
+    return putenv(strdup(argv[1]));
 }
 #endif
 
