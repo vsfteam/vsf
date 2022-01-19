@@ -187,16 +187,14 @@ int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd, vsf_linux_main
 
     while (*path != '\0') {
         path_end = strchr(path, ':');
-        if (path_end != NULL) {
-            pathlen = path_end - path;
-            memcpy(pathname_dir, path, pathlen);
-            pathname_dir[pathlen] = '\0';
-            pathlen++;
-        } else {
-            pathlen = strlen(path);
-            strcpy(pathname_dir, path);
-        }
+        pathlen = (path_end != NULL) ?  path_end - path : strlen(path);
+        VSF_LINUX_ASSERT(pathlen < sizeof(pathname_dir) - 1);
+        memcpy(pathname_dir, path, pathlen);
+        pathname_dir[pathlen] = '\0';
         path += pathlen;
+        if (*path == ':') {
+            path++;
+        }
 
         if (!vsf_linux_generate_path(pathname, path_out_lenlen, pathname_dir, cmd)) {
             exefd = vsf_linux_fs_get_executable(pathname, entry);
