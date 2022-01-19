@@ -84,8 +84,10 @@ int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
 
 int getc(FILE *f)
 {
-    int ch = EOF;
-    fread(&ch, 1, 1, f);
+    int ch = 0;
+    if (1 != fread(&ch, 1, 1, f)) {
+        return EOF;
+    }
     return ch;
 }
 
@@ -210,12 +212,12 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
 
     int fd = __get_fd(f);
     if (fd < 0) {
-        return EOF;
+        return 0;
     }
 
     ret = write(fd, (void *)ptr, size * nmemb);
     if (ret < 0) {
-        return EOF;
+        return 0;
     }
     return (size_t)(bytes_requested == ret ? nmemb : ret / size);
 }
@@ -230,12 +232,12 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
 
     int fd = __get_fd(f);
     if (fd < 0) {
-        return EOF;
+        return 0;
     }
 
     ret = read(fd, (void *)ptr, size * nmemb);
     if (ret < 0) {
-        return EOF;
+        return 0;
     }
     return (size_t)(bytes_requested == ret ? nmemb : ret / size);
 }
@@ -247,7 +249,7 @@ int fflush(FILE *f)
 
 int fgetc(FILE *f)
 {
-    int ch;
+    int ch = 0;
     if (1 != fread(&ch, 1, 1, f)) {
         return EOF;
     }
@@ -295,7 +297,10 @@ char * gets(char *str)
 
 int fputc(int ch, FILE *f)
 {
-    return fwrite(&ch, 1, 1, f);
+    if (1 != fwrite(&ch, 1, 1, f)) {
+        return EOF;
+    }
+    return ch;
 }
 
 int fputs(const char *str, FILE *f)
@@ -308,9 +313,12 @@ int puts(const char *str)
     return printf("%s\n", str);
 }
 
-int putc(int c, FILE* f)
+int putc(int ch, FILE* f)
 {
-    return fwrite(&c, 1, 1, f);;
+    if (1 != fwrite(&ch, 1, 1, f)) {
+        return EOF;
+    }
+    return ch;
 }
 
 int putchar(int c)
@@ -322,7 +330,7 @@ int vfprintf(FILE *f, const char *format, va_list ap)
 {
     char buff[VSF_LINUX_CFG_PRINT_BUFF_SIZE];
     va_list ap_temp;
-    size_t size;
+    int size;
 
     va_copy(ap_temp, ap);
     size = vsnprintf(buff, sizeof(buff), format, ap);
@@ -334,12 +342,17 @@ int vfprintf(FILE *f, const char *format, va_list ap)
 
         size = vsnprintf(buff, size + 1, format, ap_temp);
         if (size > 0) {
-            size = fwrite(buff, 1, size, f);
+            if (size != fwrite(buff, 1, size, f)) {
+                size = -1;
+            }
         }
         free(buff);
         return size;
     }
-    return fwrite(buff, 1, size, f);
+    if (size != fwrite(buff, 1, size, f)) {
+        return -1;
+    }
+    return size;
 }
 
 int vprintf(const char *format, va_list arg)
