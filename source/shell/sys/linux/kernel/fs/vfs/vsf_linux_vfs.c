@@ -75,7 +75,7 @@ int vsf_linux_vfs_init(void)
 #include VSF_LINUX_CFG_TERMINFO_TYPE
     };
     vsf_linux_fs_bind_buffer(VSF_LINUX_CFG_TERMINFO_PATH "/x/" VSF_LINUX_CFG_TERMINFO_TYPE, 
-        __terminfo, VSF_FILE_ATTR_READ, sizeof(__terminfo));
+        (void *)__terminfo, VSF_FILE_ATTR_READ, sizeof(__terminfo));
 
 #   if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
     putenv("TERM=" VSF_LINUX_CFG_TERMINFO_TYPE);
