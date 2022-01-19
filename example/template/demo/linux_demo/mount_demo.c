@@ -12,9 +12,6 @@
 
 #if VSF_USE_LINUX == ENABLED && APP_USE_LINUX_MOUNT_DEMO == ENABLED
 
-// maybe read is a macro from linux subsystem in vsf
-#undef read
-
 typedef struct __fs_param_t {
     char *device;
     uint32_t block_size;
@@ -56,6 +53,8 @@ static void * __prepare_lfs_fsdata(const __fs_type_t *fstype, __fs_param_t *para
     }
 
     fsinfo->config.context = file_mal;
+// maybe read is a macro from linux subsystem in vsf
+#undef read
     fsinfo->config.read = vsf_lfs_mal_read;
     fsinfo->config.prog = vsf_lfs_mal_prog;
     fsinfo->config.erase = vsf_lfs_mal_erase;
