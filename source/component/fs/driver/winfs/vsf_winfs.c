@@ -136,8 +136,20 @@ __vsf_component_peda_ifs_entry(__vk_winfs_mount, vk_fs_mount)
     vk_winfs_info_t *fsinfo = dir->subfs.data;
     VSF_FS_ASSERT((fsinfo != NULL) && (fsinfo->root.name != NULL));
 
+    size_t namelen = strlen(fsinfo->root.name);
+    char find_str[namelen + 2 + 1];
+    strcpy(find_str, fsinfo->root.name);
+    if ('\\' == find_str[namelen - 1]) {
+        find_str[namelen + 0] = '*';
+        find_str[namelen + 1] = '\0';
+    } else {
+        find_str[namelen + 0] = '\\';
+        find_str[namelen + 1] = '*';
+        find_str[namelen + 2] = '\0';
+    }
+
     WIN32_FIND_DATAA FindFileData;
-    HANDLE hFind = FindFirstFileA(fsinfo->root.name, &FindFileData);
+    HANDLE hFind = FindFirstFileA(find_str, &FindFileData);
     if (hFind == INVALID_HANDLE_VALUE) {
         vsf_eda_return(VSF_ERR_NOT_AVAILABLE);
         return;
