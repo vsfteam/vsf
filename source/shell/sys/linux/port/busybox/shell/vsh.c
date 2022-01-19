@@ -550,17 +550,26 @@ int export_main(int argc, char *argv[])
         return 0;
     }
 
+    char *env_str;
     if (strchr(argv[1], '=') == NULL) {
-        printf("format: %s ENV_NAME=<ENV_VALUE>" VSH_LINEEND, argv[0]);
-        return 0;
+        env_str = malloc(strlen(argv[1]) + 2);
+        if (env_str != NULL) {
+            sprintf(env_str, "%s=", argv[1]);
+        }
+    } else {
+        env_str = strdup(argv[1]);
     }
-    if (strchr(argv[1], '$') != NULL) {
-        printf("$ not supported" VSH_LINEEND);
-        return 0;
+    if (NULL == env_str) {
+        printf("fail to allocate environment string" VSH_LINEEND);
+        return -1;
     }
 
-    // env_in_ram not belong to us after putenv
-    return putenv(strdup(argv[1]));
+    // env_str not belong to us after putenv
+    int ret = putenv(env_str);
+    if (ret < 0) {
+        free(env_str);
+    }
+    return ret;
 }
 #endif
 
