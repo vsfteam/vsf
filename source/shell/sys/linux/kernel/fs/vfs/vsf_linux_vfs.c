@@ -79,6 +79,7 @@ int vsf_linux_vfs_init(void)
 
 #   if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
     putenv("TERM=" VSF_LINUX_CFG_TERMINFO_TYPE);
+    putenv("TERMINFO=" VSF_LINUX_CFG_TERMINFO_PATH);
 #   endif
 #endif
 
