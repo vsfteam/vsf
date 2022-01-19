@@ -141,6 +141,9 @@ int vsf_linux_fs_bind_target_ex(const char *pathname, void *target,
         uint_fast32_t feature, uint64_t size);
 extern int vsf_linux_fs_get_target(const char *pathname, void **target);
 
+extern int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
+        uint_fast32_t feature, uint64_t size);
+
 extern int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
 extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
 extern void vsf_linux_fd_delete(int fd);

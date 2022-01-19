@@ -151,7 +151,7 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
     ssize_t result = 0;
     int32_t rsize;
 
-    while (count > 0) {
+    while ((count > 0) && (priv->pos < file->size)) {
         vk_file_read(file, priv->pos, count, (uint8_t *)buf);
         rsize = (int32_t)vsf_eda_get_return_value();
         if (rsize < 0) {
@@ -1262,6 +1262,63 @@ int vsf_linux_fs_bind_target(const char *pathname, void *target,
         vsf_param_eda_evthandler_t peda_write)
 {
     return vsf_linux_fs_bind_target_ex(pathname, target, peda_read, peda_write, 0, 0);
+}
+
+__vsf_component_peda_ifs_entry(__vk_vfs_buffer_write, vk_file_write)
+{
+    vsf_peda_begin();
+
+    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)&vsf_this;
+    void *buffer = vfs_file->f.param;
+    int realsize;
+
+    if (vsf_local.offset >= vfs_file->size) {
+        realsize = -1;
+    } else if (vsf_local.offset + vsf_local.size > vfs_file->size) {
+        realsize = vfs_file->size - vsf_local.offset;
+    } else {
+        realsize = vsf_local.size;
+    }
+
+    if (realsize > 0) {
+        memcpy((uint8_t *)buffer + vsf_local.offset, vsf_local.buff, realsize);
+    }
+    vsf_eda_return(realsize);
+
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_vfs_buffer_read, vk_file_read)
+{
+    vsf_peda_begin();
+
+    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)&vsf_this;
+    void *buffer = vfs_file->f.param;
+    int realsize;
+
+    if (vsf_local.offset >= vfs_file->size) {
+        realsize = -1;
+    } else if (vsf_local.offset + vsf_local.size > vfs_file->size) {
+        realsize = vfs_file->size - vsf_local.offset;
+    } else {
+        realsize = vsf_local.size;
+    }
+
+    if (realsize > 0) {
+        memcpy(vsf_local.buff, (uint8_t *)buffer + vsf_local.offset, realsize);
+    }
+    vsf_eda_return(realsize);
+
+    vsf_peda_end();
+}
+
+int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
+        uint_fast32_t feature, uint64_t size)
+{
+    return vsf_linux_fs_bind_target_ex(pathname, buffer,
+        (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_buffer_read),
+        (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_buffer_write),
+        feature, size);
 }
 
 // stream

@@ -49,6 +49,9 @@
 #ifndef VSF_LINUX_CFG_TERMINFO_PATH
 #   define VSF_LINUX_CFG_TERMINFO_PATH          "/usr/share/terminfo"
 #endif
+#ifndef VSF_LINUX_CFG_TERMINFO_TYPE
+#   define VSF_LINUX_CFG_TERMINFO_TYPE          "xterm-color"
+#endif
 
 // to use simple libc
 //  1. enable VSF_LINUX_USE_SIMPLE_LIBC

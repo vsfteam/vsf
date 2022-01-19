@@ -21,6 +21,7 @@
 
 #if VSF_USE_LINUX == ENABLED
 
+#define __VSF_LINUX_FS_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../include/unistd.h"
 #else
@@ -70,9 +71,14 @@ int vsf_linux_vfs_init(void)
         fprintf(stderr, "fail to mkdir %s\r\n", VSF_LINUX_CFG_TERMINFO_PATH "/x");
         return err;
     }
+    static const char __terminfo[] = {
+#include VSF_LINUX_CFG_TERMINFO_TYPE
+    };
+    vsf_linux_fs_bind_buffer(VSF_LINUX_CFG_TERMINFO_PATH "/x/" VSF_LINUX_CFG_TERMINFO_TYPE, 
+        __terminfo, VSF_FILE_ATTR_READ, sizeof(__terminfo));
 
 #   if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-    putenv("TERM=xtem");
+    putenv("TERM=" VSF_LINUX_CFG_TERMINFO_TYPE);
 #   endif
 #endif
 
