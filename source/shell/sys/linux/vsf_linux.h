@@ -160,7 +160,9 @@ vsf_class(vsf_linux_process_t) {
             pid_t pid;
             pid_t ppid;
         } id;
+#if VSF_LINUX_USE_TERMIOS == ENABLED
         struct termios term[3];
+#endif
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED

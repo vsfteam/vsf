@@ -390,9 +390,23 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
         process->prio = vsf_prio_inherit;
         process->shell_process = process;
 
-        // termios, TODO: support other termios flags & settings
-        process->term[STDIN_FILENO].c_lflag = ECHO;
-        process->term[STDIN_FILENO].c_cc[VMIN] = 1;
+#if VSF_LINUX_USE_TERMIOS == ENABLED
+        static const struct termios __default_term[3] = {
+            [STDIN_FILENO]  = {
+                .c_lflag    = ECHO,
+                .c_cc[VMIN] = 1,
+            },
+            [STDOUT_FILENO] = {
+                0
+            },
+            [STDERR_FILENO] = {
+                0
+            },
+        };
+        process->term[STDIN_FILENO] = __default_term[STDIN_FILENO];
+        process->term[STDOUT_FILENO] = __default_term[STDOUT_FILENO];
+        process->term[STDERR_FILENO] = __default_term[STDERR_FILENO];
+#endif
 
 #if VSF_LINUX_USE_GETOPT == ENABLED
         process->__opterr = 1;

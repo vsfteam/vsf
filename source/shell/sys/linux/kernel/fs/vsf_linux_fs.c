@@ -382,12 +382,14 @@ void vsf_linux_fd_delete(int fd)
 bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
 {
     vsf_linux_process_t *process;
-    if (sfd->fd == STDIN_FILENO) {
+#if VSF_LINUX_USE_TERMIOS == ENABLED
+    if (sfd->fd < 3) {
         process = vsf_linux_get_cur_process();
         VSF_LINUX_ASSERT(process != NULL);
-        struct termios *term = &process->term[STDIN_FILENO];
+        struct termios *term = &process->term[sfd->fd];
         return term->c_cc[VMIN] > 0;
     }
+#endif
     return !(sfd->flags & O_NONBLOCK);
 }
 
@@ -949,9 +951,9 @@ int fcntl(int fd, int cmd, ...)
 
 ssize_t read(int fd, void *buf, size_t count)
 {
-    if (2 == fd) {
+    if (STDERR_FILENO == fd) {
         // read from fd2(stderr) is redirected to fd0(stdin)
-        fd = 0;
+        fd = STDIN_FILENO;
     }
 
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
@@ -1391,11 +1393,15 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 
         cursize = vsf_stream_read(stream, buf, size);
         if (sfd->fd == STDIN_FILENO) {
+#if VSF_LINUX_USE_TERMIOS == ENABLED
             vsf_linux_process_t *process = vsf_linux_get_cur_process();
             VSF_LINUX_ASSERT(process != NULL);
             struct termios *term = &process->term[STDIN_FILENO];
 
             if (term->c_lflag & ECHO) {
+#else
+            if (true) {
+#endif
                 // TODO: do not use static value here for multi process support
                 static int skip_echo = 0;
                 char ch;
