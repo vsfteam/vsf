@@ -104,7 +104,7 @@ extern FILE *stdin, *stdout, *stderr;
 #ifndef PATH_MAX
 #   define PATH_MAX         255
 #endif
-#define EOF                 0xFF
+#define EOF                 -1
 
 #define fpos_t              uintmax_t
 
