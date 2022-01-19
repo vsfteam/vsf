@@ -1409,7 +1409,6 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
                     ch = ((char *)buf)[i];
                     switch (ch) {
                     case '\033':skip_echo = 2;                      break;
-                    case '\r':  write(STDOUT_FILENO, "\r\n", 2);    break;
                     case 0x7F:
                     case '\b':  write(STDOUT_FILENO, "\b \b", 3);   break;
                     default:

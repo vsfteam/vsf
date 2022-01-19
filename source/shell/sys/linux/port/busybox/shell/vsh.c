@@ -342,6 +342,9 @@ int vsh_main(int argc, char *argv[])
 
                 switch (ch) {
                 case VSH_ENTER_CHAR:
+#if VSH_ENTER_CHAR == '\r'
+                    write(STDOUT_FILENO, "\n", 1);
+#endif
                     if (strlen(ctx.cmd) > 0) {
 #if VSH_HISTORY_NUM > 0
                         if (ctx.history.entry_num < dimof(ctx.history.entries)) {
