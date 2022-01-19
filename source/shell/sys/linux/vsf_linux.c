@@ -391,21 +391,17 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
         process->shell_process = process;
 
 #if VSF_LINUX_USE_TERMIOS == ENABLED
-        static const struct termios __default_term[3] = {
-            [STDIN_FILENO]  = {
-                .c_lflag    = ECHO,
-                .c_cc[VMIN] = 1,
-            },
-            [STDOUT_FILENO] = {
-                0
-            },
-            [STDERR_FILENO] = {
-                0
-            },
+        static const struct termios __default_term = {
+            .c_oflag        = OPOST | ONLCR,
+            .c_lflag        = ECHO | ECHOE | ECHOK | ECHONL | ICANON,
+            .c_cc[VMIN]     = 1,
+            .c_cc[VERASE]   = 010,      // BS
+            .c_cc[VWERASE]  = 027,      // ETB
+            .c_cc[VKILL]    = 025,      // NAK
         };
-        process->term[STDIN_FILENO] = __default_term[STDIN_FILENO];
-        process->term[STDOUT_FILENO] = __default_term[STDOUT_FILENO];
-        process->term[STDERR_FILENO] = __default_term[STDERR_FILENO];
+        process->term[STDIN_FILENO] = __default_term;
+        process->term[STDOUT_FILENO] = __default_term;
+        process->term[STDERR_FILENO] = __default_term;
 #endif
 
 #if VSF_LINUX_USE_GETOPT == ENABLED
