@@ -51,6 +51,12 @@ typedef struct vsf_linux_fd_op_t {
 } vsf_linux_fd_op_t;
 
 vsf_class(vsf_linux_fd_priv_t) {
+    protected_member(
+        bool txrdy;
+        bool txevt;
+        bool rxrdy;
+        bool rxevt;
+    )
     private_member(
         int ref;
     )
@@ -64,10 +70,6 @@ vsf_class(vsf_linux_fd_t) {
         const vsf_linux_fd_op_t *op;
 
         vsf_trig_t *txpend, *rxpend;
-        bool txrdy;
-        bool txevt;
-        bool rxrdy;
-        bool rxevt;
     )
 
     private_member(
@@ -75,7 +77,7 @@ vsf_class(vsf_linux_fd_t) {
     )
 
     protected_member(
-        void *priv;
+        vsf_linux_fd_priv_t *priv;
     )
 };
 
