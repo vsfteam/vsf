@@ -60,12 +60,16 @@ extern "C" {
 vsf_class(vsf_queue_stream_t) {
     public_member(
         implement(vsf_stream_t)
-        // max_buffer_size < 0 means no limitted, else means the buffer limit in bytes
+        // max_buffer_size < 0 means no limitation, otherwise means the buffer limit in bytes
         int32_t max_buffer_size;
+        // each write will add a entry in queue
+        // max_entry_num < 0 means no limitation, otherwise means the entry limit
+        int32_t max_entry_num;
     )
     private_member(
         vsf_slist_queue_t buffer_queue;
         uint32_t size;
+        uint32_t entry_num;
     )
 };
 

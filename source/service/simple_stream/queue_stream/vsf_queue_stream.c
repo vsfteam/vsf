@@ -76,6 +76,7 @@ static void __vsf_queue_stream_init(vsf_stream_t *stream)
 {
     vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)stream;
     VSF_SERVICE_ASSERT(queue_stream->max_buffer_size != 0);
+    VSF_SERVICE_ASSERT(queue_stream->max_entry_num != 0);
     vsf_slist_queue_init(&queue_stream->buffer_queue);
     queue_stream->size = 0;
 }
@@ -99,7 +100,21 @@ static uint_fast32_t __vsf_queue_stream_get_data_length(vsf_stream_t *stream)
 
 static uint_fast32_t __vsf_queue_stream_get_avail_length(vsf_stream_t *stream)
 {
-    return __vsf_queue_stream_get_buff_length(stream) - __vsf_queue_stream_get_data_length(stream);
+    vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)stream;
+    uint_fast32_t data_size, entry_num;
+
+    vsf_protect_t orig = __vsf_queue_stream_protect();
+        data_size = queue_stream->size;
+        entry_num = queue_stream->entry_num;
+    __vsf_queue_stream_unprotect(orig);
+
+    if (entry_num >= queue_stream->max_entry_num) {
+        return 0;
+    }
+    if (queue_stream->max_buffer_size < 0) {
+        return 0xFFFFFFFF - data_size;
+    }
+    return queue_stream->max_buffer_size - data_size;
 }
 
 static uint_fast32_t __vsf_queue_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
@@ -136,6 +151,7 @@ static uint_fast32_t __vsf_queue_stream_write(vsf_stream_t *stream, uint8_t *buf
 
     vsf_protect_t orig = __vsf_queue_stream_protect();
         queue_stream->size += size;
+        queue_stream->entry_num++;
         vsf_slist_queue_enqueue(vsf_queue_stream_buffer_node_t, buffer_node, &queue_stream->buffer_queue, buffer_node);
     __vsf_queue_stream_unprotect(orig);
 
@@ -171,6 +187,7 @@ static uint_fast32_t __vsf_queue_stream_read(vsf_stream_t *stream, uint8_t *buf,
         vsf_protect_t orig = __vsf_queue_stream_protect();
             queue_stream->size -= cur_size;
             if (buffer_node != NULL) {
+                queue_stream->entry_num--;
                 vsf_slist_queue_dequeue(vsf_queue_stream_buffer_node_t, buffer_node, &queue_stream->buffer_queue, buffer_node);
             }
         __vsf_queue_stream_unprotect(orig);
