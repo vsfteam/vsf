@@ -1494,12 +1494,14 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
 
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd)
 {
-    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
-    if (priv->stream_rx != NULL) {
-        vsf_stream_disconnect_rx(priv->stream_rx);
-    }
-    if (priv->stream_tx != NULL) {
-        vsf_stream_disconnect_tx(priv->stream_tx);
+    if (!isatty(sfd->fd)) {
+        vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+        if (priv->stream_rx != NULL) {
+            vsf_stream_disconnect_rx(priv->stream_rx);
+        }
+        if (priv->stream_tx != NULL) {
+            vsf_stream_disconnect_tx(priv->stream_tx);
+        }
     }
     return 0;
 }
