@@ -1204,6 +1204,14 @@ int posix_spawnp(pid_t *pid, const char *file,
                 }
                 break;
             case spawn_do_dup2:
+                sfd = __vsf_linux_fd_get_ex(process, a->action.dup2_action.newfd);
+                if (sfd != NULL) {
+                    orig = vsf_protect_sched();
+                        ((vsf_linux_fd_priv_t *)sfd->priv)->ref--;
+                    vsf_unprotect_sched(orig);
+                    __vsf_linux_fd_delete_ex(process, sfd->fd);
+                }
+
                 sfd = __vsf_linux_fd_get_ex(process, a->action.dup2_action.fd);
                 if (sfd != NULL) {
                     int ret = __vsf_linux_fd_create_ex(process, &sfd_new, sfd->op, a->action.dup2_action.newfd, false);
