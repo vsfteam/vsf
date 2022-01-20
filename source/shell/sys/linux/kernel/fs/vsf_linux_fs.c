@@ -390,7 +390,7 @@ bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
         return term->c_cc[VMIN] > 0;
     }
 #endif
-    return !(sfd->flags & O_NONBLOCK);
+    return !(sfd->status_flags & O_NONBLOCK);
 }
 
 void vsf_linux_fd_trigger_init(vsf_trig_t *trig)
@@ -879,7 +879,7 @@ int open(const char *pathname, int flags, ...)
         __vsf_linux_fs_close_do(file);
     } else {
         vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-        sfd->flags = flags;
+        sfd->status_flags = flags;
         priv->file = file;
         if ((flags & O_TRUNC) && !(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
             // todo:
@@ -935,13 +935,22 @@ int fcntl(int fd, int cmd, ...)
             return ret;
         }
         break;
+    case F_GETFD:
+        return sfd->fd_flags;
+        break;
+    case F_SETFD: {
+            long tmp_arg = arg;
+            arg = arg ^ sfd->fd_flags;
+            sfd->fd_flags = tmp_arg;
+        }
+        break;
     case F_GETFL:
-        return sfd->flags;
+        return sfd->status_flags;
         break;
     case F_SETFL: {
             long tmp_arg = arg;
-            arg = arg ^ sfd->flags;
-            sfd->flags = tmp_arg;
+            arg = arg ^ sfd->status_flags;
+            sfd->status_flags = tmp_arg;
         }
         break;
     }
@@ -957,14 +966,14 @@ ssize_t read(int fd, void *buf, size_t count)
     }
 
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    if (!sfd || (sfd->flags & O_WRONLY)) { return -1; }
+    if (!sfd || (sfd->status_flags & O_WRONLY)) { return -1; }
     return sfd->op->fn_read(sfd, buf, count);
 }
 
 ssize_t write(int fd, const void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    if (!sfd || (sfd->flags & O_RDONLY)) { return -1; }
+    if (!sfd || (sfd->status_flags & O_RDONLY)) { return -1; }
     return sfd->op->fn_write(sfd, buf, count);
 }
 

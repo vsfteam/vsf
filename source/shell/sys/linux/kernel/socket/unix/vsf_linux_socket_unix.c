@@ -227,7 +227,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     if (NULL == sfd_rx) {
         return -1;
     }
-    fcntl(sfd_rx->fd, F_SETFL, sfd_local->flags);
+    fcntl(sfd_rx->fd, F_SETFL, sfd_local->status_flags);
     vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
     priv_rx->on_evt = __vsf_linux_socket_unix_pipe_on_rx_evt;
     priv_rx->target = sfd_local;
@@ -260,7 +260,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
         vsf_eda_trig_set(priv->remote->trig);
         goto delete_sfd_rx_and_fail;
     }
-    fcntl(sfd_tx->fd, F_SETFL, sfd_local->flags);
+    fcntl(sfd_tx->fd, F_SETFL, sfd_local->status_flags);
     priv->rw.sfd_tx = sfd_tx;
 
     // 3. trigger remote again to complete conection

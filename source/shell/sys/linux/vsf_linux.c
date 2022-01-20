@@ -595,19 +595,19 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     sfd = vsf_linux_fd_get(0);
     if (NULL == sfd) {
         sfd = vsf_linux_rx_stream(thread->process->stdio_stream.in);
-        sfd->flags = O_RDONLY;
+        sfd->status_flags = O_RDONLY;
     }
 
     sfd = vsf_linux_fd_get(1);
     if (NULL == sfd) {
         sfd = vsf_linux_tx_stream(thread->process->stdio_stream.out);
-        sfd->flags = O_WRONLY;
+        sfd->status_flags = O_WRONLY;
     }
 
     sfd = vsf_linux_fd_get(2);
     if (NULL == sfd) {
         sfd = vsf_linux_tx_stream(thread->process->stdio_stream.err);
-        sfd->flags = O_WRONLY;
+        sfd->status_flags = O_WRONLY;
     }
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
@@ -1161,7 +1161,7 @@ int posix_spawnp(pid_t *pid, const char *file,
     vsf_linux_fd_t *sfd, *sfd_new;
     vsf_protect_t orig;
     __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
-        if (!(_->flags & FD_CLOEXEC)) {
+        if (!(_->fd_flags & FD_CLOEXEC)) {
             if (__vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, false) == _->fd) {
                 sfd->priv = _->priv;
 

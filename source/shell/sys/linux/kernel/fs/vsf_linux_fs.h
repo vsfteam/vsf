@@ -59,7 +59,8 @@ vsf_class(vsf_linux_fd_priv_t) {
 vsf_class(vsf_linux_fd_t) {
     protected_member(
         int fd;
-        int flags;
+        int fd_flags;
+        int status_flags;
         const vsf_linux_fd_op_t *op;
 
         vsf_trig_t *txpend, *rxpend;
