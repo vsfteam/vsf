@@ -1182,8 +1182,12 @@ int posix_spawnp(pid_t *pid, const char *file,
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
     if (env != NULL) {
         extern int __putenv(char *string, char ***environ);
+        char *cur_env;
         while (*env != NULL) {
-            __putenv(*env++, &process->__environ);
+            cur_env = strdup(*env++);
+            if (cur_env != NULL) {
+                __putenv(cur_env, &process->__environ);
+            }
         }
     }
 #endif
