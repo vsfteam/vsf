@@ -21,10 +21,7 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
-#   define __VSF_LINUX_CLASS_INHERIT__
-#endif
-
+#define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/simple_libc/stdlib.h"
@@ -158,13 +155,14 @@ void * calloc(size_t n, size_t size)
 
 void exit(int status)
 {
-    // exit process is not supported, can exit current thread only
-    vsf_thread_exit();
+    vsf_linux_exit_process(status);
 }
 
 int atexit(void (*func)(void))
 {
-    // TODO: since exit is not fully supported, any meaning to support atexit?
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    process->fn_atexit = func;
     return 0;
 }
 

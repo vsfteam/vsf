@@ -502,6 +502,26 @@ int vsf_linux_start_process(vsf_linux_process_t *process)
     return vsf_linux_start_thread(thread, vsf_prio_inherit);
 }
 
+void vsf_linux_exit_process(int status)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    vsf_linux_fd_t *sfd;
+
+    if (process->fn_atexit != NULL) {
+        process->fn_atexit();
+    }
+
+    do {
+        vsf_dlist_peek_head(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
+        if (sfd != NULL) {
+            close(sfd->fd);
+        }
+    } while (sfd != NULL);
+
+    vsf_thread_exit();
+}
+
 static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
         vsf_linux_main_entry_t entry, vsf_prio_t prio)
 {
@@ -591,13 +611,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     VSF_LINUX_ASSERT(ctx->entry != NULL);
     thread->retval = ctx->entry(ctx->arg.argc, (char **)ctx->arg.argv);
 
-    // clean up
-    do {
-        vsf_dlist_peek_head(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
-        if (sfd != NULL) {
-            close(sfd->fd);
-        }
-    } while (sfd != NULL);
+    vsf_linux_exit_process(thread->retval);
 }
 
 static void __vsf_linux_process_unref(vsf_linux_process_t *process)
