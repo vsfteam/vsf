@@ -288,8 +288,6 @@ static int __vsf_linux_fd_add(vsf_linux_process_t *process, vsf_linux_fd_t *sfd,
         process = vsf_linux_get_cur_process();
     }
 
-    sfd->rxpend = sfd->txpend = NULL;
-
     vsf_protect_t orig = vsf_protect_sched();
         if (fd_desired >= 0) {
 #ifdef VSF_LINUX_CFG_FD_BITMAP_SIZE
@@ -405,7 +403,7 @@ int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t or
         sfd->priv->txevt = false;
         vsf_unprotect_sched(orig);
     } else {
-        sfd->txpend = trig;
+        sfd->priv->txpend = trig;
         vsf_unprotect_sched(orig);
         vsf_thread_trig_pend(trig, -1);
     }
@@ -418,7 +416,7 @@ int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t or
         sfd->priv->rxevt = false;
         vsf_unprotect_sched(orig);
     } else {
-        sfd->rxpend = trig;
+        sfd->priv->rxpend = trig;
         vsf_unprotect_sched(orig);
         vsf_thread_trig_pend(trig, -1);
     }
@@ -427,10 +425,10 @@ int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t or
 
 int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
-    vsf_trig_t *trig = sfd->txpend;
+    vsf_trig_t *trig = sfd->priv->txpend;
     if (trig != NULL) {
         vsf_unprotect_sched(orig);
-        sfd->txpend = NULL;
+        sfd->priv->txpend = NULL;
         vsf_eda_trig_set_isr(trig);
     } else {
         sfd->priv->txevt = true;
@@ -441,10 +439,10 @@ int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 
 int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
-    vsf_trig_t *trig = sfd->rxpend;
+    vsf_trig_t *trig = sfd->priv->rxpend;
     if (trig != NULL) {
         vsf_unprotect_sched(orig);
-        sfd->rxpend = NULL;
+        sfd->priv->rxpend = NULL;
         vsf_eda_trig_set_isr(trig);
     } else {
         sfd->priv->rxevt = true;
@@ -477,7 +475,7 @@ int vsf_linux_fd_rx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 
 void vsf_linux_fd_tx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
-    if (sfd->txpend != NULL) {
+    if (sfd->priv->txpend != NULL) {
         VSF_LINUX_ASSERT(false);
     } else {
         sfd->priv->txevt = sfd->priv->txrdy = false;
@@ -487,7 +485,7 @@ void vsf_linux_fd_tx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 
 void vsf_linux_fd_rx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig)
 {
-    if (sfd->rxpend != NULL) {
+    if (sfd->priv->rxpend != NULL) {
         VSF_LINUX_ASSERT(false);
     } else {
         sfd->priv->rxevt = sfd->priv->rxrdy = false;
@@ -537,10 +535,10 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
                 continue;
             }
             if (fds[i].events & POLLIN) {
-                sfd->rxpend = &trig;
+                sfd->priv->rxpend = &trig;
             }
             if (fds[i].events & POLLOUT) {
-                sfd->txpend = &trig;
+                sfd->priv->txpend = &trig;
             }
         }
         vsf_unprotect_sched(orig);
@@ -560,17 +558,17 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             }
             orig = vsf_protect_sched();
                 if (fds[i].events & POLLIN) {
-                    if (NULL == sfd->rxpend) {
+                    if (NULL == sfd->priv->rxpend) {
                         sfd->priv->rxevt = true;
                     } else {
-                        sfd->rxpend = NULL;
+                        sfd->priv->rxpend = NULL;
                     }
                 }
                 if (fds[i].events & POLLOUT) {
-                    if (NULL == sfd->txpend) {
+                    if (NULL == sfd->priv->txpend) {
                         sfd->priv->txevt = true;
                     } else {
-                        sfd->txpend = NULL;
+                        sfd->priv->txpend = NULL;
                     }
                 }
             vsf_unprotect_sched(orig);
@@ -1401,7 +1399,7 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
         }
 
         cursize = vsf_stream_read(stream, buf, size);
-        if (sfd->fd == STDIN_FILENO) {
+        if ((sfd->fd == STDIN_FILENO) && isatty(sfd->fd)) {
 #if VSF_LINUX_USE_TERMIOS == ENABLED
             vsf_linux_process_t *process = vsf_linux_get_cur_process();
             VSF_LINUX_ASSERT(process != NULL);
@@ -1434,11 +1432,14 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 
         size -= cursize;
         buf = (uint8_t *)buf + cursize;
+
+        // TODO: need to read all data
+        break;
     }
 
 do_return:
     orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT(NULL == sfd->rxpend);
+    VSF_LINUX_ASSERT(NULL == sfd->priv->rxpend);
     if (!vsf_stream_get_data_size(stream)) {
         __vsf_linux_stream_evt(sfd, orig, true, false);
     } else {
@@ -1470,7 +1471,7 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
     }
 
     orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT(NULL == sfd->txpend);
+    VSF_LINUX_ASSERT(NULL == sfd->priv->txpend);
     if (!vsf_stream_get_free_size(stream)) {
         __vsf_linux_stream_evt(sfd, orig, false, false);
     } else {
@@ -1584,6 +1585,7 @@ vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream)
         }
 
         queue_stream->max_buffer_size = -1;
+        queue_stream->max_entry_num = 1;
         queue_stream->op = &vsf_queue_stream_op;
         priv_rx->stream = &queue_stream->use_as__vsf_stream_t;
         vsf_stream_init(priv_rx->stream);
