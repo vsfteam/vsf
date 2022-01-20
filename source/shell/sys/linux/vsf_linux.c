@@ -393,6 +393,7 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
         memset(process, 0, sizeof(*process));
         process->prio = vsf_prio_inherit;
         process->shell_process = process;
+        process->ref_cnt = 1;
 
 #if VSF_LINUX_USE_TERMIOS == ENABLED
         static const struct termios __default_term = {
@@ -419,6 +420,7 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
             vsf_heap_free(process);
             return NULL;
         }
+        thread->is_main = true;
 
         vsf_protect_t orig = vsf_protect_sched();
             process->id.pid = __vsf_linux.cur_pid++;
@@ -447,10 +449,12 @@ vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdi
         process->stdio_stream = *stdio_stream;
         VSF_LINUX_ASSERT(process->working_dir != NULL);
 
-#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
         VSF_LINUX_ASSERT(cur_process != NULL);
+        cur_process->ref_cnt++;
+        process->parent_process = cur_process;
 
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         int envnum = 0;
         char **environ_from = cur_process->__environ, **environ_to;
         if (environ_from != NULL) {
@@ -596,6 +600,21 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     } while (sfd != NULL);
 }
 
+static void __vsf_linux_process_unref(vsf_linux_process_t *process)
+{
+    if (!--process->ref_cnt) {
+        vsf_linux_process_t *parent_process = process->parent_process;
+        if (process->thread_pending != NULL) {
+            vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
+        }
+        vsf_heap_free(process);
+
+        if (parent_process != NULL) {
+            __vsf_linux_process_unref(parent_process);
+        }
+    }
+}
+
 void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
 {
     if (thread->thread_pending != NULL) {
@@ -609,6 +628,9 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
         is_to_free_process = vsf_dlist_is_empty(&process->thread_list);
     vsf_unprotect_sched(orig);
+    if (thread->is_main && (process->thread_pending != NULL)) {
+        process->thread_pending->retval = thread->retval;
+    }
     vsf_heap_free(thread);
 
     if (is_to_free_process) {
@@ -616,10 +638,6 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
             vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
         vsf_unprotect_sched(orig);
 
-        if (process->thread_pending != NULL) {
-            process->thread_pending->retval = thread->retval;
-            vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
-        }
         if (process->working_dir != NULL) {
             vsf_heap_free(process->working_dir);
         }
@@ -640,7 +658,7 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
             free(process->__environ);
         }
 #endif
-        vsf_heap_free(process);
+        __vsf_linux_process_unref(process);
     }
 }
 

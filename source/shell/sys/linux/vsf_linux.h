@@ -122,6 +122,7 @@ vsf_class(vsf_linux_thread_t) {
     private_member(
         vsf_linux_process_t *process;
         vsf_dlist_node_t thread_node;
+        bool is_main;
     )
 };
 
@@ -195,6 +196,9 @@ vsf_class(vsf_linux_process_t) {
         } sig;
 
         vsf_prio_t prio;
+
+        vsf_linux_process_t *parent_process;
+        int ref_cnt;
     )
 };
 
