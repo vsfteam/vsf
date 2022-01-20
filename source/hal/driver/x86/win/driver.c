@@ -42,6 +42,7 @@
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 #   if VSF_USE_SIMPLE_STREAM == ENABLED
+static void __vsf_x86_debug_stream_tx_init(vsf_stream_t *stream);
 static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t *stream,
             uint8_t *buf, uint_fast32_t size);
 static uint_fast32_t __vsf_x86_debug_stream_tx_get_data_length(vsf_stream_t *stream);
@@ -56,6 +57,7 @@ static uint_fast32_t __vsf_x86_debug_stream_tx_get_avail_length(vsf_stream_t *st
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 #   if VSF_USE_SIMPLE_STREAM == ENABLED
 static const vsf_stream_op_t __vsf_x86_debug_stream_tx_op = {
+    .init = __vsf_x86_debug_stream_tx_init,
     .get_data_length = __vsf_x86_debug_stream_tx_get_data_length,
     .get_avail_length = __vsf_x86_debug_stream_tx_get_avail_length,
     .write = __vsf_x86_debug_stream_tx_write,
@@ -90,6 +92,12 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 #   if VSF_USE_SIMPLE_STREAM == ENABLED
+static void __vsf_x86_debug_stream_tx_init(vsf_stream_t *stream)
+{
+    vsf_stream_connect_rx(stream);
+    vsf_stream_connect_tx(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t);
+}
+
 static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t *stream,
             uint8_t *buf, uint_fast32_t size)
 {
