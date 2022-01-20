@@ -656,6 +656,16 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
                         process->heap_usage, process, process->heap_balance);
         }
 #endif
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+        char **environ = process->__environ;
+        if (environ != NULL) {
+            while (*environ != NULL) {
+                free(*environ);
+                environ++;
+            }
+            free(process->__environ);
+        }
+#endif
         vsf_heap_free(process);
     }
 }
