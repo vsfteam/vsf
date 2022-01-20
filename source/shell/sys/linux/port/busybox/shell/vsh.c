@@ -509,12 +509,25 @@ int ls_main(int argc, char *argv[])
 
 int mkdir_main(int argc, char *argv[])
 {
-    if (argc != 2) {
-        printf("format: mkdir directory_name" VSH_LINEEND);
+    if (argc < 2) {
+    arg_fail:
+        printf("format: mkdir [-p] directory_name" VSH_LINEEND);
         return -1;
     }
 
-    if (0 != mkdir(argv[1], 0)) {
+    if (argv[1][0] == '-') {
+        if (argv[1][1] != 'p') {
+            printf("unknown option: %s" VSH_LINEEND, argv[1]);
+            return -1;
+        }
+        if (argc < 3) {
+            goto arg_fail;
+        }
+        if (0 != mkdirs(argv[2], 0)) {
+            printf("fail to create directory %s" VSH_LINEEND, argv[2]);
+            return -1;
+        }
+    } else if (0 != mkdir(argv[1], 0)) {
         printf("fail to create directory %s" VSH_LINEEND, argv[1]);
         return -1;
     }
