@@ -213,8 +213,6 @@ extern int vsf_linux_fd_bind_executable(int fd, vsf_linux_main_entry_t entry);
 extern int vsf_linux_expandenv(const char *str, char *output, size_t bufflen);
 
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
-extern void vsf_linux_set_dominant_process(void);
-
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 

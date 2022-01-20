@@ -88,7 +88,8 @@ vsf_class(vsf_linux_stream_priv_t) {
         implement(vsf_linux_fd_priv_t)
     )
     protected_member(
-        vsf_stream_t *stream;
+        vsf_stream_t *stream_rx;
+        vsf_stream_t *stream_tx;
         vsf_linux_stream_on_evt_t on_evt;
     )
 };
@@ -170,9 +171,11 @@ extern void vsf_linux_fd_rx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
 
 // stream
 // IMPORTANT: priority of stream MUST be within scheduler priorities
+extern vsf_linux_fd_t * vsf_linux_stream(vsf_stream_t *stream_rx, vsf_stream_t *stream_tx);
 extern vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream);
 extern vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream);
-extern vsf_stream_t * vsf_linux_get_stream(vsf_linux_fd_t *sfd);
+extern vsf_stream_t * vsf_linux_get_rx_stream(vsf_linux_fd_t *sfd);
+extern vsf_stream_t * vsf_linux_get_tx_stream(vsf_linux_fd_t *sfd);
 
 // pipe
 extern vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream);

@@ -313,10 +313,14 @@ int isatty(int fd)
     // terminal is __vsf_linux.stdio_stream
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     VSF_LINUX_ASSERT(sfd != NULL);
-    vsf_stream_t *stream = vsf_linux_get_stream(sfd);
-    return  (stream == __vsf_linux.stdio_stream.in)
-        ||  (stream == __vsf_linux.stdio_stream.out)
-        ||  (stream == __vsf_linux.stdio_stream.err);
+    vsf_stream_t *stream_rx = vsf_linux_get_rx_stream(sfd);
+    vsf_stream_t *stream_tx = vsf_linux_get_tx_stream(sfd);
+    return  (stream_rx == __vsf_linux.stdio_stream.in)
+        ||  (stream_rx == __vsf_linux.stdio_stream.out)
+        ||  (stream_rx == __vsf_linux.stdio_stream.err)
+        ||  (stream_tx == __vsf_linux.stdio_stream.in)
+        ||  (stream_tx == __vsf_linux.stdio_stream.out)
+        ||  (stream_tx == __vsf_linux.stdio_stream.err);
 }
 
 vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
@@ -555,36 +559,6 @@ vsf_linux_process_t * vsf_linux_get_cur_process(void)
                 process : __vsf_linux.kernel_process;
 }
 
-void vsf_linux_set_dominant_process(void)
-{
-    vsf_linux_fd_t *sfd;
-    vsf_stream_t *stream;
-
-    sfd = vsf_linux_fd_get(0);
-    if (sfd != NULL) {
-        stream = vsf_linux_get_stream(sfd);
-        if (stream != NULL) {
-            stream->rx.param = sfd;
-        }
-    }
-
-    sfd = vsf_linux_fd_get(1);
-    if (sfd != NULL) {
-        stream = vsf_linux_get_stream(sfd);
-        if (stream != NULL) {
-            stream->tx.param = sfd;
-        }
-    }
-
-    sfd = vsf_linux_fd_get(2);
-    if (sfd != NULL) {
-        stream = vsf_linux_get_stream(sfd);
-        if (stream != NULL) {
-            stream->tx.param = sfd;
-        }
-    }
-}
-
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
@@ -606,8 +580,8 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 
     sfd = vsf_linux_fd_get(2);
     if (NULL == sfd) {
-        sfd = vsf_linux_tx_stream(thread->process->stdio_stream.err);
-        sfd->status_flags = O_WRONLY;
+        sfd = vsf_linux_stream(thread->process->stdio_stream.in, thread->process->stdio_stream.err);
+        sfd->status_flags = 0;
     }
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
@@ -793,7 +767,7 @@ int pipe(int pipefd[2])
     }
 
     vsf_linux_pipe_rx_priv_t *pipe_priv = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
-    vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)pipe_priv->stream;
+    vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)pipe_priv->stream_rx;
     sfd_tx = vsf_linux_tx_pipe(queue_stream);
     if (NULL == sfd_tx) {
         close(sfd_rx->fd);

@@ -958,11 +958,6 @@ int fcntl(int fd, int cmd, ...)
 
 ssize_t read(int fd, void *buf, size_t count)
 {
-    if (STDERR_FILENO == fd) {
-        // read from fd2(stderr) is redirected to fd0(stdin)
-        fd = STDIN_FILENO;
-    }
-
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if (!sfd || (sfd->status_flags & O_WRONLY)) { return -1; }
     return sfd->op->fn_read(sfd, buf, count);
@@ -1366,11 +1361,20 @@ static void __vsf_linux_stream_evt(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool
 static void __vsf_linux_stream_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vsf_linux_fd_t *sfd = param;
+    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    vsf_stream_t *stream;
+
     switch (evt) {
     case VSF_STREAM_ON_RX:
+        stream = priv->stream_rx;
+        stream->rx.param = NULL;
+        stream->rx.evthandler = NULL;
         __vsf_linux_stream_evt(sfd, vsf_protect_sched(), true, true);
         break;
     case VSF_STREAM_ON_TX:
+        stream = priv->stream_tx;
+        stream->tx.param = NULL;
+        stream->tx.evthandler = NULL;
         __vsf_linux_stream_evt(sfd, vsf_protect_sched(), false, true);
         break;
     }
@@ -1379,7 +1383,8 @@ static void __vsf_linux_stream_evthandler(void *param, vsf_stream_evt_t evt)
 static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
-    vsf_stream_t *stream = priv->stream;
+    vsf_stream_t *stream = priv->stream_rx;
+    VSF_LINUX_ASSERT(stream != NULL);
     uint_fast32_t size = count, cursize;
     vsf_protect_t orig;
 
@@ -1389,6 +1394,9 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
             if (vsf_linux_fd_is_block(sfd)) {
                 vsf_trig_t trig;
                 vsf_linux_fd_trigger_init(&trig);
+                VSF_LINUX_ASSERT((NULL == stream->rx.param) && (NULL == stream->rx.evthandler));
+                stream->rx.param = sfd;
+                stream->rx.evthandler = __vsf_linux_stream_evthandler;
                 vsf_linux_fd_rx_pend(sfd, &trig, orig);
             } else {
                 vsf_unprotect_sched(orig);
@@ -1451,7 +1459,8 @@ do_return:
 static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
-    vsf_stream_t *stream = priv->stream;
+    vsf_stream_t *stream = priv->stream_tx;
+    VSF_LINUX_ASSERT(stream != NULL);
     uint_fast32_t size = count, cursize;
     vsf_protect_t orig;
 
@@ -1460,6 +1469,9 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
         if (!sfd->priv->txrdy) {
             vsf_trig_t trig;
             vsf_linux_fd_trigger_init(&trig);
+            VSF_LINUX_ASSERT((NULL == stream->tx.param) || (NULL == stream->tx.evthandler));
+            stream->tx.param = sfd;
+            stream->tx.evthandler = __vsf_linux_stream_evthandler;
             vsf_linux_fd_tx_pend(sfd, &trig, orig);
         } else {
             vsf_unprotect_sched(orig);
@@ -1485,22 +1497,23 @@ static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
-static vsf_linux_fd_t * __vsf_linux_stream(vsf_stream_t *stream)
+static vsf_linux_fd_t * __vsf_linux_stream(vsf_stream_t *stream_rx, vsf_stream_t *stream_tx)
 {
     vsf_linux_fd_t *sfd = NULL;
     vsf_linux_stream_priv_t *stream_priv;
 
     if (vsf_linux_fd_create(&sfd, &__vsf_linux_stream_fdop) >= 0) {
         stream_priv = (vsf_linux_stream_priv_t *)sfd->priv;
-        stream_priv->stream = stream;
+        stream_priv->stream_rx = stream_rx;
+        stream_priv->stream_tx = stream_tx;
     }
     return sfd;
 }
 
 static void __vsf_linux_tx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream)
 {
-    stream->tx.evthandler = __vsf_linux_stream_evthandler;
-    stream->tx.param = sfd;
+    stream->tx.evthandler = NULL;
+    stream->tx.param = NULL;
     vsf_stream_connect_tx(stream);
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -1513,8 +1526,8 @@ static void __vsf_linux_tx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream
 
 static void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream)
 {
-    stream->rx.evthandler = __vsf_linux_stream_evthandler;
-    stream->rx.param = sfd;
+    stream->rx.evthandler = NULL;
+    stream->rx.param = NULL;
     vsf_stream_connect_rx(stream);
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -1525,28 +1538,42 @@ static void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream
     }
 }
 
-vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream)
+vsf_linux_fd_t * vsf_linux_stream(vsf_stream_t *stream_rx, vsf_stream_t *stream_tx)
 {
-    vsf_linux_fd_t *sfd = __vsf_linux_stream(stream);
+    vsf_linux_fd_t *sfd = __vsf_linux_stream(stream_rx, stream_tx);
     if (sfd != NULL) {
-        __vsf_linux_rx_stream_init(sfd, stream);
+        if (stream_rx != NULL) {
+            __vsf_linux_rx_stream_init(sfd, stream_rx);
+        }
+        if (stream_tx != NULL) {
+            __vsf_linux_tx_stream_init(sfd, stream_tx);
+        }
     }
     return sfd;
+}
+
+vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream)
+{
+    return vsf_linux_stream(stream, NULL);
 }
 
 vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream)
 {
-    vsf_linux_fd_t *sfd = __vsf_linux_stream(stream);
-    if (sfd != NULL) {
-        __vsf_linux_tx_stream_init(sfd, stream);
-    }
-    return sfd;
+    return vsf_linux_stream(NULL, stream);
 }
 
-vsf_stream_t * vsf_linux_get_stream(vsf_linux_fd_t *sfd)
+vsf_stream_t * vsf_linux_get_rx_stream(vsf_linux_fd_t *sfd)
 {
     if (sfd->op == &__vsf_linux_stream_fdop) {
-        return ((vsf_linux_stream_priv_t *)sfd->priv)->stream;
+        return ((vsf_linux_stream_priv_t *)sfd->priv)->stream_rx;
+    }
+    return NULL;
+}
+
+vsf_stream_t * vsf_linux_get_tx_stream(vsf_linux_fd_t *sfd)
+{
+    if (sfd->op == &__vsf_linux_stream_fdop) {
+        return ((vsf_linux_stream_priv_t *)sfd->priv)->stream_tx;
     }
     return NULL;
 }
@@ -1561,9 +1588,9 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
 {
     if (&vsf_linux_pipe_rx_fdop == sfd->op) {
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd->priv;
-        VSF_STREAM_READ(priv_rx->stream, NULL, 0xFFFFFFFF);
+        VSF_STREAM_READ(priv_rx->stream_rx, NULL, 0xFFFFFFFF);
         if (priv_rx->is_to_free_stream) {
-            free(priv_rx->stream);
+            free(priv_rx->stream_rx);
         }
     }
     return 0;
@@ -1587,14 +1614,14 @@ vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream)
         queue_stream->max_buffer_size = -1;
         queue_stream->max_entry_num = 1;
         queue_stream->op = &vsf_queue_stream_op;
-        priv_rx->stream = &queue_stream->use_as__vsf_stream_t;
-        vsf_stream_init(priv_rx->stream);
+        priv_rx->stream_rx = &queue_stream->use_as__vsf_stream_t;
+        vsf_stream_init(priv_rx->stream_rx);
 #if VSF_STREAM_CFG_THRESHOLD == ENABLED
-        vsf_stream_set_tx_threshold(priv_rx->stream, 0);
-        vsf_stream_set_rx_threshold(priv_rx->stream, 0);
+        vsf_stream_set_tx_threshold(priv_rx->stream_rx, 0);
+        vsf_stream_set_rx_threshold(priv_rx->stream_rx, 0);
 #endif
 
-        __vsf_linux_rx_stream_init(sfd_rx, priv_rx->stream);
+        __vsf_linux_rx_stream_init(sfd_rx, priv_rx->stream_rx);
     }
     return sfd_rx;
 }
@@ -1605,9 +1632,9 @@ vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_queue_stream_t *queue_stream)
     vsf_linux_fd_t *sfd_tx = NULL;
     if (vsf_linux_fd_create(&sfd_tx, &vsf_linux_pipe_tx_fdop) >= 0) {
         vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
-        priv_tx->stream = &queue_stream->use_as__vsf_stream_t;
+        priv_tx->stream_tx = &queue_stream->use_as__vsf_stream_t;
 
-        __vsf_linux_tx_stream_init(sfd_tx, priv_tx->stream);
+        __vsf_linux_tx_stream_init(sfd_tx, priv_tx->stream_tx);
     }
     return sfd_tx;
 }

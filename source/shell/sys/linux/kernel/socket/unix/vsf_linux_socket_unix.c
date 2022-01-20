@@ -252,8 +252,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     }
     VSF_LINUX_ASSERT(priv->remote->trig != NULL);
 
-    vsf_linux_pipe_rx_priv_t *pipe_priv = (vsf_linux_pipe_rx_priv_t *)priv->rw.sfd_tx->priv;
-    vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)pipe_priv->stream;
+    vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)vsf_linux_get_rx_stream(priv->rw.sfd_tx);
     vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe(queue_stream);
     if (NULL == sfd_tx) {
         priv->remote->remote = NULL;
@@ -324,8 +323,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
             priv_remote->remote = priv_new;
 
             // 2. provide sfd_rx and trigger remote
-            vsf_linux_pipe_rx_priv_t *pipe_priv = (vsf_linux_pipe_rx_priv_t *)priv_remote->rw.sfd_rx->priv;
-            vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)pipe_priv->stream;
+            vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)vsf_linux_get_rx_stream(priv_remote->rw.sfd_rx);
             vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe(queue_stream);
             if (NULL == sfd_tx) {
             close_sockfd_new_and_fail:

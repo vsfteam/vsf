@@ -256,15 +256,14 @@ int __vsh_run_cmd(char *cmd)
     vsf_linux_start_process(process);
 
     if (is_background) {
-        // yield to run new process, and then set current process dominant
+        // yield to new process, make sure main_on_run is called,
+        //  and stdio fds are initialized, then return to vsh, call read will be OK
         vsf_thread_yield();
-        vsf_linux_set_dominant_process();
         return 0;
     } else {
         int result;
         waitpid(process->id.pid, &result, 0);
         close(exefd);
-        vsf_linux_set_dominant_process();
         return result;
     }
 }
