@@ -1391,7 +1391,7 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
     while (size > 0) {
         orig = vsf_protect_sched();
         if (!sfd->priv->rxrdy && (0 == vsf_stream_get_rbuf(stream, NULL))) {
-            if (vsf_linux_fd_is_block(sfd) && stream->tx.ready) {
+            if (vsf_linux_fd_is_block(sfd) && vsf_stream_is_tx_connected(stream)) {
                 vsf_trig_t trig;
                 vsf_linux_fd_trigger_init(&trig);
                 VSF_LINUX_ASSERT((NULL == stream->rx.param) && (NULL == stream->rx.evthandler));

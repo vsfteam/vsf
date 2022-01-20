@@ -173,6 +173,7 @@ vsf_class(vsf_linux_process_t) {
         size_t heap_usage;
         int heap_balance;
 #endif
+        void (*fn_atexit)(void);
     )
 
     private_member(
@@ -197,7 +198,6 @@ vsf_class(vsf_linux_process_t) {
 
         vsf_prio_t prio;
 
-        void (*fn_atexit)(void);
         vsf_linux_process_t *parent_process;
         int ref_cnt;
     )
