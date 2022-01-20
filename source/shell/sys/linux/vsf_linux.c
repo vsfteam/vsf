@@ -442,6 +442,38 @@ vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdi
         }
         process->stdio_stream = *stdio_stream;
         VSF_LINUX_ASSERT(process->working_dir != NULL);
+
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+        vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(cur_process != NULL);
+
+        int envnum = 0;
+        char **environ_from = cur_process->__environ, **environ_to;
+        if (environ_from != NULL) {
+            while (*environ_from++ != NULL) {
+                envnum++;
+            }
+        }
+        if (envnum > 0) {
+            process->__environ = malloc((envnum + 1) * sizeof(char *));
+            if (NULL == process->__environ) {
+            fail_env:
+                vsf_trace_warning("linux: fail to allocate environ, maybe error if environ is used", VSF_TRACE_CFG_LINEEND);
+            } else {
+                environ_to = process->__environ;
+                environ_from = cur_process->__environ;
+                while (*environ_from != NULL) {
+                    *environ_to = strdup(*environ_from);
+                    if (NULL == *environ_to) {
+                        goto fail_env;
+                    }
+                    environ_to++;
+                    environ_from++;
+                }
+                *environ_to = NULL;
+            }
+        }
+#endif
     }
     return process;
 }
@@ -1109,6 +1141,7 @@ int posix_spawnp(pid_t *pid, const char *file,
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     process->shell_process = process;
     ctx->entry = entry;
+    VSF_LINUX_ASSERT(argv != NULL);
     while ((*argv != NULL) && (ctx->arg.argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
         ctx->arg.argv[ctx->arg.argc++] = *argv++;
     }
@@ -1128,6 +1161,16 @@ int posix_spawnp(pid_t *pid, const char *file,
             }
         }
     }
+
+    // env
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+    if (env != NULL) {
+        extern int __putenv(char *string, char ***environ);
+        while (*env != NULL) {
+            __putenv(*env++, &process->__environ);
+        }
+    }
+#endif
 
     // apply actions
     if (actions != NULL) {

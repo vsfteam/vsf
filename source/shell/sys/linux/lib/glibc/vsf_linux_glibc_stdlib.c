@@ -44,11 +44,6 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
-#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-char **environ = NULL;
-#endif
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -248,15 +243,16 @@ char * itoa(int num, char *str, int radix)
 }
 
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-int putenv(char *string)
+int __putenv(char *string, char ***environ)
 {
+    VSF_LINUX_ASSERT(environ != NULL);
     const char * str = strchr(string, '=');
     bool is_to_set = str != NULL;
     size_t namelen = is_to_set ? str - string : strlen(string);
     size_t size = 0;
     bool is_match = false;
 
-    char **env = environ, **env_removed = NULL;
+    char **env = *environ, **env_removed = NULL;
     if (env != NULL) {
         for (char **env_tmp = env; *env_tmp != NULL; env_tmp++, size++) {
             if (    !strncmp(string, *env_tmp, namelen)
@@ -277,7 +273,7 @@ int putenv(char *string)
 
     if (is_to_set) {
         VSF_LINUX_ASSERT(!is_match);
-        environ = env = (char **)realloc(env, (size + 2) * sizeof(char *));
+        *environ = env = (char **)realloc(env, (size + 2) * sizeof(char *));
         if (NULL == env) {
             return -1;
         }
@@ -290,7 +286,7 @@ int putenv(char *string)
     return 0;
 }
 
-char * getenv(const char *name)
+char * __getenv(const char *name, char **environ)
 {
     size_t namelen = strlen(name);
     char **env = environ;
@@ -306,6 +302,20 @@ char * getenv(const char *name)
         }
     }
     return NULL;
+}
+
+int putenv(char *string)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    return __putenv(string, &process->__environ);
+}
+
+char * getenv(const char *name)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    return __getenv(name, process->__environ);
 }
 
 int setenv(const char *name, const char *value, int replace)

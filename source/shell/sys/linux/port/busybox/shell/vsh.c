@@ -564,9 +564,11 @@ int clear_main(int argc, char *argv[])
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
 int export_main(int argc, char *argv[])
 {
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT((process != NULL) && (process->shell_process != NULL));
+
     if (1 == argc) {
-        extern char **environ;
-        char **env = environ;
+        char **env = process->__environ;
         if (NULL == env) {
             return 0;
         }
@@ -593,7 +595,8 @@ int export_main(int argc, char *argv[])
     }
 
     // env_str not belong to us after putenv
-    int ret = putenv(env_str);
+    extern int __putenv(char *string, char ***environ);
+    int ret = __putenv(env_str, &process->shell_process->__environ);
     if (ret) {
         free(env_str);
     }

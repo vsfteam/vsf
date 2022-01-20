@@ -152,6 +152,9 @@ vsf_class(vsf_linux_process_t) {
         char *__optarg;
         int __optreset;
 #endif
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+        char **__environ;
+#endif
     )
 
     protected_member(
