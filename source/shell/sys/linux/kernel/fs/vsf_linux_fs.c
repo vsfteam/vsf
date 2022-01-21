@@ -869,6 +869,7 @@ int open(const char *pathname, int flags, ...)
 
             return creat(fullpath, mode);
         }
+        errno = ENOENT;
         return -1;
     }
 
