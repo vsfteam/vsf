@@ -590,6 +590,20 @@ void vsf_heap_statistics(vsf_heap_statistics_t *statistics)
     __vsf_heap_statistics(&__vsf_heap.use_as__vsf_heap_t, statistics);
 }
 
+char * vsf_heap_strdup(const char *str)
+{
+    if (str != NULL) {
+        int str_len = strlen(str);
+        char *new_str = vsf_heap_malloc(str_len + 1);
+        if (new_str != NULL) {
+            memcpy(new_str, str, str_len);
+            new_str[str_len] = '\0';
+        }
+        return new_str;
+    }
+    return NULL;
+}
+
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
