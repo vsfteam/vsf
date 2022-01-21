@@ -20,7 +20,7 @@
 
 #if APP_USE_BTSTACK_DEMO == ENABLED
 
-#include "vsf.h"
+#include <unistd.h>
 #include "btstack_event.h"
 #include "hci.h"
 

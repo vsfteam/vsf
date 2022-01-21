@@ -86,7 +86,7 @@
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>OGBufferedTerminalOutput</name>
@@ -117,7 +117,7 @@
                 <option>
                     <name>GBECoreSlave</name>
                     <version>27</version>
-                    <state>0</state>
+                    <state>39</state>
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
@@ -367,6 +367,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
@@ -445,7 +446,7 @@
                 </option>
                 <option>
                     <name>IccAllowVLA</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IccStaticDestr</name>
@@ -1457,6 +1458,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
@@ -1544,7 +1546,7 @@
                 </option>
                 <option>
                     <name>IccAllowVLA</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IccStaticDestr</name>
@@ -4713,6 +4715,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
                     <state>//$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
@@ -4838,7 +4841,7 @@
                 </option>
                 <option>
                     <name>IccAllowVLA</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IccStaticDestr</name>

@@ -53,6 +53,7 @@ char * nl_langinfo(nl_item item)
     }
 }
 
+#if !__IS_COMPILER_IAR__
 int abs(int j)
 {
     return (j < 0 ? -j : j);
@@ -67,6 +68,7 @@ long long llabs(long long j)
 {
     return (j < 0 ? -j : j);
 }
+#endif
 
 intmax_t imaxabs(intmax_t j)
 {

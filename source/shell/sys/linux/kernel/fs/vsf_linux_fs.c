@@ -374,7 +374,7 @@ void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd)
 
 void vsf_linux_fd_delete(int fd)
 {
-    return __vsf_linux_fd_delete_ex(NULL, fd);
+    __vsf_linux_fd_delete_ex(NULL, fd);
 }
 
 bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)

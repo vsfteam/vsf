@@ -3324,6 +3324,9 @@
     <ClInclude Include="..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.h">
       <Filter>vsf\service\simple_stream\queue_stream</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\langinfo.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
