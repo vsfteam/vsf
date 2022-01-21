@@ -48,38 +48,34 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_SPI_FN_INIT               VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_init)
-#define VSF_SPI_FN_ENABLE             VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_enable)
-#define VSF_SPI_FN_DISABLE            VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_disable)
-#define VSF_SPI_FN_IRQ_ENABLE         VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_irq_enable)
-#define VSF_SPI_FN_IRQ_DISABLE        VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_irq_disable)
-#define VSF_SPI_FN_STATUS             VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_status)
-#define VSF_SPI_FN_FIFO_READ          VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_fifo_read)
-#define VSF_SPI_FN_FIFO_WRITE         VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_fifo_write)
-#define VSF_SPI_FN_REQUEST_RX         VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_request_rx)
-#define VSF_SPI_FN_REQUEST_TX         VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_request_tx)
-#define VSF_SPI_FN_CANCEL_RX          VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_cancel_rx)
-#define VSF_SPI_FN_CANCEL_TX          VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_cancel_tx)
-#define VSF_SPI_FN_GET_RX_COUNT       VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_get_rx_count)
-#define VSF_SPI_FN_GET_TX_COUNT       VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_get_tx_count)
-#define VSF_SPI_FN_GET_DATA_LENGTH    VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_get_data_length)
+#define VSF_SPI_FN_INIT                 VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_init)
+#define VSF_SPI_FN_ENABLE               VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_enable)
+#define VSF_SPI_FN_DISABLE              VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_disable)
+#define VSF_SPI_FN_IRQ_ENABLE           VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_irq_enable)
+#define VSF_SPI_FN_IRQ_DISABLE          VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_irq_disable)
+#define VSF_SPI_FN_STATUS               VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_status)
+#define VSF_SPI_FN_CS_ACTIVE            VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_cs_active)
+#define VSF_SPI_FN_CS_INACTIVE          VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_cs_inactive)
+#define VSF_SPI_FN_FIFO_TRANSFER        VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_fifo_transfer)
+#define VSF_SPI_FN_REQUEST_TRANSFER     VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_fifo_transfer)
+#define VSF_SPI_FN_CANCEL_TRANSFER      VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_cancel_transfer)
+#define VSF_SPI_FN_GET_TRANSFERED_COUNT VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_get_transfered_count)
 
-#define __VSF_SPI_APIS(__prefix_name)                                                                                   \
-    __VSF_SPI_API(__prefix_name, vsf_err_t,    init,                 vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)            \
-    __VSF_SPI_API(__prefix_name, fsm_rt_t,     enable,               vsf_spi_t *spi_ptr)                                \
-    __VSF_SPI_API(__prefix_name, fsm_rt_t,     disable,              vsf_spi_t *spi_ptr)                                \
-    __VSF_SPI_API(__prefix_name, void,         irq_enable,           vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)    \
-    __VSF_SPI_API(__prefix_name, void,         irq_disable,          vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)    \
-    __VSF_SPI_API(__prefix_name, spi_status_t, status,               vsf_spi_t *spi_ptr)                                \
-    __VSF_SPI_API(__prefix_name, void,         cs_active,            vsf_spi_t *spi_ptr, uint_fast8_t index)            \
-    __VSF_SPI_API(__prefix_name, void,         cs_inactive,          vsf_spi_t *spi_ptr, uint_fast8_t index)            \
-    __VSF_SPI_API(__prefix_name, void,         fifo_transfer,        vsf_spi_t *spi_ptr, void *out_buffer_ptr,          \
-                                                                     uint_fast32_t *out_count_ptr, void *in_buffer_ptr, \
-                                                                     uint_fast32_t *in_count_ptr)                       \
-    __VSF_SPI_API(__prefix_name, bool,         fifo_flush,           vsf_spi_t *spi_ptr)                                \
-    __VSF_SPI_API(__prefix_name, vsf_err_t,    request_transfer,     vsf_spi_t *spi_ptr, void *out_buffer_ptr,          \
-                                                                     void *in_buffer_ptr, uint_fast32_t count)          \
-    __VSF_SPI_API(__prefix_name, vsf_err_t,    cancel_transfer,      vsf_spi_t *spi_ptr)                                \
+#define __VSF_SPI_APIS(__prefix_name)                                                                                                               \
+    __VSF_SPI_API(__prefix_name, vsf_err_t,    init,                 vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)                                        \
+    __VSF_SPI_API(__prefix_name, fsm_rt_t,     enable,               vsf_spi_t *spi_ptr)                                                            \
+    __VSF_SPI_API(__prefix_name, fsm_rt_t,     disable,              vsf_spi_t *spi_ptr)                                                            \
+    __VSF_SPI_API(__prefix_name, void,         irq_enable,           vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)                                \
+    __VSF_SPI_API(__prefix_name, void,         irq_disable,          vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)                                \
+    __VSF_SPI_API(__prefix_name, spi_status_t, status,               vsf_spi_t *spi_ptr)                                                            \
+    __VSF_SPI_API(__prefix_name, void,         cs_active,            vsf_spi_t *spi_ptr, uint_fast8_t index)                                        \
+    __VSF_SPI_API(__prefix_name, void,         cs_inactive,          vsf_spi_t *spi_ptr, uint_fast8_t index)                                        \
+    __VSF_SPI_API(__prefix_name, void,         fifo_transfer,        vsf_spi_t *spi_ptr,                                                            \
+                                                                     void *out_buffer_ptr, uint_fast32_t out_cnt, uint_fast32_t *out_offset_ptr,    \
+                                                                     void *in_buffer_ptr, uint_fast32_t in_cnt, uint_fast32_t *in_offset_ptr)       \
+    __VSF_SPI_API(__prefix_name, vsf_err_t,    request_transfer,     vsf_spi_t *spi_ptr, void *out_buffer_ptr,                                      \
+                                                                     void *in_buffer_ptr, uint_fast32_t count)                                      \
+    __VSF_SPI_API(__prefix_name, vsf_err_t,    cancel_transfer,      vsf_spi_t *spi_ptr)                                                            \
     __VSF_SPI_API(__prefix_name, int_fast32_t, get_transfered_count, vsf_spi_t *spi_ptr)
 
 /*============================ PROTOTYPES ====================================*/

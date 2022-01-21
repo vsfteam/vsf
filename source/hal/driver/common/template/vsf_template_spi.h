@@ -25,8 +25,6 @@
 
 /*============================ MACROS ========================================*/
 
-#define SPI_DATASIZE(__N)       VSF_MCONNECT2(SPI_MODE_DATASIZE_, __N)
-
 #ifndef VSF_SPI_CFG_MULTI_INSTANCES
 #   define VSF_SPI_CFG_MULTI_INSTANCES        DISABLED
 #endif
@@ -60,7 +58,7 @@
 #   define vsf_spi_irq_enable           __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_irq_enable)
 #   define vsf_spi_irq_disable          __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_irq_disable)
 #   define vsf_spi_status               __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_status)
-#   define vsf_spi_cs_active            __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_fifo_read)
+#   define vsf_spi_cs_active            __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cs_active)
 #   define vsf_spi_cs_inactive          __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cs_inactive)
 #   define vsf_spi_fifo_transfer        __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_fifo_transfer)
 #   define vsf_spi_fifo_flush           __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_fifo_flush)
@@ -85,12 +83,11 @@
     vsf_spi_cs_active((vsf_spi_t *)spi_ptr, index)
 #define VSF_SPI_CS_INACTIVE(spi_ptr, index)                                     \
     vsf_spi_cs_inactive((vsf_spi_t *)spi_ptr, index)
-#define VSF_SPI_FIFO_TRANSFER(spi_ptr, out_buffer_ptr, out_count_ptr,           \
-                              in_buffer_ptr, in_count_ptr)                      \
-    vsf_spi_fifo_transfer((vsf_spi_t *)spi_ptr, out_buffer_ptr,                 \
-                          out_count_ptr, in_buffer_ptr, in_count_ptr)
-#define VSF_SPI_FIFO_FLUSH(spi_ptr)                                             \
-    vsf_spi_fifo_flush((vsf_spi_t *)spi_ptr)
+#define VSF_SPI_FIFO_TRANSFER(spi_ptr, out_buffer_ptr, out_cnt, out_offset_ptr, \
+                              in_buffer_ptr, in_cnt, in_offset_ptr)             \
+    vsf_spi_fifo_transfer((vsf_spi_t *)spi_ptr,                                 \
+                          out_buffer_ptr, out_cnt, out_offset_ptr,              \
+                          in_buffer_ptr, in_cnt, in_offset_ptr)
 #define VSF_SPI_REQUEST_TRANSFER(spi_ptr, out_buffer_ptr,                       \
                                  in_buffer_ptr, count)                          \
     vsf_spi_request_transfer((vsf_spi_t *)spi_ptr, out_buffer_ptr,              \
@@ -160,6 +157,9 @@ enum em_spi_mode_t {
 
     SPI_LOOP_BACK               = 0x01ul << 10,     //!< enable loop back
 };
+
+#define SPI_DATASIZE_TO_BYTE(__S)   (((((__S) & SPI_DATASIZE_MASK) >> 4) + 8) / 8)
+
 //! @}
 #endif
 
@@ -242,9 +242,13 @@ typedef struct vsf_spi_op_t {
     spi_capability_t   (*capability)          (vsf_spi_t *spi_ptr);
     void               (*cs_active)           (vsf_spi_t *spi_ptr, uint_fast8_t index);
     void               (*cs_inactive)         (vsf_spi_t *spi_ptr, uint_fast8_t index);
-    void               (*fifo_transfer)       (vsf_spi_t *spi_ptr, void *out_buffer_ptr,
-                                               uint_fast32_t *out_count_ptr, void *in_buffer_ptr,
-                                               uint_fast32_t *in_count_ptr);
+    void               (*fifo_transfer)       (vsf_spi_t *spi_ptr,
+                                               void *out_buffer_ptr,
+                                               uint_fast32_t  out_cnt,
+                                               uint_fast32_t* out_offset_ptr,
+                                               void *in_buffer_ptr,
+                                               uint_fast32_t  in_cnt,
+                                               uint_fast32_t* in_offset_ptr);
     bool               (*fifo_flush)          (vsf_spi_t *spi_ptr);
     vsf_err_t          (*request_transfer)    (vsf_spi_t *spi_ptr, void *out_buffer_ptr,
                                                void *in_buffer_ptr, uint_fast32_t count);
@@ -360,11 +364,11 @@ extern spi_status_t     vsf_spi_status(             vsf_spi_t *spi_ptr);
 
 extern void             vsf_spi_fifo_transfer(      vsf_spi_t *spi_ptr,
                                                     void *out_buffer_ptr,
-                                                    uint_fast32_t* out_count_ptr,
+                                                    uint_fast32_t  out_cnt,
+                                                    uint_fast32_t* out_offset_ptr,
                                                     void *in_buffer_ptr,
-                                                    uint_fast32_t* in_count_ptr);
-
-extern bool             vsf_spi_fifo_flush(         vsf_spi_t *spi_ptr);
+                                                    uint_fast32_t  in_cnt,
+                                                    uint_fast32_t* in_offset_ptr);
 
 extern vsf_err_t        vsf_spi_request_transfer(   vsf_spi_t *spi_ptr,
                                                     void *out_buffer_ptr,
