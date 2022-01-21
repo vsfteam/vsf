@@ -31,8 +31,12 @@
 #   define APP_SPI_DEMO_CFG_SPI                         (vsf_spi_t *)&vsf_spi0
 #endif
 
+#ifndef APP_SPI_DEMO_CFG_DATASIZE
+#   define APP_SPI_DEMO_CFG_DATASIZE                    SPI_DATASIZE_8
+#endif
+
 #ifndef APP_SPI_DEMO_CFG_MODE
-#   define APP_SPI_DEMO_CFG_MODE                        (SPI_MASTER | SPI_MODE_0 | SPI_MSB_FIRST | SPI_AUTO_CS_DISABLE | SPI_DATASIZE_8)
+#   define APP_SPI_DEMO_CFG_MODE                        (SPI_MASTER | SPI_MODE_0 | SPI_MSB_FIRST | SPI_AUTO_CS_ENABLE | APP_SPI_DEMO_CFG_DATASIZE)
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_SPEED
@@ -43,19 +47,58 @@
 #   define APP_SPI_DEMO_IRQ_PRIO                        vsf_arch_prio_2
 #endif
 
+#ifndef APP_SPI_DEMO_CFG_BUFFER_SIZE
+#   define APP_SPI_DEMO_CFG_BUFFER_SIZE                 256
+#endif
+
+#ifndef APP_SPI_DEMO_CFG_FIFO_SEND_TEST
+#   define APP_SPI_DEMO_CFG_FIFO_SEND_TEST              ENABLED
+#endif
+
+#ifndef APP_SPI_DEMO_CFG_FIFO_RECV_TEST
+#   define APP_SPI_DEMO_CFG_FIFO_RECV_TEST              ENABLED
+#endif
+
+#ifndef APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST
+#   define APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST         ENABLED
+#endif
+
+#ifndef APP_SPI_DEMO_CFG_REQUEST_SEND_TEST
+#   define APP_SPI_DEMO_CFG_REQUEST_SEND_TEST           ENABLED
+#endif
+
+#ifndef APP_SPI_DEMO_CFG_REQUEST_RECV_TEST
+#   define APP_SPI_DEMO_CFG_REQUEST_RECV_TEST           ENABLED
+#endif
+
+#ifndef APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST
+#   define APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST      ENABLED
+#endif
+
+#if    (APP_SPI_DEMO_CFG_FIFO_SEND_TEST          == ENABLED) \
+    || (APP_SPI_DEMO_CFG_FIFO_RECV_TEST          == ENABLED) \
+    || (APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST     == ENABLED)
+#   define APP_SPI_DEMO_CFG_FIFO                        ENABLED
+#endif
+
+#if    (APP_SPI_DEMO_CFG_REQUEST_SEND_TEST       == ENABLED) \
+    || (APP_SPI_DEMO_CFG_REQUEST_RECV_TEST       == ENABLED) \
+    || (APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST  == ENABLED)
+#   define APP_SPI_DEMO_CFG_REQUEST                     ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct app_spi_demo_t {
-    volatile bool is_to_exit;
+    uint8_t send_buff[APP_SPI_DEMO_CFG_BUFFER_SIZE * SPI_DATASIZE_TO_BYTE(APP_SPI_DEMO_CFG_DATASIZE)];
+    uint8_t recv_buff[APP_SPI_DEMO_CFG_BUFFER_SIZE * SPI_DATASIZE_TO_BYTE(APP_SPI_DEMO_CFG_DATASIZE)];
 } app_spi_demo_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static app_spi_demo_t __app_spi_demo = {
-    .is_to_exit     = false,
-};
+static app_spi_demo_t __app_spi_demo;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -92,7 +135,7 @@ static vsf_err_t __spi_demo_init(vsf_spi_t * spi,
     return VSF_ERR_NONE;
 }
 
-static void __spi_demo_disable(vsf_spi_t * spi, em_spi_irq_mask_t mask)
+static void __spi_demo_deinit(vsf_spi_t * spi, em_spi_irq_mask_t mask)
 {
     if (mask & SPI_IRQ_MASK) {
         vsf_spi_irq_disable(spi, mask);
@@ -101,16 +144,141 @@ static void __spi_demo_disable(vsf_spi_t * spi, em_spi_irq_mask_t mask)
     while (fsm_rt_cpl != vsf_spi_disable(spi));
 }
 
-static void __spi_demo_fifo_poll_write(vsf_spi_t * spi)
+#if APP_SPI_DEMO_CFG_FIFO == ENABLED
+static void __spi_demo_fifo_poll(vsf_spi_t *spi,
+                                       void             *send_buff,
+                                       void             *recv_buff,
+                                       uint_fast32_t     count)
 {
     VSF_ASSERT(spi != NULL);
-    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
 
     vsf_err_t err = __spi_demo_init(spi, NULL, NULL, APP_SPI_DEMO_IRQ_PRIO, 0);
     VSF_ASSERT(err == VSF_ERR_NONE);
 
-    __spi_demo_disable(spi, 0);
+    uint32_t send_count = 0;
+    uint32_t recv_count = 0;
+
+    while (1) {
+        vsf_spi_fifo_transfer(spi, send_buff, count, &send_count, recv_buff, count, &recv_count);
+        if ((send_count == count) && (recv_count == count)) {
+            break;
+        }
+    }
+
+    __spi_demo_deinit(spi, 0);
 }
+#endif
+
+#if APP_SPI_DEMO_CFG_FIFO_SEND_TEST == ENABLED
+static void __spi_demo_fifo_send_only(vsf_spi_t *spi)
+{
+    VSF_ASSERT(spi != NULL);
+    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
+
+    __spi_demo_fifo_poll(spi, demo->send_buff, NULL, dimof(demo->send_buff));
+}
+#endif
+
+#if APP_SPI_DEMO_CFG_FIFO_RECV_TEST == ENABLED
+static void __spi_demo_fifo_recv_only(vsf_spi_t *spi)
+{
+    VSF_ASSERT(spi != NULL);
+    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
+
+    __spi_demo_fifo_poll(spi, NULL, demo->recv_buff, dimof(demo->send_buff));
+}
+#endif
+
+#if APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST == ENABLED
+static void __spi_demo_fifo_send_recv(vsf_spi_t *spi)
+{
+    VSF_ASSERT(spi != NULL);
+    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
+
+    __spi_demo_fifo_poll(spi, demo->send_buff, demo->recv_buff, dimof(demo->send_buff));
+}
+#endif
+
+#if APP_SPI_DEMO_CFG_REQUEST == ENABLED
+static void __spi_request_isr_handler(void              *target,
+                                      vsf_spi_t         *spi_ptr,
+                                      em_spi_irq_mask_t  irq_mask)
+{
+    app_spi_demo_t * demo = (app_spi_demo_t *)target;
+    VSF_ASSERT(demo != NULL);
+
+    if (irq_mask & SPI_IRQ_MASK_CPL) {
+#if (APP_SPI_DEMO_CFG_MODE & SPI_AUTO_CS_MASK) == SPI_AUTO_CS_DISABLE
+        vsf_spi_cs_inactive(spi_ptr, 0);
+#endif
+
+        __spi_demo_deinit(spi_ptr, 0);
+
+        vsf_trace_debug("spi request finished" VSF_TRACE_CFG_LINEEND, __DATE__, __TIME__);
+        vsf_trace_debug("send buff:" VSF_TRACE_CFG_LINEEND, __DATE__, __TIME__);
+        vsf_trace_buffer(VSF_TRACE_DEBUG, demo->send_buff, dimof(demo->send_buff));
+        vsf_trace_debug("recv buff:" VSF_TRACE_CFG_LINEEND, __DATE__, __TIME__);
+        vsf_trace_buffer(VSF_TRACE_DEBUG, demo->recv_buff, dimof(demo->recv_buff));
+    }
+}
+
+static void __spi_demo_request(app_spi_demo_t   *demo,
+                               vsf_spi_t        *spi_ptr,
+                               void             *send_buff,
+                               void             *recv_buff,
+                               uint_fast32_t     count)
+{
+
+    vsf_err_t err = __spi_demo_init(spi_ptr, __spi_request_isr_handler,
+                          demo, APP_SPI_DEMO_IRQ_PRIO, SPI_IRQ_MASK_CPL);
+    VSF_ASSERT(err == VSF_ERR_NONE);
+
+#if (APP_SPI_DEMO_CFG_MODE & SPI_AUTO_CS_MASK) == SPI_AUTO_CS_DISABLE
+    vsf_spi_cs_active(spi_ptr, 0);
+#endif
+
+    err = vsf_spi_request_transfer(spi_ptr, send_buff, recv_buff, count);
+    VSF_ASSERT(err == VSF_ERR_NONE);
+
+    (void)err;
+}
+#endif
+
+#if APP_SPI_DEMO_CFG_REQUEST_SEND_TEST == ENABLED
+static void __spi_demo_request_send_only(vsf_spi_t *spi_ptr)
+{
+    VSF_ASSERT(spi_ptr != NULL);
+
+    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
+    for (int i = 0; i < sizeof(demo->send_buff); i++) {
+        demo->send_buff[i] = i;
+    }
+    __spi_demo_request(demo, spi_ptr, demo->send_buff, NULL, dimof(demo->send_buff));
+}
+#endif
+
+#if APP_SPI_DEMO_CFG_REQUEST_RECV_TEST == ENABLED
+static void __spi_demo_request_recv_only(vsf_spi_t *spi_ptr)
+{
+    VSF_ASSERT(spi_ptr != NULL);
+
+    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
+    __spi_demo_request(demo, spi_ptr, NULL, demo->recv_buff, dimof(demo->recv_buff));
+}
+#endif
+
+#if APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST == ENABLED
+static void __spi_demo_request_send_recv(vsf_spi_t *spi_ptr)
+{
+    VSF_ASSERT(spi_ptr != NULL);
+
+    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
+    for (int i = 0; i < dimof(demo->send_buff); i++) {
+        demo->send_buff[i] = i;
+    }
+    __spi_demo_request(demo, spi_ptr, demo->send_buff, demo->recv_buff, dimof(demo->send_buff));
+}
+#endif
 
 #if APP_USE_LINUX_DEMO == ENABLED
 int spi_main(int argc, char *argv[])
@@ -124,6 +292,31 @@ int VSF_USER_ENTRY(void)
 #   if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
 #   endif
+#endif
+
+
+#if APP_SPI_DEMO_CFG_FIFO_SEND_TEST == ENABLED
+    __spi_demo_fifo_send_only(APP_SPI_DEMO_CFG_SPI);
+#endif
+
+#if APP_SPI_DEMO_CFG_FIFO_RECV_TEST == ENABLED
+    __spi_demo_fifo_recv_only(APP_SPI_DEMO_CFG_SPI);
+#endif
+
+#if APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST == ENABLED
+    __spi_demo_fifo_send_recv(APP_SPI_DEMO_CFG_SPI);
+#endif
+
+#if APP_SPI_DEMO_CFG_REQUEST_SEND_TEST == ENABLED
+    __spi_demo_request_send_only(APP_SPI_DEMO_CFG_SPI);
+#endif
+
+#if APP_SPI_DEMO_CFG_REQUEST_RECV_TEST == ENABLED
+    __spi_demo_request_recv_only(APP_SPI_DEMO_CFG_SPI);
+#endif
+
+#if APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST == ENABLED
+    __spi_demo_request_send_recv(APP_SPI_DEMO_CFG_SPI);
 #endif
 
     return 0;
