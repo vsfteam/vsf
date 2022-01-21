@@ -40,17 +40,17 @@ extern "C" {
 
 #define REG_SPI0                                    ((REG_SPI_T *)SPI0_BASE_ADDRESS)
 
-/* Define structure member permissions : ‘read only’ */
+/* Define structure member permissions : read only’ */
 #ifndef __IM
 #   define __IM                                     const
 #endif
 
-/* Define structure member permissions : ‘write only’ */
+/* Define structure member permissions : write only’ */
 #ifndef __OM
 #   define __OM
 #endif
 
-/* Define structure member permissions : ‘read or write’ */
+/* Define structure member permissions : read or write’ */
 #ifndef __IOM
 #   define __IOM
 #endif
@@ -69,6 +69,10 @@ extern "C" {
 #   define DEF_SPI_REG(__NAME, __TOTAL_SIZE, ...)                               \
         __VA_ARGS__ reg##__TOTAL_SIZE##_t __NAME
 #endif
+
+#define SPI_DR_DIV              0
+#define SPI_DR_DIV_MASK         ((reg32_t)(0xFFFF << SPI_DR_DIV))
+
 /*============================ TYPES =========================================*/
 
 typedef struct REG_SPI_T {

@@ -16,237 +16,211 @@
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
 
-#include "spi.h"
+#include "../driver.h"
+
 #if VSF_HAL_USE_SPI == ENABLED
 
 #include "sysctrl_api.h"
 #include "../vendor/plf/aic8800/src/driver/dma/dma_api.h"
-#include "../gpio/gpio.h"
 
 #define VSF_SPI_CFG_IMPLEMENT_OP            ENABLED
 #include "hal/driver/common/spi/spi_template.inc"
 
 /*============================ MACROS ========================================*/
 
-#define SPI0_RXDMA_CH_IDX               DMA_CHANNEL_SPI0_RX
-#define SPI0_TXDMA_CH_IDX               DMA_CHANNEL_SPI0_TX
-#define SPI0_RXDMA_IRQ_IDX              DMA08_IRQn
-#define SPI0_TXDMA_IRQ_IDX              DMA09_IRQn
-#define SPI0_DMA_CFG_BYTE_CNT_MAX       (64)
-
-#ifndef SPI0_USE_GPIO
-#   define SPI0_USE_GPIO                vsf_gpio0
+#ifndef SPI_DMA_CFG_BYTE_CNT_MAX
+#   define SPI_DMA_CFG_BYTE_CNT_MAX     64
 #endif
 
-#undef SPI0_USE_GPIO_PIN
-#define SPI0_USE_GPIO_PIN               (1 << 11)
-
-#undef SPI0_CFG_GPIO_FEATURE
-#define SPI0_CFG_GPIO_FEATURE           (0ul)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_HW_SPI_IMP_LV0(__count, __dont_care)                              \
+    static const vsf_hw_spi_cosnt_t vsf_spi ##__count ## _const = {             \
+        .reg = REG_SPI##__count,                                                \
+        .irqn = {                                                               \
+            .spi    = SPI ##__count ## _IRQ_IDX,                                \
+            .dma_rx = SPI ##__count ## _RXDMA_IRQ_IDX,                          \
+            .dma_tx = SPI ##__count ## _TXDMA_IRQ_IDX,                          \
+        },                                                                      \
+        .request = {                                                            \
+            .send = {                                                           \
+                .channel = SPI ##__count ## _TXDMA_CH_IDX,                      \
+                .cid     = SPI ##__count ## _TXDMA_CID,                         \
+            },                                                                  \
+            .recv = {                                                           \
+                .channel = SPI ##__count ## _RXDMA_CH_IDX,                      \
+                .cid     = SPI ##__count ## _RXDMA_CID,                         \
+            },                                                                  \
+        },                                                                      \
+        .clock = {                                                              \
+            .hclk = SPI ##__count## _HCLKME_EN_BIT,                             \
+            .oclk = SPI ##__count## _OCLKME_EN_BIT,                             \
+            .pclk = SPI ##__count## _PCLKME_EN_BIT,                             \
+        },                                                                      \
+    };                                                                          \
     vsf_hw_spi_t vsf_spi##__count = {                                           \
         VSF_SPI_OP                                                              \
-        .param = REG_SPI##__count,                                              \
-        .is_able = false,                                                       \
-    };
-
-#define aic8800_spi_def(__count)                                                \
-    VSF_MREPEAT(__count, __VSF_HW_SPI_IMP_LV0, __count)
+        .spi_const = &vsf_spi##__count ## _const,                               \
+    };                                                                          \
+    void SPI ##__count ## _RXDMA_IRQ(void)                                      \
+    {                                                                           \
+        __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_CPL);                \
+    }                                                                           \
+    void SPI ##__count ## _TXDMA_IRQ(void)                                      \
+    {                                                                           \
+        __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_TX_CPL);             \
+    }
 
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_hw_spi_cosnt_t {
+    REG_SPI_T          *reg;
+
+    struct {
+        IRQn_Type       spi;
+        IRQn_Type       dma_rx;
+        IRQn_Type       dma_tx;
+    } irqn;
+
+    struct {
+        struct {
+            int channel;
+            int cid;
+        } send, recv;
+    } request;
+
+    // TODO: move to pm
+    struct {
+        uint32_t hclk;
+        uint32_t oclk;
+        uint32_t pclk;
+    } clock;
+} vsf_hw_spi_cosnt_t;
 
 typedef struct vsf_hw_spi_t {
 #if VSF_SPI_CFG_MULTI_INSTANCES == ENABLED
     vsf_spi_t vsf_spi;
 #endif
 
-    REG_SPI_T                   *param;
-    spi_cfg_t                   cfg;
-    em_spi_irq_mask_t           irq_msk;
-    spi_status_t                status;
+    const vsf_hw_spi_cosnt_t * spi_const;
+    bool is_auto_cs;
+    vsf_spi_isr_t isr;
+    em_spi_irq_mask_t irq_mask;
+
     struct {
-        uint32_t                count;
-        uint32_t                off_set_64;
+        uint32_t count;
+
         struct {
-            void                *out_buff;
-            void                *in_buff;
-        } buff;
-    } __off_set;
-    bool                        is_able;
-    bool                        is_busy;
+            void *buffer;
+            uint32_t offset;
+        } send, recv;
+    } request;
 } vsf_hw_spi_t;
+
+static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-aic8800_spi_def(1)
+VSF_MREPEAT(SPI_MAX_PORT, __VSF_HW_SPI_IMP_LV0, NULL)
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_err_t __vsf_spi_init(vsf_hw_spi_t *hw_spi_ptr)
+static vsf_err_t __clock_init(vsf_hw_spi_t *hw_spi_ptr, uint32_t clock_hz)
 {
-    uint32_t pclk;
-    uint32_t cr0;
-    cpusysctrl_pclkme_set(CSC_PCLKME_SPI_EN_BIT);
-    cpusysctrl_oclkme_set(CSC_OCLKME_SPI_EN_BIT);
-    cpusysctrl_hclkme_set(CSC_HCLKME_DMA_EN_BIT);
+    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    VSF_HAL_ASSERT(spi_const != NULL);
 
-    pclk = sysctrl_clock_get(SYS_PCLK);
-    hw_spi_ptr->param->DR |= (pclk / 2 / hw_spi_ptr->cfg.clock_hz - 1);
+    cpusysctrl_pclkme_set(spi_const->clock.pclk);
+    cpusysctrl_oclkme_set(spi_const->clock.oclk);
+    cpusysctrl_hclkme_set(spi_const->clock.hclk);
 
-    if (SPI_MODE_0 == (hw_spi_ptr->cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x01ul << 0) |(0x01ul << 1) | (0x00ul << 13);
-    } else if (SPI_MODE_1 == (hw_spi_ptr->cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x00ul << 0) |(0x00ul << 1) | (0x00ul << 13);
-    } else if (SPI_MODE_2 == (hw_spi_ptr->cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x01ul << 0) |(0x01ul << 1) | (0x01ul << 13);
-    } else if (SPI_MODE_3 == (hw_spi_ptr->cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x00ul << 0) |(0x00ul << 1) | (0x01ul << 13);
-    }
-    hw_spi_ptr->param->CR[0] = ((0x0EUL <<  8) | (8 << 2) | cr0);
+    uint32_t pclk = sysctrl_clock_get(SYS_PCLK);
+    int32_t value = pclk / 2 / clock_hz - 1;
 
-    return VSF_ERR_NONE;
-}
-
-
-static vsf_err_t __vsf_spi_request_transfer(vsf_hw_spi_t *hw_spi_ptr, void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count)
-{
-    uint32_t cr0;
-    int ch = SPI0_TXDMA_CH_IDX;
-    if (count > SPI0_DMA_CFG_BYTE_CNT_MAX) {
-        hw_spi_ptr->__off_set.count = count;
-        hw_spi_ptr->__off_set.off_set_64 = 0;
-        hw_spi_ptr->__off_set.buff.out_buff = out_buffer_ptr;
-        hw_spi_ptr->__off_set.buff.in_buff = out_buffer_ptr;
-        count = SPI0_DMA_CFG_BYTE_CNT_MAX;
+    if ((value < 0) || (value > 0xFFFF)) {
+        return VSF_ERR_NOT_SUPPORT;
     } else {
-        hw_spi_ptr->__off_set.count = 0;
+        uint32_t dr_value = spi_const->reg->DR & ~SPI_DR_DIV_MASK;
+        spi_const->reg->DR = dr_value | ((value << SPI_DR_DIV) & SPI_DR_DIV_MASK);
+        return VSF_ERR_NONE;
     }
-    dma_erqcsr_set(REQ_CID_SPI_TX, ch);
-    dma_ch_rqr_erqm_clrb(ch);
-    dma_ch_rqr_erql_setb(ch);
-    dma_ch_dar_set(ch, (unsigned int)(&hw_spi_ptr->param->IOR));
-    dma_ch_sar_set(ch, (unsigned int)out_buffer_ptr);
-    dma_ch_tbl0cr_set(ch, ((1) | (REQ_FRAG << DMA_CH_RQTYP_LSB) | (AHB_BYTE << DMA_CH_DBUSU_LSB) |
-                             (AHB_WORD << DMA_CH_SBUSU_LSB) | DMA_CH_CONSTDA_BIT));
-    dma_ch_tbl1cr_set(ch, count);
-    dma_ch_tbl2cr_set(ch, count);
-    dma_ch_tsr_set(ch, ((4 << DMA_CH_STRANSZ_LSB) | (1 << DMA_CH_DTRANSZ_LSB)));
-    dma_ch_wmar_set(ch, 0);
-    dma_ch_wjar_set(ch, 0);
-    dma_ch_lnar_set(ch, 0);
-    dma_ch_tbl0sr_set(ch, ((0 << DMA_CH_STBL0SZ_LSB) | (0 << DMA_CH_DTBL0SZ_LSB)));
-    dma_ch_tbl1ssr_set(ch, 0);
-    dma_ch_tbl1dsr_set(ch, 0);
-    dma_ch_icsr_set(ch, (DMA_CH_TBL2_IENA_BIT | DMA_CH_CE_IENA_BIT));
-    dma_ch_ctlr_set(ch, (DMA_CH_CHENA_BIT | (0x01UL << DMA_CH_BUSBU_LSB)));
+}
 
-    ch = SPI0_RXDMA_CH_IDX;
-    dma_erqcsr_set(REQ_CID_SPI_RX, ch);
-    dma_ch_rqr_erqm_clrb(ch);
-    dma_ch_rqr_erql_setb(ch);
-    dma_ch_dar_set(ch, (unsigned int)in_buffer_ptr);
-    dma_ch_sar_set(ch, (unsigned int)(&hw_spi_ptr->param->IOR));
-    dma_ch_tbl0cr_set(ch, ((1) | (REQ_FRAG << DMA_CH_RQTYP_LSB) | (AHB_WORD << DMA_CH_DBUSU_LSB) |
-                             (AHB_BYTE << DMA_CH_SBUSU_LSB) | DMA_CH_CONSTSA_BIT));
-    dma_ch_tbl1cr_set(ch, count);
-    dma_ch_tbl2cr_set(ch, count);
-    dma_ch_tsr_set(ch, ((1 << DMA_CH_STRANSZ_LSB) | (4 << DMA_CH_DTRANSZ_LSB)));
-    dma_ch_wmar_set(ch, 0);
-    dma_ch_wjar_set(ch, 0);
-    dma_ch_lnar_set(ch, 0);
-    dma_ch_tbl0sr_set(ch, ((0 << DMA_CH_STBL0SZ_LSB) | (0 << DMA_CH_DTBL0SZ_LSB)));
-    dma_ch_tbl1ssr_set(ch, 0);
-    dma_ch_tbl1dsr_set(ch, 0);
-
-    dma_ch_icsr_set(ch, (DMA_CH_TBL2_IENA_BIT | DMA_CH_CE_IENA_BIT));
-
-    dma_ch_ctlr_set(ch, (DMA_CH_CHENA_BIT | (0x01UL << DMA_CH_BUSBU_LSB)));
-
-    hw_spi_ptr->param->OCR   = count;
-    hw_spi_ptr->param->ICR   = count;
-    hw_spi_ptr->param->MR0   = ((0x01UL << 11) | (0x00UL <<  3)); // slave, generic mode
-    if (SPI_MODE_0 == (hw_spi_ptr->cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x01ul << 0) |(0x01ul << 1) | (0x00ul << 13);
-    } else if (SPI_MODE_1 == (hw_spi_ptr->cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x00ul << 0) |(0x00ul << 1) | (0x00ul << 13);
-    } else if (SPI_MODE_2 == (hw_spi_ptr->cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x01ul << 0) |(0x01ul << 1) | (0x01ul << 13);
-    } else if (SPI_MODE_3 == (hw_spi_ptr->cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x00ul << 0) |(0x00ul << 1) | (0x01ul << 13);
+static vsf_err_t __cfg_check(vsf_hw_spi_t *hw_spi_ptr, spi_cfg_t *cfg_ptr)
+{
+    // TODO: support spi slave mode
+    if ((cfg_ptr->mode & SPI_DIR_MODE_MASK) != SPI_MASTER) {
+        VSF_ASSERT(0);
+        return VSF_ERR_NOT_SUPPORT;
     }
-    hw_spi_ptr->param->CR[0] = ((0x0EUL <<  8) | (8 << 2) | cr0);
-    hw_spi_ptr->param->CR[1] = ((0x03UL << 12) | (0x01UL <<  6));
-    hw_spi_ptr->param->CR[2] = (0x01UL <<  6);
-    hw_spi_ptr->param->CR[3] = ((0x02UL << 8) | (0x01UL << 0));
-    hw_spi_ptr->param->TCR   = (0x01UL << 1);
+
+    // TODO: test spi datasize
+    if ((cfg_ptr->mode & SPI_DATASIZE_MASK) != SPI_DATASIZE_8) {
+        VSF_ASSERT(0);
+        return VSF_ERR_NOT_SUPPORT;
+    }
+
+    // TODO: test spi msb
+    if ((cfg_ptr->mode & SPI_BIT_ORDER_MASK) == SPI_LSB_FIRST) {
+        VSF_ASSERT(0);
+        return VSF_ERR_NOT_SUPPORT;
+    }
 
     return VSF_ERR_NONE;
-}
-
-void SPI0_IRQHandler(void)
-{
-    uint32_t int_st = vsf_spi0.param->IMSR;
-    vsf_spi0.param->ICLR = int_st;
-}
-
-void DMA08_IRQHandler(void)
-{
-    const int ch = SPI0_RXDMA_CH_IDX;
-    uint32_t cr0;
-    dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
-    if (0 != vsf_spi0.__off_set.count) {
-        vsf_spi0.__off_set.count -= SPI0_DMA_CFG_BYTE_CNT_MAX;
-        __vsf_spi_request_transfer(&vsf_spi0,
-                                   (void *)((uint8_t *)vsf_spi0.__off_set.buff.out_buff + SPI0_DMA_CFG_BYTE_CNT_MAX),
-                                   (void *)((uint8_t *)vsf_spi0.__off_set.buff.in_buff + SPI0_DMA_CFG_BYTE_CNT_MAX),
-                                   vsf_spi0.__off_set.count);
-        return;
-    }
-    if ((vsf_spi0.irq_msk & SPI_IRQ_MASK_CPL) && NULL != vsf_spi0.cfg.isr.handler_fn) {
-        vsf_spi0.cfg.isr.handler_fn(vsf_spi0.cfg.isr.target_ptr, (vsf_spi_t *)&vsf_spi0, SPI_IRQ_MASK_CPL);
-    }
-    if (SPI_MODE_0 == (vsf_spi0.cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x01ul << 0) |(0x01ul << 1) | (0x00ul << 13);
-    } else if (SPI_MODE_1 == (vsf_spi0.cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x00ul << 0) |(0x00ul << 1) | (0x00ul << 13);
-    } else if (SPI_MODE_2 == (vsf_spi0.cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x01ul << 0) |(0x01ul << 1) | (0x01ul << 13);
-    } else if (SPI_MODE_3 == (vsf_spi0.cfg.mode & SPI_MODE_3)) {
-        cr0 = (0x00ul << 0) |(0x00ul << 1) | (0x01ul << 13);
-    }
-    vsf_spi0.param->CR[0] = ((0x0EUL <<  8) | cr0);
-    vsf_spi0.param->CR[2] = 0x00UL;
-    vsf_spi0.param->TCR   = 0x00UL;
-    vsf_spi0.is_busy = false;
-}
-
-void DMA09_IRQHandler(void)
-{
-    const int ch = SPI0_TXDMA_CH_IDX;
-    dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
-    if ((vsf_spi0.irq_msk & SPI_IRQ_MASK_TX_CPL) && NULL != vsf_spi0.cfg.isr.handler_fn) {
-        vsf_spi0.cfg.isr.handler_fn(vsf_spi0.cfg.isr.target_ptr, (vsf_spi_t *)&vsf_spi0, SPI_IRQ_MASK_TX_CPL);
-        if (!(vsf_spi0.irq_msk & SPI_IRQ_MASK_CPL)) {
-            vsf_spi0.is_busy = false;
-        }
-    }
 }
 
 vsf_err_t vsf_hw_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
 {
-    vsf_err_t ret;
+    vsf_err_t err;
+
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
     VSF_HAL_ASSERT(cfg_ptr != NULL);
 
-    hw_spi_ptr->cfg = *cfg_ptr;
-    ret = __vsf_spi_init(hw_spi_ptr);
-    hw_spi_ptr->param->MR0 = (((hw_spi_ptr->cfg.mode & SPI_MASTER) << 11) | (0x00ul <<  3));
-    return ret;
+    err = __cfg_check(hw_spi_ptr, cfg_ptr);
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
+
+    err = __clock_init(hw_spi_ptr, cfg_ptr->clock_hz);
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
+
+    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    VSF_HAL_ASSERT(spi_const != NULL);
+    REG_SPI_T *reg = spi_const->reg;
+
+    reg->MR0   = cfg_ptr->mode & SPI_DIR_MODE_MASK;
+    reg->CR[0] = (0x0Ful <<  8) | (cfg_ptr->mode & (SPI_CLOCK_MODE_MASK | SPI_DATASIZE_MASK));
+    reg->CR[1] = (0x03ul << 12) | (0x00ul << 6);
+    reg->CR[2] = (0x01ul <<  6); // en dma
+    reg->CR[3] = ((0x02ul << 8) | (0x01ul << 0));
+
+    hw_spi_ptr->is_auto_cs = !!(cfg_ptr->mode & SPI_AUTO_CS_MASK);
+    hw_spi_ptr->isr = cfg_ptr->isr;
+    if (hw_spi_ptr->isr.handler_fn != NULL) {
+        uint32_t prio = (uint32_t)hw_spi_ptr->isr.prio;
+
+        //reg->IER = (0x01ul << 8);
+        // TODO: add spi interrupt support
+        //NVIC_SetPriority(spi_const->irqn.spi, prio);
+
+        // Because the hardware only support up to 64 bytes at a time
+        // So the DMA interrupt of spi needs to be enalbe for the relay function
+        NVIC_SetPriority(spi_const->irqn.dma_rx, prio);
+        NVIC_SetPriority(spi_const->irqn.dma_tx, prio);
+        NVIC_EnableIRQ(spi_const->irqn.dma_rx);
+        NVIC_EnableIRQ(spi_const->irqn.dma_tx);
+    } else {
+        //NVIC_DisableIRQ(spi_const->irqn.spi);
+        NVIC_DisableIRQ(spi_const->irqn.dma_rx);
+        NVIC_DisableIRQ(spi_const->irqn.dma_tx);
+    }
+
+    return VSF_ERR_NONE;
 }
 
 fsm_rt_t vsf_hw_spi_enable(vsf_spi_t *spi_ptr)
@@ -254,7 +228,6 @@ fsm_rt_t vsf_hw_spi_enable(vsf_spi_t *spi_ptr)
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
 
-    hw_spi_ptr->is_able = true;
     return fsm_rt_cpl;
 }
 
@@ -263,7 +236,6 @@ fsm_rt_t vsf_hw_spi_disable(vsf_spi_t *spi_ptr)
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
 
-    hw_spi_ptr->is_able = false;
     return fsm_rt_cpl;
 }
 
@@ -272,19 +244,7 @@ void vsf_hw_spi_irq_enable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
 
-    if (!hw_spi_ptr->is_able) {
-        return;
-    }
-    hw_spi_ptr->irq_msk = irq_mask;
-    if (irq_mask & SPI_IRQ_MASK_TX_CPL) {
-        NVIC_SetPriority(SPI0_TXDMA_IRQ_IDX, __NVIC_PRIO_LOWEST);
-        NVIC_EnableIRQ(SPI0_TXDMA_IRQ_IDX);
-    }
-    if (irq_mask & SPI_IRQ_MASK_CPL) {
-        hw_spi_ptr->param->IER = (0x01UL << 8);
-        NVIC_SetPriority(SPI0_RXDMA_IRQ_IDX, __NVIC_PRIO_LOWEST);
-        NVIC_EnableIRQ(SPI0_RXDMA_IRQ_IDX);
-    }
+    hw_spi_ptr->irq_mask |= irq_mask;
 }
 
 void vsf_hw_spi_irq_disable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
@@ -292,83 +252,266 @@ void vsf_hw_spi_irq_disable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
 
-    if (!hw_spi_ptr->is_able) {
-        return;
+    hw_spi_ptr->irq_mask &= ~irq_mask;
+}
+
+#if 0
+// TODO : add spi fifi support
+static vsf_err_t __hw_spi_is_send_full(vsf_hw_spi_t *hw_spi_ptr)
+{
+    return true;
+}
+
+static vsf_err_t __hw_spi_is_recv_emtpy(vsf_hw_spi_t *hw_spi_ptr)
+{
+    return true;
+}
+#endif
+
+void vsf_hw_spi_fifo_transfer(vsf_spi_t *spi_ptr,
+                              void *out_buffer_ptr,
+                              uint_fast32_t out_cnt,
+                              uint_fast32_t* out_offset_ptr,
+                              void *in_buffer_ptr,
+                              uint_fast32_t in_cnt,
+                              uint_fast32_t* in_offset_ptr)
+{
+    VSF_HAL_ASSERT(0);
+
+#if 0
+    vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
+    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    VSF_HAL_ASSERT(spi_const != NULL);
+    REG_SPI_T *reg = spi_const->reg;
+    VSF_HAL_ASSERT(reg != NULL);
+
+    uint32_t byte_cnt = SPI_DATASIZE_TO_BYTE(reg->CR[0]);
+    uint8_t *out_buf = (uint8_t *)out_buffer_ptr;
+    uint8_t *in_buf = (uint8_t *)in_buffer_ptr;
+
+    bool is_continue = false;
+    do {
+        uint32_t value = 0;
+
+        if (*out_offset_ptr < out_cnt && __hw_spi_is_send_full(hw_spi_ptr)) {
+            if (out_buf != NULL) {
+                memcpy(&value, out_buf + *out_offset_ptr * byte_cnt, byte_cnt);
+            }
+            reg->IOR = value;
+            (*out_offset_ptr)++;
+
+            is_continue = true;
+        }
+
+        if (*in_offset_ptr < in_cnt && __hw_spi_is_recv_emtpy(hw_spi_ptr)) {
+            uint32_t value = reg->IOR;
+            if (in_buf != NULL) {
+                memcpy(in_buf + *in_offset_ptr * byte_cnt, &value, byte_cnt);
+            }
+            (*in_offset_ptr)++;
+
+            is_continue = true;
+        }
+    } while (is_continue);
+#endif
+}
+
+static void __request_dma(int channel, int cid_num,
+                          uint32_t count, uint32_t src_addr, uint32_t dst_addr,
+                          uint32_t src_size, uint32_t dst_size,
+                          bool src_const_addr, bool dst_const_addr)
+{
+    static const uint8_t __ahb_cnts[] = {AHB_BYTE, AHB_BYTE, AHB_HWORD, AHB_WORD, AHB_WORD};
+
+    uint32_t tbl_val = (__ahb_cnts[dst_size] << DMA_CH_DBUSU_LSB) | (__ahb_cnts[src_size] << DMA_CH_SBUSU_LSB);
+    uint32_t tsr_value = (dst_size << DMA_CH_DTRANSZ_LSB) | (src_size << DMA_CH_STRANSZ_LSB);
+    if (src_const_addr) {
+        tbl_val |= DMA_CH_CONSTSA_BIT;
     }
-    hw_spi_ptr->irq_msk = irq_mask;
-    if (irq_mask & SPI_IRQ_MASK_TX_CPL) {
-        NVIC_DisableIRQ(SPI0_TXDMA_IRQ_IDX);
+    if (dst_const_addr) {
+        tbl_val |= DMA_CH_CONSTDA_BIT;
     }
+
+    dma_erqcsr_set(cid_num, channel);
+    dma_ch_rqr_erqm_clrb(channel);
+    dma_ch_rqr_erql_setb(channel);
+    dma_ch_dar_set(channel, dst_addr);
+    dma_ch_sar_set(channel, src_addr);
+    dma_ch_tbl0cr_set(channel, 1 | (REQ_FRAG << DMA_CH_RQTYP_LSB) | tbl_val);
+    dma_ch_tbl1cr_set(channel, count);
+    dma_ch_tbl2cr_set(channel, count);
+    dma_ch_tsr_set(channel, tsr_value);
+    dma_ch_wmar_set(channel, 0);
+    dma_ch_wjar_set(channel, 0);
+    dma_ch_lnar_set(channel, 0);
+    dma_ch_tbl0sr_set(channel, ((0 << DMA_CH_STBL0SZ_LSB) | (0 << DMA_CH_DTBL0SZ_LSB)));
+    dma_ch_tbl1ssr_set(channel, 0);
+    dma_ch_tbl1dsr_set(channel, 0);
+    dma_ch_icsr_set(channel, (DMA_CH_TBL2_IENA_BIT | DMA_CH_CE_IENA_BIT));
+    dma_ch_ctlr_set(channel, (DMA_CH_CHENA_BIT | (0x01ul << DMA_CH_BUSBU_LSB)));
+}
+
+static void __spi_request_transfer(vsf_hw_spi_t *hw_spi_ptr)
+{
+    static uint32_t __dummy;
+
+    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    VSF_HAL_ASSERT(spi_const != NULL);
+    REG_SPI_T *reg = spi_const->reg;
+    VSF_HAL_ASSERT(reg != NULL);
+
+    VSF_HAL_ASSERT(hw_spi_ptr->request.count > hw_spi_ptr->request.recv.offset);
+
+    uint32_t count = min(hw_spi_ptr->request.count - hw_spi_ptr->request.recv.offset,
+                         SPI_DMA_CFG_BYTE_CNT_MAX);
+    uint32_t byte_cnt = SPI_DATASIZE_TO_BYTE(reg->CR[0]);
+
+    bool send_const_addr;
+    uint8_t *send_buffer = hw_spi_ptr->request.send.buffer;
+    if (send_buffer != NULL) {
+        send_const_addr = false;
+        send_buffer += hw_spi_ptr->request.send.offset * byte_cnt;
+    } else {
+        send_buffer = (uint8_t *)&__dummy;
+        send_const_addr = true;
+    }
+    __request_dma(spi_const->request.send.channel,
+                  spi_const->request.send.cid,
+                  count, (uint32_t)send_buffer, (uint32_t)(&reg->IOR),
+                  byte_cnt, sizeof(reg->IOR), send_const_addr, true);
+
+    bool recv_const_addr;
+    uint8_t *recv_buffer = hw_spi_ptr->request.recv.buffer;
+    if (recv_buffer != NULL) {
+        recv_const_addr = false;
+        recv_buffer += hw_spi_ptr->request.recv.offset * byte_cnt;
+    } else {
+        recv_const_addr = true;
+        recv_buffer = (uint8_t *)&__dummy;
+    }
+    __request_dma(spi_const->request.recv.channel,
+                  spi_const->request.recv.cid,
+                  count, (uint32_t)&reg->IOR, (uint32_t)recv_buffer,
+                  sizeof(reg->IOR), byte_cnt, true, recv_const_addr);
+
+    reg->OCR = count;           // out data cnt
+    reg->ICR = count;           // in data cnt
+    reg->TCR = (0x01ul << 1);   // trans start
+}
+
+static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask)
+{
+    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    VSF_HAL_ASSERT(spi_const != NULL);
+    em_spi_irq_mask_t cb_irq_mask = 0;
+
     if (irq_mask & SPI_IRQ_MASK_CPL) {
-        NVIC_DisableIRQ(SPI0_RXDMA_IRQ_IDX);
+        const int ch = spi_const->request.recv.channel;
+        dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
+
+        hw_spi_ptr->request.recv.offset = min(hw_spi_ptr->request.recv.offset + SPI_DMA_CFG_BYTE_CNT_MAX,
+                                              hw_spi_ptr->request.count);
+        VSF_HAL_ASSERT(hw_spi_ptr->request.count >= hw_spi_ptr->request.recv.offset);
+
+        if (hw_spi_ptr->request.count == hw_spi_ptr->request.recv.offset) {
+            cb_irq_mask = SPI_IRQ_MASK_CPL;
+
+            if (hw_spi_ptr->is_auto_cs) {
+                vsf_hw_spi_cs_inactive((vsf_spi_t *)hw_spi_ptr, 0);
+            }
+        } else {
+            __spi_request_transfer(hw_spi_ptr);
+        }
+    }
+
+    if (irq_mask & SPI_IRQ_MASK_TX_CPL) {
+        const int ch = spi_const->request.send.channel;
+        dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
+
+         hw_spi_ptr->request.send.offset = min(hw_spi_ptr->request.send.offset + SPI_DMA_CFG_BYTE_CNT_MAX,
+                                               hw_spi_ptr->request.count);
+        if (hw_spi_ptr->request.count == hw_spi_ptr->request.send.offset) {
+            cb_irq_mask = SPI_IRQ_MASK_TX_CPL;
+        }
+    }
+
+    cb_irq_mask &= hw_spi_ptr->irq_mask;
+    if (cb_irq_mask) {
+        if (NULL != hw_spi_ptr->isr.handler_fn) {
+            hw_spi_ptr->isr.handler_fn(hw_spi_ptr->isr.target_ptr, (vsf_spi_t *)hw_spi_ptr, cb_irq_mask);
+        }
     }
 }
 
-vsf_err_t vsf_hw_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count)
+vsf_err_t vsf_hw_spi_request_transfer(vsf_spi_t    *spi_ptr,
+                                      void         *send_buffer_ptr,
+                                      void         *recv_buffer_ptr,
+                                      uint_fast32_t count)
 {
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
+    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    VSF_HAL_ASSERT(spi_const != NULL);
+    REG_SPI_T *reg = spi_const->reg;
+    VSF_HAL_ASSERT(reg != NULL);
 
-    VSF_HAL_ASSERT((NULL != out_buffer_ptr) || (NULL != in_buffer_ptr));
-    if (!hw_spi_ptr->is_able) {
-        return VSF_ERR_NOT_READY;
+    hw_spi_ptr->request.count = count;
+    hw_spi_ptr->request.send.offset = 0;
+    hw_spi_ptr->request.send.buffer = send_buffer_ptr;
+    hw_spi_ptr->request.recv.offset = 0;
+    hw_spi_ptr->request.recv.buffer = recv_buffer_ptr;
+
+    if (hw_spi_ptr->is_auto_cs) {
+        vsf_hw_spi_cs_active(spi_ptr, 0);
     }
-    if (hw_spi_ptr->is_busy) {
-        return VSF_ERR_ALREADY_EXISTS;
-    }
-    hw_spi_ptr->is_busy = true;
-    return __vsf_spi_request_transfer(hw_spi_ptr, out_buffer_ptr, in_buffer_ptr, count);
+
+    __spi_request_transfer(hw_spi_ptr);
+
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_spi_cancel_transfer(vsf_spi_t *spi_ptr)
 {
-    //todo:
     VSF_HAL_ASSERT(false);
+    return VSF_ERR_NOT_SUPPORT;
 }
 
 void vsf_hw_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
-    VSF_HAL_ASSERT(hw_spi_ptr->cfg.mode & SPI_AUTO_CS_MASK == SPI_AUTO_CS_DISABLE);
+    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    VSF_HAL_ASSERT(spi_const != NULL);
+    REG_SPI_T *reg = spi_const->reg;
+    VSF_HAL_ASSERT(reg != NULL);
 
-    //vsf_gpio_clear((vsf_gpio_t *)&SPI0_USE_GPIO, 1 << index);
+    reg->CR[0] &= ~(1 << 8);
 }
 
 void vsf_hw_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
-    VSF_HAL_ASSERT(hw_spi_ptr->cfg.mode & SPI_AUTO_CS_MASK == SPI_AUTO_CS_DISABLE);
+    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    VSF_HAL_ASSERT(spi_const != NULL);
+    REG_SPI_T *reg = spi_const->reg;
+    VSF_HAL_ASSERT(reg != NULL);
 
-    //vsf_gpio_set((vsf_gpio_t *)&SPI0_USE_GPIO, 1 << index);
+    reg->CR[0] |= (1 << 8);
 }
 
 spi_status_t vsf_hw_spi_status(vsf_spi_t *spi_ptr)
 {
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
+    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    VSF_HAL_ASSERT(spi_const != NULL);
+    REG_SPI_T *reg = spi_const->reg;
 
-    return hw_spi_ptr->status;
-}
+    spi_status_t status;
+    status.is_busy = (reg->OCR != 0) || (reg->ICR != 0);
 
-void vsf_hw_spi_fifo_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr, uint_fast32_t* out_count_ptr,
-                                               void *in_buffer_ptr,  uint_fast32_t* in_count_ptr)
-{
-    vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
-    VSF_HAL_ASSERT(hw_spi_ptr != NULL);
-
-    //todo:
-    VSF_HAL_ASSERT(false);
-}
-
-bool vsf_hw_spi_fifo_flush(vsf_spi_t *spi_ptr)
-{
-    vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
-    VSF_HAL_ASSERT(hw_spi_ptr != NULL);
-
-    //todo:
-    VSF_HAL_ASSERT(false);
+    return status;
 }
 
 int_fast32_t vsf_hw_spi_get_transfered_count(vsf_spi_t *spi_ptr)
@@ -376,8 +519,7 @@ int_fast32_t vsf_hw_spi_get_transfered_count(vsf_spi_t *spi_ptr)
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
 
-    //todo:
-    VSF_HAL_ASSERT(false);
+    return hw_spi_ptr->request.recv.offset;
 }
 
 #endif      // VSF_HAL_USE_SPI
