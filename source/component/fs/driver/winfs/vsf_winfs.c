@@ -390,7 +390,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_create, vk_file_create)
         err = !CreateDirectoryA(path, NULL) ? VSF_ERR_FAIL : VSF_ERR_NONE;
     } else {
         HANDLE hFile = CreateFileA(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
-            NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
         VSF_LINUX_ASSERT(0 == vsf_local.size);
         err = (INVALID_HANDLE_VALUE == hFile) ? VSF_ERR_FAIL : VSF_ERR_NONE;
     }
