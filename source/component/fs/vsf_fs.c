@@ -752,7 +752,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_create, vk_file_create)
 #if VSF_FS_REF_TRACE == ENABLED
             vsf_trace_debug("create vfs %s" VSF_TRACE_CFG_LINEEND, new_file->name);
 #endif
-            // avoid to be freed
+            // avoid to be freed while closing, can only be freed in unlink
             __vk_file_ref(&new_file->use_as__vk_file_t);
             goto do_return;
         }
