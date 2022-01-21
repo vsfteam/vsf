@@ -240,6 +240,28 @@ char * itoa(int num, char *str, int radix)
     return str;
 }
 
+#if !__IS_COMPILER_IAR__
+int abs(int j)
+{
+    return (j < 0 ? -j : j);
+}
+
+long labs(long j)
+{
+    return (j < 0 ? -j : j);
+}
+
+long long llabs(long long j)
+{
+    return (j < 0 ? -j : j);
+}
+#endif
+
+intmax_t imaxabs(intmax_t j)
+{
+    return (j < 0 ? -j : j);
+}
+
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
 int __putenv(char *string, char ***environ)
 {

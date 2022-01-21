@@ -25,11 +25,9 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/errno.h"
-#   include "../../include/simple_libc/langinfo.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
-#   include <langinfo.h>
 #endif
 
 /*============================ MACROS ========================================*/
@@ -43,36 +41,6 @@
 void vsf_linux_glibc_init(void)
 {
 
-}
-
-char * nl_langinfo(nl_item item)
-{
-    switch (item) {
-    case CODESET:   return "ANSI_X3.4-1968";
-    default:        return NULL;
-    }
-}
-
-#if !__IS_COMPILER_IAR__
-int abs(int j)
-{
-    return (j < 0 ? -j : j);
-}
-
-long labs(long j)
-{
-    return (j < 0 ? -j : j);
-}
-
-long long llabs(long long j)
-{
-    return (j < 0 ? -j : j);
-}
-#endif
-
-intmax_t imaxabs(intmax_t j)
-{
-    return (j < 0 ? -j : j);
 }
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC

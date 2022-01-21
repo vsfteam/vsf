@@ -41,6 +41,7 @@
 #   include "./include/pwd.h"
 #   include "./include/sys/utsname.h"
 #   include "./include/spawn.h"
+#   include "./include/langinfo.h"
 #else
 #   include <unistd.h>
 #   include <sched.h>
@@ -55,6 +56,7 @@
 #   include <pwd.h>
 #   include <sys/utsname.h>
 #   include <spawn.h>
+#   include <langinfo.h>
 #endif
 #include <stdarg.h>
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
@@ -1601,6 +1603,15 @@ int vsf_linux_expandenv(const char *str, char *output, size_t bufflen)
     }
 
     return envlen;
+}
+
+// langinfo
+char * nl_langinfo(nl_item item)
+{
+    switch (item) {
+    case CODESET:   return "ANSI_X3.4-1968";
+    default:        return NULL;
+    }
 }
 
 #if __IS_COMPILER_GCC__
