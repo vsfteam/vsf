@@ -175,7 +175,7 @@ static vsf_err_t __usart_demo_init(vsf_usart_t * usart,
     return VSF_ERR_NONE;
 }
 
-static void __usart_demo_disable(vsf_usart_t * usart, em_usart_irq_mask_t mask)
+static void __usart_demo_deinit(vsf_usart_t * usart, em_usart_irq_mask_t mask)
 {
     if (mask & USART_IRQ_MASK) {
         vsf_usart_irq_disable(usart, mask);
@@ -198,7 +198,7 @@ static void __usart_demo_fifo_poll_write(vsf_usart_t * usart)
     }
 
     while (!__app_usart_demo.is_to_exit);
-    __usart_demo_disable(usart, 0);
+    __usart_demo_deinit(usart, 0);
 }
 #endif
 
@@ -232,7 +232,7 @@ static void __usart_demo_fifo_isr_write(vsf_usart_t * usart)
     __usart_write_isr_handler((void *)demo, usart, USART_IRQ_MASK_TX);
 
     while (!__app_usart_demo.is_to_exit);
-    __usart_demo_disable(usart, 0);
+    __usart_demo_deinit(usart, 0);
 }
 #endif
 
@@ -263,7 +263,7 @@ static void __usart_demo_fifo_isr_read(vsf_usart_t * usart)
 
     while (!demo->is_to_exit);
 
-    __usart_demo_disable(usart, 0);
+    __usart_demo_deinit(usart, 0);
 }
 #endif
 
@@ -284,7 +284,7 @@ static void __usart_fifo_echo(vsf_usart_t * usart)
         }
     }
 
-    __usart_demo_disable(usart, 0);
+    __usart_demo_deinit(usart, 0);
 }
 #endif
 
@@ -310,7 +310,7 @@ static void __usart_fifo_write_then_read(vsf_usart_t * usart)
         }
     }
 
-    __usart_demo_disable(usart, 0);
+    __usart_demo_deinit(usart, 0);
 }
 #endif
 
@@ -336,7 +336,7 @@ static void __usart_isr_handler(void *target,
 
     if (irq_mask & USART_IRQ_MASK_TX_CPL) {
         if (demo->is_to_exit) {
-            __usart_demo_disable(usart, USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+            __usart_demo_deinit(usart, USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
         } else {
             err = vsf_usart_request_rx(usart, demo->buff, sizeof(demo->buff));
             VSF_ASSERT(VSF_ERR_NONE == err);
@@ -385,7 +385,7 @@ static void __usart_isr_handler(void *target,
     }
     if (irq_mask & USART_IRQ_MASK_TX_CPL) {
         if (demo->is_to_exit) {
-            __usart_demo_disable(usart, USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+            __usart_demo_deinit(usart, USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
         }
     }
 }
