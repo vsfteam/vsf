@@ -106,24 +106,19 @@ void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
 }
 
 void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
-                           void *out_buffer_ptr, uint_fast32_t *out_count_ptr,
-                           void *in_buffer_ptr, uint_fast32_t *in_count_ptr)
+                           void *out_buffer_ptr,
+                           uint_fast32_t  out_cnt,
+                           uint_fast32_t* out_offset_ptr,
+                           void *in_buffer_ptr,
+                           uint_fast32_t  in_cnt,
+                           uint_fast32_t* in_offset_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
     VSF_HAL_ASSERT(spi_ptr->op->fifo_transfer != NULL);
 
-    spi_ptr->op->fifo_transfer(spi_ptr, out_buffer_ptr, out_count_ptr,
-                                        in_buffer_ptr,  in_count_ptr);
-}
-
-bool vsf_spi_fifo_flush(vsf_spi_t *spi_ptr)
-{
-    VSF_HAL_ASSERT(spi_ptr != NULL);
-    VSF_HAL_ASSERT(spi_ptr->op != NULL);
-    VSF_HAL_ASSERT(spi_ptr->op->fifo_flush != NULL);
-
-    return spi_ptr->op->fifo_flush(spi_ptr);
+    spi_ptr->op->fifo_transfer(spi_ptr, out_buffer_ptr, out_cnt, out_offset_ptr,
+                                        in_buffer_ptr,  in_cnt, in_offset_ptr);
 }
 
 vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
