@@ -729,6 +729,31 @@ static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
     return VSF_ERR_NONE == err ? 0 : -1;
 }
 
+int __vsf_linux_fs_rename(const char *pathname_old, const char *pathname_new)
+{
+    char fullpath[MAX_PATH], *name_tmp;
+    int err = 0;
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname_old)) {
+        return -1;
+    }
+
+    name_tmp = vk_file_getfilename((char *)fullpath);
+    fullpath[name_tmp - fullpath] = '\0';
+    vk_file_t *dir = __vsf_linux_fs_get_file(fullpath);
+    if (!dir) {
+        return -1;
+    }
+
+    pathname_old = vk_file_getfilename((char *)pathname_old);
+    pathname_new = vk_file_getfilename((char *)pathname_new);
+    vk_file_rename(dir, pathname_old, pathname_new);
+    if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
+        err = -1;
+    }
+    __vsf_linux_fs_close_do(dir);
+    return err;
+}
+
 int mkdir(const char *pathname, mode_t mode)
 {
     if ((NULL == pathname) || ('\0' == *pathname)) {

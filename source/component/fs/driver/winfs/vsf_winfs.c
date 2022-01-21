@@ -39,6 +39,7 @@ dcl_vsf_peda_methods(static, __vk_winfs_write)
 dcl_vsf_peda_methods(static, __vk_winfs_close)
 dcl_vsf_peda_methods(static, __vk_winfs_create)
 dcl_vsf_peda_methods(static, __vk_winfs_unlink)
+dcl_vsf_peda_methods(static, __vk_winfs_rename)
 
 extern vk_file_t * __vk_file_get_fs_parent(vk_file_t *file);
 
@@ -66,7 +67,7 @@ const vk_fs_op_t vk_winfs_op = {
         .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_create),
         .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_unlink),
         .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_rename),
     },
 };
 
@@ -121,6 +122,20 @@ static vsf_err_t __vk_winfs_set_pos(vk_winfs_file_t *file, uint_fast64_t pos)
         return VSF_ERR_FAIL;
     }
     return VSF_ERR_NONE;
+}
+
+static vk_winfs_file_t * __vk_winfs_get_file(vk_winfs_file_t *dir, const char *name)
+{
+    vk_winfs_file_t *result = NULL;
+    vsf_protect_t orig = vsf_protect_sched();
+        __vsf_dlist_foreach_unsafe(vk_winfs_file_t, child_node, &dir->d.child_list) {
+            if (!strcmp(_->name, name)) {
+                result = _;
+                break;
+            }
+        }
+    vsf_unprotect_sched(orig);
+    return result;
 }
 
 #if     __IS_COMPILER_GCC__
@@ -259,12 +274,16 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
         goto do_return;
     }
 
-    vk_winfs_file_t *winfs_file = (vk_winfs_file_t *)vk_file_alloc(sizeof(*winfs_file) + namelen + 1);
+    vk_winfs_file_t *winfs_file = (vk_winfs_file_t *)vk_file_alloc(sizeof(*winfs_file));
     if (NULL == winfs_file) {
         err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         goto do_return;
     }
-    winfs_file->name = (char *)&winfs_file[1];
+    winfs_file->name = vsf_heap_malloc(namelen + 1);
+    if (NULL == winfs_file->name) {
+        err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+        goto do_free_and_return;
+    }
     strcpy(winfs_file->name, vk_file_getfilename(path));
     winfs_file->fsop = &vk_winfs_op;
 
@@ -360,6 +379,9 @@ __vsf_component_peda_ifs_entry(__vk_winfs_close, vk_file_close)
     vk_winfs_file_t *file = (vk_winfs_file_t *)&vsf_this;
     vk_winfs_file_t *parent = (vk_winfs_file_t *)__vk_file_get_fs_parent(&file->use_as__vk_file_t);
 
+    VSF_FS_ASSERT(file->name != NULL);
+    vsf_heap_free(file->name);
+
     if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
         // TODO: Close Directory
     } else {
@@ -399,6 +421,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_create, vk_file_create)
             NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
         VSF_LINUX_ASSERT(0 == vsf_local.size);
         err = (INVALID_HANDLE_VALUE == hFile) ? VSF_ERR_FAIL : VSF_ERR_NONE;
+        CloseHandle(hFile);
     }
     vsf_eda_return(err);
 
@@ -409,6 +432,42 @@ __vsf_component_peda_ifs_entry(__vk_winfs_unlink, vk_file_unlink)
 {
     vsf_peda_begin();
     vsf_eda_return(VSF_ERR_FAIL);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_winfs_rename, vk_file_rename)
+{
+    vsf_peda_begin();
+    vk_winfs_file_t *dir = (vk_winfs_file_t *)&vsf_this;
+    vk_winfs_file_t *child = __vk_winfs_get_file(dir, vsf_local.from_name);
+    char * to_name = vsf_heap_strdup(vsf_local.to_name);
+
+    if (NULL == to_name) {
+        vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
+        return;
+    }
+
+    char from_path[MAX_PATH], to_path[MAX_PATH];
+    __vk_winfs_file_get_path(&dir->use_as__vk_file_t, from_path, sizeof(from_path));
+    strcat(from_path, "\\");
+    strcpy(to_path, from_path);
+    strcat(from_path, vsf_local.from_name);
+    strcat(to_path, vsf_local.to_name);
+
+
+    if (!MoveFileA(from_path, to_path)) {
+        vsf_trace_error("winfs: fail to rename %s to %s %d\r\n", from_path, vsf_local.to_name, GetLastError());
+        vsf_heap_free(to_name);
+        vsf_eda_return(VSF_ERR_FAIL);
+        return;
+    }
+
+    if (child != NULL) {
+        free(child->name);
+        child->name = to_name;
+    }
+
+    vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
 

@@ -64,6 +64,7 @@ dcl_vsf_peda_methods(static, __vk_vfs_unmount)
 dcl_vsf_peda_methods(static, __vk_vfs_lookup)
 dcl_vsf_peda_methods(static, __vk_vfs_create)
 dcl_vsf_peda_methods(static, __vk_vfs_unlink)
+dcl_vsf_peda_methods(static, __vk_vfs_rename)
 dcl_vsf_peda_methods(static, __vk_vfs_close)
 dcl_vsf_peda_methods(static, __vk_vfs_read)
 dcl_vsf_peda_methods(static, __vk_vfs_write)
@@ -97,7 +98,7 @@ vk_fs_op_t vk_vfs_op = {
         .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_create),
         .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_unlink),
         .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_rename),
     },
 };
 
@@ -578,6 +579,27 @@ vsf_err_t vk_file_unlink(vk_file_t *dir, const char *name)
     return err;
 }
 
+vsf_err_t vk_file_rename(vk_file_t *dir, const char *from_name, const char *to_name)
+{
+    vsf_err_t err;
+    if (NULL == dir) {
+        dir = &__vk_fs.rootfs.use_as__vk_file_t;
+    }
+
+    VSF_FS_ASSERT(dir != NULL);
+    VSF_FS_ASSERT(dir->attr & VSF_FILE_ATTR_DIRECTORY);
+    VSF_FS_ASSERT(dir->fsop != NULL);
+    VSF_FS_ASSERT(dir->fsop->dop.fn_rename != NULL);
+    VSF_FS_ASSERT((from_name != NULL) && (*from_name != '\0'));
+    VSF_FS_ASSERT((to_name != NULL) && (*to_name != '\0'));
+
+    __vsf_component_call_peda_ifs(vk_file_rename, err, dir->fsop->dop.fn_rename, dir->fsop->dop.rename_local_size, dir,
+        .from_name  = from_name,
+        .to_name    = to_name,
+    );
+    return err;
+}
+
 #if VSF_FS_CFG_USE_CACHE == ENABLED
 vsf_err_t vk_file_sync(vk_file_t *file)
 {
@@ -776,7 +798,8 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
     case VSF_EVT_INIT:
         if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
             __vsf_component_call_peda_ifs(vk_file_unlink, err, dir->subfs.op->dop.fn_unlink, dir->subfs.op->dop.unlink_local_size, dir->subfs.root,
-                .name = vsf_local.name);
+                .name = vsf_local.name
+            );
             if (VSF_ERR_NONE == err) {
                 break;
             }
@@ -809,6 +832,51 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
     vsf_peda_end();
 }
 
+__vsf_component_peda_ifs_entry(__vk_vfs_rename, vk_file_rename)
+{
+    vsf_peda_begin();
+    vsf_err_t err;
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+            __vsf_component_call_peda_ifs(vk_file_rename, err, dir->subfs.op->dop.fn_rename, dir->subfs.op->dop.rename_local_size, dir->subfs.root,
+                .from_name = vsf_local.from_name,
+                .to_name = vsf_local.to_name,
+            );
+            if (VSF_ERR_NONE == err) {
+                break;
+            }
+
+            err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+        } else {
+            vk_vfs_file_t *child = __vk_vfs_lookup_imp(dir, vsf_local.to_name, NULL);
+            if (NULL == child) {
+                child = __vk_vfs_lookup_imp(dir, vsf_local.from_name, NULL);
+                if (child != NULL) {
+                    char *new_name = vsf_heap_malloc(strlen(vsf_local.to_name) + 1); 
+                    if (new_name != NULL) {
+                        strcpy(new_name, vsf_local.to_name);
+                        free(child->name);
+                        child->name = new_name;
+                        vsf_eda_return(VSF_ERR_NONE);
+                        return;
+                    }
+                }
+            }
+        }
+    case VSF_EVT_RETURN:
+        if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+            err = (vsf_err_t)vsf_eda_get_return_value();
+        } else {
+            err = VSF_ERR_FAIL;
+        }
+        vsf_eda_return(err);
+        break;
+    }
+    vsf_peda_end();
+}
+
 __vsf_component_peda_ifs_entry(__vk_vfs_close, vk_file_close)
 {
     vsf_peda_begin();
@@ -819,6 +887,9 @@ __vsf_component_peda_ifs_entry(__vk_vfs_close, vk_file_close)
         &&  (NULL != file->f.param)) {
         vsf_heap_free(file->f.param);
         file->f.param = NULL;
+    }
+    if (file->name != NULL) {
+        vsf_heap_free(file->name);
     }
 
     vsf_eda_return(VSF_ERR_NONE);
