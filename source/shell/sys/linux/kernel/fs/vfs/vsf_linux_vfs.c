@@ -66,15 +66,22 @@ int vsf_linux_vfs_init(void)
 #endif
 
 #if VSF_LINUX_USE_TERMIOS == ENABLED
-    err = mkdirs(VSF_LINUX_CFG_TERMINFO_PATH "/x", 0);
+    char terminfo_path[MAX_PATH];
+    int terminfo_pathlen;
+    strcpy(terminfo_path, VSF_LINUX_CFG_TERMINFO_PATH "/");
+    terminfo_pathlen = strlen(terminfo_path);
+    terminfo_path[terminfo_pathlen + 0] = VSF_LINUX_CFG_TERMINFO_TYPE[0];
+    terminfo_path[terminfo_pathlen + 1] = '\0';
+    err = mkdirs(terminfo_path, 0);
     if (err != 0) {
-        fprintf(stderr, "fail to mkdir %s\r\n", VSF_LINUX_CFG_TERMINFO_PATH "/x");
+        fprintf(stderr, "fail to mkdir %s\r\n", terminfo_path);
         return err;
     }
     static const char __terminfo[] = {
 #include VSF_LINUX_CFG_TERMINFO_TYPE
     };
-    vsf_linux_fs_bind_buffer(VSF_LINUX_CFG_TERMINFO_PATH "/x/" VSF_LINUX_CFG_TERMINFO_TYPE, 
+    strcat(terminfo_path, "/" VSF_LINUX_CFG_TERMINFO_TYPE);
+    vsf_linux_fs_bind_buffer(terminfo_path,
         (void *)__terminfo, VSF_FILE_ATTR_READ, sizeof(__terminfo));
 
 #   if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED

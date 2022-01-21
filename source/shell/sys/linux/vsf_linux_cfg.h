@@ -58,7 +58,7 @@
 //  Convert the real file by bin2array, and add a the path to the include path.
 // There is some terminfo files copied from ubuntu, to use them,
 //  add vsf/source/shell/sys/linux/kernel/fs/vfs/files/terminfo to include path.
-#       define VSF_LINUX_CFG_TERMINFO_TYPE      "xterm-color"
+#       define VSF_LINUX_CFG_TERMINFO_TYPE      "vt100"
 #   endif
 #endif
 
