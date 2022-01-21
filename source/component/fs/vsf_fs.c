@@ -711,38 +711,59 @@ __vsf_component_peda_ifs_entry(__vk_vfs_lookup, vk_file_lookup)
 __vsf_component_peda_ifs_entry(__vk_vfs_create, vk_file_create)
 {
     vsf_peda_begin();
-    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
-    vk_vfs_file_t *new_file = __vk_vfs_lookup_imp(dir, vsf_local.name, NULL);
-    vsf_protect_t orig;
     vsf_err_t err = VSF_ERR_NONE;
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+            __vsf_component_call_peda_ifs(vk_file_create, err, dir->subfs.op->dop.fn_create, dir->subfs.op->dop.create_local_size, dir->subfs.root,
+                .name       = vsf_local.name,
+                .attr       = vsf_local.attr,
+                .size       = vsf_local.size,
+            );
+            if (VSF_ERR_NONE == err) {
+                break;
+            }
 
-    if (new_file != NULL) {
-        err = VSF_ERR_ALREADY_EXISTS;
-        goto do_return;
-    }
+            goto do_no_resources;
+        } else {
+            vk_vfs_file_t *new_file = __vk_vfs_lookup_imp(dir, vsf_local.name, NULL);
+            if (new_file != NULL) {
+                err = VSF_ERR_ALREADY_EXISTS;
+                goto do_return;
+            }
 
-    new_file = (vk_vfs_file_t *)vk_file_alloc(sizeof(vk_vfs_file_t) + strlen(vsf_local.name) + 1);
-    if (NULL == new_file) {
-        err = VSF_ERR_NOT_ENOUGH_RESOURCES;
-        goto do_return;
-    }
+            new_file = (vk_vfs_file_t *)vk_file_alloc(sizeof(vk_vfs_file_t) + strlen(vsf_local.name) + 1);
+            if (NULL == new_file) {
+            do_no_resources:
+                err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+                goto do_return;
+            }
 
-    strcpy((char *)&new_file[1], vsf_local.name);
-    new_file->name = (char *)&new_file[1];
-    new_file->attr |= vsf_local.attr;
-    new_file->fsop = &vk_vfs_op;
+            strcpy((char *)&new_file[1], vsf_local.name);
+            new_file->name = (char *)&new_file[1];
+            new_file->attr |= vsf_local.attr;
+            new_file->fsop = &vk_vfs_op;
 
-    orig = vsf_protect_sched();
-        vsf_dlist_add_to_tail(vk_vfs_file_t, use_as__vsf_dlist_node_t, &dir->d.child_list, new_file);
-    vsf_unprotect_sched(orig);
-    // avoid to be freed
+            vsf_protect_t orig = vsf_protect_sched();
+                vsf_dlist_add_to_tail(vk_vfs_file_t, use_as__vsf_dlist_node_t, &dir->d.child_list, new_file);
+            vsf_unprotect_sched(orig);
+
 #if VSF_FS_REF_TRACE == ENABLED
-    vsf_trace_debug("create vfs %s" VSF_TRACE_CFG_LINEEND, new_file->name);
+            vsf_trace_debug("create vfs %s" VSF_TRACE_CFG_LINEEND, new_file->name);
 #endif
-    __vk_file_ref(&new_file->use_as__vk_file_t);
-
-do_return:
-    vsf_eda_return(err);
+            // avoid to be freed
+            __vk_file_ref(&new_file->use_as__vk_file_t);
+            goto do_return;
+        }
+    case VSF_EVT_RETURN:
+        if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+            err = (vsf_err_t)vsf_eda_get_return_value();
+        }
+    do_return:
+        vsf_eda_return(err);
+        break;
+    }
     vsf_peda_end();
 }
 
