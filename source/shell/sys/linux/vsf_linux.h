@@ -111,6 +111,8 @@ vsf_class(vsf_linux_thread_t) {
         implement(vsf_thread_t)
         implement(vsf_thread_cb_t)
         const vsf_linux_thread_op_t *op;
+
+        int __errno;
     )
 
     protected_member(
@@ -232,12 +234,14 @@ extern vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process
 extern int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority);
 
 extern void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread);
-extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);
 extern vsf_linux_thread_t * vsf_linux_get_thread(int tid);
 extern vsf_linux_process_t * vsf_linux_get_process(pid_t pid);
 #endif
 
-// open vsf_linux_get_cur_process for getopt variables
+// open vsf_linux_get_cur_thread for thread-related variables like errno, etc
+extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);
+
+// open vsf_linux_get_cur_process for process-related variables like optarg, etc
 extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
 
 #ifdef __cplusplus

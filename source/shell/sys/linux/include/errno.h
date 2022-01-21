@@ -143,7 +143,7 @@ extern "C" {
 #define EKEYREJECTED    129 /* Key was rejected by service */
 
 
-extern int errno;
+#define errno           (vsf_linux_get_cur_thread()->__errno)
 
 #ifdef __cplusplus
 }

@@ -131,8 +131,6 @@ typedef struct vsf_linux_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-int errno;
-
 const struct passwd __vsf_default_passwd = {
     .pw_name            = "vsf",
     .pw_passwd          = "vsf",

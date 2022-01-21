@@ -26,10 +26,12 @@
 #   include "../../include/unistd.h"
 #   include "../../include/sys/types.h"
 #   include "../../include/simple_libc/stdio.h"
+#   include "../../include/errno.h"
 #else
 #   include <unistd.h>
 #   include <sys/types.h>
 #   include <stdio.h>
+#   include <errno.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
 #   include "../../include/simple_libc/string.h"
@@ -422,7 +424,6 @@ int feof(FILE *f)
 #if !__IS_COMPILER_IAR__
 void perror(const char *str)
 {
-    extern int errno;
     fprintf(stderr, "%s: %s\r\n", str, strerror(errno));
 }
 #endif
