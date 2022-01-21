@@ -99,6 +99,22 @@
 #   define I2C_TEMPLATE_COUNT       2
 #endif
 
+#define SPI_MAX_PORT                    1
+
+#define SPI0_IRQ_IDX                    SPI_IRQn
+#define SPI0_IRQ                        SPI_IRQHandler
+#define SPI0_RXDMA_IRQ_IDX              DMA08_IRQn
+#define SPI0_TXDMA_IRQ_IDX              DMA09_IRQn
+#define SPI0_RXDMA_IRQ                  DMA08_IRQHandler
+#define SPI0_TXDMA_IRQ                  DMA09_IRQHandler
+#define SPI0_RXDMA_CH_IDX               DMA_CHANNEL_SPI0_RX
+#define SPI0_TXDMA_CH_IDX               DMA_CHANNEL_SPI0_TX
+#define SPI0_RXDMA_CID                  REQ_CID_SPI_RX
+#define SPI0_TXDMA_CID                  REQ_CID_SPI_TX
+#define SPI0_PCLKME_EN_BIT              CSC_PCLKME_SPI_EN_BIT
+#define SPI0_OCLKME_EN_BIT              CSC_OCLKME_SPI_EN_BIT
+#define SPI0_HCLKME_EN_BIT              CSC_HCLKME_DMA_EN_BIT
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
