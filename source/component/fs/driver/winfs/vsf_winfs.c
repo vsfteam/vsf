@@ -378,12 +378,18 @@ __vsf_component_peda_ifs_entry(__vk_winfs_create, vk_file_create)
     vk_winfs_file_t *dir = (vk_winfs_file_t *)&vsf_this;
     char path[MAX_PATH];
     uint_fast16_t len = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, sizeof(path));
-    int pathlen = strlen(path);
+    int namelen = strlen(vsf_local.name);
     vsf_err_t err;
 
-    if (path[pathlen - 1] != '\\') {
-        path[pathlen + 0] = '\\';
-        path[pathlen + 1] = '\0';
+    if ((len + namelen + 1) > MAX_PATH) {
+        vsf_eda_return(VSF_ERR_FAIL);
+        return;
+    }
+
+    namelen = strlen(path);
+    if (path[namelen - 1] != '\\') {
+        path[namelen + 0] = '\\';
+        path[namelen + 1] = '\0';
     }
     strcat(path, vsf_local.name);
     if (vsf_local.attr & VSF_FILE_ATTR_DIRECTORY) {
