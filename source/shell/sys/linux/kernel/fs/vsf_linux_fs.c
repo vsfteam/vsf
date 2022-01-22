@@ -1149,10 +1149,10 @@ int access(const char *pathname, int mode)
     if (fd < 0) { return -1; }
 
     int ret = 0;
-    vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
-    if (    ((mode & R_OK) && !(vfs_file->attr & VSF_FILE_ATTR_READ))
-        ||  ((mode & W_OK) && !(vfs_file->attr & VSF_FILE_ATTR_WRITE))
-        ||  ((mode & X_OK) && !(vfs_file->attr & VSF_FILE_ATTR_EXECUTE))) {
+    vk_file_t *file = __vsf_linux_get_fs_ex(NULL, fd);
+    if (    ((mode & R_OK) && !(file->attr & VSF_FILE_ATTR_READ))
+        ||  ((mode & W_OK) && !(file->attr & VSF_FILE_ATTR_WRITE))
+        ||  ((mode & X_OK) && !(file->attr & VSF_FILE_ATTR_EXECUTE))) {
         ret = -1;
     }
 
