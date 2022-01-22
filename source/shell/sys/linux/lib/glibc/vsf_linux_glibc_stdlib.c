@@ -24,7 +24,7 @@
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
-#   include "../../include/errno.h
+#   include "../../include/errno.h"
 #   include "../../include/fcntl.h"
 #   include "../../include/simple_libc/stdlib.h"
 #else
