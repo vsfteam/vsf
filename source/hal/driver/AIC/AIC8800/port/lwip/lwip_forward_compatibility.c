@@ -7,6 +7,9 @@
 #include "lwip/arch.h"
 #include "lwip/pbuf.h"
 
+// libwifi depends on errno, but errno in vsf.linux is a MACRO
+int errno;
+
 // API copied from LWIP 2.1.2
 // remove this until vendor updates lwip to 2.1.2
 u8_t
