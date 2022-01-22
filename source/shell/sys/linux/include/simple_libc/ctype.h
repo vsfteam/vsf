@@ -4,9 +4,7 @@
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "../errno.h"
 #else
-#   include <errno.h>
 #endif
 
 #ifdef __cplusplus
