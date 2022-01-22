@@ -296,6 +296,7 @@ extern vsf_err_t vk_file_open(vk_file_t *dir, const char *name, uint_fast16_t id
 extern vsf_err_t vk_file_create(vk_file_t *dir, const char *name, vk_file_attr_t attr, uint_fast64_t size);
 extern vsf_err_t vk_file_unlink(vk_file_t *dir, const char *name);
 extern vsf_err_t vk_file_rename(vk_file_t *olddir, const char *oldname, vk_file_t *newdir, const char *newname);
+extern uint32_t vk_file_get_ref(vk_file_t *file);
 
 extern vsf_err_t vk_file_close(vk_file_t *file);
 extern vsf_err_t vk_file_read(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);

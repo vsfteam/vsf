@@ -732,26 +732,74 @@ static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
 int __vsf_linux_fs_rename(const char *pathname_old, const char *pathname_new)
 {
     char fullpath[MAX_PATH], *name_tmp;
+    vk_file_t *olddir, *newdir, *newfile;
     int err = 0;
+
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname_old)) {
         return -1;
     }
+    olddir = __vsf_linux_fs_get_file(fullpath);
+    if (NULL == olddir) {
+        return -1;
+    }
+    if (vk_file_get_ref(olddir) > 1) {
+        goto do_close_olddir_and_fail;
+    }
+    __vsf_linux_fs_close_do(olddir);
 
     name_tmp = vk_file_getfilename((char *)fullpath);
     fullpath[name_tmp - fullpath] = '\0';
-    vk_file_t *dir = __vsf_linux_fs_get_file(fullpath);
-    if (!dir) {
+    olddir = __vsf_linux_fs_get_file(fullpath);
+    if (!olddir) {
         return -1;
     }
 
+    if (    !(olddir->attr & VSF_FILE_ATTR_WRITE)
+        ||  vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname_new)) {
+        goto do_close_olddir_and_fail;
+    }
     pathname_old = vk_file_getfilename((char *)pathname_old);
     pathname_new = vk_file_getfilename((char *)pathname_new);
-    vk_file_rename(dir, pathname_old, pathname_new);
+
+    newfile = __vsf_linux_fs_get_file(fullpath);
+    name_tmp = vk_file_getfilename((char *)fullpath);
+    fullpath[name_tmp - fullpath] = '\0';
+    newdir = __vsf_linux_fs_get_file(fullpath);
+    if (newfile != NULL) {
+        uint32_t newfile_ref = vk_file_get_ref(newfile);
+        __vsf_linux_fs_close_do(newfile);
+        if (newfile_ref > 1) {
+            goto do_close_newdir_olddir_and_fail;
+        }
+
+        vk_file_unlink(newdir, pathname_new);
+        vsf_err_t err = (vsf_err_t)vsf_eda_get_return_value();
+        if (err != VSF_ERR_NONE) {
+            goto do_close_newdir_olddir_and_fail;
+        }
+    }
+
+    if (!newdir) {
+        goto do_close_olddir_and_fail;
+    }
+    if (!(newdir->attr & VSF_FILE_ATTR_WRITE)) {
+        goto do_close_newdir_olddir_and_fail;
+    }
+
+    vk_file_rename(olddir, pathname_old, newdir, pathname_new);
     if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
         err = -1;
     }
-    __vsf_linux_fs_close_do(dir);
+
+    __vsf_linux_fs_close_do(olddir);
+    __vsf_linux_fs_close_do(newdir);
     return err;
+
+do_close_newdir_olddir_and_fail:
+    __vsf_linux_fs_close_do(newdir);
+do_close_olddir_and_fail:
+    __vsf_linux_fs_close_do(olddir);
+    return -1;
 }
 
 int mkdir(const char *pathname, mode_t mode)

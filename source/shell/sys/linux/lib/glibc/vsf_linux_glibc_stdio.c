@@ -443,6 +443,9 @@ char * tmpnam(char *str)
 
 int rename(const char *old_filename, const char *new_filename)
 {
+    if (!strcmp(old_filename, "/")) {
+        return -1;
+    }
     extern int __vsf_linux_fs_rename(const char *pathname, const char *toname);
     return __vsf_linux_fs_rename(old_filename, new_filename);
 }

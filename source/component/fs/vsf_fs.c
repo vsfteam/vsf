@@ -163,6 +163,11 @@ static void __vk_file_deref_parent(vk_file_t *file)
     }
 }
 
+uint32_t vk_file_get_ref(vk_file_t *file)
+{
+    return (NULL == file) ? 0 : file->ref;
+}
+
 vk_file_t * vk_file_alloc(uint_fast16_t size)
 {
     vk_file_t *file = VSF_FS_CFG_MALLOC(size);
