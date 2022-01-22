@@ -1104,7 +1104,10 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\api_lib.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\api_msg.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\err.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\if_api.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\if_api.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netbuf.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netdb.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netifapi.c" />

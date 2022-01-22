@@ -8026,9 +8026,6 @@
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\api\err.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\api\if_api.c</name>
-                                </file>
-                                <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\api\netbuf.c</name>
                                 </file>
                                 <file>
