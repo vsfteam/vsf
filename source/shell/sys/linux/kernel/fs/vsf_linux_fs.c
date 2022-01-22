@@ -1170,6 +1170,16 @@ int unlink(const char *pathname)
     return __vsf_linux_fs_remove(pathname, S_IFMT & ~S_IFDIR);
 }
 
+int symlink(const char *target, const char *linkpath)
+{
+    return -1;
+}
+
+ssize_t readlink(const char *pathname, char *buf, size_t bufsiz)
+{
+    return -1;
+}
+
 DIR * opendir(const char *name)
 {
     int fd = open(name, 0);
