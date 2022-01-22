@@ -264,6 +264,7 @@ void vk_fs_init(void)
     memset(&__vk_fs, 0, sizeof(__vk_fs));
     __vk_fs.rootfs.attr = VSF_FILE_ATTR_DIRECTORY;
     __vk_fs.rootfs.fsop = &vk_vfs_op;
+    __vk_file_ref(&__vk_fs.rootfs.use_as__vk_file_t);
     vsf_eda_crit_init(&__vk_fs.open.lock);
 }
 
