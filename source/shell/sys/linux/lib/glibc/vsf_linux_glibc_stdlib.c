@@ -251,6 +251,16 @@ int mkstemp(char *template)
     return mkostemps(template, 0, 0);
 }
 
+char * mkdtemp(char *template)
+{
+    char *name = mktemp(template);
+    if (NULL == name) {
+        return NULL;
+    }
+
+    return (mkdir(name, 0) < 0) ? NULL : name;
+}
+
 char * itoa(int num, char *str, int radix)
 {
     char index[] = "0123456789ABCDEF";

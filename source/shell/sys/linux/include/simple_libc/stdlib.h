@@ -36,6 +36,7 @@ extern "C" {
 #define mkostemp            VSF_LINUX_LIBC_WRAPPER(mkostemp)
 #define mkstemps            VSF_LINUX_LIBC_WRAPPER(mkstemps)
 #define mkostemps           VSF_LINUX_LIBC_WRAPPER(mkostemps)
+#define mkdtemp             VSF_LINUX_LIBC_WRAPPER(mkdtemp)
 #endif
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
@@ -86,6 +87,7 @@ int mkstemp(char *template_str);
 int mkostemp(char *template_str, int flags);
 int mkstemps(char *template_str, int suffixlen);
 int mkostemps(char *template_str, int suffixlen, int flags);
+char * mkdtemp(char *template_str);
 
 int abs(int x);
 typedef struct {
