@@ -24,9 +24,13 @@
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
+#   include "../../include/errno.h
+#   include "../../include/fcntl.h"
 #   include "../../include/simple_libc/stdlib.h"
 #else
 #   include <unistd.h>
+#   include <errno.h>
+#   include <fcntl.h>
 #   include <stdlib.h>
 #endif
 
@@ -179,16 +183,57 @@ int system(const char * cmd)
     return result;
 }
 
-char * mktemp(char *template_str)
+char * mktemps(char *template, int suffixlen)
 {
-    VSF_LINUX_ASSERT(false);
-    return NULL;
+    static const char __letters[] =
+"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+
+    int len = strlen(template);
+    if (    (len < (6 + suffixlen))
+        ||  memcmp(&template[len - 6 - suffixlen], "XXXXXX", 6)) {
+        set_errno(EINVAL);
+        return NULL;
+    }
+
+    char *XXXXXX = &template[len - 6 - suffixlen];
+    uint64_t value = vsf_systimer_get_tick(), value_tmp;
+    value = value ^ bswap_64(value);
+
+    for (int retry = 0; retry < 4; value += 7777, retry++) {
+        value_tmp = value;
+        XXXXXX[0] = __letters[value_tmp % dimof(__letters)];
+        value_tmp /= dimof(__letters);
+        XXXXXX[1] = __letters[value_tmp % dimof(__letters)];
+        value_tmp /= dimof(__letters);
+        XXXXXX[2] = __letters[value_tmp % dimof(__letters)];
+        value_tmp /= dimof(__letters);
+        XXXXXX[3] = __letters[value_tmp % dimof(__letters)];
+        value_tmp /= dimof(__letters);
+        XXXXXX[4] = __letters[value_tmp % dimof(__letters)];
+        value_tmp /= dimof(__letters);
+        XXXXXX[5] = __letters[value_tmp % dimof(__letters)];
+
+        if (open(template, 0) < 0) {
+            break;
+        }
+    }
+
+    return template;
+}
+
+char * mktemp(char *template)
+{
+    return mktemps(template, 0);
 }
 
 int mkostemps(char *template, int suffixlen, int flags)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    char *name = mktemps(template, suffixlen);
+    if (NULL == name) {
+        return -1;
+    }
+
+    return open(name, flags | O_CREAT);
 }
 
 int mkostemp(char *template, int flags)

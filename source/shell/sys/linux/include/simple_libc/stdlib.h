@@ -30,6 +30,7 @@ extern "C" {
 #define setenv              VSF_LINUX_LIBC_WRAPPER(setenv)
 #define unsetenv            VSF_LINUX_LIBC_WRAPPER(unsetenv)
 #   endif
+#define mktemps             VSF_LINUX_LIBC_WRAPPER(mktemps)
 #define mktemp              VSF_LINUX_LIBC_WRAPPER(mktemp)
 #define mkstemp             VSF_LINUX_LIBC_WRAPPER(mkstemp)
 #define mkostemp            VSF_LINUX_LIBC_WRAPPER(mkostemp)
@@ -79,6 +80,7 @@ char * getenv(const char *name);
 int setenv(const char *name, const char *value, int replace);
 int unsetenv(const char *name);
 #endif
+char * mktemps(char *template_str, int suffixlen);
 char * mktemp(char *template_str);
 int mkstemp(char *template_str);
 int mkostemp(char *template_str, int flags);
