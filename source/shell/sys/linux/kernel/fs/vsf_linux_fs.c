@@ -687,10 +687,6 @@ static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr
         err = -1;
     }
     __vsf_linux_fs_close_do(dir);
-    if (!err) {
-        err = open(pathname, 0);
-    }
-
     return err;
 }
 
@@ -808,12 +804,7 @@ int mkdir(const char *pathname, mode_t mode)
         return -1;
     }
 
-    int fd = __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
-    if (fd >= 0) {
-        close(fd);
-        fd = 0;
-    }
-    return fd;
+    return __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
 
 int mkdirs(const char *pathname, mode_t mode)
@@ -913,7 +904,10 @@ int creat(const char *pathname, mode_t mode)
     if ((NULL == pathname) || ('\0' == *pathname)) {
         return -1;
     }
-    return __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+    if (__vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0) < 0) {
+        return -1;
+    }
+    return open(pathname, 0);
 }
 
 int open(const char *pathname, int flags, ...)
