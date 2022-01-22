@@ -610,9 +610,9 @@ vsf_err_t vk_file_rename(vk_file_t *olddir, const char *oldname, vk_file_t *newd
     VSF_FS_ASSERT((oldname != NULL) && (*oldname != '\0'));
 
     vk_file_t *root = __vk_file_get_fs_root(olddir);
-    VSF_LINUX_ASSERT(root != NULL);
+    VSF_FS_ASSERT(root != NULL);
     vk_file_t *newroot = (newdir != NULL) ? __vk_file_get_fs_root(newdir) : root;
-    VSF_LINUX_ASSERT(newroot != NULL);
+    VSF_FS_ASSERT(newroot != NULL);
     if (root != newroot) {
         return VSF_ERR_INVALID_PARAMETER;
     }
