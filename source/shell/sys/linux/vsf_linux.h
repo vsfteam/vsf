@@ -244,6 +244,9 @@ extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);
 // open vsf_linux_get_cur_process for process-related variables like optarg, etc
 extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
 
+extern int vsf_linux_get_errno(void);
+extern void vsf_linux_set_errno(int err);
+
 #ifdef __cplusplus
 }
 #endif

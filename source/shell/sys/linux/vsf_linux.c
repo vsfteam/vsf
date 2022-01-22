@@ -175,6 +175,20 @@ int vsf_linux_create_fhs(void)
 }
 #endif
 
+int vsf_linux_get_errno(void)
+{
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+    return thread->__errno;
+}
+
+void vsf_linux_set_errno(int err)
+{
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+    thread->__errno = err;
+}
+
 int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in)
 {
     char working_dir[MAX_PATH];
@@ -916,7 +930,7 @@ char * getcwd(char *buffer, size_t maxlen)
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
     if (strlen(process->working_dir) >= maxlen) {
-        errno = ERANGE;
+        set_errno(ERANGE);
         return NULL;
     }
     strcpy(buffer, process->working_dir);
