@@ -56,6 +56,7 @@ const vk_fs_op_t vk_winfs_op = {
 #if VSF_FS_CFG_USE_CACHE == ENABLED
     .fn_sync        = vk_file_dummy,
 #endif
+    .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_rename),
     .fop            = {
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_write),
@@ -67,7 +68,6 @@ const vk_fs_op_t vk_winfs_op = {
         .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_create),
         .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_unlink),
         .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_rename),
     },
 };
 
@@ -438,33 +438,40 @@ __vsf_component_peda_ifs_entry(__vk_winfs_unlink, vk_file_unlink)
 __vsf_component_peda_ifs_entry(__vk_winfs_rename, vk_file_rename)
 {
     vsf_peda_begin();
-    vk_winfs_file_t *dir = (vk_winfs_file_t *)&vsf_this;
-    vk_winfs_file_t *child = __vk_winfs_get_file(dir, vsf_local.from_name);
-    char * to_name = vsf_heap_strdup(vsf_local.to_name);
+    vk_winfs_file_t *oldfile = __vk_winfs_get_file((vk_winfs_file_t *)vsf_local.olddir, vsf_local.oldname);
+    char *newname;
 
-    if (NULL == to_name) {
-        vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
-        return;
+    if (vsf_local.newname != NULL) {
+        newname = vsf_heap_malloc(strlen(vsf_local.newname) + 1);
+        if (NULL == newname) {
+            vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
+            return;
+        }
+        strcpy(newname, vsf_local.newname);
+    } else {
+        newname = (char *)vsf_local.oldname;
     }
 
-    char from_path[MAX_PATH], to_path[MAX_PATH];
-    __vk_winfs_file_get_path(&dir->use_as__vk_file_t, from_path, sizeof(from_path));
-    strcat(from_path, "\\");
-    strcpy(to_path, from_path);
-    strcat(from_path, vsf_local.from_name);
-    strcat(to_path, vsf_local.to_name);
+    char oldpath[MAX_PATH], newpath[MAX_PATH];
+    __vk_winfs_file_get_path(vsf_local.olddir, oldpath, sizeof(oldpath));
+    strcat(oldpath, "\\");
+    strcat(oldpath, vsf_local.oldname);
+    __vk_winfs_file_get_path(vsf_local.newdir, newpath, sizeof(newpath));
+    strcat(newpath, "\\");
+    strcat(newpath, newname);
 
-
-    if (!MoveFileA(from_path, to_path)) {
-        vsf_trace_error("winfs: fail to rename %s to %s %d\r\n", from_path, vsf_local.to_name, GetLastError());
-        vsf_heap_free(to_name);
+    if (!MoveFileA(oldpath, newpath)) {
+        vsf_trace_error("winfs: fail to rename %s to %s %d\r\n", oldpath, newpath, GetLastError());
+        if (vsf_local.newname != NULL) {
+            vsf_heap_free(newname);
+        }
         vsf_eda_return(VSF_ERR_FAIL);
         return;
     }
 
-    if (child != NULL) {
-        free(child->name);
-        child->name = to_name;
+    if (oldfile != NULL) {
+        free(oldfile->name);
+        oldfile->name = newname;
     }
 
     vsf_eda_return(VSF_ERR_NONE);

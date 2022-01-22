@@ -119,12 +119,10 @@ vsf_class(vk_fs_dop_t) {
         uint8_t create_local_size;
         uint8_t unlink_local_size;
         uint8_t chmod_local_size;
-        uint8_t rename_local_size;
         vsf_peda_evthandler_t fn_lookup;
         vsf_peda_evthandler_t fn_create;
         vsf_peda_evthandler_t fn_unlink;
         vsf_peda_evthandler_t fn_chmod;
-        vsf_peda_evthandler_t fn_rename;
     )
 };
 
@@ -137,8 +135,10 @@ vsf_class(vk_fs_op_t) {
 #if VSF_FS_CFG_USE_CACHE == ENABLED
         uint8_t sync_local_size;
 #endif
+        uint8_t rename_local_size;
         vsf_peda_evthandler_t fn_mount;
         vsf_peda_evthandler_t fn_unmount;
+        vsf_peda_evthandler_t fn_rename;
 #if VSF_FS_CFG_USE_CACHE == ENABLED
         vsf_peda_evthandler_t sync;
 #endif
@@ -254,12 +254,15 @@ __vsf_component_peda_ifs(vk_file_unlink,
 )
 __vsf_component_peda_ifs(vk_file_lookup,
     const char      *name;
+    // TODO: idx will be removed later, use readdir to enumerate directories
     uint32_t        idx;
     vk_file_t       **result;
 )
 __vsf_component_peda_ifs(vk_file_rename,
-    const char *from_name;
-    const char *to_name;
+    vk_file_t       *olddir;
+    const char      *oldname;
+    vk_file_t       *newdir;
+    const char      *newname;
 )
 __vsf_component_peda_ifs(vk_file_read,
     uint64_t        offset;
@@ -292,7 +295,7 @@ extern vsf_err_t vk_fs_sync(vk_file_t *dir);
 extern vsf_err_t vk_file_open(vk_file_t *dir, const char *name, uint_fast16_t idx, vk_file_t **file);
 extern vsf_err_t vk_file_create(vk_file_t *dir, const char *name, vk_file_attr_t attr, uint_fast64_t size);
 extern vsf_err_t vk_file_unlink(vk_file_t *dir, const char *name);
-extern vsf_err_t vk_file_rename(vk_file_t *dir, const char *from_name, const char *to_name);
+extern vsf_err_t vk_file_rename(vk_file_t *olddir, const char *oldname, vk_file_t *newdir, const char *newname);
 
 extern vsf_err_t vk_file_close(vk_file_t *file);
 extern vsf_err_t vk_file_read(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);

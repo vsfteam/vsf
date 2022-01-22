@@ -87,6 +87,7 @@ vk_fs_op_t vk_vfs_op = {
 #if VSF_FS_CFG_USE_CACHE == ENABLED
     .fn_sync        = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
 #endif
+    .fn_rename      = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_rename),
     .fop            = {
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_close),
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_read),
@@ -98,7 +99,6 @@ vk_fs_op_t vk_vfs_op = {
         .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_create),
         .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_unlink),
         .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_rename),
     },
 };
 
@@ -239,6 +239,19 @@ vk_file_t * __vk_file_get_fs_parent(vk_file_t *file)
         }
     }
     return parent;
+}
+
+vk_file_t * __vk_file_get_fs_root(vk_file_t *file)
+{
+    if (file->fsop == &vk_vfs_op) {
+        return &__vk_fs.rootfs.use_as__vk_file_t;
+    }
+
+    vk_file_t *root = file;
+    while ((root != NULL) && !(root->attr & VSF_VFS_FILE_ATTR_MOUNTED)) {
+        root = root->parent;
+    }
+    return root;
 }
 
 void vk_fs_init(void)
@@ -579,23 +592,31 @@ vsf_err_t vk_file_unlink(vk_file_t *dir, const char *name)
     return err;
 }
 
-vsf_err_t vk_file_rename(vk_file_t *dir, const char *from_name, const char *to_name)
+vsf_err_t vk_file_rename(vk_file_t *olddir, const char *oldname, vk_file_t *newdir, const char *newname)
 {
     vsf_err_t err;
-    if (NULL == dir) {
-        dir = &__vk_fs.rootfs.use_as__vk_file_t;
+    if (NULL == olddir) {
+        olddir = &__vk_fs.rootfs.use_as__vk_file_t;
     }
 
-    VSF_FS_ASSERT(dir != NULL);
-    VSF_FS_ASSERT(dir->attr & VSF_FILE_ATTR_DIRECTORY);
-    VSF_FS_ASSERT(dir->fsop != NULL);
-    VSF_FS_ASSERT(dir->fsop->dop.fn_rename != NULL);
-    VSF_FS_ASSERT((from_name != NULL) && (*from_name != '\0'));
-    VSF_FS_ASSERT((to_name != NULL) && (*to_name != '\0'));
+    VSF_FS_ASSERT(olddir != NULL);
+    VSF_FS_ASSERT(olddir->attr & VSF_FILE_ATTR_DIRECTORY);
+    VSF_FS_ASSERT((NULL == newdir) || (newdir->attr & VSF_FILE_ATTR_DIRECTORY));
+    VSF_FS_ASSERT((oldname != NULL) && (*oldname != '\0'));
 
-    __vsf_component_call_peda_ifs(vk_file_rename, err, dir->fsop->dop.fn_rename, dir->fsop->dop.rename_local_size, dir,
-        .from_name  = from_name,
-        .to_name    = to_name,
+    vk_file_t *root = __vk_file_get_fs_root(olddir);
+    VSF_LINUX_ASSERT(root != NULL);
+    vk_file_t *newroot = (newdir != NULL) ? __vk_file_get_fs_root(newdir) : root;
+    VSF_LINUX_ASSERT(newroot != NULL);
+    if (root != newroot) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+
+    __vsf_component_call_peda_ifs(vk_file_rename, err, root->fsop->fn_rename, root->fsop->rename_local_size, root,
+        .olddir     = olddir,
+        .oldname    = oldname,
+        .newdir     = newdir,
+        .newname    = newname,
     );
     return err;
 }
@@ -836,13 +857,15 @@ __vsf_component_peda_ifs_entry(__vk_vfs_rename, vk_file_rename)
 {
     vsf_peda_begin();
     vsf_err_t err;
-    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
+    vk_vfs_file_t *root = (vk_vfs_file_t *)&vsf_this;
     switch (evt) {
     case VSF_EVT_INIT:
-        if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
-            __vsf_component_call_peda_ifs(vk_file_rename, err, dir->subfs.op->dop.fn_rename, dir->subfs.op->dop.rename_local_size, dir->subfs.root,
-                .from_name = vsf_local.from_name,
-                .to_name = vsf_local.to_name,
+        if (root->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+            __vsf_component_call_peda_ifs(vk_file_rename, err, root->subfs.op->fn_rename, root->subfs.op->rename_local_size, root->subfs.root,
+                .olddir     = vsf_local.olddir,
+                .oldname    = vsf_local.oldname,
+                .newdir     = vsf_local.newdir,
+                .newname    = vsf_local.newname,
             );
             if (VSF_ERR_NONE == err) {
                 break;
@@ -850,27 +873,57 @@ __vsf_component_peda_ifs_entry(__vk_vfs_rename, vk_file_rename)
 
             err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         } else {
-            vk_vfs_file_t *child = __vk_vfs_lookup_imp(dir, vsf_local.to_name, NULL);
-            if (NULL == child) {
-                child = __vk_vfs_lookup_imp(dir, vsf_local.from_name, NULL);
-                if (child != NULL) {
-                    char *new_name = vsf_heap_malloc(strlen(vsf_local.to_name) + 1); 
-                    if (new_name != NULL) {
-                        strcpy(new_name, vsf_local.to_name);
-                        free(child->name);
-                        child->name = new_name;
-                        vsf_eda_return(VSF_ERR_NONE);
-                        return;
-                    }
-                }
+            vk_vfs_file_t *olddir = (vk_vfs_file_t *)vsf_local.olddir;
+            vk_vfs_file_t *newdir = (vk_vfs_file_t *)vsf_local.newdir;
+            vk_vfs_file_t *oldfile = __vk_vfs_lookup_imp(olddir, vsf_local.oldname, NULL);
+            vk_vfs_file_t *newfile;
+            char *newname;
+
+            if (vsf_local.newname != NULL) {
+                newfile = __vk_vfs_lookup_imp(newdir, vsf_local.newname, NULL);
+            } else {
+                newfile = __vk_vfs_lookup_imp(newdir, vsf_local.oldname, NULL);
             }
+
+            if (newfile != NULL) {
+                err = VSF_ERR_ALREADY_EXISTS;
+                goto do_exit;
+            } else if (oldfile != NULL) {
+                err = VSF_ERR_NOT_AVAILABLE;
+                goto do_exit;
+            }
+
+            if (vsf_local.newname != NULL) {
+                newname = vsf_heap_malloc(strlen(vsf_local.newname) + 1);
+                if (NULL == newname) {
+                    err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+                    goto do_exit;
+                }
+                strcpy(newname, vsf_local.newname);
+
+                free(oldfile->name);
+                oldfile->name = newname;
+            } else {
+                newname = (char *)vsf_local.oldname;
+            }
+
+            if (newdir != NULL) {
+                vsf_protect_t orig = vsf_protect_sched();
+                    vsf_dlist_remove(vk_vfs_file_t, use_as__vsf_dlist_node_t, &olddir->d.child_list, oldfile);
+                    vsf_dlist_add_to_tail(vk_vfs_file_t, use_as__vsf_dlist_node_t, &newdir->d.child_list, oldfile);
+                vsf_unprotect_sched(orig);
+            }
+
+            vsf_eda_return(VSF_ERR_NONE);
+            return;
         }
     case VSF_EVT_RETURN:
-        if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+        if (root->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
             err = (vsf_err_t)vsf_eda_get_return_value();
         } else {
             err = VSF_ERR_FAIL;
         }
+    do_exit:
         vsf_eda_return(err);
         break;
     }
