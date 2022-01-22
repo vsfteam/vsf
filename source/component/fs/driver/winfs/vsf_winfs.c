@@ -403,7 +403,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_create, vk_file_create)
     int namelen = strlen(vsf_local.name);
     vsf_err_t err;
 
-    if ((len + namelen + 1) > MAX_PATH) {
+    if ((len + 1/* possible '\\' */ + namelen + 1) > MAX_PATH) {
         vsf_eda_return(VSF_ERR_FAIL);
         return;
     }
@@ -415,7 +415,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_create, vk_file_create)
     }
     strcat(path, vsf_local.name);
     if (vsf_local.attr & VSF_FILE_ATTR_DIRECTORY) {
-        err = !CreateDirectoryA(path, NULL) ? VSF_ERR_FAIL : VSF_ERR_NONE;
+        err = CreateDirectoryA(path, NULL) ? VSF_ERR_NONE : VSF_ERR_FAIL;
     } else {
         HANDLE hFile = CreateFileA(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
             NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -431,7 +431,38 @@ __vsf_component_peda_ifs_entry(__vk_winfs_create, vk_file_create)
 __vsf_component_peda_ifs_entry(__vk_winfs_unlink, vk_file_unlink)
 {
     vsf_peda_begin();
-    vsf_eda_return(VSF_ERR_FAIL);
+    vk_winfs_file_t *dir = (vk_winfs_file_t *)&vsf_this;
+    char path[MAX_PATH];
+    uint_fast16_t len = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, sizeof(path));
+    int namelen = strlen(vsf_local.name);
+    vsf_err_t err;
+
+    if ((len + 1/* possible '\\' */ + namelen + 1) > MAX_PATH) {
+        vsf_eda_return(VSF_ERR_FAIL);
+        return;
+    }
+
+    namelen = strlen(path);
+    if (path[namelen - 1] != '\\') {
+        path[namelen + 0] = '\\';
+        path[namelen + 1] = '\0';
+    }
+    strcat(path, vsf_local.name);
+
+    DWORD dwAttribute = GetFileAttributesA(path);
+    if (INVALID_FILE_ATTRIBUTES == dwAttribute) {
+    do_not_available:
+        err = VSF_ERR_NOT_AVAILABLE;
+        goto do_return;
+    }
+
+    if (dwAttribute & FILE_ATTRIBUTE_DIRECTORY) {
+        err = RemoveDirectoryA(path) ? VSF_ERR_NONE : VSF_ERR_FAIL;
+    } else {
+        err = DeleteFileA(path) ? VSF_ERR_NONE : VSF_ERR_FAIL;
+    }
+do_return:
+    vsf_eda_return(err);
     vsf_peda_end();
 }
 
