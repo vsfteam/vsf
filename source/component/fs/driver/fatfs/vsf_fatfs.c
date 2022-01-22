@@ -180,6 +180,7 @@ const vk_fs_op_t vk_fatfs_op = {
 #if VSF_FS_CFG_USE_CACHE == ENABLED
     .fn_sync                = vk_file_dummy,
 #endif
+    .fn_rename              = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     .fop                    = {
         .read_local_size    = sizeof(vk_fatfs_read_local),
         .fn_read            = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_read),
@@ -193,7 +194,6 @@ const vk_fs_op_t vk_fatfs_op = {
         .fn_create          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
         .fn_unlink          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
         .fn_chmod           = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_rename          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
 };
 

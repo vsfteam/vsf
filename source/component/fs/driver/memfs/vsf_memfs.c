@@ -48,6 +48,7 @@ const vk_fs_op_t vk_memfs_op = {
 #if VSF_FS_CFG_USE_CACHE == ENABLED
     .fn_sync        = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
 #endif
+    .fn_rename      = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     .fop            = {
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_write),
@@ -59,7 +60,6 @@ const vk_fs_op_t vk_memfs_op = {
         .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
         .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
         .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
 };
 

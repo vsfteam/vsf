@@ -56,7 +56,7 @@ const vk_fs_op_t vk_winfs_op = {
 #if VSF_FS_CFG_USE_CACHE == ENABLED
     .fn_sync        = vk_file_dummy,
 #endif
-    .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_rename),
+    .fn_rename      = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_rename),
     .fop            = {
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_write),
