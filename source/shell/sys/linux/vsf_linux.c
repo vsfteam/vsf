@@ -1233,7 +1233,7 @@ int posix_spawnp(pid_t *pid, const char *file,
                 sfd = __vsf_linux_fd_get_ex(process, a->action.dup2_action.fd);
                 if (sfd != NULL) {
                     int ret = __vsf_linux_fd_create_ex(process, &sfd_new, sfd->op, a->action.dup2_action.newfd, false);
-                    if (!ret) {
+                    if (ret >= 0) {
                         vsf_linux_fd_priv_t *priv = sfd->priv;
                         orig = vsf_protect_sched();
                             priv->ref++;
