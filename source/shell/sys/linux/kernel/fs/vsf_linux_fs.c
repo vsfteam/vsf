@@ -81,11 +81,14 @@ static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd);
+static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
+static int __vsf_linux_stream_rx_eof(vsf_linux_fd_t *sfd);
+static int __vsf_linux_stream_tx_eof(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
@@ -98,6 +101,7 @@ const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
     .fn_read            = __vsf_linux_fs_read,
     .fn_write           = __vsf_linux_fs_write,
     .fn_close           = __vsf_linux_fs_close,
+    .fn_eof             = __vsf_linux_fs_eof,
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -115,6 +119,7 @@ const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop = {
     .fn_fcntl           = __vsf_linux_pipe_fcntl,
     .fn_read            = __vsf_linux_stream_read,
     .fn_close           = __vsf_linux_pipe_close,
+    .fn_eof             = __vsf_linux_stream_rx_eof,
 };
 
 const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
@@ -122,6 +127,7 @@ const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
     .fn_fcntl           = __vsf_linux_pipe_fcntl,
     .fn_write           = __vsf_linux_stream_write,
     .fn_close           = __vsf_linux_pipe_close,
+    .fn_eof             = __vsf_linux_stream_tx_eof,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -197,6 +203,12 @@ static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd)
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     __vsf_linux_fs_close_do(priv->file);
     return 0;
+}
+
+static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    return !(priv->file->size - priv->pos);
 }
 
 vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd)
@@ -1582,6 +1594,18 @@ static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd)
         }
     }
     return 0;
+}
+
+static int __vsf_linux_stream_rx_eof(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    return !vsf_stream_is_tx_connected(priv->stream_rx);
+}
+
+static int __vsf_linux_stream_tx_eof(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    return !vsf_stream_is_rx_connected(priv->stream_rx);
 }
 
 static vsf_linux_fd_t * __vsf_linux_stream(vsf_stream_t *stream_rx, vsf_stream_t *stream_tx)

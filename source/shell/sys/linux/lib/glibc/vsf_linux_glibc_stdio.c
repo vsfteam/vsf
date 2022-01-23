@@ -408,11 +408,10 @@ void clearerr(FILE *f)
 int feof(FILE *f)
 {
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
-    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
-    // -Wcast-align by gcc
-    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-
-    return !(priv->file->size - priv->pos);
+    if (sfd->op->fn_eof != NULL) {
+        return sfd->op->fn_eof(sfd);
+    }
+    return 0;
 }
 
 #if __IS_COMPILER_GCC__

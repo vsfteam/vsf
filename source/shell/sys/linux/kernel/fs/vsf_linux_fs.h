@@ -48,6 +48,7 @@ typedef struct vsf_linux_fd_op_t {
     ssize_t (*fn_read)(vsf_linux_fd_t *sfd, void *buf, size_t count);
     ssize_t (*fn_write)(vsf_linux_fd_t *sfd, const void *buf, size_t count);
     int (*fn_close)(vsf_linux_fd_t *sfd);
+    int (*fn_eof)(vsf_linux_fd_t *sfd);
 } vsf_linux_fd_op_t;
 
 vsf_class(vsf_linux_fd_priv_t) {
