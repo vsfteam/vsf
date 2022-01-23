@@ -166,6 +166,7 @@ extern void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size);
 extern void vsf_heap_free_imp(void *buffer);
 extern void vsf_heap_statistics(vsf_heap_statistics_t *statistics);
 
+extern void * vsf_heap_calloc(uint_fast32_t n, uint_fast32_t size);
 extern char * vsf_heap_strdup(const char *str);
 
 #endif

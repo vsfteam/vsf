@@ -582,12 +582,24 @@ void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size)
 
 void vsf_heap_free_imp(void *buffer)
 {
-    __vsf_heap_free(&__vsf_heap.use_as__vsf_heap_t, buffer);
+    if (buffer != NULL) {
+        __vsf_heap_free(&__vsf_heap.use_as__vsf_heap_t, buffer);
+    }
 }
 
 void vsf_heap_statistics(vsf_heap_statistics_t *statistics)
 {
     __vsf_heap_statistics(&__vsf_heap.use_as__vsf_heap_t, statistics);
+}
+
+void * vsf_heap_calloc(uint_fast32_t n, uint_fast32_t size)
+{
+    size *= n;
+    void *buff = vsf_heap_malloc(size);
+    if (buff != NULL) {
+        memset(buff, 0, size);
+    }
+    return buff;
 }
 
 char * vsf_heap_strdup(const char *str)
