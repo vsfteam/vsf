@@ -235,6 +235,33 @@ int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char
     return 0;
 }
 
+void __vsf_linux_process_free_arg(vsf_linux_process_arg_t *arg)
+{
+    if (arg->is_dyn_argv) {
+        arg->is_dyn_argv = false;
+        for (int i = 0; i < arg->argc; i++) {
+            free((void *)arg->argv[i]);
+            arg->argv[i] = NULL;
+        }
+    }
+}
+
+int __vsf_linux_process_parse_arg(vsf_linux_process_arg_t *arg, char const * const * argv)
+{
+    arg->is_dyn_argv = true;
+    arg->argc = 0;
+    while ((*argv != NULL) && (arg->argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
+        arg->argv[arg->argc] = strdup(*argv);
+        if (NULL == arg->argv[arg->argc]) {
+            vsf_trace_error("linux: fail to allocate space for %s" VSF_TRACE_CFG_LINEEND, *argv);
+            return -1;
+        }
+        arg->argc++;
+        argv++;
+    }
+    return 0;
+}
+
 static int __vsf_linux_init_thread(int argc, char *argv[])
 {
     int err = vsf_linux_create_fhs();
@@ -635,6 +662,7 @@ static void __vsf_linux_process_unref(vsf_linux_process_t *process)
         if (process->thread_pending != NULL) {
             vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
         }
+        __vsf_linux_process_free_arg(&process->ctx.arg);
         vsf_heap_free(process);
 
         if (parent_process != NULL) {
@@ -690,7 +718,7 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     }
 }
 
-exec_ret_t execvp(const char *pathname, char const* const* argv)
+exec_ret_t execvp(const char *pathname, char const * const * argv)
 {
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
@@ -703,10 +731,8 @@ exec_ret_t execvp(const char *pathname, char const* const* argv)
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_thread_t *thread;
 
-    ctx->arg.argc = 0;
-    while ((*argv != NULL) && (ctx->arg.argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
-        ctx->arg.argv[ctx->arg.argc++] = *argv++;
-    }
+    __vsf_linux_process_free_arg(&ctx->arg);
+    __vsf_linux_process_parse_arg(&ctx->arg, argv);
     ctx->entry = entry;
 
     vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
@@ -740,6 +766,8 @@ static exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_thread_t *thread;
     const char *args;
+
+    __vsf_linux_process_free_arg(&ctx->arg);
 
     ctx->arg.argc = 1;
     ctx->arg.argv[0] = arg;
@@ -1172,9 +1200,7 @@ int posix_spawnp(pid_t *pid, const char *file,
     process->shell_process = process;
     ctx->entry = entry;
     VSF_LINUX_ASSERT(argv != NULL);
-    while ((*argv != NULL) && (ctx->arg.argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
-        ctx->arg.argv[ctx->arg.argc++] = *argv++;
-    }
+    __vsf_linux_process_parse_arg(&ctx->arg, (const char * const *)argv);
 
     // dup fds
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
@@ -1188,6 +1214,8 @@ int posix_spawnp(pid_t *pid, const char *file,
                 orig = vsf_protect_sched();
                     ((vsf_linux_fd_priv_t *)_->priv)->ref++;
                 vsf_unprotect_sched(orig);
+            } else {
+                vsf_trace_error("spawn: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
             }
         }
     }
@@ -1198,10 +1226,13 @@ int posix_spawnp(pid_t *pid, const char *file,
         extern int __putenv(char *string, char ***environ);
         char *cur_env;
         while (*env != NULL) {
-            cur_env = strdup(*env++);
+            cur_env = strdup(*env);
             if (cur_env != NULL) {
                 __putenv(cur_env, &process->__environ);
+            } else {
+                vsf_trace_error("spawn: failed to dup env %s", VSF_TRACE_CFG_LINEEND, *env);
             }
+            env++;
         }
     }
 #endif
@@ -1214,12 +1245,16 @@ int posix_spawnp(pid_t *pid, const char *file,
             switch (a->tag) {
             case spawn_do_close:
                 sfd = __vsf_linux_fd_get_ex(process, a->action.close_action.fd);
-                if (sfd != NULL) {
-                    orig = vsf_protect_sched();
-                        ((vsf_linux_fd_priv_t *)sfd->priv)->ref--;
-                    vsf_unprotect_sched(orig);
-                    __vsf_linux_fd_delete_ex(process, sfd->fd);
+                if (NULL == sfd) {
+                    vsf_trace_error("spawn: action: failed to close fd %d", VSF_TRACE_CFG_LINEEND,
+                        a->action.close_action.fd);
+                    continue;
                 }
+
+                orig = vsf_protect_sched();
+                    ((vsf_linux_fd_priv_t *)sfd->priv)->ref--;
+                vsf_unprotect_sched(orig);
+                __vsf_linux_fd_delete_ex(process, sfd->fd);
                 break;
             case spawn_do_dup2:
                 sfd = __vsf_linux_fd_get_ex(process, a->action.dup2_action.newfd);
@@ -1231,16 +1266,23 @@ int posix_spawnp(pid_t *pid, const char *file,
                 }
 
                 sfd = __vsf_linux_fd_get_ex(process, a->action.dup2_action.fd);
-                if (sfd != NULL) {
-                    int ret = __vsf_linux_fd_create_ex(process, &sfd_new, sfd->op, a->action.dup2_action.newfd, false);
-                    if (ret >= 0) {
-                        vsf_linux_fd_priv_t *priv = sfd->priv;
-                        orig = vsf_protect_sched();
-                            priv->ref++;
-                        vsf_unprotect_sched(orig);
-                        sfd_new->priv = priv;
-                    }
+                if (NULL == sfd) {
+                action_fail_dup:
+                    vsf_trace_error("spawn: action: failed to dup fd %d", VSF_TRACE_CFG_LINEEND,
+                        a->action.dup2_action.fd);
+                    continue;
                 }
+
+                int ret = __vsf_linux_fd_create_ex(process, &sfd_new, sfd->op, a->action.dup2_action.newfd, false);
+                if (ret < 0) {
+                    goto action_fail_dup;
+                }
+
+                vsf_linux_fd_priv_t *priv = sfd->priv;
+                orig = vsf_protect_sched();
+                    priv->ref++;
+                vsf_unprotect_sched(orig);
+                sfd_new->priv = priv;
                 break;
             case spawn_do_open:
                 VSF_LINUX_ASSERT(false);
@@ -1248,6 +1290,9 @@ int posix_spawnp(pid_t *pid, const char *file,
             case spawn_do_fchdir: {
                     vk_file_t *file = __vsf_linux_get_fs_ex(process, a->action.fchdir_action.fd);
                     if (NULL == file) {
+                    action_fail_fchdir:
+                        vsf_trace_error("spawn: action: failed to fchdir fd %d", VSF_TRACE_CFG_LINEEND,
+                            a->action.fchdir_action.fd);
                         continue;
                     }
 
@@ -1266,13 +1311,16 @@ int posix_spawnp(pid_t *pid, const char *file,
                     }
 
                     if (NULL == ptr) {
-                        continue;
+                        goto action_fail_fchdir;
                     }
                     a->action.chdir_action.path = ptr;
                 }
                 // fall through
             case spawn_do_chdir:
-                vsf_linux_chdir(process, a->action.chdir_action.path);
+                if (vsf_linux_chdir(process, a->action.chdir_action.path) < 0) {
+                    vsf_trace_error("spawn: action: failed to chdir fd %s", VSF_TRACE_CFG_LINEEND,
+                        a->action.chdir_action.path);
+                }
                 break;
             }
         }

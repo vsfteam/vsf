@@ -90,6 +90,7 @@ vsf_dcl_class(vsf_linux_thread_t)
 typedef struct vsf_linux_process_arg_t {
     int argc;
     char const *argv[VSF_LINUX_CFG_MAX_ARG_NUM + 1];
+    bool is_dyn_argv;
 } vsf_linux_process_arg_t;
 
 typedef int (*vsf_linux_main_entry_t)(int, char **);
@@ -236,6 +237,9 @@ extern int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priorit
 extern void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread);
 extern vsf_linux_thread_t * vsf_linux_get_thread(int tid);
 extern vsf_linux_process_t * vsf_linux_get_process(pid_t pid);
+
+extern void __vsf_linux_process_free_arg(vsf_linux_process_arg_t *arg);
+extern int __vsf_linux_process_parse_arg(vsf_linux_process_arg_t *arg, char const * const * argv);
 #endif
 
 // open vsf_linux_get_cur_thread for thread-related variables like errno, etc
