@@ -92,6 +92,7 @@ enum {
     SO_RCVBUF,
     SO_RCVTIMEO,
     SO_SNDTIMEO,
+    SO_NONBLOCK,
 };
 int setsockopt(int socket, int level, int optname, const void *optval,
                     socklen_t optlen);

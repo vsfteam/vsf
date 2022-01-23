@@ -213,8 +213,8 @@ static int lwip_sockopt_to_ipopt(int optname)
     return SOF_BROADCAST;
   case SO_KEEPALIVE:
     return SOF_KEEPALIVE;
-//  case SO_REUSEADDR:
-//    return SOF_REUSEADDR;
+  case SO_REUSEADDR:
+    return SOF_REUSEADDR;
   default:
     LWIP_ASSERT("Unknown socket option", 0);
     return 0;
@@ -297,6 +297,22 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
         case SO_RCVBUF:
             netconn_set_recvbufsize(conn, *(const int *)optval);
             break;
+        case SO_REUSEADDR:
+            if (    (optname == SO_BROADCAST)
+                &&  (NETCONNTYPE_GROUP(conn->type) != NETCONN_UDP)) {
+                return ENOPROTOOPT;
+            }
+
+            optname = lwip_sockopt_to_ipopt(optname);
+            if (*(const int *)optval) {
+                ip_set_option(conn->pcb.ip, optname);
+            } else {
+                ip_reset_option(conn->pcb.ip, optname);
+            }
+            break;
+        case SO_NONBLOCK:
+            netconn_set_nonblocking(conn, *(const int *)optval);
+            break;
         default:
             // TODO: add support
             VSF_LINUX_ASSERT(false);
@@ -330,6 +346,16 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
             break;
         case SO_RCVBUF:
             *(int *)optval = netconn_get_recvbufsize(conn);
+            break;
+        case SO_REUSEADDR:
+            if (    (optname == SO_BROADCAST)
+                &&  (NETCONNTYPE_GROUP(conn->type) != NETCONN_UDP)) {
+                return ENOPROTOOPT;
+            }
+
+            optname = lwip_sockopt_to_ipopt(optname);
+
+            *(int *)optval = ip_get_option(conn->pcb.ip, optname);
             break;
         default:
             // TODO: add support
