@@ -690,6 +690,10 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
     }
 
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)conn->socket;
+    if (NULL == sfd) {
+        return;
+    }
+
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
     if (sfd != NULL) {
         switch (evt) {
