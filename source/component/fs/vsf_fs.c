@@ -227,7 +227,11 @@ vk_file_t * vk_file_get_parent(vk_file_t *file)
 {
     vk_file_t *parent = file->parent;
     if (parent != NULL) {
+#if VSF_FS_REF_TRACE == ENABLED
+        vsf_trace_debug("get_parent %s" VSF_TRACE_CFG_LINEEND, parent->name ? parent->name : "ROOT");
+#endif
         __vk_file_ref(parent);
+        __vk_file_ref_parent(parent);
     }
     return parent;
 }
@@ -843,8 +847,9 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
                 VSF_FS_ASSERT(1 == child->ref);
 #if VSF_FS_REF_TRACE == ENABLED
                 vsf_trace_debug("unlink vfs %s" VSF_TRACE_CFG_LINEEND, child->name);
-                __vk_file_deref(child);
 #endif
+                // deref the ref referenced in __vk_vfs_create
+                __vk_file_deref(&child->use_as__vk_file_t);
                 vsf_protect_t orig = vsf_protect_sched();
                     vsf_dlist_remove(vk_vfs_file_t, use_as__vsf_dlist_node_t, &dir->d.child_list, child);
                 vsf_unprotect_sched(orig);
