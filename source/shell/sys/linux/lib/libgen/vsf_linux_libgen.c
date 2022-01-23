@@ -29,9 +29,6 @@
 #   include <libgen.h>
 #endif
 
-// for compiler and stdbool.h
-#include "utilities/vsf_utilities.h"
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -42,27 +39,31 @@
 
 char * basename(char *path)
 {
-    VSF_LINUX_ASSERT(path != NULL);
-    char *base = strrchr(path, '/');
-    return base ? base + 1 : path;
-}
+    if (!path || !*path) { return "."; }
 
-#if __IS_COMPILER_IAR__
-//! statement is unreachable
-#   pragma diag_suppress=pe111
-#endif
+    int pathlen = strlen(path);
+    if (pathlen > 1 && path[pathlen - 1] == '/') {
+        path[pathlen - 1] = '\0';
+    }
+
+    char *base = strrchr(path, '/');
+    return base && base[1] ? &base[1] : path;
+}
 
 char * dirname(char *path)
 {
-    VSF_LINUX_ASSERT(path != NULL);
-
     char *base = basename(path);
-    if (base != path) {
-        VSF_LINUX_ASSERT(base[-1] == '/');
-        base[-1] = '\0';
-        return path;
+    VSF_LINUX_ASSERT(base != NULL);
+    if (    (base[0] == '.' && base[1] == '\0')
+        ||  (base[0] == '/' && base[1] == '\0')
+        ||  (base[0] == '.' && base[1] == '.' && base[2] == '\0')) {
+        return base;
     }
-    return NULL;
+    if (base == path) {
+        return ".";
+    }
+    base[-1] = '\0';
+    return path;
 }
 
 #endif      // VSF_USE_LINUX
