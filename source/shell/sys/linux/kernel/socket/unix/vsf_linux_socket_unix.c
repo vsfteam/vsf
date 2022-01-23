@@ -77,14 +77,14 @@ static ssize_t __vsf_linux_socket_unix_read(vsf_linux_fd_t *sfd, void *buf, size
 static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_socket_unix_close(vsf_linux_fd_t *sfd);
 
-static int __vsf_linux_socket_unix_init(vsf_linux_socket_priv_t *priv);
+static int __vsf_linux_socket_unix_init(vsf_linux_fd_t *sfd);
 static int __vsf_linux_socket_unix_fini(vsf_linux_socket_priv_t *socket_priv, int how);
-static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *priv, const struct sockaddr *addr, socklen_t addrlen);
-static int __vsf_linux_socket_unix_listen(vsf_linux_socket_priv_t *priv, int backlog);
-static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *priv, struct sockaddr *addr, socklen_t *addr_len);
-static int __vsf_linux_socket_unix_bind(vsf_linux_socket_priv_t *priv, const struct sockaddr *addr, socklen_t addrlen);
-static int __vsf_linux_socket_unix_getsockopt(vsf_linux_socket_priv_t *priv, int level, int optname, void *optval, socklen_t *optlen);
-static int __vsf_linux_socket_unix_setsockopt(vsf_linux_socket_priv_t *priv, int level, int optname,const void *optval, socklen_t optlen);
+static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen);
+static int __vsf_linux_socket_unix_listen(vsf_linux_socket_priv_t *socket_priv, int backlog);
+static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addr_len);
+static int __vsf_linux_socket_unix_bind(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen);
+static int __vsf_linux_socket_unix_getsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, void *optval, socklen_t *optlen);
+static int __vsf_linux_socket_unix_setsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname,const void *optval, socklen_t optlen);
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -160,7 +160,7 @@ static int __vsf_linux_socket_unix_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
-static int __vsf_linux_socket_unix_init(vsf_linux_socket_priv_t *socket_priv)
+static int __vsf_linux_socket_unix_init(vsf_linux_fd_t *sfd)
 {
     return 0;
 }

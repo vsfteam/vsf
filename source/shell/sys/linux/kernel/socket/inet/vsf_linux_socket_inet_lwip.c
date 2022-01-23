@@ -93,14 +93,14 @@ extern struct pbuf * pbuf_free_header(struct pbuf *q, u16_t size);
 
 static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len);
 
-static int __vsf_linux_socket_inet_init(vsf_linux_socket_priv_t *priv);
+static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd);
 static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, int how);
-static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *priv, const struct sockaddr *addr, socklen_t addrlen);
-static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *priv, int backlog);
-static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *priv, struct sockaddr *addr, socklen_t *addr_len);
-static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *priv, const struct sockaddr *addr, socklen_t addrlen);
-static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *priv, int level, int optname, void *optval, socklen_t *optlen);
-static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *priv, int level, int optname,const void *optval, socklen_t optlen);
+static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen);
+static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, int backlog);
+static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addr_len);
+static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen);
+static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, void *optval, socklen_t *optlen);
+static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname,const void *optval, socklen_t optlen);
 static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen);
 static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen);
 
@@ -222,8 +222,9 @@ static int lwip_sockopt_to_ipopt(int optname)
 }
 
 // socket
-static int __vsf_linux_socket_inet_init(vsf_linux_socket_priv_t *socket_priv)
+static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
 {
+    vsf_linux_socket_priv_t *socket_priv = (vsf_linux_socket_priv_t *)sfd->priv;
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn;
     enum netconn_type conn_type;
@@ -257,7 +258,7 @@ static int __vsf_linux_socket_inet_init(vsf_linux_socket_priv_t *socket_priv)
 
     priv->conn = conn;
     VSF_LINUX_ASSERT(sizeof(conn->socket) >= sizeof(vsf_linux_fd_t *));
-    conn->socket = (int)container_of(priv, vsf_linux_fd_t, priv);
+    conn->socket = (int)sfd;
     return 0;
 }
 

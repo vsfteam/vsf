@@ -310,7 +310,7 @@ int socket(int domain, int type, int protocol)
         priv->protocol = protocol;
 
         if (sockop->fn_init != NULL) {
-            if (sockop->fn_init(priv) != 0) {
+            if (sockop->fn_init(sfd) != 0) {
                 vsf_linux_fd_delete(fd);
                 return -1;
             }

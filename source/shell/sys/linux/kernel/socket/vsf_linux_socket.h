@@ -51,7 +51,7 @@ vsf_dcl_class(vsf_linux_socket_priv_t)
 typedef struct vsf_linux_socket_op_t {
     vsf_linux_fd_op_t fdop;
 
-    int (*fn_init)(vsf_linux_socket_priv_t *priv);
+    int (*fn_init)(vsf_linux_fd_t *sfd);
     int (*fn_fini)(vsf_linux_socket_priv_t *priv, int how);
     int (*fn_connect)(vsf_linux_socket_priv_t *priv, const struct sockaddr *addr, socklen_t addrlen);
     int (*fn_listen)(vsf_linux_socket_priv_t *priv, int backlog);
