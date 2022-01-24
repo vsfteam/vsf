@@ -55,14 +55,17 @@ enum em_spi_mode_t {
     // CTL: [1 << 0 ~ 1 << 20]
     SPI_MASTER          = 0x00,
     SPI_SLAVE           = SPI_CTL_SLAVE_Msk,
+    SPI_DIR_MODE_MASK   = SPI_SLAVE | SPI_MASTER,
 
     SPI_MODE_0          = SPI_CTL_TXNEG_Msk,
     SPI_MODE_1          = SPI_CTL_RXNEG_Msk,
     SPI_MODE_2          = SPI_CTL_CLKPOL_Msk | SPI_CTL_RXNEG_Msk,
     SPI_MODE_3          = SPI_CTL_CLKPOL_Msk | SPI_CTL_TXNEG_Msk,
+    SPI_CLOCK_MODE_MASK = SPI_MODE_0 | SPI_MODE_1 | SPI_MODE_2 | SPI_MODE_3,
 
     SPI_MSB_FIRST       = 0,
     SPI_LSB_FIRST       = SPI_CTL_LSB_Msk,
+    SPI_BIT_ORDER_MASK  = SPI_MSB_FIRST | SPI_LSB_FIRST,
 
     SPI_DATASIZE_8      = ( 8 << SPI_CTL_DWIDTH_Pos),
     SPI_DATASIZE_9      = ( 9 << SPI_CTL_DWIDTH_Pos),
@@ -89,9 +92,11 @@ enum em_spi_mode_t {
     SPI_DATASIZE_30     = (30 << SPI_CTL_DWIDTH_Pos),
     SPI_DATASIZE_31     = (31 << SPI_CTL_DWIDTH_Pos),
     SPI_DATASIZE_32     = ( 0 << SPI_CTL_DWIDTH_Pos),
+    SPI_DATASIZE_MASK   = SPI_CTL_DWIDTH_Msk,
 
     SPI_FULL_DUPLEX     = 0,
     SPI_HALF_DUPLEX     = SPI_CTL_HALFDPX_Msk,
+    SPI_DUPLEX_MASK     = SPI_HALF_DUPLEX,
 
     // This bit is used to select the data input/output direction
     // in half-duplex transfer and Dual/Quad transfer
