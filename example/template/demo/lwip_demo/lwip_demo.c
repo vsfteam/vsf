@@ -65,7 +65,6 @@
 typedef struct usrapp_lwip_t {
     struct netif netif;
     struct dhcp netif_dhcp;
-    vsf_eda_t *eda;
 } usrapp_lwip_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -115,7 +114,9 @@ static void dns_found(const char *name, const ip_addr_t *addr, void *arg)
     } else {
         vsf_trace(VSF_TRACE_INFO, "fail to get ip for %s\n", name);
     }
-    vsf_eda_post_evt(__usrapp_lwip.eda, VSF_EVT_USER);
+    if (arg != NULL) {
+        vsf_eda_post_evt((vsf_eda_t *)arg, VSF_EVT_USER);
+    }
 }
 
 static int __lwip_nslookup(int argc, char *argv[])
@@ -128,16 +129,17 @@ static int __lwip_nslookup(int argc, char *argv[])
         return 0;
     }
 
-    __usrapp_lwip.eda = vsf_eda_get_cur();
+    vsf_eda_t *eda = vsf_eda_get_cur();
 
     LOCK_TCPIP_CORE();
-        err = dns_gethostbyname(argv[1], &ipaddr, dns_found, NULL);
+        err = dns_gethostbyname(argv[1], &ipaddr, dns_found, eda);
     UNLOCK_TCPIP_CORE();
 
     if (ERR_OK == err) {
         dns_found(argv[1], &ipaddr, NULL);
+    } else {
+        vsf_thread_wfe(VSF_EVT_USER);
     }
-    vsf_thread_wfe(VSF_EVT_USER);
     return 0;
 }
 
@@ -176,8 +178,8 @@ int lwip_main(int argc, char *argv[])
         return -1;
     }
 
-    busybox_bind("/sbin/ping", __lwip_ping);
-    busybox_bind("/sbin/nslookup", __lwip_nslookup);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/ping", __lwip_ping);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/nslookup", __lwip_nslookup);
 
     while (dhcp->state != DHCP_STATE_BOUND) {
         vsf_thread_delay_ms(10);
