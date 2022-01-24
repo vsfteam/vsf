@@ -86,7 +86,7 @@ typedef union vsf_linux_sockaddr_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
+int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd);
@@ -751,11 +751,6 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
 }
 
 // socket fd
-int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
-{
-    return 0;
-}
-
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;

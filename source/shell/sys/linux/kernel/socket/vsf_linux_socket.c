@@ -27,6 +27,7 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   if VSF_LINUX_SOCKET_USE_INET == ENABLED
+#       include "../../include/fcntl.h"
 #       include "../../include/netinet/in.h"
 #       include "../../include/arpa/inet.h"
 #       include "../../include/netdb.h"
@@ -34,6 +35,7 @@
 #else
 #   include <unistd.h>
 #   if VSF_LINUX_SOCKET_USE_INET == ENABLED
+#       include <fcntl.h>
 #       include <netinet/in.h>
 #       include <arpa/inet.h>
 #       include <netdb.h>
@@ -179,6 +181,20 @@ const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
         return NULL;
     }
     return dst;
+}
+
+// fcntl, dedicated driver can over-write this common version
+WEAK(__vsf_linux_socket_inet_fcntl)
+int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+{
+    switch (cmd) {
+    case F_SETFL:
+        if (arg & O_NONBLOCK) {
+            setsockopt(sfd->fd, SOL_SOCKET, SO_NONBLOCK, &arg, sizeof(arg));
+        }
+        break;
+    }
+    return 0;
 }
 
 // netdb
