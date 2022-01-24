@@ -42,6 +42,15 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+time_t time(time_t *t)
+{
+    time_t sec = vsf_systimer_get_ms() / 1000;
+    if (t != NULL) {
+        *t = sec;
+    }
+    return sec;
+}
+
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
 {
     if (requested_time->tv_sec) {
