@@ -812,18 +812,30 @@ void freeifaddrs(struct ifaddrs *ifaddrs)
 
 // netdb.h
 // none thread safty
+typedef struct gethostbyname_param_t {
+    ip_addr_t ipaddr;
+    vsf_eda_t *eda;
+} gethostbyname_param_t;
 static void __inet_dns_on_found(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
 {
-    vsf_eda_post_evt((vsf_eda_t *)callback_arg, VSF_EVT_USER + (NULL == ipaddr ? 1 : 0));
+    gethostbyname_param_t *param = callback_arg;
+    if (ipaddr != NULL) {
+        param->ipaddr = *ipaddr;
+        vsf_eda_post_evt(param->eda, VSF_EVT_USER);
+    } else {
+        vsf_eda_post_evt(param->eda, VSF_EVT_USER + 1);
+    }
 }
 
 int __inet_gethostbyname(const char *name, in_addr_t *addr)
 {
-    ip_addr_t ipaddr;
+    gethostbyname_param_t param = {
+        .eda    = vsf_eda_get_cur(),
+    };
     err_t err;
 
     LOCK_TCPIP_CORE();
-        err = dns_gethostbyname(name, &ipaddr, __inet_dns_on_found, vsf_eda_get_cur());
+        err = dns_gethostbyname(name, &param.ipaddr, __inet_dns_on_found, &param);
     UNLOCK_TCPIP_CORE();
 
     if (ERR_ARG == err) {
@@ -841,9 +853,9 @@ int __inet_gethostbyname(const char *name, in_addr_t *addr)
 
     if (addr != NULL) {
 #if LWIP_IPV4 && LWIP_IPV6
-        *addr = ipaddr.u_addr.ip4.addr;
+        *addr = param.ipaddr.u_addr.ip4.addr;
 #elif LWIP_IPV4
-        *addr = ipaddr.addr;
+        *addr = param.ipaddr.addr;
 #endif
     }
     return 0;
