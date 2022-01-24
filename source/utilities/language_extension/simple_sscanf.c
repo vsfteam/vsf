@@ -32,7 +32,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static char * skip_space(char *str, size_t *size)
+static char * __skip_space(char *str, size_t *size)
 {
     while (isspace(*str) && *size) {
         str++;
@@ -41,11 +41,21 @@ static char * skip_space(char *str, size_t *size)
     return str;
 }
 
+static bool __is_in_seq(char ch, const char *seq, int seq_len)
+{
+    for (int i = 0; i < seq_len; i++) {
+        if (ch == seq[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static int vsnscanf(const char *str, size_t size, const char *format, va_list ap)
 {
-    char ch;
+    char ch, integer_buf[32], *ptr;
     char *strtmp;
-    int result = 0;
+    int result = 0, cur_size;
 
     while (*format != '\0') {
         ch = *format++;
@@ -60,72 +70,93 @@ static int vsnscanf(const char *str, size_t size, const char *format, va_list ap
                 } flags;
                 int radix;
 
+                int seqlen;
+                const char *seq;
+
                 flags.all = 0;
                 if ('*' == *format) {
                     // TODO:
                 } else {
                     width = strtoull(format, &strtmp, 0);
-                    if (format == strtmp) {
-                        width = -1;
-                    }
                     format = strtmp;
                 }
 
                 ch = *format++;
                 switch (ch) {
+                case '[':
+                    seq = format;
+                    while (true) {
+                        ch = *format++;
+                        if (!ch) {
+                            return -1;
+                        }
+                        if (ch == ']') {
+                            break;
+                        }
+                    }
+                    seqlen = format - seq - 1;
+
+                    ptr = va_arg(ap, char *);
+                    if (!width) { width = -1; }
+                    while (__is_in_seq(*str, seq, seqlen) && (width-- > 0)) {
+                        *ptr++ = *str++;
+                        size--;
+                    }
+                    result++;
+                    break;
                 case 'u':
                     flags.is_signed = 0;
                     radix = 10;
-                    width = sizeof(unsigned int);
                     goto parse_integer;
                 case 'i':
                 case 'd':
                     flags.is_signed = 1;
                     radix = 10;
-                    width = sizeof(int);
                     goto parse_integer;
                 case 'o':
                     flags.is_signed = 0;
                     radix = 8;
-                    width = sizeof(unsigned int);
                     goto parse_integer;
                 case 'x':
                 case 'X':
                     flags.is_signed = 0;
                     radix = 16;
-                    width = sizeof(unsigned int);
                     goto parse_integer;
 
                 parse_integer:
-                    str = skip_space((char *)str, &size);
-                    if (!size) { goto end; }
-                    if (flags.is_signed) {
-                        *va_arg(ap, int *) = strtol(str, &strtmp, radix);;
+                    if (width > 0) {
+                        VSF_ASSERT(width <= sizeof(integer_buf) - 1);
+                        memcpy(integer_buf, str, width);
+                        integer_buf[width] = '\0';
+                        ptr = integer_buf;
                     } else {
-                        *va_arg(ap, unsigned int *) = strtoul(str, &strtmp, radix);;
+                        ptr = (char *)str;
                     }
-                    size -= strtmp - str;
-                    str = strtmp;
+                    if (flags.is_signed) {
+                        *va_arg(ap, int *) = strtol(ptr, &strtmp, radix);;
+                    } else {
+                        *va_arg(ap, unsigned int *) = strtoul(ptr, &strtmp, radix);;
+                    }
+                    cur_size = strtmp - ptr;
+                    size -= cur_size;
+                    str += cur_size;
                     result++;
                     break;
                 case 'f':
-                    str = skip_space((char *)str, &size);
-                    if (!size) { goto end; }
                     *va_arg(ap, float *) = strtof(str, &strtmp);
                     size -= strtmp - str;
                     str = strtmp;
                     result++;
                     break;
                 case 'c':
-                    str = skip_space((char *)str, &size);
-                    if (!size) { goto end; }
                     *va_arg(ap, char *) = *str++;
                     size--;
                     result++;
                     break;
                 case 's': {
                         char *ptr = va_arg(ap, char *);
-                        while (!isspace(*str) && (!width || (width-- > 0))) {
+                        if (!width) { width = -1; }
+                        while (!isspace(*str) && (width-- > 0)) {
                             *ptr++ = *str++;
                             size--;
                         }
@@ -136,7 +167,7 @@ static int vsnscanf(const char *str, size_t size, const char *format, va_list ap
             }
             break;
         case ' ':
-            str = skip_space((char *)str, &size);
+            str = __skip_space((char *)str, &size);
             if (!size) { goto end; }
             break;
         default:
