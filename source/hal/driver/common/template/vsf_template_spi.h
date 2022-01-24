@@ -61,7 +61,6 @@
 #   define vsf_spi_cs_active            __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cs_active)
 #   define vsf_spi_cs_inactive          __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cs_inactive)
 #   define vsf_spi_fifo_transfer        __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_fifo_transfer)
-#   define vsf_spi_fifo_flush           __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_fifo_flush)
 #   define vsf_spi_request_transfer     __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_request_transfer)
 #   define vsf_spi_cancel_transfer      __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cancel_transfer)
 #   define vsf_spi_get_transfered_count __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_get_transfered_count)

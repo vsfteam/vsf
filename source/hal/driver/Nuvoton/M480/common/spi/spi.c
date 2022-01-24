@@ -257,23 +257,22 @@ spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
 }
 
 void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
-                                               uint_fast32_t* out_count_ptr,
+                                               uint_fast32_t  out_cnt,
+                                               uint_fast32_t* out_offset_ptr,
                                                void *in_buffer_ptr,
-                                               uint_fast32_t* in_count_ptr)
+                                               uint_fast32_t  in_cnt,
+                                               uint_fast32_t* in_offset_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
 
-    VSF_HAL_ASSERT(out_count_ptr != NULL);
-    //VSF_HAL_ASSERT(in_count_ptr != NULL);
-
-    if ((*out_count_ptr == 0) && (*in_count_ptr == 0)) {
+    if ((out_cnt == 0) && (in_cnt == 0)) {
         VSF_HAL_ASSERT(0);
     }
 
     uint8_t data_width = __vsf_spi_get_data_width(spi_ptr);
     uint32_t widty_bytes;
-    uint32_t value;
+    uint32_t value = 0;
     if (data_width == 8) {
         widty_bytes = 1;
     } else if (data_width <= 16) {
@@ -282,26 +281,29 @@ void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
         widty_bytes = 4;
     }
 
-    while (*out_count_ptr > 0 || *in_count_ptr > 0) {
+    uint_fast32_t out_offset = 0;
+    uint_fast32_t in_offset = 0;
+
+    while (out_cnt > out_offset || in_cnt > in_offset) {
         uint32_t status = spi_ptr->reg->STATUS & (SPI_STATUS_TXFULL_Msk | SPI_STATUS_RXEMPTY_Msk);
         if (status == (SPI_STATUS_RXEMPTY_Msk | SPI_STATUS_TXFULL_Msk)) {
             break;
         }
 
-        if ((*out_count_ptr > 0) && !(status & SPI_STATUS_TXFULL_Msk)) {
-            (*out_count_ptr)--;
+        if ((out_cnt > out_offset) && !(status & SPI_STATUS_TXFULL_Msk)) {
+            out_offset++;
 
             if (out_buffer_ptr != NULL) {
                 memcpy(&value, out_buffer_ptr, widty_bytes);
-                spi_ptr->reg->TX = value;
             }
+            spi_ptr->reg->TX = value;
         }
 
-        if ((*in_count_ptr > 0) && !(status & SPI_STATUS_RXEMPTY_Msk)) {
-            (*in_count_ptr)--;
+        if ((in_cnt > in_offset) && !(status & SPI_STATUS_RXEMPTY_Msk)) {
+            in_offset--;
 
+            value = spi_ptr->reg->RX;
             if (out_buffer_ptr != NULL) {
-                value = spi_ptr->reg->RX;
                 memcpy(&value, out_buffer_ptr, widty_bytes);
             }
         }
