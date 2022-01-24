@@ -87,6 +87,7 @@ void vsf_pnp_on_netdrv_connected(vk_netdrv_t *netdrv)
     LOCK_TCPIP_CORE();
     dhcp_set_struct(netif, &__usrapp_lwip.netif_dhcp);
     netif_set_up(netif);
+    netif_set_default(netif);
 
     dhcp_start(netif);
     UNLOCK_TCPIP_CORE();
