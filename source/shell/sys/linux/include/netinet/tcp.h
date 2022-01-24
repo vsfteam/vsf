@@ -21,6 +21,7 @@ extern "C" {
 
 // tcp options
 #define TCP_NODELAY         1
+#define TCP_KEEPALIVE       2
 
 #if defined(__FAVOR_BSD) || defined(_BSD_SOURCE)
 typedef uint32_t            tcp_seq;

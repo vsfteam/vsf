@@ -194,7 +194,23 @@ struct hostent * gethostbyaddr(const void *addr, size_t len, int type)
 
 struct hostent * gethostbyname(const char *name)
 {
-    return NULL;
+    static struct hostent __hostent;
+    static char * __h_addr_list[2];
+    static in_addr_t __addr;
+
+    extern int __inet_gethostbyname(const char *name, in_addr_t *addr);
+    if (__inet_gethostbyname(name, &__addr) < 0) {
+        return NULL;
+    }
+
+    __h_addr_list[0] = (char *)&__addr;
+    __h_addr_list[1] = NULL;
+    memset(&__hostent, 0, sizeof(__hostent));
+    __hostent.h_name = (char *)name;
+    __hostent.h_addrtype = AF_INET;
+    __hostent.h_length = 4;
+    __hostent.h_addr_list = (char **)&__h_addr_list;
+    return &__hostent;
 }
 
 int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,

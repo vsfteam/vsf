@@ -30,6 +30,7 @@
 #   include "../../../include/errno.h"
 #   include "../../../include/sys/socket.h"
 #   include "../../../include/netinet/in.h"
+#   include "../../../include/netinet/tcp.h"
 #   include "../../../include/arpa/inet.h"
 #   include "../../../include/ifaddrs.h"
 #else
@@ -37,6 +38,7 @@
 #   include <errno.h>
 #   include <sys/socket.h>
 #   include <netinet/in.h>
+#   include <netinet/tcp.h>
 #   include <arpa/inet.h>
 #   include <ifaddrs.h>
 #endif
@@ -45,6 +47,7 @@
 #include "lwip/tcpip.h"
 #include "lwip/api.h"
 #include "lwip/ip.h"
+#include "lwip/tcp.h"
 
 /*============================ MACROS ========================================*/
 
@@ -320,6 +323,23 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             break;
         }
         break;
+    case IPPROTO_TCP:
+        switch (optname) {
+        case TCP_NODELAY:
+            if (*(const int *)optval) {
+                tcp_nagle_disable(conn->pcb.tcp);
+            } else {
+                tcp_nagle_enable(conn->pcb.tcp);
+            }
+            break;
+        case TCP_KEEPALIVE:
+            conn->pcb.tcp->keep_idle = (u32_t)(*(const int *)optval);
+            break;
+        default:
+            VSF_LINUX_ASSERT(false);
+            break;
+        }
+        break;
     default:
         // TODO: add support
         VSF_LINUX_ASSERT(false);
@@ -358,6 +378,19 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
 
             *(int *)optval = ip_get_option(conn->pcb.ip, optname);
             break;
+    case IPPROTO_TCP:
+        switch (optname) {
+        case TCP_NODELAY:
+            *(int *)optval = tcp_nagle_disabled(conn->pcb.tcp);
+            break;
+        case TCP_KEEPALIVE:
+            *(int *)optval = (int)conn->pcb.tcp->keep_idle;
+            break;
+        default:
+            VSF_LINUX_ASSERT(false);
+            break;
+        }
+        break;
         default:
             // TODO: add support
             VSF_LINUX_ASSERT(false);
@@ -780,6 +813,45 @@ int getifaddrs(struct ifaddrs **ifaddrs)
 
 void freeifaddrs(struct ifaddrs *ifaddrs)
 {
+}
+
+// netdb.h
+// none thread safty
+static void __inet_dns_on_found(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
+{
+    vsf_eda_post_evt((vsf_eda_t *)callback_arg, VSF_EVT_USER + (NULL == ipaddr ? 1 : 0));
+}
+
+int __inet_gethostbyname(const char *name, in_addr_t *addr)
+{
+    ip_addr_t ipaddr;
+    err_t err;
+
+    LOCK_TCPIP_CORE();
+        err = dns_gethostbyname(name, &ipaddr, __inet_dns_on_found, vsf_eda_get_cur());
+    UNLOCK_TCPIP_CORE();
+
+    if (ERR_ARG == err) {
+        return -1;
+    } else if (ERR_OK != err) {
+        vsf_evt_t evt = vsf_thread_wait();
+        if (    (evt != VSF_EVT_USER)
+#if LWIP_IPV4 && LWIP_IPV6
+            ||  (IPADDR_TYPE_V6 == ipaddr.type)
+#endif
+        ) {
+            return -1;
+        }
+    }
+
+    if (addr != NULL) {
+#if LWIP_IPV4 && LWIP_IPV6
+        *addr = ipaddr.u_addr.ip4.addr;
+#elif LWIP_IPV4
+        *addr = ipaddr.addr;
+#endif
+    }
+    return 0;
 }
 
 #endif
