@@ -64,6 +64,12 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define neconn_is_ok(__conn, __err)                                             \
+        (   (ERR_OK == (__err))                                                 \
+        ||  (netconn_is_nonblocking(__conn) && (ERR_INPROGRESS == (__err)))     \
+        )
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_linux_socket_inet_priv_t {
@@ -516,7 +522,7 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
     }
 #endif
     err_t err = netconn_connect(conn, &remote_addr, remote_port);
-    return (ERR_OK == err) ? 0 : SOCKET_ERROR;
+    return neconn_is_ok(conn, err) ? 0 : SOCKET_ERROR;
 }
 
 static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, int backlog)
@@ -544,7 +550,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
     if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
         size_t written = 0;
         err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
-        return (ERR_OK == err) ? (ssize_t)written : SOCKET_ERROR;
+        return neconn_is_ok(conn, err) ? (ssize_t)written : SOCKET_ERROR;
     } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
         if (size > LWIP_MIN(0xFFFF, SSIZE_MAX)) {
             return SOCKET_ERROR;
@@ -589,7 +595,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
 
         err_t err = netconn_send(conn, &buf);
         netbuf_free(&buf);
-        return (ERR_OK == err) ? size : SOCKET_ERROR;
+        return neconn_is_ok(conn, err) ? size : SOCKET_ERROR;
     }
     return SOCKET_ERROR;
 }
