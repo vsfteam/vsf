@@ -68,6 +68,10 @@
 #   undef pipe
 #endif
 
+#if VSF_USE_USB_HOST != ENABLED || VSF_USBH_USE_LIBUSB != ENABLED
+#   error Please enable VSF_USE_USB_HOST and VSF_USBH_USE_LIBUSB
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
