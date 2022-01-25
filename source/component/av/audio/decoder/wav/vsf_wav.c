@@ -73,7 +73,7 @@ typedef struct vk_wav_data_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vk_wav_playback_stream_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_wav_playback_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_wav_t *wav = param;
     uint32_t data_size;
@@ -87,7 +87,7 @@ static void __vk_wav_playback_stream_evthandler(void *param, vsf_stream_evt_t ev
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_IN:
         while (1) {
-            data_size = vsf_stream_get_data_size(wav->stream);
+            data_size = vsf_stream_get_data_size(stream);
             if (!data_size) {
                 break;
             }
@@ -95,7 +95,7 @@ static void __vk_wav_playback_stream_evthandler(void *param, vsf_stream_evt_t ev
             switch (wav->state) {
             case VSF_WAV_STATE_RIFF:
                 if (data_size >= sizeof(header.riff)) {
-                    vsf_stream_read(wav->stream, (uint8_t *)&header.riff, sizeof(header.riff));
+                    vsf_stream_read(stream, (uint8_t *)&header.riff, sizeof(header.riff));
                     if (    strncmp(header.riff.chunk_id, "RIFF", 4)
                         ||  strncmp(header.riff.format, "WAVE", 4)) {
                         goto failed;
@@ -106,7 +106,7 @@ static void __vk_wav_playback_stream_evthandler(void *param, vsf_stream_evt_t ev
                 break;
             case VSF_WAV_STATE_FORMAT:
                 if (data_size >= sizeof(header.format)) {
-                    vsf_stream_read(wav->stream, (uint8_t *)&header.format, sizeof(header.format));
+                    vsf_stream_read(stream, (uint8_t *)&header.format, sizeof(header.format));
                     if (    strncmp(header.format.sub_chunk_id, "fmt ", 4)
                         ||  (header.format.sub_chunk_size != 16)) {
                         goto failed;
@@ -120,7 +120,7 @@ static void __vk_wav_playback_stream_evthandler(void *param, vsf_stream_evt_t ev
                 break;
             case VSF_WAV_STATE_DATA:
                 if (data_size >= sizeof(header.data)) {
-                    vsf_stream_read(wav->stream, (uint8_t *)&header.data, sizeof(header.data));
+                    vsf_stream_read(stream, (uint8_t *)&header.data, sizeof(header.data));
                     if (strncmp(header.data.sub_chunk_id, "data", 4)) {
                         goto failed;
                     }

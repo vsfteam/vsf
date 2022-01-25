@@ -387,10 +387,9 @@ static vsf_err_t __vk_usbd_uac_ac_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *
     return VSF_ERR_NONE;
 }
 
-static void __vk_usbd_uac_as_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_usbd_uac_as_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_usbd_uac_as_t *uac_as = param;
-    vsf_stream_t *stream = uac_as->stream;
     vk_usbd_trans_t *trans = &uac_as->trans;
     bool is_in = (USB_DIR_IN == (uac_as->ep & USB_DIR_MASK));
     uint_fast32_t size;

@@ -187,7 +187,7 @@ vsf_class(vsf_stream_terminal_t) {
 
     public_member(
         void *param;
-        void (*evthandler)(void *param, vsf_stream_evt_t evt);
+        void (*evthandler)(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt);
     )
 
     private_member(

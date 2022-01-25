@@ -494,9 +494,8 @@ static usbd_uac_t __user_usbd_uac = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __usrapp_usbd_uac_on_stream(void *param, vsf_stream_evt_t evt)
+static void __usrapp_usbd_uac_on_stream(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
-    vsf_stream_t *stream = param;
     switch (evt) {
     case VSF_STREAM_ON_TX:
         vsf_stream_write(stream, NULL, vsf_stream_get_free_size(stream));
@@ -525,13 +524,11 @@ int VSF_USER_ENTRY(void)
 
     stream = &__user_usbd_uac_rx_stream.use_as__vsf_stream_t;
     vsf_stream_init(stream);
-    stream->rx.param = &__user_usbd_uac_rx_stream;
     stream->rx.evthandler = __usrapp_usbd_uac_on_stream;
     vsf_stream_connect_rx(stream);
 
     stream = &__user_usbd_uac_tx_stream.use_as__vsf_stream_t;
     vsf_stream_init(stream);
-    stream->tx.param = &__user_usbd_uac_tx_stream;
     stream->tx.evthandler = __usrapp_usbd_uac_on_stream;
     vsf_stream_connect_tx(stream);
 

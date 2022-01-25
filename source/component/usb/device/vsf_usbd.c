@@ -1061,12 +1061,11 @@ static void __vk_usbd_stream_tx_on_trans_finish(void *param)
     }
 }
 
-static void __vk_usbd_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_usbd_stream_tx_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_usbd_ep_stream_t *stream_ep = (vk_usbd_ep_stream_t *)param;
     VSF_USBD_DRV_PREPARE(stream_ep->dev);
     uint_fast16_t ep_size = vk_usbd_drv_ep_get_size(stream_ep->use_as__vk_usbd_trans_t.ep);
-    vsf_stream_t *stream = stream_ep->stream;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
@@ -1126,11 +1125,10 @@ static void __vk_usbd_stream_rx_on_trans_finish(void *param)
     }
 }
 
-static void __vk_usbd_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_usbd_stream_rx_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_usbd_ep_stream_t *stream_ep = (vk_usbd_ep_stream_t *)param;
     vk_usbd_dev_t *dev = stream_ep->dev;
-    vsf_stream_t *stream = stream_ep->stream;
 
     switch (evt) {
     case VSF_STREAM_ON_RX:

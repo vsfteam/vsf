@@ -542,7 +542,7 @@ static void __vsf_linux_httpd_send_response(vsf_linux_httpd_session_t *session)
     vsf_stream_write_str(stream, "\r\n");
 }
 
-static void __vsf_linux_httpd_stream_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *param, vsf_stream_evt_t evt)
 {
     vsf_linux_httpd_session_t *session = param;
     vsf_err_t err;

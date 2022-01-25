@@ -157,7 +157,7 @@ static bool __vk_winsound_playback_buffer(vk_winsound_dev_t *dev, uint8_t *buffe
     return false;
 }
 
-static void __vk_winsound_playback_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_winsound_playback_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_audio_stream_t *audio_stream = param;
     vk_audio_stream_t *audio_stream_base = audio_stream - audio_stream->stream_index;
@@ -171,11 +171,11 @@ static void __vk_winsound_playback_evthandler(void *param, vsf_stream_evt_t evt)
     case VSF_STREAM_ON_IN:
         while (playback_ctx->is_playing && (playback_ctx->buffer_taken < dimof(playback_ctx->buffer))) {
             __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: play stream evthandler\r\n", vsf_systimer_get_ms());
-            datasize = vsf_stream_get_rbuf(audio_stream->stream, &buff);
+            datasize = vsf_stream_get_rbuf(stream, &buff);
             if (!datasize) { break; }
 
             if (__vk_winsound_playback_buffer(dev, buff, datasize)) {
-                vsf_stream_read(audio_stream->stream, (uint8_t *)buff, datasize);
+                vsf_stream_read(stream, (uint8_t *)buff, datasize);
             }
         }
         break;

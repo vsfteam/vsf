@@ -122,11 +122,10 @@ vsf_err_t vk_mal_write(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, 
 }
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-static void __vk_mal_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_mal_stream_tx_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_mal_stream_t *pthis = (vk_mal_stream_t *)param;
     vk_mal_t *mal = pthis->mal;
-    vsf_stream_t *stream = pthis->stream;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
@@ -143,11 +142,10 @@ static void __vk_mal_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
     }
 }
 
-static void __vk_mal_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_mal_stream_rx_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_mal_stream_t *pthis = (vk_mal_stream_t *)param;
     vk_mal_t *mal = pthis->mal;
-    vsf_stream_t *stream = pthis->stream;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:

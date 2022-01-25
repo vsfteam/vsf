@@ -50,7 +50,7 @@ void __vsf_stream_on_write(vsf_stream_t *stream)
         &&  (stream->rx.evthandler != NULL)) {
 
         stream->rx.data_notified = true;
-        stream->rx.evthandler(stream->rx.param, VSF_STREAM_ON_IN);
+        stream->rx.evthandler(stream, stream->rx.param, VSF_STREAM_ON_IN);
     }
 }
 
@@ -69,7 +69,7 @@ void __vsf_stream_on_read(vsf_stream_t *stream)
         &&  (stream->tx.evthandler != NULL)) {
 
         stream->tx.data_notified = true;
-        stream->tx.evthandler(stream->tx.param, VSF_STREAM_ON_OUT);
+        stream->tx.evthandler(stream, stream->tx.param, VSF_STREAM_ON_OUT);
     }
 }
 
@@ -157,10 +157,10 @@ static void __vsf_stream_connect_terminal(vsf_stream_t *stream, uint_fast8_t ter
     if (!term_current->ready) {
         if (term_another->ready) {
             if (term_another->evthandler != NULL) {
-                term_another->evthandler(term_another->param, VSF_STREAM_ON_CONNECT);
+                term_another->evthandler(stream, term_another->param, VSF_STREAM_ON_CONNECT);
             }
             if (term_current->evthandler != NULL) {
-                term_current->evthandler(term_current->param, VSF_STREAM_ON_CONNECT);
+                term_current->evthandler(stream, term_current->param, VSF_STREAM_ON_CONNECT);
             }
         }
         term_current->ready = true;
@@ -197,7 +197,7 @@ static void __vsf_stream_disconnect_terminal(vsf_stream_t *stream, uint_fast8_t 
     vsf_stream_terminal_t *term_another = &stream->terminal[terminal ^ 1];
 
     if (term_current->ready && (term_another->evthandler != NULL)) {
-        term_another->evthandler(term_another->param, VSF_STREAM_ON_DISCONNECT);
+        term_another->evthandler(stream, term_another->param, VSF_STREAM_ON_DISCONNECT);
     }
     term_current->ready = false;
 }

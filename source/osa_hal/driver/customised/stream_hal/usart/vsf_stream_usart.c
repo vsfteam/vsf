@@ -35,7 +35,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_stream_usart_stream_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vsf_stream_usart_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vsf_stream_usart_t *stream_usart = param;
     vsf_protect_t orig;

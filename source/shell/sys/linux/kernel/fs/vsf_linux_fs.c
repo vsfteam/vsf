@@ -1431,21 +1431,28 @@ static void __vsf_linux_stream_evt(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool
     vsf_unprotect_sched(orig);
 }
 
-static void __vsf_linux_stream_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vsf_linux_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vsf_linux_fd_t *sfd = param;
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
-    vsf_stream_t *stream;
 
     switch (evt) {
+    case VSF_STREAM_ON_DISCONNECT:
+        if (priv->stream_rx == stream) {
+            goto on_stream_rx;
+        } else if (priv->stream_tx == stream) {
+            goto on_stream_tx;
+        } else {
+            VSF_LINUX_ASSERT(false);
+        }
     case VSF_STREAM_ON_RX:
-        stream = priv->stream_rx;
+    on_stream_rx:
         stream->rx.param = NULL;
         stream->rx.evthandler = NULL;
         __vsf_linux_stream_evt(sfd, vsf_protect_sched(), true, true);
         break;
     case VSF_STREAM_ON_TX:
-        stream = priv->stream_tx;
+    on_stream_tx:
         stream->tx.param = NULL;
         stream->tx.evthandler = NULL;
         __vsf_linux_stream_evt(sfd, vsf_protect_sched(), false, true);

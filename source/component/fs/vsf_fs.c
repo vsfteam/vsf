@@ -1087,10 +1087,9 @@ uint_fast16_t vk_file_get_name_length(vk_file_t *file)
 #endif
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-static void __vk_file_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_file_stream_tx_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_file_stream_t *pthis = (vk_file_stream_t *)param;
-    vsf_stream_t *stream = pthis->stream;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
@@ -1103,10 +1102,9 @@ static void __vk_file_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
     }
 }
 
-static void __vk_file_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
+static void __vk_file_stream_rx_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_file_stream_t *pthis = (vk_file_stream_t *)param;
-    vsf_stream_t *stream = pthis->stream;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:

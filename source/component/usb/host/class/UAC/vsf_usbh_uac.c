@@ -276,7 +276,7 @@ static bool __vk_usbh_uac_submit_urb_iso(vk_usbh_uac_t *uac, vk_usbh_uac_stream_
     return false;
 }
 
-void __vk_usbh_uac_stream_evthandler(void *param, vsf_stream_evt_t evt)
+void __vk_usbh_uac_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_usbh_uac_stream_t *uac_stream = param;
 

@@ -35,9 +35,8 @@
 #if VSF_USBH_USE_UAC == ENABLED
 describe_mem_stream(__user_usbh_uac_rx_stream, 100)
 describe_mem_stream(__user_usbh_uac_tx_stream, 200)
-static void __usrapp_usbh_uac_on_stream(void *param, vsf_stream_evt_t evt)
+static void __usrapp_usbh_uac_on_stream(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
-    vsf_stream_t *stream = param;
     switch (evt) {
     case VSF_STREAM_ON_TX:
         vsf_stream_write(stream, NULL, vsf_stream_get_free_size(stream));
@@ -68,13 +67,11 @@ void vsf_usbh_uac_on_new(void *uac, usb_uac_ac_interface_header_desc_t *ac_heade
         if (stream->is_in) {
             vsf_usbh_uac_connect_stream(uac, i, &__user_usbh_uac_rx_stream.use_as__vsf_stream_t);
 
-            __user_usbh_uac_rx_stream.rx.param = &__user_usbh_uac_rx_stream;
             __user_usbh_uac_rx_stream.rx.evthandler = __usrapp_usbh_uac_on_stream;
             vsf_stream_connect_rx(&__user_usbh_uac_rx_stream.use_as__vsf_stream_t);
         } else {
             vsf_usbh_uac_connect_stream(uac, i, &__user_usbh_uac_tx_stream.use_as__vsf_stream_t);
 
-            __user_usbh_uac_tx_stream.tx.param = &__user_usbh_uac_tx_stream;
             __user_usbh_uac_tx_stream.tx.evthandler = __usrapp_usbh_uac_on_stream;
             vsf_stream_connect_tx(&__user_usbh_uac_tx_stream.use_as__vsf_stream_t);
             vsf_stream_write(&__user_usbh_uac_tx_stream.use_as__vsf_stream_t, NULL, vsf_stream_get_free_size(&__user_usbh_uac_tx_stream.use_as__vsf_stream_t));
