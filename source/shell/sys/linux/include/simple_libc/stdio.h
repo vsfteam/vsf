@@ -70,12 +70,6 @@ extern "C" {
 
 #define tmpfile             VSF_LINUX_LIBC_WRAPPER(tmpfile)
 #define tmpnam              VSF_LINUX_LIBC_WRAPPER(tmpnam)
-
-// use extern functions with no dependent on shell.linux
-#define stdin               __vsf_linux_stdin()
-#define stdout              __vsf_linux_stdout()
-#define stderr              __vsf_linux_stderr()
-
 #endif
 
 #ifdef __WIN__
@@ -96,6 +90,10 @@ typedef int FILE;
 extern FILE * __vsf_linux_stdin(void);
 extern FILE * __vsf_linux_stdout(void);
 extern FILE * __vsf_linux_stderr(void);
+// use extern functions with no dependent on shell.linux
+#define stdin               __vsf_linux_stdin()
+#define stdout              __vsf_linux_stdout()
+#define stderr              __vsf_linux_stderr()
 
 #define BUFSIZ              512
 #define L_tmpnam            260
