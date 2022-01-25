@@ -196,13 +196,14 @@ static void __vk_winsound_playback_irq_thread(void *arg)
                 vk_winsound_playback_buffer_t *winsound_buffer =
                     playback_ctx->play_ticktock ? &playback_ctx->buffer[0] : &playback_ctx->buffer[1];
                 WAVEHDR *header = (WAVEHDR *)&winsound_buffer->header;
+                UNUSED_PARAM(header);
                 playback_ctx->play_ticktock = !playback_ctx->play_ticktock;
 
                 __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: playback evt %d\r\n", vsf_systimer_get_ms(), header->dwFlags);
                 vsf_protect_t orig = vsf_protect_int();
                     playback_ctx->buffer_taken--;
                 vsf_unprotect_int(orig);
-                __vk_winsound_playback_evthandler(playback_ctx->audio_stream, VSF_STREAM_ON_IN);
+                __vk_winsound_playback_evthandler(playback_ctx->audio_stream->stream, playback_ctx->audio_stream, VSF_STREAM_ON_IN);
             }
         __vsf_arch_irq_end(irq_thread, false);
     }
@@ -259,7 +260,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_playback_start, vk_audio_start)
             audio_stream->stream->rx.evthandler = __vk_winsound_playback_evthandler;
             vsf_stream_connect_rx(audio_stream->stream);
             if (vsf_stream_get_data_size(audio_stream->stream)) {
-                __vk_winsound_playback_evthandler(audio_stream, VSF_STREAM_ON_IN);
+                __vk_winsound_playback_evthandler(audio_stream->stream, audio_stream, VSF_STREAM_ON_IN);
             }
 
             vsf_eda_return(VSF_ERR_NONE);

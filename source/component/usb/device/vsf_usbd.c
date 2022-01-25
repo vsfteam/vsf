@@ -1096,7 +1096,7 @@ vsf_err_t vk_usbd_ep_recv_stream(vk_usbd_ep_stream_t *stream_ep, uint_fast32_t s
     trans->buffer = NULL;
     vsf_stream_connect_tx(stream);
 
-    __vk_usbd_stream_tx_evthandler(stream_ep, VSF_STREAM_ON_OUT);
+    __vk_usbd_stream_tx_evthandler(stream_ep->stream, stream_ep, VSF_STREAM_ON_OUT);
     return VSF_ERR_NONE;
 }
 
@@ -1161,7 +1161,7 @@ vsf_err_t vk_usbd_ep_send_stream(vk_usbd_ep_stream_t *stream_ep, uint_fast32_t s
     trans->on_finish = NULL;
     vsf_stream_connect_rx(stream);
 
-    __vk_usbd_stream_rx_evthandler(stream_ep, VSF_STREAM_ON_IN);
+    __vk_usbd_stream_rx_evthandler(stream_ep->stream, stream_ep, VSF_STREAM_ON_IN);
     return VSF_ERR_NONE;
 }
 

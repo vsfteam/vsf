@@ -44,7 +44,7 @@ static void __vsf_stream_usart_stream_evthandler(vsf_stream_t *stream, void *par
     case VSF_STREAM_ON_IN:
         orig = vsf_protect_int();
         if (!stream_usart->is_txing) {
-            stream_usart->cur_tx_len = vsf_stream_get_rbuf(stream_usart->stream_tx, &stream_usart->cur_tx_buf);
+            stream_usart->cur_tx_len = vsf_stream_get_rbuf(stream, &stream_usart->cur_tx_buf);
             if (stream_usart->cur_tx_len > 0) {
                 stream_usart->is_txing = true;
                 vsf_unprotect_int(orig);
@@ -61,7 +61,7 @@ static void __vsf_stream_usart_stream_evthandler(vsf_stream_t *stream, void *par
     case VSF_STREAM_ON_OUT:
         orig = vsf_protect_int();
         if (!stream_usart->is_rxing) {
-            if (vsf_stream_get_free_size(stream_usart->stream_rx) > 0) {
+            if (vsf_stream_get_free_size(stream) > 0) {
                 stream_usart->is_rxing = true;
                 vsf_unprotect_int(orig);
 
@@ -89,12 +89,12 @@ void vsf_stream_usart_irq(void *param, vsf_usart_t *usart, em_usart_irq_mask_t i
     if (irq_mask & USART_IRQ_MASK_RX_CPL) {
         vsf_stream_write(stream_usart->stream_rx, &stream_usart->rxbuf, 1);
         stream_usart->is_rxing = false;
-        __vsf_stream_usart_stream_evthandler(stream_usart, VSF_STREAM_ON_OUT);
+        __vsf_stream_usart_stream_evthandler(stream_usart->stream_rx, stream_usart, VSF_STREAM_ON_OUT);
     }
     if (irq_mask & USART_IRQ_MASK_TX_CPL) {
         vsf_stream_read(stream_usart->stream_tx, NULL, stream_usart->cur_tx_len);
         stream_usart->is_txing = false;
-        __vsf_stream_usart_stream_evthandler(stream_usart, VSF_STREAM_ON_IN);
+        __vsf_stream_usart_stream_evthandler(stream_usart->stream_tx, stream_usart, VSF_STREAM_ON_IN);
     }
 }
 
@@ -109,7 +109,7 @@ void vsf_stream_usart_init(vsf_stream_usart_t *stream_usart)
         stream->rx.evthandler = __vsf_stream_usart_stream_evthandler;
         vsf_stream_connect_rx(stream);
         vsf_usart_irq_enable(stream_usart->usart, USART_IRQ_MASK_TX_CPL);
-        __vsf_stream_usart_stream_evthandler(stream_usart, VSF_STREAM_ON_IN);
+        __vsf_stream_usart_stream_evthandler(stream_usart->stream_tx, stream_usart, VSF_STREAM_ON_IN);
     }
 
     stream = stream_usart->stream_rx;
@@ -118,7 +118,7 @@ void vsf_stream_usart_init(vsf_stream_usart_t *stream_usart)
         stream->tx.evthandler = __vsf_stream_usart_stream_evthandler;
         vsf_stream_connect_tx(stream);
         vsf_usart_irq_enable(stream_usart->usart, USART_IRQ_MASK_RX_CPL);
-        __vsf_stream_usart_stream_evthandler(stream_usart, VSF_STREAM_ON_OUT);
+        __vsf_stream_usart_stream_evthandler(stream_usart->stream_rx, stream_usart, VSF_STREAM_ON_OUT);
     }
 }
 
