@@ -408,110 +408,85 @@ void vsf_linux_fd_trigger_init(vsf_trig_t *trig)
     vsf_eda_trig_init(trig, false, true);
 }
 
-// vsf_linux_fd_tx_[pend/ready/busy/trigger] MUST be called scheduler protected
-int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig)
+// vsf_linux_fd_[pend/set/clear]_[status/events] MUST be called scheduler protected
+short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_trig_t *trig, vsf_protect_t orig)
 {
-    if (sfd->priv->txevt) {
-        sfd->priv->txevt = false;
+    vsf_linux_fd_priv_t *priv = sfd->priv;
+    uint16_t events_triggered = priv->events & events;
+    if (events_triggered) {
+        priv->events &= ~events_triggered;
         vsf_unprotect_sched(orig);
     } else {
-        sfd->priv->txpend = trig;
+        priv->trigger = trig;
+        priv->events_pending = events;
         vsf_unprotect_sched(orig);
+
+        // TODO: add timeout?
         vsf_thread_trig_pend(trig, -1);
+
+        events_triggered = priv->events_triggered;
     }
-    return 0;
+    return events_triggered;
 }
 
-int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig)
+void vsf_linux_fd_set_events(vsf_linux_fd_t *sfd, short events, vsf_protect_t orig)
 {
-    if (sfd->priv->rxevt) {
-        sfd->priv->rxevt = false;
-        vsf_unprotect_sched(orig);
-    } else {
-        sfd->priv->rxpend = trig;
-        vsf_unprotect_sched(orig);
-        vsf_thread_trig_pend(trig, -1);
-    }
-    return 0;
-}
-
-int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
-{
-    vsf_trig_t *trig = sfd->priv->txpend;
+    vsf_linux_fd_priv_t *priv = sfd->priv;
+    vsf_trig_t *trig = priv->trigger;
+    priv->events |= events;
     if (trig != NULL) {
-        vsf_unprotect_sched(orig);
-        sfd->priv->txpend = NULL;
-        vsf_eda_trig_set_isr(trig);
-    } else {
-        sfd->priv->txevt = true;
-        vsf_unprotect_sched(orig);
-    }
-    return 0;
-}
+        priv->events_triggered = events & priv->events_pending;
+        priv->events &= ~priv->events_triggered;
+        if (priv->events_triggered) {
+            vsf_unprotect_sched(orig);
 
-int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig)
-{
-    vsf_trig_t *trig = sfd->priv->rxpend;
-    if (trig != NULL) {
-        vsf_unprotect_sched(orig);
-        sfd->priv->rxpend = NULL;
-        vsf_eda_trig_set_isr(trig);
-    } else {
-        sfd->priv->rxevt = true;
-        vsf_unprotect_sched(orig);
-    }
-    return 0;
-}
-
-int vsf_linux_fd_tx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig)
-{
-    if (!sfd->priv->txrdy) {
-        sfd->priv->txrdy = true;
-        return vsf_linux_fd_tx_trigger(sfd, orig);
-    } else {
-        vsf_unprotect_sched(orig);
-    }
-    return 0;
-}
-
-int vsf_linux_fd_rx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig)
-{
-    if (!sfd->priv->rxrdy) {
-        sfd->priv->rxrdy = true;
-        return vsf_linux_fd_rx_trigger(sfd, orig);
-    } else {
-        vsf_unprotect_sched(orig);
-    }
-    return 0;
-}
-
-void vsf_linux_fd_tx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig)
-{
-    if (sfd->priv->txpend != NULL) {
-        VSF_LINUX_ASSERT(false);
-    } else {
-        sfd->priv->txevt = sfd->priv->txrdy = false;
+            priv->trigger = NULL;
+            vsf_eda_trig_set_isr(trig);
+            return;
+        }
     }
     vsf_unprotect_sched(orig);
 }
 
-void vsf_linux_fd_rx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig)
+void vsf_linux_fd_set_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig)
 {
-    if (sfd->priv->rxpend != NULL) {
+    vsf_linux_fd_priv_t *priv = sfd->priv;
+    short events_triggered = (priv->status & status) ^ status;
+    priv->status |= status;
+    if (events_triggered) {
+        vsf_linux_fd_set_events(sfd, events_triggered, orig);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
+}
+
+void vsf_linux_fd_clear_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig)
+{
+    vsf_linux_fd_priv_t *priv = sfd->priv;
+    if ((priv->trigger != NULL) && (priv->events_pending & status)) {
         VSF_LINUX_ASSERT(false);
     } else {
-        sfd->priv->rxevt = sfd->priv->rxrdy = false;
+        status = ~status;
+        priv->events &= status;
+        priv->status &= status;
     }
     vsf_unprotect_sched(orig);
+}
+
+short vsf_linux_fd_get_status(vsf_linux_fd_t *sfd, short status)
+{
+    return sfd->priv->status & status;
 }
 
 int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t timeout)
 {
     vsf_protect_t orig;
     vsf_linux_fd_t *sfd;
+    vsf_linux_fd_priv_t *priv;
     int ret = 0;
     nfds_t i;
     vsf_trig_t trig;
+    short events_triggered;
 
     vsf_linux_fd_trigger_init(&trig);
     while (1) {
@@ -522,18 +497,14 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             if (NULL == sfd) {
                 continue;
             }
-            if (sfd->priv->rxevt || sfd->priv->txevt) {
-                if ((fds[i].events & POLLIN) && sfd->priv->rxevt) {
-                    sfd->priv->rxevt = sfd->priv->rxrdy;
-                    fds[i].revents |= POLLIN;
-                }
-                if ((fds[i].events & POLLOUT) && sfd->priv->txevt) {
-                    sfd->priv->txevt = sfd->priv->txrdy;
-                    fds[i].revents |= POLLOUT;
-                }
-                if (fds[i].revents) {
-                    ret++;
-                }
+            priv = sfd->priv;
+            VSF_LINUX_ASSERT(priv != NULL);
+            events_triggered = priv->events & fds[i].events;
+            if (events_triggered) {
+                fds[i].revents = events_triggered;
+                priv->events &= ~events_triggered;
+                priv->events |= priv->status & events_triggered;
+                ret++;
             }
         }
         if (ret || (0 == timeout)) {
@@ -546,12 +517,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             if (NULL == sfd) {
                 continue;
             }
-            if (fds[i].events & POLLIN) {
-                sfd->priv->rxpend = &trig;
-            }
-            if (fds[i].events & POLLOUT) {
-                sfd->priv->txpend = &trig;
-            }
+            sfd->priv->trigger = &trig;
         }
         vsf_unprotect_sched(orig);
 
@@ -568,21 +534,10 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             if (NULL == sfd) {
                 continue;
             }
+            priv = sfd->priv;
+            VSF_LINUX_ASSERT(priv != NULL);
             orig = vsf_protect_sched();
-                if (fds[i].events & POLLIN) {
-                    if (NULL == sfd->priv->rxpend) {
-                        sfd->priv->rxevt = true;
-                    } else {
-                        sfd->priv->rxpend = NULL;
-                    }
-                }
-                if (fds[i].events & POLLOUT) {
-                    if (NULL == sfd->priv->txpend) {
-                        sfd->priv->txevt = true;
-                    } else {
-                        sfd->priv->txpend = NULL;
-                    }
-                }
+                priv->trigger = NULL;
             vsf_unprotect_sched(orig);
         }
     }
@@ -1434,15 +1389,15 @@ static void __vsf_linux_stream_evt(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool
             priv->on_evt(sfd, orig, is_ready);
         } else if (is_ready) {
             if (is_rx) {
-                vsf_linux_fd_rx_ready(sfd, orig);
+                vsf_linux_fd_set_status(sfd, POLLIN, orig);
             } else {
-                vsf_linux_fd_tx_ready(sfd, orig);
+                vsf_linux_fd_set_status(sfd, POLLOUT, orig);
             }
         } else {
             if (is_rx) {
-                vsf_linux_fd_rx_busy(sfd, orig);
+                vsf_linux_fd_clear_status(sfd, POLLIN, orig);
             } else {
-                vsf_linux_fd_tx_busy(sfd, orig);
+                vsf_linux_fd_clear_status(sfd, POLLOUT, orig);
             }
         }
     vsf_unprotect_sched(orig);
@@ -1480,14 +1435,14 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 
     while (size > 0) {
         orig = vsf_protect_sched();
-        if (!sfd->priv->rxrdy && (0 == vsf_stream_get_rbuf(stream, NULL))) {
+        if (!vsf_linux_fd_get_status(sfd, POLLIN) && (0 == vsf_stream_get_rbuf(stream, NULL))) {
             if (vsf_linux_fd_is_block(sfd) && vsf_stream_is_tx_connected(stream)) {
                 vsf_trig_t trig;
                 vsf_linux_fd_trigger_init(&trig);
                 VSF_LINUX_ASSERT((NULL == stream->rx.param) && (NULL == stream->rx.evthandler));
                 stream->rx.param = sfd;
                 stream->rx.evthandler = __vsf_linux_stream_evthandler;
-                vsf_linux_fd_rx_pend(sfd, &trig, orig);
+                vsf_linux_fd_pend_events(sfd, POLLIN, &trig, orig);
             } else {
                 vsf_unprotect_sched(orig);
                 goto do_return;
@@ -1537,11 +1492,11 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 
 do_return:
     orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT(NULL == sfd->priv->rxpend);
+    VSF_LINUX_ASSERT((NULL == sfd->priv->trigger) || !(sfd->priv->events_pending & POLLIN));
     if (!vsf_stream_get_data_size(stream)) {
         __vsf_linux_stream_evt(sfd, orig, true, false);
     } else {
-        vsf_linux_fd_rx_trigger(sfd, orig);
+        vsf_linux_fd_set_events(sfd, POLLIN, orig);
     }
     return count - size;
 }
@@ -1556,13 +1511,13 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
 
     while (size > 0) {
         orig = vsf_protect_sched();
-        if (!sfd->priv->txrdy) {
+        if (!vsf_linux_fd_get_status(sfd, POLLOUT)) {
             vsf_trig_t trig;
             vsf_linux_fd_trigger_init(&trig);
             VSF_LINUX_ASSERT((NULL == stream->tx.param) || (NULL == stream->tx.evthandler));
             stream->tx.param = sfd;
             stream->tx.evthandler = __vsf_linux_stream_evthandler;
-            vsf_linux_fd_tx_pend(sfd, &trig, orig);
+            vsf_linux_fd_pend_events(sfd, POLLOUT, &trig, orig);
         } else {
             vsf_unprotect_sched(orig);
         }
@@ -1573,11 +1528,11 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
     }
 
     orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT(NULL == sfd->priv->txpend);
+    VSF_LINUX_ASSERT((NULL == sfd->priv->trigger) || !(sfd->priv->events_pending & POLLOUT));
     if (!vsf_stream_get_free_size(stream)) {
         __vsf_linux_stream_evt(sfd, orig, false, false);
     } else {
-        vsf_linux_fd_tx_trigger(sfd, orig);
+        vsf_linux_fd_set_events(sfd, POLLOUT, orig);
     }
     return count;
 }
@@ -1629,7 +1584,7 @@ static void __vsf_linux_tx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream
 
     vsf_protect_t orig = vsf_protect_sched();
     if (vsf_stream_get_free_size(stream)) {
-        vsf_linux_fd_tx_ready(sfd, orig);
+        vsf_linux_fd_set_status(sfd, POLLOUT, orig);
     } else {
         vsf_unprotect_sched(orig);
     }
@@ -1643,7 +1598,7 @@ static void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream
 
     vsf_protect_t orig = vsf_protect_sched();
     if (vsf_stream_get_data_size(stream)) {
-        vsf_linux_fd_tx_ready(sfd, orig);
+        vsf_linux_fd_set_status(sfd, POLLOUT, orig);
     } else {
         vsf_unprotect_sched(orig);
     }

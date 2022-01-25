@@ -33,6 +33,7 @@
 #   include "../../../include/netinet/tcp.h"
 #   include "../../../include/arpa/inet.h"
 #   include "../../../include/ifaddrs.h"
+#   include "../../../include/poll.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -41,6 +42,7 @@
 #   include <netinet/tcp.h>
 #   include <arpa/inet.h>
 #   include <ifaddrs.h>
+#   include <poll.h>
 #endif
 #include "../vsf_linux_socket.h"
 
@@ -738,19 +740,19 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
         switch (evt) {
         case NETCONN_EVT_RCVPLUS:
             if (0 == priv->rxcnt++) {
-                vsf_linux_fd_rx_ready(sfd, vsf_protect_sched());
+                vsf_linux_fd_set_status(sfd, POLLIN, vsf_protect_sched());
             }
             break;
         case NETCONN_EVT_RCVMINUS:
             if (0 == --priv->rxcnt) {
-                vsf_linux_fd_rx_busy(sfd, vsf_protect_sched());
+                vsf_linux_fd_clear_status(sfd, POLLIN, vsf_protect_sched());
             }
             break;
         case NETCONN_EVT_SENDPLUS:
-            vsf_linux_fd_tx_ready(sfd, vsf_protect_sched());
+            vsf_linux_fd_set_status(sfd, POLLOUT, vsf_protect_sched());
             break;
         case NETCONN_EVT_SENDMINUS:
-            vsf_linux_fd_tx_busy(sfd, vsf_protect_sched());
+            vsf_linux_fd_clear_status(sfd, POLLOUT, vsf_protect_sched());
             break;
         }
     }

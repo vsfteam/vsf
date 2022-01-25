@@ -28,12 +28,14 @@
 #   include "../../../include/fcntl.h"
 #   include "../../../include/sys/un.h"
 #   include "../../../include/sys/stat.h"
+#   include "../../../include/poll.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
 #   include <fcntl.h>
 #   include <sys/un.h>
 #   include <sys/stat.h>
+#   include <poll.h>
 #endif
 #include "../vsf_linux_socket.h"
 
@@ -182,7 +184,7 @@ static int __vsf_linux_socket_unix_fini(vsf_linux_socket_priv_t *socket_priv, in
     if (priv->remote != NULL) {
         vsf_linux_fd_t *sfd_remote = container_of(priv->remote, vsf_linux_fd_t, priv);
         priv->remote->remote = NULL;
-        vsf_linux_fd_rx_trigger(sfd_remote, orig);
+        vsf_linux_fd_set_events(sfd_remote, POLLIN, orig);
     } else {
         vsf_unprotect_sched(orig);
     }
@@ -202,9 +204,9 @@ static void __vsf_linux_socket_unix_pipe_on_rx_evt(vsf_linux_fd_t *sfd_rx, vsf_p
 {
     vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
     if (is_ready) {
-        vsf_linux_fd_rx_ready((vsf_linux_fd_t *)priv_rx->target, orig);
+        vsf_linux_fd_set_status((vsf_linux_fd_t *)priv_rx->target, POLLIN, orig);
     } else {
-        vsf_linux_fd_rx_busy((vsf_linux_fd_t *)priv_rx->target, orig);
+        vsf_linux_fd_clear_status((vsf_linux_fd_t *)priv_rx->target, POLLIN, orig);
     }
 }
 
@@ -241,7 +243,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     VSF_LINUX_ASSERT(!priv->remote->remote);
     vsf_protect_t orig = vsf_protect_sched();
     vsf_dlist_add_to_tail(vsf_linux_socket_unix_priv_t, sock_node, &priv->remote->listener.accept_list, priv);
-    vsf_linux_fd_rx_trigger(sfd_remote, orig);
+    vsf_linux_fd_set_events(sfd_remote, POLLIN, orig);
 
     // 2. pend to get remote response and get sfd_rx from remote
     vsf_thread_trig_pend(&trig, -1);
@@ -264,7 +266,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
 
     // 3. trigger remote again to complete conection
     vsf_eda_trig_set(priv->remote->trig);
-    vsf_linux_fd_tx_ready(sfd_local, vsf_protect_sched());
+    vsf_linux_fd_set_status(sfd_local, POLLOUT, vsf_protect_sched());
     return 0;
 }
 
@@ -296,7 +298,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
         orig = vsf_protect_sched();
         vsf_dlist_remove_head(vsf_linux_socket_unix_priv_t, sock_node, &priv->listener.accept_list, priv_remote);
         if (NULL == priv_remote) {
-            vsf_linux_fd_rx_pend(sfd_local, &trig, orig);
+            vsf_linux_fd_pend_events(sfd_local, POLLIN, &trig, orig);
 
             orig = vsf_protect_sched();
             vsf_dlist_remove_head(vsf_linux_socket_unix_priv_t, sock_node, &priv->listener.accept_list, priv_remote);
@@ -355,7 +357,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
                 orig = vsf_protect_sched();
                 priv->listener.backlog--;
                 vsf_dlist_add_to_tail(vsf_linux_socket_unix_priv_t, sock_node, &priv->listener.child_list, priv_new);
-                vsf_linux_fd_tx_ready(sfd_new, orig);
+                vsf_linux_fd_set_status(sfd_new, POLLOUT, orig);
                 return sockfd_new;
             } else {
                 vsf_linux_fd_delete(sfd_rx->fd);

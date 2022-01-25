@@ -53,11 +53,12 @@ typedef struct vsf_linux_fd_op_t {
 
 vsf_class(vsf_linux_fd_priv_t) {
     protected_member(
-        vsf_trig_t *txpend, *rxpend;
-        bool txrdy;
-        bool txevt;
-        bool rxrdy;
-        bool rxevt;
+        vsf_trig_t *trigger;
+        short events_pending;
+        short events_triggered;
+
+        short status;
+        short events;
     )
     private_member(
         int ref;
@@ -161,14 +162,11 @@ extern int vsf_linux_fd_set_size(int fd, uint64_t size);
 
 extern void vsf_linux_fd_trigger_init(vsf_trig_t *trig);
 // vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
-extern int vsf_linux_fd_tx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
-extern int vsf_linux_fd_rx_pend(vsf_linux_fd_t *sfd, vsf_trig_t *trig, vsf_protect_t orig);
-extern int vsf_linux_fd_tx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern int vsf_linux_fd_rx_trigger(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern int vsf_linux_fd_tx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern int vsf_linux_fd_rx_ready(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern void vsf_linux_fd_tx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
-extern void vsf_linux_fd_rx_busy(vsf_linux_fd_t *sfd, vsf_protect_t orig);
+extern short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_trig_t *trig, vsf_protect_t orig);
+extern void vsf_linux_fd_set_events(vsf_linux_fd_t *sfd, short events, vsf_protect_t orig);
+extern void vsf_linux_fd_set_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig);
+extern void vsf_linux_fd_clear_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig);
+extern short vsf_linux_fd_get_status(vsf_linux_fd_t *sfd, short status);
 
 // stream
 // IMPORTANT: priority of stream MUST be within scheduler priorities
@@ -186,6 +184,9 @@ extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_queue_stream_t *queue_stream);
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_LINUX_FS_CLASS_IMPLEMENT
+#undef __VSF_LINUX_FS_CLASS_INHERIT__
 
 /*============================ INCLUDES ======================================*/
 
