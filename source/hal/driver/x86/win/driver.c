@@ -93,7 +93,6 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 int __vsf_arch_printf(const char *format, ...)
 {
     char buff[4096];
-    va_list ap_temp;
     int size;
 
     va_list ap;
