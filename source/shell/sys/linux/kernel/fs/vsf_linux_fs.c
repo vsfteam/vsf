@@ -549,16 +549,13 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
     int fd_num = 0;
 
     VSF_LINUX_ASSERT((nfds > 0) && (nfds < FD_SETSIZE));
-    if (execeptfds != NULL) {
-        VSF_LINUX_ASSERT(false);
-        return -1;
-    }
 
     fd_set mask;
     FD_ZERO(&mask);
     for (int i = 0; i < nfds; i++) {
         if (    ((readfds != NULL) && (FD_ISSET(i, readfds)))
-            ||  ((writefds != NULL) && (FD_ISSET(i, writefds)))) {
+            ||  ((writefds != NULL) && (FD_ISSET(i, writefds)))
+            ||  ((execeptfds != NULL) && (FD_ISSET(i, execeptfds)))) {
             FD_SET(i, &mask);
             fd_num++;
         }
@@ -575,9 +572,19 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
         for (int i = 0, idx = 0; i < nfds; i++) {
             if (FD_ISSET(i, &mask)) {
                 fds[idx].fd = i;
+#if POLLPRI != POLLIN
                 if ((readfds != NULL) && (FD_ISSET(i, readfds))) {
                     fds[idx].events |= POLLIN;
                 }
+                if ((execeptfds != NULL) && (FD_ISSET(i, execeptfds))) {
+                    fds[idx].events |= POLLPRI;
+                }
+#else
+                if (    ((readfds != NULL) && (FD_ISSET(i, readfds)))
+                    ||  ((execeptfds != NULL) && (FD_ISSET(i, execeptfds)))) {
+                    fds[idx].events |= POLLIN;
+                }
+#endif
                 if ((writefds != NULL) && (FD_ISSET(i, writefds))) {
                     fds[idx].events |= POLLOUT;
                 }
@@ -590,6 +597,9 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
         }
         if (writefds != NULL) {
             FD_ZERO(writefds);
+        }
+        if (execeptfds != NULL) {
+            FD_ZERO(execeptfds);
         }
     }
 
@@ -607,6 +617,11 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
             if (fds[i].revents & POLLOUT) {
                 FD_SET(fds[i].fd, writefds);
             }
+#if POLLPRI != POLLIN
+            if (fds[i].revents & POLLPRI) {
+                FD_SET(fds[i].fd, execeptfds);
+            }
+#endif
         }
     }
     if (fds != NULL) {
