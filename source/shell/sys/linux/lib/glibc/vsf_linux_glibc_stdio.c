@@ -53,10 +53,6 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
-static int stdin_fd = STDIN_FILENO, stdout_fd = STDOUT_FILENO, stderr_fd = STDERR_FILENO;
-FILE *stdin = (FILE *)&stdin_fd, *stdout = (FILE *)&stdout_fd, *stderr = (FILE *)&stderr_fd;
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
@@ -64,18 +60,19 @@ extern const vsf_linux_fd_op_t __vsf_linux_fs_fdop;
 
 /*============================ IMPLEMENTATION ================================*/
 
-static int __get_fd(FILE *f)
+FILE * __vsf_linux_stdin(void)
 {
-    if (stdin == f) {
-        return STDIN_FILENO;
-    } else if (stdout == f) {
-        return STDOUT_FILENO;
-    } else if (stderr == f) {
-        return STDERR_FILENO;
-    } else {
-        vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
-        return sfd->fd;
-    }
+    return (FILE *)vsf_linux_fd_get(STDIN_FILENO);
+}
+
+FILE * __vsf_linux_stdout(void)
+{
+    return (FILE *)vsf_linux_fd_get(STDOUT_FILENO);
+}
+
+FILE * __vsf_linux_stderr(void)
+{
+    return (FILE *)vsf_linux_fd_get(STDERR_FILENO);
 }
 
 int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
@@ -120,7 +117,7 @@ FILE * freopen(const char *filename, const char *mode, FILE *f)
 
 int fclose(FILE *f)
 {
-    int fd = __get_fd(f);
+    int fd = ((vsf_linux_fd_t *)f)->fd;
     if (fd < 0) {
         return EOF;
     }
@@ -137,7 +134,7 @@ int fileno(FILE *stream)
 
 int fseeko(FILE *f, off_t offset, int fromwhere)
 {
-    int fd = __get_fd(f);
+    int fd = ((vsf_linux_fd_t *)f)->fd;
     if (fd < 0) {
         return -1;
     }
@@ -212,7 +209,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
         return 0;
     }
 
-    int fd = __get_fd(f);
+    int fd = ((vsf_linux_fd_t *)f)->fd;
     if (fd < 0) {
         return 0;
     }
@@ -232,7 +229,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
         return 0;
     }
 
-    int fd = __get_fd(f);
+    int fd = ((vsf_linux_fd_t *)f)->fd;
     if (fd < 0) {
         return 0;
     }
