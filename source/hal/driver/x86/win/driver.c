@@ -90,6 +90,24 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+int __vsf_arch_printf(const char *format, ...)
+{
+    char buff[4096];
+    va_list ap_temp;
+    int size;
+
+    va_list ap;
+    va_start(ap, format);
+        size = vsnprintf(buff, sizeof(buff), format, ap);
+    va_end(ap);
+
+    if (size <= sizeof(buff)) {
+        DWORD wsize;
+        WriteFile(hOut, buff, size, &wsize, NULL);
+    }
+    return size;
+}
+
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 #   if VSF_USE_SIMPLE_STREAM == ENABLED
 static void __vsf_x86_debug_stream_tx_init(vsf_stream_t *stream)

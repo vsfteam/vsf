@@ -72,7 +72,7 @@ extern "C" {
 
 // for trace
 #ifndef VSF_ARCH_TRACE_FUNC
-#   define VSF_ARCH_TRACE_FUNC              printf
+#   define VSF_ARCH_TRACE_FUNC              __vsf_arch_printf
 #endif
 
 #ifndef vsf_arch_trace
@@ -185,6 +185,9 @@ vsf_class(vsf_arch_irq_thread_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+// this API is implement in driver
+extern int __vsf_arch_printf(const char *format, ...);
 
 extern void __vsf_arch_irq_sleep(uint_fast32_t ms);
 
