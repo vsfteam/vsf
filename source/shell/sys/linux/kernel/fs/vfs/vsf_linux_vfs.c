@@ -28,6 +28,12 @@
 #   include <unistd.h>
 #endif
 
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   include "../../../include/simple_libc/stdlib.h"
+#else
+#   include <stdlib.h>
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

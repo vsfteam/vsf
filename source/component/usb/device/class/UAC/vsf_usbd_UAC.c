@@ -511,11 +511,11 @@ static vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
 
 static vsf_err_t __vk_usbd_uac_as_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
-    vk_usbd_uac_as_t *uac_as = ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
 
 #if VSF_USBD_UAC_CFG_TRACE_EN == ENABLED
+    vk_usbd_uac_as_t *uac_as = ifs->class_param;
     ctrl_handler->trans.size = uac_as->cur_size;
     __vk_usbd_uac_trace_request_process(uac_as->uac_ac, ctrl_handler);
 #endif

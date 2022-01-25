@@ -50,6 +50,7 @@
 #include "lwip/api.h"
 #include "lwip/ip.h"
 #include "lwip/tcp.h"
+#include "lwip/dns.h"
 
 /*============================ MACROS ========================================*/
 
