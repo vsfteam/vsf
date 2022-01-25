@@ -126,6 +126,9 @@ static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx, vsh_shell_stat
     char esc = ctx->cmd[ctx->pos];
     int esclen = ctx->escpos;
 
+    // esclen will be used for full support to escape strings
+    UNUSED_PARAM(esclen);
+
     switch (type) {
     case SHELL_STATE_CSI:
         VSF_LINUX_ASSERT(1 == esclen);

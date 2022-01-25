@@ -409,6 +409,7 @@ int pthread_mutex_lock(pthread_mutex_t *mutex)
 
     if (vsf_eda_mutex_enter(&mutex->use_as__vsf_mutex_t)) {
         vsf_sync_reason_t reason = vsf_eda_sync_get_reason(&mutex->use_as__vsf_sync_t, vsf_thread_wait());
+        UNUSED_PARAM(reason);
         VSF_LINUX_ASSERT(VSF_SYNC_GET == reason);
     }
 
