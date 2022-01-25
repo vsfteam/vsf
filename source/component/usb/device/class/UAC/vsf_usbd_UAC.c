@@ -69,13 +69,13 @@ static bool __vk_usbd_uac_is_get(vk_usbd_uac_ac_t *uac_ac, vk_usbd_ctrl_handler_
 #if VSF_USBD_UAC_CFG_UAC1_EN == ENABLED
     if (uac_ac->version == VK_USB_UAC1) {
         return request->bRequest & USB_UAC_REQ_GET;
-    } else 
+    } else
 #endif
 #if VSF_USBD_UAC_CFG_UAC2_EN == ENABLED
     if (uac_ac->version == VK_USB_UAC2) {
         return (request->bRequestType & USB_DIR_MASK) == USB_DIR_IN;
-    } 
-#endif    
+    }
+#endif
     else {
         VSF_USB_ASSERT(0);
         return false;
@@ -93,7 +93,7 @@ static char * __vk_usbd_uac_trace_get_request(vk_usbd_uac_ac_t *uac_ac, uint_fas
         case USB_UAC_REQ_MAX:   return "MAX";
         case USB_UAC_REQ_RES:   return "RES";
         }
-    } else 
+    } else
 #endif
 #if VSF_USBD_UAC_CFG_UAC2_EN == ENABLED
     if (uac_ac->version == VK_USB_UAC2) {
@@ -102,7 +102,7 @@ static char * __vk_usbd_uac_trace_get_request(vk_usbd_uac_ac_t *uac_ac, uint_fas
         case USB_UAC2_REQ_RANGE:    return "RANGE";
         case USB_UAC2_REQ_MEM:      return "MEM";
         }
-    } 
+    }
 #endif
     else {
         VSF_USB_ASSERT(0);
@@ -208,7 +208,7 @@ static vk_av_control_value_t *__vk_usbd_uac_get_value(vk_usbd_uac_ac_t *uac_ac,
         case USB_UAC2_REQ_RANGE: value = (vk_av_control_value_t *)&control->info->res; break;
         case USB_UAC2_REQ_MEM:   VSF_USB_ASSERT(0); break;  // TODO: support req memory
         }
-    } 
+    }
 #endif
     else {
         VSF_USB_ASSERT(0);
@@ -260,7 +260,7 @@ static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
                         }
 #endif
                     }
-                } else 
+                } else
 #endif
 #if VSF_USBD_UAC_CFG_UAC2_EN == ENABLED
                 if (uac_ac->version == VK_USB_UAC2) {
@@ -268,23 +268,23 @@ static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
                     const vk_usbd_uac2_range_t * range = info2->range;
                     VSF_USB_ASSERT(range != NULL);
                     size = info2->size;
-                    
+
                     switch (request->bRequest) {
                     case USB_UAC2_REQ_CUR:
                         buffer = (uint8_t *)&control->cur;
                         break;
                     case USB_UAC2_REQ_RANGE:
                         // Audio20 final.pdf 5.2.3 Offset 0: wNumSubRanges
-                        buffer = (uint8_t *)&range->number;     
+                        buffer = (uint8_t *)&range->number;
                         // 3: MIN(n), MAX(n), RES(n)
-                        size = sizeof(info2->range->number) + size * info2->range->number * 3; 
+                        size = sizeof(info2->range->number) + size * info2->range->number * 3;
                         break;
                     case USB_UAC2_REQ_MEM:	//TODO: support request memory
                     default:
                         VSF_USB_ASSERT(0);
                         return VSF_ERR_FAIL;
                     }
-                } 
+                }
 #endif
                 else {
                     VSF_USB_ASSERT(0);
@@ -454,7 +454,7 @@ static void __vk_usbd_uac_as_on_finish(void *param)
         orig = vsf_protect_int();
             uac_as->is_submitted = false;
         vsf_unprotect_int(orig);
-        __vk_usbd_uac_as_evthandler(uac_as, VSF_STREAM_ON_RX);
+        __vk_usbd_uac_as_evthandler(uac_as->stream, uac_as, VSF_STREAM_ON_RX);
     } else {
         if (!uac_as->trans.size) {
             vsf_stream_write(stream, NULL, uac_as->packet_size);
@@ -462,7 +462,7 @@ static void __vk_usbd_uac_as_on_finish(void *param)
         orig = vsf_protect_int();
             uac_as->is_submitted = false;
         vsf_unprotect_int(orig);
-        __vk_usbd_uac_as_evthandler(uac_as, VSF_STREAM_ON_TX);
+        __vk_usbd_uac_as_evthandler(uac_as->stream, uac_as, VSF_STREAM_ON_TX);
     }
 }
 
