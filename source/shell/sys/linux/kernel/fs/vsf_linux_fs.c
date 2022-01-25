@@ -359,6 +359,11 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
 free_sfd_and_exit:
         free(new_sfd);
     }
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+    vsf_trace_debug("%s: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+        __FUNCTION__, NULL == process ? vsf_linux_get_cur_process() : process,
+        new_sfd->fd, new_sfd->priv, NULL == new_sfd->priv ? 0 : new_sfd->priv->ref);
+#endif
     return ret;
 }
 
@@ -944,6 +949,10 @@ int close(int fd)
     vsf_linux_fd_priv_t *priv = sfd->priv;
     vsf_protect_t orig = vsf_protect_sched();
         bool is_to_close = --priv->ref == 0;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+        vsf_trace_debug("%s: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, vsf_linux_get_cur_process(), sfd->fd, priv, priv->ref);
+#endif
     vsf_unprotect_sched(orig);
 
     int err = 0;
@@ -978,6 +987,10 @@ int fcntl(int fd, int cmd, ...)
             vsf_linux_fd_priv_t *priv = sfd->priv;
             vsf_protect_t orig = vsf_protect_sched();
                 priv->ref++;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+                vsf_trace_debug("%s: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+                    __FUNCTION__, vsf_linux_get_cur_process(), sfd_new->fd, priv, priv->ref);
+#endif
             vsf_unprotect_sched(orig);
             sfd_new->priv = priv;
             return ret;

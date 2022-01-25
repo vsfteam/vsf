@@ -1212,7 +1212,11 @@ int posix_spawnp(pid_t *pid, const char *file,
                 sfd->priv = _->priv;
 
                 orig = vsf_protect_sched();
-                    ((vsf_linux_fd_priv_t *)_->priv)->ref++;
+                    sfd->priv->ref++;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+                    vsf_trace_debug("%s dup fds: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
+#endif
                 vsf_unprotect_sched(orig);
             } else {
                 vsf_trace_error("spawn: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
@@ -1252,7 +1256,11 @@ int posix_spawnp(pid_t *pid, const char *file,
                 }
 
                 orig = vsf_protect_sched();
-                    ((vsf_linux_fd_priv_t *)sfd->priv)->ref--;
+                    sfd->priv->ref--;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+                    vsf_trace_debug("%s action close: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
+#endif
                 vsf_unprotect_sched(orig);
                 __vsf_linux_fd_delete_ex(process, sfd->fd);
                 break;
@@ -1260,7 +1268,11 @@ int posix_spawnp(pid_t *pid, const char *file,
                 sfd = __vsf_linux_fd_get_ex(process, a->action.dup2_action.newfd);
                 if (sfd != NULL) {
                     orig = vsf_protect_sched();
-                        ((vsf_linux_fd_priv_t *)sfd->priv)->ref--;
+                        sfd->priv->ref--;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+                        vsf_trace_debug("%s action dup2_close: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+                            __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
+#endif
                     vsf_unprotect_sched(orig);
                     __vsf_linux_fd_delete_ex(process, sfd->fd);
                 }
@@ -1281,6 +1293,10 @@ int posix_spawnp(pid_t *pid, const char *file,
                 vsf_linux_fd_priv_t *priv = sfd->priv;
                 orig = vsf_protect_sched();
                     priv->ref++;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+                    vsf_trace_debug("%s action dup2: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
+#endif
                 vsf_unprotect_sched(orig);
                 sfd_new->priv = priv;
                 break;
