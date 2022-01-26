@@ -30,9 +30,6 @@
 #include "./vsf_disp_mipi_lcd.h"
 
 /*============================ MACROS ========================================*/
-#ifndef MIPI_LCD_SPI_FREQ
-#   define MIPI_LCD_SPI_FREQ                            (48ul * 1000 * 1000)
-#endif
 
 #ifndef MIPI_LCD_SPI_PRIO
 #   define MIPI_LCD_SPI_PRIO                            vsf_prio_0
@@ -78,15 +75,16 @@ static vsf_err_t __vk_disp_mipi_lcd_refresh(vk_disp_t *pthis,
                                             void *disp_buff);
 
 #if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
-extern void vk_disp_mipi_lcd_hw_reset(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level);
+extern void vk_disp_mipi_lcd_hw_reset_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level);
 static void __lcd_hardware_reset_pin(vsf_eda_t *teda, vsf_evt_t evt);
 #endif
+
 static void __lcd_exit_sleep_mode(vsf_eda_t *teda, vsf_evt_t evt);
 static void __lcd_init_param_seq(vsf_eda_t *teda, vsf_evt_t evt);
 static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt);
 
 extern void vk_disp_mipi_lcd_io_init(vk_disp_mipi_lcd_t *disp_mipi_lcd);
-extern void vk_disp_mipi_te_line_interrupt_enable_once(vk_disp_mipi_lcd_t *disp_mipi_lcd);
+extern void vk_disp_mipi_lcd_te_line_isr_handler(vk_disp_mipi_lcd_t *disp_mipi_lcd);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -96,17 +94,69 @@ const vk_disp_drv_t vk_disp_drv_mipi_lcd = {
 };
 
 /*============================ IMPLEMENTATION ================================*/
+
+// avoid access private member
 void vk_disp_mipi_tearing_effect_line_ready(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
     vsf_eda_post_evt(&disp_mipi_lcd->teda.use_as__vsf_eda_t, VSF_EVT_REFRESHING);
 }
 
+#ifndef WEAK_VK_DISP_MIPI_LCD_TE_LINE_ISR_HANDLER
+WEAK(vk_disp_mipi_lcd_te_line_isr_handler)
+void vk_disp_mipi_lcd_te_line_isr_handler(vk_disp_mipi_lcd_t *disp_mipi_lcd)
+{
+    // If we want to avoid tearing, then we need to wait for the TE signal to be ready.
+    // The default behavior is refresh immediately.
+
+    vk_disp_mipi_tearing_effect_line_ready(disp_mipi_lcd);
+}
+#endif
+
+#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#ifndef WEAK_VK_DISP_MIPI_LCD_RESET_IO_WRITE
+WEAK(vk_disp_mipi_lcd_hw_reset_io_write)
+void vk_disp_mipi_lcd_hw_reset_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level)
+{
+#if VSF_DISP_MIPI_LCD_USING_VSF_GPIO == ENABLED
+    vsf_gpio_write(disp_mipi_lcd->reset.gpio,
+                   level ? disp_mipi_lcd->reset.pin_mask : 0,
+                   disp_mipi_lcd->reset.pin_mask);
+#endif
+}
+#endif
+#endif
+
+#ifndef WEAK_VK_DISP_MIPI_LCD_DCX_WRITE
+WEAK(vk_disp_mipi_lcd_dcx_io_write)
+void vk_disp_mipi_lcd_dcx_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level)
+{
+#if VSF_DISP_MIPI_LCD_USING_VSF_GPIO == ENABLED
+    vsf_gpio_write(disp_mipi_lcd->dcx.gpio,
+                   level ? disp_mipi_lcd->dcx.pin_mask : 0,
+                   disp_mipi_lcd->dcx.pin_mask);
+#endif
+}
+#endif
+
 #ifndef WEAK_VK_DISP_MIPI_LCD_IO_INIT
 WEAK(vk_disp_mipi_lcd_io_init)
 void vk_disp_mipi_lcd_io_init(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
+#if VSF_DISP_MIPI_LCD_USING_VSF_GPIO == ENABLED
+    vsf_gpio_config_pin(disp_mipi_lcd->reset.gpio,
+                        disp_mipi_lcd->reset.pin_mask, IO_PULL_UP);
+    vsf_gpio_set_output(disp_mipi_lcd->reset.gpio,
+                        disp_mipi_lcd->reset.pin_mask);
+
+    vsf_gpio_config_pin(disp_mipi_lcd->dcx.gpio,
+                        disp_mipi_lcd->dcx.pin_mask, IO_PULL_UP);
+    vsf_gpio_set_output(disp_mipi_lcd->dcx.gpio,
+                        disp_mipi_lcd->dcx.pin_mask);
+#endif
 }
 #endif
+
+
 
 #ifndef WEAK_VK_DISP_MIPI_TE_LINE_ISR_ENABLE_ONCE
 WEAK(vk_disp_mipi_te_line_isr_enable_once)
@@ -117,11 +167,7 @@ void vk_disp_mipi_te_line_isr_enable_once(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 #endif
 
 static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-                                           const i_spi_t *spi_ptr,
-#else
                                            vsf_spi_t *spi_ptr,
-#endif
                                            em_spi_irq_mask_t irq_mask)
 {
     if (irq_mask & SPI_IRQ_MASK_CPL) {
@@ -130,21 +176,16 @@ static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
     }
 }
 
-static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_lcd_t * disp_mipi_lcd,
-                                     uint32_t clock_hz)
+static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_lcd_t * disp_mipi_lcd)
 {
     vsf_err_t init_result;
     fsm_rt_t enable_status;
 
     VSF_UI_ASSERT(disp_mipi_lcd->spi != NULL);
 
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-    i_spi_cfg_t spi_cfg = {
-#else
     spi_cfg_t spi_cfg = {
-#endif
         .mode = { MIPI_LCD_SPI_CFG },
-        .clock_hz = clock_hz,
+        .clock_hz = disp_mipi_lcd->clock_hz,
         .isr = {
             .handler_fn = __mipi_lcd_spi_req_cpl_handler,
             .target_ptr = disp_mipi_lcd,
@@ -152,31 +193,16 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_lcd_t * disp_mipi_lcd,
         }
     };
 
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-    VSF_UI_ASSERT(disp_mipi_lcd->spi->Init != NULL);
-    init_result = disp_mipi_lcd->spi->Init(&spi_cfg);
-#else
     init_result = vsf_spi_init(disp_mipi_lcd->spi, &spi_cfg);
-#endif
     if (init_result != VSF_ERR_NONE) {
         return init_result;
     }
 
     do {
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-        VSF_UI_ASSERT(disp_mipi_lcd->spi->Enable != NULL);
-        enable_status = disp_mipi_lcd->spi->Enable();
-#else
         enable_status = vsf_spi_enable(disp_mipi_lcd->spi);
-#endif
     } while (enable_status != fsm_rt_cpl);
 
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-    VSF_UI_ASSERT(disp_mipi_lcd->spi->IRQ.Enable != NULL);
-    disp_mipi_lcd->spi->IRQ.Enable(SPI_IRQ_MASK_CPL);
-#else
     vsf_spi_irq_enable(disp_mipi_lcd->spi, SPI_IRQ_MASK_CPL);
-#endif
 
     return VSF_ERR_NONE;
 }
@@ -222,40 +248,19 @@ static void __lcd_spi_request_cmd(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
     VSF_UI_ASSERT(disp_mipi_lcd->spi != NULL);
 
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-    VSF_UI_ASSERT(disp_mipi_lcd->spi->CS.Set != NULL);
-    disp_mipi_lcd->spi->CS.Set(0);
-#else
     vsf_spi_cs_active(disp_mipi_lcd->spi, 0);
-#endif
-
-    vk_disp_mipi_lcd_dcx_set(disp_mipi_lcd, 0);
-
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-    VSF_UI_ASSERT(disp_mipi_lcd->spi->Block.RequestTransfer != NULL);
-    disp_mipi_lcd->spi->Block.RequestTransfer(&disp_mipi_lcd->cmd.cmd, NULL, 1);
-#else
+    vk_disp_mipi_lcd_dcx_io_write(disp_mipi_lcd, false);
     vsf_spi_request_transfer(disp_mipi_lcd->spi, &disp_mipi_lcd->cmd.cmd, NULL, 1);
-#endif
 }
 
 static void __lcd_spi_request_data(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
     VSF_UI_ASSERT(disp_mipi_lcd->spi != NULL);
 
-    vk_disp_mipi_lcd_dcx_set(disp_mipi_lcd, 1);
-
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-    VSF_UI_ASSERT(disp_mipi_lcd->spi->Block.RequestTransfer != NULL);
-    disp_mipi_lcd->spi->Block.RequestTransfer(disp_mipi_lcd->cmd.param_buffer,
-                                              NULL,
-                                              disp_mipi_lcd->cmd.param_size);
-#else
+    vk_disp_mipi_lcd_dcx_io_write(disp_mipi_lcd, true);
     vsf_spi_request_transfer(disp_mipi_lcd->spi,
                              disp_mipi_lcd->cmd.param_buffer,
                              NULL, disp_mipi_lcd->cmd.param_size);
-#endif
-
 }
 
 static void __lcd_write_command_seq(vsf_eda_t *teda, vsf_evt_t evt)
@@ -284,12 +289,7 @@ static void __lcd_write_command_seq(vsf_eda_t *teda, vsf_evt_t evt)
                 __lcd_spi_request_data(disp_mipi_lcd);
                 disp_mipi_lcd->cmd.param_size = 0;
             } else {
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-                VSF_UI_ASSERT(disp_mipi_lcd->spi->CS.Clear != NULL);
-                disp_mipi_lcd->spi->CS.Clear(0);
-#else
                 vsf_spi_cs_inactive(disp_mipi_lcd->spi, 0);
-#endif
                 vsf_eda_post_evt(&disp_mipi_lcd->teda.use_as__vsf_eda_t, VSF_EVT_CMD_NEXT);
             }
             break;
@@ -318,9 +318,9 @@ static void __lcd_hardware_reset_pin(vsf_eda_t *teda, vsf_evt_t evt)
         VSF_UI_ASSERT(disp_mipi_lcd->spi != NULL);
 
         vk_disp_mipi_lcd_io_init(disp_mipi_lcd);
-        __mipi_lcd_spi_init(disp_mipi_lcd, MIPI_LCD_SPI_FREQ);
+        __mipi_lcd_spi_init(disp_mipi_lcd);
 
-        vk_disp_mipi_lcd_hw_reset(disp_mipi_lcd, false);
+        vk_disp_mipi_lcd_hw_reset_io_write(disp_mipi_lcd, false);
         disp_mipi_lcd->reset_state = 0;
         vsf_teda_set_timer_ms(MIPI_LCD_RESET_LOW_PULSE_TIME);
         break;
@@ -328,7 +328,7 @@ static void __lcd_hardware_reset_pin(vsf_eda_t *teda, vsf_evt_t evt)
     case VSF_EVT_TIMER:
         if (disp_mipi_lcd->reset_state == 0) {
             disp_mipi_lcd->reset_state++;
-            vk_disp_mipi_lcd_hw_reset(disp_mipi_lcd, true);
+            vk_disp_mipi_lcd_hw_reset_io_write(disp_mipi_lcd, true);
             vsf_teda_set_timer_ms(MIPI_LCD_RESET_COMPLETION_TIME);
         } else {
             disp_mipi_lcd->teda.fn.evthandler = __lcd_exit_sleep_mode;
@@ -400,7 +400,7 @@ static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
         break;
 
     case VSF_EVT_REFRESH:
-        vk_disp_mipi_te_line_interrupt_enable_once(disp_mipi_lcd);
+        vk_disp_mipi_lcd_te_line_isr_handler(disp_mipi_lcd);
         break;
 
     case VSF_EVT_REFRESHING: {
@@ -439,7 +439,7 @@ static vsf_err_t __vk_disp_mipi_lcd_init(vk_disp_t *pthis)
     VSF_UI_ASSERT(disp_mipi_lcd != NULL);
 
 //    vk_disp_mipi_lcd_io_init(disp_mipi_lcd);
-//    __mipi_lcd_spi_init(disp_mipi_lcd, MIPI_LCD_SPI_FREQ);
+//    __mipi_lcd_spi_init(disp_mipi_lcd);
 
 #if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
     disp_mipi_lcd->teda.fn.evthandler = __lcd_hardware_reset_pin;
