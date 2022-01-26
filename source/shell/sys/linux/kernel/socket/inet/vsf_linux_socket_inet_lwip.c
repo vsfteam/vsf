@@ -645,6 +645,8 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
             } else if (ERR_CLSD == err) {
                 // remote closed, return 0
                 return 0;
+            } else if (ERR_WOULDBLOCK == err) {
+                errno = EAGAIN;
             }
         }
 
