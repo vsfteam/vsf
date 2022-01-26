@@ -36,6 +36,10 @@
 #   endif
 #endif
 
+#ifndef VSF_DEBUG_STREAM_CFG_HW_PRIORITY
+#   define VSF_DEBUG_STREAM_CFG_HW_PRIORITY             vsf_arch_prio_32
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
@@ -169,7 +173,7 @@ static void __vsf_x86_debug_stream_init(void)
 
     VSF_STREAM_CONNECT_TX(&VSF_DEBUG_STREAM_RX);
     __vsf_arch_irq_init(&__vsf_x86_debug_stream_rx_irq, "debug_stream_rx",
-        __vsf_x86_debug_stream_rx_irqhandler, vsf_arch_prio_32);
+        __vsf_x86_debug_stream_rx_irqhandler, VSF_DEBUG_STREAM_CFG_HW_PRIORITY);
 }
 #   elif   VSF_USE_STREAM == ENABLED
 #   endif
