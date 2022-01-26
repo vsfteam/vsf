@@ -332,14 +332,6 @@ void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
     }
 }
 
-bool vsf_spi_fifo_flush(vsf_spi_t *spi_ptr)
-{
-    VSF_HAL_ASSERT(spi_ptr != NULL);
-    VSF_HAL_ASSERT(spi_ptr->reg != NULL);
-
-    return !(spi_ptr->reg->STATUS & (SPI_STATUS_RXEMPTY_Msk | SPI_STATUS_TXEMPTY_Pos));
-}
-
 static void __m484_spi_tx_dma_done_handler(void *target_ptr, uint32_t dma_irq_mask)
 {
     vsf_spi_t *spi_ptr = (vsf_spi_t *)target_ptr;
