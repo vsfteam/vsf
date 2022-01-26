@@ -50,20 +50,24 @@
 #       define VSF_SPI_CFG_PREFIX             vsf_hw
 #   endif
 
+#   ifndef VSF_SPI_CFG_REAL_PREFIX
+#       define VSF_SPI_CFG_REAL_PREFIX        VSF_SPI_CFG_PREFIX
+#   endif
+
 #   define ____VSF_SPI_WRAPPER(__header, __api)   __header ## _ ## __api
 #   define __VSF_SPI_WRAPPER(__header, __api)     ____VSF_SPI_WRAPPER(__header, __api)
-#   define vsf_spi_init                 __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_init)
-#   define vsf_spi_enable               __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_enable)
-#   define vsf_spi_disable              __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_disable)
-#   define vsf_spi_irq_enable           __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_irq_enable)
-#   define vsf_spi_irq_disable          __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_irq_disable)
-#   define vsf_spi_status               __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_status)
-#   define vsf_spi_cs_active            __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cs_active)
-#   define vsf_spi_cs_inactive          __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cs_inactive)
-#   define vsf_spi_fifo_transfer        __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_fifo_transfer)
-#   define vsf_spi_request_transfer     __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_request_transfer)
-#   define vsf_spi_cancel_transfer      __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_cancel_transfer)
-#   define vsf_spi_get_transfered_count __VSF_SPI_WRAPPER(VSF_SPI_CFG_PREFIX, spi_get_transfered_count)
+#   define vsf_spi_init                 __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_init)
+#   define vsf_spi_enable               __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_enable)
+#   define vsf_spi_disable              __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_disable)
+#   define vsf_spi_irq_enable           __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_irq_enable)
+#   define vsf_spi_irq_disable          __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_irq_disable)
+#   define vsf_spi_status               __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_status)
+#   define vsf_spi_cs_active            __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_cs_active)
+#   define vsf_spi_cs_inactive          __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_cs_inactive)
+#   define vsf_spi_fifo_transfer        __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_fifo_transfer)
+#   define vsf_spi_request_transfer     __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_request_transfer)
+#   define vsf_spi_cancel_transfer      __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_cancel_transfer)
+#   define vsf_spi_get_transfered_count __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_get_transfered_count)
 #endif
 
 #define VSF_SPI_INIT(spi_ptr, cfg_ptr)                                          \
