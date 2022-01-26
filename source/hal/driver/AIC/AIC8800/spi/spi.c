@@ -29,7 +29,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef SPI_DMA_CFG_BYTE_CNT_MAX
-#   define SPI_DMA_CFG_BYTE_CNT_MAX     64
+#   define SPI_DMA_CFG_BYTE_CNT_MAX     65535
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -288,31 +288,40 @@ void vsf_hw_spi_fifo_transfer(vsf_spi_t *spi_ptr,
     uint32_t byte_cnt = SPI_DATASIZE_TO_BYTE(reg->CR[0]);
     uint8_t *out_buf = (uint8_t *)out_buffer_ptr;
     uint8_t *in_buf = (uint8_t *)in_buffer_ptr;
+    uint_fast32_t out_offset = 0;
+    uint_fast32_t in_offset = 0;
 
     bool is_continue = false;
     do {
         uint32_t value = 0;
 
-        if (*out_offset_ptr < out_cnt && __hw_spi_is_send_full(hw_spi_ptr)) {
+        if (out_offset < out_cnt && __hw_spi_is_send_full(hw_spi_ptr)) {
             if (out_buf != NULL) {
-                memcpy(&value, out_buf + *out_offset_ptr * byte_cnt, byte_cnt);
+                memcpy(&value, out_buf + out_offset * byte_cnt, byte_cnt);
             }
             reg->IOR = value;
-            (*out_offset_ptr)++;
+            out_offset++;
 
             is_continue = true;
         }
 
-        if (*in_offset_ptr < in_cnt && __hw_spi_is_recv_emtpy(hw_spi_ptr)) {
+        if (in_offset < in_cnt && __hw_spi_is_recv_emtpy(hw_spi_ptr)) {
             uint32_t value = reg->IOR;
             if (in_buf != NULL) {
-                memcpy(in_buf + *in_offset_ptr * byte_cnt, &value, byte_cnt);
+                memcpy(in_buf + in_offset * byte_cnt, &value, byte_cnt);
             }
-            (*in_offset_ptr)++;
+            in_offset++;
 
             is_continue = true;
         }
     } while (is_continue);
+
+    if (out_offset_ptr != NULL) {
+        *out_offset_ptr = out_offset;
+    }
+    if (in_offset_ptr != NULL) {
+        *in_offset_ptr = in_offset;
+    }
 #endif
 }
 
