@@ -57,6 +57,7 @@
 #define VSF_HAL_GPIO_USE_74HC165                        ENABLED
 #define VSF_HAL_USE_RNG                                 ENABLED
 #define VSF_HAL_USE_GPIO                                ENABLED
+#define VSF_HAL_USE_SPI                                 ENABLED
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
@@ -75,6 +76,7 @@
 #define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
 #define APP_USE_SDL2_DEMO                               ENABLED
+#define APP_USE_DISP_DEMO                               DISABLED
 // if using dl1x5, only RGB565 is supported
 #   define APP_SDL2_DEMO_CFG_COLOR_RGB565
 #   define APP_SDL2_DEMO_CFG_WIDTH                      256
@@ -93,6 +95,7 @@
 #       define APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST   DISABLED
 #       define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            ENABLED
 #       define APP_USART_DEMO_CFG_USART                     (vsf_usart_t *)&vsf_usart1
+#       define APP_USE_HAL_SPI_DEMO                     DISABLED
 
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
@@ -350,6 +353,22 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 // use lua module in evm if lua_demo is enabled while evm is enabled
 #if APP_USE_LUA_DEMO == ENABLED && APP_USE_EVM_DEMO == ENABLED
 #   define VSF_EVM_USE_LUA                              ENABLED
+#endif
+
+#if APP_USE_DISP_DEMO == ENABLED
+#   define VSF_USE_UI                                   ENABLED
+#   define VSF_DISP_USE_MIPI_LCD                        ENABLED
+#      define APP_DISP_DEMO_SPI                         (vsf_spi_t *)&vsf_spi0
+#      define APP_DISP_DEMO_RESET_GPIO                  (vsf_gpio_t *)&vsf_gpio0
+#      define APP_DISP_DEMO_RESET_PIN_MASK              (1 << 5)
+#      define APP_DISP_DEMO_DCX_GPIO                    (vsf_gpio_t *)&vsf_gpio0
+#      define APP_DISP_DEMO_DCX_PIN_MASK                (1 << 6)
+
+#      define APP_DISP_DEMO_HEIGHT                      240
+#      define APP_DISP_DEMO_WIDTH                       320
+#      define APP_DISP_DEMO_COLOR                       VSF_DISP_COLOR_RGB565
+#      define APP_DISP_DEMO_SEQ                         VSF_DISP_MIPI_LCD_ST7789V
+#      define APP_DISP_DEMO_CLOCK_HZ                    (20ul * 1000ul * 1000ul)
 #endif
 
 /*============================ TYPES =========================================*/

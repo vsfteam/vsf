@@ -112,11 +112,16 @@ usrapp_ui_common_t usrapp_ui_common = {
             .drv                = &vk_disp_drv_mipi_lcd,
             .color              = APP_DISP_DEMO_COLOR,
         },
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-        .spi                    = &VSF_SPI0_CS0,
-#else
-        .spi                    = &vsf_spi0,
-#endif
+        .spi                    = APP_DISP_DEMO_SPI,
+        .reset                  = {
+            .gpio               = APP_DISP_DEMO_RESET_GPIO,
+            .pin_mask           = APP_DISP_DEMO_RESET_PIN_MASK,
+        },
+        .dcx                    = {
+            .gpio               = APP_DISP_DEMO_DCX_GPIO,
+            .pin_mask           = APP_DISP_DEMO_DCX_PIN_MASK,
+        },
+        .clock_hz               = APP_DISP_DEMO_CLOCK_HZ,
         .init_seq               = (const uint8_t [])APP_DISP_DEMO_SEQ,
         .init_seq_len           = sizeof((const uint8_t [])APP_DISP_DEMO_SEQ),
 

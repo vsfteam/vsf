@@ -33,11 +33,16 @@
 
 bool vsf_app_driver_init(void)
 {
-    iomux_gpio_config_sel_setf(10, 0x01); // PA10 as uart1 rx
-    iomux_gpio_config_sel_setf(11, 0x01); // PA11 as uart1 tx
+    iomux_gpio_config_sel_setf(10, 0x03); // PA10 as spi sck
+    iomux_gpio_config_sel_setf(11, 0x03); // PA11 as spi csn
+    iomux_gpio_config_sel_setf(12, 0x03); // PA10 as spi di
+    iomux_gpio_config_sel_setf(13, 0x03); // PA11 as spi do
 
-    iomux_gpio_config_sel_setf(6, 0x02); // PA10 as uart2 rx
-    iomux_gpio_config_sel_setf(7, 0x02); // PA11 as uart2 tx
+#if VSF_DISP_USE_MIPI_LCD == ENABLED
+    iomux_gpio_config_sel_setf(5, 0x00); // PA5 as LCD RESET
+    iomux_gpio_config_sel_setf(6, 0x00); // PA6 as LCD DCS
+    iomux_gpio_config_sel_setf(7, 0x00); // PA7 as LCD TE
+#endif
 
     return true;
 }
