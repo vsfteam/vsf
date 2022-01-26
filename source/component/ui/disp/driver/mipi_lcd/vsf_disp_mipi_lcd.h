@@ -47,23 +47,27 @@ extern "C" {
 #   error "need VSF_HAL_USE_SPI"
 #endif
 
-#ifndef VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE
-#   define VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE  ENABLED
+#ifndef VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET
+#   define VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET  ENABLED
+#endif
+
+#ifndef VSF_DISP_MIPI_LCD_USING_VSF_GPIO
+#   define VSF_DISP_MIPI_LCD_USING_VSF_GPIO         ENABLED
 #endif
 
 #ifndef VSF_DISP_MIPI_LCD_CFG_WIDTH
-#   define VSF_DISP_MIPI_LCD_CFG_WIDTH          240
+#   define VSF_DISP_MIPI_LCD_CFG_WIDTH              240
 #endif
 
 #ifndef VSF_DISP_MIPI_LCD_CFG_HEIGTH
-#   define VSF_DISP_MIPI_LCD_CFG_HEIGTH         320
+#   define VSF_DISP_MIPI_LCD_CFG_HEIGTH             320
 #endif
 
-#define VSF_DISP_MIPI_LCD_SPI_8BITS_MODE        0
-#define VSF_DISP_MIPI_LCD_SPI_9BITS_MODE        1
+#define VSF_DISP_MIPI_LCD_SPI_8BITS_MODE            0
+#define VSF_DISP_MIPI_LCD_SPI_9BITS_MODE            1
 
 #ifndef VSF_DISP_MIPI_LCD_SPI_MODE
-#   define  VSF_DISP_MIPI_LCD_SPI_MODE          VSF_DISP_MIPI_LCD_SPI_8BITS_MODE
+#   define  VSF_DISP_MIPI_LCD_SPI_MODE              VSF_DISP_MIPI_LCD_SPI_8BITS_MODE
 #endif
 
 #if (VSF_DISP_MIPI_LCD_SPI_MODE != VSF_DISP_MIPI_LCD_SPI_8BITS_MODE) && \
@@ -307,9 +311,6 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-
-
-
 enum {
     MIPI_LCD_STATE_INIT = 0,
     MIPI_LCD_STATE_HW_RESET_WAIT_CPL,
@@ -320,13 +321,16 @@ enum {
 vsf_class(vk_disp_mipi_lcd_t) {
     public_member(
         implement(vk_disp_t)
-#if VSF_DISP_MIPI_LCD_USE_SPI_INTERFACE == ENABLED
-        const i_spi_t   *spi;
-#else
         vsf_spi_t       *spi;
-#endif
+        uint32_t         clock_hz;
         const uint8_t   *init_seq;
-        const uint16_t  init_seq_len;
+        const uint16_t   init_seq_len;
+#if VSF_DISP_MIPI_LCD_USING_VSF_GPIO == ENABLED
+        struct {
+            vsf_gpio_t * gpio;
+            uint32_t     pin_mask;
+        } reset, dcx;
+#endif
     )
 
     private_member(
@@ -337,7 +341,7 @@ vsf_class(vk_disp_mipi_lcd_t) {
         uint8_t             *cur_buffer;
 
         uint8_t             refresh_seq[VSF_DISP_MIPI_LCD_REFRESH_SEQ_LEN];
-#ifdef VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET
+#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
         uint8_t             reset_state : 1;
 #endif
 
@@ -356,13 +360,15 @@ vsf_class(vk_disp_mipi_lcd_t) {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
 extern const vk_disp_drv_t vk_disp_drv_mipi_lcd;
 
 /*============================ PROTOTYPES ====================================*/
+
 extern void vk_disp_mipi_tearing_effect_line_ready(vk_disp_mipi_lcd_t *disp_mipi_lcd);
 
 #if VSF_DISP_MIPI_LCD_SPI_MODE == VSF_DISP_MIPI_LCD_SPI_8BITS_MODE
-extern void vk_disp_mipi_lcd_dcx_set(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool state);
+extern void vk_disp_mipi_lcd_dcx_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool state);
 #endif
 
 #ifdef __cplusplus
