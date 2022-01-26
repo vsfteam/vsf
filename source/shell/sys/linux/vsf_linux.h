@@ -159,6 +159,9 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         char **__environ;
 #endif
+#if VSF_LINUX_CFG_PROCESS_SHARED_DATA_SIZE
+        char shared_data[VSF_LINUX_CFG_PROCESS_SHARED_DATA_SIZE];
+#endif
     )
 
     protected_member(
