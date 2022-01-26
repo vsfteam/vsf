@@ -132,17 +132,17 @@ struct in_addr inet_makeaddr(in_addr_t net, in_addr_t lna)
 {
     in_addr_t addr;
 
-	if (net < 128) {
-		addr = (net << IN_CLASSA_NSHIFT) | (lna & IN_CLASSA_HOST);
+    if (net < 128) {
+        addr = (net << IN_CLASSA_NSHIFT) | (lna & IN_CLASSA_HOST);
     } else if (net < 0x10000) {
-		addr = (net << IN_CLASSB_NSHIFT) | (lna & IN_CLASSB_HOST);
+        addr = (net << IN_CLASSB_NSHIFT) | (lna & IN_CLASSB_HOST);
     } else if (net < 0x1000000L) {
-		addr = (net << IN_CLASSC_NSHIFT) | (lna & IN_CLASSC_HOST);
+        addr = (net << IN_CLASSC_NSHIFT) | (lna & IN_CLASSC_HOST);
     } else {
-		addr = net | lna;
+        addr = net | lna;
     }
-	addr = htonl(addr);
-	return (*(struct in_addr *)&addr);
+    addr = htonl(addr);
+    return (*(struct in_addr *)&addr);
 }
 
 in_addr_t inet_netof(struct in_addr in)
@@ -159,10 +159,10 @@ in_addr_t inet_netof(struct in_addr in)
 
 char * inet_ntoa(struct in_addr in)
 {
-	static char __inet_ntoa_buf[16];
-	unsigned char *a = (void *)&in;
-	snprintf(__inet_ntoa_buf, sizeof(__inet_ntoa_buf), "%d.%d.%d.%d", a[0], a[1], a[2], a[3]);
-	return __inet_ntoa_buf;
+    static char __inet_ntoa_buf[16];
+    unsigned char *a = (void *)&in;
+    snprintf(__inet_ntoa_buf, sizeof(__inet_ntoa_buf), "%d.%d.%d.%d", a[0], a[1], a[2], a[3]);
+    return __inet_ntoa_buf;
 }
 
 in_addr_t inet_network(const char *cp)
@@ -353,120 +353,135 @@ int socket(int domain, int type, int protocol)
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
 
-	vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-	VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_connect != NULL));
-	return priv->sockop->fn_connect(priv, addr, addrlen);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_connect != NULL));
+    return priv->sockop->fn_connect(priv, addr, addrlen);
 }
 
 int listen(int sockfd, int backlog)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
 
-	vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-	VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_listen != NULL));
-	return priv->sockop->fn_listen(priv, backlog);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_listen != NULL));
+    return priv->sockop->fn_listen(priv, backlog);
 }
 
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
 
-	vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-	VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_accept != NULL));
-	return priv->sockop->fn_accept(priv, addr, addrlen);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_accept != NULL));
+    return priv->sockop->fn_accept(priv, addr, addrlen);
 }
 
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
 
-	vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-	VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_bind != NULL));
-	return priv->sockop->fn_bind(priv, addr, addrlen);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_bind != NULL));
+    return priv->sockop->fn_bind(priv, addr, addrlen);
 }
 
 int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
 
-	vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-	VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_getsockopt != NULL));
-	return priv->sockop->fn_getsockopt(priv, level, optname, optval, optlen);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_getsockopt != NULL));
+    return priv->sockop->fn_getsockopt(priv, level, optname, optval, optlen);
 }
 
-int setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t optlen)
+int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
 
-	vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-	VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_setsockopt != NULL));
-	return priv->sockop->fn_setsockopt(priv, level, optname, optval, optlen);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_setsockopt != NULL));
+    int err = priv->sockop->fn_setsockopt(priv, level, optname, optval, optlen);
+
+    switch (level) {
+    case SOL_SOCKET:
+        switch (optname) {
+        case SO_NONBLOCK:
+            if (*(const int *)optval) {
+                sfd->status_flags |= O_NONBLOCK;
+            } else {
+                sfd->status_flags &= ~O_NONBLOCK;
+            }
+            break;
+        }
+        break;
+    }
+    return 0;
 }
 
 int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    if (!sfd) {
+        return -1;
+    }
 
-	vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-	VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_getpeername != NULL));
-	return priv->sockop->fn_getpeername(priv, addr, addrlen);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_getpeername != NULL));
+    return priv->sockop->fn_getpeername(priv, addr, addrlen);
 }
 
 int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    if (!sfd) {
+        return -1;
+    }
 
-	vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-	VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_getsockname != NULL));
-	return priv->sockop->fn_getsockname(priv, addr, addrlen);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_getsockname != NULL));
+    return priv->sockop->fn_getsockname(priv, addr, addrlen);
 }
 
 int shutdown(int sockfd, int how)
 {
-	vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
 
-	vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-	VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_fini != NULL));
-	return priv->sockop->fn_fini(priv, how);
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT((priv->sockop != NULL) && (priv->sockop->fn_fini != NULL));
+    return priv->sockop->fn_fini(priv, how);
 }
 
 int send(int sockfd, const void *buf, size_t len, int flags)
 {
-	return write(sockfd, buf, len);
+    return write(sockfd, buf, len);
 }
 
 int recv(int sockfd, void *buf, size_t len, int flags)
 {
-	return read(sockfd, buf, len);
+    return read(sockfd, buf, len);
 }
 
 #endif
