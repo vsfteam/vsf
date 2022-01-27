@@ -127,6 +127,10 @@ typedef struct vsf_linux_t {
         vsf_linux_shm_mem_t mem[VSF_LINUX_CFG_SHM_NUM];
     } shm;
 #endif
+
+#if VSF_LINUX_CFG_LIB_NUM > 0
+    int lib_num;
+#endif
 } vsf_linux_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -166,6 +170,59 @@ static const vsf_linux_thread_op_t __vsf_linux_main_op = {
 };
 
 /*============================ IMPLEMENTATION ================================*/
+
+int vsf_linux_app_init(int app_ctx_size)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+
+    if (!app_ctx_size) {
+        return 0;
+    }
+
+    process->app_ctx = calloc(1, app_ctx_size);
+    return NULL == process->app_ctx ? -1 : 0;
+}
+
+void * vsf_linux_app_ctx(void)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    return process->app_ctx;
+}
+
+#if VSF_LINUX_CFG_LIB_NUM > 0
+// helper for manage libraries
+int vsf_linux_library_init(int *lib_idx, void *lib_ctx)
+{
+    VSF_LINUX_ASSERT(lib_idx != NULL);
+    if (*lib_idx < 0) {
+        vsf_protect_t orig = vsf_protect_sched();
+        if (__vsf_linux.lib_num >= VSF_LINUX_CFG_LIB_NUM) {
+            vsf_unprotect_sched(orig);
+            VSF_LINUX_ASSERT(false);
+            return -1;
+        }
+        *lib_idx = __vsf_linux.lib_num++;
+        vsf_unprotect_sched(orig);
+    }
+
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    process->lib_ctx[*lib_idx] = lib_ctx;
+    return 0;
+}
+
+void * vsf_linux_library_ctx(int lib_idx)
+{
+    VSF_LINUX_ASSERT((lib_idx >= 0) && (lib_idx < VSF_LINUX_CFG_LIB_NUM));
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    void *lib_ctx = process->lib_ctx[lib_idx];
+    VSF_LINUX_ASSERT(lib_ctx != NULL);
+    return lib_ctx;
+}
+#endif
 
 #ifndef WEAK_VSF_LINUX_CREATE_FHS
 WEAK(vsf_linux_create_fhs)
@@ -663,6 +720,9 @@ static void __vsf_linux_process_unref(vsf_linux_process_t *process)
             vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
         }
         __vsf_linux_process_free_arg(&process->ctx.arg);
+        if (process->app_ctx != NULL) {
+            free(process->app_ctx);
+        }
         vsf_heap_free(process);
 
         if (parent_process != NULL) {

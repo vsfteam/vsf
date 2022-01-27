@@ -78,8 +78,6 @@ extern "C" {
 #   define VSF_LINUX_CFG_PRIO_HIGHEST       vsf_prio_0
 #endif
 
-#define vsf_linux_app_ctx                   (vsf_linux_get_cur_process()->app_ctx)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_linux_thread_get_priv(__thread)         (void *)(&(((vsf_linux_thread_t *)(__thread))[1]))
@@ -161,8 +159,6 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         char **__environ;
 #endif
-
-        void *app_ctx;
     )
 
     protected_member(
@@ -207,6 +203,11 @@ vsf_class(vsf_linux_process_t) {
 
         vsf_linux_process_t *parent_process;
         int ref_cnt;
+
+        void *app_ctx;
+#if VSF_LINUX_CFG_LIB_NUM > 0
+        void *lib_ctx[VSF_LINUX_CFG_LIB_NUM];
+#endif
     )
 };
 
@@ -216,6 +217,13 @@ vsf_class(vsf_linux_process_t) {
 
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
+
+extern int vsf_linux_app_init(int app_ctx_size);
+extern void * vsf_linux_app_ctx(void);
+#if VSF_LINUX_CFG_LIB_NUM > 0
+extern int vsf_linux_library_init(int *lib_idx, void *lib_ctx);
+extern void * vsf_linux_library_ctx(int lib_idx);
+#endif
 
 extern int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in);
 extern int vsf_linux_chdir(vsf_linux_process_t *process, char *working_dir);
