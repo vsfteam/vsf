@@ -77,7 +77,8 @@ struct sigaction {
 #define SIGXFSZ         25  //                      coredump
 #define SIGVTALRM       26  //                      terminate
 #define SIGPROF         27  //                      terminate
-#define SIGWINCH        28  //                      ignore
+// some applications will check SIGWINCH, undefine it to mark unsupported
+//#define SIGWINCH        28  //                      ignore
 #define SIGPOLL         20  //                      terminate
 #define SIGIO           29  //                      terminate
 #define SIGPWR          30  //                      terminate
