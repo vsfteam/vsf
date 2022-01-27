@@ -78,6 +78,8 @@ extern "C" {
 #   define VSF_LINUX_CFG_PRIO_HIGHEST       vsf_prio_0
 #endif
 
+#define vsf_linux_app_ctx                   (vsf_linux_get_cur_process()->app_ctx)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_linux_thread_get_priv(__thread)         (void *)(&(((vsf_linux_thread_t *)(__thread))[1]))
@@ -159,9 +161,8 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         char **__environ;
 #endif
-#if VSF_LINUX_CFG_PROCESS_SHARED_DATA_SIZE
-        char shared_data[VSF_LINUX_CFG_PROCESS_SHARED_DATA_SIZE];
-#endif
+
+        void *app_ctx;
     )
 
     protected_member(
