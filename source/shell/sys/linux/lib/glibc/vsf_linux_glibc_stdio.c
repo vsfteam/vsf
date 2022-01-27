@@ -424,6 +424,18 @@ void perror(const char *str)
 }
 #endif
 
+FILE * popen(const char *command, const char *type)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
+int pclose(FILE *stream)
+{
+    VSF_LINUX_ASSERT(false);
+    return 0;
+}
+
 // TODO: implement tmpnam and tmpfile
 FILE * tmpfile(void)
 {

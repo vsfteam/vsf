@@ -149,6 +149,9 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f);
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f);
 int fflush(FILE *f);
 
+FILE * popen(const char *command, const char *type);
+int pclose(FILE *stream);
+
 void setbuf(FILE *f, char *buf);
 #define _IOFBF              0x0000
 #define _IOLBF              0x0040
