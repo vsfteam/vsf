@@ -717,6 +717,7 @@ static bool __vk_dl1x5_cls_callback(void *dev)
     while (dl1x5->pixel_addr < timing->h.active * timing->v.active) {
         if (!vk_usbh_dl1x5_fill_color(dev, dl1x5->pixel_addr, DL1X5_PIXELS_IN_CMD, 0)) {
             vsf_err_t err = vk_usbh_dl1x5_commit(dev);
+            UNUSED_PARAM(err);
             VSF_USB_ASSERT(VSF_ERR_NONE == err);
             return false;
         }
@@ -759,6 +760,7 @@ static void __vk_disp_dl1x5_refresh_callback(void *dev, vsf_err_t err)
 
             if (!vk_usbh_dl1x5_fill_buf(dev, pixel_addr, pixel_num, dl1x5->disp_buff_rgb565)) {
                 vsf_err_t err = vk_usbh_dl1x5_commit(dev);
+                UNUSED_PARAM(err);
                 VSF_USB_ASSERT(VSF_ERR_NONE == err);
                 return;
             }

@@ -199,6 +199,7 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_init(vk_netdrv_t *netdrv)
         // get mac address for WIN
         netdrv->macaddr.size = 6;
         int status = pcap_oid_get_request((pcap_t *)wpcap_netdrv->fp, OID_802_3_CURRENT_ADDRESS, &netdrv->macaddr.addr_buf, &netdrv->macaddr.size);
+        UNUSED_PARAM(status);
         VSF_TCPIP_ASSERT(!status && (6 == netdrv->macaddr.size));
 #endif
         netdrv->mac_header_size = TCPIP_ETH_HEADSIZE;

@@ -163,6 +163,7 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
             uint_fast8_t cbd_len = vk_scsi_get_command_len(cbd);
             scsi_cmd_code_t cmd_code = (scsi_cmd_code_t)(cbd[0] & 0x1F);
             bool is_rw = vk_scsi_get_rw_param(cbd, &msc->addr, &msc->total_size);
+            UNUSED_PARAM(is_rw);
 
             msc->state = VSF_USBH_MSC_STATE_COMMAND;
             memset(&msc->buffer.cbw, 0, sizeof(msc->buffer.cbw));

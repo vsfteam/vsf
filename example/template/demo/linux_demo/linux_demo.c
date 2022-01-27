@@ -404,6 +404,7 @@ int VSF_USER_ENTRY(int argc, char *argv[])
         .err    = stream_tx,
     };
     vsf_err_t err = vsf_linux_init(&stream);
+    UNUSED_PARAM(err);
     VSF_ASSERT(VSF_ERR_NONE == err);
     return 0;
 }

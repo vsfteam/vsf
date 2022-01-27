@@ -435,7 +435,7 @@ int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t
         }
         break;
     }
-    return 0;
+    return err;
 }
 
 int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen)

@@ -140,6 +140,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_fini, vk_scsi_fini)
 {
     vsf_peda_begin();
     vk_scsi_t *pthis = (vk_scsi_t *)&vsf_this;
+    UNUSED_PARAM(pthis);
     VSF_SCSI_ASSERT(pthis != NULL);
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
@@ -388,6 +389,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute_stream, vk_scsi_execute
     case VSF_EVT_INIT: {
             vk_virtual_scsi_t *pthis = (vk_virtual_scsi_t *)&vsf_this;
             scsi_cmd_code_t cmd_code = (scsi_cmd_code_t)(vsf_local.cbd[0] & 0x1F);
+            UNUSED_PARAM(cmd_code);
             VSF_SCSI_ASSERT((SCSI_CMDCODE_READ == cmd_code) || (SCSI_CMDCODE_WRITE == cmd_code));
             pthis->is_stream = true;
             __vk_virtual_scsi_rw(pthis, vsf_local.cbd, vsf_local.stream);
