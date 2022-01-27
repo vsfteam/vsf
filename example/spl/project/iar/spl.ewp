@@ -220,6 +220,7 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
+                    <state>__VSF__</state>
                     <state>__CPU_ARM9__</state>
                     <state>__Allwinner__</state>
                     <state>__F1C100S__</state>

@@ -220,6 +220,7 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
+                    <state>__VSF__</state>
                     <state>__Nuvoton__</state>
                     <state>__M484__</state>
                     <state>__OOC_CPP__</state>
@@ -1313,6 +1314,7 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
+                    <state>__VSF__</state>
                     <state>__CPU_ARM9__</state>
                     <state>__Allwinner__</state>
                     <state>__F1C100S__</state>
@@ -2413,6 +2415,7 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
+                    <state>__VSF__</state>
                     <state>__GigaDevice__</state>
                     <state>__GD32E103__</state>
                 </option>
@@ -3485,6 +3488,7 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
+                    <state>__VSF__</state>
                     <state>__MT071__</state>
                 </option>
                 <option>
@@ -4558,6 +4562,7 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
+                    <state>__VSF__</state>
                     <state>__AIC__</state>
                     <state>__AIC8800__</state>
                     <state>__OOC_CPP__</state>
