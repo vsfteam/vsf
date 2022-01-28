@@ -834,8 +834,9 @@ vsf_class(vsf_callback_timer_t) {
 //! \name sync
 //! @{
 vsf_class(vsf_sync_t) {
-
-    protected_member(
+    // it's not good to make cur_union & max_union public
+    //  but some APIs in shell will require these to be visible
+    public_member(
         union {
             struct {
                 uint16_t        cur         : 15;
@@ -850,7 +851,9 @@ vsf_class(vsf_sync_t) {
             } bits;
             uint16_t            max_value;
         } max_union;
+    )
 
+    protected_member(
         vsf_dlist_t             pending_list;
     )
 };
