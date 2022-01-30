@@ -1331,7 +1331,6 @@ int vsf_linux_fs_bind_target_ex(const char *pathname, void *target,
         if (!err) {
             vsf_linux_fd_set_feature(fd, feature);
             vsf_linux_fd_set_size(fd, size);
-            printf("%s bound.\r\n", pathname);
         }
         close(fd);
         return err;
