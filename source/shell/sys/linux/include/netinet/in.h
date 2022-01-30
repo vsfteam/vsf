@@ -93,6 +93,8 @@ typedef uint32_t            in_addr_t;
          && (((const uint32_t *) (a))[2] == ((const uint32_t *) (b))[2])        \
          && (((const uint32_t *) (a))[3] == ((const uint32_t *) (b))[3]))
 
+#define INET_ADDRSTRLEN     16
+#define INADDR_ANY          ((in_addr_t) 0x00000000)
 struct in_addr {
     in_addr_t               s_addr;
 };
@@ -104,6 +106,7 @@ struct sockaddr_in {
     char                    sin_zero[SIN_ZERO_LEN];
 };
 
+#define INET6_ADDRSTRLEN    46
 #define IN6ADDR_ANY_INIT    { 0 }
 struct in6_addr {
     uint8_t                 s6_addr[16];
