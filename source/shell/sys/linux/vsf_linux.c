@@ -1119,7 +1119,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
         .tm_min = rtc_tm.tm_min,
         .tm_hour = rtc_tm.tm_hour,
         .tm_mday = rtc_tm.tm_day,
-        .tm_mon = rtc_tm.tm_mon,
+        .tm_mon = rtc_tm.tm_mon - 1,
         .tm_year = rtc_tm.tm_year - 1900,
     };
 
