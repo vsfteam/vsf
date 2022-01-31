@@ -295,6 +295,9 @@
     <Filter Include="vsf\component\mal\driver\fakefat32_mal">
       <UniqueIdentifier>{fe462d39-0aa8-4fe0-8708-eef1ad07cc87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\driver\x86\win\rtc">
+      <UniqueIdentifier>{437b8675-2a4f-4a92-ae9b-e4ae2a100291}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -1089,6 +1092,9 @@
     <ClInclude Include="..\..\..\..\source\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.h">
       <Filter>vsf\component\mal\driver\fakefat32_mal</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -1552,6 +1558,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
       <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -183,6 +183,7 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\driver.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\device.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\driver.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.h" />
     <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_common.h" />
     <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_io.h" />
@@ -378,6 +379,7 @@
     <ClCompile Include="..\..\..\..\source\hal\arch\x86\win\win_generic.c" />
     <ClCompile Include="..\..\..\..\source\hal\arch\x86\win\win_generic_simple.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\driver.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.c" />
     <ClCompile Include="..\..\..\..\source\hal\vsf_hal.c" />
     <ClCompile Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_bmpevt.c" />
