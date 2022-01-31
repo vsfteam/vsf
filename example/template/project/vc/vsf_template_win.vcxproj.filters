@@ -1120,6 +1120,9 @@
     <Filter Include="vsf\service\simple_stream\queue_stream">
       <UniqueIdentifier>{e1aea818-5269-4bc9-9099-8f139667452b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\driver\x86\win\rtc">
+      <UniqueIdentifier>{66ffeef7-6d0b-4cab-ba57-53e07e5c5c47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3326,6 +3329,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\langinfo.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5803,6 +5809,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.c">
       <Filter>vsf\service\simple_stream\queue_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

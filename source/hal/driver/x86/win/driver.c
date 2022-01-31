@@ -26,6 +26,8 @@
 #   endif
 #endif
 #include "hal/arch/vsf_arch.h"
+#include "./rtc/rtc.h"
+
 #include <Windows.h>
 
 /*============================ MACROS ========================================*/
@@ -183,6 +185,10 @@ bool vsf_driver_init(void)
 {
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
     __vsf_x86_debug_stream_init();
+#endif
+#if VSF_HAL_USE_RTC == ENABLED
+    vsf_hw_rtc_init((vsf_rtc_t *)&vsf_hw_rtc0, NULL);
+    vsf_hw_rtc_enable((vsf_rtc_t *)&vsf_hw_rtc0);
 #endif
     return true;
 }
