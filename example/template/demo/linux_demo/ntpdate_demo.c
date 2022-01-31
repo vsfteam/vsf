@@ -48,7 +48,7 @@ int ntpdate_main(int argc, char *argv[])
             .tm_mon     = rtc_tm.tm_mon,
             .tm_year    = rtc_tm.tm_year - 1900,
         };
-        printf("%s\n", asctime(&t));
+        printf("%s", asctime(&t));
     }
     return 0;
 }
