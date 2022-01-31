@@ -20,6 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "shell/sys/linux/vsf_linux_cfg.h"
 #include "service/vsf_service.h"
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
