@@ -15,46 +15,30 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __HAL_X86_WIN_RTC_H__
+#define __HAL_X86_WIN_RTC_H__
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-
-#else
-
-#ifndef __HAL_DRIVER_X86_WIN_H__
-#define __HAL_DRIVER_X86_WIN_H__
-
-/*============================ INCLUDES ======================================*/
-
-#include "service/vsf_service.h"
-
-#include "./device.h"
-#include "./uart/uart.h"
-#include "./rtc/rtc.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#if VSF_HAL_USE_RTC == ENABLED
 
 /*============================ MACROS ========================================*/
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/template/vsf_template_rtc.h"
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_hw_rtc_t vsf_hw_rtc_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_SIMPLE_STREAM == ENABLED
-extern vsf_stream_t VSF_DEBUG_STREAM_TX;
-extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
-#endif
+extern vsf_hw_rtc_t vsf_hw_rtc0;
 
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#ifdef __cplusplus
-}
 #endif
-
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-#endif
-/* EOF */
+#endif      // __HAL_X86_WIN_RTC_H__

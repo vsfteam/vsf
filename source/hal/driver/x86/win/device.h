@@ -28,6 +28,9 @@
 
 /*============================ MACROS ========================================*/
 
+#define RTC_HW_COUNT                            1
+
+// TODO: use USART_HW_COUNT
 #ifndef USART_MAX_PORT
 #   define USART_MAX_PORT                       1
 #endif
