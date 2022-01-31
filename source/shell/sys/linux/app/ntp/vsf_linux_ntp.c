@@ -24,6 +24,12 @@
 #define __VSF_LINUX_NTP_CLASS_IMPLEMENT
 #include "./vsf_linux_ntp.h"
 
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../../include/sys/time.h"
+#else
+#   include <sys/time.h>
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -119,6 +125,14 @@ vsf_err_t vsf_linux_ntp_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
     ntp_rtc_ptr->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (ntp_rtc_ptr->sock < 0) {
         return VSF_ERR_FAIL;
+    }
+
+    if (ntp_rtc_ptr->timeout_ms > 0) {
+        struct timeval timeout = {
+            .tv_sec     = ntp_rtc_ptr->timeout_ms / 1000,
+            .tv_usec    = (ntp_rtc_ptr->timeout_ms % 1000) * 1000,
+        };
+        setsockopt(ntp_rtc_ptr->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
     }
 
     ssize_t ret;

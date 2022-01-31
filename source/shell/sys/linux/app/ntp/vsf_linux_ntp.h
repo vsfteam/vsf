@@ -52,6 +52,7 @@ vsf_class(vsf_linux_ntp_rtc_t) {
         vsf_rtc_t vsf_rtc;
 #endif
         struct sockaddr_in host_addr;
+        uint16_t timeout_ms;
     )
 
     private_member(

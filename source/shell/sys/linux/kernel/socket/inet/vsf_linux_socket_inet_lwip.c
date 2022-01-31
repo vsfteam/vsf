@@ -29,6 +29,7 @@
 #   include "../../../include/unistd.h"
 #   include "../../../include/errno.h"
 #   include "../../../include/sys/socket.h"
+#   include "../../../include/sys/time.h"
 #   include "../../../include/netinet/in.h"
 #   include "../../../include/netinet/tcp.h"
 #   include "../../../include/arpa/inet.h"
@@ -38,6 +39,7 @@
 #   include <unistd.h>
 #   include <errno.h>
 #   include <sys/socket.h>
+#   include <sys/time.h>
 #   include <netinet/in.h>
 #   include <netinet/tcp.h>
 #   include <arpa/inet.h>
@@ -286,6 +288,11 @@ static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, in
     return (ERR_OK == err) ? 0 : -1;
 }
 
+static long __vsf_linux_timeval_to_ms(const struct timeval *t)
+{
+    return t->tv_sec * 1000 + t->tv_usec / 1000;
+}
+
 static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, const void *optval, socklen_t optlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
@@ -323,6 +330,20 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                 ip_reset_option(conn->pcb.ip, optname);
             }
             break;
+#if LWIP_SO_RCVTIMEO
+        case SO_RCVTIMEO: {
+                long ms = __vsf_linux_timeval_to_ms((const struct timeval *)optval);
+                netconn_set_recvtimeout(conn, (u32_t)ms);
+            }
+            break;
+#endif
+#if LWIP_SO_SNDTIMEO
+        case SO_SNDTIMEO: {
+                long ms = __vsf_linux_timeval_to_ms((const struct timeval *)optval);
+                netconn_set_sendtimeout(conn, ms);
+            }
+            break;
+#endif
         case SO_NONBLOCK:
             netconn_set_nonblocking(conn, *(const int *)optval);
             break;
@@ -357,6 +378,12 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
     return 0;
 }
 
+static void __vsf_linux_ms_to_timeval(struct timeval *t, u32_t ms)
+{
+    t->tv_sec = ms / 1000;
+    t->tv_usec = (ms % 1000) * 1000;
+}
+
 static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, void *optval, socklen_t *optlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
@@ -387,6 +414,21 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
 
             *(int *)optval = ip_get_option(conn->pcb.ip, optname);
             break;
+#if LWIP_SO_RCVTIMEO
+        case SO_RCVTIMEO:
+            __vsf_linux_ms_to_timeval(optval, netconn_get_recvtimeout(conn));
+            break;
+#endif
+#if LWIP_SO_SNDTIMEO
+        case SO_SNDTIMEO:
+            __vsf_linux_ms_to_timeval(optval, netconn_get_sendtimeout(conn));
+            break;
+#endif
+        default:
+            VSF_LINUX_ASSERT(false);
+            break;
+        }
+        break;
     case IPPROTO_TCP:
         switch (optname) {
         case TCP_NODELAY:
@@ -396,12 +438,6 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
             *(int *)optval = (int)conn->pcb.tcp->keep_idle;
             break;
         default:
-            VSF_LINUX_ASSERT(false);
-            break;
-        }
-        break;
-        default:
-            // TODO: add support
             VSF_LINUX_ASSERT(false);
             break;
         }

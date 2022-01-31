@@ -25,6 +25,7 @@ int ntpdate_main(int argc, char *argv[])
     }
 
     vsf_linux_ntp_rtc_t ntp_rtc = {
+        .timeout_ms             = 5000,
         .host_addr              = {
             .sin_family         = AF_INET,
             .sin_port           = htons(123),
@@ -49,7 +50,10 @@ int ntpdate_main(int argc, char *argv[])
             .tm_year    = rtc_tm.tm_year - 1900,
         };
         printf("%s", asctime(&t));
+        return 0;
     }
-    return 0;
+
+    printf("fail to get reply from %s\n", argv[1]);
+    return -1;
 }
 #endif
