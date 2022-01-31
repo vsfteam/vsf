@@ -1109,10 +1109,28 @@ key_t ftok(const char *pathname, int id)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
+#ifdef VSF_LINUX_CFG_RTC
+    vsf_rtc_tm_t rtc_tm;
+    VSF_RTC_GET(&VSF_LINUX_CFG_RTC, &rtc_tm);
+
+    VSF_LINUX_ASSERT(rtc_tm.tm_year >= 1900);
+    struct tm t = {
+        .tm_sec = rtc_tm.tm_sec,
+        .tm_min = rtc_tm.tm_min,
+        .tm_hour = rtc_tm.tm_hour,
+        .tm_mday = rtc_tm.tm_day,
+        .tm_mon = rtc_tm.tm_mon,
+        .tm_year = rtc_tm.tm_year - 1900,
+    };
+
+    tv->tv_sec = mktime(&t);
+    tv->tv_usec = 0;
+#else
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     tv->tv_sec = ts.tv_sec;
     tv->tv_usec = ts.tv_nsec / 1000;
+#endif
     return 0;
 }
 #endif

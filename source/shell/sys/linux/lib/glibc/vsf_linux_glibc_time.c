@@ -42,13 +42,31 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+time_t mktime(struct tm *tm)
+{
+    const uint16_t yday_month[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+    time_t t;
+
+    int year = tm->tm_year;
+    int leap_years = year / 4;
+    leap_years -= year / 100;
+    leap_years += (year + 300) / 400;
+
+    t = year * 365 + leap_years;
+    t +=  yday_month[tm->tm_mon] + tm->tm_mday - 1;
+    t *= (time_t)86400;
+    t += (((tm->tm_hour * 60) + tm->tm_min) * 60) + tm->tm_sec;
+    return t;
+}
+
 time_t time(time_t *t)
 {
-    time_t sec = vsf_systimer_get_ms() / 1000;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
     if (t != NULL) {
-        *t = sec;
+        *t = tv.tv_sec;
     }
-    return sec;
+    return tv.tv_sec;
 }
 
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
