@@ -66,28 +66,28 @@ fsm_rt_t vsf_hw_rtc_disable(vsf_rtc_t *rtc_ptr)
     return fsm_rt_cpl;
 }
 
-vsf_err_t vsf_hw_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *tm)
+vsf_err_t vsf_hw_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 {
     vsf_hw_rtc_t *hw_rtc_ptr = (vsf_hw_rtc_t *)rtc_ptr;
     if (hw_rtc_ptr->is_enabled) {
         SYSTEMTIME system_time;
-        GetSystemTime(&system_time);
+        GetLocalTime(&system_time);
 
-        if (tm != NULL) {
-            tm->tm_sec = system_time.wSecond;
-            tm->tm_min = system_time.wMinute;
-            tm->tm_hour = system_time.wHour;
-            tm->tm_day = system_time.wDay;
-            tm->tm_wday = system_time.wDayOfWeek == 0 ? 7 : system_time.wDayOfWeek;
-            tm->tm_mon = system_time.wMonth;
-            tm->tm_year = system_time.wYear;
+        if (rtc_tm != NULL) {
+            rtc_tm->tm_sec = system_time.wSecond;
+            rtc_tm->tm_min = system_time.wMinute;
+            rtc_tm->tm_hour = system_time.wHour;
+            rtc_tm->tm_mday = system_time.wDay;
+            rtc_tm->tm_wday = system_time.wDayOfWeek == 0 ? 7 : system_time.wDayOfWeek;
+            rtc_tm->tm_mon = system_time.wMonth;
+            rtc_tm->tm_year = system_time.wYear;
         }
         return VSF_ERR_NONE;
     }
     return VSF_ERR_FAIL;
 }
 
-vsf_err_t vsf_hw_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *tm)
+vsf_err_t vsf_hw_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 {
     return VSF_ERR_FAIL;
 }

@@ -54,15 +54,15 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_RTC_INIT(__RTC_PTR, __CFG_PTR)                                      \
-            vsf_rtc_init((__RTC_PTR), (__CFG_PTR))
+            vsf_rtc_init((vsf_rtc_t *)(__RTC_PTR), (__CFG_PTR))
 #define VSF_RTC_ENABLE(__RTC_PTR)                                               \
-            vsf_rtc_enable(__RTC_PTR)
+            vsf_rtc_enable((vsf_rtc_t *)(__RTC_PTR))
 #define VSF_RTC_DISABLE(__RTC_PTR)                                              \
-            vsf_rtc_disable(__RTC_PTR)
+            vsf_rtc_disable((vsf_rtc_t *)(__RTC_PTR))
 #define VSF_RTC_GET(__RTC_PTR, __TM)                                            \
-            vsf_rtc_get((__RTC_PTR), (__TM))
+            vsf_rtc_get((vsf_rtc_t *)(__RTC_PTR), (__TM))
 #define VSF_RTC_SET(__RTC_PTR, __TM)                                            \
-            vsf_rtc_set((__RTC_PTR), (__TM))
+            vsf_rtc_set((vsf_rtc_t *)(__RTC_PTR), (__TM))
 
 /*============================ TYPES =========================================*/
 
@@ -80,9 +80,9 @@ typedef struct vsf_rtc_tm_t {
     uint8_t tm_sec;         // [0 .. 59]
     uint8_t tm_min;         // [0 .. 59]
     uint8_t tm_hour;        // [0 .. 23]
-    uint8_t tm_day;         // [1 .. 31]    - [January -- December]
+    uint8_t tm_mday;        // [1 .. 31]
     uint8_t tm_wday;        // [1 .. 7]     - [Monday -- Sunday]
-    uint8_t tm_mon;         // [1 .. 12]
+    uint8_t tm_mon;         // [1 .. 12]    - [January -- December]
     uint16_t tm_year;       // [1900 .. ]
 } vsf_rtc_tm_t;
 
@@ -114,7 +114,7 @@ extern fsm_rt_t vsf_rtc_disable(vsf_rtc_t *rtc_ptr);
  * @param[in] rtc_ptr rtc instance
  * @param[out] rtc data time
  */
-extern vsf_err_t vsf_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *tm);
+extern vsf_err_t vsf_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm);
 
 /**
  * set rtc date time
@@ -122,7 +122,7 @@ extern vsf_err_t vsf_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *tm);
  * @param[in] rtc_ptr rtc instance
  * @param[in] rtc data time
  */
-extern vsf_err_t vsf_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *tm);
+extern vsf_err_t vsf_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm);
 
 #ifdef __cplusplus
 }
