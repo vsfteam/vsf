@@ -194,6 +194,7 @@ int vsf_linux_pls_alloc(void)
 void vsf_linux_pls_free(int idx)
 {
     vsf_protect_t orig = vsf_protect_sched();
+        VSF_LINUX_ASSERT(vsf_bitmap_get(&__vsf_linux.pls.bitmap, idx));
         vsf_bitmap_clear(&__vsf_linux.pls.bitmap, idx);
     vsf_unprotect_sched(orig);
 }
@@ -226,6 +227,56 @@ void * vsf_linux_library_ctx(int lib_idx)
     void *lib_ctx = process->pls[lib_idx];
     VSF_LINUX_ASSERT(lib_ctx != NULL);
     return lib_ctx;
+}
+#endif
+
+#if VSF_LINUX_CFG_TLS_NUM > 0
+int vsf_linux_tls_alloc(void (*destructor)(void*))
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+
+    vsf_protect_t orig = vsf_protect_sched();
+    int_fast16_t idx = vsf_bitmap_ffz(&process->tls.bitmap, VSF_LINUX_CFG_TLS_NUM);
+    if (idx < 0) {
+        vsf_unprotect_sched(orig);
+        return -1;
+    }
+    vsf_bitmap_set(&process->tls.bitmap, idx);
+    vsf_unprotect_sched(orig);
+
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+
+    thread->tls[idx].destructor = destructor;
+    thread->tls[idx].data = NULL;
+    return idx;
+}
+
+void vsf_linux_tls_free(int idx)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+
+    vsf_protect_t orig = vsf_protect_sched();
+        VSF_LINUX_ASSERT(vsf_bitmap_get(&process->tls.bitmap, idx));
+        vsf_bitmap_clear(&process->tls.bitmap, idx);
+    vsf_unprotect_sched(orig);
+}
+
+vsf_linux_tls_t * vsf_linux_tls_get(int idx)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+
+    vsf_protect_t orig = vsf_protect_sched();
+        VSF_LINUX_ASSERT(vsf_bitmap_get(&process->tls.bitmap, idx));
+    vsf_unprotect_sched(orig);
+
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+
+    return &thread->tls[idx];
 }
 #endif
 

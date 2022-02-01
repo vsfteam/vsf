@@ -94,12 +94,13 @@ extern "C" {
 
 
 
+#if VSF_LINUX_CFG_TLS_NUM > 0
 typedef int pthread_key_t;
-
 int pthread_key_create(pthread_key_t *key, void (*destructor)(void*));
 int pthread_key_delete(pthread_key_t key);
 int pthread_setspecific(pthread_key_t key, const void *value);
-void *pthread_getspecific(pthread_key_t key);
+void * pthread_getspecific(pthread_key_t key);
+#endif
 
 
 

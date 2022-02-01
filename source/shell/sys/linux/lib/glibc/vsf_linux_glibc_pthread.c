@@ -624,29 +624,37 @@ int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clock_id)
 
 
 
+#if VSF_LINUX_CFG_TLS_NUM > 0
 int pthread_key_create(pthread_key_t *key, void (*destructor)(void*))
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    VSF_LINUX_ASSERT(key != NULL);
+    *key = vsf_linux_tls_alloc(destructor);
+    return *key >= 0 ? 0 : -1;
 }
 
 int pthread_key_delete(pthread_key_t key)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_tls_free(key);
+    return 0;
 }
 
 int pthread_setspecific(pthread_key_t key, const void *value)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_tls_t *tls = vsf_linux_tls_get(key);
+    if (NULL == tls) { return -1; }
+
+    tls->data = (void *)value;
+    return 0;
 }
 
-void *pthread_getspecific(pthread_key_t key)
+void * pthread_getspecific(pthread_key_t key)
 {
-    VSF_LINUX_ASSERT(false);
-    return NULL;
+    vsf_linux_tls_t *tls = vsf_linux_tls_get(key);
+    if (NULL == tls) { return NULL; }
+
+    return tls->data;
 }
+#endif
 
 int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset)
 {
