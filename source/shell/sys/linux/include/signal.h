@@ -26,6 +26,13 @@ extern "C" {
 #define pthread_sigmask     VSF_LINUX_WRAPPER(pthread_sigmask)
 #endif
 
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+#else
+#define sigjmp_buf          jmp_buf
+#define siglongjmp(__j, __s)longjmp((__j), (__s))
+#define sigsetjmp(__j, __s) setjmp(__j)
+#endif
+
 #define _NSIG           32
 
 typedef void (*sighandler_t)(int);
