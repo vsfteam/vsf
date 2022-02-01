@@ -206,9 +206,8 @@ vsf_class(vsf_linux_process_t) {
         vsf_linux_process_t *parent_process;
         int ref_cnt;
 
-        void *app_ctx;
-#if VSF_LINUX_CFG_LIB_NUM > 0
-        void *lib_ctx[VSF_LINUX_CFG_LIB_NUM];
+#if VSF_LINUX_CFG_PLS_NUM > 0
+        void *pls[VSF_LINUX_CFG_PLS_NUM];
 #endif
     )
 };
@@ -220,9 +219,10 @@ vsf_class(vsf_linux_process_t) {
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 
-extern int vsf_linux_app_init(int app_ctx_size);
-extern void * vsf_linux_app_ctx(void);
-#if VSF_LINUX_CFG_LIB_NUM > 0
+#if VSF_LINUX_CFG_PLS_NUM > 0
+extern int vsf_linux_pls_alloc(void);
+extern void vsf_linux_pls_free(int idx);
+
 extern int vsf_linux_library_init(int *lib_idx, void *lib_ctx);
 extern void * vsf_linux_library_ctx(int lib_idx);
 #endif

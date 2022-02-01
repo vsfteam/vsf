@@ -109,6 +109,10 @@ typedef struct vsf_linux_shm_mem_t {
 } vsf_linux_shm_mem_t;
 #endif
 
+#if VSF_LINUX_CFG_PLS_NUM > 0
+dcl_vsf_bitmap(vsf_linux_pls_bitmap, VSF_LINUX_CFG_PLS_NUM);
+#endif
+
 typedef struct vsf_linux_t {
     int cur_tid;
     int cur_pid;
@@ -128,8 +132,10 @@ typedef struct vsf_linux_t {
     } shm;
 #endif
 
-#if VSF_LINUX_CFG_LIB_NUM > 0
-    int lib_num;
+#if VSF_LINUX_CFG_PLS_NUM > 0
+    struct {
+        vsf_bitmap(vsf_linux_pls_bitmap) bitmap;
+    } pls;
 #endif
 } vsf_linux_t;
 
@@ -171,54 +177,53 @@ static const vsf_linux_thread_op_t __vsf_linux_main_op = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-int vsf_linux_app_init(int app_ctx_size)
+#if VSF_LINUX_CFG_PLS_NUM > 0
+int vsf_linux_pls_alloc(void)
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-
-    if (!app_ctx_size) {
-        return 0;
+    vsf_protect_t orig = vsf_protect_sched();
+    int_fast16_t idx = vsf_bitmap_ffz(&__vsf_linux.pls.bitmap, VSF_LINUX_CFG_PLS_NUM);
+    if (idx < 0) {
+        vsf_unprotect_sched(orig);
+        return -1;
     }
-
-    process->app_ctx = calloc(1, app_ctx_size);
-    return NULL == process->app_ctx ? -1 : 0;
+    vsf_bitmap_set(&__vsf_linux.pls.bitmap, idx);
+    vsf_unprotect_sched(orig);
+    return idx;
 }
 
-void * vsf_linux_app_ctx(void)
+void vsf_linux_pls_free(int idx)
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    return process->app_ctx;
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_bitmap_clear(&__vsf_linux.pls.bitmap, idx);
+    vsf_unprotect_sched(orig);
 }
 
-#if VSF_LINUX_CFG_LIB_NUM > 0
-// helper for manage libraries
 int vsf_linux_library_init(int *lib_idx, void *lib_ctx)
 {
     VSF_LINUX_ASSERT(lib_idx != NULL);
+    vsf_protect_t orig = vsf_protect_sched();
     if (*lib_idx < 0) {
-        vsf_protect_t orig = vsf_protect_sched();
-        if (__vsf_linux.lib_num >= VSF_LINUX_CFG_LIB_NUM) {
+        *lib_idx = vsf_linux_pls_alloc();
+        if (*lib_idx < 0) {
             vsf_unprotect_sched(orig);
-            VSF_LINUX_ASSERT(false);
+            vsf_trace_error("linux: fail to allocate pls for library" VSF_TRACE_CFG_LINEEND);
             return -1;
         }
-        *lib_idx = __vsf_linux.lib_num++;
-        vsf_unprotect_sched(orig);
     }
+    vsf_unprotect_sched(orig);
 
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
-    process->lib_ctx[*lib_idx] = lib_ctx;
+    process->pls[*lib_idx] = lib_ctx;
     return 0;
 }
 
 void * vsf_linux_library_ctx(int lib_idx)
 {
-    VSF_LINUX_ASSERT((lib_idx >= 0) && (lib_idx < VSF_LINUX_CFG_LIB_NUM));
+    VSF_LINUX_ASSERT((lib_idx >= 0) && (lib_idx < VSF_LINUX_CFG_PLS_NUM));
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
-    void *lib_ctx = process->lib_ctx[lib_idx];
+    void *lib_ctx = process->pls[lib_idx];
     VSF_LINUX_ASSERT(lib_ctx != NULL);
     return lib_ctx;
 }
@@ -713,9 +718,6 @@ static void __vsf_linux_process_unref(vsf_linux_process_t *process)
             vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
         }
         __vsf_linux_process_free_arg(&process->ctx.arg);
-        if (process->app_ctx != NULL) {
-            free(process->app_ctx);
-        }
         vsf_heap_free(process);
 
         if (parent_process != NULL) {
