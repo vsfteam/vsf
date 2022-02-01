@@ -6,7 +6,9 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./simple_libc/stddef.h"
 #   include "./linux/limits.h"
+#   include "./sys/types.h"
 #   include "./sys/select.h"
+#   include "./pwd.h"
 
 // avoid compiler.h in vsf.h include c headers
 #   define __USE_LOCAL_LIBC__
@@ -14,7 +16,9 @@
 #else
 #   include <stddef.h>
 #   include <linux/limits.h>
+#   include <sys/types.h>
 #   include <sys/select.h>
+#   include <pwd.h>
 #endif
 
 #include "vsf.h"
@@ -32,6 +36,9 @@ extern "C" {
 #define getpid              VSF_LINUX_WRAPPER(getpid)
 #define getppid             VSF_LINUX_WRAPPER(getppid)
 #define getpgid             VSF_LINUX_WRAPPER(getpgid)
+#define geteuid             VSF_LINUX_WRAPPER(geteuid)
+#define getgid              VSF_LINUX_WRAPPER(getgid)
+#define getegid             VSF_LINUX_WRAPPER(getegid)
 #define execl               VSF_LINUX_WRAPPER(execl)
 #define execlp              VSF_LINUX_WRAPPER(execlp)
 #define execv               VSF_LINUX_WRAPPER(execv)
@@ -99,6 +106,11 @@ unsigned int alarm(unsigned int seconds);
 pid_t getpid(void);
 pid_t getppid(void);
 pid_t getpgid(pid_t pid);
+uid_t getuid(void);
+uid_t geteuid(void);
+gid_t getgid(void);
+gid_t getegid(void);
+
 
 #if defined(__WIN__) && defined(__CPU_X64__)
 #   define exec_ret_t           intptr_t
