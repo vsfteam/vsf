@@ -87,7 +87,7 @@ struct servent {
 #endif
 
 extern int * __vsf_linux_h_errno(void);
-#define h_errno()           (*__vsf_linux_h_errno())
+#define h_errno             (*__vsf_linux_h_errno())
 
 struct hostent * gethostbyaddr(const void *addr, size_t len, int type);
 struct hostent * gethostbyname(const char *name);
