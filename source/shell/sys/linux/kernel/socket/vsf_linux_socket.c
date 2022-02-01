@@ -198,6 +198,13 @@ int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
 }
 
 // netdb
+int * __vsf_linux_h_errno(void)
+{
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+    return &thread->__h_errno;
+}
+
 const char * gai_strerror(int errcode)
 {
     return (const char *)"unknown error";
@@ -205,6 +212,24 @@ const char * gai_strerror(int errcode)
 
 struct hostent * gethostbyaddr(const void *addr, size_t len, int type)
 {
+    return NULL;
+}
+
+struct servent * getservbyname(const char *name, const char *proto)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
+struct servent * getservbyport(int port, const char *proto)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
+struct servent * getservent(void)
+{
+    VSF_LINUX_ASSERT(false);
     return NULL;
 }
 

@@ -22,6 +22,7 @@ typedef uint32_t            in_addr_t;
 #define INADDR_ANY          (uint32_t)0x00000000
 #define INADDR_NONE         (uint32_t)0xFFFFFFFF
 #define INADDR_BROADCAST    (uint32_t)0xFFFFFFFF
+#define INADDR_LOOPBACK     (uint32_t)0x7F000001
 
 #define IN_CLASSA(a)        ((((long int) (a)) & 0x80000000) == 0)
 #define IN_CLASSA_NET       0xff000000

@@ -114,6 +114,8 @@ vsf_class(vsf_linux_thread_t) {
         const vsf_linux_thread_op_t *op;
 
         int __errno;
+        // for gethostbyname, etc
+        int __h_errno;
     )
 
     protected_member(

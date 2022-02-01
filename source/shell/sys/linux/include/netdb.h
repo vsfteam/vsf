@@ -22,6 +22,9 @@ extern "C" {
 #define AI_ADDRCONFIG       0x0020
 #define AI_NUMERICSERV      0x0400
 
+#define NI_MAXHOST          1025
+#define NI_MAXSERV          32
+
 // error value for getaddrinfo
 #define EAI_BADFLAGS        -1
 #define EAI_NONAME          -2
@@ -82,6 +85,9 @@ struct servent {
 #define getaddrinfo         VSF_LINUX_SOCKET_WRAPPER(getaddrinfo)
 #define freeaddrinfo        VSF_LINUX_SOCKET_WRAPPER(freeaddrinfo)
 #endif
+
+extern int * __vsf_linux_h_errno(void);
+#define h_errno()           (*__vsf_linux_h_errno())
 
 struct hostent * gethostbyaddr(const void *addr, size_t len, int type);
 struct hostent * gethostbyname(const char *name);
