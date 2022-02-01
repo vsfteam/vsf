@@ -120,6 +120,12 @@ void pthread_exit(void *retval)
 #   pragma GCC diagnostic pop
 #endif
 
+int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 pthread_t pthread_self(void)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();

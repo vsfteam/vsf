@@ -189,6 +189,7 @@ enum {
   PTHREAD_CANCEL_ASYNCHRONOUS,
 };
 
+int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
 pthread_t pthread_self(void);
 int pthread_equal(pthread_t t1, pthread_t t2);
 int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg);
