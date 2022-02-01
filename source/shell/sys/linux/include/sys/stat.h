@@ -35,13 +35,15 @@ extern "C" {
 #define S_IRUSR         (VSF_FILE_ATTR_USER << 1)
 #define S_IWUSR         (VSF_FILE_ATTR_USER << 2)
 #define S_IXUSR         (VSF_FILE_ATTR_USER << 3)
-#define S_IRWXU         (S_IRUSR | S_IWUSR | S_IXUSR)
 #define S_IRGRP         (S_IRUSR << 3)
 #define S_IWGRP         (S_IWUSR << 3)
 #define S_IXGRP         (S_IXUSR << 3)
 #define S_IROTH         (S_IRGRP << 3)
 #define S_IWOTH         (S_IWGRP << 3)
 #define S_IXOTH         (S_IXGRP << 3)
+#define S_IRWXU         (S_IRUSR | S_IWUSR | S_IXUSR)
+#define S_IRWXG         (S_IRGRP | S_IWGRP | S_IXGRP)
+#define S_IRWXO         (S_IROTH | S_IWOTH | S_IXOTH)
 
 // protection bits
 #define S_ISUID         (VSF_FILE_ATTR_USER << 13)
@@ -55,6 +57,7 @@ extern "C" {
 
 struct stat {
     dev_t           st_dev;
+    dev_t           st_rdev;
     ino_t           st_ino;
     mode_t          st_mode;
     uid_t           st_uid;
