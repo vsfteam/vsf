@@ -232,18 +232,11 @@ int vsf_linux_create_fhs(void)
 }
 #endif
 
-int vsf_linux_get_errno(void)
+int * __vsf_linux_errno(void)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     VSF_LINUX_ASSERT(thread != NULL);
-    return thread->__errno;
-}
-
-void vsf_linux_set_errno(int err)
-{
-    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
-    VSF_LINUX_ASSERT(thread != NULL);
-    thread->__errno = err;
+    return &thread->__errno;
 }
 
 int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in)
@@ -995,6 +988,26 @@ pid_t getpgid(pid_t pid)
     return pid;
 }
 
+uid_t getuid(void)
+{
+    return (uid_t)0;
+}
+
+uid_t geteuid(void)
+{
+    return (uid_t)0;
+}
+
+gid_t getgid(void)
+{
+    return (gid_t)0;
+}
+
+gid_t getegid(void)
+{
+    return (gid_t)0;
+}
+
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
@@ -1018,7 +1031,7 @@ char * getcwd(char *buffer, size_t maxlen)
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
     if (strlen(process->working_dir) >= maxlen) {
-        set_errno(ERANGE);
+        errno = ERANGE;
         return NULL;
     }
     strcpy(buffer, process->working_dir);

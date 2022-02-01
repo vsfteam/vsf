@@ -337,7 +337,7 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
 
     new_sfd = calloc(1, sizeof(vsf_linux_fd_t));
     if (!new_sfd) {
-        set_errno(ENOMEM);
+        errno = ENOMEM;
         return -1;
     }
     new_sfd->op = op;
@@ -686,7 +686,7 @@ static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
 
     vk_file_t *file = __vsf_linux_fs_get_file(fullpath), *dir;
     if (!file) {
-        set_errno(ENOENT);
+        errno = ENOENT;
         return -1;
     }
 
@@ -923,7 +923,7 @@ int open(const char *pathname, int flags, ...)
 
             return creat(fullpath, mode);
         }
-        set_errno(ENOENT);
+        errno = ENOENT;
         return -1;
     }
 

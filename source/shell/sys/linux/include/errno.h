@@ -144,13 +144,8 @@ extern "C" {
 #define EKEYREVOKED     128 /* Key has been revoked */
 #define EKEYREJECTED    129 /* Key was rejected by service */
 
-extern void vsf_linux_set_errno(int err);
-extern int vsf_linux_get_errno(void);
-#define set_errno(err)  vsf_linux_set_errno(err)
-#define get_errno()     vsf_linux_get_errno()
-
-// TODO: DO NOT expose errno implementation if possible
-#define errno           (vsf_linux_get_cur_thread()->__errno)
+extern int * __vsf_linux_errno(void);
+#define errno           (*__vsf_linux_errno())
 
 #ifdef __cplusplus
 }

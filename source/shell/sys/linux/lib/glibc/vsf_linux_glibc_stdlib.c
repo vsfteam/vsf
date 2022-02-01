@@ -191,7 +191,7 @@ char * mktemps(char *template, int suffixlen)
     int len = strlen(template);
     if (    (len < (6 + suffixlen))
         ||  memcmp(&template[len - 6 - suffixlen], "XXXXXX", 6)) {
-        set_errno(EINVAL);
+        errno = EINVAL;
         return NULL;
     }
 
