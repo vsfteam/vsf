@@ -199,11 +199,12 @@ void vsf_linux_pls_free(int idx)
     vsf_protect_t orig = vsf_protect_sched();
         VSF_LINUX_ASSERT(vsf_bitmap_get(&__vsf_linux.pls.bitmap, idx));
         vsf_bitmap_clear(&__vsf_linux.pls.bitmap, idx);
-        process->pls[idx] = NULL;
+        process->pls[idx].data = NULL;
+        process->pls[idx].destructor = NULL;
     vsf_unprotect_sched(orig);
 }
 
-void ** vsf_linux_pls_get(int idx)
+vsf_linux_localstorage_t * vsf_linux_pls_get(int idx)
 {
     VSF_LINUX_ASSERT((idx >= 0) && (idx < VSF_LINUX_CFG_PLS_NUM));
 
@@ -216,7 +217,7 @@ void ** vsf_linux_pls_get(int idx)
     return &process->pls[idx];
 }
 
-int vsf_linux_library_init(int *lib_idx, void *lib_ctx)
+int vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*destructor)(void *))
 {
     VSF_LINUX_ASSERT(lib_idx != NULL);
     vsf_protect_t orig = vsf_protect_sched();
@@ -230,17 +231,18 @@ int vsf_linux_library_init(int *lib_idx, void *lib_ctx)
     }
     vsf_unprotect_sched(orig);
 
-    void ** pls = vsf_linux_pls_get(*lib_idx);
+    vsf_linux_localstorage_t *pls = vsf_linux_pls_get(*lib_idx);
     VSF_LINUX_ASSERT(pls != NULL);
-    *pls = lib_ctx;
+    pls->data = lib_ctx;
+    pls->destructor = destructor;
     return 0;
 }
 
 void * vsf_linux_library_ctx(int lib_idx)
 {
-    void ** pls = vsf_linux_pls_get(lib_idx);
+    vsf_linux_localstorage_t *pls = vsf_linux_pls_get(lib_idx);
     VSF_LINUX_ASSERT(pls != NULL);
-    return *pls;
+    return pls->data;
 }
 #endif
 
@@ -278,7 +280,7 @@ void vsf_linux_tls_free(int idx)
     vsf_unprotect_sched(orig);
 }
 
-vsf_linux_tls_t * vsf_linux_tls_get(int idx)
+vsf_linux_localstorage_t * vsf_linux_tls_get(int idx)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
@@ -779,8 +781,8 @@ static void __vsf_linux_process_unref(vsf_linux_process_t *process)
         __vsf_linux_process_free_arg(&process->ctx.arg);
         for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
             if (vsf_bitmap_get(&__vsf_linux.pls.bitmap, i)) {
-                if (process->pls[i] != NULL) {
-                    free(process->pls[i]);
+                if (process->pls[i].destructor != NULL) {
+                    process->pls[i].destructor(process->pls[i].data);
                 }
             }
         }

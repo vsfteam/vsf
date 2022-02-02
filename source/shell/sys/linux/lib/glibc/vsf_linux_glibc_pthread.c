@@ -640,7 +640,7 @@ int pthread_key_delete(pthread_key_t key)
 
 int pthread_setspecific(pthread_key_t key, const void *value)
 {
-    vsf_linux_tls_t *tls = vsf_linux_tls_get(key);
+    vsf_linux_localstorage_t *tls = vsf_linux_tls_get(key);
     if (NULL == tls) { return -1; }
 
     tls->data = (void *)value;
@@ -649,7 +649,7 @@ int pthread_setspecific(pthread_key_t key, const void *value)
 
 void * pthread_getspecific(pthread_key_t key)
 {
-    vsf_linux_tls_t *tls = vsf_linux_tls_get(key);
+    vsf_linux_localstorage_t *tls = vsf_linux_tls_get(key);
     if (NULL == tls) { return NULL; }
 
     return tls->data;

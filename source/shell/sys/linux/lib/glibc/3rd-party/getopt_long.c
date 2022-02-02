@@ -322,7 +322,7 @@ getopt_internal(int nargc, char * const *nargv, const char *options,
 		ctx->__opterr = 1;
 		ctx->__optind = 1;
 		ctx->__optopt = '?';
-		vsf_linux_library_init(&getopt_lib_idx, ctx);
+		vsf_linux_library_init(&getopt_lib_idx, ctx, free);
 	}
 	
 #endif

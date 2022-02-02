@@ -107,12 +107,15 @@ typedef struct vsf_linux_process_ctx_t {
     vsf_linux_main_entry_t entry;
 } vsf_linux_process_ctx_t;
 
-#if VSF_LINUX_CFG_TLS_NUM > 0
-dcl_vsf_bitmap(vsf_linux_tls_bitmap, VSF_LINUX_CFG_TLS_NUM);
-typedef struct vsf_linux_tls_t {
+#if VSF_LINUX_CFG_PLS_NUM > 0 || VSF_LINUX_CFG_TLS_NUM > 0
+typedef struct vsf_linux_localstorage_t {
     void *data;
     void (*destructor)(void *data);
-} vsf_linux_tls_t;
+} vsf_linux_localstorage_t;
+#endif
+
+#if VSF_LINUX_CFG_TLS_NUM > 0
+dcl_vsf_bitmap(vsf_linux_tls_bitmap, VSF_LINUX_CFG_TLS_NUM);
 #endif
 
 vsf_class(vsf_linux_thread_t) {
@@ -131,7 +134,7 @@ vsf_class(vsf_linux_thread_t) {
         int tid;
         vsf_linux_thread_t *thread_pending;
 #if VSF_LINUX_CFG_TLS_NUM > 0
-        vsf_linux_tls_t tls[VSF_LINUX_CFG_TLS_NUM];
+        vsf_linux_localstorage_t tls[VSF_LINUX_CFG_TLS_NUM];
 #endif
     )
 
@@ -211,7 +214,7 @@ vsf_class(vsf_linux_process_t) {
         int ref_cnt;
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
-        void *pls[VSF_LINUX_CFG_PLS_NUM];
+        vsf_linux_localstorage_t pls[VSF_LINUX_CFG_PLS_NUM];
 #endif
 
 #if VSF_LINUX_CFG_TLS_NUM > 0
@@ -232,16 +235,16 @@ extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 #if VSF_LINUX_CFG_PLS_NUM > 0
 extern int vsf_linux_pls_alloc(void);
 extern void vsf_linux_pls_free(int idx);
-extern void ** vsf_linux_pls_get(int idx);
+extern vsf_linux_localstorage_t * vsf_linux_pls_get(int idx);
 
-extern int vsf_linux_library_init(int *lib_idx, void *lib_ctx);
+extern int vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*destructor)(void *));
 extern void * vsf_linux_library_ctx(int lib_idx);
 #endif
 
 #if VSF_LINUX_CFG_TLS_NUM > 0
 extern int vsf_linux_tls_alloc(void (*destructor)(void *));
 extern void vsf_linux_tls_free(int idx);
-extern vsf_linux_tls_t * vsf_linux_tls_get(int idx);
+extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
 #endif
 
 extern int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in);
