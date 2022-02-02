@@ -341,6 +341,7 @@ int __vsh_run_cmd(char *cmd)
         if (NULL == next) {
             break;
         }
+        *next++ = '\0';
 
         int pipefd[2];
         if (pipe(pipefd) < 0) {
@@ -350,6 +351,8 @@ int __vsh_run_cmd(char *cmd)
         VSF_LINUX_ASSERT(process_cnt < dimof(processes));
         processes[process_cnt] = __vsh_prepare_process(cmd, fd_in, pipefd[1]);
         if (NULL == processes[process_cnt]) {
+            close(pipefd[0]);
+            close(pipefd[1]);
             goto cleanup;
         }
 
@@ -359,9 +362,14 @@ int __vsh_run_cmd(char *cmd)
         }
         fd_in = pipefd[0];
         process_cnt++;
+        cmd = next;
     }
     VSF_LINUX_ASSERT(process_cnt < dimof(processes));
     processes[process_cnt++] = __vsh_prepare_process(cmd, fd_in, -1);
+    if (fd_in >= 0) {
+        close(fd_in);
+        fd_in = -1;
+    }
     if (NULL == processes[process_cnt]) {
         goto cleanup;
     }
@@ -383,6 +391,9 @@ int __vsh_run_cmd(char *cmd)
         return result;
     }
 cleanup:
+    if (fd_in >= 0) {
+        close(fd_in);
+    }
     for (int i = 0; i < process_cnt; i++) {
         vsf_linux_unref_process(processes[i]);
     }
