@@ -55,7 +55,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if VSF_LINUX_USE_GETOPT != ENABLED
+#if VSF_LINUX_USE_GETOPT == ENABLED
+int getopt_lib_idx = -1;
+#else
 int	opterr = 1;		/* if error message should be printed */
 int	optind = 1;		/* index into parent argv vector */
 int	optopt = '?';		/* character checked for validity */
@@ -294,6 +296,33 @@ getopt_internal(int nargc, char * const *nargv, const char *options,
 	char *oli;				/* option letter list index */
 	int optchar, short_too;
 	static int posixly_correct = -1;
+
+#if VSF_LINUX_USE_GETOPT == ENABLED
+	vsf_protect_t orig = vsf_protect_sched();
+	if (getopt_lib_idx < 0) {
+		getopt_lib_idx = vsf_linux_pls_alloc();
+		if (getopt_lib_idx < 0) {
+			vsf_unprotect_sched(orig);
+			VSF_LINUX_ASSERT(false);
+			return -1;
+		}
+	}
+	vsf_unprotect_sched(orig);
+
+	struct getopt_lib_ctx_t *ctx = getopt_ctx;
+	if (NULL == ctx) {
+		ctx = calloc(1, sizeof(struct getopt_lib_ctx_t));
+		if (NULL == ctx) {
+			VSF_LINUX_ASSERT(false);
+			return -1;
+		}
+		ctx->__opterr = 1;
+		ctx->__optind = 1;
+		ctx->__optopt = '?';
+		vsf_linux_library_init(&getopt_lib_idx, ctx);
+	}
+	
+#endif
 
 	if (options == NULL)
 		return (-1);

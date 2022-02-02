@@ -193,10 +193,27 @@ int vsf_linux_pls_alloc(void)
 
 void vsf_linux_pls_free(int idx)
 {
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+
     vsf_protect_t orig = vsf_protect_sched();
         VSF_LINUX_ASSERT(vsf_bitmap_get(&__vsf_linux.pls.bitmap, idx));
         vsf_bitmap_clear(&__vsf_linux.pls.bitmap, idx);
+        process->pls[idx] = NULL;
     vsf_unprotect_sched(orig);
+}
+
+void ** vsf_linux_pls_get(int idx)
+{
+    VSF_LINUX_ASSERT((idx >= 0) && (idx < VSF_LINUX_CFG_PLS_NUM));
+
+    vsf_protect_t orig = vsf_protect_sched();
+        VSF_LINUX_ASSERT(vsf_bitmap_get(&__vsf_linux.pls.bitmap, idx));
+    vsf_unprotect_sched(orig);
+
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    return &process->pls[idx];
 }
 
 int vsf_linux_library_init(int *lib_idx, void *lib_ctx)
@@ -213,20 +230,17 @@ int vsf_linux_library_init(int *lib_idx, void *lib_ctx)
     }
     vsf_unprotect_sched(orig);
 
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    process->pls[*lib_idx] = lib_ctx;
+    void ** pls = vsf_linux_pls_get(*lib_idx);
+    VSF_LINUX_ASSERT(pls != NULL);
+    *pls = lib_ctx;
     return 0;
 }
 
 void * vsf_linux_library_ctx(int lib_idx)
 {
-    VSF_LINUX_ASSERT((lib_idx >= 0) && (lib_idx < VSF_LINUX_CFG_PLS_NUM));
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    void *lib_ctx = process->pls[lib_idx];
-    VSF_LINUX_ASSERT(lib_ctx != NULL);
-    return lib_ctx;
+    void ** pls = vsf_linux_pls_get(lib_idx);
+    VSF_LINUX_ASSERT(pls != NULL);
+    return *pls;
 }
 #endif
 
@@ -556,12 +570,6 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
         process->term[STDERR_FILENO] = __default_term;
 #endif
 
-#if VSF_LINUX_USE_GETOPT == ENABLED
-        process->__opterr = 1;
-        process->__optind = 1;
-        process->__optopt = '?';
-#endif
-
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {
             vsf_heap_free(process);
@@ -769,8 +777,23 @@ static void __vsf_linux_process_unref(vsf_linux_process_t *process)
             vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
         }
         __vsf_linux_process_free_arg(&process->ctx.arg);
-        vsf_heap_free(process);
+        for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
+            if (vsf_bitmap_get(&__vsf_linux.pls.bitmap, i)) {
+                if (process->pls[i] != NULL) {
+                    free(process->pls[i]);
+                }
+            }
+        }
 
+#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+        if(process->heap_usage != 0) {
+            vsf_trace_warning("memory leak %d bytes detected in process 0x%p, balance = %d" VSF_TRACE_CFG_LINEEND,
+                        process->heap_usage, process, process->heap_balance);
+        }
+#endif
+
+        vsf_heap_free(process);
         if (parent_process != NULL) {
             __vsf_linux_process_unref(parent_process);
         }
@@ -793,6 +816,13 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     if (thread->is_main && (process->thread_pending != NULL)) {
         process->thread_pending->retval = thread->retval;
     }
+    for (int i = 0; i < VSF_LINUX_CFG_TLS_NUM; i++) {
+        if (vsf_bitmap_get(&process->tls.bitmap, i)) {
+            if (thread->tls[i].destructor != NULL) {
+                thread->tls[i].destructor(thread->tls[i].data);
+            }
+        }
+    }
     vsf_heap_free(thread);
 
     if (is_to_free_process) {
@@ -803,13 +833,7 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         if (process->working_dir != NULL) {
             vsf_heap_free(process->working_dir);
         }
-#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
-        if(process->heap_usage != 0) {
-            vsf_trace_warning("memory leak %d bytes detected in process 0x%p, balance = %d" VSF_TRACE_CFG_LINEEND,
-                        process->heap_usage, process, process->heap_balance);
-        }
-#endif
+
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         char **environ = process->__environ;
         if (environ != NULL) {
