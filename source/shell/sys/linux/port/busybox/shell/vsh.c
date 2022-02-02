@@ -278,14 +278,16 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     ctx->entry = entry;
     ctx->arg.argv[ctx->arg.argc++] = strdupped;
     ctx->arg.is_dyn_argv = true;
+    char *nextnext;
     while ((*next != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
+        nextnext = __vsh_get_next_arg(next);
         strdupped = strdup(next);
         if (NULL == strdupped) {
             goto unref_process_cleanup_env_and_fail;
         }
 
         ctx->arg.argv[ctx->arg.argc++] = strdupped;
-        next = __vsh_get_next_arg(next);
+        next = nextnext;
     }
 
     extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
