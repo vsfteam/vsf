@@ -270,10 +270,21 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     process->shell_process = cur_process->shell_process;
+
+    char *strdupped = strdup(cmd);
+    if (NULL == strdupped) {
+        goto unref_process_cleanup_env_and_fail;
+    }
     ctx->entry = entry;
-    ctx->arg.argv[ctx->arg.argc++] = cmd;
+    ctx->arg.argv[ctx->arg.argc++] = strdupped;
+    ctx->arg.is_dyn_argv = true;
     while ((*next != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
-        ctx->arg.argv[ctx->arg.argc++] = next;
+        strdupped = strdup(next);
+        if (NULL == strdupped) {
+            goto unref_process_cleanup_env_and_fail;
+        }
+
+        ctx->arg.argv[ctx->arg.argc++] = strdupped;
         next = __vsh_get_next_arg(next);
     }
 
@@ -329,6 +340,25 @@ int __vsh_run_cmd(char *cmd)
     vsf_linux_process_t * processes[4];
     int process_cnt = 0, fd_in = -1;
     char *next;
+    bool is_environ_expanded = false;
+
+    // expand environ
+    char *real_cmd = NULL;
+    if (strchr(cmd, '$') != NULL) {
+        int cmdlen = vsf_linux_expandenv(cmd, NULL, 0);
+        if (cmdlen < 0) {
+            printf("fail to parse command %s" VSH_LINEEND, cmd);
+            return -1;
+        }
+        real_cmd = malloc(cmdlen + 1);
+        if (NULL == real_cmd) {
+            printf("fail to allocate buffer to parse command %s" VSH_LINEEND, cmd);
+            return -1;
+        }
+        vsf_linux_expandenv(cmd, real_cmd, cmdlen + 1);
+        is_environ_expanded = true;
+        cmd = real_cmd;
+    }
 
     // remove spaces
     next = &cmd[strlen(cmd) - 1];
@@ -373,6 +403,9 @@ int __vsh_run_cmd(char *cmd)
     if (NULL == processes[process_cnt]) {
         goto cleanup;
     }
+    if (is_environ_expanded) {
+        free(real_cmd);
+    }
 
     for (int i = 0; i < process_cnt; i++) {
         vsf_linux_start_process(processes[i]);
@@ -391,6 +424,9 @@ int __vsh_run_cmd(char *cmd)
         return result;
     }
 cleanup:
+    if (is_environ_expanded) {
+        free(real_cmd);
+    }
     if (fd_in >= 0) {
         close(fd_in);
     }
@@ -494,34 +530,9 @@ int vsh_main(int argc, char *argv[])
                         }
                         ctx.history.cur_disp_entry = ctx.history.cur_save_entry;
 #endif
-#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-                        char *cmd = NULL;
-                        if (strchr(ctx.cmd, '$') != NULL) {
-                            int cmdlen = vsf_linux_expandenv(ctx.cmd, NULL, 0);
-                            if (cmdlen < 0) {
-                                printf("fail to parse command %s" VSH_LINEEND, ctx.cmd);
-                                goto input_cmd;
-                            }
-                            cmd = malloc(cmdlen + 1);
-                            if (NULL == cmd) {
-                                printf("fail to allocate buffer to parse command %s" VSH_LINEEND, ctx.cmd);
-                                goto input_cmd;
-                            }
-                            vsf_linux_expandenv(ctx.cmd, cmd, cmdlen + 1);
-                        } else {
-                            cmd = ctx.cmd;
-                        }
-                        if (__vsh_run_cmd(cmd) < 0) {
-                            printf("fail to execute %s" VSH_LINEEND, ctx.cmd);
-                        }
-                        if (cmd != ctx.cmd) {
-                            free(cmd);
-                        }
-#else
                         if (__vsh_run_cmd(ctx.cmd) < 0) {
                             printf("fail to execute %s" VSH_LINEEND, ctx.cmd);
                         }
-#endif
                     }
                     goto input_cmd;
 #if     VSH_ENTER_CHAR == '\r'
@@ -588,12 +599,11 @@ int cd_main(int argc, char *argv[])
 int ls_main(int argc, char *argv[])
 {
     int dirnum, childnum;
-    char **dirnames;
+    char **dirnames, *dirnames_dot = ".";
 
     if (1 == argc) {
-        argv[0] = ".";
         dirnum = 1;
-        dirnames = &argv[0];
+        dirnames = &dirnames_dot;
     } else {
         dirnum = argc - 1;
         dirnames = &argv[1];
