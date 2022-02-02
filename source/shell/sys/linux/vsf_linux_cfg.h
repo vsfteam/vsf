@@ -43,6 +43,14 @@
 #   define VSF_LINUX_CFG_SHM_NUM                32
 #endif
 
+#ifdef VSF_LINUX_CFG_PLS_NUM
+#   define VSF_LINUX_CFG_PLS_NUM                8
+#endif
+
+#ifndef VSF_LINUX_CFG_TLS_NUM
+#   define VSF_LINUX_CFG_TLS_NUM                8
+#endif
+
 #ifndef VSF_LINUX_CFG_BIN_PATH
 #   define VSF_LINUX_CFG_BIN_PATH               "/bin"
 #endif
