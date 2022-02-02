@@ -43,7 +43,7 @@
 #   define VSF_LINUX_CFG_SHM_NUM                32
 #endif
 
-#ifdef VSF_LINUX_CFG_PLS_NUM
+#ifndef VSF_LINUX_CFG_PLS_NUM
 #   define VSF_LINUX_CFG_PLS_NUM                8
 #endif
 
