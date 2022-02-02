@@ -56,6 +56,9 @@
 #include <string.h>
 
 #if VSF_LINUX_USE_GETOPT == ENABLED
+#	if VSF_LINUX_CFG_PLS_NUM <= 0
+#		error VSF_LINUX_CFG_PLS_NUM MUST be configured > 0 for getopt library
+#	endif
 int getopt_lib_idx = -1;
 #else
 int	opterr = 1;		/* if error message should be printed */
