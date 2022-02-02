@@ -260,6 +260,8 @@ extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entr
 
 extern vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_stream_t *stdio_stream, char *working_dir);
 extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
+// free unstarted/existed process
+extern void vsf_linux_unref_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
 extern void vsf_linux_exit_process(int status);
 
@@ -274,6 +276,9 @@ extern vsf_linux_process_t * vsf_linux_get_process(pid_t pid);
 
 extern void __vsf_linux_process_free_arg(vsf_linux_process_arg_t *arg);
 extern int __vsf_linux_process_parse_arg(vsf_linux_process_arg_t *arg, char const * const * argv);
+
+extern int vsf_linux_merge_env(char ***to_environ, char **from_environ);
+extern void vsf_linux_free_env(char **environ);
 #endif
 
 // open vsf_linux_get_cur_thread for thread-related variables like errno, etc

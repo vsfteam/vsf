@@ -296,6 +296,39 @@ vsf_linux_localstorage_t * vsf_linux_tls_get(int idx)
 }
 #endif
 
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+int vsf_linux_merge_env(char ***to_environ, char **from_environ)
+{
+    extern int __putenv(char *string, char ***environ);
+    char *cur_env;
+    if (from_environ != NULL) {
+        while (*from_environ != NULL) {
+            cur_env = strdup(*from_environ);
+            if (cur_env != NULL) {
+                __putenv(cur_env, to_environ);
+            } else {
+                vsf_trace_error("spawn: failed to dup env %s", VSF_TRACE_CFG_LINEEND, *from_environ);
+                return -1;
+            }
+            from_environ++;
+        }
+    }
+    return 0;
+}
+
+void vsf_linux_free_env(char **environ)
+{
+    char **environ_tmp = environ;
+    if (environ_tmp != NULL) {
+        while (*environ_tmp != NULL) {
+            free(*environ_tmp);
+            environ_tmp++;
+        }
+        free(environ);
+    }
+}
+#endif
+
 #ifndef WEAK_VSF_LINUX_CREATE_FHS
 WEAK(vsf_linux_create_fhs)
 int vsf_linux_create_fhs(void)
@@ -612,31 +645,8 @@ vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdi
         process->parent_process = cur_process;
 
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-        int envnum = 0;
-        char **environ_from = cur_process->__environ, **environ_to;
-        if (environ_from != NULL) {
-            while (*environ_from++ != NULL) {
-                envnum++;
-            }
-        }
-        if (envnum > 0) {
-            process->__environ = malloc((envnum + 1) * sizeof(char *));
-            if (NULL == process->__environ) {
-            fail_env:
-                vsf_trace_warning("linux: fail to allocate environ, maybe error if environ is used", VSF_TRACE_CFG_LINEEND);
-            } else {
-                environ_to = process->__environ;
-                environ_from = cur_process->__environ;
-                while (*environ_from != NULL) {
-                    *environ_to = strdup(*environ_from);
-                    if (NULL == *environ_to) {
-                        goto fail_env;
-                    }
-                    environ_to++;
-                    environ_from++;
-                }
-                *environ_to = NULL;
-            }
+        if (vsf_linux_merge_env(&process->__environ, cur_process->__environ) < 0) {
+            vsf_trace_warning("linux: fail to allocate environ, maybe error if environ is used", VSF_TRACE_CFG_LINEEND);
         }
 #endif
     }
@@ -649,6 +659,45 @@ vsf_linux_process_t * vsf_linux_create_process(int stack_size)
     VSF_LINUX_ASSERT(parent_process != NULL);
 
     return vsf_linux_create_process_ex(stack_size, &parent_process->stdio_stream, parent_process->working_dir);
+}
+
+void vsf_linux_unref_process(vsf_linux_process_t *process)
+{
+    if (!--process->ref_cnt) {
+        vsf_linux_process_t *parent_process = process->parent_process;
+        if (process->thread_pending != NULL) {
+            vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
+        }
+
+        __vsf_linux_process_free_arg(&process->ctx.arg);
+        for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
+            if (vsf_bitmap_get(&__vsf_linux.pls.bitmap, i)) {
+                if (process->pls[i].destructor != NULL) {
+                    process->pls[i].destructor(process->pls[i].data);
+                }
+            }
+        }
+
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+        vsf_linux_free_env(process->__environ);
+#endif
+        if (process->working_dir != NULL) {
+            vsf_heap_free(process->working_dir);
+        }
+
+#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+        if(process->heap_usage != 0) {
+            vsf_trace_warning("memory leak %d bytes detected in process 0x%p, balance = %d" VSF_TRACE_CFG_LINEEND,
+                        process->heap_usage, process, process->heap_balance);
+        }
+#endif
+
+        vsf_heap_free(process);
+        if (parent_process != NULL) {
+            vsf_linux_unref_process(parent_process);
+        }
+    }
 }
 
 int vsf_linux_start_process(vsf_linux_process_t *process)
@@ -771,37 +820,6 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     vsf_linux_exit_process(thread->retval);
 }
 
-static void __vsf_linux_process_unref(vsf_linux_process_t *process)
-{
-    if (!--process->ref_cnt) {
-        vsf_linux_process_t *parent_process = process->parent_process;
-        if (process->thread_pending != NULL) {
-            vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
-        }
-        __vsf_linux_process_free_arg(&process->ctx.arg);
-        for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
-            if (vsf_bitmap_get(&__vsf_linux.pls.bitmap, i)) {
-                if (process->pls[i].destructor != NULL) {
-                    process->pls[i].destructor(process->pls[i].data);
-                }
-            }
-        }
-
-#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
-        if(process->heap_usage != 0) {
-            vsf_trace_warning("memory leak %d bytes detected in process 0x%p, balance = %d" VSF_TRACE_CFG_LINEEND,
-                        process->heap_usage, process, process->heap_balance);
-        }
-#endif
-
-        vsf_heap_free(process);
-        if (parent_process != NULL) {
-            __vsf_linux_process_unref(parent_process);
-        }
-    }
-}
-
 void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
 {
     if (thread->thread_pending != NULL) {
@@ -832,21 +850,7 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
             vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
         vsf_unprotect_sched(orig);
 
-        if (process->working_dir != NULL) {
-            vsf_heap_free(process->working_dir);
-        }
-
-#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-        char **environ = process->__environ;
-        if (environ != NULL) {
-            while (*environ != NULL) {
-                free(*environ);
-                environ++;
-            }
-            free(process->__environ);
-        }
-#endif
-        __vsf_linux_process_unref(process);
+        vsf_linux_unref_process(process);
     }
 }
 
@@ -854,10 +858,11 @@ exec_ret_t execvp(const char *pathname, char const * const * argv)
 {
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
-    int fd = vsf_linux_fs_get_executable(pathname, &entry);
-    if (fd < 0) {
+    int exefd = vsf_linux_fs_get_executable(pathname, &entry);
+    if (exefd < 0) {
         return -1;
     }
+    close(exefd);
 
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     vsf_linux_process_ctx_t *ctx = &process->ctx;
@@ -889,10 +894,11 @@ static exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
 {
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
-    int fd = vsf_linux_fs_get_executable(pathname, &entry);
-    if (fd < 0) {
+    int exefd = vsf_linux_fs_get_executable(pathname, &entry);
+    if (exefd < 0) {
         return -1;
     }
+    close(exefd);
 
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     vsf_linux_process_ctx_t *ctx = &process->ctx;
@@ -1353,15 +1359,15 @@ int posix_spawnp(pid_t *pid, const char *file,
     extern void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd);
     extern vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd);
 
-    // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
-    int fd = vsf_linux_fs_get_executable(file, &entry);
-    if (fd < 0) {
+    int exefd = vsf_linux_fs_get_executable(file, &entry);
+    if (exefd < 0) {
         if (pid != NULL) {
             *pid = -1;
         }
         return -1;
     }
+    close(exefd);
     VSF_LINUX_ASSERT(entry != NULL);
 
     vsf_linux_process_t *process = vsf_linux_create_process(0);
@@ -1394,21 +1400,9 @@ int posix_spawnp(pid_t *pid, const char *file,
         }
     }
 
-    // env
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-    if (env != NULL) {
-        extern int __putenv(char *string, char ***environ);
-        char *cur_env;
-        while (*env != NULL) {
-            cur_env = strdup(*env);
-            if (cur_env != NULL) {
-                __putenv(cur_env, &process->__environ);
-            } else {
-                vsf_trace_error("spawn: failed to dup env %s", VSF_TRACE_CFG_LINEEND, *env);
-            }
-            env++;
-        }
-    }
+    // env
+    vsf_linux_merge_env(&process->__environ, (char **)env);
 #endif
 
     // apply actions

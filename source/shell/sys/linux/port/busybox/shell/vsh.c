@@ -3,6 +3,7 @@
 #if VSF_USE_LINUX == ENABLED
 
 #define __VSF_LINUX_CLASS_INHERIT__
+#define __VSF_LINUX_FS_CLASS_IMPLEMENT
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../include/unistd.h"
 #   include "../../../include/errno.h"
@@ -209,23 +210,39 @@ int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd, vsf_linux_main
     return exefd;
 }
 
-int __vsh_run_cmd(char *cmd)
+static char * __vsh_get_next_arg(char *cmd)
 {
-    char *cur;
+    while ((*cmd != '\0') && !isspace((int)*cmd)) { cmd++; }
+    while ((*cmd != '\0') && isspace((int)*cmd)) { *cmd++ = '\0'; }
+    return cmd;
+}
+
+static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
+{
+    char *next;
     int exefd = -1, err;
     vsf_linux_main_entry_t entry;
+    char **env_tmp = NULL, *env[2];
 
+    // skip spaces
     while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
     if ('\0' == *cmd) { return 0; }
+    next = &cmd[strlen(cmd) - 1];
+    while (isspace((int)*next)) { *next-- = '\0'; }
 
-    cur = &cmd[strlen(cmd) - 1];
-    while (isspace((int)*cur)) { *cur-- = '\0'; }
-    bool is_background = *cur == '&';
-    if (is_background) { *cur = '\0'; }
+    env[1] = NULL;
+    for (;;) {
+        next = __vsh_get_next_arg(cmd);
+        if (!strchr(cmd, '=')) {
+            break;
+        }
 
-    cur = cmd;
-    while ((*cur != '\0') && !isspace((int)*cur)) { cur++; }
-    while ((*cur != '\0') && isspace((int)*cur)) { *cur++ = '\0'; }
+        env[0] = cmd;
+        cmd = next;
+        if (vsf_linux_merge_env(&env_tmp, env) < 0) {
+            goto cleanup_env_and_fail;
+        }
+    }
 
     // search in path first if not absolute path
     if (cmd[0] != '/') {
@@ -237,26 +254,121 @@ int __vsh_run_cmd(char *cmd)
         if (exefd < 0) {
             printf("%s not found" VSH_LINEEND, cmd);
             err = -ENOENT;
-            return err;
+            goto cleanup_env_and_fail;
         }
     }
+    close(exefd);
 
     vsf_linux_process_t *process = vsf_linux_create_process(0);
-    if (NULL == process) { return -ENOMEM; }
+    if (NULL == process) { goto cleanup_env_and_fail; }
+    if (vsf_linux_merge_env(&process->__environ, env_tmp) < 0) {
+        goto unref_process_cleanup_env_and_fail;
+    }
+    vsf_linux_free_env(env_tmp);
+    env_tmp = NULL;
 
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     process->shell_process = cur_process->shell_process;
     ctx->entry = entry;
     ctx->arg.argv[ctx->arg.argc++] = cmd;
-    while ((*cur != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
-        ctx->arg.argv[ctx->arg.argc++] = cur;
-        while ((*cur != '\0') && !isspace((int)*cur)) { cur++; }
-        while ((*cur != '\0') && isspace((int)*cur)) { *cur++ = '\0'; }
+    while ((*next != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
+        ctx->arg.argv[ctx->arg.argc++] = next;
+        next = __vsh_get_next_arg(next);
+    }
+
+    extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
+                const vsf_linux_fd_op_t *op, int fd_desired, bool allocate_priv);
+    extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
+    vsf_linux_fd_t *sfd, *sfd_from;
+    vsf_protect_t orig;
+    if (fd_in >= 0) {
+        sfd_from = vsf_linux_fd_get(fd_in);
+        VSF_LINUX_ASSERT(sfd_from != NULL);
+
+        if (STDIN_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, false)) {
+            goto unref_process_cleanup_env_and_fail;
+        }
+        sfd->priv = sfd_from->priv;
+        orig = vsf_protect_sched();
+            sfd->priv->ref++;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+            vsf_trace_debug("%s dup fds: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
+#endif
+        vsf_unprotect_sched(orig);
+    }
+    if (fd_out >= 0) {
+        sfd_from = vsf_linux_fd_get(fd_out);
+        VSF_LINUX_ASSERT(sfd_from != NULL);
+
+        if (STDOUT_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, false)) {
+            goto unref_process_cleanup_env_and_fail;
+        }
+        sfd->priv = sfd_from->priv;
+        orig = vsf_protect_sched();
+            sfd->priv->ref++;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+            vsf_trace_debug("%s dup fds: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
+#endif
+        vsf_unprotect_sched(orig);
     }
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
-    vsf_linux_start_process(process);
+    return process;
+unref_process_cleanup_env_and_fail:
+    vsf_linux_unref_process(process);
+cleanup_env_and_fail:
+    vsf_linux_free_env(env_tmp);
+    return NULL;
+}
+
+int __vsh_run_cmd(char *cmd)
+{
+    vsf_linux_process_t * processes[4];
+    int process_cnt = 0, fd_in = -1;
+    char *next;
+
+    // remove spaces
+    next = &cmd[strlen(cmd) - 1];
+    while (isspace((int)*next)) { *next-- = '\0'; }
+    bool is_background = *next == '&';
+    if (is_background) { *next = '\0'; }
+
+    for (;;) {
+        next = strchr(cmd, '|');
+        if (NULL == next) {
+            break;
+        }
+
+        int pipefd[2];
+        if (pipe(pipefd) < 0) {
+            goto cleanup;
+        }
+
+        VSF_LINUX_ASSERT(process_cnt < dimof(processes));
+        processes[process_cnt] = __vsh_prepare_process(cmd, fd_in, pipefd[1]);
+        if (NULL == processes[process_cnt]) {
+            goto cleanup;
+        }
+
+        close(pipefd[1]);
+        if (fd_in >= 0) {
+            close(fd_in);
+        }
+        fd_in = pipefd[0];
+        process_cnt++;
+    }
+    VSF_LINUX_ASSERT(process_cnt < dimof(processes));
+    processes[process_cnt++] = __vsh_prepare_process(cmd, fd_in, -1);
+    if (NULL == processes[process_cnt]) {
+        goto cleanup;
+    }
+
+    for (int i = 0; i < process_cnt; i++) {
+        vsf_linux_start_process(processes[i]);
+    }
 
     if (is_background) {
         // yield to new process, make sure main_on_run is called,
@@ -265,10 +377,16 @@ int __vsh_run_cmd(char *cmd)
         return 0;
     } else {
         int result;
-        waitpid(process->id.pid, &result, 0);
-        close(exefd);
+        for (int i = 0; i < process_cnt; i++) {
+            waitpid(processes[i]->id.pid, &result, 0);
+        }
         return result;
     }
+cleanup:
+    for (int i = 0; i < process_cnt; i++) {
+        vsf_linux_unref_process(processes[i]);
+    }
+    return -1;
 }
 
 #if __IS_COMPILER_IAR__
