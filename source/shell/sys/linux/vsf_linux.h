@@ -157,9 +157,7 @@ typedef struct vsf_linux_stdio_stream_t {
     vsf_stream_t *err;
 } vsf_linux_stdio_stream_t;
 
-#ifdef VSF_LINUX_CFG_FD_BITMAP_SIZE
 dcl_vsf_bitmap(vsf_linux_fd_bitmap, VSF_LINUX_CFG_FD_BITMAP_SIZE);
-#endif
 
 vsf_class(vsf_linux_process_t) {
     public_member(
@@ -196,11 +194,7 @@ vsf_class(vsf_linux_process_t) {
         vsf_dlist_t thread_list;
         vsf_dlist_t fd_list;
         vsf_linux_thread_t *thread_pending;
-#ifdef VSF_LINUX_CFG_FD_BITMAP_SIZE
         vsf_bitmap(vsf_linux_fd_bitmap) fd_bitmap;
-#else
-        int cur_fd;
-#endif
 
         struct {
             sigset_t pending;
