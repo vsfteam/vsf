@@ -1491,21 +1491,12 @@ int posix_spawnp(pid_t *pid, const char *file,
         for (int i = 0; i < actions->used; i++, a++) {
             switch (a->tag) {
             case spawn_do_close:
-                sfd = __vsf_linux_fd_get_ex(process, a->action.close_action.fd);
-                if (NULL == sfd) {
+                extern int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd);
+                if (__vsf_linux_fd_close_ex(process, a->action.close_action.fd) < 0) {
                     vsf_trace_error("spawn: action: failed to close fd %d", VSF_TRACE_CFG_LINEEND,
                         a->action.close_action.fd);
                     goto delete_process_and_fail;
                 }
-
-                orig = vsf_protect_sched();
-                    sfd->priv->ref--;
-#if VSF_LINUX_CFG_FD_TRACE == ENABLED
-                    vsf_trace_debug("%s action close: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
-                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
-#endif
-                vsf_unprotect_sched(orig);
-                __vsf_linux_fd_delete_ex(process, sfd->fd);
                 break;
             case spawn_do_dup2:
                 sfd = __vsf_linux_fd_get_ex(process, a->action.dup2_action.newfd);
