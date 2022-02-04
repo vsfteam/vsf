@@ -284,13 +284,8 @@ void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod)
 
     void *ctx = dynlib->modules[mod->mod_idx];
     if (NULL == ctx) {
-        if (dynlib->modules_men_size > 0) {
-            VSF_LINUX_ASSERT(dynlib->modules_men_size >= mod->mod_size);
-            ctx = (void *)((uint8_t *)&dynlib->modules[dynlib->module_num] + dynlib->modules_men_brk);
-        } else {
-            ctx = calloc(1, mod->mod_size);
-            VSF_LINUX_ASSERT(ctx != NULL);
-        }
+        VSF_LINUX_ASSERT(dynlib->modules_men_size >= mod->mod_size);
+        ctx = (void *)((uint8_t *)&dynlib->modules[dynlib->module_num] + dynlib->modules_men_brk);
         if (mod->init != NULL) {
             mod->init(ctx);
         }
