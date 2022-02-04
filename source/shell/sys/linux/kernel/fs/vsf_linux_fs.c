@@ -930,9 +930,9 @@ int open(const char *pathname, int flags, ...)
     return fd;
 }
 
-int close(int fd)
+int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
 {
-    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
     if (!sfd) { return -1; }
 
     vsf_linux_fd_priv_t *priv = sfd->priv;
@@ -949,8 +949,13 @@ int close(int fd)
         err = sfd->op->fn_close(sfd);
         free(sfd->priv);
     }
-    vsf_linux_fd_delete(fd);
+    __vsf_linux_fd_delete_ex(NULL, fd);
     return err;
+}
+
+int close(int fd)
+{
+    return __vsf_linux_fd_close_ex(NULL, fd);
 }
 
 int fcntl(int fd, int cmd, ...)

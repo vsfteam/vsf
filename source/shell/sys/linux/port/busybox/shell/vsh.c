@@ -262,7 +262,7 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     vsf_linux_process_t *process = vsf_linux_create_process(0);
     if (NULL == process) { goto cleanup_env_and_fail; }
     if (vsf_linux_merge_env(&process->__environ, env_tmp) < 0) {
-        goto unref_process_cleanup_env_and_fail;
+        goto delete_process_cleanup_env_and_fail;
     }
     vsf_linux_free_env(env_tmp);
     env_tmp = NULL;
@@ -273,7 +273,7 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
 
     char *strdupped = strdup(cmd);
     if (NULL == strdupped) {
-        goto unref_process_cleanup_env_and_fail;
+        goto delete_process_cleanup_env_and_fail;
     }
     ctx->entry = entry;
     ctx->arg.argv[ctx->arg.argc++] = strdupped;
@@ -283,7 +283,7 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
         nextnext = __vsh_get_next_arg(next);
         strdupped = strdup(next);
         if (NULL == strdupped) {
-            goto unref_process_cleanup_env_and_fail;
+            goto delete_process_cleanup_env_and_fail;
         }
 
         ctx->arg.argv[ctx->arg.argc++] = strdupped;
@@ -300,7 +300,7 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
         VSF_LINUX_ASSERT(sfd_from != NULL);
 
         if (STDIN_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, false)) {
-            goto unref_process_cleanup_env_and_fail;
+            goto delete_process_cleanup_env_and_fail;
         }
         sfd->priv = sfd_from->priv;
         orig = vsf_protect_sched();
@@ -316,7 +316,7 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
         VSF_LINUX_ASSERT(sfd_from != NULL);
 
         if (STDOUT_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, false)) {
-            goto unref_process_cleanup_env_and_fail;
+            goto delete_process_cleanup_env_and_fail;
         }
         sfd->priv = sfd_from->priv;
         orig = vsf_protect_sched();
@@ -330,8 +330,8 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
     return process;
-unref_process_cleanup_env_and_fail:
-    vsf_linux_unref_process(process);
+delete_process_cleanup_env_and_fail:
+    vsf_linux_delete_process(process);
 cleanup_env_and_fail:
     vsf_linux_free_env(env_tmp);
     return NULL;
@@ -433,7 +433,7 @@ cleanup:
         close(fd_in);
     }
     for (int i = 0; i < process_cnt; i++) {
-        vsf_linux_unref_process(processes[i]);
+        vsf_linux_delete_process(processes[i]);
     }
     return -1;
 }

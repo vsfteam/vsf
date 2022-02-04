@@ -121,6 +121,7 @@ exec_ret_t execl(const char *pathname, const char *arg, ...);
 exec_ret_t execlp(const char *file, const char *arg, ...);
 exec_ret_t execv(const char *pathname, char const * const * argv);
 exec_ret_t execvp(const char *file, char const * const * argv);
+int daemon(int nochdir, int noclose);
 
 int system(const char *cmd);
 enum {

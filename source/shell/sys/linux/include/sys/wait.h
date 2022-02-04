@@ -21,6 +21,10 @@ extern "C" {
 #define WNOHANG                 1
 #define WUNTRACED               2
 
+// internal usage
+#define PID_STATUS_RUNNING      (1 << 0)
+#define PID_STATUS_DADMON       (1 << 1)
+
 #define WIFEXITED(__STATUS)     !((__STATUS) & 0xFF)
 #define WEXITSTATUS(__STATUS)   ((__STATUS) >> 8)
 // TODO: implement WIFSIGNALED

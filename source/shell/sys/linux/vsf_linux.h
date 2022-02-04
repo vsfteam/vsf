@@ -141,7 +141,6 @@ vsf_class(vsf_linux_thread_t) {
     private_member(
         vsf_linux_process_t *process;
         vsf_dlist_node_t thread_node;
-        bool is_main;
     )
 };
 
@@ -169,6 +168,7 @@ vsf_class(vsf_linux_process_t) {
     )
 
     protected_member(
+        int status;
         vsf_linux_process_t *shell_process;
         struct {
             pid_t pid;
@@ -204,8 +204,10 @@ vsf_class(vsf_linux_process_t) {
 
         vsf_prio_t prio;
 
+        vsf_linux_thread_t *thread_pending_exit;
         vsf_linux_process_t *parent_process;
-        int ref_cnt;
+        vsf_dlist_t child_list;
+        vsf_dlist_node_t child_node;
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
         vsf_linux_localstorage_t pls[VSF_LINUX_CFG_PLS_NUM];
@@ -254,8 +256,8 @@ extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entr
 
 extern vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_stream_t *stdio_stream, char *working_dir);
 extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
-// free unstarted/existed process
-extern void vsf_linux_unref_process(vsf_linux_process_t *process);
+// delete unstarted/existed process
+void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
 extern void vsf_linux_exit_process(int status);
 
