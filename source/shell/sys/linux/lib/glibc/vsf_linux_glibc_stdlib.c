@@ -136,12 +136,14 @@ void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...)
 
 void __free_ex(vsf_linux_process_t *process, void *ptr, ...)
 {
-    size_t *i = (size_t *)ptr - 1;
-    va_list ap;
-    va_start(ap, ptr);
-        __vsf_linux_heap_trace_free(process, *i, ptr, ap);
-    va_end(ap);
-    vsf_heap_free(i);
+    if (ptr != NULL) {
+        size_t *i = (size_t *)ptr - 1;
+        va_list ap;
+        va_start(ap, ptr);
+            __vsf_linux_heap_trace_free(process, *i, ptr, ap);
+        va_end(ap);
+        vsf_heap_free(i);
+    }
 }
 #endif
 
