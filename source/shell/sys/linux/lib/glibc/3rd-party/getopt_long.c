@@ -59,7 +59,22 @@
 #	if VSF_LINUX_CFG_PLS_NUM <= 0
 #		error VSF_LINUX_CFG_PLS_NUM MUST be configured > 0 for getopt library
 #	endif
-int getopt_lib_idx = -1;
+int __getopt_lib_idx = -1;
+static void __getopt_mod_init(void *ctx)
+{
+	struct __getopt_lib_ctx_t *getopt_mod_ctx = ctx;
+	getopt_mod_ctx->__opterr = 1;
+	getopt_mod_ctx->__optind = 1;
+	getopt_mod_ctx->__optopt = '?';
+}
+const vsf_linux_dynlib_mod_t __getopt_long_mod = {
+	.lib_idx			= &__getopt_lib_idx,
+	.mod_idx			= 0,
+	.module_num			= 1,
+	.modules_men_size	= sizeof(struct __getopt_lib_ctx_t),
+	.mod_size			= sizeof(struct __getopt_lib_ctx_t),
+	.init				= __getopt_mod_init,
+};
 #else
 int	opterr = 1;		/* if error message should be printed */
 int	optind = 1;		/* index into parent argv vector */
@@ -299,33 +314,6 @@ getopt_internal(int nargc, char * const *nargv, const char *options,
 	char *oli;				/* option letter list index */
 	int optchar, short_too;
 	static int posixly_correct = -1;
-
-#if VSF_LINUX_USE_GETOPT == ENABLED
-	vsf_protect_t orig = vsf_protect_sched();
-	if (getopt_lib_idx < 0) {
-		getopt_lib_idx = vsf_linux_pls_alloc();
-		if (getopt_lib_idx < 0) {
-			vsf_unprotect_sched(orig);
-			VSF_LINUX_ASSERT(false);
-			return -1;
-		}
-	}
-	vsf_unprotect_sched(orig);
-
-	struct getopt_lib_ctx_t *ctx = getopt_ctx;
-	if (NULL == ctx) {
-		ctx = calloc(1, sizeof(struct getopt_lib_ctx_t));
-		if (NULL == ctx) {
-			VSF_LINUX_ASSERT(false);
-			return -1;
-		}
-		ctx->__opterr = 1;
-		ctx->__optind = 1;
-		ctx->__optopt = '?';
-		vsf_linux_library_init(&getopt_lib_idx, ctx, free);
-	}
-	
-#endif
 
 	if (options == NULL)
 		return (-1);

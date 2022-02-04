@@ -217,7 +217,7 @@ vsf_linux_localstorage_t * vsf_linux_pls_get(int idx)
     return &process->pls[idx];
 }
 
-int vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*destructor)(void *))
+vsf_err_t vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*destructor)(void *))
 {
     VSF_LINUX_ASSERT(lib_idx != NULL);
     vsf_protect_t orig = vsf_protect_sched();
@@ -226,23 +226,77 @@ int vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*destructor)(void 
         if (*lib_idx < 0) {
             vsf_unprotect_sched(orig);
             vsf_trace_error("linux: fail to allocate pls for library" VSF_TRACE_CFG_LINEEND);
-            return -1;
+            return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
     }
     vsf_unprotect_sched(orig);
 
     vsf_linux_localstorage_t *pls = vsf_linux_pls_get(*lib_idx);
     VSF_LINUX_ASSERT(pls != NULL);
+    if (pls->data != NULL) {
+        vsf_trace_warning("linux: can not initiazlize a initizlized library" VSF_TRACE_CFG_LINEEND);
+        return VSF_ERR_ALREADY_EXISTS;
+    }
     pls->data = lib_ctx;
     pls->destructor = destructor;
-    return 0;
+    return VSF_ERR_NONE;
 }
 
 void * vsf_linux_library_ctx(int lib_idx)
 {
+    if (lib_idx < 0) {
+        return NULL;
+    }
     vsf_linux_localstorage_t *pls = vsf_linux_pls_get(lib_idx);
     VSF_LINUX_ASSERT(pls != NULL);
     return pls->data;
+}
+
+vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int module_mem_size)
+{
+    vsf_linux_dynlib_t *dynlib = calloc(1, sizeof(vsf_linux_dynlib_t) + module_num * sizeof(void *) + module_mem_size);
+    if (NULL == dynlib) { return -1; }
+
+    dynlib->module_num = module_num;
+    dynlib->modules_men_size = module_mem_size;
+    vsf_err_t err = vsf_linux_library_init(lib_idx, dynlib, free);
+    if (err != VSF_ERR_NONE) {
+        free(dynlib);
+    }
+    return err;
+}
+
+void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod)
+{
+    VSF_LINUX_ASSERT(mod != NULL);
+    vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(*mod->lib_idx);
+
+    if (NULL == dynlib) {
+        if (vsf_linux_dynlib_init(mod->lib_idx, mod->module_num, mod->modules_men_size) < 0) {
+            vsf_trace_error("linux: fail to allocate dynlib" VSF_TRACE_CFG_LINEEND);
+            VSF_LINUX_ASSERT(false);
+            return NULL;
+        }
+        dynlib = vsf_linux_library_ctx(*mod->lib_idx);
+        VSF_LINUX_ASSERT(dynlib != NULL);
+    }
+    VSF_LINUX_ASSERT(mod->mod_idx < dynlib->module_num);
+
+    void *ctx = dynlib->modules[mod->mod_idx];
+    if (NULL == ctx) {
+        if (dynlib->modules_men_size > 0) {
+            VSF_LINUX_ASSERT(dynlib->modules_men_size >= mod->mod_size);
+            ctx = (void *)((uint8_t *)&dynlib->modules[dynlib->module_num] + dynlib->modules_men_brk);
+        } else {
+            ctx = calloc(1, mod->mod_size);
+            VSF_LINUX_ASSERT(ctx != NULL);
+        }
+        if (mod->init != NULL) {
+            mod->init(ctx);
+        }
+        dynlib->modules[mod->mod_idx] = ctx;
+    }
+    return ctx;
 }
 #endif
 

@@ -76,15 +76,16 @@ int	 getopt(int, char * const *, const char *);
 #	if VSF_LINUX_USE_GETOPT == ENABLED
 // for vsf linux, put these variable in process context and implement them as macro
 #		include "shell/sys/linux/vsf_linux.h"
-extern int getopt_lib_idx;
-struct getopt_lib_ctx_t {
+extern int __getopt_lib_idx;
+extern const vsf_linux_dynlib_mod_t __getopt_long_mod;
+struct __getopt_lib_ctx_t {
 	char *__optarg;
 	int __opterr;
 	int __optind;
 	int __optopt;
 	int __optreset;
 };
-#		define getopt_ctx		((struct getopt_lib_ctx_t *)vsf_linux_library_ctx(getopt_lib_idx))
+#		define getopt_ctx		((struct __getopt_lib_ctx_t *)vsf_linux_dynlib_ctx(&__getopt_long_mod))
 #		define opterr			(getopt_ctx->__opterr)
 #		define optind			(getopt_ctx->__optind)
 #		define optopt			(getopt_ctx->__optopt)
