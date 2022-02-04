@@ -118,7 +118,7 @@ typedef struct vsf_linux_dynlib_mod_t {
     uint16_t mod_idx;
     uint16_t module_num;
     uint32_t modules_men_size;
-    int mod_size;
+    uint32_t mod_size;
     void (*init)(void *ctx);
 } vsf_linux_dynlib_mod_t;
 
