@@ -628,12 +628,11 @@ vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdi
 
     vsf_linux_process_t *process = __vsf_linux_create_process(stack_size);
     if (process != NULL) {
-        process->working_dir = vsf_heap_malloc(strlen(working_dir) + 1);
+        process->working_dir = vsf_heap_strdup(working_dir);
         if (NULL == process->working_dir) {
-            vsf_trace_warning("linux: fail to allocate working_dir, maybe error if working_dir is used", VSF_TRACE_CFG_LINEEND);
-        } else {
-            strcpy(process->working_dir, working_dir);
+            goto delete_process_and_fail;
         }
+
         process->stdio_stream = *stdio_stream;
         VSF_LINUX_ASSERT(process->working_dir != NULL);
 
@@ -646,11 +645,14 @@ vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdi
 
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         if (vsf_linux_merge_env(&process->__environ, cur_process->__environ) < 0) {
-            vsf_trace_warning("linux: fail to allocate environ, maybe error if environ is used", VSF_TRACE_CFG_LINEEND);
+            goto delete_process_and_fail;
         }
 #endif
     }
     return process;
+delete_process_and_fail:
+    vsf_linux_delete_process(process);
+    return NULL;
 }
 
 vsf_linux_process_t * vsf_linux_create_process(int stack_size)
@@ -781,11 +783,10 @@ static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
     if (process != NULL) {
         process->prio = prio;
         process->ctx.entry = entry;
-        process->working_dir = vsf_heap_malloc(2);
+        process->working_dir = vsf_heap_strdup("/");
         if (NULL == process->working_dir) {
-            vsf_trace_warning("linux: fail to allocate working_dir, maybe error if working_dir is used", VSF_TRACE_CFG_LINEEND);
-        } else {
-            strcpy(process->working_dir, "/");
+            vsf_linux_delete_process(process);
+            return NULL;
         }
         process->stdio_stream = __vsf_linux.stdio_stream;
         VSF_LINUX_ASSERT(process->working_dir != NULL);
@@ -888,7 +889,7 @@ int daemon(int nochdir, int noclose)
 
     if (!nochdir) {
         vsf_heap_free(process->working_dir);
-        process->working_dir = strdup("/");
+        process->working_dir = vsf_heap_strdup("/");
     }
     if (!noclose) {
         int fd = open("/dev/null", 0);
@@ -1471,13 +1472,16 @@ int posix_spawnp(pid_t *pid, const char *file,
                 vsf_unprotect_sched(orig);
             } else {
                 vsf_trace_error("spawn: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
+                goto delete_process_and_fail;
             }
         }
     }
 
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
     // env
-    vsf_linux_merge_env(&process->__environ, (char **)env);
+    if (vsf_linux_merge_env(&process->__environ, (char **)env) < 0) {
+        goto delete_process_and_fail;
+    }
 #endif
 
     // apply actions
@@ -1491,7 +1495,7 @@ int posix_spawnp(pid_t *pid, const char *file,
                 if (NULL == sfd) {
                     vsf_trace_error("spawn: action: failed to close fd %d", VSF_TRACE_CFG_LINEEND,
                         a->action.close_action.fd);
-                    continue;
+                    goto delete_process_and_fail;
                 }
 
                 orig = vsf_protect_sched();
@@ -1521,7 +1525,7 @@ int posix_spawnp(pid_t *pid, const char *file,
                 action_fail_dup:
                     vsf_trace_error("spawn: action: failed to dup fd %d", VSF_TRACE_CFG_LINEEND,
                         a->action.dup2_action.fd);
-                    continue;
+                    goto delete_process_and_fail;
                 }
 
                 int ret = __vsf_linux_fd_create_ex(process, &sfd_new, sfd->op, a->action.dup2_action.newfd, false);
@@ -1548,7 +1552,7 @@ int posix_spawnp(pid_t *pid, const char *file,
                     action_fail_fchdir:
                         vsf_trace_error("spawn: action: failed to fchdir fd %d", VSF_TRACE_CFG_LINEEND,
                             a->action.fchdir_action.fd);
-                        continue;
+                        goto delete_process_and_fail;
                     }
 
                     char *ptr = &fullpath[sizeof(fullpath) - 1];
@@ -1575,6 +1579,7 @@ int posix_spawnp(pid_t *pid, const char *file,
                 if (vsf_linux_chdir(process, a->action.chdir_action.path) < 0) {
                     vsf_trace_error("spawn: action: failed to chdir fd %s", VSF_TRACE_CFG_LINEEND,
                         a->action.chdir_action.path);
+                    goto delete_process_and_fail;
                 }
                 break;
             }
@@ -1585,6 +1590,9 @@ int posix_spawnp(pid_t *pid, const char *file,
         *pid = process->id.pid;
     }
     return vsf_linux_start_process(process);
+delete_process_and_fail:
+    vsf_linux_delete_process(process);
+    return -1;
 }
 
 int posix_spawn(pid_t *pid, const char *path,
