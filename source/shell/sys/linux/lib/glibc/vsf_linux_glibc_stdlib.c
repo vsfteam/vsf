@@ -61,6 +61,7 @@ static size_t __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, void *p
     vsf_protect_t orig = vsf_protect_sched();
 #   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
         i = vsf_bitmap_ffz(&process->heap_monitor.bitmap, VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
+        // if assert here, please increate VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH
         VSF_LINUX_ASSERT(i >= 0);
         // can not go on, stalls here even if assert is not enabled
         if (i < 0) { while(1); }
