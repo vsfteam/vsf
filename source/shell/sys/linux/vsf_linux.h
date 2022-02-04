@@ -116,7 +116,6 @@ typedef struct vsf_linux_localstorage_t {
 typedef struct vsf_linux_dynlib_mod_t {
     int *lib_idx;
     uint16_t mod_idx;
-    // if module_num > 0, then vsf_linux_dynlib_init is not necessary
     uint16_t module_num;
     uint32_t modules_men_size;
     int mod_size;
