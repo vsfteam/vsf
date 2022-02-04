@@ -1501,6 +1501,7 @@ int posix_spawnp(pid_t *pid, const char *file,
                 const vsf_linux_fd_op_t *op, int fd_desired, bool allocate_priv);
     extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
     extern void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd);
+    extern int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd);
     extern vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd);
 
     vsf_linux_main_entry_t entry;
@@ -1559,7 +1560,6 @@ int posix_spawnp(pid_t *pid, const char *file,
         for (int i = 0; i < actions->used; i++, a++) {
             switch (a->tag) {
             case spawn_do_close:
-                extern int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd);
                 if (__vsf_linux_fd_close_ex(process, a->action.close_action.fd) < 0) {
                     vsf_trace_error("spawn: action: failed to close fd %d", VSF_TRACE_CFG_LINEEND,
                         a->action.close_action.fd);
