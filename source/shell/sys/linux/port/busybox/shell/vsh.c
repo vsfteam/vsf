@@ -390,12 +390,12 @@ int __vsh_run_cmd(char *cmd)
         cmd = next;
     }
     VSF_LINUX_ASSERT(process_cnt < dimof(processes));
-    processes[process_cnt++] = __vsh_prepare_process(cmd, fd_in, -1);
+    processes[process_cnt] = __vsh_prepare_process(cmd, fd_in, -1);
     if (fd_in >= 0) {
         close(fd_in);
         fd_in = -1;
     }
-    if (NULL == processes[process_cnt]) {
+    if (NULL == processes[process_cnt++]) {
         goto cleanup;
     }
     if (is_environ_expanded) {
@@ -426,7 +426,9 @@ cleanup:
         close(fd_in);
     }
     for (int i = 0; i < process_cnt; i++) {
-        vsf_linux_delete_process(processes[i]);
+        if (processes[i] != NULL) {
+            vsf_linux_delete_process(processes[i]);
+        }
     }
     return -1;
 }
