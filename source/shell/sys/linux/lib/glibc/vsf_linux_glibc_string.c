@@ -44,13 +44,24 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-char * strdup(const char *str)
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+char * __strdup_ex(vsf_linux_process_t *process, const char *str)
 {
-    char *newstr = malloc(strlen(str) + 1);
+    char *newstr = __malloc_ex(process, strlen(str) + 1);
     if (newstr != NULL) {
         strcpy(newstr, str);
     }
     return newstr;
+}
+#endif
+
+char * strdup(const char *str)
+{
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    return __strdup_ex(NULL, str);
+#else
+    return vsf_heap_strdup(str);
+#endif
 }
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STRING

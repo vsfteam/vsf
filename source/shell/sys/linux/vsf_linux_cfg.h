@@ -99,6 +99,14 @@
 #       ifndef VSF_LINUX_LIBC_USE_ENVIRON
 #           define VSF_LINUX_LIBC_USE_ENVIRON   ENABLED
 #       endif
+#       ifndef VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR
+#           define VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR DISABLED
+#       endif
+#       if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#           ifndef VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH
+#               define VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH   0
+#           endif
+#       endif
 #   endif
 #   ifndef VSF_LINUX_USE_GETOPT
 #       define VSF_LINUX_USE_GETOPT             ENABLED

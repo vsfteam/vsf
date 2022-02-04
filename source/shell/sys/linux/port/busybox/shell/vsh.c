@@ -222,13 +222,16 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     char *next;
     int exefd = -1, err;
     vsf_linux_main_entry_t entry;
-    char **env_tmp = NULL, *env[2];
+    char *env[2];
 
     // skip spaces
     while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
     if ('\0' == *cmd) { return 0; }
     next = &cmd[strlen(cmd) - 1];
     while (isspace((int)*next)) { *next-- = '\0'; }
+
+    vsf_linux_process_t *process = vsf_linux_create_process(0);
+    if (NULL == process) { return NULL; }
 
     env[1] = NULL;
     for (;;) {
@@ -239,8 +242,8 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
 
         env[0] = cmd;
         cmd = next;
-        if (vsf_linux_merge_env(&env_tmp, env) < 0) {
-            goto cleanup_env_and_fail;
+        if (vsf_linux_merge_env(process, env) < 0) {
+            goto delete_process_and_fail;
         }
     }
 
@@ -254,26 +257,18 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
         if (exefd < 0) {
             printf("%s not found" VSH_LINEEND, cmd);
             err = -ENOENT;
-            goto cleanup_env_and_fail;
+            goto delete_process_and_fail;
         }
     }
     close(exefd);
-
-    vsf_linux_process_t *process = vsf_linux_create_process(0);
-    if (NULL == process) { goto cleanup_env_and_fail; }
-    if (vsf_linux_merge_env(&process->__environ, env_tmp) < 0) {
-        goto delete_process_cleanup_env_and_fail;
-    }
-    vsf_linux_free_env(env_tmp);
-    env_tmp = NULL;
 
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     process->shell_process = cur_process->shell_process;
 
-    char *strdupped = strdup(cmd);
+    char *strdupped = __strdup_ex(process, cmd);
     if (NULL == strdupped) {
-        goto delete_process_cleanup_env_and_fail;
+        goto delete_process_and_fail;
     }
     ctx->entry = entry;
     ctx->arg.argv[ctx->arg.argc++] = strdupped;
@@ -281,9 +276,9 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     char *nextnext;
     while ((*next != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
         nextnext = __vsh_get_next_arg(next);
-        strdupped = strdup(next);
+        strdupped = __strdup_ex(process, next);
         if (NULL == strdupped) {
-            goto delete_process_cleanup_env_and_fail;
+            goto delete_process_and_fail;
         }
 
         ctx->arg.argv[ctx->arg.argc++] = strdupped;
@@ -300,7 +295,7 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
         VSF_LINUX_ASSERT(sfd_from != NULL);
 
         if (STDIN_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, false)) {
-            goto delete_process_cleanup_env_and_fail;
+            goto delete_process_and_fail;
         }
         sfd->priv = sfd_from->priv;
         orig = vsf_protect_sched();
@@ -316,7 +311,7 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
         VSF_LINUX_ASSERT(sfd_from != NULL);
 
         if (STDOUT_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, false)) {
-            goto delete_process_cleanup_env_and_fail;
+            goto delete_process_and_fail;
         }
         sfd->priv = sfd_from->priv;
         orig = vsf_protect_sched();
@@ -330,10 +325,8 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
     return process;
-delete_process_cleanup_env_and_fail:
+delete_process_and_fail:
     vsf_linux_delete_process(process);
-cleanup_env_and_fail:
-    vsf_linux_free_env(env_tmp);
     return NULL;
 }
 
@@ -742,12 +735,12 @@ int export_main(int argc, char *argv[])
 
     char *env_str;
     if (strchr(argv[1], '=') == NULL) {
-        env_str = malloc(strlen(argv[1]) + 2);
+        env_str = __malloc_ex(process->shell_process, strlen(argv[1]) + 2);
         if (env_str != NULL) {
             sprintf(env_str, "%s=", argv[1]);
         }
     } else {
-        env_str = strdup(argv[1]);
+        env_str = __strdup_ex(process->shell_process, argv[1]);
     }
     if (NULL == env_str) {
         printf("fail to allocate environment string" VSH_LINEEND);
@@ -755,10 +748,10 @@ int export_main(int argc, char *argv[])
     }
 
     // env_str not belong to us after putenv
-    extern int __putenv(char *string, char ***environ);
-    int ret = __putenv(env_str, &process->shell_process->__environ);
+    extern int __putenv_ex(vsf_linux_process_t *process, char *string);
+    int ret = __putenv_ex(&process->shell_process, env_str);
     if (ret) {
-        free(env_str);
+        __free_ex(process->shell_process, env_str);
     }
     return ret;
 }

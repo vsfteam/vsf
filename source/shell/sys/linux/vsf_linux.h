@@ -158,6 +158,34 @@ typedef struct vsf_linux_stdio_stream_t {
 
 dcl_vsf_bitmap(vsf_linux_fd_bitmap, VSF_LINUX_CFG_FD_BITMAP_SIZE);
 
+#if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+typedef struct vsf_linux_heap_info_t {
+    size_t usage;
+    int balance;
+} vsf_linux_heap_info_t;
+
+typedef struct vsf_liunx_heap_node_t {
+    void *ptr;
+    size_t size;
+
+    char *func;
+} vsf_liunx_heap_node_t;
+
+#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
+dcl_vsf_bitmap(vsf_linux_heap_nodes_bitmap, VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
+#   endif
+
+typedef struct vsf_linux_heap_monitor_t {
+    vsf_linux_heap_info_t info;
+
+#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
+    vsf_bitmap(vsf_linux_heap_nodes_bitmap) bitmap;
+    vsf_liunx_heap_node_t nodes[VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH];
+#   endif
+} vsf_linux_heap_monitor_t;
+#endif
+
 vsf_class(vsf_linux_process_t) {
     public_member(
         vsf_linux_process_ctx_t ctx;
@@ -179,9 +207,8 @@ vsf_class(vsf_linux_process_t) {
 #endif
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
-        size_t heap_usage;
-        int heap_balance;
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+        vsf_linux_heap_monitor_t heap_monitor;
 #endif
         void (*fn_atexit)(void);
     )
@@ -228,21 +255,6 @@ vsf_class(vsf_linux_process_t) {
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 
-#if VSF_LINUX_CFG_PLS_NUM > 0
-extern int vsf_linux_pls_alloc(void);
-extern void vsf_linux_pls_free(int idx);
-extern vsf_linux_localstorage_t * vsf_linux_pls_get(int idx);
-
-extern int vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*destructor)(void *));
-extern void * vsf_linux_library_ctx(int lib_idx);
-#endif
-
-#if VSF_LINUX_CFG_TLS_NUM > 0
-extern int vsf_linux_tls_alloc(void (*destructor)(void *));
-extern void vsf_linux_tls_free(int idx);
-extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
-#endif
-
 extern int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in);
 extern int vsf_linux_chdir(vsf_linux_process_t *process, char *working_dir);
 
@@ -251,6 +263,34 @@ extern int vsf_linux_fd_bind_executable(int fd, vsf_linux_main_entry_t entry);
 extern int vsf_linux_expandenv(const char *str, char *output, size_t bufflen);
 
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
+#   if VSF_LINUX_CFG_PLS_NUM > 0
+extern int vsf_linux_pls_alloc(void);
+extern void vsf_linux_pls_free(int idx);
+extern vsf_linux_localstorage_t * vsf_linux_pls_get(int idx);
+
+extern int vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*destructor)(void *));
+extern void * vsf_linux_library_ctx(int lib_idx);
+#   endif
+
+#   if VSF_LINUX_CFG_TLS_NUM > 0
+extern int vsf_linux_tls_alloc(void (*destructor)(void *));
+extern void vsf_linux_tls_free(int idx);
+extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
+#   endif
+
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+// can not put in clib headers because of dependency, so put them here
+extern void * __malloc_ex(vsf_linux_process_t *process, int size, ...);
+extern void __free_ex(vsf_linux_process_t *process, void *ptr, ...);
+extern void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...);
+extern void * __strdup_ex(vsf_linux_process_t *process, const char *str);
+#   else
+#       define __malloc_ex(__process, __size, ...)          malloc(__size)
+#       define __free_ex(__process, __ptr, ...)             free(__ptr)
+#       define __realloc_ex(__process, __ptr, __size, ...)  realloc((__ptr), (__size))
+#       define __strdup_ex(__process, __str)                strdup(__str)
+#   endif
+
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
@@ -270,11 +310,11 @@ extern void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread);
 extern vsf_linux_thread_t * vsf_linux_get_thread(int tid);
 extern vsf_linux_process_t * vsf_linux_get_process(pid_t pid);
 
-extern void __vsf_linux_process_free_arg(vsf_linux_process_arg_t *arg);
-extern int __vsf_linux_process_parse_arg(vsf_linux_process_arg_t *arg, char const * const * argv);
+extern void __vsf_linux_process_free_arg(vsf_linux_process_t *process);
+extern int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, char const * const * argv);
 
-extern int vsf_linux_merge_env(char ***to_environ, char **from_environ);
-extern void vsf_linux_free_env(char **environ);
+extern int vsf_linux_merge_env(vsf_linux_process_t *process, char **env);
+extern void vsf_linux_free_env(vsf_linux_process_t *process);
 #endif
 
 // open vsf_linux_get_cur_thread for thread-related variables like errno, etc

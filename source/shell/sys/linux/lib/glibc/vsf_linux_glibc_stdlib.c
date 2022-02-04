@@ -49,43 +49,106 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
-static void __vsf_linux_heap_check_malloc(size_t size)
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+static size_t __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, void *ptr, size_t size, va_list ap)
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
     VSF_LINUX_ASSERT(process != NULL);
+
+    size_t i;
     vsf_protect_t orig = vsf_protect_sched();
-        process->heap_usage += size;
-        process->heap_balance++;
+#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
+        i = vsf_bitmap_ffz(&process->heap_monitor.bitmap, VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
+        VSF_LINUX_ASSERT(i >= 0);
+        // can not go on, stalls here even if assert is not enabled
+        if (i < 0) { while(1); }
+
+        process->heap_monitor.nodes[i].ptr = ptr;
+        process->heap_monitor.nodes[i].size = size - sizeof(size_t);
+        vsf_bitmap_set(&process->heap_monitor.bitmap, i);
+#   else
+        i = size;
+#   endif
+        process->heap_monitor.info.usage += size - sizeof(size_t);
+        process->heap_monitor.info.balance++;
+    vsf_unprotect_sched(orig);
+    return i;
+}
+
+static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, void *ptr, va_list ap)
+{
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    VSF_LINUX_ASSERT(process != NULL);
+
+    vsf_protect_t orig = vsf_protect_sched();
+#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
+        VSF_LINUX_ASSERT(i < VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
+        VSF_LINUX_ASSERT(vsf_bitmap_get(&process->heap_monitor.bitmap, i));
+        VSF_LINUX_ASSERT(process->heap_monitor.nodes[i].ptr == ptr);
+        process->heap_monitor.info.usage -= process->heap_monitor.nodes[i].size;
+        vsf_bitmap_clear(&process->heap_monitor.bitmap, i);
+#   else
+        process->heap_monitor.info.usage -= i;
+#   endif
+        process->heap_monitor.info.balance--;
     vsf_unprotect_sched(orig);
 }
 
-static void __vsf_linux_heap_check_free(size_t size)
+void * __malloc_ex(vsf_linux_process_t *process, int size, ...)
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    vsf_protect_t orig = vsf_protect_sched();
-        process->heap_usage -= size;
-        process->heap_balance--;
-    vsf_unprotect_sched(orig);
-}
-#endif
-
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
-void * __malloc(size_t size)
-#else
-void * malloc(size_t size)
-#endif
-{
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
     size += sizeof(size_t);
-    size_t *ret = vsf_heap_malloc(size);
-    if (ret != NULL) {
-        *ret = size;
-        __vsf_linux_heap_check_malloc(size);
-        return (void *)(ret + 1);
+    size_t *i = vsf_heap_malloc(size);
+    if (i != NULL) {
+        va_list ap;
+        va_start(ap, size);
+            *i = __vsf_linux_heap_trace_alloc(process, (void *)(i + 1), size, ap);
+        va_end(ap);
+        return (void *)(i + 1);
     }
     return NULL;
+}
+
+void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...)
+{
+    if (NULL == p) {
+        if (size > 0) {
+            return __malloc_ex(process, size);
+        }
+        return NULL;
+    } else if (0 == size) {
+        if (p != NULL) {
+            __free_ex(process, p);
+        }
+        return NULL;
+    } else {
+        void *new_buff = __malloc_ex(process, size);
+        if (new_buff != NULL) {
+            memcpy(new_buff, p, size);
+        }
+        __free_ex(process, p);
+        return new_buff;
+    }
+}
+
+void __free_ex(vsf_linux_process_t *process, void *ptr, ...)
+{
+    size_t *i = (size_t *)ptr - 1;
+    va_list ap;
+    va_start(ap, ptr);
+        __vsf_linux_heap_trace_free(process, *i, ptr, ap);
+    va_end(ap);
+    vsf_heap_free(i);
+}
+#endif
+
+void * malloc(size_t size)
+{
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    return __malloc_ex(NULL, size);
 #else
     return vsf_heap_malloc(size);
 #endif
@@ -93,58 +156,30 @@ void * malloc(size_t size)
 
 void * aligned_alloc(size_t alignment, size_t size)
 {
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     VSF_LINUX_ASSERT(false);
+    return NULL;
 #else
     return vsf_heap_malloc_aligned(size, alignment);
 #endif
 }
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
-void * __realloc(void *p, size_t size)
-#else
 void * realloc(void *p, size_t size)
-#endif
 {
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
-    if (NULL == p) {
-        if (size > 0) {
-            return malloc(size);
-        }
-        return NULL;
-    } else if (0 == size) {
-        if (p != NULL) {
-            free(p);
-        }
-        return NULL;
-    } else {
-        void *new_buff = malloc(size);
-        if (new_buff != NULL) {
-            memcpy(new_buff, p, size);
-        }
-        free(p);
-        return new_buff;
-    }
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    return __realloc_ex(NULL, p, size);
 #else
     return vsf_heap_realloc(p, size);
 #endif
 }
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_TRACE == ENABLED
-void __free(void *p)
-#else
 void free(void *p)
-#endif
 {
-    if (p != NULL) {
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_CHECK == ENABLED
-        size_t *size = (size_t *)p - 1;
-        __vsf_linux_heap_check_free(*size);
-        vsf_heap_free(size);
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    __free_ex(NULL, p);
 #else
-        vsf_heap_free(p);
+    vsf_heap_free(p);
 #endif
-    }
 }
 
 void * calloc(size_t n, size_t size)
@@ -318,9 +353,14 @@ intmax_t imaxabs(intmax_t j)
 }
 
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-int __putenv(char *string, char ***environ)
+int __putenv_ex(vsf_linux_process_t *process, char *string)
 {
-    VSF_LINUX_ASSERT(environ != NULL);
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    VSF_LINUX_ASSERT(process != NULL);
+
+    char ***environ = &process->__environ;
     const char * str = strchr(string, '=');
     bool is_to_set = str != NULL;
     size_t namelen = is_to_set ? str - string : strlen(string);
@@ -348,7 +388,7 @@ int __putenv(char *string, char ***environ)
 
     if (is_to_set) {
         VSF_LINUX_ASSERT(!is_match);
-        *environ = env = (char **)realloc(env, (size + 2) * sizeof(char *));
+        *environ = env = (char **)__realloc_ex(process, env, (size + 2) * sizeof(char *));
         if (NULL == env) {
             return -1;
         }
@@ -361,10 +401,15 @@ int __putenv(char *string, char ***environ)
     return 0;
 }
 
-char * __getenv(const char *name, char **environ)
+char * __getenv_ex(vsf_linux_process_t *process, const char *name)
 {
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    VSF_LINUX_ASSERT(process != NULL);
+
     size_t namelen = strlen(name);
-    char **env = environ;
+    char **env = process->__environ;
 
     if (NULL == env) {
         return NULL;
@@ -379,22 +424,13 @@ char * __getenv(const char *name, char **environ)
     return NULL;
 }
 
-int putenv(char *string)
+int __setenv_ex(vsf_linux_process_t *process, const char *name, const char *value, int replace)
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
     VSF_LINUX_ASSERT(process != NULL);
-    return __putenv(string, &process->__environ);
-}
 
-char * getenv(const char *name)
-{
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    return __getenv(name, process->__environ);
-}
-
-int setenv(const char *name, const char *value, int replace)
-{
     size_t namelen = strlen(name), valuelen = strlen(value);
     if (!replace) {
         if (getenv(name) != NULL) {
@@ -402,7 +438,7 @@ int setenv(const char *name, const char *value, int replace)
         }
     }
 
-    char *env_str = malloc(namelen + valuelen + 2);
+    char *env_str = __malloc_ex(process, namelen + valuelen + 2);
     if (NULL == env_str) {
         return -1;
     }
@@ -410,7 +446,22 @@ int setenv(const char *name, const char *value, int replace)
     env_str[namelen] = '=';
     memcpy(env_str + namelen + 1, value, valuelen);
     env_str[namelen + valuelen + 1] = '\0';
-    return putenv(env_str);
+    return __putenv_ex(process, env_str);
+}
+
+int putenv(char *string)
+{
+    return __putenv_ex(NULL, string);
+}
+
+char * getenv(const char *name)
+{
+    return __getenv_ex(NULL, name);
+}
+
+int setenv(const char *name, const char *value, int replace)
+{
+    return __setenv_ex(NULL, name, value, replace);
 }
 
 int unsetenv(const char *name)
