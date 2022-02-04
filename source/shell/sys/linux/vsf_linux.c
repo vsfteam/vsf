@@ -715,7 +715,7 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
 
             vsf_trace_warning("    0x%p(%d)" VSF_TRACE_CFG_LINEEND,
                 process->heap_monitor.nodes[idx].ptr, process->heap_monitor.nodes[idx].size);
-            vsf_bitmap_clear(&process->heap_monitor.bitmap, idx);
+            free(process->heap_monitor.nodes[idx].ptr);
         }
 #   endif
     }
