@@ -117,15 +117,15 @@ typedef struct vsf_linux_dynlib_mod_t {
     int *lib_idx;
     uint16_t mod_idx;
     uint16_t module_num;
-    uint32_t modules_men_size;
+    uint32_t bss_size;
     uint32_t mod_size;
     void (*init)(void *ctx);
 } vsf_linux_dynlib_mod_t;
 
 typedef struct vsf_linux_dynlib_t {
     uint16_t module_num;
-    uint32_t modules_men_size;
-    uint32_t modules_men_brk;
+    uint32_t bss_size;
+    uint32_t bss_brk;
     // just make iar happy, which does not support zla
     void * modules[1];
 } vsf_linux_dynlib_t;
@@ -288,7 +288,7 @@ extern vsf_linux_localstorage_t * vsf_linux_pls_get(int idx);
 extern vsf_err_t vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*destructor)(void *));
 extern void * vsf_linux_library_ctx(int lib_idx);
 
-extern vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int module_mem_size);
+extern vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int bss_size);
 extern void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod);
 #   endif
 

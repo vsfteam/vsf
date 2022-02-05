@@ -252,13 +252,13 @@ void * vsf_linux_library_ctx(int lib_idx)
     return pls->data;
 }
 
-vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int module_mem_size)
+vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int bss_size)
 {
-    vsf_linux_dynlib_t *dynlib = calloc(1, sizeof(vsf_linux_dynlib_t) + module_num * sizeof(void *) + module_mem_size);
+    vsf_linux_dynlib_t *dynlib = calloc(1, sizeof(vsf_linux_dynlib_t) + module_num * sizeof(void *) + bss_size);
     if (NULL == dynlib) { return -1; }
 
     dynlib->module_num = module_num;
-    dynlib->modules_men_size = module_mem_size;
+    dynlib->bss_size = bss_size;
     vsf_err_t err = vsf_linux_library_init(lib_idx, dynlib, free);
     if (err != VSF_ERR_NONE) {
         free(dynlib);
@@ -272,7 +272,7 @@ void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod)
     vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(*mod->lib_idx);
 
     if (NULL == dynlib) {
-        if (vsf_linux_dynlib_init(mod->lib_idx, mod->module_num, mod->modules_men_size) < 0) {
+        if (vsf_linux_dynlib_init(mod->lib_idx, mod->module_num, mod->bss_size) < 0) {
             vsf_trace_error("linux: fail to allocate dynlib" VSF_TRACE_CFG_LINEEND);
             VSF_LINUX_ASSERT(false);
             return NULL;
@@ -285,13 +285,13 @@ void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod)
     void *ctx = dynlib->modules[mod->mod_idx];
     if (NULL == ctx) {
         uint32_t mod_size = (mod->mod_size + (sizeof(int) - 1)) & ~(sizeof(int) - 1);
-        VSF_LINUX_ASSERT(dynlib->modules_men_size >= dynlib->modules_men_brk + mod_size);
-        ctx = (void *)((uint8_t *)&dynlib->modules[dynlib->module_num] + dynlib->modules_men_brk);
-        dynlib->modules_men_brk += mod_size;
+        VSF_LINUX_ASSERT(dynlib->bss_size >= dynlib->bss_brk + mod_size);
+        ctx = (void *)((uint8_t *)&dynlib->modules[dynlib->module_num] + dynlib->bss_brk);
+        dynlib->bss_brk += mod_size;
+        dynlib->modules[mod->mod_idx] = ctx;
         if (mod->init != NULL) {
             mod->init(ctx);
         }
-        dynlib->modules[mod->mod_idx] = ctx;
     }
     return ctx;
 }

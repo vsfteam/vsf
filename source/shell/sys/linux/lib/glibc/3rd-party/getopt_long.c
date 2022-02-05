@@ -71,7 +71,7 @@ const vsf_linux_dynlib_mod_t __getopt_long_mod = {
 	.lib_idx			= &__getopt_lib_idx,
 	.mod_idx			= 0,
 	.module_num			= 1,
-	.modules_men_size	= sizeof(struct __getopt_lib_ctx_t),
+	.bss_size			= sizeof(struct __getopt_lib_ctx_t),
 	.mod_size			= sizeof(struct __getopt_lib_ctx_t),
 	.init				= __getopt_mod_init,
 };
