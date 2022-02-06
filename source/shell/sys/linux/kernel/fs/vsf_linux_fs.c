@@ -334,7 +334,7 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
     new_sfd->op = op;
     if (allocate_priv) {
         // priv of fd does not belong to the process
-        new_sfd->priv = vsf_heap_calloc(1, priv_size);
+        new_sfd->priv = __calloc_ex(vsf_linux_resources_process(), 1, priv_size);
         if (!new_sfd->priv) {
             ret = -1;
             goto free_sfd_and_exit;
@@ -857,8 +857,8 @@ int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
         return -1;
     }
 
-    vsf_heap_free(process->working_dir);
-    process->working_dir = vsf_heap_malloc(strlen(fullpath) + 1);
+    __free_ex(process, process->working_dir);
+    process->working_dir = __malloc_ex(process, strlen(fullpath) + 1);
     if (process->working_dir != NULL) {
         strcpy(process->working_dir, fullpath);
         return 0;
@@ -949,7 +949,7 @@ int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
     if (is_to_close) {
         err = sfd->op->fn_close(sfd);
         // priv of fd does not belong to the process
-        vsf_heap_free(sfd->priv);
+        __free_ex(vsf_linux_resources_process(), sfd->priv);
     }
     __vsf_linux_fd_delete_ex(NULL, fd);
     return err;
@@ -1692,7 +1692,7 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd->priv;
         if (priv_rx->is_to_free_stream) {
             // pipe internals does not belong to process
-            vsf_heap_free(priv_rx->stream_rx);
+            __free_ex(vsf_linux_resources_process(), priv_rx->stream_rx);
         }
     }
     return ret;
@@ -1706,7 +1706,7 @@ vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream)
 
         if (NULL == queue_stream) {
             // pipe internals does not belong to process
-            queue_stream = vsf_heap_malloc(sizeof(vsf_queue_stream_t));
+            queue_stream = __malloc_ex(vsf_linux_resources_process(), sizeof(vsf_queue_stream_t));
             if (NULL == queue_stream) {
                 vsf_linux_fd_delete(sfd_rx->fd);
                 return NULL;

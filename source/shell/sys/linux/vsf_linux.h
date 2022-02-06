@@ -313,6 +313,8 @@ extern void * __strdup_ex(vsf_linux_process_t *process, const char *str);
 #       define __strdup_ex(__process, __str)                strdup(__str)
 #   endif
 
+extern vsf_linux_process_t * vsf_linux_resources_process(void);
+
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 

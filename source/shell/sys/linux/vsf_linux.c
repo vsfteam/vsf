@@ -118,6 +118,7 @@ typedef struct vsf_linux_t {
     int cur_pid;
     vsf_dlist_t process_list;
 
+    vsf_linux_process_t process_for_resources;
     vsf_linux_process_t *kernel_process;
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
     int sig_pid;
@@ -539,6 +540,11 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
     return 0;
 }
 
+vsf_linux_process_t * vsf_linux_resources_process(void)
+{
+    return &__vsf_linux.process_for_resources;
+}
+
 vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 {
     VSF_LINUX_ASSERT(stdio_stream != NULL);
@@ -637,7 +643,7 @@ int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority)
 
 static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
 {
-    vsf_linux_process_t *process = vsf_heap_malloc(sizeof(vsf_linux_process_t));
+    vsf_linux_process_t *process = __malloc_ex(vsf_linux_resources_process(), sizeof(vsf_linux_process_t));
     if (process != NULL) {
         memset(process, 0, sizeof(*process));
         process->prio = vsf_prio_inherit;
@@ -659,7 +665,7 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
 
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {
-            vsf_heap_free(process);
+            __free_ex(vsf_linux_resources_process(), process);
             return NULL;
         }
 
@@ -776,7 +782,7 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
     }
 #endif
 
-    vsf_heap_free(process);
+    __free_ex(vsf_linux_resources_process(), process);
 }
 
 void vsf_linux_exit_process(int status)
