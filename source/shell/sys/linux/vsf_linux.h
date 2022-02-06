@@ -272,6 +272,23 @@ vsf_class(vsf_linux_process_t) {
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 
+// used for dynamic libraries, allocate/free memory from resources_process
+extern vsf_linux_process_t * vsf_linux_resources_process(void);
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+// can not put in clib headers because of dependency, so put them here
+extern void * __malloc_ex(vsf_linux_process_t *process, int size, ...);
+extern void * __calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, ...);
+extern void __free_ex(vsf_linux_process_t *process, void *ptr, ...);
+extern void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...);
+extern char * __strdup_ex(vsf_linux_process_t *process, const char *str);
+#else
+#   define __malloc_ex(__process, __size, ...)          malloc(__size)
+#   define __calloc_ex(__process, __n, __size, ...)     calloc((__n), (__size))
+#   define __free_ex(__process, __ptr, ...)             free(__ptr)
+#   define __realloc_ex(__process, __ptr, __size, ...)  realloc((__ptr), (__size))
+#   define __strdup_ex(__process, __str)                strdup(__str)
+#endif
+
 extern int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in);
 extern int vsf_linux_chdir(vsf_linux_process_t *process, char *working_dir);
 
@@ -297,23 +314,6 @@ extern int vsf_linux_tls_alloc(void (*destructor)(void *));
 extern void vsf_linux_tls_free(int idx);
 extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
 #   endif
-
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-// can not put in clib headers because of dependency, so put them here
-extern void * __malloc_ex(vsf_linux_process_t *process, int size, ...);
-extern void * __calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, ...);
-extern void __free_ex(vsf_linux_process_t *process, void *ptr, ...);
-extern void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...);
-extern void * __strdup_ex(vsf_linux_process_t *process, const char *str);
-#   else
-#       define __malloc_ex(__process, __size, ...)          malloc(__size)
-#       define __calloc_ex(__process, __n, __size, ...)     calloc((__n), (__size))
-#       define __free_ex(__process, __ptr, ...)             free(__ptr)
-#       define __realloc_ex(__process, __ptr, __size, ...)  realloc((__ptr), (__size))
-#       define __strdup_ex(__process, __str)                strdup(__str)
-#   endif
-
-extern vsf_linux_process_t * vsf_linux_resources_process(void);
 
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
