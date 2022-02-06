@@ -33,6 +33,8 @@ extern "C" {
 #define libusb_get_device_list                          VSF_LINUX_LIBUSB_WRAPPER(libusb_get_device_list)
 #define libusb_free_device_list                         VSF_LINUX_LIBUSB_WRAPPER(libusb_free_device_list)
 #define libusb_open                                     VSF_LINUX_LIBUSB_WRAPPER(libusb_open)
+#define libusb_open_device_with_vid_pid                 VSF_LINUX_LIBUSB_WRAPPER(libusb_open_device_with_vid_pid)
+#define libusb_get_device                               VSF_LINUX_LIBUSB_WRAPPER(libusb_get_device)
 #define libusb_close                                    VSF_LINUX_LIBUSB_WRAPPER(libusb_close)
 #define libusb_get_device_descriptor                    VSF_LINUX_LIBUSB_WRAPPER(libusb_get_device_descriptor)
 #define libusb_get_device_address                       VSF_LINUX_LIBUSB_WRAPPER(libusb_get_device_address)
@@ -123,6 +125,7 @@ enum libusb_speed {
 enum libusb_endpoint_direction {
     LIBUSB_ENDPOINT_IN                  = USB_DIR_IN,
     LIBUSB_ENDPOINT_OUT                 = USB_DIR_OUT,
+    LIBUSB_ENDPOINT_DIR_MASK            = USB_DIR_MASK,
 };
 
 enum libusb_request_type {
@@ -266,10 +269,11 @@ enum libusb_transfer_status {
 };
 
 enum libusb_transfer_type {
-    LIBUSB_TRANSFER_TYPE_CONTROL = 0,
-    LIBUSB_TRANSFER_TYPE_ISOCHRONOUS = 1,
-    LIBUSB_TRANSFER_TYPE_BULK = 2,
-    LIBUSB_TRANSFER_TYPE_INTERRUPT = 3,
+    LIBUSB_TRANSFER_TYPE_CONTROL        = USB_ENDPOINT_XFER_CONTROL,
+    LIBUSB_TRANSFER_TYPE_ISOCHRONOUS    = USB_ENDPOINT_XFER_ISOC,
+    LIBUSB_TRANSFER_TYPE_BULK           = USB_ENDPOINT_XFER_BULK,
+    LIBUSB_TRANSFER_TYPE_INTERRUPT      = USB_ENDPOINT_XFER_INT,
+    LIBUSB_TRANSFER_TYPE_MASK           = USB_ENDPOINT_XFERTYPE_MASK,
 };
 
 enum libusb_transfer_flags {
@@ -312,6 +316,9 @@ ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device *** list);
 void libusb_free_device_list(libusb_device **list, int unref_devices);
 int libusb_get_device_descriptor(libusb_device *dev, struct libusb_device_descriptor *desc);
 int libusb_open(libusb_device *dev, libusb_device_handle **dev_handle);
+libusb_device * libusb_get_device(libusb_device_handle *dev_handle);
+libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx,
+        uint16_t vendor_id, uint16_t product_id);
 void libusb_close(libusb_device_handle *dev_handle);
 uint8_t libusb_get_device_address(libusb_device *dev);
 uint8_t libusb_get_bus_number(libusb_device *dev);

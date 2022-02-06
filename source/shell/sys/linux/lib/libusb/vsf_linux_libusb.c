@@ -500,6 +500,34 @@ int libusb_open(libusb_device *dev, libusb_device_handle **dev_handle)
     return LIBUSB_SUCCESS;
 }
 
+libusb_device * libusb_get_device(libusb_device_handle *dev_handle)
+{
+    return (libusb_device *)dev_handle;
+}
+
+libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx,
+        uint16_t vendor_id, uint16_t product_id)
+{
+    struct libusb_device **devs, *dev_match = NULL;
+    vsf_linux_libusb_dev_t *dev;
+    int i = 0;
+
+    if (libusb_get_device_list(ctx, &devs) < 0) {
+        return NULL;
+    }
+
+    while ((dev = (vsf_linux_libusb_dev_t *)devs[i++]) != NULL) {
+        if (    (dev->libusb_dev->vid == vendor_id)
+            &&  (dev->libusb_dev->vid == vendor_id)) {
+            dev_match = (struct libusb_device *)dev;
+            break;
+        }
+    }
+
+    libusb_free_device_list(devs, 1);
+    return (libusb_device_handle *)dev_match;
+}
+
 void libusb_close(libusb_device_handle *dev_handle)
 {
 
