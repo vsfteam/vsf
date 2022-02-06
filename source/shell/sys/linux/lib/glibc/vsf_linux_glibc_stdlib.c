@@ -146,6 +146,16 @@ void __free_ex(vsf_linux_process_t *process, void *ptr, ...)
         vsf_heap_free(i);
     }
 }
+
+void * __calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, ...)
+{
+    size_t allsize = n * size;
+    void *buf = __malloc_ex(process, allsize);
+    if (buf != NULL) {
+        memset(buf, 0, allsize);
+    }
+    return buf;
+}
 #endif
 
 void * malloc(size_t size)
@@ -187,12 +197,11 @@ void free(void *p)
 
 void * calloc(size_t n, size_t size)
 {
-    size_t allsize = n * size;
-    void *buf = malloc(allsize);
-    if (buf != NULL) {
-        memset(buf, 0, allsize);
-    }
-    return buf;
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    return __calloc_ex(NULL, n, size);
+#else
+    return vsf_heap_calloc(n, size);
+#endif
 }
 
 void exit(int status)

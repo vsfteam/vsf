@@ -301,11 +301,13 @@ extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
 #   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 // can not put in clib headers because of dependency, so put them here
 extern void * __malloc_ex(vsf_linux_process_t *process, int size, ...);
+extern void * __calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, ...);
 extern void __free_ex(vsf_linux_process_t *process, void *ptr, ...);
 extern void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...);
 extern void * __strdup_ex(vsf_linux_process_t *process, const char *str);
 #   else
 #       define __malloc_ex(__process, __size, ...)          malloc(__size)
+#       define __calloc_ex(__process, __n, __size, ...)     calloc((__n), (__size))
 #       define __free_ex(__process, __ptr, ...)             free(__ptr)
 #       define __realloc_ex(__process, __ptr, __size, ...)  realloc((__ptr), (__size))
 #       define __strdup_ex(__process, __str)                strdup(__str)

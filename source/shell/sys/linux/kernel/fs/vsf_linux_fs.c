@@ -326,7 +326,7 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
     int ret;
     vsf_linux_fd_t *new_sfd;
 
-    new_sfd = calloc(1, sizeof(vsf_linux_fd_t));
+    new_sfd = __calloc_ex(process, 1, sizeof(vsf_linux_fd_t));
     if (!new_sfd) {
         errno = ENOMEM;
         return -1;
@@ -376,7 +376,7 @@ void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd)
         vsf_bitmap_clear(&process->fd_bitmap, sfd->fd);
     vsf_unprotect_sched(orig);
 
-    free(sfd);
+    __free_ex(process, sfd);
 }
 
 void vsf_linux_fd_delete(int fd)
@@ -1691,7 +1691,8 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
     if (is_rx_pipe) {
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd->priv;
         if (priv_rx->is_to_free_stream) {
-            free(priv_rx->stream_rx);
+            // pipe internals does not belong to process
+            vsf_heap_free(priv_rx->stream_rx);
         }
     }
     return ret;
@@ -1704,7 +1705,8 @@ vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream)
         vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
 
         if (NULL == queue_stream) {
-            queue_stream = malloc(sizeof(vsf_queue_stream_t));
+            // pipe internals does not belong to process
+            queue_stream = vsf_heap_malloc(sizeof(vsf_queue_stream_t));
             if (NULL == queue_stream) {
                 vsf_linux_fd_delete(sfd_rx->fd);
                 return NULL;
