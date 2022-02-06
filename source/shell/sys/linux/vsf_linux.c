@@ -934,8 +934,9 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
         sfd->status_flags = 0;
     }
 
+    vsf_linux_process_arg_t arg = ctx->arg;
     VSF_LINUX_ASSERT(ctx->entry != NULL);
-    thread->retval = ctx->entry(ctx->arg.argc, (char **)ctx->arg.argv);
+    thread->retval = ctx->entry(arg.argc, (char **)arg.argv);
 
     vsf_linux_exit_process(thread->retval);
 }

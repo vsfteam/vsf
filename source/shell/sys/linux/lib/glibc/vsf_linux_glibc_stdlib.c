@@ -385,7 +385,7 @@ int __putenv_ex(vsf_linux_process_t *process, char *string)
             if (    !strncmp(string, *env_tmp, namelen)
                 &&  ((*env_tmp)[namelen] == '=')) {
                 is_match = true;
-                free(*env_tmp);
+                __free_ex(process, *env_tmp);
                 if (is_to_set) {
                     *env_tmp = string;
                     VSF_LINUX_ASSERT(*env_tmp != NULL);
@@ -445,7 +445,7 @@ int __setenv_ex(vsf_linux_process_t *process, const char *name, const char *valu
 
     size_t namelen = strlen(name), valuelen = strlen(value);
     if (!replace) {
-        if (getenv(name) != NULL) {
+        if (__getenv_ex(process, name) != NULL) {
             return 0;
         }
     }
