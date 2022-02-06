@@ -333,7 +333,8 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
     }
     new_sfd->op = op;
     if (allocate_priv) {
-        new_sfd->priv = calloc(1, priv_size);
+        // priv of fd does not belong to the process
+        new_sfd->priv = vsf_heap_calloc(1, priv_size);
         if (!new_sfd->priv) {
             ret = -1;
             goto free_sfd_and_exit;
@@ -947,7 +948,8 @@ int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
     int err = 0;
     if (is_to_close) {
         err = sfd->op->fn_close(sfd);
-        free(sfd->priv);
+        // priv of fd does not belong to the process
+        vsf_heap_free(sfd->priv);
     }
     __vsf_linux_fd_delete_ex(NULL, fd);
     return err;
