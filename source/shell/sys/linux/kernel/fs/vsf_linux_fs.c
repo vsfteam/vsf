@@ -294,7 +294,7 @@ int vsf_linux_fd_set_size(int fd, uint64_t size)
     return -1;
 }
 
-static int __vsf_linux_fd_add(vsf_linux_process_t *process, vsf_linux_fd_t *sfd, int fd_desired)
+static int __vsf_linux_fd_add_ex(vsf_linux_process_t *process, vsf_linux_fd_t *sfd, int fd_desired)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
@@ -346,10 +346,10 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
         *sfd = new_sfd;
     }
 
-    ret = __vsf_linux_fd_add(process, new_sfd, fd_desired);
+    ret = __vsf_linux_fd_add_ex(process, new_sfd, fd_desired);
     if (ret < 0) {
 free_sfd_and_exit:
-        free(new_sfd);
+        __free_ex(process, new_sfd);
     }
 #if VSF_LINUX_CFG_FD_TRACE == ENABLED
     vsf_trace_debug("%s: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
@@ -951,7 +951,7 @@ int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
         // priv of fd does not belong to the process
         __free_ex(vsf_linux_resources_process(), sfd->priv);
     }
-    __vsf_linux_fd_delete_ex(NULL, fd);
+    __vsf_linux_fd_delete_ex(process, fd);
     return err;
 }
 
