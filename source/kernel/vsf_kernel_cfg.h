@@ -313,6 +313,11 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #   define VSF_KERNEL_CFG_THREAD_STACK_CHECK                DISABLED
 #endif
 
+// to support stacks >= 64K bytes, enable VSF_KERNEL_CFG_THREAD_STACK_LARGE, disabled by default
+#if     !defined(VSF_KERNEL_CFG_THREAD_STACK_LARGE)
+#   define VSF_KERNEL_CFG_THREAD_STACK_LARGE                DISABLED
+#endif
+
 #if     !defined(VSF_KERNEL_CFG_CPU_USAGE)
 #   define VSF_KERNEL_CFG_CPU_USAGE                         VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
 #endif

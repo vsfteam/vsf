@@ -394,7 +394,11 @@ def_class(vsf_thread_cb_t,
 
     public_member(
         vsf_thread_entry_t      *entry;
+#if VSF_KERNEL_CFG_THREAD_STACK_LARGE == ENABLED
+        uint32_t                stack_size;
+#else
         uint16_t                stack_size;
+#endif
         uint64_t                *stack;                 //!< stack must be 8byte aligned
     )
 
