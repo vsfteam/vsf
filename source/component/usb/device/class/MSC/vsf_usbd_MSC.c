@@ -87,8 +87,8 @@ static void __vk_usbd_msc_send_csw(void *p)
     usb_msc_csw_t *csw = &msc->ctx.csw;
     vk_usbd_trans_t *trans = &msc->ep_stream.use_as__vk_usbd_trans_t;
 
-    // TODO: fix csw->dCSWDataResidue
     csw->dCSWSignature = cpu_to_le32(USB_MSC_CSW_SIGNATURE);
+    csw->dCSWDataResidue -= msc->reply_len;
     trans->ep = msc->ep_in;
     trans->buffer = (uint8_t *)&msc->ctx.csw;
     trans->size = sizeof(msc->ctx.csw);
@@ -186,6 +186,7 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 break;
             }
 
+            msc->reply_len = reply_len;
             if (is_in && (cbw->dCBWDataTransferLength > 0)) {
                 if (!msc->is_stream) {
                     trans->size = reply_len;
