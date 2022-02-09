@@ -109,6 +109,8 @@ void * __malloc_ex(vsf_linux_process_t *process, int size, ...)
             *i = __vsf_linux_heap_trace_alloc(process, (void *)(i + 1), size, ap);
         va_end(ap);
         return (void *)(i + 1);
+    } else {
+        errno = ENOMEM;
     }
     return NULL;
 }
@@ -163,7 +165,11 @@ void * malloc(size_t size)
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     return __malloc_ex(NULL, size);
 #else
-    return vsf_heap_malloc(size);
+    void *result = vsf_heap_malloc(size);
+    if (NULL == result) {
+        errno = ENOMEM;
+    }
+    return result;
 #endif
 }
 
@@ -173,7 +179,11 @@ void * aligned_alloc(size_t alignment, size_t size)
     VSF_LINUX_ASSERT(false);
     return NULL;
 #else
-    return vsf_heap_malloc_aligned(size, alignment);
+    void *result = vsf_heap_malloc_aligned(size, alignment);
+    if (NULL == result) {
+        errno = ENOMEM;
+    }
+    return result;
 #endif
 }
 
@@ -182,7 +192,11 @@ void * realloc(void *p, size_t size)
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     return __realloc_ex(NULL, p, size);
 #else
-    return vsf_heap_realloc(p, size);
+    void *result = vsf_heap_realloc(p, size);
+    if (NULL == result) {
+        errno = ENOMEM;
+    }
+    return result;
 #endif
 }
 
@@ -200,7 +214,11 @@ void * calloc(size_t n, size_t size)
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     return __calloc_ex(NULL, n, size);
 #else
-    return vsf_heap_calloc(n, size);
+    void *result = vsf_heap_calloc(n, size);
+    if (NULL == result) {
+        errno = ENOMEM;
+    }
+    return result;
 #endif
 }
 

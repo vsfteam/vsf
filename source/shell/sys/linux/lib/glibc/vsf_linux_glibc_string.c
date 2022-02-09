@@ -23,9 +23,11 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
+#   include "../../include/errno.h"
 #   include "../../include/simple_libc/string.h"
 #else
 #   include <unistd.h>
+#   include <errno.h>
 #   include <string.h>
 #endif
 
@@ -60,7 +62,11 @@ char * strdup(const char *str)
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     return __strdup_ex(NULL, str);
 #else
-    return vsf_heap_strdup(str);
+    char *result = vsf_heap_strdup(str);
+    if (NULL == result) {
+        errno = ENOMEM;
+    }
+    return result;
 #endif
 }
 
