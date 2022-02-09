@@ -390,6 +390,62 @@ void vsf_linux_free_env(vsf_linux_process_t *process)
 }
 #endif
 
+void vsf_linux_trigger_init(vsf_linux_trigger_t *trig)
+{
+    vsf_eda_trig_init(&trig->use_as__vsf_trig_t, false, true);
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    vsf_dlist_init_node(vsf_linux_trigger_t, node, trig);
+    trig->pending_process = NULL;
+#endif
+}
+
+int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig)
+{
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    vsf_linux_process_t *pending_process;
+    vsf_protect_t orig = vsf_protect_sched();
+    pending_process = trig->pending_process;
+    if (NULL == pending_process) {
+        vsf_unprotect_sched(orig);
+        return 0;
+    }
+
+    trig->pending_process = NULL;
+    vsf_dlist_remove(vsf_linux_trigger_t, node, &pending_process->sig.trigger_list, trig);
+    vsf_unprotect_sched(orig);
+#endif
+    vsf_eda_trig_set_isr(trig);
+    return 0;
+}
+
+int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout)
+{
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+
+    trig->sig = 0;
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_dlist_add_to_tail(vsf_linux_trigger_t, node, &process->sig.trigger_list, trig);
+        VSF_LINUX_ASSERT(NULL == trig->pending_process);
+        trig->pending_process = process;
+    vsf_unprotect_sched(orig);
+#endif
+
+    vsf_sync_reason_t r = vsf_thread_trig_pend(trig, timeout);
+    if (VSF_SYNC_TIMEOUT == r) {
+        return 1;
+    }
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    if (trig->sig) {
+        errno = EINTR;
+    }
+    return trig->sig;
+#else
+    return 0;
+#endif
+}
+
 #ifndef WEAK_VSF_LINUX_CREATE_FHS
 WEAK(vsf_linux_create_fhs)
 int vsf_linux_create_fhs(void)
@@ -950,6 +1006,16 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
         if (sighandler != SIG_IGN) {
             sighandler(sig);
         }
+
+        orig = vsf_protect_sched();
+            vsf_linux_trigger_t *trigger;
+            do {
+                vsf_dlist_remove_head(vsf_linux_trigger_t, node,  &process->sig.trigger_list, trigger);
+                if (trigger != NULL) {
+                    vsf_linux_trigger_signal(trigger, sig);
+                }
+            } while (trigger != NULL);
+        vsf_unprotect_sched(orig);
     }
 }
 #endif

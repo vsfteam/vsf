@@ -474,10 +474,12 @@ int vsh_main(int argc, char *argv[])
         printf(VSH_PROMPT);
         fflush(stdout);
         while (1) {
-            if (read(STDIN_FILENO, &ch, 1) != 1) {
-                fprintf(stderr, "fail to read from stdin, is stdin disconnected?" VSH_LINEEND);
-                VSF_LINUX_ASSERT(false);
-                return -1;
+            while (read(STDIN_FILENO, &ch, 1) != 1) {
+                if (errno != EINTR) {
+                    fprintf(stderr, "fail to read from stdin, is stdin disconnected?" VSH_LINEEND);
+                    VSF_LINUX_ASSERT(false);
+                    return -1;
+                }
             }
             switch (ch) {
             case '\033':        // ESC

@@ -125,6 +125,19 @@ typedef struct vsf_linux_dynlib_t {
 } vsf_linux_dynlib_t;
 #endif
 
+vsf_class(vsf_linux_trigger_t) {
+    public_member(
+        implement(vsf_trig_t)
+    )
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    private_member(
+        vsf_dlist_node_t node;
+        vsf_linux_process_t *pending_process;
+        int sig;
+    )
+#endif
+};
+
 #if VSF_LINUX_CFG_TLS_NUM > 0
 dcl_vsf_bitmap(vsf_linux_tls_bitmap, VSF_LINUX_CFG_TLS_NUM);
 #endif
@@ -245,6 +258,7 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
             vsf_dlist_t handler_list;
             vsf_linux_thread_t *sighandler_thread;
+            vsf_dlist_node_t trigger_list;
 #endif
         } sig;
 
@@ -341,6 +355,14 @@ extern int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, char cons
 
 extern int vsf_linux_merge_env(vsf_linux_process_t *process, char **env);
 extern void vsf_linux_free_env(vsf_linux_process_t *process);
+
+extern void vsf_linux_trigger_init(vsf_linux_trigger_t *trig);
+// return value:
+//  < 0 : triggered by signals, returns the minus signal
+//  0   : triggered normaly
+//  > 0 : triggered because of timeout
+extern int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout);
+extern int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig);
 #endif
 
 // open vsf_linux_get_cur_thread for thread-related variables like errno, etc

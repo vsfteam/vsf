@@ -54,7 +54,7 @@ struct vsf_linux_socket_unix_priv_t {
         uint32_t flags;
     };
 
-    vsf_trig_t *trig;
+    vsf_linux_trigger_t *trig;
     vsf_dlist_node_t sock_node;
     vsf_linux_socket_unix_priv_t *remote;
     union {
@@ -234,8 +234,8 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     priv_rx->on_evt = __vsf_linux_socket_unix_pipe_on_rx_evt;
     priv_rx->target = sfd_local;
 
-    vsf_trig_t trig;
-    vsf_linux_fd_trigger_init(&trig);
+    vsf_linux_trigger_t trig;
+    vsf_linux_trigger_init(&trig);
     priv->trig = &trig;
 
     // 1. setup sfd_rx and trigger remote for conection request
@@ -246,11 +246,9 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     vsf_linux_fd_set_events(sfd_remote, POLLIN, orig);
 
     // 2. pend to get remote response and get sfd_rx from remote
-    vsf_thread_trig_pend(&trig, -1);
-    if (NULL == priv->remote) {
-    delete_sfd_rx_and_fail:
-        vsf_linux_fd_delete(sfd_rx->fd);
-        return -1;
+    if (    (vsf_linux_trigger_pend(&trig, -1) < 0)
+        ||  (NULL == priv->remote)) {
+        goto delete_sfd_rx_and_fail;
     }
     VSF_LINUX_ASSERT(priv->remote->trig != NULL);
 
@@ -258,16 +256,20 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe(queue_stream);
     if (NULL == sfd_tx) {
         priv->remote->remote = NULL;
-        vsf_eda_trig_set(priv->remote->trig);
+        vsf_linux_trigger_signal(priv->remote->trig, 0);
         goto delete_sfd_rx_and_fail;
     }
     fcntl(sfd_tx->fd, F_SETFL, sfd_local->status_flags);
     priv->rw.sfd_tx = sfd_tx;
 
     // 3. trigger remote again to complete conection
-    vsf_eda_trig_set(priv->remote->trig);
+    vsf_linux_trigger_signal(priv->remote->trig, 0);
     vsf_linux_fd_set_status(sfd_local, POLLOUT, vsf_protect_sched());
     return 0;
+
+delete_sfd_rx_and_fail:
+    vsf_linux_fd_delete(sfd_rx->fd);
+    return -1;
 }
 
 static int __vsf_linux_socket_unix_listen(vsf_linux_socket_priv_t *socket_priv, int backlog)
@@ -290,15 +292,18 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
         vsf_linux_socket_unix_priv_t *priv_remote;
         vsf_protect_t orig;
 
-        vsf_trig_t trig;
-        vsf_linux_fd_trigger_init(&trig);
+        vsf_linux_trigger_t trig;
+        vsf_linux_trigger_init(&trig);
 
     wait_next:
         // 1. wait for connection request
         orig = vsf_protect_sched();
         vsf_dlist_remove_head(vsf_linux_socket_unix_priv_t, sock_node, &priv->listener.accept_list, priv_remote);
         if (NULL == priv_remote) {
-            vsf_linux_fd_pend_events(sfd_local, POLLIN, &trig, orig);
+            if (!vsf_linux_fd_pend_events(sfd_local, POLLIN, &trig, orig)) {
+                // triggered by signal
+                return -1;
+            }
 
             orig = vsf_protect_sched();
             vsf_dlist_remove_head(vsf_linux_socket_unix_priv_t, sock_node, &priv->listener.accept_list, priv_remote);
@@ -313,7 +318,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
         fail:
             priv_remote->remote = NULL;
             VSF_LINUX_ASSERT(priv_remote->trig != NULL);
-            vsf_eda_trig_set(priv_remote->trig);
+            vsf_linux_trigger_signal(priv_remote->trig, 0);
             goto wait_next;
         } else {
             vsf_linux_fd_t *sfd_new = vsf_linux_fd_get(sockfd_new);
@@ -345,10 +350,13 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
             // rw.sfd_tx is free in priv_remote
             priv_remote->rw.sfd_tx = sfd_rx;
             VSF_LINUX_ASSERT(priv_remote->trig != NULL);
-            vsf_eda_trig_set(priv_remote->trig);
+            vsf_linux_trigger_signal(priv_remote->trig, 0);
 
             // 3. pend for connection complete
-            vsf_thread_trig_pend(&trig, -1);
+            if (vsf_linux_trigger_pend(&trig, -1) < 0) {
+                vsf_linux_fd_delete(sfd_rx->fd);
+                goto free_sfd_tx_and_close_sockfd_new_and_fail;
+            }
             if (priv_new->remote != NULL) {
                 // success
                 priv_new->rw.sfd_rx = sfd_rx;

@@ -41,6 +41,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 vsf_dcl_class(vsf_linux_fd_t)
+vsf_dcl_class(vsf_linux_trigger_t)
 
 typedef struct vsf_linux_fd_op_t {
     int priv_size;
@@ -53,7 +54,7 @@ typedef struct vsf_linux_fd_op_t {
 
 vsf_class(vsf_linux_fd_priv_t) {
     protected_member(
-        vsf_trig_t *trigger;
+        vsf_linux_trigger_t *trigger;
         short events_pending;
         short events_triggered;
 
@@ -160,9 +161,8 @@ extern int vsf_linux_fd_add_feature(int fd, uint_fast32_t feature);
 
 extern int vsf_linux_fd_set_size(int fd, uint64_t size);
 
-extern void vsf_linux_fd_trigger_init(vsf_trig_t *trig);
 // vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
-extern short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_trig_t *trig, vsf_protect_t orig);
+extern short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_linux_trigger_t *trig, vsf_protect_t orig);
 extern void vsf_linux_fd_set_events(vsf_linux_fd_t *sfd, short events, vsf_protect_t orig);
 extern void vsf_linux_fd_set_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig);
 extern void vsf_linux_fd_clear_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig);

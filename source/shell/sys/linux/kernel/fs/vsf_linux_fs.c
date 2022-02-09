@@ -398,13 +398,8 @@ bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
     return !(sfd->status_flags & O_NONBLOCK);
 }
 
-void vsf_linux_fd_trigger_init(vsf_trig_t *trig)
-{
-    vsf_eda_trig_init(trig, false, true);
-}
-
 // vsf_linux_fd_[pend/set/clear]_[status/events] MUST be called scheduler protected
-short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_trig_t *trig, vsf_protect_t orig)
+short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_linux_trigger_t *trig, vsf_protect_t orig)
 {
     vsf_linux_fd_priv_t *priv = sfd->priv;
     uint16_t events_triggered = priv->events & events;
@@ -416,10 +411,10 @@ short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_trig_t *tr
         priv->events_pending = events;
         vsf_unprotect_sched(orig);
 
-        // TODO: add timeout?
-        vsf_thread_trig_pend(trig, -1);
-
-        events_triggered = priv->events_triggered;
+        int ret = vsf_linux_trigger_pend(trig, -1);
+        if (!ret) {
+            events_triggered = priv->events_triggered;
+        }
     }
     return events_triggered;
 }
@@ -427,16 +422,16 @@ short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_trig_t *tr
 void vsf_linux_fd_set_events(vsf_linux_fd_t *sfd, short events, vsf_protect_t orig)
 {
     vsf_linux_fd_priv_t *priv = sfd->priv;
-    vsf_trig_t *trig = priv->trigger;
+    vsf_linux_trigger_t *trig = priv->trigger;
     priv->events |= events;
     if (trig != NULL) {
         priv->events_triggered = events & priv->events_pending;
         priv->events &= ~priv->events_triggered;
         if (priv->events_triggered) {
+            priv->trigger = NULL;
             vsf_unprotect_sched(orig);
 
-            priv->trigger = NULL;
-            vsf_eda_trig_set_isr(trig);
+            vsf_linux_trigger_signal(trig, 0);
             return;
         }
     }
@@ -480,10 +475,10 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
     vsf_linux_fd_priv_t *priv;
     int ret = 0;
     nfds_t i;
-    vsf_trig_t trig;
+    vsf_linux_trigger_t trig;
     short events_triggered;
 
-    vsf_linux_fd_trigger_init(&trig);
+    vsf_linux_trigger_init(&trig);
     while (1) {
         orig = vsf_protect_sched();
         for (i = 0; i < nfds; i++) {
@@ -516,11 +511,10 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
         }
         vsf_unprotect_sched(orig);
 
-        vsf_sync_reason_t r = vsf_thread_trig_pend(&trig, timeout);
-        if (VSF_SYNC_TIMEOUT == r) {
+        int r = vsf_linux_trigger_pend(&trig, timeout);
+        // timeout or interrupted by signal
+        if (r != 0) {
             return 0;
-        } else if (r != VSF_SYNC_GET) {
-            return -1;
         }
 
         for (i = 0; i < nfds; i++) {
@@ -1467,12 +1461,16 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
         orig = vsf_protect_sched();
         if (!vsf_linux_fd_get_status(sfd, POLLIN) && (0 == vsf_stream_get_rbuf(stream, NULL))) {
             if (vsf_linux_fd_is_block(sfd) && vsf_stream_is_tx_connected(stream)) {
-                vsf_trig_t trig;
-                vsf_linux_fd_trigger_init(&trig);
+                vsf_linux_trigger_t trig;
+                vsf_linux_trigger_init(&trig);
                 VSF_LINUX_ASSERT((NULL == stream->rx.param) && (NULL == stream->rx.evthandler));
                 stream->rx.param = sfd;
                 stream->rx.evthandler = __vsf_linux_stream_evthandler;
-                vsf_linux_fd_pend_events(sfd, POLLIN, &trig, orig);
+
+                if (!vsf_linux_fd_pend_events(sfd, POLLIN, &trig, orig)) {
+                    // triggered by signal
+                    return 0;
+                }
             } else {
                 vsf_unprotect_sched(orig);
                 goto do_return;
@@ -1542,12 +1540,16 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
     while (size > 0) {
         orig = vsf_protect_sched();
         if (!vsf_linux_fd_get_status(sfd, POLLOUT)) {
-            vsf_trig_t trig;
-            vsf_linux_fd_trigger_init(&trig);
+            vsf_linux_trigger_t trig;
+            vsf_linux_trigger_init(&trig);
             VSF_LINUX_ASSERT((NULL == stream->tx.param) || (NULL == stream->tx.evthandler));
             stream->tx.param = sfd;
             stream->tx.evthandler = __vsf_linux_stream_evthandler;
-            vsf_linux_fd_pend_events(sfd, POLLOUT, &trig, orig);
+
+            if (!vsf_linux_fd_pend_events(sfd, POLLOUT, &trig, orig)) {
+                // triggered by signal
+                return 0;
+            }
         } else {
             vsf_unprotect_sched(orig);
         }
