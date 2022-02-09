@@ -57,7 +57,7 @@ static size_t __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, void *p
     }
     VSF_LINUX_ASSERT(process != NULL);
 
-    size_t i;
+    ssize_t i;
     vsf_protect_t orig = vsf_protect_sched();
 #   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
         i = vsf_bitmap_ffz(&process->heap_monitor.bitmap, VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
@@ -75,7 +75,7 @@ static size_t __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, void *p
         process->heap_monitor.info.usage += size - sizeof(size_t);
         process->heap_monitor.info.balance++;
     vsf_unprotect_sched(orig);
-    return i;
+    return (size_t)i;
 }
 
 static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, void *ptr, va_list ap)

@@ -414,6 +414,10 @@ short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_linux_trig
         int ret = vsf_linux_trigger_pend(trig, -1);
         if (!ret) {
             events_triggered = priv->events_triggered;
+        } else {
+            orig = vsf_protect_sched();
+                priv->trigger = NULL;
+            vsf_unprotect_sched(orig);
         }
     }
     return events_triggered;
@@ -1469,7 +1473,7 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 
                 if (!vsf_linux_fd_pend_events(sfd, POLLIN, &trig, orig)) {
                     // triggered by signal
-                    return 0;
+                    return -1;
                 }
             } else {
                 vsf_unprotect_sched(orig);
@@ -1548,7 +1552,7 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
 
             if (!vsf_linux_fd_pend_events(sfd, POLLOUT, &trig, orig)) {
                 // triggered by signal
-                return 0;
+                return -1;
             }
         } else {
             vsf_unprotect_sched(orig);

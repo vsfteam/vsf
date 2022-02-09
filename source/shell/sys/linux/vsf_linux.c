@@ -410,6 +410,7 @@ int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig)
         return 0;
     }
 
+    trig->sig = sig;
     trig->pending_process = NULL;
     vsf_dlist_remove(vsf_linux_trigger_t, node, &pending_process->sig.trigger_list, trig);
     vsf_unprotect_sched(orig);
@@ -993,7 +994,8 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
                     .si_errno   = errno,
                 };
                 handler->sigaction_handler(sig, &siginfo, NULL);
-                return;
+                // signal processed by sigaction, but still needs to interrupt slow syscall if necessary
+                sighandler = SIG_IGN;
             } else {
                 sighandler = handler->sighandler;
             }
@@ -1005,17 +1007,18 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
         }
         if (sighandler != SIG_IGN) {
             sighandler(sig);
+        } else if ((NULL == handler) || !(handler->flags & SA_RESTART)) {
+            // handler is not registered, or SA_RESTART is not set
+            orig = vsf_protect_sched();
+                vsf_linux_trigger_t *trigger;
+                do {
+                    vsf_dlist_remove_head(vsf_linux_trigger_t, node,  &process->sig.trigger_list, trigger);
+                    if (trigger != NULL) {
+                        vsf_linux_trigger_signal(trigger, sig);
+                    }
+                } while (trigger != NULL);
+            vsf_unprotect_sched(orig);
         }
-
-        orig = vsf_protect_sched();
-            vsf_linux_trigger_t *trigger;
-            do {
-                vsf_dlist_remove_head(vsf_linux_trigger_t, node,  &process->sig.trigger_list, trigger);
-                if (trigger != NULL) {
-                    vsf_linux_trigger_signal(trigger, sig);
-                }
-            } while (trigger != NULL);
-        vsf_unprotect_sched(orig);
     }
 }
 #endif
