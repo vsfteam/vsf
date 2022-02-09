@@ -414,7 +414,7 @@ int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig)
     vsf_dlist_remove(vsf_linux_trigger_t, node, &pending_process->sig.trigger_list, trig);
     vsf_unprotect_sched(orig);
 #endif
-    vsf_eda_trig_set_isr(trig);
+    vsf_eda_trig_set_isr(&trig->use_as__vsf_trig_t);
     return 0;
 }
 

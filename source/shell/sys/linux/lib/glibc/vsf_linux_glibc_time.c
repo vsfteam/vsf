@@ -22,6 +22,8 @@
 #if     VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED        \
     &&  VSF_LINUX_USE_SIMPLE_TIME == ENABLED
 
+// for itimers
+#define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/simple_libc/time.h"
@@ -118,14 +120,66 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
 
 int getitimer(int which, struct itimerval *curr_value)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    VSF_LINUX_ASSERT(which < ITIMER_NUM);
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+
+    vsf_systimer_tick_t elapsed_value;
+    switch (which) {
+    case ITIMER_REAL:
+        elapsed_value = vsf_systimer_get_elapsed(process->timers[which].start);
+        break;
+    default:
+        elapsed_value = 0;
+        break;
+    }
+
+    if (curr_value != NULL) {
+        curr_value->it_interval = process->timers[which].value.it_interval;
+
+        elapsed_value = vsf_systimer_tick_to_us(elapsed_value);
+        curr_value->it_value.tv_sec = elapsed_value / (1000 * 1000);
+        curr_value->it_value.tv_usec = elapsed_value % (1000 * 1000);
+    }
+    return 0;
 }
 
-int setitimer(int which, const struct itimerval *new_valie, struct itimerval *old_value)
+static void __vsf_linux_prepare_real_timer(vsf_linux_process_t *process)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_timer_t *timer = &process->timers[ITIMER_REAL];
+    vsf_systimer_tick_t ticks = timer->value.it_value.tv_sec * 1000 * 1000 + timer->value.it_value.tv_usec;
+    ticks = vsf_systimer_us_to_tick(ticks);
+    if (ticks != 0) {
+        process->timers[ITIMER_REAL].start = vsf_systimer_get_tick();
+        vsf_callback_timer_add(&process->real_timer, ticks);
+    }
+}
+
+static void __vsf_linux_on_real_timer(vsf_callback_timer_t *timer)
+{
+    vsf_linux_process_t *process = container_of(timer, vsf_linux_process_t, real_timer);
+    kill(process->id.pid, SIGALRM);
+    process->timers[ITIMER_NUM].value.it_value = process->timers[ITIMER_NUM].value.it_interval;
+    __vsf_linux_prepare_real_timer(process);
+}
+
+int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value)
+{
+    VSF_LINUX_ASSERT(which < ITIMER_NUM);
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+
+    if (old_value != NULL) {
+        *old_value = process->timers[which].value;
+    }
+    process->timers[which].value = *new_value;
+
+    if (ITIMER_REAL == which) {
+        vsf_callback_timer_remove(&process->real_timer);
+        process->real_timer.on_timer = __vsf_linux_on_real_timer;
+        __vsf_linux_prepare_real_timer(process);
+    }
+    return 0;
 }
 
 #if __IS_COMPILER_LLVM__

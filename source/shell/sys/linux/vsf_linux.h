@@ -29,10 +29,12 @@
 #   include "./include/signal.h"
 #   include "./include/dirent.h"
 #   include "./include/termios.h"
+#   include "./include/sys/time.h"
 #else
 #   include <signal.h>
 #   include <dirent.h>
 #   include <termios.h>
+#   include <sys/time.h>
 #endif
 
 #include "./kernel/fs/vsf_linux_fs.h"
@@ -185,6 +187,13 @@ typedef struct vsf_linux_stdio_stream_t {
     vsf_stream_t *err;
 } vsf_linux_stdio_stream_t;
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+typedef struct vsf_linux_timer_t {
+    struct itimerval value;
+    vsf_systimer_tick_t start;
+} vsf_linux_timer_t;
+#endif
+
 dcl_vsf_bitmap(vsf_linux_fd_bitmap, VSF_LINUX_CFG_FD_BITMAP_SIZE);
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
@@ -234,6 +243,10 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_USE_TERMIOS == ENABLED
         struct termios term[3];
 #endif
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+        struct vsf_linux_timer_t timers[ITIMER_NUM];
+        vsf_callback_timer_t real_timer;
+#endif
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
@@ -258,7 +271,7 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
             vsf_dlist_t handler_list;
             vsf_linux_thread_t *sighandler_thread;
-            vsf_dlist_node_t trigger_list;
+            vsf_dlist_t trigger_list;
 #endif
         } sig;
 

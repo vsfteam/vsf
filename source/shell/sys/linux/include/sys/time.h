@@ -30,6 +30,7 @@ enum {
     ITIMER_REAL     = 0,
     ITIMER_VIRTUAL  = 1,
     ITIMER_PROF     = 2,
+    ITIMER_NUM      = 3,
 };
 
 struct timeval {
@@ -49,7 +50,7 @@ struct itimerval {
 
 int gettimeofday(struct timeval * tv, struct timezone * tz);
 int getitimer(int which, struct itimerval *curr_value);
-int setitimer(int which, const struct itimerval *new_valie, struct itimerval *old_value);
+int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);
 
 #ifdef __cplusplus
 }
