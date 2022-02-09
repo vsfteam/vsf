@@ -169,6 +169,7 @@ void vk_dwcotg_dcd_reset(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
 
     for (uint_fast8_t i = 0; i < dwcotg_dcd->ep_num; i++) {
         dwcotg_dcd->reg.dev.ep.out_regs[i].doepctl |= USB_OTG_DOEPCTL_SNAK;
+        dwcotg_dcd->reg.dev.ep.in_regs[i].diepctl |= USB_OTG_DIEPCTL_SD0PID_SEVNFRM;
     }
     dev_global_regs->dcfg &= ~USB_OTG_DCFG_DAD;
     memset(dwcotg_dcd->trans, 0, sizeof(dwcotg_dcd->trans));
