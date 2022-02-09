@@ -98,7 +98,7 @@ enum {
     DT_EXE,
 };
 
-void usleep(int micro_seconds);
+int usleep(int micro_seconds);
 unsigned sleep(unsigned seconds);
 
 unsigned int alarm(unsigned int seconds);

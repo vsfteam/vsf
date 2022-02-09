@@ -1496,23 +1496,31 @@ char * getpass(const char *prompt)
 }
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-void usleep(int usec)
+vsf_systimer_tick_t vsf_linux_sleep(vsf_systimer_tick_t ticks)
 {
-#   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
-    vsf_teda_set_timer_us(usec);
-#   else
-    // us sleep is not available in non tickless mode
-    VSF_LINUX_ASSERT(false);
-#   endif
-    vsf_thread_wfe(VSF_EVT_TIMER);
+    vsf_systimer_tick_t realticks;
+    vsf_linux_trigger_t trigger;
+    vsf_linux_trigger_init(&trigger);
+
+    realticks = vsf_systimer_get_tick();
+    vsf_linux_trigger_pend(&trigger, (vsf_timeout_tick_t)ticks);
+    realticks = vsf_systimer_get_elapsed(realticks);
+
+    return ticks > realticks ? ticks - realticks : 0;
+}
+
+int usleep(int usec)
+{
+    errno = 0;
+    vsf_systimer_tick_t ticks_remain = vsf_linux_sleep(vsf_systimer_us_to_tick(usec));
+    return errno != 0 ? -1 : 0;
 }
 
 // TODO: wakeup after signal
 unsigned sleep(unsigned sec)
 {
-    vsf_teda_set_timer_ms(sec * 1000);
-    vsf_thread_wfe(VSF_EVT_TIMER);
-    return 0;
+    vsf_systimer_tick_t ticks_remain = vsf_linux_sleep(vsf_systimer_ms_to_tick(sec * 1000));
+    return vsf_systimer_tick_to_ms(ticks_remain) / 1000;
 }
 #endif
 

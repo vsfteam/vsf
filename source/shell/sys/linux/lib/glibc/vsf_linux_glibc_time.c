@@ -73,15 +73,16 @@ time_t time(time_t *t)
 
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
 {
-    if (requested_time->tv_sec) {
-        sleep(requested_time->tv_sec);
-    }
-    if (requested_time->tv_nsec) {
-        usleep(requested_time->tv_nsec / 1000);
-    }
+    vsf_timeout_tick_t ticks;
+    ticks = 1000ULL * 1000 * requested_time->tv_sec + requested_time->tv_nsec / 1000;
+    ticks = vsf_systimer_us_to_tick(ticks);
+
+    vsf_systimer_tick_t remain_ticks = vsf_linux_sleep(ticks);
+
     if (remaining != NULL) {
-        remaining->tv_nsec = 0;
-        remaining->tv_sec = 0;
+        vsf_timeout_tick_t us = vsf_systimer_tick_to_us(remain_ticks);
+        remaining->tv_sec = us / (1000 * 1000);
+        remaining->tv_nsec = (us % (1000 * 1000)) * 1000;
     }
     return 0;
 }

@@ -288,6 +288,8 @@ vsf_class(vsf_linux_process_t) {
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 
+extern vsf_systimer_tick_t vsf_linux_sleep(vsf_systimer_tick_t ticks);
+
 // used for dynamic libraries, allocate/free memory from resources_process
 extern vsf_linux_process_t * vsf_linux_resources_process(void);
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
