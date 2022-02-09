@@ -25,8 +25,10 @@
 #include "./vsf_linux_ntp.h"
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+$   include "../../include/unistd.h"
 #   include "../../include/sys/time.h"
 #else
+#   include <unistd.h>
 #   include <sys/time.h>
 #endif
 
@@ -154,6 +156,7 @@ vsf_err_t vsf_linux_ntp_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
     if (ret != sizeof(ntp_packet_header)) {
         goto close_and_fail;
     }
+    close(ntp_rtc_ptr->sock);
 
     // 32-bit seconds, will overflow in 2036
     // ntp time starts from 1900, while time_t starts from 1970
