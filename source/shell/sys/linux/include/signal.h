@@ -17,6 +17,7 @@ extern "C" {
 #define kill                VSF_LINUX_WRAPPER(kill)
 #define signal              VSF_LINUX_WRAPPER(signal)
 #define sigprocmask         VSF_LINUX_WRAPPER(sigprocmask)
+#define raise               VSF_LINUX_WRAPPER(raise)
 
 #define sigemptyset         VSF_LINUX_WRAPPER(sigemptyset)
 #define sigfillset          VSF_LINUX_WRAPPER(sigfillset)
@@ -49,8 +50,10 @@ typedef struct {
 } siginfo_t;
 
 struct sigaction {
-    void (*sa_handler)(int);
-    void (*sa_sigaction)(int, siginfo_t *, void *);
+    union {
+        sighandler_t sa_handler;
+        void (*sa_sigaction)(int, siginfo_t *, void *);
+    };
     sigset_t sa_mask;
     int sa_flags;
     void (*sa_restorer)(void);
@@ -149,18 +152,10 @@ static inline int sigtestsetmask(sigset_t *set, unsigned long mask)
 int kill(pid_t pid, int sig);
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 sighandler_t signal(int signum, sighandler_t handler);
+int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
+int raise(int sig);
 
 int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
-
-static inline int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
-{
-    return -1;
-}
-
-static inline int raise(int sig)
-{
-    return -1;
-}
 
 #ifdef __cplusplus
 }

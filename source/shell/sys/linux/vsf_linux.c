@@ -120,9 +120,6 @@ typedef struct vsf_linux_t {
 
     vsf_linux_process_t process_for_resources;
     vsf_linux_process_t *kernel_process;
-#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
-    int sig_pid;
-#endif
 
     vsf_linux_stdio_stream_t stdio_stream;
 
@@ -166,6 +163,10 @@ static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
 extern int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd,
         vsf_linux_main_entry_t *entry);
 
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb);
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static NO_INIT vsf_linux_t __vsf_linux;
@@ -175,6 +176,14 @@ static const vsf_linux_thread_op_t __vsf_linux_main_op = {
     .on_run             = __vsf_linux_main_on_run,
     .on_terminate       = vsf_linux_thread_on_terminate,
 };
+
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+static const vsf_linux_thread_op_t __vsf_linux_sighandler_op = {
+    .priv_size          = 0,
+    .on_run             = __vsf_linux_sighandler_on_run,
+    .on_terminate       = vsf_linux_thread_on_terminate,
+};
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -487,56 +496,7 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
 #endif
 
     __vsf_linux.kernel_process = vsf_linux_get_cur_process();
-
-#if VSF_LINUX_CFG_SUPPORT_SIG != ENABLED
     __vsf_linux_init_thread(argc, argv);
-#else
-    // create init process(pid1)
-    __vsf_linux_start_process_internal(0, __vsf_linux_init_thread, VSF_LINUX_CFG_PRIO_HIGHEST);
-
-    vsf_linux_sig_handler_t *handler;
-    vsf_linux_process_t *process;
-    vsf_evt_t evt;
-    unsigned long sig_mask;
-    int sig;
-    bool found_handler;
-
-    while (1) {
-        evt = vsf_thread_wait();
-        VSF_LINUX_ASSERT(VSF_EVT_MESSAGE == evt);
-
-        process = vsf_eda_get_cur_msg();
-        sig_mask = process->sig.pending.sig[0] & ~process->sig.mask.sig[0];
-        while (sig_mask) {
-            sig = vsf_ffz32(~sig_mask);
-            sig_mask &= ~(1 << sig);
-
-            found_handler = false;
-            __vsf_dlist_foreach_unsafe(vsf_linux_sig_handler_t, node, &process->sig.handler_list) {
-                if (_->sig == sig) {
-                    handler = _;
-                    found_handler = true;
-                    break;
-                }
-            }
-
-            __vsf_linux.sig_pid = process->id.pid;
-            if (found_handler && (handler != SIG_DFL)) {
-                if (handler != (vsf_linux_sig_handler_t *)SIG_IGN) {
-                    siginfo_t siginfo = {
-                        .si_signo   = sig,
-                        .si_errno   = errno,
-                    };
-                    handler->handler(sig, &siginfo, NULL);
-                }
-            } else if (!((1 << sig) & ((1 << SIGURG) | (1 << SIGCONT) | (1 << SIGWINCH)))) {
-                // TODO: terminate other thread is not supported in VSF, so just ignore
-//                VSF_LINUX_ASSERT(false);
-            }
-        }
-    }
-#endif
-    // actually will not return, just make compiler happy
     return 0;
 }
 
@@ -578,15 +538,11 @@ int isatty(int fd)
         ||  (stream_tx == __vsf_linux.stdio_stream.err);
 }
 
-vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
-            const vsf_linux_thread_op_t *op,
+vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op,
             int stack_size, void *stack)
 {
     vsf_linux_thread_t *thread;
 
-    if (!process) {
-        process = ((vsf_linux_thread_t *)vsf_eda_get_cur())->process;
-    }
     if (!stack_size) {
         stack_size = VSF_LINUX_CFG_STACKSIZE;
     }
@@ -610,7 +566,6 @@ vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
     thread = (vsf_linux_thread_t *)vsf_heap_malloc_aligned(all_size, alignment);
     if (thread != NULL) {
         memset(thread, 0, thread_size);
-        thread->process = process;
 
         // set entry and on_terminate
         thread->on_terminate = (vsf_eda_on_terminate_t)op->on_terminate;
@@ -623,7 +578,20 @@ vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
         } else {
             thread->stack = (void *)((uintptr_t)thread + thread_size);
         }
+    }
+    return thread;
+}
 
+vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
+            const vsf_linux_thread_op_t *op,
+            int stack_size, void *stack)
+{
+    vsf_linux_thread_t *thread = vsf_linux_create_raw_thread(op, stack_size, stack);
+    if (thread != NULL) {
+        if (!process) {
+            process = vsf_linux_get_cur_process();
+        }
+        thread->process = process;
         vsf_protect_t orig = vsf_protect_sched();
             thread->tid = __vsf_linux.cur_tid++;
             vsf_dlist_add_to_tail(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
@@ -751,6 +719,13 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
             __vsf_linux_fd_close_ex(process, sfd->fd);
         }
     } while (sfd != NULL);
+
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    __vsf_dlist_foreach_next_unsafe(vsf_linux_sig_handler_t, node, &process->sig.handler_list) {
+        vsf_dlist_remove(vsf_linux_sig_handler_t, node, &process->sig.handler_list, _);
+        __free_ex(process, _);
+    }
+#endif
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
     vsf_linux_free_env(process);
 #endif
@@ -793,18 +768,20 @@ void vsf_linux_exit_process(int status)
     vsf_protect_t orig;
     bool need_wait;
 
-    // WIFEXITED
-    process->status = status << 8;
-
-    // 1. dequeue cur_threadn and wait all other threads
     orig = vsf_protect_sched();
-        vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, cur_thread);
-        VSF_LINUX_ASSERT(NULL == process->thread_pending_exit);
-        need_wait = !vsf_dlist_is_empty(&process->thread_list);
-        if (need_wait) {
-            process->thread_pending_exit = cur_thread;
+        if (process->thread_pending_exit != NULL) {
+            vsf_unprotect_sched(orig);
+            goto end_no_return;
         }
+        process->thread_pending_exit = cur_thread;
+
+    // WIFEXITED
+        process->status = status << 8;
+    // 1. dequeue cur_thread and wait all other threads
+        vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, cur_thread);
+        need_wait = !vsf_dlist_is_empty(&process->thread_list);
     vsf_unprotect_sched(orig);
+
     if (need_wait) {
         do {
             vsf_thread_wfe(VSF_EVT_USER);
@@ -846,6 +823,7 @@ void vsf_linux_exit_process(int status)
 
     // 8. exit current thread
     cur_thread->process = NULL;
+end_no_return:
     vsf_thread_exit();
 }
 
@@ -909,6 +887,73 @@ vsf_linux_process_t * vsf_linux_get_cur_process(void)
                 process : __vsf_linux.kernel_process;
 }
 
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+static vsf_linux_sig_handler_t * __vsf_linux_get_sighandler_ex(vsf_linux_process_t *process, int sig)
+{
+    vsf_linux_sig_handler_t *handler = NULL;
+    VSF_LINUX_ASSERT(process != NULL);
+    __vsf_dlist_foreach_unsafe(vsf_linux_sig_handler_t, node, &process->sig.handler_list) {
+        if (_->sig == sig) {
+            handler = _;
+            break;
+        }
+    }
+    return handler;
+}
+
+static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
+{
+    vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
+    vsf_linux_process_t *process = thread->process;
+    vsf_linux_sig_handler_t *handler;
+    sighandler_t sighandler;
+    unsigned long sig_mask;
+    int sig;
+    vsf_protect_t orig;
+    bool is_all_done = false;
+
+    while (true) {
+        orig = vsf_protect_sched();
+            sig_mask = process->sig.pending.sig[0] & ~process->sig.mask.sig[0];
+            if (!sig_mask) {
+                process->sig.sighandler_thread = NULL;
+                is_all_done = true;
+            } else {
+                sig = vsf_ffz32(~sig_mask);
+                process->sig.pending.sig[0] &= ~(1 << sig);
+            }
+        vsf_unprotect_sched(orig);
+        if (is_all_done) {
+            break;
+        }
+
+        handler = __vsf_linux_get_sighandler_ex(process, sig);
+        sighandler = SIG_DFL;
+        if (handler != NULL) {
+            if (handler->flags & SA_SIGINFO) {
+                VSF_LINUX_ASSERT(handler->sigaction_handler != NULL);
+                siginfo_t siginfo = {
+                    .si_signo   = sig,
+                    .si_errno   = errno,
+                };
+                handler->sigaction_handler(sig, &siginfo, NULL);
+                return;
+            } else {
+                sighandler = handler->sighandler;
+            }
+        }
+
+        if (SIG_DFL == sighandler) {
+            // TODO: try to get default handler
+            sighandler = SIG_IGN;
+        }
+        if (sighandler != SIG_IGN) {
+            sighandler(sig);
+        }
+    }
+}
+#endif
+
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
@@ -953,6 +998,10 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         vsf_protect_t orig = vsf_protect_sched();
             vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
         vsf_unprotect_sched(orig);
+
+        if (process->thread_pending_exit != NULL) {
+            vsf_eda_post_evt(&process->thread_pending_exit->use_as__vsf_eda_t, VSF_EVT_USER);
+        }
     }
     vsf_heap_free(thread);
 }
@@ -1135,36 +1184,96 @@ int pipe(int pipefd[2])
 int kill(pid_t pid, int sig)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    vsf_protect_t orig = vsf_protect_sched();
     vsf_linux_process_t *process = vsf_linux_get_process(pid);
-    if (process != NULL) {
-        if (!process->id.pid) {
+    if ((NULL == process) || (process->thread_pending_exit != NULL)) {
+        vsf_unprotect_sched(orig);
+        return -1;
+    }
+
+    process->sig.pending.sig[0] |= 1 << sig;
+    if (NULL == process->sig.sighandler_thread) {
+        process->sig.sighandler_thread = vsf_linux_create_raw_thread(&__vsf_linux_sighandler_op, 0, NULL);
+        if (NULL == process->sig.sighandler_thread) {
+            vsf_unprotect_sched(orig);
             return -1;
         }
 
-        vsf_protect_t orig = vsf_protect_sched();
-            process->sig.pending.sig[0] |= 1 << sig;
+        vsf_linux_thread_t *thread = process->sig.sighandler_thread;
+        thread->process = process;
+        thread->tid = -1;
+        vsf_dlist_add_to_tail(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
         vsf_unprotect_sched(orig);
-
-        vsf_linux_thread_t *thread;
-        vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &__vsf_linux.kernel_process->thread_list, thread);
-        // TODO: avoid posting event/message to thread,
-        //  if the thread is not waiting for the dedicated event/message
-        vsf_eda_post_msg(&thread->use_as__vsf_eda_t, process);
+        vsf_linux_start_thread(thread, VSF_LINUX_CFG_PRIO_SIGNAL);
         return 0;
     }
-#endif
+    vsf_unprotect_sched(orig);
+    // put a yield here to make sure sighandler will be runed?
+    vsf_thread_yield();
+    return 0;
+#else
     return -1;
+#endif
+}
+
+int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
+{
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    vsf_linux_sig_handler_t *handler = __vsf_linux_get_sighandler_ex(process, signum);
+    bool new_handler = NULL == handler;
+
+    if (new_handler) {
+        handler = calloc(1, sizeof(vsf_linux_sig_handler_t));
+        if (NULL == handler) {
+            return -1;
+        }
+        handler->sig = signum;
+        handler->sighandler = SIG_DFL;
+    }
+
+    if (oldact != NULL) {
+        oldact->sa_handler = handler->sighandler;
+        oldact->sa_flags = handler->flags;
+        oldact->sa_mask = handler->mask;
+    }
+    handler->sighandler = act->sa_handler;
+    handler->flags = act->sa_flags;
+    handler->mask = act->sa_mask;
+
+    if (new_handler) {
+        vsf_protect_t orig = vsf_protect_sched();
+            vsf_dlist_add_to_tail(vsf_linux_sig_handler_t, node, &process->sig.handler_list, handler);
+        vsf_unprotect_sched(orig);
+    }
+    return 0;
+#else
+    return -1;
+#endif
 }
 
 #if !defined(__WIN__) || VSF_LINUX_CFG_WRAPPER == ENABLED
-// conflicts with signal in ucrt, need VSF_LINUX_CFG_WRAPPER
+// conflicts with APIs in ucrt, need VSF_LINUX_CFG_WRAPPER
 sighandler_t signal(int signum, sighandler_t handler)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
-    // not supported yet
+    const struct sigaction in = {
+        .sa_handler = handler,
+    };
+    struct sigaction out;
+    if (!sigaction(signum, &in, &out)) {
+        return out.sa_handler;
+    }
+    return SIG_DFL;
 #else
     return NULL;
 #endif
+}
+
+int raise(int sig)
+{
+    return kill(getpid(), sig);
 }
 #endif
 

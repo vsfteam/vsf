@@ -34,11 +34,6 @@
 #define VSF_LINUX_WRAPPER(__api)                VSF_SHELL_WRAPPER(vsf_linux, __api)
 #define VSF_LINUX_SOCKET_WRAPPER(__api)         VSF_SHELL_WRAPPER(vsf_linux_socket, __api)
 
-// signal support is not implemented
-#ifndef VSF_LINUX_CFG_SUPPORT_SIG
-#   define VSF_LINUX_CFG_SUPPORT_SIG            DISABLED
-#endif
-
 #ifndef VSF_LINUX_CFG_FD_BITMAP_SIZE
 #   define VSF_LINUX_CFG_FD_BITMAP_SIZE         32
 #endif
@@ -53,6 +48,23 @@
 
 #ifndef VSF_LINUX_CFG_TLS_NUM
 #   define VSF_LINUX_CFG_TLS_NUM                8
+#endif
+
+#ifndef VSF_LINUX_CFG_PRIO_LOWEST
+#   define VSF_LINUX_CFG_PRIO_LOWEST            vsf_prio_0
+#endif
+
+#ifndef VSF_LINUX_CFG_PRIO_HIGHEST
+#   define VSF_LINUX_CFG_PRIO_HIGHEST           vsf_prio_0
+#endif
+
+#ifndef VSF_LINUX_CFG_SUPPORT_SIG
+#   define VSF_LINUX_CFG_SUPPORT_SIG            ENABLED
+#endif
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+#   ifndef VSF_LINUX_CFG_PRIO_SIGNAL
+#       define VSF_LINUX_CFG_PRIO_SIGNAL        VSF_LINUX_CFG_PRIO_HIGHEST
+#   endif
 #endif
 
 #ifndef VSF_LINUX_CFG_BIN_PATH

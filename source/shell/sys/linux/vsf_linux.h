@@ -72,14 +72,6 @@ extern "C" {
 #   error invalid VSF_LINUX_CFG_STACKSIZE
 #endif
 
-#ifndef VSF_LINUX_CFG_PRIO_LOWEST
-#   define VSF_LINUX_CFG_PRIO_LOWEST        vsf_prio_0
-#endif
-
-#ifndef VSF_LINUX_CFG_PRIO_HIGHEST
-#   define VSF_LINUX_CFG_PRIO_HIGHEST       vsf_prio_0
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_linux_thread_get_priv(__thread)         (void *)(&(((vsf_linux_thread_t *)(__thread))[1]))
@@ -165,8 +157,13 @@ vsf_class(vsf_linux_thread_t) {
 
 typedef struct vsf_linux_sig_handler_t {
     vsf_dlist_node_t node;
-    uint_fast8_t sig;
-    void (*handler)(int, siginfo_t *, void *);
+    uint8_t sig;
+    uint8_t flags;
+    sigset_t mask;
+    union {
+        sighandler_t sighandler;
+        void (*sigaction_handler)(int, siginfo_t *, void *);
+    };
 } vsf_linux_sig_handler_t;
 
 typedef struct vsf_linux_stdio_stream_t {
@@ -245,7 +242,10 @@ vsf_class(vsf_linux_process_t) {
         struct {
             sigset_t pending;
             sigset_t mask;
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
             vsf_dlist_t handler_list;
+            vsf_linux_thread_t *sighandler_thread;
+#endif
         } sig;
 
         vsf_prio_t prio;
