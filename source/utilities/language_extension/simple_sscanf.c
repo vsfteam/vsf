@@ -64,9 +64,9 @@ static int vsnscanf(const char *str, size_t size, const char *format, va_list ap
                 int width = 0;
                 union {
                     struct {
-                        int is_signed       : 1;
+                        unsigned is_signed      : 1;
                     };
-                    int all;
+                    unsigned all;
                 } flags;
                 int radix;
 

@@ -58,17 +58,17 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
         case '%': {
                 union {
                     struct {
-                        int has_prefix0     : 1;
-                        int has_prefix      : 1;
-                        int align_left      : 1;
-                        int has_plus_minus  : 1;
-                        int is_upper        : 1;
-                        int is_signed       : 1;
-                        int is_plus         : 1;
-                        int is_halfword     : 1;
-                        int long_cnt        : 2;
+                        unsigned has_prefix0    : 1;
+                        unsigned has_prefix     : 1;
+                        unsigned align_left     : 1;
+                        unsigned has_plus_minus : 1;
+                        unsigned is_upper       : 1;
+                        unsigned is_signed      : 1;
+                        unsigned is_plus        : 1;
+                        unsigned is_halfword    : 1;
+                        unsigned long_cnt       : 2;
                     };
-                    int all;
+                    unsigned all;
                 } flags;
 
                 char *format_tmp;
