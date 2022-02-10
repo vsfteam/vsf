@@ -1,8 +1,6 @@
 #ifndef __VSF_LINUX_ERRNO_H__
 #define __VSF_LINUX_ERRNO_H__
 
-#include "shell/sys/linux/vsf_linux.h"
-
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Winconsistent-dllimport"
