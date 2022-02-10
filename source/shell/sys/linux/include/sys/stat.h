@@ -25,29 +25,34 @@ extern "C" {
 #endif
 #define lstat           stat
 
-#define S_IFDIR         VSF_FILE_ATTR_DIRECTORY
-#define S_IFREG         (VSF_FILE_ATTR_USER << 0)
-#define S_IFLNK         (VSF_FILE_ATTR_USER << 10)
-#define S_IFIFO         (VSF_FILE_ATTR_USER << 11)
-#define S_IFSOCK        (VSF_FILE_ATTR_USER << 12)
-#define S_IFMT          (S_IFDIR | S_IFREG | S_IFLNK | S_IFIFO | S_IFSOCK)
+#define S_IFDIR         0040000
+#define S_IFREG         0100000
+#define S_IFLNK         0120000
+#define S_IFIFO         0010000
+#define S_IFSOCK        0140000
+#define S_IFBLK         0060000
+#define S_IFMT          0170000
 
-#define S_IRUSR         (VSF_FILE_ATTR_USER << 1)
-#define S_IWUSR         (VSF_FILE_ATTR_USER << 2)
-#define S_IXUSR         (VSF_FILE_ATTR_USER << 3)
-#define S_IRGRP         (S_IRUSR << 3)
-#define S_IWGRP         (S_IWUSR << 3)
-#define S_IXGRP         (S_IXUSR << 3)
-#define S_IROTH         (S_IRGRP << 3)
-#define S_IWOTH         (S_IWGRP << 3)
-#define S_IXOTH         (S_IXGRP << 3)
-#define S_IRWXU         (S_IRUSR | S_IWUSR | S_IXUSR)
-#define S_IRWXG         (S_IRGRP | S_IWGRP | S_IXGRP)
+#define __S_IR          04
+#define __S_IW          02
+#define __S_IX          01
+#define S_IROTH         (__S_IR << 0)
+#define S_IWOTH         (__S_IW << 0)
+#define S_IXOTH         (__S_IX << 0)
 #define S_IRWXO         (S_IROTH | S_IWOTH | S_IXOTH)
+#define S_IRGRP         (__S_IR << 3)
+#define S_IWGRP         (__S_IW << 3)
+#define S_IXGRP         (__S_IX << 3)
+#define S_IRWXG         (S_IRGRP | S_IWGRP | S_IXGRP)
+#define S_IRUSR         (__S_IR << 6)
+#define S_IWUSR         (__S_IW << 6)
+#define S_IXUSR         (__S_IX << 6)
+#define S_IRWXU         (S_IRUSR | S_IWUSR | S_IXUSR)
 
 // protection bits
-#define S_ISUID         (VSF_FILE_ATTR_USER << 13)
-#define S_ISGID         (VSF_FILE_ATTR_USER << 14)
+#define S_ISUID         0004000
+#define S_ISGID         0002000
+#define S_ISVTX         0001000
 
 #define S_ISLNK(__MODE) (((__MODE) & S_IFMT) == S_IFLNK)
 #define S_ISREG(__MODE) (((__MODE) & S_IFMT) == S_IFREG)

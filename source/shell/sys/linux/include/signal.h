@@ -16,6 +16,7 @@ extern "C" {
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define kill                VSF_LINUX_WRAPPER(kill)
 #define signal              VSF_LINUX_WRAPPER(signal)
+#define sigaction           VSF_LINUX_WRAPPER(sigaction)
 #define sigprocmask         VSF_LINUX_WRAPPER(sigprocmask)
 #define raise               VSF_LINUX_WRAPPER(raise)
 

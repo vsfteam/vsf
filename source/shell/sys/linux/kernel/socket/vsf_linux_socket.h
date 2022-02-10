@@ -77,6 +77,14 @@ vsf_class(vsf_linux_socket_priv_t) {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#if VSF_LINUX_SOCKET_USE_UNIX == ENABLED
+extern const vsf_linux_socket_op_t vsf_linux_socket_unix_op;
+#endif
+#if VSF_LINUX_SOCKET_USE_INET == ENABLED
+extern const vsf_linux_socket_op_t vsf_linux_socket_inet_op;
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 

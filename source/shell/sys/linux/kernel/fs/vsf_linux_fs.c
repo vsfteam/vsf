@@ -61,6 +61,7 @@
 #endif
 
 #include "./vsf_linux_fs.h"
+#include "../socket/vsf_linux_socket.h"
 
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
@@ -1086,13 +1087,30 @@ int fstat(int fd, struct stat *buf)
         vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
         vk_file_t *file = priv->file;
 
-        buf->st_mode = file->attr;
-        if (!(file->attr & S_IFMT)) {
-            buf->st_mode |= S_IFREG;
+        if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
+            buf->st_mode = S_IFDIR;
+        } else {
+            buf->st_mode = S_IFREG;
         }
+        buf->st_mode |= 0777;
         buf->st_size = file->size;
         return 0;
+#if VSF_LINUX_USE_SOCKET == ENABLED
+    } else if (
+#   if VSF_LINUX_SOCKET_USE_UNIX == ENABLED
+                (&vsf_linux_socket_unix_op.fdop == sfd->op)
+#   endif
+#   if VSF_LINUX_SOCKET_USE_UNIX == ENABLED && VSF_LINUX_SOCKET_USE_INET == ENABLED
+            ||
+#   endif
+#   if VSF_LINUX_SOCKET_USE_INET == ENABLED
+                (&vsf_linux_socket_unix_op.fdop == sfd->op)
+#   endif
+        ) {
+        buf->st_mode = S_IFSOCK;
+        return 0;
     } else {
+#endif
         return -1;
     }
 }
