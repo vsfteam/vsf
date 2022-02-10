@@ -65,6 +65,7 @@ vsf_stream_t VSF_DEBUG_STREAM_TX = {
 static void __vsf_debug_stream_tx_init(vsf_stream_t *stream)
 {
     __VSF_DEBUG_STREAM_TX_INIT();
+    vsf_stream_connect_rx(stream);
 }
 
 static uint_fast32_t __vsf_debug_stream_tx_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)

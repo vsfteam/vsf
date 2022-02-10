@@ -79,6 +79,7 @@ static void __vsf_debug_stream_on_rx(void)
 
 static void __VSF_DEBUG_STREAM_TX_INIT(void)
 {
+    vsf_stream_connect_tx(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t);
     register_stdio_uart_rx_function(__vsf_debug_stream_on_rx);
 }
 
