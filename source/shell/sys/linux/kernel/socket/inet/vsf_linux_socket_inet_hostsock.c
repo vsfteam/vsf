@@ -64,6 +64,16 @@ struct dirent {
 /*============================ TYPES =========================================*/
 
 // need to sync types/constants below with the real definitions in vsf
+// from time.h
+#ifndef __SUSECONDS_T
+#   define __SUSECONDS_T    long int
+#endif
+typedef __SUSECONDS_T       suseconds_t;
+struct vsf_linux_timeval {
+    time_t          tv_sec;
+    suseconds_t     tv_usec;
+};
+
 // from socket.h
 #define VSF_LINUX_SOCKET_INVALID_SOCKET -1
 #define VSF_LINUX_SOCKET_SOCKET_ERROR   -1
@@ -75,21 +85,18 @@ enum {
     VSF_LINUX_SOCKET_IPPROTO_UDP        = 17,
 };
 #define VSF_LINUX_SOCKET_SOL_SOCKET     0xFFFF
-enum {
-    VSF_LINUX_SOCKET_SO_DEBUG           = 1,
-    VSF_LINUX_SOCKET_SO_REUSEADDR,
-    VSF_LINUX_SOCKET_SO_ACCEPTCONN,
-    VSF_LINUX_SOCKET_SO_KEEPALIVE,
-    VSF_LINUX_SOCKET_SO_BROADCAST,
-
-    VSF_LINUX_SOCKET_SO_TYPE,
-    VSF_LINUX_SOCKET_SO_ERROR,
-    VSF_LINUX_SOCKET_SO_SNDBUF,
-    VSF_LINUX_SOCKET_SO_RCVBUF,
-    VSF_LINUX_SOCKET_SO_RCVTIMEO,
-    VSF_LINUX_SOCKET_SO_SNDTIMEO,
-    VSF_LINUX_SOCKET_SO_NONBLOCK,
-};
+#define VSF_LINUX_SOCKET_SO_DEBUG       1
+#define VSF_LINUX_SOCKET_SO_REUSEADDR   2
+#define VSF_LINUX_SOCKET_SO_ACCEPTCONN  3
+#define VSF_LINUX_SOCKET_SO_KEEPALIVE   4
+#define VSF_LINUX_SOCKET_SO_BROADCAST   5
+#define VSF_LINUX_SOCKET_SO_TYPE        6
+#define VSF_LINUX_SOCKET_SO_ERROR       7
+#define VSF_LINUX_SOCKET_SO_SNDBUF      8
+#define VSF_LINUX_SOCKET_SO_RCVBUF      9
+#define VSF_LINUX_SOCKET_SO_RCVTIMEO    10
+#define VSF_LINUX_SOCKET_SO_SNDTIMEO    11
+#define VSF_LINUX_SOCKET_SO_NONBLOCK    12
 typedef uint32_t socklen_t;
 typedef uint16_t vsf_linux_socket_sa_family_t;
 struct vsf_linux_socket_sockaddr {
@@ -233,6 +240,7 @@ static void __vsf_linux_sockaddr2host(const struct vsf_linux_socket_sockaddr *so
     struct sockaddr_in *hsockaddr_in = (struct sockaddr_in *)hsockaddr;
 
     switch (sockaddr_in->sin_family) {
+    case 0:
     case VSF_LINUX_SOCKET_AF_INET:  hsockaddr_in->sin_family = AF_INET; break;
     default:                        VSF_LINUX_ASSERT(false);
     }
@@ -247,11 +255,23 @@ static void __vsf_linux_sockaddr2vsf(const struct sockaddr *hsockaddr,
     struct sockaddr_in *hsockaddr_in = (struct sockaddr_in *)hsockaddr;
 
     switch (hsockaddr_in->sin_family) {
+    case 0:
     case AF_INET:   sockaddr_in->sin_family = VSF_LINUX_SOCKET_AF_INET; break;
     default:        VSF_LINUX_ASSERT(false);
     }
     sockaddr_in->sin_port = hsockaddr_in->sin_port;
     sockaddr_in->sin_addr.__s_addr = hsockaddr_in->sin_addr.s_addr;
+}
+
+static unsigned long __vsf_linux_timeval_to_ms(const struct vsf_linux_timeval *t)
+{
+    return t->tv_sec * 1000 + t->tv_usec / 1000;
+}
+
+static void __vsf_linux_ms_to_timeval(struct vsf_linux_timeval *t, unsigned long ms)
+{
+    t->tv_sec = ms / 1000;
+    t->tv_usec = (ms % 1000) * 1000;
 }
 
 static int __vsf_linux_sockflag2host(int flags)
@@ -303,91 +323,102 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                     int level, int optname, const void *optval, socklen_t optlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
+    int ret;
 
     switch (level) {
     case VSF_LINUX_SOCKET_SOL_SOCKET:
+        level = SOL_SOCKET;
         switch (optname) {
-        case VSF_LINUX_SOCKET_SO_BROADCAST:
+        case VSF_LINUX_SOCKET_SO_BROADCAST:     optname = SO_BROADCAST;     break;
+        case VSF_LINUX_SOCKET_SO_KEEPALIVE:     optname = SO_KEEPALIVE;     break;
+        case VSF_LINUX_SOCKET_SO_RCVBUF:        optname = SO_RCVBUF;        break;
+        case VSF_LINUX_SOCKET_SO_REUSEADDR:     optname = SO_REUSEADDR;     break;
+        case VSF_LINUX_SOCKET_SO_RCVTIMEO: {
+                unsigned long ms = __vsf_linux_timeval_to_ms((const struct vsf_linux_timeval *)optval);
+                optname = SO_RCVTIMEO;
+                ret = setsockopt(priv->hostsock, level, optname, (const char *)&ms, sizeof(ms));
+                goto __return;
+            }
             break;
-        case VSF_LINUX_SOCKET_SO_KEEPALIVE:
+        case VSF_LINUX_SOCKET_SO_SNDTIMEO: {
+                unsigned long ms = __vsf_linux_timeval_to_ms((const struct vsf_linux_timeval *)optval);
+                optname = SO_SNDTIMEO;
+                ret = setsockopt(priv->hostsock, level, optname, (const char *)&ms, sizeof(ms));
+                goto __return;
+            }
             break;
-        case VSF_LINUX_SOCKET_SO_RCVBUF:
-            break;
-        case VSF_LINUX_SOCKET_SO_REUSEADDR:
-            break;
-        case VSF_LINUX_SOCKET_SO_RCVTIMEO:
-            break;
-        case VSF_LINUX_SOCKET_SO_SNDTIMEO:
-            break;
-        case VSF_LINUX_SOCKET_SO_NONBLOCK:
-            break;
-        default:
-            // TODO: add support
-            VSF_LINUX_ASSERT(false);
-            break;
+        case VSF_LINUX_SOCKET_SO_NONBLOCK: {
+                u_long optval_ulong = (u_long)(int *)optval;
+                ret = ioctlsocket(priv->hostsock, FIONBIO, &optval_ulong);
+                goto __return;
+            }
+        default:                                VSF_LINUX_ASSERT(false);    break;
         }
         break;
     case VSF_LINUX_SOCKET_IPPROTO_TCP:
+        level = IPPROTO_TCP;
         switch (optname) {
-        case VSF_LINUX_SOCKET_TCP_NODELAY:
-            break;
-        case VSF_LINUX_SOCKET_TCP_KEEPALIVE:
-            break;
-        default:
-            VSF_LINUX_ASSERT(false);
-            break;
+        case VSF_LINUX_SOCKET_TCP_NODELAY:      optname = TCP_NODELAY;      break;
+        case VSF_LINUX_SOCKET_TCP_KEEPALIVE:    optname = SO_KEEPALIVE;     break;
+        default:                                VSF_LINUX_ASSERT(false);    break;
         }
         break;
     default:
-        // TODO: add support
         VSF_LINUX_ASSERT(false);
         break;
     }
-    return 0;
+    ret = setsockopt(priv->hostsock, level, optname, optval, optlen);
+__return:
+    return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
 }
 
 static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_priv,
                     int level, int optname, void *optval, socklen_t *optlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
+    int ret;
 
     switch (level) {
     case VSF_LINUX_SOCKET_SOL_SOCKET:
         switch (optname) {
-        case VSF_LINUX_SOCKET_SO_BROADCAST:
+        case VSF_LINUX_SOCKET_SO_BROADCAST:     optname = SO_BROADCAST;     break;
+        case VSF_LINUX_SOCKET_SO_KEEPALIVE:     optname = SO_KEEPALIVE;     break;
+        case VSF_LINUX_SOCKET_SO_RCVBUF:        optname = SO_RCVBUF;        break;
+        case VSF_LINUX_SOCKET_SO_REUSEADDR:     optname = SO_REUSEADDR;     break;
+        case VSF_LINUX_SOCKET_SO_RCVTIMEO: {
+                unsigned long ms;
+                int hoptlen = sizeof(ms);
+                optname = SO_RCVTIMEO;
+                ret = getsockopt(priv->hostsock, level, optname, (char *)&ms, &hoptlen);
+                __vsf_linux_ms_to_timeval(optval, ms);
+            }
             break;
-        case VSF_LINUX_SOCKET_SO_KEEPALIVE:
+        case VSF_LINUX_SOCKET_SO_SNDTIMEO: {
+                unsigned long ms;
+                int hoptlen = sizeof(ms);
+                optname = SO_SNDTIMEO;
+                ret = getsockopt(priv->hostsock, level, optname, (char *)&ms, &hoptlen);
+                __vsf_linux_ms_to_timeval(optval, ms);
+            }
             break;
-        case VSF_LINUX_SOCKET_SO_RCVBUF:
-            break;
-        case VSF_LINUX_SOCKET_SO_REUSEADDR:
-            break;
-        case VSF_LINUX_SOCKET_SO_RCVTIMEO:
-            break;
-        case VSF_LINUX_SOCKET_SO_SNDTIMEO:
-            break;
-        default:
-            VSF_LINUX_ASSERT(false);
-            break;
+        case VSF_LINUX_SOCKET_SO_NONBLOCK:      VSF_LINUX_ASSERT(false);    break;
+        default:                                VSF_LINUX_ASSERT(false);    break;
         }
         break;
     case VSF_LINUX_SOCKET_IPPROTO_TCP:
         switch (optname) {
-        case VSF_LINUX_SOCKET_TCP_NODELAY:
-            break;
-        case VSF_LINUX_SOCKET_TCP_KEEPALIVE:
-            break;
-        default:
-            VSF_LINUX_ASSERT(false);
-            break;
+        case VSF_LINUX_SOCKET_TCP_NODELAY:      optname = TCP_NODELAY;      break;
+        case VSF_LINUX_SOCKET_TCP_KEEPALIVE:    optname = SO_KEEPALIVE;     break;
+        default:                                VSF_LINUX_ASSERT(false);    break;
         }
         break;
     default:
-        // TODO: add support
         VSF_LINUX_ASSERT(false);
         break;
     }
-    return 0;
+    ret = getsockopt(priv->hostsock, level, optname, optval, (int *)optlen);
+__return:
+    return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
 }
 
 static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_priv,

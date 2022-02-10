@@ -80,21 +80,19 @@ struct sockaddr_storage {
 // level for setsockopt
 #define SOL_SOCKET      0xFFFF
 // option_name for setsockopt
-enum {
-    SO_DEBUG            = 1,
-    SO_REUSEADDR,
-    SO_ACCEPTCONN,
-    SO_KEEPALIVE,
-    SO_BROADCAST,
+#define SO_DEBUG        1
+#define SO_REUSEADDR    2
+#define SO_ACCEPTCONN   3
+#define SO_KEEPALIVE    4
+#define SO_BROADCAST    5
+#define SO_TYPE         6
+#define SO_ERROR        7
+#define SO_SNDBUF       8
+#define SO_RCVBUF       9
+#define SO_RCVTIMEO     10
+#define SO_SNDTIMEO     11
+#define SO_NONBLOCK     12
 
-    SO_TYPE,
-    SO_ERROR,
-    SO_SNDBUF,
-    SO_RCVBUF,
-    SO_RCVTIMEO,
-    SO_SNDTIMEO,
-    SO_NONBLOCK,
-};
 int setsockopt(int socket, int level, int optname, const void *optval,
                     socklen_t optlen);
 int getsockopt(int socket, int level, int optname, void *optval,
