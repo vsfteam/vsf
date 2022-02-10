@@ -169,7 +169,6 @@ void vk_dwcotg_dcd_reset(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
 
     for (uint_fast8_t i = 0; i < dwcotg_dcd->ep_num; i++) {
         dwcotg_dcd->reg.dev.ep.out_regs[i].doepctl |= USB_OTG_DOEPCTL_SNAK;
-        dwcotg_dcd->reg.dev.ep.in_regs[i].diepctl |= USB_OTG_DIEPCTL_SD0PID_SEVNFRM;
     }
     dev_global_regs->dcfg &= ~USB_OTG_DCFG_DAD;
     memset(dwcotg_dcd->trans, 0, sizeof(dwcotg_dcd->trans));
@@ -285,6 +284,9 @@ vsf_err_t vk_dwcotg_dcd_ep_add(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, usb
         }
     }
     if (is_in) {
+        // initialize to DATA0 PIN
+        *ep_ctrl |= USB_OTG_DIEPCTL_SD0PID_SEVNFRM;
+
         size = (size + 3) & ~3;
         size = vsf_dwcotg_dcd_get_fifo_size(ep | 0x80, type, size);
         size >>= 2;
