@@ -914,6 +914,8 @@ int open(const char *pathname, int flags, ...)
         }
         errno = ENOENT;
         return -1;
+    } else if (flags & O_TRUNC) {
+        // TODO: trunc fils
     }
 
     fd = vsf_linux_fd_create(&sfd, &__vsf_linux_fs_fdop);

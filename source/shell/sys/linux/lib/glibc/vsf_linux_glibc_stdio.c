@@ -27,11 +27,13 @@
 #   include "../../include/sys/types.h"
 #   include "../../include/simple_libc/stdio.h"
 #   include "../../include/errno.h"
+#   include "../../include/fcntl.h"
 #else
 #   include <unistd.h>
 #   include <sys/types.h>
 #   include <stdio.h>
 #   include <errno.h>
+#   include <fcntl.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
 #   include "../../include/simple_libc/string.h"
@@ -97,8 +99,30 @@ int getchar(void)
 
 FILE * fopen(const char *filename, const char *mode)
 {
-    // TODO: support mode
-    int fd = open(filename, 0);
+    int flags = 0;
+    if (mode != NULL) {
+        char operate = *mode++;
+        if ((*mode == 'b') || (*mode == 't')) {
+            mode++;
+        }
+        switch (operate) {
+        case 'a':
+            flags = O_WRONLY | O_CREAT | O_APPEND;
+            break;
+        case 'r':
+            flags = O_RDONLY;
+            break;
+        case 'w':
+            flags = O_WRONLY | O_CREAT | O_TRUNC;
+            break;
+        }
+        if (*mode == '+') {
+            flags &= ~(O_RDONLY | O_WRONLY);
+            flags |= O_RDWR;
+        }
+    }
+
+    int fd = open(filename, flags);
     if (fd < 0) {
         return NULL;
     }
