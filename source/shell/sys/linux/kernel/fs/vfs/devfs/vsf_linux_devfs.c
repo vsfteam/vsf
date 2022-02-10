@@ -26,8 +26,10 @@
 #define __VSF_FS_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../../include/unistd.h"
+#   include "../../../../include/sys/stat.h"
 #else
 #   include <unistd.h>
+#   include <sys/stat.h>
 #endif
 
 /*============================ MACROS ========================================*/
@@ -113,7 +115,7 @@ int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal)
     return vsf_linux_fs_bind_target_ex(path, mal,
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_read),
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_write),
-                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, mal->size);
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_BLK, mal->size);
 }
 #endif
 

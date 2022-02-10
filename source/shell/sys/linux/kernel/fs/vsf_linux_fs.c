@@ -1089,12 +1089,17 @@ int fstat(int fd, struct stat *buf)
 
         if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
             buf->st_mode = S_IFDIR;
+        } else if (file->attr & VSF_FILE_ATTR_BLK) {
+            buf->st_mode = S_IFBLK;
         } else {
             buf->st_mode = S_IFREG;
         }
         buf->st_mode |= 0777;
         buf->st_size = file->size;
         return 0;
+    } else if ( (&vsf_linux_pipe_rx_fdop == sfd->op)
+            ||  (&vsf_linux_pipe_tx_fdop == sfd->op)) {
+        buf->st_mode = S_IFIFO;
 #if VSF_LINUX_USE_SOCKET == ENABLED
     } else if (
 #   if VSF_LINUX_SOCKET_USE_UNIX == ENABLED
@@ -1109,8 +1114,8 @@ int fstat(int fd, struct stat *buf)
         ) {
         buf->st_mode = S_IFSOCK;
         return 0;
-    } else {
 #endif
+    } else {
         return -1;
     }
 }

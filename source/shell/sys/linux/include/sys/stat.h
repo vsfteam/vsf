@@ -19,40 +19,43 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define stat            VSF_LINUX_WRAPPER(stat)
-#define fstat           VSF_LINUX_WRAPPER(fstat)
-#define umask           VSF_LINUX_WRAPPER(umask)
+#define stat                    VSF_LINUX_WRAPPER(stat)
+#define fstat                   VSF_LINUX_WRAPPER(fstat)
+#define umask                   VSF_LINUX_WRAPPER(umask)
 #endif
-#define lstat           stat
+#define lstat                   stat
 
-#define S_IFDIR         0040000
-#define S_IFREG         0100000
-#define S_IFLNK         0120000
-#define S_IFIFO         0010000
-#define S_IFSOCK        0140000
-#define S_IFBLK         0060000
-#define S_IFMT          0170000
+#define VSF_FILE_ATTR_BLK       (VSF_FILE_ATTR_USER + 0)
+#define VSF_FILE_ATTR_LNK       (VSF_FILE_ATTR_USER + 1)
 
-#define __S_IR          04
-#define __S_IW          02
-#define __S_IX          01
-#define S_IROTH         (__S_IR << 0)
-#define S_IWOTH         (__S_IW << 0)
-#define S_IXOTH         (__S_IX << 0)
-#define S_IRWXO         (S_IROTH | S_IWOTH | S_IXOTH)
-#define S_IRGRP         (__S_IR << 3)
-#define S_IWGRP         (__S_IW << 3)
-#define S_IXGRP         (__S_IX << 3)
-#define S_IRWXG         (S_IRGRP | S_IWGRP | S_IXGRP)
-#define S_IRUSR         (__S_IR << 6)
-#define S_IWUSR         (__S_IW << 6)
-#define S_IXUSR         (__S_IX << 6)
-#define S_IRWXU         (S_IRUSR | S_IWUSR | S_IXUSR)
+#define S_IFDIR                 0040000
+#define S_IFREG                 0100000
+#define S_IFLNK                 0120000
+#define S_IFIFO                 0010000
+#define S_IFSOCK                0140000
+#define S_IFBLK                 0060000
+#define S_IFMT                  0170000
+
+#define __S_IR                  04
+#define __S_IW                  02
+#define __S_IX                  01
+#define S_IROTH                 (__S_IR << 0)
+#define S_IWOTH                 (__S_IW << 0)
+#define S_IXOTH                 (__S_IX << 0)
+#define S_IRWXO                 (S_IROTH | S_IWOTH | S_IXOTH)
+#define S_IRGRP                 (__S_IR << 3)
+#define S_IWGRP                 (__S_IW << 3)
+#define S_IXGRP                 (__S_IX << 3)
+#define S_IRWXG                 (S_IRGRP | S_IWGRP | S_IXGRP)
+#define S_IRUSR                 (__S_IR << 6)
+#define S_IWUSR                 (__S_IW << 6)
+#define S_IXUSR                 (__S_IX << 6)
+#define S_IRWXU                 (S_IRUSR | S_IWUSR | S_IXUSR)
 
 // protection bits
-#define S_ISUID         0004000
-#define S_ISGID         0002000
-#define S_ISVTX         0001000
+#define S_ISUID                 0004000
+#define S_ISGID                 0002000
+#define S_ISVTX                 0001000
 
 #define S_ISLNK(__MODE) (((__MODE) & S_IFMT) == S_IFLNK)
 #define S_ISREG(__MODE) (((__MODE) & S_IFMT) == S_IFREG)
