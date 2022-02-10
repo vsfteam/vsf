@@ -48,12 +48,14 @@ struct dirent {
 #if defined(__WIN__)
 #   include <WinSock2.h>
 #   pragma comment (lib, "ws2_32.lib")
+#elif defined(__LINUX__) || defined(__linux__)
+// TODO: include linux raw socket headers
 #endif
 
 /*============================ MACROS ========================================*/
 
 #if VSF_LINUX_SOCKET_CFG_WRAPPER != ENABLED
-#   error VSF_LINUX_SOCKET_CFG_WRAPPER MUST be enabled to avoid conflicts with WinSock APIs
+#   error VSF_LINUX_SOCKET_CFG_WRAPPER MUST be enabled to avoid conflicts with host socket APIs
 #endif
 
 #define VSF_LINUX_SOCKET_WRAPPER(__api)     VSF_SHELL_WRAPPER(vsf_linux_socket, __api)
@@ -63,13 +65,18 @@ struct dirent {
 
 // need to sync types/constants below with the real definitions in vsf
 // from socket.h
+#define VSF_LINUX_SOCKET_INVALID_SOCKET -1
+#define VSF_LINUX_SOCKET_SOCKET_ERROR   -1
+#define VSF_LINUX_SOCKET_AF_INET        2
+#define VSF_LINUX_SOCKET_SOCK_STREAM    1
+#define VSF_LINUX_SOCKET_SOCK_DGRAM     2
 enum {
-    VSF_LINUX_SOCKET_IPPROTO_TCP         = 6,
-    VSF_LINUX_SOCKET_IPPROTO_UDP         = 17,
+    VSF_LINUX_SOCKET_IPPROTO_TCP        = 6,
+    VSF_LINUX_SOCKET_IPPROTO_UDP        = 17,
 };
-#define VSF_LINUX_SOCKET_SOL_SOCKET      0xFFFF
+#define VSF_LINUX_SOCKET_SOL_SOCKET     0xFFFF
 enum {
-    VSF_LINUX_SOCKET_SO_DEBUG            = 1,
+    VSF_LINUX_SOCKET_SO_DEBUG           = 1,
     VSF_LINUX_SOCKET_SO_REUSEADDR,
     VSF_LINUX_SOCKET_SO_ACCEPTCONN,
     VSF_LINUX_SOCKET_SO_KEEPALIVE,
@@ -128,10 +135,19 @@ vsf_class(vsf_linux_socket_priv_t) {
     )
 };
 
-// winsock2 private
+// hostsock private
 typedef struct vsf_linux_socket_inet_priv_t {
     implement(vsf_linux_socket_priv_t)
-    int host_sock;
+
+#ifdef __WIN__
+    SOCKET hostsock;
+#else
+    int hostsock;
+#endif
+
+    int hdomain;
+    int htype;
+    int hprotocol;
 } vsf_linux_socket_inet_priv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -154,6 +170,16 @@ static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_p
 static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, socklen_t *addrlen);
 
 /*============================ LOCAL VARIABLES ===============================*/
+
+#ifdef __WIN__
+struct vsf_linux_socket_inet_hostsock_t {
+    WSADATA wsaData;
+    bool is_inited;
+} __vsf_linux_hostsock = {
+    .is_inited = false,
+};
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
@@ -179,32 +205,82 @@ const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+static void __vsf_linux_hostsock_init(void)
+{
+#ifdef __WIN__
+    if (!__vsf_linux_hostsock.is_inited) {
+        __vsf_linux_hostsock.is_inited = true;
+        WSAStartup(MAKEWORD(2, 2), &__vsf_linux_hostsock.wsaData);
+    }
+#endif
+}
+
+static void __vsf_linux_sockaddr2host(const struct vsf_linux_socket_sockaddr *sockaddr,
+                    struct sockaddr *host_sockaddr)
+{
+    switch (sockaddr->sa_family) {
+    case VSF_LINUX_SOCKET_AF_INET:  host_sockaddr->sa_family = AF_INET; break;
+    default:                        VSF_LINUX_ASSERT(false);
+    }
+    memcpy(host_sockaddr->sa_data, sockaddr->sa_data, sizeof(host_sockaddr->sa_data));
+}
+
+static void __vsf_linux_sockaddr2vsf(const struct sockaddr *host_sockaddr,
+                    struct vsf_linux_socket_sockaddr *sockaddr)
+{
+    switch (host_sockaddr->sa_family) {
+    case AF_INET:       sockaddr->sa_family = VSF_LINUX_SOCKET_AF_INET; break;
+    default:            VSF_LINUX_ASSERT(false);
+    }
+    memcpy(sockaddr->sa_data, host_sockaddr->sa_data, sizeof(sockaddr->sa_data));
+}
+
+static int __vsf_linux_sockflag2host(int flags)
+{
+    return 0;
+}
+
 static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_socket_priv_t *socket_priv = (vsf_linux_socket_priv_t *)sfd->priv;
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
 
+    __vsf_linux_hostsock_init();
+
+    switch (socket_priv->domain) {
+    case VSF_LINUX_SOCKET_AF_INET:      priv->hdomain = AF_INET;        break;
+    default:                            goto assert_fail;
+    }
     switch (socket_priv->type) {
-    case SOCK_DGRAM:
-        
-        break;
-    case SOCK_STREAM:
-        
-        break;
-    default:
-        return INVALID_SOCKET;
+    case VSF_LINUX_SOCKET_SOCK_STREAM:  priv->htype = SOCK_STREAM;      break;
+    case VSF_LINUX_SOCKET_SOCK_DGRAM:   priv->htype = SOCK_DGRAM;       break;
+    default:                            goto assert_fail;
+    }
+    switch (socket_priv->protocol) {
+    case VSF_LINUX_SOCKET_IPPROTO_TCP:  priv->hprotocol = IPPROTO_TCP;  break;
+    case VSF_LINUX_SOCKET_IPPROTO_UDP:  priv->hprotocol = IPPROTO_UDP;  break;
+    default:                            goto assert_fail;
     }
 
+    priv->hostsock = socket(priv->hdomain, priv->htype, priv->hprotocol);
+    if (INVALID_SOCKET == priv->hostsock) {
+        return -1;
+    }
     return 0;
+assert_fail:
+    VSF_LINUX_ASSERT(false);
+    return VSF_LINUX_SOCKET_INVALID_SOCKET;
 }
 
 static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, int how)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
+    shutdown(priv->hostsock, SD_BOTH);
     return 0;
 }
 
-static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, const void *optval, socklen_t optlen)
+static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_priv,
+                    int level, int optname, const void *optval, socklen_t optlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
 
@@ -250,7 +326,8 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
     return 0;
 }
 
-static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, void *optval, socklen_t *optlen)
+static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_priv,
+                    int level, int optname, void *optval, socklen_t *optlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
 
@@ -311,14 +388,24 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
                     struct vsf_linux_socket_sockaddr *addr, socklen_t *addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
+    struct sockaddr host_sockaddr;
+    int hsockaddr_len = sizeof(host_sockaddr);
 
-    int newsock = socket(socket_priv->domain, socket_priv->type, socket_priv->protocol);
+    int hnewsock = accept(priv->hostsock, &host_sockaddr, &hsockaddr_len);
+    if (INVALID_SOCKET == hnewsock) {
+        return VSF_LINUX_SOCKET_INVALID_SOCKET;
+    }
+
+    int newsock = VSF_LINUX_SOCKET_WRAPPER(socket)(socket_priv->domain, socket_priv->type, socket_priv->protocol);
     if (newsock < 0) {
-        return INVALID_SOCKET;
+        closesocket(newsock);
+        return VSF_LINUX_SOCKET_INVALID_SOCKET;
     }
 
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(newsock);
-    priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
+    vsf_linux_socket_inet_priv_t *newpriv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
+    *newpriv = *priv;
+    newpriv->hostsock = hnewsock;
     return newsock;
 }
 
@@ -326,6 +413,11 @@ static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *socket_priv,
                     const struct vsf_linux_socket_sockaddr *addr, socklen_t addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
+    struct sockaddr host_sockaddr;
+    __vsf_linux_sockaddr2host(addr, &host_sockaddr);
+    if (!bind(priv->hostsock, (const struct sockaddr *)&host_sockaddr, sizeof(host_sockaddr))) {
+        return 0;
+    }
     return SOCKET_ERROR;
 }
 
@@ -333,7 +425,10 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
                     const struct vsf_linux_socket_sockaddr *addr, socklen_t addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
-    return SOCKET_ERROR;
+    struct sockaddr host_sockaddr;
+    __vsf_linux_sockaddr2host(addr, &host_sockaddr);
+    int ret = connect(priv->hostsock, &host_sockaddr, sizeof(host_sockaddr));
+    return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
 }
 
 static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, int backlog)
@@ -345,13 +440,30 @@ static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, 
 static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, const void *buffer, size_t size, int flags,
                     const struct vsf_linux_socket_sockaddr *dst_addr, socklen_t addrlen)
 {
-    return SOCKET_ERROR;
+    int ret;
+    if (dst_addr != NULL) {
+        struct sockaddr host_sockaddr;
+        __vsf_linux_sockaddr2host(dst_addr, &host_sockaddr);
+        ret = sendto(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags), &host_sockaddr, sizeof(host_sockaddr));
+    } else {
+        ret = send(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags));
+    }
+    return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
 }
 
 static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, void *buffer, size_t size, int flags,
                     struct vsf_linux_socket_sockaddr *src_addr, socklen_t *addrlen)
 {
-    return SOCKET_ERROR;
+    int ret;
+    if (src_addr != NULL) {
+        struct sockaddr host_sockaddr;
+        int hsockaddr_len = sizeof(host_sockaddr);
+        ret = recvfrom(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags), &host_sockaddr, &hsockaddr_len);
+        __vsf_linux_sockaddr2vsf(&host_sockaddr, src_addr);
+    } else {
+        ret = send(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags));
+    }
+    return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
 }
 
 // socket fd
@@ -370,6 +482,7 @@ static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *bu
 static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
+    closesocket(priv->hostsock);
     return 0;
 }
 
@@ -398,20 +511,19 @@ ssize_t VSF_LINUX_SOCKET_WRAPPER(recvfrom)(int sockfd, void *buffer, size_t size
                     buffer, size, flags, src_addr, addrlen);
 }
 
-// ifaddrs.h
-int getifaddrs(struct ifaddrs **ifaddrs)
-{
-    return 0;
-}
-
-void freeifaddrs(struct ifaddrs *ifaddrs)
-{
-}
-
 // netdb.h
 // none thread safty
 int __inet_gethostbyname(const char *name, in_addr_t *addr)
 {
+    __vsf_linux_hostsock_init();
+
+    struct hostent *host = gethostbyname(name);
+    if (NULL == host) {
+        return -1;
+    }
+    if (addr != NULL) {
+        *addr = *(in_addr_t *)host->h_addr;
+    }
     return 0;
 }
 
