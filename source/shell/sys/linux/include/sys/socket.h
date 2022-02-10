@@ -42,6 +42,7 @@ enum {
 };
 
 typedef uint32_t        socklen_t;
+#define __socklen_t_defined
 
 typedef uint16_t        sa_family_t;
 struct sockaddr {
