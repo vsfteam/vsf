@@ -220,7 +220,7 @@ static char * __vsh_get_next_arg(char *cmd)
 static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
 {
     char *next;
-    int exefd = -1, err;
+    int exefd = -1;
     vsf_linux_main_entry_t entry;
     char *env[2];
 
@@ -256,7 +256,7 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
         exefd = vsf_linux_fs_get_executable(cmd, &entry);
         if (exefd < 0) {
             printf("%s not found" VSH_LINEEND, cmd);
-            err = -ENOENT;
+            errno = ENOENT;
             goto delete_process_and_fail;
         }
     }

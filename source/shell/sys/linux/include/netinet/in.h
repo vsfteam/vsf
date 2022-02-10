@@ -19,10 +19,10 @@ extern "C" {
 typedef uint16_t            in_port_t;
 typedef uint32_t            in_addr_t;
 
-#define INADDR_ANY          (uint32_t)0x00000000
-#define INADDR_NONE         (uint32_t)0xFFFFFFFF
-#define INADDR_BROADCAST    (uint32_t)0xFFFFFFFF
-#define INADDR_LOOPBACK     (uint32_t)0x7F000001
+#define INADDR_ANY          (in_addr_t)0x00000000
+#define INADDR_NONE         (in_addr_t)0xFFFFFFFF
+#define INADDR_BROADCAST    (in_addr_t)0xFFFFFFFF
+#define INADDR_LOOPBACK     (in_addr_t)0x7F000001
 
 #define IN_CLASSA(a)        ((((long int) (a)) & 0x80000000) == 0)
 #define IN_CLASSA_NET       0xff000000
@@ -95,7 +95,6 @@ typedef uint32_t            in_addr_t;
          && (((const uint32_t *) (a))[3] == ((const uint32_t *) (b))[3]))
 
 #define INET_ADDRSTRLEN     16
-#define INADDR_ANY          ((in_addr_t) 0x00000000)
 struct in_addr {
     in_addr_t               s_addr;
 };

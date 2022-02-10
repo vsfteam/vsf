@@ -1109,15 +1109,14 @@ int fstat(int fd, struct stat *buf)
             ||
 #   endif
 #   if VSF_LINUX_SOCKET_USE_INET == ENABLED
-                (&vsf_linux_socket_unix_op.fdop == sfd->op)
+                (&vsf_linux_socket_inet_op.fdop == sfd->op)
 #   endif
         ) {
         buf->st_mode = S_IFSOCK;
         return 0;
 #endif
-    } else {
-        return -1;
     }
+    return -1;
 }
 
 int stat(const char *pathname, struct stat *buf)

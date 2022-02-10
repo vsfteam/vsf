@@ -518,7 +518,7 @@ libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx,
 
     while ((dev = (vsf_linux_libusb_dev_t *)devs[i++]) != NULL) {
         if (    (dev->libusb_dev->vid == vendor_id)
-            &&  (dev->libusb_dev->vid == vendor_id)) {
+            &&  (dev->libusb_dev->pid == product_id)) {
             dev_match = (struct libusb_device *)dev;
             break;
         }
