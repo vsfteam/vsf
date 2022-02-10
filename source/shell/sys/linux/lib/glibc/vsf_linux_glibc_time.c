@@ -159,7 +159,7 @@ static void __vsf_linux_on_real_timer(vsf_callback_timer_t *timer)
 {
     vsf_linux_process_t *process = container_of(timer, vsf_linux_process_t, real_timer);
     kill(process->id.pid, SIGALRM);
-    process->timers[ITIMER_NUM].value.it_value = process->timers[ITIMER_NUM].value.it_interval;
+    process->timers[ITIMER_REAL].value.it_value = process->timers[ITIMER_REAL].value.it_interval;
     __vsf_linux_prepare_real_timer(process);
 }
 
