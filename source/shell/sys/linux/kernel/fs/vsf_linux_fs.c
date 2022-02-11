@@ -420,6 +420,7 @@ short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_linux_trig
                 priv->trigger = NULL;
             vsf_unprotect_sched(orig);
         }
+        priv->events_triggered = 0;
     }
     return events_triggered;
 }
@@ -512,15 +513,12 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             if (NULL == sfd) {
                 continue;
             }
+            sfd->priv->events_pending = fds[i].events;
             sfd->priv->trigger = &trig;
         }
         vsf_unprotect_sched(orig);
 
         int r = vsf_linux_trigger_pend(&trig, timeout);
-        // timeout or interrupted by signal
-        if (r != 0) {
-            return 0;
-        }
 
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_fd_get(fds[i].fd);
@@ -532,7 +530,14 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             VSF_LINUX_ASSERT(priv != NULL);
             orig = vsf_protect_sched();
                 priv->trigger = NULL;
+                priv->events = priv->events_triggered;
+                priv->events_triggered = 0;
             vsf_unprotect_sched(orig);
+        }
+
+        // timeout or interrupted by signal
+        if (r != 0) {
+            return 0;
         }
     }
     return 0;
