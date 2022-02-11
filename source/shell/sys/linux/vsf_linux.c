@@ -135,6 +135,8 @@ typedef struct vsf_linux_t {
         vsf_bitmap(vsf_linux_pls_bitmap) bitmap;
     } pls;
 #endif
+
+    char hostname[HOST_NAME_MAX + 1];
 } vsf_linux_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -575,6 +577,8 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
     vsf_linux_glibc_init();
 #endif
+
+    sethostname(VSF_LINUX_CFG_HOSTNAME, strlen(VSF_LINUX_CFG_HOSTNAME));
 
     // create kernel process(pid0)
     if (NULL != __vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, VSF_LINUX_CFG_PRIO_LOWEST)) {
@@ -1736,12 +1740,18 @@ size_t getpagesize(void)
 
 int gethostname(char *name, size_t len)
 {
-    return -1;
+    strncpy(name, __vsf_linux.hostname, len);
+    return 0;
 }
 
 int sethostname(const char *name, size_t len)
 {
-    return -1;
+    if (len > HOST_NAME_MAX) {
+        return -1;
+    }
+    memcpy(__vsf_linux.hostname, name, len);
+    __vsf_linux.hostname[len] = '\0';
+    return 0;
 }
 
 // spawn.h

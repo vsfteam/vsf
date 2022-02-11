@@ -67,6 +67,10 @@
 #   endif
 #endif
 
+#ifndef VSF_LINUX_CFG_HOSTNAME
+#   define VSF_LINUX_CFG_HOSTNAME               "vsf"
+#endif
+
 #ifndef VSF_LINUX_CFG_BIN_PATH
 #   define VSF_LINUX_CFG_BIN_PATH               "/bin"
 #endif

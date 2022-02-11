@@ -9,6 +9,10 @@ extern "C" {
 #   define MAX_PATH             260
 #endif
 
+#ifndef HOST_NAME_MAX
+#   define HOST_NAME_MAX        64
+#endif
+
 #ifdef __cplusplus
 }
 #endif
