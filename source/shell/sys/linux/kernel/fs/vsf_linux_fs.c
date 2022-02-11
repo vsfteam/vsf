@@ -530,7 +530,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             VSF_LINUX_ASSERT(priv != NULL);
             orig = vsf_protect_sched();
                 priv->trigger = NULL;
-                priv->events = priv->events_triggered;
+                priv->events |= priv->events_triggered;
                 priv->events_triggered = 0;
             vsf_unprotect_sched(orig);
         }
