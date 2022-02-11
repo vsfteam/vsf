@@ -30,13 +30,20 @@
 #define VSF_USART_CFG_IMPLEMENT_OP                      ENABLED
 #define VSF_USART_CFG_IMPLEMENT_REQUEST_BY_FIFO         ENABLED
 #define VSF_USART_CFG_INSTANCE_PREFIX                   vsf_hw
-#define VSF_USART_CFG_USART_COUNT                       VSF_HW_USART_COUNT
-#define VSF_USART_CFG_USART_MASK                        VSF_HW_USART_MASK
-#define VSF_USART_CFG_USART_IMP_LV0                     VSF_HW_USART_IMP_LV0
+
+#ifndef VSF_HW_USART_COUNT
+#   error "Please define macro VSF_HW_USART_COUNT"
+#else
+#   define VSF_USART_CFG_TEMPLATE_COUNT                 VSF_HW_USART_COUNT
+#endif
+
+#ifdef  VSF_HW_USART_MASK
+#   define VSF_USART_CFG_TEMPLATE_MASK                  VSF_HW_USART_MASK
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_HW_USART_IMP_LV0(__count, __dont_care)                              \
+#define VSF_USART_CFG_IMP_LV0(__count, __dont_care)                             \
     static const vsf_hw_usart_clock_t vsf_usart##__count##_clock = {            \
         .hclk   = CSC_HCLKME_UART##__count##_EN_BIT,                            \
         .oclk   = CSC_OCLKME_UART##__count##_EN_BIT,                            \
@@ -83,11 +90,6 @@ typedef struct vsf_hw_usart_t {
     uint8_t              index;
 } vsf_hw_usart_t;
 
-
-/*============================ PROTOTYPES ====================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ INCLUDES ======================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 vsf_err_t vsf_hw_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)

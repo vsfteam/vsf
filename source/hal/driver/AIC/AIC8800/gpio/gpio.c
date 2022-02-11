@@ -31,7 +31,6 @@
 
 #define VSF_GPIO_CFG_IMPLEMENT_OP                       ENABLED
 #define VSF_GPIO_CFG_INSTANCE_PREFIX                    vsf_hw
-#include "hal/driver/common/gpio/gpio_template.inc"
 
 /*============================ MACROS ========================================*/
 
@@ -45,9 +44,20 @@
 #define __VSF_HW_GPIO_IS_VAILID_FEATURE(__F)                                    \
     ((__F & ~(uint32_t)__IO_FEATURE_MASK) == 0)
 
+
+#ifndef VSF_HW_GPIO_COUNT
+#   error "Please define macro VSF_HW_GPIO_COUNT"
+#else
+#   define VSF_GPIO_CFG_TEMPLATE_COUNT      VSF_HW_GPIO_COUNT
+#endif
+
+#ifdef  VSF_HW_GPIO_MASK
+#   define VSF_GPIO_CFG_TEMPLATE_MASK       VSF_HW_GPIO_MASK
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_GPIO_IPM_LV0(__COUNT, __dont_care)                             \
+#define VSF_GPIO_CFG_IMP_LV0(__COUNT, __dont_care)                              \
     vsf_hw_gpio_t vsf_gpio##__COUNT = {                                         \
         VSF_GPIO_OP                                                             \
         .GPIO = REG_GPIO##__COUNT,                                              \
@@ -81,10 +91,6 @@ typedef struct vsf_hw_gpio_t {
     AIC_IOMUX_TypeDef *IOMUX;
     uint8_t pin_sel[VSF_HW_GPIO_PIN_MAX];
 } vsf_hw_gpio_t;
-
-/*============================ GLOBAL VARIABLES ==============================*/
-
-VSF_MREPEAT(VSF_HW_GPIO_COUNT, __VSF_HW_GPIO_IPM_LV0, NULL)
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -202,5 +208,9 @@ void vsf_hw_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     VSF_HAL_ASSERT(0);
 }
 #endif
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/gpio/gpio_template.inc"
 
 #endif      // VSF_HAL_USE_GPIO

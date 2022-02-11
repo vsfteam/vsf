@@ -31,14 +31,20 @@
 #define VSF_USART_REIMPLEMENT_MODE          ENABLED
 #define VSF_USART_REIMPLEMENT_IRQ_MASK      ENABLED
 
-#define VSF_USART_CFG_USART_COUNT           VSF_HW_USART_COUNT
-#define VSF_USART_CFG_USART_DEC_LV0         VSF_HW_USART_DEC_LV0
-#define VSF_USART_CFG_USART_MASK            VSF_HW_USART_MASK
+#ifndef VSF_HW_USART_COUNT
+#   error "Please define macro VSF_HW_USART_COUNT"
+#else
+#   define VSF_USART_CFG_TEMPLATE_COUNT     VSF_HW_USART_COUNT
+#endif
+
+#ifdef  VSF_HW_USART_MASK
+#   define VSF_USART_CFG_TEMPLATE_MASK      VSF_HW_USART_MASK
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_HW_USART_DEC_LV0(__COUNT, __dont_care)                              \
-    extern vsf_usart_request_t vsf_usart##__COUNT;
+#define VSF_USART_CFG_DEC_LV0(__count, __dont_care)                             \
+    extern vsf_usart_request_t vsf_usart ## __count;
 
 /*============================ TYPES =========================================*/
 

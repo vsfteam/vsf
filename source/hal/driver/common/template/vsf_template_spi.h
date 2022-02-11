@@ -340,7 +340,44 @@ def_interface(i_spi_t)
 end_def_interface(i_spi_t)
 //! @}
 
-/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#ifdef VSF_SPI_CFG_TEMPLATE_COUNT
+#   ifndef VSF_SPI_CFG_TEMPLATE_MASK
+#       define VSF_SPI_CFG_TEMPLATE_MASK         ((1ul << VSF_SPI_CFG_TEMPLATE_COUNT) - 1)
+#   endif
+
+#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 0)
+        VSF_SPI_CFG_DEC_LV0(0, NULL)
+#   endif
+#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 1)
+        VSF_SPI_CFG_DEC_LV0(1, NULL)
+#   endif
+#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 2)
+        VSF_SPI_CFG_DEC_LV0(2, NULL)
+#   endif
+#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 3)
+        VSF_SPI_CFG_DEC_LV0(3, NULL)
+#   endif
+#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 4)
+        VSF_SPI_CFG_DEC_LV0(4, NULL)
+#   endif
+#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 5)
+        VSF_SPI_CFG_DEC_LV0(5, NULL)
+#   endif
+#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 6)
+        VSF_SPI_CFG_DEC_LV0(6, NULL)
+#   endif
+#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 7)
+        VSF_SPI_CFG_DEC_LV0(7, NULL)
+#   endif
+
+#   undef VSF_SPI_CFG_TEMPLATE_COUNT
+#   undef VSF_SPI_CFG_TEMPLATE_MASK
+#   undef VSF_SPI_CFG_DEC_LV0
+#endif
+
+
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t        vsf_spi_init(               vsf_spi_t *spi_ptr,

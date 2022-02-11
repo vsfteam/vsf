@@ -146,39 +146,39 @@ static const vsf_usart_op_t VSF_USART_FIFO2REQ_OP_VAR = {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#ifdef VSF_USART_CFG_USART_COUNT
-#   ifndef VSF_USART_CFG_USART_MASK
-#       define VSF_USART_CFG_USART_MASK     ((1ul << VSF_USART_CFG_USART_COUNT) - 1)
+#ifdef VSF_USART_CFG_TEMPLATE_COUNT
+#   ifndef VSF_USART_CFG_TEMPLATE_MASK
+#       define VSF_USART_CFG_TEMPLATE_MASK     ((1ul << VSF_USART_CFG_TEMPLATE_COUNT) - 1)
 #   endif
 
-#   if VSF_USART_CFG_USART_MASK & (1 << 0)
-        VSF_USART_CFG_USART_IMP_LV0(0, NULL)
+#   if VSF_USART_CFG_TEMPLATE_MASK & (1 << 0)
+        VSF_USART_CFG_IMP_LV0(0, NULL)
 #   endif
-#   if VSF_USART_CFG_USART_MASK & (1 << 1)
-        VSF_USART_CFG_USART_IMP_LV0(1, NULL)
+#   if VSF_USART_CFG_TEMPLATE_MASK & (1 << 1)
+        VSF_USART_CFG_IMP_LV0(1, NULL)
 #   endif
-#   if VSF_USART_CFG_USART_MASK & (1 << 2)
-        VSF_USART_CFG_USART_IMP_LV0(2, NULL)
+#   if VSF_USART_CFG_TEMPLATE_MASK & (1 << 2)
+        VSF_USART_CFG_IMP_LV0(2, NULL)
 #   endif
-#   if VSF_USART_CFG_USART_MASK & (1 << 3)
-        VSF_USART_CFG_USART_IMP_LV0(3, NULL)
+#   if VSF_USART_CFG_TEMPLATE_MASK & (1 << 3)
+        VSF_USART_CFG_IMP_LV0(3, NULL)
 #   endif
-#   if VSF_USART_CFG_USART_MASK & (1 << 4)
-        VSF_USART_CFG_USART_IMP_LV0(4, NULL)
+#   if VSF_USART_CFG_TEMPLATE_MASK & (1 << 4)
+        VSF_USART_CFG_IMP_LV0(4, NULL)
 #   endif
-#   if VSF_USART_CFG_USART_MASK & (1 << 5)
-        VSF_USART_CFG_USART_IMP_LV0(5, NULL)
+#   if VSF_USART_CFG_TEMPLATE_MASK & (1 << 5)
+        VSF_USART_CFG_IMP_LV0(5, NULL)
 #   endif
-#   if VSF_USART_CFG_USART_MASK & (1 << 6)
-        VSF_USART_CFG_USART_IMP_LV0(6, NULL)
+#   if VSF_USART_CFG_TEMPLATE_MASK & (1 << 6)
+        VSF_USART_CFG_IMP_LV0(6, NULL)
 #   endif
-#   if VSF_USART_CFG_USART_MASK & (1 << 7)
-        VSF_USART_CFG_USART_IMP_LV0(7, NULL)
+#   if VSF_USART_CFG_TEMPLATE_MASK & (1 << 7)
+        VSF_USART_CFG_IMP_LV0(7, NULL)
 #   endif
 
-#   undef VSF_USART_CFG_USART_COUNT
-#   undef VSF_USART_CFG_USART_MASK
-#   undef VSF_USART_CFG_USART_IMP_LV0
+#   undef VSF_USART_CFG_TEMPLATE_COUNT
+#   undef VSF_USART_CFG_TEMPLATE_MASK
+#   undef VSF_USART_CFG_IMP_LV0
 #endif
 
 /*============================ PROTOTYPES ====================================*/
