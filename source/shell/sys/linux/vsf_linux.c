@@ -1078,6 +1078,16 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     vsf_heap_free(thread);
 }
 
+void vsf_linux_detach_process(vsf_linux_process_t *process)
+{
+    if (process->parent_process != NULL) {
+        vsf_protect_t orig = vsf_protect_sched();
+            vsf_dlist_remove(vsf_linux_process_t, child_node, &process->parent_process->child_list, process);
+        vsf_unprotect_sched(orig);
+        process->parent_process = NULL;
+    }
+}
+
 int daemon(int nochdir, int noclose)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
@@ -1097,12 +1107,7 @@ int daemon(int nochdir, int noclose)
     }
 
     process->shell_process = process;
-    if (process->parent_process != NULL) {
-        vsf_protect_t orig = vsf_protect_sched();
-            vsf_dlist_remove(vsf_linux_process_t, child_node, &process->parent_process->child_list, process);
-        vsf_unprotect_sched(orig);
-        process->parent_process = NULL;
-    }
+    vsf_linux_detach_process(process);
 
     vsf_linux_thread_t *thread_pending;
     vsf_protect_t orig = vsf_protect_sched();

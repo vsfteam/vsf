@@ -402,6 +402,12 @@ int __vsh_run_cmd(char *cmd)
         free(real_cmd);
     }
 
+    if (is_background) {
+        for (int i = 0; i < process_cnt; i++) {
+            vsf_linux_detach_process(processes[i]);
+        }
+    }
+
     for (int i = 0; i < process_cnt; i++) {
         vsf_linux_start_process(processes[i]);
     }
