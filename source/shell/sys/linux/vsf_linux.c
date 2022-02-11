@@ -434,6 +434,9 @@ int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout
 #endif
 
     vsf_sync_reason_t r = vsf_thread_trig_pend(&trig->use_as__vsf_trig_t, timeout);
+    orig = vsf_protect_sched();
+        trig->pending_process = NULL;
+    vsf_unprotect_sched(orig);
     if (VSF_SYNC_TIMEOUT == r) {
         return 1;
     }
@@ -1515,7 +1518,7 @@ vsf_systimer_tick_t vsf_linux_sleep(vsf_systimer_tick_t ticks)
 int usleep(int usec)
 {
     errno = 0;
-    vsf_systimer_tick_t ticks_remain = vsf_linux_sleep(vsf_systimer_us_to_tick(usec));
+    vsf_linux_sleep(vsf_systimer_us_to_tick(usec));
     return errno != 0 ? -1 : 0;
 }
 
