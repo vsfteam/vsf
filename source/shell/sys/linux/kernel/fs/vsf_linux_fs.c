@@ -1119,6 +1119,12 @@ int fdatasync(int fd)
     return 0;
 }
 
+int ftruncate(int fd, off_t length)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 int fstat(int fd, struct stat *buf)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);

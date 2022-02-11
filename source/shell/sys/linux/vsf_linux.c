@@ -137,6 +137,9 @@ typedef struct vsf_linux_t {
 #endif
 
     char hostname[HOST_NAME_MAX + 1];
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    struct tm tm;
+#endif
 } vsf_linux_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -1606,6 +1609,39 @@ key_t ftok(const char *pathname, int id)
 
 // sys/time.h
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+struct tm * gmtime_r(const time_t *timep, struct tm *result)
+{
+#ifdef VSF_LINUX_CFG_RTC
+    vsf_rtc_tm_t rtc_tm;
+    VSF_RTC_GET(&VSF_LINUX_CFG_RTC, &rtc_tm);
+
+    VSF_LINUX_ASSERT(rtc_tm.tm_year >= 1900);
+    VSF_LINUX_ASSERT(result != NULL);
+    result->tm_sec = rtc_tm.tm_sec;
+    result->tm_min = rtc_tm.tm_min;
+    result->tm_hour = rtc_tm.tm_hour;
+    result->tm_mday = rtc_tm.tm_mday;
+    result->tm_mon = rtc_tm.tm_mon - 1;
+    result->tm_year = rtc_tm.tm_year - 1900;
+#endif
+    return result;
+}
+
+struct tm * gmtime(const time_t *timep)
+{
+    return gmtime_r(timep, &__vsf_linux.tm);
+}
+
+struct tm * localtime_r(const time_t *timep, struct tm *result)
+{
+    return gmtime_r(timep, result);
+}
+
+struct tm * localtime(const time_t *timep)
+{
+    return localtime_r(timep, &__vsf_linux.tm);
+}
+
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
 #ifdef VSF_LINUX_CFG_RTC
