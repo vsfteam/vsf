@@ -118,8 +118,6 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-typedef enum em_usart_mode_t em_usart_mode_t;
-
 #if VSF_USART_REIMPLEMENT_MODE == DISABLED
 /*! \name usart working mode
  *! \note if your peripheral has any customised configuration, please reimplement
@@ -159,6 +157,8 @@ enum em_usart_mode_t {
     USART_ENABLE_MASK           = USART_TX_ENABLE | USART_RX_ENABLE,
 };
 #endif
+
+typedef enum em_usart_mode_t em_usart_mode_t;
 
 typedef enum em_usart_irq_mask_t em_usart_irq_mask_t;
 

@@ -37,10 +37,6 @@
     typedef struct vsf_usart_request_t vsf_usart_request_t;                     \
     extern vsf_usart_request_t vsf_usart##__COUNT;
 
-/*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_usart.h"
-
 /*============================ TYPES =========================================*/
 
 enum em_usart_mode_t {
@@ -104,6 +100,10 @@ enum em_usart_irq_mask_t {
                                      | USART_IRQ_MASK_RX_TIMEOUT
                                      | USART_IRQ_MASK_ERROR,
 };
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/template/vsf_template_usart.h"
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
