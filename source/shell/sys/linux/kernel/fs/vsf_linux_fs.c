@@ -1107,6 +1107,7 @@ int fstat(int fd, struct stat *buf)
     } else if ( (&vsf_linux_pipe_rx_fdop == sfd->op)
             ||  (&vsf_linux_pipe_tx_fdop == sfd->op)) {
         buf->st_mode = S_IFIFO;
+        return 0;
 #if VSF_LINUX_USE_SOCKET == ENABLED
     } else if (
 #   if VSF_LINUX_SOCKET_USE_UNIX == ENABLED
