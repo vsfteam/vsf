@@ -40,7 +40,7 @@
 #       include "./adc/adc.h"
 #       include "./flash/flash.h"
 #       include "./pwm/pwm.h"
-#       include "./i2c/i2c.h"
+//#       include "./i2c/i2c.h" /* TODO: fixed i2c build error in cpp */
 #       include "./trng/trng.h"
 
 // mbedtls configurations ONLY in mbedtls_aic8800.h

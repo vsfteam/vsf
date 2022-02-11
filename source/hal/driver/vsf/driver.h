@@ -31,7 +31,7 @@
 #endif
 
 #if VSF_HAL_USE_I2C_GPIO == ENABLED
-#   include "./i2c/i2c_gpio/i2c_gpio.h"
+//#   include "./i2c/i2c_gpio/i2c_gpio.h"
 #endif
 
 /*============================ MACROS ========================================*/
