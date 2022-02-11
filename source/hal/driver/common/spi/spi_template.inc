@@ -30,7 +30,7 @@
 #   define VSF_SPI_CFG_INSTANCE_PREFIX                vsf_hw
 #endif
 
-#if VSF_SPI_CFG_MULTI_INSTANCES == DISABLED
+#if VSF_SPI_CFG_MULTI_CLASS == DISABLED
 #   define VSF_SPI_OP
 #else
 #   define ____VSF_SPI_OP(__p)                        .vsf_spi.op = & __ ## __p ## _spi_op,
@@ -88,7 +88,7 @@ __VSF_SPI_APIS(VSF_SPI_CFG_INSTANCE_PREFIX)
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if VSF_SPI_CFG_MULTI_INSTANCES == ENABLED && VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_SPI_CFG_MULTI_CLASS == ENABLED && VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
 
 #   undef   __VSF_SPI_API
 #   define  __VSF_SPI_API(__prefix_name, __return, __name, ...)                   \

@@ -30,7 +30,7 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_rtc_t {
-#if VSF_SPI_CFG_MULTI_INSTANCES == ENABLED
+#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
     vsf_rtc_t vsf_rtc;
 #endif
 

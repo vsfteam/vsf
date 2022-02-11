@@ -91,7 +91,6 @@ typedef enum em_spi_mode_t {
     SPI_MODE_MASK                    = __SPI_HW_MODE_MASK | SPI_DATASIZE_MASK,
 } em_spi_mode_t;
 
-
 typedef struct vsf_hw_spi_t vsf_hw_spi_t;
 
 /*============================ INCLUDES ======================================*/

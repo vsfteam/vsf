@@ -26,7 +26,7 @@
 #   define VSF_GPIO_CFG_IMPLEMENT_OP                    DISABLED
 #endif
 
-#if VSF_GPIO_CFG_MULTI_INSTANCES == DISABLED
+#if VSF_GPIO_CFG_MULTI_CLASS == DISABLED
 #   define VSF_GPIO_OP
 #else
 #   define ____VSF_GPIO_OP(__p) .vsf_gpio.op = & __p ## _gpio_op,
@@ -108,7 +108,7 @@ __VSF_GPIO_APIS(VSF_GPIO_CFG_INSTANCE_PREFIX)
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if VSF_GPIO_CFG_MULTI_INSTANCES == ENABLED && VSF_GPIO_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_GPIO_CFG_MULTI_CLASS == ENABLED && VSF_GPIO_CFG_IMPLEMENT_OP == ENABLED
 static const vsf_gpio_op_t vsf_hw_gpio_op = {
 
 #undef   __VSF_GPIO_API

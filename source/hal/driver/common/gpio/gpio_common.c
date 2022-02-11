@@ -20,7 +20,7 @@
 
 #include "hal/driver/driver.h"
 
-#if VSF_HAL_USE_GPIO == ENABLED && VSF_GPIO_CFG_MULTI_INSTANCES == ENABLED
+#if VSF_HAL_USE_GPIO == ENABLED && VSF_GPIO_CFG_MULTI_CLASS == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
