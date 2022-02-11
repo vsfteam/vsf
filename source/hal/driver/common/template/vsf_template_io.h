@@ -437,6 +437,8 @@ typedef struct vsf_gpio_t  {
 } vsf_gpio_t;
 #endif
 
+// TODO: support c plus plus
+#ifndef __cplusplus
 //! \name gpio control interface
 //! @{
 dcl_interface(i_gpio_t)
@@ -487,11 +489,15 @@ def_interface(i_io_t)
     };
 end_def_interface(i_io_t)
 //! @}
-
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+// TODO: support c plus plus
+#ifndef __cplusplus
 //! \brief io interface
 extern const i_io_t VSF_IO;
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
