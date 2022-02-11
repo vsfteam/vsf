@@ -188,7 +188,41 @@ void VSF_GPIO_FN_OUTPUT_AND_CLEAR(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 }
 #endif
 
-/*============================ TYPES =========================================*/
-/*============================ IMPLEMENTATION ================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+
+#ifdef VSF_GPIO_CFG_TEMPLATE_COUNT
+#   ifndef VSF_GPIO_CFG_TEMPLATE_MASK
+#       define VSF_GPIO_CFG_TEMPLATE_MASK     ((1ul << VSF_GPIO_CFG_TEMPLATE_COUNT) - 1)
+#   endif
+
+#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 0)
+        VSF_GPIO_CFG_IMP_LV0(0, NULL)
+#   endif
+#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 1)
+        VSF_GPIO_CFG_IMP_LV0(1, NULL)
+#   endif
+#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 2)
+        VSF_GPIO_CFG_IMP_LV0(2, NULL)
+#   endif
+#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 3)
+        VSF_GPIO_CFG_IMP_LV0(3, NULL)
+#   endif
+#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 4)
+        VSF_GPIO_CFG_IMP_LV0(4, NULL)
+#   endif
+#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 5)
+        VSF_GPIO_CFG_IMP_LV0(5, NULL)
+#   endif
+#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 6)
+        VSF_GPIO_CFG_IMP_LV0(6, NULL)
+#   endif
+#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 7)
+        VSF_GPIO_CFG_IMP_LV0(7, NULL)
+#   endif
+
+#   undef VSF_GPIO_CFG_TEMPLATE_COUNT
+#   undef VSF_GPIO_CFG_TEMPLATE_MASK
+#   undef VSF_GPIO_CFG_IMP_LV0
+#endif
 
 #endif // VSF_HAL_USE_GPIO == ENABLED

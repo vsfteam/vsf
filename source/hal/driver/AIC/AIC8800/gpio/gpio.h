@@ -28,11 +28,21 @@
 #   include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HW_GPIO_COUNT
+#   error "Please define macro VSF_HW_GPIO_COUNT"
+#else
+#   define VSF_GPIO_CFG_TEMPLATE_COUNT      VSF_HW_GPIO_COUNT
+#endif
+
+#ifdef  VSF_HW_GPIO_MASK
+#   define VSF_GPIO_CFG_TEMPLATE_MASK       VSF_HW_GPIO_MASK
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_GPIO_DEC_LV0(__COUNT, __dont_care)                             \
-    extern vsf_hw_gpio_t vsf_gpio##__COUNT;
-
+#define VSF_GPIO_CFG_DEC_LV0(__count, __dont_care)                              \
+    extern vsf_hw_gpio_t vsf_gpio ## __count;
 
 /*============================ TYPES =========================================*/
 
@@ -53,22 +63,11 @@ enum io_pin_no_t {
     TODO_REMOVE,
 };
 
-/*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_io.h"
-
-/*============================ TYPES =========================================*/
-
 typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
 
 /*============================ INCLUDES ======================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
 
-VSF_MREPEAT(VSF_HW_GPIO_COUNT, __VSF_HW_GPIO_DEC_LV0, NULL)
-
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
+#include "hal/driver/common/template/vsf_template_io.h"
 
 #endif /* VSF_HAL_USE_GPIO */
 #endif /* __HAL_DRIVER_AIC8800_HW_GPIO_H__ */

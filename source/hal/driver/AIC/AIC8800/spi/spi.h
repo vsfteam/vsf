@@ -28,11 +28,24 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_SPI_REIMPLEMENT_MODE                ENABLED
-
+#define VSF_SPI_REIMPLEMENT_MODE            ENABLED
 #define SPI_DATASIZE_TO_BYTE(__S)           (((((__S) & SPI_DATASIZE_MASK) >> 2) + 7) / 8)
 
+#ifndef VSF_HW_SPI_COUNT
+#   error "Please define macro VSF_HW_SPI_COUNT"
+#else
+#   define VSF_SPI_CFG_TEMPLATE_COUNT               VSF_HW_SPI_COUNT
+#endif
+
+#ifdef  VSF_HW_SPI_MASK
+#   define VSF_SPI_CFG_TEMPLATE_MASK             VSF_HW_SPI_MASK
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define VSF_SPI_CFG_DEC_LV0(__count, __dont_care)                               \
+    extern vsf_hw_spi_t vsf_spi ## __count;
+
 /*============================ TYPES =========================================*/
 
 typedef enum em_spi_mode_t {
@@ -97,12 +110,5 @@ typedef struct vsf_hw_spi_t vsf_hw_spi_t;
 
 #include "hal/driver/common/template/vsf_template_spi.h"
 
-/*============================ GLOBAL VARIABLES ==============================*/
-
-extern vsf_hw_spi_t vsf_spi0;
-
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
 #endif  /*  VSF_HAL_USE_SPI */
 #endif  /* EOF */

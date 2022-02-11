@@ -24,38 +24,47 @@
 #include "../vendor/plf/aic8800/src/driver/dma/dma_api.h"
 
 #define VSF_SPI_CFG_IMPLEMENT_OP            ENABLED
-#include "hal/driver/common/spi/spi_template.inc"
 
 /*============================ MACROS ========================================*/
 
-#ifndef SPI_DMA_CFG_BYTE_CNT_MAX
-#   define SPI_DMA_CFG_BYTE_CNT_MAX     65535
+#ifndef VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX
+#   define VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX      65535
+#endif
+
+#ifndef VSF_HW_SPI_COUNT
+#   error "Please define macro VSF_HW_SPI_COUNT"
+#else
+#   define VSF_SPI_CFG_TEMPLATE_COUNT           VSF_HW_SPI_COUNT
+#endif
+
+#ifdef  VSF_HW_SPI_MASK
+#   define VSF_SPI_CFG_TEMPLATE_MASK            VSF_HW_SPI_MASK
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_SPI_IMP_LV0(__count, __dont_care)                              \
+#define VSF_SPI_CFG_IMP_LV0(__count, __dont_care)                               \
     static const vsf_hw_spi_cosnt_t vsf_spi ##__count ## _const = {             \
         .reg = REG_SPI##__count,                                                \
         .irqn = {                                                               \
-            .spi    = SPI ##__count ## _IRQ_IDX,                                \
-            .dma_rx = SPI ##__count ## _RXDMA_IRQ_IDX,                          \
-            .dma_tx = SPI ##__count ## _TXDMA_IRQ_IDX,                          \
+            .spi    = VSF_HW_SPI ##__count ## _IRQ_IDX,                         \
+            .dma_rx = VSF_HW_SPI ##__count ## _RXDMA_IRQ_IDX,                   \
+            .dma_tx = VSF_HW_SPI ##__count ## _TXDMA_IRQ_IDX,                   \
         },                                                                      \
         .request = {                                                            \
             .send = {                                                           \
-                .channel = SPI ##__count ## _TXDMA_CH_IDX,                      \
-                .cid     = SPI ##__count ## _TXDMA_CID,                         \
+                .channel = VSF_HW_SPI ##__count ## _TXDMA_CH_IDX,               \
+                .cid     = VSF_HW_SPI ##__count ## _TXDMA_CID,                  \
             },                                                                  \
             .recv = {                                                           \
-                .channel = SPI ##__count ## _RXDMA_CH_IDX,                      \
-                .cid     = SPI ##__count ## _RXDMA_CID,                         \
+                .channel = VSF_HW_SPI ##__count ## _RXDMA_CH_IDX,               \
+                .cid     = VSF_HW_SPI ##__count ## _RXDMA_CID,                  \
             },                                                                  \
         },                                                                      \
         .clock = {                                                              \
-            .hclk = SPI ##__count## _HCLKME_EN_BIT,                             \
-            .oclk = SPI ##__count## _OCLKME_EN_BIT,                             \
-            .pclk = SPI ##__count## _PCLKME_EN_BIT,                             \
+            .hclk = VSF_HW_SPI ##__count## _HCLKME_EN_BIT,                      \
+            .oclk = VSF_HW_SPI ##__count## _OCLKME_EN_BIT,                      \
+            .pclk = VSF_HW_SPI ##__count## _PCLKME_EN_BIT,                      \
         },                                                                      \
     };                                                                          \
     vsf_hw_spi_t vsf_spi##__count = {                                           \
@@ -64,11 +73,11 @@
     };                                                                          \
     void SPI ##__count ## _RXDMA_IRQ(void)                                      \
     {                                                                           \
-        __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_CPL);                \
+        __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_CPL);                    \
     }                                                                           \
     void SPI ##__count ## _TXDMA_IRQ(void)                                      \
     {                                                                           \
-        __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_TX_CPL);             \
+        __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_TX_CPL);                 \
     }
 
 /*============================ TYPES =========================================*/
@@ -117,14 +126,6 @@ typedef struct vsf_hw_spi_t {
     } request;
 } vsf_hw_spi_t;
 
-static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask);
-
-/*============================ GLOBAL VARIABLES ==============================*/
-
-VSF_MREPEAT(SPI_MAX_PORT, __VSF_HW_SPI_IMP_LV0, NULL)
-
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 static vsf_err_t __clock_init(vsf_hw_spi_t *hw_spi_ptr, uint32_t clock_hz)
@@ -372,7 +373,7 @@ static void __spi_request_transfer(vsf_hw_spi_t *hw_spi_ptr)
     VSF_HAL_ASSERT(hw_spi_ptr->request.count > hw_spi_ptr->request.recv.offset);
 
     uint32_t count = min(hw_spi_ptr->request.count - hw_spi_ptr->request.recv.offset,
-                         SPI_DMA_CFG_BYTE_CNT_MAX);
+                         VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX);
     uint32_t byte_cnt = SPI_DATASIZE_TO_BYTE(reg->CR[0]);
 
     bool send_const_addr;
@@ -418,7 +419,7 @@ static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask)
         const int ch = spi_const->request.recv.channel;
         dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
 
-        hw_spi_ptr->request.recv.offset = min(hw_spi_ptr->request.recv.offset + SPI_DMA_CFG_BYTE_CNT_MAX,
+        hw_spi_ptr->request.recv.offset = min(hw_spi_ptr->request.recv.offset + VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX,
                                               hw_spi_ptr->request.count);
         VSF_HAL_ASSERT(hw_spi_ptr->request.count >= hw_spi_ptr->request.recv.offset);
 
@@ -437,7 +438,7 @@ static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask)
         const int ch = spi_const->request.send.channel;
         dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
 
-         hw_spi_ptr->request.send.offset = min(hw_spi_ptr->request.send.offset + SPI_DMA_CFG_BYTE_CNT_MAX,
+         hw_spi_ptr->request.send.offset = min(hw_spi_ptr->request.send.offset + VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX,
                                                hw_spi_ptr->request.count);
         if (hw_spi_ptr->request.count == hw_spi_ptr->request.send.offset) {
             cb_irq_mask = SPI_IRQ_MASK_TX_CPL;
@@ -530,5 +531,9 @@ int_fast32_t vsf_hw_spi_get_transfered_count(vsf_spi_t *spi_ptr)
 
     return hw_spi_ptr->request.recv.offset;
 }
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/spi/spi_template.inc"
 
 #endif      // VSF_HAL_USE_SPI
