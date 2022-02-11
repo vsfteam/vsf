@@ -123,7 +123,7 @@ extern "C" {
  *! \note if your peripheral has any customised configuration, please reimplement
  *!       em_usart_mode_t
  */
-enum em_usart_mode_t {
+typedef enum em_usart_mode_t {
     USART_NO_PARITY         = (0x0ul << 0),
     USART_EVEN_PARITY       = (0x1ul << 0),
     USART_ODD_PARITY        = (0x2ul << 0),
@@ -155,18 +155,14 @@ enum em_usart_mode_t {
     USART_TX_ENABLE             = (0x1ul << 7),
     USART_RX_ENABLE             = (0x1ul << 8),
     USART_ENABLE_MASK           = USART_TX_ENABLE | USART_RX_ENABLE,
-};
+} em_usart_mode_t;
 #endif
-
-typedef enum em_usart_mode_t em_usart_mode_t;
-
-typedef enum em_usart_irq_mask_t em_usart_irq_mask_t;
 
 #if VSF_USART_REIMPLEMENT_IRQ_MASK == DISABLED
 /*! \brief em_usart_irq_mask_t
  *! \note em_usart_irq_mask_t should provide irq masks
  */
-enum em_usart_irq_mask_t {
+typedef enum em_usart_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     USART_IRQ_MASK_TX               = (0x1ul << 0),
     USART_IRQ_MASK_RX               = (0x1ul << 1),
@@ -186,7 +182,7 @@ enum em_usart_irq_mask_t {
                                       | USART_IRQ_MASK_PARITY_ERR
                                       | USART_IRQ_MASK_BREAK_ERR
                                       | USART_IRQ_MASK_OVERFLOW_ERR,
-};
+} em_usart_irq_mask_t;
 #endif
 
 typedef struct vsf_usart_t vsf_usart_t;
@@ -268,9 +264,9 @@ typedef struct vsf_usart_op_t {
 } vsf_usart_op_t;
 
 #if VSF_USART_CFG_MULTI_INSTANCES == ENABLED
-typedef struct vsf_usart_t  {
+struct vsf_usart_t  {
         const vsf_usart_op_t * op;
-} vsf_usart_t;
+};
 #endif
 
 //! \name class: usart_t
