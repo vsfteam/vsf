@@ -107,7 +107,14 @@ void * pthread_getspecific(pthread_key_t key);
 enum {
     // pshared
     PTHREAD_PROCESS_SHARED              = 0,
+#define PTHREAD_PROCESS_SHARED          PTHREAD_PROCESS_SHARED
     PTHREAD_PROCESS_PRIVATE             = 1 << 0,
+#define PTHREAD_PROCESS_PRIVATE         PTHREAD_PROCESS_PRIVATE
+
+    PTHREAD_CREATE_JOINABLE             = 0,
+#define PTHREAD_CREATE_JOINABLE         PTHREAD_CREATE_JOINABLE
+    PTHREAD_CREATE_DETACHED             = 1,
+#define PTHREAD_CREATE_DETACHED         PTHREAD_CREATE_DETACHED
 
     // mutex
     PTHREAD_MUTEX_ERRORCHECK            = 1 << 1,

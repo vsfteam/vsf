@@ -82,28 +82,23 @@ static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
     thread->retval = (int)priv->entry(priv->param);
 }
 
-int pthread_detach(pthread_t thread)
+int pthread_detach(pthread_t tid)
 {
+    vsf_linux_thread_t *thread = vsf_linux_get_thread(tid);
+    if (thread != NULL) {
+        vsf_linux_detach_thread(thread);
+    }
     return 0;
 }
 
 int pthread_join(pthread_t tid, void **retval)
 {
-    vsf_protect_t orig = vsf_protect_sched();
-    vsf_linux_thread_t *thread = vsf_linux_get_thread(tid);
-    if (NULL == thread) {
-        vsf_unprotect_sched(orig);
-        return -1;
-    }
-
-    thread->thread_pending = vsf_linux_get_cur_thread();
-    vsf_unprotect_sched(orig);
-    vsf_thread_wfe(VSF_EVT_USER);
-
+    int retval_int;
+    int ret = vsf_linux_wait_thread(tid, &retval_int);
     if (retval != NULL) {
-        *retval = (void *)thread->retval;
+        *retval = (void *)retval_int;
     }
-    return 0;
+    return ret;
 }
 
 void pthread_exit(void *retval)
@@ -156,6 +151,10 @@ int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_r
 
     if (tidp != NULL) {
         *tidp = thread->tid;
+    }
+
+    if (attr->detachstate == PTHREAD_CREATE_DETACHED) {
+        pthread_detach(thread->tid);
     }
 
     vsf_prio_t priority = attr->inheritsched ? vsf_prio_inherit : attr->schedparam.sched_priority;

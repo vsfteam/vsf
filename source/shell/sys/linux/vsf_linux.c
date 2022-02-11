@@ -759,7 +759,7 @@ int vsf_linux_start_process(vsf_linux_process_t *process)
     return vsf_linux_start_thread(thread, vsf_prio_inherit);
 }
 
-void vsf_linux_delete_process(vsf_linux_process_t *process)
+void vsf_linux_cleanup_process(vsf_linux_process_t *process)
 {
     vsf_linux_fd_t *sfd;
     for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
@@ -816,17 +816,26 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
 #   endif
     }
 #endif
+}
 
-    __free_ex(vsf_linux_resources_process(), process);
+void vsf_linux_delete_process(vsf_linux_process_t *process)
+{
+    vsf_linux_cleanup_process(process);
+
+    // DO NOT free process here, should be freed in waitpid in host process
+    if (NULL == process->parent_process) {
+        __free_ex(vsf_linux_resources_process(), process);
+    }
 }
 
 void vsf_linux_exit_process(int status)
 {
+    vsf_linux_thread_t *thread2wait;
+    vsf_linux_process_t *process2wait;
     vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
     vsf_linux_process_t *process = cur_thread->process;
     VSF_LINUX_ASSERT(process != NULL);
     vsf_protect_t orig;
-    bool need_wait;
 
     orig = vsf_protect_sched();
         if (process->thread_pending_exit != NULL) {
@@ -839,49 +848,55 @@ void vsf_linux_exit_process(int status)
         process->status = status << 8;
     // 1. dequeue cur_thread and wait all other threads
         vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, cur_thread);
-        need_wait = !vsf_dlist_is_empty(&process->thread_list);
     vsf_unprotect_sched(orig);
-
-    if (need_wait) {
-        do {
-            vsf_thread_wfe(VSF_EVT_USER);
-        } while (!vsf_dlist_is_empty(&process->thread_list));
-    }
 
     // 2. call atexit, some resources maybe freed by user
     if (process->fn_atexit != NULL) {
         process->fn_atexit();
     }
 
-    // 3. wait child processes
-    orig = vsf_protect_sched();
-        need_wait = false;
-        __vsf_dlist_foreach_unsafe(vsf_linux_process_t, child_node, &process->child_list) {
-            _->thread_pending = cur_thread;
-            need_wait = true;
+    // 3. wait child threads and processes
+    while (true) {
+        orig = vsf_protect_sched();
+            vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread2wait);
+        vsf_unprotect_sched(orig);
+        if (NULL == thread2wait) {
+            break;
         }
-    vsf_unprotect_sched(orig);
-    if (need_wait) {
-        do {
-            vsf_thread_wfe(VSF_EVT_USER);
-        } while (!vsf_dlist_is_empty(&process->child_list));
+
+        // tid < 0 is not user thread, do not print warning
+        if (thread2wait->tid >= 0) {
+            vsf_trace_warning("linux: undetached thread %d, need pthread_join before exit\n", thread2wait->tid);
+        }
+        vsf_linux_wait_thread(thread2wait->tid, NULL);
     }
 
-    // 5. detach from process_list
-    orig = vsf_protect_sched();
-        vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
-    vsf_unprotect_sched(orig);
+    while (true) {
+        orig = vsf_protect_sched();
+            vsf_dlist_peek_head(vsf_linux_process_t, child_node, &process->child_list, process2wait);
+        vsf_unprotect_sched(orig);
+        if (NULL == process2wait) {
+            break;
+        }
 
-    // 6. notify pending thread
+        vsf_trace_warning("linux: undetached process %d, need waitpid before exit\n", process2wait->id.pid);
+        waitpid(process2wait->id.pid, NULL, 0);
+    }
+
+    // 5. cleanup process
+    vsf_linux_cleanup_process(process);
+
+    // 6. notify pending thread, MUST be the last before exiting current thread
+    process->status &= ~PID_STATUS_RUNNING;
     if (process->thread_pending != NULL) {
+        vsf_unprotect_sched(orig);
         process->thread_pending->retval = process->status;
         vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
+    } else {
+        vsf_unprotect_sched(orig);
     }
 
-    // 7. delete process
-    vsf_linux_delete_process(process);
-
-    // 8. exit current thread
+    // 7. exit current thread
     cur_thread->process = NULL;
 end_no_return:
     vsf_thread_exit();
@@ -1060,22 +1075,21 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 
 void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
 {
+    vsf_protect_t orig = vsf_protect_sched();
+    thread->op = NULL;
     if (thread->thread_pending != NULL) {
+        vsf_unprotect_sched(orig);
         thread->thread_pending->retval = thread->retval;
         vsf_eda_post_evt(&thread->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
-    }
-
-    vsf_linux_process_t *process = thread->process;
-    if (process != NULL) {
-        vsf_protect_t orig = vsf_protect_sched();
-            vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
+    } else {
         vsf_unprotect_sched(orig);
 
-        if (process->thread_pending_exit != NULL) {
-            vsf_eda_post_evt(&process->thread_pending_exit->use_as__vsf_eda_t, VSF_EVT_USER);
+        vsf_linux_process_t *process = thread->process;
+        if (NULL == process) {
+            vsf_heap_free(thread);
+            return;
         }
     }
-    vsf_heap_free(thread);
 }
 
 void vsf_linux_detach_process(vsf_linux_process_t *process)
@@ -1086,6 +1100,41 @@ void vsf_linux_detach_process(vsf_linux_process_t *process)
         vsf_unprotect_sched(orig);
         process->parent_process = NULL;
     }
+}
+
+void vsf_linux_detach_thread(vsf_linux_thread_t *thread)
+{
+    vsf_linux_process_t *process = thread->process;
+    if (process != NULL) {
+        vsf_protect_t orig = vsf_protect_sched();
+            vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
+        vsf_unprotect_sched(orig);
+    }
+}
+
+int vsf_linux_wait_thread(int tid, int *retval)
+{
+    vsf_protect_t orig = vsf_protect_sched();
+    vsf_linux_thread_t *thread = vsf_linux_get_thread(tid);
+    if (NULL == thread) {
+        vsf_unprotect_sched(orig);
+        return -1;
+    }
+
+    if (thread->op != NULL) {
+        thread->thread_pending = vsf_linux_get_cur_thread();
+        vsf_unprotect_sched(orig);
+        vsf_thread_wfe(VSF_EVT_USER);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
+
+    if (retval != NULL) {
+        *retval = thread->retval;
+    }
+    vsf_linux_detach_thread(thread);
+    vsf_heap_free(thread);
+    return 0;
 }
 
 int daemon(int nochdir, int noclose)
@@ -1376,10 +1425,11 @@ pid_t waitpid(pid_t pid, int *status, int options)
 
     vsf_protect_t orig = vsf_protect_sched();
     vsf_linux_process_t *process = vsf_linux_get_process(pid);
-    if (NULL == process) {
+    if ((NULL == process) || (process->parent_process != cur_thread->process)) {
         vsf_unprotect_sched(orig);
         return -1;
     }
+    vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
     if (process->status & PID_STATUS_RUNNING) {
         process->thread_pending = cur_thread;
         vsf_unprotect_sched(orig);
@@ -1392,6 +1442,8 @@ pid_t waitpid(pid_t pid, int *status, int options)
     if (status != NULL) {
         *status = cur_thread->retval;
     }
+    vsf_linux_detach_process(process);
+    __free_ex(vsf_linux_resources_process(), process);
     return pid;
 }
 

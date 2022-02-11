@@ -353,11 +353,15 @@ extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entr
 
 extern vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_stream_t *stdio_stream, char *working_dir);
 extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
-extern void vsf_linux_detach_process(vsf_linux_process_t *process);
 // delete unstarted/existed process
 void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
 extern void vsf_linux_exit_process(int status);
+
+extern void vsf_linux_cleanup_process(vsf_linux_process_t *process);
+extern void vsf_linux_detach_process(vsf_linux_process_t *process);
+extern void vsf_linux_detach_thread(vsf_linux_thread_t *thread);
+extern int vsf_linux_wait_thread(int tid, int *retval);
 
 extern vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
             const vsf_linux_thread_op_t *op,
