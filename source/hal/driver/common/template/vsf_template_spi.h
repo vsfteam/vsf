@@ -103,12 +103,10 @@
 
 /*============================ TYPES =========================================*/
 
-typedef enum em_spi_mode_t em_spi_mode_t;
-
 #if VSF_SPI_REIMPLEMENT_MODE == DISABLED
 //! \name spi working mode
 //! @{
-enum em_spi_mode_t {
+typedef enum em_spi_mode_t {
     SPI_MASTER                  = 0x00ul << 0,      //!< select master mode
     SPI_SLAVE                   = 0x01ul << 0,      //!< select slave mode
     SPI_DIR_MODE_MASK           = 0x01ul << 0,
@@ -159,7 +157,7 @@ enum em_spi_mode_t {
     SPI_AUTO_CS_MASK            = 0x01ul << 9,
 
     SPI_LOOP_BACK               = 0x01ul << 10,     //!< enable loop back
-};
+} em_spi_mode_t;
 
 #define SPI_DATASIZE_TO_BYTE(__S)   (((((__S) & SPI_DATASIZE_MASK) >> 4) + 8) / 8)
 
@@ -170,7 +168,7 @@ enum em_spi_mode_t {
 /*! \brief em_spi_irq_mask_t
  *! \note em_spi_irq_mask_t should provide irq masks
  */
-enum em_spi_irq_mask_t {
+typedef enum em_spi_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     SPI_IRQ_MASK_TX             = 0x01ul << 0,
     SPI_IRQ_MASK_RX             = 0x01ul << 1,
@@ -190,10 +188,8 @@ enum em_spi_irq_mask_t {
                                  | SPI_IRQ_MASK_CPL
                                  | SPI_IRQ_MASK_RX_FIFO_FULL
                                  | SPI_IRQ_MASK_TX_FIFO_EMPTY,
-};
+} em_spi_irq_mask_t;
 #endif
-
-typedef enum em_spi_irq_mask_t em_spi_irq_mask_t;
 
 /* spi_status_t should implement peripheral_status_t */
 typedef struct spi_status_t spi_status_t;
