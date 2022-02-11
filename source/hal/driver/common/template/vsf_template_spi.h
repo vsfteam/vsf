@@ -166,8 +166,6 @@ enum em_spi_mode_t {
 //! @}
 #endif
 
-typedef enum em_spi_irq_mask_t em_spi_irq_mask_t;
-
 #if VSF_SPI_REIMPLEMENT_IRQ_MASK == DISABLED
 /*! \brief em_spi_irq_mask_t
  *! \note em_spi_irq_mask_t should provide irq masks
@@ -194,6 +192,8 @@ enum em_spi_irq_mask_t {
                                  | SPI_IRQ_MASK_TX_FIFO_EMPTY,
 };
 #endif
+
+typedef enum em_spi_irq_mask_t em_spi_irq_mask_t;
 
 /* spi_status_t should implement peripheral_status_t */
 typedef struct spi_status_t spi_status_t;
