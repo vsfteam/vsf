@@ -1515,7 +1515,7 @@ char * getcwd(char *buffer, size_t maxlen)
         errno = ERANGE;
         return NULL;
     }
-    strcpy(buffer, process->working_dir);
+    strncpy(buffer, process->working_dir, maxlen);
     return buffer;
 }
 
