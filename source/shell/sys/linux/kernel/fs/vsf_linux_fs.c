@@ -202,6 +202,7 @@ static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t
 static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    priv->file->attr &= ~VSF_FILE_ATTR_EXCL;
     __vsf_linux_fs_close_do(priv->file);
     return 0;
 }
@@ -790,31 +791,12 @@ int mkdir(const char *pathname, mode_t mode)
 
 int mkdirs(const char *pathname, mode_t mode)
 {
-    char *path_in_ram;
-    if ((NULL == pathname) || ('\0' == *pathname)) {
+    int fd = open(pathname, O_CREAT | O_DIRECTORY, mode);
+    if (fd < 0) {
         return -1;
     }
-    path_in_ram = strdup(pathname);
-    if (NULL == path_in_ram) {
-        return -1;
-    }
-
-    int ret = -1;
-    struct stat statbuf;
-    for (   char *tmp = path_in_ram + (*pathname == '/' ? 1 : 0), *end;
-            (end = strchr(tmp, '/')) != NULL;
-            tmp = end + 1) {
-        *end = '\0';
-        if (    (stat(path_in_ram, &statbuf) < 0)
-            &&  (mkdir(path_in_ram, mode) < 0)) {
-            goto _exit_failure;
-        }
-        *end = '/';
-    }
-    ret = mkdir(path_in_ram, mode);
-_exit_failure:
-    free(path_in_ram);
-    return ret;
+    close(fd);
+    return 0;
 }
 
 int rmdir(const char *pathname)
@@ -882,13 +864,7 @@ int chdir(const char *pathname)
 
 int creat(const char *pathname, mode_t mode)
 {
-    if ((NULL == pathname) || ('\0' == *pathname)) {
-        return -1;
-    }
-    if (__vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0) < 0) {
-        return -1;
-    }
-    return open(pathname, 0);
+    return open(pathname, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
 int open(const char *pathname, int flags, ...)
@@ -904,7 +880,13 @@ int open(const char *pathname, int flags, ...)
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
     }
+    // check not supported flags here
+    if (flags & (O_NONBLOCK)) {
+        VSF_LINUX_ASSERT(false);
+        return -1;
+    }
 
+__open_again:
     file = __vsf_linux_fs_get_file(fullpath);
     if (!file) {
         if (flags & O_CREAT) {
@@ -915,12 +897,49 @@ int open(const char *pathname, int flags, ...)
                 mode = va_arg(ap, mode_t);
             va_end(ap);
 
-            return creat(fullpath, mode);
+            char *path_in_ram = strdup(pathname);
+            if (NULL == path_in_ram) {
+                return -1;
+            }
+
+            struct stat statbuf;
+            for (   char *tmp = path_in_ram + (*pathname == '/' ? 1 : 0), *end;
+                    (end = strchr(tmp, '/')) != NULL;
+                    tmp = end + 1) {
+                if (*end == '\0') {
+                    break;
+                }
+                *end = '\0';
+                if (    (stat(path_in_ram, &statbuf) < 0)
+                    &&  (mkdir(path_in_ram, mode) < 0)) {
+                    goto __exit_failure;
+                }
+                *end = '/';
+            }
+            if (flags & O_DIRECTORY) {
+                if (mkdir(path_in_ram, mode) < 0) {
+                    goto __exit_failure;
+                }
+            } else {
+                if (__vsf_linux_fs_create(path_in_ram, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0) < 0) {
+                    goto __exit_failure;
+                }
+            }
+            flags &= ~O_CREAT;
+            free(path_in_ram);
+            goto __open_again;
+        __exit_failure:
+            free(path_in_ram);
+            return -1;
         }
         errno = ENOENT;
         return -1;
-    } else if (flags & O_TRUNC) {
-        // TODO: trunc fils
+    } else if ((flags & (O_EXCL | O_CREAT)) == (O_EXCL | O_CREAT)) {
+        // O_EXECL | O_CREAT MUST be for non-existing files
+        errno = EEXIST;
+        return -1;
+    } else if (file->attr & VSF_FILE_ATTR_EXCL) {
+        return -1;
     }
 
     fd = vsf_linux_fd_create(&sfd, &__vsf_linux_fs_fdop);
@@ -930,8 +949,23 @@ int open(const char *pathname, int flags, ...)
         vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
         sfd->status_flags = flags;
         priv->file = file;
-        if ((flags & O_TRUNC) && !(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
-            // todo:
+
+        if ((flags & O_DIRECTORY) && !(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
+            close(fd);
+            errno = ENOTDIR;
+            return -1;
+        }
+        if (flags & O_APPEND) {
+            priv->pos = file->size;
+        }
+        if (flags & O_EXCL) {
+            file->attr |= VSF_FILE_ATTR_EXCL;
+        }
+        if (flags & O_CLOEXEC) {
+            sfd->fd_flags |= FD_CLOEXEC;
+        }
+        if ((flags & O_TRUNC) && (flags & (O_RDWR | O_WRONLY))) {
+            // TODO: trunc fils
         }
     }
     return fd;

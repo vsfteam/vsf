@@ -25,8 +25,9 @@ extern "C" {
 #endif
 #define lstat                   stat
 
-#define VSF_FILE_ATTR_BLK       (VSF_FILE_ATTR_USER + 0)
-#define VSF_FILE_ATTR_LNK       (VSF_FILE_ATTR_USER + 1)
+#define VSF_FILE_ATTR_BLK       (VSF_FILE_ATTR_USER << 0)
+#define VSF_FILE_ATTR_LNK       (VSF_FILE_ATTR_USER << 1)
+#define VSF_FILE_ATTR_EXCL      (VSF_FILE_ATTR_USER << 2)
 
 #define S_IFDIR                 0040000
 #define S_IFREG                 0100000

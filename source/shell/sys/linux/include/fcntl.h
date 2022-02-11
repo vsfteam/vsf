@@ -18,9 +18,11 @@ extern "C" {
 
 #define O_NONBLOCK      0x0004
 #define O_APPEND        0x0008
+#define O_DIRECTORY     0x0100
 #define O_CREAT         0x0200
 #define O_TRUNC         0x0400
 #define O_EXCL          0x0800
+#define O_CLOEXEC       0x1000
 
 #define F_DUPFD         0
 #define F_GETFD         1
