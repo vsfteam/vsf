@@ -24,18 +24,19 @@
 #include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/ipc/reg_ipc_comreg.h"
 #include "sysctrl_api.h"
-//#include "reg_access.h"
+
+/*============================ MACROS ========================================*/
 
 #define VSF_USART_CFG_IMPLEMENT_OP                      ENABLED
 #define VSF_USART_CFG_IMPLEMENT_REQUEST_BY_FIFO         ENABLED
 #define VSF_USART_CFG_INSTANCE_PREFIX                   vsf_hw
-#include "hal/driver/common/usart/usart_template.inc"
-#include "hal/driver/common/usart/usart_request.h"
+#define VSF_USART_CFG_USART_COUNT                       VSF_HW_USART_COUNT
+#define VSF_USART_CFG_USART_MASK                        VSF_HW_USART_MASK
+#define VSF_USART_CFG_USART_IMP_LV0                     VSF_HW_USART_IMP_LV0
 
-/*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_USART_IMP_LV0(__count, __dont_care)                            \
+#define VSF_HW_USART_IMP_LV0(__count, __dont_care)                              \
     static const vsf_hw_usart_clock_t vsf_usart##__count##_clock = {            \
         .hclk   = CSC_HCLKME_UART##__count##_EN_BIT,                            \
         .oclk   = CSC_OCLKME_UART##__count##_EN_BIT,                            \
@@ -84,21 +85,7 @@ typedef struct vsf_hw_usart_t {
 
 
 /*============================ PROTOTYPES ====================================*/
-
-static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *usart_ptr);
-
 /*============================ GLOBAL VARIABLES ==============================*/
-
-#if USART_MASK & (1 << 0)
-__VSF_HW_USART_IMP_LV0(0, NULL)
-#endif
-#if USART_MASK & (1 << 1)
-__VSF_HW_USART_IMP_LV0(1, NULL)
-#endif
-#if USART_MASK & (1 << 2)
-__VSF_HW_USART_IMP_LV0(2, NULL)
-#endif
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -287,5 +274,8 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
     }
 }
 
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/usart/usart_template.inc"
 
 #endif      // VSF_HAL_USE_USART

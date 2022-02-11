@@ -64,7 +64,7 @@ typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-VSF_MREPEAT(GPIO_COUNT, __VSF_HW_GPIO_DEC_LV0, NULL)
+VSF_MREPEAT(VSF_HW_GPIO_COUNT, __VSF_HW_GPIO_DEC_LV0, NULL)
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

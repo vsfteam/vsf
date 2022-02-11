@@ -31,10 +31,13 @@
 #define VSF_USART_REIMPLEMENT_MODE          ENABLED
 #define VSF_USART_REIMPLEMENT_IRQ_MASK      ENABLED
 
+#define VSF_USART_CFG_USART_COUNT           VSF_HW_USART_COUNT
+#define VSF_USART_CFG_USART_DEC_LV0         VSF_HW_USART_DEC_LV0
+#define VSF_USART_CFG_USART_MASK            VSF_HW_USART_MASK
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_USART_DEC_LV0(__COUNT, __dont_care)                            \
-    typedef struct vsf_usart_request_t vsf_usart_request_t;                     \
+#define VSF_HW_USART_DEC_LV0(__COUNT, __dont_care)                              \
     extern vsf_usart_request_t vsf_usart##__COUNT;
 
 /*============================ TYPES =========================================*/
@@ -106,17 +109,6 @@ typedef enum em_usart_irq_mask_t {
 #include "hal/driver/common/template/vsf_template_usart.h"
 
 /*============================ GLOBAL VARIABLES ==============================*/
-
-#if USART_MASK & (1 << 0)
-__VSF_HW_USART_DEC_LV0(0, NULL)
-#endif
-#if USART_MASK & (1 << 1)
-__VSF_HW_USART_DEC_LV0(1, NULL)
-#endif
-#if USART_MASK & (1 << 2)
-__VSF_HW_USART_DEC_LV0(2, NULL)
-#endif
-
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
