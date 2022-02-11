@@ -54,7 +54,7 @@
     VSF_MREPEAT(__count, __extern_m480_usart, __count)
 /*============================ TYPES =========================================*/
 
-enum  em_usart_mode_t {
+typedef enum  em_usart_mode_t {
     USART_8_BIT_LENGTH              = 3ul,
     USART_7_BIT_LENGTH              = 2ul,
     USART_6_BIT_LENGTH              = 1ul,
@@ -96,9 +96,9 @@ enum  em_usart_mode_t {
     USART_RX_INVERTED               = 0x08000000ul,
     USART_TX_RX_INVERTED            =       USART_TX_INVERTED
                                         |   USART_RX_INVERTED,
-};
+} em_usart_mode_t;
 
-enum em_usart_irq_mask_t {
+typedef enum em_usart_irq_mask_t {
     USART_IRQ_MASK_RX               = BIT(0),
     USART_IRQ_MASK_TX               = BIT(1),
     USART_IRQ_MASK_RX_CPL           = BIT(2),
@@ -115,7 +115,7 @@ enum em_usart_irq_mask_t {
     USART_IRQ_MASK                  =  USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
                                      | USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL
                                      | USART_IRQ_MASK_ERROR    | USART_IRQ_MASK_RX_TIMEOUT,
-};
+} em_usart_irq_mask_t;
 
 /*============================ INCLUDES ======================================*/
 

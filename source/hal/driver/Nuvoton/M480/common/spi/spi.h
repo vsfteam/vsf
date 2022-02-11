@@ -46,12 +46,12 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-enum em_spi_irq_mask_t {
+typedef enum em_spi_irq_mask_t {
     SPI_IRQ_MASK_TX_CPL = 1 << 0,
     SPI_IRQ_MASK_CPL    = 1 << 1,   // SPI completed recepiton and transmission
-};
+} em_spi_irq_mask_t;
 
-enum em_spi_mode_t {
+typedef enum em_spi_mode_t {
     // CTL: [1 << 0 ~ 1 << 20]
     SPI_MASTER          = 0x00,
     SPI_SLAVE           = SPI_CTL_SLAVE_Msk,
@@ -116,7 +116,7 @@ enum em_spi_mode_t {
 
     SPI_SLAVE_SELECTION_ACTIVE_LOW    = 0,
     SPI_SLAVE_SELECTION_ACTIVE_HIGH   = 1 << (SPI_SSCTL_SSACTPOL_Pos + SPI_SSCTL_POS),
-};
+} em_spi_mode_t;
 
 /*============================ INCLUDES ======================================*/
 
