@@ -36,7 +36,7 @@
 /*============================ MACROS ========================================*/
 
 #define __VSF_HW_GPIO_PIN_MASK                                                  \
-    ((1ul << GPIO_PIN_MAX) - 1)
+    ((1ul << VSF_HW_GPIO_PIN_MAX) - 1)
 
 #define __VSF_HW_GPIO_IS_VAILID_PIN(__P)                                        \
     (((__P &  __VSF_HW_GPIO_PIN_MASK) != 0) &&                                  \
@@ -51,9 +51,9 @@
     vsf_hw_gpio_t vsf_gpio##__COUNT = {                                         \
         VSF_GPIO_OP                                                             \
         .GPIO = REG_GPIO##__COUNT,                                              \
-        .IOMUX = ((AIC_IOMUX_TypeDef *)GPIO##__COUNT##_IOMUX_REG_BASE),         \
-        .is_pmic = GPIO##__COUNT##_IS_PMIC,                                     \
-        .pin_sel = GPIO##__COUNT##_PIN_SEL,                                     \
+        .IOMUX = ((AIC_IOMUX_TypeDef *)VSF_HW_GPIO##__COUNT##_IOMUX_REG_BASE),  \
+        .is_pmic = VSF_HW_GPIO##__COUNT##_IS_PMIC,                              \
+        .pin_sel = VSF_HW_GPIO##__COUNT##_PIN_SEL,                              \
         .output_reg = 0,                                                        \
     };
 
@@ -79,12 +79,12 @@ typedef struct vsf_hw_gpio_t {
 
     // TODO: move to IO module
     AIC_IOMUX_TypeDef *IOMUX;
-    uint8_t pin_sel[GPIO_PIN_MAX];
+    uint8_t pin_sel[VSF_HW_GPIO_PIN_MAX];
 } vsf_hw_gpio_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-VSF_MREPEAT(GPIO_COUNT, __VSF_HW_GPIO_IPM_LV0, NULL)
+VSF_MREPEAT(VSF_HW_GPIO_COUNT, __VSF_HW_GPIO_IPM_LV0, NULL)
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -121,7 +121,7 @@ void vsf_hw_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32
     VSF_HAL_ASSERT(__VSF_HW_GPIO_IS_VAILID_PIN(pin_mask));
     VSF_HAL_ASSERT(__VSF_HW_GPIO_IS_VAILID_FEATURE(feature));
 
-    for (int i = 0; i < GPIO_PIN_MAX; i++) {
+    for (int i = 0; i < VSF_HW_GPIO_PIN_MAX; i++) {
         if (pin_mask & (1 << i)) {
             // TODO: move to IO module
             uint32_t wdata = feature | hw_gpio_ptr->pin_sel[i];

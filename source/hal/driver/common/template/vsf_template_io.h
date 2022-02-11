@@ -437,8 +437,8 @@ typedef struct vsf_gpio_t  {
 } vsf_gpio_t;
 #endif
 
-// TODO: support c plus plus
-#ifndef __cplusplus
+// TODO: support interface
+#if 0
 //! \name gpio control interface
 //! @{
 dcl_interface(i_gpio_t)
@@ -493,8 +493,8 @@ end_def_interface(i_io_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-// TODO: support c plus plus
-#ifndef __cplusplus
+// TODO: support interface
+#if 0
 //! \brief io interface
 extern const i_io_t VSF_IO;
 #endif
@@ -504,52 +504,6 @@ extern const i_io_t VSF_IO;
 
 /*! \brief gpio batch configuration
            an implementation example:
-
-static bool vsf_gpio_config( io_cfg_t *cfg_ptr, uint_fast8_t count )
-{
-    bool result = true;
-    if (NULL == cfg_ptr || 0 == count) {
-        return false;
-    }
-
-    //! io configure
-    do {
-        uint_fast8_t pin_index = cfg_ptr->pin_index;  //!< get pin index number
-        uint32_t function = cfg_ptr->function;  //!< get pin function selection
-
-        //! get pin feature and make sure pin-input is enabled by default
-        //! this is an example to enable some feature to be default.
-        uint_fast8_t feature = cfg_ptr->feature ^ IOCTRL_PIN_IE_MSK;
-
-        //! set pin feature: this is the most optimal solution
-        GSP_IOCTRL.PIN[pin_index].Value = feature;
-
-        //! but if we are not lucky enough, we can only use the following way
-        if (feature & IO_PULL_UP) {
-            IOCTRL_ENABLE_PULL_UP(pin_index);
-        } else {
-            IOCTRL_DISABLE_PULL_UP
-        }
-        if (feature & IO_HIGH_DRV) {
-            IOCTRL_ENABLE_HIGH_DRIVER_STRENGH(pin_index);
-        } else {
-            IOCTRL_DISABLE_HIGH_DRIVER_STRENGH(pin_index);
-        }
-        ...
-
-        //! I know this is ugly, but some times, the two methods aforementioned
-        //! can be combined. So you should fully use the 32 bit of the
-        //! cfg_ptr->feature
-
-        //! set pin function selection
-        IOCTRL_FUNCTION_SELECT(pin_index, function);
-
-
-        cfg_ptr++;                                //!< next one...
-    } while(--count);
-
-    return result;
-}
  *! \param cfg_ptr the pointer points to configuration array
  *! \param count the count of configurations in the array
  *! \return configuration result

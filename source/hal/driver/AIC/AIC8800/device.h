@@ -66,17 +66,17 @@
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
 
-#define GPIO_COUNT                  2
-#define GPIO_PIN_MAX                16
-#define GPIO0_IOMUX_REG_BASE        (0x40503000)
-#define GPIO0_IS_PMIC               false
-#define GPIO0_PIN_SEL              {                                            \
+#define VSF_HW_GPIO_COUNT           2
+#define VSF_HW_GPIO_PIN_MAX         16
+#define VSF_HW_GPIO0_IOMUX_REG_BASE (0x40503000)
+#define VSF_HW_GPIO0_IS_PMIC        false
+#define VSF_HW_GPIO0_PIN_SEL        {                                            \
         1, 1, 0, 0, 0, 0, 0, 0,                                                 \
         1, 1, 0, 0, 0, 0, 0, 0,                                                 \
     }
-#define GPIO1_IOMUX_REG_BASE        (0x50012000)
-#define GPIO1_IS_PMIC               true
-#define GPIO1_PIN_SEL {                                                         \
+#define VSF_HW_GPIO1_IOMUX_REG_BASE (0x50012000)
+#define VSF_HW_GPIO1_IS_PMIC        true
+#define VSF_HW_GPIO1_PIN_SEL        {                                                         \
         1, 1, 0, 0, 0, 0, 0, 0,                                                 \
         0, 0, 0, 0, 0, 0, 0, 0,                                                 \
     }
@@ -89,7 +89,7 @@
             .pclk                   = CSC_PCLKME_TRNG_EN_BIT,
 
 // uart0 is already used in the library(include interrupt) and debug_uart
-#define USART_MASK                  ((1 << 1) | (1 << 2))
+#define VSF_HW_USART_MASK           ((1 << 1) | (1 << 2))
 
 #define I2C_MAX_PORT                1
 #define VSF_HAL_I2C0_MULTIPLEX_CNT  2
