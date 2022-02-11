@@ -424,6 +424,9 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
             __vsf_linux_ms_to_timeval(optval, netconn_get_sendtimeout(conn));
             break;
 #endif
+        case SO_ERROR:
+            *(int *)optval = err_to_errno(netconn_err(conn));
+            break;
         default:
             VSF_LINUX_ASSERT(false);
             break;
