@@ -366,6 +366,9 @@ __vsf_component_peda_ifs_entry(__vk_winfs_write, vk_file_write)
 
     if (    (VSF_ERR_NONE != __vk_winfs_set_pos(file, offset))
         ||  WriteFile(file->f.hFile, buff, size, &wsize, NULL)) {
+        if (offset + wsize > file->size) {
+            file->size = offset + wsize;
+        }
         vsf_eda_return(wsize);
     } else {
         vsf_eda_return(VSF_ERR_FAIL);
