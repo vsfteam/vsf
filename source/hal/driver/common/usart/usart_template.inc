@@ -32,7 +32,7 @@
 
 #define VSF_USART_CFG_FIFO2REQ_PREFIX                   vsf_fifo2req
 
-#if VSF_USART_CFG_MULTI_INSTANCES == DISABLED
+#if VSF_USART_CFG_MULTI_CLASS == DISABLED
 #   define VSF_USART_OP
 #   define VSF_USART_FIFO2REQ_OP
 #else
@@ -119,7 +119,7 @@
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if VSF_USART_CFG_MULTI_INSTANCES == ENABLED && VSF_USART_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_USART_CFG_MULTI_CLASS == ENABLED && VSF_USART_CFG_IMPLEMENT_OP == ENABLED
 
 #   undef   __VSF_USART_API
 #   define  __VSF_USART_API(__prefix_name, __return, __name, ...)                   \

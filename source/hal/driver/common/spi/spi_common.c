@@ -31,7 +31,7 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_SPI_CFG_MULTI_INSTANCES == ENABLED
+#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
 
 vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
 {
@@ -150,5 +150,5 @@ int_fast32_t vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr)
     return spi_ptr->op->get_transfered_count(spi_ptr);
 }
 
-#endif /* VSF_SPI_CFG_MULTI_INSTANCES == ENABLED */
+#endif /* VSF_SPI_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_SPI == ENABLED */

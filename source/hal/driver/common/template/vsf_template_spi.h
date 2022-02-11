@@ -25,8 +25,8 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_SPI_CFG_MULTI_INSTANCES
-#   define VSF_SPI_CFG_MULTI_INSTANCES        DISABLED
+#ifndef VSF_SPI_CFG_MULTI_CLASS
+#   define VSF_SPI_CFG_MULTI_CLASS        DISABLED
 #endif
 
 #ifndef VSF_SPI_REIMPLEMENT_MODE
@@ -45,7 +45,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 
-#if VSF_SPI_CFG_MULTI_INSTANCES == DISABLED
+#if VSF_SPI_CFG_MULTI_CLASS == DISABLED
 #   ifndef VSF_SPI_CFG_PREFIX
 #       define VSF_SPI_CFG_PREFIX             vsf_hw
 #   endif
@@ -255,7 +255,7 @@ typedef struct vsf_spi_op_t {
     int_fast32_t       (*get_transfered_count)(vsf_spi_t *spi_ptr);
 } vsf_spi_op_t;
 
-#if VSF_SPI_CFG_MULTI_INSTANCES == ENABLED
+#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
 struct vsf_spi_t  {
     const vsf_spi_op_t * op;
 };

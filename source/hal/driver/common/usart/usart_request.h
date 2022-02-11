@@ -35,7 +35,7 @@ typedef struct vsf_usart_request_item_t {
 } vsf_usart_request_item_t;
 
 typedef struct vsf_usart_request_t {
-#if VSF_USART_CFG_MULTI_INSTANCES == ENABLED
+#if VSF_USART_CFG_MULTI_CLASS == ENABLED
     vsf_usart_t vsf_usart;
 #endif
 

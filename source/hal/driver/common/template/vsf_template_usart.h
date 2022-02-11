@@ -28,8 +28,8 @@ extern "C" {
 #endif
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_USART_CFG_MULTI_INSTANCES
-#   define VSF_USART_CFG_MULTI_INSTANCES        DISABLED
+#ifndef VSF_USART_CFG_MULTI_CLASS
+#   define VSF_USART_CFG_MULTI_CLASS        DISABLED
 #endif
 
 #ifndef VSF_USART_CFG_FIFO_TO_REQUEST
@@ -50,7 +50,7 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#if VSF_USART_CFG_MULTI_INSTANCES == DISABLED
+#if VSF_USART_CFG_MULTI_CLASS == DISABLED
 #   ifndef VSF_USART_CFG_PREFIX
 #       define VSF_USART_CFG_PREFIX             vsf_hw
 #   endif
@@ -263,7 +263,7 @@ typedef struct vsf_usart_op_t {
     int_fast32_t       (*get_tx_count) (vsf_usart_t *usart_ptr);
 } vsf_usart_op_t;
 
-#if VSF_USART_CFG_MULTI_INSTANCES == ENABLED
+#if VSF_USART_CFG_MULTI_CLASS == ENABLED
 struct vsf_usart_t  {
         const vsf_usart_op_t * op;
 };
