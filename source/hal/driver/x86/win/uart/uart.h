@@ -24,6 +24,8 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 
+#include "utilities/compiler/compiler.h"
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USART_CFG_PORT_NUM
@@ -33,16 +35,14 @@
 #define VSF_USART_REIMPLEMENT_MODE                  ENABLED
 #define VSF_USART_REIMPLEMENT_IRQ_MASK              ENABLED
 
-/*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_usart.h"
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
 #define __VSF_USART_EXTERN_REPEAD(__N, __DONT_CARE)                             \
                                   extern vsf_usart_t vsf_usart##__N;
+
 /*============================ TYPES =========================================*/
 
-enum em_usart_mode_t {
+typedef enum em_usart_mode_t {
     USART_8_BIT_LENGTH              = 0x0000ul,
     USART_9_BIT_LENGTH              = 0x1000ul,
     USART_BIT_LENGTH_MASK           = USART_8_BIT_LENGTH | USART_9_BIT_LENGTH,
@@ -66,9 +66,9 @@ enum em_usart_mode_t {
     USART_TX_ENABLE                 = 0x0010ul,
     USART_RX_ENABLE                 = 0x0020ul,
     USART_ENABLE_MASK               = USART_TX_ENABLE | USART_RX_ENABLE,
-};
+} em_usart_mode_t;
 
-enum em_usart_irq_mask_t {
+typedef enum em_usart_irq_mask_t {
     USART_IRQ_MASK_RX               = BIT(0),
     USART_IRQ_MASK_TX               = BIT(1),
     USART_IRQ_MASK_RX_TIMEOUT       = BIT(2),
@@ -84,11 +84,18 @@ enum em_usart_irq_mask_t {
     USART_IRQ_MASK                  =   USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
                                       | USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL
                                       | USART_IRQ_MASK_ERR,
-};
+} em_usart_irq_mask_t;
+
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/template/vsf_template_usart.h"
+
+/*============================ TYPES =========================================*/
 
 typedef struct vsf_usart_win_expression_t {
-    vsf_usart_t                         *vsf_usart_instance_ptr;
-    uint8_t                             win_serial_port_num;
+    vsf_usart_t *vsf_usart_instance_ptr;
+    uint8_t      win_serial_port_num;
 }vsf_usart_win_expression_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -97,9 +104,9 @@ VSF_MREPEAT(VSF_USART_CFG_PORT_NUM, __VSF_USART_EXTERN_REPEAD, NULL)
 
 /*============================ PROTOTYPES ====================================*/
 
-void vsf_usart_get_can_used_port(uint8_t *available_number_port);
-bool vsf_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size);
-bool vsf_usart_port_isbusy();
+extern void vsf_usart_get_can_used_port(uint8_t *available_number_port);
+extern bool vsf_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size);
+extern bool vsf_usart_port_isbusy();
 
 #endif
 #endif      // __OSA_HAL_X86_WIN_USART_H__
