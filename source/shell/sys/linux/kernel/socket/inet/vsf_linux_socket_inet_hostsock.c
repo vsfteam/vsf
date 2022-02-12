@@ -80,6 +80,11 @@ struct dirent {
 /*============================ TYPES =========================================*/
 
 // need to sync types/constants below with the real definitions in vsf
+// from errno.h
+#define VSF_LINUX_ERRNO_EAGAIN          11
+extern int * __vsf_linux_errno(void);
+#define vsf_linux_errno                 (*__vsf_linux_errno())
+
 // from time.h
 #ifndef __SUSECONDS_T
 #   define __SUSECONDS_T    long int
@@ -689,6 +694,9 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
 
     int hnewsock = accept(priv->hostsock, &hsockaddr, &hsockaddr_len);
     if (INVALID_SOCKET == hnewsock) {
+        if (errno == ERRNO_WOULDBLOCK) {
+            vsf_linux_errno = VSF_LINUX_ERRNO_EAGAIN;
+        }
         return VSF_LINUX_SOCKET_INVALID_SOCKET;
     }
 
@@ -745,6 +753,8 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
             if (ret <= 0) {
                 return VSF_LINUX_SOCKET_INVALID_SOCKET;
             }
+        } else {
+            vsf_linux_errno = VSF_LINUX_ERRNO_EAGAIN;
         }
     }
     return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
@@ -782,6 +792,9 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
     } else {
         ret = send(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags));
     }
+    if ((SOCKET_ERROR == ret) && (errno == ERRNO_WOULDBLOCK)) {
+        vsf_linux_errno = VSF_LINUX_ERRNO_EAGAIN;
+    }
     __vsf_linux_hostsock_pend(priv);
     return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
 }
@@ -811,6 +824,9 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
         __vsf_linux_sockaddr2vsf(&hsockaddr, src_addr);
     } else {
         ret = recv(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags));
+    }
+    if ((SOCKET_ERROR == ret) && (errno == ERRNO_WOULDBLOCK)) {
+        vsf_linux_errno = VSF_LINUX_ERRNO_EAGAIN;
     }
     __vsf_linux_hostsock_pend(priv);
     return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
