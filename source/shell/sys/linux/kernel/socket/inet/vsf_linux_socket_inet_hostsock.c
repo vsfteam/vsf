@@ -60,7 +60,11 @@ struct dirent {
 #if VSF_LINUX_SOCKET_CFG_WRAPPER != ENABLED
 #   error VSF_LINUX_SOCKET_CFG_WRAPPER MUST be enabled to avoid conflicts with host socket APIs
 #endif
+#if VSF_LINUX_CFG_WRAPPER != ENABLED
+#   error VSF_LINUX_CFG_WRAPPER MUST be enabled to avoid conflicts with host socket APIs
+#endif
 
+#define VSF_LINUX_WRAPPER(__api)            VSF_SHELL_WRAPPER(vsf_linux, __api)
 #define VSF_LINUX_SOCKET_WRAPPER(__api)     VSF_SHELL_WRAPPER(vsf_linux_socket, __api)
 
 #ifdef __WIN__
@@ -86,6 +90,13 @@ struct vsf_linux_timeval {
 // from poll.h
 #define VSF_LINUX_POLLIN                (1 << 0)
 #define VSF_LINUX_POLLOUT               (1 << 1)
+typedef int vsf_linux_nfds_t;
+struct vsf_linux_pollfd {
+    int fd;
+    short events;
+    short revents;
+};
+extern int VSF_LINUX_WRAPPER(poll)(struct vsf_linux_pollfd *fds, vsf_linux_nfds_t nfds, int timeout);
 
 // from socket.h
 #define VSF_LINUX_SOCKET_INVALID_SOCKET -1
@@ -174,6 +185,7 @@ typedef struct vsf_linux_socket_inet_priv_t {
     int hdomain;
     int htype;
     int hprotocol;
+    int is_nonblock;
 
     vsf_dlist_node_t node;
     vsf_linux_fd_t *sfd;
@@ -220,9 +232,7 @@ struct vsf_linux_socket_inet_hostsock_t {
 
     vsf_dlist_t sock_list;
     vsf_arch_irq_thread_t irq_thread;
-} __vsf_linux_hostsock = {
-    .is_inited = false,
-};
+} __vsf_linux_hostsock;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -484,6 +494,8 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
         return -1;
     }
 
+    u_long optval_ulong = 1;
+    ioctlsocket(priv->hostsock, FIONBIO, &optval_ulong);
     priv->sfd = sfd;
     __vsf_linux_hostsock_add(priv);
     return 0;
@@ -528,8 +540,8 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             }
             break;
         case VSF_LINUX_SOCKET_SO_NONBLOCK: {
-                u_long optval_ulong = (u_long)(int *)optval;
-                ret = ioctlsocket(priv->hostsock, FIONBIO, &optval_ulong);
+                priv->is_nonblock = *(int *)optval;
+                ret = 0;
                 goto __return;
             }
         default:                                VSF_LINUX_ASSERT(false);    break;
@@ -571,6 +583,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
                 optname = SO_RCVTIMEO;
                 ret = getsockopt(priv->hostsock, level, optname, (char *)&ms, &hoptlen);
                 __vsf_linux_ms_to_timeval(optval, ms);
+                goto __return;
             }
             break;
         case VSF_LINUX_SOCKET_SO_SNDTIMEO: {
@@ -579,9 +592,13 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
                 optname = SO_SNDTIMEO;
                 ret = getsockopt(priv->hostsock, level, optname, (char *)&ms, &hoptlen);
                 __vsf_linux_ms_to_timeval(optval, ms);
+                goto __return;
             }
             break;
-        case VSF_LINUX_SOCKET_SO_NONBLOCK:      VSF_LINUX_ASSERT(false);    break;
+        case VSF_LINUX_SOCKET_SO_NONBLOCK:
+            *(int *)optval = priv->is_nonblock;
+            ret = 0;
+            goto __return;
         default:                                VSF_LINUX_ASSERT(false);    break;
         }
         break;
@@ -629,6 +646,19 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct sockaddr hsockaddr;
     int hsockaddr_len = sizeof(hsockaddr);
+
+    if (!priv->is_nonblock) {
+        struct vsf_linux_pollfd fds[1] = {
+            {
+                .fd     = priv->sfd->fd,
+                .events = VSF_LINUX_POLLIN,
+            },
+        };
+        int ret = VSF_LINUX_WRAPPER(poll)(fds, 1, -1);
+        if (ret <= 0) {
+            return VSF_LINUX_SOCKET_INVALID_SOCKET;
+        }
+    }
 
     int hnewsock = accept(priv->hostsock, &hsockaddr, &hsockaddr_len);
     if (INVALID_SOCKET == hnewsock) {
@@ -687,6 +717,20 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
                     const struct vsf_linux_socket_sockaddr *dst_addr, socklen_t addrlen)
 {
     int ret;
+
+    if (!priv->is_nonblock) {
+        struct vsf_linux_pollfd fds[1] = {
+            {
+                .fd     = priv->sfd->fd,
+                .events = VSF_LINUX_POLLOUT,
+            },
+        };
+        int ret = VSF_LINUX_WRAPPER(poll)(fds, 1, -1);
+        if (ret <= 0) {
+            return VSF_LINUX_SOCKET_INVALID_SOCKET;
+        }
+    }
+
     if (dst_addr != NULL) {
         struct sockaddr hsockaddr = { 0 };
         __vsf_linux_sockaddr2host(dst_addr, &hsockaddr);
@@ -702,6 +746,20 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
                     struct vsf_linux_socket_sockaddr *src_addr, socklen_t *addrlen)
 {
     int ret;
+
+    if (!priv->is_nonblock) {
+        struct vsf_linux_pollfd fds[1] = {
+            {
+                .fd     = priv->sfd->fd,
+                .events = VSF_LINUX_POLLIN,
+            },
+        };
+        int ret = VSF_LINUX_WRAPPER(poll)(fds, 1, -1);
+        if (ret <= 0) {
+            return VSF_LINUX_SOCKET_INVALID_SOCKET;
+        }
+    }
+
     if (src_addr != NULL) {
         struct sockaddr hsockaddr = { 0 };
         int hsockaddr_len = sizeof(hsockaddr);
