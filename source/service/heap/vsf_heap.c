@@ -501,7 +501,7 @@ uint_fast32_t __vsf_heap_size(vsf_heap_t *heap, void *buffer)
         &&  mcb->magic == VSF_HEAP_MCB_MAGIC
 #endif
     );
-    return __vsf_heap_mcb_get_size(mcb);
+    return __vsf_heap_mcb_get_size(mcb) - ((uint8_t *)buffer - (uint8_t *)mcb);
 }
 
 void __vsf_heap_free(vsf_heap_t *heap, void *buffer)
