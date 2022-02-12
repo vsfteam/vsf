@@ -69,8 +69,11 @@ struct dirent {
 
 #ifdef __WIN__
 #   define socket_t                         SOCKET
+#   define errno                            WSAGetLastError()
+#   define ERRNO_WOULDBLOCK                 WSAEWOULDBLOCK
 #else
 #   define socket_t                         int
+#   define ERRNO_WOULDBLOCK                 EWOULDBLOCK
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -227,7 +230,6 @@ struct vsf_linux_socket_inet_hostsock_t {
     struct sockaddr_in *inaddr;
 
     struct {
-        int nfds;
         fd_set rfds;
         fd_set wfds;
     } select;
@@ -261,25 +263,10 @@ const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_linux_socket_update_fd_set(void)
-{
-    int nfds_new = -1;
-    for (int i = 0; i <= __vsf_linux_hostsock.select.nfds; i++) {
-        if (    (   FD_ISSET(i, &__vsf_linux_hostsock.select.rfds)
-                ||  FD_ISSET(i, &__vsf_linux_hostsock.select.wfds))
-            &&  (i > nfds_new)) {
-            nfds_new = i;
-        }
-    }
-    if (nfds_new < __vsf_linux_hostsock.sock_event_listener) {
-        nfds_new = __vsf_linux_hostsock.sock_event_listener;
-    }
-    __vsf_linux_hostsock.select.nfds = nfds_new;
-}
-
 static void __vsf_linux_socket_inet_irqthread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
+    vsf_linux_socket_inet_priv_t *priv;
     vsf_protect_t orig;
     fd_set rfds;
     fd_set wfds;
@@ -287,7 +274,6 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
 
     __vsf_arch_irq_set_background(irq_thread);
     connect(__vsf_linux_hostsock.sock_event_listener, (const struct sockaddr *)__vsf_linux_hostsock.inaddr, sizeof(*__vsf_linux_hostsock.inaddr));
-    __vsf_linux_hostsock.select.nfds = __vsf_linux_hostsock.sock_event_listener;
     FD_ZERO(&__vsf_linux_hostsock.select.rfds);
     FD_ZERO(&__vsf_linux_hostsock.select.wfds);
     FD_SET(__vsf_linux_hostsock.sock_event_listener, &__vsf_linux_hostsock.select.rfds);
@@ -297,7 +283,12 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
         orig = vsf_protect_sched();
         rfds = __vsf_linux_hostsock.select.rfds;
         wfds = __vsf_linux_hostsock.select.wfds;
-        nfds = __vsf_linux_hostsock.select.nfds;
+        vsf_dlist_peek_head(vsf_linux_socket_inet_priv_t, node, &__vsf_linux_hostsock.sock_list, priv);
+        if (NULL == priv) {
+            nfds = __vsf_linux_hostsock.sock_event_listener;
+        } else {
+            nfds = max(__vsf_linux_hostsock.sock_event_listener, priv->hostsock);
+        }
         vsf_unprotect_sched(orig);
         __vsf_arch_irq_end(irq_thread, false);
 
@@ -313,9 +304,43 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
             ret--;
         }
         if (ret > 0) {
-            vsf_linux_socket_inet_priv_t *priv;
-
             __vsf_arch_irq_start(irq_thread);
+#ifdef __WIN__
+            for (int i = 0; i < rfds.fd_count; i++) {
+                priv = NULL;
+                orig = vsf_protect_sched();
+                __vsf_dlist_foreach_unsafe(vsf_linux_socket_inet_priv_t, node, &__vsf_linux_hostsock.sock_list) {
+                    if (_->hostsock == rfds.fd_array[i]) {
+                        priv = _;
+                        break;
+                    }
+                }
+
+                if (priv != NULL) {
+                    FD_CLR(rfds.fd_array[i], &__vsf_linux_hostsock.select.rfds);
+                    vsf_linux_fd_set_status(priv->sfd, VSF_LINUX_POLLIN, orig);
+                } else {
+                    vsf_unprotect_sched(orig);
+                }
+            }
+            for (int i = 0; i < wfds.fd_count; i++) {
+                priv = NULL;
+                orig = vsf_protect_sched();
+                __vsf_dlist_foreach_unsafe(vsf_linux_socket_inet_priv_t, node, &__vsf_linux_hostsock.sock_list) {
+                    if (_->hostsock == wfds.fd_array[i]) {
+                        priv = _;
+                        break;
+                    }
+                }
+
+                if (priv != NULL) {
+                    FD_CLR(wfds.fd_array[i], &__vsf_linux_hostsock.select.wfds);
+                    vsf_linux_fd_set_status(priv->sfd, VSF_LINUX_POLLOUT, orig);
+                } else {
+                    vsf_unprotect_sched(orig);
+                }
+            }
+#else
             for (int i = 0; ret > 0 && i <= nfds; i++) {
                 priv = NULL;
                 orig = vsf_protect_sched();
@@ -335,11 +360,11 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
                         FD_CLR(i, &__vsf_linux_hostsock.select.wfds);
                         vsf_linux_fd_set_status(priv->sfd, VSF_LINUX_POLLOUT, vsf_protect_sched());
                     }
-                    __vsf_linux_socket_update_fd_set();
                     ret--;
                 }
                 vsf_unprotect_sched(orig);
             }
+#endif
             __vsf_arch_irq_end(irq_thread, false);
         }
     }
@@ -358,9 +383,6 @@ static void __vsf_linux_hostsock_pend(vsf_linux_socket_inet_priv_t *priv)
     vsf_protect_t orig = vsf_protect_sched();
         FD_SET(priv->hostsock, &__vsf_linux_hostsock.select.rfds);
         FD_SET(priv->hostsock, &__vsf_linux_hostsock.select.wfds);
-        if (priv->hostsock > __vsf_linux_hostsock.select.nfds) {
-            __vsf_linux_hostsock.select.nfds = priv->hostsock;
-        }
     vsf_unprotect_sched(orig);
     __vsf_linux_hostsock_notify();
 }
@@ -368,7 +390,7 @@ static void __vsf_linux_hostsock_pend(vsf_linux_socket_inet_priv_t *priv)
 static void __vsf_linux_hostsock_add(vsf_linux_socket_inet_priv_t *priv)
 {
     vsf_protect_t orig = vsf_protect_sched();
-        vsf_dlist_add_to_tail(vsf_linux_socket_inet_priv_t, node, &__vsf_linux_hostsock.sock_list, priv);
+        vsf_dlist_insert(vsf_linux_socket_inet_priv_t, node, &__vsf_linux_hostsock.sock_list, priv, _->hostsock < priv->hostsock);
     vsf_unprotect_sched(orig);
     __vsf_linux_hostsock_pend(priv);
 }
@@ -379,7 +401,6 @@ static void __vsf_linux_hostsock_remove(vsf_linux_socket_inet_priv_t *priv)
         vsf_dlist_remove(vsf_linux_socket_inet_priv_t, node, &__vsf_linux_hostsock.sock_list, priv);
         FD_CLR(priv->hostsock, &__vsf_linux_hostsock.select.rfds);
         FD_CLR(priv->hostsock, &__vsf_linux_hostsock.select.wfds);
-        __vsf_linux_socket_update_fd_set();
     vsf_unprotect_sched(orig);
     __vsf_linux_hostsock_notify();
 }
@@ -582,6 +603,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
         case VSF_LINUX_SOCKET_SO_KEEPALIVE:     optname = SO_KEEPALIVE;     break;
         case VSF_LINUX_SOCKET_SO_RCVBUF:        optname = SO_RCVBUF;        break;
         case VSF_LINUX_SOCKET_SO_REUSEADDR:     optname = SO_REUSEADDR;     break;
+        case VSF_LINUX_SOCKET_SO_ERROR:         optname = SO_ERROR;         break;
         case VSF_LINUX_SOCKET_SO_RCVTIMEO: {
                 unsigned long ms;
                 int hoptlen = sizeof(ms);
@@ -687,6 +709,7 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
     newpriv->htype = priv->htype;
     newpriv->hprotocol = priv->hprotocol;
     newpriv->sfd = sfd;
+    __vsf_linux_hostsock_add(newpriv);
     __vsf_linux_hostsock_pend(priv);
     return newsock;
 }
@@ -709,11 +732,7 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
     __vsf_linux_sockaddr2host(addr, &hsockaddr);
     int ret = connect(priv->hostsock, &hsockaddr, sizeof(hsockaddr));
     if (    (SOCKET_ERROR == ret)
-#ifdef __WIN__
-        &&  (WSAGetLastError() == WSAEWOULDBLOCK)) {
-#else
-        &&  (errno == EWOULDBLOCK)) {
-#endif
+        &&  (errno == ERRNO_WOULDBLOCK)) {
         ret = 0;
         if (!priv->is_nonblock) {
             struct vsf_linux_pollfd fds[1] = {
@@ -791,7 +810,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
         ret = recvfrom(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags), &hsockaddr, &hsockaddr_len);
         __vsf_linux_sockaddr2vsf(&hsockaddr, src_addr);
     } else {
-        ret = send(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags));
+        ret = recv(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags));
     }
     __vsf_linux_hostsock_pend(priv);
     return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
