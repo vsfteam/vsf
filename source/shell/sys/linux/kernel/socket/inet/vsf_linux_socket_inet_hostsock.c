@@ -715,6 +715,18 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
         &&  (errno == EWOULDBLOCK)) {
 #endif
         ret = 0;
+        if (!priv->is_nonblock) {
+            struct vsf_linux_pollfd fds[1] = {
+                {
+                    .fd     = priv->sfd->fd,
+                    .events = VSF_LINUX_POLLOUT,
+                },
+            };
+            int ret = VSF_LINUX_WRAPPER(poll)(fds, 1, priv->sndto);
+            if (ret <= 0) {
+                return VSF_LINUX_SOCKET_INVALID_SOCKET;
+            }
+        }
     }
     return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
 }
