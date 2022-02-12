@@ -245,6 +245,7 @@ extern void * vsf_arch_heap_malloc(uint_fast32_t size);
 extern void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size);
 extern void vsf_arch_heap_free(void *buffer);
 extern unsigned int vsf_arch_heap_alignment(void);
+extern uint_fast32_t vsf_arch_heap_size(void *buffer);
 #endif
 
 /*----------------------------------------------------------------------------*

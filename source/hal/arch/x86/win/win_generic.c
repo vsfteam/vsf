@@ -1180,4 +1180,9 @@ unsigned int vsf_arch_heap_alignment(void)
     return MEMORY_ALLOCATION_ALIGNMENT;
 }
 
+uint_fast32_t vsf_arch_heap_size(void *buffer)
+{
+    return HeapSize(GetProcessHeap(), 0, buffer);
+}
+
 /* EOF */

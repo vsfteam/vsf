@@ -150,6 +150,7 @@ extern void __vsf_heap_add_buffer(vsf_heap_t *heap, uint8_t *buffer, uint_fast32
 extern void * __vsf_heap_malloc_aligned(vsf_heap_t *heap, uint_fast32_t size, uint_fast32_t alignment);
 extern void * __vsf_heap_realloc_aligned(vsf_heap_t *heap, void *buffer, uint_fast32_t size, uint_fast32_t alignment);
 extern void __vsf_heap_free(vsf_heap_t *heap, void *buffer);
+extern uint_fast32_t __vsf_heap_size(vsf_heap_t *heap, void *buffer);
 #if VSF_HEAP_CFG_STATISTICS == ENABLED
 extern void __vsf_heap_statistics(vsf_heap_t *heap, vsf_heap_statistics_t *statistics);
 #endif
@@ -165,6 +166,7 @@ extern void vsf_heap_add_buffer(uint8_t *buffer, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);
 extern void vsf_heap_statistics(vsf_heap_statistics_t *statistics);
 #endif
+extern uint_fast32_t vsf_heap_size(uint8_t *buffer);
 extern void * vsf_heap_malloc_aligned_imp(uint_fast32_t size, uint_fast32_t alignment);
 extern void * vsf_heap_malloc_imp(uint_fast32_t size);
 extern void * vsf_heap_realloc_aligned_imp(void *buffer, uint_fast32_t size, uint_fast32_t alignment);

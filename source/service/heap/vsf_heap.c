@@ -490,6 +490,20 @@ void * __vsf_heap_realloc_aligned(vsf_heap_t *heap, void *buffer, uint_fast32_t 
     }
 }
 
+uint_fast32_t __vsf_heap_size(vsf_heap_t *heap, void *buffer)
+{
+    vsf_heap_mcb_t *mcb;
+
+    VSF_SERVICE_ASSERT(buffer != NULL);
+    mcb = __vsf_heap_get_mcb((uint8_t *)buffer);
+    VSF_SERVICE_ASSERT( __vsf_heap_mcb_is_allocated(heap, mcb)
+#if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
+        &&  mcb->magic == VSF_HEAP_MCB_MAGIC
+#endif
+    );
+    return __vsf_heap_mcb_get_size(mcb);
+}
+
 void __vsf_heap_free(vsf_heap_t *heap, void *buffer)
 {
     vsf_heap_mcb_t *mcb;
@@ -637,6 +651,15 @@ void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size)
     return new_buffer;
 #else
     return vsf_heap_realloc_aligned(buffer, size, sizeof(uintalu_t));
+#endif
+}
+
+uint_fast32_t vsf_heap_size(uint8_t *buffer)
+{
+#ifdef VSF_ARCH_PROVIDE_HEAP
+    return vsf_arch_heap_size(buffer);
+#else
+    return __vsf_heap_size(&__vsf_heap.use_as__vsf_heap_t, buffer);
 #endif
 }
 
