@@ -23,6 +23,7 @@
 #include "service/vsf_service_cfg.h"
 #if VSF_USE_HEAP == ENABLED
 
+#include "hal/arch/vsf_arch.h"
 #include "utilities/vsf_utilities.h"
 
 #if VSF_HEAP_CFG_TRACE == ENABLED
@@ -122,15 +123,17 @@ declare_interface(i_heap_t)
 //! \name vsf heap interface
 //! @{
 def_interface(i_heap_t)
+#ifndef VSF_ARCH_PROVIDE_HEAP
     void (*Init)            (void);
     void (*AddBuffer)       (uint8_t *buffer, uint_fast32_t size);
     void (*AddMemory)       (vsf_mem_t mem);
+#endif
     void *(*MallocAligned)  (uint_fast32_t size, uint_fast32_t alignment);
     void *(*Malloc)         (uint_fast32_t size);
     void *(*ReallocAligned) (void *buffer, uint_fast32_t size, uint_fast32_t alignment);
     void *(*Realloc)        (void *buffer, uint_fast32_t size);
     void (*Free)            (void *buffer);
-#if VSF_HEAP_CFG_STATISTICS == ENABLED
+#if !defined(VSF_ARCH_PROVIDE_HEAP) && VSF_HEAP_CFG_STATISTICS == ENABLED
     void (*Statistics)      (vsf_heap_statistics_t *statistics);
 #endif
 end_def_interface(i_heap_t)
@@ -151,6 +154,7 @@ extern void __vsf_heap_free(vsf_heap_t *heap, void *buffer);
 extern void __vsf_heap_statistics(vsf_heap_t *heap, vsf_heap_statistics_t *statistics);
 #endif
 
+#ifndef VSF_ARCH_PROVIDE_HEAP
 // default heap
 extern void vsf_heap_init(void);
 /*!\note: vsf_heap_add_buffer and vsf_heap_add_memory cannot add misaligned memory spaces.
@@ -159,12 +163,13 @@ extern void vsf_heap_init(void);
 */
 extern void vsf_heap_add_buffer(uint8_t *buffer, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);
+extern void vsf_heap_statistics(vsf_heap_statistics_t *statistics);
+#endif
 extern void * vsf_heap_malloc_aligned_imp(uint_fast32_t size, uint_fast32_t alignment);
 extern void * vsf_heap_malloc_imp(uint_fast32_t size);
 extern void * vsf_heap_realloc_aligned_imp(void *buffer, uint_fast32_t size, uint_fast32_t alignment);
 extern void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size);
 extern void vsf_heap_free_imp(void *buffer);
-extern void vsf_heap_statistics(vsf_heap_statistics_t *statistics);
 
 extern void * vsf_heap_calloc(uint_fast32_t n, uint_fast32_t size);
 extern char * vsf_heap_strdup(const char *str);

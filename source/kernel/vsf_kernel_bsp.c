@@ -306,7 +306,7 @@ will be forced to DISABLED.
 #endif
 }
 
-#if VSF_USE_HEAP == ENABLED
+#if VSF_USE_HEAP == ENABLED && !defined(VSF_ARCH_PROVIDE_HEAP)
 #ifndef WEAK_VSF_SERVICE_REQ___HEAP_MEMORY_BUFFER___FROM_USR
 WEAK(vsf_service_req___heap_memory_buffer___from_usr)
 vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void)
@@ -318,9 +318,7 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
  to add memory buffers to heap."
     return (vsf_mem_t){0};
 #else
-#if     defined(VSF_ARCH_PROVIDE_HEAP)
-    uint8_t *__heap_buffer = vsf_arch_get_heap(VSF_HEAP_SIZE);
-#elif   defined(VSF_HEAP_ADDR)
+#if     defined(VSF_HEAP_ADDR)
     uint8_t *__heap_buffer = (uint8_t *)(VSF_HEAP_ADDR);
 #else
     NO_INIT static uint_fast8_t __heap_buffer[

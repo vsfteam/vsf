@@ -20,8 +20,6 @@
 #define __VSF_ARCH_WIN_IMPLEMENT
 #include "hal/arch/vsf_arch_abstraction.h"
 
-#if VSF_ARCH_PRI_NUM != 1 || VSF_ARCH_SWI_NUM != 0
-
 // for trace
 #include "service/vsf_service.h"
 // for list
@@ -35,7 +33,7 @@
 // configuration start
 //#define VSF_ARCH_CFG_BACKGROUND_TRACE           ENABLED
 #define VSF_ARCH_CFG_LOW_LANTECY                DISABLED
-//#define VSF_ARCH_CFG_BACKGROUND_TRACE_FILTER    &__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t
+//#define VSF_ARCH_CFG_BACKGROUND_TRACE_FILTER    &__vsf_x86_systimer.use_as__vsf_arch_irq_thread_t
 //#define VSF_ARCH_CFG_BACKGROUND_TRACE_NUM       (32 * 1024)
 //#define VSF_ARCH_CFG_TRACE_IRQ                  ENABLED
 //#define VSF_ARCH_CFG_TRACE_CALLSTACK            ENABLED
@@ -154,7 +152,6 @@ typedef struct vsf_x86_t {
 
     vsf_arch_irq_thread_t por_thread;    // power on reset
     vsf_arch_swi_ctx_t swi[VSF_ARCH_SWI_NUM];
-    vsf_arch_systimer_ctx_t systimer;
 
     vsf_dlist_t irq_list;
     vsf_dlist_t irq_rdy_list;
@@ -225,8 +222,6 @@ typedef struct vsf_arch_background_trace_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-NO_INIT static vsf_x86_t __vsf_x86;
-
 #if __VSF_ARCH_CFG_TRACE == ENABLED
 static const char *__vsf_x86_trace_color[] = {
     [VSF_ARCH_TRACE_CALLSTACK_COLOR]    = "\033[1;32m",
@@ -240,6 +235,12 @@ static const char *__vsf_x86_trace_color[] = {
 #if VSF_ARCH_CFG_BACKGROUND_TRACE == ENABLED
 static vsf_arch_background_trace_t __vsf_arch_background_trace;
 #endif
+
+NO_INIT static vsf_arch_systimer_ctx_t __vsf_x86_systimer;
+
+#if VSF_ARCH_PRI_NUM != 1 || VSF_ARCH_SWI_NUM != 0
+
+NO_INIT static vsf_x86_t __vsf_x86;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -776,151 +777,6 @@ void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 }
 
 
-
-/*----------------------------------------------------------------------------*
- * Systimer Timer Implementation                                              *
- *----------------------------------------------------------------------------*/
-
-#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
-
-static void __vsf_systimer_thread(void *arg)
-{
-    vsf_arch_systimer_ctx_t *ctx = arg;
-    __vsf_arch_irq_set_background(&ctx->use_as__vsf_arch_irq_thread_t);
-    while (1) {
-        __vsf_arch_irq_request_pend(&__vsf_x86.systimer.timer_request);
-        WaitForSingleObject(ctx->timer, INFINITE);
-
-        __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
-
-            vsf_systimer_tick_t tick = vsf_systimer_get();
-            vsf_arch_trace_systimer("systimer triggered: %lld\r\n", tick);
-            vsf_systimer_timeout_evt_hanlder(tick);
-
-        __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
-    }
-}
-
-/*! \brief initialise SysTick to generate a system timer
- *! \param frequency the target tick frequency in Hz
- *! \return initialization result in vsf_err_t
- */
-vsf_err_t vsf_systimer_init(void)
-{
-    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-
-    __vsf_x86.systimer.start_tick = vsf_systimer_get();
-
-    __vsf_x86.systimer.timer = CreateWaitableTimer(NULL, true, NULL);
-    VSF_HAL_ASSERT(NULL != __vsf_x86.systimer.timer);
-
-    __vsf_arch_irq_request_init(&__vsf_x86.systimer.timer_request);
-
-    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, VSF_ERR_NONE);
-    return VSF_ERR_NONE;
-}
-
-vsf_err_t vsf_systimer_start(void)
-{
-    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-
-    __vsf_arch_irq_init(&__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t,
-                "timer", __vsf_systimer_thread, vsf_arch_prio_32);
-
-    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, VSF_ERR_NONE);
-    return VSF_ERR_NONE;
-}
-
-void vsf_systimer_set_idle(void)
-{
-    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-}
-
-vsf_systimer_tick_t __vsf_systimer_get(void)
-{
-    LARGE_INTEGER li;
-    GetSystemTimeAsFileTime((LPFILETIME)&li);
-
-    return (vsf_systimer_tick_t)li.QuadPart - __vsf_x86.systimer.start_tick;
-}
-
-vsf_systimer_tick_t vsf_systimer_get(void)
-{
-    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-    vsf_systimer_tick_t ret = __vsf_systimer_get();
-    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
-    return ret;
-}
-
-bool vsf_systimer_set(vsf_systimer_tick_t due)
-{
-    vsf_arch_trace_function("%s(%d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)due);
-
-    LARGE_INTEGER li = {
-        .QuadPart = __vsf_x86.systimer.start_tick + due,
-    };
-    vsf_arch_trace_systimer("systimer update: %lld\r\n", due);
-    if (!SetWaitableTimer(__vsf_x86.systimer.timer, &li, 0, NULL, NULL, false)) {
-        VSF_HAL_ASSERT(false);
-        vsf_arch_trace_function("%s exited with false" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-        return false;
-    }
-    __vsf_arch_irq_request_send(&__vsf_x86.systimer.timer_request);
-    vsf_arch_trace_function("%s exited with true" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-    return true;
-}
-
-bool vsf_systimer_is_due(vsf_systimer_tick_t due)
-{
-    vsf_arch_trace_function("%s(due: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)due);
-    bool ret = vsf_systimer_get() >= due;
-    vsf_arch_trace_function("%s exited with %s" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret ? "true" : "false");
-    return ret;
-}
-
-vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
-{
-    vsf_arch_trace_function("%s(time_us: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_us);
-    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
-    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
-    return ret;
-}
-
-vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
-{
-    vsf_arch_trace_function("%s(time_ms: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_ms);
-    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
-    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
-    return ret;
-}
-
-vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
-{
-    vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
-    vsf_systimer_tick_t ret = tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
-    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
-    return ret;
-}
-
-vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
-{
-    vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
-    vsf_systimer_tick_t ret = tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
-    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
-    return ret;
-}
-
-void vsf_systimer_prio_set(vsf_arch_prio_t priority)
-{
-    vsf_arch_trace_function("%s(priority: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, priority);
-    __vsf_arch_irq_set_priority(&__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t, priority);
-    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-}
-
-#endif
-
-
 /*----------------------------------------------------------------------------*
  * SWI Implementation                                                         *
  *----------------------------------------------------------------------------*/
@@ -1152,10 +1008,176 @@ void vsf_arch_sleep(uint_fast32_t mode)
     vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
-void * vsf_arch_get_heap(uint_fast32_t size)
+#endif
+
+/*----------------------------------------------------------------------------*
+ * Systimer Timer Implementation                                              *
+ *----------------------------------------------------------------------------*/
+
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
+
+void __vsf_systimer_thread(void *arg)
+{
+    vsf_arch_systimer_ctx_t *ctx = arg;
+    __vsf_arch_irq_set_background(&ctx->use_as__vsf_arch_irq_thread_t);
+    while (1) {
+        __vsf_arch_irq_request_pend(&__vsf_x86_systimer.timer_request);
+        WaitForSingleObject(ctx->timer, INFINITE);
+
+        __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
+
+            vsf_systimer_tick_t tick = vsf_systimer_get();
+            vsf_arch_trace_systimer("systimer triggered: %lld\r\n", tick);
+            vsf_systimer_timeout_evt_hanlder(tick);
+
+        __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
+    }
+}
+
+/*! \brief initialise SysTick to generate a system timer
+ *! \param frequency the target tick frequency in Hz
+ *! \return initialization result in vsf_err_t
+ */
+vsf_err_t vsf_systimer_init(void)
+{
+    memset(&__vsf_x86_systimer, 0, sizeof(__vsf_x86_systimer));
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+
+    __vsf_x86_systimer.start_tick = vsf_systimer_get();
+
+    __vsf_x86_systimer.timer = CreateWaitableTimer(NULL, true, NULL);
+    VSF_HAL_ASSERT(NULL != __vsf_x86_systimer.timer);
+
+    __vsf_arch_irq_request_init(&__vsf_x86_systimer.timer_request);
+
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, VSF_ERR_NONE);
+    return VSF_ERR_NONE;
+}
+
+void vsf_systimer_set_idle(void)
+{
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+}
+
+vsf_systimer_tick_t __vsf_systimer_get(void)
+{
+    LARGE_INTEGER li;
+    GetSystemTimeAsFileTime((LPFILETIME)&li);
+
+    return (vsf_systimer_tick_t)li.QuadPart - __vsf_x86_systimer.start_tick;
+}
+
+vsf_systimer_tick_t vsf_systimer_get(void)
+{
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+    vsf_systimer_tick_t ret = __vsf_systimer_get();
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
+    return ret;
+}
+
+bool vsf_systimer_set(vsf_systimer_tick_t due)
+{
+    vsf_arch_trace_function("%s(%d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)due);
+
+    LARGE_INTEGER li = {
+        .QuadPart = __vsf_x86_systimer.start_tick + due,
+    };
+    vsf_arch_trace_systimer("systimer update: %lld\r\n", due);
+    if (!SetWaitableTimer(__vsf_x86_systimer.timer, &li, 0, NULL, NULL, false)) {
+        VSF_HAL_ASSERT(false);
+        vsf_arch_trace_function("%s exited with false" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+        return false;
+    }
+    __vsf_arch_irq_request_send(&__vsf_x86_systimer.timer_request);
+    vsf_arch_trace_function("%s exited with true" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+    return true;
+}
+
+bool vsf_systimer_is_due(vsf_systimer_tick_t due)
+{
+    vsf_arch_trace_function("%s(due: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)due);
+    bool ret = vsf_systimer_get() >= due;
+    vsf_arch_trace_function("%s exited with %s" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret ? "true" : "false");
+    return ret;
+}
+
+vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+{
+    vsf_arch_trace_function("%s(time_us: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_us);
+    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
+    return ret;
+}
+
+vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
+{
+    vsf_arch_trace_function("%s(time_ms: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_ms);
+    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
+    return ret;
+}
+
+vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
+{
+    vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
+    vsf_systimer_tick_t ret = tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
+    return ret;
+}
+
+vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
+{
+    vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
+    vsf_systimer_tick_t ret = tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
+    return ret;
+}
+
+#   if VSF_ARCH_PRI_NUM != 1 || VSF_ARCH_SWI_NUM != 0
+vsf_err_t vsf_systimer_start(void)
+{
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+
+    __vsf_arch_irq_init(&__vsf_x86_systimer.use_as__vsf_arch_irq_thread_t,
+                "timer", __vsf_systimer_thread, vsf_arch_prio_32);
+
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, VSF_ERR_NONE);
+    return VSF_ERR_NONE;
+}
+
+void vsf_systimer_prio_set(vsf_arch_prio_t priority)
+{
+    vsf_arch_trace_function("%s(priority: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, priority);
+    __vsf_arch_irq_set_priority(&__vsf_x86_systimer.use_as__vsf_arch_irq_thread_t, priority);
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+}
+#   endif
+
+#endif
+
+/*----------------------------------------------------------------------------*
+ * Heap Implementation                                                        *
+ *----------------------------------------------------------------------------*/
+
+void * vsf_arch_heap_malloc(uint_fast32_t size)
 {
     return HeapAlloc(GetProcessHeap(), 0, (SIZE_T)size);
 }
 
-#endif
+void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size)
+{
+    return HeapReAlloc(GetProcessHeap(), 0, buffer, (SIZE_T)size);
+}
+
+void vsf_arch_heap_free(void *buffer)
+{
+    HeapFree(GetProcessHeap(), 0, buffer);
+}
+
+unsigned int vsf_arch_heap_alignment(void)
+{
+    return MEMORY_ALLOCATION_ALIGNMENT;
+}
+
 /* EOF */

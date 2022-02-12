@@ -241,7 +241,10 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef VSF_ARCH_PROVIDE_HEAP
-extern void * vsf_arch_get_heap(uint_fast32_t size);
+extern void * vsf_arch_heap_malloc(uint_fast32_t size);
+extern void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size);
+extern void vsf_arch_heap_free(void *buffer);
+extern unsigned int vsf_arch_heap_alignment(void);
 #endif
 
 /*----------------------------------------------------------------------------*

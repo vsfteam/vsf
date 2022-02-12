@@ -128,92 +128,12 @@ void __vsf_arch_irq_sleep(uint32_t ms)
 
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
 
-static void __vsf_systimer_thread(void *arg)
-{
-    vsf_arch_systimer_ctx_t *ctx = arg;
-    __vsf_arch_irq_set_background(&ctx->use_as__vsf_arch_irq_thread_t);
-    while (1) {
-        __vsf_arch_irq_request_pend(&__vsf_arch_systimer.timer_request);
-        WaitForSingleObject(ctx->timer, INFINITE);
-
-        __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
-
-            vsf_systimer_tick_t tick = vsf_systimer_get();
-            vsf_systimer_timeout_evt_hanlder(tick);
-
-        __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
-    }
-}
-
-/*! \brief initialise SysTick to generate a system timer
- *! \param frequency the target tick frequency in Hz
- *! \return initialization result in vsf_err_t
- */
-vsf_err_t vsf_systimer_init(void)
-{
-    __vsf_arch_systimer.start_tick = vsf_systimer_get();
-
-    __vsf_arch_systimer.timer = CreateWaitableTimer(NULL, true, NULL);
-    VSF_HAL_ASSERT(NULL != __vsf_arch_systimer.timer);
-
-    __vsf_arch_irq_request_init(&__vsf_arch_systimer.timer_request);
-    return VSF_ERR_NONE;
-}
-
 vsf_err_t vsf_systimer_start(void)
 {
+    extern void __vsf_systimer_thread(void *arg);
     __vsf_arch_irq_init(&__vsf_arch_systimer.use_as__vsf_arch_irq_thread_t,
                 "timer", __vsf_systimer_thread, vsf_arch_prio_0);
     return VSF_ERR_NONE;
-}
-
-void vsf_systimer_set_idle(void)
-{
-}
-
-vsf_systimer_tick_t vsf_systimer_get(void)
-{
-    LARGE_INTEGER li;
-    GetSystemTimeAsFileTime((LPFILETIME)&li);
-    return (vsf_systimer_tick_t)li.QuadPart - __vsf_arch_systimer.start_tick;
-}
-
-bool vsf_systimer_set(vsf_systimer_tick_t due)
-{
-    LARGE_INTEGER li = {
-        .QuadPart = __vsf_arch_systimer.start_tick + due,
-    };
-    if (!SetWaitableTimer(__vsf_arch_systimer.timer, &li, 0, NULL, NULL, false)) {
-        VSF_HAL_ASSERT(false);
-        return false;
-    }
-    __vsf_arch_irq_request_send(&__vsf_arch_systimer.timer_request);
-    return true;
-}
-
-bool vsf_systimer_is_due(vsf_systimer_tick_t due)
-{
-    return (vsf_systimer_get() >= due);
-}
-
-vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
-{
-    return (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
-}
-
-vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
-{
-    return (vsf_systimer_tick_t)(((vsf_systimer_tick_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
-}
-
-vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
-{
-    return tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
-}
-
-vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
-{
-    return tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
 }
 
 void vsf_systimer_prio_set(vsf_arch_prio_t priority)
@@ -235,11 +155,6 @@ bool vsf_arch_low_level_init(void)
     __vsf_arch_common.por_thread.thread_id = GetCurrentThreadId();
     __vsf_arch_common.por_thread.thread = OpenThread(THREAD_ALL_ACCESS, false, __vsf_arch_common.por_thread.thread_id);
     return __vsf_arch_low_level_init();
-}
-
-void * vsf_arch_get_heap(uint_fast32_t size)
-{
-    return HeapAlloc(GetProcessHeap(), 0, (SIZE_T)size);
 }
 
 #endif
