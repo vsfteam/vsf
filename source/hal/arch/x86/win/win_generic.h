@@ -63,6 +63,7 @@ extern "C" {
 
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
+#define VSF_ARCH_PROVIDE_HEAP
 
 #ifndef FAR
 #   define FAR

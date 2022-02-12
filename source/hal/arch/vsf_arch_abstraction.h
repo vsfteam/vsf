@@ -240,6 +240,10 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef VSF_ARCH_PROVIDE_HEAP
+extern void * vsf_arch_get_heap(uint_fast32_t size);
+#endif
+
 /*----------------------------------------------------------------------------*
  * Architecture Infrastructure                                                *
  *----------------------------------------------------------------------------*/

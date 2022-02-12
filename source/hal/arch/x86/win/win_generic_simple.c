@@ -237,5 +237,10 @@ bool vsf_arch_low_level_init(void)
     return __vsf_arch_low_level_init();
 }
 
+void * vsf_arch_get_heap(uint_fast32_t size)
+{
+    return HeapAlloc(GetProcessHeap(), 0, (SIZE_T)size);
+}
+
 #endif
 /* EOF */

@@ -1152,5 +1152,10 @@ void vsf_arch_sleep(uint_fast32_t mode)
     vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
+void * vsf_arch_get_heap(uint_fast32_t size)
+{
+    return HeapAlloc(GetProcessHeap(), 0, (SIZE_T)size);
+}
+
 #endif
 /* EOF */
