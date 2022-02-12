@@ -492,6 +492,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             sfd = vsf_linux_fd_get(fds[i].fd);
             // fd maybe closed by other thread while being polled
             if (NULL == sfd) {
+                fds[i].revents = 0;
                 continue;
             }
             priv = sfd->priv;
@@ -502,6 +503,8 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
                 priv->events &= ~events_triggered;
                 priv->events |= priv->status & events_triggered;
                 ret++;
+            } else {
+                fds[i].revents = 0;
             }
         }
         if (ret || (0 == timeout)) {
