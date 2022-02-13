@@ -71,8 +71,6 @@ static const vsf_stream_op_t __vsf_x86_debug_stream_tx_op = {
 static uint8_t __vsf_x86_debug_stream_rx_buff[VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE];
 static vsf_arch_irq_thread_t __vsf_x86_debug_stream_rx_irq;
 #   endif
-
-static HANDLE hOut, hIn;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -108,7 +106,7 @@ int __vsf_arch_printf(const char *format, ...)
 
     if (size <= sizeof(buff)) {
         DWORD wsize;
-        WriteFile(hOut, buff, size, &wsize, NULL);
+        WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), buff, size, &wsize, NULL);
     }
     return size;
 }
@@ -125,7 +123,7 @@ static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t *stream,
             uint8_t *buf, uint_fast32_t size)
 {
     DWORD wsize;
-    WriteFile(hOut, buf, size, &wsize, NULL);
+    WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), buf, size, &wsize, NULL);
     return wsize;
 }
 
@@ -148,7 +146,7 @@ static void __vsf_x86_debug_stream_rx_irqhandler(void *arg)
     __vsf_arch_irq_set_background(thread);
     while (1) {
         do {
-            ReadFile(hIn, &ch, 1, &rsize, NULL);
+            ReadConsoleA(GetStdHandle(STD_INPUT_HANDLE), &ch, 1, &rsize, NULL);
         } while (!rsize);
 
         __vsf_arch_irq_start(thread);
@@ -161,8 +159,8 @@ static void __vsf_x86_debug_stream_init(void)
 {
     DWORD mode;
 
-    hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    hIn = GetStdHandle(STD_INPUT_HANDLE);
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 
     GetConsoleMode(hIn, &mode);
     mode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
