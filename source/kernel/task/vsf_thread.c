@@ -545,7 +545,9 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
         }
 #endif
 #if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
-        vsf_thread_stack_check();
+        // can not check stack here, because __vsf_eda_call_eda_ex_prepare switch
+        //  current frame to eda context instead of thread context
+//        vsf_thread_stack_check();
 #endif
         longjmp(*(cb->ret), 0);
     }
