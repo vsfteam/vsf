@@ -91,6 +91,9 @@ static uint_fast16_t __vk_winfs_file_get_path(vk_file_t *file, char *path, uint_
         tmp = tmp->parent;
     }
 
+    if (NULL == path) {
+        return real_len;
+    }
     if (real_len > len) {
         return 0;
     }
@@ -165,8 +168,12 @@ __vsf_component_peda_ifs_entry(__vk_winfs_mount, vk_fs_mount)
         find_str[namelen + 2] = '\0';
     }
 
-    WIN32_FIND_DATAA FindFileData;
-    HANDLE hFind = FindFirstFileA(find_str, &FindFileData);
+    int path_unicode_len = MultiByteToWideChar(CP_UTF8, 0, find_str, -1, NULL, 0);
+    wchar_t path_unicode[path_unicode_len];
+    MultiByteToWideChar(CP_UTF8, 0, find_str, -1, path_unicode, path_unicode_len);
+
+    WIN32_FIND_DATAW FindFileData;
+    HANDLE hFind = FindFirstFileW(path_unicode, &FindFileData);
     if (hFind == INVALID_HANDLE_VALUE) {
         vsf_eda_return(VSF_ERR_NOT_AVAILABLE);
         return;
@@ -197,16 +204,17 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
                 ||  (!name && (_->idx == idx))) {
                 vsf_unprotect_sched(orig);
                 *vsf_local.result = &_->use_as__vk_file_t;
-                goto do_return;
+                vsf_eda_return(err);
+                return;
             }
         }
     vsf_unprotect_sched(orig);
-
-    char path[MAX_PATH];
-    uint_fast16_t len = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, sizeof(path));
-    uint_fast16_t namelen;
-
     *vsf_local.result = NULL;
+
+    uint_fast16_t pathlen = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, NULL, 0);
+    uint_fast16_t namelen;
+    WIN32_FIND_DATAW FindFileData;
+    HANDLE hFind = INVALID_HANDLE_VALUE;
     if (name != NULL) {
         const char *ptr = name;
         while (*ptr != '\0') {
@@ -220,56 +228,59 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
         } else {
             namelen = ptr - name;
         }
-        if ((len + namelen + 1) > MAX_PATH) {
-            err = VSF_ERR_FAIL;
-            goto do_return;
-        }
-        path[len - 1] = '/';
-        memcpy(&path[len], name, namelen);
-        path[len + namelen] = '\0';
     } else {
-        WIN32_FIND_DATAA FindFileData;
-        HANDLE hFind;
+        char path[pathlen + 2];
+        __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, pathlen);
+        strcat(path, "\\*");
 
-        if ((len + 2) > MAX_PATH) {
-            err = VSF_ERR_FAIL;
-            goto do_return;
-        }
-        strcat(path, "/*");
+        int path_unicode_len = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
+        wchar_t path_unicode[path_unicode_len];
+        MultiByteToWideChar(CP_UTF8, 0, path, -1, path_unicode, path_unicode_len);
 
-        hFind = FindFirstFileA(path, &FindFileData);
+        hFind = FindFirstFileW(path_unicode, &FindFileData);
         if (hFind != INVALID_HANDLE_VALUE) {
             do {
-                if (    !strcmp(FindFileData.cFileName, ".")
-                    ||  !strcmp(FindFileData.cFileName, "..")) {
+                if (    !wcscmp(FindFileData.cFileName, L".")
+                    ||  !wcscmp(FindFileData.cFileName, L"..")) {
                     idx++;
                 }
                 if (!idx) {
                     break;
                 }
 
-                if (!FindNextFileA(hFind, &FindFileData)) {
+                if (!FindNextFile(hFind, &FindFileData)) {
                     FindClose(hFind);
-                    goto do_not_available;
+                    err = VSF_ERR_NOT_AVAILABLE;
+                    vsf_eda_return(err);
+                    return;
                 }
             } while (idx--);
-            FindClose(hFind);
-
-            namelen = strlen(FindFileData.cFileName);
-            if ((len + namelen + 1) > MAX_PATH) {
-                err = VSF_ERR_FAIL;
-                goto do_return;
-            }
-            path[len] = '\0';
-            strcat(path, FindFileData.cFileName);
+            namelen = WideCharToMultiByte(CP_UTF8, 0, FindFileData.cFileName, -1, NULL, 0, 0, false) - 1;
         } else {
-            goto do_not_available;
+            err = VSF_ERR_NOT_AVAILABLE;
+            vsf_eda_return(err);
+            return;
         }
     }
 
-    DWORD dwAttribute = GetFileAttributesA(path);
+    char path[pathlen /* including '\0' */ + 1 /* '/' */ + namelen];
+    __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, pathlen);
+    path[pathlen - 1] = '/';
+    if (NULL == name) {
+        VSF_FS_ASSERT(hFind != INVALID_HANDLE_VALUE);
+        name = &path[pathlen];
+        WideCharToMultiByte(CP_UTF8, 0, FindFileData.cFileName, -1, (char *)name, namelen, 0, false);
+        FindClose(hFind);
+    } else {
+        memcpy(&path[pathlen], name, namelen);
+    }
+    path[pathlen + namelen] = '\0';
+
+    int path_unicode_len = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
+    wchar_t path_unicode[path_unicode_len];
+    MultiByteToWideChar(CP_UTF8, 0, path, -1, path_unicode, path_unicode_len);
+    DWORD dwAttribute = GetFileAttributesW(path_unicode);
     if (INVALID_FILE_ATTRIBUTES == dwAttribute) {
-    do_not_available:
         err = VSF_ERR_NOT_AVAILABLE;
         goto do_return;
     }
@@ -284,7 +295,8 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
         err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         goto do_free_and_return;
     }
-    strcpy(winfs_file->name, vk_file_getfilename(path));
+    memcpy(winfs_file->name, name, namelen);
+    winfs_file->name[namelen] = '\0';
     winfs_file->fsop = &vk_winfs_op;
 
     if (dwAttribute & FILE_ATTRIBUTE_ARCHIVE) {
@@ -310,7 +322,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
             access_mode |= GENERIC_WRITE;
             share_mode |= FILE_SHARE_WRITE;
         }
-        winfs_file->f.hFile = CreateFileA(path, access_mode, share_mode, NULL, OPEN_EXISTING,
+        winfs_file->f.hFile = CreateFileW(path_unicode, access_mode, share_mode, NULL, OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL, NULL);
         if (INVALID_HANDLE_VALUE == winfs_file->f.hFile) {
             err = VSF_ERR_NOT_AVAILABLE;
@@ -401,26 +413,25 @@ __vsf_component_peda_ifs_entry(__vk_winfs_create, vk_file_create)
 {
     vsf_peda_begin();
     vk_winfs_file_t *dir = (vk_winfs_file_t *)&vsf_this;
-    char path[MAX_PATH];
-    uint_fast16_t len = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, sizeof(path));
+    uint_fast16_t pathlen = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, NULL, 0);
     int namelen = strlen(vsf_local.name);
     vsf_err_t err;
 
-    if ((len + 1/* possible '\\' */ + namelen + 1) > MAX_PATH) {
-        vsf_eda_return(VSF_ERR_FAIL);
-        return;
-    }
-
-    namelen = strlen(path);
-    if (path[namelen - 1] != '\\') {
-        path[namelen + 0] = '\\';
-        path[namelen + 1] = '\0';
+    char path[pathlen /* including '\0' */ + 1 /* possible '\\' */ + namelen];
+    __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, pathlen);
+    if ((path[pathlen - 2] != '\\') && (path[pathlen - 2] != '/')) {
+        path[pathlen - 1] = '\\';
+        path[pathlen] = '\0';
     }
     strcat(path, vsf_local.name);
+    int path_unicode_len = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
+    wchar_t path_unicode[path_unicode_len];
+    MultiByteToWideChar(CP_UTF8, 0, path, -1, path_unicode, path_unicode_len);
+
     if (vsf_local.attr & VSF_FILE_ATTR_DIRECTORY) {
-        err = CreateDirectoryA(path, NULL) ? VSF_ERR_NONE : VSF_ERR_FAIL;
+        err = CreateDirectoryW(path_unicode, NULL) ? VSF_ERR_NONE : VSF_ERR_FAIL;
     } else {
-        HANDLE hFile = CreateFileA(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+        HANDLE hFile = CreateFileW(path_unicode, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
             NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
         VSF_LINUX_ASSERT(0 == vsf_local.size);
         err = (INVALID_HANDLE_VALUE == hFile) ? VSF_ERR_FAIL : VSF_ERR_NONE;
@@ -435,24 +446,22 @@ __vsf_component_peda_ifs_entry(__vk_winfs_unlink, vk_file_unlink)
 {
     vsf_peda_begin();
     vk_winfs_file_t *dir = (vk_winfs_file_t *)&vsf_this;
-    char path[MAX_PATH];
-    uint_fast16_t len = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, sizeof(path));
+    uint_fast16_t pathlen = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, NULL, 0);
     int namelen = strlen(vsf_local.name);
     vsf_err_t err;
 
-    if ((len + 1/* possible '\\' */ + namelen + 1) > MAX_PATH) {
-        vsf_eda_return(VSF_ERR_FAIL);
-        return;
-    }
-
-    namelen = strlen(path);
-    if (path[namelen - 1] != '\\') {
-        path[namelen + 0] = '\\';
-        path[namelen + 1] = '\0';
+    char path[pathlen /* including '\0' */ + 1 /* possible '\\' */ + namelen];
+    __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, pathlen);
+    if ((path[pathlen - 2] != '\\') && (path[pathlen - 2] != '/')) {
+        path[pathlen - 1] = '\\';
+        path[pathlen] = '\0';
     }
     strcat(path, vsf_local.name);
+    int path_unicode_len = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
+    wchar_t path_unicode[path_unicode_len];
+    MultiByteToWideChar(CP_UTF8, 0, path, -1, path_unicode, path_unicode_len);
 
-    DWORD dwAttribute = GetFileAttributesA(path);
+    DWORD dwAttribute = GetFileAttributesW(path_unicode);
     if (INVALID_FILE_ATTRIBUTES == dwAttribute) {
     do_not_available:
         err = VSF_ERR_NOT_AVAILABLE;
@@ -460,9 +469,9 @@ __vsf_component_peda_ifs_entry(__vk_winfs_unlink, vk_file_unlink)
     }
 
     if (dwAttribute & FILE_ATTRIBUTE_DIRECTORY) {
-        err = RemoveDirectoryA(path) ? VSF_ERR_NONE : VSF_ERR_FAIL;
+        err = RemoveDirectoryW(path_unicode) ? VSF_ERR_NONE : VSF_ERR_FAIL;
     } else {
-        err = DeleteFileA(path) ? VSF_ERR_NONE : VSF_ERR_FAIL;
+        err = DeleteFileW(path_unicode) ? VSF_ERR_NONE : VSF_ERR_FAIL;
     }
 do_return:
     vsf_eda_return(err);
@@ -486,16 +495,29 @@ __vsf_component_peda_ifs_entry(__vk_winfs_rename, vk_file_rename)
         newname = (char *)vsf_local.oldname;
     }
 
-    char oldpath[MAX_PATH], newpath[MAX_PATH];
-    __vk_winfs_file_get_path(vsf_local.olddir, oldpath, sizeof(oldpath));
-    strcat(oldpath, "\\");
-    strcat(oldpath, vsf_local.oldname);
-    __vk_winfs_file_get_path(vsf_local.newdir, newpath, sizeof(newpath));
-    strcat(newpath, "\\");
-    strcat(newpath, newname);
+    uint_fast16_t pathlen_old = __vk_winfs_file_get_path(vsf_local.olddir, NULL, 0);
+    uint_fast16_t pathlen_new = __vk_winfs_file_get_path(vsf_local.newdir, NULL, 0);
+    uint_fast16_t namelen_old = strlen(vsf_local.oldname);
+    uint_fast16_t namelen_new = strlen(vsf_local.newname);
 
-    if (!MoveFileA(oldpath, newpath)) {
-        vsf_trace_error("winfs: fail to rename %s to %s %d\r\n", oldpath, newpath, GetLastError());
+    char path_old[pathlen_old /* including '\0' */ + 1 /* '\\' */ + namelen_old];
+    __vk_winfs_file_get_path(vsf_local.olddir, path_old, pathlen_old);
+    strcat(path_old, "\\");
+    strcat(path_old, vsf_local.oldname);
+    int path_old_unicode_len = MultiByteToWideChar(CP_UTF8, 0, path_old, -1, NULL, 0);
+    wchar_t path_old_unicode[path_old_unicode_len];
+    MultiByteToWideChar(CP_UTF8, 0, path_old, -1, path_old_unicode, path_old_unicode_len);
+
+    char path_new[pathlen_new /* including '\0' */ + 1 /* '\\' */ + namelen_new];
+    __vk_winfs_file_get_path(vsf_local.newdir, path_new, pathlen_new);
+    strcat(path_new, "\\");
+    strcat(path_new, vsf_local.newname);
+    int path_new_unicode_len = MultiByteToWideChar(CP_UTF8, 0, path_new, -1, NULL, 0);
+    wchar_t path_new_unicode[path_new_unicode_len];
+    MultiByteToWideChar(CP_UTF8, 0, path_new, -1, path_new_unicode, path_new_unicode_len);
+
+    if (!MoveFileW(path_old_unicode, path_new_unicode)) {
+        vsf_trace_error("winfs: fail to rename %s to %s %d\r\n", path_old, path_new, GetLastError());
         if (vsf_local.newname != NULL) {
             vsf_heap_free(newname);
         }
