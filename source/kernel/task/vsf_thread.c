@@ -280,7 +280,7 @@ static void __vsf_thread_stack_check(uintptr_t stack)
     VSF_KERNEL_ASSERT(NULL != pthis);
 #   endif
 
-    VSF_KERNEL_ASSERT(  (stack < (uintptr_t)&pthis->stack[(pthis->stack_size >> 3)])
+    VSF_KERNEL_ASSERT(  (stack <= (uintptr_t)&pthis->stack[(pthis->stack_size >> 3)])
                     &&  (stack >= (uintptr_t)&pthis->stack[0]));
 }
 
