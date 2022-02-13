@@ -31,6 +31,11 @@
 
 /*============================ MACROS ========================================*/
 
+#if __IS_COMPILER_IAR__
+#   define VSF_KERNEL_CFG_THREAD_STACK_CHECK            ENABLED
+#   define VSF_KERNEL_GET_STACK_FROM_JMPBUF(__JMPBUF)   ((*(__JMPBUF))[4] & 0xFFFFFFFF)
+#endif
+
 //extern uint32_t SystemCoreClock;
 // DO NOT use SystemCoreClock for VSF_SYSTIMER_FREQ, because systimer is initialized
 //  in vsf_arch_init, which is eariler than initialization of SystemCoreClock in
