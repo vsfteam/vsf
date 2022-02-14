@@ -115,7 +115,6 @@ vsf_class(vsf_linux_pipe_tx_priv_t) {
 typedef struct vsf_linux_fs_priv_t {
     implement(vsf_linux_fd_priv_t)
     vk_file_t *file;
-    uint64_t pos;
 
     struct dirent dir;
     vk_file_t *child;

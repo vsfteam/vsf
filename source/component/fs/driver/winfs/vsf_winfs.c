@@ -40,6 +40,7 @@ dcl_vsf_peda_methods(static, __vk_winfs_close)
 dcl_vsf_peda_methods(static, __vk_winfs_create)
 dcl_vsf_peda_methods(static, __vk_winfs_unlink)
 dcl_vsf_peda_methods(static, __vk_winfs_rename)
+dcl_vsf_peda_methods(static, __vk_winfs_setpos)
 
 extern vk_file_t * __vk_file_get_fs_parent(vk_file_t *file);
 
@@ -52,22 +53,23 @@ extern vk_file_t * __vk_file_get_fs_parent(vk_file_t *file);
 
 const vk_fs_op_t vk_winfs_op = {
     .fn_mount       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_mount),
-    .fn_unmount     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+    .fn_unmount     = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    .fn_sync        = vk_file_dummy,
+    .fn_sync        = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
 #endif
     .fn_rename      = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_rename),
     .fop            = {
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_write),
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_close),
-        .fn_resize  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_setpos),
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_lookup),
         .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_create),
         .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_unlink),
-        .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     },
 };
 
@@ -185,9 +187,24 @@ __vsf_component_peda_ifs_entry(__vk_winfs_mount, vk_fs_mount)
     FindClose(hFind);
 
     fsinfo->root.parent = NULL;
+    fsinfo->root.d.hFind = INVALID_HANDLE_VALUE;
     dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
+}
+
+static void __vk_winfs_prepare_find(vk_winfs_file_t *dir, WIN32_FIND_DATAW *FindFileData)
+{
+    uint_fast16_t pathlen = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, NULL, 0);
+    char path[pathlen + 2];
+    __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, pathlen);
+    strcat(path, "\\*");
+
+    int path_unicode_len = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
+    wchar_t path_unicode[path_unicode_len];
+    MultiByteToWideChar(CP_UTF8, 0, path, -1, path_unicode, path_unicode_len);
+
+    dir->d.hFind = FindFirstFileW(path_unicode, FindFileData);
 }
 
 __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
@@ -195,7 +212,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
     vsf_peda_begin();
     vk_winfs_file_t *dir = (vk_winfs_file_t *)&vsf_this;
     const char *name = vsf_local.name;
-    uint_fast32_t idx = vsf_local.idx;
+    uint_fast32_t idx = dir->pos;
     vsf_err_t err = VSF_ERR_NONE;
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -211,10 +228,8 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
     vsf_unprotect_sched(orig);
     *vsf_local.result = NULL;
 
-    uint_fast16_t pathlen = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, NULL, 0);
     uint_fast16_t namelen;
     WIN32_FIND_DATAW FindFileData;
-    HANDLE hFind = INVALID_HANDLE_VALUE;
     if (name != NULL) {
         const char *ptr = name;
         while (*ptr != '\0') {
@@ -229,48 +244,46 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
             namelen = ptr - name;
         }
     } else {
-        char path[pathlen + 2];
-        __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, pathlen);
-        strcat(path, "\\*");
+        if (INVALID_HANDLE_VALUE == dir->d.hFind) {
+            __vk_winfs_prepare_find(dir, &FindFileData);
+            VSF_FS_ASSERT(dir->d.hFind != INVALID_HANDLE_VALUE);
+        } else if (!FindNextFileW(dir->d.hFind, &FindFileData)) {
+            FindClose(dir->d.hFind);
+            dir->d.hFind = INVALID_HANDLE_VALUE;
+            dir->pos = 0;
 
-        int path_unicode_len = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
-        wchar_t path_unicode[path_unicode_len];
-        MultiByteToWideChar(CP_UTF8, 0, path, -1, path_unicode, path_unicode_len);
-
-        hFind = FindFirstFileW(path_unicode, &FindFileData);
-        if (hFind != INVALID_HANDLE_VALUE) {
-            do {
-                if (    !wcscmp(FindFileData.cFileName, L".")
-                    ||  !wcscmp(FindFileData.cFileName, L"..")) {
-                    idx++;
-                }
-                if (!idx) {
-                    break;
-                }
-
-                if (!FindNextFile(hFind, &FindFileData)) {
-                    FindClose(hFind);
-                    err = VSF_ERR_NOT_AVAILABLE;
-                    vsf_eda_return(err);
-                    return;
-                }
-            } while (idx--);
-            namelen = WideCharToMultiByte(CP_UTF8, 0, FindFileData.cFileName, -1, NULL, 0, 0, false) - 1;
-        } else {
             err = VSF_ERR_NOT_AVAILABLE;
             vsf_eda_return(err);
             return;
         }
+
+        idx = 0;
+        do {
+            if (    !wcscmp(FindFileData.cFileName, L".")
+                ||  !wcscmp(FindFileData.cFileName, L"..")) {
+                idx++;
+            }
+            if (!idx) {
+                break;
+            }
+
+            if (!FindNextFileW(dir->d.hFind, &FindFileData)) {
+                err = VSF_ERR_NOT_AVAILABLE;
+                vsf_eda_return(err);
+                return;
+            }
+        } while (idx--);
+        namelen = WideCharToMultiByte(CP_UTF8, 0, FindFileData.cFileName, -1, NULL, 0, 0, false) - 1;
     }
 
+    uint_fast16_t pathlen = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, NULL, 0);
     char path[pathlen /* including '\0' */ + 1 /* '/' */ + namelen];
     __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, pathlen);
     path[pathlen - 1] = '/';
     if (NULL == name) {
-        VSF_FS_ASSERT(hFind != INVALID_HANDLE_VALUE);
+        VSF_FS_ASSERT(dir->d.hFind != INVALID_HANDLE_VALUE);
         name = &path[pathlen];
         WideCharToMultiByte(CP_UTF8, 0, FindFileData.cFileName, -1, (char *)name, namelen, 0, false);
-        FindClose(hFind);
     } else {
         memcpy(&path[pathlen], name, namelen);
     }
@@ -315,7 +328,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
         winfs_file->attr &= ~VSF_FILE_ATTR_WRITE;
     }
     if (dwAttribute & FILE_ATTRIBUTE_DIRECTORY) {
-        // TODO: Open Directory
+        winfs_file->d.hFind = INVALID_HANDLE_VALUE;
     } else {
         DWORD access_mode = GENERIC_READ, share_mode = FILE_SHARE_READ;
         if (winfs_file->attr & VSF_FILE_ATTR_WRITE) {
@@ -333,6 +346,8 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
         winfs_file->size = GetFileSize(winfs_file->f.hFile, &sizehigh) | ((uint64_t)sizehigh << 32);
     }
 
+    winfs_file->idx = dir->pos;
+    dir->pos++;
     orig = vsf_protect_sched();
         vsf_dlist_add_to_head(vk_winfs_file_t, child_node, &dir->d.child_list, winfs_file);
     vsf_unprotect_sched(orig);
@@ -349,17 +364,53 @@ do_return:
     vsf_peda_end();
 }
 
-__vsf_component_peda_ifs_entry(__vk_winfs_read, vk_file_read)
+__vsf_component_peda_ifs_entry(__vk_winfs_setpos, vk_file_setpos)
 {
     vsf_peda_begin();
     vk_winfs_file_t *file = (vk_winfs_file_t *)&vsf_this;
     uint_fast64_t offset = vsf_local.offset;
+    if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
+        if (file->d.hFind != INVALID_HANDLE_VALUE) {
+            FindClose(file->d.hFind);
+        }
+        if (0 == offset) {
+            file->d.hFind = INVALID_HANDLE_VALUE;
+        } else {
+            WIN32_FIND_DATAW FindFileData;
+            __vk_winfs_prepare_find(file, &FindFileData);
+            VSF_FS_ASSERT(file->d.hFind != INVALID_HANDLE_VALUE);
+
+            while (--offset > 0) {
+                if (!FindNextFileW(file->d.hFind, &FindFileData)) {
+                    FindClose(file->d.hFind);
+                    file->d.hFind = INVALID_HANDLE_VALUE;
+                    goto assert_fail;
+                }
+            }
+        }
+    } else {
+        if (VSF_ERR_NONE != __vk_winfs_set_pos(file, offset)) {
+        assert_fail:
+            VSF_FS_ASSERT(false);
+            vsf_eda_return(VSF_ERR_FAIL);
+            return;
+        }
+    }
+    VSF_FS_ASSERT(vsf_local.result != NULL);
+    *vsf_local.result = offset;
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_winfs_read, vk_file_read)
+{
+    vsf_peda_begin();
+    vk_winfs_file_t *file = (vk_winfs_file_t *)&vsf_this;
     uint_fast32_t size = vsf_local.size;
     uint8_t *buff = vsf_local.buff;
     DWORD rsize = 0;
 
-    if (    (VSF_ERR_NONE != __vk_winfs_set_pos(file, offset))
-        ||  ReadFile(file->f.hFile, buff, size, &rsize, NULL)) {
+    if (ReadFile(file->f.hFile, buff, size, &rsize, NULL)) {
         vsf_eda_return(rsize);
     } else {
         vsf_eda_return(VSF_ERR_FAIL);
@@ -371,15 +422,13 @@ __vsf_component_peda_ifs_entry(__vk_winfs_write, vk_file_write)
 {
     vsf_peda_begin();
     vk_winfs_file_t *file = (vk_winfs_file_t *)&vsf_this;
-    uint_fast64_t offset = vsf_local.offset;
     uint_fast32_t size = vsf_local.size;
     uint8_t *buff = vsf_local.buff;
     DWORD wsize = 0;
 
-    if (    (VSF_ERR_NONE != __vk_winfs_set_pos(file, offset))
-        ||  WriteFile(file->f.hFile, buff, size, &wsize, NULL)) {
-        if (offset + wsize > file->size) {
-            file->size = offset + wsize;
+    if (WriteFile(file->f.hFile, buff, size, &wsize, NULL)) {
+        if (file->pos + wsize > file->size) {
+            file->size = file->pos + wsize;
         }
         vsf_eda_return(wsize);
     } else {
@@ -398,10 +447,14 @@ __vsf_component_peda_ifs_entry(__vk_winfs_close, vk_file_close)
     vsf_heap_free(file->name);
 
     if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
-        // TODO: Close Directory
+        if (file->d.hFind != INVALID_HANDLE_VALUE) {
+            FindClose(file->d.hFind);
+            file->d.hFind = INVALID_HANDLE_VALUE;
+        }
     } else {
         CloseHandle(file->f.hFile);
     }
+
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_remove(vk_winfs_file_t, child_node, &parent->d.child_list, file);
     vsf_unprotect_sched(orig);
@@ -433,7 +486,6 @@ __vsf_component_peda_ifs_entry(__vk_winfs_create, vk_file_create)
     } else {
         HANDLE hFile = CreateFileW(path_unicode, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
             NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-        VSF_LINUX_ASSERT(0 == vsf_local.size);
         err = (INVALID_HANDLE_VALUE == hFile) ? VSF_ERR_FAIL : VSF_ERR_NONE;
         CloseHandle(hFile);
     }

@@ -340,7 +340,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
                     malfs_fat->root_name[4] = '0' + mounter->partition_idx;
                     malfs_fat->root_name[5] = '\0';
                     mounter->cur_root_name = malfs_fat->root_name;
-                    if (VSF_ERR_NONE != vk_file_create(mounter->dir, mounter->cur_root_name, VSF_FILE_ATTR_DIRECTORY, 0)) {
+                    if (VSF_ERR_NONE != vk_file_create(mounter->dir, mounter->cur_root_name, VSF_FILE_ATTR_DIRECTORY)) {
                         goto return_mount_failed;
                     }
                 }
@@ -353,7 +353,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
                 goto return_mount_failed;
             }
             mounter->mount_state = VSF_MOUNT_STATE_OPEN_ROOT;
-            if (VSF_ERR_NONE != vk_file_open(mounter->dir, mounter->cur_root_name, 0, &partition->root)) {
+            if (VSF_ERR_NONE != vk_file_open(mounter->dir, mounter->cur_root_name, &partition->root)) {
                 goto return_mount_failed;
             }
             break;

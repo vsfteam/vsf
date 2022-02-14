@@ -59,20 +59,21 @@ const vk_fs_op_t vk_lfs_op = {
     .fn_mount       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_mount),
     .fn_unmount     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_unmount),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    .fn_sync        = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+    .fn_sync        = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
 #endif
-    .fn_rename      = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+    .fn_rename      = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     .fop            = {
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_write),
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_close),
-        .fn_resize  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_setpos),
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_lookup),
-        .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     },
 };
 

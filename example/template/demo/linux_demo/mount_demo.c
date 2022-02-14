@@ -190,7 +190,7 @@ static void * __prepare_file_mal_fsdata(const __fs_type_t *fstype, __fs_param_t 
         return NULL;
     }
 
-    vk_file_open(NULL, param->device, 0, &file_mal->file);
+    vk_file_open(NULL, param->device, &file_mal->file);
     if (NULL == file_mal->file) {
         printf("fail to open src_file %s\r\n", param->device);
         goto cleanup;

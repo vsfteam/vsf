@@ -130,7 +130,7 @@ void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...)
     } else {
         void *new_buff = __malloc_ex(process, size);
         if (new_buff != NULL) {
-            size_t copy_size = vsf_heap_size((char *)p - sizeof(size_t)) - sizeof(size_t);
+            size_t copy_size = vsf_heap_size((uint8_t *)p - sizeof(size_t)) - sizeof(size_t);
             copy_size = min(size, copy_size);
             memcpy(new_buff, p, copy_size);
         }

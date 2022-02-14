@@ -44,22 +44,23 @@ dcl_vsf_peda_methods(static, __vk_memfs_write)
 
 const vk_fs_op_t vk_memfs_op = {
     .fn_mount       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_mount),
-    .fn_unmount     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+    .fn_unmount     = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    .fn_sync        = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+    .fn_sync        = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
 #endif
-    .fn_rename      = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+    .fn_rename      = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     .fop            = {
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_write),
-        .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
-        .fn_resize  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
+        .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_setpos),
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_lookup),
-        .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     },
 };
 

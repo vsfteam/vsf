@@ -45,7 +45,7 @@ static void __vsf_linux_httpd_urihandler_file_evthandler(vsf_eda_t *eda, vsf_evt
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vk_file_read_stream(file_stream, 0, request->content_length, stream);
+        vk_file_read_stream(file_stream, stream, request->content_length);
         request->is_stream_out_started = true;
         break;
     case VSF_EVT_RETURN:
@@ -70,7 +70,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
     // get root file
     vk_file_t *root_dir = NULL, *uri_file;
     if (root_path != NULL) {
-        vk_file_open(NULL, root_path, 0, &root_dir);
+        vk_file_open(NULL, root_path, &root_dir);
         if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
             goto __not_found;
         }
@@ -79,7 +79,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
     if (uri[0] == '/') {
         uri++;
     }
-    vk_file_open(root_dir, uri, 0, &uri_file);
+    vk_file_open(root_dir, uri, &uri_file);
     if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
         goto __not_found;
     }
@@ -88,9 +88,9 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
     // if uri is a directory, get index.html/index.htm
     if (uri_file->attr & VSF_FILE_ATTR_DIRECTORY) {
         vk_file_t *html_file;
-        vk_file_open(uri_file, "index.html", 0, &html_file);
+        vk_file_open(uri_file, "index.html", &html_file);
         if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
-            vk_file_open(uri_file, "index.htm", 0, &html_file);
+            vk_file_open(uri_file, "index.htm", &html_file);
             if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
                 vk_file_close(uri_file);
                 goto __not_found;

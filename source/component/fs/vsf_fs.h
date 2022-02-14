@@ -92,24 +92,26 @@ typedef enum vk_file_attr_t {
     VSF_FILE_ATTR_DYN           = 1 << 7,
     VSF_FILE_ATTR_EXT           = 1 << 8,
     VSF_FILE_ATTR_USER          = 1 << 9,
-
-    // TODO: for linux, file attr need to be 32-bit for vfs special files
-#if VSF_USE_LINUX == ENABLED
-    // make file attr 32-bit
-    __VSF_FILE_ATTR_ALL_SET     = 0xFFFFFFFF,
-#endif
 } vk_file_attr_t;
+
+typedef enum vk_file_whence_t {
+    VSF_FILE_SEEK_SET = 0,
+    VSF_FILE_SEEK_CUR = 1,
+    VSF_FILE_SEEK_END = 2,
+} vk_file_whence_t;
 
 vsf_class(vk_fs_fop_t) {
     protected_member(
         uint8_t close_local_size;
         uint8_t read_local_size;
         uint8_t write_local_size;
-        uint8_t resize_local_size;
+        uint8_t setsize_local_size;
+        uint8_t setpos_local_size;
         vsf_peda_evthandler_t fn_close;
         vsf_peda_evthandler_t fn_read;
         vsf_peda_evthandler_t fn_write;
-        vsf_peda_evthandler_t fn_resize;
+        vsf_peda_evthandler_t fn_setsize;
+        vsf_peda_evthandler_t fn_setpos;
     )
 };
 
@@ -147,17 +149,9 @@ vsf_class(vk_fs_op_t) {
     )
 };
 
-// (bytelen << 6) | index
-typedef enum vk_file_name_coding_t {
-    VSF_FILE_NAME_CODING_UNKNOWN    = 0,
-    VSF_FILE_NAME_CODING_ASCII      = (1 << 6) | 0,
-    VSF_FILE_NAME_CODING_UCS2       = (2 << 6) | 1,
-} vk_file_name_coding_t;
-
 vsf_class(vk_file_t) {
     public_member(
         vk_file_attr_t attr;
-        vk_file_name_coding_t coding;
         char *name;
         uint64_t size;
 
@@ -173,6 +167,7 @@ vsf_class(vk_file_t) {
     protected_member(
         const vk_fs_op_t *fsop;
         vk_file_t *parent;
+        uint64_t pos;
     )
 
     private_member(
@@ -228,7 +223,6 @@ vsf_class(vk_file_stream_t) {
         vk_file_t *file;
     )
     private_member(
-        uint64_t addr;
         uint32_t size;
         uint32_t rw_size;
         vsf_stream_t *stream;
@@ -245,34 +239,36 @@ __vsf_component_peda_ifs(vk_fs_unmount)
 __vsf_component_peda_ifs(vk_fs_sync)
 
 __vsf_component_peda_ifs(vk_file_create,
-    const char      *name;
-    vk_file_attr_t  attr;
-    uint64_t        size;
+    const char          *name;
+    vk_file_attr_t      attr;
 )
 __vsf_component_peda_ifs(vk_file_unlink,
-    const char      *name;
+    const char          *name;
 )
 __vsf_component_peda_ifs(vk_file_lookup,
     const char      *name;
-    // TODO: idx will be removed later, use readdir to enumerate directories
-    uint32_t        idx;
     vk_file_t       **result;
 )
+__vsf_component_peda_ifs(vk_file_setsize,
+    uint64_t            size;
+)
 __vsf_component_peda_ifs(vk_file_rename,
-    vk_file_t       *olddir;
-    const char      *oldname;
-    vk_file_t       *newdir;
-    const char      *newname;
+    vk_file_t           *olddir;
+    const char          *oldname;
+    vk_file_t           *newdir;
+    const char          *newname;
 )
 __vsf_component_peda_ifs(vk_file_read,
-    uint64_t        offset;
-    uint32_t        size;
-    uint8_t         *buff;
+    uint8_t             *buff;
+    uint32_t            size;
 )
 __vsf_component_peda_ifs(vk_file_write,
-    uint64_t        offset;
-    uint32_t        size;
-    uint8_t         *buff;
+    uint8_t             *buff;
+    uint32_t            size;
+)
+__vsf_component_peda_ifs(vk_file_setpos,
+    uint64_t            offset;
+    uint64_t            *result;
 )
 __vsf_component_peda_ifs(vk_file_close)
 __vsf_component_peda_ifs(vk_file_sync)
@@ -292,20 +288,21 @@ extern vsf_err_t vk_fs_unmount(vk_file_t *dir);
 extern vsf_err_t vk_fs_sync(vk_file_t *dir);
 #endif
 
-extern vsf_err_t vk_file_open(vk_file_t *dir, const char *name, uint_fast16_t idx, vk_file_t **file);
-extern vsf_err_t vk_file_create(vk_file_t *dir, const char *name, vk_file_attr_t attr, uint_fast64_t size);
+extern vsf_err_t vk_file_open(vk_file_t *dir, const char *name, vk_file_t **file);
+extern vsf_err_t vk_file_create(vk_file_t *dir, const char *name, vk_file_attr_t attr);
 extern vsf_err_t vk_file_unlink(vk_file_t *dir, const char *name);
 extern vsf_err_t vk_file_rename(vk_file_t *olddir, const char *oldname, vk_file_t *newdir, const char *newname);
-extern uint32_t vk_file_get_ref(vk_file_t *file);
 
+extern uint32_t vk_file_get_ref(vk_file_t *file);
 extern vsf_err_t vk_file_close(vk_file_t *file);
-extern vsf_err_t vk_file_read(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
-extern vsf_err_t vk_file_write(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
+extern uint64_t vk_file_tell(vk_file_t *file);
+extern vsf_err_t vk_file_seek(vk_file_t *file, int64_t offset, vk_file_whence_t whence);
+extern vsf_err_t vk_file_read(vk_file_t *file, uint8_t *buff, uint_fast32_t size);
+extern vsf_err_t vk_file_write(vk_file_t *file, uint8_t *buff, uint_fast32_t size);
+extern vsf_err_t vk_file_setsize(vk_file_t *file, uint64_t size);
 #if VSF_FS_CFG_USE_CACHE == ENABLED
 extern vsf_err_t vk_file_sync(vk_file_t *file);
 #endif
-
-extern uint_fast16_t vk_file_get_name_length(vk_file_t *file);
 
 extern char * vk_file_getfileext(char *fname);
 extern char * vk_file_getfilename(char *path);
@@ -320,13 +317,14 @@ extern void vk_file_free(vk_file_t *file);
 
 extern void vk_fs_return(vk_file_t *file, vsf_err_t err);
 
-dcl_vsf_peda_methods(extern, vk_dummyfs_succeed)
-dcl_vsf_peda_methods(extern, vk_dummyfs_not_support)
+dcl_vsf_peda_methods(extern, vk_fsop_succeed)
+dcl_vsf_peda_methods(extern, vk_fsop_not_support)
+dcl_vsf_peda_methods(extern, vk_fsop_setpos)
 #endif
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-extern vsf_err_t vk_file_read_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
-extern vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
+extern vsf_err_t vk_file_read_stream(vk_file_stream_t *pthis, vsf_stream_t *stream, uint_fast32_t size);
+extern vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, vsf_stream_t *stream, uint_fast32_t size);
 #endif
 
 #ifdef __cplusplus

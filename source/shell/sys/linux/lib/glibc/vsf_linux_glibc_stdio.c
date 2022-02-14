@@ -184,7 +184,7 @@ off64_t ftello64(FILE *f)
     VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
 
-    return (off64_t)priv->pos;
+    return vk_file_tell(priv->file);
 }
 
 void rewind(FILE *f)
@@ -193,7 +193,7 @@ void rewind(FILE *f)
     VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
 
-    priv->pos = 0;
+    vk_file_seek(priv->file, 0, VSF_FILE_SEEK_SET);
 }
 
 #if __IS_COMPILER_GCC__

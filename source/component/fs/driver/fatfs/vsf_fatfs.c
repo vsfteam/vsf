@@ -166,6 +166,7 @@ dcl_vsf_peda_methods(static, __vk_fatfs_lookup)
 dcl_vsf_peda_methods(static, __vk_fatfs_read)
 dcl_vsf_peda_methods(static, __vk_fatfs_write)
 dcl_vsf_peda_methods(static, __vk_fatfs_close)
+dcl_vsf_peda_methods(static, __vk_fatfs_setpos)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -178,22 +179,23 @@ const vk_fs_op_t vk_fatfs_op = {
     .fn_mount               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_mount),
     .fn_unmount             = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_unmount),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    .fn_sync                = vk_file_dummy,
+    .fn_sync                = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
 #endif
-    .fn_rename              = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+    .fn_rename              = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     .fop                    = {
         .read_local_size    = sizeof(vk_fatfs_read_local),
         .fn_read            = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_read),
         .fn_write           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_write),
         .fn_close           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_close),
-        .fn_resize          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_setsize         = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setpos          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_setpos),
     },
     .dop                    = {
         .lookup_local_size  = sizeof(vk_fatfs_lookup_local),
         .fn_lookup          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_lookup),
-        .fn_create          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_unlink          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .fn_chmod           = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_create          = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_unlink          = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_chmod           = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     },
 };
 
@@ -642,6 +644,17 @@ __vsf_component_peda_private_entry(__vk_fatfs_get_fat_entry,,
     vsf_peda_end();
 }
 
+__vsf_component_peda_ifs_entry(__vk_fatfs_setpos, vk_file_setpos)
+{
+    vsf_peda_begin();
+    vk_fatfs_file_t *file = (vk_fatfs_file_t *)&vsf_this;
+    uint_fast64_t offset = vsf_local.offset;
+    if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
+    } else {
+    }
+    vsf_peda_end();
+}
+
 __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
     implement(vk_fatfs_lookup_local)
 ) {
@@ -737,7 +750,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
 
                             dentry = (fatfs_dentry_t *)dparser->entry;
                             fatfs_file->attr |= (vk_file_attr_t)__vk_fatfs_parse_file_attr(dentry->fat.Attr);
-                            fatfs_file->coding = dparser->is_unicode ? VSF_FILE_NAME_CODING_UCS2 : VSF_FILE_NAME_CODING_UNKNOWN;
+//                            fatfs_file->name_coding = dparser->is_unicode ? VSF_FILE_NAME_CODING_UCS2 : VSF_FILE_NAME_CODING_UNKNOWN;
                             fatfs_file->fsop = &vk_fatfs_op;
                             fatfs_file->size = dentry->fat.FileSize;
                             fatfs_file->info = fsinfo;
@@ -832,11 +845,12 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
     __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)fatfs_file->info;
     __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
     uint32_t clustersize = 1 << (fsinfo->cluster_size_bits + fsinfo->sector_size_bits);
+    uint64_t pos = fatfs_file->pos;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (vsf_local.size > (fatfs_file->size - vsf_local.offset)) {
-            vsf_local.size = fatfs_file->size - vsf_local.offset;
+        if (vsf_local.size > (fatfs_file->size - pos)) {
+            vsf_local.size = fatfs_file->size - pos;
         }
         // locate the first cluster for access
         vsf_local.cur_cluster = fatfs_file->first_cluster;

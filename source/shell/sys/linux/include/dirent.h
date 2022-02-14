@@ -16,7 +16,11 @@ extern "C" {
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define opendir         VSF_LINUX_WRAPPER(opendir)
 #define readdir         VSF_LINUX_WRAPPER(readdir)
+#define rewinddir       VSF_LINUX_WRAPPER(rewinddir)
+#define telldir         VSF_LINUX_WRAPPER(telldir)
+#define seekdir         VSF_LINUX_WRAPPER(seekdir)
 #define closedir        VSF_LINUX_WRAPPER(closedir)
+#define scandir         VSF_LINUX_WRAPPER(scandir)
 #endif
 
 struct dirent {
@@ -30,7 +34,13 @@ typedef struct vsf_linux_fd_t DIR;
 
 DIR * opendir(const char *name);
 struct dirent * readdir(DIR *dir);
+void rewinddir(DIR *dir);
+long telldir(DIR *dir);
+void seekdir(DIR *dir, long loc);
 int closedir(DIR *dir);
+int scandir(const char *dir, struct dirent ***namelist,
+              int (*filter)(const struct dirent *),
+              int (*compar)(const struct dirent **, const struct dirent **));
 
 #ifdef __cplusplus
 }

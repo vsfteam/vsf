@@ -137,7 +137,7 @@ static vk_file_t * __vsf_linux_fs_get_file(const char *pathname)
 {
     vk_file_t *file;
 
-    vk_file_open(NULL, pathname, 0, &file);
+    vk_file_open(NULL, pathname, &file);
     return file;
 }
 
@@ -158,8 +158,8 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
     ssize_t result = 0;
     int32_t rsize;
 
-    while ((count > 0) && (priv->pos < file->size)) {
-        vk_file_read(file, priv->pos, count, (uint8_t *)buf);
+    while (count > 0) {
+        vk_file_read(file, (uint8_t *)buf, count);
         rsize = (int32_t)vsf_eda_get_return_value();
         if (rsize < 0) {
             return -1;
@@ -169,7 +169,6 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 
         count -= rsize;
         result += rsize;
-        priv->pos += rsize;
         buf = (uint8_t *)buf + rsize;
     }
     return result;
@@ -183,7 +182,7 @@ static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t
     int32_t wsize;
 
     while (count > 0) {
-        vk_file_write(file, priv->pos, count, (uint8_t *)buf);
+        vk_file_write(file, (uint8_t *)buf, count);
         wsize = (int32_t)vsf_eda_get_return_value();
         if (wsize < 0) {
             return -1;
@@ -193,7 +192,6 @@ static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t
 
         count -= wsize;
         result += wsize;
-        priv->pos += wsize;
         buf = (uint8_t *)buf + wsize;
     }
     return result;
@@ -210,7 +208,7 @@ static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd)
 static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-    return !(priv->file->size - priv->pos);
+    return !(priv->file->size - vk_file_tell(priv->file));
 }
 
 vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd)
@@ -651,7 +649,7 @@ int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, co
     return ready;
 }
 
-static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr_t attr, uint_fast64_t size)
+static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr_t attr)
 {
     char fullpath[MAX_PATH], *name_tmp;
     int err = 0;
@@ -667,7 +665,7 @@ static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr
     }
 
     name_tmp = vk_file_getfilename((char *)pathname);
-    vk_file_create(dir, name_tmp, attr, size);
+    vk_file_create(dir, name_tmp, attr);
     if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
         err = -1;
     }
@@ -789,7 +787,7 @@ int mkdir(const char *pathname, mode_t mode)
         return -1;
     }
 
-    return __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+    return __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE);
 }
 
 int mkdirs(const char *pathname, mode_t mode)
@@ -924,7 +922,7 @@ __open_again:
                     goto __exit_failure;
                 }
             } else {
-                if (__vsf_linux_fs_create(path_in_ram, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0) < 0) {
+                if (__vsf_linux_fs_create(path_in_ram, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE) < 0) {
                     goto __exit_failure;
                 }
             }
@@ -959,7 +957,7 @@ __open_again:
             return -1;
         }
         if (flags & O_APPEND) {
-            priv->pos = file->size;
+            vk_file_seek(file, 0, VSF_FILE_SEEK_END);
         }
         if (flags & O_EXCL) {
             file->attr |= VSF_FILE_ATTR_EXCL;
@@ -1095,21 +1093,9 @@ off_t lseek(int fd, off_t offset, int whence)
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     VSF_LINUX_ASSERT(sfd->op == &__vsf_linux_fs_fdop);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-    uint_fast64_t new_pos;
 
-    switch (whence) {
-    case SEEK_SET:  new_pos = 0;                break;
-    case SEEK_CUR:  new_pos = priv->pos;        break;
-    case SEEK_END:  new_pos = priv->file->size; break;
-    default:        return -1;
-    }
-
-    new_pos += offset;
-    if (new_pos > priv->file->size) {
-        return -1;
-    }
-    priv->pos = new_pos;
-    return (off_t)new_pos;
+    vk_file_seek(priv->file, offset, whence);
+    return vk_file_tell(priv->file);
 }
 
 int fsync(int fd)
@@ -1124,8 +1110,30 @@ int fdatasync(int fd)
 
 int ftruncate(int fd, off_t length)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    vk_file_t *file = priv->file;
+
+    vk_file_setsize(file, length);
+    return vsf_eda_get_return_value();
+}
+
+int truncate(const char *path, off_t length)
+{
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)path)) {
+        return -1;
+    }
+
+    int fd = open(fullpath, O_WRONLY);
+    if (fd < 0) {
+        return -1;
+    }
+
+    int ret = ftruncate(fd, length);
+    close(fd);
+    return ret;
 }
 
 int fstat(int fd, struct stat *buf)
@@ -1262,17 +1270,46 @@ struct dirent * readdir(DIR *dir)
         priv->child = NULL;
     }
 
-    vk_file_open(file, NULL, priv->dir.d_ino++, &priv->child);
+    vk_file_open(file, NULL, &priv->child);
     if (NULL == priv->child) {
         return NULL;
     }
+    priv->dir.d_ino++;
 
     child = priv->child;
     priv->dir.d_name = child->name;
-    priv->dir.d_reclen = vk_file_get_name_length(child);
+    priv->dir.d_reclen = sizeof(struct dirent);
     priv->dir.d_type = child->attr & VSF_FILE_ATTR_DIRECTORY ? DT_DIR :
                 child->attr & VSF_FILE_ATTR_EXECUTE ? DT_EXE : DT_REG;
     return &priv->dir;
+}
+
+int scandir(const char *dir, struct dirent ***namelist,
+              int (*filter)(const struct dirent *),
+              int (*compar)(const struct dirent **, const struct dirent **))
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+long telldir(DIR *dir)
+{
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)dir->priv;
+    vk_file_t *file = priv->file;
+    vk_file_seek(file, 0, VSF_FILE_SEEK_CUR);
+    return vk_file_tell(file);
+}
+
+void seekdir(DIR *dir, long loc)
+{
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)dir->priv;
+    vk_file_t *file = priv->file;
+    vk_file_seek(file, loc, VSF_FILE_SEEK_SET);
+}
+
+void rewinddir(DIR *dir)
+{
+    seekdir(dir, 0);
 }
 
 int closedir(DIR *dir)
@@ -1420,16 +1457,16 @@ __vsf_component_peda_ifs_entry(__vk_vfs_buffer_write, vk_file_write)
     void *buffer = vfs_file->f.param;
     int realsize;
 
-    if (vsf_local.offset >= vfs_file->size) {
+    if (vfs_file->pos >= vfs_file->size) {
         realsize = -1;
-    } else if (vsf_local.offset + vsf_local.size > vfs_file->size) {
-        realsize = vfs_file->size - vsf_local.offset;
+    } else if (vfs_file->pos + vsf_local.size > vfs_file->size) {
+        realsize = vfs_file->size - vfs_file->pos;
     } else {
         realsize = vsf_local.size;
     }
 
     if (realsize > 0) {
-        memcpy((uint8_t *)buffer + vsf_local.offset, vsf_local.buff, realsize);
+        memcpy((uint8_t *)buffer + vfs_file->pos, vsf_local.buff, realsize);
     }
     vsf_eda_return(realsize);
 
@@ -1444,16 +1481,16 @@ __vsf_component_peda_ifs_entry(__vk_vfs_buffer_read, vk_file_read)
     void *buffer = vfs_file->f.param;
     int realsize;
 
-    if (vsf_local.offset >= vfs_file->size) {
+    if (vfs_file->pos >= vfs_file->size) {
         realsize = -1;
-    } else if (vsf_local.offset + vsf_local.size > vfs_file->size) {
-        realsize = vfs_file->size - vsf_local.offset;
+    } else if (vfs_file->pos + vsf_local.size > vfs_file->size) {
+        realsize = vfs_file->size - vfs_file->pos;
     } else {
         realsize = vsf_local.size;
     }
 
     if (realsize > 0) {
-        memcpy(vsf_local.buff, (uint8_t *)buffer + vsf_local.offset, realsize);
+        memcpy(vsf_local.buff, (uint8_t *)buffer + vfs_file->pos, realsize);
     }
     vsf_eda_return(realsize);
 

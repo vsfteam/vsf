@@ -81,7 +81,7 @@ __vsf_component_peda_ifs_entry(__vk_devfs_mal_read, vk_file_read)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vk_mal_read(mal, vsf_local.offset, vsf_local.size, vsf_local.buff);
+        vk_mal_read(mal, vfs_file->pos, vsf_local.size, vsf_local.buff);
         break;
     case VSF_EVT_RETURN:
         vsf_eda_return(vsf_eda_get_return_value());
@@ -100,7 +100,7 @@ __vsf_component_peda_ifs_entry(__vk_devfs_mal_write, vk_file_write)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vk_mal_write(mal, vsf_local.offset, vsf_local.size, vsf_local.buff);
+        vk_mal_write(mal, vfs_file->pos, vsf_local.size, vsf_local.buff);
         break;
     case VSF_EVT_RETURN:
         vsf_eda_return(vsf_eda_get_return_value());

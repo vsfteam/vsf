@@ -55,6 +55,7 @@ vsf_class(vk_winfs_file_t) {
             } f;
             struct {
                 vsf_dlist_t child_list;
+                HANDLE hFind;
             } d;
         };
         uint32_t idx;

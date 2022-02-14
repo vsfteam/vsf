@@ -98,9 +98,9 @@ extern FILE * __vsf_linux_stderr(void);
 #define BUFSIZ              512
 #define L_tmpnam            260
 
-#define SEEK_SET            0
-#define SEEK_CUR            1
-#define SEEK_END            2
+#define SEEK_SET            0   // same value as VSF_FILE_SEEK_SET
+#define SEEK_CUR            1   // same value as VSF_FILE_SEEK_CUR
+#define SEEK_END            2   // same value as VSF_FILE_SEEK_END
 
 #ifndef PATH_MAX
 #   define PATH_MAX         255
