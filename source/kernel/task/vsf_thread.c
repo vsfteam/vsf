@@ -286,6 +286,7 @@ static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
 {
     VSF_KERNEL_ASSERT(local != (uintptr_t)NULL);
     vsf_thread_cb_t *pthis = (vsf_thread_cb_t *)(*(void **)((uintptr_t)local - sizeof(uintptr_t)));
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
 #   ifdef VSF_ARCH_LIMIT_NO_SET_STACK
     vsf_arch_irq_request_t rep;
@@ -617,7 +618,7 @@ vsf_err_t vsf_thread_start(vsf_thread_t *pthis, vsf_prio_t priority)
 #   endif
 
 #   if VSF_KERNEL_CFG_TRACE == ENABLED
-    vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, NULL, pthis->stack, pthis->stack_size);
+    vsf_kernel_trace_eda_info(&pthis->use_as__vsf_eda_t, NULL, pthis->stack, pthis->stack_size);
 #   endif
 
     return err;
