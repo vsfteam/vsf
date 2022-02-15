@@ -162,6 +162,10 @@ static void __vsf_x86_debug_stream_init(void)
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 
+    // switch to utf8
+#undef system
+    system("chcp 65001");
+
     GetConsoleMode(hIn, &mode);
     mode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
     mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;

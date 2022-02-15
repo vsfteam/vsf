@@ -639,7 +639,6 @@ int ls_main(int argc, char *argv[])
                     printf(VSH_COLOR_NORMAL);
                 }
 #endif
-                // TODO: add convert to win console, which is not utf8
                 write(STDOUT_FILENO, ent->d_name, strlen(ent->d_name));
                 printf("  ");
                 fflush(stdout);
