@@ -9,11 +9,13 @@
 #   include "../../../include/errno.h"
 #   include "../../../include/sys/wait.h"
 #   include "../../../include/dirent.h"
+#   include "../../../include/fcntl.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
 #   include <sys/wait.h>
 #   include <dirent.h>
+#   include <fcntl.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_CTYPE == ENABLED
 #   include "../../../include/simple_libc/ctype.h"
@@ -110,35 +112,42 @@ static void __vsh_history_down(vsh_cmd_ctx_t *ctx)
 #   pragma diag_suppress=pe111
 #endif
 
-static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx, vsh_shell_state_t type)
+static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx)
 {
     int esclen = ctx->escpos;
+    char type = ctx->cmd[ctx->pos];
     char lastch = ctx->cmd[ctx->pos + esclen - 1];
 
     // esclen will be used for full support to escape strings
     UNUSED_PARAM(esclen);
 
-    if (!(  ((lastch >= 'a') && (lastch <= 'z'))
-        ||  ((lastch >= 'A') && (lastch <= 'Z')))) {
+    bool is_end = false;
+    switch (type) {
+    case '[':
+        is_end =    ((lastch >= 'a') && (lastch <= 'z'))
+                ||  ((lastch >= 'A') && (lastch <= 'Z'))
+                ||  (lastch == '~');
+        break;
+    case 'O':
+        is_end = esclen == 2;
+        break;
+    }
+    if (!is_end) {
         return SHELL_STATE_ESC;
     }
 
-    if (esclen == 2) {
-        char *esc = &ctx->cmd[ctx->pos];
-        if (*esc++ == '[') {
+    char *esc = &ctx->cmd[ctx->pos + 1];
+    switch (type) {
+    case '[':
+        if (esclen == 2) {
+#if VSH_HISTORY_NUM > 0
             switch (*esc) {
-            case 'A':       // up
-#if VSH_HISTORY_NUM > 0
-                __vsh_history_up(ctx);
-                break;
-#endif
-            case 'B':       // down
-#if VSH_HISTORY_NUM > 0
-                __vsh_history_down(ctx);
-                break;
-#endif
+            case 'A':       __vsh_history_up(ctx);      break;
+            case 'B':       __vsh_history_down(ctx);    break;
             }
+#endif
         }
+        break;
     }
 
     ctx->cmd[ctx->pos] = '\0';
@@ -476,8 +485,15 @@ int vsh_main(int argc, char *argv[])
             }
             switch (ch) {
             case '\033':        // ESC
-                state = SHELL_STATE_ESC;
-                ctx.escpos = 0;
+                fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK | fcntl(STDIN_FILENO, F_GETFL, 0));
+                ssize_t ret = read(STDIN_FILENO, &ch, 1);
+                fcntl(STDIN_FILENO, F_SETFL, ~O_NONBLOCK & fcntl(STDIN_FILENO, F_GETFL, 0));
+
+                if (1 == ret) {
+                    state = SHELL_STATE_ESC;
+                    ctx.escpos = 0;
+                    goto input_char;
+                }
                 continue;
             default:
             input_char:
@@ -489,7 +505,7 @@ int vsh_main(int argc, char *argv[])
                         return -ENOMEM;
                     }
                     ctx.cmd[ctx.pos + ctx.escpos++] = ch;
-                    state = __vsh_process_escape(&ctx, state);
+                    state = __vsh_process_escape(&ctx);
                     continue;
                 }
 
