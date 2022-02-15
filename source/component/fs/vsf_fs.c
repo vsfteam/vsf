@@ -69,6 +69,7 @@ dcl_vsf_peda_methods(static, __vk_vfs_close)
 dcl_vsf_peda_methods(static, __vk_vfs_read)
 dcl_vsf_peda_methods(static, __vk_vfs_write)
 dcl_vsf_peda_methods(static, __vk_vfs_setpos)
+dcl_vsf_peda_methods(static, __vk_vfs_setsize)
 
 static vsf_err_t __vk_file_lookup(vk_file_t *dir, const char *name, vk_file_t **file);
 
@@ -93,7 +94,7 @@ vk_fs_op_t vk_vfs_op = {
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_close),
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_write),
-        .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_setsize),
         .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_setpos),
     },
     .dop            = {
@@ -1100,6 +1101,28 @@ __vsf_component_peda_ifs_entry(__vk_vfs_setpos, vk_file_setpos)
     vk_file_t *file = (vk_file_t *)&vsf_this;
     VSF_FS_ASSERT(file != NULL);
     file->pos = vsf_local.offset;
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_vfs_setsize, vk_file_setsize)
+{
+    vsf_peda_begin();
+    vk_vfs_file_t *file = (vk_vfs_file_t *)&vsf_this;
+    VSF_FS_ASSERT((file != NULL) && !(file->attr & VSF_FILE_ATTR_DIRECTORY));
+    VSF_FS_ASSERT((NULL == file->f.callback.fn_read) && (NULL == file->f.callback.fn_write));
+
+    file->f.param = vsf_heap_realloc(file->f.param, vsf_local.size);
+    if (NULL == file->f.param) {
+        file->size = 0;
+        vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
+        return;
+    }
+
+    if (vsf_local.size > file->size) {
+        memset((uint8_t *)file->f.param + file->size, 0, vsf_local.size - file->size);
+    }
+    file->size = vsf_local.size;
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }

@@ -246,8 +246,8 @@ __vsf_component_peda_ifs(vk_file_unlink,
     const char          *name;
 )
 __vsf_component_peda_ifs(vk_file_lookup,
-    const char      *name;
-    vk_file_t       **result;
+    const char          *name;
+    vk_file_t           **result;
 )
 __vsf_component_peda_ifs(vk_file_setsize,
     uint64_t            size;
