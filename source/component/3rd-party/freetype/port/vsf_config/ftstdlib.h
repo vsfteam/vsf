@@ -99,6 +99,7 @@
    */
 
 
+
 #include "component/fs/vsf_fs.h"
 #include "utilities/vsf_utilities.h"
 #include "utilities/ooc_class.h"
@@ -135,7 +136,7 @@ static ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere)
         new_pos = 0;
         break;
     case SEEK_CUR:
-        new_pos = f->pos;
+        new_pos = vk_memfs_tell(&f->use_as__vk_memfs_file_t);
         break;
     case SEEK_END:
         new_pos = f->size;
@@ -149,26 +150,24 @@ static ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere)
     if (new_pos > f->size) {
         return -1;
     }
-    f->pos = new_pos;
+    vk_memfs_setpos(&f->use_as__vk_memfs_file_t, new_pos);
     return 0;
 }
 
 static ALWAYS_INLINE long ft_ftell(FT_FILE *f)
 {
-    return f->pos;
+    return vk_memfs_tell(&f->use_as__vk_memfs_file_t);
 }
 
 static ALWAYS_INLINE size_t ft_fread(const void *ptr, size_t size, size_t nmemb, FT_FILE *f)
 {
-    int_fast32_t rlen = vk_memfs_read(&f->use_as__vk_memfs_file_t, f->pos, size * nmemb, (uint8_t *)ptr);
-    if (rlen > 0) { f->pos += rlen; }
+    int_fast32_t rlen = vk_memfs_read(&f->use_as__vk_memfs_file_t, (uint8_t *)ptr, size * nmemb);
     return rlen;
 }
 
 static ALWAYS_INLINE size_t ft_fwrite(const void *ptr, size_t size, size_t nmemb, FT_FILE *f)
 {
-    int_fast32_t wlen = vk_memfs_write(&f->use_as__vk_memfs_file_t, f->pos, size * nmemb, (uint8_t *)ptr);
-    if (wlen > 0) { f->pos += wlen; }
+    int_fast32_t wlen = vk_memfs_write(&f->use_as__vk_memfs_file_t, (uint8_t *)ptr, size * nmemb);
     return wlen;
 }
 

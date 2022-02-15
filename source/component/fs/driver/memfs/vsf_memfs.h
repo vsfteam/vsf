@@ -85,8 +85,10 @@ extern const vk_fs_op_t vk_memfs_op;
 
 extern void vk_memfs_init(vk_memfs_info_t *memfs);
 extern vk_memfs_file_t * vk_memfs_open(vk_memfs_file_t *dir, const char *path);
-extern int_fast32_t vk_memfs_read(vk_memfs_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
-extern int_fast32_t vk_memfs_write(vk_memfs_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
+extern uint_fast64_t vk_memfs_tell(vk_memfs_file_t *file);
+extern uint_fast64_t vk_memfs_setpos(vk_memfs_file_t *file, uint_fast64_t offset);
+extern int_fast32_t vk_memfs_read(vk_memfs_file_t *file, uint8_t *buff, uint_fast32_t size);
+extern int_fast32_t vk_memfs_write(vk_memfs_file_t *file, uint8_t *buff, uint_fast32_t size);
 
 #ifdef __cplusplus
 }

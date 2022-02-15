@@ -259,29 +259,39 @@ vk_memfs_file_t * vk_memfs_open(vk_memfs_file_t *dir, const char *path)
     return dir;
 }
 
-int_fast32_t vk_memfs_read(vk_memfs_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff)
+uint_fast64_t vk_memfs_tell(vk_memfs_file_t *file)
+{
+    return file->pos;
+}
+
+uint_fast64_t vk_memfs_setpos(vk_memfs_file_t *file, uint_fast64_t offset)
+{
+    uint_fast64_t orig = file->pos;
+    file->pos = offset;
+    return orig;
+}
+
+int_fast32_t vk_memfs_read(vk_memfs_file_t *file, uint8_t *buff, uint_fast32_t size)
 {
     VSF_FS_ASSERT(file != NULL);
     VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
-    if (addr >= file->size) {
-        return -1;
-    }
 
-    int_fast32_t rsize = min(size, file->size - addr);
-    memcpy(buff, &file->f.buff[addr], rsize);
+    int_fast32_t rsize = file->size - file->pos;
+    rsize = min(size, rsize);
+    memcpy(buff, &file->f.buff[file->pos], rsize);
+    file->pos += rsize;
     return rsize;
 }
 
-int_fast32_t vk_memfs_write(vk_memfs_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff)
+int_fast32_t vk_memfs_write(vk_memfs_file_t *file, uint8_t *buff, uint_fast32_t size)
 {
     VSF_FS_ASSERT(file != NULL);
     VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
-    if (addr >= file->size) {
-        return -1;
-    }
 
-    int_fast32_t wsize = min(size, file->size - addr);
-    memcpy(&file->f.buff[addr], buff, wsize);
+    int_fast32_t wsize = file->size - file->pos;
+    wsize = min(size, wsize);
+    memcpy(&file->f.buff[file->pos], buff, wsize);
+    file->pos += wsize;
     return wsize;
 }
 

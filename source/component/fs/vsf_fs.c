@@ -128,7 +128,7 @@ __vsf_component_peda_ifs_entry(vk_fsop_setpos, vk_file_setpos)
 {
     vsf_peda_begin();
     vk_file_t *file = (vk_file_t *)&vsf_this;
-    VSF_LINUX_ASSERT(file != NULL);
+    VSF_FS_ASSERT(file != NULL);
     file->pos = vsf_local.offset;
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
