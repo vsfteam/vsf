@@ -44,6 +44,7 @@ dcl_vsf_peda_methods(static, __vk_linfs_lookup)
 dcl_vsf_peda_methods(static, __vk_linfs_read)
 dcl_vsf_peda_methods(static, __vk_linfs_write)
 dcl_vsf_peda_methods(static, __vk_linfs_close)
+dcl_vsf_peda_methods(static, __vk_linfs_setpos)
 
 extern vk_file_t * __vk_file_get_fs_parent(vk_file_t *file);
 
@@ -144,6 +145,7 @@ __vsf_component_peda_ifs_entry(__vk_linfs_mount, vk_fs_mount)
     }
 
     fsinfo->root.parent = NULL;
+    fsinfo->root.d.dir = NULL;
     dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
@@ -154,7 +156,7 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
     vsf_peda_begin();
     vk_linfs_file_t *dir = (vk_linfs_file_t *)&vsf_this;
     const char *name = vsf_local.name;
-    uint_fast32_t idx = vsf_local.idx;
+    uint_fast32_t idx = dir->pos;
     vsf_err_t err = VSF_ERR_NONE;
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -194,35 +196,36 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
         memcpy(&path[len], name, namelen);
         path[len + namelen] = '\0';
     } else {
-        DIR *dir = opendir(path);
-        if (dir != NULL) {
-            struct dirent *entry;
-            while ((entry = readdir(dir)) != NULL) {
-                if (    !strcmp(entry->d_name, ".")
-                    ||  !strcmp(entry->d_name, "..")) {
-                    idx++;
-                }
-                if (!idx--) {
-                    break;
-                }
-            }
-            if (NULL == entry) {
-                closedir(dir);
-                goto do_not_available;
-            }
-
-            namelen = strlen(entry->d_name);
-            if ((len + namelen + 1) > PATH_MAX) {
-                err = VSF_ERR_FAIL;
-                goto do_return;
-            }
-            path[len] = '\0';
-            strcat(path, "/");
-            strcat(path, entry->d_name);
-            closedir(dir);
-        } else {
-            goto do_not_available;
+        struct dirent *entry;
+        if (NULL == dir->d.dir) {
+            dir->d.dir = opendir(path);
+            VSF_FS_ASSERT(dir->d.dir != NULL);
         }
+    read_next:
+        entry = readdir((DIR *)dir->d.dir);
+        if (NULL == entry) {
+            closedir((DIR *)dir->d.dir);
+            dir->d.dir = NULL;
+            dir->pos = 0;
+
+            err = VSF_ERR_NOT_AVAILABLE;
+            vsf_eda_return(err);
+            return;
+        }
+
+        if (    !strcmp(entry->d_name, ".")
+            ||  !strcmp(entry->d_name, "..")) {
+            goto read_next;
+        }
+
+        namelen = strlen(entry->d_name);
+        if ((len + namelen + 1) > PATH_MAX) {
+            err = VSF_ERR_FAIL;
+            goto do_return;
+        }
+        path[len] = '\0';
+        strcat(path, "/");
+        strcat(path, entry->d_name);
     }
 
     struct stat statbuf;
@@ -258,6 +261,7 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
     }
     linfs_file->attr |= VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE;
 
+    linfs_file->idx = dir->pos++;
     orig = vsf_protect_sched();
         vsf_dlist_add_to_head(vk_linfs_file_t, child_node, &dir->d.child_list, linfs_file);
     vsf_unprotect_sched(orig);
@@ -274,16 +278,51 @@ do_return:
     vsf_peda_end();
 }
 
+__vsf_component_peda_ifs_entry(__vk_linfs_setpos, vk_file_setpos)
+{
+    vsf_peda_begin();
+    vk_linfs_file_t *file = (vk_linfs_file_t *)&vsf_this;
+    uint_fast64_t offset = vsf_local.offset;
+    if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
+        if (file->d.dir != NULL) {
+            closedir((DIR *)file->d.dir);
+        }
+        if (0 == offset) {
+            file->d.dir = NULL;
+        } else {
+            char path[PATH_MAX];
+            uint_fast16_t len = __vk_linfs_file_get_path(&file->use_as__vk_file_t, path, sizeof(path));
+            file->d.dir = opendir(path);
+            VSF_FS_ASSERT(file->d.dir != NULL);
+
+            struct dirent *entry;
+            while (--offset > 0) {
+                if (NULL == (entry = readdir((DIR *)file->d.dir))) {
+                    closedir((DIR *)file->d.dir);
+                    file->d.dir = NULL;
+                    goto assert_fail;
+                }
+            }
+        }
+    } else {
+        if (lseek(file->f.fd, vsf_local.offset, SEEK_SET) < 0) {
+        assert_fail:
+            VSF_FS_ASSERT(false);
+            vsf_eda_return(VSF_ERR_FAIL);
+            return;
+        }
+    }
+    VSF_FS_ASSERT(vsf_local.result != NULL);
+    *vsf_local.result = offset;
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
+}
+
 __vsf_component_peda_ifs_entry(__vk_linfs_read, vk_file_read)
 {
     vsf_peda_begin();
     vk_linfs_file_t *file = (vk_linfs_file_t *)&vsf_this;
-
-    if (-1 != lseek(file->f.fd, vsf_local.offset, SEEK_SET)) {
-        vsf_eda_return(read(file->f.fd, vsf_local.buff, vsf_local.size));
-    } else {
-        vsf_eda_return(VSF_ERR_FAIL);
-    }
+    vsf_eda_return(read(file->f.fd, vsf_local.buff, vsf_local.size));
     vsf_peda_end();
 }
 
@@ -291,12 +330,11 @@ __vsf_component_peda_ifs_entry(__vk_linfs_write, vk_file_write)
 {
     vsf_peda_begin();
     vk_linfs_file_t *file = (vk_linfs_file_t *)&vsf_this;
-
-    if (-1 != lseek(file->f.fd, vsf_local.offset, SEEK_SET)) {
-        vsf_eda_return(write(file->f.fd, vsf_local.buff, vsf_local.size));
-    } else {
-        vsf_eda_return(VSF_ERR_FAIL);
+    ssize_t wsize = write(file->f.fd, vsf_local.buff, vsf_local.size);
+    if (file->pos + wsize > file->size) {
+        file->size = file->pos + wsize;
     }
+    vsf_eda_return(wsize);
     vsf_peda_end();
 }
 
@@ -310,10 +348,14 @@ __vsf_component_peda_ifs_entry(__vk_linfs_close, vk_file_close)
     vsf_heap_free(file->name);
 
     if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
-        // TODO: Close Directory
+        if (file->d.dir != NULL) {
+            closedir((DIR *)file->d.dir);
+            file->d.dir = NULL;
+        }
     } else {
         close(file->f.fd);
     }
+
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_remove(vk_linfs_file_t, child_node, &parent->d.child_list, file);
     vsf_unprotect_sched(orig);

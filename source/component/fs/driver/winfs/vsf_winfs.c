@@ -248,6 +248,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
             __vk_winfs_prepare_find(dir, &FindFileData);
             VSF_FS_ASSERT(dir->d.hFind != INVALID_HANDLE_VALUE);
         } else if (!FindNextFileW(dir->d.hFind, &FindFileData)) {
+        return_not_available:
             FindClose(dir->d.hFind);
             dir->d.hFind = INVALID_HANDLE_VALUE;
             dir->pos = 0;
@@ -268,9 +269,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
             }
 
             if (!FindNextFileW(dir->d.hFind, &FindFileData)) {
-                err = VSF_ERR_NOT_AVAILABLE;
-                vsf_eda_return(err);
-                return;
+                goto return_not_available;
             }
         } while (idx--);
         namelen = WideCharToMultiByte(CP_UTF8, 0, FindFileData.cFileName, -1, NULL, 0, 0, false) - 1;
@@ -346,8 +345,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
         winfs_file->size = GetFileSize(winfs_file->f.hFile, &sizehigh) | ((uint64_t)sizehigh << 32);
     }
 
-    winfs_file->idx = dir->pos;
-    dir->pos++;
+    winfs_file->idx = dir->pos++;
     orig = vsf_protect_sched();
         vsf_dlist_add_to_head(vk_winfs_file_t, child_node, &dir->d.child_list, winfs_file);
     vsf_unprotect_sched(orig);

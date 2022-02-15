@@ -51,6 +51,7 @@ vsf_class(vk_linfs_file_t) {
             } f;
             struct {
                 vsf_dlist_t child_list;
+                void *dir;
             } d;
         };
         uint32_t idx;
