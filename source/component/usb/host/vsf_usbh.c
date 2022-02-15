@@ -1018,12 +1018,12 @@ static vsf_err_t __vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *p
             } else {
                 if (desc_ifs->bInterfaceNumber == ifs_no) {
                     if (parser_alt > parser_ifs->parser_alt) {
-                        parser_alt[-1].desc_size = (uint32_t)desc_ifs - (uint32_t)parser_alt[-1].desc_ifs;
+                        parser_alt[-1].desc_size = (uint8_t *)desc_ifs - (uint8_t *)parser_alt[-1].desc_ifs;
                     }
                     (++parser_alt)->desc_ifs = desc_ifs;
                 } else {
                 probe_alt:
-                    parser_alt->desc_size = (uint32_t)desc_ifs - (uint32_t)parser_alt->desc_ifs;
+                    parser_alt->desc_size = (uint8_t *)desc_ifs - (uint8_t *)parser_alt->desc_ifs;
                     parser_alt = NULL;
                     stage = size > 0 ? STAGE_ALLOC_ALT : STAGE_NONE;
                     ifs_no++;
