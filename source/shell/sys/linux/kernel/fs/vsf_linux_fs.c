@@ -387,6 +387,10 @@ void vsf_linux_fd_delete(int fd)
 bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
 {
     vsf_linux_process_t *process;
+    if (sfd->status_flags & O_NONBLOCK) {
+        return false;
+    }
+
 #if VSF_LINUX_USE_TERMIOS == ENABLED
     if (sfd->fd < 3) {
         process = vsf_linux_get_cur_process();
@@ -395,7 +399,7 @@ bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
         return term->c_cc[VMIN] > 0;
     }
 #endif
-    return !(sfd->status_flags & O_NONBLOCK);
+    return true;
 }
 
 // vsf_linux_fd_[pend/set/clear]_[status/events] MUST be called scheduler protected
@@ -1511,7 +1515,6 @@ int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
 // stream
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
 {
-    VSF_LINUX_ASSERT(false);
     return 0;
 }
 
