@@ -125,6 +125,7 @@ __vsf_component_peda_ifs_entry(__vk_memfs_lookup, vk_file_lookup)
     }
 
     if (found) {
+        dir->pos++;
         *vsf_local.result = &child->use_as__vk_file_t;
         vsf_eda_return(VSF_ERR_NONE);
     } else {

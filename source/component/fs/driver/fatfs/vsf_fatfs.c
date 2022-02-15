@@ -352,6 +352,7 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
             return VSF_ERR_FAIL;
         }
     }
+    info->root.cur.cluster = info->root.first_cluster;
 
     return VSF_ERR_NONE;
 }
@@ -730,6 +731,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
         } else {
             vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, dir->cur.cluster);
         }
+        vsf_local.cur_sector += dir->cur.sector_offset_in_cluster;
         vsf_local.dparser.lfn = 0;
         vsf_eda_set_user_value(LOOKUP_STATE_READ_SECTOR);
 
@@ -758,12 +760,15 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                 dparser->entry_num = 1 << (fsinfo->sector_size_bits - 5);
                 dparser->entry_num -= dir->cur.offset_in_sector >> 5;
                 dparser->filename = vsf_local.filename;
-                uint16_t entry_num = dparser->entry_num;
                 while (dparser->entry_num) {
-                    if (vk_fatfs_parse_dentry_fat(dparser)) {
-                        dir->cur.offset_in_sector += (entry_num - dparser->entry_num) << 5;
-                        if (!name || vk_file_is_match((char *)name, dparser->filename)) {
+                    uint16_t entry_num = dparser->entry_num;
+                    bool parsed = vk_fatfs_parse_dentry_fat(dparser);
+                    uint32_t tmp32 = (entry_num - dparser->entry_num) << 5;
+                    dir->cur.offset_in_sector += tmp32;
+                    dir->pos += tmp32;
 
+                    if (parsed) {
+                        if (!name || vk_file_is_match((char *)name, dparser->filename)) {
                             vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)vk_file_alloc(sizeof(vk_fatfs_file_t));
                             if (NULL == fatfs_file) {
                             fail_mem:
@@ -780,6 +785,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                                 }
                                 filename_len += 2;
                                 // TODO: convert to utf8 length
+                                VSF_FS_ASSERT(false);
                             } else {
                                 filename_len = strlen(dparser->filename) + 1;
                             }
@@ -807,6 +813,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                         }
                         dparser->entry += 32;
                     } else if (dparser->entry_num > 0) {
+                    __not_available:
+                        dir->cur.cluster = dir->first_cluster;
+                        dir->cur.sector_offset_in_cluster = 0;
+                        dir->cur.offset_in_sector = 0;
+                        dir->pos = 0;
                         err = VSF_ERR_NOT_AVAILABLE;
                         goto __fail_and_exit;
                     } else {
@@ -819,6 +830,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                     // not found in current sector, find next sector
                     vsf_local.cur_sector++;
                     dir->cur.sector_offset_in_cluster++;
+                    dir->cur.offset_in_sector = 0;
                     goto read_fat_sector;
                 } else {
                     vsf_err_t err;
@@ -836,14 +848,14 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
             if (    ((vsf_err_t)vsf_eda_get_return_value() != VSF_ERR_NONE)
                 ||  !__vk_fatfs_fat_entry_is_valid(fsinfo, dir->cur.cluster)
                 ||  __vk_fatfs_fat_entry_is_eof(fsinfo, dir->cur.cluster)) {
-                err = VSF_ERR_NOT_AVAILABLE;
-                goto __fail_and_exit;
+                goto __not_available;
             }
 
             // remove MSB 4-bit for 32-bit FAT entry
             dir->cur.cluster &= 0x0FFFFFFF;
             vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, dir->cur.cluster);
             dir->cur.sector_offset_in_cluster = 0;
+            dir->cur.offset_in_sector = 0;
             goto read_fat_sector;
         }
         break;

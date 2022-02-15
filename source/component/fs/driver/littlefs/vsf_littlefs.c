@@ -307,6 +307,7 @@ __vsf_component_peda_ifs_entry(__vk_lfs_lookup, vk_file_lookup)
 
             if ((0 == ret) && (result_file != NULL)) {
                 *vsf_local.result = &result_file->use_as__vk_file_t;
+                dir->pos++;
             }
             vsf_eda_return(ret < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE);
         }
