@@ -66,18 +66,6 @@ typedef struct vsh_cmd_ctx_t {
 typedef enum vsh_shell_state_t {
     SHELL_STATE_NORMAL,
     SHELL_STATE_ESC,
-
-    // refer to https://en.wikipedia.org/wiki/ANSI_escape_code
-    SHELL_STATE_SS2,
-    SHELL_STATE_SS3,
-    SHELL_STATE_DCS,
-    SHELL_STATE_CSI,
-    SHELL_STATE_ST,
-    SHELL_STATE_OSC,
-    SHELL_STATE_SOS,
-    SHELL_STATE_PM,
-    SHELL_STATE_APC,
-    SHELL_STATE_RIS,
 } vsh_shell_state_t;
 
 #if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
@@ -110,7 +98,7 @@ static void __vsh_history_up(vsh_cmd_ctx_t *ctx)
 static void __vsh_history_down(vsh_cmd_ctx_t *ctx)
 {
     if (ctx->history.entry_num > 0) {
-        uint8_t new_entry = ((ctx->history.entry_num - 1) == ctx->history.cur_disp_entry) ?
+        uint8_t new_entry = ((ctx->history.entry_num - 1) <= ctx->history.cur_disp_entry) ?
                 0 : ctx->history.cur_disp_entry + 1;
         __vsh_history_apply(ctx, new_entry);
     }
@@ -124,38 +112,37 @@ static void __vsh_history_down(vsh_cmd_ctx_t *ctx)
 
 static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx, vsh_shell_state_t type)
 {
-    char esc = ctx->cmd[ctx->pos];
     int esclen = ctx->escpos;
+    char lastch = ctx->cmd[ctx->pos + esclen - 1];
 
     // esclen will be used for full support to escape strings
     UNUSED_PARAM(esclen);
 
-    switch (type) {
-    case SHELL_STATE_CSI:
-        VSF_LINUX_ASSERT(1 == esclen);
-        switch (esc) {
-        case 'A':       // up
-#if VSH_HISTORY_NUM > 0
-            __vsh_history_up(ctx);
-            goto exit_csi;
-#endif
-        case 'B':       // down
-#if VSH_HISTORY_NUM > 0
-            __vsh_history_down(ctx);
-            goto exit_csi;
-#endif
-        case 'C':       // right
-        case 'D':       // left
-        default:
-        exit_csi:
-            ctx->cmd[ctx->pos] = '\0';
-            return SHELL_STATE_NORMAL;
-        }
-        return type;
-    default:
-        VSF_LINUX_ASSERT(false);
-        return SHELL_STATE_NORMAL;
+    if (!(  ((lastch >= 'a') && (lastch <= 'z'))
+        ||  ((lastch >= 'A') && (lastch <= 'Z')))) {
+        return SHELL_STATE_ESC;
     }
+
+    if (esclen == 2) {
+        char *esc = &ctx->cmd[ctx->pos];
+        if (*esc++ == '[') {
+            switch (*esc) {
+            case 'A':       // up
+#if VSH_HISTORY_NUM > 0
+                __vsh_history_up(ctx);
+                break;
+#endif
+            case 'B':       // down
+#if VSH_HISTORY_NUM > 0
+                __vsh_history_down(ctx);
+                break;
+#endif
+            }
+        }
+    }
+
+    ctx->cmd[ctx->pos] = '\0';
+    return SHELL_STATE_NORMAL;
 }
 
 #if __IS_COMPILER_IAR__
@@ -492,16 +479,6 @@ int vsh_main(int argc, char *argv[])
                 state = SHELL_STATE_ESC;
                 ctx.escpos = 0;
                 continue;
-            case 'N':   if (SHELL_STATE_ESC == state) { state = SHELL_STATE_SS2; continue; }    goto input_char;
-            case 'O':   if (SHELL_STATE_ESC == state) { state = SHELL_STATE_SS3; continue; }    goto input_char;
-            case 'P':   if (SHELL_STATE_ESC == state) { state = SHELL_STATE_DCS; continue; }    goto input_char;
-            case '[':   if (SHELL_STATE_ESC == state) { state = SHELL_STATE_CSI; continue; }    goto input_char;
-            case '\\':  if (SHELL_STATE_ESC == state) { state = SHELL_STATE_ST;  continue; }    goto input_char;
-            case ']':   if (SHELL_STATE_ESC == state) { state = SHELL_STATE_OSC; continue; }    goto input_char;
-            case 'X':   if (SHELL_STATE_ESC == state) { state = SHELL_STATE_SOS; continue; }    goto input_char;
-            case '^':   if (SHELL_STATE_ESC == state) { state = SHELL_STATE_PM;  continue; }    goto input_char;
-            case '_':   if (SHELL_STATE_ESC == state) { state = SHELL_STATE_APC; continue; }    goto input_char;
-            case 'c':   if (SHELL_STATE_ESC == state) { state = SHELL_STATE_RIS; continue; }    goto input_char;
             default:
             input_char:
                 if (state != SHELL_STATE_NORMAL) {
