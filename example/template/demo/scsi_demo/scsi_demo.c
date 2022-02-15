@@ -68,7 +68,7 @@ void __user_scsi_mounter(vsf_eda_t *eda, vsf_evt_t evt)
         switch (mounter->state) {
         case STATE_INIT:
             mounter->state = STATE_OPEN_DIR;
-            vk_file_open(NULL, "/scsi", 0, &mounter->dir);
+            vk_file_open(NULL, "/scsi", &mounter->dir);
             break;
         case STATE_OPEN_DIR:
             mounter->mal = &mounter->use_as__vk_mal_t;

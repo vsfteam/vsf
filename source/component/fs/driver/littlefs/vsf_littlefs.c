@@ -67,7 +67,7 @@ const vk_fs_op_t vk_lfs_op = {
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_write),
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_close),
         .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
-        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_setpos),
+        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_lookup),
@@ -94,6 +94,9 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
     if (ret < 0) {
         lfs_format(lfs, &fsinfo->config);
         ret = lfs_mount(lfs, &fsinfo->config);
+        VSF_FS_ASSERT(LFS_ERR_OK == ret);
+        ret = lfs_dir_open(lfs, &fsinfo->root.lfs_dir, "/");
+        VSF_FS_ASSERT(LFS_ERR_OK == ret);
     }
 
     while (true) {
@@ -109,54 +112,43 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
 
         switch (fsinfo->op) {
         case VK_LFS_UNMOUNT:
+            lfs_dir_close(lfs, &fsinfo->root.lfs_dir);
             ret = lfs_unmount(lfs);
             break;
         case VK_LFS_LOOKUP: {
-                vk_file_t *dir = fsinfo->param.open.dir;
+                vk_lfs_file_t *dir = fsinfo->param.open.dir;
                 const char *name = fsinfo->param.open.name;
-                uint_fast32_t idx = fsinfo->param.open.idx;
                 struct lfs_info lfsinfo;
 
-                char path[LFS_NAME_MAX] = { 0 };
+                char path[LFS_NAME_MAX];
+                path[0] = '\0';
                 while (dir->name != NULL) {
                     VSF_FS_ASSERT(strlen(path) + strlen(dir->name) <= sizeof(path) - 1);
                     strcat(path, dir->name);
                 }
 
+                ret = 0;
                 if (name != NULL) {
                     // by name
                     VSF_FS_ASSERT(strlen(path) + strlen(name) <= sizeof(path) - 1);
                     strcat(path, name);
-                    ret = 0;
                 } else {
-                    // by index
-                    ret = 0;
-
-                    lfs_dir_t lfs_dir;
-                    ret = lfs_dir_open(lfs, &lfs_dir, path);
-                    if (ret < 0) {
+                scan_next:
+                    lfs_dir_read(lfs, &dir->lfs_dir, &lfsinfo);
+                    if (0 == strlen(lfsinfo.name)) {
+                        lfs_dir_rewind(lfs, &dir->lfs_dir);
+                        ret = -1;
                         break;
                     }
 
-                    while (true) {
-                        lfs_dir_read(lfs, &lfs_dir, &lfsinfo);
-                        if (0 == strlen(lfsinfo.name)) {
-                            ret = -1;
-                            break;
-                        }
-
-                        if (    !strcmp(lfsinfo.name, ".")
-                            ||  !strcmp(lfsinfo.name, "..")) {
-                            continue;
-                        }
-                        if (0 == idx--) {
-                            VSF_FS_ASSERT(strlen(path) + strlen(lfsinfo.name) <= sizeof(path) - 1);
-                            name = &path[strlen(path)];
-                            strcat(path, lfsinfo.name);
-                            break;
-                        }
+                    if (    !strcmp(lfsinfo.name, ".")
+                        ||  !strcmp(lfsinfo.name, "..")) {
+                        goto scan_next;
                     }
-                    lfs_dir_close(lfs, &lfs_dir);
+
+                    VSF_FS_ASSERT(strlen(path) + strlen(lfsinfo.name) <= sizeof(path) - 1);
+                    name = &path[strlen(path)];
+                    strcat(path, lfsinfo.name);
                 }
 
                 if (0 == ret) {
@@ -202,13 +194,6 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                 lfs_file_t *file = fsinfo->param.read_file.file;
                 void *buffer = fsinfo->param.read_file.buffer;
                 lfs_size_t size = fsinfo->param.read_file.size;
-                lfs_soff_t offset = fsinfo->param.read_file.offset;
-
-                if (offset != lfs_file_seek(lfs, file, offset, LFS_SEEK_SET)) {
-                    ret = -1;
-                    break;
-                }
-
                 fsinfo->result.read_file.size = lfs_file_read(lfs, file, buffer, size);
             }
             break;
@@ -216,13 +201,6 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                 lfs_file_t *file = fsinfo->param.read_file.file;
                 void *buffer = fsinfo->param.read_file.buffer;
                 lfs_size_t size = fsinfo->param.read_file.size;
-                lfs_soff_t offset = fsinfo->param.read_file.offset;
-
-                if (offset != lfs_file_seek(lfs, file, offset, LFS_SEEK_SET)) {
-                    ret = -1;
-                    break;
-                }
-
                 fsinfo->result.read_file.size = lfs_file_write(lfs, file, buffer, size);
             }
             break;
@@ -307,7 +285,6 @@ __vsf_component_peda_ifs_entry(__vk_lfs_lookup, vk_file_lookup)
     vk_lfs_file_t *dir = (vk_lfs_file_t *)&vsf_this;
     vk_lfs_info_t *fsinfo = dir->info;
     const char *name = vsf_local.name;
-    uint_fast32_t idx = vsf_local.idx;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -318,9 +295,8 @@ __vsf_component_peda_ifs_entry(__vk_lfs_lookup, vk_file_lookup)
     case VSF_EVT_SYNC:
         fsinfo->caller = vsf_eda_get_cur();
 
-        fsinfo->param.open.dir = &dir->use_as__vk_file_t;
+        fsinfo->param.open.dir = dir;
         fsinfo->param.open.name = name;
-        fsinfo->param.open.idx = idx;
         fsinfo->op = VK_LFS_LOOKUP;
         vsf_eda_sem_post(&fsinfo->sem);
         break;
@@ -395,7 +371,6 @@ __vsf_component_peda_ifs_entry(__vk_lfs_read, vk_file_read)
         fsinfo->param.read_file.file = &file->lfs_file;
         fsinfo->param.read_file.buffer = vsf_local.buff;
         fsinfo->param.read_file.size = vsf_local.size;
-        fsinfo->param.read_file.offset = vsf_local.offset;
         fsinfo->op = VK_LFS_READ_FILE;
         vsf_eda_sem_post(&fsinfo->sem);
         break;
@@ -428,7 +403,6 @@ __vsf_component_peda_ifs_entry(__vk_lfs_write, vk_file_write)
         fsinfo->param.write_file.file = &file->lfs_file;
         fsinfo->param.write_file.buffer = vsf_local.buff;
         fsinfo->param.write_file.size = vsf_local.size;
-        fsinfo->param.write_file.offset = vsf_local.offset;
         fsinfo->op = VK_LFS_WRITE_FILE;
         vsf_eda_sem_post(&fsinfo->sem);
         break;

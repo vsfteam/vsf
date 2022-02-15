@@ -94,7 +94,8 @@ vsf_class(vk_fatfs_file_t) {
         uint32_t first_cluster;
         struct {
             uint32_t cluster;
-            uint32_t fat_entry;
+            uint32_t sector_offset_in_cluster;
+            uint32_t offset_in_sector;
         } cur;
     )
 };

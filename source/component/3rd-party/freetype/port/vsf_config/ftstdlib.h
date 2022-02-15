@@ -107,7 +107,6 @@
 
 typedef struct FT_FILE {
     implement(vk_memfs_file_t)
-    uint64_t pos;
 } FT_FILE;
 
 extern FT_FILE ft_root;

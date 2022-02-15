@@ -54,7 +54,7 @@ const vk_fs_op_t vk_memfs_op = {
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_write),
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
         .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
-        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_setpos),
+        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_lookup),
@@ -111,7 +111,7 @@ __vsf_component_peda_ifs_entry(__vk_memfs_lookup, vk_file_lookup)
     vk_memfs_file_t *dir = (vk_memfs_file_t *)&vsf_this;
     vk_memfs_file_t *child = dir->d.child;
     const char *name = vsf_local.name;
-    uint_fast32_t idx = vsf_local.idx;
+    uint_fast32_t idx = dir->pos;
     bool found = false;
 
     for (uint_fast16_t i = 0; i < dir->d.child_num; i++) {
@@ -142,7 +142,7 @@ __vsf_component_peda_ifs_entry(__vk_memfs_read, vk_file_read)
     switch (evt) {
     case VSF_EVT_INIT:
         if (file->f.buff != NULL) {
-            uint_fast64_t offset = vsf_local.offset;
+            uint_fast64_t offset = file->pos;
             uint_fast32_t size = vsf_local.size;
             uint8_t *buff = vsf_local.buff;
             int_fast32_t rsize = 0;
@@ -155,7 +155,7 @@ __vsf_component_peda_ifs_entry(__vk_memfs_read, vk_file_read)
         } else if (file->callback.fn_read != NULL) {
             vsf_err_t err;
             __vsf_component_call_peda_ifs(vk_memfs_callback_read, err, file->callback.fn_read, 0, file,
-                .offset     = vsf_local.offset,
+                .offset     = file->pos,
                 .size       = vsf_local.size,
                 .buff       = vsf_local.buff,
             );
@@ -181,7 +181,7 @@ __vsf_component_peda_ifs_entry(__vk_memfs_write, vk_file_write)
     switch (evt) {
     case VSF_EVT_INIT:
         if (file->f.buff != NULL) {
-            uint_fast64_t offset = vsf_local.offset;
+            uint_fast64_t offset = file->pos;
             uint_fast32_t size = vsf_local.size;
             uint8_t *buff = vsf_local.buff;
             int_fast32_t wsize = 0;
@@ -194,7 +194,7 @@ __vsf_component_peda_ifs_entry(__vk_memfs_write, vk_file_write)
         } else if (file->callback.fn_write != NULL) {
             vsf_err_t err;
             __vsf_component_call_peda_ifs(vk_memfs_callback_write, err, file->callback.fn_write, 0, file,
-                .offset     = vsf_local.offset,
+                .offset     = file->pos,
                 .size       = vsf_local.size,
                 .buff       = vsf_local.buff,
             );

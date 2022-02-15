@@ -113,13 +113,13 @@ int audio_play_main(int argc, char *argv[])
         goto cleanup;
     }
 
-    vk_file_open(NULL, argv[1], 0, &file_stream.file);
+    vk_file_open(NULL, argv[1], &file_stream.file);
     if (NULL == file_stream.file) {
         printf("fail to open %s\r\n", argv[1]);
         result = -1;
     } else {
-        vk_file_read_stream(&file_stream, 0, file_stream.file->size,
-                &audio_mem_stream.use_as__vsf_stream_t);
+        vk_file_read_stream(&file_stream, &audio_mem_stream.use_as__vsf_stream_t,
+                file_stream.file->size);
         vk_file_close(file_stream.file);
 
         usleep(delay_us);
