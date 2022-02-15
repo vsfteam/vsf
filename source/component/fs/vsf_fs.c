@@ -816,7 +816,11 @@ static vk_vfs_file_t * __vk_vfs_lookup_imp(vk_vfs_file_t *dir, const char *name)
         }
     vsf_unprotect_sched(orig);
     if (NULL == name) {
-        dir->pos++;
+        if (child != NULL) {
+            dir->pos++;
+        } else {
+            dir->pos = 0;
+        }
     }
     return child;
 }
