@@ -124,7 +124,15 @@ __vsf_component_peda_public_entry(vk_fsop_not_support)
     vsf_peda_end();
 }
 
-__vsf_component_peda_ifs_entry(vk_fsop_setpos, vk_file_setpos)
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
+__vsf_component_peda_public_entry(vk_fsop_setpos, vk_file_setpos)
 {
     vsf_peda_begin();
     vk_file_t *file = (vk_file_t *)&vsf_this;
@@ -133,6 +141,12 @@ __vsf_component_peda_ifs_entry(vk_fsop_setpos, vk_file_setpos)
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 static void __vk_file_ref(vk_file_t *file)
 {
@@ -452,7 +466,6 @@ __vsf_component_peda_private_entry(__vk_file_read,
             .buff       = vsf_local.buff,
         );
         if (VSF_ERR_NONE != err) {
-        do_return:
             vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
         }
         break;
@@ -484,7 +497,6 @@ __vsf_component_peda_private_entry(__vk_file_write,
             .buff       = vsf_local.buff,
         );
         if (VSF_ERR_NONE != err) {
-        do_return:
             vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
         }
         break;
@@ -527,7 +539,6 @@ __vsf_component_peda_private_entry(__vk_file_setpos,
             .result     = &vsf_local.result,
         );
         if (VSF_ERR_NONE != err) {
-        do_return:
             vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
         }
         break;
