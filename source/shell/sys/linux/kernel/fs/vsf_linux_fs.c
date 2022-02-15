@@ -1264,6 +1264,7 @@ struct dirent * readdir(DIR *dir)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)dir->priv;
     vk_file_t *file = priv->file, *child;
+    off_t offset = vk_file_tell(file);
 
     if (priv->child != NULL) {
         vk_file_close(priv->child);
@@ -1278,6 +1279,7 @@ struct dirent * readdir(DIR *dir)
 
     child = priv->child;
     priv->dir.d_name = child->name;
+    priv->dir.d_off = offset;
     priv->dir.d_reclen = sizeof(struct dirent);
     priv->dir.d_type = child->attr & VSF_FILE_ATTR_DIRECTORY ? DT_DIR :
                 child->attr & VSF_FILE_ATTR_EXECUTE ? DT_EXE : DT_REG;
