@@ -319,7 +319,6 @@ extern void vk_fs_return(vk_file_t *file, vsf_err_t err);
 
 dcl_vsf_peda_methods(extern, vk_fsop_succeed)
 dcl_vsf_peda_methods(extern, vk_fsop_not_support)
-dcl_vsf_peda_methods(extern, vk_fsop_setpos)
 #endif
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED

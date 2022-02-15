@@ -68,6 +68,7 @@ dcl_vsf_peda_methods(static, __vk_vfs_rename)
 dcl_vsf_peda_methods(static, __vk_vfs_close)
 dcl_vsf_peda_methods(static, __vk_vfs_read)
 dcl_vsf_peda_methods(static, __vk_vfs_write)
+dcl_vsf_peda_methods(static, __vk_vfs_setpos)
 
 static vsf_err_t __vk_file_lookup(vk_file_t *dir, const char *name, vk_file_t **file);
 
@@ -93,7 +94,7 @@ vk_fs_op_t vk_vfs_op = {
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_write),
         .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
-        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_setpos),
+        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_setpos),
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_lookup),
@@ -123,30 +124,6 @@ __vsf_component_peda_public_entry(vk_fsop_not_support)
     vsf_eda_return(VSF_ERR_NOT_SUPPORT);
     vsf_peda_end();
 }
-
-#if     __IS_COMPILER_GCC__
-#   pragma GCC diagnostic push
-#   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wcast-align"
-#endif
-
-__vsf_component_peda_public_entry(vk_fsop_setpos, vk_file_setpos)
-{
-    vsf_peda_begin();
-    vk_file_t *file = (vk_file_t *)&vsf_this;
-    VSF_FS_ASSERT(file != NULL);
-    file->pos = vsf_local.offset;
-    vsf_eda_return(VSF_ERR_NONE);
-    vsf_peda_end();
-}
-
-#if     __IS_COMPILER_GCC__
-#   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
-#   pragma clang diagnostic pop
-#endif
 
 static void __vk_file_ref(vk_file_t *file)
 {
@@ -1114,6 +1091,16 @@ __vsf_component_peda_ifs_entry(__vk_vfs_rename, vk_file_rename)
         vsf_eda_return(err);
         break;
     }
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_vfs_setpos, vk_file_setpos)
+{
+    vsf_peda_begin();
+    vk_file_t *file = (vk_file_t *)&vsf_this;
+    VSF_FS_ASSERT(file != NULL);
+    file->pos = vsf_local.offset;
+    vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
 
