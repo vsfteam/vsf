@@ -1610,20 +1610,39 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
             if (true) {
 #endif
                 // TODO: do not use static value here for multi process support
-                static int skip_echo = 0;
+                static char esc_type = '\0';
                 char ch;
                 for (uint_fast32_t i = 0; i < cursize; i++) {
                     ch = ((char *)buf)[i];
-                    switch (ch) {
-                    case '\033':skip_echo = 2;                      break;
-                    case 0x7F:
-                    case '\b':  write(STDOUT_FILENO, "\b \b", 3);   break;
-                    default:
-                        if (skip_echo) {
-                            skip_echo--;
+                    switch (esc_type) {
+                    case '\033':
+                        if ((ch == '[') || (ch == 'O')){
+                            esc_type = ch;
+                        } else {
+                            esc_type = '\0';
+                            goto char_input;
+                        }
+                        break;
+                    case '[':
+                        if (    ((ch >= 'a') && (ch <= 'z'))
+                            ||  ((ch >= 'A') && (ch <= 'Z'))
+                            ||  (ch == '~')) {
+                            esc_type = '\0';
+                        }
+                        break;
+                    case 'O':
+                        esc_type = '\0';
+                        break;
+                    case '\0':
+                    char_input:
+                        switch (ch) {
+                        case '\033':esc_type = '\033';                  break;
+                        case 0x7F:
+                        case '\b':  write(STDOUT_FILENO, "\b \b", 3);   break;
+                        default:
+                            write(STDOUT_FILENO, &ch, 1);
                             break;
                         }
-                        write(STDOUT_FILENO, &ch, 1);
                         break;
                     }
                 }
