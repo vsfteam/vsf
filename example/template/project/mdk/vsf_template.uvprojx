@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>CMSDK_CM7</Device>
           <Vendor>ARM</Vendor>
-          <PackID>Keil.V2M-MPS2_CMx_BSP.1.7.0</PackID>
+          <PackID>Keil.V2M-MPS2_CMx_BSP.1.7.1</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00400000) IROM(0x00000000,0x00400000) CPUTYPE("Cortex-M7") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -339,7 +339,7 @@
               <MiscControls>-fms-extensions  -Wno-enum-conversion -Wno-empty-body  -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
               <Define>__ARM__, __MPS2__, __OOC_CPP__, LV_CONF_INCLUDE_SIMPLE, FT2_BUILD_LIBRARY</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\config;..\..\..\..\source;..\..\..\..\source\shell\sys\linux\include;..\..\..\..\source\shell\sys\linux\include\simple_libc;..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;..\..\..\..\source\component\3rd-party\nnom\raw\inc;..\..\..\..\source\component\3rd-party\vsfvm\raw;..\..\..\..\source\component\3rd-party\lvgl\raw;..\..\..\..\source\component\3rd-party\segger_rtt\raw;..\..\..\..\source\component\3rd-party\LingLongGUI\port;..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;..\..\..\..\source\component\3rd-party\freetype\port;..\..\..\..\source\component\3rd-party\freetype\raw\include;..\..\..\..\source\component\3rd-party\coremark\port;..\..\..\..\source\component\3rd-party\coremark\raw;..\..\..\..\source\component\3rd-party\lua\extension\oo;..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;..\..\..\..\source\component\3rd-party\lua\raw;..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;..\..\..\..\source\component\3rd-party\libpng\port;..\..\..\..\source\component\3rd-party\libpng\raw;..\..\..\..\source\component\3rd-party\zlib\raw</IncludePath>
+              <IncludePath>..\..\config;..\..\config\3rd-party\lvgl;..\..\..\..\source;..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo;..\..\..\..\source\shell\sys\linux\include;..\..\..\..\source\shell\sys\linux\include\simple_libc;..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;..\..\..\..\source\component\3rd-party\nnom\raw\inc;..\..\..\..\source\component\3rd-party\vsfvm\raw;..\..\..\..\source\component\3rd-party\lvgl\raw;..\..\..\..\source\component\3rd-party\segger\raw\RTT;..\..\..\..\source\component\3rd-party\segger\raw\SystemView;..\..\..\..\source\component\3rd-party\segger\port\Config;..\..\..\..\source\component\3rd-party\LingLongGUI\port;..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;..\..\..\..\source\component\3rd-party\freetype\port;..\..\..\..\source\component\3rd-party\freetype\raw\include;..\..\..\..\source\component\3rd-party\coremark\port;..\..\..\..\source\component\3rd-party\coremark\raw;..\..\..\..\source\component\3rd-party\lua\extension\oo;..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;..\..\..\..\source\component\3rd-party\lua\raw;..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;..\..\..\..\source\component\3rd-party\libpng\port;..\..\..\..\source\component\3rd-party\libpng\raw;..\..\..\..\source\component\3rd-party\zlib\raw</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -923,6 +923,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>example/template/demo/cpu_usage_demo</GroupName>
+          <Files>
+            <File>
+              <FileName>cpu_usage_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\cpu_usage_demo\cpu_usage_demo.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>example/template/demo/disp_demo</GroupName>
           <Files>
             <File>
@@ -1145,9 +1155,19 @@
               <FilePath>../../../../example/template/demo/linux_demo/linux_demo.c</FilePath>
             </File>
             <File>
-              <FileName>mount_file_demo.c</FileName>
+              <FileName>httpd_demo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/linux_demo/mount_file_demo.c</FilePath>
+              <FilePath>..\..\demo\linux_demo\httpd_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>mount_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\linux_demo\mount_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>ntpdate_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\linux_demo\ntpdate_demo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -34576,6 +34596,11 @@
               <FileType>5</FileType>
               <FilePath>../../../../source/kernel/task/vsf_thread.h</FilePath>
             </File>
+            <File>
+              <FileName>vsf_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\kernel\task\vsf_task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -35089,6 +35114,21 @@
               <FileName>vsf_mem_stream.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../source/service/simple_stream/mem_stream/vsf_mem_stream.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/service/simple_stream/queue_stream</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_queue_stream.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_queue_stream.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -37054,7 +37094,7 @@
               <MiscControls>-fms-extensions  -Wno-enum-conversion -Wno-empty-body  -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
               <Define>__Hercules__, __CMEM7__, __M7M12N5__, PRINT_UART=UART0, __OOC_CPP__, LV_CONF_INCLUDE_SIMPLE, FT2_BUILD_LIBRARY</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\config;..\..\config\3rd-party\lvgl;..\..\..\..\source;..\..\..\..\source\shell\sys\linux\include;..\..\..\..\source\shell\sys\linux\include\simple_libc;..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;..\..\..\..\source\component\3rd-party\nnom\raw\inc;..\..\..\..\source\component\3rd-party\vsfvm\raw;..\..\..\..\source\component\3rd-party\lvgl\raw;..\..\..\..\source\component\3rd-party\segger_rtt\raw;..\..\..\..\source\component\3rd-party\LingLongGUI\port;..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;..\..\..\..\source\component\3rd-party\freetype\port;..\..\..\..\source\component\3rd-party\freetype\raw\include;..\..\..\..\source\component\3rd-party\coremark\port;..\..\..\..\source\component\3rd-party\coremark\raw;..\..\..\..\source\component\3rd-party\lua\extension\oo;..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;..\..\..\..\source\component\3rd-party\lua\raw;..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;..\..\..\..\source\component\3rd-party\libpng\port;..\..\..\..\source\component\3rd-party\libpng\raw;..\..\..\..\source\component\3rd-party\segger\port\Config;..\..\..\..\source\component\3rd-party\segger\raw\RTT;..\..\..\..\source\component\3rd-party\segger\raw\SystemView;..\..\..\..\source\component\3rd-party\zlib\raw;..\..\..\..\source\hal\driver\hercules\cmem7\common\Vendor\Driver\inc;..\..\..\..\source\component\usb\driver\otg\dwcotg</IncludePath>
+              <IncludePath>..\..\config;..\..\config\3rd-party\lvgl;..\..\..\..\source;..\..\..\..\source\shell\sys\linux\include;..\..\..\..\source\shell\sys\linux\include\simple_libc;..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo;..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include;..\..\..\..\source\component\3rd-party\nnom\raw\inc;..\..\..\..\source\component\3rd-party\vsfvm\raw;..\..\..\..\source\component\3rd-party\lvgl\raw;..\..\..\..\source\component\3rd-party\segger_rtt\raw;..\..\..\..\source\component\3rd-party\LingLongGUI\port;..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;..\..\..\..\source\component\3rd-party\freetype\port;..\..\..\..\source\component\3rd-party\freetype\raw\include;..\..\..\..\source\component\3rd-party\coremark\port;..\..\..\..\source\component\3rd-party\coremark\raw;..\..\..\..\source\component\3rd-party\lua\extension\oo;..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;..\..\..\..\source\component\3rd-party\lua\raw;..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;..\..\..\..\source\component\3rd-party\libpng\port;..\..\..\..\source\component\3rd-party\libpng\raw;..\..\..\..\source\component\3rd-party\segger\port\Config;..\..\..\..\source\component\3rd-party\segger\raw\RTT;..\..\..\..\source\component\3rd-party\segger\raw\SystemView;..\..\..\..\source\component\3rd-party\zlib\raw;..\..\..\..\source\component\usb\driver\otg\dwcotg;..\..\..\..\source\hal\driver\hercules\cmem7\common\Vendor\Driver\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -37707,6 +37747,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>example/template/demo/cpu_usage_demo</GroupName>
+          <Files>
+            <File>
+              <FileName>cpu_usage_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\cpu_usage_demo\cpu_usage_demo.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>example/template/demo/disp_demo</GroupName>
           <Files>
             <File>
@@ -37929,9 +37979,19 @@
               <FilePath>../../../../example/template/demo/linux_demo/linux_demo.c</FilePath>
             </File>
             <File>
-              <FileName>mount_file_demo.c</FileName>
+              <FileName>httpd_demo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/linux_demo/mount_file_demo.c</FilePath>
+              <FilePath>..\..\demo\linux_demo\httpd_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>mount_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\linux_demo\mount_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>ntpdate_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\linux_demo\ntpdate_demo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -71153,6 +71213,11 @@
               <FileType>5</FileType>
               <FilePath>../../../../source/kernel/task/vsf_thread.h</FilePath>
             </File>
+            <File>
+              <FileName>vsf_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\kernel\task\vsf_task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -71666,6 +71731,21 @@
               <FileName>vsf_mem_stream.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../source/service/simple_stream/mem_stream/vsf_mem_stream.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source/service/simple_stream/queue_stream</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_queue_stream.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_queue_stream.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.h</FilePath>
             </File>
           </Files>
         </Group>
