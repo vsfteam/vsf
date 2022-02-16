@@ -20,7 +20,11 @@ extern "C" {
 
 #if defined(__CPU_X64__)
 typedef int                 ssize_t;
+#   ifdef __WIN__
+typedef unsigned long long  size_t;
+#   else
 typedef unsigned long int   size_t;
+#   endif
 #else
 typedef int                 ssize_t;
 typedef unsigned int        size_t;

@@ -31,6 +31,7 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 #undef _WIN32
+#undef _MSC_VER
 #define __unix__
 
 /**

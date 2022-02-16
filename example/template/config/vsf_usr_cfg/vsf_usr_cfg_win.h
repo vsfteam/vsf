@@ -198,6 +198,8 @@
 #define USRAPP_CFG_STDIO_EN                             ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
+#   define VSF_LINUX_CFG_WRAPPER                        ENABLED
+#   define VSF_LINUX_SOCKET_CFG_WRAPPER                 ENABLED
 #   define VSF_LINUX_USE_SOCKET                         ENABLED
 #       define VSF_LINUX_SOCKET_USE_INET                VSF_USE_LWIP
 #       define VSF_LINUX_SOCKET_USE_UNIX                ENABLED

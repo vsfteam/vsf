@@ -941,7 +941,7 @@ static vsf_err_t __vsf_eda_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool for
 SECTION(".text.vsf.kernel.vsf_eda_post_msg")
 vsf_err_t vsf_eda_post_msg(vsf_eda_t *pthis, void *msg)
 {
-    VSF_KERNEL_ASSERT((pthis != NULL) && !((uint_fast32_t)msg & 1));
+    VSF_KERNEL_ASSERT((pthis != NULL) && !((uintptr_t)msg & 1));
     return vsf_evtq_post_msg(pthis, msg);
 }
 
