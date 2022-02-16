@@ -61,6 +61,8 @@ extern "C" {
 #   error VSF_ARCH_SWI_NUM MUST be 0 for linux
 #endif
 
+// x64 stack alignment is 16bytes
+#define VSF_ARCH_CFG_STACK_ALIGN_BIT    4
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
 
