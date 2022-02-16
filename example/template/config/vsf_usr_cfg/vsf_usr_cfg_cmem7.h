@@ -70,7 +70,7 @@
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
-#   define VSF_HEAP_SIZE                                (16 * 1024)
+#   define VSF_HEAP_SIZE                                (32 * 1024)
 //#   define VSF_SYSTIMER_FREQ                            (25000000ul)
 
 #define VSF_USE_VIDEO                                   ENABLED
