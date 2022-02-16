@@ -31,9 +31,6 @@
 #   ifndef VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE
 #       define VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE         32
 #   endif
-#   ifndef VSF_DEBUG_STREAM_CFG_TX_BUF_SIZE
-#       define VSF_DEBUG_STREAM_CFG_TX_BUF_SIZE         (64 * 1024)
-#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -44,18 +41,11 @@
 
 #if     VSF_USE_SIMPLE_STREAM == ENABLED
 static uint8_t __vsf_debug_stream_rx_buff[VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE];
-static uint8_t __vsf_debug_stream_tx_buff[VSF_DEBUG_STREAM_CFG_TX_BUF_SIZE];
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if     VSF_USE_SIMPLE_STREAM == ENABLED
-vsf_mem_stream_t VSF_DEBUG_STREAM_TX = {
-    .op         = &vsf_mem_stream_op,
-    .buffer     = __vsf_debug_stream_tx_buff,
-    .size       = sizeof(__vsf_debug_stream_tx_buff),
-};
-
 vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
     .op         = &vsf_mem_stream_op,
     .buffer     = __vsf_debug_stream_rx_buff,
@@ -87,12 +77,12 @@ static void __uart_config(void)
 #endif
 }
 
-static bool __uart_is_tx_not_full(void)
+static bool __uart_is_tx_full(void)
 {
 #if defined(IOTKIT_SECURE_UART0)
-    return !(IOTKIT_UART0->STATE & IOTKIT_UART_STATE_TXBF_Msk);
+    return (IOTKIT_UART0->STATE & IOTKIT_UART_STATE_TXBF_Msk);
 #elif defined(CMSDK_UART0)
-    return !(CMSDK_UART0->STATE & CMSDK_UART_STATE_TXBF_Msk);
+    return (CMSDK_UART0->STATE & CMSDK_UART_STATE_TXBF_Msk);
 #else
 #   error No defined USART
 #endif
@@ -131,26 +121,27 @@ static uint8_t __uart_rx_read(void)
 #endif
 }
 
+static void __VSF_DEBUG_STREAM_TX_INIT(void)
+{
+    __uart_config();
+    vsf_stream_connect_tx(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t);
+}
+
+static void __VSF_DEBUG_STREAM_TX_WRITE_BLOCKED(uint8_t *buf, uint_fast32_t size)
+{
+    for (uint_fast32_t i = 0; i < size; i++) {
+        while(__uart_is_tx_full());
+        __uart_tx_write(*buf++);
+    }
+}
+
+#include "hal/driver/common/debug_stream/debug_stream_tx_blocked.inc"
+
 // TODO: use interrupt mode
 void VSF_DEBUG_STREAM_POLL(void)
 {
-    uint_fast32_t tx_size = VSF_STREAM_GET_DATA_SIZE(&VSF_DEBUG_STREAM_TX);
     uint_fast32_t rx_free_size = VSF_STREAM_GET_FREE_SIZE(&VSF_DEBUG_STREAM_RX);
     uint8_t ch;
-
-    static bool __is_init = false;
-
-    if (!__is_init) {
-        __is_init = true;
-        __uart_config();
-    }
-
-    while (tx_size && __uart_is_tx_not_full()) {
-        tx_size--;
-
-        VSF_STREAM_READ(&VSF_DEBUG_STREAM_TX, &ch, 1);
-        __uart_tx_write(ch);
-    }
 
     while (rx_free_size && __uart_is_rx_not_empty()) {
         rx_free_size--;
@@ -159,6 +150,7 @@ void VSF_DEBUG_STREAM_POLL(void)
         VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, &ch, 1);
     }
 }
+
 #elif   VSF_USE_STREAM == ENABLED
 #endif
 
