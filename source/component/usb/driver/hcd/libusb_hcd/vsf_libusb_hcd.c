@@ -447,7 +447,7 @@ static int LIBUSB_CALL __vk_libusb_hcd_hotplug_cb(libusb_context *ctx, libusb_de
     return 0;
 }
 
-// return 0 on success, non-0 otherwise
+// return 0 on success, < 0 otherwise
 static int __vk_libusb_hcd_init(void)
 {
     vk_libusb_hcd_param_t *param = __vk_libusb_hcd.hcd->param;
@@ -685,7 +685,9 @@ static void __vk_libusb_hcd_init_thread(void *arg)
     vsf_arch_irq_thread_t *irq_thread = arg;
 
     __vsf_arch_irq_set_background(irq_thread);
-        __vk_libusb_hcd_init();
+        if (__vk_libusb_hcd_init() < 0) {
+            VSF_USB_ASSERT(false);
+        }
     __vsf_arch_irq_start(irq_thread);
         vsf_eda_post_evt(__vk_libusb_hcd.init_eda, VSF_EVT_LIBUSB_HCD_READY);
     __vsf_arch_irq_end(irq_thread, false);
