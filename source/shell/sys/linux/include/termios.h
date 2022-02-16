@@ -10,6 +10,16 @@ extern "C" {
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define tcgetattr   VSF_LINUX_WRAPPER(tcgetattr)
 #define tcsetattr   VSF_LINUX_WRAPPER(tcsetattr)
+#define tcsendbreak VSF_LINUX_WRAPPER(tcsendbreak)
+#define tcdrain     VSF_LINUX_WRAPPER(tcdrain)
+#define tcflush     VSF_LINUX_WRAPPER(tcflush)
+#define tcflow      VSF_LINUX_WRAPPER(tcflow)
+#define cfmakeraw   VSF_LINUX_WRAPPER(cfmakeraw)
+#define cfgetispeed VSF_LINUX_WRAPPER(cfgetispeed)
+#define cfgetospeed VSF_LINUX_WRAPPER(cfgetospeed)
+#define cfsetispeed VSF_LINUX_WRAPPER(cfsetispeed)
+#define cfsetospeed VSF_LINUX_WRAPPER(cfsetospeed)
+#define cfsetspeed  VSF_LINUX_WRAPPER(cfsetspeed)
 #endif
 
 typedef unsigned int tcflag_t;
