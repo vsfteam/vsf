@@ -48,7 +48,7 @@ extern "C" {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if     VSF_USE_SIMPLE_STREAM == ENABLED
-extern vsf_mem_stream_t VSF_DEBUG_STREAM_TX;
+extern vsf_stream_t VSF_DEBUG_STREAM_TX;
 extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
 #elif   VSF_USE_STREAM == ENABLED
 #endif
