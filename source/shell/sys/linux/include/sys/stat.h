@@ -22,6 +22,8 @@ extern "C" {
 #define stat                    VSF_LINUX_WRAPPER(stat)
 #define fstat                   VSF_LINUX_WRAPPER(fstat)
 #define umask                   VSF_LINUX_WRAPPER(umask)
+#define chmod                   VSF_LINUX_WRAPPER(chmod)
+#define fchmod                  VSF_LINUX_WRAPPER(fchmod)
 #endif
 #define lstat                   stat
 
