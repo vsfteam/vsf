@@ -564,7 +564,7 @@ extern "C" {
 
 
 //! \name stack / stack-like operations using list
-//£¡ @{
+//! @{
 #define vsf_slist_stack_init(__list_ptr)    vsf_slist_init_node(__list_ptr)
 
 #define vsf_slist_stack_pop(__host_type,    /* the type of the host type */     \
@@ -637,7 +637,7 @@ extern "C" {
 
 
 //! \name queue / queue-like operations using slist
-//£¡ @{
+//! @{
 #define vsf_slist_queue_is_empty(__queue_ptr)                                   \
             vsf_slist_is_empty(&(__queue_ptr)->head)
 
