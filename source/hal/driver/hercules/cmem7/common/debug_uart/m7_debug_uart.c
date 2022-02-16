@@ -15,9 +15,7 @@
  *                                                                           *
  ****************************************************************************/
 
-#include "vsf.h"
-#include <stdio.h>
-#include "cmem7_includes.h"
+#include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 
@@ -25,6 +23,9 @@
 #   define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #   include "service/vsf_service.h"
 #endif
+
+#include <stdio.h>
+#include "cmem7_includes.h"
 
 /*============================ MACROS ========================================*/
 
