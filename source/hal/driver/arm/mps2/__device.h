@@ -21,29 +21,29 @@
 #undef VSF_ARM_MPS2_DEVICE_HEADER
 
 #if   defined CMSDK_CM0
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM0/device.h"                        
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM0/device.h"
 #elif defined CMSDK_CM0plus
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM0plus/device.h"                  
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM0plus/device.h"
 #elif defined CMSDK_CM3
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM3/device.h"                       
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM3/device.h"
 #elif defined CMSDK_CM4
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM4/device.h"                       
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM4/device.h"
 #elif defined CMSDK_CM4_FP
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM4_FP/device.h"                    
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM4_FP/device.h"
 #elif defined CMSDK_CM7
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM7/device.h"                       
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM7/device.h"
 #elif defined CMSDK_CM7_SP
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM7/device.h"                    
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM7/device.h"
 #elif defined CMSDK_CM7_DP
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM7/device.h"                   
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_CM7/device.h"
 #elif defined CMSDK_ARMv8MBL
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_ARMv8MBL/device.h"                
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_ARMv8MBL/device.h"
 #elif defined CMSDK_ARMv8MML
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_ARMv8MML/device.h"                 
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_ARMv8MML/device.h"
 #elif defined CMSDK_ARMv8MML_SP
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_ARMv8MML_SP/device.h"             
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_ARMv8MML_SP/device.h"
 #elif defined CMSDK_ARMv8MML_DP
-#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_ARMv8MML_DP/device.h"             
+#   define VSF_ARM_MPS2_DEVICE_HEADER       "./CMSDK_ARMv8MML_DP/device.h"
 #else
 #   warning "no appropriate header file found!"
 #endif
