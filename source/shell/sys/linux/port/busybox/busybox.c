@@ -25,6 +25,9 @@ extern int clear_main(int argc, char *argv[]);
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
 extern int export_main(int argc, char *argv[]);
 #endif
+#if !defined(VSF_ARCH_PROVIDE_HEAP) && VSF_HEAP_CFG_STATISTICS == ENABLED
+extern int free_main(int argc, char *argv[]);
+#endif
 
 extern int vsf_linux_init_main(int argc, char *argv[]);
 
@@ -84,6 +87,9 @@ int busybox_install(void)
         ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/clear", clear_main) < 0
 #   if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/export", export_main) < 0
+#   endif
+#if !defined(VSF_ARCH_PROVIDE_HEAP) && VSF_HEAP_CFG_STATISTICS == ENABLED
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/free", free_main) < 0
 #   endif
         ) {
         return -1;

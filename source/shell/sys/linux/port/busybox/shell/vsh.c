@@ -717,6 +717,24 @@ int clear_main(int argc, char *argv[])
     return 0;
 }
 
+#if !defined(VSF_ARCH_PROVIDE_HEAP) && VSF_HEAP_CFG_STATISTICS == ENABLED
+int free_main(int argc, char *argv[])
+{
+    vsf_heap_statistics_t statistics;
+    vsf_heap_statistics(&statistics);
+
+    // 20 bytes is enough for 64-bit value
+    char numbuf_total[20], numbuf_used[20], numbuf_free[20];
+    itoa(statistics.all_size, numbuf_total, 10);
+    itoa(statistics.used_size, numbuf_used, 10);
+    itoa(statistics.all_size - statistics.used_size, numbuf_free, 10);
+
+    printf("          total       used       free\nMem:%11s%11s%11s\n",
+            numbuf_total, numbuf_used, numbuf_free);
+    return 0;
+}
+#endif
+
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
 int export_main(int argc, char *argv[])
 {
