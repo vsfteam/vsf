@@ -71,11 +71,11 @@
         VSF_SPI_OP                                                              \
         .spi_const = &vsf_spi##__count ## _const,                               \
     };                                                                          \
-    void SPI ##__count ## _RXDMA_IRQ(void)                                      \
+    void VSF_HW_SPI ## __count ## _RXDMA_IRQ(void)                              \
     {                                                                           \
         __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_CPL);                    \
     }                                                                           \
-    void SPI ##__count ## _TXDMA_IRQ(void)                                      \
+    void VSF_HW_SPI ## __count ## _TXDMA_IRQ(void)                              \
     {                                                                           \
         __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_TX_CPL);                 \
     }
