@@ -46,6 +46,7 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
 static NO_INIT vsf_teda_t __disp_task;
 
 /*============================ PROTOTYPES ====================================*/
@@ -55,7 +56,6 @@ static NO_INIT vsf_teda_t __disp_task;
 static void __disp_demo_fps_dump(void)
 {
 #if APP_DISP_DEMO_FPS_OUTPUT == ENABLED
-    static uint16_t __fps;
     static uint32_t __refresh_cnt;
     static vsf_systimer_tick_t __start_tick;
 
@@ -67,10 +67,9 @@ static void __disp_demo_fps_dump(void)
     elapse = vsf_systimer_tick_to_ms(current_tick - __start_tick);
 
     if (elapse >= 1000) {
-        __start_tick = current_tick;
-        __fps = __refresh_cnt * 1000 / elapse;
+        vsf_trace_info("disp demo, fps: %d" VSF_TRACE_CFG_LINEEND, __refresh_cnt * 1000 / elapse);
         __refresh_cnt = 0;
-        vsf_trace_info("disp demo, fps: %d\n", __fps);
+        __start_tick = current_tick;
     }
 #endif
 }
