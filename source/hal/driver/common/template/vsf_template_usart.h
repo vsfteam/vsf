@@ -305,6 +305,48 @@ def_interface(i_usart_t)
 end_def_interface(i_usart_t)
 //! @}
 
+/*============================ PROTOTYPES ====================================*/
+
+extern vsf_err_t          vsf_usart_init(           vsf_usart_t *usart_ptr,
+                                                    usart_cfg_t *cfg_ptr);
+
+extern fsm_rt_t           vsf_usart_enable(         vsf_usart_t *usart_ptr);
+extern fsm_rt_t           vsf_usart_disable(        vsf_usart_t *usart_ptr);
+
+extern void               vsf_usart_irq_enable(     vsf_usart_t *usart_ptr,
+                                                    em_usart_irq_mask_t irq_mask);
+extern void               vsf_usart_irq_disable(    vsf_usart_t *usart_ptr,
+                                                    em_usart_irq_mask_t irq_mask);
+
+#if __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
+#endif
+extern usart_status_t     vsf_usart_status(         vsf_usart_t *usart_ptr);
+extern usart_capability_t vsf_usart_capability(     vsf_usart_t *usart_ptr);
+#if __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
+
+extern uint_fast16_t      vsf_usart_fifo_read(      vsf_usart_t *usart_ptr,
+                                                    void *buffer_ptr,
+                                                    uint_fast16_t count);
+extern uint_fast16_t      vsf_usart_fifo_write(     vsf_usart_t *usart_ptr,
+                                                    void *buffer_ptr,
+                                                    uint_fast16_t count);
+
+extern vsf_err_t          vsf_usart_request_rx(     vsf_usart_t *usart_ptr,
+                                                    void *buffer_ptr,
+                                                    uint_fast32_t count);
+extern vsf_err_t          vsf_usart_request_tx(     vsf_usart_t *usart_ptr,
+                                                    void *buffer_ptr,
+                                                    uint_fast32_t count);
+extern vsf_err_t          vsf_usart_cancel_rx(      vsf_usart_t *usart_ptr);
+extern vsf_err_t          vsf_usart_cancel_tx(      vsf_usart_t *usart_ptr);
+extern int_fast32_t       vsf_usart_get_rx_count(   vsf_usart_t *usart_ptr);
+extern int_fast32_t       vsf_usart_get_tx_count(   vsf_usart_t *usart_ptr);
+
+
 /*============================ INCLUDES ======================================*/
 
 #if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
@@ -347,47 +389,6 @@ end_def_interface(i_usart_t)
 #   undef VSF_USART_CFG_TEMPLATE_MASK
 #   undef VSF_USART_CFG_DEC_LV0
 #endif
-
-/*============================ PROTOTYPES ====================================*/
-
-extern vsf_err_t          vsf_usart_init(           vsf_usart_t *usart_ptr,
-                                                    usart_cfg_t *cfg_ptr);
-
-extern fsm_rt_t           vsf_usart_enable(         vsf_usart_t *usart_ptr);
-extern fsm_rt_t           vsf_usart_disable(        vsf_usart_t *usart_ptr);
-
-extern void               vsf_usart_irq_enable(     vsf_usart_t *usart_ptr,
-                                                    em_usart_irq_mask_t irq_mask);
-extern void               vsf_usart_irq_disable(    vsf_usart_t *usart_ptr,
-                                                    em_usart_irq_mask_t irq_mask);
-
-#if __IS_COMPILER_LLVM__
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
-#endif
-extern usart_status_t     vsf_usart_status(         vsf_usart_t *usart_ptr);
-extern usart_capability_t vsf_usart_capability(     vsf_usart_t *usart_ptr);
-#if __IS_COMPILER_LLVM__
-#   pragma clang diagnostic pop
-#endif
-
-extern uint_fast16_t      vsf_usart_fifo_read(      vsf_usart_t *usart_ptr,
-                                                    void *buffer_ptr,
-                                                    uint_fast16_t count);
-extern uint_fast16_t      vsf_usart_fifo_write(     vsf_usart_t *usart_ptr,
-                                                    void *buffer_ptr,
-                                                    uint_fast16_t count);
-
-extern vsf_err_t          vsf_usart_request_rx(     vsf_usart_t *usart_ptr,
-                                                    void *buffer_ptr,
-                                                    uint_fast32_t count);
-extern vsf_err_t          vsf_usart_request_tx(     vsf_usart_t *usart_ptr,
-                                                    void *buffer_ptr,
-                                                    uint_fast32_t count);
-extern vsf_err_t          vsf_usart_cancel_rx(      vsf_usart_t *usart_ptr);
-extern vsf_err_t          vsf_usart_cancel_tx(      vsf_usart_t *usart_ptr);
-extern int_fast32_t       vsf_usart_get_rx_count(   vsf_usart_t *usart_ptr);
-extern int_fast32_t       vsf_usart_get_tx_count(   vsf_usart_t *usart_ptr);
 
 #ifdef __cplusplus
 }

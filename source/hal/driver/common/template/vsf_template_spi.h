@@ -23,27 +23,37 @@
 #include "./vsf_template_hal_driver.h"
 #include "hal/arch/vsf_arch.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_SPI_CFG_MULTI_CLASS
-#   define VSF_SPI_CFG_MULTI_CLASS        DISABLED
+#   define VSF_SPI_CFG_MULTI_CLASS          DISABLED
+#endif
+
+#ifndef VSF_SPI_CFG_MULTIPLEX
+#   define VSF_SPI_CFG_MULTIPLEX            ENABLED
 #endif
 
 #ifndef VSF_SPI_REIMPLEMENT_MODE
-#   define VSF_SPI_REIMPLEMENT_MODE           DISABLED
+#   define VSF_SPI_REIMPLEMENT_MODE         DISABLED
 #endif
 
 #ifndef VSF_SPI_REIMPLEMENT_IRQ_MASK
-#   define VSF_SPI_REIMPLEMENT_IRQ_MASK       DISABLED
+#   define VSF_SPI_REIMPLEMENT_IRQ_MASK     DISABLED
 #endif
 
 #ifndef VSF_SPI_REIMPLEMENT_STATUS
-#   define VSF_SPI_REIMPLEMENT_STATUS         DISABLED
+#   define VSF_SPI_REIMPLEMENT_STATUS       DISABLED
+#endif
+
+#ifndef VSF_SPI_REIMPLEMENT_CAPABILITY
+#   define VSF_SPI_REIMPLEMENT_CAPABILITY   DISABLED
 #endif
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
 
 #if VSF_SPI_CFG_MULTI_CLASS == DISABLED
 #   ifndef VSF_SPI_CFG_PREFIX
@@ -104,8 +114,7 @@
 /*============================ TYPES =========================================*/
 
 #if VSF_SPI_REIMPLEMENT_MODE == DISABLED
-//! \name spi working mode
-//! @{
+//! spi working mode
 typedef enum em_spi_mode_t {
     SPI_MASTER                  = 0x00ul << 0,      //!< select master mode
     SPI_SLAVE                   = 0x01ul << 0,      //!< select slave mode
@@ -159,9 +168,7 @@ typedef enum em_spi_mode_t {
     SPI_LOOP_BACK               = 0x01ul << 10,     //!< enable loop back
 } em_spi_mode_t;
 
-#define SPI_DATASIZE_TO_BYTE(__S)   (((((__S) & SPI_DATASIZE_MASK) >> 4) + 8) / 8)
-
-//! @}
+#   define SPI_DATASIZE_TO_BYTE(__S)   (((((__S) & SPI_DATASIZE_MASK) >> 4) + 8) / 8)
 #endif
 
 #if VSF_SPI_REIMPLEMENT_IRQ_MASK == DISABLED
@@ -191,45 +198,49 @@ typedef enum em_spi_irq_mask_t {
 } em_spi_irq_mask_t;
 #endif
 
-/* spi_status_t should implement peripheral_status_t */
-typedef struct spi_status_t spi_status_t;
-
 #if VSF_SPI_REIMPLEMENT_STATUS == DISABLED
-struct spi_status_t {
+typedef struct spi_status_t {
     union {
         inherit(peripheral_status_t)
         struct {
             uint32_t is_busy : 1;
         };
     };
-};
+} spi_status_t;
 #endif
 
-/* spi_capability_t should implement peripheral_capability_t */
-typedef struct spi_capability_t spi_capability_t;
+#if VSF_SPI_REIMPLEMENT_CAPABILITY == DISABLED
+typedef struct spi_capability_t {
+    //inherit(peripheral_capability_t)
+    uint8_t cs_count;
+} spi_capability_t;
+#endif
 
+#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
+typedef struct vsf_spi_t  {
+    const vsf_spi_op_t * op;
+} vsf_spi_t;
+#else
 typedef struct vsf_spi_t vsf_spi_t;
+#endif
 
 typedef void vsf_spi_isr_handler_t(void *target_ptr,
                                    vsf_spi_t *spi_ptr,
                                    em_spi_irq_mask_t irq_mask);
 
-//! \name spi isr for api
-//! @{
+//! spi isr for api
 typedef struct vsf_spi_isr_t {
     vsf_spi_isr_handler_t *handler_fn;
     void                  *target_ptr;
     vsf_arch_prio_t        prio;
 } vsf_spi_isr_t;
 
-//! \name spi configuration for api
-//! @{
+//! spi configuration for api
 typedef struct spi_cfg_t {
-    uint32_t                    mode;               //!< spi working mode
-    uint32_t                    clock_hz;
-    vsf_spi_isr_t               isr;
+    em_spi_mode_t   mode;               //!< spi working mode
+    uint32_t        clock_hz;
+    vsf_spi_isr_t   isr;
 } spi_cfg_t;
-//! @}
 
 typedef struct vsf_spi_op_t {
     vsf_err_t          (*init)                (vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr);
@@ -255,20 +266,13 @@ typedef struct vsf_spi_op_t {
     int_fast32_t       (*get_transfered_count)(vsf_spi_t *spi_ptr);
 } vsf_spi_op_t;
 
-#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
-struct vsf_spi_t  {
-    const vsf_spi_op_t * op;
-};
-#endif
-
 dcl_interface(i_spi_t)
 
 typedef void vsf_i_spi_isrhandler_t(void *target_ptr,
                                     const i_spi_t *i_spi_ptr,
                                     em_spi_irq_mask_t irq_mask);
 
-//! \name spi isr for interface
-//! @{
+//! spi isr for interface
 typedef struct vsf_i_spi_isr_t {
     vsf_i_spi_isrhandler_t      *handler_fn;
     void                        *target_ptr;
@@ -276,17 +280,14 @@ typedef struct vsf_i_spi_isr_t {
 } vsf_i_spi_isr_t;
 
 
-//! \name spi configuration for interface
-//! @{
+//! spi configuration for interface
 typedef struct i_spi_cfg_t {
     uint32_t                    mode;               //!< spi working mode
     uint32_t                    clock_hz;
     vsf_i_spi_isr_t             isr;
 } i_spi_cfg_t;
-//! @}
 
-//! \name class: spi_t
-//! @{
+//! class: spi_t
 def_interface(i_spi_t)
     union {
         implement(i_peripheral_t);
@@ -338,7 +339,52 @@ def_interface(i_spi_t)
         void                    (*Disable)(em_spi_irq_mask_t mask);
     } IRQ;
 end_def_interface(i_spi_t)
-//! @}
+
+/*============================ PROTOTYPES ====================================*/
+
+extern vsf_err_t        vsf_spi_init(               vsf_spi_t *spi_ptr,
+                                                    spi_cfg_t *cfg_ptr);
+
+extern fsm_rt_t         vsf_spi_enable(             vsf_spi_t *spi_ptr);
+extern fsm_rt_t         vsf_spi_disable(            vsf_spi_t *spi_ptr);
+
+extern void             vsf_spi_irq_enable(         vsf_spi_t *spi_ptr,
+                                                    em_spi_irq_mask_t irq_mask);
+extern void             vsf_spi_irq_disable(        vsf_spi_t *spi_ptr,
+                                                    em_spi_irq_mask_t irq_mask);
+
+extern void             vsf_spi_cs_active(          vsf_spi_t *spi_ptr,
+                                                    uint_fast8_t index);
+extern void             vsf_spi_cs_inactive(        vsf_spi_t *spi_ptr,
+                                                    uint_fast8_t index);
+
+extern spi_status_t     vsf_spi_status(             vsf_spi_t *spi_ptr);
+
+extern spi_capability_t vsf_spi_capability(         vsf_spi_t *spi_ptr);
+
+extern void             vsf_spi_fifo_transfer(      vsf_spi_t *spi_ptr,
+                                                    void *out_buffer_ptr,
+                                                    uint_fast32_t  out_cnt,
+                                                    uint_fast32_t* out_offset_ptr,
+                                                    void *in_buffer_ptr,
+                                                    uint_fast32_t  in_cnt,
+                                                    uint_fast32_t* in_offset_ptr);
+
+extern vsf_err_t        vsf_spi_request_transfer(   vsf_spi_t *spi_ptr,
+                                                    void *out_buffer_ptr,
+                                                    void *in_buffer_ptr,
+                                                    uint_fast32_t count);
+extern vsf_err_t        vsf_spi_cancel_transfer(    vsf_spi_t *spi_ptr);
+extern int_fast32_t     vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
+
+
+
+/*============================ INCLUDES ======================================*/
+
+#if VSF_SPI_CFG_MULTIPLEX == ENABLED
+#   include "hal/driver/common/template/vsf_template_io.h"
+#   include "hal/driver/common/spi/multiplex_spi.h"
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -375,43 +421,11 @@ end_def_interface(i_spi_t)
 #   undef VSF_SPI_CFG_TEMPLATE_COUNT
 #   undef VSF_SPI_CFG_TEMPLATE_MASK
 #   undef VSF_SPI_CFG_DEC_LV0
+#endif  /*VSF_SPI_CFG_TEMPLATE_COUNT*/
+
+#ifdef __cplusplus
+}
 #endif
 
-
-/*============================ PROTOTYPES ====================================*/
-
-extern vsf_err_t        vsf_spi_init(               vsf_spi_t *spi_ptr,
-                                                    spi_cfg_t *cfg_ptr);
-
-extern fsm_rt_t         vsf_spi_enable(             vsf_spi_t *spi_ptr);
-extern fsm_rt_t         vsf_spi_disable(            vsf_spi_t *spi_ptr);
-
-extern void             vsf_spi_irq_enable(         vsf_spi_t *spi_ptr,
-                                                    em_spi_irq_mask_t irq_mask);
-extern void             vsf_spi_irq_disable(        vsf_spi_t *spi_ptr,
-                                                    em_spi_irq_mask_t irq_mask);
-
-extern void             vsf_spi_cs_active(          vsf_spi_t *spi_ptr,
-                                                    uint_fast8_t index);
-extern void             vsf_spi_cs_inactive(        vsf_spi_t *spi_ptr,
-                                                    uint_fast8_t index);
-
-extern spi_status_t     vsf_spi_status(             vsf_spi_t *spi_ptr);
-
-extern void             vsf_spi_fifo_transfer(      vsf_spi_t *spi_ptr,
-                                                    void *out_buffer_ptr,
-                                                    uint_fast32_t  out_cnt,
-                                                    uint_fast32_t* out_offset_ptr,
-                                                    void *in_buffer_ptr,
-                                                    uint_fast32_t  in_cnt,
-                                                    uint_fast32_t* in_offset_ptr);
-
-extern vsf_err_t        vsf_spi_request_transfer(   vsf_spi_t *spi_ptr,
-                                                    void *out_buffer_ptr,
-                                                    void *in_buffer_ptr,
-                                                    uint_fast32_t count);
-extern vsf_err_t        vsf_spi_cancel_transfer(    vsf_spi_t *spi_ptr);
-extern int_fast32_t     vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
-
-#endif
+#endif  /*__HAL_DRIVER_SPI_INTERFACE_H__*/
 
