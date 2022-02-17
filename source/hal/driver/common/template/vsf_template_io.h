@@ -27,7 +27,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_GPIO_CFG_MULTI_CLASS
-#   define VSF_GPIO_CFG_MULTI_CLASS     DISABLED
+#   define VSF_GPIO_CFG_MULTI_CLASS                 DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -285,6 +285,29 @@ static void gpio##__N##_toggle(uint32_t pin_mask)                               
 
 /*============================ TYPES =========================================*/
 
+typedef struct vsf_gpio_t vsf_gpio_t;
+
+typedef struct vsf_gpio_op_t {
+    void            (*config_pin)       (vsf_gpio_t * gpio_ptr, uint32_t pin_mask, uint_fast32_t feature);
+    void            (*set_direction)    (vsf_gpio_t * gpio_ptr, uint32_t dir_bitmap, uint32_t pin_mask);
+    uint32_t        (*get_direction)    (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*set_input)        (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*set_output)       (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*switch_direction) (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    uint32_t        (*read)             (vsf_gpio_t * gpio_ptr);
+    void            (*write)            (vsf_gpio_t * gpio_ptr, uint32_t value, uint32_t pin_mask);
+    void            (*set)              (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*clear)            (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*toggle)           (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*output_and_set)   (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+    void            (*output_and_clear) (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+} vsf_gpio_op_t;
+
+#if VSF_GPIO_CFG_MULTI_CLASS == ENABLED
+typedef struct vsf_gpio_t  {
+    const vsf_gpio_op_t * op;
+} vsf_gpio_t;
+#endif
 
 /*! \note those pin mask should be defined by io.h of target device,
  *        PIO_PORTB_PIN_NUM is defined by device.h of target device,
@@ -393,6 +416,8 @@ enum io_feature_t{
 //! @}
 */
 
+// TODO: support interface
+#if 0
 #ifndef __cplusplus
 typedef enum io_pin_no_t    io_pin_no_t;
 typedef enum io_feature_t   io_feature_t;
@@ -410,35 +435,6 @@ typedef struct {
 }io_cfg_t;
 //! @}
 
-typedef struct vsf_gpio_t vsf_gpio_t;
-
-#if VSF_GPIO_CFG_MULTI_CLASS == ENABLED
-//! \name gpio multiplex
-//! @{
-typedef struct vsf_gpio_op_t {
-    void            (*config_pin)       (vsf_gpio_t * gpio_ptr, uint32_t pin_mask, uint_fast32_t feature);
-    void            (*set_direction)    (vsf_gpio_t * gpio_ptr, uint32_t dir_bitmap, uint32_t pin_mask);
-    uint32_t        (*get_direction)    (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*set_input)        (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*set_output)       (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*switch_direction) (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    uint32_t        (*read)             (vsf_gpio_t * gpio_ptr);
-    void            (*write)            (vsf_gpio_t * gpio_ptr, uint32_t value, uint32_t pin_mask);
-    void            (*set)              (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*clear)            (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*toggle)           (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*output_and_set)   (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*output_and_clear) (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-} vsf_gpio_op_t;
-//! @}
-
-typedef struct vsf_gpio_t  {
-    const vsf_gpio_op_t * op;
-} vsf_gpio_t;
-#endif
-
-// TODO: support interface
-#if 0
 //! \name gpio control interface
 //! @{
 dcl_interface(i_gpio_t)
@@ -489,12 +485,9 @@ def_interface(i_io_t)
     };
 end_def_interface(i_io_t)
 //! @}
-#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-// TODO: support interface
-#if 0
 //! \brief io interface
 extern const i_io_t VSF_IO;
 #endif
@@ -537,14 +530,6 @@ extern const i_io_t VSF_IO;
 #endif
 
 /*============================ PROTOTYPES ====================================*/
-
-/*! \brief gpio batch configuration
-           an implementation example:
- *! \param cfg_ptr the pointer points to configuration array
- *! \param count the count of configurations in the array
- *! \return configuration result
- */
-extern vsf_err_t vsf_gpio_config(io_cfg_t *cfg_ptr, uint_fast8_t count);
 
 extern void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
                                 uint32_t pin_mask,
