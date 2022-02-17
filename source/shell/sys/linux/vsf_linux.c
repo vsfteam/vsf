@@ -440,11 +440,13 @@ int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout
 
     vsf_sync_reason_t r = vsf_thread_trig_pend(&trig->use_as__vsf_trig_t, timeout);
     orig = vsf_protect_sched();
-        trig->pending_process = NULL;
-    vsf_unprotect_sched(orig);
+    trig->pending_process = NULL;
     if (VSF_SYNC_TIMEOUT == r) {
+        vsf_dlist_remove(vsf_linux_trigger_t, node, &process->sig.trigger_list, trig);
+        vsf_unprotect_sched(orig);
         return 1;
     }
+    vsf_unprotect_sched(orig);
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
     if (trig->sig) {
         errno = EINTR;
