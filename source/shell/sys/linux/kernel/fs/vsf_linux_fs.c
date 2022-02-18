@@ -1518,23 +1518,15 @@ static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
     return 0;
 }
 
-static void __vsf_linux_stream_evt(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool is_rx, bool is_ready)
+static void __vsf_linux_stream_evt(vsf_linux_fd_t *sfd, vsf_protect_t orig, short event, bool is_ready)
 {
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
         if (priv->on_evt != NULL) {
             priv->on_evt(sfd, orig, is_ready);
         } else if (is_ready) {
-            if (is_rx) {
-                vsf_linux_fd_set_status(sfd, POLLIN, orig);
-            } else {
-                vsf_linux_fd_set_status(sfd, POLLOUT, orig);
-            }
+            vsf_linux_fd_set_status(sfd, event, orig);
         } else {
-            if (is_rx) {
-                vsf_linux_fd_clear_status(sfd, POLLIN, orig);
-            } else {
-                vsf_linux_fd_clear_status(sfd, POLLOUT, orig);
-            }
+            vsf_linux_fd_clear_status(sfd, event, orig);
         }
     vsf_unprotect_sched(orig);
 }
@@ -1557,13 +1549,13 @@ static void __vsf_linux_stream_evthandler(vsf_stream_t *stream, void *param, vsf
     on_stream_rx:
         stream->rx.param = NULL;
         stream->rx.evthandler = NULL;
-        __vsf_linux_stream_evt(sfd, vsf_protect_sched(), true, true);
+        __vsf_linux_stream_evt(sfd, vsf_protect_sched(), POLLIN, true);
         break;
     case VSF_STREAM_ON_TX:
     on_stream_tx:
         stream->tx.param = NULL;
         stream->tx.evthandler = NULL;
-        __vsf_linux_stream_evt(sfd, vsf_protect_sched(), false, true);
+        __vsf_linux_stream_evt(sfd, vsf_protect_sched(), POLLOUT, true);
         break;
     }
 }
@@ -1660,7 +1652,7 @@ do_return:
     orig = vsf_protect_sched();
     VSF_LINUX_ASSERT((NULL == sfd->priv->trigger) || !(sfd->priv->events_pending & POLLIN));
     if (!vsf_stream_get_data_size(stream)) {
-        __vsf_linux_stream_evt(sfd, orig, true, false);
+        __vsf_linux_stream_evt(sfd, orig, POLLIN, false);
     } else {
         vsf_linux_fd_set_events(sfd, POLLIN, orig);
     }
@@ -1700,7 +1692,7 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
     orig = vsf_protect_sched();
     VSF_LINUX_ASSERT((NULL == sfd->priv->trigger) || !(sfd->priv->events_pending & POLLOUT));
     if (!vsf_stream_get_free_size(stream)) {
-        __vsf_linux_stream_evt(sfd, orig, false, false);
+        __vsf_linux_stream_evt(sfd, orig, POLLOUT, false);
     } else {
         vsf_linux_fd_set_events(sfd, POLLOUT, orig);
     }
