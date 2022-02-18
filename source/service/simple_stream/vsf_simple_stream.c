@@ -196,7 +196,7 @@ static void __vsf_stream_disconnect_terminal(vsf_stream_t *stream, uint_fast8_t 
     vsf_stream_terminal_t *term_current = &stream->terminal[terminal];
     vsf_stream_terminal_t *term_another = &stream->terminal[terminal ^ 1];
 
-    if (term_current->ready && (term_another->evthandler != NULL)) {
+    if (term_current->ready && term_another->ready && (term_another->evthandler != NULL)) {
         term_another->evthandler(stream, term_another->param, VSF_STREAM_ON_DISCONNECT);
     }
     term_current->ready = false;
