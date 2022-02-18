@@ -219,11 +219,11 @@ void __vsf_arch_irq_thread_start(vsf_arch_irq_thread_t *irq_thread,
 
     // because dynamic xTaskCreate does not support stack from user, so xTaskCreateStatic is sued
     // and part of the stack is used as StaticTask_t.
-#ifdef VSF_ARCH_CFG_STACK_ALIGN_BIT
-    VSF_ARCH_ASSERT(!((1 << VSF_ARCH_CFG_STACK_ALIGN_BIT) % sizeof(StackType_t)));
-    VSF_ARCH_ASSERT(!((uintptr_t)stack & ((1 << VSF_ARCH_CFG_STACK_ALIGN_BIT) - 1)));
-    uint_fast32_t reserved_stack_depth = sizeof(StaticTask_t) + (1 << VSF_ARCH_CFG_STACK_ALIGN_BIT) - 1;
-    reserved_stack_depth &= ~((1 << VSF_ARCH_CFG_STACK_ALIGN_BIT) - 1);
+#ifdef VSF_ARCH_STACK_ALIGN_BIT
+    VSF_ARCH_ASSERT(!((1 << VSF_ARCH_STACK_ALIGN_BIT) % sizeof(StackType_t)));
+    VSF_ARCH_ASSERT(!((uintptr_t)stack & ((1 << VSF_ARCH_STACK_ALIGN_BIT) - 1)));
+    uint_fast32_t reserved_stack_depth = sizeof(StaticTask_t) + (1 << VSF_ARCH_STACK_ALIGN_BIT) - 1;
+    reserved_stack_depth &= ~((1 << VSF_ARCH_STACK_ALIGN_BIT) - 1);
 #else
     uint_fast32_t reserved_stack_depth = sizeof(StaticTask_t) + sizeof(StackType_t) - 1;
     if (sizeof(StackType_t) < sizeof(VSF_ARCH_RTOS_STACK_T)) {

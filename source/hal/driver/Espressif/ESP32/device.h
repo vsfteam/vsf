@@ -54,7 +54,7 @@ typedef int                                     intalu_t;
 //#define VSF_ARCH_RTOS_CFG_SET_STACK(__STACK)    SET_STACK(__STACK)
 
 // 16-byte align, necessary if > 8
-#define VSF_ARCH_CFG_STACK_ALIGN_BIT            4
+#define VSF_ARCH_STACK_ALIGN_BIT                4
 
 #else
 

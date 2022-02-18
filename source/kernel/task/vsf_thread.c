@@ -27,6 +27,16 @@
 #include "../vsf_os.h"
 
 /*============================ MACROS ========================================*/
+
+#ifdef VSF_ARCH_SETJMP
+#   undef setjmp
+#   define setjmp               VSF_ARCH_SETJMP
+#endif
+#ifdef VSF_ARCH_LONGJMP
+#   undef longjmp
+#   define longjmp              VSF_ARCH_LONGJMP
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -80,7 +90,7 @@ void vsf_thread_exit(void)
     __vsf_arch_irq_request_send(pthis->rep);
     __vsf_arch_irq_thread_exit();
 #else
-    longjmp(*(pthis->ret), 0);
+    longjmp(*(pthis->ret), -1);
 #endif
 }
 
@@ -122,7 +132,7 @@ static vsf_evt_t __vsf_thread_wait(vsf_thread_cb_t *pthis)
     curevt = setjmp(*(pthis->pos));
 
     if (!curevt) {
-        longjmp(*(pthis->ret), 0);
+        longjmp(*(pthis->ret), -1);
     }
     pthis->pos = NULL;
 #   endif
@@ -154,7 +164,7 @@ vsf_evt_t vsf_thread_wait(void)
     thread_obj->pos = &pos;
     curevt = setjmp(*thread_obj->pos);
     if (!curevt) {
-        longjmp(*(thread_obj->ret), 0);
+        longjmp(*(thread_obj->ret), -1);
     }
     thread_obj->pos = NULL;
 #    endif
@@ -225,7 +235,7 @@ static void __vsf_thread_entry(void)
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
     __vsf_arch_irq_request_send(pthis->rep);
 #else
-    longjmp(*(pthis->ret), 0);
+    longjmp(*(pthis->ret), -1);
 #endif
 }
 
@@ -524,7 +534,7 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
         //  current frame to eda context instead of thread context
 //        vsf_thread_stack_check();
 #endif
-        longjmp(*(cb_obj->ret), 0);
+        longjmp(*(cb_obj->ret), -1);
     }
     cb_obj->pos = NULL;
 

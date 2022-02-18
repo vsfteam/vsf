@@ -130,8 +130,8 @@ vsf_class(vsf_arch_irq_thread_with_stack_t) {
     private_member(
         implement(vsf_arch_irq_thread_t)
 
-#ifdef VSF_ARCH_CFG_STACK_ALIGN_BIT
-        VSF_ARCH_RTOS_STACK_T       stack[VSF_ARCH_RTOS_CFG_STACK_DEPTH] ALIGN(1 << VSF_ARCH_CFG_STACK_ALIGN_BIT);
+#ifdef VSF_ARCH_STACK_ALIGN_BIT
+        VSF_ARCH_RTOS_STACK_T       stack[VSF_ARCH_RTOS_CFG_STACK_DEPTH] ALIGN(1 << VSF_ARCH_STACK_ALIGN_BIT);
 #else
         VSF_ARCH_RTOS_STACK_T       stack[VSF_ARCH_RTOS_CFG_STACK_DEPTH];
 #endif

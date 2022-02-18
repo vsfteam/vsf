@@ -63,10 +63,10 @@ extern "C" {
 
 #if     defined(__CPU_X86__)
 // x86 stack alignment is 8bytes
-#define VSF_ARCH_CFG_STACK_ALIGN_BIT    3
+#   define VSF_ARCH_STACK_ALIGN_BIT     3
 #elif   defined(__CPU_X64__)
 // x64 stack alignment is 16bytes
-#define VSF_ARCH_CFG_STACK_ALIGN_BIT    4
+#   define VSF_ARCH_STACK_ALIGN_BIT     4
 #endif
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
