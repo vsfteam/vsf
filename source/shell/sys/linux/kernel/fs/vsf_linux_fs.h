@@ -42,6 +42,7 @@ extern "C" {
 
 vsf_dcl_class(vsf_linux_fd_t)
 vsf_dcl_class(vsf_linux_trigger_t)
+vsf_dcl_class(vsf_linux_process_t)
 
 typedef struct vsf_linux_fd_op_t {
     int priv_size;
@@ -54,6 +55,7 @@ typedef struct vsf_linux_fd_op_t {
 
 vsf_class(vsf_linux_fd_priv_t) {
     protected_member(
+        void *target;
         vsf_linux_trigger_t *trigger;
         short events_pending;
         short events_triggered;
@@ -84,7 +86,8 @@ vsf_class(vsf_linux_fd_t) {
 };
 
 #if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
-typedef void (*vsf_linux_stream_on_evt_t)(vsf_linux_fd_t *sfd, vsf_protect_t orig, bool is_ready);
+vsf_dcl_class(vsf_linux_stream_priv_t)
+typedef void (*vsf_linux_stream_on_evt_t)(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready);
 
 vsf_class(vsf_linux_stream_priv_t) {
     public_member(
@@ -100,7 +103,6 @@ vsf_class(vsf_linux_stream_priv_t) {
 vsf_class(vsf_linux_pipe_rx_priv_t) {
     protected_member(
         implement(vsf_linux_stream_priv_t)
-        void *target;
         bool is_to_free_stream;
     )
 };
@@ -108,7 +110,6 @@ vsf_class(vsf_linux_pipe_rx_priv_t) {
 vsf_class(vsf_linux_pipe_tx_priv_t) {
     protected_member(
         implement(vsf_linux_stream_priv_t)
-        void *target;
     )
 };
 
@@ -161,11 +162,11 @@ extern int vsf_linux_fd_add_feature(int fd, uint_fast32_t feature);
 extern int vsf_linux_fd_set_size(int fd, uint64_t size);
 
 // vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
-extern short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_linux_trigger_t *trig, vsf_protect_t orig);
-extern void vsf_linux_fd_set_events(vsf_linux_fd_t *sfd, short events, vsf_protect_t orig);
-extern void vsf_linux_fd_set_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig);
-extern void vsf_linux_fd_clear_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig);
-extern short vsf_linux_fd_get_status(vsf_linux_fd_t *sfd, short status);
+extern short vsf_linux_fd_pend_events(vsf_linux_fd_priv_t *priv, short events, vsf_linux_trigger_t *trig, vsf_protect_t orig);
+extern void vsf_linux_fd_set_events(vsf_linux_fd_priv_t *priv, short events, vsf_protect_t orig);
+extern void vsf_linux_fd_set_status(vsf_linux_fd_priv_t *priv, short status, vsf_protect_t orig);
+extern void vsf_linux_fd_clear_status(vsf_linux_fd_priv_t *priv, short status, vsf_protect_t orig);
+extern short vsf_linux_fd_get_status(vsf_linux_fd_priv_t *priv, short status);
 
 // stream
 // IMPORTANT: priority of stream MUST be within scheduler priorities

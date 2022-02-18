@@ -187,6 +187,13 @@ typedef struct vsf_linux_stdio_stream_t {
     vsf_stream_t *err;
 } vsf_linux_stdio_stream_t;
 
+typedef struct vsf_linux_stdio_t {
+    // actually pointer to vsf_linux_stream_priv_t
+    void *in;
+    void *out;
+    void *err;
+} vsf_linux_stdio_t;
+
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 typedef struct vsf_linux_timer_t {
     struct itimerval value;
@@ -256,7 +263,7 @@ vsf_class(vsf_linux_process_t) {
     )
 
     private_member(
-        vsf_linux_stdio_stream_t stdio_stream;
+        vsf_linux_stdio_t stdio_stream;
         char *working_dir;
 
         vsf_dlist_node_t process_node;
@@ -351,7 +358,7 @@ extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
-extern vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_stream_t *stdio_stream, char *working_dir);
+extern vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_t *stdio_stream, char *working_dir);
 extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
 // delete unstarted/existed process
 void vsf_linux_delete_process(vsf_linux_process_t *process);

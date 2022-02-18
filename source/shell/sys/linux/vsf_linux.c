@@ -42,6 +42,7 @@
 #   include "./include/sys/utsname.h"
 #   include "./include/spawn.h"
 #   include "./include/langinfo.h"
+#   include "./include/poll.h"
 #else
 #   include <unistd.h>
 #   include <sched.h>
@@ -57,6 +58,7 @@
 #   include <sys/utsname.h>
 #   include <spawn.h>
 #   include <langinfo.h>
+#   include <poll.h>
 #endif
 #include <stdarg.h>
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
@@ -121,7 +123,7 @@ typedef struct vsf_linux_t {
     vsf_linux_process_t process_for_resources;
     vsf_linux_process_t *kernel_process;
 
-    vsf_linux_stdio_stream_t stdio_stream;
+    vsf_linux_stdio_t stdio_stream;
 
 #if VSF_LINUX_CFG_SHM_NUM > 0
     struct {
@@ -171,6 +173,19 @@ extern int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd,
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
 static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb);
 #endif
+
+// private APIs in other files
+extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
+            const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv);
+extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
+extern void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd);
+extern int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd);
+extern vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd);
+
+extern void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream);
+extern void __vsf_linux_tx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream);
+extern void __vsf_linux_stream_evt(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready);
+extern const vsf_linux_fd_op_t __vsf_linux_stream_fdop;
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -572,11 +587,27 @@ vsf_linux_process_t * vsf_linux_resources_process(void)
     return &__vsf_linux.process_for_resources;
 }
 
+static void __vsf_linux_stderr_on_evt(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready)
+{
+    if (is_ready) {
+        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, event, orig);
+    } else {
+        vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, event, orig);
+    }
+    if (event & POLLIN) {
+        VSF_LINUX_ASSERT(priv->target != NULL);
+        vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex((vsf_linux_process_t *)priv->target, STDIN_FILENO);
+        if (    (sfd->op == &__vsf_linux_stream_fdop)
+            &&  (((vsf_linux_stream_priv_t *)sfd->priv)->stream_rx == priv->stream_rx)) {
+            __vsf_linux_stream_evt((vsf_linux_stream_priv_t *)sfd->priv, vsf_protect_sched(), event, is_ready);
+        }
+    }
+}
+
 vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 {
     VSF_LINUX_ASSERT(stdio_stream != NULL);
     memset(&__vsf_linux, 0, sizeof(__vsf_linux));
-    __vsf_linux.stdio_stream = *stdio_stream;
     vk_fs_init();
 
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
@@ -584,6 +615,40 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 #endif
 
     sethostname(VSF_LINUX_CFG_HOSTNAME, strlen(VSF_LINUX_CFG_HOSTNAME));
+
+    // setup stdio
+    vsf_linux_fd_t *sfd;
+    vsf_linux_stream_priv_t *priv;
+    int ret;
+
+    ret = __vsf_linux_fd_create_ex(vsf_linux_resources_process(), &sfd,
+        &__vsf_linux_stream_fdop, STDIN_FILENO, NULL);
+    VSF_LINUX_ASSERT(ret == STDIN_FILENO);
+    priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    priv->stream_rx = stdio_stream->in;
+    __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
+    __vsf_linux.stdio_stream.in = sfd->priv;
+
+    ret = __vsf_linux_fd_create_ex(vsf_linux_resources_process(), &sfd,
+        &__vsf_linux_stream_fdop, STDOUT_FILENO, NULL);
+    VSF_LINUX_ASSERT(ret == STDOUT_FILENO);
+    priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    priv->stream_tx = stdio_stream->out;
+    __vsf_linux_tx_stream_init(sfd, priv->stream_tx);
+    __vsf_linux.stdio_stream.out = sfd->priv;
+
+    ret = __vsf_linux_fd_create_ex(vsf_linux_resources_process(), &sfd,
+        &__vsf_linux_stream_fdop, STDERR_FILENO, NULL);
+    VSF_LINUX_ASSERT(ret == STDERR_FILENO);
+    priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    // stderr is initialized after stdin, so stdin events will be bound to stderr
+    //  inplement a evthandler to redirect to stdin if stdin stream_rx is same as stderr
+    priv->on_evt = __vsf_linux_stderr_on_evt;
+    priv->stream_rx = stdio_stream->in;
+    priv->stream_tx = stdio_stream->err;
+    __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
+    __vsf_linux_tx_stream_init(sfd, priv->stream_tx);
+    __vsf_linux.stdio_stream.err = sfd->priv;
 
     // create kernel process(pid0)
     if (NULL != __vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, VSF_LINUX_CFG_PRIO_LOWEST)) {
@@ -597,14 +662,10 @@ int isatty(int fd)
     // terminal is __vsf_linux.stdio_stream
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     VSF_LINUX_ASSERT(sfd != NULL);
-    vsf_stream_t *stream_rx = vsf_linux_get_rx_stream(sfd);
-    vsf_stream_t *stream_tx = vsf_linux_get_tx_stream(sfd);
-    return  (stream_rx == __vsf_linux.stdio_stream.in)
-        ||  (stream_rx == __vsf_linux.stdio_stream.out)
-        ||  (stream_rx == __vsf_linux.stdio_stream.err)
-        ||  (stream_tx == __vsf_linux.stdio_stream.in)
-        ||  (stream_tx == __vsf_linux.stdio_stream.out)
-        ||  (stream_tx == __vsf_linux.stdio_stream.err);
+    vsf_linux_fd_priv_t* priv = sfd->priv;
+    return  (priv == __vsf_linux.stdio_stream.in)
+        ||  (priv == __vsf_linux.stdio_stream.out)
+        ||  (priv == __vsf_linux.stdio_stream.err);
 }
 
 vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op,
@@ -717,7 +778,7 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
     return process;
 }
 
-vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_stream_t *stdio_stream, char *working_dir)
+vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_t *stdio_stream, char *working_dir)
 {
     VSF_LINUX_ASSERT(stdio_stream != NULL);
     VSF_LINUX_ASSERT(working_dir != NULL);
@@ -1056,22 +1117,27 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     vsf_linux_process_t *process = thread->process;
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_fd_t *sfd;
+    int ret;
 
     sfd = vsf_linux_fd_get(0);
     if (NULL == sfd) {
-        sfd = vsf_linux_rx_stream(thread->process->stdio_stream.in);
+        ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDIN_FILENO, process->stdio_stream.in);
+        VSF_LINUX_ASSERT(ret == STDIN_FILENO);
         sfd->status_flags = O_RDONLY;
     }
 
     sfd = vsf_linux_fd_get(1);
     if (NULL == sfd) {
-        sfd = vsf_linux_tx_stream(thread->process->stdio_stream.out);
+        ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDOUT_FILENO, process->stdio_stream.out);
+        VSF_LINUX_ASSERT(ret == STDOUT_FILENO);
         sfd->status_flags = O_WRONLY;
     }
 
     sfd = vsf_linux_fd_get(2);
     if (NULL == sfd) {
-        sfd = vsf_linux_stream(thread->process->stdio_stream.in, thread->process->stdio_stream.err);
+        ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDERR_FILENO, process->stdio_stream.err);
+        VSF_LINUX_ASSERT(ret == STDERR_FILENO);
+        sfd->priv->target = process;
         sfd->status_flags = 0;
     }
 
@@ -1798,13 +1864,6 @@ int posix_spawnp(pid_t *pid, const char *file,
                 const posix_spawnattr_t *attr,
                 char * const argv[], char * const env[])
 {
-    extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
-                const vsf_linux_fd_op_t *op, int fd_desired, bool allocate_priv);
-    extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
-    extern void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd);
-    extern int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd);
-    extern vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd);
-
     vsf_linux_main_entry_t entry;
     int exefd = vsf_linux_fs_get_executable(file, &entry);
     if (exefd < 0) {
@@ -1830,17 +1889,7 @@ int posix_spawnp(pid_t *pid, const char *file,
     vsf_protect_t orig;
     __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
         if (!(_->fd_flags & FD_CLOEXEC)) {
-            if (__vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, false) == _->fd) {
-                sfd->priv = _->priv;
-
-                orig = vsf_protect_sched();
-                    sfd->priv->ref++;
-#if VSF_LINUX_CFG_FD_TRACE == ENABLED
-                    vsf_trace_debug("%s dup fds: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
-                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
-#endif
-                vsf_unprotect_sched(orig);
-            } else {
+            if (__vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, _->priv) != _->fd) {
                 vsf_trace_error("spawn: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
                 goto delete_process_and_fail;
             }
@@ -1888,20 +1937,10 @@ int posix_spawnp(pid_t *pid, const char *file,
                     goto delete_process_and_fail;
                 }
 
-                int ret = __vsf_linux_fd_create_ex(process, &sfd_new, sfd->op, a->action.dup2_action.newfd, false);
+                int ret = __vsf_linux_fd_create_ex(process, &sfd_new, sfd->op, a->action.dup2_action.newfd, sfd->priv);
                 if (ret < 0) {
                     goto action_fail_dup;
                 }
-
-                vsf_linux_fd_priv_t *priv = sfd->priv;
-                orig = vsf_protect_sched();
-                    priv->ref++;
-#if VSF_LINUX_CFG_FD_TRACE == ENABLED
-                    vsf_trace_debug("%s action dup2: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
-                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
-#endif
-                vsf_unprotect_sched(orig);
-                sfd_new->priv = priv;
                 break;
             case spawn_do_open:
                 VSF_LINUX_ASSERT(false);

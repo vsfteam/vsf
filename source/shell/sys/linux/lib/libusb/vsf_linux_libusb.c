@@ -223,7 +223,7 @@ static void __vsf_linux_libusb_fd_trigger(void)
 {
     for (int i = 0; i < dimof(__vsf_libusb.pollfd); i++) {
         if (__vsf_libusb.pollfd[i].fd >= 0) {
-            vsf_linux_fd_set_events(__vsf_libusb.pollfd[i].sfd, POLLIN, vsf_protect_sched());
+            vsf_linux_fd_set_events(__vsf_libusb.pollfd[i].sfd->priv, POLLIN, vsf_protect_sched());
         }
     }
 }

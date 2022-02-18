@@ -107,7 +107,7 @@ const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-static const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
+const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
     .priv_size          = sizeof(vsf_linux_stream_priv_t),
     .fn_fcntl           = __vsf_linux_stream_fcntl,
     .fn_read            = __vsf_linux_stream_read,
@@ -320,7 +320,7 @@ static int __vsf_linux_fd_add_ex(vsf_linux_process_t *process, vsf_linux_fd_t *s
 }
 
 int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
-        const vsf_linux_fd_op_t *op, int fd_desired, bool allocate_priv)
+        const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv)
 {
     int priv_size = (op != NULL) ? op->priv_size : sizeof(vsf_linux_fd_priv_t);
     int ret;
@@ -332,14 +332,23 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
         return -1;
     }
     new_sfd->op = op;
-    if (allocate_priv) {
+    if (NULL == priv) {
         // priv of fd does not belong to the process
         new_sfd->priv = __calloc_ex(vsf_linux_resources_process(), 1, priv_size);
         if (!new_sfd->priv) {
             ret = -1;
             goto free_sfd_and_exit;
         }
-        ((vsf_linux_fd_priv_t *)new_sfd->priv)->ref = 1;
+        new_sfd->priv->ref = 1;
+    } else {
+        vsf_protect_t orig = vsf_protect_sched();
+            priv->ref++;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+            vsf_trace_debug("%s: priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+                __FUNCTION__, priv, priv->ref);
+#endif
+        vsf_unprotect_sched(orig);
+        new_sfd->priv = priv;
     }
 
     if (sfd != NULL) {
@@ -361,7 +370,7 @@ free_sfd_and_exit:
 
 int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
 {
-    return __vsf_linux_fd_create_ex(NULL, sfd, op, -1, true);
+    return __vsf_linux_fd_create_ex(NULL, sfd, op, -1, NULL);
 }
 
 void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd)
@@ -403,9 +412,8 @@ bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
 }
 
 // vsf_linux_fd_[pend/set/clear]_[status/events] MUST be called scheduler protected
-short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_linux_trigger_t *trig, vsf_protect_t orig)
+short vsf_linux_fd_pend_events(vsf_linux_fd_priv_t *priv, short events, vsf_linux_trigger_t *trig, vsf_protect_t orig)
 {
-    vsf_linux_fd_priv_t *priv = sfd->priv;
     uint16_t events_triggered = priv->events & events;
     if (events_triggered) {
         priv->events &= ~events_triggered;
@@ -428,9 +436,8 @@ short vsf_linux_fd_pend_events(vsf_linux_fd_t *sfd, short events, vsf_linux_trig
     return events_triggered;
 }
 
-void vsf_linux_fd_set_events(vsf_linux_fd_t *sfd, short events, vsf_protect_t orig)
+void vsf_linux_fd_set_events(vsf_linux_fd_priv_t *priv, short events, vsf_protect_t orig)
 {
-    vsf_linux_fd_priv_t *priv = sfd->priv;
     vsf_linux_trigger_t *trig = priv->trigger;
     priv->events |= events;
     if (trig != NULL) {
@@ -447,21 +454,19 @@ void vsf_linux_fd_set_events(vsf_linux_fd_t *sfd, short events, vsf_protect_t or
     vsf_unprotect_sched(orig);
 }
 
-void vsf_linux_fd_set_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig)
+void vsf_linux_fd_set_status(vsf_linux_fd_priv_t *priv, short status, vsf_protect_t orig)
 {
-    vsf_linux_fd_priv_t *priv = sfd->priv;
     short events_triggered = (priv->status & status) ^ status;
     priv->status |= status;
     if (events_triggered) {
-        vsf_linux_fd_set_events(sfd, events_triggered, orig);
+        vsf_linux_fd_set_events(priv, events_triggered, orig);
     } else {
         vsf_unprotect_sched(orig);
     }
 }
 
-void vsf_linux_fd_clear_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t orig)
+void vsf_linux_fd_clear_status(vsf_linux_fd_priv_t *priv, short status, vsf_protect_t orig)
 {
-    vsf_linux_fd_priv_t *priv = sfd->priv;
     if ((priv->trigger != NULL) && (priv->events_pending & status)) {
         VSF_LINUX_ASSERT(false);
     } else {
@@ -472,9 +477,9 @@ void vsf_linux_fd_clear_status(vsf_linux_fd_t *sfd, short status, vsf_protect_t 
     vsf_unprotect_sched(orig);
 }
 
-short vsf_linux_fd_get_status(vsf_linux_fd_t *sfd, short status)
+short vsf_linux_fd_get_status(vsf_linux_fd_priv_t *priv, short status)
 {
-    return sfd->priv->status & status;
+    return priv->status & status;
 }
 
 int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t timeout)
@@ -1018,25 +1023,8 @@ int fcntl(int fd, int cmd, ...)
 
     // process generic commands
     switch (cmd) {
-    case F_DUPFD: {
-            vsf_linux_fd_t *sfd_new;
-            int ret = __vsf_linux_fd_create_ex(NULL, &sfd_new, sfd->op, arg, false);
-            if (ret < 0) {
-                return ret;
-            }
-
-            vsf_linux_fd_priv_t *priv = sfd->priv;
-            vsf_protect_t orig = vsf_protect_sched();
-                priv->ref++;
-#if VSF_LINUX_CFG_FD_TRACE == ENABLED
-                vsf_trace_debug("%s: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
-                    __FUNCTION__, vsf_linux_get_cur_process(), sfd_new->fd, priv, priv->ref);
-#endif
-            vsf_unprotect_sched(orig);
-            sfd_new->priv = priv;
-            return ret;
-        }
-        break;
+    case F_DUPFD:
+        return __vsf_linux_fd_create_ex(NULL, NULL, sfd->op, arg, sfd->priv);
     case F_GETFD:
         return sfd->fd_flags;
         break;
@@ -1518,23 +1506,20 @@ static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
     return 0;
 }
 
-static void __vsf_linux_stream_evt(vsf_linux_fd_t *sfd, vsf_protect_t orig, short event, bool is_ready)
+void __vsf_linux_stream_evt(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready)
 {
-    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
-        if (priv->on_evt != NULL) {
-            priv->on_evt(sfd, orig, is_ready);
-        } else if (is_ready) {
-            vsf_linux_fd_set_status(sfd, event, orig);
-        } else {
-            vsf_linux_fd_clear_status(sfd, event, orig);
-        }
-    vsf_unprotect_sched(orig);
+    if (priv->on_evt != NULL) {
+        priv->on_evt(priv, orig, event, is_ready);
+    } else if (is_ready) {
+        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, event, orig);
+    } else {
+        vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, event, orig);
+    }
 }
 
 static void __vsf_linux_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
-    vsf_linux_fd_t *sfd = param;
-    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    vsf_linux_stream_priv_t *priv = param;
 
     switch (evt) {
     case VSF_STREAM_ON_DISCONNECT:
@@ -1547,15 +1532,11 @@ static void __vsf_linux_stream_evthandler(vsf_stream_t *stream, void *param, vsf
         }
     case VSF_STREAM_ON_RX:
     on_stream_rx:
-        stream->rx.param = NULL;
-        stream->rx.evthandler = NULL;
-        __vsf_linux_stream_evt(sfd, vsf_protect_sched(), POLLIN, true);
+        __vsf_linux_stream_evt(priv, vsf_protect_sched(), POLLIN, true);
         break;
     case VSF_STREAM_ON_TX:
     on_stream_tx:
-        stream->tx.param = NULL;
-        stream->tx.evthandler = NULL;
-        __vsf_linux_stream_evt(sfd, vsf_protect_sched(), POLLOUT, true);
+        __vsf_linux_stream_evt(priv, vsf_protect_sched(), POLLOUT, true);
         break;
     }
 }
@@ -1570,15 +1551,12 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 
     while (size > 0) {
         orig = vsf_protect_sched();
-        if (!vsf_linux_fd_get_status(sfd, POLLIN) && (0 == vsf_stream_get_rbuf(stream, NULL))) {
+        if (!vsf_linux_fd_get_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN) && (0 == vsf_stream_get_rbuf(stream, NULL))) {
             if (vsf_linux_fd_is_block(sfd) && vsf_stream_is_tx_connected(stream)) {
                 vsf_linux_trigger_t trig;
                 vsf_linux_trigger_init(&trig);
-                VSF_LINUX_ASSERT((NULL == stream->rx.param) && (NULL == stream->rx.evthandler));
-                stream->rx.param = sfd;
-                stream->rx.evthandler = __vsf_linux_stream_evthandler;
 
-                if (!vsf_linux_fd_pend_events(sfd, POLLIN, &trig, orig)) {
+                if (!vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, &trig, orig)) {
                     // triggered by signal
                     return -1;
                 }
@@ -1652,9 +1630,9 @@ do_return:
     orig = vsf_protect_sched();
     VSF_LINUX_ASSERT((NULL == sfd->priv->trigger) || !(sfd->priv->events_pending & POLLIN));
     if (!vsf_stream_get_data_size(stream)) {
-        __vsf_linux_stream_evt(sfd, orig, POLLIN, false);
+        __vsf_linux_stream_evt(priv, orig, POLLIN, false);
     } else {
-        vsf_linux_fd_set_events(sfd, POLLIN, orig);
+        vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
     }
     return count - size;
 }
@@ -1669,14 +1647,11 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
 
     while (size > 0) {
         orig = vsf_protect_sched();
-        if (!vsf_linux_fd_get_status(sfd, POLLOUT)) {
+        if (!vsf_linux_fd_get_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT)) {
             vsf_linux_trigger_t trig;
             vsf_linux_trigger_init(&trig);
-            VSF_LINUX_ASSERT((NULL == stream->tx.param) || (NULL == stream->tx.evthandler));
-            stream->tx.param = sfd;
-            stream->tx.evthandler = __vsf_linux_stream_evthandler;
 
-            if (!vsf_linux_fd_pend_events(sfd, POLLOUT, &trig, orig)) {
+            if (!vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, &trig, orig)) {
                 // triggered by signal
                 return -1;
             }
@@ -1692,9 +1667,9 @@ static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
     orig = vsf_protect_sched();
     VSF_LINUX_ASSERT((NULL == sfd->priv->trigger) || !(sfd->priv->events_pending & POLLOUT));
     if (!vsf_stream_get_free_size(stream)) {
-        __vsf_linux_stream_evt(sfd, orig, POLLOUT, false);
+        __vsf_linux_stream_evt(priv, orig, POLLOUT, false);
     } else {
-        vsf_linux_fd_set_events(sfd, POLLOUT, orig);
+        vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, orig);
     }
     return count;
 }
@@ -1738,29 +1713,29 @@ static vsf_linux_fd_t * __vsf_linux_stream(vsf_stream_t *stream_rx, vsf_stream_t
     return sfd;
 }
 
-static void __vsf_linux_tx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream)
+void __vsf_linux_tx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream)
 {
-    stream->tx.evthandler = NULL;
-    stream->tx.param = NULL;
+    stream->tx.evthandler = __vsf_linux_stream_evthandler;
+    stream->tx.param = sfd->priv;
     vsf_stream_connect_tx(stream);
 
     vsf_protect_t orig = vsf_protect_sched();
     if (vsf_stream_get_free_size(stream)) {
-        vsf_linux_fd_set_status(sfd, POLLOUT, orig);
+        vsf_linux_fd_set_status(sfd->priv, POLLOUT, orig);
     } else {
         vsf_unprotect_sched(orig);
     }
 }
 
-static void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream)
+void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream)
 {
-    stream->rx.evthandler = NULL;
-    stream->rx.param = NULL;
+    stream->rx.evthandler = __vsf_linux_stream_evthandler;
+    stream->rx.param = sfd->priv;
     vsf_stream_connect_rx(stream);
 
     vsf_protect_t orig = vsf_protect_sched();
     if (vsf_stream_get_data_size(stream)) {
-        vsf_linux_fd_set_status(sfd, POLLOUT, orig);
+        vsf_linux_fd_set_status(sfd->priv, POLLOUT, orig);
     } else {
         vsf_unprotect_sched(orig);
     }
