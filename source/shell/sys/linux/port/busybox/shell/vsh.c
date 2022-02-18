@@ -9,13 +9,11 @@
 #   include "../../../include/errno.h"
 #   include "../../../include/sys/wait.h"
 #   include "../../../include/dirent.h"
-#   include "../../../include/fcntl.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
 #   include <sys/wait.h>
 #   include <dirent.h>
-#   include <fcntl.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_CTYPE == ENABLED
 #   include "../../../include/simple_libc/ctype.h"
@@ -131,6 +129,9 @@ static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx)
     case 'O':
         is_end = esclen == 2;
         break;
+    default:
+        ctx->cmd[ctx->pos++] = type;
+        goto return_to_normal;
     }
     if (!is_end) {
         return SHELL_STATE_ESC;
@@ -149,7 +150,7 @@ static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx)
         }
         break;
     }
-
+return_to_normal:
     ctx->cmd[ctx->pos] = '\0';
     return SHELL_STATE_NORMAL;
 }
@@ -484,16 +485,9 @@ int vsh_main(int argc, char *argv[])
                 }
             }
             switch (ch) {
-            case '\033':        // ESC
-                fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK | fcntl(STDIN_FILENO, F_GETFL, 0));
-                ssize_t ret = read(STDIN_FILENO, &ch, 1);
-                fcntl(STDIN_FILENO, F_SETFL, ~O_NONBLOCK & fcntl(STDIN_FILENO, F_GETFL, 0));
-
-                if (1 == ret) {
-                    state = SHELL_STATE_ESC;
-                    ctx.escpos = 0;
-                    goto input_char;
-                }
+            case '\033':
+                state = SHELL_STATE_ESC;
+                ctx.escpos = 0;
                 continue;
             default:
             input_char:
