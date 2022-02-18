@@ -1159,8 +1159,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_read, vk_file_read)
     case VSF_EVT_INIT:
         if (file->f.callback.fn_read != NULL) {
             vsf_err_t err;
-            __vsf_component_call_peda_ifs(vk_vfs_callback_read, err, file->f.callback.fn_read, 0, file,
-                .offset     = file->pos,
+            __vsf_component_call_peda_ifs(vk_file_read, err, file->f.callback.fn_read, 0, file,
                 .size       = vsf_local.size,
                 .buff       = vsf_local.buff,
             );
@@ -1199,8 +1198,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_write, vk_file_write)
     case VSF_EVT_INIT:
         if (file->f.callback.fn_write != NULL) {
             vsf_err_t err;
-            __vsf_component_call_peda_ifs(vk_vfs_callback_write, err, file->f.callback.fn_write, 0, file,
-                .offset     = file->pos,
+            __vsf_component_call_peda_ifs(vk_file_write, err, file->f.callback.fn_write, 0, file,
                 .size       = vsf_local.size,
                 .buff       = vsf_local.buff,
             );

@@ -180,17 +180,6 @@ typedef enum vk_vfs_file_attr_t {
     VSF_VFS_FILE_ATTR_MOUNTED   = VSF_FILE_ATTR_EXT,
 } vk_vfs_file_attr_t;
 
-__vsf_component_peda_ifs(vk_vfs_callback_read,
-    uint64_t        offset;
-    uint32_t        size;
-    uint8_t         *buff;
-)
-__vsf_component_peda_ifs(vk_vfs_callback_write,
-    uint64_t        offset;
-    uint32_t        size;
-    uint8_t         *buff;
-)
-
 vsf_class(vk_vfs_file_t) {
     implement(vk_file_t)
     implement(vsf_dlist_node_t)
