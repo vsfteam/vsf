@@ -129,3 +129,4 @@ To use applications from other system, shell can be used.
 | awtk              |                                                               | LGPL 2.1   | https://www.zlg.cn/index/pub/awtk.html         |
 | littlefs          | source/component/3rd-party/littlefs/raw                       | BSD        | https://github.com/littlefs-project/littlefs   |
 | getopt_long       | source/shell/sys/linux/lib/glibc/3rd-party                    | OpenBSD    | https://github.com/openbsd/src                 |
+| setjmp            | source/hal/arch/x86/win                                       | BSD        |                                                |
