@@ -595,11 +595,9 @@ static void __vsf_linux_stderr_on_evt(vsf_linux_stream_priv_t *priv, vsf_protect
         vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, event, orig);
     }
     if (event & POLLIN) {
-        VSF_LINUX_ASSERT(priv->target != NULL);
-        vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex((vsf_linux_process_t *)priv->target, STDIN_FILENO);
-        if (    (sfd->op == &__vsf_linux_stream_fdop)
-            &&  (((vsf_linux_stream_priv_t *)sfd->priv)->stream_rx == priv->stream_rx)) {
-            __vsf_linux_stream_evt((vsf_linux_stream_priv_t *)sfd->priv, vsf_protect_sched(), event, is_ready);
+        vsf_linux_fd_priv_t *stdin_priv = priv->target;
+        if (stdin_priv != NULL) {
+            __vsf_linux_stream_evt(stdin_priv, vsf_protect_sched(), event, is_ready);
         }
     }
 }
@@ -1116,6 +1114,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_process_t *process = thread->process;
     vsf_linux_process_ctx_t *ctx = &process->ctx;
+    vsf_linux_fd_priv_t *stdin_priv = NULL;
     vsf_linux_fd_t *sfd;
     int ret;
 
@@ -1124,6 +1123,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
         ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDIN_FILENO, process->stdio_stream.in);
         VSF_LINUX_ASSERT(ret == STDIN_FILENO);
         sfd->status_flags = O_RDONLY;
+        stdin_priv = sfd->priv;
     }
 
     sfd = vsf_linux_fd_get(1);
@@ -1137,7 +1137,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     if (NULL == sfd) {
         ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDERR_FILENO, process->stdio_stream.err);
         VSF_LINUX_ASSERT(ret == STDERR_FILENO);
-        sfd->priv->target = process;
+        sfd->priv->target = stdin_priv;
         sfd->status_flags = 0;
     }
 
