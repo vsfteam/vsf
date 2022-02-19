@@ -37,9 +37,9 @@
 typedef struct vsf_disp_wingdi_t {
     vsf_arch_irq_thread_t thread;
     bool is_inited;
-    bool is_first_paint;
     vk_disp_wingdi_t *disp;
 
+    BITMAPINFO bmi;
     HWND hWnd;
     HDC hFrameDC;
     HBITMAP hFrameBitmap;
@@ -48,9 +48,7 @@ typedef struct vsf_disp_wingdi_t {
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static vsf_disp_wingdi_t __vk_disp_wingdi = {
-    .is_first_paint = true,
-};
+static vsf_disp_wingdi_t __vk_disp_wingdi;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -86,18 +84,17 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
                 __vk_disp_wingdi.hFrameDC, ps.rcPaint.left, ps.rcPaint.top,
                 SRCCOPY);
             EndPaint(hWnd, &ps);
-
-            if (__vk_disp_wingdi.is_first_paint) {
-                __vk_disp_wingdi.is_first_paint = false;
-
-                vk_disp_wingdi_t *disp_wingdi = __vk_disp_wingdi.disp;
-                vsf_arch_irq_thread_t *irq_thread = &__vk_disp_wingdi.thread;
-
-                __vsf_arch_irq_start(irq_thread);
-                    vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
-                __vsf_arch_irq_end(irq_thread, false);
-            }
         }
+        break;
+    case WM_SIZE:
+        __vk_disp_wingdi.bmi.bmiHeader.biWidth  = LOWORD(lParam);
+        __vk_disp_wingdi.bmi.bmiHeader.biHeight = HIWORD(lParam);
+
+        if (__vk_disp_wingdi.hFrameBitmap) {
+            DeleteObject(__vk_disp_wingdi.hFrameBitmap);
+        }
+        __vk_disp_wingdi.hFrameBitmap = CreateDIBSection(NULL, &__vk_disp_wingdi.bmi, DIB_RGB_COLORS, &__vk_disp_wingdi.pixels, 0, 0);
+        SelectObject(__vk_disp_wingdi.hFrameDC, __vk_disp_wingdi.hFrameBitmap);
         break;
     case WM_CLOSE:
         DestroyWindow(hWnd);
@@ -117,72 +114,62 @@ static void __vk_disp_wingdi_thread(void *arg)
     vk_disp_wingdi_t *disp_wingdi = __vk_disp_wingdi.disp;
 
     static const wchar_t __ClassName[] = L"vsf_display";
-    WNDCLASSEX wc = {
-        .cbSize         = sizeof(WNDCLASSEX),
-        .style          = 0,
-        .lpfnWndProc    = __WindowProc,
-        .cbClsExtra     = 0,
-        .cbWndExtra     = 0,
-        .lpszClassName  = __ClassName,
-    };
+    HINSTANCE hInstance = GetModuleHandle(NULL);
 
     __vsf_arch_irq_set_background(irq_thread);
 
     // step 1: Register Windows Class
-    wc.hInstance = GetModuleHandle(NULL);
-    wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-    if (!RegisterClassEx(&wc)) {
+    WNDCLASS wc = {
+        .lpfnWndProc    = __WindowProc,
+        .lpszClassName  = __ClassName,
+        .hInstance      = hInstance,
+    };
+    if (!RegisterClass(&wc)) {
         VSF_UI_ASSERT(false);
         return;
     }
 
-    // step 2: Create Window
-    __vk_disp_wingdi.hWnd = CreateWindowEx(WS_EX_CLIENTEDGE, __ClassName,
-        TEXT("vsf display wingdi"), WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+    // Step 2: Create FrameDC
+    __vk_disp_wingdi.bmi.bmiHeader.biSize = sizeof(__vk_disp_wingdi.bmi.bmiHeader);
+    __vk_disp_wingdi.bmi.bmiHeader.biPlanes = 1;
+    __vk_disp_wingdi.bmi.bmiHeader.biBitCount = vsf_disp_get_pixel_bitsize(disp_wingdi);
+    __vk_disp_wingdi.bmi.bmiHeader.biCompression = BI_RGB;
+    __vk_disp_wingdi.hFrameDC = CreateCompatibleDC(0);
+    if (NULL == __vk_disp_wingdi.hFrameDC) {
+        VSF_UI_ASSERT(false);
+        return;
+    }
+
+    // step 3: Create Window
+    RECT rect = {
+        .left   = 0,
+        .top    = 0,
+        .right  = disp_wingdi->param.width,
+        .bottom = disp_wingdi->param.height,
+    };
+    AdjustWindowRect(&rect, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE, false);
+    __vk_disp_wingdi.hWnd = CreateWindow(__ClassName,
+        TEXT("vsf display wingdi"),
+        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        disp_wingdi->param.width, disp_wingdi->param.height,
-         NULL, NULL, wc.hInstance, NULL);
+        rect.right - rect.left, rect.bottom - rect.top,
+        NULL, NULL, wc.hInstance, NULL);
     if (NULL == __vk_disp_wingdi.hWnd) {
         VSF_UI_ASSERT(false);
         return;
     }
 
-    ShowWindow(__vk_disp_wingdi.hWnd, SW_NORMAL);
-    InvalidateRect(__vk_disp_wingdi.hWnd, NULL, false);
-
-    __vk_disp_wingdi.hFrameDC = CreateCompatibleDC(NULL);
-    if (NULL == __vk_disp_wingdi.hFrameDC) {
-        VSF_UI_ASSERT(false);
-        return;
-    }
-    BITMAPINFO bmi          = {
-        .bmiHeader          = {
-            .biSize         = sizeof(bmi.bmiHeader),
-            .biPlanes       = 1,
-            .biBitCount     = vsf_disp_get_pixel_bitsize(disp_wingdi),
-            .biCompression  = BI_RGB,
-            .biWidth        = disp_wingdi->param.width,
-            .biHeight       = disp_wingdi->param.height,
-        },
-    };
-    __vk_disp_wingdi.hFrameBitmap = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, &__vk_disp_wingdi.pixels, 0, 0);
-    if (NULL == __vk_disp_wingdi.hFrameBitmap) {
-        VSF_UI_ASSERT(false);
-        return;
-    }
-    HGDIOBJ obj = SelectObject(__vk_disp_wingdi.hFrameDC, __vk_disp_wingdi.hFrameBitmap);
-    if (NULL == obj) {
-        VSF_UI_ASSERT(false);
-        return;
-    }
-    memset(__vk_disp_wingdi.pixels, 0xAA, 512);
-
+    // Step 4: Message Handling
     MSG Msg;
     while (GetMessage(&Msg, NULL, 0, 0) > 0) {
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
+
+        if (WM_PAINT == Msg.message) {
+            __vsf_arch_irq_start(irq_thread);
+                vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
+            __vsf_arch_irq_end(irq_thread, false);
+        }
     }
     __vsf_arch_irq_fini(irq_thread);
 }
@@ -207,14 +194,14 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
     vk_disp_wingdi_t *disp_wingdi = (vk_disp_wingdi_t *)pthis;
     VSF_UI_ASSERT(disp_wingdi != NULL);
     uint8_t bytesize_pixel = vsf_disp_get_pixel_bytesize(disp_wingdi);
-    uint32_t byteoffset = (area->pos.y * disp_wingdi->param.width + area->pos.x) * bytesize_pixel;
+    uint32_t byteoffset = ((disp_wingdi->param.height - 1 - area->pos.y) * disp_wingdi->param.width + area->pos.x) * bytesize_pixel;
     uint32_t bytesize_line = disp_wingdi->param.width * bytesize_pixel;
     uint32_t bytesize_line_area = area->size.x * bytesize_pixel;
     void *ptr = (void *)((uint8_t *)__vk_disp_wingdi.pixels + byteoffset);
 
     for (uint16_t i = 0; i < area->size.y; i++) {
         memcpy(ptr, disp_buff, bytesize_line_area);
-        ptr = (void *)((uint8_t *)ptr + bytesize_line);
+        ptr = (void *)((uint8_t *)ptr - bytesize_line);
         disp_buff = (void *)((uint8_t *)disp_buff + bytesize_line_area);
     }
     RECT rect = {
@@ -222,7 +209,6 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
         .top    = area->pos.y,
         .right  = area->pos.x + area->size.x,
         .bottom = area->pos.y + area->size.y,
-
     };
     InvalidateRect(__vk_disp_wingdi.hWnd, &rect, false);
     return VSF_ERR_NONE;
