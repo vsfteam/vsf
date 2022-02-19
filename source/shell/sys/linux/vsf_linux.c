@@ -595,7 +595,7 @@ static void __vsf_linux_stderr_on_evt(vsf_linux_stream_priv_t *priv, vsf_protect
         vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, event, orig);
     }
     if (event & POLLIN) {
-        vsf_linux_fd_priv_t *stdin_priv = priv->target;
+        vsf_linux_stream_priv_t *stdin_priv = priv->target;
         if (stdin_priv != NULL) {
             __vsf_linux_stream_evt(stdin_priv, vsf_protect_sched(), event, is_ready);
         }
