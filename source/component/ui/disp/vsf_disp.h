@@ -205,6 +205,9 @@ extern void vk_disp_on_ready(vk_disp_t *pthis);
 #include "./driver/vga/m480/vsf_disp_vga_m480.h"
 #include "./driver/fb/vsf_disp_fb.h"
 #include "./driver/mipi_lcd/vsf_disp_mipi_lcd.h"
+#if VSF_DISP_USE_WINGDI == ENABLED && defined(__WIN__)
+#   include "./driver/wingdi/vsf_disp_wingdi.h"
+#endif
 
 #undef __VSF_DISP_CLASS_IMPLEMENT
 #undef __VSF_DISP_CLASS_INHERIT__
