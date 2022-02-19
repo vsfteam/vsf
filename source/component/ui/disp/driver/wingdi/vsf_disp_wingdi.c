@@ -84,6 +84,12 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
                 __vk_disp_wingdi.hFrameDC, ps.rcPaint.left, ps.rcPaint.top,
                 SRCCOPY);
             EndPaint(hWnd, &ps);
+
+            vsf_arch_irq_thread_t *irq_thread = &__vk_disp_wingdi.thread;
+            vk_disp_wingdi_t *disp_wingdi = __vk_disp_wingdi.disp;
+            __vsf_arch_irq_start(irq_thread);
+                vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
+            __vsf_arch_irq_end(irq_thread, false);
         }
         break;
     case WM_SIZE:
@@ -164,12 +170,6 @@ static void __vk_disp_wingdi_thread(void *arg)
     while (GetMessage(&Msg, NULL, 0, 0) > 0) {
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
-
-        if (WM_PAINT == Msg.message) {
-            __vsf_arch_irq_start(irq_thread);
-                vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
-            __vsf_arch_irq_end(irq_thread, false);
-        }
     }
     __vsf_arch_irq_fini(irq_thread);
 }
