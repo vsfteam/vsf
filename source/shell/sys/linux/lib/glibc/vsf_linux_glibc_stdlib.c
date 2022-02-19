@@ -89,9 +89,6 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, 
 #   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
         VSF_LINUX_ASSERT(i < VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
         VSF_LINUX_ASSERT(vsf_bitmap_get(&process->heap_monitor.bitmap, i));
-if (process->heap_monitor.nodes[i].ptr != ptr) {
-    __asm("nop");
-}
         VSF_LINUX_ASSERT(process->heap_monitor.nodes[i].ptr == ptr);
         process->heap_monitor.info.usage -= process->heap_monitor.nodes[i].size;
         vsf_bitmap_clear(&process->heap_monitor.bitmap, i);
