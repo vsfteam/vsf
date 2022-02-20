@@ -154,7 +154,6 @@ static uint_fast16_t __vk_disp_win_keycode_remap(uint8_t keycode)
     case VK_SUBTRACT:           return VSF_KP_MINUS;
     case VK_ADD:                return VSF_KP_PLUS;
 //    case VK_SEPARATOR           return VSF_KP_??;
-//    case SDLK_KP_ENTER:         return VSF_KP_ENTER;
     case VK_DECIMAL:            return VSF_KP_DOT;
     case VK_NUMPAD0:            return VSF_KP_0;
     case VK_NUMPAD1:            return VSF_KP_1;
@@ -221,6 +220,7 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         __vk_disp_wingdi.hFrameBitmap = CreateDIBSection(NULL, &__vk_disp_wingdi.bmi, DIB_RGB_COLORS, &__vk_disp_wingdi.pixels, 0, 0);
         SelectObject(__vk_disp_wingdi.hFrameDC, __vk_disp_wingdi.hFrameBitmap);
         break;
+#if VSF_USE_INPUT == ENABLED
     case WM_KEYDOWN:
         if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, wParam & 0xFF)) {
             break;
@@ -238,6 +238,74 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
                 __vk_disp_win_keymod());
         }
         break;
+#   if VSF_DISP_WINGDI_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
+    case WM_LBUTTONUP:
+        is_down = false;
+        x = LOWORD(lParam);
+        y = HIWORD(lParam);
+        is_event_triggered = true;
+        evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
+        break;
+    case WM_LBUTTONDOWN:
+        is_down = true;
+        x = LOWORD(lParam);
+        y = HIWORD(lParam);
+        is_event_triggered = true;
+        evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
+        break;
+    case WM_MOUSEMOVE:
+        x = LOWORD(lParam);
+        y = HIWORD(lParam);
+        is_event_triggered = is_down;
+        evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
+        break;
+#   else
+    case WM_MBUTTONDOWN:
+        is_down = true;
+        mouse_button = VSF_INPUT_MOUSE_BUTTON_MIDDLE;
+        goto issue_mouse_btn_event;
+    case WM_MBUTTONUP:
+        is_down = false;
+        mouse_button = VSF_INPUT_MOUSE_BUTTON_MIDDLE;
+        goto issue_mouse_btn_event;
+    case WM_RBUTTONDOWN:
+        is_down = true;
+        mouse_button = VSF_INPUT_MOUSE_BUTTON_RIGHT;
+        goto issue_mouse_btn_event;
+    case WM_RBUTTONUP:
+        is_down = false;
+        mouse_button = VSF_INPUT_MOUSE_BUTTON_RIGHT;
+        goto issue_mouse_btn_event;
+    case WM_LBUTTONUP:
+        is_down = false;
+        mouse_button = VSF_INPUT_MOUSE_BUTTON_LEFT;
+        goto issue_mouse_btn_event;
+    case WM_LBUTTONDOWN:
+        is_down = true;
+        mouse_button = VSF_INPUT_MOUSE_BUTTON_LEFT;
+
+    issue_mouse_btn_event:
+        x = LOWORD(lParam);
+        y = HIWORD(lParam);
+        mouse_evt = VSF_INPUT_MOUSE_EVT_BUTTON;
+        is_event_triggered = true;
+        evt_type = VSF_INPUT_TYPE_MOUSE;
+        break;
+    case WM_MOUSEMOVE:
+        x = LOWORD(lParam);
+        y = HIWORD(lParam);
+        mouse_evt = VSF_INPUT_MOUSE_EVT_MOVE;
+        is_event_triggered = true;
+        evt_type = VSF_INPUT_TYPE_MOUSE;
+        break;
+    case WM_MOUSEWHEEL:
+        wheel_y = (short)HIWORD(wParam) / WHEEL_DELTA;
+        mouse_evt = VSF_INPUT_MOUSE_EVT_WHEEL;
+        is_event_triggered = true;
+        evt_type = VSF_INPUT_TYPE_MOUSE;
+        break;
+#   endif
+#endif
     case WM_CLOSE:
         DestroyWindow(hWnd);
         break;
