@@ -34,6 +34,8 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+dcl_vsf_bitmap(vsf_disp_wingdi_key_state_map, 256);
+
 typedef struct vsf_disp_wingdi_t {
     vsf_arch_irq_thread_t thread;
     bool is_inited;
@@ -44,6 +46,10 @@ typedef struct vsf_disp_wingdi_t {
     HDC hFrameDC;
     HBITMAP hFrameBitmap;
     void *pixels;
+
+    struct {
+        vsf_bitmap(vsf_disp_wingdi_key_state_map) state;
+    } kb;
 } vsf_disp_wingdi_t;
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -72,8 +78,123 @@ const vk_disp_drv_t vk_disp_drv_wingdi = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_USE_INPUT == ENABLED
+static uint_fast8_t __vk_disp_win_keymod(void)
+{
+    uint_fast8_t keymod = 0;
+    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_SHIFT)) {
+        keymod |= VSF_KM_LEFT_SHIFT;
+    }
+    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_CONTROL)) {
+        keymod |= VSF_KM_LEFT_CTRL;
+    }
+    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_MENU)) {
+        keymod |= VSF_KM_LEFT_ALT;
+    }
+    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_LWIN)) {
+        keymod |= VSF_KM_LEFT_GUI;
+    }
+    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_RWIN)) {
+        keymod |= VSF_KM_RIGHT_GUI;
+    }
+    return keymod;
+}
+
+static uint_fast16_t __vk_disp_win_keycode_remap(uint8_t keycode)
+{
+    uint_fast16_t ext = vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_SHIFT) ? VSF_KB_EXT : 0;
+
+    // https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+    if ((keycode >= '0') && (keycode <= '9')) {
+        return (VSF_KB_0 | ext) + (keycode - 0x30);
+    } else if ((keycode >= 'A') && (keycode <= 'Z')) {
+        if (GetKeyState(VK_CAPITAL) & 0x0001) {
+            ext ^= VSF_KB_EXT;
+        }
+        return (VSF_KB_a | ext) + (keycode - 0x41);
+    } else if ((keycode >= VK_F1) && (keycode <= VK_F24)) {
+        return (keycode <= VK_F12) ? VSF_KB_F1 + keycode - VK_F1 : 0;
+    }
+    switch (keycode) {
+    case VK_CAPITAL:            return VSF_KB_CAPSLOCK;
+    case VK_RETURN:             return VSF_KB_ENTER;
+    case VK_ESCAPE:             return VSF_KB_ESCAPE;
+    case VK_BACK:               return VSF_KB_BACKSPACE;
+    case VK_TAB:                return VSF_KB_TAB;
+    case VK_SPACE:              return VSF_KB_SPACE;
+    case VK_OEM_PLUS:           return VSF_KB_PLUS | ext;
+    case VK_OEM_COMMA:          return VSF_KB_COMMA | ext;
+    case VK_OEM_MINUS:          return VSF_KB_MINUS | ext;
+    case VK_OEM_PERIOD:         return VSF_KB_DOT | ext;
+    case VK_OEM_1:              return VSF_KB_SEMICOLON | ext;
+    case VK_OEM_2:              return VSF_KB_SLASH | ext;
+    case VK_OEM_3:              return VSF_KB_GRAVE | ext;
+    case VK_OEM_4:              return VSF_KB_LEFT_BRACKET | ext;
+    case VK_OEM_5:              return VSF_KB_BACKSLASH | ext;
+    case VK_OEM_6:              return VSF_KB_RIGHT_BRACKET | ext;
+    case VK_OEM_7:              return VSF_KB_SINGLE_QUOTE | ext;
+
+    case VK_SNAPSHOT:           return VSF_KB_PRINT_SCREEN;
+    case VK_SCROLL:             return VSF_KB_SCROLL_LOCK;
+    case VK_PAUSE:              return VSF_KB_PAUSE;
+    case VK_INSERT:             return VSF_KB_INSERT;
+    case VK_HOME:               return VSF_KB_HOME;
+    case VK_PRIOR:              return VSF_KB_PAGE_UP;
+    case VK_DELETE:             return VSF_KB_DELETE;
+    case VK_END:                return VSF_KB_END;
+    case VK_NEXT:               return VSF_KB_PAGE_DOWN;
+    case VK_RIGHT:              return VSF_KB_RIGHT;
+    case VK_LEFT:               return VSF_KB_LEFT;
+    case VK_DOWN:               return VSF_KB_DOWN;
+    case VK_UP:                 return VSF_KB_UP;
+
+    case VK_NUMLOCK:            return VSF_KP_NUMLOCK;
+    case VK_DIVIDE:             return VSF_KP_DIVIDE;
+    case VK_MULTIPLY:           return VSF_KP_MULTIPLY;
+    case VK_SUBTRACT:           return VSF_KP_MINUS;
+    case VK_ADD:                return VSF_KP_PLUS;
+//    case VK_SEPARATOR           return VSF_KP_??;
+//    case SDLK_KP_ENTER:         return VSF_KP_ENTER;
+    case VK_DECIMAL:            return VSF_KP_DOT;
+    case VK_NUMPAD0:            return VSF_KP_0;
+    case VK_NUMPAD1:            return VSF_KP_1;
+    case VK_NUMPAD2:            return VSF_KP_2;
+    case VK_NUMPAD3:            return VSF_KP_3;
+    case VK_NUMPAD4:            return VSF_KP_4;
+    case VK_NUMPAD5:            return VSF_KP_5;
+    case VK_NUMPAD6:            return VSF_KP_6;
+    case VK_NUMPAD7:            return VSF_KP_7;
+    case VK_NUMPAD8:            return VSF_KP_8;
+    case VK_NUMPAD9:            return VSF_KP_9;
+    }
+    return 0;
+}
+#endif
+
 static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+    vk_disp_wingdi_t *disp_wingdi = __vk_disp_wingdi.disp;
+    vsf_arch_irq_thread_t *irq_thread = &__vk_disp_wingdi.thread;
+
+#if VSF_USE_INPUT == ENABLED
+    union {
+        implement(vk_input_evt_t)
+        vk_touchscreen_evt_t    ts_evt;
+        vk_gamepad_evt_t        gamepad_evt;
+        vk_keyboard_evt_t       keyboard_evt;
+        vk_mouse_evt_t          mouse_evt;
+    } evt;
+    vk_input_type_t evt_type;
+
+    uint_fast16_t x = 0, y = 0;
+    uint_fast8_t pressure = 0;
+    bool is_down = false, is_event_triggered = false;
+    int_fast16_t wheel_x = 0, wheel_y = 0;
+    int mouse_evt = 0, mouse_button = 0;
+
+    evt.dev = disp_wingdi;
+#endif
+
     switch (msg) {
     case WM_PAINT: {
             PAINTSTRUCT ps;
@@ -85,8 +206,6 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
                 SRCCOPY);
             EndPaint(hWnd, &ps);
 
-            vsf_arch_irq_thread_t *irq_thread = &__vk_disp_wingdi.thread;
-            vk_disp_wingdi_t *disp_wingdi = __vk_disp_wingdi.disp;
             __vsf_arch_irq_start(irq_thread);
                 vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
             __vsf_arch_irq_end(irq_thread, false);
@@ -102,6 +221,23 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         __vk_disp_wingdi.hFrameBitmap = CreateDIBSection(NULL, &__vk_disp_wingdi.bmi, DIB_RGB_COLORS, &__vk_disp_wingdi.pixels, 0, 0);
         SelectObject(__vk_disp_wingdi.hFrameDC, __vk_disp_wingdi.hFrameBitmap);
         break;
+    case WM_KEYDOWN:
+        if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, wParam & 0xFF)) {
+            break;
+        }
+        vsf_bitmap_set(&__vk_disp_wingdi.kb.state, wParam & 0xFF);
+        goto issue_kb_event;
+    case WM_KEYUP:
+        vsf_bitmap_clear(&__vk_disp_wingdi.kb.state, wParam & 0xFF);
+    issue_kb_event: {
+            is_event_triggered = true;
+            evt_type = VSF_INPUT_TYPE_KEYBOARD;
+            vsf_input_keyboard_set(&evt.keyboard_evt,
+                __vk_disp_win_keycode_remap(wParam & 0xFF),
+                WM_KEYDOWN == msg,
+                __vk_disp_win_keymod());
+        }
+        break;
     case WM_CLOSE:
         DestroyWindow(hWnd);
         break;
@@ -111,6 +247,40 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
     default:
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
+
+    if (is_event_triggered) {
+        __vsf_arch_irq_start(irq_thread);
+        switch (evt_type) {
+        case VSF_INPUT_TYPE_TOUCHSCREEN:
+            evt.ts_evt.info.width = disp_wingdi->param.width;
+            evt.ts_evt.info.height = disp_wingdi->param.height;
+            vsf_input_touchscreen_set(&evt.ts_evt, 0, is_down, pressure, x, y);
+            vsf_input_on_touchscreen(&evt.ts_evt);
+            break;
+        case VSF_INPUT_TYPE_GAMEPAD:
+            vsf_input_on_gamepad(&evt.gamepad_evt);
+            break;
+        case VSF_INPUT_TYPE_KEYBOARD:
+            vsf_input_on_keyboard(&evt.keyboard_evt);
+            break;
+        case VSF_INPUT_TYPE_MOUSE:
+            switch (mouse_evt) {
+            case VSF_INPUT_MOUSE_EVT_BUTTON:
+                vk_input_mouse_evt_button_set(&evt.mouse_evt, mouse_button, is_down, x, y);
+                break;
+            case VSF_INPUT_MOUSE_EVT_MOVE:
+                vk_input_mouse_evt_move_set(&evt.mouse_evt, x, y);
+                break;
+            case VSF_INPUT_MOUSE_EVT_WHEEL:
+                vk_input_mouse_evt_wheel_set(&evt.mouse_evt, wheel_x, wheel_y);
+                break;
+            }
+            vsf_input_on_mouse(&evt.mouse_evt);
+            break;
+        }
+        __vsf_arch_irq_end(irq_thread, false);
+    }
+
     return 0;
 }
 
