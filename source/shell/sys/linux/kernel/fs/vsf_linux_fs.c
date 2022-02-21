@@ -696,14 +696,7 @@ static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
     }
 
     // check file attr
-    int fattr = file->attr & S_IFMT;
-    if (0 == fattr) {
-        fattr |= S_IFREG;
-    }
-    if (0 == attr) {
-        attr |= S_IFREG;
-    }
-    if (!(fattr & attr)) {
+    if (!(file->attr & attr)) {
         return -1;
     }
 
@@ -1223,7 +1216,7 @@ int link(const char *oldpath, const char *newpath)
 
 int unlink(const char *pathname)
 {
-    return __vsf_linux_fs_remove(pathname, S_IFMT & ~S_IFDIR);
+    return __vsf_linux_fs_remove(pathname, 0);
 }
 
 int symlink(const char *target, const char *linkpath)
