@@ -416,7 +416,7 @@ short vsf_linux_fd_pend_events(vsf_linux_fd_priv_t *priv, short events, vsf_linu
 {
     uint16_t events_triggered = priv->events & events;
     if (events_triggered) {
-        priv->events &= ~events_triggered;
+        priv->events &= ~(events_triggered & ~priv->sticky_events);
         vsf_unprotect_sched(orig);
     } else {
         priv->trigger = trig;
@@ -442,7 +442,7 @@ void vsf_linux_fd_set_events(vsf_linux_fd_priv_t *priv, short events, vsf_protec
     priv->events |= events;
     if (trig != NULL) {
         priv->events_triggered = events & priv->events_pending;
-        priv->events &= ~priv->events_triggered;
+        priv->events &= ~(priv->events_triggered & ~priv->sticky_events);
         if (priv->events_triggered) {
             priv->trigger = NULL;
             vsf_unprotect_sched(orig);
@@ -470,9 +470,8 @@ void vsf_linux_fd_clear_status(vsf_linux_fd_priv_t *priv, short status, vsf_prot
     if ((priv->trigger != NULL) && (priv->events_pending & status)) {
         VSF_LINUX_ASSERT(false);
     } else {
-        status = ~status;
-        priv->events &= status;
-        priv->status &= status;
+        priv->events &= ~(status & ~priv->sticky_events);
+        priv->status &= ~status;
     }
     vsf_unprotect_sched(orig);
 }
@@ -507,7 +506,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             events_triggered = priv->events & fds[i].events;
             if (events_triggered) {
                 fds[i].revents = events_triggered;
-                priv->events &= ~events_triggered;
+                priv->events &= ~(events_triggered & ~priv->sticky_events);
                 priv->events |= priv->status & events_triggered;
                 ret++;
             } else {
@@ -696,7 +695,7 @@ static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
     }
 
     // check file attr
-    if (!(file->attr & attr)) {
+    if (attr && !(file->attr & attr)) {
         return -1;
     }
 
@@ -1788,13 +1787,32 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
         VSF_STREAM_READ(priv_rx->stream_rx, NULL, 0xFFFFFFFF);
     }
     int ret = __vsf_linux_stream_close(sfd);
+    union {
+        vsf_linux_pipe_rx_priv_t *rx;
+        vsf_linux_pipe_tx_priv_t *tx;
+        void *ptr;
+    } priv;
+    priv.ptr = sfd->priv;
     if (is_rx_pipe) {
-        vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd->priv;
-        if (priv_rx->is_to_free_stream) {
+        if (priv.rx->is_to_free_stream) {
             // pipe internals does not belong to process
-            __free_ex(vsf_linux_resources_process(), priv_rx->stream_rx);
+            __free_ex(vsf_linux_resources_process(), priv.rx->stream_rx);
         }
     }
+
+    vsf_protect_t orig = vsf_protect_sched();
+    if (is_rx_pipe) {
+        if (priv.rx->pipe_tx_priv != NULL) {
+            priv.rx->pipe_tx_priv->pipe_rx_priv = NULL;
+        }
+    } else {
+        // pipe_tx is closed, set stick_events in pipe_rx with POLLLIN
+        if (priv.tx->pipe_rx_priv != NULL) {
+            priv.tx->pipe_rx_priv->sticky_events = POLLIN;
+            priv.tx->pipe_rx_priv->pipe_tx_priv = NULL;
+        }
+    }
+    vsf_unprotect_sched(orig);
     return ret;
 }
 

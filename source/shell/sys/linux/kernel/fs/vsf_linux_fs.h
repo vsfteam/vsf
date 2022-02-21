@@ -62,6 +62,9 @@ vsf_class(vsf_linux_fd_priv_t) {
 
         short status;
         short events;
+        // sticky_events will not be cleared
+        //  use for eg pipe, pipe_tx is closed, pipe_rx will always POLLIN
+        short sticky_events;
     )
     private_member(
         int ref;
@@ -100,16 +103,19 @@ vsf_class(vsf_linux_stream_priv_t) {
     )
 };
 
+vsf_dcl_class(vsf_linux_pipe_tx_priv_t)
 vsf_class(vsf_linux_pipe_rx_priv_t) {
     protected_member(
         implement(vsf_linux_stream_priv_t)
         bool is_to_free_stream;
+        vsf_linux_pipe_tx_priv_t *pipe_tx_priv;
     )
 };
 
 vsf_class(vsf_linux_pipe_tx_priv_t) {
     protected_member(
         implement(vsf_linux_stream_priv_t)
+        vsf_linux_pipe_rx_priv_t *pipe_rx_priv;
     )
 };
 
