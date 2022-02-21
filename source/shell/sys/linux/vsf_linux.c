@@ -696,6 +696,7 @@ vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op
         memset(thread, 0, thread_size);
 
         // set entry and on_terminate
+        thread->op = op;
         thread->on_terminate = (vsf_eda_on_terminate_t)op->on_terminate;
         thread->entry = (vsf_thread_entry_t *)op->on_run;
 
