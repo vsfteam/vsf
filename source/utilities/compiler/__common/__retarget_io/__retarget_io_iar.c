@@ -19,19 +19,34 @@
 #undef __USE_COMMON_RETARGET_IO_IAR_C__
 
 #if VSF_USE_POSIX == ENABLED
+#include <LowLevelIOInterface.h>
+#include <fcntl.h>
+
 SECTION(".vsf.utilities.stdio.iar.__open")
-int __open(const char *path_name, int flags, mode_t mode)
+int __open(const char *path_name, int flags)
 {
-    int fd = open(path_name, flags, mode);
+    int real_flags = 0;
+    int fd;
+    if (flags & _LLIO_CREAT) {
+        real_flags |= O_CREAT;
+    }
+    if (flags & _LLIO_APPEND) {
+        real_flags |= O_APPEND;
+    }
+    if (flags & _LLIO_TRUNC) {
+        real_flags |= O_TRUNC;
+    }
+
+    fd = open(path_name, flags);
     // iar uses signed char to save fd, assert it's same as original fd
     VSF_LINUX_ASSERT(fd == (signed char)fd);
     return fd;
 }
 
 SECTION(".vsf.utilities.stdio.iar.__close")
-void __close(int handle)
+int __close(int handle)
 {
-    close(handle);
+    return close(handle);
 }
 
 SECTION(".vsf.utilities.stdio.iar.__lseek")
