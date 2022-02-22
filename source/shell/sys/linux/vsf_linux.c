@@ -1123,7 +1123,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     if (NULL == sfd) {
         ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDIN_FILENO, process->stdio_stream.in);
         VSF_LINUX_ASSERT(ret == STDIN_FILENO);
-        sfd->status_flags = O_RDONLY;
+        sfd->priv->flags = O_RDONLY;
         stdin_priv = sfd->priv;
     }
 
@@ -1131,7 +1131,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     if (NULL == sfd) {
         ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDOUT_FILENO, process->stdio_stream.out);
         VSF_LINUX_ASSERT(ret == STDOUT_FILENO);
-        sfd->status_flags = O_WRONLY;
+        sfd->priv->flags = O_WRONLY;
     }
 
     sfd = vsf_linux_fd_get(2);
@@ -1139,7 +1139,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
         ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDERR_FILENO, process->stdio_stream.err);
         VSF_LINUX_ASSERT(ret == STDERR_FILENO);
         sfd->priv->target = stdin_priv;
-        sfd->status_flags = 0;
+        sfd->priv->flags = 0;
     }
 
     vsf_linux_process_arg_t arg = ctx->arg;

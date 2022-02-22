@@ -397,7 +397,7 @@ void vsf_linux_fd_delete(int fd)
 bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
 {
     vsf_linux_process_t *process;
-    if (sfd->status_flags & O_NONBLOCK) {
+    if (sfd->priv->flags & O_NONBLOCK) {
         return false;
     }
 
@@ -950,7 +950,7 @@ __open_again:
         __vsf_linux_fs_close_do(file);
     } else {
         vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-        sfd->status_flags = flags;
+        sfd->priv->flags = flags;
         priv->file = file;
 
         if ((flags & O_DIRECTORY) && !(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
@@ -1028,12 +1028,12 @@ int fcntl(int fd, int cmd, ...)
         }
         break;
     case F_GETFL:
-        return sfd->status_flags;
+        return sfd->priv->flags;
         break;
     case F_SETFL: {
             long tmp_arg = arg;
-            arg = arg ^ sfd->status_flags;
-            sfd->status_flags = tmp_arg;
+            arg = arg ^ sfd->priv->flags;
+            sfd->priv->flags = tmp_arg;
         }
         break;
     }
@@ -1044,14 +1044,14 @@ int fcntl(int fd, int cmd, ...)
 ssize_t read(int fd, void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    if (!sfd || (sfd->status_flags & O_WRONLY)) { return -1; }
+    if (!sfd || (sfd->priv->flags & O_WRONLY)) { return -1; }
     return sfd->op->fn_read(sfd, buf, count);
 }
 
 ssize_t write(int fd, const void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    if (!sfd || (sfd->status_flags & O_RDONLY)) { return -1; }
+    if (!sfd || (sfd->priv->flags & O_RDONLY)) { return -1; }
     return sfd->op->fn_write(sfd, buf, count);
 }
 
@@ -1762,7 +1762,8 @@ vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream)
 
 vsf_stream_t * vsf_linux_get_rx_stream(vsf_linux_fd_t *sfd)
 {
-    if (sfd->op == &__vsf_linux_stream_fdop) {
+    if (    (sfd->op == &__vsf_linux_stream_fdop)
+        ||  (sfd->op == &vsf_linux_pipe_rx_fdop)) {
         return ((vsf_linux_stream_priv_t *)sfd->priv)->stream_rx;
     }
     return NULL;
@@ -1770,7 +1771,8 @@ vsf_stream_t * vsf_linux_get_rx_stream(vsf_linux_fd_t *sfd)
 
 vsf_stream_t * vsf_linux_get_tx_stream(vsf_linux_fd_t *sfd)
 {
-    if (sfd->op == &__vsf_linux_stream_fdop) {
+    if (    (sfd->op == &__vsf_linux_stream_fdop)
+        ||  (sfd->op == &vsf_linux_pipe_tx_fdop)) {
         return ((vsf_linux_stream_priv_t *)sfd->priv)->stream_tx;
     }
     return NULL;

@@ -56,6 +56,7 @@ typedef struct vsf_linux_fd_op_t {
 vsf_class(vsf_linux_fd_priv_t) {
     protected_member(
         void *target;
+        int flags;
         vsf_linux_trigger_t *trigger;
         short events_pending;
         short events_triggered;
@@ -75,7 +76,6 @@ vsf_class(vsf_linux_fd_t) {
     protected_member(
         int fd;
         int fd_flags;
-        int status_flags;
         const vsf_linux_fd_op_t *op;
     )
 

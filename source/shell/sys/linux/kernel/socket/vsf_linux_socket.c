@@ -452,9 +452,9 @@ int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t
         switch (optname) {
         case SO_NONBLOCK:
             if (*(const int *)optval) {
-                sfd->status_flags |= O_NONBLOCK;
+                sfd->priv->flags |= O_NONBLOCK;
             } else {
-                sfd->status_flags &= ~O_NONBLOCK;
+                sfd->priv->flags &= ~O_NONBLOCK;
             }
             break;
         }
