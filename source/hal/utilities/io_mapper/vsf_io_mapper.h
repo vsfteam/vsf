@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#if GPIO_COUNT > 0
+#if VSF_HW_GPIO_COUNT > 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -148,7 +148,7 @@ typedef struct vsf_io_mapper_t {
     void           *io[0];
 } vsf_io_mapper_t;
 
-define_io_mapper(vsf_hw, GPIO_COUNT)
+define_io_mapper(vsf_hw, VSF_HW_GPIO_COUNT)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -162,5 +162,5 @@ extern const vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper;
 }
 #endif
 
-#endif  // GPIO_COUNT > 0
+#endif  // VSF_HW_GPIO_COUNT > 0
 #endif  // __VSF_IO_MAPPER_H__

@@ -19,7 +19,7 @@
 
 #include "hal/vsf_hal.h"
 
-#if GPIO_COUNT > 0
+#if VSF_HW_GPIO_COUNT > 0
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -30,10 +30,10 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper = {
-    VSF_IO_MAPPER_INIT(GPIO_COUNT, VSF_HW_IO_MAPPER_PORT_BITS_LOG2)
+    VSF_IO_MAPPER_INIT(VSF_HW_GPIO_COUNT, VSF_HW_IO_MAPPER_PORT_BITS_LOG2)
 
     .io = {
-        VSF_MREPEAT(GPIO_COUNT, __VSF_IO_MAPPER_HW, 0)
+        VSF_MREPEAT(VSF_HW_GPIO_COUNT, __VSF_IO_MAPPER_HW, 0)
     }
 };
 
@@ -41,4 +41,4 @@ const vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#endif      // GPIO_COUNT > 0
+#endif      // VSF_HW_GPIO_COUNT > 0
