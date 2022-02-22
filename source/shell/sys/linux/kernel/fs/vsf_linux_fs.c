@@ -1134,6 +1134,8 @@ int fstat(int fd, struct stat *buf)
             buf->st_mode = S_IFDIR;
         } else if (file->attr & VSF_FILE_ATTR_BLK) {
             buf->st_mode = S_IFBLK;
+        } else if (file->attr & VSF_FILE_ATTR_SOCK) {
+            buf->st_mode = S_IFSOCK;
         } else {
             buf->st_mode = S_IFREG;
         }

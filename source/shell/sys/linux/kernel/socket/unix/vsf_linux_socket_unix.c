@@ -391,7 +391,7 @@ static int __vsf_linux_socket_unix_bind(vsf_linux_socket_priv_t *socket_priv, co
         return -1;
     }
 
-    vsf_linux_fd_add_feature(fd, S_IFSOCK);
+    vsf_linux_fd_add_feature(fd, VSF_FILE_ATTR_SOCK);
     close(fd);
     return 0;
 }
