@@ -322,7 +322,7 @@ static int __vsf_linux_fd_add_ex(vsf_linux_process_t *process, vsf_linux_fd_t *s
 int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
         const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv)
 {
-    int priv_size = (op != NULL) ? op->priv_size : sizeof(vsf_linux_fd_priv_t);
+    int priv_size = ((op != NULL) && (op->priv_size > 0)) ? op->priv_size : sizeof(vsf_linux_fd_priv_t);
     int ret;
     vsf_linux_fd_t *new_sfd;
 
@@ -334,6 +334,7 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
     new_sfd->op = op;
     if (NULL == priv) {
         // priv of fd does not belong to the process
+        VSF_LINUX_ASSERT(priv_size >= sizeof(vsf_linux_fd_priv_t));
         new_sfd->priv = __calloc_ex(vsf_linux_resources_process(), 1, priv_size);
         if (!new_sfd->priv) {
             ret = -1;
