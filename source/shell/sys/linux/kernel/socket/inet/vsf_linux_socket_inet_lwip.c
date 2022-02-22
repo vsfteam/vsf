@@ -782,19 +782,19 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
         switch (evt) {
         case NETCONN_EVT_RCVPLUS:
             if (0 == priv->rxcnt++) {
-                vsf_linux_fd_set_status(priv, POLLIN, vsf_protect_sched());
+                vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
             }
             break;
         case NETCONN_EVT_RCVMINUS:
             if (0 == --priv->rxcnt) {
-                vsf_linux_fd_clear_status(priv, POLLIN, vsf_protect_sched());
+                vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
             }
             break;
         case NETCONN_EVT_SENDPLUS:
-            vsf_linux_fd_set_status(priv, POLLOUT, vsf_protect_sched());
+            vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
             break;
         case NETCONN_EVT_SENDMINUS:
-            vsf_linux_fd_clear_status(priv, POLLOUT, vsf_protect_sched());
+            vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
             break;
         }
     }

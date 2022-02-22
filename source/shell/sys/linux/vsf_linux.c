@@ -1546,6 +1546,11 @@ uid_t getuid(void)
     return (uid_t)0;
 }
 
+int setuid(uid_t uid)
+{
+    return 0;
+}
+
 uid_t geteuid(void)
 {
     return (uid_t)0;

@@ -36,6 +36,8 @@ extern "C" {
 #define getpid              VSF_LINUX_WRAPPER(getpid)
 #define getppid             VSF_LINUX_WRAPPER(getppid)
 #define getpgid             VSF_LINUX_WRAPPER(getpgid)
+#define getuid              VSF_LINUX_WRAPPER(getuid)
+#define setuid              VSF_LINUX_WRAPPER(setuid)
 #define geteuid             VSF_LINUX_WRAPPER(geteuid)
 #define getgid              VSF_LINUX_WRAPPER(getgid)
 #define getegid             VSF_LINUX_WRAPPER(getegid)
@@ -107,6 +109,7 @@ pid_t getpid(void);
 pid_t getppid(void);
 pid_t getpgid(pid_t pid);
 uid_t getuid(void);
+int setuid(uid_t uid);
 uid_t geteuid(void);
 gid_t getgid(void);
 gid_t getegid(void);
