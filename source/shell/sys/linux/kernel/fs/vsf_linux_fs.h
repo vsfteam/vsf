@@ -184,7 +184,7 @@ extern vsf_stream_t * vsf_linux_get_tx_stream(vsf_linux_fd_t *sfd);
 
 // pipe
 extern vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream);
-extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_queue_stream_t *queue_stream);
+extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_rx_priv_t *priv_rx);
 #endif
 
 #ifdef __cplusplus

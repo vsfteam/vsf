@@ -1370,16 +1370,11 @@ int pipe(int pipefd[2])
         return -1;
     }
 
-    vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
-    vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)priv_rx->stream_rx;
-    sfd_tx = vsf_linux_tx_pipe(queue_stream);
+    sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_rx_priv_t *)sfd_rx->priv);
     if (NULL == sfd_tx) {
         close(sfd_rx->fd);
         return -1;
     }
-    vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
-    priv_rx->pipe_tx_priv = priv_tx;
-    priv_tx->pipe_rx_priv = priv_rx;
 
     pipefd[0] = sfd_rx->fd;
     pipefd[1] = sfd_tx->fd;
