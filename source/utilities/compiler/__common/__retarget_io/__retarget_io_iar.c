@@ -37,7 +37,7 @@ int __open(const char *path_name, int flags)
         real_flags |= O_TRUNC;
     }
 
-    fd = open(path_name, flags);
+    fd = open(path_name, real_flags);
     // iar uses signed char to save fd, assert it's same as original fd
     VSF_LINUX_ASSERT(fd == (signed char)fd);
     return fd;
