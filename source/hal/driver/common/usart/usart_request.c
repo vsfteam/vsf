@@ -19,17 +19,13 @@
 #include "hal/vsf_hal_cfg.h"
 #if VSF_HAL_USE_USART == ENABLED
 
-/*============================ MACROS ========================================*/
-
-#define VSF_USART_CFG_REAL_PREFIX VSF_USART_CFG_PREFIX
-
-/*============================ INCLUDES ======================================*/
-
+// when multi class is diabled, we want to call vsf_[real_spi]_{init, enable, disable, ...}
+#if VSF_SPI_CFG_MULTI_CLASS == DISALBED
+#   define VSF_USART_CFG_REAL_PREFIX        VSF_USART_CFG_PREFIX
+#endif
 #include "hal/driver/driver.h"
 
 #if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-
-#include "usart_request.h"
 
 /*============================ MACROS ========================================*/
 
@@ -281,7 +277,6 @@ void vsf_fifo2req_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t i
     if (others_irq_mask) {
         vsf_usart_irq_enable(request_ptr->real_usart_ptr, others_irq_mask);
     }
-
 }
 
 void vsf_fifo2req_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
