@@ -770,7 +770,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
 {
     int ret;
 
-    if (!priv->is_nonblock) {
+    if (!priv->is_nonblock && (priv->hprotocol != IPPROTO_UDP)) {
         struct vsf_linux_pollfd fds[1] = {
             {
                 .fd     = priv->sfd->fd,
