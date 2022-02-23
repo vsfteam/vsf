@@ -601,6 +601,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
 
     switch (level) {
     case VSF_LINUX_SOCKET_SOL_SOCKET:
+        level = SOL_SOCKET;
         switch (optname) {
         case VSF_LINUX_SOCKET_SO_BROADCAST:     optname = SO_BROADCAST;     break;
         case VSF_LINUX_SOCKET_SO_KEEPALIVE:     optname = SO_KEEPALIVE;     break;
@@ -633,6 +634,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
         }
         break;
     case VSF_LINUX_SOCKET_IPPROTO_TCP:
+        level = IPPROTO_TCP;
         switch (optname) {
         case VSF_LINUX_SOCKET_TCP_NODELAY:      optname = TCP_NODELAY;      break;
         case VSF_LINUX_SOCKET_TCP_KEEPALIVE:    optname = SO_KEEPALIVE;     break;

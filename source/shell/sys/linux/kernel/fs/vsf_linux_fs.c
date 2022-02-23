@@ -525,6 +525,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
                 continue;
             }
             sfd->priv->events_pending = fds[i].events;
+            VSF_LINUX_ASSERT(NULL == sfd->priv->trigger);
             sfd->priv->trigger = &trig;
         }
         vsf_unprotect_sched(orig);
