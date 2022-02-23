@@ -1797,25 +1797,23 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
         vsf_linux_pipe_tx_priv_t *tx;
         void *ptr;
     } priv;
-    vsf_protect_t orig;
     priv.ptr = sfd->priv;
+    vsf_protect_t orig = vsf_protect_sched();
     if (is_rx_pipe) {
-        orig = vsf_protect_sched();
         if (priv.rx->is_to_free_stream) {
-            priv.rx->pipe_tx_priv->stream_tx = NULL;
+            if (priv.rx->pipe_tx_priv != NULL) {
+                priv.rx->pipe_tx_priv->stream_tx = NULL;
+                priv.rx->pipe_tx_priv->pipe_rx_priv = NULL;
+            }
             vsf_unprotect_sched(orig);
 
             // pipe internals does not belong to process
             __free_ex(vsf_linux_resources_process(), priv.rx->stream_rx);
         } else {
+            if (priv.rx->pipe_tx_priv != NULL) {
+                priv.rx->pipe_tx_priv->pipe_rx_priv = NULL;
+            }
             vsf_unprotect_sched(orig);
-        }
-    }
-
-    orig = vsf_protect_sched();
-    if (is_rx_pipe) {
-        if (priv.rx->pipe_tx_priv != NULL) {
-            priv.rx->pipe_tx_priv->pipe_rx_priv = NULL;
         }
     } else {
         // pipe_tx is closed, set stick_events in pipe_rx with POLLLIN
@@ -1823,8 +1821,8 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
             priv.tx->pipe_rx_priv->sticky_events = POLLIN;
             priv.tx->pipe_rx_priv->pipe_tx_priv = NULL;
         }
+        vsf_unprotect_sched(orig);
     }
-    vsf_unprotect_sched(orig);
     return ret;
 }
 
