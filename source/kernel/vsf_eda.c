@@ -95,7 +95,7 @@ extern vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis);
 extern vsf_prio_t __vsf_os_evtq_get_priority(vsf_evtq_t *pthis);
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 SECTION(".text.vsf.kernel.eda_task")
 extern void __vsf_eda_task_evthandler_process_return_value(vsf_eda_t *eda, vsf_evt_t evt);
 #endif
@@ -238,7 +238,7 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
         __vsf_eda_frame_t *frame = pthis->fn.frame;
         VSF_KERNEL_ASSERT(frame != NULL);
 
-#   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         if (pthis->flag.feature.is_subcall_has_return_value) {
             __vsf_eda_task_evthandler_process_return_value(pthis, evt);
         } else
