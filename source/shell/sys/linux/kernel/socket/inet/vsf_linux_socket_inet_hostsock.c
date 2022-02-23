@@ -24,10 +24,8 @@
     && (defined(__WIN__) || defined(__LINUX__) || defined(__linux__))
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "../../../include/errno.h"
 #   include "../../../include/sys/types.h"
 #else
-#   include <errno.h>
 #   include <sys/types.h>
 #endif
 
