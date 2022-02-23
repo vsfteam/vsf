@@ -1730,7 +1730,7 @@ void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream)
 
     vsf_protect_t orig = vsf_protect_sched();
     if (vsf_stream_get_data_size(stream)) {
-        vsf_linux_fd_set_status(sfd->priv, POLLOUT, orig);
+        vsf_linux_fd_set_status(sfd->priv, POLLIN, orig);
     } else {
         vsf_unprotect_sched(orig);
     }
