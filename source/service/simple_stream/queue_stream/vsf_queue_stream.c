@@ -79,6 +79,7 @@ static void __vsf_queue_stream_init(vsf_stream_t *stream)
     VSF_SERVICE_ASSERT(queue_stream->max_entry_num != 0);
     vsf_slist_queue_init(&queue_stream->buffer_queue);
     queue_stream->size = 0;
+    queue_stream->entry_num = 0;
 }
 
 static uint_fast32_t __vsf_queue_stream_get_buff_length(vsf_stream_t *stream)
