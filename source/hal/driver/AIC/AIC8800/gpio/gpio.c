@@ -25,10 +25,8 @@
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET
-#   define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET      ENABLED
-#endif
-
+// TODO: fixed gpio output_and_set
+#define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET      	DISABLED
 #define VSF_GPIO_CFG_IMPLEMENT_OP                       ENABLED
 #define VSF_GPIO_CFG_INSTANCE_PREFIX                    vsf_hw
 

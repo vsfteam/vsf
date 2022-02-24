@@ -39,6 +39,8 @@
 #   define VSF_GPIO_CFG_TEMPLATE_MASK       VSF_HW_GPIO_MASK
 #endif
 
+#define VSF_IO_REIMPLEMENT_FEATURE          ENABLED
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_GPIO_CFG_DEC_LV0(__count, __dont_care)                              \
@@ -46,7 +48,7 @@
 
 /*============================ TYPES =========================================*/
 
-enum io_feature_t {
+typedef enum io_feature_t {
     //! no-pull resistor
     IO_NOT_PULL             =  (0 << IOMUX_GPIO_CONFIG_PULL_FRC_LSB),
     //! pull-up resistor
@@ -56,12 +58,7 @@ enum io_feature_t {
     __IO_PULL_MASK          = IOMUX_AGPIO_CONFIG_PULL_FRC_MASK | IOMUX_AGPIO_CONFIG_PULL_DN_MASK | IOMUX_AGPIO_CONFIG_PULL_UP_MASK,
 
     __IO_FEATURE_MASK       = __IO_PULL_MASK | IOMUX_GPIO_CONFIG_SEL_MASK,
-};
-
-//todo: remove
-enum io_pin_no_t {
-    TODO_REMOVE,
-};
+} io_feature_t;
 
 typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
 
