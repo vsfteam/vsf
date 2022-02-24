@@ -78,6 +78,20 @@ struct dirent {
 /*============================ TYPES =========================================*/
 
 // need to sync types/constants below with the real definitions in vsf
+// from vsf_linux.h
+vsf_class(vsf_linux_trigger_t) {
+    public_member(
+        implement(vsf_trig_t)
+    )
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    private_member(
+        vsf_dlist_node_t node;
+        void *pending_process;
+        int sig;
+    )
+#endif
+};
+
 // from errno.h
 #define VSF_LINUX_ERRNO_EAGAIN          11
 extern int * __vsf_linux_errno(void);
@@ -196,7 +210,6 @@ typedef struct vsf_linux_socket_inet_priv_t {
     int sndto;
 
     vsf_dlist_node_t node;
-    vsf_linux_fd_t *sfd;
 } vsf_linux_socket_inet_priv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -523,7 +536,6 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
     u_long optval_ulong = 1;
     ioctlsocket(priv->hostsock, FIONBIO, &optval_ulong);
     priv->rcvto = priv->sndto = -1;
-    priv->sfd = sfd;
     __vsf_linux_hostsock_add(priv);
     return 0;
 assert_fail:
@@ -680,14 +692,10 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
     int hsockaddr_len = sizeof(hsockaddr);
 
     if (!priv->is_nonblock) {
-        struct vsf_linux_pollfd fds[1] = {
-            {
-                .fd     = priv->sfd->fd,
-                .events = VSF_LINUX_POLLIN,
-            },
-        };
-        int ret = VSF_LINUX_WRAPPER(poll)(fds, 1, priv->rcvto);
-        if (ret <= 0) {
+        vsf_linux_trigger_t trig;
+        vsf_linux_trigger_init(&trig);
+        short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, &trig, vsf_protect_sched());
+        if (!(events & VSF_LINUX_POLLIN)) {
             return VSF_LINUX_SOCKET_INVALID_SOCKET;
         }
     }
@@ -716,7 +724,6 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
     newpriv->hdomain = priv->hdomain;
     newpriv->htype = priv->htype;
     newpriv->hprotocol = priv->hprotocol;
-    newpriv->sfd = sfd;
     __vsf_linux_hostsock_add(newpriv);
     __vsf_linux_hostsock_pend(priv);
     return newsock;
@@ -743,14 +750,10 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
         &&  (errno == ERRNO_WOULDBLOCK)) {
         ret = 0;
         if (!priv->is_nonblock) {
-            struct vsf_linux_pollfd fds[1] = {
-                {
-                    .fd     = priv->sfd->fd,
-                    .events = VSF_LINUX_POLLOUT,
-                },
-            };
-            int ret = VSF_LINUX_WRAPPER(poll)(fds, 1, priv->sndto);
-            if (ret <= 0) {
+            vsf_linux_trigger_t trig;
+            vsf_linux_trigger_init(&trig);
+            short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, &trig, vsf_protect_sched());
+            if (!(events & VSF_LINUX_POLLOUT)) {
                 return VSF_LINUX_SOCKET_INVALID_SOCKET;
             }
         } else {
@@ -773,14 +776,10 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
     int ret;
 
     if (!priv->is_nonblock && (priv->hprotocol != IPPROTO_UDP)) {
-        struct vsf_linux_pollfd fds[1] = {
-            {
-                .fd     = priv->sfd->fd,
-                .events = VSF_LINUX_POLLOUT,
-            },
-        };
-        int ret = VSF_LINUX_WRAPPER(poll)(fds, 1, priv->sndto);
-        if (ret <= 0) {
+        vsf_linux_trigger_t trig;
+        vsf_linux_trigger_init(&trig);
+        short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, &trig, vsf_protect_sched());
+        if (!(events & VSF_LINUX_POLLOUT)) {
             return VSF_LINUX_SOCKET_INVALID_SOCKET;
         }
     }
@@ -805,14 +804,10 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
     int ret;
 
     if (!priv->is_nonblock) {
-        struct vsf_linux_pollfd fds[1] = {
-            {
-                .fd     = priv->sfd->fd,
-                .events = VSF_LINUX_POLLIN,
-            },
-        };
-        int ret = VSF_LINUX_WRAPPER(poll)(fds, 1, priv->rcvto);
-        if (ret <= 0) {
+        vsf_linux_trigger_t trig;
+        vsf_linux_trigger_init(&trig);
+        short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, &trig, vsf_protect_sched());
+        if (!(events & VSF_LINUX_POLLIN)) {
             return VSF_LINUX_SOCKET_INVALID_SOCKET;
         }
     }
