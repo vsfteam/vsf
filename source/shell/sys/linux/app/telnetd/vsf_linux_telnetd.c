@@ -110,6 +110,7 @@ void vsf_linux_telnetd_thread(vsf_linux_telnetd_t *telnetd)
         process->shell_process = process;
         vsf_linux_start_process(process);
 
+        close(client_sock);
         continue;
     delete_process_and_close_client:
         vsf_linux_delete_process(process);
