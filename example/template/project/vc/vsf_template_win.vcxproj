@@ -1543,6 +1543,7 @@
     <ClCompile Include="..\..\demo\gato_demo\gato_demo.c" />
     <ClCompile Include="..\..\demo\guilite_demo\guilite_demo.c" />
     <ClCompile Include="..\..\demo\guilite_demo\UIcode.cpp" />
+    <ClCompile Include="..\..\demo\hal_demo\spi_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\usart_demo.c" />
     <ClCompile Include="..\..\demo\json_demo\json_demo.c" />
     <ClCompile Include="..\..\demo\kernel_test\cross_task_test.c" />
