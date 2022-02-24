@@ -652,9 +652,26 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     return VSF_ERR_FAIL;
 }
 
+int vsf_linux_is_stdio_stream(int fd)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    vsf_linux_fd_priv_t* priv = sfd->priv;
+
+    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(cur_process != NULL);
+    vsf_linux_process_t *stdio_process = &__vsf_linux.process_for_resources;
+
+    vsf_linux_fd_t *sfd_stdin = __vsf_linux_fd_get_ex(stdio_process, STDIN_FILENO);
+    vsf_linux_fd_t *sfd_stdout = __vsf_linux_fd_get_ex(stdio_process, STDOUT_FILENO);
+    vsf_linux_fd_t *sfd_stderr = __vsf_linux_fd_get_ex(stdio_process, STDERR_FILENO);
+    return  (priv == sfd_stdin->priv)
+        ||  (priv == sfd_stdout->priv)
+        ||  (priv == sfd_stderr->priv);
+}
+
 int isatty(int fd)
 {
-    // terminal is __vsf_linux.stdio_stream
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     VSF_LINUX_ASSERT(sfd != NULL);
     vsf_linux_fd_priv_t* priv = sfd->priv;

@@ -347,6 +347,8 @@ extern void vsf_linux_tls_free(int idx);
 extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
 #   endif
 
+extern int vsf_linux_is_stdio_stream(int fd);
+
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 

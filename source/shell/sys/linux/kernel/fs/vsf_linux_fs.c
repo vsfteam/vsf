@@ -1565,7 +1565,7 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
         }
 
         cursize = vsf_stream_read(stream, buf, size);
-        if ((sfd->fd == STDIN_FILENO) && isatty(sfd->fd)) {
+        if ((sfd->fd == STDIN_FILENO) && vsf_linux_is_stdio_stream(sfd->fd)) {
 #if VSF_LINUX_USE_TERMIOS == ENABLED
             vsf_linux_process_t *process = vsf_linux_get_cur_process();
             VSF_LINUX_ASSERT(process != NULL);
