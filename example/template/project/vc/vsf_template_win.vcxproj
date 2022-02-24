@@ -620,6 +620,8 @@
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_cfg.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\ntp\vsf_linux_ntp.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\arpa\inet.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\dirent.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\err.h" />
@@ -1484,6 +1486,8 @@
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_event.c" />
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_pixelformat.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\ntp\vsf_linux_ntp.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c" />

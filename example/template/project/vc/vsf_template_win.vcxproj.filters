@@ -1123,6 +1123,12 @@
     <Filter Include="vsf\hal\driver\x86\win\rtc">
       <UniqueIdentifier>{66ffeef7-6d0b-4cab-ba57-53e07e5c5c47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\app\ntp">
+      <UniqueIdentifier>{55818377-59ed-4591-905c-d8558feaed07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\app\telnet">
+      <UniqueIdentifier>{66c9d1a9-98d4-4c12-afac-36a2942617d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3332,6 +3338,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\ntp\vsf_linux_ntp.h">
+      <Filter>vsf\shell\sys\linux\app\ntp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.h">
+      <Filter>vsf\shell\sys\linux\app\telnet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5812,6 +5824,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\ntp\vsf_linux_ntp.c">
+      <Filter>vsf\shell\sys\linux\app\ntp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.c">
+      <Filter>vsf\shell\sys\linux\app\telnet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
