@@ -126,6 +126,11 @@ typedef struct vsf_hw_spi_t {
     } request;
 } vsf_hw_spi_t;
 
+/*============================ PROTOTYPES ====================================*/
+
+void vsf_hw_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index);
+void vsf_hw_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index);
+
 /*============================ IMPLEMENTATION ================================*/
 
 static vsf_err_t __clock_init(vsf_hw_spi_t *hw_spi_ptr, uint32_t clock_hz)
@@ -200,7 +205,7 @@ vsf_err_t vsf_hw_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
     reg->CR[2] = (0x01ul <<  6); // en dma
     reg->CR[3] = ((0x02ul << 8) | (0x01ul << 0));
 
-    hw_spi_ptr->is_auto_cs = !!(cfg_ptr->mode & SPI_AUTO_CS_MASK);
+    hw_spi_ptr->is_auto_cs = ((cfg_ptr->mode & SPI_AUTO_CS_MASK) == SPI_AUTO_CS_ENABLE);
     hw_spi_ptr->isr = cfg_ptr->isr;
     if (hw_spi_ptr->isr.handler_fn != NULL) {
         uint32_t prio = (uint32_t)hw_spi_ptr->isr.prio;
