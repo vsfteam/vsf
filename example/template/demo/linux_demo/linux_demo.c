@@ -251,13 +251,17 @@ int vsf_linux_create_fhs(void)
     busybox_bind(VSF_LINUX_CFG_BIN_PATH "/json", json_main);
 #endif
 #if APP_USE_HAL_DEMO == ENABLED
-#   if APP_USE_HAL_USART_DEMO == ENABLED && VSF_HAL_USE_USART == ENABLED
-    extern int usart_main(int argc, char *argv[]);
-    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/usart", usart_main);
-#   endif
 #   if APP_USE_HAL_GPIO_DEMO == ENABLED && VSF_HAL_USE_GPIO == ENABLED
     extern int gpio_main(int argc, char *argv[]);
     busybox_bind(VSF_LINUX_CFG_BIN_PATH "/gpio", gpio_main);
+#   endif
+#   if APP_USE_HAL_SPI_DEMO == ENABLED && VSF_HAL_USE_GPIO == ENABLED
+    extern int spi_main(int argc, char *argv[]);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/spi", spi_main);
+#   endif
+#   if APP_USE_HAL_USART_DEMO == ENABLED && VSF_HAL_USE_USART == ENABLED
+    extern int usart_main(int argc, char *argv[]);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/usart", usart_main);
 #   endif
 #endif
 #if APP_USE_STREAM_HAL_DEMO == ENABLED
