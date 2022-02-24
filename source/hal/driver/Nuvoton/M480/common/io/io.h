@@ -24,6 +24,11 @@
 
 /*============================ MACROS ========================================*/
 
+#define VSF_IO_REIMPLEMENT_FEATURE          ENABLED
+#define VSF_IO_REIMPLEMENT_PORT_NO          ENABLED
+#define VSF_IO_REIMPLEMENT_PIN_MSK          ENABLED
+#define VSF_IO_REIMPLEMENT_PIN_NUNBER       ENABLED
+
 #define __IO_PINA_NUM(__N, __OFFSET)        PA##__N = (__OFFSET) + (__N),       \
                                             PA##__N##_idx = (__OFFSET) + (__N),
 #define __IO_PINB_NUM(__N, __OFFSET)        PB##__N = (__OFFSET) + (__N),       \
@@ -61,9 +66,9 @@ struct vsf_gpio_t {
     GPIO_T *reg;
 };
 
-//! \name PIN name 
+//! \name PIN name
 //! @{
-enum io_pin_no_t {
+typedef enum io_pin_no_t {
 #if defined(PIO_PORTA)
     VSF_MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_NUM, 0)
 #endif
@@ -76,12 +81,12 @@ enum io_pin_no_t {
 #if defined(PIO_PORTD)
     VSF_MREPEAT(PIO_PORTD_PIN_NUM, __IO_PIND_NUM, 48)
 #endif
-};
+} io_pin_no_t;
 //! @}
 
-//! \name PIN name 
+//! \name PIN name
 //! @{
-enum io_pin_msk_t{
+typedef enum io_pin_msk_t{
 #if defined(PIO_PORTA)
     VSF_MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_MSK, 0)
 #endif
@@ -94,12 +99,12 @@ enum io_pin_msk_t{
 #if defined(PIO_PORTD)
     VSF_MREPEAT(PIO_PORTD_PIN_NUM, __IO_PIND_MSK, 0)
 #endif
-};
+} io_pin_msk_t;
 //! @}
 
 //! \name port name
 //! @{
-enum io_port_no_t{
+typedef enum io_port_no_t{
 #if defined(PIO_PORTA)
     PORTA, PORTA_idx = PORTA,
 #endif
@@ -112,12 +117,12 @@ enum io_port_no_t{
 #if defined(PIO_PORTD)
     PORTD, PORTD_idx = PORTD,
 #endif
-};
+} io_port_no_t;
 //! @}
 
 //! \name IO model
 //! @{
-enum io_model_t{
+typedef enum io_model_t {
     IO_ANALOG_INPUT         = 0x00,
     IO_INPUT_FLOAT          = 0x00,
     IO_INPUT_PU             = 0x10,
@@ -135,7 +140,7 @@ enum io_model_t{
 
     IO_DISABLE_INPUT        = (1<<8),           //!< disable input
 /*
-    IO_INVERT_INPUT         = (1<<6),           //!< invert the input pin level 
+    IO_INVERT_INPUT         = (1<<6),           //!< invert the input pin level
 
 
     IO_FILTER_BYPASS        = (0<<11),          //!< filter is bypassed
@@ -157,7 +162,7 @@ enum io_model_t{
     IO_HIGH_DRIVE           = (1<<9),           //!< enable high drive strength
     IO_HIGH_DRIVE_STRENGTH  = (1<<9),           //!< enable high drive strength
 */
-};
+} io_model_t;
 //! @}
 
 /*============================ GLOBAL VARIABLES ==============================*/

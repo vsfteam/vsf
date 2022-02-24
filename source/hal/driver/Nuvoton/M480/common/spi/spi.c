@@ -483,8 +483,4 @@ __vsf_hw_spi_imp_lv0(6, NULL)
 __vsf_hw_spi_imp_lv0(7, NULL)
 #endif
 
-#if VSF_HAL_SPI_IMP_INTERFACE == ENABLED
-#   include "hal/driver/common/spi/__spi_cs_common.inc"
-#endif
-
 #endif

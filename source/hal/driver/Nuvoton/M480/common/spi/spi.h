@@ -25,6 +25,8 @@
 
 #if VSF_HAL_USE_SPI == ENABLED
 
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+
 /*============================ MACROS ========================================*/
 #define SPI_CTL_MODE_MASK           (  SPI_CTL_SLAVE_Msk  | SPI_CTL_CLKPOL_Msk  \
                                      | SPI_CTL_TXNEG_Msk  | SPI_CTL_RXNEG_Msk   \
@@ -46,6 +48,7 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
 typedef enum em_spi_irq_mask_t {
     SPI_IRQ_MASK_TX_CPL = 1 << 0,
     SPI_IRQ_MASK_CPL    = 1 << 1,   // SPI completed recepiton and transmission
@@ -118,11 +121,14 @@ typedef enum em_spi_mode_t {
     SPI_SLAVE_SELECTION_ACTIVE_HIGH   = 1 << (SPI_SSCTL_SSACTPOL_Pos + SPI_SSCTL_POS),
 } em_spi_mode_t;
 
+typedef struct spi_status_t spi_status_t;
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/driver/common/template/vsf_template_spi.h"
 
 /*============================ TYPES =========================================*/
+
 struct spi_status_t {
     union {
         inherit(peripheral_status_t)
@@ -137,7 +143,7 @@ typedef struct vsf_spi_dma_t {
     void     *buffer;
 } vsf_spi_dma_t;
 
-struct vsf_spi_t {
+typedef struct vsf_spi_t {
     SPI_T           *reg;
     IRQn_Type       irq;
 
@@ -149,7 +155,7 @@ struct vsf_spi_t {
 
     vsf_spi_dma_t tx_dma;
     vsf_spi_dma_t rx_dma;
-};
+} vsf_spi_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -177,10 +183,6 @@ extern vsf_spi_t vsf_spi6;
 #endif
 #if SPI_MAX_PORT >= 7 && VSF_HAL_USE_SPI7 == ENABLED && (SPI_PORT_MASK & (1 << 7))
 extern vsf_spi_t vsf_spi7;
-#endif
-
-#if VSF_HAL_SPI_IMP_INTERFACE == ENABLED
-#   include "hal/driver/common/spi/__spi_cs_common.h"
 #endif
 
 #endif
