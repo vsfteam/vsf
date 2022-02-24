@@ -36,15 +36,23 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_MULTIPLEXER_SPI_MASK_TYPE
-#   define VSF_MULTIPLEXER_SPI_MASK_TYPE    uint8_t
+#ifndef VSF_MULTIPLEXER_SPI_CFG_MASK_TYPE
+#   define VSF_MULTIPLEXER_SPI_CFG_MASK_TYPE        uint8_t
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-typedef VSF_MULTIPLEXER_SPI_MASK_TYPE spi_multi_cs_mask_t;
+typedef VSF_MULTIPLEXER_SPI_CFG_MASK_TYPE spi_multi_mask_t;
 
 /*============================ TYPES =========================================*/
+
+typedef struct multiplex_spi_request_t {
+    void *out_buffer_ptr;
+    void *in_buffer_ptr;
+    uint_fast32_t count;
+} multiplex_spi_request_t;
+
+vsf_declare_class(vsf_multiplex_spi_t)
 
 vsf_class(vsf_multiplex_spi_info_t) {
     public_member(
@@ -53,12 +61,19 @@ vsf_class(vsf_multiplex_spi_info_t) {
 
     private_member(
         vsf_slist_queue_t list;
+
+        // inited configraction
+        vsf_multiplex_spi_t *cfg_spi_ptr;
+        spi_multi_mask_t     init_mask;
+
+        // enable/disable mask
+        spi_multi_mask_t     en_mask;
+
+        // cs mask
+        spi_multi_mask_t     cs_mask;
+
+        // irq mask
         em_spi_irq_mask_t irq_mask;     // All CS IRQ Mask Wire-OR
-        struct {
-            spi_multi_cs_mask_t init;
-            spi_multi_cs_mask_t en;
-            spi_multi_cs_mask_t cs;
-        } api_mask;
     )
 };
 
@@ -75,11 +90,7 @@ vsf_class(vsf_multiplex_spi_t) {
         spi_cfg_t spi_cfg;              // init and re-init
         em_spi_irq_mask_t irq_mask;     // enable/disable interrupt
         uint_fast32_t transfered_count;
-        struct {
-            void *out_buffer_ptr;
-            void *in_buffer_ptr;
-            uint_fast32_t count;
-        } request;
+        multiplex_spi_request_t request;
     )
 };
 

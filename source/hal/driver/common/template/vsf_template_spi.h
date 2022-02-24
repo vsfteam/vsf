@@ -32,6 +32,10 @@ extern "C" {
 #   define VSF_SPI_CFG_MULTI_CLASS          DISABLED
 #endif
 
+#ifndef VSF_SPI_CFG_MULTIPLEX_CS
+#   define VSF_SPI_CFG_MULTIPLEX_CS         ENABLED
+#endif
+
 #ifndef VSF_SPI_CFG_MULTIPLEX
 #   define VSF_SPI_CFG_MULTIPLEX            ENABLED
 #endif
@@ -52,16 +56,22 @@ extern "C" {
 #   define VSF_SPI_REIMPLEMENT_CAPABILITY   DISABLED
 #endif
 
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SPI_CFG_MULTI_CLASS == DISABLED
 #   ifndef VSF_SPI_CFG_PREFIX
-#       define VSF_SPI_CFG_PREFIX             vsf_hw
+#       define VSF_SPI_CFG_PREFIX               vsf_hw
+#   endif
+#   ifndef VSF_SPI_CFG_MULTIPLEX_CS_PREFIX
+#       define VSF_SPI_CFG_MULTIPLEX_CS_PREFIX  vsf_multiplex
 #   endif
 
 #   ifndef VSF_SPI_CFG_REAL_PREFIX
-#       define VSF_SPI_CFG_REAL_PREFIX        VSF_SPI_CFG_PREFIX
+#       if VSF_SPI_CFG_MULTIPLEX_CS == ENABLED
+#           define VSF_SPI_CFG_REAL_PREFIX      VSF_SPI_CFG_MULTIPLEX_CS_PREFIX
+#       else
+#           define VSF_SPI_CFG_REAL_PREFIX      VSF_SPI_CFG_PREFIX
+#       endif
 #   endif
 
 #   define ____VSF_SPI_WRAPPER(__header, __api)   __header ## _ ## __api
@@ -72,6 +82,7 @@ extern "C" {
 #   define vsf_spi_irq_enable           __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_irq_enable)
 #   define vsf_spi_irq_disable          __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_irq_disable)
 #   define vsf_spi_status               __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_status)
+#   define vsf_spi_capability           __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_capability)
 #   define vsf_spi_cs_active            __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_cs_active)
 #   define vsf_spi_cs_inactive          __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_cs_inactive)
 #   define vsf_spi_fifo_transfer        __VSF_SPI_WRAPPER(VSF_SPI_CFG_REAL_PREFIX, spi_fifo_transfer)
@@ -92,6 +103,8 @@ extern "C" {
     vsf_spi_irq_disable((vsf_spi_t *)spi_ptr, irq_mask)
 #define VSF_SPI_STATUS(spi_ptr)                                                 \
     vsf_spi_status((vsf_spi_t *)spi_ptr)
+#define VSF_SPI_CAPABILITY(spi_ptr)                                             \
+    vsf_spi_capability((vsf_spi_t *)spi_ptr)
 #define VSF_SPI_CS_ACTIVE(spi_ptr, index)                                       \
     vsf_spi_cs_active((vsf_spi_t *)spi_ptr, index)
 #define VSF_SPI_CS_INACTIVE(spi_ptr, index)                                     \
