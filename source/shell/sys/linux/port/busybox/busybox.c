@@ -78,7 +78,8 @@ int busybox_install(void)
     }
 
 #if VSF_LINUX_USE_BUSYBOX == ENABLED
-    if (    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/ls", ls_main) < 0
+    if (    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/sh", vsh_main) < 0
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/ls", ls_main) < 0
         ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/cd", cd_main) < 0
         ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/pwd", pwd_main) < 0
         ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/cat", cat_main) < 0
