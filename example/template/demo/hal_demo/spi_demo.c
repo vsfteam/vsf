@@ -23,9 +23,9 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef APP_SPI_DEMO_CFG_DEBUG
-#   define APP_SPI_DEMO_CFG_DEBUG                       ENABLED
-#endif
+extern vsf_multiplex_spi_t multiplex_spi1;
+#undef APP_SPI_DEMO_CFG_SPI
+#define APP_SPI_DEMO_CFG_SPI (vsf_spi_t *)&multiplex_spi1
 
 #ifndef APP_SPI_DEMO_CFG_SPI
 #   define APP_SPI_DEMO_CFG_SPI                         (vsf_spi_t *)&vsf_spi0
@@ -35,12 +35,19 @@
 #   define APP_SPI_DEMO_CFG_DATASIZE                    SPI_DATASIZE_8
 #endif
 
-#ifndef APP_SPI_DEMO_CFG_MODE
-#   define APP_SPI_DEMO_CFG_MODE                        (SPI_MASTER | SPI_MODE_0 | SPI_MSB_FIRST | SPI_AUTO_CS_ENABLE | APP_SPI_DEMO_CFG_DATASIZE)
+#ifndef APP_SPI_DEMO_CFG_AUTO_CS_EN
+#   define APP_SPI_DEMO_CFG_AUTO_CS_EN                  DISABLED
+#endif
+
+#define __APP_SPI_DEMO_MODE                             (SPI_MASTER | SPI_MODE_0 | SPI_MSB_FIRST | APP_SPI_DEMO_CFG_DATASIZE)
+#if APP_SPI_DEMO_CFG_AUTO_CS_EN == ENABLED
+#   define APP_SPI_DEMO_CFG_MODE                        (__APP_SPI_DEMO_MODE | SPI_AUTO_CS_ENABLE)
+#else
+#   define APP_SPI_DEMO_CFG_MODE                        (__APP_SPI_DEMO_MODE | SPI_AUTO_CS_DISABLE)
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_SPEED
-#   define APP_SPI_DEMO_CFG_SPEED                       (1ul * 1000ul * 1000ul)
+#   define APP_SPI_DEMO_CFG_SPEED                       (1ul * 100ul * 1000ul)
 #endif
 
 #ifndef APP_SPI_DEMO_IRQ_PRIO
@@ -48,27 +55,27 @@
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_BUFFER_SIZE
-#   define APP_SPI_DEMO_CFG_BUFFER_SIZE                 256
+#   define APP_SPI_DEMO_CFG_BUFFER_SIZE                 (1024)
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_FIFO_SEND_TEST
-#   define APP_SPI_DEMO_CFG_FIFO_SEND_TEST              ENABLED
+#   define APP_SPI_DEMO_CFG_FIFO_SEND_TEST              DISABLED
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_FIFO_RECV_TEST
-#   define APP_SPI_DEMO_CFG_FIFO_RECV_TEST              ENABLED
+#   define APP_SPI_DEMO_CFG_FIFO_RECV_TEST              DISABLED
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST
-#   define APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST         ENABLED
+#   define APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST         DISABLED
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_REQUEST_SEND_TEST
-#   define APP_SPI_DEMO_CFG_REQUEST_SEND_TEST           ENABLED
+#   define APP_SPI_DEMO_CFG_REQUEST_SEND_TEST           DISABLED
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_REQUEST_RECV_TEST
-#   define APP_SPI_DEMO_CFG_REQUEST_RECV_TEST           ENABLED
+#   define APP_SPI_DEMO_CFG_REQUEST_RECV_TEST           DISABLED
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST
@@ -208,7 +215,7 @@ static void __spi_request_isr_handler(void              *target,
     VSF_ASSERT(demo != NULL);
 
     if (irq_mask & SPI_IRQ_MASK_CPL) {
-#if (APP_SPI_DEMO_CFG_MODE & SPI_AUTO_CS_MASK) == SPI_AUTO_CS_DISABLE
+#if APP_SPI_DEMO_CFG_AUTO_CS_EN == DISABLED
         vsf_spi_cs_inactive(spi_ptr, 0);
 #endif
 
@@ -233,7 +240,7 @@ static void __spi_demo_request(app_spi_demo_t   *demo,
                           demo, APP_SPI_DEMO_IRQ_PRIO, SPI_IRQ_MASK_CPL);
     VSF_ASSERT(err == VSF_ERR_NONE);
 
-#if (APP_SPI_DEMO_CFG_MODE & SPI_AUTO_CS_MASK) == SPI_AUTO_CS_DISABLE
+#if APP_SPI_DEMO_CFG_AUTO_CS_EN == DISABLED
     vsf_spi_cs_active(spi_ptr, 0);
 #endif
 
@@ -293,7 +300,6 @@ int VSF_USER_ENTRY(void)
     vsf_stdio_init();
 #   endif
 #endif
-
 
 #if APP_SPI_DEMO_CFG_FIFO_SEND_TEST == ENABLED
     __spi_demo_fifo_send_only(APP_SPI_DEMO_CFG_SPI);
