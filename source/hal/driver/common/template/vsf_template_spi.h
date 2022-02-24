@@ -36,10 +36,6 @@ extern "C" {
 #   define VSF_SPI_CFG_MULTIPLEX_CS         ENABLED
 #endif
 
-#ifndef VSF_SPI_CFG_MULTIPLEX
-#   define VSF_SPI_CFG_MULTIPLEX            ENABLED
-#endif
-
 #ifndef VSF_SPI_REIMPLEMENT_MODE
 #   define VSF_SPI_REIMPLEMENT_MODE         DISABLED
 #endif
@@ -394,7 +390,7 @@ extern int_fast32_t     vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
 
 /*============================ INCLUDES ======================================*/
 
-#if VSF_SPI_CFG_MULTIPLEX == ENABLED
+#if VSF_SPI_CFG_MULTIPLEX_CS == ENABLED
 #   include "hal/driver/common/template/vsf_template_io.h"
 #   include "hal/driver/common/spi/multiplex_spi.h"
 #endif
