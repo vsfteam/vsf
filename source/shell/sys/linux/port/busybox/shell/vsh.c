@@ -260,9 +260,6 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     close(exefd);
 
     vsf_linux_process_ctx_t *ctx = &process->ctx;
-    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
-    process->shell_process = cur_process->shell_process;
-
     char *strdupped = __strdup_ex(process, cmd);
     if (NULL == strdupped) {
         goto delete_process_and_fail;

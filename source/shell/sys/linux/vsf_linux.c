@@ -810,6 +810,7 @@ vsf_linux_process_t * vsf_linux_create_process(int stack_size)
         vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
         VSF_LINUX_ASSERT(cur_process != NULL);
         process->parent_process = cur_process;
+        process->shell_process = cur_process->shell_process;
 
         process->working_dir = __strdup_ex(process, cur_process->working_dir);
         if (NULL == process->working_dir) {
@@ -1904,13 +1905,14 @@ int posix_spawnp(pid_t *pid, const char *file,
     vsf_linux_process_t *process = vsf_linux_create_process(0);
     if (NULL == process) { return -ENOMEM; }
     vsf_linux_process_ctx_t *ctx = &process->ctx;
-    process->shell_process = process;
     ctx->entry = entry;
     VSF_LINUX_ASSERT(argv != NULL);
     __vsf_linux_process_parse_arg(process, (const char * const *)argv);
 
-    // dup fds
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    process->shell_process = cur_process->shell_process;
+
+    // dup fds
     vsf_linux_fd_t *sfd, *sfd_new;
     vsf_protect_t orig;
     __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
