@@ -683,12 +683,13 @@ int isatty(int fd)
         return 0;
     }
 
-    vsf_linux_fd_t *shell_sfd_stdin = __vsf_linux_fd_get_ex(shell_process, STDIN_FILENO);
-    vsf_linux_fd_t *shell_sfd_stdout = __vsf_linux_fd_get_ex(shell_process, STDOUT_FILENO);
-    vsf_linux_fd_t *shell_sfd_stderr = __vsf_linux_fd_get_ex(shell_process, STDERR_FILENO);
-    return  (priv == shell_sfd_stdin->priv)
-        ||  (priv == shell_sfd_stdout->priv)
-        ||  (priv == shell_sfd_stderr->priv);
+    vsf_linux_fd_t *stdio_sfd = __vsf_linux_fd_get_ex(shell_process, STDIN_FILENO);
+    if ((stdio_sfd != NULL) && (stdio_sfd->priv == priv)) { return true; }
+    stdio_sfd = __vsf_linux_fd_get_ex(shell_process, STDOUT_FILENO);
+    if ((stdio_sfd != NULL) && (stdio_sfd->priv == priv)) { return true; }
+    stdio_sfd = __vsf_linux_fd_get_ex(shell_process, STDERR_FILENO);
+    if ((stdio_sfd != NULL) && (stdio_sfd->priv == priv)) { return true; }
+    return 0;
 }
 
 vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op,
