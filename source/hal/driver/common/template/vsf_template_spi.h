@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 #ifndef VSF_SPI_CFG_MULTIPLEX_CS
-#   define VSF_SPI_CFG_MULTIPLEX_CS         ENABLED
+#   define VSF_SPI_CFG_MULTIPLEX_CS         DISABLED
 #endif
 
 #ifndef VSF_SPI_REIMPLEMENT_MODE
