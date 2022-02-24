@@ -6,7 +6,7 @@
 int telnetd_main(int argc, char *argv[])
 {
     vsf_linux_telnetd_t telnetd = {
-        .port       = htons(23),
+        .port       = 23,
         .backlog    = 1,
     };
     vsf_linux_telnetd_thread(&telnetd);
