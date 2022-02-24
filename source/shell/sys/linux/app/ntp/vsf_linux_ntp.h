@@ -33,6 +33,7 @@
 #include "hal/driver/common/template/vsf_template_rtc.h"
 
 #if     defined(__VSF_LINUX_NTP_CLASS_IMPLEMENT)
+#   undef __VSF_LINUX_NTP_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #endif
 

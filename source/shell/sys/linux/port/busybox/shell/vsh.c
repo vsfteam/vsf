@@ -283,41 +283,24 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     }
 
     extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
-                const vsf_linux_fd_op_t *op, int fd_desired, bool allocate_priv);
+                const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv);
     extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
     vsf_linux_fd_t *sfd, *sfd_from;
-    vsf_protect_t orig;
     if (fd_in >= 0) {
         sfd_from = vsf_linux_fd_get(fd_in);
         VSF_LINUX_ASSERT(sfd_from != NULL);
 
-        if (STDIN_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, false)) {
+        if (STDIN_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, sfd_from->priv)) {
             goto delete_process_and_fail;
         }
-        sfd->priv = sfd_from->priv;
-        orig = vsf_protect_sched();
-            sfd->priv->ref++;
-#if VSF_LINUX_CFG_FD_TRACE == ENABLED
-            vsf_trace_debug("%s dup fds: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
-                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
-#endif
-        vsf_unprotect_sched(orig);
     }
     if (fd_out >= 0) {
         sfd_from = vsf_linux_fd_get(fd_out);
         VSF_LINUX_ASSERT(sfd_from != NULL);
 
-        if (STDOUT_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, false)) {
+        if (STDOUT_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, sfd_from->priv)) {
             goto delete_process_and_fail;
         }
-        sfd->priv = sfd_from->priv;
-        orig = vsf_protect_sched();
-            sfd->priv->ref++;
-#if VSF_LINUX_CFG_FD_TRACE == ENABLED
-            vsf_trace_debug("%s dup fds: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
-                        __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
-#endif
-        vsf_unprotect_sched(orig);
     }
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
@@ -447,18 +430,6 @@ int vsh_main(int argc, char *argv[])
     char ch;
     vsh_shell_state_t state;
 
-
-#if VSH_HAS_COLOR
-    printf(VSH_COLOR_NORMAL);
-#endif
-    printf("path: %s" VSH_LINEEND,
-#if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
-        __vsh_path
-#else
-        getenv("PATH")
-#endif
-    );
-
     if ((argc > 2) && !strcmp(argv[1], "-c")) {
         if (strlen(argv[2]) >= VSH_CMD_SIZE) {
             return -ENOMEM;
@@ -467,6 +438,17 @@ int vsh_main(int argc, char *argv[])
         strcpy(ctx.cmd, argv[2]);
         return __vsh_run_cmd(ctx.cmd);
     }
+
+#if VSH_HAS_COLOR
+    printf(VSH_COLOR_NORMAL);
+#endif
+    printf("VSF Linux\npath: %s" VSH_LINEEND,
+#if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
+        __vsh_path
+#else
+        getenv("PATH")
+#endif
+    );
 
     while (1) {
     input_cmd:
