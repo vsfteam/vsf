@@ -321,7 +321,7 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
 
                 if (priv != NULL) {
                     FD_CLR(rfds.fd_array[i], &__vsf_linux_hostsock.select.rfds);
-                    vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, orig);
+                    vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, orig);
                 } else {
                     vsf_unprotect_sched(orig);
                 }
@@ -338,7 +338,7 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
 
                 if (priv != NULL) {
                     FD_CLR(wfds.fd_array[i], &__vsf_linux_hostsock.select.wfds);
-                    vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, orig);
+                    vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, orig);
                 } else {
                     vsf_unprotect_sched(orig);
                 }
@@ -357,11 +357,11 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
                 if (priv != NULL) {
                     if (FD_ISSET(i, &rfds)) {
                         FD_CLR(i, &__vsf_linux_hostsock.select.rfds);
-                        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, vsf_protect_sched());
+                        vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, vsf_protect_sched());
                     }
                     if (FD_ISSET(i, &wfds)) {
                         FD_CLR(i, &__vsf_linux_hostsock.select.wfds);
-                        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, vsf_protect_sched());
+                        vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, vsf_protect_sched());
                     }
                     ret--;
                 }
