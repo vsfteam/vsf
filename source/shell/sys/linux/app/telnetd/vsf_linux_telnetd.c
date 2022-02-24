@@ -103,6 +103,9 @@ void vsf_linux_telnetd_thread(vsf_linux_telnetd_t *telnetd)
         if (STDOUT_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, sfd_from->priv)) {
             goto delete_process_and_close_client;
         }
+        if (STDERR_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDERR_FILENO, sfd_from->priv)) {
+            goto delete_process_and_close_client;
+        }
         vsf_linux_detach_process(process);
         process->shell_process = process;
         vsf_linux_start_process(process);

@@ -123,8 +123,6 @@ typedef struct vsf_linux_t {
     vsf_linux_process_t process_for_resources;
     vsf_linux_process_t *kernel_process;
 
-    vsf_linux_stdio_t stdio_stream;
-
 #if VSF_LINUX_CFG_SHM_NUM > 0
     struct {
         vsf_bitmap(vsf_linux_shm_bitmap) bitmap;
@@ -624,16 +622,16 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     VSF_LINUX_ASSERT(ret == STDIN_FILENO);
     priv = (vsf_linux_stream_priv_t *)sfd->priv;
     priv->stream_rx = stdio_stream->in;
+    priv->flags = O_RDONLY;
     __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
-    __vsf_linux.stdio_stream.in = sfd->priv;
 
     ret = __vsf_linux_fd_create_ex(vsf_linux_resources_process(), &sfd,
         &__vsf_linux_stream_fdop, STDOUT_FILENO, NULL);
     VSF_LINUX_ASSERT(ret == STDOUT_FILENO);
     priv = (vsf_linux_stream_priv_t *)sfd->priv;
     priv->stream_tx = stdio_stream->out;
+    priv->flags = O_WRONLY;
     __vsf_linux_tx_stream_init(sfd, priv->stream_tx);
-    __vsf_linux.stdio_stream.out = sfd->priv;
 
     ret = __vsf_linux_fd_create_ex(vsf_linux_resources_process(), &sfd,
         &__vsf_linux_stream_fdop, STDERR_FILENO, NULL);
@@ -646,7 +644,6 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     priv->stream_tx = stdio_stream->err;
     __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
     __vsf_linux_tx_stream_init(sfd, priv->stream_tx);
-    __vsf_linux.stdio_stream.err = sfd->priv;
 
     // create kernel process(pid0)
     if (NULL != __vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, VSF_LINUX_CFG_PRIO_LOWEST)) {
@@ -661,9 +658,20 @@ int isatty(int fd)
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     VSF_LINUX_ASSERT(sfd != NULL);
     vsf_linux_fd_priv_t* priv = sfd->priv;
-    return  (priv == __vsf_linux.stdio_stream.in)
-        ||  (priv == __vsf_linux.stdio_stream.out)
-        ||  (priv == __vsf_linux.stdio_stream.err);
+
+    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(cur_process != NULL);
+    vsf_linux_process_t *shell_process = cur_process->shell_process;
+    if (NULL == shell_process) {
+        return 0;
+    }
+
+    vsf_linux_fd_t *shell_sfd_stdin = __vsf_linux_fd_get_ex(shell_process, STDIN_FILENO);
+    vsf_linux_fd_t *shell_sfd_stdout = __vsf_linux_fd_get_ex(shell_process, STDOUT_FILENO);
+    vsf_linux_fd_t *shell_sfd_stderr = __vsf_linux_fd_get_ex(shell_process, STDERR_FILENO);
+    return  (priv == shell_sfd_stdin->priv)
+        ||  (priv == shell_sfd_stdout->priv)
+        ||  (priv == shell_sfd_stderr->priv);
 }
 
 vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op,
@@ -777,24 +785,19 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
     return process;
 }
 
-vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdio_t *stdio_stream, char *working_dir)
+vsf_linux_process_t * vsf_linux_create_process(int stack_size)
 {
-    VSF_LINUX_ASSERT(stdio_stream != NULL);
-    VSF_LINUX_ASSERT(working_dir != NULL);
-
     vsf_linux_process_t *process = __vsf_linux_create_process(stack_size);
     if (process != NULL) {
-        process->working_dir = __strdup_ex(process, working_dir);
+        vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(cur_process != NULL);
+        process->parent_process = cur_process;
+
+        process->working_dir = __strdup_ex(process, cur_process->working_dir);
         if (NULL == process->working_dir) {
             goto delete_process_and_fail;
         }
 
-        process->stdio_stream = *stdio_stream;
-        VSF_LINUX_ASSERT(process->working_dir != NULL);
-
-        vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
-        VSF_LINUX_ASSERT(cur_process != NULL);
-        process->parent_process = cur_process;
         vsf_protect_t orig = vsf_protect_sched();
             vsf_dlist_add_to_tail(vsf_linux_process_t, child_node, &cur_process->child_list, process);
         vsf_unprotect_sched(orig);
@@ -809,14 +812,6 @@ vsf_linux_process_t * vsf_linux_create_process_ex(int stack_size, vsf_linux_stdi
 delete_process_and_fail:
     vsf_linux_delete_process(process);
     return NULL;
-}
-
-vsf_linux_process_t * vsf_linux_create_process(int stack_size)
-{
-    vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(parent_process != NULL);
-
-    return vsf_linux_create_process_ex(stack_size, &parent_process->stdio_stream, parent_process->working_dir);
 }
 
 int vsf_linux_start_process(vsf_linux_process_t *process)
@@ -984,8 +979,6 @@ static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
             vsf_linux_delete_process(process);
             return NULL;
         }
-        process->stdio_stream = __vsf_linux.stdio_stream;
-        VSF_LINUX_ASSERT(process->working_dir != NULL);
         vsf_linux_start_process(process);
     }
     return process;
@@ -1114,32 +1107,43 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_process_t *process = thread->process;
+    vsf_linux_process_t *shell_process = process->shell_process;
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_fd_priv_t *stdin_priv = NULL;
-    vsf_linux_fd_t *sfd;
+    vsf_linux_fd_t *sfd, *sfd_from;
     int ret;
+
+    if ((NULL == shell_process) || (shell_process == process)) {
+        shell_process = &__vsf_linux.process_for_resources;
+    }
 
     sfd = vsf_linux_fd_get(0);
     if (NULL == sfd) {
-        ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDIN_FILENO, process->stdio_stream.in);
+        sfd_from = __vsf_linux_fd_get_ex(shell_process, STDIN_FILENO);
+        VSF_LINUX_ASSERT(sfd_from != NULL);
+
+        ret = __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, sfd_from->priv);
         VSF_LINUX_ASSERT(ret == STDIN_FILENO);
-        sfd->priv->flags = O_RDONLY;
         stdin_priv = sfd->priv;
     }
 
     sfd = vsf_linux_fd_get(1);
     if (NULL == sfd) {
-        ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDOUT_FILENO, process->stdio_stream.out);
+        sfd_from = __vsf_linux_fd_get_ex(shell_process, STDOUT_FILENO);
+        VSF_LINUX_ASSERT(sfd_from != NULL);
+
+        ret = __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, sfd_from->priv);
         VSF_LINUX_ASSERT(ret == STDOUT_FILENO);
-        sfd->priv->flags = O_WRONLY;
     }
 
     sfd = vsf_linux_fd_get(2);
     if (NULL == sfd) {
-        ret = __vsf_linux_fd_create_ex(process, &sfd, &__vsf_linux_stream_fdop, STDERR_FILENO, process->stdio_stream.err);
+        sfd_from = __vsf_linux_fd_get_ex(shell_process, STDERR_FILENO);
+        VSF_LINUX_ASSERT(sfd_from != NULL);
+
+        ret = __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDERR_FILENO, sfd_from->priv);
         VSF_LINUX_ASSERT(ret == STDERR_FILENO);
         sfd->priv->target = stdin_priv;
-        sfd->priv->flags = 0;
     }
 
     vsf_linux_process_arg_t arg = ctx->arg;

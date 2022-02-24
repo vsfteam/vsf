@@ -442,7 +442,7 @@ int vsh_main(int argc, char *argv[])
 #if VSH_HAS_COLOR
     printf(VSH_COLOR_NORMAL);
 #endif
-    printf("VSF Linux\npath: %s" VSH_LINEEND,
+    printf("VSF Linux" VSH_LINEEND "path: %s" VSH_LINEEND,
 #if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
         __vsh_path
 #else
