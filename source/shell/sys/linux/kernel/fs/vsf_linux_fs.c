@@ -468,12 +468,8 @@ void vsf_linux_fd_set_status(vsf_linux_fd_priv_t *priv, short status, vsf_protec
 
 void vsf_linux_fd_clear_status(vsf_linux_fd_priv_t *priv, short status, vsf_protect_t orig)
 {
-    if ((priv->trigger != NULL) && (priv->events_pending & status)) {
-        VSF_LINUX_ASSERT(false);
-    } else {
-        priv->events &= ~(status & ~priv->sticky_events);
-        priv->status &= ~status;
-    }
+    priv->events &= ~(status & ~priv->sticky_events);
+    priv->status &= ~status;
     vsf_unprotect_sched(orig);
 }
 
