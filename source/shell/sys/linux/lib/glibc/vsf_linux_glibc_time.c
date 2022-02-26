@@ -51,7 +51,7 @@ struct vsf_linux_glibc_time_t {
 
 time_t mktime(struct tm *tm)
 {
-    const uint16_t yday_month[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+    static const uint16_t __yday_month[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
     time_t t;
 
     // tm_year in struct tm starts from 1900, time_t is calculated from 1970
@@ -62,7 +62,7 @@ time_t mktime(struct tm *tm)
     leap_years += (year + 300) / 400;
 
     t = year * 365 + leap_years;
-    t += yday_month[tm->tm_mon] + tm->tm_mday - 1;
+    t += __yday_month[tm->tm_mon] + tm->tm_mday - 1;
     t *= (time_t)86400;
     t += (((tm->tm_hour * 60) + tm->tm_min) * 60) + tm->tm_sec;
     return t;
@@ -80,19 +80,51 @@ time_t time(time_t *t)
 
 struct tm * gmtime_r(const time_t *timep, struct tm *result)
 {
-#ifdef VSF_LINUX_CFG_RTC
-    vsf_rtc_tm_t rtc_tm;
-    VSF_RTC_GET(&VSF_LINUX_CFG_RTC, &rtc_tm);
+    static const uint16_t __lyday_month[12] = {-1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
+    static const uint16_t __yday_month[12] = {-1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364};
+    VSF_LINUX_ASSERT((timep != NULL) && (result != NULL));
+    memset(result, 0, sizeof(struct tm));
 
-    VSF_LINUX_ASSERT(rtc_tm.tm_year >= 1900);
-    VSF_LINUX_ASSERT(result != NULL);
-    result->tm_sec = rtc_tm.tm_sec;
-    result->tm_min = rtc_tm.tm_min;
-    result->tm_hour = rtc_tm.tm_hour;
-    result->tm_mday = rtc_tm.tm_mday;
-    result->tm_mon = rtc_tm.tm_mon - 1;
-    result->tm_year = rtc_tm.tm_year - 1900;
-#endif
+    time_t caltime = *timep;
+    bool is_leap_year = false;
+    const uint16_t *yday_month;
+
+#define SECONDS_PER_DAY             (24 * 60 * 60)
+#define SECONDS_PER_YEAR            (365 * SECONDS_PER_DAY)
+#define SECONDS_PER_4YEARS          ((4 * 365 + 1) * SECONDS_PER_DAY)
+#define IS_LEAP_YEAR(__Y)           ((!((__Y) % 4) && ((__Y) % 100)) || !(((__Y) + 1900) % 400))
+#define LEAP_YEARS_SINCE(__Y)       ((((__Y) - 1) / 4) - (((__Y) - 1) / 100) + (((__Y) + 299) / 400) - 17)
+
+    int tmp = caltime / SECONDS_PER_YEAR;
+    caltime -= (time_t)tmp * SECONDS_PER_DAY;
+    tmp += 70;
+    caltime -= LEAP_YEARS_SINCE(tmp) * SECONDS_PER_DAY;
+    if (caltime < 0) {
+        caltime += SECONDS_PER_YEAR;
+        tmp--;
+        if (IS_LEAP_YEAR(tmp)) {
+            caltime += SECONDS_PER_DAY;
+            is_leap_year = true;
+        }
+    } else if (IS_LEAP_YEAR(tmp)) {
+        is_leap_year = true;
+    }
+
+    result->tm_year = tmp;
+    result->tm_yday = caltime / SECONDS_PER_DAY;
+    caltime %= SECONDS_PER_DAY;
+
+    yday_month = is_leap_year ? __lyday_month : __yday_month;
+    for (tmp = 1; yday_month[tmp] < result->tm_yday; tmp++);
+
+    result->tm_mon = --tmp;
+    result->tm_mday = result->tm_yday - yday_month[tmp];
+    result->tm_wday = ((*timep / SECONDS_PER_DAY) + 4/* wday of 01-01-1970 is 4*/) % 7;
+    result->tm_hour = caltime / 3600;
+    caltime = caltime % 3600;
+    result->tm_min = caltime / 60;
+    result->tm_sec = caltime % 60;
+
     return result;
 }
 
