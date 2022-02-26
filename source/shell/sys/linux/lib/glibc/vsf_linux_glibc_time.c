@@ -41,6 +41,11 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+struct vsf_linux_glibc_time_t {
+    struct tm tm;
+} static __vsf_linux_glibc_time;
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -93,7 +98,7 @@ struct tm * gmtime_r(const time_t *timep, struct tm *result)
 
 struct tm * gmtime(const time_t *timep)
 {
-    return gmtime_r(timep, &__vsf_linux.tm);
+    return gmtime_r(timep, &__vsf_linux_glibc_time.tm);
 }
 
 struct tm * localtime_r(const time_t *timep, struct tm *result)
@@ -103,7 +108,7 @@ struct tm * localtime_r(const time_t *timep, struct tm *result)
 
 struct tm * localtime(const time_t *timep)
 {
-    return localtime_r(timep, &__vsf_linux.tm);
+    return localtime_r(timep, &__vsf_linux_glibc_time.tm);
 }
 
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining)

@@ -137,9 +137,6 @@ typedef struct vsf_linux_t {
 #endif
 
     char hostname[HOST_NAME_MAX + 1];
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-    struct tm tm;
-#endif
 } vsf_linux_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
