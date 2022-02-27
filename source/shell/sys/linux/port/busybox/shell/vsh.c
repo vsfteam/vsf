@@ -457,11 +457,11 @@ int vsh_main(int argc, char *argv[])
         fflush(stdout);
         while (1) {
             while (read(STDIN_FILENO, &ch, 1) != 1) {
-                if (errno != EINTR) {
+                if ((errno != EINTR) && vsf_linux_is_stdio_stream(STDIN_FILENO)) {
                     fprintf(stderr, "fail to read from stdin, is stdin disconnected?" VSH_LINEEND);
                     VSF_LINUX_ASSERT(false);
-                    return -1;
                 }
+                return -1;
             }
             switch (ch) {
             case '\033':
