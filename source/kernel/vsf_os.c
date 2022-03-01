@@ -265,7 +265,7 @@ static void __vsf_os_evtq_swi_handler(void *p)
 
 #if VSF_KERNEL_CFG_EDA_CPU_USAGE == ENABLED
     // fixme: NO NEED to protect, because pold->cur.eda will not preempt current context
-    vsf_systimer_tick_t start_tick;
+    vsf_systimer_tick_t start_tick = 0;
     if (pold != NULL) {
         if (pold->cur.is_timing) {
             start_tick = vsf_systimer_get_tick();

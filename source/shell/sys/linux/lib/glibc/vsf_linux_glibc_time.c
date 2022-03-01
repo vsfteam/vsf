@@ -80,8 +80,8 @@ time_t time(time_t *t)
 
 struct tm * gmtime_r(const time_t *timep, struct tm *result)
 {
-    static const uint16_t __lyday_month[12] = {-1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
-    static const uint16_t __yday_month[12] = {-1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364};
+    static const uint16_t __lyday_month[13] = {-1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
+    static const uint16_t __yday_month[13] = {-1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364};
     VSF_LINUX_ASSERT((timep != NULL) && (result != NULL));
     memset(result, 0, sizeof(struct tm));
 

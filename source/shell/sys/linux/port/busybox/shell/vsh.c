@@ -469,7 +469,6 @@ int vsh_main(int argc, char *argv[])
                 ctx.escpos = 0;
                 continue;
             default:
-            input_char:
                 if (state != SHELL_STATE_NORMAL) {
                     if (ctx.pos + ctx.escpos >= VSH_CMD_SIZE - 1) {
                     input_too_long:
