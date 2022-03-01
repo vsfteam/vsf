@@ -19,7 +19,7 @@
 
 #include "../../vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED
 
 #define __VSF_LINUX_NTP_CLASS_IMPLEMENT
 #include "./vsf_linux_ntp.h"
