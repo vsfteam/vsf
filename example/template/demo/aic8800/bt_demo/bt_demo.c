@@ -19,7 +19,7 @@
 
 #include "vsf_cfg.h"
 
-#if APP_USE_BTSTACK_DEMO == ENABLED
+#if AIC8800_APP_USE_BT_DEMO == ENABLED && APP_USE_BTSTACK_DEMO == ENABLED
 
 #include "vsf.h"
 

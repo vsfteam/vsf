@@ -93,7 +93,7 @@ void aic8800_demo_init(void)
     extern void aic8800_wifi_start(void);
     aic8800_wifi_start();
 #endif
-#if AIC8800_APP_USE_BT_DEMO == ENABLED
+#if AIC8800_APP_USE_BT_DEMO == ENABLED && APP_USE_BTSTACK_DEMO == ENABLED
     extern vsf_err_t aic8800_bt_start(void);
     aic8800_bt_start();
 #endif
