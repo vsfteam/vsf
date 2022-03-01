@@ -4,10 +4,16 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
+#   include "shell/sys/linux/include/netdb.h"
 #else
 #   include <unistd.h>
+#   include <netdb.h>
 #endif
-#include <netdb.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   include "shell/sys/linux/include/simple_libc/stdio.h"
+#else
+#   include <stdio.h>
+#endif
 
 #include "shell/sys/linux/app/ntp/vsf_linux_ntp.h"
 

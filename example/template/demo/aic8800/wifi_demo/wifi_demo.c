@@ -22,6 +22,7 @@
 #if AIC8800_APP_USE_WIFI_DEMO == ENABLED
 
 #include <unistd.h>
+#include <stdio.h>
 
 #include "net_al.h"
 

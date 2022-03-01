@@ -25,11 +25,16 @@
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #define __VSF_FS_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "../../../../include/unistd.h"
-#   include "../../../../include/sys/stat.h"
+#   include "shell/sys/linux/include/unistd.h"
+#   include "shell/sys/linux/include/sys/stat.h"
 #else
 #   include <unistd.h>
 #   include <sys/stat.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   include "shell/sys/linux/include/simple_libc/stdio.h"
+#else
+#   include <stdio.h>
 #endif
 
 /*============================ MACROS ========================================*/

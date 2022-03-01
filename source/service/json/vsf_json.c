@@ -23,6 +23,8 @@
 
 #define __VSF_JSON_CLASS_IMPLEMENT
 #include "./vsf_json.h"
+// for snprintf
+#include <stdio.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
