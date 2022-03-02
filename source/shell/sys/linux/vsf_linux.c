@@ -184,7 +184,9 @@ extern const vsf_linux_fd_op_t __vsf_linux_stream_fdop;
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vsf_linux_t __vsf_linux;
+static vsf_linux_t __vsf_linux = {
+    .cur_pid            = -1,
+};
 
 static const vsf_linux_thread_op_t __vsf_linux_main_op = {
     .priv_size          = 0,
@@ -597,10 +599,15 @@ static void __vsf_linux_stderr_on_evt(vsf_linux_stream_priv_t *priv, vsf_protect
     }
 }
 
+bool vsf_linux_is_inited(void)
+{
+    return __vsf_linux.cur_pid >= 0;
+}
+
 vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 {
     VSF_LINUX_ASSERT(stdio_stream != NULL);
-    memset(&__vsf_linux, 0, sizeof(__vsf_linux));
+    __vsf_linux.cur_pid = 0;
     vk_fs_init();
 
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED

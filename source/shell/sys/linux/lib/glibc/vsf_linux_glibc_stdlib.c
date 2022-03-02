@@ -231,9 +231,12 @@ void exit(int status)
 
 int atexit(void (*func)(void))
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    process->fn_atexit = func;
+    // atexit maybe called by c-startup in newlib, ignore if linux is not initialized
+    if (vsf_linux_is_inited()) {
+        vsf_linux_process_t *process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(process != NULL);
+        process->fn_atexit = func;
+    }
     return 0;
 }
 
