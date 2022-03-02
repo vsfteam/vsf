@@ -80,7 +80,7 @@ vsf_err_t vsf_tgui_send_touch_evt(  vsf_tgui_t *tgui_ptr,
     VSF_TGUI_ASSERT(finger_idx < 2);
 
     if (is_down) {
-        if (tgui_ptr->input.finger.status & BIT(finger_idx)) {
+        if (tgui_ptr->input.finger.status & VSF_BIT(finger_idx)) {
 
             result &= __vk_tgui_send_gesture_evt(tgui_ptr, 
                                                  finger_idx,
@@ -99,7 +99,7 @@ vsf_err_t vsf_tgui_send_touch_evt(  vsf_tgui_t *tgui_ptr,
 
         } else {
 
-            tgui_ptr->input.finger.status |= BIT(finger_idx);
+            tgui_ptr->input.finger.status |= VSF_BIT(finger_idx);
             /* first time */
             result &=  __vk_tgui_send_touch_evt(
                             tgui_ptr, 
@@ -113,7 +113,7 @@ vsf_err_t vsf_tgui_send_touch_evt(  vsf_tgui_t *tgui_ptr,
 
     } else {
 
-        if (!(tgui_ptr->input.finger.status & BIT(finger_idx))) {
+        if (!(tgui_ptr->input.finger.status & VSF_BIT(finger_idx))) {
             /* finger is already up, treat this as pointer move */
              result &= __vk_tgui_send_touch_evt( tgui_ptr, 
                                                 finger_idx,
@@ -122,7 +122,7 @@ vsf_err_t vsf_tgui_send_touch_evt(  vsf_tgui_t *tgui_ptr,
         } else {
             result &= __vk_tgui_send_touch_evt(tgui_ptr, finger_idx, VSF_TGUI_EVT_POINTER_UP, position);
             result &= __vk_tgui_send_touch_evt(tgui_ptr, finger_idx, VSF_TGUI_EVT_POINTER_CLICK, position);
-            tgui_ptr->input.finger.status &= ~BIT(finger_idx);
+            tgui_ptr->input.finger.status &= ~VSF_BIT(finger_idx);
         }
         
     }

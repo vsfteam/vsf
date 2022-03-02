@@ -75,11 +75,11 @@
         }
 
 
-#define VSF_TGUI_CTRL_STATUS_INITIALISED                BIT(0)
-#define VSF_TGUI_CTRL_STATUS_ENABLED                    BIT(1)
-#define VSF_TGUI_CTRL_STATUS_VISIBLE                    BIT(2)
-#define VSF_TGUI_CTRL_STATUS_ACTIVE                     BIT(3)
-#define VSF_TGUI_CTRL_STATUS_HIDE_CONTAINER_CONTENT     BIT(4)
+#define VSF_TGUI_CTRL_STATUS_INITIALISED                VSF_BIT(0)
+#define VSF_TGUI_CTRL_STATUS_ENABLED                    VSF_BIT(1)
+#define VSF_TGUI_CTRL_STATUS_VISIBLE                    VSF_BIT(2)
+#define VSF_TGUI_CTRL_STATUS_ACTIVE                     VSF_BIT(3)
+#define VSF_TGUI_CTRL_STATUS_HIDE_CONTAINER_CONTENT     VSF_BIT(4)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -486,10 +486,10 @@ def_class(vsf_tgui_control_t,
             vsf_tgui_control_t *ptAlignTo;
 
             /* \note Only following mode supported:
-                    VSF_TGUI_ALIGN_LEFT     = BIT(0),
-                    VSF_TGUI_ALIGN_RIGHT    = BIT(1),
-                    VSF_TGUI_ALIGN_TOP      = BIT(2),
-                    VSF_TGUI_ALIGN_BOTTOM   = BIT(3),
+                    VSF_TGUI_ALIGN_LEFT     = VSF_BIT(0),
+                    VSF_TGUI_ALIGN_RIGHT    = VSF_BIT(1),
+                    VSF_TGUI_ALIGN_TOP      = VSF_BIT(2),
+                    VSF_TGUI_ALIGN_BOTTOM   = VSF_BIT(3),
              */
             vsf_tgui_align_mode_t  tMode;
         } tAlign;

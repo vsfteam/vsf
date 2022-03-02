@@ -75,7 +75,7 @@ declare_structure(vsf_msgt_node_t)
 //! \name the base class for all other tree messages
 //! @{
 typedef struct vsf_msgt_msg_t {
-    vsf_evt_t   msg;                                                           //!< the tree message which should larger than VSF_EVT_USER
+    vsf_evt_t   msg;                                                            //!< the tree message which should larger than VSF_EVT_USER
 }vsf_msgt_msg_t;
 //! @}
 
@@ -84,11 +84,11 @@ typedef enum vsf_msgt_node_status_t {
     __VSF_MSGT_NODE_STATUS_LEAST_MAX    = INT16_MAX,
     __VSF_MSGT_NODE_STATUS_LEAST_MIN    = INT16_MIN,
 
-    VSF_MSGT_NODE_VALID                 = BIT(0),                               //!< whether the node is valid/initialised or not
-    VSF_MSGT_NODE_ENABLED               = BIT(1),                               //!< whether the node is enabled or not
-    VSF_MSGT_NODE_VISIBLE               = BIT(2),                               //!< whether the node is visible
-    VSF_MSGT_NODE_ACTIVE                = BIT(3),
-    VSF_MSGT_NODE_HIDE_CONTENT          = BIT(4),                               //!< whether hide the content inside container
+    VSF_MSGT_NODE_VALID                 = VSF_BIT(0),                           //!< whether the node is valid/initialised or not
+    VSF_MSGT_NODE_ENABLED               = VSF_BIT(1),                           //!< whether the node is enabled or not
+    VSF_MSGT_NODE_VISIBLE               = VSF_BIT(2),                           //!< whether the node is visible
+    VSF_MSGT_NODE_ACTIVE                = VSF_BIT(3),
+    VSF_MSGT_NODE_HIDE_CONTENT          = VSF_BIT(4),                           //!< whether hide the content inside container
 }vsf_msgt_node_status_t;
 
 typedef enum vsf_msgt_handler_type_t {

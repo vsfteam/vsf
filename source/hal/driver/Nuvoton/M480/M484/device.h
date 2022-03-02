@@ -141,7 +141,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __def_idx(__name, __no)     VSF_MCONNECT2(__name, _IDX) = (__no)
-#define __def_msk(__name)           VSF_MCONNECT2(__name, _MSK) = BIT(VSF_MCONNECT2(__name, _IDX) & 0x1F)
+#define __def_msk(__name)           VSF_MCONNECT2(__name, _MSK) = VSF_BIT(VSF_MCONNECT2(__name, _IDX) & 0x1F)
 
 // bit0 - bit13:    clksrc bitfield
 // bit14- bit27:    clkdiv bitfield
