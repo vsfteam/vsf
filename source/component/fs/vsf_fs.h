@@ -83,23 +83,6 @@ vsf_dcl_class(vk_fs_fop_t)
 vsf_dcl_class(vk_fs_dop_t)
 vsf_dcl_class(vk_fs_op_t)
 
-typedef enum vk_file_attr_t {
-    VSF_FILE_ATTR_READ          = 1 << 0,
-    VSF_FILE_ATTR_WRITE         = 1 << 1,
-    VSF_FILE_ATTR_EXECUTE       = 1 << 2,
-    VSF_FILE_ATTR_HIDDEN        = 1 << 3,
-    VSF_FILE_ATTR_DIRECTORY     = 1 << 4,
-    VSF_FILE_ATTR_DYN           = 1 << 7,
-    VSF_FILE_ATTR_EXT           = 1 << 8,
-    VSF_FILE_ATTR_USER          = 1 << 9,
-} vk_file_attr_t;
-
-typedef enum vk_file_whence_t {
-    VSF_FILE_SEEK_SET = 0,
-    VSF_FILE_SEEK_CUR = 1,
-    VSF_FILE_SEEK_END = 2,
-} vk_file_whence_t;
-
 vsf_class(vk_fs_fop_t) {
     protected_member(
         uint8_t close_local_size;

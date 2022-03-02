@@ -38,6 +38,25 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+// for libc sorce codes which want types and consts below
+typedef enum vk_file_attr_t {
+    VSF_FILE_ATTR_READ          = 1 << 0,
+    VSF_FILE_ATTR_WRITE         = 1 << 1,
+    VSF_FILE_ATTR_EXECUTE       = 1 << 2,
+    VSF_FILE_ATTR_HIDDEN        = 1 << 3,
+    VSF_FILE_ATTR_DIRECTORY     = 1 << 4,
+    VSF_FILE_ATTR_DYN           = 1 << 7,
+    VSF_FILE_ATTR_EXT           = 1 << 8,
+    VSF_FILE_ATTR_USER          = 1 << 9,
+} vk_file_attr_t;
+
+typedef enum vk_file_whence_t {
+    VSF_FILE_SEEK_SET = 0,
+    VSF_FILE_SEEK_CUR = 1,
+    VSF_FILE_SEEK_END = 2,
+} vk_file_whence_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

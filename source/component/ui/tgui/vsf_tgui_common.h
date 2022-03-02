@@ -248,10 +248,10 @@ typedef struct vsf_tgui_region_t {
 
 typedef enum {
     VSF_TGUI_ALIGN_CENTER       = 0,
-    VSF_TGUI_ALIGN_LEFT         = BIT(0),
-    VSF_TGUI_ALIGN_RIGHT        = BIT(1),
-    VSF_TGUI_ALIGN_TOP          = BIT(2),
-    VSF_TGUI_ALIGN_BOTTOM       = BIT(3),
+    VSF_TGUI_ALIGN_LEFT         = VSF_BIT(0),
+    VSF_TGUI_ALIGN_RIGHT        = VSF_BIT(1),
+    VSF_TGUI_ALIGN_TOP          = VSF_BIT(2),
+    VSF_TGUI_ALIGN_BOTTOM       = VSF_BIT(3),
     VSF_TGUI_ALIGN_FILL         = VSF_TGUI_ALIGN_LEFT
                                 | VSF_TGUI_ALIGN_RIGHT
                                 | VSF_TGUI_ALIGN_TOP
@@ -281,10 +281,10 @@ typedef enum {
 
 typedef enum {
     VSF_TGUI_DOCK_NONE      = 0,
-    VSF_TGUI_DOCK_LEFT      = BIT(0),
-    VSF_TGUI_DOCK_RIGHT     = BIT(1),
-    VSF_TGUI_DOCK_TOP       = BIT(2),
-    VSF_TGUI_DOCK_BOTTOM    = BIT(3),
+    VSF_TGUI_DOCK_LEFT      = VSF_BIT(0),
+    VSF_TGUI_DOCK_RIGHT     = VSF_BIT(1),
+    VSF_TGUI_DOCK_TOP       = VSF_BIT(2),
+    VSF_TGUI_DOCK_BOTTOM    = VSF_BIT(3),
     VSF_TGUI_DOCK_FILL      =   VSF_TGUI_DOCK_LEFT
                             |   VSF_TGUI_DOCK_RIGHT
                             |   VSF_TGUI_DOCK_TOP
@@ -293,10 +293,10 @@ typedef enum {
 
 typedef enum {
     VSF_TGUI_ANCHOR_NONE    = 0,
-    VSF_TGUI_ANCHOR_LEFT    = BIT(0),
-    VSF_TGUI_ANCHOR_RIGHT   = BIT(1),
-    VSF_TGUI_ANCHOR_TOP     = BIT(2),
-    VSF_TGUI_ANCHOR_BOTTOM  = BIT(3),
+    VSF_TGUI_ANCHOR_LEFT    = VSF_BIT(0),
+    VSF_TGUI_ANCHOR_RIGHT   = VSF_BIT(1),
+    VSF_TGUI_ANCHOR_TOP     = VSF_BIT(2),
+    VSF_TGUI_ANCHOR_BOTTOM  = VSF_BIT(3),
 }vsf_tgui_anchor_mode_t;
 
 

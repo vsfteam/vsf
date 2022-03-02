@@ -12,7 +12,7 @@
 #endif
 
 // for fs constants
-#include "component/vsf_component.h"
+#include "component/fs/vsf_fs_cfg.h"
 
 #ifdef __cplusplus
 extern "C" {
