@@ -1,40 +1,10 @@
 # CMakeLists head
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-    port
-    port/arch/ll
-    port/rtos
-
     vendor/lwip/net_al
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/ports/rtos/include
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/include
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/src/include/lwip
-
-    vendor/plf/aic8800/src/arch
-    vendor/plf/aic8800/src/arch/boot
-    vendor/plf/aic8800/src/arch/cmsis
-
-    vendor/plf/aic8800/src/driver
-    vendor/plf/aic8800/src/driver/common
-    vendor/plf/aic8800/src/driver/reg
-    vendor/plf/aic8800/src/driver/ipc
-    vendor/plf/aic8800/src/driver/stdio_uart
-    vendor/plf/aic8800/src/driver/iomux
-    vendor/plf/aic8800/src/driver/dma
-    vendor/plf/aic8800/src/driver/ticker
-    vendor/plf/aic8800/src/driver/flash
-    vendor/plf/aic8800/src/driver/pmic
-    vendor/plf/aic8800/src/driver/sleep
-    vendor/plf/aic8800/src/driver/aic1000lite_regs
-    vendor/plf/aic8800/src/driver/sysctrl
-    vendor/plf/aic8800/src/driver/asdma_mst
-    vendor/plf/aic8800/src/driver/trng
-    vendor/plf/aic8800/src/driver/time
-    vendor/plf/aic8800/src/driver/bt
-    vendor/plf/aic8800/src/driver/bt/patch/mcu
-
-    vendor/modules/common/api
-    vendor/modules/dbg/api
 
     vendor/wifi/fhost
     vendor/wifi/fhost/application
