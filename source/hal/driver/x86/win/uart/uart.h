@@ -69,16 +69,16 @@ typedef enum em_usart_mode_t {
 } em_usart_mode_t;
 
 typedef enum em_usart_irq_mask_t {
-    USART_IRQ_MASK_RX               = BIT(0),
-    USART_IRQ_MASK_TX               = BIT(1),
-    USART_IRQ_MASK_RX_TIMEOUT       = BIT(2),
+    USART_IRQ_MASK_RX               = VSF_BIT(0),
+    USART_IRQ_MASK_TX               = VSF_BIT(1),
+    USART_IRQ_MASK_RX_TIMEOUT       = VSF_BIT(2),
 
-    USART_IRQ_MASK_RX_CPL           = BIT(3),
-    USART_IRQ_MASK_TX_CPL           = BIT(4),
+    USART_IRQ_MASK_RX_CPL           = VSF_BIT(3),
+    USART_IRQ_MASK_TX_CPL           = VSF_BIT(4),
 
     // optional
-    USART_IRQ_MASK_RX_ERR           = BIT(5),
-    USART_IRQ_MASK_TX_ERR           = BIT(6),
+    USART_IRQ_MASK_RX_ERR           = VSF_BIT(5),
+    USART_IRQ_MASK_TX_ERR           = VSF_BIT(6),
     USART_IRQ_MASK_ERR              = USART_IRQ_MASK_RX_ERR | USART_IRQ_MASK_TX_ERR,
 
     USART_IRQ_MASK                  =   USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
