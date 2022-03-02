@@ -89,9 +89,9 @@ typedef struct usrapp_common_t {
 #   endif
 
 #   if      VSF_USE_FS == ENABLED                                               \
-        &&  (VSF_FS_USE_MEMFS == ENABLED)
+        &&  (VSF_FS_USE_MEMFS == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED)
     struct {
-#       if VSF_FS_USE_MEMFS == ENABLED
+#       if VSF_FS_USE_MEMFS == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         vk_memfs_info_t memfs_info;
 #       endif
     } fs;

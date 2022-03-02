@@ -88,7 +88,9 @@ const vk_usbh_class_drv_t vk_usbh_nspro_drv = {
 
 extern void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report);
 extern void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro);
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
 extern void vsf_nspro_on_report_parsed(vk_input_evt_t *evt);
+#endif
 extern void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro);
 extern void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro);
 

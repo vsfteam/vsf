@@ -51,9 +51,9 @@ usrapp_common_t usrapp_common = {
 #   endif
 
 #   if      VSF_USE_FS == ENABLED                                               \
-        &&  (VSF_FS_USE_MEMFS == ENABLED)
+        &&  (VSF_FS_USE_MEMFS == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED)
     .fs                         = {
-#       if VSF_FS_USE_MEMFS == ENABLED
+#       if VSF_FS_USE_MEMFS == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         .memfs_info             = {
             .root               = {
                 .d.child        = (vk_memfs_file_t *)USRAPP_CFG_MEMFS_ROOT,
