@@ -1186,7 +1186,7 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
                         if (pktsts == 7) {      // RXSTAT_CH_HALTED
                             // just do a read
                             volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
-                            UNUSED_PARAM(grxstsp);
+                            VSF_UNUSED_PARAM(grxstsp);
                         }
                     }
                 } else if (dwcotg_urb->is_discarded) {
@@ -1247,7 +1247,7 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
         while (dwcotg_hcd->reg.global_regs->grxfsiz > 0) {
             // just do a read
             volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
-            UNUSED_PARAM(grxstsp);
+            VSF_UNUSED_PARAM(grxstsp);
         }
     }
     if (intsts & USB_OTG_GINTSTS_NPTXFE) {

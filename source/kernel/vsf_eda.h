@@ -537,7 +537,7 @@ extern "C" {
             vsf_peda_param(__name) *vsf_pthis =                                 \
                 *(vsf_peda_param(__name) **)                                    \
                     ((uintptr_t)vsf_plocal - sizeof(uintptr_t));                \
-            UNUSED_PARAM(vsf_pthis);                                            \
+            VSF_UNUSED_PARAM(vsf_pthis);                                        \
             VSF_KERNEL_ASSERT(NULL != vsf_pthis || NULL != vsf_plocal);
 
 #   define __implement_vsf_peda1(__name)                                        \
@@ -547,7 +547,7 @@ extern "C" {
             vsf_peda_param(__name) *vsf_pthis =                                 \
                 *(vsf_peda_param(__name) **)                                    \
                     ((uintptr_t)vsf_plocal - sizeof(uintptr_t));                \
-            UNUSED_PARAM(vsf_pthis);                                            \
+            VSF_UNUSED_PARAM(vsf_pthis);                                        \
             VSF_KERNEL_ASSERT(NULL != vsf_pthis || NULL != vsf_plocal);
 
 #   define vsf_peda_begin()

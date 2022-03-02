@@ -77,7 +77,7 @@ void vsf_service_init(void)
             VSF_PBUF_ADAPTERS
         };
 
-        vsf_adapter_register(c_tpbufAdapters, UBOUND(c_tpbufAdapters));
+        vsf_adapter_register(c_tpbufAdapters, dimof(c_tpbufAdapters));
     } while(0);
 #endif
 

@@ -62,14 +62,14 @@ const code_region_t DEFAULT_CODE_REGION_NONE = {
 
 static void __default_code_region_none_on_enter(void *obj_ptr, void *local_ptr)
 {
-    UNUSED_PARAM(obj_ptr);
-    UNUSED_PARAM(local_ptr);
+    VSF_UNUSED_PARAM(obj_ptr);
+    VSF_UNUSED_PARAM(local_ptr);
 }
 
 static void __default_code_region_none_on_leave(void *obj_ptr,void *local_ptr)
 {
-    UNUSED_PARAM(obj_ptr);
-    UNUSED_PARAM(local_ptr);
+    VSF_UNUSED_PARAM(obj_ptr);
+    VSF_UNUSED_PARAM(local_ptr);
 }
 
 /* EOF */

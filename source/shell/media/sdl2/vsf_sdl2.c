@@ -1149,7 +1149,7 @@ SDL_Surface * SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags)
 
     int bytes_per_pixel = vsf_disp_get_pixel_bytesize(__vsf_sdl2.disp);
     int bits_per_pixel = vsf_disp_get_pixel_bitsize(__vsf_sdl2.disp);
-    UNUSED_PARAM(bits_per_pixel);
+    VSF_UNUSED_PARAM(bits_per_pixel);
     if (bpp != 0) {
         VSF_SDL2_ASSERT(bpp == bits_per_pixel);
     }

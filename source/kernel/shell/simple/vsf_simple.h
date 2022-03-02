@@ -46,8 +46,8 @@ extern "C" {
         } static VSF_MACRO_SAFE_NAME(local_cb),                                 \
             *this_ptr = &VSF_MACRO_SAFE_NAME(local_cb);                         \
              vsf_evt_t evt = vsf_eda_get_cur_evt();                             \
-             UNUSED_PARAM(evt);                                                 \
-             UNUSED_PARAM(this_ptr);
+             VSF_UNUSED_PARAM(evt);                                             \
+             VSF_UNUSED_PARAM(this_ptr);
 
 #if __IS_COMPILER_IAR__
 #       define features_used(...)              __VA_ARGS__;

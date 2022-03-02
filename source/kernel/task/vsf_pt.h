@@ -71,7 +71,7 @@ extern "C" {
 #define __vsf_pt_begin(__state)     __vsf_pt_begin_common(__state)
 
 
-#define vsf_pt_begin()              UNUSED_PARAM(evt);                          \
+#define vsf_pt_begin()              VSF_UNUSED_PARAM(evt);                      \
                                     __vsf_pt_begin(__vsf_pt_state())
 
 #define vsf_pt_end()                __vsf_pt_end() }

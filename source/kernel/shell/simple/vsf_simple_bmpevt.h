@@ -88,7 +88,7 @@ extern "C" {
 #   define __init_grouped_evts(__name, __evt_group, __auto_reset)               \
         __vsf_grouped_evts_init((__evt_group),                                  \
             (vsf_bmpevt_adapter_t **)&(__adapters_of_##__name),                 \
-            UBOUND(__adapters_of_##__name),                                     \
+            dimof(__adapters_of_##__name),                                      \
             (__auto_reset))
 
 #   define init_grouped_evts(__name, __evt_group, __auto_reset)                 \

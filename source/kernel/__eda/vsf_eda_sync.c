@@ -223,7 +223,7 @@ vsf_err_t __vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda, bool man
             if (eda_pending != NULL) {
                 vsf_err_t err = __vsf_eda_post_evt_ex(eda_pending, VSF_EVT_SYNC, true);
                 VSF_KERNEL_ASSERT(!err);
-                UNUSED_PARAM(err);
+                VSF_UNUSED_PARAM(err);
                 origlevel = vsf_protect_sched();
                 continue;
             } else {

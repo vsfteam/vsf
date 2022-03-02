@@ -37,8 +37,8 @@
 // Need to know if VSF_LINUX_USE_SIMPLE_LIBC is enabled
 #include "utilities/vsf_utilities.h"
 
-#ifndef UNUSED_PARAM
-#   define UNUSED_PARAM(__VAL)      (__VAL) = (__VAL)
+#ifndef VSF_UNUSED_PARAM
+#   define VSF_UNUSED_PARAM(__VAL)      (__VAL) = (__VAL)
 #endif
 
 #define __USE_COMMON_RETARGET_IO_C__
@@ -226,8 +226,8 @@ void abort(void) {
 //SECTION(".vsf.utilities.stdio.arm_compiler._sys_open")
 FILEHANDLE $Sub$$_sys_open (const char *name, int openmode) 
 {
-    UNUSED_PARAM(name);
-    UNUSED_PARAM(openmode);
+    VSF_UNUSED_PARAM(name);
+    VSF_UNUSED_PARAM(openmode);
 
     return (0);
 }
@@ -247,7 +247,7 @@ FILEHANDLE $Sub$$_sys_open (const char *name, int openmode)
 WEAK(_sys_close)
 int _sys_close (FILEHANDLE fh) 
 {
-    UNUSED_PARAM(fh);
+    VSF_UNUSED_PARAM(fh);
     return 0;
 }
 

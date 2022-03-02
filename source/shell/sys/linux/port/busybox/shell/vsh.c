@@ -117,7 +117,7 @@ static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx)
     char lastch = ctx->cmd[ctx->pos + esclen - 1];
 
     // esclen will be used for full support to escape strings
-    UNUSED_PARAM(esclen);
+    VSF_UNUSED_PARAM(esclen);
 
     bool is_end = false;
     switch (type) {

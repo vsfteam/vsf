@@ -208,7 +208,7 @@ bool vsf_pool_add_buffer(   vsf_pool_t *this_ptr,
 WEAK(vsf_plug_in_on_failed_to_feed_pool_on_heap)
 bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *obj_ptr)
 {
-    UNUSED_PARAM(obj_ptr);
+    VSF_UNUSED_PARAM(obj_ptr);
 
     /*! \note return true will let the vsf_pool try again. Usually we can use
      *        this function to print out the heap and pool usage info. You can

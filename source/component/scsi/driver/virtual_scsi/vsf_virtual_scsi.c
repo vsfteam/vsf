@@ -140,7 +140,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_fini, vk_scsi_fini)
 {
     vsf_peda_begin();
     vk_scsi_t *pthis = (vk_scsi_t *)&vsf_this;
-    UNUSED_PARAM(pthis);
+    VSF_UNUSED_PARAM(pthis);
     VSF_SCSI_ASSERT(pthis != NULL);
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
@@ -173,7 +173,7 @@ static vsf_err_t __vk_virtual_scsi_rw(vk_virtual_scsi_t *pthis, uint8_t *cbd, vo
                 .size       = size,
                 .mem_stream = mem_stream,
             )
-            UNUSED_PARAM(err);
+            VSF_UNUSED_PARAM(err);
         } else {
             vsf_err_t err;
             __vsf_component_call_peda_ifs(vk_virtual_scsi_write, err, drv->param_subcall.write, 0, pthis,
@@ -181,7 +181,7 @@ static vsf_err_t __vk_virtual_scsi_rw(vk_virtual_scsi_t *pthis, uint8_t *cbd, vo
                 .size       = size,
                 .mem_stream = mem_stream,
             )
-            UNUSED_PARAM(err);
+            VSF_UNUSED_PARAM(err);
         }
         return VSF_ERR_NOT_READY;
     default:
@@ -389,7 +389,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute_stream, vk_scsi_execute
     case VSF_EVT_INIT: {
             vk_virtual_scsi_t *pthis = (vk_virtual_scsi_t *)&vsf_this;
             scsi_cmd_code_t cmd_code = (scsi_cmd_code_t)(vsf_local.cbd[0] & 0x1F);
-            UNUSED_PARAM(cmd_code);
+            VSF_UNUSED_PARAM(cmd_code);
             VSF_SCSI_ASSERT((SCSI_CMDCODE_READ == cmd_code) || (SCSI_CMDCODE_WRITE == cmd_code));
             pthis->is_stream = true;
             __vk_virtual_scsi_rw(pthis, vsf_local.cbd, vsf_local.stream);

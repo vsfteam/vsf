@@ -51,9 +51,9 @@ void m480_reg_lock(bool is_unlocked)
 
 uint_fast32_t m480_bit_field_get(uint_fast16_t bf, uint32_t *ptr)
 {
-    uint_fast8_t bit_offset = bf & BITMASK(5);
-    uint_fast8_t ptr_offset = (bf >> 5) & BITMASK(3);
-    uint_fast8_t bit_len = (bf >> 8) & BITMASK(5);
+    uint_fast8_t bit_offset = bf & VSF_BITMASK(5);
+    uint_fast8_t ptr_offset = (bf >> 5) & VSF_BITMASK(3);
+    uint_fast8_t bit_len = (bf >> 8) & VSF_BITMASK(5);
 
     uint_fast32_t mask = (((1 << bit_len) - 1) << bit_offset);
     return ptr[ptr_offset] & mask;
@@ -61,9 +61,9 @@ uint_fast32_t m480_bit_field_get(uint_fast16_t bf, uint32_t *ptr)
 
 void m480_bit_field_set_atom(uint_fast16_t bf, uint32_t *ptr, uint_fast32_t value)
 {
-    uint_fast8_t bit_offset = bf & BITMASK(5);
-    uint_fast8_t ptr_offset = (bf >> 5) & BITMASK(3);
-    uint_fast8_t bit_len = (bf >> 8) & BITMASK(5);
+    uint_fast8_t bit_offset = bf & VSF_BITMASK(5);
+    uint_fast8_t ptr_offset = (bf >> 5) & VSF_BITMASK(3);
+    uint_fast8_t bit_len = (bf >> 8) & VSF_BITMASK(5);
 
     uint_fast32_t mask = (((1 << bit_len) - 1) << bit_offset);
     vsf_protect_t state = vsf_protect_interrupt();

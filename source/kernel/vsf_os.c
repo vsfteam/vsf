@@ -411,8 +411,8 @@ void vsf_forced_sched_unlock(vsf_sched_lock_status_t origlevel)
 static void __vsf_code_region_forced_sched_on_enter(void *pobj, void *plocal)
 {
     vsf_sched_lock_status_t *pstate = (vsf_sched_lock_status_t *)plocal;
-    UNUSED_PARAM(pobj);
-    UNUSED_PARAM(plocal);
+    VSF_UNUSED_PARAM(pobj);
+    VSF_UNUSED_PARAM(plocal);
 
     VSF_KERNEL_ASSERT(NULL != plocal);
     (*pstate) = vsf_sched_lock();
@@ -422,8 +422,8 @@ static void __vsf_code_region_forced_sched_on_leave(void *pobj,void *plocal)
 {
     vsf_sched_lock_status_t *pstate = (vsf_sched_lock_status_t *)plocal;
 
-    UNUSED_PARAM(pobj);
-    UNUSED_PARAM(plocal);
+    VSF_UNUSED_PARAM(pobj);
+    VSF_UNUSED_PARAM(plocal);
 
     VSF_KERNEL_ASSERT(NULL != plocal);
     vsf_sched_unlock(*pstate);

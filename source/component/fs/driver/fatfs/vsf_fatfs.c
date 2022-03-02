@@ -840,7 +840,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                         .cluster = dir->cur.cluster,
                         .entry = &dir->cur.cluster,
                     )
-                    UNUSED_PARAM(err);
+                    VSF_UNUSED_PARAM(err);
                 }
             }
             break;
@@ -995,7 +995,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                         .cluster = fatfs_file->cur.cluster,
                         .entry = &fatfs_file->cur.cluster,
                     );
-                    UNUSED_PARAM(err);
+                    VSF_UNUSED_PARAM(err);
                     break;
                 }
                 vsf_local.cur_offset += vsf_local.cur_run_size;

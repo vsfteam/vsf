@@ -640,7 +640,7 @@ implement_vsf_pt(tgui_demo_t)
     stopwatch_t *ptBase = (stopwatch_t*)container_of(this_ptr, stopwatch_t, tTask.param);
     vsf_pt_begin();
 
-    UNUSED_PARAM(s_tRefreshRegion);
+    VSF_UNUSED_PARAM(s_tRefreshRegion);
 
     //vk_tgui_refresh_ex(ptBase->use_as__vsf_tgui_panel_t.gui_ptr, NULL, &s_tRefreshRegion);
     vk_tgui_refresh(ptBase->use_as__vsf_tgui_panel_t.gui_ptr);

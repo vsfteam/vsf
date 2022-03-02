@@ -348,7 +348,7 @@ int vsf_get_interrupt_id(void)
 WEAK(vsf_arch_sleep)
 void vsf_arch_sleep(uint_fast32_t mode)
 {
-    UNUSED_PARAM(mode);
+    VSF_UNUSED_PARAM(mode);
     __WFE();
 }
 

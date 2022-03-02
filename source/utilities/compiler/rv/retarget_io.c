@@ -23,8 +23,8 @@
 //#include <rt_sys.h>
 //#endif
 
-#ifndef UNUSED_PARAM
-# define UNUSED_PARAM(__VAL)    (__VAL) = (__VAL)
+#ifndef VSF_UNUSED_PARAM
+# define VSF_UNUSED_PARAM(__VAL)    (__VAL) = (__VAL)
 #endif
 
 #define __USE_COMMON_RETARGET_IO_C__

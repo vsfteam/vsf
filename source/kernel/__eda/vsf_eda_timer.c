@@ -125,7 +125,7 @@ void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
     vsf_kernel_trace_isr_enter(vsf_get_interrupt_id());
 #endif
 
-    UNUSED_PARAM(tick);
+    VSF_UNUSED_PARAM(tick);
     __vsf_systimer_wakeup();
 
 #if VSF_KERNEL_CFG_TRACE == ENABLED

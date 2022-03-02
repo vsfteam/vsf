@@ -196,7 +196,7 @@ static void __vk_winsound_playback_irq_thread(void *arg)
                 vk_winsound_playback_buffer_t *winsound_buffer =
                     playback_ctx->play_ticktock ? &playback_ctx->buffer[0] : &playback_ctx->buffer[1];
                 WAVEHDR *header = (WAVEHDR *)&winsound_buffer->header;
-                UNUSED_PARAM(header);
+                VSF_UNUSED_PARAM(header);
                 playback_ctx->play_ticktock = !playback_ctx->play_ticktock;
 
                 __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: playback evt %d\r\n", vsf_systimer_get_ms(), header->dwFlags);

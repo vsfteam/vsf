@@ -139,8 +139,8 @@ vsf_err_t vsf_usart_init(vsf_usart_t *usart, usart_cfg_t *cfg)
     reg->CTRL3 = ((cfg->mode & 0xFF000000) >> 24) | outclk_ctrl;
 
     if (cfg->rx_timeout > 0) {
-        VSF_HAL_ASSERT(cfg->rx_timeout <= BITMASK(20));
-        reg->RXTIMEOUT = (reg->RXTIMEOUT & ~BITMASK(20)) | cfg->rx_timeout | USART_RXTIMEROUT_STTTO;
+        VSF_HAL_ASSERT(cfg->rx_timeout <= VSF_BITMASK(20));
+        reg->RXTIMEOUT = (reg->RXTIMEOUT & ~VSF_BITMASK(20)) | cfg->rx_timeout | USART_RXTIMEROUT_STTTO;
     }
 
     IRQn_Type irq = usart->ip.irq;

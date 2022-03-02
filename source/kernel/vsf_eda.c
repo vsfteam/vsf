@@ -393,7 +393,7 @@ static vsf_evtq_ctx_t * __vsf_evtq_get_cur_ctx(void)
 WEAK(vsf_kernel_err_report)
 void vsf_kernel_err_report(enum vsf_kernel_error_t err)
 {
-    UNUSED_PARAM(err);
+    VSF_UNUSED_PARAM(err);
     VSF_KERNEL_ASSERT(false);
 }
 #endif

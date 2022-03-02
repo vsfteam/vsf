@@ -228,7 +228,7 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 #define vsf_protect_interrupt()             vsf_disable_interrupt()
 #define vsf_unprotect_interrupt(__state)    vsf_set_interrupt(__state)
 #define vsf_protect_none()                  (0)
-#define vsf_unprotect_none(__state)         UNUSED_PARAM(__state)
+#define vsf_unprotect_none(__state)         VSF_UNUSED_PARAM(__state)
 
 #define vsf_protect_int                     vsf_protect_interrupt
 #define vsf_unprotect_int                   vsf_unprotect_interrupt

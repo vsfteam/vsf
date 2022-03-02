@@ -518,7 +518,7 @@ static void __vk_usbh_dl1x5_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                             v_sync_start = v_sync_start ^ v_sync_end;
                         }
 
-                        // color depth, 0£º 16, 1: 24
+                        // color depth, 0ï¼š 16, 1: 24
                         __dl1x5_write_vreg(dl1x5, 0x00, 0);
                         __dl1x5_write_vreg_be16(dl1x5, 0x01, __dl1x5_lfsr16(h_display_start));
                         __dl1x5_write_vreg_be16(dl1x5, 0x03, __dl1x5_lfsr16(h_display_end));
@@ -717,7 +717,7 @@ static bool __vk_dl1x5_cls_callback(void *dev)
     while (dl1x5->pixel_addr < timing->h.active * timing->v.active) {
         if (!vk_usbh_dl1x5_fill_color(dev, dl1x5->pixel_addr, DL1X5_PIXELS_IN_CMD, 0)) {
             vsf_err_t err = vk_usbh_dl1x5_commit(dev);
-            UNUSED_PARAM(err);
+            VSF_UNUSED_PARAM(err);
             VSF_USB_ASSERT(VSF_ERR_NONE == err);
             return false;
         }
@@ -760,7 +760,7 @@ static void __vk_disp_dl1x5_refresh_callback(void *dev, vsf_err_t err)
 
             if (!vk_usbh_dl1x5_fill_buf(dev, pixel_addr, pixel_num, dl1x5->disp_buff_rgb565)) {
                 vsf_err_t err = vk_usbh_dl1x5_commit(dev);
-                UNUSED_PARAM(err);
+                VSF_UNUSED_PARAM(err);
                 VSF_USB_ASSERT(VSF_ERR_NONE == err);
                 return;
             }

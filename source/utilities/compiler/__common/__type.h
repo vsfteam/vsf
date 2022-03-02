@@ -145,9 +145,6 @@ typedef enum {
 #ifndef dimof
 #   define dimof(arr)                       (sizeof(arr) / sizeof((arr)[0]))
 #endif
-#ifndef UBOUND
-#   define UBOUND(__ARR)                    dimof(__ARR)
-#endif
 
 #ifndef offset_of
 #   define offset_of(s, m)                  (uintptr_t)(&(((s *)0)->m))
@@ -166,27 +163,13 @@ static inline int sign(int x)
     return ((int)((int)((int)(x) > 0) - (int)((int)(x) < 0)));
 }
 
-#define ABS(__NUM)                          (((__NUM) < 0) ? (-(__NUM)) : (__NUM))
+#define VSF_ABS(__NUM)                      (((__NUM) < 0) ? (-(__NUM)) : (__NUM))
 
-#ifndef BIT
-#   define BIT(__N)                         (1UL << (__N))
-#endif
-#ifndef BITMASK
-#   define BITMASK(__N)                     (BIT(__N) - 1)
-#endif
-
-#ifndef UNUSED_PARAM
-#   define UNUSED_PARAM(__VAL)              (__VAL) = (__VAL)
-#endif
-
-//! \brief This macro convert variable types between different datatypes.
-#define __TYPE_CONVERT(__ADDR,__TYPE)       (*((__TYPE *)(__ADDR)))
-#define TYPE_CONVERT(__ADDR, __TYPE)        __TYPE_CONVERT((__ADDR), __TYPE)
-#define type_convert(__ADDR, __TYPE)        TYPE_CONVERT(__ADDR, __TYPE)
+#define VSF_BIT(__N)                        (1UL << (__N))
+#define VSF_BITMASK(__N)                    (VSF_BIT(__N) - 1)
+#define VSF_UNUSED_PARAM(__VAL)             (__VAL) = (__VAL)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-#define IS_FSM_ERR(__FSM_RT)                ((__FSM_RT) < fsm_rt_cpl)
-#define is_fsm_err(__FSM_RT)                IS_FSM_ERR(__FSM_RT)
 /*============================ TYPES =========================================*/
 
 #if __IS_COMPILER_IAR__

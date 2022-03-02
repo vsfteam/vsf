@@ -310,7 +310,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *fsm_ptr,
                 case VSF_MSGT_NODE_HANDLER_TYPE_EDA: {
                     vsf_err_t tErr = vsf_eda_post_msg(handler_fn->fn.eda_ptr, fsm_ptr->msg_ptr);
                     VSF_OSA_SERVICE_ASSERT(tErr == VSF_ERR_NONE);
-                    UNUSED_PARAM(tErr);
+                    VSF_UNUSED_PARAM(tErr);
                     RESET_MSGT_HANDLING_FSM();
                     return fsm_rt_cpl;
                 }

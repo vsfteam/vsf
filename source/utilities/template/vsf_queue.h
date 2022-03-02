@@ -130,9 +130,9 @@
         vsf_rng_buf_send(my_hword_queue_t, &__queue, 0x1234);
 
 
-        vsf_rng_buf_send(my_hword_queue_t, &__queue, __temp, UBOUND(__temp));
+        vsf_rng_buf_send(my_hword_queue_t, &__queue, __temp, dimof(__temp));
 
-        vsf_rng_buf_get(my_hword_queue_t, &__queue, __temp, UBOUND(__temp));
+        vsf_rng_buf_get(my_hword_queue_t, &__queue, __temp, dimof(__temp));
         vsf_rng_buf_get(my_hword_queue_t, &__queue, &__item);
 
         const uint16_t* item_ref_ptr = NULL;

@@ -535,9 +535,9 @@ void __vsf_heap_statistics(vsf_heap_t *heap, vsf_heap_statistics_t *statistics)
 WEAK(vsf_heap_get_freelist)
 vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist_num, uint_fast32_t size)
 {
-    UNUSED_PARAM(freelist);
-    UNUSED_PARAM(freelist_num);
-    UNUSED_PARAM(size);
+    VSF_UNUSED_PARAM(freelist);
+    VSF_UNUSED_PARAM(freelist_num);
+    VSF_UNUSED_PARAM(size);
     return freelist;
 }
 #endif

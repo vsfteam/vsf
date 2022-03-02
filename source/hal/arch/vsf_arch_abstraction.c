@@ -414,30 +414,10 @@ int_fast8_t vsf_ffz32(uint_fast32_t a)
 WEAK(vsf_drv_usr_swi_trigger)
 void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
 {
-    UNUSED_PARAM(idx);
+    VSF_UNUSED_PARAM(idx);
     VSF_ARCH_ASSERT(false);
 }
 
-
-#if __IS_COMPILER_ARM_COMPILER_5__
-#warning  Due to a known issue of armcc v5.06 (build 750), the code generation of\
- the following function is wrong. Please do not use armcc to compile vsf kernel\
- code.
-/* The wrong code generation example:
-0x00002964 B510      PUSH     {r4,lr}
-0x00002966 B110      CBZ      r0,0x0000296E
-0x00002968 1E40      SUBS     r0,r0,#1
-0x0000296A F7FFFC03  BL.W     vsf_drv_usr_swi_trigger (0x00002174)
-0x0000296E E8BD4010  POP      {r4,lr}
-0x00002972 F7FFBBA9  B.W      vsf_arch_swi_trigger (0x000020C8)
-                 vsf_systick_clear_count:
-0x00002976 F04F21E0  MOV      r1,#0xE000E000
-0x0000297A 2000      MOVS     r0,#0x00
-0x0000297C 6188      STR      r0,[r1,#0x18]
-0x0000297E 4770      BX       lr
-*/
-
-#endif
 WEAK(vsf_swi_trigger)
 void vsf_swi_trigger(uint_fast8_t idx)
 {
@@ -471,10 +451,10 @@ vsf_err_t vsf_drv_usr_swi_init(     uint_fast8_t idx,
                                     vsf_swi_handler_t *handler,
                                     void *param)
 {
-    UNUSED_PARAM(idx);
-    UNUSED_PARAM(priority);
-    UNUSED_PARAM(handler);
-    UNUSED_PARAM(param);
+    VSF_UNUSED_PARAM(idx);
+    VSF_UNUSED_PARAM(priority);
+    VSF_UNUSED_PARAM(handler);
+    VSF_UNUSED_PARAM(param);
 
     VSF_ARCH_ASSERT(false);
     return VSF_ERR_FAIL;
@@ -520,7 +500,7 @@ vsf_err_t vsf_swi_init(     uint_fast8_t idx,
 WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 {
-    UNUSED_PARAM(tick);
+    VSF_UNUSED_PARAM(tick);
     VSF_ARCH_ASSERT(false);
 }
 #   endif
@@ -529,7 +509,7 @@ void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 WEAK(on_arch_systimer_tick_evt)
 bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick)
 {
-    UNUSED_PARAM(tick);
+    VSF_UNUSED_PARAM(tick);
     return true;
 }
 #endif

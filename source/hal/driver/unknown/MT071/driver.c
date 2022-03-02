@@ -175,7 +175,7 @@ __dma_channel_t * __vsf_dma_alloc_channel(__dma_trans_t *trans, uint_fast8_t tra
 //  so if DMA is enabled, over-write the vsf_arch_sleep to avoid sleeping if there is on-gong dma operation
 void vsf_arch_sleep(uint32_t mode)
 {
-    UNUSED_PARAM(mode);
+    VSF_UNUSED_PARAM(mode);
 
     for (uint_fast8_t i = 0; i < dimof(__dma.channels); i++) {
         if (__dma.channels[i].is_allocated && __dma.channels[i].is_started) {
@@ -204,7 +204,7 @@ bool vsf_driver_init(void)
     // enable clocks
 #if (PLL_SRC == CLKREF_12MOSC) || (MAINCLK_SRC == CLKSRC_12MOSC)
 //    RCC->PDRUNCFG &= ~RCC_PDRUNCFG_12MOSC;
-//    RCC->OSC12_CTRL = RCC_12OSCCTRL_OSC_EN | (1 << 17) | (RCC->OSC12_CTRL & 0xFF); //bit17´ý²âÊÔ
+//    RCC->OSC12_CTRL = RCC_12OSCCTRL_OSC_EN | (1 << 17) | (RCC->OSC12_CTRL & 0xFF); //bit17å¾…æµ‹è¯•
 //    while (!(RCC->OSC12_CTRL & RCC_12OSCCTRL_OSC_OK)) {
 //        if((timeout++) >= 0x8000) {
 //            break;

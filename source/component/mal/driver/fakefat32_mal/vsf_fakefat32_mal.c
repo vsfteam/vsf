@@ -769,7 +769,7 @@ static vsf_err_t __vk_fakefat32_read(vk_fakefat32_mal_t *pthis, uint_fast64_t ad
                     .size       = page_size,
                     .buff       = buff,
                 );
-                UNUSED_PARAM(err);
+                VSF_UNUSED_PARAM(err);
                 return VSF_ERR_NOT_READY;
             }
         }
@@ -819,7 +819,7 @@ static vsf_err_t __vk_fakefat32_write(vk_fakefat32_mal_t *pthis, uint_fast64_t a
                 .size       = page_size,
                 .buff       = buff,
             );
-            UNUSED_PARAM(err);
+            VSF_UNUSED_PARAM(err);
             return VSF_ERR_NOT_READY;
         }
     }
@@ -863,7 +863,7 @@ __vsf_component_peda_ifs_entry(__vk_fakefat32_mal_fini, vk_mal_fini)
     vsf_peda_begin();
     vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)&vsf_this;
 
-    UNUSED_PARAM(pthis);
+    VSF_UNUSED_PARAM(pthis);
     VSF_MAL_ASSERT(pthis != NULL);
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();

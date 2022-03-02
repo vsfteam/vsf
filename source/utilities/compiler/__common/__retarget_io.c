@@ -22,8 +22,8 @@
 #include "utilities/vsf_utilities_cfg.h"
 #include "utilities/vsf_utilities.h"
 
-#ifndef UNUSED_PARAM
-#   define UNUSED_PARAM(__VAL)      (__VAL) = (__VAL)
+#ifndef VSF_UNUSED_PARAM
+#   define VSF_UNUSED_PARAM(__VAL)      (__VAL) = (__VAL)
 #endif
 
 #if VSF_USE_POSIX == ENABLED

@@ -679,7 +679,7 @@ fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_
                                         ptItems->use_as__vsf_tgui_control_handler_t.fn.ptEDA,
                                         (void *)&(event_ptr->use_as__vsf_tgui_msg_t));
                     VSF_OSA_SERVICE_ASSERT(tErr == VSF_ERR_NONE);
-                    UNUSED_PARAM(tErr);
+                    VSF_UNUSED_PARAM(tErr);
                     RESET_TGUI_USER_MSG_HANDLING_FSM();
                     return fsm_rt_cpl;
                 }
@@ -919,7 +919,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
         //! message contains data
         case VSF_TGUI_MSG_POINTER_EVT & VSF_TGUI_MSG_MSK: {
             vsf_tgui_pointer_evt_t *event_ptr = (vsf_tgui_pointer_evt_t *)ptMSG;
-            UNUSED_PARAM(event_ptr);
+            VSF_UNUSED_PARAM(event_ptr);
 
         #if VSF_TGUI_CFG_SHOW_POINTER_EVT_LOG == ENABLED
             VSF_TGUI_LOG(VSF_TRACE_INFO, "VSF_TGUI_MSG_POINTER_EVT\t" );
@@ -990,7 +990,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
     #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
         case VSF_TGUI_MSG_KEY_EVT & VSF_TGUI_MSG_MSK:{
             vsf_tgui_key_evt_t* event_ptr = (vsf_tgui_key_evt_t *)ptMSG;
-            UNUSED_PARAM(event_ptr);
+            VSF_UNUSED_PARAM(event_ptr);
 
         #if VSF_TGUI_CFG_SHOW_KEY_EVT_LOG == ENABLED
             VSF_TGUI_LOG(VSF_TRACE_INFO, "VSF_TGUI_MSG_KEY_EVT\t");
@@ -1041,7 +1041,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
 
         case VSF_TGUI_MSG_GESTURE_EVT & VSF_TGUI_MSG_MSK: {
             vsf_tgui_gesture_evt_t* event_ptr = (vsf_tgui_gesture_evt_t *)ptMSG;
-            UNUSED_PARAM(event_ptr);
+            VSF_UNUSED_PARAM(event_ptr);
 
         #if VSF_TGUI_CFG_SHOW_GESTURE_EVT_LOG == ENABLED
             VSF_TGUI_LOG(VSF_TRACE_INFO, "VSF_TGUI_MSG_GESTURE_EVT\t");

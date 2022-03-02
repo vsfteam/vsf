@@ -95,7 +95,7 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t* cfg_ptr)
         do {
             const vsf_msgt_cfg_t cfg = {
                 c_tControlInterfaces,
-                UBOUND(c_tControlInterfaces),
+                dimof(c_tControlInterfaces),
             };
             vsf_msgt_init(&(this.use_as__vsf_msgt_t), &cfg);
         } while (0);

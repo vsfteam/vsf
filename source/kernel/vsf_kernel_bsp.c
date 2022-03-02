@@ -148,7 +148,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #if __VSF_OS_SWI_NUM > 0
         {
             __vsf_os_swi_priority,                  // os_swi_priorities_ptr
-            UBOUND(__vsf_os_swi_priority),          // swi_priority_cnt
+            dimof(__vsf_os_swi_priority),           // swi_priority_cnt
             {__VSF_OS_SWI_PRIORITY_BEGIN, vsf_prio_highest},
         },
 #else
@@ -167,13 +167,13 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #   if defined(__VSF_OS_CFG_EVTQ_LIST)
 #       if defined(VSF_OS_CFG_EVTQ_POOL_SIZE)
             __evt_node_buffer,                      // nodes_buf_ptr
-            (uint16_t)UBOUND(__evt_node_buffer),    // node_cnt
+            (uint16_t)dimof(__evt_node_buffer),     // node_cnt
 #       else
             NULL,                                   // nodes_buf_ptr
             0,                                      // node_cnt
 #       endif
 #   endif
-            (uint16_t)UBOUND(__vsf_os_evt_queue),   // queue_cnt
+            (uint16_t)dimof(__vsf_os_evt_queue),    // queue_cnt
         },
 
 #endif
@@ -182,7 +182,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
     &&  defined(VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE)
         {
             __vsf_eda_frame_buffer,                 // frame_buf_ptr
-            UBOUND(__vsf_eda_frame_buffer),         // frame_cnt
+            dimof(__vsf_eda_frame_buffer),          // frame_cnt
         },
 #endif
 
