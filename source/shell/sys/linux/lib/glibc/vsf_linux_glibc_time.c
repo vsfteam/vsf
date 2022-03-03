@@ -27,10 +27,12 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/simple_libc/time.h"
+#   include "../../include/simple_libc/stdio.h"
 #   include "../../include/sys/time.h"
 #else
 #   include <unistd.h>
 #   include <time.h>
+#   include <stdio.h>
 #   include <sys/time.h>
 #endif
 
@@ -78,6 +80,33 @@ time_t time(time_t *t)
     return tv.tv_sec;
 }
 
+static char * __asctime_r(const struct tm *tm, char *buf, size_t buflen)
+{
+    static const char *__day_name[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+    static const char *__mon_name[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    VSF_LINUX_ASSERT(tm->tm_wday >= 0 && tm->tm_wday < 7);
+    VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);
+    int n = snprintf(buf, buflen, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
+                      __day_name[tm->tm_wday], __mon_name[tm->tm_mon],
+                      tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec, 1900 + tm->tm_year);
+    if (n < 0) {
+        return NULL;
+    }
+    return buf;
+}
+
+char * asctime_r(const struct tm *tm, char *buf)
+{
+    return __asctime_r(tm, buf, 26);
+}
+
+char * asctime(const struct tm *tm)
+{
+    // format:      "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n\0"
+    static char result[3+1+ 3+20+1+20+1+20+1+20+1+20+2];
+    return __asctime_r(tm, result, sizeof(result));
+}
+
 struct tm * gmtime_r(const time_t *timep, struct tm *result)
 {
     static const uint16_t __lyday_month[13] = {-1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
@@ -96,7 +125,7 @@ struct tm * gmtime_r(const time_t *timep, struct tm *result)
 #define LEAP_YEARS_SINCE(__Y)       ((((__Y) - 1) / 4) - (((__Y) - 1) / 100) + (((__Y) + 299) / 400) - 17)
 
     int tmp = caltime / SECONDS_PER_YEAR;
-    caltime -= (time_t)tmp * SECONDS_PER_DAY;
+    caltime = caltime % SECONDS_PER_YEAR;
     tmp += 70;
     caltime -= LEAP_YEARS_SINCE(tmp) * SECONDS_PER_DAY;
     if (caltime < 0) {
