@@ -331,6 +331,68 @@ char * mkdtemp(char *template)
     return (mkdir(name, 0) < 0) ? NULL : name;
 }
 
+#if !__IS_COMPILER_IAR__
+int abs(int j)
+{
+    return (j < 0 ? -j : j);
+}
+
+long labs(long j)
+{
+    return (j < 0 ? -j : j);
+}
+
+long long llabs(long long j)
+{
+    return (j < 0 ? -j : j);
+}
+#endif
+
+intmax_t imaxabs(intmax_t j)
+{
+    return (j < 0 ? -j : j);
+}
+
+#if VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX == ENABLED
+double strtod(const char *str, char **endptr)
+{
+    double result;
+    if (sscanf(str, "%lf", &result) != 1) {
+        return 0;
+    }
+    return result;
+}
+
+float strtof(const char *str, char **endptr)
+{
+    float result;
+    if (sscanf(str, "%f", &result) != 1) {
+        return 0;
+    }
+    return result;
+}
+
+long strtol(const char *str, char **endptr, int base)
+{
+    return 0;
+}
+
+unsigned long strtoul(const char *str, char **endptr, int base)
+{
+    return 0;
+}
+
+unsigned long long strtoull(const char *str, char **endptr, int base)
+{
+    return 0;
+}
+
+int atoi(const char *str)
+{
+    return strtol(str, NULL, 10);
+}
+#endif
+
 char * itoa(int num, char *str, int radix)
 {
     char index[] = "0123456789ABCDEF";
@@ -363,28 +425,6 @@ char * itoa(int num, char *str, int radix)
         str[i - 1 + k - j] = temp;
     }
     return str;
-}
-
-#if !__IS_COMPILER_IAR__
-int abs(int j)
-{
-    return (j < 0 ? -j : j);
-}
-
-long labs(long j)
-{
-    return (j < 0 ? -j : j);
-}
-
-long long llabs(long long j)
-{
-    return (j < 0 ? -j : j);
-}
-#endif
-
-intmax_t imaxabs(intmax_t j)
-{
-    return (j < 0 ? -j : j);
 }
 
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED

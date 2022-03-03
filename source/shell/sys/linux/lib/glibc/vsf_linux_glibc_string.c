@@ -70,4 +70,9 @@ char * strdup(const char *str)
 #endif
 }
 
+char * strerror(int errnum)
+{
+    return "unknown";
+}
+
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STRING

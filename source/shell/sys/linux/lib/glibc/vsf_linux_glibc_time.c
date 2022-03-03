@@ -83,6 +83,7 @@ time_t time(time_t *t)
 
 size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm)
 {
+    VSF_LINUX_ASSERT((str != NULL) && (format != NULL) && (tm != NULL) && (maxsize > 0));
     VSF_LINUX_ASSERT(tm->tm_wday >= 0 && tm->tm_wday < 7);
     VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);
     char *str_end = str + maxsize - 1, *str_cur = str;
