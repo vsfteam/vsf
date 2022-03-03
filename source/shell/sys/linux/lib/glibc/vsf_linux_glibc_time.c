@@ -27,12 +27,10 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/simple_libc/time.h"
-#   include "../../include/simple_libc/stdio.h"
 #   include "../../include/sys/time.h"
 #else
 #   include <unistd.h>
 #   include <time.h>
-#   include <stdio.h>
 #   include <sys/time.h>
 #endif
 
@@ -47,6 +45,9 @@
 struct vsf_linux_glibc_time_t {
     struct tm tm;
 } static __vsf_linux_glibc_time;
+
+static const char *__day_name[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+static const char *__mon_name[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -80,19 +81,128 @@ time_t time(time_t *t)
     return tv.tv_sec;
 }
 
-static char * __asctime_r(const struct tm *tm, char *buf, size_t buflen)
+size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm)
 {
-    static const char *__day_name[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-    static const char *__mon_name[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     VSF_LINUX_ASSERT(tm->tm_wday >= 0 && tm->tm_wday < 7);
     VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);
-    int n = snprintf(buf, buflen, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
-                      __day_name[tm->tm_wday], __mon_name[tm->tm_mon],
-                      tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec, 1900 + tm->tm_year);
-    if (n < 0) {
-        return NULL;
+    char *str_end = str + maxsize - 1, *str_cur = str;
+    char *curfmt, *subfmt, ch;
+    size_t curlen;
+    int value, valuelen;
+
+    while ((ch = *format++) != '\0') {
+        if (ch == '%') {
+            curfmt = subfmt = NULL;
+            curlen = -1;
+            valuelen = 2;
+            switch (*format++) {
+            case '%':
+                curfmt = "%";
+                break;
+            case 'a':
+                curlen = 3;
+            case 'A':
+                curfmt = (char *)__day_name[tm->tm_wday];
+                break;
+            case 'b':
+                curlen = 3;
+            case 'B':
+                curfmt = (char *)__mon_name[tm->tm_mon];
+                break;
+            case 'c':
+                subfmt = "%a %b %d %H:%M:%S %Y";
+                break;
+            case 'd':
+                value = tm->tm_mday;
+                break;
+            case 'H':
+                value = tm->tm_hour;
+                break;
+            case 'I':
+                if (!(value = tm->tm_hour % 12)) {
+                    value = 12;
+                }
+                break;
+            case 'j':
+                value = tm->tm_yday + 1;
+                valuelen = 3;
+                break;
+            case 'm':
+                value = tm->tm_mon + 1;
+                break;
+            case 'M':
+                value = tm->tm_min;
+                break;
+            case 'p':
+                curfmt = (tm->tm_hour > 11) ? "PM" : "AM";
+                break;
+            case 'S':
+                value = tm->tm_sec;
+                break;
+            case 'U':
+                value = (tm->tm_yday + 7 - tm->tm_wday) / 7;
+                break;
+            case 'w':
+                value = tm->tm_wday;
+                valuelen = 1;
+                break;
+            case 'W':
+                value = tm->tm_yday + 7 - (tm->tm_wday ? (tm->tm_wday - 1) : 6) / 7;
+                break;
+            case 'x':
+                subfmt = "%m/%d/%y";
+                break;
+            case 'X':
+                subfmt = "%H:%M:%S";
+                break;
+            case 'y':
+                value = tm->tm_year % 100;
+                break;
+            case 'Y':
+                value = tm->tm_year + 1900;
+                valuelen = 4;
+                break;
+            default:
+                vsf_trace_error("invalid fmt %c in strftime" VSF_TRACE_CFG_LINEEND, ch);
+                return 0;
+            }
+            if (subfmt != NULL) {
+                curlen = strftime(str_cur, str_end - str_cur, subfmt, tm);
+                if (!curlen) {
+                    break;
+                }
+                str_cur += curlen;
+            } else if (curfmt != NULL) {
+                while (((ch = *curfmt++) != '\0') && (curlen < 0 || (curlen-- > 0))) {
+                    *str_cur++ = ch;
+                }
+            } else if (str_cur + valuelen >= str_end) {
+                break;
+            } else {
+                int pos = -1, digit;
+                str_cur += valuelen;
+                while (valuelen-- > 0) {
+                    digit = value % 10;
+                    value = value / 10;
+                    str_cur[pos--] = '0' + digit;
+                }
+            }
+        } else if (str_cur >= str_end) {
+            break;
+        } else {
+            *str_cur++ = ch;
+        }
     }
-    return buf;
+    *str_cur = '\0';
+    return str_cur - str;
+}
+
+static char * __asctime_r(const struct tm *tm, char *buf, size_t buflen)
+{
+    VSF_LINUX_ASSERT(tm->tm_wday >= 0 && tm->tm_wday < 7);
+    VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);
+    int n = strftime(buf, buflen, "%C", tm);
+    return n < 0 ? NULL : buf;
 }
 
 char * asctime_r(const struct tm *tm, char *buf)
