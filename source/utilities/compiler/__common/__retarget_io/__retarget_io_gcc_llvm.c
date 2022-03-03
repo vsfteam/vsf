@@ -19,6 +19,18 @@
 #undef __USE_COMMON_RETARGET_IO_GCC_LLVM_C__
 
 #if VSF_USE_POSIX == ENABLED
+// __assert_func is necessary because original function in newlib has dependency issue
+//  __assert_func in newlib depends on fprintf, which is not usable outside vsf linux
+SECTION(".vsf.utilities.stdio.gcc.__assert_func")
+void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
+{
+#if VSF_USE_TRACE == ENABLED
+    vsf_trace_error("assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
+            failedexpr, file, line, func ? ", function: " : "", func ? func : "");
+#endif
+    VSF_ASSERT(false);
+}
+
 SECTION(".vsf.utilities.stdio.gcc._open")
 int _open(const char *path_name, int flags, mode_t mode)
 {
