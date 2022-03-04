@@ -81,6 +81,11 @@ time_t time(time_t *t)
     return tv.tv_sec;
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
 size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm)
 {
     VSF_LINUX_ASSERT((str != NULL) && (format != NULL) && (tm != NULL) && (maxsize > 0));
@@ -197,6 +202,10 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
     *str_cur = '\0';
     return str_cur - str;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 static char * __asctime_r(const struct tm *tm, char *buf, size_t buflen)
 {

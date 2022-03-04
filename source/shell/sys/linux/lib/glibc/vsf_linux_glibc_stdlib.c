@@ -354,37 +354,214 @@ intmax_t imaxabs(intmax_t j)
 }
 
 #if VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX == ENABLED
-double strtod(const char *str, char **endptr)
+static int __strtoradix(const char *str, char **endptr, int base)
 {
-    double result;
-    if (sscanf(str, "%lf", &result) != 1) {
-        return 0;
+    bool is_negative = false;
+    char ch;
+    VSF_LINUX_ASSERT(str != NULL);
+
+    while (isspace(ch = *str++));
+
+    if (ch == '-') {
+        is_negative = true;
+        ch = *str++;
+    } else if (ch == '+') {
+        ch = *str++;
     }
-    return result;
+    if (!(base & ~16) && (ch == '0') && (*str == 'x' || *str == 'X')) {
+        str++;
+        base = 16;
+    } else if (!(base & ~2) && (ch == '0') && (*str == 'b' || *str == 'B')) {
+        str++;
+        base = 2;
+    }
+    if (0 == base) {
+        base = ch == '0' ? 8 : 10;
+    }
+
+    if (endptr != NULL) {
+        *endptr = (char *)str;
+    }
+    return is_negative ? -base : base;
 }
 
-float strtof(const char *str, char **endptr)
+static unsigned long long __strtonum(const char *str, char **endptr, int base, unsigned long long max)
 {
-    float result;
-    if (sscanf(str, "%f", &result) != 1) {
-        return 0;
+    unsigned long long result = 0, tmp_result;
+    const char *str_cur = str;
+    char ch;
+    bool is_valid = false;
+
+    while (true) {
+        ch = *str_cur++;
+        if (isdigit(ch)) {
+            ch -= '0';
+        } else if (isalpha(ch)) {
+            ch -= ((isupper(ch) ? 'A' : 'a') - 10);
+        } else {
+            break;
+        }
+        if (ch >= base) {
+            break;
+        }
+
+        tmp_result = result * base + ch;
+        if (tmp_result > max) {
+            break;
+        }
+        result = tmp_result;
+        is_valid = true;
+    }
+
+    if (endptr != NULL) {
+        *endptr = (char *)(is_valid ? str_cur - 1 : str);
     }
     return result;
 }
 
 long strtol(const char *str, char **endptr, int base)
 {
-    return 0;
+    char *str_cur;
+    bool is_negative = false;
+    unsigned long long max;
+
+    base = __strtoradix(str, &str_cur, base);
+    if (base < 0) {
+        is_negative = true;
+        base = -base;
+        max = -LONG_MIN;
+    } else {
+        max = LONG_MAX;
+    }
+
+    return (is_negative ? -1 : 1) * (long)__strtonum(str_cur, endptr, base, max);
+}
+
+long long strtoll(const char *str, char **endptr, int base)
+{
+    char *str_cur;
+    bool is_negative = false;
+    unsigned long long max;
+
+    base = __strtoradix(str, &str_cur, base);
+    if (base < 0) {
+        is_negative = true;
+        base = -base;
+        max = -LLONG_MIN;
+    } else {
+        max = LLONG_MAX;
+    }
+
+    return (is_negative ? -1 : 1) * (long long)__strtonum(str_cur, endptr, base, max);
 }
 
 unsigned long strtoul(const char *str, char **endptr, int base)
 {
-    return 0;
+    char *str_cur;
+    unsigned long long max;
+
+    base = __strtoradix(str, &str_cur, base);
+    if (base < 0) {
+        if (endptr != NULL) {
+            *endptr = (char *)str;
+        }
+        return 0;
+    } else {
+        max = ULONG_MAX;
+    }
+
+    return (unsigned long)__strtonum(str_cur, endptr, base, max);
 }
 
 unsigned long long strtoull(const char *str, char **endptr, int base)
 {
-    return 0;
+    char *str_cur;
+    unsigned long long max;
+
+    base = __strtoradix(str, &str_cur, base);
+    if (base < 0) {
+        if (endptr != NULL) {
+            *endptr = (char *)str;
+        }
+        return 0;
+    } else {
+        max = ULLONG_MAX;
+    }
+
+    return __strtonum(str_cur, endptr, base, max);
+}
+
+double strtod(const char *str, char **endptr)
+{
+    double number = 0;
+    int exponent;
+    bool is_negative;
+    char *str_tmp;
+    unsigned long long value;
+
+    while (isspace(*str)) { str++; }
+
+    is_negative = false;
+    switch (*str) {
+    case '-':
+        is_negative = true;
+    case '+':
+        str++;
+        break;
+    }
+
+    value = __strtonum(str, &str_tmp, 10, ULLONG_MAX);
+    if (str_tmp == str) {
+        goto error;
+    }
+    number = (double)value;
+    str = str_tmp;
+    if (*str == '.') {
+        str++;
+        value = __strtonum(str, &str_tmp, 10, ULLONG_MAX);
+        if (str_tmp != str) {
+            unsigned long long ten_n = 1;
+            exponent = str_tmp - str;
+            for (int i = 0; i < exponent; i++) {
+                ten_n *= 10;
+            }
+            number += (double)value / ten_n;
+            str = str_tmp;
+        }
+    }
+    if (is_negative) {
+        number = -number;
+    }
+
+    if (*str == 'e' || *str == 'E') {
+        double ten_n = 10.;
+        switch (*++str) {
+        case '-':
+            ten_n = 0.1;
+        case '+':
+            str++;
+            break;
+        }
+
+        exponent = (int)__strtonum(str, &str_tmp, 10, 308);
+        while (exponent) {
+            if (exponent & 1) {
+                number *= ten_n;
+            }
+            exponent >>= 1;
+            ten_n *= ten_n;
+        }
+    }
+    
+    return number;
+error:
+    errno = ERANGE;
+    return 0.0;
+}
+
+float strtof(const char *str, char **endptr)
+{
+    return (float)strtod(str, endptr);
 }
 
 int atoi(const char *str)

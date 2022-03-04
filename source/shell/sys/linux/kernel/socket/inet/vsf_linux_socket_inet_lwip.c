@@ -645,6 +645,9 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
 #if __IS_COMPILER_IAR__
 //! transfer of control bypasses initialization
 #   pragma diag_suppress=pe546
+#elif __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
 static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, void *buffer, size_t size, int flags,
@@ -758,6 +761,10 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
     return len;
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
+
 static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum netconn_evt evt, u16_t len)
 {
     VSF_LINUX_ASSERT(conn != NULL);
@@ -795,6 +802,9 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
             break;
         case NETCONN_EVT_SENDMINUS:
             vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
+            break;
+        case NETCONN_EVT_ERROR:
+            // TODO: issue POLLERR?
             break;
         }
     }
