@@ -1,0 +1,52 @@
+name: cmake-native-build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  cmake-native-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+        os: [ubuntu-latest]
+
+    runs-on: ${{matrix.os}}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true # without recursive
+
+    - name: install depends
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libusb-dev libusb-1.0
+          echo "CMAKE_PATH=linux" >> $GITHUB_ENV
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          brew install gcc llvm sdl2
+          echo "CMAKE_PATH=macos" >> $GITHUB_ENV
+        else
+          choco install mingw llvm cmake ninja sdl2
+          echo "CMAKE_PATH=windows" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: configure cmake
+      run: cmake -GNinja -S ${SOURCE_PATH} -B ${SOURCE_PATH}/build
+      env:
+        CC: ${{matrix.cc}}
+        VSF_PATH: ${{github.workspace}}
+        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{env.CMAKE_PATH}}
+
+    - name: build
+      # Build your program with the given configuration
+      run: cmake --build ${SOURCE_PATH}/build -v
+      env:
+        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{env.CMAKE_PATH}}
