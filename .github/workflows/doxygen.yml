@@ -7,19 +7,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  doxygen:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
 
       - name: doxygen-en
-        uses: mattnotmitt/doxygen-action@v1.9.2
+        uses: mattnotmitt/doxygen-action@v1.9.3
         with:
           doxyfile-path: 'doxygen/vsf_doxygen_en.conf'
 
       - name: doxygen-zh
-        uses: mattnotmitt/doxygen-action@v1.9.2
+        uses: mattnotmitt/doxygen-action@v1.9.3
         with:
           doxyfile-path: 'doxygen/vsf_doxygen_zh.conf'
 
