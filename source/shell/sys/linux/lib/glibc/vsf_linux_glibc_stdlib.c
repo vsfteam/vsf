@@ -360,19 +360,19 @@ static int __strtoradix(const char *str, char **endptr, int base)
     char ch;
     VSF_LINUX_ASSERT(str != NULL);
 
-    while (isspace(ch = *str++));
+    while (isspace(ch = *str)) { str++; }
 
     if (ch == '-') {
         is_negative = true;
-        ch = *str++;
+        ch = *++str;
     } else if (ch == '+') {
-        ch = *str++;
+        ch = *++str;
     }
-    if (!(base & ~16) && (ch == '0') && (*str == 'x' || *str == 'X')) {
-        str++;
+    if (!(base & ~16) && (ch == '0') && (str[1] == 'x' || str[1] == 'X')) {
+        str += 2;
         base = 16;
-    } else if (!(base & ~2) && (ch == '0') && (*str == 'b' || *str == 'B')) {
-        str++;
+    } else if (!(base & ~2) && (ch == '0') && (str[1] == 'b' || str[1] == 'B')) {
+        str += 2;
         base = 2;
     }
     if (0 == base) {
