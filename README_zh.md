@@ -1,6 +1,8 @@
 # VSF -- Versaloon Software Framework
 [![GitHub](https://img.shields.io/github/license/vsfteam/vsf.svg)](https://github.com/vsfteam/vsf/blob/master/LICENSE)
-[![Build Status](https://github.com/vsfteam/vsf/actions/workflows/vsf-actions.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/vsf-actions.yml)
+[![windows-build](https://github.com/vsfteam/vsf/actions/workflows/windows-build.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/windows-build.yml)
+[![cmake-native-build](https://github.com/vsfteam/vsf/actions/workflows/cmake-native-build.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/cmake-native-build.yml)
+[![cmake-arm-cross-build](https://github.com/vsfteam/vsf/actions/workflows/cmake-arm-cross-build.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/cmake-arm-cross-build.yml)
 
 [English](README.md) |
 
