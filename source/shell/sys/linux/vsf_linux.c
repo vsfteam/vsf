@@ -438,12 +438,13 @@ int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig)
 
 int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout)
 {
+    vsf_protect_t orig;
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
 
     trig->sig = 0;
-    vsf_protect_t orig = vsf_protect_sched();
+    orig = vsf_protect_sched();
         vsf_dlist_add_to_tail(vsf_linux_trigger_t, node, &process->sig.trigger_list, trig);
         VSF_LINUX_ASSERT(NULL == trig->pending_process);
         trig->pending_process = process;
@@ -452,9 +453,13 @@ int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout
 
     vsf_sync_reason_t r = vsf_thread_trig_pend(&trig->use_as__vsf_trig_t, timeout);
     orig = vsf_protect_sched();
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
     trig->pending_process = NULL;
+#endif
     if (VSF_SYNC_TIMEOUT == r) {
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
         vsf_dlist_remove(vsf_linux_trigger_t, node, &process->sig.trigger_list, trig);
+#endif
         vsf_unprotect_sched(orig);
         return 1;
     }
