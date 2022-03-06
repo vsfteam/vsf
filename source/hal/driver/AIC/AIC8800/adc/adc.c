@@ -27,11 +27,6 @@
 #include "../gpio/gpio.h"
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_AIC8800_ADC_CFG_BIT_COUNT
-#   define VSF_AIC8800_ADC_CFG_BIT_COUNT                        10
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_HW_ADC_IMP_LV0(__COUNT, __dont_care)                              \
@@ -122,12 +117,10 @@ static void __vsf_adc_measure(int type)
 static void __vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
 {
     uint32_t temp_clock_div;
-    //todo:cfg_ptr
-    __vsf_adc_measure(adc_ptr->cfg.feature & ADC_REF_VDD);
 #if PLF_PMIC_VER_LITE
     if (101960 > adc_ptr->cfg.clock_freq) {
         adc_ptr->cfg.clock_freq = 101960;
-    }else if(13000000 < adc_ptr->cfg.clock_freq) {
+    }else if (13000000 < adc_ptr->cfg.clock_freq) {
         adc_ptr->cfg.clock_freq = 13000000;
     }
     temp_clock_div = 26000000 / adc_ptr->cfg.clock_freq;
@@ -154,8 +147,8 @@ static void __vsf_adc_channel_config(vsf_adc_t *adc_ptr, adc_channel_cfg_t *chan
         }
 #endif
 
-        vsf_hw_gpio_config_pin((vsf_gpio_t *)&vsf_gpio0, 1 << (channel + 16), 0);
-        vsf_hw_gpio_set_input((vsf_gpio_t *)&vsf_gpio0, 1 << (channel + 16));
+        vsf_hw_gpio_config_pin((vsf_gpio_t *)&vsf_gpio1, channel, 0);
+        vsf_hw_gpio_set_input((vsf_gpio_t *)&vsf_gpio1, channel);
 
 #if PLF_PMIC_VER_LITE
         PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[channel]),
@@ -204,18 +197,14 @@ static void __vk_adc_on_time(vsf_callback_timer_t *timer)
     unsigned int gpmsk = 0x01UL << adc_ptr->current_channel->channel;
     uint32_t temp_mask;
     int temp_value;
-    if(0x1 != PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw))) {
+
+    if (0x1 != PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw))) {
         vsf_callback_timer_add_us(&adc_ptr->callback_timer, __vsf_adc_get_callback_time_us(adc_ptr));
         return;
     }
-
     PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw), 0x1);
 
-    temp_mask = REG_GPIO0->MR;
-    REG_GPIO0->MR = gpmsk;
     temp_value = PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_ro_acc));
-    REG_GPIO0->MR = temp_mask;
-
     temp_value = temp_value * 1175 / 32896 - 1175;
     if (adc_ptr->current_channel->channel & 0x01) {
         temp_value = -temp_value;
@@ -224,7 +213,7 @@ static void __vk_adc_on_time(vsf_callback_timer_t *timer)
         temp_value = 0;//todo:
     }
     VSF_HAL_ASSERT(temp_value <= 1175);
-    *(uint16_t *)adc_ptr->data = temp_value * (1 << VSF_AIC8800_ADC_CFG_BIT_COUNT) / 1175;
+    *(uint16_t *)adc_ptr->data = temp_value;
 
     adc_ptr->status.is_busy = false;
     if (    (NULL != adc_ptr->cfg.isr.handler_fn)
