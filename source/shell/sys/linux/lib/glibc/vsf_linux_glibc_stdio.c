@@ -83,6 +83,12 @@ int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
     return 0;
 }
 
+int ungetc(int ch, FILE *f)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 int getc(FILE *f)
 {
     int ch = 0;

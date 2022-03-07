@@ -568,6 +568,11 @@ int atoi(const char *str)
 {
     return strtol(str, NULL, 10);
 }
+
+double atof(const char *str)
+{
+    return strtod(str, NULL);
+}
 #endif
 
 char * itoa(int num, char *str, int radix)

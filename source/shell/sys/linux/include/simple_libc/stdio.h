@@ -34,6 +34,7 @@ extern "C" {
 #define getchar             VSF_LINUX_LIBC_WRAPPER(getchar)
 #define putc                VSF_LINUX_LIBC_WRAPPER(putc)
 #define putchar             VSF_LINUX_LIBC_WRAPPER(putchar)
+#define ungetc              VSF_LINUX_LIBC_WRAPPER(ungetc)
 
 
 #define fopen               VSF_LINUX_LIBC_WRAPPER(fopen)

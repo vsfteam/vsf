@@ -37,6 +37,8 @@
 #elif __IS_COMPILER_GCC__
 // strtoxxx in newlib has dependency issues, implement in simple_stdlib
 #   define VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX          ENABLED
+#   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
+#   define VSF_USE_SIMPLE_SSCANF                        ENABLED
 #endif
 
 //extern uint32_t SystemCoreClock;
