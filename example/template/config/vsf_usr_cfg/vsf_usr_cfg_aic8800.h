@@ -34,6 +34,9 @@
 #if __IS_COMPILER_IAR__
 #   define VSF_KERNEL_CFG_THREAD_STACK_CHECK            ENABLED
 #   define VSF_KERNEL_GET_STACK_FROM_JMPBUF(__JMPBUF)   ((*(__JMPBUF))[4] & 0xFFFFFFFF)
+#elif __IS_COMPILER_GCC__
+// strtoxxx in newlib has dependency issues, implement in simple_stdlib
+#   define VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX          ENABLED
 #endif
 
 //extern uint32_t SystemCoreClock;
@@ -201,7 +204,6 @@
 #define USRAPP_CFG_STDIO_EN                             ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
-#   define VSF_LINUX_CFG_WRAPPER                        ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #   define VSF_LINUX_USE_SOCKET                         ENABLED
