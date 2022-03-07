@@ -32,16 +32,7 @@ set(VSF_USE_EVM 1)
 set(VSF_CONFIG_PATH ../../../config)
 get_filename_component(VSF_LVGL_CONFIG_PATH ${VSF_CONFIG_PATH}/3rd-party/lvgl ABSOLUTE)
 get_filename_component(VSF_EVM_CONFIG_PATH ${VSF_CONFIG_PATH}/3rd-party/evm ABSOLUTE)
-# add APIs here if conflistc with libc
-set(VSF_TARGET_WRAPPER_LIST "vfprintf" "fprintf" "fflush")
 include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
-
-# user compiler definitions
-foreach(api ${VSF_TARGET_WRAPPER_LIST})
-    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
-        "${api}=__wrap_${api}"
-    )
-endforeach()
 
 # linker script
 target_link_options(${CMAKE_PROJECT_NAME} PRIVATE

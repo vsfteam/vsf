@@ -22,7 +22,21 @@
 #define __VSF_USR_CFG_M484_H__
 
 /*============================ INCLUDES ======================================*/
+
+#define __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
+#include "utilities/compiler/compiler.h"
+
 /*============================ MACROS ========================================*/
+
+#if __IS_COMPILER_IAR__
+#   define VSF_KERNEL_CFG_THREAD_STACK_CHECK            ENABLED
+#   define VSF_KERNEL_GET_STACK_FROM_JMPBUF(__JMPBUF)   ((*(__JMPBUF))[4] & 0xFFFFFFFF)
+#elif __IS_COMPILER_GCC__
+// strtoxxx in newlib has dependency issues, implement in simple_stdlib
+#   define VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX          ENABLED
+#   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
+#   define VSF_USE_SIMPLE_SSCANF                        ENABLED
+#endif
 
 #define VSF_SYSTIMER_FREQ                               (192000000ul)
 
@@ -123,7 +137,6 @@
 #define USRAPP_CFG_STDIO_EN                             ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
-#   define VSF_LINUX_CFG_WRAPPER                        ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 
