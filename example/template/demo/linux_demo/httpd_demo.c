@@ -1,9 +1,11 @@
+#include "shell/sys/linux/vsf_linux_cfg.h"
+#if VSF_USE_LINUX == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
+
 #include <unistd.h>
 #include <stdio.h>
 
 #include "shell/sys/linux/app/httpd/vsf_linux_httpd.h"
 
-#if VSF_USE_LINUX == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
 static const vsf_linux_httpd_urihandler_t __user_httpd_urihandler[] = {
     {
         .match              = VSF_LINUX_HTTPD_URI_MATCH_URI,

@@ -1,3 +1,6 @@
+#include "shell/sys/linux/vsf_linux_cfg.h"
+#if VSF_USE_LINUX == ENABLED && APP_USE_LINUX_MOUNT_DEMO == ENABLED
+
 // inherit linux fs class for bind related APIs
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #include <unistd.h>
@@ -14,8 +17,6 @@
 #if VSF_FS_USE_LITTLEFS == ENABLED
 #   include "lfs_port.h"
 #endif
-
-#if VSF_USE_LINUX == ENABLED && APP_USE_LINUX_MOUNT_DEMO == ENABLED
 
 typedef struct __fs_param_t {
     char *device;

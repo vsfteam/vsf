@@ -1,6 +1,6 @@
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if APP_USE_LINUX_NTPDATE_DEMO == ENABLED
+#if VSF_USE_LINUX == ENABLED && APP_USE_LINUX_NTPDATE_DEMO == ENABLED
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
