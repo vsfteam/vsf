@@ -5768,6 +5768,9 @@
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\gpio_demo.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\i2c_demo.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\spi_demo.c</name>
                 </file>
                 <file>
@@ -10421,6 +10424,15 @@
                             </file>
                         </group>
                         <group>
+                            <name>i2c</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\i2c\i2c.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\i2c\i2c.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>port</name>
                             <group>
                                 <name>arch</name>
@@ -11551,7 +11563,43 @@
                         </file>
                     </group>
                     <group>
+                        <name>i2c</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\__i2c_multiplex_common.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\__i2c_multiplex_common.inc</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_multiplex.c</name>
+                            <excluded>
+                                <configuration>vsf_template_aic8800</configuration>
+                            </excluded>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_multiplex.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_request.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_request.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>spi</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\multiplex_spi.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\multiplex_spi.h</name>
+                        </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_common.c</name>
                         </file>
@@ -11583,10 +11631,16 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_hal_driver.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_i2c.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_io.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_pm.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_rtc.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_spi.h</name>
@@ -12368,6 +12422,18 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\gpio\74hc165\vsf_gpio_74hc165.h</name>
+                            </file>
+                        </group>
+                    </group>
+                    <group>
+                        <name>i2c</name>
+                        <group>
+                            <name>gpio_i2c</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\i2c\gpio_i2c\gpio_i2c.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\i2c\gpio_i2c\gpio_i2c.h</name>
                             </file>
                         </group>
                     </group>

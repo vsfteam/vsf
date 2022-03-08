@@ -21,24 +21,20 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
+
 #if VSF_HAL_USE_I2C == ENABLED
+
 #include "../__device.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/i2cm/reg_i2cm.h"
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
 
 /*============================ MACROS ========================================*/
 
-#undef I2C_TEMPLATE_USE_MODULAR_NAME
-#define I2C_TEMPLATE_USE_MODULAR_NAME           hw
-
-/*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ TYPES =========================================*/
-/*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_i2c.h"
+#define VSF_I2C_REIMPLEMENT_STATUS                  ENABLED
+#define VSF_I2C_REIMPLEMENT_STATUS                  ENABLED
 
 /*============================ TYPES =========================================*/
 
-struct i2c_type_status {
+typedef struct i2c_status_t {
     union {
         inherit(peripheral_status_t)
         struct {
@@ -48,36 +44,23 @@ struct i2c_type_status {
             uint32_t                            : 29;
         } status_bool;
     };
-};
+} i2c_status_t;
 
-
-struct i2c_type_ptr {
-    AIC_I2CM_TypeDef                *REG_PARAM;
-    i2c_cfg_t                       cfg;
-    i2c_capability_t                capability;
-    i2c_type_status                 status;
-    em_i2c_irq_mask_t               irq_mask;
-    uint16_t                        data_length;
-    struct {
-        uint16_t                    address;
-        uint16_t                    data_size;
-        uint16_t                    data_offset;
-        em_i2c_cmd_t                cmd;
-    } recall_info;
-    uint8_t                         *data;
-    VSF_I2C_INTTERFACE_TYPE_DEFINE
-};
+typedef struct vsf_hw_i2c_t vsf_hw_i2c_t;
 
 /*============================ INCLUDES ======================================*/
 
-#if VSF_HAL_I2C_IMP_MULTIPLEX_I2C == ENABLED
-#   include "hal/driver/common/i2c/i2c_multiplex/__i2c_multiplex_common.h"
-#endif
+// undef after include vsf_template_i2c.h
+#define VSF_I2C_CFG_DEC_PREFIX                      vsf_hw
+#define VSF_I2C_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
+#define VSF_I2C_CFG_DEC_LV0(__count, __dont_care)   \
+    extern vsf_hw_i2c_t vsf_hw_i2c ## __count;
 
+#include "hal/driver/common/template/vsf_template_i2c.h"
+
+/*============================ TYPES =========================================*/
+/*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
-extern i2c_type_ptr vsf_hw_i2c0;
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
