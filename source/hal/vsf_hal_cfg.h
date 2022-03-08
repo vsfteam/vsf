@@ -171,17 +171,10 @@ extern "C" {
 #   define VSF_HAL_USE_I2C              ENABLED
 #endif
 
-#if VSF_HAL_USE_I2C == ENABLED
-#   define VSF_HAL_USE_I2C0                    ENABLED
-#   define VSF_HAL_I2C_IMP_MULTIPLEX_I2C       ENABLED
-#else
-#   define VSF_HAL_USE_I2C0                    DISABLED
-#   define VSF_HAL_I2C_IMP_MULTIPLEX_I2C       DISABLED
-#endif
-
 #ifndef VSF_HAL_USE_I2C_GPIO
 #   define VSF_HAL_USE_I2C_GPIO         ENABLED
 #endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
