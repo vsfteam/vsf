@@ -52,15 +52,15 @@ extern "C" {
 
 #if VSF_USART_CFG_MULTI_CLASS == DISABLED
 #   ifndef VSF_USART_CFG_PREFIX
-#       define VSF_USART_CFG_PREFIX             vsf_hw
+#       define VSF_USART_CFG_PREFIX                     vsf_hw
 #   endif
-#   ifndef VSF_USART_CFG_FIFO2REQ_PREFIX
-#       define VSF_USART_CFG_FIFO2REQ_PREFIX    vsf_fifo2req
+#   ifndef VSF_USART_CFG_FIFO_TO_REQUEST_PREFIX
+#       define VSF_USART_CFG_FIFO_TO_REQUEST_PREFIX     vsf_fifo2req
 #   endif
 
 #   ifndef VSF_USART_CFG_REAL_PREFIX
 #       if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-#           define VSF_USART_CFG_REAL_PREFIX    VSF_USART_CFG_FIFO2REQ_PREFIX
+#           define VSF_USART_CFG_REAL_PREFIX    VSF_USART_CFG_FIFO_TO_REQUEST_PREFIX
 #       else
 #           define VSF_USART_CFG_REAL_PREFIX    VSF_USART_CFG_PREFIX
 #       endif

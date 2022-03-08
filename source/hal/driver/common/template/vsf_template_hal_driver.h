@@ -27,7 +27,7 @@ extern "C" {
 #endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
-    
+
 #define VSF_TEMPLATE_HAL_API_OP(__prefix_name, __module__, __return, __name, ...)           \
     .__name = & __prefix_name ## __module__ ## __name,
 
@@ -36,7 +36,7 @@ extern "C" {
 
 #define VSF_TEMPLATE_HAL_API_DEFINE(__prefix_name, __module__, __return, __name, ...)       \
     __return __prefix_name ## __module__ ## __name ( __VA_ARGS__ )
-    
+
 /*============================ TYPES =========================================*/
 
 /*
