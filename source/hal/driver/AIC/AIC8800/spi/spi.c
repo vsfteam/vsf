@@ -44,7 +44,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_SPI_CFG_IMP_LV0(__count, __dont_care)                               \
-    static const vsf_hw_spi_cosnt_t vsf_spi ##__count ## _const = {             \
+    static const vsf_hw_spi_const_t __vsf_spi ##__count ## _const = {           \
         .reg = REG_SPI##__count,                                                \
         .irqn = {                                                               \
             .spi    = VSF_HW_SPI ##__count ## _IRQ_IDX,                         \
@@ -69,7 +69,7 @@
     };                                                                          \
     vsf_hw_spi_t vsf_spi##__count = {                                           \
         VSF_SPI_OP                                                              \
-        .spi_const = &vsf_spi##__count ## _const,                               \
+        .spi_const = &__vsf_spi##__count ## _const,                             \
     };                                                                          \
     void VSF_HW_SPI ## __count ## _RXDMA_IRQ(void)                              \
     {                                                                           \
@@ -82,7 +82,7 @@
 
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_hw_spi_cosnt_t {
+typedef struct vsf_hw_spi_const_t {
     REG_SPI_T          *reg;
 
     struct {
@@ -104,14 +104,14 @@ typedef struct vsf_hw_spi_cosnt_t {
         uint32_t oclk;
         uint32_t pclk;
     } clock;
-} vsf_hw_spi_cosnt_t;
+} vsf_hw_spi_const_t;
 
 typedef struct vsf_hw_spi_t {
 #if VSF_SPI_CFG_MULTI_CLASS == ENABLED
     vsf_spi_t vsf_spi;
 #endif
 
-    const vsf_hw_spi_cosnt_t * spi_const;
+    const vsf_hw_spi_const_t * spi_const;
     bool is_auto_cs;
     vsf_spi_isr_t isr;
     em_spi_irq_mask_t irq_mask;
@@ -135,7 +135,7 @@ void vsf_hw_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index);
 
 static vsf_err_t __clock_init(vsf_hw_spi_t *hw_spi_ptr, uint32_t clock_hz)
 {
-    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
 
     cpusysctrl_pclkme_set(spi_const->clock.pclk);
@@ -195,7 +195,7 @@ vsf_err_t vsf_hw_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
         return err;
     }
 
-    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
     REG_SPI_T *reg = spi_const->reg;
 
@@ -286,7 +286,7 @@ void vsf_hw_spi_fifo_transfer(vsf_spi_t *spi_ptr,
 
 #if 0
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
-    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
     REG_SPI_T *reg = spi_const->reg;
     VSF_HAL_ASSERT(reg != NULL);
@@ -370,7 +370,7 @@ static void __spi_request_transfer(vsf_hw_spi_t *hw_spi_ptr)
 {
     static uint32_t __dummy;
 
-    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
     REG_SPI_T *reg = spi_const->reg;
     VSF_HAL_ASSERT(reg != NULL);
@@ -416,7 +416,7 @@ static void __spi_request_transfer(vsf_hw_spi_t *hw_spi_ptr)
 
 static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask)
 {
-    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
     em_spi_irq_mask_t cb_irq_mask = 0;
 
@@ -465,7 +465,7 @@ vsf_err_t vsf_hw_spi_request_transfer(vsf_spi_t    *spi_ptr,
 {
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
-    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
     REG_SPI_T *reg = spi_const->reg;
     VSF_HAL_ASSERT(reg != NULL);
@@ -495,7 +495,7 @@ void vsf_hw_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
-    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
     REG_SPI_T *reg = spi_const->reg;
     VSF_HAL_ASSERT(reg != NULL);
@@ -507,7 +507,7 @@ void vsf_hw_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
-    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
     REG_SPI_T *reg = spi_const->reg;
     VSF_HAL_ASSERT(reg != NULL);
@@ -519,7 +519,7 @@ spi_status_t vsf_hw_spi_status(vsf_spi_t *spi_ptr)
 {
     vsf_hw_spi_t *hw_spi_ptr = (vsf_hw_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
-    const vsf_hw_spi_cosnt_t *spi_const = hw_spi_ptr->spi_const;
+    const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
     REG_SPI_T *reg = spi_const->reg;
 

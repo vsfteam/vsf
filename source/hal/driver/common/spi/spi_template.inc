@@ -117,7 +117,6 @@ spi_capability_t VSF_SPI_FN_CAPABILITY(vsf_spi_t *spi_ptr)
     return spi_capability;
 }
 
-
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #ifdef VSF_SPI_CFG_TEMPLATE_COUNT
