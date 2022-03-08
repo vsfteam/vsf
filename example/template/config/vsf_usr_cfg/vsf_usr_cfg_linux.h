@@ -24,7 +24,7 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-// linux support does not support preemption, so need evtq in idle
+// linux porting does not support preemption, so need evtq in idle
 #define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
 #define VSF_USE_UI                                      ENABLED
 #define VSF_USE_MBEDTLS                                 ENABLED 

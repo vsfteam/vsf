@@ -10,4 +10,9 @@ if(VSF_USE_LWIP)
 #       but note that DO NOT use lwip/socket.h in lwip
         "LWIP_SOCKET=1"
     )
+elseif(VSF_HOST_SYSTEM STREQUAL win)
+#elseif(VSF_HOST_SYSTEM STREQUAL win OR VSF_HOST_SYSTEM STREQUAL linux OR VSF_HOST_SYSTEM STREQUAL macos)
+    target_sources(${VSF_LIB_NAME} INTERFACE
+        vsf_linux_socket_inet_hostsock.c
+    )
 endif()
