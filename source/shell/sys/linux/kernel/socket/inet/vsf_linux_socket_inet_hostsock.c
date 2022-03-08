@@ -50,7 +50,13 @@ struct dirent {
 #   include <WinSock2.h>
 #   pragma comment (lib, "ws2_32.lib")
 #elif defined(__LINUX__) || defined(__linux__)
-// TODO: include linux raw socket headers
+#   include <unistd.h>
+#   include <netdb.h>
+#   include <sys/socket.h>
+#   include <netinet/in.h>
+#   include <netinet/tcp.h>
+#   include <fcntl.h>
+#   include <errno.h>
 #endif
 
 /*============================ MACROS ========================================*/
@@ -69,9 +75,13 @@ struct dirent {
 #   define socket_t                         SOCKET
 #   define errno                            WSAGetLastError()
 #   define ERRNO_WOULDBLOCK                 WSAEWOULDBLOCK
-#else
+#   define SHUT_RDWR                        SD_BOTH
+#elif defined(__LINUX__) || defined(__linux__)
 #   define socket_t                         int
 #   define ERRNO_WOULDBLOCK                 EWOULDBLOCK
+#   define SOCKET_ERROR                     (-1)
+#   define INVALID_SOCKET                   (-1)
+#   define closesocket(__sock)              close(__sock)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -91,6 +101,7 @@ vsf_class(vsf_linux_trigger_t) {
     )
 #endif
 };
+extern void vsf_linux_trigger_init(vsf_linux_trigger_t *trig);
 
 // from errno.h
 #define VSF_LINUX_ERRNO_EAGAIN          11
@@ -309,7 +320,7 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
         __vsf_arch_irq_end(irq_thread, false);
 
         ret = select(nfds, &rfds, &wfds, NULL, NULL);
-        if (SOCKET_ERROR == ret) {
+        if (ret < 0) {
             // if fds are not updated before socket is closed, error will be issued here, just ignore
             continue;
         }
@@ -356,7 +367,7 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
                     vsf_unprotect_sched(orig);
                 }
             }
-#else
+#elif defined(__LINUX__) || defined(__linux__)
             for (int i = 0; ret > 0 && i <= nfds; i++) {
                 priv = NULL;
                 orig = vsf_protect_sched();
@@ -534,8 +545,12 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
         return -1;
     }
 
+#ifdef __WIN__
     u_long optval_ulong = 1;
     ioctlsocket(priv->hostsock, FIONBIO, &optval_ulong);
+#elif defined(__LINUX__) || defined(__linux__)
+    fcntl(priv->hostsock, F_SETFL, fcntl(priv->hostsock, F_GETFL) | O_NONBLOCK);
+#endif
     priv->rcvto = priv->sndto = -1;
     __vsf_linux_hostsock_add(priv);
     return 0;
@@ -547,7 +562,7 @@ assert_fail:
 static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, int how)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
-    shutdown(priv->hostsock, SD_BOTH);
+    shutdown(priv->hostsock, SHUT_RDWR);
     return 0;
 }
 
