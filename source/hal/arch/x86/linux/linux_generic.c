@@ -98,8 +98,8 @@ static vsf_err_t __vsf_arch_create_irq_thread(vsf_arch_irq_thread_t *irq_thread,
 
 typedef struct vsf_arch_systimer_ctx_t {
     implement(vsf_arch_irq_thread_t);
-    vsf_arch_irq_request_t timer_request;
-    struct timespec ts;
+    vsf_arch_irq_request_t due_request;
+    timer_t timer;
 } vsf_arch_systimer_ctx_t;
 
 dcl_vsf_bitmap(vsf_arch_thread_bitmap, VSF_ARCH_CFG_THREAD_NUM)
@@ -286,13 +286,7 @@ static void __vsf_systimer_on_notify(union sigval s)
 #endif
 {
     vsf_arch_systimer_ctx_t *ctx = &__vsf_arch.systimer;
-
-    __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
-
-        vsf_systimer_tick_t tick = vsf_systimer_get();
-        vsf_systimer_timeout_evt_hanlder(tick);
-
-    __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
+    __vsf_arch_irq_request_send(&__vsf_arch.systimer.due_request);
 }
 
 static void __vsf_systimer_thread(void *arg)
@@ -301,6 +295,23 @@ static void __vsf_systimer_thread(void *arg)
 
     __vsf_arch_irq_set_background(&ctx->use_as__vsf_arch_irq_thread_t);
 
+    while (1) {
+        __vsf_arch_irq_request_pend(&__vsf_arch.systimer.due_request);
+
+        __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
+            vsf_systimer_tick_t tick = vsf_systimer_get();
+            vsf_systimer_timeout_evt_hanlder(tick);
+        __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
+    }
+}
+
+/*! \brief initialise SysTick to generate a system timer
+ *! \param frequency the target tick frequency in Hz
+ *! \return initialization result in vsf_err_t
+ */
+vsf_err_t vsf_systimer_init(void)
+{
+    vsf_arch_systimer_ctx_t *ctx = &__vsf_arch.systimer;
     struct sigevent evp = {
 #if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
         .sigev_notify = SIGEV_SIGNAL,
@@ -313,28 +324,12 @@ static void __vsf_systimer_thread(void *arg)
 #if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
     signal(SIGUSR1, __vsf_systimer_on_notify);
 #endif
-    struct itimerspec its = { 0 };
-    timer_t timer;
-    if (timer_create(CLOCK_MONOTONIC, &evp, &timer)) {
+    if (timer_create(CLOCK_MONOTONIC, &evp, &ctx->timer)) {
         VSF_HAL_ASSERT(false);
         __vsf_arch_irq_fini(&ctx->use_as__vsf_arch_irq_thread_t);
-        return;
+        return VSF_ERR_FAIL;
     }
-
-    while (1) {
-        __vsf_arch_irq_request_pend(&__vsf_arch.systimer.timer_request);
-        its.it_value = __vsf_arch.systimer.ts;
-        timer_settime(timer, TIMER_ABSTIME, &its, NULL);
-    }
-}
-
-/*! \brief initialise SysTick to generate a system timer
- *! \param frequency the target tick frequency in Hz
- *! \return initialization result in vsf_err_t
- */
-vsf_err_t vsf_systimer_init(void)
-{
-    __vsf_arch_irq_request_init(&__vsf_arch.systimer.timer_request);
+    __vsf_arch_irq_request_init(&__vsf_arch.systimer.due_request);
     return VSF_ERR_NONE;
 }
 
@@ -342,7 +337,7 @@ vsf_err_t vsf_systimer_start(void)
 {
     __vsf_arch_irq_init(&__vsf_arch.systimer.use_as__vsf_arch_irq_thread_t,
                 "timer", __vsf_systimer_thread, vsf_arch_prio_0);
-    __vsf_arch.systimer.timer_request.arch_thread = __vsf_arch.systimer.arch_thread;
+    __vsf_arch.systimer.due_request.arch_thread = __vsf_arch.systimer.arch_thread;
     return VSF_ERR_NONE;
 }
 
@@ -359,9 +354,12 @@ vsf_systimer_tick_t vsf_systimer_get(void)
 
 bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
-    __vsf_arch.systimer.ts.tv_sec = due / 1000000;
-    __vsf_arch.systimer.ts.tv_nsec = (due % 1000000) * 1000;
-    __vsf_arch_irq_request_send(&__vsf_arch.systimer.timer_request);
+    struct itimerspec its = { 0 };
+    struct timespec ts;
+    ts.tv_sec = due / 1000000;
+    ts.tv_nsec = (due % 1000000) * 1000;
+    its.it_value = ts;
+    timer_settime(__vsf_arch.systimer.timer, TIMER_ABSTIME, &its, NULL);
     return true;
 }
 
