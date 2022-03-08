@@ -319,7 +319,7 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
         vsf_unprotect_sched(orig);
         __vsf_arch_irq_end(irq_thread, false);
 
-        ret = select(nfds, &rfds, &wfds, NULL, NULL);
+        ret = select(nfds + 1, &rfds, &wfds, NULL, NULL);
         if (ret < 0) {
             // if fds are not updated before socket is closed, error will be issued here, just ignore
             continue;
@@ -381,11 +381,11 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
                 if (priv != NULL) {
                     if (FD_ISSET(i, &rfds)) {
                         FD_CLR(i, &__vsf_linux_hostsock.select.rfds);
-                        vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, vsf_protect_sched());
+                        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, vsf_protect_sched());
                     }
                     if (FD_ISSET(i, &wfds)) {
                         FD_CLR(i, &__vsf_linux_hostsock.select.wfds);
-                        vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, vsf_protect_sched());
+                        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, vsf_protect_sched());
                     }
                     ret--;
                 }
