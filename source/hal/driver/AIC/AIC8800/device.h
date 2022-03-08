@@ -92,13 +92,11 @@
 #define VSF_HW_USART_COUNT          2
 #define VSF_HW_USART_MASK           ((1 << 1) | (1 << 2))
 
-#define I2C_MAX_PORT                1
-#define VSF_HAL_I2C0_MULTIPLEX_CNT  2
-#define I2C_PORT_MASK               0x3
-
-#ifndef I2C_TEMPLATE_COUNT
-#   define I2C_TEMPLATE_COUNT       2
-#endif
+#define VSF_HW_I2C_COUNT            1
+#define VSF_HW_I2C0_IRQ_IDX         I2C_IRQn
+#define VSF_HW_I2C0_IRQ             I2C_IRQHandler
+#define VSF_HW_I2C0_REG             (AIC_I2CM_TypeDef *)AIC_I2CM0_BASE
+#define VSF_HW_I2C0_PCLKME_EN_BIT   CSC_PCLKME_I2CM_EN_BIT
 
 #define VSF_HW_SPI_COUNT            1
 #define VSF_HW_SPI0_IRQ_IDX         SPI_IRQn

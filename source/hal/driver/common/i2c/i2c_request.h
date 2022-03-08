@@ -15,37 +15,48 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_COMMON_VSF_HAL_I2C_CS_H__
-#define __HAL_DRIVER_COMMON_VSF_HAL_I2C_CS_H__
+#ifndef __HAL_DRIVER_I2C_CMD_TO_REQUEST_H__
+#define __HAL_DRIVER_I2C_CMD_TO_REQUEST_H__
 
-#if VSF_HAL_I2C_IMP_REQUEST_BY_CMD == ENABLED
-
+#if VSF_HAL_USE_I2C == ENABLED
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
-
-#define vsf_hal_i2c_def_req_by_cmd()                                            \
-        __i2c_req_by_cmd_t     __req_by_cmd;
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define vsf_i2c_master_irq_handler
-
 /*============================ TYPES =========================================*/
 
-typedef struct __i2c_req_by_cmd_t {
-    uint16_t            address;
-    em_i2c_cmd_t        cmd;
-    uint16_t            count;
-    uint16_t            idx;
-    uint8_t             *buffer_ptr;
-} __i2c_req_by_cmd_t;
+typedef vsf_err_t vsf_i2c_request_send_cmd_fn(vsf_i2c_t *i2c_ptr,
+                                              em_i2c_cmd_t command,
+                                              uint16_t data);
+
+typedef struct vsf_i2c_request_t {
+    i2c_cfg_t                       cfg;
+    uint16_t                        address;
+    em_i2c_cmd_t                    cmd;
+    uint16_t                        idx;
+    uint16_t                        count;
+    uint8_t                        *buffer_ptr;
+    vsf_i2c_request_send_cmd_fn    *fn;
+} vsf_i2c_request_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
+                                        vsf_i2c_request_t *i2c_request_ptr,
+                                        uint32_t interrupt_mask,
+                                        uint32_t param);
+
+extern vsf_err_t vsf_i2c_request_master_request(vsf_i2c_t *i2c_ptr,
+                                                vsf_i2c_request_t *i2c_request_ptr,
+                                                uint16_t address,
+                                                em_i2c_cmd_t cmd,
+                                                uint16_t count,
+                                                uint8_t *buffer_ptr);
+
 /*============================ IMPLEMENTATION ================================*/
 
 
-#endif // VSF_HAL_I2C_IMP_REQUEST_BY_CMD
-#endif
+#endif /* VSF_HAL_USE_I2C */
+#endif /* __HAL_DRIVER_I2C_CMD_TO_REQUEST_H__ */
