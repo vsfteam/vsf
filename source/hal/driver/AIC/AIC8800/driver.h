@@ -32,7 +32,6 @@
 #       include "system.h"
 
 #       include "hal/driver/common/swi/vsf_swi_template.h"
-#       include "./usb/usb.h"
 #       include "./debug_uart/debug_uart.h"
 #       include "./gpio/gpio.h"
 #       include "./spi/spi.h"
@@ -42,6 +41,7 @@
 #       include "./pwm/pwm.h"
 #       include "./i2c/i2c.h"
 #       include "./trng/trng.h"
+#       include "./usb/usb.h"
 
 // mbedtls configurations ONLY in mbedtls_aic8800.h
 #       include "./port/mbedtls/mbedtls_aic8800.h"
