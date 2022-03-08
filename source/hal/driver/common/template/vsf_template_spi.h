@@ -26,6 +26,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_SPI_CFG_MULTI_CLASS
@@ -50,6 +51,10 @@ extern "C" {
 
 #ifndef VSF_SPI_REIMPLEMENT_CAPABILITY
 #   define VSF_SPI_REIMPLEMENT_CAPABILITY   DISABLED
+#endif
+
+#ifndef VSF_SPI_DATASIZE_TO_BYTE
+#   define VSF_SPI_DATASIZE_TO_BYTE         (((((__S) & SPI_DATASIZE_MASK) >> __SPI_DATASIZE_OFFSET) + 8) / 8)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -143,32 +148,34 @@ typedef enum em_spi_mode_t {
     SPI_CLOCK_MODE_3            = SPI_CPOL_HIGH | SPI_CPHA_HIGH,
     SPI_CLOCK_MODE_MASK         = SPI_CLOCK_MODE_3,
 
-    SPI_DATASIZE_8              = 0x07ul << 4,      //!< datasize is 8 bits
-    SPI_DATASIZE_9              = 0x08ul << 4,
-    SPI_DATASIZE_10             = 0x09ul << 4,
-    SPI_DATASIZE_11             = 0x0Aul << 4,
-    SPI_DATASIZE_12             = 0x0Bul << 4,
-    SPI_DATASIZE_13             = 0x0Cul << 4,
-    SPI_DATASIZE_14             = 0x0Dul << 4,
-    SPI_DATASIZE_15             = 0x0Eul << 4,
-    SPI_DATASIZE_16             = 0x0Ful << 4,
-    SPI_DATASIZE_17             = 0x10ul << 4,
-    SPI_DATASIZE_18             = 0x11ul << 4,
-    SPI_DATASIZE_19             = 0x12ul << 4,
-    SPI_DATASIZE_20             = 0x13ul << 4,
-    SPI_DATASIZE_21             = 0x14ul << 4,
-    SPI_DATASIZE_22             = 0x15ul << 4,
-    SPI_DATASIZE_23             = 0x16ul << 4,
-    SPI_DATASIZE_24             = 0x17ul << 4,
-    SPI_DATASIZE_25             = 0x18ul << 4,
-    SPI_DATASIZE_26             = 0x19ul << 4,
-    SPI_DATASIZE_27             = 0x1Aul << 4,
-    SPI_DATASIZE_28             = 0x1Bul << 4,
-    SPI_DATASIZE_29             = 0x1Cul << 4,
-    SPI_DATASIZE_30             = 0x1Dul << 4,
-    SPI_DATASIZE_31             = 0x1Eul << 4,
-    SPI_DATASIZE_32             = 0x1Ful << 4,
-    SPI_DATASIZE_MASK           = 0x1Ful << 4,
+    __SPI_DATASIZE_OFFSET       = 0x04,
+    SPI_DATASIZE_8              = 0x07ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
+    SPI_DATASIZE_9              = 0x08ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_10             = 0x09ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_11             = 0x0Aul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_12             = 0x0Bul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_13             = 0x0Cul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_14             = 0x0Dul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_15             = 0x0Eul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_16             = 0x0Ful << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_17             = 0x10ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_18             = 0x11ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_19             = 0x12ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_20             = 0x13ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_21             = 0x14ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_22             = 0x15ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_23             = 0x16ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_24             = 0x17ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_25             = 0x18ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_26             = 0x19ul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_27             = 0x1Aul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_28             = 0x1Bul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_29             = 0x1Cul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_30             = 0x1Dul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_31             = 0x1Eul << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_32             = 0x1Ful << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_MASK           = 0x1Ful << __SPI_DATASIZE_OFFSET,
+
 
     SPI_AUTO_CS_DISABLE         = 0x00ul << 9,
     SPI_AUTO_CS_ENABLE          = 0x01ul << 9,
@@ -176,8 +183,6 @@ typedef enum em_spi_mode_t {
 
     SPI_LOOP_BACK               = 0x01ul << 10,     //!< enable loop back
 } em_spi_mode_t;
-
-#   define SPI_DATASIZE_TO_BYTE(__S)   (((((__S) & SPI_DATASIZE_MASK) >> 4) + 8) / 8)
 #endif
 
 #if VSF_SPI_REIMPLEMENT_IRQ_MASK == DISABLED
@@ -225,13 +230,7 @@ typedef struct spi_capability_t {
 } spi_capability_t;
 #endif
 
-#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
-typedef struct vsf_spi_t  {
-    const vsf_spi_op_t * op;
-} vsf_spi_t;
-#else
 typedef struct vsf_spi_t vsf_spi_t;
-#endif
 
 typedef void vsf_spi_isr_handler_t(void *target_ptr,
                                    vsf_spi_t *spi_ptr,
@@ -274,6 +273,12 @@ typedef struct vsf_spi_op_t {
     vsf_err_t          (*cancel_transfer)     (vsf_spi_t *spi_ptr);
     int_fast32_t       (*get_transfered_count)(vsf_spi_t *spi_ptr);
 } vsf_spi_op_t;
+
+#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
+struct vsf_spi_t  {
+    const vsf_spi_op_t * op;
+};
+#endif
 
 dcl_interface(i_spi_t)
 
