@@ -402,7 +402,8 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
 static void __vsf_linux_hostsock_notify(void)
 {
     char buf = 0;
-    send(__vsf_linux_hostsock.sock_event_notifier, &buf, 1, 0);
+    ssize_t size = send(__vsf_linux_hostsock.sock_event_notifier, &buf, 1, 0);
+    VSF_LINUX_ASSERT(size == 1);
 }
 
 static void __vsf_linux_hostsock_pend(vsf_linux_socket_inet_priv_t *priv)
@@ -763,7 +764,11 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
     __vsf_linux_sockaddr2host(addr, &hsockaddr);
     int ret = connect(priv->hostsock, &hsockaddr, sizeof(hsockaddr));
     if (    (SOCKET_ERROR == ret)
+#if defined(__WIN__)
         &&  (errno == ERRNO_WOULDBLOCK)) {
+#elif defined(__LINUX__) || defined(__linux__)
+        &&  ((errno == ERRNO_WOULDBLOCK) || (errno == EINPROGRESS))) {
+#endif
         ret = 0;
         if (!priv->is_nonblock) {
             vsf_linux_trigger_t trig;
