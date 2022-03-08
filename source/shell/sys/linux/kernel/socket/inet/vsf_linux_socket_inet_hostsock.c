@@ -464,8 +464,10 @@ static void __vsf_linux_hostsock_init(void)
     __vsf_arch_irq_init(&__vsf_linux_hostsock.irq_thread, "hostsock_irqthread", __vsf_linux_socket_inet_irqthread, vsf_arch_prio_0);
 
     if (INVALID_SOCKET == (__vsf_linux_hostsock.sock_event_notifier = accept(listener, NULL, NULL))) {
+        closesocket(listener);
         goto __assert_fail;
     }
+    closesocket(listener);
     __vsf_linux_hostsock.is_inited = true;
     return;
 __assert_fail:

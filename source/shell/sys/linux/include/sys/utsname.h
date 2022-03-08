@@ -15,9 +15,17 @@ extern "C" {
 #ifndef VSF_LINUX_RELEASE
 #   define VSF_LINUX_RELEASE    "0.1.0"
 #endif
+#ifndef VSF_LINUX_VERSION
+#   define VSF_LINUX_VERSION    "unknown"
+#endif
+#ifndef VSF_LINUX_MACHINE
+#   define VSF_LINUX_MACHINE    "unknown"
+#endif
 struct utsname {
     char sysname[sizeof(VSF_LINUX_SYSNAME)];
     char release[sizeof(VSF_LINUX_RELEASE)];
+    char version[sizeof(VSF_LINUX_VERSION)];
+    char machine[sizeof(VSF_LINUX_MACHINE)];
 };
 
 extern int uname(struct utsname *name);

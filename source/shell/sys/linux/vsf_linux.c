@@ -1832,8 +1832,10 @@ int sched_yield(void)
 int uname(struct utsname *name)
 {
     static const struct utsname __name = {
-        .sysname        = VSF_LINUX_SYSNAME,
-        .release        = VSF_LINUX_RELEASE,
+        .sysname    = VSF_LINUX_SYSNAME,
+        .release    = VSF_LINUX_RELEASE,
+        .version    = VSF_LINUX_VERSION,
+        .machine    = VSF_LINUX_MACHINE,
     };
     if (name != NULL) {
         *name = __name;
