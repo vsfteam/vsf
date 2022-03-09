@@ -69,12 +69,6 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define neconn_is_ok(__conn, __err)                                             \
-        (   (ERR_OK == (__err))                                                 \
-        ||  (netconn_is_nonblocking(__conn) && (ERR_INPROGRESS == (__err)))     \
-        )
-
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_linux_socket_inet_priv_t {
@@ -209,6 +203,16 @@ static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipad
     }
 }
 
+static int __netconn_return(err_t err)
+{
+    if (err == ERR_INPROGRESS) {
+        errno = EINPROGRESS;
+    } else if (ERR_WOULDBLOCK == err) {
+        errno = EAGAIN;
+    }
+    return err == ERR_OK ? 0 : SOCKET_ERROR;
+}
+
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #elif __IS_COMPILER_GCC__
@@ -285,7 +289,7 @@ static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, in
     VSF_LINUX_ASSERT((how & SHUT_RDWR) != 0);
 
     err_t err = netconn_shutdown(conn, how & SHUT_RD, how & SHUT_WR);
-    return (ERR_OK == err) ? 0 : -1;
+    return __netconn_return(err);
 }
 
 static long __vsf_linux_timeval_to_ms(const struct timeval *t)
@@ -545,7 +549,7 @@ static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *socket_priv, co
 #endif
 
     err_t err = netconn_bind(conn, &local_addr, local_port);
-    return (ERR_OK == err) ? 0 : SOCKET_ERROR;
+    return __netconn_return(err);
 }
 
 static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen)
@@ -564,7 +568,7 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
     }
 #endif
     err_t err = netconn_connect(conn, &remote_addr, remote_port);
-    return neconn_is_ok(conn, err) ? 0 : SOCKET_ERROR;
+    return __netconn_return(err);
 }
 
 static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, int backlog)
@@ -581,7 +585,7 @@ static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, 
     }
 
     err_t err = netconn_listen_with_backlog(conn, (u8_t)backlog);
-    return (ERR_OK == err) ? 0 : SOCKET_ERROR;
+    return __netconn_return(err);
 }
 
 static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, const void *buffer, size_t size, int flags,
@@ -592,7 +596,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
     if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
         size_t written = 0;
         err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
-        return neconn_is_ok(conn, err) ? (ssize_t)written : SOCKET_ERROR;
+        return __netconn_return(err);
     } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
         if (size > LWIP_MIN(0xFFFF, SSIZE_MAX)) {
             return SOCKET_ERROR;
@@ -637,7 +641,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
 
         err_t err = netconn_send(conn, &buf);
         netbuf_free(&buf);
-        return neconn_is_ok(conn, err) ? size : SOCKET_ERROR;
+        return __netconn_return(err);
     }
     return SOCKET_ERROR;
 }
