@@ -41,9 +41,9 @@
 #   define USART_MAX_PORT                                   5
 #endif
 
-#define VSF_USART_REIMPLEMENT_MODE                          ENABLED
-#define VSF_USART_REIMPLEMENT_IRQ_MASK                      ENABLED
-#define VSF_USART_REIMPLEMENT_STATUS                        ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_MODE                          ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_IRQ_MASK                      ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_STATUS                        ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

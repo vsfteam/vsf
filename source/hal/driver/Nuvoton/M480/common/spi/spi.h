@@ -42,9 +42,9 @@
 #   define VSF_HAL_SPI_IMP_INTERFACE        ENABLED
 #endif
 
-#define VSF_SPI_REIMPLEMENT_MODE            ENABLED
-#define VSF_SPI_REIMPLEMENT_STATUS          ENABLED
-#define VSF_SPI_REIMPLEMENT_IRQ_MASK        ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_MODE            ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_STATUS          ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_IRQ_MASK        ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
