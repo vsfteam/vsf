@@ -29,8 +29,7 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_I2C_REIMPLEMENT_STATUS                  ENABLED
-#define VSF_I2C_REIMPLEMENT_STATUS                  ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_STATUS          ENABLED
 
 /*============================ TYPES =========================================*/
 

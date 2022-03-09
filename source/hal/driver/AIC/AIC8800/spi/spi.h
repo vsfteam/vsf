@@ -23,30 +23,17 @@
 #include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_SPI == ENABLED
+
 #include "../__device.h"
-#include "./i_reg_spi.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 
 /*============================ MACROS ========================================*/
 
-#define VSF_SPI_REIMPLEMENT_MODE            ENABLED
-#define SPI_DATASIZE_TO_BYTE(__S)           (((((__S) & SPI_DATASIZE_MASK) >> 2) + 7) / 8)
+#define VSF_SPI_CFG_REIMPLEMENT_MODE            ENABLED
 
-#ifndef VSF_HW_SPI_COUNT
-#   error "Please define macro VSF_HW_SPI_COUNT"
-#else
-#   define VSF_SPI_CFG_TEMPLATE_COUNT               VSF_HW_SPI_COUNT
-#endif
-
-#ifdef  VSF_HW_SPI_MASK
-#   define VSF_SPI_CFG_TEMPLATE_MASK             VSF_HW_SPI_MASK
-#endif
+#define SPI_DATASIZE_TO_BYTE(__S)               \
+    (((((__S) & SPI_DATASIZE_MASK) >> 2) + 7) / 8)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define VSF_SPI_CFG_DEC_LV0(__count, __dont_care)                               \
-    extern vsf_hw_spi_t vsf_spi ## __count;
-
 /*============================ TYPES =========================================*/
 
 typedef enum em_spi_mode_t {
@@ -108,6 +95,12 @@ typedef enum em_spi_mode_t {
 typedef struct vsf_hw_spi_t vsf_hw_spi_t;
 
 /*============================ INCLUDES ======================================*/
+
+// undef after include vsf_template_spi.h
+#define VSF_SPI_CFG_DEC_PREFIX                      vsf_hw
+#define VSF_SPI_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
+#define VSF_SPI_CFG_DEC_LV0(__count, __dont_care)   \
+    extern vsf_hw_spi_t vsf_hw_spi ## __count;
 
 #include "hal/driver/common/template/vsf_template_spi.h"
 

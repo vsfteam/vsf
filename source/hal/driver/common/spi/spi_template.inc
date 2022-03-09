@@ -22,93 +22,36 @@
 /*============================ MACROS ========================================*/
 #if VSF_HAL_USE_SPI == ENABLED
 
-#ifndef VSF_SPI_CFG_IMPLEMENT_OP
-#   define VSF_SPI_CFG_IMPLEMENT_OP                 DISABLED
-#endif
-
-#ifndef VSF_SPI_CFG_INSTANCE_PREFIX
-#   define VSF_SPI_CFG_INSTANCE_PREFIX              vsf_hw
-#endif
-
 #ifndef VSF_SPI_CFG_CS_COUNT
-#   define VSF_SPI_CFG_CS_COUNT                     1
+#   define VSF_SPI_CFG_CS_COUNT     1
 #endif
 
-#if VSF_SPI_CFG_MULTI_CLASS == DISABLED
-#   define VSF_SPI_OP
+#if VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
+#   define VSF_SPI_OP_VAR           VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_op)
+#   define VSF_SPI_OP               .vsf_spi.op = & VSF_SPI_OP_VAR,
 #else
-#   define ____VSF_SPI_OP(__p)                      .vsf_spi.op = & __ ## __p ## _spi_op,
-#   define __VSF_SPI_OP(__p)                        ____VSF_SPI_OP(__p)
-#   define VSF_SPI_OP                               __VSF_SPI_OP(VSF_SPI_CFG_INSTANCE_PREFIX)
-
-#   define ____VSF_SPI_OP_VAR(__p)                  __ ## __p ## _spi_op
-#   define __VSF_SPI_OP_VAR(__p)                    ____VSF_SPI_OP_VAR(__p)
-#   define VSF_SPI_OP_VAR                           __VSF_SPI_OP_VAR(VSF_SPI_CFG_INSTANCE_PREFIX)
-#endif
-
-#ifndef VSF_SPI_CFG_IMPLEMENT_REQUEST_BY_FIFO
-#   define VSF_SPI_CFG_IMPLEMENT_REQUEST_BY_FIFO    DISABLED
+#   define VSF_SPI_OP
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define VSF_SPI_FN_INIT                 VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_init)
-#define VSF_SPI_FN_ENABLE               VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_enable)
-#define VSF_SPI_FN_DISABLE              VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_disable)
-#define VSF_SPI_FN_IRQ_ENABLE           VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_irq_enable)
-#define VSF_SPI_FN_IRQ_DISABLE          VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_irq_disable)
-#define VSF_SPI_FN_STATUS               VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_status)
-#define VSF_SPI_FN_CAPABILITY           VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_capability)
-#define VSF_SPI_FN_CS_ACTIVE            VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_cs_active)
-#define VSF_SPI_FN_CS_INACTIVE          VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_cs_inactive)
-#define VSF_SPI_FN_FIFO_TRANSFER        VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_fifo_transfer)
-#define VSF_SPI_FN_REQUEST_TRANSFER     VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_fifo_transfer)
-#define VSF_SPI_FN_CANCEL_TRANSFER      VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_cancel_transfer)
-#define VSF_SPI_FN_GET_TRANSFERED_COUNT VSF_MCONNECT(VSF_SPI_CFG_INSTANCE_PREFIX, _spi_get_transfered_count)
-
-#define __VSF_SPI_APIS(__prefix_name)                                                                                                               \
-    __VSF_SPI_API(__prefix_name, vsf_err_t,        init,                 vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)                                        \
-    __VSF_SPI_API(__prefix_name, fsm_rt_t,         enable,               vsf_spi_t *spi_ptr)                                                            \
-    __VSF_SPI_API(__prefix_name, fsm_rt_t,         disable,              vsf_spi_t *spi_ptr)                                                            \
-    __VSF_SPI_API(__prefix_name, void,             irq_enable,           vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)                                \
-    __VSF_SPI_API(__prefix_name, void,             irq_disable,          vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)                                \
-    __VSF_SPI_API(__prefix_name, spi_status_t,     status,               vsf_spi_t *spi_ptr)                                                            \
-    __VSF_SPI_API(__prefix_name, spi_capability_t, capability,           vsf_spi_t *spi_ptr)                                                            \
-    __VSF_SPI_API(__prefix_name, void,             cs_active,            vsf_spi_t *spi_ptr, uint_fast8_t index)                                        \
-    __VSF_SPI_API(__prefix_name, void,             cs_inactive,          vsf_spi_t *spi_ptr, uint_fast8_t index)                                        \
-    __VSF_SPI_API(__prefix_name, void,             fifo_transfer,        vsf_spi_t *spi_ptr,                                                            \
-                                                                         void *out_buffer_ptr, uint_fast32_t out_cnt, uint_fast32_t *out_offset_ptr,    \
-                                                                         void *in_buffer_ptr, uint_fast32_t in_cnt, uint_fast32_t *in_offset_ptr)       \
-    __VSF_SPI_API(__prefix_name, vsf_err_t,        request_transfer,     vsf_spi_t *spi_ptr, void *out_buffer_ptr,                                      \
-                                                                         void *in_buffer_ptr, uint_fast32_t count)                                      \
-    __VSF_SPI_API(__prefix_name, vsf_err_t,        cancel_transfer,      vsf_spi_t *spi_ptr)                                                            \
-    __VSF_SPI_API(__prefix_name, int_fast32_t,     get_transfered_count, vsf_spi_t *spi_ptr)
-
 /*============================ PROTOTYPES ====================================*/
-
-#undef   __VSF_SPI_API
-#define  __VSF_SPI_API(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, _spi_, __return, __name, __VA_ARGS__)
-
-__VSF_SPI_APIS(VSF_SPI_CFG_INSTANCE_PREFIX)
-
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if VSF_SPI_CFG_MULTI_CLASS == ENABLED && VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
 
-#   undef   __VSF_SPI_API
-#   define  __VSF_SPI_API(__prefix_name, __return, __name, ...)                   \
+#   undef VSF_SPI_API
+#   define  VSF_SPI_API(__prefix_name, __return, __name, ...)                   \
         VSF_TEMPLATE_HAL_API_OP(__prefix_name, _spi_, __return, __name, __VA_ARGS__)
 
 static const vsf_spi_op_t VSF_SPI_OP_VAR = {
-    __VSF_SPI_APIS(VSF_SPI_CFG_INSTANCE_PREFIX)
+    VSF_SPI_APIS(VSF_SPI_CFG_IMP_PREFIX)
 };
 
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
 
-spi_capability_t VSF_SPI_FN_CAPABILITY(vsf_spi_t *spi_ptr)
+spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr)
 {
     spi_capability_t spi_capability = {
         .cs_count = VSF_SPI_CFG_CS_COUNT,
@@ -119,38 +62,42 @@ spi_capability_t VSF_SPI_FN_CAPABILITY(vsf_spi_t *spi_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#ifdef VSF_SPI_CFG_TEMPLATE_COUNT
-#   ifndef VSF_SPI_CFG_TEMPLATE_MASK
-#       define VSF_SPI_CFG_TEMPLATE_MASK     ((1ul << VSF_SPI_CFG_TEMPLATE_COUNT) - 1)
+#if VSF_MCONNECT(VSF_SPI_CFG_IMP_UPPERCASE_PREFIX, _SPI_COUNT)
+#   define __VSF_SPI_IMP_COUNT VSF_MCONNECT(VSF_SPI_CFG_IMP_UPPERCASE_PREFIX, _SPI_COUNT)
+
+#   if VSF_MCONNECT(VSF_SPI_CFG_IMP_UPPERCASE_PREFIX, _SPI_MASK)
+#       define __VSF_SPI_IMP_MASK    VSF_MCONNECT(VSF_SPI_CFG_IMP_UPPERCASE_PREFIX, _SPI_MASK)
+#   else
+#       define __VSF_SPI_IMP_MASK    ((1ul << __VSF_SPI_IMP_COUNT) - 1)
 #   endif
 
-#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 0)
+#   if __VSF_SPI_IMP_MASK & (1 << 0)
         VSF_SPI_CFG_IMP_LV0(0, NULL)
 #   endif
-#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 1)
+#   if __VSF_SPI_IMP_MASK & (1 << 1)
         VSF_SPI_CFG_IMP_LV0(1, NULL)
 #   endif
-#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 2)
+#   if __VSF_SPI_IMP_MASK & (1 << 2)
         VSF_SPI_CFG_IMP_LV0(2, NULL)
 #   endif
-#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 3)
+#   if __VSF_SPI_IMP_MASK & (1 << 3)
         VSF_SPI_CFG_IMP_LV0(3, NULL)
 #   endif
-#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 4)
+#   if __VSF_SPI_IMP_MASK & (1 << 4)
         VSF_SPI_CFG_IMP_LV0(4, NULL)
 #   endif
-#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 5)
+#   if __VSF_SPI_IMP_MASK & (1 << 5)
         VSF_SPI_CFG_IMP_LV0(5, NULL)
 #   endif
-#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 6)
+#   if __VSF_SPI_IMP_MASK & (1 << 6)
         VSF_SPI_CFG_IMP_LV0(6, NULL)
 #   endif
-#   if VSF_SPI_CFG_TEMPLATE_MASK & (1 << 7)
+#   if __VSF_SPI_IMP_MASK & (1 << 7)
         VSF_SPI_CFG_IMP_LV0(7, NULL)
 #   endif
 
-#   undef VSF_SPI_CFG_TEMPLATE_COUNT
-#   undef VSF_SPI_CFG_TEMPLATE_MASK
+#   undef __VSF_SPI_IMP_COUNT
+#   undef __VSF_SPI_IMP_MASK
 #   undef VSF_SPI_CFG_IMP_LV0
 #endif
 

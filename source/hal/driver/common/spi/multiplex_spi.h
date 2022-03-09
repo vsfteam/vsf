@@ -34,6 +34,10 @@
 
 #include "utilities/ooc_class.h"
 
+// undef after include vsf_template_i2c.h
+#define VSF_USART_CFG_DEC_PREFIX              vsf_multiplex
+#include "hal/driver/common/template/vsf_template_usart.h"
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_MULTIPLEXER_SPI_CFG_MASK_TYPE

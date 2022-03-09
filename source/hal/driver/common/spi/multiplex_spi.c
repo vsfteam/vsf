@@ -22,16 +22,15 @@
 #include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_SPI == ENABLED
-
-// when multi class is diabled, we want to call vsf_[real_spi]_{init, enable, disable, ...}
-#if VSF_SPI_CFG_MULTI_CLASS == DISALBED
-#   define VSF_SPI_CFG_REAL_PREFIX                  VSF_SPI_CFG_PREFIX
-#endif
-#include "hal/driver/driver.h"
-
 #if VSF_SPI_CFG_MULTIPLEX_CS == ENABLED
 
+#include "hal/driver/driver.h"
+
 /*============================ MACROS ========================================*/
+
+#ifdef VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
+#   define VSF_SPI_CFG_PREFIX                       VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
+#endif
 
 #define VSF_MULTIPLEXER_SPI_MAX_CS_COUNT            (sizeof(SPI_MULTIPLEXER_MASK_TYPE) * 8)
 

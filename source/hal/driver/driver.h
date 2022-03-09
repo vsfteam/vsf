@@ -88,6 +88,9 @@
 #if !defined(__HAL_DRIVER_H__) && !defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 #define __HAL_DRIVER_H__
 
+//! common hal drivers
+#include "./common/common.h"
+
 //! software emulated hal drivers
 #include "./vsf/driver.h"
 
