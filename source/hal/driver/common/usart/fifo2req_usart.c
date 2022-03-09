@@ -14,22 +14,25 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
+
+// force convert vsf_usart_init to vsf_usart_init
+#define __VSF_HAL_FIFO2REQ_USART_CLASS_IMPLEMENT    ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
-#if VSF_HAL_USE_USART == ENABLED
 
-// when multi class is diabled, we want to call vsf_[real_spi]_{init, enable, disable, ...}
-#if VSF_SPI_CFG_MULTI_CLASS == DISALBED
-#   define VSF_USART_CFG_REAL_PREFIX        VSF_USART_CFG_PREFIX
-#endif
+#if (VSF_HAL_USE_USART == ENABLED) && (VSF_HAL_USE_FIFO2REQ_USART == ENABLED)
+
 #include "hal/driver/driver.h"
-
-#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
 
 /*============================ MACROS ========================================*/
 
-#define USART_IRQ_MASK_REQUEST      \
+#ifdef VSF_FIFO2REQ_USART_CFG_CALL_PREFIX
+#   define VSF_USART_CFG_PREFIX                 VSF_FIFO2REQ_USART_CFG_CALL_PREFIX
+#endif
+
+#define __USART_IRQ_MASK_REQUEST      \
     (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -65,8 +68,8 @@ static uint8_t __vsf_usart_get_data_length(vsf_usart_t * usart_ptr)
     return 1;
 }
 
-static bool __vsf_usart_request_process(vsf_usart_t *usart_ptr,
-                                        vsf_usart_request_item_t *item,
+static bool __vsf_fifo2req_usart_process(vsf_usart_t *usart_ptr,
+                                        vsf_fifo2req_usart_item_t *item,
                                         fifo_handler_t *fifo_handler)
 {
     if (item->count < item->max_count) {
@@ -78,26 +81,26 @@ static bool __vsf_usart_request_process(vsf_usart_t *usart_ptr,
     return item->count >= item->max_count;
 }
 
-static void __vsf_usart_request_isr_handler(void *target,
+static void __vsf_fifo2req_usart_isr_handler(void *target,
                                             vsf_usart_t *usart_ptr,
                                             em_usart_irq_mask_t irq_mask)
 {
     // One interrupt handles multipile interrupt sources
-    vsf_usart_request_t * request_ptr = (vsf_usart_request_t *)target;
+    vsf_fifo2req_usart_t * request_ptr = (vsf_fifo2req_usart_t *)target;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr == usart_ptr);
 
     em_usart_irq_mask_t current_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX | USART_IRQ_MASK_TX);
 
     if (irq_mask & (USART_IRQ_MASK_RX | USART_IRQ_MASK_RX_TIMEOUT)) {
-        if (__vsf_usart_request_process(usart_ptr, &request_ptr->rx, vsf_usart_fifo_read)) {
+        if (__vsf_fifo2req_usart_process(usart_ptr, &request_ptr->rx, vsf_usart_fifo_read)) {
             vsf_usart_irq_disable(usart_ptr, USART_IRQ_MASK_RX);
             current_irq_mask |= USART_IRQ_MASK_RX_CPL;
         }
     }
 
     if (irq_mask & USART_IRQ_MASK_TX) {
-        if (__vsf_usart_request_process(usart_ptr, &request_ptr->tx, vsf_usart_fifo_write)) {
+        if (__vsf_fifo2req_usart_process(usart_ptr, &request_ptr->tx, vsf_usart_fifo_write)) {
             vsf_usart_irq_disable(usart_ptr, USART_IRQ_MASK_TX);
             current_irq_mask |= USART_IRQ_MASK_TX_CPL;
         }
@@ -111,7 +114,7 @@ static void __vsf_usart_request_isr_handler(void *target,
     }
 }
 
-static void __vsf_usart_request_isr_init(vsf_usart_request_item_t *request_item_ptr,
+static void __vsf_fifo2req_usart_isr_init(vsf_fifo2req_usart_item_t *request_item_ptr,
                                          void * buffer,
                                          uint_fast32_t max_count)
 {
@@ -124,13 +127,13 @@ static void __vsf_usart_request_isr_init(vsf_usart_request_item_t *request_item_
 
 vsf_err_t vsf_fifo2req_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
     usart_cfg_t request_cfg = *cfg_ptr;
 
     request_ptr->isr = request_cfg.isr;
-    request_cfg.isr.handler_fn = __vsf_usart_request_isr_handler;
+    request_cfg.isr.handler_fn = __vsf_fifo2req_usart_isr_handler;
     request_cfg.isr.target_ptr = (void *)request_ptr;
 
     return vsf_usart_init(request_ptr->real_usart_ptr, &request_cfg);
@@ -138,7 +141,7 @@ vsf_err_t vsf_fifo2req_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
 
 fsm_rt_t vsf_fifo2req_usart_enable(vsf_usart_t *usart_ptr)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
@@ -147,7 +150,7 @@ fsm_rt_t vsf_fifo2req_usart_enable(vsf_usart_t *usart_ptr)
 
 fsm_rt_t vsf_fifo2req_usart_disable(vsf_usart_t *usart_ptr)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
@@ -156,7 +159,7 @@ fsm_rt_t vsf_fifo2req_usart_disable(vsf_usart_t *usart_ptr)
 
 usart_status_t vsf_fifo2req_usart_status(vsf_usart_t *usart_ptr)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
@@ -165,7 +168,7 @@ usart_status_t vsf_fifo2req_usart_status(vsf_usart_t *usart_ptr)
 
 uint_fast16_t vsf_fifo2req_usart_fifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
@@ -174,7 +177,7 @@ uint_fast16_t vsf_fifo2req_usart_fifo_read(vsf_usart_t *usart_ptr, void *buffer_
 
 uint_fast16_t vsf_fifo2req_usart_fifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
@@ -189,11 +192,11 @@ vsf_err_t  vsf_fifo2req_usart_request_rx(vsf_usart_t *usart_ptr,
     VSF_HAL_ASSERT(buffer_ptr != NULL);
     VSF_HAL_ASSERT(count > 0);
 
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
-    __vsf_usart_request_isr_init(&request_ptr->rx, buffer_ptr, count);
+    __vsf_fifo2req_usart_isr_init(&request_ptr->rx, buffer_ptr, count);
     vsf_usart_irq_enable(request_ptr->real_usart_ptr, USART_IRQ_MASK_RX);
 
     return VSF_ERR_NONE;
@@ -201,7 +204,7 @@ vsf_err_t  vsf_fifo2req_usart_request_rx(vsf_usart_t *usart_ptr,
 
 vsf_err_t vsf_fifo2req_usart_cancel_rx(vsf_usart_t *usart_ptr)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
@@ -212,7 +215,7 @@ vsf_err_t vsf_fifo2req_usart_cancel_rx(vsf_usart_t *usart_ptr)
 
 int_fast32_t vsf_fifo2req_usart_get_rx_count(vsf_usart_t *usart_ptr)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
 
     return request_ptr->rx.count;
@@ -226,17 +229,17 @@ vsf_err_t vsf_fifo2req_usart_request_tx(vsf_usart_t *usart_ptr,
     VSF_HAL_ASSERT(buffer_ptr != NULL);
     VSF_HAL_ASSERT(count > 0);
 
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
 
-    __vsf_usart_request_isr_init(&request_ptr->tx, buffer_ptr, count);
+    __vsf_fifo2req_usart_isr_init(&request_ptr->tx, buffer_ptr, count);
 
     vsf_usart_irq_enable(request_ptr->real_usart_ptr, USART_IRQ_MASK_TX);
 
     vsf_protect_t orig = __vsf_fifo2req_usart_protect();
-    __vsf_usart_request_isr_handler((void *)request_ptr, request_ptr->real_usart_ptr, USART_IRQ_MASK_TX);
+    __vsf_fifo2req_usart_isr_handler((void *)request_ptr, request_ptr->real_usart_ptr, USART_IRQ_MASK_TX);
     __vsf_fifo2req_usart_unprotect(orig);
 
     return VSF_ERR_NONE;
@@ -244,7 +247,7 @@ vsf_err_t vsf_fifo2req_usart_request_tx(vsf_usart_t *usart_ptr,
 
 vsf_err_t vsf_fifo2req_usart_cancel_tx(vsf_usart_t *usart_ptr)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
@@ -255,7 +258,7 @@ vsf_err_t vsf_fifo2req_usart_cancel_tx(vsf_usart_t *usart_ptr)
 
 int_fast32_t vsf_fifo2req_usart_get_tx_count(vsf_usart_t *usart_ptr)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
 
     return request_ptr->tx.count;
@@ -263,15 +266,15 @@ int_fast32_t vsf_fifo2req_usart_get_tx_count(vsf_usart_t *usart_ptr)
 
 void vsf_fifo2req_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
     VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK) == 0);
     VSF_HAL_ASSERT((irq_mask & (USART_IRQ_MASK_RX | USART_IRQ_MASK_TX)) == 0);
 
-    em_usart_irq_mask_t request_irq_mask = irq_mask & USART_IRQ_MASK_REQUEST;
-    em_usart_irq_mask_t others_irq_mask = irq_mask & ~USART_IRQ_MASK_REQUEST;
+    em_usart_irq_mask_t request_irq_mask = irq_mask & __USART_IRQ_MASK_REQUEST;
+    em_usart_irq_mask_t others_irq_mask = irq_mask & ~__USART_IRQ_MASK_REQUEST;
 
     request_ptr->irq_mask |= request_irq_mask;
     if (others_irq_mask) {
@@ -281,15 +284,15 @@ void vsf_fifo2req_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t i
 
 void vsf_fifo2req_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
 {
-    vsf_usart_request_t *request_ptr = (vsf_usart_request_t *)usart_ptr;
+    vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
     VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK) == 0);
     VSF_HAL_ASSERT((irq_mask & (USART_IRQ_MASK_RX | USART_IRQ_MASK_TX)) == 0);
 
-    em_usart_irq_mask_t request_irq_mask = irq_mask & USART_IRQ_MASK_REQUEST;
-    em_usart_irq_mask_t others_irq_mask = irq_mask & ~USART_IRQ_MASK_REQUEST;
+    em_usart_irq_mask_t request_irq_mask = irq_mask & __USART_IRQ_MASK_REQUEST;
+    em_usart_irq_mask_t others_irq_mask = irq_mask & ~__USART_IRQ_MASK_REQUEST;
 
     request_ptr->irq_mask &= ~request_irq_mask;
     if (others_irq_mask) {
@@ -297,6 +300,4 @@ void vsf_fifo2req_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t 
     }
 }
 
-#endif      // VSF_USART_CFG_FIFO_TO_REQUEST
-
-#endif      // VSF_HAL_USE_USART
+#endif      // VSF_USART_CFG_FIFO_TO_REQUEST && VSF_HAL_USE_USART

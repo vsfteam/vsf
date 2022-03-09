@@ -60,20 +60,20 @@ extern "C" {
 #   define VSF_I2C_CFG_REQUEST_TEMPLATE     DISABLED
 #endif
 
-#ifndef VSF_I2C_REIMPLEMENT_FEATURE
-#   define VSF_I2C_REIMPLEMENT_FEATURE      DISABLED
+#ifndef VSF_I2C_CFG_REIMPLEMENT_FEATURE
+#   define VSF_I2C_CFG_REIMPLEMENT_FEATURE      DISABLED
 #endif
 
-#ifndef VSF_I2C_REIMPLEMENT_IRQ_MASK
-#   define VSF_I2C_REIMPLEMENT_IRQ_MASK     DISABLED
+#ifndef VSF_I2C_CFG_REIMPLEMENT_IRQ_MASK
+#   define VSF_I2C_CFG_REIMPLEMENT_IRQ_MASK     DISABLED
 #endif
 
-#ifndef VSF_I2C_REIMPLEMENT_STATUS
-#   define VSF_I2C_REIMPLEMENT_STATUS       DISABLED
+#ifndef VSF_I2C_CFG_REIMPLEMENT_STATUS
+#   define VSF_I2C_CFG_REIMPLEMENT_STATUS       DISABLED
 #endif
 
-#ifndef VSF_I2C_REIMPLEMENT_CAPABILITY
-#   define VSF_I2C_REIMPLEMENT_CAPABILITY   DISABLED
+#ifndef VSF_I2C_CFG_REIMPLEMENT_CAPABILITY
+#   define VSF_I2C_CFG_REIMPLEMENT_CAPABILITY   DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -119,7 +119,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-#if VSF_I2C_REIMPLEMENT_FEATURE == DISABLED
+#if VSF_I2C_CFG_REIMPLEMENT_FEATURE == DISABLED
 typedef enum em_i2c_feature_t {
     I2C_MODE_MASTER           = (0x1ul << 0),  // select master mode
     I2C_MODE_SLAVE            = (0x0ul << 0),  // select slave mode
@@ -151,7 +151,7 @@ typedef enum em_i2c_feature_t {
  @brief i2c 传输的标志
  @note em_i2c_cmd_t 由具体驱动实现。
  */
-#if VSF_I2C_REIMPLEMENT_CMD == DISABLED
+#if VSF_I2C_CFG_REIMPLEMENT_CMD == DISABLED
 typedef enum em_i2c_cmd_t {
     I2C_CMD_WRITE      = (0x00ul << 0),
     I2C_CMD_READ       = (0x01ul << 0),
@@ -173,7 +173,7 @@ typedef enum em_i2c_cmd_t {
 } em_i2c_cmd_t;
 #endif
 
-#if VSF_I2C_REIMPLEMENT_IRQ_MASK == DISABLED
+#if VSF_I2C_CFG_REIMPLEMENT_IRQ_MASK == DISABLED
 typedef enum em_i2c_irq_mask_t {
     I2C_IRQ_MASK_MASTER_STARTED                 = (0x1ul <<  0),
     I2C_IRQ_MASK_MASTER_ADDRESS_SEND            = (0x1ul <<  1),
@@ -200,7 +200,7 @@ typedef enum em_i2c_irq_mask_t {
 } em_i2c_irq_mask_t;
 #endif
 
-#if VSF_I2C_REIMPLEMENT_STATUS == DISABLED
+#if VSF_I2C_CFG_REIMPLEMENT_STATUS == DISABLED
 typedef struct i2c_status_t {
     union {
         inherit(peripheral_status_t)
@@ -209,7 +209,7 @@ typedef struct i2c_status_t {
 } i2c_status_t;
 #endif
 
-#if VSF_I2C_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_I2C_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct i2c_capability_t {
     inherit(peripheral_capability_t)
 } i2c_capability_t;

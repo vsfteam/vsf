@@ -15,10 +15,25 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_USART_REQUEST_H__
-#define __HAL_DRIVER_USART_REQUEST_H__
+#ifndef __HAL_DRIVER_FIFO2REQ_USART_H__
+#define __HAL_DRIVER_FIFO2REQ_USART_H__
 
 /*============================ INCLUDES ======================================*/
+
+#include "hal/vsf_hal_cfg.h"
+
+#if (VSF_HAL_USE_USART == ENABLED) && (VSF_HAL_USE_FIFO2REQ_USART == ENABLED)
+
+#if defined(__VSF_HAL_FIFO2REQ_USART_CLASS_IMPLEMENT)
+#   define __VSF_CLASS_IMPLEMENT__
+#endif
+
+#include "utilities/ooc_class.h"
+
+// undef after include vsf_template_i2c.h
+#define VSF_USART_CFG_DEC_PREFIX              vsf_fifo2req
+#include "hal/driver/common/template/vsf_template_usart.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -26,37 +41,40 @@
 // TODO: add usart rx idle or timeout support
 // TODO: support 9 bit mode
 
-#if VSF_HAL_USE_USART == ENABLED
-
-typedef struct vsf_usart_request_item_t {
+typedef struct vsf_fifo2req_usart_item_t {
     void           * buffer;
     uint32_t         max_count;
     uint32_t         count;
-} vsf_usart_request_item_t;
+} vsf_fifo2req_usart_item_t;
 
-typedef struct vsf_usart_request_t {
-#if VSF_USART_CFG_MULTI_CLASS == ENABLED
-    vsf_usart_t vsf_usart;
+vsf_class(vsf_fifo2req_usart_t) {
+    private_member(
+#if VSF_I2C_CFG_IMPLEMENT_OP == ENABLED
+        vsf_usart_t vsf_usart;
 #endif
+        vsf_fifo2req_usart_item_t rx;
+        vsf_fifo2req_usart_item_t tx;
 
-    vsf_usart_t *real_usart_ptr;
+        vsf_usart_isr_t isr;
 
-    vsf_usart_request_item_t rx;
-    vsf_usart_request_item_t tx;
+        em_usart_irq_mask_t irq_mask;
 
-    vsf_usart_isr_t isr;
+        //uint8_t data_length;
+    )
 
-    em_usart_irq_mask_t irq_mask;
+    public_member(
+        vsf_usart_t *real_usart_ptr;
+    )
+};
 
-    //uint8_t data_length;
-} vsf_usart_request_t;
 
-#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#endif
 
 #endif
 /* EOF */

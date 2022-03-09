@@ -28,18 +28,10 @@
 /*============================ MACROS ========================================*/
 
 #define VSF_USART_CFG_FIFO_TO_REQUEST       ENABLED
-#define VSF_USART_REIMPLEMENT_MODE          ENABLED
-#define VSF_USART_REIMPLEMENT_IRQ_MASK      ENABLED
-#define VSF_USART_CFG_TEMPLATE_COUNT        VSF_HW_USART_COUNT
-#ifdef  VSF_HW_USART_MASK
-#   define VSF_USART_CFG_TEMPLATE_MASK      VSF_HW_USART_MASK
-#endif
+#define VSF_USART_CFG_REIMPLEMENT_MODE      ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_IRQ_MASK  ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define VSF_USART_CFG_DEC_LV0(__count, __dont_care)                             \
-    extern vsf_usart_request_t vsf_usart ## __count;
-
 /*============================ TYPES =========================================*/
 
 typedef enum em_usart_mode_t {
@@ -104,8 +96,15 @@ typedef enum em_usart_irq_mask_t {
                                      | USART_IRQ_MASK_ERROR,
 } em_usart_irq_mask_t;
 
+typedef struct vsf_hw_usart_t vsf_hw_usart_t;
+
 /*============================ INCLUDES ======================================*/
 
+// undef after include vsf_template_i2c.h
+#define VSF_USART_CFG_DEC_PREFIX                      vsf_hw
+#define VSF_USART_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
+#define VSF_USART_CFG_DEC_LV0(__count, __dont_care)                             \
+    extern vsf_hw_usart_t vsf_hw_usart ## __count;
 #include "hal/driver/common/template/vsf_template_usart.h"
 
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -14,16 +14,22 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
+
+// force convert vsf_spi_init to vsf_spi_init
+#define VSF_SPI_CFG_PREFIX                  vsf_hw
+#define VSF_SPI_CFG_IMP_PREFIX              VSF_SPI_CFG_PREFIX
+#define VSF_SPI_CFG_IMP_UPPERCASE_PREFIX    VSF_HW
+
 /*============================ INCLUDES ======================================*/
 
-#include "../driver.h"
+#include "./spi.h"
 
 #if VSF_HAL_USE_SPI == ENABLED
 
-#include "sysctrl_api.h"
+#include "./i_reg_spi.h"
+#include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
+#include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/dma/dma_api.h"
-
-#define VSF_SPI_CFG_IMPLEMENT_OP            ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -31,55 +37,7 @@
 #   define VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX      65535
 #endif
 
-#ifndef VSF_HW_SPI_COUNT
-#   error "Please define macro VSF_HW_SPI_COUNT"
-#else
-#   define VSF_SPI_CFG_TEMPLATE_COUNT           VSF_HW_SPI_COUNT
-#endif
-
-#ifdef  VSF_HW_SPI_MASK
-#   define VSF_SPI_CFG_TEMPLATE_MASK            VSF_HW_SPI_MASK
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define VSF_SPI_CFG_IMP_LV0(__count, __dont_care)                               \
-    static const vsf_hw_spi_const_t __vsf_spi ##__count ## _const = {           \
-        .reg = REG_SPI##__count,                                                \
-        .irqn = {                                                               \
-            .spi    = VSF_HW_SPI ##__count ## _IRQ_IDX,                         \
-            .dma_rx = VSF_HW_SPI ##__count ## _RXDMA_IRQ_IDX,                   \
-            .dma_tx = VSF_HW_SPI ##__count ## _TXDMA_IRQ_IDX,                   \
-        },                                                                      \
-        .request = {                                                            \
-            .send = {                                                           \
-                .channel = VSF_HW_SPI ##__count ## _TXDMA_CH_IDX,               \
-                .cid     = VSF_HW_SPI ##__count ## _TXDMA_CID,                  \
-            },                                                                  \
-            .recv = {                                                           \
-                .channel = VSF_HW_SPI ##__count ## _RXDMA_CH_IDX,               \
-                .cid     = VSF_HW_SPI ##__count ## _RXDMA_CID,                  \
-            },                                                                  \
-        },                                                                      \
-        .clock = {                                                              \
-            .hclk = VSF_HW_SPI ##__count## _HCLKME_EN_BIT,                      \
-            .oclk = VSF_HW_SPI ##__count## _OCLKME_EN_BIT,                      \
-            .pclk = VSF_HW_SPI ##__count## _PCLKME_EN_BIT,                      \
-        },                                                                      \
-    };                                                                          \
-    vsf_hw_spi_t vsf_spi##__count = {                                           \
-        VSF_SPI_OP                                                              \
-        .spi_const = &__vsf_spi##__count ## _const,                             \
-    };                                                                          \
-    void VSF_HW_SPI ## __count ## _RXDMA_IRQ(void)                              \
-    {                                                                           \
-        __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_CPL);                    \
-    }                                                                           \
-    void VSF_HW_SPI ## __count ## _TXDMA_IRQ(void)                              \
-    {                                                                           \
-        __irq_handler(&vsf_spi ##__count, SPI_IRQ_MASK_TX_CPL);                 \
-    }
-
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_spi_const_t {
@@ -107,7 +65,7 @@ typedef struct vsf_hw_spi_const_t {
 } vsf_hw_spi_const_t;
 
 typedef struct vsf_hw_spi_t {
-#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
+#if VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
     vsf_spi_t vsf_spi;
 #endif
 
@@ -538,6 +496,44 @@ int_fast32_t vsf_hw_spi_get_transfered_count(vsf_spi_t *spi_ptr)
 }
 
 /*============================ INCLUDES ======================================*/
+
+#define VSF_SPI_CFG_IMP_UPPERCASE_PREFIX            VSF_HW
+#define VSF_SPI_CFG_IMP_LV0(__count, __dont_care)                               \
+    static const vsf_hw_spi_const_t __vsf_hw_spi ##__count ## _const = {        \
+        .reg = REG_SPI##__count,                                                \
+        .irqn = {                                                               \
+            .spi    = VSF_HW_SPI ## __count ## _IRQ_IDX,                        \
+            .dma_rx = VSF_HW_SPI ## __count ## _RXDMA_IRQ_IDX,                  \
+            .dma_tx = VSF_HW_SPI ## __count ## _TXDMA_IRQ_IDX,                  \
+        },                                                                      \
+        .request = {                                                            \
+            .send = {                                                           \
+                .channel = VSF_HW_SPI ## __count ## _TXDMA_CH_IDX,              \
+                .cid     = VSF_HW_SPI ## __count ## _TXDMA_CID,                 \
+            },                                                                  \
+            .recv = {                                                           \
+                .channel = VSF_HW_SPI ## __count ## _RXDMA_CH_IDX,              \
+                .cid     = VSF_HW_SPI ## __count ## _RXDMA_CID,                 \
+            },                                                                  \
+        },                                                                      \
+        .clock = {                                                              \
+            .hclk = VSF_HW_SPI ## __count ## _HCLKME_EN_BIT,                    \
+            .oclk = VSF_HW_SPI ## __count ## _OCLKME_EN_BIT,                    \
+            .pclk = VSF_HW_SPI ## __count ## _PCLKME_EN_BIT,                    \
+        },                                                                      \
+    };                                                                          \
+    vsf_hw_spi_t vsf_hw_spi ## __count = {                                      \
+        VSF_SPI_OP                                                              \
+        .spi_const = &__vsf_hw_spi ##__count ## _const,                         \
+    };                                                                          \
+    void VSF_HW_SPI ## __count ## _RXDMA_IRQ(void)                              \
+    {                                                                           \
+        __irq_handler(&vsf_hw_spi ##__count, SPI_IRQ_MASK_CPL);                 \
+    }                                                                           \
+    void VSF_HW_SPI ## __count ## _TXDMA_IRQ(void)                              \
+    {                                                                           \
+        __irq_handler(&vsf_hw_spi ##__count, SPI_IRQ_MASK_TX_CPL);              \
+    }
 
 #include "hal/driver/common/spi/spi_template.inc"
 
