@@ -13,5 +13,6 @@ add_subdirectory(usb)
 add_subdirectory(gpio)
 add_subdirectory(adc)
 add_subdirectory(trng)
+add_subdirectory(flash)
 
 include(vendor.cmake)
