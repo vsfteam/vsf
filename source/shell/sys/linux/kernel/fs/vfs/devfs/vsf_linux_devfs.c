@@ -77,10 +77,15 @@ int vsf_linux_fs_bind_rand(char *path)
 #endif
 
 #if VSF_USE_MAL == ENABLED
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
 __vsf_component_peda_ifs_entry(__vk_devfs_mal_read, vk_file_read)
 {
     vsf_peda_begin();
 
+    // GCC: -Wcast-align
     vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)&vsf_this;
     vk_mal_t *mal = vfs_file->f.param;
 
@@ -100,6 +105,7 @@ __vsf_component_peda_ifs_entry(__vk_devfs_mal_write, vk_file_write)
 {
     vsf_peda_begin();
 
+    // GCC: -Wcast-align
     vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)&vsf_this;
     vk_mal_t *mal = vfs_file->f.param;
 
@@ -114,6 +120,9 @@ __vsf_component_peda_ifs_entry(__vk_devfs_mal_write, vk_file_write)
 
     vsf_peda_end();
 }
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal)
 {

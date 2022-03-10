@@ -73,10 +73,16 @@ static void __vsf_eda_bmpevt_adapter_sync_evthander(vsf_eda_t *eda, vsf_evt_t ev
     }
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_init")
 static vsf_err_t __vsf_eda_bmpevt_adapter_sync_init(vsf_bmpevt_adapter_t *this_ptr)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
+    // GCC: -Wcast-align
     vsf_bmpevt_adapter_eda_t *adapter_eda = (vsf_bmpevt_adapter_eda_t *)this_ptr;
 
     adapter_eda->eda.fn.evthandler = __vsf_eda_bmpevt_adapter_sync_evthander;
@@ -86,6 +92,7 @@ static vsf_err_t __vsf_eda_bmpevt_adapter_sync_init(vsf_bmpevt_adapter_t *this_p
 SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_reset")
 static vsf_err_t __vsf_eda_bmpevt_adapter_sync_reset(vsf_bmpevt_adapter_t *this_ptr)
 {
+    // GCC: -Wcast-align
     vsf_bmpevt_adapter_sync_t *adapter_sync = (vsf_bmpevt_adapter_sync_t *)this_ptr;
     VSF_KERNEL_ASSERT(this_ptr != NULL);
     vsf_sync_t *sync = adapter_sync->sync;
@@ -124,6 +131,7 @@ static void __vsf_eda_bmpevt_adapter_bmpevt_evthander(vsf_eda_t *eda, vsf_evt_t 
 SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_bmpevt_init")
 static vsf_err_t __vsf_eda_bmpevt_adapter_bmpevt_init(vsf_bmpevt_adapter_t *this_ptr)
 {
+    // GCC: -Wcast-align
     vsf_bmpevt_adapter_eda_t *adapter_eda = (vsf_bmpevt_adapter_eda_t *)this_ptr;
 
     VSF_KERNEL_ASSERT(this_ptr != NULL);
@@ -134,12 +142,16 @@ static vsf_err_t __vsf_eda_bmpevt_adapter_bmpevt_init(vsf_bmpevt_adapter_t *this
 SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_bmpevt_reset")
 static vsf_err_t __vsf_eda_bmpevt_adapter_bmpevt_reset(vsf_bmpevt_adapter_t *this_ptr)
 {
+    // GCC: -Wcast-align
     vsf_bmpevt_adapter_bmpevt_t *adapter_bmpevt = (vsf_bmpevt_adapter_bmpevt_t *)this_ptr;
     VSF_KERNEL_ASSERT(this_ptr != NULL);
 
     vsf_eda_bmpevt_reset(adapter_bmpevt->bmpevt, adapter_bmpevt->pender.mask);
     return __vsf_eda_bmpevt_adapter_eda_init((vsf_bmpevt_adapter_eda_t *)adapter_bmpevt);
 }
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 SECTION(".data.vsf.kernel.vsf_eda_bmpevt_adapter_bmpevt_op")
 const vsf_bmpevt_adapter_op_t vsf_eda_bmpevt_adapter_bmpevt_op = {

@@ -32,9 +32,14 @@ extern int free_main(int argc, char *argv[]);
 extern int vsf_linux_init_main(int argc, char *argv[]);
 
 #ifndef WEAK_VSF_LINUX_INIT_MAIN
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
 WEAK(vsf_linux_init_main)
 int vsf_linux_init_main(int argc, char *argv[])
 {
+    // GCC: -Wcast-align
     vsh_set_path((char **)VSF_LINUX_CFG_BIN_PATH);
 
     // run init scripts first
@@ -50,6 +55,9 @@ int vsf_linux_init_main(int argc, char *argv[])
 
     return vsh_main(argc, argv);
 }
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 #endif
 
 int busybox_bind(char *path, vsf_linux_main_entry_t entry)

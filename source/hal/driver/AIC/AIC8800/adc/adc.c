@@ -194,8 +194,6 @@ static vsf_err_t __vsf_adc_channel_request(vsf_adc_t *adc_ptr, adc_channel_cfg_t
 static void __vk_adc_on_time(vsf_callback_timer_t *timer)
 {
     vsf_adc_t *adc_ptr = container_of(timer, vsf_adc_t, callback_timer);
-    unsigned int gpmsk = 0x01UL << adc_ptr->current_channel->channel;
-    uint32_t temp_mask;
     int temp_value;
 
     if (0x1 != PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw))) {
