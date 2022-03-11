@@ -23,6 +23,11 @@
 
 /*============================ MACROS ========================================*/
 
+#ifdef APP_USART_DEMO_CFG_USART_PREFIX
+#   undef VSF_USART_CFG_PREFIX
+#   define VSF_USART_CFG_PREFIX                         APP_USART_DEMO_CFG_USART_PREFIX
+#endif
+
 #ifndef APP_USART_DEMO_CFG_DEBUG
 #   define APP_USART_DEMO_CFG_DEBUG                     ENABLED
 #endif
@@ -78,6 +83,11 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#ifdef APP_USART_DEMO_CFG_USART_EXTERN
+    APP_USART_DEMO_CFG_USART_EXTERN
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct app_usart_demo_t {

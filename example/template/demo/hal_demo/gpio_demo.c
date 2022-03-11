@@ -23,6 +23,11 @@
 
 /*============================ MACROS ========================================*/
 
+#ifdef APP_GPIO_DEMO_CFG_GPIO_PREFIX
+#   undef VSF_GPIO_CFG_PREFIX
+#   define VSF_GPIO_CFG_PREFIX                          APP_GPIO_DEMO_CFG_GPIO_PREFIX
+#endif
+
 #ifndef APP_GPIO_DEMO_CFG_INPUT_TEST
 #   define APP_GPIO_DEMO_CFG_INPUT_TEST                 ENABLED
 #endif
@@ -80,6 +85,11 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#ifdef APP_GPIO_DEMO_CFG_GPIO_EXTERN
+    APP_GPIO_DEMO_CFG_GPIO_EXTERN
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct app_gpio_demo_t {
