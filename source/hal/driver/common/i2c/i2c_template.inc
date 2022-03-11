@@ -23,8 +23,8 @@
 #if VSF_HAL_USE_I2C == ENABLED
 
 #if VSF_I2C_CFG_IMPLEMENT_OP == ENABLED
-#   define VSF_I2C_OP_VAR               VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_op)
-#   define VSF_I2C_OP                   .vsf_i2c.op = & VSF_I2C_OP_VAR,
+#   define __VSF_I2C_OP_VAR             VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_op)
+#   define VSF_I2C_OP                   .vsf_i2c.op = & __VSF_I2C_OP_VAR,
 #else
 #   define VSF_I2C_OP
 #endif
@@ -38,7 +38,7 @@
 #   define VSF_I2C_API(__prefix_name, __return, __name, ...)                   \
         VSF_TEMPLATE_HAL_API_OP(__prefix_name, _i2c_, __return, __name, __VA_ARGS__)
 
-static const vsf_i2c_op_t VSF_I2C_OP_VAR = {
+static const vsf_i2c_op_t __VSF_I2C_OP_VAR = {
     VSF_I2C_APIS(VSF_I2C_CFG_IMP_PREFIX)
 };
 

@@ -78,15 +78,6 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vsf_i2c_init            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)
-#define vsf_i2c_enable          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)
-#define vsf_i2c_disable         VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)
-#define vsf_i2c_irq_enable      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)
-#define vsf_i2c_irq_disable     VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_disable)
-#define vsf_i2c_status          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_status)
-#define vsf_i2c_capability      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)
-#define vsf_i2c_master_request  VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)
-
 #define VSF_I2C_INIT(i2c_ptr, cfg_ptr)                                          \
     vsf_i2c_init((vsf_i2c_t *)i2c_ptr, cfg_ptr)
 #define VSF_I2C_ENABLE(i2c_ptr)                                                 \
@@ -451,6 +442,17 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
 
 #include "hal/driver/common/i2c/i2c_request.h"
 
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_i2c_init            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)
+#define vsf_i2c_enable          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)
+#define vsf_i2c_disable         VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)
+#define vsf_i2c_irq_enable      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)
+#define vsf_i2c_irq_disable     VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_disable)
+#define vsf_i2c_status          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_status)
+#define vsf_i2c_capability      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)
+#define vsf_i2c_master_request  VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)
+
 #ifdef __cplusplus
 }
 #endif
@@ -525,5 +527,3 @@ typedef struct VSF_MCONNECT(VSF_I2C_CFG_DEC_PREFIX, _i2c_t) \
 
 #   undef VSF_I2C_CFG_DEC_PREFIX
 #endif /* VSF_I2C_CFG_DEC_PREFIX */
-
-

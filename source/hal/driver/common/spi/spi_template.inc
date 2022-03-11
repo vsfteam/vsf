@@ -27,8 +27,8 @@
 #endif
 
 #if VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
-#   define VSF_SPI_OP_VAR           VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_op)
-#   define VSF_SPI_OP               .vsf_spi.op = & VSF_SPI_OP_VAR,
+#   define __VSF_SPI_OP_VAR         VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_op)
+#   define VSF_SPI_OP               .vsf_spi.op = & __VSF_SPI_OP_VAR,
 #else
 #   define VSF_SPI_OP
 #endif
@@ -43,7 +43,7 @@
 #   define  VSF_SPI_API(__prefix_name, __return, __name, ...)                   \
         VSF_TEMPLATE_HAL_API_OP(__prefix_name, _spi_, __return, __name, __VA_ARGS__)
 
-static const vsf_spi_op_t VSF_SPI_OP_VAR = {
+static const vsf_spi_op_t __VSF_SPI_OP_VAR = {
     VSF_SPI_APIS(VSF_SPI_CFG_IMP_PREFIX)
 };
 

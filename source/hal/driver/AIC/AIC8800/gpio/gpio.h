@@ -29,23 +29,9 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_HW_GPIO_COUNT
-#   error "Please define macro VSF_HW_GPIO_COUNT"
-#else
-#   define VSF_GPIO_CFG_TEMPLATE_COUNT      VSF_HW_GPIO_COUNT
-#endif
-
-#ifdef  VSF_HW_GPIO_MASK
-#   define VSF_GPIO_CFG_TEMPLATE_MASK       VSF_HW_GPIO_MASK
-#endif
-
 #define VSF_IO_REIMPLEMENT_FEATURE          ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define VSF_GPIO_CFG_DEC_LV0(__count, __dont_care)                              \
-    extern vsf_hw_gpio_t vsf_gpio ## __count;
-
 /*============================ TYPES =========================================*/
 
 typedef enum io_feature_t {
@@ -63,6 +49,10 @@ typedef enum io_feature_t {
 typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
 
 /*============================ INCLUDES ======================================*/
+
+// undef after include vsf_template_i2c.h
+#define VSF_GPIO_CFG_DEC_PREFIX                      vsf_hw
+#define VSF_GPIO_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
 
 #include "hal/driver/common/template/vsf_template_io.h"
 

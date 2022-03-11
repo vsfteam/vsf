@@ -80,20 +80,6 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vsf_spi_init                 VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_init)
-#define vsf_spi_enable               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_enable)
-#define vsf_spi_disable              VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_disable)
-#define vsf_spi_irq_enable           VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_enable)
-#define vsf_spi_irq_disable          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_disable)
-#define vsf_spi_status               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_status)
-#define vsf_spi_capability           VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_capability)
-#define vsf_spi_cs_active            VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cs_active)
-#define vsf_spi_cs_inactive          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cs_inactive)
-#define vsf_spi_fifo_transfer        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_fifo_transfer)
-#define vsf_spi_request_transfer     VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_request_transfer)
-#define vsf_spi_cancel_transfer      VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cancel_transfer)
-#define vsf_spi_get_transfered_count VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_transfered_count)
-
 #define VSF_SPI_INIT(spi_ptr, cfg_ptr)                                          \
     vsf_spi_init((vsf_spi_t *)spi_ptr, cfg_ptr)
 #define VSF_SPI_ENABLE(spi_ptr)                                                 \
@@ -419,6 +405,22 @@ extern int_fast32_t     vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
 #   include "hal/driver/common/spi/multiplex_spi.h"
 #endif
 
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_spi_init                 VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_init)
+#define vsf_spi_enable               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_enable)
+#define vsf_spi_disable              VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_disable)
+#define vsf_spi_irq_enable           VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_enable)
+#define vsf_spi_irq_disable          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_disable)
+#define vsf_spi_status               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_status)
+#define vsf_spi_capability           VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_capability)
+#define vsf_spi_cs_active            VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cs_active)
+#define vsf_spi_cs_inactive          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cs_inactive)
+#define vsf_spi_fifo_transfer        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_fifo_transfer)
+#define vsf_spi_request_transfer     VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_request_transfer)
+#define vsf_spi_cancel_transfer      VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cancel_transfer)
+#define vsf_spi_get_transfered_count VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_transfered_count)
+
 #ifdef __cplusplus
 }
 #endif
@@ -427,59 +429,70 @@ extern int_fast32_t     vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-// extended to:
-//  extern vsf_err_t vsf_xxx_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr);
-//  ...
-#ifdef VSF_SPI_CFG_DEC_PREFIX
+#if defined(VSF_SPI_CFG_DEC_PREFIX)
 #   undef VSF_SPI_API
 #   define VSF_SPI_API(__prefix_name, __return, __name, ...)                   \
     VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, _spi_, __return, __name, __VA_ARGS__)
 
+// expand to:
+//  extern vsf_err_t vsf_xxx_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr);
+//  ...
 VSF_SPI_APIS(VSF_SPI_CFG_DEC_PREFIX)
 
-#   undef VSF_SPI_CFG_DEC_PREFIX
-#endif
+#   if defined(VSF_SPI_CFG_DEC_UPPERCASE_PREFIX)
+#       if VSF_MCONNECT(VSF_SPI_CFG_DEC_UPPERCASE_PREFIX, _SPI_COUNT)
+#           define __VSF_SPI_DEC_COUNT VSF_MCONNECT(VSF_SPI_CFG_DEC_UPPERCASE_PREFIX, _SPI_COUNT)
 
-// extended to:
+#           if VSF_MCONNECT(VSF_SPI_CFG_DEC_UPPERCASE_PREFIX, _SPI_MASK)
+#               define __VSF_SPI_DEC_MASK    VSF_MCONNECT(VSF_SPI_CFG_DEC_UPPERCASE_PREFIX, _SPI_MASK)
+#           else
+#               define __VSF_SPI_DEC_MASK    ((1ul << __VSF_SPI_DEC_COUNT) - 1)
+#           endif
+
+// expand to:
+//  typedef vsf_xxx_spi_t vsf_xxx_spi_t;
+typedef struct VSF_MCONNECT(VSF_SPI_CFG_DEC_PREFIX, _spi_t) \
+            VSF_MCONNECT(VSF_SPI_CFG_DEC_PREFIX, _spi_t);
+
+// expand to:
 //  extern vsf_xxx_spi_t vsf_xxx_spi{0,1,2,3,...};
-#ifdef VSF_SPI_CFG_DEC_LV0
-#   if VSF_MCONNECT(VSF_SPI_CFG_DEC_UPPERCASE_PREFIX, _SPI_COUNT)
-#       define __VSF_SPI_DEC_COUNT VSF_MCONNECT(VSF_SPI_CFG_DEC_UPPERCASE_PREFIX, _SPI_COUNT)
+#           define __VSF_SPI_DEC_LV0(__count, __dont_care)   \
+                extern VSF_MCONNECT(VSF_SPI_CFG_DEC_PREFIX, _spi_t) \
+                    VSF_MCONNECT(VSF_SPI_CFG_DEC_PREFIX, _spi, __count);
 
-#       if VSF_MCONNECT(VSF_SPI_CFG_DEC_UPPERCASE_PREFIX, _SPI_MASK)
-#           define __VSF_SPI_DEC_MASK    VSF_MCONNECT(VSF_SPI_CFG_DEC_UPPERCASE_PREFIX, _SPI_MASK)
-#       else
-#           define __VSF_SPI_DEC_MASK    ((1ul << __VSF_SPI_DEC_COUNT) - 1)
+#           if __VSF_SPI_DEC_MASK & (1 << 0)
+                __VSF_SPI_DEC_LV0(0, NULL)
+#           endif
+#           if __VSF_SPI_DEC_MASK & (1 << 1)
+                __VSF_SPI_DEC_LV0(1, NULL)
+#           endif
+#           if __VSF_SPI_DEC_MASK & (1 << 2)
+                __VSF_SPI_DEC_LV0(2, NULL)
+#           endif
+#           if __VSF_SPI_DEC_MASK & (1 << 3)
+                __VSF_SPI_DEC_LV0(3, NULL)
+#           endif
+#           if __VSF_SPI_DEC_MASK & (1 << 4)
+                __VSF_SPI_DEC_LV0(4, NULL)
+#           endif
+#           if __VSF_SPI_DEC_MASK & (1 << 5)
+                __VSF_SPI_DEC_LV0(5, NULL)
+#           endif
+#           if __VSF_SPI_DEC_MASK & (1 << 6)
+                __VSF_SPI_DEC_LV0(6, NULL)
+#           endif
+#           if __VSF_SPI_DEC_MASK & (1 << 7)
+                __VSF_SPI_DEC_LV0(7, NULL)
+#           endif
+
+#           undef __VSF_SPI_DEC_COUNT
+#           undef __VSF_SPI_DEC_MASK
+#           undef __VSF_SPI_DEC_LV0
 #       endif
 
-#       if __VSF_SPI_DEC_MASK & (1 << 0)
-            VSF_SPI_CFG_DEC_LV0(0, NULL)
-#       endif
-#       if __VSF_SPI_DEC_MASK & (1 << 1)
-            VSF_SPI_CFG_DEC_LV0(1, NULL)
-#       endif
-#       if __VSF_SPI_DEC_MASK & (1 << 2)
-            VSF_SPI_CFG_DEC_LV0(2, NULL)
-#       endif
-#       if __VSF_SPI_DEC_MASK & (1 << 3)
-            VSF_SPI_CFG_DEC_LV0(3, NULL)
-#       endif
-#       if __VSF_SPI_DEC_MASK & (1 << 4)
-            VSF_SPI_CFG_DEC_LV0(4, NULL)
-#       endif
-#       if __VSF_SPI_DEC_MASK & (1 << 5)
-            VSF_SPI_CFG_DEC_LV0(5, NULL)
-#       endif
-#       if __VSF_SPI_DEC_MASK & (1 << 6)
-            VSF_SPI_CFG_DEC_LV0(6, NULL)
-#       endif
-#       if __VSF_SPI_DEC_MASK & (1 << 7)
-            VSF_SPI_CFG_DEC_LV0(7, NULL)
-#       endif
+#       undef VSF_SPI_CFG_DEC_UPPERCASE_PREFIX
+#   endif   /* VSF_SPI_CFG_DEC_UPPERCASE_PREFIX */
 
-#       undef __VSF_SPI_DEC_COUNT
-#       undef __VSF_SPI_DEC_MASK
-#       undef VSF_SPI_CFG_DEC_LV0
-#endif
-#endif
+#   undef VSF_SPI_CFG_DEC_PREFIX
+#endif /* VSF_SPI_CFG_DEC_PREFIX */
 

@@ -15,11 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-// force convert vsf_i2c_init to vsf_i2c_init
-#define VSF_I2C_CFG_PREFIX                  vsf_hw
-#define VSF_I2C_CFG_IMP_PREFIX              VSF_I2C_CFG_PREFIX
-#define VSF_I2C_CFG_IMP_UPPERCASE_PREFIX    VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
 #include "./i2c.h"
@@ -71,7 +66,8 @@ static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr);
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_I2C_CFG_IMP_UPPERCASE_PREFIX            VSF_HW
+#define VSF_I2C_CFG_IMP_PREFIX              VSF_I2C_CFG_PREFIX
+#define VSF_I2C_CFG_IMP_UPPERCASE_PREFIX    VSF_HW
 #define VSF_I2C_CFG_IMP_LV0(__count, __dont_care)                               \
     static const vsf_hw_i2c_const_t __vsf_hw_i2c ##__count ## _const = {        \
         .reg  = VSF_HW_I2C ## __count ## _REG,                                  \
