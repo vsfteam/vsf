@@ -27,12 +27,12 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#ifndef VSF_I2C_CFG_PROTECT_LEVEL
-#   define VSF_I2C_CFG_PROTECT_LEVEL        interrupt
+#ifndef VSF_I2C_REQUEST_CFG_PROTECT_LEVEL
+#   define VSF_I2C_REQUEST_CFG_PROTECT_LEVEL    interrupt
 #endif
 
-#define __vsf_i2c_protect                   vsf_protect(VSF_I2C_CFG_PROTECT_LEVEL)
-#define __vsf_i2c_unprotect                 vsf_unprotect(VSF_I2C_CFG_PROTECT_LEVEL)
+#define __vsf_i2c_protect                       vsf_protect(VSF_I2C_REQUEST_CFG_PROTECT_LEVEL)
+#define __vsf_i2c_unprotect                     vsf_unprotect(VSF_I2C_REQUEST_CFG_PROTECT_LEVEL)
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -54,6 +54,9 @@ void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
                                  uint32_t interrupt_mask,
                                  uint32_t param)
 {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+    VSF_HAL_ASSERT(NULL != i2c_request_ptr);
+
     i2c_cfg_t *cfg = &i2c_request_ptr->cfg;
     uint32_t cur_interrupt_mask = 0;
 
@@ -87,6 +90,10 @@ vsf_err_t vsf_i2c_request_master_request(vsf_i2c_t *i2c_ptr,
                                          uint16_t count,
                                          uint8_t *buffer_ptr)
 {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+    VSF_HAL_ASSERT(NULL != i2c_request_ptr);
+    VSF_HAL_ASSERT(NULL != i2c_request_ptr->fn);
+
     i2c_request_ptr->address = address;
     i2c_request_ptr->cmd = cmd;
     i2c_request_ptr->count = count;
@@ -106,4 +113,5 @@ vsf_err_t vsf_i2c_request_master_request(vsf_i2c_t *i2c_ptr,
 
 /*============================ IMPLEMENTATION ================================*/
 
-#endif
+#endif // VSF_HAL_USE_I2C == ENABLED
+
