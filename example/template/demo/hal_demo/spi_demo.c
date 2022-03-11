@@ -22,13 +22,19 @@
 #if APP_USE_HAL_DEMO == ENABLED && APP_USE_HAL_SPI_DEMO == ENABLED && VSF_HAL_USE_SPI == ENABLED
 
 /*============================ MACROS ========================================*/
+#if VSF_SPI_CFG_MULTIPLEX_CS == ENABLED
+    extern vsf_multiplex_spi_t multiplex_spi1;
+    #undef APP_SPI_DEMO_CFG_SPI
+    #define APP_SPI_DEMO_CFG_SPI (vsf_spi_t *)&multiplex_spi1
+#endif
 
-extern vsf_multiplex_spi_t multiplex_spi1;
-#undef APP_SPI_DEMO_CFG_SPI
-#define APP_SPI_DEMO_CFG_SPI (vsf_spi_t *)&multiplex_spi1
+#ifdef APP_SPI_DEMO_CFG_SPI_PREFIX
+#   undef VSF_SPI_CFG_PREFIX
+#   define VSF_SPI_CFG_PREFIX                           APP_SPI_DEMO_CFG_SPI_PREFIX
+#endif
 
 #ifndef APP_SPI_DEMO_CFG_SPI
-#   define APP_SPI_DEMO_CFG_SPI                         (vsf_spi_t *)&vsf_spi0
+#   define APP_SPI_DEMO_CFG_SPI                         (vsf_spi_t *)&vsf_hw_spi0
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_DATASIZE
@@ -103,6 +109,11 @@ typedef struct app_spi_demo_t {
 } app_spi_demo_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#ifdef APP_SPI_DEMO_CFG_SPI_EXTERN
+    APP_SPI_DEMO_CFG_SPI_EXTERN
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static app_spi_demo_t __app_spi_demo;

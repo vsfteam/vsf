@@ -23,15 +23,13 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef APP_I2C_DEMO_CFG_I2C
-#   if 0
-#       define APP_I2C_DEMO_CFG_I2C                     (vsf_i2c_t *)&vsf_hw_i2c0
-#   else
-    extern vsf_gpio_i2c_t vsf_gpio_i2c0;
-#       define APP_I2C_DEMO_CFG_I2C                     (vsf_i2c_t *)&vsf_gpio_i2c0
-#       undef VSF_I2C_CFG_PREFIX
-#       define VSF_I2C_CFG_PREFIX vsf_gpio
+#ifdef APP_I2C_DEMO_CFG_I2C_PREFIX
+#   undef VSF_I2C_CFG_PREFIX
+#   define VSF_I2C_CFG_PREFIX                           APP_I2C_DEMO_CFG_I2C_PREFIX
 #endif
+
+#ifndef APP_I2C_DEMO_CFG_I2C
+#   define APP_I2C_DEMO_CFG_I2C                         (vsf_i2c_t *)&vsf_hw_i2c0
 #endif
 
 #ifndef APP_I2C_DEMO_CFG_ADDRESS_START
@@ -43,7 +41,7 @@
 #endif
 
 #ifndef APP_I2C_DEMO_PRIO
-#   define APP_I2C_DEMO_PRIO                            vsf_prio_0
+#   define APP_I2C_DEMO_PRIO                            vsf_arch_prio_2
 #endif
 
 #ifndef APP_I2C_DEMO_CFG_MODE
@@ -54,27 +52,36 @@
 #   define APP_I2C_DEMO_CLOCK_HZ                        1000
 #endif
 
+#ifndef APP_I2C_DEMO_TEST_DATA_CNT
+#   define APP_I2C_DEMO_TEST_DATA_CNT                   1
+#endif
+
+#ifndef APP_I2C_DEMO_TEST_DATA_ARRAY
+#   define APP_I2C_DEMO_TEST_DATA_ARRAY                 {0xFF}
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct app_i2c_demo_t {
-    uint16_t address;
-
+    uint16_t start_address;
+    uint16_t end_address;
 } app_i2c_demo_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 app_i2c_demo_t __app_i2c_demo = {
-    .address = APP_I2C_DEMO_CFG_ADDRESS_START,
+    .start_address = APP_I2C_DEMO_CFG_ADDRESS_START,
+    .end_address = APP_I2C_DEMO_CFG_ADDRESS_END,
 };
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 static vsf_err_t __i2c_demo_init(vsf_i2c_t *i2c_ptr,
-                            vsf_i2c_isr_t *irs_ptr,
-                            em_i2c_irq_mask_t mask)
+                                 vsf_i2c_isr_t *irs_ptr,
+                                 em_i2c_irq_mask_t mask)
 {
     VSF_ASSERT(i2c_ptr != NULL);
     VSF_ASSERT(irs_ptr != NULL);
@@ -109,8 +116,18 @@ static void __i2c_demo_deinit(vsf_i2c_t *i2c_ptr)
 
 static void __i2c_search_next(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_ptr)
 {
-    if (i2c_demo_ptr->address < APP_I2C_DEMO_CFG_ADDRESS_END) {
-        vsf_i2c_master_request(i2c_ptr, i2c_demo_ptr->address, I2C_CMD_START | I2C_CMD_WRITE | I2C_CMD_STOP, 0, NULL);
+#ifdef APP_I2C_DEMO_TEST_DATA_ARRAY
+    static uint8_t __reqeust_data[] = APP_I2C_DEMO_TEST_DATA_ARRAY;
+    uint16_t request_data_len = dimof(__reqeust_data);
+#else
+    uint8_t *__reqeust_data = NULL;
+    uint16_t request_data_len = 0;
+#endif
+
+    if (i2c_demo_ptr->start_address <= i2c_demo_ptr->end_address) {
+        vsf_i2c_master_request(i2c_ptr, i2c_demo_ptr->start_address,
+                               I2C_CMD_START | I2C_CMD_WRITE | I2C_CMD_STOP,
+                               request_data_len, __reqeust_data);
     } else {
         __i2c_demo_deinit(i2c_ptr);
     }
@@ -120,24 +137,11 @@ static void __i2c_irq_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, em_i2c_irq_m
 {
     app_i2c_demo_t *i2c_demo_ptr = (app_i2c_demo_t *)target_ptr;
 
-    if (irq_mask & I2C_IRQ_MASK_MASTER_STARTED) {
-        vsf_trace_debug("i2c address :%d start interrutp" VSF_TRACE_CFG_LINEEND, i2c_demo_ptr->address);
-        return ;
-    }
-
-    if (irq_mask & I2C_IRQ_MASK_MASTER_STOP_DETECT) {
-        vsf_trace_debug("i2c address :%d stop interrutp" VSF_TRACE_CFG_LINEEND, i2c_demo_ptr->address);
-    }
-
     if (irq_mask & I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
-        vsf_trace_debug("i2c address :%d stop interrutp" VSF_TRACE_CFG_LINEEND, i2c_demo_ptr->address);
+        vsf_trace_debug("i2c address :%d transfer complete interrutp" VSF_TRACE_CFG_LINEEND, i2c_demo_ptr->start_address);
     }
 
-    if (irq_mask & I2C_IRQ_MASK_MASTER_NACK_DETECT) {
-        vsf_trace_debug("i2c address :%d nack interrutp" VSF_TRACE_CFG_LINEEND, i2c_demo_ptr->address);
-    }
-
-    i2c_demo_ptr->address++;
+    i2c_demo_ptr->start_address++;
     __i2c_search_next(i2c_demo_ptr, i2c_ptr);
 }
 
@@ -146,12 +150,18 @@ static void __i2c_address_search(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_pt
     VSF_ASSERT(i2c_demo_ptr != NULL);
     VSF_ASSERT(i2c_ptr != NULL);
 
+    vsf_trace_debug("i2c search address, range: 0x%02x, 0x%02x", i2c_demo_ptr->start_address, i2c_demo_ptr->end_address);
+
     vsf_i2c_isr_t isr = {
         .handler_fn = __i2c_irq_handler,
         .target_ptr = i2c_demo_ptr,
         .prio = APP_I2C_DEMO_PRIO,
     };
-    em_i2c_irq_mask_t mask = I2C_IRQ_MASK_MASTER_NACK_DETECT | I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+
+    em_i2c_irq_mask_t mask =  I2C_IRQ_MASK_MASTER_ADDRESS_NACK
+                            | I2C_IRQ_MASK_MASTER_NACK_DETECT
+                            | I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+
     vsf_err_t result = __i2c_demo_init(i2c_ptr, &isr, mask);
     VSF_ASSERT(result == VSF_ERR_NONE);
 
