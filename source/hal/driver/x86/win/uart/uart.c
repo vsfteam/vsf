@@ -15,6 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
+#define VSF_USART_CFG_PREFIX                  vsf_hw
+
 /*============================ INCLUDES ======================================*/
 
 #include "./uart.h"
@@ -86,7 +88,7 @@
 #define VSF_USART_TRACE_HEADER                      "[x86/x64]:"
 
 #define __USART_LOCAL(__N,__DONT_CARE)                                          \
-    vsf_usart_t vsf_usart##__N          = {                                     \
+    vsf_usart_t vsf_hw_usart##__N       = {                                     \
         .com_port                       = __N,                                  \
         .com_status                     = USART_INIT_IS_BUSY,                   \
         .handle_com                     = NULL,                                 \
@@ -844,8 +846,8 @@ bool vsf_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size)
         return false;
     }
     static vsf_usart_t *__vsf_usart_win[] = {
-        &vsf_usart0,&vsf_usart1,&vsf_usart2,&vsf_usart3,
-        &vsf_usart4,&vsf_usart5,&vsf_usart6,&vsf_usart7
+        &vsf_hw_usart0,&vsf_hw_usart1,&vsf_hw_usart2,&vsf_hw_usart3,
+        &vsf_hw_usart4,&vsf_hw_usart5,&vsf_hw_usart6,&vsf_hw_usart7
     };
     uint8_t i, j = 0;
     for (i = 0; i < VSF_USART_CFG_PORT_NUM; i++) {
