@@ -29,31 +29,35 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_I2C_CFG_REIMPLEMENT_STATUS          ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_CMD     ENABLED
 
 /*============================ TYPES =========================================*/
 
-typedef struct i2c_status_t {
-    union {
-        inherit(peripheral_status_t)
-        struct {
-            uint32_t                            : 1;
-            uint32_t                is_enabled  : 1;
-            uint32_t                irq_enabled : 1;
-            uint32_t                            : 29;
-        } status_bool;
-    };
-} i2c_status_t;
+typedef enum em_i2c_cmd_t {
+    I2C_CMD_WRITE       = (0x00ul << 3),
+    I2C_CMD_READ        = (0x01ul << 3),
+    I2C_CMD_RW_MASK     = I2C_CMD_WRITE | I2C_CMD_READ,
 
-typedef struct vsf_hw_i2c_t vsf_hw_i2c_t;
+    I2C_CMD_START       = (0x01ul <<  0),
+    I2C_CMD_STOP        = (0x01ul << 22),
+    I2C_CMD_RESTAR      = (0x01ul << 21),
+    I2C_CMD_COND_RESTAR = (0x01ul << 21),
+
+    I2C_CMD_7_BITS      = (0x00ul << 23),
+    I2C_CMD_10_BITS     = (0x01ul << 23),
+    I2C_CMD_BITS_MASK   =  I2C_CMD_7_BITS
+                         | I2C_CMD_10_BITS,
+
+    __I2C_CMD_HW_MASK   = I2C_CMD_RW_MASK | I2C_CMD_START | I2C_CMD_RESTAR,
+
+    I2C_CMD_ALL_MASK    = I2C_CMD_RW_MASK | I2C_CMD_COND_RESTAR | I2C_CMD_BITS_MASK,
+} em_i2c_cmd_t;
 
 /*============================ INCLUDES ======================================*/
 
 // undef after include vsf_template_i2c.h
 #define VSF_I2C_CFG_DEC_PREFIX                      vsf_hw
 #define VSF_I2C_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
-#define VSF_I2C_CFG_DEC_LV0(__count, __dont_care)   \
-    extern vsf_hw_i2c_t vsf_hw_i2c ## __count;
 
 #include "hal/driver/common/template/vsf_template_i2c.h"
 
