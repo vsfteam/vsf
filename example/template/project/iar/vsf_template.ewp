@@ -11565,22 +11565,7 @@
                     <group>
                         <name>i2c</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\__i2c_multiplex_common.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\__i2c_multiplex_common.inc</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_common.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_multiplex.c</name>
-                            <excluded>
-                                <configuration>vsf_template_aic8800</configuration>
-                            </excluded>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_multiplex.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_request.c</name>
@@ -11590,6 +11575,12 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_template.inc</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.h</name>
                         </file>
                     </group>
                     <group>
@@ -11655,13 +11646,13 @@
                     <group>
                         <name>usart</name>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_common.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_request.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_request.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_template.inc</name>
