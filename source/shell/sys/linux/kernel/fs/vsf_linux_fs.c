@@ -957,6 +957,8 @@ __open_again:
         }
         if (flags & O_APPEND) {
             vk_file_seek(file, 0, VSF_FILE_SEEK_END);
+        } else {
+            vk_file_seek(file, 0, VSF_FILE_SEEK_SET);
         }
         if (flags & O_EXCL) {
             file->attr |= VSF_FILE_ATTR_EXCL;
@@ -1230,7 +1232,7 @@ ssize_t readlink(const char *pathname, char *buf, size_t bufsiz)
 
 DIR * opendir(const char *name)
 {
-    int fd = open(name, 0);
+    int fd = open(name, O_DIRECTORY);
     if (fd < 0) {
         return NULL;
     }
