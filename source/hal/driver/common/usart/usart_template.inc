@@ -26,8 +26,8 @@
 #define VSF_USART_CFG_FIFO2REQ_PREFIX           vsf_fifo2req
 
 #if VSF_USART_CFG_IMPLEMENT_OP == ENABLED
-#   define VSF_USART_OP_VAR                       VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_op)
-#   define VSF_USART_OP                           .vsf_usart.op = & VSF_USART_OP_VAR,
+#   define __VSF_USART_OP_VAR                     VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_op)
+#   define VSF_USART_OP                           .vsf_usart.op = & __VSF_USART_OP_VAR,
 #else
 #   define VSF_USART_OP
 #endif
@@ -38,11 +38,11 @@
 
 #if VSF_USART_CFG_IMPLEMENT_OP == ENABLED
 
-#   undef   __VSF_USART_API
-#   define  __VSF_USART_API(__prefix_name, __return, __name, ...)                   \
+#   undef VSF_USART_API
+#   define VSF_USART_API(__prefix_name, __return, __name, ...)                   \
         VSF_TEMPLATE_HAL_API_OP(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
 
-static const vsf_usart_op_t VSF_USART_OP_VAR = {
+static const vsf_usart_op_t __VSF_USART_OP_VAR = {
     VSF_USART_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
 };
 #endif

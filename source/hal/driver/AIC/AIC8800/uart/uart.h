@@ -103,8 +103,7 @@ typedef struct vsf_hw_usart_t vsf_hw_usart_t;
 // undef after include vsf_template_i2c.h
 #define VSF_USART_CFG_DEC_PREFIX                      vsf_hw
 #define VSF_USART_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
-#define VSF_USART_CFG_DEC_LV0(__count, __dont_care)                             \
-    extern vsf_hw_usart_t vsf_hw_usart ## __count;
+
 #include "hal/driver/common/template/vsf_template_usart.h"
 
 /*============================ GLOBAL VARIABLES ==============================*/

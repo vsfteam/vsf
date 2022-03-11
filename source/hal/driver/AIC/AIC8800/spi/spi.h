@@ -99,8 +99,6 @@ typedef struct vsf_hw_spi_t vsf_hw_spi_t;
 // undef after include vsf_template_spi.h
 #define VSF_SPI_CFG_DEC_PREFIX                      vsf_hw
 #define VSF_SPI_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
-#define VSF_SPI_CFG_DEC_LV0(__count, __dont_care)   \
-    extern vsf_hw_spi_t vsf_hw_spi ## __count;
 
 #include "hal/driver/common/template/vsf_template_spi.h"
 

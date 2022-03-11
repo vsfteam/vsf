@@ -73,22 +73,6 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vsf_usart_init           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_init)
-#define vsf_usart_enable         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_enable)
-#define vsf_usart_disable        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)
-#define vsf_usart_irq_enable     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_enable)
-#define vsf_usart_irq_disable    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_disable)
-#define vsf_usart_status         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_status)
-#define vsf_usart_fifo_read      VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_read)
-#define vsf_usart_fifo_write     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_write)
-#define vsf_usart_fifo_flush     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_flush)
-#define vsf_usart_request_rx     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_rx)
-#define vsf_usart_request_tx     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_tx)
-#define vsf_usart_cancel_rx      VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_rx)
-#define vsf_usart_cancel_tx      VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)
-#define vsf_usart_get_rx_count   VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)
-#define vsf_usart_get_tx_count   VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)
-
 #define VSF_USART_INIT(usart_ptr, cfg_ptr)                                      \
     vsf_usart_init((vsf_usart_t *)usart_ptr, cfg_ptr)
 #define VSF_USART_ENABLE(usart_ptr)                                             \
@@ -384,6 +368,24 @@ extern vsf_err_t          vsf_usart_cancel_tx(      vsf_usart_t *usart_ptr);
 extern int_fast32_t       vsf_usart_get_rx_count(   vsf_usart_t *usart_ptr);
 extern int_fast32_t       vsf_usart_get_tx_count(   vsf_usart_t *usart_ptr);
 
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_usart_init           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_init)
+#define vsf_usart_enable         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_enable)
+#define vsf_usart_disable        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)
+#define vsf_usart_irq_enable     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_enable)
+#define vsf_usart_irq_disable    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_disable)
+#define vsf_usart_status         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_status)
+#define vsf_usart_fifo_read      VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_read)
+#define vsf_usart_fifo_write     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_write)
+#define vsf_usart_fifo_flush     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_flush)
+#define vsf_usart_request_rx     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_rx)
+#define vsf_usart_request_tx     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_tx)
+#define vsf_usart_cancel_rx      VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_rx)
+#define vsf_usart_cancel_tx      VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)
+#define vsf_usart_get_rx_count   VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)
+#define vsf_usart_get_tx_count   VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)
+
 #ifdef __cplusplus
 }
 #endif
@@ -392,59 +394,71 @@ extern int_fast32_t       vsf_usart_get_tx_count(   vsf_usart_t *usart_ptr);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-// extended to:
-//  extern vsf_err_t vsf_xxx_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
-//  ...
-#ifdef VSF_USART_CFG_DEC_PREFIX
+
+#if defined(VSF_USART_CFG_DEC_PREFIX)
 #   undef VSF_USART_API
 #   define VSF_USART_API(__prefix_name, __return, __name, ...)                   \
     VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
 
+// expand to:
+//  extern vsf_err_t vsf_xxx_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
+//  ...
 VSF_USART_APIS(VSF_USART_CFG_DEC_PREFIX)
 
-#   undef VSF_USART_CFG_DEC_PREFIX
-#endif
+#   if defined(VSF_USART_CFG_DEC_UPPERCASE_PREFIX)
+#       if VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_COUNT)
+#           define __VSF_USART_DEC_COUNT VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_COUNT)
 
-// extended to:
+#           if VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_MASK)
+#               define __VSF_USART_DEC_MASK    VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_MASK)
+#           else
+#               define __VSF_USART_DEC_MASK    ((1ul << __VSF_USART_DEC_COUNT) - 1)
+#           endif
+
+// expand to:
+//  typedef vsf_xxx_usart_t vsf_xxx_usart_t;
+typedef struct VSF_MCONNECT(VSF_USART_CFG_DEC_PREFIX, _usart_t) \
+            VSF_MCONNECT(VSF_USART_CFG_DEC_PREFIX, _usart_t);
+
+// expand to:
 //  extern vsf_xxx_usart_t vsf_xxx_usart{0,1,2,3,...};
-#ifdef VSF_USART_CFG_DEC_LV0
-#   if VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_COUNT)
-#       define __VSF_USART_DEC_COUNT VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_COUNT)
+#           define __VSF_USART_DEC_LV0(__count, __dont_care)   \
+                extern VSF_MCONNECT(VSF_USART_CFG_DEC_PREFIX, _usart_t) \
+                    VSF_MCONNECT(VSF_USART_CFG_DEC_PREFIX, _usart, __count);
 
-#       if VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_MASK)
-#           define __VSF_USART_DEC_MASK    VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_MASK)
-#       else
-#           define __VSF_USART_DEC_MASK    ((1ul << __VSF_USART_DEC_COUNT) - 1)
+#           if __VSF_USART_DEC_MASK & (1 << 0)
+                __VSF_USART_DEC_LV0(0, NULL)
+#           endif
+#           if __VSF_USART_DEC_MASK & (1 << 1)
+                __VSF_USART_DEC_LV0(1, NULL)
+#           endif
+#           if __VSF_USART_DEC_MASK & (1 << 2)
+                __VSF_USART_DEC_LV0(2, NULL)
+#           endif
+#           if __VSF_USART_DEC_MASK & (1 << 3)
+                __VSF_USART_DEC_LV0(3, NULL)
+#           endif
+#           if __VSF_USART_DEC_MASK & (1 << 4)
+                __VSF_USART_DEC_LV0(4, NULL)
+#           endif
+#           if __VSF_USART_DEC_MASK & (1 << 5)
+                __VSF_USART_DEC_LV0(5, NULL)
+#           endif
+#           if __VSF_USART_DEC_MASK & (1 << 6)
+                __VSF_USART_DEC_LV0(6, NULL)
+#           endif
+#           if __VSF_USART_DEC_MASK & (1 << 7)
+                __VSF_USART_DEC_LV0(7, NULL)
+#           endif
+
+#           undef __VSF_USART_DEC_COUNT
+#           undef __VSF_USART_DEC_MASK
+#           undef __VSF_USART_DEC_LV0
 #       endif
 
-#       if __VSF_USART_DEC_MASK & (1 << 0)
-            VSF_USART_CFG_DEC_LV0(0, NULL)
-#       endif
-#       if __VSF_USART_DEC_MASK & (1 << 1)
-            VSF_USART_CFG_DEC_LV0(1, NULL)
-#       endif
-#       if __VSF_USART_DEC_MASK & (1 << 2)
-            VSF_USART_CFG_DEC_LV0(2, NULL)
-#       endif
-#       if __VSF_USART_DEC_MASK & (1 << 3)
-            VSF_USART_CFG_DEC_LV0(3, NULL)
-#       endif
-#       if __VSF_USART_DEC_MASK & (1 << 4)
-            VSF_USART_CFG_DEC_LV0(4, NULL)
-#       endif
-#       if __VSF_USART_DEC_MASK & (1 << 5)
-            VSF_USART_CFG_DEC_LV0(5, NULL)
-#       endif
-#       if __VSF_USART_DEC_MASK & (1 << 6)
-            VSF_USART_CFG_DEC_LV0(6, NULL)
-#       endif
-#       if __VSF_USART_DEC_MASK & (1 << 7)
-            VSF_USART_CFG_DEC_LV0(7, NULL)
-#       endif
+#       undef VSF_USART_CFG_DEC_UPPERCASE_PREFIX
+#   endif   /* VSF_USART_CFG_DEC_UPPERCASE_PREFIX */
 
-#       undef __VSF_USART_DEC_COUNT
-#       undef __VSF_USART_DEC_MASK
-#       undef VSF_USART_CFG_DEC_LV0
-#endif
-#endif
+#   undef VSF_USART_CFG_DEC_PREFIX
+#endif /* VSF_USART_CFG_DEC_PREFIX */
 

@@ -22,7 +22,7 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if (VSF_HAL_USE_I2C == ENABLED) && (VSF_HAL_USE_IMP_MULTIPLEX_I2C == ENABLED)
+#if (VSF_HAL_USE_I2C == ENABLED) && (VSF_HAL_USE_MULTIPLEX_I2C == ENABLED)
 
 #include "hal/driver/driver.h"
 
