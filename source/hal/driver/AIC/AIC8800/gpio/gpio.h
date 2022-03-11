@@ -46,8 +46,6 @@ typedef enum io_feature_t {
     __IO_FEATURE_MASK       = __IO_PULL_MASK | IOMUX_GPIO_CONFIG_SEL_MASK,
 } io_feature_t;
 
-typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
-
 /*============================ INCLUDES ======================================*/
 
 // undef after include vsf_template_i2c.h
