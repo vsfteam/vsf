@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-#include "i2c/i2c_multiplex.h"
+#include "i2c/multiplex_i2c.h"
 #include "usart/fifo2req_usart.h"
 
 /*============================ MACROS ========================================*/
