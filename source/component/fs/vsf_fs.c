@@ -1102,10 +1102,29 @@ __vsf_component_peda_ifs_entry(__vk_vfs_rename, vk_file_rename)
 __vsf_component_peda_ifs_entry(__vk_vfs_setpos, vk_file_setpos)
 {
     vsf_peda_begin();
-    vk_file_t *file = (vk_file_t *)&vsf_this;
-    VSF_FS_ASSERT(file != NULL);
-    file->pos = vsf_local.offset;
-    vsf_eda_return(VSF_ERR_NONE);
+    vk_vfs_file_t *file = (vk_vfs_file_t *)&vsf_this;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        VSF_FS_ASSERT(file != NULL);
+        file->pos = vsf_local.offset;
+
+        if (file->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+            vsf_err_t err;
+            __vsf_component_call_peda_ifs(vk_file_setpos, err, file->subfs.op->fop.fn_setpos, file->subfs.op->fop.setpos_local_size, file->subfs.root,
+                .offset     = vsf_local.offset,
+                .result     = vsf_local.result,
+            );
+            if (VSF_ERR_NONE != err) {
+                vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
+            }
+            break;
+        }
+        // fall through
+    case VSF_EVT_RETURN:
+        vsf_eda_return(VSF_ERR_NONE);
+        break;
+    }
     vsf_peda_end();
 }
 
