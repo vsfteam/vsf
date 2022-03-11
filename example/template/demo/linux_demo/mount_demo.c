@@ -258,6 +258,10 @@ int mount_main(int argc, char *argv[])
     if ((argc < 3) || (optind + 2 != argc)) {
         goto print_help;
     }
+    if (fs_type->need_block_size && (0 == param.block_size)) {
+        printf("block size must be defined for %s\r\n", fs_type->fs);
+        goto print_help;
+    }
 
     param.device = argv[optind + 0];
     fsdata = fs_type->prepare_fsdata(fs_type, &param);
