@@ -96,8 +96,6 @@ typedef enum em_usart_irq_mask_t {
                                      | USART_IRQ_MASK_ERROR,
 } em_usart_irq_mask_t;
 
-typedef struct vsf_hw_usart_t vsf_hw_usart_t;
-
 /*============================ INCLUDES ======================================*/
 
 // undef after include vsf_template_i2c.h
