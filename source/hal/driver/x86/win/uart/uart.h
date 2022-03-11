@@ -29,8 +29,10 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USART_CFG_PORT_NUM
-#   define VSF_USART_CFG_PORT_NUM                   8
+#   define VSF_USART_CFG_PORT_NUM                       8
 #endif
+
+#define VSF_USART_CFG_PREFIX                            vsf
 
 #define VSF_USART_CFG_REIMPLEMENT_MODE                  ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_IRQ_MASK              ENABLED
@@ -38,7 +40,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_USART_EXTERN_REPEAD(__N, __DONT_CARE)                             \
-                                  extern vsf_usart_t vsf_usart##__N;
+                                  extern vsf_usart_t vsf_hw_usart##__N;
 
 /*============================ TYPES =========================================*/
 
@@ -88,6 +90,10 @@ typedef enum em_usart_irq_mask_t {
 
 
 /*============================ INCLUDES ======================================*/
+
+// undef after include vsf_template_i2c.h
+//#define VSF_USART_CFG_DEC_PREFIX                      vsf_hw
+//#define VSF_USART_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
 
 #include "hal/driver/common/template/vsf_template_usart.h"
 

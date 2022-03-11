@@ -39,7 +39,7 @@
 #endif
 
 #ifndef APP_USART_DEMO_CFG_USART
-#   define APP_USART_DEMO_CFG_USART                     (vsf_usart_t *)&vsf_usart0
+#   define APP_USART_DEMO_CFG_USART                     (vsf_usart_t *)&vsf_hw_usart0
 #endif
 
 #ifndef APP_USART_DEMO_CFG_FIFO_POLL_WRITE_TEST

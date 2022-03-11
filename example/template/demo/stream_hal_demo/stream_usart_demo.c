@@ -28,7 +28,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef APP_STREAM_USART_DEMO_CFG_USART
-#   define APP_STREAM_USART_DEMO_CFG_USART              vsf_usart0
+#   define APP_STREAM_USART_DEMO_CFG_USART              vsf_hw_usart0
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
