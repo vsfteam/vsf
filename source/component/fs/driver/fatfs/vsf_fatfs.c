@@ -981,6 +981,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                 }
                 vsf_local.cur_size += vsf_local.cur_run_size;
                 vsf_local.offset += vsf_local.cur_run_size;
+                vsf_local.cur_offset += vsf_local.cur_run_size;
                 vsf_local.size -= vsf_local.cur_run_size;
 
                 fatfs_file->cur.offset_in_sector += vsf_local.cur_run_size;
@@ -1005,7 +1006,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                     VSF_UNUSED_PARAM(err);
                     break;
                 }
-                vsf_local.cur_offset += vsf_local.cur_run_size;
                 vsf_local.cur_sector += vsf_local.cur_run_sector;
                 goto read_next;
             case READ_STATE_GET_NEXT_FAT_ENTRY_DONE:
@@ -1022,7 +1022,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                 fatfs_file->cur.cluster &= 0x0FFFFFFF;
                 fatfs_file->cur.sector_offset_in_cluster = 0;
                 vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, fatfs_file->cur.cluster);
-                vsf_local.cur_offset += clustersize;
                 goto read_next;
             }
         }
@@ -1129,6 +1128,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
 
                 vsf_local.cur_size += vsf_local.cur_run_size;
                 vsf_local.offset += vsf_local.cur_run_size;
+                vsf_local.cur_offset += vsf_local.cur_run_size;
                 vsf_local.size -= vsf_local.cur_run_size;
 
                 fatfs_file->cur.offset_in_sector += vsf_local.cur_run_size;
@@ -1153,7 +1153,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                     VSF_UNUSED_PARAM(err);
                     break;
                 }
-                vsf_local.cur_offset += vsf_local.cur_run_size;
                 vsf_local.cur_sector += vsf_local.cur_run_sector;
                 goto write_next;
             case WRITE_STATE_GET_NEXT_FAT_ENTRY_DONE:
@@ -1171,7 +1170,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                 fatfs_file->cur.cluster &= 0x0FFFFFFF;
                 fatfs_file->cur.sector_offset_in_cluster = 0;
                 vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, fatfs_file->cur.cluster);
-                vsf_local.cur_offset += clustersize;
                 goto write_next;
             }
         }
