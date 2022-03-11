@@ -991,12 +991,10 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                 }
 
                 // get next cluster if necessary
-                if (    vsf_local.size
-                    // check if next sector will be in new cluster
-                    &&  !(      (vsf_local.cur_sector + vsf_local.cur_run_sector - fsinfo->data_sector)
-                            &   ((1 << fsinfo->cluster_size_bits) - 1)
-                        )
-                    ) {
+                // check if next sector will be in new cluster
+                if (!(      (vsf_local.cur_sector + vsf_local.cur_run_sector - fsinfo->data_sector)
+                        &   ((1 << fsinfo->cluster_size_bits) - 1)
+                )) {
                     vsf_err_t err;
                     vsf_eda_set_user_value(READ_STATE_GET_NEXT_FAT_ENTRY_DONE);
                     __vsf_component_call_peda(__vk_fatfs_get_fat_entry, err, fsinfo,
@@ -1138,12 +1136,10 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                 }
 
                 // get next cluster if necessary
-                if (    vsf_local.size
-                    // check if next sector will be in new cluster
-                    &&  !(      (vsf_local.cur_sector + vsf_local.cur_run_sector - fsinfo->data_sector)
-                            &   ((1 << fsinfo->cluster_size_bits) - 1)
-                        )
-                    ) {
+                // check if next sector will be in new cluster
+                if (!(      (vsf_local.cur_sector + vsf_local.cur_run_sector - fsinfo->data_sector)
+                        &   ((1 << fsinfo->cluster_size_bits) - 1)
+                )) {
                     vsf_err_t err;
                     vsf_eda_set_user_value(WRITE_STATE_GET_NEXT_FAT_ENTRY_DONE);
                     __vsf_component_call_peda(__vk_fatfs_get_fat_entry, err, fsinfo,
