@@ -939,6 +939,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                         // read first non-page-aligned data
                         uint32_t offset_in_page = vsf_local.offset - vsf_local.cur_offset;
                         vsf_local.cur_run_size = (1 << fsinfo->sector_size_bits) - offset_in_page;
+                        vsf_local.cur_run_size = min(vsf_local.cur_run_size, vsf_local.size);
                         vsf_local.cur_run_sector = 1;
                         buffer = NULL;
                     } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
@@ -1092,6 +1093,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                         // read first non-page-aligned data
                         uint32_t offset_in_page = vsf_local.offset - vsf_local.cur_offset;
                         vsf_local.cur_run_size = (1 << fsinfo->sector_size_bits) - offset_in_page;
+                        vsf_local.cur_run_size = min(vsf_local.cur_run_size, vsf_local.size);
                         vsf_local.cur_run_sector = 1;
                     read_page:
                         vsf_eda_set_user_value(WRITE_STATE_READ_DONE);
