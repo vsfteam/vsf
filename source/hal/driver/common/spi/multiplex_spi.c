@@ -221,7 +221,9 @@ vsf_err_t vsf_multiplex_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
             vsf_slist_queue_init(&spi_info_ptr->list);
             result = __spi_init_en_req(m_spi_ptr, true, false);
         }
-        spi_info_ptr->init_mask |= (1 << m_spi_ptr->cs_index);
+        if (result == VSF_ERR_NONE) {
+            spi_info_ptr->init_mask |= (1 << m_spi_ptr->cs_index);
+        }
     vsf_multiplex_spi_unprotect(state);
 
     return result;
@@ -430,7 +432,7 @@ vsf_err_t vsf_multiplex_spi_cancel_transfer(vsf_spi_t *spi_ptr)
 
     vsf_err_t result;
 
-    if (1) {
+    if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
         vsf_protect_t state = vsf_multiplex_spi_protect();
             result = vsf_spi_cancel_transfer(spi_info_ptr->spi);
         vsf_multiplex_spi_unprotect(state);
@@ -449,15 +451,13 @@ spi_status_t vsf_multiplex_spi_status(vsf_spi_t *spi_ptr)
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
     VSF_HAL_ASSERT(spi_info_ptr != NULL);
 
-    spi_status_t result;
+    // TODO: add more status info
+    spi_status_t result = {0};
 
-    if (1) {
+    if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
         vsf_protect_t state = vsf_multiplex_spi_protect();
             result = vsf_spi_status(spi_info_ptr->spi);
         vsf_multiplex_spi_unprotect(state);
-    } else {
-        // TODO: when hardware support more status, how to do in multiplex_spi ?
-        result.is_busy = 0;
     }
 
     return result;
@@ -473,7 +473,7 @@ int_fast32_t vsf_multiplex_spi_get_transfered_count(vsf_spi_t *spi_ptr)
 
     int_fast32_t result;
 
-    if (1) {
+    if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
         vsf_protect_t state = vsf_multiplex_spi_protect();
             result = vsf_spi_get_transfered_count(spi_info_ptr->spi);
         vsf_multiplex_spi_unprotect(state);

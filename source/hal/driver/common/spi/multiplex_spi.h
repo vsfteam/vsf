@@ -34,9 +34,9 @@
 
 #include "utilities/ooc_class.h"
 
-// undef after include vsf_template_i2c.h
-#define VSF_USART_CFG_DEC_PREFIX              vsf_multiplex
-#include "hal/driver/common/template/vsf_template_usart.h"
+// undef after include vsf_template_spi.h
+#define VSF_SPI_CFG_DEC_PREFIX              vsf_multiplex
+#include "hal/driver/common/template/vsf_template_spi.h"
 
 /*============================ MACROS ========================================*/
 
@@ -45,10 +45,9 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
 
 typedef VSF_MULTIPLEXER_SPI_CFG_MASK_TYPE spi_multi_mask_t;
-
-/*============================ TYPES =========================================*/
 
 typedef struct multiplex_spi_request_t {
     void *out_buffer_ptr;
