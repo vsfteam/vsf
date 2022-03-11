@@ -83,14 +83,20 @@ typedef enum scsi_group_code_t {
 
 typedef enum scsi_cmd_code_t {
     SCSI_CMDCODE_TEST_UNIT_READY                = 0x00,
+    SCSI_CMDCODE_ATA_COMMAND_PASS_THROUGH12     = 0x01, // SCSI_GROUPCODE12
     SCSI_CMDCODE_REQUEST_SENSE                  = 0x03, // SCSI_GROUPCODE6
     SCSI_CMDCODE_READ_FORMAT_CAPACITIES         = 0x03, // SCSI_GROUPCODE10_1
     SCSI_CMDCODE_READ_TOC                       = 0x03, // SCSI_GROUPCODE10_2
+    SCSI_CMDCODE_REPORT_ID_INFO                 = 0x03, // SCSI_GROUPCODE12
     SCSI_CMDCODE_FORMAT_UNIT                    = 0x04,
     SCSI_CMDCODE_READ_CAPACITY                  = 0x05,
+    SCSI_CMDCODE_ATA_COMMAND_PASS_THROUGH16     = 0x05, // SCSI_GROUPCODE16
     SCSI_CMDCODE_READ                           = 0x08,
+    SCSI_CMDCODE_SERVICE_ACTION_OUT12           = 0x09, // SCSI_GROUPCODE12
     SCSI_CMDCODE_WRITE                          = 0x0A,
     SCSI_CMDCODE_GET_EVENT_STATUS_NOTIFY        = 0x0A, // SCSI_GROUPCODE10_2
+    SCSI_CMDCODE_SERVICE_ACTION_IN12            = 0x0B, // SCSI_GROUPCODE12
+    SCSI_CMDCODE_SERVICE_ACTION_IN16            = 0x0E, // SCSI_GROUPCODE16
     SCSI_CMDCODE_VERIFY                         = 0x0F,
     SCSI_CMDCODE_SYNC_CACHE16                   = 0x11, // SCSI_GROUPCODE16
     SCSI_CMDCODE_INQUIRY                        = 0x12,
@@ -100,6 +106,7 @@ typedef enum scsi_cmd_code_t {
     SCSI_CMDCODE_START_STOP_UNIT                = 0x1B,
     SCSI_CMDCODE_SEND_DIAGNOSTIC                = 0x1D,
     SCSI_CMDCODE_ALLOW_MEDIUM_REMOVAL           = 0x1E,
+    SCSI_CMDCODE_SERVICE_ACTION_OUT16           = 0x1F, // SCSI_GROUPCODE16
 } scsi_cmd_code_t;
 
 typedef struct scsi_inquiry_t {

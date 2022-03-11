@@ -308,6 +308,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                 case SCSI_CMDCODE_WRITE:
                     __vk_virtual_scsi_rw(pthis, scsi_cmd, &vsf_local.mem);
                     return;
+                case SCSI_CMDCODE_VERIFY:
                 case SCSI_CMDCODE_SYNC_CACHE10:
                     reply_len = 0;
                     break;
@@ -334,6 +335,14 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                 case SCSI_CMDCODE_SYNC_CACHE16:
                     reply_len = 0;
                     break;
+                case SCSI_CMDCODE_ATA_COMMAND_PASS_THROUGH16:
+                    goto ata_command_pass_through;
+                case SCSI_CMDCODE_SERVICE_ACTION_IN16:
+                    reply[0] = 0x20;
+                    reply_len = 32;
+                    break;
+                case SCSI_CMDCODE_SERVICE_ACTION_OUT16:
+                case SCSI_CMDCODE_REPORT_ID_INFO:
                 default:
                     goto exit_invalid_cmd;
                 }
@@ -344,6 +353,14 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                 case SCSI_CMDCODE_WRITE:
                     __vk_virtual_scsi_rw(pthis, scsi_cmd, &vsf_local.mem);
                     return;
+                case SCSI_CMDCODE_ATA_COMMAND_PASS_THROUGH12:
+                ata_command_pass_through:
+                    reply[0] = 0x02;
+                    reply[1] = 0x02;
+                    reply_len = 2;
+                    break;
+                case SCSI_CMDCODE_SERVICE_ACTION_OUT12:
+                case SCSI_CMDCODE_SERVICE_ACTION_IN12:
                 default:
                     goto exit_invalid_cmd;
                 }
