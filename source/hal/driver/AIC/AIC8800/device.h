@@ -93,14 +93,14 @@
 #define VSF_HW_USART_MASK           ((1 << 1) | (1 << 2))
 
 #define VSF_HW_I2C_COUNT            1
-#define VSF_HW_I2C0_IRQ_IDX         I2C_IRQn
-#define VSF_HW_I2C0_IRQ             I2C_IRQHandler
+#define VSF_HW_I2C0_IRQ_IDX         I2CM_IRQn
+#define VSF_HW_I2C0_IRQ             I2CM_IRQHandler
 #define VSF_HW_I2C0_REG             (AIC_I2CM_TypeDef *)AIC_I2CM0_BASE
 #define VSF_HW_I2C0_PCLKME_EN_BIT   CSC_PCLKME_I2CM_EN_BIT
 
 #define VSF_HW_SPI_COUNT            1
 #define VSF_HW_SPI0_IRQ_IDX         SPI_IRQn
-#define VSF_HW_SPI0_IRQ             SPI_IRQHandler
+#define VSF_HW_SPI0_IRQ             SPI0_IRQHandler
 #define VSF_HW_SPI0_RXDMA_IRQ_IDX   DMA08_IRQn
 #define VSF_HW_SPI0_TXDMA_IRQ_IDX   DMA09_IRQn
 #define VSF_HW_SPI0_RXDMA_IRQ       DMA08_IRQHandler
