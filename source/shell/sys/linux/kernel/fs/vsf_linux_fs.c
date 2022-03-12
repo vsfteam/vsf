@@ -162,7 +162,7 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         vk_file_read(file, (uint8_t *)buf, count);
         rsize = (int32_t)vsf_eda_get_return_value();
         if (rsize < 0) {
-            return -1;
+            return result > 0 ? result : EOF;
         } else if (!rsize) {
             break;
         }
