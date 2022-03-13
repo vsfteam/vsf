@@ -269,13 +269,13 @@ vsf_err_t vk_dwcotg_dcd_ep_add(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, usb
             VSF_USB_ASSERT(false);
             break;
         case USB_EP_TYPE_INTERRUPT:
-            *ep_ctrl |= (0x3ul << 18) | USB_OTG_DIEPCTL_USBAEP;
+            *ep_ctrl |= (0x3ul << 18) | USB_OTG_DIEPCTL_USBAEP | USB_OTG_DIEPCTL_SD0PID_SEVNFRM;
             break;
         case USB_EP_TYPE_BULK:
-            *ep_ctrl |= (0x2ul << 18) | USB_OTG_DIEPCTL_USBAEP;
+            *ep_ctrl |= (0x2ul << 18) | USB_OTG_DIEPCTL_USBAEP | USB_OTG_DIEPCTL_SD0PID_SEVNFRM;
             break;
         case USB_EP_TYPE_ISO:
-            *ep_ctrl |= (0x1ul << 18) | USB_OTG_DIEPCTL_USBAEP;
+            *ep_ctrl |= (0x1ul << 18) | USB_OTG_DIEPCTL_USBAEP | USB_OTG_DIEPCTL_SD0PID_SEVNFRM;
             break;
         }
         *ep_ctrl |= size;
@@ -284,9 +284,6 @@ vsf_err_t vk_dwcotg_dcd_ep_add(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, usb
         }
     }
     if (is_in) {
-        // initialize to DATA0 PIN
-        *ep_ctrl |= USB_OTG_DIEPCTL_SD0PID_SEVNFRM;
-
         size = (size + 3) & ~3;
         size = vsf_dwcotg_dcd_get_fifo_size(ep | 0x80, type, size);
         size >>= 2;
