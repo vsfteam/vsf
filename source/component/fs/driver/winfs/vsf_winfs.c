@@ -41,6 +41,7 @@ dcl_vsf_peda_methods(static, __vk_winfs_create)
 dcl_vsf_peda_methods(static, __vk_winfs_unlink)
 dcl_vsf_peda_methods(static, __vk_winfs_rename)
 dcl_vsf_peda_methods(static, __vk_winfs_setpos)
+dcl_vsf_peda_methods(static, __vk_winfs_setsize)
 
 extern vk_file_t * __vk_file_get_fs_parent(vk_file_t *file);
 
@@ -62,7 +63,7 @@ const vk_fs_op_t vk_winfs_op = {
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_write),
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_close),
-        .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_setsize),
         .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_setpos),
     },
     .dop            = {
@@ -396,6 +397,23 @@ __vsf_component_peda_ifs_entry(__vk_winfs_setpos, vk_file_setpos)
     }
     VSF_FS_ASSERT(vsf_local.result != NULL);
     *vsf_local.result = offset;
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_winfs_setsize, vk_file_setsize)
+{
+    vsf_peda_begin();
+    vk_winfs_file_t *file = (vk_winfs_file_t *)&vsf_this;
+    FILE_END_OF_FILE_INFO finfo;
+    VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
+
+    finfo.EndOfFile.QuadPart = (long long )vsf_local.size;
+    if (!SetFileInformationByHandle(file->f.hFile, FileEndOfFileInfo, &finfo, sizeof(finfo))) {
+        VSF_FS_ASSERT(false);
+        vsf_eda_return(VSF_ERR_FAIL);
+        return;
+    }
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }

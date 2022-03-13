@@ -532,6 +532,44 @@ __vsf_component_peda_private_entry(__vk_file_setpos,
     vsf_peda_end();
 }
 
+__vsf_component_peda_private_entry(__vk_file_setsize,
+    uint64_t size;
+) {
+    vsf_peda_begin();
+    vsf_err_t err;
+    vk_file_t *file = (vk_file_t *)&vsf_this;
+    uint64_t size = vsf_local.size;
+    VSF_FS_ASSERT(file != NULL);
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
+            vsf_eda_return(VSF_ERR_INVALID_PARAMETER);
+            return;
+        }
+
+        __vsf_component_call_peda_ifs(vk_file_setsize, err, file->fsop->fop.fn_setsize, file->fsop->fop.setsize_local_size, file,
+            .size       = size,
+        );
+        if (VSF_ERR_NONE != err) {
+            vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
+        }
+        break;
+    case VSF_EVT_RETURN: {
+            vsf_err_t ret = vsf_eda_get_return_value();
+            if (VSF_ERR_NONE == ret) {
+                file->size = size;
+                if (file->pos > file->size) {
+                    file->pos = file->size;
+                }
+            }
+            vsf_eda_return(ret);
+        }
+        break;
+    }
+    vsf_peda_end();
+}
+
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
 #elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
@@ -681,7 +719,7 @@ vsf_err_t vk_file_setsize(vk_file_t *file, uint64_t size)
     VSF_FS_ASSERT(file->fsop != NULL);
     VSF_FS_ASSERT(file->fsop->fop.fn_setsize != NULL);
 
-    __vsf_component_call_peda_ifs(vk_file_setsize, err, file->fsop->fop.fn_setsize, file->fsop->fop.setsize_local_size, file,
+    __vsf_component_call_peda(__vk_file_setsize, err, file,
         .size       = size,
     );
     return err;
