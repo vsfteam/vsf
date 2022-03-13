@@ -818,13 +818,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                         }
                         dparser->entry += 32;
                     } else if (dparser->entry_num > 0) {
-                    __not_available:
-                        dir->cur.cluster = dir->first_cluster;
-                        dir->cur.sector_offset_in_cluster = 0;
-                        dir->cur.offset_in_sector = 0;
-                        dir->pos = 0;
-                        err = VSF_ERR_NOT_AVAILABLE;
-                        goto __fail_and_exit;
+                        goto __not_available;
                     } else {
                         break;
                     }
@@ -853,7 +847,13 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
             if (    ((vsf_err_t)vsf_eda_get_return_value() != VSF_ERR_NONE)
                 ||  !__vk_fatfs_fat_entry_is_valid(fsinfo, dir->cur.cluster)
                 ||  __vk_fatfs_fat_entry_is_eof(fsinfo, dir->cur.cluster)) {
-                goto __not_available;
+            __not_available:
+                dir->cur.cluster = dir->first_cluster;
+                dir->cur.sector_offset_in_cluster = 0;
+                dir->cur.offset_in_sector = 0;
+                dir->pos = 0;
+                err = VSF_ERR_NOT_AVAILABLE;
+                goto __fail_and_exit;
             }
 
             // remove MSB 4-bit for 32-bit FAT entry
@@ -905,13 +905,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
     vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)&vsf_this;
     __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)fatfs_file->info;
     __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
-    uint32_t clustersize = 1 << (fsinfo->cluster_size_bits + fsinfo->sector_size_bits);
-    uint64_t pos = fatfs_file->pos;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (vsf_local.size > (fatfs_file->size - pos)) {
-            vsf_local.size = fatfs_file->size - pos;
+        if (vsf_local.size > (fatfs_file->size - fatfs_file->pos)) {
+            vsf_local.size = fatfs_file->size - fatfs_file->pos;
         }
         vsf_local.offset = fatfs_file->pos;
         vsf_local.cur_size = 0;
@@ -1038,12 +1036,10 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
     vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)&vsf_this;
     __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)fatfs_file->info;
     __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
-    uint32_t clustersize = 1 << (fsinfo->cluster_size_bits + fsinfo->sector_size_bits);
-    uint64_t pos = fatfs_file->pos;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (vsf_local.size > (fatfs_file->size - pos)) {
+        if (vsf_local.size > (fatfs_file->size - fatfs_file->pos)) {
             VSF_FS_ASSERT(false);
             vsf_eda_return(VSF_ERR_NOT_SUPPORT);
             return;
@@ -1087,14 +1083,14 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                         vsf_local.cur_run_size = (1 << fsinfo->sector_size_bits) - vsf_local.offset_in_sector;
                         vsf_local.cur_run_size = min(vsf_local.cur_run_size, vsf_local.size);
                         vsf_local.cur_run_sector = 1;
-                    read_page:
-                        vsf_eda_set_user_value(WRITE_STATE_READ_DONE);
-                        __vk_malfs_read(malfs_info, vsf_local.cur_sector, vsf_local.cur_run_sector, NULL);
+                        goto read_page;
                     } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
                         // read last non-page-aligned data
                         vsf_local.cur_run_size = vsf_local.size;
                         vsf_local.cur_run_sector = 1;
-                        goto read_page;
+                    read_page:
+                        vsf_eda_set_user_value(WRITE_STATE_READ_DONE);
+                        __vk_malfs_read(malfs_info, vsf_local.cur_sector, vsf_local.cur_run_sector, NULL);
                     } else {
                         // read page-aligned data in cluster
                         // get remain sector in clusrer
