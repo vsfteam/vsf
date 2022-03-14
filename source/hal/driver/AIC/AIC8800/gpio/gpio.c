@@ -97,7 +97,7 @@ static void __gpio_reg_mask_write(vsf_hw_gpio_t *hw_gpio_ptr,
     }
 }
 
-void vsf_hw_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
+void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
 {
     vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
 
@@ -115,7 +115,7 @@ void vsf_hw_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32
     }
 }
 
-void vsf_hw_gpio_set_direction(vsf_gpio_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
+void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
 {
     vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
 
@@ -125,7 +125,7 @@ void vsf_hw_gpio_set_direction(vsf_gpio_t *gpio_ptr, uint32_t direction_mask, ui
     __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->GPIO->DR, direction_mask, pin_mask);
 }
 
-uint32_t vsf_hw_gpio_get_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
 
@@ -135,7 +135,7 @@ uint32_t vsf_hw_gpio_get_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     return __gpio_reg_read(hw_gpio_ptr, &hw_gpio_ptr->GPIO->DR) & pin_mask;
 }
 
-uint32_t vsf_hw_gpio_read(vsf_gpio_t *gpio_ptr)
+uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr)
 {
     vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
     uint32_t pin_mask, pin_value;
@@ -152,7 +152,7 @@ uint32_t vsf_hw_gpio_read(vsf_gpio_t *gpio_ptr)
     return pin_value;
 }
 
-void vsf_hw_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
+void vsf_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
 {
     vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
     uint32_t temp_value;
@@ -171,7 +171,7 @@ void vsf_hw_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
     __vsf_gpio_unprotect(orig);
 }
 
-void vsf_hw_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
     VSF_HAL_ASSERT(NULL != gpio_ptr);
@@ -180,7 +180,7 @@ void vsf_hw_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 }
 
 #if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET == ENABLED
-void vsf_hw_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     // TODO
     VSF_HAL_ASSERT(0);
