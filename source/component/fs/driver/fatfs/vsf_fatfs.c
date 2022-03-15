@@ -289,6 +289,28 @@ static uint_fast32_t __vk_fatfs_read_fat(uint8_t *buf, uint_fast8_t offset, uint
 #endif
 }
 
+static void __vk_fatfs_write_fat(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len, uint_fast32_t value)
+{
+#if VSF_USE_INPUT == ENABLED
+    vk_input_buf_set_value(buf, offset, len, value);
+#else
+    uint_fast8_t bitlen, bitpos, bytepos, mask, result_len = 0;
+
+    while (result_len < len) {
+        bytepos = offset >> 3;
+        bitpos = offset & 7;
+        bitlen = min(len - result_len, 8 - bitpos);
+        mask = (1 << bitlen) - 1;
+
+        buf[bytepos] &= ~(((~0UL >> result_len) & mask) << bitpos);
+        buf[bytepos] |= ((value >> result_len) & mask) << bitpos;
+
+        offset += bitlen;
+        result_len += bitlen;
+    }
+#endif
+}
+
 static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
 {
     fatfs_dbr_t *dbr = (fatfs_dbr_t *)buff;
@@ -693,9 +715,89 @@ __vsf_component_peda_private_entry(__vk_fatfs_get_fat_entry,,
 __vsf_component_peda_private_entry(__vk_fatfs_set_fat_entry,,
     uint32_t cluster;
     uint32_t next_cluster;
+    ,
+    uint32_t cur_fat_idx;
+    uint32_t cur_fat_bit;
+    uint32_t cur_fat_sector_offset;
+    uint32_t cur_fat_bit_offset_in_sector;
+    uint32_t cur_next_cluster;
 ) {
     vsf_peda_begin();
-    VSF_FS_ASSERT(false);
+    enum {
+        APPEND_FAT_STATE_READ_FAT_DONE,
+        APPEND_FAT_STATE_WRITE_FAT_DONE,
+    };
+    __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)&vsf_this;
+    __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
+    uint_fast8_t fat_bit = __vk_fatfs_fat_bitsize[fsinfo->type];
+    uint32_t sector_bit_size_bits = fsinfo->sector_size_bits + 3;
+    uint_fast32_t sector_bit = 1 << sector_bit_size_bits;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        vsf_local.cur_fat_idx = 0;
+
+    write_next_fat:
+        if (vsf_local.cur_fat_idx >= fsinfo->fat_num) {
+            vsf_eda_return(VSF_ERR_NONE);
+            return;
+        }
+
+        uint64_t sector_bit_offset = vsf_local.cluster * fat_bit;
+        vsf_local.cur_fat_sector_offset = (uint32_t)(sector_bit_offset >> sector_bit_size_bits);
+        vsf_local.cur_fat_bit_offset_in_sector = sector_bit_offset & (sector_bit - 1);
+        vsf_local.cur_fat_bit = 0;
+        vsf_local.cur_next_cluster = vsf_local.next_cluster;
+
+    read_next_fat_sector:
+        uint32_t cur_sector = vsf_local.cur_fat_idx * fsinfo->fat_size + vsf_local.cur_fat_sector_offset;
+        vsf_eda_set_user_value(APPEND_FAT_STATE_READ_FAT_DONE);
+        __vk_malfs_read(malfs_info, cur_sector, 1, NULL);
+        break;
+    case VSF_EVT_RETURN: {
+            union {
+                uintptr_t value;
+                vsf_err_t err;
+                uint8_t *buffer;
+            } result;
+            result.value = vsf_eda_get_return_value();
+
+            switch (vsf_eda_get_user_value()) {
+            case APPEND_FAT_STATE_READ_FAT_DONE:
+                if (NULL == result.buffer) {
+                    goto fail;
+                }
+
+                uint32_t cur_bit_size;
+                if (0 == vsf_local.cur_fat_bit) {
+                    cur_bit_size = sector_bit - vsf_local.cur_fat_bit_offset_in_sector;
+                    cur_bit_size = min(cur_bit_size, fat_bit);
+                } else {
+                    cur_bit_size = fat_bit - vsf_local.cur_fat_bit;
+                }
+                vsf_local.cur_fat_bit += cur_bit_size;
+                __vk_fatfs_write_fat(result.buffer, vsf_local.cur_fat_bit_offset_in_sector, cur_bit_size, vsf_local.cur_next_cluster);
+
+                uint32_t cur_sector = vsf_local.cur_fat_idx * fsinfo->fat_size + vsf_local.cur_fat_sector_offset;
+                vsf_eda_set_user_value(APPEND_FAT_STATE_WRITE_FAT_DONE);
+                __vk_malfs_write(malfs_info, cur_sector, 1, result.buffer);
+                break;
+            case APPEND_FAT_STATE_WRITE_FAT_DONE:
+                if (vsf_local.cur_fat_bit < fat_bit) {
+                    vsf_local.cur_fat_sector_offset++;
+                    vsf_local.cur_fat_bit_offset_in_sector = 0;
+                    vsf_local.cur_next_cluster >>= vsf_local.cur_fat_bit;
+                    goto read_next_fat_sector;
+                }
+
+                vsf_local.cur_fat_idx++;
+                goto write_next_fat;
+            }
+        }
+    }
+    return;
+fail:
+    vsf_eda_return(VSF_ERR_FAIL);
     vsf_peda_end();
 }
 
