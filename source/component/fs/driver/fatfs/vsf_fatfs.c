@@ -750,8 +750,8 @@ __vsf_component_peda_private_entry(__vk_fatfs_set_fat_entry,,
         vsf_local.cur_next_cluster = vsf_local.next_cluster;
 
     read_next_fat_sector:
-        uint32_t cur_sector = vsf_local.cur_fat_idx * fsinfo->fat_size + vsf_local.cur_fat_sector_offset;
         vsf_eda_set_user_value(APPEND_FAT_STATE_READ_FAT_DONE);
+        uint32_t cur_sector = vsf_local.cur_fat_idx * fsinfo->fat_size + vsf_local.cur_fat_sector_offset;
         __vk_malfs_read(malfs_info, cur_sector, 1, NULL);
         break;
     case VSF_EVT_RETURN: {
@@ -778,8 +778,8 @@ __vsf_component_peda_private_entry(__vk_fatfs_set_fat_entry,,
                 vsf_local.cur_fat_bit += cur_bit_size;
                 __vk_fatfs_write_fat(result.buffer, vsf_local.cur_fat_bit_offset_in_sector, cur_bit_size, vsf_local.cur_next_cluster);
 
-                uint32_t cur_sector = vsf_local.cur_fat_idx * fsinfo->fat_size + vsf_local.cur_fat_sector_offset;
                 vsf_eda_set_user_value(APPEND_FAT_STATE_WRITE_FAT_DONE);
+                uint32_t cur_sector = vsf_local.cur_fat_idx * fsinfo->fat_size + vsf_local.cur_fat_sector_offset;
                 __vk_malfs_write(malfs_info, cur_sector, 1, result.buffer);
                 break;
             case APPEND_FAT_STATE_WRITE_FAT_DONE:
