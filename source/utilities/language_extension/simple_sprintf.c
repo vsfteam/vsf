@@ -315,10 +315,19 @@ int snprintf(char *str, size_t size, const char *format, ...)
     return real_size;
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
+
 int vsprintf(char *str, const char *format, va_list ap)
 {
     return vsnprintf(str, (size_t)-1, format, ap);
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 int sprintf(char *str, const char *format, ...)
 {
