@@ -168,6 +168,11 @@ typedef struct vk_fatfs_lookup_local {
     char *filename;
     uint32_t cur_offset_in_sector;
     vk_fatfs_dentry_parser_t dparser;
+    struct {
+        uint32_t sector;
+        uint8_t entry_offset_in_sector;
+        uint8_t entry_num;
+    } dentry;
 } vk_fatfs_lookup_local;
 
 typedef struct vk_fatfs_setpos_local {
@@ -1194,9 +1199,10 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                 while (dparser->entry_num) {
                     uint16_t entry_num = dparser->entry_num;
                     bool parsed = vk_fatfs_parse_dentry_fat(dparser);
-                    uint32_t tmp32 = (entry_num - dparser->entry_num) << 5;
-                    dir->cur.offset_in_sector += tmp32;
-                    dir->pos += tmp32;
+                    uint32_t parsed_entry = entry_num - dparser->entry_num;
+                    uint32_t parsed_size = parsed_entry << 5;
+                    dir->cur.offset_in_sector += parsed_size;
+                    dir->pos += parsed_size;
 
                     if (parsed) {
                         if (!name || vk_file_is_match((char *)name, dparser->filename)) {
@@ -1239,13 +1245,31 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                             fatfs_file->cur.sector_offset_in_cluster = 0;
                             fatfs_file->cur.offset_in_sector = 0;
 
+                            if (vsf_local.dentry.entry_num) {
+                                fatfs_file->dentry.sector0 = vsf_local.dentry.sector;
+                                fatfs_file->dentry.entry_offset_in_sector0 = vsf_local.dentry.entry_offset_in_sector;
+                                fatfs_file->dentry.entry_num0 = vsf_local.dentry.entry_num;
+                                fatfs_file->dentry.sector1 = vsf_local.cur_sector;
+                                fatfs_file->dentry.entry_offset_in_sector1 = entry_num;
+                                fatfs_file->dentry.entry_num1 = parsed_entry;
+                            } else {
+                                fatfs_file->dentry.sector0 = vsf_local.cur_sector;
+                                fatfs_file->dentry.entry_offset_in_sector0 = entry_num;
+                                fatfs_file->dentry.entry_num0 = parsed_entry;
+                            }
+
                             *vsf_local.result = &fatfs_file->use_as__vk_file_t;
                             goto __fail_and_exit;
+                        } else {
+                            vsf_local.dentry.entry_num = 0;
                         }
                         dparser->entry += 32;
                     } else if (dparser->entry_num > 0) {
                         goto __not_available;
                     } else {
+                        vsf_local.dentry.sector = vsf_local.cur_sector;
+                        vsf_local.dentry.entry_offset_in_sector = entry_num;
+                        vsf_local.dentry.entry_num = parsed_entry;
                         break;
                     }
                 }
