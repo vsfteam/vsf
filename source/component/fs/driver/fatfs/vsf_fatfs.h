@@ -85,6 +85,12 @@ typedef struct vk_fatfs_dentry_parser_t {
     char *filename;
 } vk_fatfs_dentry_parser_t;
 
+typedef struct vk_fatfs_file_pos_t {
+    uint32_t cluster;
+    uint32_t sector_offset_in_cluster;
+    uint32_t offset_in_sector;
+} vk_fatfs_file_pos_t;
+
 vsf_class(vk_fatfs_file_t) {
     public_member(
         implement(__vk_malfs_file_t)
@@ -92,11 +98,15 @@ vsf_class(vk_fatfs_file_t) {
 
     private_member(
         uint32_t first_cluster;
+        vk_fatfs_file_pos_t cur;
         struct {
-            uint32_t cluster;
-            uint32_t sector_offset_in_cluster;
-            uint32_t offset_in_sector;
-        } cur;
+            uint32_t sector0;
+            uint32_t sector1;
+            uint8_t entry_offset_in_sector0;
+            uint8_t entry_num0;
+            uint8_t entry_offset_in_sector1;
+            uint8_t entry_num1;
+        } dentry;
     )
 };
 

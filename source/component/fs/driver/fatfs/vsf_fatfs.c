@@ -150,6 +150,14 @@ typedef struct vk_fatfs_rw_local {
     uint16_t offset_in_sector;
 } vk_fatfs_rw_local;
 
+typedef struct vk_fatfs_setsize_local {
+    int32_t clusters;
+    uint32_t cur_cluster;
+    uint32_t next_cluster;
+    vk_fatfs_file_pos_t orig_fatfs_pos;
+    uint64_t orig_pos;
+} vk_fatfs_setsize_local;
+
 typedef struct vk_fatfs_lookup_local {
     uint32_t cur_sector;
     char *filename;
@@ -172,6 +180,7 @@ dcl_vsf_peda_methods(static, __vk_fatfs_read)
 dcl_vsf_peda_methods(static, __vk_fatfs_write)
 dcl_vsf_peda_methods(static, __vk_fatfs_close)
 dcl_vsf_peda_methods(static, __vk_fatfs_setpos)
+dcl_vsf_peda_methods(static, __vk_fatfs_setsize)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -191,10 +200,11 @@ const vk_fs_op_t vk_fatfs_op = {
         .read_local_size    = sizeof(vk_fatfs_rw_local),
         .write_local_size   = sizeof(vk_fatfs_rw_local),
         .setpos_local_size  = sizeof(vk_fatfs_setpos_local),
+        .setsize_local_size = sizeof(vk_fatfs_setsize_local),
         .fn_read            = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_read),
         .fn_write           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_write),
         .fn_close           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_close),
-        .fn_setsize         = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setsize         = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_setsize),
         .fn_setpos          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_setpos),
     },
     .dop                    = {
@@ -652,6 +662,68 @@ __vsf_component_peda_private_entry(__vk_fatfs_get_fat_entry,,
     vsf_peda_end();
 }
 
+__vsf_component_peda_private_entry(__vk_fatfs_set_fat_entry,,
+    uint32_t cluster;
+    uint32_t next_cluster;
+) {
+    vsf_peda_begin();
+    VSF_FS_ASSERT(false);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
+    uint32_t cluster;
+    uint32_t *entry;
+) {
+    vsf_peda_begin();
+    VSF_FS_ASSERT(false);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
+    uint64_t size;
+) {
+    vsf_peda_begin();
+    enum {
+        DENTRY_SETSIZE_STATE_READ,
+        DENTRY_SETSIZE_STATE_WRITE,
+    };
+    vk_fatfs_file_t *file = (vk_fatfs_file_t *)&vsf_this;
+    __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)file->info;
+    __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
+    uint32_t sector;
+    uint16_t offset;
+    if (file->dentry.entry_num1) {
+        sector = file->dentry.sector1;
+        offset = file->dentry.entry_offset_in_sector1 << 5;
+        offset += 0x20 * (file->dentry.entry_num1 - 1);
+    } else {
+        sector = file->dentry.sector0;
+        offset = file->dentry.entry_offset_in_sector0 << 5;
+        offset += 0x20 * (file->dentry.entry_num0 - 1);
+    }
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        vsf_eda_set_user_value(DENTRY_SETSIZE_STATE_READ);
+        __vk_malfs_read(malfs_info, sector, 1, NULL);
+        break;
+    case VSF_EVT_RETURN:
+        switch (vsf_eda_get_user_value()) {
+        case DENTRY_SETSIZE_STATE_READ: {
+                uint8_t *ptr = (uint8_t *)vsf_eda_get_return_value();
+                fatfs_dentry_t *dentry = (fatfs_dentry_t *)(ptr + offset);
+                dentry->fat.FileSize = (uint32_t)vsf_local.size;
+                vsf_eda_set_user_value(DENTRY_SETSIZE_STATE_WRITE);
+                __vk_malfs_write(malfs_info, sector, 1, ptr);
+            }
+            break;
+        }
+        break;
+    }
+    vsf_peda_end();
+}
+
 __vsf_component_peda_ifs_entry(__vk_fatfs_setpos, vk_file_setpos,
     implement(vk_fatfs_setpos_local)
 ) {
@@ -701,6 +773,122 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_setpos, vk_file_setpos,
     return;
 __fail_and_exit:
     vsf_eda_return(err);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_fatfs_setsize, vk_file_setsize,
+    implement(vk_fatfs_setsize_local)
+) {
+    vsf_peda_begin();
+    enum {
+        SETSIZE_STATE_APPEND,
+        SETSIZE_STATE_FREE_PREPARE,
+        SETSIZE_STATE_FREE_NEXT,
+        SETSIZE_STATE_FREE,
+        SETSIZE_STATE_UPDATE_DENTRY_DONE,
+    };
+    vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)&vsf_this;
+    __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)fatfs_file->info;
+    uint32_t clustersize = 1 << (fsinfo->cluster_size_bits + fsinfo->sector_size_bits);
+    uint64_t size = vsf_local.size;
+    vsf_err_t err;
+    VSF_FS_ASSERT(!(fatfs_file->attr & VSF_FILE_ATTR_DIRECTORY));
+
+    switch (evt) {
+    case VSF_EVT_INIT: {
+            uint64_t round_size = (size + clustersize - 1) & ~(clustersize - 1);
+            uint64_t round_file_size = (fatfs_file->size + clustersize - 1) & ~(clustersize - 1);
+            int64_t pos;
+
+            vsf_local.orig_pos = fatfs_file->pos;
+            vsf_local.orig_fatfs_pos = fatfs_file->cur;
+            if (round_size == round_file_size) {
+                goto update_dentry;
+            } else {
+                if (round_size > round_file_size) {
+                    vsf_local.clusters = (round_size - round_file_size) / clustersize;
+                    vsf_eda_set_user_value(SETSIZE_STATE_APPEND);
+                    pos = fatfs_file->size;
+                } else {
+                    vsf_local.next_cluster = 0xFFFFFFF8;
+                    vsf_eda_set_user_value(SETSIZE_STATE_FREE_PREPARE);
+                    pos = size;
+                }
+
+                err = vk_file_seek(&fatfs_file->use_as__vk_file_t, pos, VSF_FILE_SEEK_SET);
+                if (err != VSF_ERR_NONE) {
+                    goto fail;
+                }
+            }
+        }
+        break;
+    case VSF_EVT_RETURN:
+        switch (vsf_eda_get_user_value()) {
+        case SETSIZE_STATE_APPEND:
+            if (vsf_local.clusters > 0) {
+                vsf_local.clusters--;
+                __vsf_component_call_peda(__vk_fatfs_append_fat_entry, err, fsinfo,
+                    .cluster = fatfs_file->cur.cluster,
+                    .entry = &fatfs_file->cur.cluster,
+                );
+                if (err != VSF_ERR_NONE) {
+                    goto fail;
+                }
+            } else {
+                goto update_dentry;
+            }
+            break;
+        case SETSIZE_STATE_FREE:
+        set_fat_entry: {
+                uint32_t cur_cluster = vsf_local.cur_cluster;
+                uint32_t next_cluster = vsf_local.next_cluster;
+                vsf_local.cur_cluster = fatfs_file->cur.cluster;
+                vsf_local.next_cluster = 0;
+
+                vsf_eda_set_user_value(SETSIZE_STATE_FREE_NEXT);
+                __vsf_component_call_peda(__vk_fatfs_set_fat_entry, err, fsinfo,
+                    .cluster = cur_cluster,
+                    .next_cluster = next_cluster,
+                );
+                if (err != VSF_ERR_NONE) {
+                    goto fail;
+                }
+            }
+            break;
+        case SETSIZE_STATE_FREE_PREPARE:
+            if (vsf_local.orig_pos > size) {
+                vsf_local.orig_pos = fatfs_file->pos;
+                vsf_local.orig_fatfs_pos = fatfs_file->cur;
+            }
+            vsf_local.cur_cluster = fatfs_file->cur.cluster;
+        case SETSIZE_STATE_FREE_NEXT:
+            if (__vk_fatfs_fat_entry_is_valid(fsinfo, vsf_local.cur_cluster)) {
+                vsf_eda_set_user_value(SETSIZE_STATE_FREE);
+                __vsf_component_call_peda(__vk_fatfs_get_fat_entry, err, fsinfo,
+                    .cluster = vsf_local.cur_cluster,
+                    .entry = &fatfs_file->cur.cluster,
+                );
+                if (err != VSF_ERR_NONE) {
+                fail:
+                    vsf_eda_return(VSF_ERR_FAIL);
+                    return;
+                }
+            } else {
+            update_dentry:
+                vsf_eda_set_user_value(SETSIZE_STATE_UPDATE_DENTRY_DONE);
+                __vsf_component_call_peda(__vk_fatfs_dentry_setsize, err, fatfs_file,
+                    .size   = vsf_local.size,
+                );
+            }
+            break;
+        case SETSIZE_STATE_UPDATE_DENTRY_DONE:
+            fatfs_file->pos = vsf_local.orig_pos;
+            fatfs_file->cur = vsf_local.orig_fatfs_pos;
+            vsf_eda_return(VSF_ERR_NONE);
+            break;
+        }
+        break;
+    }
     vsf_peda_end();
 }
 
@@ -1031,6 +1219,8 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
         WRITE_STATE_WRITE,
         WRITE_STATE_WRITE_DONE,
         WRITE_STATE_GET_NEXT_FAT_ENTRY_DONE,
+        WRITE_STATE_APPEND_FAT_ENTRY_DONE,
+        WRITE_STATE_SETSIZE_DONE,
     };
 
     vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)&vsf_this;
@@ -1039,11 +1229,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (vsf_local.size > (fatfs_file->size - fatfs_file->pos)) {
-            VSF_FS_ASSERT(false);
-            vsf_eda_return(VSF_ERR_NOT_SUPPORT);
-            return;
-        }
         vsf_local.offset = fatfs_file->pos;
         vsf_local.cur_size = 0;
         vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, fatfs_file->cur.cluster);
@@ -1105,9 +1290,16 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                         __vk_malfs_write(malfs_info, vsf_local.cur_sector, vsf_local.cur_run_sector, result.buffer);
                     }
                     break;
+                } else if (vsf_local.offset > fatfs_file->size) {
+                    vsf_err_t err;
+                    vsf_eda_set_user_value(WRITE_STATE_SETSIZE_DONE);
+                    __vsf_component_call_peda(__vk_fatfs_dentry_setsize, err, fatfs_file,
+                        .size   = vsf_local.offset,
+                    );
+                    VSF_UNUSED_PARAM(err);
+                } else {
+                    vsf_eda_return(vsf_local.cur_size);
                 }
-
-                vsf_eda_return(vsf_local.cur_size);
                 break;
             case WRITE_STATE_WRITE_DONE:
                 if (NULL == result.buffer) {
@@ -1125,17 +1317,26 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                     fatfs_file->cur.sector_offset_in_cluster++;
                 }
 
-                // get next cluster if necessary
+                // get/append next cluster if necessary
                 // check if next sector will be in new cluster
                 if (!(      (vsf_local.cur_sector + vsf_local.cur_run_sector - fsinfo->data_sector)
                         &   ((1 << fsinfo->cluster_size_bits) - 1)
                 )) {
                     vsf_err_t err;
-                    vsf_eda_set_user_value(WRITE_STATE_GET_NEXT_FAT_ENTRY_DONE);
-                    __vsf_component_call_peda(__vk_fatfs_get_fat_entry, err, fsinfo,
-                        .cluster = fatfs_file->cur.cluster,
-                        .entry = &fatfs_file->cur.cluster,
-                    );
+                    if (vsf_local.offset < fatfs_file->size) {
+                    get_next_cluster:
+                        vsf_eda_set_user_value(WRITE_STATE_GET_NEXT_FAT_ENTRY_DONE);
+                        __vsf_component_call_peda(__vk_fatfs_get_fat_entry, err, fsinfo,
+                            .cluster = fatfs_file->cur.cluster,
+                            .entry = &fatfs_file->cur.cluster,
+                        );
+                    } else {
+                        vsf_eda_set_user_value(WRITE_STATE_APPEND_FAT_ENTRY_DONE);
+                        __vsf_component_call_peda(__vk_fatfs_append_fat_entry, err, fsinfo,
+                            .cluster = fatfs_file->cur.cluster,
+                            .entry = &fatfs_file->cur.cluster,
+                        );
+                    }
                     VSF_UNUSED_PARAM(err);
                     break;
                 }
@@ -1147,16 +1348,20 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                     break;
                 }
                 if (!__vk_fatfs_fat_entry_is_valid(fsinfo, fatfs_file->cur.cluster)) {
-                    // TODO: allocate new entry to append data
-                    vsf_eda_return(VSF_ERR_FAIL);
+                    vsf_trace_warning("fatfs: corrupted file %s" VSF_TRACE_CFG_LINEEND, fatfs_file->name);
                     break;
                 }
-
+                // fall through
+            case WRITE_STATE_APPEND_FAT_ENTRY_DONE:
                 // remove MSB 4-bit for 32-bit FAT entry
                 fatfs_file->cur.cluster &= 0x0FFFFFFF;
                 fatfs_file->cur.sector_offset_in_cluster = 0;
                 vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, fatfs_file->cur.cluster);
                 goto write_next;
+            case WRITE_STATE_SETSIZE_DONE:
+                fatfs_file->size = vsf_local.offset;
+                vsf_eda_return(vsf_local.cur_size);
+                break;
             }
         }
     }
