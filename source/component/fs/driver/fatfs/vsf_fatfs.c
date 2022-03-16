@@ -811,19 +811,32 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
 
             switch (vsf_eda_get_user_value()) {
             case APPEND_FAT_STATE_READ_FAT_DONE: {
-                    uint32_t pos = 0, cur_bit_len;
+                    uint32_t pos = 0, cur_bit_size;
 
                     if (NULL == result.buffer) {
                         goto fail;
                     }
 
-                    // TODO: optimize this algo
                     while (pos < sector_bit) {
-                        cur_bit_len = sector_bit - pos;
-                        cur_bit_len = min(cur_bit_len, fat_bit);
-//                        vsf_local.entry_tmp += __vk_fatfs_read_fat(result.buffer, pos, cur_bit_len) << vsf_local.cur_fat_bit;
+                        cur_bit_size = sector_bit - pos;
+                        cur_bit_size = min(cur_bit_size, fat_bit);
 
-                        vsf_local.cur_fat_bit += cur_bit_len;
+                        uint_fast16_t bit_size_tmp = cur_bit_size;
+                        uint_fast16_t u32off = pos >> 5;
+                        uint_fast16_t bitoff = pos & 0x1F, cur_bitsize;
+                        uint_fast32_t u32mask, u32value = 0;
+                        while (bit_size_tmp > 0) {
+                            u32value = le32_to_cpup(&(((uint32_t *)result.buffer)[u32off]));
+                            cur_bitsize = 32 - bitoff;
+                            cur_bitsize = min(cur_bitsize, bit_size_tmp);
+                            u32mask = ((1ULL << cur_bitsize) - 1) << bitoff;
+                            u32value &= u32mask;
+
+                            bit_size_tmp -= cur_bitsize;
+                        }
+                        vsf_local.entry_tmp += u32value << vsf_local.cur_fat_bit;
+
+                        vsf_local.cur_fat_bit += cur_bit_size;
                         if (vsf_local.cur_fat_bit == fat_bit) {
                             if (0 == vsf_local.entry_tmp) {
                                 vsf_err_t err;
@@ -835,8 +848,9 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
                                 if (err != VSF_ERR_NONE) {
                                     goto fail;
                                 }
-                                break;
+                                return;
                             }
+                            vsf_local.cur_fat_bit = 0;
                             vsf_local.entry_tmp = 0;
                             pos += fat_bit;
                             vsf_local.cur_cluster++;
