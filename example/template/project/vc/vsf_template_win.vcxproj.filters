@@ -1129,6 +1129,9 @@
     <Filter Include="vsf\shell\sys\linux\app\telnet">
       <UniqueIdentifier>{66c9d1a9-98d4-4c12-afac-36a2942617d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\wingdi">
+      <UniqueIdentifier>{29d1b183-f34b-45a8-9bf4-007170d7f3d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3344,6 +3347,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.h">
       <Filter>vsf\shell\sys\linux\app\telnet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h">
+      <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5833,6 +5839,9 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\hal_demo\spi_demo.c">
       <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c">
+      <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

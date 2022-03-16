@@ -21,7 +21,8 @@
 
 #if     VSF_USE_UI == ENABLED                                                   \
     &&  (   VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED          \
-        ||  VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED)
+        ||  VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED   \
+        ||  VSF_DISP_USE_WINGDI == ENABLED)
 
 #include "hal/vsf_hal.h"
 
@@ -124,7 +125,16 @@ usrapp_ui_common_t usrapp_ui_common = {
         .clock_hz               = APP_DISP_DEMO_CLOCK_HZ,
         .init_seq               = (const uint8_t [])APP_DISP_DEMO_SEQ,
         .init_seq_len           = sizeof((const uint8_t [])APP_DISP_DEMO_SEQ),
-
+    },
+#elif VSF_DISP_USE_WINGDI == ENABLED
+    .disp                       = &usrapp_ui_common.disp_wingdi.use_as__vk_disp_t,
+    .disp_wingdi                = {
+        .param                  = {
+            .height             = APP_DISP_WINGDI_HEIGHT,
+            .width              = APP_DISP_WINGDI_WIDTH,
+            .drv                = &vk_disp_drv_wingdi,
+            .color              = APP_DISP_WINGDI_COLOR,
+        },
     },
 #else
     .disp                       = NULL,

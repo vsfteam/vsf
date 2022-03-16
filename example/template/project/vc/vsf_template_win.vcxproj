@@ -431,6 +431,7 @@
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\solomon-systech\ssd1306\vsf_disp_ssd1306.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\usbd_uvc\vsf_disp_usbd_uvc.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\vsf_disp.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_msg_tree_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_button.h" />
@@ -1354,6 +1355,7 @@
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\solomon-systech\ssd1306\vsf_disp_ssd1306.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\usbd_uvc\vsf_disp_usbd_uvc.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\vsf_disp.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_button.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_control.c" />
