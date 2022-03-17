@@ -46,8 +46,6 @@ dcl_vsf_peda_methods(static, __vk_linfs_write)
 dcl_vsf_peda_methods(static, __vk_linfs_close)
 dcl_vsf_peda_methods(static, __vk_linfs_setpos)
 
-extern vk_file_t * __vk_file_get_fs_parent(vk_file_t *file);
-
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if     __IS_COMPILER_GCC__
@@ -84,41 +82,6 @@ const vk_fs_op_t vk_linfs_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static uint_fast16_t __vk_linfs_file_get_path(vk_file_t *file, char *path, uint_fast16_t len)
-{
-    vk_file_t *tmp = file;
-    uint_fast16_t real_len = 0, cur_len;
-
-    while (tmp != NULL) {
-        if (&vk_vfs_op == tmp->fsop) {
-            tmp = ((vk_vfs_file_t *)tmp)->subfs.root;
-        }
-        real_len += strlen(tmp->name) + 1;
-        tmp = tmp->parent;
-    }
-
-    if (real_len > len) {
-        return 0;
-    }
-
-    tmp = file;
-    len = real_len - 1;
-    path[len] = '\0';
-    while (tmp != NULL) {
-        if (&vk_vfs_op == tmp->fsop) {
-            tmp = ((vk_vfs_file_t *)tmp)->subfs.root;
-        }
-        cur_len = strlen(tmp->name);
-        len -= cur_len;
-        memcpy(&path[len], tmp->name, cur_len);
-        tmp = tmp->parent;
-        if (tmp != NULL) {
-            path[len-- - 1] = '/';
-        }
-    }
-    return real_len;
-}
-
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
@@ -144,7 +107,7 @@ __vsf_component_peda_ifs_entry(__vk_linfs_mount, vk_fs_mount)
         return;
     }
 
-    fsinfo->root.parent = NULL;
+    fsinfo->root.fullpath = fsinfo->root.name;
     fsinfo->root.d.dir = NULL;
     dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
     vsf_eda_return(VSF_ERR_NONE);
@@ -159,20 +122,10 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
     uint_fast32_t idx = dir->pos;
     vsf_err_t err = VSF_ERR_NONE;
 
-    vsf_protect_t orig = vsf_protect_sched();
-        __vsf_dlist_foreach_unsafe(vk_linfs_file_t, child_node, &dir->d.child_list) {
-            if (    (name && vk_file_is_match((char *)name, _->name))
-                ||  (!name && (_->idx == idx))) {
-                vsf_unprotect_sched(orig);
-                *vsf_local.result = &_->use_as__vk_file_t;
-                goto do_return;
-            }
-        }
-    vsf_unprotect_sched(orig);
-
     char path[PATH_MAX];
-    uint_fast16_t len = __vk_linfs_file_get_path(&dir->use_as__vk_file_t, path, sizeof(path));
+    uint_fast16_t len = strlen(dir->fullpath);
     uint_fast16_t namelen;
+    strcpy(path, dir->fullpath);
 
     *vsf_local.result = NULL;
     if (name != NULL) {
@@ -188,13 +141,13 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
         } else {
             namelen = ptr - name;
         }
-        if ((len + namelen + 1) > PATH_MAX) {
+        if ((len + namelen + 2) > PATH_MAX) {
             err = VSF_ERR_FAIL;
             goto do_return;
         }
-        path[len - 1] = '/';
-        memcpy(&path[len], name, namelen);
-        path[len + namelen] = '\0';
+        path[len] = '/';
+        memcpy(&path[len + 1], name, namelen);
+        path[len + namelen + 1] = '\0';
     } else {
         struct dirent *entry;
         if (NULL == dir->d.dir) {
@@ -219,11 +172,11 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
         }
 
         namelen = strlen(entry->d_name);
-        if ((len + namelen + 1) > PATH_MAX) {
+        if ((len + namelen + 2) > PATH_MAX) {
             err = VSF_ERR_FAIL;
             goto do_return;
         }
-        path[len] = '\0';
+        path[len + 1] = '\0';
         strcat(path, "/");
         strcat(path, entry->d_name);
     }
@@ -246,6 +199,14 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
         goto do_free_and_return;
     }
     strcpy(linfs_file->name, vk_file_getfilename(path));
+    linfs_file->fullpath = vsf_heap_malloc(strlen(dir->fullpath) + 1 /* '/' */ + namelen + 1 /* '\0' */);
+    if (NULL == linfs_file->fullpath) {
+        err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+        goto do_free_and_return;
+    }
+    strcpy(linfs_file->fullpath, dir->fullpath);
+    strcat(linfs_file->fullpath, "/");
+    strcat(linfs_file->fullpath, linfs_file->name);
     linfs_file->fsop = &vk_linfs_op;
 
     if (S_ISDIR(statbuf.st_mode)) {
@@ -260,11 +221,6 @@ __vsf_component_peda_ifs_entry(__vk_linfs_lookup, vk_file_lookup)
         lseek(linfs_file->f.fd, 0, SEEK_SET);
     }
     linfs_file->attr |= VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE;
-
-    linfs_file->idx = dir->pos++;
-    orig = vsf_protect_sched();
-        vsf_dlist_add_to_head(vk_linfs_file_t, child_node, &dir->d.child_list, linfs_file);
-    vsf_unprotect_sched(orig);
     *vsf_local.result = &linfs_file->use_as__vk_file_t;
     goto do_return;
 
@@ -290,9 +246,7 @@ __vsf_component_peda_ifs_entry(__vk_linfs_setpos, vk_file_setpos)
         if (0 == offset) {
             file->d.dir = NULL;
         } else {
-            char path[PATH_MAX];
-            uint_fast16_t len = __vk_linfs_file_get_path(&file->use_as__vk_file_t, path, sizeof(path));
-            file->d.dir = opendir(path);
+            file->d.dir = opendir(file->fullpath);
             VSF_FS_ASSERT(file->d.dir != NULL);
 
             struct dirent *entry;
@@ -342,10 +296,11 @@ __vsf_component_peda_ifs_entry(__vk_linfs_close, vk_file_close)
 {
     vsf_peda_begin();
     vk_linfs_file_t *file = (vk_linfs_file_t *)&vsf_this;
-    vk_linfs_file_t *parent = (vk_linfs_file_t *)__vk_file_get_fs_parent(&file->use_as__vk_file_t);
 
     VSF_FS_ASSERT(file->name != NULL);
     vsf_heap_free(file->name);
+    VSF_FS_ASSERT(file->fullpath != NULL);
+    vsf_heap_free(file->fullpath);
 
     if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
         if (file->d.dir != NULL) {
@@ -356,9 +311,6 @@ __vsf_component_peda_ifs_entry(__vk_linfs_close, vk_file_close)
         close(file->f.fd);
     }
 
-    vsf_protect_t orig = vsf_protect_sched();
-        vsf_dlist_remove(vk_linfs_file_t, child_node, &parent->d.child_list, file);
-    vsf_unprotect_sched(orig);
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }

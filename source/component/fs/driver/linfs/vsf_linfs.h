@@ -50,12 +50,10 @@ vsf_class(vk_linfs_file_t) {
                 int fd;
             } f;
             struct {
-                vsf_dlist_t child_list;
                 void *dir;
             } d;
         };
-        uint32_t idx;
-        vsf_dlist_node_t child_node;
+        char *fullpath;
     )
 };
 
