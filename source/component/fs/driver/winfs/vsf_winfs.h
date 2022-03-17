@@ -54,12 +54,10 @@ vsf_class(vk_winfs_file_t) {
                 HANDLE hFile;
             } f;
             struct {
-                vsf_dlist_t child_list;
                 HANDLE hFind;
             } d;
         };
-        uint32_t idx;
-        vsf_dlist_node_t child_node;
+        char *fullpath;
     )
 };
 
