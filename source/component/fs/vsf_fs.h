@@ -132,6 +132,7 @@ vsf_class(vk_fs_op_t) {
     )
 };
 
+typedef struct vk_fs_info_t vk_fs_info_t;
 vsf_class(vk_file_t) {
     public_member(
         vk_file_attr_t attr;
@@ -149,6 +150,8 @@ vsf_class(vk_file_t) {
 
     protected_member(
         const vk_fs_op_t *fsop;
+        vk_fs_info_t *fsinfo;
+
         vk_file_t *parent;
         uint64_t pos;
     )
@@ -156,6 +159,10 @@ vsf_class(vk_file_t) {
     private_member(
         uint32_t ref;
     )
+};
+
+struct vk_fs_info_t {
+    vk_file_t root;
 };
 
 #if defined(__VSF_FS_CLASS_INHERIT__) || defined(__VSF_FS_CLASS_IMPLEMENT)

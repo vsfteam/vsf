@@ -239,33 +239,6 @@ vk_file_t * vk_file_get_parent(vk_file_t *file)
     return parent;
 }
 
-// for fs driver only
-vk_file_t * __vk_file_get_fs_parent(vk_file_t *file)
-{
-    vk_file_t *parent = file->parent;
-    if (parent != NULL) {
-        if ((parent->fsop == &vk_vfs_op) && (file->fsop != &vk_vfs_op)) {
-            vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)parent;
-            VSF_FS_ASSERT(vfs_file->attr & VSF_VFS_FILE_ATTR_MOUNTED);
-            parent = vfs_file->subfs.root;
-        }
-    }
-    return parent;
-}
-
-vk_file_t * __vk_file_get_fs_root(vk_file_t *file)
-{
-    if (file->fsop == &vk_vfs_op) {
-        return &__vk_fs.rootfs.use_as__vk_file_t;
-    }
-
-    vk_file_t *root = file;
-    while ((root != NULL) && !(root->attr & VSF_VFS_FILE_ATTR_MOUNTED)) {
-        root = root->parent;
-    }
-    return root;
-}
-
 void vk_fs_init(void)
 {
     static bool __is_initialized = false;
@@ -276,6 +249,7 @@ void vk_fs_init(void)
         memset(&__vk_fs, 0, sizeof(__vk_fs));
         __vk_fs.rootfs.attr = VSF_FILE_ATTR_DIRECTORY;
         __vk_fs.rootfs.fsop = &vk_vfs_op;
+        __vk_fs.rootfs.fsinfo = (vk_fs_info_t *)&__vk_fs.rootfs;
         __vk_file_ref(&__vk_fs.rootfs.use_as__vk_file_t);
         vsf_eda_crit_init(&__vk_fs.open.lock);
     }
@@ -308,6 +282,10 @@ __vsf_component_peda_private_entry(__vk_file_lookup,
     case VSF_EVT_RETURN:
         if ((VSF_ERR_NONE == err) && (*vsf_local.result != NULL)) {
             (*vsf_local.result)->parent = dir;
+            if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+                dir = &((vk_fs_info_t *)(((vk_vfs_file_t *)dir)->subfs.data))->root;
+            }
+            (*vsf_local.result)->fsinfo = dir->fsinfo;
         }
         vsf_eda_return(err);
         break;
@@ -609,6 +587,9 @@ vsf_err_t vk_fs_mount(vk_file_t *dir, const vk_fs_op_t *fsop, void *fsdata)
                 &&  (dir->fsop == &vk_vfs_op)
                 &&  !(dir->attr & VSF_VFS_FILE_ATTR_MOUNTED));
 
+    vk_fs_info_t *fsinfo = fsdata;
+    fsinfo->root.fsinfo = fsinfo;
+
     ((vk_vfs_file_t *)dir)->subfs.op = fsop;
     ((vk_vfs_file_t *)dir)->subfs.data = fsdata;
     __vsf_component_call_peda_ifs(vk_fs_mount, err, dir->fsop->fn_mount, dir->fsop->mount_local_size, dir);
@@ -805,9 +786,9 @@ vsf_err_t vk_file_rename(vk_file_t *olddir, const char *oldname, vk_file_t *newd
     VSF_FS_ASSERT((NULL == newdir) || (newdir->attr & VSF_FILE_ATTR_DIRECTORY));
     VSF_FS_ASSERT((oldname != NULL) && (*oldname != '\0'));
 
-    vk_file_t *root = __vk_file_get_fs_root(olddir);
+    vk_file_t *root = &olddir->fsinfo->root;
     VSF_FS_ASSERT(root != NULL);
-    vk_file_t *newroot = (newdir != NULL) ? __vk_file_get_fs_root(newdir) : root;
+    vk_file_t *newroot = (newdir != NULL) ? &newdir->fsinfo->root : root;
     VSF_FS_ASSERT(newroot != NULL);
     if (root != newroot) {
         return VSF_ERR_INVALID_PARAMETER;
