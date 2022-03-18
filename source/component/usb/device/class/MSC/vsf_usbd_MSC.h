@@ -107,6 +107,8 @@ vsf_class(vk_usbd_msc_t) {
         vk_usbd_ep_stream_t ep_stream;
         uint8_t is_inited   : 1;
         uint8_t is_stream   : 1;
+        uint8_t is_scsi_done: 1;
+        uint8_t is_data_done: 1;
     )
 
     public_member(

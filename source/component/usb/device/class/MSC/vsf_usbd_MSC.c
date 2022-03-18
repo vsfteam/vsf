@@ -106,7 +106,15 @@ static void __vk_usbd_msc_on_data_in(void *p)
 {
     vk_usbd_msc_t *msc = p;
     msc->ctx.csw.dCSWStatus = USB_MSC_CSW_OK;
-    __vk_usbd_msc_send_csw(msc);
+
+    vsf_protect_t orig = vsf_protect_int();
+        bool is_scsi_done = msc->is_scsi_done;
+        msc->is_data_done = 1;
+    vsf_unprotect_int(orig);
+
+    if (is_scsi_done) {
+        __vk_usbd_msc_send_csw(msc);
+    }
 }
 
 static void __vk_usbd_msc_on_cbw(void *p)
@@ -193,14 +201,25 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     trans->ep = msc->ep_in;
                     trans->on_finish = __vk_usbd_msc_on_data_in;
                     trans->param = msc;
+                    msc->is_scsi_done = 1;
                     vk_usbd_ep_send(msc->dev, trans);
+                    break;
                 }
-            } else {
+            }
+
+            vsf_protect_t orig = vsf_protect_int();
+                bool is_data_done = msc->is_data_done;
+                msc->is_scsi_done = 1;
+            vsf_unprotect_int(orig);
+
+            if (is_data_done) {
                 __vk_usbd_msc_send_csw(msc);
             }
         }
         break;
     case VSF_EVT_EXECUTE:
+        msc->is_scsi_done = 0;
+        msc->is_data_done = 0;
         if (cbw->dCBWDataTransferLength > 0) {
             if (trans->buffer != NULL) {
                 msc->is_stream = false;
@@ -214,6 +233,7 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     msc->ep_stream.callback.on_finish = __vk_usbd_msc_on_data_in;
                     vk_usbd_ep_send_stream(&msc->ep_stream, cbw->dCBWDataTransferLength);
                 } else {
+                    msc->is_data_done = 1;
                     msc->ep_stream.ep = msc->ep_out;
                     msc->ep_stream.callback.on_finish = NULL;
                     vk_usbd_ep_recv_stream(&msc->ep_stream, cbw->dCBWDataTransferLength);
@@ -224,6 +244,7 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 VSF_USB_ASSERT(false);
             }
         } else {
+            msc->is_data_done = 1;
             vk_scsi_execute(msc->scsi, cbw->CBWCB, NULL);
         }
         break;
