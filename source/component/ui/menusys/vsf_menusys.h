@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "vsf_cfg.h"
+#include "../vsf_ui_cfg.h"
 
 #if VSF_USE_MENUSYS == ENABLED
 
@@ -56,7 +56,7 @@
 #define __describe_menu(__name, __idx, __id, __x, __y, __w, __h, __item_num, __user_type, ...)\
         typedef struct __##__name##_menu##__idx##_info_t {                      \
             implement(vsf_menusys_menu_info_t)                                  \
-            vsf_menu_item_t __items[(__item_num)];                              \
+            vsf_menusys_menu_item_t __items[(__item_num)];                      \
         } __##__name##_menu##__idx##_info_t;                                    \
         __##__name##_menu##__idx##_info_t __##__name##_menu##__idx##_info = {   \
             .x              = (__x),                                            \
@@ -108,7 +108,7 @@
 #define describe_menusys(__name, __screen_stack_size)                           \
         typedef struct __##__name##_menusys_t {                                 \
             implement(vsf_menusys_t)                                            \
-            vsf_menu_t * __screen_stack[(__screen_stack_size)];                 \
+            vsf_menusys_screen_t * __screen_stack[(__screen_stack_size)];       \
         } __##__name##_menusys_t;                                               \
         __##__name##_menusys_t __name = {                                       \
             .screen_stack_size = (__screen_stack_size),                         \

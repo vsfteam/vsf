@@ -17,12 +17,14 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "vsf_cfg.h"
+#include "../vsf_ui_cfg.h"
 
 #if VSF_USE_MENUSYS == ENABLED
 
 #define __VSF_MENUSYS_IMPLEMENT
 #include "./vsf_menusys.h"
+
+#include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -34,14 +36,14 @@
 
 void vsf_menusys_init(vsf_menusys_t *menusys)
 {
-    VSF_ASSERT(menusys != NULL);
+    VSF_UI_ASSERT(menusys != NULL);
     menusys->screen_stack_pos = -1;
 }
 
 vsf_menusys_menu_t * vsf_menusys_poll(vsf_menusys_t *menusys, int_fast16_t *idx)
 {
     vsf_menusys_menu_t *menu;
-    VSF_ASSERT((menusys != NULL) && (idx != NULL));
+    VSF_UI_ASSERT((menusys != NULL) && (idx != NULL));
 
     if (*idx < 0) {
         *idx = 0;
@@ -72,9 +74,9 @@ void vsf_menusys_menu_updated(vsf_menusys_t *menusys, vsf_menusys_menu_t *menu)
 
 static vsf_menusys_menu_t * __vsf_menusys_get_menu(vsf_menusys_t *menusys, uint_fast8_t menu_idx)
 {
-    VSF_ASSERT((menusys != NULL) && (menusys->screen_stack_pos >= 0) && (menusys->screen_stack_pos < menusys->screen_stack_size));
+    VSF_UI_ASSERT((menusys != NULL) && (menusys->screen_stack_pos >= 0) && (menusys->screen_stack_pos < menusys->screen_stack_size));
     vsf_menusys_screen_t *cur_screen = menusys->screen_stack[menusys->screen_stack_pos];
-    VSF_ASSERT(cur_screen->menu_num > menu_idx);
+    VSF_UI_ASSERT(cur_screen->menu_num > menu_idx);
     return &cur_screen->menus[menu_idx];
 }
 
@@ -85,7 +87,7 @@ void vsf_menusys_move_item_absolute(vsf_menusys_t *menusys, uint_fast8_t menu_id
         vsf_menusys_menu_info_t *info = menu->info;
         uint_fast8_t old_idx = menu->item_pos;
 
-        VSF_ASSERT(item_idx < info->item_num);
+        VSF_UI_ASSERT(item_idx < info->item_num);
         menu->item_pos = item_idx;
         if (old_idx != menu->item_pos) {
             menu->item_pos_pre = old_idx;
@@ -101,8 +103,8 @@ void vsf_menusys_move_item_relative(vsf_menusys_t *menusys, uint_fast8_t menu_id
     vsf_menusys_menu_t *menu = __vsf_menusys_get_menu(menusys, menu_idx);
     if (!menu->is_updating) {
         vsf_menusys_menu_info_t *info = menu->info;
-        VSF_ASSERT((step > -info->item_num) && (step < info->item_num));
-        vsf_menu_item_move_absolute(menusys, menu_idx, (menu->item_pos + info->item_num + step) % info->item_num);
+        VSF_UI_ASSERT((step > -info->item_num) && (step < info->item_num));
+        vsf_menusys_move_item_absolute(menusys, menu_idx, (menu->item_pos + info->item_num + step) % info->item_num);
     }
 }
 
@@ -128,7 +130,7 @@ static void __vf_menusys_screen_set_update(vsf_menusys_screen_t *screen)
 
 void vsf_menusys_enter_screen(vsf_menusys_t *menusys, vsf_menusys_screen_t *screen)
 {
-    VSF_ASSERT((menusys != NULL) && (menusys->screen_stack_pos < menusys->screen_stack_size));
+    VSF_UI_ASSERT((menusys != NULL) && (menusys->screen_stack_pos < menusys->screen_stack_size));
 
     if (menusys->screen_stack_pos >= 0) {
         __vf_menusys_screen_clear_update(menusys->screen_stack[menusys->screen_stack_pos]);
@@ -139,7 +141,7 @@ void vsf_menusys_enter_screen(vsf_menusys_t *menusys, vsf_menusys_screen_t *scre
 
 void vsf_menusys_leave_screen(vsf_menusys_t *menusys)
 {
-    VSF_ASSERT((menusys != NULL) && (menusys->screen_stack_pos >= 0));
+    VSF_UI_ASSERT((menusys != NULL) && (menusys->screen_stack_pos >= 0));
 
     menusys->screen_stack_pos--;
     if (menusys->screen_stack_pos >= 0) {
@@ -150,7 +152,7 @@ void vsf_menusys_leave_screen(vsf_menusys_t *menusys)
 void vsf_menusys_select_cur_item(vsf_menusys_t *menusys, uint_fast8_t menu_idx)
 {
     vsf_menusys_menu_t *menu = __vsf_menusys_get_menu(menusys, menu_idx);
-    VSF_ASSERT(menu->item_pos < menu->info->item_num);
+    VSF_UI_ASSERT(menu->item_pos < menu->info->item_num);
     vsf_menusys_menu_info_t *menu_info = menu->info;
     vsf_menusys_menu_item_t *menu_item = &menu_info->items[menu->item_pos];
 
