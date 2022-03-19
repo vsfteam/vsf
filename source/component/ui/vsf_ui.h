@@ -23,7 +23,13 @@
 #include "../vsf_component_cfg.h"
 
 #include "./disp/vsf_disp.h"
-#include "./tgui/vsf_tgui.h"
+
+#if VSF_USE_TINY_GUI == ENABLED
+#   include "./tgui/vsf_tgui.h"
+#endif
+#if VSF_USE_MENUSYS == ENABLED
+#   include "./menusys/vsf_menusys.h"
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
