@@ -303,6 +303,10 @@ int vsf_json_get_string(const char *json, char *result, int len)
 
 int vsf_json_get_number(const char *json, double *result)
 {
+    if (*json++ != '"') {
+        return -1;
+    }
+
     double value = strtod(json, NULL);
     if (result) {
         *result = value;
