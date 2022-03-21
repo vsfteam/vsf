@@ -205,10 +205,17 @@ static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipad
 
 static int __netconn_return(err_t err)
 {
-    if (err == ERR_INPROGRESS) {
-        errno = EINPROGRESS;
-    } else if (ERR_WOULDBLOCK == err) {
-        errno = EAGAIN;
+    switch (err) {
+    case ERR_OK:                                    break;
+    case ERR_MEM:           errno = ENOMEM;         break;
+    case ERR_BUF:           errno = ENOBUFS;        break;
+    case ERR_TIMEOUT:       errno = ETIMEDOUT;      break;
+    case ERR_USE:           errno = EADDRINUSE;     break;
+    case ERR_INPROGRESS:    errno = EINPROGRESS;    break;
+    case ERR_WOULDBLOCK:    errno = EAGAIN;         break;
+    case ERR_RST:           errno = ENETRESET;      break;
+    case ERR_ABRT:          errno = ECONNABORTED;   break;
+    default:                errno = EIO;            break;
     }
     return err == ERR_OK ? 0 : SOCKET_ERROR;
 }
@@ -693,6 +700,8 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
                 return 0;
             } else if (ERR_WOULDBLOCK == err) {
                 errno = EAGAIN;
+            } else {
+                errno = EIO;
             }
         }
 
