@@ -603,7 +603,8 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
     if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
         size_t written = 0;
         err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
-        return __netconn_return(err);
+        int sockerr = __netconn_return(err);
+        return sockerr ? sockerr : written;
     } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
         if (size > LWIP_MIN(0xFFFF, SSIZE_MAX)) {
             return SOCKET_ERROR;
@@ -648,7 +649,8 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
 
         err_t err = netconn_send(conn, &buf);
         netbuf_free(&buf);
-        return __netconn_return(err);
+        int sockerr = __netconn_return(err);
+        return sockerr ? sockerr : size;
     }
     return SOCKET_ERROR;
 }
