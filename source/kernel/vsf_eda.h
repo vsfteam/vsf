@@ -1243,8 +1243,8 @@ static inline vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us)
 SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
 extern vsf_err_t vsf_teda_cancel_timer(void);
 
-SECTION(".text.vsf.kernel.vsf_teda_cancel_timer_ex")
-extern vsf_err_t vsf_teda_cancel_timer_ex(vsf_teda_t *pthis);
+SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
+extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *pthis);
 
 #   if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 SECTION(".text.vsf.kernel.vsf_callback_timer_init")

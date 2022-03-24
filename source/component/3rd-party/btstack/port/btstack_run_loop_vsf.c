@@ -22,6 +22,7 @@
 #if VSF_USE_BTSTACK == ENABLED
 
 #include "service/vsf_service.h"
+#define __VSF_EDA_CLASS_INHERIT__
 #include "kernel/vsf_kernel.h"
 
 #include "btstack_linked_list.h"
@@ -30,12 +31,17 @@
 #include "btstack_run_loop_vsf.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_BTSTACK_CFG_PRIORITY
+#   define VSF_BTSTACK_CFG_PRIORITY         vsf_prio_inherit
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct btstack_vsf_t {
     btstack_linked_list_t timers;
-    vsf_callback_timer_t callback_timer;
+    vsf_teda_t task;
 } btstack_vsf_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -89,6 +95,28 @@ static void __btstack_run_loop_vsf_set_timer(btstack_timer_source_t *ts, uint32_
     ts->timeout = __btstack_run_loop_vsf_get_time_ms() + timeout_in_ms + 1;
 }
 
+static void __btstaci_run_loop_vsf_update_timer(btstack_timer_source_t *ts)
+{
+    if (NULL == ts) {
+        ts = (btstack_timer_source_t *)btstack_linked_list_get_first_item(&__btstack_vsf.timers);
+        if (NULL == ts) {
+            return;
+        }
+    }
+
+    if (ts == (btstack_timer_source_t *)btstack_linked_list_get_first_item(&__btstack_vsf.timers)) {
+        uint32_t now = __btstack_run_loop_vsf_get_time_ms();
+
+        __vsf_teda_cancel_timer(&__btstack_vsf.task);
+        if (ts->timeout > now) {
+            uint32_t duration = now - ts->timeout;
+            vsf_teda_set_timer_ex(&__btstack_vsf.task, vsf_systimer_ms_to_tick(duration));
+        } else {
+            vsf_eda_post_evt(&__btstack_vsf.task.use_as__vsf_eda_t, VSF_EVT_TIMER);
+        }
+    }
+}
+
 static void __btstack_run_loop_vsf_add_timer(btstack_timer_source_t *ts)
 {
     btstack_linked_item_t *it;
@@ -103,11 +131,18 @@ static void __btstack_run_loop_vsf_add_timer(btstack_timer_source_t *ts)
     }
     ts->item.next = it->next;
     it->next = (btstack_linked_item_t *)ts;
+
+    __btstaci_run_loop_vsf_update_timer(ts);
 }
 
 static bool __btstack_run_loop_vsf_remove_timer(btstack_timer_source_t *ts)
 {
-    return btstack_linked_list_remove(&__btstack_vsf.timers, (btstack_linked_item_t *)ts);
+    bool is_first = ts == (btstack_timer_source_t *)btstack_linked_list_get_first_item(&__btstack_vsf.timers);
+    bool ret = btstack_linked_list_remove(&__btstack_vsf.timers, (btstack_linked_item_t *)ts);
+    if (is_first) {
+        __btstaci_run_loop_vsf_update_timer(NULL);
+    }
+    return ret;
 }
 
 static void __btstack_run_loop_vsf_dump_timer(void)
@@ -117,30 +152,36 @@ static void __btstack_run_loop_vsf_dump_timer(void)
 
     for (it = (btstack_linked_item_t *)__btstack_vsf.timers; it; it = it->next) {
         btstack_timer_source_t *ts = (btstack_timer_source_t *)it;
-        vsf_trace(VSF_TRACE_DEBUG, "timer %u, timeout %u\n", index++, (unsigned int)ts->timeout);
+        vsf_trace_debug("timer %u, timeout %u\n", index++, (unsigned int)ts->timeout);
     }
 }
 
-static void __btstack_run_loop_vsf_on_timer(vsf_callback_timer_t *timer)
+static void __btstack_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    uint32_t now = __btstack_run_loop_vsf_get_time_ms();
-    while (__btstack_vsf.timers) {
-        btstack_timer_source_t *ts = (btstack_timer_source_t *)__btstack_vsf.timers;
-        if (ts->timeout > now) {
-            break;
+    switch (evt) {
+    case VSF_EVT_TIMER: {
+            uint32_t now = __btstack_run_loop_vsf_get_time_ms();
+            while (__btstack_vsf.timers) {
+                btstack_timer_source_t *ts = (btstack_timer_source_t *)__btstack_vsf.timers;
+                if (ts->timeout > now) {
+                    break;
+                }
+                __btstack_run_loop_vsf_remove_timer(ts);
+                ts->process(ts);
+            }
+
+            __btstaci_run_loop_vsf_update_timer(NULL);
         }
-        __btstack_run_loop_vsf_remove_timer(ts);
-        ts->process(ts);
+        break;
     }
-    vsf_callback_timer_add_ms(timer, 1);
 }
 
 static void __btstack_run_loop_vsf_init(void)
 {
     memset(&__btstack_vsf, 0, sizeof(__btstack_vsf));
 
-    __btstack_vsf.callback_timer.on_timer = __btstack_run_loop_vsf_on_timer;
-    vsf_callback_timer_add_ms(&__btstack_vsf.callback_timer, 1);
+    __btstack_vsf.task.fn.evthandler = __btstack_evthandler;
+    vsf_teda_init(&__btstack_vsf.task, VSF_BTSTACK_CFG_PRIORITY);
 }
 
 const btstack_run_loop_t * btstack_run_loop_vsf_get_instance(void)
