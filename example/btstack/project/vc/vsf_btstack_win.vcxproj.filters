@@ -310,6 +310,9 @@
     <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon">
       <UniqueIdentifier>{a94d2b08-6b9f-42cc-a512-6a4dfd8b2db4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\driver\x86\win\rtc">
+      <UniqueIdentifier>{90d26ae4-b59d-4f85-9258-b2d6446ad1a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -819,6 +822,9 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.h">
       <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -1138,6 +1144,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
       <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
