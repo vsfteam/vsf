@@ -98,7 +98,7 @@ void btstack_host_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t 
             }
             break;
         case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE: {
-                gap_event_inquiry_result_get_bd_addr((const uint8_t *)packet, addr);
+                hci_event_remote_name_request_complete_get_bd_addr((const uint8_t *)packet, addr);
                 btstack_get_devs(&it);
                 while (btstack_linked_list_iterator_has_next(&it)) {
                     dev = (btstack_host_dev_t *)btstack_linked_list_iterator_next(&it);

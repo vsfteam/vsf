@@ -37,8 +37,13 @@
 
 typedef union btstack_host_dev_all_t {
     btstack_host_dev_t          dev;
-#   if BTSTACK_OO_USE_HOST_HID == ENABLED && BTSTACK_OO_USE_HOST_JOYCON == ENABLED
+#   if BTSTACK_OO_USE_HOST_HID == ENABLED
+#       if BTSTACK_OO_USE_HOST_JOYCON == ENABLED
     btstack_host_joycon_t       joycon;
+#       endif
+#       if BTSTACK_OO_USE_HOST_DS4 == ENABLED
+    btstack_host_ds4_t          ds4;
+#       endif
 #   endif
 } btstack_host_dev_all_t;
 
@@ -122,14 +127,20 @@ int btstack_main(int argc, const char * argv[])
 #if BTSTACK_OO_USE_HOST == ENABLED
         btstack_host_init();
 #   if BTSTACK_OO_USE_HOST_HID == ENABLED && BTSTACK_OO_USE_HOST_JOYCON == ENABLED
-            static btstack_host_drv_t joycon_left_drv = {
+            static btstack_host_drv_t __joycon_left_drv = {
                 .op = &btstack_host_joycon_left_drv,
             };
-            static btstack_host_drv_t joycon_right_drv = {
+            static btstack_host_drv_t __joycon_right_drv = {
                 .op = &btstack_host_joycon_right_drv,
             };
-            btstack_host_register_drv(&joycon_left_drv);
-            btstack_host_register_drv(&joycon_right_drv);
+            btstack_host_register_drv(&__joycon_left_drv);
+            btstack_host_register_drv(&__joycon_right_drv);
+#   endif
+#   if BTSTACK_OO_USE_HOST_HID == ENABLED && BTSTACK_OO_USE_HOST_DS4 == ENABLED
+            static btstack_host_drv_t __ds4_drv = {
+                .op = &btstack_host_ds4_drv,
+            };
+            btstack_host_register_drv(&__ds4_drv);
 #   endif
 #endif
 #if BTSTACK_OO_USE_DEVICE == ENABLED

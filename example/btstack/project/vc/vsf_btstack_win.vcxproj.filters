@@ -313,6 +313,9 @@
     <Filter Include="vsf\hal\driver\x86\win\rtc">
       <UniqueIdentifier>{90d26ae4-b59d-4f85-9258-b2d6446ad1a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\ds4">
+      <UniqueIdentifier>{0b032fcd-c5db-480b-8a50-9b74b34d717b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -825,6 +828,9 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\ds4\btstack_host_ds4.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\ds4</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -1147,6 +1153,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\ds4\btstack_host_ds4.c">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\ds4</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

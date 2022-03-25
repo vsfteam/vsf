@@ -19,10 +19,6 @@ vsf_class(btstack_host_joycon_t) {
     public_member(
         implement(btstack_host_hid_base_t)
     )
-    private_member(
-        bool led_config_done;
-        uint8_t data[50];
-    )
 };
 
 extern const btstack_host_drv_op_t btstack_host_joycon_left_drv;

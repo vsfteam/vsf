@@ -5984,6 +5984,15 @@
                                     <group>
                                         <name>hid</name>
                                         <group>
+                                            <name>ds4</name>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\ds4\btstack_host_ds4.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\ds4\btstack_host_ds4.h</name>
+                                            </file>
+                                        </group>
+                                        <group>
                                             <name>joycon</name>
                                             <file>
                                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.c</name>

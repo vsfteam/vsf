@@ -44,6 +44,9 @@ extern int btstack_host_hid_base_disconnect(btstack_dev_t *dev);
 #if BTSTACK_OO_USE_HOST_JOYCON == ENABLED
 #   include "./joycon/btstack_host_joycon.h"
 #endif
+#if BTSTACK_OO_USE_HOST_DS4 == ENABLED
+#   include "./ds4/btstack_host_ds4.h"
+#endif
 
 #endif      // BTSTACK_OO_USE_HOST && BTSTACK_OO_USE_HOST_HID
 #endif      // __BTSTACK_HOST_HID_H__

@@ -66,6 +66,7 @@
 #   define BTSTACK_OO_USE_HOST                          ENABLED
 #       define BTSTACK_OO_USE_HOST_HID                  ENABLED
 #           define BTSTACK_OO_USE_HOST_JOYCON           ENABLED
+#           define BTSTACK_OO_USE_HOST_DS4              ENABLED
 #   define BTSTACK_OO_USE_DEVICE                        DISABLED
 #endif
 
