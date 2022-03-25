@@ -13,6 +13,15 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\main_loop_vsf.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\awtk\port\vsf_awtk_port.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\driver\hid\btstack_dev_hid.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\btstack_host.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\btstack_host_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\btstack_host_hid_base.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\port\btstack_run_loop_vsf.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm_download_firmware.h" />
@@ -759,6 +768,12 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\semaphore.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\thread.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\vsf_awtk_port.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\driver\hid\btstack_dev_hid.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\btstack_host.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\btstack_host_hid_base.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\firmware\bcm\bcm20702\bt_firmware_image.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\port\btstack_run_loop_vsf.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\port\hci_dump_vsf.c" />

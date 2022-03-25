@@ -1132,6 +1132,33 @@
     <Filter Include="vsf\component\ui\disp\driver\wingdi">
       <UniqueIdentifier>{29d1b183-f34b-45a8-9bf4-007170d7f3d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension">
+      <UniqueIdentifier>{5afd3009-0034-4d7e-96f9-15d8b23da302}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo">
+      <UniqueIdentifier>{f0e34b08-4df9-452c-8332-dec7cfe1dc29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\device">
+      <UniqueIdentifier>{3bceb27a-d66f-45c7-bad5-39953e7ec069}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\host">
+      <UniqueIdentifier>{122f0883-ca9a-498c-b058-94b1d88c3e0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\device\driver">
+      <UniqueIdentifier>{fa991111-a8cd-4c48-98c8-53eb355e7a26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\device\driver\hid">
+      <UniqueIdentifier>{3529f3b5-4c42-411b-acbc-15e5c5d46a71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver">
+      <UniqueIdentifier>{8e131ee9-349e-4380-9258-abfa6e26e294}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid">
+      <UniqueIdentifier>{f924f577-4b6f-4627-ab64-5a821d7db53c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon">
+      <UniqueIdentifier>{7dcae704-0b65-4a80-8731-2111df1c0360}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3350,6 +3377,33 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h">
       <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo_cfg.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev_cfg.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\driver\hid\btstack_dev_hid.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\device\driver\hid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\btstack_host.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\btstack_host_cfg.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\btstack_host_hid_base.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.h">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5842,6 +5896,24 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c">
       <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.c">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.c">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\driver\hid\btstack_dev_hid.c">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\device\driver\hid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\btstack_host.c">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\btstack_host_hid_base.c">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.c">
+      <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
