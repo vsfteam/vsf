@@ -20,7 +20,7 @@ btstack_host_dev_t * btstack_host_malloc_dev(void)
 WEAK(btstack_host_free_dev)
 void btstack_host_free_dev(btstack_host_dev_t *dev)
 {
-    return vsf_heap_free(dev);
+    vsf_heap_free(dev);
 }
 
 void btstack_host_trace_dev(btstack_host_dev_t *dev)
