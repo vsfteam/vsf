@@ -61,7 +61,7 @@ btstack_host_dev_t * btstack_host_malloc_dev(void)
 
 void btstack_host_free_dev(btstack_host_dev_t *dev)
 {
-    return vsf_heap_free(dev);
+    vsf_heap_free(dev);
 }
 
 int btstack_evthandler(btstack_evt_t evt, void *param)
