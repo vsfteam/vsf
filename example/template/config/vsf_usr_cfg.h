@@ -86,6 +86,7 @@
 #       define BTSTACK_OO_USE_HOST                      ENABLED
 #           define BTSTACK_OO_USE_HOST_HID              ENABLED
 #           define BTSTACK_OO_USE_HOST_JOYCON           ENABLED
+#           define BTSTACK_OO_USE_HOST_DS4              ENABLED
 #endif
 
 #if APP_USE_SDL2_DEMO == ENABLED
