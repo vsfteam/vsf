@@ -2,15 +2,14 @@
 #define __BTSTACK_CLASS_INHERIT__
 #include "./btstack_host.h"
 
+#include "service/heap/vsf_heap.h"
+
 #if BTSTACK_OO_USE_HOST == ENABLED
 typedef struct btstack_host_t {
     btstack_linked_list_t drv_list;
 } btstack_host_t;
 
 static NO_INIT btstack_host_t btstack_host;
-
-#ifndef WEAK_BTSTACK_HOST_DYNAMIC_DEV
-#include "service/heap/vsf_heap.h"
 
 WEAK(btstack_host_malloc_dev)
 btstack_host_dev_t * btstack_host_malloc_dev(void)
@@ -23,10 +22,6 @@ void btstack_host_free_dev(btstack_host_dev_t *dev)
 {
     return vsf_heap_free(dev);
 }
-#else
-extern btstack_host_dev_t * btstack_host_malloc_dev(void);
-extern void btstack_host_free_dev(btstack_host_dev_t *dev);
-#endif
 
 void btstack_host_trace_dev(btstack_host_dev_t *dev)
 {
