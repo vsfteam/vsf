@@ -544,8 +544,6 @@ static uint32_t __hci_transport_aic8800_rx_handler(const uint8_t *data, uint32_t
     *(uint32_t *)buffer = len;
     memcpy(&buffer[4], data, len);
     vsf_eda_post_msg(&__hci_transport_aic8800_param.task, buffer);
-
-    bt_hci_rx_done(BT_HCI_CH_0);
     return len;
 }
 

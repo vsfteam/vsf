@@ -31,6 +31,7 @@ void btstack_host_hid_base_packet_handler(btstack_dev_t *dev, uint8_t packet_typ
             } else if (PSM_HID_INTERRUPT == psm) {
                 BTSTACK_HOST_HID_TRACE("%d: interrupt channel connected\r\n", dev->con_handle);
                 hid_dev->l2cap_interrupt_cid = cid;
+                btstack_evthandler(BTSTACK_ON_CHANNELS_OPEN_COMPLETE, dev);
             }
             break;
         case HCI_EVENT_DISCONNECTION_COMPLETE:
