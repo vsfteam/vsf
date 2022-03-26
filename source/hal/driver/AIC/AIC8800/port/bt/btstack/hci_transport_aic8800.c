@@ -44,7 +44,7 @@
 #endif
 
 #ifndef VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE
-#   define VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE      384
+#   define VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE      (8 + 256)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -58,74 +58,77 @@ void btstack_host_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t 
     switch (packet_type) {
     case HCI_EVENT_PACKET:
         switch (hci_event_packet_get_type(packet)) {
-        case GAP_EVENT_INQUIRY_RESULT: {
-                gap_event_inquiry_result_get_bd_addr((const uint8_t *)packet, addr);
-                btstack_get_devs(&it);
-                while (btstack_linked_list_iterator_has_next(&it)) {
-                    dev = (btstack_host_dev_t *)btstack_linked_list_iterator_next(&it);
-                    if (!bd_addr_cmp(addr, dev->remote_addr)) {
-                        return;
+        case GAP_EVENT_INQUIRY_RESULT:
+            gap_event_inquiry_result_get_bd_addr((const uint8_t *)packet, addr);
+            btstack_get_devs(&it);
+            while (btstack_linked_list_iterator_has_next(&it)) {
+                dev = (btstack_host_dev_t *)btstack_linked_list_iterator_next(&it);
+                if (!bd_addr_cmp(addr, dev->remote_addr)) {
+                    return;
+                }
+            }
+
+            dev = btstack_host_malloc_dev();
+            if (NULL == dev) {
+                break;
+            }
+            memset(dev, 0, sizeof(*dev));
+            dev->con_handle = HCI_CON_HANDLE_INVALID;
+            dev->is_device = false;
+
+            bd_addr_copy(dev->remote_addr, addr);
+            dev->page_scan_repetition_mode = gap_event_inquiry_result_get_page_scan_repetition_mode((const uint8_t *)packet);
+            dev->cod = gap_event_inquiry_result_get_class_of_device((const uint8_t *)packet);
+            dev->clock_offset = gap_event_inquiry_result_get_clock_offset((const uint8_t *)packet);
+
+            if (gap_event_inquiry_result_get_name_available((const uint8_t *)packet)) {
+                strncpy(dev->name, (const char *)gap_event_inquiry_result_get_name((const uint8_t *)packet), sizeof(dev->name) - 1);
+                if (btstack_host_is_dev_supported(dev)) {
+                    btstack_host_trace_dev(dev);
+                }
+                if (!btstack_evthandler(BTSTACK_HOST_ON_INQUIRY_RESULT, dev)) {
+                    btstack_host_free_dev(dev);
+                    return;
+                }
+            } else {
+                dev->request_name = true;
+            }
+
+            btstack_add_host_dev(&dev->use_as__btstack_dev_t);
+            break;
+        case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE:
+            hci_event_remote_name_request_complete_get_bd_addr((const uint8_t *)packet, addr);
+            btstack_get_devs(&it);
+            while (btstack_linked_list_iterator_has_next(&it)) {
+                dev = (btstack_host_dev_t *)btstack_linked_list_iterator_next(&it);
+                if (dev->request_name && !bd_addr_cmp(addr, dev->remote_addr)) {
+                    dev->request_name = false;
+                    if (!hci_event_remote_name_request_complete_get_status((const uint8_t *)packet)) {
+                        strncpy(dev->name, hci_event_remote_name_request_complete_get_remote_name((const uint8_t *)packet), sizeof(dev->name) - 1);
+                    } else {
+                    remove_dev:
+                        btstack_remove_dev(&dev->use_as__btstack_dev_t, &it);
+                        btstack_host_free_dev(dev);
+                        break;
                     }
-                }
 
-                dev = btstack_host_malloc_dev();
-                if (NULL == dev) {
-                    break;
-                }
-                memset(dev, 0, sizeof(*dev));
-                dev->con_handle = HCI_CON_HANDLE_INVALID;
-                dev->is_device = false;
-
-                bd_addr_copy(dev->remote_addr, addr);
-                dev->page_scan_repetition_mode = gap_event_inquiry_result_get_page_scan_repetition_mode((const uint8_t *)packet);
-                dev->cod = gap_event_inquiry_result_get_class_of_device((const uint8_t *)packet);
-                dev->clock_offset = gap_event_inquiry_result_get_clock_offset((const uint8_t *)packet);
-
-                if (gap_event_inquiry_result_get_name_available((const uint8_t *)packet)) {
-                    strncpy(dev->name, (const char *)gap_event_inquiry_result_get_name((const uint8_t *)packet), sizeof(dev->name) - 1);
                     if (btstack_host_is_dev_supported(dev)) {
                         btstack_host_trace_dev(dev);
                     }
                     if (!btstack_evthandler(BTSTACK_HOST_ON_INQUIRY_RESULT, dev)) {
-                        btstack_host_free_dev(dev);
-                        return;
+                        goto remove_dev;
                     }
-                } else {
-                    dev->request_name = true;
-                }
-
-                btstack_add_host_dev(&dev->use_as__btstack_dev_t);
-            }
-            break;
-        case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE: {
-                hci_event_remote_name_request_complete_get_bd_addr((const uint8_t *)packet, addr);
-                btstack_get_devs(&it);
-                while (btstack_linked_list_iterator_has_next(&it)) {
-                    dev = (btstack_host_dev_t *)btstack_linked_list_iterator_next(&it);
-                    if (dev->request_name && !bd_addr_cmp(addr, dev->remote_addr)) {
-                        dev->request_name = false;
-                        if (!hci_event_remote_name_request_complete_get_status((const uint8_t *)packet)) {
-                            strncpy(dev->name, hci_event_remote_name_request_complete_get_remote_name((const uint8_t *)packet), sizeof(dev->name) - 1);
-                        }
-                        if (btstack_host_is_dev_supported(dev)) {
-                            btstack_host_trace_dev(dev);
-                        }
-                        if (!btstack_evthandler(BTSTACK_HOST_ON_INQUIRY_RESULT, dev)) {
-                            btstack_remove_dev(&dev->use_as__btstack_dev_t, &it);
-                            btstack_host_free_dev(dev);
-                        }
-                        break;
-                    }
+                    break;
                 }
             }
-            break;
+            // fall through
         case GAP_EVENT_INQUIRY_COMPLETE:
             btstack_get_devs(&it);
             while (btstack_linked_list_iterator_has_next(&it)) {
                 dev = (btstack_host_dev_t *)btstack_linked_list_iterator_next(&it);
                 if (dev->request_name) {
                     gap_remote_name_request(dev->remote_addr, dev->page_scan_repetition_mode, dev->clock_offset | 0x8000);
-                    break;
+                    return;
                 }
             }
 
