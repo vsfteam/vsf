@@ -43,18 +43,15 @@
 #   define VSF_AIC8800_BTSTACK_CFG_PRIORITY             vsf_prio_inherit
 #endif
 
-#ifndef VSF_AIC8800_BTSTACK_CFG_MAX_TX_PACKET_SIZE
-#   define VSF_AIC8800_BTSTACK_CFG_MAX_TX_PACKET_SIZE   256
-#endif
-#ifndef VSF_AIC8800_BTSTACK_CFG_MAX_RX_PACKET_SIZE
-#   define VSF_AIC8800_BTSTACK_CFG_MAX_RX_PACKET_SIZE   512
+#ifndef VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE
+#   define VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE      384
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct hci_transport_aic8800_buffer_t {
-    uint8_t buffer[VSF_AIC8800_BTSTACK_CFG_MAX_TX_PACKET_SIZE];
+    uint8_t buffer[VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE];
 } hci_transport_aic8800_buffer_t;
 
 declare_vsf_pool(hci_transport_aic8800_buffer_pool)
@@ -63,10 +60,6 @@ def_vsf_pool(hci_transport_aic8800_buffer_pool, hci_transport_aic8800_buffer_t)
 typedef struct hci_transport_aic8800_param_t {
     void (*packet_handler)(uint8_t packet_type, uint8_t *packet, uint16_t size);
     vsf_pool(hci_transport_aic8800_buffer_pool) buffer_pool;
-    struct {
-        uint8_t data[VSF_AIC8800_BTSTACK_CFG_MAX_RX_PACKET_SIZE];
-        uint32_t len;
-    } rx;
 
     vsf_eda_t task;
     uint8_t init_script_offset;
@@ -545,11 +538,14 @@ uint32_t host_power_on_mode(void)
 
 static uint32_t __hci_transport_aic8800_rx_handler(const uint8_t *data, uint32_t len)
 {
-    VSF_HAL_ASSERT(len <= VSF_AIC8800_BTSTACK_CFG_MAX_RX_PACKET_SIZE);
-    memcpy(__hci_transport_aic8800_param.rx.data, data, len);
-    __hci_transport_aic8800_param.rx.len = len;
-    vsf_eda_post_evt(&__hci_transport_aic8800_param.task, VSF_EVT_USER + 0);
+    uint8_t *buffer = (uint8_t *)VSF_POOL_ALLOC(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool);
+    VSF_HAL_ASSERT((buffer != NULL) && (len + 4 <= VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE));
 
+    *(uint32_t *)buffer = len;
+    memcpy(&buffer[4], data, len);
+    vsf_eda_post_msg(&__hci_transport_aic8800_param.task, buffer);
+
+    bt_hci_rx_done(BT_HCI_CH_0);
     return len;
 }
 
@@ -557,7 +553,7 @@ static void __hci_transport_aic8800_tx_handler(const uint8_t *data, uint32_t len
 {
     VSF_POOL_FREE(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool,
                     (hci_transport_aic8800_buffer_t *)data);
-    vsf_eda_post_evt(&__hci_transport_aic8800_param.task, VSF_EVT_USER + 1);
+    vsf_eda_post_evt(&__hci_transport_aic8800_param.task, VSF_EVT_USER + 0);
 }
 
 static void __hci_transport_aic8800_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -565,17 +561,19 @@ static void __hci_transport_aic8800_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     extern void aic_bt_start(void);
 
     switch (evt) {
-    case VSF_EVT_USER + 0: {    // EVT_RX
-            const uint8_t *data = __hci_transport_aic8800_param.rx.data;
-            uint32_t len = __hci_transport_aic8800_param.rx.len;
+    case VSF_EVT_MESSAGE: {     // EVT_RX
+            const uint8_t *msg = vsf_eda_get_cur_msg();
+            const uint8_t *data = msg + 4;
+            uint32_t len = *(uint32_t *)msg;
 
             VSF_HAL_ASSERT((__hci_transport_aic8800_param.packet_handler != NULL) && (len > 0));
             __hci_transport_aic8800_param.packet_handler(data[0], (uint8_t *)&data[1], len - 1);
-        }
 
-        bt_hci_rx_done(BT_HCI_CH_0);
+            VSF_POOL_FREE(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool,
+                    (hci_transport_aic8800_buffer_t *)msg);
+        }
         break;
-    case VSF_EVT_USER + 1: {    // EVT_RX
+    case VSF_EVT_USER + 0: {    // EVT_RX
             const uint8_t event[] = { HCI_EVENT_TRANSPORT_PACKET_SENT, 0 };
             VSF_HAL_ASSERT(__hci_transport_aic8800_param.packet_handler != NULL);
             __hci_transport_aic8800_param.packet_handler(HCI_EVENT_PACKET, (uint8_t *)event, sizeof(event));
@@ -618,7 +616,7 @@ static int __hci_transport_aic8800_can_send_packet_now(uint8_t packet_type)
 static int __hci_transport_aic8800_send_packet(uint8_t packet_type, uint8_t *packet, int size)
 {
     uint8_t *buffer = (uint8_t *)VSF_POOL_ALLOC(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool);
-    VSF_HAL_ASSERT((buffer != NULL) && (size < VSF_AIC8800_BTSTACK_CFG_MAX_TX_PACKET_SIZE));
+    VSF_HAL_ASSERT((buffer != NULL) && (size < VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE));
     buffer[0] = packet_type;
     memcpy(&buffer[1], packet, size);
     size++;
