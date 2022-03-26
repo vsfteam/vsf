@@ -172,6 +172,11 @@ void btstack_init(bd_addr_t mac)
     l2cap_init();
     hci_set_inquiry_mode(INQUIRY_MODE_RSSI_AND_EIR);
 
+    // link_policy
+    //  bit0: Park mode
+    //  bit1: sniff mode
+    //  bit2: hold mode
+    //  bit3: master/slave switch mode
 #if BTSTACK_OO_USE_HOST == ENABLED && BTSTACK_OO_USE_DEVICE == ENABLED
     gap_set_default_link_policy_settings(0x0007);
 #elif BTSTACK_OO_USE_HOST == ENABLED

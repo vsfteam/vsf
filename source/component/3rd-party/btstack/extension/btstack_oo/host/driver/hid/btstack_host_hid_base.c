@@ -11,35 +11,26 @@ void btstack_host_hid_base_packet_handler(btstack_dev_t *dev, uint8_t packet_typ
 
     if (HCI_EVENT_PACKET == packet_type) {
         switch (hci_event_packet_get_type(packet)) {
-        case L2CAP_EVENT_INCOMING_CONNECTION: {
-                uint_fast16_t cid = l2cap_event_incoming_connection_get_local_cid(packet);
-                switch (l2cap_event_incoming_connection_get_psm(packet)) {
-                case PSM_HID_CONTROL:
-                    BTSTACK_HOST_HID_TRACE("%d: incoming control channel\r\n", dev->con_handle);
-                    hid_dev->l2cap_control_cid = cid;
-                    break;
-                case PSM_HID_INTERRUPT:
-                    BTSTACK_HOST_HID_TRACE("%d: incoming interrupt channel\r\n", dev->con_handle);
-                    hid_dev->l2cap_interrupt_cid = cid;
-                    break;
-                default:
-                    BTSTACK_ASSERT(false);
-                    return;
-                }
-                l2cap_accept_connection(cid);
-            }
+        case L2CAP_EVENT_INCOMING_CONNECTION:
+            l2cap_accept_connection(l2cap_event_incoming_connection_get_local_cid(packet));
             break;
         case L2CAP_EVENT_CHANNEL_OPENED:
             if (l2cap_event_channel_opened_get_status(packet) != 0) {
                 break;
             }
 
+            uint_fast16_t cid = l2cap_event_channel_opened_get_local_cid(packet);
             uint_fast16_t psm = l2cap_event_channel_opened_get_psm(packet);
-            if (PSM_HID_CONTROL == psm) {
+            if (PSM_SDP == psm) {
+                btstack_host_hid_base_connect(dev);
+            } else if (PSM_HID_CONTROL == psm) {
                 BTSTACK_HOST_HID_TRACE("%d: control channel connected\r\n", dev->con_handle);
+                hid_dev->l2cap_control_cid = cid;
                 btstack_l2cap_create_channel(dev, PSM_HID_INTERRUPT, l2cap_max_mtu(), &hid_dev->l2cap_interrupt_cid);
+                hid_dev->l2cap_control_cid = cid;
             } else if (PSM_HID_INTERRUPT == psm) {
                 BTSTACK_HOST_HID_TRACE("%d: interrupt channel connected\r\n", dev->con_handle);
+                hid_dev->l2cap_interrupt_cid = cid;
             }
             break;
         case HCI_EVENT_DISCONNECTION_COMPLETE:
