@@ -71,32 +71,38 @@ void btstack_host_free_dev(btstack_host_dev_t *dev)
 
 int btstack_evthandler(btstack_evt_t evt, void *param)
 {
+    btstack_dev_t *dev = param;
+
     switch (evt) {
     case BTSTACK_HOST_ON_INQUIRY_RESULT:
         // return true to connect
         return btstack_host_is_dev_supported((btstack_host_dev_t *)param);
-    case BTSTACK_ON_CONNECTION_COMPLETE: {
-            btstack_dev_t *dev = param;
-            if (!dev->is_device && !btstack_is_dev_connected(dev)) {
+    case BTSTACK_ON_DISCONNECTION_COMPLETE:
+    case BTSTACK_ON_CHANNELS_OPEN_COMPLETE:
+        if (!dev->is_device && !btstack_is_dev_connected(dev)) {
+            if (evt == BTSTACK_ON_CHANNELS_OPEN_COMPLETE) {
                 btstack_host_remove_dev((btstack_host_dev_t *)dev, NULL);
             }
         }
         // fall through
     case BTSTACK_HOST_ON_INQUIRY_COMPLETE: {
-            btstack_dev_t *dev;
             btstack_linked_list_iterator_t it;
+            bool is_connected = false;
+
             btstack_get_devs(&it);
             while (btstack_linked_list_iterator_has_next(&it)) {
                 dev = (btstack_dev_t *)btstack_linked_list_iterator_next(&it);
                 if (!dev->is_device && !btstack_is_dev_connected(dev)) {
                     btstack_host_connect_dev((btstack_host_dev_t *)dev);
+                    is_connected = true;
                     break;
                 }
             }
+            if (is_connected) {
+                break;
+            }
         }
-        if (BTSTACK_HOST_ON_INQUIRY_COMPLETE == evt) {
-            btstack_host_scan(1);
-        }
+        btstack_host_scan(1);
         break;
     case BTSTACK_ON_INITIALIZED:
 #if BTSTACK_OO_USE_HOST == ENABLED
