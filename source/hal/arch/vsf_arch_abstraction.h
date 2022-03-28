@@ -325,6 +325,7 @@ extern vsf_gint_state_t vsf_disable_interrupt(void);
 extern vsf_gint_state_t vsf_enable_interrupt(void);
 
 extern void vsf_arch_sleep(uint_fast32_t mode);
+extern void vsf_arch_reset(void);
 
 #ifdef __cplusplus
 }

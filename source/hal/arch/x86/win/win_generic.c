@@ -1157,6 +1157,25 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 #endif
 
 /*----------------------------------------------------------------------------*
+ * Reset                                                                      *
+ *----------------------------------------------------------------------------*/
+
+void vsf_arch_reset(void)
+{
+    WCHAR buffer[MAX_PATH];
+    STARTUPINFO si = { 0 };
+    PROCESS_INFORMATION pi = { 0 };
+
+    GetModuleFileNameW(NULL, (LPWSTR)&buffer, dimof(buffer));
+    BOOL ret = CreateProcessW(0, buffer, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
+    if (ret) {
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    }
+    ExitProcess(0);
+}
+
+/*----------------------------------------------------------------------------*
  * Heap Implementation                                                        *
  *----------------------------------------------------------------------------*/
 
