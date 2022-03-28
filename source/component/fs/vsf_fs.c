@@ -298,6 +298,7 @@ __vsf_component_peda_private_entry(__vk_file_open,
     vk_file_t   *dir;
     vk_file_t   **file;
     vsf_err_t   err;
+    bool        is_to_setpos;
 ) {
     vsf_peda_begin();
     vk_file_t *cur_dir = vsf_local.dir;
@@ -350,11 +351,21 @@ __vsf_component_peda_private_entry(__vk_file_open,
         if (vsf_local.err != VSF_ERR_NONE) {
             goto do_fail;
         }
-        if (NULL == cur_file) {
-            vsf_local.err = VSF_ERR_NOT_AVAILABLE;
-            goto do_fail;
+        if (vsf_local.is_to_setpos) {
+            vsf_local.is_to_setpos = false;
+            VSF_FS_ASSERT(0 == cur_file->pos);
+        } else {
+            if (NULL == cur_file) {
+                vsf_local.err = VSF_ERR_NOT_AVAILABLE;
+                goto do_fail;
+            }
+            __vk_file_ref(cur_file);
+            if (cur_file->pos != 0) {
+                vsf_local.is_to_setpos = true;
+                vk_file_seek(cur_file, 0, VSF_FILE_SEEK_SET);
+                break;
+            }
         }
-        __vk_file_ref(cur_file);
         if (vsf_local.name != NULL) {
             vsf_local.name += strlen(cur_file->name);
             cur_dir = vsf_local.dir = cur_file;
@@ -921,8 +932,18 @@ __vsf_component_peda_ifs_entry(__vk_vfs_lookup, vk_file_lookup)
 
             err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         } else {
-            *vsf_local.result = (vk_file_t *)__vk_vfs_lookup_imp(dir, vsf_local.name);
-            err = (*vsf_local.result != NULL) ? VSF_ERR_NONE : VSF_ERR_NOT_AVAILABLE;
+            vk_vfs_file_t *result = __vk_vfs_lookup_imp(dir, vsf_local.name);
+            *vsf_local.result = &result->use_as__vk_file_t;
+
+            if (result != NULL) {
+                err = VSF_ERR_NONE;
+                if (result->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+                    VSF_FS_ASSERT(result->subfs.root != NULL);
+                    result->pos = result->subfs.root->pos;
+                }
+            } else {
+                err = VSF_ERR_NOT_AVAILABLE;
+            }
         }
     case VSF_EVT_RETURN:
         if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {

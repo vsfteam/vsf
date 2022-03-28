@@ -961,8 +961,6 @@ __open_again:
         }
         if (flags & O_APPEND) {
             vk_file_seek(file, 0, VSF_FILE_SEEK_END);
-        } else {
-            vk_file_seek(file, 0, VSF_FILE_SEEK_SET);
         }
         if (flags & O_EXCL) {
             file->attr |= VSF_FILE_ATTR_EXCL;
