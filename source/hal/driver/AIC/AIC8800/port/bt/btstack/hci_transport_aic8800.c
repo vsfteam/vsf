@@ -61,7 +61,9 @@ typedef struct hci_transport_aic8800_param_t {
     void (*packet_handler)(uint8_t packet_type, uint8_t *packet, uint16_t size);
     vsf_pool(hci_transport_aic8800_buffer_pool) buffer_pool;
 
-    vsf_eda_t task;
+    vsf_teda_t task;
+    uint8_t *tx_buffer;
+    uint16_t tx_size;
     uint8_t init_script_offset;
 } hci_transport_aic8800_param_t;
 
@@ -543,7 +545,7 @@ static uint32_t __hci_transport_aic8800_rx_handler(const uint8_t *data, uint32_t
 
     *(uint32_t *)buffer = len;
     memcpy(&buffer[4], data, len);
-    vsf_eda_post_msg(&__hci_transport_aic8800_param.task, buffer);
+    vsf_eda_post_msg(&__hci_transport_aic8800_param.task.use_as__vsf_eda_t, buffer);
     return len;
 }
 
@@ -551,7 +553,7 @@ static void __hci_transport_aic8800_tx_handler(const uint8_t *data, uint32_t len
 {
     VSF_POOL_FREE(hci_transport_aic8800_buffer_pool, &__hci_transport_aic8800_param.buffer_pool,
                     (hci_transport_aic8800_buffer_t *)data);
-    vsf_eda_post_evt(&__hci_transport_aic8800_param.task, VSF_EVT_USER + 0);
+    vsf_eda_post_evt(&__hci_transport_aic8800_param.task.use_as__vsf_eda_t, VSF_EVT_USER + 0);
 }
 
 static void __hci_transport_aic8800_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -559,6 +561,10 @@ static void __hci_transport_aic8800_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     extern void aic_bt_start(void);
 
     switch (evt) {
+    case VSF_EVT_TIMER:
+        bt_hci_tx(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART, __hci_transport_aic8800_param.tx_buffer, __hci_transport_aic8800_param.tx_size);
+        __hci_transport_aic8800_param.tx_buffer = NULL;
+        break;
     case VSF_EVT_MESSAGE: {     // EVT_RX
             const uint8_t *msg = vsf_eda_get_cur_msg();
             const uint8_t *data = msg + 4;
@@ -585,7 +591,7 @@ static int __hci_transport_aic8800_open(void)
     extern void aic_bt_start(void);
 
     __hci_transport_aic8800_param.task.fn.evthandler = __hci_transport_aic8800_evthandler;
-    vsf_eda_init(&__hci_transport_aic8800_param.task, VSF_AIC8800_BTSTACK_CFG_PRIORITY);
+    vsf_teda_init(&__hci_transport_aic8800_param.task, VSF_AIC8800_BTSTACK_CFG_PRIORITY);
 
     bt_hci_open(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART,
             __hci_transport_aic8800_rx_handler, __hci_transport_aic8800_tx_handler, false);
@@ -608,7 +614,13 @@ static void __hci_transport_aic8800_register_packet_handler(
 
 static int __hci_transport_aic8800_can_send_packet_now(uint8_t packet_type)
 {
-    return bt_hci_tx_available(BT_HCI_CH_0);
+    return bt_hci_tx_available(BT_HCI_CH_0) && (NULL == __hci_transport_aic8800_param.tx_buffer);
+}
+
+WEAK(__hci_transport_aic8800_get_cmd_delay_ms)
+uint_fast8_t __hci_transport_aic8800_get_cmd_delay_ms(uint8_t *packet, int size)
+{
+    return 0;
 }
 
 static int __hci_transport_aic8800_send_packet(uint8_t packet_type, uint8_t *packet, int size)
@@ -619,7 +631,15 @@ static int __hci_transport_aic8800_send_packet(uint8_t packet_type, uint8_t *pac
     memcpy(&buffer[1], packet, size);
     size++;
 
-    return bt_hci_tx(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART, buffer, size);
+    uint_fast8_t ms = __hci_transport_aic8800_get_cmd_delay_ms(buffer, size);
+    if (ms > 0) {
+        __hci_transport_aic8800_param.tx_buffer = buffer;
+        __hci_transport_aic8800_param.tx_size = size;
+        vsf_teda_set_timer_ex(&__hci_transport_aic8800_param.task, vsf_systimer_ms_to_tick(ms));
+        return 0;
+    } else {
+        return bt_hci_tx(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART, buffer, size);
+    }
 }
 
 static void __hci_transport_aic8800_init(const void *transport_config)
