@@ -31,6 +31,11 @@
 #include <Windows.h>
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_DISP_WINGDI_CFG_HW_PRIORITY
+#   define VSF_DISP_WINGDI_CFG_HW_PRIORITY              vsf_arch_prio_0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -39,6 +44,7 @@ dcl_vsf_bitmap(vsf_disp_wingdi_key_state_map, 256);
 typedef struct vsf_disp_wingdi_t {
     vsf_arch_irq_thread_t thread;
     bool is_inited;
+    bool is_notified;
     vk_disp_wingdi_t *disp;
 
     BITMAPINFO bmi;
@@ -206,7 +212,10 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             EndPaint(hWnd, &ps);
 
             __vsf_arch_irq_start(irq_thread);
-                vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
+                if (!__vk_disp_wingdi.is_notified) {
+                    __vk_disp_wingdi.is_notified = true;
+                    vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
+                }
             __vsf_arch_irq_end(irq_thread, false);
         }
         break;
@@ -419,8 +428,9 @@ static vsf_err_t __vk_disp_wingdi_init(vk_disp_t *pthis)
 
     if (!__vk_disp_wingdi.is_inited) {
         __vk_disp_wingdi.is_inited = true;
+        __vk_disp_wingdi.is_notified = false;
         __vk_disp_wingdi.disp = (vk_disp_wingdi_t *)pthis;
-        __vsf_arch_irq_init(&__vk_disp_wingdi.thread, "disp_windgi", __vk_disp_wingdi_thread, vsf_arch_prio_0);
+        __vsf_arch_irq_init(&__vk_disp_wingdi.thread, "disp_windgi", __vk_disp_wingdi_thread, VSF_DISP_WINGDI_CFG_HW_PRIORITY);
     } else {
         vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
     }
@@ -448,6 +458,7 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
         .right  = area->pos.x + area->size.x,
         .bottom = area->pos.y + area->size.y,
     };
+    __vk_disp_wingdi.is_notified = false;
     InvalidateRect(__vk_disp_wingdi.hWnd, &rect, false);
     return VSF_ERR_NONE;
 }
