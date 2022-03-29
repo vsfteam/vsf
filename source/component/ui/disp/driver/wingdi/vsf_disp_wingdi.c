@@ -448,7 +448,22 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
     void *ptr = (void *)((uint8_t *)__vk_disp_wingdi.pixels + byteoffset);
 
     for (uint16_t i = 0; i < area->size.y; i++) {
-        memcpy(ptr, disp_buff, bytesize_line_area);
+        switch (vsf_disp_get_pixel_format(disp_wingdi)) {
+        case VSF_DISP_COLOR_RGB565: {
+                // convert to RGB555 which is used by windows for 16bit RGB color
+                uint16_t color;
+                for (uint16_t j = 0; j < area->size.x; j++) {
+                    color = ((uint16_t *)disp_buff)[j];
+                    ((uint16_t *)ptr)[j] = (color & 0x001F) | ((color >> 1) & 0x7FE0);
+                }
+            }
+            break;
+        default:
+            // TODO: add support to other color formats
+            VSF_UI_ASSERT(false);
+            break;
+        }
+
         ptr = (void *)((uint8_t *)ptr - bytesize_line);
         disp_buff = (void *)((uint8_t *)disp_buff + bytesize_line_area);
     }
