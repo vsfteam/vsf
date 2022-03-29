@@ -36,6 +36,10 @@
 #   define VSF_DISP_WINGDI_CFG_HW_PRIORITY              vsf_arch_prio_0
 #endif
 
+#ifndef VSF_DISP_WINGDI_CFG_WINDOW_TITLE
+#   define VSF_DISP_WINGDI_CFG_WINDOW_TITLE             "vsf display wingdi"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -402,7 +406,7 @@ static void __vk_disp_wingdi_thread(void *arg)
     };
     AdjustWindowRect(&rect, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE, false);
     __vk_disp_wingdi.hWnd = CreateWindow(__ClassName,
-        TEXT("vsf display wingdi"),
+        TEXT(VSF_DISP_WINGDI_CFG_WINDOW_TITLE),
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT,
         rect.right - rect.left, rect.bottom - rect.top,
