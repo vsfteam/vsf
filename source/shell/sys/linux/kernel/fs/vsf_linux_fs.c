@@ -969,7 +969,7 @@ __open_again:
             sfd->fd_flags |= FD_CLOEXEC;
         }
         if ((flags & O_TRUNC) && (flags & (O_RDWR | O_WRONLY))) {
-            // TODO: trunc fils
+            ftruncate(fd, 0);
         }
     }
     return fd;
