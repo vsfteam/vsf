@@ -471,7 +471,8 @@ int rtos_semaphore_get_count(rtos_semaphore semaphore)
 
 int rtos_semaphore_wait(rtos_semaphore semaphore, int timeout)
 {
-    vsf_sync_reason_t reason = vsf_thread_sem_pend(semaphore, vsf_systimer_ms_to_tick(timeout));
+    vsf_timeout_tick_t timeout_tick = (timeout >= 0) ? vsf_systimer_ms_to_tick(timeout) : -1;
+    vsf_sync_reason_t reason = vsf_thread_sem_pend(semaphore, timeout_tick);
     return (VSF_SYNC_GET == reason) ? 0 : -1;
 }
 
@@ -500,7 +501,8 @@ void rtos_mutex_delete(rtos_mutex mutex)
 
 int rtos_mutex_lock(rtos_mutex mutex, int timeout)
 {
-    vsf_sync_reason_t reason = vsf_thread_mutex_enter(mutex, timeout);
+    vsf_timeout_tick_t timeout_tick = (timeout >= 0) ? vsf_systimer_ms_to_tick(timeout) : -1;
+    vsf_sync_reason_t reason = vsf_thread_mutex_enter(mutex, timeout_tick);
     return (VSF_SYNC_GET == reason) ? 0 : -1;
 }
 
@@ -579,8 +581,9 @@ int rtos_queue_write(rtos_queue queue, void *msg, int timeout, bool isr)
         return (VSF_ERR_NONE == err) ? 0 : -1;
     }
 
+    vsf_timeout_tick_t timeout_tick = (timeout >= 0) ? vsf_systimer_ms_to_tick(timeout) : -1;
     if (VSF_ERR_NONE == vsf_eda_queue_send(&queue->use_as__vsf_eda_queue_t,
-                                msg, vsf_systimer_ms_to_tick(timeout))) {
+                                msg, timeout_tick)) {
         return 0;
     }
 
@@ -613,8 +616,9 @@ int rtos_queue_read(rtos_queue queue, void *msg, int timeout, bool isr)
         return (VSF_ERR_NONE == err) ? 0 : -1;
     }
 
+    vsf_timeout_tick_t timeout_tick = (timeout >= 0) ? vsf_systimer_ms_to_tick(timeout) : -1;
     if (VSF_ERR_NONE == vsf_eda_queue_recv(&queue->use_as__vsf_eda_queue_t,
-                                msg, vsf_systimer_ms_to_tick(timeout))) {
+                                msg, timeout_tick)) {
         rtos_trace_queue("%s: %p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, queue);
         rtos_trace_queue_buffer(msg, queue->node_size);
         return 0;
