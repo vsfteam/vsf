@@ -115,8 +115,10 @@ static uint_fast16_t __vk_disp_win_keycode_remap(uint8_t keycode)
     uint_fast16_t ext = vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_SHIFT) ? VSF_KB_EXT : 0;
 
     // https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-    if ((keycode >= '0') && (keycode <= '9')) {
-        return (VSF_KB_0 | ext) + (keycode - 0x30);
+    if ((keycode >= '1') && (keycode <= '9')) {
+        return (VSF_KB_1 | ext) + (keycode - '1');
+    } else if (keycode == '0') {
+        return VSF_KB_0 | ext;
     } else if ((keycode >= 'A') && (keycode <= 'Z')) {
         if (GetKeyState(VK_CAPITAL) & 0x0001) {
             ext ^= VSF_KB_EXT;
