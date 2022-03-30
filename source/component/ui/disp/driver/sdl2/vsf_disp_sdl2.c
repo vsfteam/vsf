@@ -186,11 +186,13 @@ static uint_fast16_t __vk_disp_sdl2_keycode_remap(SDL_Keycode keycode)
     case SDLK_m: case SDLK_n: case SDLK_o: case SDLK_p:
     case SDLK_q: case SDLK_r: case SDLK_s: case SDLK_t:
     case SDLK_u: case SDLK_v: case SDLK_w: case SDLK_x:
-    case SDLK_y: case SDLK_z:
-        if ((SDL_GetModState() & KMOD_CAPS) != 0) {
-            return VSF_KB_A + (keycode - SDLK_a);
-        } else {
-            return VSF_KB_a + (keycode - SDLK_a);
+    case SDLK_y: case SDLK_z: {
+            bool is_shift = SDL_GetModState() & KMOD_SHIFT;
+            if ((SDL_GetModState() & KMOD_CAPS) != 0) {
+                return (is_shift ? VSF_KB_a : VSF_KB_A) + (keycode - SDLK_a);
+            } else {
+                return (is_shift ? VSF_KB_A : VSF_KB_a) + (keycode - SDLK_a);
+            }
         }
 
     case SDLK_F1:               return VSF_KB_F1;
