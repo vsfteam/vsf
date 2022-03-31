@@ -183,6 +183,22 @@ static vk_winusb_hcd_t __vk_winusb_hcd = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_WINUSB_CFG_INSTALL_DRIVER == ENABLED
+#ifndef WEAK_VSF_WINUSB_ON_INSTALL_DRIVER
+WEAK(vsf_winusb_on_install_driver)
+void vsf_winusb_on_install_driver(uint_fast16_t vid, uint_fast16_t pid)
+{
+
+}
+#endif
+
+#ifndef WEAK_VSF_WINUSB_ON_DRIVER_INSTALLED
+WEAK(vsf_winusb_on_driver_installed)
+void vsf_winusb_on_driver_installed(uint_fast16_t vid, uint_fast16_t pid, int result, const char *strerr)
+{
+
+}
+#endif
+
 static bool __vk_winusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool force)
 {
     struct wdi_options_create_list cl_options = {
@@ -205,9 +221,12 @@ static bool __vk_winusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool
     for (device = list; device != NULL; device = device->next) {
         if (    (device->vid == vid) && (device->pid == pid) && !device->is_composite
             &&  (force || strcmp(device->driver, "WinUSB"))) {
-            if (wdi_prepare_driver(device, "usb_driver", "winusb_device.inf", &pd_options) == WDI_SUCCESS) {
-                wdi_install_driver(device, "usb_driver", "winusb_device.inf", NULL);
+            vsf_winusb_on_install_driver(vid, pid);
+            int result = wdi_prepare_driver(device, "usb_driver", "winusb_device.inf", &pd_options);
+            if (result == WDI_SUCCESS) {
+                result = wdi_install_driver(device, "usb_driver", "winusb_device.inf", NULL);
             }
+            vsf_winusb_on_driver_installed(vid, pid, result, wdi_strerror(result));
             break;
         }
     }
