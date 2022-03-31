@@ -603,6 +603,7 @@ int ls_main(int argc, char *argv[])
 {
     int dirnum, childnum;
     char **dirnames, *dirnames_dot = ".";
+    int ret = -1;
 
     if (1 == argc) {
         dirnum = 1;
@@ -624,6 +625,7 @@ int ls_main(int argc, char *argv[])
             continue;
         }
 
+        ret = 0;
         childnum = 0;
         do {
             ent = readdir(dir);
@@ -652,7 +654,7 @@ int ls_main(int argc, char *argv[])
 
         closedir(dir);
     }
-    return 0;
+    return ret;
 }
 
 int mkdir_main(int argc, char *argv[])
