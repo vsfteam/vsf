@@ -134,7 +134,7 @@ static uint_fast16_t __vk_disp_win_keycode_remap(uint8_t keycode)
     case VK_BACK:               return VSF_KB_BACKSPACE;
     case VK_TAB:                return VSF_KB_TAB;
     case VK_SPACE:              return VSF_KB_SPACE;
-    case VK_OEM_PLUS:           return VSF_KB_PLUS | ext;
+    case VK_OEM_PLUS:           return VSF_KB_EQUAL | ext;
     case VK_OEM_COMMA:          return VSF_KB_COMMA | ext;
     case VK_OEM_MINUS:          return VSF_KB_MINUS | ext;
     case VK_OEM_PERIOD:         return VSF_KB_DOT | ext;
