@@ -207,45 +207,114 @@ int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd, vsf_linux_main
     return exefd;
 }
 
-static char * __vsh_get_next_arg(char **cmd, bool *is_to_expand)
+static char * __vsh_get_next_arg(char **cmd)
 {
     VSF_LINUX_ASSERT((cmd != NULL) && (*cmd != NULL));
-    char *cmd_cur = *cmd, quote = *cmd_cur;
+    char *cmd_cur = *cmd;
+    int ch;
 
-    if ((quote == '\'') || (quote == '\"')) {
-        *cmd_cur++ = '\0';
-        *cmd = cmd_cur;
+    while ((*cmd_cur != '\0') && isspace((int)*cmd_cur)) { cmd_cur++; }
+    *cmd = cmd_cur;
 
-        while ((*cmd_cur != '\0') && (*cmd_cur != quote)) { cmd_cur++; }
-        if ((*cmd_cur == '\'') || (*cmd_cur == '\"')) {
-            *cmd_cur++ = '\0';
+    while (true) {
+        ch = *cmd_cur;
+        if (isspace(ch) || ('\0' == ch)) {
+            break;
+        } else {
+            cmd_cur++;
+            if ((ch == '\"') || (ch == '\'')) {
+                while ((*cmd_cur != '\0') && (*cmd_cur != ch)) { cmd_cur++; }
+                if (*cmd_cur != '\0') { cmd_cur++; }
+            }
         }
-    } else {
-        while ((*cmd_cur != '\0') && !isspace((int)*cmd_cur)) { cmd_cur++; }
     }
     while ((*cmd_cur != '\0') && isspace((int)*cmd_cur)) { *cmd_cur++ = '\0'; }
-
-    if (is_to_expand != NULL) {
-        *is_to_expand = quote != '\'';
-    }
     return cmd_cur;
+}
+
+static int __vsh_expand_arg_section(vsf_linux_process_t *process, char *arg_sec, char **output)
+{
+    int arglen = vsf_linux_expandenv(arg_sec, NULL, 0);
+    if (arglen < 0) {
+        printf("fail to parse argument %s" VSH_LINEEND, arg_sec);
+        return -1;
+    }
+
+    int pos = (*output != NULL) ? strlen(*output) : 0;
+    *output = __realloc_ex(process, *output, pos + arglen + 1);
+    if (NULL == *output) {
+        printf("fail to allocate buffer to parse argument %s" VSH_LINEEND, arg_sec);
+        return -1;
+    }
+
+    vsf_linux_expandenv(arg_sec, *output + pos, arglen + 1);
+    return 0;
 }
 
 static char * __vsh_expand_arg(vsf_linux_process_t *process, char *arg)
 {
-    int arglen = vsf_linux_expandenv(arg, NULL, 0);
-    if (arglen < 0) {
-        printf("fail to parse argument %s" VSH_LINEEND, arg);
-        return NULL;
+    char *arg_cur, *arg_sec, *real_arg = NULL, ch;
+    int cur_len, pos;
+    bool is_to_expand;
+
+    if (strchr(arg, '$')) {
+        is_to_expand = true;
+    } else {
+        is_to_expand = false;
     }
 
-    char *real_arg = __malloc_ex(process, arglen + 1);
-    if (NULL == real_arg) {
-        printf("fail to allocate buffer to parse argument %s" VSH_LINEEND, arg);
-        return NULL;
+    arg_cur = arg;
+    arg_sec = arg_cur;
+    while (true) {
+        ch = *arg_cur;
+        if (ch == '\0') {
+            if (is_to_expand && (*arg_sec != '\0')) {
+                if (__vsh_expand_arg_section(process, arg_sec, &real_arg)) {
+                    return NULL;
+                }
+            }
+            break;
+        } if ((ch == '\'') || (ch == '\"')) {
+            if (arg_sec != arg_cur) {
+                *arg_cur = '\0';
+
+                if (is_to_expand) {
+                    if (__vsh_expand_arg_section(process, arg_sec, &real_arg)) {
+                        return NULL;
+                    }
+                }
+            }
+            arg_sec = ++arg_cur;
+
+            while ((*arg_cur != '\0') && (*arg_cur != ch)) { arg_cur++; }
+            if (*arg_cur != '\0') {
+                *arg_cur++ = '\0';
+            }
+
+            if (is_to_expand) {
+                if (ch == '\'') {
+                    cur_len = strlen(arg_sec);
+                    pos = real_arg != NULL ? strlen(real_arg) : 0;
+                    real_arg = __realloc_ex(process, real_arg, pos + cur_len + 1);
+                    if (NULL == real_arg) {
+                        return NULL;
+                    }
+                    strcpy(real_arg + pos, arg_sec);
+                } else {
+                    if (__vsh_expand_arg_section(process, arg_sec, &real_arg)) {
+                        return NULL;
+                    }
+                }
+            } else {
+                strcpy(arg_sec - 1, arg_sec);
+            }
+            arg_sec = arg_cur;
+        } else {
+            arg_cur++;
+        }
     }
-    vsf_linux_expandenv(arg, real_arg, arglen + 1);
-    return real_arg;
+
+    return NULL == real_arg ? arg : real_arg;
 }
 
 static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
@@ -254,7 +323,6 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     int exefd = -1, ret;
     vsf_linux_main_entry_t entry;
     char *env[2], *arg_expanded;
-    bool is_to_expand;
 
     // skip spaces
     while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
@@ -267,30 +335,25 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
 
     env[1] = NULL;
     for (;;) {
-        next = __vsh_get_next_arg(&cmd, &is_to_expand);
+        next = __vsh_get_next_arg(&cmd);
         if (!strchr(cmd, '=')) {
             break;
         }
 
-        if (is_to_expand && (strchr(cmd, '$') != NULL)) {
-            arg_expanded = __vsh_expand_arg(process, cmd);
-            if (NULL == arg_expanded) {
-                goto delete_process_and_fail;
-            }
-        } else {
-            is_to_expand = false;
-            arg_expanded = cmd;
+        arg_expanded = __vsh_expand_arg(process, cmd);
+        if (NULL == arg_expanded) {
+            goto delete_process_and_fail;
         }
 
         env[0] = arg_expanded;
-        cmd = next;
         ret = vsf_linux_merge_env(process, env);
-        if (is_to_expand) {
+        if (arg_expanded != cmd) {
             __free_ex(process, arg_expanded);
         }
         if (ret < 0) {
             goto delete_process_and_fail;
         }
+        cmd = next;
     }
 
     // search in path first if not absolute path
@@ -318,16 +381,11 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     ctx->arg.is_dyn_argv = true;
     char *nextnext;
     while ((*next != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
-        nextnext = __vsh_get_next_arg(&next, &is_to_expand);
-
-        if (is_to_expand && (strchr(next, '$') != NULL)) {
-            arg_expanded = __vsh_expand_arg(process, next);
-        } else {
-            is_to_expand = false;
+        nextnext = __vsh_get_next_arg(&next);
+        arg_expanded = __vsh_expand_arg(process, next);
+        if (arg_expanded == next) {
             arg_expanded = __strdup_ex(process, next);
-        }
-
-        if (NULL == arg_expanded) {
+        } else if (NULL == arg_expanded) {
             goto delete_process_and_fail;
         }
 

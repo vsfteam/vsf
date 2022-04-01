@@ -2314,7 +2314,7 @@ int vsf_linux_expandenv(const char *str, char *output, size_t bufflen)
         } else {
             name_end = env_end - 1;
         }
-        if (name_end <= name_start) {
+        if (name_end < name_start) {
             return -1;
         }
 
