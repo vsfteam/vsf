@@ -41,15 +41,15 @@
 #endif
 
 #ifndef APP_GPIO_DEMO_CFG_INPUT_GPIO
-#   define APP_GPIO_DEMO_CFG_INPUT_GPIO                 (vsf_gpio_t *)&vsf_gpio0
+#   define APP_GPIO_DEMO_CFG_INPUT_GPIO                 (vsf_gpio_t *)&vsf_hw_gpio0
 #endif
 
 #ifndef APP_GPIO_DEMO_CFG_OUTPUT_GPIO
-#   define APP_GPIO_DEMO_CFG_OUTPUT_GPIO                (vsf_gpio_t *)&vsf_gpio1
+#   define APP_GPIO_DEMO_CFG_OUTPUT_GPIO                (vsf_gpio_t *)&vsf_hw_gpio1
 #endif
 
 #ifndef APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_GPIO
-#   define APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_GPIO         (vsf_gpio_t *)&vsf_gpio1
+#   define APP_GPIO_DEMO_CFG_OUTPUT_TOGGLE_GPIO         (vsf_gpio_t *)&vsf_hw_gpio1
 #endif
 
 #ifndef APP_GPIO_DEMO_CFG_INPUT_PIN_MASK
