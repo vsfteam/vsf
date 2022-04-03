@@ -107,9 +107,12 @@ vsf_class(vsf_adc_t) {
     )
 };
 
+// TODO: update template
+typedef vsf_adc_t vsf_hw_adc_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern vsf_adc_t vsf_adc0;
+extern vsf_hw_adc_t vsf_hw_adc0;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

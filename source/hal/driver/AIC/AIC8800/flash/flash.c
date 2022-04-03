@@ -68,7 +68,7 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-vsf_flash_t vsf_flash0 = {
+vsf_hw_flash_t vsf_hw_flash0 = {
     .cfg = {
         .isr = {
             .handler_fn = NULL,

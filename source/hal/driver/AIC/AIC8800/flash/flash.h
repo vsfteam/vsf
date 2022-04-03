@@ -42,10 +42,13 @@ struct vsf_flash_t {
     bool                    is_enabled;
 };
 
+// TODO: update template
+typedef vsf_flash_t vsf_hw_flash_t;
+
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern vsf_flash_t vsf_flash0;
+extern vsf_hw_flash_t vsf_hw_flash0;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

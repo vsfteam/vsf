@@ -31,7 +31,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_HW_RNG_INIT(__COUNT, __DONT_CARE)                                 \
-    vsf_hw_rng_init(&VSF_MCONNECT(vsf_rng, __COUNT));
+    vsf_hw_rng_init(&VSF_MCONNECT(vsf_hw_rng, __COUNT));
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
