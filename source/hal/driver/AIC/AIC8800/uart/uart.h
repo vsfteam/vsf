@@ -98,7 +98,7 @@ typedef enum em_usart_irq_mask_t {
 
 /*============================ INCLUDES ======================================*/
 
-// undef after include vsf_template_i2c.h
+// undef after include vsf_template_usart.h
 #define VSF_USART_CFG_DEC_PREFIX                      vsf_hw
 #define VSF_USART_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
 
