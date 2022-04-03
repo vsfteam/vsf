@@ -30,7 +30,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_HW_ADC_IMP_LV0(__COUNT, __dont_care)                              \
-    vsf_adc_t vsf_adc##__COUNT = {                                              \
+    vsf_hw_adc_t vsf_hw_adc##__COUNT = {                                        \
         .data = NULL,                                                           \
         .channel_count = 0,                                                     \
         .channel_index = 0,                                                     \

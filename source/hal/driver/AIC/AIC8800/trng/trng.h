@@ -34,7 +34,7 @@ typedef struct vsf_hw_rng_t vsf_hw_rng_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern vsf_hw_rng_t vsf_rng0;
+extern vsf_hw_rng_t vsf_hw_rng0;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

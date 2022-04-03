@@ -34,12 +34,12 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_HW_RNG_IMP_LV0(__COUNT, __DONT_CARE)                              \
-    vsf_hw_rng_t VSF_MCONNECT(vsf_rng, __COUNT) = {                             \
+    vsf_hw_rng_t VSF_MCONNECT(vsf_hw_rng, __COUNT) = {                          \
         VSF_MCONNECT(RNG, __COUNT, _CONFIG)                                     \
     };                                                                          \
     void VSF_MCONNECT(RNG, __COUNT, _IRQHandler)(void)                          \
     {                                                                           \
-        vsf_hw_rng_t *rng = &VSF_MCONNECT(vsf_rng, __COUNT);                    \
+        vsf_hw_rng_t *rng = &VSF_MCONNECT(vsf_hw_rng, __COUNT);                 \
         AIC_TRNG_TypeDef *reg = rng->reg;                                       \
         uint32_t data = reg->trng_data;                                         \
                                                                                 \
