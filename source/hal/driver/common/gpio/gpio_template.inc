@@ -143,38 +143,42 @@ void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#ifdef VSF_GPIO_CFG_TEMPLATE_COUNT
-#   ifndef VSF_GPIO_CFG_TEMPLATE_MASK
-#       define VSF_GPIO_CFG_TEMPLATE_MASK     ((1ul << VSF_GPIO_CFG_TEMPLATE_COUNT) - 1)
+#if VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPPERCASE_PREFIX, _GPIO_COUNT)
+#   define __VSF_GPIO_IMP_COUNT VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPPERCASE_PREFIX, _GPIO_COUNT)
+
+#   if VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPPERCASE_PREFIX, _GPIO_MASK)
+#       define __VSF_GPIO_IMP_MASK    VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPPERCASE_PREFIX, _GPIO_MASK)
+#   else
+#       define __VSF_GPIO_IMP_MASK    ((1ul << __VSF_GPIO_IMP_COUNT) - 1)
 #   endif
 
-#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 0)
+#   if __VSF_GPIO_IMP_MASK & (1 << 0)
         VSF_GPIO_CFG_IMP_LV0(0, NULL)
 #   endif
-#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 1)
+#   if __VSF_GPIO_IMP_MASK & (1 << 1)
         VSF_GPIO_CFG_IMP_LV0(1, NULL)
 #   endif
-#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 2)
+#   if __VSF_GPIO_IMP_MASK & (1 << 2)
         VSF_GPIO_CFG_IMP_LV0(2, NULL)
 #   endif
-#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 3)
+#   if __VSF_GPIO_IMP_MASK & (1 << 3)
         VSF_GPIO_CFG_IMP_LV0(3, NULL)
 #   endif
-#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 4)
+#   if __VSF_GPIO_IMP_MASK & (1 << 4)
         VSF_GPIO_CFG_IMP_LV0(4, NULL)
 #   endif
-#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 5)
+#   if __VSF_GPIO_IMP_MASK & (1 << 5)
         VSF_GPIO_CFG_IMP_LV0(5, NULL)
 #   endif
-#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 6)
+#   if __VSF_GPIO_IMP_MASK & (1 << 6)
         VSF_GPIO_CFG_IMP_LV0(6, NULL)
 #   endif
-#   if VSF_GPIO_CFG_TEMPLATE_MASK & (1 << 7)
+#   if __VSF_GPIO_IMP_MASK & (1 << 7)
         VSF_GPIO_CFG_IMP_LV0(7, NULL)
 #   endif
 
-#   undef VSF_GPIO_CFG_TEMPLATE_COUNT
-#   undef VSF_GPIO_CFG_TEMPLATE_MASK
+#   undef __VSF_GPIO_IMP_COUNT
+#   undef __VSF_GPIO_IMP_MASK
 #   undef VSF_GPIO_CFG_IMP_LV0
 #endif
 
