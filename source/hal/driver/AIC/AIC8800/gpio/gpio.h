@@ -48,7 +48,7 @@ typedef enum io_feature_t {
 
 /*============================ INCLUDES ======================================*/
 
-// undef after include vsf_template_i2c.h
+// undef after include vsf_template_gpio.h
 #define VSF_GPIO_CFG_DEC_PREFIX                      vsf_hw
 #define VSF_GPIO_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
 

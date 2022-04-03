@@ -192,7 +192,7 @@ void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 #define VSF_GPIO_CFG_IMP_PREFIX              VSF_GPIO_CFG_PREFIX
 #define VSF_GPIO_CFG_IMP_UPPERCASE_PREFIX    VSF_HW
 #define VSF_GPIO_CFG_IMP_LV0(__COUNT, __dont_care)                              \
-    vsf_hw_gpio_t vsf_gpio##__COUNT = {                                         \
+    vsf_hw_gpio_t vsf_hw_gpio##__COUNT = {                                      \
         VSF_GPIO_OP                                                             \
         .GPIO = REG_GPIO##__COUNT,                                              \
         .IOMUX = ((AIC_IOMUX_TypeDef *)VSF_HW_GPIO##__COUNT##_IOMUX_REG_BASE),  \
