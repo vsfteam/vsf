@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
+#define pthread_atfork                  VSF_LINUX_WRAPPER(pthread_atfork)
 #define pthread_self                    VSF_LINUX_WRAPPER(pthread_self)
 #define pthread_equal                   VSF_LINUX_WRAPPER(pthread_equal)
 #define pthread_create                  VSF_LINUX_WRAPPER(pthread_create)
