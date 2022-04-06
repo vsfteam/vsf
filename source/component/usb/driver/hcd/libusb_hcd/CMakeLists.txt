@@ -1,7 +1,7 @@
 # CMakeLists head
 
 # libusb only available in windows/linux/macos
-if(VSF_HOST_SYSTEM STREQUAL win OR VSF_HOST_SYSTEM STREQUAL linux OR VSF_HOST_SYSTEM STREQUAL macos)
+if(VSF_HOST_HAS_LIBUSB)
     # check libusb
     find_package(PkgConfig)
     pkg_check_modules(libusb-1.0 libusb-1.0)
