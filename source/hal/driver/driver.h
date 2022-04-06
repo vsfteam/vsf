@@ -40,7 +40,7 @@
 #       define  VSF_DRIVER_HEADER       "./Nuvoton/driver.h"
 #   elif    defined(__WinnerMicro__)
 #       define  VSF_DRIVER_HEADER       "./WinnerMicro/driver.h"
-#   elif    defined(__CPU_X86__) || defined(__CPU_X64__)
+#   elif    defined(__CPU_X86__) || defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)
 #       define  VSF_DRIVER_HEADER       "./x86/driver.h"
 #   elif    defined(__SiliconLabs__)
 #       define  VSF_DRIVER_HEADER       "./SiliconLabs/driver.h"

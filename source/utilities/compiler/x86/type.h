@@ -73,7 +73,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if     defined(__CPU_X86__)
+#if     defined(__CPU_X86__) || defined(__CPU_WEBASSEMBLY__)
 typedef uint32_t            uintalu_t;
 typedef int32_t             intalu_t;
 #elif   defined(__CPU_X64__)
