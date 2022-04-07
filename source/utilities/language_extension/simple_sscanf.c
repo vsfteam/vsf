@@ -155,11 +155,13 @@ static int vsnscanf(const char *str, size_t size, const char *format, va_list ap
                     break;
                 case 's': {
                         char *ptr = va_arg(ap, char *);
-                        if (!width) { width = -1; }
-                        while (!isspace(*str) && (width-- > 0)) {
+                        if (width) { width--; /* reserved for '\0' */ }
+                        else { width = -1; }
+                        while (!isspace(*str) && ((width < 0) || (width-- > 0))) {
                             *ptr++ = *str++;
                             size--;
                         }
+                        *ptr = '\0';
                         result++;
                     }
                     break;
