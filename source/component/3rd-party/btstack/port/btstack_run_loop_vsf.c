@@ -109,7 +109,7 @@ static void __btstaci_run_loop_vsf_update_timer(btstack_timer_source_t *ts)
 
         __vsf_teda_cancel_timer(&__btstack_vsf.task);
         if (ts->timeout > now) {
-            uint32_t duration = now - ts->timeout;
+            uint32_t duration = ts->timeout - now;
             vsf_teda_set_timer_ex(&__btstack_vsf.task, vsf_systimer_ms_to_tick(duration));
         } else {
             vsf_eda_post_evt(&__btstack_vsf.task.use_as__vsf_eda_t, VSF_EVT_TIMER);
