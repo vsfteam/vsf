@@ -90,7 +90,7 @@ extern "C" {
             struct __name {                                                     \
                 implement(vsf_thread_t)                                         \
                 implement_ex(thread_cb_##__name##_t, param)                     \
-            }ALIGN(8);                                                          \
+            } ALIGN(8);                                                         \
             extern void vsf_thread_##__name##_start(struct __name *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__name##_entry(                            \
@@ -103,11 +103,11 @@ extern "C" {
                                                 vsf_prio_t priority)            \
             {                                                                   \
                 VSF_KERNEL_ASSERT(NULL != task);                                \
-                thread_cb_##__name##_t *vsf_pthis =  &(task->param);            \
+                thread_cb_##__name##_t *vsf_pthis = &(task->param);             \
                 vsf_pthis->use_as__vsf_thread_cb_t.entry = (vsf_thread_entry_t *)\
                                     &vsf_thread_##__name##_entry;               \
                 vsf_pthis->use_as__vsf_thread_cb_t.stack = task->param.stack_arr;\
-                vsf_pthis->use_as__vsf_thread_cb_t.stack_size =                  \
+                vsf_pthis->use_as__vsf_thread_cb_t.stack_size =                 \
                     sizeof(task->param.stack_arr);                              \
                 vsf_pthis->canary = 0xDEADBEEF;                                 \
                 vsf_thread_start(   &(task->use_as__vsf_thread_t),              \
@@ -163,7 +163,7 @@ extern "C" {
                                                 uint_fast32_t size)             \
             {                                                                   \
                 VSF_KERNEL_ASSERT(NULL != task && 0 != size && NULL != stack);  \
-                thread_cb_##__name##_t *vsf_pthis =  &(task->param);            \
+                thread_cb_##__name##_t *vsf_pthis = &(task->param);             \
                 vsf_pthis->use_as__vsf_thread_cb_t.entry = (vsf_thread_entry_t *)\
                                     &vsf_thread_##__name##_entry;               \
                 vsf_pthis->use_as__vsf_thread_cb_t.stack = stack;               \
@@ -215,7 +215,7 @@ extern "C" {
                 uint64_t stack_arr[(__VSF_THREAD_STACK_SAFE_SIZE(__stack)+7)/8] \
                         ALIGN(1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);      \
                 implement_ex(thread_cb_##__name##_t, param);                    \
-            }ALIGN(8);                                                          \
+            } ALIGN(8);                                                         \
             extern void vsf_thread_##__name##_start(struct __name *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__name##_entry(                            \
@@ -246,7 +246,7 @@ extern "C" {
             };                                                                  \
             struct __name {                                                     \
                 implement_ex(thread_cb_##__name##_t, param);                    \
-            }ALIGN(8);                                                          \
+            } ALIGN(8);                                                         \
             extern void vsf_thread_##__name##_start(struct __name *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__name##_entry(                            \
@@ -401,6 +401,7 @@ def_class(vsf_thread_cb_t,
         vsf_arch_irq_thread_t   host_thread;
         vsf_arch_irq_request_t  req, *rep;
         vsf_evt_t               evt;
+        bool                    is_inited;
 #else
         jmp_buf                 *pos;
         jmp_buf                 *ret;

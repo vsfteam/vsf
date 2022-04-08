@@ -219,6 +219,11 @@ extern void __vsf_arch_irq_set_background(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_start(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_end(vsf_arch_irq_thread_t *irq_thread, bool is_terminate);
 
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+extern void __vsf_arch_irq_exit(void);
+vsf_err_t __vsf_kernel_irq_restart(vsf_arch_irq_thread_t *irq_thread);
+#endif
+
 // for trace only
 extern vsf_systimer_tick_t __vsf_systimer_get(void);
 

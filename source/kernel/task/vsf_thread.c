@@ -37,6 +37,22 @@
 #   define longjmp              VSF_ARCH_LONGJMP
 #endif
 
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#   ifdef VSF_ARCH_IRQ_REQUEST_SUPPORT_MANUAL_RESET
+#       define __vsf_kernel_irq_request_init(__req)     __vsf_arch_irq_request_init((__req), true)
+#   else
+#       define __vsf_kernel_irq_request_init(__req)     __vsf_arch_irq_request_init(__req)
+#   endif
+
+#   ifdef VSF_ARCH_IRQ_SUPPORT_STACK
+#       define __vsf_kernel_irq_init(__thread, __name, __entry, __prio, __stack, __stacksize)\
+                __vsf_arch_irq_init(__thread, __name, __entry, __prio, __stack, __stacksize)
+#   else
+#       define __vsf_kernel_irq_init(__thread, __name, __entry, __prio, __stack, __stacksize)\
+                __vsf_arch_irq_init(__thread, __name, __entry, __prio)
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -88,7 +104,7 @@ void vsf_thread_exit(void)
     vsf_eda_return();
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
     __vsf_arch_irq_request_send(pthis->rep);
-    __vsf_arch_irq_thread_exit();
+    __vsf_arch_irq_exit();
 #else
     longjmp(*(pthis->ret), -1);
 #endif
@@ -251,7 +267,7 @@ void __vsf_thread_host_thread(void *arg)
 
     VSF_KERNEL_ASSERT(VSF_EVT_INIT == thread->evt);
     __vsf_thread_entry();
-    __vsf_arch_irq_thread_exit();
+    __vsf_arch_irq_exit();
 }
 #endif
 
@@ -299,16 +315,21 @@ static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
     VSF_KERNEL_ASSERT(pthis != NULL);
 
 #   ifdef VSF_ARCH_LIMIT_NO_SET_STACK
-    vsf_arch_irq_request_t rep;
+    vsf_arch_irq_request_t rep = { 0 };
 
     pthis->rep = &rep;
-    __vsf_arch_irq_request_init(&rep, true);
+    __vsf_kernel_irq_request_init(&rep);
     pthis->evt = evt;
     switch (evt) {
     case VSF_EVT_INIT:
-        __vsf_arch_irq_request_init(&pthis->req, true);
-        __vsf_arch_irq_thread_start(&pthis->host_thread, "vsf_thread", __vsf_thread_host_thread,
+        if (!pthis->is_inited) {
+            pthis->is_inited = true;
+            __vsf_kernel_irq_request_init(&pthis->req);
+            __vsf_kernel_irq_init(&pthis->host_thread, "vsf_thread", __vsf_thread_host_thread,
                 -1, (VSF_ARCH_RTOS_STACK_T *)pthis->stack, pthis->stack_size / sizeof(VSF_ARCH_RTOS_STACK_T));
+        } else {
+            __vsf_kernel_irq_restart(&pthis->host_thread);
+        }
         // no need to send request because target thread is not pending for request after startup
         goto pend;
     default:
@@ -352,16 +373,21 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     VSF_KERNEL_ASSERT(pthis != NULL);
 
 #   ifdef VSF_ARCH_LIMIT_NO_SET_STACK
-    vsf_arch_irq_request_t rep;
+    vsf_arch_irq_request_t rep = { 0 };
 
     pthis->rep = &rep;
-    __vsf_arch_irq_request_init(&rep, true);
+    __vsf_kernel_irq_request_init(&rep);
     pthis->evt = evt;
     switch (evt) {
     case VSF_EVT_INIT:
-        __vsf_arch_irq_request_init(&pthis->req, true);
-        __vsf_arch_irq_thread_start(&pthis->host_thread, __vsf_thread_host_thread,
+        if (!pthis->is_inited) {
+            pthis->is_inited = true;
+            __vsf_kernel_irq_request_init(&pthis->req);
+            __vsf_kernel_irq_init(&pthis->host_thread, "host_thread", __vsf_thread_host_thread,
                 -1, (VSF_ARCH_RTOS_STACK_T *)pthis->stack, pthis->stack_size / sizeof(VSF_ARCH_RTOS_STACK_T));
+        } else {
+            __vsf_kernel_irq_restart(&pthis->host_thread);
+        }
         // no need to send request because target thread is not pending for request after startup
         goto pend;
     default:
@@ -434,6 +460,10 @@ vsf_err_t vsf_thread_start( vsf_thread_t *pthis,
         return VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED;
     }
 
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+    thread_cb->is_inited = false;
+#endif
+
     vsf_err_t err;
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     err = vsf_teda_start(&pthis->use_as__vsf_teda_t, &cfg);
@@ -502,11 +532,30 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
 
     vsf_err_t err;
 
-    enum {
-        VSF_THREAD_CALL_PEDA = 0,
-        VSF_THREAD_WAIT_RETURN,
-    };
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+    err = __vsf_eda_call_eda_ex_prepare(eda_handler, param, state, true);
+    VSF_KERNEL_ASSERT(VSF_ERR_NONE == err);
+    if ((uintptr_t)NULL != local_buff) {
+        //! initialise local
+        size_t size = min(state.local_size, local_buff_size);
+        if (size > 0) {
+            uintptr_t local = vsf_eda_get_local();
+            memcpy((void *)local, (void *)local_buff, size);
+        }
+    }
 
+#   if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
+    extern void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
+    __vsf_dispatch_evt((vsf_eda_t *)thread_obj, VSF_EVT_INIT);
+#   else
+    if (VSF_ERR_NONE != vsf_eda_post_evt((vsf_eda_t *)thread_obj, VSF_EVT_INIT)) {
+        VSF_KERNEL_ASSERT(false);
+    }
+#   endif
+    vsf_evt_t evt = __vsf_thread_wait(cb_obj);
+    VSF_KERNEL_ASSERT(evt == VSF_EVT_RETURN);
+
+#else
     jmp_buf pos;
     cb_obj->pos = &pos;
     if (!setjmp(*(cb_obj->pos))) {
@@ -521,23 +570,23 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
             }
         }
 
-#if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
+#   if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
         extern void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
         __vsf_dispatch_evt((vsf_eda_t *)thread_obj, VSF_EVT_INIT);
-#else
+#   else
         if (VSF_ERR_NONE != vsf_eda_post_evt((vsf_eda_t *)thread_obj, VSF_EVT_INIT)) {
             VSF_KERNEL_ASSERT(false);
         }
-#endif
-#if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+#   endif
+#   if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
         // can not check stack here, because __vsf_eda_call_eda_ex_prepare switch
         //  current frame to eda context instead of thread context
 //        vsf_thread_stack_check();
-#endif
+#   endif
         longjmp(*(cb_obj->ret), -1);
     }
     cb_obj->pos = NULL;
-
+#endif
     return err;
 }
 
