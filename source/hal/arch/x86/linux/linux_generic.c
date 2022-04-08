@@ -268,6 +268,30 @@ static vsf_err_t __vsf_arch_create_irq_thread(vsf_arch_irq_thread_t *irq_thread,
     return VSF_ERR_NOT_ENOUGH_RESOURCES;
 }
 
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+void __vsf_arch_irq_exit(void)
+{
+    pthread_exit((void *)0);
+}
+
+vsf_err_t __vsf_kernel_irq_restart(vsf_arch_irq_thread_t *irq_thread)
+{
+    vsf_arch_thread_t *thread = irq_thread->arch_thread;
+    int idx = __vsf_arch_get_thread_idx(thread);
+
+    pthread_cancel(thread->pthread);
+    if (0 != pthread_create(&thread->pthread, NULL, __vsf_arch_irq_entry, thread)) {
+        VSF_HAL_ASSERT(false);
+    }
+
+    __vsf_arch_crit_enter(__vsf_arch_common.lock);
+        vsf_bitmap_clear(&__vsf_arch.thread.bitmap, idx);
+    __vsf_arch_crit_leave(__vsf_arch_common.lock);
+
+    return __vsf_arch_create_irq_thread(irq_thread, irq_thread->entry);
+}
+#endif
+
 void __vsf_arch_irq_sleep(uint32_t ms)
 {
     usleep(ms * 1000);

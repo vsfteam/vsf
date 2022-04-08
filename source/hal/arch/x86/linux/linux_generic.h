@@ -64,9 +64,16 @@ extern "C" {
 #if     defined(__CPU_X86__)
 // x86 stack alignment is 8bytes
 #   define VSF_ARCH_STACK_ALIGN_BIT     3
-#elif   defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)
+#elif   defined(__CPU_X64__)
 // x64 stack alignment is 16bytes
 #   define VSF_ARCH_STACK_ALIGN_BIT     4
+#elif   defined(__CPU_WEBASSEMBLY__)
+//#   define VSF_ARCH_STACK_ALIGN_BIT     4
+#   define VSF_ARCH_LIMIT_NO_SET_STACK
+// manual reset is not supported
+//#   define VSF_ARCH_IRQ_REQUEST_SUPPORT_MANUAL_RESET
+// stack is not supported
+//#   define VSF_ARCH_IRQ_SUPPORT_STACK
 #endif
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
@@ -134,12 +141,15 @@ extern void __vsf_arch_irq_set_background(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_start(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_end(vsf_arch_irq_thread_t *irq_thread, bool is_terminate);
 
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+extern void __vsf_arch_irq_exit(void);
+extern vsf_err_t __vsf_kernel_irq_restart(vsf_arch_irq_thread_t *irq_thread);
+#endif
+
+#ifndef __CPU_WEBASSEMBLY__
 static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {
-#if     defined(__CPU_WEBASSEMBLY__)
-    extern void stackRestore(int stack);
-    stackRestore(stack);
-#elif   defined(__CPU_X86__)
+#if     defined(__CPU_X86__)
     __asm__("movl %0, %%esp" : : "r"(stack));
 #elif   defined(__CPU_X64__)
     __asm__("movq %0, %%rsp" : : "r"(stack));
@@ -149,16 +159,14 @@ static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 static ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)
 {
     uintptr_t stack;
-#if     defined(__CPU_WEBASSEMBLY__)
-    extern int stackSave(void);
-    stack = stackSave();
-#elif   defined(__CPU_X86__)
+#if     defined(__CPU_X86__)
     __asm__("movl %%esp, %0" : "=r"(stack) :);
 #elif   defined(__CPU_X64__)
     __asm__("movq %%esp, %0" : "=r"(stack) :);
 #endif
     return stack;
 }
+#endif
 
 #ifdef __cplusplus
 }
