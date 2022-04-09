@@ -39,18 +39,24 @@
 
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
 #   ifdef VSF_ARCH_IRQ_REQUEST_SUPPORT_MANUAL_RESET
-#       define __vsf_kernel_irq_request_init(__req)     __vsf_arch_irq_request_init((__req), true)
+#       define __vsf_kernel_host_request_init(__req)    __vsf_arch_irq_request_init((__req), true)
 #   else
-#       define __vsf_kernel_irq_request_init(__req)     __vsf_arch_irq_request_init(__req)
+#       define __vsf_kernel_host_request_init(__req)    __vsf_arch_irq_request_init(__req)
 #   endif
+#   define __vsf_kernel_host_request_fini(__req)        __vsf_arch_irq_request_fini(__req)
+#   define __vsf_kernel_host_request_send(__req)        __vsf_arch_irq_request_send(__req)
+#   define __vsf_kernel_host_request_pend(__req)        __vsf_arch_irq_request_pend(__req)
 
 #   ifdef VSF_ARCH_IRQ_SUPPORT_STACK
-#       define __vsf_kernel_irq_init(__thread, __name, __entry, __prio, __stack, __stacksize)\
+#       define __vsf_kernel_host_thread_init(__thread, __name, __entry, __prio, __stack, __stacksize)\
                 __vsf_arch_irq_init(__thread, __name, __entry, __prio, __stack, __stacksize)
 #   else
-#       define __vsf_kernel_irq_init(__thread, __name, __entry, __prio, __stack, __stacksize)\
+#       define __vsf_kernel_host_thread_init(__thread, __name, __entry, __prio, __stack, __stacksize)\
                 __vsf_arch_irq_init(__thread, __name, __entry, __prio)
 #   endif
+
+#   define __vsf_kernel_host_thread_restart(__thread)   __vsf_kernel_irq_restart(__thread)
+#   define __vsf_kernel_host_thread_exit(__thread)      __vsf_arch_irq_exit(__thread)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -103,8 +109,8 @@ void vsf_thread_exit(void)
 #endif
     vsf_eda_return();
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
-    __vsf_arch_irq_request_send(pthis->rep);
-    __vsf_arch_irq_exit();
+    __vsf_kernel_host_request_send(pthis->rep);
+    __vsf_kernel_host_thread_exit();
 #else
     longjmp(*(pthis->ret), -1);
 #endif
@@ -134,8 +140,8 @@ static vsf_evt_t __vsf_thread_wait(vsf_thread_cb_t *pthis)
     VSF_KERNEL_ASSERT(pthis != NULL);
 
 #   ifdef VSF_ARCH_LIMIT_NO_SET_STACK
-    __vsf_arch_irq_request_send(pthis->rep);
-    __vsf_arch_irq_request_pend(&pthis->req);
+    __vsf_kernel_host_request_send(pthis->rep);
+    __vsf_kernel_host_request_pend(&pthis->req);
     curevt = pthis->evt;
 #   else
     jmp_buf pos;
@@ -167,8 +173,8 @@ vsf_evt_t vsf_thread_wait(void)
     curevt = __vsf_thread_wait((vsf_thread_cb_t *)thread_obj->fn.frame->ptr.param);
 #else
 #    ifdef VSF_ARCH_LIMIT_NO_SET_STACK
-    __vsf_arch_irq_request_send(thread_obj->rep);
-    __vsf_arch_irq_request_pend(&thread_obj->req);
+    __vsf_kernel_host_request_send(thread_obj->rep);
+    __vsf_kernel_host_request_pend(&thread_obj->req);
     curevt = thread_obj->evt;
 #    else
     jmp_buf pos;
@@ -249,7 +255,7 @@ static void __vsf_thread_entry(void)
 #endif
     vsf_eda_return();
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
-    __vsf_arch_irq_request_send(pthis->rep);
+    __vsf_kernel_host_request_send(pthis->rep);
 #else
     longjmp(*(pthis->ret), -1);
 #endif
@@ -267,7 +273,7 @@ void __vsf_thread_host_thread(void *arg)
 
     VSF_KERNEL_ASSERT(VSF_EVT_INIT == thread->evt);
     __vsf_thread_entry();
-    __vsf_arch_irq_exit();
+    __vsf_kernel_host_thread_exit();
 }
 #endif
 
@@ -318,27 +324,29 @@ static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
     vsf_arch_irq_request_t rep = { 0 };
 
     pthis->rep = &rep;
-    __vsf_kernel_irq_request_init(&rep);
+    __vsf_kernel_host_request_init(&rep);
     pthis->evt = evt;
     switch (evt) {
     case VSF_EVT_INIT:
         if (!pthis->is_inited) {
             pthis->is_inited = true;
-            __vsf_kernel_irq_request_init(&pthis->req);
-            __vsf_kernel_irq_init(&pthis->host_thread, "vsf_thread", __vsf_thread_host_thread,
+            __vsf_kernel_host_request_init(&pthis->req);
+            __vsf_kernel_host_thread_init(&pthis->host_thread, "vsf_thread", __vsf_thread_host_thread,
                 -1, (VSF_ARCH_RTOS_STACK_T *)pthis->stack, pthis->stack_size / sizeof(VSF_ARCH_RTOS_STACK_T));
         } else {
-            __vsf_kernel_irq_restart(&pthis->host_thread);
+            __vsf_kernel_host_thread_restart(&pthis->host_thread);
+            __vsf_kernel_host_request_fini(&pthis->req);
+            __vsf_kernel_host_request_init(&pthis->req);
         }
         // no need to send request because target thread is not pending for request after startup
         goto pend;
     default:
-        __vsf_arch_irq_request_send(&pthis->req);
+        __vsf_kernel_host_request_send(&pthis->req);
     pend:
-        __vsf_arch_irq_request_pend(pthis->rep);
+        __vsf_kernel_host_request_pend(pthis->rep);
         break;
     }
-    __vsf_arch_irq_request_fini(&rep);
+    __vsf_kernel_host_request_fini(&rep);
     pthis->rep = NULL;
 #   else
     jmp_buf ret;
@@ -378,27 +386,29 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     vsf_arch_irq_request_t rep = { 0 };
 
     pthis->rep = &rep;
-    __vsf_kernel_irq_request_init(&rep);
+    __vsf_kernel_host_request_init(&rep);
     pthis->evt = evt;
     switch (evt) {
     case VSF_EVT_INIT:
         if (!pthis->is_inited) {
             pthis->is_inited = true;
-            __vsf_kernel_irq_request_init(&pthis->req);
-            __vsf_kernel_irq_init(&pthis->host_thread, "host_thread", __vsf_thread_host_thread,
+            __vsf_kernel_host_request_init(&pthis->req);
+            __vsf_kernel_host_thread_init(&pthis->host_thread, "host_thread", __vsf_thread_host_thread,
                 -1, (VSF_ARCH_RTOS_STACK_T *)pthis->stack, pthis->stack_size / sizeof(VSF_ARCH_RTOS_STACK_T));
         } else {
-            __vsf_kernel_irq_restart(&pthis->host_thread);
+            __vsf_kernel_host_thread_restart(&pthis->host_thread);
+            __vsf_kernel_host_request_fini(&pthis->req);
+            __vsf_kernel_host_request_init(&pthis->req);
         }
         // no need to send request because target thread is not pending for request after startup
         goto pend;
     default:
-        __vsf_arch_irq_request_send(&pthis->req);
+        __vsf_kernel_host_request_send(&pthis->req);
     pend:
-        __vsf_arch_irq_request_pend(pthis->rep);
+        __vsf_kernel_host_request_pend(pthis->rep);
         break;
     }
-    __vsf_arch_irq_request_fini(&rep);
+    __vsf_kernel_host_request_fini(&rep);
     pthis->rep = NULL;
 #   else
     jmp_buf ret;

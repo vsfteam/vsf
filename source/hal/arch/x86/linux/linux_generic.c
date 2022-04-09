@@ -176,8 +176,10 @@ void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request)
 {
     VSF_HAL_ASSERT(request->is_inited);
     pthread_cond_t *cond = &__vsf_arch.irq_request.pool[request->id].cond;
+    pthread_mutex_t *mutex = &__vsf_arch.irq_request.pool[request->id].mutex;
 
     pthread_cond_destroy(cond);
+    pthread_mutex_destroy(mutex);
 
     __vsf_arch_crit_enter(__vsf_arch_common.lock);
         vsf_bitmap_clear(&__vsf_arch.irq_request.bitmap, request->id);
@@ -281,9 +283,6 @@ vsf_err_t __vsf_kernel_irq_restart(vsf_arch_irq_thread_t *irq_thread)
     int idx = __vsf_arch_get_thread_idx(thread);
 
     pthread_cancel(thread->pthread);
-    __vsf_arch_irq_request_fini(&thread->start_request);
-
-    __vsf_arch_irq_request_init(&thread->start_request);
     if (0 != pthread_create(&thread->pthread, NULL, __vsf_arch_irq_entry, thread)) {
         VSF_HAL_ASSERT(false);
     }
