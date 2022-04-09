@@ -338,6 +338,8 @@ static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
         __vsf_arch_irq_request_pend(pthis->rep);
         break;
     }
+    __vsf_arch_irq_request_fini(&rep);
+    pthis->rep = NULL;
 #   else
     jmp_buf ret;
 
@@ -396,6 +398,8 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         __vsf_arch_irq_request_pend(pthis->rep);
         break;
     }
+    __vsf_arch_irq_request_fini(&rep);
+    pthis->rep = NULL;
 #   else
     jmp_buf ret;
 
