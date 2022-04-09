@@ -227,6 +227,7 @@ extern vsf_err_t __vsf_kernel_irq_restart(vsf_arch_irq_thread_t *irq_thread);
 // for trace only
 extern vsf_systimer_tick_t __vsf_systimer_get(void);
 
+#ifndef VSF_ARCH_LIMIT_NO_SET_STACK
 static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {
 #if     defined(__CPU_X86__)
@@ -246,6 +247,7 @@ static ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)
 #endif
     return stack;
 }
+#endif
 
 #ifdef __cplusplus
 }

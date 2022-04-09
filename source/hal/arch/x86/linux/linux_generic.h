@@ -146,7 +146,7 @@ extern void __vsf_arch_irq_exit(void);
 extern vsf_err_t __vsf_kernel_irq_restart(vsf_arch_irq_thread_t *irq_thread);
 #endif
 
-#ifndef __CPU_WEBASSEMBLY__
+#ifndef VSF_ARCH_LIMIT_NO_SET_STACK
 static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {
 #if     defined(__CPU_X86__)
