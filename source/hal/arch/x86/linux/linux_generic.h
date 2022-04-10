@@ -103,7 +103,9 @@ typedef void (*vsf_arch_irq_entry_t)(void*);
 vsf_class(vsf_arch_irq_request_t) {
     private_member(
         int id;
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
         void *irq_thread_to_exit;
+#endif
         void *arch_thread;
         bool is_triggered;
         bool is_inited;
@@ -121,8 +123,10 @@ typedef volatile bool vsf_gint_state_t;
 vsf_class(vsf_arch_irq_thread_t) {
     private_member(
         implement(vsf_arch_irq_thread_common_t)
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
         void *exit;
         bool is_to_restart;
+#endif
     )
 };
 

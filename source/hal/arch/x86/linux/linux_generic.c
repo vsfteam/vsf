@@ -206,11 +206,13 @@ void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request)
     pthread_mutex_unlock(mutex);
     vsf_arch_request_trace(request, "got");
 
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
     vsf_arch_irq_thread_t *irq_thread = request->irq_thread_to_exit;
     if (irq_thread != NULL) {
         request->irq_thread_to_exit = NULL;
         __vsf_arch_irq_exit(irq_thread);
     }
+#endif
 }
 
 void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
@@ -241,17 +243,23 @@ static void * __vsf_arch_irq_entry(void *arg)
 
         vsf_arch_irq_thread_t *irq_thread = thread->param;
         vsf_arch_irq_trace("irq_thread_start %s\n", irq_thread->name);
+
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
         irq_thread->exit = (void *)&exit;
         if (!setjmp(exit)) {
+#endif
             if (irq_thread->entry != NULL) {
                 irq_thread->entry(irq_thread);
             }
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
         }
         irq_thread->exit = NULL;
 
         if (irq_thread->is_to_restart) {
             irq_thread->is_to_restart = false;
-        } else {
+        } else
+#endif
+        {
             __vsf_arch_crit_enter(__vsf_arch_common.lock);
                 vsf_bitmap_clear(&__vsf_arch.thread.bitmap, idx);
             __vsf_arch_crit_leave(__vsf_arch_common.lock);
