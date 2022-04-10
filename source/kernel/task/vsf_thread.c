@@ -55,7 +55,8 @@
                 __vsf_arch_irq_init(__thread, __name, __entry, __prio)
 #   endif
 
-#   define __vsf_kernel_host_thread_restart(__thread)   __vsf_kernel_irq_restart(__thread)
+#   define __vsf_kernel_host_thread_restart(__thread, __request_pending)        \
+                __vsf_arch_irq_restart((__thread), (__request_pending))
 #   define __vsf_kernel_host_thread_exit(__thread)      __vsf_arch_irq_exit(__thread)
 #endif
 
@@ -110,7 +111,7 @@ void vsf_thread_exit(void)
     vsf_eda_return();
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
     __vsf_kernel_host_request_send(pthis->rep);
-    __vsf_kernel_host_thread_exit();
+    __vsf_kernel_host_thread_exit(&pthis->host_thread);
 #else
     longjmp(*(pthis->ret), -1);
 #endif
@@ -273,7 +274,7 @@ void __vsf_thread_host_thread(void *arg)
 
     VSF_KERNEL_ASSERT(VSF_EVT_INIT == thread->evt);
     __vsf_thread_entry();
-    __vsf_kernel_host_thread_exit();
+    __vsf_kernel_host_thread_exit(&thread->host_thread);
 }
 #endif
 
@@ -334,7 +335,7 @@ static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
             __vsf_kernel_host_thread_init(&pthis->host_thread, "vsf_thread", __vsf_thread_host_thread,
                 -1, (VSF_ARCH_RTOS_STACK_T *)pthis->stack, pthis->stack_size / sizeof(VSF_ARCH_RTOS_STACK_T));
         } else {
-            __vsf_kernel_host_thread_restart(&pthis->host_thread);
+            __vsf_kernel_host_thread_restart(&pthis->host_thread, &pthis->req);
             __vsf_kernel_host_request_fini(&pthis->req);
             __vsf_kernel_host_request_init(&pthis->req);
         }
@@ -396,7 +397,7 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             __vsf_kernel_host_thread_init(&pthis->host_thread, "host_thread", __vsf_thread_host_thread,
                 -1, (VSF_ARCH_RTOS_STACK_T *)pthis->stack, pthis->stack_size / sizeof(VSF_ARCH_RTOS_STACK_T));
         } else {
-            __vsf_kernel_host_thread_restart(&pthis->host_thread);
+            __vsf_kernel_host_thread_restart(&pthis->host_thread, &pthis->req);
             __vsf_kernel_host_request_fini(&pthis->req);
             __vsf_kernel_host_request_init(&pthis->req);
         }

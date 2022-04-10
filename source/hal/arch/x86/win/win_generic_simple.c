@@ -118,12 +118,13 @@ static vsf_err_t __vsf_arch_create_irq_thread(vsf_arch_irq_thread_t *irq_thread,
 }
 
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
-void __vsf_arch_irq_exit(void)
+void __vsf_arch_irq_exit(vsf_arch_irq_thread_t *irq_thread)
 {
     ExitThread(0);
 }
 
-vsf_err_t __vsf_kernel_irq_restart(vsf_arch_irq_thread_t *irq_thread)
+vsf_err_t __vsf_arch_irq_restart(vsf_arch_irq_thread_t *irq_thread,
+                    vsf_arch_irq_request_t *request_pending)
 {
     TerminateThread(irq_thread->thread, 0);
     return __vsf_arch_create_irq_thread(irq_thread, irq_thread->entry);
