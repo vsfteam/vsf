@@ -336,8 +336,6 @@ static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
                 -1, (VSF_ARCH_RTOS_STACK_T *)pthis->stack, pthis->stack_size / sizeof(VSF_ARCH_RTOS_STACK_T));
         } else {
             __vsf_kernel_host_thread_restart(&pthis->host_thread, &pthis->req);
-            __vsf_kernel_host_request_fini(&pthis->req);
-            __vsf_kernel_host_request_init(&pthis->req);
         }
         // no need to send request because target thread is not pending for request after startup
         goto pend;
@@ -398,8 +396,6 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 -1, (VSF_ARCH_RTOS_STACK_T *)pthis->stack, pthis->stack_size / sizeof(VSF_ARCH_RTOS_STACK_T));
         } else {
             __vsf_kernel_host_thread_restart(&pthis->host_thread, &pthis->req);
-            __vsf_kernel_host_request_fini(&pthis->req);
-            __vsf_kernel_host_request_init(&pthis->req);
         }
         // no need to send request because target thread is not pending for request after startup
         goto pend;
