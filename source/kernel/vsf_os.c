@@ -33,6 +33,16 @@
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
+
+#ifdef VSF_ARCH_ENTRY_NO_PENDING
+#   ifndef VSF_ARCH_LIMIT_NO_SET_STACK
+#       error VSF_ARCH_ENTRY_NO_PENDING depends on VSF_ARCH_LIMIT_NO_SET_STACK
+#   endif
+#   ifdef VSF_ARCH_IRQ_SUPPORT_STACK
+#       error TODO: add configuration to set stack of main_thread
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -49,6 +59,10 @@ typedef struct vsf_os_t {
     vsf_cpu_usage_t usage;
 #endif
     const vsf_kernel_resource_t *res_ptr;
+
+#ifdef VSF_ARCH_ENTRY_NO_PENDING
+    vsf_arch_irq_thread_t main_thread;
+#endif
 } vsf_os_t;
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -628,17 +642,34 @@ void __vsf_kernel_os_start(void)
     __post_vsf_kernel_init();
 }
 
+#ifdef VSF_ARCH_ENTRY_NO_PENDING
+static void __vsf_main_thread(void *arg)
+{
+    while (1) {
+#   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
+        __vsf_kernel_os_run_priority(vsf_prio_0);
+#   endif
+        vsf_plug_in_for_kernel_diagnosis(); //!< customised kernel diagnosis
+        vsf_plug_in_on_kernel_idle();       //!< user defined idle task
+    }
+}
+#endif
+
 void __vsf_main_entry(void)
 {
     __vsf_kernel_os_start();
 
+#ifdef VSF_ARCH_ENTRY_NO_PENDING
+    __vsf_kernel_host_thread_init(&__vsf_os.main_thread, "main", __vsf_main_thread, vsf_arch_prio_0, NULL, 0);
+#else
     while (1) {
-    #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
+#   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
         __vsf_kernel_os_run_priority(vsf_prio_0);
-    #endif
+#   endif
         vsf_plug_in_for_kernel_diagnosis(); //!< customised kernel diagnosis
         vsf_plug_in_on_kernel_idle();       //!< user defined idle task
     }
+#endif
 }
 
 

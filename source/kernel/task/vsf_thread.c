@@ -37,29 +37,6 @@
 #   define longjmp              VSF_ARCH_LONGJMP
 #endif
 
-#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
-#   ifdef VSF_ARCH_IRQ_REQUEST_SUPPORT_MANUAL_RESET
-#       define __vsf_kernel_host_request_init(__req)    __vsf_arch_irq_request_init((__req), true)
-#   else
-#       define __vsf_kernel_host_request_init(__req)    __vsf_arch_irq_request_init(__req)
-#   endif
-#   define __vsf_kernel_host_request_fini(__req)        __vsf_arch_irq_request_fini(__req)
-#   define __vsf_kernel_host_request_send(__req)        __vsf_arch_irq_request_send(__req)
-#   define __vsf_kernel_host_request_pend(__req)        __vsf_arch_irq_request_pend(__req)
-
-#   ifdef VSF_ARCH_IRQ_SUPPORT_STACK
-#       define __vsf_kernel_host_thread_init(__thread, __name, __entry, __prio, __stack, __stacksize)\
-                __vsf_arch_irq_init(__thread, __name, __entry, __prio, __stack, __stacksize)
-#   else
-#       define __vsf_kernel_host_thread_init(__thread, __name, __entry, __prio, __stack, __stacksize)\
-                __vsf_arch_irq_init(__thread, __name, __entry, __prio)
-#   endif
-
-#   define __vsf_kernel_host_thread_restart(__thread, __request_pending)        \
-                __vsf_arch_irq_restart((__thread), (__request_pending))
-#   define __vsf_kernel_host_thread_exit(__thread)      __vsf_arch_irq_exit(__thread)
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
