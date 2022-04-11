@@ -36,7 +36,11 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USER_ENTRY
-#   define VSF_USER_ENTRY                   main
+#   ifdef VSF_ARCH_ENTRY_NO_PENDING
+#       define VSF_USER_ENTRY               user_main
+#   else
+#       define VSF_USER_ENTRY               main
+#   endif
 #endif
 
 #if VSF_OS_CFG_PRIORITY_NUM > 1
