@@ -115,10 +115,14 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
             case 'B':
                 curfmt = (char *)__mon_name[tm->tm_mon];
                 break;
+            case 'C':
+                value = tm->tm_year / 100;
+                break;
             case 'c':
-                subfmt = "%a %b %d %H:%M:%S %Y";
+                subfmt = "%a %b %e %H:%M:%S %Y";
                 break;
             case 'd':
+            case 'e':
                 value = tm->tm_mday;
                 break;
             case 'H':
@@ -211,7 +215,7 @@ static char * __asctime_r(const struct tm *tm, char *buf, size_t buflen)
 {
     VSF_LINUX_ASSERT(tm->tm_wday >= 0 && tm->tm_wday < 7);
     VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);
-    int n = strftime(buf, buflen, "%C", tm);
+    int n = strftime(buf, buflen, "%c", tm);
     return n < 0 ? NULL : buf;
 }
 
