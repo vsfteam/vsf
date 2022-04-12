@@ -459,7 +459,9 @@ static void __vsf_linux_hostsock_init(void)
 #endif
 
 #ifdef VSF_ARCH_NO_SOCKET_PAIR
-    pipe(__vsf_linux_hostsock.pipefd);
+    if (0 != pipe(__vsf_linux_hostsock.pipefd)) {
+        goto __assert_fail;
+    }
 #else
     struct sockaddr_in inaddr = {
         .sin_family = AF_INET,
