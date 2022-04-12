@@ -252,8 +252,13 @@ struct vsf_linux_socket_inet_hostsock_t {
     bool is_inited;
 
     // socket pair for event notifier to host irq_thread
-    socket_t sock_event_listener;
-    socket_t sock_event_notifier;
+    union {
+        struct {
+            socket_t sock_event_listener;
+            socket_t sock_event_notifier;
+        };
+        socket_t pipefd[2];
+    };
     struct sockaddr_in *inaddr;
 
     struct {
@@ -300,7 +305,9 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
     int ret, nfds;
 
     __vsf_arch_irq_set_background(irq_thread);
+#ifndef VSF_ARCH_NO_SOCKET_PAIR
     connect(__vsf_linux_hostsock.sock_event_listener, (const struct sockaddr *)__vsf_linux_hostsock.inaddr, sizeof(*__vsf_linux_hostsock.inaddr));
+#endif
     FD_ZERO(&__vsf_linux_hostsock.select.rfds);
     FD_ZERO(&__vsf_linux_hostsock.select.wfds);
     FD_SET(__vsf_linux_hostsock.sock_event_listener, &__vsf_linux_hostsock.select.rfds);
@@ -326,7 +333,11 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
         }
 
         if ((ret >= 1) && FD_ISSET(__vsf_linux_hostsock.sock_event_listener, &rfds)) {
+#ifdef VSF_ARCH_NO_SOCKET_PAIR
+            read(__vsf_linux_hostsock.sock_event_listener, (char *)&ret, 1);
+#else
             recv(__vsf_linux_hostsock.sock_event_listener, (char *)&ret, 1, 0);
+#endif
             FD_CLR(__vsf_linux_hostsock.sock_event_listener, &rfds);
             ret--;
         }
@@ -402,7 +413,11 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
 static void __vsf_linux_hostsock_notify(void)
 {
     char buf = 0;
+#ifdef VSF_ARCH_NO_SOCKET_PAIR
+    ssize_t size = write(__vsf_linux_hostsock.sock_event_notifier, &buf, 1);
+#else
     ssize_t size = send(__vsf_linux_hostsock.sock_event_notifier, &buf, 1, 0);
+#endif
     VSF_LINUX_ASSERT(size == 1);
 }
 
@@ -443,6 +458,9 @@ static void __vsf_linux_hostsock_init(void)
     WSAStartup(MAKEWORD(2, 2), &__vsf_linux_hostsock.wsaData);
 #endif
 
+#ifdef VSF_ARCH_NO_SOCKET_PAIR
+    pipe(__vsf_linux_hostsock.pipefd);
+#else
     struct sockaddr_in inaddr = {
         .sin_family = AF_INET,
         .sin_addr.s_addr = htonl(INADDR_LOOPBACK),
@@ -460,14 +478,18 @@ static void __vsf_linux_hostsock_init(void)
         ||  (INVALID_SOCKET == (__vsf_linux_hostsock.sock_event_listener = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)))) {
         goto __assert_fail;
     }
+#endif
 
     __vsf_arch_irq_init(&__vsf_linux_hostsock.irq_thread, "hostsock_irqthread", __vsf_linux_socket_inet_irqthread, vsf_arch_prio_0);
 
+#ifndef VSF_ARCH_NO_SOCKET_PAIR
     if (INVALID_SOCKET == (__vsf_linux_hostsock.sock_event_notifier = accept(listener, NULL, NULL))) {
         closesocket(listener);
         goto __assert_fail;
     }
     closesocket(listener);
+#endif
+
     __vsf_linux_hostsock.is_inited = true;
     return;
 __assert_fail:

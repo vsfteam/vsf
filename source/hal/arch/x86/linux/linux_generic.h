@@ -75,6 +75,7 @@ extern "C" {
 // stack is not supported
 //#   define VSF_ARCH_IRQ_SUPPORT_STACK
 #   define VSF_ARCH_ENTRY_NO_PENDING
+#   define VSF_ARCH_NO_SOCKET_PAIR
 #endif
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
