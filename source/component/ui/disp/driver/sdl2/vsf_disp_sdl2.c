@@ -41,6 +41,10 @@
 #   define VSF_DISP_SDL2_CFG_HW_PRIORITY                vsf_arch_prio_0
 #endif
 
+#ifndef VSF_DISP_SDL2_USE_CONTROLLER
+#   define VSF_DISP_SDL2_USE_CONTROLLER                 ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -80,7 +84,11 @@ const vk_disp_drv_t vk_disp_drv_sdl2 = {
 
 static void __vk_disp_sdl2_common_init(void)
 {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+    SDL_Init(SDL_INIT_VIDEO
+#if VSF_DISP_SDL2_USE_CONTROLLER == ENABLED
+        | SDL_INIT_GAMECONTROLLER
+#endif
+    );
 }
 
 static void __vk_disp_sdl2_common_fini(void)
@@ -423,6 +431,7 @@ static void __vk_disp_sdl2_event_thread(void *arg)
                         __vk_disp_sdl2_keymod_remap(event.key.keysym.mod));
                 }
                 break;
+#if VSF_DISP_SDL2_USE_CONTROLLER == ENABLED
             case SDL_CONTROLLERDEVICEADDED:
                 SDL_GameControllerOpen(event.cdevice.which);
                 break;
@@ -494,6 +503,7 @@ static void __vk_disp_sdl2_event_thread(void *arg)
                 default:                                    is_to_update = false;                       break;
                 }
                 break;
+#endif
             }
 
             if (is_to_update) {
