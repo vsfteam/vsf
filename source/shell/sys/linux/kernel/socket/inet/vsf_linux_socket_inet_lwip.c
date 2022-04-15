@@ -358,6 +358,18 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
         case SO_NONBLOCK:
             netconn_set_nonblocking(conn, *(const int *)optval);
             break;
+#if LWIP_SO_LINGER
+        case SO_LINGER: {
+                const struct linger *linger = optval;
+                if (linger->l_onoff) {
+                    VSF_LINUX_ASSERT(linger->l_linger >= 0);
+                    conn->linger = (s16_t)linger->l_linger;
+                } else {
+                    conn->linger = -1;
+                }
+            }
+            break;
+#endif
         default:
             // TODO: add support
             VSF_LINUX_ASSERT(false);
@@ -438,6 +450,21 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
         case SO_ERROR:
             *(int *)optval = err_to_errno(netconn_err(conn));
             break;
+#if LWIP_SO_LINGER
+        case SO_LINGER: {
+                s16_t conn_linger;
+                struct linger *linger = optval;
+                conn_linger = conn->linger;
+                if (conn_linger >= 0) {
+                    linger->l_onoff = 1;
+                    linger->l_linger = (int)conn_linger;
+                } else {
+                    linger->l_onoff = 0;
+                    linger->l_linger = 0;
+                }
+            }
+            break;
+#endif
         default:
             VSF_LINUX_ASSERT(false);
             break;

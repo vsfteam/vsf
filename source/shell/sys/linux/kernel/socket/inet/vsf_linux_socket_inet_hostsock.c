@@ -129,7 +129,7 @@ struct vsf_linux_pollfd {
 };
 extern int VSF_LINUX_WRAPPER(poll)(struct vsf_linux_pollfd *fds, vsf_linux_nfds_t nfds, int timeout);
 
-// from socket.h
+// from sys/socket.h
 #define VSF_LINUX_SOCKET_INVALID_SOCKET -1
 #define VSF_LINUX_SOCKET_SOCKET_ERROR   -1
 #define VSF_LINUX_SOCKET_AF_INET        2
@@ -152,11 +152,16 @@ enum {
 #define VSF_LINUX_SOCKET_SO_RCVTIMEO    10
 #define VSF_LINUX_SOCKET_SO_SNDTIMEO    11
 #define VSF_LINUX_SOCKET_SO_NONBLOCK    12
+#define VSF_LINUX_SOCKET_SO_LINGER      13
 typedef uint32_t socklen_t;
 typedef uint16_t vsf_linux_socket_sa_family_t;
 struct vsf_linux_socket_sockaddr {
     vsf_linux_socket_sa_family_t sa_family;
     char sa_data[14];
+};
+struct vsf_linux_socket_linger {
+    int l_onoff;
+    int l_linger;
 };
 
 // from netinet/in.h
@@ -598,6 +603,9 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     int ret;
+    union {
+        struct linger linger;
+    } tmpbuf;
 
     switch (level) {
     case VSF_LINUX_SOCKET_SOL_SOCKET:
@@ -628,6 +636,17 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                 ret = 0;
                 goto __return;
             }
+            break;
+        case VSF_LINUX_SOCKET_SO_LINGER: {
+                const struct vsf_linux_socket_linger *vsf_linux_linger = optval;
+
+                tmpbuf.linger.l_onoff = vsf_linux_linger->l_onoff;
+                tmpbuf.linger.l_linger = vsf_linux_linger->l_linger;
+                optval = &tmpbuf.linger;
+                optlen = sizeof(tmpbuf.linger);
+                optname = SO_LINGER;
+            }
+            break;
         default:                                VSF_LINUX_ASSERT(false);    break;
         }
         break;
@@ -652,6 +671,10 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
                     int level, int optname, void *optval, socklen_t *optlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
+    void *orig_optval = optval;
+    union {
+        struct linger linger;
+    } tmpbuf;
     int ret;
 
     switch (level) {
@@ -685,6 +708,12 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
             *(int *)optval = priv->is_nonblock;
             ret = 0;
             goto __return;
+        case VSF_LINUX_SOCKET_SO_LINGER:
+            VSF_LINUX_ASSERT(*optlen >= sizeof(struct vsf_linux_socket_linger));
+            optval = &tmpbuf.linger;
+            *optlen = sizeof(tmpbuf.linger);
+            optname = SO_LINGER;
+            break;
         default:                                VSF_LINUX_ASSERT(false);    break;
         }
         break;
@@ -701,6 +730,20 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
         break;
     }
     ret = getsockopt(priv->hostsock, level, optname, optval, (int *)optlen);
+    if (!ret) {
+        switch (level) {
+        case SOL_SOCKET:
+            switch (optname) {
+            case SO_LINGER: {
+                    struct vsf_linux_socket_linger *vsf_linux_linger = orig_optval;
+                    vsf_linux_linger->l_onoff = tmpbuf.linger.l_onoff;
+                    vsf_linux_linger->l_linger = tmpbuf.linger.l_linger;
+                    *optlen = sizeof(struct vsf_linux_socket_linger);
+                }
+                break;
+            }
+        }
+    }
 __return:
     return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
 }

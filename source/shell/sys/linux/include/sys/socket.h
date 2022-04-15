@@ -55,6 +55,11 @@ struct sockaddr_storage {
     char                sa_data[14];
 };
 
+struct linger {
+    int                 l_onoff;
+    int                 l_linger;
+};
+
 #if VSF_LINUX_SOCKET_CFG_WRAPPER == ENABLED
 #define VSF_LINUX_SOCKET_WRAPPER(__api)     VSF_SHELL_WRAPPER(vsf_linux_socket, __api)
 
@@ -92,6 +97,7 @@ struct sockaddr_storage {
 #define SO_RCVTIMEO     10
 #define SO_SNDTIMEO     11
 #define SO_NONBLOCK     12
+#define SO_LINGER       13
 
 int setsockopt(int socket, int level, int optname, const void *optval,
                     socklen_t optlen);
