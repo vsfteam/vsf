@@ -217,6 +217,7 @@ enum {
   PTHREAD_CANCEL_DEFERRED,
   PTHREAD_CANCEL_ASYNCHRONOUS,
 };
+#define PTHREAD_STACK_MIN       1024
 
 int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
 pthread_t pthread_self(void);
