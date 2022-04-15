@@ -148,20 +148,6 @@ extern void put_unaligned_cpu##__bitlen(uint_fast##__bitlen##_t, void *);       
 extern void put_unaligned_le##__bitlen(uint_fast##__bitlen##_t, void *);        \
 extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 
-
-#ifndef ffs32
-#   define ffs32(__n)                       vsf_ffs32(__n)
-#endif
-#ifndef ffz32
-#   define ffz32(__n)                       vsf_ffz32(__n)
-#endif
-#ifndef msb32
-#   define msb32(__n)                       vsf_msb32(__n)
-#endif
-#ifndef clz32
-#   define clz32(__n)                       vsf_clz32(__n)
-#endif
-
 #define __vsf_protect_region(__region)                                          \
     for (vsf_protect_t VSF_MACRO_SAFE_NAME(protect_status),                     \
             VSF_MACRO_SAFE_NAME(local_cnt) = 1;                                 \
