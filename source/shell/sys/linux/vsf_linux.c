@@ -34,6 +34,7 @@
 #   include "./include/signal.h"
 #   include "./include/sys/wait.h"
 #   include "./include/sys/ipc.h"
+#   include "./include/sys/mman.h"
 #   include "./include/sys/shm.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
@@ -50,6 +51,7 @@
 #   include <signal.h>
 #   include <sys/wait.h>
 #   include <sys/ipc.h>
+#   include <sys/mman.h>
 #   include <sys/shm.h>
 #   include <fcntl.h>
 #   include <errno.h>
@@ -1861,6 +1863,27 @@ int sethostname(const char *name, size_t len)
     }
     memcpy(__vsf_linux.hostname, name, len);
     __vsf_linux.hostname[len] = '\0';
+    return 0;
+}
+
+// sys/mman.h
+void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
+{
+    if ((fd >= 0) || (off != 0)) {
+        return NULL;
+    }
+
+    return malloc(len);
+}
+
+int munmap(void *addr, size_t len)
+{
+    free(addr);
+    return 0;
+}
+
+int mprotect(void *addr, size_t len, int prot)
+{
     return 0;
 }
 
