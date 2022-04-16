@@ -72,6 +72,7 @@ struct stat {
     dev_t           st_rdev;
     ino_t           st_ino;
     mode_t          st_mode;
+    nlink_t         st_nlink;
     uid_t           st_uid;
     gid_t           st_gid;
     off_t           st_size;

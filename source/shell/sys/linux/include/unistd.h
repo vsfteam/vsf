@@ -61,6 +61,8 @@ extern "C" {
 #define gethostname         VSF_LINUX_WRAPPER(gethostname)
 #define sethostname         VSF_LINUX_WRAPPER(sethostname)
 
+#define getentropy          VSF_LINUX_WRAPPER(getentropy)
+
 #if __IS_COMPILER_IAR__
 #else
 #   define creat            VSF_LINUX_WRAPPER(creat)
@@ -172,6 +174,8 @@ int tcsetpgrp(int fd, pid_t pgrp);
 char * getpass(const char *prompt);
 int gethostname(char *name, size_t len);
 int sethostname(const char *name, size_t len);
+
+int getentropy(void *buffer, size_t length);
 
 #ifdef __cplusplus
 }

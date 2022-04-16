@@ -36,6 +36,7 @@ typedef unsigned int        size_t;
 typedef int                 key_t;
 typedef int                 pid_t;
 typedef unsigned int        mode_t;
+typedef unsigned int        nlink_t;
 typedef unsigned int        uid_t;
 typedef unsigned int        gid_t;
 typedef long                off_t;

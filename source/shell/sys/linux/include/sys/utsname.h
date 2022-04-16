@@ -21,8 +21,12 @@ extern "C" {
 #ifndef VSF_LINUX_MACHINE
 #   define VSF_LINUX_MACHINE    "unknown"
 #endif
+#ifndef VSF_LINUX_NODENAME
+#   define VSF_LINUX_NODENAME   "unknown"
+#endif
 struct utsname {
     char sysname[sizeof(VSF_LINUX_SYSNAME)];
+    char nodename[sizeof(VSF_LINUX_NODENAME)];
     char release[sizeof(VSF_LINUX_RELEASE)];
     char version[sizeof(VSF_LINUX_VERSION)];
     char machine[sizeof(VSF_LINUX_MACHINE)];

@@ -36,6 +36,7 @@
 #   include "./include/sys/ipc.h"
 #   include "./include/sys/mman.h"
 #   include "./include/sys/shm.h"
+#   include "./include/sys/random.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -53,6 +54,7 @@
 #   include <sys/ipc.h>
 #   include <sys/mman.h>
 #   include <sys/shm.h>
+#   include <sys/random.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -1835,6 +1837,7 @@ int uname(struct utsname *name)
 {
     static const struct utsname __name = {
         .sysname    = VSF_LINUX_SYSNAME,
+        .nodename   = VSF_LINUX_NODENAME,
         .release    = VSF_LINUX_RELEASE,
         .version    = VSF_LINUX_VERSION,
         .machine    = VSF_LINUX_MACHINE,
@@ -1885,6 +1888,35 @@ int munmap(void *addr, size_t len)
 int mprotect(void *addr, size_t len, int prot)
 {
     return 0;
+}
+
+// sys/random.h
+#if VSF_HAL_USE_RNG == ENABLED && VSF_HW_RNG_COUNT > 0
+static void __getrandom_on_ready(void *param, uint32_t *buffer, uint32_t num)
+{
+    vsf_eda_post_evt((vsf_eda_t *)param, VSF_EVT_USER);
+}
+#endif
+
+ssize_t getrandom(void *buf, size_t buflen, unsigned int flags)
+{
+#if VSF_HAL_USE_RNG == ENABLED && VSF_HW_RNG_COUNT > 0
+    if (VSF_ERR_NONE == vsf_hw_rng_generate_request(&vsf_hw_rng0, buf, buflen,
+            vsf_eda_get_cur(), __getrandom_on_ready)) {
+        vsf_thread_wfe(VSF_EVT_USER);
+        return buflen;
+    }
+    return 0;
+#else
+    VSF_LINUX_ASSERT(false);
+#endif
+    return 0;
+}
+
+int getentropy(void *buf, size_t length)
+{
+    ssize_t length_ret = getrandom(buf, length, 0);
+    return (length_ret == length) ? 0 : -1;
 }
 
 // spawn.h
