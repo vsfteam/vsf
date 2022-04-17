@@ -76,6 +76,11 @@ extern "C" {
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
 #define VSF_ARCH_PROVIDE_HEAP
+#if     defined(__CPU_X86__)
+#   define VSF_ARCH_HEAP_ALIGN          8
+#elif   defined(__CPU_X64__)
+#   define VSF_ARCH_HEAP_ALIGN          16
+#endif
 
 #ifndef FAR
 #   define FAR

@@ -42,6 +42,17 @@
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifdef VSF_ARCH_PROVIDE_HEAP
+#   ifdef VSF_ARCH_HEAP_ALIGN
+#       define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN       VSF_ARCH_HEAP_ALIGN
+#   else
+#       define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN       (2 * sizeof(int))
+#   endif
+#else
+#   define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN           (2 * sizeof(int))
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -101,14 +112,16 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, 
 
 void * __malloc_ex(vsf_linux_process_t *process, int size, ...)
 {
-    size += sizeof(size_t);
+    size += VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
     size_t *i = vsf_heap_malloc(size);
     if (i != NULL) {
+        void *buffer = (void *)((char *)i + VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN);
+
         va_list ap;
         va_start(ap, size);
-            *i = __vsf_linux_heap_trace_alloc(process, (void *)(i + 1), size, ap);
+            *i = __vsf_linux_heap_trace_alloc(process, buffer, size, ap);
         va_end(ap);
-        return (void *)(i + 1);
+        return buffer;
     } else {
         errno = ENOMEM;
     }
@@ -130,7 +143,8 @@ void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...)
     } else {
         void *new_buff = __malloc_ex(process, size);
         if (new_buff != NULL) {
-            size_t copy_size = vsf_heap_size((uint8_t *)p - sizeof(size_t)) - sizeof(size_t);
+            size_t copy_size = vsf_heap_size((uint8_t *)p - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN)
+                                    - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
             copy_size = min(size, copy_size);
             memcpy(new_buff, p, copy_size);
         }
@@ -142,7 +156,7 @@ void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...)
 void __free_ex(vsf_linux_process_t *process, void *ptr, ...)
 {
     if (ptr != NULL) {
-        size_t *i = (size_t *)ptr - 1;
+        size_t *i = (size_t *)((char *)ptr - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN);
         va_list ap;
         va_start(ap, ptr);
             __vsf_linux_heap_trace_free(process, *i, ptr, ap);
