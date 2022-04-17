@@ -44,13 +44,9 @@
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_ARCH_PROVIDE_HEAP
-#   ifdef VSF_ARCH_HEAP_ALIGN
-#       define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN       VSF_ARCH_HEAP_ALIGN
-#   else
-#       define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN       (2 * sizeof(int))
-#   endif
+#   define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN           vsf_arch_heap_alignment()
 #else
-#   define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN           (2 * sizeof(int))
+#   define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN           VSF_HEAP_ALIGN
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

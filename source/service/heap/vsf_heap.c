@@ -602,7 +602,7 @@ void * vsf_heap_malloc_imp(uint_fast32_t size)
     }
     return buffer;
 #else
-    return vsf_heap_malloc_aligned(size, 0);
+    return vsf_heap_malloc_aligned(size, VSF_HEAP_ALIGN);
 #endif
 }
 
@@ -650,7 +650,7 @@ void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size)
     }
     return new_buffer;
 #else
-    return vsf_heap_realloc_aligned(buffer, size, sizeof(uintalu_t));
+    return vsf_heap_realloc_aligned(buffer, size, VSF_HEAP_ALIGN);
 #endif
 }
 

@@ -56,6 +56,10 @@ extern "C" {
 #   define VSF_HEAP_SIZE    (128 * 1024)
 #endif
 
+#ifndef VSF_HEAP_ALIGN
+#   define VSF_HEAP_ALIGN   (2 * sizeof(uintalu_t))
+#endif
+
 #if VSF_HEAP_CFG_TRACE == ENABLED
 #   define vsf_heap_malloc_aligned(...)                                         \
     ({                                                                          \
