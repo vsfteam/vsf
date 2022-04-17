@@ -22,6 +22,7 @@
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
 
 #define __VSF_LINUX_FS_CLASS_INHERIT__
+#define _GNU_SOURCE
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/sys/types.h"
@@ -501,6 +502,12 @@ int remove(const char * pathname)
         return -1;
     }
     return 0;
+}
+
+ssize_t getline(char **lineptr, size_t *n, FILE *f)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO

@@ -71,6 +71,10 @@ extern "C" {
 
 #define tmpfile             VSF_LINUX_LIBC_WRAPPER(tmpfile)
 #define tmpnam              VSF_LINUX_LIBC_WRAPPER(tmpnam)
+
+#if defined(_GNU_SOURCE)
+#define getline             VSF_LINUX_LIBC_WRAPPER(getline)
+#endif
 #endif
 
 #ifdef __WIN__
@@ -179,6 +183,10 @@ int rename(const char *oldname, const char *newname);
 
 FILE * tmpfile(void);
 char * tmpnam(char *str);
+
+#if defined(_GNU_SOURCE)
+ssize_t getline(char **lineptr, size_t *n, FILE *f);
+#endif
 
 #ifdef __cplusplus
 }
