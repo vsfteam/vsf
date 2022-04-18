@@ -317,10 +317,27 @@ static char * __vsh_expand_arg(vsf_linux_process_t *process, char *arg)
     return NULL == real_arg ? arg : real_arg;
 }
 
+static int __vsh_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry)
+{
+    int exefd = -1;
+    if (cmd[0] != '/') {
+        exefd = __vsh_get_exe(NULL, 0, cmd, entry);
+    }
+
+    if (exefd < 0) {
+        exefd = vsf_linux_fs_get_executable(cmd, entry);
+        if (exefd < 0) {
+            return -1;
+        }
+    }
+    close(exefd);
+    return 0;
+}
+
 static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
 {
     char *next;
-    int exefd = -1, ret;
+    int ret;
     vsf_linux_main_entry_t entry;
     char *env[2], *arg_expanded;
 
@@ -357,19 +374,11 @@ static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_
     }
 
     // search in path first if not absolute path
-    if (cmd[0] != '/') {
-        exefd = __vsh_get_exe(NULL, 0, cmd, &entry);
+    if (__vsh_get_exe_entry(cmd, &entry) < 0) {
+        printf("%s not found" VSH_LINEEND, cmd);
+        errno = ENOENT;
+        goto delete_process_and_fail;
     }
-
-    if (exefd < 0) {
-        exefd = vsf_linux_fs_get_executable(cmd, &entry);
-        if (exefd < 0) {
-            printf("%s not found" VSH_LINEEND, cmd);
-            errno = ENOENT;
-            goto delete_process_and_fail;
-        }
-    }
-    close(exefd);
 
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     arg_expanded = __strdup_ex(process, cmd);
@@ -780,6 +789,29 @@ int clear_main(int argc, char *argv[])
 {
     printf("\033[2J\033[H");
     return 0;
+}
+
+int time_main(int argc, char *argv[])
+{
+    if (argc < 2) {
+        printf("format: time CMD ARG ..." VSH_LINEEND);
+        return -1;
+    }
+
+    vsf_linux_main_entry_t entry;
+    if (__vsh_get_exe_entry(argv[1], &entry) < 0) {
+        printf("command %s not found" VSH_LINEEND, argv[1]);
+        return -1;
+    }
+
+    uint32_t start_ms, end_ms;
+    start_ms = vsf_systimer_get_ms();
+
+    int ret = entry(argc - 1, argv + 1);
+
+    end_ms = vsf_systimer_get_ms();
+    printf("%s take %d ms" VSH_LINEEND, argv[1], end_ms - start_ms);
+    return ret;
 }
 
 #if !defined(VSF_ARCH_PROVIDE_HEAP) && VSF_HEAP_CFG_STATISTICS == ENABLED
