@@ -75,6 +75,24 @@ static const vsf_linux_thread_op_t __vsf_linux_pthread_op = {
 #   pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
 #endif
 
+static vsf_timeout_tick_t __vsf_linux_abstimespec_to_timeout(const struct timespec *abstime)
+{
+    vsf_timeout_tick_t timeout = -1;
+    if (abstime != NULL) {
+        struct timespec now, due = *abstime;
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        vsf_systimer_tick_t now_tick =  vsf_systimer_ms_to_tick(now.tv_sec * 1000)
+                                    +   vsf_systimer_us_to_tick(now.tv_nsec / 1000);
+        vsf_systimer_tick_t due_tick =  vsf_systimer_ms_to_tick(due.tv_sec * 1000)
+                                    +   vsf_systimer_us_to_tick(due.tv_nsec / 1000);
+        if (now_tick >= due_tick) {
+            return ETIMEDOUT;
+        }
+        timeout = due_tick - now_tick;
+    }
+    return timeout;
+}
+
 static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
@@ -535,19 +553,7 @@ int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
         return EINVAL;
     }
 
-    vsf_timeout_tick_t timeout = -1;
-    if (abstime != NULL) {
-        struct timespec now, due = *abstime;
-        clock_gettime(CLOCK_MONOTONIC, &now);
-        vsf_systimer_tick_t now_tick =  vsf_systimer_ms_to_tick(now.tv_sec * 1000)
-                                    +   vsf_systimer_us_to_tick(now.tv_nsec / 1000);
-        vsf_systimer_tick_t due_tick =  vsf_systimer_ms_to_tick(due.tv_sec * 1000)
-                                    +   vsf_systimer_us_to_tick(due.tv_nsec / 1000);
-        if (now_tick >= due_tick) {
-            return ETIMEDOUT;
-        }
-        timeout = due_tick - now_tick;
-    }
+    vsf_timeout_tick_t timeout = __vsf_linux_abstimespec_to_timeout(abstime);
     __vsf_eda_sync_pend(cond, NULL, timeout);
     pthread_mutex_unlock(mutex);
 
@@ -667,6 +673,177 @@ int pthread_setcancelstate(int state, int *oldstate)
 
 int pthread_setcanceltype(int type, int *oldtype)
 {
+    return 0;
+}
+
+
+
+// pthread_rwlock
+int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
+{
+    vsf_dlist_init(&rwlock->rdlist);
+    vsf_dlist_init(&rwlock->wrlist);
+    rwlock->rdref = rwlock->wrref = rwlock->rdpend = rwlock->wrpend = 0;
+    vsf_eda_sync_init(&rwlock->rdsync, 0, VSF_SYNC_AUTO_RST);
+    vsf_eda_sync_init(&rwlock->wrsync, 0, VSF_SYNC_AUTO_RST);
+    return 0;
+}
+
+int pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
+{
+    return 0;
+}
+
+static vsf_sync_reason_t __pthread_rwlock_pend(vsf_sync_t *sync)
+{
+    vsf_sync_reason_t reason;
+    vsf_evt_t evt;
+
+    while (true) {
+        evt = vsf_thread_wait();
+        reason = vsf_eda_sync_get_reason(sync, evt);
+        if (reason != VSF_SYNC_PENDING) {
+            break;
+        }
+    }
+
+    return reason;
+}
+
+static int __pthread_rwlock_rdlock(pthread_rwlock_t *rwlock, vsf_timeout_tick_t timeout)
+{
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    bool need_pend;
+
+    vsf_protect_t orig = vsf_protect_sched();
+        if (rwlock->wrref || rwlock->rdpend || rwlock->wrpend) {
+            __vsf_eda_sync_pend(&rwlock->rdsync, eda, timeout);
+            rwlock->rdpend++;
+            need_pend = true;
+        } else {
+            vsf_dlist_queue_enqueue(
+                vsf_eda_t, pending_node,
+                &rwlock->rdlist, eda);
+            rwlock->rdref++;
+            need_pend = false;
+        }
+    vsf_unprotect_sched(orig);
+
+    if (need_pend) {
+        vsf_sync_reason_t reason = __pthread_rwlock_pend(&rwlock->rdsync);
+        return (reason == VSF_SYNC_GET) ? 0 : -1;
+    }
+    return 0;
+}
+
+int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
+{
+    return __pthread_rwlock_rdlock(rwlock, -1);
+}
+
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock)
+{
+    return __pthread_rwlock_rdlock(rwlock, 0);
+}
+
+int pthread_rwlock_timedrdlock(pthread_rwlock_t *rwlock, const struct timespec *abstime)
+{
+    if ((abstime != NULL) && (abstime->tv_nsec >= 1000000000UL)) {
+        return EINVAL;
+    }
+
+    vsf_timeout_tick_t timeout = __vsf_linux_abstimespec_to_timeout(abstime);
+    return __pthread_rwlock_rdlock(rwlock, timeout);
+}
+
+static int __pthread_rwlock_wrlock(pthread_rwlock_t *rwlock, vsf_timeout_tick_t timeout)
+{
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    bool need_pend;
+
+    vsf_protect_t orig = vsf_protect_sched();
+        if (rwlock->wrref || rwlock->rdref || rwlock->wrpend) {
+            __vsf_eda_sync_pend(&rwlock->wrsync, eda, timeout);
+            rwlock->wrpend++;
+            need_pend = true;
+        } else {
+            vsf_dlist_queue_enqueue(
+                vsf_eda_t, pending_node,
+                &rwlock->wrlist, eda);
+            rwlock->wrref++;
+            need_pend = false;
+        }
+    vsf_unprotect_sched(orig);
+
+    if (need_pend) {
+        vsf_sync_reason_t reason = __pthread_rwlock_pend(&rwlock->wrsync);
+        return (reason == VSF_SYNC_GET) ? 0 : -1;
+    }
+    return 0;
+}
+
+int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock)
+{
+    return __pthread_rwlock_wrlock(rwlock, -1);
+}
+
+int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock)
+{
+    return __pthread_rwlock_wrlock(rwlock, 0);
+}
+
+int pthread_rwlock_timedwrlock(pthread_rwlock_t *rwlock, const struct timespec *abstime)
+{
+    if ((abstime != NULL) && (abstime->tv_nsec >= 1000000000UL)) {
+        return EINVAL;
+    }
+
+    vsf_timeout_tick_t timeout = __vsf_linux_abstimespec_to_timeout(abstime);
+    return __pthread_rwlock_wrlock(rwlock, timeout);
+}
+
+int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
+{
+    vsf_sync_t *sync = NULL;
+    vsf_eda_t *eda = vsf_eda_get_cur();
+
+    vsf_protect_t orig = vsf_protect_sched();
+        if (vsf_dlist_is_in(vsf_eda_t, pending_node, &rwlock->rdlist, eda)) {
+            vsf_dlist_remove(vsf_eda_t, pending_node, &rwlock->rdlist, eda);
+            rwlock->rdref--;
+        } else if (vsf_dlist_is_in(vsf_eda_t, pending_node, &rwlock->wrlist, eda)) {
+            vsf_dlist_remove(vsf_eda_t, pending_node, &rwlock->wrlist, eda);
+            rwlock->wrref--;
+        } else {
+            VSF_LINUX_ASSERT(false);
+            vsf_unprotect_sched(orig);
+            return -1;
+        }
+
+        if (rwlock->wrpend) {
+            if (!rwlock->rdref && !rwlock->wrref) {
+                vsf_dlist_queue_enqueue(
+                    vsf_eda_t, pending_node,
+                    &rwlock->wrlist, eda);
+                rwlock->wrref++;
+                rwlock->wrpend--;
+                sync = &rwlock->wrsync;
+            }
+        } else if (rwlock->rdpend) {
+            if (!rwlock->wrref) {
+                vsf_dlist_queue_enqueue(
+                    vsf_eda_t, pending_node,
+                    &rwlock->rdlist, eda);
+                rwlock->rdref++;
+                rwlock->rdpend--;
+                sync = &rwlock->rdsync;
+            }
+        }
+    vsf_unprotect_sched(orig);
+
+    if (sync != NULL) {
+        vsf_eda_sync_increase(sync);
+    }
     return 0;
 }
 

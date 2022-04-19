@@ -82,6 +82,16 @@ extern "C" {
 #define pthread_condattr_getpshared     VSF_LINUX_WRAPPER(pthread_condattr_getpshared)
 #define pthread_condattr_setclock       VSF_LINUX_WRAPPER(pthread_condattr_setclock)
 #define pthread_condattr_getclock       VSF_LINUX_WRAPPER(pthread_condattr_getclock)
+
+#define pthread_rwlock_init             VSF_LINUX_WRAPPER(pthread_rwlock_init)
+#define pthread_rwlock_destroy          VSF_LINUX_WRAPPER(pthread_rwlock_destroy)
+#define pthread_rwlock_rdlock           VSF_LINUX_WRAPPER(pthread_rwlock_rdlock)
+#define pthread_rwlock_tryrdlock        VSF_LINUX_WRAPPER(pthread_rwlock_tryrdlock)
+#define pthread_rwlock_timedrdlock      VSF_LINUX_WRAPPER(pthread_rwlock_timedrdlock)
+#define pthread_rwlock_wrlock           VSF_LINUX_WRAPPER(pthread_rwlock_wrlock)
+#define pthread_rwlock_trywrlock        VSF_LINUX_WRAPPER(pthread_rwlock_trywrlock)
+#define pthread_rwlock_timedwrlock      VSF_LINUX_WRAPPER(pthread_rwlock_timedwrlock)
+#define pthread_rwlock_unlock           VSF_LINUX_WRAPPER(pthread_rwlock_unlock)
 #endif
 
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
@@ -177,6 +187,32 @@ int pthread_condattr_setpshared(pthread_condattr_t *cattr, int pshared);
 int pthread_condattr_getpshared(pthread_condattr_t *cattr, int *pshared);
 int pthread_condattr_getclock(const pthread_condattr_t *cattr, clockid_t *clock_id);
 int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clock_id);
+
+
+
+#define PTHREAD_RWLOCK_INITIALIZER      { 0 }
+typedef struct pthread_rwlock_t {
+    uint16_t rdref;
+    uint16_t wrref;
+    uint16_t rdpend;
+    uint16_t wrpend;
+    vsf_dlist_t rdlist;
+    vsf_dlist_t wrlist;
+    vsf_sync_t rdsync;
+    vsf_sync_t wrsync;
+} pthread_rwlock_t;
+typedef struct {
+    int                                 attr;
+} pthread_rwlockattr_t;
+int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr);
+int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
+int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_timedrdlock(pthread_rwlock_t *rwlock, const struct timespec *abstime);
+int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_timedwrlock(pthread_rwlock_t *rwlock, const struct timespec *abstime);
+int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
 
 
 

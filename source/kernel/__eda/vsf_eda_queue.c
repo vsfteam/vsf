@@ -48,7 +48,7 @@
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED && VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE == ENABLED
 /*-----------------------------------------------------------------------------*
- * vsf_eda_queue_t                                                                 *
+ * vsf_eda_queue_t                                                             *
  *-----------------------------------------------------------------------------*/
 
 SECTION(".text.vsf.kernel.vsf_eda_queue")
