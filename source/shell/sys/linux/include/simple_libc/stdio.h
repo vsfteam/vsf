@@ -68,6 +68,7 @@ extern "C" {
 #define perror              VSF_LINUX_LIBC_WRAPPER(perror)
 #define setvbuf             VSF_LINUX_LIBC_WRAPPER(setvbuf)
 #define rename              VSF_LINUX_LIBC_WRAPPER(rename)
+#define renameat            VSF_LINUX_LIBC_WRAPPER(renameat)
 
 #define tmpfile             VSF_LINUX_LIBC_WRAPPER(tmpfile)
 #define tmpnam              VSF_LINUX_LIBC_WRAPPER(tmpnam)
@@ -164,6 +165,7 @@ void setbuf(FILE *f, char *buf);
 int setvbuf(FILE *f, char *buffer, int mode, size_t size);
 
 int rename(const char *old_filename, const char *new_filename);
+int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath);
 
 int ferror(FILE *f);
 void clearerr(FILE *f);

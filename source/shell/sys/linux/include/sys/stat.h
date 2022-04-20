@@ -21,6 +21,7 @@ extern "C" {
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define stat                    VSF_LINUX_WRAPPER(stat)
 #define fstat                   VSF_LINUX_WRAPPER(fstat)
+#define fstatat                 VSF_LINUX_WRAPPER(fstatat)
 #define umask                   VSF_LINUX_WRAPPER(umask)
 #define chmod                   VSF_LINUX_WRAPPER(chmod)
 #define fchmod                  VSF_LINUX_WRAPPER(fchmod)
@@ -90,6 +91,7 @@ struct stat {
 mode_t umask(mode_t mask);
 int stat(const char *pathname, struct stat *buf);
 int fstat(int fd, struct stat *buf);
+int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
 int chmod(const char *pathname, mode_t mode);
 int fchmod(int fd, mode_t mode);
 

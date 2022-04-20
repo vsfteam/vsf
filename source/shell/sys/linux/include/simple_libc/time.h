@@ -13,6 +13,7 @@ extern "C" {
 
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
 #define clock_gettime       VSF_LINUX_LIBC_WRAPPER(clock_gettime)
+#define clock_getres        VSF_LINUX_LIBC_WRAPPER(clock_getres)
 #define nanosleep           VSF_LINUX_LIBC_WRAPPER(nanosleep)
 #define clock               VSF_LINUX_LIBC_WRAPPER(clock)
 #endif
@@ -38,6 +39,7 @@ struct timespec {
 
 clock_t clock(void);
 int clock_gettime(clockid_t clk_id, struct timespec *tp);
+int clock_getres(clockid_t clk_id, struct timespec *res);
 
 time_t time(time_t *t);
 double difftime(time_t time1, time_t time2);

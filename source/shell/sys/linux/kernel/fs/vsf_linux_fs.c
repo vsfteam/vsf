@@ -133,12 +133,16 @@ const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-static vk_file_t * __vsf_linux_fs_get_file(const char *pathname)
+static vk_file_t * __vsf_linux_fs_get_file_ex(vk_file_t *dir, const char *pathname)
 {
     vk_file_t *file;
-
-    vk_file_open(NULL, pathname, &file);
+    vk_file_open(dir, pathname, &file);
     return file;
+}
+
+static vk_file_t * __vsf_linux_fs_get_file(const char *pathname)
+{
+    return __vsf_linux_fs_get_file_ex(NULL, pathname);
 }
 
 static void __vsf_linux_fs_close_do(vk_file_t *file)
@@ -793,6 +797,22 @@ int mkdir(const char *pathname, mode_t mode)
     return __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE);
 }
 
+int mkdirat(int dirfd, const char *pathname, mode_t mode)
+{
+    vk_file_t *dir = __vsf_linux_get_fs_ex(NULL, dirfd);
+    if (NULL == dir) {
+        errno = ENOTDIR;
+        return -1;
+    }
+
+    vk_file_create(dir, pathname, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE);
+    if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
+        return -1;
+    }
+
+    return 0;
+}
+
 int mkdirs(const char *pathname, mode_t mode)
 {
     int fd = open(pathname, O_CREAT | O_DIRECTORY, mode);
@@ -871,7 +891,7 @@ int creat(const char *pathname, mode_t mode)
     return open(pathname, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
-int open(const char *pathname, int flags, ...)
+int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
 {
     vk_file_t *file;
     vsf_linux_fd_t *sfd;
@@ -894,13 +914,6 @@ __open_again:
     file = __vsf_linux_fs_get_file(fullpath);
     if (!file) {
         if (flags & O_CREAT) {
-            va_list ap;
-            mode_t mode;
-
-            va_start(ap, flags);
-                mode = va_arg(ap, mode_t);
-            va_end(ap);
-
             char *path_in_ram = strdup(pathname);
             if (NULL == path_in_ram) {
                 return -1;
@@ -973,6 +986,34 @@ __open_again:
         }
     }
     return fd;
+}
+
+int open(const char *pathname, int flags, ...)
+{
+    va_list ap;
+    mode_t mode;
+
+    va_start(ap, flags);
+        mode = va_arg(ap, mode_t);
+    va_end(ap);
+    return vsf_linux_open(NULL, pathname, flags, mode);
+}
+
+int openat(int dirfd, const char *pathname, int flags, ...)
+{
+    va_list ap;
+    mode_t mode;
+
+    va_start(ap, flags);
+        mode = va_arg(ap, mode_t);
+    va_end(ap);
+
+    vk_file_t *dir = __vsf_linux_get_fs_ex(NULL, dirfd);
+    if ((NULL == dir) || !(dir->attr & VSF_FILE_ATTR_DIRECTORY)) {
+        errno = ENOTDIR;
+        return -1;
+    }
+    return vsf_linux_open(dir, pathname, flags, mode);
 }
 
 int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
@@ -1049,11 +1090,43 @@ ssize_t read(int fd, void *buf, size_t count)
     return sfd->op->fn_read(sfd, buf, count);
 }
 
+ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
+{
+    ssize_t size = 0, cur_size;
+    for (int i = 0; i < iovcnt; i++) {
+        cur_size = read(fd, iov->iov_base, iov->iov_len);
+        if (cur_size > 0) {
+            size += cur_size;
+        }
+        if (cur_size != iov->iov_len) {
+            return 0 == size ? cur_size : size;
+        }
+        iov++;
+    }
+    return size;
+}
+
 ssize_t write(int fd, const void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if (!sfd || (sfd->priv->flags & O_RDONLY)) { return -1; }
     return sfd->op->fn_write(sfd, buf, count);
+}
+
+ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
+{
+    ssize_t size = 0, cur_size;
+    for (int i = 0; i < iovcnt; i++) {
+        cur_size = write(fd, iov->iov_base, iov->iov_len);
+        if (cur_size > 0) {
+            size += cur_size;
+        }
+        if (cur_size != iov->iov_len) {
+            return 0 == size ? cur_size : size;
+        }
+        iov++;
+    }
+    return size;
 }
 
 ssize_t pread(int fd, void *buf, size_t count, off_t offset)
@@ -1065,12 +1138,46 @@ ssize_t pread(int fd, void *buf, size_t count, off_t offset)
     return size;
 }
 
+ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+{
+    ssize_t size = 0, cur_size;
+    for (int i = 0; i < iovcnt; i++) {
+        cur_size = pread(fd, iov->iov_base, iov->iov_len, offset);
+        if (cur_size > 0) {
+            size += cur_size;
+            offset += cur_size;
+        }
+        if (cur_size != iov->iov_len) {
+            return 0 == size ? cur_size : size;
+        }
+        iov++;
+    }
+    return size;
+}
+
 ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
 {
     off_t orig = lseek(fd, 0, SEEK_CUR);
     lseek(fd, offset, SEEK_SET);
     ssize_t size = write(fd, buf, count);
     lseek(fd, orig, SEEK_SET);
+    return size;
+}
+
+ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+{
+    ssize_t size = 0, cur_size;
+    for (int i = 0; i < iovcnt; i++) {
+        cur_size = pwrite(fd, iov->iov_base, iov->iov_len, offset);
+        if (cur_size > 0) {
+            size += cur_size;
+            offset += cur_size;
+        }
+        if (cur_size != iov->iov_len) {
+            return 0 == size ? cur_size : size;
+        }
+        iov++;
+    }
     return size;
 }
 
@@ -1180,6 +1287,20 @@ int stat(const char *pathname, struct stat *buf)
     return ret;
 }
 
+int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags)
+{
+    if ((NULL == pathname) || ('\0' == *pathname)) {
+        return -1;
+    }
+
+    int fd = openat(dirfd, pathname, 0);
+    if (fd < 0) { return -1; }
+
+    int ret = fstat(fd, buf);
+    close(fd);
+    return ret;
+}
+
 int chmod(const char *pathname, mode_t mode)
 {
     return 0;
@@ -1222,6 +1343,19 @@ int unlink(const char *pathname)
     return __vsf_linux_fs_remove(pathname, 0);
 }
 
+int unlinkat(int dirfd, const char *pathname, int flags)
+{
+    vk_file_t *dir = __vsf_linux_get_fs_ex(NULL, dirfd);
+    if ((NULL == dir) || !(dir->attr & VSF_FILE_ATTR_DIRECTORY)) {
+        errno = ENOTDIR;
+        return -1;
+    }
+
+    vk_file_unlink(dir, pathname);
+    vsf_err_t err = (vsf_err_t)vsf_eda_get_return_value();
+    return VSF_ERR_NONE == err ? 0 : -1;
+}
+
 int symlink(const char *target, const char *linkpath)
 {
     return -1;
@@ -1232,13 +1366,8 @@ ssize_t readlink(const char *pathname, char *buf, size_t bufsiz)
     return -1;
 }
 
-DIR * opendir(const char *name)
+DIR *fdopendir(int fd)
 {
-    int fd = open(name, O_DIRECTORY);
-    if (fd < 0) {
-        return NULL;
-    }
-
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     if (!(priv->file->attr & VSF_FILE_ATTR_DIRECTORY)) {
@@ -1246,6 +1375,16 @@ DIR * opendir(const char *name)
         sfd = NULL;
     }
     return sfd;
+}
+
+DIR * opendir(const char *name)
+{
+    int fd = open(name, O_DIRECTORY);
+    if (fd < 0) {
+        return NULL;
+    }
+
+    return fdopendir(fd);
 }
 
 struct dirent * readdir(DIR *dir)

@@ -15,6 +15,7 @@ extern "C" {
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define opendir         VSF_LINUX_WRAPPER(opendir)
+#define fdopendir       VSF_LINUX_WRAPPER(fdopendir)
 #define readdir         VSF_LINUX_WRAPPER(readdir)
 #define rewinddir       VSF_LINUX_WRAPPER(rewinddir)
 #define telldir         VSF_LINUX_WRAPPER(telldir)
@@ -33,6 +34,7 @@ struct dirent {
 typedef struct vsf_linux_fd_t DIR;
 
 DIR * opendir(const char *name);
+DIR *fdopendir(int fd);
 struct dirent * readdir(DIR *dir);
 void rewinddir(DIR *dir);
 long telldir(DIR *dir);

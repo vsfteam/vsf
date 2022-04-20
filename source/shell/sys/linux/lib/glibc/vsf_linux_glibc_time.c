@@ -317,6 +317,20 @@ clock_t clock(void)
     return vsf_systimer_get_ms();
 }
 
+int clock_getres(clockid_t clk_id, struct timespec *res)
+{
+    switch (clk_id) {
+    case CLOCK_MONOTONIC:
+        if (res != NULL) {
+            res->tv_sec = 0;
+            res->tv_nsec = 1000;
+        }
+        return 0;
+    default:
+        return -1;
+    }
+}
+
 int clock_gettime(clockid_t clk_id, struct timespec *tp)
 {
     switch (clk_id) {

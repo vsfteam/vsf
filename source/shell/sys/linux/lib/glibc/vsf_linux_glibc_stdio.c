@@ -489,6 +489,23 @@ int rename(const char *old_filename, const char *new_filename)
     return __vsf_linux_fs_rename(old_filename, new_filename);
 }
 
+int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath)
+{
+    vk_file_t *olddir = __vsf_linux_get_fs_ex(NULL, olddirfd);
+    vk_file_t *newdir = __vsf_linux_get_fs_ex(NULL, newdirfd);
+    if (    !(olddir->attr & VSF_FILE_ATTR_DIRECTORY)
+        ||  !(newdir->attr & VSF_FILE_ATTR_DIRECTORY)) {
+        errno = ENOTDIR;
+        return -1;
+    }
+
+    vk_file_rename(olddir, oldpath, newdir, newpath);
+    if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
+        return -1;
+    }
+    return 0;
+}
+
 int remove(const char * pathname)
 {
     int fd = open(pathname, 0);

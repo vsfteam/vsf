@@ -67,18 +67,25 @@ extern "C" {
 #else
 #   define creat            VSF_LINUX_WRAPPER(creat)
 #   define open             VSF_LINUX_WRAPPER(open)
+#   define openat           VSF_LINUX_WRAPPER(openat)
 #   define access           VSF_LINUX_WRAPPER(access)
 #   define unlink           VSF_LINUX_WRAPPER(unlink)
+#   define unlinkat         VSF_LINUX_WRAPPER(unlinkat)
 #   define link             VSF_LINUX_WRAPPER(link)
 #   define remove           VSF_LINUX_WRAPPER(remove)
 #   define mkdir            VSF_LINUX_WRAPPER(mkdir)
+#   define mkdirat          VSF_LINUX_WRAPPER(mkdirat)
 #   define rmdir            VSF_LINUX_WRAPPER(rmdir)
 #   define close            VSF_LINUX_WRAPPER(close)
 #   define lseek            VSF_LINUX_WRAPPER(lseek)
 #   define read             VSF_LINUX_WRAPPER(read)
 #   define write            VSF_LINUX_WRAPPER(write)
+#   define readv            VSF_LINUX_WRAPPER(readv)
+#   define writev           VSF_LINUX_WRAPPER(writev)
 #   define pread            VSF_LINUX_WRAPPER(pread)
 #   define pwrite           VSF_LINUX_WRAPPER(pwrite)
+#   define preadv           VSF_LINUX_WRAPPER(preadv)
+#   define pwritev          VSF_LINUX_WRAPPER(pwritev)
 #   define chdir            VSF_LINUX_WRAPPER(chdir)
 #   define getcwd           VSF_LINUX_WRAPPER(getcwd)
 #   define fsync            VSF_LINUX_WRAPPER(fsync)
@@ -138,15 +145,18 @@ int pipe(int pipefd[2]);
 
 int creat(const char *pathname, mode_t mode);
 int open(const char *pathname, int flags, ...);
+int openat(int dirfd, const char *pathname, int flags, ...);
 #define F_OK            (1 << 0)
 #define R_OK            (1 << 1)
 #define W_OK            (1 << 2)
 #define X_OK            (1 << 3)
 int access(const char *pathname, int mode);
 int unlink(const char *pathname);
+int unlinkat(int dirfd, const char *pathname, int flags);
 int link(const char *oldpath, const char *newpath);
 int remove(const char *pathname);
 int mkdir(const char *pathname, mode_t mode);
+int mkdirat(int dirfd, const char *pathname, mode_t mode);
 int mkdirs(const char *pathname, mode_t mode);
 int rmdir(const char *pathname);
 int dup(int oldfd);
@@ -157,10 +167,18 @@ char * getcwd(char *buffer, size_t maxlen);
 
 int close(int fd);
 off_t lseek(int fd, off_t offset, int whence);
+struct iovec {
+    void  *iov_base;
+    size_t iov_len;
+};
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);
+ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
+ssize_t writev(int fd, const struct iovec *iov, int iovcnt);
 ssize_t pread(int fd, void *buf, size_t count, off_t offset);
 ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
+ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, off_t offset);
+ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset);
 int fsync(int fd);
 int fdatasync(int fd);
 
