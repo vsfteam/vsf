@@ -167,6 +167,8 @@ char * getcwd(char *buffer, size_t maxlen);
 
 int close(int fd);
 off_t lseek(int fd, off_t offset, int whence);
+// workaround while using lwip, which will check iovec MACRO and define iovec if not defined
+#define iovec iovec
 struct iovec {
     void  *iov_base;
     size_t iov_len;
