@@ -222,8 +222,11 @@ static bool __vk_winusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool
         if (    (device->vid == vid) && (device->pid == pid) && !device->is_composite
             &&  (force || strcmp(device->driver, "WinUSB"))) {
             vsf_winusb_on_install_driver(vid, pid);
+#if VSF_WINUSB_CFG_INSTALL_EMBEDDED_DRIVER != ENABLED
             int result = wdi_prepare_driver(device, "usb_driver", "winusb_device.inf", &pd_options);
-            if (result == WDI_SUCCESS) {
+            if (result == WDI_SUCCESS)
+#endif
+            {
                 result = wdi_install_driver(device, "usb_driver", "winusb_device.inf", NULL);
             }
             vsf_winusb_on_driver_installed(vid, pid, result, wdi_strerror(result));

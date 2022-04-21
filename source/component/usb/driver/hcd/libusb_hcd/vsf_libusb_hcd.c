@@ -368,7 +368,10 @@ static bool __vk_libusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool
                     strcmp(device->driver, "WinUSB")
 #   endif
                 )) {
-            if (wdi_prepare_driver(device, "usb_driver", "libusb_device.inf", &pd_options) == WDI_SUCCESS) {
+#if VSF_LIBUSB_CFG_INSTALL_EMBEDDED_DRIVER != ENABLED
+            if (wdi_prepare_driver(device, "usb_driver", "libusb_device.inf", &pd_options) == WDI_SUCCESS)
+#endif
+            {
                 wdi_install_driver(device, "usb_driver", "libusb_device.inf", NULL);
             }
             break;
