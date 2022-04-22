@@ -39,3 +39,4 @@ set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections -flto --specs=nano.specs"
 
 set(CMAKE_C_COMPILER_WORKS ON)
 set(CMAKE_CXX_COMPILER_WORKS ON)
+set(CMAKE_ASM_COMPILER_WORKS ON)

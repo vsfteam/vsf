@@ -17,6 +17,6 @@ set(CMAKE_CXX_FLAGS
     CACHE INTERNAL "C++ compiler common flags"
 )
 set(CMAKE_ASM_FLAGS
-    "-mthumb ${CMAKE_ASM_FLAGS}"
+    "-mcpu=cortex-m7 -mthumb ${CMAKE_ASM_FLAGS}"
     CACHE INTERNAL "asm compiler common flags"
 )
