@@ -491,6 +491,7 @@ int rename(const char *old_filename, const char *new_filename)
 
 int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath)
 {
+    extern vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd);
     vk_file_t *olddir = __vsf_linux_get_fs_ex(NULL, olddirfd);
     vk_file_t *newdir = __vsf_linux_get_fs_ex(NULL, newdirfd);
     if (    !(olddir->attr & VSF_FILE_ATTR_DIRECTORY)

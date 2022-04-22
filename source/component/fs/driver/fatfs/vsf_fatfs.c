@@ -1088,8 +1088,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_setsize, vk_file_setsize,
                 goto update_dentry;
             }
             break;
-        case SETSIZE_STATE_FREE:
-        set_fat_entry: {
+        case SETSIZE_STATE_FREE: {
                 uint32_t cur_cluster = vsf_local.cur_cluster;
                 uint32_t next_cluster = vsf_local.next_cluster;
                 vsf_local.cur_cluster = fatfs_file->cur.cluster;
@@ -1608,7 +1607,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                     vsf_err_t err;
                     vsf_eda_set_user_value(WRITE_STATE_GET_NEXT_FAT_ENTRY_DONE);
                     if (vsf_local.offset < fatfs_file->size) {
-                    get_next_cluster:
                         __vsf_component_call_peda(__vk_fatfs_get_fat_entry, err, fsinfo,
                             .cluster = fatfs_file->cur.cluster,
                             .entry = &fatfs_file->cur.cluster,
