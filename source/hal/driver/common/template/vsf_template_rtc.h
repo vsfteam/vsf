@@ -29,52 +29,62 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if !defined(RTC_HW_MASK) && defined(RTC_HW_COUNT)
-#   define RTC_HW_MASK                  ((1 << RTC_HW_COUNT) - 1)
+#ifndef VSF_RTC_CFG_MULTI_CLASS
+#   define VSF_RTC_CFG_MULTI_CLASS              DISABLED
 #endif
 
-#if VSF_RTC_CFG_MULTI_CLASS != ENABLED
-#   ifndef VSF_RTC_CFG_PREFIX
-#       define VSF_RTC_CFG_PREFIX       vsf_hw
+// Turn off multi class support for the current implementation
+// when the VSF_RTC_CFG_MULTI_CLASS is enabled
+#ifndef VSF_RTC_CFG_IMPLEMENT_OP
+#   if VSF_RTC_CFG_MULTI_CLASS == ENABLED
+#       define VSF_RTC_CFG_IMPLEMENT_OP         ENABLED
+#   else
+#       define VSF_RTC_CFG_IMPLEMENT_OP         DISABLED
 #   endif
+#endif
 
-#   ifndef VSF_RTC_CFG_REAL_PREFIX
-#       define VSF_RTC_CFG_REAL_PREFIX  VSF_RTC_CFG_PREFIX
+// VSF_RTC_CFG_PREFIX: use for macro vsf_rtc_{init, enable, ...}
+#ifndef VSF_RTC_CFG_PREFIX
+#   if VSF_RTC_CFG_MULTI_CLASS == ENABLED
+#       define VSF_RTC_CFG_PREFIX               vsf
+#   elif defined(VSF_HW_RTC_COUNT) && (VSF_HW_RTC_COUNT != 0)
+#       define VSF_RTC_CFG_PREFIX               vsf_hw
+#   else
+#       warning "Enable VSF_HAL_USE_RTC support but no known implementation found"
 #   endif
+#endif
 
-#   define ____VSF_RTC_WRAPPER(__header, __api)   __header ## _ ## __api
-#   define __VSF_RTC_WRAPPER(__header, __api)     ____VSF_RTC_WRAPPER(__header, __api)
-#   define vsf_rtc_init                 __VSF_RTC_WRAPPER(VSF_RTC_CFG_REAL_PREFIX, rtc_init)
-#   define vsf_rtc_enable               __VSF_RTC_WRAPPER(VSF_RTC_CFG_REAL_PREFIX, rtc_enable)
-#   define vsf_rtc_disable              __VSF_RTC_WRAPPER(VSF_RTC_CFG_REAL_PREFIX, rtc_disable)
-#   define vsf_rtc_get                  __VSF_RTC_WRAPPER(VSF_RTC_CFG_REAL_PREFIX, rtc_get)
-#   define vsf_rtc_set                  __VSF_RTC_WRAPPER(VSF_RTC_CFG_REAL_PREFIX, rtc_set)
+#ifndef VSF_RTC_CFG_FUNCTION_RENAME
+#   define VSF_RTC_CFG_FUNCTION_RENAME          ENABLED
+#endif
+
+#ifndef VSF_RTC_CFG_REIMPLEMENT_CAPABILITY
+#   define VSF_RTC_CFG_REIMPLEMENT_CAPABILITY   DISABLED
+#endif
+
+#ifndef VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE
+#   define VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE     DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_RTC_INIT(__RTC_PTR, __CFG_PTR)                                      \
-            vsf_rtc_init((vsf_rtc_t *)(__RTC_PTR), (__CFG_PTR))
-#define VSF_RTC_ENABLE(__RTC_PTR)                                               \
-            vsf_rtc_enable((vsf_rtc_t *)(__RTC_PTR))
-#define VSF_RTC_DISABLE(__RTC_PTR)                                              \
-            vsf_rtc_disable((vsf_rtc_t *)(__RTC_PTR))
-#define VSF_RTC_GET(__RTC_PTR, __TM)                                            \
-            vsf_rtc_get((vsf_rtc_t *)(__RTC_PTR), (__TM))
-#define VSF_RTC_SET(__RTC_PTR, __TM)                                            \
-            vsf_rtc_set((vsf_rtc_t *)(__RTC_PTR), (__TM))
+#define VSF_RTC_APIS(__prefix_name) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, init,       VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, rtc_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         rtc, enable,     VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         rtc, disable,    VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, rtc_capability_t, rtc, capability, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, get,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_tm_t *rtc_tm) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, const vsf_rtc_tm_t *rtc_tm) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, time_t,           rtc, get_second, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set_second, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, time_t time)
 
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_rtc_irq_type_t{
-    VSF_RTC_IRQ_ALARM_MASK          = (1 << 0),
-} vsf_rtc_irq_type_t;
-
-typedef struct vsf_rtc_t vsf_rtc_t;
-
-typedef void vsf_rtc_isrhandler_t(  void *target_ptr,
-                                    vsf_rtc_irq_type_t type,
-                                    vsf_rtc_t *rtc_ptr);
+#if VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE == DISABLED
+typedef enum em_rtc_irq_mask_t {
+    VSF_RTC_IRQ_MASK_ALARM = (1 << 0),
+} em_rtc_irq_mask_t;
+#endif
 
 typedef struct vsf_rtc_tm_t {
     uint8_t tm_sec;         // [0 .. 59]
@@ -87,27 +97,47 @@ typedef struct vsf_rtc_tm_t {
     uint16_t tm_ms;
 } vsf_rtc_tm_t;
 
+typedef struct vsf_rtc_t vsf_rtc_t;
+
+typedef void vsf_rtc_isr_handler_t(void *target_ptr, em_rtc_irq_mask_t irq_mask, vsf_rtc_t *rtc_ptr);
+
 typedef struct vsf_rtc_isr_t {
-    vsf_rtc_isrhandler_t   *handler_fn;
-    void                   *target_ptr;
-    vsf_arch_prio_t         prio;
+    vsf_rtc_isr_handler_t *handler_fn;
+    void *target_ptr;
+    vsf_arch_prio_t prio;
 } vsf_rtc_isr_t;
 
-//! \name rtc configuration
-//! @{
-typedef struct rtc_cfg_t rtc_cfg_t;
-struct rtc_cfg_t {
+//! rtc configuration
+typedef struct rtc_cfg_t {
     vsf_rtc_isr_t isr;
+} rtc_cfg_t;
+
+#if VSF_RTC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+typedef struct rtc_capability_t {
+    inherit(peripheral_capability_t)
+} rtc_capability_t;
+#endif
+
+typedef struct vsf_rtc_op_t {
+#undef __VSF_HAL_TEMPLATE_API
+#define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
+
+    VSF_RTC_APIS(vsf)
+} vsf_rtc_op_t;
+
+#if VSF_RTC_CFG_MULTI_CLASS == ENABLED
+struct vsf_rtc_t  {
+    const vsf_rtc_op_t * op;
 };
-//! @}
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_rtc_init(vsf_rtc_t *rtc_ptr, rtc_cfg_t *cfg_ptr);
-
 extern fsm_rt_t vsf_rtc_enable(vsf_rtc_t *rtc_ptr);
 extern fsm_rt_t vsf_rtc_disable(vsf_rtc_t *rtc_ptr);
+extern rtc_capability_t vsf_rtc_capability(vsf_rtc_t *rtc_ptr);
 
 /**
  * get rtc date time
@@ -125,8 +155,33 @@ extern vsf_err_t vsf_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm);
  */
 extern vsf_err_t vsf_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm);
 
+extern time_t vsf_rtc_get_second(vsf_rtc_t *rtc_ptr);
+
+extern vsf_err_t vsf_rtc_set_second(vsf_rtc_t *rtc_ptr, time_t time);
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#if VSF_RTC_CFG_FUNCTION_RENAME == ENABLED
+#   define vsf_rtc_init(__RTC, ...)                                             \
+        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_init)         ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
+#   define vsf_rtc_enable(__RTC)                                                \
+        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_enable)       ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC)
+#   define vsf_rtc_disable(__RTC)                                               \
+        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_disable)      ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC)
+#   define vsf_rtc_capability(__RTC)                                            \
+        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_capability)   ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC)
+#   define vsf_rtc_get(__RTC, ...)                                              \
+        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get)          ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
+#   define vsf_rtc_set(__RTC, ...)                                              \
+        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set)          ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
+#   define vsf_rtc_get_second(__RTC, ...)                                       \
+        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get_second)   ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
+#   define vsf_rtc_set_second(__RTC, ...)                                       \
+        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set_second)   ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif  /*__HAL_DRIVER_RTC_INTERFACE_H__*/
