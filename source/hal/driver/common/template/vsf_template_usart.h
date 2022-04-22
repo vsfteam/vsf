@@ -36,9 +36,9 @@ extern "C" {
 // when the VSF_USART_CFG_MULTI_CLASS is enabled
 #ifndef VSF_USART_CFG_IMPLEMENT_OP
 #   if VSF_USART_CFG_MULTI_CLASS == ENABLED
-#       define VSF_USART_CFG_IMPLEMENT_OP         ENABLED
+#       define VSF_USART_CFG_IMPLEMENT_OP       ENABLED
 #   else
-#       define VSF_USART_CFG_IMPLEMENT_OP         DISABLED
+#       define VSF_USART_CFG_IMPLEMENT_OP       DISABLED
 #   endif
 #endif
 
@@ -50,14 +50,18 @@ extern "C" {
 #       define VSF_USART_CFG_PREFIX           vsf_fifo2req
 #   elif defined(VSF_HW_USART_COUNT) && (VSF_HW_USART_COUNT != 0)
 #       define VSF_USART_CFG_PREFIX           vsf_hw
-#   elif VSF_HAL_USE_GPIO_USART == ENABLED
+#   else
 #       warning "Enable VSF_HAL_USE_USART support but no known implementation found"
 #   endif
 #endif
 
-//#ifndef VSF_USART_CFG_FIFO_TO_REQUEST
-//#   define VSF_USART_CFG_FIFO_TO_REQUEST            DISABLED
-//#endif
+#ifndef VSF_USART_CFG_FUNCTION_RENAME
+#   define VSF_USART_CFG_FUNCTION_RENAME            ENABLED
+#endif
+
+#ifndef VSF_USART_CFG_FIFO_TO_REQUEST
+#   define VSF_USART_CFG_FIFO_TO_REQUEST            DISABLED
+#endif
 
 #ifndef VSF_USART_CFG_REIMPLEMENT_MODE
 #   define VSF_USART_CFG_REIMPLEMENT_MODE           DISABLED
@@ -71,80 +75,32 @@ extern "C" {
 #   define VSF_USART_CFG_REIMPLEMENT_STATUS         DISABLED
 #endif
 
+#ifndef VSF_USART_CFG_REQUEST_EMPTY_IMPL
+#   define VSF_USART_CFG_REQUEST_EMPTY_IMPL         DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_USART_INIT(usart_ptr, cfg_ptr)                                      \
-    vsf_usart_init((vsf_usart_t *)usart_ptr, cfg_ptr)
-#define VSF_USART_ENABLE(usart_ptr)                                             \
-    vsf_usart_enable((vsf_usart_t *)usart_ptr)
-#define VSF_USART_DISABLE(usart_ptr)                                            \
-    vsf_usart_disable((vsf_usart_t *)usart_ptr)
-#define VSF_USART_IRQ_ENABLE(usart_ptr, irq_mask)                               \
-    vsf_usart_irq_enable((vsf_usart_t *)usart_ptr, irq_mask)
-#define VSF_USART_IRQ_DISABLE(usart_ptr, irq_mask)                              \
-    vsf_usart_irq_disable((vsf_usart_t *)usart_ptr, irq_mask)
-#define VSF_USART_STATUS(usart_ptr)                                             \
-    vsf_usart_status((vsf_usart_t *)usart_ptr)
-#define VSF_USART_FIFO_READ(usart_ptr, buffer_ptr, count)                       \
-    vsf_usart_fifo_read((vsf_usart_t *)usart_ptr, buffer_ptr, count)
-#define VSF_USART_FIFO_WRITE(usart_ptr, buffer_ptr, count)                      \
-    vsf_usart_fifo_write((vsf_usart_t *)usart_ptr, buffer_ptr, count)
-#define VSF_USART_FIFO_FLUSH(usart_ptr)                                         \
-    vsf_usart_fifo_flush((vsf_usart_t *)usart_ptr)
-#define VSF_USART_REQUEST_RX(usart_ptr, buffer_ptr, count)                      \
-    vsf_usart_request_rx((vsf_usart_t *)usart_ptr, buffer_ptr, count)
-#define VSF_USART_REQUEST_TX(usart_ptr, buffer_ptr, count)                      \
-    vsf_usart_request_tx((vsf_usart_t *)usart_ptr, buffer_ptr, count)
-#define VSF_USART_CANCEL_RX(usart_ptr)                                          \
-    vsf_usart_cancel_rx((vsf_usart_t *)usart_ptr)
-#define VSF_USART_CANCEL_TX(usart_ptr)                                          \
-    vsf_usart_cancel_tx((vsf_usart_t *)usart_ptr)
-#define VSF_USART_GET_RX_COUNT(usart_ptr)                                       \
-    vsf_usart_get_rx_count((vsf_usart_t *)usart_ptr)
-#define VSF_USART_GET_TX_COUNT(usart_ptr)                                       \
-    vsf_usart_get_tx_count((vsf_usart_t *)usart_ptr)
-
-
-#define __VSF_USART_BASE_APIS(__prefix_name)                                                                                   \
-    VSF_USART_API(__prefix_name, vsf_err_t,      init,         vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)                 \
-    VSF_USART_API(__prefix_name, fsm_rt_t,       enable,       vsf_usart_t *usart_ptr)                                       \
-    VSF_USART_API(__prefix_name, fsm_rt_t,       disable,      vsf_usart_t *usart_ptr)                                       \
-    VSF_USART_API(__prefix_name, void,           irq_enable,   vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)         \
-    VSF_USART_API(__prefix_name, void,           irq_disable,  vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)         \
-    VSF_USART_API(__prefix_name, usart_status_t, status,       vsf_usart_t *usart_ptr)
-
-#define __VSF_USART_FIFO_APIS(__prefix_name)                                                                                   \
-    VSF_USART_API(__prefix_name, uint_fast16_t,  fifo_read,    vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)\
-    VSF_USART_API(__prefix_name, uint_fast16_t,  fifo_write,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
-
-#define __VSF_USART_REQUEST_APIS(__prefix_name)                                                                                \
-    VSF_USART_API(__prefix_name, vsf_err_t,      init,         vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)                 \
-    VSF_USART_API(__prefix_name, fsm_rt_t,       enable,       vsf_usart_t *usart_ptr)                                       \
-    VSF_USART_API(__prefix_name, fsm_rt_t,       disable,      vsf_usart_t *usart_ptr)                                       \
-    VSF_USART_API(__prefix_name, void,           irq_enable,   vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)         \
-    VSF_USART_API(__prefix_name, void,           irq_disable,  vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)         \
-    VSF_USART_API(__prefix_name, usart_status_t, status,       vsf_usart_t *usart_ptr)                                       \
-    VSF_USART_API(__prefix_name, uint_fast16_t,  fifo_read,    vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)\
-    VSF_USART_API(__prefix_name, uint_fast16_t,  fifo_write,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)\
-    VSF_USART_API(__prefix_name, vsf_err_t,      request_rx,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)\
-    VSF_USART_API(__prefix_name, vsf_err_t,      request_tx,   vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)\
-    VSF_USART_API(__prefix_name, vsf_err_t,      cancel_rx,    vsf_usart_t *usart_ptr)                                       \
-    VSF_USART_API(__prefix_name, vsf_err_t,      cancel_tx,    vsf_usart_t *usart_ptr)                                       \
-    VSF_USART_API(__prefix_name, int_fast32_t,   get_rx_count, vsf_usart_t *usart_ptr)                                       \
-    VSF_USART_API(__prefix_name, int_fast32_t,   get_tx_count, vsf_usart_t *usart_ptr)
-
-#define VSF_USART_APIS(__prefix_name)                                                                                   \
-    __VSF_USART_BASE_APIS(__prefix_name)                                                                                       \
-    __VSF_USART_FIFO_APIS(__prefix_name)                                                                                       \
-    __VSF_USART_REQUEST_APIS(__prefix_name)
+#define VSF_USART_APIS(__prefix_name) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, init,         VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, usart_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           usart, enable,       VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           usart, disable,      VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, usart_capability_t, usart, capability,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,               usart, irq_enable,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, em_usart_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,               usart, irq_disable,  VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, em_usart_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, usart_status_t,     usart, status,       VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast16_t,      usart, fifo_read,    VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast16_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast16_t,      usart, fifo_write,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast16_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, request_rx,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast32_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, request_tx,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast32_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cancel_rx,    VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cancel_tx,    VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, int_fast32_t,       usart, get_rx_count, VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, int_fast32_t,       usart, get_tx_count, VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)
 
 /*============================ TYPES =========================================*/
 
 #if VSF_USART_CFG_REIMPLEMENT_MODE == DISABLED
-/*! \name usart working mode
- *! \note if your peripheral has any customised configuration, please reimplement
- *!       em_usart_mode_t
- */
 typedef enum em_usart_mode_t {
     USART_NO_PARITY         = (0x0ul << 0),
     USART_EVEN_PARITY       = (0x1ul << 0),
@@ -181,9 +137,6 @@ typedef enum em_usart_mode_t {
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_IRQ_MASK == DISABLED
-/*! \brief em_usart_irq_mask_t
- *! \note em_usart_irq_mask_t should provide irq masks
- */
 typedef enum em_usart_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     USART_IRQ_MASK_TX               = (0x1ul << 0),
@@ -219,18 +172,13 @@ typedef struct vsf_usart_isr_t {
     vsf_arch_prio_t          prio;
 } vsf_usart_isr_t;
 
-//! \name usart configuration
-//! @{
-typedef struct usart_cfg_t usart_cfg_t;
-struct usart_cfg_t {
+typedef struct usart_cfg_t {
     uint32_t                mode;
     uint32_t                baudrate;
     uint32_t                rx_timeout;
     vsf_usart_isr_t         isr;
-};
-//! @}
+} usart_cfg_t;
 
-typedef struct usart_status_t usart_status_t;
 /*! \brief usart_status_t should implement peripheral_status_t
  *! \note uart_status_t should provide dedicated bits for
  *!       indicating whether a read or write timeout event is detected
@@ -254,40 +202,32 @@ typedef struct usart_status_t usart_status_t;
  *!       then the bIsRXTimeOut bit should be cleared.
  */
 #if VSF_USART_CFG_REIMPLEMENT_STATUS == DISABLED
-struct usart_status_t {
+typedef struct usart_status_t {
     union {
         inherit(peripheral_status_t)
         struct {
             uint32_t is_busy : 1;
         };
     };
-};
+} usart_status_t;
 #endif
 
-/* usart_capability_t should implement peripheral_capability_t */
-typedef struct usart_capability_t usart_capability_t;
+#if VSF_USART_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+typedef struct usart_capability_t {
+    inherit(peripheral_capability_t)
+} usart_capability_t;
+#endif
 
 typedef struct vsf_usart_op_t {
-    vsf_err_t          (*init)         (vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
-    fsm_rt_t           (*enable)       (vsf_usart_t *usart_ptr);
-    fsm_rt_t           (*disable)      (vsf_usart_t *usart_ptr);
-    void               (*irq_enable)   (vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
-    void               (*irq_disable)  (vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
-    usart_status_t     (*status)       (vsf_usart_t *usart_ptr);
-    usart_capability_t (*capability)   (vsf_usart_t *usart_ptr);
-    uint_fast16_t      (*fifo_read)    (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
-    uint_fast16_t      (*fifo_write)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
-    vsf_err_t          (*request_rx)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
-    vsf_err_t          (*request_tx)   (vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
-    vsf_err_t          (*cancel_rx)    (vsf_usart_t *usart_ptr);
-    vsf_err_t          (*cancel_tx)    (vsf_usart_t *usart_ptr);
-    int_fast32_t       (*get_rx_count) (vsf_usart_t *usart_ptr);
-    int_fast32_t       (*get_tx_count) (vsf_usart_t *usart_ptr);
+#undef __VSF_HAL_TEMPLATE_API
+#define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
+
+    VSF_USART_APIS(vsf)
 } vsf_usart_op_t;
 
 #if VSF_USART_CFG_MULTI_CLASS == ENABLED
 struct vsf_usart_t  {
-        const vsf_usart_op_t * op;
+    const vsf_usart_op_t * op;
 };
 #endif
 
@@ -370,95 +310,41 @@ extern int_fast32_t       vsf_usart_get_tx_count(   vsf_usart_t *usart_ptr);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vsf_usart_init           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_init)
-#define vsf_usart_enable         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_enable)
-#define vsf_usart_disable        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)
-#define vsf_usart_irq_enable     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_enable)
-#define vsf_usart_irq_disable    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_disable)
-#define vsf_usart_status         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_status)
-#define vsf_usart_fifo_read      VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_read)
-#define vsf_usart_fifo_write     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_write)
-#define vsf_usart_fifo_flush     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_flush)
-#define vsf_usart_request_rx     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_rx)
-#define vsf_usart_request_tx     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_tx)
-#define vsf_usart_cancel_rx      VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_rx)
-#define vsf_usart_cancel_tx      VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)
-#define vsf_usart_get_rx_count   VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)
-#define vsf_usart_get_tx_count   VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)
+#if VSF_USART_CFG_FUNCTION_RENAME == ENABLED
+#   define vsf_usart_init(__USART, ...)                                         \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_init)         ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_enable(__USART)                                            \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_enable)       ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
+#   define vsf_usart_disable(__USART)                                           \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)      ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
+#   define vsf_usart_irq_enable(__USART, ...)                                   \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_enable)   ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_irq_disable(__USART, ...)                                  \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_disable)  ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_status(__USART)                                            \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_status)       ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
+#   define vsf_usart_fifo_read(__USART, ...)                                    \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_read)    ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_fifo_write(__USART, ...)                                   \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_write)   ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_fifo_flush(__USART)                                        \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_flush)   ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
+#   define vsf_usart_request_rx(__USART, ...)                                   \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_rx)   ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_request_tx(__USART, ...)                                   \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_tx)   ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_cancel_rx(__USART)                                         \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_rx)    ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
+#   define vsf_usart_cancel_tx(__USART)                                         \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)    ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
+#   define vsf_usart_get_rx_count(__USART)                                      \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count) ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
+#   define vsf_usart_get_tx_count(__USART)                                      \
+        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count) ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-/*============================ MACROFIED FUNCTIONS ===========================*/
-
-
-#if defined(VSF_USART_CFG_DEC_PREFIX)
-#   undef VSF_USART_API
-#   define VSF_USART_API(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
-
-// expand to:
-//  extern vsf_err_t vsf_xxx_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
-//  ...
-VSF_USART_APIS(VSF_USART_CFG_DEC_PREFIX)
-
-#   if defined(VSF_USART_CFG_DEC_UPPERCASE_PREFIX)
-#       if VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_COUNT)
-#           define __VSF_USART_DEC_COUNT VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_COUNT)
-
-#           if VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_MASK)
-#               define __VSF_USART_DEC_MASK    VSF_MCONNECT(VSF_USART_CFG_DEC_UPPERCASE_PREFIX, _USART_MASK)
-#           else
-#               define __VSF_USART_DEC_MASK    ((1ul << __VSF_USART_DEC_COUNT) - 1)
-#           endif
-
-// expand to:
-//  typedef vsf_xxx_usart_t vsf_xxx_usart_t;
-typedef struct VSF_MCONNECT(VSF_USART_CFG_DEC_PREFIX, _usart_t) \
-            VSF_MCONNECT(VSF_USART_CFG_DEC_PREFIX, _usart_t);
-
-// expand to:
-//  extern vsf_xxx_usart_t vsf_xxx_usart{0,1,2,3,...};
-#           define __VSF_USART_DEC_LV0(__count, __dont_care)   \
-                extern VSF_MCONNECT(VSF_USART_CFG_DEC_PREFIX, _usart_t) \
-                    VSF_MCONNECT(VSF_USART_CFG_DEC_PREFIX, _usart, __count);
-
-#           if __VSF_USART_DEC_MASK & (1 << 0)
-                __VSF_USART_DEC_LV0(0, NULL)
-#           endif
-#           if __VSF_USART_DEC_MASK & (1 << 1)
-                __VSF_USART_DEC_LV0(1, NULL)
-#           endif
-#           if __VSF_USART_DEC_MASK & (1 << 2)
-                __VSF_USART_DEC_LV0(2, NULL)
-#           endif
-#           if __VSF_USART_DEC_MASK & (1 << 3)
-                __VSF_USART_DEC_LV0(3, NULL)
-#           endif
-#           if __VSF_USART_DEC_MASK & (1 << 4)
-                __VSF_USART_DEC_LV0(4, NULL)
-#           endif
-#           if __VSF_USART_DEC_MASK & (1 << 5)
-                __VSF_USART_DEC_LV0(5, NULL)
-#           endif
-#           if __VSF_USART_DEC_MASK & (1 << 6)
-                __VSF_USART_DEC_LV0(6, NULL)
-#           endif
-#           if __VSF_USART_DEC_MASK & (1 << 7)
-                __VSF_USART_DEC_LV0(7, NULL)
-#           endif
-
-#           undef __VSF_USART_DEC_COUNT
-#           undef __VSF_USART_DEC_MASK
-#           undef __VSF_USART_DEC_LV0
-#       endif
-
-#       undef VSF_USART_CFG_DEC_UPPERCASE_PREFIX
-#   endif   /* VSF_USART_CFG_DEC_UPPERCASE_PREFIX */
-
-#   undef VSF_USART_CFG_DEC_PREFIX
-#endif /* VSF_USART_CFG_DEC_PREFIX */
-

@@ -56,6 +56,10 @@ extern "C" {
 #   endif
 #endif
 
+#ifndef VSF_I2C_CFG_FUNCTION_RENAME
+#   define VSF_I2C_CFG_FUNCTION_RENAME          ENABLED
+#endif
+
 #ifndef VSF_I2C_CFG_REQUEST_TEMPLATE
 #   define VSF_I2C_CFG_REQUEST_TEMPLATE         DISABLED
 #endif
@@ -78,35 +82,15 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_I2C_INIT(i2c_ptr, cfg_ptr)                                          \
-    vsf_i2c_init((vsf_i2c_t *)i2c_ptr, cfg_ptr)
-#define VSF_I2C_ENABLE(i2c_ptr)                                                 \
-    vsf_i2c_enable((vsf_i2c_t *)i2c_ptr)
-#define VSF_I2C_DISABLE(i2c_ptr)                                                \
-    vsf_i2c_disable((vsf_i2c_t *)i2c_ptr)
-#define VSF_I2C_IRQ_ENABLE(i2c_ptr, irq_mask)                                   \
-    vsf_i2c_irq_enable((vsf_i2c_t *)i2c_ptr, irq_mask)
-#define VSF_I2C_IRQ_DISABLE(i2c_ptr, irq_mask)                                  \
-    vsf_i2c_irq_disable((vsf_i2c_t *)i2c_ptr, irq_mask)
-#define VSF_I2C_STATUS(i2c_ptr)                                                 \
-    vsf_i2c_status((vsf_i2c_t *)i2c_ptr)
-#define VSF_I2C_CAPABILITY(i2c_ptr)                                             \
-    vsf_i2c_capability((vsf_i2c_t *)i2c_ptr)
-#define VSF_I2C_CS_ACTIVE(i2c_ptr, index)                                       \
-    vsf_i2c_cs_active((vsf_i2c_t *)i2c_ptr, index)
-#define VSF_I2C_MASTER_REQUEST(i2c_ptr, address, cmd, count, buffer_ptr)        \
-    vsf_i2c_master_request((vsf_i2c_t *)i2c_ptr, address，cmd, count, buffer_ptr)
-
-#define VSF_I2C_APIS(__prefix_name)                                                                                   \
-    VSF_I2C_API(__prefix_name, vsf_err_t,        init,           vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)              \
-    VSF_I2C_API(__prefix_name, fsm_rt_t,         enable,         vsf_i2c_t *i2c_ptr)                                  \
-    VSF_I2C_API(__prefix_name, fsm_rt_t,         disable,        vsf_i2c_t *i2c_ptr)                                  \
-    VSF_I2C_API(__prefix_name, void,             irq_enable,     vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)      \
-    VSF_I2C_API(__prefix_name, void,             irq_disable,    vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)      \
-    VSF_I2C_API(__prefix_name, i2c_status_t,     status,         vsf_i2c_t *i2c_ptr)                                  \
-    VSF_I2C_API(__prefix_name, i2c_capability_t, capability,     vsf_i2c_t *i2c_ptr)                                  \
-    VSF_I2C_API(__prefix_name, vsf_err_t,        master_request, vsf_i2c_t *i2c_ptr, uint16_t address,                \
-                                                                 em_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)
+#define VSF_I2C_APIS(__prefix_name)                                                                                                                        \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2c, init,           VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, i2c_cfg_t *cfg_ptr)              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         i2c, enable,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         i2c, disable,        VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2c, irq_enable,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, em_i2c_irq_mask_t irq_mask)      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2c, irq_disable,    VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, em_i2c_irq_mask_t irq_mask)      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, i2c_status_t,     i2c, status,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, i2c_capability_t, i2c, capability,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2c, master_request, VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, uint16_t address, em_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)
 
 /*============================ TYPES =========================================*/
 
@@ -253,12 +237,12 @@ typedef void vsf_i2c_isr_handler_t(void *target_ptr,
  @brief i2c 中断配置
  */
 typedef struct vsf_i2c_isr_t {
-    vsf_i2c_isr_handler_t *handler_fn;    	//!< \~english TODO
-                                          	//!< \~chinese 中断回调函数
-    void                  *target_ptr;    	//!< \~english pointer of user target
-                                        	//!< \~chinese 用户传入的指针
-    vsf_arch_prio_t        prio;          	//!< \~english interrupt priority
-                                        	//!< \~chinesh 中断优先级
+    vsf_i2c_isr_handler_t *handler_fn;        //!< \~english TODO
+                                              //!< \~chinese 中断回调函数
+    void                  *target_ptr;        //!< \~english pointer of user target
+                                              //!< \~chinese 用户传入的指针
+    vsf_arch_prio_t        prio;              //!< \~english interrupt priority
+                                              //!< \~chinesh 中断优先级
 } vsf_i2c_isr_t;
 
 /**
@@ -269,28 +253,21 @@ typedef struct vsf_i2c_isr_t {
  @brief i2c 配置
  */
 typedef struct i2c_cfg_t {
-    uint32_t      mode;         //!< \~english i2c mode \ref em_i2c_feature_t
+    em_i2c_feature_t mode;      //!< \~english i2c mode \ref em_i2c_feature_t
                                 //!< \~chinese i2c 模式 \ref em_i2c_feature_t
 
-    uint32_t      clock_hz;     //!< \~english i2c clock (in Hz)
+    uint32_t clock_hz;          //!< \~english i2c clock (in Hz)
                                 //!< \~chinese i2c 时钟频率 (单位：Hz)
 
     vsf_i2c_isr_t isr;          //!< \~english i2c interrupt
                                 //!< \~chinese i2c 中断
 } i2c_cfg_t;
 
-
 typedef struct vsf_i2c_op_t {
-    vsf_err_t          (*init)                (vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr);
-    fsm_rt_t           (*enable)              (vsf_i2c_t *i2c_ptr);
-    fsm_rt_t           (*disable)             (vsf_i2c_t *i2c_ptr);
-    void               (*irq_enable)          (vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask);
-    void               (*irq_disable)         (vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask);
-    i2c_status_t       (*status)              (vsf_i2c_t *i2c_ptr);
-    i2c_capability_t   (*capability)          (vsf_i2c_t *i2c_ptr);
-    vsf_err_t          (*master_request)      (vsf_i2c_t *i2c_ptr, uint16_t address,
-                                               em_i2c_cmd_t cmd, uint16_t count,
-                                               uint8_t *buffer_ptr);
+#undef __VSF_HAL_TEMPLATE_API
+#define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
+
+    VSF_I2C_APIS(vsf)
 } vsf_i2c_op_t;
 
 #if VSF_I2C_CFG_MULTI_CLASS == ENABLED
@@ -444,86 +421,29 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vsf_i2c_init            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)
-#define vsf_i2c_enable          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)
-#define vsf_i2c_disable         VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)
-#define vsf_i2c_irq_enable      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)
-#define vsf_i2c_irq_disable     VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_disable)
-#define vsf_i2c_status          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_status)
-#define vsf_i2c_capability      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)
-#define vsf_i2c_master_request  VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)
+#if VSF_I2C_CFG_FUNCTION_RENAME == ENABLED
+#   define vsf_i2c_init(__I2C, ...)                                             \
+        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)             ((VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t) *)__I2C, ##__VA_ARGS__)
+#   define vsf_i2c_enable(__I2C)                                                \
+        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)           ((VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t) *)__I2C)
+#   define vsf_i2c_disable(__I2C)                                               \
+        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)          ((VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t) *)__I2C)
+#   define vsf_i2c_irq_enable(__I2C, ...)                                       \
+        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)       ((VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t) *)__I2C, ##__VA_ARGS__)
+#   define vsf_i2c_irq_disable(__I2C, ...)                                      \
+        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_disable)      ((VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t) *)__I2C, ##__VA_ARGS__)
+#   define vsf_i2c_status(__I2C)                                                \
+        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_status)           ((VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t) *)__I2C)
+#   define vsf_i2c_capability(__I2C)                                            \
+        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)       ((VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t) *)__I2C)
+#   define vsf_i2c_cs_active(__I2C, ...)                                        \
+        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_cs_active)        ((VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t) *)__I2C, ##__VA_ARGS__)
+#   define vsf_i2c_master_request(__I2C, ...)                                   \
+        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)   ((VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t) *)__I2C, ##__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif  /*__HAL_DRIVER_I2C_INTERFACE_H__*/
-
-/*============================ MACROFIED FUNCTIONS ===========================*/
-
-#if defined(VSF_I2C_CFG_DEC_PREFIX)
-#   undef VSF_I2C_API
-#   define VSF_I2C_API(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, _i2c_, __return, __name, __VA_ARGS__)
-
-// expand to:
-//  extern vsf_err_t vsf_xxx_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr);
-//  ...
-VSF_I2C_APIS(VSF_I2C_CFG_DEC_PREFIX)
-
-#   if defined(VSF_I2C_CFG_DEC_UPPERCASE_PREFIX)
-#       if VSF_MCONNECT(VSF_I2C_CFG_DEC_UPPERCASE_PREFIX, _I2C_COUNT)
-#           define __VSF_I2C_DEC_COUNT VSF_MCONNECT(VSF_I2C_CFG_DEC_UPPERCASE_PREFIX, _I2C_COUNT)
-
-#           if VSF_MCONNECT(VSF_I2C_CFG_DEC_UPPERCASE_PREFIX, _I2C_MASK)
-#               define __VSF_I2C_DEC_MASK    VSF_MCONNECT(VSF_I2C_CFG_DEC_UPPERCASE_PREFIX, _I2C_MASK)
-#           else
-#               define __VSF_I2C_DEC_MASK    ((1ul << __VSF_I2C_DEC_COUNT) - 1)
-#           endif
-
-// expand to:
-//  typedef vsf_xxx_i2c_t vsf_xxx_i2c_t;
-typedef struct VSF_MCONNECT(VSF_I2C_CFG_DEC_PREFIX, _i2c_t) \
-            VSF_MCONNECT(VSF_I2C_CFG_DEC_PREFIX, _i2c_t);
-
-// expand to:
-//  extern vsf_xxx_i2c_t vsf_xxx_i2c{0,1,2,3,...};
-#           define __VSF_I2C_DEC_LV0(__count, __dont_care)   \
-                extern VSF_MCONNECT(VSF_I2C_CFG_DEC_PREFIX, _i2c_t) \
-                    VSF_MCONNECT(VSF_I2C_CFG_DEC_PREFIX, _i2c, __count);
-
-#           if __VSF_I2C_DEC_MASK & (1 << 0)
-                __VSF_I2C_DEC_LV0(0, NULL)
-#           endif
-#           if __VSF_I2C_DEC_MASK & (1 << 1)
-                __VSF_I2C_DEC_LV0(1, NULL)
-#           endif
-#           if __VSF_I2C_DEC_MASK & (1 << 2)
-                __VSF_I2C_DEC_LV0(2, NULL)
-#           endif
-#           if __VSF_I2C_DEC_MASK & (1 << 3)
-                __VSF_I2C_DEC_LV0(3, NULL)
-#           endif
-#           if __VSF_I2C_DEC_MASK & (1 << 4)
-                __VSF_I2C_DEC_LV0(4, NULL)
-#           endif
-#           if __VSF_I2C_DEC_MASK & (1 << 5)
-                __VSF_I2C_DEC_LV0(5, NULL)
-#           endif
-#           if __VSF_I2C_DEC_MASK & (1 << 6)
-                __VSF_I2C_DEC_LV0(6, NULL)
-#           endif
-#           if __VSF_I2C_DEC_MASK & (1 << 7)
-                __VSF_I2C_DEC_LV0(7, NULL)
-#           endif
-
-#           undef __VSF_I2C_DEC_COUNT
-#           undef __VSF_I2C_DEC_MASK
-#           undef __VSF_I2C_DEC_LV0
-#       endif
-
-#       undef VSF_I2C_CFG_DEC_UPPERCASE_PREFIX
-#   endif   /* VSF_I2C_CFG_DEC_UPPERCASE_PREFIX */
-
-#   undef VSF_I2C_CFG_DEC_PREFIX
-#endif /* VSF_I2C_CFG_DEC_PREFIX */

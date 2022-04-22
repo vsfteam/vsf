@@ -28,14 +28,17 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_TEMPLATE_HAL_API_OP(__prefix_name, __module__, __return, __name, ...)           \
-    .__name = & __prefix_name ## __module__ ## __name,
+#define VSF_HAL_TEMPLATE_API_OP(__prefix_name, __return, __module__, __name, __first_args, ...)           \
+    .__name = (__return (*)( VSF_MCONNECT(vsf, _, __module__, _t) *, ##__VA_ARGS__ ))& VSF_MCONNECT(__prefix_name, _, __module__, _, __name),
 
-#define VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, __module__, __return, __name, ...)       \
-    extern __return __prefix_name ## __module__ ## __name ( __VA_ARGS__ );
+#define VSF_HAL_TEMPLATE_API_FP(__prefix_name, __return, __module__, __name, __first_args, ...)           \
+    __return (* __name )( __first_args, ##__VA_ARGS__ );
 
-#define VSF_TEMPLATE_HAL_API_DEFINE(__prefix_name, __module__, __return, __name, ...)       \
-    __return __prefix_name ## __module__ ## __name ( __VA_ARGS__ )
+#define VSF_HAL_TEMPLATE_API_EXTERN(__prefix_name, __return, __module__, __name, __first_args, ...)       \
+    extern __return VSF_MCONNECT(__prefix_name, _, __module__, _, __name)( __first_args, ##__VA_ARGS__ );
+
+#define VSF_HAL_TEMPLATE_API_DEFINE(__prefix_name, __return, __module__, __name, __first_args, ...)       \
+    __return VSF_MCONNECT(__prefix_name, _, __module__, _, __name)( __first_args, ##__VA_ARGS__ )
 
 /*============================ TYPES =========================================*/
 

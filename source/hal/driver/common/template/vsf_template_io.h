@@ -104,6 +104,14 @@ extern "C" {
 #   endif
 #endif
 
+#ifndef VSF_GPIO_CFG_FUNCTION_RENAME
+#   define VSF_GPIO_CFG_FUNCTION_RENAME             ENABLED
+#endif
+
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY
+#   define VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY      DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_IO_PINA_NUM(__N, __OFFSET)    PA ## __N = (__OFFSET) + (__N),       \
@@ -120,47 +128,21 @@ extern "C" {
 #define __VSF_IO_PINC_MSK(__N, __OFFSET)    PC ## __N ##_msk = (1ul<<(__N)),
 #define __VSF_IO_PIND_MSK(__N, __OFFSET)    PD ## __N ##_msk = (1ul<<(__N)),
 
-#define VSF_GPIO_CONFIG_PIN(__GPIO, __PIN_MASK, __FEATURE)                      \
-    vsf_gpio_config_pin((vsf_gpio_t *)__GPIO, __PIN_MASK, __FEATURE)
-#define VSF_GPIO_SET_DIRECTION(__GPIO, DIRECTION_MASK, __PIN_MASK)              \
-    vsf_gpio_set_direction((vsf_gpio_t *)__GPIO, DIRECTION_MASK, __PIN_MASK)
-#define VSF_GPIO_GET_DIRECTION(__GPIO, __PIN_MASK)                              \
-    vsf_gpio_get_direction((vsf_gpio_t *)__GPIO, __PIN_MASK)
-#define VSF_GPIO_SET_INPUT(__GPIO, __PIN_MASK)                                  \
-    vsf_gpio_set_input((vsf_gpio_t *)__GPIO, __PIN_MASK)
-#define VSF_GPIO_SET_OUTPUT(__GPIO, __PIN_MASK)                                 \
-    vsf_gpio_set_output((vsf_gpio_t *)__GPIO, __PIN_MASK)
-#define VSF_GPIO_SWITCH_DIRECTION(__GPIO, __PIN_MASK)                           \
-    vsf_gpio_switch_direction((vsf_gpio_t *)__GPIO, __PIN_MASK)
-#define VSF_GPIO_READ(__GPIO)                                                   \
-    vsf_gpio_read((vsf_gpio_t *)__GPIO)
-#define VSF_GPIO_WRITE(__GPIO, __VALUE, __PIN_MASK)                             \
-    vsf_gpio_write((vsf_gpio_t *)__GPIO, __VALUE, __PIN_MASK)
-#define VSF_GPIO_SET(__GPIO, __PIN_MASK)                                        \
-    vsf_gpio_set((vsf_gpio_t *)__GPIO, __PIN_MASK)
-#define VSF_GPIO_CLEAR(__GPIO, __PIN_MASK)                                      \
-    vsf_gpio_clear((vsf_gpio_t *)__GPIO, __PIN_MASK)
-#define VSF_GPIO_OUTPUT_AND_SET(__GPIO, __PIN_MASK)                             \
-    vsf_gpio_output_and_set((vsf_gpio_t *)__GPIO, __PIN_MASK)
-#define VSF_GPIO_OUTPUT_AND_CLEAR(__GPIO, __PIN_MASK)                           \
-    vsf_gpio_output_and_clear((vsf_gpio_t *)__GPIO, __PIN_MASK)
-#define VSF_GPIO_TOGGLE(__GPIO, __PIN_MASK)                                     \
-    vsf_gpio_toggle((vsf_gpio_t *)__GPIO, __PIN_MASK)
-
-#define VSF_GPIO_APIS(__prefix_name)                                                                                         \
-    VSF_GPIO_API(__prefix_name, void,     config_pin,       vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)  \
-    VSF_GPIO_API(__prefix_name, void,     set_direction,    vsf_gpio_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)\
-    VSF_GPIO_API(__prefix_name, uint32_t, get_direction,    vsf_gpio_t *gpio_ptr, uint32_t pin_mask)                         \
-    VSF_GPIO_API(__prefix_name, void,     set_input,        vsf_gpio_t *gpio_ptr, uint32_t pin_mask)                         \
-    VSF_GPIO_API(__prefix_name, void,     set_output,       vsf_gpio_t *gpio_ptr, uint32_t pin_mask)                         \
-    VSF_GPIO_API(__prefix_name, void,     switch_direction, vsf_gpio_t *gpio_ptr, uint32_t pin_mask)                         \
-    VSF_GPIO_API(__prefix_name, uint32_t, read,             vsf_gpio_t *gpio_ptr)                                            \
-    VSF_GPIO_API(__prefix_name, void,     write,            vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)         \
-    VSF_GPIO_API(__prefix_name, void,     set,              vsf_gpio_t *gpio_ptr, uint32_t pin_mask)                         \
-    VSF_GPIO_API(__prefix_name, void,     clear,            vsf_gpio_t *gpio_ptr, uint32_t pin_mask)                         \
-    VSF_GPIO_API(__prefix_name, void,     toggle,           vsf_gpio_t *gpio_ptr, uint32_t pin_mask)                         \
-    VSF_GPIO_API(__prefix_name, void,     output_and_set,   vsf_gpio_t *gpio_ptr, uint32_t pin_mask)                         \
-    VSF_GPIO_API(__prefix_name, void,     output_and_clear, vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+#define VSF_GPIO_APIS(__prefix_name)                                                                                                                                            \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, gpio_capability_t, gpio, capability,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, config_pin,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)\
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,          gpio, get_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_input,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_output,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, switch_direction, VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,          gpio, read,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                            \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, write,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t value, uint32_t pin_mask)         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set,              VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, clear,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, toggle,           VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, output_and_set,   VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, output_and_clear, VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)
 
 /*============================ TYPES =========================================*/
 
@@ -251,31 +233,30 @@ typedef struct io_cfg_t{
     uint32_t        feature;                    //!< pin feature
 } io_cfg_t;
 
-typedef struct gpio_reg_t   gpio_reg_t;
+
+#if VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+typedef struct gpio_capability_t {
+    inherit(peripheral_capability_t)
+} gpio_capability_t;
+#endif
+
+typedef struct gpio_reg_t gpio_reg_t;
 
 typedef struct vsf_gpio_t vsf_gpio_t;
 
 typedef struct vsf_gpio_op_t {
-    void            (*config_pin)       (vsf_gpio_t * gpio_ptr, uint32_t pin_mask, uint_fast32_t feature);
-    void            (*set_direction)    (vsf_gpio_t * gpio_ptr, uint32_t dir_bitmap, uint32_t pin_mask);
-    uint32_t        (*get_direction)    (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*set_input)        (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*set_output)       (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*switch_direction) (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    uint32_t        (*read)             (vsf_gpio_t * gpio_ptr);
-    void            (*write)            (vsf_gpio_t * gpio_ptr, uint32_t value, uint32_t pin_mask);
-    void            (*set)              (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*clear)            (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*toggle)           (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*output_and_set)   (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
-    void            (*output_and_clear) (vsf_gpio_t * gpio_ptr, uint32_t pin_mask);
+#undef __VSF_HAL_TEMPLATE_API
+#define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
+
+    VSF_GPIO_APIS(vsf)
 } vsf_gpio_op_t;
 
 #if VSF_GPIO_CFG_MULTI_CLASS == ENABLED
-typedef struct vsf_gpio_t  {
+struct vsf_gpio_t  {
     const vsf_gpio_op_t * op;
-} vsf_gpio_t;
+};
 #endif
+
 
 //! gpio control interface
 //! @{
@@ -396,91 +377,37 @@ extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
 
 /*============================ MACROS ========================================*/
 
-#define vsf_gpio_config_pin       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_config_pin)
-#define vsf_gpio_set_direction    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_direction)
-#define vsf_gpio_get_direction    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_get_direction)
-#define vsf_gpio_set_input        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_input)
-#define vsf_gpio_set_output       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_output)
-#define vsf_gpio_switch_direction VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_switch_direction)
-#define vsf_gpio_read             VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_read)
-#define vsf_gpio_write            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_write)
-#define vsf_gpio_set              VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set)
-#define vsf_gpio_clear            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_clear)
-#define vsf_gpio_output_and_set   VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)
-#define vsf_gpio_output_and_clear VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)
-#define vsf_gpio_toggle           VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)
+#if VSF_GPIO_CFG_FUNCTION_RENAME == ENABLED
+#   define vsf_gpio_config_pin(__GPIO, ...)                                     \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_config_pin)         ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_set_direction(__GPIO, ...)                                  \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_direction)      ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_get_direction(__GPIO, ...)                                  \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_get_direction)      ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_set_input(__GPIO, ...)                                      \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_input)          ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_set_output(__GPIO, ...)                                     \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_output)         ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_switch_direction(__GPIO, ...)                               \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_switch_direction)   ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_read(__GPIO)                                                \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_read)               ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO)
+#   define vsf_gpio_write(__GPIO, __VALUE, ...)                                 \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_write)              ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_set(__GPIO, ...)                                            \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set)                ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_clear(__GPIO, ...)                                          \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_clear)              ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_output_and_set(__GPIO, ...)                                 \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)     ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_output_and_clear(__GPIO, ...)                               \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)   ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_toggle(__GPIO, ...)                                         \
+        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)             ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif  /* __HAL_DRIVER_IO_INTERFACE_H__ */
-
-/*============================ MACROFIED FUNCTIONS ===========================*/
-
-#if defined(VSF_GPIO_CFG_DEC_PREFIX)
-#   undef VSF_GPIO_API
-#   define VSF_GPIO_API(__prefix_name, __return, __name, ...)                   \
-    VSF_TEMPLATE_HAL_API_EXTERN(__prefix_name, _gpio_, __return, __name, __VA_ARGS__)
-
-// expand to:
-//  extern vsf_err_t vsf_xxx_gpio_init(vsf_gpio_t *gpio_ptr, gpio_cfg_t *cfg_ptr);
-//  ...
-VSF_GPIO_APIS(VSF_GPIO_CFG_DEC_PREFIX)
-
-#   if defined(VSF_GPIO_CFG_DEC_UPPERCASE_PREFIX)
-#       if VSF_MCONNECT(VSF_GPIO_CFG_DEC_UPPERCASE_PREFIX, _GPIO_COUNT)
-#           define __VSF_GPIO_DEC_COUNT VSF_MCONNECT(VSF_GPIO_CFG_DEC_UPPERCASE_PREFIX, _GPIO_COUNT)
-
-#           if VSF_MCONNECT(VSF_GPIO_CFG_DEC_UPPERCASE_PREFIX, _GPIO_MASK)
-#               define __VSF_GPIO_DEC_MASK    VSF_MCONNECT(VSF_GPIO_CFG_DEC_UPPERCASE_PREFIX, _GPIO_MASK)
-#           else
-#               define __VSF_GPIO_DEC_MASK    ((1ul << __VSF_GPIO_DEC_COUNT) - 1)
-#           endif
-
-// expand to:
-//  typedef vsf_xxx_gpio_t vsf_xxx_gpio_t;
-typedef struct VSF_MCONNECT(VSF_GPIO_CFG_DEC_PREFIX, _gpio_t) \
-            VSF_MCONNECT(VSF_GPIO_CFG_DEC_PREFIX, _gpio_t);
-
-// expand to:
-//  extern vsf_xxx_gpio_t vsf_xxx_gpio{0,1,2,3,...};
-#           define __VSF_GPIO_DEC_LV0(__count, __dont_care)   \
-                extern VSF_MCONNECT(VSF_GPIO_CFG_DEC_PREFIX, _gpio_t) \
-                    VSF_MCONNECT(VSF_GPIO_CFG_DEC_PREFIX, _gpio, __count);
-
-#           if __VSF_GPIO_DEC_MASK & (1 << 0)
-                __VSF_GPIO_DEC_LV0(0, NULL)
-#           endif
-#           if __VSF_GPIO_DEC_MASK & (1 << 1)
-                __VSF_GPIO_DEC_LV0(1, NULL)
-#           endif
-#           if __VSF_GPIO_DEC_MASK & (1 << 2)
-                __VSF_GPIO_DEC_LV0(2, NULL)
-#           endif
-#           if __VSF_GPIO_DEC_MASK & (1 << 3)
-                __VSF_GPIO_DEC_LV0(3, NULL)
-#           endif
-#           if __VSF_GPIO_DEC_MASK & (1 << 4)
-                __VSF_GPIO_DEC_LV0(4, NULL)
-#           endif
-#           if __VSF_GPIO_DEC_MASK & (1 << 5)
-                __VSF_GPIO_DEC_LV0(5, NULL)
-#           endif
-#           if __VSF_GPIO_DEC_MASK & (1 << 6)
-                __VSF_GPIO_DEC_LV0(6, NULL)
-#           endif
-#           if __VSF_GPIO_DEC_MASK & (1 << 7)
-                __VSF_GPIO_DEC_LV0(7, NULL)
-#           endif
-
-#           undef __VSF_GPIO_DEC_COUNT
-#           undef __VSF_GPIO_DEC_MASK
-#           undef __VSF_GPIO_DEC_LV0
-#       endif
-
-#       undef VSF_GPIO_CFG_DEC_UPPERCASE_PREFIX
-#   endif   /* VSF_GPIO_CFG_DEC_UPPERCASE_PREFIX */
-
-#   undef VSF_GPIO_CFG_DEC_PREFIX
-#endif /* VSF_GPIO_CFG_DEC_PREFIX */
