@@ -26,7 +26,6 @@ set(VSF_USE_LINUX 1)
     set(VSF_LINUX_USE_SIMPLE_LIBC 1)
 set(VSF_USE_LVGL 1)
 set(VSF_USE_DISP 1)
-set(VSF_USE_EVM 1)
 set(VSF_USE_FREETYPE 1)
 
 # include vsf cmake script
