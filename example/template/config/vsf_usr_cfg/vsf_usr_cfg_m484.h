@@ -67,8 +67,6 @@
 #define APP_USE_HAL_SPI_DEMO                            DISABLED
 
 // 3rd-party demos
-//  awtk is LGPL, not convenient to implement in MCU
-#define APP_USE_AWTK_DEMO                               DISABLED
 // nnom minst demo seems to be broken
 #define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               DISABLED
@@ -85,7 +83,6 @@
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
 #define APP_USE_LWIP_DEMO                               DISABLED
-#define APP_USE_EVM_DEMO                                DISABLED
 
 // component configure
 #define VSF_USE_HEAP                                    ENABLED

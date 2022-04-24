@@ -13,7 +13,6 @@ target_sources(${CMAKE_PROJECT_NAME} PUBLIC
 add_subdirectory(btstack_demo)
 add_subdirectory(common)
 add_subdirectory(disp_demo)
-add_subdirectory(evm_demo)
 add_subdirectory(freetype_demo)
 add_subdirectory(hal_demo)
 add_subdirectory(kernel_test)

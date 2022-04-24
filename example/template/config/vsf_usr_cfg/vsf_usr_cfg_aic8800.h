@@ -110,8 +110,6 @@
 #       define APP_USE_HAL_GPIO_DEMO                    ENABLED
 
 // 3rd-party demos
-//  awtk is LGPL, not convenient to implement in MCU
-#define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
 //#   define APP_LVGL_DEMO_USE_TERMINAL                   ENABLED
@@ -139,7 +137,6 @@
 // lwip demo is not compatible with aic8800 sdk, but VSF_USE_LWIP should be defined
 #define APP_USE_LWIP_DEMO                               ENABLED
 #   define VSF_USE_LWIP                                 ENABLED
-#define APP_USE_EVM_DEMO                                ENABLED
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 //#define APP_USE_DISTBUS_DEMO                            ENABLED

@@ -163,21 +163,6 @@
     <Filter Include="usrapp\demo\nnom_demo">
       <UniqueIdentifier>{921a1114-4c78-4865-89ad-fa44b07e6dbd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\awtk">
-      <UniqueIdentifier>{ecced7c6-a326-4f63-ad0d-cb930a9bc26a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\awtk\port">
-      <UniqueIdentifier>{201a1f4a-39a7-40ed-a150-1cd0f84b04e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\awtk\port\platforms">
-      <UniqueIdentifier>{a2ba4fe4-dccc-446e-9ed0-e4374904fc86}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\awtk\port\platforms\vsf">
-      <UniqueIdentifier>{7d307b9e-2f3c-4e32-916b-a9171750897c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="usrapp\demo\awtk_demo">
-      <UniqueIdentifier>{1e6e0cd4-7725-4b7e-8f11-1c7589728c37}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usrapp\demo\usbh_demo">
       <UniqueIdentifier>{efa87ff8-5991-46e7-8333-dd64699e5256}</UniqueIdentifier>
     </Filter>
@@ -598,9 +583,6 @@
     <Filter Include="vsf\shell\sys\xboot\include\xfs">
       <UniqueIdentifier>{9c9df98b-ab63-43bc-867f-d12f81b66d29}</UniqueIdentifier>
     </Filter>
-    <Filter Include="usrapp\demo\xui_demo">
-      <UniqueIdentifier>{ec9bb6ec-4985-4576-b8c3-63b4f16d3dda}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\tcpip">
       <UniqueIdentifier>{9846acd1-cf23-4860-bf52-4520f45ee55c}</UniqueIdentifier>
     </Filter>
@@ -787,24 +769,6 @@
     <Filter Include="vsf\service\simple_stream\mem_stream">
       <UniqueIdentifier>{4c1e2742-4b3b-441b-b4ab-13536e0b5e8d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="usrapp\demo\gato_demo">
-      <UniqueIdentifier>{843e6614-3d28-4b4c-b480-6c1d6dc3d0b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\gato">
-      <UniqueIdentifier>{5b71e24e-090a-4f55-8370-9abdf52d59b4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\gato\raw">
-      <UniqueIdentifier>{183c897e-6607-4111-a48b-2e7fb07ad815}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\gato\raw\include">
-      <UniqueIdentifier>{9991797a-c06f-41f3-8a76-0468d7b884c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\gato\raw\image">
-      <UniqueIdentifier>{1d757c37-0afb-4cca-8866-21bb9b49d52f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\gato\raw\render">
-      <UniqueIdentifier>{1a5775b9-e2b7-4388-984a-4378742a713a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\service\fifo">
       <UniqueIdentifier>{59c16c56-15ef-4f49-8e6e-8b332ec1fa95}</UniqueIdentifier>
     </Filter>
@@ -825,15 +789,6 @@
     </Filter>
     <Filter Include="usrapp\demo\socket_demo">
       <UniqueIdentifier>{a2bc7d06-b22c-4bfe-947b-5a0fdb7e7092}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="usrapp\demo\nuklear_demo">
-      <UniqueIdentifier>{b91a2a21-0544-4871-b0dd-18207ff714bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\nuklear">
-      <UniqueIdentifier>{621d39b7-9c10-4f90-af56-a32bf468859a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\nuklear\raw">
-      <UniqueIdentifier>{1f522aa9-d73c-48af-9541-376b466df1cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="usrapp\demo\tgui_demo\tgui_demo\tgui_designer">
       <UniqueIdentifier>{d6c919d6-509b-40e6-aca1-98c128803726}</UniqueIdentifier>
@@ -979,30 +934,6 @@
     <Filter Include="vsf\hal\driver\vsf\distbus\usbd">
       <UniqueIdentifier>{dd3cbac8-3d0d-4f45-9bdc-f2a7c066672d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="usrapp\demo\LingLongGui_demo">
-      <UniqueIdentifier>{18e70199-509b-462c-abaa-bb19677b1288}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="usrapp\demo\LingLongGui_demo\application">
-      <UniqueIdentifier>{40fcae73-dbdd-44c8-9a46-0099ce741bb5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="usrapp\demo\LingLongGui_demo\application\Fonts">
-      <UniqueIdentifier>{22882236-6da1-48bc-9595-e73660bcda49}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\LingLongGUI">
-      <UniqueIdentifier>{b9b38bf9-9318-4153-bb3f-5e7f1f9e8bdc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\LingLongGUI\raw">
-      <UniqueIdentifier>{46fe314d-e6ea-4604-8f86-57cc67ed84ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\LingLongGUI\raw\Gui">
-      <UniqueIdentifier>{3c65b298-9871-449a-b604-272200d06c8e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\LingLongGUI\raw\Misc">
-      <UniqueIdentifier>{7321cedd-7da0-4bec-8025-6293a9dccb04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\LingLongGUI\port">
-      <UniqueIdentifier>{76aa02d0-fd31-49db-acb0-8e0a3906a0b9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\shell\sys\linux\include\arpa">
       <UniqueIdentifier>{c7db8d44-0203-4a44-bfc2-2b660011e86b}</UniqueIdentifier>
     </Filter>
@@ -1014,9 +945,6 @@
     </Filter>
     <Filter Include="vsf\component\3rd-party\mbedtls\raw\library">
       <UniqueIdentifier>{dcbdf083-c1fe-42be-8a7c-6676df169d55}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="usrapp\demo\guilite_demo">
-      <UniqueIdentifier>{1f226288-bb4b-4c84-a0f7-20f566c484e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\shell\sys\linux\app">
       <UniqueIdentifier>{956b6f38-c687-4a7a-86d2-bf37d4e71d23}</UniqueIdentifier>
@@ -1517,12 +1445,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\nnom\port\nnom_port.h">
       <Filter>vsf\component\3rd-party\nnom\port</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\awtk\port\vsf_awtk_port.h">
-      <Filter>vsf\component\3rd-party\awtk\port</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\main_loop_vsf.h">
-      <Filter>vsf\component\3rd-party\awtk\port\platforms\vsf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\demo\fakefat32.h">
       <Filter>usrapp\demo</Filter>
@@ -2418,33 +2340,6 @@
     <ClInclude Include="..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.h">
       <Filter>vsf\service\simple_stream\mem_stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\color.h">
-      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\consolas-font.h">
-      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\image.h">
-      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\render.h">
-      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\surface.h">
-      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\svg.h">
-      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\image\stb_image.h">
-      <Filter>vsf\component\3rd-party\gato\raw\image</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\image\stb_image_resize.h">
-      <Filter>vsf\component\3rd-party\gato\raw\image</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\image\stb_image_write.h">
-      <Filter>vsf\component\3rd-party\gato\raw\image</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\service\fifo\vsf_fifo.h">
       <Filter>vsf\service\fifo</Filter>
     </ClInclude>
@@ -2459,12 +2354,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.h">
       <Filter>vsf\hal\driver\x86\win\usart</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\nuklear\raw\nuklear.h">
-      <Filter>vsf\component\3rd-party\nuklear\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\demo\nuklear_demo\sdl2surface_rawfb.h">
-      <Filter>usrapp\demo\nuklear_demo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\stdlib.h">
       <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
@@ -3090,108 +2979,6 @@
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_log.h">
       <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Background.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Button.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ButtonEx.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_CheckBox.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ComboBox.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_DateTime.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Gauge.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_General.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Graph.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Handler.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_IconSlider.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Image.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Keyboard.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_LineEdit.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ProgressBar.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_QRCode.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Slider.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Text.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Window.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\asciiDefine.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Characters.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Font.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Lattice.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Linked_List.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Port.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Queue.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_String.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Timer.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\qrcodegen.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\demo\LingLongGui_demo\application\Fonts\SimSun_9.h">
-      <Filter>usrapp\demo\LingLongGui_demo\application\Fonts</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\demo\LingLongGui_demo\application\LL_User.h">
-      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\demo\LingLongGui_demo\application\ui_ll_application.h">
-      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\demo\LingLongGui_demo\application\ui_ll_applicationLogic.h">
-      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\port\LL_Config.h">
-      <Filter>vsf\component\3rd-party\LingLongGUI\port</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netdb.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
@@ -3599,30 +3386,6 @@
     <ClCompile Include="..\..\demo\nnom_demo\nnom_demo.c">
       <Filter>usrapp\demo\nnom_demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\vsf_awtk_port.c">
-      <Filter>vsf\component\3rd-party\awtk\port</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\fs_os.c">
-      <Filter>vsf\component\3rd-party\awtk\port\platforms\vsf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\main_loop_vsf.c">
-      <Filter>vsf\component\3rd-party\awtk\port\platforms\vsf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\mutex.c">
-      <Filter>vsf\component\3rd-party\awtk\port\platforms\vsf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\platform.c">
-      <Filter>vsf\component\3rd-party\awtk\port\platforms\vsf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\semaphore.c">
-      <Filter>vsf\component\3rd-party\awtk\port\platforms\vsf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\thread.c">
-      <Filter>vsf\component\3rd-party\awtk\port\platforms\vsf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\awtk_demo\awtk_demo.c">
-      <Filter>usrapp\demo\awtk_demo</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\demo\usbh_demo\usbh_demo.c">
       <Filter>usrapp\demo\usbh_demo</Filter>
     </ClCompile>
@@ -3697,12 +3460,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\l2cap_signaling.c">
       <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\awtk_demo\awtk_application.c">
-      <Filter>usrapp\demo\awtk_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\awtk_demo\awtk_assets.c">
-      <Filter>usrapp\demo\awtk_demo</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\debugger\nulink\NuConsole_stream.c">
       <Filter>vsf\component\debugger\nulink</Filter>
@@ -4094,9 +3851,6 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\xboot\vsf_xboot.c">
       <Filter>vsf\shell\sys\xboot</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\demo\xui_demo\xui_demo.c">
-      <Filter>usrapp\demo\xui_demo</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\tcpip\netdrv\vsf_netdrv.c">
       <Filter>vsf\component\tcpip\netdrv</Filter>
     </ClCompile>
@@ -4358,24 +4112,6 @@
     <ClCompile Include="..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.c">
       <Filter>vsf\service\simple_stream\mem_stream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\image\image.c">
-      <Filter>vsf\component\3rd-party\gato\raw\image</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\render.c">
-      <Filter>vsf\component\3rd-party\gato\raw\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\surface.c">
-      <Filter>vsf\component\3rd-party\gato\raw\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\svg.c">
-      <Filter>vsf\component\3rd-party\gato\raw\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\gato_demo\gato_demo.c">
-      <Filter>usrapp\demo\gato_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\gato_demo\gato_application.c">
-      <Filter>usrapp\demo\gato_demo</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\service\fifo\vsf_fifo.c">
       <Filter>vsf\service\fifo</Filter>
     </ClCompile>
@@ -4396,9 +4132,6 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\socket_demo\socket_demo.c">
       <Filter>usrapp\demo\socket_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\nuklear_demo\main.c">
-      <Filter>usrapp\demo\nuklear_demo</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c">
       <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
@@ -5063,12 +4796,6 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\nnom\raw\src\backends\nnom_local_q15.c">
       <Filter>vsf\component\3rd-party\nnom\raw\src\backends</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\shape.c">
-      <Filter>vsf\component\3rd-party\gato\raw\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\text.c">
-      <Filter>vsf\component\3rd-party\gato\raw\render</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\service\distbus\vsf_distbus.c">
       <Filter>vsf\service\distbus</Filter>
     </ClCompile>
@@ -5429,108 +5156,6 @@
     <ClCompile Include="..\..\..\..\source\utilities\compiler\x86\x86_compiler.c">
       <Filter>vsf\utilities\compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Background.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Button.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ButtonEx.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_CheckBox.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ComboBox.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_DateTime.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Gauge.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_General.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Graph.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Handler.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_IconSlider.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Image.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Keyboard.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_LineEdit.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_ProgressBar.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_QRCode.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Slider.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Text.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Gui\LL_Window.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Characters.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Font.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Lattice.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Linked_List.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Port.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Queue.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_String.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\LL_Timer.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGui\raw\Misc\qrcodegen.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\raw\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\LingLongGui_demo\application\Fonts\SimSun_9.c">
-      <Filter>usrapp\demo\LingLongGui_demo\application\Fonts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\LingLongGui_demo\application\LL_User.c">
-      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\LingLongGui_demo\application\ui_ll_application.c">
-      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\LingLongGui_demo\application\ui_ll_applicationLogic.c">
-      <Filter>usrapp\demo\LingLongGui_demo\application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\LingLongGui_demo\llgui_demo.c">
-      <Filter>usrapp\demo\LingLongGui_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\port\LL_Config.c">
-      <Filter>vsf\component\3rd-party\LingLongGUI\port</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\aes.c">
       <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
     </ClCompile>
@@ -5813,12 +5438,6 @@
     <ClCompile Include="..\..\..\..\source\component\input\protocol\vsf_input_touchscreen.c">
       <Filter>vsf\component\input\protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\demo\guilite_demo\UIcode.cpp">
-      <Filter>usrapp\demo\guilite_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\guilite_demo\guilite_demo.c">
-      <Filter>usrapp\demo\guilite_demo</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c">
       <Filter>vsf\shell\sys\linux\app\httpd</Filter>
     </ClCompile>
@@ -5915,11 +5534,6 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.c">
       <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="lib\awtk\awtk_vsf.lib">
-      <Filter>vsf\component\3rd-party\awtk</Filter>
-    </Library>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">

@@ -83,23 +83,6 @@
 #endif
 
 // 3rd-party demos
-#define APP_USE_XBOOT_XUI_DEMO                          DISABLED
-#define APP_USE_AWTK_DEMO                               ENABLED
-#define APP_USE_LLGUI_DEMO                              ENABLED
-#if APP_USE_LLGUI_DEMO == ENABLED
-#   define CONFIG_COLOR_DEPTH                           16
-#   define CONFIG_MONITOR_WIDTH                         320
-#   define CONFIG_MONITOR_HEIGHT                        240
-#   define USE_DOUBLE_BUFFERING                         0
-
-#   define LL_FONT_NAME_LENGTH_MAX                      48
-#   define LL_BUTTON_TEXT_LENGTH_MAX                    16
-#   define LL_LINEEDIT_TEXT_LENGTH_MAX                  48
-#   define LL_CHECKBOX_TEXT_LENGTH_MAX                  16
-#   define LL_COMBOBOX_ITEM_MAX                         16
-
-#   define IMAGE_READ_BYTE_MAX                          1024
-#endif
 // nnom minst demo seems to be broken
 #define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
@@ -124,13 +107,8 @@
 #define APP_USE_VSFIP_DEMO                              DISABLED
 #define APP_USE_LWIP_DEMO                               ENABLED
 #define APP_USE_SOCKET_DEMO                             ENABLED
-#define APP_USE_GATO_DEMO                               ENABLED
-#define APP_USE_NUKLEAR_DEMO                            ENABLED
-#define APP_USE_EVM_DEMO                                DISABLED
-#   define VSF_EVM_USE_BLUETOOTH                        DISABLED
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
-#define APP_USE_GUILITE_DEMO                            DISABLED
 
 #if     APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED       \
     ||  (APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_CFG_FREETYPE == ENABLED)

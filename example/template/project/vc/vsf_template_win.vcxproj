@@ -11,8 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\main_loop_vsf.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\awtk\port\vsf_awtk_port.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.h" />
@@ -146,15 +144,6 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\raw\include\freetype\ttnameid.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\raw\include\freetype\tttables.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\raw\include\freetype\tttags.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\image\stb_image.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\image\stb_image_resize.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\image\stb_image_write.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\color.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\consolas-font.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\image.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\render.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\surface.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\gato\raw\include\svg.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\libjpeg-turbo\port\jconfig.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\libjpeg-turbo\port\jconfigint.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\cderror.h" />
@@ -177,36 +166,6 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\libpng\raw\pnginfo.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\libpng\raw\pngpriv.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\libpng\raw\pngstruct.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\port\LL_Config.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Background.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Button.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_ButtonEx.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_CheckBox.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_ComboBox.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_DateTime.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Gauge.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_General.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Graph.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Handler.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_IconSlider.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Image.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Keyboard.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_LineEdit.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_ProgressBar.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_QRCode.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Slider.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Text.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Window.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\asciiDefine.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Characters.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Font.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Lattice.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Linked_List.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Port.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Queue.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_String.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Timer.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\qrcodegen.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\littlefs\port\lfs_port.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\littlefs\port\lfs_util_vsf.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\littlefs\raw\lfs.h" />
@@ -351,7 +310,6 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_invasive.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ssl_tls13_keys.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\nnom\port\nnom_port.h" />
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\nuklear\raw\nuklear.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\vsfip\raw\netif\vsfip_netdrv_adapter.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\vsfip\raw\netif\vsfip_netif.h" />
@@ -746,11 +704,6 @@
     <ClInclude Include="..\..\demo\common\usrapp_usbd_common.h" />
     <ClInclude Include="..\..\demo\common\usrapp_usbh_common.h" />
     <ClInclude Include="..\..\demo\fakefat32.h" />
-    <ClInclude Include="..\..\demo\LingLongGUI_demo\application\Fonts\SimSun_9.h" />
-    <ClInclude Include="..\..\demo\LingLongGUI_demo\application\LL_User.h" />
-    <ClInclude Include="..\..\demo\LingLongGUI_demo\application\ui_ll_application.h" />
-    <ClInclude Include="..\..\demo\LingLongGUI_demo\application\ui_ll_applicationLogic.h" />
-    <ClInclude Include="..\..\demo\nuklear_demo\sdl2surface_rawfb.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images_data.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.h" />
@@ -761,13 +714,6 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\fs_os.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\main_loop_vsf.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\mutex.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\platform.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\semaphore.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\platforms\vsf\thread.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\awtk\port\vsf_awtk_port.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\driver\hid\btstack_dev_hid.c" />
@@ -852,12 +798,6 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\type1\type1.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\type42\type42.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\winfonts\winfnt.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\image\image.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\render.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\shape.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\surface.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\svg.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\text.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\cdjpeg.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jaricom.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jcapimin.c" />
@@ -935,35 +875,6 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\libpng\raw\pngwrite.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\libpng\raw\pngwtran.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\libpng\raw\pngwutil.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\port\LL_Config.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Background.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Button.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_ButtonEx.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_CheckBox.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_ComboBox.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_DateTime.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Gauge.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_General.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Graph.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Handler.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_IconSlider.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Image.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Keyboard.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_LineEdit.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_ProgressBar.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_QRCode.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Slider.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Text.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui\LL_Window.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Characters.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Font.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Lattice.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Linked_List.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Port.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Queue.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_String.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\LL_Timer.c" />
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc\qrcodegen.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\littlefs\port\lfs_port.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\littlefs\raw\lfs.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\lua\port\lua_port.c" />
@@ -1538,9 +1449,6 @@
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_list.c" />
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_queue.c" />
     <ClCompile Include="..\..\demo\audio_demo\audio_demo.c" />
-    <ClCompile Include="..\..\demo\awtk_demo\awtk_application.c" />
-    <ClCompile Include="..\..\demo\awtk_demo\awtk_assets.c" />
-    <ClCompile Include="..\..\demo\awtk_demo\awtk_demo.c" />
     <ClCompile Include="..\..\demo\btstack_demo\btstack_application.c" />
     <ClCompile Include="..\..\demo\btstack_demo\btstack_demo.c" />
     <ClCompile Include="..\..\demo\common\usrapp_audio_common.c" />
@@ -1558,10 +1466,6 @@
     <ClCompile Include="..\..\demo\distbus_demo\distbus_demo.c" />
     <ClCompile Include="..\..\demo\fakefat32.c" />
     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
-    <ClCompile Include="..\..\demo\gato_demo\gato_application.c" />
-    <ClCompile Include="..\..\demo\gato_demo\gato_demo.c" />
-    <ClCompile Include="..\..\demo\guilite_demo\guilite_demo.c" />
-    <ClCompile Include="..\..\demo\guilite_demo\UIcode.cpp" />
     <ClCompile Include="..\..\demo\hal_demo\spi_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\usart_demo.c" />
     <ClCompile Include="..\..\demo\json_demo\json_demo.c" />
@@ -1569,11 +1473,6 @@
     <ClCompile Include="..\..\demo\kernel_test\eda_test.c" />
     <ClCompile Include="..\..\demo\kernel_test\fsm_test.c" />
     <ClCompile Include="..\..\demo\kernel_test\sem_test.c" />
-    <ClCompile Include="..\..\demo\LingLongGUI_demo\application\Fonts\SimSun_9.c" />
-    <ClCompile Include="..\..\demo\LingLongGUI_demo\application\LL_User.c" />
-    <ClCompile Include="..\..\demo\LingLongGUI_demo\application\ui_ll_application.c" />
-    <ClCompile Include="..\..\demo\LingLongGUI_demo\application\ui_ll_applicationLogic.c" />
-    <ClCompile Include="..\..\demo\LingLongGUI_demo\llgui_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\httpd_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\libusb_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\linux_demo.c" />
@@ -1584,7 +1483,6 @@
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_terminal_application.c" />
     <ClCompile Include="..\..\demo\lwip_demo\lwip_demo.c" />
     <ClCompile Include="..\..\demo\nnom_demo\nnom_demo.c" />
-    <ClCompile Include="..\..\demo\nuklear_demo\main.c" />
     <ClCompile Include="..\..\demo\scsi_demo\scsi_demo.c" />
     <ClCompile Include="..\..\demo\sdl2_demo\sdl2_demo.c" />
     <ClCompile Include="..\..\demo\socket_demo\socket_demo.c" />
@@ -1606,10 +1504,6 @@
     <ClCompile Include="..\..\demo\usbh_demo\usbh_demo.c" />
     <ClCompile Include="..\..\demo\vsfip_demo\vsfip_demo.c" />
     <ClCompile Include="..\..\demo\vsfvm_demo\vsfvm_demo.c" />
-    <ClCompile Include="..\..\demo\xui_demo\xui_demo.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="lib\awtk\awtk_vsf.lib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc" />
@@ -1666,7 +1560,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__VSF__;__CPU_X86__;__WIN__;__OOC_CPP__;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;PREDEF_STANDARD_C_1999;LFS_CONFIG=lfs_util_vsf.h;MBEDTLS_USER_CONFIG_FILE="component/3rd-party/mbedtls/port/platform_vsf.h";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\libusb;$(ProjectDir)..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\3rd-party;$(ProjectDir)..\..\config\3rd-party\awtk;$(ProjectDir)..\..\config\3rd-party\btstack;$(ProjectDir)..\..\config\3rd-party\evm;$(ProjectDir)..\..\config\3rd-party\lvgl;$(ProjectDir)..\..\config\3rd-party\lwip;$(ProjectDir)..\..\demo\LingLongGUI_demo\application;$(ProjectDir)..\..\demo\LingLongGUI_demo\application\Fonts;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port\vsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\nuklear\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\mbedtls\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\GuiLite\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\littlefs\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\littlefs\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\libusb;$(ProjectDir)..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\3rd-party;$(ProjectDir)..\..\config\3rd-party\btstack;$(ProjectDir)..\..\config\3rd-party\lvgl;$(ProjectDir)..\..\config\3rd-party\lwip;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port\vsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\mbedtls\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\littlefs\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\littlefs\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
@@ -1696,7 +1590,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__VSF__;__CPU_X86__;__WIN__;__OOC_RELEASE__;__OOC_CPP__;NDEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;PREDEF_STANDARD_C_1999;LFS_CONFIG=lfs_util_vsf.h;MBEDTLS_USER_CONFIG_FILE="component/3rd-party/mbedtls/port/platform_vsf.h";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\libusb;$(ProjectDir)..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\3rd-party;$(ProjectDir)..\..\config\3rd-party\awtk;$(ProjectDir)..\..\config\3rd-party\btstack;$(ProjectDir)..\..\config\3rd-party\evm;$(ProjectDir)..\..\config\3rd-party\lvgl;$(ProjectDir)..\..\config\3rd-party\lwip;$(ProjectDir)..\..\demo\LingLongGUI_demo\application;$(ProjectDir)..\..\demo\LingLongGUI_demo\application\Fonts;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port\vsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\nuklear\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Gui;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\raw\Misc;$(ProjectDir)..\..\..\..\source\component\3rd-party\LingLongGUI\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\mbedtls\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\GuiLite\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\littlefs\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\littlefs\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\libusb;$(ProjectDir)..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\3rd-party;$(ProjectDir)..\..\config\3rd-party\btstack;$(ProjectDir)..\..\config\3rd-party\lvgl;$(ProjectDir)..\..\config\3rd-party\lwip;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port\vsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\mbedtls\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\littlefs\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\littlefs\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>$(IntDir)/__sub0/__sub1/__sub2/__sub3/%(RelativeDir)</AssemblerListingLocation>

@@ -357,7 +357,6 @@
                     <state>$PROJ_DIR$\..\..\config\3rd-party</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\awtk</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\btstack</state>
-                    <state>$PROJ_DIR$\..\..\config\3rd-party\evm</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\lwip</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
@@ -385,9 +384,6 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\ecma\zephyr</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
                 </option>
                 <option>
@@ -1452,7 +1448,6 @@
                     <state>$PROJ_DIR$\..\..\config\3rd-party</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\awtk</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\btstack</state>
-                    <state>$PROJ_DIR$\..\..\config\3rd-party\evm</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\lwip</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
@@ -4714,7 +4709,6 @@
                     <state>$PROJ_DIR$\..\..\config\3rd-party</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\awtk</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\btstack</state>
-                    <state>$PROJ_DIR$\..\..\config\3rd-party\evm</state>
                     <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
@@ -4773,15 +4767,11 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\oo</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\oo</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\lovevsf</state>
-                    <state>//$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\port</state>
@@ -6178,190 +6168,6 @@
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw\coremark.h</name>
                         </file>
-                    </group>
-                </group>
-                <group>
-                    <name>evm</name>
-                    <excluded>
-                        <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
-                        <configuration>vsf_template_gd32e103</configuration>
-                        <configuration>vsf_template_mt071</configuration>
-                    </excluded>
-                    <group>
-                        <name>extension</name>
-                        <group>
-                            <name>bluetooth</name>
-                            <excluded>
-                                <configuration>vsf_template_aic8800</configuration>
-                            </excluded>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\bluetooth\evm_module_bluetooth.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\bluetooth\evm_module_bluetooth.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>oo</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\oo\evm_oo.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\oo\evm_oo.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>usbh</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\usbh\evm_module_usbh.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\usbh\evm_module_usbh.h</name>
-                            </file>
-                        </group>
-                    </group>
-                    <group>
-                        <name>port</name>
-                        <group>
-                            <name>eluaos</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_fs_vsf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_gpio_vsf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_log_vsf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_malloc_vsf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_msgbus_vsf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_netclient_vsf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_socket_vsf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_timer_vsf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_uart_vsf.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\eluaos\luat_vsf_base.c</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>iotjs</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\iotjs\evm_main.c</name>
-                            </file>
-                        </group>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\evm_port.c</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>raw</name>
-                        <group>
-                            <name>lib</name>
-                            <group>
-                                <name>cortex-m3</name>
-                                <excluded>
-                                    <configuration>vsf_template_m484</configuration>
-                                    <configuration>vsf_template_aic8800</configuration>
-                                </excluded>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m3\libecma.a</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m3\libejs.a</name>
-                                    <excluded>
-                                        <configuration>vsf_template_aic8800</configuration>
-                                    </excluded>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m3\libelua.a</name>
-                                </file>
-                            </group>
-                            <group>
-                                <name>cortex-m4</name>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libecma.a</name>
-                                    <excluded>
-                                        <configuration>vsf_template_aic8800</configuration>
-                                    </excluded>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libejs.a</name>
-                                    <excluded>
-                                        <configuration>vsf_template_aic8800</configuration>
-                                    </excluded>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libelua.a</name>
-                                </file>
-                            </group>
-                        </group>
-                        <group>
-                            <name>modules</name>
-                            <group>
-                                <name>eluaos</name>
-                                <group>
-                                    <name>lualib</name>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\lualib\bget.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\lualib\lbaselib.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\lualib\linit.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\lualib\rotable.c</name>
-                                    </file>
-                                </group>
-                                <group>
-                                    <name>modules</name>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_gpio.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_http.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_log.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_rtos.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_socket.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_timer.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_lib_uart.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_luat_bin.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_main.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\eluaos\modules\luat_malloc_weak.c</name>
-                                    </file>
-                                </group>
-                            </group>
-                        </group>
                     </group>
                 </group>
                 <group>

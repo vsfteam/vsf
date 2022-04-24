@@ -62,8 +62,6 @@
 #define VSF_USE_SIMPLE_SPRINTF                          ENABLED
 
 // 3rd-party demos
-#define APP_USE_XBOOT_XUI_DEMO                          DISABLED
-#define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                DISABLED
@@ -78,7 +76,6 @@
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
 #define APP_USE_LWIP_DEMO                               DISABLED
-#define APP_USE_EVM_DEMO                                ENABLED
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 
