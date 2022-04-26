@@ -183,6 +183,33 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
             return;
         }
         break;
+    case VSF_INPUT_TYPE_MOUSE:
+        switch (vk_input_mouse_evt_get(evt)) {
+        case VSF_INPUT_MOUSE_EVT_MOVE:
+            event.type = SDL_MOUSEMOTION;
+            event.motion.x = vk_input_mouse_evt_get_x(evt);
+            event.motion.y = vk_input_mouse_evt_get_y(evt);
+            // TODO: fix relative motion values
+            event.motion.xrel = event.motion.yrel = 0;
+            break;
+        case VSF_INPUT_MOUSE_EVT_BUTTON:
+            if (vk_input_mouse_evt_button_is_down(evt)) {
+                event.type = SDL_MOUSEBUTTONDOWN;
+            } else {
+                event.type = SDL_MOUSEBUTTONUP;
+            }
+            event.button.x = vk_input_mouse_evt_get_x(evt);
+            event.button.y = vk_input_mouse_evt_get_y(evt);
+            event.button.clicks = 1;
+            break;
+        case VSF_INPUT_MOUSE_EVT_WHEEL:
+            event.type = SDL_MOUSEWHEEL;
+            event.wheel.x = vk_input_mouse_evt_get_x(evt);
+            event.wheel.y = vk_input_mouse_evt_get_y(evt);
+            // TODO: initialize more members in wheel
+            break;
+        }
+        break;
     default:
         return;
     }
@@ -213,7 +240,8 @@ void __SDL_InitEvent(uint32_t flags)
     vsf_slist_queue_init(&__vsf_sdl2_event.evt_list);
 
     __vsf_sdl2_event.notifier.mask =    (1 << VSF_INPUT_TYPE_TOUCHSCREEN)
-                                    |   (1 << VSF_INPUT_TYPE_KEYBOARD);
+                                    |   (1 << VSF_INPUT_TYPE_KEYBOARD)
+                                    |   (1 << VSF_INPUT_TYPE_MOUSE);
     __vsf_sdl2_event.notifier.on_evt = (vk_input_on_evt_t)__vsf_sdl2_event_on_input;
     vk_input_notifier_register(&__vsf_sdl2_event.notifier);
 }
