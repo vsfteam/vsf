@@ -464,6 +464,12 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
                 }
             }
             break;
+        case VSF_DISP_COLOR_RGB888_32:
+        case VSF_DISP_COLOR_ARGB8888:
+            for (uint16_t j = 0; j < area->size.x; j++) {
+                ((uint32_t *)ptr)[j] = ((uint32_t *)disp_buff)[j];
+            }
+            break;
         default:
             // TODO: add support to other color formats
             VSF_UI_ASSERT(false);
