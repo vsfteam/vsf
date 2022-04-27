@@ -21,9 +21,19 @@
 
 #if VSF_USE_SDL2 == ENABLED
 
+#define __VSF_EDA_CLASS_INHERIT__
 #include "./include/SDL2/SDL.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
+#   error please enable VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#endif
+
+#if VSF_KERNEL_CFG_SUPPORT_SYNC != ENABLED
+#   error please enable VSF_KERNEL_CFG_SUPPORT_SYNC
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -317,26 +327,36 @@ int SDL_PollEvent(SDL_Event *event)
 
 int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
 {
-    vsf_sdl2_event_node_t *node;
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    bool is_empty;
+
     vsf_protect_t orig = vsf_protect_int();
-        vsf_slist_queue_dequeue(vsf_sdl2_event_node_t, evt_node, &__vsf_sdl2_event.evt_list, node);
-        if (NULL == node) {
+        is_empty == vsf_slist_queue_is_empty(&__vsf_sdl2_event.evt_list);
+        if (is_empty) {
             __vsf_sdl2_event.eda_pending = vsf_eda_get_cur();
+            if (timeout > 0) {
+                SECTION(".text.vsf.kernel.vsf_sync")
+                vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout);
+
+                __vsf_eda_set_timeout(eda, vsf_systimer_ms_to_tick(timeout));
+            }
         }
     vsf_unprotect_int(orig);
 
-    if (NULL == node) {
-        if (timeout >= 0) {
-            // not supported now
-            VSF_SDL2_ASSERT(false);
-        }
-        vsf_thread_wfe(VSF_EVT_USER);
-        return SDL_PollEvent(event);
+    if (is_empty) {
+        vsf_evt_t evt = vsf_thread_wait();
+
+        SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
+        vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
+        __vsf_teda_cancel_timer(eda);
+
+        orig = vsf_protect_int();
+            __vsf_sdl2_event.eda_pending = NULL;
+        vsf_unprotect_int(orig);
+        eda->flag.state.is_limitted = false;
     }
 
-    *event = node->event;
-    vsf_heap_free(node);
-    return 1;
+    return event != NULL ? SDL_PollEvent(event) : 0;
 }
 
 int SDL_WaitEvent(SDL_Event * event)
@@ -372,7 +392,12 @@ void SDL_PumpEvents(void)
 
 const char * SDL_GetKeyName(SDL_Keycode key)
 {
-    return "unknown";
+    static char __keyname[2] = { 0 };
+    if (key < 256) {
+        __keyname[0] = key;
+        return __keyname;
+    }
+    return "";
 }
 
 #endif      // VSF_USE_SDL2

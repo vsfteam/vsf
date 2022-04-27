@@ -49,7 +49,7 @@ vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout)
     if (timeout > 0) {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         eda->flag.state.is_limitted = true;
-        vsf_teda_set_timer(timeout);
+        vsf_teda_set_timer_ex(eda, timeout);
 #else
     #ifndef WEAK_VSF_KERNEL_ERR_REPORT
         vsf_kernel_err_report(VSF_KERNEL_ERR_EDA_DOES_NOT_SUPPORT_TIMER);
