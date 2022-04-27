@@ -175,6 +175,26 @@ static uint16_t __vsf_sdl2_kb_parse_keymod(uint_fast32_t mod)
     return sdl_mod;
 }
 
+static void __vsf_sdl2_push_event(SDL_Event *event)
+{
+    vsf_sdl2_event_node_t *node = vsf_heap_malloc(sizeof(*node));
+    if (node != NULL) {
+        vsf_slist_init_node(vsf_sdl2_event_node_t, evt_node, node);
+        node->event = *event;
+
+        vsf_eda_t *eda_pending;
+        vsf_protect_t orig = vsf_protect_int();
+            vsf_slist_queue_enqueue(vsf_sdl2_event_node_t, evt_node, &__vsf_sdl2_event.evt_list, node);
+            eda_pending = __vsf_sdl2_event.eda_pending;
+            __vsf_sdl2_event.eda_pending = NULL;
+        vsf_unprotect_int(orig);
+
+        if (eda_pending != NULL) {
+            vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
+        }
+    }
+}
+
 static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
 {
     SDL_Event event = { 0 };
@@ -229,30 +249,14 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
         return;
     }
 
-more_events:
-    vsf_sdl2_event_node_t *node = vsf_heap_malloc(sizeof(*node));
-    if (node != NULL) {
-        vsf_slist_init_node(vsf_sdl2_event_node_t, evt_node, node);
-        node->event = event;
-
-        vsf_eda_t *eda_pending;
-        vsf_protect_t orig = vsf_protect_int();
-            vsf_slist_queue_enqueue(vsf_sdl2_event_node_t, evt_node, &__vsf_sdl2_event.evt_list, node);
-            eda_pending = __vsf_sdl2_event.eda_pending;
-            __vsf_sdl2_event.eda_pending = NULL;
-        vsf_unprotect_int(orig);
-
-        if (eda_pending != NULL) {
-            vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
-        }
-    }
+    __vsf_sdl2_push_event(&event);    
 
     if (text_input != '\0') {
         event.type = SDL_TEXTINPUT;
         event.text.text[0] = text_input;
         event.text.text[1] = '\0';
         text_input = '\0';
-        goto more_events;
+        __vsf_sdl2_push_event(&event);
     }
 }
 
