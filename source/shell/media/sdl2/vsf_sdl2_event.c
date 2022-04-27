@@ -133,8 +133,8 @@ static SDL_Keycode __vsf_sdl2_kb_parse_keycode(uint_fast32_t code)
         case VSF_KB_RIGHT_PAREN:        return SDLK_RIGHTPAREN;
         case VSF_KB_UNDERSCORE:         return SDLK_UNDERSCORE;
         case VSF_KB_PLUS:               return SDLK_PLUS;
-//        case VSF_KB_LEFT_BRACE:         return SDLK_LEFTBRACE;
-//        case VSF_KB_RIGHT_BRACE:        return SDLK_RIGHTBRACE;
+        case VSF_KB_LEFT_BRACE:         return SDLK_LEFTBRACE;
+        case VSF_KB_RIGHT_BRACE:        return SDLK_RIGHTBRACE;
         case VSF_KB_COLON:              return SDLK_COLON;
         case VSF_KB_DOUBLE_QUOTE:       return SDLK_QUOTEDBL;
 //        case VSF_KB_TIDE:               return SDLK_TIDE;

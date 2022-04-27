@@ -77,6 +77,8 @@ enum {
     SDLK_CARET                  = '^',
     SDLK_UNDERSCORE             = '_',
     SDLK_BACKQUOTE              = '`',
+    SDLK_LEFTBRACE              = '{',
+    SDLK_RIGHTBRACE             = '}',
 
     SDLK_a                      = 'a',
     SDLK_b                      = 'b',
@@ -133,7 +135,7 @@ enum {
     SDLK_KP_PLUS                = 270,
     SDLK_KP_ENTER               = 271,
     SDLK_KP_EQUALS              = 272,
-    SDLK_NUMLOCKCLEAR           = 273,
+    SDLK_NUMLOCKCLEAR           = 275,
 
     // 288 - 310
     SDLK_UP                     = 288,
