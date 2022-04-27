@@ -149,6 +149,14 @@ enum {
     VSF_KP_0                = 98,
     VSF_KP_DOT              = 99,
     VSF_KP_EQUAL            = 100,
+    VSF_KB_LCTRL            = 101,
+    VSF_KB_LSHIFT           = 102,
+    VSF_KB_LALT             = 103,
+    VSF_KB_LGUI             = 104,
+    VSF_KB_RCTRL            = 105,
+    VSF_KB_RSHIFT           = 106,
+    VSF_KB_RALT             = 107,
+    VSF_KB_RGUI             = 108,
 
     VSF_KB_EXT              = 0x0100,
     // keycodes with SHIFT pressed

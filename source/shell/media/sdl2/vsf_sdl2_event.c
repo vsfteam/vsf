@@ -118,6 +118,15 @@ static SDL_Keycode __vsf_sdl2_kb_parse_keycode(uint_fast32_t code)
         case VSF_KP_ENTER:              return SDLK_KP_ENTER;
         case VSF_KP_DOT:                return SDLK_KP_PERIOD;
         case VSF_KP_EQUAL:              return SDLK_KP_EQUALS;
+
+        case VSF_KB_LCTRL:              return SDLK_LCTRL;
+        case VSF_KB_LSHIFT:             return SDLK_LSHIFT;
+        case VSF_KB_LALT:               return SDLK_LALT;
+        case VSF_KB_LGUI:               return SDLK_LGUI;
+        case VSF_KB_RCTRL:              return SDLK_RCTRL;
+        case VSF_KB_RSHIFT:             return SDLK_RSHIFT;
+        case VSF_KB_RALT:               return SDLK_RALT;
+        case VSF_KB_RGUI:               return SDLK_RGUI;
         }
     } else {
         switch (code | VSF_KB_EXT) {
@@ -211,13 +220,16 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
         }
 
         SDL_Keycode keycode = __vsf_sdl2_kb_parse_keycode(vsf_input_keyboard_get_keycode(evt));
-        event.key.keysym.mod = __vsf_sdl2_kb_parse_keymod(vsf_input_keyboard_get_keymod(evt));
+        uint16_t mod = __vsf_sdl2_kb_parse_keymod(vsf_input_keyboard_get_keymod(evt));
         event.key.keysym.sym = keycode;
+        event.key.keysym.mod = mod;
 
         if (SDLK_UNKNOWN == keycode) {
-            return;
+            if (0 == mod) {
+                return;
+            }
         } else if ( (SDL_KEYUP == event.type)
-                &&  !(event.key.keysym.mod & (KMOD_LCTRL | KMOD_LALT | KMOD_LGUI | KMOD_RCTRL | KMOD_RALT | KMOD_RGUI))
+                &&  !(mod & (KMOD_LCTRL | KMOD_LALT | KMOD_LGUI | KMOD_RCTRL | KMOD_RALT | KMOD_RGUI))
                 &&  (keycode >= ' ') && (keycode <= '~')) {
             text_input = keycode;
         }

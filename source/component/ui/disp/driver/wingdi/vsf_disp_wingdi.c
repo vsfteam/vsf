@@ -128,6 +128,9 @@ static uint_fast16_t __vk_disp_win_keycode_remap(uint8_t keycode)
         return (keycode <= VK_F12) ? VSF_KB_F1 + keycode - VK_F1 : 0;
     }
     switch (keycode) {
+    case VK_SHIFT:              return VSF_KB_LSHIFT;
+    case VK_CONTROL:            return VSF_KB_LCTRL;
+    case VK_MENU:               return VSF_KB_LGUI;
     case VK_CAPITAL:            return VSF_KB_CAPSLOCK;
     case VK_RETURN:             return VSF_KB_ENTER;
     case VK_ESCAPE:             return VSF_KB_ESCAPE;
@@ -167,6 +170,8 @@ static uint_fast16_t __vk_disp_win_keycode_remap(uint8_t keycode)
     case VK_ADD:                return VSF_KP_PLUS;
 //    case VK_SEPARATOR           return VSF_KP_??;
     case VK_DECIMAL:            return VSF_KP_DOT;
+    case VK_LWIN:               return VSF_KB_LGUI;
+    case VK_RWIN:               return VSF_KB_RGUI;
     case VK_NUMPAD0:            return VSF_KP_0;
     case VK_NUMPAD1:            return VSF_KP_1;
     case VK_NUMPAD2:            return VSF_KP_2;
