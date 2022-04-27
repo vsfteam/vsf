@@ -216,7 +216,9 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
 
         if (SDLK_UNKNOWN == keycode) {
             return;
-        } else if ((SDL_KEYUP == event.type) && (keycode >= ' ') && (keycode <= '~')) {
+        } else if ( (SDL_KEYUP == event.type)
+                &&  !(event.key.keysym.mod & (KMOD_LCTRL | KMOD_LALT | KMOD_LGUI | KMOD_RCTRL | KMOD_RALT | KMOD_RGUI))
+                &&  (keycode >= ' ') && (keycode <= '~')) {
             text_input = keycode;
         }
         break;
