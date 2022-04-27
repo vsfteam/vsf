@@ -178,6 +178,7 @@ static uint16_t __vsf_sdl2_kb_parse_keymod(uint_fast32_t mod)
 static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
 {
     SDL_Event event = { 0 };
+    char text_input = '\0';
 
     switch (type) {
     case VSF_INPUT_TYPE_KEYBOARD:
@@ -186,11 +187,15 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
         } else {
             event.type = SDL_KEYUP;
         }
-        event.key.keysym.sym = __vsf_sdl2_kb_parse_keycode(vsf_input_keyboard_get_keycode(evt));
+
+        SDL_Keycode keycode = __vsf_sdl2_kb_parse_keycode(vsf_input_keyboard_get_keycode(evt));
+        event.key.keysym.sym = keycode;
         event.key.keysym.mod = __vsf_sdl2_kb_parse_keymod(vsf_input_keyboard_get_keymod(evt));
 
-        if (SDLK_UNKNOWN == event.key.keysym.sym) {
+        if (SDLK_UNKNOWN == keycode) {
             return;
+        } else if ((SDL_KEYUP == event.type) && (keycode >= ' ') && (keycode <= '~')) {
+            text_input = keycode;
         }
         break;
     case VSF_INPUT_TYPE_MOUSE:
@@ -224,6 +229,7 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
         return;
     }
 
+more_events:
     vsf_sdl2_event_node_t *node = vsf_heap_malloc(sizeof(*node));
     if (node != NULL) {
         vsf_slist_init_node(vsf_sdl2_event_node_t, evt_node, node);
@@ -239,6 +245,14 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
         if (eda_pending != NULL) {
             vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
         }
+    }
+
+    if (text_input != '\0') {
+        event.type = SDL_TEXTINPUT;
+        event.text.text[0] = text_input;
+        event.text.text[1] = '\0';
+        text_input = '\0';
+        goto more_events;
     }
 }
 
@@ -331,7 +345,7 @@ int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
     bool is_empty;
 
     vsf_protect_t orig = vsf_protect_int();
-        is_empty == vsf_slist_queue_is_empty(&__vsf_sdl2_event.evt_list);
+        is_empty = vsf_slist_queue_is_empty(&__vsf_sdl2_event.evt_list);
         if (is_empty) {
             __vsf_sdl2_event.eda_pending = vsf_eda_get_cur();
             if (timeout > 0) {
@@ -345,10 +359,11 @@ int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
 
     if (is_empty) {
         vsf_evt_t evt = vsf_thread_wait();
+        VSF_UNUSED_PARAM(evt);
 
         SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
         vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
-        __vsf_teda_cancel_timer(eda);
+        __vsf_teda_cancel_timer((vsf_teda_t *)eda);
 
         orig = vsf_protect_int();
             __vsf_sdl2_event.eda_pending = NULL;
@@ -392,12 +407,70 @@ void SDL_PumpEvents(void)
 
 const char * SDL_GetKeyName(SDL_Keycode key)
 {
-    static char __keyname[2] = { 0 };
-    if (key < 256) {
-        __keyname[0] = key;
+    static char __keyname[32] = { 0 };
+    if ((key >= ' ') && (key < '~')) {
+        if ((key >= 'a') && (key <= 'z')) {
+            __keyname[0] = 'A' + (key - 'a');
+        } else {
+            __keyname[0] = key;
+        }
         return __keyname;
+    } else if ((key >= SDLK_KP_0) && (key <= SDLK_KP_9)) {
+        int size = sizeof("Keypad ");
+        memcpy(__keyname, "Keypad ", size - 1);
+        __keyname[size - 1] = '0' + (key - SDLK_KP_0);
+        __keyname[size] = '\0';
+        return __keyname;
+    } else if ((key >= SDLK_F1) && (key <= SDLK_F24)) {
+        key -= SDLK_F1;
+        key++;
+        __keyname[0] = 'F';
+        __keyname[1] = '0' + key / 10;
+        key %= 10;
+        if (key > 0) {
+            __keyname[2] = '0' + key;
+            __keyname[3] = '\0';
+        } else {
+            __keyname[2] = '\0';
+        }
+        return __keyname;
+    } else {
+        switch (key) {
+        case SDLK_BACKSPACE:    return "Backspace";
+        case SDLK_RETURN:       return "Return";
+        case SDLK_ESCAPE:       return "Escape";
+        case SDLK_TAB:          return "Tab";
+        case SDLK_KP_PERIOD:    return "Keypad .";
+        case SDLK_KP_DIVIDE:    return "Keypad /";
+        case SDLK_KP_MULTIPLY:  return "Keypad *";
+        case SDLK_KP_MINUS:     return "Keypad -";
+        case SDLK_KP_PLUS:      return "Keypad +";
+        case SDLK_KP_ENTER:     return "Keypad Enter";
+        case SDLK_KP_EQUALS:    return "Keypad =";
+        case SDLK_NUMLOCKCLEAR: return "Numlock";
+        case SDLK_UP:           return "Up";
+        case SDLK_DOWN:         return "Down";
+        case SDLK_RIGHT:        return "Right";
+        case SDLK_LEFT:         return "Left";
+        case SDLK_INSERT:       return "Insert";
+        case SDLK_HOME:         return "Home";
+        case SDLK_END:          return "End";
+        case SDLK_PAGEUP:       return "PageUp";
+        case SDLK_PAGEDOWN:     return "PageDown";
+        case SDLK_DELETE:       return "Delete";
+        case SDLK_PAUSE:        return "Pause";
+        case SDLK_CAPSLOCK:     return "CapsLock";
+        case SDLK_LCTRL:        return "Left Ctrl";
+        case SDLK_LSHIFT:       return "Left Shift";
+        case SDLK_LALT:         return "Left Alt";
+        case SDLK_LGUI:         return "Left GUI";
+        case SDLK_RCTRL:        return "Right Ctrl";
+        case SDLK_RSHIFT:       return "Right Shift";
+        case SDLK_RALT:         return "Right Alt";
+        case SDLK_RGUI:         return "Right GUI";
+        default:                return "";
+        }
     }
-    return "";
 }
 
 #endif      // VSF_USE_SDL2
