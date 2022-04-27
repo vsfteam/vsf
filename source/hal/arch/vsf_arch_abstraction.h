@@ -290,6 +290,7 @@ extern bool vsf_systimer_set(vsf_systimer_tick_t due);
 extern void vsf_systimer_set_idle(void);
 extern bool vsf_systimer_is_due(vsf_systimer_tick_t due);
 extern void vsf_systimer_prio_set(vsf_arch_prio_t priority);
+extern uint32_t vsf_systimer_get_freq(void);
 
 extern vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
 extern vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);

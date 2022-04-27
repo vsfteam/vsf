@@ -144,6 +144,9 @@ extern bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick);
 #   if  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
     ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
+#   endif
+#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
+extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
 extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
 #   endif
 #endif
@@ -528,16 +531,6 @@ uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
 #   endif
 
 
-
-#   ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
-WEAK(vsf_arch_req___systimer_resolution___from_usr)
-uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
-{
-    return 1000000ul;       //!< 1us (1MHz)
-}
-#   endif
-
-
 WEAK(vsf_systimer_us_to_tick)
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
@@ -639,7 +632,11 @@ vsf_err_t vsf_systimer_init(void)
     return vsf_systimer_low_level_init(__systimer.max_tick_per_round);
 }
 
-
+WEAK(vsf_systimer_get_freq)
+uint32_t vsf_systimer_get_freq(void)
+{
+    return vsf_arch_req___systimer_freq___from_usr();
+}
 
 WEAK(vsf_systimer_set_idle)
 void vsf_systimer_set_idle(void)
@@ -840,7 +837,11 @@ vsf_err_t vsf_systimer_init(void)
     return vsf_systimer_low_level_init(__systimer.cycle_per_tick);
 }
 
-
+WEAK(vsf_systimer_get_freq)
+uint32_t vsf_systimer_get_freq(void)
+{
+    return vsf_arch_req___systimer_resolution___from_usr();
+}
 
 WEAK(vsf_systimer_set_idle)
 void vsf_systimer_set_idle(void)
@@ -899,6 +900,16 @@ void vsf_systimer_timeout_evt_hanlder(vsf_systimer_tick_t tick)
     if (on_arch_systimer_tick_evt(tick)) {
         vsf_systimer_evthandler(tick);
     }
+}
+
+WEAK(vsf_systimer_get_freq)
+uint32_t vsf_systimer_get_freq(void)
+{
+#ifdef VSF_ARCH_SYSTIMER_FREQ
+    return VSF_ARCH_SYSTIMER_FREQ;
+#else
+    return vsf_arch_req___systimer_freq___from_usr();
+#endif
 }
 
 #endif

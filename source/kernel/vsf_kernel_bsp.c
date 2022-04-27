@@ -61,10 +61,6 @@
 #   ifndef VSF_SYSTIMER_RESOLUTION
 #       define VSF_SYSTIMER_RESOLUTION      (1000)    /*! using default 1us */
 #   endif
-#else
-#   ifndef VSF_SYSTIMER_RESOLUTION
-#       define VSF_SYSTIMER_RESOLUTION      (1000000)    /*! using default 1us */
-#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -201,10 +197,12 @@ uint32_t vsf_arch_req___systimer_freq___from_usr(void)
 #endif
 }
 
+#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
 uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
 {
     return VSF_SYSTIMER_RESOLUTION;
 }
+#   endif
 #endif
 
 void vsf_kernel_err_report(vsf_kernel_error_t err)

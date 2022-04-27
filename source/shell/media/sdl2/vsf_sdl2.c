@@ -1064,8 +1064,7 @@ uint64_t SDL_GetPerformanceCounter(void)
 
 uint64_t SDL_GetPerformanceFrequency(void)
 {
-    extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
-    return vsf_arch_req___systimer_freq___from_usr();
+    return vsf_systimer_get_freq();
 }
 
 // audio
