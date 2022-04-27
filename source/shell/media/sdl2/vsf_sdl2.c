@@ -1054,7 +1054,13 @@ int SDL_SetClipboardText(const char * text)
 
 char * SDL_GetClipboardText(void)
 {
-    return __vsf_sdl2.clipboard.text;
+    if (NULL == __vsf_sdl2.clipboard.text) {
+        return NULL;
+    }
+
+    char *result = SDL_malloc(strlen(__vsf_sdl2.clipboard.text) + 1);
+    strcpy(result, __vsf_sdl2.clipboard.text);
+    return result;
 }
 
 uint64_t SDL_GetPerformanceCounter(void)
