@@ -67,38 +67,17 @@ static SDL_Keycode __vsf_sdl2_kb_parse_keycode(uint_fast32_t code)
         return SDLK_a + (code - VSF_KB_a);
     } else if ((code >= VSF_KB_F1) && (code <= VSF_KB_F12)) {
         return SDLK_F1 + (code - VSF_KB_F1);
-    } else if (code == VSF_KB_0) {
-        return SDLK_0;
-    } else if ((code >= VSF_KB_1) && (code <= VSF_KB_0)) {
-        return SDLK_1 + (code - VSF_KB_1);
     } else if (code == VSF_KP_0) {
         return SDLK_KP_0;
     } else if ((code >= VSF_KP_1) && (code <= VSF_KP_0)) {
         return SDLK_1 + (code - VSF_KP_1);
-    } else if (is_ext) {
-        switch (code | VSF_KB_EXT) {
-        case VSF_KB_EXCLAM:             return SDLK_EXCLAIM;
-        case VSF_KB_AT:                 return SDLK_AT;
-        case VSF_KB_POUND:              return SDLK_HASH;
-        case VSF_KB_DOLLAR:             return SDLK_DOLLAR;
-        case VSF_KB_PERCENT:            return SDLK_PERCENT;
-        case VSF_KB_CARET:              return SDLK_CARET;
-        case VSF_KB_AMPERSAND:          return SDLK_AMPERSAND;
-        case VSF_KB_ASTERISK:           return SDLK_ASTERISK;
-        case VSF_KB_LEFT_PAREN:         return SDLK_LEFTPAREN;
-        case VSF_KB_RIGHT_PAREN:        return SDLK_RIGHTPAREN;
-        case VSF_KB_UNDERSCORE:         return SDLK_UNDERSCORE;
-        case VSF_KB_PLUS:               return SDLK_PLUS;
-//        case VSF_KB_LEFT_BRACE:         return SDLK_LEFTBRACE;
-//        case VSF_KB_RIGHT_BRACE:        return SDLK_RIGHTBRACE;
-        case VSF_KB_COLON:              return SDLK_COLON;
-        case VSF_KB_DOUBLE_QUOTE:       return SDLK_QUOTEDBL;
-//        case VSF_KB_TIDE:               return SDLK_TIDE;
-        case VSF_KB_LESS:               return SDLK_LESS;
-        case VSF_KB_GREATER:            return SDLK_GREATER;
-        case VSF_KB_QUESTION:           return SDLK_QUESTION;
+    } else if (!is_ext) {
+        if (code == VSF_KB_0) {
+            return SDLK_0;
+        } else if ((code >= VSF_KB_1) && (code <= VSF_KB_0)) {
+            return SDLK_1 + (code - VSF_KB_1);
         }
-    } else {
+
         switch (code) {
         case VSF_KB_ENTER:              return SDLK_RETURN;
         case VSF_KB_ESCAPE:             return SDLK_ESCAPE;
@@ -139,6 +118,29 @@ static SDL_Keycode __vsf_sdl2_kb_parse_keycode(uint_fast32_t code)
         case VSF_KP_ENTER:              return SDLK_KP_ENTER;
         case VSF_KP_DOT:                return SDLK_KP_PERIOD;
         case VSF_KP_EQUAL:              return SDLK_KP_EQUALS;
+        }
+    } else {
+        switch (code | VSF_KB_EXT) {
+        case VSF_KB_EXCLAM:             return SDLK_EXCLAIM;
+        case VSF_KB_AT:                 return SDLK_AT;
+        case VSF_KB_POUND:              return SDLK_HASH;
+        case VSF_KB_DOLLAR:             return SDLK_DOLLAR;
+        case VSF_KB_PERCENT:            return SDLK_PERCENT;
+        case VSF_KB_CARET:              return SDLK_CARET;
+        case VSF_KB_AMPERSAND:          return SDLK_AMPERSAND;
+        case VSF_KB_ASTERISK:           return SDLK_ASTERISK;
+        case VSF_KB_LEFT_PAREN:         return SDLK_LEFTPAREN;
+        case VSF_KB_RIGHT_PAREN:        return SDLK_RIGHTPAREN;
+        case VSF_KB_UNDERSCORE:         return SDLK_UNDERSCORE;
+        case VSF_KB_PLUS:               return SDLK_PLUS;
+//        case VSF_KB_LEFT_BRACE:         return SDLK_LEFTBRACE;
+//        case VSF_KB_RIGHT_BRACE:        return SDLK_RIGHTBRACE;
+        case VSF_KB_COLON:              return SDLK_COLON;
+        case VSF_KB_DOUBLE_QUOTE:       return SDLK_QUOTEDBL;
+//        case VSF_KB_TIDE:               return SDLK_TIDE;
+        case VSF_KB_LESS:               return SDLK_LESS;
+        case VSF_KB_GREATER:            return SDLK_GREATER;
+        case VSF_KB_QUESTION:           return SDLK_QUESTION;
         }
     }
     return SDLK_UNKNOWN;
@@ -209,8 +211,8 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
         }
 
         SDL_Keycode keycode = __vsf_sdl2_kb_parse_keycode(vsf_input_keyboard_get_keycode(evt));
-        event.key.keysym.sym = keycode;
         event.key.keysym.mod = __vsf_sdl2_kb_parse_keymod(vsf_input_keyboard_get_keymod(evt));
+        event.key.keysym.sym = keycode;
 
         if (SDLK_UNKNOWN == keycode) {
             return;
