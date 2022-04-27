@@ -77,6 +77,9 @@ extern "C" {
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
 #define VSF_ARCH_PROVIDE_HEAP
 
+//! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
+#define VSF_ARCH_SYSTIMER_FREQ          (10 * 1000 * 1000)
+
 #ifndef FAR
 #   define FAR
 #endif

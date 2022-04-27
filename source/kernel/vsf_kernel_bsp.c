@@ -194,7 +194,11 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 uint32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
+#ifdef VSF_ARCH_SYSTIMER_FREQ
+    return VSF_ARCH_SYSTIMER_FREQ;
+#else
     return VSF_SYSTIMER_FREQ;
+#endif
 }
 
 uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)

@@ -47,8 +47,6 @@
 
 
 
-//! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
-#define VSF_ARCH_SYSTIMER_FREQ              (10 * 1000 * 1000)
 
 #if VSF_ARCH_CFG_LOW_LANTECY == ENABLED
 #   define vsf_arch_yield()                 Sleep(0)
