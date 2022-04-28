@@ -88,20 +88,20 @@ static vsf_err_t __i2c_demo_init(vsf_i2c_t *i2c_ptr,
     VSF_ASSERT((mask & ~I2C_IRQ_MASK_MASTER_ALL) == 0);
 
     i2c_cfg_t i2c_cfg = {
-        .mode     = APP_I2C_DEMO_CFG_MODE,
-        .clock_hz = APP_I2C_DEMO_CLOCK_HZ,
-        .isr      = *irs_ptr,
+        .mode           = APP_I2C_DEMO_CFG_MODE,
+        .clock_hz       = APP_I2C_DEMO_CLOCK_HZ,
+        .isr            = *irs_ptr,
     };
 
-    vsf_err_t init_result = vsf_i2c_init(i2c_ptr, &i2c_cfg);
+    vsf_err_t init_result = VSF_I2C_INIT(i2c_ptr, &i2c_cfg);
     if (init_result != VSF_ERR_NONE) {
         return init_result;
     }
 
-    while (fsm_rt_cpl != vsf_i2c_enable(i2c_ptr));
+    while (fsm_rt_cpl != VSF_I2C_ENABLE(i2c_ptr));
 
     if (mask & I2C_IRQ_MASK_MASTER_ALL) {
-        vsf_i2c_irq_enable(i2c_ptr, mask);
+        VSF_I2C_IRQ_ENABLE(i2c_ptr, mask);
     }
 
     return VSF_ERR_NONE;
@@ -110,8 +110,8 @@ static vsf_err_t __i2c_demo_init(vsf_i2c_t *i2c_ptr,
 static void __i2c_demo_deinit(vsf_i2c_t *i2c_ptr)
 {
     VSF_ASSERT(i2c_ptr != NULL);
-    vsf_i2c_irq_disable(i2c_ptr, I2C_IRQ_MASK_MASTER_ALL);
-    while (fsm_rt_cpl != vsf_i2c_disable(i2c_ptr));
+    VSF_I2C_IRQ_DISABLE(i2c_ptr, I2C_IRQ_MASK_MASTER_ALL);
+    while (fsm_rt_cpl != VSF_I2C_DISABLE(i2c_ptr));
 }
 
 static void __i2c_search_next(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_ptr)
@@ -125,7 +125,7 @@ static void __i2c_search_next(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_ptr)
 #endif
 
     if (i2c_demo_ptr->start_address <= i2c_demo_ptr->end_address) {
-        vsf_i2c_master_request(i2c_ptr, i2c_demo_ptr->start_address,
+        VSF_I2C_MASTER_REQUEST(i2c_ptr, i2c_demo_ptr->start_address,
                                I2C_CMD_START | I2C_CMD_WRITE | I2C_CMD_STOP,
                                request_data_len, __reqeust_data);
     } else {
