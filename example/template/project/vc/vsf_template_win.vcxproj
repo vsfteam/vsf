@@ -494,6 +494,22 @@
     <ClInclude Include="..\..\..\..\source\hal\arch\x86\win\win_generic.h" />
     <ClInclude Include="..\..\..\..\source\hal\arch\__vsf_arch_interface.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\common.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_adc.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_declaration.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_flash.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_hal_driver.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_i2c.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_implementation.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_io.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_pm.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_pwm.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_rng.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_rtc.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_spi.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_timer.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_usart.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_usb.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\driver.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\driver.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.h" />
@@ -1350,6 +1366,9 @@
     <ClCompile Include="..\..\..\..\source\hal\arch\vsf_arch_abstraction.c" />
     <ClCompile Include="..\..\..\..\source\hal\arch\x86\win\win_generic.c" />
     <ClCompile Include="..\..\..\..\source\hal\arch\x86\win\win_generic_simple.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\rtc\rtc_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\usart\usart_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\vsf_hal_distbus.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\driver.c" />
@@ -1466,7 +1485,14 @@
     <ClCompile Include="..\..\demo\distbus_demo\distbus_demo.c" />
     <ClCompile Include="..\..\demo\fakefat32.c" />
     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\adc_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\flash_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\gpio_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\i2c_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\pwm_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\rtc_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\spi_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\timer_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\usart_demo.c" />
     <ClCompile Include="..\..\demo\json_demo\json_demo.c" />
     <ClCompile Include="..\..\demo\kernel_test\cross_task_test.c" />
@@ -1507,6 +1533,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\usart\usart_template.inc" />
     <None Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.inc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -1087,6 +1087,15 @@
     <Filter Include="vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon">
       <UniqueIdentifier>{7dcae704-0b65-4a80-8731-2111df1c0360}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\driver\common\usart">
+      <UniqueIdentifier>{41b0b1ee-0f67-4d0b-abb8-ece28bd1846e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\common\template">
+      <UniqueIdentifier>{a7239b4a-d9de-40b3-8c96-1a1270b42922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\common\rtc">
+      <UniqueIdentifier>{c137c0f1-db91-4ca0-9755-20a5c4d0a28e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3191,6 +3200,54 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.h">
       <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.h">
+      <Filter>vsf\hal\driver\common\usart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_hal_driver.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_i2c.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_implementation.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_io.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_pm.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_pwm.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_rng.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_rtc.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_spi.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_timer.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_usart.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_usb.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_adc.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_declaration.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_flash.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5534,6 +5591,39 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon\btstack_host_joycon.c">
       <Filter>vsf\component\3rd-party\btstack\extension\btstack_oo\host\driver\hid\joycon</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\usart\usart_common.c">
+      <Filter>vsf\hal\driver\common\usart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.c">
+      <Filter>vsf\hal\driver\common\usart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\rtc\rtc_common.c">
+      <Filter>vsf\hal\driver\common\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\adc_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\flash_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\gpio_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\i2c_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\pwm_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\rtc_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\timer_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\linux_demo\ntpdate_demo.c">
+      <Filter>usrapp\demo\linux_demo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">
@@ -5541,6 +5631,12 @@
     </None>
     <None Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.inc">
       <Filter>vsf\shell\sys\linux\app\httpd\urihandler\file</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\usart\usart_template.inc">
+      <Filter>vsf\hal\driver\common\usart</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.inc">
+      <Filter>vsf\hal\driver\common\rtc</Filter>
     </None>
   </ItemGroup>
 </Project>
