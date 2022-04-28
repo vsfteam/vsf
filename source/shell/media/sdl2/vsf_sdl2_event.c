@@ -366,18 +366,16 @@ int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
 
     vsf_protect_t orig = vsf_protect_int();
         is_empty = vsf_slist_queue_is_empty(&__vsf_sdl2_event.evt_list);
-        if (is_empty) {
-            __vsf_sdl2_event.eda_pending = vsf_eda_get_cur();
-            if (timeout > 0) {
-                SECTION(".text.vsf.kernel.vsf_sync")
-                vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout);
+        if (is_empty && timeout > 0) {
+            SECTION(".text.vsf.kernel.vsf_sync")
+            vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout);
 
-                __vsf_eda_set_timeout(eda, vsf_systimer_ms_to_tick(timeout));
-            }
+            __vsf_sdl2_event.eda_pending = vsf_eda_get_cur();
+            __vsf_eda_set_timeout(eda, vsf_systimer_ms_to_tick(timeout));
         }
     vsf_unprotect_int(orig);
 
-    if (is_empty) {
+    if (is_empty && timeout > 0) {
         vsf_evt_t evt = vsf_thread_wait();
         VSF_UNUSED_PARAM(evt);
 
