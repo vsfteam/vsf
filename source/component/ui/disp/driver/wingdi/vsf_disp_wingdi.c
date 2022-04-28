@@ -241,6 +241,8 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         SelectObject(__vk_disp_wingdi.hFrameDC, __vk_disp_wingdi.hFrameBitmap);
         break;
 #if VSF_USE_INPUT == ENABLED
+    case WM_SYSCHAR:
+        break;
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
         if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, wParam & 0xFF)) {
