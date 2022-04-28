@@ -67,10 +67,9 @@ typedef void vsf_gpio_i2c_cb_fn(vsf_gpio_i2c_callback_timer_t *on_timer);
 
 /*============================ INCLUDES ======================================*/
 
-// undef after include vsf_template_i2c.h
-#define VSF_I2C_CFG_DEC_PREFIX              vsf_gpio
+#define VSF_I2C_CFG_API_DECLARATION_PREFIX              vsf_gpio
 
-#include "hal/driver/common/template/vsf_template_io.h"
+
 #include "hal/driver/common/template/vsf_template_i2c.h"
 
 /*============================ TYPES =========================================*/
