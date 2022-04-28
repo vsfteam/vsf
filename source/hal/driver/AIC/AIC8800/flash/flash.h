@@ -10,7 +10,7 @@
  *  Unless required by applicable law or agreed to in writing, software      *
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
- *  See the License for the specific language governing permissions and      *
+ *  See the License for the flashecific language governing permissions and      *
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
@@ -27,32 +27,12 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-typedef struct aic8800_flash_info_t {
-    uint32_t                flash_size;
-} aic8800_flash_info_t;
-
-#include "hal/driver/common/template/vsf_template_flash.h"
-
 /*============================ TYPES =========================================*/
-
-struct vsf_flash_t {
-    flash_cfg_t             cfg;
-    aic8800_flash_info_t    info;
-    bool                    is_enabled;
-};
-
-// TODO: update template
-typedef vsf_flash_t vsf_hw_flash_t;
-
 /*============================ INCLUDES ======================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
 
-extern vsf_hw_flash_t vsf_hw_flash0;
-
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
+#define VSF_FLASH_CFG_API_DECLARATION_PREFIX        vsf_hw
+#define VSF_FLASH_CFG_INSTANCE_DECLARATION_PREFIX   VSF_HW
+#include "hal/driver/common/flash/flash_template.h"
 
 #endif /* VSF_HAL_USE_FLASH */
 #endif /* EOF */

@@ -94,11 +94,9 @@ typedef enum em_spi_mode_t {
 
 /*============================ INCLUDES ======================================*/
 
-// undef after include vsf_template_spi.h
-#define VSF_SPI_CFG_DEC_PREFIX                      vsf_hw
-#define VSF_SPI_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
-
-#include "hal/driver/common/template/vsf_template_spi.h"
+#define VSF_SPI_CFG_API_DECLARATION_PREFIX          vsf_hw
+#define VSF_SPI_CFG_INSTANCE_DECLARATION_PREFIX     VSF_HW
+#include "hal/driver/common/spi/spi_template.h"
 
 #endif  /*  VSF_HAL_USE_SPI */
 #endif  /* EOF */

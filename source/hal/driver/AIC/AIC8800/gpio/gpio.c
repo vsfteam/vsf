@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-// force convert vsf_gpio_init to vsf_gpio_init
-#define VSF_GPIO_CFG_PREFIX                             vsf_hw
+#define VSF_GPIO_CFG_PREFIX                 vsf_hw
+#define VSF_GPIO_CFG_UPPERCASE_PREFIX       VSF_HW
 
 /*============================ INCLUDES ======================================*/
 
@@ -25,10 +25,9 @@
 #if VSF_HAL_USE_GPIO == ENABLED
 
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
-#include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
 
 // TODO: fixed gpio output_and_set
-#define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET      	DISABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET         DISABLED
 
 /*============================ MACROS ========================================*/
 
@@ -97,10 +96,8 @@ static void __gpio_reg_mask_write(vsf_hw_gpio_t *hw_gpio_ptr,
     }
 }
 
-void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
+void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
 {
-    vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
-
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__VSF_HW_GPIO_IS_VAILID_PIN(pin_mask));
     VSF_HAL_ASSERT(__VSF_HW_GPIO_IS_VAILID_FEATURE(feature));
@@ -115,29 +112,24 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t 
     }
 }
 
-void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
+void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
 {
-    vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
-
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__VSF_HW_GPIO_IS_VAILID_PIN(pin_mask));
 
     __gpio_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->GPIO->DR, direction_mask, pin_mask);
 }
 
-uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+uint32_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask)
 {
-    vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
-
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__VSF_HW_GPIO_IS_VAILID_PIN(pin_mask));
 
     return __gpio_reg_read(hw_gpio_ptr, &hw_gpio_ptr->GPIO->DR) & pin_mask;
 }
 
-uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr)
+uint32_t vsf_hw_gpio_read(vsf_hw_gpio_t *hw_gpio_ptr)
 {
-    vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
     uint32_t pin_mask, pin_value;
     uint32_t read_mask = ~(uint32_t)0;
 
@@ -152,9 +144,8 @@ uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr)
     return pin_value;
 }
 
-void vsf_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
+void vsf_hw_gpio_write(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t value, uint32_t pin_mask)
 {
-    vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
     uint32_t temp_value;
 
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
@@ -171,16 +162,15 @@ void vsf_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
     __vsf_gpio_unprotect(orig);
 }
 
-void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_hw_gpio_toggle(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask)
 {
-    vsf_hw_gpio_t *hw_gpio_ptr = (vsf_hw_gpio_t *)gpio_ptr;
-    VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
 
-    vsf_gpio_write(gpio_ptr, ~hw_gpio_ptr->output_reg, pin_mask);
+    vsf_hw_gpio_write(hw_gpio_ptr, ~hw_gpio_ptr->output_reg, pin_mask);
 }
 
 #if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET == ENABLED
-void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_hw_gpio_output_and_set(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask)
 {
     // TODO
     VSF_HAL_ASSERT(0);
@@ -189,18 +179,16 @@ void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_GPIO_CFG_IMP_PREFIX              VSF_GPIO_CFG_PREFIX
-#define VSF_GPIO_CFG_IMP_UPPERCASE_PREFIX    VSF_HW
-#define VSF_GPIO_CFG_IMP_LV0(__COUNT, __dont_care)                              \
+#define VSF_GPIO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                 \
     vsf_hw_gpio_t vsf_hw_gpio##__COUNT = {                                      \
-        VSF_GPIO_OP                                                             \
         .GPIO = REG_GPIO##__COUNT,                                              \
         .IOMUX = ((AIC_IOMUX_TypeDef *)VSF_HW_GPIO##__COUNT##_IOMUX_REG_BASE),  \
         .is_pmic = VSF_HW_GPIO##__COUNT##_IS_PMIC,                              \
         .pin_sel = VSF_HW_GPIO##__COUNT##_PIN_SEL,                              \
         .output_reg = 0,                                                        \
+        __HAL_OP                                                                \
     };
 
-#include "hal/driver/common/gpio/gpio_template.inc"
+#include "hal/driver/common/io/io_template.inc"
 
 #endif      // VSF_HAL_USE_GPIO

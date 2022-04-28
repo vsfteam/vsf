@@ -15,6 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
+#define VSF_I2C_CFG_PREFIX                  vsf_hw
+#define VSF_I2C_CFG_UPPERCASE_PREFIX        VSF_HW
+
 /*============================ INCLUDES ======================================*/
 
 #include "./i2c.h"
@@ -61,29 +64,6 @@ typedef struct vsf_hw_i2c_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
-static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr);
-
-/*============================ INCLUDES ======================================*/
-
-#define VSF_I2C_CFG_IMP_PREFIX              VSF_I2C_CFG_PREFIX
-#define VSF_I2C_CFG_IMP_UPPERCASE_PREFIX    VSF_HW
-#define VSF_I2C_CFG_IMP_LV0(__count, __dont_care)                               \
-    static const vsf_hw_i2c_const_t __vsf_hw_i2c ##__count ## _const = {        \
-        .reg  = VSF_HW_I2C ## __count ## _REG,                                  \
-        .irqn = VSF_HW_I2C ## __count ## _IRQ_IDX,                              \
-        .pclk = VSF_HW_I2C ## __count ## _PCLKME_EN_BIT,                        \
-    };                                                                          \
-    vsf_hw_i2c_t vsf_hw_i2c ##__count = {                                       \
-        VSF_I2C_OP                                                              \
-        .i2c_const = &__vsf_hw_i2c ##__count ## _const,                         \
-    };                                                                          \
-    void VSF_HW_I2C ## __count ## _IRQ(void)                                    \
-    {                                                                           \
-        __vsf_hw_i2c_irq_handler(&vsf_hw_i2c##__count);                         \
-    }
-#include "hal/driver/common/i2c/i2c_template.inc"
-
 /*============================ IMPLEMENTATION ================================*/
 
 static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
@@ -120,9 +100,8 @@ static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
     }
 }
 
-vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_i2c_init(vsf_hw_i2c_t *hw_i2c_ptr, i2c_cfg_t *cfg_ptr)
 {
-    vsf_hw_i2c_t *hw_i2c_ptr = (vsf_hw_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
     const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
@@ -151,17 +130,15 @@ vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
-void vsf_i2c_fini(vsf_i2c_t *i2c_ptr)
+void vsf_hw_i2c_fini(vsf_hw_i2c_t *hw_i2c_ptr)
 {
-    vsf_hw_i2c_t *hw_i2c_ptr = (vsf_hw_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
 
     cpusysctrl_pclkmd_set(CSC_PCLKME_I2CM_EN_BIT);
 }
 
-fsm_rt_t vsf_i2c_enable(vsf_i2c_t *i2c_ptr)
+fsm_rt_t vsf_hw_i2c_enable(vsf_hw_i2c_t *hw_i2c_ptr)
 {
-    vsf_hw_i2c_t *hw_i2c_ptr = (vsf_hw_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
 
     hw_i2c_ptr->is_enabled = true;
@@ -169,9 +146,8 @@ fsm_rt_t vsf_i2c_enable(vsf_i2c_t *i2c_ptr)
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr)
+fsm_rt_t vsf_hw_i2c_disable(vsf_hw_i2c_t *hw_i2c_ptr)
 {
-    vsf_hw_i2c_t *hw_i2c_ptr = (vsf_hw_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
 
     hw_i2c_ptr->is_enabled = false;
@@ -179,18 +155,16 @@ fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_hw_i2c_irq_enable(vsf_hw_i2c_t *hw_i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
-    vsf_hw_i2c_t *hw_i2c_ptr = (vsf_hw_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     VSF_HAL_ASSERT((irq_mask & ~I2C_IRQ_MASK_MASTER_ALL) == 0);
 
     hw_i2c_ptr->irq_mask |= irq_mask;
 }
 
-void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_hw_i2c_irq_disable(vsf_hw_i2c_t *hw_i2c_ptr, em_i2c_irq_mask_t irq_mask)
 {
-    vsf_hw_i2c_t *hw_i2c_ptr = (vsf_hw_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
     VSF_HAL_ASSERT(NULL != hw_i2c_const);
@@ -202,9 +176,8 @@ void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
     }
 }
 
-i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr)
+i2c_status_t vsf_hw_i2c_status(vsf_hw_i2c_t *hw_i2c_ptr)
 {
-    vsf_hw_i2c_t *hw_i2c_ptr = (vsf_hw_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
 
     i2c_status_t status = {
@@ -214,13 +187,12 @@ i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr)
     return status;
 }
 
-vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
+vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
                                     uint16_t address,
                                     em_i2c_cmd_t cmd,
                                     uint16_t count,
                                     uint8_t *buffer)
 {
-    vsf_hw_i2c_t *hw_i2c_ptr = (vsf_hw_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
     VSF_HAL_ASSERT(NULL != hw_i2c_const);
@@ -269,5 +241,24 @@ vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
 
     return VSF_ERR_NONE;
 }
+
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define VSF_I2C_CFG_IMP_LV0(__count, __hal_op)                                  \
+    static const vsf_hw_i2c_const_t __vsf_hw_i2c ##__count ## _const = {        \
+        .reg  = VSF_HW_I2C ## __count ## _REG,                                  \
+        .irqn = VSF_HW_I2C ## __count ## _IRQ_IDX,                              \
+        .pclk = VSF_HW_I2C ## __count ## _PCLKME_EN_BIT,                        \
+    };                                                                          \
+    vsf_hw_i2c_t vsf_hw_i2c ##__count = {                                       \
+        .i2c_const = &__vsf_hw_i2c ##__count ## _const,                         \
+        __hal_op                                                                \
+    };                                                                          \
+    void VSF_HW_I2C ## __count ## _IRQ(void)                                    \
+    {                                                                           \
+        __vsf_hw_i2c_irq_handler(&vsf_hw_i2c##__count);                         \
+    }
+#include "hal/driver/common/i2c/i2c_template.inc"
 
 #endif /* VSF_HAL_USE_I2C */

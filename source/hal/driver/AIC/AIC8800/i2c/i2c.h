@@ -25,7 +25,6 @@
 #if VSF_HAL_USE_I2C == ENABLED
 
 #include "../__device.h"
-#include "hal/driver/common/template/vsf_template_hal_driver.h"
 
 /*============================ MACROS ========================================*/
 
@@ -55,11 +54,9 @@ typedef enum em_i2c_cmd_t {
 
 /*============================ INCLUDES ======================================*/
 
-// undef after include vsf_template_i2c.h
-#define VSF_I2C_CFG_DEC_PREFIX                      vsf_hw
-#define VSF_I2C_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
-
-#include "hal/driver/common/template/vsf_template_i2c.h"
+#define VSF_I2C_CFG_API_DECLARATION_PREFIX          vsf_hw
+#define VSF_I2C_CFG_INSTANCE_DECLARATION_PREFIX     VSF_HW
+#include "hal/driver/common/i2c/i2c_template.h"
 
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/

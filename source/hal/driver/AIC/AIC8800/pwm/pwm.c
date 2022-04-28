@@ -15,106 +15,117 @@
  *                                                                           *
  ****************************************************************************/
 
+#define VSF_PWM_CFG_PREFIX                  vsf_hw
+#define VSF_PWM_CFG_UPPERCASE_PREFIX        VSF_HW
+
 /*============================ INCLUDES ======================================*/
 
 #include "./pwm.h"
+
 #if VSF_HAL_USE_PWM == ENABLED
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
+
+#include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
+#include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/sysctrl/reg_sysctrl.h"
+#include "../__device.h"
+#include "./i_reg_pwm.h"
 
 /*============================ MACROS ========================================*/
-/*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define PWM_PWM_TMR_SEL(n)                              (((n) & 3) << 16)
 
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_hw_pwm_t {
+#if VSF_PWM_CFG_IMPLEMENT_OP == ENABLED
+    vsf_pwm_t vsf_pwm;
+#endif
+
+    PWM_REG_T *reg;
+    uint32_t freq;
+
+} vsf_hw_pwm_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
-
-vsf_pwm_t vsf_pwm0 = {
-    .PARAM = (PWM_REG_T *)PWM_BASE_ADDRESS,
-    .is_enabled = false,
-};
 /*============================ LOCAL VARIABLES ===============================*/
-
-uint8_t __map_pwm_tmr[] = {0, 1, 1, 2};
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_err_t __vsf_pwm_init(vsf_pwm_t *pwm_ptr)
+vsf_err_t vsf_hw_pwm_init(vsf_hw_pwm_t *hw_pwm_ptr, pwm_cfg_t *cfg_ptr)
 {
-    // hclk divider, 26M
-    uint32_t temp_clock_div;
-    if (101960 > pwm_ptr->cfg.mini_clock_freq) {
-        temp_clock_div = 0xff;
-    } else if(13000000 < pwm_ptr->cfg.mini_clock_freq) {
-        temp_clock_div = 1;
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    uint32_t div;
+    uint32_t hclk = cpusysctrl_hclkme_get();
+    if (hclk > cfg_ptr->freq * 0xFF) {
+        div = 0xFF;
+    } else if (hclk < cfg_ptr->freq) {
+        div = 0x01;
     } else {
-        temp_clock_div = 26000000 / pwm_ptr->cfg.mini_clock_freq;
+        div = div / cfg_ptr->freq;
     }
-    pwm_ptr->cfg.mini_clock_freq = 26000000 / temp_clock_div;
+    hw_pwm_ptr->freq = hclk / div;
+
     PMIC_MEM_WRITE( (unsigned int)(&aic1000liteSysctrl->hclk_div),
-                        (AIC1000LITE_SYS_CTRL_CFG_HCLK_DIV_DENOM(temp_clock_div)
+                        (AIC1000LITE_SYS_CTRL_CFG_HCLK_DIV_DENOM(div)
                      |  AIC1000LITE_SYS_CTRL_CFG_HCLK_DIV_UPDATE));
-    // hclk sel
     PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteSysctrl->clk_sel),
         (AIC1000LITE_SYS_CTRL_CFG_CLK_PWM_SEL), (AIC1000LITE_SYS_CTRL_CFG_CLK_PWM_SEL));
+
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_pwm_init(vsf_pwm_t *pwm_ptr, pwm_cfg_t *cfg_ptr)
+fsm_rt_t vsf_hw_pwm_enable(vsf_hw_pwm_t *hw_pwm_ptr)
 {
-    VSF_HAL_ASSERT((NULL != pwm_ptr) && (NULL != cfg_ptr));
-    pwm_ptr->cfg = *cfg_ptr;
-    return __vsf_pwm_init(pwm_ptr);
-}
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
 
-fsm_rt_t vsf_pwm_enable(vsf_pwm_t *pwm_ptr)
-{
-    VSF_HAL_ASSERT(NULL != pwm_ptr);
-    pwm_ptr->is_enabled = true;
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_pwm_disable(vsf_pwm_t *pwm_ptr)
+fsm_rt_t vsf_hw_pwm_disable(vsf_hw_pwm_t *hw_pwm_ptr)
 {
-    VSF_HAL_ASSERT(NULL != pwm_ptr);
-    pwm_ptr->is_enabled = false;
-    return fsm_rt_cpl;
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
+
+    return hw_pwm_ptr->freq;
 }
 
-vsf_err_t vsf_pwm_set(  vsf_pwm_t *pwm_ptr, uint8_t channel,
-                         uint32_t period, uint32_t pulse)
+vsf_err_t vsf_hw_pwm_set(vsf_hw_pwm_t *hw_pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
 {
-    VSF_HAL_ASSERT(NULL != pwm_ptr);
+    static const uint8_t __map_pwm_tmr[] = {0, 1, 1, 2};
+
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
     VSF_HAL_ASSERT(channel < 4);
-    if (!pwm_ptr->is_enabled) {
-        return VSF_ERR_FAIL;//todo:
-    }
-    PWM_REG_T *param = pwm_ptr->PARAM;
 
-    PMIC_MEM_WRITE((unsigned int)(&param->TMR[__map_pwm_tmr[channel]].ld_value),
-                   period - 1);
-    PMIC_MEM_WRITE((unsigned int)(&param->TMR[__map_pwm_tmr[channel]].cfg),
-                   (PWM_TMR_MODE_MASK | PWM_TMR_RUN_MASK));
+    PWM_REG_T *reg = hw_pwm_ptr->reg;
 
-    PMIC_MEM_WRITE((unsigned int)(&param->PWM[channel].sta_val), period - 1);
-    PMIC_MEM_WRITE((unsigned int)(&param->PWM[channel].end_val),
-                   period - 1 - pulse);
+    PMIC_MEM_WRITE((unsigned int)(&reg->TMR[__map_pwm_tmr[channel]].ld_value), period - 1);
+    PMIC_MEM_WRITE((unsigned int)(&reg->TMR[__map_pwm_tmr[channel]].cfg), (PWM_TMR_MODE_MASK | PWM_TMR_RUN_MASK));
 
-    PMIC_MEM_WRITE( (unsigned int)(&param->PWM[channel].cfg),
+    PMIC_MEM_WRITE((unsigned int)(&reg->PWM[channel].sta_val), period - 1);
+    PMIC_MEM_WRITE((unsigned int)(&reg->PWM[channel].end_val), period - 1 - pulse);
+
+    PMIC_MEM_WRITE( (unsigned int)(&reg->PWM[channel].cfg),
                         (PWM_PWM_RUN_MASK
                     |   PWM_PWM_TMR_SEL(__map_pwm_tmr[channel])
                     |   PWM_PWM_UPDATE_MASK));
+
     return VSF_ERR_NONE;
 }
 
-uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr)
+uint32_t vsf_hw_pwm_get_freq(vsf_hw_pwm_t *hw_pwm_ptr)
 {
-    VSF_HAL_ASSERT(NULL != pwm_ptr);
-    return pwm_ptr->cfg.mini_clock_freq;
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
+
+    return hw_pwm_ptr->freq;
 }
 
-#if VSF_HAL_PWM_IMP_TIME_SETTING == ENABLED
-#   include "hal/driver/common/pwm/__pwm.inc"
-#endif
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define VSF_PWM_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
+    vsf_hw_pwm_t vsf_hw_pwm##__COUNT = {                                        \
+        .reg = (PWM_REG_T *)VSF_HW_PWM ##__COUNT ##_BASE_ADDRESS,               \
+        __hal_op                                                                \
+    };
+#include "hal/driver/common/pwm/pwm_template.inc"
+
 #endif      // VSF_HAL_USE_PWM
