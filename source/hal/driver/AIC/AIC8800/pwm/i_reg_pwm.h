@@ -37,9 +37,6 @@ extern "C" {
 #   define __AIC8800_PWM_USE_BIT_FIELD              DISABLED
 #endif
 
-#undef PWM_BASE_ADDRESS
-#define PWM_BASE_ADDRESS                            0x50014000
-
 /* Define structure member permissions : 'read only' */
 #ifndef __IM
 #   define __IM                                     const

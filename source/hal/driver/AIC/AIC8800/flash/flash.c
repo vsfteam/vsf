@@ -15,9 +15,13 @@
  *                                                                           *
  ****************************************************************************/
 
+#define VSF_FLASH_CFG_PREFIX                vsf_hw
+#define VSF_FLASH_CFG_UPPERCASE_PREFIX      VSF_HW
+
 /*============================ INCLUDES ======================================*/
 
 #include "./flash.h"
+
 #if VSF_HAL_USE_FLASH == ENABLED
 
 /*============================ MACROS ========================================*/
@@ -66,132 +70,135 @@
     ((void (*)(unsigned int adr, unsigned int len))ROM_APITBL_BASE[8])
 
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_hw_flash_t {
+#if VSF_FLASH_CFG_IMPLEMENT_OP == ENABLED
+    vsf_flash_t vsf_flash;
+#endif
+    flash_cfg_t cfg;
+    uint32_t    flash_size;
+    bool        is_enabled;
+} vsf_hw_flash_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
-
-vsf_hw_flash_t vsf_hw_flash0 = {
-    .cfg = {
-        .isr = {
-            .handler_fn = NULL,
-            .target_ptr = NULL,
-        },
-    },
-    .info = {
-        .flash_size = 0,
-    },
-    .is_enabled = 0,
-};
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, flash_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, flash_cfg_t *cfg_ptr)
 {
-    flash_ptr->cfg = *cfg_ptr;
+    VSF_HAL_ASSERT(hw_flash_ptr != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    hw_flash_ptr->cfg = *cfg_ptr;
 
     vsf_protect_t org = __aic8800_flash_protect();
-    flash_ptr->info.flash_size = ROM_FlashChipSizeGet();
+        hw_flash_ptr->flash_size = ROM_FlashChipSizeGet();
     __aic8800_flash_unprotect(org);
+
     return VSF_ERR_NONE;
 }
 
-fsm_rt_t vsf_flash_enable(vsf_flash_t *flash_ptr)
+fsm_rt_t vsf_hw_flash_enable(vsf_hw_flash_t *hw_flash_ptr)
 {
-    flash_ptr->is_enabled = 1;
+    VSF_HAL_ASSERT(hw_flash_ptr != NULL);
+
+    hw_flash_ptr->is_enabled = true;
+
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_flash_disable(vsf_flash_t *flash_ptr)
+fsm_rt_t vsf_hw_flash_disable(vsf_hw_flash_t *hw_flash_ptr)
 {
-    flash_ptr->is_enabled = 0;
+    VSF_HAL_ASSERT(hw_flash_ptr != NULL);
+
+    hw_flash_ptr->is_enabled = false;
+
     return fsm_rt_cpl;
 }
 
-vsf_err_t vsf_flash_erase(  vsf_flash_t *flash_ptr,
-                            uint_fast32_t offset,
-                            uint_fast32_t size)
+vsf_err_t vsf_hw_flash_erase(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset, uint_fast32_t size)
 {
+    VSF_HAL_ASSERT(hw_flash_ptr != NULL);
+
+    VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
+    VSF_HAL_ASSERT(offset + size > hw_flash_ptr->flash_size);
+    VSF_HAL_ASSERT(0 == (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
+    VSF_HAL_ASSERT(0 == (size % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
+
     uint_fast32_t ret;
-    if (!flash_ptr->is_enabled) {
-        return VSF_ERR_NOT_READY;
-    }
-    if (offset + size > flash_ptr->info.flash_size) {
-        return VSF_ERR_INVALID_PARAMETER;
-    }
-    if (    (0 != (offset % VSF_AIC8800_FLASH_ALIGNMENT_ERASE_SIZE))
-        ||  (0 != (size % VSF_AIC8800_FLASH_ALIGNMENT_ERASE_SIZE))  ) {
-        return VSF_ERR_INVALID_PARAMETER;
-    }
 
     vsf_protect_t org = __aic8800_flash_protect();
-    ret = ROM_FlashErase(__aic8800_flash_address_get(offset), size);//offset:4k * n
+        ret = ROM_FlashErase(__aic8800_flash_address_get(offset), size);//offset:4k * n
     __aic8800_flash_unprotect(org);
     ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
 
-    if (NULL != flash_ptr->cfg.isr.handler_fn) {
-        flash_ptr->cfg.isr.handler_fn(
-                            flash_ptr->cfg.isr.target_ptr,
-                            0 == ret ? VSF_FLASH_IRQ_ERASE_MASK : VSF_FLASH_IRQ_ERASE_ERROR_MASK,
-                            flash_ptr);
+    if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
+        vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_ERASE_MASK : VSF_FLASH_IRQ_ERASE_ERROR_MASK;
+        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, mask, (vsf_flash_t *)hw_flash_ptr);
     }
-    return VSF_ERR_NONE;
+
+    return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
-vsf_err_t vsf_flash_write(  vsf_flash_t *flash_ptr,
-                            uint_fast32_t offset,
-                            uint8_t* buffer,
-                            uint_fast32_t size)
+vsf_err_t vsf_hw_flash_write(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
 {
     uint_fast32_t ret;
-    if (!flash_ptr->is_enabled) {
-        return VSF_ERR_NOT_READY;
-    }
-    if (offset + size > flash_ptr->info.flash_size) {
-        return VSF_ERR_INVALID_PARAMETER;
-    }
-    if (0 != (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE)) {
-        return VSF_ERR_INVALID_PARAMETER;
-    }
+
+    VSF_HAL_ASSERT(hw_flash_ptr != NULL);
+    VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
+    VSF_HAL_ASSERT(offset + size > hw_flash_ptr->flash_size);
+    VSF_HAL_ASSERT(0 == (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
 
     vsf_protect_t org = __aic8800_flash_protect();
-    ret = ROM_FlashWrite(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
+        ret = ROM_FlashWrite(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
     __aic8800_flash_unprotect(org);
     ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
 
-    if (NULL != flash_ptr->cfg.isr.handler_fn) {
-        flash_ptr->cfg.isr.handler_fn(
-                            flash_ptr->cfg.isr.target_ptr,
-                            0 == ret ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK,
-                            flash_ptr);
+    if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
+        vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK;
+        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, mask, (vsf_flash_t *)hw_flash_ptr);
     }
-    return VSF_ERR_NONE;
+
+    return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
-vsf_err_t vsf_flash_read(   vsf_flash_t *flash_ptr,
-                            uint_fast32_t offset,
-                            uint8_t* buffer,
-                            uint_fast32_t size)
+vsf_err_t vsf_hw_flash_read(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
 {
     uint_fast32_t ret;
-    VSF_HAL_ASSERT((NULL != flash_ptr) && (NULL != buffer));
-    if (!flash_ptr->is_enabled) {
-        return VSF_ERR_NOT_READY;
-    }
-    if (offset + size > flash_ptr->info.flash_size) {
-        return VSF_ERR_INVALID_PARAMETER;
-    }
+
+    VSF_HAL_ASSERT(hw_flash_ptr != NULL);
+    VSF_HAL_ASSERT(NULL != buffer);
+    VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
+    VSF_HAL_ASSERT(offset + size > hw_flash_ptr->flash_size);
+    VSF_HAL_ASSERT(0 == (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
 
     vsf_protect_t org = __aic8800_flash_protect();
-    ret = ROM_FlashRead(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
+        ret = ROM_FlashRead(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
     __aic8800_flash_unprotect(org);
 
-    if (NULL != flash_ptr->cfg.isr.handler_fn) {
-        flash_ptr->cfg.isr.handler_fn(
-                            flash_ptr->cfg.isr.target_ptr,
-                            0 == ret ? VSF_FLASH_IRQ_READ_MASK : VSF_FLASH_IRQ_READ_ERROR_MASK,
-                            flash_ptr);
+    if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
+        vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK;
+        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, mask, (vsf_flash_t *)hw_flash_ptr);
     }
-    return VSF_ERR_NONE;
+
+    return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
+
+/*============================ INCLUDES ======================================*/
+
+#define VSF_FLASH_CFG_IMP_LV0(__count, __hal_op)                                \
+    vsf_hw_flash_t vsf_hw_flash ## __count = {                                  \
+        .cfg = {                                                                \
+            .isr = {                                                            \
+                .handler_fn = NULL,                                             \
+                .target_ptr = NULL,                                             \
+            },                                                                  \
+        },                                                                      \
+        .flash_size = 0,                                                        \
+        .is_enabled = false,                                                    \
+        __hal_op                                                                \
+    };
+#include "hal/driver/common/flash/flash_template.inc"
 
 #endif      // VSF_HAL_USE_FLASH

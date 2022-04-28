@@ -84,7 +84,7 @@ bool vsf_driver_init(void)
     aic_time_init(0, 0);
 
 #if VSF_HAL_USE_RNG == ENABLED
-    VSF_MREPEAT(RNG_COUNT, __VSF_HW_RNG_INIT, NULL)
+    VSF_MREPEAT(VSF_HW_RNG_COUNT, __VSF_HW_RNG_INIT, NULL)
 #endif
 
     return true;

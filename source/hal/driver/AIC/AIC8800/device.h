@@ -81,10 +81,10 @@
         0, 0, 0, 0, 0, 0, 0, 0,                                                 \
     }
 
-#define RNG_COUNT                   1
-#define RNG_BITLEN                  32
-#define RNG0_IRQHandler             TRNG_IRQHandler
-#define RNG0_CONFIG                                                             \
+#define VSF_HW_RNG_COUNT                   1
+#define VSF_HW_RNG_BITLEN                  32
+#define VSF_HW_RNG0_IRQHandler             TRNG_IRQHandler
+#define VSF_HW_RNG0_CONFIG                                                      \
             .reg                    = (void *)AIC_TRNG_BASE,                    \
             .pclk                   = CSC_PCLKME_TRNG_EN_BIT,
 
@@ -112,6 +112,15 @@
 #define VSF_HW_SPI0_PCLKME_EN_BIT   CSC_PCLKME_SPI_EN_BIT
 #define VSF_HW_SPI0_OCLKME_EN_BIT   CSC_OCLKME_SPI_EN_BIT
 #define VSF_HW_SPI0_HCLKME_EN_BIT   CSC_HCLKME_DMA_EN_BIT
+
+#define VSF_HW_ADC_COUNT            1
+
+#define VSF_HW_PWM_COUNT            1
+#define VSF_HW_PWM0_BASE_ADDRESS    0x50014000
+
+#define VSF_HW_FLASH_COUNT          1
+
+#define VSF_HW_TIMER_COUNT          1
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

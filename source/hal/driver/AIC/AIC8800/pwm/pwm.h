@@ -21,37 +21,22 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
+
 #if VSF_HAL_USE_PWM == ENABLED
-#include "../__device.h"
-#include "./i_reg_pwm.h"
 
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HAL_PWM_IMP_TIME_SETTING
 #   define VSF_HAL_PWM_IMP_TIME_SETTING                 ENABLED
 #endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/template/vsf_template_pwm.h"
-
-/*============================ TYPES =========================================*/
-
-struct vsf_pwm_t {
-    PWM_REG_T           *PARAM;
-    pwm_cfg_t           cfg;
-    bool                is_enabled;
-};
-
-/*============================ INCLUDES ======================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-
-extern vsf_pwm_t vsf_pwm0;
-
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
+#define VSF_PWM_CFG_API_DECLARATION_PREFIX          vsf_hw
+#define VSF_PWM_CFG_INSTANCE_DECLARATION_PREFIX     VSF_HW
+#include "hal/driver/common/pwm/pwm_template.h"
 
 #endif /* VSF_HAL_USE_PWM */
 #endif /* EOF */

@@ -24,26 +24,11 @@
 
 #if VSF_HAL_USE_RNG == ENABLED
 
-/*============================ MACROS ========================================*/
-/*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
-/*============================ TYPES =========================================*/
 
-typedef struct vsf_hw_rng_t vsf_hw_rng_t;
-
-/*============================ GLOBAL VARIABLES ==============================*/
-
-extern vsf_hw_rng_t vsf_hw_rng0;
-
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
-
-extern vsf_err_t vsf_hw_rng_init(vsf_hw_rng_t *rng);
-extern void vsf_hw_rng_fini(vsf_hw_rng_t *rng);
-extern vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint32_t num,
-            void *param, void (*on_ready)(void *param, uint32_t *buffer, uint32_t num));
+#define VSF_RNG_CFG_API_DECLARATION_PREFIX          vsf_hw
+#define VSF_RNG_CFG_INSTANCE_DECLARATION_PREFIX     VSF_HW
+#include "hal/driver/common/rng/rng_template.h"
 
 #endif /* VSF_HAL_USE_RNG */
 #endif /* __HAL_DRIVER_AIC8800_TRNG_H__ */

@@ -22,34 +22,24 @@
 
 #include "hal/vsf_hal_cfg.h"
 #if VSF_HAL_USE_ADC == ENABLED
-#include "./kernel/vsf_kernel.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/gpadc/gpadc_api.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_msadc.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_analog_reg.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_rtc_core.h"
-#include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
 
 /*============================ MACROS ========================================*/
 
-#if     defined(__VSF_ADC_CLASS_IMPLEMENT)
-#   undef __VSF_ADC_CLASS_IMPLEMENT
-#   define __VSF_CLASS_IMPLEMENT__
+#ifndef VSF_HW_ADC_CFG_CALLBACK_TIME_POSTPONE_US
+#   define VSF_HW_ADC_CFG_CALLBACK_TIME_POSTPONE_US                 10
 #endif
 
-#ifndef VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US
-#   define VSF_ADC_CFG_CALLBACK_TIME_POSTPONE_US                    10
+#ifndef VSF_HW_ADC_CFG_CHANNEL_COUNT
+#   define VSF_HW_ADC_CFG_CHANNEL_COUNT                             8
 #endif
 
-#ifndef VSF_ADC_CFG_CHANNEL_COUNT
-#   define VSF_ADC_CFG_CHANNEL_COUNT                                8
-#endif
-
-#define VSF_HAL_ADC_IMP_REQUEST_MULTI                               ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_FEATURE                             ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_CHANNEL_FEATURE                     ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum ad_feature_t{
+typedef enum adc_feature_t{
     ADC_REF_VDD_1           = 0,                //ADC_TYPE_VBAT
     ADC_REF_VDD_1_2,                            //Not activated
     ADC_REF_VDD_1_3,                            //ADC_TYPE_TEMP0
@@ -62,9 +52,9 @@ enum ad_feature_t{
     EXTERN_TRIGGER_0        = 0,                //Not activated
     EXTERN_TRIGGER_1        = 0,                //Not activated
     EXTERN_TRIGGER_2        = 0,                //Not activated
-};
+} adc_feature_t;
 
-enum ad_channel_feature_t {
+typedef enum adc_channel_feature_t {
     ADC_CHANNEL_GAIN_1_6    = (0 << 0),         //Not activated
     ADC_CHANNEL_GAIN_1_5    = (1 << 0),         //Not activated
     ADC_CHANNEL_GAIN_1_4    = (2 << 0),         //Not activated
@@ -76,47 +66,14 @@ enum ad_channel_feature_t {
     ADC_CHANNEL_REF_VDD_1_2 = (1 << 4),         //Not activated
     ADC_CHANNEL_REF_VDD_1_3 = (2 << 4),         //Not activated
     ADC_CHANNEL_REF_VDD_1_4 = (3 << 4),         //Not activated
-};
+} adc_channel_feature_t;
 
 /*============================ INCLUDES ======================================*/
 
-#include "utilities/ooc_class.h"
-#include "hal/driver/common/template/vsf_template_adc.h"
-#include "hal/driver/common/adc/__adc_common.h"
+#define VSF_ADC_CFG_API_DECLARATION_PREFIX              vsf_hw
+#define VSF_ADC_CFG_INSTANCE_DECLARATION_PREFIX         VSF_HW
 
-/*============================ TYPES =========================================*/
-
-vsf_class(vsf_adc_t) {
-    public_member(
-        void                    *data;
-    )
-    private_member(
-        vsf_callback_timer_t    callback_timer;
-        adc_channel_cfg_t       *current_channel;
-        adc_channel_cfg_t       cfg_channel[VSF_ADC_CFG_CHANNEL_COUNT];
-        adc_cfg_t               cfg;
-        uint_fast32_t           channel_count;
-        uint_fast32_t           channel_index;
-        vsf_hal_adc_def_req_by_once();
-        struct {
-            uint32_t            is_enable       : 1;
-            uint32_t            is_busy         : 1;
-            uint32_t            is_irq          : 1;
-            uint32_t                            : 29;
-        } status;
-    )
-};
-
-// TODO: update template
-typedef vsf_adc_t vsf_hw_adc_t;
-
-/*============================ GLOBAL VARIABLES ==============================*/
-
-extern vsf_hw_adc_t vsf_hw_adc0;
-
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
+#include "hal/driver/common/adc/adc_template.h"
 
 #endif /* VSF_HAL_USE_AD */
 #endif /* EOF */

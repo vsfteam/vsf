@@ -15,10 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-// force convert vsf_usart_init to vsf_usart_init
-#define VSF_USART_CFG_PREFIX                  vsf_hw
-#define VSF_USART_CFG_IMP_PREFIX              VSF_USART_CFG_PREFIX
-#define VSF_USART_CFG_IMP_UPPERCASE_PREFIX    VSF_HW
+#define VSF_USART_CFG_PREFIX                vsf_hw
+#define VSF_USART_CFG_UPPERCASE_PREFIX      VSF_HW
+#define VSF_USART_CFG_REQUEST_EMPTY_IMPL    ENABELD
 
 /*============================ INCLUDES ======================================*/
 
@@ -57,7 +56,7 @@ typedef struct vsf_hw_usart_t {
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
 {
     vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
@@ -66,7 +65,7 @@ vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
     uart_reg_t *reg = usart_const->reg;
     VSF_HAL_ASSERT(NULL != reg);
 
-    cpusysctrl_hclkme_set(usart_const->hclk);                                     // usart_const enable
+    cpusysctrl_hclkme_set(usart_const->hclk);                               // usart_const enable
     cpusysctrl_oclkme_set(usart_const->oclk);
 
     reg->DBUFCFG_REG = 0x0;                                                 // reset fifo
@@ -97,17 +96,17 @@ vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
-fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr)
+fsm_rt_t vsf_hw_usart_enable(vsf_hw_usart_t *usart_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr)
+fsm_rt_t vsf_hw_usart_disable(vsf_hw_usart_t *usart_ptr)
 {
     return fsm_rt_cpl;
 }
 
-void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_enable(vsf_hw_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
 {
     vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
@@ -119,7 +118,7 @@ void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
     usart_const->reg->IRQCTL_REG |= irq_mask;
 }
 
-void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_disable(vsf_hw_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
 {
     vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
@@ -131,7 +130,7 @@ void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
     usart_const->reg->IRQCTL_REG &= ~irq_mask;
 }
 
-usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
+usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *usart_ptr)
 {
     vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
@@ -149,7 +148,7 @@ static bool __hw_usart_write_fifo_is_full(vsf_hw_usart_t *hw_usart_ptr)
     return hw_usart_ptr->usart_const->reg->DBUFSTS_REG & UART_TX_DBUF_FULL_MSK;
 }
 
-uint_fast16_t vsf_usart_fifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
 {
     vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
@@ -171,7 +170,7 @@ uint_fast16_t vsf_usart_fifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint
     return i;
 }
 
-uint_fast16_t vsf_usart_fifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast16_t vsf_hw_usart_fifo_write(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
 {
     vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
@@ -238,17 +237,15 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
     em_usart_irq_mask_t irq_mask = __get_uart_irq_mask(hw_usart_ptr);
     if (irq_mask & USART_IRQ_MASK) {
         if (NULL != hw_usart_ptr->isr.handler_fn) {
-            hw_usart_ptr->isr.handler_fn(hw_usart_ptr->isr.target_ptr,
-                                         (vsf_usart_t *)hw_usart_ptr, irq_mask);
+            hw_usart_ptr->isr.handler_fn(hw_usart_ptr->isr.target_ptr, (vsf_usart_t *)hw_usart_ptr, irq_mask);
         }
     }
 }
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_USART_CFG_IMP_UPPERCASE_PREFIX            VSF_HW
-#define VSF_USART_CFG_IMP_LV0(__count, __dont_care)                             \
-    static const vsf_hw_usart_const_t __vsf_hw_usart ## __count ## _clock = {  \
+#define VSF_USART_CFG_IMP_LV0(__count, __hal_op)                                \
+    static const vsf_hw_usart_const_t __vsf_hw_usart ## __count ## _clock = {   \
         .reg    = UART ## __count,                                              \
         .irqn   = UART ## __count ## _IRQn,                                     \
         .hclk   = CSC_HCLKME_UART ## __count ## _EN_BIT,                        \
@@ -256,8 +253,8 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
         .perclk = PER_UART ## __count,                                          \
     };                                                                          \
     vsf_hw_usart_t vsf_hw_usart ## __count = {                                  \
-        VSF_USART_OP                                                            \
         .usart_const  = &__vsf_hw_usart ## __count ## _clock,                   \
+        __hal_op                                                                \
     };                                                                          \
     void UART ## __count ## _IRQHandler(void)                                   \
     {                                                                           \

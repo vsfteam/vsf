@@ -23,9 +23,6 @@
     ||  (VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_DWCOTG == ENABLED)
 
 #include "sysctrl_api.h"
-#if PLF_PMIC
-#   include "pmic_api.h"
-#endif
 #if PLF_PMIC_VER_LITE
 #   include "aic1000Lite_analog_reg.h"
 #endif
