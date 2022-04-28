@@ -24,24 +24,15 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 
+#include "../device.h"
 #include "utilities/compiler/compiler.h"
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_USART_CFG_PORT_NUM
-#   define VSF_USART_CFG_PORT_NUM                       8
-#endif
-
-#define VSF_USART_CFG_PREFIX                            vsf
 
 #define VSF_USART_CFG_REIMPLEMENT_MODE                  ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_IRQ_MASK              ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define __VSF_USART_EXTERN_REPEAD(__N, __DONT_CARE)                             \
-                                  extern vsf_usart_t vsf_hw_usart##__N;
-
 /*============================ TYPES =========================================*/
 
 typedef enum em_usart_mode_t {
@@ -91,28 +82,24 @@ typedef enum em_usart_irq_mask_t {
 
 /*============================ INCLUDES ======================================*/
 
-// undef after include vsf_template_i2c.h
-//#define VSF_USART_CFG_DEC_PREFIX                      vsf_hw
-//#define VSF_USART_CFG_DEC_UPPERCASE_PREFIX            VSF_HW
-
-#include "hal/driver/common/template/vsf_template_usart.h"
+#define VSF_USART_CFG_API_DECLARATION_PREFIX          vsf_hw
+#define VSF_USART_CFG_INSTANCE_DECLARATION_PREFIX     VSF_HW
+#include "hal/driver/common/usart/usart_template.h"
 
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_usart_win_expression_t {
     vsf_usart_t *vsf_usart_instance_ptr;
     uint8_t      win_serial_port_num;
-}vsf_usart_win_expression_t;
+} vsf_usart_win_expression_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-VSF_MREPEAT(VSF_USART_CFG_PORT_NUM, __VSF_USART_EXTERN_REPEAD, NULL)
-
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_usart_get_can_used_port(uint8_t *available_number_port);
-extern bool vsf_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size);
-extern bool vsf_usart_port_isbusy();
+extern void vsf_hw_usart_get_can_used_port(uint8_t *available_number_port);
+extern bool vsf_hw_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size);
+extern bool vsf_hw_usart_port_is_busy(void);
 
 #endif
 #endif      // __OSA_HAL_X86_WIN_USART_H__

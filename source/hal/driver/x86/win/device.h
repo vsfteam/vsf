@@ -28,11 +28,11 @@
 
 /*============================ MACROS ========================================*/
 
-#define RTC_HW_COUNT                            1
+#define VSF_HW_RTC_COUNT                        1
 
-// TODO: use USART_HW_COUNT
-#ifndef USART_MAX_PORT
-#   define USART_MAX_PORT                       1
+// for x86, maybe redefine it
+#ifndef VSF_HW_USART_COUNT
+#   define VSF_HW_USART_COUNT                   8
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

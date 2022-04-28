@@ -17,6 +17,9 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_RTC_CFG_PREFIX              vsf_hw
+#define VSF_RTC_CFG_UPPERCASE_PREFIX    VSF_HW
+
 #include "./rtc.h"
 
 #if VSF_HAL_USE_RTC == ENABLED
@@ -40,35 +43,39 @@ typedef struct vsf_hw_rtc_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
-NO_INIT vsf_hw_rtc_t vsf_hw_rtc0;
-
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_hw_rtc_init(vsf_rtc_t *rtc_ptr, rtc_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_rtc_init(vsf_hw_rtc_t *hw_rtc_ptr, rtc_cfg_t *cfg_ptr)
 {
-    vsf_hw_rtc_t *hw_rtc_ptr = (vsf_hw_rtc_t *)rtc_ptr;
     hw_rtc_ptr->is_enabled = false;
     return VSF_ERR_NONE;
 }
 
-fsm_rt_t vsf_hw_rtc_enable(vsf_rtc_t *rtc_ptr)
+fsm_rt_t vsf_hw_rtc_enable(vsf_hw_rtc_t *hw_rtc_ptr)
 {
-    vsf_hw_rtc_t *hw_rtc_ptr = (vsf_hw_rtc_t *)rtc_ptr;
     hw_rtc_ptr->is_enabled = true;
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_hw_rtc_disable(vsf_rtc_t *rtc_ptr)
+fsm_rt_t vsf_hw_rtc_disable(vsf_hw_rtc_t *hw_rtc_ptr)
 {
-    vsf_hw_rtc_t *hw_rtc_ptr = (vsf_hw_rtc_t *)rtc_ptr;
     hw_rtc_ptr->is_enabled = false;
     return fsm_rt_cpl;
 }
 
-vsf_err_t vsf_hw_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
+time_t vsf_hw_rtc_get_second(vsf_hw_rtc_t *hw_rtc_ptr)
 {
-    vsf_hw_rtc_t *hw_rtc_ptr = (vsf_hw_rtc_t *)rtc_ptr;
+    // TODO:
+    return 0;
+}
+
+vsf_err_t vsf_hw_rtc_set_second(vsf_hw_rtc_t *rtc_ptr, time_t second)
+{
+    return VSF_ERR_FAIL;
+}
+
+vsf_err_t vsf_hw_rtc_get(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_tm_t *rtc_tm)
+{
     if (hw_rtc_ptr->is_enabled) {
         SYSTEMTIME system_time;
         GetLocalTime(&system_time);
@@ -88,9 +95,15 @@ vsf_err_t vsf_hw_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
     return VSF_ERR_FAIL;
 }
 
-vsf_err_t vsf_hw_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
+vsf_err_t vsf_hw_rtc_set(vsf_hw_rtc_t *hw_rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 {
     return VSF_ERR_FAIL;
 }
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define VSF_RTC_CFG_IMP_LV0(__COUNT, __dont_care)                               \
+    NO_INIT vsf_hw_rtc_t vsf_hw_rtc##__COUNT;
+#include "hal/driver/common/rtc/rtc_template.inc"
 
 #endif
