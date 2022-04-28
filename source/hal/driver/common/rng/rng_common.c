@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Copyright(C)2009-2022 by VSF Team                                       *
+ *   Cop->right(C)2009-2019 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a copy of the License at                                  *
+ *  You may obtain a cop-> of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -15,66 +15,62 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_FIFO2REQ_USART_H__
-#define __HAL_DRIVER_FIFO2REQ_USART_H__
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+#define VSF_RNG_CFG_FUNCTION_RENAME DISABLED
 
-#if (VSF_HAL_USE_USART == ENABLED) && (VSF_HAL_USE_FIFO2REQ_USART == ENABLED)
+#include "hal/driver/driver.h"
 
-#if defined(__VSF_HAL_FIFO2REQ_USART_CLASS_IMPLEMENT)
-#   define __VSF_CLASS_IMPLEMENT__
-#endif
-
-#include "utilities/ooc_class.h"
-
-// undef after include vsf_template_i2c.h
-#define VSF_USART_CFG_API_DECLARATION_PREFIX              vsf_fifo2req
-#include "hal/driver/common/template/vsf_template_usart.h"
+#if VSF_HAL_USE_RNG == ENABLED
+#if VSF_RNG_CFG_MULTI_CLASS == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-// TODO: add usart rx idle or timeout support
-// TODO: support 9 bit mode
-
-typedef struct vsf_fifo2req_usart_item_t {
-    void           * buffer;
-    uint32_t         max_count;
-    uint32_t         count;
-} vsf_fifo2req_usart_item_t;
-
-vsf_class(vsf_fifo2req_usart_t) {
-    private_member(
-#if VSF_I2C_CFG_IMPLEMENT_OP == ENABLED
-        vsf_usart_t vsf_usart;
-#endif
-        vsf_fifo2req_usart_item_t rx;
-        vsf_fifo2req_usart_item_t tx;
-
-        vsf_usart_isr_t isr;
-
-        em_usart_irq_mask_t irq_mask;
-
-        //uint8_t data_length;
-    )
-
-    public_member(
-        vsf_usart_t *real_usart_ptr;
-    )
-};
-
-
-
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ INCLUDES ======================================*/
+/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
 /*============================ IMPLEMENTATION ================================*/
 
-#endif
 
-#endif
-/* EOF */
+vsf_err_t vsf_rng_init(vsf_rng_t *rng_ptr)
+{
+    VSF_HAL_ASSERT(rng_ptr != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op->init != NULL);
+
+    return rng_ptr->op->init(rng_ptr);
+}
+
+void vsf_rng_fini(vsf_rng_t *rng_ptr)
+{
+    VSF_HAL_ASSERT(rng_ptr != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op->fini != NULL);
+
+    rng_ptr->op->fini(rng_ptr);
+}
+
+vsf_err_t vsf_rng_generate_request(vsf_rng_t *rng_ptr, uint32_t *buffer, uint32_t num, void *param,
+                                   vsf_rng_on_ready_callback_t * on_ready_cb)
+{
+    VSF_HAL_ASSERT(rng_ptr != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op->generate_request != NULL);
+
+    return rng_ptr->op->generate_request(rng_ptr, buffer, num, param, on_ready_cb);
+}
+
+rng_capability_t vsf_rng_capability(vsf_rng_t *rng_ptr)
+{
+    VSF_HAL_ASSERT(rng_ptr != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op->capability != NULL);
+
+    return rng_ptr->op->capability(rng_ptr);
+}
+
+#endif /* VSF_RNG_CFG_MULTI_CLASS == ENABLED */
+#endif /* VSF_HAL_USE_RNG == ENABLED */

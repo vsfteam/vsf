@@ -15,49 +15,45 @@
  *                                                                           *
  ****************************************************************************/
 
+#if VSF_HAL_USE_PWM == ENABLED
+
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_hal_driver.h"
-
 /*============================ MACROS ========================================*/
-#if VSF_HAL_USE_SPI == ENABLED
-
-#ifndef VSF_SPI_CFG_CS_COUNT
-#   define VSF_SPI_CFG_CS_COUNT     1
-#endif
-
-#define vsf_real_spi_t          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t)
-#define vsf_real_spi_capability VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_capability)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ PROTOTYPES ====================================*/
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+#define vsf_real_timer_t          VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t)
+#define vsf_real_timer_capability VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_capability)
+
+/*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_SPI_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
+#if VSF_TIMER_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+timer_capability_t vsf_real_timer_capability(vsf_real_timer_t *timer_ptr)
 {
-    spi_capability_t spi_capability = {
+    timer_capability_t timer_capability = {
         0,
     };
 
-    return spi_capability;
+    return timer_capability;
 }
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     spi
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              SPI
+#define __VSF_HAL_TEMPLATE_NAME                     timer
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              TIMER
 
-#ifndef VSF_SPI_CFG_PREFIX
-#   error "Please define VSF_SPI_CFG_PREFIX in spi driver"
+#ifndef VSF_TIMER_CFG_PREFIX
+#   error "Please define VSF_TIMER_CFG_PREFIX in timer driver"
 #endif
 
-#ifndef VSF_SPI_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_SPI_CFG_UPPERCASE_PREFIX in spi driver"
+#ifndef VSF_TIMER_CFG_UPPERCASE_PREFIX
+#   error "Please define VSF_TIMER_CFG_UPPERCASE_PREFIX in timer driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
-#endif // VSF_HAL_USE_SPI == ENABLED
+#endif  /* VSF_HAL_USE_PWM */

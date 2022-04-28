@@ -18,6 +18,8 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_USART_CFG_FUNCTION_RENAME DISABLED
+
 #include "hal/driver/driver.h"
 
 #if VSF_HAL_USE_USART == ENABLED
@@ -85,6 +87,15 @@ usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
     VSF_HAL_ASSERT(usart_ptr->op->status != NULL);
 
     return usart_ptr->op->status(usart_ptr);
+}
+
+usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(usart_ptr != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op->capability != NULL);
+
+    return usart_ptr->op->capability(usart_ptr);
 }
 
 uint_fast16_t vsf_usart_fifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)

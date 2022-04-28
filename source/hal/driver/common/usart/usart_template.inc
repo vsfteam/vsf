@@ -15,78 +15,96 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_hal_driver.h"
-
-/*============================ MACROS ========================================*/
-
 #if VSF_HAL_USE_USART == ENABLED
 
-#define VSF_USART_CFG_FIFO2REQ_PREFIX           vsf_fifo2req
+/*============================ INCLUDES ======================================*/
+/*============================ MACROS ========================================*/
 
-#if VSF_USART_CFG_IMPLEMENT_OP == ENABLED
-#   define __VSF_USART_OP_VAR                     VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_op)
-#   define VSF_USART_OP                           .vsf_usart.op = & __VSF_USART_OP_VAR,
-#else
-#   define VSF_USART_OP
+#ifndef VSF_USART_CFG_REIMPLEMENT_CAPABILITY
+#   define VSF_USART_CFG_REIMPLEMENT_CAPABILITY   DISABLED
 #endif
+
+#define vsf_real_usart_t                    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t)
+#define vsf_real_usart_request_rx           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_rx)
+#define vsf_real_usart_cancel_rx            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_rx)
+#define vsf_real_usart_get_rx_count         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)
+#define vsf_real_usart_request_tx           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_tx)
+#define vsf_real_usart_cancel_tx            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)
+#define vsf_real_usart_get_tx_count         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)
+#define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USART_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_USART_CFG_REQUEST_EMPTY_IMPL == ENABLED
+vsf_err_t vsf_real_usart_request_rx(vsf_real_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
+{
+    VSF_HAL_ASSERT(0);
+    return VSF_ERR_FAIL;
+}
 
-#   undef VSF_USART_API
-#   define VSF_USART_API(__prefix_name, __return, __name, ...)                   \
-        VSF_TEMPLATE_HAL_API_OP(__prefix_name, _usart_, __return, __name, __VA_ARGS__)
+vsf_err_t vsf_real_usart_cancel_rx(vsf_real_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(0);
 
-static const vsf_usart_op_t __VSF_USART_OP_VAR = {
-    VSF_USART_APIS(VSF_USART_CFG_INSTANCE_PREFIX)
-};
+    return VSF_ERR_FAIL;
+}
+
+int_fast32_t vsf_real_usart_get_rx_count(vsf_real_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(0);
+
+    return -1;
+}
+
+vsf_err_t vsf_real_usart_request_tx(vsf_real_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
+{
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_FAIL;
+}
+
+vsf_err_t vsf_real_usart_cancel_tx(vsf_real_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_FAIL;
+}
+
+int_fast32_t vsf_real_usart_get_tx_count(vsf_real_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(0);
+
+    return -1;
+}
+#endif
+
+#if VSF_USART_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
+{
+    usart_capability_t usart_capability = {
+        0,
+    };
+
+    return usart_capability;
+}
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_MCONNECT(VSF_USART_CFG_IMP_UPPERCASE_PREFIX, _USART_COUNT)
-#   define __VSF_USART_IMP_COUNT VSF_MCONNECT(VSF_USART_CFG_IMP_UPPERCASE_PREFIX, _USART_COUNT)
+#define __VSF_HAL_TEMPLATE_NAME                     usart
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              USART
 
-#   if VSF_MCONNECT(VSF_USART_CFG_IMP_UPPERCASE_PREFIX, _USART_MASK)
-#       define __VSF_USART_IMP_MASK    VSF_MCONNECT(VSF_USART_CFG_IMP_UPPERCASE_PREFIX, _USART_MASK)
-#   else
-#       define __VSF_USART_IMP_MASK    ((1ul << __VSF_USART_IMP_COUNT) - 1)
-#   endif
-
-#   if __VSF_USART_IMP_MASK & (1 << 0)
-        VSF_USART_CFG_IMP_LV0(0, NULL)
-#   endif
-#   if __VSF_USART_IMP_MASK & (1 << 1)
-        VSF_USART_CFG_IMP_LV0(1, NULL)
-#   endif
-#   if __VSF_USART_IMP_MASK & (1 << 2)
-        VSF_USART_CFG_IMP_LV0(2, NULL)
-#   endif
-#   if __VSF_USART_IMP_MASK & (1 << 3)
-        VSF_USART_CFG_IMP_LV0(3, NULL)
-#   endif
-#   if __VSF_USART_IMP_MASK & (1 << 4)
-        VSF_USART_CFG_IMP_LV0(4, NULL)
-#   endif
-#   if __VSF_USART_IMP_MASK & (1 << 5)
-        VSF_USART_CFG_IMP_LV0(5, NULL)
-#   endif
-#   if __VSF_USART_IMP_MASK & (1 << 6)
-        VSF_USART_CFG_IMP_LV0(6, NULL)
-#   endif
-#   if __VSF_USART_IMP_MASK & (1 << 7)
-        VSF_USART_CFG_IMP_LV0(7, NULL)
-#   endif
-
-#   undef __VSF_USART_IMP_COUNT
-#   undef __VSF_USART_IMP_MASK
-#   undef VSF_USART_CFG_IMP_LV0
+#ifndef VSF_USART_CFG_PREFIX
+#   error "Please define VSF_USART_CFG_PREFIX in usart driver"
 #endif
 
+#ifndef VSF_USART_CFG_UPPERCASE_PREFIX
+#   error "Please define VSF_USART_CFG_UPPERCASE_PREFIX in usart driver"
+#endif
+
+#include "hal/driver/common/template/vsf_template_implementation.h"
 
 #endif // VSF_HAL_USE_USART == ENABLED

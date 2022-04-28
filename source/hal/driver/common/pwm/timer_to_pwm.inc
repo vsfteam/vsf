@@ -15,49 +15,62 @@
  *                                                                           *
  ****************************************************************************/
 
+#if VSF_HAL_USE_PWM == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/template/vsf_template_hal_driver.h"
-
 /*============================ MACROS ========================================*/
-#if VSF_HAL_USE_SPI == ENABLED
-
-#ifndef VSF_SPI_CFG_CS_COUNT
-#   define VSF_SPI_CFG_CS_COUNT     1
-#endif
-
-#define vsf_real_spi_t          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t)
-#define vsf_real_spi_capability VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_capability)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ PROTOTYPES ====================================*/
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_SPI_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
+vsf_err_t vsf_hw_pwm_init(vsf_hw_pwm_t *hw_pwm_ptr, pwm_cfg_t *cfg_ptr)
 {
-    spi_capability_t spi_capability = {
-        0,
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr->timer);
+
+    hw_pwm_ptr->cfg = *cfg_ptr;
+
+    timer_cfg_t timer_cfg = {
+        .mode = TIMER_MODE_PWM,
+        .min_freq = cfg_ptr->mini_clock_freq,
     };
 
-    return spi_capability;
+    return vsf_hw_timer_init(hw_pwm_ptr->timer, &timer_cfg);
 }
-#endif
 
-/*============================ GLOBAL VARIABLES ==============================*/
+fsm_rt_t vsf_hw_pwm_enable(vsf_hw_pwm_t *hw_pwm_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr->timer);
 
-#define __VSF_HAL_TEMPLATE_NAME                     spi
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              SPI
+    return vsf_hw_timer_enable(hw_pwm_ptr->timer);
+}
 
-#ifndef VSF_SPI_CFG_PREFIX
-#   error "Please define VSF_SPI_CFG_PREFIX in spi driver"
-#endif
+fsm_rt_t vsf_hw_pwm_disable(vsf_hw_pwm_t *hw_pwm_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr->timer);
 
-#ifndef VSF_SPI_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_SPI_CFG_UPPERCASE_PREFIX in spi driver"
-#endif
+    return vsf_hw_timer_disable(hw_pwm_ptr->timer);
+}
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+vsf_err_t vsf_hw_pwm_set(vsf_hw_pwm_t *hw_pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
+{
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr->timer);
 
-#endif // VSF_HAL_USE_SPI == ENABLED
+    return vsf_hw_timer_pwm_set(hw_pwm_ptr->timer, channel, period, pulse);
+}
+
+uint32_t vsf_hw_pwm_get_freq(vsf_hw_pwm_t *hw_pwm_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
+    return vsf_hw_timer_get_freq(hw_pwm_ptr->timer);
+}
+
+#endif  /* VSF_HAL_USE_PWM */
