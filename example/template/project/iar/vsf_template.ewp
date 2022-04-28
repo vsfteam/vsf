@@ -5631,18 +5631,6 @@
                 </file>
             </group>
             <group>
-                <name>awtk_demo</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\demo\awtk_demo\awtk_application.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\demo\awtk_demo\awtk_assets.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\demo\awtk_demo\awtk_demo.c</name>
-                </file>
-            </group>
-            <group>
                 <name>btstack_demo</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\btstack_demo\btstack_application.c</name>
@@ -5730,18 +5718,6 @@
                 </file>
             </group>
             <group>
-                <name>evm_demo</name>
-                <excluded>
-                    <configuration>vsf_template_m484</configuration>
-                    <configuration>vsf_template_f1c100s</configuration>
-                    <configuration>vsf_template_gd32e103</configuration>
-                    <configuration>vsf_template_mt071</configuration>
-                </excluded>
-                <file>
-                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_demo.c</name>
-                </file>
-            </group>
-            <group>
                 <name>freetype_demo</name>
                 <excluded>
                     <configuration>vsf_template_m484</configuration>
@@ -5755,13 +5731,28 @@
             <group>
                 <name>hal_demo</name>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\adc_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\flash_demo.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\gpio_demo.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\i2c_demo.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\pwm_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\rtc_demo.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\spi_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\timer_demo.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\usart_demo.c</name>
@@ -10374,6 +10365,18 @@
                             </file>
                         </group>
                         <group>
+                            <name>pwm</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\pwm\i_reg_pwm.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\pwm\pwm.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\pwm\pwm.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>spi</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\spi\i_reg_spi.h</name>
@@ -10383,6 +10386,18 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\spi\spi.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>timer</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\timer\i_reg_timer.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\timer\timer.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\timer\timer.h</name>
                             </file>
                         </group>
                         <group>
@@ -11441,12 +11456,33 @@
                 <group>
                     <name>common</name>
                     <group>
-                        <name>gpio</name>
+                        <name>adc</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_common.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\adc\adc_common.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_template.inc</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\adc\adc_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\adc\adc_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>debug_stream</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\debug_stream\debug_stream_tx_blocked.inc</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>flash</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\flash\flash_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\flash\flash_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\flash\flash_template.inc</name>
                         </file>
                     </group>
                     <group>
@@ -11461,6 +11497,9 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_request.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_template.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_template.inc</name>
                         </file>
                         <file>
@@ -11468,6 +11507,54 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>io</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\io\io_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\io\io_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\io\io_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>pwm</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\pwm\pwm_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\pwm\pwm_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\pwm\pwm_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>rng</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rng\rng_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rng\rng_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rng\rng_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>rtc</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rtc\rtc_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rtc\rtc_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rtc\rtc_template.inc</name>
                         </file>
                     </group>
                     <group>
@@ -11480,6 +11567,9 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_template.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_template.inc</name>
@@ -11503,6 +11593,9 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_adc.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_declaration.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_flash.h</name>
                         </file>
                         <file>
@@ -11512,10 +11605,19 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_i2c.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_implementation.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_io.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_pm.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_pwm.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_rng.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_rtc.h</name>
@@ -11524,10 +11626,25 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_spi.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_timer.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_usart.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_usb.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>timer</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\timer\timer_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\timer\timer_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\timer\timer_template.inc</name>
                         </file>
                     </group>
                     <group>
@@ -11540,6 +11657,9 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_template.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_template.inc</name>
