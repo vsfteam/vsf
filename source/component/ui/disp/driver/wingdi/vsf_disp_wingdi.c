@@ -130,7 +130,7 @@ static uint_fast16_t __vk_disp_win_keycode_remap(uint8_t keycode)
     switch (keycode) {
     case VK_SHIFT:              return VSF_KB_LSHIFT;
     case VK_CONTROL:            return VSF_KB_LCTRL;
-    case VK_MENU:               return VSF_KB_LGUI;
+    case VK_MENU:               return VSF_KB_LALT;
     case VK_CAPITAL:            return VSF_KB_CAPSLOCK;
     case VK_RETURN:             return VSF_KB_ENTER;
     case VK_ESCAPE:             return VSF_KB_ESCAPE;
@@ -241,12 +241,14 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         SelectObject(__vk_disp_wingdi.hFrameDC, __vk_disp_wingdi.hFrameBitmap);
         break;
 #if VSF_USE_INPUT == ENABLED
+    case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
         if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, wParam & 0xFF)) {
             break;
         }
         vsf_bitmap_set(&__vk_disp_wingdi.kb.state, wParam & 0xFF);
         goto issue_kb_event;
+    case WM_SYSKEYUP:
     case WM_KEYUP:
         vsf_bitmap_clear(&__vk_disp_wingdi.kb.state, wParam & 0xFF);
     issue_kb_event: {
@@ -254,7 +256,7 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             evt_type = VSF_INPUT_TYPE_KEYBOARD;
             vsf_input_keyboard_set(&evt.keyboard_evt,
                 __vk_disp_win_keycode_remap(wParam & 0xFF),
-                WM_KEYDOWN == msg,
+                WM_KEYDOWN == msg || WM_SYSKEYDOWN == msg,
                 __vk_disp_win_keymod());
         }
         break;
