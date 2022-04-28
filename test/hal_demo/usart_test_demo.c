@@ -131,10 +131,10 @@ static void __update_vsf_usart_win(void)
     }
     __app_usart_demo.is_inited = true;
 
-    vsf_hw_usart_get_can_used_port(&__app_usart_demo.port_available);
+    vsf_usart_get_can_used_port(&__app_usart_demo.port_available);
 
-    vsf_usart_win_expression_t com_vsf_usart[VSF_HW_USART_COUNT] = {0};
-    while (!vsf_hw_usart_get_com_num(com_vsf_usart, dimof(com_vsf_usart))) {
+    vsf_usart_win_expression_t com_vsf_usart[VSF_USART_CFG_PORT_NUM] = {0};
+    while (!vsf_usart_get_com_num(com_vsf_usart, dimof(com_vsf_usart))) {
         vsf_delay_ms(10);
     }
 

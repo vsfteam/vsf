@@ -99,15 +99,20 @@
 #       define __VSF_WORKAROUND_IAR_CPP__
 #   endif
 #define APP_USE_HAL_DEMO                                ENABLED
+#   define APP_USE_HAL_ADC_DEMO                         ENABLED
+#   define APP_USE_HAL_FLASH_DEMO                       ENABLED
+#   define APP_USE_HAL_GPIO_DEMO                        ENABLED
+#   define APP_USE_HAL_I2C_DEMO                         ENABLED
+#   define APP_USE_HAL_PWM_DEMO                         ENABLED
+#   define APP_USE_HAL_RTC_DEMO                         DISABLED
+#   define APP_USE_HAL_SPI_DEMO                         ENABLED
+#   define APP_USE_HAL_TIMER_DEMO                       ENABLED
 #   define APP_USE_HAL_USART_DEMO                       DISABLED
 #       define APP_USART_DEMO_CFG_REQUEST_TEST              DISABLED
 #       define APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST  DISABLED
 #       define APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST   DISABLED
 #       define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            ENABLED
 #       define APP_USART_DEMO_CFG_USART                     (vsf_usart_t *)&vsf_usart1
-#       define APP_USE_HAL_SPI_DEMO                     ENABLED
-#       define APP_USE_HAL_I2C_DEMO                     ENABLED
-#       define APP_USE_HAL_GPIO_DEMO                    ENABLED
 
 // 3rd-party demos
 #define APP_USE_NNOM_DEMO                               DISABLED

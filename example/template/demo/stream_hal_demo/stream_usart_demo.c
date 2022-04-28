@@ -105,7 +105,7 @@ int VSF_USER_ENTRY(void)
 
 #ifdef __WIN__
     static uint8_t ret;
-    vsf_usart_get_can_used_port(&ret);
+    vsf_hw_usart_get_can_used_port(&ret);
 #endif
 
     VSF_STREAM_INIT(&__stream_usart_tx);

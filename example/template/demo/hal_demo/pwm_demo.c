@@ -15,11 +15,39 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_COMMON_PWM_H__
-#define __HAL_DRIVER_COMMON_PWM_H__
-
 /*============================ INCLUDES ======================================*/
+
+#include "vsf.h"
+
+#if APP_USE_HAL_DEMO == ENABLED && APP_USE_HAL_PWM_DEMO == ENABLED && VSF_HAL_USE_PWM == ENABLED
+
 /*============================ MACROS ========================================*/
+
+#ifdef APP_PWM_DEMO_CFG_PWM_PREFIX
+#   undef VSF_PWM_CFG_PREFIX
+#   define VSF_PWM_CFG_PREFIX                           APP_PWM_DEMO_CFG_PWM_PREFIX
+#endif
+
+#ifndef APP_PWM_DEMO_CFG_PWM
+#   define APP_PWM_DEMO_CFG_PWM                         (vsf_pwm_t *)&vsf_hw_pwm0
+#endif
+
+#ifndef APP_PWM_DEMO_CFG_CHNNAL
+#   define APP_PWM_DEMO_CFG_CHNNAL                      0
+#endif
+
+#ifndef APP_PWM_DEMO_CFG_FREQ
+#   define APP_PWM_DEMO_CFG_FREQ                        (1 * 1000 * 1000) // 1MHz
+#endif
+
+#ifndef APP_PWM_DEMO_CFG_PREIOD_MS
+#   define APP_PWM_DEMO_CFG_PREIOD_MS                   50
+#endif
+
+#ifndef APP_PWM_DEMO_CFG_PULSE_MS
+#   define APP_PWM_DEMO_CFG_PULSE_MS                    20
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -27,61 +55,41 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static void __pwm_demo(vsf_pwm_t * pwm)
+{
+    vsf_err_t result;
 
-#if PWM_MAX_PORT >= 0 && VSF_HAL_USE_PWM0 == ENABLED && (PWM_PORT_MASK & (1 << 0))
-#   ifndef VSF_HAL_PWM0_CS_CNT
-#       define VSF_HAL_PWM0_CS_CNT 2
+    pwm_cfg_t pwm_cfg = {
+        .freq = APP_PWM_DEMO_CFG_FREQ
+    };
+
+    result = vsf_pwm_init(pwm, &pwm_cfg);
+    VSF_ASSERT(result == VSF_ERR_NONE);
+
+    while (fsm_rt_cpl != vsf_pwm_enable(pwm));
+
+    result = vsf_pwm_set_ms(pwm, APP_PWM_DEMO_CFG_CHNNAL, APP_PWM_DEMO_CFG_PREIOD_MS, APP_PWM_DEMO_CFG_PREIOD_MS);
+    VSF_ASSERT(result == VSF_ERR_NONE);
+    (void) result;
+}
+
+#if APP_USE_LINUX_DEMO == ENABLED
+int pwm_main(int argc, char *argv[])
+{
+#else
+int VSF_USER_ENTRY(void)
+{
+#   if VSF_USE_TRACE == ENABLED
+    vsf_start_trace();
 #   endif
-VSF_MREPEAT(VSF_HAL_PWM0_CS_CNT, __MULTI_PWM_DEF, VSF_PWM0_CS)
+#   if USRAPP_CFG_STDIO_EN == ENABLED
+    vsf_stdio_init();
+#   endif
 #endif
 
-#if PWM_MAX_PORT >= 1 && VSF_HAL_USE_PWM1 == ENABLED && (PWM_PORT_MASK & (1 << 1))
-#   ifndef VSF_HAL_PWM1_CS_CNT
-#       define VSF_HAL_PWM1_CS_CNT 1
-#   endif
-VSF_MREPEAT(VSF_HAL_PWM1_CS_CNT, __MULTI_PWM_DEF, VSF_PWM1_CS)
-#endif
+    __pwm_demo(APP_PWM_DEMO_CFG_PWM);
 
-#if PWM_MAX_PORT >= 2 && VSF_HAL_USE_PWM2 == ENABLED && (PWM_PORT_MASK & (1 << 2))
-#   ifndef VSF_HAL_PWM2_CS_CNT
-#       define VSF_HAL_PWM2_CS_CNT 1
-#   endif
-VSF_MREPEAT(VSF_HAL_PWM2_CS_CNT, __MULTI_PWM_DEF, VSF_PWM2_CS)
-#endif
-
-#if PWM_MAX_PORT >= 3 && VSF_HAL_USE_PWM3 == ENABLED && (PWM_PORT_MASK & (1 << 3))
-#   ifndef VSF_HAL_PWM3_CS_CNT
-#       define VSF_HAL_PWM3_CS_CNT 1
-#   endif
-VSF_MREPEAT(VSF_HAL_PWM3_CS_CNT, __MULTI_PWM_DEF, VSF_PWM3_CS)
-#endif
-
-#if PWM_MAX_PORT >= 4 && VSF_HAL_USE_PWM4 == ENABLED && (PWM_PORT_MASK & (1 << 4))
-#   ifndef VSF_HAL_PWM4_CS_CNT
-#       define VSF_HAL_PWM4_CS_CNT 1
-#   endif
-VSF_MREPEAT(VSF_HAL_PWM4_CS_CNT, __MULTI_PWM_DEF, VSF_PWM4_CS)
-#endif
-
-#if PWM_MAX_PORT >= 5 && VSF_HAL_USE_PWM5 == ENABLED && (PWM_PORT_MASK & (1 << 5))
-#   ifndef VSF_HAL_PWM5_CS_CNT
-#       define VSF_HAL_PWM5_CS_CNT 1
-#   endif
-VSF_MREPEAT(VSF_HAL_PWM5_CS_CNT, V__MULTI_PWM_DEF, VSF_PWM5_CS)
-#endif
-
-#if PWM_MAX_PORT >= 6 && VSF_HAL_USE_PWM6 == ENABLED && (PWM_PORT_MASK & (1 << 6))
-#   ifndef VSF_HAL_PWM6_CS_CNT
-#       define VSF_HAL_PWM6_CS_CNT 1
-#   endif
-VSF_MREPEAT(VSF_HAL_PWM6_CS_CNT, __MULTI_PWM_DEF, VSF_PWM6_CS)
-#endif
-
-#if PWM_MAX_PORT >= 7 && VSF_HAL_USE_PWM7 == ENABLED && (PWM_PORT_MASK & (1 << 7))
-#   ifndef VSF_HAL_PWM7_CS_CNT
-#       define VSF_HAL_PWM7_CS_CNT 1
-#   endif
-VSF_MREPEAT(VSF_HAL_PWM7_CS_CNT, __MULTI_PWM_DEF, VSF_PWM7_CS)
-#endif
+    return 0;
+}
 
 #endif
