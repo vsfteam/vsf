@@ -18,6 +18,8 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_I2C_CFG_FUNCTION_RENAME DISABLED
+
 #include "hal/driver/driver.h"
 
 #if VSF_HAL_USE_I2C == ENABLED

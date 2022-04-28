@@ -17,47 +17,21 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/template/vsf_template_hal_driver.h"
-
-/*============================ MACROS ========================================*/
-#if VSF_HAL_USE_SPI == ENABLED
-
-#ifndef VSF_SPI_CFG_CS_COUNT
-#   define VSF_SPI_CFG_CS_COUNT     1
-#endif
-
-#define vsf_real_spi_t          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t)
-#define vsf_real_spi_capability VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_capability)
+#include "hal/driver/common/template/vsf_template_rng.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ IMPLEMENTATION ================================*/
 
-#if VSF_SPI_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
-{
-    spi_capability_t spi_capability = {
-        0,
-    };
+#define __VSF_HAL_TEMPLATE_NAME                     rng
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              RNG
+#define __VSF_HAL_TEMPLATE_APIS                     VSF_RNG_APIS
 
-    return spi_capability;
-}
+#ifndef VSF_RNG_CFG_API_DECLARATION_PREFIX
+#   error "Please define VSF_RNG_CFG_API_DECLARATION_PREFIX when using vsf_template_rng.h"
 #endif
 
-/*============================ GLOBAL VARIABLES ==============================*/
-
-#define __VSF_HAL_TEMPLATE_NAME                     spi
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              SPI
-
-#ifndef VSF_SPI_CFG_PREFIX
-#   error "Please define VSF_SPI_CFG_PREFIX in spi driver"
+#ifdef VSF_RNG_CFG_INSTANCE_DECLARATION_PREFIX
+#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_RNG_CFG_INSTANCE_DECLARATION_PREFIX
 #endif
 
-#ifndef VSF_SPI_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_SPI_CFG_UPPERCASE_PREFIX in spi driver"
-#endif
+#include "hal/driver/common/template/vsf_template_declaration.h"
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
-
-#endif // VSF_HAL_USE_SPI == ENABLED

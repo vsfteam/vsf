@@ -18,6 +18,8 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_SPI_CFG_FUNCTION_RENAME DISABLED
+
 #include "hal/driver/driver.h"
 
 #if VSF_HAL_USE_SPI == ENABLED

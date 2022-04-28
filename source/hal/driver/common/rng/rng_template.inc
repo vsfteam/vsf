@@ -15,84 +15,45 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_COMMON_I2C_MULTIPLEX_H__
-#define __HAL_DRIVER_COMMON_I2C_MULTIPLEX_H__
+#if VSF_HAL_USE_PWM == ENABLED
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/vsf_hal_cfg.h"
-
-#if (VSF_HAL_USE_I2C == ENABLED) && (VSF_HAL_USE_MULTIPLEX_I2C == ENABLED)
-
-#if defined(__VSF_I2C_MULTIPLEX_CLASS_IMPLEMENT)
-#   undef __VSF_I2C_MULTIPLEX_CLASS_IMPLEMENT
-#   define __VSF_CLASS_IMPLEMENT__
-#endif
-
-#include "utilities/ooc_class.h"
-
-// undef after include vsf_template_i2c.h
-#define VSF_I2C_CFG_API_DECLARATION_PREFIX              vsf_multiplex
-#include "hal/driver/common/template/vsf_template_i2c.h"
-
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_MULTIPLEXER_I2C_CFG_MASK_TYPE
-#   define VSF_MULTIPLEXER_I2C_CFG_MASK_TYPE        uint8_t
-#endif
+#define vsf_real_rng_t          VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_t)
+#define vsf_real_rng_capability VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ INCLUDES ======================================*/
 /*============================ TYPES =========================================*/
-
-typedef VSF_MULTIPLEXER_I2C_CFG_MASK_TYPE i2c_multi_mask_t;
-
-vsf_declare_class(vsf_multiplex_i2c_t)
-
-vsf_class(vsf_multiplexer_i2c_t) {
-    public_member(
-        vsf_i2c_t *i2c_ptr;
-    )
-
-    private_member(
-        vsf_slist_queue_t slist_queue;
-
-
-        vsf_multiplex_i2c_t *current_m_i2c;
-        i2c_multi_mask_t init_mask;
-        i2c_multi_mask_t en_mask;
-        // irq mask
-        em_i2c_irq_mask_t irq_mask;     // All CS IRQ Mask Wire-OR
-
-        bool is_busy;
-    )
-};
-
-vsf_class(vsf_multiplex_i2c_t) {
-    public_member(
-        uint8_t id;
-        vsf_multiplexer_i2c_t *multiplexer;
-    )
-
-    private_member(
-        vsf_slist_node_t slist_node;
-        i2c_cfg_t cfg;
-        em_i2c_irq_mask_t  irq_mask;
-
-        struct {
-            em_i2c_cmd_t cmd;
-            uint8_t *buffer_ptr;
-            uint16_t address;
-            uint16_t count;
-        } request;
-    )
-};
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_RNG_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
+{
+    rng_capability_t rng_capability = {
+        0,
+    };
 
-#endif // VSF_HAL_I2C_IMP_REQUEST_BY_CMD
+    return rng_capability;
+}
 #endif
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+#define __VSF_HAL_TEMPLATE_NAME                     rng
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              RNG
+
+#ifndef VSF_RNG_CFG_PREFIX
+#   error "Please define VSF_RNG_CFG_PREFIX in rng driver"
+#endif
+
+#ifndef VSF_RNG_CFG_UPPERCASE_PREFIX
+#   error "Please define VSF_RNG_CFG_UPPERCASE_PREFIX in rng driver"
+#endif
+
+#include "hal/driver/common/template/vsf_template_implementation.h"
+
+#endif  /* VSF_HAL_USE_PWM */
