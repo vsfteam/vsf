@@ -486,23 +486,23 @@ void vsf_sleep(void)
         }
 #endif
 
-        // vsf_arch_sleep will enable interrupt
+        // vsf_arch_sleep will not enable interrupt
         vsf_arch_sleep(0);
 
 #if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
-        vsf_disable_interrupt();
         start_tick = vsf_systimer_get_elapsed(start_tick);
         __vsf_os.usage.ticks += start_tick;
         if ((__vsf_os.usage.ctx != NULL) && is_timing) {
             __vsf_os.usage.ctx->ticks += start_tick;
         }
-        vsf_enable_interrupt();
 #endif
 
 #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED && __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     } else {
         vsf_enable_interrupt();
     }
+#elif VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+        vsf_enable_interrupt();
 #endif
 }
 
