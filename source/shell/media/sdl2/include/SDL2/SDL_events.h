@@ -65,6 +65,7 @@ enum {
 
 typedef enum {
     SDL_FIRSTEVENT                      = 0,
+    SDL_DUMMYEVENT                      = 0,
     SDL_QUIT                            = 0x100,
 
     SDL_WINDOWEVENT                     = 0x200,
@@ -270,6 +271,12 @@ typedef struct SDL_ActiveEvent {
 } SDL_ActiveEvent;
 #endif
 
+typedef enum SDL_eventaction {
+    SDL_ADDEVENT,
+    SDL_PEEKEVENT,
+    SDL_GETEVENT,
+} SDL_eventaction;
+
 typedef union SDL_Event {
     uint32_t type;
     SDL_KeyboardEvent key;
@@ -302,6 +309,8 @@ extern int SDL_WaitEventTimeout(SDL_Event * event, int timeout);
 extern void SDL_FlushEvent(uint32_t type);
 extern uint8_t SDL_EventState(uint32_t type, int state);
 extern void SDL_PumpEvents(void);
+extern int SDL_PeepEvents(SDL_Event * events, int numevents, SDL_eventaction action, uint32_t minType, uint32_t maxType);
+int SDL_PushEvent(SDL_Event * event);
 
 #ifdef __cplusplus
 }

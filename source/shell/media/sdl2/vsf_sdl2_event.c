@@ -186,7 +186,7 @@ static uint16_t __vsf_sdl2_kb_parse_keymod(uint_fast32_t mod)
     return sdl_mod;
 }
 
-static void __vsf_sdl2_push_event(SDL_Event *event)
+int SDL_PushEvent(SDL_Event *event)
 {
     vsf_sdl2_event_node_t *node = vsf_heap_malloc(sizeof(*node));
     if (node != NULL) {
@@ -203,7 +203,9 @@ static void __vsf_sdl2_push_event(SDL_Event *event)
         if (eda_pending != NULL) {
             vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
         }
+        return 1;
     }
+    return -1;
 }
 
 static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
@@ -265,14 +267,14 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
         return;
     }
 
-    __vsf_sdl2_push_event(&event);    
+    SDL_PushEvent(&event);    
 
     if (text_input != '\0') {
         event.type = SDL_TEXTINPUT;
         event.text.text[0] = text_input;
         event.text.text[1] = '\0';
         text_input = '\0';
-        __vsf_sdl2_push_event(&event);
+        SDL_PushEvent(&event);
     }
 }
 
@@ -342,18 +344,59 @@ uint32_t SDL_GetGlobalMouseState(int * x, int * y)
     return 0;
 }
 
+int SDL_PeepEvents(SDL_Event *events, int numevents, SDL_eventaction action, uint32_t minType, uint32_t maxType)
+{
+    bool is_to_remove = true;
+    int real_events = 0;
+    VSF_SDL2_ASSERT(numevents >= 0);
+
+    switch (action) {
+    case SDL_ADDEVENT:
+        for (real_events = 0; real_events < numevents; real_events++) {
+            SDL_PushEvent(events++);
+        }
+        break;
+    case SDL_PEEKEVENT:
+        is_to_remove = false;
+    case SDL_GETEVENT: {
+            vsf_protect_t orig = vsf_protect_int();
+            __vsf_slist_foreach_unsafe(vsf_sdl2_event_node_t, evt_node, (vsf_slist_t *)&__vsf_sdl2_event.evt_list.head) {
+                if (numevents--) {
+                    if ((_->event.type >= minType) && (_->event.type <= maxType)) {
+                        real_events++;
+                        *events++ = _->event;
+                        if (is_to_remove) {
+                            _->event.type = SDL_DUMMYEVENT;
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+            vsf_unprotect_int(orig);
+        }
+    }
+    return real_events;
+}
+
 int SDL_PollEvent(SDL_Event *event)
 {
     vsf_sdl2_event_node_t *node;
-    vsf_protect_t orig = vsf_protect_int();
-        vsf_slist_queue_dequeue(vsf_sdl2_event_node_t, evt_node, &__vsf_sdl2_event.evt_list, node);
-    vsf_unprotect_int(orig);
+poll_next:
+    {
+        vsf_protect_t orig = vsf_protect_int();
+            vsf_slist_queue_dequeue(vsf_sdl2_event_node_t, evt_node, &__vsf_sdl2_event.evt_list, node);
+        vsf_unprotect_int(orig);
+    }
 
     if (node != NULL) {
         if (event != NULL) {
             *event = node->event;
         }
         vsf_heap_free(node);
+        if (SDL_DUMMYEVENT == node->event.type) {
+            goto poll_next;
+        }
         return 1;
     }
     return 0;

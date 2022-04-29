@@ -612,6 +612,7 @@ void SDL_SetWindowTitle(SDL_Window * window, const char * title) {}
 int SDL_SetWindowFullscreen(SDL_Window * window, uint32_t flags) { return 0; }
 void SDL_RestoreWindow(SDL_Window * window) {}
 void SDL_MaximizeWindow(SDL_Window * window) {}
+void SDL_MinimizeWindow(SDL_Window * window) {}
 uint32_t SDL_GetWindowFlags(SDL_Window * window)
 {
     return  SDL_WINDOW_FULLSCREEN
@@ -1118,6 +1119,11 @@ void SDL_FreeCursor(SDL_Cursor *cursor)
 {
 }
 int SDL_ShowCursor(int toggle)
+{
+    return -1;
+}
+
+int SDL_SetWindowHitTest(SDL_Window * window, SDL_HitTest callback, void *callback_data)
 {
     return -1;
 }

@@ -32,6 +32,10 @@
 #   define VSF_SDL_CFG_V1_COMPATIBLE    ENABLED
 #endif
 
+#define DECLSPEC
+#define SDLCALL
+#define SDL_INLINE                      INLINE
+
 /*============================ INCLUDES ======================================*/
 
 #include "SDL_cpuinfo.h"
@@ -49,16 +53,13 @@
 
 #include "SDL_surface.h"
 
+#include "SDL_thread.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-#define DECLSPEC
-#define SDLCALL
-#define SDL_INLINE                      INLINE
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SDL_CFG_WRAPPER == ENABLED
@@ -86,6 +87,7 @@ extern "C" {
 #define SDL_SetWindowFullscreen         VSF_SDL_WRAPPER(SDL_SetWindowFullscreen)
 #define SDL_RestoreWindow               VSF_SDL_WRAPPER(SDL_RestoreWindow)
 #define SDL_MaximizeWindow              VSF_SDL_WRAPPER(SDL_MaximizeWindow)
+#define SDL_MinimizeWindow              VSF_SDL_WRAPPER(SDL_MinimizeWindow)
 #define SDL_GetWindowFlags              VSF_SDL_WRAPPER(SDL_GetWindowFlags)
 
 #define SDL_GetDesktopDisplayMode       VSF_SDL_WRAPPER(SDL_GetDesktopDisplayMode)
@@ -168,6 +170,8 @@ extern "C" {
 #define SDL_CaptureMouse                VSF_SDL_WRAPPER(SDL_CaptureMouse)
 #define SDL_GetGlobalMouseState         VSF_SDL_WRAPPER(SDL_GetGlobalMouseState)
 
+#define SDL_SetWindowHitTest            VSF_SDL_WRAPPER(SDL_SetWindowHitTest)
+
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
 #define SDL_CreateYUVOverlay            VSF_SDL_WRAPPER(SDL_CreateYUVOverlay)
 #define SDL_FreeYUVOverlay              VSF_SDL_WRAPPER(SDL_FreeYUVOverlay)
@@ -231,6 +235,10 @@ typedef struct SDL_Rect {
     int x, y;
     int w, h;
 } SDL_Rect;
+
+typedef struct SDL_Point {
+    int x, y;
+} SDL_Point;
 
 enum {
     SDL_WINDOWPOS_CENTERED,
@@ -457,6 +465,21 @@ typedef struct SDL_AudioSpec {
     void * userdata;
 } SDL_AudioSpec;
 
+// SDL_video.h
+typedef enum {
+    SDL_HITTEST_NORMAL,
+    SDL_HITTEST_DRAGGABLE,
+    SDL_HITTEST_RESIZE_TOPLEFT,
+    SDL_HITTEST_RESIZE_TOP,
+    SDL_HITTEST_RESIZE_TOPRIGHT,
+    SDL_HITTEST_RESIZE_RIGHT,
+    SDL_HITTEST_RESIZE_BOTTOMRIGHT,
+    SDL_HITTEST_RESIZE_BOTTOM,
+    SDL_HITTEST_RESIZE_BOTTOMLEFT,
+    SDL_HITTEST_RESIZE_LEFT
+} SDL_HitTestResult;
+typedef SDL_HitTestResult (SDLCALL *SDL_HitTest)(SDL_Window *win, const SDL_Point *area, void *data);
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -486,6 +509,7 @@ extern void SDL_SetWindowTitle(SDL_Window * window, const char * title);
 extern int SDL_SetWindowFullscreen(SDL_Window * window, uint32_t flags);
 extern void SDL_RestoreWindow(SDL_Window * window);
 extern void SDL_MaximizeWindow(SDL_Window * window);
+extern void SDL_MinimizeWindow(SDL_Window * window);
 extern uint32_t SDL_GetWindowFlags(SDL_Window * window);
 
 extern int SDL_GetDesktopDisplayMode(int display_index, SDL_DisplayMode * mode);
@@ -568,6 +592,9 @@ extern int SDL_JoystickNumHats(SDL_Joystick * joystick);
 
 extern int SDL_CaptureMouse(SDL_bool enabled);
 extern uint32_t SDL_GetGlobalMouseState(int * x, int * y);
+
+// SDL_video.h
+extern int SDL_SetWindowHitTest(SDL_Window * window, SDL_HitTest callback, void *callback_data);
 
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
 extern SDL_Overlay * SDL_CreateYUVOverlay(int width, int height, uint32_t format, SDL_Surface *display);
