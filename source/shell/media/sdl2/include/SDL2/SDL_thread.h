@@ -47,6 +47,7 @@ typedef int SDL_TLSID;
 typedef struct SDL_Thread {
     SDL_threadID thread;
     SDL_ThreadFunction entry;
+    void *data;
     char name[sizeof(uintptr_t)];
 } SDL_Thread;
 

@@ -33,6 +33,14 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static void * __SDL_Thread_Entry(void *param)
+{
+    SDL_Thread *thread = param;
+    int ret = thread->entry(thread->data);
+    free(thread);
+    return (void *)ret;
+}
+
 SDL_Thread * SDL_CreateThreadWithStackSize(SDL_ThreadFunction fn, const char *name, const size_t stacksize, void *data)
 {
     size_t namelen = strlen(name) + 1;
@@ -48,11 +56,13 @@ SDL_Thread * SDL_CreateThreadWithStackSize(SDL_ThreadFunction fn, const char *na
         const pthread_attr_t attr = {
             .stacksize = stacksize,
         };
-        int ret = pthread_create(&thread->thread, &attr, (void * (*)(void *))fn, data);
+        int ret = pthread_create(&thread->thread, &attr, __SDL_Thread_Entry, thread);
         if (ret != 0) {
             free(thread);
             thread = NULL;
         } else {
+            thread->entry = fn;
+            thread->data = data;
             strcpy(thread->name, name);
         }
     }
