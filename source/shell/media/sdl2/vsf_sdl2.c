@@ -613,6 +613,9 @@ int SDL_SetWindowFullscreen(SDL_Window * window, uint32_t flags) { return 0; }
 void SDL_RestoreWindow(SDL_Window * window) {}
 void SDL_MaximizeWindow(SDL_Window * window) {}
 void SDL_MinimizeWindow(SDL_Window * window) {}
+void SDL_SetWindowBordered(SDL_Window * window, SDL_bool bordered) {}
+void SDL_SetWindowPosition(SDL_Window * window, int x, int y) {}
+int SDL_SetWindowOpacity(SDL_Window * window, float opacity) { return 0; }
 uint32_t SDL_GetWindowFlags(SDL_Window * window)
 {
     return  SDL_WINDOW_FULLSCREEN

@@ -45,6 +45,7 @@ typedef struct vsf_sdl2_event_node_t {
 typedef struct vsf_sdl2_event_t {
     uint32_t                    evtflags;
     vk_input_notifier_t         notifier;
+    uint32_t                    usr_evttype;
 
     vsf_slist_queue_t           evt_list;
     vsf_eda_t                   *eda_pending;
@@ -281,6 +282,7 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
 void __SDL_InitEvent(uint32_t flags)
 {
     memset(&__vsf_sdl2_event, 0, sizeof(__vsf_sdl2_event));
+    __vsf_sdl2_event.usr_evttype = SDL_USEREVENT;
 
     __vsf_sdl2_event.evtflags = flags;
     vsf_slist_queue_init(&__vsf_sdl2_event.evt_list);
@@ -454,6 +456,16 @@ void SDL_FlushEvent(uint32_t type)
             vsf_heap_free(node);
         }
     } while (node != NULL);
+}
+
+uint32_t SDL_RegisterEvents(int numevents)
+{
+    uint32_t evttype = __vsf_sdl2_event.usr_evttype;
+    if ((evttype + numevents) > SDL_LASTEVENT) {
+        return (uint32_t)-1;
+    }
+    __vsf_sdl2_event.usr_evttype += numevents;
+    return evttype;
 }
 
 uint8_t SDL_EventState(uint32_t type, int state)

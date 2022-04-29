@@ -511,6 +511,9 @@ extern void SDL_RestoreWindow(SDL_Window * window);
 extern void SDL_MaximizeWindow(SDL_Window * window);
 extern void SDL_MinimizeWindow(SDL_Window * window);
 extern uint32_t SDL_GetWindowFlags(SDL_Window * window);
+extern void SDL_SetWindowBordered(SDL_Window * window, SDL_bool bordered);
+extern void SDL_SetWindowPosition(SDL_Window * window, int x, int y);
+extern int SDL_SetWindowOpacity(SDL_Window * window, float opacity);
 
 extern int SDL_GetDesktopDisplayMode(int display_index, SDL_DisplayMode * mode);
 extern int SDL_GetCurrentDisplayMode(int display_index, SDL_DisplayMode * mode);

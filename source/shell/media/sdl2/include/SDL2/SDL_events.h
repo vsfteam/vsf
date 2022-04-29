@@ -310,7 +310,8 @@ extern void SDL_FlushEvent(uint32_t type);
 extern uint8_t SDL_EventState(uint32_t type, int state);
 extern void SDL_PumpEvents(void);
 extern int SDL_PeepEvents(SDL_Event * events, int numevents, SDL_eventaction action, uint32_t minType, uint32_t maxType);
-int SDL_PushEvent(SDL_Event * event);
+extern int SDL_PushEvent(SDL_Event * event);
+extern uint32_t SDL_RegisterEvents(int numevents);
 
 #ifdef __cplusplus
 }
