@@ -498,9 +498,8 @@ void vsf_sleep(void)
 #endif
 
 #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED && __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
-    } else {
-        vsf_enable_interrupt();
     }
+    vsf_enable_interrupt();
 #elif VSF_KERNEL_CFG_CPU_USAGE == ENABLED
         vsf_enable_interrupt();
 #endif
