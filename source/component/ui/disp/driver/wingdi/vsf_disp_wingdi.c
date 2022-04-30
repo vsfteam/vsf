@@ -332,7 +332,8 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 #endif
     case WM_CLOSE:
         DestroyWindow(hWnd);
-#if VSF_DISP_WINGDI_CFG_EXIT_ON_CLOSE == ENABLED
+// is console is hidden, exit process if window is closed
+#if VSF_ARCH_CFG_HIDE_CONSOLE == ENABLED
         ExitProcess(0);
 #endif
         break;
