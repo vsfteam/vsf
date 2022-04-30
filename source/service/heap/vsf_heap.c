@@ -308,48 +308,43 @@ static void __vsf_heap_mcb_free(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
     VSF_SERVICE_ASSERT(mcb->magic == VSF_HEAP_MCB_MAGIC);
 #endif
     vsf_heap_mcb_t *mcb_tmp;
-    vsf_protect_t state;
 #if VSF_HEAP_CFG_STATISTICS == ENABLED
     uint_fast32_t mcb_size = __vsf_heap_mcb_get_size(mcb);
 #endif
+    vsf_protect_t state = __vsf_heap_protect();
 
     if (mcb->linear.next != 0) {
-        state = __vsf_heap_protect();
-            mcb_tmp = __vsf_heap_mcb_get_next(mcb);
-            if (!__vsf_heap_mcb_is_allocated(heap, mcb_tmp)) {
-                __vsf_heap_mcb_remove_from_freelist(heap, mcb_tmp);
-                mcb->linear.next += mcb_tmp->linear.next;
+        mcb_tmp = __vsf_heap_mcb_get_next(mcb);
+        if (!__vsf_heap_mcb_is_allocated(heap, mcb_tmp)) {
+            __vsf_heap_mcb_remove_from_freelist(heap, mcb_tmp);
+            mcb->linear.next += mcb_tmp->linear.next;
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
-                mcb_tmp->magic = 0;
+            mcb_tmp->magic = 0;
 #endif
 
-                mcb_tmp = __vsf_heap_mcb_get_next(mcb);
-                mcb_tmp->linear.prev = mcb->linear.next;
-            }
-        __vsf_heap_unprotect(state);
+            mcb_tmp = __vsf_heap_mcb_get_next(mcb);
+            mcb_tmp->linear.prev = mcb->linear.next;
+        }
     }
 
     if (mcb->linear.prev != 0) {
-        state = __vsf_heap_protect();
-            mcb_tmp = __vsf_heap_mcb_get_prev(mcb);
-            if (!__vsf_heap_mcb_is_allocated(heap, mcb_tmp)) {
-                __vsf_heap_mcb_remove_from_freelist(heap, mcb_tmp);
-                mcb_tmp->linear.next += mcb->linear.next;
+        mcb_tmp = __vsf_heap_mcb_get_prev(mcb);
+        if (!__vsf_heap_mcb_is_allocated(heap, mcb_tmp)) {
+            __vsf_heap_mcb_remove_from_freelist(heap, mcb_tmp);
+            mcb_tmp->linear.next += mcb->linear.next;
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
-                mcb->magic = 0;
+            mcb->magic = 0;
 #endif
-                mcb = mcb_tmp;
+            mcb = mcb_tmp;
 
-                mcb_tmp = __vsf_heap_mcb_get_next(mcb);
-                mcb_tmp->linear.prev = mcb->linear.next;
-            }
-        __vsf_heap_unprotect(state);
+            mcb_tmp = __vsf_heap_mcb_get_next(mcb);
+            mcb_tmp->linear.prev = mcb->linear.next;
+        }
     }
 
-    state = __vsf_heap_protect();
-        __vsf_heap_mcb_add_to_freelist(heap, mcb);
+    __vsf_heap_mcb_add_to_freelist(heap, mcb);
 #if VSF_HEAP_CFG_STATISTICS == ENABLED
-        heap->statistics.used_size -= mcb_size;
+    heap->statistics.used_size -= mcb_size;
 #endif
     __vsf_heap_unprotect(state);
 }
