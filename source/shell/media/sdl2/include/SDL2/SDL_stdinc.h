@@ -52,8 +52,8 @@ extern "C" {
 #define SDL_stack_free(__data)              SDL_free(__data)
 #define SDL_OutOfMemory()
 
-#define SDL_min                             min
-#define SDL_max                             max
+#define SDL_min                             vsf_min
+#define SDL_max                             vsf_max
 
 // string
 #define SDL_memset                          memset

@@ -33,26 +33,26 @@
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const char * __vsfvmc_variable_id[] = {
-    STR(VSFVM_CODE_VARIABLE_NORMAL),
-    STR(VSFVM_CODE_VARIABLE_REFERENCE),
-    STR(VSFVM_CODE_VARIABLE_REFERENCE_NOTRACE),
-    STR(VSFVM_CODE_VARIABLE_RESOURCES),
-    STR(VSFVM_CODE_VARIABLE_FUNCTION),
+    VSF_STR(VSFVM_CODE_VARIABLE_NORMAL),
+    VSF_STR(VSFVM_CODE_VARIABLE_REFERENCE),
+    VSF_STR(VSFVM_CODE_VARIABLE_REFERENCE_NOTRACE),
+    VSF_STR(VSFVM_CODE_VARIABLE_RESOURCES),
+    VSF_STR(VSFVM_CODE_VARIABLE_FUNCTION),
 };
 
 static const char * __vsfvmc_variable_pos[] = {
-    STR(VSFVM_CODE_VARIABLE_POS_LOCAL),
-    STR(VSFVM_CODE_VARIABLE_POS_STACK_BEGIN),
-    STR(VSFVM_CODE_VARIABLE_POS_STACK_END),
-    STR(VSFVM_CODE_VARIABLE_POS_FUNCARG),
-    STR(VSFVM_CODE_VARIABLE_POS_FUNCAUTO),
-    STR(VSFVM_CODE_VARIABLE_POS_EXT),
+    VSF_STR(VSFVM_CODE_VARIABLE_POS_LOCAL),
+    VSF_STR(VSFVM_CODE_VARIABLE_POS_STACK_BEGIN),
+    VSF_STR(VSFVM_CODE_VARIABLE_POS_STACK_END),
+    VSF_STR(VSFVM_CODE_VARIABLE_POS_FUNCARG),
+    VSF_STR(VSFVM_CODE_VARIABLE_POS_FUNCAUTO),
+    VSF_STR(VSFVM_CODE_VARIABLE_POS_EXT),
 };
 
 static const char * __vsfvmc_funtion_id[] = {
-    STR(VSFVM_CODE_FUNCTION_SCRIPT),
-    STR(VSFVM_CODE_FUNCTION_EXT),
-    STR(VSFVM_CODE_FUNCTION_THREAD),
+    VSF_STR(VSFVM_CODE_FUNCTION_SCRIPT),
+    VSF_STR(VSFVM_CODE_FUNCTION_EXT),
+    VSF_STR(VSFVM_CODE_FUNCTION_THREAD),
 };
 
 /*============================ PROTOTYPES ====================================*/
@@ -74,7 +74,7 @@ void vsfvm_tkdump(vsfvm_bytecode_t token)
 #define case_print_symbol(sym)                                                  \
     case sym:                                                                   \
         vsf_trace(VSF_TRACE_NONE,                                               \
-            "VSFVM_SYMBOL(" __STR(sym) ", %d, %d)," VSF_TRACE_CFG_LINEEND, arg8, arg16);\
+            "VSFVM_SYMBOL(" __VSF_STR(sym) ", %d, %d)," VSF_TRACE_CFG_LINEEND, arg8, arg16);\
              break
 
         switch (id) {
@@ -112,7 +112,7 @@ void vsfvm_tkdump(vsfvm_bytecode_t token)
 #define case_print_keyword(kw)                                                  \
     case kw:                                                                    \
         vsf_trace(VSF_TRACE_NONE,                                               \
-            "VSFVM_KEYWORD(" __STR(kw) ", %d, %d)," VSF_TRACE_CFG_LINEEND, arg8, arg16);\
+            "VSFVM_KEYWORD(" __VSF_STR(kw) ", %d, %d)," VSF_TRACE_CFG_LINEEND, arg8, arg16);\
                 break
 
         switch (id) {

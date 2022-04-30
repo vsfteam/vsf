@@ -32,7 +32,7 @@
 /*============================ MACROS ========================================*/
 
 #define LOVE_MODULE_INIT(__name)    VSF_MCONNECT2(luaopen_love_, __name)
-#define LOVE_CLASS(__name)          "love_class_" __STR(__name)
+#define LOVE_CLASS(__name)          "love_class_" __VSF_STR(__name)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

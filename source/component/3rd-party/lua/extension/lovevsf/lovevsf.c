@@ -35,7 +35,7 @@
 
 #define LOVE_VERSION                "0.2.1"
 #define dcl_love_module(__name)     extern int LOVE_MODULE_INIT(__name)(lua_State *L);
-#define def_love_module(__name)     {__STR(__name), LOVE_MODULE_INIT(__name)},
+#define def_love_module(__name)     {__VSF_STR(__name), LOVE_MODULE_INIT(__name)},
 
 #define dcl_love_modules(...)       VSF_MFOREACH(dcl_love_module, __VA_ARGS__)
 #define def_love_modules(...)       VSF_MFOREACH(def_love_module, __VA_ARGS__)
