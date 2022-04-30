@@ -332,6 +332,9 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 #endif
     case WM_CLOSE:
         DestroyWindow(hWnd);
+#if VSF_DISP_WINGDI_CFG_EXIT_ON_CLOSE == ENABLED
+        ExitProcess(0);
+#endif
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
