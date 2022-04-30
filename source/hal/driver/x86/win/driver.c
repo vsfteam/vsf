@@ -122,9 +122,13 @@ static void __vsf_x86_debug_stream_tx_init(vsf_stream_t *stream)
 static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t *stream,
             uint8_t *buf, uint_fast32_t size)
 {
+#       if VSF_ARCH_CFG_HIDE_CONSOLE != ENABLED
     DWORD wsize;
     WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), buf, size, &wsize, NULL);
     return wsize;
+#       else
+    return size;
+#       endif
 }
 
 static uint_fast32_t __vsf_x86_debug_stream_tx_get_data_length(vsf_stream_t *stream)
@@ -137,6 +141,7 @@ static uint_fast32_t __vsf_x86_debug_stream_tx_get_avail_length(vsf_stream_t *st
     return 0xFFFFFFFF;
 }
 
+#       if VSF_ARCH_CFG_HIDE_CONSOLE != ENABLED
 static void __vsf_x86_debug_stream_rx_irqhandler(void *arg)
 {
     vsf_arch_irq_thread_t *thread = arg;
@@ -162,11 +167,9 @@ static void __vsf_x86_debug_stream_init(void)
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 
-#if VSF_ARCH_CFG_HIDE_CONSOLE != ENABLED
     // switch to utf8
 #undef system
     system("chcp 65001");
-#endif
 
     GetConsoleMode(hIn, &mode);
     mode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
@@ -181,13 +184,14 @@ static void __vsf_x86_debug_stream_init(void)
     __vsf_arch_irq_init(&__vsf_x86_debug_stream_rx_irq, "debug_stream_rx",
         __vsf_x86_debug_stream_rx_irqhandler, VSF_DEBUG_STREAM_CFG_HW_PRIORITY);
 }
+#       endif
 #   elif   VSF_USE_STREAM == ENABLED
 #   endif
 #endif
 
 bool vsf_driver_init(void)
 {
-#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
+#if VSF_HAL_USE_DEBUG_STREAM == ENABLED && VSF_ARCH_CFG_HIDE_CONSOLE != ENABLED
     __vsf_x86_debug_stream_init();
 #endif
 #if VSF_HAL_USE_RTC == ENABLED
