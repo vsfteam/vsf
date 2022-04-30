@@ -103,7 +103,7 @@ int_fast16_t vk_tgui_slider_on_timer_event_handler(__vk_tgui_slider_t *ptSlider)
 
     int_fast16_t nDelta = ptSlider->tPosition.iTarget - ptSlider->tPosition.iCurrent;
 
-    wStep = min(VSF_ABS(nDelta), wStep);
+    wStep = vsf_min(vsf_abs(nDelta), wStep);
 
     ptSlider->tPosition.iCurrent += ((int16_t)wStep * sign(nDelta));
 

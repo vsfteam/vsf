@@ -545,7 +545,7 @@ static void * __vk_usbh_uac_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
         vk_usbh_ifs_parser_t *parser_vs_ifs;
         vk_usbh_ifs_alt_parser_t *parser_vs_alt;
         vk_usbh_uac_stream_t *uac_stream;
-        uac->stream_num = min(VSF_USBD_UAC_CFG_STREAM_NUM, ac_header->bInCollection);
+        uac->stream_num = vsf_min(VSF_USBD_UAC_CFG_STREAM_NUM, ac_header->bInCollection);
         for (uint_fast8_t i = 0; i < uac->stream_num; i++) {
             if (ac_header->baInterfaceNr[i] >= usbh->parser->num_of_ifs) {
                 goto free_all;

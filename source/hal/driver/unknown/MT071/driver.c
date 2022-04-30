@@ -53,7 +53,7 @@ const uint16_t __dma_max_trans_size[DMA_CHANNEL_COUNT] = {
 
 static void __vsf_dma_commit(uint_fast8_t id, __dma_trans_t *trans)
 {
-    trans->count = min(trans->__remain_count, __dma_max_trans_size[id]);
+    trans->count = vsf_min(trans->__remain_count, __dma_max_trans_size[id]);
     trans->__remain_count -= trans->count;
 
     *(uint32_t *)((uint32_t)(&(DMA->SAR0)) + 0x58 * id) = (uint32_t)trans->src;

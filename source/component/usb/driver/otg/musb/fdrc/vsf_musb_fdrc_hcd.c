@@ -291,7 +291,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                 }
 
             do_ep0_data_stage:
-                musb_urb->cur_size = min(epsize, (urb->transfer_length - urb->actual_length));
+                musb_urb->cur_size = vsf_min(epsize, (urb->transfer_length - urb->actual_length));
 
                 if (urb->actual_length >= urb->transfer_length) {
                 status_stage:
@@ -346,7 +346,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                 goto urb_finished;
             } else {
             do_tx_rx:
-                musb_urb->cur_size = min(epsize, (urb->transfer_length - urb->actual_length));
+                musb_urb->cur_size = vsf_min(epsize, (urb->transfer_length - urb->actual_length));
                 if (is_in) {
                     reg->EPN.RxCSR1 |= MUSBH_RXCSR1_REQPKT;
                 } else {

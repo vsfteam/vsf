@@ -138,7 +138,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
             int16_t left_height = control_ptr->iHeight - regions[CORNOR_TILE_IN_TOP_LEFT].iHeight - regions[CORNOR_TILE_IN_BOTTOM_LEFT].iHeight;
             int16_t right_height = control_ptr->iHeight - regions[CORNOR_TILE_IN_TOP_RIGHT].iHeight - regions[CORNOR_TILE_IN_BOTTOM_RIGHT].iHeight;
 
-            int16_t top_height = max(regions[CORNOR_TILE_IN_TOP_LEFT].iHeight, regions[CORNOR_TILE_IN_TOP_RIGHT].iHeight);
+            int16_t top_height = vsf_max(regions[CORNOR_TILE_IN_TOP_LEFT].iHeight, regions[CORNOR_TILE_IN_TOP_RIGHT].iHeight);
             if (top_width > 0 && top_height > 0) {
                 vsf_tgui_region_t region = {
                     .tLocation = {
@@ -153,7 +153,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                 vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
             }
 
-            int16_t botton_height = max(regions[CORNOR_TILE_IN_BOTTOM_LEFT].iHeight, regions[CORNOR_TILE_IN_BOTTOM_RIGHT].iHeight);
+            int16_t botton_height = vsf_max(regions[CORNOR_TILE_IN_BOTTOM_LEFT].iHeight, regions[CORNOR_TILE_IN_BOTTOM_RIGHT].iHeight);
             if (bottom_width > 0 && botton_height > 0) {
                 vsf_tgui_region_t region = {
                     .tLocation = {
@@ -168,7 +168,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                 vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
             }
 
-            int16_t left_width = min(regions[CORNOR_TILE_IN_TOP_LEFT].iWidth, regions[CORNOR_TILE_IN_TOP_RIGHT].iWidth);
+            int16_t left_width = vsf_min(regions[CORNOR_TILE_IN_TOP_LEFT].iWidth, regions[CORNOR_TILE_IN_TOP_RIGHT].iWidth);
             if (left_width > 0 && left_height > 0) {
                 vsf_tgui_region_t region = {
                     .tLocation = {
@@ -183,7 +183,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                 vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
             }
 
-            int16_t right_width = min(regions[CORNOR_TILE_IN_BOTTOM_LEFT].iWidth, regions[CORNOR_TILE_IN_BOTTOM_RIGHT].iWidth);
+            int16_t right_width = vsf_min(regions[CORNOR_TILE_IN_BOTTOM_LEFT].iWidth, regions[CORNOR_TILE_IN_BOTTOM_RIGHT].iWidth);
             if (right_width > 0 && right_height > 0) {
                 vsf_tgui_region_t region = {
                     .tLocation = {

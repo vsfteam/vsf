@@ -2337,7 +2337,7 @@ int vsf_linux_expandenv(const char *str, char *output, size_t bufflen)
 #define __copy2output(__str_from, __copylen)                                    \
         do {                                                                    \
             if (output != NULL) {                                               \
-                tmplen = min(bufflen, __copylen);                               \
+                tmplen = vsf_min(bufflen, __copylen);                           \
                 if (tmplen > 0) {                                               \
                     memcpy(output, __str_from, tmplen);                         \
                     output += tmplen;                                           \

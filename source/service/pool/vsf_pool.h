@@ -202,7 +202,7 @@ void __name##_pool_init_ex( vsf_pool(__name) *this_ptr,                         
 {                                                                               \
     vsf_pool_init(  &(this_ptr->use_as__vsf_pool_t),                            \
                     sizeof(__type),                                             \
-                    max(align,__alignof__(__type)),                             \
+                    vsf_max(align,__alignof__(__type)),                         \
                     cfg_ptr);                                                   \
 }                                                                               \
 WEAK(__name##_pool_add_buffer)                                                  \

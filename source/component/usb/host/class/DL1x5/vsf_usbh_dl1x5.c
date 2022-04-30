@@ -518,7 +518,7 @@ static void __vk_usbh_dl1x5_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                             v_sync_start = v_sync_start ^ v_sync_end;
                         }
 
-                        // color depth, 0： 16, 1: 24
+                        // color depth, 0: 16, 1: 24
                         __dl1x5_write_vreg(dl1x5, 0x00, 0);
                         __dl1x5_write_vreg_be16(dl1x5, 0x01, __dl1x5_lfsr16(h_display_start));
                         __dl1x5_write_vreg_be16(dl1x5, 0x03, __dl1x5_lfsr16(h_display_end));
@@ -752,10 +752,10 @@ static void __vk_disp_dl1x5_refresh_callback(void *dev, vsf_err_t err)
             pixel_addr =    (area->pos.y + pixel_line_num) * dl1x5->timing.h.active
                         +   area->pos.x + pixel_line_offset;
             if (area->size.x == dl1x5->timing.h.active) {
-                pixel_num = min(DL1X5_PIXELS_IN_CMD, pixel_remain);
+                pixel_num = vsf_min(DL1X5_PIXELS_IN_CMD, pixel_remain);
             } else {
                 pixel_line_offset = area->size.x - pixel_line_offset;
-                pixel_num = min(DL1X5_PIXELS_IN_CMD, pixel_line_offset);
+                pixel_num = vsf_min(DL1X5_PIXELS_IN_CMD, pixel_line_offset);
             }
 
             if (!vk_usbh_dl1x5_fill_buf(dev, pixel_addr, pixel_num, dl1x5->disp_buff_rgb565)) {

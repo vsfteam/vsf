@@ -1505,7 +1505,7 @@ static int __vk_dwcotg_hcd_rh_control(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb
         datadw[1] = 0;
         data[5] = 0;
         data[8] = 0xff;
-        len = min(data[0], wLength);
+        len = vsf_min(data[0], wLength);
         break;
     default:
         goto error;

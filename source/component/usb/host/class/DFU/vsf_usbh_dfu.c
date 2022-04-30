@@ -216,7 +216,7 @@ static void __vk_usbh_dfu_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         // fall through
     case VSF_EVT_USER:
         if ((dfu->size > 0) || !dfu->is_zero_blocked) {
-            dfu->cur_size = min(dfu->transfer_size, dfu->size);
+            dfu->cur_size = vsf_min(dfu->transfer_size, dfu->size);
 
             switch (dfu->request) {
             case USB_DFUREQ_DNLOAD:

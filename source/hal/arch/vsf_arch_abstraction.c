@@ -707,7 +707,7 @@ bool vsf_systimer_set(vsf_systimer_tick_t due)
         */
         if (due > current) {
             tick_cnt = due - current;
-            tick_cnt = min(max_tick_per_round, tick_cnt);
+            tick_cnt = vsf_min(max_tick_per_round, tick_cnt);
             result = __vsf_systimer_set_target(tick_cnt);
         }
         vsf_set_interrupt(gint_state);
@@ -764,7 +764,7 @@ vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
     vsf_systimer_tick_t tick = (vsf_systimer_tick_t)time_us
                              *  __systimer.cycle_per_us;
     tick /= __systimer.cycle_per_tick;
-    tick = max(1, tick);
+    tick = vsf_max(1, tick);
     
     return tick;
 }
@@ -775,7 +775,7 @@ vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
     vsf_systimer_tick_t tick = (vsf_systimer_tick_t)time_ms
                              *  __systimer.cycle_per_us * 1000ul;
     tick /= __systimer.cycle_per_tick;
-    tick = max(1, tick);
+    tick = vsf_max(1, tick);
     
     return tick;
 }

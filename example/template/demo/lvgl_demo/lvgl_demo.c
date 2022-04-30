@@ -49,12 +49,12 @@ static NO_INIT bool __lvgl_is_looping;
 
 static lv_coord_t __lvgl_touchscreen_get_width(void)
 {
-    return min(LV_HOR_RES_MAX, usrapp_ui_common.disp->param.width);
+    return vsf_min(LV_HOR_RES_MAX, usrapp_ui_common.disp->param.width);
 }
 
 static lv_coord_t __lvgl_touchscreen_get_height(void)
 {
-    return min(LV_VER_RES_MAX, usrapp_ui_common.disp->param.height);
+    return vsf_min(LV_VER_RES_MAX, usrapp_ui_common.disp->param.height);
 }
 
 static void __lvgl_on_evt(vk_input_type_t type, vk_input_evt_t *evt)

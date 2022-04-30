@@ -796,7 +796,7 @@ static void * __vsf_linux_httpd_thread(void *param)
         FD_ZERO(&wfds);
         FD_SET(fd_listen, &rfds);
         fd_num = __vsf_linux_httpd_set_fds(httpd, &rfds, &wfds);
-        fd_num = max(fd_num, fd_listen) + 1;
+        fd_num = vsf_max(fd_num, fd_listen) + 1;
         fd_num = select(fd_num, &rfds, &wfds, NULL, NULL);
         if (fd_num < 0) {
             vsf_trace_error(MODULE_NAME ": fail to select." VSF_TRACE_CFG_LINEEND);

@@ -93,7 +93,7 @@ fsm_rt_t vk_tgui_label_update(vsf_tgui_label_t* ptLabel)
                     &(ptLabel->use_as__vsf_tgui_control_t.tRegion.tSize);
 
             ptControlSize->iHeight = tNewSize.iHeight;
-            ptControlSize->iWidth = max(tNewSize.iWidth, ptControlSize->iWidth);
+            ptControlSize->iWidth = vsf_max(tNewSize.iWidth, ptControlSize->iWidth);
 
         }
 

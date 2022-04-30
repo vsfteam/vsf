@@ -121,41 +121,38 @@ typedef enum {
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   ifndef __STR
-#       define __STR(__STRING)              #__STRING
+#   ifndef __VSF_STR
+#       define __VSF_STR(__STRING)          #__STRING
 #   endif
-#   ifndef STR
-#       define STR(__STRING)                __STR(__STRING)
+#   ifndef VSF_STR
+#       define VSF_STR(__STRING)            __VSF_STR(__STRING)
 #   endif
 #else
-#   ifndef __STR
-#       define __STR(...)                   #__VA_ARGS__
+#   ifndef __VSF_STR
+#       define __VSF_STR(...)               #__VA_ARGS__
 #   endif
-#   ifndef STR
-#       define STR(...)                     __STR(__VA_ARGS__)
+#   ifndef VSF_STR
+#       define VSF_STR(...)                 __VSF_STR(__VA_ARGS__)
 #   endif
 #endif
 
-#ifndef __cplusplus
-//  conflict with std::max, std::min
-#   define max(__A, __B)                    (((__A) > (__B)) ? (__A) : (__B))
-#   define min(__A, __B)                    (((__A) < (__B)) ? (__A) : (__B))
-#endif
+#define vsf_max(__a, __b)                   (((__a) > (__b)) ? (__a) : (__b))
+#define vsf_min(__a, __b)                   (((__a) < (__b)) ? (__a) : (__b))
 
 #ifndef dimof
-#   define dimof(arr)                       (sizeof(arr) / sizeof((arr)[0]))
+#   define dimof(__arr)                     (sizeof(__arr) / sizeof((__arr)[0]))
 #endif
 
 #ifndef offset_of
-#   define offset_of(s, m)                  (uintptr_t)(&(((s *)0)->m))
+#   define offset_of(__s, __m)              (uintptr_t)(&(((__s *)0)->__m))
 #endif
 #ifndef container_of
-#   define container_of(ptr, type, member)                                      \
-        ((type *)((uintptr_t)(ptr) - offset_of(type, member)))
+#   define container_of(__ptr, __type, __member)                                \
+        ((__type *)((uintptr_t)(__ptr) - offset_of(__type, __member)))
 #endif
 #ifndef safe_container_of
-#   define safe_container_of(ptr, type, member)                                 \
-        (ptr ? container_of(ptr, type, member) : NULL)
+#   define safe_container_of(__ptr, __type, __member)                           \
+        (__ptr ? container_of(__ptr, __type, __member) : NULL)
 #endif
 
 static inline int sign(int x)
@@ -163,11 +160,19 @@ static inline int sign(int x)
     return ((int)((int)((int)(x) > 0) - (int)((int)(x) < 0)));
 }
 
-#define VSF_ABS(__NUM)                      (((__NUM) < 0) ? (-(__NUM)) : (__NUM))
+#define vsf_abs(__num)                      (((__num) < 0) ? (-(__num) : (__num))
 
 #define VSF_BIT(__N)                        (1UL << (__N))
 #define VSF_BITMASK(__N)                    (VSF_BIT(__N) - 1)
 #define VSF_UNUSED_PARAM(__VAL)             (__VAL) = (__VAL)
+
+// will be removed later
+#ifdef __VSF_COMPAT__
+#   define min                              vsf_min
+#   define max                              vsf_max
+#   define __STR                            __VSF_STR
+#   define STR                              VSF_STR
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

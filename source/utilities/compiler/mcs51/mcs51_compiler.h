@@ -80,28 +80,28 @@ extern "C" {
 //! \brief none standard memory types
 #if __IS_COMPILER_IAR__
 #   define LOW_LEVEL_INIT_RET_T char
-#   define ROM_FLASH            _Pragma(__STR(location=".rom.flash")) const
-#   define ROM_EEPROM           _Pragma(__STR(location=".rom.eeprom")) const
+#   define ROM_FLASH            _Pragma(__VSF_STR(location=".rom.flash")) const
+#   define ROM_EEPROM           _Pragma(__VSF_STR(location=".rom.eeprom")) const
 #   define NO_INIT              __no_init
 #   define ROOT                 __root
 #   define INLINE               inline
 #   define NO_INLINE            _Pragma("optimisze=no_inline")
 #   define ALWAYS_INLINE        _Pragma("inline=forced")
-#   define WEAK(...)            _Pragma(__STR(weak __VA_ARGS__))
+#   define WEAK(...)            _Pragma(__VSF_STR(weak __VA_ARGS__))
 #   define RAMFUNC              __ramfunc
 #   define __asm__              __asm
-#   define __ALIGN(__N)         //_Pragma("data_alignment=" __STR(__N))         //!< 8051 does not have any alignment restrictions
+#   define __ALIGN(__N)         //_Pragma("data_alignment=" __VSF_STR(__N))         //!< 8051 does not have any alignment restrictions
 #   define __AT_ADDR(__ADDR)    @ __ADDR
-#   define __SECTION(__SEC)     _Pragma(__STR(section=__SEC))
+#   define __SECTION(__SEC)     _Pragma(__VSF_STR(section=__SEC))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                _Pragma(__STR(weak __ORIGIN=__ALIAS))
+                                _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
 #   define PACKED               
 #   define UNALIGNED            
 #   define TRANSPARENT_UNION    
 #   define __ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
 
 #define __ISR(__VEC)                                                            \
-        _Pragma(__STR(vector=__VEC))                                            \
+        _Pragma(__VSF_STR(vector=__VEC))                                            \
         __interrupt void vect_##__VEC##_handler(void)  
 
 //! TODO: Need further investigation about the negative effect

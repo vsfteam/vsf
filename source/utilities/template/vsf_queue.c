@@ -139,8 +139,8 @@ int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr,
 
         hwSpaceLeft = vsf_this.buffer_item_cnt - vsf_this.length;
         hwWritten = vsf_this.buffer_item_cnt - vsf_this.tail;
-        hwWritten = min((*item_cnt_ptr), hwWritten);
-        hwWritten = min(hwWritten, hwSpaceLeft);
+        hwWritten = vsf_min((*item_cnt_ptr), hwWritten);
+        hwWritten = vsf_min(hwWritten, hwSpaceLeft);
 
         *item_cnt_ptr = hwWritten;  /*!< update actual written number */
         
@@ -174,8 +174,8 @@ int32_t __vsf_rng_buf_get_multiple( vsf_rng_buf_t* obj_ptr,
         index = vsf_this.head;
 
         hwRead = vsf_this.buffer_item_cnt - vsf_this.head;
-        hwRead = min((*item_cnt_ptr), hwRead);
-        hwRead = min(vsf_this.length, hwRead);
+        hwRead = vsf_min((*item_cnt_ptr), hwRead);
+        hwRead = vsf_min(vsf_this.length, hwRead);
 
         *item_cnt_ptr = hwRead;     /*!< update actual written number */
 
@@ -271,8 +271,8 @@ int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr,
         hwItemLeft = vsf_this.length - vsf_this.peek_cnt;
 
         hwPeeked = vsf_this.buffer_item_cnt - vsf_this.peek;
-        hwPeeked = min((*item_cnt_ptr), hwPeeked);
-        hwPeeked = min(hwItemLeft, hwPeeked);
+        hwPeeked = vsf_min((*item_cnt_ptr), hwPeeked);
+        hwPeeked = vsf_min(hwItemLeft, hwPeeked);
 
         *item_cnt_ptr = hwPeeked;   /*!< update actual written number */
 

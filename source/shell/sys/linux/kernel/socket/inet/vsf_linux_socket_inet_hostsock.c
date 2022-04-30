@@ -326,7 +326,7 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
         if (NULL == priv) {
             nfds = __vsf_linux_hostsock.sock_event_listener;
         } else {
-            nfds = max(__vsf_linux_hostsock.sock_event_listener, priv->hostsock);
+            nfds = vsf_max(__vsf_linux_hostsock.sock_event_listener, priv->hostsock);
         }
         vsf_unprotect_sched(orig);
         __vsf_arch_irq_end(irq_thread, false);

@@ -133,8 +133,8 @@ extern "C" {
 //! \brief none standard memory types
 #if __IS_COMPILER_IAR__
 #   define LOW_LEVEL_INIT_RET_T int
-#   define ROM_FLASH            _Pragma(__STR(location=".rom.flash")) const
-#   define ROM_EEPROM           _Pragma(__STR(location=".rom.eeprom")) const
+#   define ROM_FLASH            _Pragma(__VSF_STR(location=".rom.flash")) const
+#   define ROM_EEPROM           _Pragma(__VSF_STR(location=".rom.eeprom")) const
 #   define NO_INIT              __no_init
 #   define ROOT                 __root
 #   define INLINE               inline
@@ -147,7 +147,7 @@ extern "C" {
 #   define __AT_ADDR(__ADDR)    @ __ADDR
 #   define __SECTION(__SEC)     __attribute__((section (__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                _Pragma(__STR(weak __ORIGIN=__ALIAS))
+                                _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
 #   define PACKED               __attribute__((packed))
 #   define UNALIGNED            __packed
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
@@ -172,7 +172,7 @@ extern "C" {
 #   define __AT_ADDR(__ADDR)    __attribute__((at(__ADDR)))
 #   define __SECTION(__SEC)     __attribute__((section (__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                __attribute__((weakref(__STR(__ALIAS))))
+                                __attribute__((weakref(__VSF_STR(__ALIAS))))
                                 
 #   define PACKED               __attribute__((packed))
 #   define UNALIGNED            __packed
@@ -196,7 +196,7 @@ extern "C" {
 #   define __AT_ADDR(__ADDR)    __attribute__((section (".ARM.__at_" #__ADDR)))
 #   define __SECTION(__SEC)     __attribute__((section (__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                __attribute__((weakref(__STR(__ALIAS))))
+                                __attribute__((weakref(__VSF_STR(__ALIAS))))
 
 #   define PACKED               __attribute__((packed))
 #   define UNALIGNED            __unaligned

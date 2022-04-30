@@ -139,7 +139,7 @@ static uint_fast32_t __vsf_queue_stream_write(vsf_stream_t *stream, uint8_t *buf
     vsf_queue_stream_t *queue_stream = (vsf_queue_stream_t *)stream;
     vsf_queue_stream_buffer_node_t *buffer_node;
     uint_fast32_t avail_len = __vsf_queue_stream_get_avail_length(stream);
-    uint_fast32_t wsize = min(avail_len, size);
+    uint_fast32_t wsize = vsf_min(avail_len, size);
 
     buffer_node = vsf_heap_malloc(sizeof(*buffer_node) + size);
     if (NULL == buffer_node) {
@@ -172,7 +172,7 @@ static uint_fast32_t __vsf_queue_stream_read(vsf_stream_t *stream, uint8_t *buf,
         }
 
         cur_size = buffer_node->size - buffer_node->pos;
-        cur_size = min(cur_size, remain_size);
+        cur_size = vsf_min(cur_size, remain_size);
         if (buf != NULL) {
             memcpy(buf, (uint8_t *)&buffer_node[1] + buffer_node->pos, cur_size);
             buf += cur_size;

@@ -207,7 +207,7 @@ static void __spinor_transfer(uint8_t *txbuffer, uint8_t *rxbuffer, uint_fast32_
     uint_fast32_t cur_len;
     uint_fast8_t value;
     while (len > 0) {
-        cur_len = min(len, 64);
+        cur_len = vsf_min(len, 64);
         len -= cur_len;
 
         SPI0_BASE->MBC = cur_len;

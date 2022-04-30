@@ -367,10 +367,10 @@ static void __vsf_sdl2_disp_on_ready(vk_disp_t *disp)
 
 static inline bool __vsf_sdl2_cord_intersect(int *start_out, int *width_out, int start0, int width0, int start1, int width1)
 {
-    int start = max(start0, start1);
+    int start = vsf_max(start0, start1);
     int end0 = start0 + width0;
     int end1 = start1 + width1;
-    int end = min(end0, end1);
+    int end = vsf_min(end0, end1);
 
     *start_out  = start;
     *width_out = end - start;
@@ -767,8 +767,8 @@ int SDL_BlitSurface(SDL_Surface * src, const SDL_Rect * srcrect, SDL_Surface * d
     } else {
         dst_real_area = dst_area;
     }
-    dst_real_area.w = src_real_area.w = min(dst_real_area.w, src_real_area.w);
-    dst_real_area.h = src_real_area.h = min(dst_real_area.h, src_real_area.h);
+    dst_real_area.w = src_real_area.w = vsf_min(dst_real_area.w, src_real_area.w);
+    dst_real_area.h = src_real_area.h = vsf_min(dst_real_area.h, src_real_area.h);
 
     uint_fast8_t dst_pixel_size = vsf_disp_get_pixel_format_bytesize(dst->format->format);
     uint_fast8_t src_pixel_size = vsf_disp_get_pixel_format_bytesize(src->format->format);
@@ -844,8 +844,8 @@ int SDL_RenderCopy(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect 
     } else {
         dst_area = window->area;
     }
-    dst_area.w = src_area.w = min(dst_area.w, src_area.w);
-    dst_area.h = src_area.h = min(dst_area.h, src_area.h);
+    dst_area.w = src_area.w = vsf_min(dst_area.w, src_area.w);
+    dst_area.h = src_area.h = vsf_min(dst_area.h, src_area.h);
 
     uint_fast8_t dst_pixel_size = vsf_disp_get_pixel_format_bytesize(renderer->window->format);
     uint_fast8_t src_pixel_size = vsf_disp_get_pixel_format_bytesize(texture->format->format);

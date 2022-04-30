@@ -449,7 +449,7 @@ static vsf_err_t __f1cx00s_usbd_ep_transfer_send(f1cx00s_usb_dcd_t *usbd, uint_f
     uint_fast8_t ep = ep_idx | 0x80;
     f1cx00s_usb_dcd_trans_t *trans = __f1cx00s_usbd_get_trans(usbd, ep);
     uint_fast16_t ep_size = f1cx00s_usbd_ep_get_size(usbd, ep);
-    uint_fast16_t size = min(ep_size, trans->remain);
+    uint_fast16_t size = vsf_min(ep_size, trans->remain);
     uint_fast8_t ep_orig;
 
     if (size > 0) {

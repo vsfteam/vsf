@@ -19,7 +19,7 @@ void VSF_MCONNECT(__name, _pool_init_ex)( vsf_pool(__name) *this_ptr,
 {
     vsf_pool_init(  &(this_ptr->use_as__vsf_pool_t),
                     sizeof(__type),
-                    max(align,__alignof__(__type)),
+                    vsf_max(align,__alignof__(__type)),
                     cfg_ptr);
 }
 
@@ -32,7 +32,7 @@ bool VSF_MCONNECT(__name, _pool_add_buffer)(
 }
 
 WEAK(VSF_MCONNECT(__name, _pool_add_buffer_ex))
-SECTION(".text." STR(__name) "_pool_add_buffer_ex")
+SECTION(".text." VSF_STR(__name) "_pool_add_buffer_ex")
 bool VSF_MCONNECT(__name, _pool_add_buffer_ex)(
         vsf_pool(__name) *this_ptr,
         void *buffer_ptr,
@@ -59,14 +59,14 @@ void VSF_MCONNECT(__name, _pool_free)(vsf_pool(__name) *this_ptr, __type *item_p
 }
 
 WEAK(VSF_MCONNECT(__name, _get_pool_item_count))
-SECTION(".text." STR(__name) "_get_pool_item_count")
+SECTION(".text." VSF_STR(__name) "_get_pool_item_count")
 uint_fast32_t VSF_MCONNECT(__name, _get_pool_item_count)(vsf_pool(__name) *this_ptr)
 {
     return vsf_pool_get_count((vsf_pool_t *)this_ptr);
 }
 
 WEAK(VSF_MCONNECT(__name, _pool_get_region))
-SECTION(".text." STR(__name) "_pool_get_region")
+SECTION(".text." VSF_STR(__name) "_pool_get_region")
 vsf_protect_region_t *VSF_MCONNECT(__name, _pool_get_region)(vsf_pool(__name) *this_ptr)
 {
     return vsf_pool_get_region((vsf_pool_t *)this_ptr);

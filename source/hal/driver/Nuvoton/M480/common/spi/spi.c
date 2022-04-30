@@ -172,7 +172,7 @@ static vsf_err_t __vsf_spi_reg_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(cfg_ptr->clock_hz > 0);
     VSF_HAL_ASSERT(cfg_ptr->clock_hz <= clock_source);
     uint32_t clkdiv = (clock_source + cfg_ptr->clock_hz / 2) / cfg_ptr->clock_hz - 1;
-    clkdiv = min(0x100, clkdiv);
+    clkdiv = vsf_min(0x100, clkdiv);
 
     VSF_HAL_ASSERT((cfg_ptr->mode & ~(SPI_CTL_MODE_MASK | SPI_SSCTL_MASK)) == 0);
     // TODO: Test Slave Mode
@@ -377,7 +377,7 @@ static vsf_err_t __vsf_spi_dma_request(vsf_spi_t *spi_ptr)
         widty_bytes = 4;
     }
 
-    uint_fast32_t current_size = min(spi_ptr->req_cnt, M484_DMA_REQUEST_MAX_SIZE);
+    uint_fast32_t current_size = vsf_min(spi_ptr->req_cnt, M484_DMA_REQUEST_MAX_SIZE);
     vsf_spi_dma_t *tx_dma = &spi_ptr->tx_dma;
     vsf_spi_dma_t *rx_dma = &spi_ptr->rx_dma;
 

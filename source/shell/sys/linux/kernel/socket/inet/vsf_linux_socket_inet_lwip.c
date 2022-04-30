@@ -747,7 +747,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
     }
 
 
-    u16_t curlen = min(pbuf->tot_len, size);
+    u16_t curlen = LWIP_MIN(pbuf->tot_len, size);
     pbuf_copy_partial(pbuf, buffer, curlen, pos);
     len += curlen;
     size -= curlen;

@@ -609,7 +609,7 @@ static vsf_err_t __ohci_ed_init(ohci_urb_t *urb_ohci, vk_usbh_hcd_urb_t *urb)
         ed->hwINFO |= !pipe.dir_in1out0 ? ED_OUT : ED_IN;
         if (ed->type != USB_ENDPOINT_XFER_BULK) {
             uint_fast32_t interval = urb->interval;
-            ed->interval = (pipe.type == USB_ENDPOINT_XFER_ISOC) ? interval : min(interval, 32);
+            ed->interval = (pipe.type == USB_ENDPOINT_XFER_ISOC) ? interval : vsf_min(interval, 32);
             ed->load = 1;
         }
     }
@@ -726,7 +726,7 @@ static void __ohci_td_submit_urb(vk_ohci_t *ohci, struct vk_usbh_hcd_urb_t *urb)
                         TD_CC | TD_DP_IN | TD_T_DATA1;
             m = data_len;
             while (m) {
-                n = min(m, 4096);
+                n = vsf_min(m, 4096);
                 m -= n;
 
                 if (!m) {
@@ -754,7 +754,7 @@ static void __ohci_td_submit_urb(vk_ohci_t *ohci, struct vk_usbh_hcd_urb_t *urb)
         info = isout ? (TD_T_TOGGLE | TD_CC | TD_DP_OUT) :
                     (TD_T_TOGGLE | TD_CC | TD_DP_IN);
         while (data_len) {
-            n = min(data_len, 4096);
+            n = vsf_min(data_len, 4096);
             data_len -= n;
 
             if (!data_len && !(urb->transfer_flags & URB_SHORT_NOT_OK) && !isout) {
@@ -1456,7 +1456,7 @@ static int __ohci_rh_control(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
             data[8] = (temp & RH_B_DR) >> 8;
             data[10] = data[9] = 0xff;
         }
-        len = min(data[0], wLength);
+        len = vsf_min(data[0], wLength);
         break;
     default:
         goto error;

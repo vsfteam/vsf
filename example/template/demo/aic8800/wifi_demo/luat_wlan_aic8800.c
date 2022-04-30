@@ -100,7 +100,7 @@ static int l_wlan_scan(lua_State *L) {
 
 static int l_wlan_scan_get_result(lua_State *L) {
     int num = luaL_optinteger(L, 1, 20);
-    num = min(num, scan_result_num);
+    num = vsf_min(num, scan_result_num);
 
     lua_createtable(L, num, 0);
     struct mac_scan_result result;

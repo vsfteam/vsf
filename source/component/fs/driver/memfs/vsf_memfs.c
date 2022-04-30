@@ -149,7 +149,7 @@ __vsf_component_peda_ifs_entry(__vk_memfs_read, vk_file_read)
             int_fast32_t rsize = 0;
 
             if (offset < file->size) {
-                rsize = min(size, file->size - offset);
+                rsize = vsf_min(size, file->size - offset);
                 memcpy(buff, &file->f.buff[offset], rsize);
             }
             vsf_eda_return(rsize);
@@ -188,7 +188,7 @@ __vsf_component_peda_ifs_entry(__vk_memfs_write, vk_file_write)
             int_fast32_t wsize = 0;
 
             if (offset < file->size) {
-                wsize = min(size, file->size - offset);
+                wsize = vsf_min(size, file->size - offset);
                 memcpy(&file->f.buff[offset], buff, wsize);
             }
             vsf_eda_return(wsize);
@@ -278,7 +278,7 @@ int_fast32_t vk_memfs_read(vk_memfs_file_t *file, uint8_t *buff, uint_fast32_t s
     VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
 
     int_fast32_t rsize = file->size - file->pos;
-    rsize = min(size, rsize);
+    rsize = vsf_min(size, rsize);
     memcpy(buff, &file->f.buff[file->pos], rsize);
     file->pos += rsize;
     return rsize;
@@ -290,7 +290,7 @@ int_fast32_t vk_memfs_write(vk_memfs_file_t *file, uint8_t *buff, uint_fast32_t 
     VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
 
     int_fast32_t wsize = file->size - file->pos;
-    wsize = min(size, wsize);
+    wsize = vsf_min(size, wsize);
     memcpy(&file->f.buff[file->pos], buff, wsize);
     file->pos += wsize;
     return wsize;

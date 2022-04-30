@@ -477,7 +477,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
 
                 do {
                     netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem);
-                    cur_size = min(mem.size, remain);
+                    cur_size = vsf_min(mem.size, remain);
                     memcpy(mem.buffer, buffer, cur_size);
                     remain -= cur_size;
                     buffer += cur_size;

@@ -200,7 +200,7 @@ __vsf_component_peda_private_entry(__vk_mal_read_stream)
         }
         break;
     case VSF_EVT_MAL_READ:
-        pthis->cur_size = min(pthis->cur_size, pthis->size);
+        pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
         vk_mal_read(mal, pthis->addr, pthis->cur_size, pthis->cur_buff);
         break;
     }
@@ -237,7 +237,7 @@ __vsf_component_peda_private_entry(__vk_mal_write_stream)
         }
         break;
     case VSF_EVT_MAL_WRITE:
-        pthis->cur_size = min(pthis->cur_size, pthis->size);
+        pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
         vk_mal_write(mal, pthis->addr, pthis->cur_size, pthis->cur_buff);
         break;
     }

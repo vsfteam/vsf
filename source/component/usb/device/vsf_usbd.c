@@ -207,7 +207,7 @@ static vsf_err_t __vk_usbd_ep_send_imp(vk_usbd_dev_t *dev, vk_usbd_trans_t *tran
     uint_fast8_t ep = trans->ep;
     VSF_USBD_DRV_PREPARE(dev);
     uint_fast16_t ep_size = vk_usbd_drv_ep_get_size(ep);
-    uint_fast16_t pkg_size = min(ep_size, trans->use_as__vsf_mem_t.size);
+    uint_fast16_t pkg_size = vsf_min(ep_size, trans->use_as__vsf_mem_t.size);
 
     vk_usbd_drv_ep_transaction_write_buffer(ep, trans->cur, pkg_size);
     trans->cur += pkg_size;
@@ -872,7 +872,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
                 } else {
                     uint_fast16_t ep_size = vk_usbd_drv_ep_get_size(ep);
                     // ignore the over-run data
-                    pkg_size = min(pkg_size, trans->use_as__vsf_mem_t.size);
+                    pkg_size = vsf_min(pkg_size, trans->use_as__vsf_mem_t.size);
                     vk_usbd_drv_ep_transaction_read_buffer(ep, trans->cur, pkg_size);
                     trans->cur += pkg_size;
                     trans->use_as__vsf_mem_t.size -= pkg_size;
@@ -1006,7 +1006,7 @@ static void __vk_usbd_stream_tx_recv(vk_usbd_ep_stream_t *stream_ep, uint_fast16
 
     if (stream_ep->total_size > 0) {
         uint_fast32_t remain_size = stream_ep->total_size - stream_ep->transfered_size;
-        size = min(wbuf_size, remain_size);
+        size = vsf_min(wbuf_size, remain_size);
     } else {
         size = wbuf_size;
     }
@@ -1037,7 +1037,7 @@ static void __vk_usbd_stream_tx_on_trans_finish(void *param)
         pkg_size = vk_usbd_drv_ep_get_data_size(ep);
         for (uint_fast16_t size_read = pkg_size; size_read > 0;) {
             size = vsf_stream_get_wbuf(stream, &buffer);
-            size = min(size, size_read);
+            size = vsf_min(size, size_read);
             vk_usbd_drv_ep_transaction_read_buffer(ep, buffer, size);
             size_read -= size;
         }

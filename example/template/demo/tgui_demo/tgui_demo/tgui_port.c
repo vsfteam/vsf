@@ -365,8 +365,8 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
     VSF_TGUI_ASSERT(tile_location_ptr->iY < tile_size.iHeight);
 
     display.tLocation = *location_ptr;
-    display.tSize.iWidth = min(size_ptr->iWidth, tile_size.iWidth - tile_location_ptr->iX);
-    display.tSize.iHeight = min(size_ptr->iHeight, tile_size.iHeight - tile_location_ptr->iY);
+    display.tSize.iWidth = vsf_min(size_ptr->iWidth, tile_size.iWidth - tile_location_ptr->iX);
+    display.tSize.iHeight = vsf_min(size_ptr->iHeight, tile_size.iHeight - tile_location_ptr->iY);
     if (display.tSize.iHeight <= 0 || display.tSize.iWidth <= 0) {
         VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port] display size error" VSF_TRACE_CFG_LINEEND);
         VSF_TGUI_ASSERT(0);
@@ -433,7 +433,7 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* location_ptr,
     int32_t left = glyph->bitmap_left;
 
     vsf_tgui_location_t bitmap_start = {
-        .iX = max(0, left),    // todo: support negative advance
+        .iX = vsf_max(0, left),    // todo: support negative advance
         .iY = base_line - top,
     };
     vsf_tgui_region_t resource_region = {
@@ -512,7 +512,7 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin( vsf_tgui_t* gui_ptr, const vsf
                          request_region_ptr->tSize.iHeight);
 
             int16_t height = __vsf_tgui_port.bitmap_size / request_region_ptr->tSize.iWidth;
-            height = min(request_region_ptr->tSize.iHeight, height);
+            height = vsf_min(request_region_ptr->tSize.iHeight, height);
 
             current_region_ptr->tLocation.iX = request_region_ptr->tLocation.iX;
             current_region_ptr->tLocation.iY = request_region_ptr->tLocation.iY;
@@ -579,7 +579,7 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr)
         int16_t height = __vsf_tgui_port.bitmap_size / request_region_ptr->tSize.iWidth;
         VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port]iHeight: %d, current_region_ptr->tLocation.iY:%d, request_location_y2:%d" VSF_TRACE_CFG_LINEEND,
                      height, current_region_ptr->tLocation.iY, request_location_y2);
-        height = min(height, remain);
+        height = vsf_min(height, remain);
         current_region_ptr->tLocation.iY += current_region_ptr->tSize.iHeight;
         current_region_ptr->tSize.iHeight = height;
         return true;

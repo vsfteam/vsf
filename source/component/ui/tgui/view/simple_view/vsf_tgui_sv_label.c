@@ -108,16 +108,16 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* l
             }
         }
 
-        size.iWidth  += max(regions[CORNOR_TILE_IN_TOP_LEFT].iWidth,
+        size.iWidth  += vsf_max(regions[CORNOR_TILE_IN_TOP_LEFT].iWidth,
                            regions[CORNOR_TILE_IN_BOTTOM_LEFT].iWidth)
-                     +  max(regions[CORNOR_TILE_IN_TOP_RIGHT].iWidth,
+                     +  vsf_max(regions[CORNOR_TILE_IN_TOP_RIGHT].iWidth,
                            regions[CORNOR_TILE_IN_BOTTOM_RIGHT].iWidth);
 
-        int16_t height  = max(regions[CORNOR_TILE_IN_TOP_LEFT].iHeight,
+        int16_t height  = vsf_max(regions[CORNOR_TILE_IN_TOP_LEFT].iHeight,
                               regions[CORNOR_TILE_IN_TOP_RIGHT].iHeight)
-                        + max(regions[CORNOR_TILE_IN_BOTTOM_LEFT].iHeight,
+                        + vsf_max(regions[CORNOR_TILE_IN_BOTTOM_LEFT].iHeight,
                               regions[CORNOR_TILE_IN_BOTTOM_RIGHT].iHeight);
-        size.iHeight = max(size.iHeight, height);
+        size.iHeight = vsf_max(size.iHeight, height);
     }
 #endif
 

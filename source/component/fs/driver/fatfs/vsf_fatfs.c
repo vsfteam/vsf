@@ -657,7 +657,7 @@ __vsf_component_peda_private_entry(__vk_fatfs_get_fat_entry,,
                     break;
                 }
 
-                vsf_local.cur_fat_bit += min(fat_bit, sector_bit - start_bit_sec);
+                vsf_local.cur_fat_bit += vsf_min(fat_bit, sector_bit - start_bit_sec);
                 *vsf_local.entry = get_unaligned_le32(&buff[start_bit_sec >> 3]);
                 *vsf_local.entry = (*vsf_local.entry >> (start_bit & 7)) & ((1ULL << vsf_local.cur_fat_bit) - 1);
                 goto read_fat_sector;
@@ -726,7 +726,7 @@ __vsf_component_peda_private_entry(__vk_fatfs_set_fat_entry,,
                 uint32_t cur_bit_size;
                 if (0 == vsf_local.cur_fat_bit) {
                     cur_bit_size = sector_bit - vsf_local.cur_fat_bit_offset_in_sector;
-                    cur_bit_size = min(cur_bit_size, fat_bit);
+                    cur_bit_size = vsf_min(cur_bit_size, fat_bit);
                 } else {
                     cur_bit_size = fat_bit - vsf_local.cur_fat_bit;
                 }
@@ -738,7 +738,7 @@ __vsf_component_peda_private_entry(__vk_fatfs_set_fat_entry,,
                 while (cur_bit_size > 0) {
                     u32value = le32_to_cpup(&(((uint32_t *)result.buffer)[u32off]));
                     cur_bitsize = 32 - bitoff;
-                    cur_bitsize = min(cur_bitsize, cur_bit_size);
+                    cur_bitsize = vsf_min(cur_bitsize, cur_bit_size);
                     u32mask = ((1ULL << cur_bitsize) - 1) << bitoff;
                     u32value &= ~u32mask;
                     u32value |= vsf_local.cur_next_cluster & ((1ULL << cur_bitsize) - 1);
@@ -819,7 +819,7 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
 
                     while (pos < sector_bit) {
                         cur_bit_size = sector_bit - pos;
-                        cur_bit_size = min(cur_bit_size, fat_bit);
+                        cur_bit_size = vsf_min(cur_bit_size, fat_bit);
 
                         uint_fast16_t bit_size_tmp = cur_bit_size;
                         uint_fast16_t u32off = pos >> 5;
@@ -828,7 +828,7 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
                         while (bit_size_tmp > 0) {
                             u32value = le32_to_cpup(&(((uint32_t *)result.buffer)[u32off]));
                             cur_bitsize = 32 - bitoff;
-                            cur_bitsize = min(cur_bitsize, bit_size_tmp);
+                            cur_bitsize = vsf_min(cur_bitsize, bit_size_tmp);
                             u32mask = ((1ULL << cur_bitsize) - 1) << bitoff;
                             u32value &= u32mask;
 
@@ -1393,7 +1393,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                     if (vsf_local.offset_in_sector != 0) {
                         // read first non-page-aligned data
                         vsf_local.cur_run_size = (1 << fsinfo->sector_size_bits) - vsf_local.offset_in_sector;
-                        vsf_local.cur_run_size = min(vsf_local.cur_run_size, vsf_local.size);
+                        vsf_local.cur_run_size = vsf_min(vsf_local.cur_run_size, vsf_local.size);
                         vsf_local.cur_run_sector = 1;
                         buffer = NULL;
                     } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
@@ -1406,7 +1406,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                         // get remain sector in clusrer
                         vsf_local.cur_run_sector = (1 << fsinfo->cluster_size_bits) -
                             ((vsf_local.cur_sector - fsinfo->data_sector) & ((1 << fsinfo->cluster_size_bits) - 1));
-                        vsf_local.cur_run_sector = min(vsf_local.cur_run_sector,
+                        vsf_local.cur_run_sector = vsf_min(vsf_local.cur_run_sector,
                             vsf_local.size >> fsinfo->sector_size_bits);
                         vsf_local.cur_run_size = vsf_local.cur_run_sector << fsinfo->sector_size_bits;
                         buffer = vsf_local.buff + vsf_local.cur_size;
@@ -1506,7 +1506,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
 
         if (0 == fatfs_file->size) {
             uint32_t clustersize = 1 << (fsinfo->cluster_size_bits + fsinfo->sector_size_bits);
-            uint32_t size = min(vsf_local.size, clustersize);
+            uint32_t size = vsf_min(vsf_local.size, clustersize);
             vsf_eda_set_user_value(WRITE_STATE_ALLOC_FIRST_CLUSTER);
             vk_file_setsize(&fatfs_file->use_as__vk_file_t, size);
             break;
@@ -1548,7 +1548,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                     if (vsf_local.offset_in_sector != 0) {
                         // read first non-page-aligned data
                         vsf_local.cur_run_size = (1 << fsinfo->sector_size_bits) - vsf_local.offset_in_sector;
-                        vsf_local.cur_run_size = min(vsf_local.cur_run_size, vsf_local.size);
+                        vsf_local.cur_run_size = vsf_min(vsf_local.cur_run_size, vsf_local.size);
                         vsf_local.cur_run_sector = 1;
                         goto read_page;
                     } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
@@ -1563,7 +1563,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                         // get remain sector in clusrer
                         vsf_local.cur_run_sector = (1 << fsinfo->cluster_size_bits) -
                             ((vsf_local.cur_sector - fsinfo->data_sector) & ((1 << fsinfo->cluster_size_bits) - 1));
-                        vsf_local.cur_run_sector = min(vsf_local.cur_run_sector,
+                        vsf_local.cur_run_sector = vsf_min(vsf_local.cur_run_sector,
                             vsf_local.size >> fsinfo->sector_size_bits);
                         vsf_local.cur_run_size = vsf_local.cur_run_sector << fsinfo->sector_size_bits;
                         result.buffer = vsf_local.buff + vsf_local.cur_size;

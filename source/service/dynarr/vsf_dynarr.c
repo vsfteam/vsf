@@ -207,7 +207,7 @@ void vsf_dynarr_fini(vsf_dynarr_t *dynarr)
     uint_fast16_t buf_num = (dynarr->length + item_num_per_buf - 1) >> dynarr->item_num_per_buf_bitlen;
 
     __vsf_slist_foreach_next_unsafe(vsf_dynarr_table_t, table_node, &dynarr->table_list) {
-        for (int i = min(buf_num, buf_num_per_table); i > 0; i--) {
+        for (int i = vsf_min(buf_num, buf_num_per_table); i > 0; i--) {
             vsf_heap_free(_->buffer[i - 1]);
             buf_num--;
         }

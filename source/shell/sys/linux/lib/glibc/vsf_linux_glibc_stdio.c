@@ -301,7 +301,7 @@ char * fgets(char *str, int n, FILE *f)
                 continue;
             }
             if (('\b' == *str) || (0x7F == *str)) {
-                int back_cnt = min(rsize, 1);
+                int back_cnt = vsf_min(rsize, 1);
                 rsize -= back_cnt;
                 str -= back_cnt;
                 continue;

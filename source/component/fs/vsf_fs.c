@@ -201,7 +201,7 @@ char * vk_file_getfilename(char *path)
 {
     char *name0 = (char *)strrchr(path, '\\');
     char *name1 = (char *)strrchr(path, '/');
-    char *name = (char *)max((uintptr_t)name0, (uintptr_t)name1);
+    char *name = (char *)vsf_max((uintptr_t)name0, (uintptr_t)name1);
     if (NULL == name) {
         name = path;
     } else if (vk_file_is_div(*name)) {
@@ -1232,7 +1232,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_read, vk_file_read)
             int_fast32_t rsize = 0;
 
             if (offset < file->size) {
-                rsize = min(size, file->size - offset);
+                rsize = vsf_min(size, file->size - offset);
                 VSF_FS_ASSERT(file->f.param != NULL);
                 memcpy(buff, &((uint8_t *)file->f.param)[offset], rsize);
             }
@@ -1281,7 +1281,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_write, vk_file_write)
             }
 
             if (offset < file->size) {
-                wsize = min(size, file->size - offset);
+                wsize = vsf_min(size, file->size - offset);
                 memcpy(&((uint8_t *)file->f.param)[offset], buff, wsize);
             }
             vsf_eda_return(wsize);
@@ -1370,7 +1370,7 @@ __vsf_component_peda_private_entry(__vk_file_read_stream)
         }
         break;
     case VSF_EVT_FILE_READ:
-        pthis->cur_size = min(pthis->cur_size, pthis->size);
+        pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
         vk_file_read(file, pthis->cur_buff, pthis->cur_size);
         break;
     }
@@ -1406,7 +1406,7 @@ __vsf_component_peda_private_entry(__vk_file_write_stream)
         }
         break;
     case VSF_EVT_FILE_WRITE:
-        pthis->cur_size = min(pthis->cur_size, pthis->size);
+        pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
         vk_file_write(file, pthis->cur_buff, pthis->cur_size);
         break;
     }

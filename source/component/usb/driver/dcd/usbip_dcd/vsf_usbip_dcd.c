@@ -103,7 +103,7 @@ static void __vk_usbip_usbd_transfer_send(vk_usbip_dcd_t *usbd, vk_usbip_dcd_ep_
 {
     vk_usbip_urb_t *urb = __vk_usbip_usbd_peek_urb(dcd_ep);
     if (urb != NULL) {
-        uint_fast32_t real_size = min(urb->req.transfer_length, dcd_ep->transfer.mem.size);
+        uint_fast32_t real_size = vsf_min(urb->req.transfer_length, dcd_ep->transfer.mem.size);
 
         memcpy(urb->mem.buffer, dcd_ep->transfer.mem.buffer, real_size);
         dcd_ep->transfer.mem.buffer += real_size;
@@ -127,7 +127,7 @@ static void __vk_usbip_usbd_transfer_recv(vk_usbip_dcd_t *usbd, vk_usbip_dcd_ep_
 {
     vk_usbip_urb_t *urb = __vk_usbip_usbd_peek_urb(dcd_ep);
     if (urb != NULL) {
-        uint_fast32_t real_size = min(urb->req.transfer_length, dcd_ep->transfer.mem.size);
+        uint_fast32_t real_size = vsf_min(urb->req.transfer_length, dcd_ep->transfer.mem.size);
 
         memcpy(dcd_ep->transfer.mem.buffer, urb->mem.buffer, real_size);
         dcd_ep->transfer.mem.buffer += real_size;

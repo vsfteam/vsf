@@ -272,7 +272,7 @@ static void __vk_fakefat32_get_sfn(vk_fakefat32_file_t* file, char sfn[11])
         __vk_memncpy_toupper(sfn, file->name, file_name_len);
     } else {
         uint_fast16_t n = strlen(file->name);
-        n = min(n, 6);
+        n = vsf_min(n, 6);
 
         __vk_memncpy_toupper(sfn, file->name, n);
         sfn[n] = '~';
@@ -281,7 +281,7 @@ static void __vk_fakefat32_get_sfn(vk_fakefat32_file_t* file, char sfn[11])
         sfn[n + 1] = '1';
     }
     if (ext) {
-        extlen = min(extlen, 3);
+        extlen = vsf_min(extlen, 3);
         __vk_memncpy_toupper((char *)&sfn[8], ext, extlen);
     }
 }

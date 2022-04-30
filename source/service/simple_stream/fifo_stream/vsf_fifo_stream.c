@@ -128,7 +128,7 @@ uint_fast32_t vsf_byte_fifo_get_rbuf(vsf_byte_fifo_t *fifo, uint8_t **buf)
         *buf = &fifo->buffer[fifo->tail];
     }
     tmp32 = fifo->size - fifo->tail;
-    return min(tmp32, avail_len);
+    return vsf_min(tmp32, avail_len);
 }
 
 uint_fast32_t vsf_byte_fifo_get_wbuf(vsf_byte_fifo_t *fifo, uint8_t **buf)
@@ -140,7 +140,7 @@ uint_fast32_t vsf_byte_fifo_get_wbuf(vsf_byte_fifo_t *fifo, uint8_t **buf)
         *buf = &fifo->buffer[fifo->head];
     }
     tmp32 = fifo->size - fifo->head;
-    return min(tmp32, avail_len);
+    return vsf_min(tmp32, avail_len);
 }
 
 uint_fast32_t vsf_byte_fifo_peek(vsf_byte_fifo_t *fifo, uint8_t *buf, uint_fast32_t size)

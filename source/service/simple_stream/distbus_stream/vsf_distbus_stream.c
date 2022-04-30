@@ -157,7 +157,7 @@ static uint_fast32_t __vsf_distbus_stream_get_wbuf(vsf_stream_t *stream, uint8_t
 
     if (avail_length > 0) {
         VSF_SERVICE_ASSERT(NULL == distbus_stream->msg);
-        avail_length = min(avail_length, distbus_stream->mtu);
+        avail_length = vsf_min(avail_length, distbus_stream->mtu);
         distbus_stream->msg = vsf_distbus_alloc_msg(distbus_stream->distbus, avail_length, ptr);
         return (NULL == distbus_stream->msg) ? 0 : avail_length;
     }
@@ -237,7 +237,7 @@ static uint_fast32_t __vsf_distbus_stream_read(vsf_stream_t *stream, uint8_t *bu
                 break;
             }
 
-            cursize = min(cursize, size - realsize);
+            cursize = vsf_min(cursize, size - realsize);
             memcpy(buf, ptr, cursize);
             realsize += cursize;
             __vsf_distbus_stream_read(stream, NULL, cursize);
@@ -252,7 +252,7 @@ static uint_fast32_t __vsf_distbus_stream_read(vsf_stream_t *stream, uint8_t *bu
                 break;
             }
 
-            cursize = min(remainsize, msg->header.datalen);
+            cursize = vsf_min(remainsize, msg->header.datalen);
             remainsize -= cursize;
             msg->pos += cursize;
             realsize += cursize;

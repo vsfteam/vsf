@@ -108,7 +108,7 @@ static void __vk_tgui_control_timer_handler(vsf_tgui_timer_t *ptTimer)
 
     tProtectStatus = vsf_protect_sched();
         if (ptTimer->bEnabled && ptTimer->bIsRepeat) {
-            ptTimer->u29Interval = max(100, ptTimer->u29Interval);
+            ptTimer->u29Interval = vsf_max(100, ptTimer->u29Interval);
             vsf_callback_timer_add_ms(  &ptTimer->use_as__vsf_callback_timer_t,
                                         ptTimer->u29Interval);
         } else {
@@ -143,7 +143,7 @@ void vsf_tgui_timer_enable(vsf_tgui_timer_t *ptTimer)
                 break;
             }
             if (ptTimer->bIsRepeat) {
-                ptTimer->u29Interval = max(100, ptTimer->u29Interval);
+                ptTimer->u29Interval = vsf_max(100, ptTimer->u29Interval);
             }
             ptTimer->Status.bIsWorking = true;
             ptTimer->Status.bEnabled = true;
@@ -1131,13 +1131,13 @@ static void __vsf_tgui_container_update_size(vsf_tgui_container_t *container_ptr
 
 #if VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER == ENABLED
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
-            ptControlSize->iHeight = max(ptSize->iHeight, ptControlSize->iHeight);
+            ptControlSize->iHeight = vsf_max(ptSize->iHeight, ptControlSize->iHeight);
             ptControlSize->iWidth = ptSize->iWidth;
             break;
 
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
             ptControlSize->iHeight = ptSize->iHeight;
-            ptControlSize->iWidth = max(ptSize->iWidth, ptControlSize->iWidth);
+            ptControlSize->iWidth = vsf_max(ptSize->iWidth, ptControlSize->iWidth);
             break;
 
 #endif
@@ -1146,8 +1146,8 @@ static void __vsf_tgui_container_update_size(vsf_tgui_container_t *container_ptr
         case VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL:
         case VSF_TGUI_CONTAINER_TYPE_STREAM_VERTICAL:
         case VSF_TGUI_CONTAINER_TYPE_PLANE:
-            ptControlSize->iHeight = max(ptSize->iHeight, ptControlSize->iHeight);
-            ptControlSize->iWidth = max(ptSize->iWidth, ptControlSize->iWidth);
+            ptControlSize->iHeight = vsf_max(ptSize->iHeight, ptControlSize->iHeight);
+            ptControlSize->iWidth = vsf_max(ptSize->iWidth, ptControlSize->iWidth);
             break;
     }
 }
@@ -1189,8 +1189,8 @@ static vsf_tgui_size_t* __vsf_tgui_plane_container_update(
 
         int16_t iWidth = item_ptr->tRegion.tSize.iWidth + item_ptr->tRegion.tLocation.iX;
         int16_t iHeight = item_ptr->tRegion.tSize.iHeight + item_ptr->tRegion.tLocation.iY;
-        tSize.iWidth =  max(tSize.iWidth, iWidth);
-        tSize.iHeight = max(tSize.iHeight, iHeight);
+        tSize.iWidth =  vsf_max(tSize.iWidth, iWidth);
+        tSize.iHeight = vsf_max(tSize.iHeight, iHeight);
         item_ptr = (vsf_tgui_control_t *)__vk_tgui_control_get_next_visible_one_within_container(item_ptr);
     }
 
@@ -1227,7 +1227,7 @@ static vsf_tgui_size_t* __vsf_tgui_line_stream_update_vertical( vsf_tgui_contain
 
         tLocation.iY += iHeight;
         tSize.iHeight += iHeight;
-        tSize.iWidth = max(tSize.iWidth, iWidth);
+        tSize.iWidth = vsf_max(tSize.iWidth, iWidth);
         item_ptr = (vsf_tgui_control_t *)__vk_tgui_control_get_next_visible_one_within_container(item_ptr);
     }
     *ptSize = tSize;
@@ -1262,7 +1262,7 @@ static vsf_tgui_size_t* __vsf_tgui_line_stream_update_horizontal( vsf_tgui_conta
 
         tLocation.iX += iWidth;
         tSize.iWidth += iWidth;
-        tSize.iHeight = max(tSize.iHeight, iHeight);
+        tSize.iHeight = vsf_max(tSize.iHeight, iHeight);
         item_ptr = (vsf_tgui_control_t *)__vk_tgui_control_get_next_visible_one_within_container(item_ptr);
     }
     *ptSize = tSize;
@@ -1318,12 +1318,12 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_vertical(  vsf_tgui_container_t
         iHeight += item_ptr->tMargin.chTop + item_ptr->tMargin.chBottom;
 #endif
         //! update the max height in a line
-        iLineMaxWidth = max(iWidth, iLineMaxWidth);
+        iLineMaxWidth = vsf_max(iWidth, iLineMaxWidth);
         //! update iY in the same line
         tLocation.iY += iHeight;
 
         //! DO **NOT** calculate the miminal required height
-        // tSize.iHeight = max(tLocation.iY, tSize.iHeight);
+        // tSize.iHeight = vsf_max(tLocation.iY, tSize.iHeight);
 
         if (tLocation.iY >= iAllowedLineHeight) {
             //! already hit the wall, we should start a new line
@@ -1404,12 +1404,12 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_horizontal(vsf_tgui_container_t
         iHeight += item_ptr->tMargin.chTop + item_ptr->tMargin.chBottom;
 #endif
         //! update the max height in a line
-        iLineMaxHeight = max(iHeight, iLineMaxHeight);
+        iLineMaxHeight = vsf_max(iHeight, iLineMaxHeight);
         //! update iX in the same line
         tLocation.iX += iWidth;
 
         //! DO **NOT** calculate the miminal required width
-        // tSize.iWidth = max(tLocation.iX, tSize.iWidth);
+        // tSize.iWidth = vsf_max(tLocation.iX, tSize.iWidth);
 
         if (tLocation.iX >= iAllowedLineWidth) {
             //! hit the wall, we should start a new line

@@ -107,7 +107,7 @@ static void __vk_netdrv_wpcap_on_input(vk_netdrv_wpcap_t *wpcap_netdrv, uint8_t 
 
         do {
             netbuf_cur = vk_netdrv_read_buf(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf_cur, &mem);
-            cur_size = min(mem.size, cur_len);
+            cur_size = vsf_min(mem.size, cur_len);
             memcpy(mem.buffer, buffer, cur_size);
             cur_len -= cur_size;
             buffer += cur_size;

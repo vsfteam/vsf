@@ -141,7 +141,7 @@ void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...)
         if (new_buff != NULL) {
             size_t copy_size = vsf_heap_size((uint8_t *)p - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN)
                                     - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
-            copy_size = min(size, copy_size);
+            copy_size = vsf_min(size, copy_size);
             memcpy(new_buff, p, copy_size);
         }
         __free_ex(process, p);

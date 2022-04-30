@@ -115,7 +115,7 @@ extern "C" {
 #   define __AT_ADDR(__ADDR)    Not Supported by GCC
 #   define __SECTION(__SEC)     __attribute__((section (__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                __attribute__((weakref(__STR(__ALIAS))))
+                                __attribute__((weakref(__VSF_STR(__ALIAS))))
 
 #   define PACKED               __attribute__((packed))
 //#   define UNALIGNED            __attribute__((packed))

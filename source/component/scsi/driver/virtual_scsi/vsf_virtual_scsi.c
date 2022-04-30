@@ -236,7 +236,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                         reply[2] = pthis->sense_key;
                         reply[7] = 0x0A;
                         reply[12] = pthis->asc;
-                        reply_len = min(len, 18);
+                        reply_len = vsf_min(len, 18);
                         break;
                     }
                 case SCSI_CMDCODE_READ:

@@ -215,7 +215,7 @@ extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
         }
 
         if ((uintptr_t)NULL != local_buff) {
-            size_t size = min(local_buff_size, local_size);
+            size_t size = vsf_min(local_buff_size, local_size);
             if (size > 0) {
                 uintptr_t local = vsf_eda_get_local();
                 memcpy((void *)local, (void *)local_buff, size);

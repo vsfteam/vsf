@@ -201,7 +201,7 @@ int_fast32_t vsf_pbuf_buffer_write( vsf_pbuf_t *obj_ptr,
         }
         
         uint_fast32_t u32_max_size = this.u24_block_size - offsite;
-        s32_size = min(s32_size, u32_max_size);
+        s32_size = vsf_min(s32_size, u32_max_size);
 
 #if VSF_PBUF_CFG_INDIRECT_RW_SUPPORT == ENABLED
         if (this.is_no_direct_access) {
@@ -256,7 +256,7 @@ int_fast32_t vsf_pbuf_buffer_read( vsf_pbuf_t *obj_ptr,
         uint_fast32_t max_size = this.u24_block_size - u32_offset;
 #if VSF_PBUF_CFG_INDIRECT_RW_SUPPORT == ENABLED
         if (this.is_no_direct_access) {
-            s32_size = min(s32_size, max_size);
+            s32_size = vsf_min(s32_size, max_size);
             
             const vsf_pbuf_adapter_t *
                 adapter_ptr = __vsf_get_adapter_interface(obj_ptr);
@@ -283,7 +283,7 @@ int_fast32_t vsf_pbuf_buffer_read( vsf_pbuf_t *obj_ptr,
         //if (s32_size <= max_size) {
         //    pbuffer = (uint8_t *)vsf_pbuf_buffer_get(obj_ptr) + u32_offset;
         //} else {
-            s32_size = min(s32_size, max_size);
+            s32_size = vsf_min(s32_size, max_size);
             memcpy(psrc, this.buffer_ptr + u32_offset, s32_size);
             //pbuffer = psrc;
         //}
@@ -307,7 +307,7 @@ void vsf_pbuf_size_set(vsf_pbuf_t *obj_ptr, int_fast32_t s32_size)
         return ;
     }
     
-    this.u24_size = min(s32_size, this.u24_block_size);
+    this.u24_size = vsf_min(s32_size, this.u24_block_size);
 }
 
 int_fast32_t vsf_pbuf_capacity_get(vsf_pbuf_t *obj_ptr)

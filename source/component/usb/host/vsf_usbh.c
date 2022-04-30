@@ -705,7 +705,7 @@ vsf_err_t vk_usbh_submit_urb_iso(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast8
     iso_packet->number_of_packets = 0;
     while (size > 0) {
         iso_packet->number_of_packets++;
-        cur_size = min(ep_size, size);
+        cur_size = vsf_min(ep_size, size);
         frame_desc->length = cur_size;
         frame_desc->offset = cur_offset;
         size -= cur_size;

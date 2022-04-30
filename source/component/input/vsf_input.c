@@ -72,7 +72,7 @@ void vk_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len)
     while (result_len < len) {
         bytepos = offset >> 3;
         bitpos = offset & 7;
-        bitlen = min(len - result_len, 8 - bitpos);
+        bitlen = vsf_min(len - result_len, 8 - bitpos);
         mask = (1 << bitlen) - 1;
 
         buf[bytepos] |= ((~0UL >> result_len) & mask) << bitpos;
@@ -89,7 +89,7 @@ void vk_input_buf_clear(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len)
     while (result_len < len) {
         bytepos = offset >> 3;
         bitpos = offset & 7;
-        bitlen = min(len - result_len, 8 - bitpos);
+        bitlen = vsf_min(len - result_len, 8 - bitpos);
         mask = (1 << bitlen) - 1;
 
         buf[bytepos] &= ~(((~0UL >> result_len) & mask) << bitpos);
@@ -107,7 +107,7 @@ uint_fast32_t vk_input_buf_get_value(uint8_t *buf, uint_fast8_t offset, uint_fas
     while (result_len < len) {
         bytepos = offset >> 3;
         bitpos = offset & 7;
-        bitlen = min(len - result_len, 8 - bitpos);
+        bitlen = vsf_min(len - result_len, 8 - bitpos);
         mask = (1 << bitlen) - 1;
 
         result |= ((buf[bytepos] >> bitpos) & mask) << result_len;
@@ -125,7 +125,7 @@ void vk_input_buf_set_value(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len,
     while (result_len < len) {
         bytepos = offset >> 3;
         bitpos = offset & 7;
-        bitlen = min(len - result_len, 8 - bitpos);
+        bitlen = vsf_min(len - result_len, 8 - bitpos);
         mask = (1 << bitlen) - 1;
 
         buf[bytepos] &= ~(((~0UL >> result_len) & mask) << bitpos);

@@ -331,7 +331,7 @@ static void __spi_request_transfer(vsf_hw_spi_t *hw_spi_ptr)
 
     VSF_HAL_ASSERT(hw_spi_ptr->request.count > hw_spi_ptr->request.recv.offset);
 
-    uint32_t count = min(hw_spi_ptr->request.count - hw_spi_ptr->request.recv.offset,
+    uint32_t count = vsf_min(hw_spi_ptr->request.count - hw_spi_ptr->request.recv.offset,
                          VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX);
     uint32_t byte_cnt = SPI_DATASIZE_TO_BYTE(reg->CR[0]);
 
@@ -378,7 +378,7 @@ static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask)
         const int ch = spi_const->request.recv.channel;
         dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
 
-        hw_spi_ptr->request.recv.offset = min(hw_spi_ptr->request.recv.offset + VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX,
+        hw_spi_ptr->request.recv.offset = vsf_min(hw_spi_ptr->request.recv.offset + VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX,
                                               hw_spi_ptr->request.count);
         VSF_HAL_ASSERT(hw_spi_ptr->request.count >= hw_spi_ptr->request.recv.offset);
 
@@ -397,7 +397,7 @@ static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask)
         const int ch = spi_const->request.send.channel;
         dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
 
-         hw_spi_ptr->request.send.offset = min(hw_spi_ptr->request.send.offset + VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX,
+         hw_spi_ptr->request.send.offset = vsf_min(hw_spi_ptr->request.send.offset + VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX,
                                                hw_spi_ptr->request.count);
         if (hw_spi_ptr->request.count == hw_spi_ptr->request.send.offset) {
             cb_irq_mask = SPI_IRQ_MASK_TX_CPL;

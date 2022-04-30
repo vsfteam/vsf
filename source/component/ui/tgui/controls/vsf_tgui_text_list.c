@@ -372,8 +372,8 @@ fsm_rt_t vk_tgui_text_list_update(vsf_tgui_text_list_t* ptTextList)
     if (__is_auto_size) {
         /*! text list doesn't support autosize, let's fix this */
         ptTextList->ContainerAttribute.bIsAutoSize = false;
-        ptTextList->iHeight = max(ptTextList->tList.tContent.iHeight, ptTextList->iHeight);
-        ptTextList->iWidth = max(ptTextList->tList.iWidth, ptTextList->iWidth);
+        ptTextList->iHeight = vsf_max(ptTextList->tList.tContent.iHeight, ptTextList->iHeight);
+        ptTextList->iWidth = vsf_max(ptTextList->tList.iWidth, ptTextList->iWidth);
     } else {
         if (0 == ptTextList->iHeight) {
             
@@ -387,10 +387,10 @@ fsm_rt_t vk_tgui_text_list_update(vsf_tgui_text_list_t* ptTextList)
         #endif
             int16_t __line_height = __char_height + ptTextList->tList.tContent.tLabel.chInterLineSpace;
 
-            ptTextList->iHeight = max(__char_height, __line_height);
+            ptTextList->iHeight = vsf_max(__char_height, __line_height);
         }  
         if (0 == ptTextList->iWidth) {
-            ptTextList->iWidth = max(ptTextList->tList.iWidth, ptTextList->iWidth);
+            ptTextList->iWidth = vsf_max(ptTextList->tList.iWidth, ptTextList->iWidth);
         }
     }
 

@@ -87,11 +87,11 @@ bool vsf_tgui_region_intersect( vsf_tgui_region_t* ptRegionOut,
         tLocationIn1End.iX = ptRegionIn1->tLocation.iX + ptRegionIn1->tSize.iWidth - 1;
         tLocationIn1End.iY = ptRegionIn1->tLocation.iY + ptRegionIn1->tSize.iHeight - 1;
 
-        tLocationOutStart.iX = max(ptRegionIn0->tLocation.iX, ptRegionIn1->tLocation.iX);
-        tLocationOutStart.iY = max(ptRegionIn0->tLocation.iY, ptRegionIn1->tLocation.iY);
+        tLocationOutStart.iX = vsf_max(ptRegionIn0->tLocation.iX, ptRegionIn1->tLocation.iX);
+        tLocationOutStart.iY = vsf_max(ptRegionIn0->tLocation.iY, ptRegionIn1->tLocation.iY);
 
-        tLocationOutEnd.iX = min(tLocationIn0End.iX, tLocationIn1End.iX);
-        tLocationOutEnd.iY = min(tLocationIn0End.iY, tLocationIn1End.iY);
+        tLocationOutEnd.iX = vsf_min(tLocationIn0End.iX, tLocationIn1End.iX);
+        tLocationOutEnd.iY = vsf_min(tLocationIn0End.iY, tLocationIn1End.iY);
 
         if ((tLocationOutStart.iX > tLocationOutEnd.iX) || (tLocationOutStart.iY > tLocationOutEnd.iY)) {
             return false;

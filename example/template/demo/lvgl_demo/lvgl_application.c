@@ -392,7 +392,7 @@ void lvgl_application(uint_fast8_t gamepad_num)
     screen = lv_scr_act();
     margin_x = lv_obj_get_width(screen) / 30;
     margin_y = lv_obj_get_height(screen) / (16 * gamepad_num);
-    margin = min(margin_x, margin_y);
+    margin = vsf_min(margin_x, margin_y);
     top_margin = (lv_obj_get_height(screen) - 16 * gamepad_num * margin) / 2;
 
     for (uint_fast8_t i = 0; i < gamepad_num; i++) {

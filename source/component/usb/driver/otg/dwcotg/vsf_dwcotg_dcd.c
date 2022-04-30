@@ -404,7 +404,7 @@ static void __vk_dwcotg_dcd_ep_write(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t e
         uint32_t data;
         bool fifo_en = remain_size > size;
 
-        size = min(size, remain_size);
+        size = vsf_min(size, remain_size);
         if (size > 0) {
             VSF_USB_ASSERT(buffer != NULL);
         }
@@ -477,7 +477,7 @@ static vsf_err_t __vk_dwcotg_dcd_ep_out_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, ui
     } else {
         max_size = (1 << 19) - 1;
     }
-    size = min(size, max_size);
+    size = vsf_min(size, max_size);
     if (size < trans->remain) {
         size &= ~(ep_size - 1);
     }
@@ -543,7 +543,7 @@ static vsf_err_t __vk_dwcotg_dcd_ep_in_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, uin
     } else {
         max_size = (1 << 19) - 1;
     }
-    size = min(size, max_size);
+    size = vsf_min(size, max_size);
     if (size < trans->remain) {
         size &= ~(ep_size - 1);
     }

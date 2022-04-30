@@ -41,7 +41,7 @@ static uint8_t __control = 0;
 
 #if APP_USE_VSFVM_DEMO == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-static const char __test_dart[] = STR(
+static const char __test_dart[] = VSF_STR(
 var i = 0;
 
 thread1(cnt) {
@@ -62,7 +62,7 @@ while (i < 2) {
 }
 );
 #   else
-static const char __test_dart[] = STR(
+static const char __test_dart[] = VSF_STR(
 var i = 0;
 
 thread1(cnt) {
@@ -84,7 +84,7 @@ while (i < 2) {
 #endif
 
 #if APP_USE_EVM_DEMO == ENABLED
-static const char __evm_main_js[] = STR(
+static const char __evm_main_js[] = VSF_STR(
   print('hello,evm')
 );
 static vk_fakefat32_file_t __evm_root[3] = {
@@ -128,7 +128,7 @@ static vk_fakefat32_file_t __fakefat32_font[3] = {
 #endif
 
 #if APP_USE_LINUX_DEMO == ENABLED && APP_USE_LINUX_HTTPD_DEMO == ENABLED
-const char __webroot_index_html[] = STR(
+const char __webroot_index_html[] = VSF_STR(
 <html>
   <head>
     <title>

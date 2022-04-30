@@ -214,7 +214,7 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t font_index,
         ) {
             if (char_u32 == '\n') {
         #if VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT == ENABLED
-                tSize.iWidth = max(tSize.iWidth, width);
+                tSize.iWidth = vsf_max(tSize.iWidth, width);
                 width = 0;
                 hwLineCount++;
         #endif
@@ -231,7 +231,7 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t font_index,
             }
         }
 
-        tSize.iWidth = max(tSize.iWidth, width);
+        tSize.iWidth = vsf_max(tSize.iWidth, width);
         tSize.iHeight = hwLineCount * (font_height + inter_line_space) + font_height;
         VSF_TGUI_ASSERT(tSize.iHeight > 0);
         hwLineCount++;

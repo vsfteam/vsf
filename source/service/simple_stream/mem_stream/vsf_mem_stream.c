@@ -129,7 +129,7 @@ static uint_fast32_t __vsf_mem_stream_get_wbuf(vsf_stream_t *stream, uint8_t **p
         *ptr = p;
         mem_stream->is_writing = true;
     }
-    return min(wlen, avail_len);
+    return vsf_min(wlen, avail_len);
 }
 
 static uint_fast32_t __vsf_mem_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
@@ -143,14 +143,14 @@ static uint_fast32_t __vsf_mem_stream_get_rbuf(vsf_stream_t *stream, uint8_t **p
     if (ptr != NULL) {
         *ptr = p;
     }
-    return min(rlen, data_len);
+    return vsf_min(rlen, data_len);
 }
 
 static uint_fast32_t __vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     uint_fast32_t avail_len = __vsf_mem_stream_get_avail_length(stream);
-    uint_fast32_t wsize = min(avail_len, size);
+    uint_fast32_t wsize = vsf_min(avail_len, size);
 
     VSF_SERVICE_ASSERT(!(mem_stream->wpos & mem_stream->align));
     mem_stream->is_writing = true;
@@ -158,7 +158,7 @@ static uint_fast32_t __vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, 
         uint_fast32_t totalsize = wsize;
         uint_fast32_t curlen = mem_stream->use_as__vsf_mem_t.size - mem_stream->wpos;
 
-        curlen = min(totalsize, curlen);
+        curlen = vsf_min(totalsize, curlen);
         memcpy(mem_stream->use_as__vsf_mem_t.buffer + mem_stream->wpos, buf, curlen);
         totalsize -= curlen;
         buf += curlen;
@@ -180,7 +180,7 @@ static uint_fast32_t __vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, u
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     uint_fast32_t data_len = __vsf_mem_stream_get_data_length(stream);
-    uint_fast32_t rsize = min(data_len, size);
+    uint_fast32_t rsize = vsf_min(data_len, size);
 
     VSF_SERVICE_ASSERT(!(mem_stream->rpos & mem_stream->align));
     if (size < data_len) {
@@ -190,7 +190,7 @@ static uint_fast32_t __vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, u
         uint_fast32_t totalsize = rsize;
         uint_fast32_t curlen = mem_stream->use_as__vsf_mem_t.size - mem_stream->rpos;
 
-        curlen = min(totalsize, curlen);
+        curlen = vsf_min(totalsize, curlen);
         memcpy(buf, mem_stream->use_as__vsf_mem_t.buffer + mem_stream->rpos, curlen);
         totalsize -= curlen;
         buf += curlen;

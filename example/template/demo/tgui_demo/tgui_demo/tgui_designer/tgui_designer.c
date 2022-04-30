@@ -234,8 +234,8 @@ static int __label_update_int_value(tgui_designer_int_label_t* label_ptr, int ne
     char name[128];
     strcpy(name, vsf_tgui_control_get_var_name((vsf_tgui_control_t*)label_ptr));
 
-    new_value = max(label_ptr->min_value, new_value);
-    new_value = min(label_ptr->max_value, new_value);
+    new_value = vsf_max(label_ptr->min_value, new_value);
+    new_value = vsf_min(label_ptr->max_value, new_value);
     label_ptr->cur_value = new_value;
 
     snprintf(label_ptr->buffer, sizeof(label_ptr->buffer), "%s:%d", name, new_value);

@@ -525,7 +525,7 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
     VSF_KERNEL_ASSERT(VSF_ERR_NONE == err);
     if ((uintptr_t)NULL != local_buff) {
         //! initialise local
-        size_t size = min(state.local_size, local_buff_size);
+        size_t size = vsf_min(state.local_size, local_buff_size);
         if (size > 0) {
             uintptr_t local = vsf_eda_get_local();
             memcpy((void *)local, (void *)local_buff, size);
@@ -551,7 +551,7 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
         VSF_KERNEL_ASSERT(VSF_ERR_NONE == err);
         if ((uintptr_t)NULL != local_buff) {
             //! initialise local
-            size_t size = min(state.local_size, local_buff_size);
+            size_t size = vsf_min(state.local_size, local_buff_size);
             if (size > 0) {
                 uintptr_t local = vsf_eda_get_local();
                 memcpy((void *)local, (void *)local_buff, size);
