@@ -1205,6 +1205,7 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
 /*----------------------------------------------------------------------------*
  * dummy WinMain, Just make some compiler happy                               *
  *----------------------------------------------------------------------------*/
+WEAK(WinMain)
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     return 0;
