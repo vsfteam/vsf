@@ -160,7 +160,7 @@ static inline int sign(int x)
     return ((int)((int)((int)(x) > 0) - (int)((int)(x) < 0)));
 }
 
-#define vsf_abs(__num)                      (((__num) < 0) ? (-(__num) : (__num))
+#define vsf_abs(__num)                      (((__num) < 0) ? (-(__num)) : (__num))
 
 #define VSF_BIT(__N)                        (1UL << (__N))
 #define VSF_BITMASK(__N)                    (VSF_BIT(__N) - 1)
