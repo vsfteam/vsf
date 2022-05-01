@@ -155,7 +155,7 @@ typedef enum {
         (__ptr ? container_of(__ptr, __type, __member) : NULL)
 #endif
 
-static inline int sign(int x)
+static inline int vsf_sign(int x)
 {
     return ((int)((int)((int)(x) > 0) - (int)((int)(x) < 0)));
 }
@@ -172,6 +172,7 @@ static inline int sign(int x)
 #   define max                              vsf_max
 #   define __STR                            __VSF_STR
 #   define STR                              VSF_STR
+#   define sign                             vsf_sign
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
