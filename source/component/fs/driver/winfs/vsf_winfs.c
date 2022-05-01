@@ -182,11 +182,15 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
     } else {
         if (INVALID_HANDLE_VALUE == dir->d.hFind) {
             __vk_winfs_prepare_find(dir, &FindFileData);
-            VSF_FS_ASSERT(dir->d.hFind != INVALID_HANDLE_VALUE);
+            if (INVALID_HANDLE_VALUE == dir->d.hFind) {
+                goto return_not_available;
+            }
         } else if (!FindNextFileW(dir->d.hFind, &FindFileData)) {
         return_not_available:
-            FindClose(dir->d.hFind);
-            dir->d.hFind = INVALID_HANDLE_VALUE;
+            if (dir->d.hFind != INVALID_HANDLE_VALUE) {
+                FindClose(dir->d.hFind);
+                dir->d.hFind = INVALID_HANDLE_VALUE;
+            }
             dir->pos = 0;
 
             err = VSF_ERR_NOT_AVAILABLE;
