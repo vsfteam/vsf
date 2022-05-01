@@ -78,11 +78,13 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
 #define __optimal_bit_sz    (sizeof(uintalu_t) * 8)
 #define __optimal_bit_msk   (__optimal_bit_sz - 1)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
 typedef uint_fast8_t        uintalu_t;
 typedef int_fast8_t         intalu_t;
 
@@ -95,6 +97,8 @@ typedef int_fast8_t         intalu_t;
 #endif
 
 #endif // __APP_TYPE_H_INCLUDED__
+
+#ifndef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
 
 /*============================ Multiple-Entry ================================*/
 #include "../__common/__type.h"
@@ -151,3 +155,4 @@ extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO)
 
 #endif      // __IS_COMPILER_XXX__
+#endif      // __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__

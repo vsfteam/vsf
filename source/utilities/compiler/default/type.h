@@ -56,4 +56,7 @@ typedef int32_t                 intalu_t;
 #endif // __APP_TYPE_H_INCLUDED__
 
 /*============================ Multiple-Entry ================================*/
-#include "../__common/__type.h"
+
+#ifndef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
+#   include "../__common/__type.h"
+#endif

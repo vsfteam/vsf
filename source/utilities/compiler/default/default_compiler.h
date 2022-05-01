@@ -51,9 +51,7 @@
 
 /*========================== Multiple-Entry Start ============================*/
 
-#ifndef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
-#   include "./type.h"
-#endif
+#include "./type.h"
 #include "../__common/__compiler.h"
 
 /*========================== Multiple-Entry End ==============================*/

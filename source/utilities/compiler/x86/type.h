@@ -91,8 +91,11 @@ typedef int64_t             intalu_t;
 
 #endif // __APP_TYPE_H_INCLUDED__
 
+#ifndef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
+
 /*============================ Multiple-Entry ================================*/
-#include "../__common/__type.h"
+
+#   include "../__common/__type.h"
 
 /*============================ Library Patch  ================================*/
 
@@ -141,3 +144,5 @@ extern int nanosleep(const struct timespec *requested_time, struct timespec *rem
 #ifdef __cplusplus
 }
 #endif
+
+#endif      // __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__

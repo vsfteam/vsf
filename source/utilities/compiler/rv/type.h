@@ -95,4 +95,7 @@ typedef int_fast8_t         intalu_t;
 
 
 /*============================ Multiple-Entry ================================*/
-#include "../__common/__type.h"
+
+#ifndef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
+#   include "../__common/__type.h"
+#endif
