@@ -17,7 +17,6 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_FS_INHERIT
 #include "vsf.h"
 
 #if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED && USRAPP_CFG_FAKEFAT32 == ENABLED
