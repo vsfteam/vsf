@@ -66,7 +66,7 @@ typedef enum {
 #   include <stdbool.h>
 #endif
 
-#if !__IS_COMPILER_GCC__ && !defined(__VSF_HEADER_ONLY_SHOW_COMPILER_INFO__)
+#if !__IS_COMPILER_GCC__
 #   include <uchar.h>
 #endif
 
@@ -95,7 +95,4 @@ typedef int_fast8_t         intalu_t;
 
 
 /*============================ Multiple-Entry ================================*/
-
-#ifndef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
-#   include "../__common/__type.h"
-#endif
+#include "../__common/__type.h"

@@ -111,7 +111,7 @@ typedef enum {
 #   include <stdbool.h>
 #endif
 
-#if !__IS_COMPILER_GCC__ && !defined(__VSF_HEADER_ONLY_SHOW_COMPILER_INFO__)
+#if !__IS_COMPILER_GCC__
 #   include <uchar.h>
 #endif
 
@@ -120,12 +120,10 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
 #define __optimal_bit_sz        (sizeof(uintalu_t) * 8)
 #define __optimal_bit_msk       (__optimal_bit_sz - 1)
 
 /*============================ TYPE DEFINE ===================================*/
-
 typedef uint_fast8_t        uintalu_t;
 typedef int_fast8_t         intalu_t; 
 
@@ -141,7 +139,4 @@ typedef int_fast8_t         intalu_t;
 
 
 /*============================ Multiple-Entry ================================*/
-
-#ifndef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
-#   include "../__common/__type.h"
-#endif
+#include "../__common/__type.h"

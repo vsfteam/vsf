@@ -57,7 +57,7 @@ typedef enum {
 #include <stdbool.h>
 #endif
 
-#if !__IS_COMPILER_GCC__ && !defined(__VSF_HEADER_ONLY_SHOW_COMPILER_INFO__)
+#if !__IS_COMPILER_GCC__
 #   include <uchar.h>
 #endif
 
@@ -81,6 +81,14 @@ typedef uint64_t            uintalu_t;
 typedef int64_t             intalu_t;
 #endif
 
+// define max_align_t if simple_libc in vsf linux is enabled
+//  because stddef.h in simple libc can now see uintalu_t(to avoid circular dependency)
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+typedef struct {
+    uintalu_t __max_align_uintalu[2];
+} max_align_t;
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -91,11 +99,8 @@ typedef int64_t             intalu_t;
 
 #endif // __APP_TYPE_H_INCLUDED__
 
-#ifndef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
-
 /*============================ Multiple-Entry ================================*/
-
-#   include "../__common/__type.h"
+#include "../__common/__type.h"
 
 /*============================ Library Patch  ================================*/
 
@@ -144,5 +149,3 @@ extern int nanosleep(const struct timespec *requested_time, struct timespec *rem
 #ifdef __cplusplus
 }
 #endif
-
-#endif      // __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
