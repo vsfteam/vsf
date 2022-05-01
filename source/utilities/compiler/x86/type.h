@@ -82,11 +82,18 @@ typedef int64_t             intalu_t;
 #endif
 
 // define max_align_t if simple_libc in vsf linux is enabled
-//  because stddef.h in simple libc can now see uintalu_t(to avoid circular dependency)
+//  because stddef.h in simple libc cannot see uintalu_t(to avoid circular dependency)
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+// make sure max_align_t is not defined
+#   if  (__IS_COMPILER_GCC__ && defined(_GCC_MAX_ALIGN_T))
+    ||  (__IS_COMPILER_LLVM__ && defined(__CLANG_MAX_ALIGN_T_DEFINED))
+#   else
+// note that the max_align_t is maybe not the same as in compiler libc
+// TODO: should define max_align_t to long double?
 typedef struct {
     uintalu_t __max_align_uintalu[2];
 } max_align_t;
+#   endif
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
