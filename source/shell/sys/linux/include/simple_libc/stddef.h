@@ -49,6 +49,10 @@ extern "C" {
 
 #define offsetof(__type, __member)  (uintptr_t)(&(((__type *)0)->__member))
 
+typedef struct {
+    uintalu_t __max_align_uintalu[2];
+} max_align_t;
+
 #ifndef __WIN__
 
 #   if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
