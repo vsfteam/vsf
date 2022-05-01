@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#if !__IS_COMPILER_GCC__
+#if !__IS_COMPILER_GCC__ && !defined(__VSF_HEADER_ONLY_SHOW_COMPILER_INFO__)
 #   include <uchar.h>
 #endif
 
