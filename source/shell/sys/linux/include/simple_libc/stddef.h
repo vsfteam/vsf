@@ -49,6 +49,30 @@ extern "C" {
 
 #define offsetof(__type, __member)  (uintptr_t)(&(((__type *)0)->__member))
 
+// define max_align_t, can not depend on uintalu_t because of circular depoendency
+#if     __IS_COMPILER_GCC__
+typedef struct {
+  long long __clang_max_align_nonce1
+      __attribute__((__aligned__(__alignof__(long long))));
+  long double __clang_max_align_nonce2
+      __attribute__((__aligned__(__alignof__(long double))));
+} max_align_t;
+#elif   __IS_COMPILER_LLVM__
+#   if      defined(__WIN__)
+typedef long double max_align_t;
+#   elif    defined(__APPLE__)
+typedef long double max_align_t;
+#   else
+typedef struct {
+  long long __clang_max_align_nonce1
+      __attribute__((__aligned__(__alignof__(long long))));
+  long double __clang_max_align_nonce2
+      __attribute__((__aligned__(__alignof__(long double))));
+} max_align_t;
+#   endif
+#else
+#endif
+
 #ifndef __WIN__
 
 #   if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
