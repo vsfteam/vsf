@@ -224,6 +224,81 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 #define vsf_protect(__type)                 __vsf_protect(__type)
 #define vsf_unprotect(__type)               __vsf_unprotect(__type)
 
+
+
+// host invoke
+#define vsf_arch_host_invoke_ctx_t(__name)  VSF_MCONNECT(__name, _ctx_t)
+#define declare_vsf_arch_host_invoke(__name)                                    \
+        typedef struct vsf_arch_host_invoke_ctx_t(__name)                       \
+                vsf_arch_host_invoke_ctx_t(__name);                             \
+        typedef struct VSF_MCONNECT(__name, _t) VSF_MCONNECT(__name, _t);       \
+        extern void VSF_MCONNECT(__name, _callback_t)                           \
+                (vsf_arch_host_invoke_ctx_t(__name) *ctx);                      \
+        extern VSF_MCONNECT(__name, _t) VSF_MCONNECT(__name, _instance);
+#define dcl_vsf_arch_host_invoke        declare_vsf_arch_host_invoke
+#define define_vsf_arch_host_invoke(__name, ...)                                \
+        typedef struct vsf_arch_host_invoke_ctx_t(__name) {                     \
+            int __dummy;                                                        \
+            __VA_ARGS__                                                         \
+        } vsf_arch_host_invoke_ctx_t(__name);                                   \
+        typedef struct VSF_MCONNECT(__name, _t) {                               \
+            implement(vsf_arch_irq_thread_t);                                   \
+            vsf_arch_irq_request_t request;                                     \
+            vsf_eda_t *caller;                                                  \
+            vsf_arch_host_invoke_ctx_t(__name) ctx;                             \
+        } VSF_MCONNECT(__name, _t);
+#define def_vsf_arch_host_invoke        define_vsf_arch_host_invoke
+#define implement_vsf_arch_host_invoke(__name)                                  \
+        VSF_MCONNECT(__name, _t) VSF_MCONNECT(__name, _instance);               \
+        extern void VSF_MCONNECT(__name, _callback_t)                           \
+                (vsf_arch_host_invoke_ctx_t(__name) *ctx);                      \
+        static void VSF_MCONNECT(__name, _thread)(void *arg)                    \
+        {                                                                       \
+            vsf_eda_t *caller;                                                  \
+            VSF_MCONNECT(__name, _t) *ctx = arg;                                \
+            __vsf_arch_irq_set_background(&ctx->use_as__vsf_arch_irq_thread_t); \
+            while (1) {                                                         \
+                __vsf_arch_irq_request_pend(&ctx->request);                     \
+                VSF_MCONNECT(__name, _callback_t)(&ctx->ctx);                   \
+                                                                                \
+                __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);      \
+                    caller = ctx->caller;                                       \
+                    if (caller != NULL) {                                       \
+                        ctx->caller = NULL;                                     \
+                        vsf_eda_post_evt(caller, VSF_EVT_USER);                 \
+                    }                                                           \
+                __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false); \
+            }                                                                   \
+        }                                                                       \
+        void VSF_MCONNECT(__name, _callback_t)(vsf_arch_host_invoke_ctx_t(__name) *_)
+#define imp_vsf_arch_host_invoke        implement_vsf_arch_host_invoke
+#define initialize_vsf_arch_host_invoke(__name, __priority)                     \
+        do {                                                                    \
+            memset(&VSF_MCONNECT(__name, _instance), 0,                         \
+                    sizeof(VSF_MCONNECT(__name, _t)));                          \
+            __vsf_arch_irq_request_init(&VSF_MCONNECT(__name, _instance).request);\
+            __vsf_arch_irq_init(                                                \
+                    &VSF_MCONNECT(__name, _instance).use_as__vsf_arch_irq_thread_t,\
+                    VSF_STR(__name), VSF_MCONNECT(__name, _thread), (__priority));\
+        } while (0)
+#define init_vsf_arch_host_invoke       initialize_vsf_arch_host_invoke
+#define vsf_arch_host_invoke_nb(__name, __eda_ptr, __ctx_ptr)                   \
+        do {                                                                    \
+            VSF_MCONNECT(__name, _instance).ctx = *(__ctx_ptr);                 \
+            VSF_MCONNECT(__name, _instance).caller = (__eda_ptr);               \
+            __vsf_arch_irq_request_send(&VSF_MCONNECT(__name, _instance).request);\
+        } while (0)
+#define vsf_arch_host_invoke_get_result_nb(__name, __ctx_ptr)                   \
+        do {                                                                    \
+            *(__ctx_ptr) = VSF_MCONNECT(__name, _instance).ctx;                 \
+        } while (0)
+#define vsf_arch_host_invoke_in_thread(__name, __ctx_ptr)                       \
+        do {                                                                    \
+            vsf_arch_host_invoke_nb(__name, vsf_eda_get_cur(), (__ctx_ptr));    \
+            vsf_thread_wfe(VSF_EVT_USER);                                       \
+            vsf_arch_host_invoke_get_result_nb(__name, __ctx_ptr);              \
+        } while (0)
+
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef VSF_ARCH_PROVIDE_HEAP
