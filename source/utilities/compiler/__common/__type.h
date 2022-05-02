@@ -166,6 +166,9 @@ static inline int vsf_sign(int x)
 #define VSF_BITMASK(__N)                    (VSF_BIT(__N) - 1)
 #define VSF_UNUSED_PARAM(__VAL)             (__VAL) = (__VAL)
 
+#define VSF_STATIC_ASSERT(__COND)                                               \
+            typedef int VSF_MACRO_SAFE_NAME(STATIC_ASSERT)[(__COND) * 2 - 1]
+
 // will be removed later
 #ifdef __VSF_COMPAT__
 #   define min                              vsf_min
