@@ -40,6 +40,9 @@ extern "C" {
 #define SDL_GetKeyboardState            VSF_SDL_WRAPPER(SDL_GetKeyboardState)
 #endif
 
+#define SDL_StartTextInput()
+#define SDL_StopTextInput()
+
 /*============================ TYPES =========================================*/
 
 typedef struct SDL_Keysym {

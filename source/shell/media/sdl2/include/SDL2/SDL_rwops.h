@@ -43,6 +43,21 @@ extern "C" {
 #define SDL_RWtell                      VSF_SDL_WRAPPER(SDL_RWtell)
 #define SDL_RWread                      VSF_SDL_WRAPPER(SDL_RWread)
 #define SDL_RWwrite                     VSF_SDL_WRAPPER(SDL_RWwrite)
+
+#define SDL_ReadU8                      VSF_SDL_WRAPPER(SDL_ReadU8)
+#define SDL_ReadLE16                    VSF_SDL_WRAPPER(SDL_ReadLE16)
+#define SDL_ReadBE16                    VSF_SDL_WRAPPER(SDL_ReadBE16)
+#define SDL_ReadLE32                    VSF_SDL_WRAPPER(SDL_ReadLE32)
+#define SDL_ReadBE32                    VSF_SDL_WRAPPER(SDL_ReadBE32)
+#define SDL_ReadLE64                    VSF_SDL_WRAPPER(SDL_ReadLE64)
+#define SDL_ReadBE64                    VSF_SDL_WRAPPER(SDL_ReadBE64)
+#define SDL_WriteU8                     VSF_SDL_WRAPPER(SDL_WriteU8)
+#define SDL_WriteLE16                   VSF_SDL_WRAPPER(SDL_WriteLE16)
+#define SDL_WriteBE16                   VSF_SDL_WRAPPER(SDL_WriteBE16)
+#define SDL_WriteLE32                   VSF_SDL_WRAPPER(SDL_WriteLE32)
+#define SDL_WriteBE32                   VSF_SDL_WRAPPER(SDL_WriteBE32)
+#define SDL_WriteLE64                   VSF_SDL_WRAPPER(SDL_WriteLE64)
+#define SDL_WriteBE64                   VSF_SDL_WRAPPER(SDL_WriteBE64)
 #endif
 
 /*============================ TYPES =========================================*/
@@ -65,6 +80,21 @@ extern int64_t SDL_RWseek(SDL_RWops * context, int64_t offset, int whence);
 extern int64_t SDL_RWtell(SDL_RWops * context);
 extern size_t SDL_RWread(SDL_RWops * context, void * ptr, size_t size, size_t maxnum);
 extern size_t SDL_RWwrite(SDL_RWops * context, const void * ptr, size_t size, size_t num);
+
+extern uint8_t SDL_ReadU8(SDL_RWops * context);
+extern uint16_t SDL_ReadLE16(SDL_RWops * context);
+extern uint16_t SDL_ReadBE16(SDL_RWops * context);
+extern uint32_t SDL_ReadLE32(SDL_RWops * context);
+extern uint32_t SDL_ReadBE32(SDL_RWops * context);
+extern uint64_t SDL_ReadLE64(SDL_RWops * context);
+extern uint64_t SDL_ReadBE64(SDL_RWops * context);
+extern uint8_t SDL_WriteU8(SDL_RWops * context, uint8_t value);
+extern uint16_t SDL_WriteLE16(SDL_RWops * context, uint16_t value);
+extern uint16_t SDL_WriteBE16(SDL_RWops * context, uint16_t value);
+extern uint32_t SDL_WriteLE32(SDL_RWops * context, uint32_t value);
+extern uint32_t SDL_WriteBE32(SDL_RWops * context, uint32_t value);
+extern uint64_t SDL_WriteLE64(SDL_RWops * context, uint64_t value);
+extern uint64_t SDL_WriteBE64(SDL_RWops * context, uint64_t value);
 
 #ifdef __cplusplus
 }

@@ -52,6 +52,26 @@ struct {
         },
     },
     {
+        .color              = SDL_PIXELFORMAT_ABGR8888,
+        .format             = {
+            .format         = SDL_PIXELFORMAT_ABGR8888,
+            .BitsPerPixel   = 32,
+            .BytesPerPixel  = 4,
+            .Rmask          = 0x000000FF,
+            .Gmask          = 0x0000FF00,
+            .Bmask          = 0x00FF0000,
+            .Amask          = 0xFF000000,
+            .Rshift         = 16,
+            .Gshift         = 8,
+            .Bshift         = 0,
+            .Ashift         = 24,
+            .Rloss          = 0,
+            .Gloss          = 0,
+            .Bloss          = 0,
+            .Aloss          = 0,
+        },
+    },
+    {
         .color              = SDL_PIXELFORMAT_RGBA8888,
         .format             = {
             .format         = SDL_PIXELFORMAT_RGBA8888,

@@ -36,7 +36,7 @@ extern "C" {
 
 #define SDL_MAJOR_VERSION                   2
 #define SDL_MINOR_VERSION                   0
-#define SDL_PATCHLEVEL                      0
+#define SDL_PATCHLEVEL                      7
 
 #define SDL_VERSIONNUM(__X, __Y, __Z)       ((__X) * 1000 + (__Y) * 100 + (__Z))
 #define SDL_COMPILEDVERSION                                                     \

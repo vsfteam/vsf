@@ -33,15 +33,26 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#define SDL_MIX_MAXVOLUME                   128
+
+#define SDL_AUDIO_ALLOW_FREQUENCY_CHANGE    0x00000001
+#define SDL_AUDIO_ALLOW_FORMAT_CHANGE       0x00000002
+#define SDL_AUDIO_ALLOW_CHANNELS_CHANGE     0x00000004
+#define SDL_AUDIO_ALLOW_SAMPLES_CHANGE      0x00000008
+#define SDL_AUDIO_ALLOW_ANY_CHANGE          (SDL_AUDIO_ALLOW_FREQUENCY_CHANGE   \
+        | SDL_AUDIO_ALLOW_FORMAT_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE       \
+        | SDL_AUDIO_ALLOW_SAMPLES_CHANGE)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SDL_CFG_WRAPPER == ENABLED
-#define SDL_OpenAudio                   VSF_SDL_WRAPPER(SDL_OpenAudio)
-#define SDL_PauseAudio                  VSF_SDL_WRAPPER(SDL_PauseAudio)
-#define SDL_GetAudioStatus              VSF_SDL_WRAPPER(SDL_GetAudioStatus)
-#define SDL_CloseAudio                  VSF_SDL_WRAPPER(SDL_CloseAudio)
-#define SDL_LockAudio                   VSF_SDL_WRAPPER(SDL_LockAudio)
-#define SDL_UnlockAudio                 VSF_SDL_WRAPPER(SDL_UnlockAudio)
+#define SDL_OpenAudio                       VSF_SDL_WRAPPER(SDL_OpenAudio)
+#define SDL_PauseAudio                      VSF_SDL_WRAPPER(SDL_PauseAudio)
+#define SDL_GetAudioStatus                  VSF_SDL_WRAPPER(SDL_GetAudioStatus)
+#define SDL_CloseAudio                      VSF_SDL_WRAPPER(SDL_CloseAudio)
+#define SDL_LockAudio                       VSF_SDL_WRAPPER(SDL_LockAudio)
+#define SDL_UnlockAudio                     VSF_SDL_WRAPPER(SDL_UnlockAudio)
 #endif
 
 /*============================ TYPES =========================================*/
@@ -107,6 +118,18 @@ typedef struct SDL_AudioSpec {
     SDL_AudioCallback callback;
     void * userdata;
 } SDL_AudioSpec;
+
+typedef uintptr_t SDL_AudioDeviceID;
+
+typedef struct SDL_AudioCVT {
+    int needed;
+    SDL_AudioFormat src_format;
+    SDL_AudioFormat dst_format;
+    uint8_t *buf;
+    int len;
+    int len_cvt;
+    int len_mult;
+} SDL_AudioCVT;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

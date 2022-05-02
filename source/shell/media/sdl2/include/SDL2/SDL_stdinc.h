@@ -30,6 +30,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#include "SDL_error.h"
 #include "begin_code.h"
 
 #ifdef __cplusplus
@@ -47,10 +48,11 @@ extern "C" {
 #define SDL_malloc                          malloc
 #define SDL_realloc                         realloc
 #define SDL_calloc                          calloc
+#define SDL_memcmp                          memcmp
+#define SDL_atoi                            atoi
 
 #define SDL_stack_alloc(__type, __count)    (__type*)SDL_malloc(sizeof(__type) * (__count))
 #define SDL_stack_free(__data)              SDL_free(__data)
-#define SDL_OutOfMemory()
 
 #define SDL_min                             vsf_min
 #define SDL_max                             vsf_max
@@ -64,6 +66,17 @@ extern "C" {
 #define SDL_strlcpy                         strlcpy
 #define SDL_strrchr                         strrchr
 #define SDL_strchr                          strchr
+#define SDL_strdup                          strdup
+#define SDL_vsnprintf                       vsnprintf
+#define SDL_strtol                          strtol
+#define SDL_strtoll                         strtoll
+#define SDL_strtoul                         strtoul
+#define SDL_strtoull                        strtoull
+#define SDL_strtof                          strtof
+#define SDL_strtod                          strtod
+#define SDL_itoa                            itoa
+#define SDL_atoi                            atoi
+#define SDL_atof                            atof
 
 // ctype
 #define SDL_toupper                         toupper
@@ -72,6 +85,8 @@ extern "C" {
 #define SDL_ceil                            ceil
 #define SDL_ceilf                           ceilf
 #define SDL_ceill                           ceill
+
+#define SDL_getenv                          getenv
 
 #define SDL_COMPILE_TIME_ASSERT(__N, __X)   VSF_STATIC_ASSERT(__X)
 

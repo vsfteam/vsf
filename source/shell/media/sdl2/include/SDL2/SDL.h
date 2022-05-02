@@ -32,10 +32,6 @@
 #   define VSF_SDL_CFG_V1_COMPATIBLE    ENABLED
 #endif
 
-#define DECLSPEC
-#define SDLCALL
-#define SDL_INLINE                      INLINE
-
 /*============================ INCLUDES ======================================*/
 
 #include "SDL_cpuinfo.h"
@@ -48,6 +44,7 @@
 #include "SDL_mutex.h"
 #include "SDL_thread.h"
 #include "SDL_timer.h"
+#include "SDL_error.h"
 
 #include "SDL_events.h"
 #include "SDL_keyboard.h"
@@ -117,9 +114,11 @@ extern "C" {
 #define SDL_DestroyRenderer             VSF_SDL_WRAPPER(SDL_DestroyRenderer)
 #define SDL_RenderClear                 VSF_SDL_WRAPPER(SDL_RenderClear)
 #define SDL_RenderCopy                  VSF_SDL_WRAPPER(SDL_RenderCopy)
+#define SDL_RenderCopyEx                VSF_SDL_WRAPPER(SDL_RenderCopyEx)
 #define SDL_RenderPresent               VSF_SDL_WRAPPER(SDL_RenderPresent)
 #define SDL_SetRenderDrawColor          VSF_SDL_WRAPPER(SDL_SetRenderDrawColor)
 #define SDL_RenderDrawPoint             VSF_SDL_WRAPPER(SDL_RenderDrawPoint)
+#define SDL_RenderDrawRect              VSF_SDL_WRAPPER(SDL_RenderDrawRect)
 #define SDL_RenderGetScale              VSF_SDL_WRAPPER(SDL_RenderGetScale)
 #define SDL_RenderSetScale              VSF_SDL_WRAPPER(SDL_RenderSetScale)
 #define SDL_RenderGetLogicalSize        VSF_SDL_WRAPPER(SDL_RenderGetLogicalSize)
@@ -128,6 +127,9 @@ extern "C" {
 #define SDL_RenderSetViewport           VSF_SDL_WRAPPER(SDL_RenderSetViewport)
 #define SDL_SetRenderTarget             VSF_SDL_WRAPPER(SDL_SetRenderTarget)
 #define SDL_GetRenderTarget             VSF_SDL_WRAPPER(SDL_GetRenderTarget)
+#define SDL_SetRenderDrawBlendMode      VSF_SDL_WRAPPER(SDL_SetRenderDrawBlendMode)
+#define SDL_GetRenderDrawBlendMode      VSF_SDL_WRAPPER(SDL_GetRenderDrawBlendMode)
+#define SDL_RenderFillRect              VSF_SDL_WRAPPER(SDL_RenderFillRect)
 
 #define SDL_CreateTexture               VSF_SDL_WRAPPER(SDL_CreateTexture)
 #define SDL_CreateTextureFromSurface    VSF_SDL_WRAPPER(SDL_CreateTextureFromSurface)
@@ -135,6 +137,12 @@ extern "C" {
 #define SDL_DestroyTexture              VSF_SDL_WRAPPER(SDL_DestroyTexture)
 #define SDL_LockTexture                 VSF_SDL_WRAPPER(SDL_LockTexture)
 #define SDL_UnlockTexture               VSF_SDL_WRAPPER(SDL_UnlockTexture)
+#define SDL_SetTextureBlendMode         VSF_SDL_WRAPPER(SDL_SetTextureBlendMode)
+#define SDL_GetTextureBlendMode         VSF_SDL_WRAPPER(SDL_GetTextureBlendMode)
+#define SDL_SetTextureColorMod          VSF_SDL_WRAPPER(SDL_SetTextureColorMod)
+#define SDL_GetTextureColorMod          VSF_SDL_WRAPPER(SDL_GetTextureColorMod)
+#define SDL_SetTextureAlphaMod          VSF_SDL_WRAPPER(SDL_SetTextureAlphaMod)
+#define SDL_GetTextureAlphaMod          VSF_SDL_WRAPPER(SDL_GetTextureAlphaMod)
 
 #define SDL_MapRGBA                     VSF_SDL_WRAPPER(SDL_MapRGBA)
 #define SDL_MapRGB                      VSF_SDL_WRAPPER(SDL_MapRGB)
@@ -399,6 +407,11 @@ typedef enum {
     SDL_RENDERER_PRESENTVSYNC   = (1 << 2),
     SDL_RENDERER_TARGETTEXTURE  = (1 << 3),
 } SDL_RendererFlags;
+typedef enum {
+    SDL_FLIP_NONE               = 0,
+    SDL_FLIP_HORIZONTAL         = (1 << 0),
+    SDL_FLIP_VERTICAL           = (1 << 1),
+} SDL_RendererFlip;
 
 typedef struct SDL_RendererInfo {
     const char                  *name;
@@ -486,9 +499,12 @@ extern SDL_Renderer * SDL_CreateRenderer(SDL_Window * window, int index, uint32_
 extern void SDL_DestroyRenderer(SDL_Renderer * renderer);
 extern int SDL_RenderClear(SDL_Renderer * renderer);
 extern int SDL_RenderCopy(SDL_Renderer * renderer, SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect);
+extern int SDL_RenderCopyEx(SDL_Renderer * renderer, SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect,
+            const double angle, const SDL_Point *center, const SDL_RendererFlip flip);
 extern void SDL_RenderPresent(SDL_Renderer * renderer);
 extern int SDL_SetRenderDrawColor(SDL_Renderer * renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 extern int SDL_RenderDrawPoint(SDL_Renderer * renderer, int x, int y);
+extern int SDL_RenderDrawRect(SDL_Renderer * renderer, const SDL_Rect * rect);
 extern void SDL_RenderGetScale(SDL_Renderer * renderer, float *scaleX, float *scaleY);
 extern int SDL_RenderSetScale(SDL_Renderer * renderer, float scaleX, float scaleY);
 extern void SDL_RenderGetLogicalSize(SDL_Renderer * renderer, int *w, int *h);
@@ -497,6 +513,9 @@ extern void SDL_RenderGetViewport(SDL_Renderer * renderer, SDL_Rect * rect);
 extern int SDL_RenderSetViewport(SDL_Renderer * renderer, const SDL_Rect * rect);
 extern int SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture);
 extern SDL_Texture * SDL_GetRenderTarget(SDL_Renderer *renderer);
+extern int SDL_SetRenderDrawBlendMode(SDL_Renderer * renderer, SDL_BlendMode blendMode);
+extern int SDL_GetRenderDrawBlendMode(SDL_Renderer * renderer, SDL_BlendMode *blendMode);
+extern int SDL_RenderFillRect(SDL_Renderer * renderer, const SDL_Rect * rect);
 
 extern SDL_Texture * SDL_CreateTexture(SDL_Renderer * renderer, uint32_t format, int access, int w, int h);
 extern SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer * renderer, SDL_Surface * surface);
@@ -504,6 +523,12 @@ extern void SDL_DestroyTexture(SDL_Texture * texture);
 extern int SDL_UpdateTexture(SDL_Texture * texture, const SDL_Rect * rect, const void * pixels, int pitch);
 extern int SDL_LockTexture(SDL_Texture * texture, const SDL_Rect * rect, void **pixels, int *pitch);
 extern void SDL_UnlockTexture(SDL_Texture * texture);
+extern int SDL_SetTextureBlendMode(SDL_Texture * texture, SDL_BlendMode blendMode);
+extern int SDL_GetTextureBlendMode(SDL_Texture * texture, SDL_BlendMode *blendMode);
+extern int SDL_SetTextureColorMod(SDL_Texture * texture, uint8_t r, uint8_t g, uint8_t b);
+extern int SDL_GetTextureColorMod(SDL_Texture * texture, uint8_t * r, uint8_t * g, uint8_t * b);
+extern int SDL_SetTextureAlphaMod(SDL_Texture * texture, uint8_t alpha);
+extern int SDL_GetTextureAlphaMod(SDL_Texture * texture, uint8_t * alpha);
 
 extern uint32_t SDL_MapRGBA(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 extern uint32_t SDL_MapRGB(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b);

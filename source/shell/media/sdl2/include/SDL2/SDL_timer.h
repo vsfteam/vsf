@@ -26,6 +26,8 @@
 
 #include "SDL_stdinc.h"
 
+#include "kernel/vsf_kernel.h"
+
 #include "begin_code.h"
 
 #ifdef __cplusplus

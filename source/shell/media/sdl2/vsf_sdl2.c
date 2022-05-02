@@ -80,6 +80,7 @@ struct SDL_Renderer {
     SDL_Window *window;
     SDL_Texture *target;
     uint32_t flags;
+    SDL_BlendMode blend_mode;
     uint32_t color;
     float scale_x;
     float scale_y;
@@ -90,6 +91,7 @@ struct SDL_Renderer {
 
 struct SDL_Texture {
     uint16_t w, h;
+    SDL_BlendMode blend_mode;
     SDL_PixelFormat *format;
     void *pixels;
 
@@ -108,6 +110,9 @@ typedef struct vsf_sdl2_t {
     struct {
         char *text;
     } clipboard;
+
+    uint32_t flags;
+    char *error;
 } vsf_sdl2_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -410,10 +415,13 @@ void vsf_sdl2_init(vk_disp_t *disp)
     __vsf_sdl2.init_flags = 0;
     __vsf_sdl2.disp = disp;
     __vsf_sdl2.sdl1_screen = NULL;
+    __vsf_sdl2.flags = 0;
+    __vsf_sdl2.error = NULL;
 }
 
 int SDL_InitSubSystem(uint32_t flags)
 {
+    __vsf_sdl2.flags = flags;
     if (flags & SDL_INIT_GAMECONTROLLER) {
         flags |= SDL_INIT_JOYSTICK;
     }
@@ -444,11 +452,17 @@ int SDL_InitSubSystem(uint32_t flags)
 
 void SDL_QuitSubSystem(uint32_t flags)
 {
+    __vsf_sdl2.flags &= ~flags;
 }
 
 int SDL_Init(uint32_t flags)
 {
     return SDL_InitSubSystem(flags);
+}
+
+uint32_t SDL_WasInit(uint32_t flags)
+{
+    return __vsf_sdl2.flags & flags;
 }
 
 void SDL_Quit(void)
@@ -495,16 +509,6 @@ int SDL_GetCurrentDisplayMode(int display_index, SDL_DisplayMode *mode)
     return SDL_GetDesktopDisplayMode(display_index, mode);
 }
 
-const char *SDL_GetError(void)
-{
-    return NULL;
-}
-
-int SDL_SetError(const char* fmt, ...)
-{
-    return 0;
-}
-
 
 SDL_RWops * SDL_RWFromFile(const char * file, const char * mode)
 {
@@ -536,6 +540,83 @@ size_t SDL_RWread(SDL_RWops * context, void * ptr, size_t size, size_t maxnum)
 size_t SDL_RWwrite(SDL_RWops * context, const void * ptr, size_t size, size_t num)
 {
     return fwrite(ptr, size, num, context);
+}
+uint8_t SDL_ReadU8(SDL_RWops * context)
+{
+    uint8_t value = 0;
+    SDL_RWread(context, &value, sizeof(value), 1);
+    return value;
+}
+uint16_t SDL_ReadLE16(SDL_RWops * context)
+{
+    uint16_t value = 0;
+    SDL_RWread(context, &value, sizeof(value), 1);
+    return SDL_SwapLE16(value);
+}
+uint16_t SDL_ReadBE16(SDL_RWops * context)
+{
+    uint16_t value = 0;
+    SDL_RWread(context, &value, sizeof(value), 1);
+    return SDL_SwapBE16(value);
+}
+uint32_t SDL_ReadLE32(SDL_RWops * context)
+{
+    uint32_t value = 0;
+    SDL_RWread(context, &value, sizeof(value), 1);
+    return SDL_SwapLE32(value);
+}
+uint32_t SDL_ReadBE32(SDL_RWops * context)
+{
+    uint32_t value = 0;
+    SDL_RWread(context, &value, sizeof(value), 1);
+    return SDL_SwapBE32(value);
+}
+uint64_t SDL_ReadLE64(SDL_RWops * context)
+{
+    uint64_t value = 0;
+    SDL_RWread(context, &value, sizeof(value), 1);
+    return SDL_SwapLE64(value);
+}
+
+uint64_t SDL_ReadBE64(SDL_RWops * context)
+{
+    uint64_t value = 0;
+    SDL_RWread(context, &value, sizeof(value), 1);
+    return SDL_SwapBE64(value);
+}
+uint8_t SDL_WriteU8(SDL_RWops * context, uint8_t value)
+{
+    return SDL_RWwrite(context, &value, sizeof(value), 1);
+}
+uint16_t SDL_WriteLE16(SDL_RWops * context, uint16_t value)
+{
+    value = SDL_SwapLE16(value);
+    return SDL_RWwrite(context, &value, sizeof(value), 1);
+}
+uint16_t SDL_WriteBE16(SDL_RWops * context, uint16_t value)
+{
+    value = SDL_SwapBE16(value);
+    return SDL_RWwrite(context, &value, sizeof(value), 1);
+}
+uint32_t SDL_WriteLE32(SDL_RWops * context, uint32_t value)
+{
+    value = SDL_SwapLE32(value);
+    return SDL_RWwrite(context, &value, sizeof(value), 1);
+}
+uint32_t SDL_WriteBE32(SDL_RWops * context, uint32_t value)
+{
+    value = SDL_SwapBE32(value);
+    return SDL_RWwrite(context, &value, sizeof(value), 1);
+}
+uint64_t SDL_WriteLE64(SDL_RWops * context, uint64_t value)
+{
+    value = SDL_SwapLE64(value);
+    return SDL_RWwrite(context, &value, sizeof(value), 1);
+}
+uint64_t SDL_WriteBE64(SDL_RWops * context, uint64_t value)
+{
+    value = SDL_SwapBE64(value);
+    return SDL_RWwrite(context, &value, sizeof(value), 1);
 }
 
 
@@ -692,6 +773,9 @@ static void __SDL_SurfaceInitFormat(SDL_Surface * surface, uint32_t color, uint3
 SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
     uint32_t format = __SDL_GetColorFromMask(Rmask, Gmask, Bmask, Amask);
+    if (format == SDL_PIXELFORMAT_UNKNOWN) {
+        __asm("nop");
+    }
     VSF_SDL2_ASSERT(format != SDL_PIXELFORMAT_UNKNOWN);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(flags, w, h, depth, format);
     if (surface != NULL) {
@@ -904,6 +988,13 @@ int SDL_RenderCopy(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect 
     return 0;
 }
 
+int SDL_RenderCopyEx(SDL_Renderer * renderer, SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect,
+            const double angle, const SDL_Point *center, const SDL_RendererFlip flip)
+{
+    VSF_SDL2_ASSERT(false);
+    return -1;
+}
+
 void SDL_RenderPresent(SDL_Renderer *renderer)
 {
     vk_disp_area_t area = {
@@ -913,6 +1004,26 @@ void SDL_RenderPresent(SDL_Renderer *renderer)
         .size.y         = renderer->window->area.h,
     };
     __vsf_sdl2_disp_refresh(&area, renderer->window->pixels);
+}
+
+int SDL_SetRenderDrawBlendMode(SDL_Renderer * renderer, SDL_BlendMode blendMode)
+{
+    renderer->blend_mode = blendMode;
+    return 0;
+}
+
+int SDL_GetRenderDrawBlendMode(SDL_Renderer * renderer, SDL_BlendMode *blendMode)
+{
+    if (blendMode != NULL) {
+        *blendMode = renderer->blend_mode;
+    }
+    return 0;
+}
+
+int SDL_RenderFillRect(SDL_Renderer * renderer, const SDL_Rect * rect)
+{
+    VSF_SDL2_ASSERT(false);
+    return -1;
 }
 
 int SDL_SetRenderDrawColor(SDL_Renderer * renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
@@ -926,6 +1037,12 @@ int SDL_RenderDrawPoint(SDL_Renderer * renderer, int x, int y)
     const SDL_Rect rect = { .x = x, .y = y, .w = 1, .h = 1 };
     SDL_FillRect(&renderer->window->surface, &rect, renderer->color);
     return 0;
+}
+
+int SDL_RenderDrawRect(SDL_Renderer * renderer, const SDL_Rect * rect)
+{
+    VSF_SDL2_ASSERT(false);
+    return -1;
 }
 
 int SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)
@@ -1069,6 +1186,25 @@ int SDL_LockTexture(SDL_Texture * texture, const SDL_Rect * rect, void **pixels,
 void SDL_UnlockTexture(SDL_Texture * texture)
 {
 }
+
+int SDL_SetTextureBlendMode(SDL_Texture * texture, SDL_BlendMode blendMode)
+{
+    texture->blend_mode = blendMode;
+    return 0;
+}
+
+int SDL_GetTextureBlendMode(SDL_Texture * texture, SDL_BlendMode *blendMode)
+{
+    if (blendMode != NULL) {
+        *blendMode = texture->blend_mode;
+    }
+    return 0;
+}
+
+int SDL_SetTextureColorMod(SDL_Texture * texture, uint8_t r, uint8_t g, uint8_t b) { return -1; }
+int SDL_GetTextureColorMod(SDL_Texture * texture, uint8_t * r, uint8_t * g, uint8_t * b) { return -1; }
+int SDL_SetTextureAlphaMod(SDL_Texture * texture, uint8_t alpha) { return -1; }
+int SDL_GetTextureAlphaMod(SDL_Texture * texture, uint8_t * alpha) { return -1; }
 
 
 
@@ -1282,6 +1418,24 @@ int SDL_ShowCursor(int toggle)
 int SDL_SetWindowHitTest(SDL_Window * window, SDL_HitTest callback, void *callback_data)
 {
     return -1;
+}
+
+// SDL_error.h
+int SDL_Error(SDL_errorcode code)
+{
+    SDL_SetError("errcode %d", code);
+    return 0;
+}
+const char *SDL_GetError(void)
+{
+    return "unknown error";
+}
+int SDL_SetError(const char *fmt, ...)
+{
+    return 0;
+}
+void SDL_ClearError(void)
+{
 }
 
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
