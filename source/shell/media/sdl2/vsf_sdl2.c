@@ -78,8 +78,14 @@ struct SDL_Window {
 
 struct SDL_Renderer {
     SDL_Window *window;
+    SDL_Texture *target;
     uint32_t flags;
     uint32_t color;
+    float scale_x;
+    float scale_y;
+    int logic_w;
+    int logic_h;
+    SDL_Rect view_port;
 };
 
 struct SDL_Texture {
@@ -358,6 +364,13 @@ const SDL_version * SDL_Linked_Version(void)
     return &__sdl2_version;
 }
 
+void SDL_GetVersion(SDL_version *ver)
+{
+    ver->major = SDL_MAJOR_VERSION;
+    ver->minor = SDL_MINOR_VERSION;
+    ver->patch = SDL_PATCHLEVEL;
+}
+
 static void __vsf_sdl2_disp_on_ready(vk_disp_t *disp)
 {
     vsf_eda_t *eda = __vsf_sdl2.disp->ui_data;
@@ -377,7 +390,7 @@ static inline bool __vsf_sdl2_cord_intersect(int *start_out, int *width_out, int
     return end > start;
 }
 
-static bool __vsf_sdl2_rect_intersect(SDL_Rect *rect_out, const SDL_Rect *rect0, const SDL_Rect *rect1)
+SDL_bool SDL_IntersectRect(const SDL_Rect * rect0, const SDL_Rect * rect1, SDL_Rect * rect_out)
 {
     VSF_SDL2_ASSERT((rect_out != NULL) && (rect0 != NULL) && (rect1 != NULL));
     bool x_intersect = __vsf_sdl2_cord_intersect(&rect_out->x, &rect_out->w, rect0->x, rect0->w, rect1->x, rect1->w);
@@ -414,6 +427,12 @@ int SDL_InitSubSystem(uint32_t flags)
         __SDL_InitEvent(flags);
     }
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    if (flags & SDL_INIT_TIMER) {
+        __vsf_sdl2.start_ms = vsf_systimer_get_ms();
+    }
+#endif
+
     if (flags & SDL_INIT_VIDEO) {
         __vsf_sdl2.disp->ui_data = vsf_eda_get_cur();
         __vsf_sdl2.disp->ui_on_ready = __vsf_sdl2_disp_on_ready;
@@ -429,9 +448,6 @@ void SDL_QuitSubSystem(uint32_t flags)
 
 int SDL_Init(uint32_t flags)
 {
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-    __vsf_sdl2.start_ms = vsf_systimer_get_ms();
-#endif
     return SDL_InitSubSystem(flags);
 }
 
@@ -533,7 +549,7 @@ SDL_Window * SDL_CreateWindow(const char *title, int x, int y, int w, int h, uin
     SDL_Window *window = __is_allocated ? NULL : (SDL_Window *)VSF_SDL_CFG_WINDOW_PTR;
     __is_allocated = true;
 #else
-    SDL_Window *window = vsf_heap_malloc(sizeof(struct SDL_Window) + pixel_byte_size * w * h);
+    SDL_Window *window = vsf_heap_malloc(sizeof(SDL_Window) + pixel_byte_size * w * h);
 #endif
     if (window != NULL) {
         window->title   = title;
@@ -636,6 +652,7 @@ SDL_Surface * __SDL_CreateRGBSurfaceWithFormat(int w, int h, int depth, uint32_t
         surface->format             = (SDL_PixelFormat *)__SDL_GetFormatFromColor(format);
         surface->w                  = w;
         surface->h                  = h;
+        SDL_SetClipRect(surface, NULL);
     }
     return surface;
 }
@@ -732,7 +749,7 @@ int SDL_FillRect(SDL_Surface * surface, const SDL_Rect * rect, uint32_t color)
     if (NULL == rect) {
         rect = &surface_rect;
     }
-    if (!__vsf_sdl2_rect_intersect(&realrect, rect, &surface_rect)) {
+    if (!SDL_IntersectRect(rect, &surface_rect, &realrect)) {
         return 0;
     }
     vsf_sdl2_pixel_fill(rect->h, rect->w, surface->pixels, surface->pitch, color, pixel_size);
@@ -748,20 +765,17 @@ int SDL_BlitSurface(SDL_Surface * src, const SDL_Rect * srcrect, SDL_Surface * d
         .w      = src->w,
         .h      = src->h,
     };
-    SDL_Rect dst_area = {
-        .w      = dst->w,
-        .h      = dst->h,
-    };
+    SDL_Rect dst_area = dst->clip_rect;
 
     if (srcrect != NULL) {
-        if (!__vsf_sdl2_rect_intersect(&src_real_area, srcrect, &src_area)) {
+        if (!SDL_IntersectRect(srcrect, &src_area, &src_real_area)) {
             return -1;
         }
     } else {
         src_real_area = src_area;
     }
     if (dstrect != NULL) {
-        if (!__vsf_sdl2_rect_intersect(&dst_real_area, dstrect, &dst_area)) {
+        if (!SDL_IntersectRect(dstrect, &dst_area, &dst_real_area)) {
             return -1;
         }
     } else {
@@ -789,12 +803,45 @@ SDL_Surface * SDL_ConvertSurfaceFormat(SDL_Surface * src, uint32_t format, uint3
     return surface_new;
 }
 
+SDL_Surface * SDL_ConvertSurface(SDL_Surface * src, const SDL_PixelFormat * format, uint32_t flags)
+{
+    return SDL_ConvertSurfaceFormat(src, format->format, flags);
+}
+
+SDL_bool SDL_SetClipRect(SDL_Surface * surface, const SDL_Rect * rect)
+{
+    SDL_Rect full_rect = {
+        .x      = 0,
+        .y      = 0,
+        .w      = surface->w,
+        .h      = surface->h,
+    };
+
+    if (!rect) {
+        surface->clip_rect = full_rect;
+        return SDL_TRUE;
+    }
+    return SDL_IntersectRect(rect, &full_rect, &surface->clip_rect);
+}
+
+void SDL_GetClipRect(SDL_Surface * surface, SDL_Rect * rect)
+{
+    if (surface && rect) {
+        *rect = surface->clip_rect;
+    }
+}
+
+
+
+
 SDL_Renderer * SDL_CreateRenderer(SDL_Window *window, int index, uint32_t flags)
 {
     SDL_Renderer *renderer;
     VSF_SDL2_ASSERT(window != NULL);
-    renderer = vsf_heap_malloc(sizeof(struct SDL_Renderer));
+    renderer = vsf_heap_malloc(sizeof(SDL_Renderer));
     if (renderer != NULL) {
+        renderer->scale_x   = 1.0;
+        renderer->scale_y   = 1.0;
         renderer->window    = window;
         renderer->flags     = flags;
         SDL_RenderClear(renderer);
@@ -831,14 +878,14 @@ int SDL_RenderCopy(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect 
     };
 
     if (srcrect != NULL) {
-        if (!__vsf_sdl2_rect_intersect(&src_area, srcrect, &texture_area)) {
+        if (!SDL_IntersectRect(srcrect, &texture_area, &src_area)) {
             return -1;
         }
     } else {
         src_area = texture_area;
     }
     if (dstrect != NULL) {
-        if (!__vsf_sdl2_rect_intersect(&dst_area, dstrect, &window->area)) {
+        if (!SDL_IntersectRect(dstrect, &window->area, &dst_area)) {
             return -1;
         }
     } else {
@@ -881,11 +928,69 @@ int SDL_RenderDrawPoint(SDL_Renderer * renderer, int x, int y)
     return 0;
 }
 
+int SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)
+{
+    renderer->target = texture;
+    return 0;
+}
+
+SDL_Texture * SDL_GetRenderTarget(SDL_Renderer *renderer)
+{
+    return renderer->target;
+}
+
+void SDL_RenderGetViewport(SDL_Renderer * renderer, SDL_Rect * rect)
+{
+    if (rect != NULL) {
+        *rect = renderer->view_port;
+    }
+}
+
+int SDL_RenderSetViewport(SDL_Renderer * renderer, const SDL_Rect * rect)
+{
+    if (rect != NULL) {
+        renderer->view_port = *rect;
+    }
+}
+
+void SDL_RenderGetLogicalSize(SDL_Renderer * renderer, int *w, int *h)
+{
+    if (w != NULL) {
+        *w = renderer->logic_w;
+    }
+    if (h != NULL) {
+        *h = renderer->logic_h;
+    }
+}
+
+int SDL_RenderSetLogicalSize(SDL_Renderer * renderer, int w, int h)
+{
+    renderer->logic_w = w;
+    renderer->logic_h = h;
+}
+
+void SDL_RenderGetScale(SDL_Renderer * renderer, float *scaleX, float *scaleY)
+{
+    if (scaleX != NULL) {
+        *scaleX = renderer->scale_x;
+    }
+    if (scaleY != NULL) {
+        *scaleY = renderer->scale_y;
+    }
+}
+
+int SDL_RenderSetScale(SDL_Renderer * renderer, float scaleX, float scaleY)
+{
+    renderer->scale_x = scaleX;
+    renderer->scale_y = scaleY;
+    return 0;
+}
+
 
 SDL_Texture * SDL_CreateTexture(SDL_Renderer *renderer, uint32_t format, int access, int w, int h)
 {
     uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(format);
-    SDL_Texture *texture = vsf_heap_malloc(sizeof(struct SDL_Texture) + pixel_size * w * h);
+    SDL_Texture *texture = vsf_heap_malloc(sizeof(SDL_Texture) + pixel_size * w * h);
     if (texture != NULL) {
         texture->format = (SDL_PixelFormat *)__SDL_GetFormatFromColor(format);
         VSF_SDL2_ASSERT(texture->format != NULL);
@@ -899,7 +1004,7 @@ SDL_Texture * SDL_CreateTexture(SDL_Renderer *renderer, uint32_t format, int acc
 
 SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface)
 {
-    SDL_Texture *texture = vsf_heap_malloc(sizeof(struct SDL_Texture));
+    SDL_Texture *texture = vsf_heap_malloc(sizeof(SDL_Texture));
     if (texture != NULL) {
         texture->format = surface->format;
         texture->w      = surface->w;
@@ -984,6 +1089,14 @@ uint32_t SDL_MapRGBA(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8
     return color;
 }
 
+SDL_PixelFormat * SDL_AllocFormat(uint32_t format)
+{
+    return (SDL_PixelFormat *)__SDL_GetFormatFromColor(format);
+}
+void SDL_FreeFormat(SDL_PixelFormat *format)
+{
+}
+
 
 
 
@@ -1016,6 +1129,50 @@ uint32_t SDL_GetTicks(void)
 {
     uint32_t cur_ms = vsf_systimer_get_ms();
     return cur_ms - __vsf_sdl2.start_ms;
+}
+uint64_t SDL_GetPerformanceCounter(void)
+{
+    return vsf_systimer_get_tick();
+}
+uint64_t SDL_GetPerformanceFrequency(void)
+{
+    return vsf_systimer_get_freq();
+}
+
+typedef struct SDL_Timer {
+    vsf_callback_timer_t timer;
+
+    SDL_TimerCallback callback;
+    uint32_t interval;
+    void *param;
+} SDL_Timer;
+static void __SDL_OnTimer(vsf_callback_timer_t *cbtimer)
+{
+    SDL_Timer *timer = container_of(cbtimer, SDL_Timer, timer);
+    uint32_t interval = timer->callback(timer->interval, timer->param);
+    if (interval != 0) {
+        vsf_callback_timer_add(&timer->timer, vsf_systimer_ms_to_tick(interval));
+    }
+}
+SDL_TimerID SDL_AddTimer(uint32_t interval, SDL_TimerCallback callback, void *param)
+{
+    SDL_Timer *timer = malloc(sizeof(SDL_Timer));
+    if (NULL == timer) {
+        return (SDL_TimerID)0;
+    }
+
+    timer->callback = callback;
+    timer->interval = interval;
+    timer->param = param;
+    timer->timer.on_timer = __SDL_OnTimer;
+    vsf_callback_timer_add(&timer->timer, vsf_systimer_ms_to_tick(interval));
+    return (SDL_TimerID)timer;
+}
+SDL_bool SDL_RemoveTimer(SDL_TimerID id)
+{
+    SDL_Timer *timer = (SDL_Timer *)id;
+    vsf_callback_timer_remove(&timer->timer);
+    free(timer);
 }
 #endif
 
@@ -1067,16 +1224,6 @@ char * SDL_GetClipboardText(void)
     return result;
 }
 
-uint64_t SDL_GetPerformanceCounter(void)
-{
-    return vsf_systimer_get_tick();
-}
-
-uint64_t SDL_GetPerformanceFrequency(void)
-{
-    return vsf_systimer_get_freq();
-}
-
 // audio
 int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
 {
@@ -1090,6 +1237,12 @@ SDL_AudioStatus SDL_GetAudioStatus(void)
     return SDL_AUDIO_STOPPED;
 }
 void SDL_CloseAudio(void)
+{
+}
+void SDL_LockAudio(void)
+{
+}
+void SDL_UnlockAudio(void)
 {
 }
 
@@ -1174,6 +1327,7 @@ SDL_Surface * SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags)
         surface->h = height;
         surface->pitch = width * bytes_per_pixel;
         surface->pixels = &surface->__pixels;
+        SDL_SetClipRect(surface, NULL);
 
         vk_disp_color_type_t color_type = vsf_disp_get_pixel_format(__vsf_sdl2.disp);
         switch (color_type) {

@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_SDL2_MOUSE_H__
-#define __VSF_SDL2_MOUSE_H__
+#ifndef __VSF_SDL2_HAPTIC_H__
+#define __VSF_SDL2_HAPTIC_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -34,17 +34,18 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#if VSF_SDL_CFG_WRAPPER == ENABLED
-#define SDL_GetMouseState               VSF_SDL_WRAPPER(SDL_GetMouseState)
-#endif
-
 /*============================ TYPES =========================================*/
+
+typedef struct SDL_Haptic SDL_Haptic;
+struct SDL_Haptic {
+    const char *name;
+    SDL_Haptic *next;
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint32_t SDL_GetMouseState(int *x, int *y);
 
 #ifdef __cplusplus
 }
@@ -52,5 +53,5 @@ extern uint32_t SDL_GetMouseState(int *x, int *y);
 #include "close_code.h"
 
 #endif      // VSF_USE_SDL2
-#endif      // __VSF_SDL2_MOUSE_H__
+#endif      // __VSF_SDL2_HAPTIC_H__
 /* EOF */

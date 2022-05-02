@@ -44,11 +44,18 @@ extern "C" {
 #define SDL_VERSION_ATLEAST(__X, __Y, __Z)                                      \
             (SDL_COMPILEDVERSION >= SDL_VERSIONNUM(__X, __Y, __Z))
 
+#define SDL_VERSION(x)                                                          \
+            do {                                                                \
+                (x)->major = SDL_MAJOR_VERSION;                                 \
+                (x)->minor = SDL_MINOR_VERSION;                                 \
+                (x)->patch = SDL_PATCHLEVEL;                                    \
+            } while (0);
 
 
 
 #if VSF_SDL_CFG_WRAPPER == ENABLED
 #define SDL_Linked_Version                  VSF_SDL_WRAPPER(SDL_Linked_Version)
+#define SDL_GetVersion                      VSF_SDL_WRAPPER(SDL_GetVersion)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -65,6 +72,7 @@ typedef struct SDL_version {
 /*============================ PROTOTYPES ====================================*/
 
 extern const SDL_version * SDL_Linked_Version(void);
+extern void SDL_GetVersion(SDL_version *ver);
 
 
 #ifdef __cplusplus

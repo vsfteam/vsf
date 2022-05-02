@@ -35,10 +35,15 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#if VSF_SDL_CFG_WRAPPER == ENABLED
+#define SDL_GetKeyboardState            VSF_SDL_WRAPPER(SDL_GetKeyboardState)
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct SDL_Keysym {
-//    SDL_Scancode scancode;
+    SDL_Scancode scancode;
     SDL_Keycode sym;
     uint16_t mod;
     uint16_t unicode;
@@ -48,6 +53,7 @@ typedef struct SDL_Keysym {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern const uint8_t * SDL_GetKeyboardState(int *numkeys);
 
 #ifdef __cplusplus
 }

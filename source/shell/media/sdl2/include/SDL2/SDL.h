@@ -46,14 +46,18 @@
 #include "SDL_log.h"
 #include "SDL_rwops.h"
 #include "SDL_mutex.h"
+#include "SDL_thread.h"
+#include "SDL_timer.h"
 
 #include "SDL_events.h"
 #include "SDL_keyboard.h"
 #include "SDL_mouse.h"
+#include "SDL_gamecontroller.h"
+#include "SDL_haptic.h"
+
+#include "SDL_audio.h"
 
 #include "SDL_surface.h"
-
-#include "SDL_thread.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,6 +109,9 @@ extern "C" {
 #define SDL_FillRect                    VSF_SDL_WRAPPER(SDL_FillRect)
 #define SDL_BlitSurface                 VSF_SDL_WRAPPER(SDL_BlitSurface)
 #define SDL_ConvertSurfaceFormat        VSF_SDL_WRAPPER(SDL_ConvertSurfaceFormat)
+#define SDL_ConvertSurface              VSF_SDL_WRAPPER(SDL_ConvertSurface)
+#define SDL_SetClipRect                 VSF_SDL_WRAPPER(SDL_SetClipRect)
+#define SDL_GetClipRect                 VSF_SDL_WRAPPER(SDL_GetClipRect)
 
 #define SDL_CreateRenderer              VSF_SDL_WRAPPER(SDL_CreateRenderer)
 #define SDL_DestroyRenderer             VSF_SDL_WRAPPER(SDL_DestroyRenderer)
@@ -113,7 +120,14 @@ extern "C" {
 #define SDL_RenderPresent               VSF_SDL_WRAPPER(SDL_RenderPresent)
 #define SDL_SetRenderDrawColor          VSF_SDL_WRAPPER(SDL_SetRenderDrawColor)
 #define SDL_RenderDrawPoint             VSF_SDL_WRAPPER(SDL_RenderDrawPoint)
-#define SDL_RenderSetLogicalSize(...)
+#define SDL_RenderGetScale              VSF_SDL_WRAPPER(SDL_RenderGetScale)
+#define SDL_RenderSetScale              VSF_SDL_WRAPPER(SDL_RenderSetScale)
+#define SDL_RenderGetLogicalSize        VSF_SDL_WRAPPER(SDL_RenderGetLogicalSize)
+#define SDL_RenderSetLogicalSize        VSF_SDL_WRAPPER(SDL_RenderSetLogicalSize)
+#define SDL_RenderGetViewport           VSF_SDL_WRAPPER(SDL_RenderGetViewport)
+#define SDL_RenderSetViewport           VSF_SDL_WRAPPER(SDL_RenderSetViewport)
+#define SDL_SetRenderTarget             VSF_SDL_WRAPPER(SDL_SetRenderTarget)
+#define SDL_GetRenderTarget             VSF_SDL_WRAPPER(SDL_GetRenderTarget)
 
 #define SDL_CreateTexture               VSF_SDL_WRAPPER(SDL_CreateTexture)
 #define SDL_CreateTextureFromSurface    VSF_SDL_WRAPPER(SDL_CreateTextureFromSurface)
@@ -124,15 +138,12 @@ extern "C" {
 
 #define SDL_MapRGBA                     VSF_SDL_WRAPPER(SDL_MapRGBA)
 #define SDL_MapRGB                      VSF_SDL_WRAPPER(SDL_MapRGB)
+#define SDL_AllocFormat                 VSF_SDL_WRAPPER(SDL_AllocFormat)
+#define SDL_FreeFormat                  VSF_SDL_WRAPPER(SDL_FreeFormat)
 
 #define SDL_CreateSemaphore             VSF_SDL_WRAPPER(SDL_CreateSemaphore)
 #define SDL_DestroySemaphore            VSF_SDL_WRAPPER(SDL_DestroySemaphore)
 #define SDL_SemPost                     VSF_SDL_WRAPPER(SDL_SemPost)
-
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   define SDL_Delay                    VSF_SDL_WRAPPER(SDL_Delay)
-#   define SDL_GetTicks                 VSF_SDL_WRAPPER(SDL_GetTicks)
-#endif
 
 #define SDL_GetDisplayDPI               VSF_SDL_WRAPPER(SDL_GetDisplayDPI)
 #define SDL_EnableScreenSaver           VSF_SDL_WRAPPER(SDL_EnableScreenSaver)
@@ -141,11 +152,6 @@ extern "C" {
 #define SDL_SetClipboardText            VSF_SDL_WRAPPER(SDL_SetClipboardText)
 #define SDL_GetPerformanceCounter       VSF_SDL_WRAPPER(SDL_GetPerformanceCounter)
 #define SDL_GetPerformanceFrequency     VSF_SDL_WRAPPER(SDL_GetPerformanceFrequency)
-
-#define SDL_OpenAudio                   VSF_SDL_WRAPPER(SDL_OpenAudio)
-#define SDL_PauseAudio                  VSF_SDL_WRAPPER(SDL_PauseAudio)
-#define SDL_GetAudioStatus              VSF_SDL_WRAPPER(SDL_GetAudioStatus)
-#define SDL_CloseAudio                  VSF_SDL_WRAPPER(SDL_CloseAudio)
 
 #define SDL_CreateCursor                VSF_SDL_WRAPPER(SDL_CreateCursor)
 #define SDL_CreateColorCursor           VSF_SDL_WRAPPER(SDL_CreateColorCursor)
@@ -201,10 +207,11 @@ extern "C" {
 #define SDL_SetWindowMinimumSize(...)
 #define SDL_SetWindowMaximumSize(...)
 #define SDL_GetRendererInfo(__renderer, __info)                                 \
-            do {                                                                \
+            ({                                                                  \
                 SDL_memset((__info), 0, sizeof(*(__info)));                     \
                 (__info)->name          = "vsf";                                \
-            } while (0)
+                0;                                                              \
+            })
 
 /*============================ MACROS ========================================*/
 
@@ -307,7 +314,7 @@ typedef enum SDL_BlendMode {
     SDL_BLENDMODE_NONE,
     SDL_BLENDMODE_BLEND,
     SDL_BLENDMODE_ADD,
-    SDL_LBENDMODE_MOD,
+    SDL_BLENDMODE_MOD,
 } SDL_BlendMode;
 
 typedef struct SDL_Texture SDL_Texture;
@@ -338,6 +345,7 @@ typedef struct SDL_PixelFormat {
 } SDL_PixelFormat;
 typedef struct SDL_Surface {
     SDL_PixelFormat *format;
+    SDL_Rect clip_rect;
     int w, h;
     int pitch;
 
@@ -394,6 +402,7 @@ typedef enum {
 
 typedef struct SDL_RendererInfo {
     const char                  *name;
+    uint32_t                    flags;
 } SDL_RendererInfo;
 
 typedef struct SDL_Renderer SDL_Renderer;
@@ -401,69 +410,6 @@ typedef struct SDL_Renderer SDL_Renderer;
 
 // semaphore
 typedef vsf_sem_t SDL_sem;
-
-// audio
-typedef enum SDL_AudioStatus {
-    SDL_AUDIO_STOPPED = 0,
-    SDL_AUDIO_PLAYING,
-    SDL_AUDIO_PAUSED
-} SDL_AudioStatus;
-typedef uint8_t SDL_AudioFormat;
-typedef void (*SDL_AudioCallback)(void * userdata, uint8_t * stream, int len);
-enum {
-    AUDIO_8                     = 0x0008,
-    AUDIO_16                    = 0x0010,
-    AUDIO_32                    = 0x0020,
-
-    // LSB is default
-    AUDIO_LSB                   = 0x0000,
-    AUDIO_MSB                   = 0x4000,
-    AUDIO_SIGNED                = 0x8000,
-    AUDIO_UNSIGNED              = 0x0000,
-    AUDIO_FLOAT                 = 0x0100,
-
-    AUDIO_U8                    = AUDIO_8 | AUDIO_UNSIGNED,
-    AUDIO_S8                    = AUDIO_8 | AUDIO_SIGNED,
-    AUDIO_U16                   = AUDIO_16 | AUDIO_UNSIGNED,
-    AUDIO_S16                   = AUDIO_16 | AUDIO_SIGNED,
-    AUDIO_F16                   = AUDIO_16 | AUDIO_FLOAT,
-    AUDIO_U32                   = AUDIO_32 | AUDIO_UNSIGNED,
-    AUDIO_S32                   = AUDIO_32 | AUDIO_SIGNED,
-    AUDIO_F32                   = AUDIO_32 | AUDIO_FLOAT,
-
-    AUDIO_U16LSB                = AUDIO_U16 | AUDIO_LSB,
-    AUDIO_U16MSB                = AUDIO_U16 | AUDIO_MSB,
-    AUDIO_S16LSB                = AUDIO_S16 | AUDIO_LSB,
-    AUDIO_S16MSB                = AUDIO_S16 | AUDIO_MSB,
-    AUDIO_U32LSB                = AUDIO_U32 | AUDIO_LSB,
-    AUDIO_U32MSB                = AUDIO_U32 | AUDIO_MSB,
-    AUDIO_S32LSB                = AUDIO_S32 | AUDIO_LSB,
-    AUDIO_S32MSB                = AUDIO_S32 | AUDIO_MSB,
-    AUDIO_F32LSB                = AUDIO_F32 | AUDIO_UNSIGNED,
-    AUDIO_F32MSB                = AUDIO_F32 | AUDIO_SIGNED,
-
-#if __BYTE_ORDER == __BIG_ENDIAN
-    AUDIO_U16SYS                = AUDIO_U16MSB,
-    AUDIO_S16SYS                = AUDIO_S16MSB,
-    AUDIO_S32SYS                = AUDIO_S32MSB,
-    AUDIO_F32SYS                = AUDIO_F32MSB,
-#else
-    AUDIO_U16SYS                = AUDIO_U16LSB,
-    AUDIO_S16SYS                = AUDIO_S16LSB,
-    AUDIO_S32SYS                = AUDIO_S32LSB,
-    AUDIO_F32SYS                = AUDIO_F32LSB,
-#endif
-};
-typedef struct SDL_AudioSpec {
-    uint32_t freq;
-    SDL_AudioFormat format;
-    uint8_t channels;
-    uint8_t silence;
-    uint16_t samples;
-    uint32_t size;
-    SDL_AudioCallback callback;
-    void * userdata;
-} SDL_AudioSpec;
 
 // SDL_video.h
 typedef enum {
@@ -495,6 +441,8 @@ extern const char * SDL_GetPlatform(void);
 extern void SDL_memset4(void *dst, int val, size_t dwords);
 extern const char * SDL_GetError(void);
 extern int SDL_SetError(const char* fmt, ...);
+
+extern SDL_bool SDL_IntersectRect(const SDL_Rect * rect0, const SDL_Rect * rect1, SDL_Rect * rect_out);
 
 extern SDL_Window * SDL_CreateWindow(const char * title, int x, int y, int w, int h, uint32_t flags);
 extern void SDL_DestroyWindow(SDL_Window * window);
@@ -530,6 +478,9 @@ extern int SDL_SetColorKey(SDL_Surface * surface, int flag, uint32_t key);
 extern int SDL_FillRect(SDL_Surface * surface, const SDL_Rect * rect, uint32_t color);
 extern int SDL_BlitSurface(SDL_Surface * src, const SDL_Rect * srcrect, SDL_Surface * dst, SDL_Rect * dstrect);
 extern SDL_Surface * SDL_ConvertSurfaceFormat(SDL_Surface * src, uint32_t format, uint32_t flags);
+extern SDL_Surface * SDL_ConvertSurface(SDL_Surface * src, const SDL_PixelFormat * format, uint32_t flags);
+extern SDL_bool SDL_SetClipRect(SDL_Surface * surface, const SDL_Rect * rect);
+extern void SDL_GetClipRect(SDL_Surface * surface, SDL_Rect * rect);
 
 extern SDL_Renderer * SDL_CreateRenderer(SDL_Window * window, int index, uint32_t flags);
 extern void SDL_DestroyRenderer(SDL_Renderer * renderer);
@@ -538,6 +489,14 @@ extern int SDL_RenderCopy(SDL_Renderer * renderer, SDL_Texture * texture, const 
 extern void SDL_RenderPresent(SDL_Renderer * renderer);
 extern int SDL_SetRenderDrawColor(SDL_Renderer * renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 extern int SDL_RenderDrawPoint(SDL_Renderer * renderer, int x, int y);
+extern void SDL_RenderGetScale(SDL_Renderer * renderer, float *scaleX, float *scaleY);
+extern int SDL_RenderSetScale(SDL_Renderer * renderer, float scaleX, float scaleY);
+extern void SDL_RenderGetLogicalSize(SDL_Renderer * renderer, int *w, int *h);
+extern int SDL_RenderSetLogicalSize(SDL_Renderer * renderer, int w, int h);
+extern void SDL_RenderGetViewport(SDL_Renderer * renderer, SDL_Rect * rect);
+extern int SDL_RenderSetViewport(SDL_Renderer * renderer, const SDL_Rect * rect);
+extern int SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture);
+extern SDL_Texture * SDL_GetRenderTarget(SDL_Renderer *renderer);
 
 extern SDL_Texture * SDL_CreateTexture(SDL_Renderer * renderer, uint32_t format, int access, int w, int h);
 extern SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer * renderer, SDL_Surface * surface);
@@ -548,16 +507,13 @@ extern void SDL_UnlockTexture(SDL_Texture * texture);
 
 extern uint32_t SDL_MapRGBA(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 extern uint32_t SDL_MapRGB(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b);
+extern SDL_PixelFormat * SDL_AllocFormat(uint32_t format);
+extern void SDL_FreeFormat(SDL_PixelFormat *format);
 
 extern SDL_sem * SDL_CreateSemaphore(uint32_t initial_value);
 extern void SDL_DestroySemaphore(SDL_sem * sem);
 extern int __vsf_sdl2_sem_wait(SDL_sem * sem, int32_t ms);
 extern int SDL_SemPost(SDL_sem * sem);
-
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-extern void SDL_Delay(uint32_t ms);
-extern uint32_t SDL_GetTicks(void);
-#endif
 
 extern int SDL_GetDisplayDPI(int display_index, float * ddpi, float * hdpi, float * vdpi);
 extern void SDL_EnableScreenSaver(void);
@@ -566,11 +522,6 @@ extern char * SDL_GetClipboardText(void);
 extern int SDL_SetClipboardText(const char * text);
 extern uint64_t SDL_GetPerformanceCounter(void);
 extern uint64_t SDL_GetPerformanceFrequency(void);
-
-extern int SDL_OpenAudio(SDL_AudioSpec * desired, SDL_AudioSpec * obtained);
-extern void SDL_PauseAudio(int pause_on);
-extern SDL_AudioStatus SDL_GetAudioStatus(void);
-extern void SDL_CloseAudio(void);
 
 extern const char * SDL_GetKeyName(SDL_Keycode key);
 

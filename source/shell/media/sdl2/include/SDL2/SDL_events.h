@@ -173,6 +173,42 @@ typedef struct SDL_JoyDeviceEvent {
     uint32_t timestamp;
     int32_t which;
 } SDL_JoyDeviceEvent;
+typedef struct SDL_ControllerDeviceEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    int32_t which;
+} SDL_ControllerDeviceEvent;
+typedef struct SDL_ControllerButtonEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    SDL_JoystickID which;
+    uint8_t button;
+    uint8_t state;
+} SDL_ControllerButtonEvent;
+typedef struct SDL_ControllerAxisEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    SDL_JoystickID which;
+    uint8_t axis;
+    int16_t value;
+} SDL_ControllerAxisEvent;
+typedef struct SDL_ControllerTouchpadEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    SDL_JoystickID which;
+    int32_t touchpad;
+    int32_t finger;
+    float x;
+    float y;
+    float pressure;
+} SDL_ControllerTouchpadEvent;
+typedef struct SDL_ControllerSensorEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    SDL_JoystickID which;
+    int32_t sendor;
+    float data[3];
+} SDL_ControllerSensorEvent;
 typedef struct SDL_MouseMotionEvent {
     uint32_t type;
     uint32_t timestamp;
@@ -251,6 +287,13 @@ typedef struct SDL_DropEvent {
     char *file;
     uint32_t windowID;
 } SDL_DropEvent;
+typedef struct SDL_UserEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    int32_t code;
+    void *data1;
+    void *data2;
+} SDL_UserEvent;
 
 typedef struct SDL_Cursor SDL_Cursor;
 typedef enum SDL_SystemCursor {
@@ -289,10 +332,17 @@ typedef union SDL_Event {
     SDL_MouseMotionEvent motion;
     SDL_MouseButtonEvent button;
     SDL_MouseWheelEvent wheel;
+    SDL_ControllerDeviceEvent cdevice;
+    SDL_ControllerButtonEvent cbutton;
+    SDL_ControllerAxisEvent caxis;
+    SDL_ControllerTouchpadEvent ctouchpad;
+    SDL_ControllerSensorEvent csensor;
 
     SDL_WindowEvent window;
     SDL_TextInputEvent text;
     SDL_DropEvent drop;
+
+    SDL_UserEvent user;
 
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
     SDL_ActiveEvent active;

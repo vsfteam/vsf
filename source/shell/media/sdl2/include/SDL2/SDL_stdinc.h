@@ -73,6 +73,8 @@ extern "C" {
 #define SDL_ceilf                           ceilf
 #define SDL_ceill                           ceill
 
+#define SDL_COMPILE_TIME_ASSERT(__N, __X)   VSF_STATIC_ASSERT(__X)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
