@@ -1427,6 +1427,7 @@ vsf_err_t vk_file_read_stream(vk_file_stream_t *pthis, vsf_stream_t *stream, uin
     VSF_FS_ASSERT(pthis != NULL);
     pthis->size = size;
     pthis->stream = stream;
+    pthis->cur_size = 0;
     __vsf_component_call_peda(__vk_file_read_stream, err, pthis)
     return err;
 }
@@ -1437,6 +1438,7 @@ vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, vsf_stream_t *stream, ui
     VSF_FS_ASSERT(pthis != NULL);
     pthis->size = size;
     pthis->stream = stream;
+    pthis->cur_size = 0;
     __vsf_component_call_peda(__vk_file_write_stream, err, pthis)
     return err;
 }
