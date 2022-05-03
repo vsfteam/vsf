@@ -11,7 +11,11 @@
 #endif
 
 #ifndef APP_CFG_AUDIO_BUFFER_SIZE
-#   define APP_CFG_AUDIO_BUFFER_SIZE        (8 * 1024)
+#   ifdef __WIN__
+#       define APP_CFG_AUDIO_BUFFER_SIZE    (512 * 1024)
+#   else
+#       define APP_CFG_AUDIO_BUFFER_SIZE    (8 * 1024)
+#   endif
 #endif
 
 static void print_help(char *exe_name)
@@ -22,6 +26,8 @@ static void print_help(char *exe_name)
 \t%s wav_file\r\n\
 \t%s mp3_file\r\n", exe_name, exe_name, exe_name);
 }
+
+describe_mem_stream(audio_mem_stream, APP_CFG_AUDIO_BUFFER_SIZE)
 
 int audio_play_main(int argc, char *argv[])
 {
@@ -35,8 +41,6 @@ int audio_play_main(int argc, char *argv[])
         *tmp = tolower(*tmp);
     }
 
-    // make sure current VSF_LINUX_CFG_STACKSIZE can hold the audio_mem_stream
-    describe_mem_stream(audio_mem_stream, APP_CFG_AUDIO_BUFFER_SIZE)
     audio_mem_stream.is_ticktock_read = true;
     VSF_STREAM_INIT(&audio_mem_stream);
 
@@ -138,7 +142,7 @@ cleanup:
         break;
     }
 
-    return 0;
+    return result;
 }
 
 #endif
