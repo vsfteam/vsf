@@ -43,7 +43,8 @@ extern "C" {
 typedef enum vk_wav_state_t {
     VSF_WAV_STATE_RIFF,
     VSF_WAV_STATE_FORMAT,
-    VSF_WAV_STATE_DATA,
+    VSF_WAV_STATE_SEARCH_DATA_TRUNK,
+    VSF_WAV_STATE_SKIP_TRUNK,
     VSF_WAV_STATE_PLAYBACK,
 } vk_wav_state_t;
 
@@ -56,6 +57,7 @@ vsf_class(vk_wav_t) {
     )
     private_member(
         vsf_eda_t           eda;
+        uint32_t            skip_size;
         vk_audio_format_t   format;
         vk_wav_state_t      state;
     )

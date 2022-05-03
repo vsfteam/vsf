@@ -46,6 +46,11 @@ enum {
     VSF_EVT_PARSE_DONE = VSF_EVT_USER + 0,
 };
 
+typedef struct vk_wav_header_t {
+    char        chunk_id[4];
+    uint32_t    chunk_size;
+} vk_wav_header_t;
+
 typedef struct vk_wav_riff_t {
     char        chunk_id[4];    // "RIFF"
     uint32_t    size;           // all size except chunk_id and size(file_size - 8)
@@ -78,6 +83,7 @@ static void __vk_wav_playback_stream_evthandler(vsf_stream_t *stream, void *para
     vk_wav_t *wav = param;
     uint32_t data_size;
     union {
+        vk_wav_header_t header;
         vk_wav_riff_t   riff;
         vk_wav_format_t format;
         vk_wav_data_t   data;
@@ -114,20 +120,33 @@ static void __vk_wav_playback_stream_evthandler(vsf_stream_t *stream, void *para
                     wav->format.channel_num = header.format.channel_number;
                     wav->format.sample_bit_width = header.format.bit_width;
                     wav->format.sample_rate = header.format.sample_rate;
-                    wav->state = VSF_WAV_STATE_DATA;
+                    wav->state = VSF_WAV_STATE_SEARCH_DATA_TRUNK;
                     break;
                 }
                 break;
-            case VSF_WAV_STATE_DATA:
-                if (data_size >= sizeof(header.data)) {
-                    vsf_stream_read(stream, (uint8_t *)&header.data, sizeof(header.data));
-                    if (strncmp(header.data.sub_chunk_id, "data", 4)) {
-                        goto failed;
+            case VSF_WAV_STATE_SEARCH_DATA_TRUNK:
+                if (data_size >= sizeof(header.header)) {
+                    vsf_stream_read(stream, (uint8_t *)&header.header, sizeof(header.header));
+                    if (strncmp(header.header.chunk_id, "data", 4)) {
+                        wav->skip_size = header.header.chunk_size;
+                        wav->state = VSF_WAV_STATE_SKIP_TRUNK;
+                        break;
                     }
                     wav->state = VSF_WAV_STATE_PLAYBACK;
                     wav->result = VSF_ERR_NONE;
                     vsf_eda_post_evt(&wav->eda, VSF_EVT_PARSE_DONE);
                     return;
+                }
+                break;
+            case VSF_WAV_STATE_SKIP_TRUNK:
+                if (data_size > 0) {
+                    uint32_t cursize = vsf_min(data_size, wav->skip_size);
+                    wav->skip_size -= cursize;
+                    vsf_stream_read(stream, NULL, cursize);
+
+                    if (0 == wav->skip_size) {
+                        wav->state = VSF_WAV_STATE_SEARCH_DATA_TRUNK;
+                    }
                 }
                 break;
             case VSF_WAV_STATE_PLAYBACK:
