@@ -32,6 +32,14 @@ struct {
     SDL_PixelFormat format;
 } static const __vsf_sdl2_color[] = {
     {
+        .color              = SDL_PIXELFORMAT_PALETTE,
+        .format             = {
+            .format         = SDL_PIXELFORMAT_PALETTE,
+            .BitsPerPixel   = 8,
+            .BytesPerPixel  = 1,
+        },
+    },
+    {
         .color              = SDL_PIXELFORMAT_ARGB8888,
         .format             = {
             .format         = SDL_PIXELFORMAT_ARGB8888,

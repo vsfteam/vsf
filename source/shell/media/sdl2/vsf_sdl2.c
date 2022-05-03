@@ -730,7 +730,21 @@ SDL_Surface * __SDL_CreateRGBSurfaceWithFormat(int w, int h, int depth, uint32_t
 {
     SDL_Surface *surface = vsf_heap_malloc(sizeof(SDL_Surface) + pixel_size * w * h);
     if (surface != NULL) {
-        surface->format             = (SDL_PixelFormat *)__SDL_GetFormatFromColor(format);
+        if (format == SDL_PIXELFORMAT_PALETTE) {
+            surface->__format       = *(SDL_PixelFormat *)__SDL_GetFormatFromColor(format);
+            surface->__format.palette = vsf_heap_malloc(sizeof(SDL_Palette) + 256 * sizeof(SDL_Color));
+            if (NULL == surface->__format.palette) {
+                vsf_heap_free(surface);
+                return NULL;
+            }
+            surface->__format.palette->ncolors = 256;
+            surface->__format.palette->colors = (SDL_Color *)&surface->__format.palette[1];
+
+            surface->format         = &surface->__format;
+        } else {
+            surface->__format.palette = NULL;
+            surface->format         = (SDL_PixelFormat *)__SDL_GetFormatFromColor(format);
+        }
         surface->w                  = w;
         surface->h                  = h;
         SDL_SetClipRect(surface, NULL);
@@ -762,20 +776,19 @@ SDL_Surface * SDL_CreateRGBSurfaceWithFormatFrom(void * pixels, int w, int h, in
 
 static void __SDL_SurfaceInitFormat(SDL_Surface * surface, uint32_t color, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-    SDL_PixelFormat *format = (SDL_PixelFormat *)__SDL_GetFormatFromColor(color);
-    if (format != NULL) {
-        surface->format             = format;
-    } else {
-        __SDL_InitFormatMask(&surface->__format, Rmask, Gmask, Bmask, Amask);
+    if (NULL == surface->format) {
+        SDL_PixelFormat *format = (SDL_PixelFormat *)__SDL_GetFormatFromColor(color);
+        if (format != NULL) {
+            surface->format             = format;
+        } else {
+            __SDL_InitFormatMask(&surface->__format, Rmask, Gmask, Bmask, Amask);
+        }
     }
 }
 
 SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
     uint32_t format = __SDL_GetColorFromMask(Rmask, Gmask, Bmask, Amask);
-    if (format == SDL_PIXELFORMAT_UNKNOWN) {
-        __asm("nop");
-    }
     VSF_SDL2_ASSERT(format != SDL_PIXELFORMAT_UNKNOWN);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(flags, w, h, depth, format);
     if (surface != NULL) {
@@ -798,6 +811,9 @@ SDL_Surface * SDL_CreateRGBSurfaceFrom(void * pixels, int w, int h, int depth, i
 void SDL_FreeSurface(SDL_Surface *surface)
 {
     VSF_SDL2_ASSERT(surface != NULL);
+    if (surface->__format.palette != NULL) {
+        vsf_heap_free(surface->__format.palette);
+    }
     vsf_heap_free(surface);
 }
 
@@ -1481,6 +1497,7 @@ SDL_Surface * SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags)
         surface->h = height;
         surface->pitch = width * bytes_per_pixel;
         surface->pixels = &surface->__pixels;
+        surface->__format.palette = NULL;
         SDL_SetClipRect(surface, NULL);
 
         vk_disp_color_type_t color_type = vsf_disp_get_pixel_format(__vsf_sdl2.disp);
