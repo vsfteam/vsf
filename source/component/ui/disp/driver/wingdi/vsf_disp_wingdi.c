@@ -404,7 +404,7 @@ static void __vk_disp_wingdi_thread(void *arg)
     // Step 2: Create FrameDC
     __vk_disp_wingdi.bmi.bmiHeader.biSize = sizeof(__vk_disp_wingdi.bmi.bmiHeader);
     __vk_disp_wingdi.bmi.bmiHeader.biPlanes = 1;
-    __vk_disp_wingdi.bmi.bmiHeader.biBitCount = vsf_disp_get_pixel_bitsize(disp_wingdi);
+    __vk_disp_wingdi.bmi.bmiHeader.biBitCount = 32;
     __vk_disp_wingdi.bmi.bmiHeader.biCompression = BI_RGB;
     __vk_disp_wingdi.hFrameDC = CreateCompatibleDC(0);
     if (NULL == __vk_disp_wingdi.hFrameDC) {
@@ -461,19 +461,35 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
     vk_disp_wingdi_t *disp_wingdi = (vk_disp_wingdi_t *)pthis;
     VSF_UI_ASSERT(disp_wingdi != NULL);
     uint8_t bytesize_pixel = vsf_disp_get_pixel_bytesize(disp_wingdi);
-    uint32_t byteoffset = ((disp_wingdi->param.height - 1 - area->pos.y) * disp_wingdi->param.width + area->pos.x) * bytesize_pixel;
-    uint32_t bytesize_line = disp_wingdi->param.width * bytesize_pixel;
     uint32_t bytesize_line_area = area->size.x * bytesize_pixel;
-    void *ptr = (void *)((uint8_t *)__vk_disp_wingdi.pixels + byteoffset);
+
+    uint32_t wingdi_bytesize_line = disp_wingdi->param.width * 4;
+    uint32_t wingdi_byteoffset = ((disp_wingdi->param.height - 1 - area->pos.y) * disp_wingdi->param.width + area->pos.x) * 4;
+    void *ptr = (void *)((uint8_t *)__vk_disp_wingdi.pixels + wingdi_byteoffset);
 
     for (uint16_t i = 0; i < area->size.y; i++) {
         switch (vsf_disp_get_pixel_format(disp_wingdi)) {
-        case VSF_DISP_COLOR_RGB565: {
-                // convert to RGB555 which is used by windows for 16bit RGB color
-                uint16_t color;
+        case VSF_DISP_COLOR_RGB332: {
+                // convert to RGB888
+                uint32_t color;
                 for (uint16_t j = 0; j < area->size.x; j++) {
-                    color = ((uint16_t *)disp_buff)[j];
-                    ((uint16_t *)ptr)[j] = (color & 0x001F) | ((color >> 1) & 0x7FE0);
+                    color = (uint32_t)(((uint8_t *)disp_buff)[j]);
+                    ((uint32_t *)ptr)[j] =
+                            ((color & 0x03) << 6)
+                        |   ((color & 0x1C) << 11)
+                        |   ((color & 0xE0) << 16);
+                }
+            }
+            break;
+        case VSF_DISP_COLOR_RGB565: {
+                // convert to RGB888
+                uint32_t color;
+                for (uint16_t j = 0; j < area->size.x; j++) {
+                    color = (uint32_t)(((uint16_t *)disp_buff)[j]);
+                    ((uint32_t *)ptr)[j] =
+                            ((color & 0x001F) << 3)
+                        |   ((color & 0x07E0) << 5)
+                        |   ((color & 0xF800) << 8);
                 }
             }
             break;
@@ -489,7 +505,7 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
             break;
         }
 
-        ptr = (void *)((uint8_t *)ptr - bytesize_line);
+        ptr = (void *)((uint8_t *)ptr - wingdi_bytesize_line);
         disp_buff = (void *)((uint8_t *)disp_buff + bytesize_line_area);
     }
     RECT rect = {

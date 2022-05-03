@@ -421,7 +421,7 @@ void vsf_sdl2_init(vk_disp_t *disp)
 
 int SDL_InitSubSystem(uint32_t flags)
 {
-    __vsf_sdl2.flags = flags;
+    __vsf_sdl2.flags |= flags;
     if (flags & SDL_INIT_GAMECONTROLLER) {
         flags |= SDL_INIT_JOYSTICK;
     }
@@ -430,7 +430,7 @@ int SDL_InitSubSystem(uint32_t flags)
     }
 
     flags &= ~__vsf_sdl2.init_flags;
-    __vsf_sdl2.init_flags = flags;
+    __vsf_sdl2.init_flags |= flags;
     if (flags & SDL_INIT_EVENTS) {
         __SDL_InitEvent(flags);
     }
