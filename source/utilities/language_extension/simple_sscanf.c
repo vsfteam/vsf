@@ -57,6 +57,7 @@ static int vsnscanf(const char *str, size_t size, const char *format, va_list ap
     char *strtmp;
     int result = 0, cur_size;
 
+    goto skip_space;
     while (*format != '\0') {
         ch = *format++;
         switch (ch) {
@@ -133,9 +134,9 @@ static int vsnscanf(const char *str, size_t size, const char *format, va_list ap
                         ptr = (char *)str;
                     }
                     if (flags.is_signed) {
-                        *va_arg(ap, int *) = strtol(ptr, &strtmp, radix);;
+                        *va_arg(ap, int *) = strtol(ptr, &strtmp, radix);
                     } else {
-                        *va_arg(ap, unsigned int *) = strtoul(ptr, &strtmp, radix);;
+                        *va_arg(ap, unsigned int *) = strtoul(ptr, &strtmp, radix);
                     }
                     cur_size = strtmp - ptr;
                     size -= cur_size;
@@ -169,6 +170,7 @@ static int vsnscanf(const char *str, size_t size, const char *format, va_list ap
             }
             break;
         case ' ':
+        skip_space:
             str = __skip_space((char *)str, &size);
             if (!size) { goto end; }
             break;

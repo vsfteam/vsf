@@ -336,6 +336,7 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
         return -1;
     }
     new_sfd->op = op;
+    new_sfd->unget_buff = EOF;
     if (NULL == priv) {
         // priv of fd does not belong to the process
         VSF_LINUX_ASSERT(priv_size >= sizeof(vsf_linux_fd_priv_t));

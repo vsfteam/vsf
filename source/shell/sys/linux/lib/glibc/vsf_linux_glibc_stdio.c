@@ -86,8 +86,13 @@ int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
 
 int ungetc(int ch, FILE *f)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
+    if (sfd->unget_buff != EOF) {
+        return EOF;
+    }
+
+    sfd->unget_buff = ch;
+    return ch;
 }
 
 int getc(FILE *f)
@@ -133,7 +138,8 @@ FILE * fopen(const char *filename, const char *mode)
     if (fd < 0) {
         return NULL;
     }
-    return (FILE *)vsf_linux_fd_get(fd);
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    return (FILE *)sfd;
 }
 
 FILE * fdopen(int fd, const char *mode)
@@ -254,21 +260,33 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
 {
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
     ssize_t bytes_requested = size * nmemb;
     ssize_t ret;
     if (0 == bytes_requested) {
         return 0;
     }
 
-    int fd = ((vsf_linux_fd_t *)f)->fd;
+    int fd = sfd->fd;
     if (fd < 0) {
         return 0;
     }
 
-    ret = read(fd, (void *)ptr, size * nmemb);
+    int pre_read = 0;
+    if (sfd->unget_buff != EOF) {
+        pre_read = 1;
+        *(uint8_t *)ptr++ = sfd->unget_buff;
+        sfd->unget_buff = EOF;
+    }
+
+    bytes_requested -= pre_read;
+    ret = read(fd, (void *)ptr, bytes_requested);
     if (ret < 0) {
         return 0;
     }
+
+    bytes_requested += pre_read;
+    ret += pre_read;
     return (size_t)(bytes_requested == ret ? nmemb : ret / size);
 }
 
@@ -343,7 +361,7 @@ int puts(const char *str)
     return printf("%s\n", str);
 }
 
-int putc(int ch, FILE* f)
+int putc(int ch, FILE *f)
 {
     if (1 != fwrite(&ch, 1, 1, f)) {
         return EOF;
@@ -400,20 +418,208 @@ int printf(const char *format, ...)
     return size;
 }
 
-int fprintf(FILE *file, const char *format, ...)
+int fprintf(FILE *f, const char *format, ...)
 {
     int size;
     va_list ap;
     va_start(ap, format);
-        size = vfprintf(file, format, ap);
+        size = vfprintf(f, format, ap);
     va_end(ap);
     return size;
 }
 
+static bool __is_in_seq(char ch, const char *seq, int seq_len)
+{
+    for (int i = 0; i < seq_len; i++) {
+        if (ch == seq[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int vfscanf(FILE *f, const char *format, va_list ap)
+{
+    char ch, ch_tmp, *ptr;
+    char *strtmp;
+    int result = 0;
+    unsigned long long arg_uinteger;
+
+    goto skip_space;
+    while (*format != '\0') {
+        ch = *format++;
+        switch (ch) {
+        case '%': {
+                int width = 0;
+                union {
+                    struct {
+                        unsigned is_signed      : 1;
+                        unsigned is_negative    : 1;
+                    };
+                    unsigned all;
+                } flags;
+                int radix;
+
+                int seqlen;
+                const char *seq;
+
+                flags.all = 0;
+                if ('*' == *format) {
+                    // TODO:
+                } else {
+                    width = strtoull(format, &strtmp, 0);
+                    format = strtmp;
+                }
+
+                ch = *format++;
+                switch (ch) {
+                case '[':
+                    seq = format;
+                    while (true) {
+                        ch = *format++;
+                        if (!ch) {
+                            return -1;
+                        }
+                        if (ch == ']') {
+                            break;
+                        }
+                    }
+                    seqlen = format - seq - 1;
+
+                    ptr = va_arg(ap, char *);
+                    if (!width) { width = -1; }
+
+                    while (width > 0) {
+                        ch_tmp = fgetc(f); if (ch_tmp == EOF) { break; }
+                        if (!__is_in_seq(ch_tmp, seq, seqlen)) {
+                            break;
+                        }
+                        *ptr++ = ch_tmp;
+                        width--;
+                    }
+                    result++;
+                    break;
+                case 'u':
+                    flags.is_signed = 0;
+                    radix = 10;
+                    goto parse_integer;
+                case 'i':
+                case 'd':
+                    flags.is_signed = 1;
+                    radix = 10;
+                    goto parse_integer;
+                case 'o':
+                    flags.is_signed = 0;
+                    radix = 8;
+                    goto parse_integer;
+                case 'x':
+                case 'X':
+                    flags.is_signed = 0;
+                    radix = 16;
+                    goto parse_integer;
+
+                parse_integer:
+                    if (flags.is_signed) {
+                        ch_tmp = fgetc(f); if (ch_tmp == EOF) { goto end; }
+                        if (ch_tmp == '-') {
+                            flags.is_negative = true;
+                        } else {
+                            flags.is_negative = false;
+                            if (ch_tmp != '+') {
+                                ungetc(ch_tmp, f);
+                            }
+                        }
+                    }
+
+                    arg_uinteger = 0;
+                    if (!width) { width = -1; }
+                    while ((width < 0) || (width-- > 0)) {
+                        ch_tmp = fgetc(f); if (ch_tmp == EOF) { break; }
+                        ch_tmp = tolower(ch_tmp);
+                        if (ch_tmp >= '0' && ch_tmp <= '9') {
+                            ch_tmp -= '0';
+                        } else if (ch_tmp >= 'a' && ch_tmp <= 'f') {
+                            ch_tmp -= 'a';
+                            ch_tmp += 10;
+                        } else {
+                            ungetc(ch_tmp, f);
+                            break;
+                        }
+                        if (ch_tmp >= radix) {
+                            ungetc(ch_tmp, f);
+                            break;
+                        }
+
+                        arg_uinteger *= radix;
+                        arg_uinteger += ch_tmp;
+                    }
+
+                    if (flags.is_negative) {
+                        *va_arg(ap, int *) = (int)-arg_uinteger;
+                    } else {
+                        *va_arg(ap, unsigned int *) = (unsigned int)arg_uinteger;
+                    }
+                    result++;
+                    break;
+                case 'f':
+                    VSF_LINUX_ASSERT(false);
+                    return -1;
+                case 'c':
+                    ch_tmp = fgetc(f); if (ch_tmp == EOF) { goto end; }
+                    *va_arg(ap, char *) = ch_tmp;
+                    result++;
+                    break;
+                case 's': {
+                        char *ptr = va_arg(ap, char *);
+                        if (width) { width--; /* reserved for '\0' */ }
+                        else { width = -1; }
+
+                        while ((width < 0) || (width-- > 0)) {
+                            ch_tmp = fgetc(f); if (ch_tmp == EOF) { break; }
+                            if (!isspace(ch_tmp)) {
+                                *ptr++ = ch_tmp;
+                            } else {
+                                ungetc(ch_tmp, f);
+                                break;
+                            }
+                        }
+                        *ptr = '\0';
+                        result++;
+                    }
+                    break;
+                }
+            }
+            break;
+        case ' ':
+        skip_space:
+            while (true) {
+                ch_tmp = fgetc(f); if (ch_tmp == EOF) { goto end; }
+                if (!isspace(ch_tmp)) {
+                    ungetc(ch_tmp, f);
+                    break;
+                }
+            }
+            break;
+        default:
+            ch_tmp = fgetc(f); if (ch_tmp == EOF) { goto end; }
+            if (ch_tmp != ch) {
+                goto end;
+            }
+            break;
+        }
+    }
+end:
+    return result;
+}
+
 int fscanf(FILE *f, const char *format, ...)
 {
-    // TODO:
-    return -1;
+    int result;
+    va_list ap;
+    va_start(ap, format);
+        result = vfscanf(f, format, ap);
+    va_end(ap);
+    return result;
 }
 
 int ferror(FILE *f)

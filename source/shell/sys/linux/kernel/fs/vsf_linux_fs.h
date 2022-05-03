@@ -84,6 +84,7 @@ vsf_class(vsf_linux_fd_t) {
     )
 
     protected_member(
+        int unget_buff;
         vsf_linux_fd_priv_t *priv;
     )
 };

@@ -65,6 +65,7 @@ extern "C" {
 #define vfprintf            VSF_LINUX_LIBC_WRAPPER(vfprintf)
 #define fprintf             VSF_LINUX_LIBC_WRAPPER(fprintf)
 #define fscanf              VSF_LINUX_LIBC_WRAPPER(fscanf)
+#define vfscanf             VSF_LINUX_LIBC_WRAPPER(vfscanf)
 #define perror              VSF_LINUX_LIBC_WRAPPER(perror)
 #define setvbuf             VSF_LINUX_LIBC_WRAPPER(setvbuf)
 #define rename              VSF_LINUX_LIBC_WRAPPER(rename)
@@ -129,9 +130,9 @@ int fputs(const char *str, FILE *f);
 char *fgets(char *str, int n, FILE *f);
 
 int scanf(const char *format, ...);
+int vscanf(const char *format, va_list ap);
 int fscanf(FILE *f, const char *format, ...);
 int vfscanf(FILE *f, const char *format, va_list ap);
-int vscanf(const char *format, va_list ap);
 
 int printf(const char *format, ...);
 int fprintf(FILE *f, const char *format, ...);
