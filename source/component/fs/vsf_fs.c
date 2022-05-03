@@ -1310,7 +1310,7 @@ static void __vk_file_stream_tx_evthandler(vsf_stream_t *stream, void *param, vs
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_OUT:
-        if (pthis->size > 0) {
+        if (!pthis->cur_size && pthis->size > 0) {
             pthis->cur_size = vsf_stream_get_wbuf(stream, &pthis->cur_buff);
             vsf_eda_post_evt(pthis->cur_eda, VSF_EVT_FILE_READ);
         }
@@ -1325,7 +1325,7 @@ static void __vk_file_stream_rx_evthandler(vsf_stream_t *stream, void *param, vs
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_IN:
-        if (pthis->size > 0) {
+        if (!pthis->cur_size && pthis->size > 0) {
             pthis->cur_size = vsf_stream_get_rbuf(stream, &pthis->cur_buff);
             vsf_eda_post_evt(pthis->cur_eda, VSF_EVT_FILE_WRITE);
         }
@@ -1359,6 +1359,7 @@ __vsf_component_peda_private_entry(__vk_file_read_stream)
     case VSF_EVT_RETURN: {
             int32_t result = (int32_t)vsf_eda_get_return_value();
             if (result > 0) {
+                pthis->cur_size = 0;
                 pthis->size -= result;
                 pthis->rw_size += result;
                 vsf_stream_write(stream, NULL, result);
@@ -1395,6 +1396,7 @@ __vsf_component_peda_private_entry(__vk_file_write_stream)
     case VSF_EVT_RETURN: {
             int32_t result = (int32_t)vsf_eda_get_return_value();
             if (result > 0) {
+                pthis->cur_size = 0;
                 pthis->size -= result;
                 pthis->rw_size += result;
                 vsf_stream_read(stream, NULL, result);
