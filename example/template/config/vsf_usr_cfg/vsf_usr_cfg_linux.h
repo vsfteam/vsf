@@ -26,6 +26,10 @@
 
 // linux porting does not support preemption, so need evtq in idle
 #define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
+// cpu usage is not supported in windows/linux/macos
+#define VSF_KERNEL_CFG_CPU_USAGE                        DISABLED
+
+
 #define VSF_USE_UI                                      ENABLED
 #define VSF_USE_MBEDTLS                                 ENABLED 
 

@@ -318,8 +318,12 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #   define VSF_KERNEL_CFG_THREAD_STACK_LARGE                DISABLED
 #endif
 
+// VSF_KERNEL_CFG_CPU_USAGE is not compatible with all platforms in vsf, disabled by default
+// VSF_KERNEL_CFG_CPU_USAGE depends on feature of arch:
+//  1. if global interrupt is disabled, interrupt can weak cpu
+//      supported by ARM/RISCV etc, not supported by win/linux/macos x86/x64
 #if     !defined(VSF_KERNEL_CFG_CPU_USAGE)
-#   define VSF_KERNEL_CFG_CPU_USAGE                         VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#   define VSF_KERNEL_CFG_CPU_USAGE                         DISABLED
 #endif
 #if VSF_KERNEL_CFG_CPU_USAGE == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
 #   error VSF_KERNEL_CFG_CPU_USAGE needs VSF_KERNEL_CFG_EDA_SUPPORT_TIMER

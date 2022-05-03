@@ -34,6 +34,9 @@
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
 //#define __VSF_X86_WIN_SINGLE_PRIORITY
 
+// cpu usage is not supported in windows/linux/macos
+#define VSF_KERNEL_CFG_CPU_USAGE                        DISABLED
+
 //#define __WIN7__
 
 // Application configure
