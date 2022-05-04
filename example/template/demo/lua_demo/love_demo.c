@@ -121,7 +121,10 @@ int love_main(int argc, char *argv[])
         return -1;
     }
 
-    vsf_sdl2_init(usrapp_ui_common.disp);
+    vsf_sdl2_cfg_t cfg = {
+        .disp = usrapp_ui_common.disp,
+    };
+    vsf_sdl2_init(&cfg);
 
     // TODO: process on_exit to call lua_close(L);
     lua_State *L = lua_newstate(NULL, NULL);

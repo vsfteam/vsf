@@ -441,11 +441,18 @@ typedef enum {
 } SDL_HitTestResult;
 typedef SDL_HitTestResult (SDLCALL *SDL_HitTest)(SDL_Window *win, const SDL_Point *area, void *data);
 
+typedef struct vsf_sdl2_cfg_t {
+    vk_disp_t *disp_dev;
+#if VSF_USE_AUDIO == ENABLED
+    vk_audio_dev_t *audio_dev;
+#endif
+} vsf_sdl2_cfg_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_sdl2_init(vk_disp_t * disp);
+extern void vsf_sdl2_init(vsf_sdl2_cfg_t *cfg);
 
 extern int SDL_Init(uint32_t flags);
 extern int SDL_InitSubSystem(uint32_t flags);

@@ -60,7 +60,10 @@ int VSF_USER_ENTRY(void)
 #endif
 
     // initialize first
-    vsf_sdl2_init(usrapp_ui_common.disp);
+    vsf_sdl2_cfg_t cfg = {
+        .disp = usrapp_ui_common.disp,
+    };
+    vsf_sdl2_init(&cfg);
 
     // SDL application
     SDL_Init(SDL_INIT_EVERYTHING);

@@ -44,6 +44,18 @@ extern "C" {
         | SDL_AUDIO_ALLOW_FORMAT_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE       \
         | SDL_AUDIO_ALLOW_SAMPLES_CHANGE)
 
+#define SDL_AUDIO_MASK_BITSIZE              0xFF
+#define SDL_AUDIO_BITSIZE(__FORMAT)         ((__FORMAT) & SDL_AUDIO_MASK_BITSIZE)
+#define SDL_AUDIO_MASK_DATATYPE             (1 << 8)
+#define SDL_AUDIO_ISFLOAT(__FORMAT)         ((__FORMAT) & SDL_AUDIO_MASK_DATATYPE)
+#define SDL_AUDIO_ISINT(__FORMAT)           (!SDL_AUDIO_ISFLOAT(__FORMAT))
+#define SDL_AUDIO_MASK_ENDIAN               (1 << 12)
+#define SDL_AUDIO_ISBIGENDIAN(__FORMAT)     ((__FORMAT) & SDL_AUDIO_MASK_ENDIAN)
+#define SDL_AUDIO_ISLITTLEENDIAN(__FORMAT)  (!SDL_AUDIO_ISBIGENDIAN(__FORMAT))
+#define SDL_AUDIO_MASK_SIGNED               (1 << 15)
+#define SDL_AUDIO_ISSIGNED(__FORMAT)        ((__FORMAT) & SDL_AUDIO_MASK_SIGNED)
+#define SDL_AUDIO_ISUNSIGNED(__FORMAT)      (!SDL_AUDIO_ISSIGNED(__FORMAT))
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SDL_CFG_WRAPPER == ENABLED
@@ -60,7 +72,7 @@ extern "C" {
 typedef enum SDL_AudioStatus {
     SDL_AUDIO_STOPPED = 0,
     SDL_AUDIO_PLAYING,
-    SDL_AUDIO_PAUSED
+    SDL_AUDIO_PAUSED,
 } SDL_AudioStatus;
 typedef uint8_t SDL_AudioFormat;
 typedef void (*SDL_AudioCallback)(void * userdata, uint8_t * stream, int len);

@@ -22,8 +22,11 @@
 #if VSF_USE_SDL2 == ENABLED
 
 #define __VSF_DISP_CLASS_INHERIT__
+#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 // for vsf_disp
 #include "component/vsf_component.h"
+// for stream
+#include "service/vsf_service.h"
 #include "./include/SDL2/SDL.h"
 
 #if __IS_COMPILER_IAR__
@@ -100,6 +103,15 @@ struct SDL_Texture {
 
 typedef struct vsf_sdl2_t {
     vk_disp_t *disp;
+#if VSF_USE_AUDIO == ENABLED
+    struct {
+        vk_audio_dev_t *dev;
+        SDL_AudioStatus state;
+        vk_audio_stream_t *stream;
+        vsf_stream_t *raw_stream;
+        SDL_AudioSpec spec;
+    } audio;
+#endif
     uint32_t init_flags;
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     uint32_t start_ms;
@@ -111,7 +123,6 @@ typedef struct vsf_sdl2_t {
         char *text;
     } clipboard;
 
-    uint32_t flags;
     char *error;
 } vsf_sdl2_t;
 
@@ -410,18 +421,22 @@ static void __vsf_sdl2_disp_refresh(vk_disp_area_t *area, void *pixels)
     vsf_thread_wfe(VSF_EVT_RETURN);
 }
 
-void vsf_sdl2_init(vk_disp_t *disp)
+void vsf_sdl2_init(vsf_sdl2_cfg_t *cfg)
 {
     __vsf_sdl2.init_flags = 0;
-    __vsf_sdl2.disp = disp;
+    __vsf_sdl2.disp = cfg->disp_dev;
+#if VSF_USE_AUDIO == ENABLED
+    __vsf_sdl2.audio.dev = cfg->audio_dev;
+    __vsf_sdl2.audio.state = SDL_AUDIO_STOPPED;
+    __vsf_sdl2.audio.stream = NULL;
+    __vsf_sdl2.audio.raw_stream = NULL;
+#endif
     __vsf_sdl2.sdl1_screen = NULL;
-    __vsf_sdl2.flags = 0;
     __vsf_sdl2.error = NULL;
 }
 
 int SDL_InitSubSystem(uint32_t flags)
 {
-    __vsf_sdl2.flags |= flags;
     if (flags & SDL_INIT_GAMECONTROLLER) {
         flags |= SDL_INIT_JOYSTICK;
     }
@@ -447,12 +462,25 @@ int SDL_InitSubSystem(uint32_t flags)
         vk_disp_init(__vsf_sdl2.disp);
         vsf_thread_wfe(VSF_EVT_RETURN);
     }
+
+#if VSF_USE_AUDIO == ENABLED
+    if (flags & SDL_INIT_AUDIO) {
+        vk_audio_dev_t *audio_dev = __vsf_sdl2.audio.dev;
+        vk_audio_init(audio_dev);
+        for (uint_fast8_t i = 0; i < audio_dev->stream_num; i++) {
+            if (0 == audio_dev->stream[i].dir_in1out0) {
+                __vsf_sdl2.audio.stream = &audio_dev->stream[i];
+                break;
+            }
+        }
+    }
+#endif
     return 0;
 }
 
 void SDL_QuitSubSystem(uint32_t flags)
 {
-    __vsf_sdl2.flags &= ~flags;
+    __vsf_sdl2.init_flags &= ~flags;
 }
 
 int SDL_Init(uint32_t flags)
@@ -462,7 +490,7 @@ int SDL_Init(uint32_t flags)
 
 uint32_t SDL_WasInit(uint32_t flags)
 {
-    return __vsf_sdl2.flags & flags;
+    return __vsf_sdl2.init_flags & flags;
 }
 
 void SDL_Quit(void)
@@ -1084,6 +1112,7 @@ int SDL_RenderSetViewport(SDL_Renderer * renderer, const SDL_Rect * rect)
     if (rect != NULL) {
         renderer->view_port = *rect;
     }
+    return 0;
 }
 
 void SDL_RenderGetLogicalSize(SDL_Renderer * renderer, int *w, int *h)
@@ -1100,6 +1129,7 @@ int SDL_RenderSetLogicalSize(SDL_Renderer * renderer, int w, int h)
 {
     renderer->logic_w = w;
     renderer->logic_h = h;
+    return 0;
 }
 
 void SDL_RenderGetScale(SDL_Renderer * renderer, float *scaleX, float *scaleY)
@@ -1325,6 +1355,7 @@ SDL_bool SDL_RemoveTimer(SDL_TimerID id)
     SDL_Timer *timer = (SDL_Timer *)id;
     vsf_callback_timer_remove(&timer->timer);
     free(timer);
+    return SDL_TRUE;
 }
 #endif
 
@@ -1377,19 +1408,110 @@ char * SDL_GetClipboardText(void)
 }
 
 // audio
+#if VSF_USE_AUDIO == ENABLED
+static void __sdl_audio_playback_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
+{
+    uint_fast32_t cur_size;
+    uint8_t *cur_buff;
+
+    switch (evt) {
+    case VSF_STREAM_ON_CONNECT:
+    case VSF_STREAM_ON_OUT:
+        if (__vsf_sdl2.audio.state == SDL_AUDIO_PLAYING) {
+            cur_size = vsf_stream_get_wbuf(stream, &cur_buff);
+            if (cur_size && __vsf_sdl2.audio.spec.callback != NULL) {
+                __vsf_sdl2.audio.spec.callback(__vsf_sdl2.audio.spec.userdata,
+                    cur_buff, cur_size);
+                vsf_stream_write(stream, cur_buff, cur_size);
+            }
+        }
+        break;
+    }
+}
+#endif
+
 int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
 {
+#if VSF_USE_AUDIO == ENABLED
+    vk_audio_format_t fmt = {
+        .channel_num        = desired->channels,
+        .sample_bit_width   = SDL_AUDIO_BITSIZE(desired->format),
+        .sample_rate        = desired->freq,
+    };
+    desired->size = (fmt.sample_bit_width >> 3) * desired->samples;
+    desired->silence = 0;
+
+    if (__vsf_sdl2.audio.raw_stream != NULL) {
+        return -1;
+    }
+
+    vsf_mem_stream_t *raw_stream = calloc(1, sizeof(vsf_mem_stream_t) + desired->size);
+    if (NULL == raw_stream) {
+        return -1;
+    }
+    raw_stream->op = &vsf_mem_stream_op;
+    raw_stream->buffer = (uint8_t *)&raw_stream[1];
+    raw_stream->size = desired->size;
+    raw_stream->is_ticktock_read = true;
+    VSF_STREAM_INIT(raw_stream);
+    raw_stream->tx.param = NULL;
+    raw_stream->tx.evthandler = __sdl_audio_playback_evthandler;
+    VSF_STREAM_CONNECT_TX(raw_stream);
+    __vsf_sdl2.audio.raw_stream = &raw_stream->use_as__vsf_stream_t;
+
+    vsf_err_t err = vk_audio_start(
+                __vsf_sdl2.audio.dev,
+                __vsf_sdl2.audio.stream->stream_index,
+                __vsf_sdl2.audio.raw_stream,
+                &fmt);
+    if (VSF_ERR_NONE != err) {
+        SDL_CloseAudio();
+        return -1;
+    }
+
+    __vsf_sdl2.audio.spec = *desired;
+    __vsf_sdl2.audio.state = SDL_AUDIO_PAUSED;
+    return 0;
+#else
     return -1;
+#endif
 }
 void SDL_PauseAudio(int pause_on)
 {
+#if VSF_USE_AUDIO == ENABLED
+    if (pause_on) {
+        if (__vsf_sdl2.audio.state == SDL_AUDIO_PLAYING) {
+            __vsf_sdl2.audio.state = SDL_AUDIO_PAUSED;
+        }
+    } else {
+        if (__vsf_sdl2.audio.state == SDL_AUDIO_PAUSED) {
+            __vsf_sdl2.audio.state = SDL_AUDIO_PLAYING;
+            __sdl_audio_playback_evthandler(__vsf_sdl2.audio.raw_stream,
+                NULL, VSF_STREAM_ON_OUT);
+        }
+    }
+#else
+#endif
 }
 SDL_AudioStatus SDL_GetAudioStatus(void)
 {
+#if VSF_USE_AUDIO == ENABLED
+    return __vsf_sdl2.audio.state;
+#else
     return SDL_AUDIO_STOPPED;
+#endif
 }
 void SDL_CloseAudio(void)
 {
+#if VSF_USE_AUDIO == ENABLED
+    __vsf_sdl2.audio.state = SDL_AUDIO_STOPPED;
+    vk_audio_stop(__vsf_sdl2.audio.dev, __vsf_sdl2.audio.stream->stream_index);
+    if (__vsf_sdl2.audio.raw_stream != NULL) {
+        free(__vsf_sdl2.audio.raw_stream);
+        __vsf_sdl2.audio.raw_stream = NULL;
+    }
+#else
+#endif
 }
 void SDL_LockAudio(void)
 {
