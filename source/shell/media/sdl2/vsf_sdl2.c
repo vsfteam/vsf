@@ -1438,10 +1438,12 @@ int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
         .sample_bit_width   = SDL_AUDIO_BITSIZE(desired->format),
         .sample_rate        = desired->freq,
     };
-    desired->size = (fmt.sample_bit_width >> 3) * desired->samples;
+    // double buffer mode
+    desired->size = (fmt.sample_bit_width >> 3) * desired->samples * 2;
     desired->silence = 0;
 
-    if (__vsf_sdl2.audio.raw_stream != NULL) {
+    if (    (__vsf_sdl2.audio.raw_stream != NULL)
+        ||  (!desired->samples)) {
         return -1;
     }
 
