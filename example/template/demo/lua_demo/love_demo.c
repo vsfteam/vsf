@@ -122,7 +122,7 @@ int love_main(int argc, char *argv[])
     }
 
     vsf_sdl2_cfg_t cfg = {
-        .disp = usrapp_ui_common.disp,
+        .disp_dev = usrapp_ui_common.disp,
     };
     vsf_sdl2_init(&cfg);
 
