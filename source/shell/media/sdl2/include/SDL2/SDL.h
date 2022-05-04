@@ -170,6 +170,7 @@ extern "C" {
 #define SDL_FreeCursor                  VSF_SDL_WRAPPER(SDL_FreeCursor)
 #define SDL_ShowCursor                  VSF_SDL_WRAPPER(SDL_ShowCursor)
 
+#define SDL_GetScancodeName             VSF_SDL_WRAPPER(SDL_GetScancodeName)
 #define SDL_GetKeyName                  VSF_SDL_WRAPPER(SDL_GetKeyName)
 
 #define SDL_NumJoysticks                VSF_SDL_WRAPPER(SDL_NumJoysticks)
@@ -557,6 +558,7 @@ extern int SDL_SetClipboardText(const char * text);
 extern uint64_t SDL_GetPerformanceCounter(void);
 extern uint64_t SDL_GetPerformanceFrequency(void);
 
+extern const char * SDL_GetScancodeName(SDL_Scancode scancode);
 extern const char * SDL_GetKeyName(SDL_Keycode key);
 
 extern SDL_Cursor * SDL_CreateCursor(const uint8_t * data, const uint8_t * mask,

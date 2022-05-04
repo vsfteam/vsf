@@ -32,15 +32,15 @@ extern "C" {
 
 #define vsf_input_keyboard_set(__event, __keycode, __is_down, __keymod)         \
             do {                                                                \
-                (__event)->id = (((__keycode) << 0) | ((__is_down) << 9) | ((__keymod) << 10));\
+                (__event)->id = (((__keycode) << 0) | ((__is_down) << 10) | ((__keymod) << 11));\
             } while (0)
 
 #define vsf_input_keyboard_get_keymod(__event)                                  \
-            ((uint16_t)(((__event)->id >> 10) & 0xFF))
+            ((uint16_t)(((__event)->id >> 11) & 0xFF))
 #define vsf_input_keyboard_get_keycode(__event)                                 \
-            ((uint16_t)(((__event)->id >> 0) & 0x1FF))
+            ((uint16_t)(((__event)->id >> 0) & 0x3FF))
 #define vsf_input_keyboard_is_down(__event)                                     \
-            (((__event)->id >> 9) & 0x01)
+            (((__event)->id >> 10) & 0x01)
 
 /*============================ TYPES =========================================*/
 
@@ -98,7 +98,6 @@ enum {
     VSF_KB_LEFT_BRACKET     = 47,
     VSF_KB_RIGHT_BRACKET    = 48,
     VSF_KB_BACKSLASH        = 49,   // '\'
-    // Non-US #
     VSF_KB_SEMICOLON        = 51,
     VSF_KB_SINGLE_QUOTE     = 52,
     VSF_KB_GRAVE            = 53,
@@ -148,17 +147,51 @@ enum {
     VSF_KP_9                = 97,
     VSF_KP_0                = 98,
     VSF_KP_DOT              = 99,
-    VSF_KP_EQUAL            = 100,
-    VSF_KB_LCTRL            = 101,
-    VSF_KB_LSHIFT           = 102,
-    VSF_KB_LALT             = 103,
-    VSF_KB_LGUI             = 104,
-    VSF_KB_RCTRL            = 105,
-    VSF_KB_RSHIFT           = 106,
-    VSF_KB_RALT             = 107,
-    VSF_KB_RGUI             = 108,
+    VSF_KB_APPLICATION      = 101,
+    VSF_KB_POWER            = 102,
+    VSF_KP_EQUAL            = 103,
+    VSF_KB_F13              = 104,
+    VSF_KB_F14              = 105,
+    VSF_KB_F15              = 106,
+    VSF_KB_F16              = 107,
+    VSF_KB_F17              = 108,
+    VSF_KB_F18              = 109,
+    VSF_KB_F19              = 110,
+    VSF_KB_F20              = 111,
+    VSF_KB_F21              = 112,
+    VSF_KB_F22              = 113,
+    VSF_KB_F23              = 114,
+    VSF_KB_F24              = 115,
+    VSF_KB_EXECUTE          = 116,
+    VSF_KB_HELP             = 117,
+    VSF_KB_MENU             = 118,
+    VSF_KB_SELECT           = 119,
+    VSF_KB_STOP             = 120,
+    VSF_KB_AGAIN            = 121,
+    VSF_KB_UNDO             = 122,
+    VSF_KB_CUT              = 123,
+    VSF_KB_COPY             = 124,
+    VSF_KB_PASTE            = 125,
+    VSF_KB_FIND             = 126,
+    VSF_KB_MUTE             = 127,
+    VSF_KB_VOLUMEUP         = 128,
+    VSF_KB_VOLUMEDOWN       = 129,
+    VSF_KP_COMMA            = 133,
 
-    VSF_KB_EXT              = 0x0100,
+    VSF_KB_LCTRL            = 224,
+    VSF_KB_LSHIFT           = 225,
+    VSF_KB_LALT             = 226,
+    VSF_KB_LGUI             = 227,
+    VSF_KB_RCTRL            = 228,
+    VSF_KB_RSHIFT           = 229,
+    VSF_KB_RALT             = 230,
+    VSF_KB_RGUI             = 231,
+    VSF_KB_MODE             = 257,
+
+    VSF_KB_EJECT            = 281,
+    VSF_KB_SLEEP            = 282,
+
+    VSF_KB_EXT              = 0x0200,
     // keycodes with SHIFT pressed
     VSF_KB_EXCLAM           = VSF_KB_1 | VSF_KB_EXT,
     VSF_KB_AT               = VSF_KB_2 | VSF_KB_EXT,
