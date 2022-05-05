@@ -275,7 +275,8 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
     int pre_read = 0;
     if (sfd->unget_buff != EOF) {
         pre_read = 1;
-        *(uint8_t *)ptr++ = sfd->unget_buff;
+        *(uint8_t *)ptr = sfd->unget_buff;
+        ptr = (uint8_t *)ptr + 1;
         sfd->unget_buff = EOF;
     }
 
