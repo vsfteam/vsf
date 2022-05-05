@@ -34,6 +34,7 @@ dcl_vsf_peda_methods(static, __vk_memfs_mount)
 dcl_vsf_peda_methods(static, __vk_memfs_lookup)
 dcl_vsf_peda_methods(static, __vk_memfs_read)
 dcl_vsf_peda_methods(static, __vk_memfs_write)
+dcl_vsf_peda_methods(static, __vk_memfs_setpos)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -54,7 +55,7 @@ const vk_fs_op_t vk_memfs_op = {
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_write),
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
         .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
-        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_setpos),
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_lookup),
@@ -210,6 +211,18 @@ __vsf_component_peda_ifs_entry(__vk_memfs_write, vk_file_write)
         vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_memfs_setpos, vk_file_setpos)
+{
+    vsf_peda_begin();
+    vk_memfs_file_t *file = (vk_memfs_file_t *)&vsf_this;
+
+    VSF_FS_ASSERT(file != NULL);
+    *vsf_local.result = file->pos = vsf_local.offset;
+    vsf_eda_return(VSF_ERR_NONE);
+
     vsf_peda_end();
 }
 
