@@ -16,25 +16,27 @@ extern "C" {
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define sem_init            VSF_LINUX_WRAPPER(sem_init)
-#define sem_destory         VSF_LINUX_WRAPPER(sem_destory)
+#define sem_destroy         VSF_LINUX_WRAPPER(sem_destroy)
 #define sem_wait            VSF_LINUX_WRAPPER(sem_wait)
 #define sem_trywait         VSF_LINUX_WRAPPER(sem_trywait)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 #   define sem_timedwait    VSF_LINUX_WRAPPER(sem_timedwait)
 #endif
 #define sem_post            VSF_LINUX_WRAPPER(sem_post)
+#define sem_getvalue        VSF_LINUX_WRAPPER(sem_getvalue)
 #endif
 
 typedef vsf_sem_t sem_t;
 
 int sem_init(sem_t *sem, int pshared, unsigned int value);
-int sem_destory(sem_t *sem);
+int sem_destroy(sem_t *sem);
 int sem_wait(sem_t *sem);
 int sem_trywait(sem_t *sem);
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);
 #endif
 int sem_post(sem_t *sem);
+int sem_getvalue(sem_t *sem, int *value);
 
 #ifdef __cplusplus
 }

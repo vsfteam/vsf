@@ -32,6 +32,8 @@ extern "C" {
 #define pthread_once                    VSF_LINUX_WRAPPER(pthread_once)
 #define pthread_setcancelstate          VSF_LINUX_WRAPPER(pthread_setcancelstate)
 #define pthread_setcanceltype           VSF_LINUX_WRAPPER(pthread_setcanceltype)
+#define pthread_setschedparam           VSF_LINUX_WRAPPER(pthread_setschedparam)
+#define pthread_getschedparam           VSF_LINUX_WRAPPER(pthread_getschedparam)
 #define pthread_attr_init               VSF_LINUX_WRAPPER(pthread_attr_init)
 #define pthread_attr_destroy            VSF_LINUX_WRAPPER(pthread_attr_destroy)
 #define pthread_attr_setstack           VSF_LINUX_WRAPPER(pthread_attr_setstack)
@@ -267,6 +269,8 @@ int pthread_kill(pthread_t thread, int sig);
 int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 int pthread_setcancelstate(int state, int *oldstate);
 int pthread_setcanceltype(int type, int *oldtype);
+int pthread_setschedparam(pthread_t thread, int policy, const struct sched_param *param);
+int pthread_getschedparam(pthread_t thread, int *policy, struct sched_param *param);
 
 int pthread_attr_init(pthread_attr_t *attr);
 int pthread_attr_destroy(pthread_attr_t *attr);

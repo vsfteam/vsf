@@ -21,6 +21,8 @@
 
 #if VSF_USE_LINUX == ENABLED
 
+// pending_list in vsf_sem_t
+#define __VSF_EDA_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/semaphore.h"
@@ -74,7 +76,7 @@ int sem_post(sem_t *sem)
     return 0;
 }
 
-int sem_destory(sem_t *sem)
+int sem_destroy(sem_t *sem)
 {
     vsf_eda_sync_cancel(sem);
     return 0;
@@ -92,6 +94,23 @@ int sem_trywait(sem_t *sem)
 {
     if (vsf_eda_sem_pend(sem, 0)) {
         return __sync_pend(sem);
+    }
+    return 0;
+}
+
+int sem_getvalue(sem_t *sem, int *value)
+{
+    vsf_protect_t orig = vsf_protect_sched();
+    int value_tmp = sem->cur_union.bits.cur;
+    if (!value_tmp) {
+        __vsf_dlist_foreach_unsafe(vsf_eda_t, pending_node, &sem->pending_list) {
+            value_tmp--;
+        }
+    }
+    vsf_unprotect_sched(orig);
+
+    if (value != NULL) {
+        *value = value_tmp;
     }
     return 0;
 }

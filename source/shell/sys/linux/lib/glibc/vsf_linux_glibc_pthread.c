@@ -208,6 +208,16 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
     return 0;
 }
 
+int pthread_setschedparam(pthread_t thread, int policy, const struct sched_param *param)
+{
+    return 0;
+}
+
+int pthread_getschedparam(pthread_t thread, int *policy, struct sched_param *param)
+{
+    return -1;
+}
+
 int pthread_attr_init(pthread_attr_t *attr)
 {
     if (attr != NULL) {
