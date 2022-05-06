@@ -252,6 +252,11 @@ enum {
     VSF_KM_RIGHT_CTRL       = 0x20,
     VSF_KM_RIGHT_ALT        = 0x40,
     VSF_KM_RIGHT_GUI        = 0x80,
+
+    VSF_KM_SHIFT            = VSF_KM_LEFT_SHIFT | VSF_KM_RIGHT_SHIFT,
+    VSF_KM_CTRL             = VSF_KM_LEFT_CTRL | VSF_KM_RIGHT_CTRL,
+    VSF_KM_ALT              = VSF_KM_LEFT_ALT | VSF_KM_RIGHT_ALT,
+    VSF_KM_GUI              = VSF_KM_LEFT_GUI | VSF_KM_RIGHT_GUI,
 };
 
 typedef struct vk_keyboard_evt_t {

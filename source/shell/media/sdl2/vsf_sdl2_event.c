@@ -610,28 +610,32 @@ static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
                 &&  (keycode >= ' ') && (keycode <= '~')) {
             text_input = keycode;
             if (vsf_keycode & VSF_KB_EXT) {
-                switch (text_input) {
-                case '`':   text_input = '~';   break;
-                case '1':   text_input = '!';   break;
-                case '2':   text_input = '@';   break;
-                case '3':   text_input = '#';   break;
-                case '4':   text_input = '$';   break;
-                case '5':   text_input = '%';   break;
-                case '6':   text_input = '^';   break;
-                case '7':   text_input = '&';   break;
-                case '8':   text_input = '*';   break;
-                case '9':   text_input = '(';   break;
-                case '0':   text_input = ')';   break;
-                case '-':   text_input = '_';   break;
-                case '=':   text_input = '+';   break;
-                case '[':   text_input = '{';   break;
-                case ']':   text_input = '}';   break;
-                case '\\':  text_input = '|';   break;
-                case ';':   text_input = ':';   break;
-                case '\'':  text_input = '\"';  break;
-                case ',':   text_input = '<';   break;
-                case '.':   text_input = '>';   break;
-                case '/':   text_input = '?';   break;
+                if ((text_input >= 'a') && (text_input <= 'z')) {
+                    text_input -= 0x20;
+                } else {
+                    switch (text_input) {
+                    case '`':   text_input = '~';   break;
+                    case '1':   text_input = '!';   break;
+                    case '2':   text_input = '@';   break;
+                    case '3':   text_input = '#';   break;
+                    case '4':   text_input = '$';   break;
+                    case '5':   text_input = '%';   break;
+                    case '6':   text_input = '^';   break;
+                    case '7':   text_input = '&';   break;
+                    case '8':   text_input = '*';   break;
+                    case '9':   text_input = '(';   break;
+                    case '0':   text_input = ')';   break;
+                    case '-':   text_input = '_';   break;
+                    case '=':   text_input = '+';   break;
+                    case '[':   text_input = '{';   break;
+                    case ']':   text_input = '}';   break;
+                    case '\\':  text_input = '|';   break;
+                    case ';':   text_input = ':';   break;
+                    case '\'':  text_input = '\"';  break;
+                    case ',':   text_input = '<';   break;
+                    case '.':   text_input = '>';   break;
+                    case '/':   text_input = '?';   break;
+                    }
                 }
             }
         }
