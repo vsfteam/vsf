@@ -22,6 +22,7 @@ extern "C" {
 #define seekdir         VSF_LINUX_WRAPPER(seekdir)
 #define closedir        VSF_LINUX_WRAPPER(closedir)
 #define scandir         VSF_LINUX_WRAPPER(scandir)
+#define alphasort       VSF_LINUX_WRAPPER(alphasort)
 #endif
 
 struct dirent {
@@ -43,6 +44,7 @@ int closedir(DIR *dir);
 int scandir(const char *dir, struct dirent ***namelist,
               int (*filter)(const struct dirent *),
               int (*compar)(const struct dirent **, const struct dirent **));
+int alphasort(const struct dirent **a, const struct dirent **b);
 
 #ifdef __cplusplus
 }

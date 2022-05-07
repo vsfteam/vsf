@@ -1422,6 +1422,12 @@ int scandir(const char *dir, struct dirent ***namelist,
     return -1;
 }
 
+int alphasort(const struct dirent **a, const struct dirent **b)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 long telldir(DIR *dir)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)dir->priv;
