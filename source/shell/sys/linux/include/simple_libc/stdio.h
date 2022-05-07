@@ -35,12 +35,12 @@ extern "C" {
 #define putc                VSF_LINUX_LIBC_WRAPPER(putc)
 #define putchar             VSF_LINUX_LIBC_WRAPPER(putchar)
 #define ungetc              VSF_LINUX_LIBC_WRAPPER(ungetc)
+#define feof                VSF_LINUX_LIBC_WRAPPER(feof)
 
 
 #define fopen               VSF_LINUX_LIBC_WRAPPER(fopen)
 #define fdopen              VSF_LINUX_LIBC_WRAPPER(fdopen)
 #define freopen             VSF_LINUX_LIBC_WRAPPER(freopen)
-#define feof                VSF_LINUX_LIBC_WRAPPER(feof)
 #define fclose              VSF_LINUX_LIBC_WRAPPER(fclose)
 #define fileno              VSF_LINUX_LIBC_WRAPPER(fileno)
 #define fseek               VSF_LINUX_LIBC_WRAPPER(fseek)

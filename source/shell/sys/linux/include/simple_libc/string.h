@@ -80,11 +80,4 @@ void * memchr(const void *buf, int ch, size_t count);
 #   pragma clang diagnostic pop
 #endif
 
-// TODO: add cpp related code outside extern "C"
-#ifdef __cplusplus
-#   ifdef __WIN__
-//#       include <xstring>
-#   endif
-#endif
-
 #endif

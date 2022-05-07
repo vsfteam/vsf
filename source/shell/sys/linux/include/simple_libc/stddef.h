@@ -59,7 +59,7 @@ typedef struct {
 } max_align_t;
 #elif   __IS_COMPILER_LLVM__
 #   if      defined(__WIN__)
-typedef long double max_align_t;
+typedef double max_align_t;
 #   elif    defined(__APPLE__)
 typedef long double max_align_t;
 #   else

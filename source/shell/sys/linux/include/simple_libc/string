@@ -1,0 +1,230 @@
+#ifndef __SIMPLE_LIBC_STRING__
+#define __SIMPLE_LIBC_STRING__
+
+#include <string.h>
+// for vsf_heap, which is process independent
+#include "service/vsf_service.h"
+
+namespace std {
+    template <typename T>
+    static size_t __strlen(const T *str)
+    {
+        size_t result = 0;
+        for (; str[result]; result++);
+        return result;
+    }
+
+    template <typename T>
+    static T* __strcpy(T *dst, const T *src)
+    {
+        T *result = dst;
+        while ((*des++ = *src++) != 0);
+        return result;
+    }
+
+    template <typename T>
+    static T* __memcpy(T *dst, const T *src, size_t count)
+    {
+        return (T *)memcpy((void *)dst, (void *)src, count * sizeof(T));
+    }
+
+    template <typename T>
+    class array_base {
+    public:
+        typedef T *iterator;
+        typedef const T *const_iterator;
+        typedef T &reference;
+        typedef const T &const_reference;
+
+        array_base<T>(const T *arr, size_t num)
+            : __length(num)
+        {
+            if (__length > 0) {
+                __array = (T *)vsf_heap_malloc(__length * sizeof(T));
+                VSF_ASSERT(__array != NULL);
+                __memcpy<T>(__array, arr, __length);
+            } else {
+                __array = nullptr;
+            }
+        }
+        array_base<T>(const array_base &arr)
+            : array_base<T>(arr.__array, arr.__length) { }
+        ~array_base<T>()
+        {
+            __length = 0;
+            if (__array != NULL) {
+                vsf_heap_free(__array);
+                __array = nullptr;
+            }
+        }
+
+        bool empty() const
+        {
+            return (0 == __length);
+        }
+        const T & at(size_t pos) const
+        {
+            VSF_ASSERT(pos < __length);
+            return __array[pos];
+        }
+        const T & back() const
+        {
+            return at(__length);
+        }
+        const T & front() const
+        {
+            return at(0);
+        }
+        size_t size() const
+        {
+            return __length * sizeof(T);
+        }
+        size_t length() const
+        {
+            return __length;
+        }
+        array_base<T> & append(const T *arr, size_t num)
+        {
+            __array = (T *)vsf_heap_realloc(__array, (__length + num) * sizeof(T));
+            VSF_ASSERT(__array != NULL);
+            __memcpy(&__array[__length], arr, num);
+            __length += num;
+            return (*this);
+        }
+        array_base<T> & append(array_base<T> &arr)
+        {
+            return append(arr.__array, arr.__length);
+        }
+        array_base<T> & assign(array_base<T> &arr)
+        {
+            if (this == &str) { return (*this); }
+
+            free(__array);
+            __array = NULL;
+            return append(arr);
+        }
+        void swap(array_base<T> &arr)
+        {
+            T * array = arr.__array;
+            size_t length = arr.__length;
+            arr.__array = __array;
+            arr.__length = __length;
+            __array = str;
+            __length = length;
+        }
+
+        iterator begin()
+        {
+            return __array == nullptr ? (iterator)nullptr : &__array[0];
+        }
+        iterator end()
+        {
+            return __array == nullptr ? (iterator)nullptr : &__array[__length];
+        }
+        iterator rbegin()
+        {
+            return end();
+        }
+        iterator rend()
+        {
+            return begin();
+        }
+        const_iterator cbegin() const
+        {
+            return __array == nullptr ? (const_iterator)nullptr : &__array[0];
+        }
+        const_iterator cend() const
+        {
+            return __array == nullptr ? (const_iterator)nullptr : &__array[__length];
+        }
+        const_iterator crbegin() const
+        {
+            return cend();
+        }
+        const_iterator crend() const
+        {
+            return cbegin();
+        }
+
+        const T & operator[](size_t pos) const
+        {
+            return at(pos);
+        }
+        array_base<T> operator=(array_base<T> &s)
+        {
+            return assign(s);
+        }
+        array_base<T> operator+=(array_base<T> &s)
+        {
+            return append(s);
+        }
+
+    private:
+        T * __array;
+        size_t __length;
+    };
+
+    template <typename T>
+    class string_base : public array_base<T> {
+    public:
+        static const size_t npos = -1;
+
+        string_base<T>(const T *str)
+            : array_base<T>(str, __strlen(str)) { }
+        string_base<T>(const string_base<T> &s)
+            : array_base<T>(s) { }
+        string_base<T>()
+            : array_base<T>(nullptr, 0) { }
+        string_base<T>(const T *arr, size_t num)
+            : array_base<T>(arr, num) { }
+
+        size_t size() const
+        {
+            return array_base<T>::length();
+        }
+        size_t length() const
+        {
+            return array_base<T>::length();
+        }
+        size_t capacity() const
+        {
+            return array_base<T>::size();
+        }
+        string_base<T> & append(const T *arr, size_t num)
+        {
+            array_base<T>::append(arr, num);
+            return (*this);
+        }
+        string_base<T> & append(const T *str)
+        {
+            size_t size = __strlen<T>(str);
+            if (size > 0) {
+                array_base<T>::append(str, size);
+            }
+            return (*this);
+        }
+        string_base<T> substr(size_t start = 0, size_t count = npos) const
+        {
+            size_t len = length();
+            if (start >= len) {
+                count = 0;
+            }
+            if (start + count > len) {
+                count -= len - (start + count);
+            }
+
+            const T * sub = array_base<T>::cbegin();
+            string_base<T> *newstr = new string_base<T>(&sub[start], count);
+            return (*newstr);
+        }
+
+        const T * c_str() const
+        {
+            return array_base<T>::cbegin();
+        }
+    };
+
+    typedef string_base<char> string;
+}
+
+#endif      // __SIMPLE_LIBC_STRING__
