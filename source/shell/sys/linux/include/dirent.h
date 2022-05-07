@@ -43,7 +43,7 @@ void seekdir(DIR *dir, long loc);
 int closedir(DIR *dir);
 int scandir(const char *dir, struct dirent ***namelist,
               int (*filter)(const struct dirent *),
-              int (*compar)(const struct dirent **, const struct dirent **));
+              int (*compare)(const struct dirent **, const struct dirent **));
 int alphasort(const struct dirent **a, const struct dirent **b);
 
 #ifdef __cplusplus

@@ -154,6 +154,10 @@ FILE * freopen(const char *filename, const char *mode, FILE *f)
 
 int fclose(FILE *f)
 {
+    if (NULL == f) {
+        return -1;
+    }
+
     int fd = ((vsf_linux_fd_t *)f)->fd;
     if (fd < 0) {
         return EOF;

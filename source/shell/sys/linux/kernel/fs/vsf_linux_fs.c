@@ -1416,16 +1416,46 @@ struct dirent * readdir(DIR *dir)
 
 int scandir(const char *dir, struct dirent ***namelist,
               int (*filter)(const struct dirent *),
-              int (*compar)(const struct dirent **, const struct dirent **))
+              int (*compare)(const struct dirent **, const struct dirent **))
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    DIR *dp = opendir(dir);
+    if (NULL == dp) {
+        return -1;
+    }
+
+    int cnt = 0;
+    struct dirent *d, *n, **result = NULL;
+    while ((d = readdir(dp)) != NULL) {
+        if ((filter != NULL) && !filter(d)) {
+            continue;
+        }
+
+        result = realloc(result, (++cnt) * sizeof(struct dirent *));
+        if (NULL == result) {
+            return -1;
+        }
+
+        n = malloc(sizeof(struct dirent) + strlen(d->d_name) + 1);
+        if (NULL == n) {
+            break;
+        }
+        *n = *d;
+        n->d_name = (char *)&n[1];
+        strcpy(n->d_name, d->d_name);
+
+        result[cnt - 1] = n;
+    }
+
+    if ((cnt > 0) && (compare != NULL)) {
+        qsort(result, cnt, sizeof(struct dirent *), compare);
+    }
+    *namelist = result;
+    return cnt;
 }
 
 int alphasort(const struct dirent **a, const struct dirent **b)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    return strcmp((*a)->d_name, (*b)->d_name);
 }
 
 long telldir(DIR *dir)

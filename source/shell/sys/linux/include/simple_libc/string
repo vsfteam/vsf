@@ -2,8 +2,6 @@
 #define __SIMPLE_LIBC_STRING__
 
 #include <string.h>
-// for vsf_heap, which is process independent
-#include "service/vsf_service.h"
 
 namespace std {
     template <typename T>
@@ -40,7 +38,7 @@ namespace std {
             : __length(num)
         {
             if (__length > 0) {
-                __array = (T *)vsf_heap_malloc(__length * sizeof(T));
+                __array = (T *)malloc(__length * sizeof(T));
                 VSF_ASSERT(__array != NULL);
                 __memcpy<T>(__array, arr, __length);
             } else {
@@ -53,7 +51,7 @@ namespace std {
         {
             __length = 0;
             if (__array != NULL) {
-                vsf_heap_free(__array);
+                free(__array);
                 __array = nullptr;
             }
         }
@@ -85,7 +83,7 @@ namespace std {
         }
         array_base<T> & append(const T *arr, size_t num)
         {
-            __array = (T *)vsf_heap_realloc(__array, (__length + num) * sizeof(T));
+            __array = (T *)realloc(__array, (__length + num) * sizeof(T));
             VSF_ASSERT(__array != NULL);
             __memcpy(&__array[__length], arr, num);
             __length += num;
