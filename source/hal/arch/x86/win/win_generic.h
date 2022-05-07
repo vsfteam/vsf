@@ -125,17 +125,17 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 // avoid to use windows.h, fix if any conflicts
-typedef void *                      HANDLE;
-typedef unsigned long               DWORD;
-typedef unsigned int                UINT;
-typedef unsigned char               BYTE;
-typedef char *                      LPSTR;
+typedef void *                      VSF_WIN_HANDLE;
+typedef unsigned long               VSF_WIN_DWORD;
+typedef unsigned int                VSF_WIN_UINT;
+typedef unsigned char               VSF_WIN_BYTE;
+typedef char *                      VSF_WIN_LPSTR;
 #ifdef __CPU_X64__
-typedef unsigned long long          ULONG_PTR, *PULONG_PTR;
+typedef unsigned long long          VSF_WIN_ULONG_PTR, *VSF_WIN_PULONG_PTR;
 #else
-typedef unsigned long               ULONG_PTR, *PULONG_PTR;
+typedef unsigned long               VSF_WIN_ULONG_PTR, *VSF_WIN_PULONG_PTR;
 #endif
-typedef ULONG_PTR                   DWORD_PTR, *PDWORD_PTR;
+typedef VSF_WIN_ULONG_PTR           VSF_WIN_DWORD_PTR, *VSF_WIN_PDWORD_PTR;
 
 #ifndef VSF_ARCH_SYSTIMER_TICK_T
 #   define VSF_ARCH_SYSTIMER_TICK_T uint64_t
@@ -153,7 +153,7 @@ typedef void (*vsf_arch_irq_entry_t)(void*);
 
 vsf_class(vsf_arch_irq_request_t) {
     private_member(
-        HANDLE event;
+        VSF_WIN_HANDLE event;
         bool is_inited;
     )
 };
@@ -172,8 +172,8 @@ typedef volatile bool vsf_gint_state_t;
 vsf_class(vsf_arch_irq_thread_t) {
     private_member(
         implement(vsf_arch_irq_thread_common_t)
-        HANDLE thread;
-        DWORD thread_id;
+        VSF_WIN_HANDLE thread;
+        VSF_WIN_DWORD thread_id;
     )
 };
 #else
@@ -190,8 +190,8 @@ vsf_class(vsf_arch_irq_thread_t) {
 
         PUBLIC_CONST vsf_dlist_node_t irq_node;
         PUBLIC_CONST vsf_dlist_node_t rdy_node;
-        PUBLIC_CONST HANDLE thread;
-        PUBLIC_CONST DWORD thread_id;
+        PUBLIC_CONST VSF_WIN_HANDLE thread;
+        PUBLIC_CONST VSF_WIN_DWORD thread_id;
         PUBLIC_CONST vsf_arch_prio_t priority;
         PUBLIC_CONST vsf_arch_irq_thread_t *prev;     // call stack
         PUBLIC_CONST vsf_arch_irq_state_t state;

@@ -44,21 +44,21 @@ extern "C" {
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
 
 // avoid to use windows.h, fix if any conflicts
-#define HWAVEOUT                        HANDLE
+#define VSF_WIN_HWAVEOUT            VSF_WIN_HANDLE
 /* wave data block header */
-typedef struct __wavehdr_tag {
-    LPSTR       lpData;                 /* pointer to locked data buffer */
-    DWORD       dwBufferLength;         /* length of data buffer */
-    DWORD       dwBytesRecorded;        /* used for input only */
-    DWORD_PTR   dwUser;                 /* for client's use */
-    DWORD       dwFlags;                /* assorted flags (see defines) */
-    DWORD       dwLoops;                /* loop control counter */
-    struct __wavehdr_tag FAR *lpNext;   /* reserved for driver */
-    DWORD_PTR   reserved;               /* reserved for driver */
-} __WAVEHDR;
+typedef struct __vsf_win_wavehdr_tag {
+    VSF_WIN_LPSTR       lpData;                 /* pointer to locked data buffer */
+    VSF_WIN_DWORD       dwBufferLength;         /* length of data buffer */
+    VSF_WIN_DWORD       dwBytesRecorded;        /* used for input only */
+    VSF_WIN_DWORD_PTR   dwUser;                 /* for client's use */
+    VSF_WIN_DWORD       dwFlags;                /* assorted flags (see defines) */
+    VSF_WIN_DWORD       dwLoops;                /* loop control counter */
+    struct __vsf_win_wavehdr_tag FAR *lpNext;   /* reserved for driver */
+    VSF_WIN_DWORD_PTR   reserved;               /* reserved for driver */
+} __VSF_WIN_WAVEHDR;
 
 typedef struct vk_winsound_playback_buffer_t {
-    __WAVEHDR header;
+    __VSF_WIN_WAVEHDR header;
     uint8_t *buffer;
 } vk_winsound_playback_buffer_t;
 
@@ -66,8 +66,8 @@ typedef struct vk_winsound_playback_ctx_t {
     vsf_arch_irq_thread_t irq_thread;
     vk_audio_stream_t *audio_stream;
 
-    HWAVEOUT hwo;
-    HANDLE hEvent;
+    VSF_WIN_HWAVEOUT hwo;
+    VSF_WIN_HANDLE hEvent;
 
     vk_winsound_playback_buffer_t buffer[2];
 

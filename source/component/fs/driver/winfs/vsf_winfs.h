@@ -51,10 +51,10 @@ vsf_class(vk_winfs_file_t) {
     private_member(
         union {
             struct {
-                HANDLE hFile;
+                VSF_WIN_HANDLE hFile;
             } f;
             struct {
-                HANDLE hFind;
+                VSF_WIN_HANDLE hFind;
             } d;
         };
         char *fullpath;
