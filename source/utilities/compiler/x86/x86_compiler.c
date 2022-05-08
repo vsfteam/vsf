@@ -50,6 +50,20 @@ size_t strlcpy(char *dst, const char *src, size_t dsize)
 }
 
 #ifdef __WIN__
+char * strcasestr(const char *str, const char *substr)
+{
+    do {
+        for (int i = 0; ; i++) {
+            if (!substr[i]) {
+                return (char *)str;
+            } else if (tolower(substr[i]) != tolower(str[i])) {
+                break;
+            }
+        }
+    } while (*str++);
+    return NULL;
+}
+
 char * strsep(char **stringp, const char *delim)
 {
     char *s;
