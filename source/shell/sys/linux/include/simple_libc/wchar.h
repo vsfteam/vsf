@@ -55,9 +55,9 @@ int vfwprintf(FILE *f, const wchar_t *format, va_list ap);
 int vfwscanf(FILE *f, const wchar_t *format, va_list ap);
 
 int swscanf(const wchar_t *str, const wchar_t *format, ...);
+int vswscanf(const wchar_t *str, const wchar_t *format, va_list ap);
 int swprintf(wchar_t *str, size_t n, const wchar_t *format, ...);
 int vswprintf(wchar_t *str, size_t n, const wchar_t *format, va_list ap);
-int vswscanf(const wchar_t *str, const wchar_t *format, va_list ap);
 
 size_t wcslen(const wchar_t *str);
 wchar_t * wcscat(wchar_t *dest, const wchar_t *src);
