@@ -64,9 +64,6 @@ struct dirent {
 #if VSF_LINUX_SOCKET_CFG_WRAPPER != ENABLED
 #   error VSF_LINUX_SOCKET_CFG_WRAPPER MUST be enabled to avoid conflicts with host socket APIs
 #endif
-#if VSF_LINUX_CFG_WRAPPER != ENABLED
-#   error VSF_LINUX_CFG_WRAPPER MUST be enabled to avoid conflicts with host socket APIs
-#endif
 
 #define VSF_LINUX_WRAPPER(__api)            VSF_SHELL_WRAPPER(vsf_linux, __api)
 #define VSF_LINUX_SOCKET_WRAPPER(__api)     VSF_SHELL_WRAPPER(vsf_linux_socket, __api)

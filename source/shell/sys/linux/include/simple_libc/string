@@ -178,11 +178,12 @@ namespace std {
 
         size_t size() const
         {
-            return array_base<T>::length();
+            return lenth();
         }
         size_t length() const
         {
-            return array_base<T>::length();
+            size_t len = array_base<T>::length();
+            return len > 0 ? len - 1 : 0;
         }
         size_t capacity() const
         {

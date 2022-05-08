@@ -42,6 +42,13 @@ extern "C" {
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
 #define getenv              VSF_LINUX_LIBC_WRAPPER(getenv)
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
+
+#define malloc              VSF_LINUX_LIBC_WRAPPER(malloc)
+#define aligned_alloc       VSF_LINUX_LIBC_WRAPPER(aligned_alloc)
+#define realloc             VSF_LINUX_LIBC_WRAPPER(realloc)
+#define free                VSF_LINUX_LIBC_WRAPPER(free)
+#define calloc              VSF_LINUX_LIBC_WRAPPER(calloc)
+#define memalign            VSF_LINUX_LIBC_WRAPPER(memalign)
 #endif
 
 void * malloc(size_t size);
