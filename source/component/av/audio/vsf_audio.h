@@ -55,10 +55,14 @@ vsf_class(vk_audio_drv_t) {
     )
 };
 
-typedef struct vk_audio_format_t {
-    uint8_t                     channel_num;        // eg: 2
-    uint8_t                     sample_bit_width;   // eg: 16
-    uint16_t                    sample_rate;        // eg: 44100/48000
+typedef union vk_audio_format_t {
+    struct {
+        uint8_t                 channel_num;        // eg: 2
+        uint8_t                 sample_bit_width;   // eg: 16
+        uint16_t                sample_rate;        // eg: 44100/48000
+    } PACKED;
+    // if value is 0, means adaptive format(from format in vk_audio_start)
+    uint32_t                    value;
 } vk_audio_format_t;
 
 typedef struct vk_audio_stream_t {

@@ -106,6 +106,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
 
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
             dev->stream[stream_idx].dir_in1out0 = 0;
+            dev->stream[stream_idx].format.value = 0;
             dev->stream[stream_idx].drv = &__vk_winsound_stream_drv_playback;
             stream_idx++;
             __vsf_arch_irq_init(&playback_ctx->irq_thread, "winsound_play",
