@@ -77,6 +77,17 @@ extern "C" {
 #if defined(_GNU_SOURCE)
 #define getline             VSF_LINUX_LIBC_WRAPPER(getline)
 #endif
+#elif defined(__WIN__)
+#define fopen               VSF_LINUX_LIBC_WRAPPER(fopen)
+#define freopen             VSF_LINUX_LIBC_WRAPPER(freopen)
+#define fclose              VSF_LINUX_LIBC_WRAPPER(fclose)
+#define fseek               VSF_LINUX_LIBC_WRAPPER(fseek)
+#define ftell               VSF_LINUX_LIBC_WRAPPER(ftell)
+#define fflush              VSF_LINUX_LIBC_WRAPPER(fflush)
+#define putc                VSF_LINUX_LIBC_WRAPPER(putc)
+#define putchar             VSF_LINUX_LIBC_WRAPPER(putchar)
+#define fputc               VSF_LINUX_LIBC_WRAPPER(fputc)
+#define fprintf             VSF_LINUX_LIBC_WRAPPER(fprintf)
 #endif
 
 #ifdef __WIN__

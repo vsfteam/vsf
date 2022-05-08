@@ -37,6 +37,11 @@ extern "C" {
 #define mkstemps            VSF_LINUX_LIBC_WRAPPER(mkstemps)
 #define mkostemps           VSF_LINUX_LIBC_WRAPPER(mkostemps)
 #define mkdtemp             VSF_LINUX_LIBC_WRAPPER(mkdtemp)
+#elif defined(__WIN__)
+#define exit                VSF_LINUX_LIBC_WRAPPER(exit)
+#define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
+#define getenv              VSF_LINUX_LIBC_WRAPPER(getenv)
+#define system              VSF_LINUX_LIBC_WRAPPER(system)
 #endif
 
 void * malloc(size_t size);

@@ -168,7 +168,7 @@ namespace std {
         static const size_t npos = -1;
 
         string_base<T>(const T *str)
-            : array_base<T>(str, __strlen(str)) { }
+            : array_base<T>(str, __strlen(str) + 1) { }
         string_base<T>(const string_base<T> &s)
             : array_base<T>(s) { }
         string_base<T>()
