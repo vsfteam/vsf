@@ -575,7 +575,10 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
     }
     cb_obj->pos = NULL;
 #endif
-    return err;
+    // do not return err;
+    //  because on some platform in high optimization, err will be wrong here
+    //  and acutally, there is no error if run here
+    return VSF_ERR_NONE;
 }
 
 
