@@ -1391,13 +1391,13 @@ char *realpath(const char *path, char *resolved_path)
 {
     bool is_allocated = false;
     if (NULL == resolved_path) {
-        resolved_path = malloc(PATH_MAX);
+        resolved_path = malloc(MAX_PATH);
         if (NULL == resolved_path) {
             return NULL;
         }
         is_allocated = true;
     }
-    if (vsf_linux_generate_path(resolved_path, PATH_MAX, NULL, (char *)path)) {
+    if (vsf_linux_generate_path(resolved_path, MAX_PATH, NULL, (char *)path)) {
         if (is_allocated) {
             free(resolved_path);
         }
