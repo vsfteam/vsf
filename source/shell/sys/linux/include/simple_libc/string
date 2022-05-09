@@ -213,7 +213,7 @@ namespace std {
             }
 
             const T * sub = array_base<T>::cbegin();
-            string_base<T> *newstr = new string_base<T>(&sub[start], count);
+            string_base<T> *newstr = new string_base<T>(&sub[start], count + 1);
             return (*newstr);
         }
 
