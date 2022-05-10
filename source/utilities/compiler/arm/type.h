@@ -116,19 +116,22 @@ typedef int_fast8_t         intalu_t;
 #   define M_SQRT2          1.41421356237309504880   // sqrt(2)
 #   define M_SQRT1_2        0.707106781186547524401  // 1/sqrt(2)
 
-// iar has no strlcpy
-size_t strlcpy(char *dst, const char *src, size_t dsize);
+// iar has no strlcpy and strcasestr
+extern size_t strlcpy(char *dst, const char *src, size_t dsize);
+extern char * strcasestr(const char *str, const char *substr);
 
 #if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
-// iar has no 64-bit stdio APIs, if simple_stdio in simple_libc is not used,
-//  implement 64-but stdio APIs here
-#   define off64_t          int64_t
-#   define ftello64         ftell
-#   define fseeko64         fseek
+#   include <stdio.h>
+typedef long                off_t;
+typedef int64_t             off64_t;
+extern int fseeko(FILE *f, off_t offset, int whence);
+extern off_t ftello(FILE *f);
+extern int fseeko64(FILE *f, off64_t offset, int whence);
+extern off64_t ftello64(FILE *f);
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO)
 
-#include <time.h>
 #if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
+#   include <time.h>
 // iar has no clockid_t
 #   ifndef __IAR_TYPE_CLOCKID_T__
 #   define __IAR_TYPE_CLOCKID_T__

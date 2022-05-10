@@ -50,6 +50,21 @@ size_t strlcpy(char *dst, const char *src, size_t dsize)
     return(src - osrc - 1);     /* count does not include NUL */
 }
 
+char * strcasestr(const char *str, const char *substr)
+{
+    do {
+        for (int i = 0; ; i++) {
+            if (!substr[i]) {
+                return (char *)str;
+            } else if (tolower(substr[i]) != tolower(str[i])) {
+                break;
+            }
+        }
+    } while (*str++);
+    return NULL;
+}
+
+// implement APIs not supported in time.h in IAR
 #   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 int clock_gettime(clockid_t clk_id, struct timespec *tp)
@@ -65,6 +80,44 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
         return -1;
     }
 }
+
+int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
+{
+    vsf_timeout_tick_t ticks;
+    ticks = 1000ULL * 1000 * requested_time->tv_sec + requested_time->tv_nsec / 1000;
+    ticks = vsf_systimer_us_to_tick(ticks);
+
+    vsf_thread_delay(ticks);
+
+    if (remaining != NULL) {
+        remaining->tv_sec = 0;
+        remaining->tv_nsec = 0;
+    }
+    return 0;
+}
 #       endif           // VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
 #   endif
+
+#if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
+int fseeko(FILE *f, off_t offset, int whence)
+{
+    return fseek(f, (long)offset, whence);
+}
+
+off_t ftello(FILE *f)
+{
+    return (off_t)ftell(f);
+}
+
+int fseeko64(FILE *f, off64_t offset, int whence)
+{
+    return fseek(f, (long)offset, whence);
+}
+
+off64_t ftello64(FILE *f)
+{
+    return (off_t)ftell(f);
+}
+#endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO)
+
 #endif
