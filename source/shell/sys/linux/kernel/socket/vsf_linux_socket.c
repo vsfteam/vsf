@@ -26,11 +26,11 @@
 #define __VSF_LINUX_SOCKET_CLASS_IMPLEMENT
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
+#   include "../../include/fcntl.h"
 #   if VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
 #       include "../../include/simple_libc/stdio.h"
 #   endif
 #   if VSF_LINUX_SOCKET_USE_INET == ENABLED
-#       include "../../include/fcntl.h"
 #       include "../../include/netinet/in.h"
 #       include "../../include/arpa/inet.h"
 #       include "../../include/netdb.h"
@@ -38,8 +38,8 @@
 #else
 #   include <unistd.h>
 #   include <stdio.h>
+#   include <fcntl.h>
 #   if VSF_LINUX_SOCKET_USE_INET == ENABLED
-#       include <fcntl.h>
 #       include <netinet/in.h>
 #       include <arpa/inet.h>
 #       include <netdb.h>
