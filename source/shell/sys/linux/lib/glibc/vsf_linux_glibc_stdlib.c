@@ -33,6 +33,7 @@
 #   include <fcntl.h>
 #   include <stdlib.h>
 #endif
+#include <limits.h>
 
 // for memset
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED

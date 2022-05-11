@@ -19,7 +19,7 @@
 
 #include "../../vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_SOCKET_USE_INET == ENABLED
 
 #define __VSF_LINUX_NTP_CLASS_IMPLEMENT
 #include "./vsf_linux_ntp.h"
@@ -179,4 +179,4 @@ close_and_fail:
     return VSF_ERR_FAIL;
 }
 
-#endif      // VSF_USE_LINUX
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SOCKET && VSF_LINUX_SOCKET_USE_INET

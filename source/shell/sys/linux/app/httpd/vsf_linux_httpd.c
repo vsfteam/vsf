@@ -19,7 +19,7 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_SOCKET_USE_INET == ENABLED
 
 #define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #define __VSF_EDA_CLASS_INHERIT__
@@ -960,4 +960,4 @@ vsf_err_t vsf_linux_httpd_start(vsf_linux_httpd_t *httpd)
                 VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
-#endif
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SOCKET && VSF_LINUX_SOCKET_USE_INET

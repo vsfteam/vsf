@@ -19,7 +19,7 @@
 
 #include "../../vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_SOCKET_USE_INET == ENABLED
 
 #define __VSF_LINUX_CLASS_INHERIT__
 #define __VSF_LINUX_FS_CLASS_INHERIT__
@@ -119,4 +119,4 @@ void vsf_linux_telnetd_thread(vsf_linux_telnetd_t *telnetd)
     }
 }
 
-#endif      // VSF_USE_LINUX
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SOCKET && VSF_LINUX_SOCKET_USE_INET
