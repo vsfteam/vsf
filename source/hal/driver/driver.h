@@ -31,7 +31,7 @@
 #ifndef VSF_DRIVER_HEADER
 
 #   if      defined(__STMicro__)
-#       define  VSF_DRIVER_HEADER       "./STMicro/driver.h"
+#       define  VSF_DRIVER_HEADER       "./ST/driver.h"
 #   elif    defined(__NXP__)
 #       define  VSF_DRIVER_HEADER       "./NXP/driver.h"
 #   elif    defined(__MicroChip__)

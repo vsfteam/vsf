@@ -15,28 +15,20 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 
-#undef VSF_ST_DRIVER_HEADER
+#   include "../__device.h"
 
-#if     defined(__STM32F730R8__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F730/STM32F730R8/driver.h"
-#elif   defined(__STM32F103ZE__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F103/STM32F103ZE/driver.h"
-#elif   defined(__STM32H743XI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7/STM32H743XI/driver.h"
 #else
-#   error No supported device found.
-#endif
 
-/* include specified device driver header file */
-#include VSF_ST_DRIVER_HEADER
+#   ifndef __HAL_DRIVER_ST_STM32H743_H__
+#       define __HAL_DRIVER_ST_STM32H743_H__
 
+/*============================ INCLUDES ======================================*/
 
-
-#ifndef __HAL_DRIVER_ST_H__
-#define __HAL_DRIVER_ST_H__
+#       include "hal/vsf_hal_cfg.h"
+#       include "./device.h"
+//#       include "../common/usb/usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -44,8 +36,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
-
+#   endif
 
 #endif
 /* EOF */
