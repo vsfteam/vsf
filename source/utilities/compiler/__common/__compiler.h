@@ -214,13 +214,10 @@ extern "C" {
 #pragma GCC diagnostic ignored "-Wswitch"
 #pragma GCC diagnostic ignored "-Wundef"
 #pragma GCC diagnostic ignored "-Wpadded"
-#pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#pragma GCC diagnostic ignored "-Wc++-compat"
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
 #pragma GCC diagnostic ignored "-Wcast-qual"
-#pragma GCC diagnostic ignored "-Wbad-function-cast"
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #pragma GCC diagnostic ignored "-Wunused-value"
@@ -228,8 +225,16 @@ extern "C" {
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #pragma GCC diagnostic ignored "-Wnonnull-compare"
 #pragma GCC diagnostic ignored "-Woverflow"
-#pragma GCC diagnostic ignored "-Wint-conversion"
-#pragma GCC diagnostic ignored "-Woverride-init-side-effects"
+
+#ifndef __cplusplus
+#   pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#   pragma GCC diagnostic ignored "-Wc++-compat"
+#   pragma GCC diagnostic ignored "-Wbad-function-cast"
+#   pragma GCC diagnostic ignored "-Wint-conversion"
+#   pragma GCC diagnostic ignored "-Woverride-init-side-effects"
+#else
+
+#endif
 
 /*! \NOTE do not ignore following warning unless you take the risk by yourself */
 //#pragma GCC diagnostic ignored "-Wbitfield-constant-conversion"
