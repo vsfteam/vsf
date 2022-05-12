@@ -134,6 +134,8 @@ int system(const char *command);
 #define EXIT_SUCCESS        0
 #define EXIT_FAILURE        -1
 void exit(int status);
+// _exit should be implemented in retarget
+void _exit(int status);
 int atexit(void (*func)(void));
 void _Exit(int exit_code);
 int at_quick_exit(void (*func)(void));
