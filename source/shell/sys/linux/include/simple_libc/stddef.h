@@ -18,8 +18,12 @@
 // define wchar_t and wint_t before include vsf_utilities.h
 // because vsf_utilities will include other c headers which will require wchar_t
 #if     !defined(__cplusplus)
+// wchar_t MSUT match the real wchar_t in the compiler, if not, fix here
+//  eg: for GCC, wchar_t is 4bytes
+#   if __IS_COMPILER_GCC__
+typedef unsigned int                wchar_t;
+#   elif !__IS_COMPILER_IAR__
 // TODO: it seems that IAR does not support wchar_t even if it's defined here
-#   if !__IS_COMPILER_IAR__
 typedef unsigned short              wchar_t;
 #   endif
 #endif
