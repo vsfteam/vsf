@@ -51,6 +51,8 @@ extern "C" {
 #define memalign            VSF_LINUX_LIBC_WRAPPER(memalign)
 #endif
 
+#define _exit               exit
+
 void * malloc(size_t size);
 void * realloc(void *p, size_t size);
 void free(void *p);
