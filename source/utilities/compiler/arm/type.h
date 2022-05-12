@@ -150,4 +150,7 @@ extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
 #   define fseeko64         fseek
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO)
 
+// gcc has no strcasestr
+extern char * strcasestr(const char *str, const char *substr);
+
 #endif      // __IS_COMPILER_XXX__

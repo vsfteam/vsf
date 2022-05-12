@@ -31,6 +31,7 @@ extern "C" {
 
 void * memset(void *s, int ch, size_t n);
 size_t strlen(const char *str);
+size_t strnlen(const char *str, size_t maxlen);
 int strcmp(const char *str1, const char *str2);
 int strncmp(const char *str1, const char *str2, size_t n);
 char * strdup(const char *str);

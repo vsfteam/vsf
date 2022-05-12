@@ -28,6 +28,22 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if __IS_COMPILER_IAR__ || __IS_COMILER_GCC__
+char * strcasestr(const char *str, const char *substr)
+{
+    do {
+        for (int i = 0; ; i++) {
+            if (!substr[i]) {
+                return (char *)str;
+            } else if (tolower(substr[i]) != tolower(str[i])) {
+                break;
+            }
+        }
+    } while (*str++);
+    return NULL;
+}
+#endif
+
 #if __IS_COMPILER_IAR__
 size_t strlcpy(char *dst, const char *src, size_t dsize)
 {
@@ -48,20 +64,6 @@ size_t strlcpy(char *dst, const char *src, size_t dsize)
             ;
     }
     return(src - osrc - 1);     /* count does not include NUL */
-}
-
-char * strcasestr(const char *str, const char *substr)
-{
-    do {
-        for (int i = 0; ; i++) {
-            if (!substr[i]) {
-                return (char *)str;
-            } else if (tolower(substr[i]) != tolower(str[i])) {
-                break;
-            }
-        }
-    } while (*str++);
-    return NULL;
 }
 
 // implement APIs not supported in time.h in IAR
