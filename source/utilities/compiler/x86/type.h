@@ -21,10 +21,8 @@
 
 
 /*============================ INCLUDES ======================================*/
+
 #if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
-#   ifdef __cplusplus
-extern "C" {
-#   endif
 typedef unsigned char       uint8_t;
 typedef signed char         int8_t;
 typedef unsigned char       uint_fast8_t;
@@ -49,9 +47,6 @@ typedef enum {
     false = 0,
     true = !false,
 } bool;
-#   ifdef __cplusplus
-}
-#   endif
 #else
 #include <stdint.h>
 #include <stdbool.h>
