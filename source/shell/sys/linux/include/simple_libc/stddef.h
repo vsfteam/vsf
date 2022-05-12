@@ -22,8 +22,8 @@
 #   if !__IS_COMPILER_IAR__
 typedef unsigned short              wchar_t;
 #   endif
-typedef unsigned short              wint_t;
 #endif
+typedef unsigned short              wint_t;
 
 // TODO: utilities.h CANNOT be included here, if need something, re-implement here
 //#include "utilities/vsf_utilities.h"

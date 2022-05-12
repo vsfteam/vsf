@@ -16,7 +16,7 @@ namespace std {
     static T* __strcpy(T *dst, const T *src)
     {
         T *result = dst;
-        while ((*des++ = *src++) != 0);
+        while ((*dst++ = *src++) != 0);
         return result;
     }
 
@@ -95,7 +95,7 @@ namespace std {
         }
         array_base<T> & assign(array_base<T> &arr)
         {
-            if (this == &str) { return (*this); }
+            if (this == &arr) { return (*this); }
 
             free(__array);
             __array = NULL;
@@ -107,7 +107,7 @@ namespace std {
             size_t length = arr.__length;
             arr.__array = __array;
             arr.__length = __length;
-            __array = str;
+            __array = array;
             __length = length;
         }
 
@@ -178,7 +178,7 @@ namespace std {
 
         size_t size() const
         {
-            return lenth();
+            return length();
         }
         size_t length() const
         {

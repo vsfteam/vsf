@@ -1,1 +1,32 @@
 #include <stdlib.h>
+
+namespace std {
+    using ::div_t;
+    using ::ldiv_t;
+    using ::lldiv_t;
+
+    using ::atof;
+    using ::atoi;
+    using ::atol;
+    using ::strtod;
+    using ::strtof;
+    using ::strtol;
+    using ::strtoll;
+
+    using ::system;
+    using ::exit;
+    using ::atexit;
+
+    using ::malloc;
+    using ::calloc;
+    using ::realloc;
+    using ::free;
+
+    using ::getenv;
+    using ::putenv;
+    using ::setenv;
+    using ::unsetenv;
+
+    using ::srand;
+    using ::rand;
+}

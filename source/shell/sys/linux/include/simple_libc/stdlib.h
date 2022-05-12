@@ -80,8 +80,8 @@ typedef struct {
 } div_t;
 div_t div(int numer, int denom);
 typedef struct {
-  long int quot;
-  long int rem;
+  long quot;
+  long rem;
 } ldiv_t;
 ldiv_t ldiv(long int numer, long int denom);
 typedef struct {
