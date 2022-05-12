@@ -16,7 +16,7 @@ set(CMAKE_C_FLAGS
     CACHE INTERNAL "C compiler common flags"
 )
 set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
+    "${CMAKE_CXX_FLAGS} -fpermissive -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
     CACHE INTERNAL "C++ compiler common flags"
 )
 
