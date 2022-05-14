@@ -152,7 +152,7 @@ void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
 }
 #endif
 
-vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
+vk_usbh_pipe_t __vk_usbh_get_pipe(vk_usbh_dev_t *dev,
         uint8_t endpoint, uint8_t type, uint16_t size, uint8_t interval)
 {
     uint_fast8_t direction = endpoint & USB_DIR_MASK;
