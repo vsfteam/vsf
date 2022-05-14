@@ -382,7 +382,7 @@ vsf_err_t vsf_evtq_post_msg(vsf_eda_t *pthis, void *msg)
     return __vsf_evtq_post(pthis, (uintptr_t)msg);
 }
 
-SECTION(".text.vsf.kernel.__vsf_evtq_ctx_t")
+SECTION(".text.vsf.kernel.__vsf_evtq_get_cur_ctx")
 static vsf_evtq_ctx_t * __vsf_evtq_get_cur_ctx(void)
 {
     return &__vsf_eda.cur;

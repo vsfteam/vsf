@@ -439,7 +439,7 @@ def_class(vsf_thread_t,
         vsf_thread_entry_t      *entry;
         uint32_t                stack_size;
         uint64_t                *stack;                 //!< stack must be 8byte aligned
-    ),
+    )
 
     private_member(
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
