@@ -843,6 +843,9 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
             if (!(events & VSF_LINUX_POLLOUT)) {
                 return VSF_LINUX_SOCKET_INVALID_SOCKET;
             }
+
+            // POLLOUT is triggered for connection, but need pollout for send
+            vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, vsf_protect_sched());
         } else {
             vsf_linux_errno = VSF_LINUX_ERRNO_EAGAIN;
         }
