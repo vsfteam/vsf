@@ -53,6 +53,21 @@ int vsf_linux_init_main(int argc, char *argv[])
         system(__init_scripts[i]);
     }
 #endif
+#ifdef VSF_LINUX_CFG_INIT_SCRIPT_FILE
+    FILE *f = fopen(VSF_LINUX_CFG_INIT_SCRIPT_FILE, "rt");
+    char linebuf[256], *line;
+    do {
+        line = fgets(linebuf, sizeof(linebuf), f);
+        if (line != NULL) {
+            while ((*line != '\0') && isspace((int)*line)) { line++; }
+
+            if (*line != '\0' && *line != '#') {
+                printf("execute init script: %s\r\n", line);
+                system(line);
+            }
+        }
+    } while (line != NULL);
+#endif
 
     return vsh_main(argc, argv);
 }
