@@ -333,7 +333,7 @@ char * fgets(char *str, int n, FILE *f)
 
         rsize++;
         str++;
-        if ('\r' == str[-1]) {
+        if ('\n' == str[-1]) {
             break;
         }
     }
