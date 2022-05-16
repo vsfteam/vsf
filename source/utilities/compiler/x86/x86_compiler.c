@@ -70,13 +70,13 @@ char * strsep(char **stringp, const char *delim)
     const char *spanp;
     int c, sc;
     char *tok;
-    if ((s = *stringp)== NULL)
+    if ((s = *stringp) == NULL)
         return (NULL);
     for (tok = s;;) {
         c = *s++;
         spanp = delim;
         do {
-            if ((sc =*spanp++) == c) {
+            if ((sc = *spanp++) == c) {
                 if (c == 0)
                     s = NULL;
                 else
@@ -87,6 +87,11 @@ char * strsep(char **stringp, const char *delim)
         } while (sc != 0);
     }
     /* NOTREACHED */
+}
+
+char * strtok_r(char *str, const char *delim, char **saveptr)
+{
+    return strtok_s(str, delim, saveptr);
 }
 
 #   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
