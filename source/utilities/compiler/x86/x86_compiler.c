@@ -91,6 +91,7 @@ char * strsep(char **stringp, const char *delim)
 
 char * strtok_r(char *str, const char *delim, char **saveptr)
 {
+    extern char * strtok_s(char *str, const char *delim, char **saveptr);
     return strtok_s(str, delim, saveptr);
 }
 
