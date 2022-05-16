@@ -141,6 +141,9 @@ extern size_t strlcpy(char *dst, const char *src, size_t dsize);
 extern char * strcasestr(const char *str, const char *substr);
 extern char * strtok_r(char *str, const char *delim, char **saveptr);
 
+extern void srandom(unsigned int seed);
+extern long int random(void);
+
 #include <time.h>
 #   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #       ifndef __VSF_COMPILER_TIME_H__

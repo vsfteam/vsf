@@ -95,6 +95,16 @@ char * strtok_r(char *str, const char *delim, char **saveptr)
     return strtok_s(str, delim, saveptr);
 }
 
+void srandom(unsigned int seed)
+{
+    srand(seed);
+}
+
+long int random(void)
+{
+    return rand();
+}
+
 #   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 #           if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED

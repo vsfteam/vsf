@@ -124,6 +124,8 @@ int wctomb(char *str, wchar_t wchar);
 #endif
 int rand(void);
 void srand(unsigned int seed);
+void srandom(unsigned int seed);
+long int random(void);
 
 void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*));
 
