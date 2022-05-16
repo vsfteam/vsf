@@ -179,7 +179,8 @@ int fseeko(FILE *f, off_t offset, int fromwhere)
     if (fd < 0) {
         return -1;
     }
-    return lseek(fd, offset, fromwhere);
+    lseek(fd, offset, fromwhere);
+    return 0;
 }
 
 int fseek(FILE *f, long offset, int fromwhere)
@@ -614,7 +615,7 @@ int vfscanf(FILE *f, const char *format, va_list ap)
         }
     }
 end:
-    return result;
+    return result ? result : EOF;
 }
 
 int fscanf(FILE *f, const char *format, ...)
