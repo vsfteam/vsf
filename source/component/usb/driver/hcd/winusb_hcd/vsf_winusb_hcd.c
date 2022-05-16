@@ -283,9 +283,10 @@ static HANDLE __vk_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
                 }
             }
             if (!is_match) {
-                continue;
+                goto check_normal_driver;
             }
         } else {
+        check_normal_driver:
             const GUID GUID_DEVINTERFACE_USB_DEVICE = {0xA5DCBF10, 0x6530, 0x11D2, {0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED}};
             if (!SetupDiEnumDeviceInterfaces(hDeviceInfo, &DeviceInfoData, &GUID_DEVINTERFACE_USB_DEVICE, 0, &deviceInterfaceData)) {
                 continue;
