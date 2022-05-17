@@ -93,7 +93,8 @@ int sem_wait(sem_t *sem)
 int sem_trywait(sem_t *sem)
 {
     if (vsf_eda_sem_pend(sem, 0)) {
-        return __sync_pend(sem);
+        errno = EAGAIN;
+        return -1;
     }
     return 0;
 }
