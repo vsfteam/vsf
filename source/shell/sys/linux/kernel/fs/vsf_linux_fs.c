@@ -1319,14 +1319,16 @@ mode_t umask(mode_t mask)
 
 int access(const char *pathname, int mode)
 {
-    int fd = open(pathname, mode);
+    int fd = open(pathname, 0);
     if (fd < 0) { return -1; }
 
     int ret = 0;
     vk_file_t *file = __vsf_linux_get_fs_ex(NULL, fd);
     if (    ((mode & R_OK) && !(file->attr & VSF_FILE_ATTR_READ))
         ||  ((mode & W_OK) && !(file->attr & VSF_FILE_ATTR_WRITE))
-        ||  ((mode & X_OK) && !(file->attr & VSF_FILE_ATTR_EXECUTE))) {
+        ||  (   (mode & X_OK)
+            &&  !(file->attr & VSF_FILE_ATTR_DIRECTORY)
+            &&  !(file->attr & VSF_FILE_ATTR_EXECUTE))) {
         ret = -1;
     }
 
