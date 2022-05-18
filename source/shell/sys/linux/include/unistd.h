@@ -39,6 +39,7 @@ extern "C" {
 #define getuid              VSF_LINUX_WRAPPER(getuid)
 #define setuid              VSF_LINUX_WRAPPER(setuid)
 #define geteuid             VSF_LINUX_WRAPPER(geteuid)
+#define setgid              VSF_LINUX_WRAPPER(setgid)
 #define getgid              VSF_LINUX_WRAPPER(getgid)
 #define getegid             VSF_LINUX_WRAPPER(getegid)
 #define execl               VSF_LINUX_WRAPPER(execl)
@@ -122,6 +123,7 @@ pid_t getpgid(pid_t pid);
 uid_t getuid(void);
 int setuid(uid_t uid);
 uid_t geteuid(void);
+int setgid(gid_t gid);
 gid_t getgid(void);
 gid_t getegid(void);
 
@@ -137,6 +139,7 @@ exec_ret_t execv(const char *pathname, char const * const * argv);
 exec_ret_t execvp(const char *file, char const * const * argv);
 int daemon(int nochdir, int noclose);
 
+pid_t fork(void);
 int system(const char *cmd);
 enum {
     _SC_PAGESIZE,

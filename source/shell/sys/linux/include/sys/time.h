@@ -19,6 +19,8 @@ extern "C" {
 #define getitimer           VSF_LINUX_WRAPPER(getitimer)
 #define setitimer           VSF_LINUX_WRAPPER(setitimer)
 #define gettimeofday        VSF_LINUX_WRAPPER(gettimeofday)
+
+#define utimes              VSF_LINUX_WRAPPER(utimes)
 #endif
 
 #ifndef __SUSECONDS_T
@@ -51,6 +53,8 @@ struct itimerval {
 int gettimeofday(struct timeval * tv, struct timezone * tz);
 int getitimer(int which, struct itimerval *curr_value);
 int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);
+
+int utimes(const char *filename, const struct timeval times[2]);
 
 #ifdef __cplusplus
 }

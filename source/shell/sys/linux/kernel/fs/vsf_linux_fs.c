@@ -1192,6 +1192,11 @@ off_t lseek(int fd, off_t offset, int whence)
     return vk_file_tell(priv->file);
 }
 
+int utimes(const char *filename, const struct timeval times[2])
+{
+    return 0;
+}
+
 int fsync(int fd)
 {
     return 0;

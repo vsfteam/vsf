@@ -1602,6 +1602,11 @@ uid_t geteuid(void)
     return (uid_t)0;
 }
 
+int setgid(gid_t gid)
+{
+    return 0;
+}
+
 gid_t getgid(void)
 {
     return (gid_t)0;
@@ -1932,6 +1937,12 @@ int getentropy(void *buf, size_t length)
 {
     ssize_t length_ret = getrandom(buf, length, 0);
     return (length_ret == length) ? 0 : -1;
+}
+
+pid_t fork(void)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 // spawn.h
