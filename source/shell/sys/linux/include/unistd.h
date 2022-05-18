@@ -97,6 +97,8 @@ extern "C" {
 #define STDOUT_FILENO       1
 #define STDERR_FILENO       2
 
+#define environ             (vsf_linux_get_cur_process()->__environ)
+
 enum {
     DT_UNKNOWN,
     DT_REG,
@@ -138,6 +140,7 @@ int daemon(int nochdir, int noclose);
 int system(const char *cmd);
 enum {
     _SC_PAGESIZE,
+    _SC_OPEN_MAX,
 };
 long sysconf(int name);
 char *realpath(const char *path, char *resolved_path);

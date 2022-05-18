@@ -186,6 +186,15 @@ void * malloc(size_t size)
 #endif
 }
 
+size_t malloc_usable_size(void *p)
+{
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    return vsf_heap_size((uint8_t *)p - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN);
+#else
+    return vsf_heap_size(p);
+#endif
+}
+
 void * aligned_alloc(size_t alignment, size_t size)
 {
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED

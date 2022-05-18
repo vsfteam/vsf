@@ -21,6 +21,7 @@ extern "C" {
 #define free                VSF_LINUX_LIBC_WRAPPER(free)
 #define calloc              VSF_LINUX_LIBC_WRAPPER(calloc)
 #define memalign            VSF_LINUX_LIBC_WRAPPER(memalign)
+#define malloc_usable_size  VSF_LINUX_LIBC_WRAPPER(malloc_usable_size)
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
@@ -58,6 +59,9 @@ void free(void *p);
 void * aligned_alloc(size_t alignment, size_t size);
 void * calloc(size_t n, size_t size);
 void * memalign(size_t alignment, size_t size);
+
+// malloc_usable_size should be in malloc.h
+size_t malloc_usable_size(void *p);
 
 #if VSF_LINUX_LIBC_USE_ENVIRON
 int putenv(char *string);

@@ -15,6 +15,17 @@
 extern "C" {
 #endif
 
+struct winsize {
+    unsigned short ws_row;
+    unsigned short ws_col;
+    unsigned short ws_xpixel;
+    unsigned short ws_ypixel;
+};
+
+enum {
+    TIOCGWINSZ = F_IO,
+};
+
 //int ioctl(int fd, unsigned long request, ...);
 #define ioctl       fcntl
 

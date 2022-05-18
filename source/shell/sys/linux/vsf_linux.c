@@ -1383,6 +1383,7 @@ long sysconf(int name)
 {
     switch (name) {
     case _SC_PAGESIZE:      return 256;
+    case _SC_OPEN_MAX:      return 65535;
     }
     return 0;
 }
