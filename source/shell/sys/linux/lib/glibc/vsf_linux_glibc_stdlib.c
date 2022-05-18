@@ -637,14 +637,14 @@ int __putenv_ex(vsf_linux_process_t *process, char *string)
     }
     VSF_LINUX_ASSERT(process != NULL);
 
-    char ***environ = &process->__environ;
+    char ***__environ = &process->__environ;
     const char * str = strchr(string, '=');
     bool is_to_set = str != NULL;
     size_t namelen = is_to_set ? str - string : strlen(string);
     size_t size = 0;
     bool is_match = false;
 
-    char **env = *environ, **env_removed = NULL;
+    char **env = *__environ, **env_removed = NULL;
     if (env != NULL) {
         for (char **env_tmp = env; *env_tmp != NULL; env_tmp++, size++) {
             if (    !strncmp(string, *env_tmp, namelen)
@@ -665,7 +665,7 @@ int __putenv_ex(vsf_linux_process_t *process, char *string)
 
     if (is_to_set) {
         VSF_LINUX_ASSERT(!is_match);
-        *environ = env = (char **)__realloc_ex(process, env, (size + 2) * sizeof(char *));
+        *__environ = env = (char **)__realloc_ex(process, env, (size + 2) * sizeof(char *));
         if (NULL == env) {
             return -1;
         }
