@@ -49,11 +49,14 @@
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 char * __strdup_ex(vsf_linux_process_t *process, const char *str)
 {
-    char *newstr = __malloc_ex(process, strlen(str) + 1);
-    if (newstr != NULL) {
-        strcpy(newstr, str);
+    if (str != NULL) {
+        char *newstr = __malloc_ex(process, strlen(str) + 1);
+        if (newstr != NULL) {
+            strcpy(newstr, str);
+        }
+        return newstr;
     }
-    return newstr;
+    return NULL;
 }
 #endif
 
