@@ -581,7 +581,7 @@ int SDL_PushEvent(SDL_Event *event)
     return -1;
 }
 
-static void __vsf_sdl2_event_on_input(vk_input_type_t type, vk_input_evt_t *evt)
+static void __vsf_sdl2_event_on_input(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
 {
     SDL_Event event = { 0 };
     char text_input = '\0';

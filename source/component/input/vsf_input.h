@@ -96,7 +96,8 @@ typedef struct vk_input_parser_t {
 } vk_input_parser_t;
 
 #if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
-typedef void (*vk_input_on_evt_t)(vk_input_type_t type, vk_input_evt_t *evt);
+typedef struct vk_input_notifier_t vk_input_notifier_t;
+typedef void (*vk_input_on_evt_t)(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt);
 typedef struct vk_input_notifier_t {
     vsf_slist_node_t notifier_node;
     vk_input_on_evt_t on_evt;

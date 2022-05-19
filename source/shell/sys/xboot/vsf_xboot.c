@@ -245,7 +245,7 @@ void window_present(struct window_t * window, struct color_t * c, void * o, void
     vsf_thread_wfe(VSF_EVT_RETURN);
 }
 
-static void __xboot_on_input(vk_input_type_t type, vk_input_evt_t *evt)
+static void __xboot_on_input(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
 {
     if (((__xboot.event_wpos + 1) % dimof(__xboot.events)) == __xboot.event_rpos) {
         VSF_XBOOT_ASSERT(false);

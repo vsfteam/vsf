@@ -96,7 +96,7 @@ typedef struct lvgl_demo_t lvgl_demo_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void __lvgl_input_on_gamepad(vk_input_type_t type, vk_gamepad_evt_t *gamepad_evt);
+static void __lvgl_input_on_gamepad(vk_input_notifier_t *notifier, vk_input_type_t type, vk_gamepad_evt_t *gamepad_evt);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -155,7 +155,7 @@ static lvgl_demo_gamepad_t * __lvgl_demo_get_gamepad(void *dev)
     return &__lvgl_demo.gamepad[empty_idx];
 }
 
-static void __lvgl_input_on_gamepad(vk_input_type_t type, vk_gamepad_evt_t *gamepad_evt)
+static void __lvgl_input_on_gamepad(vk_input_notifier_t *notifier, vk_input_type_t type, vk_gamepad_evt_t *gamepad_evt)
 {
     lvgl_demo_gamepad_t *gamepad = __lvgl_demo_get_gamepad(gamepad_evt->dev);
     VSF_ASSERT(gamepad != NULL);

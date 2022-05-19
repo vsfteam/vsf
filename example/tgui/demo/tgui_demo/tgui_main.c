@@ -38,7 +38,7 @@ extern vsf_err_t tgui_demo_init(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void __tgui_on_input_evt(vk_input_type_t type, vk_input_evt_t *evt)
+static void __tgui_on_input_evt(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
 {
 //! this block of code is used for test purpose only
     if (VSF_INPUT_TYPE_KEYBOARD == type) {

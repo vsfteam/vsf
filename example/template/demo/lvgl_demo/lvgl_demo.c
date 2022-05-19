@@ -57,7 +57,7 @@ static lv_coord_t __lvgl_touchscreen_get_height(void)
     return vsf_min(LV_VER_RES_MAX, usrapp_ui_common.disp->param.height);
 }
 
-static void __lvgl_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
+static void __lvgl_on_evt(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
 {
     switch (type) {
 #if APP_LVGL_DEMO_USE_TOUCHSCREEN == ENABLED
