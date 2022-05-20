@@ -286,9 +286,9 @@ static uint_fast16_t __vk_disp_sdl2_keycode_remap(SDL_Keycode keycode)
     return 0;
 }
 
-static uint_fast8_t __vk_disp_sdl2_keymod_remap(uint16_t keymod)
+static uint_fast16_t __vk_disp_sdl2_keymod_remap(uint16_t keymod)
 {
-    uint_fast8_t keymod_remap = 0;
+    uint_fast16_t keymod_remap = 0;
 
     if (keymod & KMOD_LSHIFT) {
         keymod_remap |= VSF_KM_LEFT_SHIFT;
@@ -313,6 +313,12 @@ static uint_fast8_t __vk_disp_sdl2_keymod_remap(uint16_t keymod)
     }
     if (keymod & KMOD_RGUI) {
         keymod_remap |= VSF_KM_RIGHT_GUI;
+    }
+    if (keymod & KMOD_NUM) {
+        keymod_remap |= VSF_KM_NUMLOCK;
+    }
+    if (keymod & KMOD_CAPS) {
+        keymod_remap |= VSF_KM_CAPSLOCK;
     }
     return keymod_remap;
 }

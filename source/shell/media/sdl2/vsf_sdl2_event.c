@@ -528,7 +528,7 @@ static const char * SDL_scancode_names[SDL_NUM_SCANCODES] = {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static uint16_t __vsf_sdl2_kb_parse_keymod(uint_fast32_t mod)
+static uint16_t __vsf_sdl2_kb_parse_keymod(uint_fast16_t mod)
 {
     uint16_t sdl_mod = KMOD_NONE;
 
@@ -555,6 +555,12 @@ static uint16_t __vsf_sdl2_kb_parse_keymod(uint_fast32_t mod)
     }
     if (mod & VSF_KM_RIGHT_GUI) {
         sdl_mod |= KMOD_RGUI;
+    }
+    if (mod & VSF_KM_NUMLOCK) {
+        sdl_mod |= KMOD_NUM;
+    }
+    if (mod & VSF_KM_CAPSLOCK) {
+        sdl_mod |= KMOD_CAPS;
     }
     return sdl_mod;
 }

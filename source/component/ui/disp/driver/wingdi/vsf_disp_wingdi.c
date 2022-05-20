@@ -89,9 +89,9 @@ const vk_disp_drv_t vk_disp_drv_wingdi = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_INPUT == ENABLED
-static uint_fast8_t __vk_disp_win_keymod(void)
+static uint_fast16_t __vk_disp_win_keymod(void)
 {
-    uint_fast8_t keymod = 0;
+    uint_fast16_t keymod = 0;
     if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_SHIFT)) {
         keymod |= VSF_KM_LEFT_SHIFT;
     }
@@ -106,6 +106,15 @@ static uint_fast8_t __vk_disp_win_keymod(void)
     }
     if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_RWIN)) {
         keymod |= VSF_KM_RIGHT_GUI;
+    }
+    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_NUMLOCK)) {
+        keymod |= VSF_KM_NUMLOCK;
+    }
+    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_CAPITAL)) {
+        keymod |= VSF_KM_CAPSLOCK;
+    }
+    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_SCROLL)) {
+        keymod |= VSF_KM_SCROLLLOCK;
     }
     return keymod;
 }

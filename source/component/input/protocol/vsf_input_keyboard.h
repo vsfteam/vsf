@@ -36,7 +36,7 @@ extern "C" {
             } while (0)
 
 #define vsf_input_keyboard_get_keymod(__event)                                  \
-            ((uint16_t)(((__event)->id >> 11) & 0xFF))
+            ((uint16_t)(((__event)->id >> 11) & 0xFFF))
 #define vsf_input_keyboard_get_keycode(__event)                                 \
             ((uint16_t)(((__event)->id >> 0) & 0x3FF))
 #define vsf_input_keyboard_is_down(__event)                                     \
@@ -252,6 +252,11 @@ enum {
     VSF_KM_RIGHT_CTRL       = 0x20,
     VSF_KM_RIGHT_ALT        = 0x40,
     VSF_KM_RIGHT_GUI        = 0x80,
+
+    VSF_KM_NUMLOCK          = 0x100,
+    VSF_KM_CAPSLOCK         = 0x200,
+    VSF_KM_SCROLLLOCK       = 0x400,
+    VSF_KM_FN               = 0x800,
 
     VSF_KM_SHIFT            = VSF_KM_LEFT_SHIFT | VSF_KM_RIGHT_SHIFT,
     VSF_KM_CTRL             = VSF_KM_LEFT_CTRL | VSF_KM_RIGHT_CTRL,
