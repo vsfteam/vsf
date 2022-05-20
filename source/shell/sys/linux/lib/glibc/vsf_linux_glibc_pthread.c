@@ -97,7 +97,7 @@ static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
-    thread->retval = (int)priv->entry(priv->param);
+    thread->retval = (int)(uintptr_t)priv->entry(priv->param);
 }
 
 int pthread_detach(pthread_t tid)
@@ -114,7 +114,7 @@ int pthread_join(pthread_t tid, void **retval)
     int retval_int;
     int ret = vsf_linux_wait_thread(tid, &retval_int);
     if (retval != NULL) {
-        *retval = (void *)retval_int;
+        *retval = (void *)(uintptr_t)retval_int;
     }
     return ret;
 }
@@ -123,7 +123,7 @@ void pthread_exit(void *retval)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     if (thread != NULL) {
-        thread->retval = (int)retval;
+        thread->retval = (int)(uintptr_t)retval;
         vsf_thread_exit();
     }
     VSF_LINUX_ASSERT(false);

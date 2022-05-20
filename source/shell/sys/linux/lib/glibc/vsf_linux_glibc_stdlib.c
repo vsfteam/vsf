@@ -192,7 +192,7 @@ size_t malloc_usable_size(const void *p)
     return vsf_heap_size((uint8_t *)p - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN)
         - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
 #else
-    return vsf_heap_size(p);
+    return vsf_heap_size((uint8_t *)p);
 #endif
 }
 
