@@ -577,12 +577,8 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
         }
     }
 
-    struct pollfd *fds = NULL;
+    struct pollfd fds[fd_num];
     if (fd_num > 0) {
-        fds = malloc(fd_num * sizeof(struct pollfd));
-        if (NULL == fds) {
-            return -1;
-        }
         memset(fds, 0, fd_num * sizeof(struct pollfd));
 
         for (int i = 0, idx = 0; i < nfds; i++) {
@@ -639,9 +635,6 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
             }
 #endif
         }
-    }
-    if (fds != NULL) {
-        free(fds);
     }
     return ret;
 }
