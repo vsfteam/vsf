@@ -76,6 +76,14 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_linux_eventfd_priv_t {
+    public_member(
+        implement(vsf_linux_fd_priv_t)
+    )
+    uint64_t counter;
+} vsf_linux_eventfd_priv_t;
+
 /*============================ PROTOTYPES ====================================*/
 
 static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
@@ -83,6 +91,12 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd);
+
+static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
+static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_eventfd_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
+static int __vsf_linux_eventfd_close(vsf_linux_fd_t *sfd);
+static int __vsf_linux_eventfd_eof(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
 static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
@@ -106,6 +120,15 @@ const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+const vsf_linux_fd_op_t __vsf_linux_eventfd_fdop = {
+    .priv_size          = sizeof(vsf_linux_eventfd_priv_t),
+    .fn_fcntl           = __vsf_linux_eventfd_fcntl,
+    .fn_read            = __vsf_linux_eventfd_read,
+    .fn_write           = __vsf_linux_eventfd_write,
+    .fn_close           = __vsf_linux_eventfd_close,
+    .fn_eof             = __vsf_linux_eventfd_eof,
+};
 
 const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
     .priv_size          = sizeof(vsf_linux_stream_priv_t),
@@ -213,6 +236,89 @@ static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     return !(priv->file->size - vk_file_tell(priv->file));
+}
+
+int eventfd(int count, int flags)
+{
+    vsf_linux_fd_t *sfd = NULL;
+    if (vsf_linux_fd_create(&sfd, &__vsf_linux_eventfd_fdop) < 0) {
+        return -1;
+    }
+
+    vsf_linux_eventfd_priv_t *priv = (vsf_linux_eventfd_priv_t *)sfd->priv;
+    priv->counter = count;
+    priv->flags = flags;
+    vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
+    return sfd->fd;
+}
+
+static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+{
+    return 0;
+}
+
+static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    vsf_linux_eventfd_priv_t *priv = (vsf_linux_eventfd_priv_t *)sfd->priv;
+    if (count != sizeof(priv->counter)) {
+        return -1;
+    }
+
+    uint64_t counter;
+    vsf_protect_t orig = vsf_protect_sched();
+again:
+    if (!priv->counter) {
+        if (vsf_linux_fd_is_block(sfd)) {
+            vsf_linux_trigger_t trig;
+            vsf_linux_trigger_init(&trig);
+
+            if (!vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, &trig, orig)) {
+                // triggered by signal
+                return -1;
+            }
+            orig = vsf_protect_sched();
+        } else {
+            vsf_unprotect_sched(orig);
+            errno = EAGAIN;
+            return -1;
+        }
+    }
+    counter = priv->counter;
+    if (!counter) {
+        goto again;
+    }
+    priv->counter = 0;
+    vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+    return counter;
+}
+
+static ssize_t __vsf_linux_eventfd_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    vsf_linux_eventfd_priv_t *priv = (vsf_linux_eventfd_priv_t *)sfd->priv;
+    if (count != sizeof(priv->counter)) {
+        return -1;
+    }
+
+    uint64_t counter = get_unaligned_cpu64((const void *)buf);
+    vsf_protect_t orig = vsf_protect_sched();
+    priv->counter += counter;
+    vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+    return counter;
+}
+
+static int __vsf_linux_eventfd_close(vsf_linux_fd_t *sfd)
+{
+    return 0;
+}
+
+static int __vsf_linux_eventfd_eof(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_eventfd_priv_t *priv = (vsf_linux_eventfd_priv_t *)sfd->priv;
+    uint64_t counter;
+    vsf_protect_t orig = vsf_protect_sched();
+        counter = priv->counter;
+    vsf_unprotect_sched(orig);
+    return !counter;
 }
 
 vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd)
