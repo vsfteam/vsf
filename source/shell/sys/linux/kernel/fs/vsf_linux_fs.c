@@ -59,6 +59,11 @@
 #else
 #   include <stdio.h>
 #endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../include/sys/eventfd.h"
+#else
+#   include <sys/eventfd.h>
+#endif
 
 #include "./vsf_linux_fs.h"
 #include "../socket/vsf_linux_socket.h"
@@ -81,7 +86,7 @@ typedef struct vsf_linux_eventfd_priv_t {
     public_member(
         implement(vsf_linux_fd_priv_t)
     )
-    uint64_t counter;
+    eventfd_t counter;
 } vsf_linux_eventfd_priv_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -252,6 +257,16 @@ int eventfd(int count, int flags)
     return sfd->fd;
 }
 
+int eventfd_read(int fd, eventfd_t *value)
+{
+    return read(fd, value, sizeof(eventfd_t)) != sizeof(eventfd_t) ? -1 : 0;
+}
+
+int eventfd_write(int fd, eventfd_t value)
+{
+    return write(fd, &value, sizeof(eventfd_t)) != sizeof(eventfd_t) ? -1 : 0;
+}
+
 static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
 {
     return 0;
@@ -287,9 +302,14 @@ again:
     if (!counter) {
         goto again;
     }
-    priv->counter = 0;
+    if (priv->flags & EFD_SEMAPHORE) {
+        priv->counter--;
+    } else {
+        priv->counter = 0;
+    }
     vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
-    return counter;
+    put_unaligned_cpu64(counter, buf);
+    return sizeof(counter);
 }
 
 static ssize_t __vsf_linux_eventfd_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
@@ -303,7 +323,7 @@ static ssize_t __vsf_linux_eventfd_write(vsf_linux_fd_t *sfd, const void *buf, s
     vsf_protect_t orig = vsf_protect_sched();
     priv->counter += counter;
     vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
-    return counter;
+    return sizeof(counter);
 }
 
 static int __vsf_linux_eventfd_close(vsf_linux_fd_t *sfd)
