@@ -279,7 +279,7 @@ static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t c
         return -1;
     }
 
-    uint64_t counter;
+    eventfd_t counter;
     vsf_protect_t orig = vsf_protect_sched();
 again:
     if (!priv->counter) {
@@ -319,7 +319,7 @@ static ssize_t __vsf_linux_eventfd_write(vsf_linux_fd_t *sfd, const void *buf, s
         return -1;
     }
 
-    uint64_t counter = get_unaligned_cpu64((const void *)buf);
+    eventfd_t counter = get_unaligned_cpu64((const void *)buf);
     vsf_protect_t orig = vsf_protect_sched();
     priv->counter += counter;
     vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
@@ -334,7 +334,7 @@ static int __vsf_linux_eventfd_close(vsf_linux_fd_t *sfd)
 static int __vsf_linux_eventfd_eof(vsf_linux_fd_t *sfd)
 {
     vsf_linux_eventfd_priv_t *priv = (vsf_linux_eventfd_priv_t *)sfd->priv;
-    uint64_t counter;
+    eventfd_t counter;
     vsf_protect_t orig = vsf_protect_sched();
         counter = priv->counter;
     vsf_unprotect_sched(orig);
