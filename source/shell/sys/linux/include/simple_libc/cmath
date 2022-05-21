@@ -1,0 +1,25 @@
+#include <math.h>
+
+namespace std {
+    using ::acos;
+    using ::asin;
+    using ::atan;
+    using ::atan2;
+    using ::cos;
+    using ::cosh;
+    using ::sin;
+    using ::sinh;
+    using ::tanh;
+    using ::exp;
+    using ::frexp;
+    using ::ldexp;
+    using ::log;
+    using ::log10;
+    using ::modf;
+    using ::pow;
+    using ::sqrt;
+    using ::ceil;
+    using ::fabs;
+    using ::floor;
+    using ::fmod;
+}

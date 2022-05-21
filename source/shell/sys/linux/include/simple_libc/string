@@ -20,10 +20,21 @@ namespace std {
         return result;
     }
 
+    static char * __strstr(const char *haystack, const char *needle)
+    {
+        return strstr(haystack, needle);
+    }
+
     template <typename T>
     static T* __memcpy(T *dst, const T *src, size_t count)
     {
         return (T *)memcpy((void *)dst, (void *)src, count * sizeof(T));
+    }
+
+    template <typename T>
+    static T* __memmove(T *dst, const T *src, size_t count)
+    {
+        return (T *)memmove((void *)dst, (void *)src, count * sizeof(T));
     }
 
     template <typename T>
@@ -40,11 +51,15 @@ namespace std {
             if (__length > 0) {
                 __array = (T *)malloc(__length * sizeof(T));
                 VSF_ASSERT(__array != NULL);
-                __memcpy<T>(__array, arr, __length);
+                if (arr != NULL) {
+                    __memcpy<T>(__array, arr, __length);
+                }
             } else {
                 __array = nullptr;
             }
         }
+        array_base<T>(size_t num)
+            : array_base<T>(NULL, num) { }
         array_base<T>(const array_base &arr)
             : array_base<T>(arr.__array, arr.__length) { }
         ~array_base<T>()
@@ -101,6 +116,14 @@ namespace std {
             __array = NULL;
             return append(arr);
         }
+        array_base<T> & assign(const T *arr, size_t num)
+        {
+            if (this->__array == arr) { return (*this); }
+
+            free(__array);
+            __array = NULL;
+            return append(arr, num);
+        }
         void swap(array_base<T> &arr)
         {
             T * array = arr.__array;
@@ -109,6 +132,22 @@ namespace std {
             arr.__length = __length;
             __array = array;
             __length = length;
+        }
+        array_base<T> & replace(size_t pos, size_t len, const T *str, size_t sublen)
+        {
+            size_t newlen = __length + sublen - len;
+            if (pos + len > __length) {
+                len = __length - pos;
+            }
+            if (sublen > len) {
+                __array = (T *)realloc(__array, newlen * sizeof(T));
+            }
+            __memmove(&__array[pos + len], &__array[pos + sublen], __length - pos - len);
+            __memcpy(&__array[pos], str, sublen);
+            if (sublen < len) {
+                __array = (T *)realloc(__array, newlen * sizeof(T));
+            }
+            return (*this);
         }
 
         iterator begin()
@@ -148,14 +187,6 @@ namespace std {
         {
             return at(pos);
         }
-        array_base<T> operator=(array_base<T> &s)
-        {
-            return assign(s);
-        }
-        array_base<T> operator+=(array_base<T> &s)
-        {
-            return append(s);
-        }
 
     private:
         T * __array;
@@ -171,6 +202,8 @@ namespace std {
             : array_base<T>(str, __strlen(str) + 1) { }
         string_base<T>(const string_base<T> &s)
             : array_base<T>(s) { }
+        string_base<T>(size_t len)
+            : array_base<T>(nullptr, len + 1) { }
         string_base<T>()
             : array_base<T>(nullptr, 0) { }
         string_base<T>(const T *arr, size_t num)
@@ -202,7 +235,7 @@ namespace std {
             }
             return (*this);
         }
-        string_base<T> substr(size_t start = 0, size_t count = npos) const
+        string_base<T> & substr(size_t start = 0, size_t count = npos) const
         {
             size_t len = length();
             if (start >= len) {
@@ -215,6 +248,115 @@ namespace std {
             const T * sub = array_base<T>::cbegin();
             string_base<T> *newstr = new string_base<T>(&sub[start], count + 1);
             return (*newstr);
+        }
+        size_t find(const string_base<T> & str, size_t pos = 0) const
+        {
+            const T *start = c_str();
+            T *found = __strstr(start + pos, str.c_str());
+            if (found) {
+                return (found - start) / sizeof(T);
+            }
+            return -1;
+        }
+
+        string_base<T> & replace(size_t pos, size_t len, const T *str, size_t sublen = -1)
+        {
+            size_t curlen = length();
+            sublen = min(sublen, __strlen(str));
+            if (pos > curlen) {
+                throw out_of_range("out of range");
+            }
+            return (string_base<T> &)array_base<T>::replace(pos, len, str, sublen);
+        }
+        string_base<T> & replace(size_t pos, size_t len, const string_base<T> &str, size_t subpos = 0, size_t sublen = -1)
+        {
+            if (subpos > str.length()) {
+                throw out_of_range("out of range");
+            }
+            return replace(pos, len, str.c_str() + subpos, sublen);
+        }
+
+        size_t find_first_of(const T *str, size_t pos = npos) const
+        {
+            const T *start = c_str();
+            ssize_t curpos = 0;
+            if (pos >= length()) {
+                return -1;
+            }
+
+            while (curpos <= pos) {
+                if (__strchr(str, start[curpos])) {
+                    break;
+                }
+                curpos++;
+            }
+            return curpos <= pos ? curpos : -1;
+        }
+        size_t find_first_of(const string_base<T> & str, size_t pos = npos) const
+        {
+            return find_first_of(str.c_str(), pos);
+        }
+        size_t find_first_of(char c, size_t pos = npos) const
+        {
+            const T str[2] = {
+                c, 0
+            };
+            return find_first_of(str, pos);
+        }
+
+        size_t find_last_of(const T *str, size_t pos = npos) const
+        {
+            const T *start = c_str();
+            ssize_t curpos = length() - 1;
+            if (pos > curpos) {
+                return -1;
+            }
+
+            while (curpos >= pos) {
+                if (__strchr(str, start[curpos])) {
+                    break;
+                }
+                curpos--;
+            }
+            return curpos >= pos ? curpos : -1;
+        }
+        size_t find_last_of(const string_base<T> & str, size_t pos = npos) const
+        {
+            return find_last_of(str.c_str(), pos);
+        }
+        size_t find_last_of(char c, size_t pos = npos) const
+        {
+            const T str[2] = {
+                c, 0
+            };
+            return find_last_of(str, pos);
+        }
+
+        string_base<T> & operator =(string_base<T> &s)
+        {
+            return (string_base<T> &)(array_base<T>::assign(s));
+        }
+        string_base<T> & operator =(const T *s)
+        {
+            size_t size = (NULL == s) ? 1 : __strlen(s) + 1;
+            return (string_base<T> &)(array_base<T>::assign(s, size));
+        }
+        string_base<T> & operator +(const T *s)
+        {
+            size_t curlen = length(), appendlen = __strlen(s);
+            string_base<T> *newstr = new string_base<T>(curlen + appendlen);
+            T * start = newstr->begin();
+            __memcpy(start, begin(), curlen);
+            __memcpy(start + curlen, s, appendlen);
+            start[curlen + appendlen] = (T)0;
+            return (*newstr);
+        }
+        string_base<T> & operator +(const T s)
+        {
+            const T tmp[2] = {
+                s, (T)0
+            };
+            return operator +(tmp);
         }
 
         const T * c_str() const
