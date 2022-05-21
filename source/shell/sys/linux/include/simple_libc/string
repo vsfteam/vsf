@@ -24,6 +24,10 @@ namespace std {
     {
         return strstr(haystack, needle);
     }
+    static char * __strchr(const char *str, int c)
+    {
+        return strchr(str, c);
+    }
 
     template <typename T>
     static T* __memcpy(T *dst, const T *src, size_t count)
@@ -262,16 +266,18 @@ namespace std {
         string_base<T> & replace(size_t pos, size_t len, const T *str, size_t sublen = -1)
         {
             size_t curlen = length();
-            sublen = min(sublen, __strlen(str));
+            sublen = vsf_min(sublen, __strlen(str));
             if (pos > curlen) {
-                throw out_of_range("out of range");
+                assert(false);
+//                throw out_of_range("out of range");
             }
             return (string_base<T> &)array_base<T>::replace(pos, len, str, sublen);
         }
         string_base<T> & replace(size_t pos, size_t len, const string_base<T> &str, size_t subpos = 0, size_t sublen = -1)
         {
             if (subpos > str.length()) {
-                throw out_of_range("out of range");
+                assert(false);
+//                throw out_of_range("out of range");
             }
             return replace(pos, len, str.c_str() + subpos, sublen);
         }
