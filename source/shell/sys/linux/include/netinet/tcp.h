@@ -35,6 +35,7 @@ extern "C" {
 #define TCP_SYNCNT          12
 #define TCP_USER_TIMEOUT    13
 #define TCP_WINDOW_CLAMP    14
+#define TCP_KEEPALIVE       15
 
 #if defined(__FAVOR_BSD) || defined(_BSD_SOURCE)
 typedef uint32_t            tcp_seq;
