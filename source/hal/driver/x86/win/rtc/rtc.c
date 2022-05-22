@@ -81,6 +81,7 @@ vsf_err_t vsf_hw_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
             rtc_tm->tm_wday = system_time.wDayOfWeek == 0 ? 7 : system_time.wDayOfWeek;
             rtc_tm->tm_mon = system_time.wMonth;
             rtc_tm->tm_year = system_time.wYear;
+            rtc_tm->tm_ms = system_time.wMilliseconds;
         }
         return VSF_ERR_NONE;
     }

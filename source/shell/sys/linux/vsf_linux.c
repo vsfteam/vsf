@@ -1755,7 +1755,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
     };
 
     tv->tv_sec = mktime(&t);
-    tv->tv_usec = 0;
+    tv->tv_usec = rtc_tm.tm_ms * 1000;
 #else
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
