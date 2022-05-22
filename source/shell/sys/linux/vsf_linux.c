@@ -1282,11 +1282,11 @@ int daemon(int nochdir, int noclose)
     return 0;
 }
 
-exec_ret_t execvp(const char *pathname, char const * const * argv)
+exec_ret_t execvpe(const char *file, char const * const * argv, char const * const * envp)
 {
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
-    int exefd = vsf_linux_fs_get_executable(pathname, &entry);
+    int exefd = vsf_linux_fs_get_executable(file, &entry);
     if (exefd < 0) {
         return -1;
     }
@@ -1298,12 +1298,18 @@ exec_ret_t execvp(const char *pathname, char const * const * argv)
 
     __vsf_linux_process_free_arg(process);
     __vsf_linux_process_parse_arg(process, argv);
+    vsf_linux_merge_env(process, (char **)envp);
     ctx->entry = entry;
 
     vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
     vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_INIT);
     vsf_thread_wfe(VSF_EVT_INVALID);
     return 0;
+}
+
+exec_ret_t execvp(const char *file, char const * const * argv)
+{
+    return execvpe(file, argv, NULL);
 }
 
 exec_ret_t execv(const char *pathname, char const* const* argv)

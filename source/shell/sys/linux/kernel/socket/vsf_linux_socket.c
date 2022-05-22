@@ -34,6 +34,7 @@
 #       include "../../include/netinet/in.h"
 #       include "../../include/arpa/inet.h"
 #       include "../../include/netdb.h"
+#       include "../../include/ifaddrs.h"
 #   endif
 #else
 #   include <unistd.h>
@@ -43,6 +44,7 @@
 #       include <netinet/in.h>
 #       include <arpa/inet.h>
 #       include <netdb.h>
+#       include <ifaddrs.h>
 #   endif
 #endif
 #include "./vsf_linux_socket.h"
@@ -513,6 +515,7 @@ int recv(int sockfd, void *buf, size_t len, int flags)
     return read(sockfd, buf, len);
 }
 
+#if VSF_LINUX_SOCKET_USE_INET == ENABLED
 // ifaddrs.h
 WEAK(getifaddrs)
 int getifaddrs(struct ifaddrs **ifaddrs)
@@ -524,5 +527,6 @@ WEAK(freeifaddrs)
 void freeifaddrs(struct ifaddrs *ifaddrs)
 {
 }
+#endif
 
 #endif
