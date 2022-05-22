@@ -150,6 +150,7 @@ enum {
 #define VSF_LINUX_SOCKET_SO_SNDTIMEO    11
 #define VSF_LINUX_SOCKET_SO_NONBLOCK    12
 #define VSF_LINUX_SOCKET_SO_LINGER      13
+#define VSF_LINUX_SOCKET_SO_PRIORITY    14
 typedef uint32_t socklen_t;
 typedef uint16_t vsf_linux_socket_sa_family_t;
 struct vsf_linux_socket_sockaddr {
@@ -176,8 +177,8 @@ struct vsf_linux_socket_sockaddr_in {
 };
 
 // from netinet/tcp.h
-#define VSF_LINUX_SOCKET_TCP_NODELAY    1
-#define VSF_LINUX_SOCKET_TCP_KEEPALIVE  2
+#define VSF_LINUX_SOCKET_TCP_NODELAY    10
+#define VSF_LINUX_SOCKET_TCP_KEEPALIVE  15
 
 // from vsf_linux_socket.h
 vsf_dcl_class(vsf_linux_socket_priv_t)
