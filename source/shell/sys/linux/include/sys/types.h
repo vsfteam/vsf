@@ -35,6 +35,7 @@ typedef unsigned int        size_t;
 
 typedef int                 key_t;
 typedef int                 pid_t;
+typedef int                 id_t;
 typedef unsigned int        mode_t;
 typedef unsigned int        nlink_t;
 typedef unsigned int        uid_t;
@@ -45,6 +46,12 @@ typedef unsigned long       dev_t;
 typedef unsigned long       ino_t;
 typedef unsigned int        blksiz_t;
 typedef unsigned long long  blkcnt_t;
+
+typedef enum {
+    P_ALL,
+    P_PGID,
+    P_PID,
+} idtype_t;
 
 #if (VSF_LINUX_USE_SIMPLE_LIBC == ENABLED) && (VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #ifndef __TIME_T

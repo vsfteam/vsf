@@ -1384,6 +1384,7 @@ long sysconf(int name)
     switch (name) {
     case _SC_PAGESIZE:      return 256;
     case _SC_OPEN_MAX:      return 65535;
+    case _SC_CLK_TCK:       return vsf_systimer_get_freq();
     }
     return 0;
 }
@@ -1572,6 +1573,14 @@ pid_t waitpid(pid_t pid, int *status, int options)
     return pid;
 }
 
+int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options)
+{
+    switch (idtype) {
+    case P_PID:     return waitpid((pid_t)id, NULL, options);
+    default:        return -1;
+    }
+}
+
 pid_t getpid(void)
 {
     return vsf_linux_get_cur_process()->id.pid;
@@ -1580,41 +1589,6 @@ pid_t getpid(void)
 pid_t getppid(void)
 {
     return vsf_linux_get_cur_process()->id.ppid;
-}
-
-pid_t getpgid(pid_t pid)
-{
-    return pid;
-}
-
-uid_t getuid(void)
-{
-    return (uid_t)0;
-}
-
-int setuid(uid_t uid)
-{
-    return 0;
-}
-
-uid_t geteuid(void)
-{
-    return (uid_t)0;
-}
-
-int setgid(gid_t gid)
-{
-    return 0;
-}
-
-gid_t getgid(void)
-{
-    return (gid_t)0;
-}
-
-gid_t getegid(void)
-{
-    return (gid_t)0;
 }
 
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
@@ -1721,6 +1695,27 @@ unsigned sleep(unsigned sec)
     return vsf_systimer_tick_to_ms(ticks_remain) / 1000;
 }
 #endif
+
+int chown(const char *pathname, uid_t owner, gid_t group)
+{
+    return 0;
+}
+
+int fchown(int fd, uid_t owner, gid_t group)
+{
+    return 0;
+}
+
+int lchown(const char *pathname, uid_t owner, gid_t group)
+{
+    return 0;
+}
+
+int fchownat(int dirfd, const char *pathname, uid_t owner, gid_t group, int flags)
+{
+    return 0;
+}
+
 
 // malloc.h
 void * memalign(size_t alignment, size_t size)

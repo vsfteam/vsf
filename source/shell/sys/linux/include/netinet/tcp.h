@@ -19,9 +19,22 @@ extern "C" {
 #   define __LITTLE_ENDIAN_BITFIELD
 #endif
 
+#define SOL_TCP             IPPROTO_TCP
 // tcp options
-#define TCP_NODELAY         1
-#define TCP_KEEPALIVE       2
+#define TCP_CONGESTION      1
+#define TCP_CORK            2
+#define TCP_DEFER_ACCEPT    3
+#define TCP_INFO            4
+#define TCP_KEEPCNT         5
+#define TCP_KEEPIDLE        6
+#define TCP_KEEPINTVL       7
+#define TCP_LINGER2         8
+#define TCP_MAXSEG          9
+#define TCP_NODELAY         10
+#define TCP_QUICKACK        11
+#define TCP_SYNCNT          12
+#define TCP_USER_TIMEOUT    13
+#define TCP_WINDOW_CLAMP    14
 
 #if defined(__FAVOR_BSD) || defined(_BSD_SOURCE)
 typedef uint32_t            tcp_seq;

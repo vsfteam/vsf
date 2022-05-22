@@ -103,22 +103,25 @@ typedef unsigned int speed_t;
 
 // baudrate
 #define CBAUD       0x100F
-#define B0          0
-#define B50         1
-#define B75         2
-#define B110        3
-#define B134        4
-#define B150        5
-#define B200        6
-#define B300        7
-#define B600        8
-#define B1200       9
-#define B1800       10
-#define B2400       11
-#define B4800       12
-#define B9600       13
-#define B19200      14
-#define B38400      15
+// use enum to avoid conflict
+enum {
+        B0          = 0,
+        B50         = 1,
+        B75         = 2,
+        B110        = 3,
+        B134        = 4,
+        B150        = 5,
+        B200        = 6,
+        B300        = 7,
+        B600        = 8,
+        B1200       = 9,
+        B1800       = 10,
+        B2400       = 11,
+        B4800       = 12,
+        B9600       = 13,
+        B19200      = 14,
+        B38400      = 15,
+};
 
 #define CSIZE       0x0030
 #define CS5         0x0000

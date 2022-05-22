@@ -36,9 +36,6 @@ extern "C" {
 #define getpid              VSF_LINUX_WRAPPER(getpid)
 #define getppid             VSF_LINUX_WRAPPER(getppid)
 #define getpgid             VSF_LINUX_WRAPPER(getpgid)
-#define getuid              VSF_LINUX_WRAPPER(getuid)
-#define setuid              VSF_LINUX_WRAPPER(setuid)
-#define geteuid             VSF_LINUX_WRAPPER(geteuid)
 #define setgid              VSF_LINUX_WRAPPER(setgid)
 #define getgid              VSF_LINUX_WRAPPER(getgid)
 #define getegid             VSF_LINUX_WRAPPER(getegid)
@@ -117,15 +114,18 @@ unsigned sleep(unsigned seconds);
 
 unsigned int alarm(unsigned int seconds);
 
+#define setgid(__uid)               (0)
+#define getgid()                    ((gid_t)0)
+#define getegid()                   ((gid_t)0)
+#define initgroups(__user, __gid)   (0)
+#define getpgid(__pid)              (__pid)
+#define getpgrp()                   ((pid_t)0)
+#define setpgrp()                   (0)
+#define getuid()                    ((uid_t)0)
+#define setuid(__uid)               (0)
+#define geteuid()                   ((uid_t)0)
 pid_t getpid(void);
 pid_t getppid(void);
-pid_t getpgid(pid_t pid);
-uid_t getuid(void);
-int setuid(uid_t uid);
-uid_t geteuid(void);
-int setgid(gid_t gid);
-gid_t getgid(void);
-gid_t getegid(void);
 
 
 #if defined(__WIN__) && defined(__CPU_X64__)
@@ -144,6 +144,7 @@ int system(const char *cmd);
 enum {
     _SC_PAGESIZE,
     _SC_OPEN_MAX,
+    _SC_CLK_TCK,
 };
 long sysconf(int name);
 char *realpath(const char *path, char *resolved_path);
@@ -168,6 +169,7 @@ int rmdir(const char *pathname);
 int dup(int oldfd);
 int dup2(int oldfd, int newfd);
 
+int chroot(const char *path);
 int chdir(const char *pathname);
 char * getcwd(char *buffer, size_t maxlen);
 
@@ -200,6 +202,11 @@ int tcsetpgrp(int fd, pid_t pgrp);
 char * getpass(const char *prompt);
 int gethostname(char *name, size_t len);
 int sethostname(const char *name, size_t len);
+
+int chown(const char *pathname, uid_t owner, gid_t group);
+int fchown(int fd, uid_t owner, gid_t group);
+int lchown(const char *pathname, uid_t owner, gid_t group);
+int fchownat(int dirfd, const char *pathname, uid_t owner, gid_t group, int flags);
 
 int getentropy(void *buffer, size_t length);
 

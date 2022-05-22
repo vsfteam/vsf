@@ -513,4 +513,16 @@ int recv(int sockfd, void *buf, size_t len, int flags)
     return read(sockfd, buf, len);
 }
 
+// ifaddrs.h
+WEAK(getifaddrs)
+int getifaddrs(struct ifaddrs **ifaddrs)
+{
+    return 0;
+}
+
+WEAK(freeifaddrs)
+void freeifaddrs(struct ifaddrs *ifaddrs)
+{
+}
+
 #endif

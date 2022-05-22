@@ -18,8 +18,12 @@ extern "C" {
 #endif
 
 // options of waitpid
-#define WNOHANG                 1
-#define WUNTRACED               2
+#define WEXITED                 1
+#define WSTOPPED                2
+#define WCONTINUED              3
+#define WNOHANG                 4
+#define WNOWAIT                 5
+#define WUNTRACED               6
 
 // internal usage
 #define PID_STATUS_RUNNING      (1 << 0)
@@ -31,7 +35,9 @@ extern "C" {
 #define WIFSIGNALED(__STATUS)   0
 #define WTERMSIG(__STATUS)      ((__STATUS) & 0x7F)
 
+pid_t wait(int *status);
 pid_t waitpid(pid_t pid, int *status, int options);
+int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options);
 
 #ifdef __cplusplus
 }

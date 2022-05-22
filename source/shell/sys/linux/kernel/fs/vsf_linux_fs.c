@@ -997,6 +997,11 @@ int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
     return -1;
 }
 
+int chroot(const char *path)
+{
+    return 0;
+}
+
 int chdir(const char *pathname)
 {
     if ((NULL == pathname) || ('\0' == *pathname)) {

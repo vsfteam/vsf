@@ -590,6 +590,16 @@ int atoi(const char *str)
     return strtol(str, NULL, 10);
 }
 
+long int atol(const char *str)
+{
+    return strtol(str, NULL, 10);
+}
+
+long long int atoll(const char *str)
+{
+    return strtoll(str, NULL, 10);
+}
+
 double atof(const char *str)
 {
     return strtod(str, NULL);

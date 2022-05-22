@@ -37,8 +37,13 @@ extern "C" {
 #define SOCKET_ERROR    -1
 
 enum {
+    IPPROTO_IP          = 0,
     IPPROTO_TCP         = 6,
     IPPROTO_UDP         = 17,
+};
+
+enum {
+    MSG_NOSIGNAL        = 0,
 };
 
 typedef uint32_t        socklen_t;
@@ -82,9 +87,9 @@ struct linger {
 #define socketpair      VSF_LINUX_SOCKET_WRAPPER(socketpair)
 #endif
 
-// level for setsockopt
+// level for sockopt
 #define SOL_SOCKET      0xFFFF
-// option_name for setsockopt
+// sock options
 #define SO_DEBUG        1
 #define SO_REUSEADDR    2
 #define SO_ACCEPTCONN   3
@@ -98,6 +103,7 @@ struct linger {
 #define SO_SNDTIMEO     11
 #define SO_NONBLOCK     12
 #define SO_LINGER       13
+#define SO_PRIORITY     14
 
 int setsockopt(int socket, int level, int optname, const void *optval,
                     socklen_t optlen);
