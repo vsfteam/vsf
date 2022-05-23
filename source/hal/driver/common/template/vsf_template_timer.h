@@ -79,6 +79,8 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
+// TODO: Add more feature support, for example match interrupt
+
 #if VSF_TIMER_CFG_REIMPLEMENT_CHANNEL_FEATURE == DISABLED
 typedef enum timer_mode_t{
     TIMER_MODE_ONESHOT,
@@ -97,8 +99,8 @@ typedef enum em_timer_irq_mask_t{
 typedef struct vsf_timer_t vsf_timer_t;
 
 typedef void vsf_timer_isr_handler_t(void *target_ptr,
-                                     em_timer_irq_mask_t irq_mask,
-                                     vsf_timer_t *timer_ptr);
+                                     vsf_timer_t *timer_ptr,
+                                     em_timer_irq_mask_t irq_mask);
 
 typedef struct vsf_timer_isr_t {
     vsf_timer_isr_handler_t *handler_fn;
@@ -109,6 +111,8 @@ typedef struct vsf_timer_isr_t {
 //! timer configuration
 typedef struct timer_cfg_t {
     timer_mode_t mode;
+
+    uint32_t max_count;
     union {
         uint32_t freq;
         uint32_t min_freq;
@@ -171,6 +175,8 @@ extern vsf_err_t vsf_timer_set(vsf_timer_t *timer_ptr, uint32_t count);
         VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_enable)  ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME, ##__VA_ARGS__)
 #   define vsf_timer_irq_disable(__TIME, ...)                                   \
         VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_disable) ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME, ##__VA_ARGS__)
+#   define vsf_timer_match_set(__TIME, ...)                                     \
+        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_match_set)   ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME, ##__VA_ARGS__)
 #   define vsf_timer_pwm_set(__TIME, ...)                                       \
         VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_pwm_set)     ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME, ##__VA_ARGS__)
 #endif

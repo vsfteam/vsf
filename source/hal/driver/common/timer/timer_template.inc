@@ -26,9 +26,20 @@
 
 #define vsf_real_timer_t          VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t)
 #define vsf_real_timer_capability VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_capability)
+#define vsf_real_timer_pwm_set    VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_pwm_set)
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_TIMER_CFG_IMPLEMENT_PWM_SET == DISABLED
+vsf_err_t vsf_real_timer_pwm_set(vsf_real_timer_t *timer_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+
+    VSF_HAL_ASSERT(0);
+    return VSF_ERR_FAIL;
+}
+#endif
 
 #if VSF_TIMER_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 timer_capability_t vsf_real_timer_capability(vsf_real_timer_t *timer_ptr)
