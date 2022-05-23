@@ -2,4 +2,5 @@
 
 target_sources(${VSF_LIB_NAME} INTERFACE
     timer.c
+    lp_timer.c
 )
