@@ -29,15 +29,19 @@
 #endif
 
 #ifndef APP_TIMER_DEMO_CFG_TIMER
-#   define APP_TIMER_DEMO_CFG_TIMER                     (vsf_timer_t *)&vsf_hw_timer0
+#   define APP_TIMER_DEMO_CFG_TIMER                     (vsf_timer_t *)&vsf_hw_timer2
 #endif
 
 #ifndef APP_TIMER_DEMO_CFG_MODE
-#   define APP_TIMER_DEMO_CFG_MODE                      TIMER_MODE_ONESHOT
+#   define APP_TIMER_DEMO_CFG_MODE                      TIMER_MODE_CONTINUES
 #endif
 
 #ifndef APP_TIMER_DEMO_CFG_FREQ
-#   define APP_TIMER_DEMO_CFG_FREQ                      (100 * 100)
+#   define APP_TIMER_DEMO_CFG_FREQ                      (1 * 1000 * 1000)   // 1us
+#endif
+
+#ifndef APP_TIMER_DEMO_CFG_MAX_COUNT
+#   define APP_TIMER_DEMO_CFG_MAX_COUNT                 (2 * 1000 * 1000)   // 2s
 #endif
 
 #ifndef APP_TIMER_DEMO_IRQ_PRIO
@@ -46,11 +50,18 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-void __timer_demo_handler(void *target_ptr, em_timer_irq_mask_t irq_mask, vsf_timer_t *timer_ptr)
+void __timer_demo_handler(void *target_ptr, vsf_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
 {
     if (irq_mask == VSF_TIMER_IRQ_MASK_OVERFLOW) {
-        vsf_trace_debug("enter timer overflow interrupt");
+        static uint32_t cnt = 0;
+        vsf_trace_debug("timer interrupt :%d" VSF_TRACE_CFG_LINEEND, cnt++);
     }
+}
+
+void __us_ticker_irq_handler(void)
+{
+    static uint32_t cnt = 0;
+    vsf_trace_debug("timer interrupt :%d" VSF_TRACE_CFG_LINEEND, cnt++);
 }
 
 static void __timer_demo(void)
@@ -59,6 +70,8 @@ static void __timer_demo(void)
 
     timer_cfg_t timer_cfg = {
         .mode           = APP_TIMER_DEMO_CFG_MODE,
+        .freq           = APP_TIMER_DEMO_CFG_FREQ,
+        .max_count      = APP_TIMER_DEMO_CFG_MAX_COUNT,
         .isr            = {
             .handler_fn = __timer_demo_handler,
             .target_ptr = NULL,

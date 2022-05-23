@@ -40,12 +40,12 @@
 #   define APP_PWM_DEMO_CFG_FREQ                        (1 * 1000 * 1000) // 1MHz
 #endif
 
-#ifndef APP_PWM_DEMO_CFG_PREIOD_MS
-#   define APP_PWM_DEMO_CFG_PREIOD_MS                   50
+#ifndef APP_PWM_DEMO_CFG_PREIOD
+#   define APP_PWM_DEMO_CFG_PREIOD                      100
 #endif
 
-#ifndef APP_PWM_DEMO_CFG_PULSE_MS
-#   define APP_PWM_DEMO_CFG_PULSE_MS                    20
+#ifndef APP_PWM_DEMO_CFG_PULSE
+#   define APP_PWM_DEMO_CFG_PULSE                       50
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -55,7 +55,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __pwm_demo(vsf_pwm_t * pwm)
+static void __pwm_demo(vsf_pwm_t * pwm, uint8_t channel,  uint32_t period, uint32_t pulse)
 {
     vsf_err_t result;
 
@@ -68,10 +68,11 @@ static void __pwm_demo(vsf_pwm_t * pwm)
 
     while (fsm_rt_cpl != vsf_pwm_enable(pwm));
 
-    result = vsf_pwm_set_ms(pwm, APP_PWM_DEMO_CFG_CHNNAL, APP_PWM_DEMO_CFG_PREIOD_MS, APP_PWM_DEMO_CFG_PREIOD_MS);
+    result = vsf_pwm_set(pwm, channel, period, pulse);
     VSF_ASSERT(result == VSF_ERR_NONE);
     (void) result;
 }
+
 
 #if APP_USE_LINUX_DEMO == ENABLED
 int pwm_main(int argc, char *argv[])
@@ -87,7 +88,7 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
-    __pwm_demo(APP_PWM_DEMO_CFG_PWM);
+    __pwm_demo(APP_PWM_DEMO_CFG_PWM, APP_PWM_DEMO_CFG_CHNNAL, APP_PWM_DEMO_CFG_PREIOD, APP_PWM_DEMO_CFG_PULSE);
 
     return 0;
 }
