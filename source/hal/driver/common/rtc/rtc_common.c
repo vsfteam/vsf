@@ -99,4 +99,56 @@ vsf_err_t vsf_rtc_set_second(vsf_rtc_t *rtc_ptr, time_t time)
 }
 
 #endif /* VSF_RTC_CFG_MULTI_CLASS == ENABLED */
+
+static bool _vsf_rtc_is_valid(const vsf_rtc_tm_t *rtc_tm)
+{
+    VSF_HAL_ASSERT(rtc_tm != NULL);
+
+    if (rtc_tm->tm_sec > 59) {
+        return false;
+    }
+    if (rtc_tm->tm_min > 59) {
+        return false;
+    }
+    if (rtc_tm->tm_hour > 23) {
+        return false;
+    }
+    if ((rtc_tm->tm_mday < 1) || (rtc_tm->tm_mday > 23)) {
+        return false;
+    }
+    if ((rtc_tm->tm_mday < 1) || (rtc_tm->tm_mday > 7)) {
+        return false;
+    }
+    if ((rtc_tm->tm_mon < 1) || (rtc_tm->tm_mon > 12)) {
+        return false;
+    }
+    if (rtc_tm->tm_year < 1900) {
+        return false;
+    }
+
+    return true;
+}
+
+bool vsf_rtc_tm_is_valid(const vsf_rtc_tm_t *rtc_tm)
+{
+    VSF_HAL_ASSERT(rtc_tm != NULL);
+
+    if (rtc_tm->tm_year < 1900) {
+        return false;
+    }
+
+    return _vsf_rtc_is_valid(rtc_tm);
+}
+
+bool vsf_rtc_tm_is_epoch_time(const vsf_rtc_tm_t *rtc_tm)
+{
+    VSF_HAL_ASSERT(rtc_tm != NULL);
+
+    if (rtc_tm->tm_year < 1970) {
+        return false;
+    }
+
+    return _vsf_rtc_is_valid(rtc_tm);
+}
+
 #endif /* VSF_HAL_USE_RTC == ENABLED */
