@@ -91,7 +91,7 @@ typedef struct vsf_rtc_tm_t {
     uint8_t tm_min;         // [0 .. 59]
     uint8_t tm_hour;        // [0 .. 23]
     uint8_t tm_mday;        // [1 .. 31]
-    uint8_t tm_wday;        // [1 .. 7]     - [Monday -- Sunday]
+    uint8_t tm_wday;        // [1 .. 7]     - [Sunday, Monday, ..., Saturday]
     uint8_t tm_mon;         // [1 .. 12]    - [January -- December]
     uint16_t tm_year;       // [1900 .. ]
     uint16_t tm_ms;

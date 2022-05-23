@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/driver/common/template/vsf_template_rtc.h"
+#include "rtc_common.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

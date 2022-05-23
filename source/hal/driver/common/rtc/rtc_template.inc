@@ -19,18 +19,22 @@
 
 /*============================ INCLUDES ======================================*/
 
+#if VSF_RTC_CFG_IMPLEMENT_TM_TO_TIME == ENABLED
+#   include <time.h>
+#endif
+
 /*============================ MACROS ========================================*/
+
+#define vsf_real_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t)
+#define vsf_real_rtc_get        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get)
+#define vsf_real_rtc_set        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set)
+#define vsf_real_rtc_get_second VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get_second)
+#define vsf_real_rtc_set_second VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set_second)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-
-
-#define vsf_real_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t)
-#define vsf_real_rtc_capability VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_capability)
-
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -42,6 +46,88 @@ rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
     };
 
     return rtc_capability;
+}
+#endif
+
+#if VSF_RTC_CFG_IMPLEMENT_TIME_TO_TM == ENABLED
+vsf_err_t vsf_real_rtc_get(vsf_real_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
+{
+    VSF_HAL_ASSERT(rtc_ptr != NULL);
+    time_t time = vsf_real_rtc_get_second(rtc_ptr);
+    struct tm *t = gmtime(&time);
+    if (t == NULL) {
+        return VSF_ERR_FAIL;
+    }
+
+    rtc_tm->tm_sec  = t->tm_sec;
+    rtc_tm->tm_min  = t->tm_min;
+    rtc_tm->tm_hour = t->tm_hour;
+    rtc_tm->tm_mday = t->tm_mday;
+    rtc_tm->tm_wday = t->tm_wday + 1;
+    rtc_tm->tm_mon  = t->tm_mon  + 1;
+    rtc_tm->tm_year = t->tm_year + 1900;
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_real_rtc_set(vsf_real_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
+{
+    VSF_HAL_ASSERT(rtc_ptr != NULL);
+    VSF_HAL_ASSERT(rtc_tm != NULL);
+
+    struct tm t = {
+        .tm_sec  = rtc_tm->tm_sec,
+        .tm_min  = rtc_tm->tm_min,
+        .tm_hour = rtc_tm->tm_hour,
+        .tm_mday = rtc_tm->tm_mday,
+        .tm_mon  = rtc_tm->tm_mon - 1,
+        .tm_year = rtc_tm->tm_year - 1900,
+    };
+
+    time_t time = mktime(&t);
+    return vsf_real_rtc_set_second(rtc_ptr, time);
+}
+#endif
+
+#if VSF_RTC_CFG_IMPLEMENT_TM_TO_TIME == ENABLED
+time_t vsf_real_rtc_get_second(vsf_real_rtc_t *rtc_ptr)
+{
+    VSF_HAL_ASSERT(rtc_ptr != NULL);
+    vsf_rtc_tm_t rtc_tm;
+    vsf_err_t result = vsf_real_rtc_get(rtc_ptr, &rtc_tm);
+    VSF_HAL_ASSERT(result == VSF_ERR_NONE);
+
+    struct tm t = {
+        .tm_sec  = rtc_tm.tm_sec,
+        .tm_min  = rtc_tm.tm_min,
+        .tm_hour = rtc_tm.tm_hour,
+        .tm_mday = rtc_tm.tm_mday,
+        .tm_mon  = rtc_tm.tm_mon - 1,
+        .tm_year = rtc_tm.tm_year - 1900,
+    };
+
+    return mktime(&t);
+}
+
+vsf_err_t vsf_real_rtc_set_second(vsf_real_rtc_t *rtc_ptr, time_t time)
+{
+    VSF_HAL_ASSERT(rtc_ptr != NULL);
+
+    struct tm *t = gmtime(&time);
+    if (NULL == t) {
+        return VSF_ERR_FAIL;
+    }
+
+    vsf_rtc_tm_t rtc_tm = {
+        .tm_sec  = t->tm_sec,
+        .tm_min  = t->tm_min,
+        .tm_hour = t->tm_hour,
+        .tm_mday = t->tm_mday,
+        .tm_mon  = t->tm_mon + 1,
+        .tm_year = t->tm_year + 1900,
+    };
+
+    return vsf_real_rtc_set(rtc_ptr, &rtc_tm);
 }
 #endif
 
