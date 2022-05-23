@@ -243,29 +243,29 @@ namespace std {
         {
             return __array == nullptr ? (iterator)nullptr : &__array[__length];
         }
-        iterator rbegin() const
-        {
-            return end();
-        }
-        iterator rend() const
-        {
-            return begin();
-        }
         const_iterator cbegin() const
         {
-            return __array == nullptr ? (const_iterator)nullptr : &__array[0];
+            return (const_iterator)begin();
         }
         const_iterator cend() const
         {
-            return __array == nullptr ? (const_iterator)nullptr : &__array[__length];
+            return (const_iterator)end();
+        }
+        iterator rbegin() const
+        {
+            return __length > 0 ? &__array[__length - 1] : NULL;
+        }
+        iterator rend() const
+        {
+            return __length > 0 ? &__array[-1] : NULL;
         }
         const_iterator crbegin() const
         {
-            return cend();
+            return (const_iterator)rbegin();
         }
         const_iterator crend() const
         {
-            return cbegin();
+            return (const_iterator)rend();
         }
 
         const T & operator [](size_t pos) const
@@ -396,6 +396,41 @@ namespace std {
             : array_base<T>(arr, num) { }
         explicit basic_string<T, Traits, Alloc>(const Alloc &a)
             : array_base<T>(nullptr, 0) { }
+
+        iterator begin() const
+        {
+            return array_base<T>::begin();
+        }
+        iterator end() const
+        {
+            iterator it = array_base<T>::end();
+            return it != NULL ? it - 1 : NULL;
+        }
+        const_iterator cbegin() const
+        {
+            return (const_iterator)begin();
+        }
+        const_iterator cend() const
+        {
+            return (const_iterator)end();
+        }
+        iterator rbegin() const
+        {
+            iterator it = array_base<T>::rbegin();
+            return it != NULL ? it - 1 : NULL;
+        }
+        iterator rend() const
+        {
+            return array_base<T>::rend();
+        }
+        const_iterator crbegin() const
+        {
+            return (const_iterator)rbegin();
+        }
+        const_iterator crend() const
+        {
+            return (const_iterator)rend();
+        }
 
         size_t size() const
         {
