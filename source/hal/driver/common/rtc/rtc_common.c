@@ -20,9 +20,11 @@
 
 #define VSF_RTC_CFG_FUNCTION_RENAME DISABLED
 
-#include "hal/driver/driver.h"
+#include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_RTC == ENABLED
+
+#include "hal/driver/driver.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -100,6 +102,8 @@ vsf_err_t vsf_rtc_set_second(vsf_rtc_t *rtc_ptr, time_t time)
 
 #endif /* VSF_RTC_CFG_MULTI_CLASS == ENABLED */
 
+#ifdef VSF_RTC_CFG_PREFIX
+
 static bool _vsf_rtc_is_valid(const vsf_rtc_tm_t *rtc_tm)
 {
     VSF_HAL_ASSERT(rtc_tm != NULL);
@@ -150,5 +154,7 @@ bool vsf_rtc_tm_is_epoch_time(const vsf_rtc_tm_t *rtc_tm)
 
     return _vsf_rtc_is_valid(rtc_tm);
 }
+
+#endif /* VSF_RTC_CFG_PREFIX */
 
 #endif /* VSF_HAL_USE_RTC == ENABLED */
