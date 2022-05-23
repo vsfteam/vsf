@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [aic8800, m484, mps2]
+        target: [aic8800, mps2] # m484
         cc: ['10-2021.10', '9-2019-q4', '8-2019-q3']
         os: [ubuntu-latest]
 
