@@ -236,8 +236,8 @@ vsf_err_t vsf_hw_adc_init(vsf_hw_adc_t *hw_adc_ptr, adc_cfg_t *cfg_ptr)
 
     hw_adc_ptr->cfg = *cfg_ptr;
 
-    hw_adc_ptr->cfg.clock_freq = max(hw_adc_ptr->cfg.clock_freq, 101960);
-    hw_adc_ptr->cfg.clock_freq = min(hw_adc_ptr->cfg.clock_freq, 13000000);
+    hw_adc_ptr->cfg.clock_freq = vsf_max(hw_adc_ptr->cfg.clock_freq, 101960);
+    hw_adc_ptr->cfg.clock_freq = vsf_min(hw_adc_ptr->cfg.clock_freq, 13000000);
 
     uint32_t temp_clock_div = 26000000 / hw_adc_ptr->cfg.clock_freq;
     PMIC_MEM_WRITE((unsigned int)(&aic1000liteSysctrl->msadc_clk_div),
