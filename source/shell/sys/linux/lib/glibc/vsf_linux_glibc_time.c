@@ -86,6 +86,7 @@ time_t time(time_t *t)
 #   pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
+#ifndef __WIN__
 size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm)
 {
     VSF_LINUX_ASSERT((str != NULL) && (format != NULL) && (tm != NULL) && (maxsize > 0));
@@ -206,6 +207,7 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
     *str_cur = '\0';
     return str_cur - str;
 }
+#endif
 
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop

@@ -99,6 +99,17 @@ static inline int toupper(int c)
     return c;
 }
 
+#ifdef __WIN__
+#define _CONTROL            CTYPE_C
+#define _SPACE              CTYPE_S
+#define _DIGIT              CTYPE_N
+#define _LOWER              CTYPE_L
+#define _PUNCT              CTYPE_P
+#define _BLANK              CTYPE_B
+#define _UPPER              CTYPE_U
+#define _HEX                CTYPE_X
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -17,7 +17,14 @@ extern "C" {
 #   define WEOF                ((wint_t)-1)
 #endif
 
-#ifndef __WIN__
+#ifdef __WIN__
+#   ifdef __cplusplus
+#       define _CONST_RETURN    const
+#   else
+#       define _CONST_RETURN
+#   endif
+#else
+#   define _CONST_RETURN
 typedef struct {
     unsigned long wc;
     unsigned short byte, state;
@@ -62,14 +69,14 @@ int vswprintf(wchar_t *str, size_t n, const wchar_t *format, va_list ap);
 size_t wcslen(const wchar_t *str);
 wchar_t * wcscat(wchar_t *dest, const wchar_t *src);
 wchar_t *wcsncat(wchar_t *dest, const wchar_t *src, size_t n);
-wchar_t * wcschr(const wchar_t *str, wchar_t c);
-wchar_t * wcsrchr(const wchar_t *str, wchar_t c);
+_CONST_RETURN wchar_t * wcschr(const wchar_t *str, wchar_t c);
+_CONST_RETURN wchar_t * wcsrchr(const wchar_t *str, wchar_t c);
 int wcscmp(const wchar_t *str1, const wchar_t *str2);
 int wcsncmp(const wchar_t *str1, const wchar_t *str2, size_t n);
 int wcscoll(const wchar_t *str1, const wchar_t *str2);
 wchar_t * wcscpy(wchar_t *dest, const wchar_t *src);
 wchar_t * wcsncpy(wchar_t *dest, const wchar_t *src, size_t n);
-wchar_t *wcsstr(const wchar_t *str1, const wchar_t *str2);
+_CONST_RETURN wchar_t *wcsstr(const wchar_t *str1, const wchar_t *str2);
 wchar_t *wcstok(wchar_t *str, const wchar_t *delim);
 
 wchar_t *wmemset(wchar_t *dest, wchar_t c, size_t n);

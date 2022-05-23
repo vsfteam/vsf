@@ -30,7 +30,8 @@
 #   include <netinet/in.h>
 #endif
 
-#include "hal/driver/common/template/vsf_template_rtc.h"
+// for rtc
+#include "hal/vsf_hal.h"
 
 #if     defined(__VSF_LINUX_NTP_CLASS_IMPLEMENT)
 #   undef __VSF_LINUX_NTP_CLASS_IMPLEMENT
