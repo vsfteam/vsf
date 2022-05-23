@@ -2,10 +2,11 @@
 #define __SIMPLE_LIBC_STRING__
 
 #include <string.h>
+#include <wchar.h>
 
 namespace std {
     template <typename T>
-    static size_t __strlen(const T *str)
+    size_t __strlen(const T *str)
     {
         size_t result = 0;
         for (; str[result]; result++);
@@ -13,7 +14,7 @@ namespace std {
     }
 
     template <typename T>
-    static T* __strcpy(T *dst, const T *src)
+    T * __strcpy(T *dst, const T *src)
     {
         T *result = dst;
         while ((*dst++ = *src++) != 0);
@@ -30,15 +31,31 @@ namespace std {
     }
 
     template <typename T>
-    static T* __memcpy(T *dst, const T *src, size_t count)
+    T * __memcpy(T *dst, const T *src, size_t count)
     {
         return (T *)memcpy((void *)dst, (void *)src, count * sizeof(T));
     }
 
     template <typename T>
-    static T* __memmove(T *dst, const T *src, size_t count)
+    T * __memmove(T *dst, const T *src, size_t count)
     {
         return (T *)memmove((void *)dst, (void *)src, count * sizeof(T));
+    }
+
+    template <typename T>
+    int __memcmp(const T *dst, const T *src, size_t count)
+    {
+        return memcmp((const void *)dst, (const void *)src, count * sizeof(T));
+    }
+
+    template <typename T>
+    T * __memset(T *dst, T t, size_t n)
+    {
+        T *tmp = dst;
+        while (n) {
+            *tmp++ = n;
+        }
+        return dst;
     }
 
     template <typename T>
@@ -48,14 +65,15 @@ namespace std {
         typedef const T *const_iterator;
         typedef T &reference;
         typedef const T &const_reference;
+        typedef size_t size_type;
 
         array_base<T>(const T *arr, size_t num)
             : __length(num)
         {
             if (__length > 0) {
                 __array = (T *)malloc(__length * sizeof(T));
-                VSF_ASSERT(__array != NULL);
-                if (arr != NULL) {
+                VSF_ASSERT(__array != nullptr);
+                if (arr != nullptr) {
                     __memcpy<T>(__array, arr, __length);
                 }
             } else {
@@ -63,13 +81,13 @@ namespace std {
             }
         }
         array_base<T>(size_t num)
-            : array_base<T>(NULL, num) { }
+            : array_base<T>(nullptr, num) { }
         array_base<T>(const array_base &arr)
             : array_base<T>(arr.__array, arr.__length) { }
         ~array_base<T>()
         {
             __length = 0;
-            if (__array != NULL) {
+            if (__array != nullptr) {
                 free(__array);
                 __array = nullptr;
             }
@@ -102,22 +120,24 @@ namespace std {
         }
         array_base<T> & append(const T *arr, size_t num)
         {
-            __array = (T *)realloc(__array, (__length + num) * sizeof(T));
-            VSF_ASSERT(__array != NULL);
-            __memcpy(&__array[__length], arr, num);
-            __length += num;
+            if (arr != nullptr && num != 0) {
+                __array = (T *)realloc(__array, (__length + num) * sizeof(T));
+                VSF_ASSERT(__array != nullptr);
+                __memcpy(&__array[__length], arr, num);
+                __length += num;
+            }
             return (*this);
         }
-        array_base<T> & append(array_base<T> &arr)
+        array_base<T> & append(const array_base<T> &arr)
         {
             return append(arr.__array, arr.__length);
         }
-        array_base<T> & assign(array_base<T> &arr)
+        array_base<T> & assign(const array_base<T> &arr)
         {
             if (this == &arr) { return (*this); }
 
             free(__array);
-            __array = NULL;
+            __array = nullptr;
             return append(arr);
         }
         array_base<T> & assign(const T *arr, size_t num)
@@ -125,8 +145,12 @@ namespace std {
             if (this->__array == arr) { return (*this); }
 
             free(__array);
-            __array = NULL;
+            __array = nullptr;
             return append(arr, num);
+        }
+        void clear()
+        {
+            assign((const T *)nullptr, 0);
         }
         void swap(array_base<T> &arr)
         {
@@ -137,8 +161,12 @@ namespace std {
             __array = array;
             __length = length;
         }
-        array_base<T> & replace(size_t pos, size_t len, const T *str, size_t sublen)
+        array_base<T> & replace(size_t pos, size_t len, const T *arr, size_t sublen)
         {
+            if (sublen && !arr) {
+                assert(false);
+            }
+
             size_t newlen = __length + sublen - len;
             if (pos + len > __length) {
                 len = __length - pos;
@@ -147,26 +175,56 @@ namespace std {
                 __array = (T *)realloc(__array, newlen * sizeof(T));
             }
             __memmove(&__array[pos + len], &__array[pos + sublen], __length - pos - len);
-            __memcpy(&__array[pos], str, sublen);
+            if (arr != nullptr) {
+                __memcpy(&__array[pos], arr, sublen);
+            }
             if (sublen < len) {
                 __array = (T *)realloc(__array, newlen * sizeof(T));
             }
             return (*this);
         }
+        array_base<T> & replace(size_t pos, size_t len, size_t n, T t)
+        {
+            size_t newlen = __length + n - len;
+            if (pos + len > __length) {
+                len = __length - pos;
+            }
+            if (n > len) {
+                __array = (T *)realloc(__array, newlen * sizeof(T));
+            }
+            __memmove(&__array[pos + len], &__array[pos + n], __length - pos - len);
+            __memset(&__array[pos], t, n);
+            if (n < len) {
+                __array = (T *)realloc(__array, newlen * sizeof(T));
+            }
+            return (*this);
+        }
+        array_base<T> & insert(size_t pos, const T *arr, size_t sublen)
+        {
+            return replace(pos, 0, arr, sublen);
+        }
+        array_base<T> & insert(size_t pos, size_t n, T t)
+        {
+            return replace(pos, 0, n, t);
+        }
+        array_base<T> & erase(size_t pos, size_t len)
+        {
+            return replace(pos, len, nullptr, 0);
+        }
 
-        iterator begin()
+        iterator begin() const
         {
             return __array == nullptr ? (iterator)nullptr : &__array[0];
         }
-        iterator end()
+        iterator end() const
         {
             return __array == nullptr ? (iterator)nullptr : &__array[__length];
         }
-        iterator rbegin()
+        iterator rbegin() const
         {
             return end();
         }
-        iterator rend()
+        iterator rend() const
         {
             return begin();
         }
@@ -187,9 +245,13 @@ namespace std {
             return cbegin();
         }
 
-        const T & operator[](size_t pos) const
+        const T & operator [](size_t pos) const
         {
             return at(pos);
+        }
+        bool operator ==(array_base<T> &arr) const
+        {
+            return (__length == arr.__length) && !__memcmp(__array, arr.__array, __length);
         }
 
     private:
@@ -239,6 +301,14 @@ namespace std {
             }
             return (*this);
         }
+        string_base<T> & append(const string_base<T> &str)
+        {
+            return append(str.c_str());
+        }
+        string_base<T> & append(size_t n, T c)
+        {
+            return (string_base<T> &)(array_base<T>::insert(length(), n, c));
+        }
         string_base<T> & substr(size_t start = 0, size_t count = npos) const
         {
             size_t len = length();
@@ -281,6 +351,24 @@ namespace std {
             }
             return replace(pos, len, str.c_str() + subpos, sublen);
         }
+        string_base<T> & erase(size_t pos = 0, size_t len = npos)
+        {
+            if (len == npos) {
+                len = length() - pos;
+            }
+            return replace(pos, len, nullptr, 0);
+        }
+        const char * erase(const char *first, const char *last)
+        {
+            ssize_t pos = first - c_str();
+            ssize_t pos_end = first - c_str();
+            if (    (pos < 0 || pos >= length())
+                ||  (pos_end < 0 || pos_end >= length())
+                ||  (first > last)) {
+                assert(false);
+            }
+            return replace(pos, pos_end - pos, NULL, 0).begin();
+        }
 
         size_t find_first_of(const T *str, size_t pos = npos) const
         {
@@ -308,6 +396,33 @@ namespace std {
                 c, 0
             };
             return find_first_of(str, pos);
+        }
+        size_t find_first_not_of(const T *str, size_t pos = npos) const
+        {
+            const T *start = c_str();
+            ssize_t curpos = 0;
+            if (pos >= length()) {
+                return -1;
+            }
+
+            while (curpos <= pos) {
+                if (!__strchr(str, start[curpos])) {
+                    break;
+                }
+                curpos++;
+            }
+            return curpos <= pos ? curpos : -1;
+        }
+        size_t find_first_not_of(const string_base<T> & str, size_t pos = npos) const
+        {
+            return find_first_not_of(str.c_str(), pos);
+        }
+        size_t find_first_not_of(char c, size_t pos = npos) const
+        {
+            const T str[2] = {
+                c, 0
+            };
+            return find_first_not_of(str, pos);
         }
 
         size_t find_last_of(const T *str, size_t pos = npos) const
@@ -337,32 +452,106 @@ namespace std {
             };
             return find_last_of(str, pos);
         }
-
-        string_base<T> & operator =(string_base<T> &s)
+        size_t find_last_not_of(const T *str, size_t pos = npos) const
         {
-            return (string_base<T> &)(array_base<T>::assign(s));
+            const T *start = c_str();
+            ssize_t curpos = length() - 1;
+            if (pos > curpos) {
+                return -1;
+            }
+
+            while (curpos >= pos) {
+                if (!__strchr(str, start[curpos])) {
+                    break;
+                }
+                curpos--;
+            }
+            return curpos >= pos ? curpos : -1;
         }
+        size_t find_last_not_of(const string_base<T> & str, size_t pos = npos) const
+        {
+            return find_last_not_of(str.c_str(), pos);
+        }
+        size_t find_last_not_of(char c, size_t pos = npos) const
+        {
+            const T str[2] = {
+                c, 0
+            };
+            return find_last_not_of(str, pos);
+        }
+
         string_base<T> & operator =(const T *s)
         {
-            size_t size = (NULL == s) ? 1 : __strlen(s) + 1;
+            size_t size = (nullptr == s) ? 1 : __strlen(s) + 1;
             return (string_base<T> &)(array_base<T>::assign(s, size));
         }
-        string_base<T> & operator +(const T *s)
+        string_base<T> & operator =(const string_base<T> &s)
+        {
+            return operator =(s.c_str());
+        }
+        string_base<T> & operator +=(const T *s)
+        {
+            return (string_base<T> &)(array_base<T>::insert(length() - 1, s, __strlen(s)));
+        }
+        string_base<T> & operator +=(const string_base<T> &s)
+        {
+            return operator +=(s.c_str());
+        }
+        string_base<T> & operator +(const T *s) const
         {
             size_t curlen = length(), appendlen = __strlen(s);
             string_base<T> *newstr = new string_base<T>(curlen + appendlen);
             T * start = newstr->begin();
-            __memcpy(start, begin(), curlen);
+            __memcpy(start, array_base<T>::begin(), curlen);
             __memcpy(start + curlen, s, appendlen);
             start[curlen + appendlen] = (T)0;
             return (*newstr);
         }
-        string_base<T> & operator +(const T s)
+        string_base<T> & operator +(const T s) const
         {
             const T tmp[2] = {
                 s, (T)0
             };
             return operator +(tmp);
+        }
+        string_base<T> & operator +(const string_base<T> &s) const
+        {
+            return operator +(s.c_str());
+        }
+        bool operator ==(const T *str) const
+        {
+            size_t arrlen = __strlen(str);
+            return (length() == arrlen) && !__memcmp(c_str(), str, arrlen);
+        }
+        bool operator ==(const string_base<T> &str) const
+        {
+            return operator ==(str.c_str());
+        }
+        bool operator !=(const T *str) const
+        {
+            return !operator ==(str);
+        }
+        bool operator !=(const string_base<T> &str) const
+        {
+            return !operator ==(str);
+        }
+        bool operator >(const T *str) const
+        {
+            size_t arrlen = vsf_min(__strlen(str), length());
+            return __memcmp(c_str(), str, arrlen) > 0;
+        }
+        bool operator >(const string_base<T> &str) const
+        {
+            return operator >(str.c_str());
+        }
+        bool operator <(const T *str) const
+        {
+            size_t arrlen = vsf_min(__strlen(str), length());
+            return __memcmp(c_str(), str, arrlen) < 0;
+        }
+        bool operator <(const string_base<T> &str) const
+        {
+            return operator <(str.c_str());
         }
 
         const T * c_str() const
@@ -372,6 +561,45 @@ namespace std {
     };
 
     typedef string_base<char> string;
+    typedef string_base<wchar_t> wstring;
+
+    // to_string
+    string to_string(int value);
+    string to_string(long value);
+    string to_string(long long value);
+    string to_string(unsigned value);
+    string to_string(unsigned long value);
+    string to_string(unsigned long long value);
+    string to_string(float value);
+    string to_string(double value);
+    string to_string(long double value);
+    // to_wstring
+    wstring to_wstring(int value);
+    wstring to_wstring(long value);
+    wstring to_wstring(long long value);
+    wstring to_wstring(unsigned value);
+    wstring to_wstring(unsigned long value);
+    wstring to_wstring(unsigned long long value);
+    wstring to_wstring(float value);
+    wstring to_wstring(double value);
+    wstring to_wstring(long double value);
+    // stox
+    float stof(const string &str, size_t *idx = 0);
+    float stof(const wstring &str, size_t *idx = 0);
+    double stod(const string &str, size_t *idx = 0);
+    double stod(const wstring &str, size_t *idx = 0);
+    long double stold (const string &str, size_t *idx = 0);
+    long double stold (const wstring &str, size_t *idx = 0);
+    int stoi(const string &str, size_t *idx = 0, int base = 10);
+    int stoi(const wstring &str, size_t *idx = 0, int base = 10);
+    long stol(const string &str, size_t *idx = 0, int base = 10);
+    long stol(const wstring &str, size_t *idx = 0, int base = 10);
+    long long stoll(const string &str, size_t *idx = 0, int base = 10);
+    long long stoll(const wstring &str, size_t *idx = 0, int base = 10);
+    unsigned long stoul(const string &str, size_t *idx = 0, int base = 10);
+    unsigned long stoul(const wstring &str, size_t *idx = 0, int base = 10);
+    unsigned long long stoull(const string &str, size_t *idx = 0, int base = 10);
+    unsigned long long stoull(const wstring &str, size_t *idx = 0, int base = 10);
 }
 
 #endif      // __SIMPLE_LIBC_STRING__

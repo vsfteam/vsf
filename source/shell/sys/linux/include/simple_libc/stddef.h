@@ -77,14 +77,20 @@ typedef struct {
 #else
 #endif
 
-#ifndef __WIN__
-
-#   if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
+#if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
 typedef __PTRDIFF_TYPE__            ptrdiff_t;
-#   else
-typedef long int                    ptrdiff_t;
+#elif defined(__WIN__)
+#   if defined(__CPU_X86__)
+typedef unsigned int                size_t;
+typedef int                         ptrdiff_t;
+typedef int                         intptr_t;
+#   elif defined(__CPU_X64__)
+typedef unsigned __int64            size_t;
+typedef __int64                     ptrdiff_t;
+typedef __int64                     intptr_t;
 #   endif
-
+#else
+typedef long int                    ptrdiff_t;
 #endif
 
 #ifdef __cplusplus
