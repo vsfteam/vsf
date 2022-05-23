@@ -7019,9 +7019,6 @@
                     </group>
                     <group>
                         <name>raw</name>
-                        <excluded>
-                            <configuration>vsf_template_aic8800</configuration>
-                        </excluded>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\raw\lapi.c</name>
                         </file>
@@ -10367,6 +10364,12 @@
                         <group>
                             <name>pwm</name>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\pwm\aic_pwm.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\pwm\aic_pwm.h</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\pwm\i_reg_pwm.h</name>
                             </file>
                             <file>
@@ -10374,6 +10377,15 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\pwm\pwm.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>rtc</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\rtc\rtc.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\rtc\rtc.h</name>
                             </file>
                         </group>
                         <group>
@@ -10390,9 +10402,6 @@
                         </group>
                         <group>
                             <name>timer</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\timer\i_reg_timer.h</name>
-                            </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\timer\timer.c</name>
                             </file>
@@ -11050,6 +11059,9 @@
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\us_ticker.c</name>
+                                                    <excluded>
+                                                        <configuration>vsf_template_aic8800</configuration>
+                                                    </excluded>
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\us_ticker_api.c</name>
@@ -11062,6 +11074,353 @@
                                                 <name>time</name>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time\time_api.c</name>
+                                                    <configuration>
+                                                        <name>vsf_template_aic8800</name>
+                                                        <settings>
+                                                            <name>ICCARM</name>
+                                                            <data>
+                                                                <version>35</version>
+                                                                <wantNonLocal>0</wantNonLocal>
+                                                                <debug>1</debug>
+                                                                <option>
+                                                                    <name>CCDefines</name>
+                                                                    <state>__VSF__</state>
+                                                                    <state>__AIC__</state>
+                                                                    <state>__AIC8800__</state>
+                                                                    <state>__OOC_CPP__</state>
+                                                                    <state>MBEDTLS_USER_CONFIG_FILE="component/3rd-party/mbedtls/port/platform_vsf.h"</state>
+                                                                    <state>LV_CONF_INCLUDE_SIMPLE</state>
+                                                                    <state>FT2_BUILD_LIBRARY</state>
+                                                                    <state>CFG_HW_PLATFORM=2</state>
+                                                                    <state>CFG_RF_MODE=3</state>
+                                                                    <state>CFG_PMIC</state>
+                                                                    <state>CFG_PMIC_VER_LITE</state>
+                                                                    <state>CFG_PMIC_ITF_ASDMA</state>
+                                                                    <state>CFG_WIFI_STACK</state>
+                                                                    <state>CFG_RSSI_DATAPKT</state>
+                                                                    <state>CFG_DBG</state>
+                                                                    <state>CFG_IPERF</state>
+                                                                    <state>CFG_ROM_VER=255</state>
+                                                                    <state>CFG_DACL_MIXER_MODE=0</state>
+                                                                    <state>CFG_DACR_MIXER_MODE=0</state>
+                                                                    <state>CFG_AIC1000_MIC_MATRIX=0</state>
+                                                                    <state>CONFIG_RWNX</state>
+                                                                    <state>CONFIG_RWNX_LWIP</state>
+                                                                    <state>LWIP_NO_STDINT_H=1</state>
+                                                                    <state>LWIP_SO_RCVBUF=1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPreprocFile</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPreprocComments</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPreprocLine</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListCFile</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListCMnemonics</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListCMessages</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListAssFile</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListAssSource</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEnableRemarks</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagSuppress</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagRemark</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagWarning</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagError</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCObjPrefix</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCAllowList</name>
+                                                                    <version>1</version>
+                                                                    <state>00000000</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDebugInfo</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IEndianMode</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IProcessor</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IExtraOptionsCheck</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IExtraOptions</name>
+                                                                    <state>--no_unaligned_access</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCLangConformance</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCSignedPlainChar</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCRequirePrototypes</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagWarnAreErr</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCCompilerRuntimeInfo</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IFpuProcessor</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>OutputFile</name>
+                                                                    <state>$FILE_BNAME$.o</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCLibConfigHeader</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>PreInclude</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CompilerMisraOverride</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCIncludePath2</name>
+                                                                    <state>$PROJ_DIR$\..\..\config</state>
+                                                                    <state>$PROJ_DIR$\..\..\config\3rd-party</state>
+                                                                    <state>$PROJ_DIR$\..\..\config\3rd-party\awtk</state>
+                                                                    <state>$PROJ_DIR$\..\..\config\3rd-party\btstack</state>
+                                                                    <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
+                                                                    <state>//$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\arch\ll</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\rtos</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\net_al</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\include\lwip</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ce</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\modules\common\api</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\fhost</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\fhost\application</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\wlan</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\macif</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\vsfvm\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nnom\raw\inc</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nnom\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\raw\include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\oo</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\lovevsf</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\zlib\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCStdIncCheck</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCCodeSection</name>
+                                                                    <state>.text</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IProcessorMode2</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptLevel</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptStrategy</name>
+                                                                    <version>0</version>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptLevelSlave</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CompilerMisraRules98</name>
+                                                                    <version>0</version>
+                                                                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CompilerMisraRules04</name>
+                                                                    <version>0</version>
+                                                                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPosIndRopi</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPosIndRwpi</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPosIndNoDynInit</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccLang</name>
+                                                                    <state>2</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccCDialect</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccAllowVLA</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccStaticDestr</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccCppInlineSemantics</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccCmsis</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccFloatSemantics</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptimizationNoSizeConstraints</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCNoLiteralPool</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptStrategySlave</name>
+                                                                    <version>0</version>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEncSource</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEncOutput</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEncOutputBom</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEncInput</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccExceptions2</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccRTTI2</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                            </data>
+                                                        </settings>
+                                                    </configuration>
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time\time_api.h</name>
@@ -11549,6 +11908,9 @@
                         <name>rtc</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rtc\rtc_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rtc\rtc_common.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rtc\rtc_template.h</name>
