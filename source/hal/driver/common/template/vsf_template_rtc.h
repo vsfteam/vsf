@@ -75,8 +75,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, rtc_capability_t, rtc, capability, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, get,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_tm_t *rtc_tm) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, const vsf_rtc_tm_t *rtc_tm) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, time_t,           rtc, get_second, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set_second, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, time_t time)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, get_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, time_t *second_ptr, time_t *millisecond_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, time_t second, time_t millisecond)
 
 /*============================ TYPES =========================================*/
 
@@ -155,9 +155,9 @@ extern vsf_err_t vsf_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm);
  */
 extern vsf_err_t vsf_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm);
 
-extern time_t vsf_rtc_get_second(vsf_rtc_t *rtc_ptr);
+extern vsf_err_t vsf_rtc_get_time(vsf_rtc_t *rtc_ptr, time_t *second_ptr, time_t *millisecond_ptr);
 
-extern vsf_err_t vsf_rtc_set_second(vsf_rtc_t *rtc_ptr, time_t time);
+extern vsf_err_t vsf_rtc_set_time(vsf_rtc_t *rtc_ptr, time_t second, time_t millisecond);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -174,9 +174,9 @@ extern vsf_err_t vsf_rtc_set_second(vsf_rtc_t *rtc_ptr, time_t time);
         VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get)          ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
 #   define vsf_rtc_set(__RTC, ...)                                              \
         VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set)          ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
-#   define vsf_rtc_get_second(__RTC, ...)                                       \
+#   define vsf_rtc_get_time(__RTC, ...)                                         \
         VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get_second)   ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
-#   define vsf_rtc_set_second(__RTC, ...)                                       \
+#   define vsf_rtc_set_time(__RTC, ...)                                         \
         VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set_second)   ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
 #endif
 
