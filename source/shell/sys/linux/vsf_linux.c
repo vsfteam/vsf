@@ -1742,7 +1742,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
 #ifdef VSF_LINUX_CFG_RTC
     vsf_rtc_tm_t rtc_tm;
-    VSF_RTC_GET(&VSF_LINUX_CFG_RTC, &rtc_tm);
+    vsf_rtc_get(&VSF_LINUX_CFG_RTC, &rtc_tm);
 
     VSF_LINUX_ASSERT(rtc_tm.tm_year >= 1900);
     struct tm t = {
