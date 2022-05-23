@@ -66,27 +66,30 @@ fsm_rt_t vsf_hw_rtc_disable(vsf_hw_rtc_t *hw_rtc_ptr)
     return fsm_rt_cpl;
 }
 
-vsf_err_t vsf_hw_rtc_get_time(vsf_hw_rtc_t *hw_rtc_ptr, time_t *second, time_t *milliseconds)
+vsf_err_t vsf_hw_rtc_get_time(vsf_hw_rtc_t *hw_rtc_ptr, time_t *second_ptr, time_t *milliseconds_ptr)
 {
     uint32_t sec;
     uint32_t usec;
-    VSF_HAL_ASSERT(second == 0);
+    VSF_HAL_ASSERT((second_ptr != NULL) || (milliseconds_ptr != NULL));
 
     int result = aic_time_get(SINCE_EPOCH, &sec, &usec);
     VSF_HAL_ASSERT(result == 0);
     (void) result;
 
-    *second = sec;
-    if (milliseconds != NULL) {
-        *milliseconds = usec / 1000;
+    if (second_ptr != NULL) {
+        *second_ptr = sec;
+    }
+
+    if (milliseconds_ptr != NULL) {
+        *milliseconds_ptr = usec / 1000;
     }
 
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_rtc_set_time(vsf_hw_rtc_t *hw_rtc_ptr, time_t time, time_t milliseconds)
+vsf_err_t vsf_hw_rtc_set_time(vsf_hw_rtc_t *hw_rtc_ptr, time_t second, time_t milliseconds)
 {
-    aic_time_update((uint32_t)time, milliseconds * 1000);
+    aic_time_update((uint32_t)second, milliseconds * 1000);
     return VSF_ERR_NONE;
 }
 
