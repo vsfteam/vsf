@@ -5,7 +5,7 @@
 #include <wchar.h>
 
 namespace std {
-    template <typename T>
+    template <class T>
     size_t __strlen(const T *str)
     {
         size_t result = 0;
@@ -13,7 +13,7 @@ namespace std {
         return result;
     }
 
-    template <typename T>
+    template <class T>
     T * __strcpy(T *dst, const T *src)
     {
         T *result = dst;
@@ -30,25 +30,25 @@ namespace std {
         return strchr(str, c);
     }
 
-    template <typename T>
+    template <class T>
     T * __memcpy(T *dst, const T *src, size_t count)
     {
         return (T *)memcpy((void *)dst, (void *)src, count * sizeof(T));
     }
 
-    template <typename T>
+    template <class T>
     T * __memmove(T *dst, const T *src, size_t count)
     {
         return (T *)memmove((void *)dst, (void *)src, count * sizeof(T));
     }
 
-    template <typename T>
+    template <class T>
     int __memcmp(const T *dst, const T *src, size_t count)
     {
         return memcmp((const void *)dst, (const void *)src, count * sizeof(T));
     }
 
-    template <typename T>
+    template <class T>
     T * __memset(T *dst, T t, size_t n)
     {
         T *tmp = dst;
@@ -58,7 +58,7 @@ namespace std {
         return dst;
     }
 
-    template <typename T>
+    template <class T>
     class array_base {
     public:
         typedef T *iterator;
@@ -259,20 +259,20 @@ namespace std {
         size_t __length;
     };
 
-    template <typename T>
-    class string_base : public array_base<T> {
+    template <class T>
+    class basic_string : public array_base<T> {
     public:
         static const size_t npos = -1;
 
-        string_base<T>(const T *str)
+        basic_string<T>(const T *str)
             : array_base<T>(str, __strlen(str) + 1) { }
-        string_base<T>(const string_base<T> &s)
+        basic_string<T>(const basic_string<T> &s)
             : array_base<T>(s) { }
-        string_base<T>(size_t len)
+        basic_string<T>(size_t len)
             : array_base<T>(nullptr, len + 1) { }
-        string_base<T>()
+        basic_string<T>()
             : array_base<T>(nullptr, 0) { }
-        string_base<T>(const T *arr, size_t num)
+        basic_string<T>(const T *arr, size_t num)
             : array_base<T>(arr, num) { }
 
         size_t size() const
@@ -288,12 +288,12 @@ namespace std {
         {
             return array_base<T>::size();
         }
-        string_base<T> & append(const T *arr, size_t num)
+        basic_string<T> & append(const T *arr, size_t num)
         {
             array_base<T>::append(arr, num);
             return (*this);
         }
-        string_base<T> & append(const T *str)
+        basic_string<T> & append(const T *str)
         {
             size_t size = __strlen<T>(str);
             if (size > 0) {
@@ -301,15 +301,15 @@ namespace std {
             }
             return (*this);
         }
-        string_base<T> & append(const string_base<T> &str)
+        basic_string<T> & append(const basic_string<T> &str)
         {
             return append(str.c_str());
         }
-        string_base<T> & append(size_t n, T c)
+        basic_string<T> & append(size_t n, T c)
         {
-            return (string_base<T> &)(array_base<T>::insert(length(), n, c));
+            return (basic_string<T> &)(array_base<T>::insert(length(), n, c));
         }
-        string_base<T> & substr(size_t start = 0, size_t count = npos) const
+        basic_string<T> & substr(size_t start = 0, size_t count = npos) const
         {
             size_t len = length();
             if (start >= len) {
@@ -320,10 +320,10 @@ namespace std {
             }
 
             const T * sub = array_base<T>::cbegin();
-            string_base<T> *newstr = new string_base<T>(&sub[start], count + 1);
+            basic_string<T> *newstr = new basic_string<T>(&sub[start], count + 1);
             return (*newstr);
         }
-        size_t find(const string_base<T> & str, size_t pos = 0) const
+        size_t find(const basic_string<T> & str, size_t pos = 0) const
         {
             const T *start = c_str();
             T *found = __strstr(start + pos, str.c_str());
@@ -333,7 +333,7 @@ namespace std {
             return -1;
         }
 
-        string_base<T> & replace(size_t pos, size_t len, const T *str, size_t sublen = -1)
+        basic_string<T> & replace(size_t pos, size_t len, const T *str, size_t sublen = -1)
         {
             size_t curlen = length();
             sublen = vsf_min(sublen, __strlen(str));
@@ -341,9 +341,9 @@ namespace std {
                 assert(false);
 //                throw out_of_range("out of range");
             }
-            return (string_base<T> &)array_base<T>::replace(pos, len, str, sublen);
+            return (basic_string<T> &)array_base<T>::replace(pos, len, str, sublen);
         }
-        string_base<T> & replace(size_t pos, size_t len, const string_base<T> &str, size_t subpos = 0, size_t sublen = -1)
+        basic_string<T> & replace(size_t pos, size_t len, const basic_string<T> &str, size_t subpos = 0, size_t sublen = -1)
         {
             if (subpos > str.length()) {
                 assert(false);
@@ -351,7 +351,7 @@ namespace std {
             }
             return replace(pos, len, str.c_str() + subpos, sublen);
         }
-        string_base<T> & erase(size_t pos = 0, size_t len = npos)
+        basic_string<T> & erase(size_t pos = 0, size_t len = npos)
         {
             if (len == npos) {
                 len = length() - pos;
@@ -386,15 +386,13 @@ namespace std {
             }
             return curpos <= pos ? curpos : -1;
         }
-        size_t find_first_of(const string_base<T> & str, size_t pos = npos) const
+        size_t find_first_of(const basic_string<T> & str, size_t pos = npos) const
         {
             return find_first_of(str.c_str(), pos);
         }
         size_t find_first_of(char c, size_t pos = npos) const
         {
-            const T str[2] = {
-                c, 0
-            };
+            const T str[2] = { c, (T)0 };
             return find_first_of(str, pos);
         }
         size_t find_first_not_of(const T *str, size_t pos = npos) const
@@ -413,15 +411,13 @@ namespace std {
             }
             return curpos <= pos ? curpos : -1;
         }
-        size_t find_first_not_of(const string_base<T> & str, size_t pos = npos) const
+        size_t find_first_not_of(const basic_string<T> & str, size_t pos = npos) const
         {
             return find_first_not_of(str.c_str(), pos);
         }
         size_t find_first_not_of(char c, size_t pos = npos) const
         {
-            const T str[2] = {
-                c, 0
-            };
+            const T str[2] = { c, (T)0 };
             return find_first_not_of(str, pos);
         }
 
@@ -441,15 +437,13 @@ namespace std {
             }
             return curpos >= pos ? curpos : -1;
         }
-        size_t find_last_of(const string_base<T> & str, size_t pos = npos) const
+        size_t find_last_of(const basic_string<T> & str, size_t pos = npos) const
         {
             return find_last_of(str.c_str(), pos);
         }
         size_t find_last_of(char c, size_t pos = npos) const
         {
-            const T str[2] = {
-                c, 0
-            };
+            const T str[2] = { c, (T)0 };
             return find_last_of(str, pos);
         }
         size_t find_last_not_of(const T *str, size_t pos = npos) const
@@ -468,53 +462,49 @@ namespace std {
             }
             return curpos >= pos ? curpos : -1;
         }
-        size_t find_last_not_of(const string_base<T> & str, size_t pos = npos) const
+        size_t find_last_not_of(const basic_string<T> & str, size_t pos = npos) const
         {
             return find_last_not_of(str.c_str(), pos);
         }
         size_t find_last_not_of(char c, size_t pos = npos) const
         {
-            const T str[2] = {
-                c, 0
-            };
+            const T str[2] = { c, (T)0 };
             return find_last_not_of(str, pos);
         }
 
-        string_base<T> & operator =(const T *s)
+        basic_string<T> & operator =(const T *s)
         {
             size_t size = (nullptr == s) ? 1 : __strlen(s) + 1;
-            return (string_base<T> &)(array_base<T>::assign(s, size));
+            return (basic_string<T> &)(array_base<T>::assign(s, size));
         }
-        string_base<T> & operator =(const string_base<T> &s)
+        basic_string<T> & operator =(const basic_string<T> &s)
         {
             return operator =(s.c_str());
         }
-        string_base<T> & operator +=(const T *s)
+        basic_string<T> & operator +=(const T *s)
         {
-            return (string_base<T> &)(array_base<T>::insert(length() - 1, s, __strlen(s)));
+            return (basic_string<T> &)(array_base<T>::insert(length() - 1, s, __strlen(s)));
         }
-        string_base<T> & operator +=(const string_base<T> &s)
+        basic_string<T> & operator +=(const basic_string<T> &s)
         {
             return operator +=(s.c_str());
         }
-        string_base<T> & operator +(const T *s) const
+        basic_string<T> & operator +(const T *s) const
         {
             size_t curlen = length(), appendlen = __strlen(s);
-            string_base<T> *newstr = new string_base<T>(curlen + appendlen);
-            T * start = newstr->begin();
+            basic_string<T> *newstr = new basic_string<T>(curlen + appendlen);
+            T *start = (T *)newstr->c_str();
             __memcpy(start, array_base<T>::begin(), curlen);
             __memcpy(start + curlen, s, appendlen);
             start[curlen + appendlen] = (T)0;
             return (*newstr);
         }
-        string_base<T> & operator +(const T s) const
+        basic_string<T> & operator +(const T c) const
         {
-            const T tmp[2] = {
-                s, (T)0
-            };
+            const T tmp[2] = { c, (T)0 };
             return operator +(tmp);
         }
-        string_base<T> & operator +(const string_base<T> &s) const
+        basic_string<T> & operator +(const basic_string<T> &s) const
         {
             return operator +(s.c_str());
         }
@@ -523,7 +513,7 @@ namespace std {
             size_t arrlen = __strlen(str);
             return (length() == arrlen) && !__memcmp(c_str(), str, arrlen);
         }
-        bool operator ==(const string_base<T> &str) const
+        bool operator ==(const basic_string<T> &str) const
         {
             return operator ==(str.c_str());
         }
@@ -531,7 +521,7 @@ namespace std {
         {
             return !operator ==(str);
         }
-        bool operator !=(const string_base<T> &str) const
+        bool operator !=(const basic_string<T> &str) const
         {
             return !operator ==(str);
         }
@@ -540,7 +530,7 @@ namespace std {
             size_t arrlen = vsf_min(__strlen(str), length());
             return __memcmp(c_str(), str, arrlen) > 0;
         }
-        bool operator >(const string_base<T> &str) const
+        bool operator >(const basic_string<T> &str) const
         {
             return operator >(str.c_str());
         }
@@ -549,7 +539,7 @@ namespace std {
             size_t arrlen = vsf_min(__strlen(str), length());
             return __memcmp(c_str(), str, arrlen) < 0;
         }
-        bool operator <(const string_base<T> &str) const
+        bool operator <(const basic_string<T> &str) const
         {
             return operator <(str.c_str());
         }
@@ -560,8 +550,27 @@ namespace std {
         }
     };
 
-    typedef string_base<char> string;
-    typedef string_base<wchar_t> wstring;
+    template <class T>
+    basic_string<T> & operator +(const T * const left, const basic_string<T> &right)
+    {
+        size_t leftlen = __strlen(left), rightlen = right.length();
+        size_t len = leftlen + rightlen;
+        basic_string<T> *newstr = new basic_string<T>(len);
+        T *start = (T *)newstr->c_str();
+        __memcpy(start, left, leftlen);
+        __memcpy(start + leftlen, right.c_str(), rightlen);
+        start[len] = (T)0;
+        return (*newstr);
+    }
+    template <class T>
+    basic_string<T> & operator +(const T left, const basic_string<T> &right)
+    {
+        const T str[2] = { left, (T)0 };
+        return operator +(str, right);
+    }
+
+    typedef basic_string<char> string;
+    typedef basic_string<wchar_t> wstring;
 
     // to_string
     string to_string(int value);
