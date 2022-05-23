@@ -25,7 +25,8 @@
 #if VSF_HAL_USE_PWM == ENABLED
 
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
-#include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/sysctrl/reg_sysctrl.h"
+#include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
+#include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pwm/reg_pwm.h"
 #include "../__device.h"
 #include "./i_reg_pwm.h"
 
@@ -43,6 +44,8 @@ typedef struct vsf_hw_pwm_t {
     PWM_REG_T *reg;
     uint32_t freq;
 
+    uint8_t timer_mask;
+    int8_t pwm_map[VSF_HW_PWM0_CHANNAL_COUNT];
 } vsf_hw_pwm_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -55,22 +58,20 @@ vsf_err_t vsf_hw_pwm_init(vsf_hw_pwm_t *hw_pwm_ptr, pwm_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
 
-    uint32_t div;
-    uint32_t hclk = cpusysctrl_hclkme_get();
-    if (hclk > cfg_ptr->freq * 0xFF) {
-        div = 0xFF;
-    } else if (hclk < cfg_ptr->freq) {
-        div = 0x01;
-    } else {
-        div = div / cfg_ptr->freq;
-    }
-    hw_pwm_ptr->freq = hclk / div;
+    uint32_t pwm_clock = 26ul * 1000 * 1000;
+    uint32_t div = pwm_clock / cfg_ptr->freq;
+    div = vsf_min(div, 0xFF);
+    div = vsf_max(div, 0x01);
+
+    hw_pwm_ptr->freq      = pwm_clock / div;
 
     PMIC_MEM_WRITE( (unsigned int)(&aic1000liteSysctrl->hclk_div),
                         (AIC1000LITE_SYS_CTRL_CFG_HCLK_DIV_DENOM(div)
                      |  AIC1000LITE_SYS_CTRL_CFG_HCLK_DIV_UPDATE));
     PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteSysctrl->clk_sel),
         (AIC1000LITE_SYS_CTRL_CFG_CLK_PWM_SEL), (AIC1000LITE_SYS_CTRL_CFG_CLK_PWM_SEL));
+
+    memset(hw_pwm_ptr->pwm_map, 0xFF, sizeof(hw_pwm_ptr->pwm_map));
 
     return VSF_ERR_NONE;
 }
@@ -86,28 +87,42 @@ fsm_rt_t vsf_hw_pwm_disable(vsf_hw_pwm_t *hw_pwm_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
 
-    return hw_pwm_ptr->freq;
+    return fsm_rt_cpl;
 }
 
 vsf_err_t vsf_hw_pwm_set(vsf_hw_pwm_t *hw_pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
 {
-    static const uint8_t __map_pwm_tmr[] = {0, 1, 1, 2};
-
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
-    VSF_HAL_ASSERT(channel < 4);
+    VSF_HAL_ASSERT(channel < VSF_HW_PWM0_CHANNAL_COUNT);
+
+    // TODO: support free timer
+    // TODO: support same period
+
+    // search idle timer
+    if (hw_pwm_ptr->timer_mask == ((1 << VSF_HW_PWM0_TIMER_COUNT) - 1)) {
+        return VSF_ERR_FAIL;
+    }
+    int timer_index = hw_pwm_ptr->pwm_map[channel];
+    if ((timer_index < 0) || (timer_index >= VSF_HW_PWM0_TIMER_COUNT)) {
+        for (timer_index = 0; timer_index < VSF_HW_PWM0_TIMER_COUNT; timer_index++) {
+            if (!(hw_pwm_ptr->timer_mask & (1 << timer_index))) {
+                hw_pwm_ptr->timer_mask |= (1 << timer_index);
+                hw_pwm_ptr->pwm_map[channel] = timer_index;
+                break;
+            }
+        }
+    }
 
     PWM_REG_T *reg = hw_pwm_ptr->reg;
 
-    PMIC_MEM_WRITE((unsigned int)(&reg->TMR[__map_pwm_tmr[channel]].ld_value), period - 1);
-    PMIC_MEM_WRITE((unsigned int)(&reg->TMR[__map_pwm_tmr[channel]].cfg), (PWM_TMR_MODE_MASK | PWM_TMR_RUN_MASK));
+    PMIC_MEM_WRITE((unsigned int)(&reg->TMR[timer_index].ld_value), period - 1);
+    PMIC_MEM_WRITE((unsigned int)(&reg->TMR[timer_index].cfg), (PWM_TMR_MODE_MASK | PWM_TMR_RUN_MASK));
 
     PMIC_MEM_WRITE((unsigned int)(&reg->PWM[channel].sta_val), period - 1);
     PMIC_MEM_WRITE((unsigned int)(&reg->PWM[channel].end_val), period - 1 - pulse);
 
-    PMIC_MEM_WRITE( (unsigned int)(&reg->PWM[channel].cfg),
-                        (PWM_PWM_RUN_MASK
-                    |   PWM_PWM_TMR_SEL(__map_pwm_tmr[channel])
-                    |   PWM_PWM_UPDATE_MASK));
+    PMIC_MEM_WRITE((unsigned int)(&reg->PWM[channel].cfg),
+                   (PWM_PWM_RUN_MASK | PWM_PWM_TMR_SEL(timer_index) | PWM_PWM_UPDATE_MASK));
 
     return VSF_ERR_NONE;
 }
