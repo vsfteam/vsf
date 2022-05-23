@@ -29,7 +29,15 @@
 #endif
 
 #ifndef APP_RTC_DEMO_CFG_RTC
-#   define APP_RTC_DEMO_CFG_RTC                     (vsf_rtc_t *)&vsf_hw_rtc0
+#   define APP_RTC_DEMO_CFG_RTC                     &vsf_hw_rtc0
+#endif
+
+#ifndef APP_RTC_DEMO_CFG_SECOND_DEMO
+#   define  APP_RTC_DEMO_CFG_SECOND_DEMO            DISABLED
+#endif
+
+#ifndef APP_RTC_DEMO_CFG_TM_DEMO
+#   define  APP_RTC_DEMO_CFG_TM_DEMO                ENABLED
 #endif
 
 #ifndef APP_RTC_DEMO_CFG_SET_RTC
@@ -44,39 +52,66 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-void __rtc_demo_handler(void *target_ptr, em_rtc_irq_mask_t irq_mask, vsf_rtc_t *rtc_ptr)
-{
-    if (irq_mask == VSF_RTC_IRQ_MASK_ALARM) {
-        vsf_trace_debug("enter timer overflow interrupt");
-    }
-}
-
-static void __rtc_demo(void)
+#if APP_RTC_DEMO_CFG_SECOND_DEMO == ENABLED
+static void __rtc_second_demo(void)
 {
     vsf_err_t result;
-    (void)result
+    time_t time;
 
-    rtc_cfg_t rtc_cfg = {
-        .isr            = {
-            .handler_fn = __rtc_demo_handler,
-            .target_ptr = NULL,
-            .prio       = APP_RTC_DEMO_IRQ_PRIO,
-        },
-    };
-
-    result = vsf_rtc_init(APP_RTC_DEMO_CFG_RTC, &rtc_cfg);
+    result = vsf_rtc_init(APP_RTC_DEMO_CFG_RTC, NULL);
     VSF_ASSERT(result == VSF_ERR_NONE);
 
-    while (fsm_rt_cpl != vsf_rtc_enable(APP_RTC_DEMO_CFG_RTC));
-
-#ifdef APP_RTC_DEMO_CFG_SET_RTC == ENABED
-    result = vsf_rtc_set_second(APP_RTC_DEMO_CFG_RTC, APP_RTC_DEMO_CFG_RTC_COUNT);
-    VSF_ASSERT(result == VSF_ERR_NONE);
+#if APP_RTC_DEMO_CFG_SET_RTC == ENABLED
+    time = vsf_rtc_get_second(APP_RTC_DEMO_CFG_RTC);
+    if (time < APP_RTC_DEMO_CFG_RTC_COUNT) {
+        result = vsf_rtc_set_second(APP_RTC_DEMO_CFG_RTC, APP_RTC_DEMO_CFG_RTC_COUNT);
+        VSF_ASSERT(result == VSF_ERR_NONE);
+    }
 #endif
 
-    time_t time = vsf_rtc_get_second(APP_RTC_DEMO_CFG_RTC);
-    vsf_trace_debug("current second: %lld" VSF_TRACE_NEWLINE, (long long)time);
+    time = vsf_rtc_get_second(APP_RTC_DEMO_CFG_RTC);
+    vsf_trace_debug("current second: %lld" VSF_TRACE_CFG_LINEEND, (long long)time);
 }
+#endif
+
+#if APP_RTC_DEMO_CFG_TM_DEMO == ENABLED
+static void __rtc_tm_demo(void)
+{
+    static const char *__weeks[] = {
+     	"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+    };
+
+    vsf_err_t result;
+    vsf_rtc_tm_t rtc_tm;
+
+    result = vsf_rtc_init(APP_RTC_DEMO_CFG_RTC, NULL);
+    VSF_ASSERT(result == VSF_ERR_NONE);
+
+#if APP_RTC_DEMO_CFG_SET_RTC == ENABLED
+    result = vsf_rtc_get(APP_RTC_DEMO_CFG_RTC, &rtc_tm);
+    VSF_ASSERT(result == VSF_ERR_NONE);
+
+    if (rtc_tm.tm_year < 2022) {
+        // Sat Jan 01 2022 00:00:00 GMT+0000 1640995200
+        rtc_tm.tm_sec  = 0x00;         // [0 .. 59]
+        rtc_tm.tm_min  = 0x00;         // [0 .. 59]
+        rtc_tm.tm_hour = 0x00;         // [0 .. 23]
+        rtc_tm.tm_mday = 1;            // [1 .. 31]
+        rtc_tm.tm_mon  = 1;            // [1 .. 12]  - [January -- December]
+        rtc_tm.tm_year = 2022;         // [1900 .. ]
+
+        result = vsf_rtc_set(APP_RTC_DEMO_CFG_RTC, &rtc_tm);
+        VSF_ASSERT(result == VSF_ERR_NONE);
+    }
+#endif
+
+    result = vsf_rtc_get(APP_RTC_DEMO_CFG_RTC, &rtc_tm);
+    vsf_trace_debug("%04d/%02d/%02d %02d:%02d:%02d %s" VSF_TRACE_CFG_LINEEND,
+                    rtc_tm.tm_year, rtc_tm.tm_mon, rtc_tm.tm_mday,
+                    rtc_tm.tm_hour, rtc_tm.tm_min, rtc_tm.tm_sec,
+                    __weeks[rtc_tm.tm_wday - 1]);
+}
+#endif
 
 #if APP_USE_LINUX_DEMO == ENABLED
 int rtc_main(int argc, char *argv[])
@@ -92,7 +127,11 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
-    __rtc_demo();
+#if APP_RTC_DEMO_CFG_SECOND_DEMO == ENABLED
+    __rtc_second_demo();
+#elif APP_RTC_DEMO_CFG_TM_DEMO == ENABLED
+    __rtc_tm_demo();
+#endif
 
     return 0;
 }
