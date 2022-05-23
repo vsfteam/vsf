@@ -45,6 +45,8 @@
 #   define APP_USE_LINUX_MOUNT_DEMO                     ENABLED
 #   define APP_USE_LINUX_HTTPD_DEMO                     ENABLED
 #       define APP_LINUX_HTTPD_DEMO_CFG_ROOT            "/winfs/webroot"
+#   define APP_USE_LINUX_NTPDATE_DEMO                   ENABLED
+#   define APP_USE_LINUX_TELNETD_DEMO                   ENABLED
 #define APP_USE_USBH_DEMO                               ENABLED
 #   define APP_USE_DFU_HOST_DEMO                        ENABLED
 #define APP_USE_USBD_DEMO                               ENABLED
@@ -187,6 +189,7 @@
 #   define VSF_LINUX_USE_DEVFS                          ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
+#   define VSF_LINUX_CFG_RTC                            vsf_hw_rtc0
 #if APP_USE_EVM_DEMO == ENABLED
 // evm console need printf and getchar
 // TODO: add back

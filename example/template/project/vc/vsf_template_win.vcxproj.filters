@@ -5624,6 +5624,9 @@
     <ClCompile Include="..\..\demo\linux_demo\ntpdate_demo.c">
       <Filter>usrapp\demo\linux_demo</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\demo\linux_demo\telnetd_demo.c">
+      <Filter>usrapp\demo\linux_demo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">

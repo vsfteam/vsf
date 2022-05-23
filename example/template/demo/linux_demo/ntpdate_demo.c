@@ -44,7 +44,7 @@ int ntpdate_main(int argc, char *argv[])
     vsf_linux_ntp_rtc_enable((vsf_rtc_t *)&ntp_rtc);
     if (VSF_ERR_NONE == vsf_linux_ntp_rtc_get((vsf_rtc_t *)&ntp_rtc, &rtc_tm)) {
 #ifdef VSF_LINUX_CFG_RTC
-        VSF_RTC_SET(&VSF_LINUX_CFG_RTC, &rtc_tm);
+        vsf_rtc_set(&VSF_LINUX_CFG_RTC, &rtc_tm);
 #endif
 
         struct tm t = {
