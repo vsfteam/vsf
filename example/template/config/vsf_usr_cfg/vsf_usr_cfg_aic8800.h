@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2022 by VSF Team                                       *
+ *   Copyright(C)2009-2019 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -104,7 +104,7 @@
 #   define APP_USE_HAL_GPIO_DEMO                        ENABLED
 #   define APP_USE_HAL_I2C_DEMO                         ENABLED
 #   define APP_USE_HAL_PWM_DEMO                         ENABLED
-#   define APP_USE_HAL_RTC_DEMO                         DISABLED
+#   define APP_USE_HAL_RTC_DEMO                         ENABLED
 #   define APP_USE_HAL_SPI_DEMO                         ENABLED
 #   define APP_USE_HAL_TIMER_DEMO                       ENABLED
 #   define APP_USE_HAL_USART_DEMO                       DISABLED
