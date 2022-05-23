@@ -11,50 +11,27 @@
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
  *  See the License for the specific language governing permissions and      *
- *  limitations under the License.                                           *
+ *  limitations under the License.                                           *x
  *                                                                           *
  ****************************************************************************/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-
-#   include "__device.h"
-
-#else
-
-#   ifndef __HAL_DRIVER_AIC_AIC8800_H__
-#       define __HAL_DRIVER_AIC_AIC8800_H__
+#ifndef __HAL_DRIVER_AIC8800_LP_TIMER_H__
+#define __HAL_DRIVER_AIC8800_LP_TIMER_H__
 
 /*============================ INCLUDES ======================================*/
 
-#       include "hal/vsf_hal_cfg.h"
-#       include "./device.h"
-
-#       include "system.h"
-
-#       include "hal/driver/common/swi/vsf_swi_template.h"
-#       include "./adc/adc.h"
-#       include "./debug_uart/debug_uart.h"
-#       include "./flash/flash.h"
-#       include "./gpio/gpio.h"
-#       include "./i2c/i2c.h"
-#       include "./pwm/pwm.h"
-#       include "./rtc/rtc.h"
-#       include "./spi/spi.h"
-#       include "./timer/timer.h"
-#       include "./trng/trng.h"
-#       include "./uart/uart.h"
-#       include "./usb/usb.h"
-
-// mbedtls configurations ONLY in mbedtls_aic8800.h
-#       include "./port/mbedtls/mbedtls_aic8800.h"
+#include "hal/vsf_hal_cfg.h"
+#if VSF_HAL_USE_TIMER == ENABLED
+#include "../__device.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
+/*============================ INCLUDES ======================================*/
 
-#   endif   // __HAL_DRIVER_AIC_AIC8800_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-/* EOF */
+#define VSF_TIMER_CFG_API_DECLARATION_PREFIX        vsf_hw_lp
+#define VSF_TIMER_CFG_INSTANCE_DECLARATION_PREFIX   VSF_HW_LP
+#include "hal/driver/common/timer/timer_template.h"
+
+#endif /* VSF_HAL_USE_TIMER */
+#endif /* __HAL_DRIVER_AIC8800_LP_TIMER_H__ */
