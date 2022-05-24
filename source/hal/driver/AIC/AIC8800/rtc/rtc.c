@@ -34,7 +34,7 @@
 
 typedef struct vsf_hw_rtc_t {
 #if VSF_RTC_CFG_IMPLEMENT_OP == ENABLED
-    vsf_hw_rtc_t vsf_rtc;
+    vsf_rtc_t vsf_rtc;
 #endif
 
     uint32_t freq;
