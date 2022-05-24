@@ -433,11 +433,10 @@ int pthread_mutex_destroy(pthread_mutex_t *mutex)
 
 int pthread_mutex_lock(pthread_mutex_t *mutex)
 {
-    if (mutex->attr & PTHREAD_MUTEX_RECURSIVE) {
-        if (vsf_eda_get_cur() == mutex->eda_owner) {
-            mutex->recursive_cnt++;
-            return 0;
-        }
+    if (    (mutex->attr & PTHREAD_MUTEX_RECURSIVE)
+        &&  (vsf_eda_get_cur() == mutex->eda_owner)) {
+        mutex->recursive_cnt++;
+        return 0;
     }
 
     if (vsf_eda_mutex_enter(&mutex->use_as__vsf_mutex_t)) {
@@ -452,6 +451,12 @@ int pthread_mutex_lock(pthread_mutex_t *mutex)
 
 int pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
+    if (    (mutex->attr & PTHREAD_MUTEX_RECURSIVE)
+        &&  (vsf_eda_get_cur() == mutex->eda_owner)) {
+        mutex->recursive_cnt++;
+        return 0;
+    }
+
     if (vsf_eda_mutex_enter(&mutex->use_as__vsf_mutex_t, 0)) {
         return EBUSY;
     }
