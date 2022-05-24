@@ -82,22 +82,22 @@ vsf_err_t vsf_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
     return rtc_ptr->op->set(rtc_ptr, rtc_tm);
 }
 
-time_t vsf_rtc_get_second(vsf_rtc_t *rtc_ptr)
+vsf_err_t vsf_rtc_get_time(vsf_rtc_t *rtc_ptr, time_t *second_ptr, time_t *millisecond_ptr)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
     VSF_HAL_ASSERT(rtc_ptr->op != NULL);
-    VSF_HAL_ASSERT(rtc_ptr->op->get_second != NULL);
+    VSF_HAL_ASSERT(rtc_ptr->op->get_time != NULL);
 
-    return rtc_ptr->op->get_second(rtc_ptr);
+    return rtc_ptr->op->get_time(rtc_ptr, second_ptr, millisecond_ptr);
 }
 
-vsf_err_t vsf_rtc_set_second(vsf_rtc_t *rtc_ptr, time_t time)
+vsf_err_t vsf_rtc_set_time(vsf_rtc_t *rtc_ptr, time_t second, time_t millisecond)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
     VSF_HAL_ASSERT(rtc_ptr->op != NULL);
-    VSF_HAL_ASSERT(rtc_ptr->op->set_second != NULL);
+    VSF_HAL_ASSERT(rtc_ptr->op->set_time != NULL);
 
-    return rtc_ptr->op->set_second(rtc_ptr, time);
+    return rtc_ptr->op->set_time(rtc_ptr, second, millisecond);
 }
 
 #endif /* VSF_RTC_CFG_MULTI_CLASS == ENABLED */
