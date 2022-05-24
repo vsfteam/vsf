@@ -26,6 +26,7 @@
 /*============================ MACROS ========================================*/
 
 #define vsf_real_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t)
+#define vsf_real_rtc_capability VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_capability)
 #define vsf_real_rtc_get        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get)
 #define vsf_real_rtc_set        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set)
 #define vsf_real_rtc_get_time   VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get_time)
@@ -37,6 +38,16 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_RTC_CFG_IMPLEMENT_PWM_SET == DISABLED
+vsf_err_t vsf_real_rtc_pwm_set(vsf_real_rtc_t *rtc_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
+{
+    VSF_HAL_ASSERT(NULL != rtc_ptr);
+
+    VSF_HAL_ASSERT(0);
+    return VSF_ERR_FAIL;
+}
+#endif
 
 #if VSF_RTC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
