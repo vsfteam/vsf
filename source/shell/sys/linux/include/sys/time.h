@@ -54,6 +54,7 @@ int gettimeofday(struct timeval * tv, struct timezone * tz);
 int getitimer(int which, struct itimerval *curr_value);
 int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);
 
+int futimes(int fd, const struct timeval tv[2]);
 int utimes(const char *filename, const struct timeval times[2]);
 
 #ifdef __cplusplus
