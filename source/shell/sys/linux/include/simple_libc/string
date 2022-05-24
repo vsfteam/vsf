@@ -648,6 +648,10 @@ namespace std {
         size_t find_last_of(const T *str, size_t pos = npos) const
         {
             const T *start = c_str();
+            if (nullptr == start) {
+                assert(false);
+            }
+
             ssize_t curpos = length() - 1;
             if (pos > curpos) {
                 pos = curpos;
@@ -673,6 +677,10 @@ namespace std {
         size_t find_last_not_of(const T *str, size_t pos = npos) const
         {
             const T *start = c_str();
+            if (nullptr == start) {
+                assert(false);
+            }
+
             ssize_t curpos = length() - 1;
             if (pos > curpos) {
                 pos = curpos;
@@ -708,7 +716,12 @@ namespace std {
         basic_string<T, Traits, Alloc> & operator +=(const T *s)
         {
             size_t inslen = s != nullptr ? __strlen(s) : 0;
-            return (basic_string<T, Traits, Alloc> &)(array_base<T>::insert(length() - 1, s, inslen));
+            size_t len = length();
+            if (0 == len) {
+                return assign(s);
+            } else {
+                return (basic_string<T, Traits, Alloc> &)(array_base<T>::insert(len - 1, s, inslen));
+            }
         }
         basic_string<T, Traits, Alloc> & operator +=(const basic_string<T, Traits, Alloc> &s)
         {
