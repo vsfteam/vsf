@@ -28,7 +28,6 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
-extern int rtc_files_debug;
 
 #define VSF_RTC_CFG_API_DECLARATION_PREFIX        vsf_hw
 #define VSF_RTC_CFG_INSTANCE_DECLARATION_PREFIX   VSF_HW
