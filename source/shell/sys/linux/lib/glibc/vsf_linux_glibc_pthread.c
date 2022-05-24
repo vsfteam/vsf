@@ -455,6 +455,7 @@ int pthread_mutex_trylock(pthread_mutex_t *mutex)
     if (vsf_eda_mutex_enter(&mutex->use_as__vsf_mutex_t, 0)) {
         return EBUSY;
     }
+    mutex->recursive_cnt = 1;
     return 0;
 }
 
