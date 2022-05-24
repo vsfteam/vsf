@@ -125,7 +125,7 @@ extern FILE * __vsf_linux_stderr(void);
 #endif
 #define EOF                 -1
 
-#define fpos_t              uintmax_t
+typedef intmax_t            fpos_t;
 
 void perror(const char *str);
 
@@ -200,6 +200,13 @@ char * tmpnam(char *str);
 
 #if defined(_GNU_SOURCE)
 ssize_t getline(char **lineptr, size_t *n, FILE *f);
+#endif
+
+#ifdef __WIN__
+void _lock_file(FILE *f);
+void _unlock_file(FILE *f);
+errno_t _get_stream_buffer_pointers(FILE *f, char ***base, char ***ptr, int **cnt);
+int _fseeki64(FILE *f, uint64_t offset, int origin);
 #endif
 
 #ifdef __cplusplus
