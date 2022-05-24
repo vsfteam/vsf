@@ -56,85 +56,12 @@ extern "C" {
 #   define VSF_HAL_USE_AD               ENABLED
 #endif
 
-/*----------------------------------------------------------------------------*
- * USART Switch                                                               *
- *----------------------------------------------------------------------------*/
 #ifndef VSF_HAL_USE_USART
 #   define VSF_HAL_USE_USART            ENABLED
-#endif
-#if VSF_HAL_USE_USART != ENABLED
-#   undef VSF_HAL_USE_USART0
-#   undef VSF_HAL_USE_USART1
-#   undef VSF_HAL_USE_USART2
-#   undef VSF_HAL_USE_USART3
-#   undef VSF_HAL_USE_USART4
-#   undef VSF_HAL_USE_USART5
-#   undef VSF_HAL_USE_USART6
-#   undef VSF_HAL_USE_USART7
-#else
-#   ifndef VSF_HAL_USE_USART0
-#       define VSF_HAL_USE_USART0       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_USART1
-#       define VSF_HAL_USE_USART1       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_USART2
-#       define VSF_HAL_USE_USART2       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_USART3
-#       define VSF_HAL_USE_USART3       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_USART4
-#       define VSF_HAL_USE_USART4       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_USART5
-#       define VSF_HAL_USE_USART5       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_USART6
-#       define VSF_HAL_USE_USART6       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_USART7
-#       define VSF_HAL_USE_USART7       ENABLED
-#   endif
 #endif
 
 #ifndef VSF_HAL_USE_SPI
 #   define VSF_HAL_USE_SPI              ENABLED
-#endif
-#if VSF_HAL_USE_SPI != ENABLED
-#   undef VSF_HAL_USE_SPI0
-#   undef VSF_HAL_USE_SPI1
-#   undef VSF_HAL_USE_SPI2
-#   undef VSF_HAL_USE_SPI3
-#   undef VSF_HAL_USE_SPI4
-#   undef VSF_HAL_USE_SPI5
-#   undef VSF_HAL_USE_SPI6
-#   undef VSF_HAL_USE_SPI7
-#else
-#   ifndef VSF_HAL_USE_SPI0
-#       define VSF_HAL_USE_SPI0       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_SPI1
-#       define VSF_HAL_USE_SPI1       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_SPI2
-#       define VSF_HAL_USE_SPI2       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_SPI3
-#       define VSF_HAL_USE_SPI3       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_SPI4
-#       define VSF_HAL_USE_SPI4       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_SPI5
-#       define VSF_HAL_USE_SPI5       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_SPI6
-#       define VSF_HAL_USE_SPI6       ENABLED
-#   endif
-#   ifndef VSF_HAL_USE_SPI7
-#       define VSF_HAL_USE_SPI7       ENABLED
-#   endif
 #endif
 
 #ifndef VSF_HAL_USE_IIC
