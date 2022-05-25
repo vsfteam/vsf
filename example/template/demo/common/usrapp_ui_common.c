@@ -22,7 +22,7 @@
 #if     VSF_USE_UI == ENABLED                                                   \
     &&  (   VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED          \
         ||  VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED   \
-        ||  VSF_DISP_USE_WINGDI == ENABLED)
+        ||  VSF_DISP_USE_WINGDI == ENABLED || VSF_DISP_USE_USBD_UVC == ENABLED)
 
 #include "hal/vsf_hal.h"
 
@@ -135,6 +135,17 @@ usrapp_ui_common_t usrapp_ui_common = {
             .drv                = &vk_disp_drv_wingdi,
             .color              = APP_DISP_WINGDI_COLOR,
         },
+    },
+#elif VSF_DISP_USE_USBD_UVC == ENABLED
+    .disp                       = &usrapp_ui_common.disp_usbd_uvc.use_as__vk_disp_t,
+    .disp_usbd_uvc                = {
+        .param                  = {
+            .height             = APP_DISP_USBD_UVC_HEIGHT,
+            .width              = APP_DISP_USBD_UVC_WIDTH,
+            .drv                = &vk_disp_drv_usbd_uvc,
+            .color              = APP_DISP_USBD_UVC_COLOR,
+        },
+        .uvc                    = NULL,
     },
 #else
     .disp                       = NULL,
