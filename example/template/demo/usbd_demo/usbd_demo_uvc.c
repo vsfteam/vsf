@@ -37,9 +37,10 @@
 #define SCREEN_FRAME_SIZE               (SCREEN_WIDTH * SCREEN_HEIGHT * SCREEN_PIXEL_BITLEN / 8)
 
 // RGB565
+
 #define SCREEN_PIXEL_FORMAT_GUID                                                \
-            0x7B, 0xEB, 0x36, 0xE4, 0x4F, 0x52, 0xCE, 0x11,                     \
-            0x9F, 0x53, 0x00, 0x20, 0xAF, 0x0B, 0xA7, 0x70
+             'R',  'G',  'B',  'P', 0x00, 0x00, 0x10, 0x00,                     \
+            0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -419,6 +420,11 @@ int VSF_USER_ENTRY(void)
 
     vk_usbd_init(&__user_usbd_uvc.usbd.dev);
     vk_usbd_connect(&__user_usbd_uvc.usbd.dev);
+
+#if VSF_USE_UI == ENABLED  &&  VSF_DISP_USE_USBD_UVC == ENABLED
+        usrapp_ui_common.disp_usbd_uvc.uvc = &__user_usbd_uvc.usbd.uvc.param;
+#endif
+
     return 0;
 }
 
