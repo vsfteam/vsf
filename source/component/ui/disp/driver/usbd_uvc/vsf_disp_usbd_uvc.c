@@ -62,6 +62,7 @@ static void __vk_disp_usbd_uvc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         disp_uvc->header[1] = 0;
         disp_uvc->line_cnt = 0;
         disp_uvc->frame_cnt = 0;
+        vk_disp_on_ready(&disp_uvc->use_as__vk_disp_t);
         break;
     case VSF_EVT_MESSAGE:
         if (++disp_uvc->line_cnt >= disp_uvc->param.height) {
@@ -73,7 +74,7 @@ static void __vk_disp_usbd_uvc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_REFRESH:
         vk_usbd_uvc_send_packet(disp_uvc->uvc, disp_uvc->cur_buffer,
-                2 + disp_uvc->param.width * VSF_DISP_GET_PIXEL_SIZE(disp_uvc) / 8);
+                2 + disp_uvc->param.width * vsf_disp_get_pixel_bytesize(disp_uvc));
         break;
     }
 }
