@@ -24,6 +24,7 @@
 #if VSF_USE_UI == ENABLED && VSF_DISP_USE_USBD_UVC == ENABLED
 
 #include "kernel/vsf_kernel.h"
+#include "component/usb/vsf_usb.h"
 
 #if     defined(__VSF_DISP_USBD_UVC_CLASS_IMPLEMENT)
 #   undef __VSF_DISP_USBD_UVC_CLASS_IMPLEMENT
