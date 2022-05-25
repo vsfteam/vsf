@@ -540,7 +540,7 @@ namespace std {
                     return (found - start) / sizeof(T);
                 }
             }
-            return -1;
+            return npos;
         }
         size_t find(const basic_string<T, Traits, Alloc> &str, size_t pos = 0) const
         {
@@ -599,7 +599,7 @@ namespace std {
             const T *start = c_str();
             ssize_t curpos = pos, slen = length();
             if (pos >= slen) {
-                return -1;
+                return npos;
             }
 
             while (curpos < slen) {
@@ -608,7 +608,7 @@ namespace std {
                 }
                 curpos++;
             }
-            return curpos < slen ? curpos : -1;
+            return curpos < slen ? curpos : npos;
         }
         size_t find_first_of(const basic_string<T, Traits, Alloc> & str, size_t pos = 0) const
         {
@@ -624,7 +624,7 @@ namespace std {
             const T *start = c_str();
             ssize_t curpos = pos, slen = length();
             if (pos >= slen) {
-                return -1;
+                return npos;
             }
 
             while (curpos < slen) {
@@ -633,7 +633,7 @@ namespace std {
                 }
                 curpos++;
             }
-            return curpos < slen ? curpos : -1;
+            return curpos < slen ? curpos : npos;
         }
         size_t find_first_not_of(const basic_string<T, Traits, Alloc> & str, size_t pos = 0) const
         {
@@ -663,7 +663,7 @@ namespace std {
                 }
                 curpos--;
             }
-            return curpos >= 0 ? curpos : -1;
+            return curpos >= 0 ? curpos : npos;
         }
         size_t find_last_of(const basic_string<T, Traits, Alloc> & str, size_t pos = npos) const
         {
@@ -678,7 +678,7 @@ namespace std {
         {
             const T *start = c_str();
             if (nullptr == start) {
-                assert(false);
+                return npos;
             }
 
             ssize_t curpos = length() - 1;
@@ -692,7 +692,7 @@ namespace std {
                 }
                 curpos--;
             }
-            return curpos >= 0 ? curpos : -1;
+            return curpos >= 0 ? curpos : npos;
         }
         size_t find_last_not_of(const basic_string<T, Traits, Alloc> & str, size_t pos = npos) const
         {
