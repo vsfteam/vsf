@@ -138,91 +138,172 @@ static bool __lvgl_mouse_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 #endif
 
 #if LV_USE_GROUP == ENABLED
-static uint32_t __input_keycode_to_lvgl_keycode(uint16_t keymod, uint16_t keycode)
+static uint32_t __input_keycode_to_lvgl_keycode(uint16_t keycode)
 {
-    static const char __shift_num[] = {')', '!', '@', '#', '$', '%', '^', '&', '*', '('};
-    bool is_shift = keymod & (VSF_KM_LEFT_SHIFT | VSF_KM_RIGHT_SHIFT);
-
-    if ((VSF_KB_a <= keycode) && (keycode <= VSF_KB_z)) {
-        return (is_shift ? 'A' : 'a') + (keycode - VSF_KB_a);
-    } else if ((VSF_KB_A <= keycode) && (keycode <= VSF_KB_Z)) {
-        return (is_shift ? 'a' : 'A') + (keycode - VSF_KB_A);
+    if (VSF_KB_UNKNOWN == keycode) {
+        return 0;
+    } else if((VSF_KB_a <= keycode) && (keycode <= VSF_KB_z)) {
+        return 'a' + (keycode - VSF_KB_a);
     } else if ((VSF_KB_1 <= keycode) && (keycode <= VSF_KB_9)) {
-        return  is_shift ? __shift_num[keycode - VSF_KB_1 + 1] : '1' + (keycode - VSF_KB_1);
+        return '1' + (keycode - VSF_KB_1);
+    } else if (VSF_KB_0 == keycode) {
+        return '0';
+    } else if (VSF_KB_ENTER == keycode) {
+		return LV_KEY_ENTER;
+    } else if (VSF_KB_ESCAPE == keycode) {
+		return LV_KEY_ESC;
+    } else if (VSF_KB_BACKSPACE == keycode) {
+		return LV_KEY_BACKSPACE;
+    } else if (VSF_KB_TAB == keycode) {
+        return 0;
+    } else if (VSF_KB_SPACE == keycode) {
+        return ' ';
+    } else if (VSF_KB_MINUS == keycode) {
+        return '-';
+    } else if (VSF_KB_EQUAL == keycode) {
+        return '=';
+    } else if (VSF_KB_LEFT_BRACKET == keycode) {
+		return '[';
+    } else if (VSF_KB_RIGHT_BRACKET == keycode) {
+        return ']';
+    } else if (VSF_KB_BACKSLASH == keycode) {
+	    return '\\';
+    } else if (VSF_KB_SEMICOLON == keycode) {
+	    return ';';
+    } else if (VSF_KB_SINGLE_QUOTE == keycode) {
+	    return '\'';
+    } else if (VSF_KB_GRAVE == keycode) {
+    	return '`';
+    } else if (VSF_KB_COMMA == keycode) {
+	    return ',';
+    } else if (VSF_KB_DOT == keycode) {
+		return '.';
+    } else if (VSF_KB_SLASH == keycode) {
+		return '/';
+    } else if (VSF_KB_CAPSLOCK == keycode) {
+        return 0;
+    } else if ((VSF_KB_F1 <= keycode) && (keycode <= VSF_KB_F12)) {
+        return 0;
+    } else if (VSF_KB_PRINT_SCREEN == keycode) {
+        return 0;
+    } else if (VSF_KB_SCROLL_LOCK == keycode) {
+        return 0;
+    } else if (VSF_KB_PAUSE == keycode) {
+        return 0;
+    } else if (VSF_KB_INSERT == keycode) {
+        return 0;
+    } else if (VSF_KB_HOME == keycode) {
+		return LV_KEY_HOME;
+    } else if (VSF_KB_PAGE_UP == keycode) {
+        return 0;
+    } else if (VSF_KB_DELETE == keycode) {
+		return LV_KEY_DEL;
+    } else if (VSF_KB_END == keycode) {
+		return LV_KEY_END;
+    } else if (VSF_KB_PAGE_DOWN == keycode) {
+        return 0;
+    } else if (VSF_KB_RIGHT == keycode) {
+        return LV_KEY_RIGHT;
+    } else if (VSF_KB_LEFT == keycode) {
+		return LV_KEY_LEFT;
+    } else if (VSF_KB_DOWN == keycode) {
+		return LV_KEY_DOWN;
+    } else if (VSF_KB_UP == keycode) {
+		return LV_KEY_UP;
+    } else if (VSF_KP_NUMLOCK == keycode) {
+        return 0;
+    } else if (VSF_KP_DIVIDE == keycode) {
+		return '/';
+    } else if (VSF_KP_MULTIPLY == keycode) {
+        return '*';
+    } else if (VSF_KP_MINUS == keycode) {
+        return '-';
+    } else if (VSF_KP_PLUS == keycode) {
+        return '+';
+    } else if (VSF_KP_ENTER == keycode) {
+		return LV_KEY_ENTER;
     } else if ((VSF_KP_1 <= keycode) && (keycode <= VSF_KP_9)) {
         return '1' + (keycode - VSF_KP_1);
-    } else if (VSF_KB_0 == keycode) {
-        return  is_shift ? __shift_num[keycode - VSF_KB_0] : '0' + (keycode - VSF_KB_0);
     } else if (VSF_KP_0 == keycode) {
         return '0';
-    } else if ((VSF_KB_RIGHT == keycode) || (VSF_KB_PLUS == keycode)) {
-        return LV_KEY_RIGHT;
-    } else if ((VSF_KB_LEFT == keycode) || (VSF_KB_MINUS == keycode)) {
-		return LV_KEY_LEFT;
-	} else if (VSF_KB_ENTER == keycode || '\r' == keycode) {
-		return LV_KEY_ENTER;
-	} else if (VSF_KB_UP == keycode) {
-		return LV_KEY_UP;
-	} else if (VSF_KB_DOWN == keycode) {
-		return LV_KEY_DOWN;
-	} else if (VSF_KB_ESCAPE == keycode) {
-		return LV_KEY_ESC;
-	} else if (VSF_KB_BACKSPACE == keycode) {
-		return LV_KEY_BACKSPACE;
-	} else if (VSF_KB_DELETE == keycode) {
-		return LV_KEY_DEL;
-	} else if (VSF_KB_HOME == keycode) {
-		return LV_KEY_HOME;
-	} else if (VSF_KB_END == keycode) {
-		return LV_KEY_END;
-	} else if (VSF_KB_EQUAL == keycode) {
-		return is_shift ? '+' : '=';
-	} else if (VSF_KB_RIGHT_BRACKET == keycode) {
-		return is_shift ? '}' : ']';
-	} else if (VSF_KB_BACKSLASH == keycode) {
-	    return is_shift ? '|' : '\\';
-    } else if (VSF_KB_SEMICOLON == keycode) {
-	    return is_shift ? ':' : ';';
-    } else if (VSF_KB_SINGLE_QUOTE == keycode) {
-	    return is_shift ? '"' : '\'';
-    } else if (VSF_KB_GRAVE == keycode) {
-    	return is_shift ? '~' : '`';
-    } else if (VSF_KB_COMMA == keycode) {
-	    return is_shift ? '<' : ',';
-    } else if (VSF_KB_DOT == keycode) {
-		return is_shift ? '>' : '.';
-	} else if (VSF_KB_SLASH == keycode) {
-		return is_shift ? '?' : '/';
-	} else if (VSF_KB_LEFT_BRACKET == keycode) {
-		return is_shift ? '{' : '[';
+    } else if (VSF_KP_DOT == keycode) {
+        return '.';
+    } else if (VSF_KP_EQUAL == keycode) {
+        return '=';
+    } else if (VSF_KB_EXCLAM == keycode) {
+        return '!';
+    } else if (VSF_KB_AT == keycode) {
+        return '@';
+    } else if (VSF_KB_POUND == keycode) {
+        return '#';
+    } else if (VSF_KB_DOLLAR == keycode) {
+        return '$';
+    } else if (VSF_KB_PERCENT == keycode) {
+        return '%';
+    } else if (VSF_KB_CARET == keycode) {
+        return '^';
+    } else if (VSF_KB_AMPERSAND == keycode) {
+        return '&';
+    } else if (VSF_KB_ASTERISK == keycode) {
+        return '*';
+    } else if (VSF_KB_LEFT_PAREN == keycode) {
+        return '(';
+    } else if (VSF_KB_RIGHT_PAREN == keycode) {
+        return ')';
+    } else if (VSF_KB_UNDERSCORE == keycode) {
+        return '_';
+    } else if (VSF_KB_PLUS == keycode) {
+        return '+';
+    } else if (VSF_KB_LEFT_BRACE == keycode) {
+        return '{';
+    } else if (VSF_KB_RIGHT_BRACE == keycode) {
+        return '}';
+    } else if (VSF_KB_BAR == keycode) {
+        return '|';
+    } else if (VSF_KB_COLON == keycode) {
+        return ':';
+    } else if (VSF_KB_DOUBLE_QUOTE == keycode) {
+        return '"';
+    } else if (VSF_KB_TIDE == keycode) {
+        return '~';
+    } else if (VSF_KB_LESS == keycode) {
+        return '<';
+    } else if (VSF_KB_GREATER == keycode) {
+        return '>';
+    } else if (VSF_KB_QUESTION == keycode) {
+        return '?';
+    } else if ((VSF_KB_A <= keycode) && (keycode <= VSF_KB_Z)) {
+        return 'A' + (keycode - VSF_KB_A);
     } else {
-        // VSF_KB_TAB, VSF_KB_SPACE, VSF_KB_CAPSLOCK, VSF_KB_F1,
-		// VSF_KB_F2, VSF_KB_F3, VSF_KB_F4, VSF_KB_F5,
-		// VSF_KB_F6, VSF_KB_F7, VSF_KB_F8, VSF_KB_F9,
-		// VSF_KB_F10, VSF_KB_F11, VSF_KB_F12, VSF_KB_PRINT_SCREEN,
-		// VSF_KB_SCROLL_LOCK, VSF_KB_PAUSE, VSF_KB_INSERT, VSF_KB_PAGE_UP,
-		// VSF_KB_PAGE_DOWN, VSF_KP_NUMLOCK, VSF_KP_DIVIDE, VSF_KP_MULTIPLY,
-		// VSF_KP_MINUS, VSF_KP_PLUS, VSF_KP_ENTER, VSF_KP_DOT,
-		// VSF_KB_EXCLAM, VSF_KB_AT, VSF_KB_POUND, VSF_KB_DOLLAR,
-		// VSF_KB_PERCENT, VSF_KB_CARET, VSF_KB_AMPERSAND, VSF_KB_ASTERISK,
-		// VSF_KB_LEFT_PAREN, VSF_KB_RIGHT_PAREN, VSF_KB_UNDERSCORE, VSF_KB_LEFT_BRACE,
-		// VSF_KB_RIGHT_BRACE, VSF_KB_BAR, VSF_KB_COLON, VSF_KB_DOUBLE_QUOTE,
-		// VSF_KB_TIDE, VSF_KB_LESS, VSF_KB_GREATER, VSF_KB_QUESTION,
+        //VSF_ASSERT(0);
         return 0;
     }
 }
 
 static bool __lvgl_keyboard_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
-    vk_keyboard_evt_t *kb_evt = &usrapp_ui_common.lvgl.kb_evt;
-    bool is_down = vsf_input_keyboard_is_down(kb_evt);
-    uint16_t keymod = vsf_input_keyboard_get_keymod(kb_evt);
-    uint16_t keycode = vsf_input_keyboard_get_keycode(kb_evt);
+    static bool __last_state = LV_INDEV_STATE_REL;
+    static bool __more_to_read = false;
+    static uint16_t __last_key = 0;
 
-    data->key = __input_keycode_to_lvgl_keycode(keymod, keycode);
-    data->state = (is_down && data->key) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+    if (__more_to_read) {
+        data->key = __last_key;
+        data->state = __last_state;
+        __more_to_read = false;
+    } else {
+        vk_keyboard_evt_t *kb_evt = &usrapp_ui_common.lvgl.kb_evt;
+        uint16_t key = __input_keycode_to_lvgl_keycode(vsf_input_keyboard_get_keycode(kb_evt));
+        bool state = vsf_input_keyboard_is_down(kb_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 
-    return false;
+        __more_to_read = (__last_state == LV_INDEV_STATE_PR) && (__last_key != key);
+        data->key   = __more_to_read ? __last_key         : key;
+        data->state = __more_to_read ? LV_INDEV_STATE_REL : state;
+
+        __last_key = key;
+        __last_state = state;
+    }
+
+    return __more_to_read;
 }
 #endif
 
