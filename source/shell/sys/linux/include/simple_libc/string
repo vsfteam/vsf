@@ -145,6 +145,9 @@ namespace std {
         {
             if (__length != n) {
                 __array = (T *)realloc(__array, n * sizeof(T));
+                if (n > 0) {
+                    VSF_ASSERT(__array != nullptr);
+                }
                 __length = n;
             }
         }
@@ -162,21 +165,22 @@ namespace std {
         {
             return append(arr.__array, arr.__length);
         }
-        array_base<T> & assign(const array_base<T> &arr)
-        {
-            if (this == &arr) { return (*this); }
-
-            free(__array);
-            __array = nullptr;
-            return append(arr);
-        }
         array_base<T> & assign(const T *arr, size_t num)
         {
             if (this->__array == arr) { return (*this); }
 
-            free(__array);
-            __array = nullptr;
-            return append(arr, num);
+            __array = (T *)realloc(__array, num * sizeof(T));
+            if (num > 0) {
+                VSF_ASSERT(__array != nullptr);
+            }
+            __length = num;
+            __memcpy(__array, arr, __length);
+            return (*this);
+        }
+        array_base<T> & assign(const array_base<T> &arr)
+        {
+            if (this == &arr) { return (*this); }
+            return assign(arr.__array, arr.__length);
         }
         void clear()
         {
@@ -203,6 +207,7 @@ namespace std {
             }
             if (sublen > len) {
                 __array = (T *)realloc(__array, newlen * sizeof(T));
+                VSF_ASSERT(__array != nullptr);
             }
             __memmove(&__array[pos + sublen], &__array[pos + len], __length - pos - len);
             if (arr != nullptr) {
@@ -210,7 +215,11 @@ namespace std {
             }
             if (sublen < len) {
                 __array = (T *)realloc(__array, newlen * sizeof(T));
+                if (newlen > 0) {
+                    VSF_ASSERT(__array != nullptr);
+                }
             }
+            __length = newlen;
             return (*this);
         }
         array_base<T> & replace(size_t pos, size_t len, size_t n, T t)
@@ -221,12 +230,17 @@ namespace std {
             }
             if (n > len) {
                 __array = (T *)realloc(__array, newlen * sizeof(T));
+                VSF_ASSERT(__array != nullptr);
             }
             __memmove(&__array[pos + len], &__array[pos + n], __length - pos - len);
             __memset(&__array[pos], t, n);
             if (n < len) {
                 __array = (T *)realloc(__array, newlen * sizeof(T));
+                if (newlen > 0) {
+                    VSF_ASSERT(__array != nullptr);
+                }
             }
+            __length = newlen;
             return (*this);
         }
         array_base<T> & insert(size_t pos, const T *arr, size_t sublen)
@@ -451,6 +465,10 @@ namespace std {
         {
             size_t len = array_base<T>::length();
             return len > 0 ? len - 1 : 0;
+        }
+        bool empty() const
+        {
+            return (0 == length());
         }
         void resize(size_t n, T c = 0)
         {
