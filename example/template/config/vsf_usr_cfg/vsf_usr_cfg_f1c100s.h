@@ -51,8 +51,6 @@
 #       define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            ENABLED
 
 // 3rd-party demos
-//  awtk is LGPL, not convenient to implement in MCU
-#define APP_USE_AWTK_DEMO                               DISABLED
 // nnom minst demo seems to be broken
 #define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               ENABLED

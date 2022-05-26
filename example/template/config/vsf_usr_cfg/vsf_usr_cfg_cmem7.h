@@ -144,8 +144,6 @@
 
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
-//#define VSH_ENTER_CHAR                                  '\n'
-
 extern void VSF_DEBUG_STREAM_POLL(void);
 #define VSF_ASSERT(...)                                 if (!(__VA_ARGS__)) {while(1);};
 #define VSF_USB_ASSERT(...)                             if (!(__VA_ARGS__)) { vsf_trace_debug( # __VA_ARGS__ VSF_TRACE_CFG_LINEEND);  while(1) { VSF_DEBUG_STREAM_POLL(); }};

@@ -44,7 +44,6 @@
 
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
-#define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               DISABLED
 //  current M484 hardware has no display
 #define APP_USE_LVGL_DEMO                               DISABLED
@@ -68,7 +67,7 @@
 #   define VSF_AUDIO_USE_CATURE                         DISABLED
 
 // UI runs in vsf_prio_0, other modules runs above vsf_prio_1
-#if APP_USE_AWTK_DEMO == ENABLED || APP_USE_LVGL_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_USE_TGUI_DEMO == ENABLED
+#if APP_USE_LVGL_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_USE_TGUI_DEMO == ENABLED
 #   define VSF_USBH_CFG_EDA_PRIORITY                    vsf_prio_1
 #   define APP_CFG_USBH_HW_PRIO                         vsf_arch_prio_1
 #endif
