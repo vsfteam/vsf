@@ -84,12 +84,6 @@ typedef struct usrapp_ui_common_t {
     } tgui;
 #endif
 
-#if VSF_USE_AWTK == ENABLED
-    struct {
-        vk_input_notifier_t notifier;
-    } awtk;
-#endif
-
 #if VSF_USE_LVGL == ENABLED
     struct {
         vk_input_notifier_t notifier;

@@ -142,10 +142,6 @@ int vsf_linux_create_fhs(void)
     extern int xui_main(int argc, char **argv);
     busybox_bind(VSF_LINUX_CFG_BIN_PATH "/xui", xui_main);
 #endif
-#if APP_USE_AWTK_DEMO == ENABLED
-    extern int awtk_main(int argc, char *argv[]);
-    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/awtk", awtk_main);
-#endif
 #if APP_USE_LVGL_DEMO == ENABLED
     extern int lvgl_main(int argc, char *argv[]);
     busybox_bind(VSF_LINUX_CFG_BIN_PATH "/lvgl", lvgl_main);
