@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>CMSDK_CM7</Device>
           <Vendor>ARM</Vendor>
-          <PackID>Keil.V2M-MPS2_CMx_BSP.1.7.1</PackID>
+          <PackID>Keil.V2M-MPS2_CMx_BSP.1.7.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00400000) IROM(0x00000000,0x00400000) CPUTYPE("Cortex-M7") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -813,26 +813,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/demo/awtk_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>awtk_application.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/awtk_demo/awtk_application.c</FilePath>
-            </File>
-            <File>
-              <FileName>awtk_assets.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/awtk_demo/awtk_assets.c</FilePath>
-            </File>
-            <File>
-              <FileName>awtk_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/awtk_demo/awtk_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>example/template/demo/btstack_demo</GroupName>
           <Files>
             <File>
@@ -978,16 +958,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/demo/evm_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/evm_demo/evm_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>example/template/demo/freetype_demo</GroupName>
           <Files>
             <File>
@@ -998,111 +968,52 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/demo/gato_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>gato_application.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/gato_demo/gato_application.c</FilePath>
-            </File>
-            <File>
-              <FileName>gato_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/gato_demo/gato_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>example/template/demo/guilite_demo</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
-          <Files>
-            <File>
-              <FileName>UIcode.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>../../../../example/template/demo/guilite_demo/UIcode.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>guilite_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/guilite_demo/guilite_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>example/template/demo/hal_demo</GroupName>
           <Files>
             <File>
               <FileName>usart_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>../../../../example/template/demo/hal_demo/usart_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\adc_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\flash_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\gpio_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\i2c_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\pwm_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\rtc_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\spi_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\timer_demo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1168,6 +1079,11 @@
               <FileName>ntpdate_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\demo\linux_demo\ntpdate_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>telnetd_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\linux_demo\telnetd_demo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1601,16 +1517,6 @@
               <FileName>vsfvm_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>../../../../example/template/demo/vsfvm_demo/vsfvm_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>example/template/demo/xui_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>xui_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/xui_demo/xui_demo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2392,131 +2298,6 @@
               <FileName>coremark.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../source/component/3rd-party/coremark/raw/coremark.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/extension/bluetooth</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_module_bluetooth.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/bluetooth/evm_module_bluetooth.c</FilePath>
-            </File>
-            <File>
-              <FileName>evm_module_bluetooth.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/bluetooth/evm_module_bluetooth.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/extension/oo</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_oo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/oo/evm_oo.c</FilePath>
-            </File>
-            <File>
-              <FileName>evm_oo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/oo/evm_oo.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/extension/usbh</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_module_usbh.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/usbh/evm_module_usbh.c</FilePath>
-            </File>
-            <File>
-              <FileName>evm_module_usbh.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/usbh/evm_module_usbh.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/port</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_port.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/evm_port.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/port/eluaos</GroupName>
-          <Files>
-            <File>
-              <FileName>luat_fs_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_fs_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_gpio_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_gpio_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_http_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_http_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_log_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_log_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_malloc_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_malloc_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_msgbus_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_msgbus_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_netclient_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_netclient_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_socket_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_socket_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_timer_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_timer_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_uart_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_uart_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_vsf_base.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_vsf_base.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/port/iotjs</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/iotjs/evm_main.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -37568,26 +37349,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/demo/awtk_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>awtk_application.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/awtk_demo/awtk_application.c</FilePath>
-            </File>
-            <File>
-              <FileName>awtk_assets.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/awtk_demo/awtk_assets.c</FilePath>
-            </File>
-            <File>
-              <FileName>awtk_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/awtk_demo/awtk_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>example/template/demo/btstack_demo</GroupName>
           <Files>
             <File>
@@ -37802,16 +37563,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/demo/evm_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/evm_demo/evm_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>example/template/demo/freetype_demo</GroupName>
           <Files>
             <File>
@@ -37822,111 +37573,52 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>example/template/demo/gato_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>gato_application.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/gato_demo/gato_application.c</FilePath>
-            </File>
-            <File>
-              <FileName>gato_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/gato_demo/gato_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>example/template/demo/guilite_demo</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
-          <Files>
-            <File>
-              <FileName>UIcode.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>../../../../example/template/demo/guilite_demo/UIcode.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>guilite_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/guilite_demo/guilite_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>example/template/demo/hal_demo</GroupName>
           <Files>
             <File>
               <FileName>usart_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>../../../../example/template/demo/hal_demo/usart_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\adc_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\flash_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\gpio_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\i2c_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\pwm_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\rtc_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\spi_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\hal_demo\timer_demo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -37992,6 +37684,11 @@
               <FileName>ntpdate_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\demo\linux_demo\ntpdate_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>telnetd_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\demo\linux_demo\telnetd_demo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -38425,16 +38122,6 @@
               <FileName>vsfvm_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>../../../../example/template/demo/vsfvm_demo/vsfvm_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>example/template/demo/xui_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>xui_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../example/template/demo/xui_demo/xui_demo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -39216,131 +38903,6 @@
               <FileName>coremark.h</FileName>
               <FileType>5</FileType>
               <FilePath>../../../../source/component/3rd-party/coremark/raw/coremark.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/extension/bluetooth</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_module_bluetooth.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/bluetooth/evm_module_bluetooth.c</FilePath>
-            </File>
-            <File>
-              <FileName>evm_module_bluetooth.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/bluetooth/evm_module_bluetooth.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/extension/oo</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_oo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/oo/evm_oo.c</FilePath>
-            </File>
-            <File>
-              <FileName>evm_oo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/oo/evm_oo.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/extension/usbh</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_module_usbh.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/usbh/evm_module_usbh.c</FilePath>
-            </File>
-            <File>
-              <FileName>evm_module_usbh.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/extension/usbh/evm_module_usbh.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/port</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_port.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/evm_port.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/port/eluaos</GroupName>
-          <Files>
-            <File>
-              <FileName>luat_fs_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_fs_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_gpio_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_gpio_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_http_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_http_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_log_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_log_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_malloc_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_malloc_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_msgbus_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_msgbus_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_netclient_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_netclient_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_socket_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_socket_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_timer_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_timer_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_uart_vsf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_uart_vsf.c</FilePath>
-            </File>
-            <File>
-              <FileName>luat_vsf_base.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/eluaos/luat_vsf_base.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>source/component/3rd-party/evm/port/iotjs</GroupName>
-          <Files>
-            <File>
-              <FileName>evm_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../source/component/3rd-party/evm/port/iotjs/evm_main.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -73385,14 +72947,5 @@
     <components/>
     <files/>
   </RTE>
-
-  <LayerInfo>
-    <Layers>
-      <Layer>
-        <LayName>Blinky</LayName>
-        <LayPrjMark>1</LayPrjMark>
-      </Layer>
-    </Layers>
-  </LayerInfo>
 
 </Project>
