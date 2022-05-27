@@ -22,7 +22,10 @@
 
 #include "vsf.h"
 
-#if VSF_USE_AUDIO == ENABLED
+#if     VSF_USE_AUDIO == ENABLED                                                \
+    &&  (   (VSF_USE_WINSOUND == ENABLED)                                       \
+        ||  (VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_UAC == ENABLED)        \
+        )
 
 #if VSF_USE_WINSOUND == ENABLED
 #   include "component/av/audio/driver/winsound/vsf_winsound.h"
@@ -61,6 +64,6 @@ extern usrapp_audio_common_t usrapp_audio_common;
 }
 #endif
 
-#endif      // VSF_USE_AUDIO
+#endif      // VSF_USE_AUDIO && (VSF_USE_WINSOUND || UAC)
 #endif      // __USRAPP_AUDIO_COMMON_H__
 /* EOF */
