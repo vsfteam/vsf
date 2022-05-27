@@ -51,8 +51,6 @@ extern "C" {
 #       define VSF_I2C_CFG_PREFIX               vsf_hw
 #   elif VSF_HAL_USE_GPIO_I2C == ENABLED
 #       define VSF_I2C_CFG_PREFIX               vsf_gpio
-#   else
-#       warning "Enable VSF_HAL_USE_I2C support but no known implementation found"
 #   endif
 #endif
 

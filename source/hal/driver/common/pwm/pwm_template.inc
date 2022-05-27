@@ -44,19 +44,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
 /*============================ LOCAL VARIABLES ===============================*/
-
-#if VSF_PWM_CFG_IMPLEMENT_OP == ENABLED
-
-#   undef __VSF_HAL_TEMPLATE_API
-#   define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_OP
-
-static const vsf_pwm_op_t __VSF_PWM_OP_VAR = {
-    VSF_PWM_APIS(VSF_PWM_CFG_PREFIX)
-};
-#endif
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 

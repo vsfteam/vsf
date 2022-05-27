@@ -99,8 +99,6 @@ extern "C" {
 #       define VSF_GPIO_CFG_PREFIX                  vsf_hw
 #   elif VSF_HAL_USE_GPIO_GPIO == ENABLED
 #       define VSF_GPIO_CFG_PREFIX                  vsf_gpio
-#   else
-#       warning "Enable VSF_HAL_USE_GPIO support but no known implementation found"
 #   endif
 #endif
 

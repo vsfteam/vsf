@@ -49,8 +49,6 @@ extern "C" {
 #       define VSF_PWM_CFG_PREFIX               vsf
 #   elif defined(VSF_HW_PWM_COUNT) && (VSF_HW_PWM_COUNT != 0)
 #       define VSF_PWM_CFG_PREFIX               vsf_hw
-#   else
-#       warning "Enable VSF_HAL_USE_PWM support but no known implementation found"
 #   endif
 #endif
 
