@@ -21,9 +21,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     pwm
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              PWM
-#define __VSF_HAL_TEMPLATE_APIS                     VSF_PWM_APIS
+#define __VSF_HAL_TEMPLATE_NAME                     _pwm
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _PWM
 
 #ifndef VSF_PWM_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_PWM_CFG_API_DECLARATION_PREFIX when using vsf_template_pwm.h"

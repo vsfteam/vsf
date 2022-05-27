@@ -21,8 +21,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     gpio
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              GPIO
+#define __VSF_HAL_TEMPLATE_NAME                     _gpio
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _GPIO
 
 #ifndef VSF_GPIO_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_GPIO_CFG_API_DECLARATION_PREFIX when using vsf_template_gpio.h"

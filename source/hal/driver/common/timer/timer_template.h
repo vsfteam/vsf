@@ -21,8 +21,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     timer
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              TIMER
+#define __VSF_HAL_TEMPLATE_NAME                     _timer
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _TIMER
 
 #ifndef VSF_TIMER_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_TIMER_CFG_API_DECLARATION_PREFIX when using vsf_template_timer.h"

@@ -119,8 +119,8 @@ pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     pwm
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              PWM
+#define __VSF_HAL_TEMPLATE_NAME                     _pwm
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _PWM
 
 #ifndef VSF_PWM_CFG_PREFIX
 #   error "Please define VSF_PWM_CFG_PREFIX in pwm driver"

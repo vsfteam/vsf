@@ -21,8 +21,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     usart
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              USART
+#define __VSF_HAL_TEMPLATE_NAME                     _usart
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _USART
 
 #ifndef VSF_USART_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_USART_CFG_API_DECLARATION_PREFIX when using vsf_template_usart.h"

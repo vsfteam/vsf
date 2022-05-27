@@ -21,9 +21,9 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     rng
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              RNG
-#define __VSF_HAL_TEMPLATE_APIS                     VSF_RNG_APIS
+
+#define __VSF_HAL_TEMPLATE_NAME                     _rng
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RNG
 
 #ifndef VSF_RNG_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_RNG_CFG_API_DECLARATION_PREFIX when using vsf_template_rng.h"

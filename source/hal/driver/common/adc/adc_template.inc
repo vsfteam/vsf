@@ -39,8 +39,8 @@ adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     adc
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              ADC
+#define __VSF_HAL_TEMPLATE_NAME                     _adc
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _ADC
 
 #ifndef VSF_ADC_CFG_PREFIX
 #   error "Please define VSF_ADC_CFG_PREFIX in adc driver"

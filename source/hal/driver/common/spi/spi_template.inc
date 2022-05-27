@@ -47,8 +47,8 @@ spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     spi
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              SPI
+#define __VSF_HAL_TEMPLATE_NAME                     _spi
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _SPI
 
 #ifndef VSF_SPI_CFG_PREFIX
 #   error "Please define VSF_SPI_CFG_PREFIX in spi driver"

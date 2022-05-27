@@ -54,8 +54,8 @@ timer_capability_t vsf_real_timer_capability(vsf_real_timer_t *timer_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     timer
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              TIMER
+#define __VSF_HAL_TEMPLATE_NAME                     _timer
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _TIMER
 
 #ifndef VSF_TIMER_CFG_PREFIX
 #   error "Please define VSF_TIMER_CFG_PREFIX in timer driver"
