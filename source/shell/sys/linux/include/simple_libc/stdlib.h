@@ -61,7 +61,7 @@ void * calloc(size_t n, size_t size);
 void * memalign(size_t alignment, size_t size);
 
 // malloc_usable_size should be in malloc.h
-size_t malloc_usable_size(const void *p);
+size_t malloc_usable_size(void *p);
 
 #if VSF_LINUX_LIBC_USE_ENVIRON
 int putenv(char *string);

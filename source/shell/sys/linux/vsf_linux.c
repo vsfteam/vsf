@@ -1312,7 +1312,7 @@ exec_ret_t execvp(const char *file, char const * const * argv)
     return execvpe(file, argv, NULL);
 }
 
-exec_ret_t execv(const char *pathname, char const* const* argv)
+exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp)
 {
     char fullpath[MAX_PATH];
     int fd = __vsh_get_exe(fullpath, sizeof(fullpath), (char *)pathname, NULL);
@@ -1321,7 +1321,12 @@ exec_ret_t execv(const char *pathname, char const* const* argv)
     }
     close(fd);
 
-    return execvp(fullpath, argv);
+    return execvpe(fullpath, argv, envp);
+}
+
+exec_ret_t execv(const char *pathname, char const* const* argv)
+{
+    return execve(pathname, argv, NULL);
 }
 
 static exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)

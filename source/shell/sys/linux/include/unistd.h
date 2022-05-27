@@ -38,6 +38,7 @@ extern "C" {
 #define execl               VSF_LINUX_WRAPPER(execl)
 #define execlp              VSF_LINUX_WRAPPER(execlp)
 #define execv               VSF_LINUX_WRAPPER(execv)
+#define execve              VSF_LINUX_WRAPPER(execve)
 #define execvp              VSF_LINUX_WRAPPER(execvp)
 #define execvpe             VSF_LINUX_WRAPPER(execvpe)
 #define realpath            VSF_LINUX_WRAPPER(realpath)
@@ -133,6 +134,7 @@ pid_t getppid(void);
 exec_ret_t execl(const char *pathname, const char *arg, ...);
 exec_ret_t execlp(const char *file, const char *arg, ...);
 exec_ret_t execv(const char *pathname, char const * const * argv);
+exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp);
 exec_ret_t execvp(const char *file, char const * const * argv);
 exec_ret_t execvpe(const char *file, char const * const * argv, char const * const * envp);
 int daemon(int nochdir, int noclose);
