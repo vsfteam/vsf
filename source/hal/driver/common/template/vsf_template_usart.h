@@ -77,24 +77,49 @@ extern "C" {
 #   define VSF_USART_CFG_REQUEST_EMPTY_IMPL         DISABLED
 #endif
 
+#ifndef VSF_USART_CFG_REQUEST_API
+#   define VSF_USART_CFG_REQUEST_API                ENABLED
+#endif
+
+#ifndef VSF_USART_CFG_FIFO_API
+#   define VSF_USART_CFG_FIFO_API                   ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_USART_APIS(__prefix_name) \
+#define __VSF_USART_BASE_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, init,         VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, usart_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           usart, enable,       VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           usart, disable,      VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, usart_capability_t, usart, capability,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,               usart, irq_enable,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, em_usart_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,               usart, irq_disable,  VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, em_usart_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, usart_status_t,     usart, status,       VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast16_t,      usart, fifo_read,    VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast16_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast16_t,      usart, fifo_write,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast16_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, request_rx,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast32_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, request_tx,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast32_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cancel_rx,    VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cancel_tx,    VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, int_fast32_t,       usart, get_rx_count, VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, int_fast32_t,       usart, get_tx_count, VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, usart_status_t,     usart, status,       VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)
+
+#if VSF_USART_CFG_FIFO_API == ENABLED
+#   define __VSF_USART_FIFO_APIS(__prefix_name) \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast16_t,      usart, fifo_read,    VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast16_t count) \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast16_t,      usart, fifo_write,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+#else
+#   define __VSF_USART_FIFO_APIS(__prefix_name)
+#endif
+
+#if VSF_USART_CFG_REQUEST_API == ENABLED
+#   define __VSF_USART_REQUEST_APIS(__prefix_name) \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, request_rx,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast32_t count) \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, request_tx,   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast32_t count) \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cancel_rx,    VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cancel_tx,    VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, int_fast32_t,       usart, get_rx_count, VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, int_fast32_t,       usart, get_tx_count, VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)
+#else
+#   define __VSF_USART_REQUEST_APIS(__prefix_name)
+#endif
+
+#define VSF_USART_APIS(__prefix_name) \
+    __VSF_USART_BASE_APIS(__prefix_name) \
+    __VSF_USART_FIFO_APIS(__prefix_name) \
+    __VSF_USART_REQUEST_APIS(__prefix_name)
 
 /*============================ TYPES =========================================*/
 
