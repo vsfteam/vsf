@@ -46,9 +46,6 @@ struct vsf_linux_glibc_time_t {
     struct tm tm;
 } static __vsf_linux_glibc_time;
 
-static const char *__day_name[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-static const char *__mon_name[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -89,6 +86,9 @@ time_t time(time_t *t)
 #ifndef __WIN__
 size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm)
 {
+    static const char *__day_name[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    static const char *__mon_name[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+
     VSF_LINUX_ASSERT((str != NULL) && (format != NULL) && (tm != NULL) && (maxsize > 0));
     VSF_LINUX_ASSERT(tm->tm_wday >= 0 && tm->tm_wday < 7);
     VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);

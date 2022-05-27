@@ -551,7 +551,7 @@ void __vsf_linux_process_free_arg(vsf_linux_process_t *process)
     }
 }
 
-int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, char const * const * argv)
+int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, char * const * argv)
 {
     vsf_linux_process_arg_t *arg = &process->ctx.arg;
     arg->is_dyn_argv = true;
@@ -1282,7 +1282,7 @@ int daemon(int nochdir, int noclose)
     return 0;
 }
 
-exec_ret_t execvpe(const char *file, char const * const * argv, char const * const * envp)
+exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
 {
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
@@ -1307,7 +1307,7 @@ exec_ret_t execvpe(const char *file, char const * const * argv, char const * con
     return 0;
 }
 
-exec_ret_t execvp(const char *file, char const * const * argv)
+exec_ret_t execvp(const char *file, char * const * argv)
 {
     return execvpe(file, argv, NULL);
 }
@@ -1324,7 +1324,7 @@ exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp
     return execvpe(fullpath, argv, envp);
 }
 
-exec_ret_t execv(const char *pathname, char const* const* argv)
+exec_ret_t execv(const char *pathname, char * const * argv)
 {
     return execve(pathname, argv, NULL);
 }
@@ -1978,7 +1978,7 @@ int posix_spawnp(pid_t *pid, const char *file,
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     ctx->entry = entry;
     VSF_LINUX_ASSERT(argv != NULL);
-    __vsf_linux_process_parse_arg(process, (const char * const *)argv);
+    __vsf_linux_process_parse_arg(process, argv);
 
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     process->shell_process = cur_process->shell_process;

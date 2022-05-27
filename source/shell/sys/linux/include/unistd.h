@@ -133,10 +133,10 @@ pid_t getppid(void);
 #endif
 exec_ret_t execl(const char *pathname, const char *arg, ...);
 exec_ret_t execlp(const char *file, const char *arg, ...);
-exec_ret_t execv(const char *pathname, char const * const * argv);
+exec_ret_t execv(const char *pathname, char * const * argv);
 exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp);
-exec_ret_t execvp(const char *file, char const * const * argv);
-exec_ret_t execvpe(const char *file, char const * const * argv, char const * const * envp);
+exec_ret_t execvp(const char *file, char * const * argv);
+exec_ret_t execvpe(const char *file, char * const * argv, char * const * envp);
 int daemon(int nochdir, int noclose);
 
 pid_t fork(void);
