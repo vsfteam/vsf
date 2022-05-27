@@ -160,8 +160,8 @@ gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     gpio
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              GPIO
+#define __VSF_HAL_TEMPLATE_NAME                     _gpio
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _GPIO
 
 #ifndef VSF_GPIO_CFG_PREFIX
 #   error "Please define VSF_GPIO_CFG_PREFIX in gpio driver"

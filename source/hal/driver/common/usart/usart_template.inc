@@ -94,8 +94,8 @@ usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     usart
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              USART
+#define __VSF_HAL_TEMPLATE_NAME                     _usart
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _USART
 
 #ifndef VSF_USART_CFG_PREFIX
 #   error "Please define VSF_USART_CFG_PREFIX in usart driver"

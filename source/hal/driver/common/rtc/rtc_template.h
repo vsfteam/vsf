@@ -22,8 +22,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     rtc
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              RTC
+#define __VSF_HAL_TEMPLATE_NAME                     _rtc
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RTC
 
 #ifndef VSF_RTC_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_RTC_CFG_API_DECLARATION_PREFIX when using vsf_template_rtc.h"

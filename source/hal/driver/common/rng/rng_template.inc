@@ -43,8 +43,8 @@ rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     rng
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              RNG
+#define __VSF_HAL_TEMPLATE_NAME                     _rng
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RNG
 
 #ifndef VSF_RNG_CFG_PREFIX
 #   error "Please define VSF_RNG_CFG_PREFIX in rng driver"

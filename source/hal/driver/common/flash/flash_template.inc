@@ -44,8 +44,8 @@ flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     flash
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              FLASH
+#define __VSF_HAL_TEMPLATE_NAME                     _flash
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _FLASH
 
 #ifndef VSF_FLASH_CFG_PREFIX
 #   error "Please define VSF_FLASH_CFG_PREFIX in flash driver"

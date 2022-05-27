@@ -51,8 +51,8 @@ i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     i2c
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              I2C
+#define __VSF_HAL_TEMPLATE_NAME                     _i2c
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _I2C
 
 #ifndef VSF_I2C_CFG_PREFIX
 #   error "Please define VSF_I2C_CFG_PREFIX in i2c driver"

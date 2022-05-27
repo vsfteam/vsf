@@ -164,8 +164,8 @@ vsf_err_t vsf_real_rtc_set_second(vsf_real_rtc_t *rtc_ptr, time_t second, time_t
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     rtc
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              RTC
+#define __VSF_HAL_TEMPLATE_NAME                     _rtc
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RTC
 
 #ifndef VSF_RTC_CFG_PREFIX
 #   error "Please define VSF_RTC_CFG_PREFIX in rtc driver"

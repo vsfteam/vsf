@@ -21,8 +21,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     i2c
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              I2C
+#define __VSF_HAL_TEMPLATE_NAME                     _i2c
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _I2C
 
 #ifndef VSF_I2C_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_I2C_CFG_API_DECLARATION_PREFIX when using vsf_template_i2c.h"

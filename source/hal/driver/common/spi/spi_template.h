@@ -21,8 +21,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     spi
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              SPI
+#define __VSF_HAL_TEMPLATE_NAME                     _spi
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _SPI
 
 #ifndef VSF_SPI_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_SPI_CFG_API_DECLARATION_PREFIX when using vsf_template_spi.h"

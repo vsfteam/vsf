@@ -21,8 +21,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     adc
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              ADC
+#define __VSF_HAL_TEMPLATE_NAME                     _adc
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _ADC
 
 #ifndef VSF_ADC_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_ADC_CFG_API_DECLARATION_PREFIX when using vsf_template_adc.h"

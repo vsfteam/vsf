@@ -21,8 +21,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     flash
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              FLASH
+#define __VSF_HAL_TEMPLATE_NAME                     _flash
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _FLASH
 
 #ifndef VSF_FLASH_CFG_API_DECLARATION_PREFIX
 #   error "Please define VSF_FLASH_CFG_API_DECLARATION_PREFIX when using vsf_template_flash.h"
