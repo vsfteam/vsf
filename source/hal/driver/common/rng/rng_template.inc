@@ -15,7 +15,7 @@
  *                                                                           *
  ****************************************************************************/
 
-#if VSF_HAL_USE_PWM == ENABLED
+#if VSF_HAL_USE_RNG == ENABLED
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
@@ -56,4 +56,4 @@ rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
-#endif  /* VSF_HAL_USE_PWM */
+#endif  /* VSF_HAL_USE_RNG */
