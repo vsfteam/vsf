@@ -50,8 +50,6 @@ extern "C" {
 #       define VSF_USART_CFG_PREFIX           vsf_fifo2req
 #   elif defined(VSF_HW_USART_COUNT) && (VSF_HW_USART_COUNT != 0)
 #       define VSF_USART_CFG_PREFIX           vsf_hw
-#   else
-#       warning "Enable VSF_HAL_USE_USART support but no known implementation found"
 #   endif
 #endif
 

@@ -49,8 +49,6 @@ extern "C" {
 #       define VSF_RNG_CFG_PREFIX           vsf
 #   elif defined(VSF_HW_RNG_COUNT) && (VSF_HW_RNG_COUNT != 0)
 #       define VSF_RNG_CFG_PREFIX           vsf_hw
-#   else
-#       warning "Enable VSF_HAL_USE_RNG support but no known implementation found"
 #   endif
 #endif
 

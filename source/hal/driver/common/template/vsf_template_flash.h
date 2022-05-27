@@ -50,8 +50,6 @@ extern "C" {
 #       define VSF_FLASH_CFG_PREFIX               vsf
 #   elif defined(VSF_HW_FLASH_COUNT) && (VSF_HW_FLASH_COUNT != 0)
 #       define VSF_FLASH_CFG_PREFIX               vsf_hw
-#   else
-#       warning "Enable VSF_HAL_USE_FLASH support but no known implementation found"
 #   endif
 #endif
 

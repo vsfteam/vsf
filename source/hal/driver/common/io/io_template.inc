@@ -67,17 +67,6 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-#if VSF_GPIO_CFG_MULTI_CLASS == ENABLED && VSF_GPIO_CFG_IMPLEMENT_OP == ENABLED
-static const vsf_gpio_op_t __VSF_GPIO_OP_VAR = {
-
-#undef __VSF_HAL_TEMPLATE_API
-#define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_OP
-
-     VSF_GPIO_APIS(VSF_GPIO_CFG_INSTANCE_PREFIX)
-};
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ IMPLEMENTATION ================================*/
 

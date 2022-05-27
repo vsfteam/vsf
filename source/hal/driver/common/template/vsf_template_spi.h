@@ -49,8 +49,6 @@ extern "C" {
 #       define VSF_SPI_CFG_PREFIX           vsf
 #   elif defined(VSF_HW_SPI_COUNT) && (VSF_HW_SPI_COUNT != 0)
 #       define VSF_SPI_CFG_PREFIX           vsf_hw
-#   else
-#       warning "Enable VSF_HAL_USE_SPI support but no known implementation found"
 #   endif
 #endif
 

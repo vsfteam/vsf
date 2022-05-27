@@ -15,22 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
-
+#ifndef __HAL_DRIVER_INTERFACE_H__
+#define __HAL_DRIVER_INTERFACE_H__
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
 
-#ifndef __HAL_DRIVER_COMMON_H__
-#define __HAL_DRIVER_COMMON_H__
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "template/vsf_template.h"
-
-#include "i2c/multiplex_i2c.h"
-#include "usart/fifo2req_usart.h"
+#include "./vsf_template_adc.h"
+#include "./vsf_template_flash.h"
+#include "./vsf_template_i2c.h"
+#include "./vsf_template_io.h"
+#include "./vsf_template_pm.h"
+#include "./vsf_template_pwm.h"
+#include "./vsf_template_rng.h"
+#include "./vsf_template_rtc.h"
+#include "./vsf_template_spi.h"
+#include "./vsf_template_timer.h"
+#include "./vsf_template_usart.h"
+#include "./vsf_template_usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -39,9 +40,6 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#ifdef __cplusplus
-}
-#endif
 
-#endif
+#endif /* __HAL_DRIVER_INTERFACE_H__ */
 /* EOF */
