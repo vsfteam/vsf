@@ -107,13 +107,14 @@ static uint_fast16_t __vk_disp_win_keymod(void)
     if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_RWIN)) {
         keymod |= VSF_KM_RIGHT_GUI;
     }
-    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_NUMLOCK)) {
+
+    if (GetKeyState(VK_NUMLOCK) & 1) {
         keymod |= VSF_KM_NUMLOCK;
     }
-    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_CAPITAL)) {
+    if (GetKeyState(VK_CAPITAL) & 1) {
         keymod |= VSF_KM_CAPSLOCK;
     }
-    if (vsf_bitmap_get(&__vk_disp_wingdi.kb.state, VK_SCROLL)) {
+    if (GetKeyState(VK_SCROLL) & 1) {
         keymod |= VSF_KM_SCROLLLOCK;
     }
     return keymod;
