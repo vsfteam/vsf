@@ -56,7 +56,7 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_gpio_t {
-#if VSF_I2C_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_GPIO_CFG_IMPLEMENT_OP == ENABLED
     vsf_gpio_t vsf_gpio;
 #endif
 

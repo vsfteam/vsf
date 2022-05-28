@@ -17,7 +17,7 @@
 
 #define VSF_USART_CFG_PREFIX                vsf_hw
 #define VSF_USART_CFG_UPPERCASE_PREFIX      VSF_HW
-#define VSF_USART_CFG_REQUEST_EMPTY_IMPL    ENABELD
+#define VSF_USART_CFG_REQUEST_EMPTY_IMPL    ENABLED
 
 /*============================ INCLUDES ======================================*/
 
