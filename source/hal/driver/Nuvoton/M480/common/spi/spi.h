@@ -28,19 +28,7 @@
 #include "hal/driver/common/template/vsf_template_hal_driver.h"
 
 /*============================ MACROS ========================================*/
-#define SPI_CTL_MODE_MASK           (  SPI_CTL_SLAVE_Msk  | SPI_CTL_CLKPOL_Msk  \
-                                     | SPI_CTL_TXNEG_Msk  | SPI_CTL_RXNEG_Msk   \
-                                     | SPI_CTL_DWIDTH_Msk | SPI_CTL_HALFDPX_Msk \
-                                     | SPI_CTL_DATDIR_Msk | SPI_CTL_RXONLY_Msk )
-
-#define SPI_SSCTL_MASK              (  SPI_AUTO_SLAVE_SELECTION_ENABLE \
-                                     | SPI_SLAVE_SELECTION_ACTIVE_HIGH)
-
 #define SPI_SSCTL_POS               21
-
-#ifndef VSF_HAL_SPI_IMP_INTERFACE
-#   define VSF_HAL_SPI_IMP_INTERFACE        ENABLED
-#endif
 
 #define VSF_SPI_CFG_REIMPLEMENT_MODE            ENABLED
 #define VSF_SPI_CFG_REIMPLEMENT_STATUS          ENABLED
@@ -121,69 +109,22 @@ typedef enum em_spi_mode_t {
     SPI_SLAVE_SELECTION_ACTIVE_HIGH   = 1 << (SPI_SSCTL_SSACTPOL_Pos + SPI_SSCTL_POS),
 } em_spi_mode_t;
 
-typedef struct spi_status_t spi_status_t;
-
-/*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_spi.h"
-
-/*============================ TYPES =========================================*/
-
-struct spi_status_t {
+typedef struct spi_status_t {
     union {
         inherit(peripheral_status_t)
         uint32_t                value;
     };
-};
+} spi_status_t;
 
-typedef struct vsf_spi_dma_t {
-    uint8_t  channel;
-    uint8_t  per_index;
+/*============================ INCLUDES ======================================*/
 
-    void     *buffer;
-} vsf_spi_dma_t;
+#define VSF_SPI_CFG_API_DECLARATION_PREFIX          vsf_hw
+#define VSF_SPI_CFG_INSTANCE_DECLARATION_PREFIX     VSF_HW
+#include "hal/driver/common/template/vsf_template_spi.h"
 
-typedef struct vsf_spi_t {
-    SPI_T           *reg;
-    IRQn_Type       irq;
-
-    vsf_spi_isr_t   isr;
-    uint32_t        irq_mask;
-
-    uint32_t req_cnt;
-    uint32_t cur_cnt;
-
-    vsf_spi_dma_t tx_dma;
-    vsf_spi_dma_t rx_dma;
-} vsf_spi_t;
-
+/*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-
-#if SPI_MAX_PORT >= 0 && VSF_HAL_USE_SPI0 == ENABLED && (SPI_PORT_MASK & (1 << 0))
-extern vsf_spi_t vsf_spi0;
-#endif
-#if SPI_MAX_PORT >= 1 && VSF_HAL_USE_SPI1 == ENABLED && (SPI_PORT_MASK & (1 << 1))
-extern vsf_spi_t vsf_spi1;
-#endif
-#if SPI_MAX_PORT >= 2 && VSF_HAL_USE_SPI2 == ENABLED && (SPI_PORT_MASK & (1 << 2))
-extern vsf_spi_t vsf_spi2;
-#endif
-#if SPI_MAX_PORT >= 3 && VSF_HAL_USE_SPI3 == ENABLED && (SPI_PORT_MASK & (1 << 3))
-extern vsf_spi_t vsf_spi3;
-#endif
-#if SPI_MAX_PORT >= 4 && VSF_HAL_USE_SPI4 == ENABLED && (SPI_PORT_MASK & (1 << 4))
-extern vsf_spi_t vsf_spi4;
-#endif
-#if SPI_MAX_PORT >= 5 && VSF_HAL_USE_SPI5 == ENABLED && (SPI_PORT_MASK & (1 << 5))
-extern vsf_spi_t vsf_spi5;
-#endif
-#if SPI_MAX_PORT >= 6 && VSF_HAL_USE_SPI6 == ENABLED && (SPI_PORT_MASK & (1 << 6))
-extern vsf_spi_t vsf_spi6;
-#endif
-#if SPI_MAX_PORT >= 7 && VSF_HAL_USE_SPI7 == ENABLED && (SPI_PORT_MASK & (1 << 7))
-extern vsf_spi_t vsf_spi7;
-#endif
 
 #endif
 #endif

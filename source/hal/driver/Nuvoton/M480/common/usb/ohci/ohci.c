@@ -30,7 +30,7 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
 {
     const m480_ohci_const_t *hc_cfg = hc->param;
     bool state = m480_reg_unlock();
-        vsf_pm_sclk_enable(hc_cfg->sclk);
+        vsf_hw_pm_sclk_enable(hc_cfg->sclk);
         do {
 //            uint_fast32_t clk = vsf_pm_pll_get_clk_out(PLL0_idx);
             // TODO: remove later
@@ -39,7 +39,7 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
                 .clk_src    = (pm_clk_src_sel_t)0,
                 .div        = clk / (48 * 1000 * 1000) - 1,
             };
-            vsf_pm_peripheral_config(hc_cfg->pclk, &cfg);
+            vsf_hw_pm_peripheral_config(hc_cfg->pclk, &cfg);
         } while (0);
 
         CLK->APBCLK0 |= CLK_APBCLK0_USBDCKEN_Msk | CLK_APBCLK0_OTGCKEN_Msk;

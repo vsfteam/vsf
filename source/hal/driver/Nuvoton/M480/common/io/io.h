@@ -22,107 +22,17 @@
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
 
+#if VSF_HAL_USE_IO == ENABLED
+
 /*============================ MACROS ========================================*/
 
 #define VSF_IO_REIMPLEMENT_FEATURE          ENABLED
-#define VSF_IO_REIMPLEMENT_PORT_NO          ENABLED
-#define VSF_IO_REIMPLEMENT_PIN_MSK          ENABLED
-#define VSF_IO_REIMPLEMENT_PIN_NUNBER       ENABLED
-
-#define __IO_PINA_NUM(__N, __OFFSET)        PA##__N = (__OFFSET) + (__N),       \
-                                            PA##__N##_idx = (__OFFSET) + (__N),
-#define __IO_PINB_NUM(__N, __OFFSET)        PB##__N = (__OFFSET) + (__N),       \
-                                            PB##__N##_idx = (__OFFSET) + (__N),
-#define __IO_PINC_NUM(__N, __OFFSET)        PC##__N = (__OFFSET) + (__N),       \
-                                            PC##__N##_idx = (__OFFSET) + (__N),
-#define __IO_PIND_NUM(__N, __OFFSET)        PD##__N = (__OFFSET) + (__N),       \
-                                            PD##__N##_idx = (__OFFSET) + (__N),
-
-#define __IO_PINA_MSK(__N, __OFFSET)        PA##__N##_msk = (1ul<<(__N)),
-#define __IO_PINB_MSK(__N, __OFFSET)        PB##__N##_msk = (1ul<<(__N)),
-#define __IO_PINC_MSK(__N, __OFFSET)        PC##__N##_msk = (1ul<<(__N)),
-#define __IO_PIND_MSK(__N, __OFFSET)        PD##__N##_msk = (1ul<<(__N)),
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct gpio_reg_t {
-    volatile uint32_t : 32;
-    volatile uint32_t : 32;
-    volatile uint32_t OUT;
-    volatile uint32_t : 32;
-    volatile uint32_t IN;
-    volatile uint32_t : 32;
-    volatile uint32_t : 32;
-    volatile uint32_t : 32;
-    volatile uint32_t : 32;
-    volatile uint32_t : 32;
-    volatile uint32_t : 32;
-    volatile uint32_t : 32;
-    volatile uint32_t : 32;
-};
-
-struct vsf_gpio_t {
-    GPIO_T *reg;
-};
-
-//! \name PIN name
-//! @{
-typedef enum io_pin_no_t {
-#if defined(PIO_PORTA)
-    VSF_MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_NUM, 0)
-#endif
-#if defined(PIO_PORTB)
-    VSF_MREPEAT(PIO_PORTB_PIN_NUM, __IO_PINB_NUM, 16)
-#endif
-#if defined(PIO_PORTC)
-    VSF_MREPEAT(PIO_PORTC_PIN_NUM, __IO_PINC_NUM, 32)
-#endif
-#if defined(PIO_PORTD)
-    VSF_MREPEAT(PIO_PORTD_PIN_NUM, __IO_PIND_NUM, 48)
-#endif
-} io_pin_no_t;
-//! @}
-
-//! \name PIN name
-//! @{
-typedef enum io_pin_msk_t{
-#if defined(PIO_PORTA)
-    VSF_MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_MSK, 0)
-#endif
-#if defined(PIO_PORTB)
-    VSF_MREPEAT(PIO_PORTB_PIN_NUM, __IO_PINB_MSK, 0)
-#endif
-#if defined(PIO_PORTC)
-    VSF_MREPEAT(PIO_PORTC_PIN_NUM, __IO_PINC_MSK, 0)
-#endif
-#if defined(PIO_PORTD)
-    VSF_MREPEAT(PIO_PORTD_PIN_NUM, __IO_PIND_MSK, 0)
-#endif
-} io_pin_msk_t;
-//! @}
-
-//! \name port name
-//! @{
-typedef enum io_port_no_t{
-#if defined(PIO_PORTA)
-    PORTA, PORTA_idx = PORTA,
-#endif
-#if defined(PIO_PORTB)
-    PORTB, PORTB_idx = PORTB,
-#endif
-#if defined(PIO_PORTC)
-    PORTC, PORTC_idx = PORTC,
-#endif
-#if defined(PIO_PORTD)
-    PORTD, PORTD_idx = PORTD,
-#endif
-} io_port_no_t;
-//! @}
-
-//! \name IO model
-//! @{
-typedef enum io_model_t {
+//! IO model
+typedef enum io_feature_t {
     IO_ANALOG_INPUT         = 0x00,
     IO_INPUT_FLOAT          = 0x00,
     IO_INPUT_PU             = 0x10,
@@ -162,16 +72,18 @@ typedef enum io_model_t {
     IO_HIGH_DRIVE           = (1<<9),           //!< enable high drive strength
     IO_HIGH_DRIVE_STRENGTH  = (1<<9),           //!< enable high drive strength
 */
-} io_model_t;
-//! @}
+} io_feature_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/template/vsf_template_io.h"
+#define VSF_GPIO_CFG_API_DECLARATION_PREFIX         vsf_hw
+#define VSF_GPIO_CFG_INSTANCE_DECLARATION_PREFIX    VSF_HW
+#include "hal/driver/common/io/io_template.h"
 
 /*============================ PROTOTYPES ====================================*/
 
-#endif
+#endif /* VSF_HAL_USE_IO == ENABLED */
+#endif /* __HAL_DRIVER_NUVOTON_M480_IO_H__ */
 /* EOF */
