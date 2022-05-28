@@ -30,29 +30,29 @@ const i_usb_dc_t VSF_USB_DC##__N = __USB_DC_INTERFACE_FUNC_DEF(__N, __VALUE);
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-VSF_MREPEAT(USB_HC_COUNT, __USB_HC_IP_FUNC_DEF, NULL)
-VSF_MREPEAT(USB_DC_COUNT, __USB_DC_FUNC_DEF, NULL)
+VSF_MREPEAT(VSF_HW_USB_HC_COUNT, __USB_HC_IP_FUNC_DEF, NULL)
+VSF_MREPEAT(VSF_HW_USB_DC_COUNT, __USB_DC_FUNC_DEF, NULL)
 
-#if USB_HC_COUNT > 0
-VSF_MREPEAT(USB_HC_OHCI_COUNT, __USB_HC_INTERFACE_DEF, NULL)
+#if VSF_HW_USB_HC_COUNT > 0
+VSF_MREPEAT(VSF_HW_USB_HC_OHCI_COUNT, __USB_HC_INTERFACE_DEF, NULL)
 #endif
 
-#if USB_DC_COUNT > 0
-VSF_MREPEAT(USB_DC_COUNT, __USB_DC_INTERFACE_DEF, NULL)
+#if VSF_HW_USB_DC_COUNT > 0
+VSF_MREPEAT(VSF_HW_USB_DC_COUNT, __USB_DC_INTERFACE_DEF, NULL)
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if USB_HC_OHCI_COUNT > 0
-VSF_MREPEAT(USB_HC_COUNT, __USB_HC_IP_BODY, m480_ohci)
+#if VSF_HW_USB_HC_OHCI_COUNT > 0
+VSF_MREPEAT(VSF_HW_USB_HC_COUNT, __USB_HC_IP_BODY, m480_ohci)
 #endif
 
-#if USB_DC_HS_COUNT > 0
-VSF_MREPEAT(USB_DC_HS_COUNT, __USB_DC_BODY, m480_usbd_hs)
+#if VSF_HW_USB_DC_HS_COUNT > 0
+VSF_MREPEAT(VSF_HW_USB_DC_HS_COUNT, __USB_DC_BODY, m480_usbd_hs)
 #endif
 
-#if USB_DC_FS_COUNT > 0
-VSF_MREPEAT(USB_DC_FS_COUNT, __USB_DC_BODY, m480_usbd_fs)
+#if VSF_HW_USB_DC_FS_COUNT > 0
+VSF_MREPEAT(VSF_HW_USB_DC_FS_COUNT, __USB_DC_BODY, m480_usbd_fs)
 #endif
