@@ -15,10 +15,7 @@
  *                                                                           *
  ****************************************************************************/
 
-//#ifdef VSF_CFG_USART_EN
 /*============================ INCLUDES ======================================*/
-
-#if VSF_HAL_USE_USART == ENABLED
 
 #ifndef __HAL_DRIVER_NUVOTON_M480_USART_H__
 #define __HAL_DRIVER_NUVOTON_M480_USART_H__
@@ -26,19 +23,13 @@
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
 
-//! include the infrastructure
-#include "../io/io.h"
-#include "../pm/pm.h"
+#if VSF_HAL_USE_USART == ENABLED
 
 /*============================ MACROS ========================================*/
 
 /* select from { HXT, LXT, PLL, HIRC} */
 #ifndef VSF_CFG_USART_CLOCK_SOURCE
-#   define VSF_CFG_USART_CLOCK_SOURCE                       HXT
-#endif
-
-#ifndef USART_MAX_PORT
-#   define USART_MAX_PORT                                   5
+#   define VSF_CFG_USART_CLOCK_SOURCE                           HXT
 #endif
 
 #define VSF_USART_CFG_REIMPLEMENT_MODE                          ENABLED
@@ -46,12 +37,6 @@
 #define VSF_USART_CFG_REIMPLEMENT_STATUS                        ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define __extern_m480_usart(__count, __dont_care)                           \
-    extern vsf_usart_t vsf_usart##__count;
-
-#define extern_m480_usart(__count)                                          \
-    VSF_MREPEAT(__count, __extern_m480_usart, __count)
 /*============================ TYPES =========================================*/
 
 typedef enum  em_usart_mode_t {
@@ -117,56 +102,27 @@ typedef enum em_usart_irq_mask_t {
                                      | USART_IRQ_MASK_ERROR    | USART_IRQ_MASK_RX_TIMEOUT,
 } em_usart_irq_mask_t;
 
-/*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_usart.h"
-
-/*============================ TYPES =========================================*/
-
-typedef struct m480_usart_t {
-    UART_T                          *usart;
-    IRQn_Type                       irq;
-    uint32_t                        module;
-    uint32_t                        clock_source;
-    uint32_t                        uartx_rst;
-} m480_usart_t;
-
-struct usart_status_t {
+typedef struct usart_status_t {
     uint8_t                         is_busy : 1;
     uint8_t                         rx_error_detected : 1;
     uint8_t                         tx_error_detected : 1;
     uint8_t                         rx_cancel : 1;
     uint8_t                         tx_cancel : 1;
     uint32_t                        more_status : 27;
-};
+} usart_status_t;
 
-typedef struct rx_tx_gpio_t {
-    struct {
-        vsf_gpio_t                  *reg;
-        uint32_t                    pin_mask;
-    }rx;
-    struct {
-        vsf_gpio_t                  *reg;
-        uint32_t                    pin_mask;
-    }tx;
-}rx_tx_gpio_t;
+/*============================ INCLUDES ======================================*/
 
-struct vsf_usart_t {
-    usart_status_t                  status;
-    uint8_t                         usart_port_num;
-    uint8_t                         *tx_buf;
-    uint8_t                         *rx_buf;
-    usart_cfg_t                     cfg;
-    rx_tx_gpio_t                    gpio_reg;
-    uint8_t                         is_enabled : 1;
-    const m480_usart_t              param;
-};
+#define VSF_USART_CFG_API_DECLARATION_PREFIX            vsf_hw
+#define VSF_USART_CFG_INSTANCE_DECLARATION_PREFIX       VSF_HW
+#include "hal/driver/common/template/vsf_template_usart.h"
+
+/*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
-extern_m480_usart(USART_MAX_PORT)
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#endif
-#endif
+#endif /* VSF_HAL_USE_USART == ENABLED */
+#endif /* __HAL_DRIVER_NUVOTON_M480_USART_H__ */
+/* EOF */

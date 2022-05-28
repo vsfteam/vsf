@@ -25,31 +25,44 @@
 
 /*============================ MACROS ========================================*/
 
-#if    (VSF_HAL_USE_SPI0 == DISABLED) && (VSF_HAL_USE_SPI0 == DISABLED) \
-    && (VSF_HAL_USE_SPI0 == DISABLED) && (VSF_HAL_USE_SPI0 == DISABLED)
-#   error "Please define at least one VSF_HAL_USE_SPIx"
-#endif
+#define SPI_CTL_MODE_MASK           (  SPI_CTL_SLAVE_Msk  | SPI_CTL_CLKPOL_Msk  \
+                                     | SPI_CTL_TXNEG_Msk  | SPI_CTL_RXNEG_Msk   \
+                                     | SPI_CTL_DWIDTH_Msk | SPI_CTL_HALFDPX_Msk \
+                                     | SPI_CTL_DATDIR_Msk | SPI_CTL_RXONLY_Msk )
+
+#define SPI_SSCTL_MASK              (  SPI_AUTO_SLAVE_SELECTION_ENABLE \
+                                     | SPI_SLAVE_SELECTION_ACTIVE_HIGH)
+
+
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define ____vsf_hw_spi_imp_lv0(__N, __DONT_CARE)                               \
-vsf_spi_t vsf_spi##__N = {                                                     \
-    .reg = SPI##__N,                                                           \
-    .irq = SPI##__N##_IRQn,                                                    \
-    .tx_dma = {                                                                \
-        .per_index = M484_DMA_SPI##__N##_TX,                                   \
-        .channel = SPI##__N##_DMA_TX_CHANNEL,                                  \
-    },                                                                         \
-    .rx_dma = {                                                                \
-        .per_index = M484_DMA_SPI##__N##_RX,                                   \
-        .channel = SPI##__N##_DMA_RX_CHANNEL,                                  \
-    },                                                                         \
-};
-
-#define __vsf_hw_spi_imp_lv0(__N, __DONT_CARE)                                 \
-            ____vsf_hw_spi_imp_lv0(__N, __DONT_CARE)
-
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_hw_spi_dma_t {
+    uint8_t  channel;
+    uint8_t  per_index;
+
+    void     *buffer;
+} vsf_hw_spi_dma_t;
+
+typedef struct vsf_hw_spi_t {
+#if VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
+    vsf_spi_t vsf_spi;
+#endif
+
+    SPI_T           *reg;
+    IRQn_Type       irq;
+
+    vsf_spi_isr_t   isr;
+    uint32_t        irq_mask;
+
+    uint32_t req_cnt;
+    uint32_t cur_cnt;
+
+    vsf_hw_spi_dma_t tx_dma;
+    vsf_hw_spi_dma_t rx_dma;
+} vsf_hw_spi_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -57,7 +70,7 @@ static volatile uint32_t __dummy;
 
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t __vsf_spi_dma_request(vsf_spi_t *spi_ptr);
+static vsf_err_t __vsf_hw_spi_dma_request(vsf_hw_spi_t *spi_ptr);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -65,7 +78,7 @@ static vsf_err_t __vsf_spi_dma_request(vsf_spi_t *spi_ptr);
 // TODO: test spi 9~32bit
 // TODO: spi request : test master input
 
-static void __vsf_spi_enable_clock(vsf_spi_t *spi_ptr)
+static void __vsf_hw_spi_enable_clock(vsf_hw_spi_t *spi_ptr)
 {
     // PCLK0 and PCLK1 all are 96MHz, and SPI only up to 96MHz.
     // So force spi using PCLK0(SPI0/SPI2/SPI4)/PCLK1(SP1/SP3)
@@ -113,7 +126,7 @@ static void __vsf_spi_enable_clock(vsf_spi_t *spi_ptr)
     m480_reg_lock(state);
 }
 
-static uint32_t __vsf_spi_get_clock(vsf_spi_t *spi_ptr)
+static uint32_t __vsf_hw_spi_get_clock(vsf_hw_spi_t *spi_ptr)
 {
     // spi clock select
     if (spi_ptr->reg == SPI0) {
@@ -129,7 +142,7 @@ static uint32_t __vsf_spi_get_clock(vsf_spi_t *spi_ptr)
     }
 }
 
-static void __vsf_spi_init_nvic(vsf_spi_t *spi_ptr, const vsf_spi_isr_t* cfg_isr_ptr)
+static void __vsf_hw_spi_init_nvic(vsf_hw_spi_t *spi_ptr, const vsf_spi_isr_t* cfg_isr_ptr)
 {
     if (cfg_isr_ptr->handler_fn != NULL) {
         spi_ptr->isr = *cfg_isr_ptr;
@@ -140,7 +153,7 @@ static void __vsf_spi_init_nvic(vsf_spi_t *spi_ptr, const vsf_spi_isr_t* cfg_isr
     }
 }
 
-static uint8_t __vsf_spi_get_data_width(vsf_spi_t *spi_ptr)
+static uint8_t __vsf_hw_spi_get_data_width(vsf_hw_spi_t *spi_ptr)
 {
     uint8_t data_width = (spi_ptr->reg->CTL & SPI_CTL_DWIDTH_Msk) >> SPI_CTL_DWIDTH_Pos;
     if (data_width == 0) {
@@ -149,13 +162,13 @@ static uint8_t __vsf_spi_get_data_width(vsf_spi_t *spi_ptr)
     return data_width;
 }
 
-static uint8_t __vsf_spi_get_data_byte_cnt(vsf_spi_t *spi_ptr)
+static uint8_t __vsf_hw_spi_get_data_byte_cnt(vsf_hw_spi_t *spi_ptr)
 {
-    uint8_t data_width = __vsf_spi_get_data_width(spi_ptr);
+    uint8_t data_width = __vsf_hw_spi_get_data_width(spi_ptr);
     return (data_width + 7) / 8;
 }
 
-static vsf_err_t __vsf_spi_reg_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
+static vsf_err_t __vsf_hw_spi_reg_init(vsf_hw_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
 {
     uint32_t clock_source;
     SPI_T* reg;
@@ -167,7 +180,7 @@ static vsf_err_t __vsf_spi_reg_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(reg != NULL);
 
     // TODO: use pm module
-    clock_source = __vsf_spi_get_clock(spi_ptr);
+    clock_source = __vsf_hw_spi_get_clock(spi_ptr);
     VSF_HAL_ASSERT(clock_source > 0);
     VSF_HAL_ASSERT(cfg_ptr->clock_hz > 0);
     VSF_HAL_ASSERT(cfg_ptr->clock_hz <= clock_source);
@@ -184,7 +197,7 @@ static vsf_err_t __vsf_spi_reg_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
 {
     vsf_err_t result;
 
@@ -192,12 +205,12 @@ vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(cfg_ptr != NULL);
 
     // TODO: use pm module to enable sync clock
-    __vsf_spi_enable_clock(spi_ptr);
+    __vsf_hw_spi_enable_clock(spi_ptr);
 
     // spi init
-    result = __vsf_spi_reg_init(spi_ptr, cfg_ptr);
+    result = __vsf_hw_spi_reg_init(spi_ptr, cfg_ptr);
     if (VSF_ERR_NONE == result) {
-        __vsf_spi_init_nvic(spi_ptr, &cfg_ptr->isr);
+        __vsf_hw_spi_init_nvic(spi_ptr, &cfg_ptr->isr);
     }
 
     m484_dma_cfg_t cfg = {
@@ -208,7 +221,7 @@ vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
     return result;
 }
 
-fsm_rt_t vsf_spi_enable(vsf_spi_t *spi_ptr)
+fsm_rt_t vsf_hw_spi_enable(vsf_hw_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -217,7 +230,7 @@ fsm_rt_t vsf_spi_enable(vsf_spi_t *spi_ptr)
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_spi_disable(vsf_spi_t *spi_ptr)
+fsm_rt_t vsf_hw_spi_disable(vsf_hw_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -226,7 +239,7 @@ fsm_rt_t vsf_spi_disable(vsf_spi_t *spi_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_spi_irq_enable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_hw_spi_irq_enable(vsf_hw_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -235,7 +248,7 @@ void vsf_spi_irq_enable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
     spi_ptr->irq_mask |= irq_mask;
 }
 
-void vsf_spi_irq_disable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_hw_spi_irq_disable(vsf_hw_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -244,7 +257,7 @@ void vsf_spi_irq_disable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
     spi_ptr->irq_mask &= ~irq_mask;
 }
 
-spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
+spi_status_t vsf_hw_spi_status(vsf_hw_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -256,7 +269,7 @@ spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
     return status;
 }
 
-void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
+void vsf_hw_spi_fifo_transfer(vsf_hw_spi_t *spi_ptr, void *out_buffer_ptr,
                                                uint_fast32_t  out_cnt,
                                                uint_fast32_t* out_offset_ptr,
                                                void *in_buffer_ptr,
@@ -270,7 +283,7 @@ void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
         VSF_HAL_ASSERT(0);
     }
 
-    uint8_t data_width = __vsf_spi_get_data_width(spi_ptr);
+    uint8_t data_width = __vsf_hw_spi_get_data_width(spi_ptr);
     uint32_t widty_bytes;
     uint32_t value = 0;
     if (data_width == 8) {
@@ -310,7 +323,7 @@ void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
     }
 }
 
-void vsf_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
+void vsf_hw_spi_cs_active(vsf_hw_spi_t *spi_ptr, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -321,7 +334,7 @@ void vsf_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
     }
 }
 
-void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
+void vsf_hw_spi_cs_inactive(vsf_hw_spi_t *spi_ptr, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -334,29 +347,29 @@ void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
 
 static void __m484_spi_tx_dma_done_handler(void *target_ptr, uint32_t dma_irq_mask)
 {
-    vsf_spi_t *spi_ptr = (vsf_spi_t *)target_ptr;
+    vsf_hw_spi_t *spi_ptr = (vsf_hw_spi_t *)target_ptr;
 
     if (spi_ptr->isr.handler_fn != NULL && (spi_ptr->irq_mask & SPI_IRQ_MASK_TX_CPL)) {
-        spi_ptr->isr.handler_fn(spi_ptr->isr.target_ptr, spi_ptr, SPI_IRQ_MASK_TX_CPL);
+        spi_ptr->isr.handler_fn(spi_ptr->isr.target_ptr, (vsf_spi_t *)spi_ptr, SPI_IRQ_MASK_TX_CPL);
     }
 }
 
 static void __m484_spi_rx_dma_done_handler(void *target_ptr, uint32_t dma_irq_mask)
 {
-    vsf_spi_t *spi_ptr = (vsf_spi_t *)target_ptr;
+    vsf_hw_spi_t *spi_ptr = (vsf_hw_spi_t *)target_ptr;
 
     spi_ptr->cur_cnt += M484_DMA_REQUEST_MAX_SIZE;
     if (spi_ptr->cur_cnt < spi_ptr->req_cnt) {
-        __vsf_spi_dma_request(spi_ptr);
+        __vsf_hw_spi_dma_request(spi_ptr);
         return ;
     }
 
     if (spi_ptr->isr.handler_fn != NULL && (spi_ptr->irq_mask & SPI_IRQ_MASK_CPL)) {
-        spi_ptr->isr.handler_fn(spi_ptr->isr.target_ptr, spi_ptr, SPI_IRQ_MASK_CPL);
+        spi_ptr->isr.handler_fn(spi_ptr->isr.target_ptr, (vsf_spi_t *)spi_ptr, SPI_IRQ_MASK_CPL);
     }
 }
 
-static vsf_err_t __vsf_spi_dma_request(vsf_spi_t *spi_ptr)
+static vsf_err_t __vsf_hw_spi_dma_request(vsf_hw_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -365,7 +378,7 @@ static vsf_err_t __vsf_spi_dma_request(vsf_spi_t *spi_ptr)
     uint32_t widty_bytes;
     uint32_t inc_mode;
 
-    uint8_t data_width = __vsf_spi_get_data_width(spi_ptr);
+    uint8_t data_width = __vsf_hw_spi_get_data_width(spi_ptr);
     if (data_width == 8) {
         width_mode = M484_DMA_TRANSFER_WIDTH_8_BIT;
         widty_bytes = 1;
@@ -378,8 +391,8 @@ static vsf_err_t __vsf_spi_dma_request(vsf_spi_t *spi_ptr)
     }
 
     uint_fast32_t current_size = vsf_min(spi_ptr->req_cnt, M484_DMA_REQUEST_MAX_SIZE);
-    vsf_spi_dma_t *tx_dma = &spi_ptr->tx_dma;
-    vsf_spi_dma_t *rx_dma = &spi_ptr->rx_dma;
+    vsf_hw_spi_dma_t *tx_dma = &spi_ptr->tx_dma;
+    vsf_hw_spi_dma_t *rx_dma = &spi_ptr->rx_dma;
 
     if (rx_dma->buffer != &__dummy) {
         rx_dma->buffer = ((uint8_t *)rx_dma->buffer) + spi_ptr->cur_cnt * widty_bytes;
@@ -432,7 +445,7 @@ static vsf_err_t __vsf_spi_dma_request(vsf_spi_t *spi_ptr)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count)
+vsf_err_t vsf_hw_spi_request_transfer(vsf_hw_spi_t *spi_ptr, void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count)
 {
     uint32_t fifo_count = (spi_ptr->reg->STATUS & SPI_STATUS_RXCNT_Msk) >> SPI_STATUS_RXCNT_Pos;
     (void)fifo_count;
@@ -443,44 +456,40 @@ vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr, voi
     spi_ptr->tx_dma.buffer = (out_buffer_ptr == NULL) ? (void *)&__dummy : out_buffer_ptr;
     spi_ptr->rx_dma.buffer = (in_buffer_ptr == NULL) ? (void *)&__dummy : in_buffer_ptr;
 
-    __vsf_spi_dma_request(spi_ptr);
+    __vsf_hw_spi_dma_request(spi_ptr);
 
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_spi_cancel_transfer(vsf_spi_t *spi_ptr)
+vsf_err_t vsf_hw_spi_cancel_transfer(vsf_hw_spi_t *spi_ptr)
 {
     return VSF_ERR_NOT_SUPPORT;
 }
 
-int_fast32_t vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr)
+int_fast32_t vsf_hw_spi_get_transfered_count(vsf_hw_spi_t *spi_ptr)
 {
     return 0;
 }
 
-#if SPI_MAX_PORT >= 0 && VSF_HAL_USE_SPI0 == ENABLED && (SPI_PORT_MASK & (1 << 0))
-__vsf_hw_spi_imp_lv0(0, NULL)
-#endif
-#if SPI_MAX_PORT >= 1 && VSF_HAL_USE_SPI1 == ENABLED && (SPI_PORT_MASK & (1 << 1))
-__vsf_hw_spi_imp_lv0(1, NULL)
-#endif
-#if SPI_MAX_PORT >= 2 && VSF_HAL_USE_SPI2 == ENABLED && (SPI_PORT_MASK & (1 << 2))
-__vsf_hw_spi_imp_lv0(2, NULL)
-#endif
-#if SPI_MAX_PORT >= 3 && VSF_HAL_USE_SPI3 == ENABLED && (SPI_PORT_MASK & (1 << 3))
-__vsf_hw_spi_imp_lv0(3, NULL)
-#endif
-#if SPI_MAX_PORT >= 4 && VSF_HAL_USE_SPI4 == ENABLED && (SPI_PORT_MASK & (1 << 4))
-__vsf_hw_spi_imp_lv0(4, NULL)
-#endif
-#if SPI_MAX_PORT >= 5 && VSF_HAL_USE_SPI5 == ENABLED && (SPI_PORT_MASK & (1 << 5))
-__vsf_hw_spi_imp_lv0(5, NULL)
-#endif
-#if SPI_MAX_PORT >= 6 && VSF_HAL_USE_SPI6 == ENABLED && (SPI_PORT_MASK & (1 << 6))
-__vsf_hw_spi_imp_lv0(6, NULL)
-#endif
-#if SPI_MAX_PORT >= 7 && VSF_HAL_USE_SPI7 == ENABLED && (SPI_PORT_MASK & (1 << 7))
-__vsf_hw_spi_imp_lv0(7, NULL)
-#endif
+/*============================ INCLUDES ======================================*/
+
+#define VSF_SPI_CFG_PREFIX                  vsf_hw
+#define VSF_SPI_CFG_UPPERCASE_PREFIX        VSF_HW
+
+#define VSF_SPI_CFG_IMP_LV0(__count, __hal_op)                                  \
+    vsf_hw_spi_t vsf_hw_spi ## __count = {                                      \
+        .reg = SPI ## __count,                                                  \
+        .irq = SPI ## __count##_IRQn,                                           \
+        .tx_dma = {                                                             \
+            .per_index = M484_DMA_SPI ## __count##_TX,                          \
+            .channel = VSF_HW_SPI ## __count##_DMA_TX_CHANNEL,                  \
+        },                                                                      \
+        .rx_dma = {                                                             \
+            .per_index = M484_DMA_SPI ## __count##_RX,                          \
+            .channel = VSF_HW_SPI ## __count##_DMA_RX_CHANNEL,                  \
+        },                                                                      \
+    };
+
+#include "hal/driver/common/spi/spi_template.inc"
 
 #endif

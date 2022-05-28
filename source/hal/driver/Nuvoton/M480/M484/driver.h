@@ -29,8 +29,8 @@
 #       include "./device.h"
 #       include "./interrupt_swi.h"
 #       include "../common/io/io.h"
-#       include "../common/usb/usb.h"
 #       include "../common/pm/pm.h"
+#       include "../common/usb/usb.h"
 #       include "../common/usart/usart.h"
 #       include "../common/spi/spi.h"
 
