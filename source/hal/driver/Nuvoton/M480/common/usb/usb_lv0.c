@@ -25,7 +25,7 @@
 #if VSF_USE_USB_HOST == ENABLED
 #define ____USB_HC_IMPLEMENT(__N, __TYPE)                                       \
 static const m480_##__TYPE##_const_t __USB_HC##__N##_const = {                  \
-    USB_HC##__N##_CONFIG                                                        \
+    VSF_HW_USB_HC##__N##_CONFIG                                                 \
 };                                                                              \
 m480_##__TYPE##_t USB_HC##__N##_IP = {                                          \
     .param = &__USB_HC##__N##_const,                                            \
@@ -37,7 +37,7 @@ ROOT ISR(USB_HC##__N##_IRQHandler)                                              
 #else
 #define ____USB_HC_IMPLEMENT(__N, __TYPE)                                       \
 static const m480_##__TYPE##_const_t __USB_HC##__N##_const = {                  \
-    USB_HC##__N##_CONFIG                                                        \
+    VSF_HW_USB_HC##__N##_CONFIG                                                 \
 };                                                                              \
 m480_##__TYPE##_t USB_HC##__N##_IP = {                                          \
     .param = &__USB_HC##__N##_const,                                            \
@@ -49,21 +49,21 @@ ISR(USB_HC##__N##_IRQHandler)                                                   
 #endif
 
 #define __USB_HC_IMPLEMENT(__N, __TYPE)     ____USB_HC_IMPLEMENT(__N, __TYPE)
-#define USB_HC_IMPLEMENT(__N, __VALUE)      __USB_HC_IMPLEMENT(__N, USB_HC##__N##_TYPE)
+#define USB_HC_IMPLEMENT(__N, __VALUE)      __USB_HC_IMPLEMENT(__N, VSF_HW_USB_HC##__N##_TYPE)
 
 
 
- 
+
 #ifdef M480_USBD_HS_WROKAROUND_ISO
 #   if VSF_USE_USB_DEVICE == ENABLED
 #   define __USB_DC_IMPLEMENT(__N, __TYPE)                                      \
-static uint16_t __USB_DC##__N##_tx_size[USB_DC##__N##_EP_NUM - 2];              \
-static uint8_t __USB_DC##__N##_tx_retry_cnt[USB_DC##__N##_EP_NUM - 2];          \
+static uint16_t __USB_DC##__N##_tx_size[VSF_HW_USB_DC##__N##_EP_NUM - 2];       \
+static uint8_t __USB_DC##__N##_tx_retry_cnt[VSF_HW_USB_DC##__N##_EP_NUM - 2];   \
 static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  \
     .tx_size = __USB_DC##__N##_tx_size,                                         \
     .tx_retry_cnt = __USB_DC##__N##_tx_retry_cnt,                               \
-    .ep_num = USB_DC##__N##_EP_NUM,                                             \
-    USB_DC##__N##_CONFIG                                                        \
+    .ep_num = VSF_HW_USB_DC##__N##_EP_NUM,                                      \
+    VSF_HW_USB_DC##__N##_CONFIG                                                 \
 };                                                                              \
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
@@ -74,13 +74,13 @@ ROOT ISR(USB_DC##__N##_IRQHandler)                                              
 }
 #   else
 #   define __USB_DC_IMPLEMENT(__N, __TYPE)                                      \
-static uint16_t __USB_DC##__N##_tx_size[USB_DC##__N##_EP_NUM - 2];              \
-static uint8_t __USB_DC##__N##_tx_retry_cnt[USB_DC##__N##_EP_NUM - 2];          \
+static uint16_t __USB_DC##__N##_tx_size[VSF_HW_USB_DC##__N##_EP_NUM - 2];       \
+static uint8_t __USB_DC##__N##_tx_retry_cnt[VSF_HW_USB_DC##__N##_EP_NUM - 2];   \
 static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  \
     .tx_size = __USB_DC##__N##_tx_size,                                         \
     .tx_retry_cnt = __USB_DC##__N##_tx_retry_cnt,                               \
-    .ep_num = USB_DC##__N##_EP_NUM,                                             \
-    USB_DC##__N##_CONFIG                                                        \
+    .ep_num = VSF_HW_USB_DC##__N##_EP_NUM,                                      \
+    VSF_HW_USB_DC##__N##_CONFIG                                                 \
 };                                                                              \
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
@@ -94,7 +94,7 @@ ISR(USB_DC##__N##_IRQHandler)                                                   
 #   if VSF_USE_USB_DEVICE == ENABLED
 #   define __USB_DC_IMPLEMENT(__N, __TYPE)                                      \
 static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  \
-    USB_DC##__N##_CONFIG                                                        \
+    VSF_HW_USB_DC##__N##_CONFIG                                                 \
 };                                                                              \
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
@@ -106,7 +106,7 @@ ROOT ISR(USB_DC##__N##_IRQHandler)                                              
 #   else
 #   define __USB_DC_IMPLEMENT(__N, __TYPE)                                      \
 static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  \
-    USB_DC##__N##_CONFIG                                                        \
+    VSF_HW_USB_DC##__N##_CONFIG                                                 \
 };                                                                              \
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
@@ -119,7 +119,7 @@ ISR(USB_DC##__N##_IRQHandler)                                                   
 #endif      // M480_USBD_HS_WROKAROUND_ISO
 
 #define _USB_DC_IMPLEMENT(__N, __TYPE)      __USB_DC_IMPLEMENT(__N, __TYPE)
-#define USB_DC_IMPLEMENT(__N, __VALUE)      _USB_DC_IMPLEMENT(__N, USB_DC##__N##_TYPE)
+#define USB_DC_IMPLEMENT(__N, __VALUE)      _USB_DC_IMPLEMENT(__N, VSF_HW_USB_DC##__N##_TYPE)
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -127,5 +127,5 @@ ISR(USB_DC##__N##_IRQHandler)                                                   
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-VSF_MREPEAT(USB_HC_COUNT, USB_HC_IMPLEMENT, NULL)
-VSF_MREPEAT(USB_DC_COUNT, USB_DC_IMPLEMENT, NULL)
+VSF_MREPEAT(VSF_HW_USB_HC_COUNT, USB_HC_IMPLEMENT, NULL)
+VSF_MREPEAT(VSF_HW_USB_HC_OHCI_COUNT, USB_DC_IMPLEMENT, NULL)
