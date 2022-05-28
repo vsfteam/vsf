@@ -225,7 +225,7 @@ typedef enum io_pin_no_t {
 #endif
 
 //! io configuration structure
-typedef struct io_cfg_t{
+typedef struct io_cfg_t {
     io_pin_no_t     pin_index;                  //!< pin index number
     uint16_t        function;                   //!< io Funcitons
     uint32_t        feature;                    //!< pin feature

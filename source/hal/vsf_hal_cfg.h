@@ -41,19 +41,16 @@ extern "C" {
 #endif
 #endif
 
+#ifndef VSF_HAL_USE_IO
+#   define VSF_HAL_USE_IO               ENABLED
+#endif
+
 #ifndef VSF_HAL_USE_GPIO
 #   define VSF_HAL_USE_GPIO             ENABLED
 #endif
+
 #ifndef VSF_HAL_USE_PM
 #   define VSF_HAL_USE_PM               ENABLED
-#endif
-
-#ifndef VSF_HAL_USE_DMA
-#   define VSF_HAL_USE_DMA              ENABLED
-#endif
-
-#ifndef VSF_HAL_USE_AD
-#   define VSF_HAL_USE_AD               ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_USART
@@ -64,24 +61,34 @@ extern "C" {
 #   define VSF_HAL_USE_SPI              ENABLED
 #endif
 
-#ifndef VSF_HAL_USE_IIC
-#   define VSF_HAL_USE_IIC              ENABLED
+#ifndef VSF_HAL_USE_I2C
+#   define VSF_HAL_USE_I2C              ENABLED
 #endif
+
+#ifndef VSF_HAL_USE_I2C_GPIO
+#   define VSF_HAL_USE_I2C_GPIO         ENABLED
+#endif
+
 #ifndef VSF_HAL_USE_TIMER
 #   define VSF_HAL_USE_TIMER            ENABLED
 #endif
+
 #ifndef VSF_HAL_USE_ADC
 #   define VSF_HAL_USE_ADC              ENABLED
 #endif
+
 #ifndef VSF_HAL_USE_DAC
 #   define VSF_HAL_USE_DAC              ENABLED
 #endif
+
 #ifndef VSF_HAL_USE_RTC
 #   define VSF_HAL_USE_RTC              ENABLED
 #endif
+
 #ifndef VSF_HAL_USE_USBD
 #   define VSF_HAL_USE_USBD             VSF_USE_USB_DEVICE
 #endif
+
 #ifndef VSF_HAL_USE_USBH
 #   define VSF_HAL_USE_USBH             VSF_USE_USB_HOST
 #endif
@@ -94,13 +101,6 @@ extern "C" {
 #   define VSF_HAL_USE_PWM              ENABLED
 #endif
 
-#ifndef VSF_HAL_USE_I2C
-#   define VSF_HAL_USE_I2C              ENABLED
-#endif
-
-#ifndef VSF_HAL_USE_I2C_GPIO
-#   define VSF_HAL_USE_I2C_GPIO         ENABLED
-#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
