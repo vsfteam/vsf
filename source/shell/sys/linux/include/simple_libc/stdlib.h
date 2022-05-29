@@ -39,17 +39,12 @@ extern "C" {
 #define mkostemps           VSF_LINUX_LIBC_WRAPPER(mkostemps)
 #define mkdtemp             VSF_LINUX_LIBC_WRAPPER(mkdtemp)
 #elif defined(__WIN__)
+// avoid conflicts with APIs in ucrt
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
 #define getenv              VSF_LINUX_LIBC_WRAPPER(getenv)
+// system("chcp 65001"); will be called in debug_stream driver, wrapper here
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
-
-#define malloc              VSF_LINUX_LIBC_WRAPPER(malloc)
-#define aligned_alloc       VSF_LINUX_LIBC_WRAPPER(aligned_alloc)
-#define realloc             VSF_LINUX_LIBC_WRAPPER(realloc)
-#define free                VSF_LINUX_LIBC_WRAPPER(free)
-#define calloc              VSF_LINUX_LIBC_WRAPPER(calloc)
-#define memalign            VSF_LINUX_LIBC_WRAPPER(memalign)
 #endif
 
 void * malloc(size_t size);

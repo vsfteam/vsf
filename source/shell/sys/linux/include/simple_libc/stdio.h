@@ -78,6 +78,7 @@ extern "C" {
 #define getline             VSF_LINUX_LIBC_WRAPPER(getline)
 #endif
 #elif defined(__WIN__)
+// avoid conflicts with APIs in ucrt
 #define fopen               VSF_LINUX_LIBC_WRAPPER(fopen)
 #define freopen             VSF_LINUX_LIBC_WRAPPER(freopen)
 #define fclose              VSF_LINUX_LIBC_WRAPPER(fclose)

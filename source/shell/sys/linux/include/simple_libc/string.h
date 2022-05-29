@@ -25,8 +25,6 @@ extern "C" {
 
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
 #define strdup              VSF_LINUX_LIBC_WRAPPER(strdup)
-#elif defined(__WIN__)
-#define strdup              VSF_LINUX_LIBC_WRAPPER(strdup)
 #endif
 
 void * memset(void *s, int ch, size_t n);
