@@ -16,6 +16,8 @@ extern "C" {
 #endif
 
 #define SOL_IP              IPPROTO_IP
+// ip options
+// refer: https://code.woboq.org/gtk/include/bits/in.h.html
 #define IP_TOS              1
 
 #define IPTOS_TOS_MASK      0x1E

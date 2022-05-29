@@ -137,20 +137,16 @@ enum {
     VSF_LINUX_SOCKET_IPPROTO_UDP        = 17,
 };
 #define VSF_LINUX_SOCKET_SOL_SOCKET     0xFFFF
-#define VSF_LINUX_SOCKET_SO_DEBUG       1
 #define VSF_LINUX_SOCKET_SO_REUSEADDR   2
-#define VSF_LINUX_SOCKET_SO_ACCEPTCONN  3
-#define VSF_LINUX_SOCKET_SO_KEEPALIVE   4
-#define VSF_LINUX_SOCKET_SO_BROADCAST   5
-#define VSF_LINUX_SOCKET_SO_TYPE        6
-#define VSF_LINUX_SOCKET_SO_ERROR       7
-#define VSF_LINUX_SOCKET_SO_SNDBUF      8
-#define VSF_LINUX_SOCKET_SO_RCVBUF      9
-#define VSF_LINUX_SOCKET_SO_RCVTIMEO    10
-#define VSF_LINUX_SOCKET_SO_SNDTIMEO    11
-#define VSF_LINUX_SOCKET_SO_NONBLOCK    12
+#define VSF_LINUX_SOCKET_SO_ERROR       4
+#define VSF_LINUX_SOCKET_SO_BROADCAST   6
+#define VSF_LINUX_SOCKET_SO_RCVBUF      8
+#define VSF_LINUX_SOCKET_SO_KEEPALIVE   9
 #define VSF_LINUX_SOCKET_SO_LINGER      13
-#define VSF_LINUX_SOCKET_SO_PRIORITY    14
+#define VSF_LINUX_SOCKET_SO_RCVTIMEO    20
+#define VSF_LINUX_SOCKET_SO_SNDTIMEO    21
+#define VSF_LINUX_SOCKET_SO_NONBLOCK    100
+
 typedef uint32_t socklen_t;
 typedef uint16_t vsf_linux_socket_sa_family_t;
 struct vsf_linux_socket_sockaddr {
@@ -177,8 +173,8 @@ struct vsf_linux_socket_sockaddr_in {
 };
 
 // from netinet/tcp.h
-#define VSF_LINUX_SOCKET_TCP_NODELAY    10
-#define VSF_LINUX_SOCKET_TCP_KEEPALIVE  15
+#define VSF_LINUX_SOCKET_TCP_NODELAY    1
+#define VSF_LINUX_SOCKET_TCP_KEEPALIVE  100
 
 // from vsf_linux_socket.h
 vsf_dcl_class(vsf_linux_socket_priv_t)

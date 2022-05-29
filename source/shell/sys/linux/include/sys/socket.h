@@ -15,21 +15,26 @@
 extern "C" {
 #endif
 
-// standard address families
-#define AF_UNSPEC       0
-#define AF_UNIX         1
-#define AF_INET         2
-#define AF_INET6        10
-#define AF_PACKET       17
-
 // protocol families
+// refer: https://code.woboq.org/gtk/include/bits/socket.h.html
 #define PF_UNSPEC       0
-#define PF_UNIX         AF_UNIX
-#define PF_INET         AF_INET
-#define PF_INET6        AF_INET6
-#define PF_PACKET       AF_PACKET
+#define PF_LOCAL        1
+#define PF_UNIX         PF_LOCAL
+#define PF_INET         2
+#define PF_INET6        10
+#define PF_PACKET       17
+
+// standard address families
+#define AF_UNSPEC       PF_UNSPEC
+#define AF_LOCAL        PF_LOCAL
+#define AF_UNIX         PF_UNIX
+#define AF_FILE         PF_FILE
+#define AF_INET         PF_INET
+#define AF_INET6        PF_INET6
+#define AF_PACKET       PF_PACKET
 
 // socket types
+// refer: https://code.woboq.org/gtk/include/bits/socket_type.h.html
 #define SOCK_STREAM	    1
 #define SOCK_DGRAM      2
 
@@ -90,20 +95,29 @@ struct linger {
 // level for sockopt
 #define SOL_SOCKET      0xFFFF
 // sock options
+// refer: https://code.woboq.org/gtk/include/asm-generic/socket.h.html
 #define SO_DEBUG        1
 #define SO_REUSEADDR    2
-#define SO_ACCEPTCONN   3
-#define SO_KEEPALIVE    4
-#define SO_BROADCAST    5
-#define SO_TYPE         6
-#define SO_ERROR        7
-#define SO_SNDBUF       8
-#define SO_RCVBUF       9
-#define SO_RCVTIMEO     10
-#define SO_SNDTIMEO     11
-#define SO_NONBLOCK     12
+#define SO_TYPE         3
+#define SO_ERROR        4
+#define SO_DONTROUTE    5
+#define SO_BROADCAST    6
+#define SO_SNDBUF       7
+#define SO_RCVBUF       8
+#define SO_KEEPALIVE    9
+#define SO_OOBINLINE    10
+#define SO_NO_CHECK     11
+#define SO_PRIORITY     12
 #define SO_LINGER       13
-#define SO_PRIORITY     14
+#define SO_BSDCOMPAT    14
+#define SO_REUSEPORT    15
+#define SO_PASSCRED     16
+#define SO_PEERCRED     17
+#define SO_RCVLOWAT     18
+#define SO_SNDLOWAT     19
+#define SO_RCVTIMEO     20
+#define SO_SNDTIMEO     21
+#define SO_NONBLOCK     100
 
 int setsockopt(int socket, int level, int optname, const void *optval,
                     socklen_t optlen);
