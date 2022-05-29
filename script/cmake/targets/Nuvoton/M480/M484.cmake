@@ -1,8 +1,6 @@
 set(VSF_HAL_CHIP_VENDOR     Nuvoton)
 set(VSF_HAL_CHIP_SERIES     M480)
 set(VSF_HAL_CHIP_NAME       M484)
-set(VSF_ARCH_SERIES         arm)
-set(VSF_ARCH_NAME           cortex-m4)
 
 set(VSF_TARGET_DEFINITIONS
     "__Nuvoton__"

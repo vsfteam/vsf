@@ -1,5 +1,6 @@
 # CMakeLists head
 
+set(ARCH_FOR_arm9                 armv5te         )
 set(ARCH_FOR_cortex-m0            armv6s-m        )
 set(ARCH_FOR_cortex-m0plus        armv6s-m        )
 set(ARCH_FOR_cortex-m3            armv7-m         )
@@ -11,6 +12,7 @@ set(ARCH_FOR_cortex-m33+nodsp     armv8-m.main    )
 set(ARCH_FOR_cortex-r4            armv7-r         )
 # TODO support cortex-a
 
+set(ARCH_SUB_FOR_arm9             arm9            )
 set(ARCH_SUB_FOR_cortex-m0        cortex-m        )
 set(ARCH_SUB_FOR_cortex-m0plus    cortex-m        )
 set(ARCH_SUB_FOR_cortex-m3        cortex-m        )
