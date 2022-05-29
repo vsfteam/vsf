@@ -148,7 +148,7 @@ typedef _Atomic(uintmax_t)          atomic_uintmax_t;
                     *(object) &= operand;                                       \
                     VSF_MACRO_SAFE_NAME(tmp) = *(object);                       \
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
-                VSF_MACRO_SAFE_NAME(tmp)                                        \
+                VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
 
 #ifdef __cplusplus
