@@ -21,17 +21,20 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
 
+#define __VSF_LINUX_CLASS_INHERIT__
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #define _GNU_SOURCE
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/sys/types.h"
+#   include "../../include/sys/wait.h"      // for waitpid
 #   include "../../include/simple_libc/stdio.h"
 #   include "../../include/errno.h"
 #   include "../../include/fcntl.h"
 #else
 #   include <unistd.h>
 #   include <sys/types.h>
+#   include <sys/wait.h>                    // for waitpid
 #   include <stdio.h>
 #   include <errno.h>
 #   include <fcntl.h>
@@ -669,14 +672,42 @@ void perror(const char *str)
 
 FILE * popen(const char *command, const char *type)
 {
-    VSF_LINUX_ASSERT(false);
-    return NULL;
+    if ((NULL == type) || ((type[0] != 'r') && (type[0] != 'w'))) {
+        return NULL;
+    }
+
+    extern vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out);
+    vsf_linux_process_t *process = NULL;
+    vsf_linux_fd_t *sfd;
+    int fd[2];
+    pipe(fd);
+
+    if (type[0] == 'w') {
+        process = __vsh_prepare_process((char *)command, fd[0], -1);
+        close(fd[0]);
+        sfd = vsf_linux_fd_get(fd[1]);
+    } else if (type[0] == 'r') {
+        process = __vsh_prepare_process((char *)command, -1, fd[1]);
+        close(fd[1]);
+        sfd = vsf_linux_fd_get(fd[0]);
+    }
+
+    if (NULL == process) {
+        close(sfd->fd);
+        return NULL;
+    }
+    sfd->binding.pid = process->id.pid;
+    vsf_linux_start_process(process);
+    return (FILE *)sfd;
 }
 
 int pclose(FILE *stream)
 {
-    VSF_LINUX_ASSERT(false);
-    return 0;
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)stream;
+    int result;
+    waitpid(sfd->binding.pid, &result, 0);
+    close(sfd->fd);
+    return result;
 }
 
 // TODO: implement tmpnam and tmpfile

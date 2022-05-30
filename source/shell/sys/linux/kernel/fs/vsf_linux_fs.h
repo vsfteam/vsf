@@ -86,6 +86,12 @@ vsf_class(vsf_linux_fd_t) {
     protected_member(
         int unget_buff;
         vsf_linux_fd_priv_t *priv;
+
+        // used while binding fd to something
+        //  eg: in popen, fd is binded with the target pid
+        union {
+            pid_t pid;
+        } binding;
     )
 };
 

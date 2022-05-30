@@ -334,7 +334,7 @@ static int __vsh_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry)
     return 0;
 }
 
-static vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
+vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
 {
     char *next;
     int ret;
