@@ -174,116 +174,23 @@ static void __vk_disp_sdl2_flush_thread(void *arg)
     }
 }
 
-static uint_fast16_t __vk_disp_sdl2_keycode_remap(SDL_Keycode keycode)
+static uint_fast16_t __vk_disp_sdl2_keycode_remap(SDL_Scancode scancode)
 {
-    switch (keycode) {
-    case SDLK_0:                return VSF_KB_0;
-    case SDLK_1:                return VSF_KB_1;
-    case SDLK_2:                return VSF_KB_2;
-    case SDLK_3:                return VSF_KB_3;
-    case SDLK_4:                return VSF_KB_4;
-    case SDLK_5:                return VSF_KB_5;
-    case SDLK_6:                return VSF_KB_6;
-    case SDLK_7:                return VSF_KB_7;
-    case SDLK_8:                return VSF_KB_8;
-    case SDLK_9:                return VSF_KB_9;
+    SDL_Keymod mod = SDL_GetModState();
+    bool is_upper = false;
 
-    case SDLK_a: case SDLK_b: case SDLK_c: case SDLK_d:
-    case SDLK_e: case SDLK_f: case SDLK_g: case SDLK_h:
-    case SDLK_i: case SDLK_j: case SDLK_k: case SDLK_l:
-    case SDLK_m: case SDLK_n: case SDLK_o: case SDLK_p:
-    case SDLK_q: case SDLK_r: case SDLK_s: case SDLK_t:
-    case SDLK_u: case SDLK_v: case SDLK_w: case SDLK_x:
-    case SDLK_y: case SDLK_z: {
-            bool is_shift = SDL_GetModState() & KMOD_SHIFT;
-            if ((SDL_GetModState() & KMOD_CAPS) != 0) {
-                return (is_shift ? VSF_KB_a : VSF_KB_A) + (keycode - SDLK_a);
-            } else {
-                return (is_shift ? VSF_KB_A : VSF_KB_a) + (keycode - SDLK_a);
-            }
-        }
-
-    case SDLK_F1:               return VSF_KB_F1;
-    case SDLK_F2:               return VSF_KB_F2;
-    case SDLK_F3:               return VSF_KB_F3;
-    case SDLK_F4:               return VSF_KB_F4;
-    case SDLK_F5:               return VSF_KB_F5;
-    case SDLK_F6:               return VSF_KB_F6;
-    case SDLK_F7:               return VSF_KB_F7;
-    case SDLK_F8:               return VSF_KB_F8;
-    case SDLK_F9:               return VSF_KB_F9;
-    case SDLK_F10:              return VSF_KB_F10;
-    case SDLK_F11:              return VSF_KB_F11;
-    case SDLK_F12:              return VSF_KB_F12;
-
-    case SDLK_CAPSLOCK:         return VSF_KB_CAPSLOCK;
-    case SDLK_RETURN:           return VSF_KB_ENTER;
-    case SDLK_ESCAPE:           return VSF_KB_ESCAPE;
-    case SDLK_BACKSPACE:        return VSF_KB_BACKSPACE;
-    case SDLK_TAB:              return VSF_KB_TAB;
-    case SDLK_SPACE:            return VSF_KB_SPACE;
-    case SDLK_EXCLAIM:          return VSF_KB_EXCLAM;
-    case SDLK_QUOTEDBL:         return VSF_KB_DOUBLE_QUOTE;
-    case SDLK_HASH:             return VSF_KB_POUND;
-    case SDLK_PERCENT:          return VSF_KB_PERCENT;
-    case SDLK_DOLLAR:           return VSF_KB_DOLLAR;
-    case SDLK_AMPERSAND:        return VSF_KB_AMPERSAND;
-    case SDLK_QUOTE:            return VSF_KB_SINGLE_QUOTE;
-    case SDLK_LEFTPAREN:        return VSF_KB_LEFT_PAREN;
-    case SDLK_RIGHTPAREN:       return VSF_KB_RIGHT_PAREN;
-    case SDLK_ASTERISK:         return VSF_KB_ASTERISK;
-    case SDLK_PLUS:             return VSF_KB_PLUS;
-    case SDLK_COMMA:            return VSF_KB_COMMA;
-    case SDLK_MINUS:            return VSF_KB_MINUS;
-    case SDLK_PERIOD:           return VSF_KB_DOT;
-    case SDLK_SLASH:            return VSF_KB_SLASH;
-    case SDLK_COLON:            return VSF_KB_COLON;
-    case SDLK_SEMICOLON:        return VSF_KB_SEMICOLON;
-    case SDLK_LESS:             return VSF_KB_LESS;
-    case SDLK_EQUALS:           return VSF_KB_EQUAL;
-    case SDLK_GREATER:          return VSF_KB_GREATER;
-    case SDLK_QUESTION:         return VSF_KB_QUESTION;
-    case SDLK_AT:               return VSF_KB_AT;
-    case SDLK_LEFTBRACKET:      return VSF_KB_LEFT_BRACKET;
-    case SDLK_BACKSLASH:        return VSF_KB_BACKSLASH;
-    case SDLK_RIGHTBRACKET:     return VSF_KB_RIGHT_BRACKET;
-    case SDLK_CARET:            return VSF_KB_CARET;
-    case SDLK_UNDERSCORE:       return VSF_KB_UNDERSCORE;
-    case SDLK_BACKQUOTE:        return VSF_KB_GRAVE;
-
-    case SDLK_PRINTSCREEN:      return VSF_KB_PRINT_SCREEN;
-    case SDLK_SCROLLLOCK:       return VSF_KB_SCROLL_LOCK;
-    case SDLK_PAUSE:            return VSF_KB_PAUSE;
-    case SDLK_INSERT:           return VSF_KB_INSERT;
-    case SDLK_HOME:             return VSF_KB_HOME;
-    case SDLK_PAGEUP:           return VSF_KB_PAGE_UP;
-    case SDLK_DELETE:           return VSF_KB_DELETE;
-    case SDLK_END:              return VSF_KB_END;
-    case SDLK_PAGEDOWN:         return VSF_KB_PAGE_DOWN;
-    case SDLK_RIGHT:            return VSF_KB_RIGHT;
-    case SDLK_LEFT:             return VSF_KB_LEFT;
-    case SDLK_DOWN:             return VSF_KB_DOWN;
-    case SDLK_UP:               return VSF_KB_UP;
-
-    case SDLK_NUMLOCKCLEAR:     return VSF_KP_NUMLOCK;
-    case SDLK_KP_DIVIDE:        return VSF_KP_DIVIDE;
-    case SDLK_KP_MULTIPLY:      return VSF_KP_MULTIPLY;
-    case SDLK_KP_MINUS:         return VSF_KP_MINUS;
-    case SDLK_KP_PLUS:          return VSF_KP_PLUS;
-    case SDLK_KP_ENTER:         return VSF_KP_ENTER;
-    case SDLK_KP_PERIOD:        return VSF_KP_DOT;
-    case SDLK_KP_1:             return VSF_KP_1;
-    case SDLK_KP_2:             return VSF_KP_2;
-    case SDLK_KP_3:             return VSF_KP_3;
-    case SDLK_KP_4:             return VSF_KP_4;
-    case SDLK_KP_5:             return VSF_KP_5;
-    case SDLK_KP_6:             return VSF_KP_6;
-    case SDLK_KP_7:             return VSF_KP_7;
-    case SDLK_KP_8:             return VSF_KP_8;
-    case SDLK_KP_9:             return VSF_KP_9;
-    case SDLK_KP_0:             return VSF_KP_0;
+    if (    (mod & VSF_KM_CAPSLOCK)
+        &&  ((scancode >= SDL_SCANCODE_A) && (scancode <= SDL_SCANCODE_Z))) {
+        is_upper = !is_upper;
+     }
+    if (    (mod & KMOD_CAPS)
+        &&  (   ((scancode >= SDL_SCANCODE_1) && (scancode <= SDL_SCANCODE_0))
+            ||  ((scancode >= SDL_SCANCODE_MINUS) && (scancode <= VSF_KB_SLASH))
+            ||  ((scancode >= SDL_SCANCODE_A) && (scancode <= SDL_SCANCODE_Z)))) {
+        is_upper = !is_upper;
     }
-    return 0;
+
+    return scancode | (is_upper ? VSF_KB_EXT : 0);
 }
 
 static uint_fast16_t __vk_disp_sdl2_keymod_remap(uint16_t keymod)
@@ -432,7 +339,7 @@ static void __vk_disp_sdl2_event_thread(void *arg)
                     is_to_update = true;
                     evt_type = VSF_INPUT_TYPE_KEYBOARD;
                     vsf_input_keyboard_set(&evt.keyboard_evt,
-                        __vk_disp_sdl2_keycode_remap(event.key.keysym.sym),
+                        __vk_disp_sdl2_keycode_remap(event.key.keysym.scancode),
                         SDL_KEYDOWN == event.type,
                         __vk_disp_sdl2_keymod_remap(event.key.keysym.mod));
                 }
