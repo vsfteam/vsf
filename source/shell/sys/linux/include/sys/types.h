@@ -69,7 +69,7 @@ typedef enum {
     CLOCK_REALTIME,
 } clockid_t;
 
-#define CLOCKS_PER_SEC      ((clock_t)1000)
+#define CLOCKS_PER_SEC      ((clock_t)1000000)
 #endif
 
 #if __IS_COMPILER_IAR__
