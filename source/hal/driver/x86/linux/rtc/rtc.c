@@ -27,7 +27,7 @@
 // for NO_INIT
 #include "utilities/vsf_utilities.h"
 
-#include <Windows.h>
+#include <sys/time.h>
 
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
@@ -77,18 +77,20 @@ vsf_err_t vsf_hw_rtc_set_second(vsf_hw_rtc_t *rtc_ptr, time_t second)
 vsf_err_t vsf_hw_rtc_get(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 {
     if (hw_rtc_ptr->is_enabled) {
-        SYSTEMTIME system_time;
-        GetLocalTime(&system_time);
+        struct timeval tv;
+        struct tm tm;
+        gettimeofday(&tv, NULL);
+        localtime_r(tv.tv_sec, &tm);
 
         if (rtc_tm != NULL) {
-            rtc_tm->tm_sec = system_time.wSecond;
-            rtc_tm->tm_min = system_time.wMinute;
-            rtc_tm->tm_hour = system_time.wHour;
-            rtc_tm->tm_mday = system_time.wDay;
-            rtc_tm->tm_wday = system_time.wDayOfWeek == 0 ? 7 : system_time.wDayOfWeek;
-            rtc_tm->tm_mon = system_time.wMonth;
-            rtc_tm->tm_year = system_time.wYear;
-            rtc_tm->tm_ms = system_time.wMilliseconds;
+            rtc_tm->tm_sec = tm.tm_sec;
+            rtc_tm->tm_min = tm.tm_min;
+            rtc_tm->tm_hour = tm.tm_hour;
+            rtc_tm->tm_mday = tm.tm_mday;
+            rtc_tm->tm_wday = tm.tm_wday;
+            rtc_tm->tm_mon = tm.tm_mon;
+            rtc_tm->tm_year = tm.tm_year;
+            rtc_tm->tm_ms = tv.tv_usec / 1000;
         }
         return VSF_ERR_NONE;
     }

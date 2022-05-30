@@ -28,6 +28,8 @@
 
 /*============================ MACROS ========================================*/
 
+#define VSF_HW_RTC_COUNT                        1
+
 #ifndef USART_MAX_PORT
 #   define USART_MAX_PORT                       1
 #endif
