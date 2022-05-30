@@ -31,6 +31,7 @@
 #include "service/vsf_service.h"
 
 #include "./device.h"
+#include "./rtc/rtc.h"
 
 #ifdef __cplusplus
 extern "C" {
