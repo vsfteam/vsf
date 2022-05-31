@@ -6,7 +6,7 @@
 
 [中文](README_zh.md) |
 
-Full name of VSF is "Versaloon Software Framework". VSF is an open-source software framework for embedded applications based on Apache2 license. VSF includes hal, a pre-emptive multi-thread kernel, many services and components. VSF is implemented by C language, and using object-oriented programming methods.
+Full name of VSF is "Versaloon Software Framework". VSF is an open-source software framework for embedded applications based on Apache2 license. VSF includes hal, a pre-emptive multi-thread kernel, services and components. VSF is implemented by C language with object-oriented programming methods(PLOOC).
 
 ## Overall Framework
 
@@ -33,24 +33,24 @@ Full name of VSF is "Versaloon Software Framework". VSF is an open-source softwa
 ## Kernel
 Pre-emptive kernel based on event-driven architecture, supporting mcs51, 8bit MCU, 32/64 bit ARM, riscv, x86, etc.
 
-- event-driven architecture, sleep if no event occured
+- event-driven architecture, sleep if no event occured, lower-power naturally
 - in pre-emptive mode, task switch is implemented by hardware swi(software interrupt), priority of task is the priority of the swi.
-- pre-emptive scheduling for different priority, collaborative scheduling for the same priority
-- can be run in other RTOS
+- pre-emptive scheduling for tasks with different priority, collaborative scheduling for tasks with the same priority
+- can run in other RTOS as a task, or as swi ISR
 - different tasks
   - event handler task -- minimum resources usage, 20 bytes ram usage for minimum configuration, 40 bytes ram usage for normal configuration
   - pt task
   - thread with dedicated stack -- depending on setjmp in libc
   - fsm task
   - other tasks in shell, eg pthread
-- IPC like semaphore, mutex, trigger, queue, etc
+- IPC: semaphore, mutex, trigger, queue, etc
 
 ## Components
 - Reasonable framework for code re-use
 - declarative development model
 - standard interface, standard port for 3rd-party components
 - software components
-  - distbus -- distribute bus framework
+  - distbus -- distributed bus framework
   - fifo
   - heap
   - json
@@ -91,15 +91,18 @@ Pre-emptive kernel based on event-driven architecture, supporting mcs51, 8bit MC
 ## Shell
 To use applications from other system, shell can be used.
 
-- SDL -- to use application code based on SDL
-- linux -- to use application code based on linux
+- SDL -- use applications based on SDL directly
+- linux -- use applications based on linux directly
   - posix
   - devfs
   - socket
   - console
-  - some libraries
+  - libraries
     - libusb
     - libgen
+    - libsdl2
+    - libcurl
+    - etc
 
 ## 3rd-party
 | Software          | Path                                                          | License    | Link                                           |
