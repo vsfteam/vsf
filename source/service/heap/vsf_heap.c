@@ -96,9 +96,6 @@ typedef struct vsf_heap_mcb_t {
     vsf_dlist_node_t list;
 } vsf_heap_mcb_t;
 
-// if compile error here, increase VSF_HEAP_CFG_MCB_ALIGN_BIT
-VSF_STATIC_ASSERT(VSF_HEAP_CFG_MCB_ALIGN >= sizeof(vsf_heap_mcb_t));
-
 #ifndef VSF_ARCH_PROVIDE_HEAP
 typedef struct vsf_default_heap_t {
     implement(vsf_heap_t)
@@ -275,20 +272,20 @@ static void * __vsf_heap_mcb_malloc(vsf_heap_t *heap, vsf_heap_mcb_t *mcb,
         vsf_heap_mcb_t *mcb_new;
         uint_fast32_t margin_size, temp_size;
 
-        __vsf_heap_mcb_remove_from_freelist(heap, mcb);
+        // IMPORTANT: DO NOT remove mcb and then add mcb if not suitable
+        //  this may cause dead loop
         mcb_new = __vsf_heap_get_mcb(buffer);
         margin_size = (uint8_t *)mcb_new - (uint8_t *)mcb;
 
         if (0 == margin_size) {
+            __vsf_heap_mcb_remove_from_freelist(heap, mcb);
             temp_size = mcb->linear.prev;
         } else if (margin_size <= sizeof(vsf_heap_mcb_t)) {
-            __vsf_heap_mcb_add_to_freelist(heap, mcb);
             unaligned_size = alignment;
             goto fix_alignment;
         } else {
             // split mcb
             temp_size = mcb->linear.next = margin_size >> VSF_HEAP_CFG_MCB_ALIGN_BIT;
-            __vsf_heap_mcb_add_to_freelist(heap, mcb);
         }
 
         __vsf_heap_mcb_init(mcb_new);
