@@ -46,6 +46,9 @@
 #   define VSF_HEAP_CFG_MCB_ALIGN_BIT       2
 #endif
 #define VSF_HEAP_CFG_MCB_ALIGN              (1 << VSF_HEAP_CFG_MCB_ALIGN_BIT)
+#ifndef VSF_HEAP_CFG_MCB_OFFSET_TYPE
+#   define VSF_HEAP_CFG_MCB_OFFSET_TYPE     uint16_t
+#endif
 
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
 #   define VSF_HEAP_MCB_MAGIC               0x1ea01ea0
@@ -86,12 +89,15 @@ typedef struct vsf_heap_mcb_t {
     uint32_t magic;
 #endif
     struct {
-        uint16_t next;
-        uint16_t prev;
+        VSF_HEAP_CFG_MCB_OFFSET_TYPE next;
+        VSF_HEAP_CFG_MCB_OFFSET_TYPE prev;
     } linear;
 
     vsf_dlist_node_t list;
 } vsf_heap_mcb_t;
+
+// if compile error here, increase VSF_HEAP_CFG_MCB_ALIGN_BIT
+VSF_STATIC_ASSERT(VSF_HEAP_CFG_MCB_ALIGN >= sizeof(vsf_heap_mcb_t));
 
 #ifndef VSF_ARCH_PROVIDE_HEAP
 typedef struct vsf_default_heap_t {
@@ -384,8 +390,11 @@ void __vsf_heap_add_buffer(vsf_heap_t *heap, uint8_t *buffer, uint_fast32_t size
     size = (size - unaligned_size) & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
     offset = (size - sizeof(vsf_heap_mcb_t))  & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
 
-    VSF_SERVICE_ASSERT(     !(size >> (VSF_HEAP_CFG_MCB_ALIGN_BIT + 16))
-                        &&  (size > 2 * sizeof(vsf_heap_mcb_t)));
+    VSF_SERVICE_ASSERT  (   (size > 2 * sizeof(vsf_heap_mcb_t))
+                        &&  (   ((VSF_HEAP_CFG_MCB_ALIGN_BIT + sizeof(VSF_HEAP_CFG_MCB_OFFSET_TYPE) * 8) >= 32)
+                            ||  !(size >> (VSF_HEAP_CFG_MCB_ALIGN_BIT + sizeof(VSF_HEAP_CFG_MCB_OFFSET_TYPE) * 8))
+                            )
+                        );
 
     mcb = (vsf_heap_mcb_t *)((uint8_t *)buffer + offset);
     __vsf_heap_mcb_init(mcb);
