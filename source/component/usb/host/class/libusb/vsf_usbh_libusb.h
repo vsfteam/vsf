@@ -62,6 +62,8 @@ extern const vk_usbh_class_drv_t vk_usbh_libusb_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
+// user should treat on_event as probe callback, submitting urb in on_event is prohibited
+//  and if user code MUST be same as a usbh driver, eg: request ep0.crit before access ep0
 extern void vk_usbh_libusb_set_evthandler(void *param,
         vk_usbh_libusb_on_event_t on_event);
 
