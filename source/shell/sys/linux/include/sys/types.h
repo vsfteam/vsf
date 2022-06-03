@@ -65,6 +65,10 @@ typedef __TIME_T            time_t;
 #   define __CLOCK_T        long
 #endif
 typedef __CLOCK_T           clock_t;
+#ifndef __USECONDS_T
+#   define __USECONDS_T     unsigned long
+#endif
+typedef __USECONDS_T        useconds_t;
 
 typedef enum {
     CLOCK_MONOTONIC,

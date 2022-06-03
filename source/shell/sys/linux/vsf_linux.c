@@ -1540,6 +1540,12 @@ int raise(int sig)
 }
 #endif
 
+useconds_t ualarm(useconds_t usecs, useconds_t interval)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 unsigned int alarm(unsigned int seconds)
 {
     VSF_LINUX_ASSERT(false);

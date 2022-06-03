@@ -45,6 +45,7 @@ extern "C" {
 #define sysconf             VSF_LINUX_WRAPPER(sysconf)
 #define pipe                VSF_LINUX_WRAPPER(pipe)
 #define alarm               VSF_LINUX_WRAPPER(alarm)
+#define ualarm              VSF_LINUX_WRAPPER(ualarm)
 
 #define isatty              VSF_LINUX_WRAPPER(isatty)
 #define symlink             VSF_LINUX_WRAPPER(symlink)
@@ -111,6 +112,7 @@ int usleep(int micro_seconds);
 unsigned sleep(unsigned seconds);
 
 unsigned int alarm(unsigned int seconds);
+useconds_t ualarm(useconds_t usecs, useconds_t interval);
 
 #define setgid(__uid)               (0)
 #define getgid()                    ((gid_t)0)
