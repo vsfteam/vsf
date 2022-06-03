@@ -27,6 +27,8 @@ extern "C" {
 #define strdup              VSF_LINUX_LIBC_WRAPPER(strdup)
 #endif
 
+#define ffs                 vsf_ffs32
+
 void * memset(void *s, int ch, size_t n);
 size_t strlen(const char *str);
 size_t strnlen(const char *str, size_t maxlen);

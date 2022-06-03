@@ -156,6 +156,29 @@ enum libusb_standard_request {
     LIBUSB_REQUEST_SYNCH_FRAME          = USB_REQ_SYNCH_FRAME,
 };
 
+ enum libusb_class_code {
+    LIBUSB_CLASS_PER_INTERFACE          = 0x00,
+    LIBUSB_CLASS_AUDIO                  = 0x01,
+    LIBUSB_CLASS_COMM                   = 0x02,
+    LIBUSB_CLASS_HID                    = 0x03,
+    LIBUSB_CLASS_PHYSICAL               = 0x05,
+    LIBUSB_CLASS_IMAGE                  = 0x06,
+    LIBUSB_CLASS_PTP                    = 0x06,
+    LIBUSB_CLASS_PRINTER                = 0x07,
+    LIBUSB_CLASS_MASS_STORAGE           = 0x08,
+    LIBUSB_CLASS_HUB                    = 0x09,
+    LIBUSB_CLASS_DATA                   = 0x0A,
+    LIBUSB_CLASS_SMART_CARD             = 0x0B,
+    LIBUSB_CLASS_CONTENT_SECURITY       = 0x0D,
+    LIBUSB_CLASS_VIDEO                  = 0x0E,
+    LIBUSB_CLASS_PERSONAL_HEALTHCARE    = 0x0F,
+    LIBUSB_CLASS_DIAGNOSTIC_DEVICE      = 0xDC,
+    LIBUSB_CLASS_WIRELESS               = 0xE0,
+    LIBUSB_CLASS_MISCELLANEOUS          = 0xEF,
+    LIBUSB_CLASS_APPLICATION            = 0xFE,
+    LIBUSB_CLASS_VENDOR_SPEC            = 0xFF,
+};
+
 enum libusb_descriptor_type {
     LIBUSB_DT_DEVICE                    = USB_DT_DEVICE,
     LIBUSB_DT_CONFIG                    = USB_DT_CONFIG,
@@ -307,6 +330,7 @@ struct libusb_transfer {
     struct libusb_iso_packet_descriptor iso_packet_desc[0];
 };
 
+const char * libusb_strerror(int code);
 const struct libusb_version * libusb_get_version(void);
 int libusb_init(libusb_context **context);
 void libusb_exit(libusb_context *ctx);

@@ -239,6 +239,7 @@ vsf_class(vsf_linux_process_t) {
         struct {
             pid_t pid;
             pid_t ppid;
+            pid_t gid;
         } id;
 #if VSF_LINUX_USE_TERMIOS == ENABLED
         struct termios term[3];

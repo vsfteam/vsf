@@ -323,6 +323,11 @@ static int __vsf_linux_libusb_fd_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
+const char * libusb_strerror(int code)
+{
+    return "unknown";
+}
+
 const struct libusb_version * libusb_get_version(void)
 {
     static const struct libusb_version __version = {

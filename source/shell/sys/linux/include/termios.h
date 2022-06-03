@@ -121,6 +121,10 @@ enum {
         B9600       = 13,
         B19200      = 14,
         B38400      = 15,
+        B57600      = 16,
+        B115200     = 17,
+        B230400     = 18,
+        B460800     = 19,
 };
 
 #define CSIZE       0x0030
@@ -133,6 +137,8 @@ enum {
 #define CREAD       0x0080
 #define PARENB      0x0100
 #define PARODD      0x0200
+
+#define CRTSCTS     0x0400
 
 struct termios {
     tcflag_t c_iflag;

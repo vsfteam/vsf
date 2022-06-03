@@ -2302,6 +2302,19 @@ int tcsetattr(int fd, int optional_actions, const struct termios *termios)
     return 0;
 }
 
+pid_t tcgetpgrp(int fd)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    return process->id.gid;
+}
+
+int tcsetpgrp(int fd, pid_t pgrp)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    process->id.gid = pgrp;
+    return 0;
+}
+
 int tcsendbreak(int fd, int duration)
 {
     return 0;

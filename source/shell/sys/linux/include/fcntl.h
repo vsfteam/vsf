@@ -40,6 +40,7 @@ extern "C" {
 #define F_UNLCK         7
 #define F_GETLK         8
 #define F_SETLK         9
+#define F_SETLKW        10
 // for ioctrl
 #define F_IO            16
 

@@ -33,6 +33,8 @@ typedef unsigned int        size_t;
 #   endif
 #endif
 
+typedef unsigned char       u_char;
+
 typedef int                 key_t;
 typedef int                 pid_t;
 typedef int                 id_t;
