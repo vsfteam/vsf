@@ -517,7 +517,7 @@ libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx,
     vsf_linux_libusb_dev_t *dev;
     int i = 0;
 
-    if (libusb_get_device_list(ctx, &devs) < 0) {
+    if (libusb_get_device_list(ctx, &devs) <= 0) {
         return NULL;
     }
 
@@ -957,7 +957,15 @@ int libusb_get_active_config_descriptor(libusb_device *dev,
     int err, config_val;
 
     err = libusb_get_configuration((libusb_device_handle *)dev, &config_val);
-    if (err != LIBUSB_SUCCESS) { return err; }
+    if (err != LIBUSB_SUCCESS) {
+        // some devices will fail if configuration is not set, so set to 0 first
+        err = libusb_control_transfer((libusb_device_handle *)dev, USB_DIR_OUT,
+            USB_REQ_SET_CONFIGURATION, 0, 0, NULL, 0, 1000);
+        if (err != LIBUSB_SUCCESS) {
+            return err;
+        }
+        config_val = 1;
+    }
     return libusb_get_config_descriptor(dev, config_val - 1, config);
 }
 
