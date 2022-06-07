@@ -129,13 +129,14 @@ extern off64_t ftello64(FILE *f);
 
 #if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #   include <time.h>
-// iar has no clockid_t
+// iar has no clockid_t and useconds_t
 #   ifndef __IAR_TYPE_CLOCKID_T__
 #   define __IAR_TYPE_CLOCKID_T__
 typedef enum {
     CLOCK_MONOTONIC,
     CLOCK_REALTIME,
 } clockid_t;
+typedef unsigned long       useconds_t;
 extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
 #   endif
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_TIME)
