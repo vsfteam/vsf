@@ -10,22 +10,34 @@ on:
 
 jobs:
   windows-build:
-    runs-on: windows-latest
 
     strategy:
       fail-fast: false
       matrix:
         solution_path: [./example/template/project/vc/vsf_template.sln, ./example/tgui/project/vc/vsf_tgui.sln]
         build_config: [Debug]
+        # https://docs.microsoft.com/en-us/visualstudio/install/visual-studio-build-numbers-and-release-dates?view=vs-2019
+        # https://docs.microsoft.com/en-us/visualstudio/install/visual-studio-build-numbers-and-release-dates?view=vs-2022
+        vs-version: ['[16.0, 17)', '[17.0, 18)']
+        os: [windows-2019, windows-2022]
+        exclude:
+            - os: windows-2019
+              vs-version: '[17.0, 18)'
+            - os: windows-2022
+              vs-version: '[16.0, 17)'            
+
+    runs-on: ${{ matrix.os }}
 
     steps:
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+      with:
+        vs-version: ${{ matrix.vs-version }}
+    
     - name: Checkout With Submodule
       uses: actions/checkout@v2
       with:
         submodules: true # without recursive
-
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Restore NuGet packages
       working-directory: ${{env.GITHUB_WORKSPACE}}
