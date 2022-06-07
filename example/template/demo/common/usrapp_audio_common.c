@@ -41,6 +41,8 @@ usrapp_audio_common_t usrapp_audio_common = {
 
 #if VSF_USE_WINSOUND == ENABLED
     .default_dev        = &usrapp_audio_common.winsound.dev.use_as__vk_audio_dev_t,
+#else
+    .default_dev        = NULL,
 #endif
 };
 
