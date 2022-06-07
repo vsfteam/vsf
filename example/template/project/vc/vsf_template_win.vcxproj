@@ -631,11 +631,14 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\semaphore.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\signal.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\ctype.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\stdatomic.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\stddef.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\stdio.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\stdlib.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\string.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\strings.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\time.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\utime.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\wchar.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\syslog.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\ipc.h" />
@@ -1445,6 +1448,8 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\3rd-party\getopt_long.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp_stdio.cpp" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp_string.cpp" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_sem.c" />
@@ -1464,6 +1469,7 @@
     <ClCompile Include="..\..\..\..\source\utilities\language_extension\delegate.c" />
     <ClCompile Include="..\..\..\..\source\utilities\language_extension\simple_sprintf.c" />
     <ClCompile Include="..\..\..\..\source\utilities\language_extension\simple_sscanf.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\language_extension\simple_swprintf.c" />
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c" />
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_list.c" />
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_queue.c" />
@@ -1538,6 +1544,13 @@
     <None Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\usart\usart_template.inc" />
     <None Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.inc" />
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cmath" />
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cstdint" />
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cstdio" />
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cstdlib" />
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cstring" />
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\string" />
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\xstring" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

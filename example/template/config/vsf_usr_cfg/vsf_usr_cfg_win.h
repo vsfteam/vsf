@@ -72,7 +72,7 @@
 //#   define APP_USE_DISTBUS_HAL_DEMO                     ENABLED
 //#       define APP_USE_DISTBUS_HAL_USBD_DEMO            ENABLED
 
-#define APP_USE_CPP_DEMO                                DISABLED
+#define APP_USE_CPP_DEMO                                ENABLED
 #define VSF_LINUX_USE_SIMPLE_LIBC                       ENABLED
 #   define VSF_LINUX_CFG_PRINT_BUFF_SIZE                4096
 // if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
@@ -82,9 +82,11 @@
 #   define VSF_LINUX_LIBC_CFG_WRAPPER                   ENABLED
 #   define VSF_USE_SIMPLE_SSCANF                        ENABLED
 #   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
+#   define VSF_USE_SIMPLE_SWPRINTF                      ENABLED
 #else
 #   define VSF_USE_SIMPLE_SSCANF                        DISABLED
 #   define VSF_USE_SIMPLE_SPRINTF                       DISABLED
+#   define VSF_USE_SIMPLE_SWPRINTF                      DISABLED
 #endif
 
 // 3rd-party demos

@@ -3249,6 +3249,15 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_flash.h">
       <Filter>vsf\hal\driver\common\template</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\stdatomic.h">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\strings.h">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\utime.h">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -5627,6 +5636,15 @@
     <ClCompile Include="..\..\demo\linux_demo\telnetd_demo.c">
       <Filter>usrapp\demo\linux_demo</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp_string.cpp">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\utilities\language_extension\simple_swprintf.c">
+      <Filter>vsf\utilities\language_externsion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp_stdio.cpp">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">
@@ -5640,6 +5658,27 @@
     </None>
     <None Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.inc">
       <Filter>vsf\hal\driver\common\rtc</Filter>
+    </None>
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cmath">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </None>
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cstdint">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </None>
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cstdio">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </None>
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cstdlib">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </None>
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cstring">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </None>
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\string">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </None>
+    <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\xstring">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
     </None>
   </ItemGroup>
 </Project>
