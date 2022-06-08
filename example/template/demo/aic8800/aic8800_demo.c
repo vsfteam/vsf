@@ -24,6 +24,7 @@
 
 #include "rtos_al.h"
 #include "sysctrl_api.h"
+#include "psram_api.h"
 #include "dbg.h"
 
 /*============================ MACROS ========================================*/
@@ -79,6 +80,12 @@ void aic8800_demo_init(void)
     dbg("\r\n    dsp_clock: %dM, sys_clock: %dM, pclk: %dM, flash_clock: %dM\r\n",
             DSPSysCoreClock / 1000000, SystemCoreClock / 1000000,
             PeripheralClock / 1000000, sysctrl_clock_get(PER_FLASH) / 1000000);
+
+    psram_init();
+    uint32_t ram_size = psram_size_get();
+    if (ram_size > 0) {
+        dbg("    psram: %dM bytes\r\n", ram_size / (1024 * 1024));
+    }
 
 #if VSF_USE_USB_HOST
     __usbh_heap_init();

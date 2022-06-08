@@ -4738,6 +4738,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\psram</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs</state>

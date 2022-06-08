@@ -41,6 +41,14 @@
 int __data_start__ = 0x00100000;
 int _shrbram = 0x00100000;
 
+// for SDK-A12-20220225
+int __fast_func_start__ = 0;
+int __fast_func_end__ = 0;
+int __fast_etext = 0;
+int __pavol_text_start__ = 0;
+int __pavol_text_end__ = 0;
+int __pavol_etext = 0;
+
 syscfg_predefined_t const syscfg_predefined = {
     #if PLF_PMIC_LDO_VCORE
     .pmic_vcore_dcdc_off = 1,
