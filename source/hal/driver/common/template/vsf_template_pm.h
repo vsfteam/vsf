@@ -144,10 +144,6 @@ extern "C" {
 #   define VSF_PM_CFG_REIMPLEMENT_POST_DIV          DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_LPOSC_CFG
-#   define VSF_PM_CFG_REIMPLEMENT_LPOSC_CFG         DISABLED
-#endif
-
 #ifndef VSF_PM_CFG_REIMPLEMENT_LPOSC_SEL
 #   define VSF_PM_CFG_REIMPLEMENT_LPOSC_SEL         DISABLED
 #endif
@@ -369,10 +365,6 @@ typedef enum pm_mclk_apb_div_t {
 typedef struct pm_mclk_cfg_t {
     pm_clk_src_sel_t                clk_src;                //!< main clock source
     uint32_t                        freq;                   //!< system oscilator frequency
-    // pm_mclk_core_div_t              core_div[CORE_NUM];     //!< system core clock divider
-    // pm_mclk_axi_div_t               axi_div[AXI_CLK_NUM];   //!< system AXI clock divider
-    // pm_mclk_ahb_div_t               ahb_div[AHB_CLK_NUM];   //!< system AHB clock divider
-    // pm_mclk_apb_div_t               apb_div[APB_CLK_NUM];   //!< system APB clock divider
 } pm_mclk_cfg_t;
 #endif
 
@@ -405,10 +397,10 @@ typedef enum pm_pll_sel_t {
 
 #if VSF_PM_CFG_REIMPLEMENT_PLL_CFG == DISABLED
 typedef struct pm_pll_cfg_t {
-    pm_clk_src_sel_t                pll_clk_src;//!< pll clock source
-    uint32_t                        freq;       //!< system oscilator frequency
-    uint8_t                         Msel;       //!< PLL Feedback divider value
-    uint8_t                         Psel;       //!< pll Feedback divider value
+    pm_clk_src_sel_t pll_clk_src;//!< pll clock source
+    uint32_t         freq;       //!< system oscilator frequency
+    uint8_t          msel;       //!< PLL Feedback divider value
+    uint8_t          ssel;       //!< pll Feedback divider value
 } pm_pll_cfg_t;
 #endif
 
@@ -425,18 +417,7 @@ typedef enum pm_pll_post_div_t {
  * Low Power Oscillator Management                                            *
  *----------------------------------------------------------------------------*/
 
-#if VSF_PM_CFG_REIMPLEMENT_LPOSC_CFG == DISABLED
-typedef struct lposc_cfg_t{
-    union {
-        struct {
-            uint32_t DIV            : 5;
-            uint32_t FREQ           : 4;
-            reg32_t                 :23;
-        };
-        uint32_t wWord;
-    };
-} lposc_cfg_t;
-#endif
+typedef struct lposc_cfg_t lposc_cfg_t;
 
 #if VSF_PM_CFG_REIMPLEMENT_LPOSC_SEL == DISABLED
 typedef enum pm_lposc_sel_t {
@@ -476,7 +457,7 @@ typedef struct vsf_pm_op_t {
 } vsf_pm_op_t;
 
 #if VSF_PM_CFG_MULTI_CLASS == ENABLED
-struct vsf_pm_t  {
+struct vsf_pm_t {
     const vsf_pm_op_t * op;
 };
 #endif
