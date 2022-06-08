@@ -40,7 +40,7 @@
 //  current M484 hardware has no display
 #   define APP_USE_SDL2_DEMO                            DISABLED
 //  TODO: need test for c++ support
-#   define APP_USE_CPP_DEMO                             DISABLED
+#   define APP_USE_CPP_DEMO                             ENABLED
 #		define APP_USE_KERNEL_TEST						ENABLED
 
 // 3rd-party demos
