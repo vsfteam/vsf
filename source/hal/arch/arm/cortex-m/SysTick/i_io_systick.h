@@ -20,8 +20,8 @@
 
 /*============================ INCLUDES ======================================*/
 
-/*! \note i_reg_xxxx.h header files must be standalong and assume following 
- *!       conditions: 
+/*! \note i_reg_xxxx.h header files must be standalong and assume following
+ *!       conditions:
  *!       a. stdint.h exists
  *!       b. anonymouse structures and unions are supported
  */
@@ -44,7 +44,7 @@ extern "C" {
 #define DEF_REG                                                                 \
         union {                                                                 \
             struct {
-    
+
 #define END_DEF_REG32(__NAME)                                                   \
             };                                                                  \
             reg32_t VALUE;                                                      \
@@ -66,7 +66,7 @@ extern "C" {
 #define SYSTICK_RVR                     SYSTICK_RVR_REG.VALUE
 #define SYSTICK_RVR_BIT                 SYSTICK_RVR_REG
 
-                 
+
 //! \brief System Timer Current value register
 #define SYSTICK_CVR_REG                 ARM_SYSTICK.SYST_CVR
 #define SYSTICK_CVR                     SYSTICK_CVR_REG.VALUE
@@ -216,30 +216,27 @@ typedef struct {
         reg32_t  EN                     : 1;
         reg32_t  TICKINT                : 1;
         reg32_t  CLKSOURCE              : 1;
-        reg32_t                         :13;
+        reg32_t  __RSVD0                :13;
         reg32_t  COUNTFLAG              : 1;
-        reg32_t                         :15;
-    END_DEF_REG32(SYST_CSR) 
+    END_DEF_REG32(SYST_CSR)
 
     //! \brief System Timer Reload value register
     DEF_REG
         reg32_t  RELOAD                 :24;
-        reg32_t                         : 8;
-    END_DEF_REG32(SYST_RVR) 
+    END_DEF_REG32(SYST_RVR)
 
     //! \brief System Timer Current value register
     DEF_REG
         reg32_t CURRENT                 :24;
-        reg32_t                         : 8;
-    END_DEF_REG32(SYST_CVR) 
+    END_DEF_REG32(SYST_CVR)
 
     //! \brief System Timer Calibration value register
     DEF_REG
         reg32_t TENMS                   :24;
-        reg32_t                         : 6;
+        reg32_t __RSVD0                 : 6;
         reg32_t SKEW                    : 1;
         reg32_t NOREF                   : 1;
-    END_DEF_REG32(SYST_CALIB) 
+    END_DEF_REG32(SYST_CALIB)
 } systick_reg_t;
 //! @}
 
