@@ -1162,6 +1162,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_setpos, vk_file_setpos)
         }
         // fall through
     case VSF_EVT_RETURN:
+        *vsf_local.result = file->pos;
         vsf_eda_return(VSF_ERR_NONE);
         break;
     }
