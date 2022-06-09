@@ -30,6 +30,7 @@ list(APPEND VSF_TARGET_INCLUDE_DIRECTORIES
     ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/dma
     ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/ticker
     ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/flash
+    ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/psram
     ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/pmic
     ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/sleep
     ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/aic1000lite_regs
