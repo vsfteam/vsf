@@ -1147,7 +1147,6 @@ __vsf_component_peda_ifs_entry(__vk_vfs_setpos, vk_file_setpos)
     switch (evt) {
     case VSF_EVT_INIT:
         VSF_FS_ASSERT(file != NULL);
-        file->pos = vsf_local.offset;
 
         if (file->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
             vsf_err_t err;
@@ -1159,10 +1158,11 @@ __vsf_component_peda_ifs_entry(__vk_vfs_setpos, vk_file_setpos)
                 vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
             }
             break;
+        } else {
+            *vsf_local.result = file->pos;
         }
         // fall through
     case VSF_EVT_RETURN:
-        *vsf_local.result = file->pos;
         vsf_eda_return(VSF_ERR_NONE);
         break;
     }
