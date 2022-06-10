@@ -1159,7 +1159,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_setpos, vk_file_setpos)
             }
             break;
         } else {
-            *vsf_local.result = file->pos;
+            *vsf_local.result = vsf_local.offset;
         }
         // fall through
     case VSF_EVT_RETURN:
