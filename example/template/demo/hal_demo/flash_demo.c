@@ -32,12 +32,12 @@
 #   define APP_FLASH_DEMO_CFG_FLASH                     (vsf_flash_t *)&vsf_hw_flash0
 #endif
 
-#ifndef APP_FLASH_DEMO_CFG_ADDRESS
-#   define APP_FLASH_DEMO_CFG_ADDRESS                   0x081FBFFF
+#ifndef APP_FLASH_DEMO_CFG_OFFSET
+#   define APP_FLASH_DEMO_CFG_OFFSET                    0x001FB000
 #endif
 
 #ifndef APP_FLASH_DEMO_CFG_SIZE
-#   define APP_FLASH_DEMO_CFG_SIZE                      512
+#   define APP_FLASH_DEMO_CFG_SIZE                      4096
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
@@ -45,30 +45,31 @@
 static void __flash_demo(void)
 {
     vsf_err_t result;
-
-    uint8_t read_buffer[APP_FLASH_DEMO_CFG_SIZE];
+    static uint8_t buffer[APP_FLASH_DEMO_CFG_SIZE];
 
     result = vsf_flash_init(APP_FLASH_DEMO_CFG_FLASH, NULL);
     VSF_ASSERT(result == VSF_ERR_NONE);
 
     while (fsm_rt_cpl != vsf_flash_enable(APP_FLASH_DEMO_CFG_FLASH));
 
-    result = vsf_flash_erase(APP_FLASH_DEMO_CFG_FLASH, APP_FLASH_DEMO_CFG_ADDRESS, sizeof(read_buffer));
+    result = vsf_flash_erase(APP_FLASH_DEMO_CFG_FLASH, APP_FLASH_DEMO_CFG_OFFSET, sizeof(buffer));
     VSF_ASSERT(result == VSF_ERR_NONE);
 
-    for (int i = 0; i < dimof(read_buffer); i++) {
-        read_buffer[i] = i;
+    for (int i = 0; i < dimof(buffer); i++) {
+        buffer[i] = i;
     }
-    result = vsf_flash_write(APP_FLASH_DEMO_CFG_FLASH, APP_FLASH_DEMO_CFG_ADDRESS, read_buffer, sizeof(read_buffer));
+    result = vsf_flash_write(APP_FLASH_DEMO_CFG_FLASH, APP_FLASH_DEMO_CFG_OFFSET, buffer, sizeof(buffer));
     VSF_ASSERT(result == VSF_ERR_NONE);
 
-    memset(read_buffer, 0x00, sizeof(read_buffer));
-    result = vsf_flash_read(APP_FLASH_DEMO_CFG_FLASH, APP_FLASH_DEMO_CFG_ADDRESS, read_buffer, sizeof(read_buffer));
+    memset(buffer, 0x00, sizeof(buffer));
+    result = vsf_flash_read(APP_FLASH_DEMO_CFG_FLASH, APP_FLASH_DEMO_CFG_OFFSET, buffer, sizeof(buffer));
     VSF_ASSERT(result == VSF_ERR_NONE);
 
-    for (int i = 0; i < dimof(read_buffer); i++) {
-        if (read_buffer[i] != i) {
-            vsf_trace_debug("veriy flash erase/write/read faild" VSF_TRACE_CFG_LINEEND);
+    for (int i = 0; i < dimof(buffer); i++) {
+        if (buffer[i] != (uint8_t)i) {
+            vsf_trace_debug("veriy flash erase/write/read faild, "
+                            "buffer[%d] is 0x%02x, expected: 0x%02x" VSF_TRACE_CFG_LINEEND,
+                            i, buffer[i], i & 0xFF);
             return ;
         }
     }
