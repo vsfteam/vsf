@@ -88,13 +88,16 @@ typedef struct vsf_hw_flash_t {
 vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, flash_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
-    VSF_HAL_ASSERT(cfg_ptr != NULL);
 
-    hw_flash_ptr->cfg = *cfg_ptr;
+    if (cfg_ptr != NULL) {
+        hw_flash_ptr->cfg = *cfg_ptr;
+    }
 
     vsf_protect_t org = __aic8800_flash_protect();
         hw_flash_ptr->flash_size = ROM_FlashChipSizeGet();
     __aic8800_flash_unprotect(org);
+
+    VSF_HAL_ASSERT(hw_flash_ptr->flash_size > 0);
 
     return VSF_ERR_NONE;
 }
@@ -122,7 +125,7 @@ vsf_err_t vsf_hw_flash_erase(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset,
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
 
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
-    VSF_HAL_ASSERT(offset + size > hw_flash_ptr->flash_size);
+    VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
     VSF_HAL_ASSERT(0 == (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
     VSF_HAL_ASSERT(0 == (size % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
 
@@ -147,7 +150,7 @@ vsf_err_t vsf_hw_flash_write(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset,
 
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
-    VSF_HAL_ASSERT(offset + size > hw_flash_ptr->flash_size);
+    VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
     VSF_HAL_ASSERT(0 == (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
 
     vsf_protect_t org = __aic8800_flash_protect();
@@ -170,7 +173,7 @@ vsf_err_t vsf_hw_flash_read(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset, 
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
     VSF_HAL_ASSERT(NULL != buffer);
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
-    VSF_HAL_ASSERT(offset + size > hw_flash_ptr->flash_size);
+    VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
     VSF_HAL_ASSERT(0 == (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
 
     vsf_protect_t org = __aic8800_flash_protect();
