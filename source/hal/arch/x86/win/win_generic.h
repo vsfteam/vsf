@@ -76,6 +76,9 @@ extern "C" {
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
 #define VSF_ARCH_PROVIDE_HEAP
+// define VSF_ARCH_LIMIT_NO_SET_STACK to remove dependency of setjmp/longjmp
+//  and use stack of thread in windows for the best compatibility
+#define VSF_ARCH_LIMIT_NO_SET_STACK
 
 //! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
 #define VSF_ARCH_SYSTIMER_FREQ          (10 * 1000 * 1000)
