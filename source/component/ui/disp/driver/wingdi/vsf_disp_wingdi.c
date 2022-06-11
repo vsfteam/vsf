@@ -49,6 +49,7 @@ typedef struct vsf_disp_wingdi_t {
     vsf_arch_irq_thread_t thread;
     bool is_inited;
     bool is_notified;
+    bool is_to_notify;
     vk_disp_wingdi_t *disp;
 
     BITMAPINFO bmi;
@@ -446,6 +447,10 @@ static void __vk_disp_wingdi_thread(void *arg)
     while (GetMessage(&Msg, NULL, 0, 0) > 0) {
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
+        if (__vk_disp_wingdi.is_to_notify) {
+            __vk_disp_wingdi.is_to_notify = false;
+            InvalidateRect(__vk_disp_wingdi.hWnd, &rect, false);
+        }
     }
     __vsf_arch_irq_fini(irq_thread);
 }
@@ -458,6 +463,7 @@ static vsf_err_t __vk_disp_wingdi_init(vk_disp_t *pthis)
     if (!__vk_disp_wingdi.is_inited) {
         __vk_disp_wingdi.is_inited = true;
         __vk_disp_wingdi.is_notified = false;
+        __vk_disp_wingdi.is_to_notify = false;
         __vk_disp_wingdi.disp = (vk_disp_wingdi_t *)pthis;
         __vsf_arch_irq_init(&__vk_disp_wingdi.thread, "disp_windgi", __vk_disp_wingdi_thread, VSF_DISP_WINGDI_CFG_HW_PRIORITY);
     } else {
@@ -525,7 +531,7 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
         .bottom = area->pos.y + area->size.y,
     };
     __vk_disp_wingdi.is_notified = false;
-    InvalidateRect(__vk_disp_wingdi.hWnd, &rect, false);
+    __vk_disp_wingdi.is_to_notify = true;
     return VSF_ERR_NONE;
 }
 
