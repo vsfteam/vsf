@@ -26,6 +26,7 @@
 
 #include "../../vsf_disp.h"
 
+#include "kernel/vsf_kernel.h"
 #include "component/input/vsf_input.h"
 
 #include <Windows.h>
@@ -43,13 +44,19 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+dcl_vsf_arch_host_invoke(__invalidate_rect)
+def_vsf_arch_host_invoke(__invalidate_rect,
+    HWND hWnd;
+    CONST RECT *lpRect;
+    BOOL bErase;
+)
+
 dcl_vsf_bitmap(vsf_disp_wingdi_key_state_map, 256);
 
 typedef struct vsf_disp_wingdi_t {
     vsf_arch_irq_thread_t thread;
     bool is_inited;
     bool is_notified;
-    bool is_to_notify;
     vk_disp_wingdi_t *disp;
 
     BITMAPINFO bmi;
@@ -447,12 +454,23 @@ static void __vk_disp_wingdi_thread(void *arg)
     while (GetMessage(&Msg, NULL, 0, 0) > 0) {
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
-        if (__vk_disp_wingdi.is_to_notify) {
-            __vk_disp_wingdi.is_to_notify = false;
-            InvalidateRect(__vk_disp_wingdi.hWnd, &rect, false);
-        }
     }
     __vsf_arch_irq_fini(irq_thread);
+}
+
+imp_vsf_arch_host_invoke(__invalidate_rect)
+{
+    InvalidateRect(_->hWnd, _->lpRect, _->bErase);
+}
+
+static void __call_invalidate_rect(HWND hWnd, CONST RECT *lpRect, BOOL bErase)
+{
+    vsf_arch_host_invoke_ctx_t(__invalidate_rect) ctx = {
+        .hWnd = hWnd,
+        .lpRect = lpRect,
+        .bErase = bErase,
+    };
+    vsf_arch_host_invoke_in_thread(__invalidate_rect, &ctx);
 }
 
 static vsf_err_t __vk_disp_wingdi_init(vk_disp_t *pthis)
@@ -463,9 +481,9 @@ static vsf_err_t __vk_disp_wingdi_init(vk_disp_t *pthis)
     if (!__vk_disp_wingdi.is_inited) {
         __vk_disp_wingdi.is_inited = true;
         __vk_disp_wingdi.is_notified = false;
-        __vk_disp_wingdi.is_to_notify = false;
         __vk_disp_wingdi.disp = (vk_disp_wingdi_t *)pthis;
-        __vsf_arch_irq_init(&__vk_disp_wingdi.thread, "disp_windgi", __vk_disp_wingdi_thread, VSF_DISP_WINGDI_CFG_HW_PRIORITY);
+        init_vsf_arch_host_invoke(__invalidate_rect, VSF_DISP_WINGDI_CFG_HW_PRIORITY);
+        __vsf_arch_irq_init(&__vk_disp_wingdi.thread, "disp_windgi", __vk_disp_wingdi_thread, VSF_DISP_WINGDI_CFG_HW_PRIORITY);        
     } else {
         vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
     }
@@ -531,7 +549,7 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
         .bottom = area->pos.y + area->size.y,
     };
     __vk_disp_wingdi.is_notified = false;
-    __vk_disp_wingdi.is_to_notify = true;
+    __call_invalidate_rect(__vk_disp_wingdi.hWnd, &rect, false);
     return VSF_ERR_NONE;
 }
 
