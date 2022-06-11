@@ -316,7 +316,7 @@ static void __lvgl_input_init(void)
 #endif
 
     usrapp_ui_common.lvgl.notifier.mask = mask;
-    usrapp_ui_common.lvgl.notifier.on_evt = (vk_input_on_evt_t)__lvgl_on_evt;
+    usrapp_ui_common.lvgl.notifier.on_evt = __lvgl_on_evt;
     vk_input_notifier_register(&usrapp_ui_common.lvgl.notifier);
 }
 
