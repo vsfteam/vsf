@@ -71,14 +71,14 @@ int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t 
 {
     static bool __is_inited = false;
 
-    VSF_ASSERT(!(len % (RNG_BITLEN >> 3)));
+    VSF_ASSERT(!(len % (VSF_HW_RNG_BITLEN >> 3)));
 
     if (!__is_inited) {
         __is_inited = true;
         vsf_hw_rng_init(&vsf_hw_rng0);
     }
 
-    vsf_hw_rng_generate_request(&vsf_hw_rng0, (uint32_t *)output, len / (RNG_BITLEN >> 3),
+    vsf_hw_rng_generate_request(&vsf_hw_rng0, (uint32_t *)output, len / (VSF_HW_RNG_BITLEN >> 3),
             vsf_thread_get_cur(), __vsf_mbedtls_hardware_poll_on_ready);
     vsf_thread_wfe(VSF_EVT_USER);
     *olen = len;

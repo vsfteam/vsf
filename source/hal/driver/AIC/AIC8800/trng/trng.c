@@ -106,7 +106,7 @@ vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint3
         VSF_MCONNECT(VSF_HW_RNG, __COUNT, _CONFIG)                              \
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_MCONNECT(RNG, __COUNT, _IRQHandler)(void)                          \
+    void VSF_MCONNECT(VSF_HW_RNG, __COUNT, _IRQHandler)(void)                   \
     {                                                                           \
         vsf_hw_rng_t *rng = &VSF_MCONNECT(vsf_hw_rng, __COUNT);                 \
         AIC_TRNG_TypeDef *reg = rng->reg;                                       \
