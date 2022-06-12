@@ -709,7 +709,10 @@ ROOT const pFunc __VECTOR_TABLE[240] __VECTOR_TABLE_ATTRIBUTE = {
 
 WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
-{}
+{
+    extern void SystemInit(void);
+    SystemInit();
+}
 
 /*----------------------------------------------------------------------------
   Reset Handler called on controller reset

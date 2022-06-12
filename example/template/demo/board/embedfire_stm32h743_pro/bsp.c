@@ -17,30 +17,10 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+#define __VSF_HEAP_CLASS_INHERIT__
+#include "vsf.h"
 
-/*============================ MACROS ========================================*/
-
-/*\note first define basic info for arch. */
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-//! arch info
-#   define VSF_ARCH_PRI_NUM         16
-#   define VSF_ARCH_PRI_BIT         4
-
-// software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_NUM             4
-
-#else
-
-#ifndef __HAL_DEVICE_ST_STM32H743_H__
-#define __HAL_DEVICE_ST_STM32H743_H__
-
-#define VSF_DEV_SWI_LIST            42, 66, 67, 147
-
-/*============================ INCLUDES ======================================*/
-
-/*\note this is should be the only place where __common.h is included.*/
-#include "../common/__common.h"
+#ifdef __STM32H743XI__
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -48,7 +28,20 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
-#endif      // __HAL_DEVICE_ST_STM32H743_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+// rewrite vsf_hal_pre_startup_init for board specific hw initialization
+void vsf_hal_pre_startup_init(void)
+{
+    extern void SystemInit(void);
+    SystemInit();
+
+    SCB_EnableICache();
+    SCB_EnableDCache();
+
+//    SDRAM_Init();
+}
+
+#endif      // __STM32H743XI__
+
 /* EOF */
