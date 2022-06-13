@@ -926,10 +926,10 @@ static int __raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf
                     }
                     interface_desc->extra_length += desc_header->bLength;
                 } else if (endpoint_desc != NULL) {
-                    if (NULL == endpoint_desc->extra) {
-                        endpoint_desc->extra = (const unsigned char *)desc_header;
+                    if (NULL == endpoint_desc[-1].extra) {
+                        endpoint_desc[-1].extra = (const unsigned char *)desc_header;
                     }
-                    endpoint_desc->extra_length += desc_header->bLength;
+                    endpoint_desc[-1].extra_length += desc_header->bLength;
                 }
             }
         }
