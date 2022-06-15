@@ -79,7 +79,7 @@ static void * __vk_disp_fb_switch_buffer(vk_disp_t *pthis, bool is_to_copy)
     if (is_to_copy) {
         memcpy(next_buffer, cur_buffer, disp_fb->fb.size);
     }
-    disp_fb->fb.drv->Present(disp_fb->fb.param, cur_buffer);
+    disp_fb->fb.drv->present(disp_fb->fb.param, cur_buffer);
     return next_buffer;
 }
 
@@ -101,8 +101,11 @@ static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis)
     }
 
     disp_fb->cur_fb_buffer = 0;
-    disp_fb->fb.drv->Init(disp_fb->fb.param, __vk_disp_fb_get_buffer(disp_fb));
+    vsf_err_t err = disp_fb->fb.drv->init(disp_fb->fb.param, disp_fb->param.color, __vk_disp_fb_get_buffer(disp_fb));
     __vk_disp_fb_next(disp_fb);
+    if (VSF_ERR_NONE == err) {
+        vk_disp_on_ready(pthis);
+    }
     return VSF_ERR_NONE;
 }
 

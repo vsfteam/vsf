@@ -41,6 +41,12 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef struct vk_disp_fb_drv_t {
+    vsf_err_t (*init)(void *fb, vk_disp_color_type_t color_format, void *initial_pixel_buffer);
+    vsf_err_t (*fini)(void *fb);
+    vsf_err_t (*present)(void *fb, void *pixel_buffer);
+} vk_disp_fb_drv_t;
+
 vsf_class(vk_disp_fb_t) {
     public_member(
         implement(vk_disp_t)
@@ -51,7 +57,8 @@ vsf_class(vk_disp_fb_t) {
             // disp_fb will provide the buffer as current user buffer
             void            *buffer;
 
-            const i_fb_t    *drv;
+            const vk_disp_fb_drv_t
+                            *drv;
             void            *param;
 
             uint32_t        size;

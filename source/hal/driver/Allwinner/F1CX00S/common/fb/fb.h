@@ -72,17 +72,7 @@ typedef struct f1cx00s_fb_t {
     uint8_t                     pixel_byte_size;
 } f1cx00s_fb_t;
 
-// TODO: move to interface in hal, lv0 interface
-def_interface(i_fb_t)
-    vsf_err_t (*Init)(void *fb, void *initial_pixel_buffer);
-    vsf_err_t (*Fini)(void *fb);
-    vsf_err_t (*Present)(void *fb, void *pixel_buffer);
-end_def_interface(i_fb_t)
-
 /*============================ GLOBAL VARIABLES ==============================*/
-
-extern const i_fb_t VSF_FB;
-
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 

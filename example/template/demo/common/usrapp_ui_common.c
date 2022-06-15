@@ -68,7 +68,10 @@ static f1cx00s_fb_t __fb = {
     .pixel_bit_size             = vsf_disp_get_pixel_format_bitsize(APP_DISP_FB_COLOR),
     .pixel_byte_size            = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR),
 };
+#   define APP_DISP_FB_PARAM    &__fb
 #   endif
+
+extern const vk_disp_fb_drv_t APP_DISP_FB_DRV;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -96,9 +99,13 @@ usrapp_ui_common_t usrapp_ui_common = {
             .color              = APP_DISP_FB_COLOR,
         },
         .fb                     = {
-//            .buffer             = NULL,
-            .drv                = &VSF_FB,
-            .param              = &__fb,
+#   ifdef APP_DISP_FB_BUFFER
+            .buffer             = (void *)APP_DISP_FB_BUFFER,
+#   endif
+            .drv                = &APP_DISP_FB_DRV,
+#   ifdef APP_DISP_FB_PARAM
+            .param              = APP_DISP_FB_PARAM,
+#   endif
             .size               = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR) * APP_DISP_FB_WIDTH * APP_DISP_FB_HEIGHT,
             .num                = APP_DISP_FB_NUM,
             .pixel_byte_size    = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR),

@@ -19,22 +19,25 @@
 
 #include "./fb.h"
 
+// in order to use color format and vk_disp_fb_drv_t
+#include "component/ui/disp/vsf_disp.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const i_fb_t VSF_FB = {
-    .Init       = (vsf_err_t (*)(void *, void *))f1cx00s_fb_init,
-    .Fini       = (vsf_err_t (*)(void *))f1cx00s_fb_fini,
-    .Present    = (vsf_err_t (*)(void *, void *))f1cx00s_fb_present,
+const vk_disp_fb_drv_t VSF_FB = {
+    .init       = (vsf_err_t (*)(void *, int, void *))f1cx00s_fb_init,
+    .fini       = (vsf_err_t (*)(void *))f1cx00s_fb_fini,
+    .present    = (vsf_err_t (*)(void *, void *))f1cx00s_fb_present,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t f1cx00s_fb_init(f1cx00s_fb_t *fb, void *initial_pixel_buffer)
+vsf_err_t f1cx00s_fb_init(f1cx00s_fb_t *fb, int color_format, void *initial_pixel_buffer)
 {
     VSF_HAL_ASSERT((fb != NULL) && (fb->param != NULL));
 
