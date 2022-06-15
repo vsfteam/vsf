@@ -672,7 +672,17 @@ void vsf_app_driver_init(void)
     SystemClock_Config();
 
     // USE AXI SRAM as frame buffer
-    LCD_Init(0x24000000, 0, LTDC_PIXEL_FORMAT_ARGB8888);
+    uint32_t *pixel = (uint32_t *)0x24000000;
+    LCD_Init((uint32_t)pixel, 0, LTDC_PIXEL_FORMAT_ARGB8888);
+
+    // Clear Screen
+#define PIXEL_CLEAR(...)        *pixel++ = 0x00000000;
+    for (int i = 0; i < LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT;) {
+        VSF_MREPEAT(32, PIXEL_CLEAR);
+        i += 32;
+    }
+
+    LCD_BackLed_Control(1);
 }
 
 #endif      // __STM32H743XI__
