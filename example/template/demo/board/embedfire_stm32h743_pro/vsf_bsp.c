@@ -45,7 +45,6 @@ static UART_HandleTypeDef DebugStream_UartHandle = {
     .Init.Mode                  = UART_MODE_TX_RX,
     .Init.OverSampling          = UART_OVERSAMPLING_16,
 };
-static bool DebugStream_IsTxing = false;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -55,18 +54,6 @@ static bool DebugStream_IsTxing = false;
 /******************************************************************************/
 
 describe_mem_stream(VSF_DEBUG_STREAM_RX, VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE)
-
-/**
-  * @brief  Tx Transfer completed callback
-  * @param  UartHandle: UART handle.
-  * @note   This example shows a simple way to report end of IT Tx transfer, and
-  *         you can add your own implementation.
-  * @retval None
-  */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
-{
-  DebugStream_IsTxing = false;
-}
 
 /**
   * @brief  Rx Transfer completed callback
@@ -83,6 +70,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
   uint_fast32_t size = VSF_STREAM_GET_WBUF(&VSF_DEBUG_STREAM_RX, &ptr);
   VSF_ASSERT(size > 0);
   UART_Start_Receive_IT(&DebugStream_UartHandle, ptr, 1);
+}
+
+void USART1_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&DebugStream_UartHandle);
 }
 
 static void __VSF_DEBUG_STREAM_TX_INIT(void)
@@ -110,9 +102,11 @@ static void __VSF_DEBUG_STREAM_TX_INIT(void)
         .Speed                  = GPIO_SPEED_FREQ_VERY_HIGH,
         .Alternate              = GPIO_AF7_USART1,
     });
-    HAL_UART_Init(&DebugStream_UartHandle);
 
     VSF_STREAM_CONNECT_TX(&VSF_DEBUG_STREAM_RX);
+    HAL_UART_Init(&DebugStream_UartHandle);
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
 
     uint8_t *ptr;
     uint_fast32_t size = VSF_STREAM_GET_WBUF(&VSF_DEBUG_STREAM_RX, &ptr);
@@ -122,9 +116,7 @@ static void __VSF_DEBUG_STREAM_TX_INIT(void)
 
 static void __VSF_DEBUG_STREAM_TX_WRITE_BLOCKED(uint8_t *buf, uint_fast32_t size)
 {
-    DebugStream_IsTxing = true;
-    HAL_UART_Transmit_IT(&DebugStream_UartHandle, buf, size);
-    while (DebugStream_IsTxing);
+    HAL_UART_Transmit(&DebugStream_UartHandle, buf, size, HAL_MAX_DELAY);
 }
 
 #define VSF_HAL_USE_DEBUG_STREAM                ENABLED
