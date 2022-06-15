@@ -35,7 +35,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static UART_HandleTypeDef UartHandle_DebugStream = {
+static UART_HandleTypeDef DebugStream_UartHandle = {
     .Instance                   = USART1,
     .Init.BaudRate              = 912600,
     .Init.WordLength            = UART_WORDLENGTH_8B,
@@ -44,8 +44,8 @@ static UART_HandleTypeDef UartHandle_DebugStream = {
     .Init.HwFlowCtl             = UART_HWCONTROL_NONE,
     .Init.Mode                  = UART_MODE_TX_RX,
     .Init.OverSampling          = UART_OVERSAMPLING_16,
-
 };
+static bool DebugStream_IsTxing = false;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -55,6 +55,18 @@ static UART_HandleTypeDef UartHandle_DebugStream = {
 /******************************************************************************/
 
 describe_mem_stream(VSF_DEBUG_STREAM_RX, VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE)
+
+/**
+  * @brief  Tx Transfer completed callback
+  * @param  UartHandle: UART handle.
+  * @note   This example shows a simple way to report end of IT Tx transfer, and
+  *         you can add your own implementation.
+  * @retval None
+  */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
+{
+  DebugStream_IsTxing = false;
+}
 
 /**
   * @brief  Rx Transfer completed callback
@@ -70,7 +82,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
   uint8_t *ptr;
   uint_fast32_t size = VSF_STREAM_GET_WBUF(&VSF_DEBUG_STREAM_RX, &ptr);
   VSF_ASSERT(size > 0);
-  UART_Start_Receive_IT(&UartHandle_DebugStream, ptr, 1);
+  UART_Start_Receive_IT(&DebugStream_UartHandle, ptr, 1);
 }
 
 static void __VSF_DEBUG_STREAM_TX_INIT(void)
@@ -98,19 +110,21 @@ static void __VSF_DEBUG_STREAM_TX_INIT(void)
         .Speed                  = GPIO_SPEED_FREQ_VERY_HIGH,
         .Alternate              = GPIO_AF7_USART1,
     });
-    HAL_UART_Init(&UartHandle_DebugStream);
+    HAL_UART_Init(&DebugStream_UartHandle);
 
     VSF_STREAM_CONNECT_TX(&VSF_DEBUG_STREAM_RX);
 
     uint8_t *ptr;
     uint_fast32_t size = VSF_STREAM_GET_WBUF(&VSF_DEBUG_STREAM_RX, &ptr);
     VSF_ASSERT(size > 0);
-    UART_Start_Receive_IT(&UartHandle_DebugStream, ptr, 1);
+    UART_Start_Receive_IT(&DebugStream_UartHandle, ptr, 1);
 }
 
 static void __VSF_DEBUG_STREAM_TX_WRITE_BLOCKED(uint8_t *buf, uint_fast32_t size)
 {
-    HAL_UART_Transmit_IT(&UartHandle_DebugStream, buf, size);
+    DebugStream_IsTxing = true;
+    HAL_UART_Transmit_IT(&DebugStream_UartHandle, buf, size);
+    while (DebugStream_IsTxing);
 }
 
 #define VSF_HAL_USE_DEBUG_STREAM                ENABLED
@@ -198,14 +212,9 @@ static void SystemClock_Config(void)
   }
 }
 
-void vsf_hal_pre_startup_init(void)
+void vsf_app_driver_init(void)
 {
-    extern void SystemInit(void);
-    SystemInit();
-
-    SCB_EnableICache();
-    SCB_EnableDCache();
-
+    HAL_Init();
     SystemClock_Config();
 }
 

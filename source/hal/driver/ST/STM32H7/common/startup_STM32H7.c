@@ -712,6 +712,8 @@ void vsf_hal_pre_startup_init(void)
 {
     extern void SystemInit(void);
     SystemInit();
+    SCB_EnableICache();
+    SCB_EnableDCache();
 }
 
 /*----------------------------------------------------------------------------

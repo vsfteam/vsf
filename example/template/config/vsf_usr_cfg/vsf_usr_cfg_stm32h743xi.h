@@ -145,8 +145,9 @@
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
 #   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   4
+// SRAM1/SRAM2/SRAM3 as heap
 #   define VSF_HEAP_ADDR                                0x30000000
-#   define VSF_HEAP_SIZE                                0x60000
+#   define VSF_HEAP_SIZE                                0x48000
 
 #define VSF_USE_INPUT                                   ENABLED
 #   define VSF_INPUT_USE_HID                            ENABLED
