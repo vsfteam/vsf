@@ -44,7 +44,7 @@ extern "C" {
 #elif   defined(__VSF_RELEASE__) && defined(__VSF_DEBUG__)
 #   error Both __VSF_RELEASE__ and __VSF_DEBUG__ are defined!!!! They should be\
  mutually exclusive from each other, i.e. either define __VSF_RELEASE__ or\
- __VSF_DEBUG__. If neither of them are defined, __VSF_DEBUG__ will be assumed. 
+ __VSF_DEBUG__. If neither of them are defined, __VSF_DEBUG__ will be assumed.
 #endif
 
 
@@ -63,7 +63,7 @@ extern "C" {
 #if VSF_USE_KERNEL == ENABLED && defined(VSF_OS_CFG_PRIORITY_NUM)
 #   if (VSF_OS_CFG_PRIORITY_NUM < 1)
 #       error VSF_OS_CFG_PRIORITY_NUM MUST be defined to calculate \
-__VSF_HAL_SWI_NUM and its value must at least be 1. 
+__VSF_HAL_SWI_NUM and its value must at least be 1.
 #   endif
 
 #   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED

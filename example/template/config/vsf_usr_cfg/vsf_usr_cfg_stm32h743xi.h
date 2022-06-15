@@ -26,9 +26,6 @@
 #define __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
 #include "utilities/compiler/compiler.h"
 
-// for uint32_t of SystemCoreClock
-#include <stdint.h>
-
 /*============================ MACROS ========================================*/
 
 #if __IS_COMPILER_IAR__
@@ -107,8 +104,6 @@
 // 3rd-party demos
 #define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               DISABLED
-//#   define APP_LVGL_DEMO_USE_TERMINAL                   ENABLED
-//#   define APP_LVGL_DEMO_CFG_ANIMINATION                ENABLED
 
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
@@ -232,32 +227,15 @@
 // VSF_DEBUGGER_CFG_CONSOLE for debug console from debugger
 // select one ONLY
 
-// APP_LVGL_DEMO_USE_TERMINAL will overwrite DEBUG_STREAM, so DO NOT use hardware DEBUG_STREAM
-#if (APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_USE_TERMINAL == ENABLED)
-#   define VSF_CFG_DEBUG_STREAM_TX_T                    vsf_stream_t
-#   define VSF_CFG_DEBUG_STREAM_RX_T                    vsf_mem_stream_t
-#else
-#   define VSF_HAL_USE_DEBUG_STREAM                     ENABLED
-#endif
+#define VSF_CFG_DEBUG_STREAM_TX_T                       vsf_stream_t
+#define VSF_CFG_DEBUG_STREAM_RX_DECLARE                 declare_mem_stream(VSF_DEBUG_STREAM_RX)
+#define VSF_CFG_DEBUG_STREAM_RX_T                       vsf_mem_stream_type(VSF_DEBUG_STREAM_RX)
+//#define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 //#define VSF_DEBUGGER_CFG_CONSOLE                        VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
 
 //#define VSF_ASSERT(...)
-#if     VSF_HAL_USE_DEBUG_STREAM == ENABLED                                     \
-    ||  (APP_USE_LVGL_DEMO == ENABLED && APP_LVGL_DEMO_USE_TERMINAL == ENABLED)
-#   ifndef VSF_ASSERT
-#       define VSF_ASSERT(...)                          if (!(__VA_ARGS__)) {while(1);}
-#   endif
-#else
-#   ifdef __cplusplus
-extern "C" {
-#   endif
-extern void VSF_DEBUG_STREAM_POLL(void);
-#   ifdef __cplusplus
-}
-#   endif
-#   ifndef VSF_ASSERT
-#       define VSF_ASSERT(...)                          if (!(__VA_ARGS__)) {while(1){VSF_DEBUG_STREAM_POLL();}}
-#   endif
+#ifndef VSF_ASSERT
+#   define VSF_ASSERT(...)                              if (!(__VA_ARGS__)) {while(1);}
 #endif
 
 #if     APP_USE_USBD_DEMO == ENABLED                                            \

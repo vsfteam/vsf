@@ -105,10 +105,16 @@ extern "C" {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #ifdef VSF_CFG_DEBUG_STREAM_TX_T
+#   ifdef VSF_CFG_DEBUG_STREAM_TX_DECLARE
+VSF_CFG_DEBUG_STREAM_TX_DECLARE
+#   endif
 extern VSF_CFG_DEBUG_STREAM_TX_T VSF_DEBUG_STREAM_TX;
 #endif
 
 #ifdef VSF_CFG_DEBUG_STREAM_RX_T
+#   ifdef VSF_CFG_DEBUG_STREAM_RX_DECLARE
+VSF_CFG_DEBUG_STREAM_RX_DECLARE
+#   endif
 extern VSF_CFG_DEBUG_STREAM_RX_T VSF_DEBUG_STREAM_RX;
 #endif
 
