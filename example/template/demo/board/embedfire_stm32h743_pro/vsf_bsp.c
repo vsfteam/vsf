@@ -584,6 +584,37 @@ void LCD_Init(uint32_t fb_addr, int lcd_clk_mhz, uint32_t pixel_format)
   LCD_LayerInit(0,fb_addr,pixel_format);
 }
 
+static vsf_err_t __stm32_ltdc_fb_init(void *fd, vk_disp_color_type_t color_format, void *initial_pixel_buffer)
+{
+    memset((void *)APP_DISP_FB_BUFFER, 0,
+            LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * APP_DISP_FB_NUM * vsf_disp_get_pixel_format_bytesize(color_format));
+
+    uint32_t pixel_format;
+    if (color_format == VSF_DISP_COLOR_RGB888_32) {
+        pixel_format = LTDC_PIXEL_FORMAT_ARGB8888;
+    } else if (color_format == VSF_DISP_COLOR_RGB565) {
+        pixel_format = LTDC_PIXEL_FORMAT_RGB565;
+    } else {
+        return VSF_ERR_NOT_SUPPORT;
+    }
+
+    LCD_Init((uint32_t)APP_DISP_FB_BUFFER, 0, pixel_format);
+    LCD_BackLed_Control(1);
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __stm32_ltdc_fb_present(void *fd, void *pixel_buffer)
+{
+    HAL_LTDC_SetAddress(&Ltdc_Handler, (uint32_t)pixel_buffer, 0);
+    return VSF_ERR_NONE;
+}
+
+const vk_disp_fb_drv_t stm32_ltdc_fb_drv = {
+    .init                       = __stm32_ltdc_fb_init,
+    .fini                       = NULL,
+    .present                    = __stm32_ltdc_fb_present,
+};
+
 /******************************************************************************/
 /*                             HW initialize                                  */
 /******************************************************************************/
@@ -670,19 +701,6 @@ void vsf_app_driver_init(void)
 {
     HAL_Init();
     SystemClock_Config();
-
-    // USE AXI SRAM as frame buffer
-    uint32_t *pixel = (uint32_t *)0x24000000;
-    LCD_Init((uint32_t)pixel, 0, LTDC_PIXEL_FORMAT_ARGB8888);
-
-    // Clear Screen
-#define PIXEL_CLEAR(...)        *pixel++ = 0x00000000;
-    for (int i = 0; i < LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT;) {
-        VSF_MREPEAT(32, PIXEL_CLEAR);
-        i += 32;
-    }
-
-    LCD_BackLed_Control(1);
 }
 
 #endif      // __STM32H743XI__

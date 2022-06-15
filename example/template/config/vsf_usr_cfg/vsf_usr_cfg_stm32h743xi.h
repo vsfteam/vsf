@@ -73,7 +73,7 @@
 #define APP_USE_SCSI_DEMO                               DISABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
 #define APP_USE_SDL2_DEMO                               DISABLED
-#define APP_USE_DISP_DEMO                               DISABLED
+#define APP_USE_DISP_DEMO                               ENABLED
 // if using dl1x5, only RGB565 is supported
 #   define APP_SDL2_DEMO_CFG_COLOR_RGB565
 #   define APP_SDL2_DEMO_CFG_WIDTH                      256
@@ -327,18 +327,14 @@
 
 #if APP_USE_DISP_DEMO == ENABLED
 #   define VSF_USE_UI                                   ENABLED
-#   define VSF_DISP_USE_MIPI_LCD                        ENABLED
-#      define APP_DISP_DEMO_SPI                         (vsf_spi_t *)&vsf_spi0
-#      define APP_DISP_DEMO_RESET_GPIO                  (vsf_gpio_t *)&vsf_gpio0
-#      define APP_DISP_DEMO_RESET_PIN_MASK              (1 << 5)
-#      define APP_DISP_DEMO_DCX_GPIO                    (vsf_gpio_t *)&vsf_gpio0
-#      define APP_DISP_DEMO_DCX_PIN_MASK                (1 << 6)
-
-#      define APP_DISP_DEMO_HEIGHT                      240
-#      define APP_DISP_DEMO_WIDTH                       320
-#      define APP_DISP_DEMO_COLOR                       VSF_DISP_COLOR_RGB565
-#      define APP_DISP_DEMO_SEQ                         VSF_DISP_MIPI_LCD_ST7789V
-#      define APP_DISP_DEMO_CLOCK_HZ                    (20ul * 1000ul * 1000ul)
+#   define VSF_DISP_USE_FB                              ENABLED
+#       define APP_DISP_FB_HEIGHT                       272
+#       define APP_DISP_FB_WIDTH                        480
+#       define APP_DISP_FB_COLOR                        VSF_DISP_COLOR_RGB565
+#       define APP_DISP_FB_NUM                          2
+#       define APP_DISP_FB_DRV                          stm32_ltdc_fb_drv
+#       define APP_DISP_FB_PARAM                        NULL
+#       define APP_DISP_FB_BUFFER                       0x24000000
 #endif
 
 /*============================ TYPES =========================================*/
