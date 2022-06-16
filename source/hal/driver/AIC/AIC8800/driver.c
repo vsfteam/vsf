@@ -75,6 +75,13 @@ int vsf_hal_pre_startup_init(void)
     return 1;
 }
 
+// IMPORTANT: to avoid cpu halt if PWR key is pulled up on startup,
+//  strong version of user_pwrkey_enabled returning 0 MUST be implemented.
+int user_pwrkey_enabled(void)
+{
+    return 0;
+}
+
 /*! \note initialize device driver
  *  \param none
  *  \retval true initialization succeeded.
