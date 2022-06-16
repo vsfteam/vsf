@@ -42,7 +42,7 @@
 // DO NOT use SystemCoreClock for VSF_SYSTIMER_FREQ, because systimer is initialized
 //  in vsf_arch_init, which is eariler than initialization of SystemCoreClock in
 //  vsf_driver_init.
-#define VSF_SYSTIMER_FREQ                               (480UL * 1000 * 1000)
+#define VSF_SYSTIMER_FREQ                               (400UL * 1000 * 1000)
 // lwip APIs are protected by a mutex, so priority boost SHOULD be supported
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
 // configure pool and heap to avoid heap allocating in interrupt
@@ -52,9 +52,6 @@
 // enable VSF_EDA_QUEUE_CFG_REGION and VSF_EDA_QUEUE_CFG_SUPPORT_ISR
 #define VSF_EDA_QUEUE_CFG_REGION                        ENABLED
 #define VSF_EDA_QUEUE_CFG_SUPPORT_ISR                   ENABLED
-
-#define VSF_HAL_USE_GPIO                                ENABLED
-#define VSF_HAL_USE_SPI                                 ENABLED
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
