@@ -714,6 +714,7 @@ void vsf_hal_pre_startup_init(void)
     SystemInit();
     SCB_EnableICache();
     SCB_EnableDCache();
+    SCB->CACR |= SCB_CACR_FORCEWT_Msk;
 }
 
 /*----------------------------------------------------------------------------
