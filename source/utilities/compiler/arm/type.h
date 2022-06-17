@@ -114,22 +114,37 @@ typedef int_fast8_t         intalu_t;
 #   define M_SQRT1_2        0.707106781186547524401  // 1/sqrt(2)
 
 // iar has no strlcpy and strcasestr
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern size_t strlcpy(char *dst, const char *src, size_t dsize);
 extern char * strcasestr(const char *str, const char *substr);
+#ifdef __cplusplus
+}
+#endif
 
 #if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
 #   include <stdio.h>
+#   ifdef __cplusplus
+extern "C" {
+#   endif
 typedef long                off_t;
 typedef int64_t             off64_t;
 extern int fseeko(FILE *f, off_t offset, int whence);
 extern off_t ftello(FILE *f);
 extern int fseeko64(FILE *f, off64_t offset, int whence);
 extern off64_t ftello64(FILE *f);
+#   ifdef __cplusplus
+}
+#   endif
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO)
 
 #if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #   include <time.h>
 // iar has no clockid_t and useconds_t
+#   ifdef __cplusplus
+extern "C" {
+#   endif
 #   ifndef __IAR_TYPE_CLOCKID_T__
 #   define __IAR_TYPE_CLOCKID_T__
 typedef enum {
@@ -138,6 +153,9 @@ typedef enum {
 } clockid_t;
 typedef unsigned long       useconds_t;
 extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
+#   ifdef __cplusplus
+}
+#   endif
 #   endif
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_TIME)
 
@@ -152,6 +170,12 @@ extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO)
 
 // gcc has no strcasestr
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern char * strcasestr(const char *str, const char *substr);
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // __IS_COMPILER_XXX__
