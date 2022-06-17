@@ -1,6 +1,8 @@
 # CMakeLists head
 
 target_sources(${VSF_LIB_NAME} INTERFACE
+    vendor/system_stm32H7xx.c
+
     __common.c
     startup_STM32H7.c
 )
