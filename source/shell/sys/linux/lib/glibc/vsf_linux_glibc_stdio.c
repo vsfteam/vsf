@@ -690,6 +690,9 @@ FILE * popen(const char *command, const char *type)
         process = __vsh_prepare_process((char *)command, -1, fd[1]);
         close(fd[1]);
         sfd = vsf_linux_fd_get(fd[0]);
+    } else {
+        VSF_LINUX_ASSERT(false);
+        return NULL;
     }
 
     if (NULL == process) {
