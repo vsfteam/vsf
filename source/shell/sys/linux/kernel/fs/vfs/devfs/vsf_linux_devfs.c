@@ -66,7 +66,7 @@ __vsf_component_peda_ifs_entry(__vk_devfs_rand_read, vk_file_read)
 
 int vsf_linux_fs_bind_rand(char *path)
 {
-    int err = vsf_linux_fs_bind_target_ex(path, NULL,
+    int err = vsf_linux_fs_bind_target_ex(path, NULL, NULL,
             (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_rand_read), NULL,
             VSF_FILE_ATTR_READ, (uint64_t)-1);
     if (!err) {
@@ -126,7 +126,7 @@ __vsf_component_peda_ifs_entry(__vk_devfs_mal_write, vk_file_write)
 
 int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal)
 {
-    return vsf_linux_fs_bind_target_ex(path, mal,
+    return vsf_linux_fs_bind_target_ex(path, mal, NULL,
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_read),
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_write),
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_BLK, mal->size);
@@ -156,7 +156,7 @@ int vsf_linux_devfs_init(void)
         return err;
     }
 
-    err = vsf_linux_fs_bind_target_ex("dev/null", NULL,
+    err = vsf_linux_fs_bind_target_ex("dev/null", NULL, NULL,
                 NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_null_write),
                 VSF_FILE_ATTR_WRITE, 0);
     if (err != 0) {
@@ -164,7 +164,7 @@ int vsf_linux_devfs_init(void)
         return err;
     }
 
-    err = vsf_linux_fs_bind_target_ex("dev/zero", NULL,
+    err = vsf_linux_fs_bind_target_ex("dev/zero", NULL, NULL,
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_zero_read), NULL,
                 VSF_FILE_ATTR_READ, 0);
     if (err != 0) {

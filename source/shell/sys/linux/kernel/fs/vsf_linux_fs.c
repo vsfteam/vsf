@@ -79,6 +79,11 @@
 #endif
 
 /*============================ MACROS ========================================*/
+
+#if VSF_FS_CFG_VFS_FILE_HAS_OP != ENABLED
+#   error vsf_linux need VSF_FS_CFG_VFS_FILE_HAS_OP
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -1020,6 +1025,7 @@ int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
 {
     vk_file_t *file;
     vsf_linux_fd_t *sfd;
+    vsf_linux_fd_op_t *fdop;
     char fullpath[MAX_PATH];
     int fd;
 
@@ -1084,7 +1090,15 @@ __open_again:
         return -1;
     }
 
-    fd = vsf_linux_fd_create(&sfd, &__vsf_linux_fs_fdop);
+    if (    (file->fsop == &vk_vfs_op)
+        &&  !(file->attr & VSF_FILE_ATTR_DIRECTORY)
+        &&  (((vk_vfs_file_t *)file)->f.op != NULL)) {
+        fdop = (vsf_linux_fd_op_t *)((vk_vfs_file_t *)file)->f.op;
+    } else {
+        fdop = (vsf_linux_fd_op_t *)&__vsf_linux_fs_fdop;
+    }
+
+    fd = vsf_linux_fd_create(&sfd, (const vsf_linux_fd_op_t *)fdop);
     if (fd < 0) {
         __vsf_linux_fs_close_do(file);
     } else {
@@ -1727,7 +1741,8 @@ int vsf_linux_fs_get_target(const char *pathname, void **target)
     return err;
 }
 
-int vsf_linux_fs_bind_target_ex(const char *pathname, void *target,
+int vsf_linux_fs_bind_target_ex(const char *pathname,
+        void *target, vsf_linux_fd_op_t *op,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write,
         uint_fast32_t feature, uint64_t size)
@@ -1736,8 +1751,12 @@ int vsf_linux_fs_bind_target_ex(const char *pathname, void *target,
     if (fd >= 0) {
         int err = vsf_linux_fd_bind_target(fd, target, peda_read, peda_write);
         if (!err) {
-            vsf_linux_fd_set_feature(fd, feature);
-            vsf_linux_fd_set_size(fd, size);
+            vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
+            VSF_LINUX_ASSERT(vfs_file != NULL);
+
+            vfs_file->attr = feature;
+            vfs_file->size = size;
+            vfs_file->f.op = (void *)op;
         }
         close(fd);
         return err;
@@ -1749,7 +1768,7 @@ int vsf_linux_fs_bind_target(const char *pathname, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write)
 {
-    return vsf_linux_fs_bind_target_ex(pathname, target, peda_read, peda_write, 0, 0);
+    return vsf_linux_fs_bind_target_ex(pathname, target, NULL, peda_read, peda_write, 0, 0);
 }
 
 __vsf_component_peda_ifs_entry(__vk_vfs_buffer_write, vk_file_write)
@@ -1803,7 +1822,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_buffer_read, vk_file_read)
 int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
         uint_fast32_t feature, uint64_t size)
 {
-    return vsf_linux_fs_bind_target_ex(pathname, buffer,
+    return vsf_linux_fs_bind_target_ex(pathname, buffer, NULL,
         (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_buffer_read),
         (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_buffer_write),
         feature, size);
