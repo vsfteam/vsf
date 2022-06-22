@@ -88,9 +88,7 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_linux_eventfd_priv_t {
-    public_member(
-        implement(vsf_linux_fd_priv_t)
-    )
+    implement(vsf_linux_fd_priv_t)
     eventfd_t counter;
 } vsf_linux_eventfd_priv_t;
 
@@ -109,8 +107,8 @@ static int __vsf_linux_eventfd_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_eventfd_eof(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
-static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
-static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
+ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_stream_rx_eof(vsf_linux_fd_t *sfd);
 static int __vsf_linux_stream_tx_eof(vsf_linux_fd_t *sfd);
@@ -1103,8 +1101,12 @@ __open_again:
         __vsf_linux_fs_close_do(file);
     } else {
         vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-        sfd->priv->flags = flags;
+        priv->flags = flags;
         priv->file = file;
+
+        if (sfd->op->fn_init != NULL) {
+            sfd->op->fn_init(sfd);
+        }
 
         if ((flags & O_DIRECTORY) && !(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
             close(fd);
@@ -1742,7 +1744,7 @@ int vsf_linux_fs_get_target(const char *pathname, void **target)
 }
 
 int vsf_linux_fs_bind_target_ex(const char *pathname,
-        void *target, vsf_linux_fd_op_t *op,
+        void *target, const vsf_linux_fd_op_t *op,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write,
         uint_fast32_t feature, uint64_t size)
@@ -1869,7 +1871,7 @@ static void __vsf_linux_stream_evthandler(vsf_stream_t *stream, void *param, vsf
     }
 }
 
-static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
     vsf_stream_t *stream = priv->stream_rx;
@@ -1965,7 +1967,7 @@ do_return:
     return count - size;
 }
 
-static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
     vsf_stream_t *stream = priv->stream_tx;

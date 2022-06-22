@@ -46,6 +46,7 @@ vsf_dcl_class(vsf_linux_process_t)
 
 typedef struct vsf_linux_fd_op_t {
     int priv_size;
+    void (*fn_init)(vsf_linux_fd_t *sfd);
     int (*fn_fcntl)(vsf_linux_fd_t *sfd, int cmd, long arg);
     ssize_t (*fn_read)(vsf_linux_fd_t *sfd, void *buf, size_t count);
     ssize_t (*fn_write)(vsf_linux_fd_t *sfd, const void *buf, size_t count);
@@ -96,12 +97,20 @@ vsf_class(vsf_linux_fd_t) {
 };
 
 #if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
+typedef struct vsf_linux_fs_priv_t {
+    implement(vsf_linux_fd_priv_t)
+    vk_file_t *file;
+
+    struct dirent dir;
+    vk_file_t *child;
+} vsf_linux_fs_priv_t;
+
 vsf_dcl_class(vsf_linux_stream_priv_t)
 typedef void (*vsf_linux_stream_on_evt_t)(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready);
 
 vsf_class(vsf_linux_stream_priv_t) {
     public_member(
-        implement(vsf_linux_fd_priv_t)
+        implement(vsf_linux_fs_priv_t)
     )
     protected_member(
         vsf_stream_t *stream_rx;
@@ -125,14 +134,6 @@ vsf_class(vsf_linux_pipe_tx_priv_t) {
         vsf_linux_pipe_rx_priv_t *pipe_rx_priv;
     )
 };
-
-typedef struct vsf_linux_fs_priv_t {
-    implement(vsf_linux_fd_priv_t)
-    vk_file_t *file;
-
-    struct dirent dir;
-    vk_file_t *child;
-} vsf_linux_fs_priv_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -155,7 +156,7 @@ extern int vsf_linux_fs_bind_target(const char *pathname, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write);
 int vsf_linux_fs_bind_target_ex(const char *pathname,
-        void *target, vsf_linux_fd_op_t *op,
+        void *target, const vsf_linux_fd_op_t *op,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write,
         uint_fast32_t feature, uint64_t size);

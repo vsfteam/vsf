@@ -23,12 +23,15 @@
 
 #define __VSF_LINUX_CLASS_INHERIT__
 #define __VSF_LINUX_FS_CLASS_INHERIT__
+#define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_FS_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
+#   include "shell/sys/linux/include/poll.h"
 #   include "shell/sys/linux/include/sys/stat.h"
 #else
 #   include <unistd.h>
+#   include <poll.h>
 #   include <sys/stat.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
@@ -130,6 +133,153 @@ int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal)
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_read),
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_write),
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_BLK, mal->size);
+}
+#endif
+
+#if 0
+//#if VSF_HAL_USE_USART == ENABLED
+
+#   if VSF_USE_SIMPLE_STREAM != ENABLED
+#       error VSF_USE_SIMPLE_STREAM MUST be enabled to support uart dev
+#   endif
+#   ifndef VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE
+#       define VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE          64
+#   endif
+#   ifndef VSF_LINUX_DEVFS_UART_CFG_PRIO
+#       define VSF_LINUX_DEVFS_UART_CFG_PRIO                vsf_arch_prio_0
+#   endif
+
+typedef struct vsf_linux_uart_priv_t {
+    implement(vsf_linux_stream_priv_t)
+    implement(vsf_eda_t)
+    vsf_eda_t *eda_pending_tx;
+
+    implement(vsf_mem_stream_t)
+    uint8_t __buffer[VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE];
+} vsf_linux_uart_priv_t;
+
+static void __vsf_linux_uart_isrhandler(void *target, vsf_usart_t *usart,
+        em_usart_irq_mask_t irq_mask)
+{
+    vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)target;
+    vsf_eda_t *eda = NULL;
+
+    if (irq_mask & USART_IRQ_MASK_RX) {
+        eda = &priv->use_as__vsf_eda_t;
+    }
+    if (irq_mask & USART_IRQ_MASK_TX_CPL) {
+        eda = priv->eda_pending_tx;
+        VSF_LINUX_ASSERT(eda != NULL);
+        priv->eda_pending_tx = NULL;
+    }
+
+    if (eda != NULL) {
+        vsf_eda_post_evt(eda, VSF_EVT_USER);
+    }
+}
+
+static void __vsf_linux_uart_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    vsf_linux_uart_priv_t *priv = container_of(eda, vsf_linux_uart_priv_t, use_as__vsf_eda_t);
+    vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    switch (evt) {
+    case VSF_EVT_USER: {
+            uint8_t *buffer;
+            uint_fast32_t buflen, all_read_size = 0;
+            vsf_protect_t orig;
+
+            while (vsf_uart_fifo_rx_size(uart) > 0) {
+                orig = vsf_protect_sched();
+                    buflen = vsf_stream_get_wbuf(&priv->use_as__vsf_stream_t, &buffer);
+                vsf_unprotect_sched(orig);
+
+                if (!buflen) {
+                    vsf_trace_error("uart rx buffer overflow, please increase VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE");
+                    break;
+                } else {
+                    all_read_size += vsf_uart_fifo_read(uart, buffer, buflen);
+                }
+            }
+
+            if (all_read_size > 0) {
+                orig = vsf_protect_sched();
+                vsf_stream_write(&priv->use_as__vsf_stream_t, NULL, all_read_size);
+                vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+            }
+        }
+        break;
+    }
+}
+
+static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
+    vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    priv->op = &vsf_mem_stream_op;
+    priv->buffer = priv->__buffer;
+    priv->size = sizeof(priv->__buffer);
+    priv->stream_rx = &priv->use_as__vsf_stream_t;
+
+    vsf_stream_connect_tx(priv->stream_rx);
+    extern void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream);
+    __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
+
+    vsf_usart_init(uart, & (usart_cfg_t) {
+        .mode               = USART_NO_PARITY | USART_1_STOPBIT | USART_8_BIT_LENGTH | USART_NO_HWCONTROL | USART_TX_ENABLE | USART_RX_ENABLE,
+        .baudrate           = 9600,
+        .rx_timeout         = 0,
+        .isr                = {
+            .handler_fn     = __vsf_linux_uart_isrhandler,
+            .target_ptr     = priv,
+            .prio           = VSF_LINUX_DEVFS_UART_CFG_PRIO,
+        },
+    });
+    vsf_usart_irq_enable(uart, USART_IRQ_MASK_RX);
+    vsf_usart_enable(uart);
+
+    priv->fn.evthandler = __vsf_linux_uart_evthandler;
+    vsf_eda_init(&priv->use_as__vsf_eda_t, vsf_prio_highest);
+}
+
+static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+{
+    return 0;
+}
+
+static ssize_t __vsf_linux_uart_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
+    vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    VSF_LINUX_ASSERT(priv->eda_pending_tx == NULL);
+    priv->eda_pending_tx = vsf_eda_get_cur();
+    vsf_usart_request_tx(uart, (void *)buf, count);
+    vsf_thread_wfe(VSF_EVT_USER);
+    return count;
+}
+
+static int __vsf_linux_uart_close(vsf_linux_fd_t *sfd)
+{
+    return 0;
+}
+
+extern ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static const vsf_linux_fd_op_t __vsf_linux_uart_fdop = {
+    .priv_size          = sizeof(vsf_linux_uart_priv_t),
+    .fn_init            = __vsf_linux_uart_init,
+    .fn_fcntl           = __vsf_linux_uart_fcntl,
+    .fn_read            = __vsf_linux_stream_read,
+    .fn_write           = __vsf_linux_uart_write,
+    .fn_close           = __vsf_linux_uart_close,
+};
+
+int vsf_linux_fd_bind_uart(char *path, vsf_usart_t *uart)
+{
+    return vsf_linux_fs_bind_target_ex(path, uart, &__vsf_linux_uart_fdop,
+                NULL, NULL,
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY, 0);
 }
 #endif
 

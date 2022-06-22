@@ -37,6 +37,7 @@
 #   include "./include/sys/mman.h"
 #   include "./include/sys/shm.h"
 #   include "./include/sys/random.h"
+#   include "./include/sys/stat.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -55,6 +56,7 @@
 #   include <sys/mman.h>
 #   include <sys/shm.h>
 #   include <sys/random.h>
+#   include <sys/stat.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -694,6 +696,12 @@ int isatty(int fd)
     vsf_linux_process_t *shell_process = cur_process->shell_process;
     if (NULL == shell_process) {
         return 0;
+    }
+
+    if (sfd->op == &__vsf_linux_fs_fdop) {
+        vk_file_t *file = __vsf_linux_get_fs_ex(cur_process, fd);
+        VSF_LINUX_ASSERT(file != NULL);
+        return !!(file->attr & VSF_FILE_ATTR_TTY);
     }
 
     vsf_linux_fd_t *stdio_sfd = __vsf_linux_fd_get_ex(shell_process, STDIN_FILENO);
