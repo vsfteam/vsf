@@ -54,6 +54,10 @@ extern "C" {
 #   define VSF_FS_CFG_TIME              ENABLED
 #endif
 
+#ifndef VSF_FS_CFG_VFS_FILE_HAS_OP
+#   define VSF_FS_CFG_VFS_FILE_HAS_OP   ENABLED
+#endif
+
 #if defined(VSF_FS_CFG_MALLOC) && !defined(VSF_FS_CFG_FREE)
 #   error VSF_FS_CFG_FREE must be defined
 #endif
@@ -182,6 +186,9 @@ vsf_class(vk_vfs_file_t) {
                     void (*fn_read)(uintptr_t target, vsf_evt_t evt);
                     void (*fn_write)(uintptr_t target, vsf_evt_t evt);
                 } callback;
+#   if VSF_FS_CFG_VFS_FILE_HAS_OP == ENABLED
+                void *op;
+#   endif
             } f;
             struct {
                 vsf_dlist_t child_list;
