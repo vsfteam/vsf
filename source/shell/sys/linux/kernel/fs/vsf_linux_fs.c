@@ -1902,7 +1902,7 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         }
 
         cursize = vsf_stream_read(stream, buf, size);
-        if (isatty(sfd->fd)) {
+        if (isatty(sfd->fd) && !(priv->flags & O_NOCTTY)) {
             vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)priv;
             if (term_priv->termios.c_lflag & ECHO) {
                 char ch;
