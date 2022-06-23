@@ -505,18 +505,6 @@ int shutdown(int sockfd, int how)
     return priv->sockop->fn_fini(priv, how);
 }
 
-WEAK(send)
-int send(int sockfd, const void *buf, size_t len, int flags)
-{
-    return write(sockfd, buf, len);
-}
-
-WEAK(recv)
-int recv(int sockfd, void *buf, size_t len, int flags)
-{
-    return read(sockfd, buf, len);
-}
-
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED
 // ifaddrs.h
 WEAK(getifaddrs)

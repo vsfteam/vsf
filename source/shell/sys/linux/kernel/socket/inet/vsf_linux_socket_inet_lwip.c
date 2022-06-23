@@ -902,6 +902,28 @@ ssize_t recvfrom(int sockfd, void *buffer, size_t size, int flags,
                     buffer, size, flags, src_addr, addrlen);
 }
 
+int send(int sockfd, const void *buffer, size_t len, int flags)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
+
+    return __vsf_linux_socket_inet_send((vsf_linux_socket_inet_priv_t *)sfd->priv,
+                    buffer, len, flags, NULL, 0);
+}
+
+int recv(int sockfd, void *buffer, size_t len, int flags)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
+
+    return __vsf_linux_socket_inet_recv((vsf_linux_socket_inet_priv_t *)sfd->priv,
+                    buffer, len, flags, NULL, NULL);
+}
+
 // ifaddrs.h
 int getifaddrs(struct ifaddrs **ifaddrs)
 {
