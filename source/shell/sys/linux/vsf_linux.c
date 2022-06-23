@@ -43,6 +43,7 @@
 #   include "./include/termios.h"
 #   include "./include/pwd.h"
 #   include "./include/sys/utsname.h"
+#   include "./include/sys/ioctl.h"
 #   include "./include/spawn.h"
 #   include "./include/langinfo.h"
 #   include "./include/poll.h"
@@ -62,6 +63,7 @@
 #   include <termios.h>
 #   include <pwd.h>
 #   include <sys/utsname.h>
+#   include <sys/ioctl.h>
 #   include <spawn.h>
 #   include <langinfo.h>
 #   include <poll.h>
@@ -633,23 +635,27 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     int ret;
 
     ret = __vsf_linux_fd_create_ex(vsf_linux_resources_process(), &sfd,
-        &__vsf_linux_stream_fdop, STDIN_FILENO, NULL);
+        &vsf_linux_term_fdop, STDIN_FILENO, NULL);
     VSF_LINUX_ASSERT(ret == STDIN_FILENO);
     priv = (vsf_linux_stream_priv_t *)sfd->priv;
     priv->stream_rx = stdio_stream->in;
     priv->flags = O_RDONLY;
     __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
+    ((vsf_linux_term_priv_t *)priv)->subop = &__vsf_linux_stream_fdop;
+    vsf_linux_term_fdop.fn_init(sfd);
 
     ret = __vsf_linux_fd_create_ex(vsf_linux_resources_process(), &sfd,
-        &__vsf_linux_stream_fdop, STDOUT_FILENO, NULL);
+        &vsf_linux_term_fdop, STDOUT_FILENO, NULL);
     VSF_LINUX_ASSERT(ret == STDOUT_FILENO);
     priv = (vsf_linux_stream_priv_t *)sfd->priv;
     priv->stream_tx = stdio_stream->out;
     priv->flags = O_WRONLY;
     __vsf_linux_tx_stream_init(sfd, priv->stream_tx);
+    ((vsf_linux_term_priv_t *)priv)->subop = &__vsf_linux_stream_fdop;
+    vsf_linux_term_fdop.fn_init(sfd);
 
     ret = __vsf_linux_fd_create_ex(vsf_linux_resources_process(), &sfd,
-        &__vsf_linux_stream_fdop, STDERR_FILENO, NULL);
+        &vsf_linux_term_fdop, STDERR_FILENO, NULL);
     VSF_LINUX_ASSERT(ret == STDERR_FILENO);
     priv = (vsf_linux_stream_priv_t *)sfd->priv;
     // stderr is initialized after stdin, so stdin events will be bound to stderr
@@ -659,6 +665,8 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     priv->stream_tx = stdio_stream->err;
     __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
     __vsf_linux_tx_stream_init(sfd, priv->stream_tx);
+    ((vsf_linux_term_priv_t *)priv)->subop = &__vsf_linux_stream_fdop;
+    vsf_linux_term_fdop.fn_init(sfd);
 
     // create kernel process(pid0)
     if (NULL != __vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, VSF_LINUX_CFG_PRIO_LOWEST)) {
@@ -667,50 +675,10 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     return VSF_ERR_FAIL;
 }
 
-int vsf_linux_is_stdio_stream(int fd)
-{
-    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    VSF_LINUX_ASSERT(sfd != NULL);
-    vsf_linux_fd_priv_t* priv = sfd->priv;
-
-    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(cur_process != NULL);
-    vsf_linux_process_t *stdio_process = &__vsf_linux.process_for_resources;
-
-    vsf_linux_fd_t *sfd_stdin = __vsf_linux_fd_get_ex(stdio_process, STDIN_FILENO);
-    vsf_linux_fd_t *sfd_stdout = __vsf_linux_fd_get_ex(stdio_process, STDOUT_FILENO);
-    vsf_linux_fd_t *sfd_stderr = __vsf_linux_fd_get_ex(stdio_process, STDERR_FILENO);
-    return  (priv == sfd_stdin->priv)
-        ||  (priv == sfd_stdout->priv)
-        ||  (priv == sfd_stderr->priv);
-}
-
 int isatty(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    VSF_LINUX_ASSERT(sfd != NULL);
-    vsf_linux_fd_priv_t* priv = sfd->priv;
-
-    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(cur_process != NULL);
-    vsf_linux_process_t *shell_process = cur_process->shell_process;
-    if (NULL == shell_process) {
-        return 0;
-    }
-
-    if (sfd->op == &__vsf_linux_fs_fdop) {
-        vk_file_t *file = __vsf_linux_get_fs_ex(cur_process, fd);
-        VSF_LINUX_ASSERT(file != NULL);
-        return !!(file->attr & VSF_FILE_ATTR_TTY);
-    }
-
-    vsf_linux_fd_t *stdio_sfd = __vsf_linux_fd_get_ex(shell_process, STDIN_FILENO);
-    if ((stdio_sfd != NULL) && (stdio_sfd->priv == priv)) { return true; }
-    stdio_sfd = __vsf_linux_fd_get_ex(shell_process, STDOUT_FILENO);
-    if ((stdio_sfd != NULL) && (stdio_sfd->priv == priv)) { return true; }
-    stdio_sfd = __vsf_linux_fd_get_ex(shell_process, STDERR_FILENO);
-    if ((stdio_sfd != NULL) && (stdio_sfd->priv == priv)) { return true; }
-    return 0;
+    return sfd->op == &vsf_linux_term_fdop;
 }
 
 vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op,
@@ -792,20 +760,6 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
         memset(process, 0, sizeof(*process));
         process->prio = vsf_prio_inherit;
         process->shell_process = process;
-
-#if VSF_LINUX_USE_TERMIOS == ENABLED
-        static const struct termios __default_term = {
-            .c_oflag        = OPOST | ONLCR,
-            .c_lflag        = ECHO | ECHOE | ECHOK | ECHONL | ICANON,
-            .c_cc[VMIN]     = 1,
-            .c_cc[VERASE]   = 010,      // BS
-            .c_cc[VWERASE]  = 027,      // ETB
-            .c_cc[VKILL]    = 025,      // NAK
-        };
-        process->term[STDIN_FILENO] = __default_term;
-        process->term[STDOUT_FILENO] = __default_term;
-        process->term[STDERR_FILENO] = __default_term;
-#endif
 
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {
@@ -2291,29 +2245,14 @@ int posix_spawn_file_actions_addfchdir_np(posix_spawn_file_actions_t *actions, i
 }
 
 // termios.h
-#if VSF_LINUX_USE_TERMIOS == ENABLED
 int tcgetattr(int fd, struct termios *termios)
 {
-    if ((fd >= 3) || (NULL == termios)) {
-        return -1;
-    }
-
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    *termios = process->term[fd];
-    return 0;
+    return ioctl(fd, TCGETS, termios);
 }
 
 int tcsetattr(int fd, int optional_actions, const struct termios *termios)
 {
-    if ((fd >= 3) || (NULL == termios)) {
-        return -1;
-    }
-
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    process->term[fd] = *termios;
-    return 0;
+    return ioctl(fd, TCSETS, termios);
 }
 
 pid_t tcgetpgrp(int fd)
@@ -2377,7 +2316,6 @@ int cfsetspeed(struct termios *termios_p, speed_t speed)
 {
     return 0;
 }
-#endif      // VSF_LINUX_USE_TERMIOS
 
 int vsf_linux_expandenv(const char *str, char *output, size_t bufflen)
 {

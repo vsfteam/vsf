@@ -152,7 +152,7 @@ int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal)
 #   endif
 
 typedef struct vsf_linux_uart_priv_t {
-    implement(vsf_linux_stream_priv_t)
+    implement(vsf_linux_term_priv_t)
     implement(vsf_eda_t)
     vsf_eda_t *eda_pending_tx;
 
@@ -236,6 +236,10 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
     vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
 
+    priv->subop = sfd->op;
+    sfd->op = &vsf_linux_term_fdop;
+    vsf_linux_term_fdop.fn_init(sfd);
+
     priv->op = &vsf_mem_stream_op;
     priv->buffer = priv->__buffer;
     priv->size = sizeof(priv->__buffer);
@@ -262,18 +266,8 @@ static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     } uarg;
 
     switch (cmd) {
-    case TCGETS:
-        uarg.termios = (struct termios *)arg;
-        uarg.termios->c_oflag       = OPOST | ONLCR;
-        uarg.termios->c_lflag       = ECHO | ECHOE | ECHOK | ECHONL | ICANON;
-        uarg.termios->c_cc[VMIN]    = 1;
-        uarg.termios->c_cc[VERASE]  = 010;      // BS
-        uarg.termios->c_cc[VWERASE] = 027;      // ETB
-        uarg.termios->c_cc[VKILL]   = 025;      // NAK
-//        uarg.termios->c_ispeed      = ;
-//        uarg.termios->c_ospeed      = ;
-        break;
     case TCSETS:
+        uarg.termios = (struct termios *)arg;
         break;
     }
     return 0;

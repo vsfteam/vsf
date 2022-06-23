@@ -241,9 +241,6 @@ vsf_class(vsf_linux_process_t) {
             pid_t ppid;
             pid_t gid;
         } id;
-#if VSF_LINUX_USE_TERMIOS == ENABLED
-        struct termios term[3];
-#endif
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         struct vsf_linux_timer_t timers[ITIMER_NUM];
         vsf_callback_timer_t real_timer;
@@ -349,7 +346,6 @@ extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
 #   endif
 
 extern bool vsf_linux_is_inited(void);
-extern int vsf_linux_is_stdio_stream(int fd);
 
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);

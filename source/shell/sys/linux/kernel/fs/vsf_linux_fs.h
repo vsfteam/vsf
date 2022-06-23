@@ -24,6 +24,12 @@
 
 #if VSF_USE_LINUX == ENABLED
 
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "./include/termios.h"
+#else
+#   include <termios.h>
+#endif
+
 #if     defined(__VSF_LINUX_FS_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_LINUX_FS_CLASS_INHERIT__)
@@ -134,6 +140,13 @@ vsf_class(vsf_linux_pipe_tx_priv_t) {
         vsf_linux_pipe_rx_priv_t *pipe_rx_priv;
     )
 };
+
+typedef struct vsf_linux_term_priv_t {
+    implement(vsf_linux_stream_priv_t)
+    const vsf_linux_fd_op_t *subop;
+    struct termios termios;
+    char esc_type;
+} vsf_linux_term_priv_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -142,6 +155,7 @@ vsf_class(vsf_linux_pipe_tx_priv_t) {
 extern const vsf_linux_fd_op_t __vsf_linux_fs_fdop;
 extern const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop;
 extern const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop;
+extern const vsf_linux_fd_op_t vsf_linux_term_fdop;
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/

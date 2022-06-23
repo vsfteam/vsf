@@ -555,7 +555,7 @@ int vsh_main(int argc, char *argv[])
         fflush(stdout);
         while (1) {
             while (read(STDIN_FILENO, &ch, 1) != 1) {
-                if ((errno != EINTR) && vsf_linux_is_stdio_stream(STDIN_FILENO)) {
+                if ((errno != EINTR) && isatty(STDIN_FILENO)) {
                     fprintf(stderr, "fail to read from stdin, is stdin disconnected?" VSH_LINEEND);
                     VSF_LINUX_ASSERT(false);
                 }
@@ -581,7 +581,7 @@ int vsh_main(int argc, char *argv[])
 
                 switch (ch) {
                 case VSH_ENTER_CHAR:
-                    if (vsf_linux_is_stdio_stream(STDIN_FILENO)) {
+                    if (isatty(STDIN_FILENO)) {
 #if VSH_ENTER_CHAR == '\r'
                         write(STDOUT_FILENO, "\n", 1);
 #endif

@@ -116,7 +116,14 @@ static int __vsf_linux_stream_tx_eof(vsf_linux_fd_t *sfd);
 static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
 
+static void __vsf_linux_term_init(vsf_linux_fd_t *sfd);
+static int __vsf_linux_term_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+static ssize_t __vsf_linux_term_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_term_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
+static int __vsf_linux_term_close(vsf_linux_fd_t *sfd);
+
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
     .priv_size          = sizeof(vsf_linux_fs_priv_t),
@@ -160,6 +167,15 @@ const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
     .fn_write           = __vsf_linux_stream_write,
     .fn_close           = __vsf_linux_pipe_close,
     .fn_eof             = __vsf_linux_stream_tx_eof,
+};
+
+const vsf_linux_fd_op_t vsf_linux_term_fdop = {
+    .priv_size          = sizeof(vsf_linux_term_priv_t),
+    .fn_init            = __vsf_linux_term_init,
+    .fn_fcntl           = __vsf_linux_term_fcntl,
+    .fn_read            = __vsf_linux_term_read,
+    .fn_write           = __vsf_linux_term_write,
+    .fn_close           = __vsf_linux_term_close,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -530,20 +546,7 @@ void vsf_linux_fd_delete(int fd)
 
 bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
 {
-    vsf_linux_process_t *process;
-    if (sfd->priv->flags & O_NONBLOCK) {
-        return false;
-    }
-
-#if VSF_LINUX_USE_TERMIOS == ENABLED
-    if (sfd->fd < 3) {
-        process = vsf_linux_get_cur_process();
-        VSF_LINUX_ASSERT(process != NULL);
-        struct termios *term = &process->term[sfd->fd];
-        return term->c_cc[VMIN] > 0;
-    }
-#endif
-    return true;
+    return !(sfd->priv->flags & O_NONBLOCK);
 }
 
 // vsf_linux_fd_[pend/set/clear]_[status/events] MUST be called scheduler protected
@@ -1899,27 +1902,18 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         }
 
         cursize = vsf_stream_read(stream, buf, size);
-        if ((sfd->fd == STDIN_FILENO) && vsf_linux_is_stdio_stream(sfd->fd)) {
-#if VSF_LINUX_USE_TERMIOS == ENABLED
-            vsf_linux_process_t *process = vsf_linux_get_cur_process();
-            VSF_LINUX_ASSERT(process != NULL);
-            struct termios *term = &process->term[STDIN_FILENO];
-
-            if (term->c_lflag & ECHO) {
-#else
-            if (true) {
-#endif
-                // TODO: do not use static value here for multi process support
-                static char esc_type = '\0';
+        if (isatty(sfd->fd)) {
+            vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)priv;
+            if (term_priv->termios.c_lflag & ECHO) {
                 char ch;
                 for (uint_fast32_t i = 0; i < cursize; i++) {
                     ch = ((char *)buf)[i];
-                    switch (esc_type) {
+                    switch (term_priv->esc_type) {
                     case '\033':
                         if ((ch == '[') || (ch == 'O')){
-                            esc_type = ch;
+                            term_priv->esc_type = ch;
                         } else {
-                            esc_type = '\0';
+                            term_priv->esc_type = '\0';
                             goto char_input;
                         }
                         break;
@@ -1927,16 +1921,16 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
                         if (    ((ch >= 'a') && (ch <= 'z'))
                             ||  ((ch >= 'A') && (ch <= 'Z'))
                             ||  (ch == '~')) {
-                            esc_type = '\0';
+                            term_priv->esc_type = '\0';
                         }
                         break;
                     case 'O':
-                        esc_type = '\0';
+                        term_priv->esc_type = '\0';
                         break;
                     case '\0':
                     char_input:
                         switch (ch) {
-                        case '\033':esc_type = '\033';                  break;
+                        case '\033':term_priv->esc_type = '\033';       break;
                         case 0x7F:
                         case '\b':  write(STDOUT_FILENO, "\b \b", 3);   break;
                         default:
@@ -2213,5 +2207,82 @@ vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_rx_priv_t *priv_rx)
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
 #endif
+
+// term
+static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
+    static const struct termios __default_term = {
+        .c_oflag        = OPOST | ONLCR,
+        .c_lflag        = ECHO | ECHOE | ECHOK | ECHONL | ICANON,
+        .c_cc[VMIN]     = 1,
+        .c_cc[VERASE]   = 010,      // BS
+        .c_cc[VWERASE]  = 027,      // ETB
+        .c_cc[VKILL]    = 025,      // NAK
+    };
+    priv->termios = __default_term;
+}
+
+static int __vsf_linux_term_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
+    const vsf_linux_fd_op_t *subop = priv->subop;
+    int ret = 0;
+
+    switch (cmd) {
+    case TCGETS:    *(struct termios *)arg = priv->termios;     return 0;
+    case TCSETS:    priv->termios = *(struct termios *)arg;     break;
+    }
+
+    if (subop->fn_fcntl != NULL) {
+        ret = subop->fn_fcntl(sfd, cmd, arg);
+    }
+
+    if (!ret) {
+        switch (cmd) {
+        case TCSETS:
+            if (priv->termios.c_cc[VMIN] > 0) {
+                sfd->priv->flags &= ~O_NONBLOCK;
+            } else {
+                sfd->priv->flags |= O_NONBLOCK;
+            }
+            break;
+        }
+    }
+    return ret;
+}
+
+static ssize_t __vsf_linux_term_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
+    const vsf_linux_fd_op_t *subop = priv->subop;
+
+    if (subop->fn_read != NULL) {
+        return subop->fn_read(sfd, buf, count);
+    }
+    return 0;
+}
+
+static ssize_t __vsf_linux_term_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
+    const vsf_linux_fd_op_t *subop = priv->subop;
+
+    if (subop->fn_write != NULL) {
+        return subop->fn_write(sfd, buf, count);
+    }
+    return 0;
+}
+
+static int __vsf_linux_term_close(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
+    const vsf_linux_fd_op_t *subop = priv->subop;
+
+    if (subop->fn_close != NULL) {
+        return subop->fn_close(sfd);
+    }
+    return 0;
+}
 
 #endif      // VSF_USE_LINUX

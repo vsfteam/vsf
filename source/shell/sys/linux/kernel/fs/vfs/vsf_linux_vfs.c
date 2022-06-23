@@ -73,7 +73,7 @@ int vsf_linux_vfs_init(void)
     }
 #endif
 
-#if VSF_LINUX_USE_TERMIOS == ENABLED
+#if VSF_LINUX_USE_TERMINFO == ENABLED
     char terminfo_path[MAX_PATH];
     int terminfo_pathlen;
     strcpy(terminfo_path, VSF_LINUX_CFG_TERMINFO_PATH "/");
