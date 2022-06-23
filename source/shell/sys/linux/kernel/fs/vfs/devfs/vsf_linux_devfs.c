@@ -129,7 +129,7 @@ __vsf_component_peda_ifs_entry(__vk_devfs_mal_write, vk_file_write)
 #   pragma GCC diagnostic pop
 #endif
 
-int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal)
+int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal)
 {
     return vsf_linux_fs_bind_target_ex(path, mal, NULL,
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_read),
@@ -306,7 +306,7 @@ static const vsf_linux_fd_op_t __vsf_linux_uart_fdop = {
     .fn_close           = __vsf_linux_uart_close,
 };
 
-int vsf_linux_fd_bind_uart(char *path, vsf_usart_t *uart)
+int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart)
 {
     return vsf_linux_fs_bind_target_ex(path, uart, &__vsf_linux_uart_fdop,
                 NULL, NULL,

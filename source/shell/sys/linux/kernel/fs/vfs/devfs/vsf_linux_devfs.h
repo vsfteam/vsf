@@ -36,10 +36,10 @@ extern "C" {
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_USE_MAL == ENABLED
-extern int vsf_linux_fd_bind_mal(char *path, vk_mal_t *mal);
+extern int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal);
 #endif
 #if VSF_HAL_USE_USART == ENABLED
-extern int vsf_linux_fd_bind_uart(char *path, vsf_usart_t *uart);
+extern int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart);
 #endif
 extern int vsf_linux_devfs_init(void);
 
