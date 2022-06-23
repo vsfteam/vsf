@@ -43,6 +43,10 @@
 #   define VSF_AIC8800_BTSTACK_CFG_PRIORITY             vsf_prio_inherit
 #endif
 
+#ifndef VSF_AIC8800_BTSTACK_CFG_HW_PRIORITY
+#   define VSF_AIC8800_BTSTACK_CFG_HW_PRIORITY          vsf_arch_prio_3
+#endif
+
 #ifndef VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE
 #   define VSF_AIC8800_BTSTACK_CFG_MAX_PACKET_SIZE      (8 + 256)
 #endif
@@ -595,9 +599,7 @@ static int __hci_transport_aic8800_open(void)
 
     bt_hci_open(BT_HCI_CH_0, BT_HCI_PKT_TYPE_HCI_UART,
             __hci_transport_aic8800_rx_handler, __hci_transport_aic8800_tx_handler, false);
-#ifdef VSF_AIC8800_BTSTACK_CFG_HW_PRIORITY
     NVIC_SetPriority(WCN2MCU0_IRQn, VSF_AIC8800_BTSTACK_CFG_HW_PRIORITY);
-#endif
     bt_hci_rx_start(BT_HCI_CH_0);
     return 0;
 }
