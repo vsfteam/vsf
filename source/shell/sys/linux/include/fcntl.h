@@ -30,6 +30,9 @@ extern "C" {
 #define O_EXCL          0x0800
 #define O_CLOEXEC       0x1000
 
+#define O_NOCTTY        0x10000
+#define O_NDELAY        O_NONBLOCK
+
 #define F_DUPFD         0
 #define F_GETFD         1
 #define F_SETFD         2

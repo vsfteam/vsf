@@ -111,24 +111,43 @@ typedef unsigned int speed_t;
 enum {
         B0          = 0,
         B50         = 1,
+#define B50         B50
         B75         = 2,
+#define B75         B75
         B110        = 3,
+#define B110        B110
         B134        = 4,
+#define B134        B134
         B150        = 5,
+#define B150        B150
         B200        = 6,
+#define B200        B200
         B300        = 7,
+#define B300        B300
         B600        = 8,
+#define B600        B600
         B1200       = 9,
+#define B1200       B1200
         B1800       = 10,
+#define B1800       B1800
         B2400       = 11,
+#define B2400       B2400
         B4800       = 12,
+#define B4800       B4800
         B9600       = 13,
+#define B9600       B9600
         B19200      = 14,
+#define B19200      B19200
         B38400      = 15,
+#define B38400      B38400
         B57600      = 16,
+#define B57600      B57600
         B115200     = 17,
+#define B115200     B115200
         B230400     = 18,
+#define B230400     B230400
         B460800     = 19,
+#define B460800     B460800
 };
 
 #define CSIZE       0x0030
@@ -141,6 +160,7 @@ enum {
 #define CREAD       0x0080
 #define PARENB      0x0100
 #define PARODD      0x0200
+#define CLOCAL      0X0400
 
 #define CRTSCTS     0x0400
 

@@ -47,10 +47,6 @@ enum {
     IPPROTO_UDP         = 17,
 };
 
-enum {
-    MSG_NOSIGNAL        = 0,
-};
-
 typedef uint32_t        socklen_t;
 #define __socklen_t_defined
 
@@ -136,8 +132,15 @@ int listen(int socket, int backlog);
 // flags
 enum {
     MSG_OOB             = 1 << 0,
+#define MSG_OOB         MSG_OOB
     MSG_PEEK            = 1 << 1,
+#define MSG_PEEK        MSG_PEEK
     MSG_WAITALL         = 1 << 2,
+#define MSG_WAITALL     MSG_WAITALL
+    MSG_NOSIGNAL        = 1 << 3,
+#define MSG_NOSIGNAL    MSG_NOSIGNAL
+    MSG_DONTWAIT        = 1 << 4,
+#define MSG_DONTWAIT    MSG_DONTWAIT
 };
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
 ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,

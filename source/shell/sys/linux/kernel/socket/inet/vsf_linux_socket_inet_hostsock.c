@@ -147,6 +147,14 @@ enum {
 #define VSF_LINUX_SOCKET_SO_SNDTIMEO    21
 #define VSF_LINUX_SOCKET_SO_NONBLOCK    100
 
+enum {
+    VSF_LINUX_SOCKET_MSG_OOB            = 1 << 0,
+    VSF_LINUX_SOCKET_MSG_PEEK           = 1 << 1,
+    VSF_LINUX_SOCKET_MSG_WAITALL        = 1 << 2,
+    VSF_LINUX_SOCKET_MSG_NOSIGNAL       = 1 << 3,
+    VSF_LINUX_SOCKET_MSG_DONTWAIT       = 1 << 4,
+};
+
 typedef uint32_t socklen_t;
 typedef uint16_t vsf_linux_socket_sa_family_t;
 struct vsf_linux_socket_sockaddr {
@@ -540,7 +548,15 @@ static void __vsf_linux_ms_to_timeval(struct vsf_linux_timeval *t, unsigned long
 
 static int __vsf_linux_sockflag2host(int flags)
 {
-    return 0;
+    int hostflags = 0;
+    if (flags & VSF_LINUX_SOCKET_MSG_DONTWAIT) {
+#ifdef __WIN__
+        VSF_LINUX_ASSERT(false);
+#else
+        hostflags |= MSG_DONTWAIT;
+#endif
+    }
+    return hostflags;
 }
 
 static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
@@ -862,7 +878,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
 {
     int ret;
 
-    if (!priv->is_nonblock && (priv->hprotocol != IPPROTO_UDP)) {
+    if (!priv->is_nonblock && !(flags & VSF_LINUX_SOCKET_MSG_DONTWAIT) && (priv->hprotocol != IPPROTO_UDP)) {
         vsf_linux_trigger_t trig;
         vsf_linux_trigger_init(&trig);
         short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, &trig, vsf_protect_sched());
@@ -890,7 +906,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
 {
     int ret;
 
-    if (!priv->is_nonblock) {
+    if (!priv->is_nonblock && !(flags & VSF_LINUX_SOCKET_MSG_DONTWAIT)) {
         vsf_linux_trigger_t trig;
         vsf_linux_trigger_init(&trig);
         short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, &trig, vsf_protect_sched());
@@ -958,6 +974,28 @@ ssize_t VSF_LINUX_SOCKET_WRAPPER(recvfrom)(int sockfd, void *buffer, size_t size
 
     return __vsf_linux_socket_inet_recv((vsf_linux_socket_inet_priv_t *)sfd->priv,
                     buffer, size, flags, src_addr, addrlen);
+}
+
+int VSF_LINUX_SOCKET_WRAPPER(send)(int sockfd, const void *buf, size_t len, int flags)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
+
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
+    return __vsf_linux_socket_inet_send(priv, buf, len, flags, NULL, 0);
+}
+
+int VSF_LINUX_SOCKET_WRAPPER(recv)(int sockfd, void *buf, size_t len, int flags)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
+    if (!sfd) {
+        return -1;
+    }
+
+    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
+    return __vsf_linux_socket_inet_recv(priv, buf, len, flags, NULL, NULL);
 }
 
 // netdb.h

@@ -142,6 +142,9 @@ extern "C" {
 #define EKEYREVOKED     128 /* Key has been revoked */
 #define EKEYREJECTED    129 /* Key was rejected by service */
 
+/* Linux has no ENOTSUP error code. */
+#define ENOTSUP         EOPNOTSUPP
+
 extern int * __vsf_linux_errno(void);
 #define errno           (*__vsf_linux_errno())
 
