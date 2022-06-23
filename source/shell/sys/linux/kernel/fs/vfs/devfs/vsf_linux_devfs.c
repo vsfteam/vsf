@@ -28,10 +28,12 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
 #   include "shell/sys/linux/include/poll.h"
+#   include "shell/sys/linux/include/termios.h"
 #   include "shell/sys/linux/include/sys/stat.h"
 #else
 #   include <unistd.h>
 #   include <poll.h>
+#   include <termios.h>
 #   include <sys/stat.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
@@ -154,18 +156,44 @@ typedef struct vsf_linux_uart_priv_t {
     implement(vsf_eda_t)
     vsf_eda_t *eda_pending_tx;
 
-    implement(vsf_mem_stream_t)
+    uint32_t mode;
+    uint32_t baudrate;
+
+    // use vsf_fifo_stream_t because it doesn't need protect.
+    //  so stream APIs can be called directly in isr
+    implement(vsf_fifo_stream_t)
     uint8_t __buffer[VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE];
 } vsf_linux_uart_priv_t;
 
-static void __vsf_linux_uart_isrhandler(void *target, vsf_usart_t *usart,
+static uint_fast32_t __vsf_linux_uart_rx(vsf_usart_t *uart, vsf_linux_uart_priv_t *priv)
+{
+    uint8_t *buffer;
+    uint_fast32_t buflen, all_read_size = 0;
+
+    while (vsf_uart_fifo_rx_size(uart) > 0) {
+        buflen = vsf_stream_get_wbuf(&priv->use_as__vsf_stream_t, &buffer);
+
+        if (!buflen) {
+            vsf_trace_error("uart rx buffer overflow, please increase VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE");
+            break;
+        } else {
+            all_read_size += vsf_stream_write(&priv->use_as__vsf_stream_t, NULL, vsf_usart_fifo_read(uart, buffer, buflen));
+        }
+    }
+
+    return all_read_size;
+}
+
+static void __vsf_linux_uart_isrhandler(void *target, vsf_usart_t *uart,
         em_usart_irq_mask_t irq_mask)
 {
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)target;
     vsf_eda_t *eda = NULL;
 
     if (irq_mask & USART_IRQ_MASK_RX) {
-        eda = &priv->use_as__vsf_eda_t;
+        if (__vsf_linux_uart_rx(uart, priv) > 0) {
+            eda = &priv->use_as__vsf_eda_t;
+        }
     }
     if (irq_mask & USART_IRQ_MASK_TX_CPL) {
         eda = priv->eda_pending_tx;
@@ -180,36 +208,27 @@ static void __vsf_linux_uart_isrhandler(void *target, vsf_usart_t *usart,
 
 static void __vsf_linux_uart_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_linux_uart_priv_t *priv = container_of(eda, vsf_linux_uart_priv_t, use_as__vsf_eda_t);
-    vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
-
-    switch (evt) {
-    case VSF_EVT_USER: {
-            uint8_t *buffer;
-            uint_fast32_t buflen, all_read_size = 0;
-            vsf_protect_t orig;
-
-            while (vsf_uart_fifo_rx_size(uart) > 0) {
-                orig = vsf_protect_sched();
-                    buflen = vsf_stream_get_wbuf(&priv->use_as__vsf_stream_t, &buffer);
-                vsf_unprotect_sched(orig);
-
-                if (!buflen) {
-                    vsf_trace_error("uart rx buffer overflow, please increase VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE");
-                    break;
-                } else {
-                    all_read_size += vsf_uart_fifo_read(uart, buffer, buflen);
-                }
-            }
-
-            if (all_read_size > 0) {
-                orig = vsf_protect_sched();
-                vsf_stream_write(&priv->use_as__vsf_stream_t, NULL, all_read_size);
-                vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
-            }
-        }
-        break;
+    if (VSF_EVT_USER == evt) {
+        vsf_linux_uart_priv_t *priv = container_of(eda, vsf_linux_uart_priv_t, use_as__vsf_eda_t);
+        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
     }
+}
+
+static void __vsf_linux_uart_config(vsf_usart_t *uart, vsf_linux_uart_priv_t *priv)
+{
+    vsf_usart_disable(uart);
+    vsf_usart_init(uart, & (usart_cfg_t) {
+        .mode               = priv->mode,
+        .baudrate           = priv->baudrate,
+        .rx_timeout         = 0,
+        .isr                = {
+            .handler_fn     = __vsf_linux_uart_isrhandler,
+            .target_ptr     = priv,
+            .prio           = VSF_LINUX_DEVFS_UART_CFG_PRIO,
+        },
+    });
+    vsf_usart_irq_enable(uart, USART_IRQ_MASK_RX);
+    vsf_usart_enable(uart);
 }
 
 static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
@@ -221,23 +240,14 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
     priv->buffer = priv->__buffer;
     priv->size = sizeof(priv->__buffer);
     priv->stream_rx = &priv->use_as__vsf_stream_t;
+    priv->mode = USART_NO_PARITY | USART_1_STOPBIT | USART_8_BIT_LENGTH | USART_NO_HWCONTROL | USART_TX_ENABLE | USART_RX_ENABLE;
+    priv->baudrate = 9600;
 
     vsf_stream_connect_tx(priv->stream_rx);
     extern void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream);
     __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
 
-    vsf_usart_init(uart, & (usart_cfg_t) {
-        .mode               = USART_NO_PARITY | USART_1_STOPBIT | USART_8_BIT_LENGTH | USART_NO_HWCONTROL | USART_TX_ENABLE | USART_RX_ENABLE,
-        .baudrate           = 9600,
-        .rx_timeout         = 0,
-        .isr                = {
-            .handler_fn     = __vsf_linux_uart_isrhandler,
-            .target_ptr     = priv,
-            .prio           = VSF_LINUX_DEVFS_UART_CFG_PRIO,
-        },
-    });
-    vsf_usart_irq_enable(uart, USART_IRQ_MASK_RX);
-    vsf_usart_enable(uart);
+    __vsf_linux_uart_config(uart, priv);
 
     priv->fn.evthandler = __vsf_linux_uart_evthandler;
     vsf_eda_init(&priv->use_as__vsf_eda_t, vsf_prio_highest);
@@ -245,6 +255,27 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
 
 static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
 {
+    vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
+    vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+    union {
+        struct termios *termios;
+    } uarg;
+
+    switch (cmd) {
+    case TCGETS:
+        uarg.termios = (struct termios *)arg;
+        uarg.termios->c_oflag       = OPOST | ONLCR;
+        uarg.termios->c_lflag       = ECHO | ECHOE | ECHOK | ECHONL | ICANON;
+        uarg.termios->c_cc[VMIN]    = 1;
+        uarg.termios->c_cc[VERASE]  = 010;      // BS
+        uarg.termios->c_cc[VWERASE] = 027;      // ETB
+        uarg.termios->c_cc[VKILL]   = 025;      // NAK
+//        uarg.termios->c_ispeed      = ;
+//        uarg.termios->c_ospeed      = ;
+        break;
+    case TCSETS:
+        break;
+    }
     return 0;
 }
 

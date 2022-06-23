@@ -22,6 +22,10 @@ extern "C" {
 #define cfsetspeed  VSF_LINUX_WRAPPER(cfsetspeed)
 #endif
 
+// for ioctrl
+#define TCGETS      (('t' << 8) | 0)
+#define TCSETS      (('t' << 8) | 1)
+
 typedef unsigned int tcflag_t;
 typedef unsigned char cc_t;
 typedef unsigned int speed_t;
@@ -147,7 +151,7 @@ struct termios {
     tcflag_t c_lflag;
     cc_t c_cc[NCCS];
     speed_t c_ispeed;
-    speed_t c_cspeed;
+    speed_t c_ospeed;
 };
 
 int tcgetattr(int fd, struct termios *termios);
