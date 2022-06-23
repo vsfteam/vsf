@@ -181,6 +181,12 @@ usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *usart_ptr)
     //todo: write status
 }
 
+uint_fast16_t vsf_hw_usart_get_read_fifo_data_count(vsf_hw_usart_t *usart_ptr)
+{
+    // TODO: CHECK M484 USART FIFO DEPTH
+    return (usart_ptr->usart_const->usart->FIFOSTS & UART_FIFOSTS_RXEMPTY_Msk) ? 0 : 1;
+}
+
 uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
 {
     uint_fast16_t ret_count;
@@ -198,6 +204,12 @@ uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr
     }
     usart_ptr->status.is_busy = false;
     return ret_count;
+}
+
+uint_fast16_t vsf_hw_usart_get_write_fifo_free_count(vsf_hw_usart_t *usart_ptr)
+{
+    // TODO: CHECK M484 USART FIFO DEPTH
+    return (usart_ptr->usart_const->usart->FIFOSTS & UART_FIFOSTS_TXEMPTY_Msk) ? 1 : 0;
 }
 
 uint_fast16_t vsf_hw_usart_fifo_write(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)

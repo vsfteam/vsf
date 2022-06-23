@@ -268,7 +268,7 @@ static void __usart_demo_fifo_isr_read(vsf_usart_t * usart)
 
     demo->cnt = 0;
     vsf_err_t err = __usart_demo_init(usart, __usart_read_isr_handler,
-                                      (void *)demo, APP_USART_DEMO_IRQ_PRIO, USART_IRQ_MASK_RX_CPL);
+                                      (void *)demo, APP_USART_DEMO_IRQ_PRIO, USART_IRQ_MASK_RX);
     VSF_ASSERT(err == VSF_ERR_NONE);
 
     while (!demo->is_to_exit);
