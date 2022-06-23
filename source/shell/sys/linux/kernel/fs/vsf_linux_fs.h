@@ -25,7 +25,7 @@
 #if VSF_USE_LINUX == ENABLED
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "./include/termios.h"
+#   include "../../include/termios.h"
 #else
 #   include <termios.h>
 #endif
