@@ -253,7 +253,7 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
     vsf_eda_init(&priv->use_as__vsf_eda_t, vsf_prio_highest);
 }
 
-static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
     vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);

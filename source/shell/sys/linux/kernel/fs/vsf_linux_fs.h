@@ -47,7 +47,7 @@ vsf_dcl_class(vsf_linux_process_t)
 typedef struct vsf_linux_fd_op_t {
     int priv_size;
     void (*fn_init)(vsf_linux_fd_t *sfd);
-    int (*fn_fcntl)(vsf_linux_fd_t *sfd, int cmd, long arg);
+    int (*fn_fcntl)(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
     ssize_t (*fn_read)(vsf_linux_fd_t *sfd, void *buf, size_t count);
     ssize_t (*fn_write)(vsf_linux_fd_t *sfd, const void *buf, size_t count);
     int (*fn_close)(vsf_linux_fd_t *sfd);

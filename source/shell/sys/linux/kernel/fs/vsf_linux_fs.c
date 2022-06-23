@@ -94,26 +94,26 @@ typedef struct vsf_linux_eventfd_priv_t {
 
 /*============================ PROTOTYPES ====================================*/
 
-static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
+static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd);
 
-static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
+static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_eventfd_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_eventfd_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_eventfd_eof(vsf_linux_fd_t *sfd);
 
-static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
+static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_stream_rx_eof(vsf_linux_fd_t *sfd);
 static int __vsf_linux_stream_tx_eof(vsf_linux_fd_t *sfd);
 
-static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg);
+static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -181,7 +181,7 @@ static void __vsf_linux_fs_close_do(vk_file_t *file)
     vk_file_close(file);
 }
 
-static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     return 0;
 }
@@ -270,7 +270,7 @@ int eventfd_write(int fd, eventfd_t value)
     return write(fd, &value, sizeof(eventfd_t)) != sizeof(eventfd_t) ? -1 : 0;
 }
 
-static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     return 0;
 }
@@ -1190,11 +1190,11 @@ int fcntl(int fd, int cmd, ...)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     va_list ap;
-    long arg;
+    uintptr_t arg;
 
     if (!sfd) { return -1; }
     va_start(ap, cmd);
-        arg = va_arg(ap, long);
+        arg = va_arg(ap, uintptr_t);
     va_end(ap);
 
     // process generic commands
@@ -1831,7 +1831,7 @@ int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
 }
 
 // stream
-static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     return 0;
 }
@@ -2114,7 +2114,7 @@ vsf_stream_t * vsf_linux_get_tx_stream(vsf_linux_fd_t *sfd)
 }
 
 // pipe
-static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, long arg)
+static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     return 0;
 }
