@@ -14277,9 +14277,6 @@
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\io\io.h</name>
                                 </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\io\io_lv0.c</name>
-                                </file>
                             </group>
                             <group>
                                 <name>pm</name>
@@ -14288,9 +14285,6 @@
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\pm\pm.h</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\pm\pm_lv0.c</name>
                                 </file>
                             </group>
                             <group>
@@ -14309,9 +14303,6 @@
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usart\usart.h</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usart\usart_lv0.c</name>
                                 </file>
                             </group>
                             <group>

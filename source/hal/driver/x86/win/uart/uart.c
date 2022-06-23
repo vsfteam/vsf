@@ -30,89 +30,89 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef vsf_hw_usart_CFG_TRACE_EN
-#   define vsf_hw_usart_CFG_TRACE_EN                   DISABLED
+#ifndef VSF_HW_USART_CFG_TRACE_EN
+#   define VSF_HW_USART_CFG_TRACE_EN                   DISABLED
 #endif
 
-#ifndef vsf_hw_usart_CFG_TRACE_FUNCTION
-#   define    vsf_hw_usart_CFG_TRACE_FUNCTION          DISABLED
+#ifndef VSF_HW_USART_CFG_TRACE_FUNCTION
+#   define    VSF_HW_USART_CFG_TRACE_FUNCTION          DISABLED
 #endif
 
-#ifndef vsf_hw_usart_CFG_TRACE_IRQ
-#   define vsf_hw_usart_CFG_TRACE_IRQ                  DISABLED
+#ifndef VSF_HW_USART_CFG_TRACE_IRQ
+#   define VSF_HW_USART_CFG_TRACE_IRQ                  DISABLED
 #endif
 
-#ifndef vsf_hw_usart_CFG_TRACE_CALLSTACK
-#   define vsf_hw_usart_CFG_TRACE_CALLSTACK            DISABLED
+#ifndef VSF_HW_USART_CFG_TRACE_CALLSTACK
+#   define VSF_HW_USART_CFG_TRACE_CALLSTACK            DISABLED
 #endif
 
-#ifndef vsf_hw_usart_CFG_TRACE_SYSTIMER
-#   define vsf_hw_usart_CFG_TRACE_SYSTIMER             DISABLED
+#ifndef VSF_HW_USART_CFG_TRACE_SYSTIMER
+#   define VSF_HW_USART_CFG_TRACE_SYSTIMER             DISABLED
 #endif
 
-#ifndef vsf_hw_usart_CFG_TRACE_STATUS
-#   define vsf_hw_usart_CFG_TRACE_STATUS               DISABLED
+#ifndef VSF_HW_USART_CFG_TRACE_STATUS
+#   define VSF_HW_USART_CFG_TRACE_STATUS               DISABLED
 #endif
 
-#ifndef vsf_hw_usart_CFG_START_PORT
-#   define vsf_hw_usart_CFG_START_PORT                 1
+#ifndef VSF_HW_USART_CFG_START_PORT
+#   define VSF_HW_USART_CFG_START_PORT                 1
 #endif
 
-#ifndef vsf_hw_usart_CFG_END_PORT
-#   define vsf_hw_usart_CFG_END_PORT                   255
+#ifndef VSF_HW_USART_CFG_END_PORT
+#   define VSF_HW_USART_CFG_END_PORT                   255
 #endif
 
-#ifndef vsf_hw_usart_CFG_INPUT_BUFFER
-#   define vsf_hw_usart_CFG_INPUT_BUFFER               1024
+#ifndef VSF_HW_USART_CFG_INPUT_BUFFER
+#   define VSF_HW_USART_CFG_INPUT_BUFFER               1024
 #endif
 
-#ifndef vsf_hw_usart_CFG_OUTPUT_BUFFER
-#   define vsf_hw_usart_CFG_OUTPUT_BUFFER              1024
+#ifndef VSF_HW_USART_CFG_OUTPUT_BUFFER
+#   define VSF_HW_USART_CFG_OUTPUT_BUFFER              1024
 #endif
 
-#ifndef vsf_hw_usart_CFG_TRACE_IRQ_PEND
-#   define vsf_hw_usart_CFG_TRACE_IRQ_PEND             "irq_request_pend:"
+#ifndef VSF_HW_USART_CFG_TRACE_IRQ_PEND
+#   define VSF_HW_USART_CFG_TRACE_IRQ_PEND             "irq_request_pend:"
 #endif
 
-#ifndef vsf_hw_usart_CFG_TRACE_IRQ_GOING
-#   define vsf_hw_usart_CFG_TRACE_IRQ_GOING            "irq_request_going:"
+#ifndef VSF_HW_USART_CFG_TRACE_IRQ_GOING
+#   define VSF_HW_USART_CFG_TRACE_IRQ_GOING            "irq_request_going:"
 #endif
 
-#undef vsf_hw_usart_CFG_TRACE_FUNC
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
-#   define vsf_hw_usart_CFG_TRACE_FUNC(...)            printf(__VA_ARGS__)
+#undef VSF_HW_USART_CFG_TRACE_FUNC
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
+#   define VSF_HW_USART_CFG_TRACE_FUNC(...)            printf(__VA_ARGS__)
 #else
-#   define vsf_hw_usart_CFG_TRACE_FUNC(...)
+#   define VSF_HW_USART_CFG_TRACE_FUNC(...)
 #endif
 
-#undef vsf_hw_usart_tRACE_HEADER
-#define vsf_hw_usart_tRACE_HEADER                      "[x86/x64]:"
+#undef VSF_HW_USART_TRACE_HEADER
+#define VSF_HW_USART_TRACE_HEADER                      "[x86/x64]:"
 
 #undef vsf_hw_usart_trace_function
-#if vsf_hw_usart_CFG_TRACE_FUNCTION == ENABLED
+#if VSF_HW_USART_CFG_TRACE_FUNCTION == ENABLED
 #   define vsf_hw_usart_trace_function(...)                                        \
     do{                                                                         \
-        vsf_hw_usart_CFG_TRACE_FUNC("%s" vsf_hw_usart_tRACE_HEADER,                   \
-                        __vsf_x86_trace_color[vsf_hw_usart_tRACE_FUNCTION_COLOR]); \
-        vsf_hw_usart_CFG_TRACE_FUNC(__VA_ARGS__);                                  \
-        vsf_hw_usart_CFG_TRACE_FUNC(VSF_TRACE_CFG_LINEEND);                        \
-        vsf_hw_usart_CFG_TRACE_FUNC("%s",                                          \
-        __vsf_x86_trace_color[vsf_hw_usart_tRACE_RESET_COLOR]);                    \
+        VSF_HW_USART_CFG_TRACE_FUNC("%s" VSF_HW_USART_TRACE_HEADER,                   \
+                        __vsf_x86_trace_color[VSF_HW_USART_TRACE_FUNCTION_COLOR]); \
+        VSF_HW_USART_CFG_TRACE_FUNC(__VA_ARGS__);                                  \
+        VSF_HW_USART_CFG_TRACE_FUNC(VSF_TRACE_CFG_LINEEND);                        \
+        VSF_HW_USART_CFG_TRACE_FUNC("%s",                                          \
+        __vsf_x86_trace_color[VSF_HW_USART_TRACE_RESET_COLOR]);                    \
     }while(0)
 #else
 #   define vsf_hw_usart_trace_function(...)
-#endif // vsf_hw_usart_CFG_TRACE_FUNCTION == ENABLED
+#endif // VSF_HW_USART_CFG_TRACE_FUNCTION == ENABLED
 
 #undef vsf_hw_usart_trace_irq
-#if vsf_hw_usart_CFG_TRACE_IRQ == ENABLED
+#if VSF_HW_USART_CFG_TRACE_IRQ == ENABLED
 #   define vsf_hw_usart_trace_irq(...)                                             \
     do{                                                                         \
-        vsf_hw_usart_CFG_TRACE_FUNC("%s" vsf_hw_usart_tRACE_HEADER,                   \
-                        __vsf_x86_trace_color[vsf_hw_usart_tRACE_IRQ_COLOR]);      \
-        vsf_hw_usart_CFG_TRACE_FUNC(__VA_ARGS__);                                  \
-        vsf_hw_usart_CFG_TRACE_FUNC(VSF_TRACE_CFG_LINEEND);                        \
-        vsf_hw_usart_CFG_TRACE_FUNC(                                               \
-        __vsf_x86_trace_color[vsf_hw_usart_tRACE_RESET_COLOR]);                    \
+        VSF_HW_USART_CFG_TRACE_FUNC("%s" VSF_HW_USART_TRACE_HEADER,                   \
+                        __vsf_x86_trace_color[VSF_HW_USART_TRACE_IRQ_COLOR]);      \
+        VSF_HW_USART_CFG_TRACE_FUNC(__VA_ARGS__);                                  \
+        VSF_HW_USART_CFG_TRACE_FUNC(VSF_TRACE_CFG_LINEEND);                        \
+        VSF_HW_USART_CFG_TRACE_FUNC(                                               \
+        __vsf_x86_trace_color[VSF_HW_USART_TRACE_RESET_COLOR]);                    \
     }while(0)
 #else
 #   define vsf_hw_usart_trace_irq(...)
@@ -149,6 +149,9 @@ typedef enum usart_cancel_status_t {
 } usart_cancel_status_t;
 
 typedef struct vsf_hw_usart_t {
+#if VSF_USART_CFG_IMPLEMENT_OP == ENABLED
+    vsf_usart_t                         vsf_usart;
+#endif
     em_usart_irq_mask_t                 enable_flag;
     uint8_t                             com_port;
     uint8_t                             com_status;
@@ -191,26 +194,26 @@ static void __vk_usart_write_event_thread(void *arg);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if     vsf_hw_usart_CFG_TRACE_IRQ == ENABLED                                      \
-    ||  vsf_hw_usart_CFG_TRACE_CALLSTACK == ENABLED                                \
-    ||  vsf_hw_usart_CFG_TRACE_SYSTIMER == ENABLED                                 \
-    ||  vsf_hw_usart_CFG_TRACE_STATUS == ENABLED                                   \
-    ||  vsf_hw_usart_CFG_TRACE_FUNCTION == ENABLED
+#if     VSF_HW_USART_CFG_TRACE_IRQ == ENABLED                                      \
+    ||  VSF_HW_USART_CFG_TRACE_CALLSTACK == ENABLED                                \
+    ||  VSF_HW_USART_CFG_TRACE_SYSTIMER == ENABLED                                 \
+    ||  VSF_HW_USART_CFG_TRACE_STATUS == ENABLED                                   \
+    ||  VSF_HW_USART_CFG_TRACE_FUNCTION == ENABLED
 enum {
-    vsf_hw_usart_tRACE_CALLSTACK_COLOR,
-    vsf_hw_usart_tRACE_IRQ_COLOR,
-    vsf_hw_usart_tRACE_SYSTIMER_COLOR,
-    vsf_hw_usart_tRACE_STATUS_COLOR,
-    vsf_hw_usart_tRACE_FUNCTION_COLOR,
-    vsf_hw_usart_tRACE_RESET_COLOR,
+    VSF_HW_USART_TRACE_CALLSTACK_COLOR,
+    VSF_HW_USART_TRACE_IRQ_COLOR,
+    VSF_HW_USART_TRACE_SYSTIMER_COLOR,
+    VSF_HW_USART_TRACE_STATUS_COLOR,
+    VSF_HW_USART_TRACE_FUNCTION_COLOR,
+    VSF_HW_USART_TRACE_RESET_COLOR,
 };
 static const char *__vsf_x86_trace_color[] = {
-    [vsf_hw_usart_tRACE_CALLSTACK_COLOR] = "\033[1;32m",
-    [vsf_hw_usart_tRACE_IRQ_COLOR]         = "\033[1;33m",
-    [vsf_hw_usart_tRACE_SYSTIMER_COLOR]    = "\033[1;35m",
-    [vsf_hw_usart_tRACE_STATUS_COLOR]      = "\033[1;36m",
-    [vsf_hw_usart_tRACE_FUNCTION_COLOR]    = "\033[1;34m",
-    [vsf_hw_usart_tRACE_RESET_COLOR]       = "\033[1;37m",
+    [VSF_HW_USART_TRACE_CALLSTACK_COLOR] = "\033[1;32m",
+    [VSF_HW_USART_TRACE_IRQ_COLOR]         = "\033[1;33m",
+    [VSF_HW_USART_TRACE_SYSTIMER_COLOR]    = "\033[1;35m",
+    [VSF_HW_USART_TRACE_STATUS_COLOR]      = "\033[1;36m",
+    [VSF_HW_USART_TRACE_FUNCTION_COLOR]    = "\033[1;34m",
+    [VSF_HW_USART_TRACE_RESET_COLOR]       = "\033[1;37m",
 };
 #endif
 
@@ -251,7 +254,7 @@ static void __vk_usart_scan_event_thread(void *arg)
         vsf_hw_usart_trace_irq(VSF_USART_CFG_TRACE_IRQ_PEND"[%s]line(%d)", __FUNCTION__, __LINE__);
         __vsf_arch_irq_request_pend(&pret->irq_scan_request);
         vsf_hw_usart_trace_irq(VSF_USART_CFG_TRACE_IRQ_GOING"[%s]line(%d)", __FUNCTION__, __LINE__);
-        for (i = vsf_hw_usart_CFG_START_PORT; (i < vsf_hw_usart_CFG_END_PORT) && (__x86_usart_win.num < VSF_HW_USART_COUNT); i++) {
+        for (i = VSF_HW_USART_CFG_START_PORT; (i < VSF_HW_USART_CFG_END_PORT) && (__x86_usart_win.num < VSF_HW_USART_COUNT); i++) {
             sprintf(file, "\\\\.\\com%d", i);
             hCom = CreateFileA(file, GENERIC_WRITE | GENERIC_READ, 0, NULL,
                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
@@ -289,7 +292,7 @@ static void __vk_usart_scan_event_thread(void *arg)
         }
         __x86_usart_win.is_busy = 0;
         for (int i=0;i < VSF_HW_USART_COUNT;i++) {
-            vsf_hw_usart_CFG_TRACE_FUNC("[%s]line(%d)com%d---vsf_usart%d\n", __FUNCTION__, __LINE__, __x86_usart_win.port[i], i);
+            VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)com%d---vsf_usart%d\n", __FUNCTION__, __LINE__, __x86_usart_win.port[i], i);
         }
     }
     __vsf_arch_irq_fini(irq_thread);
@@ -307,28 +310,28 @@ static vsf_err_t __usart_init(vsf_hw_usart_t *hw_usart)
         return VSF_ERR_FAIL;
     }
     HANDLE handle_com;
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
     DWORD res_dword = 0;
 #endif
     char file[16] = {0};
 
     sprintf(file, "\\\\.\\com%d", __x86_usart_win.port[hw_usart->com_port]);
-    vsf_hw_usart_CFG_TRACE_FUNC("[%s]line(%d)file(%s)", __FUNCTION__, __LINE__, file);
+    VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)file(%s)", __FUNCTION__, __LINE__, file);
     handle_com = CreateFileA(file, GENERIC_WRITE | GENERIC_READ, 0, NULL,
                              OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
     res_dword = GetLastError();
 #endif
-    vsf_hw_usart_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
+    VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
     hw_usart->handle_com = handle_com;
     res_bool = SetupComm(handle_com,
-                         vsf_hw_usart_CFG_INPUT_BUFFER,
-                         vsf_hw_usart_CFG_OUTPUT_BUFFER);
+                         VSF_HW_USART_CFG_INPUT_BUFFER,
+                         VSF_HW_USART_CFG_OUTPUT_BUFFER);
     if (!res_bool) {
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
         res_dword = GetLastError();
 #endif
-        vsf_hw_usart_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
+        VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
         vsf_trace_warning("cannot setup %s--vsf_usart%d\n", file, hw_usart->com_port);
         vsf_hw_usart_trace_function("%s line(%d)exited VSF_ERR_FAIL", __FUNCTION__, __LINE__);
         res_bool = CloseHandle(hw_usart->handle_com);
@@ -341,10 +344,10 @@ static vsf_err_t __usart_init(vsf_hw_usart_t *hw_usart)
     timeOuts.ReadTotalTimeoutMultiplier = 1;
     res_bool = SetCommTimeouts(handle_com, &timeOuts);
     if (!res_bool) {
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
         res_dword = GetLastError();
 #endif
-        vsf_hw_usart_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
+        VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
         vsf_trace_warning("cannot set CommTimeouts %s--vsf_usart%d\n", file, hw_usart->com_port);
         vsf_hw_usart_trace_function("%s line(%d)exited VSF_ERR_FAIL", __FUNCTION__, __LINE__);
         res_bool = CloseHandle(hw_usart->handle_com);
@@ -355,10 +358,10 @@ static vsf_err_t __usart_init(vsf_hw_usart_t *hw_usart)
     DCB dcb;
     res_bool = GetCommState(handle_com, &dcb);
     if (!res_bool) {
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
         res_dword = GetLastError();
 #endif
-        vsf_hw_usart_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
+        VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
         vsf_trace_warning("cannot get CommState %s--vsf_usart%d\n", file, hw_usart->com_port);
         vsf_hw_usart_trace_function("%s line(%d)exited VSF_ERR_FAIL", __FUNCTION__, __LINE__);
         res_bool = CloseHandle(hw_usart->handle_com);
@@ -383,10 +386,10 @@ static vsf_err_t __usart_init(vsf_hw_usart_t *hw_usart)
     }
     res_bool = SetCommState(handle_com, &dcb);
     if (!res_bool) {
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
         res_dword = GetLastError();
 #endif
-        vsf_hw_usart_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
+        VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, res_dword);
         vsf_trace_warning("cannot set CommState %s--vsf_usart%d\n", file, hw_usart->com_port);
         vsf_hw_usart_trace_function("%s line(%d)exited VSF_ERR_FAIL", __FUNCTION__, __LINE__);
         res_bool = CloseHandle(hw_usart->handle_com);
@@ -501,9 +504,9 @@ static void __vk_usart_read_event_thread(void *arg)
         }
         vsf_hw_usart_trace_irq("read_thread onece!the recbuf:\n");
         for (int temp = 0; temp < hw_usart->rec_buf_size; temp++) {
-            vsf_hw_usart_CFG_TRACE_FUNC("%x  ", *(hw_usart->rec_buf + temp));
+            VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->rec_buf + temp));
         }
-        vsf_hw_usart_CFG_TRACE_FUNC("\n");
+        VSF_HW_USART_CFG_TRACE_FUNC("\n");
         hw_usart->com_status &= (~USART_READ_IS_BUSY);
         if ((hw_usart->enable_flag & USART_IRQ_MASK_RX_CPL) && (NULL != hw_usart->cfg.isr.handler_fn)) {
             vsf_hw_usart_trace_irq("%s(%d) call %p\n", __FUNCTION__, __LINE__, hw_usart->cfg.isr.handler_fn);
@@ -551,9 +554,9 @@ static void __vk_usart_write_event_thread(void *arg)
         vsf_hw_usart_trace_irq("The data to be write(%p) is:\n", hw_usart->buf);
         if (NULL != hw_usart->buf) {
             for (int temp = 0; temp < hw_usart->buf_size; temp++) {
-                vsf_hw_usart_CFG_TRACE_FUNC("%x  ", *(hw_usart->buf + temp));
+                VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->buf + temp));
             }
-            vsf_hw_usart_CFG_TRACE_FUNC("\n");
+            VSF_HW_USART_CFG_TRACE_FUNC("\n");
         }
         memset(&overLapped, 0, sizeof(OVERLAPPED));
         overLapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -585,9 +588,9 @@ static void __vk_usart_write_event_thread(void *arg)
         vsf_hw_usart_trace_irq("The data  writed(%p) is:\n", hw_usart->buf);
         if (NULL != hw_usart->buf) {
             for (int temp = 0; temp < hw_usart->buf_size; temp++) {
-                vsf_hw_usart_CFG_TRACE_FUNC("%x  ", *(hw_usart->buf + temp));
+                VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->buf + temp));
             }
-            vsf_hw_usart_CFG_TRACE_FUNC("\n");
+            VSF_HW_USART_CFG_TRACE_FUNC("\n");
         }
         hw_usart->com_status &= (~USART_WRITE_IS_BUSY);
 
@@ -623,10 +626,10 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart, usart_cfg_t *cfg)
         uint8_t res;
         hw_usart->com_status = USART_INIT_IS_BUSY | USART_RESET;
         while ((hw_usart->com_status & USART_READ_IS_BUSY) && (hw_usart->com_status & USART_WRITE_IS_BUSY));
-        vsf_hw_usart_CFG_TRACE_FUNC("CloseHandle:%p\n", hw_usart->handle_com);
+        VSF_HW_USART_CFG_TRACE_FUNC("CloseHandle:%p\n", hw_usart->handle_com);
         bool b = CloseHandle(hw_usart->handle_com);
         (void)b;
-        vsf_hw_usart_CFG_TRACE_FUNC("CloseHandle:%d^^%p\n", b, hw_usart->handle_com);
+        VSF_HW_USART_CFG_TRACE_FUNC("CloseHandle:%d^^%p\n", b, hw_usart->handle_com);
         vsf_hw_usart_get_can_used_port(&res);
         while (vsf_hw_usart_port_is_busy());
     }
@@ -690,8 +693,15 @@ usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart)
     return ret;
 }
 
+uint_fast16_t vsf_hw_usart_get_read_fifo_data_count(vsf_hw_usart_t *hw_usart_ptr)
+{
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
 uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t number)
 {
+    VSF_HAL_ASSERT(0);
     return 0;
     //TODO:
     /*
@@ -704,9 +714,9 @@ uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr
     if (hw_usart->com_status & USART_INIT_IS_BUSY) {
         return fsm_rt_asyn;
     }
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
-    vsf_hw_usart_CFG_TRACE_FUNC("vsf_usart_read_byte:file:%sline:%d", __FILE__, __LINE__);
-#endif // vsf_hw_usart_CFG_TRACE_EN
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
+    VSF_HW_USART_CFG_TRACE_FUNC("vsf_usart_read_byte:file:%sline:%d", __FILE__, __LINE__);
+#endif // VSF_HW_USART_CFG_TRACE_EN
 
     hw_usart->com_status |= USART_READ_IS_BUSY;
     hw_usart->on_status.is_busy = 1;
@@ -718,6 +728,12 @@ uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr
 
     return true;
     */
+}
+
+uint_fast16_t vsf_hw_usart_get_write_fifo_free_count(vsf_hw_usart_t *hw_usart_ptr)
+{
+    VSF_HAL_ASSERT(0);
+    return 0;
 }
 
 uint_fast16_t vsf_hw_usart_fifo_write(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t number)
@@ -734,9 +750,9 @@ uint_fast16_t vsf_hw_usart_fifo_write(vsf_hw_usart_t *usart_ptr, void *buffer_pt
     if (hw_usart->com_status & USART_INIT_IS_BUSY) {
         return fsm_rt_asyn;
     }
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
-    vsf_hw_usart_CFG_TRACE_FUNC("vsf_usart_write_byte:file:%sline:%d", __FILE__, __LINE__);
-#endif // vsf_hw_usart_CFG_TRACE_EN
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
+    VSF_HW_USART_CFG_TRACE_FUNC("vsf_usart_write_byte:file:%sline:%d", __FILE__, __LINE__);
+#endif // VSF_HW_USART_CFG_TRACE_EN
 
     hw_usart->com_status |= USART_WRITE_IS_BUSY;
     hw_usart->on_status.is_busy = 1;
@@ -825,9 +841,9 @@ void vsf_hw_usart_get_can_used_port(uint8_t *available_number_port)
 bool vsf_hw_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size)
 {
     vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX")size(%d)", __FUNCTION__, &arr, size);
-    vsf_hw_usart_CFG_TRACE_FUNC("%s(%d)calling\n", __FUNCTION__, __LINE__);
+    VSF_HW_USART_CFG_TRACE_FUNC("%s(%d)calling\n", __FUNCTION__, __LINE__);
     if (__x86_usart_win.is_busy) {
-        vsf_hw_usart_CFG_TRACE_FUNC("__x86_usart_win: is busy %sline:%d\n", __FILE__, __LINE__);
+        VSF_HW_USART_CFG_TRACE_FUNC("__x86_usart_win: is busy %sline:%d\n", __FILE__, __LINE__);
         vsf_hw_usart_trace_function("%s exited false", __FUNCTION__);
         return false;
     }
@@ -843,15 +859,15 @@ bool vsf_hw_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size)
             j++;
         }
     }
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
     for (int temp = 0; temp < VSF_HW_USART_COUNT; temp++) {
         if (__x86_usart_win.port[temp] != 0) {
-            vsf_hw_usart_CFG_TRACE_FUNC("com%d---vsf_usart%d("VSF_TRACE_POINTER_HEX")\n",
+            VSF_HW_USART_CFG_TRACE_FUNC("com%d---vsf_usart%d("VSF_TRACE_POINTER_HEX")\n",
                                      __x86_usart_win.port[temp], temp, __vsf_usart_win[temp]);
         }
     }
-#endif // vsf_hw_usart_CFG_TRACE_EN
-#if vsf_hw_usart_CFG_TRACE_EN == ENABLED
+#endif // VSF_HW_USART_CFG_TRACE_EN
+#if VSF_HW_USART_CFG_TRACE_EN == ENABLED
     vsf_hw_usart_trace_function("%s exited true", __FUNCTION__);
 #endif
     return true;
@@ -946,7 +962,7 @@ int_fast32_t vsf_hw_usart_get_tx_count(vsf_hw_usart_t *hw_usart)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_USART_CFG_IMP_LV0(__count, __dont_care)                             \
+#define VSF_USART_CFG_IMP_LV0(__count, __hal_op)                                \
     vsf_hw_usart_t vsf_hw_usart ## __count = {                                  \
         .com_port                          = __count,                           \
         .com_status                        = USART_INIT_IS_BUSY,                \
@@ -955,6 +971,7 @@ int_fast32_t vsf_hw_usart_get_tx_count(vsf_hw_usart_t *hw_usart)
         .irp_cancel_write_request          = NULL,                              \
         .cancel_status                     = 0X00,                              \
         .init_flag                         = 1,                                 \
+        __hal_op                                                                \
     };
 #include "hal/driver/common/usart/usart_template.inc"
 

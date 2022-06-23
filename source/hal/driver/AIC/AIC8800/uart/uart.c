@@ -56,9 +56,8 @@ typedef struct vsf_hw_usart_t {
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart_ptr, usart_cfg_t *cfg_ptr)
 {
-    vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
     VSF_HAL_ASSERT(NULL != usart_const);
@@ -106,9 +105,8 @@ fsm_rt_t vsf_hw_usart_disable(vsf_hw_usart_t *usart_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_hw_usart_irq_enable(vsf_hw_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_enable(vsf_hw_usart_t *hw_usart_ptr, em_usart_irq_mask_t irq_mask)
 {
-    vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
     VSF_HAL_ASSERT(NULL != usart_const);
@@ -118,9 +116,8 @@ void vsf_hw_usart_irq_enable(vsf_hw_usart_t *usart_ptr, em_usart_irq_mask_t irq_
     usart_const->reg->IRQCTL_REG |= irq_mask;
 }
 
-void vsf_hw_usart_irq_disable(vsf_hw_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_disable(vsf_hw_usart_t *hw_usart_ptr, em_usart_irq_mask_t irq_mask)
 {
-    vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
     VSF_HAL_ASSERT(NULL != usart_const);
@@ -130,9 +127,8 @@ void vsf_hw_usart_irq_disable(vsf_hw_usart_t *usart_ptr, em_usart_irq_mask_t irq
     usart_const->reg->IRQCTL_REG &= ~irq_mask;
 }
 
-usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *usart_ptr)
+usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart_ptr)
 {
-    vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
 
     return hw_usart_ptr->status;
@@ -148,9 +144,13 @@ static bool __hw_usart_write_fifo_is_full(vsf_hw_usart_t *hw_usart_ptr)
     return hw_usart_ptr->usart_const->reg->DBUFSTS_REG & UART_TX_DBUF_FULL_MSK;
 }
 
-uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast16_t vsf_hw_usart_get_read_fifo_data_count(vsf_hw_usart_t *hw_usart_ptr)
 {
-    vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
+    return (hw_usart_ptr->usart_const->reg->DBUFSTS_REG & UART_RX_COUNT_MSK) >> UART_RX_COUNT;
+}
+
+uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *hw_usart_ptr, void *buffer_ptr, uint_fast16_t count)
+{
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
     VSF_HAL_ASSERT(NULL != usart_const);
@@ -170,9 +170,13 @@ uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr
     return i;
 }
 
-uint_fast16_t vsf_hw_usart_fifo_write(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast16_t vsf_hw_usart_get_write_fifo_free_count(vsf_hw_usart_t *hw_usart_ptr)
 {
-    vsf_hw_usart_t *hw_usart_ptr = (vsf_hw_usart_t *)usart_ptr;
+    return 0xFF - ((hw_usart_ptr->usart_const->reg->DBUFSTS_REG & UART_TX_COUNT_MSK) >> UART_TX_COUNT);
+}
+
+uint_fast16_t vsf_hw_usart_fifo_write(vsf_hw_usart_t *hw_usart_ptr, void *buffer_ptr, uint_fast16_t count)
+{
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
     VSF_HAL_ASSERT(NULL != usart_const);

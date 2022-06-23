@@ -216,8 +216,8 @@ extern "C" {
 #define UART_TX_DBUF_EMPTY                          18       /* 0x00040000 */
 #define UART_TX_DBUF_EMPTY_MSK                      ((reg32_t)(0x1 << UART_TX_DBUF_EMPTY))
 
-#define UART_RX_COUNT                               8       /* 0x0001FE00 */
-#define UART_RX_COUNT_MSK                           ((reg32_t)(0x1fe << UART_RX_COUNT))
+#define UART_RX_COUNT                               9       /* 0x0001FE00 */
+#define UART_RX_COUNT_MSK                           ((reg32_t)(0xFF << UART_RX_COUNT))
 
 #define UART_TX_COUNT                               0       /* 0x000000FF */
 #define UART_TX_COUNT_MSK                           ((reg32_t)(0xff << UART_TX_COUNT))
