@@ -93,14 +93,14 @@ static void __vsf_fifo2req_usart_isr_handler(void *target,
     em_usart_irq_mask_t current_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX | USART_IRQ_MASK_TX);
 
     if (irq_mask & (USART_IRQ_MASK_RX | USART_IRQ_MASK_RX_TIMEOUT)) {
-        if (__vsf_fifo2req_usart_process(usart_ptr, &request_ptr->rx, vsf_usart_fifo_read)) {
+        if (__vsf_fifo2req_usart_process(usart_ptr, &request_ptr->rx, vsf_usart_rxfifo_read)) {
             vsf_usart_irq_disable(usart_ptr, USART_IRQ_MASK_RX);
             current_irq_mask |= USART_IRQ_MASK_RX_CPL;
         }
     }
 
     if (irq_mask & USART_IRQ_MASK_TX) {
-        if (__vsf_fifo2req_usart_process(usart_ptr, &request_ptr->tx, vsf_usart_fifo_write)) {
+        if (__vsf_fifo2req_usart_process(usart_ptr, &request_ptr->tx, vsf_usart_txfifo_write)) {
             vsf_usart_irq_disable(usart_ptr, USART_IRQ_MASK_TX);
             current_irq_mask |= USART_IRQ_MASK_TX_CPL;
         }
@@ -166,22 +166,22 @@ usart_status_t vsf_fifo2req_usart_status(vsf_usart_t *usart_ptr)
     return vsf_usart_status(request_ptr->real_usart_ptr);
 }
 
-uint_fast16_t vsf_fifo2req_usart_fifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast16_t vsf_fifo2req_usart_rxfifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
 {
     vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
-    return vsf_usart_fifo_read(request_ptr->real_usart_ptr, buffer_ptr, count);
+    return vsf_usart_rxfifo_read(request_ptr->real_usart_ptr, buffer_ptr, count);
 }
 
-uint_fast16_t vsf_fifo2req_usart_fifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast16_t vsf_fifo2req_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
 {
     vsf_fifo2req_usart_t *request_ptr = (vsf_fifo2req_usart_t *)usart_ptr;
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->real_usart_ptr != NULL);
 
-    return vsf_usart_fifo_write(request_ptr->real_usart_ptr, buffer_ptr, count);
+    return vsf_usart_txfifo_write(request_ptr->real_usart_ptr, buffer_ptr, count);
 }
 
 vsf_err_t  vsf_fifo2req_usart_request_rx(vsf_usart_t *usart_ptr,

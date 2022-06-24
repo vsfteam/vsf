@@ -177,7 +177,7 @@ static uint_fast32_t __vsf_linux_uart_rx(vsf_usart_t *uart, vsf_linux_uart_priv_
             vsf_trace_error("uart rx buffer overflow, please increase VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE");
             break;
         } else {
-            all_read_size += vsf_stream_write(&priv->use_as__vsf_stream_t, NULL, vsf_usart_fifo_read(uart, buffer, buflen));
+            all_read_size += vsf_stream_write(&priv->use_as__vsf_stream_t, NULL, vsf_usart_rxfifo_read(uart, buffer, buflen));
         }
     }
 
