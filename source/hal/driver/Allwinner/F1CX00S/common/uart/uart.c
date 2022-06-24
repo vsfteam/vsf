@@ -158,7 +158,7 @@ usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
     return state;
 }
 
-uint_fast16_t vsf_usart_fifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t size)
+uint_fast16_t vsf_usart_rxfifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t size)
 {
     uint_fast16_t i = 0;
     uint8_t *buf = (uint8_t *)buffer_ptr;
@@ -175,7 +175,7 @@ uint_fast16_t vsf_usart_fifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint
     return i;
 }
 
-uint_fast16_t vsf_usart_fifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t size)
+uint_fast16_t vsf_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t size)
 {
     uint_fast16_t i = 0;
     uint8_t *buf = (uint8_t *)buffer_ptr;

@@ -693,13 +693,13 @@ usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart)
     return ret;
 }
 
-uint_fast16_t vsf_hw_usart_get_read_fifo_data_count(vsf_hw_usart_t *hw_usart_ptr)
+uint_fast16_t vsf_hw_usart_rxfifo_get_data_count(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(0);
     return 0;
 }
 
-uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t number)
+uint_fast16_t vsf_hw_usart_rxfifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t number)
 {
     VSF_HAL_ASSERT(0);
     return 0;
@@ -730,13 +730,13 @@ uint_fast16_t vsf_hw_usart_fifo_read(vsf_hw_usart_t *usart_ptr, void *buffer_ptr
     */
 }
 
-uint_fast16_t vsf_hw_usart_get_write_fifo_free_count(vsf_hw_usart_t *hw_usart_ptr)
+uint_fast16_t vsf_hw_usart_txfifo_get_free_count(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(0);
     return 0;
 }
 
-uint_fast16_t vsf_hw_usart_fifo_write(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t number)
+uint_fast16_t vsf_hw_usart_txfifo_write(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t number)
 {
     //TODO:
     return 0;

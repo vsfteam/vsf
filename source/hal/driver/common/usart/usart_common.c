@@ -98,40 +98,40 @@ usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr)
     return usart_ptr->op->capability(usart_ptr);
 }
 
-uint_fast16_t vsf_usart_get_read_fifo_data_count(vsf_usart_t *usart_ptr)
+uint_fast16_t vsf_usart_rxfifo_get_data_count(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op->get_read_fifo_data_count != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op->rxfifo_get_data_count != NULL);
 
-    return usart_ptr->op->get_read_fifo_data_count(usart_ptr);
+    return usart_ptr->op->rxfifo_get_data_count(usart_ptr);
 }
 
-uint_fast16_t vsf_usart_fifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast16_t vsf_usart_rxfifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op->fifo_read != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op->rxfifo_read != NULL);
 
-    return usart_ptr->op->fifo_read(usart_ptr, buffer_ptr, count);
+    return usart_ptr->op->rxfifo_read(usart_ptr, buffer_ptr, count);
 }
 
-uint_fast16_t vsf_usart_get_write_fifo_free_count(vsf_usart_t *usart_ptr)
+uint_fast16_t vsf_usart_txfifo_get_free_count(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op->get_write_fifo_free_count != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op->txfifo_get_free_count != NULL);
 
-    return usart_ptr->op->get_write_fifo_free_count(usart_ptr);
+    return usart_ptr->op->txfifo_get_free_count(usart_ptr);
 }
 
-uint_fast16_t vsf_usart_fifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast16_t vsf_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op->fifo_write != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op->txfifo_write != NULL);
 
-    return usart_ptr->op->fifo_write(usart_ptr, buffer_ptr, count);
+    return usart_ptr->op->txfifo_write(usart_ptr, buffer_ptr, count);
 }
 
 vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)

@@ -204,7 +204,7 @@ static void __usart_demo_fifo_poll_write(vsf_usart_t * usart)
     VSF_ASSERT(err == VSF_ERR_NONE);
 
     for (uint_fast16_t i = 0; i < sizeof(demo->buff);) {
-        i += vsf_usart_fifo_write(usart, &demo->buff[i], sizeof(demo->buff) - i);
+        i += vsf_usart_txfifo_write(usart, &demo->buff[i], sizeof(demo->buff) - i);
     }
 
     while (!__app_usart_demo.is_to_exit);
@@ -221,7 +221,7 @@ static void __usart_write_isr_handler(void *target, vsf_usart_t *usart,
 
     if (irq_mask & USART_IRQ_MASK_TX) {
         if (demo->cnt < dimof(demo->buff)) {
-            demo->cnt += vsf_usart_fifo_write(usart, (void *)&demo->buff[demo->cnt],
+            demo->cnt += vsf_usart_txfifo_write(usart, (void *)&demo->buff[demo->cnt],
                                               dimof(demo->buff) - demo->cnt);
         } else {
             vsf_usart_irq_disable(usart, USART_IRQ_MASK_TX);
@@ -252,8 +252,8 @@ static void __usart_read_isr_handler(void *target, vsf_usart_t *usart, em_usart_
     app_usart_demo_t * demo = (app_usart_demo_t *)target;
     VSF_ASSERT(demo != NULL);
 
-    demo->cnt += vsf_usart_fifo_read(usart, (void *)&demo->buff[demo->cnt],
-                                    dimof(demo->buff) - demo->cnt);
+    demo->cnt += vsf_usart_rxfifo_read(usart, (void *)&demo->buff[demo->cnt],
+                                       dimof(demo->buff) - demo->cnt);
 
     if (demo->cnt >= dimof(demo->buff)) {
         vsf_usart_irq_disable(usart, USART_IRQ_MASK_RX_CPL);
@@ -288,9 +288,9 @@ static void __usart_fifo_echo(vsf_usart_t * usart)
     VSF_ASSERT(err == VSF_ERR_NONE);
 
     while (!demo->is_to_exit) {
-        cur_size = vsf_usart_fifo_read(usart, demo->buff, sizeof(demo->buff));
+        cur_size = vsf_usart_rxfifo_read(usart, demo->buff, sizeof(demo->buff));
         for (uint_fast16_t i = 0; i < cur_size;) {
-            i += vsf_usart_fifo_write(usart, &demo->buff[i], cur_size - i);
+            i += vsf_usart_txfifo_write(usart, &demo->buff[i], cur_size - i);
         }
     }
 
@@ -299,7 +299,7 @@ static void __usart_fifo_echo(vsf_usart_t * usart)
 #endif
 
 #if APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ == ENABLED
-static void __usart_fifo_write_then_read(vsf_usart_t * usart)
+static void __usart_txfifo_write_then_read(vsf_usart_t * usart)
 {
     uint_fast16_t cur_size = 0;
     VSF_ASSERT(usart != NULL);
@@ -309,9 +309,9 @@ static void __usart_fifo_write_then_read(vsf_usart_t * usart)
     VSF_ASSERT(err == VSF_ERR_NONE);
 
     while (!demo->is_to_exit) {
-        cur_size = vsf_usart_fifo_write(usart, demo->txbuff, sizeof(demo->txbuff));
+        cur_size = vsf_usart_txfifo_write(usart, demo->txbuff, sizeof(demo->txbuff));
         for (uint_fast16_t i = 0; i < cur_size;) {
-            i += vsf_usart_fifo_read(usart, &demo->rxbuff[i], cur_size - i);
+            i += vsf_usart_rxfifo_read(usart, &demo->rxbuff[i], cur_size - i);
         }
         for (uint_fast16_t i = 0; i < cur_size; i++) {
             if (demo->rxbuff[i] != demo->txbuff[i]) {
@@ -451,7 +451,7 @@ int VSF_USER_ENTRY(void)
     __usart_fifo_echo(APP_USART_DEMO_CFG_USART);
 #endif
 #if APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ_TEST == ENABLED
-    __usart_fifo_write_then_read(APP_USART_DEMO_CFG_USART);
+    __usart_txfifo_write_then_read(APP_USART_DEMO_CFG_USART);
 #endif
 #if APP_USART_DEMO_CFG_REQUEST_ECHO_TEST == ENABLED
     __usart_request_echo(APP_USART_DEMO_CFG_USART);

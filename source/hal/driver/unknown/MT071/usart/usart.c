@@ -201,7 +201,7 @@ usart_status_t vsf_usart_status(vsf_usart_t *usart)
     return status;
 }
 
-uint_fast16_t vsf_usart_fifo_read(vsf_usart_t *usart, void *buffer, uint_fast16_t count)
+uint_fast16_t vsf_usart_rxfifo_read(vsf_usart_t *usart, void *buffer, uint_fast16_t count)
 {
     VSF_HAL_ASSERT((NULL != usart) && (buffer != NULL) && (count > 0));
     USART_TypeDef *reg = usart->ip.reg;
@@ -233,7 +233,7 @@ uint_fast16_t vsf_usart_fifo_read(vsf_usart_t *usart, void *buffer, uint_fast16_
     return actual_count;
 }
 
-uint_fast16_t vsf_usart_fifo_write(vsf_usart_t *usart, void *buffer, uint_fast16_t count)
+uint_fast16_t vsf_usart_txfifo_write(vsf_usart_t *usart, void *buffer, uint_fast16_t count)
 {
     VSF_HAL_ASSERT((NULL != usart) && (buffer != NULL) && (count > 0));
     USART_TypeDef *reg = usart->ip.reg;
