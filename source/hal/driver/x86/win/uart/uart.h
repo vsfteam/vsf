@@ -37,7 +37,9 @@
 
 typedef enum em_usart_mode_t {
     USART_8_BIT_LENGTH              = 0x0000ul,
+#define USART_8_BIT_LENGTH          USART_8_BIT_LENGTH
     USART_9_BIT_LENGTH              = 0x1000ul,
+#define USART_9_BIT_LENGTH          USART_9_BIT_LENGTH
     USART_BIT_LENGTH_MASK           = USART_8_BIT_LENGTH | USART_9_BIT_LENGTH,
 
     USART_1_STOPBIT                 = 0x0000ul,
