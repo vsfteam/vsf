@@ -41,9 +41,13 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-// TODO: check 32-bit/64-bit compilation for gcc and clang
+#ifdef __VSF64__
+typedef uint64_t                uintalu_t;
+typedef int64_t                 intalu_t;
+#else
 typedef uint32_t                uintalu_t;
 typedef int32_t                 intalu_t;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

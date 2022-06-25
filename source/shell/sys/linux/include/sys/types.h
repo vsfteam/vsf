@@ -26,10 +26,18 @@ typedef unsigned long long  size_t;
 typedef unsigned long int   size_t;
 #   endif
 #else
+#   ifdef __VSF64__
+typedef long long           ssize_t;
+typedef unsigned long long  size_t;
+#   ifndef SSIZE_MAX
+#       define SSIZE_MAX    LLONG_MAX
+#   endif
+#   else
 typedef int                 ssize_t;
 typedef unsigned int        size_t;
 #   ifndef SSIZE_MAX
 #       define SSIZE_MAX    INT_MAX
+#   endif
 #   endif
 #endif
 
