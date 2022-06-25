@@ -9,3 +9,13 @@ set(VSF_TARGET_DEFINITIONS
     "__LINUX__"
     "__CPU_GENERIC__"
 )
+
+# no idea why, but seems this makes the world quiet
+set(CMAKE_C_FLAGS 
+    "-Wno-builtin-declaration-mismatch"
+    CACHE INTERNAL "C compiler common flags"
+)
+set(CMAKE_CXX_FLAGS 
+    "-Wno-builtin-declaration-mismatch"
+    CACHE INTERNAL "C++ compiler common flags"
+)
