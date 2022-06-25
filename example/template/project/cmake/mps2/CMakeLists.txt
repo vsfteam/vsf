@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 
 if(NOT DEFINED ENV{VSF_PATH})
-    message(FATAL_ERROR "Please define environment VSF_PATH")
-else()
-    message(STATUS "VSF_PATH: $ENV{VSF_PATH}")
+    get_filename_component(__VSF_PATH ../../../../../ ABSOLUTE)
+    set(ENV{VSF_PATH} ${__VSF_PATH})
 endif()
+message(STATUS "VSF_PATH: $ENV{VSF_PATH}")
 
 # compiler configurations
 # arm-none-eabi-gcc will not pass compiler checker of cmake, so include before project
