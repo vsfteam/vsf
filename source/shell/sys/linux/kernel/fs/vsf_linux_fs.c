@@ -2212,13 +2212,17 @@ vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_rx_priv_t *priv_rx)
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
+    // default is 115200_8N1
     static const struct termios __default_term = {
+        .c_cflag        = CS8,
         .c_oflag        = OPOST | ONLCR,
         .c_lflag        = ECHO | ECHOE | ECHOK | ECHONL | ICANON,
         .c_cc[VMIN]     = 1,
         .c_cc[VERASE]   = 010,      // BS
         .c_cc[VWERASE]  = 027,      // ETB
         .c_cc[VKILL]    = 025,      // NAK
+        .c_ispeed       = B115200,
+        .c_ospeed       = B115200,
     };
     priv->termios = __default_term;
 }

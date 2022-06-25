@@ -155,9 +155,6 @@ typedef struct vsf_linux_uart_priv_t {
     implement(vsf_eda_t)
     vsf_eda_t *eda_pending_tx;
 
-    uint32_t mode;
-    uint32_t baudrate;
-
     // use vsf_fifo_stream_t because it doesn't need protect.
     //  so stream APIs can be called directly in isr
     implement(vsf_fifo_stream_t)
@@ -172,7 +169,7 @@ static uint_fast32_t __vsf_linux_uart_rx(vsf_usart_t *uart, vsf_linux_uart_priv_
     while (vsf_usart_rxfifo_get_data_count(uart) > 0) {
         buflen = vsf_stream_get_wbuf(&priv->use_as__vsf_stream_t, &buffer);
         if (!buflen) {
-            vsf_trace_error("uart rx buffer overflow, please increase VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE");
+            vsf_trace_error("term: uart rx buffer overflow, please increase VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE\n");
             break;
         } else {
             all_read_size += vsf_stream_write(&priv->use_as__vsf_stream_t, NULL, vsf_usart_rxfifo_read(uart, buffer, buflen));
@@ -212,12 +209,63 @@ static void __vsf_linux_uart_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static void __vsf_linux_uart_config(vsf_usart_t *uart, vsf_linux_uart_priv_t *priv)
+static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
 {
+    vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+    struct termios *term = &priv->termios;
+    uint32_t baudrate;
+    uint32_t mode = 0;
+
+    if (term->c_ospeed != term->c_ispeed) {
+        vsf_trace_error("term: doesnot support different input/output speed\n");
+        return;
+    }
+
+    switch (term->c_ospeed) {
+    default:
+    case B0:    vsf_trace_error("term: baudrate does not supported\n");  return;
+#define __case_baudrate(b)      case VSF_MCONNECT2(B, b): baudrate = b; break;
+    VSF_MFOREACH(__case_baudrate,
+        50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200, 38400,
+        57600, 115200, 230400, 460800
+    )}
+
+    switch (term->c_cflag & CSIZE) {
+#ifdef USART_5_BIT_LENGTH
+    case CS5:   mode |= USART_5_BIT_LENGTH; break;
+#endif
+#ifdef USART_6_BIT_LENGTH
+    case CS6:   mode |= USART_6_BIT_LENGTH; break;
+#endif
+#ifdef USART_7_BIT_LENGTH
+    case CS7:   mode |= USART_7_BIT_LENGTH; break;
+#endif
+#ifdef USART_8_BIT_LENGTH
+    case CS8:   mode |= USART_8_BIT_LENGTH; break;
+#endif
+    default:    vsf_trace_error("term: bit length does not supported\n");  return;
+    }
+
+    if (term->c_cflag & PARENB) {
+        if (term->c_cflag & PARODD) {
+            mode |= USART_ODD_PARITY;
+        } else {
+            mode |= USART_EVEN_PARITY;
+        }
+    } else {
+        mode |= USART_NO_PARITY;
+    }
+    if (term->c_cflag & CSTOPB) {
+        mode |= USART_1_STOPBIT;
+    } else {
+        mode |= USART_2_STOPBIT;
+    }
+
+    vsf_usart_irq_disable(uart, USART_IRQ_MASK_RX);
     vsf_usart_disable(uart);
     vsf_usart_init(uart, & (usart_cfg_t) {
-        .mode               = priv->mode,
-        .baudrate           = priv->baudrate,
+        .mode               = mode,
+        .baudrate           = baudrate,
         .rx_timeout         = 0,
         .isr                = {
             .handler_fn     = __vsf_linux_uart_isrhandler,
@@ -225,8 +273,8 @@ static void __vsf_linux_uart_config(vsf_usart_t *uart, vsf_linux_uart_priv_t *pr
             .prio           = VSF_LINUX_DEVFS_UART_CFG_PRIO,
         },
     });
-    vsf_usart_irq_enable(uart, USART_IRQ_MASK_RX);
     vsf_usart_enable(uart);
+    vsf_usart_irq_enable(uart, USART_IRQ_MASK_RX);
 }
 
 static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
@@ -242,8 +290,6 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
     priv->buffer = priv->__buffer;
     priv->size = sizeof(priv->__buffer);
     priv->stream_rx = &priv->use_as__vsf_stream_t;
-    priv->mode = USART_NO_PARITY | USART_1_STOPBIT | USART_8_BIT_LENGTH | USART_NO_HWCONTROL | USART_TX_ENABLE | USART_RX_ENABLE;
-    priv->baudrate = 9600;
 
     vsf_stream_connect_tx(priv->stream_rx);
 
@@ -257,7 +303,7 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
         vsf_unprotect_sched(orig);
     }
 
-    __vsf_linux_uart_config(uart, priv);
+    __vsf_linux_uart_config(priv);
 
     priv->fn.evthandler = __vsf_linux_uart_evthandler;
     vsf_eda_init(&priv->use_as__vsf_eda_t, vsf_prio_highest);
@@ -266,14 +312,10 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
 static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
-    vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
-    union {
-        struct termios *termios;
-    } uarg;
 
     switch (cmd) {
     case TCSETS:
-        uarg.termios = (struct termios *)arg;
+        __vsf_linux_uart_config(priv);
         break;
     }
     return 0;
