@@ -8,5 +8,5 @@ set(VSF_HOST_HAS_LIBUSB     1)
 set(VSF_TARGET_DEFINITIONS
     "__LINUX__"
     "__CPU_GENERIC__"
-    linux32.cmake
+    "__VSF64__"
 )
