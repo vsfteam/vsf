@@ -62,15 +62,21 @@ extern const vsf_protect_region_t vsf_protect_region_none;
 //! check rtos first
 # if    defined(__RTOS__)
 #   define  VSF_ARCH_HEADER     "./rtos/rtos_generic.h"
+# elif  defined(__CPU_GENERIC__)
+#   if defined(__LINUX__)
+#     define  VSF_ARCH_HEADER   "./generic/linux_generic.h"
+#   else
+#     error not supported generic arch
+#   endif
 # elif  (defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'M') || __TARGET_PROFILE_M
 #   define VSF_ARCH_HEADER      "./arm/cortex-m/cortex_m_generic.h"
 # elif  defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'A' || __TARGET_PROFILE_A
 #   define VSF_ARCH_HEADER      "./arm/cortex-a/cortex_a_generic.h"
 # elif  defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'R' || __TARGET_PROFILE_R
 #   define VSF_ARCH_HEADER      "./arm/cortex-r/cortex_r_generic.h"
-# elif  (defined(__CPU_X86__) || defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)) && __LINUX__
+# elif  (defined(__CPU_X86__) || defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)) && defined(__LINUX__)
 #   define  VSF_ARCH_HEADER     "./x86/linux/linux_generic.h"
-# elif  (defined(__CPU_X86__) || defined(__CPU_X64__)) && __WIN__
+# elif  (defined(__CPU_X86__) || defined(__CPU_X64__)) && defined(__WIN__)
 #   define  VSF_ARCH_HEADER     "./x86/win/win_generic.h"
 # elif  defined(__CPU_MCS51__)
 #   define  VSF_ARCH_HEADER     "./mcs51/mcs51_generic.h"
