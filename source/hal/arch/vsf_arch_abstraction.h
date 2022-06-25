@@ -64,7 +64,7 @@ extern const vsf_protect_region_t vsf_protect_region_none;
 #   define  VSF_ARCH_HEADER     "./rtos/rtos_generic.h"
 # elif  defined(__CPU_GENERIC__)
 #   if defined(__LINUX__)
-#     define  VSF_ARCH_HEADER   "./generic/linux_generic.h"
+#     define  VSF_ARCH_HEADER   "./generic/linux/linux_generic.h"
 #   else
 #     error not supported generic arch
 #   endif

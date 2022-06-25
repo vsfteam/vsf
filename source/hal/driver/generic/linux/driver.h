@@ -14,52 +14,46 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-#ifndef __VSF_LIBUSB_HCD_H___
-#define __VSF_LIBUSB_HCD_H___
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/usb/vsf_usb_cfg.h"
+#include "hal/vsf_hal_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_LIBUSB == ENABLED
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
-#include "hal/driver/common/template/vsf_template_usb.h"
-#include "component/usb/host/vsf_usbh.h"
-#include "hal/vsf_hal.h"
+#else
+
+#ifndef __HAL_DRIVER_GENERIC_LINUX_H__
+#define __HAL_DRIVER_GENERIC_LINUX_H__
+
+/*============================ INCLUDES ======================================*/
+
+#include "service/vsf_service.h"
+
+#include "./device.h"
+#include "./rtc/rtc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-#if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
-#   error "libusb_hcd does not support root hub"
-#endif
-#if VSF_USBH_USE_HUB == ENABLED
-#   error "libusb_hcd does not support hub"
-#endif
-#if     !defined(__CPU_X86__) && !defined(__CPU_X64__)                          \
-    &&  !(defined(__CPU_GENERIC__) && defined(__LINUX__))
-#	error "libusb_hcd ONLY support x86/64"
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-typedef struct vk_libusb_hcd_param_t {
-    vsf_arch_prio_t priority;
-} vk_libusb_hcd_param_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vk_usbh_hcd_drv_t vk_libusb_hcd_drv;
+#if VSF_USE_SIMPLE_STREAM == ENABLED
+extern vsf_stream_t VSF_DEBUG_STREAM_TX;
+extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
+#endif
 
+/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
-#endif // __VSF_LIBUSB_HCD_H___
+#endif      // __HAL_DRIVER_GENERIC_LINUX_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+/* EOF */

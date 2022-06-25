@@ -14,52 +14,29 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-#ifndef __VSF_LIBUSB_HCD_H___
-#define __VSF_LIBUSB_HCD_H___
+
+#ifndef __HAL_X86_LINUX_RTC_H__
+#define __HAL_X86_LINUX_RTC_H__
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/usb/vsf_usb_cfg.h"
+#include "hal/vsf_hal_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_LIBUSB == ENABLED
+#if VSF_HAL_USE_RTC == ENABLED
 
-#include "hal/driver/common/template/vsf_template_usb.h"
-#include "component/usb/host/vsf_usbh.h"
-#include "hal/vsf_hal.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "../device.h"
 
 /*============================ MACROS ========================================*/
+/*============================ INCLUDES ======================================*/
 
-#if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
-#   error "libusb_hcd does not support root hub"
-#endif
-#if VSF_USBH_USE_HUB == ENABLED
-#   error "libusb_hcd does not support hub"
-#endif
-#if     !defined(__CPU_X86__) && !defined(__CPU_X64__)                          \
-    &&  !(defined(__CPU_GENERIC__) && defined(__LINUX__))
-#	error "libusb_hcd ONLY support x86/64"
-#endif
+#define VSF_RTC_CFG_API_DECLARATION_PREFIX            vsf_hw
+#define VSF_RTC_CFG_INSTANCE_DECLARATION_PREFIX       VSF_HW
+#include "hal/driver/common/rtc/rtc_template.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-typedef struct vk_libusb_hcd_param_t {
-    vsf_arch_prio_t priority;
-} vk_libusb_hcd_param_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
-
-extern const vk_usbh_hcd_drv_t vk_libusb_hcd_drv;
-
 /*============================ PROTOTYPES ====================================*/
 
-#ifdef __cplusplus
-}
 #endif
-
-#endif
-#endif // __VSF_LIBUSB_HCD_H___
+#endif      // __HAL_X86_LINUX_RTC_H__

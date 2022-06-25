@@ -68,6 +68,8 @@
 */
 #   elif    defined(__ARM__) || defined(__arm__)
 #       define  VSF_DRIVER_HEADER       "./arm/driver.h"
+#   elif    defined(__CPU_GENERIC__)
+#       define  VSF_DRIVER_HEADER       "./generic/driver.h"
 
 /*! \note please try not ignore the __UNKNOWN_VENDOR__ if you want to select
  *!       the chip inside unknown folder
