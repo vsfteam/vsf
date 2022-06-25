@@ -25,6 +25,7 @@ extern "C" {
 #if VSF_LINUX_LIBUSB_CFG_WRAPPER == ENABLED
 #define VSF_LINUX_LIBUSB_WRAPPER(__api)                 VSF_SHELL_WRAPPER(vsf_linux_libusb, __api)
 
+#define libusb_strerror                                 VSF_LINUX_LIBUSB_WRAPPER(libusb_strerror)
 #define libusb_get_version                              VSF_LINUX_LIBUSB_WRAPPER(libusb_get_version)
 #define libusb_init                                     VSF_LINUX_LIBUSB_WRAPPER(libusb_init)
 #define libusb_exit                                     VSF_LINUX_LIBUSB_WRAPPER(libusb_exit)
@@ -41,6 +42,7 @@ extern "C" {
 #define libusb_get_bus_number                           VSF_LINUX_LIBUSB_WRAPPER(libusb_get_bus_number)
 #define libusb_alloc_transfer                           VSF_LINUX_LIBUSB_WRAPPER(libusb_alloc_transfer)
 #define libusb_fill_control_transfer                    VSF_LINUX_LIBUSB_WRAPPER(libusb_fill_control_transfer)
+#define libusb_fill_control_setup                       VSF_LINUX_LIBUSB_WRAPPER(libusb_fill_control_setup)
 #define libusb_fill_bulk_transfer                       VSF_LINUX_LIBUSB_WRAPPER(libusb_fill_bulk_transfer)
 #define libusb_fill_interrupt_transfer                  VSF_LINUX_LIBUSB_WRAPPER(libusb_fill_interrupt_transfer)
 #define libusb_fill_iso_transfer                        VSF_LINUX_LIBUSB_WRAPPER(libusb_fill_iso_transfer)
@@ -50,6 +52,7 @@ extern "C" {
 #define libusb_submit_transfer                          VSF_LINUX_LIBUSB_WRAPPER(libusb_submit_transfer)
 #define libusb_cancel_transfer                          VSF_LINUX_LIBUSB_WRAPPER(libusb_cancel_transfer)
 #define libusb_control_transfer                         VSF_LINUX_LIBUSB_WRAPPER(libusb_control_transfer)
+#define libusb_control_transfer_get_data                VSF_LINUX_LIBUSB_WRAPPER(libusb_control_transfer_get_data)
 #define libusb_bulk_transfer                            VSF_LINUX_LIBUSB_WRAPPER(libusb_bulk_transfer)
 #define libusb_interrupt_transfer                       VSF_LINUX_LIBUSB_WRAPPER(libusb_interrupt_transfer)
 #define libusb_get_string_descriptor_ascii              VSF_LINUX_LIBUSB_WRAPPER(libusb_get_string_descriptor_ascii)
