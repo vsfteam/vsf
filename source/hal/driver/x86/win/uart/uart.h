@@ -37,9 +37,7 @@
 
 typedef enum em_usart_mode_t {
     USART_8_BIT_LENGTH              = 0x0000ul,
-#define USART_8_BIT_LENGTH          USART_8_BIT_LENGTH
     USART_9_BIT_LENGTH              = 0x1000ul,
-#define USART_9_BIT_LENGTH          USART_9_BIT_LENGTH
     USART_BIT_LENGTH_MASK           = USART_8_BIT_LENGTH | USART_9_BIT_LENGTH,
 
     USART_1_STOPBIT                 = 0x0000ul,
@@ -61,6 +59,11 @@ typedef enum em_usart_mode_t {
     USART_TX_ENABLE                 = 0x0010ul,
     USART_RX_ENABLE                 = 0x0020ul,
     USART_ENABLE_MASK               = USART_TX_ENABLE | USART_RX_ENABLE,
+
+    // not supported by hw, but necessary, simply using used bits
+    USART_5_BIT_LENGTH              = 0x0800,
+    USART_6_BIT_LENGTH              = 0x4000,
+    USART_7_BIT_LENGTH              = 0x8000,
 } em_usart_mode_t;
 
 typedef enum em_usart_irq_mask_t {

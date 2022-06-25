@@ -231,18 +231,10 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
     )}
 
     switch (term->c_cflag & CSIZE) {
-#ifdef USART_5_BIT_LENGTH
     case CS5:   mode |= USART_5_BIT_LENGTH; break;
-#endif
-#ifdef USART_6_BIT_LENGTH
     case CS6:   mode |= USART_6_BIT_LENGTH; break;
-#endif
-#ifdef USART_7_BIT_LENGTH
     case CS7:   mode |= USART_7_BIT_LENGTH; break;
-#endif
-#ifdef USART_8_BIT_LENGTH
     case CS8:   mode |= USART_8_BIT_LENGTH; break;
-#endif
     default:    vsf_trace_error("term: bit length does not supported\n");  return;
     }
 
