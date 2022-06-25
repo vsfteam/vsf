@@ -138,8 +138,7 @@ int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal)
 }
 #endif
 
-#if 0
-//#if VSF_HAL_USE_USART == ENABLED
+#if VSF_HAL_USE_USART == ENABLED
 
 #   if VSF_USE_SIMPLE_STREAM != ENABLED
 #       error VSF_USE_SIMPLE_STREAM MUST be enabled to support uart dev
@@ -170,9 +169,8 @@ static uint_fast32_t __vsf_linux_uart_rx(vsf_usart_t *uart, vsf_linux_uart_priv_
     uint8_t *buffer;
     uint_fast32_t buflen, all_read_size = 0;
 
-    while (vsf_uart_fifo_rx_size(uart) > 0) {
+    while (vsf_usart_rxfifo_get_data_count(uart) > 0) {
         buflen = vsf_stream_get_wbuf(&priv->use_as__vsf_stream_t, &buffer);
-
         if (!buflen) {
             vsf_trace_error("uart rx buffer overflow, please increase VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE");
             break;
@@ -248,8 +246,16 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
     priv->baudrate = 9600;
 
     vsf_stream_connect_tx(priv->stream_rx);
-    extern void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream);
-    __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
+
+    // DO NOT call __vsf_linux_rx_stream_init
+    //  event is trigger in __vsf_linux_uart_evthandler, not in stream evthandler
+    vsf_stream_connect_rx(priv->stream_rx);
+    vsf_protect_t orig = vsf_protect_sched();
+    if (vsf_stream_get_data_size(priv->stream_rx)) {
+        vsf_linux_fd_set_status(sfd->priv, POLLIN, orig);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
 
     __vsf_linux_uart_config(uart, priv);
 
