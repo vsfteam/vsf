@@ -81,11 +81,12 @@ void aic8800_demo_init(void)
             DSPSysCoreClock / 1000000, SystemCoreClock / 1000000,
             PeripheralClock / 1000000, sysctrl_clock_get(PER_FLASH) / 1000000);
 
-    psram_init();
-    uint32_t ram_size = psram_size_get();
-    if (ram_size > 0) {
-        dbg("    psram: %dM bytes\r\n", ram_size / (1024 * 1024));
-    }
+// ONLY AIC8800MBWP need codes below to initialize SDRAM
+//    psram_init();
+//    uint32_t ram_size = psram_size_get();
+//    if (ram_size > 0) {
+//        dbg("    psram: %dM bytes\r\n", ram_size / (1024 * 1024));
+//    }
 
 #if VSF_USE_USB_HOST
     __usbh_heap_init();
