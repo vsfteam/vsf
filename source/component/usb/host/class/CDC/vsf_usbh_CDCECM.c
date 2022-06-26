@@ -114,6 +114,9 @@ typedef struct vk_usbh_ecm_t {
         VSF_USBH_ECM_INIT_WAIT_SET_IF1,
         VSF_USBH_ECM_INIT_WAIT_SET_FILTER,
     } init_state;
+#if VSF_USBH_CDCECM_SUPPORT_THREAD == ENABLED
+    bool is_connected;
+#endif
 } vk_usbh_ecm_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -372,6 +375,9 @@ static void __vk_usbh_ecm_netdrv_thread(void *param)
 
             __vk_usbh_ecm_netdrv_evthandler(ecm, VSF_USBH_CDCECM_ON_DISCONNECT, NULL);
             ecm->thread = NULL;
+#if VSF_USBH_CDCECM_SUPPORT_THREAD == ENABLED
+            ecm->is_connected = false;
+#endif
             break;
         } else {
             vsf_slist_queue_dequeue(vk_usbh_ecm_iocb_t, iocb_node, &ecm->iocb_queue, iocb);
@@ -417,7 +423,13 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
     case VSF_USBH_CDC_ON_EVENT:
         switch (ecm->evt[1]) {
         case 0x00: {          // NETWORK_CONNECTION
+#if VSF_USBH_CDCECM_SUPPORT_THREAD == ENABLED
+                // in thread mode, there is suitation when ecm is connected but vk_netdrv_is_connected is false.
+                //  after ecm connected, the __vk_usbh_ecm_netdrv_thread not yet run
+                bool connected = vk_netdrv_is_connected(netdrv) || ecm->is_connected;
+#else
                 bool connected = vk_netdrv_is_connected(netdrv);
+#endif
                 if (connected && ecm->evt[2] == 0) {
                     vsf_trace_info("ecm_event: NETWORK_CONNECTION Disconnected" VSF_TRACE_CFG_LINEEND);
 
@@ -437,6 +449,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
                         VSF_USB_ASSERT(NULL == ecm->thread);
                         ecm->thread = vk_netdrv_thread(netdrv, __vk_usbh_ecm_netdrv_thread, ecm);
                         VSF_USB_ASSERT(ecm->thread != NULL);
+                        ecm->is_connected = true;
                     } else
 #endif
                         __vk_usbh_ecm_netdrv_evthandler(ecm, VSF_USBH_CDCECM_ON_CONNECT, NULL);
