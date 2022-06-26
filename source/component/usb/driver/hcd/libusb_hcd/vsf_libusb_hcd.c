@@ -508,12 +508,15 @@ static int __vk_libusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 
             if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
                 &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
-#if 0
+#ifndef __WIN__
                 return libusb_set_configuration(libusb_dev->handle, setup->wValue);
 #else
                 // TODO; libusb_set_configuration will fail on windows paltform
                 return 0;
 #endif
+            } else if ( ((USB_RECIP_INTERFACE | USB_DIR_OUT) == setup->bRequestType)
+                    &&  (USB_REQ_SET_INTERFACE == setup->bRequest)) {
+                return libusb_set_interface_alt_setting(libusb_dev->handle, setup->wIndex, setup->wValue);
             } else {
                 return libusb_control_transfer(libusb_dev->handle, setup->bRequestType,
                         setup->bRequest, setup->wValue, setup->wIndex, urb->buffer,
@@ -605,6 +608,27 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
         if (!is_to_free) {
             vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
             vk_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
+            struct libusb_config_descriptor *config_desc = NULL;
+
+            // To set configuration, first step is to detach kernel driver.
+            // Then set configuration, and claim interfaces
+            if (USB_ENDPOINT_XFER_CONTROL == urb->pipe.type) {
+                struct usb_ctrlrequest_t *setup = &urb->setup_packet;
+
+                if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
+                    &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
+                    if (LIBUSB_SUCCESS == libusb_get_config_descriptor_by_value(
+                                libusb_get_device(libusb_dev->handle), setup->wValue, &config_desc)) {
+                        for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
+                            if (libusb_kernel_driver_active(libusb_dev->handle, i)) {
+                                libusb_detach_kernel_driver(libusb_dev->handle, i);
+                            }
+                        }
+                    } else {
+                        VSF_LINUX_ASSERT(false);
+                    }
+                }
+            }
 
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
             __vsf_arch_irq_start(irq_thread);
@@ -630,17 +654,11 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
                     if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
                         &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
 
-                        int config = setup->wValue;
-                        struct libusb_config_descriptor *config_desc;
-
-                        if (LIBUSB_SUCCESS == libusb_get_config_descriptor_by_value(
-                                    libusb_get_device(libusb_dev->handle), config, &config_desc)) {
-                            for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
-                                libusb_detach_kernel_driver(libusb_dev->handle, i);
-                                libusb_claim_interface(libusb_dev->handle, i);
-                            }
-                            libusb_free_config_descriptor(config_desc);
+                        VSF_LINUX_ASSERT(config_desc != NULL);
+                        for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
+                            libusb_claim_interface(libusb_dev->handle, i);
                         }
+                        libusb_free_config_descriptor(config_desc);
                     }
                 }
             }
