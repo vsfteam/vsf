@@ -362,7 +362,6 @@ static void __vk_usbh_ecm_netdrv_thread(void *param)
     vk_usbh_ecm_iocb_t *iocb;
     vsf_protect_t orig;
 
-    vsf_eda_sem_init(&ecm->sem);
     __vk_usbh_ecm_netdrv_evthandler(ecm, VSF_USBH_CDCECM_ON_CONNECT, NULL);
 
     while (true) {
@@ -447,6 +446,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
 #if VSF_USBH_CDCECM_SUPPORT_THREAD == ENABLED
                     if (vk_netdrv_feature(netdrv) & VSF_NETDRV_FEATURE_THREAD) {
                         VSF_USB_ASSERT(NULL == ecm->thread);
+                        vsf_eda_sem_init(&ecm->sem);
                         ecm->thread = vk_netdrv_thread(netdrv, __vk_usbh_ecm_netdrv_thread, ecm);
                         VSF_USB_ASSERT(ecm->thread != NULL);
                         ecm->is_connected = true;
