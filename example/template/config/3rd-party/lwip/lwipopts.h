@@ -39,7 +39,8 @@
 #include "vsf_cfg.h"
 
 #define LWIP_TIMEVAL_PRIVATE        0
-#if defined(__WIN__) && defined(__VSF_X86_WIN_SINGLE_PRIORITY)
+#if     (defined(__WIN__) && defined(__VSF_X86_WIN_SINGLE_PRIORITY))              \
+    ||  defined(__LINUX__)
 #   define TCPIP_THREAD_PRIO       vsf_prio_0
 #endif
 
