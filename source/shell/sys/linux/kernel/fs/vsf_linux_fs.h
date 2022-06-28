@@ -83,6 +83,7 @@ vsf_class(vsf_linux_fd_t) {
     protected_member(
         int fd;
         int fd_flags;
+        int cur_flags;
         const vsf_linux_fd_op_t *op;
     )
 

@@ -934,13 +934,13 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
-    return __vsf_linux_socket_inet_recv(priv, buf, count, 0, NULL, NULL);
+    return __vsf_linux_socket_inet_recv(priv, buf, count, sfd->cur_flags, NULL, NULL);
 }
 
 static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
-    return __vsf_linux_socket_inet_send(priv, buf, count, 0, NULL, 0);
+    return __vsf_linux_socket_inet_send(priv, buf, count, sfd->cur_flags, NULL, 0);
 }
 
 static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
@@ -974,28 +974,6 @@ ssize_t VSF_LINUX_SOCKET_WRAPPER(recvfrom)(int sockfd, void *buffer, size_t size
 
     return __vsf_linux_socket_inet_recv((vsf_linux_socket_inet_priv_t *)sfd->priv,
                     buffer, size, flags, src_addr, addrlen);
-}
-
-int VSF_LINUX_SOCKET_WRAPPER(send)(int sockfd, const void *buf, size_t len, int flags)
-{
-    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-    if (!sfd) {
-        return -1;
-    }
-
-    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
-    return __vsf_linux_socket_inet_send(priv, buf, len, flags, NULL, 0);
-}
-
-int VSF_LINUX_SOCKET_WRAPPER(recv)(int sockfd, void *buf, size_t len, int flags)
-{
-    vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-    if (!sfd) {
-        return -1;
-    }
-
-    vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
-    return __vsf_linux_socket_inet_recv(priv, buf, len, flags, NULL, NULL);
 }
 
 // netdb.h
