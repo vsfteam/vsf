@@ -24,20 +24,31 @@ jobs:
             - os: windows-2019
               vs-version: '[17.0, 18)'
             - os: windows-2022
-              vs-version: '[16.0, 17)'            
+              vs-version: '[16.0, 17)'
 
     runs-on: ${{ matrix.os }}
 
     steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
       with:
         vs-version: ${{ matrix.vs-version }}
-    
+
     - name: Checkout With Submodule
       uses: actions/checkout@v2
       with:
         submodules: true # without recursive
+
+    - name: Fixed NPCAP DLL Missing
+      if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
+      run: |
+        sed -i '/VSF_NETDRV_USE_WPCAP/s/ENABLED/DISABLED/' example/template/config/vsf_usr_cfg/vsf_usr_cfg_win.h
+      shell: bash
 
     - name: Restore NuGet packages
       working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -49,3 +60,17 @@ jobs:
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{matrix.build_config}} ${{matrix.solution_path}}
 
+    - name: Prepare Test
+      if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
+      run: |
+        cp example/template/project/vc/lib/{SDL2/lib/x86/SDL2.dll,libwdi/libwdi.dll} example/template/project/vc/vsf_template_win/Debug
+        pip install pytest pytest-bdd wexpect
+      shell: bash
+
+    - name: Test
+      if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
+      run: |
+        pytest -sv --vsf_template 'example\template\project\vc\vsf_template_win\Debug\vsf_template_win.exe'
+      working-directory: ${{github.workspace}}/test/pytest
+      env:
+        VSF_PATH: ${{github.workspace}}
