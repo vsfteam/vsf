@@ -27,13 +27,14 @@ jobs:
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
           sudo apt-get update
-          sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libusb-dev libusb-1.0
+          sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libusb-dev libusb-1.0 python3 python3-pip
+          pip3 install pytest pytest-bdd pexpect
           echo "CMAKE_PATH=linux" >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          brew install gcc llvm sdl2
+          brew install gcc llvm sdl2 # TODO
           echo "CMAKE_PATH=macos" >> $GITHUB_ENV
         else
-          choco install mingw llvm cmake ninja sdl2
+          choco install mingw llvm cmake ninja sdl2 # TODO
           echo "CMAKE_PATH=windows" >> $GITHUB_ENV
         fi
       shell: bash
@@ -50,3 +51,9 @@ jobs:
       run: cmake --build ${SOURCE_PATH}/build -v
       env:
         SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{env.CMAKE_PATH}}
+
+    - name: test
+      run: pytest -sv --vsf_template example/template/project/cmake/linux/build/vsf_template
+      working-directory: ${{github.workspace}}/test/pytest
+      env:
+        VSF_PATH: ${{github.workspace}}
