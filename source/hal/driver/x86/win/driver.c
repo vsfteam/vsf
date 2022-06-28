@@ -96,6 +96,7 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 
 int __vsf_arch_printf(const char *format, ...)
 {
+#if VSF_ARCH_CFG_HIDE_CONSOLE != ENABLED
     char buff[4096];
     int size;
 
@@ -109,6 +110,9 @@ int __vsf_arch_printf(const char *format, ...)
         WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), buff, size, &wsize, NULL);
     }
     return size;
+#else
+    return 0;
+#endif
 }
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
