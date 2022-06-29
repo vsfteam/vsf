@@ -82,6 +82,16 @@ int user_pwrkey_enabled(void)
     return 0;
 }
 
+void vsf_arch_reset(void)
+{
+    pmic_chip_reboot();
+}
+
+void vsf_arch_shutdown(void)
+{
+    pmic_chip_shutdown();
+}
+
 /*! \note initialize device driver
  *  \param none
  *  \retval true initialization succeeded.

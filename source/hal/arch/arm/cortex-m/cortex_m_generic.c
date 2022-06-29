@@ -352,6 +352,12 @@ void vsf_arch_sleep(uint_fast32_t mode)
     __WFE();
 }
 
+WEAK(vsf_arch_reset)
+void vsf_arch_reset(void)
+{
+    NVIC_SystemReset();
+}
+
 /*----------------------------------------------------------------------------*
  * arch enhancement                                                           *
  *----------------------------------------------------------------------------*/
