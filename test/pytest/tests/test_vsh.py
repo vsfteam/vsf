@@ -5,17 +5,18 @@ import pytest
 import platform
 import time
 
+from conftest import printh
+
 from pytest_bdd import (
     given,
     scenario,
     then,
     when,
+    parsers
 )
 
 @pytest.fixture
 def vsh_subprocess(pytestconfig):
-
-    "TODO: support windows and usart"
     vsf_serial = pytestconfig.getoption("vsf_serial")
     vsf_serial_cfg = pytestconfig.getoption("vsf_serial_cfg")
     if vsf_serial and vsf_serial_cfg:
@@ -23,31 +24,26 @@ def vsh_subprocess(pytestconfig):
             cmd = 'plink -serial \\\\.\\' + vsf_serial + ' -sercfg ' + vsf_serial_cfg
         else:
             # TODO: support screen or other serial tool
-            cmd = 'picocom ' + vsf_serial_cfg  + ' ' + vsf_serial
+            cmd = 'picocom ' + vsf_serial_cfg  + ' /dev/' + vsf_serial
     else:
-        cmd = os.path.join(os.environ['VSF_PATH'], pytestconfig.getoption("vsf_template"))
+        vsf_template = pytestconfig.getoption("vsf_template")
+        cmd = os.path.join(os.environ['VSF_PATH'], vsf_template)
     print("run cmd: %s" % cmd)
 
     if platform.system() == 'Windows':
         import wexpect
-        vsh_subprocess = wexpect.spawn(cmd)
+        vsh_subprocess = wexpect.spawn(cmd, encoding='utf-8')
     else:
         import pexpect
         vsh_subprocess = pexpect.spawn(cmd, encoding='utf-8')
 
     vsf_vsh_started = pytestconfig.getoption("vsf_vsh_started")
     if not vsf_vsh_started:
-        vsh_subprocess.expect('>>>', timeout=10)
-        print("%s%s%s" % (
-            '\n' + '*' * 80 + '\n',
-            vsh_subprocess.before,
-            vsh_subprocess.after,
-        ))
+        vsh_subprocess.expect('>>>', timeout=pytestconfig.getoption("vsf_timeout"))
+        printh("expect >>> before", vsh_subprocess.before)
+        printh("expect >>> after ", vsh_subprocess.after)
 
     yield vsh_subprocess
-
-    #if vsf_serial and vsf_serial_cfg and platform.system() != 'Windows':
-    #    vsh_subprocess.send('\x01\x11')
 
     vsh_subprocess.close()
 
@@ -61,24 +57,16 @@ def connect_vsh(vsh_subprocess):
     return vsh_subprocess
 
 @when('type ls /')
-def type_ls_(vsh_subprocess):
+def type_ls_(vsh_subprocess, pytestconfig):
     vsh_subprocess.sendline("ls /\r")
 
-@then('receive string')
-def receive_string(vsh_subprocess, pytestconfig):
+@then(parsers.parse('ls / output include "{output}"'))
+def receive_string(vsh_subprocess, pytestconfig, output):
 
-    vsf_serial = pytestconfig.getoption("vsf_serial")
-    vsf_serial_cfg = pytestconfig.getoption("vsf_serial_cfg")
-    if vsf_serial and vsf_serial_cfg:
-        time.sleep(1)
+    vsh_subprocess.expect(output + '.*$', timeout=pytestconfig.getoption("vsf_timeout"))
 
-    vsh_subprocess.expect('var.*$')
-    print("%s%s%s%s" % (
-        '\n' + '*' * 80 + '\n',
-        vsh_subprocess.before,
-        '\n' + '*' * 80 + '\n',
-        vsh_subprocess.after,
-    ))
+    printh("expect ls / output before", vsh_subprocess.before)
+    printh("expect ls / output after ", vsh_subprocess.after)
 
-    assert 'ls' in vsh_subprocess.before
-    assert 'bin' in vsh_subprocess.after
+    assert 'ls /' in vsh_subprocess.before
+    assert output in vsh_subprocess.after

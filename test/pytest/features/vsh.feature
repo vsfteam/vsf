@@ -10,4 +10,4 @@ Feature: vsh: vsf shell
     Scenario: ls
         Given connect vsh
         When type ls /
-        Then receive string
+        Then ls / output include "bin"
