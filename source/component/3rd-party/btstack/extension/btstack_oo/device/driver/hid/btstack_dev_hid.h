@@ -3,7 +3,7 @@
 
 #include "../../btstack_dev_cfg.h"
 
-#if BTSTACK_USE_DEVICE && BTSTACK_USE_DEVICE_HID == ENABLED
+#if BTSTACK_OO_USE_DEVICE && BTSTACK_OO_USE_DEVICE_HID == ENABLED
 
 #include "../../btstack_dev.h"
 
@@ -15,8 +15,6 @@
 
 #include "utilities/ooc_class.h"
 
-declare_simple_class(btstack_device_hid_t)
-
 struct btstack_device_hid_drv_op_t {
     implement(btstack_device_drv_op_t)
     int (*report)(btstack_dev_t *dev);
@@ -25,7 +23,7 @@ struct btstack_device_hid_drv_op_t {
 };
 typedef struct btstack_device_hid_drv_op_t btstack_device_hid_drv_op_t;
 
-def_simple_class(btstack_device_hid_t) {
+vsf_class(btstack_device_hid_t) {
 
     public_member(
         implement(btstack_device_dev_t)
@@ -54,20 +52,20 @@ extern void btstack_device_hid_packet_handler(btstack_dev_t *dev, uint8_t packet
         uint8_t *packet, uint16_t packet_size);
 #else
 // public APIs
-extern void btstack_dev_hid_send_report(btstack_device_hid_t *dev_hid);
+extern void btstack_device_hid_send_report(btstack_device_hid_t *dev_hid);
 
-extern void btstack_dev_hid_set_timer(btstack_device_hid_t *dev_hid, uint_fast32_t timeout_ms, void (*on_timer)(btstack_device_hid_t *dev_hid));
-extern void btstack_dev_hid_remove_timer(btstack_device_hid_t *dev_hid);
+extern void btstack_device_hid_set_timer(btstack_device_hid_t *dev_hid, uint_fast32_t timeout_ms, void (*on_timer)(btstack_device_hid_t *dev_hid));
+extern void btstack_device_hid_remove_timer(btstack_device_hid_t *dev_hid);
 #endif
 
 #undef __BTSTACK_DEVICE_HID_CLASS_INHERIT
 #undef __BTSTACK_DEVICE_HID_CLASS_IMPLEMENT
 
-#if BTSTACK_USE_DEVICE_NSPRO == ENABLED
-#   include "./nspro/btstack_dev_nspro.h"
+#if BTSTACK_OO_USE_DEVICE_NSPRO == ENABLED
+#   include "extension/btstack_oo/device/driver/hid/nspro/btstack_dev_nspro.h"
 #endif
-#if BTSTACK_USE_DEVICE_DS4 == ENABLED
-#   include "./ds4/btstack_dev_ds4.h"
+#if BTSTACK_OO_USE_DEVICE_DS4 == ENABLED
+#   include "extension/btstack_oo/device/driver/hid/ds4/btstack_dev_ds4.h"
 #endif
 
 #endif      // BTSTACK_USE_DEVICE && BTSTACK_USE_DEVICE_HID

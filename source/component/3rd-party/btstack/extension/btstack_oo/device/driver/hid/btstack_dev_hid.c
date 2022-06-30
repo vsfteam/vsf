@@ -1,9 +1,9 @@
 #define __BTSTACK_DEVICE_HID_CLASS_IMPLEMENT
-#define __BTSTACK_DEVICE_CLASS_INHERIT
-#define __BTSTACK_CLASS_INHERIT
+#define __BTSTACK_DEVICE_CLASS_INHERIT__
+#define __BTSTACK_CLASS_INHERIT__
 #include "./btstack_dev_hid.h"
 
-#if BTSTACK_USE_DEVICE == ENABLED && BTSTACK_USE_DEVICE_HID == ENABLED
+#if BTSTACK_OO_USE_DEVICE == ENABLED && BTSTACK_OO_USE_DEVICE_HID == ENABLED
 
 static void btstack_device_hid_delayed_connected(btstack_timer_source_t *timer)
 {
@@ -153,4 +153,4 @@ int btstack_device_hid_disconnect(btstack_dev_t *dev)
     return 0;
 }
 
-#endif      // BTSTACK_USE_DEVICE && BTSTACK_USE_DEVICE_HID
+#endif      // BTSTACK_OO_USE_DEVICE && BTSTACK_OO_USE_DEVICE_HID
