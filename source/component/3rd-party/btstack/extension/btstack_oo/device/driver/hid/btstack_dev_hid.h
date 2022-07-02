@@ -9,7 +9,7 @@
 
 #if     defined(__BTSTACK_DEVICE_HID_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT
-#elif   defined(__BTSTACK_DEVICE_HID_CLASS_INHERIT)
+#elif   defined(__BTSTACK_DEVICE_HID_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
 #endif
 
@@ -41,7 +41,7 @@ vsf_class(btstack_device_hid_t) {
     )
 };
 
-#if     defined(__BTSTACK_DEVICE_HID_CLASS_INHERIT) || defined(__BTSTACK_DEVICE_HID_CLASS_IMPLEMENT)
+#if     defined(__BTSTACK_DEVICE_HID_CLASS_INHERIT__) || defined(__BTSTACK_DEVICE_HID_CLASS_IMPLEMENT)
 // private/protected APIs
 extern btstack_device_hid_t * btstack_device_hid_get(uint8_t cid);
 extern int btstack_device_hid_init(btstack_dev_t *dev);
@@ -58,7 +58,7 @@ extern void btstack_device_hid_set_timer(btstack_device_hid_t *dev_hid, uint_fas
 extern void btstack_device_hid_remove_timer(btstack_device_hid_t *dev_hid);
 #endif
 
-#undef __BTSTACK_DEVICE_HID_CLASS_INHERIT
+#undef __BTSTACK_DEVICE_HID_CLASS_INHERIT__
 #undef __BTSTACK_DEVICE_HID_CLASS_IMPLEMENT
 
 #if BTSTACK_OO_USE_DEVICE_NSPRO == ENABLED
