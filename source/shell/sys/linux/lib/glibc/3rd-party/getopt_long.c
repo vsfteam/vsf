@@ -49,6 +49,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
+#if VSF_USE_LINUX == ENABLED
+
 #include <err.h>
 #include <errno.h>
 #include <getopt.h>
@@ -533,3 +537,5 @@ getopt_long_only(int nargc, char * const *nargv, const char *options,
 	return (getopt_internal(nargc, nargv, options, long_options, idx,
 	    FLAG_PERMUTE|FLAG_LONGONLY));
 }
+
+#endif      // VSF_USE_LINUX
