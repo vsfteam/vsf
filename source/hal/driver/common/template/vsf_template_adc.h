@@ -29,27 +29,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_ADC_CFG_MULTI_CLASS
-#   define VSF_ADC_CFG_MULTI_CLASS              DISABLED
-#endif
-
-// Turn off multi class support for the current implementation
-// when the VSF_ADC_CFG_MULTI_CLASS is enabled
-#ifndef VSF_ADC_CFG_IMPLEMENT_OP
-#   if VSF_ADC_CFG_MULTI_CLASS == ENABLED
-#       define VSF_ADC_CFG_IMPLEMENT_OP         ENABLED
-#   else
-#       define VSF_ADC_CFG_IMPLEMENT_OP         DISABLED
-#   endif
-#endif
-
 // VSF_ADC_CFG_PREFIX: use for macro vsf_adc_{init, enable, ...}
 #ifndef VSF_ADC_CFG_PREFIX
-#   if VSF_ADC_CFG_MULTI_CLASS == ENABLED
-#       define VSF_ADC_CFG_PREFIX               vsf
-#   elif defined(VSF_HW_ADC_COUNT) && (VSF_HW_ADC_COUNT != 0)
-#       define VSF_ADC_CFG_PREFIX               vsf_hw
-#   endif
+#   define VSF_ADC_CFG_PREFIX                       vsf
+#   define VSF_ADC_CFG_MULTI_CLASS                  ENABLED
 #endif
 
 #ifndef VSF_ADC_CFG_FUNCTION_RENAME
@@ -66,7 +49,7 @@ extern "C" {
 
 
 #ifndef VSF_ADC_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_ADC_CFG_REIMPLEMENT_CAPABILITY   DISABLED
+#   define VSF_ADC_CFG_REIMPLEMENT_CAPABILITY       DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -227,7 +210,7 @@ extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
         VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request_once)((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC, ##__VA_ARGS__)
 #   define vsf_adc_channel_config(__ADC, ...)                                   \
         VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_config)      ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC, ##__VA_ARGS__)
-#   define vsf_adc_channel_request(__ADC, ...))                                 \
+#   define vsf_adc_channel_request(__ADC, ...)                                 \
         VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request)     ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC, buffer_ptr, count)
 #endif
 

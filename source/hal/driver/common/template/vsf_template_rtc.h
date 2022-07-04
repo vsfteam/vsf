@@ -29,27 +29,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_RTC_CFG_MULTI_CLASS
-#   define VSF_RTC_CFG_MULTI_CLASS              DISABLED
-#endif
-
-// Turn off multi class support for the current implementation
-// when the VSF_RTC_CFG_MULTI_CLASS is enabled
-#ifndef VSF_RTC_CFG_IMPLEMENT_OP
-#   if VSF_RTC_CFG_MULTI_CLASS == ENABLED
-#       define VSF_RTC_CFG_IMPLEMENT_OP         ENABLED
-#   else
-#       define VSF_RTC_CFG_IMPLEMENT_OP         DISABLED
-#   endif
-#endif
-
 // VSF_RTC_CFG_PREFIX: use for macro vsf_rtc_{init, enable, ...}
 #ifndef VSF_RTC_CFG_PREFIX
-#   if VSF_RTC_CFG_MULTI_CLASS == ENABLED
-#       define VSF_RTC_CFG_PREFIX               vsf
-#   elif defined(VSF_HW_RTC_COUNT) && (VSF_HW_RTC_COUNT != 0)
-#       define VSF_RTC_CFG_PREFIX               vsf_hw
-#   endif
+#   define VSF_RTC_CFG_PREFIX                 vsf
+#   define VSF_RTC_CFG_MULTI_CLASS            ENABLED
 #endif
 
 #ifndef VSF_RTC_CFG_FUNCTION_RENAME

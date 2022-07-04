@@ -35,10 +35,14 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_HW_RNG_CFG_MULTI_CLASS
+#   define VSF_HW_RNG_CFG_MULTI_CLASS           VSF_RNG_CFG_MULTI_CLASS
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_rng_t {
-#if VSF_RNG_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_RNG_CFG_MULTI_CLASS == ENABLED
     vsf_rng_t vsf_rng;
 #endif
 

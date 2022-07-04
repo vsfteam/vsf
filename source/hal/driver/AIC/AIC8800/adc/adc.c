@@ -18,6 +18,7 @@
 #define VSF_ADC_CFG_PREFIX                  vsf_hw
 #define VSF_ADC_CFG_UPPERCASE_PREFIX        VSF_HW
 
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
@@ -38,6 +39,10 @@
 #   error "TODO"
 #endif
 
+#ifndef VSF_HW_ADC_CFG_MULTI_CLASS
+#   define VSF_HW_ADC_CFG_MULTI_CLASS VSF_ADC_CFG_MULTI_CLASS
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_adc_request_t {
@@ -49,7 +54,7 @@ typedef struct vsf_hw_adc_request_t {
 } vsf_hw_adc_request_t;
 
 typedef struct vsf_hw_adc_t {
-#if VSF_ADC_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_ADC_CFG_MULTI_CLASS == ENABLED
     vsf_adc_t vsf_adc;
 #endif
 

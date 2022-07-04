@@ -29,27 +29,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_RNG_CFG_MULTI_CLASS
-#   define VSF_RNG_CFG_MULTI_CLASS              ENABLED
-#endif
-
-// Turn off multi class support for the current implementation
-// when the VSF_RNG_CFG_MULTI_CLASS is enabled
-#ifndef VSF_RNG_CFG_IMPLEMENT_OP
-#   if VSF_RNG_CFG_MULTI_CLASS == ENABLED
-#       define VSF_RNG_CFG_IMPLEMENT_OP         ENABLED
-#   else
-#       define VSF_RNG_CFG_IMPLEMENT_OP         DISABLED
-#   endif
-#endif
-
 // VSF_RNG_CFG_PREFIX: use for macro vsf_rng_{init, enable, ...}
 #ifndef VSF_RNG_CFG_PREFIX
-#   if VSF_RNG_CFG_MULTI_CLASS == ENABLED
-#       define VSF_RNG_CFG_PREFIX           vsf
-#   elif defined(VSF_HW_RNG_COUNT) && (VSF_HW_RNG_COUNT != 0)
-#       define VSF_RNG_CFG_PREFIX           vsf_hw
-#   endif
+#   define VSF_RNG_CFG_PREFIX                 vsf
+#   define VSF_RNG_CFG_MULTI_CLASS            ENABLED
 #endif
 
 #ifndef VSF_RNG_CFG_FUNCTION_RENAME

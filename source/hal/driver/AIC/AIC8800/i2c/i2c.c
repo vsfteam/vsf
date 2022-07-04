@@ -29,6 +29,11 @@
 #include "../vendor/plf/aic8800/src/driver/i2cm/reg_i2cm.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HW_I2C_CFG_MULTI_CLASS
+#   define VSF_HW_I2C_CFG_MULTI_CLASS           VSF_I2C_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -42,7 +47,7 @@ typedef struct vsf_hw_i2c_const_t {
 } vsf_hw_i2c_const_t;
 
 typedef struct vsf_hw_i2c_t {
-#if VSF_I2C_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_I2C_CFG_MULTI_CLASS == ENABLED
     vsf_i2c_t vsf_i2c;
 #endif
 

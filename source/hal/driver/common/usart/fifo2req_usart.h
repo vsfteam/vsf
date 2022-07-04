@@ -35,6 +35,11 @@
 #include "hal/driver/common/template/vsf_template_usart.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_FIFO2REQ_USART_CFG_MULTI_CLASS
+#   define VSF_FIFO2REQ_USART_CFG_MULTI_CLASS           VSF_SPI_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -49,7 +54,7 @@ typedef struct vsf_fifo2req_usart_item_t {
 
 vsf_class(vsf_fifo2req_usart_t) {
     private_member(
-#if VSF_I2C_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_FIFO2REQ_USART_CFG_MULTI_CLASS == ENABLED
         vsf_usart_t vsf_usart;
 #endif
         vsf_fifo2req_usart_item_t rx;
