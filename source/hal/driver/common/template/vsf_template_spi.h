@@ -29,27 +29,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_SPI_CFG_MULTI_CLASS
-#   define VSF_SPI_CFG_MULTI_CLASS              DISABLED
-#endif
-
-// Turn off multi class support for the current implementation
-// when the VSF_SPI_CFG_MULTI_CLASS is enabled
-#ifndef VSF_SPI_CFG_IMPLEMENT_OP
-#   if VSF_SPI_CFG_MULTI_CLASS == ENABLED
-#       define VSF_SPI_CFG_IMPLEMENT_OP         ENABLED
-#   else
-#       define VSF_SPI_CFG_IMPLEMENT_OP         DISABLED
-#   endif
-#endif
-
 // VSF_SPI_CFG_PREFIX: use for macro vsf_spi_{init, enable, ...}
 #ifndef VSF_SPI_CFG_PREFIX
-#   if VSF_SPI_CFG_MULTI_CLASS == ENABLED
-#       define VSF_SPI_CFG_PREFIX           vsf
-#   elif defined(VSF_HW_SPI_COUNT) && (VSF_HW_SPI_COUNT != 0)
-#       define VSF_SPI_CFG_PREFIX           vsf_hw
-#   endif
+#   define VSF_SPI_CFG_PREFIX                 vsf
+#   define VSF_SPI_CFG_MULTI_CLASS            ENABLED
 #endif
 
 #ifndef VSF_SPI_CFG_FUNCTION_RENAME

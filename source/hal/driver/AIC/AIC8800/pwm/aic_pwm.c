@@ -34,6 +34,10 @@
 #define AIC_PWM_REG(__N)            \
     ((__IO uint32_t *)((uint32_t)&AIC_PWM->__N + hw_pwm_ptr->index * 0x10))
 
+#ifndef VSF_HW_PWM_CFG_MULTI_CLASS
+#   define VSF_HW_PWM_CFG_MULTI_CLASS           VSF_PWM_CFG_MULTI_CLASS
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_aic_pwm_const_t {
@@ -44,7 +48,7 @@ typedef struct vsf_aic_pwm_const_t {
 } vsf_aic_pwm_const_t;
 
 typedef struct vsf_aic_pwm_t {
-#if VSF_PWM_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_PWM_CFG_MULTI_CLASS == ENABLED
     vsf_pwm_t vsf_pwm;
 #endif
     uint8_t  index;

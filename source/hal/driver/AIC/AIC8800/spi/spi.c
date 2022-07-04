@@ -35,14 +35,14 @@
 #   define VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX      65535
 #endif
 
+#ifndef VSF_HW_SPI_CFG_MULTI_CLASS
+#   define VSF_HW_SPI_CFG_MULTI_CLASS           VSF_SPI_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_spi_const_t {
-#if VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
-    vsf_spi_t vsf_spi;
-#endif
-
     REG_SPI_T          *reg;
 
     struct {
@@ -67,7 +67,7 @@ typedef struct vsf_hw_spi_const_t {
 } vsf_hw_spi_const_t;
 
 typedef struct vsf_hw_spi_t {
-#if VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_SPI_CFG_MULTI_CLASS == ENABLED
     vsf_spi_t vsf_spi;
 #endif
 

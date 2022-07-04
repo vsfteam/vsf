@@ -26,6 +26,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_HW_FLASH_CFG_MULTI_CLASS
+#   define VSF_HW_FLASH_CFG_MULTI_CLASS           VSF_FLASH_CFG_MULTI_CLASS
+#endif
+
 #undef VSF_AIC8800_FLASH_CFG_PROTECT
 #define VSF_AIC8800_FLASH_CFG_PROTECT                   interrupt
 
@@ -72,7 +76,7 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_flash_t {
-#if VSF_FLASH_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_FLASH_CFG_MULTI_CLASS == ENABLED
     vsf_flash_t vsf_flash;
 #endif
     flash_cfg_t cfg;

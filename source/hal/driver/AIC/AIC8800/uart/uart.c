@@ -31,6 +31,11 @@
 #include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HW_USART_CFG_MULTI_CLASS
+#   define VSF_HW_USART_CFG_MULTI_CLASS           VSF_USART_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -44,7 +49,7 @@ typedef struct vsf_hw_usart_const_t {
 } vsf_hw_usart_const_t;
 
 typedef struct vsf_hw_usart_t {
-#if VSF_USART_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_USART_CFG_MULTI_CLASS == ENABLED
     vsf_usart_t vsf_usart;
 #endif
     const vsf_hw_usart_const_t *usart_const;

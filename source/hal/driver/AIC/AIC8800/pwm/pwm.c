@@ -32,12 +32,16 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_HW_PWM_CFG_MULTI_CLASS
+#   define VSF_HW_PWM_CFG_MULTI_CLASS           VSF_PWM_CFG_MULTI_CLASS
+#endif
+
 #define PWM_PWM_TMR_SEL(n)                              (((n) & 3) << 16)
 
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_pwm_t {
-#if VSF_PWM_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_PWM_CFG_MULTI_CLASS == ENABLED
     vsf_pwm_t vsf_pwm;
 #endif
 

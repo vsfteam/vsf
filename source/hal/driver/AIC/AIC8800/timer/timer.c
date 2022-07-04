@@ -31,6 +31,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_HW_TIMER_CFG_MULTI_CLASS
+#   define VSF_HW_TIMER_CFG_MULTI_CLASS           VSF_TIMER_CFG_MULTI_CLASS
+#endif
+
 #define TIMER_CLOCK_FREQ        (26000000U)
 
 /*============================ TYPES =========================================*/
@@ -56,7 +60,7 @@ typedef struct vsf_hw_timer_const_t {
 } vsf_hw_timer_const_t;
 
 typedef struct vsf_hw_timer_t {
-#if VSF_TIMER_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_TIMER_CFG_MULTI_CLASS == ENABLED
     vsf_timer_t vsf_timer;
 #endif
 

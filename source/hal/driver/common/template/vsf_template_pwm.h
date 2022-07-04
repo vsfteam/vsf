@@ -29,27 +29,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_PWM_CFG_MULTI_CLASS
-#   define VSF_PWM_CFG_MULTI_CLASS              DISABLED
-#endif
-
-// Turn off multi class support for the current implementation
-// when the VSF_PWM_CFG_MULTI_CLASS is enabled
-#ifndef VSF_PWM_CFG_IMPLEMENT_OP
-#   if VSF_PWM_CFG_MULTI_CLASS == ENABLED
-#       define VSF_PWM_CFG_IMPLEMENT_OP         ENABLED
-#   else
-#       define VSF_PWM_CFG_IMPLEMENT_OP         DISABLED
-#   endif
-#endif
-
 // VSF_PWM_CFG_PREFIX: use for macro vsf_pwm_{init, enable, ...}
 #ifndef VSF_PWM_CFG_PREFIX
-#   if VSF_PWM_CFG_MULTI_CLASS == ENABLED
-#       define VSF_PWM_CFG_PREFIX               vsf
-#   elif defined(VSF_HW_PWM_COUNT) && (VSF_HW_PWM_COUNT != 0)
-#       define VSF_PWM_CFG_PREFIX               vsf_hw
-#   endif
+#   define VSF_PWM_CFG_PREFIX                 vsf
+#   define VSF_PWM_CFG_MULTI_CLASS            ENABLED
 #endif
 
 #ifndef VSF_PWM_CFG_FUNCTION_RENAME

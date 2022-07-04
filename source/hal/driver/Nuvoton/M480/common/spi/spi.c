@@ -46,7 +46,7 @@ typedef struct vsf_hw_spi_dma_t {
 } vsf_hw_spi_dma_t;
 
 typedef struct vsf_hw_spi_t {
-#if VSF_SPI_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_SPI_CFG_MULTI_CLASS == ENABLED
     vsf_spi_t vsf_spi;
 #endif
 

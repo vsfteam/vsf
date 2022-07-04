@@ -30,6 +30,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_HW_USART_CFG_MULTI_CLASS
+#   define VSF_HW_USART_CFG_MULTI_CLASS VSF_USART_CFG_MULTI_CLASS
+#endif
+
 #ifndef VSF_HW_USART_CFG_TRACE_EN
 #   define VSF_HW_USART_CFG_TRACE_EN                   DISABLED
 #endif
@@ -149,7 +153,7 @@ typedef enum usart_cancel_status_t {
 } usart_cancel_status_t;
 
 typedef struct vsf_hw_usart_t {
-#if VSF_USART_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_USART_CFG_MULTI_CLASS == ENABLED
     vsf_usart_t                         vsf_usart;
 #endif
     em_usart_irq_mask_t                 enable_flag;

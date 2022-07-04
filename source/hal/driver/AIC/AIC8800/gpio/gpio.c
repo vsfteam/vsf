@@ -31,6 +31,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_HW_GPIO_CFG_MULTI_CLASS
+#   define VSF_HW_GPIO_CFG_MULTI_CLASS           VSF_GPIO_CFG_MULTI_CLASS
+#endif
+
 #define __VSF_HW_GPIO_PIN_MASK                                                  \
     ((1ul << VSF_HW_GPIO_PIN_MAX) - 1)
 
@@ -56,7 +60,7 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_gpio_t {
-#if VSF_GPIO_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_GPIO_CFG_MULTI_CLASS == ENABLED
     vsf_gpio_t vsf_gpio;
 #endif
 

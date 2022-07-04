@@ -30,10 +30,15 @@
 #include "../__device.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HW_RTC_CFG_MULTI_CLASS
+#   define VSF_HW_RTC_CFG_MULTI_CLASS           VSF_RTC_CFG_MULTI_CLASS
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_rtc_t {
-#if VSF_RTC_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_RTC_CFG_MULTI_CLASS == ENABLED
     vsf_rtc_t vsf_rtc;
 #endif
 

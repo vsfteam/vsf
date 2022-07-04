@@ -77,29 +77,10 @@ extern "C" {
 #   define VSF_IO_REIMPLEMENT_PIN_NUNBER            DISABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_MULTI_CLASS
-#   define VSF_GPIO_CFG_MULTI_CLASS                 DISABLED
-#endif
-
-// Turn off multi class support for the current implementation
-// when the VSF_GPIO_CFG_MULTI_CLASS is enabled
-#ifndef VSF_GPIO_CFG_IMPLEMENT_OP
-#   if VSF_GPIO_CFG_MULTI_CLASS == ENABLED
-#       define VSF_GPIO_CFG_IMPLEMENT_OP            ENABLED
-#   else
-#       define VSF_GPIO_CFG_IMPLEMENT_OP            DISABLED
-#   endif
-#endif
-
 // VSF_GPIO_CFG_PREFIX: use for macro vsf_gpio_{init, enable, ...}
 #ifndef VSF_GPIO_CFG_PREFIX
-#   if VSF_GPIO_CFG_MULTI_CLASS == ENABLED
-#       define VSF_GPIO_CFG_PREFIX                  vsf
-#   elif defined(VSF_HW_GPIO_COUNT) && (VSF_HW_GPIO_COUNT != 0)
-#       define VSF_GPIO_CFG_PREFIX                  vsf_hw
-#   elif VSF_HAL_USE_GPIO_GPIO == ENABLED
-#       define VSF_GPIO_CFG_PREFIX                  vsf_gpio
-#   endif
+#   define VSF_GPIO_CFG_PREFIX                     vsf
+#   define VSF_GPIO_CFG_MULTI_CLASS                ENABLED
 #endif
 
 #ifndef VSF_GPIO_CFG_FUNCTION_RENAME

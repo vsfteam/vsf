@@ -30,27 +30,10 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#ifndef VSF_FLASH_CFG_MULTI_CLASS
-#   define VSF_FLASH_CFG_MULTI_CLASS              DISABLED
-#endif
-
-// Turn off multi class support for the current implementation
-// when the VSF_FLASH_CFG_MULTI_CLASS is enabled
-#ifndef VSF_FLASH_CFG_IMPLEMENT_OP
-#   if VSF_FLASH_CFG_MULTI_CLASS == ENABLED
-#       define VSF_FLASH_CFG_IMPLEMENT_OP         ENABLED
-#   else
-#       define VSF_FLASH_CFG_IMPLEMENT_OP         DISABLED
-#   endif
-#endif
-
 // VSF_FLASH_CFG_PREFIX: use for macro vsf_flash_{init, enable, ...}
 #ifndef VSF_FLASH_CFG_PREFIX
-#   if VSF_FLASH_CFG_MULTI_CLASS == ENABLED
-#       define VSF_FLASH_CFG_PREFIX               vsf
-#   elif defined(VSF_HW_FLASH_COUNT) && (VSF_HW_FLASH_COUNT != 0)
-#       define VSF_FLASH_CFG_PREFIX               vsf_hw
-#   endif
+#   define VSF_FLASH_CFG_PREFIX                     vsf
+#   define VSF_FLASH_CFG_MULTI_CLASS                ENABLED
 #endif
 
 #ifndef VSF_FLASH_CFG_FUNCTION_RENAME
@@ -62,7 +45,7 @@ extern "C" {
 #endif
 
 #ifndef VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY   DISABLED
+#   define VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY     DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

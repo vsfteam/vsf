@@ -39,6 +39,10 @@
 #define vsf_hw_gpio_protect                         vsf_protect(VSF_HAL_CFG_GPIO_PROTECT_LEVEL)
 #define vsf_hw_gpio_unprotect                       vsf_unprotect(VSF_HAL_CFG_GPIO_PROTECT_LEVEL)
 
+#ifndef VSF_HW_IO_CFG_MULTI_CLASS
+#   define VSF_HW_IO_CFG_MULTI_CLASS VSF_IO_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __gpio_is_output(__mode)              ((__mode) > 0)
@@ -46,7 +50,7 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_gpio_t {
-#if VSF_GPIO_CFG_IMPLEMENT_OP == ENABLED
+#if VSF_HW_IO_CFG_MULTI_CLASS == ENABLED
     vsf_gpio_t vsf_gpio;
 #endif
 

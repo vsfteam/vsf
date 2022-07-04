@@ -29,27 +29,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_PM_CFG_MULTI_CLASS
-#   define VSF_PM_CFG_MULTI_CLASS              DISABLED
-#endif
-
-// Turn off multi class support for the current implementation
-// when the VSF_PM_CFG_MULTI_CLASS is enabled
-#ifndef VSF_PM_CFG_IMPLEMENT_OP
-#   if VSF_PM_CFG_MULTI_CLASS == ENABLED
-#       define VSF_PM_CFG_IMPLEMENT_OP         ENABLED
-#   else
-#       define VSF_PM_CFG_IMPLEMENT_OP         DISABLED
-#   endif
-#endif
-
-// VSF_PM_CFG_PREFIX: use for macro vsf_flash_{init, enable, ...}
+// VSF_PM_CFG_PREFIX: use for macro vsf_pm_{init, enable, ...}
 #ifndef VSF_PM_CFG_PREFIX
-#   if VSF_PM_CFG_MULTI_CLASS == ENABLED
-#       define VSF_PM_CFG_PREFIX               vsf
-#   elif defined(VSF_HW_PM_COUNT) && (VSF_HW_PM_COUNT != 0)
-#       define VSF_PM_CFG_PREFIX               vsf_hw
-#   endif
+#   define VSF_PM_CFG_PREFIX                        vsf
+#   define VSF_PM_CFG_MULTI_CLASS                   ENABLED
 #endif
 
 #ifndef VSF_PM_CFG_FUNCTION_RENAME
