@@ -26,8 +26,7 @@ def vsh_subprocess(pytestconfig):
             # TODO: support screen or other serial tool
             cmd = 'picocom ' + vsf_serial_cfg  + ' /dev/' + vsf_serial
     else:
-        vsf_template = pytestconfig.getoption("vsf_template")
-        cmd = os.path.join(os.environ['VSF_PATH'], vsf_template)
+        cmd = vsf_template = pytestconfig.getoption("vsf_template")
     print("run cmd: %s" % cmd)
 
     if platform.system() == 'Windows':
