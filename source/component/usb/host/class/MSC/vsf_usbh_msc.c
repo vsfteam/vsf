@@ -74,6 +74,7 @@ typedef struct vk_usbh_msc_t {
 static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
 static void __vk_usbh_msc_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param);
 
+#if VSF_USE_SCSI == ENABLED
 dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_init)
 dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_fini)
 dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_execute)
@@ -83,12 +84,15 @@ dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_execute_stream)
 
 extern void vsf_scsi_on_new(vk_scsi_t *scsi);
 extern void vsf_scsi_on_delete(vk_scsi_t *scsi);
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vk_usbh_dev_id_t __vk_usbh_msc_dev_id[] = {
     { VSF_USBH_MATCH_IFS_CLASS(USB_CLASS_MASS_STORAGE, 6, 0x50) },
 };
+
+#if VSF_USE_SCSI == ENABLED
 
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
@@ -109,6 +113,8 @@ const vk_scsi_drv_t __vk_usbh_msc_scsi_drv = {
 #   pragma GCC diagnostic pop
 #endif
 
+#endif      // VSF_USE_SCSI
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_usbh_class_drv_t vk_usbh_msc_drv = {
@@ -121,19 +127,16 @@ const vk_usbh_class_drv_t vk_usbh_msc_drv = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_SCSI_ON_NEW
+#if VSF_USE_SCSI == ENABLED
 WEAK(vsf_scsi_on_new)
 void vsf_scsi_on_new(vk_scsi_t *scsi)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_SCSI_ON_DELETE
 WEAK(vsf_scsi_on_delete)
 void vsf_scsi_on_delete(vk_scsi_t *scsi)
 {
 }
-#endif
 
 __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_init, vk_scsi_init)
 {
@@ -279,6 +282,7 @@ __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute_stream, vk_scsi_execut
     vsf_peda_end();
 }
 #endif
+#endif      // VSF_USE_SCSI
 
 static void __vk_usbh_msc_free_urb(vk_usbh_msc_t *msc)
 {
@@ -320,7 +324,9 @@ static void __vk_usbh_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_MESSAGE:
         __vsf_eda_crit_npb_leave(&dev->ep0.crit);
+#if VSF_USE_SCSI == ENABLED
         vsf_scsi_on_new(&msc->scsi);
+#endif
         break;
     }
 }
@@ -368,7 +374,9 @@ static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
             parser_alt->desc_size - ((uintptr_t)desc_ep - (uintptr_t)desc_ifs));
     }
 
+#if VSF_USE_SCSI == ENABLED
     msc->scsi.drv = &__vk_usbh_msc_scsi_drv;
+#endif
     msc->eda.fn.evthandler = __vk_usbh_msc_evthandler;
     msc->eda.on_terminate = __vk_usbh_msc_on_eda_terminate;
 #ifdef VSF_USBH_MSC_CFG_PRIORITY
@@ -390,7 +398,9 @@ free_all:
 static void __vk_usbh_msc_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
     vk_usbh_msc_t *msc = (vk_usbh_msc_t *)param;
+#if VSF_USE_SCSI == ENABLED
     vsf_scsi_on_delete(&msc->scsi);
+#endif
     __vk_usbh_msc_free_urb(msc);
 }
 
