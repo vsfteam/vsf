@@ -27,6 +27,8 @@
 extern "C" {
 #endif
 
+#include <time.h>
+
 /*============================ MACROS ========================================*/
 
 // VSF_RTC_CFG_PREFIX: use for macro vsf_rtc_{init, enable, ...}
