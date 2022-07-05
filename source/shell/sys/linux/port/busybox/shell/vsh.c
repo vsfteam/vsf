@@ -434,7 +434,8 @@ int __vsh_run_cmd(char *cmd)
 {
     vsf_linux_process_t * processes[4];
     int process_cnt = 0, fd_in = -1;
-    char *next;
+    char *next, *next_and, *next_or;
+    bool is_piping = false, is_and;
 
     // remove spaces
     next = &cmd[strlen(cmd) - 1];
@@ -443,32 +444,71 @@ int __vsh_run_cmd(char *cmd)
     if (is_background) { *next = '\0'; }
 
     for (;;) {
-        next = strchr(cmd, '|');
-        if (NULL == next) {
-            break;
-        }
-        *next++ = '\0';
+        next_and = strstr(cmd, "&&");
+        next_or = strstr(cmd, "||");
+        if ((next_and != NULL) || (next_or != NULL)) {
+            next =  NULL == next_and ? next_or :
+                    NULL == next_or ? next_and :
+                    vsf_min(next_and, next_or);
 
-        int pipefd[2];
-        if (pipe(pipefd) < 0) {
-            goto cleanup;
+            is_piping = false;
+            is_and = next == next_and;
+            *next++ = '\0';
+            next++;
+        } else {
+            next = strchr(cmd, '|');
+            if (next != NULL) {
+                is_piping = true;
+            } else {
+                break;
+            }
+            *next++ = '\0';
         }
 
-        VSF_LINUX_ASSERT(process_cnt < dimof(processes));
-        processes[process_cnt] = __vsh_prepare_process(cmd, fd_in, pipefd[1]);
-        if (NULL == processes[process_cnt]) {
-            close(pipefd[0]);
+        if (is_piping) {
+            int pipefd[2];
+            if (pipe(pipefd) < 0) {
+                goto cleanup;
+            }
+
+            VSF_LINUX_ASSERT(process_cnt < dimof(processes));
+            processes[process_cnt] = __vsh_prepare_process(cmd, fd_in, pipefd[1]);
+            if (NULL == processes[process_cnt]) {
+                close(pipefd[0]);
+                close(pipefd[1]);
+                goto cleanup;
+            }
+
             close(pipefd[1]);
-            goto cleanup;
+            if (fd_in >= 0) {
+                close(fd_in);
+            }
+            fd_in = pipefd[0];
+            cmd = next;
+        } else {
+            VSF_LINUX_ASSERT(process_cnt < dimof(processes));
+            processes[process_cnt] = __vsh_prepare_process(cmd, fd_in, -1);
+            if (NULL == processes[process_cnt]) {
+                goto cleanup;
+            }
+            fd_in = -1;
+            cmd = next;
+            VSF_LINUX_ASSERT(0 == process_cnt);
+
+            int status;
+            vsf_linux_start_process(processes[0]);
+            waitpid(processes[0]->id.pid, &status, 0);
+            bool is_succeed = WIFEXITED(status) && !WEXITSTATUS(status);
+
+            if (    (is_and && is_succeed)
+                ||  (!is_and && !is_succeed)) {
+                continue;
+            } else {
+                return status;
+            }
         }
 
-        close(pipefd[1]);
-        if (fd_in >= 0) {
-            close(fd_in);
-        }
-        fd_in = pipefd[0];
         process_cnt++;
-        cmd = next;
     }
     VSF_LINUX_ASSERT(process_cnt < dimof(processes));
     processes[process_cnt] = __vsh_prepare_process(cmd, fd_in, -1);
