@@ -4,19 +4,22 @@ import os
 import pytest
 import platform
 import time
+import re
 
 from conftest import printh
 
 from pytest_bdd import (
     given,
-    scenario,
+    scenarios,
     then,
     when,
     parsers
 )
 
-@pytest.fixture
-def vsh_subprocess(pytestconfig):
+scenarios("../features")
+
+@pytest.fixture(scope='session')
+def vsh(pytestconfig):
     vsf_serial = pytestconfig.getoption("vsf_serial")
     vsf_serial_cfg = pytestconfig.getoption("vsf_serial_cfg")
     if vsf_serial and vsf_serial_cfg:
@@ -42,30 +45,29 @@ def vsh_subprocess(pytestconfig):
         printh("expect >>> before", vsh_subprocess.before)
         printh("expect >>> after ", vsh_subprocess.after)
 
-    yield vsh_subprocess
+    yield  { "subprocess": vsh_subprocess, "input": None, "output": None, "config": pytestconfig }
+    #yield vsh_subprocess
 
     vsh_subprocess.close()
 
-
-@scenario('../features/vsh.feature', 'ls')
-def test_ls():
+@given('connect vsh')
+def connect_vsh(vsh):
     pass
 
-@given('connect vsh')
-def connect_vsh(vsh_subprocess):
-    return vsh_subprocess
+@when(parsers.parse('type {vsh_input}'))
+def type_command(vsh, vsh_input):
+    vsh['input'] = vsh_input
+    printh("sendline" , vsh_input)
+    vsh['subprocess'].sendline(vsh_input + "\r")
 
-@when('type ls /')
-def type_ls_(vsh_subprocess, pytestconfig):
-    vsh_subprocess.sendline("ls /\r")
+@then(parsers.parse('{vsh_output} in output'))
+def compare_output(vsh, vsh_output):
 
-@then(parsers.parse('ls / output include "{output}"'))
-def receive_string(vsh_subprocess, pytestconfig, output):
+    printh("compare" , vsh_output)
 
-    vsh_subprocess.expect(output + '.*$', timeout=pytestconfig.getoption("vsf_timeout"))
+    vsh['subprocess'].expect(vsh_output, timeout=vsh['config'].getoption("vsf_timeout"))
 
-    printh("expect ls / output before", vsh_subprocess.before)
-    printh("expect ls / output after ", vsh_subprocess.after)
+    printh("expect %s output before" % vsh['input'], vsh['subprocess'].before)
+    printh("expect %s output after " % vsh['input'], vsh['subprocess'].after)
 
-    assert 'ls /' in vsh_subprocess.before
-    assert output in vsh_subprocess.after
+    assert re.search(vsh_output, vsh['subprocess'].after)
