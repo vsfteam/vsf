@@ -16,8 +16,8 @@
  ****************************************************************************/
 
 // force convert vsf_i2c_init to vsf_i2c_init
-#define VSF_I2C_CFG_PREFIX                  vsf_gpio
-#define VSF_I2C_CFG_UPPERCASE_PREFIX        VSF_GPIO
+#define VSF_I2C_CFG_IMP_PREFIX                  vsf_gpio
+#define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_GPIO
 #define VSF_I2C_CFG_REQUEST_TEMPLATE        ENABLED
 
 #define __VSF_HAL_GPIO_I2C_CLASS_IMPLEMENT  ENABLED

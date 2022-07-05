@@ -99,6 +99,5 @@ vsf_err_t vsf_flash_read(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* 
     return flash_ptr->op->read(flash_ptr, offset, buffer, size);
 }
 
-
 #endif /* VSF_FLASH_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_FLASH == ENABLED */

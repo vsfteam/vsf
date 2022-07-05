@@ -29,8 +29,8 @@
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 
-#define VSF_TIMER_CFG_API_DECLARATION_PREFIX        vsf_hw_lp
-#define VSF_TIMER_CFG_INSTANCE_DECLARATION_PREFIX   VSF_HW_LP
+#define VSF_TIMER_CFG_DEC_PREFIX        vsf_hw_lp
+#define VSF_TIMER_CFG_DEC_UPCASE_PREFIX   VSF_HW_LP
 #include "hal/driver/common/timer/timer_template.h"
 
 #endif /* VSF_HAL_USE_TIMER */

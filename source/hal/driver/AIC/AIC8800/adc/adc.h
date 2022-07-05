@@ -70,8 +70,8 @@ typedef enum adc_channel_feature_t {
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_ADC_CFG_API_DECLARATION_PREFIX              vsf_hw
-#define VSF_ADC_CFG_INSTANCE_DECLARATION_PREFIX         VSF_HW
+#define VSF_ADC_CFG_DEC_PREFIX                  vsf_hw
+#define VSF_ADC_CFG_DEC_UPCASE_PREFIX           VSF_HW
 
 #include "hal/driver/common/adc/adc_template.h"
 

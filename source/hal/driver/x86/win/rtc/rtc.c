@@ -17,9 +17,6 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_RTC_CFG_PREFIX              vsf_hw
-#define VSF_RTC_CFG_UPPERCASE_PREFIX    VSF_HW
-
 #include "./rtc.h"
 
 #if VSF_HAL_USE_RTC == ENABLED
@@ -30,10 +27,15 @@
 #include <Windows.h>
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HW_RTC_CFG_MULTI_CLASS
+#   define VSF_HW_RTC_CFG_MULTI_CLASS VSF_RTC_CFG_MULTI_CLASS
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_rtc_t {
-#if VSF_RTC_CFG_MULTI_CLASS == ENABLED
+#if VSF_HW_RTC_CFG_MULTI_CLASS == ENABLED
     vsf_rtc_t vsf_rtc;
 #endif
 
@@ -102,8 +104,15 @@ vsf_err_t vsf_hw_rtc_set(vsf_hw_rtc_t *hw_rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_RTC_CFG_IMP_LV0(__COUNT, __dont_care)                               \
-    NO_INIT vsf_hw_rtc_t vsf_hw_rtc##__COUNT;
+#define VSF_RTC_CFG_IMP_PREFIX                      vsf_hw
+#define VSF_RTC_CFG_IMP_UPCASE_PREFIX            VSF_HW
+#define VSF_RTC_CFG_IMP_GET_TIME_FROM_GET           ENABLED
+#define VSF_RTC_CFG_IMP_SET_SECOND_FROM_SET         ENABLED
+
+#define VSF_RTC_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
+    vsf_hw_rtc_t vsf_hw_rtc##__COUNT  = {                                       \
+        __hal_op                                                                \
+    };
 #include "hal/driver/common/rtc/rtc_template.inc"
 
 #endif

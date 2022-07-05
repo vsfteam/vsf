@@ -24,14 +24,14 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#define vsf_real_timer_t          VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t)
-#define vsf_real_timer_capability VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_capability)
-#define vsf_real_timer_pwm_set    VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_pwm_set)
+#define vsf_real_timer_t          VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t)
+#define vsf_real_timer_capability VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_capability)
+#define vsf_real_timer_pwm_set    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_pwm_set)
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_TIMER_CFG_IMPLEMENT_PWM_SET == DISABLED
+#if VSF_TIMER_CFG_IMP_PWM_SET == DISABLED
 vsf_err_t vsf_real_timer_pwm_set(vsf_real_timer_t *timer_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
@@ -57,12 +57,12 @@ timer_capability_t vsf_real_timer_capability(vsf_real_timer_t *timer_ptr)
 #define __VSF_HAL_TEMPLATE_NAME                     _timer
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _TIMER
 
-#ifndef VSF_TIMER_CFG_PREFIX
-#   error "Please define VSF_TIMER_CFG_PREFIX in timer driver"
+#ifndef VSF_TIMER_CFG_IMP_PREFIX
+#   error "Please define VSF_TIMER_CFG_IMP_PREFIX in timer driver"
 #endif
 
-#ifndef VSF_TIMER_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_TIMER_CFG_UPPERCASE_PREFIX in timer driver"
+#ifndef VSF_TIMER_CFG_IMP_UPCASE_PREFIX   
+#   error "Please define VSF_TIMER_CFG_IMP_UPCASE_PREFIX    in timer driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

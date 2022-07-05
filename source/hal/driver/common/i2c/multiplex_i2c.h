@@ -32,7 +32,7 @@
 #include "utilities/ooc_class.h"
 
 // undef after include vsf_template_i2c.h
-#define VSF_I2C_CFG_API_DECLARATION_PREFIX              vsf_multiplex
+#define VSF_I2C_CFG_DEC_PREFIX              vsf_multiplex
 #include "hal/driver/common/template/vsf_template_i2c.h"
 
 /*============================ MACROS ========================================*/

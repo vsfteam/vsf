@@ -51,18 +51,18 @@
 #   define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_CLEAR    DISABLED
 #endif
 
-#define vsf_real_gpio_t                 VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t)
-#define vsf_real_gpio_set_input         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_input)
-#define vsf_real_gpio_set_output        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_output)
-#define vsf_real_gpio_get_direction     VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_get_direction)
-#define vsf_real_gpio_set_direction     VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_direction)
-#define vsf_real_gpio_switch_direction  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_switch_direction)
-#define vsf_real_gpio_write             VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_write)
-#define vsf_real_gpio_set               VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set)
-#define vsf_real_gpio_clear             VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_clear)
-#define vsf_real_gpio_output_and_set    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)
-#define vsf_real_gpio_output_and_clear  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)
-#define vsf_real_gpio_capability        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_capability)
+#define vsf_real_gpio_t                 VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t)
+#define vsf_real_gpio_set_input         VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_input)
+#define vsf_real_gpio_set_output        VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_output)
+#define vsf_real_gpio_get_direction     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_direction)
+#define vsf_real_gpio_set_direction     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_direction)
+#define vsf_real_gpio_switch_direction  VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_switch_direction)
+#define vsf_real_gpio_write             VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_write)
+#define vsf_real_gpio_set               VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set)
+#define vsf_real_gpio_clear             VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_clear)
+#define vsf_real_gpio_output_and_set    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_set)
+#define vsf_real_gpio_output_and_clear  VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_clear)
+#define vsf_real_gpio_capability        VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
@@ -152,12 +152,12 @@ gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 #define __VSF_HAL_TEMPLATE_NAME                     _gpio
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _GPIO
 
-#ifndef VSF_GPIO_CFG_PREFIX
-#   error "Please define VSF_GPIO_CFG_PREFIX in gpio driver"
+#ifndef VSF_GPIO_CFG_IMP_PREFIX
+#   error "Please define VSF_GPIO_CFG_IMP_PREFIX in gpio driver"
 #endif
 
-#ifndef VSF_GPIO_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_GPIO_CFG_UPPERCASE_PREFIX in gpio driver"
+#ifndef VSF_GPIO_CFG_IMP_UPCASE_PREFIX   
+#   error "Please define VSF_GPIO_CFG_IMP_UPCASE_PREFIX    in gpio driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

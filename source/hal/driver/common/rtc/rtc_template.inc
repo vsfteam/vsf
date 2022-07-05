@@ -18,19 +18,14 @@
 #if VSF_HAL_USE_RTC == ENABLED
 
 /*============================ INCLUDES ======================================*/
-
-#if VSF_RTC_CFG_IMPLEMENT_TM_TO_TIME == ENABLED
-#   include <time.h>
-#endif
-
 /*============================ MACROS ========================================*/
 
-#define vsf_real_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t)
-#define vsf_real_rtc_capability VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_capability)
-#define vsf_real_rtc_get        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get)
-#define vsf_real_rtc_set        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set)
-#define vsf_real_rtc_get_time   VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get_time)
-#define vsf_real_rtc_set_time   VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set_time)
+#define vsf_real_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)
+#define vsf_real_rtc_capability VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)
+#define vsf_real_rtc_get        VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get)
+#define vsf_real_rtc_set        VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set)
+#define vsf_real_rtc_get_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)
+#define vsf_real_rtc_set_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -39,7 +34,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_RTC_CFG_IMPLEMENT_PWM_SET == DISABLED
+#if VSF_RTC_CFG_IMP_PWM_SET == DISABLED
 vsf_err_t vsf_real_rtc_pwm_set(vsf_real_rtc_t *rtc_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
 {
     VSF_HAL_ASSERT(NULL != rtc_ptr);
@@ -60,7 +55,7 @@ rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 }
 #endif
 
-#if VSF_RTC_CFG_IMPLEMENT_TIME_TO_TM == ENABLED
+#if VSF_RTC_CFG_IMP_GET_FROM_GETTIM == ENABLED
 vsf_err_t vsf_real_rtc_get(vsf_real_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
@@ -88,7 +83,9 @@ vsf_err_t vsf_real_rtc_get(vsf_real_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 
     return VSF_ERR_NONE;
 }
+#endif
 
+#if VSF_RTC_CFG_IMP_SET_FROM_SET_TIME == ENABLED
 vsf_err_t vsf_real_rtc_set(vsf_real_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
@@ -108,7 +105,7 @@ vsf_err_t vsf_real_rtc_set(vsf_real_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 }
 #endif
 
-#if VSF_RTC_CFG_IMPLEMENT_TM_TO_TIME == ENABLED
+#if VSF_RTC_CFG_IMP_GET_TIME_FROM_GET == ENABLED
 vsf_err_t vsf_real_rtc_get_time(vsf_hw_rtc_t *rtc_ptr, time_t *second_ptr, time_t *milliseconds_ptr)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
@@ -138,8 +135,10 @@ vsf_err_t vsf_real_rtc_get_time(vsf_hw_rtc_t *rtc_ptr, time_t *second_ptr, time_
 
     return VSF_ERR_NONE;
 }
+#endif
 
-vsf_err_t vsf_real_rtc_set_second(vsf_real_rtc_t *rtc_ptr, time_t second, time_t milliseconds)
+#if VSF_RTC_CFG_IMP_SET_SECOND_FROM_SET == ENABLED
+vsf_err_t vsf_real_rtc_set_time(vsf_real_rtc_t *rtc_ptr, time_t second, time_t milliseconds)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
 
@@ -167,12 +166,12 @@ vsf_err_t vsf_real_rtc_set_second(vsf_real_rtc_t *rtc_ptr, time_t second, time_t
 #define __VSF_HAL_TEMPLATE_NAME                     _rtc
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RTC
 
-#ifndef VSF_RTC_CFG_PREFIX
-#   error "Please define VSF_RTC_CFG_PREFIX in rtc driver"
+#ifndef VSF_RTC_CFG_IMP_PREFIX
+#   error "Please define VSF_RTC_CFG_IMP_PREFIX in rtc driver"
 #endif
 
-#ifndef VSF_RTC_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_RTC_CFG_UPPERCASE_PREFIX in rtc driver"
+#ifndef VSF_RTC_CFG_IMP_UPCASE_PREFIX
+#   error "Please define VSF_RTC_CFG_IMP_UPCASE_PREFIX    in rtc driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

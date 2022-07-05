@@ -151,4 +151,13 @@ void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     gpio_ptr->op->output_and_clear(gpio_ptr, pin_mask);
 }
 
+gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->capability != NULL);
+
+    return gpio_ptr->op->capability(gpio_ptr);
+}
+
 #endif

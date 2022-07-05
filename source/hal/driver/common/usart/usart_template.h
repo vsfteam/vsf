@@ -24,12 +24,12 @@
 #define __VSF_HAL_TEMPLATE_NAME                     _usart
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _USART
 
-#ifndef VSF_USART_CFG_API_DECLARATION_PREFIX
-#   error "Please define VSF_USART_CFG_API_DECLARATION_PREFIX when using vsf_template_usart.h"
+#ifndef VSF_USART_CFG_DEC_PREFIX
+#   error "Please define VSF_USART_CFG_DEC_PREFIX when using vsf_template_usart.h"
 #endif
 
-#ifdef VSF_USART_CFG_INSTANCE_DECLARATION_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_USART_CFG_INSTANCE_DECLARATION_PREFIX
+#ifdef VSF_USART_CFG_DEC_UPCASE_PREFIX
+#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_USART_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"

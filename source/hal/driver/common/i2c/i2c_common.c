@@ -111,5 +111,6 @@ vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
     return i2c_ptr->op->master_request(i2c_ptr, address, cmd, count, buffer_ptr);
 }
 
+
 #endif /* VSF_I2C_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_I2C == ENABLED */

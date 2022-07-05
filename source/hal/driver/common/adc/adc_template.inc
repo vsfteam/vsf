@@ -20,8 +20,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define vsf_real_adc_t          VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t)
-#define vsf_real_adc_capability VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_capability)
+#define vsf_real_adc_t          VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t)
+#define vsf_real_adc_capability VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -42,12 +42,12 @@ adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 #define __VSF_HAL_TEMPLATE_NAME                     _adc
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _ADC
 
-#ifndef VSF_ADC_CFG_PREFIX
-#   error "Please define VSF_ADC_CFG_PREFIX in adc driver"
+#ifndef VSF_ADC_CFG_IMP_PREFIX
+#   error "Please define VSF_ADC_CFG_IMP_PREFIX in adc driver"
 #endif
 
-#ifndef VSF_ADC_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_ADC_CFG_UPPERCASE_PREFIX in adc driver"
+#ifndef VSF_ADC_CFG_IMP_UPCASE_PREFIX
+#   error "Please define VSF_ADC_CFG_IMP_UPCASE_PREFIX    in adc driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

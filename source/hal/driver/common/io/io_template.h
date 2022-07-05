@@ -24,12 +24,12 @@
 #define __VSF_HAL_TEMPLATE_NAME                     _gpio
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _GPIO
 
-#ifndef VSF_GPIO_CFG_API_DECLARATION_PREFIX
-#   error "Please define VSF_GPIO_CFG_API_DECLARATION_PREFIX when using vsf_template_gpio.h"
+#ifndef VSF_GPIO_CFG_DEC_PREFIX
+#   error "Please define VSF_GPIO_CFG_DEC_PREFIX when using vsf_template_gpio.h"
 #endif
 
-#ifdef VSF_GPIO_CFG_INSTANCE_DECLARATION_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_GPIO_CFG_INSTANCE_DECLARATION_PREFIX
+#ifdef VSF_GPIO_CFG_DEC_UPCASE_PREFIX
+#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_GPIO_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"

@@ -24,14 +24,14 @@
 #   define VSF_USART_CFG_REIMPLEMENT_CAPABILITY   DISABLED
 #endif
 
-#define vsf_real_usart_t                    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t)
-#define vsf_real_usart_request_rx           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_rx)
-#define vsf_real_usart_cancel_rx            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_rx)
-#define vsf_real_usart_get_rx_count         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)
-#define vsf_real_usart_request_tx           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_tx)
-#define vsf_real_usart_cancel_tx            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)
-#define vsf_real_usart_get_tx_count         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)
-#define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_capability)
+#define vsf_real_usart_t                    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)
+#define vsf_real_usart_request_rx           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_rx)
+#define vsf_real_usart_cancel_rx            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_rx)
+#define vsf_real_usart_get_rx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_rx_count)
+#define vsf_real_usart_request_tx           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_tx)
+#define vsf_real_usart_cancel_tx            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)
+#define vsf_real_usart_get_tx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)
+#define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
@@ -97,12 +97,12 @@ usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #define __VSF_HAL_TEMPLATE_NAME                     _usart
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _USART
 
-#ifndef VSF_USART_CFG_PREFIX
-#   error "Please define VSF_USART_CFG_PREFIX in usart driver"
+#ifndef VSF_USART_CFG_IMP_PREFIX
+#   error "Please define VSF_USART_CFG_IMP_PREFIX in usart driver"
 #endif
 
-#ifndef VSF_USART_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_USART_CFG_UPPERCASE_PREFIX in usart driver"
+#ifndef VSF_USART_CFG_IMP_UPCASE_PREFIX
+#   error "Please define VSF_USART_CFG_IMP_UPCASE_PREFIX    in usart driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

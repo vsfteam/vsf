@@ -26,8 +26,8 @@
 #   define VSF_SPI_CFG_CS_COUNT     1
 #endif
 
-#define vsf_real_spi_t          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t)
-#define vsf_real_spi_capability VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_capability)
+#define vsf_real_spi_t          VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)
+#define vsf_real_spi_capability VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
@@ -50,12 +50,12 @@ spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 #define __VSF_HAL_TEMPLATE_NAME                     _spi
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _SPI
 
-#ifndef VSF_SPI_CFG_PREFIX
-#   error "Please define VSF_SPI_CFG_PREFIX in spi driver"
+#ifndef VSF_SPI_CFG_IMP_PREFIX
+#   error "Please define VSF_SPI_CFG_IMP_PREFIX in spi driver"
 #endif
 
-#ifndef VSF_SPI_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_SPI_CFG_UPPERCASE_PREFIX in spi driver"
+#ifndef VSF_SPI_CFG_IMP_UPCASE_PREFIX   
+#   error "Please define VSF_SPI_CFG_IMP_UPCASE_PREFIX    in spi driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

@@ -21,8 +21,8 @@
 
 /*============================ MACROS ========================================*/
 
-#define vsf_real_flash_t          VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_t)
-#define vsf_real_flash_capability VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_capability)
+#define vsf_real_flash_t          VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)
+#define vsf_real_flash_capability VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -47,12 +47,12 @@ flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 #define __VSF_HAL_TEMPLATE_NAME                     _flash
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _FLASH
 
-#ifndef VSF_FLASH_CFG_PREFIX
-#   error "Please define VSF_FLASH_CFG_PREFIX in flash driver"
+#ifndef VSF_FLASH_CFG_IMP_PREFIX
+#   error "Please define VSF_FLASH_CFG_IMP_PREFIX in flash driver"
 #endif
 
-#ifndef VSF_FLASH_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_ADC_CFG_UPPERCASE_PREFIX in flash driver"
+#ifndef VSF_FLASH_CFG_IMP_UPCASE_PREFIX   
+#   error "Please define VSF_ADC_CFG_IMP_UPCASE_PREFIX    in flash driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

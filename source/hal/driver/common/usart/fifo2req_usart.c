@@ -29,7 +29,7 @@
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_FIFO2REQ_USART_CFG_CALL_PREFIX
-#   define VSF_USART_CFG_PREFIX                 VSF_FIFO2REQ_USART_CFG_CALL_PREFIX
+#   define VSF_USART_CFG_IMP_PREFIX                 VSF_FIFO2REQ_USART_CFG_CALL_PREFIX
 #endif
 
 #define __USART_IRQ_MASK_REQUEST      \

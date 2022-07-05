@@ -25,12 +25,12 @@
 #define __VSF_HAL_TEMPLATE_NAME                     _rtc
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RTC
 
-#ifndef VSF_RTC_CFG_API_DECLARATION_PREFIX
-#   error "Please define VSF_RTC_CFG_API_DECLARATION_PREFIX when using vsf_template_rtc.h"
+#ifndef VSF_RTC_CFG_DEC_PREFIX
+#   error "Please define VSF_RTC_CFG_DEC_PREFIX when using vsf_template_rtc.h"
 #endif
 
-#ifdef VSF_RTC_CFG_INSTANCE_DECLARATION_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_RTC_CFG_INSTANCE_DECLARATION_PREFIX
+#ifdef VSF_RTC_CFG_DEC_UPCASE_PREFIX
+#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_RTC_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"

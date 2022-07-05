@@ -113,8 +113,8 @@ typedef struct usart_status_t {
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_USART_CFG_API_DECLARATION_PREFIX            vsf_hw
-#define VSF_USART_CFG_INSTANCE_DECLARATION_PREFIX       VSF_HW
+#define VSF_USART_CFG_DEC_PREFIX            vsf_hw
+#define VSF_USART_CFG_DEC_UPCASE_PREFIX       VSF_HW
 #include "hal/driver/common/template/vsf_template_usart.h"
 
 /*============================ TYPES =========================================*/

@@ -15,9 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_RTC_CFG_PREFIX                    vsf_hw
-#define VSF_RTC_CFG_UPPERCASE_PREFIX          VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
 #include "./rtc.h"
@@ -135,7 +132,7 @@ vsf_err_t vsf_hw_rtc_set(vsf_hw_rtc_t *hw_rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
     tm_local.tm_min   = rtc_tm->tm_min;         // [0 .. 59]
     tm_local.tm_hour  = rtc_tm->tm_hour;        // [0 .. 23]
     tm_local.tm_mday  = rtc_tm->tm_mday;        // [1 .. 31]
-    tm_local.tm_mon   = rtc_tm->tm_mon  - 1;     // [1 .. 12]  - [January -- December]
+    tm_local.tm_mon   = rtc_tm->tm_mon  - 1;    // [1 .. 12]  - [January -- December]
     tm_local.tm_year  = rtc_tm->tm_year - 1900; // [1900 .. ]
     time_t time = mk_gmtime_offset_r(&tm_local, 0);
 
@@ -144,6 +141,8 @@ vsf_err_t vsf_hw_rtc_set(vsf_hw_rtc_t *hw_rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_RTC_CFG_IMP_PREFIX                  vsf_hw
+#define VSF_RTC_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_RTC_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
     vsf_hw_rtc_t vsf_hw_rtc##__COUNT = {                                        \
         .freq = 0,                                                              \

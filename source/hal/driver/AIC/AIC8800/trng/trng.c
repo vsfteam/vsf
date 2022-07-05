@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_RNG_CFG_PREFIX                  vsf_hw
-#define VSF_RNG_CFG_UPPERCASE_PREFIX        VSF_HW
+#define VSF_RNG_CFG_IMP_PREFIX                  vsf_hw
+#define VSF_RNG_CFG_IMP_UPCASE_PREFIX           VSF_HW
 
 /*============================ INCLUDES ======================================*/
 
