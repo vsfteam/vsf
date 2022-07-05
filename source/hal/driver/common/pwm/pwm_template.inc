@@ -33,13 +33,13 @@
 #   define VSF_PWM_CFG_REIMPLEMENT_SET_NS       DISABLED
 #endif
 
-#define vsf_real_pwm_t          VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t)
-#define vsf_real_pwm_set        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set)
-#define vsf_real_pwm_set_ms     VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set_ms)
-#define vsf_real_pwm_set_us     VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set_us)
-#define vsf_real_pwm_set_ns     VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set_ns)
-#define vsf_real_pwm_get_freq   VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_get_freq)
-#define vsf_real_pwm_capability VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_capability)
+#define vsf_real_pwm_t          VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)
+#define vsf_real_pwm_set        VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)
+#define vsf_real_pwm_set_ms     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set_ms)
+#define vsf_real_pwm_set_us     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set_us)
+#define vsf_real_pwm_set_ns     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set_ns)
+#define vsf_real_pwm_get_freq   VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)
+#define vsf_real_pwm_capability VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -110,12 +110,12 @@ pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #define __VSF_HAL_TEMPLATE_NAME                     _pwm
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _PWM
 
-#ifndef VSF_PWM_CFG_PREFIX
-#   error "Please define VSF_PWM_CFG_PREFIX in pwm driver"
+#ifndef VSF_PWM_CFG_IMP_PREFIX
+#   error "Please define VSF_PWM_CFG_IMP_PREFIX in pwm driver"
 #endif
 
-#ifndef VSF_PWM_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_PWM_CFG_UPPERCASE_PREFIX in pwm driver"
+#ifndef VSF_PWM_CFG_IMP_UPCASE_PREFIX   
+#   error "Please define VSF_PWM_CFG_IMP_UPCASE_PREFIX    in pwm driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

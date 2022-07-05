@@ -29,7 +29,7 @@
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
-#   define VSF_SPI_CFG_PREFIX                       VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
+#   define VSF_SPI_CFG_IMP_PREFIX                       VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
 #endif
 
 #define VSF_MULTIPLEXER_SPI_MAX_CS_COUNT            (sizeof(SPI_MULTIPLEXER_MASK_TYPE) * 8)

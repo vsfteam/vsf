@@ -34,8 +34,8 @@
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 
-#define VSF_PWM_CFG_API_DECLARATION_PREFIX          vsf_hw_aic
-#define VSF_PWM_CFG_INSTANCE_DECLARATION_PREFIX     VSF_HW_AIC
+#define VSF_PWM_CFG_DEC_PREFIX          vsf_hw_aic
+#define VSF_PWM_CFG_DEC_UPCASE_PREFIX     VSF_HW_AIC
 #include "hal/driver/common/pwm/pwm_template.h"
 
 #endif /* VSF_HAL_USE_PWM */

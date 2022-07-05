@@ -152,5 +152,14 @@ int_fast32_t vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr)
     return spi_ptr->op->get_transfered_count(spi_ptr);
 }
 
+spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr)
+{
+    VSF_HAL_ASSERT(spi_ptr != NULL);
+    VSF_HAL_ASSERT(spi_ptr->op != NULL);
+    VSF_HAL_ASSERT(spi_ptr->op->capability != NULL);
+
+    return spi_ptr->op->capability(spi_ptr);
+}
+
 #endif /* VSF_SPI_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_SPI == ENABLED */

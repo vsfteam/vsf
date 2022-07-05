@@ -48,8 +48,8 @@ typedef enum io_feature_t {
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_GPIO_CFG_API_DECLARATION_PREFIX         vsf_hw
-#define VSF_GPIO_CFG_INSTANCE_DECLARATION_PREFIX    VSF_HW
+#define VSF_GPIO_CFG_DEC_PREFIX         vsf_hw
+#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX    VSF_HW
 #include "hal/driver/common/io/io_template.h"
 
 #endif /* VSF_HAL_USE_GPIO */

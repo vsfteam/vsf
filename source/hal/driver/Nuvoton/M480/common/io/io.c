@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_GPIO_CFG_PREFIX                         vsf_hw
-#define VSF_GPIO_CFG_UPPERCASE_PREFIX               VSF_HW
+#define VSF_GPIO_CFG_IMP_PREFIX                         vsf_hw
+#define VSF_GPIO_CFG_IMP_UPCASE_PREFIX                  VSF_HW
 #define VSF_GPIO_CFG_REIMPLEMENT_SET_INPUT          ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_SET_OUTPUT         ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_SWITCH_DIRECTION   ENABLED

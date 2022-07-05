@@ -17,8 +17,8 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_RTC_CFG_PREFIX              vsf_hw
-#define VSF_RTC_CFG_UPPERCASE_PREFIX    VSF_HW
+#define VSF_RTC_CFG_IMP_PREFIX              vsf_hw
+#define VSF_RTC_CFG_IMP_UPCASE_PREFIX       VSF_HW
 
 #include "./rtc.h"
 

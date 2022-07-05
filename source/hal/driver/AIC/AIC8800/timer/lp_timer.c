@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_TIMER_CFG_PREFIX                    vsf_hw_lp
-#define VSF_TIMER_CFG_UPPERCASE_PREFIX          VSF_HW_LP
+#define VSF_TIMER_CFG_IMP_PREFIX                    vsf_hw_lp
+#define VSF_TIMER_CFG_IMP_UPCASE_PREFIX             VSF_HW_LP
 
 /*============================ INCLUDES ======================================*/
 

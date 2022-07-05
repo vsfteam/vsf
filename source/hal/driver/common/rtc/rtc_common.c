@@ -100,9 +100,17 @@ vsf_err_t vsf_rtc_set_time(vsf_rtc_t *rtc_ptr, time_t second, time_t millisecond
     return rtc_ptr->op->set_time(rtc_ptr, second, millisecond);
 }
 
+rtc_capability_t vsf_rtc_capability(vsf_rtc_t *rtc_ptr)
+{
+    VSF_HAL_ASSERT(rtc_ptr != NULL);
+    VSF_HAL_ASSERT(rtc_ptr->op != NULL);
+    VSF_HAL_ASSERT(rtc_ptr->op->capability != NULL);
+
+    return rtc_ptr->op->capability(rtc_ptr);
+}
+
 #endif /* VSF_RTC_CFG_MULTI_CLASS == ENABLED */
 
-#ifdef VSF_RTC_CFG_PREFIX
 
 static bool _vsf_rtc_is_valid(const vsf_rtc_tm_t *rtc_tm)
 {
@@ -155,6 +163,5 @@ bool vsf_rtc_tm_is_epoch_time(const vsf_rtc_tm_t *rtc_tm)
     return _vsf_rtc_is_valid(rtc_tm);
 }
 
-#endif /* VSF_RTC_CFG_PREFIX */
 
 #endif /* VSF_HAL_USE_RTC == ENABLED */

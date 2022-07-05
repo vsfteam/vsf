@@ -20,8 +20,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define vsf_real_rng_t          VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_t)
-#define vsf_real_rng_capability VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_capability)
+#define vsf_real_rng_t          VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t)
+#define vsf_real_rng_capability VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -46,12 +46,12 @@ rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 #define __VSF_HAL_TEMPLATE_NAME                     _rng
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RNG
 
-#ifndef VSF_RNG_CFG_PREFIX
-#   error "Please define VSF_RNG_CFG_PREFIX in rng driver"
+#ifndef VSF_RNG_CFG_IMP_PREFIX
+#   error "Please define VSF_RNG_CFG_IMP_PREFIX in rng driver"
 #endif
 
-#ifndef VSF_RNG_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_RNG_CFG_UPPERCASE_PREFIX in rng driver"
+#ifndef VSF_RNG_CFG_IMP_UPCASE_PREFIX   
+#   error "Please define VSF_RNG_CFG_IMP_UPCASE_PREFIX    in rng driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

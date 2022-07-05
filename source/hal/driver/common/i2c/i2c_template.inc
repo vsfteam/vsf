@@ -22,9 +22,9 @@
 /*============================ MACROS ========================================*/
 #if VSF_HAL_USE_I2C == ENABLED
 
-#define vsf_real_i2c_t          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t)
-#define vsf_real_master_request VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)
-#define vsf_real_i2c_capability VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)
+#define vsf_real_i2c_t          VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)
+#define vsf_real_master_request VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
+#define vsf_real_i2c_capability VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -33,7 +33,7 @@
 #if VSF_I2C_CFG_REQUEST_TEMPLATE == ENABLED
 vsf_err_t vsf_real_i2c_master_request(vsf_real_i2c_t *i2c_ptr, uint16_t address, em_i2c_cmd_t cmd, uint16_t count, uint8_t *buffer_ptr)
 {
-#define VSF_I2C_TYPE VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t)
+#define VSF_I2C_TYPE VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)
 
     VSF_I2C_TYPE * i2c_type_ptr = (VSF_I2C_TYPE *)i2c_ptr;
     return vsf_i2c_request_master_request(i2c_ptr, &i2c_type_ptr->request, address, cmd, count, buffer_ptr);
@@ -54,12 +54,12 @@ i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 #define __VSF_HAL_TEMPLATE_NAME                     _i2c
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _I2C
 
-#ifndef VSF_I2C_CFG_PREFIX
-#   error "Please define VSF_I2C_CFG_PREFIX in i2c driver"
+#ifndef VSF_I2C_CFG_IMP_PREFIX
+#   error "Please define VSF_I2C_CFG_IMP_PREFIX in i2c driver"
 #endif
 
-#ifndef VSF_I2C_CFG_UPPERCASE_PREFIX
-#   error "Please define VSF_I2C_CFG_UPPERCASE_PREFIX in i2c driver"
+#ifndef VSF_I2C_CFG_IMP_UPCASE_PREFIX   
+#   error "Please define VSF_I2C_CFG_IMP_UPCASE_PREFIX    in i2c driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

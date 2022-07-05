@@ -24,12 +24,12 @@
 #define __VSF_HAL_TEMPLATE_NAME                     _pwm
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _PWM
 
-#ifndef VSF_PWM_CFG_API_DECLARATION_PREFIX
-#   error "Please define VSF_PWM_CFG_API_DECLARATION_PREFIX when using vsf_template_pwm.h"
+#ifndef VSF_PWM_CFG_DEC_PREFIX
+#   error "Please define VSF_PWM_CFG_DEC_PREFIX when using vsf_template_pwm.h"
 #endif
 
-#ifdef VSF_PWM_CFG_INSTANCE_DECLARATION_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_PWM_CFG_INSTANCE_DECLARATION_PREFIX
+#ifdef VSF_PWM_CFG_DEC_UPCASE_PREFIX
+#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_PWM_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"

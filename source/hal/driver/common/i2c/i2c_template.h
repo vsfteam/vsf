@@ -24,12 +24,12 @@
 #define __VSF_HAL_TEMPLATE_NAME                     _i2c
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _I2C
 
-#ifndef VSF_I2C_CFG_API_DECLARATION_PREFIX
-#   error "Please define VSF_I2C_CFG_API_DECLARATION_PREFIX when using vsf_template_i2c.h"
+#ifndef VSF_I2C_CFG_DEC_PREFIX
+#   error "Please define VSF_I2C_CFG_DEC_PREFIX when using vsf_template_i2c.h"
 #endif
 
-#ifdef VSF_I2C_CFG_INSTANCE_DECLARATION_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_I2C_CFG_INSTANCE_DECLARATION_PREFIX
+#ifdef VSF_I2C_CFG_DEC_UPCASE_PREFIX
+#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_I2C_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"

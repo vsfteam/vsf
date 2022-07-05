@@ -29,8 +29,8 @@
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_MULTIPLEXER_I2C_CFG_CALL_PREFIX
-#   undef VSF_I2C_CFG_PREFIX
-#   define VSF_I2C_CFG_PREFIX               VSF_MULTIPLEXER_I2C_CFG_CALL_PREFIX
+#   undef VSF_I2C_CFG_IMP_PREFIX
+#   define VSF_I2C_CFG_IMP_PREFIX               VSF_MULTIPLEXER_I2C_CFG_CALL_PREFIX
 #endif
 
 #ifndef VSF_MULTIPLEX_I2C_PROTECT_LEVEL

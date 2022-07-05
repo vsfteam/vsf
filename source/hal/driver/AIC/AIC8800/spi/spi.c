@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_SPI_CFG_PREFIX                  vsf_hw
-#define VSF_SPI_CFG_UPPERCASE_PREFIX        VSF_HW
+#define VSF_SPI_CFG_IMP_PREFIX                  vsf_hw
+#define VSF_SPI_CFG_IMP_UPCASE_PREFIX           VSF_HW
 
 /*============================ INCLUDES ======================================*/
 
@@ -484,7 +484,7 @@ int_fast32_t vsf_hw_spi_get_transfered_count(vsf_hw_spi_t *hw_spi_ptr)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_SPI_CFG_UPPERCASE_PREFIX            VSF_HW
+#define VSF_SPI_CFG_IMP_UPCASE_PREFIX               VSF_HW
 #define VSF_SPI_CFG_IMP_LV0(__count, __hal_op)                                  \
     static const vsf_hw_spi_const_t __vsf_hw_spi ##__count ## _const = {        \
         .reg = REG_SPI##__count,                                                \

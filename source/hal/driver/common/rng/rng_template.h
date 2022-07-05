@@ -25,12 +25,12 @@
 #define __VSF_HAL_TEMPLATE_NAME                     _rng
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RNG
 
-#ifndef VSF_RNG_CFG_API_DECLARATION_PREFIX
-#   error "Please define VSF_RNG_CFG_API_DECLARATION_PREFIX when using vsf_template_rng.h"
+#ifndef VSF_RNG_CFG_DEC_PREFIX
+#   error "Please define VSF_RNG_CFG_DEC_PREFIX when using vsf_template_rng.h"
 #endif
 
-#ifdef VSF_RNG_CFG_INSTANCE_DECLARATION_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_RNG_CFG_INSTANCE_DECLARATION_PREFIX
+#ifdef VSF_RNG_CFG_DEC_UPCASE_PREFIX
+#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_RNG_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
