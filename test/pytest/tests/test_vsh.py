@@ -56,9 +56,9 @@ def connect_vsh(vsh):
 
 @when(parsers.parse('type {vsh_input}'))
 def type_command(vsh, vsh_input):
-    vsh['input'] = vsh_input
-    printh("sendline" , vsh_input)
-    vsh['subprocess'].sendline(vsh_input + "\r")
+    vsh['input'] = vsh_input + '\r'
+    printh("sendline" , vsh['input'])
+    vsh['subprocess'].sendline(vsh['input'])
 
 @then(parsers.parse('{vsh_output} in output'))
 def compare_output(vsh, vsh_output):
