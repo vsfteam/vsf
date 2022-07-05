@@ -106,10 +106,10 @@ static void __rtc_tm_demo(void)
 #endif
 
     result = vsf_rtc_get(APP_RTC_DEMO_CFG_RTC, &rtc_tm);
-    vsf_trace_debug("%04d/%02d/%02d %02d:%02d:%02d %s" VSF_TRACE_CFG_LINEEND,
-                    rtc_tm.tm_year, rtc_tm.tm_mon, rtc_tm.tm_mday,
-                    rtc_tm.tm_hour, rtc_tm.tm_min, rtc_tm.tm_sec,
-                    __weeks[rtc_tm.tm_wday - 1]);
+    vsf_trace_info("Current Time: %04d/%02d/%02d %02d:%02d:%02d %s" VSF_TRACE_CFG_LINEEND,
+                   rtc_tm.tm_year, rtc_tm.tm_mon, rtc_tm.tm_mday,
+                   rtc_tm.tm_hour, rtc_tm.tm_min, rtc_tm.tm_sec,
+                   __weeks[rtc_tm.tm_wday - 1]);
 }
 #endif
 
