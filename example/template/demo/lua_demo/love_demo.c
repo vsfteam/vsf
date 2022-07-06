@@ -122,12 +122,13 @@ int love_main(int argc, char *argv[])
     }
 
     vsf_sdl2_cfg_t cfg = {
-        .disp_dev = usrapp_ui_common.disp,
+        .disp_dev       = usrapp_ui_common.disp,
+        .audio_dev      = usrapp_audio_common.default_dev,
     };
     vsf_sdl2_init(&cfg);
 
     // TODO: process on_exit to call lua_close(L);
-    lua_State *L = lua_newstate(NULL, NULL);
+    lua_State *L = luaL_newstate();
     luaL_openlibs(L);
     luaL_requiref(L, "love", luaopen_love, 1);
 

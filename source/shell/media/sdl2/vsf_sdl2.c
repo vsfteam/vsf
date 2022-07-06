@@ -466,11 +466,13 @@ int SDL_InitSubSystem(uint32_t flags)
 #if VSF_USE_AUDIO == ENABLED
     if (flags & SDL_INIT_AUDIO) {
         vk_audio_dev_t *audio_dev = __vsf_sdl2.audio.dev;
-        vk_audio_init(audio_dev);
-        for (uint_fast8_t i = 0; i < audio_dev->stream_num; i++) {
-            if (0 == audio_dev->stream[i].dir_in1out0) {
-                __vsf_sdl2.audio.stream = &audio_dev->stream[i];
-                break;
+        if (audio_dev != NULL) {
+            vk_audio_init(audio_dev);
+            for (uint_fast8_t i = 0; i < audio_dev->stream_num; i++) {
+                if (0 == audio_dev->stream[i].dir_in1out0) {
+                    __vsf_sdl2.audio.stream = &audio_dev->stream[i];
+                    break;
+                }
             }
         }
     }

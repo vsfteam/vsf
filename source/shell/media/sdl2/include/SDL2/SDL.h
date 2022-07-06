@@ -90,6 +90,9 @@ extern "C" {
 #define SDL_MaximizeWindow              VSF_SDL_WRAPPER(SDL_MaximizeWindow)
 #define SDL_MinimizeWindow              VSF_SDL_WRAPPER(SDL_MinimizeWindow)
 #define SDL_GetWindowFlags              VSF_SDL_WRAPPER(SDL_GetWindowFlags)
+#define SDL_SetWindowBordered           VSF_SDL_WRAPPER(SDL_SetWindowBordered)
+#define SDL_SetWindowPosition           VSF_SDL_WRAPPER(SDL_SetWindowPosition)
+#define SDL_SetWindowOpacity            VSF_SDL_WRAPPER(SDL_SetWindowOpacity)
 
 #define SDL_GetDesktopDisplayMode       VSF_SDL_WRAPPER(SDL_GetDesktopDisplayMode)
 #define SDL_GetCurrentDisplayMode       VSF_SDL_WRAPPER(SDL_GetCurrentDisplayMode)
@@ -130,6 +133,7 @@ extern "C" {
 #define SDL_SetRenderDrawBlendMode      VSF_SDL_WRAPPER(SDL_SetRenderDrawBlendMode)
 #define SDL_GetRenderDrawBlendMode      VSF_SDL_WRAPPER(SDL_GetRenderDrawBlendMode)
 #define SDL_RenderFillRect              VSF_SDL_WRAPPER(SDL_RenderFillRect)
+#define SDL_IntersectRect               VSF_SDL_WRAPPER(SDL_IntersectRect)
 
 #define SDL_CreateTexture               VSF_SDL_WRAPPER(SDL_CreateTexture)
 #define SDL_CreateTextureFromSurface    VSF_SDL_WRAPPER(SDL_CreateTextureFromSurface)

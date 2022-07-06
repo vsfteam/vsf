@@ -191,6 +191,13 @@ int LOVE_MODULE_INIT(graphics)(lua_State *L)
     VSF_ASSERT(__l_graphics.sdl.window != NULL);
     __l_graphics.sdl.surface = SDL_GetWindowSurface(__l_graphics.sdl.window);
     VSF_ASSERT(__l_graphics.sdl.surface != NULL);
+    SDL_Rect r = {
+        .x          = 0,
+        .y          = 0,
+        .w          = dm.w,
+        .h          = dm.h,
+    };
+    SDL_SetClipRect(__l_graphics.sdl.surface, &r);
 
     {
         int result;
