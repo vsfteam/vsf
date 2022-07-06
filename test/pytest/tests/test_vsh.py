@@ -56,14 +56,13 @@ def connect_vsh(vsh):
 
 @when(parsers.parse('type {vsh_input}'))
 def type_command(vsh, vsh_input):
-    vsh['input'] = vsh_input + '\r'
+    vsh['input'] = vsh_input.lstrip() + '\r'
     printh("sendline" , vsh['input'])
     vsh['subprocess'].sendline(vsh['input'])
 
 @then(parsers.parse('{vsh_output} in output'))
 def compare_output(vsh, vsh_output):
-
-    printh("compare" , vsh_output)
+    vsh_output= vsh_output.lstrip()
 
     vsh['subprocess'].expect(vsh_output, timeout=vsh['config'].getoption("vsf_timeout"))
 
