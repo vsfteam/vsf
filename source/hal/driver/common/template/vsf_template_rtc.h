@@ -31,14 +31,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-extern int fuck_rtc;
-
 // VSF_RTC_CFG_PREFIX: use for macro vsf_rtc_{init, enable, ...}
 #ifndef VSF_RTC_CFG_PREFIX
 #   define VSF_RTC_CFG_PREFIX                   vsf
 #   define VSF_RTC_CFG_MULTI_CLASS              ENABLED
-extern int fuck_rtc_enable_multi_class;
-
 #endif
 
 #ifndef VSF_RTC_CFG_FUNCTION_RENAME
