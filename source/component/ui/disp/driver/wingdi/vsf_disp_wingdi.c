@@ -222,6 +222,9 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 #endif
 
     switch (msg) {
+    case WM_SETCURSOR:
+        SetCursor(LoadCursor(NULL, IDC_ARROW));
+        return TRUE;
     case WM_PAINT: {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
