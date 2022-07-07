@@ -109,6 +109,7 @@ typedef struct vk_winusb_hcd_t {
     uint8_t cur_dev_idx;
 
     vsf_eda_t *init_eda;
+    vsf_arch_irq_request_t poll_request;
     vsf_arch_irq_thread_t init_thread;
     vsf_teda_t teda;
     vsf_sem_t sem;
@@ -416,7 +417,7 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         UnregisterDeviceNotification(__vk_winusb_hcd.hWndNotify);
         break;
     case WM_DEVICECHANGE:
-        // TODO: notify for device change
+        __vsf_arch_irq_request_send(&__vk_winusb_hcd.poll_request);
         break;
     default:
         return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -695,6 +696,8 @@ static void __vk_winusb_hcd_init_thread(void *arg)
     __vsf_arch_irq_end(irq_thread, false);
 
     while (1) {
+        __vsf_arch_irq_request_pend(&__vk_winusb_hcd.poll_request);
+
         vk_winusb_hcd_dev_t *winusb_dev = &__vk_winusb_hcd.devs[0];
         for (int i = 0; i < dimof(__vk_winusb_hcd.devs); i++, winusb_dev++) {
             if ((INVALID_HANDLE_VALUE == winusb_dev->hDev) && (0 == winusb_dev->evt_mask.value)) {
@@ -749,7 +752,6 @@ static void __vk_winusb_hcd_init_thread(void *arg)
                 }
             }
         }
-        __vsf_arch_irq_sleep(100);
     }
     __vsf_arch_irq_fini(irq_thread);
 }
@@ -940,6 +942,9 @@ static vsf_err_t __vk_winusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
 
         __vk_winusb_hcd.teda.fn.evthandler = __vk_winusb_hcd_evthandler;
         vsf_teda_init(&__vk_winusb_hcd.teda);
+
+        __vsf_arch_irq_request_init(&__vk_winusb_hcd.poll_request);
+        __vsf_arch_irq_request_send(&__vk_winusb_hcd.poll_request);
 
         __vk_winusb_hcd.init_eda = eda;
         __vsf_arch_irq_init(&__vk_winusb_hcd.init_thread, "winusb_hcd_init", __vk_winusb_hcd_init_thread, param->priority);
