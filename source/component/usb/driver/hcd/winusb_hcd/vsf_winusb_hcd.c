@@ -111,7 +111,7 @@ typedef struct vk_winusb_hcd_t {
     vsf_eda_t *init_eda;
     vsf_arch_irq_request_t poll_request;
     vsf_arch_irq_thread_t init_thread;
-    vsf_teda_t teda;
+    vsf_eda_t eda;
     vsf_sem_t sem;
     vsf_dlist_t urb_list;
 
@@ -616,12 +616,12 @@ static void __vk_winusb_hcd_dev_thread(void *arg)
         if (winusb_dev->evt_mask.is_attaching) {
             winusb_dev->evt_mask.is_attaching = false;
             __vsf_arch_irq_start(irq_thread);
-                vsf_eda_post_evt(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, VSF_EVT_WINUSB_HCD_ATTACH | idx);
+                vsf_eda_post_evt(&__vk_winusb_hcd.eda, VSF_EVT_WINUSB_HCD_ATTACH | idx);
             __vsf_arch_irq_end(irq_thread, false);
         }
         if (winusb_dev->evt_mask.is_detaching) {
             __vsf_arch_irq_start(irq_thread);
-                vsf_eda_post_evt(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, VSF_EVT_WINUSB_HCD_DETACH | idx);
+                vsf_eda_post_evt(&__vk_winusb_hcd.eda, VSF_EVT_WINUSB_HCD_DETACH | idx);
             __vsf_arch_irq_end(irq_thread, false);
         }
         if (winusb_dev->evt_mask.is_detached) {
@@ -674,7 +674,7 @@ static void __vk_winusb_hcd_urb_thread(void *arg)
                 winusb_urb->is_irq_enabled = false;
             }
             winusb_urb->is_msg_processed = false;
-            vsf_eda_post_msg(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, urb);
+            vsf_eda_post_msg(&__vk_winusb_hcd.eda, urb);
         __vsf_arch_irq_end(irq_thread, false);
 
         if (is_to_free) {
@@ -777,13 +777,12 @@ static bool __vk_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 
 static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_winusb_hcd_t *winusb = container_of(eda, vk_winusb_hcd_t, teda);
+    vk_winusb_hcd_t *winusb = container_of(eda, vk_winusb_hcd_t, eda);
 
     switch (evt) {
     case VSF_EVT_INIT:
         vsf_dlist_init(&__vk_winusb_hcd.urb_list);
         vsf_eda_sem_init(&__vk_winusb_hcd.sem, 0);
-        vsf_teda_set_timer_ms(100);
 
     wait_next_urb:
         if (vsf_eda_sem_pend(&__vk_winusb_hcd.sem, -1)) {
@@ -819,7 +818,7 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
                                 VSF_USB_ASSERT(vsf_dlist_is_empty(&winusb_dev->urb_pending_list));
                                 vsf_dlist_add_to_tail(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb);
-                                vsf_eda_post_msg(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, urb);
+                                vsf_eda_post_msg(&__vk_winusb_hcd.eda, urb);
                                 goto wait_next_urb;
                             }
                         }
@@ -845,7 +844,7 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             goto wait_next_urb;
         }
         break;
-    case VSF_EVT_TIMER:
+    case VSF_EVT_USER:
         if (__vk_winusb_hcd.new_mask != 0) {
             vk_usbh_t *usbh = (vk_usbh_t *)winusb->hcd;
             if (NULL == usbh->dev_new) {
@@ -860,7 +859,6 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 winusb_dev->state = VSF_WINUSB_HCD_DEV_STATE_ATTACHED;
             }
         }
-        vsf_teda_set_timer_ms(100);
         break;
     case VSF_EVT_MESSAGE: {
             vk_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
@@ -911,6 +909,7 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             case VSF_EVT_WINUSB_HCD_ATTACH:
                 if (winusb_dev->state != VSF_WINUSB_HCD_DEV_STATE_ATTACHED) {
                     __vk_winusb_hcd.new_mask |= 1 << idx;
+                    vsf_eda_post_evt(&__vk_winusb_hcd.eda, VSF_EVT_USER);
                 }
                 break;
             case VSF_EVT_WINUSB_HCD_DETACH:
@@ -940,8 +939,8 @@ static vsf_err_t __vk_winusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
         __vk_winusb_hcd.new_mask = 0;
         __vk_winusb_hcd.cur_dev_idx = 0;
 
-        __vk_winusb_hcd.teda.fn.evthandler = __vk_winusb_hcd_evthandler;
-        vsf_teda_init(&__vk_winusb_hcd.teda);
+        __vk_winusb_hcd.eda.fn.evthandler = __vk_winusb_hcd_evthandler;
+        vsf_eda_init(&__vk_winusb_hcd.eda);
 
         __vsf_arch_irq_request_init(&__vk_winusb_hcd.poll_request);
         __vsf_arch_irq_request_send(&__vk_winusb_hcd.poll_request);
