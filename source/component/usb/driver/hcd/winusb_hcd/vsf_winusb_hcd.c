@@ -31,6 +31,9 @@
 #include <Windows.h>
 #include <SetupAPI.h>
 #include <winusb.h>
+#include <dbt.h>
+#include <initguid.h>
+#include <Usbiodef.h>
 
 #if VSF_WINUSB_CFG_INSTALL_DRIVER == ENABLED
 #   include "libwdi.h"
@@ -110,6 +113,10 @@ typedef struct vk_winusb_hcd_t {
     vsf_teda_t teda;
     vsf_sem_t sem;
     vsf_dlist_t urb_list;
+
+    vsf_arch_irq_thread_t detect_thread;
+    HWND hWndNotify;
+    HDEVNOTIFY hDeviceNotify;
 } vk_winusb_hcd_t;
 
 typedef struct vk_winusb_hcd_urb_t {
@@ -287,7 +294,6 @@ static HANDLE __vk_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
             }
         } else {
         check_normal_driver:
-            const GUID GUID_DEVINTERFACE_USB_DEVICE = {0xA5DCBF10, 0x6530, 0x11D2, {0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED}};
             if (!SetupDiEnumDeviceInterfaces(hDeviceInfo, &DeviceInfoData, &GUID_DEVINTERFACE_USB_DEVICE, 0, &deviceInterfaceData)) {
                 continue;
             }
@@ -345,13 +351,15 @@ static void __vk_winusb_hcd_on_arrived(vk_winusb_hcd_dev_t *winusb_dev)
 {
     UCHAR speed;
     ULONG length = sizeof(speed);
-    WinUsb_QueryDeviceInformation(winusb_dev->hUsbIfs[0], DEVICE_SPEED, &length, &speed);
-    switch (speed) {
-    case LowSpeed:  winusb_dev->speed = USB_SPEED_LOW;      break;
-    case FullSpeed: winusb_dev->speed = USB_SPEED_FULL;     break;
-    case HighSpeed: winusb_dev->speed = USB_SPEED_HIGH;     break;
-    default:        winusb_dev->speed = USB_SPEED_UNKNOWN;  break;
+    if (WinUsb_QueryDeviceInformation(winusb_dev->hUsbIfs[0], DEVICE_SPEED, &length, &speed)) {
+        switch (speed) {
+        case LowSpeed:  winusb_dev->speed = USB_SPEED_LOW;      break;
+        case FullSpeed: winusb_dev->speed = USB_SPEED_FULL;     break;
+        case HighSpeed: winusb_dev->speed = USB_SPEED_HIGH;     break;
+        default:        winusb_dev->speed = USB_SPEED_UNKNOWN;  break;
+        }
     }
+
     winusb_dev->evt_mask.is_attaching = true;
     __vsf_arch_irq_request_send(&winusb_dev->irq_request);
 }
@@ -387,6 +395,64 @@ static void __vk_winusb_hcd_assign_endpoints(vk_winusb_hcd_dev_t *winusb_dev, ui
     } while (0);
 }
 
+static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    switch (msg) {
+    case WM_CREATE: {
+            DEV_BROADCAST_DEVICEINTERFACE NotificationFilter = {
+                .dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE),
+                .dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE,
+                .dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE,
+            };
+            __vk_winusb_hcd.hDeviceNotify = RegisterDeviceNotification(
+                __vk_winusb_hcd.hWndNotify, // events recipient
+                &NotificationFilter,        // type of device
+                DEVICE_NOTIFY_WINDOW_HANDLE | DEVICE_NOTIFY_ALL_INTERFACE_CLASSES // type of recipient handle
+            );
+            VSF_USB_ASSERT(__vk_winusb_hcd.hDeviceNotify != NULL);
+        }
+        break;
+    case WM_DESTROY:
+        UnregisterDeviceNotification(__vk_winusb_hcd.hWndNotify);
+        break;
+    case WM_DEVICECHANGE:
+        // TODO: notify for device change
+        break;
+    default:
+        return DefWindowProc(hWnd, msg, wParam, lParam);
+    }
+    return 0;
+}
+
+static void __vk_winusb_hcd_dev_detect_thread(void *arg)
+{
+    vsf_arch_irq_thread_t *irq_thread = arg;
+    __vsf_arch_irq_set_background(irq_thread);
+
+    WNDCLASS wc = {
+        .hInstance = (HINSTANCE)GetModuleHandle(NULL),
+        .lpfnWndProc = (WNDPROC)__WindowProc,
+        .lpszClassName = L"vsf_winusb_hcd",
+    };
+    if (!RegisterClass(&wc)) {
+        VSF_USB_ASSERT(false);
+    }
+    __vk_winusb_hcd.hWndNotify = CreateWindow(wc.lpszClassName,
+        NULL, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        0, 0, NULL, NULL, wc.hInstance, NULL
+    );
+    vsf_trace_debug("create_windows: %d\n", GetLastError());
+    VSF_USB_ASSERT(__vk_winusb_hcd.hWndNotify != NULL);
+
+    MSG Msg;
+    while (GetMessage(&Msg, NULL, 0, 0) > 0) {
+        TranslateMessage(&Msg);
+        DispatchMessage(&Msg);
+    }
+    __vsf_arch_irq_fini(irq_thread);
+}
+
 // return 0 on success, non-0 otherwise
 static int __vk_winusb_hcd_init(void)
 {
@@ -403,6 +469,8 @@ static int __vk_winusb_hcd_init(void)
         __vsf_arch_irq_request_init(&winusb_dev->irq_request);
         __vsf_arch_irq_init(&winusb_dev->irq_thread, "winusb_hcd_dev", __vk_winusb_hcd_dev_thread, param->priority);
     }
+
+    __vsf_arch_irq_init(&__vk_winusb_hcd.detect_thread, "winusb_hcd_dev", __vk_winusb_hcd_dev_detect_thread, param->priority);
     return 0;
 }
 
@@ -672,6 +740,12 @@ static void __vk_winusb_hcd_init_thread(void *arg)
                         }
 #endif
                     }
+                }
+            } else if (winusb_dev->hDev != NULL) {
+                UCHAR speed;
+                ULONG length = sizeof(speed);
+                if (!WinUsb_QueryDeviceInformation(winusb_dev->hUsbIfs[0], DEVICE_SPEED, &length, &speed)) {
+                    __vk_winusb_hcd_on_left(winusb_dev);
                 }
             }
         }
