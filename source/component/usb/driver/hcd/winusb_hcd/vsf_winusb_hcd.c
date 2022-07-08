@@ -439,7 +439,7 @@ static void __vk_winusb_hcd_dev_detect_thread(void *arg)
         VSF_USB_ASSERT(false);
     }
     __vk_winusb_hcd.hWndNotify = CreateWindow(wc.lpszClassName,
-        NULL, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE,
+        NULL, WS_OVERLAPPED,
         CW_USEDEFAULT, CW_USEDEFAULT,
         0, 0, NULL, NULL, wc.hInstance, NULL
     );
