@@ -27,7 +27,7 @@
 #endif
 
 #if VSF_HAL_GPIO_USE_74HC165 == ENABLED
-#   include "./gpio/74hc165/vsf_gpio_74hc165.h"
+#   include "./gpio/74hc165/vsf_74hc165_gpio.h"
 #endif
 
 #if VSF_HAL_USE_GPIO_I2C == ENABLED
