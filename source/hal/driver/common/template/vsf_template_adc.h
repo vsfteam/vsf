@@ -29,9 +29,17 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-// VSF_ADC_CFG_PREFIX: use for macro vsf_adc_{init, enable, ...}
+// application code can redefine it
 #ifndef VSF_ADC_CFG_PREFIX
-#   define VSF_ADC_CFG_PREFIX                       vsf
+#   if defined(VSF_HW_ADC_COUNT) && (VSF_HW_ADC_COUNT != 0)
+#       define VSF_ADC_CFG_PREFIX                   vsf_hw
+#   else
+#       define VSF_ADC_CFG_PREFIX                   vsf
+#   endif
+#endif
+
+// multi-class support enabled by default for maximum availability.
+#ifndef VSF_ADC_CFG_MULTI_CLASS
 #   define VSF_ADC_CFG_MULTI_CLASS                  ENABLED
 #endif
 

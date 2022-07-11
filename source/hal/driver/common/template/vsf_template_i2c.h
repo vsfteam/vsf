@@ -29,10 +29,20 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-// VSF_I2C_CFG_PREFIX: use for macro vsf_i2c_{init, enable, ...}
+// application code can redefine it
 #ifndef VSF_I2C_CFG_PREFIX
-#   define VSF_I2C_CFG_PREFIX                     vsf
-#   define VSF_I2C_CFG_MULTI_CLASS                ENABLED
+#   if defined(VSF_HW_I2C_COUNT) && (VSF_HW_I2C_COUNT != 0)
+#       define VSF_I2C_CFG_PREFIX               vsf_hw
+#   elif VSF_HAL_USE_GPIO_I2C == ENABLED
+#       define VSF_I2C_CFG_PREFIX               vsf_hw
+#   else
+#       define VSF_I2C_CFG_PREFIX               vsf
+#   endif
+#endif
+
+// multi-class support enabled by default for maximum availability.
+#ifndef VSF_I2C_CFG_MULTI_CLASS
+#   define VSF_I2C_CFG_MULTI_CLASS              ENABLED
 #endif
 
 #ifndef VSF_I2C_CFG_FUNCTION_RENAME

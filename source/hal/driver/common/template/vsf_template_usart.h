@@ -28,10 +28,18 @@ extern "C" {
 #endif
 /*============================ MACROS ========================================*/
 
-// VSF_USART_CFG_PREFIX: use for macro vsf_usart_{init, enable, ...}
+// application code can redefine it
 #ifndef VSF_USART_CFG_PREFIX
-#   define VSF_USART_CFG_PREFIX                 vsf
-#   define VSF_USART_CFG_MULTI_CLASS            ENABLED
+#   if defined(VSF_HW_USART_COUNT) && (VSF_HW_USART_COUNT != 0)
+#       define VSF_USART_CFG_PREFIX                 vsf_hw
+#   else
+#       define VSF_USART_CFG_PREFIX                 vsf
+#   endif
+#endif
+
+// multi-class support enabled by default for maximum availability.
+#ifndef VSF_USART_CFG_MULTI_CLASS
+#   define VSF_USART_CFG_MULTI_CLASS                ENABLED
 #endif
 
 #ifndef VSF_USART_CFG_FUNCTION_RENAME
