@@ -29,22 +29,30 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-// VSF_TIMER_CFG_PREFIX: use for macro vsf_timer_{init, enable, ...}
+// application code can redefine it
 #ifndef VSF_TIMER_CFG_PREFIX
-#   define VSF_TIMER_CFG_PREFIX                 vsf
-#   define VSF_TIMER_CFG_MULTI_CLASS            ENABLED
+#   if defined(VSF_HW_TIMER_COUNT) && (VSF_HW_TIMER_COUNT != 0)
+#       define VSF_TIMER_CFG_PREFIX                 vsf_hw
+#   else
+#       define VSF_TIMER_CFG_PREFIX                 vsf
+#   endif
+#endif
+
+// multi-class support enabled by default for maximum availability.
+#ifndef VSF_TIMER_CFG_MULTI_CLASS
+#   define VSF_TIMER_CFG_MULTI_CLASS                ENABLED
 #endif
 
 #ifndef VSF_TIMER_CFG_FUNCTION_RENAME
-#   define VSF_TIMER_CFG_FUNCTION_RENAME           ENABLED
+#   define VSF_TIMER_CFG_FUNCTION_RENAME            ENABLED
 #endif
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_TIMER_CFG_REIMPLEMENT_CAPABILITY   DISABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_CAPABILITY     DISABLED
 #endif
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_IRQ_TYPE
-#   define VSF_TIMER_CFG_REIMPLEMENT_IRQ_TYPE      DISABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_IRQ_TYPE       DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
