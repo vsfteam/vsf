@@ -34188,14 +34188,14 @@
           <GroupName>source/hal/driver/vsf/gpio/74hc165</GroupName>
           <Files>
             <File>
-              <FileName>vsf_gpio_74hc165.c</FileName>
+              <FileName>vsf_74hc165_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_gpio_74hc165.c</FilePath>
+              <FilePath>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_74hc165_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_gpio_74hc165.h</FileName>
+              <FileName>vsf_74hc165_gpio.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_gpio_74hc165.h</FilePath>
+              <FilePath>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_74hc165_gpio.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -70586,14 +70586,14 @@
           <GroupName>source/hal/driver/vsf/gpio/74hc165</GroupName>
           <Files>
             <File>
-              <FileName>vsf_gpio_74hc165.c</FileName>
+              <FileName>vsf_74hc165_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_gpio_74hc165.c</FilePath>
+              <FilePath>..\..\..\..\source\hal\driver\vsf\gpio\74hc165\vsf_74hc165_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_gpio_74hc165.h</FileName>
+              <FileName>vsf_74hc165_gpio.h</FileName>
               <FileType>5</FileType>
-              <FilePath>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_gpio_74hc165.h</FilePath>
+              <FilePath>..\..\..\..\source\hal\driver\vsf\gpio\74hc165\vsf_74hc165_gpio.h</FilePath>
             </File>
           </Files>
         </Group>

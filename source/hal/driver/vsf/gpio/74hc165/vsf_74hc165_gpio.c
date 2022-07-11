@@ -32,7 +32,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_gpio_74hc165_config_pin(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
+void vsf_74hc165_gpio_config_pin(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
 {
     VSF_HAL_ASSERT( (gpio_ptr != NULL) && (gpio_ptr->op != NULL)
                 &&  (gpio_ptr->op->load_control != NULL)
@@ -47,35 +47,35 @@ void vsf_gpio_74hc165_config_pin(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask
     gpio_ptr->op->clock_control(gpio_ptr->param, 1);
 }
 
-void vsf_gpio_74hc165_set_direction(vsf_gpio_74hc165_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
+void vsf_74hc165_gpio_set_direction(vsf_74hc165_gpio_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT((gpio_ptr != NULL) && ((direction_mask & pin_mask) == 0));
 }
 
-uint32_t vsf_gpio_74hc165_get_direction(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask)
+uint32_t vsf_74hc165_gpio_get_direction(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     return 0;
 }
 
-void vsf_gpio_74hc165_set_input(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask)
+void vsf_74hc165_gpio_set_input(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
 }
 
-void vsf_gpio_74hc165_set_output(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask)
-{
-    VSF_HAL_ASSERT(gpio_ptr != NULL);
-    VSF_HAL_ASSERT(false);
-}
-
-void vsf_gpio_74hc165_switch_direction(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask)
+void vsf_74hc165_gpio_set_output(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(false);
 }
 
-uint32_t vsf_gpio_74hc165_read(vsf_gpio_74hc165_t *gpio_ptr)
+void vsf_74hc165_gpio_switch_direction(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    VSF_HAL_ASSERT(false);
+}
+
+uint32_t vsf_74hc165_gpio_read(vsf_74hc165_gpio_t *gpio_ptr)
 {
     uint32_t value = 0;
 
@@ -99,25 +99,25 @@ uint32_t vsf_gpio_74hc165_read(vsf_gpio_74hc165_t *gpio_ptr)
     return value;
 }
 
-void vsf_gpio_74hc165_write(vsf_gpio_74hc165_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
+void vsf_74hc165_gpio_write(vsf_74hc165_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(false);
 }
 
-void vsf_gpio_74hc165_set(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask)
+void vsf_74hc165_gpio_set(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(false);
 }
 
-void vsf_gpio_74hc165_clear(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask)
+void vsf_74hc165_gpio_clear(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(false);
 }
 
-void vsf_gpio_74hc165_toggle(vsf_gpio_74hc165_t *gpio_ptr, uint32_t pin_mask)
+void vsf_74hc165_gpio_toggle(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(false);
