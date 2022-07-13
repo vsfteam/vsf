@@ -11,7 +11,6 @@ Feature: vsh: vsf shell
         | vsh_input                                                              | vsh_output            |
         | ls /                                                                   | bin.*                 |
         | ls /bin                                                                | sh.*                  |
-        | cat /fatfs/FAKEFAT32/readme.txt                                        | readme\s+.*           |
         | time ls /                                                              | take.*                |
         | export                                                                 | PATH.*                |
         | export EXPORT_TEST=abcd1234                                            | EXPORT_TEST=abcd1234.*|
