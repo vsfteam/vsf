@@ -272,7 +272,6 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
 static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
-    vsf_usart_t *uart = (vsf_usart_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
 
     priv->subop = sfd->op;
     sfd->op = &vsf_linux_term_fdop;

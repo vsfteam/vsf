@@ -5,8 +5,10 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../sys/time.h"
+#   include "../signal.h"
 #else
 #   include <sys/time.h>
+#   include <signal.h>
 #endif
 // for bitmap
 #include "utilities/vsf_utilities.h"
@@ -19,6 +21,7 @@ extern "C" {
 #   define select               VSF_LINUX_WRAPPER(select)
 #elif defined(__WIN__)
 #   define select               VSF_LINUX_WRAPPER(select)
+#   define pselect              VSF_LINUX_WRAPPER(pselect)
 #endif
 
 #ifndef FD_SETSIZE
@@ -31,6 +34,7 @@ extern "C" {
 
 __vsf_declare_bitmap_ex(fd_set, FD_SETSIZE)
 int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, struct timeval *timeout);
+int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timespec *timeout_ts, const sigset_t *sigmask);
 
 #ifdef __cplusplus
 }

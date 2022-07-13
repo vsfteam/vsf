@@ -30,6 +30,7 @@
 #   include "../../include/unistd.h"
 #   include "../../include/sys/stat.h"
 #   include "../../include/sys/mount.h"
+#   include "../../include/sys/epoll.h"
 #   include "../../include/poll.h"
 #   include "../../include/fcntl.h"
 #   include "../../include/errno.h"
@@ -38,6 +39,7 @@
 #   include <unistd.h>
 #   include <sys/stat.h>
 #   include <sys/mount.h>
+#   include <sys/epoll.h>
 #   include <poll.h>
 #   include <fcntl.h>
 #   include <errno.h>
@@ -92,6 +94,21 @@ typedef struct vsf_linux_eventfd_priv_t {
     eventfd_t counter;
 } vsf_linux_eventfd_priv_t;
 
+typedef struct vsf_linux_epoll_node_t {
+    vsf_linux_fd_priv_t *fd_priv;
+    uint32_t events;
+    epoll_data_t data;
+    vsf_dlist_node_t rdy_node;
+    vsf_dlist_node_t fd_node;
+} vsf_linux_epoll_node_t;
+
+typedef struct vsf_linux_epollfd_priv_t {
+    implement(vsf_linux_fd_priv_t)
+    vsf_dlist_t rdy_list;
+    vsf_dlist_t fd_list;
+    vsf_linux_trigger_t *trig;
+} vsf_linux_epollfd_priv_t;
+
 /*============================ PROTOTYPES ====================================*/
 
 static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
@@ -105,6 +122,8 @@ static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t c
 static ssize_t __vsf_linux_eventfd_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_eventfd_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_eventfd_eof(vsf_linux_fd_t *sfd);
+
+static int __vsf_linux_epollfd_close(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
@@ -143,6 +162,11 @@ const vsf_linux_fd_op_t __vsf_linux_eventfd_fdop = {
     .fn_write           = __vsf_linux_eventfd_write,
     .fn_close           = __vsf_linux_eventfd_close,
     .fn_eof             = __vsf_linux_eventfd_eof,
+};
+
+const vsf_linux_fd_op_t __vsf_linux_epollfd_fdop = {
+    .priv_size          = sizeof(vsf_linux_epollfd_priv_t),
+    .fn_close           = __vsf_linux_epollfd_close,
 };
 
 const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
@@ -358,6 +382,205 @@ static int __vsf_linux_eventfd_eof(vsf_linux_fd_t *sfd)
         counter = priv->counter;
     vsf_unprotect_sched(orig);
     return !counter;
+}
+
+// epoll
+static int __vsf_linux_epollfd_close(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_epollfd_priv_t *epoll_priv = (vsf_linux_epollfd_priv_t *)sfd->priv;
+    __vsf_dlist_foreach_next_unsafe(vsf_linux_epoll_node_t, fd_node, &epoll_priv->fd_list) {
+        free(_);
+    }
+    return 0;
+}
+
+static vsf_linux_epoll_node_t * __vsf_linux_epoll_get_node(vsf_linux_epollfd_priv_t *epoll_priv, vsf_linux_fd_priv_t *fd_priv)
+{
+    vsf_linux_epoll_node_t *result = NULL;
+    __vsf_dlist_foreach_unsafe(vsf_linux_epoll_node_t, fd_node, &epoll_priv->fd_list) {
+        if (_->fd_priv == fd_priv) {
+            result = _;
+            break;
+        }
+    }
+    return result;
+}
+
+// __vsf_linux_epoll_on_events is called scheduler protected
+static void __vsf_linux_epoll_on_events(vsf_linux_fd_priv_t *priv, void *param, short events)
+{
+    vsf_linux_epollfd_priv_t *epoll_priv = (vsf_linux_epollfd_priv_t *)param;
+    vsf_linux_epoll_node_t *node = __vsf_linux_epoll_get_node(epoll_priv, priv);
+    VSF_LINUX_ASSERT(node != NULL);
+
+    if (!vsf_dlist_is_in(vsf_linux_epoll_node_t, rdy_node, &epoll_priv->rdy_list, node)) {
+        if (events & node->events) {
+            vsf_dlist_add_to_tail(vsf_linux_epoll_node_t, rdy_node, &epoll_priv->rdy_list, node);
+        }
+    }
+}
+
+int __vsf_linux_epoll_tick(vsf_linux_epollfd_priv_t *epoll_priv, struct epoll_event *events, int maxevents, vsf_timeout_tick_t timeout)
+{
+    vsf_protect_t orig;
+    vsf_linux_trigger_t trig;
+    vsf_linux_epoll_node_t *node;
+    vsf_linux_fd_priv_t *priv;
+    short events_triggered;
+    int ret;
+
+    vsf_linux_trigger_init(&trig);
+    while (1) {
+        ret = 0;
+        orig = vsf_protect_sched();
+        while (!vsf_dlist_is_empty(&epoll_priv->rdy_list) && (maxevents > ret)) {
+            vsf_dlist_remove_head(vsf_linux_epoll_node_t, rdy_node, &epoll_priv->rdy_list, node);
+            VSF_LINUX_ASSERT(node != NULL);
+
+            priv = node->fd_priv;
+            events_triggered = node->events & priv->events;
+            priv->events &= ~(events_triggered & ~priv->sticky_events);
+            priv->events |= priv->status & events_triggered;
+
+            events->events = events_triggered;
+            events->data = node->data;
+            ret++;
+        }
+        if (ret || (0 == timeout)) {
+            vsf_unprotect_sched(orig);
+            return ret;
+        }
+
+        epoll_priv->trig = &trig;
+        vsf_unprotect_sched(orig);
+
+        int r = vsf_linux_trigger_pend(&trig, timeout);
+        // timeout or interrupted by signal
+        if (r != 0) {
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
+int epoll_create1(int flags)
+{
+    vsf_linux_fd_t *sfd;
+    int fd = vsf_linux_fd_create(&sfd, &__vsf_linux_epollfd_fdop);
+    if (fd < 0) {
+        return -1;
+    }
+
+    if (flags & EPOLL_CLOEXEC) {
+        sfd->fd_flags |= FD_CLOEXEC;
+    }
+    return fd;
+}
+
+int epoll_create(int size)
+{
+    return epoll_create1(0);
+}
+
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
+{
+    vsf_linux_fd_t *epoll_sfd = vsf_linux_fd_get(epfd);
+    VSF_LINUX_ASSERT(epoll_sfd != NULL);
+    vsf_linux_epollfd_priv_t *epoll_priv = (vsf_linux_epollfd_priv_t *)epoll_sfd->priv;
+    VSF_LINUX_ASSERT(epoll_priv != NULL);
+    vsf_linux_epoll_node_t *node;
+    vsf_protect_t orig;
+
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    vsf_linux_fd_priv_t *priv = sfd->priv;
+    VSF_LINUX_ASSERT(priv != NULL);
+    short events_triggered;
+
+    switch (op) {
+    case EPOLL_CTL_ADD:
+        node = calloc(1, sizeof(vsf_linux_epoll_node_t));
+        if (NULL == node) {
+            return -1;
+        }
+
+        node->fd_priv = priv;
+        node->events = event->events;
+        node->data = event->data;
+
+        orig = vsf_protect_sched();
+            vsf_dlist_add_to_head(vsf_linux_epoll_node_t, fd_node, &epoll_priv->fd_list, node);
+            priv->events_callback.param = epoll_priv;
+            priv->events_callback.cb = __vsf_linux_epoll_on_events;
+            events_triggered = priv->events & node->events;
+            if (events_triggered) {
+                __vsf_linux_epoll_on_events(priv, epoll_priv, events_triggered);
+            }
+        vsf_unprotect_sched(orig);
+        break;
+    case EPOLL_CTL_MOD:
+        orig = vsf_protect_sched();
+        node = __vsf_linux_epoll_get_node(epoll_priv, priv);
+        if (NULL == node) {
+            vsf_unprotect_sched(orig);
+            return -1;
+        }
+        node->data = event->data;
+        node->events = event->events;
+
+        events_triggered = priv->events & node->events;
+        if (events_triggered) {
+            __vsf_linux_epoll_on_events(priv, epoll_priv, events_triggered);
+        }
+        vsf_unprotect_sched(orig);
+        break;
+    case EPOLL_CTL_DEL:
+        orig = vsf_protect_sched();
+        node = __vsf_linux_epoll_get_node(epoll_priv, priv);
+        if (NULL == node) {
+            vsf_unprotect_sched(orig);
+            return -1;
+        }
+
+        vsf_dlist_remove(vsf_linux_epoll_node_t, fd_node, &epoll_priv->fd_list, node);
+        if (vsf_dlist_is_in(vsf_linux_epoll_node_t, rdy_node, &epoll_priv->rdy_list, node)) {
+            vsf_dlist_remove(vsf_linux_epoll_node_t, rdy_node, &epoll_priv->rdy_list, node);
+        }
+        vsf_unprotect_sched(orig);
+        free(node);
+        break;
+    default:
+        return -1;
+    }
+    return 0;
+}
+
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
+{
+    vsf_linux_fd_t *epoll_sfd = vsf_linux_fd_get(epfd);
+    VSF_LINUX_ASSERT(epoll_sfd != NULL);
+    vsf_linux_epollfd_priv_t *epoll_priv = (vsf_linux_epollfd_priv_t *)epoll_sfd->priv;
+    VSF_LINUX_ASSERT(epoll_priv != NULL);
+    vsf_timeout_tick_t timeout_tick = (timeout < 0) ? -1 : vsf_systimer_ms_to_tick(timeout);
+    return __vsf_linux_epoll_tick(epoll_priv, events, maxevents, timeout_tick);
+}
+
+int epoll_pwait(int epfd, struct epoll_event *events, int maxevents, int timeout, const sigset_t *sigmask)
+{
+    sigset_t origmask;
+    int result;
+
+    sigprocmask(SIG_SETMASK, sigmask, &origmask);
+    result = epoll_wait(epfd, events, maxevents, timeout);
+    sigprocmask(SIG_SETMASK, &origmask, NULL);
+    return result;
+}
+
+int epoll_pwait2(int epfd, struct epoll_event *events, int maxevents, const struct timespec *timeout_ts, const sigset_t *sigmask)
+{
+    int timeout = (timeout_ts == NULL) ? -1 : (timeout_ts->tv_sec * 1000 + timeout_ts->tv_nsec / 1000000);
+    return epoll_pwait(epfd, events, maxevents, timeout, sigmask);
 }
 
 vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd)
@@ -772,6 +995,20 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
         }
     }
     return ret;
+}
+
+int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timespec *timeout_ts, const sigset_t *sigmask)
+{
+    sigset_t origmask;
+    struct timeval timeout;
+    int ready;
+
+    timeout.tv_sec = timeout_ts->tv_sec;
+    timeout.tv_usec = timeout_ts->tv_nsec / 1000;
+    sigprocmask(SIG_SETMASK, sigmask, &origmask);
+    ready = select(nfds, readfds, writefds, exceptfds, &timeout);
+    sigprocmask(SIG_SETMASK, &origmask, NULL);
+    return ready;
 }
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
@@ -1234,7 +1471,7 @@ ssize_t read(int fd, void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if (!sfd || (sfd->priv->flags & O_WRONLY)) { return -1; }
-    sfd->cur_flags = 0;
+    sfd->cur_rdflags = 0;
     return sfd->op->fn_read(sfd, buf, count);
 }
 
@@ -1258,7 +1495,7 @@ ssize_t write(int fd, const void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if (!sfd || (sfd->priv->flags & O_RDONLY)) { return -1; }
-    sfd->cur_flags = 0;
+    sfd->cur_wrflags = 0;
     return sfd->op->fn_write(sfd, buf, count);
 }
 

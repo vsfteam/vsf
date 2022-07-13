@@ -71,6 +71,10 @@
 #   define VSF_LINUX_CFG_HOSTNAME               "vsf"
 #endif
 
+#ifndef VSF_LINUX_USE_EPOLL
+#   define VSF_LINUX_USE_EPOLL                  ENABLED
+#endif
+
 #ifndef VSF_LINUX_CFG_BIN_PATH
 #   define VSF_LINUX_CFG_BIN_PATH               "/bin"
 #endif

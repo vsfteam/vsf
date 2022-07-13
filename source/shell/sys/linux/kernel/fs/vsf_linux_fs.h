@@ -73,6 +73,7 @@ vsf_class(vsf_linux_fd_priv_t) {
         // sticky_events will not be cleared
         //  use for eg pipe, pipe_tx is closed, pipe_rx will always POLLIN
         short sticky_events;
+        short user_data;
 
         struct {
             void *param;
@@ -88,7 +89,8 @@ vsf_class(vsf_linux_fd_t) {
     protected_member(
         int fd;
         int fd_flags;
-        int cur_flags;
+        int cur_rdflags;
+        int cur_wrflags;
         const vsf_linux_fd_op_t *op;
     )
 

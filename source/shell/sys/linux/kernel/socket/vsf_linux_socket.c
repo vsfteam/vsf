@@ -512,7 +512,7 @@ int send(int sockfd, const void *buf, size_t len, int flags)
         return -1;
     }
 
-    sfd->cur_flags = flags;
+    sfd->cur_wrflags = flags;
     return write(sockfd, buf, len);
 }
 
@@ -523,7 +523,7 @@ int recv(int sockfd, void *buf, size_t len, int flags)
         return -1;
     }
 
-    sfd->cur_flags = flags;
+    sfd->cur_rdflags = flags;
     return read(sockfd, buf, len);
 }
 
