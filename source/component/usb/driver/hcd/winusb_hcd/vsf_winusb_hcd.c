@@ -443,7 +443,6 @@ static void __vk_winusb_hcd_dev_detect_thread(void *arg)
         CW_USEDEFAULT, CW_USEDEFAULT,
         0, 0, NULL, NULL, wc.hInstance, NULL
     );
-    vsf_trace_debug("create_windows: %d\n", GetLastError());
     VSF_USB_ASSERT(__vk_winusb_hcd.hWndNotify != NULL);
 
     MSG Msg;
