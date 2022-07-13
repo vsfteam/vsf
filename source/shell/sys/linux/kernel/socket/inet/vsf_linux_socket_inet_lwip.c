@@ -856,13 +856,13 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
-    return __vsf_linux_socket_inet_recv(priv, buf, count, sfd->cur_flags, NULL, NULL);
+    return __vsf_linux_socket_inet_recv(priv, buf, count, sfd->cur_rdflags, NULL, NULL);
 }
 
 static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
-    return __vsf_linux_socket_inet_send(priv, buf, count, sfd->cur_flags, NULL, 0);
+    return __vsf_linux_socket_inet_send(priv, buf, count, sfd->cur_wrflags, NULL, 0);
 }
 
 static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
