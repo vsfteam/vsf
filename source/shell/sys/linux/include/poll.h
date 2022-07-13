@@ -36,6 +36,10 @@ struct pollfd {
     int fd;
     short events;
     short revents;
+
+    // private
+    short events_triggered;
+    void *trig;
 };
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout);

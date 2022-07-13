@@ -64,8 +64,6 @@ vsf_class(vsf_linux_fd_priv_t) {
     protected_member(
         void *target;
         int flags;
-        short events_pending;
-        short events_triggered;
 
         short status;
         short events;
