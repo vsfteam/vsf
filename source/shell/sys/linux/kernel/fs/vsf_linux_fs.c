@@ -578,6 +578,9 @@ void vsf_linux_fd_set_events(vsf_linux_fd_priv_t *priv, short events, vsf_protec
 {
     vsf_linux_trigger_t *trig = priv->trigger;
     priv->events |= events;
+    if (priv->events_callback.cb != NULL) {
+        priv->events_callback.cb(priv, priv->events_callback.param, events);
+    }
     if (trig != NULL) {
         priv->events_triggered = events & priv->events_pending;
         priv->events &= ~(priv->events_triggered & ~priv->sticky_events);

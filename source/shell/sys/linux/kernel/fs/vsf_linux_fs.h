@@ -73,6 +73,11 @@ vsf_class(vsf_linux_fd_priv_t) {
         // sticky_events will not be cleared
         //  use for eg pipe, pipe_tx is closed, pipe_rx will always POLLIN
         short sticky_events;
+
+        struct {
+            void *param;
+            void (*cb)(vsf_linux_fd_priv_t *priv, void *param, short events);
+        } events_callback;
     )
     private_member(
         int ref;
