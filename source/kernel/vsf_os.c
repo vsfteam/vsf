@@ -464,8 +464,8 @@ const code_region_t VSF_FORCED_SCHED_SAFE_CODE_REGION = {
 };
 #endif
 
-// vsf_sleep can only be called in vsf_plug_in_on_kernel_idle
-void vsf_sleep(void)
+// __vsf_sleep can only be called in vsf_plug_in_on_kernel_idle
+void __vsf_sleep(int level)
 {
 #if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_kernel_trace_idle();
@@ -487,7 +487,7 @@ void vsf_sleep(void)
 #endif
 
         // vsf_arch_sleep will not enable interrupt
-        vsf_arch_sleep(0);
+        vsf_arch_sleep(level);
 
 #if VSF_KERNEL_CFG_CPU_USAGE == ENABLED
         start_tick = vsf_systimer_get_elapsed(start_tick);

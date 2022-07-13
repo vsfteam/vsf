@@ -113,6 +113,10 @@ extern "C" {
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+// prototype: void vsf_sleep(int level = 0);
+#define vsf_sleep(...)                      __vsf_sleep((0, ##__VA_ARGS__))
+
 /*============================ TYPES =========================================*/
 
 typedef vsf_arch_prio_t vsf_sched_lock_status_t;
@@ -197,7 +201,7 @@ extern void vsf_forced_sched_unlock(vsf_sched_lock_status_t origlevel);
 #endif
 
 // vsf_sleep can only be called in vsf_plug_in_on_kernel_idle
-extern void vsf_sleep(void);
+extern void __vsf_sleep(int level);
 
 #ifdef __cplusplus
 }
