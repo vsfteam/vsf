@@ -64,7 +64,6 @@ vsf_class(vsf_linux_fd_priv_t) {
     protected_member(
         void *target;
         int flags;
-        vsf_linux_trigger_t *trigger;
         short events_pending;
         short events_triggered;
 
@@ -77,7 +76,7 @@ vsf_class(vsf_linux_fd_priv_t) {
 
         struct {
             void *param;
-            void (*cb)(vsf_linux_fd_priv_t *priv, void *param, short events);
+            void (*cb)(vsf_linux_fd_priv_t *priv, void *param, short events, vsf_protect_t orig);
         } events_callback;
     )
     private_member(

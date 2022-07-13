@@ -94,6 +94,10 @@ typedef struct vsf_linux_eventfd_priv_t {
     eventfd_t counter;
 } vsf_linux_eventfd_priv_t;
 
+typedef struct vsf_linux_fd_event_t {
+    vsf_linux_trigger_t *trigger;
+} vsf_linux_fd_event_t;
+
 typedef struct vsf_linux_epoll_node_t {
     vsf_linux_fd_priv_t *fd_priv;
     uint32_t events;
@@ -106,7 +110,7 @@ typedef struct vsf_linux_epollfd_priv_t {
     implement(vsf_linux_fd_priv_t)
     vsf_dlist_t rdy_list;
     vsf_dlist_t fd_list;
-    vsf_linux_trigger_t *trig;
+    vsf_linux_trigger_t *trigger;
 } vsf_linux_epollfd_priv_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -389,6 +393,7 @@ static int __vsf_linux_epollfd_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_epollfd_priv_t *epoll_priv = (vsf_linux_epollfd_priv_t *)sfd->priv;
     __vsf_dlist_foreach_next_unsafe(vsf_linux_epoll_node_t, fd_node, &epoll_priv->fd_list) {
+        _->fd_priv->events_callback.cb = NULL;
         free(_);
     }
     return 0;
@@ -407,17 +412,26 @@ static vsf_linux_epoll_node_t * __vsf_linux_epoll_get_node(vsf_linux_epollfd_pri
 }
 
 // __vsf_linux_epoll_on_events is called scheduler protected
-static void __vsf_linux_epoll_on_events(vsf_linux_fd_priv_t *priv, void *param, short events)
+static void __vsf_linux_epoll_on_events(vsf_linux_fd_priv_t *priv, void *param, short events, vsf_protect_t orig)
 {
     vsf_linux_epollfd_priv_t *epoll_priv = (vsf_linux_epollfd_priv_t *)param;
+    vsf_linux_trigger_t *trig = epoll_priv->trigger;
     vsf_linux_epoll_node_t *node = __vsf_linux_epoll_get_node(epoll_priv, priv);
     VSF_LINUX_ASSERT(node != NULL);
 
     if (!vsf_dlist_is_in(vsf_linux_epoll_node_t, rdy_node, &epoll_priv->rdy_list, node)) {
         if (events & node->events) {
             vsf_dlist_add_to_tail(vsf_linux_epoll_node_t, rdy_node, &epoll_priv->rdy_list, node);
+            epoll_priv->trigger = NULL;
+            vsf_unprotect_sched(orig);
+
+            if (trig != NULL) {
+                vsf_linux_trigger_signal(trig, 0);
+            }
+            return;
         }
     }
+    vsf_unprotect_sched(orig);
 }
 
 int __vsf_linux_epoll_tick(vsf_linux_epollfd_priv_t *epoll_priv, struct epoll_event *events, int maxevents, vsf_timeout_tick_t timeout)
@@ -451,7 +465,7 @@ int __vsf_linux_epoll_tick(vsf_linux_epollfd_priv_t *epoll_priv, struct epoll_ev
             return ret;
         }
 
-        epoll_priv->trig = &trig;
+        epoll_priv->trigger = &trig;
         vsf_unprotect_sched(orig);
 
         int r = vsf_linux_trigger_pend(&trig, timeout);
@@ -510,14 +524,15 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
         node->data = event->data;
 
         orig = vsf_protect_sched();
-            vsf_dlist_add_to_head(vsf_linux_epoll_node_t, fd_node, &epoll_priv->fd_list, node);
-            priv->events_callback.param = epoll_priv;
-            priv->events_callback.cb = __vsf_linux_epoll_on_events;
-            events_triggered = priv->events & node->events;
-            if (events_triggered) {
-                __vsf_linux_epoll_on_events(priv, epoll_priv, events_triggered);
-            }
-        vsf_unprotect_sched(orig);
+        vsf_dlist_add_to_head(vsf_linux_epoll_node_t, fd_node, &epoll_priv->fd_list, node);
+        priv->events_callback.param = epoll_priv;
+        priv->events_callback.cb = __vsf_linux_epoll_on_events;
+        events_triggered = priv->events & node->events;
+        if (events_triggered) {
+            __vsf_linux_epoll_on_events(priv, epoll_priv, events_triggered, orig);
+        } else {
+            vsf_unprotect_sched(orig);
+        }
         break;
     case EPOLL_CTL_MOD:
         orig = vsf_protect_sched();
@@ -531,9 +546,10 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 
         events_triggered = priv->events & node->events;
         if (events_triggered) {
-            __vsf_linux_epoll_on_events(priv, epoll_priv, events_triggered);
+            __vsf_linux_epoll_on_events(priv, epoll_priv, events_triggered, orig);
+        } else {
+            vsf_unprotect_sched(orig);
         }
-        vsf_unprotect_sched(orig);
         break;
     case EPOLL_CTL_DEL:
         orig = vsf_protect_sched();
@@ -547,6 +563,7 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
         if (vsf_dlist_is_in(vsf_linux_epoll_node_t, rdy_node, &epoll_priv->rdy_list, node)) {
             vsf_dlist_remove(vsf_linux_epoll_node_t, rdy_node, &epoll_priv->rdy_list, node);
         }
+        priv->events_callback.cb = NULL;
         vsf_unprotect_sched(orig);
         free(node);
         break;
@@ -772,6 +789,24 @@ bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
     return !(sfd->priv->flags & O_NONBLOCK);
 }
 
+static void __vsf_linux_fd_on_events(vsf_linux_fd_priv_t *priv, void *param, short events, vsf_protect_t orig)
+{
+    vsf_linux_fd_event_t *fd_event = param;
+    vsf_linux_trigger_t *trig = fd_event->trigger;
+    if (trig != NULL) {
+        priv->events_triggered = events & priv->events_pending;
+        priv->events &= ~(priv->events_triggered & ~priv->sticky_events);
+        if (priv->events_triggered) {
+            fd_event->trigger = NULL;
+            vsf_unprotect_sched(orig);
+
+            vsf_linux_trigger_signal(trig, 0);
+            return;
+        }
+    }
+    vsf_unprotect_sched(orig);
+}
+
 // vsf_linux_fd_[pend/set/clear]_[status/events] MUST be called scheduler protected
 short vsf_linux_fd_pend_events(vsf_linux_fd_priv_t *priv, short events, vsf_linux_trigger_t *trig, vsf_protect_t orig)
 {
@@ -780,17 +815,20 @@ short vsf_linux_fd_pend_events(vsf_linux_fd_priv_t *priv, short events, vsf_linu
         priv->events &= ~(events_triggered & ~priv->sticky_events);
         vsf_unprotect_sched(orig);
     } else {
-        priv->trigger = trig;
+        vsf_linux_fd_event_t fd_event = {
+            .trigger    = trig,
+        };
+        priv->events_callback.param = &fd_event;
+        priv->events_callback.cb = __vsf_linux_fd_on_events;
         priv->events_pending = events;
         vsf_unprotect_sched(orig);
 
         int ret = vsf_linux_trigger_pend(trig, -1);
+        orig = vsf_protect_sched();
+            priv->events_callback.cb = NULL;
+        vsf_unprotect_sched(orig);
         if (!ret) {
             events_triggered = priv->events_triggered;
-        } else {
-            orig = vsf_protect_sched();
-                priv->trigger = NULL;
-            vsf_unprotect_sched(orig);
         }
         priv->events_triggered = 0;
     }
@@ -799,23 +837,12 @@ short vsf_linux_fd_pend_events(vsf_linux_fd_priv_t *priv, short events, vsf_linu
 
 void vsf_linux_fd_set_events(vsf_linux_fd_priv_t *priv, short events, vsf_protect_t orig)
 {
-    vsf_linux_trigger_t *trig = priv->trigger;
     priv->events |= events;
     if (priv->events_callback.cb != NULL) {
-        priv->events_callback.cb(priv, priv->events_callback.param, events);
+        priv->events_callback.cb(priv, priv->events_callback.param, events, orig);
+    } else {
+        vsf_unprotect_sched(orig);
     }
-    if (trig != NULL) {
-        priv->events_triggered = events & priv->events_pending;
-        priv->events &= ~(priv->events_triggered & ~priv->sticky_events);
-        if (priv->events_triggered) {
-            priv->trigger = NULL;
-            vsf_unprotect_sched(orig);
-
-            vsf_linux_trigger_signal(trig, 0);
-            return;
-        }
-    }
-    vsf_unprotect_sched(orig);
 }
 
 void vsf_linux_fd_set_status(vsf_linux_fd_priv_t *priv, short status, vsf_protect_t orig)
@@ -849,6 +876,9 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
     int ret = 0;
     nfds_t i;
     vsf_linux_trigger_t trig;
+    vsf_linux_fd_event_t fd_event = {
+        .trigger    = &trig,
+    };
     short events_triggered;
 
     vsf_linux_trigger_init(&trig);
@@ -885,11 +915,8 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             }
             priv = sfd->priv;
             priv->events_pending = fds[i].events;
-            if (priv->trigger != NULL) {
-                VSF_LINUX_ASSERT(priv->trigger == &trig);
-            } else {
-                priv->trigger = &trig;
-            }
+            priv->events_callback.param = &fd_event;
+            priv->events_callback.cb = __vsf_linux_fd_on_events;
         }
         vsf_unprotect_sched(orig);
 
@@ -904,7 +931,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             priv = sfd->priv;
             VSF_LINUX_ASSERT(priv != NULL);
             orig = vsf_protect_sched();
-                priv->trigger = NULL;
+                priv->events_callback.cb = NULL;
                 priv->events |= priv->events_triggered;
                 priv->events_triggered = 0;
             vsf_unprotect_sched(orig);
@@ -2194,7 +2221,7 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 
 do_return:
     orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT((NULL == sfd->priv->trigger) || !(sfd->priv->events_pending & POLLIN));
+    VSF_LINUX_ASSERT((NULL == sfd->priv->events_callback.cb) || !(sfd->priv->events_pending & POLLIN));
     if (!vsf_stream_get_data_size(stream)) {
         __vsf_linux_stream_evt(priv, orig, POLLIN, false);
     } else {
@@ -2231,7 +2258,7 @@ ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t co
     }
 
     orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT((NULL == sfd->priv->trigger) || !(sfd->priv->events_pending & POLLOUT));
+    VSF_LINUX_ASSERT((NULL == sfd->priv->events_callback.cb) || !(sfd->priv->events_pending & POLLOUT));
     if (!vsf_stream_get_free_size(stream)) {
         __vsf_linux_stream_evt(priv, orig, POLLOUT, false);
     } else {
