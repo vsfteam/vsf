@@ -1,8 +1,14 @@
 # VSF -- Versaloon Software Framework
+
 [![GitHub](https://img.shields.io/github/license/vsfteam/vsf.svg)](https://github.com/vsfteam/vsf/blob/master/LICENSE)
+
 [![windows-build](https://github.com/vsfteam/vsf/actions/workflows/windows-build.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/windows-build.yml)
 [![cmake-native-build](https://github.com/vsfteam/vsf/actions/workflows/cmake-native-build.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/cmake-native-build.yml)
 [![cmake-arm-cross-build](https://github.com/vsfteam/vsf/actions/workflows/cmake-arm-cross-build.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/cmake-arm-cross-build.yml)
+
+[![vsf.linux windows build](https://github.com/vsf-linux/vsf.linux/actions/workflows/windows-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/windows-build.yml)
+[![cmake-arm-cross-build](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-arm-cross-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-arm-cross-build.yml)
+[![cmake-native-build](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-native-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-native-build.yml)
 
 [中文](README_zh.md) |
 
