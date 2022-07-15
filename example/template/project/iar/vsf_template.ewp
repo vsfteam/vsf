@@ -14877,10 +14877,10 @@
                         <group>
                             <name>74hc165</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\gpio\74hc165\vsf_74hc165_gpio.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\gpio\74hc165\vsf_gpio_74hc165.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\gpio\74hc165\vsf_74hc165_gpio.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\gpio\74hc165\vsf_gpio_74hc165.h</name>
                             </file>
                         </group>
                     </group>
@@ -14889,10 +14889,10 @@
                         <group>
                             <name>gpio_i2c</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\i2c\gpio_i2c\gpio_i2c.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\i2c\gpio_i2c\vsf_gpio_i2c.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\i2c\gpio_i2c\gpio_i2c.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vsf\i2c\gpio_i2c\vsf_gpio_i2c.h</name>
                             </file>
                         </group>
                     </group>

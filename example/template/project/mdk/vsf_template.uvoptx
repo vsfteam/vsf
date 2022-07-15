@@ -30049,8 +30049,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_74hc165_gpio.c</PathWithFileName>
-      <FilenameWithoutPath>vsf_74hc165_gpio.c</FilenameWithoutPath>
+      <PathWithFileName>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_gpio_74hc165.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_gpio_74hc165.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -30061,8 +30061,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_74hc165_gpio.h</PathWithFileName>
-      <FilenameWithoutPath>vsf_74hc165_gpio.h</FilenameWithoutPath>
+      <PathWithFileName>../../../../source/hal/driver/vsf/gpio/74hc165/vsf_gpio_74hc165.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_gpio_74hc165.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

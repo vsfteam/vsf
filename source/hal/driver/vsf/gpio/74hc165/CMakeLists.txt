@@ -1,5 +1,5 @@
 # CMakeLists head
 
 target_sources(${VSF_LIB_NAME} INTERFACE
-    vsf_74hc165_gpio.c
+    vsf_gpio_74hc165.c
 )
