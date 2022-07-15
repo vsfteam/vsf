@@ -1,4 +1,4 @@
-name: windows-build
+name: vsf windows build
 
 on:
   push:
