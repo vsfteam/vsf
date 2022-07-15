@@ -1,0 +1,23 @@
+name: repository dispath
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.VSF_AIO }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'vsf-linux',
+              repo: 'vsf.linux',
+              workflow_id: 'vsf-sync.yml',
+              ref: 'main'
+            })
