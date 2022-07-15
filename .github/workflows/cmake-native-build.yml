@@ -1,4 +1,4 @@
-name: cmake-native-build
+name: vsf cmake native build
 
 on:
   push:

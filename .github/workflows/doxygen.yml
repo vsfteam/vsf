@@ -1,4 +1,4 @@
-name: doxygen
+name: vsf doxygen
 
 on:
   push:
