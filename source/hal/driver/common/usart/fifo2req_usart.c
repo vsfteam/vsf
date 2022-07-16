@@ -61,17 +61,25 @@ static void __vsf_usart_fifo2req_isr_handler(void * target_ptr,
 
     em_usart_irq_mask_t current_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX | USART_IRQ_MASK_TX);
 
-    if (irq_mask & (USART_IRQ_MASK_RX | USART_IRQ_MASK_RX_TIMEOUT)) {
-        if (__vsf_usart_fifo2req_process(&request_ptr->rx, usart_ptr)) {
-            request_ptr->disable_irq_fn(usart_ptr, USART_IRQ_MASK_RX);
-            current_irq_mask |= USART_IRQ_MASK_RX_CPL;
+    if (irq_mask & USART_IRQ_MASK_RX) {
+        if (request_ptr->irq_mask & USART_IRQ_MASK_RX_CPL) {
+            if (__vsf_usart_fifo2req_process(&request_ptr->rx, usart_ptr)) {
+                request_ptr->disable_irq_fn(usart_ptr, USART_IRQ_MASK_RX);
+                current_irq_mask |= USART_IRQ_MASK_RX_CPL;
+            }
+        } else {
+            current_irq_mask |= USART_IRQ_MASK_RX;
         }
     }
 
     if (irq_mask & USART_IRQ_MASK_TX) {
-        if (__vsf_usart_fifo2req_process(&request_ptr->tx, usart_ptr)) {
-            request_ptr->disable_irq_fn(usart_ptr, USART_IRQ_MASK_TX);
-            current_irq_mask |= USART_IRQ_MASK_TX_CPL;
+        if (request_ptr->irq_mask & USART_IRQ_MASK_TX_CPL) {
+            if (__vsf_usart_fifo2req_process(&request_ptr->tx, usart_ptr)) {
+                request_ptr->disable_irq_fn(usart_ptr, USART_IRQ_MASK_TX);
+                current_irq_mask |= USART_IRQ_MASK_TX_CPL;
+            }
+        } else {
+            current_irq_mask |= USART_IRQ_MASK_TX;
         }
     }
 
@@ -147,7 +155,10 @@ vsf_err_t vsf_usart_fifo2req_request_tx(vsf_usart_fifo2req_t *request_ptr,
 
     __vsf_usart_fifo2req_isr_init(&request_ptr->tx, buffer_ptr, count);
     __vsf_usart_fifo2req_isr_handler(request_ptr, usart_ptr, USART_IRQ_MASK_TX);
-    request_ptr->enable_irq_fn(usart_ptr, USART_IRQ_MASK_TX);
+
+    if (request_ptr->tx.count < request_ptr->tx.max_count) {
+        request_ptr->enable_irq_fn(usart_ptr, USART_IRQ_MASK_TX);
+    }
 
     return VSF_ERR_NONE;
 }
