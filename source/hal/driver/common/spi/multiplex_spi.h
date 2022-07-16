@@ -34,9 +34,8 @@
 
 #include "utilities/ooc_class.h"
 
-// undef after include vsf_template_spi.h
 #define VSF_SPI_CFG_DEC_PREFIX              vsf_multiplex
-#include "hal/driver/common/template/vsf_template_spi.h"
+#include "hal/driver/common/spi/spi_template.h"
 
 /*============================ MACROS ========================================*/
 

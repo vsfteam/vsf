@@ -35,3 +35,6 @@
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
 
+#undef VSF_RNG_CFG_DEC_PREFIX
+#undef VSF_RNG_CFG_DEC_UPCASE_PREFIX
+
