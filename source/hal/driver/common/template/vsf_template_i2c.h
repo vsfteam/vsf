@@ -34,7 +34,7 @@ extern "C" {
 #   if defined(VSF_HW_I2C_COUNT) && (VSF_HW_I2C_COUNT != 0)
 #       define VSF_I2C_CFG_PREFIX               vsf_hw
 #   elif VSF_HAL_USE_GPIO_I2C == ENABLED
-#       define VSF_I2C_CFG_PREFIX               vsf_hw
+#       define VSF_I2C_CFG_PREFIX               vsf_gpio
 #   else
 #       define VSF_I2C_CFG_PREFIX               vsf
 #   endif
