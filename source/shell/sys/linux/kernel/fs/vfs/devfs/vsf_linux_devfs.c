@@ -277,7 +277,7 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
     sfd->op = &vsf_linux_term_fdop;
     vsf_linux_term_fdop.fn_init(sfd);
 
-    priv->op = &vsf_mem_stream_op;
+    priv->op = &vsf_fifo_stream_op;
     priv->buffer = priv->__buffer;
     priv->size = sizeof(priv->__buffer);
     priv->stream_rx = &priv->use_as__vsf_stream_t;
