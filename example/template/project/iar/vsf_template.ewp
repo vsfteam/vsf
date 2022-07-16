@@ -7193,6 +7193,9 @@
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\linux_demo\mount_demo.c</name>
                 </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\linux_demo\tty_demo.c</name>
+                </file>
             </group>
             <group>
                 <name>lua_demo</name>

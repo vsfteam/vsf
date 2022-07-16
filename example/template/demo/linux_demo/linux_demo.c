@@ -74,6 +74,17 @@ int vsf_linux_create_fhs(void)
 #ifdef __AIC8800__
     extern void aic8800_demo_init(void);
     aic8800_demo_init();
+
+#   if APP_USE_LINUX_TTY_DEMO == ENABLED
+    // TODO: use VSF APIs to configure io
+    // PA10/PA11 is USART1
+    iomux_gpio_config_sel_setf(10, 0x01);
+    iomux_gpio_config_sel_setf(11, 0x01);
+    vsf_linux_fs_bind_uart("/dev/ttyS0", (vsf_usart_t *)&vsf_hw_usart1);
+
+    extern int tty_main(int argc, char *argv[]);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/tty", tty_main);
+#   endif
 #endif
 #if APP_USE_USBH_DEMO == ENABLED
     extern int usbh_main(int argc, char *argv[]);

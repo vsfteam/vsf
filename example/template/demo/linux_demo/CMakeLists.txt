@@ -5,4 +5,5 @@ target_sources(${CMAKE_PROJECT_NAME} PUBLIC
     libusb_demo.c
     mount_demo.c
     httpd_demo.c
+    tty_demo.c
 )
