@@ -27,6 +27,19 @@
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+
+#define VSF_USART_FIFO2REQ_IMP_LV0(__PREFIX)                                                                \
+    .request = {                                                                                            \
+        .enable_irq_fn  = (vsf_usart_fifo2req_irq_fn_t *) VSF_MCONNECT(__, __PREFIX, _usart_irq_enable),    \
+        .disable_irq_fn = (vsf_usart_fifo2req_irq_fn_t *) VSF_MCONNECT(__, __PREFIX, _usart_irq_disable),   \
+        .rx = {                                                                                             \
+            .fifo_fn    = (vsf_usart_fifo2req_fifo_fn_t *)VSF_MCONNECT(__PREFIX, _usart_rxfifo_read),       \
+        },                                                                                                  \
+        .tx = {                                                                                             \
+            .fifo_fn    = (vsf_usart_fifo2req_fifo_fn_t *)VSF_MCONNECT(__PREFIX, _usart_txfifo_write),      \
+        },                                                                                                  \
+    },
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -68,26 +81,29 @@ typedef struct vsf_usart_fifo2req_t {
 
 vsf_err_t vsf_usart_fifo2req_init(vsf_usart_fifo2req_t *request_ptr,
                                   vsf_usart_fifo2req_init_fn_t  * init_fn,
-                                  vsf_usart_fifo2req_irq_fn_t   * enable_irq_fn,
-                                  vsf_usart_fifo2req_irq_fn_t   * disable_irq_fn,
-                                  vsf_usart_fifo2req_fifo_fn_t  * rxfifo_fn,
-                                  vsf_usart_fifo2req_fifo_fn_t  * txfifo_fn,
                                   vsf_usart_t *usart_ptr,
                                   usart_cfg_t *cfg_ptr);
 
-vsf_err_t vsf_usart_fifo2req_request_rx(vsf_usart_fifo2req_t *request_ptr, vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
+vsf_err_t vsf_usart_fifo2req_request_rx(vsf_usart_fifo2req_t *request_ptr,
+                                        vsf_usart_t *usart_ptr,
+                                        void *buffer_ptr,
+                                        uint_fast32_t count);
 
-vsf_err_t vsf_usart_fifo2req_cancel_rx(vsf_usart_fifo2req_t *request_ptr, vsf_usart_t *usart_ptr);
+vsf_err_t vsf_usart_fifo2req_cancel_rx(vsf_usart_fifo2req_t *request_ptr,
+                                       vsf_usart_t *usart_ptr);
 
-int_fast32_t vsf_usart_fifo2req_get_rx_count(vsf_usart_fifo2req_t *request_ptr, vsf_usart_t *usart_ptr);
+int_fast32_t vsf_usart_fifo2req_get_rx_count(vsf_usart_fifo2req_t *request_ptr,
+                                             vsf_usart_t *usart_ptr);
 
 vsf_err_t vsf_usart_fifo2req_request_tx(vsf_usart_fifo2req_t *request_ptr,
                                         vsf_usart_t *usart_ptr,
                                         void *buffer_ptr, uint_fast32_t count);
 
-vsf_err_t vsf_usart_fifo2req_cancel_tx(vsf_usart_fifo2req_t *request_ptr, vsf_usart_t *usart_ptr);
+vsf_err_t vsf_usart_fifo2req_cancel_tx(vsf_usart_fifo2req_t *request_ptr,
+                                       vsf_usart_t *usart_ptr);
 
-int_fast32_t vsf_usart_fifo2req_get_tx_count(vsf_usart_fifo2req_t *request_ptr, vsf_usart_t *usart_ptr);
+int_fast32_t vsf_usart_fifo2req_get_tx_count(vsf_usart_fifo2req_t *request_ptr,
+                                             vsf_usart_t *usart_ptr);
 
 void vsf_usart_fifo2req_irq_enable(vsf_usart_fifo2req_t *request_ptr,
                                    vsf_usart_t *usart_ptr,

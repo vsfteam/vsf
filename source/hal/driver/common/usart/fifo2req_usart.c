@@ -96,19 +96,11 @@ static void __vsf_usart_fifo2req_isr_init(vsf_usart_fifo2req_item_t *request_ite
 
 vsf_err_t vsf_usart_fifo2req_init(vsf_usart_fifo2req_t *request_ptr,
                                   vsf_usart_fifo2req_init_fn_t  * init_fn,
-                                  vsf_usart_fifo2req_irq_fn_t   * enable_irq_fn,
-                                  vsf_usart_fifo2req_irq_fn_t   * disable_irq_fn,
-                                  vsf_usart_fifo2req_fifo_fn_t  * rxfifo_fn,
-                                  vsf_usart_fifo2req_fifo_fn_t  * txfifo_fn,
                                   vsf_usart_t *usart_ptr,
                                   usart_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(init_fn != NULL);
-    VSF_HAL_ASSERT(enable_irq_fn != NULL);
-    VSF_HAL_ASSERT(disable_irq_fn != NULL);
-    VSF_HAL_ASSERT(rxfifo_fn != NULL);
-    VSF_HAL_ASSERT(txfifo_fn != NULL);
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(cfg_ptr != NULL);
 
@@ -117,11 +109,6 @@ vsf_err_t vsf_usart_fifo2req_init(vsf_usart_fifo2req_t *request_ptr,
     request_ptr->isr = request_cfg.isr;
     request_cfg.isr.handler_fn = __vsf_usart_fifo2req_isr_handler;
     request_cfg.isr.target_ptr = (void *)request_ptr;
-
-    request_ptr->enable_irq_fn = enable_irq_fn;
-    request_ptr->disable_irq_fn = disable_irq_fn;
-    request_ptr->rx.fifo_fn = rxfifo_fn;
-    request_ptr->tx.fifo_fn = txfifo_fn;
 
     return init_fn(usart_ptr, &request_cfg);
 }
@@ -186,7 +173,8 @@ void vsf_usart_fifo2req_irq_enable(vsf_usart_fifo2req_t *request_ptr,
     VSF_HAL_ASSERT(usart_ptr != NULL);
 
     VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK) == 0);
-    VSF_HAL_ASSERT((irq_mask & (USART_IRQ_MASK_RX | USART_IRQ_MASK_TX)) == 0);
+    VSF_HAL_ASSERT(((irq_mask & USART_IRQ_MASK_RX) == 0) || ((request_ptr->irq_mask & USART_IRQ_MASK_RX_CPL) == 0));
+    VSF_HAL_ASSERT(((irq_mask & USART_IRQ_MASK_TX) == 0) || ((request_ptr->irq_mask & USART_IRQ_MASK_TX_CPL) == 0));
 
     em_usart_irq_mask_t request_irq_mask = irq_mask & (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
     em_usart_irq_mask_t others_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
@@ -203,12 +191,10 @@ void vsf_usart_fifo2req_irq_disable(vsf_usart_fifo2req_t *request_ptr,
                                     em_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(request_ptr != NULL);
-
     VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK) == 0);
-    VSF_HAL_ASSERT((irq_mask & (USART_IRQ_MASK_RX | USART_IRQ_MASK_TX)) == 0);
 
     em_usart_irq_mask_t request_irq_mask = irq_mask & (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
-    em_usart_irq_mask_t others_irq_mask = irq_mask & ~~(USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+    em_usart_irq_mask_t others_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
 
     request_ptr->irq_mask &= ~request_irq_mask;
     if (others_irq_mask) {

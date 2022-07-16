@@ -55,10 +55,6 @@ vsf_err_t vsf_real_usart_init(vsf_real_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
 {
     return vsf_usart_fifo2req_init(&usart_ptr->request,
                                    (vsf_usart_fifo2req_init_fn_t *)__vsf_real_usart_init,
-                                   (vsf_usart_fifo2req_irq_fn_t  *)__vsf_real_usart_irq_enable,
-                                   (vsf_usart_fifo2req_irq_fn_t  *)__vsf_real_usart_irq_disable,
-                                   (vsf_usart_fifo2req_fifo_fn_t *)vsf_real_usart_rxfifo_read,
-                                   (vsf_usart_fifo2req_fifo_fn_t *)vsf_real_usart_txfifo_write,
                                    (vsf_usart_t *)usart_ptr, cfg_ptr);
 }
 

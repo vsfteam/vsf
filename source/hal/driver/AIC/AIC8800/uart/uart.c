@@ -269,9 +269,12 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 /*============================ INCLUDES ======================================*/
 
 #if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
+#   define __USART_REQUEST_IMP      VSF_USART_FIFO2REQ_IMP_LV0(VSF_USART_CFG_IMP_PREFIX)
 #   undef  vsf_hw_usart_init
 #   undef  vsf_hw_usart_irq_enable
 #   undef  vsf_hw_usart_irq_disable
+#else
+#   define __USART_REQUEST_IMP
 #endif
 
 #define VSF_USART_CFG_IMP_LV0(__count, __hal_op)                                \
@@ -284,6 +287,7 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
     };                                                                          \
     vsf_hw_usart_t vsf_hw_usart ## __count = {                                  \
         .usart_const  = &__vsf_hw_usart ## __count ## _clock,                   \
+        __USART_REQUEST_IMP                                                     \
         __hal_op                                                                \
     };                                                                          \
     void UART ## __count ## _IRQHandler(void)                                   \
