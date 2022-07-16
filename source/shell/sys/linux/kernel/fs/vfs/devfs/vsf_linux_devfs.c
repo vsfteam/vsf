@@ -248,12 +248,12 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
         mode |= USART_NO_PARITY;
     }
     if (term->c_cflag & CSTOPB) {
-        mode |= USART_1_STOPBIT;
-    } else {
         mode |= USART_2_STOPBIT;
+    } else {
+        mode |= USART_1_STOPBIT;
     }
 
-    vsf_usart_irq_disable(uart, USART_IRQ_MASK_RX);
+    vsf_usart_irq_disable(uart, USART_IRQ_MASK_RX | USART_IRQ_MASK_TX_CPL);
     vsf_usart_disable(uart);
     vsf_usart_init(uart, & (usart_cfg_t) {
         .mode               = mode,
@@ -266,7 +266,7 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
         },
     });
     vsf_usart_enable(uart);
-    vsf_usart_irq_enable(uart, USART_IRQ_MASK_RX);
+    vsf_usart_irq_enable(uart, USART_IRQ_MASK_RX | USART_IRQ_MASK_TX_CPL);
 }
 
 static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
