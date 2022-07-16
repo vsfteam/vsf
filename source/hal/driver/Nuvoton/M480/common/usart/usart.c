@@ -17,7 +17,7 @@
 
 #define VSF_USART_CFG_IMP_PREFIX                vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HW
-#define VSF_USART_CFG_REQUEST_API           DISABLED
+#define VSF_USART_CFG_REQUEST_API               DISABLED
 
 /*============================ INCLUDES ======================================*/
 

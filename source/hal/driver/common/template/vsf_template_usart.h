@@ -46,10 +46,6 @@ extern "C" {
 #   define VSF_USART_CFG_FUNCTION_RENAME            ENABLED
 #endif
 
-#ifndef VSF_USART_CFG_FIFO_TO_REQUEST
-#   define VSF_USART_CFG_FIFO_TO_REQUEST            DISABLED
-#endif
-
 #ifndef VSF_USART_CFG_REIMPLEMENT_MODE
 #   define VSF_USART_CFG_REIMPLEMENT_MODE           DISABLED
 #endif
@@ -60,6 +56,10 @@ extern "C" {
 
 #ifndef VSF_USART_CFG_REIMPLEMENT_STATUS
 #   define VSF_USART_CFG_REIMPLEMENT_STATUS         DISABLED
+#endif
+
+#ifndef VSF_USART_CFG_FIFO_TO_REQUEST
+#   define VSF_USART_CFG_FIFO_TO_REQUEST            DISABLED
 #endif
 
 #ifndef VSF_USART_CFG_REQUEST_EMPTY_IMPL
@@ -171,6 +171,14 @@ typedef enum em_usart_irq_mask_t {
                                       | USART_IRQ_MASK_PARITY_ERR
                                       | USART_IRQ_MASK_BREAK_ERR
                                       | USART_IRQ_MASK_OVERFLOW_ERR,
+
+    USART_IRQ_MASK                  =   USART_IRQ_MASK_TX
+                                      | USART_IRQ_MASK_RX
+                                      | USART_IRQ_MASK_RX_TIMEOUT
+                                      | USART_IRQ_MASK_TX_CPL
+                                      | USART_IRQ_MASK_RX_CPL
+                                      | USART_IRQ_MASK_ERR,
+
 } em_usart_irq_mask_t;
 #endif
 
