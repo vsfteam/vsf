@@ -30,7 +30,7 @@ extern "C" {
 #include "template/vsf_template.h"
 
 #include "i2c/multiplex_i2c.h"
-#include "usart/fifo2req_usart.h"
+#include "spi/multiplex_spi.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

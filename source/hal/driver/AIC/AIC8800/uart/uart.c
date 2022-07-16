@@ -17,7 +17,7 @@
 
 #define VSF_USART_CFG_IMP_PREFIX                vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HW
-#define VSF_USART_CFG_REQUEST_EMPTY_IMPL    ENABLED
+#define VSF_USART_CFG_FIFO_TO_REQUEST           ENABLED
 
 /*============================ INCLUDES ======================================*/
 
@@ -29,6 +29,13 @@
 #include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/ipc/reg_ipc_comreg.h"
 #include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
+
+#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
+#   include "hal/driver/common/usart/fifo2req_usart.h"
+#   define  vsf_hw_usart_init           __vsf_hw_usart_init
+#   define  vsf_hw_usart_irq_enable     __vsf_hw_usart_irq_enable
+#   define  vsf_hw_usart_irq_disable    __vsf_hw_usart_irq_disable
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -53,10 +60,12 @@ typedef struct vsf_hw_usart_t {
     vsf_usart_t vsf_usart;
 #endif
     const vsf_hw_usart_const_t *usart_const;
-    vsf_usart_isr_t     isr;
 
-    usart_status_t       status;
-    em_usart_irq_mask_t  irq_mask;
+#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
+    vsf_usart_fifo2req_t request;
+#endif
+
+    vsf_usart_isr_t         isr;
 } vsf_hw_usart_t;
 
 /*============================ IMPLEMENTATION ================================*/
@@ -132,13 +141,6 @@ void vsf_hw_usart_irq_disable(vsf_hw_usart_t *hw_usart_ptr, em_usart_irq_mask_t 
     usart_const->reg->IRQCTL_REG &= ~irq_mask;
 }
 
-usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart_ptr)
-{
-    VSF_HAL_ASSERT(NULL != hw_usart_ptr);
-
-    return hw_usart_ptr->status;
-}
-
 static bool __hw_usart_read_fifo_is_empty(vsf_hw_usart_t *hw_usart_ptr)
 {
     return hw_usart_ptr->usart_const->reg->DBUFSTS_REG & UART_RX_DBUF_EMPTY_MSK;
@@ -147,6 +149,19 @@ static bool __hw_usart_read_fifo_is_empty(vsf_hw_usart_t *hw_usart_ptr)
 static bool __hw_usart_write_fifo_is_full(vsf_hw_usart_t *hw_usart_ptr)
 {
     return hw_usart_ptr->usart_const->reg->DBUFSTS_REG & UART_TX_DBUF_FULL_MSK;
+}
+
+usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_usart_ptr);
+
+    uint32_t idle_mask = UART_RX_DBUF_EMPTY | UART_TX_DBUF_EMPTY_MSK;
+
+    usart_status_t status = {
+        .is_busy = (hw_usart_ptr->usart_const->reg->DBUFSTS_REG & idle_mask) != idle_mask,
+    };
+
+    return status;
 }
 
 uint_fast16_t vsf_hw_usart_rxfifo_get_data_count(vsf_hw_usart_t *hw_usart_ptr)
@@ -252,6 +267,12 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 }
 
 /*============================ INCLUDES ======================================*/
+
+#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
+#   undef  vsf_hw_usart_init
+#   undef  vsf_hw_usart_irq_enable
+#   undef  vsf_hw_usart_irq_disable
+#endif
 
 #define VSF_USART_CFG_IMP_LV0(__count, __hal_op)                                \
     static const vsf_hw_usart_const_t __vsf_hw_usart ## __count ## _clock = {   \
