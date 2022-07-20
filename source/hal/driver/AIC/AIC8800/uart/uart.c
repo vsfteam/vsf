@@ -91,7 +91,7 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart_ptr, usart_cfg_t *cfg_ptr)
     reg->DFMTCFG_REG |= UART_DIVAE_MSK;                                     // div reg access enable
     reg->DIV0_REG = (div >> 4) & UART_DIV0_MSK;
     reg->DIV1_REG = (div >> 12) & UART_DIV1_MSK;
-    reg->DIV2_REG = (div & 0x1) + ((div >> 1) & 0x7) + ((div << 3) & 0x7);
+    reg->DIV2_REG = (div & 0x1) + ((div >> 1) & 0x7) + ((div << 3) & 0x70);
     reg->DFMTCFG_REG &= ~UART_DIVAE_MSK;                                    // div reg access disable
 
     reg->DBUFCFG_REG = UART_DBUFEN_MSK | UART_RXDRST_MSK | UART_TXDRST_MSK; // tx/rx data buf reset and enable
