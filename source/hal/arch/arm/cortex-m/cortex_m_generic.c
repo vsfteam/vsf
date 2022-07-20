@@ -348,7 +348,16 @@ int vsf_get_interrupt_id(void)
 WEAK(vsf_arch_sleep)
 void vsf_arch_sleep(uint_fast32_t mode)
 {
-    VSF_UNUSED_PARAM(mode);
+    switch (mode) {
+    case 0:     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;  break;
+    case 1:     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;  break;
+    default:
+        // arm core supports normalsleep(0) and deepsleep(1)
+        // for other vendor specified sleep modes,
+        //  chip vendor should rewrite vsf_arch_sleep in chip driver
+        VSF_ARCH_ASSERT(false);
+    }
+    __DSB();
     __WFE();
 }
 
