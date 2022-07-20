@@ -66,6 +66,9 @@ bool vsf_arch_low_level_init(void)
     /*! disable processor's support for unaligned access for debug purpose */
     SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
 #endif
+
+    // SEVONPEND is maybe initialized to 0, which will make wfe not sensitive to interrupt
+    SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
     return true;
 }
 
