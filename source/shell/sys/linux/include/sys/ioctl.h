@@ -23,7 +23,9 @@ struct winsize {
 };
 
 enum {
-    TIOCGWINSZ = F_IO,
+    TIOCGWINSZ      = F_IO,
+    TIOCGSERIAL     = F_IO + 1,
+    TIOCSSERIAL     = F_IO + 2,
 };
 
 //int ioctl(int fd, unsigned long request, ...);

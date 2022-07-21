@@ -1,5 +1,5 @@
-#ifndef __LIMITS_H__
-#define __LIMITS_H__
+#ifndef __VSF_LINUX_LIMITS_H__
+#define __VSF_LINUX_LIMITS_H__
 
 #ifdef __cplusplus
 extern "C" {

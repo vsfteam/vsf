@@ -29,11 +29,15 @@
 #   include "shell/sys/linux/include/unistd.h"
 #   include "shell/sys/linux/include/poll.h"
 #   include "shell/sys/linux/include/termios.h"
+#   include "shell/sys/linux/include/linux/serial.h"
+#   include "shell/sys/linux/include/sys/ioctl.h"
 #   include "shell/sys/linux/include/sys/stat.h"
 #else
 #   include <unistd.h>
 #   include <poll.h>
 #   include <termios.h>
+#   include <linux/serial.h>
+#   include <sys/ioctl.h>
 #   include <sys/stat.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
@@ -153,6 +157,7 @@ int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal)
 typedef struct vsf_linux_uart_priv_t {
     implement(vsf_linux_term_priv_t)
     implement(vsf_eda_t)
+    struct serial_struct ss;
     vsf_eda_t *eda_pending_tx;
 
     // use vsf_fifo_stream_t because it doesn't need protect.
@@ -216,19 +221,24 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
     uint32_t baudrate;
     uint32_t mode = 0;
 
-    if (term->c_ospeed != term->c_ispeed) {
-        vsf_trace_error("term: doesnot support different input/output speed\n");
-        return;
-    }
+    if (priv->ss.flags & ASYNC_SPD_CUST) {
+        baudrate = priv->ss.baud_base / priv->ss.custom_divisor;
+    } else {
+        if (term->c_ospeed != term->c_ispeed) {
+            vsf_trace_error("term: doesnot support different input/output speed\n");
+            return;
+        }
 
-    switch (term->c_ospeed) {
-    default:
-    case B0:    vsf_trace_error("term: baudrate does not supported\n");  return;
+        switch (term->c_ospeed) {
+        default:
+        case B0:    vsf_trace_error("term: baudrate does not supported\n");  return;
 #define __case_baudrate(b)      case VSF_MCONNECT2(B, b): baudrate = b; break;
-    VSF_MFOREACH(__case_baudrate,
-        50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200, 38400,
-        57600, 115200, 230400, 460800
-    )}
+        VSF_MFOREACH(__case_baudrate,
+            50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200,
+            38400, 57600, 115200, 230400, 460800, 500000, 576000, 921600, 1000000,
+            1152000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000
+        )}
+    }
 
     switch (term->c_cflag & CSIZE) {
     case CS5:   mode |= USART_5_BIT_LENGTH; break;
@@ -303,8 +313,18 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
 static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
+    union {
+        uintptr_t arg;
+        struct serial_struct *ss;
+    } arg_union;
+    arg_union.arg = arg;
 
     switch (cmd) {
+    case TIOCGSERIAL:
+        *arg_union.ss = priv->ss;
+        break;
+    case TIOCSSERIAL:
+        priv->ss = *arg_union.ss;
     case TCSETS:
         __vsf_linux_uart_config(priv);
         break;
