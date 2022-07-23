@@ -166,6 +166,15 @@ typedef struct vsf_linux_uart_priv_t {
     uint8_t __buffer[VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE];
 } vsf_linux_uart_priv_t;
 
+static const uint32_t __vsf_linux_uart_baudrates[] = {
+#define __enum_baudrates(__b)       [VSF_MCONNECT2(B, __b)] = __b,
+    VSF_MFOREACH(__enum_baudrates,
+        50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200,
+        38400, 57600, 115200, 230400, 460800, 500000, 576000, 921600, 1000000,
+        1152000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000
+    )
+};
+
 static uint_fast32_t __vsf_linux_uart_rx(vsf_usart_t *uart, vsf_linux_uart_priv_t *priv)
 {
     uint8_t *buffer;
@@ -229,15 +238,12 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
             return;
         }
 
-        switch (term->c_ospeed) {
-        default:
-        case B0:    vsf_trace_error("term: baudrate does not supported\n");  return;
-#define __case_baudrate(b)      case VSF_MCONNECT2(B, b): baudrate = b; break;
-        VSF_MFOREACH(__case_baudrate,
-            50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200,
-            38400, 57600, 115200, 230400, 460800, 500000, 576000, 921600, 1000000,
-            1152000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000
-        )}
+        if ((0 == term->c_ospeed) || (term->c_ospeed >= dimof(__vsf_linux_uart_baudrates))) {
+            vsf_trace_error("term: baudrate does not supported\n");
+            return;
+        }
+
+        baudrate = __vsf_linux_uart_baudrates[term->c_ospeed];
     }
 
     switch (term->c_cflag & CSIZE) {
