@@ -27,18 +27,22 @@
 #define __VSF_FS_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
+#   include "shell/sys/linux/include/errno.h"
 #   include "shell/sys/linux/include/poll.h"
 #   include "shell/sys/linux/include/termios.h"
-#   include "shell/sys/linux/include/linux/serial.h"
 #   include "shell/sys/linux/include/sys/ioctl.h"
 #   include "shell/sys/linux/include/sys/stat.h"
+#   include "shell/sys/linux/include/linux/serial.h"
+#   include "shell/sys/linux/include/linux/input.h"
 #else
 #   include <unistd.h>
+#   include <errno.h>
 #   include <poll.h>
 #   include <termios.h>
-#   include <linux/serial.h>
 #   include <sys/ioctl.h>
 #   include <sys/stat.h>
+#   include <linux/serial.h>
+#   include <linux/input.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 #   include "shell/sys/linux/include/simple_libc/stdio.h"
@@ -392,7 +396,7 @@ int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart)
 
 typedef struct vsf_linux_input_event_t {
     vsf_slist_node_t node;
-    vk_input_evt_t evt;
+    struct input_event evt;
 } vsf_linux_input_event_t;
 
 dcl_vsf_pool(vsf_linux_input_event_pool)
@@ -410,6 +414,10 @@ typedef struct vsf_linux_input_priv_t {
     vsf_slist_queue_t event_queue;
 } vsf_linux_input_priv_t;
 
+static void __vsf_linux_input_from_vsf_input(struct input_event *input_event, vk_input_type_t type, vk_input_evt_t *evt)
+{
+}
+
 static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
 {
     vsf_linux_input_priv_t *input_priv = container_of(notifier, vsf_linux_input_priv_t, notifier);
@@ -419,9 +427,12 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
         return;
     }
 
+    __vsf_linux_input_from_vsf_input(&event->evt, type, evt);
+
     vsf_protect_t orig = vsf_protect_int();
         vsf_slist_queue_enqueue(vsf_linux_input_event_t, node, &input_priv->event_queue, event);
     vsf_unprotect_int(orig);
+    vsf_linux_fd_set_status(&input_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
 }
 
 static void __vsf_linux_input_init(vsf_linux_fd_t *sfd)
@@ -432,6 +443,9 @@ static void __vsf_linux_input_init(vsf_linux_fd_t *sfd)
         vk_input_notifier_register(&input_priv->notifier);
     }
 
+    VSF_POOL_PREPARE(vsf_linux_input_event_pool, &input_priv->event_pool,
+        .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_int,
+    );
     VSF_POOL_ADD_BUFFER(vsf_linux_input_event_pool, &input_priv->event_pool,
         input_priv->event_buffer, sizeof(input_priv->event_buffer));
 }
@@ -443,12 +457,71 @@ static int __vsf_linux_input_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 
 static ssize_t __vsf_linux_input_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
-    return 0;
+    VSF_LINUX_ASSERT(!(count % sizeof(struct input_event)));
+    vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)sfd->priv;
+    struct input_event *linux_input_event = (struct input_event *)buf;
+    vsf_linux_input_event_t *event;
+    size_t read_count = 0;
+    vsf_protect_t orig;
+
+again:
+    while (read_count < count) {
+        orig = vsf_protect_int();
+            vsf_slist_queue_dequeue(vsf_linux_input_event_t, node, &input_priv->event_queue, event);
+        vsf_unprotect_int(orig);
+
+        if (NULL == event) {
+            break;
+        }
+
+        *linux_input_event = event->evt;
+        read_count += sizeof(struct input_event);
+    }
+
+    if (!read_count) {
+        if (vsf_linux_fd_is_block(sfd)) {
+            vsf_linux_trigger_t trig;
+            vsf_linux_trigger_init(&trig);
+
+            if (!vsf_linux_fd_pend_events(&input_priv->use_as__vsf_linux_fd_priv_t, POLLIN, &trig, vsf_protect_sched())) {
+                // triggered by signal
+                return -1;
+            }
+            goto again;
+        } else {
+            errno = EAGAIN;
+            return -1;
+        }
+    }
+
+    return read_count;
 }
 
 static ssize_t __vsf_linux_input_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
-    return 0;
+    VSF_LINUX_ASSERT(!(count % sizeof(struct input_event)));
+    vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)sfd->priv;
+    struct input_event *linux_input_event = (struct input_event *)buf;
+    vsf_linux_input_event_t *event;
+    size_t written_count = 0;
+
+    while (written_count < count) {
+        event = VSF_POOL_ALLOC(vsf_linux_input_event_pool, &input_priv->event_pool);
+        if (event != NULL) {
+            break;
+        }
+
+        event->evt = *linux_input_event;
+        vsf_protect_t orig = vsf_protect_int();
+            vsf_slist_queue_enqueue(vsf_linux_input_event_t, node, &input_priv->event_queue, event);
+        vsf_unprotect_int(orig);
+        vsf_linux_fd_set_status(&input_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
+
+        linux_input_event++;
+        written_count += sizeof(struct input_event);
+    }
+
+    return written_count;
 }
 
 static int __vsf_linux_input_close(vsf_linux_fd_t *sfd)
