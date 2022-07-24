@@ -474,7 +474,7 @@ again:
             break;
         }
 
-        *linux_input_event = event->evt;
+        *linux_input_event++ = event->evt;
         read_count += sizeof(struct input_event);
     }
 
@@ -511,13 +511,12 @@ static ssize_t __vsf_linux_input_write(vsf_linux_fd_t *sfd, const void *buf, siz
             break;
         }
 
-        event->evt = *linux_input_event;
+        event->evt = *linux_input_event++;
         vsf_protect_t orig = vsf_protect_int();
             vsf_slist_queue_enqueue(vsf_linux_input_event_t, node, &input_priv->event_queue, event);
         vsf_unprotect_int(orig);
         vsf_linux_fd_set_status(&input_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
 
-        linux_input_event++;
         written_count += sizeof(struct input_event);
     }
 
