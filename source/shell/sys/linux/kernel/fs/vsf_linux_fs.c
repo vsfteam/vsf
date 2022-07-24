@@ -2018,12 +2018,13 @@ int vsf_linux_fs_get_target(const char *pathname, void **target)
     return err;
 }
 
-int vsf_linux_fs_bind_target_ex(const char *pathname,
+vsf_linux_fd_priv_t * vsf_linux_fs_bind_target_ex(const char *pathname,
         void *target, const vsf_linux_fd_op_t *op,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write,
         uint_fast32_t feature, uint64_t size)
 {
+    void *priv;
     int fd = __vsf_linux_create_open_path((char *)pathname);
     if (fd >= 0) {
         int err = vsf_linux_fd_bind_target(fd, target, peda_read, peda_write);
@@ -2035,13 +2036,15 @@ int vsf_linux_fs_bind_target_ex(const char *pathname,
             vfs_file->size = size;
             vfs_file->f.op = (void *)op;
         }
+
+        vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
         close(fd);
-        return err;
+        return sfd->priv;
     }
-    return -1;
+    return NULL;
 }
 
-int vsf_linux_fs_bind_target(const char *pathname, void *target,
+vsf_linux_fd_priv_t * vsf_linux_fs_bind_target(const char *pathname, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write)
 {
@@ -2099,10 +2102,15 @@ __vsf_component_peda_ifs_entry(__vk_vfs_buffer_read, vk_file_read)
 int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
         uint_fast32_t feature, uint64_t size)
 {
-    return vsf_linux_fs_bind_target_ex(pathname, buffer, NULL,
+    vsf_linux_fd_priv_t * priv = vsf_linux_fs_bind_target_ex(pathname, buffer, NULL,
         (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_buffer_read),
         (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_buffer_write),
         feature, size);
+    if (priv != NULL) {
+        printf("%s bound.\r\n", pathname);
+        return 0;
+    }
+    return -1;
 }
 
 // stream

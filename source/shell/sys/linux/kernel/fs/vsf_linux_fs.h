@@ -171,10 +171,10 @@ extern int vsf_linux_fd_bind_target(int fd, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write);
 extern int vsf_linux_fd_get_target(int fd, void **target);
-extern int vsf_linux_fs_bind_target(const char *pathname, void *target,
+extern vsf_linux_fd_priv_t * vsf_linux_fs_bind_target(const char *pathname, void *target,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write);
-int vsf_linux_fs_bind_target_ex(const char *pathname,
+extern vsf_linux_fd_priv_t * vsf_linux_fs_bind_target_ex(const char *pathname,
         void *target, const vsf_linux_fd_op_t *op,
         vsf_param_eda_evthandler_t peda_read,
         vsf_param_eda_evthandler_t peda_write,
