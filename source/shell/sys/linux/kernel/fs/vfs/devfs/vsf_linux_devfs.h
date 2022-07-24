@@ -41,8 +41,8 @@ extern int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal);
 #if VSF_HAL_USE_USART == ENABLED
 extern int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart);
 #endif
-#if VSF_USE_INPUT == ENABLED
-extern int vsf_linux_fs_bind_input(char *path, void *dev, vk_input_mask_t event_mask);
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
+extern int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier);
 #endif
 extern int vsf_linux_devfs_init(void);
 

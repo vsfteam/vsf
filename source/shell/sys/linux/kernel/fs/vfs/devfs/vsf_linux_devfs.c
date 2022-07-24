@@ -79,14 +79,13 @@ __vsf_component_peda_ifs_entry(__vk_devfs_rand_read, vk_file_read)
 
 int vsf_linux_fs_bind_rand(char *path)
 {
-    vsf_linux_fd_priv_t *priv = vsf_linux_fs_bind_target_ex(path, NULL, NULL,
+    int err = vsf_linux_fs_bind_target_ex(path, NULL, NULL,
             (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_rand_read), NULL,
             VSF_FILE_ATTR_READ, (uint64_t)-1);
-    if (priv != NULL) {
+    if (!err) {
         printf("%s bound.\r\n", path);
-        return 0;
     }
-    return -1;
+    return err;
 }
 #endif
 
@@ -140,15 +139,14 @@ __vsf_component_peda_ifs_entry(__vk_devfs_mal_write, vk_file_write)
 
 int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal)
 {
-    vsf_linux_fd_priv_t *priv = vsf_linux_fs_bind_target_ex(path, mal, NULL,
+    int err = vsf_linux_fs_bind_target_ex(path, mal, NULL,
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_read),
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_write),
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_BLK, mal->size);
-    if (priv != NULL) {
+    if (!err) {
         printf("%s bound.\r\n", path);
-        return 0;
     }
-    return -1;
+    return err;
 }
 #endif
 
@@ -377,18 +375,17 @@ static const vsf_linux_fd_op_t __vsf_linux_uart_fdop = {
 
 int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart)
 {
-    vsf_linux_fd_priv_t *priv = vsf_linux_fs_bind_target_ex(path, uart, &__vsf_linux_uart_fdop,
+    int err = vsf_linux_fs_bind_target_ex(path, uart, &__vsf_linux_uart_fdop,
                 NULL, NULL,
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY, 0);
-    if (priv != NULL) {
+    if (!err) {
         printf("%s bound.\r\n", path);
-        return 0;
     }
-    return -1;
+    return err;
 }
 #endif
 
-#if VSF_USE_INPUT == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 
 #ifndef VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE
 #   define VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE        64
@@ -416,6 +413,17 @@ typedef struct vsf_linux_input_priv_t {
 
 static void __vsf_linux_input_from_vsf_input(struct input_event *input_event, vk_input_type_t type, vk_input_evt_t *evt)
 {
+    vsf_systimer_tick_t us = vsf_systimer_get_us();
+    input_event->time.tv_usec = us % 1000;
+    input_event->time.tv_sec = us / 1000;
+    input_event->type = type;
+
+    switch (type) {
+    case VSF_INPUT_TYPE_KEYBOARD:
+        input_event->code = vsf_input_keyboard_get_keycode(evt);
+        input_event->value = vsf_input_keyboard_is_down(evt) ? 1 : 0;
+        break;
+    }
 }
 
 static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
@@ -438,6 +446,11 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
 static void __vsf_linux_input_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)sfd->priv;
+
+    vk_input_notifier_t *notifier = (vk_input_notifier_t *)(((vk_vfs_file_t *)(input_priv->file))->f.param);
+    input_priv->notifier.dev = notifier->dev;
+    input_priv->notifier.mask = notifier->mask;
+
     if (input_priv->notifier.mask != 0) {
         input_priv->notifier.on_evt = __vsf_linux_input_on_event;
         vk_input_notifier_register(&input_priv->notifier);
@@ -471,6 +484,7 @@ again:
         vsf_unprotect_int(orig);
 
         if (NULL == event) {
+            vsf_linux_fd_clear_status(&input_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
             break;
         }
 
@@ -526,8 +540,10 @@ static ssize_t __vsf_linux_input_write(vsf_linux_fd_t *sfd, const void *buf, siz
 static int __vsf_linux_input_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)sfd->priv;
-    if (input_priv->notifier.mask != 0) {
-        vk_input_notifier_unregister(&input_priv->notifier);
+    vk_input_notifier_t *notifier = (vk_input_notifier_t *)(((vk_vfs_file_t *)(input_priv->file))->f.param);
+
+    if (notifier->mask != 0) {
+        vk_input_notifier_unregister(notifier);
     }
     return 0;
 }
@@ -541,19 +557,15 @@ static const vsf_linux_fd_op_t __vsf_linux_input_fdop = {
     .fn_close           = __vsf_linux_input_close,
 };
 
-int vsf_linux_fs_bind_input(char *path, void *dev, vk_input_mask_t event_mask)
+int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier)
 {
-    vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)vsf_linux_fs_bind_target_ex(
-                path, NULL, &__vsf_linux_input_fdop, NULL, NULL,
+    int err = vsf_linux_fs_bind_target_ex(
+                path, notifier, &__vsf_linux_input_fdop, NULL, NULL,
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
-    if (NULL == input_priv) {
-        return -1;
+    if (!err) {
+        printf("%s bound.\r\n", path);
     }
-
-    input_priv->notifier.dev = dev;
-    input_priv->notifier.mask = event_mask;
-    printf("%s bound.\r\n", path);
-    return 0;
+    return err;
 }
 #endif
 
@@ -580,18 +592,18 @@ int vsf_linux_devfs_init(void)
         return err;
     }
 
-    vsf_linux_fd_priv_t * priv = vsf_linux_fs_bind_target_ex("dev/null", NULL, NULL,
+    err = vsf_linux_fs_bind_target_ex("dev/null", NULL, NULL,
                 NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_null_write),
                 VSF_FILE_ATTR_WRITE, 0);
-    if (NULL == priv) {
+    if (err != 0) {
         fprintf(stderr, "fail to bind /dev/null\r\n");
         return err;
     }
 
-    priv = vsf_linux_fs_bind_target_ex("dev/zero", NULL, NULL,
+    err = vsf_linux_fs_bind_target_ex("dev/zero", NULL, NULL,
                 (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_zero_read), NULL,
                 VSF_FILE_ATTR_READ, 0);
-    if (NULL == priv) {
+    if (err != 0) {
         fprintf(stderr, "fail to bind /dev/zero\r\n");
         return err;
     }
