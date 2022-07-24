@@ -79,6 +79,8 @@ typedef enum vk_input_type_t {
     VSF_INPUT_TYPE_UNKNOWN,
 } vk_input_type_t;
 
+typedef uint32_t vk_input_mask_t;
+
 typedef struct vk_input_evt_t {
     void *dev;
     uint32_t duration;          // duration in ms between pre and cur
@@ -101,7 +103,8 @@ typedef void (*vk_input_on_evt_t)(vk_input_notifier_t *notifier, vk_input_type_t
 typedef struct vk_input_notifier_t {
     vsf_slist_node_t notifier_node;
     vk_input_on_evt_t on_evt;
-    uint8_t mask;
+    void *dev;
+    vk_input_mask_t mask;
 } vk_input_notifier_t;
 #endif
 

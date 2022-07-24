@@ -176,9 +176,11 @@ void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
 #if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
     vsf_protect_t orig = vsf_input_protect();
         __vsf_slist_foreach_unsafe(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list) {
-            if (_->mask & (1 << type)) {
-                VSF_INPUT_ASSERT(_->on_evt != NULL);
-                _->on_evt(_, type, evt);
+            if ((NULL == _->dev) || (_->dev == evt->dev)) {
+                if (_->mask & (1 << type)) {
+                    VSF_INPUT_ASSERT(_->on_evt != NULL);
+                    _->on_evt(_, type, evt);
+                }
             }
         }
     vsf_input_unprotect(orig);
