@@ -489,6 +489,7 @@ again:
         }
 
         *linux_input_event++ = event->evt;
+        VSF_POOL_FREE(vsf_linux_input_event_pool, &input_priv->event_pool, event);
         read_count += sizeof(struct input_event);
     }
 
