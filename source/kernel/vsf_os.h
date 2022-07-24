@@ -122,12 +122,12 @@ extern "C" {
 typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 
 #ifdef __VSF_OS_CFG_EVTQ_LIST
-declare_vsf_pool(vsf_evt_node_pool)
+dcl_vsf_pool(vsf_evt_node_pool)
 def_vsf_pool(vsf_evt_node_pool, vsf_evt_node_t)
 #endif
 
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
-declare_vsf_pool(vsf_eda_frame_pool)
+dcl_vsf_pool(vsf_eda_frame_pool)
 def_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
 #endif
 
