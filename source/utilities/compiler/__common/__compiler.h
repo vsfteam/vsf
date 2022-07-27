@@ -196,6 +196,7 @@ extern "C" {
 #pragma clang diagnostic ignored "-Wextern-c-compat"
 #pragma clang diagnostic ignored "-Wunused-label"
 #pragma clang diagnostic ignored "-Wgnu-variable-sized-type-not-at-end"
+#pragma clang diagnostic ignored "-Wself-assign"
 /*! \NOTE do not ignore following warning unless you take the risk by yourself */
 //#pragma clang diagnostic ignored "-Wbitfield-constant-conversion"
 //#pragma clang diagnostic ignored "-Wpointer-integer-compare"

@@ -77,7 +77,7 @@ vsf_class(vk_netdrv_adapter_op_t) {
         void (*on_netlink_outputted)(void *netif, vsf_err_t err);
         void (*on_inputted)(void *netif, void *netbuf, uint_fast32_t size);
 
-        void * (*alloc_buf)(void *netif, uint_fast16_t len);
+        void * (*alloc_buf)(void *netif, uint_fast32_t len);
         void (*free_buf)(void *netbuf);
         void * (*read_buf)(void *netbuf, vsf_mem_t *mem);
         uint8_t * (*header)(void *netbuf, int32_t len);

@@ -290,6 +290,7 @@ static vsf_err_t __vk_usbd_auto_init(vk_usbd_dev_t *dev)
     if (attr & USB_CONFIG_ATT_WAKEUP) {
         feature |= 1 << USB_DEVICE_REMOTE_WAKEUP;
     }
+    VSF_UNUSED_PARAM(feature);
 
     cur_ifs = -1;
     pos = USB_DT_CONFIG_SIZE;

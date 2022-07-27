@@ -124,7 +124,7 @@ extern FILE * __vsf_linux_stderr(void);
 #ifndef PATH_MAX
 #   define PATH_MAX         255
 #endif
-#define EOF                 -1
+#define EOF                 ((char)-1)
 
 typedef intmax_t            fpos_t;
 

@@ -74,8 +74,8 @@ static void __request_once_demo_isr_handler(void *target_ptr, vsf_adc_t *adc_ptr
 
     vsf_trace_debug("enter timer overflow interrupt");
 
-    vsf_err_t result = vsf_adc_disable(adc_ptr);
-    VSF_ASSERT(result == VSF_ERR_NONE);
+    fsm_rt_t result = vsf_adc_disable(adc_ptr);
+    VSF_ASSERT(result == fsm_rt_cpl);
     (void)result;
 }
 
