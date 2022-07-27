@@ -63,7 +63,7 @@ typedef enum {
 #include <stdbool.h>
 #endif
 
-#if !__IS_COMPILER_GCC__ && !__IS_COMPILER_ARM_COMPILER_5__
+#if !__IS_COMPILER_GCC__ && !__IS_COMPILER_ARM_COMPILER_5__ && !__IS_COMPILER_LLVM__
 #   include <uchar.h>
 #endif
 
