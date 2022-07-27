@@ -103,7 +103,9 @@ extern "C" {
 #elif __IS_COMPILER_IAR__
   #pragma language=extended
 #elif __IS_COMPILER_GCC__
-  /* anonymous unions are enabled by default */
+/* anonymous unions are enabled by default */
+#elif __IS_COMPILER_LLVM__
+/* anonymous unions are enabled by default */
 #elif defined(__TMS470__)
 /* anonymous unions are enabled by default */
 #elif defined(__TASKING__)
@@ -115,7 +117,7 @@ extern "C" {
 /*----------------------------------------------------------------------------*
  * Warning Mitigation                                                         *
  *----------------------------------------------------------------------------*/
- 
+
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
 #endif
@@ -161,19 +163,19 @@ extern "C" {
 #   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
 #   define ROM_EEPROM           __attribute__(( section( ".rom.eeprom"))) const
 #   define NO_INIT              __attribute__( ( section( ".bss.noinit"),zero_init) )
-#   define ROOT                 __attribute__((used))    
+#   define ROOT                 __attribute__((used))
 #   define INLINE               __inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        __inline __attribute__((always_inline))
 #   define WEAK(...)            __attribute__((weak))
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((aligned (__N))) 
+#   define __ALIGN(__N)         __attribute__((aligned (__N)))
 #   define __AT_ADDR(__ADDR)    __attribute__((at(__ADDR)))
 #   define __SECTION(__SEC)     __attribute__((section (__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                 __attribute__((weakref(__VSF_STR(__ALIAS))))
-                                
+
 #   define PACKED               __attribute__((packed))
 #   define UNALIGNED            __packed
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
@@ -185,14 +187,14 @@ extern "C" {
 #   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
 #   define ROM_EEPROM           __attribute__(( section( ".rom.eeprom"))) const
 #   define NO_INIT              __attribute__( ( section( ".bss.noinit")) )
-#   define ROOT                 __attribute__((used))    
+#   define ROOT                 __attribute__((used))
 #   define INLINE               __inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        __inline __attribute__((always_inline))
 #   define WEAK(...)            __attribute__((weak))
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((aligned (__N))) 
+#   define __ALIGN(__N)         __attribute__((aligned (__N)))
 #   define __AT_ADDR(__ADDR)    __attribute__((section (".ARM.__at_" #__ADDR)))
 #   define __SECTION(__SEC)     __attribute__((section (__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
@@ -221,7 +223,7 @@ extern "C" {
 #if __IS_COMPILER_IAR__
 #   define DISABLE_GLOBAL_INTERRUPT()           ____disable_irq()
 
-static ALWAYS_INLINE uint32_t ____disable_irq(void) 
+static ALWAYS_INLINE uint32_t ____disable_irq(void)
 {
     uint32_t wPRIMASK = __get_interrupt_state();
     __disable_interrupt();
@@ -238,7 +240,7 @@ static ALWAYS_INLINE uint32_t ____disable_irq(void)
 
 #   define DISABLE_GLOBAL_INTERRUPT()           ____disable_irq()
 
-static ALWAYS_INLINE uint32_t ____disable_irq(void) 
+static ALWAYS_INLINE uint32_t ____disable_irq(void)
 {
     uint32_t cpsr;
 
