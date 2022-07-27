@@ -1,0 +1,45 @@
+name: cmake armclang build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  armclang-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [aic8800, m484, mps2]
+        cc_version: ["14.0.0"]
+        os: [ubuntu-latest]
+
+    runs-on: ${{matrix.os}}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true # without recursive
+
+    - name:
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential ninja-build
+        release_version=${{matrix.cc_version}}
+        file_name="LLVMEmbeddedToolchainForArm-${release_version}-linux.tar.gz"
+        wget https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm/releases/download/release-${release_version}/${file_name}
+        tar xvf ${file_name} --directory=.
+
+    - name: configure cmake
+      working-directory: ${{github.workspace}}/example/template/project/cmake/${{matrix.target}}
+      run: |
+        cmake --version
+        cmake -GNinja -DCMAKE_C_COMPILER:FILEPATH=${VSF_C} -DCMAKE_CXX_COMPILER:FILEPATH=${VSF_CXX} -B ./build
+      env:
+        VSF_PATH: ${{github.workspace}}
+        VSF_C: ${{github.workspace}}/LLVMEmbeddedToolchainForArm-${{matrix.cc_version}}/bin/clang
+        VSF_CXX: ${{github.workspace}}/LLVMEmbeddedToolchainForArm-${{matrix.cc_version}}/bin/clang++
+
+    - name: build
+      working-directory: ${{github.workspace}}/example/template/project/cmake/${{matrix.target}}
+      run: cmake --build ./build -v
