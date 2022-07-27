@@ -449,9 +449,9 @@ static bool __is_in_seq(char ch, const char *seq, int seq_len)
 
 int vfscanf(FILE *f, const char *format, va_list ap)
 {
-    char ch, ch_tmp, *ptr;
+    char ch, *ptr;
     char *strtmp;
-    int result = 0;
+    int result = 0, ch_tmp;
     unsigned long long arg_uinteger;
 
     goto skip_space;
