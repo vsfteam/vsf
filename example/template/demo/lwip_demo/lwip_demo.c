@@ -25,8 +25,6 @@
 #include "shell/sys/linux/vsf_linux.h"
 #include "shell/sys/linux/port/busybox/busybox.h"
 
-#include "component/3rd-party/lwip/port/lwip_netdrv_adapter.h"
-
 /* lwIP core includes */
 #include "lwip/opt.h"
 
@@ -50,6 +48,9 @@
 #include "lwip/etharp.h"
 #include "netif/ethernet.h"
 #include "lwip/apps/mdns.h"
+
+/* vsf netdrv adapter should be included after lwip headers */
+#include "component/3rd-party/lwip/port/lwip_netdrv_adapter.h"
 
 /* applications includes */
 
