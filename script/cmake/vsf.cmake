@@ -2,6 +2,7 @@ cmake_policy(SET CMP0076 NEW)
 cmake_policy(SET CMP0079 NEW)
 
 if(DEFINED ENV{VSF_PATH})
+    message(STATUS "VSF_PATH: $ENV{VSF_PATH}")
     set(VSF_SRC_PATH $ENV{VSF_PATH}/source)
 else()
     message(FATAL_ERROR "Please define VSF_PATH")
