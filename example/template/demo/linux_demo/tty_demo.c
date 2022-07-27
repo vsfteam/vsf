@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <stdio.h>
 
 int tty_main(int argc, char *argv[])
 {
