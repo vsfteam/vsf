@@ -1,5 +1,9 @@
 # CMakeLists head
 
+target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
+    # necessary for llvm to avoid compiler errors: redefinition u32_t etc.
+    LWIP_NO_STDINT_H=1
+)
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     vendor/lwip/net_al
     vendor/lwip/lwip-STABLE-2_0_2_RELEASE_VER/ports/rtos/include
