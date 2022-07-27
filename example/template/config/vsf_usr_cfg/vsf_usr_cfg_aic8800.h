@@ -34,7 +34,7 @@
 #if __IS_COMPILER_IAR__
 #   define VSF_KERNEL_CFG_THREAD_STACK_CHECK            ENABLED
 #   define VSF_KERNEL_GET_STACK_FROM_JMPBUF(__JMPBUF)   ((*(__JMPBUF))[4] & 0xFFFFFFFF)
-#elif __IS_COMPILER_GCC__
+#elif __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
 // strtoxxx in newlib has dependency issues, implement in simple_stdlib
 #   define VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX          ENABLED
 #   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
