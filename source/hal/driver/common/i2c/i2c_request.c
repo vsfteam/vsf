@@ -73,6 +73,7 @@ void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
             }
             uint16_t data = i2c_request_ptr->buffer_ptr[i2c_request_ptr->idx - 1];
             vsf_err_t ret = i2c_request_ptr->fn(i2c_ptr, data, temp_cmd);
+            VSF_HAL_ASSERT(ret == VSF_ERR_NONE);
         }
     }
 
