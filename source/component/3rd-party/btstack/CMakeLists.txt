@@ -41,6 +41,7 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     ${VSF_BTSTACK_PATH}/src/classic/sdp_util.c
     ${VSF_BTSTACK_PATH}/src/classic/spp_server.c
 
+    ${VSF_BTSTACK_PATH}/src/btstack_hid_parser.c
     ${VSF_BTSTACK_PATH}/src/ad_parser.c
     ${VSF_BTSTACK_PATH}/src/btstack_linked_list.c
     ${VSF_BTSTACK_PATH}/src/btstack_memory.c
