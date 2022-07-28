@@ -265,7 +265,7 @@ ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     (pFunc)0xFFFFFFFF,
 };
 
-static NO_INIT pFunc __isr_vector[dimof(__VECTOR_TABLE) - 4] ALIGN(512);
+NO_INIT pFunc __isr_vector[dimof(__VECTOR_TABLE) - 4] ALIGN(512);
 
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
