@@ -14,7 +14,7 @@ message(STATUS "\tOBJCOPY: ${CMAKE_OBJCOPY}")
 message(STATUS "\tOBJDUMP: ${CMAKE_OBJDUMP}")
 message(STATUS "\tSIZE: ${CMAKE_SIZE}")
 
-if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
+if(("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"))
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fms-extensions -fdiagnostics-color=always")
 
     foreach(api ${VSF_TARGET_WRAPPER_LIST})
