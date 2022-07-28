@@ -23,7 +23,7 @@ else()
     set(CMAKE_ASM_COMPILER_WORKS ON)
 endif()
 
-project(vsf_template)
+project(vsf_template C CXX ASM)
 set(VSF_TARGET AIC8800M)
 set(VSF_TARGET_DEFINITIONS
 #   hw related definitions for AIC8800M required by sdk
