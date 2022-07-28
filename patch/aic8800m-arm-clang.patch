@@ -1,0 +1,102 @@
+diff --git a/example/template/config/vsf_usr_cfg/vsf_usr_cfg_aic8800.h b/example/template/config/vsf_usr_cfg/vsf_usr_cfg_aic8800.h
+index 24770693..0a70e4b3 100644
+--- a/example/template/config/vsf_usr_cfg/vsf_usr_cfg_aic8800.h
++++ b/example/template/config/vsf_usr_cfg/vsf_usr_cfg_aic8800.h
+@@ -87,7 +87,7 @@
+ #   define APP_USE_USBD_USER_DEMO                       ENABLED
+ #define APP_USE_SCSI_DEMO                               ENABLED
+ #define APP_USE_AUDIO_DEMO                              DISABLED
+-#define APP_USE_SDL2_DEMO                               ENABLED
++#define APP_USE_SDL2_DEMO                               DISABLED
+ #define APP_USE_DISP_DEMO                               DISABLED
+ // if using dl1x5, only RGB565 is supported
+ #   define APP_SDL2_DEMO_CFG_COLOR_RGB565
+@@ -144,7 +144,7 @@
+ // lwip demo is not compatible with aic8800 sdk, but VSF_USE_LWIP should be defined
+ #define APP_USE_LWIP_DEMO                               ENABLED
+ #   define VSF_USE_LWIP                                 ENABLED
+-#define APP_USE_LUA_DEMO                                ENABLED
++#define APP_USE_LUA_DEMO                                DISABLED
+ #define APP_USE_COREMARK_DEMO                           ENABLED
+ //#define APP_USE_DISTBUS_DEMO                            ENABLED
+ //#   define APP_DISTBUS_DEMO_CFG_LWIP                    ENABLED
+diff --git a/example/template/project/cmake/aic8800/CMakeLists.txt b/example/template/project/cmake/aic8800/CMakeLists.txt
+index ef0673ce..bde287bf 100644
+--- a/example/template/project/cmake/aic8800/CMakeLists.txt
++++ b/example/template/project/cmake/aic8800/CMakeLists.txt
+@@ -7,14 +7,22 @@ endif()
+ 
+ # compiler configurations
+ # arm-none-eabi-gcc will not pass compiler checker of cmake, so include before project
++set(COMMON_FLAGS 
++    "--config armv6m_soft_nofp_nosys -Oz"
++    CACHE INTERNAL "common flags"
++)
+ set(CMAKE_C_FLAGS 
+-    "-Ofast"
++    "${COMMON_FLAGS} -std=gnu11 -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
+     CACHE INTERNAL "C compiler common flags"
+ )
+ set(CMAKE_CXX_FLAGS 
+-    "-Ofast"
++    "${COMMON_FLAGS} -std=gnu11 -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
+     CACHE INTERNAL "C++ compiler common flags"
+ )
++#set(CMAKE_ASM_FLAGS 
++#    "${COMMON_FLAGS}"
++#    CACHE INTERNAL "ASM compiler common flags"
++#)
+ if(NOT CMAKE_C_COMPILER)
+     include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
+ else()
+@@ -59,7 +67,7 @@ set(VSF_USE_LVGL 1)
+     set(VSF_LVGL_USE_FREETYPE 1)
+ set(VSF_USE_FREETYPE 1)
+ set(VSF_USE_DISP 1)
+-set(VSF_USE_SDL2 1)
++set(VSF_USE_SDL2 0)
+     set(VSF_SDL2_USE_TTF 1)
+     set(VSF_SDL2_USE_IMAGE 1)
+ set(VSF_USE_LIBJPEG_TURBO 1)
+@@ -70,7 +78,7 @@ set(VSF_USE_LWIP 1)
+ set(VSF_USE_BTSTACK 1)
+     set(VSF_BTSTACK_USE_LINKKEY_MEMORY 1)
+ set(VSF_USE_COREMARK 1)
+-set(VSF_USE_LUA 1)
++set(VSF_USE_LUA 0)
+ 
+ # include vsf cmake script
+ set(VSF_CONFIG_PATH ../../../config)
+@@ -82,7 +90,7 @@ include($ENV{VSF_PATH}/script/cmake/vsf.cmake)
+ # linker script
+ target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
+     LINKER:-T${CMAKE_CURRENT_SOURCE_DIR}/linker.ld
+-    LINKER:-Map=output.map
++    LINKER:-Wl,-Map=output.map
+ )
+ 
+ # add user application source code/include directories
+@@ -101,4 +109,4 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+     COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+     USES_TERMINAL
+-)
+\ No newline at end of file
++)
+diff --git a/source/hal/driver/AIC/AIC8800/vendor.cmake b/source/hal/driver/AIC/AIC8800/vendor.cmake
+index d1fce0a3..1120bc13 100644
+--- a/source/hal/driver/AIC/AIC8800/vendor.cmake
++++ b/source/hal/driver/AIC/AIC8800/vendor.cmake
+@@ -104,9 +104,9 @@ target_sources(${VSF_LIB_NAME} INTERFACE
+     #vendor/plf/aic8800/src/driver/ticker/us_ticker.c
+     #vendor/plf/aic8800/src/driver/ticker/us_ticker_api.c
+     vendor/plf/aic8800/src/driver/time/time_api.c
+-    vendor/plf/aic8800/src/driver/trans/arm_bitreversal2.S
+-    vendor/plf/aic8800/src/driver/trans/arm_cfft_q15.c
+-    vendor/plf/aic8800/src/driver/trans/arm_cfft_radix4_q15.c
++    #vendor/plf/aic8800/src/driver/trans/arm_bitreversal2.S
++    #vendor/plf/aic8800/src/driver/trans/arm_cfft_q15.c
++    #vendor/plf/aic8800/src/driver/trans/arm_cfft_radix4_q15.c
+     vendor/plf/aic8800/src/driver/trng/trng_api.c
+     vendor/plf/aic8800/src/driver/wdt/wdt_api.c
+ 
