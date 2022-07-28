@@ -537,6 +537,17 @@ uint32_t host_power_on_mode(void)
  * end of code copied from bt_aic8800_driver.c in vendor SDK
 *******************************************************************************/
 
+// sdk library need bt_drv_ecc_key_complete_notify and bt_drv_task_notify
+void bt_drv_ecc_key_complete_notify(void)
+{
+    VSF_HAL_ASSERT(false);
+}
+
+void bt_drv_task_notify(bool isr)
+{
+    VSF_HAL_ASSERT(false);
+}
+
 //implement_vsf_pool(hci_transport_aic8800_buffer_pool, hci_transport_aic8800_buffer_t)
 #define __name hci_transport_aic8800_buffer_pool
 #define __type hci_transport_aic8800_buffer_t
