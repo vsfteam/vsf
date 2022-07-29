@@ -33,10 +33,6 @@
 #   include "component/3rd-party/lvgl/port/vsf_lvgl_port.h"
 #endif
 
-#if VSF_USE_LLGUI == ENABLED
-#   include "LL_Config.h"
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -108,22 +104,6 @@ typedef struct usrapp_ui_common_t {
 #endif
         vsf_eda_t *eda_poll;
     } lvgl;
-#endif
-
-#if VSF_USE_LLGUI == ENABLED
-    struct {
-#if defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_PTR) || defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_HEAP)
-#   error not supported now
-        llColor *color;
-#elif USE_DOUBLE_BUFFERING
-#   error not supported now
-        llColor color[APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_SIZE * 2];
-#elif defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_SIZE)
-        llColor color[APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_SIZE];
-#else
-        llColor color[CONFIG_MONITOR_WIDTH * CONFIG_MONITOR_HEIGHT];
-#endif
-    } llgui;
 #endif
 } usrapp_ui_common_t;
 

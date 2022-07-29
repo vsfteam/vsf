@@ -1098,7 +1098,7 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\vsf.linux\vsf.linux\vsf\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h">
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h">
       <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1568,7 +1568,7 @@
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\vsf.linux\vsf.linux\vsf\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c">
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c">
       <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
     </ClCompile>
   </ItemGroup>
