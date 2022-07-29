@@ -168,10 +168,14 @@
                 }
 
 
-#define __tgui_msgmap(__MSGMAP)                                                 \
+#define __tgui_msgmap(...)                                                      \
                 .tMSGMap = {                                                    \
-                    .ptItems =  __MSGMAP,                                       \
-                    .chCount = dimof(__MSGMAP),                                 \
+                    .ptItems =  (const vsf_tgui_user_evt_handler []) {          \
+                        __VA_ARGS__                                             \
+                    },                                                          \
+                    .chCount = dimof(((const vsf_tgui_user_evt_handler []) {    \
+                        __VA_ARGS__                                             \
+                    })),                                                        \
                 }
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
@@ -224,6 +228,12 @@
 
 #define tgui_msg_mux(__MSG, __FUNC, ...)                                        \
             __tgui_msg_mux((__MSG), __FUNC, ##__VA_ARGS__)
+
+#define tgui_initalize_top_contaienr(__DESCRIPTOR_NAME, __PTR)                  \
+            do {                                                                \
+                *(__PTR) = __DESCRIPTOR_NAME;                                   \
+                vsf_msgt_offset_tree_init((const vsf_msgt_container_t*)(__PTR));\
+            } while(0)
 
 /*============================ TYPES =========================================*/
 

@@ -153,11 +153,11 @@
                 VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
             }
 
-#define __describe_tgui_control_base(   __VAR,                                  \
+#define __describe_tgui_control_base(   __NAME,                                 \
                                         __ID,                                   \
                                         __TYPE,                                 \
                                         ...)                                    \
-            static const __TYPE VSF_MACRO_SAFE_NAME(__DESCRIPTOR) = {           \
+            static const __TYPE __NAME = {                                      \
                 .id = (__ID),                                                   \
                 __tgui_name_string_tag(__VAR, __TYPE)                           \
                 .bIsEnabled = true,                                             \
@@ -165,15 +165,15 @@
                 VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
                 VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
-            };                                                                  \
-            __VAR = VSF_MACRO_SAFE_NAME(__DESCRIPTOR);
+            };                                                                  
 
-#define __describe_tgui_container_base( __VAR,                                  \
+
+#define __describe_tgui_container_base( __NAME,                                 \
                                         __ID,                                   \
                                         __TYPE,                                 \
                                         ...)                                    \
             __describe_tgui_control_base(                                       \
-                    __VAR,                                                      \
+                    __NAME,                                                     \
                     __ID,                                                       \
                     __TYPE,                                                     \
                     .is_container = true,                                       \
@@ -186,11 +186,11 @@
                     VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE                   \
                 )
 
-#define describe_tgui_container_base(   __VAR,                                  \
+#define describe_tgui_container_base(   __NAME,                                 \
                                         __ID,                                   \
                                         __TYPE,                                 \
                                         ...)                                    \
-            __describe_tgui_container_base( __VAR,                              \
+            __describe_tgui_container_base( __NAME,                             \
                                             __ID,                               \
                                             __TYPE,                             \
                                             __VA_ARGS__)
@@ -228,11 +228,11 @@
                         __VA_ARGS__)
 
 
-#define describe_tgui_control_base( __VAR,                                      \
+#define describe_tgui_control_base( __NAME,                                     \
                                     __ID,                                       \
                                     __TYPE,                                     \
                                     ...)                                        \
-             __describe_tgui_control_base(  __VAR,                              \
+             __describe_tgui_control_base(  __NAME,                             \
                                             __ID,                               \
                                             __TYPE,                             \
                                             __VA_ARGS__)

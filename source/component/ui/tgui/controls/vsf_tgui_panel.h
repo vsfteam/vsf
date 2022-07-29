@@ -121,11 +121,11 @@
 #define end_def_tgui_panel(...)                                                 \
     };
 
-#define __describ_tgui_panel(__NAME, __VAR, ...)                                \
+#define __describ_tgui_panel(__TYPE, __NAME, ...)                               \
         describe_tgui_container_base(                                           \
-            __VAR,                                                              \
-            VSF_TGUI_COMPONENT_ID_PANEL,                                        \
             __NAME,                                                             \
+            VSF_TGUI_COMPONENT_ID_PANEL,                                        \
+            __TYPE,                                                             \
             VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                                \
             __VA_ARGS__                                                         \
             VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE                               \
