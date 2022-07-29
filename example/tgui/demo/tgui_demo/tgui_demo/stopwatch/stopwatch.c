@@ -136,7 +136,7 @@ popup_t * popup_init(popup_t * ptPanel)
             break;
         }
 
-        tgui_initalize_top_contaienr(pupup_panel_descriptor, ptPanel);
+        tgui_initalize_top_container(pupup_panel_descriptor, ptPanel);
 
     } while(0);
 
@@ -409,7 +409,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel)
             break;
         }
 
-        tgui_initalize_top_contaienr(main_panel_descriptor, ptPanel);
+        tgui_initalize_top_container(main_panel_descriptor, ptPanel);
 
         //tgui_text(ptPanel->tLeftContainer.tTime.tLabel, ptPanel->chTimeBuffer, false);
         ptPanel->tLeftContainer.tTime.tLabel.tString.pstrText = ptPanel->chTimeBuffer;

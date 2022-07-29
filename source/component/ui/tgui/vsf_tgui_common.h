@@ -229,7 +229,7 @@
 #define tgui_msg_mux(__MSG, __FUNC, ...)                                        \
             __tgui_msg_mux((__MSG), __FUNC, ##__VA_ARGS__)
 
-#define tgui_initalize_top_contaienr(__DESCRIPTOR_NAME, __PTR)                  \
+#define tgui_initalize_top_container(__DESCRIPTOR_NAME, __PTR)                  \
             do {                                                                \
                 *(__PTR) = __DESCRIPTOR_NAME;                                   \
                 vsf_msgt_offset_tree_init((const vsf_msgt_container_t*)(__PTR));\
