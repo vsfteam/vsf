@@ -138,23 +138,6 @@
 #   define tgui_container_type(__TYPE, ...)                                     \
                 __tgui_container_type(__TYPE, ##__VA_ARGS__)
 
-#define def_tgui_msgmap(__NAME)
-#define end_def_tgui_msgmap(...)
-#define implement_tgui_msgmap(...)
-
-#define __declare_tgui_msgmap(__NAME, ...)                                      \
-            const vsf_tgui_user_evt_handler[__VA_ARGS__] __NAME;
-#define declare_tgui_msgmap(__NAME, ...)                                        \
-            __declare_tgui_msgmap(__NAME, __VA_ARGS__)
-
-#define __describe_tgui_msgmap(__NAME, ...)                                     \
-            const vsf_tgui_user_evt_handler __NAME[] = {                        \
-                __VA_ARGS__                                                     \
-            };
-
-#define describe_tgui_msgmap(__NAME, ...)                                       \
-            __describe_tgui_msgmap(__NAME, __VA_ARGS__)
-
 
 #define __tgui_handlers(...)                                                    \
                 .tMSGMap = {                                                    \
