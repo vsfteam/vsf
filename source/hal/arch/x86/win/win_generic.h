@@ -48,17 +48,8 @@ extern "C" {
 #   define __BYTE_ORDER                 __LITTLE_ENDIAN
 #endif
 
-#ifndef VSF_ARCH_PRI_NUM
-#   define VSF_ARCH_PRI_NUM             64
-#endif
-
 #ifndef VSF_SYSTIMER_CFG_IMPL_MODE
 #   define VSF_SYSTIMER_CFG_IMPL_MODE   VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
-#endif
-
-// software interrupt provided by arch
-#ifndef VSF_ARCH_SWI_NUM
-#   define VSF_ARCH_SWI_NUM             32
 #endif
 
 #if     defined(__CPU_X86__)
@@ -84,6 +75,14 @@ extern "C" {
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
 #   define VSF_ARCH_PRI_NUM             1
 #   define VSF_ARCH_SWI_NUM             0
+#endif
+
+// software interrupt provided by arch
+#ifndef VSF_ARCH_SWI_NUM
+#   define VSF_ARCH_SWI_NUM             32
+#endif
+#ifndef VSF_ARCH_PRI_NUM
+#   define VSF_ARCH_PRI_NUM             64
 #endif
 
 //! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
