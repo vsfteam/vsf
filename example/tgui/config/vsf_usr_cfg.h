@@ -76,6 +76,12 @@
 #define VSF_USE_FIFO                                    ENABLED
 #define VSF_USE_SIMPLE_STREAM                           ENABLED
 
+#if 1
+#define VSF_DISP_USE_WINGDI                             ENABLED
+#   define APP_DISP_WINGDI_HEIGHT                       768
+#   define APP_DISP_WINGDI_WIDTH                        1024
+#   define APP_DISP_WINGDI_COLOR                        VSF_DISP_COLOR_RGB565
+#else
 #define VSF_DISP_USE_SDL2                               ENABLED
 #   define VSF_DISP_SDL2_CFG_INCLUDE                    "lib\SDL2\include\SDL.h"
 #   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       ENABLED
@@ -89,6 +95,7 @@
 #   define APP_DISP_SDL2_TITLE                          "vsf_screen"
 #   define APP_DISP_SDL2_COLOR                          VSF_DISP_COLOR_RGB565
 #   define APP_DISP_SDL2_AMPLIFIER                      1
+#endif
 
 // configuration check
 #ifdef __WIN7__

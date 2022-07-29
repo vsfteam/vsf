@@ -26,7 +26,6 @@
 
 
 #define VSF_USE_UI                                          ENABLED
-#   define VSF_DISP_USE_SDL2                                ENABLED
 
 #   define VSF_USE_TINY_GUI                                 ENABLED
 #       define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL          VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW

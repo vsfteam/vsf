@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\ft2build.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\vsf_config\ftconfig.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\vsf_config\ftheader.h" />
@@ -278,6 +279,7 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\autofit\autofit.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\base\ftbase.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\base\ftbbox.c" />
@@ -501,8 +503,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\lib\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>
       </UACExecutionLevel>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -528,8 +530,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\lib\libusb;$(ProjectDir)\lib\libusb-win32;$(ProjectDir)\lib\SDL2\lib\x86;$(ProjectDir)\lib\npcap\Lib;$(ProjectDir)\lib\libwdi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;wpcap.lib;libusb-1.0.lib;libusb0.lib;libwdi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>

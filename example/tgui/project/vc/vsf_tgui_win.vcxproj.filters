@@ -298,6 +298,9 @@
     <Filter Include="vsf\hal\driver\x86\win\rtc">
       <UniqueIdentifier>{437b8675-2a4f-4a92-ae9b-e4ae2a100291}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\wingdi">
+      <UniqueIdentifier>{5ae22d12-7836-45f7-9009-dd6abe6be455}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -1095,6 +1098,9 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\vsf.linux\vsf.linux\vsf\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h">
+      <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -1561,6 +1567,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\vsf.linux\vsf.linux\vsf\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c">
+      <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

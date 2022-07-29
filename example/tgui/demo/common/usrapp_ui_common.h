@@ -23,12 +23,22 @@
 #include "vsf.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED || VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED)
+    &&  (   VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED          \
+        ||  VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED   \
+        ||  VSF_DISP_USE_WINGDI == ENABLED || VSF_DISP_USE_USBD_UVC == ENABLED)
 
 #if VSF_USE_LVGL == ENABLED
 #   include "lvgl/lvgl.h"
 #   include "lv_conf.h"
 #   include "component/3rd-party/lvgl/port/vsf_lvgl_port.h"
+#endif
+
+#if VSF_USE_LLGUI == ENABLED
+#   include "LL_Config.h"
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
@@ -57,6 +67,10 @@ typedef struct usrapp_ui_common_t {
     vk_disp_fb_t disp_fb;
 #elif VSF_DISP_USE_MIPI_LCD == ENABLED
     vk_disp_mipi_lcd_t disp_mipi_lcd;
+#elif VSF_DISP_USE_WINGDI == ENABLED
+    vk_disp_wingdi_t disp_wingdi;
+#elif VSF_DISP_USE_USBD_UVC == ENABLED
+    vk_disp_usbd_uvc_t disp_usbd_uvc;
 #endif
 
 #if VSF_USE_TINY_GUI == ENABLED
@@ -68,12 +82,6 @@ typedef struct usrapp_ui_common_t {
         uint32_t color[VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE];
 #endif
     } tgui;
-#endif
-
-#if VSF_USE_AWTK == ENABLED
-    struct {
-        vk_input_notifier_t notifier;
-    } awtk;
 #endif
 
 #if VSF_USE_LVGL == ENABLED
@@ -91,7 +99,7 @@ typedef struct usrapp_ui_common_t {
 #endif
         lv_disp_buf_t disp_buf;
 // if APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR is defined, use defined buffer
-#ifdef APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR
+#if defined(APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR) || defined(APP_LVGL_DEMO_CFG_PIXEL_BUFFER_HEAP)
         lv_color_t *color;
 #elif APP_LVGL_DEMO_CFG_DOUBLE_BUFFER == ENABLED
         lv_color_t color[APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE * 2];
@@ -101,6 +109,22 @@ typedef struct usrapp_ui_common_t {
         vsf_eda_t *eda_poll;
     } lvgl;
 #endif
+
+#if VSF_USE_LLGUI == ENABLED
+    struct {
+#if defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_PTR) || defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_HEAP)
+#   error not supported now
+        llColor *color;
+#elif USE_DOUBLE_BUFFERING
+#   error not supported now
+        llColor color[APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_SIZE * 2];
+#elif defined(APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_SIZE)
+        llColor color[APP_LLGUI_DEMO_CFG_PIXEL_BUFFER_SIZE];
+#else
+        llColor color[CONFIG_MONITOR_WIDTH * CONFIG_MONITOR_HEIGHT];
+#endif
+    } llgui;
+#endif
 } usrapp_ui_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -109,6 +133,10 @@ extern usrapp_ui_common_t usrapp_ui_common;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_UI
 #endif      // __USRAPP_UI_COMMON_H__

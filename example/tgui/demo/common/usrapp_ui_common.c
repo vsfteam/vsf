@@ -20,7 +20,9 @@
 #include "./usrapp_ui_common.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED || VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED)
+    &&  (   VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED          \
+        ||  VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED   \
+        ||  VSF_DISP_USE_WINGDI == ENABLED || VSF_DISP_USE_USBD_UVC == ENABLED)
 
 #include "hal/vsf_hal.h"
 
@@ -66,7 +68,10 @@ static f1cx00s_fb_t __fb = {
     .pixel_bit_size             = vsf_disp_get_pixel_format_bitsize(APP_DISP_FB_COLOR),
     .pixel_byte_size            = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR),
 };
+#   define APP_DISP_FB_PARAM    &__fb
 #   endif
+
+extern const vk_disp_fb_drv_t APP_DISP_FB_DRV;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -94,9 +99,13 @@ usrapp_ui_common_t usrapp_ui_common = {
             .color              = APP_DISP_FB_COLOR,
         },
         .fb                     = {
-//            .buffer             = NULL,
-            .drv                = &VSF_FB,
-            .param              = &__fb,
+#   ifdef APP_DISP_FB_BUFFER
+            .buffer             = (void *)APP_DISP_FB_BUFFER,
+#   endif
+            .drv                = &APP_DISP_FB_DRV,
+#   ifdef APP_DISP_FB_PARAM
+            .param              = APP_DISP_FB_PARAM,
+#   endif
             .size               = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR) * APP_DISP_FB_WIDTH * APP_DISP_FB_HEIGHT,
             .num                = APP_DISP_FB_NUM,
             .pixel_byte_size    = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR),
@@ -111,10 +120,39 @@ usrapp_ui_common_t usrapp_ui_common = {
             .drv                = &vk_disp_drv_mipi_lcd,
             .color              = APP_DISP_DEMO_COLOR,
         },
-        .spi                    = &vsf_spi0,
+        .spi                    = APP_DISP_DEMO_SPI,
+        .reset                  = {
+            .gpio               = APP_DISP_DEMO_RESET_GPIO,
+            .pin_mask           = APP_DISP_DEMO_RESET_PIN_MASK,
+        },
+        .dcx                    = {
+            .gpio               = APP_DISP_DEMO_DCX_GPIO,
+            .pin_mask           = APP_DISP_DEMO_DCX_PIN_MASK,
+        },
+        .clock_hz               = APP_DISP_DEMO_CLOCK_HZ,
         .init_seq               = (const uint8_t [])APP_DISP_DEMO_SEQ,
         .init_seq_len           = sizeof((const uint8_t [])APP_DISP_DEMO_SEQ),
-
+    },
+#elif VSF_DISP_USE_WINGDI == ENABLED
+    .disp                       = &usrapp_ui_common.disp_wingdi.use_as__vk_disp_t,
+    .disp_wingdi                = {
+        .param                  = {
+            .height             = APP_DISP_WINGDI_HEIGHT,
+            .width              = APP_DISP_WINGDI_WIDTH,
+            .drv                = &vk_disp_drv_wingdi,
+            .color              = APP_DISP_WINGDI_COLOR,
+        },
+    },
+#elif VSF_DISP_USE_USBD_UVC == ENABLED
+    .disp                       = &usrapp_ui_common.disp_usbd_uvc.use_as__vk_disp_t,
+    .disp_usbd_uvc                = {
+        .param                  = {
+            .height             = APP_DISP_USBD_UVC_HEIGHT,
+            .width              = APP_DISP_USBD_UVC_WIDTH,
+            .drv                = &vk_disp_drv_usbd_uvc,
+            .color              = APP_DISP_USBD_UVC_COLOR,
+        },
+        .uvc                    = NULL,
     },
 #else
     .disp                       = NULL,
