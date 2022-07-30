@@ -15,56 +15,85 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_SERVICE_H__
-#define __VSF_SERVICE_H__
+/**
+ * \file vsf_elfloader.h
+ * \brief vsf elf loader
+ *
+ * provides a elf loader implementation
+ */
 
-/** @ingroup vsf
+/** @ingroup vsf_loader
  *  @{
  */
 
-/** @defgroup vsf_service vsf service
- *  @{
- */
+#ifndef __VSF_ELFLOADER_H__
+#define __VSF_ELFLOADER_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "service/vsf_service_cfg.h"
 
-#include "./heap/vsf_heap.h"
-#include "./pool/vsf_pool.h"
-#include "./dynarr/vsf_dynarr.h"
-#include "./dynstack/vsf_dynstack.h"
-#include "./pbuf/vsf_pbuf.h"
-#include "./pbuf/vsf_pbuf_pool.h"
-#include "./fifo/vsf_fifo.h"
+#if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
 
-#include "./stream/vsf_stream.h"
-#include "./simple_stream/vsf_simple_stream.h"
+#include <stdint.h>
 
-#include "./trace/vsf_trace.h"
-#include "./json/vsf_json.h"
-#include "./distbus/vsf_distbus.h"
-#if VSF_USE_LOADER == ENABLED
-#   include "./loader/vsf_loader.h"
+#if     defined(__VSF_ELFLOADER_CLASS_IMPLEMENT)
+#   undef __VSF_ELFLOADER_CLASS_IMPLEMENT
+#   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_ELFLOADER_CLASS_INHERIT__)
+#   undef __VSF_ELFLOADER_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
 #endif
+
+#include "utilities/ooc_class.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+vsf_class(vsf_elfloader_t) {
+    public_member(
+        implement(vsf_loader_t)
+    )
+
+    private_member(
+        void * got;
+
+        uint32_t symtab_off;
+        uint32_t strtab_off;
+        uint32_t finitab_off;
+        uint32_t symtab_sz;
+        uint32_t strtab_sz;
+        uint32_t finitab_sz;
+    )
+};
+
+typedef enum vsf_elfloader_sym_type_t {
+    VSF_ELFLOADER_SYM_NONE      = 0,    // STT_NOTYPE
+    VSF_ELFLOADER_SYM_OBJECT    = 1,    // STT_OBJECT
+    VSF_ELFLOADER_SYM_FUNC      = 2,    // STT_FUNC
+    VSF_ELFLOADER_SYM_SECTION   = 3,    // STT_SECTION
+    VSF_ELFLOADER_SYM_FILE      = 4,    // STT_FILE
+} vsf_elfloader_sym_type_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_service_init(void);
+extern void * vsf_elfloader_load(vsf_loader_t *loader);
+extern void vsf_elfloader_cleanup(vsf_loader_t *loader);
 
+extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,
+        const char *symbol_name, vsf_elfloader_sym_type_t symbol_type);
 
 #ifdef __cplusplus
 }
 #endif
 
-/** @} */ // vsf service group
-/** @} */ // vsf group
+/** @} */   // vsf_loader
 
-#endif
-/* EOF */
+#endif      // VSF_USE_ELFLOADER
+#endif      // __VSF_ELFLOADER_H__

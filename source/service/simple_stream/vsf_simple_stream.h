@@ -136,12 +136,12 @@ typedef enum vsf_stream_evt_t {
 vsf_class(vsf_stream_op_t) {
     protected_member(
         /**
-         \~english initialization function, must be called before other API.
+         \~english initialization function, must be called before other APIs.
          @param stream stream instance, cannot be NULL.
          @return None.
 
          \~chinese 初始化函数，必须在其他API之前调用。
-         @param stream 流实例, 不能是空指针
+         @param stream 流实例, 不能是空指针。
          @return 无返回值。
          */
         void (*init)(vsf_stream_t *stream);
@@ -156,8 +156,8 @@ vsf_class(vsf_stream_op_t) {
          @param size write size(bytes), if buffer is NULL, then do dummy write.
 
          \~chinese 初始化函数，必须在其他API之前调用。
-         @param stream 流实例, 不能是空指针
-         @param buf 缓冲指针, 指向一块缓冲或者是NULL
+         @param stream 流实例, 不能是空指针。
+         @param buf 缓冲指针, 指向一块缓冲或者是NULL。
          @param size 写大小(字节单位), 如果缓冲区是NULL, 将写给定大小的虚假数据
          */
         uint_fast32_t (*write)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
@@ -169,8 +169,8 @@ vsf_class(vsf_stream_op_t) {
          @param size read size(bytes), if buffer is NULL, then do dummy read.
 
          \~chinese 初始化函数，必须在其他API之前调用。
-         @param stream 流实例, 不能是空指针
-         @param buf 缓冲指针, 指向一块缓冲或者是NULL
+         @param stream 流实例, 不能是空指针。
+         @param buf 缓冲指针, 指向一块缓冲或者是NULL。
          @param size 读大小(字节单位), 如果缓冲区是NULL, 将读给定大小的虚假数据
          */
         uint_fast32_t (*read)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
@@ -224,11 +224,11 @@ vsf_class(vsf_stream_t) {
 /*============================ PROTOTYPES ====================================*/
 
 /**
- * \~english initialization function, must be called before other API.
+ * \~english initialization function, must be called before other APIs.
  * @param stream stream instance, cannot be NULL.
  *
  * \~chinese 初始化函数，必须在其他API之前调用。
- * @param stream 流实例, 不能是空指针
+ * @param stream 流实例, 不能是空指针。
  */
 extern vsf_err_t vsf_stream_init(vsf_stream_t *stream);
 extern vsf_err_t vsf_stream_fini(vsf_stream_t *stream);
@@ -239,9 +239,9 @@ extern vsf_err_t vsf_stream_fini(vsf_stream_t *stream);
  * @param size read size(bytes), if buffer is NULL, then do dummy read.
  *
  * \~chinese 初始化函数，必须在其他API之前调用。
- * @param stream 流实例, 不能是空指针
- * @param buf 缓冲指针, 指向一块缓冲或者是NULL
- * @param size 读大小(字节单位), 如果缓冲区是NULL, 将读给定大小的虚假数据
+ * @param stream 流实例, 不能是空指针。
+ * @param buf 缓冲指针, 指向一块缓冲或者是NULL。
+ * @param size 读大小(字节单位), 如果缓冲区是NULL, 将读给定大小的虚假数据。
  */
 extern uint_fast32_t vsf_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
 extern uint_fast32_t vsf_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);

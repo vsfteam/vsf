@@ -15,56 +15,31 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_SERVICE_H__
-#define __VSF_SERVICE_H__
-
-/** @ingroup vsf
- *  @{
- */
-
-/** @defgroup vsf_service vsf service
- *  @{
- */
-
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
-#include "./heap/vsf_heap.h"
-#include "./pool/vsf_pool.h"
-#include "./dynarr/vsf_dynarr.h"
-#include "./dynstack/vsf_dynstack.h"
-#include "./pbuf/vsf_pbuf.h"
-#include "./pbuf/vsf_pbuf_pool.h"
-#include "./fifo/vsf_fifo.h"
+#if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
 
-#include "./stream/vsf_stream.h"
-#include "./simple_stream/vsf_simple_stream.h"
+#define __VSF_ELFLOADER_CLASS_IMPLEMENT
+#define __VSF_LOADER_CLASS_INHERIT__
+#include "../vsf_loader.h"
 
-#include "./trace/vsf_trace.h"
-#include "./json/vsf_json.h"
-#include "./distbus/vsf_distbus.h"
-#if VSF_USE_LOADER == ENABLED
-#   include "./loader/vsf_loader.h"
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ IMPLEMENTATION ================================*/
 
-extern void vsf_service_init(void);
-
-
-#ifdef __cplusplus
+void * vsf_elfloader_load(vsf_loader_t *loader)
+{
+    return NULL;
 }
-#endif
 
-/** @} */ // vsf service group
-/** @} */ // vsf group
+void vsf_elfloader_cleanup(vsf_loader_t *loader)
+{
+    vsf_loader_cleanup(loader);
+}
 
-#endif
-/* EOF */
+#endif      // VSF_USE_LOADER && VSF_LOADER_USE_ELF

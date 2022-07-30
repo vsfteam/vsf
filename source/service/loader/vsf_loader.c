@@ -15,56 +15,48 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_SERVICE_H__
-#define __VSF_SERVICE_H__
-
-/** @ingroup vsf
- *  @{
- */
-
-/** @defgroup vsf_service vsf service
- *  @{
- */
-
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
-#include "./heap/vsf_heap.h"
-#include "./pool/vsf_pool.h"
-#include "./dynarr/vsf_dynarr.h"
-#include "./dynstack/vsf_dynstack.h"
-#include "./pbuf/vsf_pbuf.h"
-#include "./pbuf/vsf_pbuf_pool.h"
-#include "./fifo/vsf_fifo.h"
-
-#include "./stream/vsf_stream.h"
-#include "./simple_stream/vsf_simple_stream.h"
-
-#include "./trace/vsf_trace.h"
-#include "./json/vsf_json.h"
-#include "./distbus/vsf_distbus.h"
 #if VSF_USE_LOADER == ENABLED
-#   include "./loader/vsf_loader.h"
-#endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define __VSF_LOADER_CLASS_IMPLEMENT
+#include "./vsf_loader.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ IMPLEMENTATION ================================*/
 
-extern void vsf_service_init(void);
+void vsf_loader_cleanup(vsf_loader_t *loader)
+{
+    VSF_SERVICE_ASSERT(loader != NULL);
+    VSF_SERVICE_ASSERT(loader->cfg != NULL);
+    VSF_SERVICE_ASSERT(loader->cfg->fn_free != NULL);
 
-
-#ifdef __cplusplus
+    if (loader->text != NULL) {
+        loader->cfg->fn_free(loader, loader->text);
+        loader->text = NULL;
+    }
+    if (loader->bss != NULL) {
+        loader->cfg->fn_free(loader, loader->bss);
+        loader->bss = NULL;
+    }
+    if (loader->data != NULL) {
+        loader->cfg->fn_free(loader, loader->data);
+        loader->data = NULL;
+    }
+    if (loader->rodata != NULL) {
+        loader->cfg->fn_free(loader, loader->rodata);
+        loader->rodata = NULL;
+    }
+    if (loader->got != NULL) {
+        loader->cfg->fn_free(loader, loader->got);
+        loader->got = NULL;
+    }
 }
-#endif
 
-/** @} */ // vsf service group
-/** @} */ // vsf group
-
-#endif
-/* EOF */
+#endif      // VSF_USE_LOADER
