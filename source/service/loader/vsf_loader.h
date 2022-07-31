@@ -54,6 +54,15 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_loader_read(__target, __offset, __ptr, __size)                      \
+        (__target)->fn_read((__target), (__offset), (__ptr), (__size))
+
+#define vsf_loader_malloc(__loader, __attr, __size, __align)                    \
+        (__loader)->heap_op->fn_malloc((__loader), (__attr), (__size), (__align))
+#define vsf_loader_free(__loader, __attr, __ptr)                                \
+        (__loader)->heap_op->fn_free((__loader), (__attr), (__ptr))
+
 /*============================ TYPES =========================================*/
 
 vsf_dcl_class(vsf_loader_t)
@@ -65,7 +74,7 @@ vsf_dcl_class(vsf_loader_t)
  * \~chinese vsf loader 内存属性
  * @note TODO
  */
-enum vsf_loader_mem_attr_t {
+typedef enum vsf_loader_mem_attr_t {
     VSF_LOADER_MEM_R    = 1 << 0,
     VSF_LOADER_MEM_W    = 1 << 1,
     VSF_LOADER_MEM_X    = 1 << 2,
@@ -85,14 +94,14 @@ typedef struct vsf_loader_heap_op_t {
      @param loader loader instance, cannot be NULL.
      @param attr attribution of the memory(R/W/X/RW).
      @param size byte size of memory to allocate.
-     @param alignment memory alignment.
+     @param alignment memory alignment: 2**alignment.
      @return memory allocated.
 
      \~chinese 内存分配函数。
      @param loader 加载器实例, 不能是空指针。
      @param attr 需要分配的内存属性（只读、只写、读写、执行）。
      @param size 需要分配的内存的字节大小。
-     @param alignment 内存对其。
+     @param alignment 内存对其：2**alignment。
      @return 分配的内存。
     */
     void * (*fn_malloc)(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, uint32_t size, uint32_t alignment);
@@ -110,16 +119,17 @@ typedef struct vsf_loader_heap_op_t {
      @param buffer 需要释放的内存。
      @return 无返回值。
     */
-    void (*fn_free)(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, void *buffer, uint32_t alignment);
+    void (*fn_free)(vsf_loader_t *loader, vsf_loader_mem_attr_t attr, void *buffer);
 } vsf_loader_heap_op_t;
 
-typedef struct vsf_loader_target_t {
+typedef struct vsf_loader_target_t vsf_loader_target_t;
+struct vsf_loader_target_t {
     /**
-     \~english target, can be fd, pointer, etc.
+     \~english target object, can be fd, pointer, etc.
 
      \~chinese 目标，可以是文件、指针等等。
     */
-    uintptr_t taget;
+    uintptr_t object;
 
     /**
      \~english whether xip is supported. For xip, target is the address of image.
@@ -143,20 +153,21 @@ typedef struct vsf_loader_target_t {
      @param size 读取的数据大小.
      @return 实际读取的大小。
     */
-    uint32_t (*fn_read)(vsf_loader_t *loader, uint32_t offset, void *buffer, uint32_t size);
-} vsf_loader_target_t;
+    uint32_t (*fn_read)(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size);
+};
+
+typedef struct vsf_loader_lnktbl_t {
+    const char *name;
+    void *value;
+} vsf_loader_lnktbl_t;
 
 vsf_class(vsf_loader_t) {
     public_member(
         const vsf_loader_heap_op_t *heap_op;
-        vsf_loader_target_t *target;
+        vsf_loader_lnktbl_t *lnktbl;
     )
-
     protected_member(
-        void * text;
-        void * bss;
-        void * data;
-        void * rodata;
+        vsf_loader_target_t *target;
     )
 };
 
@@ -164,16 +175,7 @@ vsf_class(vsf_loader_t) {
 /*============================ PROTOTYPES ====================================*/
 
 #if defined(__VSF_LOADER_CLASS_IMPLEMENT) || defined(__VSF_LOADER_CLASS_INHERIT__)
-/**
- \~english cleanup loader.
- @param loader loader instance, cannot be NULL.
- @return None.
-
- \~chinese 清理载入器。
- @param loader 载入器实例, 不能是空指针。
- @return 无返回值。
-*/
-extern void vsf_loader_cleanup(vsf_loader_t *loader);
+extern void * vsf_loader_link(vsf_loader_t *loader, const char *name);
 #endif
 
 #ifdef __cplusplus

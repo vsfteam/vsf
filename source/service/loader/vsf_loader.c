@@ -31,32 +31,18 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_loader_cleanup(vsf_loader_t *loader)
+void * vsf_loader_link(vsf_loader_t *loader, const char *name)
 {
-    VSF_SERVICE_ASSERT(loader != NULL);
-    VSF_SERVICE_ASSERT(loader->cfg != NULL);
-    VSF_SERVICE_ASSERT(loader->cfg->fn_free != NULL);
-
-    if (loader->text != NULL) {
-        loader->cfg->fn_free(loader, loader->text);
-        loader->text = NULL;
+    vsf_loader_lnktbl_t *lnktbl = loader->lnktbl;
+    if (lnktbl != NULL) {
+        while (lnktbl->name != NULL) {
+            if (!strcmp(lnktbl->name, name)) {
+                return lnktbl->value;
+            }
+            lnktbl++;
+        }
     }
-    if (loader->bss != NULL) {
-        loader->cfg->fn_free(loader, loader->bss);
-        loader->bss = NULL;
-    }
-    if (loader->data != NULL) {
-        loader->cfg->fn_free(loader, loader->data);
-        loader->data = NULL;
-    }
-    if (loader->rodata != NULL) {
-        loader->cfg->fn_free(loader, loader->rodata);
-        loader->rodata = NULL;
-    }
-    if (loader->got != NULL) {
-        loader->cfg->fn_free(loader, loader->got);
-        loader->got = NULL;
-    }
+    return NULL;
 }
 
 #endif      // VSF_USE_LOADER
