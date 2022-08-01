@@ -59,11 +59,11 @@ vsf_class(vsf_elfloader_t) {
     public_member(
         implement(vsf_loader_t)
         uint16_t machine;
+        void *got;
     )
 
     private_member(
         void *plt;
-        void *got;
 
         void *text;
         void *finiarr;
@@ -76,6 +76,8 @@ vsf_class(vsf_elfloader_t) {
         uint32_t strtbl_sz;
         uint32_t symtbl_off;
         uint32_t symtbl_sz;
+        uint32_t symstrtbl_off;
+        uint32_t symstrtbl_sz;
         uint32_t finiarr_off;
         uint32_t finiarr_sz;
     )
@@ -92,8 +94,8 @@ typedef enum vsf_elfloader_sym_type_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void * vsf_elfloader_load(vsf_loader_t *loader, vsf_loader_target_t *target);
-extern void vsf_elfloader_cleanup(vsf_loader_t *loader);
+extern void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target);
+extern void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader);
 
 extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,
         const char *symbol_name, vsf_elfloader_sym_type_t symbol_type);

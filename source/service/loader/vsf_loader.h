@@ -59,9 +59,9 @@ extern "C" {
         (__target)->fn_read((__target), (__offset), (__ptr), (__size))
 
 #define vsf_loader_malloc(__loader, __attr, __size, __align)                    \
-        (__loader)->heap_op->fn_malloc((__loader), (__attr), (__size), (__align))
+        (__loader)->heap_op->fn_malloc((vsf_loader_t *)(__loader), (__attr), (__size), (__align))
 #define vsf_loader_free(__loader, __attr, __ptr)                                \
-        (__loader)->heap_op->fn_free((__loader), (__attr), (__ptr))
+        (__loader)->heap_op->fn_free((vsf_loader_t *)(__loader), (__attr), (__ptr))
 
 /*============================ TYPES =========================================*/
 
@@ -172,7 +172,36 @@ vsf_class(vsf_loader_t) {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#if VSF_USE_HEAP == ENABLED
+/**
+ \~english default heap op.
+ @note alignment is not supported.
+
+ \~chinese 默认heap操作。
+ @note 不支持对其。
+*/
+extern const vsf_loader_heap_op_t vsf_loader_default_heap_op;
+#endif
+
 /*============================ PROTOTYPES ====================================*/
+
+/**
+ \~english read function for xip target, set to fn_read member of vsf_loader_target_t.
+ @param target loader target, object of target MUST be the address of image.
+ @param offset offset in image.
+ @param buffer buffer to hold the data read.
+ @param size size to read.
+ @return the actual data size read.
+
+ \~chinese xip目标的读取函数，设置给vsf_loader_target_t的fn_read参数。
+ @param target 载入目标，target的object参数必须是镜像地址。
+ @param offset 镜像中的偏移
+ @param buffer 读取缓存。
+ @param size 读取大小。
+ @return 实际读取大小。
+*/
+extern uint32_t vsf_loader_xip_read(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size);
 
 #if defined(__VSF_LOADER_CLASS_IMPLEMENT) || defined(__VSF_LOADER_CLASS_INHERIT__)
 extern void * vsf_loader_link(vsf_loader_t *loader, const char *name);
