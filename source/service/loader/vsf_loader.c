@@ -65,17 +65,9 @@ uint32_t vsf_loader_xip_read(vsf_loader_target_t *target, uint32_t offset, void 
     return size;
 }
 
+WEAK(vsf_loader_link)
 void * vsf_loader_link(vsf_loader_t *loader, const char *name)
 {
-    vsf_loader_lnktbl_t *lnktbl = loader->lnktbl;
-    if (lnktbl != NULL) {
-        while (lnktbl->name != NULL) {
-            if (!strcmp(lnktbl->name, name)) {
-                return lnktbl->value;
-            }
-            lnktbl++;
-        }
-    }
     return NULL;
 }
 

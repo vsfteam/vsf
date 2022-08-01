@@ -156,15 +156,9 @@ struct vsf_loader_target_t {
     uint32_t (*fn_read)(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size);
 };
 
-typedef struct vsf_loader_lnktbl_t {
-    const char *name;
-    void *value;
-} vsf_loader_lnktbl_t;
-
 vsf_class(vsf_loader_t) {
     public_member(
         const vsf_loader_heap_op_t *heap_op;
-        vsf_loader_lnktbl_t *lnktbl;
     )
     protected_member(
         vsf_loader_target_t *target;

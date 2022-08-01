@@ -35,6 +35,8 @@
 #   define VSF_ELFLOADER_CFG_MAX_SYM_LEN        (32 + 1)
 #endif
 
+#define VSF_ELFLOADER_LOADABLE_SECNUM           7
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #ifdef VSF_ELFLOADER_CFG_DEBUG
@@ -55,7 +57,20 @@ typedef struct vsf_elfloader_section_info_t {
     void *buffer;
 } vsf_elfloader_section_info_t;
 
-typedef struct vsf_elfloader_info_t vsf_elfloader_info_t;
+typedef struct vsf_elfloader_info_t {
+    void *initarr;
+    Elf32_Word initarr_sz;
+
+    struct {
+        Elf32_Shdr header;
+        int loader_index;               // index in __vsf_elfloader_section_loaders
+        void **buffer;                  // buffer to load
+        uint32_t align;                 // alignment of the buffer
+        vsf_loader_mem_attr_t attr;     // attribute of the buffer
+        bool is_to_load_section;
+    } sinfo;
+    vsf_elfloader_section_info_t sinfos[VSF_ELFLOADER_LOADABLE_SECNUM];
+} vsf_elfloader_info_t;
 
 typedef struct vsf_elfloader_section_loader_t {
     char *name;
@@ -79,6 +94,7 @@ static vsf_err_t __vsf_elfloader_got_loader(vsf_elfloader_t *elfloader, vsf_load
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vsf_elfloader_section_loader_t __vsf_elfloader_section_loaders[] = {
+    // loadable sections
     {".bss",            __vsf_elfloader_bss_loader},
     {".data",           __vsf_elfloader_data_loader},
     {".noinit",         __vsf_elfloader_noinit_loader},
@@ -88,27 +104,11 @@ static const vsf_elfloader_section_loader_t __vsf_elfloader_section_loaders[] = 
     {".plt",            __vsf_elfloader_plt_loader},
     {".rodata",         __vsf_elfloader_rodata_loader},
 
+    // non-loadable sections
     {".dynsym",         __vsf_elfloader_dynsym_loader},
     {".dynstr",         __vsf_elfloader_dynstr_loader},
     {".init_array",     __vsf_elfloader_initarr_loader},
     {".fini_array",     __vsf_elfloader_finiarr_loader},
-};
-
-/*============================ TYPES =========================================*/
-
-struct vsf_elfloader_info_t {
-    void *initarr;
-    Elf32_Word initarr_sz;
-
-    struct {
-        Elf32_Shdr header;
-        int loader_index;               // index in __vsf_elfloader_section_loaders
-        void **buffer;                  // buffer to load
-        uint32_t align;                 // alignment of the buffer
-        vsf_loader_mem_attr_t attr;     // attribute of the buffer
-        bool is_to_load_section;
-    } sinfo;
-    vsf_elfloader_section_info_t sinfos[dimof(__vsf_elfloader_section_loaders)];
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -431,10 +431,12 @@ void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *targe
         }
 
         if (sloader != NULL) {
-            linfo.sinfos[linfo.sinfo.loader_index].index = i;
-            linfo.sinfos[linfo.sinfo.loader_index].offset = linfo.sinfo.header.sh_offset;
-            linfo.sinfos[linfo.sinfo.loader_index].size = linfo.sinfo.header.sh_size;
-            linfo.sinfos[linfo.sinfo.loader_index].addr = linfo.sinfo.header.sh_addr;
+            if (linfo.sinfo.loader_index < dimof(linfo.sinfos)) {
+                linfo.sinfos[linfo.sinfo.loader_index].index = i;
+                linfo.sinfos[linfo.sinfo.loader_index].offset = linfo.sinfo.header.sh_offset;
+                linfo.sinfos[linfo.sinfo.loader_index].size = linfo.sinfo.header.sh_size;
+                linfo.sinfos[linfo.sinfo.loader_index].addr = linfo.sinfo.header.sh_addr;
+            }
             if ((sloader->load != NULL) && (VSF_ERR_NONE != sloader->load(elfloader, target, &linfo))) {
                 vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to load section %s" VSF_TRACE_CFG_LINEEND, section_name);
                 goto cleanup_and_fail;
@@ -454,7 +456,7 @@ void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *targe
                 }
             }
 
-            if (sloader != NULL) {
+            if ((sloader != NULL) && (linfo.sinfo.loader_index < dimof(linfo.sinfos))) {
                 linfo.sinfos[linfo.sinfo.loader_index].buffer = *linfo.sinfo.buffer;
             }
         }
