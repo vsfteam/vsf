@@ -36,6 +36,7 @@
 #if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
 
 #include <stdint.h>
+#include "./elf.h"
 
 #if     defined(__VSF_ELFLOADER_CLASS_IMPLEMENT)
 #   undef __VSF_ELFLOADER_CLASS_IMPLEMENT
@@ -58,7 +59,6 @@ extern "C" {
 vsf_class(vsf_elfloader_t) {
     public_member(
         implement(vsf_loader_t)
-        uint16_t machine;
         void *static_base;
     )
 
@@ -98,8 +98,10 @@ extern void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t
 extern void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader);
 
 // can be called before vsf_elfloader_load
+extern int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
+        bool (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf32_Shdr *header, char *name, int index, void *param));
 extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader,
-        vsf_loader_target_t *target, const char *section_name);
+        vsf_loader_target_t *target, const char *name, Elf32_Shdr *header);
 
 // CAN NOT be called before vsf_elfloader_load
 extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,
