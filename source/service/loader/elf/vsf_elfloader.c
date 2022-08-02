@@ -404,6 +404,7 @@ void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *targe
         VSF_SERVICE_ASSERT(target->is_xip);
     }
 
+    vsf_elfloader_section_info_t *entry_sinfo;
     vsf_elfloader_info_t linfo = { 0 };
     Elf32_Hdr elf_hdr;
     if (VSF_ERR_NONE != __vsf_elfloader_load_elfhdr(elfloader, target, &elf_hdr)) {
@@ -539,7 +540,7 @@ second_round_for_ram_base:
         vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, linfo.initarr);
     }
 
-    vsf_elfloader_section_info_t *entry_sinfo = __vsf_elfloader_get_section_by_addr(&linfo, elf_hdr.e_entry);
+    entry_sinfo = __vsf_elfloader_get_section_by_addr(&linfo, elf_hdr.e_entry);
     if (NULL == entry_sinfo) {
         vsf_elfloader_trace(VSF_TRACE_ERROR, "invalid entry" VSF_TRACE_CFG_LINEEND);
         goto cleanup_and_fail;
