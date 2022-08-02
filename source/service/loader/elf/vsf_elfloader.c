@@ -98,7 +98,7 @@ static vsf_err_t __vsf_elfloader_got_loader(vsf_elfloader_t *elfloader, vsf_load
 static const vsf_elfloader_section_loader_t __vsf_elfloader_section_loaders[] = {
     // loadable sections
     {".bss",            __vsf_elfloader_bss_loader},
-    {".data P2",           __vsf_elfloader_data_loader},
+    {".data P2",        __vsf_elfloader_data_loader},
     {".noinit",         __vsf_elfloader_noinit_loader},
     {".got",            __vsf_elfloader_got_loader},
 
