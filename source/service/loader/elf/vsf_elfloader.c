@@ -98,11 +98,11 @@ static vsf_err_t __vsf_elfloader_got_loader(vsf_elfloader_t *elfloader, vsf_load
 static const vsf_elfloader_section_loader_t __vsf_elfloader_section_loaders[] = {
     // loadable sections
     {".bss",            __vsf_elfloader_bss_loader},
-    {".data",           __vsf_elfloader_data_loader},
+    {".data P2",           __vsf_elfloader_data_loader},
     {".noinit",         __vsf_elfloader_noinit_loader},
     {".got",            __vsf_elfloader_got_loader},
 
-    {".text",           __vsf_elfloader_text_loader},
+    {".text P1",        __vsf_elfloader_text_loader},
     {".plt",            __vsf_elfloader_plt_loader},
     {".rodata",         __vsf_elfloader_rodata_loader},
 
@@ -455,9 +455,14 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
 
     vsf_elfloader_section_loader_t *sloader = NULL;
     for (linfo->sinfo.loader_index = 0; linfo->sinfo.loader_index < dimof(__vsf_elfloader_section_loaders); linfo->sinfo.loader_index++) {
-        if (!strcmp(__vsf_elfloader_section_loaders[linfo->sinfo.loader_index].name, name)) {
-            sloader = (vsf_elfloader_section_loader_t *)&__vsf_elfloader_section_loaders[linfo->sinfo.loader_index];
-            break;
+        char *match_start = strstr(__vsf_elfloader_section_loaders[linfo->sinfo.loader_index].name, name);
+        if (match_start != NULL) {
+            char ch_end = *(match_start + strlen(name));
+            if (    ((ch_end == '\0') || (ch_end == ' '))
+                &&  ((match_start == __vsf_elfloader_section_loaders[linfo->sinfo.loader_index].name) || (match_start[-1] == ' '))) {
+                sloader = (vsf_elfloader_section_loader_t *)&__vsf_elfloader_section_loaders[linfo->sinfo.loader_index];
+                break;
+            }
         }
     }
 
