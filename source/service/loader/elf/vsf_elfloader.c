@@ -489,6 +489,8 @@ second_round_for_ram_base:
                         vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to read section %s" VSF_TRACE_CFG_LINEEND, section_name);
                         goto cleanup_and_fail;
                     }
+                } else {
+                    memset(*linfo.sinfo.buffer, 0, linfo.sinfo.header.sh_size);
                 }
                 if ((sloader != NULL) && (linfo.sinfo.loader_index < dimof(linfo.sinfos))) {
                     linfo.sinfos[linfo.sinfo.loader_index].buffer = *linfo.sinfo.buffer;
