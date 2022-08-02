@@ -91,6 +91,12 @@ typedef enum vsf_elfloader_sym_type_t {
     VSF_ELFLOADER_SYM_FILE      = 4,    // STT_FILE
 } vsf_elfloader_sym_type_t;
 
+enum {
+    VSF_ELFLOADER_CB_FAIL       = -1,
+    VSF_ELFLOADER_CB_GOON       = 0,
+    VSF_ELFLOADER_CB_DONE       = 1,
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
@@ -99,7 +105,7 @@ extern void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader);
 
 // can be called before vsf_elfloader_load
 extern int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
-        bool (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf32_Shdr *header, char *name, int index, void *param));
+        int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf32_Shdr *header, char *name, int index, void *param));
 extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader,
         vsf_loader_target_t *target, const char *name, Elf32_Shdr *header);
 
