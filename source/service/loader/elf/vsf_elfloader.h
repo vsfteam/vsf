@@ -59,10 +59,11 @@ vsf_class(vsf_elfloader_t) {
     public_member(
         implement(vsf_loader_t)
         uint16_t machine;
-        void *got;
+        void *static_base;
     )
 
     private_member(
+        void *got;
         void *plt;
 
         void *text;
@@ -71,9 +72,8 @@ vsf_class(vsf_elfloader_t) {
         void *data;
         void *rodata;
         void *noinit;
+        void *ram_base;
 
-        uint32_t strtbl_off;
-        uint32_t strtbl_sz;
         uint32_t symtbl_off;
         uint32_t symtbl_sz;
         uint32_t symstrtbl_off;
@@ -97,6 +97,11 @@ typedef enum vsf_elfloader_sym_type_t {
 extern void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target);
 extern void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader);
 
+// can be called before vsf_elfloader_load
+extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader,
+        vsf_loader_target_t *target, const char *section_name);
+
+// CAN NOT be called before vsf_elfloader_load
 extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,
         const char *symbol_name, vsf_elfloader_sym_type_t symbol_type);
 

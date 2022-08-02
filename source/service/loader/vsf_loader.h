@@ -139,6 +139,16 @@ struct vsf_loader_target_t {
     bool is_xip;
 
     /**
+     \~english whether to use embedded position independency.
+     @note Usually, epi is ABI for ropi/rwpi options, supported by clang and IAR.
+            While -fPIC option will generate GOT-base position independent code.
+
+     \~chinese 是否支持epi。
+     @note 同样epi是clang和IAR的ropi/rwpi选项对应的ABI规范。而-fPIC选项会产生基于GOT的地址无关代码。
+    */
+    bool is_epi;
+
+    /**
      \~english function to read taget to memory.
      @param loader loader instance, cannot be NULL.
      @param offset offset in target.
