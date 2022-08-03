@@ -129,7 +129,7 @@ typedef intmax_t            fpos_t;
 #define _IOLBF              0x0040
 #define _IONBF              0x0004
 
-#if VSF_LINUX_APPLET_CFG_STDIO == ENABLED
+#if VSF_LINUX_APPLET_USE_STDIO == ENABLED
 typedef struct vsf_linux_stdio_vplt_t {
     FILE * (*__vsf_linux_stdin)(void);
     FILE * (*__vsf_linux_stdout)(void);
@@ -203,12 +203,15 @@ typedef struct vsf_linux_stdio_vplt_t {
     FILE * (*tmpfile)(void);
     char * (*tmpnam)(char *str);
 } vsf_linux_stdio_vplt_t;
+#   ifndef __VSF_APPLET__
+extern const vsf_linux_stdio_vplt_t __vsf_linux_stdio_vplt;
+#   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_CFG_STDIO == ENABLED
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_STDIO == ENABLED
 
 #ifndef VSF_LINUX_APPLET_STDIO_VPLT
-#   if VSF_LINUX_CFG_APPLET == ENABLED
+#   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_STDIO_VPLT                                      \
             ((vsf_linux_stdio_vplt_t *)(VSF_LINUX_APPLET_VPLT->stdio))
 #   else

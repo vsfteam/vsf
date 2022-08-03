@@ -133,14 +133,14 @@
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_CFG_APPLET == ENABLED
-// check dependency of VSF_LINUX_CFG_APPLET
-#   if VSF_LINUX_APPLET_CFG_STDIO != ENABLED
+#if defined(__VSF_APPLET__) && VSF_LINUX_USE_APPLET == ENABLED
+// check dependency of VSF_LINUX_USE_APPLET
+#   if VSF_LINUX_APPLET_USE_STDIO != ENABLED
 #       error what to put in vsf_linux_vplt?
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_VPLT
-#       if VSF_CFG_APPLET == ENABLED
+#       if VSF_USE_APPLET == ENABLED
 #           define VSF_LINUX_APPLET_VPLT                                        \
                 ((vsf_linux_vplt_t *)(VSF_APPLET_VPLT->linux))
 #       else
@@ -150,7 +150,7 @@
 #   endif
 
 typedef struct vsf_linux_vplt_t {
-#   if VSF_LINUX_APPLET_CFG_STDIO == ENABLED
+#   if VSF_LINUX_APPLET_USE_STDIO == ENABLED
     void *stdio;
 #   endif
 } vsf_linux_vplt_t;

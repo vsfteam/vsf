@@ -111,13 +111,13 @@ extern int main(int, char **);
         }                                                                       \
         int main(__VA_ARGS__)
 
-#   if VSF_CFG_APPLET == ENABLED
-// check dependency of VSF_CFG_APPLET
-#       if VSF_LINUX_CFG_APPLET != ENABLED
+#   if VSF_USE_APPLET == ENABLED
+// check dependency of VSF_USE_APPLET
+#       if VSF_LINUX_USE_APPLET != ENABLED
 #           error what to put in vsf_vplt?
 #       endif
 typedef struct vsf_vplt_t {
-#       if VSF_LINUX_CFG_APPLET == ENABLED
+#       if VSF_LINUX_USE_APPLET == ENABLED
     void *linux;
 #       endif
 } vsf_vplt_t;
