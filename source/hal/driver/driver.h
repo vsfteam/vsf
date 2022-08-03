@@ -30,7 +30,9 @@
  */
 #ifndef VSF_DRIVER_HEADER
 
-#   if      defined(__STMicro__)
+#   if      defined(__VSF_APPLET__)
+// no hw driver for __VSF_APPLET__
+#   elif    defined(__STMicro__)
 #       define  VSF_DRIVER_HEADER       "./ST/driver.h"
 #   elif    defined(__NXP__)
 #       define  VSF_DRIVER_HEADER       "./NXP/driver.h"

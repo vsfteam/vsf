@@ -51,7 +51,7 @@ static bool __is_in_seq(char ch, const char *seq, int seq_len)
     return false;
 }
 
-static int vsnscanf(const char *str, size_t size, const char *format, va_list ap)
+int vsnscanf(const char *str, size_t size, const char *format, va_list ap)
 {
     char ch, integer_buf[32], *ptr;
     char *strtmp;

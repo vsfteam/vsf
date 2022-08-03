@@ -22,6 +22,7 @@
 #define __VSF_CFG_H__
 
 /*============================ MACROS ========================================*/
+
 #ifndef ENABLED
 #   define ENABLED                              1
 #endif
@@ -31,12 +32,14 @@
 #endif
 
 /*============================ INCLUDES ======================================*/
+
 /* do not modify this */
 #include "vsf_usr_cfg.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 
 #if     !defined(__VSF_RELEASE__) && !defined(__VSF_DEBUG__)
@@ -85,6 +88,41 @@ __VSF_HAL_SWI_NUM and its value must at least be 1.
 #   error "please enable one of VSF_HAL_USE_DEBUG_STREAM/VSF_DEBUGGER_CFG_CONSOLE/VSF_CFG_DEBUG_STREAM_TX_T"
 #endif
 
+#if defined(__VSF_APPLET__)
+extern void * vsf_vplt(void *);
+extern int main(int, char **);
+#   ifndef VSF_APPLET_VPLT
+#       define VSF_APPLET_VPLT                  ((vsf_vplt_t *)vsf_vplt((void *)0))
+#   endif
+
+#   define main(...)                                                            \
+        _start(int argc, char **argv, void *vplt)                               \
+        {                                                                       \
+            vsf_vplt(vplt);                                                     \
+            return main(argc, argv);                                            \
+        }                                                                       \
+        void * vsf_vplt(void *vplt)                                             \
+        {                                                                       \
+            static void *__vplt;                                                \
+            if (vplt != (void *)0) {                                            \
+                __vplt = vplt;                                                  \
+            }                                                                   \
+            return __vplt;                                                      \
+        }                                                                       \
+        int main(__VA_ARGS__)
+
+#   if VSF_CFG_APPLET == ENABLED
+// check dependency of VSF_CFG_APPLET
+#       if VSF_LINUX_CFG_APPLET != ENABLED
+#           error what to put in vsf_vplt?
+#       endif
+typedef struct vsf_vplt_t {
+#       if VSF_LINUX_CFG_APPLET == ENABLED
+    void *linux;
+#       endif
+} vsf_vplt_t;
+#   endif
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

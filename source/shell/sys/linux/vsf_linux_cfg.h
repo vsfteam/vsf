@@ -133,6 +133,29 @@
 #   endif
 #endif
 
+#if defined(__VSF_APPLET__) && VSF_LINUX_CFG_APPLET == ENABLED
+// check dependency of VSF_LINUX_CFG_APPLET
+#   if VSF_LINUX_APPLET_CFG_STDIO != ENABLED
+#       error what to put in vsf_linux_vplt?
+#   endif
+
+#   ifndef VSF_LINUX_APPLET_VPLT
+#       if VSF_CFG_APPLET == ENABLED
+#           define VSF_LINUX_APPLET_VPLT                                        \
+                ((vsf_linux_vplt_t *)(VSF_APPLET_VPLT->linux))
+#       else
+#           define VSF_LINUX_APPLET_VPLT                                        \
+                ((vsf_linux_vplt_t *)vsf_vplt((void *)0))
+#       endif
+#   endif
+
+typedef struct vsf_linux_vplt_t {
+#   if VSF_LINUX_APPLET_CFG_STDIO == ENABLED
+    void *stdio;
+#   endif
+} vsf_linux_vplt_t;
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
