@@ -793,7 +793,7 @@ ssize_t getline(char **lineptr, size_t *n, FILE *f)
 }
 
 #if VSF_LINUX_APPLET_USE_STDIO == ENABLED && !defined(__VSF_APPLET__)
-const vsf_linux_stdio_vplt_t __vsf_linux_stdio_vplt = {
+const vsf_linux_stdio_vplt_t vsf_linux_stdio_vplt = {
     .__vsf_linux_stdin      = __vsf_linux_stdin,
     .__vsf_linux_stdout     = __vsf_linux_stdout,
     .__vsf_linux_stderr     = __vsf_linux_stderr,

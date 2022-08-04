@@ -2406,9 +2406,9 @@ char * nl_langinfo(nl_item item)
 
 // vplt
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
-const vsf_linux_vplt_t __vsf_linux_vplt = {
+const vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_USE_APPLET == ENABLED
-    .stdio          = (void *)&__vsf_linux_stdio_vplt,
+    .stdio          = (void *)&vsf_linux_stdio_vplt,
 #   endif
 };
 #endif

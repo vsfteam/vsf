@@ -156,7 +156,7 @@ typedef struct vsf_linux_vplt_t {
 } vsf_linux_vplt_t;
 
 #   ifndef __VSF_APPLET__
-extern const vsf_linux_vplt_t __vsf_linux_vplt;
+extern const vsf_linux_vplt_t vsf_linux_vplt;
 #   endif
 #endif
 
