@@ -42,6 +42,7 @@ extern "C" {
 // avoid conflicts with APIs in ucrt
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
+#define getenv              VSF_LINUX_LIBC_WRAPPER(getenv)
 // system("chcp 65001"); will be called in debug_stream driver, wrapper here
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
 #endif
