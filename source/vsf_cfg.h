@@ -98,15 +98,17 @@ typedef struct vsf_vplt_t {
     void *linux;
 #   endif
 } vsf_vplt_t;
+extern const vsf_vplt_t vsf_vplt;
+#endif
 
-#   ifdef __VSF_APPLET__
+#ifdef __VSF_APPLET__
+#   if VSF_USE_APPLET == ENABLED && !defined(VSF_APPLET_VPLT)
+#       define VSF_APPLET_VPLT              ((vsf_vplt_t *)vsf_vplt((void *)0))
+#   endif
+
 extern void * vsf_vplt(void *);
 extern int main(int, char **);
-#       ifndef VSF_APPLET_VPLT
-#           define VSF_APPLET_VPLT              ((vsf_vplt_t *)vsf_vplt((void *)0))
-#       endif
-
-#       define main(...)                                                        \
+#   define main(...)                                                            \
         _start(int argc, char **argv, void *vplt)                               \
         {                                                                       \
             vsf_vplt(vplt);                                                     \
@@ -121,9 +123,6 @@ extern int main(int, char **);
             return __vplt;                                                      \
         }                                                                       \
         int main(__VA_ARGS__)
-#   else
-extern const vsf_vplt_t vsf_vplt;
-#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
