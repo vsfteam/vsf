@@ -178,9 +178,6 @@ typedef struct vsf_linux_stdio_vplt_t {
     FILE * (*popen)(const char *command, const char *type);
     int (*pclose)(FILE *stream);
 
-    void (*setbuf)(FILE *f, char *buf);
-    int (*setvbuf)(FILE *f, char *buffer, int mode, size_t size);
-
     int (*rename)(const char *old_filename, const char *new_filename);
     int (*renameat)(int olddirfd, const char *oldpath, int newdirfd, const char *newpath);
 
@@ -199,9 +196,6 @@ typedef struct vsf_linux_stdio_vplt_t {
     int (*sscanf)(const char *str, const char *format, ...);
 
     int (*remove)(const char *filename);
-
-    FILE * (*tmpfile)(void);
-    char * (*tmpnam)(char *str);
 } vsf_linux_stdio_vplt_t;
 #   ifndef __VSF_APPLET__
 extern const vsf_linux_stdio_vplt_t __vsf_linux_stdio_vplt;
@@ -293,9 +287,6 @@ static inline int fflush(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fflush(f
 static inline FILE * popen(const char *command, const char *type) { return VSF_LINUX_APPLET_STDIO_VPLT->popen(command, type); }
 static inline int pclose(FILE *stream) { return VSF_LINUX_APPLET_STDIO_VPLT->pclose(stream); }
 
-static inline void setbuf(FILE *f, char *buf) { VSF_LINUX_APPLET_STDIO_VPLT->setbuf(f, buf); }
-static inline int setvbuf(FILE *f, char *buffer, int mode, size_t size) { return VSF_LINUX_APPLET_STDIO_VPLT->setvbuf(f, buffer, mode, size); }
-
 static inline int rename(const char *old_filename, const char *new_filename) { return VSF_LINUX_APPLET_STDIO_VPLT->rename(old_filename, new_filename); }
 static inline int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath) { return VSF_LINUX_APPLET_STDIO_VPLT->renameat(olddirfd, oldpath, newdirfd, newpath); }
 
@@ -342,9 +333,6 @@ static inline int sscanf(const char *str, const char *format, ...) {
 }
 
 static inline int remove(const char *filename) { return VSF_LINUX_APPLET_STDIO_VPLT->remove(filename); }
-
-static inline FILE * tmpfile(void) { return VSF_LINUX_APPLET_STDIO_VPLT->tmpfile(); }
-static inline char * tmpnam(char *str) { return VSF_LINUX_APPLET_STDIO_VPLT->tmpnam(str); }
 
 #else
 
@@ -416,10 +404,10 @@ int snscanf(const char *str, size_t size, const char *format, ...);
 int sscanf(const char *str, const char *format, ...);
 
 int remove(const char *filename);
+#endif
 
 FILE * tmpfile(void);
 char * tmpnam(char *str);
-#endif
 
 #if defined(_GNU_SOURCE)
 ssize_t getline(char **lineptr, size_t *n, FILE *f);

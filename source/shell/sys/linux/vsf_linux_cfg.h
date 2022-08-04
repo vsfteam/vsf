@@ -133,7 +133,7 @@
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_USE_APPLET == ENABLED
+#if VSF_LINUX_USE_APPLET == ENABLED
 // check dependency of VSF_LINUX_USE_APPLET
 #   if VSF_LINUX_APPLET_USE_STDIO != ENABLED
 #       error what to put in vsf_linux_vplt?
@@ -154,6 +154,10 @@ typedef struct vsf_linux_vplt_t {
     void *stdio;
 #   endif
 } vsf_linux_vplt_t;
+
+#   ifndef __VSF_APPLET__
+extern const vsf_linux_vplt_t __vsf_linux_vplt;
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

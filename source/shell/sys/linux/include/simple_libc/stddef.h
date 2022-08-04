@@ -9,9 +9,6 @@
 #   include <sys/types.h>
 #endif
 
-#if __IS_COMPILER_IAR__ && (VSF_LINUX_LIBC_CFG_CPP == ENABLED)
-#   error simple_libc DOES NOT support IAR, please use libc in iar
-#endif
 
 #define VSF_LINUX_LIBC_WRAPPER(__api)   VSF_SHELL_WRAPPER(vsf_linux_libc, __api)
 

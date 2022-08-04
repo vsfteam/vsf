@@ -81,6 +81,11 @@ FILE * __vsf_linux_stderr(void)
     return (FILE *)vsf_linux_fd_get(STDERR_FILENO);
 }
 
+void setbuf(FILE *f, char *buf)
+{
+    // TODO: add implementation
+}
+
 int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
 {
     // TODO: add implementation
@@ -621,12 +626,27 @@ end:
     return result ? result : EOF;
 }
 
+int vscanf(const char *format, va_list ap)
+{
+    return vfscanf(stdin, format, ap);
+}
+
 int fscanf(FILE *f, const char *format, ...)
 {
     int result;
     va_list ap;
     va_start(ap, format);
         result = vfscanf(f, format, ap);
+    va_end(ap);
+    return result;
+}
+
+int scanf(const char *format, ...)
+{
+    int result;
+    va_list ap;
+    va_start(ap, format);
+        result = vscanf(format, ap);
     va_end(ap);
     return result;
 }
@@ -663,12 +683,10 @@ int feof(FILE *f)
 #   pragma clang diagnostic pop
 #endif
 
-#if !__IS_COMPILER_IAR__
 void perror(const char *str)
 {
     fprintf(stderr, "%s: %s\r\n", str, strerror(errno));
 }
-#endif
 
 FILE * popen(const char *command, const char *type)
 {
@@ -773,5 +791,64 @@ ssize_t getline(char **lineptr, size_t *n, FILE *f)
     VSF_LINUX_ASSERT(false);
     return -1;
 }
+
+#if VSF_LINUX_APPLET_USE_STDIO == ENABLED && !defined(__VSF_APPLET__)
+const vsf_linux_stdio_vplt_t __vsf_linux_stdio_vplt = {
+    .__vsf_linux_stdin      = __vsf_linux_stdin,
+    .__vsf_linux_stdout     = __vsf_linux_stdout,
+    .__vsf_linux_stderr     = __vsf_linux_stderr,
+    .perror                 = perror,
+    .putchar                = putchar,
+    .getchar                = getchar,
+    .fgetc                  = fgetc,
+    .fputc                  = fputc,
+    .getc                   = getc,
+    .putc                   = putc,
+    .ungetc                 = ungetc,
+    .puts                   = puts,
+    .fputs                  = fputs,
+    .fgets                  = fgets,
+    .scanf                  = scanf,
+    .vscanf                 = vscanf,
+    .fscanf                 = fscanf,
+    .vfscanf                = vfscanf,
+    .printf                 = printf,
+    .fprintf                = fprintf,
+    .vfprintf               = vfprintf,
+    .vprintf                = vprintf,
+    .fopen                  = fopen,
+    .fdopen                 = fdopen,
+    .freopen                = freopen,
+    .fclose                 = fclose,
+    .fileno                 = fileno,
+    .fseek                  = fseek,
+    .fseeko                 = fseeko,
+    .ftell                  = ftell,
+    .ftello                 = ftello,
+    .ftello64               = ftello64,
+    .rewind                 = rewind,
+    .fgetpos                = fgetpos,
+    .fsetpos                = fsetpos,
+    .fread                  = fread,
+    .fwrite                 = fwrite,
+    .fflush                 = fflush,
+    .popen                  = popen,
+    .pclose                 = pclose,
+    .rename                 = rename,
+    .renameat               = renameat,
+    .ferror                 = ferror,
+    .clearerr               = clearerr,
+    .feof                   = feof,
+    .sprintf                = sprintf,
+    .vsprintf               = vsprintf,
+    .snprintf               = snprintf,
+    .vsnprintf              = vsnprintf,
+    .vsscanf                = vsscanf,
+    .vsnscanf               = vsnscanf,
+    .snscanf                = snscanf,
+    .sscanf                 = sscanf,
+    .remove                 = remove,
+};
+#endif
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO

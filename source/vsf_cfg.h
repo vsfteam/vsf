@@ -88,14 +88,25 @@ __VSF_HAL_SWI_NUM and its value must at least be 1.
 #   error "please enable one of VSF_HAL_USE_DEBUG_STREAM/VSF_DEBUGGER_CFG_CONSOLE/VSF_CFG_DEBUG_STREAM_TX_T"
 #endif
 
-#if defined(__VSF_APPLET__)
+#if VSF_USE_APPLET == ENABLED
+// check dependency of VSF_USE_APPLET
+#   if VSF_LINUX_USE_APPLET != ENABLED
+#       error what to put in vsf_vplt?
+#   endif
+typedef struct vsf_vplt_t {
+#   if VSF_LINUX_USE_APPLET == ENABLED
+    void *linux;
+#   endif
+} vsf_vplt_t;
+
+#   ifdef __VSF_APPLET__
 extern void * vsf_vplt(void *);
 extern int main(int, char **);
-#   ifndef VSF_APPLET_VPLT
-#       define VSF_APPLET_VPLT                  ((vsf_vplt_t *)vsf_vplt((void *)0))
-#   endif
+#       ifndef VSF_APPLET_VPLT
+#           define VSF_APPLET_VPLT              ((vsf_vplt_t *)vsf_vplt((void *)0))
+#       endif
 
-#   define main(...)                                                            \
+#       define main(...)                                                        \
         _start(int argc, char **argv, void *vplt)                               \
         {                                                                       \
             vsf_vplt(vplt);                                                     \
@@ -110,17 +121,8 @@ extern int main(int, char **);
             return __vplt;                                                      \
         }                                                                       \
         int main(__VA_ARGS__)
-
-#   if VSF_USE_APPLET == ENABLED
-// check dependency of VSF_USE_APPLET
-#       if VSF_LINUX_USE_APPLET != ENABLED
-#           error what to put in vsf_vplt?
-#       endif
-typedef struct vsf_vplt_t {
-#       if VSF_LINUX_USE_APPLET == ENABLED
-    void *linux;
-#       endif
-} vsf_vplt_t;
+#   else
+extern const vsf_vplt_t vsf_vplt;
 #   endif
 #endif
 
