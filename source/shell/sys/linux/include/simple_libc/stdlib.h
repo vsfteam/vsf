@@ -185,7 +185,7 @@ static inline int unsetenv(const char *name) {
 }
 #endif
 static inline char * mktemps(char *template_str, int suffixlen) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->mktemps(tempalte_str, suffixlen);
+    return VSF_LINUX_APPLET_STDLIB_VPLT->mktemps(template_str, suffixlen);
 }
 static inline char * mktemp(char *template_str) {
     return VSF_LINUX_APPLET_STDLIB_VPLT->mktemp(template_str);
