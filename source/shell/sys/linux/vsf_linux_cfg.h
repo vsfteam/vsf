@@ -133,9 +133,27 @@
 #   endif
 #endif
 
+#if VSF_LINUX_APPLET_USE_LIBC == ENABLED
+#   ifndef VSF_LINUX_APPLET_USE_STDIO
+#       define VSF_LINUX_APPLET_USE_STDIO       ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_STDLIB
+#       define VSF_LINUX_APPLET_USE_STDLIB      ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_STDSTRING
+#       define VSF_LINUX_APPLET_USE_STDSTRING   ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_STDTIME
+#       define VSF_LINUX_APPLET_USE_STDTIME     ENABLED
+#   endif
+#endif
+
 #if VSF_LINUX_USE_APPLET == ENABLED
 // check dependency of VSF_LINUX_USE_APPLET
-#   if VSF_LINUX_APPLET_USE_STDIO != ENABLED
+#   if  VSF_LINUX_APPLET_USE_STDIO != ENABLED                                   \
+    &&  VSF_LINUX_APPLET_USE_STDLIB != ENABLED                                  \
+    &&  VSF_LINUX_APPLET_USE_STDSTRING != ENABLED                               \
+    &&  VSF_LINUX_APPLET_USE_STDTIME != ENABLED
 #       error what to put in vsf_linux_vplt?
 #   endif
 
@@ -152,6 +170,15 @@
 typedef struct vsf_linux_vplt_t {
 #   if VSF_LINUX_APPLET_USE_STDIO == ENABLED
     void *stdio;
+#   endif
+#   if VSF_LINUX_APPLET_USE_STDLIB == ENABLED
+    void *stdlib;
+#   endif
+#   if VSF_LINUX_APPLET_USE_STDSTRING == ENABLED
+    void *stdstring;
+#   endif
+#   if VSF_LINUX_APPLET_USE_STDTIME == ENABLED
+    void *stdtime;
 #   endif
 } vsf_linux_vplt_t;
 

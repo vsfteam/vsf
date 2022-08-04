@@ -573,7 +573,7 @@ double strtod(const char *str, char **endptr)
             ten_n *= ten_n;
         }
     }
-    
+
     return number;
 error:
     errno = ERANGE;
@@ -756,6 +756,67 @@ int unsetenv(const char *name)
 {
     return putenv((char *)name);
 }
+#endif
+
+#if VSF_LINUX_APPLET_USE_STDLIB == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_STDLIB_FUNC(__FUNC)     .__FUNC = __FUNC
+const vsf_linux_stdlib_vplt_t vsf_linux_stdlib_vplt = {
+    VSF_LINUX_APPLET_STDLIB_FUNC(malloc),
+    VSF_LINUX_APPLET_STDLIB_FUNC(realloc),
+    VSF_LINUX_APPLET_STDLIB_FUNC(free),
+    VSF_LINUX_APPLET_STDLIB_FUNC(aligned_alloc),
+    VSF_LINUX_APPLET_STDLIB_FUNC(calloc),
+    VSF_LINUX_APPLET_STDLIB_FUNC(memalign),
+    // malloc_usable_size should be in malloc.h
+    VSF_LINUX_APPLET_STDLIB_FUNC(malloc_usable_size),
+#if VSF_LINUX_LIBC_USE_ENVIRON
+    VSF_LINUX_APPLET_STDLIB_FUNC(putenv),
+    VSF_LINUX_APPLET_STDLIB_FUNC(getenv),
+    VSF_LINUX_APPLET_STDLIB_FUNC(setenv),
+    VSF_LINUX_APPLET_STDLIB_FUNC(unsetenv),
+#endif
+    VSF_LINUX_APPLET_STDLIB_FUNC(mktemps),
+    VSF_LINUX_APPLET_STDLIB_FUNC(mktemp),
+    VSF_LINUX_APPLET_STDLIB_FUNC(mkstemp),
+    VSF_LINUX_APPLET_STDLIB_FUNC(mkostemp),
+    VSF_LINUX_APPLET_STDLIB_FUNC(mkstemps),
+    VSF_LINUX_APPLET_STDLIB_FUNC(mkostemps),
+    VSF_LINUX_APPLET_STDLIB_FUNC(mkdtemp),
+
+    VSF_LINUX_APPLET_STDLIB_FUNC(div),
+    VSF_LINUX_APPLET_STDLIB_FUNC(ldiv),
+    VSF_LINUX_APPLET_STDLIB_FUNC(lldiv),
+
+    VSF_LINUX_APPLET_STDLIB_FUNC(itoa),
+    VSF_LINUX_APPLET_STDLIB_FUNC(atoi),
+    VSF_LINUX_APPLET_STDLIB_FUNC(atol),
+    VSF_LINUX_APPLET_STDLIB_FUNC(atoll),
+    VSF_LINUX_APPLET_STDLIB_FUNC(atof),
+    VSF_LINUX_APPLET_STDLIB_FUNC(strtol),
+    VSF_LINUX_APPLET_STDLIB_FUNC(strtoul),
+    VSF_LINUX_APPLET_STDLIB_FUNC(strtoll),
+    VSF_LINUX_APPLET_STDLIB_FUNC(strtoull),
+    VSF_LINUX_APPLET_STDLIB_FUNC(strtof),
+    VSF_LINUX_APPLET_STDLIB_FUNC(strtod),
+    VSF_LINUX_APPLET_STDLIB_FUNC(strtold),
+
+    VSF_LINUX_APPLET_STDLIB_FUNC(bsearch),
+    VSF_LINUX_APPLET_STDLIB_FUNC(qsort),
+
+    VSF_LINUX_APPLET_STDLIB_FUNC(rand),
+    VSF_LINUX_APPLET_STDLIB_FUNC(srand),
+
+    VSF_LINUX_APPLET_STDLIB_FUNC(abort),
+    VSF_LINUX_APPLET_STDLIB_FUNC(system),
+
+    VSF_LINUX_APPLET_STDLIB_FUNC(exit),
+    VSF_LINUX_APPLET_STDLIB_FUNC(atexit),
+
+    VSF_LINUX_APPLET_STDLIB_FUNC(abs),
+    VSF_LINUX_APPLET_STDLIB_FUNC(labs),
+    VSF_LINUX_APPLET_STDLIB_FUNC(llabs),
+    VSF_LINUX_APPLET_STDLIB_FUNC(imaxabs),
+};
 #endif
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDLIB

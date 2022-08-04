@@ -233,6 +233,16 @@ char * asctime(const struct tm *tm)
     return __asctime_r(tm, result, sizeof(result));
 }
 
+char * ctime(const time_t *t)
+{
+    return asctime(localtime(t));
+}
+
+char * ctime_r(const time_t *t, char *buf)
+{
+    return asctime_r(localtime_r(t, &(struct tm){ 0 }), buf);
+}
+
 struct tm * gmtime_r(const time_t *timep, struct tm *result)
 {
     static const uint16_t __lyday_month[13] = {-1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
@@ -423,6 +433,28 @@ int setitimer(int which, const struct itimerval *new_value, struct itimerval *ol
 
 #if __IS_COMPILER_LLVM__
 #   pragma clang diagnostic pop
+#endif
+
+#if VSF_LINUX_APPLET_USE_STDTIME == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_STDTIME_FUNC(__FUNC)    .__FUNC = __FUNC
+const vsf_linux_stdtime_vplt_t vsf_linux_stdtime_vplt = {
+    VSF_LINUX_APPLET_STDTIME_FUNC(clock),
+    VSF_LINUX_APPLET_STDTIME_FUNC(clock_gettime),
+    VSF_LINUX_APPLET_STDTIME_FUNC(clock_getres),
+    VSF_LINUX_APPLET_STDTIME_FUNC(time),
+    VSF_LINUX_APPLET_STDTIME_FUNC(difftime),
+    VSF_LINUX_APPLET_STDTIME_FUNC(asctime),
+    VSF_LINUX_APPLET_STDTIME_FUNC(asctime_r),
+    VSF_LINUX_APPLET_STDTIME_FUNC(ctime),
+    VSF_LINUX_APPLET_STDTIME_FUNC(ctime_r),
+    VSF_LINUX_APPLET_STDTIME_FUNC(gmtime),
+    VSF_LINUX_APPLET_STDTIME_FUNC(gmtime_r),
+    VSF_LINUX_APPLET_STDTIME_FUNC(localtime),
+    VSF_LINUX_APPLET_STDTIME_FUNC(localtime_r),
+    VSF_LINUX_APPLET_STDTIME_FUNC(mktime),
+    VSF_LINUX_APPLET_STDTIME_FUNC(strftime),
+    VSF_LINUX_APPLET_STDTIME_FUNC(nanosleep),
+};
 #endif
 
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_TIMER

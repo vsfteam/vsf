@@ -2407,8 +2407,17 @@ char * nl_langinfo(nl_item item)
 // vplt
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
 const vsf_linux_vplt_t vsf_linux_vplt = {
-#   if VSF_LINUX_USE_APPLET == ENABLED
+#   if VSF_LINUX_APPLET_USE_STDIO == ENABLED
     .stdio          = (void *)&vsf_linux_stdio_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_STDLIB == ENABLED
+    .stdlib         = (void *)&vsf_linux_stdlib_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_STDSTRING == ENABLED
+    .stdstring      = (void *)&vsf_linux_stdstring_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_STDTIME == ENABLED
+    .stdtime        = (void *)&vsf_linux_stdtime_vplt,
 #   endif
 };
 #endif

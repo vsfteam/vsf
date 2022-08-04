@@ -214,23 +214,55 @@ extern const vsf_linux_stdio_vplt_t vsf_linux_stdio_vplt;
 #   endif
 #endif
 
-static inline FILE * __vsf_linux_stdin(void) { return VSF_LINUX_APPLET_STDIO_VPLT->__vsf_linux_stdin(); }
-static inline FILE * __vsf_linux_stdout(void) { return VSF_LINUX_APPLET_STDIO_VPLT->__vsf_linux_stdout(); }
-static inline FILE * __vsf_linux_stderr(void) { return VSF_LINUX_APPLET_STDIO_VPLT->__vsf_linux_stderr(); }
-static inline void perror(const char *str) { VSF_LINUX_APPLET_STDIO_VPLT->perror(str); }
-static inline int putchar(int ch) { return VSF_LINUX_APPLET_STDIO_VPLT->putchar(ch); }
-static inline int getchar(void) { return VSF_LINUX_APPLET_STDIO_VPLT->getchar(); }
-static inline int fgetc(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fgetc(f); }
-static inline int fputc(int ch, FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fputc(ch, f); }
-static inline int getc(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->getc(f); }
-static inline int putc(int ch, FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->putc(ch, f); }
-static inline int ungetc(int c, FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->ungetc(c, f); }
-static inline int puts(const char *str) { return VSF_LINUX_APPLET_STDIO_VPLT->puts(str); }
-static inline int fputs(const char *str, FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fputs(str, f); }
-static inline char *fgets(char *str, int n, FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fgets(str, n, f); }
+static inline FILE * __vsf_linux_stdin(void) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->__vsf_linux_stdin();
+}
+static inline FILE * __vsf_linux_stdout(void) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->__vsf_linux_stdout();
+}
+static inline FILE * __vsf_linux_stderr(void) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->__vsf_linux_stderr();
+}
+static inline void perror(const char *str) {
+    VSF_LINUX_APPLET_STDIO_VPLT->perror(str);
+}
+static inline int putchar(int ch) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->putchar(ch);
+}
+static inline int getchar(void) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->getchar();
+}
+static inline int fgetc(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fgetc(f);
+}
+static inline int fputc(int ch, FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fputc(ch, f);
+}
+static inline int getc(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->getc(f);
+}
+static inline int putc(int ch, FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->putc(ch, f);
+}
+static inline int ungetc(int c, FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->ungetc(c, f);
+}
+static inline int puts(const char *str) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->puts(str);
+}
+static inline int fputs(const char *str, FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fputs(str, f);
+}
+static inline char *fgets(char *str, int n, FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fgets(str, n, f);
+}
 
-static inline int vscanf(const char *format, va_list ap) { return VSF_LINUX_APPLET_STDIO_VPLT->vscanf(format, ap); }
-static inline int vfscanf(FILE *f, const char *format, va_list ap) { return VSF_LINUX_APPLET_STDIO_VPLT->vfscanf(f, format, ap); }
+static inline int vscanf(const char *format, va_list ap) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->vscanf(format, ap);
+}
+static inline int vfscanf(FILE *f, const char *format, va_list ap) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->vfscanf(f, format, ap);
+}
 static inline int scanf(const char *format, ...) {
     int result;
     va_list ap;
@@ -248,8 +280,12 @@ static inline int fscanf(FILE *f, const char *format, ...) {
     return result;
 }
 
-static inline int vfprintf(FILE *f, const char *format, va_list ap) { return VSF_LINUX_APPLET_STDIO_VPLT->vfprintf(f, format, ap); }
-static inline int vprintf(const char *format, va_list ap) { return VSF_LINUX_APPLET_STDIO_VPLT->vprintf(format, ap); }
+static inline int vfprintf(FILE *f, const char *format, va_list ap) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->vfprintf(f, format, ap);
+}
+static inline int vprintf(const char *format, va_list ap) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->vprintf(format, ap);
+}
 static inline int printf(const char *format, ...) {
     int result;
     va_list ap;
@@ -267,35 +303,85 @@ static inline int fprintf(FILE *f, const char *format, ...) {
     return result;
 }
 
-static inline FILE * fopen(const char *filename, const char *mode) { return VSF_LINUX_APPLET_STDIO_VPLT->fopen(filename, mode); }
-static inline FILE * fdopen(int fildes, const char *mode) { return VSF_LINUX_APPLET_STDIO_VPLT->fdopen(fildes, mode); }
-static inline FILE * freopen(const char *filename, const char *mode, FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->freopen(filename, mode, f); }
-static inline int fclose(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fclose(f); }
-static inline int fileno(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fileno(f); }
-static inline int fseek(FILE *f, long offset, int fromwhere) { return VSF_LINUX_APPLET_STDIO_VPLT->fseek(f, offset, fromwhere); }
-static inline int fseeko(FILE *f, off_t offset, int fromwhere) { return VSF_LINUX_APPLET_STDIO_VPLT->fseeko(f, offset, fromwhere); }
-static inline long ftell(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->ftell(f); }
-static inline off_t ftello(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->ftello(f); }
-static inline off64_t ftello64(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->ftello64(f); }
-static inline void rewind(FILE *f) { VSF_LINUX_APPLET_STDIO_VPLT->rewind(f); }
-static inline int fgetpos(FILE *f, fpos_t *pos) { return VSF_LINUX_APPLET_STDIO_VPLT->fgetpos(f, pos); }
-static inline int fsetpos(FILE *f, const fpos_t *pos) { return VSF_LINUX_APPLET_STDIO_VPLT->fsetpos(f, pos); }
-static inline size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fread(ptr, size, nmemb, f); }
-static inline size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fwrite(ptr, size, nmemb, f); }
-static inline int fflush(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->fflush(f); }
+static inline FILE * fopen(const char *filename, const char *mode) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fopen(filename, mode);
+}
+static inline FILE * fdopen(int fildes, const char *mode) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fdopen(fildes, mode);
+}
+static inline FILE * freopen(const char *filename, const char *mode, FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->freopen(filename, mode, f);
+}
+static inline int fclose(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fclose(f);
+}
+static inline int fileno(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fileno(f);
+}
+static inline int fseek(FILE *f, long offset, int fromwhere) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fseek(f, offset, fromwhere);
+}
+static inline int fseeko(FILE *f, off_t offset, int fromwhere) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fseeko(f, offset, fromwhere);
+}
+static inline long ftell(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->ftell(f);
+}
+static inline off_t ftello(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->ftello(f);
+}
+static inline off64_t ftello64(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->ftello64(f);
+}
+static inline void rewind(FILE *f) {
+    VSF_LINUX_APPLET_STDIO_VPLT->rewind(f);
+}
+static inline int fgetpos(FILE *f, fpos_t *pos) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fgetpos(f, pos);
+}
+static inline int fsetpos(FILE *f, const fpos_t *pos) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fsetpos(f, pos);
+}
+static inline size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fread(ptr, size, nmemb, f);
+}
+static inline size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fwrite(ptr, size, nmemb, f);
+}
+static inline int fflush(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->fflush(f);
+}
 
-static inline FILE * popen(const char *command, const char *type) { return VSF_LINUX_APPLET_STDIO_VPLT->popen(command, type); }
-static inline int pclose(FILE *stream) { return VSF_LINUX_APPLET_STDIO_VPLT->pclose(stream); }
+static inline FILE * popen(const char *command, const char *type) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->popen(command, type);
+}
+static inline int pclose(FILE *stream) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->pclose(stream);
+}
 
-static inline int rename(const char *old_filename, const char *new_filename) { return VSF_LINUX_APPLET_STDIO_VPLT->rename(old_filename, new_filename); }
-static inline int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath) { return VSF_LINUX_APPLET_STDIO_VPLT->renameat(olddirfd, oldpath, newdirfd, newpath); }
+static inline int rename(const char *old_filename, const char *new_filename) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->rename(old_filename, new_filename);
+}
+static inline int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->renameat(olddirfd, oldpath, newdirfd, newpath);
+}
 
-static inline int ferror(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->ferror(f); }
-static inline void clearerr(FILE *f) { VSF_LINUX_APPLET_STDIO_VPLT->clearerr(f); }
-static inline int feof(FILE *f) { return VSF_LINUX_APPLET_STDIO_VPLT->feof(f); }
+static inline int ferror(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->ferror(f);
+}
+static inline void clearerr(FILE *f) {
+    VSF_LINUX_APPLET_STDIO_VPLT->clearerr(f);
+}
+static inline int feof(FILE *f) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->feof(f);
+}
 
-static inline int vsprintf(char *str, const char *format, va_list ap) { return VSF_LINUX_APPLET_STDIO_VPLT->vsprintf(str, format, ap); }
-static inline int vsnprintf(char *str, size_t size, const char* format, va_list ap) { return VSF_LINUX_APPLET_STDIO_VPLT->vsnprintf(str, size, format, ap); }
+static inline int vsprintf(char *str, const char *format, va_list ap) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->vsprintf(str, format, ap);
+}
+static inline int vsnprintf(char *str, size_t size, const char* format, va_list ap) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->vsnprintf(str, size, format, ap);
+}
 static inline int sprintf(char *str, const char *format, ...) {
     int result;
     va_list ap;
@@ -313,8 +399,12 @@ static inline int snprintf(char *str, size_t size, const char *format, ...) {
     return result;
 }
 
-static inline int vsscanf(const char *str, const char *format, va_list ap) { return VSF_LINUX_APPLET_STDIO_VPLT->vsscanf(str, format, ap); }
-static inline int vsnscanf(const char *str, size_t size, const char *format, va_list ap) { return VSF_LINUX_APPLET_STDIO_VPLT->vsnscanf(str, size, format, ap); }
+static inline int vsscanf(const char *str, const char *format, va_list ap) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->vsscanf(str, format, ap);
+}
+static inline int vsnscanf(const char *str, size_t size, const char *format, va_list ap) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->vsnscanf(str, size, format, ap);
+}
 static inline int snscanf(const char *str, size_t size, const char *format, ...) {
     int result;
     va_list ap;
@@ -332,9 +422,11 @@ static inline int sscanf(const char *str, const char *format, ...) {
     return result;
 }
 
-static inline int remove(const char *filename) { return VSF_LINUX_APPLET_STDIO_VPLT->remove(filename); }
+static inline int remove(const char *filename) {
+    return VSF_LINUX_APPLET_STDIO_VPLT->remove(filename);
+}
 
-#else
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_STDIO
 
 FILE * __vsf_linux_stdin(void);
 FILE * __vsf_linux_stdout(void);
@@ -404,7 +496,7 @@ int snscanf(const char *str, size_t size, const char *format, ...);
 int sscanf(const char *str, const char *format, ...);
 
 int remove(const char *filename);
-#endif
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_STDIO
 
 FILE * tmpfile(void);
 char * tmpnam(char *str);
