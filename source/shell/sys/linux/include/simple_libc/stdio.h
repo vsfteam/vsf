@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 // in cstdio, common macro overrides will be undefined
-#if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED && !defined(__VSF_APPLET__)
+#if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
 #define ferror              VSF_LINUX_LIBC_WRAPPER(ferror)
 #define clearerr            VSF_LINUX_LIBC_WRAPPER(clearerr)
 #define getc                VSF_LINUX_LIBC_WRAPPER(getc)

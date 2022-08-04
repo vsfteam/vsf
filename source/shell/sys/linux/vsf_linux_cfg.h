@@ -160,6 +160,14 @@ extern const vsf_linux_vplt_t vsf_linux_vplt;
 #   endif
 #endif
 
+#if     defined(__VSF_APPLET__)                                                 \
+    &&  (   (VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED)                             \
+        ||  (VSF_LINUX_CFG_WRAPPER == ENABLED)                                  \
+        ||  (VSF_LINUX_LIBUSB_CFG_WRAPPER == ENABLED)                           \
+        )
+#   error wrappers are not supported in applet.
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
