@@ -94,7 +94,7 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
     VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);
     char *str_end = str + maxsize - 1, *str_cur = str;
     char *curfmt, *subfmt, ch;
-    size_t curlen;
+    ssize_t curlen;
     int value, valuelen;
 
     while ((ch = *format++) != '\0') {

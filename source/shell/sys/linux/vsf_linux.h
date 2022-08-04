@@ -173,7 +173,7 @@ vsf_class(vsf_linux_thread_t) {
 typedef struct vsf_linux_sig_handler_t {
     vsf_dlist_node_t node;
     uint8_t sig;
-    uint8_t flags;
+    uint32_t flags;
     sigset_t mask;
     union {
         sighandler_t sighandler;
