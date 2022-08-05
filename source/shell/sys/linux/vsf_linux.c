@@ -572,6 +572,17 @@ int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, char * const * a
     return 0;
 }
 
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+static void __vsf_linux_thread_on_run(vsf_thread_cb_t *cb)
+{
+    vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
+    vsf_linux_process_t *process = thread->process;
+
+    vsf_arch_set_thread_reg(process->reg);
+    thread->op->on_run(cb);
+}
+#endif
+
 static int __vsf_linux_init_thread(int argc, char *argv[])
 {
     int err = vsf_linux_create_fhs();
@@ -713,7 +724,11 @@ vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op
         // set entry and on_terminate
         thread->op = op;
         thread->on_terminate = (vsf_eda_on_terminate_t)op->on_terminate;
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+        thread->entry = __vsf_linux_thread_on_run;
+#else
         thread->entry = (vsf_thread_entry_t *)op->on_run;
+#endif
 
         // set stack
         thread->stack_size = stack_size;
@@ -958,6 +973,16 @@ void vsf_linux_exit_process(int status)
     cur_thread->process = NULL;
 end_no_return:
     vsf_thread_exit();
+}
+
+void vsf_linux_set_process_reg(uintptr_t reg)
+{
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    process->reg = reg;
+    vsf_arch_set_thread_reg(reg);
+#endif
 }
 
 static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,

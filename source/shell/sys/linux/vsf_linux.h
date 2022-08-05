@@ -258,6 +258,9 @@ vsf_class(vsf_linux_process_t) {
     )
 
     private_member(
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+        uintptr_t reg;
+#endif
         char *working_dir;
 
         vsf_dlist_node_t process_node;
@@ -356,9 +359,10 @@ extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entr
 
 extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
 // delete unstarted/existed process
-void vsf_linux_delete_process(vsf_linux_process_t *process);
+extern void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
 extern void vsf_linux_exit_process(int status);
+extern void vsf_linux_set_process_reg(uintptr_t reg);
 
 extern void vsf_linux_cleanup_process(vsf_linux_process_t *process);
 extern void vsf_linux_detach_process(vsf_linux_process_t *process);
