@@ -134,17 +134,17 @@
 #endif
 
 #if VSF_LINUX_APPLET_USE_LIBC == ENABLED
-#   ifndef VSF_LINUX_APPLET_USE_STDIO
-#       define VSF_LINUX_APPLET_USE_STDIO       ENABLED
+#   ifndef VSF_LINUX_APPLET_USE_LIBC_STDIO
+#       define VSF_LINUX_APPLET_USE_LIBC_STDIO  ENABLED
 #   endif
-#   ifndef VSF_LINUX_APPLET_USE_STDLIB
-#       define VSF_LINUX_APPLET_USE_STDLIB      ENABLED
+#   ifndef VSF_LINUX_APPLET_USE_LIBC_STDLIB
+#       define VSF_LINUX_APPLET_USE_LIBC_STDLIB ENABLED
 #   endif
-#   ifndef VSF_LINUX_APPLET_USE_STDSTRING
-#       define VSF_LINUX_APPLET_USE_STDSTRING   ENABLED
+#   ifndef VSF_LINUX_APPLET_USE_LIBC_STRING
+#       define VSF_LINUX_APPLET_USE_LIBC_STRING ENABLED
 #   endif
-#   ifndef VSF_LINUX_APPLET_USE_STDTIME
-#       define VSF_LINUX_APPLET_USE_STDTIME     ENABLED
+#   ifndef VSF_LINUX_APPLET_USE_LIBC_TIME
+#       define VSF_LINUX_APPLET_USE_LIBC_TIME   ENABLED
 #   endif
 #endif
 
@@ -163,79 +163,79 @@ typedef struct vsf_linux_vplt_t {
     vsf_vplt_info_t info;
 
     // libc
-    void *stdio;
-    void *stdlib;
-    void *stdstring;
-    void *stdtime;
-    void *stdgetopt;
-    void *stdres0;
-    void *stdres1;
-    void *stdres2;
-    void *stdres3;
-    void *stdres4;
-    void *stdres5;
-    void *stdres6;
-    void *stdres7;
+    void *libc_stdio;
+    void *libc_stdlib;
+    void *libc_string;
+    void *libc_time;
+    void *libc_setjmp;
+    void *libc_assert;
+    void *libc_math;
+    void *libc_res0;
+    void *libc_res1;
+    void *libc_res2;
+    void *libc_res3;
+    void *libc_res4;
+    void *libc_res5;
+    void *libc_res6;
+    void *libc_res7;
 
     // sys
-    void *sysepoll;
-    void *sysselect;
-    void *systime;
-    void *syswait;
-    void *syseventfd;
-    void *sysstat;
-    void *sysmman;
-    void *sysutsname;
-    void *sysshm;
-    void *sysmount;
-    void *syscall;
-    void *syssocket;
-    void *sysipc;
-    void *syslog;
-    void *sysrandom;
-    void *sysres0;
-    void *sysres1;
-    void *sysres2;
-    void *sysres3;
-    void *sysres4;
-    void *sysres5;
-    void *sysres6;
-    void *sysres7;
+    void *sys_epoll;
+    void *sys_select;
+    void *sys_time;
+    void *sys_wait;
+    void *sys_eventfd;
+    void *sys_stat;
+    void *sys_mman;
+    void *sys_utsname;
+    void *sys_shm;
+    void *sys_mount;
+    void *sys_syscall;
+    void *sys_socket;
+    void *sys_ipc;
+    void *sys_syslog;
+    void *sys_random;
+    void *sys_res0;
+    void *sys_res1;
+    void *sys_res2;
+    void *sys_res3;
+    void *sys_res4;
+    void *sys_res5;
+    void *sys_res6;
+    void *sys_res7;
 
     // unix
     void *unistd;
-    void *unisignal;
-    void *unierrno;
-    void *unipthread;
-    void *unipoll;
-    void *unisem;
-    void *unifcntl;
-    void *unidirent;
-    void *unispawn;
-    void *unitermios;
-    void *uninetdb;
-    void *unilanginfo;
-    void *unisyslog;
-    void *uniarpainet;
-    void *unires0;
-    void *unires1;
-    void *unires2;
-    void *unires3;
-    void *unires4;
-    void *unires5;
-    void *unires6;
-    void *unires7;
+    void *signal;
+    void *pthread;
+    void *poll;
+    void *semaphore;
+    void *fcntl;
+    void *dirent;
+    void *spawn;
+    void *termios;
+    void *netdb;
+    void *langinfo;
+    void *syslog;
+    void *sched;
+    void *ifaddrs;
+    void *arpa_inet;
+    void *res0;
+    void *res1;
+    void *res2;
+    void *res3;
+    void *res4;
+    void *res5;
+    void *res6;
+    void *res7;
 
     // libraries
     void *libusb;
-    void *libres0;
-    void *libres1;
-    void *libres2;
-    void *libres3;
-    void *libres4;
-    void *libres5;
-    void *libres6;
-    void *libres7;
+    void *libgen;
+    void *libgetopt;
+    void *libsdl2;
+    void *libncurses;
+    void *libcurl;
 
     // for compatibility, new entries added below
 } vsf_linux_vplt_t;

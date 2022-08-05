@@ -42,8 +42,33 @@ struct pollfd {
     void *trig;
 };
 
+#if VSF_LINUX_APPLET_USE_POLL == ENABLED
+typedef struct vsf_linux_poll_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_poll_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_poll_vplt_t vsf_linux_poll_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_POLL == ENABLED
+
+#ifndef VSF_LINUX_APPLET_POLL_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_POLL_VPLT                                       \
+            ((vsf_linux_poll_vplt_t *)(VSF_LINUX_APPLET_VPLT->poll))
+#   else
+#       define VSF_LINUX_APPLET_POLL_VPLT                                       \
+            ((vsf_linux_poll_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_POLL
+
 int poll(struct pollfd *fds, nfds_t nfds, int timeout);
 int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_POLL
 
 #ifdef __cplusplus
 }

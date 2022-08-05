@@ -37,9 +37,34 @@ extern "C" {
 #define WIFSIGNALED(__STATUS)   0
 #define WTERMSIG(__STATUS)      ((__STATUS) & 0x7F)
 
+#if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED
+typedef struct vsf_linux_sys_wait_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_sys_wait_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_wait_vplt_t vsf_linux_sys_wait_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SYS_WAIT_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SYS_WAIT_VPLT                                   \
+            ((vsf_linux_sys_wait_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_wait))
+#   else
+#       define VSF_LINUX_APPLET_SYS_WAIT_VPLT                                   \
+            ((vsf_linux_sys_wait_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_WAIT
+
 pid_t wait(int *status);
 pid_t waitpid(pid_t pid, int *status, int options);
 int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_WAIT
 
 #ifdef __cplusplus
 }

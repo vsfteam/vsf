@@ -56,6 +56,29 @@ struct epoll_event {
 #define epoll_pwait2        VSF_LINUX_WRAPPER(epoll_pwait2)
 #endif
 
+#if VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED
+typedef struct vsf_linux_sys_epoll_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_sys_epoll_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_epoll_vplt_t vsf_linux_sys_epoll_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SYS_EPOLL_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SYS_EPOLL_VPLT                                  \
+            ((vsf_linux_sys_epoll_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_epoll))
+#   else
+#       define VSF_LINUX_APPLET_SYS_EPOLL_VPLT                                  \
+            ((vsf_linux_sys_epoll_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_EPOLL
+
 int epoll_create(int size);
 int epoll_create1(int flags);
 int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
@@ -67,6 +90,8 @@ int epoll_pwait(int epfd, struct epoll_event *events,
 int epoll_pwait2(int epfd, struct epoll_event *events,
                       int maxevents, const struct timespec *timeout,
                       const sigset_t *sigmask);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_EPOLL
 
 #ifdef __cplusplus
 }

@@ -32,6 +32,29 @@ extern "C" {
 #define ntohl               be32_to_cpu
 #define ntohs               be16_to_cpu
 
+#if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+typedef struct vsf_linux_arpa_inet_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_arpa_inet_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+
+#ifndef VSF_LINUX_APPLET_ARPA_INET_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_ARPA_INET_VPLT                                  \
+            ((vsf_linux_termios_vplt_t *)(VSF_LINUX_APPLET_VPLT->arpa_inet))
+#   else
+#       define VSF_LINUX_APPLET_ARPA_INET_VPLT                                  \
+            ((vsf_linux_termios_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_ARPA_INET
+
 in_addr_t inet_addr(const char *cp);
 in_addr_t inet_lnaof(struct in_addr in);
 struct in_addr inet_makeaddr(in_addr_t net, in_addr_t lna);
@@ -40,6 +63,8 @@ in_addr_t inet_network(const char *cp);
 int inet_aton(const char *cp, struct in_addr *addr);
 char * inet_ntoa(struct in_addr in);
 const char * inet_ntop(int af, const void *src, char *dst, socklen_t size);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_ARPA_INET
 
 #ifdef __cplusplus
 }

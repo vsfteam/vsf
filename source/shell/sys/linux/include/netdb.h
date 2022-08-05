@@ -89,23 +89,49 @@ struct servent {
 extern int * __vsf_linux_h_errno(void);
 #define h_errno             (*__vsf_linux_h_errno())
 
-struct hostent * gethostbyaddr(const void *addr, size_t len, int type);
-struct hostent * gethostbyname(const char *name);
-
-const char * gai_strerror(int errcode);
-
 // flags for getnameinfo
 #define NI_NAMEREQD         (1 << 0)
 #define NI_DGRAM            (1 << 1)
 #define NI_NOFQDN           (1 << 2)
 #define NI_NUMERICHOST      (1 << 3)
 #define NI_NUMERICSERV      (1 << 4)
+
+#if VSF_LINUX_APPLET_USE_NETDB == ENABLED
+typedef struct vsf_linux_netdb_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_netdb_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_NETDB == ENABLED
+
+#ifndef VSF_LINUX_APPLET_NETDB_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_NETDB_VPLT                                      \
+            ((vsf_linux_netdb_vplt_t *)(VSF_LINUX_APPLET_VPLT->netdb))
+#   else
+#       define VSF_LINUX_APPLET_NETDB_VPLT                                      \
+            ((vsf_linux_netdb_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_NETDB
+
+struct hostent * gethostbyaddr(const void *addr, size_t len, int type);
+struct hostent * gethostbyname(const char *name);
+
+const char * gai_strerror(int errcode);
+
 int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
                         char *host, socklen_t hostlen,
                         char *serv, socklen_t servlen, int flags);
 int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
                         struct addrinfo **pai);
 void freeaddrinfo(struct addrinfo *ai);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_NETDB
 
 #ifdef __cplusplus
 }

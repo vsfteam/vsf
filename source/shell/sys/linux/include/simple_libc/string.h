@@ -29,8 +29,8 @@ extern "C" {
 
 #define ffs                 vsf_ffs32
 
-#if VSF_LINUX_APPLET_USE_STDSTRING == ENABLED
-typedef struct vsf_linux_stdstring_vplt_t {
+#if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED
+typedef struct vsf_linux_libc_string_vplt_t {
     vsf_vplt_info_t info;
 
     int_fast8_t (*ffs)(uint_fast32_t);
@@ -61,110 +61,110 @@ typedef struct vsf_linux_stdstring_vplt_t {
     void * (*memmove)(void *dest, const void *src, size_t n);
     int (*memcmp)(const void *str1, const void *str2, size_t n);
     void * (*memchr)(const void *buf, int ch, size_t count);
-} vsf_linux_stdstring_vplt_t;
+} vsf_linux_libc_string_vplt_t;
 #   ifndef __VSF_APPLET__
-extern __VSF_VPLT_DECORATOR__ vsf_linux_stdstring_vplt_t vsf_linux_stdstring_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt;
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_STDSTRING == ENABLED
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED
 
-#ifndef VSF_LINUX_APPLET_STDSTRING_VPLT
+#ifndef VSF_LINUX_APPLET_LIBC_STRING_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
-#       define VSF_LINUX_APPLET_STDSTRING_VPLT                                  \
-            ((vsf_linux_stdstring_vplt_t *)(VSF_LINUX_APPLET_VPLT->stdstring))
+#       define VSF_LINUX_APPLET_LIBC_STRING_VPLT                                \
+            ((vsf_linux_libc_string_vplt_t *)(VSF_LINUX_APPLET_VPLT->libc_string))
 #   else
-#       define VSF_LINUX_APPLET_STDSTRING_VPLT                                  \
-            ((vsf_linux_stdstring_vplt_t *)vsf_vplt((void *)0))
+#       define VSF_LINUX_APPLET_LIBC_STRING_VPLT                                \
+            ((vsf_linux_libc_string_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
 
 static inline int ffs(int i) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->ffs(i);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->ffs(i);
 }
 static inline void * memset(void *s, int ch, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->memset(s, ch, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->memset(s, ch, n);
 }
 static inline size_t strlen(const char *str) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strlen(str);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strlen(str);
 }
 static inline size_t strnlen(const char *str, size_t maxlen) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strnlen(str, maxlen);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strnlen(str, maxlen);
 }
 static inline int strcmp(const char *str1, const char *str2) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strcmp(str1, str2);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strcmp(str1, str2);
 }
 static inline int strncmp(const char *str1, const char *str2, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strncmp(str1, str2, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strncmp(str1, str2, n);
 }
 static inline char * strdup(const char *str) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strdup(str);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strdup(str);
 }
 static inline char * strcpy(char *dest, const char *src) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strcpy(dest, src);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strcpy(dest, src);
 }
 static inline char * strncpy(char *dest, const char *src, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strncpy(dest, src, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strncpy(dest, src, n);
 }
 static inline char * strcat(char *dest, const char *src) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strcat(dest, src);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strcat(dest, src);
 }
 static inline char * strncat(char *dest, const char *str, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strncat(dest, str, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strncat(dest, str, n);
 }
 static inline int strcoll(const char *str1, const char *str2) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strcoll(str1, str2);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strcoll(str1, str2);
 }
 static inline char * strtok(char *str, const char *delim) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strtok(str, delim);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strtok(str, delim);
 }
 static inline size_t strxfrm(char *dest, const char *src, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strxfrm(dest, src, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strxfrm(dest, src, n);
 }
 static inline size_t strspn(const char *str1, const char *str2) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strspn(str1, str2);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strspn(str1, str2);
 }
 static inline size_t strcspn(const char *str1, const char *str2) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strcspn(str1, str2);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strcspn(str1, str2);
 }
 static inline char * strpbrk(const char *str1, const char *str2) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strpbrk(str1, str2);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strpbrk(str1, str2);
 }
 static inline char * strerror(int errnum) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strerror(errnum);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strerror(errnum);
 }
 static inline int strcasecmp(const char *s1, const char *s2) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strcasecmp(s1, s2);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strcasecmp(s1, s2);
 }
 static inline int strncasecmp(const char *s1, const char *s2, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strncasecmp(s1, s2, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strncasecmp(s1, s2, n);
 }
 static inline void * memcpy(void *dest, const void *src, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->memcpy(dest, src, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->memcpy(dest, src, n);
 }
 static inline size_t strlcpy(char *dest, const char *src, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strlcpy(dest, src, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strlcpy(dest, src, n);
 }
 static inline char * strstr(const char *str1, const char *str2) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strstr(str1, str2);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strstr(str1, str2);
 }
 static inline char * strchr(const char *str, int c) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strchr(str, c);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strchr(str, c);
 }
 static inline char * strrchr(const char *str, int c) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->strrchr(str, c);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strrchr(str, c);
 }
 static inline void * memmove(void *dest, const void *src, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->memmove(dest, src, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->memmove(dest, src, n);
 }
 static inline int memcmp(const void *str1, const void *str2, size_t n) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->memcmp(str1, str2, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->memcmp(str1, str2, n);
 }
 static inline void * memchr(const void *buf, int ch, size_t count) {
-    return VSF_LINUX_APPLET_STDSTRING_VPLT->memchr(buf, ch, count);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->memchr(buf, ch, count);
 }
 
-#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_STDSTRING
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STRING
 
 void * memset(void *s, int ch, size_t n);
 size_t strlen(const char *str);
@@ -219,7 +219,8 @@ _CONST_RETURN char * strrchr(const char *str, int c);
 void * memmove(void *dest, const void *src, size_t n);
 int memcmp(const void *str1, const void *str2, size_t n);
 _CONST_RETURN void * memchr(const void *buf, int ch, size_t count);
-#endif      // // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_STDSTRING
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STRING
 
 #ifdef __cplusplus
 }

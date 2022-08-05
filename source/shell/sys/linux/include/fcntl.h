@@ -57,7 +57,32 @@ struct flock {
     short   l_whence;
 };
 
+#if VSF_LINUX_APPLET_USE_FCNTL == ENABLED
+typedef struct vsf_linux_fcntl_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_fcntl_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_FCNTL == ENABLED
+
+#ifndef VSF_LINUX_APPLET_FCNTL_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_FCNTL_VPLT                                      \
+            ((vsf_linux_fcntl_vplt_t *)(VSF_LINUX_APPLET_VPLT->fcntl))
+#   else
+#       define VSF_LINUX_APPLET_FCNTL_VPLT                                      \
+            ((vsf_linux_fcntl_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_FCNTL
+
 int fcntl(int fd, int cmd, ...);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_FCNTL
 
 #ifdef __cplusplus
 }

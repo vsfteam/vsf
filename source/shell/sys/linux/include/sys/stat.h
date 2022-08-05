@@ -91,12 +91,37 @@ struct stat {
 #define st_ctime    st_ctim.tv_sec
 };
 
+#if VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED
+typedef struct vsf_linux_sys_stat_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_sys_stat_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SYS_STAT_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SYS_STAT_VPLT                                   \
+            ((vsf_linux_sys_stat_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_stat))
+#   else
+#       define VSF_LINUX_APPLET_SYS_STAT_VPLT                                   \
+            ((vsf_linux_sys_stat_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT
+
 mode_t umask(mode_t mask);
 int stat(const char *pathname, struct stat *buf);
 int fstat(int fd, struct stat *buf);
 int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
 int chmod(const char *pathname, mode_t mode);
 int fchmod(int fd, mode_t mode);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT
 
 #ifdef __cplusplus
 }

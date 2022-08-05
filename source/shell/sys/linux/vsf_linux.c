@@ -2409,17 +2409,17 @@ char * nl_langinfo(nl_item item)
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     .info.entry_num = (sizeof(vsf_linux_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
 
-#   if VSF_LINUX_APPLET_USE_STDIO == ENABLED
-    .stdio          = (void *)&vsf_linux_stdio_vplt,
+#   if VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED
+    .libc_stdio     = (void *)&vsf_linux_libc_stdio_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_STDLIB == ENABLED
-    .stdlib         = (void *)&vsf_linux_stdlib_vplt,
+#   if VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED
+    .libc_stdlib    = (void *)&vsf_linux_libc_stdlib_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_STDSTRING == ENABLED
-    .stdstring      = (void *)&vsf_linux_stdstring_vplt,
+#   if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED
+    .libc_string    = (void *)&vsf_linux_libc_string_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_STDTIME == ENABLED
-    .stdtime        = (void *)&vsf_linux_stdtime_vplt,
+#   if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED
+    .libc_time      = (void *)&vsf_linux_libc_time_vplt,
 #   endif
 };
 #endif

@@ -145,7 +145,10 @@ extern "C" {
 /* Linux has no ENOTSUP error code. */
 #define ENOTSUP         EOPNOTSUPP
 
+#ifndef __VSF_APPLET__
 extern int * __vsf_linux_errno(void);
+#endif
+
 #define errno           (*__vsf_linux_errno())
 
 #ifdef __cplusplus

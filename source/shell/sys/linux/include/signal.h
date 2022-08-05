@@ -153,6 +153,29 @@ static inline int sigtestsetmask(sigset_t *set, unsigned long mask)
     return (set->sig[0] & mask) != 0;
 }
 
+#if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED
+typedef struct vsf_linux_signal_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_signal_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SIGNAL == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SIGNAL_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SIGNAL_VPLT                                     \
+            ((vsf_linux_signal_vplt_t *)(VSF_LINUX_APPLET_VPLT->signal))
+#   else
+#       define VSF_LINUX_APPLET_SIGNAL_VPLT                                     \
+            ((vsf_linux_signal_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SIGNAL
+
 int kill(pid_t pid, int sig);
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 sighandler_t signal(int signum, sighandler_t handler);
@@ -160,6 +183,8 @@ int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
 int raise(int sig);
 
 int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SIGNAL
 
 #ifdef __cplusplus
 }

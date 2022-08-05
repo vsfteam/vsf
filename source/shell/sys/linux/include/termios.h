@@ -196,6 +196,29 @@ struct termios {
     speed_t c_ospeed;
 };
 
+#if VSF_LINUX_APPLET_USE_TERMIOS == ENABLED
+typedef struct vsf_linux_termios_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_termios_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_termios_vplt_t vsf_linux_termios_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_TERMIOS == ENABLED
+
+#ifndef VSF_LINUX_APPLET_TERMIOS_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_TERMIOS_VPLT                                    \
+            ((vsf_linux_termios_vplt_t *)(VSF_LINUX_APPLET_VPLT->termios))
+#   else
+#       define VSF_LINUX_APPLET_TERMIOS_VPLT                                    \
+            ((vsf_linux_termios_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_TERMIOS
+
 int tcgetattr(int fd, struct termios *termios);
 int tcsetattr(int fd, int optional_actions, const struct termios *termios);
 int tcsendbreak(int fd, int duration);
@@ -208,6 +231,8 @@ speed_t cfgetospeed(const struct termios *termios_p);
 int cfsetispeed(struct termios *termios_p, speed_t speed);
 int cfsetospeed(struct termios *termios_p, speed_t speed);
 int cfsetspeed(struct termios *termios_p, speed_t speed);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_TERMIOS
 
 #ifdef __cplusplus
 }

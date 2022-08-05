@@ -116,6 +116,50 @@ struct linger {
 #define SO_SNDTIMEO     21
 #define SO_NONBLOCK     100
 
+// flags for send/recv
+enum {
+    MSG_OOB             = 1 << 0,
+#define MSG_OOB         MSG_OOB
+    MSG_PEEK            = 1 << 1,
+#define MSG_PEEK        MSG_PEEK
+    MSG_WAITALL         = 1 << 2,
+#define MSG_WAITALL     MSG_WAITALL
+    MSG_NOSIGNAL        = 1 << 3,
+#define MSG_NOSIGNAL    MSG_NOSIGNAL
+    MSG_DONTWAIT        = 1 << 4,
+#define MSG_DONTWAIT    MSG_DONTWAIT
+};
+
+// how for shutdown
+enum {
+    SHUT_RD             = 1 << 0,
+    SHUT_WR             = 1 << 1,
+    SHUT_RDWR           = SHUT_RD | SHUT_WR,
+};
+
+#if VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED
+typedef struct vsf_linux_sys_socket_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_sys_socket_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SYS_SOCKET_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SYS_SOCKET_VPLT                                 \
+            ((vsf_linux_sys_socket_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_socket))
+#   else
+#       define VSF_LINUX_APPLET_SYS_SOCKET_VPLT                                 \
+            ((vsf_linux_sys_socket_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SOCKET
+
 int setsockopt(int socket, int level, int optname, const void *optval,
                     socklen_t optlen);
 int getsockopt(int socket, int level, int optname, void *optval,
@@ -129,34 +173,18 @@ int bind(int socket, const struct sockaddr *addr, socklen_t addrlen);
 int connect(int socket, const struct sockaddr *addr, socklen_t addrlen);
 int listen(int socket, int backlog);
 
-// flags
-enum {
-    MSG_OOB             = 1 << 0,
-#define MSG_OOB         MSG_OOB
-    MSG_PEEK            = 1 << 1,
-#define MSG_PEEK        MSG_PEEK
-    MSG_WAITALL         = 1 << 2,
-#define MSG_WAITALL     MSG_WAITALL
-    MSG_NOSIGNAL        = 1 << 3,
-#define MSG_NOSIGNAL    MSG_NOSIGNAL
-    MSG_DONTWAIT        = 1 << 4,
-#define MSG_DONTWAIT    MSG_DONTWAIT
-};
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
 ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen);
 ssize_t send(int socket, const void *message, size_t length, int flags);
 ssize_t sendto(int socket, const void *message, size_t length, int flags,
                     const struct sockaddr *dest_addr, socklen_t addrlen);
-// how for shutdown
-enum {
-    SHUT_RD             = 1 << 0,
-    SHUT_WR             = 1 << 1,
-    SHUT_RDWR           = SHUT_RD | SHUT_WR,
-};
+
 int shutdown(int socket, int how);
 int socket(int domain, int type, int protocol);
 int socketpair(int domain, int type, int protocol, int socket_vector[2]);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SOCKET
 
 #ifdef __cplusplus
 }

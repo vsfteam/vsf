@@ -435,27 +435,27 @@ int setitimer(int which, const struct itimerval *new_value, struct itimerval *ol
 #   pragma clang diagnostic pop
 #endif
 
-#if VSF_LINUX_APPLET_USE_STDTIME == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_STDTIME_FUNC(__FUNC)    .__FUNC = __FUNC
-__VSF_VPLT_DECORATOR__ vsf_linux_stdtime_vplt_t vsf_linux_stdtime_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_stdtime_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+#if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_LIBC_TIME_FUNC(__FUNC)          .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_libc_time_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
 
-    VSF_LINUX_APPLET_STDTIME_FUNC(clock),
-    VSF_LINUX_APPLET_STDTIME_FUNC(clock_gettime),
-    VSF_LINUX_APPLET_STDTIME_FUNC(clock_getres),
-    VSF_LINUX_APPLET_STDTIME_FUNC(time),
-    VSF_LINUX_APPLET_STDTIME_FUNC(difftime),
-    VSF_LINUX_APPLET_STDTIME_FUNC(asctime),
-    VSF_LINUX_APPLET_STDTIME_FUNC(asctime_r),
-    VSF_LINUX_APPLET_STDTIME_FUNC(ctime),
-    VSF_LINUX_APPLET_STDTIME_FUNC(ctime_r),
-    VSF_LINUX_APPLET_STDTIME_FUNC(gmtime),
-    VSF_LINUX_APPLET_STDTIME_FUNC(gmtime_r),
-    VSF_LINUX_APPLET_STDTIME_FUNC(localtime),
-    VSF_LINUX_APPLET_STDTIME_FUNC(localtime_r),
-    VSF_LINUX_APPLET_STDTIME_FUNC(mktime),
-    VSF_LINUX_APPLET_STDTIME_FUNC(strftime),
-    VSF_LINUX_APPLET_STDTIME_FUNC(nanosleep),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(clock),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(clock_gettime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(clock_getres),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(time),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(difftime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(asctime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(asctime_r),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(ctime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(ctime_r),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(gmtime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(gmtime_r),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(localtime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(localtime_r),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(mktime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(strftime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(nanosleep),
 };
 #endif
 

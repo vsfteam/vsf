@@ -37,10 +37,35 @@ struct shmid_ds {
 #define shmctl              VSF_LINUX_WRAPPER(shmctl)
 #endif
 
+#if VSF_LINUX_APPLET_USE_SYS_SHM == ENABLED
+typedef struct vsf_linux_sys_shm_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_sys_shm_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_SHM == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SYS_SHM_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SYS_SHM_VPLT                                    \
+            ((vsf_linux_sys_shm_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_shm))
+#   else
+#       define VSF_LINUX_APPLET_SYS_SHM_VPLT                                    \
+            ((vsf_linux_sys_shm_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SHM
+
 int shmget(key_t key, size_t size, int shmflg);
 void * shmat(int shmid, const void *shmaddr, int shmflg);
 int shmdt(const void *shmaddr);
 int shmctl(int shmid, int cmd, struct shmid_ds *buf);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SHM
 
 #ifdef __cplusplus
 }

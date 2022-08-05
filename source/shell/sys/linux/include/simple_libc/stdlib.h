@@ -71,8 +71,8 @@ typedef struct {
   long long rem;
 } lldiv_t;
 
-#if VSF_LINUX_APPLET_USE_STDLIB == ENABLED
-typedef struct vsf_linux_stdlib_vplt_t {
+#if VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED
+typedef struct vsf_linux_libc_stdlib_vplt_t {
     vsf_vplt_info_t info;
 
     void * (*malloc)(size_t size);
@@ -128,180 +128,180 @@ typedef struct vsf_linux_stdlib_vplt_t {
     long (*labs)(long j);
     long long (*llabs)(long long j);
     intmax_t (*imaxabs)(intmax_t j);
-} vsf_linux_stdlib_vplt_t;
+} vsf_linux_libc_stdlib_vplt_t;
 #   ifndef __VSF_APPLET__
-extern __VSF_VPLT_DECORATOR__ vsf_linux_stdlib_vplt_t vsf_linux_stdlib_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt;
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_STDLIB == ENABLED
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED
 
-#ifndef VSF_LINUX_APPLET_STDLIB_VPLT
+#ifndef VSF_LINUX_APPLET_LIBC_STDLIB_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
-#       define VSF_LINUX_APPLET_STDLIB_VPLT                                     \
-            ((vsf_linux_stdlib_vplt_t *)(VSF_LINUX_APPLET_VPLT->stdlib))
+#       define VSF_LINUX_APPLET_LIBC_STDLIB_VPLT                                \
+            ((vsf_linux_libc_stdlib_vplt_t *)(VSF_LINUX_APPLET_VPLT->libc_stdlib))
 #   else
-#       define VSF_LINUX_APPLET_STDLIB_VPLT                                     \
-            ((vsf_linux_stdlib_vplt_t *)vsf_vplt((void *)0))
+#       define VSF_LINUX_APPLET_LIBC_STDLIB_VPLT                                \
+            ((vsf_linux_libc_stdlib_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
 
 static inline void * malloc(size_t size) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->malloc(size);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->malloc(size);
 }
 static inline void * realloc(void *p, size_t size) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->realloc(p, size);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->realloc(p, size);
 }
 static inline void free(void *p) {
-    VSF_LINUX_APPLET_STDLIB_VPLT->free(p);
+    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->free(p);
 }
 
 static inline void * aligned_alloc(size_t alignment, size_t size) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->aligned_alloc(alignment, size);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->aligned_alloc(alignment, size);
 }
 static inline void * calloc(size_t n, size_t size) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->calloc(n, size);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->calloc(n, size);
 }
 static inline void * memalign(size_t alignment, size_t size) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->memalign(alignment, size);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->memalign(alignment, size);
 }
 
 // malloc_usable_size should be in malloc.h
 static inline size_t malloc_usable_size(void *p) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->malloc_usable_size(p);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->malloc_usable_size(p);
 }
 
 #if VSF_LINUX_LIBC_USE_ENVIRON
 static inline int putenv(char *string) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->putenv(string);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->putenv(string);
 }
 static inline char * getenv(const char *name) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->getenv(name);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->getenv(name);
 }
 static inline int setenv(const char *name, const char *value, int replace) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->setenv(name, value, replace);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->setenv(name, value, replace);
 }
 static inline int unsetenv(const char *name) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->unsetenv(name);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->unsetenv(name);
 }
 #endif
 static inline char * mktemps(char *template_str, int suffixlen) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->mktemps(template_str, suffixlen);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mktemps(template_str, suffixlen);
 }
 static inline char * mktemp(char *template_str) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->mktemp(template_str);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mktemp(template_str);
 }
 static inline int mkstemp(char *template_str) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->mkstemp(template_str);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkstemp(template_str);
 }
 static inline int mkostemp(char *template_str, int flags) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->mkostemp(template_str, flags);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkostemp(template_str, flags);
 }
 static inline int mkstemps(char *template_str, int suffixlen) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->mkstemps(template_str, suffixlen);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkstemps(template_str, suffixlen);
 }
 static inline int mkostemps(char *template_str, int suffixlen, int flags) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->mkostemps(template_str, suffixlen, flags);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkostemps(template_str, suffixlen, flags);
 }
 static inline char * mkdtemp(char *template_str) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->mkdtemp(template_str);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkdtemp(template_str);
 }
 
 static inline div_t div(int numer, int denom) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->div(numer, denom);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->div(numer, denom);
 }
 static inline ldiv_t ldiv(long int numer, long int denom) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->ldiv(numer, denom);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->ldiv(numer, denom);
 }
 static inline lldiv_t lldiv(long long int numer, long long int denom) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->lldiv(numer, denom);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->lldiv(numer, denom);
 }
 
 static inline char * itoa(int num, char *str, int radix) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->itoa(num, str, radix);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->itoa(num, str, radix);
 }
 static inline int atoi(const char * str) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->atoi(str);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atoi(str);
 }
 static inline long int atol(const char *str) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->atol(str);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atol(str);
 }
 static inline long long int atoll(const char *str) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->atoll(str);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atoll(str);
 }
 static inline double atof(const char *str) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->atof(str);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atof(str);
 }
 static inline long strtol(const char *str, char **endptr, int base) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->strtol(str, endptr, base);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtol(str, endptr, base);
 }
 static inline unsigned long strtoul(const char *str, char **endptr, int base) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->strtoul(str, endptr, base);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtoul(str, endptr, base);
 }
 static inline long long strtoll(const char *str, char **endptr, int base) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->strtoll(str, endptr, base);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtoll(str, endptr, base);
 }
 static inline unsigned long long strtoull(const char *str, char **endptr, int base) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->strtoull(str, endptr, base);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtoull(str, endptr, base);
 }
 static inline float strtof(const char *str, char **endptr) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->strtof(str, endptr);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtof(str, endptr);
 }
 static inline double strtod(const char *str, char **endptr) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->strtod(str, endptr);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtod(str, endptr);
 }
 static inline long double strtold(const char *str, char **endptr) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->strtold(str, endptr);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtold(str, endptr);
 }
 
 static inline void * bsearch(const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *)) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->bsearch(key, base, nitems, size, compar);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->bsearch(key, base, nitems, size, compar);
 }
 static inline void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)) {
-    VSF_LINUX_APPLET_STDLIB_VPLT->qsort(base, nitems, size, compar);
+    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->qsort(base, nitems, size, compar);
 }
 
 static inline int rand(void) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->rand();
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->rand();
 }
 static inline void srand(unsigned int seed) {
-    VSF_LINUX_APPLET_STDLIB_VPLT->srand(seed);
+    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->srand(seed);
 }
 static inline void srandom(unsigned int seed) {
-    VSF_LINUX_APPLET_STDLIB_VPLT->srand(seed);
+    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->srand(seed);
 }
 static inline long int random(void) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->rand();
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->rand();
 }
 
 static inline void abort(void) {
-    VSF_LINUX_APPLET_STDLIB_VPLT->abort();
+    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->abort();
 }
 static inline int system(const char *command) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->system(command);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->system(command);
 }
 
 static inline void exit(int status) {
-    VSF_LINUX_APPLET_STDLIB_VPLT->exit(status);
+    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->exit(status);
 }
 static inline int atexit(void (*func)(void)) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->atexit(func);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atexit(func);
 }
 
 static inline int abs(int j) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->abs(j);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->abs(j);
 }
 static inline long labs(long j) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->labs(j);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->labs(j);
 }
 static inline long long llabs(long long j) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->llabs(j);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->llabs(j);
 }
 static inline intmax_t imaxabs(intmax_t j) {
-    return VSF_LINUX_APPLET_STDLIB_VPLT->imaxabs(j);
+    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->imaxabs(j);
 }
 
-#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_STDLIB
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB
 
 void * malloc(size_t size);
 void * realloc(void *p, size_t size);
@@ -364,7 +364,7 @@ int abs(int j);
 long labs(long j);
 long long llabs(long long j);
 intmax_t imaxabs(intmax_t j);
-#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_STDLIB
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB
 
 int at_quick_exit(void (*func)(void));
 void quick_exit(int status);

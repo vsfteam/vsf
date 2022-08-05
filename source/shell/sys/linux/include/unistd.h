@@ -108,12 +108,6 @@ enum {
     DT_EXE,
 };
 
-int usleep(int micro_seconds);
-unsigned sleep(unsigned seconds);
-
-unsigned int alarm(unsigned int seconds);
-useconds_t ualarm(useconds_t usecs, useconds_t interval);
-
 #define setgid(__uid)               (0)
 #define getgid()                    ((gid_t)0)
 #define getegid()                   ((gid_t)0)
@@ -124,6 +118,54 @@ useconds_t ualarm(useconds_t usecs, useconds_t interval);
 #define getuid()                    ((uid_t)0)
 #define setuid(__uid)               (0)
 #define geteuid()                   ((uid_t)0)
+
+enum {
+    _SC_PAGESIZE,
+    _SC_OPEN_MAX,
+    _SC_CLK_TCK,
+};
+
+// workaround while using lwip, which will check iovec MACRO and define iovec if not defined
+#define iovec iovec
+struct iovec {
+    void  *iov_base;
+    size_t iov_len;
+};
+
+#define F_OK                (1 << 0)
+#define R_OK                (1 << 1)
+#define W_OK                (1 << 2)
+#define X_OK                (1 << 3)
+
+#if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
+typedef struct vsf_linux_unistd_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_unistd_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_UNISTD == ENABLED
+
+#ifndef VSF_LINUX_APPLET_UNISTD_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_UNISTD_VPLT                                     \
+            ((vsf_linux_unistd_vplt_t *)(VSF_LINUX_APPLET_VPLT->unistd))
+#   else
+#       define VSF_LINUX_APPLET_UNISTD_VPLT                                     \
+            ((vsf_linux_unistd_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_UNISTD
+
+int usleep(int micro_seconds);
+unsigned sleep(unsigned seconds);
+
+unsigned int alarm(unsigned int seconds);
+useconds_t ualarm(useconds_t usecs, useconds_t interval);
+
 pid_t getpid(void);
 pid_t getppid(void);
 
@@ -143,11 +185,6 @@ int daemon(int nochdir, int noclose);
 
 pid_t fork(void);
 int system(const char *cmd);
-enum {
-    _SC_PAGESIZE,
-    _SC_OPEN_MAX,
-    _SC_CLK_TCK,
-};
 long sysconf(int name);
 char *realpath(const char *path, char *resolved_path);
 int pipe(int pipefd[2]);
@@ -155,10 +192,6 @@ int pipe(int pipefd[2]);
 int creat(const char *pathname, mode_t mode);
 int open(const char *pathname, int flags, ...);
 int openat(int dirfd, const char *pathname, int flags, ...);
-#define F_OK            (1 << 0)
-#define R_OK            (1 << 1)
-#define W_OK            (1 << 2)
-#define X_OK            (1 << 3)
 int access(const char *pathname, int mode);
 int unlink(const char *pathname);
 int unlinkat(int dirfd, const char *pathname, int flags);
@@ -177,12 +210,6 @@ char * getcwd(char *buffer, size_t maxlen);
 
 int close(int fd);
 off_t lseek(int fd, off_t offset, int whence);
-// workaround while using lwip, which will check iovec MACRO and define iovec if not defined
-#define iovec iovec
-struct iovec {
-    void  *iov_base;
-    size_t iov_len;
-};
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);
 ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
@@ -211,6 +238,8 @@ int lchown(const char *pathname, uid_t owner, gid_t group);
 int fchownat(int dirfd, const char *pathname, uid_t owner, gid_t group, int flags);
 
 int getentropy(void *buffer, size_t length);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_UNISTD
 
 #ifdef __cplusplus
 }

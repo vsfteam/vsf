@@ -65,13 +65,40 @@ struct option {
 };
 
 __BEGIN_DECLS
+
+#if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
+typedef struct vsf_linux_libgetopt_vplt_t {
+    vsf_vplt_info_t info;
+} vsf_linux_libgetopt_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_libgetopt_vplt_t vsf_linux_libgetopt_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
+
+#ifndef VSF_LINUX_APPLET_LIBGETOPT_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_LIBGETOPT_VPLT                                  \
+            ((vsf_linux_libgetopt_vplt_t *)(VSF_LINUX_APPLET_VPLT->libgetopt))
+#   else
+#       define VSF_LINUX_APPLET_LIBGETOPT_VPLT                                  \
+            ((vsf_linux_libgetopt_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBGETOPT
+
 int	 getopt_long(int, char * const *, const char *,
 	    const struct option *, int *);
 int	 getopt_long_only(int, char * const *, const char *,
 	    const struct option *, int *);
+int	 getopt(int, char * const *, const char *);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBGETOPT
+
 #ifndef _GETOPT_DEFINED_
 #define _GETOPT_DEFINED_
-int	 getopt(int, char * const *, const char *);
 
 #	if VSF_LINUX_USE_GETOPT == ENABLED
 // for vsf linux, put these variable in process context and implement them as macro
@@ -100,5 +127,5 @@ extern   int optreset;
 #	endif
 #endif
 __END_DECLS
- 
+
 #endif /* !_GETOPT_H_ */
