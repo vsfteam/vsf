@@ -373,12 +373,12 @@ declare_class(vsf_thread_cb_t)
 typedef void vsf_thread_entry_t(vsf_thread_cb_t *thread);
 
 def_class( vsf_thread_t,
-    which(
-    #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    public_member(
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         implement(vsf_teda_t)
-    #   else
+#else
         implement(vsf_eda_t)
-    #   endif
+#endif
     )
 )
 end_def_class(vsf_thread_t)
@@ -427,7 +427,7 @@ typedef void vsf_thread_entry_t(vsf_thread_t *thread);
 //! \name thread
 //! @{
 def_class(vsf_thread_t,
-    which(
+    public_member(
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         implement(vsf_teda_t)
 #else
