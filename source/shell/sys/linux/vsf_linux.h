@@ -57,6 +57,10 @@ extern "C" {
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE MUST be enabled to use vsf_linux
 #endif
 
+#if VSF_USE_SIMPLE_STREAM != ENABLED
+#   error VSF_USE_SIMPLE_STREAM MUST be enabled to use vsf_linux
+#endif
+
 #ifndef VSF_LINUX_CFG_MAX_ARG_NUM
 #   define VSF_LINUX_CFG_MAX_ARG_NUM        31
 #endif

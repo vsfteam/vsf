@@ -1291,7 +1291,7 @@ exec_ret_t execv(const char *pathname, char * const * argv)
     return execve(pathname, argv, NULL);
 }
 
-static exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
+exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
 {
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
@@ -1334,7 +1334,7 @@ exec_ret_t execlp(const char *pathname, const char *arg, ...)
     return ret;
 }
 
-exec_ret_t execl(const char *pathname, const char *arg, ...)
+exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
 {
     char fullpath[MAX_PATH];
     int fd = __vsh_get_exe(fullpath, sizeof(fullpath), (char *)pathname, NULL);
@@ -1343,11 +1343,16 @@ exec_ret_t execl(const char *pathname, const char *arg, ...)
     }
     close(fd);
 
+    return __execlp_va(pathname, arg, ap);
+}
+
+exec_ret_t execl(const char *pathname, const char *arg, ...)
+{
     exec_ret_t ret;
 
     va_list ap;
     va_start(ap, arg);
-        ret = __execlp_va(pathname, arg, ap);
+        ret = __execl_va(pathname, arg, ap);
     va_end(ap);
     return ret;
 }
@@ -2405,6 +2410,77 @@ char * nl_langinfo(nl_item item)
 }
 
 // vplt
+#if VSF_LINUX_APPLET_USE_UNISTD == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_UNISTD_FUNC(__FUNC)         .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_unistd_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_UNISTD_FUNC(__vsf_linux_errno),
+    VSF_LINUX_APPLET_UNISTD_FUNC(usleep),
+    VSF_LINUX_APPLET_UNISTD_FUNC(sleep),
+    VSF_LINUX_APPLET_UNISTD_FUNC(alarm),
+    VSF_LINUX_APPLET_UNISTD_FUNC(ualarm),
+    VSF_LINUX_APPLET_UNISTD_FUNC(getpid),
+    VSF_LINUX_APPLET_UNISTD_FUNC(getppid),
+    VSF_LINUX_APPLET_UNISTD_FUNC(__execl_va),
+    VSF_LINUX_APPLET_UNISTD_FUNC(execl),
+    VSF_LINUX_APPLET_UNISTD_FUNC(__execlp_va),
+    VSF_LINUX_APPLET_UNISTD_FUNC(execlp),
+    VSF_LINUX_APPLET_UNISTD_FUNC(execv),
+    VSF_LINUX_APPLET_UNISTD_FUNC(execve),
+    VSF_LINUX_APPLET_UNISTD_FUNC(execvp),
+    VSF_LINUX_APPLET_UNISTD_FUNC(execvpe),
+    VSF_LINUX_APPLET_UNISTD_FUNC(daemon),
+    VSF_LINUX_APPLET_UNISTD_FUNC(sysconf),
+    VSF_LINUX_APPLET_UNISTD_FUNC(realpath),
+    VSF_LINUX_APPLET_UNISTD_FUNC(pipe),
+    VSF_LINUX_APPLET_UNISTD_FUNC(creat),
+    VSF_LINUX_APPLET_UNISTD_FUNC(__open_va),
+    VSF_LINUX_APPLET_UNISTD_FUNC(open),
+    VSF_LINUX_APPLET_UNISTD_FUNC(__openat_va),
+    VSF_LINUX_APPLET_UNISTD_FUNC(openat),
+    VSF_LINUX_APPLET_UNISTD_FUNC(access),
+    VSF_LINUX_APPLET_UNISTD_FUNC(unlink),
+    VSF_LINUX_APPLET_UNISTD_FUNC(unlinkat),
+    VSF_LINUX_APPLET_UNISTD_FUNC(link),
+    VSF_LINUX_APPLET_UNISTD_FUNC(mkdir),
+    VSF_LINUX_APPLET_UNISTD_FUNC(mkdirat),
+    VSF_LINUX_APPLET_UNISTD_FUNC(rmdir),
+    VSF_LINUX_APPLET_UNISTD_FUNC(dup),
+    VSF_LINUX_APPLET_UNISTD_FUNC(dup2),
+    VSF_LINUX_APPLET_UNISTD_FUNC(chroot),
+    VSF_LINUX_APPLET_UNISTD_FUNC(chdir),
+    VSF_LINUX_APPLET_UNISTD_FUNC(getcwd),
+    VSF_LINUX_APPLET_UNISTD_FUNC(close),
+    VSF_LINUX_APPLET_UNISTD_FUNC(lseek),
+    VSF_LINUX_APPLET_UNISTD_FUNC(read),
+    VSF_LINUX_APPLET_UNISTD_FUNC(write),
+    VSF_LINUX_APPLET_UNISTD_FUNC(readv),
+    VSF_LINUX_APPLET_UNISTD_FUNC(writev),
+    VSF_LINUX_APPLET_UNISTD_FUNC(pread),
+    VSF_LINUX_APPLET_UNISTD_FUNC(pwrite),
+    VSF_LINUX_APPLET_UNISTD_FUNC(preadv),
+    VSF_LINUX_APPLET_UNISTD_FUNC(pwritev),
+    VSF_LINUX_APPLET_UNISTD_FUNC(fsync),
+    VSF_LINUX_APPLET_UNISTD_FUNC(fdatasync),
+    VSF_LINUX_APPLET_UNISTD_FUNC(isatty),
+    VSF_LINUX_APPLET_UNISTD_FUNC(getpagesize),
+    VSF_LINUX_APPLET_UNISTD_FUNC(symlink),
+    VSF_LINUX_APPLET_UNISTD_FUNC(ftruncate),
+    VSF_LINUX_APPLET_UNISTD_FUNC(readlink),
+    VSF_LINUX_APPLET_UNISTD_FUNC(tcgetpgrp),
+    VSF_LINUX_APPLET_UNISTD_FUNC(tcsetpgrp),
+    VSF_LINUX_APPLET_UNISTD_FUNC(getpass),
+    VSF_LINUX_APPLET_UNISTD_FUNC(gethostname),
+    VSF_LINUX_APPLET_UNISTD_FUNC(sethostname),
+    VSF_LINUX_APPLET_UNISTD_FUNC(chown),
+    VSF_LINUX_APPLET_UNISTD_FUNC(fchown),
+    VSF_LINUX_APPLET_UNISTD_FUNC(lchown),
+    VSF_LINUX_APPLET_UNISTD_FUNC(fchownat),
+    VSF_LINUX_APPLET_UNISTD_FUNC(getentropy),
+};
+#endif
+
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     .info.entry_num = (sizeof(vsf_linux_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
@@ -2420,6 +2496,10 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED
     .libc_time      = (void *)&vsf_linux_libc_time_vplt,
+#   endif
+
+#   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
+    .unistd         = (void *)&vsf_linux_unistd_vplt,
 #   endif
 };
 #endif

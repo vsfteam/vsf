@@ -1402,25 +1402,26 @@ __open_again:
     return fd;
 }
 
-int open(const char *pathname, int flags, ...)
+int __open_va(const char *pathname, int flags, va_list ap)
 {
-    va_list ap;
-    mode_t mode;
-
-    va_start(ap, flags);
-        mode = va_arg(ap, mode_t);
-    va_end(ap);
+    mode_t mode = va_arg(ap, mode_t);
     return vsf_linux_open(NULL, pathname, flags, mode);
 }
 
-int openat(int dirfd, const char *pathname, int flags, ...)
+int open(const char *pathname, int flags, ...)
 {
-    va_list ap;
-    mode_t mode;
+    int ret;
 
+    va_list ap;
     va_start(ap, flags);
-        mode = va_arg(ap, mode_t);
+        ret = __open_va(pathname, flags, ap);
     va_end(ap);
+    return ret;
+}
+
+int __openat_va(int dirfd, const char *pathname, int flags, va_list ap)
+{
+    mode_t mode = va_arg(ap, mode_t);
 
     vk_file_t *dir = __vsf_linux_get_fs_ex(NULL, dirfd);
     if ((NULL == dir) || !(dir->attr & VSF_FILE_ATTR_DIRECTORY)) {
@@ -1428,6 +1429,17 @@ int openat(int dirfd, const char *pathname, int flags, ...)
         return -1;
     }
     return vsf_linux_open(dir, pathname, flags, mode);
+}
+
+int openat(int dirfd, const char *pathname, int flags, ...)
+{
+    int ret;
+
+    va_list ap;
+    va_start(ap, flags);
+        ret = __openat_va(dirfd, pathname, flags, ap);
+    va_end(ap);
+    return ret;
 }
 
 int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)

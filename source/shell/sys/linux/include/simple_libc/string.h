@@ -27,13 +27,11 @@ extern "C" {
 #define strdup              VSF_LINUX_LIBC_WRAPPER(strdup)
 #endif
 
-#define ffs                 vsf_ffs32
-
 #if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED
 typedef struct vsf_linux_libc_string_vplt_t {
     vsf_vplt_info_t info;
 
-    int_fast8_t (*ffs)(uint_fast32_t);
+    int (*ffs)(int i);
     void * (*memset)(void *s, int ch, size_t n);
     size_t (*strlen)(const char *str);
     size_t (*strnlen)(const char *str, size_t maxlen);
@@ -166,6 +164,7 @@ static inline void * memchr(const void *buf, int ch, size_t count) {
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STRING
 
+int ffs(int i);
 void * memset(void *s, int ch, size_t n);
 size_t strlen(const char *str);
 size_t strnlen(const char *str, size_t maxlen);

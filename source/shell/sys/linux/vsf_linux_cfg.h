@@ -162,6 +162,9 @@
 typedef struct vsf_linux_vplt_t {
     vsf_vplt_info_t info;
 
+    // fundmental, vsf APIs for linux
+    void *fundmental;
+
     // libc
     void *libc_stdio;
     void *libc_stdlib;
