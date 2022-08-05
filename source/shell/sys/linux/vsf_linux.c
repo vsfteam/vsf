@@ -2507,6 +2507,12 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #endif
 
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "./include/pthread.h"
+#else
+#   include <pthread.h>
+#endif
+
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     .info.entry_num = (sizeof(vsf_linux_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
 
@@ -2525,6 +2531,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 
 #   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
     .unistd         = (void *)&vsf_linux_unistd_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
+    .pthread        = (void *)&vsf_linux_pthread_vplt,
 #   endif
 };
 #endif
