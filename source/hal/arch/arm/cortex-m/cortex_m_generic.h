@@ -124,6 +124,16 @@ static ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)
     return __get_MSP();
 }
 
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+static ALWAYS_INLINE uintptr_t vsf_arch_set_thread_reg(uintptr_t value)
+{
+    register uintptr_t result;
+    __asm__ __volatile__ ("MOV %0, r9" : "=r"(result));
+    __asm__ __volatile__ ("MOV r9, %0" : : "r"(value));
+    return result;
+}
+#endif
+
 #ifdef __cplusplus
 }
 #endif
