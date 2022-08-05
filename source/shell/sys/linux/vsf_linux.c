@@ -2406,7 +2406,9 @@ char * nl_langinfo(nl_item item)
 
 // vplt
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
-const vsf_linux_vplt_t vsf_linux_vplt = {
+__VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
 #   if VSF_LINUX_APPLET_USE_STDIO == ENABLED
     .stdio          = (void *)&vsf_linux_stdio_vplt,
 #   endif

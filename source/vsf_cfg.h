@@ -88,17 +88,23 @@ __VSF_HAL_SWI_NUM and its value must at least be 1.
 #   error "please enable one of VSF_HAL_USE_DEBUG_STREAM/VSF_DEBUGGER_CFG_CONSOLE/VSF_CFG_DEBUG_STREAM_TX_T"
 #endif
 
+// for vplt
+#ifndef __VSF_VPLT_DECORATE__
+#   define __VSF_VPLT_DECORATOR__               const
+#endif
+typedef struct vsf_vplt_info_t {
+    unsigned char major;
+    unsigned char minor;
+    unsigned short entry_num;
+} vsf_vplt_info_t;
+
 #if VSF_USE_APPLET == ENABLED
-// check dependency of VSF_USE_APPLET
-#   if VSF_LINUX_USE_APPLET != ENABLED
-#       error what to put in vsf_vplt?
-#   endif
 typedef struct vsf_vplt_t {
-#   if VSF_LINUX_USE_APPLET == ENABLED
+    vsf_vplt_info_t info;
+
     void *linux;
-#   endif
 } vsf_vplt_t;
-extern const vsf_vplt_t vsf_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt;
 #endif
 
 #ifdef __VSF_APPLET__

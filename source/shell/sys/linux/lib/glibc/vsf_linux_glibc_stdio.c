@@ -794,7 +794,9 @@ ssize_t getline(char **lineptr, size_t *n, FILE *f)
 
 #if VSF_LINUX_APPLET_USE_STDIO == ENABLED && !defined(__VSF_APPLET__)
 #   define VSF_LINUX_APPLET_STDIO_FUNC(__FUNC)      .__FUNC = __FUNC
-const vsf_linux_stdio_vplt_t vsf_linux_stdio_vplt = {
+__VSF_VPLT_DECORATOR__ vsf_linux_stdio_vplt_t vsf_linux_stdio_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_stdio_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
     VSF_LINUX_APPLET_STDIO_FUNC(__vsf_linux_stdin),
     VSF_LINUX_APPLET_STDIO_FUNC(__vsf_linux_stdout),
     VSF_LINUX_APPLET_STDIO_FUNC(__vsf_linux_stderr),

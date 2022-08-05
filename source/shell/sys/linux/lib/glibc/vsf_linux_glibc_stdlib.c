@@ -760,7 +760,9 @@ int unsetenv(const char *name)
 
 #if VSF_LINUX_APPLET_USE_STDLIB == ENABLED && !defined(__VSF_APPLET__)
 #   define VSF_LINUX_APPLET_STDLIB_FUNC(__FUNC)     .__FUNC = __FUNC
-const vsf_linux_stdlib_vplt_t vsf_linux_stdlib_vplt = {
+__VSF_VPLT_DECORATOR__ vsf_linux_stdlib_vplt_t vsf_linux_stdlib_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_stdlib_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
     VSF_LINUX_APPLET_STDLIB_FUNC(malloc),
     VSF_LINUX_APPLET_STDLIB_FUNC(realloc),
     VSF_LINUX_APPLET_STDLIB_FUNC(free),

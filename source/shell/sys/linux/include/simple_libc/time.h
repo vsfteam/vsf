@@ -39,6 +39,8 @@ struct timespec {
 
 #if VSF_LINUX_APPLET_USE_STDTIME == ENABLED
 typedef struct vsf_linux_stdtime_vplt_t {
+    vsf_vplt_info_t info;
+
     clock_t (*clock)(void);
     int (*clock_gettime)(clockid_t clk_id, struct timespec *tp);
     int (*clock_getres)(clockid_t clk_id, struct timespec *res);
@@ -57,7 +59,7 @@ typedef struct vsf_linux_stdtime_vplt_t {
     int (*nanosleep)(const struct timespec *requested_time, struct timespec *remaining);
 } vsf_linux_stdtime_vplt_t;
 #   ifndef __VSF_APPLET__
-extern const vsf_linux_stdtime_vplt_t vsf_linux_stdtime_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_stdtime_vplt_t vsf_linux_stdtime_vplt;
 #   endif
 #endif
 

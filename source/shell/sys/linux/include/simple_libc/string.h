@@ -31,6 +31,8 @@ extern "C" {
 
 #if VSF_LINUX_APPLET_USE_STDSTRING == ENABLED
 typedef struct vsf_linux_stdstring_vplt_t {
+    vsf_vplt_info_t info;
+
     int_fast8_t (*ffs)(uint_fast32_t);
     void * (*memset)(void *s, int ch, size_t n);
     size_t (*strlen)(const char *str);
@@ -61,7 +63,7 @@ typedef struct vsf_linux_stdstring_vplt_t {
     void * (*memchr)(const void *buf, int ch, size_t count);
 } vsf_linux_stdstring_vplt_t;
 #   ifndef __VSF_APPLET__
-extern const vsf_linux_stdstring_vplt_t vsf_linux_stdstring_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_stdstring_vplt_t vsf_linux_stdstring_vplt;
 #   endif
 #endif
 

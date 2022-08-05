@@ -73,6 +73,8 @@ typedef struct {
 
 #if VSF_LINUX_APPLET_USE_STDLIB == ENABLED
 typedef struct vsf_linux_stdlib_vplt_t {
+    vsf_vplt_info_t info;
+
     void * (*malloc)(size_t size);
     void * (*realloc)(void *p, size_t size);
     void (*free)(void *p);
@@ -81,12 +83,10 @@ typedef struct vsf_linux_stdlib_vplt_t {
     void * (*memalign)(size_t alignment, size_t size);
     // malloc_usable_size should be in malloc.h
     size_t (*malloc_usable_size)(void *p);
-#if VSF_LINUX_LIBC_USE_ENVIRON
     int (*putenv)(char *string);
     char * (*getenv)(const char *name);
     int (*setenv)(const char *name, const char *value, int replace);
     int (*unsetenv)(const char *name);
-#endif
     char * (*mktemps)(char *template_str, int suffixlen);
     char * (*mktemp)(char *template_str);
     int (*mkstemp)(char *template_str);
@@ -130,7 +130,7 @@ typedef struct vsf_linux_stdlib_vplt_t {
     intmax_t (*imaxabs)(intmax_t j);
 } vsf_linux_stdlib_vplt_t;
 #   ifndef __VSF_APPLET__
-extern const vsf_linux_stdlib_vplt_t vsf_linux_stdlib_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_stdlib_vplt_t vsf_linux_stdlib_vplt;
 #   endif
 #endif
 

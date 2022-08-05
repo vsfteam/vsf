@@ -131,6 +131,8 @@ typedef intmax_t            fpos_t;
 
 #if VSF_LINUX_APPLET_USE_STDIO == ENABLED
 typedef struct vsf_linux_stdio_vplt_t {
+    vsf_vplt_info_t info;
+
     FILE * (*__vsf_linux_stdin)(void);
     FILE * (*__vsf_linux_stdout)(void);
     FILE * (*__vsf_linux_stderr)(void);
@@ -198,7 +200,7 @@ typedef struct vsf_linux_stdio_vplt_t {
     int (*remove)(const char *filename);
 } vsf_linux_stdio_vplt_t;
 #   ifndef __VSF_APPLET__
-extern const vsf_linux_stdio_vplt_t vsf_linux_stdio_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_stdio_vplt_t vsf_linux_stdio_vplt;
 #   endif
 #endif
 

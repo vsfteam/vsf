@@ -437,7 +437,9 @@ int setitimer(int which, const struct itimerval *new_value, struct itimerval *ol
 
 #if VSF_LINUX_APPLET_USE_STDTIME == ENABLED && !defined(__VSF_APPLET__)
 #   define VSF_LINUX_APPLET_STDTIME_FUNC(__FUNC)    .__FUNC = __FUNC
-const vsf_linux_stdtime_vplt_t vsf_linux_stdtime_vplt = {
+__VSF_VPLT_DECORATOR__ vsf_linux_stdtime_vplt_t vsf_linux_stdtime_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_stdtime_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
     VSF_LINUX_APPLET_STDTIME_FUNC(clock),
     VSF_LINUX_APPLET_STDTIME_FUNC(clock_gettime),
     VSF_LINUX_APPLET_STDTIME_FUNC(clock_getres),

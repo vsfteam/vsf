@@ -149,14 +149,6 @@
 #endif
 
 #if VSF_LINUX_USE_APPLET == ENABLED
-// check dependency of VSF_LINUX_USE_APPLET
-#   if  VSF_LINUX_APPLET_USE_STDIO != ENABLED                                   \
-    &&  VSF_LINUX_APPLET_USE_STDLIB != ENABLED                                  \
-    &&  VSF_LINUX_APPLET_USE_STDSTRING != ENABLED                               \
-    &&  VSF_LINUX_APPLET_USE_STDTIME != ENABLED
-#       error what to put in vsf_linux_vplt?
-#   endif
-
 #   ifndef VSF_LINUX_APPLET_VPLT
 #       if VSF_USE_APPLET == ENABLED
 #           define VSF_LINUX_APPLET_VPLT                                        \
@@ -168,31 +160,99 @@
 #   endif
 
 typedef struct vsf_linux_vplt_t {
-#   if VSF_LINUX_APPLET_USE_STDIO == ENABLED
+    vsf_vplt_info_t info;
+
+    // libc
     void *stdio;
-#   endif
-#   if VSF_LINUX_APPLET_USE_STDLIB == ENABLED
     void *stdlib;
-#   endif
-#   if VSF_LINUX_APPLET_USE_STDSTRING == ENABLED
     void *stdstring;
-#   endif
-#   if VSF_LINUX_APPLET_USE_STDTIME == ENABLED
     void *stdtime;
-#   endif
+    void *stdgetopt;
+    void *stdres0;
+    void *stdres1;
+    void *stdres2;
+    void *stdres3;
+    void *stdres4;
+    void *stdres5;
+    void *stdres6;
+    void *stdres7;
+
+    // sys
+    void *sysepoll;
+    void *sysselect;
+    void *systime;
+    void *syswait;
+    void *syseventfd;
+    void *sysstat;
+    void *sysmman;
+    void *sysutsname;
+    void *sysshm;
+    void *sysmount;
+    void *syscall;
+    void *syssocket;
+    void *sysipc;
+    void *syslog;
+    void *sysrandom;
+    void *sysres0;
+    void *sysres1;
+    void *sysres2;
+    void *sysres3;
+    void *sysres4;
+    void *sysres5;
+    void *sysres6;
+    void *sysres7;
+
+    // unix
+    void *unistd;
+    void *unisignal;
+    void *unierrno;
+    void *unipthread;
+    void *unipoll;
+    void *unisem;
+    void *unifcntl;
+    void *unidirent;
+    void *unispawn;
+    void *unitermios;
+    void *uninetdb;
+    void *unilanginfo;
+    void *unisyslog;
+    void *uniarpainet;
+    void *unires0;
+    void *unires1;
+    void *unires2;
+    void *unires3;
+    void *unires4;
+    void *unires5;
+    void *unires6;
+    void *unires7;
+
+    // libraries
+    void *libusb;
+    void *libres0;
+    void *libres1;
+    void *libres2;
+    void *libres3;
+    void *libres4;
+    void *libres5;
+    void *libres6;
+    void *libres7;
+
+    // for compatibility, new entries added below
 } vsf_linux_vplt_t;
 
 #   ifndef __VSF_APPLET__
-extern const vsf_linux_vplt_t vsf_linux_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt;
 #   endif
 #endif
 
-#if     defined(__VSF_APPLET__)                                                 \
-    &&  (   (VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED)                             \
-        ||  (VSF_LINUX_CFG_WRAPPER == ENABLED)                                  \
-        ||  (VSF_LINUX_LIBUSB_CFG_WRAPPER == ENABLED)                           \
-        )
-#   error wrappers are not supported in applet.
+#ifdef __VSF_APPLET__
+
+#   if  (VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED)                                 \
+    ||  (VSF_LINUX_CFG_WRAPPER == ENABLED)                                      \
+    ||  (VSF_LINUX_LIBUSB_CFG_WRAPPER == ENABLED)                               \
+#       error wrappers are not supported in applet.
+#   endif
+
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
