@@ -250,6 +250,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt;
 #   if  (VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED)                                 \
     ||  (VSF_LINUX_CFG_WRAPPER == ENABLED)                                      \
     ||  (VSF_LINUX_LIBUSB_CFG_WRAPPER == ENABLED)                               \
+    ||  (VSF_LINUX_SOCKET_CFG_WRAPPER == ENABLED)
 #       error wrappers are not supported in applet.
 #   endif
 
