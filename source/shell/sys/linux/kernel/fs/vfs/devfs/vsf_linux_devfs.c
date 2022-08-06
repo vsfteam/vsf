@@ -411,7 +411,7 @@ typedef struct vsf_linux_input_priv_t {
     vsf_slist_queue_t event_queue;
 } vsf_linux_input_priv_t;
 
-static void __vsf_linux_input_from_vsf_input(struct input_event *input_event, vk_input_type_t type, vk_input_evt_t *evt)
+static void __linux_input_from_vsf_input(struct input_event *input_event, vk_input_type_t type, vk_input_evt_t *evt)
 {
     vsf_systimer_tick_t us = vsf_systimer_get_us();
     input_event->time.tv_usec = us % 1000;
@@ -426,6 +426,11 @@ static void __vsf_linux_input_from_vsf_input(struct input_event *input_event, vk
     }
 }
 
+static void __vsf_input_from_linux_input(vk_input_type_t *type, vk_input_evt_t *evt, struct input_event *input_event)
+{
+    // TODO:
+}
+
 static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
 {
     vsf_linux_input_priv_t *input_priv = container_of(notifier, vsf_linux_input_priv_t, notifier);
@@ -435,7 +440,7 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
         return;
     }
 
-    __vsf_linux_input_from_vsf_input(&event->evt, type, evt);
+    __linux_input_from_vsf_input(&event->evt, type, evt);
 
     vsf_protect_t orig = vsf_protect_int();
         vsf_slist_queue_enqueue(vsf_linux_input_event_t, node, &input_priv->event_queue, event);
@@ -515,23 +520,14 @@ again:
 static ssize_t __vsf_linux_input_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     VSF_LINUX_ASSERT(!(count % sizeof(struct input_event)));
-    vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)sfd->priv;
     struct input_event *linux_input_event = (struct input_event *)buf;
-    vsf_linux_input_event_t *event;
     size_t written_count = 0;
+    vk_input_type_t vsf_input_type;
+    vk_input_evt_t vsf_input_event;
 
     while (written_count < count) {
-        event = VSF_POOL_ALLOC(vsf_linux_input_event_pool, &input_priv->event_pool);
-        if (event != NULL) {
-            break;
-        }
-
-        event->evt = *linux_input_event++;
-        vsf_protect_t orig = vsf_protect_int();
-            vsf_slist_queue_enqueue(vsf_linux_input_event_t, node, &input_priv->event_queue, event);
-        vsf_unprotect_int(orig);
-        vsf_linux_fd_set_status(&input_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
-
+        __vsf_input_from_linux_input(&vsf_input_type, &vsf_input_event, linux_input_event++);
+        vsf_input_on_evt(vsf_input_type, &vsf_input_event);
         written_count += sizeof(struct input_event);
     }
 
