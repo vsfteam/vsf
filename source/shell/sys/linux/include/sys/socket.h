@@ -132,6 +132,16 @@ enum {
 #define MSG_DONTWAIT    MSG_DONTWAIT
 };
 
+struct msghdr {
+    void                *msg_name;
+    socklen_t           msg_namelen;
+    struct iovec        *msg_iov;
+    size_t              msg_iovlen;
+    void                *msg_control;
+    size_t              msg_controllen;
+    int                 msg_flags;
+};
+
 // how for shutdown
 enum {
     SHUT_RD             = 1 << 0,
@@ -216,9 +226,9 @@ static inline int listen(int socket, int backlog) {
 static inline ssize_t recv(int socket, void *buffer, size_t length, int flags) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recv(socket, buffer, length, flags);
 }
-static inline ssize_t recvmsg(int socket, struct msghdr *msg, int flags) {
-    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recvmsg(socket, msg, flags);
-}
+//static inline ssize_t recvmsg(int socket, struct msghdr *msg, int flags) {
+//    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recvmsg(socket, msg, flags);
+//}
 static inline ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recvfrom(socket, buffer, length, flags,
@@ -227,9 +237,9 @@ static inline ssize_t recvfrom(int socket, void *buffer, size_t length, int flag
 static inline ssize_t send(int socket, const void *buffer, size_t length, int flags) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->send(socket, buffer, length, flags);
 }
-static inline ssize_t sendmsg(int socket, const struct msghdr *msg, int flags) {
-    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->sendmsg(socket, msg, flags);
-}
+//static inline ssize_t sendmsg(int socket, const struct msghdr *msg, int flags) {
+//    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->sendmsg(socket, msg, flags);
+//}
 static inline ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                     const struct sockaddr *dest_addr, socklen_t addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->sendto(socket, buffer, length, flags,
