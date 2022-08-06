@@ -80,8 +80,10 @@ struct linger {
 #define connect         VSF_LINUX_SOCKET_WRAPPER(connect)
 #define listen          VSF_LINUX_SOCKET_WRAPPER(listen)
 #define recv            VSF_LINUX_SOCKET_WRAPPER(recv)
+#define recvmsg         VSF_LINUX_SOCKET_WRAPPER(recvmsg)
 #define recvfrom        VSF_LINUX_SOCKET_WRAPPER(recvfrom)
 #define send            VSF_LINUX_SOCKET_WRAPPER(send)
+#define sendmsg         VSF_LINUX_SOCKET_WRAPPER(sendmsg)
 #define sendto          VSF_LINUX_SOCKET_WRAPPER(sendto)
 #define shutdown        VSF_LINUX_SOCKET_WRAPPER(shutdown)
 #define socket          VSF_LINUX_SOCKET_WRAPPER(socket)
@@ -155,9 +157,11 @@ typedef struct vsf_linux_sys_socket_vplt_t {
     int (*listen)(int socket, int backlog);
 
     ssize_t (*recv)(int socket, void *buffer, size_t length, int flags);
+    ssize_t (*recvmsg)(int sockfd, struct msghdr *msg, int flags);
     ssize_t (*recvfrom)(int socket, void *buffer, size_t length, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen);
     ssize_t (*send)(int socket, const void *message, size_t length, int flags);
+    ssize_t (*sendmsg)(int socket, const struct msghdr *msg, int flags);
     ssize_t (*sendto)(int socket, const void *message, size_t length, int flags,
                     const struct sockaddr *dest_addr, socklen_t addrlen);
 
@@ -212,6 +216,9 @@ static inline int listen(int socket, int backlog) {
 static inline ssize_t recv(int socket, void *buffer, size_t length, int flags) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recv(socket, buffer, length, flags);
 }
+static inline ssize_t recvmsg(int socket, struct msghdr *msg, int flags) {
+    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recvmsg(socket, msg, flags);
+}
 static inline ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recvfrom(socket, buffer, length, flags,
@@ -219,6 +226,9 @@ static inline ssize_t recvfrom(int socket, void *buffer, size_t length, int flag
 }
 static inline ssize_t send(int socket, const void *buffer, size_t length, int flags) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->send(socket, buffer, length, flags);
+}
+static inline ssize_t sendmsg(int socket, const struct msghdr *msg, int flags) {
+    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->sendmsg(socket, msg, flags);
 }
 static inline ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                     const struct sockaddr *dest_addr, socklen_t addrlen) {
@@ -253,9 +263,11 @@ int connect(int socket, const struct sockaddr *addr, socklen_t addrlen);
 int listen(int socket, int backlog);
 
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
+ssize_t recvmsg(int socket, struct msghdr *msg, int flags);
 ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen);
 ssize_t send(int socket, const void *buffer, size_t length, int flags);
+ssize_t sendmsg(int socket, const struct msghdr *msg, int flags);
 ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
                     const struct sockaddr *dest_addr, socklen_t addrlen);
 
