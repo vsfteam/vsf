@@ -17,6 +17,9 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 typedef struct vsf_linux_libgen_vplt_t {
     vsf_vplt_info_t info;
+
+    char * (*basename)(char *);
+    char * (*dirname)(char *);
 } vsf_linux_libgen_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt;
@@ -28,12 +31,19 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt;
 #ifndef VSF_LINUX_APPLET_LIBGEN_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_LIBGEN_VPLT                                     \
-            ((vsf_linux_libgen_vplt_t *)(VSF_LINUX_APPLET_VPLT->lib_libgen))
+            ((vsf_linux_libgen_vplt_t *)(VSF_LINUX_APPLET_VPLT->libgen))
 #   else
 #       define VSF_LINUX_APPLET_LIBGEN_VPLT                                     \
             ((vsf_linux_libgen_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline char * basename(char *path) {
+    return VSF_LINUX_APPLET_LIBGEN_VPLT->basename(path);
+}
+static inline char * dirname(char *path) {
+    return VSF_LINUX_APPLET_LIBGEN_VPLT->basename(path);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBGEN
 

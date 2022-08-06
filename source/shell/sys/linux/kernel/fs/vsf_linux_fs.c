@@ -1471,16 +1471,13 @@ int close(int fd)
     return __vsf_linux_fd_close_ex(NULL, fd);
 }
 
-int fcntl(int fd, int cmd, ...)
+int __fcntl_va(int fd, int cmd, va_list ap)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    va_list ap;
     uintptr_t arg;
 
     if (!sfd) { return -1; }
-    va_start(ap, cmd);
-        arg = va_arg(ap, uintptr_t);
-    va_end(ap);
+    arg = va_arg(ap, uintptr_t);
 
     // process generic commands
     switch (cmd) {
@@ -1507,6 +1504,17 @@ int fcntl(int fd, int cmd, ...)
     }
 
     return sfd->op->fn_fcntl(sfd, cmd, arg);
+}
+
+int fcntl(int fd, int cmd, ...)
+{
+    int ret;
+
+    va_list ap;
+    va_start(ap, cmd);
+        ret = __fcntl_va(fd, cmd, ap);
+    va_end(ap);
+    return ret;
 }
 
 ssize_t read(int fd, void *buf, size_t count)
@@ -2576,5 +2584,91 @@ static int __vsf_linux_term_close(vsf_linux_fd_t *sfd)
     }
     return 0;
 }
+
+#if VSF_LINUX_APPLET_USE_POLL == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_POLL_FUNC(__FUNC)           .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_poll_vplt_t vsf_linux_poll_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_poll_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_POLL_FUNC(poll),
+    VSF_LINUX_APPLET_POLL_FUNC(ppoll),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_SYS_EPOLL_FUNC(__FUNC)      .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_epoll_vplt_t vsf_linux_sys_epoll_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_sys_epoll_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_SYS_EPOLL_FUNC(epoll_create),
+    VSF_LINUX_APPLET_SYS_EPOLL_FUNC(epoll_create1),
+    VSF_LINUX_APPLET_SYS_EPOLL_FUNC(epoll_ctl),
+    VSF_LINUX_APPLET_SYS_EPOLL_FUNC(epoll_wait),
+    VSF_LINUX_APPLET_SYS_EPOLL_FUNC(epoll_pwait),
+    VSF_LINUX_APPLET_SYS_EPOLL_FUNC(epoll_pwait2),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_FCNTL == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_FCNTL_FUNC(__FUNC)          .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_fcntl_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_FCNTL_FUNC(__fcntl_va),
+    VSF_LINUX_APPLET_FCNTL_FUNC(fcntl),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_DIRENT == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_DIRENT_FUNC(__FUNC)         .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_dirent_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_DIRENT_FUNC(opendir),
+    VSF_LINUX_APPLET_DIRENT_FUNC(fdopendir),
+    VSF_LINUX_APPLET_DIRENT_FUNC(readdir),
+    VSF_LINUX_APPLET_DIRENT_FUNC(rewinddir),
+    VSF_LINUX_APPLET_DIRENT_FUNC(telldir),
+    VSF_LINUX_APPLET_DIRENT_FUNC(seekdir),
+    VSF_LINUX_APPLET_DIRENT_FUNC(closedir),
+    VSF_LINUX_APPLET_DIRENT_FUNC(scandir),
+    VSF_LINUX_APPLET_DIRENT_FUNC(alphasort),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_EVENTFD == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_SYS_EVENTFD_FUNC(__FUNC)    .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_eventfd_vplt_t vsf_linux_sys_eventfd_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_sys_eventfd_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_SYS_EVENTFD_FUNC(eventfd),
+    VSF_LINUX_APPLET_SYS_EVENTFD_FUNC(eventfd_read),
+    VSF_LINUX_APPLET_SYS_EVENTFD_FUNC(eventfd_write),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_SELECT == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_SYS_SELECT_FUNC(__FUNC)     .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_select_vplt_t vsf_linux_sys_select_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_sys_select_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_SYS_SELECT_FUNC(select),
+    VSF_LINUX_APPLET_SYS_SELECT_FUNC(pselect),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_SYS_STAT_FUNC(__FUNC)       .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_sys_stat_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_SYS_STAT_FUNC(umask),
+    VSF_LINUX_APPLET_SYS_STAT_FUNC(stat),
+    VSF_LINUX_APPLET_SYS_STAT_FUNC(fstat),
+    VSF_LINUX_APPLET_SYS_STAT_FUNC(fstatat),
+    VSF_LINUX_APPLET_SYS_STAT_FUNC(chmod),
+    VSF_LINUX_APPLET_SYS_STAT_FUNC(fchmod),
+};
+#endif
 
 #endif      // VSF_USE_LINUX

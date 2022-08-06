@@ -19,6 +19,8 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED
 typedef struct vsf_linux_sys_random_vplt_t {
     vsf_vplt_info_t info;
+
+    ssize_t (*getrandom)(void *buf, size_t buflen, unsigned int flags);
 } vsf_linux_sys_random_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_vplt;
@@ -36,6 +38,10 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_v
             ((vsf_linux_sys_random_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+ssize_t getrandom(void *buf, size_t buflen, unsigned int flags) {
+    return VSF_LINUX_APPLET_SYS_RANDOM_VPLT->getrandom(buf, buflen, flags);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_RANDOM
 

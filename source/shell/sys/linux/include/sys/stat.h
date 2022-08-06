@@ -94,6 +94,13 @@ struct stat {
 #if VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED
 typedef struct vsf_linux_sys_stat_vplt_t {
     vsf_vplt_info_t info;
+
+    mode_t (*umask)(mode_t mask);
+    int (*stat)(const char *pathname, struct stat *buf);
+    int (*fstat)(int fd, struct stat *buf);
+    int (*fstatat)(int dirfd, const char *pathname, struct stat *buf, int flags);
+    int (*chmod)(const char *pathname, mode_t mode);
+    int (*fchmod)(int fd, mode_t mode);
 } vsf_linux_sys_stat_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
@@ -111,6 +118,25 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
             ((vsf_linux_sys_stat_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline mode_t umask(mode_t mask) {
+    return VSF_LINUX_APPLET_SYS_STAT_VPLT->umask(mask);
+}
+static inline int stat(const char *pathname, struct stat *buf) {
+    return VSF_LINUX_APPLET_SYS_STAT_VPLT->stat(pathname, buf);
+}
+static inline int fstat(int fd, struct stat *buf) {
+    return VSF_LINUX_APPLET_SYS_STAT_VPLT->fstat(fd, buf);
+}
+static inline int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags) {
+    return VSF_LINUX_APPLET_SYS_STAT_VPLT->fstatat(dirfd, pathname, buf, flags);
+}
+static inline int chmod(const char *pathname, mode_t mode) {
+    return VSF_LINUX_APPLET_SYS_STAT_VPLT->chmod(pathname, mode);
+}
+static inline int fchmod(int fd, mode_t mode) {
+    return VSF_LINUX_APPLET_SYS_STAT_VPLT->fchmod(fd, mode);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT
 

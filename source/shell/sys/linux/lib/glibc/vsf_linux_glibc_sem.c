@@ -127,4 +127,19 @@ int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout)
 }
 #endif
 
+#if VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_SEMAPHORE_FUNC(__FUNC)          .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_semaphore_vplt_t vsf_linux_semaphore_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_semaphore_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_SEMAPHORE_FUNC(sem_init),
+    VSF_LINUX_APPLET_SEMAPHORE_FUNC(sem_destroy),
+    VSF_LINUX_APPLET_SEMAPHORE_FUNC(sem_wait),
+    VSF_LINUX_APPLET_SEMAPHORE_FUNC(sem_trywait),
+    VSF_LINUX_APPLET_SEMAPHORE_FUNC(sem_timedwait),
+    VSF_LINUX_APPLET_SEMAPHORE_FUNC(sem_post),
+    VSF_LINUX_APPLET_SEMAPHORE_FUNC(sem_getvalue),
+};
+#endif
+
 #endif      // VSF_USE_LINUX

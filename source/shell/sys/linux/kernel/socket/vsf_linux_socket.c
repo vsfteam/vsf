@@ -539,6 +539,54 @@ WEAK(freeifaddrs)
 void freeifaddrs(struct ifaddrs *ifaddrs)
 {
 }
+
+#if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_IFADDRS_FUNC(__FUNC)        .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_ifaddrs_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_IFADDRS_FUNC(getifaddrs),
+    VSF_LINUX_APPLET_IFADDRS_FUNC(freeifaddrs),
+};
+#endif
+#endif
+
+#if VSF_LINUX_APPLET_USE_NETDB == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_NETDB_FUNC(__FUNC)          .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_netdb_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_NETDB_FUNC(gethostbyaddr),
+    VSF_LINUX_APPLET_NETDB_FUNC(gethostbyname),
+    VSF_LINUX_APPLET_NETDB_FUNC(gai_strerror),
+    VSF_LINUX_APPLET_NETDB_FUNC(getnameinfo),
+    VSF_LINUX_APPLET_NETDB_FUNC(getaddrinfo),
+    VSF_LINUX_APPLET_NETDB_FUNC(freeaddrinfo),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_SYS_SOCKET_FUNC(__FUNC)     .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_sys_socket_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(setsockopt),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(getsockopt),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(getpeername),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(getsockname),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(accept),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(bind),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(connect),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(listen),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(recv),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(recvfrom),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(send),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(sendto),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(shutdown),
+    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(socket),
+    // TODO: add socketpair if supported
+//    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(socketpair),
+};
 #endif
 
 #endif

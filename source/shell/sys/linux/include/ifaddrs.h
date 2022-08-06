@@ -52,6 +52,9 @@ struct ifaddrs {
 #if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
 typedef struct vsf_linux_ifaddrs_vplt_t {
     vsf_vplt_info_t info;
+
+    int (*getifaddrs)(struct ifaddrs **ifa);
+    void (*freeifaddrs)(struct ifaddrs *ifa);
 } vsf_linux_ifaddrs_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt;
@@ -69,6 +72,13 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt;
             ((vsf_linux_ifaddrs_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline int getifaddrs(struct ifaddrs **ifa) {
+    return VSF_LINUX_APPLET_IFADDRS_VPLT->getifaddrs(ifa);
+}
+static inline void freeifaddrs(struct ifaddrs *ifa) {
+    VSF_LINUX_APPLET_IFADDRS_VPLT->freeifaddrs(ifa);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_IFADDRS
 

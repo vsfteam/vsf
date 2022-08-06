@@ -53,6 +53,13 @@ struct itimerval {
 #if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
 typedef struct vsf_linux_sys_time_vplt_t {
     vsf_vplt_info_t info;
+
+    int (*gettimeofday)(struct timeval * tv, struct timezone * tz);
+    int (*getitimer)(int which, struct itimerval *curr_value);
+    int (*setitimer)(int which, const struct itimerval *new_value, struct itimerval *old_value);
+
+    int (*futimes)(int fd, const struct timeval tv[2]);
+    int (*utimes)(const char *filename, const struct timeval times[2]);
 } vsf_linux_sys_time_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt;
@@ -70,6 +77,23 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt;
             ((vsf_linux_sys_time_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline int gettimeofday(struct timeval * tv, struct timezone * tz) {
+    return VSF_LINUX_APPLET_SYS_TIME_VPLT->gettimeofday(tv, tz);
+}
+static inline int getitimer(int which, struct itimerval *curr_value) {
+    return VSF_LINUX_APPLET_SYS_TIME_VPLT->getitimer(which, curr_value);
+}
+static inline int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value) {
+    return VSF_LINUX_APPLET_SYS_TIME_VPLT->setitimer(which, new_value, old_value);
+}
+
+static inline int futimes(int fd, const struct timeval tv[2]) {
+    return VSF_LINUX_APPLET_SYS_TIME_VPLT->futimes(fd, tv);
+}
+static inline int utimes(const char *filename, const struct timeval times[2]) {
+    return VSF_LINUX_APPLET_SYS_TIME_VPLT->utimes(filename, times);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_TIME
 

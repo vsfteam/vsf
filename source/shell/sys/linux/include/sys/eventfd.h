@@ -31,6 +31,10 @@ typedef uint64_t                eventfd_t;
 #if VSF_LINUX_APPLET_USE_SYS_EVENTFD == ENABLED
 typedef struct vsf_linux_sys_eventfd_vplt_t {
     vsf_vplt_info_t info;
+
+    int (*eventfd)(int count, int flags);
+    int (*eventfd_read)(int fd, eventfd_t *value);
+    int (*eventfd_write)(int fd, eventfd_t value);
 } vsf_linux_sys_eventfd_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_eventfd_vplt_t vsf_linux_sys_eventfd_vplt;
@@ -42,12 +46,22 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_eventfd_vplt_t vsf_linux_sys_eventfd
 #ifndef VSF_LINUX_APPLET_SYS_EVENTFD_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SYS_EVENTFD_VPLT                                \
-            ((vsf_linux_sys_eventfd_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_eventfs))
+            ((vsf_linux_sys_eventfd_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_eventfd))
 #   else
 #       define VSF_LINUX_APPLET_SYS_EVENTFD_VPLT                                \
             ((vsf_linux_sys_eventfd_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline int eventfd(int count, int flags) {
+    return VSF_LINUX_APPLET_SYS_EVENTFD_VPLT->eventfd(count, flags);
+}
+static inline int eventfd_read(int fd, eventfd_t *value) {
+    return VSF_LINUX_APPLET_SYS_EVENTFD_VPLT->eventfd_read(fd, value);
+}
+static inline int eventfd_write(int fd, eventfd_t value) {
+    return VSF_LINUX_APPLET_SYS_EVENTFD_VPLT->eventfd_write(fd, value);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_EVENTFD
 

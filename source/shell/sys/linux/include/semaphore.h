@@ -31,6 +31,14 @@ typedef vsf_sem_t sem_t;
 #if VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED
 typedef struct vsf_linux_semaphore_vplt_t {
     vsf_vplt_info_t info;
+
+    int (*sem_init)(sem_t *sem, int pshared, unsigned int value);
+    int (*sem_destroy)(sem_t *sem);
+    int (*sem_wait)(sem_t *sem);
+    int (*sem_trywait)(sem_t *sem);
+    int (*sem_timedwait)(sem_t *sem, const struct timespec *abs_timeout);
+    int (*sem_post)(sem_t *sem);
+    int (*sem_getvalue)(sem_t *sem, int *value);
 } vsf_linux_semaphore_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_semaphore_vplt_t vsf_linux_semaphore_vplt;
@@ -48,6 +56,28 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_semaphore_vplt_t vsf_linux_semaphore_vpl
             ((vsf_linux_semaphore_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline int sem_init(sem_t *sem, int pshared, unsigned int value) {
+    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_init(sem, pshared, value);
+}
+static inline int sem_destroy(sem_t *sem) {
+    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_destroy(sem);
+}
+static inline int sem_wait(sem_t *sem) {
+    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_wait(sem);
+}
+static inline int sem_trywait(sem_t *sem) {
+    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_trywait(sem);
+}
+static inline int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout) {
+    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_timedwait(sem, abs_timeout);
+}
+static inline int sem_post(sem_t *sem) {
+    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_post(sem);
+}
+static inline int sem_getvalue(sem_t *sem, int *value) {
+    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_getvalue(sem, value);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SEMAPHORE
 

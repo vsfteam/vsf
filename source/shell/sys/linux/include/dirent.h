@@ -37,6 +37,18 @@ typedef struct vsf_linux_fd_t DIR;
 #if VSF_LINUX_APPLET_USE_DIRENT == ENABLED
 typedef struct vsf_linux_dirent_vplt_t {
     vsf_vplt_info_t info;
+
+    DIR * (*opendir)(const char *name);
+    DIR * (*fdopendir)(int fd);
+    struct dirent * (*readdir)(DIR *dir);
+    void (*rewinddir)(DIR *dir);
+    long (*telldir)(DIR *dir);
+    void (*seekdir)(DIR *dir, long loc);
+    int (*closedir)(DIR *dir);
+    int (*scandir)(const char *dir, struct dirent ***namelist,
+              int (*filter)(const struct dirent *),
+              int (*compare)(const struct dirent **, const struct dirent **));
+    int (*alphasort)(const struct dirent **a, const struct dirent **b);
 } vsf_linux_dirent_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt;
@@ -55,10 +67,40 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt;
 #   endif
 #endif
 
+static inline DIR * opendir(const char *name) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->opendir(name);
+}
+static inline DIR * fdopendir(int fd) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->fdopendir(fd);
+}
+static inline struct dirent * readdir(DIR *dir) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->readdir(dir);
+}
+static inline void rewinddir(DIR *dir) {
+    VSF_LINUX_APPLET_DIRENT_VPLT->rewinddir(dir);
+}
+static inline long telldir(DIR *dir) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->telldir(dir);
+}
+static inline void seekdir(DIR *dir, long loc) {
+    VSF_LINUX_APPLET_DIRENT_VPLT->seekdir(dir, loc);
+}
+static inline int closedir(DIR *dir) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->closedir(dir);
+}
+static inline int scandir(const char *dir, struct dirent ***namelist,
+              int (*filter)(const struct dirent *),
+              int (*compare)(const struct dirent **, const struct dirent **)) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->scandir(dir, namelist, filter, compare);
+}
+static inline int alphasort(const struct dirent **a, const struct dirent **b) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->alphasort(a, b);
+}
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_DIRENT
 
 DIR * opendir(const char *name);
-DIR *fdopendir(int fd);
+DIR * fdopendir(int fd);
 struct dirent * readdir(DIR *dir);
 void rewinddir(DIR *dir);
 long telldir(DIR *dir);

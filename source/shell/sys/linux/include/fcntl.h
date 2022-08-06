@@ -60,6 +60,9 @@ struct flock {
 #if VSF_LINUX_APPLET_USE_FCNTL == ENABLED
 typedef struct vsf_linux_fcntl_vplt_t {
     vsf_vplt_info_t info;
+
+    int (*__fcntl_va)(int fd, int cmd, va_list ap);
+    int (*fcntl)(int fd, int cmd, ...);
 } vsf_linux_fcntl_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt;
@@ -77,6 +80,16 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt;
             ((vsf_linux_fcntl_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline int fcntl(int fd, int cmd, ...) {
+    int ret;
+
+    va_list ap;
+    va_start(ap, cmd);
+        ret = VSF_LINUX_APPLET_FCNTL_VPLT->__fcntl_va(fd, cmd, ap);
+    va_end(ap);
+    return ret;
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_FCNTL
 

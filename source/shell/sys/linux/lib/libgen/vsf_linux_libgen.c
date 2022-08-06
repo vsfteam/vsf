@@ -66,4 +66,14 @@ char * dirname(char *path)
     return path;
 }
 
+#if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_LIBGEN_FUNC(__FUNC)         .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_libgen_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_LIBGEN_FUNC(basename),
+    VSF_LINUX_APPLET_LIBGEN_FUNC(dirname),
+};
+#endif
+
 #endif      // VSF_USE_LINUX

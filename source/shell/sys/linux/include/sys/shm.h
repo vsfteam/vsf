@@ -40,6 +40,11 @@ struct shmid_ds {
 #if VSF_LINUX_APPLET_USE_SYS_SHM == ENABLED
 typedef struct vsf_linux_sys_shm_vplt_t {
     vsf_vplt_info_t info;
+
+    int (*shmget)(key_t key, size_t size, int shmflg);
+    void * (*shmat)(int shmid, const void *shmaddr, int shmflg);
+    int (*shmdt)(const void *shmaddr);
+    int (*shmctl)(int shmid, int cmd, struct shmid_ds *buf);
 } vsf_linux_sys_shm_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt;
@@ -57,6 +62,19 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt;
             ((vsf_linux_sys_shm_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline int shmget(key_t key, size_t size, int shmflg) {
+    return VSF_LINUX_APPLET_SYS_SHM_VPLT->shmget(key, size, shmflg);
+}
+static inline void * shmat(int shmid, const void *shmaddr, int shmflg) {
+    return VSF_LINUX_APPLET_SYS_SHM_VPLT->shmat(shmid, shmaddr, shmflg);
+}
+static inline int shmdt(const void *shmaddr) {
+    return VSF_LINUX_APPLET_SYS_SHM_VPLT->shmdt(shmaddr);
+}
+static inline int shmctl(int shmid, int cmd, struct shmid_ds *buf) {
+    return VSF_LINUX_APPLET_SYS_SHM_VPLT->shmctl(shmid, cmd, buf);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SHM
 

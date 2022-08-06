@@ -37,6 +37,11 @@ __vsf_declare_bitmap_ex(fd_set, FD_SETSIZE)
 #if VSF_LINUX_APPLET_USE_SYS_SELECT == ENABLED
 typedef struct vsf_linux_sys_select_vplt_t {
     vsf_vplt_info_t info;
+
+    int (*select)(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+        struct timeval *timeout);
+    int (*pselect)(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+        const struct timespec *timeout_ts, const sigset_t *sigmask);
 } vsf_linux_sys_select_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_select_vplt_t vsf_linux_sys_select_vplt;
@@ -55,10 +60,21 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_select_vplt_t vsf_linux_sys_select_v
 #   endif
 #endif
 
+static inline int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+        struct timeval *timeout) {
+    return VSF_LINUX_APPLET_SYS_SELECT_VPLT->select(nfds, readfds, writefds, exceptfds, timeout);
+}
+static inline int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+        const struct timespec *timeout_ts, const sigset_t *sigmask) {
+    return VSF_LINUX_APPLET_SYS_SELECT_VPLT->pselect(nfds, readfds, writefds, exceptfds, timeout_ts, sigmask);
+}
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SELECT
 
-int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, struct timeval *timeout);
-int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timespec *timeout_ts, const sigset_t *sigmask);
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+        struct timeval *timeout);
+int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+        const struct timespec *timeout_ts, const sigset_t *sigmask);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SELECT
 

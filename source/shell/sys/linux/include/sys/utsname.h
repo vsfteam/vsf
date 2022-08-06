@@ -35,6 +35,8 @@ struct utsname {
 #if VSF_LINUX_APPLET_USE_SYS_UTSNAME == ENABLED
 typedef struct vsf_linux_sys_utsname_vplt_t {
     vsf_vplt_info_t info;
+
+    int (*uname)(struct utsname *name);
 } vsf_linux_sys_utsname_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_utsname_vplt_t vsf_linux_sys_utsname_vplt;
@@ -52,6 +54,10 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_utsname_vplt_t vsf_linux_sys_utsname
             ((vsf_linux_sys_utsname_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline int uname(struct utsname *name) {
+    return VSF_LINUX_APPLET_SYS_UTSNAME_VPLT->uname(name);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_UTSNAME
 

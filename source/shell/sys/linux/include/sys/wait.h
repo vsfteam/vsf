@@ -40,6 +40,10 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED
 typedef struct vsf_linux_sys_wait_vplt_t {
     vsf_vplt_info_t info;
+
+    pid_t (*wait)(int *status);
+    pid_t (*waitpid)(pid_t pid, int *status, int options);
+    int (*waitid)(idtype_t idtype, id_t id, siginfo_t *infop, int options);
 } vsf_linux_sys_wait_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_wait_vplt_t vsf_linux_sys_wait_vplt;
@@ -57,6 +61,16 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_wait_vplt_t vsf_linux_sys_wait_vplt;
             ((vsf_linux_sys_wait_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline pid_t wait(int *status) {
+    return VSF_LINUX_APPLET_SYS_WAIT_VPLT->wait(status);
+}
+static inline pid_t waitpid(pid_t pid, int *status, int options) {
+    return VSF_LINUX_APPLET_SYS_WAIT_VPLT->waitpid(pid, status, options);
+}
+static inline int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options) {
+    return VSF_LINUX_APPLET_SYS_WAIT_VPLT->waitid(idtype, id, infop, options);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_WAIT
 

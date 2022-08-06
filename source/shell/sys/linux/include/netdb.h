@@ -99,6 +99,16 @@ extern int * __vsf_linux_h_errno(void);
 #if VSF_LINUX_APPLET_USE_NETDB == ENABLED
 typedef struct vsf_linux_netdb_vplt_t {
     vsf_vplt_info_t info;
+
+    struct hostent * (*gethostbyaddr)(const void *addr, size_t len, int type);
+    struct hostent * (*gethostbyname)(const char *name);
+    const char * (*gai_strerror)(int errcode);
+    int (*getnameinfo)(const struct sockaddr *addr, socklen_t addrlen,
+                        char *host, socklen_t hostlen,
+                        char *serv, socklen_t servlen, int flags);
+    int (*getaddrinfo)(const char *name, const char *service, const struct addrinfo *hints,
+                        struct addrinfo **pai);
+    void (*freeaddrinfo)(struct addrinfo *ai);
 } vsf_linux_netdb_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
@@ -116,6 +126,28 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
             ((vsf_linux_netdb_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
+
+static inline struct hostent * gethostbyaddr(const void *addr, size_t len, int type) {
+    return VSF_LINUX_APPLET_NETDB_VPLT->gethostbyaddr(addr, len, type);
+}
+static inline struct hostent * gethostbyname(const char *name) {
+    return VSF_LINUX_APPLET_NETDB_VPLT->gethostbyname(name);
+}
+static inline const char * gai_strerror(int errcode) {
+    return VSF_LINUX_APPLET_NETDB_VPLT->gai_strerror(errcode);
+}
+static inline int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
+                        char *host, socklen_t hostlen,
+                        char *serv, socklen_t servlen, int flags) {
+    return VSF_LINUX_APPLET_NETDB_VPLT->getnameinfo(addr, addrlen, host, hostlen, serv, servlen, flags);
+}
+static inline int getaddrinfo(const char *name, const char *service,
+                        const struct addrinfo *hints, struct addrinfo **pai) {
+    return VSF_LINUX_APPLET_NETDB_VPLT->getaddrinfo(name, service, hints, pai);
+}
+static inline void freeaddrinfo(struct addrinfo *ai) {
+    return VSF_LINUX_APPLET_NETDB_VPLT->freeaddrinfo(ai);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_NETDB
 
