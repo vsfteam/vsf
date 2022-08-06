@@ -800,7 +800,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(strtoull),
     VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(strtof),
     VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(strtod),
-    VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(strtold),
+//    VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(strtold),
 
     VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(bsearch),
     VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(qsort),

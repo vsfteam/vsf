@@ -250,9 +250,9 @@ static inline float strtof(const char *str, char **endptr) {
 static inline double strtod(const char *str, char **endptr) {
     return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtod(str, endptr);
 }
-static inline long double strtold(const char *str, char **endptr) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtold(str, endptr);
-}
+//static inline long double strtold(const char *str, char **endptr) {
+//    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtold(str, endptr);
+//}
 
 static inline void * bsearch(const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *)) {
     return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->bsearch(key, base, nitems, size, compar);
@@ -343,7 +343,7 @@ long long strtoll(const char *str, char **endptr, int base);
 unsigned long long strtoull(const char *str, char **endptr, int base);
 float strtof(const char *str, char **endptr);
 double strtod(const char *str, char **endptr);
-long double strtold(const char *str, char **endptr);
+//long double strtold(const char *str, char **endptr);
 
 void * bsearch(const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *));
 
