@@ -567,10 +567,10 @@ static inline int libusb_init(libusb_context **ctx) {
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_init(ctx);
 }
 static inline void libusb_exit(libusb_context *ctx) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_exit(ctx);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_exit(ctx);
 }
 static inline void libusb_set_debug(libusb_context *ctx, int level) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_set_debug(ctx, level);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_set_debug(ctx, level);
 }
 static inline const char * libusb_error_name(int errcode) {
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_error_name(errcode);
@@ -579,7 +579,7 @@ static inline ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device 
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_get_device_list(ctx, list);
 }
 static inline void libusb_free_device_list(libusb_device **list, int unref_devices) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_device_list(list, unref_devices);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_device_list(list, unref_devices);
 }
 static inline int libusb_get_device_descriptor(libusb_device *dev, struct libusb_device_descriptor *desc) {
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_get_device_descriptor(dev, desc);
@@ -595,7 +595,7 @@ static inline libusb_device_handle * libusb_open_device_with_vid_pid(libusb_cont
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_open_device_with_vid_pid(ctx, vendor_id, product_id);
 }
 static inline void libusb_close(libusb_device_handle *dev_handle) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_close(dev_handle);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_close(dev_handle);
 }
 static inline uint8_t libusb_get_device_address(libusb_device *dev) {
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_get_device_address(dev);
@@ -614,7 +614,7 @@ static inline struct libusb_transfer *libusb_alloc_transfer(int iso_packets) {
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_alloc_transfer(iso_packets);
 }
 static inline void libusb_free_transfer(struct libusb_transfer *transfer) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_transfer(transfer);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_transfer(transfer);
 }
 static inline int libusb_submit_transfer(struct libusb_transfer *transfer) {
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_submit_transfer(transfer);
@@ -655,7 +655,7 @@ static inline int libusb_hotplug_register_callback(libusb_context *ctx,
 }
 static inline void libusb_hotplug_deregister_callback(libusb_context *ctx,
         libusb_hotplug_callback_handle callback_handle) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_hotplug_deregister_callback(ctx, callback_handle);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_hotplug_deregister_callback(ctx, callback_handle);
 }
 
 static inline int libusb_get_string_descriptor_ascii(libusb_device_handle *dev_handle,
@@ -676,7 +676,7 @@ static inline int libusb_get_active_config_descriptor(libusb_device *dev,
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_get_active_config_descriptor(dev, config);
 }
 static inline void libusb_free_config_descriptor(struct libusb_config_descriptor *config) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_config_descriptor(config);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_config_descriptor(config);
 }
 static inline int libusb_get_descriptor(libusb_device_handle *dev_handle,
         uint8_t desc_type, uint8_t desc_index, unsigned char *data, int length) {
@@ -703,7 +703,7 @@ static inline int libusb_get_ss_endpoint_companion_descriptor(
 }
 static inline void libusb_free_ss_endpoint_companion_descriptor(
         struct libusb_ss_endpoint_companion_descriptor *ep_comp) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_ss_endpoint_companion_descriptor(ep_comp);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_ss_endpoint_companion_descriptor(ep_comp);
 }
 
 static inline int libusb_get_next_timeout(libusb_context *ctx, struct timeval *tv) {
@@ -727,7 +727,7 @@ static inline libusb_device * libusb_ref_device(libusb_device *dev) {
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_ref_device(dev);
 }
 static inline void libusb_unref_device(libusb_device *dev) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_unref_device(dev);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_unref_device(dev);
 }
 
 static inline int libusb_get_max_packet_size(libusb_device *dev, unsigned char endpoint) {
@@ -761,7 +761,7 @@ static inline const struct libusb_pollfd** libusb_get_pollfds(libusb_context *ct
     return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_get_pollfds(ctx);
 }
 static inline void libusb_free_pollfds(const struct libusb_pollfd **pollfds) {
-    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_pollfds(pollfds);
+    VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_pollfds(pollfds);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBUSB
