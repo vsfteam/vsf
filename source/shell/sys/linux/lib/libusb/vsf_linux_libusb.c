@@ -89,7 +89,7 @@ typedef struct vsf_linux_libusb_cb_t {
     int dev_class;
 
 #if VSF_ARCH_USE_THREAD_REG == ENABLED
-    uintptr_t process_reg;
+    vsf_linux_process_t *target_process;
 #endif
     void *user_data;
 } vsf_linux_libusb_cb_t;
@@ -207,7 +207,7 @@ static void __vsf_linux_libusb_process_cb(vsf_linux_libusb_dev_t *ldev, vk_usbh_
             &&  (_->cb_fn != NULL)) {
 
 #if VSF_ARCH_USE_THREAD_REG == ENABLED
-            uintptr_t reg_orig = vsf_arch_set_thread_reg(_->process_reg);
+            uintptr_t reg_orig = vsf_arch_set_thread_reg(_->target_process->reg);
 #endif
             switch (evt) {
             case VSF_USBH_LIBUSB_EVT_ON_ARRIVED:
@@ -451,7 +451,7 @@ int libusb_hotplug_register_callback(libusb_context *ctx,
     cb->cb_fn = cb_fn;
     cb->user_data = user_data;
 #if VSF_ARCH_USE_THREAD_REG == ENABLED
-    cb->process_reg = vsf_linux_get_cur_process()->reg;
+    cb->target_process = vsf_linux_get_cur_process();
 #endif
 
     vsf_protect_t orig = vsf_protect_sched();
