@@ -2508,9 +2508,19 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "./include/pthread.h"
+#   if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
+#       include "./include/pthread.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
+#       include "./include/libusb/libusb.h"
+#   endif
 #else
-#   include <pthread.h>
+#   if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
+#       include <pthread.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
+#       include <libusb/libusb.h>
+#   endif
 #endif
 
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
@@ -2534,6 +2544,10 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
     .pthread        = (void *)&vsf_linux_pthread_vplt,
+#   endif
+
+#   if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
+    .libusb         = (void *)&vsf_linux_libusb_vplt,
 #   endif
 };
 #endif

@@ -88,6 +88,9 @@ typedef struct vsf_linux_libusb_cb_t {
     int product_id;
     int dev_class;
 
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+    uintptr_t process_reg;
+#endif
     void *user_data;
 } vsf_linux_libusb_cb_t;
 
@@ -203,6 +206,9 @@ static void __vsf_linux_libusb_process_cb(vsf_linux_libusb_dev_t *ldev, vk_usbh_
             &&  ((_->dev_class == LIBUSB_HOTPLUG_MATCH_ANY) || (_->dev_class == ldev->libusb_dev->c))
             &&  (_->cb_fn != NULL)) {
 
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+            uintptr_t reg_orig = vsf_arch_set_thread_reg(_->process_reg);
+#endif
             switch (evt) {
             case VSF_USBH_LIBUSB_EVT_ON_ARRIVED:
                 if (_->events & LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED) {
@@ -215,6 +221,9 @@ static void __vsf_linux_libusb_process_cb(vsf_linux_libusb_dev_t *ldev, vk_usbh_
                 }
                 break;
             }
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+            vsf_arch_set_thread_reg(reg_orig);
+#endif
         }
     }
 }
@@ -441,6 +450,9 @@ int libusb_hotplug_register_callback(libusb_context *ctx,
     cb->dev_class = dev_class;
     cb->cb_fn = cb_fn;
     cb->user_data = user_data;
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+    cb->process_reg = vsf_linux_get_cur_process()->reg;
+#endif
 
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_add_to_head(vsf_linux_libusb_cb_t, cbnode, &__vsf_libusb.cblist, cb);
@@ -1256,6 +1268,67 @@ void libusb_free_pollfds(const struct libusb_pollfd **pollfds)
         free(pollfds);
     }
 }
+
+#if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED && !defined(__VSF_APPLET__)
+#   define VSF_LINUX_APPLET_LIBUSB_FUNC(__FUNC)         .__FUNC = __FUNC
+__VSF_VPLT_DECORATOR__ vsf_linux_libusb_vplt_t vsf_linux_libusb_vplt = {
+    .info.entry_num = (sizeof(vsf_linux_libusb_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_strerror),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_version),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_init),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_exit),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_set_debug),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_error_name),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_device_list),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_free_device_list),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_device_descriptor),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_open),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_device),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_open_device_with_vid_pid),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_close),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_device_address),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_bus_number),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_release_interface),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_claim_interface),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_alloc_transfer),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_free_transfer),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_submit_transfer),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_cancel_transfer),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_control_transfer),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_bulk_transfer),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_interrupt_transfer),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_hotplug_register_callback),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_hotplug_deregister_callback),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_string_descriptor_ascii),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_config_descriptor),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_config_descriptor_by_value),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_active_config_descriptor),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_free_config_descriptor),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_descriptor),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_string_descriptor),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_set_interface_alt_setting),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_ss_endpoint_companion_descriptor),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_free_ss_endpoint_companion_descriptor),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_next_timeout),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_has_capability),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_attach_kernel_driver),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_detach_kernel_driver),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_kernel_driver_active),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_ref_device),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_unref_device),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_max_packet_size),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_device_speed),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_set_configuration),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_configuration),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_handle_events_timeout_completed),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_handle_events_completed),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_handle_events_timeout),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_handle_events),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_get_pollfds),
+    VSF_LINUX_APPLET_LIBUSB_FUNC(libusb_free_pollfds),
+};
+#endif
 
 // libusb 0.1 compatibility
 #if VSF_LINUX_LIBUSB_CFG_01_COMPATIBLE == ENABLED
