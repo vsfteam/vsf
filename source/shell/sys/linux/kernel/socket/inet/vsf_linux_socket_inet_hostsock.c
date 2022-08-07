@@ -69,12 +69,18 @@ struct dirent {
 #define VSF_LINUX_SOCKET_WRAPPER(__api)     VSF_SHELL_WRAPPER(vsf_linux_socket, __api)
 
 #ifdef __WIN__
-#   define socket_t                         SOCKET
+// uppercase for host type
+#   define SOCKET_T                         SOCKET
+#   define SOCKLEN_T                        int
+
 #   define errno                            WSAGetLastError()
 #   define ERRNO_WOULDBLOCK                 WSAEWOULDBLOCK
 #   define SHUT_RDWR                        SD_BOTH
 #elif defined(__LINUX__) || defined(__linux__)
-#   define socket_t                         int
+// uppercase for host type
+#   define SOCKET_T                         int
+#   define SOCKLEN_T                        socklen_t
+
 #   define ERRNO_WOULDBLOCK                 EWOULDBLOCK
 #   define SOCKET_ERROR                     (-1)
 #   define INVALID_SOCKET                   (-1)
@@ -219,7 +225,7 @@ vsf_class(vsf_linux_socket_priv_t) {
 typedef struct vsf_linux_socket_inet_priv_t {
     implement(vsf_linux_socket_priv_t)
 
-    socket_t hostsock;
+    SOCKET_T hostsock;
     int hdomain;
     int htype;
     int hprotocol;
@@ -261,10 +267,10 @@ struct vsf_linux_socket_inet_hostsock_t {
     // socket pair for event notifier to host irq_thread
     union {
         struct {
-            socket_t sock_event_listener;
-            socket_t sock_event_notifier;
+            SOCKET_T sock_event_listener;
+            SOCKET_T sock_event_notifier;
         };
-        socket_t pipefd[2];
+        SOCKET_T pipefd[2];
     };
     struct sockaddr_in *inaddr;
 
@@ -475,8 +481,8 @@ static void __vsf_linux_hostsock_init(void)
         .sin_addr.s_addr = htonl(INADDR_LOOPBACK),
         .sin_port = 0,
     };
-    int addrlen = sizeof(inaddr);
-    socket_t listener;
+    SOCKLEN_T addrlen = sizeof(inaddr);
+    SOCKET_T listener;
 
     __vsf_linux_hostsock.inaddr = &inaddr;
     if (    (INVALID_SOCKET == (listener = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)))
@@ -698,7 +704,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
         case VSF_LINUX_SOCKET_SO_ERROR:         optname = SO_ERROR;         break;
         case VSF_LINUX_SOCKET_SO_RCVTIMEO: {
                 unsigned long ms;
-                int hoptlen = sizeof(ms);
+                SOCKLEN_T hoptlen = sizeof(ms);
                 optname = SO_RCVTIMEO;
                 ret = getsockopt(priv->hostsock, level, optname, (char *)&ms, &hoptlen);
                 __vsf_linux_ms_to_timeval(optval, ms);
@@ -707,7 +713,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
             break;
         case VSF_LINUX_SOCKET_SO_SNDTIMEO: {
                 unsigned long ms;
-                int hoptlen = sizeof(ms);
+                SOCKLEN_T hoptlen = sizeof(ms);
                 optname = SO_SNDTIMEO;
                 ret = getsockopt(priv->hostsock, level, optname, (char *)&ms, &hoptlen);
                 __vsf_linux_ms_to_timeval(optval, ms);
@@ -739,7 +745,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
         VSF_LINUX_ASSERT(false);
         break;
     }
-    ret = getsockopt(priv->hostsock, level, optname, optval, (int *)optlen);
+    ret = getsockopt(priv->hostsock, level, optname, optval, (SOCKLEN_T *)optlen);
     if (!ret) {
         switch (level) {
         case SOL_SOCKET:
@@ -763,7 +769,7 @@ static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_p
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct sockaddr hsockaddr = { 0 };
-    int hsockaddr_len = sizeof(hsockaddr);
+    SOCKLEN_T hsockaddr_len = sizeof(hsockaddr);
     int ret = getpeername(priv->hostsock, &hsockaddr, &hsockaddr_len);
     __vsf_linux_sockaddr2vsf(&hsockaddr, addr);
     return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
@@ -774,7 +780,7 @@ static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_p
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct sockaddr hsockaddr = { 0 };
-    int hsockaddr_len = sizeof(hsockaddr);
+    SOCKLEN_T hsockaddr_len = sizeof(hsockaddr);
     int ret = getsockname(priv->hostsock, &hsockaddr, &hsockaddr_len);
     __vsf_linux_sockaddr2vsf(&hsockaddr, addr);
     return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
@@ -785,7 +791,7 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct sockaddr hsockaddr;
-    int hsockaddr_len = sizeof(hsockaddr);
+    SOCKLEN_T hsockaddr_len = sizeof(hsockaddr);
 
     if (!priv->is_nonblock) {
         vsf_linux_trigger_t trig;
@@ -917,7 +923,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
 
     if (src_addr != NULL) {
         struct sockaddr hsockaddr = { 0 };
-        int hsockaddr_len = sizeof(hsockaddr);
+        SOCKLEN_T hsockaddr_len = sizeof(hsockaddr);
         ret = recvfrom(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags), &hsockaddr, &hsockaddr_len);
         __vsf_linux_sockaddr2vsf(&hsockaddr, src_addr);
     } else {
