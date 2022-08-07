@@ -78,17 +78,29 @@ extern "C" {
 
 //! \brief none standard memory types
 #if __IS_COMPILER_LLVM__
-#   define NO_INIT              __attribute__(( __section__( ".bss.noinit")))
+#   ifdef __APPLE__
+#       define NO_INIT          
+#   else
+#       define NO_INIT          __attribute__(( __section__( ".bss.noinit")))
+#   endif
 #   define ROOT                 __attribute__((__used__))
 #   define INLINE               __inline__
 #   define NO_INLINE            __attribute__ ((__noinline__))
 #   define ALWAYS_INLINE        __inline__ __attribute__((__always_inline__))
 #   define WEAK(...)            __attribute__((__weak__))
-#   define RAMFUNC              __attribute__((__section__ (".textrw")))
+#   ifdef __APPLE__
+#       define RAMFUNC          Not Supported by Apple LLVM
+#   else
+#       define RAMFUNC          __attribute__((__section__ (".textrw")))
+#   endif
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((__aligned__(__N)))
 #   define __AT_ADDR(__ADDR)    Not Supported by LLVM
-#   define __SECTION(__SEC)     __attribute__((__section__(__SEC)))
+#   ifdef __APPLE__
+#       define __SECTION(__SEC)
+#   else
+#       define __SECTION(__SEC) __attribute__((__section__(__SEC)))
+#   endif
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS)                                      \
                                 __asm__(".weak " #__ALIAS);                     \
                                 __asm__(".equ " #__ALIAS ", " #__ORIGIN)
