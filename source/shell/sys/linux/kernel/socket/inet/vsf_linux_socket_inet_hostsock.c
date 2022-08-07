@@ -113,12 +113,12 @@ extern int * __vsf_linux_errno(void);
 
 // from time.h
 #ifndef __SUSECONDS_T
-#   define __SUSECONDS_T    long int
+#   define __SUSECONDS_T                long int
 #endif
-typedef __SUSECONDS_T       suseconds_t;
+typedef __SUSECONDS_T vsf_suseconds_t;
 struct vsf_linux_timeval {
     time_t          tv_sec;
-    suseconds_t     tv_usec;
+    vsf_suseconds_t tv_usec;
 };
 
 // from poll.h
@@ -161,7 +161,7 @@ enum {
     VSF_LINUX_SOCKET_MSG_DONTWAIT       = 1 << 4,
 };
 
-typedef uint32_t socklen_t;
+typedef uint32_t vsf_socklen_t;
 typedef uint16_t vsf_linux_socket_sa_family_t;
 struct vsf_linux_socket_sockaddr {
     vsf_linux_socket_sa_family_t sa_family;
@@ -173,15 +173,15 @@ struct vsf_linux_socket_linger {
 };
 
 // from netinet/in.h
-typedef uint32_t in_addr_t;
-typedef uint16_t in_port_t;
+typedef uint32_t vsf_in_addr_t;
+typedef uint16_t vsf_in_port_t;
 struct vsf_linux_socket_in_addr {
     // s_addr maybe MACRO
-    in_addr_t __s_addr;
+    vsf_in_addr_t __s_addr;
 };
 struct vsf_linux_socket_sockaddr_in {
     vsf_linux_socket_sa_family_t sin_family;
-    in_port_t sin_port;
+    vsf_in_port_t sin_port;
     struct vsf_linux_socket_in_addr sin_addr;
     char sin_zero[8];
 };
@@ -198,16 +198,16 @@ typedef struct vsf_linux_socket_op_t {
 
     int (*fn_init)(vsf_linux_fd_t *sfd);
     int (*fn_fini)(vsf_linux_socket_priv_t *priv, int how);
-    int (*fn_connect)(vsf_linux_socket_priv_t *priv, const struct vsf_linux_socket_sockaddr *addr, socklen_t addrlen);
+    int (*fn_connect)(vsf_linux_socket_priv_t *priv, const struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t addrlen);
     int (*fn_listen)(vsf_linux_socket_priv_t *priv, int backlog);
-    int (*fn_accept)(vsf_linux_socket_priv_t *priv, struct vsf_linux_socket_sockaddr *addr, socklen_t *addr_len);
-    int (*fn_bind)(vsf_linux_socket_priv_t *priv, const struct vsf_linux_socket_sockaddr *addr, socklen_t addrlen);
+    int (*fn_accept)(vsf_linux_socket_priv_t *priv, struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t *addr_len);
+    int (*fn_bind)(vsf_linux_socket_priv_t *priv, const struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t addrlen);
 
-    int (*fn_getsockopt)(vsf_linux_socket_priv_t *priv, int level, int optname, void *optval, socklen_t *optlen);
-    int (*fn_setsockopt)(vsf_linux_socket_priv_t *priv, int level, int optname,const void *optval, socklen_t optlen);
+    int (*fn_getsockopt)(vsf_linux_socket_priv_t *priv, int level, int optname, void *optval, vsf_socklen_t *optlen);
+    int (*fn_setsockopt)(vsf_linux_socket_priv_t *priv, int level, int optname,const void *optval, vsf_socklen_t optlen);
 
-    int (*fn_getpeername)(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, socklen_t *addrlen);
-    int (*fn_getsockname)(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, socklen_t *addrlen);
+    int (*fn_getpeername)(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t *addrlen);
+    int (*fn_getsockname)(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t *addrlen);
 } vsf_linux_socket_op_t;
 
 vsf_class(vsf_linux_socket_priv_t) {
@@ -246,14 +246,14 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd);
 static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, int how);
-static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv, const struct vsf_linux_socket_sockaddr *addr, socklen_t addrlen);
+static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv, const struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t addrlen);
 static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, int backlog);
-static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, socklen_t *addr_len);
-static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *socket_priv, const struct vsf_linux_socket_sockaddr *addr, socklen_t addrlen);
-static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, void *optval, socklen_t *optlen);
-static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname,const void *optval, socklen_t optlen);
-static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, socklen_t *addrlen);
-static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, socklen_t *addrlen);
+static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t *addr_len);
+static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *socket_priv, const struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t addrlen);
+static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname, void *optval, vsf_socklen_t *optlen);
+static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname,const void *optval, vsf_socklen_t optlen);
+static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t *addrlen);
+static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_priv, struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t *addrlen);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -615,7 +615,7 @@ static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, in
 }
 
 static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_priv,
-                    int level, int optname, const void *optval, socklen_t optlen)
+                    int level, int optname, const void *optval, vsf_socklen_t optlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     int ret;
@@ -684,7 +684,7 @@ __return:
 }
 
 static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_priv,
-                    int level, int optname, void *optval, socklen_t *optlen)
+                    int level, int optname, void *optval, vsf_socklen_t *optlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     void *orig_optval = optval;
@@ -765,7 +765,7 @@ __return:
 }
 
 static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_priv,
-                    struct vsf_linux_socket_sockaddr *addr, socklen_t *addrlen)
+                    struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t *addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct sockaddr hsockaddr = { 0 };
@@ -776,7 +776,7 @@ static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_p
 }
 
 static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_priv,
-                    struct vsf_linux_socket_sockaddr *addr, socklen_t *addrlen)
+                    struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t *addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct sockaddr hsockaddr = { 0 };
@@ -787,7 +787,7 @@ static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_p
 }
 
 static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
-                    struct vsf_linux_socket_sockaddr *addr, socklen_t *addrlen)
+                    struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t *addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct sockaddr hsockaddr;
@@ -832,7 +832,7 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
 }
 
 static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *socket_priv,
-                    const struct vsf_linux_socket_sockaddr *addr, socklen_t addrlen)
+                    const struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct sockaddr hsockaddr = { 0 };
@@ -842,7 +842,7 @@ static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *socket_priv,
 }
 
 static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
-                    const struct vsf_linux_socket_sockaddr *addr, socklen_t addrlen)
+                    const struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct sockaddr hsockaddr = { 0 };
@@ -880,7 +880,7 @@ static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, 
 }
 
 static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, const void *buffer, size_t size, int flags,
-                    const struct vsf_linux_socket_sockaddr *dst_addr, socklen_t addrlen)
+                    const struct vsf_linux_socket_sockaddr *dst_addr, vsf_socklen_t addrlen)
 {
     int ret;
 
@@ -908,7 +908,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
 }
 
 static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, void *buffer, size_t size, int flags,
-                    struct vsf_linux_socket_sockaddr *src_addr, socklen_t *addrlen)
+                    struct vsf_linux_socket_sockaddr *src_addr, vsf_socklen_t *addrlen)
 {
     int ret;
 
@@ -959,7 +959,7 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
 
 // sendto & recvfrom
 ssize_t VSF_LINUX_SOCKET_WRAPPER(sendto)(int sockfd, const void *buffer, size_t size, int flags,
-                    const struct vsf_linux_socket_sockaddr *dst_addr, socklen_t addrlen)
+                    const struct vsf_linux_socket_sockaddr *dst_addr, vsf_socklen_t addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
 	if (!sfd) {
@@ -971,7 +971,7 @@ ssize_t VSF_LINUX_SOCKET_WRAPPER(sendto)(int sockfd, const void *buffer, size_t 
 }
 
 ssize_t VSF_LINUX_SOCKET_WRAPPER(recvfrom)(int sockfd, void *buffer, size_t size, int flags,
-                    struct vsf_linux_socket_sockaddr *src_addr, socklen_t *addrlen)
+                    struct vsf_linux_socket_sockaddr *src_addr, vsf_socklen_t *addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
     if (!sfd) {
@@ -984,7 +984,7 @@ ssize_t VSF_LINUX_SOCKET_WRAPPER(recvfrom)(int sockfd, void *buffer, size_t size
 
 // netdb.h
 // none thread safty
-int __inet_gethostbyname(const char *name, in_addr_t *addr)
+int __inet_gethostbyname(const char *name, vsf_in_addr_t *addr)
 {
     __vsf_linux_hostsock_init();
 
@@ -993,7 +993,7 @@ int __inet_gethostbyname(const char *name, in_addr_t *addr)
         return -1;
     }
     if (addr != NULL) {
-        *addr = *(in_addr_t *)host->h_addr;
+        *addr = *(vsf_in_addr_t *)host->h_addr;
     }
     return 0;
 }
