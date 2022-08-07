@@ -80,7 +80,7 @@ vsf_err_t vsf_hw_rtc_get(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_tm_t *rtc_tm)
         struct timeval tv;
         struct tm tm;
         gettimeofday(&tv, NULL);
-        localtime_r(tv.tv_sec, &tm);
+        localtime_r(&tv.tv_sec, &tm);
 
         if (rtc_tm != NULL) {
             rtc_tm->tm_sec = tm.tm_sec;
