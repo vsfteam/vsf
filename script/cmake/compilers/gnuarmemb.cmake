@@ -12,11 +12,11 @@ set(CMAKE_OBJDUMP arm-none-eabi-objdump CACHE INTERNAL "objdump")
 set(CMAKE_SIZE arm-none-eabi-size CACHE INTERNAL "size")
 
 set(CMAKE_C_FLAGS 
-    "${CMAKE_C_FLAGS} -std=gnu11 -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
+    "${CMAKE_C_FLAGS} -std=gnu11 -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections"
     CACHE INTERNAL "C compiler common flags"
 )
 set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -fpermissive -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -fms-extensions -ffunction-sections"
+    "${CMAKE_CXX_FLAGS} -fpermissive -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections"
     CACHE INTERNAL "C++ compiler common flags"
 )
 
