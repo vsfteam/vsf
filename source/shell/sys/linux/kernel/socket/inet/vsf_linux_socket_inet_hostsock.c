@@ -49,7 +49,7 @@ struct dirent {
 #if defined(__WIN__)
 #   include <WinSock2.h>
 #   pragma comment (lib, "ws2_32.lib")
-#elif defined(__LINUX__) || defined(__linux__)
+#elif defined(__LINUX__) || defined(__linux__) || defined(__MACOS__)
 #   include <unistd.h>
 #   include <netdb.h>
 #   include <sys/socket.h>
@@ -57,6 +57,8 @@ struct dirent {
 #   include <netinet/tcp.h>
 #   include <fcntl.h>
 #   include <errno.h>
+#else
+#   error hostos not supported
 #endif
 
 /*============================ MACROS ========================================*/
@@ -391,7 +393,7 @@ static void __vsf_linux_socket_inet_irqthread(void *arg)
                     vsf_unprotect_sched(orig);
                 }
             }
-#elif defined(__LINUX__) || defined(__linux__)
+#elif defined(__LINUX__) || defined(__linux__) || defined(__MACOS__)
             for (int i = 0; ret > 0 && i <= nfds; i++) {
                 priv = NULL;
                 orig = vsf_protect_sched();
@@ -596,7 +598,7 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
 #ifdef __WIN__
     u_long optval_ulong = 1;
     ioctlsocket(priv->hostsock, FIONBIO, &optval_ulong);
-#elif defined(__LINUX__) || defined(__linux__)
+#elif defined(__LINUX__) || defined(__linux__) || defined(__MACOS__)
     fcntl(priv->hostsock, F_SETFL, fcntl(priv->hostsock, F_GETFL) | O_NONBLOCK);
 #endif
     priv->rcvto = priv->sndto = -1;
@@ -851,7 +853,7 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
     if (    (SOCKET_ERROR == ret)
 #if defined(__WIN__)
         &&  (errno == ERRNO_WOULDBLOCK)) {
-#elif defined(__LINUX__) || defined(__linux__)
+#elif defined(__LINUX__) || defined(__linux__) || defined(__MACOS__)
         &&  ((errno == ERRNO_WOULDBLOCK) || (errno == EINPROGRESS))) {
 #endif
         ret = 0;
