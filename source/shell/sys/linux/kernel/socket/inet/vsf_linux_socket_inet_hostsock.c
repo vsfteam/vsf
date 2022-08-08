@@ -76,7 +76,7 @@ struct dirent {
 #   define errno                            WSAGetLastError()
 #   define ERRNO_WOULDBLOCK                 WSAEWOULDBLOCK
 #   define SHUT_RDWR                        SD_BOTH
-#elif defined(__LINUX__) || defined(__linux__) || defined(__MSCOS__)
+#elif defined(__LINUX__) || defined(__linux__) || defined(__MACOS__)
 // uppercase for host type
 #   define SOCKET_T                         int
 #   define SOCKLEN_T                        socklen_t
