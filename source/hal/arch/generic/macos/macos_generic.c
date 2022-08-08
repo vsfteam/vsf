@@ -27,6 +27,8 @@
 #include <pthread.h>
 #include <setjmp.h>
 
+#include <mach/clock.h>
+#include <mach/mach.h>
 #include <dispatch/dispatch.h>
 
 /*============================ MACROS ========================================*/
@@ -56,8 +58,6 @@
 #ifndef VSF_ARCH_CFG_REQUEST_TRACE_EN
 #   define VSF_ARCH_CFG_REQUEST_TRACE_EN    DISABLED
 #endif
-
-#define __VSF_ARCH_MACOS_CFG_SYSTIMER_SIGNAL    ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -102,7 +102,7 @@ static vsf_err_t __vsf_arch_create_irq_thread(vsf_arch_irq_thread_t *irq_thread,
 typedef struct vsf_arch_systimer_ctx_t {
     implement(vsf_arch_irq_thread_t);
     vsf_arch_irq_request_t due_request;
-    dispatch_queue_t dispatch_queue;
+    dispatch_queue_t queue;
     dispatch_source_t timer;
 } vsf_arch_systimer_ctx_t;
 
@@ -320,16 +320,6 @@ void __vsf_arch_irq_sleep(uint32_t ms)
 
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
 
-#if __VSF_ARCH_MACOS_CFG_SYSTIMER_SIGNAL == ENABLED
-static void __vsf_systimer_on_notify(int signal)
-#else
-static void __vsf_systimer_on_notify(union sigval s)
-#endif
-{
-    vsf_arch_systimer_ctx_t *ctx = &__vsf_arch.systimer;
-    __vsf_arch_irq_request_send(&__vsf_arch.systimer.due_request);
-}
-
 static void __vsf_systimer_thread(void *arg)
 {
     vsf_arch_systimer_ctx_t *ctx = arg;
@@ -353,23 +343,20 @@ static void __vsf_systimer_thread(void *arg)
 vsf_err_t vsf_systimer_init(void)
 {
     vsf_arch_systimer_ctx_t *ctx = &__vsf_arch.systimer;
-    struct sigevent evp = {
-#if __VSF_ARCH_MACOS_CFG_SYSTIMER_SIGNAL == ENABLED
-        .sigev_notify = SIGEV_SIGNAL,
-        .sigev_signo = SIGUSR1,
-#else
-        .sigev_notify = SIGEV_THREAD,
-        .sigev_notify_function = __vsf_systimer_on_notify,
-#endif
-    };
-#if __VSF_ARCH_MACOS_CFG_SYSTIMER_SIGNAL == ENABLED
-    signal(SIGUSR1, __vsf_systimer_on_notify);
-#endif
 
-    ctx->dispatch_queue = dispatch_queue_create("timer_queue", 0);
-    ctx->timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, ctx->dispatch_queue);
-    //dispatch_source_set_event_handler(ctx->timer, handler);
-    //dispatch_queue_set_cancel_handler(ctx->timer, handler);
+    ctx->queue = dispatch_queue_create("timer_queue", 0);
+    ctx->timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, ctx->queue);
+    dispatch_set_context(ctx->timer, ctx);
+    dispatch_source_set_event_handler(ctx->timer, ^{
+        dispatch_source_cancel(ctx->timer);
+        __vsf_arch_irq_request_send(&ctx->due_request);
+    });
+    dispatch_source_set_cancel_handler(ctx->timer, ^{
+        dispatch_release(ctx->timer);
+        dispatch_release(ctx->queue);
+        ctx->timer = NULL;
+        ctx->queue = NULL;
+    });
     __vsf_arch_irq_request_init(&__vsf_arch.systimer.due_request);
     return VSF_ERR_NONE;
 }
@@ -388,14 +375,25 @@ void vsf_systimer_set_idle(void)
 
 vsf_systimer_tick_t vsf_systimer_get(void)
 {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
+    clock_serv_t clock_serv;
+    mach_timespec_t ts;
+    host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &clock_serv);
+    clock_get_time(clock_serv, &ts);
+    mach_port_deallocate(mach_task_self(), clock_serv);
+    return ts.tv_sec * 1000000000 + ts.tv_nsec;
 }
 
 bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
-    // TODO: set dispatch_timer
+    vsf_systimer_tick_t now = vsf_systimer_get();
+    dispatch_source_cancel(__vsf_arch.systimer.timer);
+    if (now >= due) {
+        __vsf_macos_timer_handler(&__vsf_arch.systimer);
+    } else {
+        vsf_systimer_tick_t interval = due - now;
+        dispatch_source_set_timer(__vsf_arch.systimer.timer, dispatch_time(DISPATCH_TIME_NOW, 0), interval, 0);
+        dispatch_resume(__vsf_arch.systimer.timer);
+    }
     return true;
 }
 
