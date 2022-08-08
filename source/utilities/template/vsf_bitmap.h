@@ -124,9 +124,9 @@ extern "C" {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void __vsf_bitmap_reset(uintalu_t * this_ptr, int_fast16_t bit_size);
-extern int_fast16_t __vsf_bitmap_ffz(uintalu_t * bitmap_ptr, int_fast16_t bit_size);
-extern int_fast16_t __vsf_bitmap_ffs(uintalu_t * bitmap_ptr, int_fast16_t bit_size);
+extern void __vsf_bitmap_reset(uintalu_t * this_ptr, int_fast32_t bit_size);
+extern int_fast32_t __vsf_bitmap_ffz(uintalu_t * bitmap_ptr, int_fast32_t bit_size);
+extern int_fast32_t __vsf_bitmap_ffs(uintalu_t * bitmap_ptr, int_fast32_t bit_size);
 
 #ifdef __cplusplus
 }

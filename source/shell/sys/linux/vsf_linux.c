@@ -216,7 +216,7 @@ static const vsf_linux_thread_op_t __vsf_linux_sighandler_op = {
 int vsf_linux_pls_alloc(void)
 {
     vsf_protect_t orig = vsf_protect_sched();
-    int_fast16_t idx = vsf_bitmap_ffz(&__vsf_linux.pls.bitmap, VSF_LINUX_CFG_PLS_NUM);
+    int_fast32_t idx = vsf_bitmap_ffz(&__vsf_linux.pls.bitmap, VSF_LINUX_CFG_PLS_NUM);
     if (idx < 0) {
         vsf_unprotect_sched(orig);
         return -1;
@@ -339,7 +339,7 @@ int vsf_linux_tls_alloc(void (*destructor)(void*))
     VSF_LINUX_ASSERT(process != NULL);
 
     vsf_protect_t orig = vsf_protect_sched();
-    int_fast16_t idx = vsf_bitmap_ffz(&process->tls.bitmap, VSF_LINUX_CFG_TLS_NUM);
+    int_fast32_t idx = vsf_bitmap_ffz(&process->tls.bitmap, VSF_LINUX_CFG_TLS_NUM);
     if (idx < 0) {
         vsf_unprotect_sched(orig);
         return -1;
