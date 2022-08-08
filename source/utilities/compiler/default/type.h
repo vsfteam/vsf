@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#if !__IS_COMPILER_GCC__
+#if !__IS_COMPILER_GCC__ && !__IS_COMPILER_LLVM__
 #   include <uchar.h>
 #endif
 
