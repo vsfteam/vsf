@@ -39,9 +39,8 @@ extern "C" {
 #if VSF_USBH_USE_HUB == ENABLED
 #   error "libusb_hcd does not support hub"
 #endif
-#if     !defined(__CPU_X86__) && !defined(__CPU_X64__)                          \
-    &&  !(defined(__CPU_GENERIC__) && defined(__LINUX__))
-#	error "libusb_hcd ONLY support x86/64"
+#if !defined(__WIN__) && !defined(__LINUX__) && !defined(__MACOS__)
+#	error "libusb_hcd ONLY support win/linux/mac"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
