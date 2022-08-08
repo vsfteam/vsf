@@ -21,7 +21,7 @@
 
 #undef VSF_GENERIC_DRIVER_HEADER
 
-#if     defined(__LINUX__)
+#if     defined(__LINUX__) || defined(__MACOS__)
 #   define  VSF_GENERIC_DRIVER_HEADER       "./linux/driver.h"
 #else
 #   error No supported device found.
