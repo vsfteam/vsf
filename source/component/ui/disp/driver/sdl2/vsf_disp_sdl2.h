@@ -38,8 +38,8 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if !defined(__CPU_X86__) && !defined(__CPU_X64__) && !defined(__CPU_WEBASSEMBLY__)
-#   error "vsf_disp_sdl2 ONLY support x86/64/webassembly"
+#if !defined(__WIN__) && !defined(__LINUX__) && !defined(__MACOS__)
+#   error "vsf_disp_sdl2 ONLY support win/linux/macos"
 #endif
 
 // if VSF_DISP_USE_SDL2 is used, SDL header files are not visible in vsf header files
