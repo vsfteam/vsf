@@ -21,7 +21,7 @@
 
 #if     VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED             \
     &&  VSF_LINUX_SOCKET_USE_INET == ENABLED                                    \
-    && (defined(__WIN__) || defined(__LINUX__) || defined(__linux__))
+    && (defined(__WIN__) || defined(__LINUX__) || defined(__linux__) || defined(__MACOS__))
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../include/sys/types.h"
