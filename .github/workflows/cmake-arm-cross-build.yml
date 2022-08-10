@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         target: [aic8800, mps2] # m484
-        cc: ['10-2021.10', '9-2019-q4', '8-2019-q3']
+        cc: ['11.3.Rel1', '10.3-2021.10', '9-2019-q4', '8-2019-q3']
         os: [ubuntu-latest]
 
     runs-on: ${{matrix.os}}
@@ -28,7 +28,7 @@ jobs:
       uses: lukka/get-cmake@latest
 
     - name: arm-none-eabi-gcc
-      uses: ryanwinter/arm-none-eabi-gcc@master
+      uses: carlosperate/arm-none-eabi-gcc-action@v1
       with:
         release: ${{matrix.cc}}
 
