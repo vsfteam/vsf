@@ -30,8 +30,10 @@
 #   include "./vsf_usr_cfg/vsf_usr_cfg_f1c100s.h"
 #elif   defined(__WIN__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_win.h"
-#elif   defined(__LINUX__) || defined(__MACOS__)
+#elif   defined(__LINUX__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_linux.h"
+#elif   defined(__MACOS__)
+#   include "./vsf_usr_cfg/vsf_usr_cfg_macos.h"
 #elif   defined(__GD32E103__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_gd32e103.h"
 #elif   defined(__MT071__)

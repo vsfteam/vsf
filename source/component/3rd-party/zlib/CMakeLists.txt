@@ -5,8 +5,9 @@ endif()
 target_include_directories(${VSF_LIB_NAME} INTERFACE
     ${VSF_ZLIB_PATH}
 )
-#target_compile_definitions(${VSF_LIB_NAME} INTERFACE
-#)
+target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+    Z_HAVE_UNISTD_H
+)
 
 target_sources(${VSF_LIB_NAME} INTERFACE
     ${VSF_ZLIB_PATH}/adler32.c
