@@ -1,8 +1,14 @@
 # VSF -- Versaloon Software Framework
+
 [![GitHub](https://img.shields.io/github/license/vsfteam/vsf.svg)](https://github.com/vsfteam/vsf/blob/master/LICENSE)
+
 [![windows-build](https://github.com/vsfteam/vsf/actions/workflows/windows-build.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/windows-build.yml)
 [![cmake-native-build](https://github.com/vsfteam/vsf/actions/workflows/cmake-native-build.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/cmake-native-build.yml)
 [![cmake-arm-cross-build](https://github.com/vsfteam/vsf/actions/workflows/cmake-arm-cross-build.yml/badge.svg)](https://github.com/vsfteam/vsf/actions/workflows/cmake-arm-cross-build.yml)
+
+[![vsf.linux windows build](https://github.com/vsf-linux/vsf.linux/actions/workflows/windows-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/windows-build.yml)
+[![cmake-arm-cross-build](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-arm-cross-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-arm-cross-build.yml)
+[![cmake-native-build](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-native-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-native-build.yml)
 
 [English](README.md) |
 
@@ -68,13 +74,9 @@ VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开�
   - bt -- 蓝牙协议栈（使用第三方的btstack）
 
 ## 硬件抽象层
-- 标准hal接口，统一API -- 比如：vsf_spi_init可以用于所有VSF中支持的SPI，包括GPIO模拟的SPI、通过USB外扩的SPI，通过分布式总线访问的远端SPI
+- 标准hal接口，统一API -- 比如：vsf_spi_init可以用于所有VSF中支持的SPI，包括芯片自带SPI、GPIO模拟的SPI、通过USB外扩的SPI，通过分布式总线访问的远端SPI
 - 简化开发的IP核驱动 -- 移植仅需要实现时钟、复位、中断等等IP核心之外的功能
 - 各种接口封装模板
-- 不同等级的封装接口
-  - lv0 -- 方便移植
-  - lv1 -- 方便使用，可以简单通过引用模板调用lv0的接口来实现
-  - lv2 -- 对接各种应用（比如arduino）
 - 接口
   - PM
   - GPIO
