@@ -106,7 +106,7 @@ vsf_err_t vsf_real_rtc_set(vsf_real_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 #endif
 
 #if VSF_RTC_CFG_IMP_GET_TIME_FROM_GET == ENABLED
-vsf_err_t vsf_real_rtc_get_time(vsf_hw_rtc_t *rtc_ptr, time_t *second_ptr, time_t *milliseconds_ptr)
+vsf_err_t vsf_real_rtc_get_time(vsf_hw_rtc_t *rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *milliseconds_ptr)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
     VSF_HAL_ASSERT((second_ptr != NULL) || (milliseconds_ptr != NULL));
@@ -138,7 +138,7 @@ vsf_err_t vsf_real_rtc_get_time(vsf_hw_rtc_t *rtc_ptr, time_t *second_ptr, time_
 #endif
 
 #if VSF_RTC_CFG_IMP_SET_SECOND_FROM_SET == ENABLED
-vsf_err_t vsf_real_rtc_set_time(vsf_real_rtc_t *rtc_ptr, time_t second, time_t milliseconds)
+vsf_err_t vsf_real_rtc_set_time(vsf_real_rtc_t *rtc_ptr, vsf_rtc_time_t second, vsf_rtc_time_t milliseconds)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
 

@@ -40,6 +40,10 @@
 #   define  APP_RTC_DEMO_CFG_TM_DEMO                ENABLED
 #endif
 
+#ifndef APP_RTC_DEMO_CFG_INIT
+#   define APP_RTC_DEMO_CFG_INIT                    ENABLED
+#endif
+
 #ifndef APP_RTC_DEMO_CFG_SET_RTC
 #   define APP_RTC_DEMO_CFG_SET_RTC                 ENABLED
 #endif
@@ -81,11 +85,19 @@ static void __rtc_tm_demo(void)
      	"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
     };
 
+
     vsf_err_t result;
     vsf_rtc_tm_t rtc_tm;
 
-    result = vsf_rtc_init(APP_RTC_DEMO_CFG_RTC, NULL);
-    VSF_ASSERT(result == VSF_ERR_NONE);
+#if APP_RTC_DEMO_CFG_INIT == ENABLED
+    static bool __is_inited = false;
+    if (!__is_inited) {
+        result = vsf_rtc_init(APP_RTC_DEMO_CFG_RTC, NULL);
+        VSF_ASSERT(result == VSF_ERR_NONE);
+
+        __is_inited = true;
+    }
+#endif
 
 #if APP_RTC_DEMO_CFG_SET_RTC == ENABLED
     result = vsf_rtc_get(APP_RTC_DEMO_CFG_RTC, &rtc_tm);
