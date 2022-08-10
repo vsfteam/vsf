@@ -36,20 +36,26 @@ jobs:
             sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libusb-dev libusb-1.0 python3 python3-pip
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install gcc llvm sdl2 libusb ninja
+
+            echo "" >> ~/.bash_profile # fixed last line withou line break
+            echo "export LIBRARY_PATH=/usr/local/lib" >> ~/.bash_profile
+            echo "export C_INCLUDE_PATH=/usr/local/include" >> ~/.bash_profile
+
           fi
           pip3 install pytest pytest-bdd pexpect simple-hexdump
       shell: bash
 
     - name: configure cmake
       run: cmake -GNinja -S ${SOURCE_PATH} -B ${SOURCE_PATH}/build
+      shell: bash -ileo pipefail {0}
       env:
         CC: ${{matrix.cc}}
         VSF_PATH: ${{github.workspace}}
         SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{matrix.src}}
 
     - name: build
-      # Build your program with the given configuration
       run: cmake --build ${SOURCE_PATH}/build -v
+      shell: bash -ileo pipefail {0}
       env:
         SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{matrix.src}}
 
