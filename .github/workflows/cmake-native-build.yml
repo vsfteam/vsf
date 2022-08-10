@@ -15,6 +15,12 @@ jobs:
       matrix:
         cc: [gcc, clang]
         os: [ubuntu-latest, macos-12]
+        src: [linux, macos]
+        exclude:
+          - os: ubuntu-latest
+            src: macos
+          - os: macos-12
+            src: linux
 
     runs-on: ${{matrix.os}}
 
@@ -39,14 +45,14 @@ jobs:
       env:
         CC: ${{matrix.cc}}
         VSF_PATH: ${{github.workspace}}
-        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/linux
+        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{matrix.src}}
 
     - name: build
       # Build your program with the given configuration
       run: cmake --build ${SOURCE_PATH}/build -v
       env:
-        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/linux
+        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{matrix.src}}
 
     - name: test
-      run: pytest -m "base or memory or linux-only" --verbose -o log_cli=true --log-cli-level="DEBUG" --vsf_template=${{github.workspace}}/example/template/project/cmake/linux/build/vsf_template
+      run: pytest -m "base or memory or linux-only" --verbose -o log_cli=true --log-cli-level="DEBUG" --vsf_template=${{github.workspace}}/example/template/project/cmake/${{matrix.src}}/build/vsf_template
       working-directory: ${{github.workspace}}/test/pytest
