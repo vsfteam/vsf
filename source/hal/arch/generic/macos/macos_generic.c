@@ -385,14 +385,16 @@ vsf_systimer_tick_t vsf_systimer_get(void)
 
 bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
+    vsf_arch_systimer_ctx_t *ctx = &__vsf_arch.systimer;
     vsf_systimer_tick_t now = vsf_systimer_get();
-    dispatch_source_cancel(__vsf_arch.systimer.timer);
+
+    dispatch_source_cancel(ctx->timer);
     if (now >= due) {
-        __vsf_macos_timer_handler(&__vsf_arch.systimer);
+        __vsf_arch_irq_request_send(&ctx->due_request);
     } else {
         vsf_systimer_tick_t interval = due - now;
-        dispatch_source_set_timer(__vsf_arch.systimer.timer, dispatch_time(DISPATCH_TIME_NOW, 0), interval, 0);
-        dispatch_resume(__vsf_arch.systimer.timer);
+        dispatch_source_set_timer(ctx->timer, dispatch_time(DISPATCH_TIME_NOW, 0), interval, 0);
+        dispatch_resume(ctx->timer);
     }
     return true;
 }
