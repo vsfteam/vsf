@@ -68,7 +68,7 @@ fsm_rt_t vsf_hw_rtc_disable(vsf_hw_rtc_t *hw_rtc_ptr)
     return fsm_rt_cpl;
 }
 
-vsf_err_t vsf_hw_rtc_get_time(vsf_hw_rtc_t *hw_rtc_ptr, time_t *second_ptr, time_t *milliseconds_ptr)
+vsf_err_t vsf_hw_rtc_get_time(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *milliseconds_ptr)
 {
     uint32_t sec;
     uint32_t usec;
@@ -89,7 +89,7 @@ vsf_err_t vsf_hw_rtc_get_time(vsf_hw_rtc_t *hw_rtc_ptr, time_t *second_ptr, time
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_rtc_set_time(vsf_hw_rtc_t *hw_rtc_ptr, time_t second, time_t milliseconds)
+vsf_err_t vsf_hw_rtc_set_time(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_time_t second, vsf_rtc_time_t milliseconds)
 {
     aic_time_update((uint32_t)second, milliseconds * 1000);
     return VSF_ERR_NONE;
@@ -100,14 +100,15 @@ vsf_err_t vsf_hw_rtc_get(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_tm_t *rtc_tm)
     VSF_HAL_ASSERT(NULL != hw_rtc_ptr);
     VSF_HAL_ASSERT(NULL != rtc_tm);
 
-    time_t second, milliseconds;
+    vsf_rtc_time_t second, milliseconds;
     vsf_err_t result = vsf_hw_rtc_get_time(hw_rtc_ptr, &second, &milliseconds);
     if (result != VSF_ERR_NONE) {
         return result;
     }
 
     struct tm tm_local;
-    gmtime_offset_r(&second, &tm_local, 0);
+    time_t second_time = (time_t)second;
+    gmtime_offset_r(&second_time, &tm_local, 0);
 
     rtc_tm->tm_sec  = tm_local.tm_sec;          // [0 .. 59]
     rtc_tm->tm_min  = tm_local.tm_min;          // [0 .. 59]
@@ -136,7 +137,7 @@ vsf_err_t vsf_hw_rtc_set(vsf_hw_rtc_t *hw_rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
     tm_local.tm_year  = rtc_tm->tm_year - 1900; // [1900 .. ]
     time_t time = mk_gmtime_offset_r(&tm_local, 0);
 
-    return vsf_hw_rtc_set_time(hw_rtc_ptr, time, rtc_tm->tm_ms);
+    return vsf_hw_rtc_set_time(hw_rtc_ptr, (vsf_rtc_time_t)time, (vsf_rtc_time_t)rtc_tm->tm_ms);
 }
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

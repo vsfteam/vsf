@@ -27,8 +27,6 @@
 extern "C" {
 #endif
 
-#include <time.h>
-
 /*============================ MACROS ========================================*/
 
 // application code can redefine it
@@ -57,6 +55,10 @@ extern "C" {
 #   define VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE     DISABLED
 #endif
 
+#ifndef VSF_RTC_CFG_TIME_TYPE
+#   define VSF_RTC_CFG_TIME_TYPE                uint64_t
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_RTC_APIS(__prefix_name) \
@@ -66,8 +68,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, rtc_capability_t, rtc, capability, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, get,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_tm_t *rtc_tm) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, const vsf_rtc_tm_t *rtc_tm) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, get_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, time_t *second_ptr, time_t *millisecond_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, time_t second, time_t millisecond)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, get_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *millisecond_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_time_t second, vsf_rtc_time_t millisecond)
 
 /*============================ TYPES =========================================*/
 
@@ -76,6 +78,8 @@ typedef enum em_rtc_irq_mask_t {
     VSF_RTC_IRQ_MASK_ALARM = (1 << 0),
 } em_rtc_irq_mask_t;
 #endif
+
+typedef VSF_RTC_CFG_TIME_TYPE vsf_rtc_time_t;
 
 typedef struct vsf_rtc_tm_t {
     uint8_t tm_sec;         // [0 .. 59]
@@ -146,9 +150,9 @@ extern vsf_err_t vsf_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm);
  */
 extern vsf_err_t vsf_rtc_set(vsf_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm);
 
-extern vsf_err_t vsf_rtc_get_time(vsf_rtc_t *rtc_ptr, time_t *second_ptr, time_t *millisecond_ptr);
+extern vsf_err_t vsf_rtc_get_time(vsf_rtc_t *rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *millisecond_ptr);
 
-extern vsf_err_t vsf_rtc_set_time(vsf_rtc_t *rtc_ptr, time_t second, time_t millisecond);
+extern vsf_err_t vsf_rtc_set_time(vsf_rtc_t *rtc_ptr, vsf_rtc_time_t second, vsf_rtc_time_t millisecond);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
