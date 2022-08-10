@@ -17,10 +17,10 @@
 #if     !defined(__cplusplus)
 // wchar_t MSUT match the real wchar_t in the compiler, if not, fix here
 //  eg: for GCC, wchar_t is 4bytes
-#   if __IS_COMPILER_GCC__
-typedef unsigned int                wchar_t;
-#   elif __IS_COMPILER_LLVM__ && defined(__MACOS__)
+#   if defined(__MACOS__)
 typedef int                         wchar_t;
+#   elif __IS_COMPILER_GCC__
+typedef unsigned int                wchar_t;
 #   elif !__IS_COMPILER_IAR__
 // TODO: it seems that IAR does not support wchar_t even if it's defined here
 typedef unsigned short              wchar_t;
