@@ -14,8 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         cc: [gcc, clang]
+        os: [ubuntu-latest, macos-12]
 
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
 
     steps:
     - uses: actions/checkout@v2
@@ -24,8 +25,12 @@ jobs:
 
     - name: install depends
       run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libusb-dev libusb-1.0 python3 python3-pip
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get update
+            sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libusb-dev libusb-1.0 python3 python3-pip
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install gcc llvm sdl2 libusb ninja
+          fi
           pip3 install pytest pytest-bdd pexpect simple-hexdump
       shell: bash
 
