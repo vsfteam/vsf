@@ -180,7 +180,7 @@ const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
 {
     switch (af) {
     case AF_INET:
-        strlcpy(dst, inet_ntoa(*(struct in_addr *)src), size);
+        strncpy(dst, inet_ntoa(*(struct in_addr *)src), size);
         break;
     case AF_INET6:
         // TODO: add ipv6 support
