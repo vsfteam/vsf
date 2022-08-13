@@ -22,12 +22,10 @@
 #include "hal/arch/__vsf_arch_interface.h"
 
 /*============================ MACROS ========================================*/
-#define SYSTICK_IRQ         7
-#define PENDSV_IRQ          3
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-struct __vsf_rv_t {
+
+typedef struct vsf_rv_t {
     struct {
         vsf_swi_handler_t *handler;
         void *pparam;
@@ -37,12 +35,11 @@ struct __vsf_rv_t {
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
     vsf_systimer_tick_t reload;
 #endif
-};
-typedef struct __vsf_rv_t __vsf_rv_t;
+} vsf_rv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static __vsf_rv_t __vsf_rv;
+static vsf_rv_t __vsf_rv;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -58,9 +55,9 @@ static __vsf_rv_t __vsf_rv;
 bool vsf_arch_low_level_init(void)
 {
     //! support 16 SWI at max
-    eclic_set_nlbits(4);
+//    eclic_set_nlbits(4);
     //!< set priority to 1 (only high 4 bits are configurable)
-    eclic_set_irq_lvl(SYSTICK_IRQ, 0x10);
+//    eclic_set_irq_lvl(SYSTICK_IRQ, 0x10);
     //!< set priority to 0 (only high 4 bits are configurable)
     //eclic_set_irq_lvl(PENDSV_IRQ, 0x00);
 
@@ -76,17 +73,18 @@ bool vsf_arch_low_level_init(void)
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
-    return SYSTICK.COUNTER;
+//    return SYSTICK.COUNTER;
+    return 0;
 }
 
 void vsf_systimer_clear_int_pending_bit(void)
 {
-    eclic_clear_pending(SYSTICK_IRQ);
+//    eclic_clear_pending(SYSTICK_IRQ);
 }
 
 void vsf_systimer_reset_counter_value(void)
 {
-    SYSTICK.COUNTER = 0;
+//    SYSTICK.COUNTER = 0;
 }
 
 /*! \brief disable systimer and return over-flow flag status
@@ -96,37 +94,38 @@ void vsf_systimer_reset_counter_value(void)
  */
 bool vsf_systimer_low_level_disable(void)
 {
-    SYSTICK.CTRL = SYSTICK_CTRL_DISABLE_MSK;
+//    SYSTICK.CTRL = SYSTICK_CTRL_DISABLE_MSK;
+    return false;
 }
 
 /*! \brief only enable systimer without clearing any flags
  */
 void vsf_systimer_low_level_enable(void)
 {
-    SYSTICK.CTRL = 0;
+//    SYSTICK.CTRL = 0;
 }
 
 void vsf_systimer_low_level_int_disable(void)
 {
-    eclic_disable_interrupt(SYSTICK_IRQ);
+//    eclic_disable_interrupt(SYSTICK_IRQ);
 }
 
 void vsf_systimer_low_level_int_enable(void)
 {
-    eclic_enable_interrupt(SYSTICK_IRQ);
+//    eclic_enable_interrupt(SYSTICK_IRQ);
 }
 
 void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 {
     __vsf_rv.reload = tick_cnt;
-    SYSTICK.COMPARE = tick_cnt;
+//    SYSTICK.COMPARE = tick_cnt;
 }
 
-ISR(SysTick_Handler)
-{
-    vsf_systimer_reset_counter_value();
-    vsf_systimer_ovf_evt_hanlder();
-}
+//ISR(SysTick_Handler)
+//{
+//    vsf_systimer_reset_counter_value();
+//    vsf_systimer_ovf_evt_hanlder();
+//}
 
 /*! \brief initialise systimer without enable it 
  */
@@ -138,7 +137,8 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
 #elif   VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 #endif
 
-    eclic_set_posedge_trig(SYSTICK_IRQ);
+//    eclic_set_posedge_trig(SYSTICK_IRQ);
+    return VSF_ERR_NONE;
 }
 
 #endif
@@ -147,13 +147,13 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
  * SWI / PendSV                                                               *
  *----------------------------------------------------------------------------*/
 
-ROOT ISR(PendSV_Handler)
-{
-    SYSTICK.PENDSV = 0;
-    if (__vsf_rv.pendsv.handler != NULL) {
-        __vsf_rv.pendsv.handler(__vsf_rv.pendsv.pparam);
-    }
-}
+//ROOT ISR(PendSV_Handler)
+//{
+//    SYSTICK.PENDSV = 0;
+//    if (__vsf_rv.pendsv.handler != NULL) {
+//        __vsf_rv.pendsv.handler(__vsf_rv.pendsv.pparam);
+//    }
+//}
 
 /*! \brief initialise a software interrupt
  *! \param idx the index of the software interrupt
@@ -168,8 +168,8 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
         __vsf_rv.pendsv.handler = handler;
         __vsf_rv.pendsv.pparam = pparam;
 
-        eclic_set_irq_lvl(PENDSV_IRQ, priority << (8 - VSF_ARCH_PRI_BIT));
-        eclic_enable_interrupt(PENDSV_IRQ);
+//        eclic_set_irq_lvl(PENDSV_IRQ, priority << (8 - VSF_ARCH_PRI_BIT));
+//        eclic_enable_interrupt(PENDSV_IRQ);
         return VSF_ERR_NONE;
     }
     VSF_HAL_ASSERT(false);
@@ -184,7 +184,7 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
 void vsf_arch_swi_trigger(uint_fast8_t idx)
 {
     if (0 == idx) {
-        SYSTICK.PENDSV = SYSTICK_PENDSV_PENDING_MSK;
+//        SYSTICK.PENDSV = SYSTICK_PENDSV_PENDING_MSK;
         return;
     }
     VSF_HAL_ASSERT(false);
@@ -194,38 +194,43 @@ void vsf_arch_swi_trigger(uint_fast8_t idx)
 
 vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 {
-    vsf_arch_prio_t original = eclic_get_mth();
-    eclic_set_mth(priority << (8 - VSF_ARCH_PRI_BIT) | ((1<<(8 - VSF_ARCH_PRI_BIT)) - 1));
-    return original;
+//    vsf_arch_prio_t original = eclic_get_mth();
+//    eclic_set_mth(priority << (8 - VSF_ARCH_PRI_BIT) | ((1<<(8 - VSF_ARCH_PRI_BIT)) - 1));
+//    return original;
+    return 0;
 }
 
 vsf_gint_state_t vsf_get_interrupt(void)
 {
-    return GET_GLOBAL_INTERRUPT_STATE();
+    return 0;
+//    return GET_GLOBAL_INTERRUPT_STATE();
 }
 
-void vsf_set_interrupt(vsf_gint_state_t level)
+vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level)
 {
-    SET_GLOBAL_INTERRUPT_STATE(level);
+    return 0;
+//    return SET_GLOBAL_INTERRUPT_STATE(level);
 }
 
 vsf_gint_state_t vsf_disable_interrupt(void)
 {
-    return DISABLE_GLOBAL_INTERRUPT();
+    return 0;
+//    return DISABLE_GLOBAL_INTERRUPT();
 }
 
-void vsf_enable_interrupt(void)
+vsf_gint_state_t vsf_enable_interrupt(void)
 {
-    ENABLE_GLOBAL_INTERRUPT();
+    return 0;
+//    return ENABLE_GLOBAL_INTERRUPT();
 }
 
 /*----------------------------------------------------------------------------*
  * Others: sleep, reset, etc.                                                 *
  *----------------------------------------------------------------------------*/
 
-void vsf_arch_sleep(uint32_t mode)
+void vsf_arch_sleep(uint_fast32_t mode)
 {
-    ENABLE_GLOBAL_INTERRUPT();
+//    ENABLE_GLOBAL_INTERRUPT();
 }
 
 /* EOF */

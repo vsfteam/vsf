@@ -19,12 +19,6 @@
 #define __USE_RV_COMPILER_H_PART_1__
 
 /*============================ INCLUDES ======================================*/
-#ifndef VSF_UTILITIES_REQ___RV_HEADER_FILE__FROM_USR
-#include "./RISCV/riscv_compiler.h"
-#else
-#include VSF_UTILITIES_REQ___RV_HEADER_FILE__FROM_USR
-#endif
-
 
 //! \name The macros to identify the compiler
 //! @{
@@ -90,7 +84,7 @@ extern "C" {
 
 //! \brief 1 cycle nop operation
 #ifndef NOP
-    #define NOP()                       __asm__ __volatile__ ("nop");
+    #define NOP()               __asm__ __volatile__ ("nop");
 #endif
 
 
@@ -122,38 +116,9 @@ extern "C" {
 
 #endif
 
-/*----------------------------------------------------------------------------*
- * Signal & Interrupt Definition                                              *
- *----------------------------------------------------------------------------*/
-
-  /*!< Macro to enable/disable all interrupts. */
-#if __IS_COMPILER_IAR__
-#   define ENABLE_GLOBAL_INTERRUPT()            __enable_interrupt()
-#   define DISABLE_GLOBAL_INTERRUPT()           ____disable_irq()
-
-static ALWAYS_INLINE uint32_t ____disable_irq(void) 
-{
-    uint32_t wPRIMASK = __get_interrupt_state();
-    __disable_irq();
-    return wPRIMASK & 0x1;
-}
-#else
-#   define ENABLE_GLOBAL_INTERRUPT()            __enable_interrupt()
-#   define DISABLE_GLOBAL_INTERRUPT()           __disable_interrupt()
-#endif
-
-#if __IS_COMPILER_IAR__
-#   define GET_GLOBAL_INTERRUPT_STATE()         __get_interrupt_state()
-#   define SET_GLOBAL_INTERRUPT_STATE(__STATE)  __set_interrupt_state(__STATE)
-typedef __istate_t   vsf_gint_state_t;
-#elif __IS_COMPILER_GCC__
-#   define GET_GLOBAL_INTERRUPT_STATE()         __get_interrupt_state()
-#   define SET_GLOBAL_INTERRUPT_STATE(__STATE)  __set_interrupt_state(__STATE)
-typedef uint32_t   vsf_gint_state_t;
-#endif
-
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
+
 extern void vsf_stdio_init(void);
 
 #ifdef __cplusplus

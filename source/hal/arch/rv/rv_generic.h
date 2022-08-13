@@ -19,6 +19,7 @@
 #define __RV_GENERIC_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
 #define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
@@ -56,6 +57,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 typedef uint64_t vsf_systimer_tick_t;
+typedef uint32_t vsf_gint_state_t;
 
 #define __VSF_ARCH_PRI_INDEX(__N, __UNUSED)                                     \
             __vsf_arch_prio_index_##__N = (__N),
