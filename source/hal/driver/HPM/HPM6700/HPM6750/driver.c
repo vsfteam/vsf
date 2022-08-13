@@ -20,6 +20,10 @@
 #include "hal/vsf_hal_cfg.h"
 #include "./device.h"
 
+#include "hpm_common.h"
+#include "hpm_soc.h"
+#include "hpm_l1c_drv.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -27,6 +31,34 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+void reset_handler(void)
+{
+    l1c_dc_disable();
+    l1c_dc_invalidate_all();
+
+#if !defined(__SEGGER_RTL_VERSION) || defined(__GNU_LINKER)
+    /*
+     * Initialize LMA/VMA sections.
+     * Relocation for any sections that need to be copied from LMA to VMA.
+     */
+    extern void c_startup(void);
+    c_startup();
+#endif
+
+    /* Call platform specific hardware initialization */
+    extern void system_init(void);
+    system_init();
+
+#ifdef __cplusplus
+    /* Do global constructors */
+    __libc_init_array();
+#endif
+
+    /* Entry function */
+    extern void __vsf_main_entry(void);
+    __vsf_main_entry();
+}
 
 /*! \note initialize device driver
  *  \param none
