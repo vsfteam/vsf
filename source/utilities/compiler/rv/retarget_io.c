@@ -18,13 +18,11 @@
 
 #include "rv_compiler.h"
 
-
-//#if !__IS_COMPILER_IAR__
-//#include <rt_sys.h>
-//#endif
+// Need to know if VSF_LINUX_USE_SIMPLE_LIBC is enabled
+#include "utilities/vsf_utilities.h"
 
 #ifndef VSF_UNUSED_PARAM
-# define VSF_UNUSED_PARAM(__VAL)    (__VAL) = (__VAL)
+# define VSF_UNUSED_PARAM(__VAL)    (void)(__VAL)
 #endif
 
 #define __USE_COMMON_RETARGET_IO_C__

@@ -21,9 +21,11 @@
 #include <stdio.h>
 #include "utilities/vsf_utilities_cfg.h"
 #include "utilities/vsf_utilities.h"
+// for vsf_trace only
+#include "service/trace/vsf_trace.h"
 
 #ifndef VSF_UNUSED_PARAM
-#   define VSF_UNUSED_PARAM(__VAL)      (__VAL) = (__VAL)
+#   define VSF_UNUSED_PARAM(__VAL)      (void)(__VAL)
 #endif
 
 #if VSF_USE_POSIX == ENABLED
