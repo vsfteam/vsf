@@ -62,6 +62,8 @@
 #       define  VSF_DRIVER_HEADER       "./AIC/driver.h"
 #   elif    defined(__Hercules__)
 #       define  VSF_DRIVER_HEADER       "./hercules/driver.h"
+#   elif    defined(__HPM__)
+#       define  VSF_DRIVER_HEADER       "./HPM/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"
