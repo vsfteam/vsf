@@ -22,6 +22,7 @@
 // __assert_func is necessary because original function in newlib has dependency issue
 //  __assert_func in newlib depends on fprintf, which is not usable outside vsf linux
 SECTION(".vsf.utilities.stdio.gcc.__assert_func")
+WEAK(__assert_func)
 void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
 {
 #if VSF_USE_TRACE == ENABLED
@@ -32,60 +33,70 @@ void __assert_func(const char *file, int line, const char *func, const char *fai
 }
 
 SECTION(".vsf.utilities.stdio.gcc._open")
+WEAK(_open)
 int _open(const char *path_name, int flags, mode_t mode)
 {
     return open(path_name, flags, mode);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._close")
+WEAK(_close)
 void _close(int handle)
 {
     close(handle);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._lseek")
+WEAK(_lseek)
 off_t _lseek(int handle, off_t offset, int whence)
 {
     return lseek(handle, offset, whence);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._kill")
+WEAK(_kill)
 int _kill(pid_t pid, int sig)
 {
     return kill(pid, sig);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._getpid")
+WEAK(_getpid)
 pid_t _getpid(void)
 {
     return getpid();
 }
 
 SECTION(".vsf.utilities.stdio.gcc._fstat")
+WEAK(_fstat)
 int _fstat(int fd, struct stat *buf)
 {
     return fstat(fd, buf);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._isatty")
+WEAK(_isatty)
 int _isatty(int fd)
 {
     return 0;
 }
 
 SECTION(".vsf.utilities.stdio.gcc._unlink")
+WEAK(_unlink)
 int _unlink(const char *pathname)
 {
     return unlink(pathname);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._link")
+WEAK(_link)
 int _link(const char *oldpath, const char *newpath)
 {
     return link(oldpath, newpath);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._gettimeofday")
+WEAK(_gettimeofday)
 int _gettimeofday(struct timeval *tv, struct timezone *tz)
 {
     return gettimeofday(tv, tz);
@@ -93,18 +104,21 @@ int _gettimeofday(struct timeval *tv, struct timezone *tz)
 #endif
 
 SECTION(".vsf.utilities.stdio.gcc._write")
+WEAK(_write)
 int _write(int handle, char *buf, int buf_size)
 {
     return __vsf_stdio_write(handle, (const unsigned char *)buf, buf_size);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._read")
+WEAK(_read)
 int _read(int handle, char *buf, int buf_size)
 {
     return __vsf_stdio_read(handle, (unsigned char *)buf, buf_size);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._sbrk")
+WEAK(_sbrk)
 void * _sbrk(intptr_t increment)
 {
     return NULL;
@@ -112,6 +126,7 @@ void * _sbrk(intptr_t increment)
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED && VSF_USE_KERNEL == ENABLED
 SECTION(".vsf.utilities.stdio.gcc._exit")
+WEAK(_exit)
 void _exit(int status)
 {
     vsf_thread_exit();
