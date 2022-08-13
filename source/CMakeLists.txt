@@ -1,5 +1,10 @@
 # CMakeLists head
 
+if(NOT DEFINED ${VSF_SRC_PATH})
+    get_filename_component(VSF_SRC_PATH . REALPATH)
+    message(STATUS "VSF_SRC_PATH: ${VSF_SRC_PATH}")
+endif()
+
 target_include_directories(${VSF_LIB_NAME} INTERFACE
     .
 )
