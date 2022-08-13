@@ -1,7 +1,7 @@
 # CMakeLists head
 
 if(VSF_SDL2_USE_TTF)
-    target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+    target_include_directories(${VSF_TARGET_NAME} PUBLIC
         SDL_ttf
     )
     target_sources(${VSF_LIB_NAME} INTERFACE
@@ -10,7 +10,7 @@ if(VSF_SDL2_USE_TTF)
 endif()
 
 if(VSF_SDL2_USE_IMAGE)
-    target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+    target_include_directories(${VSF_TARGET_NAME} PUBLIC
         SDL_image
     )
     target_sources(${VSF_LIB_NAME} INTERFACE

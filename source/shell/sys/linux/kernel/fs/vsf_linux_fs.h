@@ -45,7 +45,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_FS != ENABLED
-#   error VSF_USE_FS MUST be enabled
+#   error VSF_USE_FS MUST be enabled to use fs in linux
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

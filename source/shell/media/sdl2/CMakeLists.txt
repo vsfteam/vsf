@@ -1,7 +1,7 @@
 # CMakeLists head
 
 if(VSF_USE_SDL2)
-    target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+    target_include_directories(${VSF_TARGET_NAME} PUBLIC
         include
         include/SDL2
     )

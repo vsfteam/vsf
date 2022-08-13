@@ -1,12 +1,12 @@
 # CMakeLists head
 
 if(VSF_USE_LINUX)
-    target_include_directories(${CMAKE_PROJECT_NAME} BEFORE PUBLIC
+    target_include_directories(${VSF_TARGET_NAME} BEFORE PUBLIC
         include
         include/libusb
     )
     if(VSF_LINUX_USE_SIMPLE_LIBC)
-        target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+        target_include_directories(${VSF_TARGET_NAME} PUBLIC
             include/simple_libc
         )
     endif()
