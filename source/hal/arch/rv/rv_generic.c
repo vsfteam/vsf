@@ -127,6 +127,11 @@ void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 //    vsf_systimer_ovf_evt_hanlder();
 //}
 
+void vsf_systimer_prio_set(vsf_arch_prio_t priority)
+{
+// TODO:
+}
+
 /*! \brief initialise systimer without enable it 
  */
 vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
