@@ -44,14 +44,14 @@
 
 #ifndef VSF_AIC8800_USB_CFG_SPEED
 #   define VSF_AIC8800_USB_CFG_SPEED                USB_SPEED_HIGH
+// AIC8800 has problem with usbh disconnect detecting level in high speed mode,
+//  use port disable as a replacement
+#   define VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT    ENABLED
 #endif
 
 #define USB_OTG_COUNT               1
 // required by dwcotg, define the max ep number of dwcotg include ep0
 #define USB_DWCOTG_MAX_EP_NUM       16
-
-// AIC8800 has problem with usbh disconnect detecting level, use port disable as a replacement
-#define VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT    ENABLED
 
 #define USB_OTG0_IRQHandler         USBDMA_IRQHandler
 #define USB_OTG0_CONFIG                                                         \
