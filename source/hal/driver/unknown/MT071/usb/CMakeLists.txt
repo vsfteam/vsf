@@ -1,6 +1,6 @@
 # CMakeLists head
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     usb_lv0.c
     usb.c
     usb_common.c

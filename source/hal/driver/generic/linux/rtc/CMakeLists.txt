@@ -1,3 +1,3 @@
 # CMakeLists head
 
-target_sources(${VSF_LIB_NAME} INTERFACE rtc.c)
+vsf_add_sources(rtc.c)

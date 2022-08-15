@@ -5,7 +5,7 @@ if(NOT DEFINED ${VSF_SRC_PATH})
     message(STATUS "VSF_SRC_PATH: ${VSF_SRC_PATH}")
 endif()
 
-target_include_directories(${VSF_LIB_NAME} INTERFACE
+vsf_add_include_directories(
     .
 )
 

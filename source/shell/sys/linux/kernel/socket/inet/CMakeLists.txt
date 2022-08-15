@@ -5,10 +5,10 @@ if(VSF_HOST_SYSTEM STREQUAL win OR VSF_HOST_SYSTEM STREQUAL linux OR VSF_HOST_SY
         vsf_linux_socket_inet_hostsock.c
     )
 elseif(VSF_USE_LWIP)
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         vsf_linux_socket_inet_lwip.c
     )
-    target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+    vsf_add_compile_definitions(
         "LWIP_SO_RCVBUF=1"
 #       enable LWIP_SOCKET so that struct netconn has socket member
 #       but note that DO NOT use lwip/socket.h in lwip

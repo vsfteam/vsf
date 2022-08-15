@@ -4,6 +4,6 @@ target_sources(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
     macos_generic.c
 )
 
-target_link_libraries(${VSF_LIB_NAME} INTERFACE
+vsf_add_libraries(
     pthread
 )

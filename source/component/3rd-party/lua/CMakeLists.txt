@@ -1,11 +1,11 @@
-target_include_directories(${VSF_LIB_NAME} INTERFACE
+vsf_add_include_directories(
     extension/oo
     extension/lovevsf
 )
-#target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+#vsf_add_compile_definitions(
 #)
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     extension/lovevsf/modules/l_filesystem.c
     extension/lovevsf/modules/l_font.c
     extension/lovevsf/modules/l_graphics.c
@@ -23,11 +23,11 @@ if(NOT (VSF_USE_EVM AND VSF_EVM_USE_LUA))
         set(VSF_LUA_PATH ${VSF_SRC_PATH}/component/3rd-party/lua/raw)
     endif()
 
-    target_include_directories(${VSF_LIB_NAME} INTERFACE
+    vsf_add_include_directories(
         ${VSF_LUA_PATH}
     )
 
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         ${VSF_LUA_PATH}/lapi.c
         ${VSF_LUA_PATH}/lauxlib.c
         ${VSF_LUA_PATH}/lbaselib.c
@@ -66,7 +66,7 @@ if(NOT (VSF_USE_EVM AND VSF_EVM_USE_LUA))
     add_library(lua_main STATIC
         ${VSF_LUA_PATH}/lua.c
     )
-    target_link_libraries(${VSF_LIB_NAME} INTERFACE
+    vsf_add_libraries(
         lua_main
     )
 

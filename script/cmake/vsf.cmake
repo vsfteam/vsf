@@ -14,6 +14,19 @@ include(${VSF_CMAKE_ROOT}/extensions.cmake)
 set(VSF_LIB_NAME vsf)
 add_library(${VSF_LIB_NAME} INTERFACE)
 
+function(vsf_add_sources)
+    target_sources(${VSF_LIB_NAME} INTERFACE ${ARGN})
+endfunction()
+function(vsf_add_include_directories)
+    target_include_directories(${VSF_LIB_NAME} INTERFACE ${ARGN})
+endfunction()
+function(vsf_add_compile_definitions)
+    target_compile_definitions(${VSF_LIB_NAME} INTERFACE ${ARGN})
+endfunction()
+function(vsf_add_libraries)
+    target_link_libraries(${VSF_LIB_NAME} INTERFACE ${ARGN})
+endfunction()
+
 add_executable(${CMAKE_PROJECT_NAME} "")
 target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
     ${VSF_LIB_NAME}
@@ -47,7 +60,7 @@ if(VSF_HOST_SYSTEM)
     )
 
     # no idea why can not simply add ${VSF_HOST_SYSTEM_LIB_NAME}
-    target_link_libraries(${VSF_LIB_NAME} INTERFACE
+    vsf_add_libraries(
         ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${VSF_HOST_SYSTEM_LIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
     )
 endif()
@@ -58,7 +71,7 @@ add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
 
 # libraries MUST be placed at the end
-target_link_libraries(${VSF_LIB_NAME} INTERFACE
+vsf_add_libraries(
 #   -lm
     m
 )

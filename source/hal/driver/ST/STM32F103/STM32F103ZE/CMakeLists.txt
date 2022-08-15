@@ -1,6 +1,6 @@
 # CMakeLists head
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     driver.c
     $<$<OR:
         $<COMPILE_LANG_AND_ID:C,IAR>,

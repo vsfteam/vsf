@@ -2,14 +2,14 @@ if(NOT VSF_ZLIB_PATH)
     set(VSF_ZLIB_PATH ${VSF_SRC_PATH}/component/3rd-party/zlib/raw)
 endif()
 
-target_include_directories(${VSF_LIB_NAME} INTERFACE
+vsf_add_include_directories(
     ${VSF_ZLIB_PATH}
 )
-target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+vsf_add_include_directories(
     Z_HAVE_UNISTD_H
 )
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     ${VSF_ZLIB_PATH}/adler32.c
     ${VSF_ZLIB_PATH}/compress.c
     ${VSF_ZLIB_PATH}/crc32.c

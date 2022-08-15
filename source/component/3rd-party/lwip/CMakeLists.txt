@@ -4,17 +4,17 @@ if(NOT VSF_LWIP_VENDOR)
         set(VSF_LWIP_PATH ${VSF_SRC_PATH}/component/3rd-party/lwip/raw)
     endif()
 
-    target_include_directories(${VSF_LIB_NAME} INTERFACE
+    vsf_add_include_directories(
         ${VSF_SRC_PATH}/component/3rd-party/lwip/port/vsf
         ${VSF_LWIP_PATH}/src/include
     )
     if(VSF_LWIP_CONFIG_PATH)
-        target_include_directories(${VSF_LIB_NAME} INTERFACE
+        vsf_add_include_directories(
             ${VSF_LWIP_CONFIG_PATH}
         )
     endif()
 
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         ./port/vsf/arch/sys_arch.c
 
         ${VSF_LWIP_PATH}/src/apps/mdns/mdns.c
@@ -64,6 +64,6 @@ if(NOT VSF_LWIP_VENDOR)
     )
 endif()
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     ./port/lwip_netdrv_adapter.c
 )

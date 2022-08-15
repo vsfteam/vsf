@@ -1,6 +1,6 @@
 # CMakeLists head
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     cstartup.s51
     mcs51_generic.c
     POST_STARTUP.A51

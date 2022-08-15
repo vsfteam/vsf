@@ -5,7 +5,7 @@ if(VSF_USE_SDL2)
         include
         include/SDL2
     )
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         vsf_sdl2.c
         vsf_sdl2_event.c
         vsf_sdl2_pixelformat.c

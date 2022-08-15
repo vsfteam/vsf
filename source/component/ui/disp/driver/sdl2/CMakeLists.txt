@@ -10,5 +10,5 @@ if(VSF_USE_DISP AND VSF_DISP_USE_SDL2)
     target_include_directories(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
         ${SDL2_INCLUDE_DIRS}
     )
-    target_link_libraries(${VSF_LIB_NAME} INTERFACE ${SDL2_LIBRARIES})
+    vsf_add_libraries(${SDL2_LIBRARIES})
 endif()

@@ -1,16 +1,16 @@
 # CMakeLists head
 
 if(VSF_LINUX_TERMINFO_FILES_PATH)
-    target_include_directories(${VSF_LIB_NAME} INTERFACE
+    vsf_add_include_directories(
         ${VSF_LINUX_TERMINFO_FILES_PATH}
     )
 else()
-    target_include_directories(${VSF_LIB_NAME} INTERFACE
+    vsf_add_include_directories(
         files/terminfo
     )
 endif()
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     vsf_linux_vfs.c
 )
 

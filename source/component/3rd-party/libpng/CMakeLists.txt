@@ -2,14 +2,14 @@ if(NOT VSF_LIBPNG_PATH)
     set(VSF_LIBPNG_PATH ${VSF_SRC_PATH}/component/3rd-party/libpng/raw)
 endif()
 
-target_include_directories(${VSF_LIB_NAME} INTERFACE
+vsf_add_include_directories(
     port
     ${VSF_LIBPNG_PATH}
 )
-#target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+#vsf_add_compile_definitions(
 #)
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     ${VSF_LIBPNG_PATH}/png.c
     ${VSF_LIBPNG_PATH}/pngerror.c
     ${VSF_LIBPNG_PATH}/pngget.c

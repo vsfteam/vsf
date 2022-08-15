@@ -2,24 +2,24 @@ if(NOT VSF_LVGL_PATH)
     set(VSF_LVGL_PATH ${VSF_SRC_PATH}/component/3rd-party/lvgl/raw/lvgl)
 endif()
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     ${VSF_SRC_PATH}/component/3rd-party/lvgl/port/vsf_lvgl_port.c
 )
-target_include_directories(${VSF_LIB_NAME} INTERFACE
+vsf_add_include_directories(
     # some app will include lvgl/lvgl.h
     ${VSF_SRC_PATH}/component/3rd-party/lvgl/raw
     # some app will include lvgl.h
     ${VSF_SRC_PATH}/component/3rd-party/lvgl/raw/lvgl
 )
 if (VSF_LVGL_USE_FREETYPE)
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         ${VSF_SRC_PATH}/component/3rd-party/lvgl/extension/lv_lib_freetype/raw/lv_freetype.c
     )
 endif()
 
 add_subdirectory(${VSF_LVGL_PATH} ${CMAKE_CURRENT_BINARY_DIR}/lvgl_bin)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/lvgl_bin)
-target_link_libraries(${VSF_LIB_NAME} INTERFACE
+vsf_add_libraries(
     lvgl
 )
 

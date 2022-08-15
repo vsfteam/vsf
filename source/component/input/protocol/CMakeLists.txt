@@ -1,6 +1,6 @@
 # CMakeLists head
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     vsf_input_gamepad.c
     vsf_input_keyboard.c
     vsf_input_mouse.c

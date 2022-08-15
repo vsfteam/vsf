@@ -2,14 +2,14 @@ if(NOT VSF_LIBJPEG_TURBO_PATH)
     set(VSF_LIBJPEG_TURBO_PATH ${VSF_SRC_PATH}/component/3rd-party/libjpeg-turbo/raw)
 endif()
 
-target_include_directories(${VSF_LIB_NAME} INTERFACE
+vsf_add_include_directories(
     port
     ${VSF_LIBJPEG_TURBO_PATH}
 )
-#target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+#vsf_add_compile_definitions(
 #)
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     ${VSF_LIBJPEG_TURBO_PATH}/cdjpeg.c
     ${VSF_LIBJPEG_TURBO_PATH}/jaricom.c
     ${VSF_LIBJPEG_TURBO_PATH}/jcapimin.c

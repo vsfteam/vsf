@@ -2,15 +2,15 @@ if(NOT VSF_BTSTACK_PATH)
     set(VSF_BTSTACK_PATH ${VSF_SRC_PATH}/component/3rd-party/btstack/raw)
 endif()
 
-target_include_directories(${VSF_LIB_NAME} INTERFACE
+vsf_add_include_directories(
     ${VSF_BTSTACK_PATH}/src
     ${VSF_BTSTACK_PATH}/chipset
 )
-#target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+#vsf_add_compile_definitions(
 #)
 
 if(VSF_BTSTACK_USE_BCM20702)
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         firmware/bcm/bcm20702/bt_firmware_image.c
         port/hci_transport_h2_vsf.c
 
@@ -20,18 +20,18 @@ if(VSF_BTSTACK_USE_BCM20702)
 endif()
 
 if(VSF_BTSTACK_USE_CSR)
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         ${VSF_BTSTACK_PATH}/chipset/csr/btstack_chipset_csr.c
     )
 endif()
 
 if(VSF_BTSTACK_USE_LINKKEY_MEMORY)
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         ${VSF_BTSTACK_PATH}/src/classic/btstack_link_key_db_memory.c
     )
 endif()
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     port/btstack_run_loop_vsf.c
     port/hci_dump_vsf.c
 
@@ -56,7 +56,7 @@ target_sources(${VSF_LIB_NAME} INTERFACE
 
 if(VSF_BTSTACK_CONFIG_PATH)
     message(STATUS "VSF_BTSTACK_CONFIG_PATH: ${VSF_BTSTACK_CONFIG_PATH}")
-    target_include_directories(${VSF_LIB_NAME} INTERFACE
+    vsf_add_include_directories(
         ${VSF_BTSTACK_CONFIG_PATH}
     )
 endif()

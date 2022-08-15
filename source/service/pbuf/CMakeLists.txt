@@ -1,6 +1,6 @@
 # CMakeLists head
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     vsf_pbuf.c
     vsf_pbuf_pool.c
 )

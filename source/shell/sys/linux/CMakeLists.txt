@@ -11,7 +11,7 @@ if(VSF_USE_LINUX)
         )
     endif()
 
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         vsf_linux.c
     )
 

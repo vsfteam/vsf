@@ -2,15 +2,15 @@ if(NOT VSF_FREETYPE_PATH)
     set(VSF_FREETYPE_PATH ${VSF_SRC_PATH}/component/3rd-party/freetype/raw)
 endif()
 
-target_include_directories(${VSF_LIB_NAME} INTERFACE
+vsf_add_include_directories(
     port
     ${VSF_FREETYPE_PATH}/include
 )
-target_compile_definitions(${VSF_LIB_NAME} INTERFACE
+vsf_add_compile_definitions(
     "FT2_BUILD_LIBRARY"
 )
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     ${VSF_FREETYPE_PATH}/src/base/ftbase.c
     ${VSF_FREETYPE_PATH}/src/base/ftbbox.c
     ${VSF_FREETYPE_PATH}/src/base/ftbdf.c

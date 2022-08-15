@@ -1,6 +1,6 @@
 # CMakeLists head
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     vsf_eda.c
     vsf_eda_slist_queue.c
     vsf_evtq_array.c

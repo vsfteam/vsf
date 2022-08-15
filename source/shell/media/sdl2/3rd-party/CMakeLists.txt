@@ -4,7 +4,7 @@ if(VSF_SDL2_USE_TTF)
     target_include_directories(${VSF_TARGET_NAME} PUBLIC
         SDL_ttf
     )
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         SDL_ttf/SDL_ttf.c
     )
 endif()
@@ -13,7 +13,7 @@ if(VSF_SDL2_USE_IMAGE)
     target_include_directories(${VSF_TARGET_NAME} PUBLIC
         SDL_image
     )
-    target_sources(${VSF_LIB_NAME} INTERFACE
+    vsf_add_sources(
         SDL_image/IMG.c
         SDL_image/IMG_bmp.c
         SDL_image/IMG_gif.c

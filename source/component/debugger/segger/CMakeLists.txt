@@ -1,5 +1,5 @@
 # CMakeLists head
 
-target_sources(${VSF_LIB_NAME} INTERFACE
+vsf_add_sources(
     segger_rtt_stream.c
 )
