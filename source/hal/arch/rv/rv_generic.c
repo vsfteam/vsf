@@ -39,6 +39,7 @@ typedef struct vsf_rv_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
 static vsf_rv_t __vsf_rv;
 
 /*============================ PROTOTYPES ====================================*/
@@ -54,14 +55,6 @@ static vsf_rv_t __vsf_rv;
  */
 bool vsf_arch_low_level_init(void)
 {
-    //! support 16 SWI at max
-//    eclic_set_nlbits(4);
-    //!< set priority to 1 (only high 4 bits are configurable)
-//    eclic_set_irq_lvl(SYSTICK_IRQ, 0x10);
-    //!< set priority to 0 (only high 4 bits are configurable)
-    //eclic_set_irq_lvl(PENDSV_IRQ, 0x00);
-
-    vsf_enable_interrupt();
     return true;
 }
 
@@ -195,47 +188,5 @@ void vsf_arch_swi_trigger(uint_fast8_t idx)
     VSF_HAL_ASSERT(false);
 }
 
-
-
-vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
-{
-//    vsf_arch_prio_t original = eclic_get_mth();
-//    eclic_set_mth(priority << (8 - VSF_ARCH_PRI_BIT) | ((1<<(8 - VSF_ARCH_PRI_BIT)) - 1));
-//    return original;
-    return 0;
-}
-
-vsf_gint_state_t vsf_get_interrupt(void)
-{
-    return 0;
-//    return GET_GLOBAL_INTERRUPT_STATE();
-}
-
-vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level)
-{
-    return 0;
-//    return SET_GLOBAL_INTERRUPT_STATE(level);
-}
-
-vsf_gint_state_t vsf_disable_interrupt(void)
-{
-    return 0;
-//    return DISABLE_GLOBAL_INTERRUPT();
-}
-
-vsf_gint_state_t vsf_enable_interrupt(void)
-{
-    return 0;
-//    return ENABLE_GLOBAL_INTERRUPT();
-}
-
-/*----------------------------------------------------------------------------*
- * Others: sleep, reset, etc.                                                 *
- *----------------------------------------------------------------------------*/
-
-void vsf_arch_sleep(uint_fast32_t mode)
-{
-//    ENABLE_GLOBAL_INTERRUPT();
-}
 
 /* EOF */

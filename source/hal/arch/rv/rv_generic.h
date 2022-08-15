@@ -46,7 +46,7 @@ extern "C" {
 #endif
 
 // software interrupt provided by arch
-#define VSF_ARCH_SWI_NUM                1
+#define VSF_ARCH_SWI_NUM                0
 #define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 #define __VSF_ARCH_SYSTIMER_BITS        63
 
@@ -82,9 +82,50 @@ typedef enum vsf_arch_prio_t vsf_arch_prio_t;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+static ALWAYS_INLINE vsf_gint_state_t vsf_get_interrupt(void)
+{
+    vsf_gint_state_t result;
+    __asm volatile("csrr %0, mstatus" : "=r"(result) : );
+    return result;
+}
+
+static ALWAYS_INLINE vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level)
+{
+    vsf_gint_state_t result;
+    __asm volatile("csrrw %0, mstatus, %1" : "=r"(result) : "r"(level));
+    return result;
+}
+
+static ALWAYS_INLINE vsf_gint_state_t vsf_disable_interrupt(void)
+{
+    vsf_gint_state_t result;
+    uint32_t bits = 0x80;
+    __asm volatile("csrrc %0, mstatus, %1" : "=r"(result) : "r"(bits));
+    return result;
+}
+
+static ALWAYS_INLINE vsf_gint_state_t vsf_enable_interrupt(void)
+{
+    vsf_gint_state_t result;
+    uint32_t bits = 0x80;
+    __asm volatile("csrrs %0, mstatus, %1" : "=r"(result) : "r"(bits));
+    return result;
+}
+
+static ALWAYS_INLINE vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
+{
+    VSF_ARCH_ASSERT(false);
+    return 0;
+}
+
+static ALWAYS_INLINE void vsf_arch_sleep(uint_fast32_t mode)
+{
+    __asm volatile("wfi" : :);
+}
+
 static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {
-// TODO:
+    __asm volatile("mv sp, %0" : : "r"(stack) : );
 }
 
 #ifdef __cplusplus
