@@ -782,7 +782,7 @@ WEAK(vsf_systimer_set)
 bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
     vsf_systimer_low_level_set_match(due);
-    return false;
+    return true;
 }
 
 WEAK(vsf_systimer_is_due)
