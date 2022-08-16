@@ -99,7 +99,7 @@ static ALWAYS_INLINE vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level)
 static ALWAYS_INLINE vsf_gint_state_t vsf_disable_interrupt(void)
 {
     vsf_gint_state_t result;
-    uint32_t bits = 0x80;
+    uint32_t bits = 8;
     __asm volatile("csrrc %0, mstatus, %1" : "=r"(result) : "r"(bits));
     return result;
 }
@@ -107,7 +107,7 @@ static ALWAYS_INLINE vsf_gint_state_t vsf_disable_interrupt(void)
 static ALWAYS_INLINE vsf_gint_state_t vsf_enable_interrupt(void)
 {
     vsf_gint_state_t result;
-    uint32_t bits = 0x80;
+    uint32_t bits = 8;
     __asm volatile("csrrs %0, mstatus, %1" : "=r"(result) : "r"(bits));
     return result;
 }
@@ -120,7 +120,7 @@ static ALWAYS_INLINE vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t prior
 
 static ALWAYS_INLINE void vsf_arch_sleep(uint_fast32_t mode)
 {
-    __asm volatile("wfi" : :);
+//    __asm volatile("wfi" : :);
 }
 
 static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
