@@ -26,6 +26,7 @@
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM                 0
 
+// __vsf_main_entry is called in reset_handler
 #define VSF_KERNEL_CFG_NON_STANDALONE   ENABLED
 
 #else
