@@ -23,6 +23,9 @@
 #include "hpm_common.h"
 #include "hpm_soc.h"
 #include "hpm_l1c_drv.h"
+#include "hpm_clock_drv.h"
+#include "hpm_sysctl_drv.h"
+#include "hpm_mchtmr_drv.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -38,6 +41,9 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 
 static void __isr_mchtmr(void)
 {
+    HPM_MCHTMR->MTIMECMP = 0xFFFFFFFFFFFFFFFF;
+
+    extern void vsf_systimer_match_evthanlder(void);
     vsf_systimer_match_evthanlder();
 }
 SDK_DECLARE_MCHTMR_ISR(__isr_mchtmr)
@@ -46,7 +52,15 @@ SDK_DECLARE_MCHTMR_ISR(__isr_mchtmr)
  */
 vsf_err_t vsf_systimer_low_level_init(void)
 {
-    HPM_MCHTMR->MTIME = 0;
+    sysctl_set_cpu_lp_mode(HPM_SYSCTL, HPM_CORE0, cpu_lp_mode_ungate_cpu_clock);
+
+    if (clock_get_frequency(clock_mchtmr0) != VSF_SYSTIMER_FREQ) {
+        VSF_HAL_ASSERT(false);
+        return VSF_ERR_FAIL;
+    }
+
+    enable_mchtmr_irq();
+    return VSF_ERR_NONE;
 }
 
 /*! \brief only enable systimer without clearing any flags
