@@ -16,9 +16,11 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "vsf_arch_abstraction.h"
 #include "./__vsf_arch_interface.h"
+
 /*============================ MACROS ========================================*/
 
 #define IMPLEMENT_ENDIAN_FUNC(__bitlen)                                         \
@@ -113,10 +115,15 @@ void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t val, void *p)           
 #ifndef VSF_GET_MAIN_CLK
 #   define VSF_GET_MAIN_CLK()         (0)
 #endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-#if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
-    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+
+#if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+typedef struct __systimer_t {
+    vsf_systimer_tick_t unit;
+} __systimer_t;
+#elif   VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 typedef struct __systimer_t {
     vsf_systimer_tick_t tick;
     vsf_systimer_tick_t unit;
@@ -131,9 +138,6 @@ typedef struct __systimer_t {
     vsf_systimer_tick_t cycle_per_us;
 } __systimer_t;
 #endif
-
-
-
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -211,6 +215,7 @@ static void __vsf_protect_region_none_leave(vsf_protect_t orig)
 /*----------------------------------------------------------------------------*
  * Architecture Infrastructure                                                *
  *----------------------------------------------------------------------------*/
+
 WEAK(bswap_16)
 uint_fast16_t bswap_16(uint_fast16_t value16)
 {
@@ -499,23 +504,19 @@ vsf_err_t vsf_swi_init(     uint_fast8_t idx,
  *----------------------------------------------------------------------------*/
 
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
-#   ifndef WEAK_VSF_SYSTIMER_EVTHANDLER
 WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 {
     VSF_UNUSED_PARAM(tick);
     VSF_ARCH_ASSERT(false);
 }
-#   endif
 
-#   ifndef WEAK_ON_ARCH_SYSTIMER_TICK_EVT
 WEAK(on_arch_systimer_tick_evt)
 bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick)
 {
     VSF_UNUSED_PARAM(tick);
     return true;
 }
-#endif
 
 
 
@@ -729,7 +730,67 @@ bool vsf_systimer_is_due(vsf_systimer_tick_t due)
  *                match                                                       *
  *----------------------------------------------------------------------------*/
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
-//! todo
+
+void vsf_systimer_match_evthanlder(void)
+{
+    vsf_systimer_evthandler(vsf_systimer_low_level_get_current());
+}
+
+/*! \brief initialise SysTick to generate a system timer
+ *! \param frequency the target tick frequency in Hz
+ *! \return initialization result in vsf_err_t
+ */
+WEAK(vsf_systimer_init)
+vsf_err_t vsf_systimer_init(void)
+{
+    //! calculate the cycle count of 1 tick
+    __systimer.unit = vsf_arch_req___systimer_freq___from_usr() / 1000000ul;
+    if (0 == __systimer.unit) {
+        /*! assume that systimer frequency is at least 1MHz */
+        __systimer.unit = 1;
+    }
+
+    return vsf_systimer_low_level_init();
+}
+
+WEAK(vsf_systimer_get_freq)
+uint32_t vsf_systimer_get_freq(void)
+{
+    return vsf_arch_req___systimer_freq___from_usr();
+}
+
+WEAK(vsf_systimer_set_idle)
+void vsf_systimer_set_idle(void)
+{
+}
+
+WEAK(vsf_systimer_get)
+vsf_systimer_tick_t vsf_systimer_get(void)
+{
+    return vsf_systimer_low_level_get_current();
+}
+
+WEAK(vsf_systimer_start)
+vsf_err_t vsf_systimer_start(void)
+{
+    vsf_systimer_low_level_enable();
+    return VSF_ERR_NONE;
+}
+
+
+WEAK(vsf_systimer_set)
+bool vsf_systimer_set(vsf_systimer_tick_t due)
+{
+    vsf_systimer_low_level_set_match(due);
+    return false;
+}
+
+WEAK(vsf_systimer_is_due)
+bool vsf_systimer_is_due(vsf_systimer_tick_t due)
+{
+    return (vsf_systimer_low_level_get_current() >= due);
+}
+
 #endif
 
 

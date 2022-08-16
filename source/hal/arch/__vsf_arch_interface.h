@@ -59,13 +59,18 @@ extern bool vsf_arch_low_level_init(void);
 
 
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+
+extern void vsf_systimer_prio_set(vsf_arch_prio_t priority);
+
 /*----------------------------------------------------------------------------*
  * System Timer : Implement with Normal Timer (Count down or Count up)        *
  *----------------------------------------------------------------------------*/
+#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
 /*-------------------------------------------*
  * APIs to be implemented by target arch     *
  *-------------------------------------------*/
+
 /*! \brief initialise systimer without enable it
  */
 extern vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks);
@@ -89,7 +94,7 @@ extern bool vsf_systimer_low_level_disable(void);
 extern void vsf_systimer_low_level_enable(void);
 extern void vsf_systimer_low_level_int_disable(void);
 extern void vsf_systimer_low_level_int_enable(void);
-extern void vsf_systimer_set_reload_value( vsf_systimer_tick_t tick_cnt);
+extern void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt);
 extern void vsf_systimer_reset_counter_value(void);
 extern void vsf_systimer_clear_int_pending_bit(void);
 extern vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void);
@@ -114,9 +119,44 @@ extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
 extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
 
 /*----------------------------------------------------------------------------*
+ * System Timer : Implement with timer with 64-bit compare match, hit if      *
+ *                  current_value >= compare_value                            *
+ *----------------------------------------------------------------------------*/
+#   elif VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+
+/*-------------------------------------------*
+ * APIs to be implemented by target arch     *
+ *-------------------------------------------*/
+
+/*! \brief initialise systimer (current value set to 0) without enable it
+ */
+extern vsf_err_t vsf_systimer_low_level_init(void);
+
+/*! \brief only enable systimer without clearing any flags
+ */
+extern void vsf_systimer_low_level_enable(void);
+
+/*! \brief get current value of timer
+ */
+extern vsf_systimer_tick_t vsf_systimer_low_level_get_current(void);
+
+/*! \brief set match value, will be triggered when current >= match,
+        vsf_systimer_match_evthanlder will be called if triggered.
+ */
+extern void vsf_systimer_low_level_set_match(vsf_systimer_tick_t match);
+
+/*-------------------------------------------*
+ * APIs to be used by target arch            *
+ *-------------------------------------------*/
+/*! \brief systimer compare match event handler which is called by target timer
+ *!        interrupt handler
+ */
+extern void vsf_systimer_match_evthanlder(void);
+
+/*----------------------------------------------------------------------------*
  * System Timer : Implement with request / response model                     *
  *----------------------------------------------------------------------------*/
-#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
+#   elif VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
 
 /*-------------------------------------------*
  * APIs to be implemented by target arch     *

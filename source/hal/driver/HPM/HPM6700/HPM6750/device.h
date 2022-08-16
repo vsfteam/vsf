@@ -29,6 +29,12 @@
 // __vsf_main_entry is called in reset_handler
 #define VSF_KERNEL_CFG_NON_STANDALONE   ENABLED
 
+#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+#define VSF_ARCH_PRI_NUM                256
+#define VSF_ARCH_PRI_BIT                8
+
+#define __VSF_ARCH_SYSTIMER_BITS        64
+
 #else
 
 #ifndef __HAL_DEVICE_HPM_HPM6750_H__

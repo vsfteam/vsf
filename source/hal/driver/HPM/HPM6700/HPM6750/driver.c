@@ -32,6 +32,44 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+void vsf_systimer_prio_set(vsf_arch_prio_t priority)
+{
+}
+
+static void __isr_mchtmr(void)
+{
+    vsf_systimer_match_evthanlder();
+}
+SDK_DECLARE_MCHTMR_ISR(__isr_mchtmr)
+
+/*! \brief initialise systimer (current value set to 0) without enable it
+ */
+vsf_err_t vsf_systimer_low_level_init(void)
+{
+    HPM_MCHTMR->MTIME = 0;
+}
+
+/*! \brief only enable systimer without clearing any flags
+ */
+void vsf_systimer_low_level_enable(void)
+{
+}
+
+/*! \brief get current value of timer
+ */
+vsf_systimer_tick_t vsf_systimer_low_level_get_current(void)
+{
+    return HPM_MCHTMR->MTIME;
+}
+
+/*! \brief set match value, will be triggered when current >= match,
+        vsf_systimer_match_evthanlder will be called if triggered.
+ */
+void vsf_systimer_low_level_set_match(vsf_systimer_tick_t match)
+{
+    HPM_MCHTMR->MTIMECMP = match;
+}
+
 void reset_handler(void)
 {
     l1c_dc_disable();

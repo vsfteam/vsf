@@ -29,26 +29,28 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef __LITTLE_ENDIAN
-#   define __LITTLE_ENDIAN                 1
+#   define __LITTLE_ENDIAN              1
 #endif
 #ifndef __BYTE_ORDER
-#   define __BYTE_ORDER                    __LITTLE_ENDIAN
+#   define __BYTE_ORDER                 __LITTLE_ENDIAN
 #endif
 
 #ifndef VSF_ARCH_PRI_NUM
-#   define VSF_ARCH_PRI_NUM             128
+#   define VSF_ARCH_PRI_NUM             256
 #endif
 #ifndef VSF_ARCH_PRI_BIT
-#   define VSF_ARCH_PRI_BIT             7
+#   define VSF_ARCH_PRI_BIT             8
+#endif
+#ifndef __VSF_ARCH_SYSTIMER_BITS
+#   define __VSF_ARCH_SYSTIMER_BITS     64
 #endif
 
 // software interrupt provided by arch
 #define VSF_ARCH_SWI_NUM                0
-#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
-#define __VSF_ARCH_SYSTIMER_BITS        63
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -110,12 +112,6 @@ static ALWAYS_INLINE vsf_gint_state_t vsf_enable_interrupt(void)
     uint32_t bits = 8;
     __asm volatile("csrrs %0, mstatus, %1" : "=r"(result) : "r"(bits));
     return result;
-}
-
-static ALWAYS_INLINE vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
-{
-    VSF_ARCH_ASSERT(false);
-    return 0;
 }
 
 static ALWAYS_INLINE void vsf_arch_sleep(uint_fast32_t mode)
