@@ -120,7 +120,7 @@ static ALWAYS_INLINE vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t prior
 
 static ALWAYS_INLINE void vsf_arch_sleep(uint_fast32_t mode)
 {
-//    __asm volatile("wfi" : :);
+    __asm volatile("wfi" : :);
 }
 
 static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
