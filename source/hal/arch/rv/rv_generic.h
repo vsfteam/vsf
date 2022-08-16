@@ -44,7 +44,9 @@ extern "C" {
 #endif
 
 // software interrupt provided by arch
-#define VSF_ARCH_SWI_NUM                0
+#ifndef VSF_ARCH_SWI_NUM
+#   define VSF_ARCH_SWI_NUM             0
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

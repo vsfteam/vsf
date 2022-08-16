@@ -23,22 +23,22 @@
 
 /*\note first define basic info for arch. */
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-// software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_NUM                 0
 
 // __vsf_main_entry is called in reset_handler
 #define VSF_KERNEL_CFG_NON_STANDALONE   ENABLED
 
 #define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
-#define VSF_ARCH_PRI_NUM                256
-#define VSF_ARCH_PRI_BIT                8
+#define VSF_ARCH_PRI_NUM                7
+#define VSF_ARCH_SWI_NUM                1
 
 #define __VSF_ARCH_SYSTIMER_BITS        64
 
 extern unsigned int __hpm_systimer_get_frequency(void);
 #define VSF_ARCH_SYSTIMER_FREQ          __hpm_systimer_get_frequency()
 
-enum vsf_arch_prio_t {
+#ifndef __VSF_ARCH_PRIO_DEFINED
+#define __VSF_ARCH_PRIO_DEFINED
+typedef enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_INVALID = -1,
     vsf_arch_prio_invalid = -1,
     VSF_ARCH_PRIO_0       = 1,
@@ -56,8 +56,8 @@ enum vsf_arch_prio_t {
     vsf_arch_prio_5       = 6,
     vsf_arch_prio_6       = 7,
     vsf_arch_prio_highest = 7,
-};
-typedef enum vsf_arch_prio_t vsf_arch_prio_t;
+} vsf_arch_prio_t;
+#endif
 
 #else
 
