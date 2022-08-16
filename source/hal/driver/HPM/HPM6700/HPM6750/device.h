@@ -35,6 +35,9 @@
 
 #define __VSF_ARCH_SYSTIMER_BITS        64
 
+extern unsigned int __hpm_systimer_get_frequency(void);
+#define VSF_ARCH_SYSTIMER_FREQ          __hpm_systimer_get_frequency()
+
 #else
 
 #ifndef __HAL_DEVICE_HPM_HPM6750_H__

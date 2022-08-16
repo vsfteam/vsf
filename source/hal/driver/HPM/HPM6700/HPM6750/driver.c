@@ -53,12 +53,6 @@ SDK_DECLARE_MCHTMR_ISR(__isr_mchtmr)
 vsf_err_t vsf_systimer_low_level_init(void)
 {
     sysctl_set_cpu_lp_mode(HPM_SYSCTL, HPM_CORE0, cpu_lp_mode_ungate_cpu_clock);
-
-    if (clock_get_frequency(clock_mchtmr0) != VSF_SYSTIMER_FREQ) {
-        VSF_HAL_ASSERT(false);
-        return VSF_ERR_FAIL;
-    }
-
     enable_mchtmr_irq();
     return VSF_ERR_NONE;
 }
@@ -82,6 +76,11 @@ vsf_systimer_tick_t vsf_systimer_low_level_get_current(void)
 void vsf_systimer_low_level_set_match(vsf_systimer_tick_t match)
 {
     HPM_MCHTMR->MTIMECMP = match;
+}
+
+unsigned int __hpm_systimer_get_frequency(void)
+{
+    return clock_get_frequency(clock_mchtmr0);
 }
 
 void reset_handler(void)
