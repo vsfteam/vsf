@@ -38,6 +38,27 @@
 extern unsigned int __hpm_systimer_get_frequency(void);
 #define VSF_ARCH_SYSTIMER_FREQ          __hpm_systimer_get_frequency()
 
+enum vsf_arch_prio_t {
+    VSF_ARCH_PRIO_INVALID = -1,
+    vsf_arch_prio_invalid = -1,
+    VSF_ARCH_PRIO_0       = 1,
+    VSF_ARCH_PRIO_1       = 2,
+    VSF_ARCH_PRIO_2       = 3,
+    VSF_ARCH_PRIO_3       = 4,
+    VSF_ARCH_PRIO_4       = 5,
+    VSF_ARCH_PRIO_5       = 6,
+    VSF_ARCH_PRIO_6       = 7,
+    vsf_arch_prio_0       = 1,
+    vsf_arch_prio_1       = 2,
+    vsf_arch_prio_2       = 3,
+    vsf_arch_prio_3       = 4,
+    vsf_arch_prio_4       = 5,
+    vsf_arch_prio_5       = 6,
+    vsf_arch_prio_6       = 7,
+    vsf_arch_prio_highest = 7,
+};
+typedef enum vsf_arch_prio_t vsf_arch_prio_t;
+
 #else
 
 #ifndef __HAL_DEVICE_HPM_HPM6750_H__

@@ -39,12 +39,6 @@ extern "C" {
 #   define __BYTE_ORDER                 __LITTLE_ENDIAN
 #endif
 
-#ifndef VSF_ARCH_PRI_NUM
-#   define VSF_ARCH_PRI_NUM             256
-#endif
-#ifndef VSF_ARCH_PRI_BIT
-#   define VSF_ARCH_PRI_BIT             8
-#endif
 #ifndef __VSF_ARCH_SYSTIMER_BITS
 #   define __VSF_ARCH_SYSTIMER_BITS     64
 #endif
@@ -60,25 +54,6 @@ extern "C" {
 
 typedef uint64_t vsf_systimer_tick_t;
 typedef uint32_t vsf_gint_state_t;
-
-#define __VSF_ARCH_PRI_INDEX(__N, __UNUSED)                                     \
-            __vsf_arch_prio_index_##__N = (__N),
-
-enum {
-    VSF_MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI_INDEX, VSF_ARCH_PRI_BIT)
-};
-
-#define __VSF_ARCH_PRI(__N, __BIT)                                              \
-            VSF_ARCH_PRIO_##__N = (__N),                                        \
-            vsf_arch_prio_##__N = (__N),
-
-enum vsf_arch_prio_t {
-    VSF_ARCH_PRIO_INVALID = -1,
-    vsf_arch_prio_invalid = -1,
-    VSF_MREPEAT(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
-    vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
-};
-typedef enum vsf_arch_prio_t vsf_arch_prio_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
