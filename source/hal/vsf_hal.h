@@ -30,7 +30,8 @@
 #   include "hal/vsf_hal_cfg.h"
 #   include "./arch/vsf_arch.h"
 #   include "./driver/driver.h"
-#   include "./driver/common/common.h"
+// DO NOT INCLUDE COMMON.h, so that use can use their own hal API standard
+//#   include "./driver/common/common.h"
 
 #   include "./utilities/io_mapper/vsf_io_mapper.h"
 
