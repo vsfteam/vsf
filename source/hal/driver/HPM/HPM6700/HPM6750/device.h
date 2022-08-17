@@ -29,7 +29,8 @@
 
 #define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 #define VSF_ARCH_PRI_NUM                7
-#define VSF_ARCH_SWI_NUM                1
+// do not use PLICSW
+#define VSF_ARCH_SWI_NUM                0
 
 #define __VSF_ARCH_SYSTIMER_BITS        64
 
@@ -63,8 +64,6 @@ typedef enum vsf_arch_prio_t {
 
 #ifndef __HAL_DEVICE_HPM_HPM6750_H__
 #define __HAL_DEVICE_HPM_HPM6750_H__
-
-#define VSF_DEV_SWI_LIST            
 
 /*============================ INCLUDES ======================================*/
 
