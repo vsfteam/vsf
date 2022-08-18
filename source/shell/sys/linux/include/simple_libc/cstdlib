@@ -5,6 +5,7 @@ namespace std {
     using ::ldiv_t;
     using ::lldiv_t;
 
+    using ::abs;
     using ::atof;
     using ::atoi;
     using ::atol;
