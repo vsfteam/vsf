@@ -312,7 +312,7 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
 
         root_entry = le16_to_cpu(dbr->bpb.RootEntCnt);
         if (root_entry) {
-            info->root_size = ((root_entry >> 5) + sector_size - 1) / sector_size;
+            info->root_size = ((root_entry << 5) + sector_size - 1) / sector_size;
         } else {
             info->root_size = 0;
         }
