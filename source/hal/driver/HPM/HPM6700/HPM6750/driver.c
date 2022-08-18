@@ -93,14 +93,6 @@ unsigned int __hpm_systimer_get_frequency(void)
  * SWI                                                                        *
  *----------------------------------------------------------------------------*/
 
-vsf_arch_prio_t vsf_get_base_priority(void)
-{
-    volatile uint32_t *threshold_ptr = (volatile uint32_t *)(HPM_PLIC_BASE +
-            HPM_PLIC_THRESHOLD_OFFSET +
-            (HPM_PLIC_TARGET_M_MODE << HPM_PLIC_THRESHOLD_SHIFT_PER_TARGET));
-    return (vsf_arch_prio_t)*threshold_ptr;
-}
-
 vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 {
     // TODO: is PLICSW affected by PLIC threshold?

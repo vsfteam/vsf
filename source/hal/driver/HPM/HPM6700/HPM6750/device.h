@@ -34,8 +34,13 @@
 
 #define __VSF_ARCH_SYSTIMER_BITS        64
 
-extern unsigned int __hpm_systimer_get_frequency(void);
 #define VSF_ARCH_SYSTIMER_FREQ          __hpm_systimer_get_frequency()
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern unsigned int __hpm_systimer_get_frequency(void);
 
 #ifndef __VSF_ARCH_PRIO_DEFINED
 #define __VSF_ARCH_PRIO_DEFINED
@@ -58,6 +63,10 @@ typedef enum vsf_arch_prio_t {
     vsf_arch_prio_6       = 7,
     vsf_arch_prio_highest = 7,
 } vsf_arch_prio_t;
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #else
