@@ -42,9 +42,12 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 typedef struct vk_disp_fb_drv_t {
-    vsf_err_t (*init)(void *fb, vk_disp_color_type_t color_format, void *initial_pixel_buffer);
-    vsf_err_t (*fini)(void *fb);
-    vsf_err_t (*present)(void *fb, void *pixel_buffer);
+    vsf_err_t (*init)(vk_disp_t *pthis);
+    struct {
+        vsf_err_t (*init)(void *fb, vk_disp_color_type_t color_format, void *initial_pixel_buffer);
+        vsf_err_t (*fini)(void *fb);
+        vsf_err_t (*present)(void *fb, void *pixel_buffer);
+    } fb;
 } vk_disp_fb_drv_t;
 
 vsf_class(vk_disp_fb_t) {

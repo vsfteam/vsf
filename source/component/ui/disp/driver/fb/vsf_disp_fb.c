@@ -76,10 +76,10 @@ static void * __vk_disp_fb_switch_buffer(vk_disp_t *pthis, bool is_to_copy)
     VSF_UI_ASSERT((disp_fb != NULL) && (disp_fb->fb.drv != NULL));
     cur_buffer = __vk_disp_fb_get_buffer(disp_fb);
     next_buffer = __vk_disp_fb_next(disp_fb);
+    disp_fb->fb.drv->fb.present(disp_fb->fb.param, cur_buffer);
     if (is_to_copy) {
         memcpy(next_buffer, cur_buffer, disp_fb->fb.size);
     }
-    disp_fb->fb.drv->present(disp_fb->fb.param, cur_buffer);
     return next_buffer;
 }
 
@@ -87,6 +87,10 @@ static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis)
 {
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)pthis;
     VSF_UI_ASSERT((disp_fb != NULL) && (disp_fb->fb.drv != NULL) && (disp_fb->fb.num > 0));
+
+    if (disp_fb->fb.drv->init != NULL) {
+        disp_fb->fb.drv->init(pthis);
+    }
 
     if (disp_fb->fb.buffer != NULL) {
         disp_fb->fb_buffer = disp_fb->fb.buffer;
@@ -101,7 +105,7 @@ static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis)
     }
 
     disp_fb->cur_fb_buffer = 0;
-    vsf_err_t err = disp_fb->fb.drv->init(disp_fb->fb.param, disp_fb->param.color, __vk_disp_fb_get_buffer(disp_fb));
+    vsf_err_t err = disp_fb->fb.drv->fb.init(disp_fb->fb.param, disp_fb->param.color, __vk_disp_fb_get_buffer(disp_fb));
     __vk_disp_fb_next(disp_fb);
     if (VSF_ERR_NONE == err) {
         vk_disp_on_ready(pthis);
