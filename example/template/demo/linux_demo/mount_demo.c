@@ -222,7 +222,7 @@ int mount_main(int argc, char *argv[])
     __fs_param_t param = { 0 };
     void *fsdata = NULL;
 
-    char ch;
+    int ch;
     while ((ch = getopt(argc, argv, "t:b:")) >= 0) {
         switch (ch) {
         case 't': {
