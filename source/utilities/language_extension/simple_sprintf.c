@@ -24,6 +24,10 @@
 
 #include "../compiler/compiler.h"
 
+#if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
+#   include <math.h>
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -49,7 +53,15 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
         char *str;
         signed long long integer;
         unsigned long long uinteger;
+#if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
+        double d;
+#endif
     } arg;
+#if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
+    double d_intpart, d_fractpart;
+    signed long long i_intpart, i_fractpart, pow;
+    int exp;
+#endif
 
     if (NULL == str) { size = 0; }
     if (0 == size) { curpos = NULL; }
@@ -71,6 +83,8 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         unsigned is_plus        : 1;
                         unsigned is_halfword    : 1;
                         unsigned long_cnt       : 2;
+                        unsigned float_state    : 2;
+                        unsigned exp_state      : 2;
                     };
                     unsigned all;
                 } flags;
@@ -78,7 +92,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 char *format_tmp;
                 int radix;
                 int width;
-                int precision = 0;
+                int precision = -1;
                 int actual_width;
 
                 flags.all = 0;
@@ -185,6 +199,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         }
                     }
 
+                print_integer_do:
                     {
                         char integer_buf[32];
                         int pos = sizeof(integer_buf) - 1;
@@ -239,7 +254,120 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                             }
                         }
                     }
+#if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
+                    if (flags.float_state) {
+                        goto print_float;
+                    }
+#endif
                     break;
+#if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
+                case 'f':
+                print_float:
+                    switch (flags.float_state) {
+                    case 0:
+                        arg.d = va_arg(ap, double);
+
+                    print_float_do:
+                        if (precision < 0) {
+                            precision = 6;
+                        }
+                        d_fractpart = modf(arg.d, &d_intpart);
+
+                        pow = 10;
+                        for (int i = 0; i < precision; i++) {
+                            pow *= 10;
+                        }
+
+                        i_intpart = d_intpart;
+                        i_fractpart = d_fractpart * pow;
+                        if ((i_fractpart % 10) >= 5) {
+                            i_fractpart += 10;
+                        }
+                        i_fractpart /= 10;
+                        if (i_fractpart < 0) {
+                            i_fractpart = -i_fractpart;
+                        }
+
+                        arg.integer = i_intpart;
+                        flags.is_signed = 1;
+                        flags.float_state = 1;
+                        radix = 10;
+                        goto print_integer_do;
+                    case 1:
+                        if (0 == precision) {
+                            goto print_float_end;
+                        }
+                        width = precision;
+
+                        if (++realsize <= size) {
+                            *curpos++ = '.';
+                        }
+
+                        arg.integer = i_fractpart;
+                        flags.is_signed = 1;
+                        flags.float_state = 2;
+                        flags.has_plus_minus = 0;
+                        flags.has_prefix0 = 1;
+                        goto print_integer_do;
+                    case 2:
+                    print_float_end:
+                        if (flags.exp_state) {
+                            goto print_exp;
+                        }
+                        break;
+                    }
+                    break;
+                case 'E':
+                    flags.is_upper = 1;
+                    // fall through
+                case 'e':
+                print_exp:
+                    switch (flags.exp_state) {
+                    case 0:
+                        arg.d = va_arg(ap, double);
+                        d_fractpart = modf(arg.d, &d_intpart);
+
+                        exp = 0;
+                        i_intpart = d_intpart;
+                        if (i_intpart < 0) {
+                            i_intpart = -i_intpart;
+                        }
+                        if (i_intpart >= 10) {
+                            while (i_intpart >= 10) {
+                                i_intpart /= 10;
+                                arg.d /= 10;
+                                exp++;
+                            }
+                        } else if (0 == i_intpart) {
+                            while (d_fractpart < 1) {
+                                d_fractpart *= 10;
+                                exp--;
+                            }
+
+                            arg.d = d_fractpart;
+                        }
+                        flags.exp_state = 1;
+                        goto print_float_do;
+                    case 1:
+                        if (++realsize <= size) {
+                            *curpos++ = flags.is_upper ? 'E' : 'e';
+                        }
+                        if (++realsize <= size) {
+                            *curpos++ = exp >= 0 ? '+' : '-';
+                        }
+                        if (exp < 0) {
+                            exp = -exp;
+                        }
+                        if (++realsize <= size) {
+                            *curpos++ = '0' + (exp / 10);
+                        }
+                        if (++realsize <= size) {
+                            *curpos++ = '0' + (exp % 10);
+                        }
+                        break;
+                    }
+                    break;
+#endif
                 case 'c':
                 case 'C':
                     arg.ch = va_arg(ap, int);
@@ -258,7 +386,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     if (width < actual_width) {
                         width = actual_width;
                     }
-                    if ((precision != 0) && (width > precision)) {
+                    if ((precision >= 0) && (width > precision)) {
                         width = precision;
                     }
                     if (!flags.align_left) {
@@ -322,7 +450,7 @@ int snprintf(char *str, size_t size, const char *format, ...)
 
 int vsprintf(char *str, const char *format, va_list ap)
 {
-    return vsnprintf(str, (size_t)-1, format, ap);
+    return snprintf(str, (size_t)-1, format, ap);
 }
 
 #if __IS_COMPILER_GCC__
