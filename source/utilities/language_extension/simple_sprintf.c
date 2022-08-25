@@ -280,13 +280,23 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 
                         i_intpart = d_intpart;
                         i_fractpart = d_fractpart * pow;
+                        flags.is_signed = i_fractpart < 0;
+                        if (flags.is_signed) {
+                            i_fractpart = -i_fractpart;
+                        }
+
                         if ((i_fractpart % 10) >= 5) {
                             i_fractpart += 10;
                         }
-                        i_fractpart /= 10;
-                        if (i_fractpart < 0) {
-                            i_fractpart = -i_fractpart;
+                        if (i_fractpart >= pow) {
+                            if (flags.is_signed) {
+                                i_intpart -= 1;
+                            } else {
+                                i_intpart += 1;
+                            }
+                            i_fractpart = 0;
                         }
+                        i_fractpart /= 10;
 
                         arg.integer = i_intpart;
                         flags.is_signed = 1;
