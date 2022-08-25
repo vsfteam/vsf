@@ -450,7 +450,7 @@ int snprintf(char *str, size_t size, const char *format, ...)
 
 int vsprintf(char *str, const char *format, va_list ap)
 {
-    return snprintf(str, (size_t)-1, format, ap);
+    return vsnprintf(str, (size_t)-1, format, ap);
 }
 
 #if __IS_COMPILER_GCC__
