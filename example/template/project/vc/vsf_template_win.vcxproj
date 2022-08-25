@@ -682,7 +682,6 @@
     <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_simple.h" />
     <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_simple_c90.h" />
     <ClInclude Include="..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_strict.h" />
-    <ClInclude Include="..\..\..\..\source\utilities\communicate.h" />
     <ClInclude Include="..\..\..\..\source\utilities\compiler\compiler.h" />
     <ClInclude Include="..\..\..\..\source\utilities\compiler\x86\type.h" />
     <ClInclude Include="..\..\..\..\source\utilities\compiler\x86\x86_compiler.h" />

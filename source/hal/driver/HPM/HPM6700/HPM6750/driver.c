@@ -174,7 +174,7 @@ static const uint8_t __hpm_swi_irq[VSF_DEV_SWI_NUM] = {
             swi->handler(swi->param);                                         \
         }                                                                     \
     }                                                                         \
-    SDK_DECLARE_EXT_ISR_M(VSF_MCONNECT(VSF_DEV_SWI, __N ,_IRQ), VSF_MCONNECT(SWI, __N, _IRQHandler))
+    SDK_DECLARE_EXT_ISR_M(VSF_MCONNECT(VSF_DEV_SWI, __N, _IRQ), VSF_MCONNECT(SWI, __N, _IRQHandler))
 
 VSF_MREPEAT(VSF_DEV_SWI_NUM, __HPM_SWI, NULL)
 

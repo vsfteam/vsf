@@ -18,10 +18,6 @@
 
 /*! \note Top Level Configuration */
 
-/*====================== Reentrant Header File================================*/
-//#ifndef __VSF_UTILITIES_H__
-//#define __VSF_UTILITIES_H__
-
 /*============================ MACROS ========================================*/
 /*============================ INCLUDES ======================================*/
 /* do not modify this */
@@ -33,21 +29,70 @@
 /* minimal OO support for interface definie only, no class support */
 #include "./3rd-party/PLOOC/raw/plooc.h"
 
-/* definition for communication pipe and memory block */
-#include "./communicate.h"
-
 /* template for abstraction data type */
 #include "./template/template.h"
 
 /* other high level language externsion for OOPC */
 #include "./language_extension/language_extension.h"
 
+#ifndef __VSF_UTILITIES_H__
+#define __VSF_UTILITIES_H__
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+typedef struct vsf_mem_t vsf_mem_t;
+struct vsf_mem_t {
+    union {
+        // implement linux-style variable
+        uint8_t *buffer;
+        uint8_t *src;
+        void *obj;
+
+        uint8_t *buffer_ptr;         //!< stream buffer
+        uint8_t *src_ptr;
+        void *obj_ptr;
+    } ptr;
+    int32_t size;
+};
+//! @}
+#else
+//! \name stream
+//! @{
+typedef struct vsf_mem_t vsf_mem_t;
+struct vsf_mem_t {
+    union {
+        union {
+            // implement linux-style variable
+            uint8_t *buffer;
+            uint8_t *src;
+            void *obj;
+
+            uint8_t *buffer_ptr;         //!< stream buffer
+            uint8_t *src_ptr;
+            void *obj_ptr;
+        };
+        union {
+            uint8_t *buffer_ptr;         //!< stream buffer
+            uint8_t *src_ptr;
+            void *obj_ptr;
+        } ptr;
+    };
+    union {
+        // implement linux-style variable
+        int32_t size;
+        int32_t s32_size;                  //!< stream size
+    };
+};
+//! @}
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -56,5 +101,5 @@ extern "C" {
 }
 #endif
 
-//#endif
+#endif
 /* EOF */

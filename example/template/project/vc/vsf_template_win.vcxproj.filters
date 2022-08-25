@@ -1104,9 +1104,6 @@
     <ClInclude Include="..\..\..\..\source\vsf_cfg.h">
       <Filter>vsf</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\utilities\communicate.h">
-      <Filter>vsf\utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\utilities\ooc_class.h">
       <Filter>vsf\utilities</Filter>
     </ClInclude>
