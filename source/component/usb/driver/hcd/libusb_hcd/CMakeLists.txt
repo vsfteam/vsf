@@ -4,7 +4,7 @@
 if(VSF_HOST_HAS_LIBUSB)
     # check libusb
     find_package(PkgConfig)
-    pkg_check_modules(libusb-1.0 libusb-1.0)
+    pkg_check_modules(libusb-1.0 REQUIRED libusb-1.0)
     vsf_add_compile_definitions(
         VSF_LIBUSB_CFG_INCLUDE="${libusb-1.0_INCLUDE_DIRS}/libusb.h"
     )
