@@ -404,7 +404,9 @@ static void __vk_libusb_hcd_on_arrived(vk_libusb_hcd_dev_t *libusb_dev)
         case LIBUSB_SPEED_HIGH:
             libusb_dev->speed = USB_SPEED_HIGH;
             break;
+#if defined(LIBUSB_API_VERSION) && ((LIBUSB_MAJOR > 1) || (LIBUSB_MINOR  > 0) || (LIBUSB_MICRO > 21))
         case LIBUSB_SPEED_SUPER_PLUS:
+#endif
         case LIBUSB_SPEED_SUPER:
             libusb_dev->speed = USB_SPEED_SUPER;
             break;
