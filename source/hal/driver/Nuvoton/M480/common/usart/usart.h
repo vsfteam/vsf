@@ -115,7 +115,7 @@ typedef struct usart_status_t {
 
 #define VSF_USART_CFG_DEC_PREFIX            vsf_hw
 #define VSF_USART_CFG_DEC_UPCASE_PREFIX       VSF_HW
-#include "hal/driver/common/template/vsf_template_usart.h"
+#include "hal/driver/common/usart/usart_template.h"
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

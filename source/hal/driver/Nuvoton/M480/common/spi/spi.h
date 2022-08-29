@@ -120,7 +120,7 @@ typedef struct spi_status_t {
 
 #define VSF_SPI_CFG_DEC_PREFIX          vsf_hw
 #define VSF_SPI_CFG_DEC_UPCASE_PREFIX     VSF_HW
-#include "hal/driver/common/template/vsf_template_spi.h"
+#include "hal/driver/common/spi/spi_template.h"
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
