@@ -22,7 +22,7 @@
 
 #include "../../../vsf_av_cfg.h"
 
-#if VSF_USE_AUDIO == ENABLED && VSF_USE_WINSOUND == ENABLED
+#if VSF_USE_AUDIO == ENABLED && VSF_AUDIO_USE_WINSOUND == ENABLED
 
 #include "component/av/vsf_av.h"
 
@@ -110,5 +110,5 @@ extern const vk_audio_drv_t vk_winsound_drv;
 }
 #endif
 
-#endif      // VSF_USE_AUDIO && VSF_USE_WINSOUND
+#endif      // VSF_USE_AUDIO && VSF_AUDIO_USE_WINSOUND
 #endif      // __VSF_WINSOUND_H__
