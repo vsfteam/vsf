@@ -584,8 +584,9 @@ typedef struct pm_pll_cfg_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 
-// TODO : update template path
-#include "hal/driver/common/template/vsf_template_pm.h"
+#define VSF_PM_CFG_DEC_PREFIX           vsf_hw
+#define VSF_PM_CFG_DEC_UPCASE_PREFIX    VSF_HW
+#include "hal/driver/common/pm/pm_template.h"
 
 /*============================ PROTOTYPES ====================================*/
 

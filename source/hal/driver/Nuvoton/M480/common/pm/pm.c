@@ -83,53 +83,53 @@ vsf_err_t vsf_hw_pm_sleep(pm_sleep_cfg_t *cfg)
     return VSF_ERR_NONE;
 }
 
-pm_pclk_status_t vsf_hw_pm_peripheral_get_status(pm_pclk_no_t index)
+pm_pclk_status_t vsf_hw_pm_pclk_get_status(pm_pclk_no_t index)
 {
     return (pm_pclk_status_t)(
                 (m480_bit_field_get((index >> 0) & 0x3FFF, (uint32_t *)&CLK->CLKSEL0) << 8)
             |   (m480_bit_field_get((index >> 14) & 0x3FFF, (uint32_t *)&CLK->CLKDIV0) << 0));
 }
 
-vsf_err_t vsf_hw_pm_peripheral_resume(pm_pclk_no_t index , pm_pclk_status_t status)
+vsf_err_t vsf_hw_pm_pclk_resume(pm_pclk_no_t index , pm_pclk_status_t status)
 {
-    if (status != vsf_hw_pm_peripheral_get_status(index)) {
+    if (status != vsf_hw_pm_pclk_get_status(index)) {
         m480_bit_field_set((index >> 0) & 0x3FFF, (uint32_t *)&CLK->CLKSEL0, (status >> 8) & 0xFF);
         m480_bit_field_set((index >> 14) & 0x3FFF, (uint32_t *)&CLK->CLKDIV0, (status >> 0) & 0xFF);
     }
     return VSF_ERR_NONE;
 }
 
-pm_pclk_status_t vsf_hw_pm_peripheral_config(pm_pclk_no_t index, const pm_pclk_cfg_t *cfg)
+pm_pclk_status_t vsf_hw_pm_pclk_config(pm_pclk_no_t index, pm_pclk_cfg_t *cfg)
 {
-    pm_pclk_status_t orig = vsf_hw_pm_peripheral_get_status(index);
-    vsf_hw_pm_peripheral_resume(index, (pm_pclk_status_t)(cfg->div | (cfg->clk_src << 8)));
+    pm_pclk_status_t orig = vsf_hw_pm_pclk_get_status(index);
+    vsf_hw_pm_pclk_resume(index, (pm_pclk_status_t)(cfg->div | (cfg->clk_src << 8)));
     return orig;
 }
 
-#define __def_vsf_hw_pm_peripheral_clksel(__name)                                  \
+#define __def_vsf_hw_pm_pclk_clksel(__name)                                  \
             [VSF_MCONNECT2(__name, _MAP_IDX)] = VSF_MCONNECT2(__name, _MAP)
 
-static const pm_periph_clksel_t vsf_hw_pm_peripheral_clksel[] = {
-    __def_vsf_hw_pm_peripheral_clksel(SDH_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(STCLK_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(HCLK_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(WWDT_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(CLKO_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(UART_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(TMR3_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(TMR2_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(TMR1_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(TMR0_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(WDT_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(SPI13_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(SPI02_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(BPWM1_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(BPWM0_CLKSEL),
-    __def_vsf_hw_pm_peripheral_clksel(RTC_CLKSEL),
+static const pm_periph_clksel_t vsf_hw_pm_pclk_clksel[] = {
+    __def_vsf_hw_pm_pclk_clksel(SDH_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(STCLK_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(HCLK_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(WWDT_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(CLKO_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(UART_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(TMR3_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(TMR2_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(TMR1_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(TMR0_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(WDT_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(SPI13_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(SPI02_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(BPWM1_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(BPWM0_CLKSEL),
+    __def_vsf_hw_pm_pclk_clksel(RTC_CLKSEL),
 };
 
 // todo: calculate frequency of clocks
-static uint_fast32_t vsf_hw_pm_peripheral_get_clksrc(uint_fast8_t index)
+static uint_fast32_t vsf_hw_pm_pclk_get_clksrc(uint_fast8_t index)
 {
     switch (index) {
     case CLKSRC_HXT:
@@ -155,24 +155,24 @@ static uint_fast32_t vsf_hw_pm_peripheral_get_clksrc(uint_fast8_t index)
     return 0;
 }
 
-static uint_fast32_t vsf_hw_pm_peripheral_get_clksrc_from_clksel(uint_fast8_t map_idx, uint_fast8_t clksel)
+static uint_fast32_t vsf_hw_pm_pclk_get_clksrc_from_clksel(uint_fast8_t map_idx, uint_fast8_t clksel)
 {
-    VSF_HAL_ASSERT((map_idx < dimof(vsf_hw_pm_peripheral_clksel)) && (clksel <= 7));
-    uint_fast8_t clksrc = (vsf_hw_pm_peripheral_clksel[map_idx] >> (4 * clksel)) & 0x0F;
-    return vsf_hw_pm_peripheral_get_clksrc(clksrc);
+    VSF_HAL_ASSERT((map_idx < dimof(vsf_hw_pm_pclk_clksel)) && (clksel <= 7));
+    uint_fast8_t clksrc = (vsf_hw_pm_pclk_clksel[map_idx] >> (4 * clksel)) & 0x0F;
+    return vsf_hw_pm_pclk_get_clksrc(clksrc);
 }
 
-uint_fast32_t vsf_hw_pm_peripheral_get_clock(pm_pclk_no_t index)
+uint_fast32_t vsf_hw_pm_pclk_get_clock(pm_pclk_no_t index)
 {
     uint_fast16_t bf_clksel = (index >> 0) & 0x3FFF;
 
     if (M480_BIT_FIELD_GET_BITLEN(bf_clksel)) {
-        pm_pclk_status_t status = vsf_hw_pm_peripheral_get_status(index);
+        pm_pclk_status_t status = vsf_hw_pm_pclk_get_status(index);
         uint_fast8_t clksel = (status >> 8) & 0xFF;
         uint_fast16_t clkdiv = (status >> 0) & 0xFFFF;
         uint_fast8_t clksel_map_idx = index >> 28;
 
-        uint_fast32_t clk = vsf_hw_pm_peripheral_get_clksrc_from_clksel(clksel_map_idx, clksel);
+        uint_fast32_t clk = vsf_hw_pm_pclk_get_clksrc_from_clksel(clksel_map_idx, clksel);
         return clk / (clkdiv + 1);
     }
     return 0;
