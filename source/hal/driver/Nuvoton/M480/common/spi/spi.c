@@ -162,12 +162,6 @@ static uint8_t __vsf_hw_spi_get_data_width(vsf_hw_spi_t *spi_ptr)
     return data_width;
 }
 
-static uint8_t __vsf_hw_spi_get_data_byte_cnt(vsf_hw_spi_t *spi_ptr)
-{
-    uint8_t data_width = __vsf_hw_spi_get_data_width(spi_ptr);
-    return (data_width + 7) / 8;
-}
-
 static vsf_err_t __vsf_hw_spi_reg_init(vsf_hw_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
 {
     uint32_t clock_source;
