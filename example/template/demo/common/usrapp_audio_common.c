@@ -21,6 +21,7 @@
 
 #if     VSF_USE_AUDIO == ENABLED                                                \
     &&  (   (VSF_AUDIO_USE_WINSOUND == ENABLED)                                 \
+        ||  (VSF_AUDIO_USE_DUMMY == ENABLED)                                    \
         ||  (VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_UAC == ENABLED)        \
         )
 
@@ -38,9 +39,18 @@ usrapp_audio_common_t usrapp_audio_common = {
         },
     },
 #endif
+#if VSF_AUDIO_USE_DUMMY == ENABLED
+    .audio_dummy        = {
+        .dev            = {
+            .drv        = &vk_audio_dummy_drv,
+        },
+    },
+#endif
 
 #if VSF_AUDIO_USE_WINSOUND == ENABLED
     .default_dev        = &usrapp_audio_common.winsound.dev.use_as__vk_audio_dev_t,
+#elif VSF_AUDIO_USE_DUMMY == ENABLED
+    .default_dev        = &usrapp_audio_common.audio_dummy.dev.use_as__vk_audio_dev_t,
 #else
     .default_dev        = NULL,
 #endif

@@ -15,62 +15,80 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __USRAPP_AUDIO_COMMON_H__
-#define __USRAPP_AUDIO_COMMON_H__
+#ifndef __VSF_AUDIO_DUMMY_H__
+#define __VSF_AUDIO_DUMMY_H__
 
 /*============================ INCLUDES ======================================*/
 
-#include "vsf.h"
+#include "../../../vsf_av_cfg.h"
 
-#if     VSF_USE_AUDIO == ENABLED                                                \
-    &&  (   (VSF_AUDIO_USE_WINSOUND == ENABLED)                                 \
-        ||  (VSF_AUDIO_USE_DUMMY == ENABLED)                                    \
-        ||  (VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_UAC == ENABLED)        \
-        )
+#if VSF_USE_AUDIO == ENABLED && VSF_AUDIO_USE_DUMMY == ENABLED
 
-#if VSF_AUDIO_USE_WINSOUND == ENABLED
-#   include "component/av/audio/driver/winsound/vsf_winsound.h"
-#elif VSF_AUDIO_USE_DUMMY == ENABLED
-#   include "component/av/audio/driver/dummy/vsf_audio_dummy.h"
+#include "component/av/vsf_av.h"
+
+#if     defined(__VSF_AUDIO_DUMMY_CLASS_IMPLEMENT)
+#   undef __VSF_AUDIO_DUMMY_CLASS_IMPLEMENT
+#   define __VSF_CLASS_IMPLEMENT__
 #endif
+
+#include "utilities/ooc_class.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-#ifndef APP_CFG_WINSOUND_PRIO
-#   define APP_CFG_WINSOUND_PRIO            vsf_arch_prio_0
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct usrapp_audio_common_t {
-    vk_audio_dev_t *default_dev;
-#if VSF_AUDIO_USE_WINSOUND == ENABLED
-    struct {
-        vk_winsound_dev_t dev;
-    } winsound;
-#elif VSF_AUDIO_USE_DUMMY == ENABLED
-    struct {
-        vk_audio_dummy_dev_t dev;
-    } audio_dummy;
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+
+typedef struct vk_audio_dummy_playback_buffer_t {
+    vsf_callback_timer_t timer;
+    void *param;
+} vk_audio_dummy_playback_buffer_t;
+
+typedef struct vk_audio_dummy_playback_ctx_t {
+    vk_audio_stream_t *audio_stream;
+    vk_audio_dummy_playback_buffer_t buffer[2];
+
+    bool is_playing;
+    bool fill_ticktock;
+    uint8_t buffer_taken;
+} vk_audio_dummy_playback_ctx_t;
+
+#undef HWAVEOUT
 #endif
-} usrapp_audio_common_t;
+
+vsf_class(vk_audio_dummy_dev_t) {
+    private_member(
+        bool is_inited;
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+        vk_audio_dummy_playback_ctx_t playback_ctx;
+#endif
+    )
+
+    public_member(
+        implement(vk_audio_dev_t)
+        vk_audio_stream_t __stream[
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED && VSF_AUDIO_USE_CAPTURE == ENABLED
+            2
+#else
+            1
+#endif
+        ];
+    )
+};
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern usrapp_audio_common_t usrapp_audio_common;
+extern const vk_audio_drv_t vk_audio_dummy_drv;
 
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif      // VSF_USE_AUDIO && (VSF_AUDIO_USE_WINSOUND || UAC)
-#endif      // __USRAPP_AUDIO_COMMON_H__
-/* EOF */
+#endif      // VSF_USE_AUDIO && VSF_AUDIO_USE_DUMMY
+#endif      // __VSF_AUDIO_DUMMY_H__
