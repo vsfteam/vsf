@@ -75,8 +75,6 @@
 
 #define M480_BIT_FIELD_GET_BITLEN(__bf) (((__bf) >> 8) & 0x1F)
 
-#define VSF_HW_PM_COUNT             1
-
 #define VSF_HAL_USE_GPIO            ENABLED
 #define VSF_HW_GPIO_COUNT           4
 #define VSF_HW_GPIO0_ADDRESS        GPIOA_BASE
