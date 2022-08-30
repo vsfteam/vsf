@@ -9,6 +9,8 @@
 #   include <sys/types.h>
 #endif
 
+// for uintptr_t
+#include <stdint.h>
 
 #define VSF_LINUX_LIBC_WRAPPER(__api)   VSF_SHELL_WRAPPER(vsf_linux_libc, __api)
 
