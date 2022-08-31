@@ -257,7 +257,8 @@ void __vsf_trace_buffer(  vsf_trace_level_t level,
         // line format 16 data max:
         //    XXXXXXXX: XXXXXXXX XXXXXXXX ....  | CHAR.....\r\n\0
         //              9 * 16                 3   4 * 16   3
-        char linebuf[(8 + 1) * 16 + 3 + 64 + 3], *ptr, ch;
+        char linebuf[(8 + 1) * 16 + 3 + 64 + 3], *ptr;
+        uint8_t ch;
 
         for (uint_fast16_t i = 0; i < len; i += data_size * data_per_line) {
             if (disp_addr) {
