@@ -346,7 +346,7 @@ void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
     }
 }
 
-static bool __vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
+bool vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 {
 #if VSF_USBH_USE_HUB == ENABLED
     if (dev->dev_parent != NULL) {
@@ -1196,7 +1196,7 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_TIMER:
         switch (parser->probe_state) {
         case VSF_USBH_PROBE_WAIT_DEVICE_RESET:
-            if (__vk_usbh_is_dev_resetting(usbh, dev)) {
+            if (vk_usbh_is_dev_resetting(usbh, dev)) {
             device_reset_wait:
                 vsf_teda_set_timer_ms(20);
                 return;

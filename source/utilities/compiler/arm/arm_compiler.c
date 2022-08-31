@@ -68,7 +68,7 @@ size_t strlcpy(char *dst, const char *src, size_t dsize)
 
 // implement APIs not supported in time.h in IAR
 #   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
-#       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED && VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 int clock_gettime(clockid_t clk_id, struct timespec *tp)
 {
     switch (clk_id) {

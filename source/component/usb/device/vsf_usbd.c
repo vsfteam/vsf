@@ -833,7 +833,9 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
 
             err = vsf_usbd_notify_user(dev, evt, request);
             if (err > 0) { break; } else if (err < 0) {
+#if VSF_USBD_CFG_RAW_MODE != ENABLED
             stall_ep0:
+#endif
                 vk_usbd_drv_ep_set_stall(0 | USB_DIR_OUT);
                 vk_usbd_drv_ep_set_stall(0 | USB_DIR_IN);
                 break;
