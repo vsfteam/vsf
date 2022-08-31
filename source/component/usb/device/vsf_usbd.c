@@ -160,6 +160,8 @@ static vk_usbd_trans_t * __vk_usbd_get_trans(vk_usbd_dev_t *dev, uint_fast8_t ep
 
 static void __vk_usbd_trans_finish(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans)
 {
+    vsf_usbd_notify_user(dev, (usb_evt_t)(trans->ep & USB_DIR_MASK ? USB_ON_IN : USB_ON_OUT), NULL);
+
     vsf_slist_remove(vk_usbd_trans_t, node, &dev->trans_list, trans);
 #if VSF_USE_KERNEL == ENABLED
     if (trans->notify_eda) {
@@ -690,13 +692,11 @@ static void __vk_usbd_setup_status_callback(void *param)
     vk_usbd_drv_status_stage(out);
 }
 
-#ifndef WEAK_VSF_USBD_NOTIFY_USER
 WEAK(vsf_usbd_notify_user)
 vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
 {
     return VSF_ERR_NONE;
 }
-#endif
 
 static void __vk_usbd_hw_init_reset(vk_usbd_dev_t *dev, bool reset)
 {
@@ -716,6 +716,30 @@ static void __vk_usbd_hw_init_reset(vk_usbd_dev_t *dev, bool reset)
 }
 
 // state machines
+void vk_usbd_stdreq_data_stage(vk_usbd_dev_t *dev)
+{
+    struct usb_ctrlrequest_t *request = &dev->ctrl_handler.request;
+    vk_usbd_trans_t *trans = &dev->ctrl_handler.trans;
+
+    if (trans->use_as__vsf_mem_t.size > request->wLength) {
+        trans->use_as__vsf_mem_t.size = request->wLength;
+    }
+
+    if ((request->bRequestType & USB_DIR_MASK) == USB_DIR_OUT) {
+        if (0 == request->wLength) {
+            __vk_usbd_setup_status_callback((void *)dev);
+        } else {
+            trans->on_finish = __vk_usbd_setup_status_callback;
+            vk_usbd_ep_recv(dev, trans);
+        }
+    } else {
+        trans->on_finish = __vk_usbd_setup_status_callback;
+        trans->zlp =    (trans->use_as__vsf_mem_t.size > 0)
+                    &&  (trans->use_as__vsf_mem_t.size < request->wLength);
+        vk_usbd_ep_send(dev, trans);
+    }
+}
+
 static void __vk_usbd_hal_evthandler(void *p, usb_evt_t evt, uint_fast8_t value)
 #if VSF_USBD_CFG_USE_EDA == ENABLED
 {
@@ -800,39 +824,29 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             break;
         }
     case USB_ON_SETUP: {
-            vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
-            struct usb_ctrlrequest_t *request = &ctrl_handler->request;
-            vk_usbd_trans_t *trans = &ctrl_handler->trans;
+            struct usb_ctrlrequest_t *request = &dev->ctrl_handler.request;
+            vsf_err_t err;
 
             vk_usbd_drv_get_setup(request);
             __vsf_usbd_trace_setup(request);
-            if (    VSF_ERR_NONE != vsf_usbd_notify_user(dev, evt, request)
-#if VSF_USBD_CFG_RAW_MODE != ENABLED
-                ||  (VSF_ERR_NONE != __vk_usbd_ctrl_prepare(dev))
-#endif
-                ) {
+
+            err = vsf_usbd_notify_user(dev, evt, request);
+            if (err > 0) { break; } else if (err < 0) {
                 vk_usbd_drv_ep_set_stall(0 | USB_DIR_OUT);
                 vk_usbd_drv_ep_set_stall(0 | USB_DIR_IN);
                 break;
             }
 
-            if (trans->use_as__vsf_mem_t.size > request->wLength) {
-                trans->use_as__vsf_mem_t.size = request->wLength;
+#if VSF_USBD_CFG_RAW_MODE != ENABLED
+            err = __vk_usbd_ctrl_prepare(dev);
+            if (err > 0) { break; } else if (err < 0) {
+                vk_usbd_drv_ep_set_stall(0 | USB_DIR_OUT);
+                vk_usbd_drv_ep_set_stall(0 | USB_DIR_IN);
+                break;
             }
+#endif
 
-            if ((request->bRequestType & USB_DIR_MASK) == USB_DIR_OUT) {
-                if (0 == request->wLength) {
-                    __vk_usbd_setup_status_callback((void *)dev);
-                } else {
-                    trans->on_finish = __vk_usbd_setup_status_callback;
-                    vk_usbd_ep_recv(dev, trans);
-                }
-            } else {
-                trans->on_finish = __vk_usbd_setup_status_callback;
-                trans->zlp =    (trans->use_as__vsf_mem_t.size > 0)
-                            &&  (trans->use_as__vsf_mem_t.size < request->wLength);
-                vk_usbd_ep_send(dev, trans);
-            }
+            vk_usbd_stdreq_data_stage(dev);
             break;
         }
     case USB_ON_STATUS:
