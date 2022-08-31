@@ -160,7 +160,8 @@ static vk_usbd_trans_t * __vk_usbd_get_trans(vk_usbd_dev_t *dev, uint_fast8_t ep
 
 static void __vk_usbd_trans_finish(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans)
 {
-    vsf_usbd_notify_user(dev, (usb_evt_t)(trans->ep & USB_DIR_MASK ? USB_ON_IN : USB_ON_OUT), NULL);
+    vsf_usbd_notify_user(dev,
+        (usb_evt_t)(trans->ep & USB_DIR_MASK ? USB_ON_IN : USB_ON_OUT), trans);
 
     vsf_slist_remove(vk_usbd_trans_t, node, &dev->trans_list, trans);
 #if VSF_USE_KERNEL == ENABLED
