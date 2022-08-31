@@ -586,6 +586,7 @@ extern vsf_err_t vk_usbd_ep_recv(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans);
 extern vsf_err_t vk_usbd_ep_send(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans);
 
 extern void vk_usbd_stdreq_data_stage(vk_usbd_dev_t *dev);
+extern void vk_usbd_stdreq_status_stage(vk_usbd_dev_t *dev);
 
 #   if VSF_USBD_CFG_STREAM_EN == ENABLED
 extern vsf_err_t vk_usbd_ep_recv_stream(vk_usbd_ep_stream_t *stream, uint_fast32_t size);
