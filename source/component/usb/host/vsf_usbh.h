@@ -512,12 +512,10 @@ vsf_class(vk_usbh_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if !defined(__VSF_USBH_CLASS_IMPLEMENT_HCD__) && !defined(__VSF_USBH_CLASS_IMPLEMENT_CLASS__)
 // APIs to be called by user
 extern vsf_err_t vk_usbh_init(vk_usbh_t *usbh);
 extern vsf_err_t vk_usbh_fini(vk_usbh_t *usbh);
 extern void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *c);
-#endif
 
 #if defined(__VSF_USBH_CLASS_IMPLEMENT) || defined(__VSF_USBH_CLASS_IMPLEMENT_HCD__)
 // APIs to be called by hcd drivers
