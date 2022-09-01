@@ -332,6 +332,8 @@ static void __vk_usbh_clean_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 
 void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 {
+    vk_usbh_update_address(dev, 0);
+
 #if VSF_USBH_USE_HUB == ENABLED
     if (dev->dev_parent != NULL) {
         vk_usbh_hub_reset_dev(dev);
@@ -361,6 +363,16 @@ bool vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
         return usbh->drv->is_dev_reset(&usbh->use_as__vk_usbh_hcd_t, &dev->use_as__vk_usbh_hcd_dev_t);
     }
     return false;
+}
+
+void vk_usbh_update_address(vk_usbh_dev_t *dev, uint_fast8_t address)
+{
+    vk_usbh_urb_t *urb = &dev->ep0.urb;
+    if (vk_usbh_urb_is_alloced(urb)) {
+        urb->urb_hcd->pipe.address = address;
+    } else {
+        urb->pipe.address = address;
+    }
 }
 
 #if __IS_COMPILER_IAR__
@@ -1211,7 +1223,7 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         case VSF_USBH_PROBE_WAIT_ADDRESS_STABLE:
             // update address
-            urb->urb_hcd->pipe.address = dev->devnum;
+            vk_usbh_update_address(dev, dev->devnum);
             // get full device descriptor
             err = vk_usbh_get_descriptor(usbh, dev, USB_DT_DEVICE, 0,
                     sizeof(*parser->desc_device));

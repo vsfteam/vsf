@@ -561,6 +561,7 @@ extern uint_fast32_t vk_usbh_urb_get_actual_length(vk_usbh_urb_t *urb);
 
 extern void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
 extern bool vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
+extern void vk_usbh_update_address(vk_usbh_dev_t *dev, uint_fast8_t address);
 
 extern vsf_err_t vk_usbh_submit_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb);
 extern vsf_err_t vk_usbh_submit_urb_flags(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t flags);
