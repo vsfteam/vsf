@@ -107,9 +107,9 @@
 #define VSF_HW_USB_HC_COUNT         1
 #define VSF_HW_USB_HC_OHCI_COUNT    1
 
-#define VSF_HW_USB_HC0_TYPE                ohci
-#define VSF_HW_USB_HC0_IRQHandler          OHCI_IRQHandler
-#define VSF_HW_USB_HC0_CONFIG                                                          \
+#define VSF_HW_USB_HC0_TYPE         ohci
+#define VSF_HW_USB_HC0_IRQHandler   OHCI_IRQHandler
+#define VSF_HW_USB_HC0_CONFIG                                                   \
     .reg                            = USBH,                                     \
     .sclk                           = SCLK_USBH_IDX,                            \
     .pclk                           = PCLK_USB_IDX,                             \
@@ -126,10 +126,10 @@
 #define VSF_HW_USB_DC_FS_COUNT      0
 
 
-#define VSF_HW_USB_DC0_TYPE                usbd_hs
-#define VSF_HW_USB_DC0_IRQHandler          USBD20_IRQHandler
-#define VSF_HW_USB_DC0_EP_NUM              14
-#define VSF_HW_USB_DC0_CONFIG                                                          \
+#define VSF_HW_USB_DC0_TYPE         usbd_hs
+#define VSF_HW_USB_DC0_IRQHandler   USBD20_IRQHandler
+#define VSF_HW_USB_DC0_EP_NUM       14
+#define VSF_HW_USB_DC0_CONFIG                                                   \
     .reg                            = HSUSBD,                                   \
     .sclk                           = SCLK_USBD_IDX,                            \
     .phy                            = M480_USBPHY_HS,                           \
