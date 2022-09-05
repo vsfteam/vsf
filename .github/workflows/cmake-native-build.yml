@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cc: [gcc, clang]
+        cc: [gcc-9, gcc-10, gcc-11, clang]
         os: [ubuntu-latest, macos-12]
         src: [linux, macos]
         exclude:
