@@ -55,7 +55,7 @@ rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 }
 #endif
 
-#if VSF_RTC_CFG_IMP_GET_FROM_GETTIM == ENABLED
+#if VSF_RTC_CFG_IMP_GET_FROM_GET_TIME == ENABLED
 vsf_err_t vsf_real_rtc_get(vsf_real_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
@@ -142,7 +142,7 @@ vsf_err_t vsf_real_rtc_set_time(vsf_real_rtc_t *rtc_ptr, vsf_rtc_time_t second, 
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
 
-    struct tm *t = gmtime(&second);
+    struct tm *t = gmtime((const time_t *)&second);
     if (NULL == t) {
         return VSF_ERR_FAIL;
     }
