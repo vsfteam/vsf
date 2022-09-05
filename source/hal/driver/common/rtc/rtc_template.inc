@@ -27,6 +27,14 @@
 #define vsf_real_rtc_get_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)
 #define vsf_real_rtc_set_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)
 
+#if VSF_RTC_CFG_GET_API_TEMPLATE == ENABLED && VSF_RTC_CFG_GET_TIME_API_TEMPLATE == ENABLED
+#   error "VSF_RTC_CFG_GET_API_TEMPLATE and  VSF_RTC_CFG_GET_TIME_API_TEMPLATE Only one can be defined at a time"
+#endif
+
+#if VSF_RTC_CFG_SET_API_TEMPLATE == ENABLED && VSF_RTC_CFG_SET_TIME_API_TEMPLATE == ENABLED
+#   error "VSF_RTC_CFG_SET_API_TEMPLATE and  VSF_RTC_CFG_SET_TIME_API_TEMPLATE Only one can be defined at a time"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -55,7 +63,7 @@ rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 }
 #endif
 
-#if VSF_RTC_CFG_IMP_GET_FROM_GET_TIME == ENABLED
+#if VSF_RTC_CFG_GET_API_TEMPLATE == ENABLED
 vsf_err_t vsf_real_rtc_get(vsf_real_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
@@ -85,7 +93,7 @@ vsf_err_t vsf_real_rtc_get(vsf_real_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 }
 #endif
 
-#if VSF_RTC_CFG_IMP_SET_FROM_SET_TIME == ENABLED
+#if VSF_RTC_CFG_SET_API_TEMPLATE == ENABLED
 vsf_err_t vsf_real_rtc_set(vsf_real_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
@@ -105,7 +113,7 @@ vsf_err_t vsf_real_rtc_set(vsf_real_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 }
 #endif
 
-#if VSF_RTC_CFG_IMP_GET_TIME_FROM_GET == ENABLED
+#if VSF_RTC_CFG_GET_TIME_API_TEMPLATE == ENABLED
 vsf_err_t vsf_real_rtc_get_time(vsf_hw_rtc_t *rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *milliseconds_ptr)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
@@ -137,7 +145,7 @@ vsf_err_t vsf_real_rtc_get_time(vsf_hw_rtc_t *rtc_ptr, vsf_rtc_time_t *second_pt
 }
 #endif
 
-#if VSF_RTC_CFG_IMP_SET_SECOND_FROM_SET == ENABLED
+#if VSF_RTC_CFG_SET_TIME_API_TEMPLATE == ENABLED
 vsf_err_t vsf_real_rtc_set_time(vsf_real_rtc_t *rtc_ptr, vsf_rtc_time_t second, vsf_rtc_time_t milliseconds)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
