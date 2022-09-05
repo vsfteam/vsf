@@ -79,11 +79,7 @@ extern "C" {
 
 #ifndef MAX_CONSTRUCTOR_PRIORITY
 #   if __IS_COMPILER_GCC__
-#       ifdef __MACOS__
-#           define MAX_CONSTRUCTOR_PRIORITY             0xFFFFFFFF
-#       else
-#           define MAX_CONSTRUCTOR_PRIORITY             65535
-#       endif
+#       define MAX_CONSTRUCTOR_PRIORITY                 65535
 #   elif __IS_COMPILER_LLVM__
 #       define MAX_CONSTRUCTOR_PRIORITY                 0xFFFFFFFF
 #   endif
