@@ -27,8 +27,6 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_CFG_USER_HEADER                             "config/vsf_usr_cfg_weak.h"
-
 #define VSF_USE_SIMPLE_STREAM                           ENABLED
 #define VSF_USE_TRACE                                   ENABLED
 

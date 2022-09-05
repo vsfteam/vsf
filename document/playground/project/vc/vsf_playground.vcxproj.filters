@@ -403,9 +403,6 @@
     <Filter Include="vsf\component\tcpip\netdrv\driver\wpcap">
       <UniqueIdentifier>{817ac589-42f7-44d9-8df0-1b3361bc0419}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\host\class\rtl8152">
-      <UniqueIdentifier>{845012a4-c61f-448d-b552-3b7375dae544}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\crypto">
       <UniqueIdentifier>{270587e0-572c-4c46-9608-b3b54844bb21}</UniqueIdentifier>
     </Filter>
@@ -471,9 +468,6 @@
     </Filter>
     <Filter Include="vsf\service\json">
       <UniqueIdentifier>{7b0f1556-80e8-4e18-8669-a817438a73b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\debugger\segger_rtt">
-      <UniqueIdentifier>{d42ea5e5-b341-45be-b5d9-74b32e93eeaf}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\osa_hal\driver\customised">
       <UniqueIdentifier>{9c096bd0-f1a0-4e67-b7a8-f8844a51f163}</UniqueIdentifier>
@@ -558,6 +552,48 @@
     </Filter>
     <Filter Include="vsf\hal\driver\vsf\distbus\usbd">
       <UniqueIdentifier>{dd3cbac8-3d0d-4f45-9bdc-f2a7c066672d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\wingdi">
+      <UniqueIdentifier>{847e8859-694a-4f22-b6c5-48a16816f8b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\debugger\segger">
+      <UniqueIdentifier>{d42ea5e5-b341-45be-b5d9-74b32e93eeaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\app">
+      <UniqueIdentifier>{500f4def-cef1-4fd4-9ec6-8c5e3800aec0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\app\httpd">
+      <UniqueIdentifier>{e065945a-ac86-4227-977c-858e3821ff8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\app\ntp">
+      <UniqueIdentifier>{0c9f765f-a20f-465a-ac07-af9fcef8b6e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\app\telnetd">
+      <UniqueIdentifier>{9e7f11bf-cb2c-4f89-8a4f-268cd8077f33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel">
+      <UniqueIdentifier>{874be396-af0c-4ad5-a461-78fc91a1b993}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\fs">
+      <UniqueIdentifier>{d5fb814d-9709-4ade-952c-2071421535ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\fs\vfs">
+      <UniqueIdentifier>{3b513d04-773e-45b5-a331-07480def13c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\fs\vfs\devfs">
+      <UniqueIdentifier>{907c4a7c-fd11-4570-bbc6-0b63fbf497a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\socket">
+      <UniqueIdentifier>{545040ad-b79f-486f-8559-f160ea3c7ea7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\socket\inet">
+      <UniqueIdentifier>{967a0eec-95bf-4388-b5cc-b3e400ba5b89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\kernel\socket\unix">
+      <UniqueIdentifier>{b1cdaa48-8a29-46a2-81c6-1a5efe60a889}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\x86\win\rtc">
+      <UniqueIdentifier>{0895024a-b39a-4861-a738-356bb449e7b2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1233,9 +1269,6 @@
     <ClInclude Include="..\..\..\..\source\component\tcpip\netdrv\driver\wpcap\vsf_netdrv_wpcap.h">
       <Filter>vsf\component\tcpip\netdrv\driver\wpcap</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h">
-      <Filter>vsf\component\usb\host\class\rtl8152</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\usb\vsf_usb.h">
       <Filter>vsf\component\usb</Filter>
     </ClInclude>
@@ -1325,9 +1358,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\service\json\vsf_json.h">
       <Filter>vsf\service\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.h">
-      <Filter>vsf\component\debugger\segger_rtt</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\utilities\vsf_utilities.h">
       <Filter>vsf\utilities</Filter>
@@ -1497,11 +1527,38 @@
     <ClInclude Include="..\..\config\vsf_usr_cfg_arch.h">
       <Filter>usrapp\config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\config\vsf_usr_cfg_weak.h">
-      <Filter>usrapp\config</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\config\arch\vsf_usr_cfg_win.h">
       <Filter>usrapp\config\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h">
+      <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.h">
+      <Filter>vsf\component\debugger\segger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.h">
+      <Filter>vsf\shell\sys\linux\app\httpd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\ntp\vsf_linux_ntp.h">
+      <Filter>vsf\shell\sys\linux\app\ntp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.h">
+      <Filter>vsf\shell\sys\linux\app\telnetd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.h">
+      <Filter>vsf\shell\sys\linux\kernel\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.h">
+      <Filter>vsf\shell\sys\linux\kernel\fs\vfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.h">
+      <Filter>vsf\shell\sys\linux\kernel\fs\vfs\devfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.h">
+      <Filter>vsf\shell\sys\linux\kernel\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1663,9 +1720,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_string.c">
       <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux_socket.c">
-      <Filter>vsf\shell\sys\linux</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
       <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
@@ -1886,9 +1940,6 @@
     <ClCompile Include="..\..\..\..\source\component\tcpip\netdrv\driver\wpcap\vsf_netdrv_wpcap.c">
       <Filter>vsf\component\tcpip\netdrv\driver\wpcap</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.c">
-      <Filter>vsf\component\usb\host\class\rtl8152</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\crypto\hash\crc\vsf_crc.c">
       <Filter>vsf\component\crypto\hash\crc</Filter>
     </ClCompile>
@@ -1942,9 +1993,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\service\json\vsf_json.c">
       <Filter>vsf\service\json</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.c">
-      <Filter>vsf\component\debugger\segger_rtt</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.c">
       <Filter>vsf\osa_hal\driver\customised\stream_hal\usart</Filter>
@@ -2038,6 +2086,48 @@
     </ClCompile>
     <ClCompile Include="..\..\main.c">
       <Filter>usrapp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c">
+      <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.c">
+      <Filter>vsf\component\debugger\segger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c">
+      <Filter>vsf\shell\sys\linux\app\httpd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\ntp\vsf_linux_ntp.c">
+      <Filter>vsf\shell\sys\linux\app\ntp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.c">
+      <Filter>vsf\shell\sys\linux\app\telnetd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c">
+      <Filter>vsf\shell\sys\linux\kernel\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c">
+      <Filter>vsf\shell\sys\linux\kernel\fs\vfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c">
+      <Filter>vsf\shell\sys\linux\kernel\fs\vfs\devfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c">
+      <Filter>vsf\shell\sys\linux\kernel\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_hostsock.c">
+      <Filter>vsf\shell\sys\linux\kernel\socket\inet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_lwip.c">
+      <Filter>vsf\shell\sys\linux\kernel\socket\inet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c">
+      <Filter>vsf\shell\sys\linux\kernel\socket\unix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
+      <Filter>vsf\kernel\task</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

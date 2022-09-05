@@ -21,7 +21,7 @@
     <ClInclude Include="..\..\..\..\source\component\crypto\vsf_crypto.h" />
     <ClInclude Include="..\..\..\..\source\component\crypto\vsf_crypto_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\debugger\nulink\NuConsole_stream.h" />
-    <ClInclude Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.h" />
+    <ClInclude Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.h" />
     <ClInclude Include="..\..\..\..\source\component\debugger\vsf_debugger.h" />
     <ClInclude Include="..\..\..\..\source\component\debugger\vsf_debugger_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\fs\driver\fatfs\vsf_fatfs.h" />
@@ -66,6 +66,7 @@
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\solomon-systech\ssd1306\vsf_disp_ssd1306.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\usbd_uvc\vsf_disp_usbd_uvc.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\vsf_disp.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_msg_tree_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_button.h" />
@@ -148,7 +149,6 @@
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\HUB\vsf_usbh_HUB.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\libusb\vsf_usbh_libusb.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\MSC\vsf_usbh_msc.h" />
-    <ClInclude Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\UAC\vsf_usbh_uac.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\class\XB1\vsf_usbh_xb1.h" />
     <ClInclude Include="..\..\..\..\source\component\usb\host\vsf_usbh.h" />
@@ -169,6 +169,7 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\driver.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\device.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\driver.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.h" />
     <ClInclude Include="..\..\..\..\source\hal\vsf_hal.h" />
     <ClInclude Include="..\..\..\..\source\hal\vsf_hal_cfg.h" />
@@ -242,6 +243,9 @@
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_timer.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\include\SDL2\SDL_version.h" />
     <ClInclude Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\ntp\vsf_linux_ntp.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\arpa\inet.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\dirent.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\errno.h" />
@@ -275,6 +279,10 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\sys\wait.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\termios.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\unistd.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\port\busybox\busybox.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\port\busybox\config.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\vsf_linux.h" />
@@ -323,7 +331,6 @@
     <ClInclude Include="..\..\..\..\source\vsf_cfg.h" />
     <ClInclude Include="..\..\config\arch\vsf_usr_cfg_win.h" />
     <ClInclude Include="..\..\config\vsf_usr_cfg_arch.h" />
-    <ClInclude Include="..\..\config\vsf_usr_cfg_weak.h" />
     <ClInclude Include="..\..\vsf_usr_cfg.h" />
   </ItemGroup>
   <ItemGroup>
@@ -332,7 +339,7 @@
     <ClCompile Include="..\..\..\..\source\component\av\audio\vsf_audio.c" />
     <ClCompile Include="..\..\..\..\source\component\crypto\hash\crc\vsf_crc.c" />
     <ClCompile Include="..\..\..\..\source\component\debugger\nulink\NuConsole_stream.c" />
-    <ClCompile Include="..\..\..\..\source\component\debugger\segger_rtt\segger_rtt_stream.c" />
+    <ClCompile Include="..\..\..\..\source\component\debugger\segger\segger_rtt_stream.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\fatfs\vsf_fatfs.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\malfs\vsf_malfs.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\memfs\vsf_memfs.c" />
@@ -369,6 +376,7 @@
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\solomon-systech\ssd1306\vsf_disp_ssd1306.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\usbd_uvc\vsf_disp_usbd_uvc.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\vsf_disp.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_button.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_control.c" />
@@ -428,7 +436,6 @@
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\HUB\vsf_usbh_HUB.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\libusb\vsf_usbh_libusb.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\MSC\vsf_usbh_msc.c" />
-    <ClCompile Include="..\..\..\..\source\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\UAC\vsf_usbh_uac.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\XB1\vsf_usbh_xb1.c" />
     <ClCompile Include="..\..\..\..\source\component\usb\host\vsf_usbh.c" />
@@ -439,11 +446,13 @@
     <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\usbd\vsf_hal_distbus_usbd.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\vsf\distbus\vsf_hal_distbus.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\driver.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.c" />
     <ClCompile Include="..\..\..\..\source\hal\vsf_hal.c" />
     <ClCompile Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_bmpevt.c" />
     <ClCompile Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_task.c" />
     <ClCompile Include="..\..\..\..\source\kernel\shell\vsf_shell.c" />
+    <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c" />
     <ClCompile Include="..\..\..\..\source\kernel\task\vsf_thread.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_eda.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_eda_slist_queue.c" />
@@ -480,6 +489,16 @@
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2.c" />
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_event.c" />
     <ClCompile Include="..\..\..\..\source\shell\media\sdl2\vsf_sdl2_pixelformat.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\httpd\vsf_linux_httpd.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\ntp\vsf_linux_ntp.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\app\telnetd\vsf_linux_telnetd.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\devfs\vsf_linux_devfs.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\vsf_linux_vfs.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\fs\vsf_linux_fs.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_hostsock.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\inet\vsf_linux_socket_inet_lwip.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c" />
@@ -493,7 +512,6 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\port\busybox\busybox.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\port\busybox\shell\vsh.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux.c" />
-    <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux_socket.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\xboot\vsf_xboot.c" />
     <ClCompile Include="..\..\..\..\source\utilities\compiler\x86\x86_compiler.c" />
     <ClCompile Include="..\..\..\..\source\utilities\compiler\__common\__retarget_io.c" />
