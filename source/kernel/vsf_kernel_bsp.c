@@ -410,7 +410,9 @@ void __cmain(void)
     ||  __IS_COMPILER_ARM_COMPILER_6__
 
 #if __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
-__attribute__((constructor(255)))
+// FIXME: priority of constructor is unsigned int,
+//  fix if 0xFFFFFFFF is not the right highest priority(executed last)
+__attribute__((constructor(0xFFFFFFFF)))
 #endif
 void vsf_main_entry(void)
 {
