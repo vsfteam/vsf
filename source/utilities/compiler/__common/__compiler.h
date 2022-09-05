@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 /*============================ INCLUDES ======================================*/
+
 #include "vsf_cfg.h"
 
 /*============================ MACROS ========================================*/
@@ -74,6 +75,12 @@ extern "C" {
 
 #ifndef __IS_COMPILER_IAR__
 #   define __IS_COMPILER_IAR__  0
+#endif
+
+#ifndef MAX_CONSTRUCTOR_PRIORITY
+#   if __IS_COMPILER_GCC__ ||  __IS_COMPILER_LLVM__
+#       define MAX_CONSTRUCTOR_PRIORITY                 0xFFFFFFFF
+#   endif
 #endif
 
 //! \brief none standard memory types

@@ -95,6 +95,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*----------------------------------------------------------------------------*
+ * Overwrite MAX_CONSTRUCTOR_PRIORITY if necessary                            *
+ *----------------------------------------------------------------------------*/
+#if     __IS_COMPILER_GCC__                                                     \
+    ||  __IS_COMPILER_LLVM__                                                    \
+    ||  __IS_COMPILER_ARM_COMPILER_5__                                          \
+    ||  __IS_COMPILER_ARM_COMPILER_6__
+#   undef MAX_CONSTRUCTOR_PRIORITY
+#   define MAX_CONSTRUCTOR_PRIORITY             65535
+#endif
+
 /* -----------------  Start of section using anonymous unions  -------------- */
 #if __IS_COMPILER_ARM_COMPILER_5__
   //#pragma push
