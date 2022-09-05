@@ -70,10 +70,9 @@
 /*----------------------------------------------------------------------------*
  * Overwrite MAX_CONSTRUCTOR_PRIORITY if necessary                            *
  *----------------------------------------------------------------------------*/
-#if     __IS_COMPILER_GCC__                                                     \
-    ||  __IS_COMPILER_LLVM__                                                    \
-    ||  __IS_COMPILER_ARM_COMPILER_5__                                          \
+#if     __IS_COMPILER_ARM_COMPILER_5__                                          \
     ||  __IS_COMPILER_ARM_COMPILER_6__
+// TODO: what is the real MAX_CONSTRUCTOR_PRIORITY for arm-compiler 5/6?
 #   ifndef MAX_CONSTRUCTOR_PRIORITY
 #       define MAX_CONSTRUCTOR_PRIORITY        65535
 #   endif
