@@ -13,9 +13,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cc: [gcc-9, gcc-10, gcc-11, clang]
-        os: [ubuntu-latest, macos-12]
-        src: [linux, macos]
+        cc: [9, 10, 11]
+        os: [ubuntu-latest]
+        src: [linux]
         exclude:
           - os: ubuntu-latest
             src: macos
@@ -49,7 +49,8 @@ jobs:
       run: cmake -GNinja -S ${SOURCE_PATH} -B ${SOURCE_PATH}/build
       shell: bash -ileo pipefail {0}
       env:
-        CC: ${{matrix.cc}}
+        CC: gcc-${{matrix.gcc}}
+        CXX: gxx-${{matrix.gcc}}
         VSF_PATH: ${{github.workspace}}
         SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{matrix.src}}
 
