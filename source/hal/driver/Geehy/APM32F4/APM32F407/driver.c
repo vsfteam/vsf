@@ -18,25 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
-
-#undef VSF_NUVOTON_DRIVER_HEADER
-
-#if     defined(__M484__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./M480/M484/driver.h"
-#elif   defined(__NUC505__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./NUC500/NUC505/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_NUVOTON_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_NUVOTON_H__
-#define __HAL_DRIVER_NUVOTON_H__
-
+#include "./device.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -44,7 +26,23 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
+
+// TODO: if these initialization is implemented in startup file, remove here
+int __low_level_init(void)
+{
+    return 1;
+}
+
+/*! \note initialize device driver
+ *  \param none
+ *  \retval true initialization succeeded.
+ *  \retval false initialization failed
+ */
+bool vsf_driver_init(void)
+{
+    return true;
+}
 
 
-#endif
 /* EOF */

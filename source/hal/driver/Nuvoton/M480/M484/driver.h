@@ -25,6 +25,7 @@
 #       define __HAL_DRIVER_NUVOTON_M484_H__
 
 /*============================ INCLUDES ======================================*/
+
 #       include "hal/vsf_hal_cfg.h"
 #       include "./device.h"
 #       include "./interrupt_swi.h"

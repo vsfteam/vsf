@@ -15,28 +15,20 @@
  *                                                                           *
  ****************************************************************************/
 
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+
+#   include "../__device.h"
+
+#else
+
+#   ifndef __HAL_DRIVER_GEEHY_APM32F407_H__
+#       define __HAL_DRIVER_GEEHY_APM32F407_H__
+
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
-
-#undef VSF_NUVOTON_DRIVER_HEADER
-
-#if     defined(__M484__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./M480/M484/driver.h"
-#elif   defined(__NUC505__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./NUC500/NUC505/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_NUVOTON_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_NUVOTON_H__
-#define __HAL_DRIVER_NUVOTON_H__
-
+#       include "hal/vsf_hal_cfg.h"
+#       include "./device.h"
+#       include "./interrupt_swi.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -44,7 +36,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
+#   endif
 
 #endif
 /* EOF */

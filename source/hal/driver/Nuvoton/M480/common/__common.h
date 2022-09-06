@@ -53,6 +53,7 @@ typedef enum m480_usbphy_role_t m480_usbphy_role_t;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
+
 extern bool m480_reg_unlock(void);
 extern void m480_reg_lock(bool islocked);
 

@@ -19,26 +19,52 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_NUVOTON_DRIVER_HEADER
+/*============================ MACROS ========================================*/
 
-#if     defined(__M484__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./M480/M484/driver.h"
-#elif   defined(__NUC505__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./NUC500/NUC505/driver.h"
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+/*\note first define basic info for arch. */
+//! arch info
+#   define VSF_ARCH_PRI_NUM         8
+#   define VSF_ARCH_PRI_BIT         3
+
+// software interrupt provided by a dedicated device
+#define VSF_DEV_SWI_NUM             2
+
 #else
-#   error No supported device found.
-#endif
 
-/* include specified device driver header file */
-#include VSF_NUVOTON_DRIVER_HEADER
+#ifndef __HAL_DEVICE_GEEHY_APM32F407_H__
+#define __HAL_DEVICE_GEEHY_APM32F407_H__
 
+// software interrupt provided by a dedicated device
+#define VSF_DEV_SWI_LIST            79, 80
+#define SWI0_IRQHandler             CRYPT_IRQHandler
+#define SWI1_IRQHandler             HASH_RNG_IRQHandler
 
+/*============================ INCLUDES ======================================*/
 
-#ifndef __HAL_DRIVER_NUVOTON_H__
-#define __HAL_DRIVER_NUVOTON_H__
-
+/*\note this is should be the only place where __common.h is included.*/
+#include "../common/__common.h"
 
 /*============================ MACROS ========================================*/
+
+// user configurations with default value
+
+#define VSF_HW_USB_HC_COUNT         2
+
+#define VSF_HW_USB_HC0_TYPE         usbhc
+//#define VSF_HW_USB_HC0_IRQHandler   OHCI_IRQHandler
+//#define VSF_HW_USB_HC0_CONFIG
+
+#define VSF_HW_USB_DC_COUNT         2
+#define VSF_HW_USB_DC_HS_COUNT      1
+#define VSF_HW_USB_DC_FS_COUNT      1
+
+#define VSF_HW_USB_DC0_TYPE         usbdc
+//#define VSF_HW_USB_DC0_IRQHandler   USBD20_IRQHandler
+#define VSF_HW_USB_DC0_EP_NUM       8
+//#define VSF_HW_USB_DC0_CONFIG
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -46,5 +72,6 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif
+#endif      // __HAL_DEVICE_GEEHY_APM32F407_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

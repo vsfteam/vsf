@@ -46,6 +46,6 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif      // __HAL_DRIVER_NUVOTON_M480_DEVICE_H__
+#endif      // __HAL_DEVICE_NUVOTON_M480_H__
 #endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

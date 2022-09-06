@@ -15,34 +15,27 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __HAL_DRIVER_GEEHY_APM32F407_COMMON_H__
+#define __HAL_DRIVER_GEEHY_APM32F407_COMMON_H__
+
+/* \note __common.h should only be included by device.h */
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
+#include "./vendor/Include/apm32f4xx.h"
+#include "hal/arch/vsf_arch.h"
 
-#undef VSF_NUVOTON_DRIVER_HEADER
-
-#if     defined(__M484__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./M480/M484/driver.h"
-#elif   defined(__NUC505__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./NUC500/NUC505/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_NUVOTON_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_NUVOTON_H__
-#define __HAL_DRIVER_NUVOTON_H__
-
+// CMSIS headers which will not be included in core_xxx.h
+//  and arm_math.h CAN ONLY be included after core_xxx.h
+#include "arm_math.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
 

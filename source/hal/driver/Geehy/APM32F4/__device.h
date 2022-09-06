@@ -16,27 +16,27 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_NUVOTON_DRIVER_HEADER
+#undef VSF_DEVICE_HEADER
 
-#if     defined(__M484__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./M480/M484/driver.h"
-#elif   defined(__NUC505__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./NUC500/NUC505/driver.h"
+#if     defined(__APM32F407__)
+#   define  VSF_DEVICE_HEADER       "./APM32F407/device.h"
 #else
 #   error No supported device found.
 #endif
 
 /* include specified device driver header file */
-#include VSF_NUVOTON_DRIVER_HEADER
+#include VSF_DEVICE_HEADER
 
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#   ifndef __CPU_ARM__
+#       define __CPU_ARM__
+#   endif
+#else
 
-
-#ifndef __HAL_DRIVER_NUVOTON_H__
-#define __HAL_DRIVER_NUVOTON_H__
-
+#ifndef __HAL_DEVICE_GEEHY_APM32F4_H__
+#define __HAL_DEVICE_GEEHY_APM32F4_H__
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -46,5 +46,6 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif
+#endif      // __HAL_DEVICE_GEEHY_APM32F4_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

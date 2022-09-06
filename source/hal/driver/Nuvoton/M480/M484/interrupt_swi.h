@@ -14,10 +14,12 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
+
 #ifndef __HAL_DRIVER_NUVOTON_M484_INTERRUPT_SWI_H__
 #define __HAL_DRIVER_NUVOTON_M484_INTERRUPT_SWI_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "./device.h"
 #include "hal/driver/common/swi/vsf_swi_template.h"

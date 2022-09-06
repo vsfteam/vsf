@@ -19,23 +19,21 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_NUVOTON_DRIVER_HEADER
+#undef VSF_GEEHY_DRIVER_HEADER
 
-#if     defined(__M484__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./M480/M484/driver.h"
-#elif   defined(__NUC505__)
-#   define  VSF_NUVOTON_DRIVER_HEADER       "./NUC500/NUC505/driver.h"
+#if     defined(__APM32F407__)
+#   define  VSF_GEEHY_DRIVER_HEADER         "./APM32F4/APM32F407/driver.h"
 #else
 #   error No supported device found.
 #endif
 
 /* include specified device driver header file */
-#include VSF_NUVOTON_DRIVER_HEADER
+#include VSF_GEEHY_DRIVER_HEADER
 
 
 
-#ifndef __HAL_DRIVER_NUVOTON_H__
-#define __HAL_DRIVER_NUVOTON_H__
+#ifndef __HAL_DRIVER_GEEHY_H__
+#define __HAL_DRIVER_GEEHY_H__
 
 
 /*============================ MACROS ========================================*/
