@@ -31,7 +31,13 @@
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             2
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern unsigned int SystemCoreClock;
+#ifdef __cplusplus
+}
+#endif
 #define VSF_ARCH_SYSTIMER_FREQ      SystemCoreClock
 
 #else
