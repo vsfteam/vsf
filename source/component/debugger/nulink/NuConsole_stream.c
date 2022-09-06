@@ -55,19 +55,19 @@ static uint8_t __vsf_debug_stream_rx_buff[VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE];
 
 #if     VSF_USE_SIMPLE_STREAM == ENABLED
 static void __vsf_nu_console_stream_init(vsf_stream_t *stream);
-static uint_fast32_t __vsf_nu_console_stream_write( vsf_stream_t *stream, 
-                                                    uint8_t *buf, 
+static uint_fast32_t __vsf_nu_console_stream_write( vsf_stream_t *stream,
+                                                    uint8_t *buf,
                                                     uint_fast32_t size);
 static uint_fast32_t __vsf_nu_console_stream_get_data_length(vsf_stream_t *stream);
 static uint_fast32_t __vsf_nu_console_stream_get_avail_length(vsf_stream_t *stream);
 #elif   VSF_USE_STREAM == ENABLED
-static vsf_err_t __vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr, 
+static vsf_err_t __vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
                                                     vsf_pbuf_t *pblock);
-static 
+static
 vsf_stream_status_t __vsf_nu_console_stream_tx_get_status(vsf_stream_tx_t *obj_ptr);
 
-static vsf_err_t __vsf_nu_console_stream_tx_dat_drn_evt_reg(  
-                                            vsf_stream_tx_t *obj_ptr, 
+static vsf_err_t __vsf_nu_console_stream_tx_dat_drn_evt_reg(
+                                            vsf_stream_tx_t *obj_ptr,
                                             vsf_stream_dat_drn_evt_t event);
 #endif
 
@@ -128,11 +128,14 @@ void VSF_DEBUG_STREAM_POLL(void)
 
 static void __vsf_nu_console_stream_init(vsf_stream_t *stream)
 {
+    vsf_stream_connect_rx(stream);
+    vsf_stream_connect_tx(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t);
+
     __vsf_nu_console_stream_init_imp();
 }
 
-static uint_fast32_t __vsf_nu_console_stream_write( vsf_stream_t *stream, 
-                                                    uint8_t *buf, 
+static uint_fast32_t __vsf_nu_console_stream_write( vsf_stream_t *stream,
+                                                    uint8_t *buf,
                                                     uint_fast32_t size)
 {
     __vsf_nu_console_stream_init_imp();
@@ -151,7 +154,7 @@ uint_fast32_t __vsf_nu_console_stream_get_avail_length(vsf_stream_t *stream)
 
 #elif   VSF_USE_STREAM == ENABLED
 
-static vsf_err_t __vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr, 
+static vsf_err_t __vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
                                                     vsf_pbuf_t *block_ptr)
 {
     vsf_err_t result = VSF_ERR_NONE;
@@ -169,13 +172,13 @@ static vsf_err_t __vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
             //! no direct access: todo add support
             result = VSF_ERR_NOT_ACCESSABLE;
             break;
-        } else 
+        } else
     #endif
         {
-            NuConsole_Write(vsf_pbuf_buffer_get(block_ptr), 
+            NuConsole_Write(vsf_pbuf_buffer_get(block_ptr),
                             vsf_pbuf_size_get(block_ptr));
         }
-        
+
     } while(0);
 
     vsf_pbuf_free(block_ptr);
@@ -183,14 +186,14 @@ static vsf_err_t __vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
     return result;
 }
 
-static 
+static
 vsf_stream_status_t __vsf_nu_console_stream_tx_get_status(vsf_stream_tx_t *obj_ptr)
 {
     return (vsf_stream_status_t){0};//s_tNuStream.Status;
 }
 
-static vsf_err_t __vsf_nu_console_stream_tx_dat_drn_evt_reg(  
-                                            vsf_stream_tx_t *obj_ptr, 
+static vsf_err_t __vsf_nu_console_stream_tx_dat_drn_evt_reg(
+                                            vsf_stream_tx_t *obj_ptr,
                                             vsf_stream_dat_drn_evt_t event)
 {
     //s_tNuStream.event = event;

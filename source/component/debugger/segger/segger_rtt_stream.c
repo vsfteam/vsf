@@ -122,6 +122,9 @@ void VSF_DEBUG_STREAM_POLL(void)
 
 static void __vsf_segger_rtt_stream_init(vsf_stream_t *stream)
 {
+    vsf_stream_connect_rx(stream);
+    vsf_stream_connect_tx(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t);
+
     __vsf_segger_rtt_stream_init_imp();
 }
 
