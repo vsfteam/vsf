@@ -59,20 +59,44 @@ extern unsigned int SystemCoreClock;
 
 // user configurations with default value
 
-#define VSF_HW_USB_HC_COUNT         2
+#ifndef VSF_HW_USB_OTG1_USB_CFG_SPEED
+#   define VSF_HW_USB_OTG1_USB_CFG_SPEED        USB_SPEED_HIGH
+#endif
 
-#define VSF_HW_USB_HC0_TYPE         usbhc
-//#define VSF_HW_USB_HC0_IRQHandler   OHCI_IRQHandler
-//#define VSF_HW_USB_HC0_CONFIG
+// HW definition
 
-#define VSF_HW_USB_DC_COUNT         2
-#define VSF_HW_USB_DC_HS_COUNT      1
-#define VSF_HW_USB_DC_FS_COUNT      1
+#define VSF_HW_USB_OTG_COUNT        2
+// required by dwcotg, define the max ep number of dwcotg include ep0
+#define USB_DWCOTG_MAX_EP_NUM       16
 
-#define VSF_HW_USB_DC0_TYPE         usbdc
-//#define VSF_HW_USB_DC0_IRQHandler   USBD20_IRQHandler
-#define VSF_HW_USB_DC0_EP_NUM       8
-//#define VSF_HW_USB_DC0_CONFIG
+#define USB_OTG_FS_BASE             ((uint32_t)0x50000000)
+#define USB_OTG_HS_BASE             ((uint32_t)0x40040000)
+
+#define VSF_HW_USB_OTG0_IRQHandler  OTG_FS_IRQHandler
+#define VSF_HW_USB_OTG0_CONFIG                                                  \
+            .dc_ep_num              = 8 << 1,                                   \
+            .hc_ep_num              = 11,                                       \
+            .reg                    = (void *)USB_OTG_FS_BASE,                  \
+            /* vk_dwcotg_hw_info_t */                                           \
+                .buffer_word_size   = 256,                                      \
+                .speed              = USB_SPEED_FULL,                           \
+                .dma_en             = true,                                     \
+                .ulpi_en            = true,                                     \
+                .utmi_en            = false,                                    \
+                .vbus_en            = false,
+
+#define VSF_HW_USB_OTG1_IRQHandler  OTG_HS_IRQHandler
+#define VSF_HW_USB_OTG1_CONFIG                                                  \
+            .dc_ep_num              = 8 << 1,                                   \
+            .hc_ep_num              = 11,                                       \
+            .reg                    = (void *)USB_OTG_HS_BASE,                  \
+            /* vk_dwcotg_hw_info_t */                                           \
+                .buffer_word_size   = 256,                                      \
+                .speed              = VSF_HW_USB_OTG1_USB_CFG_SPEED,            \
+                .dma_en             = true,                                     \
+                .ulpi_en            = true,                                     \
+                .utmi_en            = false,                                    \
+                .vbus_en            = false,
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
