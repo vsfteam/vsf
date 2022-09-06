@@ -89,7 +89,8 @@ vsf_class(vk_usbd_hid_t) {
         uint8_t cur_report;
         uint8_t cur_in_id;
 
-        bool busy;
+        uint8_t busy : 1;
+        uint8_t report_from_control : 1;
 
         vk_usbd_trans_t transact_in;
         vk_usbd_trans_t transact_out;
@@ -106,9 +107,9 @@ extern const vk_usbd_class_op_t vk_usbd_hid;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern bool vk_usbh_hid_in_report_can_update(vk_usbd_hid_report_t *report);
+extern bool vk_usbd_hid_in_report_can_update(vk_usbd_hid_report_t *report);
 extern void vk_usbd_hid_in_report_changed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report);
-extern void vk_usbh_hid_out_report_processed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report);
+extern void vk_usbd_hid_out_report_processed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report);
 
 #ifdef __cplusplus
 }
