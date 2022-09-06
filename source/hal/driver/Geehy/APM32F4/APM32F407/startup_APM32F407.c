@@ -460,6 +460,8 @@ void Reset_Handler(void)
     vsf_arch_set_stack((uintptr_t)&__INITIAL_SP);
     vsf_hal_pre_startup_init();
 
+    SystemInit();
+
     //! enable FPU
     SCB->CPACR |= ((3U << 10U*2U) |           /* enable CP10 Full Access */
                    (3U << 11U*2U));           /* enable CP11 Full Access */

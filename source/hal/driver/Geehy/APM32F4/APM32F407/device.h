@@ -31,6 +31,9 @@
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             2
 
+extern unsigned int SystemCoreClock;
+#define VSF_ARCH_SYSTIMER_FREQ      SystemCoreClock
+
 #else
 
 #ifndef __HAL_DEVICE_GEEHY_APM32F407_H__

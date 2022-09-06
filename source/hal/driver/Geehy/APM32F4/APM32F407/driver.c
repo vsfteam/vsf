@@ -41,6 +41,7 @@ int __low_level_init(void)
  */
 bool vsf_driver_init(void)
 {
+    SystemCoreClockUpdate();
     return true;
 }
 
