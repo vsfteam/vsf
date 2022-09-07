@@ -56,4 +56,9 @@ void vsf_hw_usbh_get_info(vsf_hw_usb_t *hc, usb_hc_ip_info_t *info)
     dwcotg_info->use_as__vk_dwcotg_hw_info_t = param->use_as__vk_dwcotg_hw_info_t;
 }
 
+void vsf_hw_usbh_irq(vsf_hw_usb_t *dc)
+{
+    VSF_HAL_ASSERT(false);
+}
+
 #endif

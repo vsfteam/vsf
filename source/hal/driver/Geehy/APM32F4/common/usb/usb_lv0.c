@@ -32,12 +32,12 @@
 static const vsf_hw_usb_const_t __USB_OTG##__N##_const = {                      \
     VSF_HW_USB_OTG##__N##_CONFIG                                                \
 };                                                                              \
-vsf_hw_usb_t VSF_HW_USB_OTG##__N##_IP = {                                       \
+vsf_hw_usb_t USB_OTG##__N##_IP = {                                              \
     .param = &__USB_OTG##__N##_const,                                           \
 };                                                                              \
 ROOT ISR(VSF_HW_USB_OTG##__N##_IRQHandler)                                      \
 {                                                                               \
-    vsf_hw_usb_t *usb = &VSF_HW_USB_OTG##__N##_IP;                              \
+    vsf_hw_usb_t *usb = &USB_OTG##__N##_IP;                                     \
     if (usb->callback.irqhandler != NULL) {                                     \
         usb->callback.irqhandler(usb->callback.param);                          \
     }                                                                           \

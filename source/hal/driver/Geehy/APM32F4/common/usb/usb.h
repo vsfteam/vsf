@@ -33,7 +33,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define ____USB_OTG_DEF(__N, __VALUE)                                           \
-    extern vsf_hw_usb_t USB_OTG##__N##_IP;                                     \
+    extern vsf_hw_usb_t USB_OTG##__N##_IP;                                      \
     extern const i_usb_dc_ip_t VSF_USB_DC##__N##_IP;                            \
     extern const i_usb_hc_ip_t VSF_USB_HC##__N##_IP;
 #define __USB_OTG_DEF(__N, __VALUE)         ____USB_OTG_DEF(__N, __VALUE)
@@ -65,7 +65,7 @@ typedef struct vsf_hw_usb_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_DEF, NULL)
+VSF_MREPEAT(VSF_HW_USB_OTG_COUNT, USB_OTG_DEF, NULL)
 
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/

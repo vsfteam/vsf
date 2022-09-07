@@ -67,4 +67,9 @@ void vsf_hw_usbd_disconnect(vsf_hw_usb_t *dc)
 {
 }
 
+void vsf_hw_usbd_irq(aic8800_usb_t *dc)
+{
+    VSF_HAL_ASSERT(false);
+}
+
 #endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_DCD_DWCOTG
