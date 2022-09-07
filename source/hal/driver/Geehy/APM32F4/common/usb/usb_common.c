@@ -33,8 +33,14 @@
 vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority,
             bool is_fs_phy, usb_ip_irqhandler_t handler, void *param)
 {
+    const vsf_hw_usb_const_t *usb_hw_param = usb->param;
+
     usb->callback.irqhandler = handler;
     usb->callback.param = param;
+
+    NVIC_SetPriority(usb_hw_param->irq, priority);
+    NVIC_ClearPendingIRQ(usb_hw_param->irq);
+    NVIC_EnableIRQ(usb_hw_param->irq);
     return VSF_ERR_NONE;
 }
 
