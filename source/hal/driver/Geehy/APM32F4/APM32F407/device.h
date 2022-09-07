@@ -29,7 +29,7 @@
 #   define VSF_ARCH_PRI_BIT         3
 
 // software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_NUM             2
+#define VSF_DEV_SWI_NUM             1
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,9 +46,10 @@ extern unsigned int SystemCoreClock;
 #define __HAL_DEVICE_GEEHY_APM32F407_H__
 
 // software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_LIST            79, 80
+#define VSF_DEV_SWI_LIST            79
 #define SWI0_IRQHandler             CRYPT_IRQHandler
-#define SWI1_IRQHandler             HASH_RNG_IRQHandler
+
+#define RNG_IRQHandler              HASH_RNG_IRQHandler
 
 /*============================ INCLUDES ======================================*/
 
