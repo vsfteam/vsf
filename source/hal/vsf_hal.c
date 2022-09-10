@@ -34,29 +34,23 @@ extern bool vsf_driver_init(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_DRIVER_INIT
 WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
     return true;
 }
-#endif
 
-#ifndef WEAK_VSF_APP_DRIVER_INIT
 WEAK(vsf_app_driver_init)
 bool vsf_app_driver_init(void)
 {
     return true;
 }
-#endif
 
-#ifndef WEAK_VSF_DRIVER_POLL
 WEAK(vsf_driver_poll)
 bool vsf_driver_poll(void)
 {
     return true;
 }
-#endif
 
 /*! \note initialize level 0/1 hardware abstract layer
  *  \param none

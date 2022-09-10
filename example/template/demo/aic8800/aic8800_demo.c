@@ -20,6 +20,15 @@
 #define __VSF_HEAP_CLASS_INHERIT__
 #include "vsf.h"
 
+#if APP_USE_LINUX_TTY_DEMO == ENABLED
+//  for VSF_LINUX_CFG_BIN_PATH
+#   if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#       include "shell/sys/linux/include/unistd.h"
+#   else
+#       include <unistd.h>
+#   endif
+#endif
+
 #ifdef __AIC8800__
 
 #include "rtos_al.h"
@@ -75,7 +84,7 @@ void __vsf_usbh_free(void *buffer)
 }
 #endif
 
-void aic8800_demo_init(void)
+void vsf_board_init(void)
 {
     dbg("\r\n    dsp_clock: %dM, sys_clock: %dM, pclk: %dM, flash_clock: %dM\r\n",
             DSPSysCoreClock / 1000000, SystemCoreClock / 1000000,
@@ -104,6 +113,16 @@ void aic8800_demo_init(void)
 #if AIC8800_APP_USE_BT_DEMO == ENABLED && APP_USE_BTSTACK_DEMO == ENABLED
     extern vsf_err_t aic8800_bt_start(void);
     aic8800_bt_start();
+#endif
+#if APP_USE_LINUX_TTY_DEMO == ENABLED
+    // TODO: use VSF APIs to configure io
+    // PA10/PA11 is USART1
+    iomux_gpio_config_sel_setf(10, 0x01);
+    iomux_gpio_config_sel_setf(11, 0x01);
+    vsf_linux_fs_bind_uart("/dev/ttyS0", (vsf_usart_t *)&vsf_hw_usart1);
+
+    extern int tty_main(int argc, char *argv[]);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/tty", tty_main);
 #endif
 }
 
