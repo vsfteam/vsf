@@ -46,6 +46,7 @@ typedef struct vsf_hw_usb_const_t {
     uint8_t hc_ep_num;
     IRQn_Type irq;
     void *reg;
+    void *phy_reg;
 
     implement(vk_dwcotg_hw_info_t)
 } vsf_hw_usb_const_t;

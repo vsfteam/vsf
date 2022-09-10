@@ -25,6 +25,26 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef struct vk_hw_usb_phyreg_t {
+    uint32_t USB_SWITCH;
+    uint32_t POWERON_CORE;
+    uint32_t USB_PLL_EN;
+    uint32_t SHORT_5V_ENABLE;
+    uint32_t OTG_SUSPENDM;
+    uint32_t TXBITSTUFFENABLE;
+    uint32_t PLLICP_SEL_I2C;
+    uint32_t HSZR_CNTL_I2C;
+    uint32_t SQVTH_CNTL_I2C;
+    uint32_t SW_RREF_I2C;
+    uint32_t SW_BUF_I2C;
+    uint32_t TX2RX_T_CFG_I2C;
+    uint32_t TEST_ANA_FAST_I2C;
+    uint32_t CLK_MODE_I2C;
+    uint32_t USB_DBNCE_FLTR_BYPASS;
+    uint32_t USB_SS_SCALEDOWN_MODE;
+} vk_hw_usb_phyreg_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -34,6 +54,17 @@ vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority,
             bool is_fs_phy, usb_ip_irqhandler_t handler, void *param)
 {
     const vsf_hw_usb_const_t *usb_hw_param = usb->param;
+    vk_hw_usb_phyreg_t *phy_reg = (vk_hw_usb_phyreg_t *)usb_hw_param->phy_reg;
+
+    if (phy_reg != NULL) {
+        phy_reg->USB_SWITCH = 1;
+        phy_reg->POWERON_CORE = 1;
+        phy_reg->OTG_SUSPENDM = 1;
+
+        __asm("nop"); __asm("nop"); __asm("nop"); __asm("nop");
+        __asm("nop"); __asm("nop"); __asm("nop"); __asm("nop");
+        phy_reg->PLLICP_SEL_I2C = 5;
+    }
 
     usb->callback.irqhandler = handler;
     usb->callback.param = param;

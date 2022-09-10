@@ -87,16 +87,17 @@ extern unsigned int SystemCoreClock;
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
 
-#define VSF_HW_USB_OTG1_IRQHandler  OTG_HS_IRQHandler
+#define VSF_HW_USB_OTG1_IRQHandler  OTG_HS1_IRQHandler
 #define VSF_HW_USB_OTG1_CONFIG                                                  \
             .dc_ep_num              = (USB_DWCOTG_MAX_EP_NUM - 1) << 1,         \
             .hc_ep_num              = USB_DWCOTG_MAX_EP_NUM,                    \
             .reg                    = (void *)USB_OTG_HS_BASE,                  \
+            .phy_reg                = (void *)(USB_OTG_HS_BASE + 0x200),        \
             .irq                    = OTG_HS1_IRQn,                             \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size   = 1024,                                     \
                 .speed              = VSF_HW_USB_OTG1_USB_CFG_SPEED,            \
-                .dma_en             = true,                                     \
+                .dma_en             = false,                                    \
                 .ulpi_en            = false,                                    \
                 .utmi_en            = true,                                     \
                 .vbus_en            = false,
