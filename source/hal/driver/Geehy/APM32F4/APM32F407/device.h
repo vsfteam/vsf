@@ -82,7 +82,7 @@ extern unsigned int SystemCoreClock;
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size   = 320,                                      \
                 .speed              = USB_SPEED_FULL,                           \
-                .dma_en             = true,                                     \
+                .dma_en             = false,                                    \
                 .ulpi_en            = false,                                    \
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
