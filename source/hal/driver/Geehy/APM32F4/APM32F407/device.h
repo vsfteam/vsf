@@ -68,15 +68,15 @@ extern unsigned int SystemCoreClock;
 
 #define VSF_HW_USB_OTG_COUNT        2
 // required by dwcotg, define the max ep number of dwcotg include ep0
-#define USB_DWCOTG_MAX_EP_NUM       5
+#define USB_DWCOTG_MAX_EP_NUM       6
 
 #define USB_OTG_FS_BASE             ((uint32_t)0x50000000)
 #define USB_OTG_HS_BASE             ((uint32_t)0x40040000)
 
 #define VSF_HW_USB_OTG0_IRQHandler  OTG_FS_IRQHandler
 #define VSF_HW_USB_OTG0_CONFIG                                                  \
-            .dc_ep_num              = USB_DWCOTG_MAX_EP_NUM << 1,               \
-            .hc_ep_num              = 6,                                        \
+            .dc_ep_num              = (USB_DWCOTG_MAX_EP_NUM - 1) << 1,         \
+            .hc_ep_num              = USB_DWCOTG_MAX_EP_NUM,                    \
             .reg                    = (void *)USB_OTG_FS_BASE,                  \
             .irq                    = OTG_FS_IRQn,                              \
             /* vk_dwcotg_hw_info_t */                                           \
@@ -89,8 +89,8 @@ extern unsigned int SystemCoreClock;
 
 #define VSF_HW_USB_OTG1_IRQHandler  OTG_HS_IRQHandler
 #define VSF_HW_USB_OTG1_CONFIG                                                  \
-            .dc_ep_num              = USB_DWCOTG_MAX_EP_NUM << 1,               \
-            .hc_ep_num              = 6,                                        \
+            .dc_ep_num              = (USB_DWCOTG_MAX_EP_NUM - 1) << 1,         \
+            .hc_ep_num              = USB_DWCOTG_MAX_EP_NUM,                    \
             .reg                    = (void *)USB_OTG_HS_BASE,                  \
             .irq                    = OTG_HS1_IRQn,                             \
             /* vk_dwcotg_hw_info_t */                                           \
