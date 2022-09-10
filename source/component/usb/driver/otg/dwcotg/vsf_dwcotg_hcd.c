@@ -117,6 +117,7 @@ typedef struct vk_dwcotg_hcd_urb_t {
 #endif
 
     uint16_t current_size;
+    uint16_t pos;
 
     uint32_t timeout;
 
@@ -125,6 +126,16 @@ typedef struct vk_dwcotg_hcd_urb_t {
     void *orig_buffer;
 #endif
 } vk_dwcotg_hcd_urb_t;
+
+typedef union vk_dwcotg_fifo_status_t {
+    volatile uint32_t word;
+    struct {
+        volatile uint32_t channel   : 4;
+        volatile uint32_t size      : 11;
+        volatile uint32_t pid       : 2;
+        volatile uint32_t status    : 4;
+    };
+} vk_dwcotg_fifo_status_t;
 
 typedef struct vk_dwcotg_hcd_t {
     implement(vk_dwcotg_t)
@@ -260,11 +271,16 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
     if (    (urb->pipe.type == USB_ENDPOINT_XFER_BULK)
         ||  (urb->pipe.type == USB_ENDPOINT_XFER_CONTROL)) {
         // in DMA mode, no need to check request queue
-        if (!dwcotg_hcd->dma_en && dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) {
-            channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
-            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
-            channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
-            // skip delay
+        if (!dwcotg_hcd->dma_en) {
+            if (dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) {
+                channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
+                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+                channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
+                // skip delay
+            } else {
+                VSF_USB_ASSERT(false);
+//                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            }
         } else {
             // DO NOT enable channel, set CHDIS in DMA mode is enough to halt a channel.
             //  If CHENA is set here, there is possibility that the channel is enabled after halt,
@@ -273,11 +289,16 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
         }
     } else {
         // in DMA mode, no need to check request queue
-        if (!dwcotg_hcd->dma_en && dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) {
-            channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
-            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
-            channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
-            // skip delay
+        if (!dwcotg_hcd->dma_en) {
+            if (dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) {
+                channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
+                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+                channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
+                // skip delay
+            } else {
+                VSF_USB_ASSERT(false);
+//                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            }
         } else {
             // DO NOT enable channel, set CHDIS in DMA mode is enough to halt a channel.
             //  If CHENA is set here, there is possibility that the channel is enabled after halt,
@@ -324,6 +345,7 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
 //    }
 
     dwcotg_urb->current_size = size;
+    dwcotg_urb->pos = 0;
     channel_regs->hctsiz = ((pkt_num << 19) & USB_OTG_HCTSIZ_PKTCNT) | ((uint32_t)dpid << 29) | size;
 
 #if VSF_USBH_USE_HUB == ENABLED
@@ -377,7 +399,11 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
                         dwcotg_urb->channel_idx, urb);
 #endif
 
-    channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
+    if (dwcotg_hcd->dma_en) {
+        channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
+    } else {
+        channel_regs->hcintmsk = USB_OTG_HCINT_XFRC | USB_OTG_HCINT_NAK | USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
+    }
 #if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
     if (pipe.dir_in1out0 && (USB_ENDPOINT_XFER_BULK == pipe.type) && (pipe.speed == USB_SPEED_HIGH)) {
         dwcotg_urb->holdoff_cnt = 0;
@@ -390,7 +416,7 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
     vsf_unprotect_int(orig);
 
     if (!dwcotg_hcd->dma_en && !dir_in1out0 && (dwcotg_urb->current_size > 0)) {
-        // TODO: check FIFO space
+        VSF_USB_ASSERT((dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) >= size);
         uint32_t *fifo_reg = (uint32_t *)dwcotg_hcd->reg.dfifo[dwcotg_urb->channel_idx];
         for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
             *fifo_reg = get_unaligned_le32(buffer);
@@ -558,7 +584,6 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
     case VSF_EVT_INIT: {
             vk_dwcotg_hc_ip_info_t info = { 0 };
             param->op->GetInfo(&info.use_as__usb_hc_ip_info_t);
-            VSF_USB_ASSERT(info.dma_en);
 
             uint_fast32_t dwcotg_size = sizeof(*dwcotg_hcd) + info.ep_num * sizeof(vk_usbh_hcd_urb_t *);
             dwcotg_hcd = hcd->priv = vsf_usbh_malloc(dwcotg_size);
@@ -918,7 +943,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             is_to_notify = true;
         } else if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
             bool is_stall = channel_intsts & USB_OTG_HCINT_STALL;
-            bool is_in = channel_regs->hcchar & USB_OTG_HCCHAR_EPDIR;
+            bool is_in = urb->pipe.dir_in1out0;
 
             if (VSF_DWCOTG_HCD_PHASE_DATA == dwcotg_urb->phase) {
                 if (is_in) {
@@ -1119,6 +1144,17 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         //  set VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE to use buffer in urb
         vsf_trace_error("dwcotg_hcd.channel%d: ahb fatal error" VSF_TRACE_CFG_LINEEND, channel_idx);
         VSF_USB_ASSERT(false);
+    } else if (channel_intsts & USB_OTG_HCINT_XFRC) {
+        channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_XFRCM;
+        __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
+    } else if (channel_intsts & USB_OTG_HCINT_NAK) {
+        if (    (urb->pipe.type == USB_ENDPOINT_XFER_BULK)
+            ||  (urb->pipe.type == USB_ENDPOINT_XFER_CONTROL)) {
+            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+        } else {
+            channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_NAKM;
+            __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
+        }
     } else {
 #if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
         channel_intsts &= channel_regs->hcintmsk;
@@ -1182,11 +1218,11 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
 
                     if (dwcotg_hcd->reg.global_regs->grxfsiz > 0) {
                         // read rx queue first, if pktsts is CH_HALTED, then pop it
-                        uint32_t pktsts = (dwcotg_hcd->reg.global_regs->grxstsr & USB_OTG_GRXSTSP_PKTSTS) >> 17;
-                        if (pktsts == 7) {      // RXSTAT_CH_HALTED
+                        vk_dwcotg_fifo_status_t pktsts;
+                        pktsts.word = dwcotg_hcd->reg.global_regs->grxstsr;
+                        if ((pktsts.channel == i) && (pktsts.status == 7)) {    // RXSTAT_CH_HALTED
                             // just do a read
-                            volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
-                            VSF_UNUSED_PARAM(grxstsp);
+                            pktsts.word = dwcotg_hcd->reg.global_regs->grxstsp;
                         }
                     }
                 } else if (dwcotg_urb->is_discarded) {
@@ -1244,10 +1280,34 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
     }
     if (intsts & USB_OTG_GINTSTS_RXFLVL) {
         *intsts_reg = USB_OTG_GINTSTS_RXFLVL;
-        while (dwcotg_hcd->reg.global_regs->grxfsiz > 0) {
-            // just do a read
-            volatile uint32_t grxstsp = dwcotg_hcd->reg.global_regs->grxstsp;
-            VSF_UNUSED_PARAM(grxstsp);
+
+        struct dwcotg_hc_regs_t *channel_regs;
+        vk_dwcotg_fifo_status_t pktsts;
+        vk_usbh_hcd_urb_t *urb;
+        vk_dwcotg_hcd_urb_t *dwcotg_urb;
+        uint32_t *fifo_reg;
+        uint8_t *buffer;
+
+        while (dwcotg_hcd->reg.global_regs->gintsts & USB_OTG_GINTSTS_RXFLVL) {
+            pktsts.word = dwcotg_hcd->reg.global_regs->grxstsp;
+            if (!dwcotg_hcd->dma_en && (2 == pktsts.status) && (pktsts.size > 0)) {
+                urb = dwcotg_hcd->urb[pktsts.channel];
+                VSF_USB_ASSERT((urb != NULL) && (urb->buffer != NULL));
+                dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+                VSF_USB_ASSERT((dwcotg_urb->current_size - dwcotg_urb->pos) >= pktsts.size);
+
+                fifo_reg = (uint32_t *)dwcotg_hcd->reg.dfifo[dwcotg_urb->channel_idx];
+                buffer = (uint8_t *)urb->buffer + dwcotg_urb->pos;
+                dwcotg_urb->pos += pktsts.size;
+                for (uint_fast16_t i = 0; i < pktsts.size; i += 4, buffer += 4) {
+                    put_unaligned_le32(*fifo_reg, buffer);
+                }
+
+                channel_regs = &dwcotg_hcd->reg.host.hc_regs[pktsts.channel];
+                if ((channel_regs->hctsiz & USB_OTG_HCTSIZ_PKTCNT) >> 19) {
+                    channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+                }
+            }
         }
     }
     if (intsts & USB_OTG_GINTSTS_NPTXFE) {
@@ -1262,8 +1322,10 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
 #   endif
         if (hprt0 & USB_OTG_HPRT_PCDET) {
             *dwcotg_hcd->reg.host.hprt0 = hprt0_masked | USB_OTG_HPRT_PCDET;
-            // disable rx queue interrupt which is used to clear CH_HALTED while device disconnected
-            dwcotg_hcd->reg.global_regs->gintmsk &= ~USB_OTG_GINTMSK_RXFLVLM;
+            // disable rx queue interrupt which is used to clear CH_HALTED while device disconnected in dma mode
+            if (dwcotg_hcd->dma_en) {
+                dwcotg_hcd->reg.global_regs->gintmsk &= ~USB_OTG_GINTMSK_RXFLVLM;
+            }
 #   if VSF_DWCOTG_HCD_WORKAROUND_PORT_DISABLE_AS_DISCONNECT == ENABLED
             // if disconnect is not enabled, below timing will not be supported, so simply send a disconnect event first
             //  PCDET       -- connected
