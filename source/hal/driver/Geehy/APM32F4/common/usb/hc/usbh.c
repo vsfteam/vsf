@@ -42,14 +42,7 @@ vsf_err_t vsf_hw_usbh_init(vsf_hw_usb_t *hc, usb_hc_ip_cfg_t *cfg)
     bool is_fs_phy = hc->param->speed == USB_SPEED_FULL;
     hc->is_host = true;
 
-    vsf_err_t err = __vsf_hw_usb_init(hc, cfg->priority, is_fs_phy, cfg->irqhandler, cfg->param);
-    if (VSF_ERR_NONE == err) {
-        uint32_t *hfir = (uint32_t *)((uint8_t *)hc->param->reg + 0x404);
-        if (is_fs_phy) {
-            *hfir = 48000;
-        }
-    }
-    return err;
+    return __vsf_hw_usb_init(hc, cfg->priority, is_fs_phy, cfg->irqhandler, cfg->param);
 }
 
 void vsf_hw_usbh_get_info(vsf_hw_usb_t *hc, usb_hc_ip_info_t *info)

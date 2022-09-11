@@ -676,10 +676,14 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             reg->host.global_regs->hcfg &= ~USB_OTG_HCFG_FSLSPCS;
             if (dwcotg_hcd->speed == USB_SPEED_HIGH) {
                 reg->host.global_regs->hcfg &= ~USB_OTG_HCFG_FSLSS;
+                reg->host.global_regs->hfir = 60000;
             } else if (dwcotg_hcd->speed == USB_SPEED_FULL) {
                 reg->host.global_regs->hcfg |= USB_OTG_HCFG_FSLSS | USB_OTG_HCFG_FSLSPCS_0;
+                reg->host.global_regs->hfir = 48000;
             } else {
                 reg->host.global_regs->hcfg |= USB_OTG_HCFG_FSLSS | USB_OTG_HCFG_FSLSPCS_1;
+                // TODO: hfir for low speed?
+//                reg->host.global_regs->hfir = 12000;
             }
 
             // Flush FIFO
