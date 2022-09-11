@@ -87,7 +87,7 @@ void aic8800_usbh_get_info(aic8800_usb_t *hc, usb_hc_ip_info_t *info)
     dwcotg_info->ep_num = param->hc_ep_num;
     dwcotg_info->is_dma = true;
     dwcotg_info->use_as__vk_dwcotg_hw_info_t = param->use_as__vk_dwcotg_hw_info_t;
-    dwcotg_info->workaround_param = hc->reg;
+    dwcotg_info->workaround_param = param->reg;
     dwcotg_info->workaround = (vk_dwcotg_hcd_workaround_t *)&__aic8800_usbh_workaround;
 }
 
