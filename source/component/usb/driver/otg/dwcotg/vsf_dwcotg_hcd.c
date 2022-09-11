@@ -403,7 +403,10 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
     if (dwcotg_hcd->dma_en) {
         channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
     } else {
-        channel_regs->hcintmsk = USB_OTG_HCINT_XFRC | USB_OTG_HCINT_NAK | USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
+        channel_regs->hcintmsk = USB_OTG_HCINTMSK_XFRCM | USB_OTG_HCINTMSK_NAKM
+                            |   USB_OTG_HCINTMSK_TXERRM | USB_OTG_HCINTMSK_BBERRM
+                            |   USB_OTG_HCINTMSK_FRMORM | USB_OTG_HCINTMSK_DTERRM
+                            |   USB_OTG_HCINTMSK_CHHM | USB_OTG_HCINTMSK_AHBERR;
     }
 #if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
     if (pipe.dir_in1out0 && (USB_ENDPOINT_XFER_BULK == pipe.type) && (pipe.speed == USB_SPEED_HIGH)) {
@@ -1158,6 +1161,9 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_NAKM;
             __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
         }
+    } else if (channel_intsts & (USB_OTG_HCINT_TXERR | USB_OTG_HCINT_BBERR | USB_OTG_HCINT_FRMOR | USB_OTG_HCINT_DTERR)) {
+        channel_regs->hcintmsk &= ~(USB_OTG_HCINTMSK_TXERRM | USB_OTG_HCINTMSK_BBERRM | USB_OTG_HCINTMSK_FRMORM | USB_OTG_HCINTMSK_DTERRM);
+        __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
     } else {
 #if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
         channel_intsts &= channel_regs->hcintmsk;
