@@ -671,7 +671,6 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             vsf_teda_set_timer_ms(50);
             break;
         case DWCOTG_HCD_STATE_WAIT_ENABLE:
-            // USBx->GCCFG |= USB_OTG_GCCFG_VBDEN;
             reg->global_regs->gccfg |= USB_OTG_GCCFG_VBDEN;
             reg->host.global_regs->hcfg &= ~USB_OTG_HCFG_FSLSPCS;
             if (dwcotg_hcd->speed == USB_SPEED_HIGH) {
