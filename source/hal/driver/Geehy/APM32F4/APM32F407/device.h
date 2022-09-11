@@ -61,7 +61,8 @@ extern unsigned int SystemCoreClock;
 // user configurations with default value
 
 #ifndef VSF_HW_USB_OTG1_USB_CFG_SPEED
-#   define VSF_HW_USB_OTG1_USB_CFG_SPEED        USB_SPEED_HIGH
+// TODO: USB_SPEED_HIGH is not tested OK
+#   define VSF_HW_USB_OTG1_USB_CFG_SPEED        USB_SPEED_FULL
 #endif
 
 // HW definition

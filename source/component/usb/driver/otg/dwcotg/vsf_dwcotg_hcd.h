@@ -49,7 +49,6 @@ typedef struct vk_dwcotg_hcd_param_t {
 } vk_dwcotg_hcd_param_t;
 
 typedef struct vk_dwcotg_hcd_workaround_t {
-    void *param;
     // reset_port returns delay in ms before doing reset port
     uint_fast32_t (*reset_port)(void *param);
     uint_fast32_t (*enable_port)(void *param, uint8_t speed);
@@ -59,6 +58,7 @@ typedef struct vk_dwcotg_hcd_workaround_t {
 typedef struct vk_dwcotg_hc_ip_info_t {
     implement(usb_hc_ip_info_t)
     implement(vk_dwcotg_hw_info_t)
+    void *workaround_param;
     vk_dwcotg_hcd_workaround_t *workaround;
 } vk_dwcotg_hc_ip_info_t;
 

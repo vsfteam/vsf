@@ -166,6 +166,7 @@ typedef struct vk_dwcotg_hcd_t {
     vsf_slist_queue_t ready_queue;
     vsf_slist_queue_t pending_queue;
 
+    void *workaround_param;
     vk_dwcotg_hcd_workaround_t *workaround;
 
     vk_usbh_hcd_urb_t *urb[0];
@@ -369,7 +370,7 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
     if (dwcotg_hcd->dma_en && (size > 0)) {
         bool is_addr_valid;
         if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->check_dma_addr != NULL)) {
-            is_addr_valid = dwcotg_hcd->workaround->check_dma_addr(dwcotg_hcd->workaround->param, (uintptr_t)buffer);
+            is_addr_valid = dwcotg_hcd->workaround->check_dma_addr(dwcotg_hcd->workaround_param, (uintptr_t)buffer);
         } else {
             is_addr_valid = true;
         }
@@ -490,7 +491,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             dwcotg_hcd->speed = __vk_dwcotg_hcd_get_port_speed(hprt0);
             uint_fast32_t delay_ms = 20;
             if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->enable_port != NULL)) {
-                delay_ms = dwcotg_hcd->workaround->enable_port(dwcotg_hcd->workaround->param, dwcotg_hcd->speed);
+                delay_ms = dwcotg_hcd->workaround->enable_port(dwcotg_hcd->workaround_param, dwcotg_hcd->speed);
             }
             vsf_teda_set_timer_ms(delay_ms);
         } else if (NULL == dwcotg_hcd->dev) {
@@ -517,7 +518,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #endif
         dwcotg_hcd->is_reset_pending = true;
         if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port != NULL)) {
-            uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround->param);
+            uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround_param);
             if (delay_ms > 0) {
                 vsf_teda_set_timer_ms(delay_ms);
                 break;
@@ -593,6 +594,7 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             }
             memset(dwcotg_hcd, 0, dwcotg_size);
             dwcotg_hcd->hcd = hcd;
+            dwcotg_hcd->workaround_param = info.workaround_param;
             dwcotg_hcd->workaround = info.workaround;
 
             {
@@ -629,6 +631,7 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
                 }
             } else {
                 reg->global_regs->gusbcfg |= USB_OTG_GUSBCFG_PHYSEL;
+                reg->global_regs->gusbcfg &= ~(USB_OTG_GUSBCFG_TSDPS | USB_OTG_GUSBCFG_ULPIFSLS | USB_OTG_GUSBCFG_ULPICSM);
             }
 
             reg->global_regs->grstctl |= USB_OTG_GRSTCTL_CSRST;
@@ -673,7 +676,7 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             } else if (dwcotg_hcd->speed == USB_SPEED_FULL) {
                 reg->host.global_regs->hcfg |= USB_OTG_HCFG_FSLSS | USB_OTG_HCFG_FSLSPCS_0;
             } else {
-                VSF_USB_ASSERT(false);
+                reg->host.global_regs->hcfg |= USB_OTG_HCFG_FSLSS | USB_OTG_HCFG_FSLSPCS_1;
             }
 
             // Flush FIFO

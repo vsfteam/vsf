@@ -41,7 +41,6 @@ static bool __aic8800_usbh_workaround_check_dma_addr(void *param, uintptr_t addr
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vk_dwcotg_hcd_workaround_t __aic8800_usbh_workaround = {
-    .param          = (void *)AIC_USB_BASE,
     .reset_port     = __aic8800_usbh_workaround_reset_port,
     .enable_port    = __aic8800_usbh_workaround_enable_port,
     .check_dma_addr = __aic8800_usbh_workaround_check_dma_addr,
@@ -51,8 +50,8 @@ static const vk_dwcotg_hcd_workaround_t __aic8800_usbh_workaround = {
 
 static uint_fast32_t __aic8800_usbh_workaround_reset_port(void *param)
 {
-    PMIC_MEM_WRITE(0X50010118, 0x400);
-    PMIC_MEM_WRITE(0X5001011c, 0x400);
+    PMIC_MEM_WRITE(0x50010118, 0x400);
+    PMIC_MEM_WRITE(0x5001011c, 0x400);
     return 10;
 }
 
@@ -84,10 +83,11 @@ void aic8800_usbh_get_info(aic8800_usb_t *hc, usb_hc_ip_info_t *info)
     vk_dwcotg_hc_ip_info_t *dwcotg_info = (vk_dwcotg_hc_ip_info_t *)info;
 
     VSF_HAL_ASSERT(info != NULL);
-    dwcotg_info->regbase = hc->param->reg;
-    dwcotg_info->ep_num = hc->param->hc_ep_num;
+    dwcotg_info->regbase = param->reg;
+    dwcotg_info->ep_num = param->hc_ep_num;
     dwcotg_info->is_dma = true;
     dwcotg_info->use_as__vk_dwcotg_hw_info_t = param->use_as__vk_dwcotg_hw_info_t;
+    dwcotg_info->workaround_param = hc->reg;
     dwcotg_info->workaround = (vk_dwcotg_hcd_workaround_t *)&__aic8800_usbh_workaround;
 }
 
