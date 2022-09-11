@@ -31,6 +31,8 @@
 #include "hal/arch/vsf_arch.h"
 // for vsf_hal_init
 #include "hal/vsf_hal.h"
+// for VSF_DEBUG_STREAM_NEED_POLL
+#include "component/debugger/vsf_debugger.h"
 
 /*============================ MACROS ========================================*/
 
@@ -112,7 +114,6 @@ const vsf_protect_region_t vsf_protect_region_sched = {
 #include "service/pool/impl_vsf_pool.inc"
 
 
-#ifndef WEAK_VSF_EDA_NEW_FRAME
 SECTION(".text.vsf.kernel.vsf_eda_new_frame")
 WEAK(vsf_eda_new_frame)
 __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
@@ -145,9 +146,7 @@ __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
     }
     return frame;
 }
-#endif
 
-#ifndef WEAK_VSF_EDA_FREE_FRAME
 SECTION(".text.vsf.kernel.vsf_eda_free_frame")
 WEAK(vsf_eda_free_frame)
 void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
@@ -159,7 +158,6 @@ void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
     vsf_heap_free(frame);
 #endif
 }
-#endif
 #endif      // __VSF_KERNEL_CFG_EDA_FRAME_POOL
 
 #ifdef __VSF_OS_CFG_EVTQ_LIST
@@ -529,28 +527,26 @@ void vsf_cpu_usage_stop(void)
 }
 #endif
 
-#ifndef WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE
 WEAK(vsf_plug_in_on_kernel_idle)
 void vsf_plug_in_on_kernel_idle(void)
 {
+#ifdef VSF_DEBUG_STREAM_NEED_POLL
+    VSF_DEBUG_STREAM_POLL();
+#else
     vsf_sleep();
-}
 #endif
+}
 
-#ifndef WEAK_VSF_PLUG_IN_FOR_KERNEL_DIAGNOSIS
 WEAK(vsf_plug_in_for_kernel_diagnosis)
 void vsf_plug_in_for_kernel_diagnosis(void)
 {
     //! doing nothing here
 }
-#endif
 
-#ifndef WEAK___POST_VSF_KERNEL_INIT
 WEAK(__post_vsf_kernel_init)
 void __post_vsf_kernel_init(void)
 {
 }
-#endif
 
 void __vsf_kernel_os_run_priority(vsf_prio_t priority)
 {
