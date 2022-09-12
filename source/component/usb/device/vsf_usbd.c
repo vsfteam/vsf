@@ -584,20 +584,16 @@ static vsf_err_t __vk_usbd_stdctrl_process(vk_usbd_dev_t *dev)
     return VSF_ERR_NONE;
 }
 
-#ifndef WEAK_VSF_USBD_VENDOR_PREPARE
 WEAK(vsf_usbd_vendor_prepare)
 vsf_err_t vsf_usbd_vendor_prepare(vk_usbd_dev_t *dev)
 {
     return VSF_ERR_FAIL;
 }
-#endif
 
-#ifndef WEAK_VSF_USBD_VENDOR_PROCESS
 WEAK(vsf_usbd_vendor_process)
 void vsf_usbd_vendor_process(vk_usbd_dev_t *dev)
 {
 }
-#endif
 
 #if __IS_COMPILER_IAR__
 //! statement is unreachable

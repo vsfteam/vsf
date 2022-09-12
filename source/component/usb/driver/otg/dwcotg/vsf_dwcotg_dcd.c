@@ -662,7 +662,7 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
         global_regs->gintsts = USB_OTG_GINTSTS_WKUINT;
     }
     if (intsts & USB_OTG_GINTSTS_SOF) {
-        __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_SOF, 0);
+        __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_SOF, vk_dwcotg_dcd_get_frame_number(dwcotg_dcd));
         global_regs->gintsts = USB_OTG_GINTSTS_SOF;
     }
 
