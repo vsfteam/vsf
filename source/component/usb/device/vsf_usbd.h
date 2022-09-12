@@ -382,6 +382,7 @@ typedef enum vk_usbd_evt_t {
     USB_ON_INIT             = USB_USR_EVT + 0,
     USB_ON_FINI             = USB_USR_EVT + 1,
     USB_ON_STATUS_QUERY     = USB_USR_EVT + 2,
+    VSF_USBD_MAX_EVT,
 } vk_usbd_evt_t;
 
 typedef struct vk_usbd_desc_t {
