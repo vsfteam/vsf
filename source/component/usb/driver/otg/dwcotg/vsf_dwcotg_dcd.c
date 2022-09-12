@@ -512,7 +512,13 @@ static vsf_err_t __vk_dwcotg_dcd_ep_out_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, ui
 vsf_err_t vk_dwcotg_dcd_ep_transfer_recv(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size)
 {
     VSF_USB_ASSERT(!(ep & 0x80));
+#if VSF_DWCOTG_DCD_CFG_FAKE_EP == ENABLED
+    if (ep >= dwcotg_dcd->ep_num) {
+        return VSF_ERR_NONE;
+    }
+#else
     VSF_USB_ASSERT(ep < dwcotg_dcd->ep_num);
+#endif
 
     VSF_USB_ASSERT(((ep == 0) && dwcotg_dcd->ctrl_transfer_state != DWCOTG_SETUP_STAGE) || (ep > 0));
 
@@ -588,7 +594,13 @@ vsf_err_t vk_dwcotg_dcd_ep_transfer_send(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8
     VSF_USB_ASSERT(ep & 0x80);
 
     ep &= 0x0F;
+#if VSF_DWCOTG_DCD_CFG_FAKE_EP == ENABLED
+    if (ep >= dwcotg_dcd->ep_num) {
+        return VSF_ERR_NONE;
+    }
+#else
     VSF_USB_ASSERT(ep < dwcotg_dcd->ep_num);
+#endif
 
     vk_dwcotg_dcd_trans_t *trans = &dwcotg_dcd->trans[VSF_DWCOTG_DCD_CFG_EP_NUM + ep];
     trans->buffer = buffer;
