@@ -76,7 +76,7 @@ extern unsigned int SystemCoreClock;
 
 #define VSF_HW_USB_OTG0_IRQHandler  OTG_FS_IRQHandler
 #define VSF_HW_USB_OTG0_CONFIG                                                  \
-            .dc_ep_num              = (USB_DWCOTG_MAX_EP_NUM - 1) << 1,         \
+            .dc_ep_num              = 4 << 1,                                   \
             .hc_ep_num              = USB_DWCOTG_MAX_EP_NUM,                    \
             .reg                    = (void *)USB_OTG_FS_BASE,                  \
             .irq                    = OTG_FS_IRQn,                              \
