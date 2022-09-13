@@ -15,7 +15,7 @@
     (symbol "AIC1000A_0_1"
       (rectangle (start -10.16 16.51) (end 10.16 -16.51)
         (stroke (width 0.1524) (type default) (color 0 0 0 0))
-        (fill (type none))
+        (fill (type background))
       )
     )
     (symbol "AIC1000A_1_1"
