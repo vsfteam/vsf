@@ -3176,7 +3176,7 @@
     (property "Value" "Conn_01x06" (id 1) (at 114.935 30.48 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Connector_FFC-FPC:Hirose_FH12-6S-0.5SH_1x06-1MP_P0.50mm_Horizontal" (id 2) (at 120.65 38.735 0)
+    (property "Footprint" "VSF:Hirose_FH12-6S-0.5SH_1x06-1MP_P0.50mm_Horizontal_Reverse" (id 2) (at 120.65 38.735 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 120.65 38.735 0)
@@ -3593,7 +3593,7 @@
     (property "Value" "Conn_01x10" (id 1) (at 79.375 23.495 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Connector_FFC-FPC:Hirose_FH12-10S-0.5SH_1x10-1MP_P0.50mm_Horizontal" (id 2) (at 89.535 36.83 0)
+    (property "Footprint" "VSF:Hirose_FH12-10S-0.5SH_1x10-1MP_P0.50mm_Horizontal_Reverse" (id 2) (at 89.535 36.83 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 89.535 36.83 0)
@@ -3614,7 +3614,7 @@
   (symbol (lib_id "power:GND") (at 180.975 51.435 90) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid f0527ce6-54eb-44ec-8b40-f12bfb912173)
-    (property "Reference" "#PWR?" (id 0) (at 187.325 51.435 0)
+    (property "Reference" "#PWR0102" (id 0) (at 187.325 51.435 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (id 1) (at 185.3692 51.308 0))
@@ -3760,7 +3760,7 @@
       (reference "#PWR0101") (unit 1) (value "GND") (footprint "")
     )
     (path "/f0527ce6-54eb-44ec-8b40-f12bfb912173"
-      (reference "#PWR?") (unit 1) (value "GND") (footprint "")
+      (reference "#PWR0102") (unit 1) (value "GND") (footprint "")
     )
     (path "/faf7f873-d004-44e5-b2bd-9d7562f28cb5"
       (reference "C1") (unit 1) (value "1uF") (footprint "Capacitor_SMD:C_0402_1005Metric")
@@ -3802,10 +3802,10 @@
       (reference "J2") (unit 1) (value "Conn_01x20") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x20_P2.54mm_Vertical")
     )
     (path "/e204a6c5-45d9-4fa4-b41f-d94e47c3560c"
-      (reference "J3") (unit 1) (value "Conn_01x10") (footprint "Connector_FFC-FPC:Hirose_FH12-10S-0.5SH_1x10-1MP_P0.50mm_Horizontal")
+      (reference "J3") (unit 1) (value "Conn_01x10") (footprint "VSF:Hirose_FH12-10S-0.5SH_1x10-1MP_P0.50mm_Horizontal_Reverse")
     )
     (path "/7e3b4dd4-b83a-4efe-a2fa-f2570d41b3e3"
-      (reference "J4") (unit 1) (value "Conn_01x06") (footprint "Connector_FFC-FPC:Hirose_FH12-6S-0.5SH_1x06-1MP_P0.50mm_Horizontal")
+      (reference "J4") (unit 1) (value "Conn_01x06") (footprint "VSF:Hirose_FH12-6S-0.5SH_1x06-1MP_P0.50mm_Horizontal_Reverse")
     )
     (path "/f7e476c6-81a9-4c32-8e43-9df3cee2cd9a"
       (reference "J5") (unit 1) (value "USB_C_Receptacle_USB2.0") (footprint "VSF:USB_C_Receptacle_Palconn_UTC16-G_DOWN1.6")
