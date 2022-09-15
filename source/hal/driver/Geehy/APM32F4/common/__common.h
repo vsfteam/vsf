@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_GEEHY_APM32F407_COMMON_H__
-#define __HAL_DRIVER_GEEHY_APM32F407_COMMON_H__
+#ifndef __HAL_DRIVER_GEEHY_APM32F4_COMMON_H__
+#define __HAL_DRIVER_GEEHY_APM32F4_COMMON_H__
 
 /* \note __common.h should only be included by device.h */
 

@@ -89,22 +89,22 @@ WEAK(FLASH_IRQHandler)
 void FLASH_IRQHandler       (void){}
 
 WEAK(RCM_IRQHandler)
-void RCM_IRQHandler        (void){}
+void RCM_IRQHandler         (void){}
 
 WEAK(EINT0_IRQHandler)
-void EINT0_IRQHandler      (void){}
+void EINT0_IRQHandler       (void){}
 
 WEAK(EINT1_IRQHandler)
-void EINT1_IRQHandler      (void){}
+void EINT1_IRQHandler       (void){}
 
 WEAK(EINT2_IRQHandler)
-void EINT2_IRQHandler      (void){}
+void EINT2_IRQHandler       (void){}
 
 WEAK(EINT3_IRQHandler)
-void EINT3_IRQHandler      (void){}
+void EINT3_IRQHandler       (void){}
 
 WEAK(EINT4_IRQHandler)
-void EINT4_IRQHandler      (void){}
+void EINT4_IRQHandler       (void){}
 
 WEAK(DMA1_STR0_IRQHandler)
 void DMA1_STR0_IRQHandler   (void){}
