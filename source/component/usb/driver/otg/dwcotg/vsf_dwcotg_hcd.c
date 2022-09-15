@@ -279,7 +279,7 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
                 channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
                 // skip delay
             } else {
-                VSF_USB_ASSERT(false);
+//                VSF_USB_ASSERT(false);
 //                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
             }
         } else {
@@ -297,7 +297,7 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
                 channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
                 // skip delay
             } else {
-                VSF_USB_ASSERT(false);
+//                VSF_USB_ASSERT(false);
 //                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
             }
         } else {
@@ -420,7 +420,7 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
     vsf_unprotect_int(orig);
 
     if (!dwcotg_hcd->dma_en && !dir_in1out0 && (dwcotg_urb->current_size > 0)) {
-        VSF_USB_ASSERT((dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) >= size);
+        VSF_USB_ASSERT(((dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) << 2) >= size);
         uint32_t *fifo_reg = (uint32_t *)dwcotg_hcd->reg.dfifo[dwcotg_urb->channel_idx];
         for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
             *fifo_reg = get_unaligned_le32(buffer);
