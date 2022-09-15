@@ -76,6 +76,14 @@ Additional information:
 **********************************************************************
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern uint32_t vsf_arch_req___systimer_freq___from_usr(void);
+#ifdef __cplusplus
+}
+#endif
+
 //#define SEGGER_SYSVIEW_DEVICE_NAME
 //#define SEGGER_SYSVIEW_APP_NAME
 
