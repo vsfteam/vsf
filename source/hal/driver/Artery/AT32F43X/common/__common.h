@@ -23,7 +23,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
-#include "./vendor/libraries/cmsis/cm4/device_support/at32f435_437.h"
+#include "libraries/cmsis/cm4/device_support/at32f435_437.h"
 #include "hal/arch/vsf_arch.h"
 
 // CMSIS headers which will not be included in core_xxx.h
