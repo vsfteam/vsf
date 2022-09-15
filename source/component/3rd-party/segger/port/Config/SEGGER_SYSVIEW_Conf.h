@@ -81,7 +81,7 @@ Additional information:
 
 #define SEGGER_SYSVIEW_GET_TIMESTAMP()          vsf_systimer_get_tick()
 #define SEGGER_SYSVIEW_TIMESTAMP_BITS           64
-#define SEGGER_SYSVIEW_TIMESTAMP_FREQ           VSF_SYSTIMER_FREQ
+#define SEGGER_SYSVIEW_TIMESTAMP_FREQ           vsf_arch_req___systimer_freq___from_usr()
 
 #define SEGGER_SYSVIEW_GET_INTERRUPT_ID()       vsf_get_interrupt_id()
 
