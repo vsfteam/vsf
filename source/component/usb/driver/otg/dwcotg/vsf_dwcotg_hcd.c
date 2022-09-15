@@ -480,7 +480,12 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             *reg->host.hprt0 = hprt0 | USB_OTG_HPRT_PRST;
             // flush fifo
             reg->global_regs->grstctl = USB_OTG_GRSTCTL_TXFFLSH | USB_OTG_GRSTCTL_TXFNUM_4 | USB_OTG_GRSTCTL_RXFFLSH;
-            vsf_teda_set_timer_ms(20);
+
+            uint_fast32_t delay_ms = 20;
+            if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port != NULL)) {
+                delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround_param);
+            }
+            vsf_teda_set_timer_ms(delay_ms);
         } else if (hprt0 & USB_OTG_HPRT_PRST) {
             *reg->host.hprt0 &= ~(USB_OTG_HPRT_PRST | USB_OTG_HPRT_W1C_MASK);
             // 2021.10.16: seems that PLSTS in hprt0 maybe different to the actual signal
@@ -520,8 +525,8 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     __do_reset_issue:
 #endif
         dwcotg_hcd->is_reset_pending = true;
-        if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port != NULL)) {
-            uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround_param);
+        if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port_prepare != NULL)) {
+            uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port_prepare(dwcotg_hcd->workaround_param);
             if (delay_ms > 0) {
                 vsf_teda_set_timer_ms(delay_ms);
                 break;
