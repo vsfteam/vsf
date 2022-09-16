@@ -29,109 +29,57 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_IO_REIMPLEMENT_FEATURE
-#   define VSF_IO_REIMPLEMENT_FEATURE               DISABLED
+// application code can redefine it
+#ifndef VSF_IO_CFG_PREFIX
+#   if defined(VSF_HW_IO_COUNT) && (VSF_HW_IO_COUNT != 0)
+#       define VSF_IO_CFG_PREFIX                    vsf_hw
+#   else
+#       define VSF_IO_CFG_PREFIX                    vsf
+#   endif
 #endif
 
-#ifndef VSF_IO_REIMPLEMENT_PORT_NO
-#   define VSF_IO_REIMPLEMENT_PORT_NO               DISABLED
+// multi-class support enabled by default for maximum availability.
+#ifndef VSF_IO_CFG_MULTI_CLASS
+#   define VSF_IO_CFG_MULTI_CLASS                   ENABLED
+#endif
+
+#ifndef VSF_IO_CFG_FUNCTION_RENAME
+#   define VSF_IO_CFG_FUNCTION_RENAME               ENABLED
+#endif
+
+#ifndef VSF_IO_REIMPLEMENT_FEATURE
+#   define VSF_IO_REIMPLEMENT_FEATURE               DISABLED
 #endif
 
 #ifndef VSF_IO_CFG_PORTA
 #   define VSF_IO_CFG_PORTA                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTA_PIN_NUM
-#   define VSF_IO_CFG_PORTA_PIN_NUM                 32
-#endif
-
 #ifndef VSF_IO_CFG_PORTB
 #   define VSF_IO_CFG_PORTB                         ENABLED
-#endif
-
-#ifndef VSF_IO_CFG_PORTB_PIN_NUM
-#   define VSF_IO_CFG_PORTB_PIN_NUM                 32
 #endif
 
 #ifndef VSF_IO_CFG_PORTC
 #   define VSF_IO_CFG_PORTC                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTC_PIN_NUM
-#   define VSF_IO_CFG_PORTC_PIN_NUM                 32
-#endif
-
 #ifndef VSF_IO_CFG_PORTD
 #   define VSF_IO_CFG_PORTD                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTD_PIN_NUM
-#   define VSF_IO_CFG_PORTD_PIN_NUM                 32
-#endif
-
-#ifndef VSF_IO_REIMPLEMENT_PIN_MSK
-#   define VSF_IO_REIMPLEMENT_PIN_MSK               DISABLED
-#endif
-
-#ifndef VSF_IO_REIMPLEMENT_PIN_NUNBER
-#   define VSF_IO_REIMPLEMENT_PIN_NUNBER            DISABLED
-#endif
-
-// application code can redefine it
-#ifndef VSF_GPIO_CFG_PREFIX
-#   if defined(VSF_HW_GPIO_COUNT) && (VSF_HW_GPIO_COUNT != 0)
-#       define VSF_GPIO_CFG_PREFIX                  vsf_hw
-#   elif VSF_HAL_GPIO_USE_74HC165 == ENABLED
-#       define VSF_GPIO_CFG_PREFIX                  vsf
-#   else
-#       define VSF_GPIO_CFG_PREFIX                  vsf
-#   endif
-#endif
-
-// multi-class support enabled by default for maximum availability.
-#ifndef VSF_GPIO_CFG_MULTI_CLASS
-#   define VSF_GPIO_CFG_MULTI_CLASS                 ENABLED
-#endif
-
-#ifndef VSF_GPIO_CFG_FUNCTION_RENAME
-#   define VSF_GPIO_CFG_FUNCTION_RENAME             ENABLED
-#endif
-
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY      DISABLED
+#ifndef VSF_IO_CFG_PORT_MAX_PIN_NUM
+#   define VSF_IO_CFG_PORT_MAX_PIN_NUM              32
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+#define __VSF_IO_PORT_PIN_NUM(__PIN_NUM, __PORT_NUM)                            \
+    VSF_P ## __PORT_NUM ## __PIN_NUM = (((uint32_t) PORT ##__PORT_NUM) << 16) | __PIN_NUM,
+#define __VSF_IO_PIN_NUM(__N, __NAME)       __NAME ## __N = __N,
+#define __VSF_IO_PIN_MSK(__N, __NAME)       __NAME ## __N ##_MSK = (1ul << (__N)),
 
-#define __VSF_IO_PINA_NUM(__N, __OFFSET)    PA ## __N = (__OFFSET) + (__N),       \
-                                            PA ## __N ##_idx = (__OFFSET) + (__N),
-#define __VSF_IO_PINB_NUM(__N, __OFFSET)    PB ## __N = (__OFFSET) + (__N),       \
-                                            PB ## __N ##_idx = (__OFFSET) + (__N),
-#define __VSF_IO_PINC_NUM(__N, __OFFSET)    PC ## __N = (__OFFSET) + (__N),       \
-                                            PC ## __N ##_idx = (__OFFSET) + (__N),
-#define __VSF_IO_PIND_NUM(__N, __OFFSET)    PD ## __N = (__OFFSET) + (__N),       \
-                                            PD ## __N ##_idx = (__OFFSET) + (__N),
-
-#define __VSF_IO_PINA_MSK(__N, __OFFSET)    PA ## __N ##_msk = (1ul<<(__N)),
-#define __VSF_IO_PINB_MSK(__N, __OFFSET)    PB ## __N ##_msk = (1ul<<(__N)),
-#define __VSF_IO_PINC_MSK(__N, __OFFSET)    PC ## __N ##_msk = (1ul<<(__N)),
-#define __VSF_IO_PIND_MSK(__N, __OFFSET)    PD ## __N ##_msk = (1ul<<(__N)),
-
-#define VSF_GPIO_APIS(__prefix_name)                                                                                                                                            \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, gpio_capability_t, gpio, capability,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, config_pin,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)\
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,          gpio, get_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_input,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_output,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, switch_direction, VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,          gpio, read,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                            \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, write,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t value, uint32_t pin_mask)         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set,              VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, clear,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, toggle,           VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, output_and_set,   VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, output_and_clear, VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)
+#define VSF_IO_APIS(__prefix_name) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, io, config,         VSF_MCONNECT(__prefix_name, _io_t) *io_ptr, io_cfg_t *cfg_ptr, uint_fast8_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, io, config_one_pin, VSF_MCONNECT(__prefix_name, _io_t) *io_ptr, io_cfg_t *cfg_ptr)
 
 /*============================ TYPES =========================================*/
 
@@ -161,238 +109,113 @@ typedef enum io_feature_t {
     IO_HIGH_DRV             = (1<<9),           //!< enable high drive strength
     IO_HIGH_DRIVE           = (1<<9),           //!< enable high drive strength
     IO_HIGH_DRIVE_STRENGTH  = (1<<9),           //!< enable high drive strength
+
+    IO_FEATURE_ALL_BITS     = IO_PULL_UP | IO_OPEN_DRAIN |
+                              IO_DISABLE_INPUT | IO_INVERT_INPUT |
+                              IO_FILTER_BYPASS | IO_FILTER_2CLK | IO_FILTER_4CLK | IO_FILTER_8CLK |
+                              IO_FILTER_CLK_SRC0 | IO_FILTER_CLK_SRC1 | IO_FILTER_CLK_SRC2 |
+                              IO_FILTER_CLK_SRC3 | IO_FILTER_CLK_SRC4 | IO_FILTER_CLK_SRC5 |
+                              IO_FILTER_CLK_SRC6 | IO_FILTER_CLK_SRC7 |
+                              IO_HIGH_DRV,
 } io_feature_t;
 #endif
 
-#if VSF_IO_REIMPLEMENT_PORT_NO == DISABLED
+typedef enum io_pin_msk_t {
+    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_MSK, PIN)
+} io_pin_msk_t;
+
+typedef enum io_pin_no_t {
+    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_NUM, PIN)
+} io_pin_no_t;
+
 typedef enum io_port_no_t {
 #if defined(VSF_IO_CFG_PORTA)
-    PORTA, PORTA_idx = PORTA,
+    PORTA,
 #endif
 #if defined(VSF_IO_CFG_PORTB)
-    PORTB, PORTB_idx = PORTB,
+    PORTB,
 #endif
 #if defined(VSF_IO_CFG_PORTC)
-    PORTC, PORTC_idx = PORTC,
+    PORTC,
 #endif
 #if defined(VSF_IO_CFG_PORTD)
-    PORTD, PORTD_idx = PORTD,
+    PORTD,
 #endif
 } io_port_no_t;
-#endif
 
-#if VSF_IO_REIMPLEMENT_PIN_MSK == DISABLED
-typedef enum io_pin_msk_t {
+typedef enum io_port_pin_no_t {
 #if defined(VSF_IO_CFG_PORTA)
-    VSF_MREPEAT(VSF_IO_CFG_PORTA_PIN_NUM, __VSF_IO_PINA_MSK, 0)
+    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PORT_PIN_NUM, A)
 #endif
 #if defined(VSF_IO_CFG_PORTB)
-    VSF_MREPEAT(VSF_IO_CFG_PORTB_PIN_NUM, __VSF_IO_PINB_MSK, 0)
+    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PORT_PIN_NUM, B)
 #endif
 #if defined(VSF_IO_CFG_PORTC)
-    VSF_MREPEAT(VSF_IO_CFG_PORTC_PIN_NUM, __VSF_IO_PINC_MSK, 0)
+    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PORT_PIN_NUM, C)
 #endif
 #if defined(VSF_IO_CFG_PORTD)
-    VSF_MREPEAT(VSF_IO_CFG_PORTD_PIN_NUM, __VSF_IO_PIND_MSK, 0)
+    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PORT_PIN_NUM, D)
 #endif
-} io_pin_msk_t;
-#endif
-
-#if VSF_IO_REIMPLEMENT_PIN_NUNBER == DISABLED
-typedef enum io_pin_no_t {
-#if defined(VSF_IO_CFG_PORTA)
-    VSF_MREPEAT(VSF_IO_CFG_PORTA_PIN_NUM, __VSF_IO_PINA_NUM, 0)
-#endif
-#if defined(VSF_IO_CFG_PORTB)
-    VSF_MREPEAT(VSF_IO_CFG_PORTB_PIN_NUM, __VSF_IO_PINB_NUM, 32)
-#endif
-#if defined(VSF_IO_CFG_PORTC)
-    VSF_MREPEAT(VSF_IO_CFG_PORTC_PIN_NUM, __VSF_IO_PINC_NUM, 64)
-#endif
-#if defined(VSF_IO_CFG_PORTD)
-    VSF_MREPEAT(VSF_IO_CFG_PORTD_PIN_NUM, __VSF_IO_PIND_NUM, 96)
-#endif
-} io_pin_no_t;
-#endif
+} io_port_pin_no_t;
 
 //! io configuration structure
 typedef struct io_cfg_t {
-    io_pin_no_t     pin_index;                  //!< pin index number
+    union {
+        uint32_t port_pin_index;
+        struct {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+            uint16_t pin_index;
+            uint16_t port_index;
+#else
+            uint16_t port_index;
+            uint16_t pin_index;
+#endif
+        };
+    };
     uint16_t        function;                   //!< io Funcitons
     uint32_t        feature;                    //!< pin feature
 } io_cfg_t;
 
-
-#if VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-typedef struct gpio_capability_t {
+#if VSF_IO_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+typedef struct vsf_io_capability_t {
     inherit(peripheral_capability_t)
-} gpio_capability_t;
+} vsf_io_capability_t;
 #endif
 
-typedef struct gpio_reg_t gpio_reg_t;
+typedef struct vsf_io_t vsf_io_t;
 
-typedef struct vsf_gpio_t vsf_gpio_t;
-
-typedef struct vsf_gpio_op_t {
+typedef struct vsf_io_op_t {
 #undef __VSF_HAL_TEMPLATE_API
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 
-    VSF_GPIO_APIS(vsf)
-} vsf_gpio_op_t;
+    VSF_IO_APIS(vsf)
+} vsf_io_op_t;
 
-#if VSF_GPIO_CFG_MULTI_CLASS == ENABLED
-struct vsf_gpio_t  {
-    const vsf_gpio_op_t * op;
+#if VSF_IO_CFG_MULTI_CLASS == ENABLED
+struct vsf_io_t  {
+    const vsf_io_op_t * op;
 };
-#endif
-
-
-//! gpio control interface
-//! @{
-dcl_interface(i_gpio_t)
-def_interface(i_gpio_t)
-
-    //! config pin mode
-    void            (*ConfigPin)        (uint32_t pin_mask,
-                                         uint_fast32_t feature);
-
-    //! set pin directions with pin-mask
-    void            (*SetDirection)     (uint32_t dir_bitmap,
-                                         uint32_t pin_mask);
-    //! get pin direction with pin-mask
-    uint32_t        (*GetDirection)     (uint32_t pin_mask);
-    //! Set specified pin direction to input
-    void            (*SetInput)         (uint32_t pin_mask);
-    //! Set specified pin direction to output
-    void            (*SetOutput)        (uint32_t pin_mask);
-    //! Switch specified pin direction
-    void            (*SwitchDirection)  (uint32_t pin_mask);
-    //! get pin value on specified port
-    uint32_t        (*Read)             (void);
-    //! write pin value with pin-mask
-    void            (*Write)            (uint32_t value, uint32_t pin_mask);
-    //! set specified pins
-    void            (*Set)              (uint32_t pin_mask);
-    //! clear specified pins
-    void            (*Clear)            (uint32_t pin_mask);
-    //! toggle specified pins
-    void            (*Toggle)           (uint32_t pin_mask);
-    //! get base address of specified port
-    gpio_reg_t *const reg_ptr;
-
-end_def_interface(i_gpio_t)
-//! @}
-
-#if 0
-//! gpio user interface
-dcl_interface(i_io_t)
-def_interface(i_io_t)
-    //! general io configuration
-    vsf_err_t (*Config)(io_cfg_t *cfg_ptr, uint_fast8_t count);
-    union {
-        i_gpio_t  PORT[GPIO_COUNT];         //!< dedicated gpio control interface
-        struct {
-            VSF_MREPEAT(GPIO_COUNT, __GPIO_INTERFACE, NULL)
-        };
-    };
-end_def_interface(i_io_t)
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if 0
-//! \brief io interface
-extern const i_io_t VSF_IO;
+#ifndef VSF_IO_GET_PORT_NO_FROM_PIN_NO
+#   define VSF_IO_GET_PORT_NO_FROM_PIN_NO(__p)      ((io_port_no_t)(__p / VSF_IO_CFG_PORT_MAX_PIN_NUM))
+#endif
+
+#ifndef VSF_IO_GET_REAL_PIN_NO_FROM_PIN_NO
+#   define VSF_IO_GET_REAL_PIN_NO_FROM_PIN_NO(__p)  ((io_port_no_t)(__p % VSF_IO_CFG_PORT_MAX_PIN_NUM))
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
-
-extern void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
-                                uint32_t pin_mask,
-                                uint_fast32_t feature);
-
-/*! \brief set the specified pins to corresponding directions
- *!        pseudo code:
- *!        uint32_t temp = VSF_GPIOx.DIR;
- *!        temp &= ~pin_mask;
- *!        VSF_GPIOx.DIR = temp | (direction_bitmap & pin_mask);
- *!
- *! \param gpio_ptr the address of target vsf_gpio_t object (given port)
- *! \param direction_bitmap direction bitmap which will be ANDDed with pin_mask
- *!          direction value is 1 for output
- *!          direction value is 0 for input
- *! \param pin_mask pin mask to mark the target pin within a given port
- *! \return none
- */
-extern void vsf_gpio_set_direction( vsf_gpio_t *gpio_ptr,
-                                    uint32_t direction_mask,
-                                    uint32_t pin_mask);
-
-extern uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr,
-                                       uint32_t pin_mask);
-
-extern void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
-
-extern void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
-
-extern void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
-
-extern uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
-
-/*! \brief set the specified pins to corresponding value
- *!        pseudo code:
- *!        VSF_GPIOx.OUT &= ~pin_mask;
- *!        VSF_GPIOx.OUT |= (value & pin_mask);
- *!
- *! \param gpio_ptr the address of target vsf_gpio_t object (given port)
- *! \param value value bitmap which will be ANDDed with pin_mask
- *! \param pin_mask pin mask to mark the target pin within a given port
- *! \return none
- */
-extern void vsf_gpio_write( vsf_gpio_t *gpio_ptr,
-                                uint32_t value,
-                                uint32_t pin_mask);
-
-extern void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
-
-extern void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
-
-extern void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
-
-extern void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
-
-extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
-
 /*============================ MACROS ========================================*/
 
-#if VSF_GPIO_CFG_FUNCTION_RENAME == ENABLED
-#   define vsf_gpio_config_pin(__GPIO, ...)                                     \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_config_pin)         ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_set_direction(__GPIO, ...)                                  \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_direction)      ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_get_direction(__GPIO, ...)                                  \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_get_direction)      ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_set_input(__GPIO, ...)                                      \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_input)          ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_set_output(__GPIO, ...)                                     \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_output)         ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_switch_direction(__GPIO, ...)                               \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_switch_direction)   ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_read(__GPIO)                                                \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_read)               ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO)
-#   define vsf_gpio_write(__GPIO, __VALUE, ...)                                 \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_write)              ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_set(__GPIO, ...)                                            \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set)                ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_clear(__GPIO, ...)                                          \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_clear)              ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_output_and_set(__GPIO, ...)                                 \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)     ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_output_and_clear(__GPIO, ...)                               \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)   ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_toggle(__GPIO, ...)                                         \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)             ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#if VSF_IO_CFG_FUNCTION_RENAME == ENABLED
+#   define vsf_io_config_one_pin(__IO, ...)                                     \
+        VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_config_one_pin) ((VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_t) *)__IO, ##__VA_ARGS__)
+#   define vsf_io_config(__IO, ...)                                             \
+        VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_config)         ((VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_t) *)__IO, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
