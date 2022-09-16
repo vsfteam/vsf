@@ -218,7 +218,6 @@ const vk_usbh_hcd_drv_t vk_dwcotg_hcd_drv = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_DWCOTG_HCD_GET_FIFO_SIZE
 WEAK(vsf_dwcotg_hcd_get_fifo_size)
 void vsf_dwcotg_hcd_get_fifo_size(vk_usbh_hcd_t *hcd,
         uint16_t *rx_fifo_size, uint16_t *non_periodic_tx_fifo_size, uint16_t *periodic_tx_fifo_size)
@@ -238,7 +237,6 @@ void vsf_dwcotg_hcd_get_fifo_size(vk_usbh_hcd_t *hcd,
         break;
     }
 }
-#endif
 
 static void __vk_dwcotg_hcd_init_regs(vk_dwcotg_hcd_t *dwcotg_hcd, void *regbase, uint_fast8_t ep_num)
 {
@@ -420,9 +418,10 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
     vsf_unprotect_int(orig);
 
     if (!dwcotg_hcd->dma_en && !dir_in1out0 && (dwcotg_urb->current_size > 0)) {
-        VSF_USB_ASSERT( (   (pipe.type == USB_ENDPOINT_XFER_ISOC)
+        bool is_periodic = (pipe.type == USB_ENDPOINT_XFER_ISOC) || (pipe.type == USB_ENDPOINT_XFER_INT);
+        VSF_USB_ASSERT( (   is_periodic
                         &&  ((dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) << 2) >= size)
-                    ||  (   (pipe.type != USB_ENDPOINT_XFER_ISOC)
+                    ||  (   !is_periodic
                         &&  ((dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) << 2) >= size));
         uint32_t *fifo_reg = (uint32_t *)dwcotg_hcd->reg.dfifo[dwcotg_urb->channel_idx];
         for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
@@ -727,10 +726,13 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
 
                 vsf_dwcotg_hcd_get_fifo_size(hcd,
                     &rx_fifo_size, &non_periodic_tx_fifo_size, &periodic_tx_fifo_size);
+                rx_fifo_size >>= 2;
+                non_periodic_tx_fifo_size >>= 2;
+                periodic_tx_fifo_size >>= 2;
 
-                reg->global_regs->grxfsiz = rx_fifo_size >> 2;
-                reg->global_regs->gnptxfsiz = ((non_periodic_tx_fifo_size >> 2) << 16) | (reg->global_regs->grxfsiz & 0xffff);
-                reg->global_regs->hptxfsiz = ((periodic_tx_fifo_size >> 2) << 16) | (reg->global_regs->gnptxfsiz & 0xffff);
+                reg->global_regs->grxfsiz = rx_fifo_size;
+                reg->global_regs->gnptxfsiz = (non_periodic_tx_fifo_size << 16) | rx_fifo_size;
+                reg->global_regs->hptxfsiz = (periodic_tx_fifo_size << 16) | (rx_fifo_size + non_periodic_tx_fifo_size);
             }
 
             if (!dwcotg_hcd->dma_en) {
