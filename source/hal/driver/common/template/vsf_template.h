@@ -20,10 +20,11 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "./vsf_template_io.h"
+#include "./vsf_template_gpio.h"
 #include "./vsf_template_adc.h"
 #include "./vsf_template_flash.h"
 #include "./vsf_template_i2c.h"
-#include "./vsf_template_io.h"
 #include "./vsf_template_pm.h"
 #include "./vsf_template_pwm.h"
 #include "./vsf_template_rng.h"
