@@ -27,51 +27,46 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HW_FLASH_CFG_MULTI_CLASS
-#   define VSF_HW_FLASH_CFG_MULTI_CLASS           VSF_FLASH_CFG_MULTI_CLASS
+#   define VSF_HW_FLASH_CFG_MULTI_CLASS         VSF_FLASH_CFG_MULTI_CLASS
 #endif
 
-#undef VSF_AIC8800_FLASH_CFG_PROTECT
-#define VSF_AIC8800_FLASH_CFG_PROTECT                   interrupt
+// only define in source file
+#define VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY    ENABLED
+#define VSF_FLASH_CFG_BASE_ADDRESS              0x8000000
 
-#undef VSF_AIC8800_FLASH_BASE_ADDRESS
-#define VSF_AIC8800_FLASH_BASE_ADDRESS                  0x8000000
+#define __AIC8800_FLASH_CFG_PROTECT             interrupt
 
-#undef VSF_AIC8800_FLASH_ALIGNMENT_ERASE_SIZE
-#define VSF_AIC8800_FLASH_ALIGNMENT_ERASE_SIZE          0x1000
+#define __AIC8800_FLASH_ALIGNMENT_ERASE_SIZE    0x1000
 
-#undef VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE
-#define VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE          0x100
+#define __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE    0x100
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#undef __aic8800_flash_protect
 #define __aic8800_flash_protect                                                 \
-    vsf_protect(VSF_AIC8800_FLASH_CFG_PROTECT)
+    vsf_protect(__AIC8800_FLASH_CFG_PROTECT)
 
-#undef __aic8800_flash_unprotect
 #define __aic8800_flash_unprotect                                               \
-    vsf_unprotect(VSF_AIC8800_FLASH_CFG_PROTECT)
+    vsf_unprotect(__AIC8800_FLASH_CFG_PROTECT)
 
-#undef __aic8800_flash_address_get
 #define __aic8800_flash_address_get(__offset)                                   \
-    ((unsigned int)(VSF_AIC8800_FLASH_BASE_ADDRESS + (uint32_t)__offset))
+    ((unsigned int)(VSF_FLASH_CFG_BASE_ADDRESS + (uint32_t)__offset))
 
-#define ROM_APITBL_BASE                         ((unsigned int *)0x00000180UL)
+#define __ROM_APITBL_BASE                         ((unsigned int *)0x00000180UL)
 
-#define ROM_FlashChipSizeGet                                                    \
-    ((unsigned int (*)(void))ROM_APITBL_BASE[2])
+#define __ROM_FlashChipSizeGet                                                  \
+    ((unsigned int (*)(void))__ROM_APITBL_BASE[2])
 
-#define ROM_FlashErase                                                          \
-    ((int (*)(unsigned int a4k, unsigned int len))ROM_APITBL_BASE[4])
+#define __ROM_FlashErase                                                        \
+    ((int (*)(unsigned int a4k, unsigned int len))__ROM_APITBL_BASE[4])
 
-#define ROM_FlashWrite                                                          \
-    ((int (*)(unsigned int adr, unsigned int len, unsigned int buf))ROM_APITBL_BASE[5])
+#define __ROM_FlashWrite                                                        \
+    ((int (*)(unsigned int adr, unsigned int len, unsigned int buf))__ROM_APITBL_BASE[5])
 
-#define ROM_FlashRead                                                           \
-    ((int (*)(unsigned int adr, unsigned int len, unsigned int buf))ROM_APITBL_BASE[6])
+#define __ROM_FlashRead                                                         \
+    ((int (*)(unsigned int adr, unsigned int len, unsigned int buf))__ROM_APITBL_BASE[6])
 
-#define ROM_FlashCacheInvalidRange                                              \
-    ((void (*)(unsigned int adr, unsigned int len))ROM_APITBL_BASE[8])
+#define __ROM_FlashCacheInvalidRange                                            \
+    ((void (*)(unsigned int adr, unsigned int len))__ROM_APITBL_BASE[8])
 
 /*============================ TYPES =========================================*/
 
@@ -80,8 +75,8 @@ typedef struct vsf_hw_flash_t {
     vsf_flash_t vsf_flash;
 #endif
     flash_cfg_t cfg;
-    uint32_t    flash_size;
-    bool        is_enabled;
+    vsf_flash_size_t flash_size;
+    bool is_enabled;
 } vsf_hw_flash_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -98,7 +93,7 @@ vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, flash_cfg_t *cfg_ptr)
     }
 
     vsf_protect_t org = __aic8800_flash_protect();
-        hw_flash_ptr->flash_size = ROM_FlashChipSizeGet();
+        hw_flash_ptr->flash_size = __ROM_FlashChipSizeGet();
     __aic8800_flash_unprotect(org);
 
     VSF_HAL_ASSERT(hw_flash_ptr->flash_size > 0);
@@ -124,21 +119,21 @@ fsm_rt_t vsf_hw_flash_disable(vsf_hw_flash_t *hw_flash_ptr)
     return fsm_rt_cpl;
 }
 
-vsf_err_t vsf_hw_flash_erase(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset, uint_fast32_t size)
+vsf_err_t vsf_hw_flash_erase(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, vsf_flash_size_t size)
 {
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
 
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
     VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
-    VSF_HAL_ASSERT(0 == (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
-    VSF_HAL_ASSERT(0 == (size % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
+    VSF_HAL_ASSERT(0 == (offset % __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
+    VSF_HAL_ASSERT(0 == (size % __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
 
-    uint_fast32_t ret;
+    vsf_flash_size_t ret;
 
     vsf_protect_t org = __aic8800_flash_protect();
-        ret = ROM_FlashErase(__aic8800_flash_address_get(offset), size);//offset:4k * n
+        ret = __ROM_FlashErase(__aic8800_flash_address_get(offset), size);//offset:4k * n
     __aic8800_flash_unprotect(org);
-    ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
+    __ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_ERASE_MASK : VSF_FLASH_IRQ_ERASE_ERROR_MASK;
@@ -148,19 +143,19 @@ vsf_err_t vsf_hw_flash_erase(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset,
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
-vsf_err_t vsf_hw_flash_write(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
+vsf_err_t vsf_hw_flash_write(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
 {
-    uint_fast32_t ret;
+    vsf_flash_size_t ret;
 
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
     VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
-    VSF_HAL_ASSERT(0 == (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
+    VSF_HAL_ASSERT(0 == (offset % __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
 
     vsf_protect_t org = __aic8800_flash_protect();
-        ret = ROM_FlashWrite(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
+        ret = __ROM_FlashWrite(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
     __aic8800_flash_unprotect(org);
-    ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
+    __ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK;
@@ -170,18 +165,18 @@ vsf_err_t vsf_hw_flash_write(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset,
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
-vsf_err_t vsf_hw_flash_read(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
+vsf_err_t vsf_hw_flash_read(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
 {
-    uint_fast32_t ret;
+    vsf_flash_size_t ret;
 
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
     VSF_HAL_ASSERT(NULL != buffer);
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
     VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
-    VSF_HAL_ASSERT(0 == (offset % VSF_AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
+    VSF_HAL_ASSERT(0 == (offset % __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
 
     vsf_protect_t org = __aic8800_flash_protect();
-        ret = ROM_FlashRead(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
+        ret = __ROM_FlashRead(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
     __aic8800_flash_unprotect(org);
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
@@ -190,6 +185,16 @@ vsf_err_t vsf_hw_flash_read(vsf_hw_flash_t *hw_flash_ptr, uint_fast32_t offset, 
     }
 
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
+}
+
+flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
+{
+    flash_capability_t flash_capability = {
+        .base_address = VSF_FLASH_CFG_BASE_ADDRESS,
+        .size         = hw_flash_ptr->flash_size,
+    };
+
+    return flash_capability;
 }
 
 /*============================ INCLUDES ======================================*/
