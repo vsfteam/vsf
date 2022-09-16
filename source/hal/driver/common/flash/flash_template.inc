@@ -24,6 +24,16 @@
 #define vsf_real_flash_t          VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)
 #define vsf_real_flash_capability VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
 
+#if VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#   ifndef VSF_FLASH_CFG_BASE_ADDRESS
+#       define VSF_FLASH_CFG_BASE_ADDRESS           0
+#   endif
+
+#   ifndef VSF_FLASH_CFG_MAX_SIZE
+#       error "Please define flash size macro 'VSF_FLASH_CFG_MAX_SIZE' in source files"
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -35,7 +45,8 @@
 flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 {
     flash_capability_t flash_capability = {
-        0,
+        .base_address = VSF_FLASH_CFG_BASE_ADDRESS,
+        .size         = VSF_FLASH_CFG_MAX_SIZE,
     };
 
     return flash_capability;
@@ -51,7 +62,7 @@ flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 #   error "Please define VSF_FLASH_CFG_IMP_PREFIX in flash driver"
 #endif
 
-#ifndef VSF_FLASH_CFG_IMP_UPCASE_PREFIX   
+#ifndef VSF_FLASH_CFG_IMP_UPCASE_PREFIX
 #   error "Please define VSF_ADC_CFG_IMP_UPCASE_PREFIX    in flash driver"
 #endif
 
