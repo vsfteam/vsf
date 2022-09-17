@@ -568,7 +568,7 @@ extern vsf_err_t vk_usbh_submit_urb_flags(vk_usbh_t *usbh, vk_usbh_urb_t *urb, u
 extern vsf_err_t vk_usbh_submit_urb_ex(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t flags, vsf_eda_t *eda);
 
 #if VSF_USBH_CFG_ISO_EN == ENABLED
-extern vsf_err_t vk_usbh_submit_urb_iso(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast8_t start_frame);
+extern vsf_err_t vk_usbh_submit_urb_iso(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t start_frame);
 #endif
 
 extern void vk_usbh_remove_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,

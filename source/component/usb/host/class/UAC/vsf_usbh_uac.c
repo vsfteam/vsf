@@ -253,7 +253,7 @@ static bool __vk_usbh_uac_submit_urb_iso(vk_usbh_uac_t *uac, vk_usbh_uac_stream_
         vk_usbh_urb_set_buffer(urb, ptr, frame_size);
 #endif
 
-        uint_fast8_t start_frame = uac_stream->next_frame;
+        uint_fast16_t start_frame = uac_stream->next_frame;
         uint_fast16_t cur_frame = vk_usbh_get_frame(uac->usbh);
         bool positive = start_frame >= cur_frame;
         if ((start_frame != 0) && (positive || ((cur_frame - start_frame) > (0x07FF >> 1)))) {

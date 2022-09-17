@@ -704,7 +704,7 @@ vsf_err_t vk_usbh_submit_urb_ex(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16
 }
 
 #if VSF_USBH_CFG_ISO_EN == ENABLED
-vsf_err_t vk_usbh_submit_urb_iso(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast8_t start_frame)
+vsf_err_t vk_usbh_submit_urb_iso(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t start_frame)
 {
     VSF_USB_ASSERT(vk_usbh_urb_is_alloced(urb));
     vk_usbh_hcd_iso_packet_t *iso_packet = &urb->urb_hcd->iso_packet;
