@@ -107,7 +107,7 @@ extern "C" {
             vsf_class(vsf_fifo(__name)) {                                       \
                 private_member(                                                 \
                     implement(vsf_fifo_base_t)                                  \
-                    __item_type mem[__depth];                                   \
+                    __item_type __mem[__depth];                                 \
                 )                                                               \
             };
 
@@ -135,22 +135,25 @@ extern "C" {
 #define end_define_fifo(__name)
 
 // upper-case for simplified user interface
-#define VSF_FIFO_INIT(__fifo)           /* the address of the fifo */           \
-            vsf_fifo_init((vsf_fifo_t *)(__fifo), dimof(__fifo->__mem));
+#define VSF_FIFO_INIT(__FIFO)           /* the address of the fifo */           \
+            vsf_fifo_init((vsf_fifo_t *)(__FIFO), dimof((__FIFO)->__mem));
 
-#define VSF_FIFO_GET_HEAD(__fifo)       /* the address of the fifo */           \
-            vsf_fifo_get_head((vsf_fifo_t *)(__fifo), sizeof(__fifo->__mem[0]))
+#define VSF_FIFO_GET_HEAD(__FIFO)       /* the address of the fifo */           \
+            vsf_fifo_get_head((vsf_fifo_t *)(__FIFO), sizeof((__FIFO)->__mem[0]))
 
-#define VSF_FIFO_GET_TAIL(__fifo)       /* the address of the fifo */           \
-            vsf_fifo_get_tail((vsf_fifo_t *)(__fifo), sizeof(__fifo->__mem[0]))
+#define VSF_FIFO_GET_TAIL(__FIFO)       /* the address of the fifo */           \
+            vsf_fifo_get_tail((vsf_fifo_t *)(__FIFO), sizeof((__FIFO)->__mem[0]))
 
-#define VSF_FIFO_PUSH(  __fifo,         /* the address of the fifo */           \
-                        __item)         /* the address of the item to push */   \
-            vsf_fifo_push((vsf_fifo_t *)(__fifo), (__item), sizeof(__fifo->__mem[0]))
+#define VSF_FIFO_PUSH(  __FIFO,         /* the address of the fifo */           \
+                        __ITEM)         /* the address of the item to push */   \
+            vsf_fifo_push((vsf_fifo_t *)(__FIFO), (uintptr_t)(__ITEM), sizeof((__FIFO)->__mem[0]))
 
-#define VSF_FIFO_POP(   __fifo,         /* the address of the fifo */           \
-                        __item)         /* the address of the item to push */   \
-            vsf_fifo_pop((vsf_fifo_t *)(__fifo), (__item), sizeof(__fifo->__mem[0]))
+#define VSF_FIFO_POP(   __FIFO,         /* the address of the fifo */           \
+                        __ITEM)         /* the address of the item to pop */    \
+            vsf_fifo_pop((vsf_fifo_t *)(__FIFO), (uintptr_t)(__ITEM), sizeof((__FIFO)->__mem[0]))
+
+#define VSF_FIFO_GET_NUMBER(__FIFO)     /* the address of the fifo */           \
+            vsf_fifo_get_number((vsf_fifo_t *)(__FIFO))
 
 //! @}
 
