@@ -686,7 +686,6 @@ static ohci_td_t * __ohci_td_fill_iso(ohci_td_t *td, uint_fast32_t info, void *d
     }
 
     td_tmp->hwPSW[0] = (bufferStart & 0x0FFF) | (TD_NOTACCESSED << 12);
-    td_tmp->hwNextTD = 0;
     urb_ohci->ed->hwTailP = td_tmp->hwNextTD;
     vsf_slist_peek_next(ohci_td_t, node, &td->node, td_tmp);
     return td_tmp;
