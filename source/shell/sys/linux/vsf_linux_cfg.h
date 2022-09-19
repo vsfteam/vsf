@@ -94,6 +94,10 @@
 #   endif
 #endif
 
+#ifndef VSF_LINUX_USE_BUSYBOX
+#   define VSF_LINUX_USE_BUSYBOX                ENABLED
+#endif
+
 // to use simple libc
 //  1. enable VSF_LINUX_USE_SIMPLE_LIBC
 //  2. add "shell/sys/linux/include/simple_libc to include path
