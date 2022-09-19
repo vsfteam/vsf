@@ -526,9 +526,6 @@
     <Filter Include="vsf\shell\sys\linux\include\arpa">
       <UniqueIdentifier>{c7db8d44-0203-4a44-bfc2-2b660011e86b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="usrapp\config\arch">
-      <UniqueIdentifier>{061c6b45-1b28-4d7d-8a71-234c210407c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\hal\driver">
       <UniqueIdentifier>{c9df9a5d-4876-4ef7-a01d-db95b9f5073f}</UniqueIdentifier>
     </Filter>
@@ -594,6 +591,9 @@
     </Filter>
     <Filter Include="vsf\hal\driver\x86\win\rtc">
       <UniqueIdentifier>{0895024a-b39a-4861-a738-356bb449e7b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\target">
+      <UniqueIdentifier>{5e341468-03ee-4824-b310-ce80c66d4309}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1524,12 +1524,6 @@
     <ClInclude Include="..\..\vsf_usr_cfg.h">
       <Filter>usrapp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\config\vsf_usr_cfg_arch.h">
-      <Filter>usrapp\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\config\arch\vsf_usr_cfg_win.h">
-      <Filter>usrapp\config\arch</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h">
       <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
     </ClInclude>
@@ -1559,6 +1553,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\vsf_usr_cfg_target.h">
+      <Filter>usrapp\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\target\vsf_usr_cfg_win.h">
+      <Filter>usrapp\config\target</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

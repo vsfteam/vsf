@@ -329,8 +329,8 @@
     <ClInclude Include="..\..\..\..\source\utilities\vsf_utilities_cfg.h" />
     <ClInclude Include="..\..\..\..\source\vsf.h" />
     <ClInclude Include="..\..\..\..\source\vsf_cfg.h" />
-    <ClInclude Include="..\..\config\arch\vsf_usr_cfg_win.h" />
-    <ClInclude Include="..\..\config\vsf_usr_cfg_arch.h" />
+    <ClInclude Include="..\..\config\target\vsf_usr_cfg_win.h" />
+    <ClInclude Include="..\..\config\vsf_usr_cfg_target.h" />
     <ClInclude Include="..\..\vsf_usr_cfg.h" />
   </ItemGroup>
   <ItemGroup>
