@@ -595,6 +595,9 @@
     <Filter Include="usrapp\config\target">
       <UniqueIdentifier>{5e341468-03ee-4824-b310-ce80c66d4309}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\simple_stream\queue_stream">
+      <UniqueIdentifier>{585c6998-4093-4000-ab79-a4a9db7430fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -1560,6 +1563,9 @@
     <ClInclude Include="..\..\config\target\vsf_usr_cfg_win.h">
       <Filter>usrapp\config\target</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.h">
+      <Filter>vsf\service\simple_stream\queue_stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -2128,6 +2134,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
       <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\service\simple_stream\queue_stream\vsf_queue_stream.c">
+      <Filter>vsf\service\simple_stream\queue_stream</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
