@@ -82,8 +82,12 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_USE_SIMPLE_STREAM != ENABLED
+#   error vsf_linux_fs need VSF_USE_SIMPLE_STREAM
+#endif
+
 #if VSF_FS_CFG_VFS_FILE_HAS_OP != ENABLED
-#   error vsf_linux need VSF_FS_CFG_VFS_FILE_HAS_OP
+#   error vsf_linux_fs need VSF_FS_CFG_VFS_FILE_HAS_OP
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

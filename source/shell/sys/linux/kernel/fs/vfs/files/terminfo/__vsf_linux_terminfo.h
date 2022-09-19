@@ -1,0 +1,1 @@
+#include VSF_LINUX_CFG_TERMINFO_TYPE

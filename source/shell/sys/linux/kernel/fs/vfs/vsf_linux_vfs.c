@@ -86,7 +86,7 @@ int vsf_linux_vfs_init(void)
         return err;
     }
     static const char __terminfo[] = {
-#include VSF_LINUX_CFG_TERMINFO_TYPE
+#include "./files/terminfo/__vsf_linux_terminfo.h"
     };
     strcat(terminfo_path, "/" VSF_LINUX_CFG_TERMINFO_TYPE);
     vsf_linux_fs_bind_buffer(terminfo_path,
