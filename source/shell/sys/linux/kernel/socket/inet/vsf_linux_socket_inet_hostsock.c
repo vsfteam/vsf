@@ -40,6 +40,7 @@ struct dirent {
     char *d_name;
 };
 
+#define __VSF_HEADER_ONLY_SHOW_FS_INFO__
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #include "../../fs/vsf_linux_fs.h"
 
