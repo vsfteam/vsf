@@ -98,6 +98,24 @@
 #   define VSF_LINUX_USE_BUSYBOX                ENABLED
 #endif
 
+#ifndef VSF_LINUX_USE_SOCKET
+#   define VSF_LINUX_USE_SOCKET                 ENABLED
+#endif
+
+#if VSF_LINUX_USE_SOCKET == ENABLED
+#   ifndef VSF_LINUX_SOCKET_USE_UNIX
+#       define VSF_LINUX_SOCKET_USE_UNIX        ENABLED
+#   endif
+#   ifndef VSF_LINUX_SOCKET_USE_INET
+#       if VSF_USE_LWIP == ENABLED
+#           define VSF_LINUX_SOCKET_USE_INET    ENABLED
+#       elif (defined(__WIN__) || defined(__LINUX__) || defined(__linux__) || defined(__MACOS__))
+#           define VSF_LINUX_SOCKET_USE_INET    ENABLED
+#           define VSF_LINUX_SOCKET_CFG_WRAPPER ENABLED
+#       endif
+#   endif
+#endif
+
 // to use simple libc
 //  1. enable VSF_LINUX_USE_SIMPLE_LIBC
 //  2. add "shell/sys/linux/include/simple_libc to include path

@@ -482,12 +482,18 @@ int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout
 #endif
 }
 
+WEAK(vsf_linux_create_fhs_user)
+int vsf_linux_create_fhs_user(void)
+{
+    return 0;
+}
+
 WEAK(vsf_linux_create_fhs)
 int vsf_linux_create_fhs(void)
 {
     vsf_linux_vfs_init();
     busybox_install();
-    return 0;
+    return vsf_linux_create_fhs_user();
 }
 
 int * __vsf_linux_errno(void)
