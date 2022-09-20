@@ -32,6 +32,7 @@
 #       include "system.h"
 
 #       include "hal/driver/common/swi/vsf_swi_template.h"
+#       include "./io/io.h"
 #       include "./adc/adc.h"
 #       include "./debug_uart/debug_uart.h"
 #       include "./flash/flash.h"

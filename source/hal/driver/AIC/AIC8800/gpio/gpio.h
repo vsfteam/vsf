@@ -23,34 +23,18 @@
 #include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_GPIO == ENABLED
-#   include "../__device.h"
+
+#   include "../io/io.h"
 #   include "./i_reg_gpio.h"
-#   include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 
 /*============================ MACROS ========================================*/
-
-#define VSF_IO_REIMPLEMENT_FEATURE          ENABLED
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-typedef enum io_feature_t {
-    //! no-pull resistor
-    IO_NOT_PULL             =  (0 << IOMUX_GPIO_CONFIG_PULL_FRC_LSB),
-    //! pull-up resistor
-    IO_PULL_UP              = ((1 << IOMUX_AGPIO_CONFIG_PULL_FRC_LSB) | (1 << IOMUX_AGPIO_CONFIG_PULL_UP_LSB)),
-    //! pull-down resistor
-    IO_PULL_DOWN            = ((1 << IOMUX_AGPIO_CONFIG_PULL_FRC_LSB) | (1 << IOMUX_AGPIO_CONFIG_PULL_DN_LSB)),
-    __IO_PULL_MASK          = IOMUX_AGPIO_CONFIG_PULL_FRC_MASK | IOMUX_AGPIO_CONFIG_PULL_DN_MASK | IOMUX_AGPIO_CONFIG_PULL_UP_MASK,
-
-    __IO_FEATURE_MASK       = __IO_PULL_MASK | IOMUX_GPIO_CONFIG_SEL_MASK,
-} io_feature_t;
-
 /*============================ INCLUDES ======================================*/
 
 #define VSF_GPIO_CFG_DEC_PREFIX         vsf_hw
-#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX    VSF_HW
-#include "hal/driver/common/io/io_template.h"
+#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX  VSF_HW
+#include "hal/driver/common/gpio/gpio_template.h"
 
 #endif /* VSF_HAL_USE_GPIO */
 #endif /* __HAL_DRIVER_AIC8800_HW_GPIO_H__ */
