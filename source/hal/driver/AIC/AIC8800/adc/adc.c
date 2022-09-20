@@ -58,17 +58,17 @@ typedef struct vsf_hw_adc_t {
     vsf_adc_t vsf_adc;
 #endif
 
-    adc_cfg_t               cfg;
+    vsf_adc_cfg_t               cfg;
 
     vsf_callback_timer_t    callback_timer;
 
     struct {
-        adc_channel_cfg_t  *current_channel;
+        vsf_adc_channel_cfg_t  *current_channel;
         void               *buffer_ptr;
     };
 
     struct {
-        adc_channel_cfg_t   cfgs[VSF_HW_ADC_CFG_CHANNEL_COUNT];
+        vsf_adc_channel_cfg_t   cfgs[VSF_HW_ADC_CFG_CHANNEL_COUNT];
         uint_fast32_t       count;
         uint_fast32_t       index;
     } chns;
@@ -145,7 +145,7 @@ static void __vsf_adc_measure(int type)
     }
 }
 
-static vsf_err_t __vsf_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr, adc_channel_cfg_t *channel_cfgs_ptr)
+static vsf_err_t __vsf_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr)
 {
     uint8_t channel = channel_cfgs_ptr->channel;
     if (channel > 7) {
@@ -173,7 +173,7 @@ static vsf_err_t __vsf_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr, adc_channel_
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vsf_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, adc_channel_cfg_t *channel_cfg_ptr)
+static vsf_err_t __vsf_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_channel_cfg_t *channel_cfg_ptr)
 {
     uint8_t channel = channel_cfg_ptr->channel;
     if (channel > 7) {              // TODO:
@@ -235,7 +235,7 @@ static void __vk_adc_on_time(vsf_callback_timer_t *timer)
     }
 }
 
-vsf_err_t vsf_hw_adc_init(vsf_hw_adc_t *hw_adc_ptr, adc_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_adc_init(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT((NULL != hw_adc_ptr) && (NULL != cfg_ptr));
 
@@ -288,7 +288,7 @@ void vsf_hw_adc_irq_disable(vsf_hw_adc_t *hw_adc_ptr)
 }
 
 vsf_err_t vsf_hw_adc_channel_request_once(vsf_hw_adc_t *hw_adc_ptr,
-                                          adc_channel_cfg_t *channel_cfg_ptr,
+                                          vsf_adc_channel_cfg_t *channel_cfg_ptr,
                                           void *buffer_ptr)
 {
     VSF_HAL_ASSERT((NULL != hw_adc_ptr) && (NULL != buffer_ptr));
@@ -310,7 +310,7 @@ vsf_err_t vsf_hw_adc_channel_request_once(vsf_hw_adc_t *hw_adc_ptr,
 }
 
 vsf_err_t vsf_hw_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr,
-                                    adc_channel_cfg_t *channel_cfgs_ptr,
+                                    vsf_adc_channel_cfg_t *channel_cfgs_ptr,
                                     uint32_t channel_cfgs_cnt)
 {
     VSF_HAL_ASSERT((NULL != hw_adc_ptr) && (NULL != channel_cfgs_ptr));

@@ -34,7 +34,7 @@ typedef struct VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, 
     VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t);
 
 // expand to:
-//  extern vsf_err_t vsf_hw_adc_init(vsf_hw_adc_t *adc_ptr, adc_cfg_t *cfg_ptr);
+//  extern vsf_err_t vsf_hw_adc_init(vsf_hw_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr);
 //  ...
 VSF_MCONNECT(VSF, __VSF_HAL_TEMPLATE_UPCASE_NAME, _APIS) (__VSF_HAL_TEMPLATE_PREFIX)
 #endif

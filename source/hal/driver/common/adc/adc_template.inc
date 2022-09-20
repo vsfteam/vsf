@@ -27,9 +27,9 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_ADC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
+vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 {
-    adc_capability_t adc_capability = {
+    vsf_adc_capability_t adc_capability = {
         0,
     };
 

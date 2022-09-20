@@ -35,7 +35,7 @@
 
 #if VSF_ADC_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, adc_cfg_t *cfg_ptr)
+vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(adc_ptr != NULL);
     VSF_HAL_ASSERT(adc_ptr->op != NULL);
@@ -80,7 +80,7 @@ void vsf_adc_irq_disable(vsf_adc_t *adc_ptr)
     adc_ptr->op->irq_disable(adc_ptr);
 }
 
-adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr)
+vsf_adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(adc_ptr != NULL);
     VSF_HAL_ASSERT(adc_ptr->op != NULL);
@@ -89,7 +89,7 @@ adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr)
     return adc_ptr->op->capability(adc_ptr);
 }
 
-vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr, adc_channel_cfg_t *channel_cfg, void *buffer_ptr)
+vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr, vsf_adc_channel_cfg_t *channel_cfg, void *buffer_ptr)
 {
     VSF_HAL_ASSERT(adc_ptr != NULL);
     VSF_HAL_ASSERT(adc_ptr->op != NULL);
@@ -98,7 +98,7 @@ vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr, adc_channel_cfg_t *ch
     return adc_ptr->op->channel_request_once(adc_ptr, channel_cfg, buffer_ptr);
 }
 
-vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr, adc_channel_cfg_t *channel_cfgs_ptr, uint32_t channel_cfgs_cnt)
+vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr, uint32_t channel_cfgs_cnt)
 {
     VSF_HAL_ASSERT(adc_ptr != NULL);
     VSF_HAL_ASSERT(adc_ptr->op != NULL);
