@@ -83,7 +83,7 @@ static void __adc_request_once_demo(void)
 {
     vsf_err_t result;
 
-    adc_cfg_t adc_cfg = {
+    vsf_adc_cfg_t adc_cfg = {
         .feature        = APP_ADC_DEMO_CFG_FEATURE,
         .isr            = {
             .handler_fn = __request_once_demo_isr_handler,
@@ -97,7 +97,7 @@ static void __adc_request_once_demo(void)
 
     while (fsm_rt_cpl != vsf_adc_enable(APP_ADC_DEMO_CFG_ADC));
 
-    adc_channel_cfg_t adc_channel_cfg = {
+    vsf_adc_channel_cfg_t adc_channel_cfg = {
         .channel = 0,
     };
     vsf_adc_channel_request_once(APP_ADC_DEMO_CFG_ADC, &adc_channel_cfg, &__request_once_demo.value);
@@ -114,7 +114,7 @@ static void __adc_requests_demo(void)
 {
     vsf_err_t result;
 
-    adc_cfg_t adc_cfg = {
+    vsf_adc_cfg_t adc_cfg = {
         .feature        = APP_ADC_DEMO_CFG_FEATURE,
         .clock_freq     = APP_ADC_DEMO_CFG_CLOCK,
         .isr            = {
@@ -129,7 +129,7 @@ static void __adc_requests_demo(void)
 
     while (fsm_rt_cpl != vsf_adc_enable(APP_ADC_DEMO_CFG_ADC));
 
-    adc_channel_cfg_t adc_channel_cfg = {
+    vsf_adc_channel_cfg_t adc_channel_cfg = {
         .channel = 0,
     };
     vsf_adc_channel_request_once(APP_ADC_DEMO_CFG_ADC, &adc_channel_cfg, &__request_once_demo.value);

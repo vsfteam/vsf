@@ -39,7 +39,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum adc_feature_t{
+typedef enum vsf_adc_feature_t{
     ADC_REF_VDD_1           = 0,                //ADC_TYPE_VBAT
     ADC_REF_VDD_1_2,                            //Not activated
     ADC_REF_VDD_1_3,                            //ADC_TYPE_TEMP0
@@ -52,9 +52,9 @@ typedef enum adc_feature_t{
     EXTERN_TRIGGER_0        = 0,                //Not activated
     EXTERN_TRIGGER_1        = 0,                //Not activated
     EXTERN_TRIGGER_2        = 0,                //Not activated
-} adc_feature_t;
+} vsf_adc_feature_t;
 
-typedef enum adc_channel_feature_t {
+typedef enum vsf_adc_channel_feature_t {
     ADC_CHANNEL_GAIN_1_6    = (0 << 0),         //Not activated
     ADC_CHANNEL_GAIN_1_5    = (1 << 0),         //Not activated
     ADC_CHANNEL_GAIN_1_4    = (2 << 0),         //Not activated
@@ -66,7 +66,7 @@ typedef enum adc_channel_feature_t {
     ADC_CHANNEL_REF_VDD_1_2 = (1 << 4),         //Not activated
     ADC_CHANNEL_REF_VDD_1_3 = (2 << 4),         //Not activated
     ADC_CHANNEL_REF_VDD_1_4 = (3 << 4),         //Not activated
-} adc_channel_feature_t;
+} vsf_adc_channel_feature_t;
 
 /*============================ INCLUDES ======================================*/
 
