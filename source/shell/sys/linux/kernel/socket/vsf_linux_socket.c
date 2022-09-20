@@ -505,7 +505,7 @@ int shutdown(int sockfd, int how)
     return priv->sockop->fn_fini(priv, how);
 }
 
-int send(int sockfd, const void *buf, size_t len, int flags)
+ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
     if (!sfd) {
@@ -516,7 +516,7 @@ int send(int sockfd, const void *buf, size_t len, int flags)
     return write(sockfd, buf, len);
 }
 
-int recv(int sockfd, void *buf, size_t len, int flags)
+ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
     if (!sfd) {
