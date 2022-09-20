@@ -12033,6 +12033,15 @@
                             </file>
                         </group>
                         <group>
+                            <name>io</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\io\io.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\io\io.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>port</name>
                             <group>
                                 <name>arch</name>
@@ -13919,6 +13928,18 @@
                         </file>
                     </group>
                     <group>
+                        <name>gpio</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>i2c</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_common.c</name>
@@ -15444,6 +15465,7 @@
                             <configuration>vsf_template_m484</configuration>
                             <configuration>vsf_template_gd32e103</configuration>
                             <configuration>vsf_template_mt071</configuration>
+                            <configuration>vsf_template_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>SDL_image</name>
