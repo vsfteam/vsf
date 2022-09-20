@@ -88,24 +88,12 @@ static app_gpio_demo_t __app_gpio_demo;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __gpio_input_demo_init(void)
-{
-    vsf_gpio_config_pin(APP_GPIO_DEMO_CFG_INPUT_GPIO,  APP_GPIO_DEMO_CFG_INPUT_PIN_MASK, APP_GPIO_DEMO_CFG_INPUT_FEATURE);
-    vsf_gpio_set_input (APP_GPIO_DEMO_CFG_INPUT_GPIO,  APP_GPIO_DEMO_CFG_INPUT_PIN_MASK);
-}
-
-static void __gpio_output_demo_init(void)
-{
-    vsf_gpio_config_pin(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK, APP_GPIO_DEMO_CFG_OUTPUT_FEATURE);
-    vsf_gpio_set_output(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
-}
-
 static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     switch (evt) {
     case VSF_EVT_INIT:
-        __gpio_input_demo_init();
-        __gpio_output_demo_init();
+        vsf_gpio_set_input(APP_GPIO_DEMO_CFG_INPUT_GPIO,  APP_GPIO_DEMO_CFG_INPUT_PIN_MASK);
+        vsf_gpio_set_output(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
 
     case VSF_EVT_TIMER:
         vsf_gpio_toggle(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);

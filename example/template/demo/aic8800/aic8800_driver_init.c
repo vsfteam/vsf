@@ -33,16 +33,24 @@
 
 bool vsf_app_driver_init(void)
 {
-    iomux_gpio_config_sel_setf(10, 0x03); // PA10 as spi sck
-    iomux_gpio_config_sel_setf(11, 0x03); // PA11 as spi csn
-    iomux_gpio_config_sel_setf(12, 0x03); // PA10 as spi di
-    iomux_gpio_config_sel_setf(13, 0x03); // PA11 as spi do
+    io_cfg_t cfgs[] = {
+        {VSF_PA10, 0x03, 0}, // PA10 as spi sck
+        {VSF_PA11, 0x03, 0}, // PA10 as spi sck
+        {VSF_PA12, 0x03, 0}, // PA10 as spi sck
+        {VSF_PA13, 0x03, 0}, // PA10 as spi sck
 
 #if VSF_DISP_USE_MIPI_LCD == ENABLED
-    iomux_gpio_config_sel_setf(5, 0x00); // PA5 as LCD RESET
-    iomux_gpio_config_sel_setf(6, 0x00); // PA6 as LCD DCS
-    iomux_gpio_config_sel_setf(7, 0x00); // PA7 as LCD TE
+        {VSF_PA5, 0x00, 0},    // PA5 as LCD RESET
+        {VSF_PA6, 0x00, 0},    // PA6 as LCD DCS
+        {VSF_PA7, 0x00, 0},    // PA7 as LCD TE
 #endif
+
+#ifdef APP_USE_HAL_GPIO_DEMO
+        {VSF_PA10,  0x00, IO_PULL_UP},
+        {VSF_PB3,   0x00, IO_PULL_UP},
+#endif
+    };
+    vsf_io_config(&vsf_hw_io0, cfgs, dimof(cfgs));
 
     return true;
 }
