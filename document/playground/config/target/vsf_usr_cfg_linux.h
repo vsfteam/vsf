@@ -51,7 +51,6 @@
 #define VSF_USBH_USE_HCD_LIBUSB                         ENABLED
 
 #if VSF_USBH_USE_HCD_LIBUSB == ENABLED
-#   define VSF_LIBUSB_CFG_INCLUDE                       "lib\libusb\libusb.h"
 #   define VSF_LIBUSB_HCD_CFG_DEV_NUM                   1
 #   define VSF_LIBUSB_HCD_DEV0_VID                      0x0A5C      // BCM20702 bthci
 #   define VSF_LIBUSB_HCD_DEV0_PID                      0x21E8

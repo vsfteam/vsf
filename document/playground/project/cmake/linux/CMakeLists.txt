@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.13)
 
 if(NOT DEFINED ENV{VSF_PATH})
-    message(FATAL_ERROR "Please define environment VSF_PATH")
-else()
-    message(STATUS "VSF_PATH: $ENV{VSF_PATH}")
+    get_filename_component(__VSF_PATH ../../../../../ ABSOLUTE)
+    set(ENV{VSF_PATH} ${__VSF_PATH})
 endif()
+message(STATUS "VSF_PATH: $ENV{VSF_PATH}")
 
 project(vsf_playground)
-set(VSF_TARGET x64/linux)
+set(VSF_TARGET generic/linux64)
 
 # compiler configurations
 # if compiler is not set, cmake will find one
