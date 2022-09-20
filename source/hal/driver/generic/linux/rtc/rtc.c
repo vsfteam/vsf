@@ -24,6 +24,9 @@
 // for NO_INIT
 #include "utilities/vsf_utilities.h"
 
+// for gettimeofday
+#include <sys/time.h>
+// for struct tm
 #include <time.h>
 
 /*============================ MACROS ========================================*/
