@@ -66,20 +66,19 @@
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
 
-#define VSF_HW_GPIO_COUNT           2
-#define VSF_HW_GPIO_PIN_MAX         16
-#define VSF_HW_GPIO0_IOMUX_REG_BASE (0x40503000)
-#define VSF_HW_GPIO0_IS_PMIC        false
-#define VSF_HW_GPIO0_PIN_SEL        {                                           \
-        1, 1, 0, 0, 0, 0, 0, 0,                                                 \
-        1, 1, 0, 0, 0, 0, 0, 0,                                                 \
-    }
-#define VSF_HW_GPIO1_IOMUX_REG_BASE (0x50012000)
-#define VSF_HW_GPIO1_IS_PMIC        true
-#define VSF_HW_GPIO1_PIN_SEL        {                                           \
-        1, 1, 0, 0, 0, 0, 0, 0,                                                 \
-        0, 0, 0, 0, 0, 0, 0, 0,                                                 \
-    }
+#define VSF_HW_IO_COUNT                 1
+#define VSF_HW_IO_PORT_MAX              2
+#define VSF_HW_IO_PIN_MAX               16
+#define VSF_HW_IO_FUNCTION_MAX          10 // All Function 10 ~ Function 15 is invalid
+#define VSF_HW_IO_PORT0_IOMUX_REG_BASE  (0x40503000)
+#define VSF_HW_IO_PORT0_IS_PMIC         false
+#define VSF_HW_IO_PORT1_IOMUX_REG_BASE  (0x50012000)
+#define VSF_HW_IO_PORT1_IS_PMIC         true
+
+#define VSF_HW_GPIO_COUNT               VSF_HW_IO_PORT_MAX
+#define VSF_HW_GPIO_PIN_MAX             VSF_HW_IO_PIN_MAX
+
+
 
 #define VSF_HW_RNG_COUNT                   1
 #define VSF_HW_RNG_BITLEN                  32
