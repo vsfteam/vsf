@@ -42,6 +42,11 @@
 #define __VSF_HW_IO_IS_VAILID_FEATURE(__F)                                      \
     ((__F & ~(uint32_t)__HW_IO_FEATURE_ALL_BITS) == 0)
 
+
+// TODO: add io function mode tables
+//#defin VSF_PA0_AS_GPIO                  0
+//#defin VSF_PA0_AS_SWCLK                 1
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
