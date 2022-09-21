@@ -10,11 +10,11 @@ vsf_spi_t vsf_spi[SPI_COUNT] = {
     },
 };
 
-spi_status_t vsf_spi_get_status(vsf_spi_t *spi_obj)
+vsf_spi_status_t vsf_spi_get_status(vsf_spi_t *spi_obj)
 {
     VSF_ASSERT(spi_obj != NULL);
     
-    spi_status_t spi_status;
+    vsf_spi_status_t spi_status;
     
     spi_status.SPI_RXNE   = spi_obj->hspi->SR & 0x01; 
     spi_status.SPI_TXE    = spi_obj->hspi->SR & 0x02; 
@@ -28,9 +28,9 @@ spi_status_t vsf_spi_get_status(vsf_spi_t *spi_obj)
     return spi_status;
 }
 
-spi_capability_t vsf_spi_get_capability(void)
+vsf_spi_capability_t vsf_spi_get_capability(void)
 {
-    spi_capability_t spi_capability;
+    vsf_spi_capability_t spi_capability;
     
     spi_capability.Read.can_read_block   = true;
     spi_capability.Read.can_read_byte    = true;
@@ -52,7 +52,7 @@ spi_capability_t vsf_spi_get_capability(void)
     return spi_capability;
 }
 
-vsf_err_t vsf_spi_init(vsf_spi_t *spi_obj, spi_cfg_t *cfg_ptr)
+vsf_err_t vsf_spi_init(vsf_spi_t *spi_obj, vsf_spi_cfg_t *cfg_ptr)
 {
     VSF_ASSERT((spi_obj != NULL) && (cfg_ptr != NULL));
     
@@ -202,12 +202,12 @@ static void vsf_spi_irqhandler(vsf_spi_t *spi_obj)
 }
 
 #define __VSF_SPI_FUNC_BODY(__N, __VALUE)                                    \
-spi_status_t vsf_spi##__N##_get_status(void)                                 \
+vsf_spi_status_t vsf_spi##__N##_get_status(void)                                 \
 {                                                                            \
     return vsf_spi_get_status(&vsf_spi[__N]);                                \
 }                                                                            \
                                                                              \
-vsf_err_t vsf_spi##__N##_init(spi_cfg_t *cfg_ptr)                            \
+vsf_err_t vsf_spi##__N##_init(vsf_spi_cfg_t *cfg_ptr)                            \
 {                                                                            \
     return vsf_spi_init(&vsf_spi[__N], cfg_ptr);                             \
 }                                                                            \

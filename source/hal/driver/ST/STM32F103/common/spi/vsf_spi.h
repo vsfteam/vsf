@@ -5,7 +5,7 @@
 #include "../../__device.h"
 #include "hal/driver/common/template/vsf_template_spi.h"
 
-enum em_spi_mode_t {
+enum vsf_spi_mode_t {
     SPI_EN                      = 0x0040,
     SPI_NSS_SET                 = 0x0100,
     
@@ -74,7 +74,7 @@ typedef enum {
     SPI2_GPIO_MODE              = 0x4B400000U,
 }en_spi_clk_gpio_t;
 
-struct spi_status_t {
+struct vsf_spi_status_t {
     uint8_t SPI_RXNE   : 1;
     uint8_t SPI_TXE    : 1;
     uint8_t SPI_CHSIDE : 1;
@@ -85,7 +85,7 @@ struct spi_status_t {
     uint8_t SPI_BSY    : 1;
 };
 
-struct spi_capability_t {
+struct vsf_spi_capability_t {
     implement(peripheral_capability_t);
 };
 
@@ -101,9 +101,9 @@ struct vsf_spi_t {
 
 extern vsf_spi_t vsf_spi[SPI_COUNT];
 
-extern spi_status_t     vsf_spi_get_status(vsf_spi_t *spi_obj);
-extern spi_capability_t vsf_spi_get_capability(void);
-extern vsf_err_t        vsf_spi_init(vsf_spi_t *spi_obj, spi_cfg_t *cfg_ptr);
+extern vsf_spi_status_t     vsf_spi_get_status(vsf_spi_t *spi_obj);
+extern vsf_spi_capability_t vsf_spi_get_capability(void);
+extern vsf_err_t        vsf_spi_init(vsf_spi_t *spi_obj, vsf_spi_cfg_t *cfg_ptr);
 extern uintalu_t        vsf_spi_polarity_set(vsf_spi_t *spi_obj, uintalu_t polarity);
 extern uintalu_t        vsf_spi_polarity_get(vsf_spi_t *spi_obj);
 extern fsm_rt_t         vsf_spi_exchange(vsf_spi_t *spi_obj, uintalu_t output, void *input);

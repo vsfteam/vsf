@@ -36,7 +36,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum em_spi_mode_t {
+typedef enum vsf_spi_mode_t {
     SPI_SLAVE                        = 0x00ul << 11,
     SPI_MASTER                       = 0x01ul << 11,
     SPI_DIR_MODE_MASK                = SPI_SLAVE | SPI_MASTER,
@@ -90,7 +90,7 @@ typedef enum em_spi_mode_t {
                                       | SPI_AUTO_CS_MASK,
 
     SPI_MODE_MASK                    = __SPI_HW_MODE_MASK | SPI_DATASIZE_MASK,
-} em_spi_mode_t;
+} vsf_spi_mode_t;
 
 /*============================ INCLUDES ======================================*/
 

@@ -35,7 +35,7 @@
 
 #if VSF_SPI_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
+vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
@@ -62,7 +62,7 @@ fsm_rt_t vsf_spi_disable(vsf_spi_t *spi_ptr)
     return spi_ptr->op->disable(spi_ptr);
 }
 
-void vsf_spi_irq_enable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_spi_irq_enable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
@@ -71,7 +71,7 @@ void vsf_spi_irq_enable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
     spi_ptr->op->irq_enable(spi_ptr, irq_mask);
 }
 
-void vsf_spi_irq_disable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_spi_irq_disable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
@@ -80,7 +80,7 @@ void vsf_spi_irq_disable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
     spi_ptr->op->irq_disable(spi_ptr, irq_mask);
 }
 
-spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
+vsf_spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
@@ -152,7 +152,7 @@ int_fast32_t vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr)
     return spi_ptr->op->get_transfered_count(spi_ptr);
 }
 
-spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr)
+vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);

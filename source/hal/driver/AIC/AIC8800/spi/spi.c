@@ -74,7 +74,7 @@ typedef struct vsf_hw_spi_t {
     const vsf_hw_spi_const_t * spi_const;
     bool is_auto_cs;
     vsf_spi_isr_t isr;
-    em_spi_irq_mask_t irq_mask;
+    vsf_spi_irq_mask_t irq_mask;
 
     struct {
         uint32_t count;
@@ -110,7 +110,7 @@ static vsf_err_t __clock_init(vsf_hw_spi_t *hw_spi_ptr, uint32_t clock_hz)
     }
 }
 
-static vsf_err_t __cfg_check(vsf_hw_spi_t *hw_spi_ptr, spi_cfg_t *cfg_ptr)
+static vsf_err_t __cfg_check(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
     // TODO: support spi slave mode
     if ((cfg_ptr->mode & SPI_DIR_MODE_MASK) != SPI_MASTER) {
@@ -133,7 +133,7 @@ static vsf_err_t __cfg_check(vsf_hw_spi_t *hw_spi_ptr, spi_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *hw_spi_ptr, spi_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
     vsf_err_t err;
 
@@ -198,14 +198,14 @@ fsm_rt_t vsf_hw_spi_disable(vsf_hw_spi_t *hw_spi_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_hw_spi_irq_enable(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_hw_spi_irq_enable(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
 
     hw_spi_ptr->irq_mask |= irq_mask;
 }
 
-void vsf_hw_spi_irq_disable(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_hw_spi_irq_disable(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
 
@@ -364,11 +364,11 @@ static void __spi_request_transfer(vsf_hw_spi_t *hw_spi_ptr)
     reg->TCR = (0x01ul << 1);   // trans start
 }
 
-static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, em_spi_irq_mask_t irq_mask)
+static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
-    em_spi_irq_mask_t cb_irq_mask = 0;
+    vsf_spi_irq_mask_t cb_irq_mask = 0;
 
     if (irq_mask & SPI_IRQ_MASK_CPL) {
         const int ch = spi_const->request.recv.channel;
@@ -462,14 +462,14 @@ void vsf_hw_spi_cs_inactive(vsf_hw_spi_t *hw_spi_ptr, uint_fast8_t index)
     reg->CR[0] |= (1 << 8);
 }
 
-spi_status_t vsf_hw_spi_status(vsf_hw_spi_t *hw_spi_ptr)
+vsf_spi_status_t vsf_hw_spi_status(vsf_hw_spi_t *hw_spi_ptr)
 {
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
     const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
     VSF_HAL_ASSERT(spi_const != NULL);
     REG_SPI_T *reg = spi_const->reg;
 
-    spi_status_t status;
+    vsf_spi_status_t status;
     status.is_busy = (reg->OCR != 0) || (reg->ICR != 0);
 
     return status;

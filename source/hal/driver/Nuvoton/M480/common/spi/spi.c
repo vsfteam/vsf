@@ -162,7 +162,7 @@ static uint8_t __vsf_hw_spi_get_data_width(vsf_hw_spi_t *spi_ptr)
     return data_width;
 }
 
-static vsf_err_t __vsf_hw_spi_reg_init(vsf_hw_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
+static vsf_err_t __vsf_hw_spi_reg_init(vsf_hw_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
     uint32_t clock_source;
     SPI_T* reg;
@@ -191,7 +191,7 @@ static vsf_err_t __vsf_hw_spi_reg_init(vsf_hw_spi_t *spi_ptr, spi_cfg_t *cfg_ptr
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
     vsf_err_t result;
 
@@ -233,7 +233,7 @@ fsm_rt_t vsf_hw_spi_disable(vsf_hw_spi_t *spi_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_hw_spi_irq_enable(vsf_hw_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_hw_spi_irq_enable(vsf_hw_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -242,7 +242,7 @@ void vsf_hw_spi_irq_enable(vsf_hw_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
     spi_ptr->irq_mask |= irq_mask;
 }
 
-void vsf_hw_spi_irq_disable(vsf_hw_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_hw_spi_irq_disable(vsf_hw_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
@@ -251,12 +251,12 @@ void vsf_hw_spi_irq_disable(vsf_hw_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
     spi_ptr->irq_mask &= ~irq_mask;
 }
 
-spi_status_t vsf_hw_spi_status(vsf_hw_spi_t *spi_ptr)
+vsf_spi_status_t vsf_hw_spi_status(vsf_hw_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
 
-    spi_status_t status = {
+    vsf_spi_status_t status = {
         .use_as__peripheral_status_t.is_busy = !!(spi_ptr->reg->STATUS & SPI_STATUS_BUSY_Msk),
     };
 
