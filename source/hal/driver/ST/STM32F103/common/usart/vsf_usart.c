@@ -49,7 +49,7 @@ ROOT void USART##__N##_IRQHandler(void)                                         
 /*============================ IMPLEMENTATION ================================*/
 
 
-vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
+vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)
 {
     VSF_ASSERT((NULL != usart_ptr) && (NULL != cfg_ptr));
     USART_TypeDef *pusart = usart_ptr->reg_ptr;
@@ -166,11 +166,11 @@ fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr)
 }
 
 /***********************************usart_status*********************************/
-usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
+vsf_usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
 {
     VSF_ASSERT(NULL != usart_ptr);
 
-    usart_status_t state_break = {
+    vsf_usart_status_t state_break = {
         .ip_is_busy = false,
         .bw_is_busy = false,
         .br_is_busy = false

@@ -39,7 +39,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum  em_usart_mode_t {
+typedef enum  vsf_usart_mode_t {
     USART_8_BIT_LENGTH              = 3ul,
     USART_7_BIT_LENGTH              = 2ul,
     USART_6_BIT_LENGTH              = 1ul,
@@ -81,9 +81,9 @@ typedef enum  em_usart_mode_t {
     USART_RX_INVERTED               = 0x08000000ul,
     USART_TX_RX_INVERTED            =       USART_TX_INVERTED
                                         |   USART_RX_INVERTED,
-} em_usart_mode_t;
+} vsf_usart_mode_t;
 
-typedef enum em_usart_irq_mask_t {
+typedef enum vsf_usart_irq_mask_t {
     USART_IRQ_MASK_RX               = VSF_BIT(0),
     USART_IRQ_MASK_TX               = VSF_BIT(1),
     USART_IRQ_MASK_RX_CPL           = VSF_BIT(2),
@@ -100,16 +100,16 @@ typedef enum em_usart_irq_mask_t {
     USART_IRQ_MASK                  =  USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
                                      | USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL
                                      | USART_IRQ_MASK_ERROR    | USART_IRQ_MASK_RX_TIMEOUT,
-} em_usart_irq_mask_t;
+} vsf_usart_irq_mask_t;
 
-typedef struct usart_status_t {
+typedef struct vsf_usart_status_t {
     uint8_t                         is_busy : 1;
     uint8_t                         rx_error_detected : 1;
     uint8_t                         tx_error_detected : 1;
     uint8_t                         rx_cancel : 1;
     uint8_t                         tx_cancel : 1;
     uint32_t                        more_status : 27;
-} usart_status_t;
+} vsf_usart_status_t;
 
 /*============================ INCLUDES ======================================*/
 

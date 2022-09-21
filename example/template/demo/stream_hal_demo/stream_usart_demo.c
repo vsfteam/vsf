@@ -114,7 +114,7 @@ int VSF_USER_ENTRY(void)
     vk_usbd_connect(&__usbd);
 
     {
-        usart_cfg_t cfg = {
+        vsf_usart_cfg_t cfg = {
             .mode       = USART_8_BIT_LENGTH | USART_NO_PARITY | USART_1_STOPBIT,
             .baudrate   = 115200,
         };

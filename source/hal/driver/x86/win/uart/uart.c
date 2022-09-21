@@ -156,12 +156,12 @@ typedef struct vsf_hw_usart_t {
 #if VSF_HW_USART_CFG_MULTI_CLASS == ENABLED
     vsf_usart_t                         vsf_usart;
 #endif
-    em_usart_irq_mask_t                 enable_flag;
+    vsf_usart_irq_mask_t                 enable_flag;
     uint8_t                             com_port;
     uint8_t                             com_status;
     uint8_t                             cancel_status;
     uint8_t                             init_flag : 1;
-    usart_cfg_t                         cfg;
+    vsf_usart_cfg_t                         cfg;
     uint8_t                             *buf;
     uint_fast32_t                       buf_size;
     int_fast32_t                        sended_buf_size;
@@ -615,7 +615,7 @@ static void __vk_usart_write_event_thread(void *arg)
     __vsf_arch_irq_fini(irq_thread);
 }
 
-vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart, usart_cfg_t *cfg)
+vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart, vsf_usart_cfg_t *cfg)
 {
     vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX",0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, hw_usart, cfg);
     VSF_HAL_ASSERT(cfg != NULL);
@@ -664,7 +664,7 @@ fsm_rt_t vsf_hw_usart_disable(vsf_hw_usart_t *hw_usart)
     return fsm_rt_cpl;
 }
 
-void vsf_hw_usart_irq_enable(vsf_hw_usart_t *hw_usart, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_enable(vsf_hw_usart_t *hw_usart, vsf_usart_irq_mask_t irq_mask)
 {
     vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX",%d)", __FUNCTION__, hw_usart, irq_mask);
     VSF_HAL_ASSERT(hw_usart != NULL);
@@ -673,7 +673,7 @@ void vsf_hw_usart_irq_enable(vsf_hw_usart_t *hw_usart, em_usart_irq_mask_t irq_m
     vsf_hw_usart_trace_function("%s exited", __FUNCTION__);
 }
 
-void vsf_hw_usart_irq_disable(vsf_hw_usart_t *hw_usart, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_disable(vsf_hw_usart_t *hw_usart, vsf_usart_irq_mask_t irq_mask)
 {
     vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX",%d)", __FUNCTION__, hw_usart, irq_mask);
     VSF_HAL_ASSERT(hw_usart != NULL);
@@ -681,11 +681,11 @@ void vsf_hw_usart_irq_disable(vsf_hw_usart_t *hw_usart, em_usart_irq_mask_t irq_
     vsf_hw_usart_trace_function("%s exited", __FUNCTION__);
 }
 
-usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart)
+vsf_usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart)
 {
     vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, hw_usart);
     VSF_HAL_ASSERT(hw_usart != NULL);
-    usart_status_t ret;
+    vsf_usart_status_t ret;
     if ((hw_usart->com_status & USART_INIT_IS_BUSY)
         || (hw_usart->com_status & USART_READ_IS_BUSY)
         || (hw_usart->com_status & USART_WRITE_IS_BUSY)) {

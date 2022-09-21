@@ -51,9 +51,9 @@ typedef uint_fast16_t vsf_usart_fifo2req_fifo_fn_t(vsf_usart_t *usart_ptr,
                                                    uint_fast16_t count);
 
 typedef void vsf_usart_fifo2req_irq_fn_t(vsf_usart_t *usart_ptr,
-                                         em_usart_irq_mask_t irq_mask);
+                                         vsf_usart_irq_mask_t irq_mask);
 
-typedef vsf_err_t vsf_usart_fifo2req_init_fn_t(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
+typedef vsf_err_t vsf_usart_fifo2req_init_fn_t(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr);
 
 
 typedef struct vsf_usart_fifo2req_item_t {
@@ -68,7 +68,7 @@ typedef struct vsf_usart_fifo2req_t {
     vsf_usart_fifo2req_item_t tx;
 
     vsf_usart_isr_t isr;
-    em_usart_irq_mask_t irq_mask;
+    vsf_usart_irq_mask_t irq_mask;
 
     vsf_usart_fifo2req_irq_fn_t * enable_irq_fn;
     vsf_usart_fifo2req_irq_fn_t * disable_irq_fn;
@@ -82,7 +82,7 @@ typedef struct vsf_usart_fifo2req_t {
 vsf_err_t vsf_usart_fifo2req_init(vsf_usart_fifo2req_t *request_ptr,
                                   vsf_usart_fifo2req_init_fn_t  * init_fn,
                                   vsf_usart_t *usart_ptr,
-                                  usart_cfg_t *cfg_ptr);
+                                  vsf_usart_cfg_t *cfg_ptr);
 
 vsf_err_t vsf_usart_fifo2req_request_rx(vsf_usart_fifo2req_t *request_ptr,
                                         vsf_usart_t *usart_ptr,
@@ -107,11 +107,11 @@ int_fast32_t vsf_usart_fifo2req_get_tx_count(vsf_usart_fifo2req_t *request_ptr,
 
 void vsf_usart_fifo2req_irq_enable(vsf_usart_fifo2req_t *request_ptr,
                                    vsf_usart_t *usart_ptr,
-                                   em_usart_irq_mask_t irq_mask);
+                                   vsf_usart_irq_mask_t irq_mask);
 
 void vsf_usart_fifo2req_irq_disable(vsf_usart_fifo2req_t *request_ptr,
                                     vsf_usart_t *usart_ptr,
-                                    em_usart_irq_mask_t irq_mask);
+                                    vsf_usart_irq_mask_t irq_mask);
 
 /*============================ IMPLEMENTATION ================================*/
 

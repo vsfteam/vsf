@@ -38,7 +38,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum em_usart_mode_t {
+enum vsf_usart_mode_t {
     // LINECTRL, bit 0-7
     USART_5_BIT_LENGTH          = (0x0ul << 5),
     USART_6_BIT_LENGTH          = (0x1ul << 5),
@@ -82,7 +82,7 @@ enum em_usart_mode_t {
     USART_SYNC_CLKOUT_EN        = (1ul << (6 + 24)),
 };
 
-struct usart_status_t {
+struct vsf_usart_status_t {
     union {
         inherit(peripheral_status_t)
         struct {
@@ -98,7 +98,7 @@ struct usart_status_t {
     };
 };
 
-enum em_usart_irq_mask_t {
+enum vsf_usart_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     USART_IRQ_MASK_TX           = USART_INTR_TXIS,
     USART_IRQ_MASK_RX           = USART_INTR_RXIS,
