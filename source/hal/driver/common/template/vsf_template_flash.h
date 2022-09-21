@@ -134,6 +134,7 @@ def_interface(i_flash_t)
 
     vsf_err_t (*Init)(vsf_flash_cfg_t *pCfg);
 
+    // Provides byte-level random reads and writes
     vsf_err_t (*Erase)(vsf_flash_size_t address, vsf_flash_size_t size);
     vsf_err_t (*Write)(vsf_flash_size_t address, uint8_t* buffer, vsf_flash_size_t size);
     vsf_err_t (*Read)(vsf_flash_size_t address, uint8_t* buffer, vsf_flash_size_t size);
