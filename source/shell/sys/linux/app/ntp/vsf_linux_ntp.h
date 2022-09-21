@@ -65,7 +65,7 @@ vsf_class(vsf_linux_ntp_rtc_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_linux_ntp_rtc_init(vsf_rtc_t *rtc_ptr, rtc_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_linux_ntp_rtc_init(vsf_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr);
 extern fsm_rt_t vsf_linux_ntp_rtc_enable(vsf_rtc_t *rtc_ptr);
 extern vsf_err_t vsf_linux_ntp_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm);
 

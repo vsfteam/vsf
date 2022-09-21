@@ -62,21 +62,21 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_RTC_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, init,       VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, rtc_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         rtc, enable,     VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         rtc, disable,    VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, rtc_capability_t, rtc, capability, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, get,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_tm_t *rtc_tm) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, const vsf_rtc_tm_t *rtc_tm) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, get_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *millisecond_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rtc, set_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_time_t second, vsf_rtc_time_t millisecond)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, init,       VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             rtc, enable,     VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             rtc, disable,    VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_rtc_capability_t, rtc, capability, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, get,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_tm_t *rtc_tm) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set,        VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, const vsf_rtc_tm_t *rtc_tm) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, get_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *millisecond_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set_time,   VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_time_t second, vsf_rtc_time_t millisecond)
 
 /*============================ TYPES =========================================*/
 
 #if VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE == DISABLED
-typedef enum em_rtc_irq_mask_t {
+typedef enum vsf_rtc_irq_mask_t {
     VSF_RTC_IRQ_MASK_ALARM = (1 << 0),
-} em_rtc_irq_mask_t;
+} vsf_rtc_irq_mask_t;
 #endif
 
 typedef VSF_RTC_CFG_TIME_TYPE vsf_rtc_time_t;
@@ -94,7 +94,7 @@ typedef struct vsf_rtc_tm_t {
 
 typedef struct vsf_rtc_t vsf_rtc_t;
 
-typedef void vsf_rtc_isr_handler_t(void *target_ptr, em_rtc_irq_mask_t irq_mask, vsf_rtc_t *rtc_ptr);
+typedef void vsf_rtc_isr_handler_t(void *target_ptr, vsf_rtc_irq_mask_t irq_mask, vsf_rtc_t *rtc_ptr);
 
 typedef struct vsf_rtc_isr_t {
     vsf_rtc_isr_handler_t *handler_fn;
@@ -103,14 +103,14 @@ typedef struct vsf_rtc_isr_t {
 } vsf_rtc_isr_t;
 
 //! rtc configuration
-typedef struct rtc_cfg_t {
+typedef struct vsf_rtc_cfg_t {
     vsf_rtc_isr_t isr;
-} rtc_cfg_t;
+} vsf_rtc_cfg_t;
 
 #if VSF_RTC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-typedef struct rtc_capability_t {
+typedef struct vsf_rtc_capability_t {
     inherit(peripheral_capability_t)
-} rtc_capability_t;
+} vsf_rtc_capability_t;
 #endif
 
 typedef struct vsf_rtc_op_t {
@@ -129,10 +129,10 @@ struct vsf_rtc_t  {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_rtc_init(vsf_rtc_t *rtc_ptr, rtc_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_rtc_init(vsf_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr);
 extern fsm_rt_t vsf_rtc_enable(vsf_rtc_t *rtc_ptr);
 extern fsm_rt_t vsf_rtc_disable(vsf_rtc_t *rtc_ptr);
-extern rtc_capability_t vsf_rtc_capability(vsf_rtc_t *rtc_ptr);
+extern vsf_rtc_capability_t vsf_rtc_capability(vsf_rtc_t *rtc_ptr);
 
 /**
  * get rtc date time

@@ -47,7 +47,7 @@ typedef struct vsf_hw_rtc_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_hw_rtc_init(vsf_hw_rtc_t *hw_rtc_ptr, rtc_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_rtc_init(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_cfg_t *cfg_ptr)
 {
     hw_rtc_ptr->is_enabled = false;
     return VSF_ERR_NONE;
