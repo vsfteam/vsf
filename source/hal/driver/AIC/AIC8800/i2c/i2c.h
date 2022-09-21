@@ -32,7 +32,7 @@
 
 /*============================ TYPES =========================================*/
 
-typedef enum em_i2c_cmd_t {
+typedef enum vsf_i2c_cmd_t {
     I2C_CMD_WRITE       = (0x00ul << 3),
     I2C_CMD_READ        = (0x01ul << 3),
     I2C_CMD_RW_MASK     = I2C_CMD_WRITE | I2C_CMD_READ,
@@ -50,7 +50,7 @@ typedef enum em_i2c_cmd_t {
     __I2C_CMD_HW_MASK   = I2C_CMD_RW_MASK | I2C_CMD_START | I2C_CMD_RESTAR,
 
     I2C_CMD_ALL_MASK    = I2C_CMD_RW_MASK | I2C_CMD_COND_RESTAR | I2C_CMD_BITS_MASK,
-} em_i2c_cmd_t;
+} vsf_i2c_cmd_t;
 
 /*============================ INCLUDES ======================================*/
 

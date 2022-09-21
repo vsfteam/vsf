@@ -54,8 +54,8 @@ typedef struct vsf_hw_i2c_t {
     const vsf_hw_i2c_const_t *i2c_const;
     vsf_i2c_isr_t isr;
 
-    i2c_cfg_t           cfg;
-    em_i2c_irq_mask_t   irq_mask;
+    vsf_i2c_cfg_t           cfg;
+    vsf_i2c_irq_mask_t   irq_mask;
     uint8_t             is_enabled :1;
 
     struct {
@@ -86,7 +86,7 @@ static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
         }
     }
 
-    em_i2c_irq_mask_t irq_mask;
+    vsf_i2c_irq_mask_t irq_mask;
     if (0 != hw_i2c_const->reg->LR) {
         irq_mask = I2C_IRQ_MASK_MASTER_NACK_DETECT;
     } else {
@@ -105,7 +105,7 @@ static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
     }
 }
 
-vsf_err_t vsf_hw_i2c_init(vsf_hw_i2c_t *hw_i2c_ptr, i2c_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_i2c_init(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
@@ -160,7 +160,7 @@ fsm_rt_t vsf_hw_i2c_disable(vsf_hw_i2c_t *hw_i2c_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_hw_i2c_irq_enable(vsf_hw_i2c_t *hw_i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_hw_i2c_irq_enable(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     VSF_HAL_ASSERT((irq_mask & ~I2C_IRQ_MASK_MASTER_ALL) == 0);
@@ -168,7 +168,7 @@ void vsf_hw_i2c_irq_enable(vsf_hw_i2c_t *hw_i2c_ptr, em_i2c_irq_mask_t irq_mask)
     hw_i2c_ptr->irq_mask |= irq_mask;
 }
 
-void vsf_hw_i2c_irq_disable(vsf_hw_i2c_t *hw_i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_hw_i2c_irq_disable(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
@@ -181,11 +181,11 @@ void vsf_hw_i2c_irq_disable(vsf_hw_i2c_t *hw_i2c_ptr, em_i2c_irq_mask_t irq_mask
     }
 }
 
-i2c_status_t vsf_hw_i2c_status(vsf_hw_i2c_t *hw_i2c_ptr)
+vsf_i2c_status_t vsf_hw_i2c_status(vsf_hw_i2c_t *hw_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
 
-    i2c_status_t status = {
+    vsf_i2c_status_t status = {
         .use_as__peripheral_status_t.is_busy = false,
     };
 
@@ -194,7 +194,7 @@ i2c_status_t vsf_hw_i2c_status(vsf_hw_i2c_t *hw_i2c_ptr)
 
 vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
                                     uint16_t address,
-                                    em_i2c_cmd_t cmd,
+                                    vsf_i2c_cmd_t cmd,
                                     uint16_t count,
                                     uint8_t *buffer)
 {

@@ -72,19 +72,19 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_I2C_APIS(__prefix_name)                                                                                                                        \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2c, init,           VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, i2c_cfg_t *cfg_ptr)              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2c, init,           VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         i2c, enable,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         i2c, disable,        VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2c, irq_enable,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, em_i2c_irq_mask_t irq_mask)      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2c, irq_disable,    VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, em_i2c_irq_mask_t irq_mask)      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, i2c_status_t,     i2c, status,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, i2c_capability_t, i2c, capability,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2c, master_request, VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, uint16_t address, em_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2c, irq_enable,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2c, irq_disable,    VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_status_t,     i2c, status,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_capability_t, i2c, capability,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2c, master_request, VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, uint16_t address, vsf_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)
 
 /*============================ TYPES =========================================*/
 
 #if VSF_I2C_CFG_REIMPLEMENT_FEATURE == DISABLED
-typedef enum em_i2c_feature_t {
+typedef enum vsf_i2c_feature_t {
     I2C_MODE_MASTER           = (0x1ul << 0),  // select master mode
     I2C_MODE_SLAVE            = (0x0ul << 0),  // select slave mode
     I2C_MODE_MASK             = (0x1ul << 0),
@@ -103,20 +103,20 @@ typedef enum em_i2c_feature_t {
     I2C_FEATURE_MASK          =  I2C_MODE_MASK
                                | I2C_SPEED_MASK
                                | I2C_ADDR_MASK,
-} em_i2c_feature_t;
+} vsf_i2c_feature_t;
 #endif
 
 /**
  \~english
  @brief flags of i2c tranfer messages
- @note em_i2c_cmd_t is implemented by specific driver.
+ @note vsf_i2c_cmd_t is implemented by specific driver.
 
  \~chinese
  @brief i2c 传输的标志
- @note em_i2c_cmd_t 由具体驱动实现。
+ @note vsf_i2c_cmd_t 由具体驱动实现。
  */
 #if VSF_I2C_CFG_REIMPLEMENT_CMD == DISABLED
-typedef enum em_i2c_cmd_t {
+typedef enum vsf_i2c_cmd_t {
     I2C_CMD_WRITE      = (0x00ul << 0),
     I2C_CMD_READ       = (0x01ul << 0),
     I2C_CMD_RW_MASK    = (0x01ul << 1),
@@ -134,11 +134,11 @@ typedef enum em_i2c_cmd_t {
                         | I2C_CMD_10_BITS,
 
     I2C_CMD_ALL_MASK   = I2C_CMD_RW_MASK | I2C_CMD_MASK | I2C_CMD_BITS_MASK,
-} em_i2c_cmd_t;
+} vsf_i2c_cmd_t;
 #endif
 
 #if VSF_I2C_CFG_REIMPLEMENT_IRQ_MASK == DISABLED
-typedef enum em_i2c_irq_mask_t {
+typedef enum vsf_i2c_irq_mask_t {
     I2C_IRQ_MASK_MASTER_STARTED                 = (0x1ul <<  0),
     I2C_IRQ_MASK_MASTER_ADDRESS_SEND            = (0x1ul <<  1),
     I2C_IRQ_MASK_MASTER_10_BITS_ADDRESS_SEND    = (0x1ul <<  2),
@@ -161,22 +161,22 @@ typedef enum em_i2c_irq_mask_t {
                                                  | I2C_IRQ_MASK_MASTER_ERROR
                                                  | I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
                                                  | I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
-} em_i2c_irq_mask_t;
+} vsf_i2c_irq_mask_t;
 #endif
 
 #if VSF_I2C_CFG_REIMPLEMENT_STATUS == DISABLED
-typedef struct i2c_status_t {
+typedef struct vsf_i2c_status_t {
     union {
         inherit(peripheral_status_t)
         uint32_t value;
     };
-} i2c_status_t;
+} vsf_i2c_status_t;
 #endif
 
 #if VSF_I2C_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-typedef struct i2c_capability_t {
+typedef struct vsf_i2c_capability_t {
     inherit(peripheral_capability_t)
-} i2c_capability_t;
+} vsf_i2c_capability_t;
 #endif
 
 typedef struct vsf_i2c_t vsf_i2c_t;
@@ -188,7 +188,7 @@ typedef struct vsf_i2c_t vsf_i2c_t;
 
  @param target_ptr pointer of user.
  @param i2c_ptr pointer of i2c instance.
- @param irq_mask one or more value of enum em_i2c_irq_mask_t
+ @param irq_mask one or more value of enum vsf_i2c_irq_mask_t
  @return None.
 
  \~chinese
@@ -197,7 +197,7 @@ typedef struct vsf_i2c_t vsf_i2c_t;
 
  @param target_ptr 用户指针
  @param i2c_ptr i2c实例的指针
- @param irq_mask 一个或者多个枚举 em_i2c_irq_mask_t 的值的按位或
+ @param irq_mask 一个或者多个枚举 vsf_i2c_irq_mask_t 的值的按位或
  @return 无。
 
  \~
@@ -216,7 +216,7 @@ typedef struct vsf_i2c_t vsf_i2c_t;
  */
 typedef void vsf_i2c_isr_handler_t(void *target_ptr,
                                    vsf_i2c_t *i2c_ptr,
-                                   em_i2c_irq_mask_t irq_mask);
+                                   vsf_i2c_irq_mask_t irq_mask);
 
 /**
  \~english
@@ -241,16 +241,16 @@ typedef struct vsf_i2c_isr_t {
  \~chinese
  @brief i2c 配置
  */
-typedef struct i2c_cfg_t {
-    em_i2c_feature_t mode;      //!< \~english i2c mode \ref em_i2c_feature_t
-                                //!< \~chinese i2c 模式 \ref em_i2c_feature_t
+typedef struct vsf_i2c_cfg_t {
+    vsf_i2c_feature_t mode;      //!< \~english i2c mode \ref vsf_i2c_feature_t
+                                //!< \~chinese i2c 模式 \ref vsf_i2c_feature_t
 
     uint32_t clock_hz;          //!< \~english i2c clock (in Hz)
                                 //!< \~chinese i2c 时钟频率 (单位：Hz)
 
     vsf_i2c_isr_t isr;          //!< \~english i2c interrupt
                                 //!< \~chinese i2c 中断
-} i2c_cfg_t;
+} vsf_i2c_cfg_t;
 
 typedef struct vsf_i2c_op_t {
 #undef __VSF_HAL_TEMPLATE_API
@@ -272,16 +272,16 @@ struct vsf_i2c_t  {
  \~english
  @brief initialize a i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @param[in] cfg_ptr: a pointer to structure @ref i2c_cfg_t
+ @param[in] cfg_ptr: a pointer to structure @ref vsf_i2c_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if i2c was initialized, or a negative error code
 
  \~chinese
  @brief 初始化一个 i2c 实例
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- @param[in] cfg_ptr: 结构体 i2c_cfg_t 的指针，参考 @ref i2c_cfg_t
+ @param[in] cfg_ptr: 结构体 vsf_i2c_cfg_t 的指针，参考 @ref vsf_i2c_cfg_t
  @return vsf_err_t: 如果 i2c 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
  */
-extern vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr);
 
 /**
  \~english
@@ -326,7 +326,7 @@ extern fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr);
  \~english
  @brief enable interrupt masks of i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @param[in] irq_mask: one or more value of enum em_i2c_irq_mask_t
+ @param[in] irq_mask: one or more value of enum vsf_i2c_irq_mask_t
  @return none.
 
  \~chinese
@@ -334,48 +334,48 @@ extern fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr);
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
  @return fsm_rt_t: 如果使能成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
  */
-extern void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask);
+extern void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask);
 
 /**
  \~english
  @brief disable interrupt masks of i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @param[in] irq_mask: one or more value of enum em_i2c_irq_mask_t, @ref em_i2c_irq_mask_t
+ @param[in] irq_mask: one or more value of enum vsf_i2c_irq_mask_t, @ref vsf_i2c_irq_mask_t
  @return none.
 
  \~chinese
  @brief 禁能 i2c 实例的中断
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- @param[in] irq_mask: 一个或者多个枚举 em_i2c_irq_mask_t 的值的按位或，@ref em_i2c_irq_mask_t
+ @param[in] irq_mask: 一个或者多个枚举 vsf_i2c_irq_mask_t 的值的按位或，@ref vsf_i2c_irq_mask_t
  @return 无。
  */
-extern void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask);
+extern void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask);
 
 /**
  \~english
  @brief get the status of i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @return i2c_status_t: return all status of current i2c
+ @return vsf_i2c_status_t: return all status of current i2c
 
  \~chinese
  @brief 获取 i2c 实例状态
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- @return i2c_status_t: 返回当前i2c的所有状态
+ @return vsf_i2c_status_t: 返回当前i2c的所有状态
  */
-extern i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
+extern vsf_i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
 
 /**
  \~english
  @brief get the capability of i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @return i2c_status_t: return all capability of current i2c
+ @return vsf_i2c_status_t: return all capability of current i2c
 
  \~chinese
  @brief 获取 i2c 实例能力
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- @return i2c_status_t: 返回当前i2c的所有能力
+ @return vsf_i2c_status_t: 返回当前i2c的所有能力
  */
-extern i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
+extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
 
 /**
  \~english
@@ -400,7 +400,7 @@ extern i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
  */
 extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
                                         uint16_t address,
-                                        em_i2c_cmd_t cmd,
+                                        vsf_i2c_cmd_t cmd,
                                         uint16_t count,
                                         uint8_t *buffer_ptr);
 

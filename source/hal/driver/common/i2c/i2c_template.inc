@@ -31,7 +31,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_I2C_CFG_REQUEST_TEMPLATE == ENABLED
-vsf_err_t vsf_real_i2c_master_request(vsf_real_i2c_t *i2c_ptr, uint16_t address, em_i2c_cmd_t cmd, uint16_t count, uint8_t *buffer_ptr)
+vsf_err_t vsf_real_i2c_master_request(vsf_real_i2c_t *i2c_ptr, uint16_t address, vsf_i2c_cmd_t cmd, uint16_t count, uint8_t *buffer_ptr)
 {
 #define VSF_I2C_TYPE VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)
 
@@ -41,10 +41,10 @@ vsf_err_t vsf_real_i2c_master_request(vsf_real_i2c_t *i2c_ptr, uint16_t address,
 #endif
 
 #if VSF_I2C_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
+vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 {
     // TODO: support capability
-    i2c_capability_t i2c_capability = { 0 };
+    vsf_i2c_capability_t i2c_capability = { 0 };
     return i2c_capability;
 }
 #endif

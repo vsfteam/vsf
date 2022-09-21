@@ -227,7 +227,7 @@ static void __vsf_gpio_i2c_callback(vsf_gpio_i2c_callback_timer_t *on_timer)
     }
 }
 
-vsf_err_t vsf_gpio_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
+vsf_err_t vsf_gpio_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
 {
     vsf_gpio_i2c_t *gpio_i2c_ptr = (vsf_gpio_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
@@ -275,7 +275,7 @@ fsm_rt_t vsf_gpio_i2c_disable(vsf_i2c_t *i2c_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_gpio_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_gpio_i2c_irq_enable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     vsf_gpio_i2c_t *gpio_i2c_ptr = (vsf_gpio_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
@@ -283,7 +283,7 @@ void vsf_gpio_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
     gpio_i2c_ptr->enabled_irq_mask = irq_mask;
 }
 
-void vsf_gpio_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_gpio_i2c_irq_disable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     vsf_gpio_i2c_t *gpio_i2c_ptr = (vsf_gpio_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
@@ -291,19 +291,19 @@ void vsf_gpio_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
     gpio_i2c_ptr->enabled_irq_mask &= ~irq_mask;
 }
 
-i2c_status_t vsf_gpio_i2c_status(vsf_i2c_t *i2c_ptr)
+vsf_i2c_status_t vsf_gpio_i2c_status(vsf_i2c_t *i2c_ptr)
 {
     vsf_gpio_i2c_t *gpio_i2c_ptr = (vsf_gpio_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
 
-    i2c_status_t status = {
+    vsf_i2c_status_t status = {
         .use_as__peripheral_status_t.is_busy = gpio_i2c_ptr->is_busy,
     };
 
     return status;
 }
 
-vsf_err_t __vsf_i2c_send_cmd(vsf_i2c_t *i2c_ptr, uint16_t data, em_i2c_cmd_t command)
+vsf_err_t __vsf_i2c_send_cmd(vsf_i2c_t *i2c_ptr, uint16_t data, vsf_i2c_cmd_t command)
 {
     vsf_gpio_i2c_t *gpio_i2c_ptr = (vsf_gpio_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);

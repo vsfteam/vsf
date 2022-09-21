@@ -84,9 +84,9 @@ vsf_class(vsf_gpio_i2c_t) {
         uint8_t                             gpio_i2c_cmd;
         uint16_t                            data;
 
-        em_i2c_cmd_t cmd;
-        em_i2c_irq_mask_t irq_mask;
-        em_i2c_irq_mask_t                   enabled_irq_mask;
+        vsf_i2c_cmd_t cmd;
+        vsf_i2c_irq_mask_t irq_mask;
+        vsf_i2c_irq_mask_t                   enabled_irq_mask;
         uint16_t                            bit_mask;
 
         vsf_gpio_i2c_callback_timer_t       callback_timer;

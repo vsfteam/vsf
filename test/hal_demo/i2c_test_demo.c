@@ -81,13 +81,13 @@ app_i2c_demo_t __app_i2c_demo = {
 
 static vsf_err_t __i2c_demo_init(vsf_i2c_t *i2c_ptr,
                                  vsf_i2c_isr_t *irs_ptr,
-                                 em_i2c_irq_mask_t mask)
+                                 vsf_i2c_irq_mask_t mask)
 {
     VSF_ASSERT(i2c_ptr != NULL);
     VSF_ASSERT(irs_ptr != NULL);
     VSF_ASSERT((mask & ~I2C_IRQ_MASK_MASTER_ALL) == 0);
 
-    i2c_cfg_t i2c_cfg = {
+    vsf_i2c_cfg_t i2c_cfg = {
         .mode           = APP_I2C_DEMO_CFG_MODE,
         .clock_hz       = APP_I2C_DEMO_CLOCK_HZ,
         .isr            = *irs_ptr,
@@ -133,7 +133,7 @@ static void __i2c_search_next(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_ptr)
     }
 }
 
-static void __i2c_irq_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+static void __i2c_irq_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     app_i2c_demo_t *i2c_demo_ptr = (app_i2c_demo_t *)target_ptr;
 
@@ -158,7 +158,7 @@ static void __i2c_address_search(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_pt
         .prio = APP_I2C_DEMO_PRIO,
     };
 
-    em_i2c_irq_mask_t mask =  I2C_IRQ_MASK_MASTER_ADDRESS_NACK
+    vsf_i2c_irq_mask_t mask =  I2C_IRQ_MASK_MASTER_ADDRESS_NACK
                             | I2C_IRQ_MASK_MASTER_NACK_DETECT
                             | I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
 
