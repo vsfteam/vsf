@@ -63,6 +63,10 @@ typedef struct vsf_linux_fd_op_t {
     ssize_t (*fn_write)(vsf_linux_fd_t *sfd, const void *buf, size_t count);
     int (*fn_close)(vsf_linux_fd_t *sfd);
     int (*fn_eof)(vsf_linux_fd_t *sfd);
+
+    void * (*fn_mmap)(vsf_linux_fd_t *sfd, uint64_t minimum_size);
+    int (*fn_munmap)(vsf_linux_fd_t *sfd);
+    int (*fn_msync)(vsf_linux_fd_t *sfd);
 } vsf_linux_fd_op_t;
 
 vsf_class(vsf_linux_fd_priv_t) {
@@ -98,6 +102,7 @@ vsf_class(vsf_linux_fd_t) {
 
     private_member(
         vsf_dlist_node_t fd_node;
+        void *mmapped_buffer;
     )
 
     protected_member(

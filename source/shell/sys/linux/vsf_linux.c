@@ -1902,8 +1902,22 @@ int sethostname(const char *name, size_t len)
 // sys/mman.h
 void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
-    if ((fd >= 0) || (off != 0)) {
-        return NULL;
+    if (fd >= 0) {
+        vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+        if ((NULL == sfd) || (NULL == sfd->op) || (NULL == sfd->op->fn_mmap)) {
+            return NULL;
+        }
+        if (sfd->mmapped_buffer != NULL) {
+            return NULL;
+        }
+
+        void * ptr = sfd->op->fn_mmap(sfd, off + len);
+        if (NULL == ptr) {
+            return NULL;
+        }
+
+        sfd->mmapped_buffer = (void *)((uint8_t *)ptr + off);
+        return sfd->mmapped_buffer;
     }
 
     return malloc(len);
@@ -1911,11 +1925,24 @@ void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 
 int msync(void *addr, size_t len, int flags)
 {
+    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
+        if (_->mmapped_buffer == addr) {
+            return NULL == _->op->fn_msync ? 0 : _->op->fn_msync(_);
+        }
+    }
     return 0;
 }
 
 int munmap(void *addr, size_t len)
 {
+    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
+        if (_->mmapped_buffer == addr) {
+            return NULL == _->op->fn_munmap ? 0 : _->op->fn_munmap(_);
+        }
+    }
+
     free(addr);
     return 0;
 }
