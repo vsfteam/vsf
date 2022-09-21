@@ -64,9 +64,9 @@ typedef struct vsf_linux_fd_op_t {
     int (*fn_close)(vsf_linux_fd_t *sfd);
     int (*fn_eof)(vsf_linux_fd_t *sfd);
 
-    void * (*fn_mmap)(vsf_linux_fd_t *sfd, uint64_t minimum_size);
-    int (*fn_munmap)(vsf_linux_fd_t *sfd);
-    int (*fn_msync)(vsf_linux_fd_t *sfd);
+    void * (*fn_mmap)(vsf_linux_fd_t *sfd, off_t offset, size_t len, uint_fast32_t feature);
+    int (*fn_munmap)(vsf_linux_fd_t *sfd, void *buffer);
+    int (*fn_msync)(vsf_linux_fd_t *sfd, void *buffer);
 } vsf_linux_fd_op_t;
 
 vsf_class(vsf_linux_fd_priv_t) {

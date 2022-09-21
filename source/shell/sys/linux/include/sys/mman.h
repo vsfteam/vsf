@@ -3,6 +3,9 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
+// for VSF_FILE_ATTR_XXXX
+#include "component/fs/vsf_fs_cfg.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,10 +17,10 @@ extern "C" {
 #endif
 
 #define PROT_NONE       0
-#define PROT_READ       (1 << 0)
-#define PROT_WRITE      (1 << 1)
-#define PROT_EXEC       (1 << 2)
-#define MAP_32BIT       (1 << 3)
+#define PROT_READ       VSF_FILE_ATTR_READ
+#define PROT_WRITE      VSF_FILE_ATTR_WRITE
+#define PROT_EXEC       VSF_FILE_ATTR_EXECUTE
+#define MAP_32BIT       0
 
 #define MAP_FILE        0
 #define MAP_SHARED      1

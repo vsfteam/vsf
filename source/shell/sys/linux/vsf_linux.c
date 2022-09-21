@@ -1911,12 +1911,7 @@ void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
             return NULL;
         }
 
-        void * ptr = sfd->op->fn_mmap(sfd, off + len);
-        if (NULL == ptr) {
-            return NULL;
-        }
-
-        sfd->mmapped_buffer = (void *)((uint8_t *)ptr + off);
+        sfd->mmapped_buffer = sfd->op->fn_mmap(sfd, off, len, prot);
         return sfd->mmapped_buffer;
     }
 
@@ -1928,7 +1923,7 @@ int msync(void *addr, size_t len, int flags)
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
         if (_->mmapped_buffer == addr) {
-            return NULL == _->op->fn_msync ? 0 : _->op->fn_msync(_);
+            return NULL == _->op->fn_msync ? 0 : _->op->fn_msync(_, _->mmapped_buffer);
         }
     }
     return 0;
@@ -1939,8 +1934,9 @@ int munmap(void *addr, size_t len)
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
         if (_->mmapped_buffer == addr) {
+            int ret = NULL == _->op->fn_munmap ? 0 : _->op->fn_munmap(_, _->mmapped_buffer);
             _->mmapped_buffer = NULL;
-            return NULL == _->op->fn_munmap ? 0 : _->op->fn_munmap(_);
+            return ret;
         }
     }
 
