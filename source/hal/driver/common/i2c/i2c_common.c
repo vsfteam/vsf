@@ -35,7 +35,7 @@
 
 #if VSF_I2C_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
+vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
@@ -62,7 +62,7 @@ fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr)
     return i2c_ptr->op->disable(i2c_ptr);
 }
 
-void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
@@ -71,7 +71,7 @@ void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
     i2c_ptr->op->irq_enable(i2c_ptr, irq_mask);
 }
 
-void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
@@ -80,7 +80,7 @@ void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
     i2c_ptr->op->irq_disable(i2c_ptr, irq_mask);
 }
 
-i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr)
+vsf_i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
@@ -89,7 +89,7 @@ i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr)
     return i2c_ptr->op->status(i2c_ptr);
 }
 
-i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr)
+vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
@@ -100,7 +100,7 @@ i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr)
 
 vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
                                  uint16_t address,
-                                 em_i2c_cmd_t cmd,
+                                 vsf_i2c_cmd_t cmd,
                                  uint16_t count,
                                  uint8_t *buffer_ptr)
 {

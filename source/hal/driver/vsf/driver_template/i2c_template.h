@@ -85,7 +85,7 @@ extern "C" {
 #   define ____VSF_I2C_INTTERFACE_BODY(__NAME)                                  \
     /* I2C INIT */                                                              \
         vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr,                              \
-                                          i2c_cfg_t *cfg_ptr) {                 \
+                                          vsf_i2c_cfg_t *cfg_ptr) {                 \
             return ((vsf_##__NAME##_i2c_t *)i2c_ptr)->Init(((vsf_##__NAME##_i2c_t *)i2c_ptr), cfg_ptr);\
         }                                                                       \
     /* I2C FINI */                                                              \
@@ -102,13 +102,13 @@ extern "C" {
         }                                                                       \
     /* I2C IRQ ENABLED */                                                       \
         void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr,                             \
-                                em_i2c_irq_mask_t irq_mask) {                   \
+                                vsf_i2c_irq_mask_t irq_mask) {                   \
             ((vsf_##__NAME##_i2c_t *)i2c_ptr)->Irq_Enable(((vsf_##__NAME##_i2c_t *)i2c_ptr),\
                                  irq_mask);                                     \
         }                                                                       \
     /* I2C IRQ DISABLED */                                                      \
         void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr,                            \
-                                      em_i2c_irq_mask_t irq_mask) {             \
+                                      vsf_i2c_irq_mask_t irq_mask) {             \
             ((vsf_##__NAME##_i2c_t *)i2c_ptr)->Irq_Disable(((vsf_##__NAME##_i2c_t *)i2c_ptr),\
                                         irq_mask);                              \
         }                                                                       \
@@ -119,7 +119,7 @@ extern "C" {
     /* I2C MASTER REQUEST */                                                    \
         vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,                    \
                                              uint16_t address,                  \
-                                             em_i2c_cmd_t cmd,                  \
+                                             vsf_i2c_cmd_t cmd,                  \
                                              uint16_t count,                    \
                                              uint8_t *buffer_ptr){              \
             return ((vsf_##__NAME##_i2c_t *)i2c_ptr)->Master_Request(((vsf_##__NAME##_i2c_t *)i2c_ptr),\
@@ -131,7 +131,7 @@ extern "C" {
 #   define ____VSF_I2C_INTTERFACE_TYPE_DEFINE(__NAME)                           \
     /* I2C INIT */                                                              \
         vsf_err_t       (*Init)             (vsf_##__NAME##_i2c_t *i2c_ptr,     \
-                                             i2c_cfg_t *cfg_ptr);               \
+                                             vsf_i2c_cfg_t *cfg_ptr);               \
     /* I2C FINI */                                                              \
         void            (*Fini)             (vsf_##__NAME##_i2c_t *i2c_ptr);    \
     /* I2C EENABLED */                                                          \
@@ -140,16 +140,16 @@ extern "C" {
         fsm_rt_t        (*Disable)         (vsf_##__NAME##_i2c_t *i2c_ptr);     \
     /* I2C IRQ ENABLED */                                                       \
         void            (*Irq_Enable)      (vsf_##__NAME##_i2c_t *i2c_ptr,      \
-                                             em_i2c_irq_mask_t irq_mask);       \
+                                             vsf_i2c_irq_mask_t irq_mask);       \
     /* I2C IRQ DISABLED */                                                      \
         void            (*Irq_Disable)     (vsf_##__NAME##_i2c_t *i2c_ptr,      \
-                                             em_i2c_irq_mask_t irq_mask);       \
+                                             vsf_i2c_irq_mask_t irq_mask);       \
     /* I2C STATUS */                                                            \
         i2c_type_status (*Status)           (vsf_##__NAME##_i2c_t *i2c_ptr);    \
     /* I2C MASTER REQUEST */                                                    \
         vsf_err_t       (*Master_Request)   (vsf_##__NAME##_i2c_t *i2c_ptr,     \
                                              uint16_t address,                  \
-                                             em_i2c_cmd_t cmd,                  \
+                                             vsf_i2c_cmd_t cmd,                  \
                                              uint16_t count,                    \
                                              uint8_t *buffer_ptr);
 

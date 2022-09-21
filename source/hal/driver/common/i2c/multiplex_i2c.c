@@ -47,7 +47,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 static vsf_err_t __m_i2c_request(vsf_multiplex_i2c_t *m_i2c_ptr);
-static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask);
+static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -57,7 +57,7 @@ static vsf_err_t __m_i2c_init(vsf_multiplex_i2c_t *m_i2c_ptr)
     vsf_multiplexer_i2c_t * multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
 
-    i2c_cfg_t cfg = m_i2c_ptr->cfg;
+    vsf_i2c_cfg_t cfg = m_i2c_ptr->cfg;
     cfg.isr.handler_fn = __i2c_isr_handler;
     cfg.isr.target_ptr = m_i2c_ptr;
     vsf_err_t result = vsf_i2c_init(multiplexer->i2c_ptr, &cfg);
@@ -99,7 +99,7 @@ static void __i2c_start_next(vsf_multiplexer_i2c_t *multiplexer)
     }
 }
 
-static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)target_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
@@ -107,7 +107,7 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, em_i2c_irq_m
     VSF_HAL_ASSERT(NULL != multiplexer);
 
     bool is_restart = m_i2c_ptr->request.cmd & I2C_CMD_RESTAR;
-    em_i2c_irq_mask_t cpl_irq_mask =  I2C_IRQ_MASK_MASTER_STOP_DETECT
+    vsf_i2c_irq_mask_t cpl_irq_mask =  I2C_IRQ_MASK_MASTER_STOP_DETECT
                                     | I2C_IRQ_MASK_MASTER_NACK_DETECT
                                     | I2C_IRQ_MASK_MASTER_ADDRESS_NACK
                                     | I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
@@ -118,13 +118,13 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, em_i2c_irq_m
     }
 
     vsf_i2c_isr_t *isr_ptr = &m_i2c_ptr->cfg.isr;
-    em_i2c_irq_mask_t real_irq_mask = irq_mask & m_i2c_ptr->irq_mask;
+    vsf_i2c_irq_mask_t real_irq_mask = irq_mask & m_i2c_ptr->irq_mask;
     if ((real_irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)m_i2c_ptr, real_irq_mask);
     }
 }
 
-vsf_err_t vsf_multiplex_i2c_init(vsf_i2c_t *i2c_ptr, i2c_cfg_t *cfg_ptr)
+vsf_err_t vsf_multiplex_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
 {
     vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
@@ -206,7 +206,7 @@ fsm_rt_t vsf_multiplex_i2c_disable(vsf_i2c_t *i2c_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_multiplex_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_multiplex_i2c_irq_enable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
@@ -217,7 +217,7 @@ void vsf_multiplex_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask
 
     vsf_protect_t state = vsf_multiplex_i2c_protect();
         m_i2c_ptr->irq_mask |= irq_mask;
-        em_i2c_irq_mask_t new_irq_mask = ~multiplexer->irq_mask & irq_mask;
+        vsf_i2c_irq_mask_t new_irq_mask = ~multiplexer->irq_mask & irq_mask;
         if (new_irq_mask) {
             multiplexer->irq_mask |= new_irq_mask;
             vsf_i2c_irq_enable(multiplexer->i2c_ptr, new_irq_mask);
@@ -225,7 +225,7 @@ void vsf_multiplex_i2c_irq_enable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask
     vsf_multiplex_i2c_unprotect(state);
 }
 
-void vsf_multiplex_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mask)
+void vsf_multiplex_i2c_irq_disable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
@@ -236,7 +236,7 @@ void vsf_multiplex_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mas
 
     vsf_protect_t state = vsf_multiplex_i2c_protect();
         m_i2c_ptr->irq_mask &= ~irq_mask;
-        em_i2c_irq_mask_t new_irq_mask = multiplexer->irq_mask & irq_mask;
+        vsf_i2c_irq_mask_t new_irq_mask = multiplexer->irq_mask & irq_mask;
         if (new_irq_mask) {
             multiplexer->irq_mask &= ~new_irq_mask;
             vsf_i2c_irq_disable(multiplexer->i2c_ptr, new_irq_mask);
@@ -244,7 +244,7 @@ void vsf_multiplex_i2c_irq_disable(vsf_i2c_t *i2c_ptr, em_i2c_irq_mask_t irq_mas
     vsf_multiplex_i2c_unprotect(state);
 }
 
-i2c_status_t vsf_multiplex_i2c_status(vsf_i2c_t *i2c_ptr)
+vsf_i2c_status_t vsf_multiplex_i2c_status(vsf_i2c_t *i2c_ptr)
 {
     vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
@@ -254,7 +254,7 @@ i2c_status_t vsf_multiplex_i2c_status(vsf_i2c_t *i2c_ptr)
     VSF_HAL_ASSERT(multiplexer->init_mask & (1 << m_i2c_ptr->id));
 
     // TODO: add more status info
-    i2c_status_t status = {0};
+    vsf_i2c_status_t status = {0};
 
     if (multiplexer->current_m_i2c == m_i2c_ptr) {
         vsf_protect_t state = vsf_multiplex_i2c_protect();
@@ -267,7 +267,7 @@ i2c_status_t vsf_multiplex_i2c_status(vsf_i2c_t *i2c_ptr)
 
 vsf_err_t vsf_multiplex_i2c_master_request(vsf_i2c_t *i2c_ptr,
                                            uint16_t address,
-                                           em_i2c_cmd_t cmd,
+                                           vsf_i2c_cmd_t cmd,
                                            uint16_t count,
                                            uint8_t *buffer_ptr)
 {

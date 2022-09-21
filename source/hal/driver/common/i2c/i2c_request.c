@@ -57,7 +57,7 @@ void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     VSF_HAL_ASSERT(NULL != i2c_request_ptr);
 
-    i2c_cfg_t *cfg = &i2c_request_ptr->cfg;
+    vsf_i2c_cfg_t *cfg = &i2c_request_ptr->cfg;
     uint32_t cur_interrupt_mask = 0;
 
     if (interrupt_mask & I2C_IRQ_MASK_MASTER_NACK_DETECT) {
@@ -67,7 +67,7 @@ void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
         if (i2c_request_ptr->idx > i2c_request_ptr->count) {
             cur_interrupt_mask = cur_interrupt_mask;
         } else {
-            em_i2c_cmd_t temp_cmd = i2c_request_ptr->cmd & ~(I2C_CMD_START | I2C_CMD_RESTAR);
+            vsf_i2c_cmd_t temp_cmd = i2c_request_ptr->cmd & ~(I2C_CMD_START | I2C_CMD_RESTAR);
             if (i2c_request_ptr->idx != i2c_request_ptr->count) {
                 temp_cmd &= ~I2C_CMD_STOP;
             }
@@ -87,7 +87,7 @@ void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
 vsf_err_t vsf_i2c_request_master_request(vsf_i2c_t *i2c_ptr,
                                          vsf_i2c_request_t *i2c_request_ptr,
                                          uint16_t address,
-                                         em_i2c_cmd_t cmd,
+                                         vsf_i2c_cmd_t cmd,
                                          uint16_t count,
                                          uint8_t *buffer_ptr)
 {
