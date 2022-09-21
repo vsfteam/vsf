@@ -73,7 +73,7 @@ static void __flash_isrhandler(     void *target_ptr,
 
 static void __flash_init(void)
 {
-    flash_cfg_t cfg         = {
+    vsf_flash_cfg_t cfg         = {
         .isr                = {
             .handler_fn     = __flash_isrhandler,
         },
