@@ -35,7 +35,7 @@
 
 #if VSF_FLASH_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, flash_cfg_t *cfg_ptr)
+vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, vsf_flash_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(flash_ptr->op != NULL);

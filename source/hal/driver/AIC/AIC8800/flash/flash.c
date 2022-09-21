@@ -74,7 +74,7 @@ typedef struct vsf_hw_flash_t {
 #if VSF_HW_FLASH_CFG_MULTI_CLASS == ENABLED
     vsf_flash_t vsf_flash;
 #endif
-    flash_cfg_t cfg;
+    vsf_flash_cfg_t cfg;
     vsf_flash_size_t flash_size;
     bool is_enabled;
 } vsf_hw_flash_t;
@@ -84,7 +84,7 @@ typedef struct vsf_hw_flash_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, flash_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
 

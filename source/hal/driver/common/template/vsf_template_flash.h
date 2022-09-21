@@ -63,7 +63,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_FLASH_APIS(__prefix_name)                                                                                                                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          flash, init,      VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, flash_cfg_t *cfg_ptr)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          flash, init,      VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_cfg_t *cfg_ptr)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           flash, enable,    VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr)                                                            \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           flash, disable,   VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr)                                                            \
     __VSF_HAL_TEMPLATE_API(__prefix_name, flash_capability_t, flash, capability,VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr)                                                            \
@@ -74,7 +74,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 #if VSF_FLASH_CFG_REIMPLEMENT_IRQ_TYPE == DISABLED
-typedef enum vsf_flash_irq_mask_t{
+typedef enum vsf_flash_irq_mask_t {
     VSF_FLASH_IRQ_ERASE_MASK        = (1 << 0),
     VSF_FLASH_IRQ_WRITE_MASK        = (1 << 1),
     VSF_FLASH_IRQ_READ_MASK         = (1 << 2),
@@ -101,9 +101,9 @@ typedef struct vsf_flash_isr_t {
     vsf_arch_prio_t          prio;
 } vsf_flash_isr_t;
 
-typedef struct flash_cfg_t {
+typedef struct vsf_flash_cfg_t {
     vsf_flash_isr_t isr;
-} flash_cfg_t;
+} vsf_flash_cfg_t;
 
 #if VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct flash_capability_t {
@@ -121,7 +121,7 @@ typedef struct vsf_flash_op_t {
 } vsf_flash_op_t;
 
 #if VSF_FLASH_CFG_MULTI_CLASS == ENABLED
-struct vsf_flash_t  {
+struct vsf_flash_t {
     const vsf_flash_op_t * op;
 };
 #endif
@@ -132,7 +132,7 @@ struct vsf_flash_t  {
 def_interface(i_flash_t)
     implement(i_peripheral_t);
 
-    vsf_err_t (*Init)(flash_cfg_t *pCfg);
+    vsf_err_t (*Init)(vsf_flash_cfg_t *pCfg);
 
     vsf_err_t (*Erase)(vsf_flash_size_t address, vsf_flash_size_t size);
     vsf_err_t (*Write)(vsf_flash_size_t address, uint8_t* buffer, vsf_flash_size_t size);
@@ -144,7 +144,7 @@ end_def_interface(i_flash_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, flash_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, vsf_flash_cfg_t *cfg_ptr);
 
 extern fsm_rt_t vsf_flash_enable(vsf_flash_t *flash_ptr);
 
