@@ -51,18 +51,18 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void __vsf_multiplex_spi_irq_handler(void *target_ptr, vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask);
+static void __vsf_multiplex_spi_irq_handler(void *target_ptr, vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask);
 
 /*============================ IMPLEMENTATION ================================*/
 
-static bool __spi_mode_is_auto_cs(em_spi_mode_t mode)
+static bool __spi_mode_is_auto_cs(vsf_spi_mode_t mode)
 {
     return (mode & SPI_AUTO_CS_MASK) == SPI_AUTO_CS_ENABLE;
 }
 
 static bool __spi_cs_pin_is_hardware(vsf_multiplex_spi_t *m_spi_ptr)
 {
-    spi_capability_t spi_capability = vsf_spi_capability(m_spi_ptr->spi_info_ptr->spi);
+    vsf_spi_capability_t spi_capability = vsf_spi_capability(m_spi_ptr->spi_info_ptr->spi);
     return (m_spi_ptr->cs_index < spi_capability.cs_count);
 }
 
@@ -121,7 +121,7 @@ static vsf_err_t __spi_init_en_req(vsf_multiplex_spi_t *m_spi_ptr, bool need_rec
     }
 
     if (need_reconf) {
-        spi_cfg_t local_cfg = m_spi_ptr->spi_cfg;
+        vsf_spi_cfg_t local_cfg = m_spi_ptr->spi_cfg;
         // force disalbe auto cs mode
         local_cfg.mode =  (local_cfg.mode & ~SPI_AUTO_CS_MASK) | SPI_AUTO_CS_DISABLE;
         local_cfg.isr.handler_fn = __vsf_multiplex_spi_irq_handler;
@@ -171,7 +171,7 @@ static void __spi_start_next(vsf_multiplex_spi_info_t *spi_info_ptr)
     }
 }
 
-static void __vsf_multiplex_spi_irq_handler(void *target_ptr, vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
+static void __vsf_multiplex_spi_irq_handler(void *target_ptr, vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)target_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
@@ -192,13 +192,13 @@ static void __vsf_multiplex_spi_irq_handler(void *target_ptr, vsf_spi_t *spi_ptr
     }
 
     vsf_spi_isr_t *isr_ptr = &m_spi_ptr->spi_cfg.isr;
-    em_spi_irq_mask_t real_irq_mask = irq_mask & m_spi_ptr->irq_mask;
+    vsf_spi_irq_mask_t real_irq_mask = irq_mask & m_spi_ptr->irq_mask;
     if ((real_irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_spi_t *)m_spi_ptr, real_irq_mask);
     }
 }
 
-vsf_err_t vsf_multiplex_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
+vsf_err_t vsf_multiplex_spi_init(vsf_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
     vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
@@ -274,7 +274,7 @@ fsm_rt_t vsf_multiplex_spi_disable(vsf_spi_t *spi_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_multiplex_spi_irq_enable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_multiplex_spi_irq_enable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
@@ -288,7 +288,7 @@ void vsf_multiplex_spi_irq_enable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask
 
     vsf_protect_t state = vsf_multiplex_spi_protect();
         m_spi_ptr->irq_mask |= irq_mask;
-        em_spi_irq_mask_t new_irq_mask = ~spi_info_ptr->irq_mask & irq_mask;
+        vsf_spi_irq_mask_t new_irq_mask = ~spi_info_ptr->irq_mask & irq_mask;
         if (new_irq_mask) {
             spi_info_ptr->irq_mask |= new_irq_mask;
             vsf_spi_irq_enable(spi_info_ptr->spi, new_irq_mask);
@@ -296,7 +296,7 @@ void vsf_multiplex_spi_irq_enable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask
     vsf_multiplex_spi_unprotect(state);
 }
 
-void vsf_multiplex_spi_irq_disable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mask)
+void vsf_multiplex_spi_irq_disable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
@@ -310,7 +310,7 @@ void vsf_multiplex_spi_irq_disable(vsf_spi_t *spi_ptr, em_spi_irq_mask_t irq_mas
 
     vsf_protect_t state = vsf_multiplex_spi_protect();
         m_spi_ptr->irq_mask &= ~irq_mask;
-        em_spi_irq_mask_t new_irq_mask = spi_info_ptr->irq_mask & irq_mask;
+        vsf_spi_irq_mask_t new_irq_mask = spi_info_ptr->irq_mask & irq_mask;
         if (new_irq_mask) {
             spi_info_ptr->irq_mask &= ~new_irq_mask;
             vsf_spi_irq_disable(spi_info_ptr->spi, new_irq_mask);
@@ -443,7 +443,7 @@ vsf_err_t vsf_multiplex_spi_cancel_transfer(vsf_spi_t *spi_ptr)
     return result;
 }
 
-spi_status_t vsf_multiplex_spi_status(vsf_spi_t *spi_ptr)
+vsf_spi_status_t vsf_multiplex_spi_status(vsf_spi_t *spi_ptr)
 {
     vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
@@ -452,7 +452,7 @@ spi_status_t vsf_multiplex_spi_status(vsf_spi_t *spi_ptr)
     VSF_HAL_ASSERT(spi_info_ptr != NULL);
 
     // TODO: add more status info
-    spi_status_t result = {0};
+    vsf_spi_status_t result = {0};
 
     if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
         vsf_protect_t state = vsf_multiplex_spi_protect();

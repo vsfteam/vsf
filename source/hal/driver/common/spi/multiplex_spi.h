@@ -75,7 +75,7 @@ vsf_class(vsf_multiplex_spi_info_t) {
         spi_multi_mask_t     cs_mask;
 
         // irq mask
-        em_spi_irq_mask_t irq_mask;     // All CS IRQ Mask Wire-OR
+        vsf_spi_irq_mask_t irq_mask;     // All CS IRQ Mask Wire-OR
     )
 };
 
@@ -89,8 +89,8 @@ vsf_class(vsf_multiplex_spi_t) {
 
     private_member(
         vsf_slist_node_t node;
-        spi_cfg_t spi_cfg;              // init and re-init
-        em_spi_irq_mask_t irq_mask;     // enable/disable interrupt
+        vsf_spi_cfg_t spi_cfg;              // init and re-init
+        vsf_spi_irq_mask_t irq_mask;     // enable/disable interrupt
         uint_fast32_t transfered_count;
         multiplex_spi_request_t request;
     )

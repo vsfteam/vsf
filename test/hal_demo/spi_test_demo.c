@@ -125,11 +125,11 @@ static vsf_err_t __spi_demo_init(vsf_spi_t * spi,
                                  vsf_spi_isr_handler_t * handler_fn,
                                  void *target_ptr,
                                  vsf_arch_prio_t prio,
-                                 em_spi_irq_mask_t mask)
+                                 vsf_spi_irq_mask_t mask)
 {
     vsf_err_t init_result;
 
-    spi_cfg_t spi_cfg = {
+    vsf_spi_cfg_t spi_cfg = {
         .mode           = APP_SPI_DEMO_CFG_MODE,
         .clock_hz       = APP_SPI_DEMO_CFG_SPEED,
         .isr            = {
@@ -153,7 +153,7 @@ static vsf_err_t __spi_demo_init(vsf_spi_t * spi,
     return VSF_ERR_NONE;
 }
 
-static void __spi_demo_deinit(vsf_spi_t * spi, em_spi_irq_mask_t mask)
+static void __spi_demo_deinit(vsf_spi_t * spi, vsf_spi_irq_mask_t mask)
 {
     if (mask & SPI_IRQ_MASK) {
         VSF_SPI_IRQ_DISABLE(spi, mask);
@@ -220,7 +220,7 @@ static void __spi_demo_fifo_send_recv(vsf_spi_t *spi)
 #if APP_SPI_DEMO_CFG_REQUEST == ENABLED
 static void __spi_request_isr_handler(void              *target,
                                       vsf_spi_t         *spi_ptr,
-                                      em_spi_irq_mask_t  irq_mask)
+                                      vsf_spi_irq_mask_t  irq_mask)
 {
     app_spi_demo_t * demo = (app_spi_demo_t *)target;
     VSF_ASSERT(demo != NULL);
