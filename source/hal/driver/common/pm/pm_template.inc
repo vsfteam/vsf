@@ -35,9 +35,9 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_PM_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-pm_capability_t vsf_real_pm_capability(vsf_real_pm_t *pm_ptr)
+vsf_pm_capability_t vsf_real_pm_capability(vsf_real_pm_t *pm_ptr)
 {
-    pm_capability_t pm_capability = {
+    vsf_pm_capability_t pm_capability = {
         0,
     };
 

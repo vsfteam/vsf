@@ -46,7 +46,7 @@ typedef struct m480_usbd_hs_const_t {
     uint8_t ep_num;
     m480_usbphy_t phy;
     IRQn_Type irq;
-    pm_sclk_no_t sclk;
+    vsf_pm_sclk_no_t sclk;
     HSUSBD_T *reg;
 } m480_usbd_hs_const_t;
 

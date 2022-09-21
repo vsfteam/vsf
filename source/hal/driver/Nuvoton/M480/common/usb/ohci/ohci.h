@@ -36,8 +36,8 @@
 typedef struct m480_ohci_const_t {
     m480_usbphy_t phy;
     IRQn_Type irq;
-    pm_sclk_no_t sclk;
-    pm_pclk_no_t pclk;
+    vsf_pm_sclk_no_t sclk;
+    vsf_pm_pclk_no_t pclk;
 
     USBH_T *reg;
     io_cfg_t dp;

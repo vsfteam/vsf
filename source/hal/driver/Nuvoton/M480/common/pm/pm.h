@@ -60,23 +60,23 @@
 /*============================ TYPES =========================================*/
 
 //! power set index
-typedef enum pm_power_cfg_no_t{
+typedef enum vsf_pm_power_cfg_no_t{
     __def_idx(POWER_HXT, 0),
     __def_idx(POWER_LXT, 1),
     __def_idx(POWER_HIRC, 2),
     __def_idx(POWER_LIRC, 3),
-} pm_power_cfg_no_t;
+} vsf_pm_power_cfg_no_t;
 
 //! power set mask
-typedef enum pm_power_cfg_msk_t {
+typedef enum vsf_pm_power_cfg_msk_t {
     __def_msk(POWER_HXT),
     __def_msk(POWER_LXT),
     __def_msk(POWER_HIRC),
     __def_msk(POWER_LIRC),
-} pm_power_cfg_msk_t;
+} vsf_pm_power_cfg_msk_t;
 
 //! the lowpower mode
-typedef enum pm_sleep_mode_t{
+typedef enum vsf_pm_sleep_mode_t{
     PM_NPD              = 0,
     PM_LLPD             = 1,
     PM_FWPD             = 2,
@@ -88,7 +88,7 @@ typedef enum pm_sleep_mode_t{
     PM_SLEEP            = PM_NPD,
     PM_DEEP_SLEEP       = PM_DPD,
     PM_POWER_OFF        = PM_DPD,
-} pm_sleep_mode_t;
+} vsf_pm_sleep_mode_t;
 
 typedef enum pm_periph_clksrc_t {
     CLKSRC_HXT,
@@ -167,7 +167,7 @@ typedef enum pm_periph_clksel_t {
 } pm_periph_clksel_t;
 
 //! peripheral clock index
-typedef enum pm_pclk_no_t{
+typedef enum vsf_pm_pclk_no_t{
                         // NAME         BF_CLKSEL,      BF_CLKDIV,      CLKSEL_MAP_IDX
     M480_BIT_FIELD(     HCLK_CLKSEL,    0,  3,  true),
     M480_BIT_FIELD(     SYSTICK_CLKSEL, 3,  3,  true),
@@ -249,13 +249,13 @@ typedef enum pm_pclk_no_t{
     __def_pclk(         PCLK_BPWM0,     BPWM0_CLKSEL,   0,              BPWM0_CLKSEL_MAP_IDX),
     M480_BIT_FIELD(     BPWM1_CLKSEL,   73, 1,  false),
     __def_pclk(         PCLK_BPWM1,     BPWM1_CLKSEL,   0,              BPWM1_CLKSEL_MAP_IDX),
-} pm_pclk_no_t;
+} vsf_pm_pclk_no_t;
 
-typedef enum pm_mclk_no_t {
+typedef enum vsf_pm_mclk_no_t {
     MCLK_CORE_IDX = 0,
-} pm_mclk_no_t;
+} vsf_pm_mclk_no_t;
 //! Peripheral AHB Clock Macros
-typedef enum pm_sclk_no_t {
+typedef enum vsf_pm_sclk_no_t {
                         // NAME         BUS_IDX,    BIT_IDX
     // AHB
     __def_sclk_idx(     SCLK_DMA,       0,          1   ),
@@ -318,9 +318,9 @@ typedef enum pm_sclk_no_t {
     __def_sclk_idx(     SCLK_CAP0,      2,          26  ),
     __def_sclk_idx(     SCLK_CAP1,      2,          27  ),
     __def_sclk_idx(     SCLK_OP,        2,          30  ),
-} pm_sclk_no_t;
+} vsf_pm_sclk_no_t;
 
-typedef enum pm_sclk_msk_t {
+typedef enum vsf_pm_sclk_msk_t {
     // AHB
     __def_msk(SCLK_DMA),
     __def_msk(SCLK_ISP),
@@ -382,9 +382,9 @@ typedef enum pm_sclk_msk_t {
     __def_msk(SCLK_CAP0),
     __def_msk(SCLK_CAP1),
     __def_msk(SCLK_OP),
-} pm_sclk_msk_t;
+} vsf_pm_sclk_msk_t;
 
-typedef enum pm_clk_src_sel_t {
+typedef enum vsf_pm_clk_src_sel_t {
     // CLK->CLKSEL0
     __def_clk_src(  HCLK_CLKSRC_HXT,        0),
     __def_clk_src(  HCLK_CLKSRC_LXT,        1),
@@ -540,11 +540,11 @@ typedef enum pm_clk_src_sel_t {
     __def_clk_src(  UART5_CLKSRC_PLL,       1),
     __def_clk_src(  UART5_CLKSRC_LXT,       2),
     __def_clk_src(  UART5_CLKSRC_HIRC,      3),
-} pm_clk_src_sel_t;
+} vsf_pm_clk_src_sel_t;
 
-typedef enum pm_pll_sel_t {
+typedef enum vsf_pm_pll_sel_t {
     PLL0_IDX,
-} pm_pll_sel_t;
+} vsf_pm_pll_sel_t;
 
 typedef struct io_wakeup_cfg_t {
     uint32_t dummy;
@@ -559,27 +559,27 @@ typedef struct io_wakeup_cfg_t {
 //    } UseIO;
 //end_def_interface( i_pm_wakeup_t )
 
-typedef struct pm_pclk_cfg_t {
-    pm_clk_src_sel_t    clk_src;
+typedef struct vsf_pm_pclk_cfg_t {
+    vsf_pm_clk_src_sel_t    clk_src;
     uint16_t            div;
-} pm_pclk_cfg_t;
+} vsf_pm_pclk_cfg_t;
 
 //! main clock config sturct
-typedef struct pm_mclk_cfg_t {
-    pm_clk_src_sel_t    clk_src;                //!< main clock source
+typedef struct vsf_pm_mclk_cfg_t {
+    vsf_pm_clk_src_sel_t    clk_src;                //!< main clock source
     uint32_t            freq;                   //!< system oscilator frequency
     uint16_t            core_div[1];            //!< system core clock divider
     uint16_t            ahb_div[1];             //!< system AHB clock divider
     uint16_t            apb_div[2];             //!< system APB clock divider
-} pm_mclk_cfg_t;
+} vsf_pm_mclk_cfg_t;
 
 //! pll config struct
-typedef struct pm_pll_cfg_t {
-    pm_clk_src_sel_t            pll_clk_src;    //!< pll clock source
+typedef struct vsf_pm_pll_cfg_t {
+    vsf_pm_clk_src_sel_t            pll_clk_src;    //!< pll clock source
     uint32_t                    freq;           //!< system oscilator frequency
     uint8_t                     Msel;           //!< PLL Feedback divider value
     uint8_t                     Psel;           //!< pll Feedback divider value
-} pm_pll_cfg_t;
+} vsf_pm_pll_cfg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
