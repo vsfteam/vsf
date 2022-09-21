@@ -63,7 +63,7 @@ vsf_err_t vsf_rng_generate_request(vsf_rng_t *rng_ptr, uint32_t *buffer, uint32_
     return rng_ptr->op->generate_request(rng_ptr, buffer, num, param, on_ready_cb);
 }
 
-rng_capability_t vsf_rng_capability(vsf_rng_t *rng_ptr)
+vsf_rng_capability_t vsf_rng_capability(vsf_rng_t *rng_ptr)
 {
     VSF_HAL_ASSERT(rng_ptr != NULL);
     VSF_HAL_ASSERT(rng_ptr->op != NULL);
