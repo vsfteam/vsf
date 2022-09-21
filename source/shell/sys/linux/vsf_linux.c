@@ -1939,6 +1939,7 @@ int munmap(void *addr, size_t len)
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
         if (_->mmapped_buffer == addr) {
+            _->mmapped_buffer = NULL;
             return NULL == _->op->fn_munmap ? 0 : _->op->fn_munmap(_);
         }
     }
