@@ -40,7 +40,7 @@ typedef struct vsf_hw_rtc_t {
 #endif
 
     uint32_t freq;
-    rtc_cfg_t cfg;
+    vsf_rtc_cfg_t cfg;
 
 } vsf_hw_rtc_t;
 
@@ -49,7 +49,7 @@ typedef struct vsf_hw_rtc_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_hw_rtc_init(vsf_hw_rtc_t *hw_rtc_ptr, rtc_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_rtc_init(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_cfg_t *cfg_ptr)
 {
     return VSF_ERR_NONE;
 }

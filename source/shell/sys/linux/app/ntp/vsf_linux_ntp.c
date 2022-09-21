@@ -110,7 +110,7 @@ typedef struct ntp_packet_header_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_linux_ntp_rtc_init(vsf_rtc_t *rtc_ptr, rtc_cfg_t *cfg_ptr)
+vsf_err_t vsf_linux_ntp_rtc_init(vsf_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr)
 {
     return VSF_ERR_NONE;
 }

@@ -37,7 +37,7 @@
 
 #if VSF_RTC_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_rtc_init(vsf_rtc_t *rtc_ptr, rtc_cfg_t *cfg_ptr)
+vsf_err_t vsf_rtc_init(vsf_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
     VSF_HAL_ASSERT(rtc_ptr->op != NULL);
@@ -100,7 +100,7 @@ vsf_err_t vsf_rtc_set_time(vsf_rtc_t *rtc_ptr, vsf_rtc_time_t second, vsf_rtc_ti
     return rtc_ptr->op->set_time(rtc_ptr, second, millisecond);
 }
 
-rtc_capability_t vsf_rtc_capability(vsf_rtc_t *rtc_ptr)
+vsf_rtc_capability_t vsf_rtc_capability(vsf_rtc_t *rtc_ptr)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
     VSF_HAL_ASSERT(rtc_ptr->op != NULL);
