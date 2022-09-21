@@ -10548,6 +10548,15 @@
                         </file>
                     </group>
                     <group>
+                        <name>hw_flash_mal</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\hw_flash_mal\vsf_hw_flash_mal.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\hw_flash_mal\vsf_hw_flash_mal.h</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>mem_mal</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\mem_mal\vsf_mem_mal.c</name>
