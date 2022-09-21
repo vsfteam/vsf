@@ -59,7 +59,7 @@ static void __pwm_demo(vsf_pwm_t * pwm, uint8_t channel,  uint32_t period, uint3
 {
     vsf_err_t result;
 
-    pwm_cfg_t pwm_cfg = {
+    vsf_pwm_cfg_t pwm_cfg = {
         .freq = APP_PWM_DEMO_CFG_FREQ
     };
 

@@ -35,7 +35,7 @@
 
 #if VSF_PWM_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_pwm_init(vsf_pwm_t *pwm_ptr, pwm_cfg_t *cfg_ptr)
+vsf_err_t vsf_pwm_init(vsf_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(pwm_ptr != NULL);
     VSF_HAL_ASSERT(pwm_ptr->op != NULL);
@@ -62,7 +62,7 @@ fsm_rt_t vsf_pwm_disable(vsf_pwm_t *pwm_ptr)
     return pwm_ptr->op->disable(pwm_ptr);
 }
 
-pwm_capability_t vsf_pwm_capability(vsf_pwm_t *pwm_ptr)
+vsf_pwm_capability_t vsf_pwm_capability(vsf_pwm_t *pwm_ptr)
 {
     VSF_HAL_ASSERT(pwm_ptr != NULL);
     VSF_HAL_ASSERT(pwm_ptr->op != NULL);
