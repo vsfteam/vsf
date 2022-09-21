@@ -31,9 +31,9 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_RNG_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
+vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 {
-    rng_capability_t rng_capability = {
+    vsf_rng_capability_t rng_capability = {
         0,
     };
 

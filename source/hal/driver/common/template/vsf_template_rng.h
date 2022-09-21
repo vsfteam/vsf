@@ -56,7 +56,7 @@ extern "C" {
 #define VSF_RNG_APIS(__prefix_name)                                                                                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rng, init,             VSF_MCONNECT(__prefix_name, _rng_t) *rng_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,             rng, fini,             VSF_MCONNECT(__prefix_name, _rng_t) *rng_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, rng_capability_t, rng, capability,       VSF_MCONNECT(__prefix_name, _rng_t) *rng_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_rng_capability_t, rng, capability,       VSF_MCONNECT(__prefix_name, _rng_t) *rng_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        rng, generate_request, VSF_MCONNECT(__prefix_name, _rng_t) *rng_ptr, \
                                 uint32_t *buffer, uint32_t num, void *param, vsf_rng_on_ready_callback_t * on_ready_cb)
 
@@ -66,9 +66,9 @@ typedef struct vsf_rng_t vsf_rng_t;
 typedef void vsf_rng_on_ready_callback_t(void *param, uint32_t *buffer, uint32_t num);
 
 #if VSF_RNG_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-typedef struct rng_capability_t {
+typedef struct vsf_rng_capability_t {
     inherit(peripheral_capability_t)
-} rng_capability_t;
+} vsf_rng_capability_t;
 #endif
 
 typedef struct vsf_rng_op_t {
@@ -85,13 +85,6 @@ struct vsf_rng_t  {
 #endif
 
 /*============================ PROTOTYPES ====================================*/
-
-extern vsf_err_t vsf_rng_init(vsf_rng_t *rng);
-extern void vsf_rng_fini(vsf_rng_t *rng);
-extern rng_capability_t vsf_rng_capability(vsf_rng_t *rng_ptr);
-extern vsf_err_t vsf_rng_generate_request(vsf_rng_t *rng, uint32_t *buffer, uint32_t num,
-            void *param, vsf_rng_on_ready_callback_t * on_ready_cb);
-
 /*============================ INCLUDES ======================================*/
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
