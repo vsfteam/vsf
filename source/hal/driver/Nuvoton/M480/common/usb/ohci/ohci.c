@@ -37,8 +37,8 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
 //            uint_fast32_t clk = vsf_pm_pll_get_clk_out(PLL0_idx);
             // TODO: remove later
             uint_fast32_t clk = M480_PLL_FREQ_HZ;
-            pm_pclk_cfg_t cfg = {
-                .clk_src    = (pm_clk_src_sel_t)0,
+            vsf_pm_pclk_cfg_t cfg = {
+                .clk_src    = (vsf_pm_clk_src_sel_t)0,
                 .div        = clk / (48 * 1000 * 1000) - 1,
             };
             vsf_hw_pm_pclk_config(hc_cfg->pclk, &cfg);

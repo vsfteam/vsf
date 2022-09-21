@@ -141,46 +141,46 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_PM_POWER_APIS(__prefix_name)                                                                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_power_status_t, pm, power_enable,       pm_power_cfg_no_t index)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_power_status_t, pm, power_disable,      pm_power_cfg_no_t index)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_power_status_t, pm, power_get_status,   pm_power_cfg_no_t index)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,         pm, power_resume,       pm_power_cfg_no_t index, pm_power_status_t status)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_power_status_t, pm, power_enable,       vsf_pm_power_cfg_no_t index)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_power_status_t, pm, power_disable,      vsf_pm_power_cfg_no_t index)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_power_status_t, pm, power_get_status,   vsf_pm_power_cfg_no_t index)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,         pm, power_resume,           vsf_pm_power_cfg_no_t index, vsf_pm_power_status_t status)
 
 #define VSF_PM_SLEEP_APIS(__prefix_name)                                                                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,         pm, sleep_enter,        pm_sleep_cfg_t *cfg_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,         pm, sleep_enter,            vsf_pm_sleep_cfg_t *cfg_ptr)
 
 #define VSF_PM_PCLK_APIS(__prefix_name)                                                                                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_pclk_status_t,  pm, pclk_config,        pm_pclk_no_t index, pm_pclk_cfg_t *cfg_ptr)        \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,     pm, pclk_get_clock,     pm_pclk_no_t index)                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_pclk_status_t,  pm, pclk_enable,        pm_pclk_no_t index)                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_pclk_status_t,  pm, pclk_disable,       pm_pclk_no_t index)                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_pclk_status_t,  pm, pclk_get_status,    pm_pclk_no_t index)                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,         pm, pclk_resume,        pm_pclk_no_t index, pm_pclk_status_t status)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_pclk_status_t,  pm, pclk_config,        vsf_pm_pclk_no_t index, vsf_pm_pclk_cfg_t *cfg_ptr)        \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,         pm, pclk_get_clock,         vsf_pm_pclk_no_t index)                                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_pclk_status_t,  pm, pclk_enable,        vsf_pm_pclk_no_t index)                                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_pclk_status_t,  pm, pclk_disable,       vsf_pm_pclk_no_t index)                                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_pclk_status_t,  pm, pclk_get_status,    vsf_pm_pclk_no_t index)                                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pm, pclk_resume,            vsf_pm_pclk_no_t index, vsf_pm_pclk_status_t status)
 
 #define VSF_PM_SCLK_APIS(__prefix_name)                                                                                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_sclk_status_t,  pm, sclk_enable,        pm_sclk_no_t index)                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_sclk_status_t,  pm, sclk_disable,       pm_sclk_no_t index)                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_sclk_status_t,  pm, sclk_get_status,    pm_sclk_no_t index)                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,         pm, sclk_resume,        pm_sclk_no_t index, pm_sclk_status_t status)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_sclk_status_t,  pm, sclk_enable,        vsf_pm_sclk_no_t index)                                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_sclk_status_t,  pm, sclk_disable,       vsf_pm_sclk_no_t index)                                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_sclk_status_t,  pm, sclk_get_status,    vsf_pm_sclk_no_t index)                                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pm, sclk_resume,            vsf_pm_sclk_no_t index, vsf_pm_sclk_status_t status)
 
 #define VSF_PM_MCLK_APIS(__prefix_name)                                                                                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,          pm, mclk_init,          pm_mclk_cfg_t *cfg_ptr)                            \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,     pm, mclk_get_clock,     pm_mclk_no_t sel)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pm, mclk_init,              vsf_pm_mclk_cfg_t *cfg_ptr)                            \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,         pm, mclk_get_clock,         vsf_pm_mclk_no_t sel)
 
 #define VSF_PM_PLL_APIS(__prefix_name)                                                                                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,          pm, pll_init,           pm_pll_sel_t pll, pm_pll_cfg_t *cfg_ptr)           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, bool,              pm, pll_is_locked,      pm_pll_sel_t pll)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,     pm, pll_get_clock_out,  pm_pll_sel_t pll)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,     pm, pll_get_clock_in,   pm_pll_sel_t pll)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pm, pll_init,               vsf_pm_pll_sel_t pll, vsf_pm_pll_cfg_t *cfg_ptr)           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, bool,                  pm, pll_is_locked,          vsf_pm_pll_sel_t pll)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,         pm, pll_get_clock_out,      vsf_pm_pll_sel_t pll)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,         pm, pll_get_clock_in,       vsf_pm_pll_sel_t pll)
 
 #define VSF_PM_LPOSC_APIS(__prefix_name)                                                                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,         pm, lposc_init,         pm_lposc_sel_t lposc, pm_lposc_cfg_t *cfg_ptr)     \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              pm, lposc_enable,       pm_lposc_sel_t lposc)                              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              pm, lposc_disable,      pm_lposc_sel_t lposc)                              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,     pm, lposc_get_clock,    pm_lposc_sel_t lposc)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pm, lposc_init,             vsf_pm_lposc_sel_t lposc, vsf_pm_lposc_cfg_t *cfg_ptr)     \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  pm, lposc_enable,           vsf_pm_lposc_sel_t lposc)                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  pm, lposc_disable,          vsf_pm_lposc_sel_t lposc)                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,         pm, lposc_get_clock,        vsf_pm_lposc_sel_t lposc)
 
 #define VSF_PM_MISC_APIS(__prefix_name)                                                                                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, pm_capability_t,   pm, capability,    VSF_MCONNECT(__prefix_name, _pm_t) * pm_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_capability_t,   pm, capability,             VSF_MCONNECT(__prefix_name, _pm_t) * pm_ptr)
 
 
 #define VSF_PM_APIS(__prefix_name)      \
@@ -201,69 +201,69 @@ extern "C" {
  *----------------------------------------------------------------------------*/
 
 #if VSF_PM_CFG_REIMPLEMENT_POWER_NUMBER == DISABLED
-typedef enum pm_power_cfg_no_t{
+typedef enum vsf_pm_power_cfg_no_t{
     POWER_IRC_IDX    = 1,
-} pm_power_cfg_no_t;
+} vsf_pm_power_cfg_no_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_POWER_NUMBER_MASK == DISABLED
-typedef enum pm_power_cfg_msk_t {
+typedef enum vsf_pm_power_cfg_msk_t {
     POWER_IRC_MSK    = 1UL << 0,
-} pm_power_cfg_msk_t;
+} vsf_pm_power_cfg_msk_t;
 #endif
 
-typedef uint_fast32_t pm_power_status_t;
+typedef uint_fast32_t vsf_pm_power_status_t;
 
 /*----------------------------------------------------------------------------*
  * Sleep Management                                                           *
  *----------------------------------------------------------------------------*/
 
 #if VSF_PM_CFG_REIMPLEMENT_SLEEP_MODE == DISABLED
-typedef enum pm_sleep_mode_t {
+typedef enum vsf_pm_sleep_mode_t {
     PM_WAIT       = 0,
     PM_SLEEP      = 1,
     PM_DEEP_SLEEP = 2,
     PM_POWER_OFF  = 3,
-} pm_sleep_mode_t;
+} vsf_pm_sleep_mode_t;
 #endif
 
-typedef struct {
-    pm_sleep_mode_t sleep_mode;         //!< sleep mode
+typedef struct vsf_pm_sleep_cfg_t {
+    vsf_pm_sleep_mode_t sleep_mode;         //!< sleep mode
     uint32_t        sleep_cfg;          //!< Sleep mode cfg
     uint32_t        wake_cfg;           //!< Awake mode cfg
     uint32_t        sleep_walking_cfg;  //!< Sleep Walking mode cfg
-} pm_sleep_cfg_t;
+} vsf_pm_sleep_cfg_t;
 
 /*----------------------------------------------------------------------------*
  * AHB Clock Management                                                       *
  *----------------------------------------------------------------------------*/
 
 #if VSF_PM_CFG_REIMPLEMENT_SCLK_NUMBER == DISABLED
-typedef enum pm_sclk_no_t {
+typedef enum vsf_pm_sclk_no_t {
     SCLK_CORE_IDX   = 0,
     SCLK_ROM0_IDX   = 1,
     SCLK_PM0_IDX    = 2,
     SCLK_SRAM0_IDX  = 3,
-} pm_sclk_no_t;
+} vsf_pm_sclk_no_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_SCLK_NUMBER_MASK == DISABLED
-typedef enum pm_sclk_msk_t {
+typedef enum vsf_pm_sclk_msk_t {
     SCLK_CORE_MSK    = 0x1ul << SCLK_CORE_IDX,
     SCLK_ROM0_MSK    = 0x1ul << SCLK_ROM0_IDX,
     SCLK_PM0_MSK     = 0x1ul << SCLK_ROM0_IDX,
     SCLK_SRAM0_MSK   = 0x1ul << SCLK_SRAM0_IDX,
-} pm_sclk_msk_t;
+} vsf_pm_sclk_msk_t;
 #endif
 
-typedef uint_fast32_t pm_sclk_status_t;
+typedef uint_fast32_t vsf_pm_sclk_status_t;
 
 /*----------------------------------------------------------------------------*
  * Main Clock Management                                                      *
  *----------------------------------------------------------------------------*/
 
 #if VSF_PM_CFG_REIMPLEMENT_SCLK_SEL == DISABLED
-typedef enum pm_clk_src_sel_t {
+typedef enum vsf_pm_clk_src_sel_t {
     AUTO_CLKSRC_IRC                 = 0x0,      //!< source clk is IRC
     AUTO_CLKSRC_SYSOSC0             = 0x1,      //!< source clk is System oscilator
     AUTO_CLKSRC_SYSOSC1             = 0x2,      //!< source clock is WDTOSC
@@ -286,14 +286,14 @@ typedef enum pm_clk_src_sel_t {
     CLKOUT_CLKSRC_SYSOSC0           = 0x1,      //!< Clockout source is System Oscillator 0
     CLKOUT_CLKSRC_LPOSC             = 0x2,      //!< Clockout source is LPOSC
     CLKOUT_CLKSRC_MCLK              = 0x3,      //!< Clockout source is PLLOUT
-} pm_clk_src_sel_t;
+} vsf_pm_clk_src_sel_t;
 #endif
 
 //! main clock prescaler
 #if VSF_PM_CFG_REIMPLEMENT_SCLK_DIV == DISABLED
-typedef enum pm_divider_t {
+typedef enum vsf_pm_divider_t {
     VSF_MREPEAT(255, __PM_DIV_, MAIN)
-} pm_divider_t;
+} vsf_pm_divider_t;
 #endif
 
 /*----------------------------------------------------------------------------*
@@ -301,57 +301,57 @@ typedef enum pm_divider_t {
  *----------------------------------------------------------------------------*/
 
 #if VSF_PM_CFG_REIMPLEMENT_PCLK_NUMBER == DISABLED
-typedef enum pm_pclk_no_t {
+typedef enum vsf_pm_pclk_no_t {
     PCLK_PM0_IDX    = 8,        //!< PM 0
     PCLK_SPI0_IDX   = 9,        //!< SPI 0
     PCLK_SPI1_IDX   = 10,       //!< SPI 1
     PCLK_USART0_IDX = 12,       //!< USART0
     PCLK_USART1_IDX = 13,       //!< USART1
-} pm_pclk_no_t;
+} vsf_pm_pclk_no_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_PCLK_CFG == DISABLED
-typedef struct pm_pclk_cfg_t {
-    pm_clk_src_sel_t clk_src;
+typedef struct vsf_pm_pclk_cfg_t {
+    vsf_pm_clk_src_sel_t clk_src;
     uint16_t         div;
-} pm_pclk_cfg_t;
+} vsf_pm_pclk_cfg_t;
 #endif
 
-typedef int_fast16_t pm_pclk_status_t;
+typedef int_fast16_t vsf_pm_pclk_status_t;
 
 #if VSF_PM_CFG_REIMPLEMENT_MCLK_CORE_DIV == DISABLED
-typedef enum pm_mclk_core_div_t {
+typedef enum vsf_pm_mclk_core_div_t {
     VSF_MREPEAT(255, __PM_DIV_, MCLK_CORE)
-} pm_mclk_core_div_t;
+} vsf_pm_mclk_core_div_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_MCLK_AXI_DIV == DISABLED
-typedef enum pm_mclk_axi_div_t {
+typedef enum vsf_pm_mclk_axi_div_t {
     VSF_MREPEAT(255, __PM_DIV_, MCLK_AXI)
-} pm_mclk_axi_div_t;
+} vsf_pm_mclk_axi_div_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_MCLK_AHB_DIV == DISABLED
-typedef enum pm_mclk_ahb_div_t {
+typedef enum vsf_pm_mclk_ahb_div_t {
     VSF_MREPEAT(255, __PM_DIV_, MCLK_AHB)
-} pm_mclk_ahb_div_t;
+} vsf_pm_mclk_ahb_div_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_MCLK_APB_DIV == DISABLED
-typedef enum pm_mclk_apb_div_t {
+typedef enum vsf_pm_mclk_apb_div_t {
     VSF_MREPEAT(255, __PM_DIV_, MCLK_APB)
-} pm_mclk_apb_div_t;
+} vsf_pm_mclk_apb_div_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_MCLK_CFG == DISABLED
-typedef struct pm_mclk_cfg_t {
-    pm_clk_src_sel_t                clk_src;                //!< main clock source
+typedef struct vsf_pm_mclk_cfg_t {
+    vsf_pm_clk_src_sel_t                clk_src;                //!< main clock source
     uint32_t                        freq;                   //!< system oscilator frequency
-} pm_mclk_cfg_t;
+} vsf_pm_mclk_cfg_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_MCLK_NO == DISABLED
-typedef enum pm_mclk_no_t {
+typedef enum vsf_pm_mclk_no_t {
     MCLK_CORE_IDX = 0,
     MCLK_CORE0_IDX = 0,
 
@@ -363,7 +363,7 @@ typedef enum pm_mclk_no_t {
 
     MCLK_APB0_IDX,
     MCLK_APB1_IDX,
-} pm_mclk_no_t;
+} vsf_pm_mclk_no_t;
 #endif
 
 /*----------------------------------------------------------------------------*
@@ -371,62 +371,62 @@ typedef enum pm_mclk_no_t {
  *----------------------------------------------------------------------------*/
 
 #if VSF_PM_CFG_REIMPLEMENT_PLL_SEL == DISABLED
-typedef enum pm_pll_sel_t {
+typedef enum vsf_pm_pll_sel_t {
     PLL0_IDX,
     PLL1_IDX,
-} pm_pll_sel_t;
+} vsf_pm_pll_sel_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_PLL_CFG == DISABLED
-typedef struct pm_pll_cfg_t {
-    pm_clk_src_sel_t pll_clk_src;//!< pll clock source
+typedef struct vsf_pm_pll_cfg_t {
+    vsf_pm_clk_src_sel_t pll_clk_src;//!< pll clock source
     uint32_t         freq;       //!< system oscilator frequency
     uint8_t          msel;       //!< PLL Feedback divider value
     uint8_t          ssel;       //!< pll Feedback divider value
-} pm_pll_cfg_t;
+} vsf_pm_pll_cfg_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_POST_DIV == DISABLED
-typedef enum pm_pll_post_div_t {
+typedef enum vsf_pm_pll_post_div_t {
     PLL_POST_DIV_1                  = 0x00,     //!< pll post divider rate is 1
     PLL_POST_DIV_2                  = 0x01,     //!< pll post divider rate is 2
     PLL_POST_DIV_4                  = 0x02,     //!< pll post divider rate is 4
     PLL_POST_DIV_8                  = 0x03,     //!< pll post divider rate is 8
-} pm_pll_post_div_t;
+} vsf_pm_pll_post_div_t;
 #endif
 
 /*----------------------------------------------------------------------------*
  * Low Power Oscillator Management                                            *
  *----------------------------------------------------------------------------*/
 
-typedef struct lposc_cfg_t lposc_cfg_t;
+typedef struct vsf_lposc_cfg_t vsf_lposc_cfg_t;
 
 #if VSF_PM_CFG_REIMPLEMENT_LPOSC_SEL == DISABLED
-typedef enum pm_lposc_sel_t {
+typedef enum vsf_pm_lposc_sel_t {
     LPOSC_ALWAYS_ON,
     LPOSC_32K_OSC
-} pm_lposc_sel_t;
+} vsf_pm_lposc_sel_t;
 #endif
 
-typedef struct pm_lposc_cfg_t pm_lposc_cfg_t;
+typedef struct vsf_pm_lposc_cfg_t vsf_pm_lposc_cfg_t;
 
 /*----------------------------------------------------------------------------*
  * Clock Management                                                           *
  *----------------------------------------------------------------------------*/
 
 #if VSF_PM_CFG_REIMPLEMENT_CLOCK_OUT_CFG == DISABLED
-typedef struct pm_clock_out_cfg_t {
+typedef struct vsf_pm_clock_out_cfg_t {
     //! clk out source select
-    pm_clk_src_sel_t                clk_src;    //!< clock source for output
+    vsf_pm_clk_src_sel_t                clk_src;    //!< clock source for output
     //! clk divider
     uint_fast8_t                    div;        //!< divider for output clock
-} pm_clock_out_cfg_t;
+} vsf_pm_clock_out_cfg_t;
 #endif
 
 #if VSF_PWM_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-typedef struct pm_capability_t {
+typedef struct vsf_pm_capability_t {
     inherit(peripheral_capability_t)
-} pm_capability_t;
+} vsf_pm_capability_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

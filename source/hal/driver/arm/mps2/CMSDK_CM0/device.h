@@ -92,21 +92,21 @@
 #if 0
 //! \name power set index
 //! @{
-enum pm_power_cfg_no_t{
+enum vsf_pm_power_cfg_no_t{
     __def_idx(POWER_DUMMY, 0),
 };
 //! @}
 
 //! \name power set mask
 //! @{
-enum pm_power_cfg_msk_t {
+enum vsf_pm_power_cfg_msk_t {
     __def_msk(POWER_DUMMY),
 } ;
 //! @}
 
 //! \name the lowpower mode
 //! @{
-enum pm_sleep_mode_t{
+enum vsf_pm_sleep_mode_t{
     PM_WAIT         = 0,
     PM_SLEEP,
     PM_DEEP_SLEEP,
@@ -151,12 +151,12 @@ enum pm_sync_clk_msk_t {
 //! @}
 
 //! @{
-enum pm_clk_src_sel_t {
+enum vsf_pm_clk_src_sel_t {
     ...
 };
 //! @}
 
-enum pm_pll_sel_t {
+enum vsf_pm_pll_sel_t {
     PLL0_idx,
 };
 
@@ -166,7 +166,7 @@ struct io_wakeup_cfg_t {
 typedef struct io_wakeup_cfg_t io_wakeup_cfg_t;
 
 typedef enum io_port_no_t io_port_no_t;
-typedef enum pm_clk_src_sel_t pm_clk_src_sel_t;
+typedef enum vsf_pm_clk_src_sel_t vsf_pm_clk_src_sel_t;
 
 declare_interface( i_pm_wakeup_t )
 def_interface( i_pm_wakeup_t )
@@ -177,18 +177,18 @@ def_interface( i_pm_wakeup_t )
 end_def_interface( i_pm_wakeup_t )
 
 struct pm_periph_asyn_clk_cfg_t {
-    pm_clk_src_sel_t    clk_src;
-    uint16_t            div;
+    vsf_pm_clk_src_sel_t clk_src;
+    uint16_t             div;
 };
 
 //! \name main clock config sturct
 //! @{
 struct pm_main_clk_cfg_t {
-    pm_clk_src_sel_t    clk_src;                //!< main clock source
-    uint32_t            freq;                   //!< system oscilator frequency
-    uint16_t            core_div[1];            //!< system core clock divider
-    uint16_t            ahb_div[1];             //!< system AHB clock divider
-    uint16_t            apb_div[2];             //!< system APB clock divider
+    vsf_pm_clk_src_sel_t clk_src;                //!< main clock source
+    uint32_t             freq;                   //!< system oscilator frequency
+    uint16_t             core_div[1];            //!< system core clock divider
+    uint16_t             ahb_div[1];             //!< system AHB clock divider
+    uint16_t             apb_div[2];             //!< system APB clock divider
 };
 //! @}
 #endif

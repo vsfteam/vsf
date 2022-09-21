@@ -54,8 +54,8 @@
 
 typedef struct mt071_usb_const_t {
     IRQn_Type irq;
-    pm_sclk_no_t sclk;
-    pm_pclk_no_t pclk;
+    vsf_pm_sclk_no_t sclk;
+    vsf_pm_pclk_no_t pclk;
     void *reg;
 } mt071_usb_const_t;
 

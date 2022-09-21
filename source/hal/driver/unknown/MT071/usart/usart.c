@@ -53,8 +53,8 @@ typedef struct vsf_usart_ip_t {
     USART_TypeDef               *reg;
     IRQn_Type                   irq;
 
-    pm_pclk_no_t                pclk_idx;
-    pm_sclk_no_t                sclk_idx;
+    vsf_pm_pclk_no_t            pclk_idx;
+    vsf_pm_sclk_no_t            sclk_idx;
 
     uint8_t                     tx_dma;
     uint8_t                     rx_dma;

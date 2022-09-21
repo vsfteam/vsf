@@ -97,7 +97,7 @@
 
 //! \name power set index
 //! @{
-enum pm_power_cfg_no_t {
+enum vsf_pm_power_cfg_no_t {
     __def_idx(POWER_12MIRC, 0),
     __def_idx(POWER_12MOSC, 2),
     __def_idx(POWER_10KIRC, 3),
@@ -106,7 +106,7 @@ enum pm_power_cfg_no_t {
 
 //! \name power set mask
 //! @{
-enum pm_power_cfg_msk_t {
+enum vsf_pm_power_cfg_msk_t {
     __def_msk(POWER_12MIRC),
     __def_msk(POWER_12MOSC),
     __def_msk(POWER_10KIRC),
@@ -115,7 +115,7 @@ enum pm_power_cfg_msk_t {
 
 //! \name the lowpower mode
 //! @{
-enum pm_sleep_mode_t {
+enum vsf_pm_sleep_mode_t {
     PM_SLEEP        = 1 << 8,
     PM_DPD          = 1 << 1,
 
@@ -127,7 +127,7 @@ enum pm_sleep_mode_t {
 
 //! \name peripheral async clock index
 //! @{
-enum pm_pclk_no_t {
+enum vsf_pm_pclk_no_t {
                     // NAME         CLKSEL,         CLKDIV,         CLKREF
     __def_clk_idx(  PCLK_USB,       0x18,           0,              0x0F),
     __def_clk_idx(  PCLK_USART0,    0x16,           0x24,           0),
@@ -143,7 +143,7 @@ enum pm_pclk_no_t {
 
 //! \name Peripheral Sync Clock Macros
 //! @{
-enum pm_sclk_no_t {
+enum vsf_pm_sclk_no_t {
     __def_idx(  SCLK_FLASH,         0),
     __def_idx(  SCLK_RAM,           1),
     __def_idx(  SCLK_GPIO,          2),
@@ -169,7 +169,7 @@ enum pm_sclk_no_t {
     __def_idx(  SCLK_USB,           31),
 };
 
-enum pm_sclk_msk_t {
+enum vsf_pm_sclk_msk_t {
     __def_msk(SCLK_FLASH),
     __def_msk(SCLK_RAM),
     __def_msk(SCLK_GPIO),
@@ -197,7 +197,7 @@ enum pm_sclk_msk_t {
 //! @}
 
 //! @{
-enum pm_clk_src_sel_t {
+enum vsf_pm_clk_src_sel_t {
     CLKSRC_12MIRC           = 0,
     CLKSRC_PLL              = 1,
     CLKSRC_12MOSC           = 2,
@@ -228,7 +228,7 @@ enum pm_clk_src_sel_t {
 };
 //! @}
 
-enum pm_pll_sel_t {
+enum vsf_pm_pll_sel_t {
     PLL_IDX,
     PLL_USB_IDX,
 };
@@ -239,7 +239,7 @@ struct io_wakeup_cfg_t {
 typedef struct io_wakeup_cfg_t io_wakeup_cfg_t;
 
 typedef enum io_port_no_t io_port_no_t;
-typedef enum pm_clk_src_sel_t pm_clk_src_sel_t;
+typedef enum vsf_pm_clk_src_sel_t vsf_pm_clk_src_sel_t;
 
 def_interface( i_pm_wakeup_t )
     struct {
@@ -248,15 +248,15 @@ def_interface( i_pm_wakeup_t )
     }UseIO;
 end_def_interface( i_pm_wakeup_t )
 
-struct pm_pclk_cfg_t {
-    pm_clk_src_sel_t    clk_src;
+struct vsf_pm_pclk_cfg_t {
+    vsf_pm_clk_src_sel_t    clk_src;
     uint16_t            div;
 };
 
 //! \name main clock config sturct
 //! @{
-struct pm_mclk_cfg_t {
-    pm_clk_src_sel_t    clk_src;                //!< main clock source
+struct vsf_pm_mclk_cfg_t {
+    vsf_pm_clk_src_sel_t    clk_src;                //!< main clock source
     uint32_t            freq;                   //!< system oscilator frequency
     uint16_t            core_div[1];            //!< system core clock divider
     uint16_t            sclk_div[1];            //!< system sync clock divider
