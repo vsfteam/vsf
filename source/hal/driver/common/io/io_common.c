@@ -33,7 +33,7 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_io_config_one_pin(vsf_io_t *io_ptr, io_cfg_t *cfg_ptr)
+vsf_err_t vsf_io_config_one_pin(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(io_ptr != NULL);
     VSF_HAL_ASSERT(io_ptr->op != NULL);
@@ -43,7 +43,7 @@ vsf_err_t vsf_io_config_one_pin(vsf_io_t *io_ptr, io_cfg_t *cfg_ptr)
     return io_ptr->op->config_one_pin(io_ptr, cfg_ptr);
 }
 
-vsf_err_t vsf_io_config(vsf_io_t *io_ptr, io_cfg_t *cfg_ptr, uint_fast8_t count)
+vsf_err_t vsf_io_config(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast8_t count)
 {
     VSF_HAL_ASSERT(io_ptr != NULL);
     VSF_HAL_ASSERT(io_ptr->op != NULL);

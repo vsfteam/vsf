@@ -63,7 +63,7 @@ struct vsf_gpio_t {
 
 //! \name PIN name 
 //! @{
-enum io_pin_no_t {
+enum vsf_io_pin_no_t {
 #if defined(PIO_PORTA)
     VSF_MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_NUM, 0)
 #endif
@@ -75,7 +75,7 @@ enum io_pin_no_t {
 
 //! \name PIN name 
 //! @{
-enum io_pin_msk_t{
+enum vsf_io_pin_msk_t{
 #if defined(PIO_PORTA)
     VSF_MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_MSK, 0)
 #endif
@@ -87,7 +87,7 @@ enum io_pin_msk_t{
 
 //! \name port name
 //! @{
-enum io_port_no_t{
+enum vsf_io_port_no_t{
 #if defined(PIO_PORTA)
     PORTA, PORTA_idx = PORTA,
 #endif

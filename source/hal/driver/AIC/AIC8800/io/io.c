@@ -45,7 +45,7 @@ typedef struct vsf_hw_io_t {
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, io_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(io_ptr != NULL);
     VSF_HAL_ASSERT(cfg_ptr != NULL);
@@ -78,7 +78,7 @@ vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, io_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_io_config(vsf_hw_io_t *io_ptr, io_cfg_t *cfg_ptr, uint_fast8_t count)
+vsf_err_t vsf_hw_io_config(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast8_t count)
 {
     VSF_HAL_ASSERT(io_ptr != NULL);
     VSF_HAL_ASSERT(cfg_ptr != NULL);

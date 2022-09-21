@@ -147,7 +147,7 @@ void vsf_gpio_toggle(vsf_gpio_t *pthis, uint32_t pin_mask)
 /*! \brief gpio batch configuration 
            an implementation example:
 
-static bool vsf_gpio_config( io_cfg_t *cfg_ptr, uint_fast8_t count )
+static bool vsf_gpio_config( vsf_io_cfg_t *cfg_ptr, uint_fast8_t count )
 {
     bool result = true;
     if (NULL == cfg_ptr || 0 == count) {
@@ -198,7 +198,7 @@ static bool vsf_gpio_config( io_cfg_t *cfg_ptr, uint_fast8_t count )
  *! \param count the count of configurations in the array
  *! \return configuration result
  */
-vsf_err_t vsf_gpio_config(io_cfg_t *cfg, uint_fast8_t count)
+vsf_err_t vsf_gpio_config(vsf_io_cfg_t *cfg, uint_fast8_t count)
 {
     for (; count > 0; count--, cfg++) {
         // TODO: config function

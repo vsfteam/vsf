@@ -40,8 +40,8 @@ typedef struct m480_ohci_const_t {
     vsf_pm_pclk_no_t pclk;
 
     USBH_T *reg;
-    io_cfg_t dp;
-    io_cfg_t dm;
+    vsf_io_cfg_t dp;
+    vsf_io_cfg_t dm;
 } m480_ohci_const_t;
 
 typedef struct m480_ohci_t {

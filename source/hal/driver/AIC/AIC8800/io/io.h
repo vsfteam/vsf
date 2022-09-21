@@ -50,7 +50,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum io_feature_t {
+typedef enum vsf_io_feature_t {
     IO_OPEN_DRAIN           = (0 << IOMUX_GPIO_CONFIG_PULL_FRC_LSB),
     IO_PULL_UP              = ((1 << IOMUX_AGPIO_CONFIG_PULL_FRC_LSB) | (1 << IOMUX_AGPIO_CONFIG_PULL_UP_LSB)),
     IO_PULL_DOWN            = ((1 << IOMUX_AGPIO_CONFIG_PULL_FRC_LSB) | (1 << IOMUX_AGPIO_CONFIG_PULL_DN_LSB)),
@@ -89,7 +89,7 @@ typedef enum io_feature_t {
 
     __HW_IO_FEATURE_ALL_BITS  = IO_PULL_UP | IO_OPEN_DRAIN | IO_OPEN_DRAIN
 
-} io_feature_t;
+} vsf_io_feature_t;
 
 
 static inline uint32_t __hw_io_reg_read(bool is_pmic, volatile uint32_t *reg)

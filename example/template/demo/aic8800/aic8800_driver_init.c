@@ -33,7 +33,7 @@
 
 bool vsf_app_driver_init(void)
 {
-    io_cfg_t cfgs[] = {
+    vsf_io_cfg_t cfgs[] = {
         {VSF_PA10, 0x03, 0}, // PA10 as spi sck
         {VSF_PA11, 0x03, 0}, // PA10 as spi sck
         {VSF_PA12, 0x03, 0}, // PA10 as spi sck
