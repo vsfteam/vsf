@@ -58,38 +58,38 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_TIMER_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          timer, init,        VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, timer_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           timer, enable,      VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           timer, disable,     VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,               timer, irq_enable,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, em_timer_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,               timer, irq_disable, VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, em_timer_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, timer_capability_t, timer, capability,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          timer, pwm_set,     VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr,  uint8_t channel, uint32_t period, uint32_t pulse)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, init,        VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, enable,      VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, disable,     VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_enable,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_disable, VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_capability_t, timer, capability,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, pwm_set,     VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr,  uint8_t channel, uint32_t period, uint32_t pulse)
 
 /*============================ TYPES =========================================*/
 
 // TODO: Add more feature support, for example match interrupt
 
 #if VSF_TIMER_CFG_REIMPLEMENT_CHANNEL_FEATURE == DISABLED
-typedef enum timer_mode_t{
+typedef enum vsf_timer_mode_t {
     TIMER_MODE_ONESHOT,
     TIMER_MODE_CONTINUES,
 
     TIMER_MODE_PWM,
-} timer_mode_t;
+} vsf_timer_mode_t;
 #endif
 
 #if VSF_TIMER_CFG_REIMPLEMENT_IRQ_TYPE == DISABLED
-typedef enum em_timer_irq_mask_t{
+typedef enum vsf_timer_irq_mask_t {
     VSF_TIMER_IRQ_MASK_OVERFLOW = (1 << 0),
-} em_timer_irq_mask_t;
+} vsf_timer_irq_mask_t;
 #endif
 
 typedef struct vsf_timer_t vsf_timer_t;
 
 typedef void vsf_timer_isr_handler_t(void *target_ptr,
                                      vsf_timer_t *timer_ptr,
-                                     em_timer_irq_mask_t irq_mask);
+                                     vsf_timer_irq_mask_t irq_mask);
 
 typedef struct vsf_timer_isr_t {
     vsf_timer_isr_handler_t *handler_fn;
@@ -98,8 +98,8 @@ typedef struct vsf_timer_isr_t {
 } vsf_timer_isr_t;
 
 //! timer configuration
-typedef struct timer_cfg_t {
-    timer_mode_t mode;
+typedef struct vsf_timer_cfg_t {
+    vsf_timer_mode_t mode;
 
     uint32_t max_count;
     union {
@@ -108,13 +108,13 @@ typedef struct timer_cfg_t {
     };
 
     vsf_timer_isr_t isr;
-} timer_cfg_t;
+} vsf_timer_cfg_t;
 
 
 #if VSF_TIMER_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-typedef struct timer_capability_t {
+typedef struct vsf_timer_capability_t {
     inherit(peripheral_capability_t)
-} timer_capability_t;
+} vsf_timer_capability_t;
 #endif
 
 typedef struct vsf_timer_op_t {
@@ -133,12 +133,12 @@ struct vsf_timer_t  {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_timer_init(vsf_timer_t *timer_ptr, timer_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_timer_init(vsf_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr);
 extern fsm_rt_t vsf_timer_enable(vsf_timer_t *timer_ptr);
 extern fsm_rt_t vsf_timer_disable(vsf_timer_t *timer_ptr);
-extern timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr);
-extern void vsf_timer_irq_enable(vsf_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask);
-extern void vsf_timer_irq_disable(vsf_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask);
+extern vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr);
+extern void vsf_timer_irq_enable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask);
+extern void vsf_timer_irq_disable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask);
 extern vsf_err_t vsf_timer_pwm_set(vsf_timer_t *timer_ptr, uint8_t channel, uint32_t period, uint32_t pulse);
 
 /**

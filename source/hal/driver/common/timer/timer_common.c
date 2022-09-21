@@ -35,7 +35,7 @@
 
 #if VSF_TIMER_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_timer_init(vsf_timer_t *timer_ptr, timer_cfg_t *cfg_ptr)
+vsf_err_t vsf_timer_init(vsf_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(timer_ptr != NULL);
     VSF_HAL_ASSERT(timer_ptr->op != NULL);
@@ -62,7 +62,7 @@ fsm_rt_t vsf_timer_disable(vsf_timer_t *timer_ptr)
     return timer_ptr->op->disable(timer_ptr);
 }
 
-void vsf_timer_irq_enable(vsf_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
+void vsf_timer_irq_enable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(timer_ptr != NULL);
     VSF_HAL_ASSERT(timer_ptr->op != NULL);
@@ -71,7 +71,7 @@ void vsf_timer_irq_enable(vsf_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
     timer_ptr->op->irq_enable(timer_ptr, irq_mask);
 }
 
-void vsf_timer_irq_disable(vsf_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
+void vsf_timer_irq_disable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(timer_ptr != NULL);
     VSF_HAL_ASSERT(timer_ptr->op != NULL);
@@ -80,7 +80,7 @@ void vsf_timer_irq_disable(vsf_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
     timer_ptr->op->irq_disable(timer_ptr, irq_mask);
 }
 
-timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr)
+vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr)
 {
     VSF_HAL_ASSERT(timer_ptr != NULL);
     VSF_HAL_ASSERT(timer_ptr->op != NULL);
