@@ -95,9 +95,9 @@ vsf_err_t vsf_real_pwm_set_ns(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t
 #endif
 
 #if VSF_PWM_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
+vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 {
-    pwm_capability_t pwm_capability = {
+    vsf_pwm_capability_t pwm_capability = {
         0,
     };
 

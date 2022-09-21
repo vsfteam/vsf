@@ -63,7 +63,7 @@ typedef struct vsf_aic_pwm_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_aic_pwm_init(vsf_aic_pwm_t *hw_pwm_ptr, pwm_cfg_t *cfg_ptr)
+vsf_err_t vsf_aic_pwm_init(vsf_aic_pwm_t *hw_pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr->pwm_const);
