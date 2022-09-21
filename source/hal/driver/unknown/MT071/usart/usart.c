@@ -108,7 +108,7 @@ static inline uint_fast8_t __vsf_usart_get_word_length(vsf_usart_t *usart)
 }
 #endif
 
-vsf_err_t vsf_usart_init(vsf_usart_t *usart, usart_cfg_t *cfg)
+vsf_err_t vsf_usart_init(vsf_usart_t *usart, vsf_usart_cfg_t *cfg)
 {
     VSF_HAL_ASSERT((NULL != usart) && (NULL != cfg));
     USART_TypeDef *reg = usart->ip.reg;
@@ -169,7 +169,7 @@ fsm_rt_t vsf_usart_disable(vsf_usart_t *usart)
     return fsm_rt_cpl;
 }
 
-void vsf_usart_irq_enable(vsf_usart_t *usart, em_usart_irq_mask_t irq_mask)
+void vsf_usart_irq_enable(vsf_usart_t *usart, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != usart);
     USART_TypeDef *reg = usart->ip.reg;
@@ -180,7 +180,7 @@ void vsf_usart_irq_enable(vsf_usart_t *usart, em_usart_irq_mask_t irq_mask)
     // TODO: DMA interrupt USART_IRQ_MASK_TX_CPL and USART_IRQ_MASK_RX_CPL
 }
 
-void vsf_usart_irq_disable(vsf_usart_t *usart, em_usart_irq_mask_t irq_mask)
+void vsf_usart_irq_disable(vsf_usart_t *usart, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != usart);
     USART_TypeDef *reg = usart->ip.reg;
@@ -191,11 +191,11 @@ void vsf_usart_irq_disable(vsf_usart_t *usart, em_usart_irq_mask_t irq_mask)
     // TODO: DMA interrupt USART_IRQ_MASK_TX_CPL and USART_IRQ_MASK_RX_CPL
 }
 
-usart_status_t vsf_usart_status(vsf_usart_t *usart)
+vsf_usart_status_t vsf_usart_status(vsf_usart_t *usart)
 {
     VSF_HAL_ASSERT(NULL != usart);
     uint_fast32_t usart_status = usart->ip.reg->STAT & ~1;
-    usart_status_t status = {
+    vsf_usart_status_t status = {
         .value = usart_status | ((usart_status & USART_STAT_BUSY) >> 29),
     };
     return status;
@@ -402,7 +402,7 @@ static void __vsf_usart_dma_irqhandler(void *param, __dma_channel_t *channel)
 {
     vsf_usart_t *usart = (vsf_usart_t *)((uintptr_t)param & ~1);
     USART_TypeDef *reg = usart->ip.reg;
-    em_usart_irq_mask_t irq_mask;
+    vsf_usart_irq_mask_t irq_mask;
 
     if ((uintptr_t)param & 1) {
         // tx
@@ -439,7 +439,7 @@ static void __vsf_usart_irqhandler(vsf_usart_t *usart)
     }
 
     if (usart->isr.handler_fn != NULL) {
-        usart->isr.handler_fn(usart->isr.target_ptr, usart, (em_usart_irq_mask_t)irq_mask);
+        usart->isr.handler_fn(usart->isr.target_ptr, usart, (vsf_usart_irq_mask_t)irq_mask);
     }
 }
 

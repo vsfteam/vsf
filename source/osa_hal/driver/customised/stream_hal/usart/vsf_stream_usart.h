@@ -69,7 +69,7 @@ vsf_class(vsf_stream_usart_t) {
 extern void vsf_stream_usart_init(vsf_stream_usart_t *stream_usart);
 extern void vsf_stream_usart_fini(vsf_stream_usart_t *stream_usart);
 
-extern void vsf_stream_usart_irq(void *param, vsf_usart_t *usart, em_usart_irq_mask_t irq_mask);
+extern void vsf_stream_usart_irq(void *param, vsf_usart_t *usart, vsf_usart_irq_mask_t irq_mask);
 
 #endif
 #endif

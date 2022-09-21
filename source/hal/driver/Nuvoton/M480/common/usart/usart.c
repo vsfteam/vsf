@@ -42,10 +42,10 @@ typedef struct vsf_hw_usart_const_t {
 } vsf_hw_usart_const_t;
 
 typedef struct vsf_hw_usart_t {
-    usart_status_t              status;
+    vsf_usart_status_t              status;
     uint8_t                    *tx_buf;
     uint8_t                    *rx_buf;
-    usart_cfg_t                 cfg;
+    vsf_usart_cfg_t                 cfg;
     uint8_t                     is_enabled : 1;
     const vsf_hw_usart_const_t *usart_const;
 } vsf_hw_usart_t;
@@ -84,7 +84,7 @@ static uint32_t __clk_get_pllclockfreq(void)
     return u32_pll_freq;
 }
 
-vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)
 {
     uint32_t u32_sel = 0ul, u32_div = 0ul;
     uint32_t u32_tmp_val = 0ul, u32_tmp_addr = 0ul;
@@ -175,7 +175,7 @@ fsm_rt_t vsf_hw_usart_disable(vsf_hw_usart_t *usart_ptr)
     return fsm_rt_cpl;
 }
 
-usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *usart_ptr)
+vsf_usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *usart_ptr)
 {
     return  usart_ptr->status;
     //todo: write status
@@ -237,7 +237,7 @@ bool vsf_hw_usart_fifo_flush(vsf_hw_usart_t *usart_ptr)
     return true;
 }
 
-void vsf_hw_usart_irq_enable(vsf_hw_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_enable(vsf_hw_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
     if (irq_mask & USART_IRQ_MASK_RX) {
         usart_ptr->usart_const->usart->INTEN |= UART_INTEN_RDAIEN_Msk;
@@ -259,7 +259,7 @@ void vsf_hw_usart_irq_enable(vsf_hw_usart_t *usart_ptr, em_usart_irq_mask_t irq_
 //
 //    }
 }
-void vsf_hw_usart_irq_disable(vsf_hw_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_disable(vsf_hw_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
     if (irq_mask & USART_IRQ_MASK_RX) {
         usart_ptr->usart_const->usart->INTEN &= ~(UART_INTEN_RDAIEN_Msk | 0xffffffff);

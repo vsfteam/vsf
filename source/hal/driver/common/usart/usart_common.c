@@ -35,7 +35,7 @@
 
 #if VSF_USART_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
+vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
@@ -62,7 +62,7 @@ fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr)
     return usart_ptr->op->disable(usart_ptr);
 }
 
-void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
@@ -71,7 +71,7 @@ void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
     usart_ptr->op->irq_enable(usart_ptr, irq_mask);
 }
 
-void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
@@ -80,7 +80,7 @@ void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
     usart_ptr->op->irq_disable(usart_ptr, irq_mask);
 }
 
-usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
+vsf_usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
@@ -89,7 +89,7 @@ usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
     return usart_ptr->op->status(usart_ptr);
 }
 
-usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr)
+vsf_usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);

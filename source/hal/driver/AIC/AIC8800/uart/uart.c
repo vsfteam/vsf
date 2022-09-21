@@ -70,7 +70,7 @@ typedef struct vsf_hw_usart_t {
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart_ptr, usart_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
@@ -119,7 +119,7 @@ fsm_rt_t vsf_hw_usart_disable(vsf_hw_usart_t *usart_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_hw_usart_irq_enable(vsf_hw_usart_t *hw_usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_enable(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
@@ -130,7 +130,7 @@ void vsf_hw_usart_irq_enable(vsf_hw_usart_t *hw_usart_ptr, em_usart_irq_mask_t i
     usart_const->reg->IRQCTL_REG |= irq_mask;
 }
 
-void vsf_hw_usart_irq_disable(vsf_hw_usart_t *hw_usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_hw_usart_irq_disable(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
@@ -151,13 +151,13 @@ static bool __hw_usart_write_fifo_is_full(vsf_hw_usart_t *hw_usart_ptr)
     return hw_usart_ptr->usart_const->reg->DBUFSTS_REG & UART_TX_DBUF_FULL_MSK;
 }
 
-usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart_ptr)
+vsf_usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
 
     uint32_t idle_mask = UART_RX_DBUF_EMPTY | UART_TX_DBUF_EMPTY_MSK;
 
-    usart_status_t status = {
+    vsf_usart_status_t status = {
         .is_busy = (hw_usart_ptr->usart_const->reg->DBUFSTS_REG & idle_mask) != idle_mask,
     };
 
@@ -216,7 +216,7 @@ uint_fast16_t vsf_hw_usart_txfifo_write(vsf_hw_usart_t *hw_usart_ptr, void *buff
     return i;
 }
 
-static em_usart_irq_mask_t __get_uart_irq_mask(vsf_hw_usart_t *hw_usart_ptr)
+static vsf_usart_irq_mask_t __get_uart_irq_mask(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
@@ -245,20 +245,20 @@ static em_usart_irq_mask_t __get_uart_irq_mask(vsf_hw_usart_t *hw_usart_ptr)
         case UART_IRQTYP_MODEM_INT:
             value = reg->MDMSTS_REG;        // TODO: report more specific moden line interrupt
             (void)value;
-            return (em_usart_irq_mask_t)0;
+            return (vsf_usart_irq_mask_t)0;
 
         case UART_IRQTYP_NO_INT:
-            return (em_usart_irq_mask_t)0;
+            return (vsf_usart_irq_mask_t)0;
 
         default:
             VSF_HAL_ASSERT(0);
-            return (em_usart_irq_mask_t)0;
+            return (vsf_usart_irq_mask_t)0;
     }
 }
 
 static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 {
-    em_usart_irq_mask_t irq_mask = __get_uart_irq_mask(hw_usart_ptr);
+    vsf_usart_irq_mask_t irq_mask = __get_uart_irq_mask(hw_usart_ptr);
     if (irq_mask & USART_IRQ_MASK) {
         if (NULL != hw_usart_ptr->isr.handler_fn) {
             hw_usart_ptr->isr.handler_fn(hw_usart_ptr->isr.target_ptr, (vsf_usart_t *)hw_usart_ptr, irq_mask);

@@ -53,7 +53,7 @@ enum em_gpio_reg_rw_t {
     USART3_GPIO_MODE        = 0x00008B00U,
 };
 
-enum em_usart_mode_t {
+enum vsf_usart_mode_t {
     USART_5_BIT_LENGTH          = LCR_DLS_5,
     USART_6_BIT_LENGTH          = LCR_DLS_6,
     USART_7_BIT_LENGTH          = LCR_DLS_7,
@@ -85,7 +85,7 @@ enum em_usart_mode_t {
     USART_RX_ENABLE             = 0,
 };
 
-enum em_usart_irq_mask_t {
+enum vsf_usart_irq_mask_t {
     USART_IRQ_MASK_RX           = IER_ERBFI,
     USART_IRQ_MASK_TX           = IER_ETBEI,
 
@@ -104,7 +104,7 @@ enum em_usart_irq_mask_t {
 
 /*============================ TYPES =========================================*/
 
-struct usart_status_t {
+struct vsf_usart_status_t {
     union {
         inherit(peripheral_status_t)
         struct {

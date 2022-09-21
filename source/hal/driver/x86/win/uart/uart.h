@@ -35,7 +35,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum em_usart_mode_t {
+typedef enum vsf_usart_mode_t {
     USART_8_BIT_LENGTH              = 0x0000ul,
     USART_9_BIT_LENGTH              = 0x1000ul,
     USART_BIT_LENGTH_MASK           = USART_8_BIT_LENGTH | USART_9_BIT_LENGTH,
@@ -64,9 +64,9 @@ typedef enum em_usart_mode_t {
     USART_5_BIT_LENGTH              = 0x0800,
     USART_6_BIT_LENGTH              = 0x4000,
     USART_7_BIT_LENGTH              = 0x8000,
-} em_usart_mode_t;
+} vsf_usart_mode_t;
 
-typedef enum em_usart_irq_mask_t {
+typedef enum vsf_usart_irq_mask_t {
     USART_IRQ_MASK_RX               = VSF_BIT(0),
     USART_IRQ_MASK_TX               = VSF_BIT(1),
     USART_IRQ_MASK_RX_TIMEOUT       = VSF_BIT(2),
@@ -82,7 +82,7 @@ typedef enum em_usart_irq_mask_t {
     USART_IRQ_MASK                  =   USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
                                       | USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL
                                       | USART_IRQ_MASK_ERR,
-} em_usart_irq_mask_t;
+} vsf_usart_irq_mask_t;
 
 
 /*============================ INCLUDES ======================================*/

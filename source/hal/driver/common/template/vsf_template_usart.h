@@ -77,13 +77,13 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_USART_BASE_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              usart, init,                  VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, usart_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              usart, init,                  VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               usart, enable,                VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               usart, disable,               VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, usart_capability_t,     usart, capability,            VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, irq_enable,            VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, em_usart_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, irq_disable,           VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, em_usart_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, usart_status_t,         usart, status,                VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_capability_t,     usart, capability,            VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, irq_enable,            VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, irq_disable,           VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_status_t,         usart, status,                VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)
 
 #if VSF_USART_CFG_FIFO_API == ENABLED
 #   define __VSF_USART_FIFO_APIS(__prefix_name) \
@@ -115,7 +115,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 #if VSF_USART_CFG_REIMPLEMENT_MODE == DISABLED
-typedef enum em_usart_mode_t {
+typedef enum vsf_usart_mode_t {
     USART_NO_PARITY         = (0x0ul << 0),
     USART_EVEN_PARITY       = (0x1ul << 0),
     USART_ODD_PARITY        = (0x2ul << 0),
@@ -147,11 +147,11 @@ typedef enum em_usart_mode_t {
     USART_TX_ENABLE             = (0x1ul << 7),
     USART_RX_ENABLE             = (0x1ul << 8),
     USART_ENABLE_MASK           = USART_TX_ENABLE | USART_RX_ENABLE,
-} em_usart_mode_t;
+} vsf_usart_mode_t;
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_IRQ_MASK == DISABLED
-typedef enum em_usart_irq_mask_t {
+typedef enum vsf_usart_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     USART_IRQ_MASK_TX               = (0x1ul << 0),
     USART_IRQ_MASK_RX               = (0x1ul << 1),
@@ -179,14 +179,14 @@ typedef enum em_usart_irq_mask_t {
                                       | USART_IRQ_MASK_RX_CPL
                                       | USART_IRQ_MASK_ERR,
 
-} em_usart_irq_mask_t;
+} vsf_usart_irq_mask_t;
 #endif
 
 typedef struct vsf_usart_t vsf_usart_t;
 
 typedef void vsf_usart_isr_handler_t(void *target_ptr,
                                      vsf_usart_t *usart_ptr,
-                                     em_usart_irq_mask_t irq_mask);
+                                     vsf_usart_irq_mask_t irq_mask);
 
 typedef struct vsf_usart_isr_t {
     vsf_usart_isr_handler_t *handler_fn;
@@ -194,14 +194,14 @@ typedef struct vsf_usart_isr_t {
     vsf_arch_prio_t          prio;
 } vsf_usart_isr_t;
 
-typedef struct usart_cfg_t {
+typedef struct vsf_usart_cfg_t {
     uint32_t                mode;
     uint32_t                baudrate;
     uint32_t                rx_timeout;
     vsf_usart_isr_t         isr;
-} usart_cfg_t;
+} vsf_usart_cfg_t;
 
-/*! \brief usart_status_t should implement peripheral_status_t
+/*! \brief vsf_usart_status_t should implement peripheral_status_t
  *! \note uart_status_t should provide dedicated bits for
  *!       indicating whether a read or write timeout event is detected
  *!       or not:
@@ -224,20 +224,20 @@ typedef struct usart_cfg_t {
  *!       then the bIsRXTimeOut bit should be cleared.
  */
 #if VSF_USART_CFG_REIMPLEMENT_STATUS == DISABLED
-typedef struct usart_status_t {
+typedef struct vsf_usart_status_t {
     union {
         inherit(peripheral_status_t)
         struct {
             uint32_t is_busy : 1;
         };
     };
-} usart_status_t;
+} vsf_usart_status_t;
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-typedef struct usart_capability_t {
+typedef struct vsf_usart_capability_t {
     inherit(peripheral_capability_t)
-} usart_capability_t;
+} vsf_usart_capability_t;
 #endif
 
 typedef struct vsf_usart_op_t {
@@ -259,16 +259,16 @@ def_interface(i_usart_t)
     union {
         implement(i_peripheral_t);
         struct {
-            usart_status_t     (*Status)(void);
-            usart_capability_t (*Capability)(void);
+            vsf_usart_status_t     (*Status)(void);
+            vsf_usart_capability_t (*Capability)(void);
         } USART;
     };
-    vsf_err_t (*Init)(usart_cfg_t *pCfg);
+    vsf_err_t (*Init)(vsf_usart_cfg_t *pCfg);
 
     //! Irq
     struct {
-        void (*Enable)(em_usart_irq_mask_t tEventMask);
-        void (*Disable)(em_usart_irq_mask_t tEventMask);
+        void (*Enable)(vsf_usart_irq_mask_t tEventMask);
+        void (*Disable)(vsf_usart_irq_mask_t tEventMask);
     } Irq;
 
     //! fifo access
@@ -291,20 +291,20 @@ end_def_interface(i_usart_t)
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr);
 
 extern fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr);
 extern fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr);
 
-extern void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
-extern void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask);
+extern void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask);
+extern void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask);
 
 #if __IS_COMPILER_LLVM__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 #endif
-extern usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr);
-extern usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr);
+extern vsf_usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr);
+extern vsf_usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr);
 #if __IS_COMPILER_LLVM__
 #   pragma clang diagnostic pop
 #endif

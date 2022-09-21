@@ -51,7 +51,7 @@
 
 #if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
 
-vsf_err_t vsf_real_usart_init(vsf_real_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
+vsf_err_t vsf_real_usart_init(vsf_real_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)
 {
     return vsf_usart_fifo2req_init(&usart_ptr->request,
                                    (vsf_usart_fifo2req_init_fn_t *)__vsf_real_usart_init,
@@ -88,12 +88,12 @@ int_fast32_t vsf_real_usart_get_tx_count(vsf_real_usart_t *usart_ptr)
     return vsf_usart_fifo2req_get_tx_count(&usart_ptr->request, (vsf_usart_t *)usart_ptr);
 }
 
-void vsf_real_usart_irq_enable(vsf_real_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_real_usart_irq_enable(vsf_real_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
     vsf_usart_fifo2req_irq_enable(&usart_ptr->request, (vsf_usart_t *)usart_ptr, irq_mask);
 }
 
-void vsf_real_usart_irq_disable(vsf_real_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+void vsf_real_usart_irq_disable(vsf_real_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
     vsf_usart_fifo2req_irq_disable(&usart_ptr->request, (vsf_usart_t *)usart_ptr, irq_mask);
 }
@@ -139,9 +139,9 @@ int_fast32_t vsf_real_usart_get_tx_count(vsf_real_usart_t *usart_ptr)
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
+vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 {
-    usart_capability_t usart_capability = {
+    vsf_usart_capability_t usart_capability = {
         0,
     };
 

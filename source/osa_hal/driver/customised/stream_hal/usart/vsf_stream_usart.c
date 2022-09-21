@@ -81,7 +81,7 @@ static void __vsf_stream_usart_stream_evthandler(vsf_stream_t *stream, void *par
     }
 }
 
-void vsf_stream_usart_irq(void *param, vsf_usart_t *usart, em_usart_irq_mask_t irq_mask)
+void vsf_stream_usart_irq(void *param, vsf_usart_t *usart, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(param != NULL);
     vsf_stream_usart_t *stream_usart = param;

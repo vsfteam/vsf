@@ -150,11 +150,11 @@ static vsf_err_t __usart_demo_init(vsf_usart_t * usart,
                                    vsf_usart_isr_handler_t * handler_fn,
                                    void *target_ptr,
                                    vsf_arch_prio_t prio,
-                                   em_usart_irq_mask_t mask)
+                                   vsf_usart_irq_mask_t mask)
 {
     vsf_err_t init_result;
 
-    usart_cfg_t usart_cfg = {
+    vsf_usart_cfg_t usart_cfg = {
         .mode           = APP_USART_DEMO_CFG_MODE,
         .baudrate       = APP_USART_DEMO_CFG_BAUDRATE,
         .rx_timeout     = 0,
@@ -185,7 +185,7 @@ static vsf_err_t __usart_demo_init(vsf_usart_t * usart,
     return VSF_ERR_NONE;
 }
 
-static void __usart_demo_deinit(vsf_usart_t * usart, em_usart_irq_mask_t mask)
+static void __usart_demo_deinit(vsf_usart_t * usart, vsf_usart_irq_mask_t mask)
 {
     if (mask & USART_IRQ_MASK) {
         vsf_usart_irq_disable(usart, mask);
@@ -214,7 +214,7 @@ static void __usart_demo_fifo_poll_write(vsf_usart_t * usart)
 
 #if APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST == ENABLED
 static void __usart_write_isr_handler(void *target, vsf_usart_t *usart,
-                                      em_usart_irq_mask_t irq_mask)
+                                      vsf_usart_irq_mask_t irq_mask)
 {
     app_usart_demo_t * demo = (app_usart_demo_t *)target;
     VSF_ASSERT(demo != NULL);
@@ -247,7 +247,7 @@ static void __usart_demo_fifo_isr_write(vsf_usart_t * usart)
 #endif
 
 #if APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST == ENABLED
-static void __usart_read_isr_handler(void *target, vsf_usart_t *usart, em_usart_irq_mask_t irq_mask)
+static void __usart_read_isr_handler(void *target, vsf_usart_t *usart, vsf_usart_irq_mask_t irq_mask)
 {
     app_usart_demo_t * demo = (app_usart_demo_t *)target;
     VSF_ASSERT(demo != NULL);
@@ -327,7 +327,7 @@ static void __usart_txfifo_write_then_read(vsf_usart_t * usart)
 #if APP_USART_DEMO_CFG_REQUEST_ECHO_TEST == ENABLED
 static void __usart_isr_handler(void *target,
                                 vsf_usart_t *usart,
-                                em_usart_irq_mask_t irq_mask)
+                                vsf_usart_irq_mask_t irq_mask)
 {
     vsf_err_t err;
     app_usart_demo_t * demo = (app_usart_demo_t *)target;
@@ -373,7 +373,7 @@ static void __usart_request_echo(vsf_usart_t * usart)
 #if APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ_TEST == ENABLED
 static void __usart_isr_handler(void *target,
                                 vsf_usart_t *usart,
-                                em_usart_irq_mask_t irq_mask)
+                                vsf_usart_irq_mask_t irq_mask)
 {
     vsf_err_t err;
     app_usart_demo_t * demo = (app_usart_demo_t *)target;

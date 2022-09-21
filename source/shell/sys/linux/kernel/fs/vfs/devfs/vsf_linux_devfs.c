@@ -202,7 +202,7 @@ static uint_fast32_t __vsf_linux_uart_rx(vsf_usart_t *uart, vsf_linux_uart_priv_
 }
 
 static void __vsf_linux_uart_isrhandler(void *target, vsf_usart_t *uart,
-        em_usart_irq_mask_t irq_mask)
+        vsf_usart_irq_mask_t irq_mask)
 {
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)target;
     vsf_eda_t *eda = NULL;
@@ -279,7 +279,7 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
 
     vsf_usart_irq_disable(uart, USART_IRQ_MASK_RX | USART_IRQ_MASK_TX_CPL);
     vsf_usart_disable(uart);
-    vsf_usart_init(uart, & (usart_cfg_t) {
+    vsf_usart_init(uart, & (vsf_usart_cfg_t) {
         .mode               = mode,
         .baudrate           = baudrate,
         .rx_timeout         = 0,

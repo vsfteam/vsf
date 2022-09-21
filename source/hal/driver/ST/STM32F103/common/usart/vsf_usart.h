@@ -44,7 +44,7 @@ enum em_gpio_reg_rw_t {
     USART3_GPIO_MODE        = 0x00008B00U,
 };
 
-enum em_usart_mode_t {
+enum vsf_usart_mode_t {
 
     USART_8_BIT_LENGTH      = 0x0000U,
     USART_9_BIT_LENGTH      = 0x1000U,
@@ -81,7 +81,7 @@ enum em_usart_reg_rw_t {
     USART_CR1_RXNEIE_DISEN = 0XFFDFU,
 };
 
-struct usart_status_t {
+struct vsf_usart_status_t {
     union {
         inherit(peripheral_status_t)
         struct {
@@ -111,7 +111,7 @@ struct vsf_usart_t {
     vsf_usart_event_t    event_tx;
     vsf_usart_event_t    event_rcv;
     vsf_usart_event_t    event_send;
-    usart_status_t       event_status;
+    vsf_usart_status_t       event_status;
     usart_event_status_t event_mask;
 };
 
