@@ -41,7 +41,7 @@ typedef struct vsf_hw_lp_timer_t {
 #endif
 
     uint32_t freq;
-    timer_cfg_t cfg;
+    vsf_timer_cfg_t cfg;
 
 } vsf_hw_lp_timer_t;
 
@@ -50,7 +50,7 @@ typedef struct vsf_hw_lp_timer_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_hw_lp_timer_init(vsf_hw_lp_timer_t *timer_ptr, timer_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_lp_timer_init(vsf_hw_lp_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)
 {
     return VSF_ERR_NONE;
 }
@@ -69,12 +69,12 @@ fsm_rt_t vsf_hw_lp_timer_disable(vsf_hw_lp_timer_t *timer_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_hw_lp_timer_irq_enable(vsf_hw_lp_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
+void vsf_hw_lp_timer_irq_enable(vsf_hw_lp_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
 }
 
-void vsf_hw_lp_timer_irq_disable(vsf_hw_lp_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
+void vsf_hw_lp_timer_irq_disable(vsf_hw_lp_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
 }

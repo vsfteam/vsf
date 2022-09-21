@@ -50,7 +50,7 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-void __timer_demo_handler(void *target_ptr, vsf_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
+void __timer_demo_handler(void *target_ptr, vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
 {
     if (irq_mask == VSF_TIMER_IRQ_MASK_OVERFLOW) {
         static uint32_t cnt = 0;
@@ -68,7 +68,7 @@ static void __timer_demo(void)
 {
     vsf_err_t result;
 
-    timer_cfg_t timer_cfg = {
+    vsf_timer_cfg_t timer_cfg = {
         .mode           = APP_TIMER_DEMO_CFG_MODE,
         .freq           = APP_TIMER_DEMO_CFG_FREQ,
         .max_count      = APP_TIMER_DEMO_CFG_MAX_COUNT,

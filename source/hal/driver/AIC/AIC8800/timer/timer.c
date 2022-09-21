@@ -65,7 +65,7 @@ typedef struct vsf_hw_timer_t {
 #endif
 
     const vsf_hw_timer_const_t *timer_const;
-    em_timer_irq_mask_t irq_mask;
+    vsf_timer_irq_mask_t irq_mask;
     vsf_timer_isr_t isr;
 } vsf_hw_timer_t;
 
@@ -100,7 +100,7 @@ static void __vsf_hw_timer_irq_handler(vsf_hw_timer_t * timer_ptr)
     }
 }
 
-vsf_err_t vsf_hw_timer_init(vsf_hw_timer_t *timer_ptr, timer_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_timer_init(vsf_hw_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(timer_ptr != NULL);
     const vsf_hw_timer_const_t *timer_const = timer_ptr->timer_const;
@@ -150,7 +150,7 @@ fsm_rt_t vsf_hw_timer_disable(vsf_hw_timer_t *timer_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_hw_timer_irq_enable(vsf_hw_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
+void vsf_hw_timer_irq_enable(vsf_hw_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
 
@@ -164,7 +164,7 @@ void vsf_hw_timer_irq_enable(vsf_hw_timer_t *timer_ptr, em_timer_irq_mask_t irq_
 
 }
 
-void vsf_hw_timer_irq_disable(vsf_hw_timer_t *timer_ptr, em_timer_irq_mask_t irq_mask)
+void vsf_hw_timer_irq_disable(vsf_hw_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
     if (irq_mask == VSF_TIMER_IRQ_MASK_OVERFLOW) {
