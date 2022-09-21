@@ -550,12 +550,12 @@ typedef struct io_wakeup_cfg_t {
     uint32_t dummy;
 } io_wakeup_cfg_t;
 
-////typedef enum io_port_no_t io_port_no_t;
+////typedef enum vsf_io_port_no_t vsf_io_port_no_t;
 //
 //def_interface( i_pm_wakeup_t )
 //    struct {
 //        vsf_err_t (*Enable)(io_wakeup_cfg_t *pcfg, uint_fast8_t size);
-//        //vsf_err_t (*Disable)(io_port_no_t port, uint_fast32_t msk);
+//        //vsf_err_t (*Disable)(vsf_io_port_no_t port, uint_fast32_t msk);
 //    } UseIO;
 //end_def_interface( i_pm_wakeup_t )
 

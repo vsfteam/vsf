@@ -78,13 +78,13 @@ extern "C" {
 #define __VSF_IO_PIN_MSK(__N, __NAME)       __NAME ## __N ##_MSK = (1ul << (__N)),
 
 #define VSF_IO_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, io, config,         VSF_MCONNECT(__prefix_name, _io_t) *io_ptr, io_cfg_t *cfg_ptr, uint_fast8_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, io, config_one_pin, VSF_MCONNECT(__prefix_name, _io_t) *io_ptr, io_cfg_t *cfg_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, io, config,         VSF_MCONNECT(__prefix_name, _io_t) *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast8_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, io, config_one_pin, VSF_MCONNECT(__prefix_name, _io_t) *io_ptr, vsf_io_cfg_t *cfg_ptr)
 
 /*============================ TYPES =========================================*/
 
 #if VSF_IO_REIMPLEMENT_FEATURE == DISABLED
-typedef enum io_feature_t {
+typedef enum vsf_io_feature_t {
     IO_PULL_UP              = (1<<4),           //!< enable pull-up resistor
     IO_OPEN_DRAIN           = (1<<10),          //!< enable open-drain mode
 
@@ -117,18 +117,18 @@ typedef enum io_feature_t {
                               IO_FILTER_CLK_SRC3 | IO_FILTER_CLK_SRC4 | IO_FILTER_CLK_SRC5 |
                               IO_FILTER_CLK_SRC6 | IO_FILTER_CLK_SRC7 |
                               IO_HIGH_DRV,
-} io_feature_t;
+} vsf_io_feature_t;
 #endif
 
-typedef enum io_pin_msk_t {
+typedef enum vsf_io_pin_msk_t {
     VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_MSK, PIN)
-} io_pin_msk_t;
+} vsf_io_pin_msk_t;
 
-typedef enum io_pin_no_t {
+typedef enum vsf_io_pin_no_t {
     VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_NUM, PIN)
-} io_pin_no_t;
+} vsf_io_pin_no_t;
 
-typedef enum io_port_no_t {
+typedef enum vsf_io_port_no_t {
 #if defined(VSF_IO_CFG_PORTA)
     PORTA,
 #endif
@@ -141,9 +141,9 @@ typedef enum io_port_no_t {
 #if defined(VSF_IO_CFG_PORTD)
     PORTD,
 #endif
-} io_port_no_t;
+} vsf_io_port_no_t;
 
-typedef enum io_port_pin_no_t {
+typedef enum vsf_io_port_pin_no_t {
 #if defined(VSF_IO_CFG_PORTA)
     VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PORT_PIN_NUM, A)
 #endif
@@ -156,10 +156,10 @@ typedef enum io_port_pin_no_t {
 #if defined(VSF_IO_CFG_PORTD)
     VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PORT_PIN_NUM, D)
 #endif
-} io_port_pin_no_t;
+} vsf_io_port_pin_no_t;
 
 //! io configuration structure
-typedef struct io_cfg_t {
+typedef struct vsf_io_cfg_t {
     union {
         uint32_t port_pin_index;
         struct {
@@ -174,7 +174,7 @@ typedef struct io_cfg_t {
     };
     uint16_t        function;                   //!< io Funcitons
     uint32_t        feature;                    //!< pin feature
-} io_cfg_t;
+} vsf_io_cfg_t;
 
 #if VSF_IO_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_io_capability_t {
@@ -200,11 +200,11 @@ struct vsf_io_t  {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #ifndef VSF_IO_GET_PORT_NO_FROM_PIN_NO
-#   define VSF_IO_GET_PORT_NO_FROM_PIN_NO(__p)      ((io_port_no_t)(__p / VSF_IO_CFG_PORT_MAX_PIN_NUM))
+#   define VSF_IO_GET_PORT_NO_FROM_PIN_NO(__p)      ((vsf_io_port_no_t)(__p / VSF_IO_CFG_PORT_MAX_PIN_NUM))
 #endif
 
 #ifndef VSF_IO_GET_REAL_PIN_NO_FROM_PIN_NO
-#   define VSF_IO_GET_REAL_PIN_NO_FROM_PIN_NO(__p)  ((io_port_no_t)(__p % VSF_IO_CFG_PORT_MAX_PIN_NUM))
+#   define VSF_IO_GET_REAL_PIN_NO_FROM_PIN_NO(__p)  ((vsf_io_port_no_t)(__p % VSF_IO_CFG_PORT_MAX_PIN_NUM))
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
