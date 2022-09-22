@@ -24,6 +24,8 @@
 
 #if VSF_USE_MAL == ENABLED && VSF_MAL_USE_HW_FLASH_MAL == ENABLED && VSF_HAL_USE_FLASH == ENABLED
 
+#include "hal/vsf_hal.h"
+
 #if     defined(__VSF_HW_FLASH_MAL_CLASS_IMPLEMENT)
 #   undef __VSF_HW_FLASH_MAL_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
@@ -44,8 +46,6 @@ vsf_class(vk_hw_flash_mal_t) {
 
     public_member(
         vsf_hw_flash_t *flash;
-        uint32_t start_addr;
-        uint32_t size;
     )
 };
 

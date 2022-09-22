@@ -33,7 +33,6 @@
 /*============================ PROTOTYPES ====================================*/
 
 static uint_fast32_t __vk_hw_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
-static bool __vk_hw_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
 dcl_vsf_peda_methods(static, __vk_hw_flash_mal_init)
 dcl_vsf_peda_methods(static, __vk_hw_flash_mal_fini)
 dcl_vsf_peda_methods(static, __vk_hw_flash_mal_read)
@@ -48,7 +47,6 @@ dcl_vsf_peda_methods(static, __vk_hw_flash_mal_write)
 
 const vk_mal_drv_t vk_hw_flash_mal_drv = {
     .blksz          = __vk_hw_flash_mal_blksz,
-    .buffer         = __vk_hw_flash_mal_buffer,
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_init),
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_read),
@@ -65,17 +63,7 @@ const vk_mal_drv_t vk_hw_flash_mal_drv = {
 static uint_fast32_t __vk_hw_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr,
                 uint_fast32_t size, vsf_mal_op_t op)
 {
-    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)mal;
-    return pthis->blksz;
-}
-
-static bool __vk_hw_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr,
-                uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
-{
-    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)mal;
-    mem->buffer = &pthis->mem.buffer[addr];
-    mem->size = size;
-    return true;
+    return 0;
 }
 
 #if     __IS_COMPILER_GCC__
@@ -91,7 +79,6 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_init, vk_mal_init)
     vsf_peda_begin();
     vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
     VSF_MAL_ASSERT(pthis != NULL);
-    pthis->size = pthis->mem.size;
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
@@ -116,11 +103,7 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_read, vk_mal_read)
     VSF_MAL_ASSERT(pthis != NULL);
     addr = vsf_local.addr;
     size = vsf_local.size;
-    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.size));
 
-    if (vsf_local.buff != &pthis->mem.buffer[addr]) {
-        memcpy(vsf_local.buff, &pthis->mem.buffer[addr], size);
-    }
     vsf_eda_return(size);
     vsf_peda_end();
 }
@@ -135,11 +118,7 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_write, vk_mal_write)
     VSF_MAL_ASSERT(pthis != NULL);
     addr = vsf_local.addr;
     size = vsf_local.size;
-    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.size));
 
-    if (vsf_local.buff != &pthis->mem.buffer[addr]) {
-        memcpy(&pthis->mem.buffer[addr], vsf_local.buff, size);
-    }
     vsf_eda_return(size);
     vsf_peda_end();
 }
