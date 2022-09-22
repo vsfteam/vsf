@@ -154,7 +154,11 @@ vsf_class(vk_disp_drv_t) {
         union {
 #   if VSF_DISP_USE_FB == ENABLED
             struct {
-                void * (*switch_buffer)(vk_disp_t *pthis, bool is_to_copy);
+                void * (*get_buffer)(vk_disp_t *pthis, uint8_t idx);
+                void * (*get_front_buffer)(vk_disp_t *pthis);
+                void * (*get_back_buffer)(vk_disp_t *pthis);
+                // if idx < 0, then set next buffer(returned by get_back_buffer) as front buffer
+                void * (*set_front_buffer)(vk_disp_t *pthis, int8_t idx);
             } fb;
 #   endif
         };

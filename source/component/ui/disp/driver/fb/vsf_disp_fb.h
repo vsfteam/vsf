@@ -72,7 +72,7 @@ vsf_class(vk_disp_fb_t) {
 
     private_member(
         void                *fb_buffer;
-        uint8_t             cur_fb_buffer;
+        uint8_t             front_buffer_idx;
     )
 };
 
