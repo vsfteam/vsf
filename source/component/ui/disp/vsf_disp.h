@@ -73,6 +73,10 @@ extern "C" {
             vsf_disp_get_pixel_format_bytesize(vsf_disp_get_pixel_format(__disp))
 #define vsf_disp_get_has_alpha(__disp)                                          \
             vsf_disp_get_pixel_format_has_alpha(vsf_disp_get_pixel_format(__disp))
+#define vsf_disp_get_pitch(__disp)                                              \
+            ((__disp)->param.width * vsf_disp_get_pixel_bytesize(__disp))
+#define vsf_disp_get_frame_size(__disp)                                         \
+            ((__disp)->param.height * vsf_disp_get_pitch(__disp))
 
 #ifndef vk_disp_coord_t
 #   define vk_disp_coord_t          uint16_t

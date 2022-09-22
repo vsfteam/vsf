@@ -81,6 +81,10 @@ extern const vk_disp_drv_t vk_disp_drv_fb;
 
 /*============================ PROTOTYPES ====================================*/
 
+extern void * vk_disp_fb_get_front_buffer(vk_disp_t *disp);
+extern void * vk_disp_fb_get_back_buffer(vk_disp_t *disp);
+extern void * vk_disp_fb_switch_buffer(vk_disp_t *disp);
+
 #ifdef __cplusplus
 }
 #endif

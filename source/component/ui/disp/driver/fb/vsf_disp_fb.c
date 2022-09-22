@@ -154,6 +154,21 @@ static vsf_err_t __vk_disp_fb_refresh(vk_disp_t *pthis, vk_disp_area_t *area, vo
     vk_disp_on_ready(&disp_fb->use_as__vk_disp_t);
     return VSF_ERR_NONE;
 }
+
+void * vk_disp_fb_get_front_buffer(vk_disp_t *disp)
+{
+    return disp->param.drv->fb.get_front_buffer(disp);
+}
+
+void * vk_disp_fb_get_back_buffer(vk_disp_t *disp)
+{
+    return disp->param.drv->fb.get_back_buffer(disp);
+}
+
+void * vk_disp_fb_switch_buffer(vk_disp_t *disp)
+{
+    return disp->param.drv->fb.set_front_buffer(disp, -1);
+}
 #endif
 
 /* EOF */
