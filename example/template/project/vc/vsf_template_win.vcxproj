@@ -733,6 +733,27 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_tree_dump.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\epoll.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\eventfd.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\ioctl.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\ipc.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\mman.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\mount.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\random.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\resource.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\select.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\shm.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\socket.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\stat.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\syscall.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\syslog.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\time.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\times.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\types.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\uio.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\un.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\utsname.h" />
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\wait.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.c" />

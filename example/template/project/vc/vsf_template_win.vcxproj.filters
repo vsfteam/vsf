@@ -3264,6 +3264,69 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\serial.h">
       <Filter>vsf\shell\sys\linux\include\linux</Filter>
     </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\epoll.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\eventfd.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\ioctl.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\ipc.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\mman.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\mount.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\random.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\resource.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\select.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\shm.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\socket.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\stat.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\syscall.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\syslog.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\time.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\times.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\types.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\uio.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\un.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\utsname.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\wait.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
