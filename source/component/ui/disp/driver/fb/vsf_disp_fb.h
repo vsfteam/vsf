@@ -81,9 +81,11 @@ extern const vk_disp_drv_t vk_disp_drv_fb;
 
 /*============================ PROTOTYPES ====================================*/
 
+extern void * vk_disp_fb_get_buffer(vk_disp_t *disp, uint_fast8_t idx);
 extern void * vk_disp_fb_get_front_buffer(vk_disp_t *disp);
 extern void * vk_disp_fb_get_back_buffer(vk_disp_t *disp);
-extern void * vk_disp_fb_switch_buffer(vk_disp_t *disp);
+// if idx < 0, then set back buffer(returned by get_back_buffer) as front buffer
+extern void * vk_disp_fb_set_front_buffer(vk_disp_t *disp, int_fast8_t idx);
 
 #ifdef __cplusplus
 }

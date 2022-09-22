@@ -151,23 +151,6 @@ vsf_class(vk_disp_drv_t) {
                         vk_disp_area_t *area, uint_fast32_t color);
 #endif
     )
-    // interfaces for specific driver
-#if VSF_DISP_USE_FB == ENABLED
-    protected_member(
-        // TODO: add a enum for driver type
-        union {
-#   if VSF_DISP_USE_FB == ENABLED
-            struct {
-                void * (*get_buffer)(vk_disp_t *pthis, uint8_t idx);
-                void * (*get_front_buffer)(vk_disp_t *pthis);
-                void * (*get_back_buffer)(vk_disp_t *pthis);
-                // if idx < 0, then set next buffer(returned by get_back_buffer) as front buffer
-                void * (*set_front_buffer)(vk_disp_t *pthis, int8_t idx);
-            } fb;
-#   endif
-        };
-    )
-#endif
 };
 
 typedef struct vk_disp_param_t {

@@ -594,10 +594,9 @@ static void __vsf_linux_fb_init(vsf_linux_fd_t *sfd)
     vsf_thread_wfe(VSF_EVT_USER);
 
 #if VSF_DISP_USE_FB == ENABLED
-    fb_priv->is_disp_fb = disp->param.drv->fb.set_front_buffer != NULL;
+    fb_priv->is_disp_fb = disp->param.drv == &vk_disp_drv_fb;
     if (fb_priv->is_disp_fb) {
-        const vk_disp_drv_t *drv = disp->param.drv;
-        fb_priv->front_buffer = drv->fb.get_front_buffer(disp);
+        fb_priv->front_buffer = vk_disp_fb_get_front_buffer(disp);
         return;
     }
 #endif
@@ -614,7 +613,6 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 #if VSF_DISP_USE_FB == ENABLED
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)disp;
 #endif
-    const vk_disp_drv_t *drv = disp->param.drv;
     uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
 
     switch (cmd) {
@@ -659,18 +657,18 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     case FBIOPAN_DISPLAY: {
             struct fb_var_screeninfo *info = (struct fb_var_screeninfo *)arg;
 #if VSF_DISP_USE_FB == ENABLED
-            uint8_t frame_number = fb_priv->is_disp_fb ? disp_fb->fb.num : 1;
+            uint_fast8_t frame_number = fb_priv->is_disp_fb ? disp_fb->fb.num : 1;
 #else
-            uint8_t frame_number = 1;
+            uint_fast8_t frame_number = 1;
 #endif
-            uint8_t frame_idx = info->yoffset / frame_size;
+            uint_fast8_t frame_idx = info->yoffset / frame_size;
             if ((info->yoffset % frame_size) || (frame_idx >= frame_number)) {
                 return -1;
             }
 
 #if VSF_DISP_USE_FB == ENABLED
             if (fb_priv->is_disp_fb) {
-                drv->fb.set_front_buffer(disp, frame_idx);
+                vk_disp_fb_set_front_buffer(disp, frame_idx);
             } else
 #endif
             {
@@ -744,8 +742,7 @@ static void * __vsf_linux_fb_mmap(vsf_linux_fd_t *sfd, off_t offset, size_t len,
 
 #if VSF_DISP_USE_FB == ENABLED
     if (fb_priv->is_disp_fb) {
-        const vk_disp_drv_t *drv = disp->param.drv;
-        fb_priv->front_buffer = drv->fb.set_front_buffer(disp, 0);
+        fb_priv->front_buffer = vk_disp_fb_set_front_buffer(disp, 0);
         return (void *)((uintptr_t)fb_priv->front_buffer + offset);
     }
 #endif

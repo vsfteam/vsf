@@ -40,22 +40,12 @@
 
 static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis);
 static vsf_err_t __vk_disp_fb_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
-static void * __vk_disp_fb_get_buffer(vk_disp_t *pthis, uint8_t idx);
-static void * __vk_disp_fb_get_front_buffer(vk_disp_t *pthis);
-static void * __vk_disp_fb_get_back_buffer(vk_disp_t *pthis);
-static void * __vk_disp_fb_set_front_buffer(vk_disp_t *pthis, int8_t idx);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_disp_drv_t vk_disp_drv_fb = {
     .init                   = __vk_disp_fb_init,
     .refresh                = __vk_disp_fb_refresh,
-    .fb                     = {
-        .get_buffer         = __vk_disp_fb_get_buffer,
-        .get_front_buffer   = __vk_disp_fb_get_front_buffer,
-        .get_back_buffer    = __vk_disp_fb_get_back_buffer,
-        .set_front_buffer   = __vk_disp_fb_set_front_buffer,
-    },
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -69,28 +59,28 @@ static uint8_t __vk_disp_fb_get_back_buffer_idx(vk_disp_fb_t *disp_fb)
     return back_buffer_idx;
 }
 
-static void * __vk_disp_fb_get_buffer(vk_disp_t *pthis, uint8_t idx)
+void * vk_disp_fb_get_buffer(vk_disp_t *pthis, uint_fast8_t idx)
 {
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)pthis;
     return ((uint8_t *)disp_fb->fb_buffer + idx * disp_fb->fb.size);
 }
 
-static void * __vk_disp_fb_set_front_buffer(vk_disp_t *pthis, int8_t idx)
+void * vk_disp_fb_set_front_buffer(vk_disp_t *pthis, int_fast8_t idx)
 {
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)pthis;
-    void *buffer = __vk_disp_fb_get_buffer(pthis, idx < 0 ? __vk_disp_fb_get_back_buffer_idx(disp_fb) : idx);
+    void *buffer = vk_disp_fb_get_buffer(pthis, idx < 0 ? __vk_disp_fb_get_back_buffer_idx(disp_fb) : idx);
     disp_fb->fb.drv->fb.present(disp_fb->fb.param, buffer);
     return buffer;
 }
 
-static void * __vk_disp_fb_get_front_buffer(vk_disp_t *pthis)
+void * vk_disp_fb_get_front_buffer(vk_disp_t *pthis)
 {
-    return __vk_disp_fb_get_buffer(pthis, ((vk_disp_fb_t *)pthis)->front_buffer_idx);
+    return vk_disp_fb_get_buffer(pthis, ((vk_disp_fb_t *)pthis)->front_buffer_idx);
 }
 
-static void * __vk_disp_fb_get_back_buffer(vk_disp_t *pthis)
+void * vk_disp_fb_get_back_buffer(vk_disp_t *pthis)
 {
-    return __vk_disp_fb_get_buffer(pthis, __vk_disp_fb_get_back_buffer_idx((vk_disp_fb_t *)pthis));
+    return vk_disp_fb_get_buffer(pthis, __vk_disp_fb_get_back_buffer_idx((vk_disp_fb_t *)pthis));
 }
 
 static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis)
@@ -116,7 +106,7 @@ static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis)
 
     disp_fb->front_buffer_idx = 0;
     vsf_err_t err = disp_fb->fb.drv->fb.init(disp_fb->fb.param, disp_fb->param.color,
-                __vk_disp_fb_get_buffer(pthis, disp_fb->front_buffer_idx));
+                vk_disp_fb_get_buffer(pthis, disp_fb->front_buffer_idx));
     if (VSF_ERR_NONE == err) {
         vk_disp_on_ready(pthis);
     }
@@ -142,32 +132,15 @@ static vsf_err_t __vk_disp_fb_refresh(vk_disp_t *pthis, vk_disp_area_t *area, vo
     uint_fast32_t copy_size = disp_fb->fb.pixel_byte_size * real_area.size.x;
     uint_fast32_t x_offset = disp_fb->fb.pixel_byte_size * real_area.pos.x;
     uint_fast32_t y_end = real_area.pos.y + real_area.size.y;
-    void *cur_buffer = __vk_disp_fb_get_back_buffer(pthis);
+    void *cur_buffer = vk_disp_fb_get_back_buffer(pthis);
 
     for (uint_fast32_t y = real_area.pos.y; y < y_end; y++) {
         memcpy((uint8_t *)cur_buffer + x_offset, disp_buff, copy_size);
         disp_buff = (uint8_t *)disp_buff + copy_size;
         cur_buffer = (uint8_t *)cur_buffer + line_size;
     }
-
-    __vk_disp_fb_set_front_buffer(pthis, -1);
-    vk_disp_on_ready(&disp_fb->use_as__vk_disp_t);
+    vk_disp_fb_set_front_buffer(pthis, -1);
     return VSF_ERR_NONE;
-}
-
-void * vk_disp_fb_get_front_buffer(vk_disp_t *disp)
-{
-    return disp->param.drv->fb.get_front_buffer(disp);
-}
-
-void * vk_disp_fb_get_back_buffer(vk_disp_t *disp)
-{
-    return disp->param.drv->fb.get_back_buffer(disp);
-}
-
-void * vk_disp_fb_switch_buffer(vk_disp_t *disp)
-{
-    return disp->param.drv->fb.set_front_buffer(disp, -1);
 }
 #endif
 
