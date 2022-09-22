@@ -611,7 +611,9 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
     vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);
+#if VSF_DISP_USE_FB == ENABLED
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)disp;
+#endif
     const vk_disp_drv_t *drv = disp->param.drv;
     uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
 
@@ -623,9 +625,11 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             info->yres = disp->param.height;
             info->xres_virtual = info->xres;
             info->yres_virtual = info->yres;
+#if VSF_DISP_USE_FB == ENABLED
             if (fb_priv->is_disp_fb) {
                 info->yres_virtual *= disp_fb->fb.num;
             }
+#endif
             info->bits_per_pixel = vsf_disp_get_pixel_bitsize(disp);
             // todo: parse fb_bitfield red/green/blue/transp
 //            switch (disp->param.color) {
@@ -640,10 +644,13 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     case FBIOGET_FSCREENINFO: {
             struct fb_fix_screeninfo *info = (struct fb_fix_screeninfo *)arg;
             strcpy(info->id, "vsf_disp_fb");
+#if VSF_DISP_USE_FB == ENABLED
             if (fb_priv->is_disp_fb) {
                 info->smem_start = (uintptr_t)disp_fb->fb.buffer;
                 info->smem_len = disp_fb->fb.size * disp_fb->fb.num;
-            } else {
+            } else
+#endif
+            {
                 info->smem_start = (uintptr_t)fb_priv->front_buffer;
                 info->smem_len = frame_size;
             }
@@ -651,15 +658,22 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         break;
     case FBIOPAN_DISPLAY: {
             struct fb_var_screeninfo *info = (struct fb_var_screeninfo *)arg;
+#if VSF_DISP_USE_FB == ENABLED
             uint8_t frame_number = fb_priv->is_disp_fb ? disp_fb->fb.num : 1;
+#else
+            uint8_t frame_number = 1;
+#endif
             uint8_t frame_idx = info->yoffset / frame_size;
             if ((info->yoffset % frame_size) || (frame_idx >= frame_number)) {
                 return -1;
             }
 
+#if VSF_DISP_USE_FB == ENABLED
             if (fb_priv->is_disp_fb) {
                 drv->fb.set_front_buffer(disp, frame_idx);
-            } else {
+            } else
+#endif
+            {
                 vk_disp_refresh(disp, NULL, fb_priv->front_buffer);
                 vsf_thread_wfe(VSF_EVT_USER);
             }
@@ -699,7 +713,10 @@ static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t
     }
 
     memcpy((void *)((uintptr_t)fb_priv->front_buffer + vfs_file->pos), buf, count);
-    if (!fb_priv->is_disp_fb) {
+#if VSF_DISP_USE_FB == ENABLED
+    if (!fb_priv->is_disp_fb)
+#endif
+    {
         vk_disp_refresh(disp, NULL, fb_priv->front_buffer);
         vsf_thread_wfe(VSF_EVT_USER);
     }
@@ -709,7 +726,11 @@ static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t
 static int __vsf_linux_fb_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
-    if ((fb_priv->is_disp_fb) && (fb_priv->front_buffer != NULL)) {
+    if (    (fb_priv->front_buffer != NULL)
+#if VSF_DISP_USE_FB == ENABLED
+        &&  (fb_priv->is_disp_fb)
+#endif
+        ) {
         free(fb_priv->front_buffer);
     }
     fb_priv->front_buffer = NULL;
@@ -729,7 +750,7 @@ static void * __vsf_linux_fb_mmap(vsf_linux_fd_t *sfd, off_t offset, size_t len,
     }
 #endif
     uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
-    if ((offset + len) >= frame_size) {
+    if ((offset + len) > frame_size) {
         return NULL;
     }
     return (void *)((uintptr_t)fb_priv->front_buffer + offset);
