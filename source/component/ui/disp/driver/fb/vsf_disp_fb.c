@@ -68,7 +68,8 @@ void * vk_disp_fb_get_buffer(vk_disp_t *pthis, uint_fast8_t idx)
 void * vk_disp_fb_set_front_buffer(vk_disp_t *pthis, int_fast8_t idx)
 {
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)pthis;
-    void *buffer = vk_disp_fb_get_buffer(pthis, idx < 0 ? __vk_disp_fb_get_back_buffer_idx(disp_fb) : idx);
+    disp_fb->front_buffer_idx = idx < 0 ? __vk_disp_fb_get_back_buffer_idx(disp_fb) : idx;
+    void *buffer = vk_disp_fb_get_buffer(pthis, disp_fb->front_buffer_idx);
     disp_fb->fb.drv->fb.present(disp_fb->fb.param, buffer);
     return buffer;
 }
