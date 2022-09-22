@@ -44,6 +44,9 @@ extern int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart);
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 extern int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier);
 #endif
+#if VSF_USE_UI == ENABLED
+extern int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp);
+#endif
 extern int vsf_linux_devfs_init(void);
 
 #ifdef __cplusplus

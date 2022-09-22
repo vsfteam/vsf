@@ -34,6 +34,7 @@
 #   include "shell/sys/linux/include/sys/stat.h"
 #   include "shell/sys/linux/include/linux/serial.h"
 #   include "shell/sys/linux/include/linux/input.h"
+#   include "shell/sys/linux/include/linux/fb.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -43,6 +44,7 @@
 #   include <sys/stat.h>
 #   include <linux/serial.h>
 #   include <linux/input.h>
+#   include <linux/fb.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 #   include "shell/sys/linux/include/simple_libc/stdio.h"
@@ -559,6 +561,209 @@ int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier)
     int err = vsf_linux_fs_bind_target_ex(
                 path, notifier, &__vsf_linux_input_fdop, NULL, NULL,
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+    if (!err) {
+        printf("%s bound.\r\n", path);
+    }
+    return err;
+}
+#endif
+
+#if VSF_USE_UI == ENABLED
+typedef struct vsf_linux_fb_priv_t {
+    implement(vsf_linux_fs_priv_t)
+    void *front_buffer;
+#if VSF_DISP_USE_FB == ENABLED
+    bool is_disp_fb;
+#endif
+} vsf_linux_fb_priv_t;
+
+static void __vsf_linux_disp_on_ready(vk_disp_t *disp)
+{
+    vsf_eda_post_evt((vsf_eda_t *)disp->ui_data, VSF_EVT_USER);
+}
+
+static void __vsf_linux_fb_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
+    vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);
+
+    disp->ui_on_ready = __vsf_linux_disp_on_ready;
+    disp->ui_data = vsf_eda_get_cur();
+    vk_disp_init(disp);
+    vsf_thread_wfe(VSF_EVT_USER);
+
+#if VSF_DISP_USE_FB == ENABLED
+    fb_priv->is_disp_fb = disp->param.drv->fb.set_front_buffer != NULL;
+    if (fb_priv->is_disp_fb) {
+        const vk_disp_drv_t *drv = disp->param.drv;
+        fb_priv->front_buffer = drv->fb.get_front_buffer(disp);
+        return;
+    }
+#endif
+
+    uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
+    fb_priv->front_buffer = malloc(frame_size);
+    VSF_LINUX_ASSERT(fb_priv->front_buffer != NULL);
+}
+
+static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
+    vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);
+    vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)disp;
+    const vk_disp_drv_t *drv = disp->param.drv;
+    uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
+
+    switch (cmd) {
+    case FBIOGET_VSCREENINFO: {
+            struct fb_var_screeninfo *info = (struct fb_var_screeninfo *)arg;
+            memset(info, 0, sizeof(*info));
+            info->xres = disp->param.width;
+            info->yres = disp->param.height;
+            info->xres_virtual = info->xres;
+            info->yres_virtual = info->yres;
+            if (fb_priv->is_disp_fb) {
+                info->yres_virtual *= disp_fb->fb.num;
+            }
+            info->bits_per_pixel = vsf_disp_get_pixel_bitsize(disp);
+            // todo: parse fb_bitfield red/green/blue/transp
+//            switch (disp->param.color) {
+//            }
+        }
+        break;
+    case FBIOPUT_VSCREENINFO: {
+            struct fb_var_screeninfo *info = (struct fb_var_screeninfo *)arg;
+            VSF_UNUSED_PARAM(info);
+        }
+        break;
+    case FBIOGET_FSCREENINFO: {
+            struct fb_fix_screeninfo *info = (struct fb_fix_screeninfo *)arg;
+            strcpy(info->id, "vsf_disp_fb");
+            if (fb_priv->is_disp_fb) {
+                info->smem_start = (uintptr_t)disp_fb->fb.buffer;
+                info->smem_len = disp_fb->fb.size * disp_fb->fb.num;
+            } else {
+                info->smem_start = (uintptr_t)fb_priv->front_buffer;
+                info->smem_len = frame_size;
+            }
+        }
+        break;
+    case FBIOPAN_DISPLAY: {
+            struct fb_var_screeninfo *info = (struct fb_var_screeninfo *)arg;
+            uint8_t frame_number = fb_priv->is_disp_fb ? disp_fb->fb.num : 1;
+            uint8_t frame_idx = info->yoffset / frame_size;
+            if ((info->yoffset % frame_size) || (frame_idx >= frame_number)) {
+                return -1;
+            }
+
+            if (fb_priv->is_disp_fb) {
+                drv->fb.set_front_buffer(disp, frame_idx);
+            } else {
+                vk_disp_refresh(disp, NULL, fb_priv->front_buffer);
+                vsf_thread_wfe(VSF_EVT_USER);
+            }
+        }
+        break;
+    case FBIO_WAITFORVSYNC:
+        // TODO
+        break;
+    }
+    return 0;
+}
+
+static ssize_t __vsf_linux_fb_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
+    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)fb_priv->file;
+    vk_disp_t *disp = (vk_disp_t *)vfs_file->f.param;
+    uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
+
+    if (vfs_file->pos + count >= frame_size) {
+        count = frame_size - vfs_file->pos;
+    }
+
+    memcpy(buf, (void *)((uintptr_t)fb_priv->front_buffer + vfs_file->pos), count);
+    return count;
+}
+
+static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
+    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)fb_priv->file;
+    vk_disp_t *disp = (vk_disp_t *)vfs_file->f.param;
+    uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
+
+    if (vfs_file->pos + count >= frame_size) {
+        count = frame_size - vfs_file->pos;
+    }
+
+    memcpy((void *)((uintptr_t)fb_priv->front_buffer + vfs_file->pos), buf, count);
+    if (!fb_priv->is_disp_fb) {
+        vk_disp_refresh(disp, NULL, fb_priv->front_buffer);
+        vsf_thread_wfe(VSF_EVT_USER);
+    }
+    return count;
+}
+
+static int __vsf_linux_fb_close(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
+    if ((fb_priv->is_disp_fb) && (fb_priv->front_buffer != NULL)) {
+        free(fb_priv->front_buffer);
+    }
+    fb_priv->front_buffer = NULL;
+    return 0;
+}
+
+static void * __vsf_linux_fb_mmap(vsf_linux_fd_t *sfd, off_t offset, size_t len, uint_fast32_t feature)
+{
+    vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
+    vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);
+
+#if VSF_DISP_USE_FB == ENABLED
+    if (fb_priv->is_disp_fb) {
+        const vk_disp_drv_t *drv = disp->param.drv;
+        fb_priv->front_buffer = drv->fb.set_front_buffer(disp, 0);
+        return (void *)((uintptr_t)fb_priv->front_buffer + offset);
+    }
+#endif
+    uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
+    if ((offset + len) >= frame_size) {
+        return NULL;
+    }
+    return (void *)((uintptr_t)fb_priv->front_buffer + offset);
+}
+
+static int __vsf_linux_fb_msync(vsf_linux_fd_t *sfd, void *buffer)
+{
+    vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
+    vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);
+
+#if VSF_DISP_USE_FB == ENABLED
+    if (fb_priv->is_disp_fb) {
+        return 0;
+    }
+#endif
+    vk_disp_refresh(disp, NULL, buffer);
+    vsf_thread_wfe(VSF_EVT_USER);
+    return 0;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_fb_fdop = {
+    .priv_size          = sizeof(vsf_linux_fb_priv_t),
+    .fn_init            = __vsf_linux_fb_init,
+    .fn_fcntl           = __vsf_linux_fb_fcntl,
+    .fn_read            = __vsf_linux_fb_read,
+    .fn_write           = __vsf_linux_fb_write,
+    .fn_close           = __vsf_linux_fb_close,
+    .fn_mmap            = __vsf_linux_fb_mmap,
+    .fn_msync           = __vsf_linux_fb_msync,
+};
+
+int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp)
+{
+    int err = vsf_linux_fs_bind_target_ex(
+                path, disp, &__vsf_linux_fb_fdop, NULL, NULL, 0, 0);
     if (!err) {
         printf("%s bound.\r\n", path);
     }

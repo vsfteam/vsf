@@ -617,7 +617,10 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\langinfo.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libgen.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\libusb\libusb.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\fb.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\input.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\limits.h" />
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\serial.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netdb.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netinet\in.h" />
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\netinet\ip.h" />

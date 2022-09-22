@@ -57,7 +57,6 @@ vsf_class(vk_disp_fb_t) {
         struct {
             // user can provide the frame buffer here
             //  if NULL, frame buffer will be allocated from heap
-            // disp_fb will provide the buffer as current user buffer
             void            *buffer;
 
             const vk_disp_fb_drv_t

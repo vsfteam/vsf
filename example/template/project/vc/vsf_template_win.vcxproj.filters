@@ -3255,6 +3255,15 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\utime.h">
       <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\fb.h">
+      <Filter>vsf\shell\sys\linux\include\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\input.h">
+      <Filter>vsf\shell\sys\linux\include\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\serial.h">
+      <Filter>vsf\shell\sys\linux\include\linux</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
