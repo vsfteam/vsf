@@ -33,8 +33,8 @@
 // only define in source file
 #define VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY    ENABLED
 #define VSF_FLASH_CFG_BASE_ADDRESS              0x8000000
-#define __AIC8800_FLASH_ALIGNMENT_ERASE_SIZE    0x1000
-#define __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE    0x100
+#define VSF_FLASH_CFG_ERASE_SECTORE_SIZE        0x1000
+#define VSF_FLASH_CFG_WRITE_SECTORE_SIZE        0x100
 
 #define __AIC8800_FLASH_CFG_PROTECT             interrupt
 
@@ -119,14 +119,14 @@ fsm_rt_t vsf_hw_flash_disable(vsf_hw_flash_t *hw_flash_ptr)
 
 vsf_err_t vsf_hw_flash_erase(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, vsf_flash_size_t size)
 {
+    vsf_flash_size_t ret;
+
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
 
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
     VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
-    VSF_HAL_ASSERT(0 == (offset % __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
-    VSF_HAL_ASSERT(0 == (size % __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
-
-    vsf_flash_size_t ret;
+    VSF_HAL_ASSERT(0 == (offset % VSF_FLASH_CFG_ERASE_SECTORE_SIZE));
+    VSF_HAL_ASSERT(0 == (size % VSF_FLASH_CFG_ERASE_SECTORE_SIZE));
 
     vsf_protect_t org = __aic8800_flash_protect();
         ret = __ROM_FlashErase(__aic8800_flash_address_get(offset), size);//offset:4k * n
@@ -148,7 +148,7 @@ vsf_err_t vsf_hw_flash_write(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offs
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
     VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
-    VSF_HAL_ASSERT(0 == (offset % __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
+    VSF_HAL_ASSERT(0 == (offset % VSF_FLASH_CFG_WRITE_SECTORE_SIZE));
 
     vsf_protect_t org = __aic8800_flash_protect();
         ret = __ROM_FlashWrite(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
@@ -171,7 +171,6 @@ vsf_err_t vsf_hw_flash_read(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offse
     VSF_HAL_ASSERT(NULL != buffer);
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
     VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
-    VSF_HAL_ASSERT(0 == (offset % __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE));
 
     vsf_protect_t org = __aic8800_flash_protect();
         ret = __ROM_FlashRead(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
@@ -185,13 +184,14 @@ vsf_err_t vsf_hw_flash_read(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offse
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
-flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
+vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
 {
-    flash_capability_t flash_capability = {
-        .base_address       = VSF_FLASH_CFG_BASE_ADDRESS,
-        .max_size           = hw_flash_ptr->flash_size,
-        .sector_erase_size  = VSF_FLASH_CFG_SECTORE_ERASE_SIZE,
-        .sector_write_size  = VSF_FLASH_CFG_SECTORE_WRITE_SIZE,
+    vsf_flash_capability_t flash_capability = {
+        .base_address          = VSF_FLASH_CFG_BASE_ADDRESS,
+        .max_size              = hw_flash_ptr->flash_size,
+        .erase_sector_size     = VSF_FLASH_CFG_ERASE_SECTORE_SIZE,
+        .write_sector_size     = VSF_FLASH_CFG_WRITE_SECTORE_SIZE,
+        .can_write_any_address = 0,
     };
 
     return flash_capability;

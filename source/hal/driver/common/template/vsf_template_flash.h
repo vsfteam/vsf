@@ -106,8 +106,12 @@ typedef struct vsf_flash_capability_t {
     inherit(vsf_peripheral_capability_t)
     vsf_flash_size_t base_address;
     vsf_flash_size_t max_size;
-    vsf_flash_size_t sector_erase_size;
-    vsf_flash_size_t sector_write_size;
+    vsf_flash_size_t erase_sector_size;
+    vsf_flash_size_t write_sector_size;
+    struct {
+        // there are some flash only supports writing from the first address of the sector
+        uint8_t can_write_any_address : 1;
+    };
 } vsf_flash_capability_t;
 #endif
 
