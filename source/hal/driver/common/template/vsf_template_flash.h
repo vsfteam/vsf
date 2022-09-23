@@ -56,20 +56,16 @@ extern "C" {
 #   define VSF_FLASH_CFG_REIMPLEMENT_FLASH_SIZE_TYPE    DISABLED
 #endif
 
-#ifndef VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY         DISABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_FLASH_APIS(__prefix_name)                                                                                                                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          flash, init,      VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_cfg_t *cfg_ptr)                                      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           flash, enable,    VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr)                                                            \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,           flash, disable,   VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr)                                                            \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, flash_capability_t, flash, capability,VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr)                                                            \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          flash, erase,     VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset, vsf_flash_size_t size)                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          flash, write,     VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          flash, read,      VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, init,      VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_cfg_t *cfg_ptr)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, enable,    VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr)                                                            \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, disable,   VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr)                                                            \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_flash_capability_t, flash, capability,VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr)                                                            \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase,     VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset, vsf_flash_size_t size)                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, write,     VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, read,      VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
 
 /*============================ TYPES =========================================*/
 
@@ -106,13 +102,13 @@ typedef struct vsf_flash_cfg_t {
 } vsf_flash_cfg_t;
 
 #if VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-typedef struct flash_capability_t {
+typedef struct vsf_flash_capability_t {
     inherit(peripheral_capability_t)
     vsf_flash_size_t base_address;
     vsf_flash_size_t max_size;
     vsf_flash_size_t sector_erase_size;
     vsf_flash_size_t sector_write_size;
-} flash_capability_t;
+} vsf_flash_capability_t;
 #endif
 
 typedef struct vsf_flash_op_t {
