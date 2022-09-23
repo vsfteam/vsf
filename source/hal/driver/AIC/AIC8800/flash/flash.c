@@ -33,12 +33,10 @@
 // only define in source file
 #define VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY    ENABLED
 #define VSF_FLASH_CFG_BASE_ADDRESS              0x8000000
+#define __AIC8800_FLASH_ALIGNMENT_ERASE_SIZE    0x1000
+#define __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE    0x100
 
 #define __AIC8800_FLASH_CFG_PROTECT             interrupt
-
-#define __AIC8800_FLASH_ALIGNMENT_ERASE_SIZE    0x1000
-
-#define __AIC8800_FLASH_ALIGNMENT_WRITE_SIZE    0x100
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -190,8 +188,10 @@ vsf_err_t vsf_hw_flash_read(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offse
 flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
 {
     flash_capability_t flash_capability = {
-        .base_address = VSF_FLASH_CFG_BASE_ADDRESS,
-        .size         = hw_flash_ptr->flash_size,
+        .base_address       = VSF_FLASH_CFG_BASE_ADDRESS,
+        .max_size           = hw_flash_ptr->flash_size,
+        .sector_erase_size  = VSF_FLASH_CFG_SECTORE_ERASE_SIZE,
+        .sector_write_size  = VSF_FLASH_CFG_SECTORE_WRITE_SIZE,
     };
 
     return flash_capability;

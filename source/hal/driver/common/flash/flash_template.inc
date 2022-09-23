@@ -45,8 +45,10 @@
 flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 {
     flash_capability_t flash_capability = {
-        .base_address = VSF_FLASH_CFG_BASE_ADDRESS,
-        .size         = VSF_FLASH_CFG_MAX_SIZE,
+        .base_address       = VSF_FLASH_CFG_BASE_ADDRESS,
+        .max_size           = VSF_FLASH_CFG_MAX_SIZE,
+        .sector_erase_size  = VSF_FLASH_CFG_SECTORE_ERASE_SIZE,
+        .sector_write_size  = VSF_FLASH_CFG_SECTORE_WRITE_SIZE,
     };
 
     return flash_capability;

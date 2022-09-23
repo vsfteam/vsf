@@ -109,7 +109,9 @@ typedef struct vsf_flash_cfg_t {
 typedef struct flash_capability_t {
     inherit(peripheral_capability_t)
     vsf_flash_size_t base_address;
-    vsf_flash_size_t size;
+    vsf_flash_size_t max_size;
+    vsf_flash_size_t sector_erase_size;
+    vsf_flash_size_t sector_write_size;
 } flash_capability_t;
 #endif
 
