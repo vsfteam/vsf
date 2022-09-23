@@ -24,6 +24,10 @@
 #define vsf_real_flash_t          VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)
 #define vsf_real_flash_capability VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
 
+#ifndef VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY
+#   define VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY         DISABLED
+#endif
+
 #if VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 #   ifndef VSF_FLASH_CFG_BASE_ADDRESS
 #       define VSF_FLASH_CFG_BASE_ADDRESS           0
@@ -42,9 +46,9 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY == DISABLED
-flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
+vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 {
-    flash_capability_t flash_capability = {
+    vsf_flash_capability_t flash_capability = {
         .base_address       = VSF_FLASH_CFG_BASE_ADDRESS,
         .max_size           = VSF_FLASH_CFG_MAX_SIZE,
         .sector_erase_size  = VSF_FLASH_CFG_SECTORE_ERASE_SIZE,

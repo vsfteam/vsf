@@ -62,7 +62,7 @@ fsm_rt_t vsf_flash_disable(vsf_flash_t *flash_ptr)
     return flash_ptr->op->disable(flash_ptr);
 }
 
-flash_capability_t vsf_flash_capability(vsf_flash_t *flash_ptr)
+vsf_flash_capability_t vsf_flash_capability(vsf_flash_t *flash_ptr)
 {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(flash_ptr->op != NULL);
