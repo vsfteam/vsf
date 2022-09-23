@@ -56,8 +56,8 @@ struct peripheral_status_t {
 };
 
 
-typedef struct peripheral_capability_t peripheral_capability_t;
-struct peripheral_capability_t {
+typedef struct vsf_peripheral_capability_t vsf_peripheral_capability_t;
+struct vsf_peripheral_capability_t {
     union {
         struct {
             uint8_t can_read_byte       : 1;
@@ -68,8 +68,8 @@ struct peripheral_capability_t {
             uint8_t random_access       : 1;
             uint8_t                     : 2;
         };
-        uint8_t bCanRead;
-    }Read;
+        uint8_t can_read;
+    } Read;
 
     union {
         struct {
@@ -81,8 +81,8 @@ struct peripheral_capability_t {
             uint8_t random_access       : 1;
             uint8_t                     : 2;
         };
-        uint8_t can_read;
-    }Write;
+        uint8_t can_write;
+    } Write;
 
     union {
         struct {
@@ -94,14 +94,14 @@ struct peripheral_capability_t {
             uint16_t                    : 8;
         };
         uint16_t info;
-    }Feature;
+    } Feature;
 };
 
 //! \name interface: i_peripheral_t
 //! @{
 def_interface(i_peripheral_t)
     peripheral_status_t     (*Status)       (void);
-    peripheral_capability_t (*Capability)   (void);
+    vsf_peripheral_capability_t (*Capability)   (void);
     fsm_rt_t                (*Uninit)       (void);
     union {
         fsm_rt_t            (*Enable)       (void);

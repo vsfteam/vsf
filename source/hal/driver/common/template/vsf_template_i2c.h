@@ -175,7 +175,7 @@ typedef struct vsf_i2c_status_t {
 
 #if VSF_I2C_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_i2c_capability_t {
-    inherit(peripheral_capability_t)
+    inherit(vsf_peripheral_capability_t)
 } vsf_i2c_capability_t;
 #endif
 
