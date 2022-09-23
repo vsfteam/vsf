@@ -86,7 +86,7 @@ struct vsf_spi_status_t {
 };
 
 struct vsf_spi_capability_t {
-    implement(peripheral_capability_t);
+    implement(vsf_peripheral_capability_t);
 };
 
 struct vsf_spi_t {

@@ -137,7 +137,7 @@ typedef struct vsf_adc_cfg_t {
 
 #if VSF_ADC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_adc_capability_t {
-    inherit(peripheral_capability_t)
+    inherit(vsf_peripheral_capability_t)
 } vsf_adc_capability_t;
 #endif
 

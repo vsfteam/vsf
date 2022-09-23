@@ -67,7 +67,7 @@ typedef void vsf_rng_on_ready_callback_t(void *param, uint32_t *buffer, uint32_t
 
 #if VSF_RNG_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_rng_capability_t {
-    inherit(peripheral_capability_t)
+    inherit(vsf_peripheral_capability_t)
 } vsf_rng_capability_t;
 #endif
 

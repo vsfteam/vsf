@@ -103,7 +103,7 @@ typedef struct vsf_flash_cfg_t {
 
 #if VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_flash_capability_t {
-    inherit(peripheral_capability_t)
+    inherit(vsf_peripheral_capability_t)
     vsf_flash_size_t base_address;
     vsf_flash_size_t max_size;
     vsf_flash_size_t sector_erase_size;

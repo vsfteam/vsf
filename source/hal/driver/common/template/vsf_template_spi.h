@@ -191,7 +191,7 @@ typedef struct vsf_spi_status_t {
 
 #if VSF_SPI_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_spi_capability_t {
-    inherit(peripheral_capability_t)
+    inherit(vsf_peripheral_capability_t)
     uint8_t cs_count;
 } vsf_spi_capability_t;
 #endif

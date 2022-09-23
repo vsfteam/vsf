@@ -109,7 +109,7 @@ typedef struct vsf_rtc_cfg_t {
 
 #if VSF_RTC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_rtc_capability_t {
-    inherit(peripheral_capability_t)
+    inherit(vsf_peripheral_capability_t)
 } vsf_rtc_capability_t;
 #endif
 

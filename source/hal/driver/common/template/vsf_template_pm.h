@@ -425,7 +425,7 @@ typedef struct vsf_pm_clock_out_cfg_t {
 
 #if VSF_PWM_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_pm_capability_t {
-    inherit(peripheral_capability_t)
+    inherit(vsf_peripheral_capability_t)
 } vsf_pm_capability_t;
 #endif
 

@@ -178,7 +178,7 @@ typedef struct vsf_io_cfg_t {
 
 #if VSF_IO_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_io_capability_t {
-    inherit(peripheral_capability_t)
+    inherit(vsf_peripheral_capability_t)
 } vsf_io_capability_t;
 #endif
 

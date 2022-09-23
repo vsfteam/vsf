@@ -113,7 +113,7 @@ typedef struct vsf_timer_cfg_t {
 
 #if VSF_TIMER_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_timer_capability_t {
-    inherit(peripheral_capability_t)
+    inherit(vsf_peripheral_capability_t)
 } vsf_timer_capability_t;
 #endif
 
