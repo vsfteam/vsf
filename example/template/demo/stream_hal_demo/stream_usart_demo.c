@@ -81,7 +81,7 @@ describe_usbd(__usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USB_DC_SPEED_FULL)
 end_describe_usbd(__usbd, VSF_USB_DC0)
 
 static vsf_stream_usart_t __stream_usart = {
-    .usart = &APP_STREAM_USART_DEMO_CFG_USART,
+    .usart = (vsf_usart_t *)&APP_STREAM_USART_DEMO_CFG_USART,
     .stream_tx = &__stream_usart_tx.use_as__vsf_stream_t,
     .stream_rx = &__stream_usart_rx.use_as__vsf_stream_t,
 };
@@ -104,8 +104,7 @@ int VSF_USER_ENTRY(void)
 #endif
 
 #ifdef __WIN__
-    static uint8_t ret;
-    vsf_hw_usart_get_can_used_port(&ret);
+    vsf_hw_usart_scan_devices();
 #endif
 
     VSF_STREAM_INIT(&__stream_usart_tx);

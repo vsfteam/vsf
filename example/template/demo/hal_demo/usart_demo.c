@@ -106,7 +106,6 @@ typedef struct app_usart_demo_t {
 
 #ifdef __WIN__
     bool is_inited;
-    uint8_t port_available;
 #endif
 } app_usart_demo_t;
 
@@ -131,16 +130,17 @@ static void __update_vsf_usart_win(void)
     }
     __app_usart_demo.is_inited = true;
 
-    vsf_hw_usart_get_can_used_port(&__app_usart_demo.port_available);
-
-    vsf_usart_win_expression_t com_vsf_usart[VSF_HW_USART_COUNT] = {0};
-    while (!vsf_hw_usart_get_com_num(com_vsf_usart, dimof(com_vsf_usart))) {
+    vsf_usart_win_device_t com_vsf_usart[VSF_HW_USART_COUNT] = {0};
+    uint8_t port_number;
+    vsf_hw_usart_scan_devices();
+    while (!vsf_hw_usart_is_scanning(&port_number)) {
         vsf_delay_ms(10);
     }
+    vsf_hw_usart_get_devices(com_vsf_usart, dimof(com_vsf_usart));
 
-    for (int i = 0; i < __app_usart_demo.port_available; i++) {
-        if (com_vsf_usart[i].win_serial_port_num != 0) {
-            vsf_trace(VSF_TRACE_INFO, "com%d---vsf_usart%d\n", com_vsf_usart[i].win_serial_port_num, i);
+    for (int i = 0; i < port_number; i++) {
+        if (com_vsf_usart[i].port != 0) {
+            vsf_trace(VSF_TRACE_INFO, "com%d---vsf_usart%d\n", com_vsf_usart[i].port, i);
         }
     }
 }
