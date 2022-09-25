@@ -48,6 +48,8 @@ extern "C" {
 #define F_IO            16
 
 #define FD_CLOEXEC      1
+// __FD_READALL is used internally to indicate to read all data
+#define __FD_READALL    2
 
 struct flock {
     off_t   l_start;

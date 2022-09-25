@@ -2246,18 +2246,20 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         size -= cursize;
         buf = (uint8_t *)buf + cursize;
 
-        // TODO: need to read all data
-        break;
+        orig = vsf_protect_sched();
+        VSF_LINUX_ASSERT(NULL == sfd->priv->events_callback.cb);
+        if (!vsf_stream_get_data_size(stream)) {
+            __vsf_linux_stream_evt(priv, orig, POLLIN, false);
+        } else {
+            vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+        }
+
+        if (!size || !(sfd->fd_flags & __FD_READALL)) {
+            break;
+        }
     }
 
 do_return:
-    orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT(NULL == sfd->priv->events_callback.cb);
-    if (!vsf_stream_get_data_size(stream)) {
-        __vsf_linux_stream_evt(priv, orig, POLLIN, false);
-    } else {
-        vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
-    }
     return count - size;
 }
 
@@ -2525,6 +2527,7 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
         .c_ospeed       = B115200,
     };
     priv->termios = __default_term;
+    sfd->fd_flags |= __FD_READALL;
 }
 
 static int __vsf_linux_term_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
