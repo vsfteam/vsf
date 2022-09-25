@@ -856,8 +856,8 @@ bool vsf_hw_usart_get_devices(vsf_usart_win_device_t *devices, uint8_t size)
     uint8_t i, j = 0;
     for (i = 0; i < VSF_HW_USART_COUNT; i++) {
         if (0 != __x86_usart_win.port[i]) {
-            devices[j].win_serial_port_num = __x86_usart_win.port[i];
-            devices[j].vsf_usart_instance_ptr = (vsf_usart_t *)__vsf_usart_win[i];
+            devices[j].port = __x86_usart_win.port[i];
+            devices[j].instance = (vsf_usart_t *)__vsf_usart_win[i];
             j++;
         }
     }

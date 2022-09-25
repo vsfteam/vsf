@@ -94,8 +94,8 @@ typedef enum vsf_usart_irq_mask_t {
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_usart_win_device_t {
-    vsf_usart_t *vsf_usart_instance_ptr;
-    uint8_t      win_serial_port_num;
+    vsf_usart_t *instance;
+    uint8_t      port;
 } vsf_usart_win_device_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
