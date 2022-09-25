@@ -93,18 +93,18 @@ typedef enum vsf_usart_irq_mask_t {
 
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_usart_win_expression_t {
+typedef struct vsf_usart_win_device_t {
     vsf_usart_t *vsf_usart_instance_ptr;
     uint8_t      win_serial_port_num;
-} vsf_usart_win_expression_t;
+} vsf_usart_win_device_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_hw_usart_get_can_used_port(uint8_t *available_number_port);
-extern bool vsf_hw_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size);
-extern bool vsf_hw_usart_port_is_busy(void);
+extern void vsf_hw_usart_scan_devices(void);
+extern bool vsf_hw_usart_is_scanning(uint8_t *device_num);
+extern bool vsf_hw_usart_get_devices(vsf_usart_win_device_t *devices, uint8_t size);
 
 #endif
 #endif      // __OSA_HAL_X86_WIN_USART_H__

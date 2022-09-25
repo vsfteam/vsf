@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_USART_CFG_IMP_PREFIX                 vsf_hw
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX       VSF_HW
+#define VSF_USART_CFG_IMP_PREFIX                        vsf_hw
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX                 VSF_HW
 
 /*============================ INCLUDES ======================================*/
 
@@ -156,12 +156,12 @@ typedef struct vsf_hw_usart_t {
 #if VSF_HW_USART_CFG_MULTI_CLASS == ENABLED
     vsf_usart_t                         vsf_usart;
 #endif
-    vsf_usart_irq_mask_t                 enable_flag;
+    vsf_usart_irq_mask_t                enable_flag;
     uint8_t                             com_port;
     uint8_t                             com_status;
     uint8_t                             cancel_status;
     uint8_t                             init_flag : 1;
-    vsf_usart_cfg_t                         cfg;
+    vsf_usart_cfg_t                     cfg;
     uint8_t                             *buf;
     uint_fast32_t                       buf_size;
     int_fast32_t                        sended_buf_size;
@@ -181,8 +181,7 @@ typedef struct vsf_hw_usart_t {
 typedef struct x86_usart_win_t {
     vsf_arch_irq_thread_t               irq_scan_thread;
     vsf_arch_irq_request_t              irq_scan_request;
-    uint8_t                             *ret;
-    uint8_t                             is_busy : 1;
+    uint8_t                             is_scanning : 1;
     uint8_t                             is_scan_inited : 1;
     vsf_arch_irq_request_t              irq_init_request;
     struct {
@@ -222,7 +221,7 @@ static const char *__vsf_x86_trace_color[] = {
 #endif
 
 static x86_usart_win_t __x86_usart_win = {
-    .is_busy = 1,
+    .is_scanning = true,
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -250,9 +249,8 @@ static void __vk_usart_scan_event_thread(void *arg)
     HANDLE hCom;
     char file[16] = {0};
     uint8_t i, j;
-    for (i = 0; i < VSF_HW_USART_COUNT; i++) {
-        __x86_usart_win.port[i] = 0;
-    }
+
+    memset(__x86_usart_win.port, 0, sizeof(__x86_usart_win.port));
     __x86_usart_win.num = 0;
     while (1) {
         vsf_hw_usart_trace_irq(VSF_USART_CFG_TRACE_IRQ_PEND"[%s]line(%d)", __FUNCTION__, __LINE__);
@@ -292,10 +290,9 @@ static void __vk_usart_scan_event_thread(void *arg)
             }
         close_handle:
             CloseHandle(hCom);
-            *__x86_usart_win.ret = __x86_usart_win.num;
         }
-        __x86_usart_win.is_busy = 0;
-        for (int i=0;i < VSF_HW_USART_COUNT;i++) {
+        __x86_usart_win.is_scanning = false;
+        for (int i = 0; i < VSF_HW_USART_COUNT; i++) {
             VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)com%d---vsf_usart%d\n", __FUNCTION__, __LINE__, __x86_usart_win.port[i], i);
         }
     }
@@ -620,22 +617,21 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart, vsf_usart_cfg_t *cfg)
     vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX",0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, hw_usart, cfg);
     VSF_HAL_ASSERT(cfg != NULL);
     VSF_HAL_ASSERT(hw_usart != NULL);
-    if (__x86_usart_win.is_busy) {
+    if (__x86_usart_win.is_scanning) {
         vsf_hw_usart_trace_function("%s exited VSF_ERR_FAIL", __FUNCTION__);
         return VSF_ERR_FAIL;
     }
     if (NULL == hw_usart->handle_com || INVALID_HANDLE_VALUE == hw_usart->handle_com) {
         hw_usart->com_status |= USART_INIT_IS_BUSY;
     } else {
-        uint8_t res;
         hw_usart->com_status = USART_INIT_IS_BUSY | USART_RESET;
         while ((hw_usart->com_status & USART_READ_IS_BUSY) && (hw_usart->com_status & USART_WRITE_IS_BUSY));
         VSF_HW_USART_CFG_TRACE_FUNC("CloseHandle:%p\n", hw_usart->handle_com);
         bool b = CloseHandle(hw_usart->handle_com);
         (void)b;
         VSF_HW_USART_CFG_TRACE_FUNC("CloseHandle:%d^^%p\n", b, hw_usart->handle_com);
-        vsf_hw_usart_get_can_used_port(&res);
-        while (vsf_hw_usart_port_is_busy());
+        vsf_hw_usart_scan_devices();
+        while (vsf_hw_usart_is_scanning(NULL));
     }
     hw_usart->handle_com = INVALID_HANDLE_VALUE;
 
@@ -819,18 +815,20 @@ vsf_err_t vsf_hw_usart_request_tx(vsf_hw_usart_t *hw_usart, void *buffer, uint_f
     return VSF_ERR_NONE;
 }
 
-bool vsf_hw_usart_port_is_busy()
+bool vsf_hw_usart_is_scanning(uint8_t *device_num)
 {
     vsf_hw_usart_trace_function("%s", __FUNCTION__);
     vsf_hw_usart_trace_function("%s exited %s", __FUNCTION__, __x86_usart_win.is_busy == 1 ? "true" : "false");
-    return __x86_usart_win.is_busy == 1;
+    if (device_num != NULL) {
+        *device_num = __x86_usart_win.num;
+    }
+    return __x86_usart_win.is_scanning;
 }
 
-void vsf_hw_usart_get_can_used_port(uint8_t *available_number_port)
+void vsf_hw_usart_scan_devices(void)
 {
-    vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, available_number_port);
-    __x86_usart_win.ret = available_number_port;
-    __x86_usart_win.is_busy = 1;
+    vsf_hw_usart_trace_function("%s()", __FUNCTION__);
+    __x86_usart_win.is_scanning = true;
     if (!__x86_usart_win.is_scan_inited) {
         __x86_usart_win.is_scan_inited = true;
         __vsf_arch_irq_request_init(&__x86_usart_win.irq_scan_request);
@@ -842,11 +840,11 @@ void vsf_hw_usart_get_can_used_port(uint8_t *available_number_port)
     vsf_hw_usart_trace_function("%s exited", __FUNCTION__);
 }
 
-bool vsf_hw_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size)
+bool vsf_hw_usart_get_devices(vsf_usart_win_device_t *devices, uint8_t size)
 {
-    vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX")size(%d)", __FUNCTION__, &arr, size);
+    vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX")size(%d)", __FUNCTION__, &devices, size);
     VSF_HW_USART_CFG_TRACE_FUNC("%s(%d)calling\n", __FUNCTION__, __LINE__);
-    if (__x86_usart_win.is_busy) {
+    if (__x86_usart_win.is_scanning) {
         VSF_HW_USART_CFG_TRACE_FUNC("__x86_usart_win: is busy %sline:%d\n", __FILE__, __LINE__);
         vsf_hw_usart_trace_function("%s exited false", __FUNCTION__);
         return false;
@@ -858,8 +856,8 @@ bool vsf_hw_usart_get_com_num(vsf_usart_win_expression_t arr[], uint8_t size)
     uint8_t i, j = 0;
     for (i = 0; i < VSF_HW_USART_COUNT; i++) {
         if (0 != __x86_usart_win.port[i]) {
-            arr[j].win_serial_port_num = __x86_usart_win.port[i];
-            arr[j].vsf_usart_instance_ptr = (vsf_usart_t *)__vsf_usart_win[i];
+            devices[j].win_serial_port_num = __x86_usart_win.port[i];
+            devices[j].vsf_usart_instance_ptr = (vsf_usart_t *)__vsf_usart_win[i];
             j++;
         }
     }
