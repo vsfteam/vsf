@@ -460,6 +460,9 @@ static void __vk_usart_read_event_thread(void *arg)
             vsf_hw_usart_trace_irq("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, rres);
             if (rres == ERROR_IO_PENDING) {
                 GetOverlappedResult(hw_usart->handle_com, &overLapped, &read_len, TRUE);
+            } else if (rres == ERROR_INVALID_HANDLE) {
+                // maybe handle is closed, and opened again, just ignore
+                //  eg: call vsf_hw_usart_init twice will
             } else {
                 if ((hw_usart->enable_flag & USART_IRQ_MASK_RX_ERR) && NULL != hw_usart->cfg.isr.handler_fn) {
                     hw_usart->enable_flag &= ~USART_IRQ_MASK_TX_ERR;
