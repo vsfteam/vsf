@@ -2288,15 +2288,16 @@ ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t co
         cursize = vsf_stream_write(stream, (uint8_t *)buf, size);
         size -= cursize;
         buf = (uint8_t *)buf + cursize;
+
+        orig = vsf_protect_sched();
+        VSF_LINUX_ASSERT(NULL == sfd->priv->events_callback.cb);
+        if (!vsf_stream_get_free_size(stream)) {
+            __vsf_linux_stream_evt(priv, orig, POLLOUT, false);
+        } else {
+            vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, orig);
+        }
     }
 
-    orig = vsf_protect_sched();
-    VSF_LINUX_ASSERT(NULL == sfd->priv->events_callback.cb);
-    if (!vsf_stream_get_free_size(stream)) {
-        __vsf_linux_stream_evt(priv, orig, POLLOUT, false);
-    } else {
-        vsf_linux_fd_set_events(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, orig);
-    }
     return count;
 }
 
