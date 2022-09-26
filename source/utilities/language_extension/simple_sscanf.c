@@ -53,7 +53,11 @@ static bool __is_in_seq(char ch, const char *seq, int seq_len)
 
 int vsnscanf(const char *str, size_t size, const char *format, va_list ap)
 {
-    char ch, integer_buf[32], *ptr;
+    union {
+        char integer_buf[32];
+        char seq_buf[256];
+    } buf;
+    char ch, *ptr;
     char *strtmp;
     int result = 0, cur_size;
 
@@ -71,8 +75,8 @@ int vsnscanf(const char *str, size_t size, const char *format, va_list ap)
                 } flags;
                 int radix;
 
+                bool seqnot;
                 int seqlen;
-                const char *seq;
 
                 flags.all = 0;
                 if ('*' == *format) {
@@ -85,24 +89,41 @@ int vsnscanf(const char *str, size_t size, const char *format, va_list ap)
                 ch = *format++;
                 switch (ch) {
                 case '[':
-                    seq = format;
+                    seqlen = 0;
+                    seqnot = *format == '^';
+                    if (seqnot) { format++; }
                     while (true) {
-                        ch = *format++;
-                        if (!ch) {
+                        VSF_ASSERT(seqlen < dimof(buf.seq_buf));
+                        buf.seq_buf[seqlen] = *format++;
+                        if (!buf.seq_buf[seqlen]) {
                             return -1;
-                        }
-                        if (ch == ']') {
+                        } else if (buf.seq_buf[seqlen] == ']') {
                             break;
+                        } else if (buf.seq_buf[seqlen] == '-') {
+                            char last = *format++;
+                            if (!seqlen) { return -1; }
+                            if (    (last < buf.seq_buf[seqlen - 1])
+                                ||  (seqlen + last - buf.seq_buf[seqlen - 1] >= dimof(buf.seq_buf))) {
+                                return -1;
+                            }
+                            while (last > buf.seq_buf[seqlen - 1]) {
+                                buf.seq_buf[seqlen] = buf.seq_buf[seqlen - 1] + 1;
+                                seqlen++;
+                            }
+                            continue;
                         }
+                        seqlen++;
                     }
-                    seqlen = format - seq - 1;
 
                     ptr = va_arg(ap, char *);
                     if (!width) { width = -1; }
-                    while (__is_in_seq(*str, seq, seqlen) && (width-- > 0)) {
+                    while ( (   (seqnot && !__is_in_seq(*str, buf.seq_buf, seqlen))
+                            ||  (!seqnot && __is_in_seq(*str, buf.seq_buf, seqlen)))
+                        &&  ((width < 0) || (width-- > 0))) {
                         *ptr++ = *str++;
                         size--;
                     }
+                    *ptr = '\0';
                     result++;
                     break;
                 case 'u':
@@ -126,10 +147,10 @@ int vsnscanf(const char *str, size_t size, const char *format, va_list ap)
 
                 parse_integer:
                     if (width > 0) {
-                        VSF_ASSERT(width <= sizeof(integer_buf) - 1);
-                        memcpy(integer_buf, str, width);
-                        integer_buf[width] = '\0';
-                        ptr = integer_buf;
+                        VSF_ASSERT(width <= sizeof(buf.integer_buf) - 1);
+                        memcpy(buf.integer_buf, str, width);
+                        buf.integer_buf[width] = '\0';
+                        ptr = buf.integer_buf;
                     } else {
                         ptr = (char *)str;
                     }
