@@ -71,32 +71,58 @@ vsf_flash_capability_t vsf_flash_capability(vsf_flash_t *flash_ptr)
     return flash_ptr->op->capability(flash_ptr);
 }
 
-vsf_err_t vsf_flash_erase(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint_fast32_t size)
+vsf_err_t vsf_flash_erase_one_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset)
 {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(flash_ptr->op != NULL);
-    VSF_HAL_ASSERT(flash_ptr->op->erase != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->erase_one_sector != NULL);
 
-    return flash_ptr->op->erase(flash_ptr, offset, size);
+    return flash_ptr->op->erase_one_sector(flash_ptr, offset);
 }
 
-
-vsf_err_t vsf_flash_write(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
+vsf_err_t vsf_flash_erase_multi_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint_fast32_t size)
 {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(flash_ptr->op != NULL);
-    VSF_HAL_ASSERT(flash_ptr->op->write != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->erase_multi_sector != NULL);
 
-    return flash_ptr->op->write(flash_ptr, offset, buffer, size);
+    return flash_ptr->op->erase_multi_sector(flash_ptr, offset, size);
 }
 
-vsf_err_t vsf_flash_read(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
+vsf_err_t vsf_flash_write_one_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
 {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(flash_ptr->op != NULL);
-    VSF_HAL_ASSERT(flash_ptr->op->read != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->write_one_sector != NULL);
 
-    return flash_ptr->op->read(flash_ptr, offset, buffer, size);
+    return flash_ptr->op->write_one_sector(flash_ptr, offset, buffer, size);
+}
+
+vsf_err_t vsf_flash_write_multi_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->write_multi_sector != NULL);
+
+    return flash_ptr->op->write_multi_sector(flash_ptr, offset, buffer, size);
+}
+
+vsf_err_t vsf_flash_read_one_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->read_one_sector != NULL);
+
+    return flash_ptr->op->read_one_sector(flash_ptr, offset, buffer, size);
+}
+
+vsf_err_t vsf_flash_read_mult_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->read_multi_sector != NULL);
+
+    return flash_ptr->op->read_multi_sector(flash_ptr, offset, buffer, size);
 }
 
 #endif /* VSF_FLASH_CFG_MULTI_CLASS == ENABLED */

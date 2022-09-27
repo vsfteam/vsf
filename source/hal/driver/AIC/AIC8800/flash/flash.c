@@ -32,7 +32,11 @@
 
 // only define in source file
 #define VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY    ENABLED
-#define VSF_FLASH_CFG_BASE_ADDRESS              0x8000000
+#define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE        ENABLED
+#define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE ENABLED
+#define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE ENABLED
+#define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE  ENABLED
+#define VSF_FLASH_CFG_BASE_ADDRESS              0x08000000
 #define VSF_FLASH_CFG_ERASE_SECTORE_SIZE        0x1000
 #define VSF_FLASH_CFG_WRITE_SECTORE_SIZE        0x100
 
@@ -117,7 +121,7 @@ fsm_rt_t vsf_hw_flash_disable(vsf_hw_flash_t *hw_flash_ptr)
     return fsm_rt_cpl;
 }
 
-vsf_err_t vsf_hw_flash_erase(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, vsf_flash_size_t size)
+vsf_err_t vsf_hw_flash_erase_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, vsf_flash_size_t size)
 {
     vsf_flash_size_t ret;
 
@@ -141,7 +145,7 @@ vsf_err_t vsf_hw_flash_erase(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offs
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
-vsf_err_t vsf_hw_flash_write(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
+vsf_err_t vsf_hw_flash_write_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
 {
     vsf_flash_size_t ret;
 
@@ -163,7 +167,7 @@ vsf_err_t vsf_hw_flash_write(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offs
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
-vsf_err_t vsf_hw_flash_read(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
+vsf_err_t vsf_hw_flash_read_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
 {
     vsf_flash_size_t ret;
 
@@ -192,6 +196,7 @@ vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
         .erase_sector_size     = VSF_FLASH_CFG_ERASE_SECTORE_SIZE,
         .write_sector_size     = VSF_FLASH_CFG_WRITE_SECTORE_SIZE,
         .can_write_any_address = 0,
+        .can_read_any_address  = 1,
     };
 
     return flash_capability;
