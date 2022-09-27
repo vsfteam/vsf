@@ -485,6 +485,8 @@ static bool __vk_winusb_hcd_sumbit_urb_epnz(vk_usbh_hcd_urb_t *urb, WINUSB_INTER
         return false;
 #else
         VSF_USB_ASSERT(urb->iso_packet.number_of_packets > 0);
+        // if assert below, increase VSF_USBH_CFG_ISO_PACKET_LIMIT
+        VSF_USB_ASSERT(urb->iso_packet.number_of_packets <= dimof(urb->iso_packet.frame_desc));
         for (int i = 0; i < urb->iso_packet.number_of_packets; i++) {
             urb->iso_packet.frame_desc[i].actual_length = 0;
         }
