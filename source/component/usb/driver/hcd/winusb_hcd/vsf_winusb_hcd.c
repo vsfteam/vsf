@@ -571,13 +571,14 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
                     .Index          = setup->wIndex,
                     .Length         = setup->wLength,
                 };
+                uint8_t ifs_no = (setup->bRequestType & USB_RECIP_MASK) == USB_RECIP_INTERFACE ? setup->wIndex : 0;
 
                 if (USB_REQ_SET_CONFIGURATION == setup->bRequest) {
                     // TODO: update winusbh_dev->ifs_num
                     // workaround: set ifs_num large enough
                     winusb_dev->ifs_num = 0xFF;
                 }
-                if (!WinUsb_ControlTransfer(winusb_dev->hUsbIfs[0], SetupPacket, urb->buffer,
+                if (!WinUsb_ControlTransfer(winusb_dev->hUsbIfs[ifs_no], SetupPacket, urb->buffer,
                             setup->wLength, &real_size, NULL)) {
                     return -GetLastError();
                 }
