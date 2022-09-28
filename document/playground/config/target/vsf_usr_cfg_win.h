@@ -35,6 +35,7 @@
 //#define VSF_ASSERT(...)
 
 #define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
+#   define VSF_DEBUG_STREAM_CFG_HW_PRIORITY             vsf_arch_prio_0
 
 #define VSF_HEAP_SIZE                                   0x2000000
 #define VSF_HEAP_CFG_MCB_ALIGN_BIT                      12      // 4K alignment
