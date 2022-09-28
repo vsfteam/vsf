@@ -2335,17 +2335,53 @@ int tcsendbreak(int fd, int duration)
 
 int tcdrain(int fd)
 {
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    if (NULL == sfd) { return -1; }
+    vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)sfd->priv;
+    vsf_stream_t *stream_tx = term_priv->stream_tx;
+    if (NULL == stream_tx) { return 0; }
+
+    while (vsf_stream_get_data_size(stream_tx)) {
+        usleep(10 * 1000);
+    }
     return 0;
+}
+
+static void __vsf_linux_tcflush_stream(vsf_stream_t *stream)
+{
+    if (stream != NULL) {
+        uint_fast32_t data_size;
+        while ((data_size = vsf_stream_get_data_size(stream))) {
+            vsf_stream_read(stream, NULL, data_size);
+        }
+    }
 }
 
 int tcflush(int fd, int queue_selector)
 {
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    if (NULL == sfd) { return -1; }
+    vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)sfd->priv;
+    uint8_t op;
+
+    if (queue_selector == TCIOFLUSH) {
+        op = (1 << TCIFLUSH) | (1 << TCOFLUSH);
+    } else {
+        op = 1 << queue_selector;
+    }
+
+    if (op & (1 << TCIFLUSH)) {
+        __vsf_linux_tcflush_stream(term_priv->stream_rx);
+    }
+    if (op & (1 << TCOFLUSH)) {
+        __vsf_linux_tcflush_stream(term_priv->stream_tx);
+    }
     return 0;
 }
 
 int tcflow(int fd, int action)
 {
-    return 0;
+    return -1;
 }
 
 void cfmakeraw(struct termios *termios_p)

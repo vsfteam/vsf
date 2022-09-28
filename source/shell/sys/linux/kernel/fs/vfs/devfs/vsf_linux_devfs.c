@@ -319,13 +319,7 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
     // DO NOT call __vsf_linux_rx_stream_init
     //  event is trigger in __vsf_linux_uart_evthandler, not in stream evthandler
     vsf_stream_connect_rx(priv->stream_rx);
-    vsf_protect_t orig = vsf_protect_sched();
-    if (vsf_stream_get_data_size(priv->stream_rx)) {
-        vsf_linux_fd_set_status(sfd->priv, POLLIN, orig);
-    } else {
-        vsf_unprotect_sched(orig);
-    }
-
+    __vsf_linux_uart_evthandler(&priv->use_as__vsf_eda_t, VSF_EVT_USER);
     __vsf_linux_uart_config(priv);
 
     priv->fn.evthandler = __vsf_linux_uart_evthandler;
