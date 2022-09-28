@@ -1310,11 +1310,6 @@ int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
     }
-    // check not supported flags here
-    if (flags & (O_NONBLOCK)) {
-        VSF_LINUX_ASSERT(false);
-        return -1;
-    }
 
 __open_again:
     file = __vsf_linux_fs_get_file(fullpath);
@@ -1371,6 +1366,11 @@ __open_again:
         fdop = (vsf_linux_fd_op_t *)((vk_vfs_file_t *)file)->f.op;
     } else {
         fdop = (vsf_linux_fd_op_t *)&__vsf_linux_fs_fdop;
+        // check not supported flags here
+        if (flags & (O_NONBLOCK)) {
+            VSF_LINUX_ASSERT(false);
+            return -1;
+        }
     }
 
     fd = vsf_linux_fd_create(&sfd, (const vsf_linux_fd_op_t *)fdop);
