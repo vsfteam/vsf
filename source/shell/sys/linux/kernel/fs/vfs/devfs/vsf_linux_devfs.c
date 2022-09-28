@@ -230,7 +230,12 @@ static void __vsf_linux_uart_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     if (VSF_EVT_USER == evt) {
         vsf_linux_uart_priv_t *priv = container_of(eda, vsf_linux_uart_priv_t, use_as__vsf_eda_t);
-        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
+        vsf_protect_t orig = vsf_protect_sched();
+        if (vsf_stream_get_data_size(priv->stream_rx)) {
+            vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+        } else {
+            vsf_unprotect_sched(orig);
+        }
     }
 }
 
@@ -342,6 +347,9 @@ static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         break;
     case TIOCSSERIAL:
         priv->ss = *arg_union.ss;
+    case FIONREAD:
+        *(int *)arg = vsf_stream_get_data_size(priv->stream_rx);
+        break;
     case TCSETS:
         __vsf_linux_uart_config(priv);
         break;
