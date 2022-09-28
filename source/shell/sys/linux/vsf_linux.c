@@ -1137,13 +1137,15 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_fd_priv_t *stdin_priv = NULL;
     vsf_linux_fd_t *sfd, *sfd_from;
+    bool process_is_shell = false;
     int ret;
 
     if ((NULL == shell_process) || (shell_process == process)) {
         shell_process = &__vsf_linux.process_for_resources;
+        process_is_shell = true;
     }
 
-    sfd = vsf_linux_fd_get(0);
+    sfd = vsf_linux_fd_get(STDIN_FILENO);
     if (NULL == sfd) {
         sfd_from = __vsf_linux_fd_get_ex(shell_process, STDIN_FILENO);
         VSF_LINUX_ASSERT(sfd_from != NULL);
@@ -1153,7 +1155,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
         stdin_priv = sfd->priv;
     }
 
-    sfd = vsf_linux_fd_get(1);
+    sfd = vsf_linux_fd_get(STDOUT_FILENO);
     if (NULL == sfd) {
         sfd_from = __vsf_linux_fd_get_ex(shell_process, STDOUT_FILENO);
         VSF_LINUX_ASSERT(sfd_from != NULL);
@@ -1162,14 +1164,16 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
         VSF_LINUX_ASSERT(ret == STDOUT_FILENO);
     }
 
-    sfd = vsf_linux_fd_get(2);
+    sfd = vsf_linux_fd_get(STDERR_FILENO);
     if (NULL == sfd) {
         sfd_from = __vsf_linux_fd_get_ex(shell_process, STDERR_FILENO);
         VSF_LINUX_ASSERT(sfd_from != NULL);
 
         ret = __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDERR_FILENO, sfd_from->priv);
         VSF_LINUX_ASSERT(ret == STDERR_FILENO);
-        sfd->priv->target = stdin_priv;
+        if (process_is_shell) {
+            sfd->priv->target = stdin_priv;
+        }
     }
 
     vsf_linux_process_arg_t arg = ctx->arg;
