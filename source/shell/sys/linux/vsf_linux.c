@@ -695,6 +695,7 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 int isatty(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    if (NULL == sfd) { return 0; }
     return sfd->op == &vsf_linux_term_fdop;
 }
 
@@ -2336,7 +2337,7 @@ int tcsendbreak(int fd, int duration)
 int tcdrain(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    if (NULL == sfd) { return -1; }
+    if ((NULL == sfd) || (sfd->op != &vsf_linux_term_fdop)) { return -1; }
     vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)sfd->priv;
     vsf_stream_t *stream_tx = term_priv->stream_tx;
     if (NULL == stream_tx) { return 0; }
@@ -2360,7 +2361,7 @@ static void __vsf_linux_tcflush_stream(vsf_stream_t *stream)
 int tcflush(int fd, int queue_selector)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    if (NULL == sfd) { return -1; }
+    if ((NULL == sfd) || (sfd->op != &vsf_linux_term_fdop)) { return -1; }
     vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)sfd->priv;
     uint8_t op;
 
