@@ -322,8 +322,22 @@ static vsf_err_t __usart_init(vsf_hw_usart_t *hw_usart)
 
     sprintf(file, "\\\\.\\com%d", __x86_usart_win.port[hw_usart->com_port]);
     VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)file(%s)", __FUNCTION__, __LINE__, file);
-    handle_com = CreateFileA(file, GENERIC_WRITE | GENERIC_READ, 0, NULL,
+
+    int retry = 0;
+    while (true) {
+        handle_com = CreateFileA(file, GENERIC_WRITE | GENERIC_READ, 0, NULL,
                              OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
+        if ((handle_com != INVALID_HANDLE_VALUE) || (retry > 3)) {
+            break;
+        }
+        __vsf_arch_irq_sleep(100);
+        retry++;
+    }
+    if (INVALID_HANDLE_VALUE == handle_com) {
+        vsf_trace_warning("cannot open %s\n", file);
+        return VSF_ERR_FAIL;
+    }
+
 #if VSF_HW_USART_CFG_TRACE_EN == ENABLED
     res_dword = GetLastError();
 #endif
