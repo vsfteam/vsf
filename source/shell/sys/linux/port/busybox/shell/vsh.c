@@ -320,6 +320,12 @@ static char * __vsh_expand_arg(vsf_linux_process_t *process, char *arg)
 static int __vsh_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry)
 {
     int exefd = -1;
+
+    char last = cmd[strlen(cmd) - 1];
+    if ((last == '\\') || (last == '/')) {
+        return -1;
+    }
+
     if (cmd[0] != '/') {
         exefd = __vsh_get_exe(NULL, 0, cmd, entry);
     }
