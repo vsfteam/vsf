@@ -37,9 +37,13 @@
 #   include "shell/sys/linux/include/linux/input.h"
 #   include "shell/sys/linux/include/linux/fb.h"
 #   include "shell/sys/linux/include/linux/fs.h"
+#   include "shell/sys/linux/include/linux/i2c.h"
+#   include "shell/sys/linux/include/linux/i2c-dev.h"
+#   include "shell/sys/linux/include/linux/spi/spidev.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
+#   include <poll.h>
 #   include <poll.h>
 #   include <termios.h>
 #   include <sys/ioctl.h>
@@ -48,6 +52,9 @@
 #   include <linux/input.h>
 #   include <linux/fb.h>
 #   include <linux/fs.h>
+#   include <linux/i2c.h>
+#   include <linux/i2c-dev.h>
+#   include <linux/spi/spidev.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 #   include "shell/sys/linux/include/simple_libc/stdio.h"
@@ -318,16 +325,95 @@ int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart)
 #endif
 
 #if VSF_HAL_USE_I2C == ENABLED
+
+typedef struct vsf_linux_i2c_priv_t {
+    implement(vsf_linux_fs_priv_t)
+
+    struct {
+        uint16_t addr;
+        uint16_t flags;
+    } i2c;
+} vsf_linux_i2c_priv_t;
+
+static int __vsf_linux_i2c_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    vsf_linux_i2c_priv_t *priv = (vsf_linux_i2c_priv_t *)sfd->priv;
+    vsf_i2c_t *i2c = (vsf_i2c_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    switch (cmd) {
+    case I2C_SLAVE:
+        if ((arg > 0x3FF) || (!(priv->flags & I2C_M_TEN) && (arg > 0x7F))) {
+            return -1;
+        }
+        priv->i2c.addr = (uint16_t)arg;
+        break;
+    case I2C_TENBIT:
+        if (arg) {
+            priv->i2c.flags |= I2C_M_TEN;
+        } else {
+            priv->i2c.flags &= ~I2C_M_TEN;
+        }
+        break;
+    case I2C_FUNCS:
+        *(unsigned long *)arg = I2C_FUNC_I2C | I2C_FUNC_NOSTART;
+        break;
+    case I2C_RDWR: {
+            struct i2c_rdwr_ioctl_data *msgset = (struct i2c_rdwr_ioctl_data *)arg;
+        }
+        break;
+    }
+    return 0;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_i2c_fdop = {
+    .priv_size          = sizeof(vsf_linux_i2c_priv_t),
+    .fn_fcntl           = __vsf_linux_i2c_fcntl,
+};
+
 int vsf_linux_fs_bind_i2c(char *path, vsf_i2c_t *i2c)
 {
-    return -1;
+    return vsf_linux_fs_bind_target_ex(path, i2c, &__vsf_linux_i2c_fdop,
+                NULL, NULL,
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
 #endif
 
 #if VSF_HAL_USE_SPI == ENABLED
+
+typedef struct vsf_linux_spi_priv_t {
+    implement(vsf_linux_fs_priv_t)
+} vsf_linux_spi_priv_t;
+
+static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    vsf_linux_spi_priv_t *priv = (vsf_linux_spi_priv_t *)sfd->priv;
+    vsf_spi_t *spi = (vsf_spi_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    switch (cmd) {
+    case SPI_IOC_MESSAGE(0):
+        break;
+    case SPI_IOC_RD_MODE:
+        break;
+    case SPI_IOC_RD_LSB_FIRST:
+        break;
+    case SPI_IOC_RD_BITS_PER_WORD:
+        break;
+    case SPI_IOC_RD_MAX_SPEED_HZ:
+        break;
+    }
+    return 0;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_spi_fdop = {
+    .priv_size          = sizeof(vsf_linux_spi_priv_t),
+    .fn_fcntl           = __vsf_linux_spi_fcntl,
+};
+
 int vsf_linux_fs_bind_spi(char *path, vsf_spi_t *spi)
 {
-    return -1;
+    return vsf_linux_fs_bind_target_ex(path, spi, &__vsf_linux_spi_fdop,
+                NULL, NULL,
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
 #endif
 
