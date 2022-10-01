@@ -1096,6 +1096,9 @@
     <Filter Include="vsf\hal\driver\common\rtc">
       <UniqueIdentifier>{c137c0f1-db91-4ca0-9755-20a5c4d0a28e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\include\linux\spi">
+      <UniqueIdentifier>{93be5929-6391-48c8-a424-64d96daf0755}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3326,6 +3329,18 @@
     </ClInclude>
     <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\wait.h">
       <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\fs.h">
+      <Filter>vsf\shell\sys\linux\include\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\i2c.h">
+      <Filter>vsf\shell\sys\linux\include\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\i2c-dev.h">
+      <Filter>vsf\shell\sys\linux\include\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\spi\spidev.h">
+      <Filter>vsf\shell\sys\linux\include\linux\spi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

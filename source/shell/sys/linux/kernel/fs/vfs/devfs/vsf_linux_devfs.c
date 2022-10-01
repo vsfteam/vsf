@@ -389,17 +389,22 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     vsf_linux_spi_priv_t *priv = (vsf_linux_spi_priv_t *)sfd->priv;
     vsf_spi_t *spi = (vsf_spi_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
 
-    switch (cmd) {
-    case SPI_IOC_MESSAGE(0):
-        break;
-    case SPI_IOC_RD_MODE:
-        break;
-    case SPI_IOC_RD_LSB_FIRST:
-        break;
-    case SPI_IOC_RD_BITS_PER_WORD:
-        break;
-    case SPI_IOC_RD_MAX_SPEED_HZ:
-        break;
+    if (cmd >= SPI_IOC_MESSAGE(1)) {
+        int len = cmd - SPI_IOC_MESSAGE(0);
+        struct spi_ioc_transfer *transfer = (struct spi_ioc_transfer *)arg;
+    } else {
+        switch (cmd) {
+        case SPI_IOC_MESSAGE(0):
+            return -1;
+        case SPI_IOC_RD_MODE:
+            break;
+        case SPI_IOC_RD_LSB_FIRST:
+            break;
+        case SPI_IOC_RD_BITS_PER_WORD:
+            break;
+        case SPI_IOC_RD_MAX_SPEED_HZ:
+            break;
+        }
     }
     return 0;
 }

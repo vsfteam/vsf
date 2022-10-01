@@ -21,7 +21,7 @@ extern "C" {
 #define SPI_READY                   0x80
 
 // IOCTL
-#define SPI_IOC_MESSAGE(__N)        (('s' << 8) | 0)
+#define SPI_IOC_MESSAGE(__N)        (('s' << 8) | (0x10 + (__N)))
 
 #define SPI_IOC_RD_MODE             (('s' << 8) | 1)
 #define SPI_IOC_WR_MODE             (('s' << 8) | 1)
