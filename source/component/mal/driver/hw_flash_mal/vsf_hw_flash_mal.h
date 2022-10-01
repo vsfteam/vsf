@@ -44,6 +44,8 @@ extern "C" {
 vsf_class(vk_hw_flash_mal_t) {
     implement(vk_mal_t)
 
+    vsf_flash_capability_t cap;
+
     public_member(
         vsf_hw_flash_t *flash;
     )

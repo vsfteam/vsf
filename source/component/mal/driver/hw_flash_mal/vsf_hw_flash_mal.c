@@ -33,6 +33,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 static uint_fast32_t __vk_hw_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
+static bool __vk_hw_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
 dcl_vsf_peda_methods(static, __vk_hw_flash_mal_init)
 dcl_vsf_peda_methods(static, __vk_hw_flash_mal_fini)
 dcl_vsf_peda_methods(static, __vk_hw_flash_mal_read)
@@ -47,6 +48,7 @@ dcl_vsf_peda_methods(static, __vk_hw_flash_mal_write)
 
 const vk_mal_drv_t vk_hw_flash_mal_drv = {
     .blksz          = __vk_hw_flash_mal_blksz,
+    .buffer         = __vk_hw_flash_mal_buffer,
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_init),
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_read),
@@ -63,7 +65,16 @@ const vk_mal_drv_t vk_hw_flash_mal_drv = {
 static uint_fast32_t __vk_hw_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr,
                 uint_fast32_t size, vsf_mal_op_t op)
 {
-    return 0;
+    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)mal;
+    return pthis->cap.erase_sector_size;
+}
+
+static bool __vk_hw_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr,
+                uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
+{
+    mem->buffer = 0;
+    mem->size = 0;
+    return false;
 }
 
 #if     __IS_COMPILER_GCC__
@@ -79,7 +90,16 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_init, vk_mal_init)
     vsf_peda_begin();
     vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
     VSF_MAL_ASSERT(pthis != NULL);
-    vsf_eda_return(VSF_ERR_NONE);
+    VSF_MAL_ASSERT(pthis->flash != NULL);
+
+    // TODO: interrupt mode
+    vsf_err_t err = vsf_hw_flash_init(pthis->flash, NULL);
+    if (err == VSF_ERR_NONE) {
+        while (vsf_hw_flash_enable(pthis->flash) != fsm_rt_cpl);
+        pthis->cap = vsf_hw_flash_capability(pthis->flash);
+    }
+
+    vsf_eda_return(err);
     vsf_peda_end();
 }
 
@@ -89,7 +109,36 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_fini, vk_mal_fini)
     vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
     VSF_UNUSED_PARAM(pthis);
     VSF_MAL_ASSERT(pthis != NULL);
+
+    while (vsf_hw_flash_disable(pthis->flash) != fsm_rt_cpl);
+
     vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_hw_flash_mal_erase, vk_mal_erase)
+{
+    vsf_peda_begin();
+    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
+    vsf_flash_size_t offset;
+    vsf_flash_size_t size;
+
+    VSF_MAL_ASSERT(pthis != NULL);
+    offset = vsf_local.addr;
+    size = vsf_local.size;
+    VSF_MAL_ASSERT((offset + size) <= pthis->cap.max_size);
+
+    vsf_err_t err;
+    if (size == 0) {
+        err = vsf_hw_flash_erase_all(pthis->flash);
+    } else {
+        err = vsf_hw_flash_erase_multi_sector(pthis->flash, offset, size);
+    }
+    if (err != VSF_ERR_NONE) {
+        size = (vsf_flash_size_t)-1;
+    }
+
+    vsf_eda_return(size);
     vsf_peda_end();
 }
 
@@ -97,12 +146,18 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_read, vk_mal_read)
 {
     vsf_peda_begin();
     vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
-    uint_fast64_t addr;
-    uint_fast32_t size;
+    vsf_flash_size_t offset;
+    vsf_flash_size_t size;
 
     VSF_MAL_ASSERT(pthis != NULL);
-    addr = vsf_local.addr;
+    offset = vsf_local.addr;
     size = vsf_local.size;
+    VSF_MAL_ASSERT((size > 0) && ((offset + size) <= pthis->cap.max_size));
+    VSF_MAL_ASSERT(pthis->flash != NULL);
+
+    if (VSF_ERR_NONE != vsf_hw_flash_read_multi_sector(pthis->flash, offset, vsf_local.buff, size)) {
+        size = (vsf_flash_size_t)-1;
+    }
 
     vsf_eda_return(size);
     vsf_peda_end();
@@ -112,12 +167,32 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_write, vk_mal_write)
 {
     vsf_peda_begin();
     vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
-    uint_fast64_t addr;
-    uint_fast32_t size;
+    vsf_flash_size_t offset;
+    vsf_flash_size_t size;
 
     VSF_MAL_ASSERT(pthis != NULL);
-    addr = vsf_local.addr;
+    offset = vsf_local.addr;
     size = vsf_local.size;
+    VSF_MAL_ASSERT(size > 0);
+    VSF_MAL_ASSERT((offset + size) <= pthis->cap.max_size);
+
+    {
+        vsf_err_t err;
+        if (size == 0) {
+            err = vsf_hw_flash_erase_all(pthis->flash);
+        } else {
+            err = vsf_hw_flash_erase_multi_sector(pthis->flash, offset, size);
+        }
+        if (err != VSF_ERR_NONE) {
+            size = (vsf_flash_size_t)-1;
+        } else {
+
+            if (VSF_ERR_NONE != vsf_hw_flash_write_multi_sector(pthis->flash, offset, vsf_local.buff, size)) {
+                size = (vsf_flash_size_t)-1;
+            }
+
+        }
+    }
 
     vsf_eda_return(size);
     vsf_peda_end();
