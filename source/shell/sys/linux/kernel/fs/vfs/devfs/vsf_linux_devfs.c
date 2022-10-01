@@ -36,6 +36,7 @@
 #   include "shell/sys/linux/include/linux/serial.h"
 #   include "shell/sys/linux/include/linux/input.h"
 #   include "shell/sys/linux/include/linux/fb.h"
+#   include "shell/sys/linux/include/linux/fs.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -46,6 +47,7 @@
 #   include <linux/serial.h>
 #   include <linux/input.h>
 #   include <linux/fb.h>
+#   include <linux/fs.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 #   include "shell/sys/linux/include/simple_libc/stdio.h"
@@ -82,74 +84,9 @@ __vsf_component_peda_ifs_entry(__vk_devfs_rand_read, vk_file_read)
 
 int vsf_linux_fs_bind_rand(char *path)
 {
-    int err = vsf_linux_fs_bind_target_ex(path, NULL, NULL,
+    return vsf_linux_fs_bind_target_ex(path, NULL, NULL,
             (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_rand_read), NULL,
             VSF_FILE_ATTR_READ, (uint64_t)-1);
-    if (!err) {
-        printf("%s bound.\r\n", path);
-    }
-    return err;
-}
-#endif
-
-#if VSF_USE_MAL == ENABLED
-#if __IS_COMPILER_GCC__
-#   pragma GCC diagnostic push
-#   pragma GCC diagnostic ignored "-Wcast-align"
-#endif
-__vsf_component_peda_ifs_entry(__vk_devfs_mal_read, vk_file_read)
-{
-    vsf_peda_begin();
-
-    // GCC: -Wcast-align
-    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)&vsf_this;
-    vk_mal_t *mal = vfs_file->f.param;
-
-    switch (evt) {
-    case VSF_EVT_INIT:
-        vk_mal_read(mal, vfs_file->pos, vsf_local.size, vsf_local.buff);
-        break;
-    case VSF_EVT_RETURN:
-        vsf_eda_return(vsf_eda_get_return_value());
-        break;
-    }
-
-    vsf_peda_end();
-}
-
-__vsf_component_peda_ifs_entry(__vk_devfs_mal_write, vk_file_write)
-{
-    vsf_peda_begin();
-
-    // GCC: -Wcast-align
-    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)&vsf_this;
-    vk_mal_t *mal = vfs_file->f.param;
-
-    switch (evt) {
-    case VSF_EVT_INIT:
-        vk_mal_write(mal, vfs_file->pos, vsf_local.size, vsf_local.buff);
-        break;
-    case VSF_EVT_RETURN:
-        vsf_eda_return(vsf_eda_get_return_value());
-        break;
-    }
-
-    vsf_peda_end();
-}
-#if __IS_COMPILER_GCC__
-#   pragma GCC diagnostic pop
-#endif
-
-int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal)
-{
-    int err = vsf_linux_fs_bind_target_ex(path, mal, NULL,
-                (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_read),
-                (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_mal_write),
-                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_BLK, mal->size);
-    if (!err) {
-        printf("%s bound.\r\n", path);
-    }
-    return err;
 }
 #endif
 
@@ -363,11 +300,6 @@ static ssize_t __vsf_linux_uart_write(vsf_linux_fd_t *sfd, const void *buf, size
     return count;
 }
 
-static int __vsf_linux_uart_close(vsf_linux_fd_t *sfd)
-{
-    return 0;
-}
-
 extern ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static const vsf_linux_fd_op_t __vsf_linux_uart_fdop = {
     .priv_size          = sizeof(vsf_linux_uart_priv_t),
@@ -375,18 +307,101 @@ static const vsf_linux_fd_op_t __vsf_linux_uart_fdop = {
     .fn_fcntl           = __vsf_linux_uart_fcntl,
     .fn_read            = __vsf_linux_stream_read,
     .fn_write           = __vsf_linux_uart_write,
-    .fn_close           = __vsf_linux_uart_close,
 };
 
 int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart)
 {
-    int err = vsf_linux_fs_bind_target_ex(path, uart, &__vsf_linux_uart_fdop,
+    return vsf_linux_fs_bind_target_ex(path, uart, &__vsf_linux_uart_fdop,
                 NULL, NULL,
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY, 0);
-    if (!err) {
-        printf("%s bound.\r\n", path);
+}
+#endif
+
+#if VSF_HAL_USE_I2C == ENABLED
+int vsf_linux_fs_bind_i2c(char *path, vsf_i2c_t *i2c)
+{
+    return -1;
+}
+#endif
+
+#if VSF_HAL_USE_SPI == ENABLED
+int vsf_linux_fs_bind_spi(char *path, vsf_spi_t *spi)
+{
+    return -1;
+}
+#endif
+
+#if VSF_USE_MAL == ENABLED
+
+typedef struct vsf_linux_mal_priv_t {
+    implement(vsf_linux_fs_priv_t)
+} vsf_linux_mal_priv_t;
+
+static int __vsf_linux_mal_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    vsf_linux_mal_priv_t *priv = (vsf_linux_mal_priv_t *)sfd->priv;
+    vk_mal_t *mal = (vk_mal_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    switch (cmd) {
+    case BLKGETSIZE64:
+    case BLKBSZGET: {
+            uint_fast32_t blksz = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_ERASE);
+            if (!blksz) {
+                blksz = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_WRITE);
+            }
+            if (BLKGETSIZE64 == cmd) {
+                *(uint64_t *)arg = blksz;
+            } else {
+                *(int *)arg = blksz;
+            }
+        }
+        break;
+    case BLKBSZSET:
+        return -1;
     }
-    return err;
+    return 0;
+}
+
+static ssize_t __vsf_linux_mal_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    vsf_linux_mal_priv_t *priv = (vsf_linux_mal_priv_t *)sfd->priv;
+    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)priv->file;
+    vk_mal_t *mal = (vk_mal_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+    uint_fast32_t blksz = vk_mal_blksz(mal, vfs_file->pos, count, VSF_MAL_OP_READ);
+
+    if (count % blksz) {
+        return -1;
+    }
+    vk_mal_write(mal, vfs_file->pos, count, (uint8_t *)buf);
+    return vsf_eda_get_return_value();
+}
+
+static ssize_t __vsf_linux_mal_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    vsf_linux_mal_priv_t *priv = (vsf_linux_mal_priv_t *)sfd->priv;
+    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)priv->file;
+    vk_mal_t *mal = (vk_mal_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+    uint_fast32_t blksz = vk_mal_blksz(mal, vfs_file->pos, count, VSF_MAL_OP_WRITE);
+
+    if (count % blksz) {
+        return -1;
+    }
+    vk_mal_write(mal, vfs_file->pos, count, (uint8_t *)buf);
+    return vsf_eda_get_return_value();
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_mal_fdop = {
+    .priv_size          = sizeof(vsf_linux_mal_priv_t),
+    .fn_fcntl           = __vsf_linux_mal_fcntl,
+    .fn_read            = __vsf_linux_mal_read,
+    .fn_write           = __vsf_linux_mal_write,
+};
+
+int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal)
+{
+    return vsf_linux_fs_bind_target_ex(path, mal, &__vsf_linux_mal_fdop,
+                NULL, NULL,
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_BLK, mal->size);
 }
 #endif
 
@@ -561,13 +576,9 @@ static const vsf_linux_fd_op_t __vsf_linux_input_fdop = {
 
 int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier)
 {
-    int err = vsf_linux_fs_bind_target_ex(
+    return vsf_linux_fs_bind_target_ex(
                 path, notifier, &__vsf_linux_input_fdop, NULL, NULL,
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
-    if (!err) {
-        printf("%s bound.\r\n", path);
-    }
-    return err;
 }
 #endif
 
@@ -783,12 +794,8 @@ static const vsf_linux_fd_op_t __vsf_linux_fb_fdop = {
 
 int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp)
 {
-    int err = vsf_linux_fs_bind_target_ex(
+    return vsf_linux_fs_bind_target_ex(
                 path, disp, &__vsf_linux_fb_fdop, NULL, NULL, 0, 0);
-    if (!err) {
-        printf("%s bound.\r\n", path);
-    }
-    return err;
 }
 #endif
 

@@ -35,11 +35,18 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_USE_MAL == ENABLED
-extern int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal);
-#endif
 #if VSF_HAL_USE_USART == ENABLED
 extern int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart);
+#endif
+#if VSF_HAL_USE_I2C == ENABLED
+extern int vsf_linux_fs_bind_i2c(char *path, vsf_i2c_t *i2c);
+#endif
+#if VSF_HAL_USE_SPI == ENABLED
+extern int vsf_linux_fs_bind_spi(char *path, vsf_spi_t *spi);
+#endif
+
+#if VSF_USE_MAL == ENABLED
+extern int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal);
 #endif
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 extern int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier);

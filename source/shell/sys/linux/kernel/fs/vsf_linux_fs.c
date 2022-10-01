@@ -2058,6 +2058,7 @@ int vsf_linux_fs_bind_target_ex(const char *pathname,
             vfs_file->attr = feature;
             vfs_file->size = size;
             vfs_file->f.op = (void *)op;
+            printf("%s bound.\r\n", pathname);
         }
         close(fd);
         return err;
@@ -2123,14 +2124,10 @@ __vsf_component_peda_ifs_entry(__vk_vfs_buffer_read, vk_file_read)
 int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
         uint_fast32_t feature, uint64_t size)
 {
-    int err = vsf_linux_fs_bind_target_ex(pathname, buffer, NULL,
+    return vsf_linux_fs_bind_target_ex(pathname, buffer, NULL,
         (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_buffer_read),
         (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_buffer_write),
         feature, size);
-    if (!err) {
-        printf("%s bound.\r\n", pathname);
-    }
-    return err;
 }
 
 // stream
