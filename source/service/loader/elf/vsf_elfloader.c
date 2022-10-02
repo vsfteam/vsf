@@ -521,7 +521,7 @@ static int __vsf_elfloader_link_cb(vsf_elfloader_t *elfloader, vsf_loader_target
         return VSF_ELFLOADER_CB_GOON;
     }
 
-    vsf_elfloader_trace(VSF_TRACE_DEBUG, "relcating section %s" VSF_TRACE_CFG_LINEEND, name);
+    vsf_elfloader_trace(VSF_TRACE_DEBUG, "relocating section %s" VSF_TRACE_CFG_LINEEND, name);
     if (VSF_ERR_NONE != __vsf_elfloader_relocate(elfloader, target, header, linfo)) {
         vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to relocate section %s" VSF_TRACE_CFG_LINEEND, name);
         return VSF_ELFLOADER_CB_FAIL;
