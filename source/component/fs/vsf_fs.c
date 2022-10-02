@@ -349,6 +349,7 @@ __vsf_component_peda_private_entry(__vk_file_open,
         break;
     case VSF_EVT_RETURN:
         if (vsf_local.err != VSF_ERR_NONE) {
+            *vsf_local.file = NULL;
             goto do_fail;
         }
         if (vsf_local.is_to_setpos) {
