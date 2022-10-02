@@ -164,6 +164,7 @@ vsf_class(vsf_linux_thread_t) {
     )
 
     protected_member(
+        pid_t pid_exited;     // used in wait
         int retval;
         int tid;
         vsf_linux_thread_t *thread_pending;
@@ -244,6 +245,8 @@ vsf_class(vsf_linux_process_t) {
     protected_member(
         int status;
         vsf_linux_process_t *shell_process;
+        // thread pending child process
+        vsf_linux_thread_t *thread_pending_child;
         struct {
             pid_t pid;
             pid_t ppid;
@@ -270,6 +273,7 @@ vsf_class(vsf_linux_process_t) {
         vsf_dlist_node_t process_node;
         vsf_dlist_t thread_list;
         vsf_dlist_t fd_list;
+        // thread pending this process
         vsf_linux_thread_t *thread_pending;
         vsf_bitmap(vsf_linux_fd_bitmap) fd_bitmap;
 

@@ -973,7 +973,17 @@ void vsf_linux_exit_process(int status)
         process->thread_pending->retval = process->status;
         vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
     } else {
-        vsf_unprotect_sched(orig);
+        vsf_linux_process_t *parent_process = process->parent_process;
+        if ((parent_process != NULL) && (parent_process->thread_pending_child != NULL)) {
+            vsf_linux_thread_t *thread_pending = parent_process->thread_pending_child;
+            parent_process->thread_pending_child = NULL;
+            vsf_unprotect_sched(orig);
+            thread_pending->retval = process->status;
+            thread_pending->pid_exited = process->id.pid;
+            vsf_eda_post_evt(&thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
+        } else {
+            vsf_unprotect_sched(orig);
+        }
     }
 
     // 7. exit current thread
@@ -1553,6 +1563,32 @@ unsigned int alarm(unsigned int seconds)
 {
     VSF_LINUX_ASSERT(false);
     return -1;
+}
+
+pid_t wait(int *status)
+{
+    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(cur_thread != NULL);
+
+    VSF_LINUX_ASSERT(cur_process != NULL);
+    vsf_protect_t orig = vsf_protect_sched();
+        if (cur_process->thread_pending_child != NULL) {
+            vsf_unprotect_sched(orig);
+            return (pid_t)-1;
+        }
+        cur_process->thread_pending_child = cur_thread;
+    vsf_unprotect_sched(orig);
+
+    vsf_thread_wfe(VSF_EVT_USER);
+
+    if (status != NULL) {
+        *status = cur_thread->retval;
+    }
+    vsf_linux_process_t *process = vsf_linux_get_process(cur_thread->pid_exited);
+    vsf_linux_detach_process(process);
+    __free_ex(vsf_linux_resources_process(), process);
+    return cur_thread->pid_exited;
 }
 
 pid_t waitpid(pid_t pid, int *status, int options)
