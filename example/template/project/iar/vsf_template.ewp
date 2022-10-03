@@ -12042,6 +12042,15 @@
                             </file>
                         </group>
                         <group>
+                            <name>mmc</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\mmc\mmc.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\mmc\mmc.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>port</name>
                             <group>
                                 <name>arch</name>
@@ -13976,6 +13985,15 @@
                         </file>
                     </group>
                     <group>
+                        <name>mmc</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>pwm</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\pwm\pwm_common.c</name>
@@ -14069,6 +14087,9 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_io.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_mmc.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_pm.h</name>

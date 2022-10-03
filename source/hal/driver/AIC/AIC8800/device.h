@@ -112,6 +112,11 @@
 #define VSF_HW_SPI0_OCLKME_EN_BIT   CSC_OCLKME_SPI_EN_BIT
 #define VSF_HW_SPI0_HCLKME_EN_BIT   CSC_HCLKME_DMA_EN_BIT
 
+#define VSF_HW_MMC_COUNT            1
+#define VSF_HW_MMC0_IRQ_IDX         SDMMC_IRQn
+#define VSF_HW_MMC0_IRQ             SDMMC_IRQHandler
+#define VSF_HW_MMC0_REG             (AIC_SDMMC_TypeDef *)AIC_SDMMC_BASE
+
 #define VSF_HW_ADC_COUNT            1
 
 #define VSF_HW_PWM_COUNT            1

@@ -15,48 +15,25 @@
  *                                                                           *
  ****************************************************************************/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-
-#   include "__device.h"
-
-#else
-
-#   ifndef __HAL_DRIVER_AIC_AIC8800_H__
-#       define __HAL_DRIVER_AIC_AIC8800_H__
+#ifndef __HAL_DRIVER_AIC8800_HW_MMC_H__
+#define __HAL_DRIVER_AIC8800_HW_MMC_H__
 
 /*============================ INCLUDES ======================================*/
 
-#       include "hal/vsf_hal_cfg.h"
-#       include "./device.h"
+#include "hal/vsf_hal_cfg.h"
 
-#       include "system.h"
+#if VSF_HAL_USE_MMC == ENABLED
 
-#       include "hal/driver/common/swi/vsf_swi_template.h"
-#       include "./io/io.h"
-#       include "./adc/adc.h"
-#       include "./debug_uart/debug_uart.h"
-#       include "./flash/flash.h"
-#       include "./gpio/gpio.h"
-#       include "./i2c/i2c.h"
-#       include "./pwm/pwm.h"
-#       include "./rtc/rtc.h"
-#       include "./spi/spi.h"
-#       include "./timer/timer.h"
-#       include "./trng/trng.h"
-#       include "./uart/uart.h"
-#       include "./usb/usb.h"
-#       include "./mmc/mmc.h"
-
-// mbedtls configurations ONLY in mbedtls_aic8800.h
-#       include "./port/mbedtls/mbedtls_aic8800.h"
+#include "../__device.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
+/*============================ INCLUDES ======================================*/
 
-#   endif   // __HAL_DRIVER_AIC_AIC8800_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-/* EOF */
+#define VSF_MMC_CFG_DEC_PREFIX          vsf_hw
+#define VSF_MMC_CFG_DEC_UPCASE_PREFIX   VSF_HW
+#include "hal/driver/common/mmc/mmc_template.h"
+
+#endif /* VSF_HAL_USE_MMC */
+#endif /* __HAL_DRIVER_AIC8800_HW_MMC_H__ */

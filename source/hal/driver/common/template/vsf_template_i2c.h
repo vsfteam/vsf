@@ -368,12 +368,12 @@ extern vsf_i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
  \~english
  @brief get the capability of i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @return vsf_i2c_status_t: return all capability of current i2c
+ @return vsf_i2c_capability_t: return all capability of current i2c @ref vsf_i2c_capability_t
 
  \~chinese
  @brief 获取 i2c 实例能力
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- @return vsf_i2c_status_t: 返回当前i2c的所有能力
+ @return vsf_i2c_capability_t: 返回当前i2c的所有能力 @ref vsf_i2c_capability_t
  */
 extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
 
