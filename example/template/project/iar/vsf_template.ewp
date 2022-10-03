@@ -14056,6 +14056,9 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_flash.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_gpio.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_hal_driver.h</name>
                         </file>
                         <file>

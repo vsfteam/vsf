@@ -114,7 +114,6 @@ void vk_disp_mipi_lcd_te_line_isr_handler(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 #endif
 
 #if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
-#ifndef WEAK_VK_DISP_MIPI_LCD_RESET_IO_WRITE
 WEAK(vk_disp_mipi_lcd_hw_reset_io_write)
 void vk_disp_mipi_lcd_hw_reset_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level)
 {
@@ -125,9 +124,7 @@ void vk_disp_mipi_lcd_hw_reset_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool 
 #endif
 }
 #endif
-#endif
 
-#ifndef WEAK_VK_DISP_MIPI_LCD_DCX_WRITE
 WEAK(vk_disp_mipi_lcd_dcx_io_write)
 void vk_disp_mipi_lcd_dcx_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level)
 {
@@ -137,9 +134,7 @@ void vk_disp_mipi_lcd_dcx_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level
                    disp_mipi_lcd->dcx.pin_mask);
 #endif
 }
-#endif
 
-#ifndef WEAK_VK_DISP_MIPI_LCD_IO_INIT
 WEAK(vk_disp_mipi_lcd_io_init)
 void vk_disp_mipi_lcd_io_init(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
@@ -155,17 +150,14 @@ void vk_disp_mipi_lcd_io_init(vk_disp_mipi_lcd_t *disp_mipi_lcd)
                         disp_mipi_lcd->dcx.pin_mask);
 #endif
 }
-#endif
 
 
 
-#ifndef WEAK_VK_DISP_MIPI_TE_LINE_ISR_ENABLE_ONCE
 WEAK(vk_disp_mipi_te_line_isr_enable_once)
 void vk_disp_mipi_te_line_isr_enable_once(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
     vk_disp_mipi_tearing_effect_line_ready(disp_mipi_lcd);
 }
-#endif
 
 static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
                                            vsf_spi_t *spi_ptr,

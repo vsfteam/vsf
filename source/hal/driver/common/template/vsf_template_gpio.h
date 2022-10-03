@@ -173,7 +173,7 @@ extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_switch_direction)   ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_read(__GPIO)                                                \
         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_read)               ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO)
-#   define vsf_gpio_write(__GPIO, __VALUE, ...)                                 \
+#   define vsf_gpio_write(__GPIO, ...)                                          \
         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_write)              ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_set(__GPIO, ...)                                            \
         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set)                ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
