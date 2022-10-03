@@ -71,10 +71,7 @@ typedef struct app_i2c_demo_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-app_i2c_demo_t __app_i2c_demo = {
-    .start_address = APP_I2C_DEMO_CFG_ADDRESS_START,
-    .end_address = APP_I2C_DEMO_CFG_ADDRESS_END,
-};
+app_i2c_demo_t __app_i2c_demo;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -183,6 +180,8 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
+    __app_i2c_demo.start_address = APP_I2C_DEMO_CFG_ADDRESS_START;
+    __app_i2c_demo.end_address = APP_I2C_DEMO_CFG_ADDRESS_END;
     __i2c_address_search(&__app_i2c_demo, APP_I2C_DEMO_CFG_I2C);
 
     return 0;
