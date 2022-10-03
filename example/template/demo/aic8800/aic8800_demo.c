@@ -115,10 +115,18 @@ void vsf_board_init(void)
     aic8800_bt_start();
 #endif
 #if APP_USE_LINUX_TTY_DEMO == ENABLED
-    // TODO: use VSF APIs to configure io
     // PA10/PA11 is USART1
-    iomux_gpio_config_sel_setf(10, 0x01);
-    iomux_gpio_config_sel_setf(11, 0x01);
+    vsf_io_cfg_t cfg[] = {
+        {
+            .port_pin_index     = VSF_PA10,
+            .function           = 1,
+        },
+        {
+            .port_pin_index     = VSF_PA11,
+            .function           = 1,
+        },
+    };
+    vsf_hw_io_config(&vsf_hw_io0, (vsf_io_cfg_t *)&cfg, dimof(cfg));
     vsf_linux_fs_bind_uart("/dev/ttyS0", (vsf_usart_t *)&vsf_hw_usart1);
 
     extern int tty_main(int argc, char *argv[]);
