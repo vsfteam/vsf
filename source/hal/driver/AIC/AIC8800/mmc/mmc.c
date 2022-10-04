@@ -160,9 +160,14 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
         return VSF_ERR_BUSY;
     }
 
+    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
     bool has_data = ((trans->buffer != NULL) && (trans->count > 0));
     int ch;
     if (has_data) {
+        VSF_HAL_ASSERT(trans->block_size_bits != NULL);
+        reg->DBLR = trans->block_size_bits;
+        reg->DBCR = trans->count / (1 << trans->block_size_bits);
+
         if (trans->op & MMC_CMDOP_WRITE) {
             ch = DMA_CHANNEL_SDMMC_TX;
             dma_erqcsr_set(REQ_CID_SDMMC_TX, ch);
@@ -192,7 +197,6 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
         dma_ch_ctlr_set(ch, (DMA_CH_CHENA_BIT | (0x01UL << DMA_CH_BUSBU_LSB)));
     }
 
-    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
     reg->CFGR = 0;
     reg->CMDR = trans->cmd;
     reg->ARGR = trans->arg;

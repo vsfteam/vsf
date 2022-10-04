@@ -288,6 +288,8 @@ typedef struct vsf_mmc_trans_t {
     uint8_t *resp;
     vsf_mmc_transop_t op;
 
+    // block_size will be 1 << block_size_bits
+    uint8_t block_size_bits;
     uint8_t *buffer;
     uint32_t count;
 } vsf_mmc_trans_t;
