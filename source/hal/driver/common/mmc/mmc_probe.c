@@ -15,46 +15,61 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_I2C_CMD_TO_REQUEST_H__
-#define __HAL_DRIVER_I2C_CMD_TO_REQUEST_H__
-
-#if VSF_HAL_USE_I2C == ENABLED
 
 /*============================ INCLUDES ======================================*/
+
+#define __VSF_MMC_PROBE_CLASS_IMPLEMENT
+#include "hal/vsf_hal.h"
+
+#if VSF_HAL_USE_MMC == ENABLED
+
+#include "hal/driver/driver.h"
+
 /*============================ MACROS ========================================*/
+
+#define MMC_SEND_IF_COND_CHECK_PATTERN          0xAA
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-typedef vsf_err_t vsf_i2c_request_send_cmd_fn(vsf_i2c_t *i2c_ptr,
-                                              vsf_i2c_cmd_t command,
-                                              uint16_t data);
-
-typedef struct vsf_i2c_request_t {
-    vsf_i2c_cfg_t                       cfg;
-    uint16_t                        address;
-    vsf_i2c_cmd_t                    cmd;
-    uint16_t                        idx;
-    uint16_t                        count;
-    uint8_t                        *buffer_ptr;
-    vsf_i2c_request_send_cmd_fn    *fn;
-} vsf_i2c_request_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
-extern void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
-                                        vsf_i2c_request_t *i2c_request_ptr,
-                                        uint32_t interrupt_mask,
-                                        uint32_t param);
+vsf_err_t vsf_mmc_probe_start(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe)
+{
+    vsf_mmc_host_set_clock(mmc, 400 * 1000);
+    vsf_mmc_host_set_buswidth(mmc, 1);
+    probe->state = VSF_MMC_PROBE_STATE_GO_IDLE;
+    return vsf_mmc_host_transact_start(mmc, &(vsf_mmc_trans_t){
+        .cmd    = MMC_GO_IDLE_STATE,
+        .arg    = 0,
+        .op     = MMC_GO_IDLE_STATE_OP,
+    });
+}
 
-extern vsf_err_t vsf_i2c_request_master_request(vsf_i2c_t *i2c_ptr,
-                                                vsf_i2c_request_t *i2c_request_ptr,
-                                                uint16_t address,
-                                                vsf_i2c_cmd_t cmd,
-                                                uint16_t count,
-                                                uint8_t *buffer_ptr);
+vsf_err_t vsf_mmc_probe_irqhandler(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe,
+        vsf_mmc_irq_mask_t irq_mask, vsf_mmc_transact_status_t status,
+        uint32_t resp[4])
+{
+    vsf_mmc_trans_t trans = { 0 };
 
+    switch (probe->state) {
+    case VSF_MMC_PROBE_STATE_GO_IDLE:
+        trans.cmd = SD_SEND_IF_COND;
+        trans.arg = (((probe->voltage & SD_OCR_VDD_HIGH) != 0) << 8) | MMC_SEND_IF_COND_CHECK_PATTERN;
+        trans.op = SD_SEND_IF_COND_OP;
+        break;
+    case VSF_MMC_PROBE_STATE_SEND_IF_COND:
+        break;
+    }
 
-#endif /* VSF_HAL_USE_I2C */
-#endif /* __HAL_DRIVER_I2C_CMD_TO_REQUEST_H__ */
+    probe->state++;
+    if (VSF_ERR_NONE != vsf_mmc_host_transact_start(mmc, &trans)) {
+        return VSF_ERR_FAIL;
+    }
+    return VSF_ERR_NOT_READY;
+}
+
+#endif // VSF_HAL_USE_I2C == ENABLED
+

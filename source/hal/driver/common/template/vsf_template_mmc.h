@@ -63,6 +63,181 @@ extern "C" {
 #   define VSF_MMC_CFG_REIMPLEMENT_CAPABILITY   DISABLED
 #endif
 
+/* SD commands                                  type  argument     response */
+  /* class 0 */
+/* This is basically the same command as for MMC with some quirks. */
+#define SD_SEND_RELATIVE_ADDR           3   /* bcr                      R6  */
+#define SD_SEND_RELATIVE_ADDR_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define SD_SEND_IF_COND                 8   /* bcr  [11:0] See below    R7  */
+#define SD_SEND_IF_COND_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define SD_SWITCH_VOLTAGE               11  /* ac                       R1  */
+#define SD_SWITCH_VOLTAGE_OP            (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 10 */
+#define SD_SWITCH                       6   /* adtc [31:0] See below    R1  */
+#define SD_SWITCH_OP                    (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 5 */
+#define SD_ERASE_WR_BLK_START           32   /* ac   [31:0] data addr   R1  */
+#define SD_ERASE_WR_BLK_START_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define SD_ERASE_WR_BLK_END             33   /* ac   [31:0] data addr   R1  */
+#define SD_ERASE_WR_BLK_END_OP          (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* Application commands */
+#define SD_APP_SET_BUS_WIDTH            6   /* ac   [1:0] bus width     R1  */
+#define SD_APP_SET_BUS_WIDTH_OP         (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define SD_APP_SD_STATUS                13   /* adtc                    R1  */
+#define SD_APP_SD_STATUS_OP             (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define SD_APP_SEND_NUM_WR_BLKS         22   /* adtc                    R1  */
+#define SD_APP_SEND_NUM_WR_BLKS_OP      (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define SD_APP_OP_COND                  41   /* bcr  [31:0] OCR         R3  */
+#define SD_APP_OP_COND_OP               (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT)
+#define SD_APP_SEND_SCR                 51   /* adtc                    R1  */
+#define SD_APP_SEND_SCR_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 11 */
+#define SD_READ_EXTR_SINGLE             48   /* adtc [31:0]             R1  */
+#define SD_READ_EXTR_SINGLE_OP          (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define SD_WRITE_EXTR_SINGLE            49   /* adtc [31:0]             R1  */
+#define SD_WRITE_EXTR_SINGLE_OP         (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+/* OCR bit definitions */
+#define SD_OCR_VDD_165_195              0x00000080  /* VDD voltage 1.65 - 1.95 */
+#define SD_OCR_VDD_20_21                0x00000100  /* VDD voltage 2.0 ~ 2.1 */
+#define SD_OCR_VDD_21_22                0x00000200  /* VDD voltage 2.1 ~ 2.2 */
+#define SD_OCR_VDD_22_23                0x00000400  /* VDD voltage 2.2 ~ 2.3 */
+#define SD_OCR_VDD_23_24                0x00000800  /* VDD voltage 2.3 ~ 2.4 */
+#define SD_OCR_VDD_24_25                0x00001000  /* VDD voltage 2.4 ~ 2.5 */
+#define SD_OCR_VDD_25_26                0x00002000  /* VDD voltage 2.5 ~ 2.6 */
+#define SD_OCR_VDD_26_27                0x00004000  /* VDD voltage 2.6 ~ 2.7 */
+#define SD_OCR_VDD_27_28                0x00008000  /* VDD voltage 2.7 ~ 2.8 */
+#define SD_OCR_VDD_28_29                0x00010000  /* VDD voltage 2.8 ~ 2.9 */
+#define SD_OCR_VDD_29_30                0x00020000  /* VDD voltage 2.9 ~ 3.0 */
+#define SD_OCR_VDD_30_31                0x00040000  /* VDD voltage 3.0 ~ 3.1 */
+#define SD_OCR_VDD_31_32                0x00080000  /* VDD voltage 3.1 ~ 3.2 */
+#define SD_OCR_VDD_32_33                0x00100000  /* VDD voltage 3.2 ~ 3.3 */
+#define SD_OCR_VDD_33_34                0x00200000  /* VDD voltage 3.3 ~ 3.4 */
+#define SD_OCR_VDD_34_35                0x00400000  /* VDD voltage 3.4 ~ 3.5 */
+#define SD_OCR_VDD_35_36                0x00800000  /* VDD voltage 3.5 ~ 3.6 */
+#define SD_OCR_VDD_HIGH                 0x00FF8000  /* VDD voltage 2.7 ~ 3.6 */
+#define SD_OCR_VDD_LOW                  0x00007F80  /* VDD voltage 1.65 ~ 2.7 */
+#define SD_OCR_VDD                      (SD_OCR_VDD_HIGH | SD_OCR_VDD_LOW)
+#define SD_OCR_S18R		                (1 << 24)   /* 1.8V switching request */
+#define SD_ROCR_S18A		            SD_OCR_S18R /* 1.8V switching accepted by card */
+#define SD_OCR_XPC		                (1 << 28)   /* SDXC power control */
+#define SD_OCR_CCS		                (1 << 30)   /* Card Capacity Status */
+
+/* Standard MMC commands (4.1)                  type  argument     response */
+   /* class 1 */
+#define MMC_GO_IDLE_STATE               0    /* bc                          */
+#define MMC_GO_IDLE_STATE_OP            0
+#define MMC_SEND_OP_COND                1    /* bcr  [31:0] OCR         R3  */
+#define MMC_SEND_OP_COND_OP             (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT)
+#define MMC_ALL_SEND_CID                2    /* bcr                     R2  */
+#define MMC_ALL_SEND_CID_OP             (MMC_CMDOP_RESP | MMC_CMDOP_RESP_LONG_CRC)
+#define MMC_SET_RELATIVE_ADDR           3    /* ac   [31:16] RCA        R1  */
+#define MMC_SET_RELATIVE_ADDR_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SET_DSR                     4    /* bc   [31:16] RCA            */
+#define MMC_SLEEP_AWAKE		            5    /* ac   [31:16] RCA 15:flg R1b */
+#define MMC_SLEEP_AWAKE_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SWITCH                      6    /* ac   [31:0] See below   R1b */
+#define MMC_SWITCH_OP                   (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SELECT_CARD                 7    /* ac   [31:16] RCA        R1  */
+#define MMC_SELECT_CARD_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_EXT_CSD                8    /* adtc                    R1  */
+#define MMC_SEND_EXT_CSD_OP             (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_CSD                    9    /* ac   [31:16] RCA        R2  */
+#define MMC_SEND_CSD_OP                 (MMC_CMDOP_RESP | MMC_CMDOP_RESP_LONG_CRC)
+#define MMC_SEND_CID                    10   /* ac   [31:16] RCA        R2  */
+#define MMC_SEND_CID_OP                 (MMC_CMDOP_RESP | MMC_CMDOP_RESP_LONG_CRC)
+#define MMC_READ_DAT_UNTIL_STOP         11   /* adtc [31:0] dadr        R1  */
+#define MMC_READ_DAT_UNTIL_STOP_OP      (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_STOP_TRANSMISSION           12   /* ac                      R1b */
+#define MMC_STOP_TRANSMISSION_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_STATUS                 13   /* ac   [31:16] RCA        R1  */
+#define MMC_SEND_STATUS_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_BUS_TEST_R                  14   /* adtc                    R1  */
+#define MMC_BUS_TEST_R_OP               (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_GO_INACTIVE_STATE           15   /* ac   [31:16] RCA            */
+#define MMC_BUS_TEST_W                  19   /* adtc                    R1  */
+#define MMC_BUS_TEST_W_OP               (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SPI_READ_OCR                58   /* spi                  spi_R3 */
+#define MMC_SPI_READ_OCR_OP             (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT)
+#define MMC_SPI_CRC_ON_OFF              59   /* spi  [0:0] flag      spi_R1 */
+#define MMC_SPI_CRC_ON_OFF_OP           (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 2 */
+#define MMC_SET_BLOCKLEN                16   /* ac   [31:0] block len   R1  */
+#define MMC_SET_BLOCKLEN_OP             (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_READ_SINGLE_BLOCK           17   /* adtc [31:0] data addr   R1  */
+#define MMC_READ_SINGLE_BLOCK_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_READ_MULTIPLE_BLOCK         18   /* adtc [31:0] data addr   R1  */
+#define MMC_READ_MULTIPLE_BLOCK_OP      (MMC_CMDOP_MULTIBLOCK | MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_TUNING_BLOCK           19   /* adtc                    R1  */
+#define MMC_SEND_TUNING_BLOCK_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_TUNING_BLOCK_HS200     21	 /* adtc R1  */
+#define MMC_SEND_TUNING_BLOCK_HS200_OP  (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 3 */
+#define MMC_WRITE_DAT_UNTIL_STOP        20   /* adtc [31:0] data addr   R1  */
+#define MMC_WRITE_DAT_UNTIL_STOP_OP     (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 4 */
+#define MMC_SET_BLOCK_COUNT             23   /* adtc [31:0] data addr   R1  */
+#define MMC_SET_BLOCK_COUNT_OP          (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_WRITE_BLOCK                 24   /* adtc [31:0] data addr   R1  */
+#define MMC_WRITE_BLOCK_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_WRITE_MULTIPLE_BLOCK        25   /* adtc                    R1  */
+#define MMC_WRITE_MULTIPLE_BLOCK_OP     (MMC_CMDOP_MULTIBLOCK | MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_PROGRAM_CID                 26   /* adtc                    R1  */
+#define MMC_PROGRAM_CID_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_PROGRAM_CSD                 27   /* adtc                    R1  */
+#define MMC_PROGRAM_CSD_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 6 */
+#define MMC_SET_WRITE_PROT              28   /* ac   [31:0] data addr   R1b */
+#define MMC_SET_WRITE_PROT_OP           (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_CLR_WRITE_PROT              29   /* ac   [31:0] data addr   R1b */
+#define MMC_CLR_WRITE_PROT_OP           (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_WRITE_PROT             30   /* adtc [31:0] wpdata addr R1  */
+#define MMC_SEND_WRITE_PROT_OP          (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 5 */
+#define MMC_ERASE_GROUP_START           35   /* ac   [31:0] data addr   R1  */
+#define MMC_ERASE_GROUP_START_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_ERASE_GROUP_END             36   /* ac   [31:0] data addr   R1  */
+#define MMC_ERASE_GROUP_END_OP          (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_ERASE                       38   /* ac                      R1b */
+#define MMC_ERASE_OP                    (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 9 */
+#define MMC_FAST_IO                     39   /* ac   <Complex>          R4  */
+#define MMC_FAST_IO_OP                  (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_GO_IRQ_STATE                40   /* bcr                     R5  */
+#define MMC_GO_IRQ_STATE_OP             (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 7 */
+#define MMC_LOCK_UNLOCK                 42   /* adtc                    R1b */
+#define MMC_LOCK_UNLOCK_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 8 */
+#define MMC_APP_CMD                     55   /* ac   [31:16] RCA        R1  */
+#define MMC_APP_CMD_OP                  (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_GEN_CMD                     56   /* adtc [0] RD/WR          R1  */
+#define MMC_GEN_CMD_OP                  (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
+  /* class 11 */
+#define MMC_QUE_TASK_PARAMS             44   /* ac   [20:16] task id    R1  */
+#define MMC_QUE_TASK_PARAMS_OP          (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_QUE_TASK_ADDR               45   /* ac   [31:0] data addr   R1  */
+#define MMC_QUE_TASK_ADDR_OP            (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_EXECUTE_READ_TASK           46   /* adtc [20:16] task id    R1  */
+#define MMC_EXECUTE_READ_TASK_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_EXECUTE_WRITE_TASK          47   /* adtc [20:16] task id    R1  */
+#define MMC_EXECUTE_WRITE_TASK_OP       (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_CMDQ_TASK_MGMT              48   /* ac   [20:16] task id    R1b */
+#define MMC_CMDQ_TASK_MGMT_OP           (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_MMC_APIS(__prefix)                                                                                                                                  \
@@ -278,13 +453,14 @@ extern void vsf_mmc_fini(vsf_mmc_t *mmc_ptr);
  \~english
  @brief enable interrupt masks of mmc instance.
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
- @param[in] irq_mask: one or more value of enum vsf_mmc_irq_mask_t
+ @param[in] irq_mask: one or more value of enum @ref vsf_mmc_irq_mask_t
  @return none.
 
  \~chinese
  @brief 使能 mmc 实例的中断
  @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
- @return fsm_rt_t: 如果使能成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
+ @param[in] irq_mask: 一个或者多个枚举 vsf_i2c_irq_mask_t 的值的按位或，@ref vsf_mmc_irq_mask_t
+ @return 无。
  */
 extern void vsf_mmc_irq_enable(vsf_mmc_t *mmc_ptr, vsf_mmc_irq_mask_t irq_mask);
 

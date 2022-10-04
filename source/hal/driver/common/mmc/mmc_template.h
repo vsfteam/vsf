@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/driver/common/template/vsf_template_mmc.h"
+#include "hal/driver/common/mmc/mmc_probe.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

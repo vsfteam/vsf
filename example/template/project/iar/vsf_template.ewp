@@ -13987,6 +13987,12 @@
                     <group>
                         <name>mmc</name>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_probe.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_probe.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_template.h</name>
                         </file>
                         <file>
