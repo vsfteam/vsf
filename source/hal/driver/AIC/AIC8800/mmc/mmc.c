@@ -35,9 +35,6 @@
 #   define VSF_HW_MMC_CFG_MULTI_CLASS           VSF_MMC_CFG_MULTI_CLASS
 #endif
 
-/* Interrupt Register not in reg_sdmmc.h */
-#define SDMMC_RESP_DONE_FLAG                    (1ul << 9)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -160,7 +157,6 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
     reg->CFGR = 0;
     reg->CMDR = trans->cmd;
     reg->ARGR = trans->arg;
-    reg->IER |= SDMMC_RESP_DONE_FLAG;
     reg->CFGR = trans->op | SDMMC_COMMAND_START;
     return VSF_ERR_NONE;
 }

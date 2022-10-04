@@ -36,31 +36,33 @@
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_mmc_transop_t {
-    MMC_CMDOP_AUTOCMD12             = (1ul << 16),  // SDMMC_AUTOCMD12_ENABLE
-    MMC_CMDOP_MULTIBLOCK            = (1ul << 10),  // SDMMC_MULTI_BLOCK_MODE
-    MMC_CMDOP_WRITE                 = (1ul << 9),   // SDMMC_WRITE_MODE
-    MMC_CMDOP_RW                    = (1ul << 8),   // SDMMC_RW_MODE
-    MMC_CMDOP_RESP                  = (1ul << 4),   // SDMMC_RESPONSE_ENABLE
-    MMC_CMDOP_RESP_SHORT            = (1ul << 5),   // SDMMC_CONFIG_R3
-    MMC_CMDOP_RESP_SHORT_CRC        = (0ul << 5),   // SDMMC_CONFIG_Rx
-    MMC_CMDOP_RESP_LONG_CRC         = (2ul << 5),   // SDMMC_CONFIG_R2
+    MMC_CMDOP_AUTOCMD12                 = (1ul << 16),  // SDMMC_AUTOCMD12_ENABLE
+    MMC_CMDOP_MULTIBLOCK                = (1ul << 10),  // SDMMC_MULTI_BLOCK_MODE
+    MMC_CMDOP_WRITE                     = (1ul << 9),   // SDMMC_WRITE_MODE
+    MMC_CMDOP_RW                        = (1ul << 8),   // SDMMC_RW_MODE
+    MMC_CMDOP_RESP                      = (1ul << 4),   // SDMMC_RESPONSE_ENABLE
+    MMC_CMDOP_RESP_SHORT                = (1ul << 5),   // SDMMC_CONFIG_R3
+    MMC_CMDOP_RESP_SHORT_CRC            = (0ul << 5),   // SDMMC_CONFIG_Rx
+    MMC_CMDOP_RESP_LONG_CRC             = (2ul << 5),   // SDMMC_CONFIG_R2
 } vsf_mmc_transop_t;
 
 typedef enum vsf_mmc_irq_mask_t {
-    MMC_IRQ_MASK_HOST_TRANSACT_DONE = (0x1ul << 0),
-    MMC_IRQ_MASK_MASTER_ALL         =  MMC_IRQ_MASK_HOST_TRANSACT_DONE,
+    MMC_IRQ_MASK_HOST_RESP_DONE         = (0x1ul << 9), // SDMMC_RESP_DONE_FLAG
+    MMC_IRQ_MASK_HOST_DATA_DONE         = (0x1ul << 4), // SDMMC_DATA_DONE_FLAG
+    MMC_IRQ_MASK_HOST_ALL               = MMC_IRQ_MASK_HOST_RESP_DONE
+                                        | MMC_IRQ_MASK_HOST_DATA_DONE,
 } vsf_mmc_irq_mask_t;
 
 typedef enum vsf_mmc_transact_status_t {
-    MMC_TRANSACT_STATUS_DONE                    = 0,
-    MMC_TRANSACT_STATUS_ERR_RESP_NONE           = (0x1ul << 9),
-    MMC_TRANSACT_STATUS_ERR_RESP_CRC            = (0x1ul << 8),
-    MMC_TRANSACT_STATUS_ERR_DATA_CRC            = (0xFFul << 16),
-    MMC_TRANSACT_STATUS_DATA_BUSY               = (0x1ul << 2),
-    MMC_TRANSACT_STATUS_BUSY                    = (0x1ul << 1),
-    MMC_TRANSACT_STATUS_ERR_MASK                = MMC_TRANSACT_STATUS_ERR_RESP_NONE
-                                                | MMC_TRANSACT_STATUS_ERR_RESP_CRC
-                                                | MMC_TRANSACT_STATUS_ERR_DATA_CRC,
+    MMC_TRANSACT_STATUS_DONE            = 0,
+    MMC_TRANSACT_STATUS_ERR_RESP_NONE   = (0x1ul << 9),
+    MMC_TRANSACT_STATUS_ERR_RESP_CRC    = (0x1ul << 8),
+    MMC_TRANSACT_STATUS_ERR_DATA_CRC    = (0xFFul << 16),
+    MMC_TRANSACT_STATUS_DATA_BUSY       = (0x1ul << 2),
+    MMC_TRANSACT_STATUS_BUSY            = (0x1ul << 1),
+    MMC_TRANSACT_STATUS_ERR_MASK        = MMC_TRANSACT_STATUS_ERR_RESP_NONE
+                                        | MMC_TRANSACT_STATUS_ERR_RESP_CRC
+                                        | MMC_TRANSACT_STATUS_ERR_DATA_CRC,
 } vsf_mmc_transact_status_t;
 
 /*============================ INCLUDES ======================================*/

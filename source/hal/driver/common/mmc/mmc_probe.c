@@ -40,6 +40,7 @@ vsf_err_t vsf_mmc_probe_start(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe)
 {
     vsf_mmc_host_set_clock(mmc, 400 * 1000);
     vsf_mmc_host_set_buswidth(mmc, 1);
+    vsf_mmc_irq_enable(mmc, MMC_IRQ_MASK_HOST_RESP_DONE | MMC_IRQ_MASK_HOST_DATA_DONE);
     probe->state = VSF_MMC_PROBE_STATE_GO_IDLE;
     return vsf_mmc_host_transact_start(mmc, &(vsf_mmc_trans_t){
         .cmd    = MMC_GO_IDLE_STATE,
@@ -52,8 +53,11 @@ vsf_err_t vsf_mmc_probe_irqhandler(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe,
         vsf_mmc_irq_mask_t irq_mask, vsf_mmc_transact_status_t status,
         uint32_t resp[4])
 {
-    vsf_mmc_trans_t trans = { 0 };
+    if (status & MMC_TRANSACT_STATUS_ERR_MASK) {
+        return VSF_ERR_FAIL;
+    }
 
+    vsf_mmc_trans_t trans = { 0 };
     switch (probe->state) {
     case VSF_MMC_PROBE_STATE_GO_IDLE:
         trans.cmd = SD_SEND_IF_COND;
@@ -61,6 +65,7 @@ vsf_err_t vsf_mmc_probe_irqhandler(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe,
         trans.op = SD_SEND_IF_COND_OP;
         break;
     case VSF_MMC_PROBE_STATE_SEND_IF_COND:
+        return VSF_ERR_NONE;
         break;
     }
 

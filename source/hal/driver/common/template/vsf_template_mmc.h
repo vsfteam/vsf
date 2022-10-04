@@ -295,8 +295,10 @@ typedef struct vsf_mmc_trans_t {
 
 #if VSF_MMC_CFG_REIMPLEMENT_IRQ_MASK == DISABLED
 typedef enum vsf_mmc_irq_mask_t {
-    MMC_IRQ_MASK_HOST_TRANSACT_DONE             = (0x1ul <<  0),
-    MMC_IRQ_MASK_MASTER_ALL                     =  MMC_IRQ_MASK_HOST_TRANSACT_DONE,
+    MMC_IRQ_MASK_HOST_RESP_DONE                 = (0x1ul <<  0),
+    MMC_IRQ_MASK_HOST_DATA_DONE                 = (0x1ul <<  1),
+    MMC_IRQ_MASK_HOST_ALL                       = MMC_IRQ_MASK_HOST_RESP_DONE
+                                                | MMC_IRQ_MASK_HOST_DATA_DONE,
 } vsf_mmc_irq_mask_t;
 #endif
 
@@ -363,7 +365,7 @@ typedef struct vsf_mmc_t vsf_mmc_t;
  \code {.c}
     static void __user_mmc_irchandler(void *target_ptr, vsf_mmc_t *mmc_ptr, enum irq_mask)
     {
-        if (irq_mask & MMC_IRQ_MASK_HOST_TRANSACT_DONE) {
+        if (irq_mask & MMC_IRQ_MASK_HOST_RESP_DONE) {
             // do something
         }
     }
