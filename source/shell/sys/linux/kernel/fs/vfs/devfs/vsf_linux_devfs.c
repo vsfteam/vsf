@@ -799,7 +799,7 @@ static ssize_t __vsf_linux_fb_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         count = frame_size - vfs_file->pos;
     }
 
-    memcpy(buf, (void *)((uintptr_t)fb_priv->front_buffer + vfs_file->pos), count);
+    memcpy(buf, (void *)((uint8_t *)fb_priv->front_buffer + vfs_file->pos), count);
     return count;
 }
 
@@ -814,7 +814,7 @@ static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t
         count = frame_size - vfs_file->pos;
     }
 
-    memcpy((void *)((uintptr_t)fb_priv->front_buffer + vfs_file->pos), buf, count);
+    memcpy((void *)((uint8_t *)fb_priv->front_buffer + vfs_file->pos), buf, count);
 #if VSF_DISP_USE_FB == ENABLED
     if (!fb_priv->is_disp_fb)
 #endif
