@@ -28,12 +28,16 @@
 #include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
 #include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/sdmmc/reg_sdmmc.h"
+#include "../vendor/plf/aic8800/src/driver/dma/dma_generic.h"
 
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HW_MMC_CFG_MULTI_CLASS
 #   define VSF_HW_MMC_CFG_MULTI_CLASS           VSF_MMC_CFG_MULTI_CLASS
 #endif
+
+#define DATARD_TRIG_TH                          4
+#define DATAWR_TRIG_TH                          4
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
@@ -52,7 +56,6 @@ typedef struct vsf_hw_mmc_t {
 
     const vsf_hw_mmc_const_t *mmc_const;
     vsf_mmc_cfg_t cfg;
-    vsf_mmc_trans_t trans;
 } vsf_hw_mmc_t;
 
 /*============================ IMPLEMENTATION ================================*/
@@ -66,6 +69,11 @@ static void __vsf_hw_mmc_irq_handler(vsf_hw_mmc_t *mmc_ptr)
         uint32_t resp[4] = {
             reg->R0R << 1, reg->R1R, reg->R2R, reg->R3R,
         };
+        if (irq & MMC_IRQ_MASK_HOST_DATA_DONE) {
+            int ch = reg->CFGR & MMC_CMDOP_WRITE ? DMA_CHANNEL_SDMMC_TX : DMA_CHANNEL_SDMMC_RX;
+            dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL0_ICLR_BIT |
+                         DMA_CH_TBL1_ICLR_BIT | DMA_CH_TBL2_ICLR_BIT));
+        }
         mmc_ptr->cfg.isr.handler_fn(mmc_ptr->cfg.isr.target_ptr, &mmc_ptr->vsf_mmc, irq, reg->GSR, resp);
     }
 }
@@ -151,13 +159,45 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
     if (__vsf_hw_mmc_host_is_busy(mmc_ptr)) {
         return VSF_ERR_BUSY;
     }
-    mmc_ptr->trans = *trans;
+
+    bool has_data = ((trans->buffer != NULL) && (trans->count > 0));
+    int ch;
+    if (has_data) {
+        if (trans->op & MMC_CMDOP_WRITE) {
+            ch = DMA_CHANNEL_SDMMC_TX;
+            dma_erqcsr_set(REQ_CID_SDMMC_TX, ch);
+            dma_ch_rqr_erql_setb(ch);
+            dma_ch_dar_set(ch, (unsigned int)(&AIC_SDMMC->DWRR));
+            dma_ch_sar_set(ch, (unsigned int)trans->buffer);
+            dma_ch_tbl0cr_set(ch, ((4 * DATAWR_TRIG_TH) | (REQ_FRAG << DMA_CH_RQTYP_LSB) | (AHB_WORD << DMA_CH_DBUSU_LSB) |
+                             (AHB_WORD << DMA_CH_SBUSU_LSB) | DMA_CH_CONSTDA_BIT));
+        } else {
+            ch = DMA_CHANNEL_SDMMC_RX;
+            dma_erqcsr_set(REQ_CID_SDMMC_RX, ch);
+            dma_ch_rqr_erql_setb(ch);
+            dma_ch_dar_set(ch, (unsigned int)trans->buffer);
+            dma_ch_sar_set(ch, (unsigned int)(&AIC_SDMMC->DRDR));
+            dma_ch_tbl0cr_set(ch, ((4 * DATARD_TRIG_TH) | (REQ_FRAG << DMA_CH_RQTYP_LSB) | (AHB_WORD << DMA_CH_DBUSU_LSB) |
+                             (AHB_WORD << DMA_CH_SBUSU_LSB) | DMA_CH_CONSTSA_BIT));
+        }
+
+        dma_ch_tbl1cr_set(ch, trans->count);
+        dma_ch_tbl2cr_set(ch, trans->count);
+        dma_ch_tsr_set(ch, ((4 << DMA_CH_STRANSZ_LSB) | (4 << DMA_CH_DTRANSZ_LSB)));
+        dma_ch_wmar_set(ch, 0);
+        dma_ch_wjar_set(ch, 0);
+        dma_ch_tbl0sr_set(ch, ((0 << DMA_CH_STBL0SZ_LSB) | (0 << DMA_CH_DTBL0SZ_LSB)));
+        dma_ch_tbl1ssr_set(ch, 0);
+        dma_ch_tbl1dsr_set(ch, 0);
+        dma_ch_ctlr_set(ch, (DMA_CH_CHENA_BIT | (0x01UL << DMA_CH_BUSBU_LSB)));
+    }
 
     AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
     reg->CFGR = 0;
     reg->CMDR = trans->cmd;
     reg->ARGR = trans->arg;
     reg->CFGR = trans->op | SDMMC_COMMAND_START;
+
     return VSF_ERR_NONE;
 }
 

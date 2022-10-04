@@ -170,9 +170,9 @@ extern "C" {
 #define MMC_SET_BLOCKLEN                16   /* ac   [31:0] block len   R1  */
 #define MMC_SET_BLOCKLEN_OP             (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_READ_SINGLE_BLOCK           17   /* adtc [31:0] data addr   R1  */
-#define MMC_READ_SINGLE_BLOCK_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_READ_SINGLE_BLOCK_OP        (MMC_CMDOP_SINGLE_BLOCK | MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_READ_MULTIPLE_BLOCK         18   /* adtc [31:0] data addr   R1  */
-#define MMC_READ_MULTIPLE_BLOCK_OP      (MMC_CMDOP_MULTIBLOCK | MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_READ_MULTIPLE_BLOCK_OP      (MMC_CMDOP_MULTI_BLOCK | MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_SEND_TUNING_BLOCK           19   /* adtc                    R1  */
 #define MMC_SEND_TUNING_BLOCK_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_SEND_TUNING_BLOCK_HS200     21	 /* adtc R1  */
@@ -186,9 +186,9 @@ extern "C" {
 #define MMC_SET_BLOCK_COUNT             23   /* adtc [31:0] data addr   R1  */
 #define MMC_SET_BLOCK_COUNT_OP          (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_WRITE_BLOCK                 24   /* adtc [31:0] data addr   R1  */
-#define MMC_WRITE_BLOCK_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_WRITE_BLOCK_OP              (MMC_CMDOP_SINGLE_BLOCK | MMC_CMDOP_WRITE | MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_WRITE_MULTIPLE_BLOCK        25   /* adtc                    R1  */
-#define MMC_WRITE_MULTIPLE_BLOCK_OP     (MMC_CMDOP_MULTIBLOCK | MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#define MMC_WRITE_MULTIPLE_BLOCK_OP     (MMC_CMDOP_MULTI_BLOCK | MMC_CMDOP_WRITE | MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_PROGRAM_CID                 26   /* adtc                    R1  */
 #define MMC_PROGRAM_CID_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_PROGRAM_CSD                 27   /* adtc                    R1  */
@@ -272,14 +272,13 @@ typedef enum vsf_mmc_feature_t {
  */
 #if VSF_MMC_CFG_REIMPLEMENT_CMDOP == DISABLED
 typedef enum vsf_mmc_transop_t {
-    MMC_CMDOP_AUTOCMD12         = (1ul << 0),
-    MMC_CMDOP_MULTIBLOCK        = (1ul << 1),
+    MMC_CMDOP_SINGLE_BLOCK      = (1ul << 0),
+    MMC_CMDOP_MULTI_BLOCK       = (1ul << 1),
     MMC_CMDOP_WRITE             = (1ul << 2),
-    MMC_CMDOP_RW                = (1ul << 3),
-    MMC_CMDOP_RESP              = (1ul << 4),
-    MMC_CMDOP_RESP_SHORT        = (1ul << 5),
-    MMC_CMDOP_RESP_SHORT_CRC    = (2ul << 5),
-    MMC_CMDOP_RESP_LONG_CRC     = (3ul << 5),
+    MMC_CMDOP_RESP              = (1ul << 3),
+    MMC_CMDOP_RESP_SHORT        = (1ul << 4),
+    MMC_CMDOP_RESP_SHORT_CRC    = (2ul << 4),
+    MMC_CMDOP_RESP_LONG_CRC     = (3ul << 4),
 } vsf_mmc_transop_t;
 #endif
 

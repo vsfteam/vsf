@@ -40,7 +40,7 @@ vsf_err_t vsf_mmc_probe_start(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe)
 {
     vsf_mmc_host_set_clock(mmc, 400 * 1000);
     vsf_mmc_host_set_buswidth(mmc, 1);
-    vsf_mmc_irq_enable(mmc, MMC_IRQ_MASK_HOST_RESP_DONE | MMC_IRQ_MASK_HOST_DATA_DONE);
+    vsf_mmc_irq_enable(mmc, MMC_IRQ_MASK_HOST_RESP_DONE);
     probe->state = VSF_MMC_PROBE_STATE_GO_IDLE;
     return vsf_mmc_host_transact_start(mmc, &(vsf_mmc_trans_t){
         .cmd    = MMC_GO_IDLE_STATE,

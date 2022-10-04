@@ -36,10 +36,9 @@
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_mmc_transop_t {
-    MMC_CMDOP_AUTOCMD12                 = (1ul << 16),  // SDMMC_AUTOCMD12_ENABLE
-    MMC_CMDOP_MULTIBLOCK                = (1ul << 10),  // SDMMC_MULTI_BLOCK_MODE
+    MMC_CMDOP_SINGLE_BLOCK              = (1ul << 8),   // MMC_CMDOP_RW
+    MMC_CMDOP_MULTI_BLOCK               = (1ul << 10) | (1ul << 16),  // SDMMC_MULTI_BLOCK_MODE | SDMMC_AUTOCMD12_ENABLE
     MMC_CMDOP_WRITE                     = (1ul << 9),   // SDMMC_WRITE_MODE
-    MMC_CMDOP_RW                        = (1ul << 8),   // SDMMC_RW_MODE
     MMC_CMDOP_RESP                      = (1ul << 4),   // SDMMC_RESPONSE_ENABLE
     MMC_CMDOP_RESP_SHORT                = (1ul << 5),   // SDMMC_CONFIG_R3
     MMC_CMDOP_RESP_SHORT_CRC            = (0ul << 5),   // SDMMC_CONFIG_Rx
