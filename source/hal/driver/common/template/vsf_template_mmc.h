@@ -67,8 +67,6 @@ extern "C" {
 
 #define VSF_MMC_APIS(__prefix)                                                                                                                                  \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, init,                  VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, vsf_mmc_cfg_t *cfg_ptr)        \
-    __VSF_HAL_TEMPLATE_API(__prefix, fsm_rt_t,              mmc, enable,                VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)                                \
-    __VSF_HAL_TEMPLATE_API(__prefix, fsm_rt_t,              mmc, disable,               VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)                                \
     __VSF_HAL_TEMPLATE_API(__prefix, void,                  mmc, irq_enable,            VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, vsf_mmc_irq_mask_t irq_mask)   \
     __VSF_HAL_TEMPLATE_API(__prefix, void,                  mmc, irq_disable,           VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, vsf_mmc_irq_mask_t irq_mask)   \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_mmc_status_t,      mmc, status,                VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)                                \
@@ -127,25 +125,25 @@ typedef enum vsf_mmc_irq_mask_t {
 } vsf_mmc_irq_mask_t;
 #endif
 
-#if VSF_MMC_CFG_REIMPLEMENT_TRANSACT_RESULT == DISABLED
-typedef enum vsf_mmc_transact_result_t {
-    MMC_TRANSACT_RESULT_DONE                    = 0,
-    MMC_TRANSACT_RESULT_ERR_RESP_NONE           = (0x1ul <<  0),
-    MMC_TRANSACT_RESULT_ERR_RESP_CRC            = (0x1ul <<  1),
-    MMC_TRANSACT_RESULT_ERR_DATA_CRC            = (0x1ul <<  2),
-    MMC_TRANSACT_RESULT_ERR_TRANSACT            = (0x1ul <<  3),
-    MMC_TRANSACT_RESULT_ERR_MASK                = MMC_TRANSACT_RESULT_ERR_RESP_NONE
-                                                | MMC_TRANSACT_RESULT_ERR_RESP_CRC
-                                                | MMC_TRANSACT_RESULT_ERR_DATA_CRC
-                                                | MMC_TRANSACT_RESULT_ERR_TRANSACT,
-} vsf_mmc_transact_result_t;
+#if VSF_MMC_CFG_REIMPLEMENT_TRANSACT_STATUS == DISABLED
+typedef enum vsf_mmc_transact_status_t {
+    MMC_TRANSACT_STATUS_DONE                    = 0,
+    MMC_TRANSACT_STATUS_ERR_RESP_NONE           = (0x1ul <<  0),
+    MMC_TRANSACT_STATUS_ERR_RESP_CRC            = (0x1ul <<  1),
+    MMC_TRANSACT_STATUS_ERR_DATA_CRC            = (0x1ul <<  2),
+    MMC_TRANSACT_STATUS_DATA_BUSY               = (0x1ul <<  3),
+    MMC_TRANSACT_STATUS_BUSY                    = (0x1ul <<  4),
+    MMC_TRANSACT_STATUS_ERR_MASK                = MMC_TRANSACT_STATUS_ERR_RESP_NONE
+                                                | MMC_TRANSACT_STATUS_ERR_RESP_CRC
+                                                | MMC_TRANSACT_STATUS_ERR_DATA_CRC,
+} vsf_mmc_transact_status_t;
 #endif
 
 #if VSF_MMC_CFG_REIMPLEMENT_STATUS == DISABLED
 typedef struct vsf_mmc_status_t {
     union {
         inherit(peripheral_status_t)
-        vsf_mmc_transact_result_t value;
+        vsf_mmc_transact_status_t mmc_status;
     };
 } vsf_mmc_status_t;
 #endif
@@ -153,6 +151,11 @@ typedef struct vsf_mmc_status_t {
 #if VSF_MMC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_mmc_capability_t {
     inherit(vsf_peripheral_capability_t)
+    enum {
+        MMC_CAP_BUSWIDTH_1                      = (0x1ul <<  0),
+        MMC_CAP_BUSWIDTH_4                      = (0x1ul <<  1),
+        MMC_CAP_BUSWIDTH_8                      = (0x1ul <<  2),
+    } mmc_capability;
 } vsf_mmc_capability_t;
 #endif
 
@@ -166,6 +169,8 @@ typedef struct vsf_mmc_t vsf_mmc_t;
  @param target_ptr pointer of user.
  @param mmc_ptr pointer of mmc instance.
  @param irq_mask one or more value of enum vsf_mmc_irq_mask_t
+ @param status transact status.
+ @param resp response.
  @return None.
 
  \~chinese
@@ -175,6 +180,8 @@ typedef struct vsf_mmc_t vsf_mmc_t;
  @param target_ptr 用户指针
  @param mmc_ptr mmc实例的指针
  @param irq_mask 一个或者多个枚举 vsf_mmc_irq_mask_t 的值的按位或
+ @param status 传输状态
+ @param resp 应答
  @return 无。
 
  \~
@@ -189,7 +196,9 @@ typedef struct vsf_mmc_t vsf_mmc_t;
  */
 typedef void vsf_mmc_isr_handler_t(void *target_ptr,
                                    vsf_mmc_t *mmc_ptr,
-                                   vsf_mmc_irq_mask_t irq_mask);
+                                   vsf_mmc_irq_mask_t irq_mask,
+                                   vsf_mmc_transact_status_t status,
+                                   uint32_t resp[4]);
 
 /**
  \~english
@@ -217,10 +226,6 @@ typedef struct vsf_mmc_isr_t {
 typedef struct vsf_mmc_cfg_t {
     vsf_mmc_feature_t mode;                     //!< \~english mmc mode \ref vsf_mmc_feature_t
                                                 //!< \~chinese mmc 模式 \ref vsf_mmc_feature_t
-
-    uint32_t clock_hz;                          //!< \~english mmc clock (in Hz)
-                                                //!< \~chinese mmc 时钟频率 (单位：Hz)
-
     vsf_mmc_isr_t isr;                          //!< \~english mmc interrupt
                                                 //!< \~chinese mmc 中断
 } vsf_mmc_cfg_t;
@@ -268,32 +273,6 @@ extern vsf_err_t vsf_mmc_init(vsf_mmc_t *mmc_ptr, vsf_mmc_cfg_t *cfg_ptr);
  @return none
  */
 extern void vsf_mmc_fini(vsf_mmc_t *mmc_ptr);
-
-/**
- \~english
- @brief enable mmc instance.
- @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
- @return fsm_rt_t: fsm_rt_cpl if enable complete, else return fsm_rt_onging
-
- \~chinese
- @brief 使能 mmc 实例
- @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
- @return fsm_rt_t: 如果使能成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
- */
-extern fsm_rt_t vsf_mmc_enable(vsf_mmc_t *mmc_ptr);
-
-/**
- \~english
- @brief disable mmc instance.
- @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
- @return fsm_rt_t: fsm_rt_cpl if disable complete, else return fsm_rt_onging
-
- \~chinese
- @brief禁能 mmc 实例
- @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
- @return fsm_rt_t: 如果禁能成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
- */
-extern fsm_rt_t vsf_mmc_disable(vsf_mmc_t *mmc_ptr);
 
 /**
  \~english
