@@ -25,7 +25,11 @@
 #if VSF_HAL_USE_MMC == ENABLED
 
 #if     defined(__VSF_MMC_PROBE_CLASS_IMPLEMENT)
+#   undef __VSF_MMC_PROBE_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
+#   define public_const
+#else
+#   define public_const const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -38,17 +42,30 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_mmc_probe_state_t {
-    VSF_MMC_PROBE_STATE_GO_IDLE,
-    VSF_MMC_PROBE_STATE_SEND_IF_COND,
-} vsf_mmc_probe_state_t;
-
 vsf_class(vsf_mmc_probe_t) {
     public_member(
-        uint32_t                voltage;
+        uint32_t                    voltage;
+        uint32_t                    working_clock_hz;
+        uint8_t                     bus_width;
+        bool                        uhs_en;
+
+        public_const vsf_mmc_csd_t  csd;
+        public_const bool           high_capacity;
+        public_const uint8_t        delay_ms;
+        public_const uint32_t       version;
+        public_const uint32_t       ocr;
+        public_const uint32_t       cid[4];
+        public_const uint64_t       capacity;
     )
     private_member(
-        vsf_mmc_probe_state_t   state;
+        uint8_t                     state;
+        bool                        is_app_cmd;
+        bool                        is_resp_r1;
+        bool                        is_to_retry;
+        bool                        is_to_ignore_fail;
+        uint32_t                    rca;
+        uint32_t                    r1_expected_card_status_mask;
+        uint32_t                    r1_expected_card_status;
     )
 };
 
@@ -61,34 +78,38 @@ vsf_class(vsf_mmc_probe_t) {
  @brief start mmc probe, mmc MUST be initialized by calling vsf_mmc_init first.
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
  @param[in] vsf_mmc_probe_t: a pointer to struct @ref vsf_mmc_probe_t
- @return vsf_err_t: on success£¨returns VSF_ERR_NONE(0); on error, returns err code(< 0)
+ @return vsf_err_t: on successÔºåreturns VSF_ERR_NONE(0); on error, returns err code(< 0)
 
  \~chinese
- @brief ∆Ù∂Ø mmc Õ‚…ËºÏ≤‚, mmu ±ÿ–Î «“—æ≠Õ®π˝ vsf_mmc_init ≥ı ºªØµƒ°£
- @param[in] mmc_ptr: Ω·ππÃÂ vsf_mmc_t µƒ÷∏’Î£¨≤Œøº @ref vsf_mmc_t
- @param[in] vsf_mmc_probe_t: Ω·ππÃÂ vsf_mmc_probe_t µƒ÷∏’Î£¨≤Œøº @ref vsf_mmc_probe_t
- @return vsf_err_t: »Áπ˚ºÏ≤‚≥…π¶£¨∑µªÿ VSF_ERR_NONE(¡„); »Áπ˚≥ˆ¥Ì, ∑µªÿ∏∫÷µ¥ÌŒÛ¬Î
+ @brief ÂêØÂä® mmc Â§ñËÆæÊ£ÄÊµã, mmc ÂøÖÈ°ªÂ∑≤ÁªèÁªèËøá vsf_mmc_init ÂÆåÊàêÂàùÂßãÂåñ„ÄÇ
+ @param[in] mmc_ptr: ÁªìÊûÑ‰Ωì vsf_mmc_t ÁöÑÊåáÈíà, ÂèÇËÄÉ @ref vsf_mmc_t
+ @param[in] vsf_mmc_probe_t mmc ÂÆû‰æãÁöÑÊåáÈíà
+ @return vsf_err_t: Êìç‰ΩúÂÆåÊàêËøîÂõû VSF_ERR_NONE(0); Âá∫ÈîôËøîÂõûÈîôËØØÁ†Å (< 0)„ÄÇ
  */
 extern vsf_err_t vsf_mmc_probe_start(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe);
 
 /**
  \~english
  @brief called in mmc irqhandler while probing mmc.
+ @note if probe->delay_ms is none zero after returned with VSF_ERR_NOT_READY,
+        vsf_mmc_probe_irqhandler(irq_mask: 0, status: 0) should be called again after delay_ms delayed.
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
  @param[in] vsf_mmc_probe_t: a pointer to struct @ref vsf_mmc_probe_t
- @param[in] irq_mask one or more value of enum vsf_mmc_irq_mask_t
- @param[in] status transact status.
- @param[in] resp response.
- @return vsf_err_t: on success£¨returns VSF_ERR_NONE(0); on going, returns VSF_ERR_NOT_READY(> 0); on error, returns err code(< 0)
+ @param[in] irq_mask: one or more value of enum vsf_mmc_irq_mask_t
+ @param[in] status: transact status.
+ @param[in] resp: response.
+ @return vsf_err_t: on successÔºåreturns VSF_ERR_NONE(0); on going, returns VSF_ERR_NOT_READY(> 0); on error, returns err code(< 0)
 
  \~chinese
- @brief ºÏ≤‚ mmc Õ‚…Ëµƒ ±∫Ú£¨‘⁄ mmc ÷–∂œ÷–µ˜”√µƒ÷–∂œ¥¶¿Ì‘≠∫Ø ˝
- @param[in] mmc_ptr: Ω·ππÃÂ vsf_mmc_t µƒ÷∏’Î£¨≤Œøº @ref vsf_mmc_t
- @param[in] vsf_mmc_probe_t: Ω·ππÃÂ vsf_mmc_probe_t µƒ÷∏’Î£¨≤Œøº @ref vsf_mmc_probe_t
- @param[in] irq_mask “ª∏ˆªÚ’ﬂ∂‡∏ˆ√∂æŸ vsf_mmc_irq_mask_t µƒ÷µµƒ∞¥ŒªªÚ
- @param[in] status ¥´ ‰◊¥Ã¨
- @param[in] resp ”¶¥
- @return vsf_err_t: »Áπ˚ºÏ≤‚≥…π¶£¨∑µªÿ VSF_ERR_NONE(¡„); »Áπ˚Œ¥ÕÍ≥…, ∑µªÿ VSF_ERR_NOT_READY(’˝÷µ); »Áπ˚≥ˆ¥Ì, ∑µªÿ∏∫÷µ¥ÌŒÛ¬Î
+ @brief Ê£ÄÊµã mmc Â§ñËÆæÁöÑÊó∂ÂÄôÔºåÂú® mmc ‰º†ËæìÂÆåÊàê‰∏≠Êñ≠‰∏≠Ë∞ÉÁî®ÁöÑ‰∏≠Êñ≠Â§ÑÁêÜÂáΩÊï∞
+ @note Â¶ÇÊûúË∞ÉÁî®ËøîÂõû VSF_ERR_NOT_READY ÂêéÔºå probe->delay_ms ÈùûÈõ∂,
+        ÈúÄË¶ÅÂú® delay_ms Á≠âÂæÖÂÆåÊàê‰πãÂêéÔºåÂÜçÊ¨°Ë∞ÉÁî® vsf_mmc_probe_irqhandler(irq_mask: 0, status: 0).
+ @param[in] mmc_ptr: ÁªìÊûÑ‰Ωì vsf_mmc_t ÁöÑÊåáÈíà, ÂèÇËÄÉ @ref vsf_mmc_t
+ @param[in] vsf_mmc_probe_t mmc ÂÆû‰æãÁöÑÊåáÈíà
+ @param[in] irq_mask: ‰∏Ä‰∏™ÊàñËÄÖÂ§ö‰∏™Êûö‰∏æ vsf_mmc_irq_mask_t ÁöÑÂÄºÁöÑÊåâ‰ΩçÊàñ
+ @param[in] status: ‰º†ËæìÁä∂ÊÄÅ
+ @param[in] resp: Â∫îÁ≠î
+ @return vsf_err_t: Êìç‰ΩúÂÆåÊàêËøîÂõû VSF_ERR_NONE(0); Êú™ÂÆåÊàêËøîÂõû VSF_ERR_NOT_READY(> 0); Âá∫ÈîôËøîÂõûÈîôËØØÁ†Å (< 0)„ÄÇ
  */
 extern vsf_err_t vsf_mmc_probe_irqhandler(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe,
         vsf_mmc_irq_mask_t irq_mask, vsf_mmc_transact_status_t status,

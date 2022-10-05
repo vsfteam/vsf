@@ -86,6 +86,9 @@ extern "C" {
   /* Application commands */
 #define SD_APP_SET_BUS_WIDTH            6   /* ac   [1:0] bus width     R1  */
 #define SD_APP_SET_BUS_WIDTH_OP         (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
+#   define SD_BUS_WIDTH_1               0
+#   define SD_BUS_WIDTH_4               2
+#   define SD_BUS_WIDTH_8               3
 #define SD_APP_SD_STATUS                13   /* adtc                    R1  */
 #define SD_APP_SD_STATUS_OP             (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define SD_APP_SEND_NUM_WR_BLKS         22   /* adtc                    R1  */
@@ -138,6 +141,7 @@ extern "C" {
 #define MMC_SET_RELATIVE_ADDR           3    /* ac   [31:16] RCA        R1  */
 #define MMC_SET_RELATIVE_ADDR_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_SET_DSR                     4    /* bc   [31:16] RCA            */
+#define MMC_SET_DSR_OP                  0
 #define MMC_SLEEP_AWAKE		            5    /* ac   [31:16] RCA 15:flg R1b */
 #define MMC_SLEEP_AWAKE_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_SWITCH                      6    /* ac   [31:0] See below   R1b */
@@ -238,6 +242,47 @@ extern "C" {
 #define MMC_CMDQ_TASK_MGMT              48   /* ac   [20:16] task id    R1b */
 #define MMC_CMDQ_TASK_MGMT_OP           (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 
+/* SD/MMC version bits; 8 flags, 8 major, 8 minor, 8 change */
+#define SD_VERSION_SD                   (1U << 31)
+#define MMC_VERSION_MMC                 (1U << 30)
+
+#define MAKE_SDMMC_VERSION(a, b, c)                                             \
+    ((((uint32_t)(a)) << 16) | ((uint32_t)(b) << 8) | (uint32_t)(c))
+#define MAKE_SD_VERSION(a, b, c)                                                \
+    (SD_VERSION_SD | MAKE_SDMMC_VERSION(a, b, c))
+#define MAKE_MMC_VERSION(a, b, c)                                               \
+    (MMC_VERSION_MMC | MAKE_SDMMC_VERSION(a, b, c))
+
+#define EXTRACT_SDMMC_MAJOR_VERSION(x)                                          \
+    (((uint32_t)(x) >> 16) & 0xff)
+#define EXTRACT_SDMMC_MINOR_VERSION(x)                                          \
+    (((uint32_t)(x) >> 8) & 0xff)
+#define EXTRACT_SDMMC_CHANGE_VERSION(x)                                         \
+    ((uint32_t)(x) & 0xff)
+
+#define SD_VERSION_3                    MAKE_SD_VERSION(3, 0, 0)
+#define SD_VERSION_2                    MAKE_SD_VERSION(2, 0, 0)
+#define SD_VERSION_1_0                  MAKE_SD_VERSION(1, 0, 0)
+#define SD_VERSION_1_10                 MAKE_SD_VERSION(1, 10, 0)
+
+#define MMC_VERSION_UNKNOWN             MAKE_MMC_VERSION(0, 0, 0)
+#define MMC_VERSION_1_2                 MAKE_MMC_VERSION(1, 2, 0)
+#define MMC_VERSION_1_4                 MAKE_MMC_VERSION(1, 4, 0)
+#define MMC_VERSION_2_2                 MAKE_MMC_VERSION(2, 2, 0)
+#define MMC_VERSION_3                   MAKE_MMC_VERSION(3, 0, 0)
+#define MMC_VERSION_4                   MAKE_MMC_VERSION(4, 0, 0)
+#define MMC_VERSION_4_1                 MAKE_MMC_VERSION(4, 1, 0)
+#define MMC_VERSION_4_2                 MAKE_MMC_VERSION(4, 2, 0)
+#define MMC_VERSION_4_3                 MAKE_MMC_VERSION(4, 3, 0)
+#define MMC_VERSION_4_4                 MAKE_MMC_VERSION(4, 4, 0)
+#define MMC_VERSION_4_41                MAKE_MMC_VERSION(4, 4, 1)
+#define MMC_VERSION_4_5                 MAKE_MMC_VERSION(4, 5, 0)
+#define MMC_VERSION_5_0                 MAKE_MMC_VERSION(5, 0, 0)
+#define MMC_VERSION_5_1                 MAKE_MMC_VERSION(5, 1, 0)
+
+#define IS_SD(x)                        ((x) & SD_VERSION_SD)
+#define IS_MMC(x)                       ((x) & MMC_VERSION_MMC)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_MMC_APIS(__prefix)                                                                                                                                  \
@@ -247,11 +292,172 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_mmc_status_t,      mmc, status,                VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)                                \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_mmc_capability_t,  mmc, capability,            VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)                                \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, host_set_clock,        VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, uint32_t clock_hz)             \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, host_set_buswidth,     VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, uint8_t buswidth)              \
+    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, host_set_bus_width,    VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, uint8_t bus_width)             \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, host_transact_start,   VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, vsf_mmc_trans_t *trans)        \
     __VSF_HAL_TEMPLATE_API(__prefix, void,                  mmc, host_transact_stop,    VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)
 
 /*============================ TYPES =========================================*/
+
+typedef union vsf_mmc_csd_t {
+// refer to: Part_1_Physical_Layer_Specification_Ver3.01_Final_100218.pdf
+//               name               bitlen      offset
+    struct {
+        uint32_t                    : 1;        //  0
+        uint32_t CRC                : 7;        //  1
+
+        // different part from mmc
+        uint32_t                    : 2;        //  8
+
+        uint32_t FILE_FORMAT        : 2;        //  10
+        uint32_t TMP_WRITE_PROTECT  : 1;        //  12
+        uint32_t PERM_WRITE_PROTECT : 1;        //  13
+        uint32_t COPY               : 1;        //  14
+        uint32_t FILE_FORMAT_GRP    : 1;        //  15
+
+        // different part from mmc
+        uint32_t                    : 5;        //  16
+
+        uint32_t WRITE_BL_PARTIAL   : 1;        //  21
+        uint32_t WRITE_BL_LEN       : 4;        //  22
+        uint32_t R2W_FACTOR         : 3;        //  26
+
+        // different part from mmc
+        uint32_t                    : 2;        //  29
+
+        uint32_t WP_GRP_ENABLE      : 1;        //  31
+        uint32_t WP_GRP_SIZE        : 7;        //  32
+        uint32_t SECTOR_SIZE        : 7;        //  39
+        uint32_t ERASE_BLK_EN       : 1;        //  46
+
+        // different part from sd_v2
+        uint32_t C_SIZE_MULT        : 3;        //  47
+        uint32_t VDD_W_CURR_MAX     : 3;        //  50
+        uint32_t VDD_W_CURR_MIN     : 3;        //  53
+        uint32_t VDD_R_CURR_MAX     : 3;        //  56
+        uint32_t VDD_R_CURR_MIN     : 3;        //  59
+        uint32_t C_SIZE             : 12;       //  62
+        uint32_t                    : 2;        //  74
+
+        uint32_t DSR_IMP            : 1;        //  76
+        uint32_t READ_BLK_MISALIGN  : 1;        //  77
+        uint32_t WRITE_BLK_MISALIGN : 1;        //  78
+        uint32_t READ_BL_PARTIAL    : 1;        //  79
+        uint32_t READ_BL_LEN        : 4;        //  80
+        uint32_t CCC                : 12;       //  84
+        uint32_t TRANS_SPEED        : 8;        //  96
+        uint32_t NSAC               : 8;        //  104
+        uint32_t TAAC               : 8;        //  112
+
+        // different part from mmc
+        uint32_t                    : 6;        //  120
+
+        uint32_t CSD_STRUCTURE      : 2;        //  126
+    } PACKED sd_v1;
+    struct {
+        uint32_t                    : 1;        //  0
+        uint32_t CRC                : 7;        //  1
+
+        // different part from mmc
+        uint32_t                    : 2;        //  8
+
+        uint32_t FILE_FORMAT        : 2;        //  10
+        uint32_t TMP_WRITE_PROTECT  : 1;        //  12
+        uint32_t PERM_WRITE_PROTECT : 1;        //  13
+        uint32_t COPY               : 1;        //  14
+        uint32_t FILE_FORMAT_GRP    : 1;        //  15
+
+        // different part from mmc
+        uint32_t                    : 5;        //  16
+
+        uint32_t WRITE_BL_PARTIAL   : 1;        //  21
+        uint32_t WRITE_BL_LEN       : 4;        //  22
+        uint32_t R2W_FACTOR         : 3;        //  26
+
+        // different part from mmc
+        uint32_t                    : 2;        //  29
+
+        uint32_t WP_GRP_ENABLE      : 1;        //  31
+        uint32_t WP_GRP_SIZE        : 7;        //  32
+        uint32_t SECTOR_SIZE        : 7;        //  39
+        uint32_t ERASE_BLK_EN       : 1;        //  46
+
+        // different part from sd_v1 and mmc
+        uint32_t                    : 1;        //  47
+        uint32_t C_SIZE             : 22;       //  48
+        uint32_t                    : 6;        //  70
+
+        uint32_t DSR_IMP            : 1;        //  76
+        uint32_t READ_BLK_MISALIGN  : 1;        //  77
+        uint32_t WRITE_BLK_MISALIGN : 1;        //  78
+        uint32_t READ_BL_PARTIAL    : 1;        //  79
+        uint32_t READ_BL_LEN        : 4;        //  80
+        uint32_t CCC                : 12;       //  84
+        uint32_t TRANS_SPEED        : 8;        //  96
+        uint32_t NSAC               : 8;        //  104
+        uint32_t TAAC               : 8;        //  112
+
+        // different part from mmc
+        uint32_t                    : 6;        //  120
+
+        uint32_t CSD_STRUCTURE      : 2;        //  126
+    } PACKED sd_v2;
+    struct {
+        uint32_t                    : 1;        //  0
+        uint32_t CRC                : 7;        //  1
+
+        // different part from sd_v1 and sd_v2
+        uint32_t ECC                : 2;        //  8
+
+        uint32_t FILE_FORMAT        : 2;        //  10
+        uint32_t TMP_WRITE_PROTECT  : 1;        //  12
+        uint32_t PERM_WRITE_PROTECT : 1;        //  13
+        uint32_t COPY               : 1;        //  14
+        uint32_t FILE_FORMAT_GRP    : 1;        //  15
+
+        // different part from sd_v1 and sd_v2
+        uint32_t CONTENT_PROT_APP   : 1;        //  16
+        uint32_t                    : 4;        //  17
+
+        uint32_t WRITE_BL_PARTIAL   : 1;        //  21
+        uint32_t WRITE_BL_LEN       : 4;        //  22
+        uint32_t R2W_FACTOR         : 3;        //  26
+
+        // different part from sd_v1 and sd_v2
+        uint32_t DEFAULT_ECC        : 2;        //  29
+
+        uint32_t WP_GRP_ENABLE      : 1;        //  31
+
+        // different part from sd_v1 and sd_v2
+        uint32_t WP_GRP_SIZE        : 5;        //  32
+        uint32_t ERASE_GRP_MULT     : 5;        //  37
+        uint32_t ERASE_GRP_SIZE     : 5;        //  42
+
+        // different part from sd_v2
+        uint32_t C_SIZE_MULT        : 3;        //  47
+        uint32_t VDD_W_CURR_MAX     : 3;        //  50
+        uint32_t VDD_W_CURR_MIN     : 3;        //  53
+        uint32_t VDD_R_CURR_MAX     : 3;        //  56
+        uint32_t VDD_R_CURR_MIN     : 3;        //  59
+        uint32_t C_SIZE             : 12;       //  62
+        uint32_t                    : 2;        //  74
+
+        uint32_t DSR_IMP            : 1;        //  76
+        uint32_t READ_BLK_MISALIGN  : 1;        //  77
+        uint32_t WRITE_BLK_MISALIGN : 1;        //  78
+        uint32_t READ_BL_PARTIAL    : 1;        //  79
+        uint32_t READ_BL_LEN        : 4;        //  80
+        uint32_t CCC                : 12;       //  84
+        uint32_t TRANS_SPEED        : 8;        //  96
+        uint32_t NSAC               : 8;        //  104
+        uint32_t TAAC               : 8;        //  112
+
+        // different part from sd_v1 and sd_v2
+        uint32_t                    : 2;        //  120
+        uint32_t SPEC_VERS          : 4;        //  122
+
+        uint32_t CSD_STRUCTURE      : 2;        //  126
+    } PACKED mmc;
+} PACKED vsf_mmc_csd_t;
 
 #if VSF_MMC_CFG_REIMPLEMENT_FEATURE == DISABLED
 typedef enum vsf_mmc_feature_t {
@@ -329,10 +535,13 @@ typedef struct vsf_mmc_status_t {
 #if VSF_MMC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_mmc_capability_t {
     inherit(vsf_peripheral_capability_t)
-    enum {
-        MMC_CAP_BUSWIDTH_1                      = (0x1ul <<  0),
-        MMC_CAP_BUSWIDTH_4                      = (0x1ul <<  1),
-        MMC_CAP_BUSWIDTH_8                      = (0x1ul <<  2),
+    struct {
+        enum {
+            MMC_CAP_BUS_WIDTH_1                 = (0x1ul <<  0),
+            MMC_CAP_BUS_WIDTH_4                 = (0x1ul <<  1),
+            MMC_CAP_BUS_WIDTH_8                 = (0x1ul <<  2),
+        } bus_width;
+        uint32_t max_freq_hz;
     } mmc_capability;
 } vsf_mmc_capability_t;
 #endif
@@ -356,7 +565,7 @@ typedef struct vsf_mmc_t vsf_mmc_t;
  @note 这个回调函数在中断发生之后被调用
 
  @param target_ptr 用户指针
- @param mmc_ptr mmc实例的指针
+ @param mmc_ptr mmc 实例的指针
  @param irq_mask 一个或者多个枚举 vsf_mmc_irq_mask_t 的值的按位或
  @param status 传输状态
  @param resp 应答
@@ -527,16 +736,16 @@ extern vsf_err_t vsf_mmc_host_set_clock(vsf_mmc_t *mmc_ptr, uint32_t clock_hz);
  \~english
  @brief set the bus width of mmc instance.
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
- @param[in] buswidth: bus width in 1, 4, 8
+ @param[in] bus_width: bus width in 1, 4, 8
  @return vsf_err_t: VSF_ERR_NONE if mmc was initialized, or a negative error code
 
  \~chinese
  @brief 设置 mmc 总线位宽
  @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
- @param[in] buswidth: 总线位宽，范围：1, 4, 8
+ @param[in] bus_width: 总线位宽，范围：1, 4, 8
  @return vsf_err_t: 如果 mmc 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
  */
-extern vsf_err_t vsf_mmc_host_set_buswidth(vsf_mmc_t *mmc_ptr, uint8_t buswidth);
+extern vsf_err_t vsf_mmc_host_set_bus_width(vsf_mmc_t *mmc_ptr, uint8_t bus_width);
 
 /**
  \~english
@@ -585,8 +794,8 @@ extern void vsf_mmc_host_transact_stop(vsf_mmc_t *mmc_ptr);
         VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_capability)       ((VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_t) *)__MMC)
 #   define vsf_mmc_host_set_clock(__MMC, ...)                                   \
         VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_set_clock)   ((VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_t) *)__MMC, ##__VA_ARGS__)
-#   define vsf_mmc_host_set_buswidth(__MMC, ...)                                \
-        VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_set_buswidth)((VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_t) *)__MMC, ##__VA_ARGS__)
+#   define vsf_mmc_host_set_bus_width(__MMC, ...)                               \
+        VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_set_bus_width)((VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_t) *)__MMC, ##__VA_ARGS__)
 #   define vsf_mmc_host_transact_start(__MMC, ...)                              \
         VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_transact_start)((VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_t) *)__MMC, ##__VA_ARGS__)
 #   define vsf_mmc_host_transact_stop(__MMC, ...)                               \

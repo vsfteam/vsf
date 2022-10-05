@@ -56,6 +56,7 @@ typedef struct vsf_hw_mmc_t {
 
     const vsf_hw_mmc_const_t *mmc_const;
     vsf_mmc_cfg_t cfg;
+    bool is_resp_long;
 } vsf_hw_mmc_t;
 
 /*============================ IMPLEMENTATION ================================*/
@@ -66,9 +67,19 @@ static void __vsf_hw_mmc_irq_handler(vsf_hw_mmc_t *mmc_ptr)
         AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
         uint32_t irq = reg->ISR;
         reg->ICR = irq;
-        uint32_t resp[4] = {
-            reg->R0R << 1, reg->R1R, reg->R2R, reg->R3R,
-        };
+        uint32_t resp[4];
+
+        if (irq & MMC_IRQ_MASK_HOST_RESP_DONE) {
+            if (mmc_ptr->is_resp_long) {
+                resp[0] = reg->R0R << 1;
+                resp[1] = reg->R1R;
+                resp[2] = reg->R2R;
+                resp[3] = reg->R3R;
+            } else {
+                resp[0] = reg->R3R;
+            }
+        }
+
         if (irq & MMC_IRQ_MASK_HOST_DATA_DONE) {
             int ch = reg->CFGR & MMC_CMDOP_WRITE ? DMA_CHANNEL_SDMMC_TX : DMA_CHANNEL_SDMMC_RX;
             dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL0_ICLR_BIT |
@@ -135,7 +146,10 @@ vsf_mmc_status_t vsf_hw_mmc_status(vsf_hw_mmc_t *mmc_ptr)
 vsf_mmc_capability_t vsf_hw_mmc_capability(vsf_hw_mmc_t *mmc_ptr)
 {
     vsf_mmc_capability_t capability = {
-        0
+        .mmc_capability     = {
+            .bus_width      = MMC_CAP_BUS_WIDTH_1 | MMC_CAP_BUS_WIDTH_4,
+            .max_freq_hz    = 24 * 1000 * 1000,
+        },
     };
     return capability;
 }
@@ -151,10 +165,10 @@ vsf_err_t vsf_hw_mmc_host_set_clock(vsf_hw_mmc_t *mmc_ptr, uint32_t clock_hz)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_mmc_host_set_buswidth(vsf_hw_mmc_t *mmc_ptr, uint8_t buswidth)
+vsf_err_t vsf_hw_mmc_host_set_bus_width(vsf_hw_mmc_t *mmc_ptr, uint8_t bus_width)
 {
     AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
-    reg->DBWR = buswidth;
+    reg->DBWR = bus_width;
     return VSF_ERR_NONE;
 }
 
@@ -205,6 +219,7 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
         dma_ch_ctlr_set(ch, (DMA_CH_CHENA_BIT | (0x01UL << DMA_CH_BUSBU_LSB)));
     }
 
+    mmc_ptr->is_resp_long = !!((trans->op & (3 << 5)) == MMC_CMDOP_RESP_LONG_CRC);
     reg->CFGR = 0;
     reg->CMDR = trans->cmd;
     reg->ARGR = trans->arg;
