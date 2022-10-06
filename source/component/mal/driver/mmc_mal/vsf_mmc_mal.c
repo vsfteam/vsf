@@ -193,10 +193,10 @@ __vsf_component_peda_ifs_entry(__vk_mmc_mal_read, vk_mal_read)
         });
         break;
     case VSF_EVT_MMC_ERROR:
-        vsf_eda_return(VSF_ERR_FAIL);
+        vsf_eda_return(-1);
         break;
     case VSF_EVT_MMC_DONE:
-        vsf_eda_return(VSF_ERR_NONE);
+        vsf_eda_return(vsf_local.size);
         break;
     }
     vsf_peda_end();
@@ -224,10 +224,10 @@ __vsf_component_peda_ifs_entry(__vk_mmc_mal_write, vk_mal_write)
         });
         break;
     case VSF_EVT_MMC_ERROR:
-        vsf_eda_return(VSF_ERR_FAIL);
+        vsf_eda_return(-1);
         break;
     case VSF_EVT_MMC_DONE:
-        vsf_eda_return(VSF_ERR_NONE);
+        vsf_eda_return(vsf_local.size);
         break;
     }
     vsf_peda_end();

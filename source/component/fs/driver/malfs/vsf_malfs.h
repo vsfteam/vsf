@@ -29,9 +29,13 @@
 #if     defined(__VSF_MALFS_CLASS_IMPLEMENT)
 #   undef __VSF_MALFS_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
+#   define public_const
 #elif   defined(__VSF_MALFS_CLASS_INHERIT__)
 #   undef __VSF_MALFS_CLASS_INHERIT__
 #   define __VSF_CLASS_INHERIT__
+#   define public_const
+#else
+#   define public_const const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -123,7 +127,7 @@ vsf_class(vk_malfs_mounter_t) {
     public_member(
         vk_mal_t *mal;
         vk_file_t *dir;
-        vsf_err_t err;
+        public_const vsf_err_t err;
     )
     private_member(
         uint8_t *mbr;
