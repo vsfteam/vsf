@@ -299,8 +299,8 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 typedef union vsf_mmc_csd_t {
-// refer to: Part_1_Physical_Layer_Specification_Ver3.01_Final_100218.pdf
 //               name               bitlen      offset
+// refer to: Part_1_Physical_Layer_Specification_Ver3.01_Final_100218.pdf
     struct {
         uint32_t                    : 1;        //  0
         uint32_t CRC                : 7;        //  1
@@ -353,6 +353,7 @@ typedef union vsf_mmc_csd_t {
 
         uint32_t CSD_STRUCTURE      : 2;        //  126
     } PACKED sd_v1;
+// refer to: Part_1_Physical_Layer_Specification_Ver3.01_Final_100218.pdf
     struct {
         uint32_t                    : 1;        //  0
         uint32_t CRC                : 7;        //  1
@@ -401,6 +402,7 @@ typedef union vsf_mmc_csd_t {
 
         uint32_t CSD_STRUCTURE      : 2;        //  126
     } PACKED sd_v2;
+// refer to: mmc specification
     struct {
         uint32_t                    : 1;        //  0
         uint32_t CRC                : 7;        //  1
@@ -459,6 +461,19 @@ typedef union vsf_mmc_csd_t {
     } PACKED mmc;
 } PACKED vsf_mmc_csd_t;
 
+typedef struct vsf_mmc_cid_t {
+// refer to: Part_1_Physical_Layer_Specification_Ver3.01_Final_100218.pdf
+    uint64_t                        : 1;        //  0
+    uint64_t CRC                    : 7;        //  1
+    uint64_t MDT                    : 12;       //  8   Manufacturing date
+    uint64_t                        : 4;        //  20
+    uint64_t PSN                    : 32;       //  24  Product serial number
+    uint64_t PRV                    : 8;        //  56  Product revision
+    uint64_t PNM                    : 40;       //  64  Product name
+    uint64_t OID                    : 16;       //  104 OEM/Application ID
+    uint64_t MID                    : 8;        //  120 Manufacturer ID
+} PACKED vsf_mmc_cid_t;
+
 #if VSF_MMC_CFG_REIMPLEMENT_FEATURE == DISABLED
 typedef enum vsf_mmc_feature_t {
     MMC_MODE_HOST               = (0x1ul << 0), // select host mode
@@ -491,7 +506,6 @@ typedef enum vsf_mmc_transop_t {
 typedef struct vsf_mmc_trans_t {
     uint8_t cmd;
     uint32_t arg;
-    uint8_t *resp;
     vsf_mmc_transop_t op;
 
     // block_size will be 1 << block_size_bits

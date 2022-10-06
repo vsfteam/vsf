@@ -49,20 +49,20 @@ vsf_class(vsf_mmc_probe_t) {
         uint8_t                     bus_width;
         bool                        uhs_en;
 
-        public_const vsf_mmc_csd_t  csd;
         public_const bool           high_capacity;
         public_const uint8_t        delay_ms;
         public_const uint32_t       version;
         public_const uint32_t       ocr;
-        public_const uint32_t       cid[4];
         public_const uint64_t       capacity;
+        public_const vsf_mmc_csd_t  csd;
+        public_const vsf_mmc_cid_t  cid;
     )
     private_member(
         uint8_t                     state;
-        bool                        is_app_cmd;
-        bool                        is_resp_r1;
-        bool                        is_to_retry;
-        bool                        is_to_ignore_fail;
+        uint8_t                     is_app_cmd : 1;
+        uint8_t                     is_resp_r1 : 1;
+        uint8_t                     is_to_retry : 1;
+        uint8_t                     is_to_ignore_fail : 1;
         uint32_t                    rca;
         uint32_t                    r1_expected_card_status_mask;
         uint32_t                    r1_expected_card_status;

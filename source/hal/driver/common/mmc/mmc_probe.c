@@ -274,10 +274,7 @@ vsf_err_t vsf_mmc_probe_irqhandler(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe,
         trans.op = MMC_ALL_SEND_CID_OP;
         break;
     case VSF_MMC_PROBE_STATE_ALL_SEND_CID:
-        probe->cid[0] = resp[0];
-        probe->cid[1] = resp[1];
-        probe->cid[2] = resp[2];
-        probe->cid[3] = resp[3];
+        probe->cid = *(vsf_mmc_cid_t *)resp;
 
         trans.arg = probe->rca;
         if (IS_MMC(probe->version)) {
