@@ -70,6 +70,7 @@ static void __vk_mmc_mal_on_timer(vsf_callback_timer_t *timer)
     if (pthis->is_probing) {
         vsf_err_t err = vsf_mmc_probe_irqhandler(pthis->mmc, &pthis->use_as__vsf_mmc_probe_t, 0, 0, NULL);
         if (err <= 0) {
+            pthis->is_probing = false;
             vsf_eda_post_evt(pthis->eda, (err < 0) ? VSF_EVT_MMC_ERROR : VSF_EVT_MMC_DONE);
         }
     }
@@ -79,25 +80,38 @@ static void __vk_mmc_mal_irqhandler(void *target, vsf_mmc_t *mmc,
     vsf_mmc_irq_mask_t irq_mask, vsf_mmc_transact_status_t status, uint32_t resp[4])
 {
     vk_mmc_mal_t *pthis = target;
+    vsf_eda_t *eda;
+
     if (pthis->is_probing) {
         vsf_err_t err = vsf_mmc_probe_irqhandler(mmc, &pthis->use_as__vsf_mmc_probe_t, irq_mask, status, resp);
-        if ((err > 0) && (pthis->delay_ms > 0)) {
-            vsf_callback_timer_add_ms(&pthis->timer, pthis->delay_ms);
-        } else if (pthis->eda != NULL) {
+        if (err > 0) {
+            if (pthis->delay_ms > 0) {
+                vsf_callback_timer_add_ms(&pthis->timer, pthis->delay_ms);
+            }
+        } else {
             pthis->is_probing = false;
-            vsf_eda_post_evt(pthis->eda, (err < 0) ? VSF_EVT_MMC_ERROR : VSF_EVT_MMC_DONE);
+            if ((eda = pthis->eda) != NULL) {
+                pthis->eda = NULL;
+                vsf_eda_post_evt(eda, (err < 0) ? VSF_EVT_MMC_ERROR : VSF_EVT_MMC_DONE);
+            }
         }
     } else {
         if (    (status & MMC_TRANSACT_STATUS_ERR_MASK)
             ||  (   (irq_mask & MMC_IRQ_MASK_HOST_RESP_DONE)
-                 && ((resp[0] & R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_MASK)) != R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_TRAN))
+                 && ((resp[0] & (R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_MASK))) != (R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_TRAN)))
                 )
            ) {
             vsf_mmc_host_transact_stop(pthis->mmc);
-            vsf_eda_post_evt(pthis->eda, VSF_EVT_MMC_ERROR);
+            if ((eda = pthis->eda) != NULL) {
+                pthis->eda = NULL;
+                vsf_eda_post_evt(eda, VSF_EVT_MMC_ERROR);
+            }
         }
         if (irq_mask & MMC_IRQ_MASK_HOST_DATA_DONE) {
-            vsf_eda_post_evt(pthis->eda, VSF_EVT_MMC_DONE);
+            if ((eda = pthis->eda) != NULL) {
+                pthis->eda = NULL;
+                vsf_eda_post_evt(eda, VSF_EVT_MMC_DONE);
+            }
         }
     }
 }
@@ -131,7 +145,7 @@ __vsf_component_peda_ifs_entry(__vk_mmc_mal_init, vk_mal_init)
         vsf_mmc_init(pthis->mmc, &(vsf_mmc_cfg_t) {
             .mode   = MMC_MODE_HOST,
             .isr    = {
-                .prio       = pthis->priority,
+                .prio       = pthis->hw_priority,
                 .target_ptr = pthis,
                 .handler_fn = __vk_mmc_mal_irqhandler,
             },

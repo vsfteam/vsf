@@ -183,7 +183,7 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
     bool has_data = ((trans->buffer != NULL) && (trans->count > 0));
     int ch;
     if (has_data) {
-        VSF_HAL_ASSERT(trans->block_size_bits != NULL);
+        VSF_HAL_ASSERT(trans->block_size_bits != 0);
         reg->DBLR = trans->block_size_bits;
         reg->DBCR = trans->count / (1 << trans->block_size_bits);
 

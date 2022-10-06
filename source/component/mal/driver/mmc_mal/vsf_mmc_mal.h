@@ -52,7 +52,7 @@ vsf_class(vk_mmc_mal_t) {
 
     public_member(
         vsf_mmc_t              *mmc;
-        vsf_arch_prio_t         priority;
+        vsf_arch_prio_t         hw_priority;
         implement(vsf_mmc_probe_t)
     )
     private_member(
