@@ -10575,6 +10575,15 @@
                         </file>
                     </group>
                     <group>
+                        <name>mmc_mal</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\mmc_mal\vsf_mmc_mal.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\mmc_mal\vsf_mmc_mal.h</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>scsi_mal</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\scsi_mal\vsf_scsi_mal.c</name>
