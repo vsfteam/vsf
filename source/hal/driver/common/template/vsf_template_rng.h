@@ -90,14 +90,11 @@ struct vsf_rng_t  {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_RNG_CFG_FUNCTION_RENAME == ENABLED
-#   define vsf_rng_init(__RNG, ...)                                             \
-        VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_init)             ((VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_t) *)__RNG, ##__VA_ARGS__)
-#   define vsf_rng_fini(__RNG)                                                  \
-        VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_fini)             ((VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_t) *)__RNG)
-#   define vsf_rng_capability(__RNG)                                            \
-        VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_capability)       ((VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_t) *)__RNG)
-#   define vsf_rng_generate_request(__RNG, ...)                                 \
-        VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_generate_request) ((VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_t) *)__RNG, ##__VA_ARGS__)
+#   define __vsf_rng_t                          VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_t)
+#   define vsf_rng_init(__RNG, ...)             VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_init)             ((__vsf_rng_t *)__RNG, ##__VA_ARGS__)
+#   define vsf_rng_fini(__RNG)                  VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_fini)             ((__vsf_rng_t *)__RNG)
+#   define vsf_rng_capability(__RNG)            VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_capability)       ((__vsf_rng_t *)__RNG)
+#   define vsf_rng_generate_request(__RNG, ...) VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_generate_request) ((__vsf_rng_t *)__RNG, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

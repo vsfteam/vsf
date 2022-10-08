@@ -159,32 +159,20 @@ extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
 /*============================ MACROS ========================================*/
 
 #if VSF_GPIO_CFG_FUNCTION_RENAME == ENABLED
-#   define vsf_gpio_config_pin(__GPIO, ...)                                     \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_config_pin)         ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_set_direction(__GPIO, ...)                                  \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_direction)      ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_get_direction(__GPIO, ...)                                  \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_get_direction)      ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_set_input(__GPIO, ...)                                      \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_input)          ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_set_output(__GPIO, ...)                                     \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_output)         ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_switch_direction(__GPIO, ...)                               \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_switch_direction)   ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_read(__GPIO)                                                \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_read)               ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO)
-#   define vsf_gpio_write(__GPIO, ...)                                          \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_write)              ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_set(__GPIO, ...)                                            \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set)                ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_clear(__GPIO, ...)                                          \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_clear)              ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_output_and_set(__GPIO, ...)                                 \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)     ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_output_and_clear(__GPIO, ...)                               \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)   ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_toggle(__GPIO, ...)                                         \
-        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)             ((VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t) *)__GPIO, ##__VA_ARGS__)
+#   define __vsf_gpio_t                           VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t)
+#   define vsf_gpio_config_pin(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_config_pin)       ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_set_direction(__GPIO, ...)    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_direction)    ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_get_direction(__GPIO, ...)    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_get_direction)    ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_set_input(__GPIO, ...)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_input)        ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_set_output(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_output)       ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_switch_direction(__GPIO, ...) VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_switch_direction) ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_read(__GPIO)                  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_read)             ((__vsf_gpio_t *)__GPIO)
+#   define vsf_gpio_write(__GPIO, ...)            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_write)            ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_set(__GPIO, ...)              VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set)              ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_clear(__GPIO, ...)            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_clear)            ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_output_and_set(__GPIO, ...)   VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)   ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_output_and_clear(__GPIO, ...) VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear) ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_toggle(__GPIO, ...)           VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)           ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

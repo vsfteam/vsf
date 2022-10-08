@@ -324,40 +324,24 @@ extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_USART_CFG_FUNCTION_RENAME == ENABLED
-#   define vsf_usart_init(__USART, ...)                                         \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_init)                     ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
-#   define vsf_usart_enable(__USART)                                            \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_enable)                   ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
-#   define vsf_usart_disable(__USART)                                           \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)                  ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
-#   define vsf_usart_irq_enable(__USART, ...)                                   \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_enable)               ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
-#   define vsf_usart_irq_disable(__USART, ...)                                  \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_disable)              ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
-#   define vsf_usart_status(__USART)                                            \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_status)                   ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
-#   define vsf_usart_rxfifo_get_data_count(__USART, ...)                     \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_rxfifo_get_data_count) ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
-#   define vsf_usart_rxfifo_read(__USART, ...)                                  \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_rxfifo_read)    ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
-#   define vsf_usart_rxfifo_get_data_count(__USART, ...)                     \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_rxfifo_get_data_count) ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
-#   define vsf_usart_txfifo_write(__USART, ...)                                 \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_txfifo_write)               ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
-#   define vsf_usart_fifo_flush(__USART)                                        \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_flush)               ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
-#   define vsf_usart_request_rx(__USART, ...)                                   \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_rx)               ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
-#   define vsf_usart_request_tx(__USART, ...)                                   \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_tx)               ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART, ##__VA_ARGS__)
-#   define vsf_usart_cancel_rx(__USART)                                         \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_rx)                ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
-#   define vsf_usart_cancel_tx(__USART)                                         \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)                ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
-#   define vsf_usart_get_rx_count(__USART)                                      \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)             ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
-#   define vsf_usart_get_tx_count(__USART)                                      \
-        VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)             ((VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t) *)__USART)
+#   define __vsf_usart_t                                 VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t)
+#   define vsf_usart_init(__USART, ...)                  VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_init)                  ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_enable(__USART)                     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_enable)                ((__vsf_usart_t *)__USART)
+#   define vsf_usart_disable(__USART)                    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)               ((__vsf_usart_t *)__USART)
+#   define vsf_usart_irq_enable(__USART, ...)            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_enable)            ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_irq_disable(__USART, ...)           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_disable)           ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_status(__USART)                     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_status)                ((__vsf_usart_t *)__USART)
+#   define vsf_usart_rxfifo_get_data_count(__USART, ...) VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_rxfifo_get_data_count) ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_rxfifo_read(__USART, ...)           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_rxfifo_read)           ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_rxfifo_get_data_count(__USART, ...) VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_rxfifo_get_data_count) ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_txfifo_write(__USART, ...)          VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_txfifo_write)          ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_fifo_flush(__USART)                 VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fifo_flush)            ((__vsf_usart_t *)__USART)
+#   define vsf_usart_request_rx(__USART, ...)            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_rx)            ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_request_tx(__USART, ...)            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_request_tx)            ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_cancel_rx(__USART)                  VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_rx)             ((__vsf_usart_t *)__USART)
+#   define vsf_usart_cancel_tx(__USART)                  VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)             ((__vsf_usart_t *)__USART)
+#   define vsf_usart_get_rx_count(__USART)               VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)          ((__vsf_usart_t *)__USART)
+#   define vsf_usart_get_tx_count(__USART)               VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)          ((__vsf_usart_t *)__USART)
 #endif
 
 #ifdef __cplusplus
