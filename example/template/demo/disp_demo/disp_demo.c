@@ -67,8 +67,6 @@ static void __disp_demo_fps_dump(void)
     elapse = vsf_systimer_tick_to_ms(current_tick - __start_tick);
 
     if (elapse >= 1000) {
-        vsf_trace_info("%lld %lld\n", __start_tick, current_tick);
-        vsf_trace_info("%d %d\n", __refresh_cnt, elapse);
         vsf_trace_info("disp demo, fps: %d" VSF_TRACE_CFG_LINEEND, __refresh_cnt * 1000 / elapse);
         __refresh_cnt = 0;
         __start_tick = current_tick;
