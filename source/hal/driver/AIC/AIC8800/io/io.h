@@ -117,5 +117,8 @@ static inline void __hw_io_reg_mask_write(bool is_pmic, volatile uint32_t *reg,
 #define VSF_IO_CFG_DEC_UPCASE_PREFIX       VSF_HW
 #include "hal/driver/common/io/io_template.h"
 
+#define vsf_hw_io0                          vsf_hw_io
+#define vsf_hw_io1                          vsf_hw_io
+
 #endif /* VSF_HAL_USE_IO */
 #endif /* __HAL_DRIVER_AIC8800_HW_IO_H__ */

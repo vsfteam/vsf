@@ -32,6 +32,11 @@
 #   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_IO_CFG_DEC_UPCASE_PREFIX
 #endif
 
+#define __VSF_HAL_TEMPLATE_DEC_COUNT                1
+#define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                        \
+    extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t) \
+        VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME);
+
 #include "hal/driver/common/template/vsf_template_declaration.h"
 
 #undef VSF_IO_CFG_DEC_PREFIX

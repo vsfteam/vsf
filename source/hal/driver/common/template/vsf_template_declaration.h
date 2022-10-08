@@ -56,9 +56,11 @@ VSF_MCONNECT(VSF, __VSF_HAL_TEMPLATE_UPCASE_NAME, _APIS) (__VSF_HAL_TEMPLATE_PRE
 
 // expand to:
 //  #define __VSF_HAL_TEMPLATE_DEC_LV0  vsf_hw_adc_t vsf_hw_adc_0;
-#   define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                                 \
-        extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)         \
-            VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
+#   ifndef __VSF_HAL_TEMPLATE_DEC_LV0
+#       define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                             \
+            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)     \
+                VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
+#   endif
 
 #   if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 0)
         __VSF_HAL_TEMPLATE_DEC_LV0(0, NULL)
