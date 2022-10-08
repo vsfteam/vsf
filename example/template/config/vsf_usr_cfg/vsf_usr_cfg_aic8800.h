@@ -70,6 +70,7 @@
 #define VSF_HAL_USE_SPI                                 ENABLED
 #define VSF_HAL_USE_USART                               ENABLED
 #define VSF_HAL_USE_FLASH                               ENABLED
+#define VSF_HAL_USE_MMC                                 ENABLED
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
@@ -202,6 +203,7 @@
 #   define VSF_MAL_USE_SCSI_MAL                         ENABLED
 #   define VSF_MAL_USE_FILE_MAL                         ENABLED
 #   define VSF_MAL_USE_HW_FLASH_MAL                     VSF_HAL_USE_FLASH
+#   define VSF_MAL_USE_MMC_MAL                          VSF_HAL_USE_MMC
 
 #define VSF_USE_SCSI                                    ENABLED
 #   define VSF_SCSI_USE_MAL_SCSI                        ENABLED
@@ -375,10 +377,10 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #if APP_USE_DISP_DEMO == ENABLED
 #   define VSF_USE_UI                                   ENABLED
 #   define VSF_DISP_USE_MIPI_LCD                        ENABLED
-#      define APP_DISP_DEMO_SPI                         (vsf_spi_t *)&vsf_spi0
-#      define APP_DISP_DEMO_RESET_GPIO                  (vsf_gpio_t *)&vsf_gpio0
+#      define APP_DISP_DEMO_SPI                         (vsf_spi_t *)&vsf_hw_spi0
+#      define APP_DISP_DEMO_RESET_GPIO                  (vsf_gpio_t *)&vsf_hw_gpio0
 #      define APP_DISP_DEMO_RESET_PIN_MASK              (1 << 5)
-#      define APP_DISP_DEMO_DCX_GPIO                    (vsf_gpio_t *)&vsf_gpio0
+#      define APP_DISP_DEMO_DCX_GPIO                    (vsf_gpio_t *)&vsf_hw_gpio0
 #      define APP_DISP_DEMO_DCX_PIN_MASK                (1 << 6)
 
 #      define APP_DISP_DEMO_HEIGHT                      240
