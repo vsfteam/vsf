@@ -581,7 +581,8 @@ typedef enum vsf_mmc_transact_status_t {
 typedef struct vsf_mmc_status_t {
     union {
         inherit(peripheral_status_t)
-        vsf_mmc_transact_status_t mmc_status;
+        vsf_mmc_transact_status_t transact_status;
+        vsf_mmc_irq_mask_t irq_status;
     };
 } vsf_mmc_status_t;
 #endif

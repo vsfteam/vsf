@@ -137,8 +137,10 @@ void vsf_hw_mmc_irq_disable(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_irq_mask_t irq_mask)
 
 vsf_mmc_status_t vsf_hw_mmc_status(vsf_hw_mmc_t *mmc_ptr)
 {
+    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
     vsf_mmc_status_t status = {
-        0
+        .transact_status    = reg->GSR,
+        .irq_status         = reg->ISR,
     };
     return status;
 }
