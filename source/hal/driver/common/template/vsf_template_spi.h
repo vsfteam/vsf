@@ -345,32 +345,20 @@ extern int_fast32_t     vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SPI_CFG_FUNCTION_RENAME == ENABLED
-#   define vsf_spi_init(__SPI, ...)                                             \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_init)                 ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI, ##__VA_ARGS__)
-#   define vsf_spi_enable(__SPI)                                                \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_enable)               ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI)
-#   define vsf_spi_disable(__SPI)                                               \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_disable)              ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI)
-#   define vsf_spi_irq_enable(__SPI, ...)                                       \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_enable)           ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI, ##__VA_ARGS__)
-#   define vsf_spi_irq_disable(__SPI, ...)                                      \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_disable)          ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI, ##__VA_ARGS__)
-#   define vsf_spi_status(__SPI)                                                \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_status)               ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI)
-#   define vsf_spi_capability(__SPI)                                            \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_capability)           ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI)
-#   define vsf_spi_cs_active(__SPI, ...)                                        \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cs_active)            ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI, ##__VA_ARGS__)
-#   define vsf_spi_cs_inactive(__SPI, ...)                                      \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cs_inactive)          ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI, ##__VA_ARGS__)
-#   define vsf_spi_fifo_transfer(__SPI, ...)                                    \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_fifo_transfer)        ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI, ##__VA_ARGS__)
-#   define vsf_spi_request_transfer(__SPI, ...)                                 \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_request_transfer)     ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI, ##__VA_ARGS__)
-#   define vsf_spi_cancel_transfer(__SPI)                                       \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cancel_transfer)      ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI)
-#   define vsf_spi_get_transfered_count(__SPI)                                  \
-        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_transfered_count) ((VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t) *)__SPI)
+#   define __vsf_spi_t                          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t)
+#   define vsf_spi_init(__SPI, ...)             VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_init)                 ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
+#   define vsf_spi_enable(__SPI)                VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_enable)               ((__vsf_spi_t *)__SPI)
+#   define vsf_spi_disable(__SPI)               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_disable)              ((__vsf_spi_t *)__SPI)
+#   define vsf_spi_irq_enable(__SPI, ...)       VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_enable)           ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
+#   define vsf_spi_irq_disable(__SPI, ...)      VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_disable)          ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
+#   define vsf_spi_status(__SPI)                VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_status)               ((__vsf_spi_t *)__SPI)
+#   define vsf_spi_capability(__SPI)            VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_capability)           ((__vsf_spi_t *)__SPI)
+#   define vsf_spi_cs_active(__SPI, ...)        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cs_active)            ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
+#   define vsf_spi_cs_inactive(__SPI, ...)      VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cs_inactive)          ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
+#   define vsf_spi_fifo_transfer(__SPI, ...)    VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_fifo_transfer)        ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
+#   define vsf_spi_request_transfer(__SPI, ...) VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_request_transfer)     ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
+#   define vsf_spi_cancel_transfer(__SPI)       VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cancel_transfer)      ((__vsf_spi_t *)__SPI)
+#   define vsf_spi_get_transfered_count(__SPI)  VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_transfered_count) ((__vsf_spi_t *)__SPI)
 #endif
 
 #ifdef __cplusplus

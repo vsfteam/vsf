@@ -157,22 +157,15 @@ extern vsf_err_t vsf_rtc_set_time(vsf_rtc_t *rtc_ptr, vsf_rtc_time_t second, vsf
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_RTC_CFG_FUNCTION_RENAME == ENABLED
-#   define vsf_rtc_init(__RTC, ...)                                             \
-        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_init)         ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
-#   define vsf_rtc_enable(__RTC)                                                \
-        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_enable)       ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC)
-#   define vsf_rtc_disable(__RTC)                                               \
-        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_disable)      ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC)
-#   define vsf_rtc_capability(__RTC)                                            \
-        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_capability)   ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC)
-#   define vsf_rtc_get(__RTC, ...)                                              \
-        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get)          ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
-#   define vsf_rtc_set(__RTC, ...)                                              \
-        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set)          ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
-#   define vsf_rtc_get_time(__RTC, ...)                                         \
-        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get_second)   ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
-#   define vsf_rtc_set_time(__RTC, ...)                                         \
-        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set_second)   ((VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t) *)__RTC, ##__VA_ARGS__)
+#   define __vsf_rtc_t                  VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_t)
+#   define vsf_rtc_init(__RTC, ...)     VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_init)         ((__vsf_rtc_t *)__RTC, ##__VA_ARGS__)
+#   define vsf_rtc_enable(__RTC)        VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_enable)       ((__vsf_rtc_t *)__RTC)
+#   define vsf_rtc_disable(__RTC)       VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_disable)      ((__vsf_rtc_t *)__RTC)
+#   define vsf_rtc_capability(__RTC)    VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_capability)   ((__vsf_rtc_t *)__RTC)
+#   define vsf_rtc_get(__RTC, ...)      VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get)          ((__vsf_rtc_t *)__RTC, ##__VA_ARGS__)
+#   define vsf_rtc_set(__RTC, ...)      VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set)          ((__vsf_rtc_t *)__RTC, ##__VA_ARGS__)
+#   define vsf_rtc_get_time(__RTC, ...) VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get_second)   ((__vsf_rtc_t *)__RTC, ##__VA_ARGS__)
+#   define vsf_rtc_set_time(__RTC, ...) VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set_second)   ((__vsf_rtc_t *)__RTC, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

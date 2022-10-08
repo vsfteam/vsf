@@ -152,22 +152,15 @@ extern vsf_err_t vsf_timer_set(vsf_timer_t *timer_ptr, uint32_t count);
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_TIMER_CFG_FUNCTION_RENAME == ENABLED
-#   define vsf_timer_init(__TIME, ...)                                          \
-        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_init)        ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME, ##__VA_ARGS__)
-#   define vsf_timer_enable(__TIME)                                             \
-        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_enable)      ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME)
-#   define vsf_timer_disable(__TIME)                                            \
-        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_disable)     ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME)
-#   define vsf_timer_capability(__TIME)                                         \
-        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_capability)  ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME)
-#   define vsf_timer_irq_enable(__TIME, ...)                                    \
-        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_enable)  ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME, ##__VA_ARGS__)
-#   define vsf_timer_irq_disable(__TIME, ...)                                   \
-        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_disable) ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME, ##__VA_ARGS__)
-#   define vsf_timer_match_set(__TIME, ...)                                     \
-        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_match_set)   ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME, ##__VA_ARGS__)
-#   define vsf_timer_pwm_set(__TIME, ...)                                       \
-        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_pwm_set)     ((VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t) *)__TIME, ##__VA_ARGS__)
+#   define __vsf_timer_t                      VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t)
+#   define vsf_timer_init(__TIME, ...)        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_init)        ((__vsf_timer_t *)__TIME, ##__VA_ARGS__)
+#   define vsf_timer_enable(__TIME)           VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_enable)      ((__vsf_timer_t *)__TIME)
+#   define vsf_timer_disable(__TIME)          VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_disable)     ((__vsf_timer_t *)__TIME)
+#   define vsf_timer_capability(__TIME)       VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_capability)  ((__vsf_timer_t *)__TIME)
+#   define vsf_timer_irq_enable(__TIME, ...)  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_enable)  ((__vsf_timer_t *)__TIME, ##__VA_ARGS__)
+#   define vsf_timer_irq_disable(__TIME, ...) VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_disable) ((__vsf_timer_t *)__TIME, ##__VA_ARGS__)
+#   define vsf_timer_match_set(__TIME, ...)   VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_match_set)   ((__vsf_timer_t *)__TIME, ##__VA_ARGS__)
+#   define vsf_timer_pwm_set(__TIME, ...)     VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_pwm_set)     ((__vsf_timer_t *)__TIME, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

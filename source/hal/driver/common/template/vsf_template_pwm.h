@@ -169,24 +169,16 @@ extern uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr);
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_PWM_CFG_FUNCTION_RENAME == ENABLED
-#   define vsf_pwm_init(__PM, ...)                                              \
-        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_init)       ((VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t) *)__PM, ##__VA_ARGS__)
-#   define vsf_pwm_enable(__PM)                                                 \
-        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_enable)     ((VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t) *)__PM)
-#   define vsf_pwm_disable(__PM)                                                \
-        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_disable)    ((VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t) *)__PM)
-#   define vsf_pwm_capability(__PM)                                             \
-        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_capability) ((VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t) *)__PM)
-#   define vsf_pwm_set(__PM, ...)                                               \
-        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set)        ((VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t) *)__PM, ##__VA_ARGS__)
-#   define vsf_pwm_set_ms(__PM, ...)                                            \
-        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set_ms)     ((VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t) *)__PM, ##__VA_ARGS__)
-#   define vsf_pwm_set_us(__PM, ...)                                            \
-        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set_us)     ((VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t) *)__PM, ##__VA_ARGS__)
-#   define vsf_pwm_set_ns(__PM, ...)                                            \
-        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set_ns)     ((VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t) *)__PM, ##__VA_ARGS__)
-#   define vsf_pwm_get_freq(__PM)                                               \
-        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_get_freq)   ((VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t) *)__PM)
+#   define __vsf_pwm_t               VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t)
+#   define vsf_pwm_init(__PM, ...)   VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_init)       ((__vsf_pwm_t *)__PM, ##__VA_ARGS__)
+#   define vsf_pwm_enable(__PM)      VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_enable)     ((__vsf_pwm_t *)__PM)
+#   define vsf_pwm_disable(__PM)     VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_disable)    ((__vsf_pwm_t *)__PM)
+#   define vsf_pwm_capability(__PM)  VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_capability) ((__vsf_pwm_t *)__PM)
+#   define vsf_pwm_set(__PM, ...)    VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set)        ((__vsf_pwm_t *)__PM, ##__VA_ARGS__)
+#   define vsf_pwm_set_ms(__PM, ...) VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set_ms)     ((__vsf_pwm_t *)__PM, ##__VA_ARGS__)
+#   define vsf_pwm_set_us(__PM, ...) VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set_us)     ((__vsf_pwm_t *)__PM, ##__VA_ARGS__)
+#   define vsf_pwm_set_ns(__PM, ...) VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set_ns)     ((__vsf_pwm_t *)__PM, ##__VA_ARGS__)
+#   define vsf_pwm_get_freq(__PM)    VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_get_freq)   ((__vsf_pwm_t *)__PM)
 #endif
 
 #ifdef __cplusplus

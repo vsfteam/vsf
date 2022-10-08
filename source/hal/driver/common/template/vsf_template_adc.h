@@ -202,24 +202,16 @@ extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_ADC_CFG_FUNCTION_RENAME == ENABLED
-#   define vsf_adc_init(__ADC, ...)                                             \
-        VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_init)                ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC, ##__VA_ARGS__)
-#   define vsf_adc_enable(__ADC)                                                \
-        VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_enable)              ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC)
-#   define vsf_adc_disable(__ADC)                                               \
-        VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_disable)             ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC)
-#   define vsf_adc_capability(__ADC)                                            \
-        VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_capability)          ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC)
-#   define vsf_adc_irq_enable(__ADC)                                            \
-        VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_irq_enable)          ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC)
-#   define vsf_adc_irq_disable(__ADC)                                           \
-        VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_irq_disable)         ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC)
-#   define vsf_adc_channel_request_once(__ADC, ...)                             \
-        VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request_once)((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC, ##__VA_ARGS__)
-#   define vsf_adc_channel_config(__ADC, ...)                                   \
-        VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_config)      ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC, ##__VA_ARGS__)
-#   define vsf_adc_channel_request(__ADC, ...)                                 \
-        VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request)     ((VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t) *)__ADC, buffer_ptr, count)
+#   define __vsf_adc_t                              VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t)
+#   define vsf_adc_init(__ADC, ...)                 VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_init)                 ((__vsf_adc_t *)__ADC, ##__VA_ARGS__)
+#   define vsf_adc_enable(__ADC)                    VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_enable)               ((__vsf_adc_t *)__ADC)
+#   define vsf_adc_disable(__ADC)                   VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_disable)              ((__vsf_adc_t *)__ADC)
+#   define vsf_adc_capability(__ADC)                VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_capability)           ((__vsf_adc_t *)__ADC)
+#   define vsf_adc_irq_enable(__ADC)                VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_irq_enable)           ((__vsf_adc_t *)__ADC)
+#   define vsf_adc_irq_disable(__ADC)               VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_irq_disable)          ((__vsf_adc_t *)__ADC)
+#   define vsf_adc_channel_request_once(__ADC, ...) VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request_once) ((__vsf_adc_t *)__ADC, ##__VA_ARGS__)
+#   define vsf_adc_channel_config(__ADC, ...)       VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_config)       ((__vsf_adc_t *)__ADC, ##__VA_ARGS__)
+#   define vsf_adc_channel_request(__ADC, ...)      VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request)      ((__vsf_adc_t *)__ADC, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
