@@ -72,8 +72,9 @@ extern "C" {
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
 #define __VSF_IO_PORT_PIN_NUM(__PIN_NUM, __PORT_NUM)                            \
-    VSF_P ## __PORT_NUM ## __PIN_NUM = (((uint32_t) PORT ##__PORT_NUM) << 16) | __PIN_NUM,
+    VSF_P ## __PORT_NUM ## __PIN_NUM = (((uint32_t) PORT ##__PORT_NUM) << 8) | __PIN_NUM,
 #define __VSF_IO_PIN_NUM(__N, __NAME)       __NAME ## __N = __N,
 #define __VSF_IO_PIN_MSK(__N, __NAME)       __NAME ## __N ##_MSK = (1ul << (__N)),
 
@@ -161,14 +162,14 @@ typedef enum vsf_io_port_pin_no_t {
 //! io configuration structure
 typedef struct vsf_io_cfg_t {
     union {
-        uint32_t port_pin_index;
+        uint16_t port_pin_index;
         struct {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-            uint16_t pin_index;
-            uint16_t port_index;
+            uint8_t pin_index;
+            uint8_t port_index;
 #else
-            uint16_t port_index;
-            uint16_t pin_index;
+            uint8_t port_index;
+            uint8_t pin_index;
 #endif
         };
     };
@@ -198,6 +199,12 @@ struct vsf_io_t  {
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
+/*============================ PROTOTYPES ====================================*/
+
+extern vsf_err_t vsf_io_config(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast8_t count);
+extern vsf_err_t vsf_io_config_one_pin(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr);
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
 
 #ifndef VSF_IO_GET_PORT_NO_FROM_PIN_NO
 #   define VSF_IO_GET_PORT_NO_FROM_PIN_NO(__p)      ((vsf_io_port_no_t)(__p / VSF_IO_CFG_PORT_MAX_PIN_NUM))

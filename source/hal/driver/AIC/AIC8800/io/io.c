@@ -50,12 +50,12 @@ vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(io_ptr != NULL);
     VSF_HAL_ASSERT(cfg_ptr != NULL);
 
-    uint16_t port_index = cfg_ptr->port_index;
+    uint8_t port_index = cfg_ptr->port_index;
     if (port_index >= VSF_HW_IO_PORT_MAX) {
         VSF_ASSERT(0);
         return VSF_ERR_INVALID_RANGE;
     }
-    uint16_t pin_index = cfg_ptr->pin_index;
+    uint8_t pin_index = cfg_ptr->pin_index;
     if (pin_index >= VSF_HW_IO_PIN_MAX) {
         VSF_ASSERT(0);
         return VSF_ERR_INVALID_RANGE;
@@ -100,7 +100,7 @@ vsf_err_t vsf_hw_io_config(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast
     ((AIC_IOMUX_TypeDef *) VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),
 
 #define VSF_IO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                   \
-    vsf_hw_io_t vsf_hw_io##__COUNT = {                                          \
+    vsf_hw_io_t vsf_hw_io = {                                                   \
         .IOMUX = {                                                              \
             VSF_MREPEAT(VSF_HW_IO_PORT_MAX, __VSF_HW_IOMUX, NULL)               \
         },                                                                      \

@@ -56,7 +56,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_GPIO_APIS(__prefix_name)                                                                                                                                            \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, gpio_capability_t, gpio, capability,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, gpio_capability_t, gpio, capability,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                            \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, config_pin,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)\
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,          gpio, get_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                         \

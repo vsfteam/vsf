@@ -66,7 +66,6 @@
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
 
-#define VSF_HW_IO_COUNT                 1
 #define VSF_HW_IO_PORT_MAX              2
 #define VSF_HW_IO_PIN_MAX               16
 #define VSF_HW_IO_FUNCTION_MAX          10 // All Function 10 ~ Function 15 is invalid
@@ -80,9 +79,9 @@
 
 
 
-#define VSF_HW_RNG_COUNT                   1
-#define VSF_HW_RNG_BITLEN                  32
-#define VSF_HW_RNG0_IRQHandler             TRNG_IRQHandler
+#define VSF_HW_RNG_COUNT            1
+#define VSF_HW_RNG_BITLEN           32
+#define VSF_HW_RNG0_IRQHandler      TRNG_IRQHandler
 #define VSF_HW_RNG0_CONFIG                                                      \
             .reg                    = (void *)AIC_TRNG_BASE,                    \
             .pclk                   = CSC_PCLKME_TRNG_EN_BIT,
