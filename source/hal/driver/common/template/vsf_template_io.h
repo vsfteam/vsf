@@ -31,7 +31,7 @@ extern "C" {
 
 // application code can redefine it
 #ifndef VSF_IO_CFG_PREFIX
-#   if defined(VSF_HW_IO_COUNT) && (VSF_HW_IO_COUNT != 0)
+#   if defined(VSF_HW_IO_PORT_MAX) && (VSF_HW_IO_PORT_MAX != 0)
 #       define VSF_IO_CFG_PREFIX                    vsf_hw
 #   else
 #       define VSF_IO_CFG_PREFIX                    vsf
@@ -219,10 +219,18 @@ extern vsf_err_t vsf_io_config_one_pin(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr);
 /*============================ MACROS ========================================*/
 
 #if VSF_IO_CFG_FUNCTION_RENAME == ENABLED
+#   define __vsf_io_t                 VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_t)
+#   define __vsf_io_config_one_pin    VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_config_one_pin)
+#   define __vsf_io_config            VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_config)
+
 #   define vsf_io_config_one_pin(__IO, ...)                                     \
-        VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_config_one_pin) ((VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_t) *)__IO, ##__VA_ARGS__)
-#   define vsf_io_config(__IO, ...)                                             \
-        VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_config)         ((VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_t) *)__IO, ##__VA_ARGS__)
+        __vsf_io_config_one_pin(__vsf_io_t *)__IO, ##__VA_ARGS__)
+
+#   define __vsf_io_config_eval3(__IO, __CFGS, __CNT)    __vsf_io_config((__vsf_io_t *)__IO, __CFGS, __CNT)
+#   define __vsf_io_config_eval2(__CFGS, __CNT)          __vsf_io_config((__vsf_io_t *)&vsf_hw_io, __CFGS, __CNT)
+#   define vsf_io_config(...)                                                   \
+        __PLOOC_EVAL(__vsf_io_config_eval, __VA_ARGS__)(##__VA_ARGS__)
+
 #endif
 
 #ifdef __cplusplus
