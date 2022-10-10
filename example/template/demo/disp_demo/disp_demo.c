@@ -56,18 +56,20 @@ static NO_INIT vsf_teda_t __disp_task;
 static void __disp_demo_fps_dump(void)
 {
 #if APP_DISP_DEMO_FPS_OUTPUT == ENABLED
+    static uint32_t __dump_cnt;
     static uint32_t __refresh_cnt;
     static vsf_systimer_tick_t __start_tick;
 
-    uint32_t elapse;
+    vsf_systimer_tick_t elapse;
     vsf_systimer_tick_t current_tick;
 
     __refresh_cnt++;
     current_tick = vsf_systimer_get_tick();
-    elapse = vsf_systimer_tick_to_ms(current_tick - __start_tick);
+    elapse = vsf_systimer_get_duration(__start_tick, current_tick);
+    elapse = vsf_systimer_tick_to_ms(elapse);
 
     if (elapse >= 1000) {
-        vsf_trace_info("disp demo, fps: %d" VSF_TRACE_CFG_LINEEND, __refresh_cnt * 1000 / elapse);
+        vsf_trace_info("[%8d]disp demo, fps: %d" VSF_TRACE_CFG_LINEEND, __dump_cnt++, (int)(__refresh_cnt * 1000 / elapse));
         __refresh_cnt = 0;
         __start_tick = current_tick;
     }
