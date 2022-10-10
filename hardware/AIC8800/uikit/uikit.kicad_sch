@@ -3130,7 +3130,7 @@
     (in_bom yes) (on_board yes)
     (uuid 3625a949-0ec7-4992-8b3f-92ea9e8fc090)
     (property "Reference" "C11" (id 0) (at 79.375 129.54 90))
-    (property "Value" "0.1uF" (id 1) (at 78.74 132.08 90))
+    (property "Value" "1.0uF" (id 1) (at 78.74 132.08 90))
     (property "Footprint" "Capacitor_SMD:C_0402_1005Metric" (id 2) (at 86.36 129.8448 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -3904,7 +3904,7 @@
     (in_bom yes) (on_board yes)
     (uuid d3b746a4-24d4-4d94-812d-8fdff5b5d7a6)
     (property "Reference" "C13" (id 0) (at 69.215 142.24 90))
-    (property "Value" "0.1uF" (id 1) (at 68.58 139.065 90))
+    (property "Value" "1.0uF" (id 1) (at 68.58 139.065 90))
     (property "Footprint" "Capacitor_SMD:C_0402_1005Metric" (id 2) (at 76.2 140.0048 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -4204,13 +4204,13 @@
       (reference "C10") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0402_1005Metric")
     )
     (path "/3625a949-0ec7-4992-8b3f-92ea9e8fc090"
-      (reference "C11") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (reference "C11") (unit 1) (value "1.0uF") (footprint "Capacitor_SMD:C_0402_1005Metric")
     )
     (path "/090869a7-5d10-4fc0-b6da-f9a792cb3d45"
       (reference "C12") (unit 1) (value "0.39uF") (footprint "Capacitor_SMD:C_0402_1005Metric")
     )
     (path "/d3b746a4-24d4-4d94-812d-8fdff5b5d7a6"
-      (reference "C13") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (reference "C13") (unit 1) (value "1.0uF") (footprint "Capacitor_SMD:C_0402_1005Metric")
     )
     (path "/76a7f0ab-c33f-4240-89ef-a022300bf5dc"
       (reference "D1") (unit 1) (value "LESD5Z5.0CT1G") (footprint "Diode_SMD:D_SOD-523")
