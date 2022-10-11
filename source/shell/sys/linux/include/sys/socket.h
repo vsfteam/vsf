@@ -15,6 +15,10 @@
 extern "C" {
 #endif
 
+#define	SCM_RIGHTS      0x01
+#define SCM_CREDENTIALS 0x02
+#define SCM_SECURITY    0x03
+
 // protocol families
 // refer: https://code.woboq.org/gtk/include/bits/socket.h.html
 #define PF_UNSPEC       0
@@ -141,6 +145,30 @@ struct msghdr {
     size_t              msg_controllen;
     int                 msg_flags;
 };
+
+#define CMSG_ALIGN(len) (((len)+sizeof(long)-1) & ~(sizeof(long)-1))
+#define CMSG_SPACE(len) (sizeof(struct cmsghdr) + CMSG_ALIGN(len))
+#define CMSG_LEN(len)   (sizeof(struct cmsghdr) + (len))
+#define CMSG_DATA(cmsg) ((void *)(cmsg) + sizeof(struct cmsghdr))
+#define CMSG_FIRSTHDR(msg)                                                      \
+            ((msg)->msg_controllen >= sizeof(struct cmsghdr) ?                  \
+                (struct cmsghdr *)(msg)->msg_control                            \
+            :   (struct cmsghdr *)NULL)
+struct cmsghdr {
+    size_t              cmsg_len;
+    int                 cmsg_level;
+    int                 cmsg_type;
+};
+static inline struct cmsghdr * CMSG_NXTHDR(struct msghdr *__msg, struct cmsghdr *__cmsg)
+{
+    struct cmsghdr * __ptr;
+
+	__ptr = (struct cmsghdr*)(((unsigned char *) __cmsg) +  CMSG_ALIGN(__cmsg->cmsg_len));
+	if ((unsigned long)((char*)(__ptr+1) - (char *)__msg->msg_control) > __msg->msg_controllen)
+		return (struct cmsghdr *)0;
+
+	return __ptr;
+}
 
 // how for shutdown
 enum {
