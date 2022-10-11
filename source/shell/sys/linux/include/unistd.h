@@ -122,6 +122,8 @@ enum {
     _SC_PAGESIZE,
     _SC_OPEN_MAX,
     _SC_CLK_TCK,
+
+    _SC_PAGE_SIZE = _SC_PAGESIZE,
 };
 
 // workaround while using lwip, which will check iovec MACRO and define iovec if not defined

@@ -51,6 +51,7 @@ typedef struct {
     uid_t si_uid;
     int si_errno;
     int si_status;
+    int si_fd;
 } siginfo_t;
 
 struct sigaction {
