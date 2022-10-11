@@ -1910,6 +1910,11 @@ int alphasort(const struct dirent **a, const struct dirent **b)
     return strcmp((*a)->d_name, (*b)->d_name);
 }
 
+int versionsort(const struct dirent **a, const struct dirent **b)
+{
+    return strverscmp((*a)->d_name, (*b)->d_name);
+}
+
 long telldir(DIR *dir)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)dir->priv;

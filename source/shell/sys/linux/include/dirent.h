@@ -49,6 +49,7 @@ typedef struct vsf_linux_dirent_vplt_t {
               int (*filter)(const struct dirent *),
               int (*compare)(const struct dirent **, const struct dirent **));
     int (*alphasort)(const struct dirent **a, const struct dirent **b);
+    int (*versionsort)(const struct dirent **a, const struct dirent **b);
 } vsf_linux_dirent_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt;
@@ -96,6 +97,9 @@ static inline int scandir(const char *dir, struct dirent ***namelist,
 static inline int alphasort(const struct dirent **a, const struct dirent **b) {
     return VSF_LINUX_APPLET_DIRENT_VPLT->alphasort(a, b);
 }
+static inline int versionsort(const struct dirent **a, const struct dirent **b) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->versionsort(a, b);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_DIRENT
 
@@ -110,6 +114,7 @@ int scandir(const char *dir, struct dirent ***namelist,
               int (*filter)(const struct dirent *),
               int (*compare)(const struct dirent **, const struct dirent **));
 int alphasort(const struct dirent **a, const struct dirent **b);
+int versionsort(const struct dirent **a, const struct dirent **b);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_DIRENT
 
