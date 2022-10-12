@@ -15,57 +15,37 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_LINUX_FS_DEVFS_INTERNAL_H__
-#define __VSF_LINUX_FS_DEVFS_INTERNAL_H__
+#ifndef __VSF_LINUX_FS_DEVFS_ALSA_INTERNAL_H__
+#define __VSF_LINUX_FS_DEVFS_ALSA_INTERNAL_H__
 
 /*============================ INCLUDES ======================================*/
 
-#include "../../../../vsf_linux_cfg.h"
+#include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_DEVFS == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_DEVFS == ENABLED && VSF_LINUX_DEVFS_USE_ALSA == ENABLED
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#if VSF_USE_AUDIO != ENABLED
+#   error need VSF_USE_AUDIO
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_HAL_USE_USART == ENABLED
-extern int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart);
-#endif
-#if VSF_HAL_USE_I2C == ENABLED
-extern int vsf_linux_fs_bind_i2c(char *path, vsf_i2c_t *i2c);
-#endif
-#if VSF_HAL_USE_SPI == ENABLED
-extern int vsf_linux_fs_bind_spi(char *path, vsf_spi_t *spi);
-#endif
-
-#if VSF_USE_MAL == ENABLED
-extern int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal);
-#endif
-#if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
-extern int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier);
-#endif
-#if VSF_USE_UI == ENABLED
-extern int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp);
-#endif
-extern int vsf_linux_devfs_init(void);
+extern int vsf_linux_fs_bind_audio(char *path, int card_idx, vk_audio_dev_t *audio_dev);
 
 #ifdef __cplusplus
 }
 #endif
 
-/*============================ INCLUDES ======================================*/
-
-#if VSF_LINUX_DEVFS_USE_ALSA == ENABLED
-#   include "./alsa/vsf_linux_devfs_alsa.h"
-#endif
-
-#endif      // VSF_USE_LINUX && VSF_LINUX_USE_DEVFS
-#endif      // __VSF_LINUX_FS_DEV_INTERNAL_H__
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_DEVFS && VSF_LINUX_DEVFS_USE_ALSA
+#endif      // __VSF_LINUX_FS_DEVFS_ALSA_INTERNAL_H__
 /* EOF */

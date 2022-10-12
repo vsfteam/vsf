@@ -1402,6 +1402,7 @@ __open_again:
         if ((flags & O_TRUNC) && (flags & (O_RDWR | O_WRONLY))) {
             ftruncate(fd, 0);
         }
+        file->pos = 0;
     }
     return fd;
 }
@@ -1462,7 +1463,9 @@ int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
 
     int err = 0;
     if (is_to_close) {
-        err = sfd->op->fn_close(sfd);
+        if (sfd->op->fn_close != NULL) {
+            err = sfd->op->fn_close(sfd);
+        }
         // priv of fd does not belong to the process
         __free_ex(vsf_linux_resources_process(), sfd->priv);
     }

@@ -44,7 +44,6 @@
 #   include <unistd.h>
 #   include <errno.h>
 #   include <poll.h>
-#   include <poll.h>
 #   include <termios.h>
 #   include <sys/ioctl.h>
 #   include <sys/stat.h>
@@ -67,9 +66,6 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-
-extern int __vsf_linux_create_open_path(char *path);
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
