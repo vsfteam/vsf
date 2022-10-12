@@ -62,6 +62,9 @@ typedef struct vsf_linux_libc_string_vplt_t {
     void * (*memchr)(const void *buf, int ch, size_t count);
     int (*strverscmp)(const char *str1, const char *str2);
     char * (*strndup)(const char *str, size_t n);
+    char * (*strsignal)(int sig);
+    const char * (*sigdescr_np)(int sig);
+    const char * (*sigabbrev_np)(int sig);
 } vsf_linux_libc_string_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt;
@@ -170,6 +173,15 @@ static inline int strverscmp(const char *str1, const char *str2) {
 static inline char * strndup(const char *str, size_t n) {
     return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strndup(str, n);
 }
+static inline char * strsignal(int sig) {
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strsignal(sig);
+}
+static inline const char * sigdescr_np(int sig) {
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->sigdescr_np(sig);
+}
+static inline const char * sigabbrev_np(int sig) {
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->sigabbrev_np(str, n);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STRING
 
@@ -229,6 +241,10 @@ _CONST_RETURN char * strrchr(const char *str, int c);
 void * memmove(void *dest, const void *src, size_t n);
 int memcmp(const void *str1, const void *str2, size_t n);
 _CONST_RETURN void * memchr(const void *buf, int ch, size_t count);
+
+char * strsignal(int sig);
+const char * sigdescr_np(int sig);
+const char * sigabbrev_np(int sig);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STRING
 

@@ -115,6 +115,19 @@ int strverscmp(const char *str1, const char *str2)
     return 0;
 }
 
+char * strsignal(int sig)
+{
+    return "unknown";
+}
+const char * sigdescr_np(int sig)
+{
+    return "unknown";
+}
+const char * sigabbrev_np(int sig)
+{
+    return "unknown";
+}
+
 #if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED && !defined(__VSF_APPLET__)
 #   define VSF_LINUX_APPLET_LIBC_STRING_FUNC(__FUNC)        .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt = {
@@ -148,6 +161,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt =
     VSF_LINUX_APPLET_LIBC_STRING_FUNC(memmove),
     VSF_LINUX_APPLET_LIBC_STRING_FUNC(memcmp),
     VSF_LINUX_APPLET_LIBC_STRING_FUNC(memchr),
+    VSF_LINUX_APPLET_LIBC_STRING_FUNC(strsignal),
+    VSF_LINUX_APPLET_LIBC_STRING_FUNC(sigdescr_np),
+    VSF_LINUX_APPLET_LIBC_STRING_FUNC(sigabbrev_np),
 };
 #endif
 

@@ -196,9 +196,6 @@ int vsf_linux_fs_bind_target_ex(const char *pathname,
         uint_fast32_t feature, uint64_t size);
 extern int vsf_linux_fs_get_target(const char *pathname, void **target);
 
-extern int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
-        uint_fast32_t feature, uint64_t size);
-
 extern int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
 extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
 extern void vsf_linux_fd_delete(int fd);
@@ -229,6 +226,9 @@ extern vsf_stream_t * vsf_linux_get_tx_stream(vsf_linux_fd_t *sfd);
 extern vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream);
 extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_rx_priv_t *priv_rx);
 #endif
+
+extern int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
+        uint_fast32_t feature, uint64_t size);
 
 #ifdef __cplusplus
 }

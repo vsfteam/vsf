@@ -217,6 +217,8 @@ typedef struct vsf_linux_unistd_vplt_t {
     int (*fchownat)(int dirfd, const char *pathname, uid_t owner, gid_t group, int flags);
 
     int (*getentropy)(void *buffer, size_t length);
+
+    off64_t (*lseek64)(int fd, off64_t offset, int whence);
 } vsf_linux_unistd_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt;
@@ -447,6 +449,10 @@ static inline int getentropy(void *buffer, size_t length) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->getentropy(buffer, length);
 }
 
+static inline off64_t lseek64(int fd, off64_t offset, int whence) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->lseek64(fd, offset, whence);
+}
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_UNISTD
 
 int usleep(int micro_seconds);
@@ -499,6 +505,7 @@ char * getcwd(char *buffer, size_t maxlen);
 
 int close(int fd);
 off_t lseek(int fd, off_t offset, int whence);
+off64_t lseek64(int fd, off64_t offset, int whence);
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);
 ssize_t readv(int fd, const struct iovec *iov, int iovcnt);

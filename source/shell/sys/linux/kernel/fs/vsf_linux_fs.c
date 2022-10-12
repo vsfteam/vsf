@@ -1621,7 +1621,7 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
     return size;
 }
 
-off_t lseek(int fd, off_t offset, int whence)
+off64_t lseek64(int fd, off64_t offset, int whence)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     VSF_LINUX_ASSERT(sfd->op == &__vsf_linux_fs_fdop);
@@ -1629,6 +1629,11 @@ off_t lseek(int fd, off_t offset, int whence)
 
     vk_file_seek(priv->file, offset, whence);
     return vk_file_tell(priv->file);
+}
+
+off_t lseek(int fd, off_t offset, int whence)
+{
+    return (off_t)lseek64(fd, (off64_t)offset, whence);
 }
 
 int futimes(int fd, const struct timeval tv[2])
