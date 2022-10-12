@@ -82,6 +82,7 @@ static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *bu
 static int __vsf_linux_socket_unix_close(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_socket_unix_init(vsf_linux_fd_t *sfd);
+static int __vsf_linux_socket_unix_socketpair(vsf_linux_fd_t *rsfd, vsf_linux_fd_t *wsfd);
 static int __vsf_linux_socket_unix_fini(vsf_linux_socket_priv_t *socket_priv, int how);
 static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen);
 static int __vsf_linux_socket_unix_listen(vsf_linux_socket_priv_t *socket_priv, int backlog);
@@ -103,6 +104,7 @@ const vsf_linux_socket_op_t vsf_linux_socket_unix_op = {
     },
 
     .fn_init            = __vsf_linux_socket_unix_init,
+    .fn_socketpair      = __vsf_linux_socket_unix_socketpair,
     .fn_fini            = __vsf_linux_socket_unix_fini,
     .fn_connect         = __vsf_linux_socket_unix_connect,
     .fn_listen          = __vsf_linux_socket_unix_listen,
@@ -397,6 +399,30 @@ static int __vsf_linux_socket_unix_getsockopt(vsf_linux_socket_priv_t *socket_pr
 
 static int __vsf_linux_socket_unix_setsockopt(vsf_linux_socket_priv_t *socket_priv, int level, int optname,const void *optval, socklen_t optlen)
 {
+    return 0;
+}
+
+static int __vsf_linux_socket_unix_socketpair(vsf_linux_fd_t *rsfd, vsf_linux_fd_t *wsfd)
+{
+    vsf_linux_socket_unix_priv_t *priv_rx = (vsf_linux_socket_unix_priv_t *)rsfd->priv;
+    vsf_linux_socket_unix_priv_t *priv_tx = (vsf_linux_socket_unix_priv_t *)wsfd->priv;
+
+    vsf_linux_fd_t *sfd_rx = vsf_linux_rx_pipe(NULL);
+    if (NULL == sfd_rx) {
+        return -1;
+    }
+    fcntl(sfd_rx->fd, F_SETFL, priv_rx->flags);
+    vsf_linux_pipe_rx_priv_t *priv_rxpipe = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+    priv_rxpipe->on_evt = __vsf_linux_socket_unix_pipe_on_rx_evt;
+    priv_rxpipe->target = priv_rx;
+
+    vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_rx_priv_t *)sfd_rx->priv);
+    if (NULL == sfd_tx) {
+        return -1;
+    }
+
+    priv_rx->rw.sfd_tx = sfd_tx;
+    priv_tx->rw.sfd_rx = sfd_rx;
     return 0;
 }
 

@@ -71,7 +71,12 @@ typedef struct vsf_linux_fd_op_t {
 
 vsf_class(vsf_linux_fd_priv_t) {
     protected_member(
+        // target is used in socket_unix to indicate target rx vsf_linux_fd_priv_t,
+        //  ofc it can be used in other fd types
         void *target;
+        // msg is used in socket_unix to indicate message for sendmsg/recvmsg,
+        //  ofc it can be used in other fd types
+        void *msg;
         int flags;
 
         short status;

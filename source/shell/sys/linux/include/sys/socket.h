@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#define	SCM_RIGHTS      0x01
+#define SCM_RIGHTS      0x01
 #define SCM_CREDENTIALS 0x02
 #define SCM_SECURITY    0x03
 
@@ -181,29 +181,29 @@ enum {
 typedef struct vsf_linux_sys_socket_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*setsockopt)(int socket, int level, int optname, const void *optval,
+    int (*setsockopt)(int sockfd, int level, int optname, const void *optval,
                     socklen_t optlen);
-    int (*getsockopt)(int socket, int level, int optname, void *optval,
+    int (*getsockopt)(int sockfd, int level, int optname, void *optval,
                     socklen_t *optlen);
 
-    int (*getpeername)(int socket, struct sockaddr *addr, socklen_t *addrlen);
-    int (*getsockname)(int socket, struct sockaddr *addr, socklen_t *addrlen);
+    int (*getpeername)(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+    int (*getsockname)(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
-    int (*accept)(int socket, struct sockaddr *addr, socklen_t *addrlen);
-    int (*bind)(int socket, const struct sockaddr *addr, socklen_t addrlen);
-    int (*connect)(int socket, const struct sockaddr *addr, socklen_t addrlen);
-    int (*listen)(int socket, int backlog);
+    int (*accept)(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+    int (*bind)(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+    int (*connect)(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+    int (*listen)(int sockfd, int backlog);
 
-    ssize_t (*recv)(int socket, void *buffer, size_t length, int flags);
+    ssize_t (*recv)(int sockfd, void *buffer, size_t length, int flags);
     ssize_t (*recvmsg)(int sockfd, struct msghdr *msg, int flags);
-    ssize_t (*recvfrom)(int socket, void *buffer, size_t length, int flags,
+    ssize_t (*recvfrom)(int sockfd, void *buffer, size_t length, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen);
-    ssize_t (*send)(int socket, const void *message, size_t length, int flags);
-    ssize_t (*sendmsg)(int socket, const struct msghdr *msg, int flags);
-    ssize_t (*sendto)(int socket, const void *message, size_t length, int flags,
+    ssize_t (*send)(int sockfd, const void *message, size_t length, int flags);
+    ssize_t (*sendmsg)(int sockfd, const struct msghdr *msg, int flags);
+    ssize_t (*sendto)(int sockfd, const void *message, size_t length, int flags,
                     const struct sockaddr *dest_addr, socklen_t addrlen);
 
-    int (*shutdown)(int socket, int how);
+    int (*shutdown)(int sockfd, int how);
     int (*socket)(int domain, int type, int protocol);
     int (*socketpair)(int domain, int type, int protocol, int socket_vector[2]);
 } vsf_linux_sys_socket_vplt_t;
@@ -224,92 +224,91 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_v
 #   endif
 #endif
 
-static inline int setsockopt(int socket, int level, int optname, const void *optval, socklen_t optlen) {
+static inline int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->setsockopt(socket, level, optname, optval, optlen);
 }
-static inline int getsockopt(int socket, int level, int optname, void *optval, socklen_t *optlen) {
+static inline int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->getsockopt(socket, level, optname, optval, optlen);
 }
 
-static inline int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen) {
+static inline int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->getpeername(socket, addr, addrlen);
 }
-static inline int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen) {
+static inline int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->getsockname(socket, addr, addrlen);
 }
 
-static inline int accept(int socket, struct sockaddr *addr, socklen_t *addrlen) {
+static inline int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->accept(socket, addr, addrlen);
 }
-static inline int bind(int socket, const struct sockaddr *addr, socklen_t addrlen) {
+static inline int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->bind(socket, addr, addrlen);
 }
-static inline int connect(int socket, const struct sockaddr *addr, socklen_t addrlen) {
+static inline int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->connect(socket, addr, addrlen);
 }
-static inline int listen(int socket, int backlog) {
+static inline int listen(int sockfd, int backlog) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->listen(socket, backlog);
 }
 
-static inline ssize_t recv(int socket, void *buffer, size_t length, int flags) {
+static inline ssize_t recv(int sockfd, void *buffer, size_t length, int flags) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recv(socket, buffer, length, flags);
 }
-//static inline ssize_t recvmsg(int socket, struct msghdr *msg, int flags) {
-//    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recvmsg(socket, msg, flags);
-//}
-static inline ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
+static inline ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags) {
+    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recvmsg(socket, msg, flags);
+}
+static inline ssize_t recvfrom(int sockfd, void *buffer, size_t length, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->recvfrom(socket, buffer, length, flags,
                     src_addr, addrlen);
 }
-static inline ssize_t send(int socket, const void *buffer, size_t length, int flags) {
+static inline ssize_t send(int sockfd, const void *buffer, size_t length, int flags) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->send(socket, buffer, length, flags);
 }
-//static inline ssize_t sendmsg(int socket, const struct msghdr *msg, int flags) {
-//    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->sendmsg(socket, msg, flags);
-//}
-static inline ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
+static inline ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags) {
+    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->sendmsg(socket, msg, flags);
+}
+static inline ssize_t sendto(int sockfd, const void *buffer, size_t length, int flags,
                     const struct sockaddr *dest_addr, socklen_t addrlen) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->sendto(socket, buffer, length, flags,
                     dest_addr, addrlen);
 }
 
-static inline int shutdown(int socket, int how) {
+static inline int shutdown(int sockfd, int how) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->shutdown(socket, how);
 }
 static inline int socket(int domain, int type, int protocol) {
     return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->socket(domain, type, protocol);
 }
-// TODO: add socketpair if supported
-//static inline int socketpair(int domain, int type, int protocol, int socket_vector[2]) {
-//    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->socketpair(domain, type, protocol, socket_vector);
-//}
+static inline int socketpair(int domain, int type, int protocol, int socket_vector[2]) {
+    return VSF_LINUX_APPLET_SYS_SOCKET_VPLT->socketpair(domain, type, protocol, socket_vector);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SOCKET
 
-int setsockopt(int socket, int level, int optname, const void *optval,
+int setsockopt(int sockfd, int level, int optname, const void *optval,
                     socklen_t optlen);
-int getsockopt(int socket, int level, int optname, void *optval,
+int getsockopt(int sockfd, int level, int optname, void *optval,
                     socklen_t *optlen);
 
-int getpeername(int socket, struct sockaddr *addr, socklen_t *addrlen);
-int getsockname(int socket, struct sockaddr *addr, socklen_t *addrlen);
+int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
-int accept(int socket, struct sockaddr *addr, socklen_t *addrlen);
-int bind(int socket, const struct sockaddr *addr, socklen_t addrlen);
-int connect(int socket, const struct sockaddr *addr, socklen_t addrlen);
-int listen(int socket, int backlog);
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+int listen(int sockfd, int backlog);
 
-ssize_t recv(int socket, void *buffer, size_t length, int flags);
-ssize_t recvmsg(int socket, struct msghdr *msg, int flags);
-ssize_t recvfrom(int socket, void *buffer, size_t length, int flags,
+ssize_t recv(int sockfd, void *buffer, size_t length, int flags);
+ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags);
+ssize_t recvfrom(int sockfd, void *buffer, size_t length, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen);
-ssize_t send(int socket, const void *buffer, size_t length, int flags);
-ssize_t sendmsg(int socket, const struct msghdr *msg, int flags);
-ssize_t sendto(int socket, const void *buffer, size_t length, int flags,
+ssize_t send(int sockfd, const void *buffer, size_t length, int flags);
+ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);
+ssize_t sendto(int sockfd, const void *buffer, size_t length, int flags,
                     const struct sockaddr *dest_addr, socklen_t addrlen);
 
-int shutdown(int socket, int how);
+int shutdown(int sockfd, int how);
 int socket(int domain, int type, int protocol);
 int socketpair(int domain, int type, int protocol, int socket_vector[2]);
 
