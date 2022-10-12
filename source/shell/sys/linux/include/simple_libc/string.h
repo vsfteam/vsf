@@ -25,6 +25,7 @@ extern "C" {
 
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
 #define strdup              VSF_LINUX_LIBC_WRAPPER(strdup)
+#define strndup             VSF_LINUX_LIBC_WRAPPER(strndup)
 #endif
 
 #if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED
@@ -60,6 +61,7 @@ typedef struct vsf_linux_libc_string_vplt_t {
     int (*memcmp)(const void *str1, const void *str2, size_t n);
     void * (*memchr)(const void *buf, int ch, size_t count);
     int (*strverscmp)(const char *str1, const char *str2);
+    char * (*strndup)(const char *str, size_t n);
 } vsf_linux_libc_string_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt;
@@ -165,6 +167,9 @@ static inline void * memchr(const void *buf, int ch, size_t count) {
 static inline int strverscmp(const char *str1, const char *str2) {
     return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strverscmp(str1, str2);
 }
+static inline char * strndup(const char *str, size_t n) {
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->strndup(str, n);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STRING
 
@@ -176,6 +181,7 @@ int strcmp(const char *str1, const char *str2);
 int strncmp(const char *str1, const char *str2, size_t n);
 int strverscmp(const char *str1, const char *str2);
 char * strdup(const char *str);
+char * strndup(const char *str, size_t n);
 char * strcpy(char *dest, const char *src);
 char * strncpy(char *dest, const char *src, size_t n);
 char * strcat(char *dest, const char *src);

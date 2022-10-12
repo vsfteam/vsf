@@ -73,6 +73,32 @@ char * strdup(const char *str)
 #endif
 }
 
+char * strndup(const char *str, size_t n)
+{
+    const char *p;
+    char *r;
+
+    if (NULL == str) {
+        return NULL;
+    }
+
+    p = str;
+    while (n > 0) {
+        if (*p == 0) {
+            break;
+        }
+        p++;
+        n--;
+    }
+    n = (p - str);
+    r = __malloc_ex(NULL, 1 + n);
+    if (r != NULL) {
+        memcpy(r, str, n);
+        r[n] = '\0';
+    }
+    return r;
+}
+
 char * strerror(int errnum)
 {
     return "unknown";
