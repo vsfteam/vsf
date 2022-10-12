@@ -28,6 +28,12 @@ struct passwd {
 
 extern const struct passwd __vsf_default_passwd;
 
+static inline int getpwuid_r(uid_t uid, struct passwd *pwd,
+        char *buffer, size_t bufsize, struct passwd **result)
+{
+    return 0;
+}
+
 #ifdef __cplusplus
 }
 #endif

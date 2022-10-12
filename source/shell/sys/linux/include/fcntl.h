@@ -29,7 +29,8 @@ extern "C" {
 #define O_TRUNC         0x0400
 #define O_EXCL          0x0800
 #define O_CLOEXEC       0x1000
-#define O_ASYNC         0x2000
+#define O_SYNC          0x2000
+#define O_ASYNC         0x4000
 
 #define O_NOCTTY        0x2000
 #define O_NDELAY        O_NONBLOCK

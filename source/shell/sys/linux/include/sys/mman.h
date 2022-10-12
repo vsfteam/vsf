@@ -63,10 +63,14 @@ void * mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off);
 int munmap(void *addr, size_t len);
 int mprotect(void *addr, size_t len, int prot);
 int msync(void *addr, size_t len, int flags);
-int mlock(const void *addr, size_t len);
-int munlock(const void *addr, size_t len);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_MMAP
+
+static inline int mlock(const void *addr, size_t len) { return 0; }
+static inline int mlock2(const void *addr, size_t len, unsigned int flags) { return 0; }
+static inline int munlock(const void *addr, size_t len) { return 0; }
+static inline int mlockall(int flags) { return 0; }
+static inline int munlockall(void) { return 0; }
 
 #ifdef __cplusplus
 }

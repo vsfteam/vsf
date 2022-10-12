@@ -117,6 +117,7 @@ enum {
 #define getuid()                    ((uid_t)0)
 #define setuid(__uid)               (0)
 #define geteuid()                   ((uid_t)0)
+#define setsid()                    ((pid_t)0)
 
 enum {
     _SC_PAGESIZE,
