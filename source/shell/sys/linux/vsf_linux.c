@@ -34,6 +34,7 @@
 #   include "./include/signal.h"
 #   include "./include/sys/wait.h"
 #   include "./include/sys/ipc.h"
+#   include "./include/sys/sem.h"
 #   include "./include/sys/mman.h"
 #   include "./include/sys/shm.h"
 #   include "./include/sys/random.h"
@@ -54,6 +55,7 @@
 #   include <signal.h>
 #   include <sys/wait.h>
 #   include <sys/ipc.h>
+#   include <sys/sem.h>
 #   include <sys/mman.h>
 #   include <sys/shm.h>
 #   include <sys/random.h>
@@ -1781,6 +1783,32 @@ void * memalign(size_t alignment, size_t size)
 
 // ipc.h
 key_t ftok(const char *pathname, int id)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+// sys/sem.h
+int semctl(int semid, int semnum, int cmd, ...)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int semget(key_t key, int nsems, int semflg)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int semop(int semid, struct sembuf *sops, size_t nsops)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int semtimedop(int semid, struct sembuf *sops, size_t nsops,
+                    const struct timespec *timeout)
 {
     VSF_LINUX_ASSERT(false);
     return -1;

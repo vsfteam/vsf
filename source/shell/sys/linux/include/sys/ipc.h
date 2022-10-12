@@ -17,7 +17,7 @@ extern "C" {
 enum {
     IPC_CREAT               = 1 << 12,
     IPC_EXCL                = 2 << 12,
-    IPC_NOEAIT              = 4 << 12,
+    IPC_NOWAIT              = 4 << 12,
 };
 enum {
     IPC_RMID,

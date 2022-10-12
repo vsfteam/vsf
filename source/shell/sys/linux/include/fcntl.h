@@ -29,6 +29,7 @@ extern "C" {
 #define O_TRUNC         0x0400
 #define O_EXCL          0x0800
 #define O_CLOEXEC       0x1000
+#define O_ASYNC         0x2000
 
 #define O_NOCTTY        0x2000
 #define O_NDELAY        O_NONBLOCK
@@ -44,6 +45,11 @@ extern "C" {
 #define F_GETLK         8
 #define F_SETLK         9
 #define F_SETLKW        10
+#define F_GETOWN        11
+#define F_SETOWN        12
+#define F_GETSIG        13
+#define F_SETSIG        14
+#define F_USER          16
 // for ioctrl
 #define F_IO            16
 
