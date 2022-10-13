@@ -113,6 +113,7 @@ static void __disp_demo_evthandler(vsf_eda_t* eda, vsf_evt_t evt)
 
     vk_disp_t * disp = usrapp_ui_common.disp;
     VSF_ASSERT(NULL != eda);
+    vsf_err_t err;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -123,7 +124,8 @@ static void __disp_demo_evthandler(vsf_eda_t* eda, vsf_evt_t evt)
 
     case VSF_EVT_MESSAGE:
         __disp_demo_update_buffer(__color_buf, dimof(__color_buf));
-        vk_disp_refresh(disp, &__disp_area, __color_buf);
+        err = vk_disp_refresh(disp, &__disp_area, __color_buf);
+        VSF_ASSERT(err == VSF_ERR_NONE);
         __disp_demo_fps_dump();
         break;
     }
