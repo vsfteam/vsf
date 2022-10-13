@@ -305,40 +305,62 @@ end_def_interface(i_spi_t)
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t        vsf_spi_init(               vsf_spi_t *spi_ptr,
-                                                    vsf_spi_cfg_t *cfg_ptr);
+extern vsf_err_t            vsf_spi_init(               vsf_spi_t *spi_ptr,
+                                                        vsf_spi_cfg_t *cfg_ptr);
 
-extern fsm_rt_t         vsf_spi_enable(             vsf_spi_t *spi_ptr);
-extern fsm_rt_t         vsf_spi_disable(            vsf_spi_t *spi_ptr);
+extern fsm_rt_t             vsf_spi_enable(             vsf_spi_t *spi_ptr);
+extern fsm_rt_t             vsf_spi_disable(            vsf_spi_t *spi_ptr);
 
-extern void             vsf_spi_irq_enable(         vsf_spi_t *spi_ptr,
-                                                    vsf_spi_irq_mask_t irq_mask);
-extern void             vsf_spi_irq_disable(        vsf_spi_t *spi_ptr,
-                                                    vsf_spi_irq_mask_t irq_mask);
+extern void                 vsf_spi_irq_enable(         vsf_spi_t *spi_ptr,
+                                                        vsf_spi_irq_mask_t irq_mask);
+extern void                 vsf_spi_irq_disable(        vsf_spi_t *spi_ptr,
+                                                        vsf_spi_irq_mask_t irq_mask);
 
-extern void             vsf_spi_cs_active(          vsf_spi_t *spi_ptr,
-                                                    uint_fast8_t index);
-extern void             vsf_spi_cs_inactive(        vsf_spi_t *spi_ptr,
-                                                    uint_fast8_t index);
+extern void                 vsf_spi_cs_active(          vsf_spi_t *spi_ptr,
+                                                        uint_fast8_t index);
+extern void                 vsf_spi_cs_inactive(        vsf_spi_t *spi_ptr,
+                                                        uint_fast8_t index);
 
 extern vsf_spi_status_t     vsf_spi_status(             vsf_spi_t *spi_ptr);
 
 extern vsf_spi_capability_t vsf_spi_capability(         vsf_spi_t *spi_ptr);
 
-extern void             vsf_spi_fifo_transfer(      vsf_spi_t *spi_ptr,
-                                                    void *out_buffer_ptr,
-                                                    uint_fast32_t  out_cnt,
-                                                    uint_fast32_t* out_offset_ptr,
-                                                    void *in_buffer_ptr,
-                                                    uint_fast32_t  in_cnt,
-                                                    uint_fast32_t* in_offset_ptr);
+extern void                 vsf_spi_fifo_transfer(      vsf_spi_t *spi_ptr,
+                                                        void *out_buffer_ptr,
+                                                        uint_fast32_t  out_cnt,
+                                                        uint_fast32_t* out_offset_ptr,
+                                                        void *in_buffer_ptr,
+                                                        uint_fast32_t  in_cnt,
+                                                        uint_fast32_t* in_offset_ptr);
 
-extern vsf_err_t        vsf_spi_request_transfer(   vsf_spi_t *spi_ptr,
-                                                    void *out_buffer_ptr,
-                                                    void *in_buffer_ptr,
-                                                    uint_fast32_t count);
-extern vsf_err_t        vsf_spi_cancel_transfer(    vsf_spi_t *spi_ptr);
-extern int_fast32_t     vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
+/**
+ \~english
+ @brief start spi transfer. The best way to do this is to use DMA.
+        Software implementation is the solution when DMA cannot be used
+ @note When using DMA, you need to use DMA to receive data first,
+       and then process DMA to send data.
+ @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
+ @param[in] out_buffer_ptr: a pointer to spi send data buffer, it can be a null pointer
+ @param[in] in_buffer_ptr: a pointer to spi receive data buffer, it can be a null pointer
+ @param[in] count: The number of data received. It is also the number of data sent
+ @return vsf_err_t: VSF_ERR_NONE if spi transfer successfully, or a negative error code
+
+ \~chinese
+ @brief 启动 spi 传输
+ @brief 启动 spi 传输. 最好的方式是使用 DMA 来完成，
+        无法使用 DMA 完成的时候可以使用软件模拟完成
+ @note 当使用 DMA 的时候，需要先使用 DMA 接收数据，然后再使用 DMA 发送数据
+ @param[in] spi_ptr: @ref vsf_spi_t 传输结构指针
+ @param[in] out_buffer_ptr: spi 发送数据的缓冲区, 它可以是空指针
+ @param[in] in_buffer_ptr: spi 接收数据的缓冲区, 它可以是空指针
+ @param[in] count: 接收数据的个数， 同时也是发送数据的个数
+ @return vsf_err_t: 如果传输成功返回 VSF_ERR_NONE, 否则返回负数
+ */
+extern vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
+                                          void *in_buffer_ptr, uint_fast32_t count);
+
+extern vsf_err_t            vsf_spi_cancel_transfer(    vsf_spi_t *spi_ptr);
+extern int_fast32_t         vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
 
 
 
