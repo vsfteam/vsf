@@ -27,7 +27,7 @@
 
 #include "kernel/vsf_kernel.h"
 #include "../../vsf_disp.h"
-#include "./vsf_disp_mipi_lcd.h"
+#include "./vsf_disp_mipi_spi_lcd.h"
 
 /*============================ MACROS ========================================*/
 
@@ -55,6 +55,8 @@
 #ifndef VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET
 #   define VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET      DISABLED
 #endif
+
+#define __MIPI_LCD_BUFFER_TYPE                          0xFF
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -85,7 +87,7 @@ static void __lcd_init_param_seq(vsf_eda_t *teda, vsf_evt_t evt);
 static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt);
 
 extern void vk_disp_mipi_lcd_io_init(vk_disp_mipi_lcd_t *disp_mipi_lcd);
-extern void vk_disp_mipi_lcd_te_line_isr_handler(vk_disp_mipi_lcd_t *disp_mipi_lcd);
+extern void vsf_disp_mipi_lcd_wait_te_line_ready(vk_disp_mipi_lcd_t *disp_mipi_lcd);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -97,23 +99,20 @@ const vk_disp_drv_t vk_disp_drv_mipi_lcd = {
 /*============================ IMPLEMENTATION ================================*/
 
 // avoid access private member
-void vk_disp_mipi_tearing_effect_line_ready(vk_disp_mipi_lcd_t *disp_mipi_lcd)
+void vsf_disp_mipi_te_line_ready(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
     vsf_eda_post_evt(&disp_mipi_lcd->teda.use_as__vsf_eda_t, VSF_EVT_REFRESHING);
 }
 
-#ifndef WEAK_VK_DISP_MIPI_LCD_TE_LINE_ISR_HANDLER
-WEAK(vk_disp_mipi_lcd_te_line_isr_handler)
-void vk_disp_mipi_lcd_te_line_isr_handler(vk_disp_mipi_lcd_t *disp_mipi_lcd)
+WEAK(vsf_disp_mipi_lcd_wait_te_line_ready)
+void vsf_disp_mipi_lcd_wait_te_line_ready(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
     // If we want to avoid tearing, then we need to wait for the TE signal to be ready.
     // The default behavior is refresh immediately.
 
-    vk_disp_mipi_tearing_effect_line_ready(disp_mipi_lcd);
+    vsf_disp_mipi_te_line_ready(disp_mipi_lcd);
 }
-#endif
 
-#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 WEAK(vk_disp_mipi_lcd_hw_reset_io_write)
 void vk_disp_mipi_lcd_hw_reset_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level)
 {
@@ -121,9 +120,10 @@ void vk_disp_mipi_lcd_hw_reset_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool 
     vsf_gpio_write(disp_mipi_lcd->reset.gpio,
                    level ? disp_mipi_lcd->reset.pin_mask : 0,
                    disp_mipi_lcd->reset.pin_mask);
+#else
+#   error "Please implement hardware reset function"
 #endif
 }
-#endif
 
 WEAK(vk_disp_mipi_lcd_dcx_io_write)
 void vk_disp_mipi_lcd_dcx_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level)
@@ -132,6 +132,8 @@ void vk_disp_mipi_lcd_dcx_io_write(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level
     vsf_gpio_write(disp_mipi_lcd->dcx.gpio,
                    level ? disp_mipi_lcd->dcx.pin_mask : 0,
                    disp_mipi_lcd->dcx.pin_mask);
+#else
+#   error "Please implement lcd dcx io function"
 #endif
 }
 
@@ -148,6 +150,8 @@ void vk_disp_mipi_lcd_io_init(vk_disp_mipi_lcd_t *disp_mipi_lcd)
                         disp_mipi_lcd->dcx.pin_mask, IO_PULL_UP);
     vsf_gpio_set_output(disp_mipi_lcd->dcx.gpio,
                         disp_mipi_lcd->dcx.pin_mask);
+#else
+#   error "Please implement lcd io init function"
 #endif
 }
 
@@ -156,7 +160,7 @@ void vk_disp_mipi_lcd_io_init(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 WEAK(vk_disp_mipi_te_line_isr_enable_once)
 void vk_disp_mipi_te_line_isr_enable_once(vk_disp_mipi_lcd_t *disp_mipi_lcd)
 {
-    vk_disp_mipi_tearing_effect_line_ready(disp_mipi_lcd);
+    vsf_disp_mipi_te_line_ready(disp_mipi_lcd);
 }
 
 static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
@@ -225,7 +229,7 @@ static bool __lcd_get_next_command(vk_disp_mipi_lcd_t *disp_mipi_lcd)
     disp_mipi_lcd->cmd.cmd        = command_seq[cur_cnt + 0];
     disp_mipi_lcd->cmd.param_size = command_seq[cur_cnt + 1];
 
-    if (disp_mipi_lcd->cmd.param_size != 0xFF) {
+    if (disp_mipi_lcd->cmd.param_size != __MIPI_LCD_BUFFER_TYPE) {
         disp_mipi_lcd->cmd.param_buffer  = (disp_mipi_lcd->cmd.param_size == 0) ? NULL : (void *)&command_seq[cur_cnt + 2];
         disp_mipi_lcd->seq.cur_cnt += 2 + disp_mipi_lcd->cmd.param_size;
     } else {
@@ -335,7 +339,7 @@ static void __lcd_hardware_reset_pin(vsf_eda_t *teda, vsf_evt_t evt)
 static void __lcd_exit_sleep_mode(vsf_eda_t *teda, vsf_evt_t evt)
 {
     static const uint8_t __seq[] = {
-        MIPI_DCS_EXIT_SLEEP_MODE,   0,
+        MIPI_DCS_CMD_EXIT_SLEEP_MODE
     };
     VSF_UI_ASSERT(teda != NULL);
     vk_disp_mipi_lcd_t *disp_mipi_lcd = container_of(teda, vk_disp_mipi_lcd_t, teda);
@@ -393,7 +397,7 @@ static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
         break;
 
     case VSF_EVT_REFRESH:
-        vk_disp_mipi_lcd_te_line_isr_handler(disp_mipi_lcd);
+        vsf_disp_mipi_lcd_wait_te_line_ready(disp_mipi_lcd);
         break;
 
     case VSF_EVT_REFRESHING: {
@@ -404,9 +408,9 @@ static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
             uint32_t size    = disp_mipi_lcd->area.size.x * disp_mipi_lcd->area.size.y * 2;
             uint32_t address = (uint32_t)disp_mipi_lcd->cur_buffer;
             uint8_t  seq[] = {
-                MIPI_DCS_SET_COLUMN_ADDRESS,   4, x_start >> 8, x_start & 0xFF, x_end >> 8, x_end & 0xFF,
-                MIPI_DCS_SET_PAGE_ADDRESS,     4, y_start >> 8, y_start & 0xFF, y_end >> 8, y_end & 0xFF,
-                MIPI_DCS_WRITE_MEMORY_START, 255, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                MIPI_DCS_CMD_SET_COLUMN_ADDRESS(x_start, x_end),
+                MIPI_DCS_CMD_SET_COLUMN_ADDRESS(y_start, y_end),
+                MIPI_DCS_CMD_WRITE_MEMORY_START(__MIPI_LCD_BUFFER_TYPE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
             };
             put_unaligned_cpu32(size, &seq[6 + 6 + 2]);
             put_unaligned_cpu32(address, &seq[6 + 6 + 2 + 4]);
@@ -423,6 +427,8 @@ static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
     case VSF_EVT_MESSAGE:
         vk_disp_on_ready(&disp_mipi_lcd->use_as__vk_disp_t);
         break;
+    default:
+        VSF_UI_ASSERT(0);
     }
 }
 
@@ -430,9 +436,6 @@ static vsf_err_t __vk_disp_mipi_lcd_init(vk_disp_t *pthis)
 {
     vk_disp_mipi_lcd_t *disp_mipi_lcd = (vk_disp_mipi_lcd_t *)pthis;
     VSF_UI_ASSERT(disp_mipi_lcd != NULL);
-
-//    vk_disp_mipi_lcd_io_init(disp_mipi_lcd);
-//    __mipi_lcd_spi_init(disp_mipi_lcd);
 
 #if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
     disp_mipi_lcd->teda.fn.evthandler = __lcd_hardware_reset_pin;
@@ -455,6 +458,7 @@ static vsf_err_t __vk_disp_mipi_lcd_refresh(vk_disp_t *pthis,
     VSF_UI_ASSERT(disp_mipi_lcd != NULL);
 
     if (disp_mipi_lcd->teda.fn.evthandler != __lcd_refresh_evthandler) {
+        VSF_UI_ASSERT(0);
         return VSF_ERR_NOT_READY;
     }
 
@@ -462,6 +466,7 @@ static vsf_err_t __vk_disp_mipi_lcd_refresh(vk_disp_t *pthis,
         || (area->pos.y + area->size.y > disp_mipi_lcd->param.height)) {
         vsf_trace_error("disp area [%d,%d], [%d,%d] out of bounds\r\n",
                     area->pos.x, area->pos.y, area->size.x, area->size.y);
+        VSF_UI_ASSERT(0);
         return VSF_ERR_INVALID_RANGE;
     }
 
