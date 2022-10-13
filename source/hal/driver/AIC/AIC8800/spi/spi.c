@@ -331,20 +331,6 @@ static void __spi_request_transfer(vsf_hw_spi_t *hw_spi_ptr)
                          VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX);
     uint32_t byte_cnt = SPI_DATASIZE_TO_BYTE(reg->CR[0]);
 
-    bool send_const_addr;
-    uint8_t *send_buffer = hw_spi_ptr->request.send.buffer;
-    if (send_buffer != NULL) {
-        send_const_addr = false;
-        send_buffer += hw_spi_ptr->request.send.offset * byte_cnt;
-    } else {
-        send_buffer = (uint8_t *)&__dummy;
-        send_const_addr = true;
-    }
-    __request_dma(spi_const->request.send.channel,
-                  spi_const->request.send.cid,
-                  count, (uint32_t)send_buffer, (uint32_t)(&reg->IOR),
-                  byte_cnt, sizeof(reg->IOR), send_const_addr, true);
-
     bool recv_const_addr;
     uint8_t *recv_buffer = hw_spi_ptr->request.recv.buffer;
     if (recv_buffer != NULL) {
@@ -358,6 +344,20 @@ static void __spi_request_transfer(vsf_hw_spi_t *hw_spi_ptr)
                   spi_const->request.recv.cid,
                   count, (uint32_t)&reg->IOR, (uint32_t)recv_buffer,
                   sizeof(reg->IOR), byte_cnt, true, recv_const_addr);
+
+    bool send_const_addr;
+    uint8_t *send_buffer = hw_spi_ptr->request.send.buffer;
+    if (send_buffer != NULL) {
+        send_const_addr = false;
+        send_buffer += hw_spi_ptr->request.send.offset * byte_cnt;
+    } else {
+        send_buffer = (uint8_t *)&__dummy;
+        send_const_addr = true;
+    }
+    __request_dma(spi_const->request.send.channel,
+                  spi_const->request.send.cid,
+                  count, (uint32_t)send_buffer, (uint32_t)(&reg->IOR),
+                  byte_cnt, sizeof(reg->IOR), send_const_addr, true);
 
     reg->OCR = count;           // out data cnt
     reg->ICR = count;           // in data cnt
