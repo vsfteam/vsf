@@ -1437,11 +1437,11 @@ int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
 #if VSF_USE_AUDIO == ENABLED
     vk_audio_format_t fmt = {
         .channel_num        = desired->channels,
-        .sample_bit_width   = SDL_AUDIO_BITSIZE(desired->format),
+        .datatype.value     = VSF_AUDIO_DATA_TYPE_LEUL(SDL_AUDIO_BITSIZE(desired->format)),
         .sample_rate        = desired->freq,
     };
     // double buffer mode
-    desired->size = (fmt.sample_bit_width >> 3) * desired->samples * 2;
+    desired->size = (VSF_AUDIO_DATA_TYPE_BITLEN(fmt.datatype.value) >> 3) * desired->samples * 2;
     desired->silence = 0;
 
     if (    (__vsf_sdl2.audio.raw_stream != NULL)

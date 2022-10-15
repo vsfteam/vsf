@@ -118,7 +118,7 @@ static void __vk_wav_playback_stream_evthandler(vsf_stream_t *stream, void *para
                         goto failed;
                     }
                     wav->format.channel_num = header.format.channel_number;
-                    wav->format.sample_bit_width = header.format.bit_width;
+                    wav->format.datatype.value = VSF_AUDIO_DATA_TYPE_LEUL(header.format.bit_width);
                     wav->format.sample_rate = header.format.sample_rate;
                     wav->state = VSF_WAV_STATE_SEARCH_DATA_TRUNK;
                     break;

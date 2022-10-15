@@ -81,11 +81,11 @@ int audio_play_main(int argc, char *argv[])
         }
 
         ctx.format.channel_num      = strtoul(argv[2], NULL, 0);
-        ctx.format.sample_bit_width = strtoul(argv[4], NULL, 0);
+        ctx.format.datatype.value   = VSF_AUDIO_DATA_TYPE_BITLEN(strtoul(argv[4], NULL, 0));
         ctx.format.sample_rate      = strtoul(argv[3], NULL, 0);
 
         delay_us =  1000000ULL
-                *   (APP_CFG_AUDIO_BUFFER_SIZE / ((ctx.format.sample_bit_width / 8) * ctx.format.channel_num))
+                *   (APP_CFG_AUDIO_BUFFER_SIZE / ((VSF_AUDIO_DATA_TYPE_BITLEN(ctx.format.datatype.value) >> 3) * ctx.format.channel_num))
                 /   ctx.format.sample_rate;
         vk_audio_start(audio_dev, audio_stream->stream_index, &audio_mem_stream.use_as__vsf_stream_t, &ctx.format);
     } else if (!strcmp(ext, "wav")) {
