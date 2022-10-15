@@ -10687,10 +10687,13 @@
                         <group>
                             <name>mipi_lcd</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\ui\disp\driver\mipi_lcd\vsf_disp_mipi_lcd.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\ui\disp\driver\mipi_lcd\vsf_disp_mipi_lcd_dcs.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\component\ui\disp\driver\mipi_lcd\vsf_disp_mipi_lcd.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\ui\disp\driver\mipi_lcd\vsf_disp_mipi_spi_lcd.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\ui\disp\driver\mipi_lcd\vsf_disp_mipi_spi_lcd.h</name>
                             </file>
                         </group>
                         <group>
@@ -15504,7 +15507,6 @@
                             <configuration>vsf_template_m484</configuration>
                             <configuration>vsf_template_gd32e103</configuration>
                             <configuration>vsf_template_mt071</configuration>
-                            <configuration>vsf_template_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>SDL_image</name>

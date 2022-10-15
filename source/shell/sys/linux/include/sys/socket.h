@@ -149,7 +149,7 @@ struct msghdr {
 #define CMSG_ALIGN(len) (((len)+sizeof(long)-1) & ~(sizeof(long)-1))
 #define CMSG_SPACE(len) (sizeof(struct cmsghdr) + CMSG_ALIGN(len))
 #define CMSG_LEN(len)   (sizeof(struct cmsghdr) + (len))
-#define CMSG_DATA(cmsg) ((void *)(cmsg) + sizeof(struct cmsghdr))
+#define CMSG_DATA(cmsg) (void *)((uint8_t *)(cmsg) + sizeof(struct cmsghdr))
 #define CMSG_FIRSTHDR(msg)                                                      \
             ((msg)->msg_controllen >= sizeof(struct cmsghdr) ?                  \
                 (struct cmsghdr *)(msg)->msg_control                            \
