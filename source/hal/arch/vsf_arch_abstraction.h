@@ -327,6 +327,8 @@ extern uint_fast64_t bswap_64(uint_fast64_t);
 #endif
 
 #ifndef VSF_FFS32
+// returns the first bits(start from 0) which is '1'
+//  if all bits are 0s, -1 is returned
 extern int_fast8_t vsf_ffs32(uint_fast32_t);
 #endif
 

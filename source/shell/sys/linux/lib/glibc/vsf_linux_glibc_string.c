@@ -106,7 +106,7 @@ char * strerror(int errnum)
 
 int ffs(int i)
 {
-    return (int)vsf_ffs32((uint_fast32_t)i);
+    return (int)vsf_ffs32((uint_fast32_t)i) + 1;
 }
 
 WEAK(strverscmp)

@@ -1161,6 +1161,8 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         break;
     case SNDRV_PCM_IOCTL_RESUME:
         break;
+    case SNDRV_PCM_IOCTL_WRITEI_FRAMES:
+        break;
     default:
         errno = EOPNOTSUPP;
         return -1;
