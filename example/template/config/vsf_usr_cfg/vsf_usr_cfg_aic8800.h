@@ -378,16 +378,26 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #   define VSF_USE_UI                                   ENABLED
 #   define VSF_DISP_USE_MIPI_LCD                        ENABLED
 #      define APP_DISP_DEMO_SPI                         (vsf_spi_t *)&vsf_hw_spi0
-#      define APP_DISP_DEMO_RESET_GPIO                  (vsf_gpio_t *)&vsf_hw_gpio0
-#      define APP_DISP_DEMO_RESET_PIN_MASK              (1 << 5)
+#      define APP_DISP_DEMO_RESET_GPIO                  (vsf_gpio_t *)&vsf_hw_gpio1
+#      define APP_DISP_DEMO_RESET_PIN_MASK              (1 << 1)
 #      define APP_DISP_DEMO_DCX_GPIO                    (vsf_gpio_t *)&vsf_hw_gpio0
-#      define APP_DISP_DEMO_DCX_PIN_MASK                (1 << 6)
+#      define APP_DISP_DEMO_DCX_PIN_MASK                (1 << 4)
 
 #      define APP_DISP_DEMO_HEIGHT                      240
 #      define APP_DISP_DEMO_WIDTH                       320
 #      define APP_DISP_DEMO_COLOR                       VSF_DISP_COLOR_RGB565
-#      define APP_DISP_DEMO_SEQ                         VSF_DISP_MIPI_LCD_ST7789V
-#      define APP_DISP_DEMO_CLOCK_HZ                    (20ul * 1000ul * 1000ul)
+#      define APP_DISP_DEMO_ADDRESS_MODE                                        \
+               (MIPI_DCS_PAGE_ADDRESS_TOP_TO_BOTTOM         |                   \
+                MIPI_DCS_COLUME_ADDRESS_LEFT_TO_RIGHT       |                   \
+                MIPI_DCS_PAGE_COLUMN_NORMAL_ORDER)
+#      define APP_DISP_DEMO_SEQ                         {                       \
+                VSF_DISP_MIPI_LCD_ST7789V_BASE,                                 \
+                VSF_DISP_MIPI_LCD_INIT_MODE_AND_FORMAT(                         \
+                    APP_DISP_DEMO_ADDRESS_MODE,                                 \
+                    MIPI_DCS_PIXEL_FORMAT_DBI_16_BITS                           \
+                ),                                                              \
+        }
+#      define APP_DISP_DEMO_CLOCK_HZ                    (60ul * 1000ul * 1000ul)
 #endif
 
 /*============================ TYPES =========================================*/
