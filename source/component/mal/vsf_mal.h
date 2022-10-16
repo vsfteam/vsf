@@ -137,6 +137,7 @@ vsf_class(vk_reentrant_mal_t) {
         vk_mal_t *mal;
         // same initialized mutex MUST be used for the same mal above
         vsf_mutex_t *mutex;
+        uint64_t offset;
     )
 };
 

@@ -154,12 +154,14 @@ vsf_err_t vk_mal_write(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, 
 
 static uint_fast32_t __vk_reentrant_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op)
 {
-    return vk_mal_blksz(((vk_reentrant_mal_t *)mal)->mal, addr, size, op);
+    vk_reentrant_mal_t *pthis = (vk_reentrant_mal_t *)mal;
+    return vk_mal_blksz(pthis->mal, addr + pthis->offset, size, op);
 }
 
 static bool __vk_reentrant_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
 {
-    return vk_mal_prepare_buffer(((vk_reentrant_mal_t *)mal)->mal, addr, size, op, mem);
+    vk_reentrant_mal_t *pthis = (vk_reentrant_mal_t *)mal;
+    return vk_mal_prepare_buffer(pthis->mal, addr + pthis->offset, size, op, mem);
 }
 
 #if     __IS_COMPILER_GCC__
@@ -200,7 +202,7 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_read, vk_mal_read)
         }
         // fall througn
     case VSF_EVT_SYNC:
-        err = vk_mal_read(pthis->mal, vsf_local.addr, vsf_local.size, vsf_local.buff);
+        err = vk_mal_read(pthis->mal, vsf_local.addr + pthis->offset, vsf_local.size, vsf_local.buff);
         if (err != VSF_ERR_NONE) {
             vsf_eda_return(err);
         }
@@ -229,7 +231,7 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_write, vk_mal_write)
         }
         // fall througn
     case VSF_EVT_SYNC:
-        err = vk_mal_write(pthis->mal, vsf_local.addr, vsf_local.size, vsf_local.buff);
+        err = vk_mal_write(pthis->mal, vsf_local.addr + pthis->offset, vsf_local.size, vsf_local.buff);
         if (err != VSF_ERR_NONE) {
             vsf_eda_return(err);
         }
