@@ -12,6 +12,12 @@ extern "C" {
 #define umount              VSF_LINUX_WRAPPER(umount)
 #endif
 
+// fsdata if filesystem is not specified
+typedef struct vsf_linux_fsdata_auto_t {
+    vk_mal_t *mal;
+    vsf_mutex_t mutex;
+} vsf_linux_fsdata_auto_t;
+
 #if VSF_LINUX_APPLET_USE_SYS_MOUNT == ENABLED
 typedef struct vsf_linux_sys_mount_vplt_t {
     vsf_vplt_info_t info;

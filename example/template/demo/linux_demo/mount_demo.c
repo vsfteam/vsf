@@ -185,8 +185,9 @@ static const __fs_type_t __fs_types[] = {
 
 static void * __prepare_file_mal_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
-    vk_file_mal_t *file_mal = vsf_heap_calloc(1, sizeof(*file_mal));
-    if (NULL == file_mal) {
+    vsf_linux_fsdata_auto_t *fsdata = vsf_heap_calloc(1, sizeof(vsf_linux_fsdata_auto_t) + sizeof(vk_file_mal_t));
+    vk_file_mal_t *file_mal = (vk_file_mal_t *)&fsdata[1];
+    if (NULL == fsdata) {
         printf("not enough resources\r\n");
         return NULL;
     }
@@ -201,7 +202,7 @@ static void * __prepare_file_mal_fsdata(const __fs_type_t *fstype, __fs_param_t 
     file_mal->block_size = param->block_size;
     vk_mal_init(&file_mal->use_as__vk_mal_t);
 
-    return file_mal;
+    return fsdata;
 cleanup:
     __cleanup_file_mal_fsdata(file_mal);
     return NULL;

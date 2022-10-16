@@ -1970,9 +1970,11 @@ int mount(const char *source, const char *target,
         err = (vsf_err_t)vsf_eda_get_return_value();
     } else {
 #if VSF_FS_USE_MALFS == ENABLED
+        vsf_linux_fsdata_auto_t *fsdata = (vsf_linux_fsdata_auto_t *)data;
         vk_malfs_mounter_t mounter;
         mounter.dir = dir;
-        mounter.mal = (vk_mal_t *)data;
+        mounter.mal = fsdata->mal;
+        mounter.mutex = &fsdata->mutex;
         vk_malfs_mount_mbr(&mounter);
         err = mounter.err;
 #else
