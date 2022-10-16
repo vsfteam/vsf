@@ -130,6 +130,12 @@ static void __vk_reentrant_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 static vsf_err_t __vk_reentrant_disp_init(vk_disp_t *disp)
 {
     vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp;
+    disp = pthis->disp;
+
+    if (    ((pthis->pos.x + pthis->param.width) > disp->param.width)
+        ||  ((pthis->pos.y + pthis->param.height) > disp->param.height)) {
+        return VSF_ERR_FAIL;
+    }
 
     pthis->eda.fn.evthandler = __vk_reentrant_disp_evthandler;
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
@@ -142,6 +148,8 @@ static vsf_err_t __vk_reentrant_disp_refresh(vk_disp_t *disp, vk_disp_area_t *ar
 {
     vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp;
 
+    area->pos.x += pthis->pos.x;
+    area->pos.y += pthis->pos.y;
     pthis->area = *area;
     pthis->buffer = disp_buff;
     return vsf_eda_post_evt(&pthis->eda, VSF_EVT_REFRESH);

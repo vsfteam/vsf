@@ -183,6 +183,7 @@ vsf_class(vk_reentrant_disp_t) {
         vk_disp_t *disp;
         // same initialized mutex MUST be used for the same disp above
         vsf_mutex_t *mutex;
+        vk_disp_point pos;
     )
     private_member(
         vsf_eda_t eda;
@@ -219,7 +220,6 @@ extern void vk_disp_on_ready(vk_disp_t *pthis);
 #include "./driver/vga/m480/vsf_disp_vga_m480.h"
 #include "./driver/fb/vsf_disp_fb.h"
 #include "./driver/mipi_lcd/vsf_disp_mipi_spi_lcd.h"
-#include "./driver/did/vsf_disp_did.h"
 #if VSF_DISP_USE_WINGDI == ENABLED && defined(__WIN__)
 #   include "./driver/wingdi/vsf_disp_wingdi.h"
 #endif
