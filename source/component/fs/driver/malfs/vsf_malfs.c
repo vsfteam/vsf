@@ -265,6 +265,9 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        if (mounter->mutex != NULL) {
+            vsf_eda_mutex_init(mounter->mutex);
+        }
         mounter->mbr = vsf_heap_malloc(512);
         if (NULL == mounter->mbr) {
         return_not_enough_resources:
@@ -312,7 +315,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
             case VSF_MBR_PARTITION_TYPE_FAT32_LBA:
             case VSF_MBR_PARTITION_TYPE_FAT16_32_2G_LBA: {
                     typedef struct vk_malfs_fat_t {
-                        vk_mim_mal_t fat_mal;
+                        vk_reentrant_mal_t fat_mal;
                         char root_name[6];
                         implement_fatfs_info(512, 1);
                     } vk_malfs_fat_t;
@@ -328,8 +331,9 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
                     partition->malfs_info = &malfs_fat->use_as____vk_malfs_info_t;
                     partition->fsop = &vk_fatfs_op;
 
-                    malfs_fat->fat_mal.host_mal = mal;
-                    malfs_fat->fat_mal.drv = &vk_mim_mal_drv;
+                    malfs_fat->fat_mal.mal = mal;
+                    malfs_fat->fat_mal.mutex = mounter->mutex;
+                    malfs_fat->fat_mal.drv = &vk_reentrant_mal_drv;
                     malfs_fat->fat_mal.offset = le32_to_cpu(dpt->sectors_preceding) * 512;
                     malfs_fat->fat_mal.size = le32_to_cpu(dpt->sectors_in_partition) * 512;
                     malfs_fat->mal = &malfs_fat->fat_mal.use_as__vk_mal_t;

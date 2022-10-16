@@ -126,6 +126,8 @@ typedef struct vk_malfs_mount_partition_t {
 vsf_class(vk_malfs_mounter_t) {
     public_member(
         vk_mal_t *mal;
+        // set mutex if there is multiple volume in mal
+        vsf_mutex_t *mutex;
         vk_file_t *dir;
         public_const vsf_err_t err;
     )
