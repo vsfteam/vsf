@@ -127,15 +127,16 @@ __vsf_component_peda_ifs(vk_mal_write,
 )
 #endif
 
+// vk_reentrant_mal_t can be used to make a vk_mal_t reentrant
+//  by implementint multiple vk_reentrant_mal_t with same mutex
 vsf_class(vk_reentrant_mal_t) {
     public_member(
         implement(vk_mal_t)
 
         // mal should be initialized
         vk_mal_t *mal;
-    )
-    private_member(
-        implement(vsf_mutex_t)
+        // same initialized mutex MUST be used for the same mal above
+        vsf_mutex_t *mutex;
     )
 };
 

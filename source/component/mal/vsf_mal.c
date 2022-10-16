@@ -173,8 +173,6 @@ static bool __vk_reentrant_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fa
 __vsf_component_peda_ifs_entry(__vk_reentrant_mal_init, vk_mal_init)
 {
     vsf_peda_begin();
-    vk_reentrant_mal_t *pthis = (vk_reentrant_mal_t *)&vsf_this;
-    vsf_eda_mutex_init(&pthis->use_as__vsf_mutex_t);
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
@@ -194,7 +192,7 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_read, vk_mal_read)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        err = vsf_eda_mutex_enter(&pthis->use_as__vsf_mutex_t);
+        err = vsf_eda_mutex_enter(pthis->mutex);
         if (err < 0) {
             vsf_eda_return(err);
         } else if (err != VSF_ERR_NONE) {
@@ -208,7 +206,7 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_read, vk_mal_read)
         }
         break;
     case VSF_EVT_RETURN:
-        vsf_eda_mutex_leave(&pthis->use_as__vsf_mutex_t);
+        vsf_eda_mutex_leave(pthis->mutex);
         vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
@@ -223,7 +221,7 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_write, vk_mal_write)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        err = vsf_eda_mutex_enter(&pthis->use_as__vsf_mutex_t);
+        err = vsf_eda_mutex_enter(pthis->mutex);
         if (err < 0) {
             vsf_eda_return(err);
         } else if (err != VSF_ERR_NONE) {
@@ -237,7 +235,7 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_write, vk_mal_write)
         }
         break;
     case VSF_EVT_RETURN:
-        vsf_eda_mutex_leave(&pthis->use_as__vsf_mutex_t);
+        vsf_eda_mutex_leave(pthis->mutex);
         vsf_eda_return(vsf_eda_get_return_value());
         break;
     }

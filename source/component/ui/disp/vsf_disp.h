@@ -173,15 +173,18 @@ vsf_class(vk_disp_t) {
     )
 };
 
+// vk_reentrant_disp_t can be used to make a vk_disp_t reentrant
+//  by implementint multiple vk_reentrant_disp_t with same mutex
 vsf_class(vk_reentrant_disp_t) {
     public_member(
         implement(vk_disp_t)
 
         // disp should be already initialized
         vk_disp_t *disp;
+        // same initialized mutex MUST be used for the same disp above
+        vsf_mutex_t *mutex;
     )
     private_member(
-        implement(vsf_mutex_t)
         vsf_eda_t eda;
 
         void *buffer;
