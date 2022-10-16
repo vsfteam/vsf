@@ -35,6 +35,7 @@
 typedef struct vsf_scsi_mounter_t {
     implement(vk_scsi_mal_t)
     implement(vk_malfs_mounter_t)
+    vsf_mutex_t __mutex;
     vsf_eda_t eda;
     enum {
         STATE_INIT,
@@ -58,6 +59,7 @@ void __user_scsi_mounter(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        mounter->mutex = &mounter->__mutex;
         mounter->state = STATE_INIT;
         vk_mal_init(&mounter->use_as__vk_mal_t);
         break;
