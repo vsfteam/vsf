@@ -1130,6 +1130,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
                 snd_pcm_format_t format = (snd_pcm_format_t)snd_mask_min(mask);
                 int channels = snd_interval_value(interval);
                 ssize_t frame_size = pcm_formats[format].phys >> 3;
+                // TODO: fix fifo_size
                 u.hw_params->fifo_size = channels * frame_size;
             } else {
                 u.hw_params->fifo_size = 0;
@@ -1141,9 +1142,35 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
             u.hw_params->rmask = 0;
         }
         break;
-    case SNDRV_PCM_IOCTL_HW_PARAMS:
-        priv->hw_params = *u.hw_params;
-        // TODO: set audio format
+    case SNDRV_PCM_IOCTL_HW_PARAMS: {
+            priv->hw_params = *u.hw_params;
+
+            struct snd_mask *mask = param_mask(&priv->hw_params.masks[0], SNDRV_PCM_HW_PARAM_FORMAT);
+            if (!snd_mask_single(mask)) {
+                errno = EINVAL;
+                return -1;
+            }
+            snd_pcm_format_t format = (snd_pcm_format_t)snd_mask_min(mask);
+            audio_stream->format.datatype.value =
+                    __VSF_AUDIO_DATA_TYPE_BITLEN(pcm_formats[format].phys)
+                |   (pcm_formats[format].signd ? VSF_AUDIO_DATA_TYPE_SIGNED : VSF_AUDIO_DATA_TYPE_UNSIGNED)
+                |   (pcm_formats[format].le ? VSF_AUDIO_DATA_TYPE_LE : VSF_AUDIO_DATA_TYPE_BE)
+                |   VSF_AUDIO_DATA_TYPE_INT;
+
+            struct snd_interval *interval = param_interval(&priv->hw_params.intervals[0], SNDRV_PCM_HW_PARAM_CHANNELS);
+            if (!snd_interval_single(interval)) {
+                errno = EINVAL;
+                return -1;
+            }
+            audio_stream->format.channel_num = interval->min;
+
+            interval = param_interval(priv->hw_params.intervals, SNDRV_PCM_HW_PARAM_RATE);
+            if (!snd_interval_single(interval)) {
+                errno = EINVAL;
+                return -1;
+            }
+            audio_stream->format.sample_rate = interval->min;
+        }
         break;
     case SNDRV_PCM_IOCTL_HW_FREE:
         if (is_playback) {
