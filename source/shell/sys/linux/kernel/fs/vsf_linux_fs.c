@@ -2335,18 +2335,10 @@ void __vsf_linux_tx_stream_fini(vsf_linux_stream_priv_t *priv_tx)
 
 void __vsf_linux_tx_stream_drain(vsf_linux_stream_priv_t *priv_tx)
 {
-    if (priv_tx->stream_tx != NULL) {
-        vsf_protect_t orig;
-        vsf_linux_trigger_t trig;
-        vsf_linux_trigger_init(&trig);
-
-        while (true) {
-            orig = vsf_protect_sched();
-            if (!vsf_stream_get_data_size(priv_tx->stream_tx)) {
-                vsf_unprotect_sched(orig);
-                break;
-            }
-            vsf_linux_fd_pend_events(&priv_tx->use_as__vsf_linux_fd_priv_t, POLLIN, &trig, orig);
+    vsf_stream_t *stream_tx = priv_tx->stream_tx;
+    if (stream_tx != NULL) {
+        while (vsf_stream_get_data_size(stream_tx)) {
+            usleep(10 * 1000);
         }
     }
 }
