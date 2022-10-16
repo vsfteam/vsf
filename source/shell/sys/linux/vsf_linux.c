@@ -187,8 +187,11 @@ extern void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd);
 extern int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd);
 extern vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd);
 
-extern void __vsf_linux_rx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream);
-extern void __vsf_linux_tx_stream_init(vsf_linux_fd_t *sfd, vsf_stream_t *stream);
+extern void __vsf_linux_rx_stream_init(vsf_linux_stream_priv_t *priv_tx);
+extern void __vsf_linux_tx_stream_init(vsf_linux_stream_priv_t *priv_rx);
+extern void __vsf_linux_tx_stream_drop(vsf_linux_stream_priv_t *priv_tx);
+extern void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx);
+extern void __vsf_linux_tx_stream_drain(vsf_linux_stream_priv_t *priv_tx);
 extern void __vsf_linux_stream_evt(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready);
 extern const vsf_linux_fd_op_t __vsf_linux_stream_fdop;
 
@@ -616,6 +619,17 @@ vsf_linux_process_t * vsf_linux_resources_process(void)
     return &__vsf_linux.process_for_resources;
 }
 
+
+void * vsf_linux_malloc_res(size_t size)
+{
+    return __malloc_ex(vsf_linux_resources_process(), size);
+}
+
+void vsf_linux_free_res(void *ptr)
+{
+    __free_ex(vsf_linux_resources_process(), ptr);
+}
+
 static void __vsf_linux_stderr_on_evt(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready)
 {
     if (is_ready) {
@@ -659,7 +673,7 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     priv = (vsf_linux_stream_priv_t *)sfd->priv;
     priv->stream_rx = stdio_stream->in;
     priv->flags = O_RDONLY;
-    __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
+    __vsf_linux_rx_stream_init(priv);
     ((vsf_linux_term_priv_t *)priv)->subop = &__vsf_linux_stream_fdop;
     vsf_linux_term_fdop.fn_init(sfd);
 
@@ -669,7 +683,7 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     priv = (vsf_linux_stream_priv_t *)sfd->priv;
     priv->stream_tx = stdio_stream->out;
     priv->flags = O_WRONLY;
-    __vsf_linux_tx_stream_init(sfd, priv->stream_tx);
+    __vsf_linux_tx_stream_init(priv);
     ((vsf_linux_term_priv_t *)priv)->subop = &__vsf_linux_stream_fdop;
     vsf_linux_term_fdop.fn_init(sfd);
 
@@ -682,8 +696,8 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     priv->on_evt = __vsf_linux_stderr_on_evt;
     priv->stream_rx = stdio_stream->in;
     priv->stream_tx = stdio_stream->err;
-    __vsf_linux_rx_stream_init(sfd, priv->stream_rx);
-    __vsf_linux_tx_stream_init(sfd, priv->stream_tx);
+    __vsf_linux_rx_stream_init(priv);
+    __vsf_linux_tx_stream_init(priv);
     ((vsf_linux_term_priv_t *)priv)->subop = &__vsf_linux_stream_fdop;
     vsf_linux_term_fdop.fn_init(sfd);
 
@@ -779,7 +793,7 @@ int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority)
 
 static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
 {
-    vsf_linux_process_t *process = __malloc_ex(vsf_linux_resources_process(), sizeof(vsf_linux_process_t));
+    vsf_linux_process_t *process = vsf_linux_malloc_res(sizeof(vsf_linux_process_t));
     if (process != NULL) {
         memset(process, 0, sizeof(*process));
         process->prio = vsf_prio_inherit;
@@ -787,7 +801,7 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
 
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_main_op, stack_size, NULL);
         if (NULL == thread) {
-            __free_ex(vsf_linux_resources_process(), process);
+            vsf_linux_free_res(process);
             return NULL;
         }
 
@@ -906,7 +920,7 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
 
     // DO NOT free process here, should be freed in waitpid in host process
     if (NULL == process->parent_process) {
-        __free_ex(vsf_linux_resources_process(), process);
+        vsf_linux_free_res(process);
     }
 }
 
@@ -1589,7 +1603,7 @@ pid_t wait(int *status)
     }
     vsf_linux_process_t *process = vsf_linux_get_process(cur_thread->pid_exited);
     vsf_linux_detach_process(process);
-    __free_ex(vsf_linux_resources_process(), process);
+    vsf_linux_free_res(process);
     return cur_thread->pid_exited;
 }
 
@@ -1627,7 +1641,7 @@ pid_t waitpid(pid_t pid, int *status, int options)
         *status = cur_thread->retval;
     }
     vsf_linux_detach_process(process);
-    __free_ex(vsf_linux_resources_process(), process);
+    vsf_linux_free_res(process);
     return pid;
 }
 
@@ -2407,23 +2421,8 @@ int tcdrain(int fd)
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     if ((NULL == sfd) || (sfd->op != &vsf_linux_term_fdop)) { return -1; }
     vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)sfd->priv;
-    vsf_stream_t *stream_tx = term_priv->stream_tx;
-    if (NULL == stream_tx) { return 0; }
-
-    while (vsf_stream_get_data_size(stream_tx)) {
-        usleep(10 * 1000);
-    }
+    __vsf_linux_tx_stream_drain(&term_priv->use_as__vsf_linux_stream_priv_t);
     return 0;
-}
-
-static void __vsf_linux_tcflush_stream(vsf_stream_t *stream)
-{
-    if (stream != NULL) {
-        uint_fast32_t data_size;
-        while ((data_size = vsf_stream_get_data_size(stream))) {
-            vsf_stream_read(stream, NULL, data_size);
-        }
-    }
 }
 
 int tcflush(int fd, int queue_selector)
@@ -2440,10 +2439,10 @@ int tcflush(int fd, int queue_selector)
     }
 
     if (op & (1 << TCIFLUSH)) {
-        __vsf_linux_tcflush_stream(term_priv->stream_rx);
+        __vsf_linux_rx_stream_drop(&term_priv->use_as__vsf_linux_stream_priv_t);
     }
     if (op & (1 << TCOFLUSH)) {
-        __vsf_linux_tcflush_stream(term_priv->stream_tx);
+        __vsf_linux_tx_stream_drop(&term_priv->use_as__vsf_linux_stream_priv_t);
     }
     return 0;
 }

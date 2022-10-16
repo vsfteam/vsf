@@ -319,7 +319,7 @@ extern vsf_systimer_tick_t vsf_linux_sleep(vsf_systimer_tick_t ticks);
 extern vsf_linux_process_t * vsf_linux_resources_process(void);
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 // can not put in clib headers because of dependency, so put them here
-extern void * __malloc_ex(vsf_linux_process_t *process, int size, ...);
+extern void * __malloc_ex(vsf_linux_process_t *process, size_t size, ...);
 extern void * __calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, ...);
 extern void __free_ex(vsf_linux_process_t *process, void *ptr, ...);
 extern void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...);
@@ -331,6 +331,9 @@ extern char * __strdup_ex(vsf_linux_process_t *process, const char *str);
 #   define __realloc_ex(__process, __ptr, __size, ...)  realloc((__ptr), (__size))
 #   define __strdup_ex(__process, __str)                strdup(__str)
 #endif
+
+extern void * vsf_linux_malloc_res(size_t size);
+extern void vsf_linux_free_res(void *ptr);
 
 extern int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in);
 extern int vsf_linux_chdir(vsf_linux_process_t *process, char *working_dir);

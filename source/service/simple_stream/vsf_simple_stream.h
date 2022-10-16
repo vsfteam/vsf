@@ -146,19 +146,17 @@ vsf_class(vsf_stream_op_t) {
          */
         void (*init)(vsf_stream_t *stream);
         void (*fini)(vsf_stream_t *stream);
-        // for read/write, if buffer->buffer is NULL,
-        //         then do dummy read/write of buffer->size
 
         /**
          \~english write function, must be called after init.
          @param stream stream instance, cannot be NULL.
          @param buf buffer pointer, poin to a buffer or NULL
-         @param size write size(bytes), if buffer is NULL, then do dummy write.
+         @param size write size(bytes), if buffer is NULL, then increase stream size.
 
          \~chinese 初始化函数，必须在其他API之前调用。
          @param stream 流实例, 不能是空指针。
          @param buf 缓冲指针, 指向一块缓冲或者是NULL。
-         @param size 写大小(字节单位), 如果缓冲区是NULL, 将写给定大小的虚假数据
+         @param size 写大小(字节单位), 如果缓冲区是NULL, 将只增大流中的数据缓冲大小
          */
         uint_fast32_t (*write)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
 
@@ -166,12 +164,12 @@ vsf_class(vsf_stream_op_t) {
          \~english read function, must be called after init.
          @param stream stream instance, cannot be NULL.
          @param buf buffer pointer, poin to a buffer or NULL
-         @param size read size(bytes), if buffer is NULL, then do dummy read.
+         @param size read size(bytes), if buffer is NULL, then decrease stream size
 
          \~chinese 初始化函数，必须在其他API之前调用。
          @param stream 流实例, 不能是空指针。
          @param buf 缓冲指针, 指向一块缓冲或者是NULL。
-         @param size 读大小(字节单位), 如果缓冲区是NULL, 将读给定大小的虚假数据
+         @param size 读大小(字节单位), 如果缓冲区是NULL, 将只减小流中的数据缓冲大小
          */
         uint_fast32_t (*read)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
         uint_fast32_t (*get_buff_length)(vsf_stream_t *stream);
@@ -233,17 +231,28 @@ vsf_class(vsf_stream_t) {
 extern vsf_err_t vsf_stream_init(vsf_stream_t *stream);
 extern vsf_err_t vsf_stream_fini(vsf_stream_t *stream);
 /**
- * \~english read function, must be called after init.
- * @param stream stream instance, cannot be NULL.
- * @param buf buffer pointer, poin to a buffer or NULL
- * @param size read size(bytes), if buffer is NULL, then do dummy read.
- *
- * \~chinese 初始化函数，必须在其他API之前调用。
- * @param stream 流实例, 不能是空指针。
- * @param buf 缓冲指针, 指向一块缓冲或者是NULL。
- * @param size 读大小(字节单位), 如果缓冲区是NULL, 将读给定大小的虚假数据。
- */
+ \~english write function, must be called after init.
+ @param stream stream instance, cannot be NULL.
+ @param buf buffer pointer, poin to a buffer or NULL
+ @param size write size(bytes), if buffer is NULL, then increase stream size.
+
+ \~chinese 初始化函数，必须在其他API之前调用。
+ @param stream 流实例, 不能是空指针。
+ @param buf 缓冲指针, 指向一块缓冲或者是NULL。
+ @param size 写大小(字节单位), 如果缓冲区是NULL, 将只增大流中的数据缓冲大小
+*/
 extern uint_fast32_t vsf_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+/**
+ \~english read function, must be called after init.
+ @param stream stream instance, cannot be NULL.
+ @param buf buffer pointer, poin to a buffer or NULL
+ @param size read size(bytes), if buffer is NULL, then decrease stream size
+
+ \~chinese 初始化函数，必须在其他API之前调用。
+ @param stream 流实例, 不能是空指针。
+ @param buf 缓冲指针, 指向一块缓冲或者是NULL。
+ @param size 读大小(字节单位), 如果缓冲区是NULL, 将只减小流中的数据缓冲大小
+*/
 extern uint_fast32_t vsf_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
 #if VSF_STREAM_CFG_THRESHOLD == ENABLED
 // set threshold CAN ONLY be called after stream_init

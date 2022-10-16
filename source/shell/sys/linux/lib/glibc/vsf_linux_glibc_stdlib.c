@@ -107,7 +107,7 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, 
     vsf_unprotect_sched(orig);
 }
 
-void * __malloc_ex(vsf_linux_process_t *process, int size, ...)
+void * __malloc_ex(vsf_linux_process_t *process, size_t size, ...)
 {
     size += VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
     size_t *i = vsf_heap_malloc(size);

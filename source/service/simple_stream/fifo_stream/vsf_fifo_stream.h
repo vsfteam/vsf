@@ -87,12 +87,12 @@ extern "C" {
 
 vsf_class(vsf_byte_fifo_t) {
     public_member(
-	    uint8_t *buffer;
+        uint8_t *buffer;
         vsf_fifo_stream_size_t size;
     )
     private_member(
-	    vsf_fifo_stream_size_t head;
-	    vsf_fifo_stream_size_t tail;
+        vsf_fifo_stream_size_t head;
+        vsf_fifo_stream_size_t tail;
     )
 };
 

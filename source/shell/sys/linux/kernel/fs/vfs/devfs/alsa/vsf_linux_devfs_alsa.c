@@ -94,12 +94,15 @@ typedef struct vsf_linux_audio_control_priv_t {
 
 typedef struct vsf_linux_audio_play_priv_t {
     implement(vsf_linux_stream_priv_t)
+    implement(vsf_fifo_stream_t)
 
     struct snd_pcm_hw_constraints hw_constraints;
+    struct snd_pcm_hw_params hw_params;
     struct {
         struct snd_pcm_mmap_control control;
         struct snd_pcm_mmap_status status;
     } mmap;
+    bool is_started;
 } vsf_linux_audio_play_priv_t;
 
 typedef struct vsf_linux_audio_capture_priv_t {
@@ -108,6 +111,12 @@ typedef struct vsf_linux_audio_capture_priv_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern void __vsf_linux_rx_stream_init(vsf_linux_stream_priv_t *priv_tx);
+extern void __vsf_linux_tx_stream_init(vsf_linux_stream_priv_t *priv_rx);
+extern void __vsf_linux_tx_stream_drain(vsf_linux_stream_priv_t *priv_tx);
+extern void __vsf_linux_tx_stream_fini(vsf_linux_stream_priv_t *priv_tx);
+extern void __vsf_linux_rx_stream_fini(vsf_linux_stream_priv_t *priv_rx);
 
 extern ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 extern ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
@@ -975,6 +984,12 @@ static void __vsf_linux_audio_play_init(vsf_linux_fd_t *sfd)
     params_update(priv->hw_constraints.masks, priv->hw_constraints.intervals, &cmask, 0, false);
 }
 
+static int __vsf_linux_audio_play_start(vk_audio_dev_t *audio_dev, vk_audio_stream_t *audio_stream,
+            vsf_stream_t *stream)
+{
+    return vk_audio_start(audio_dev, audio_stream->stream_index, stream, &audio_stream->format);
+}
+
 static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_audio_play_priv_t *priv = (vsf_linux_audio_play_priv_t *)sfd->priv;
@@ -990,7 +1005,8 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         errno = EINVAL;
         return -1;
     }
-    audio_stream = __vsf_linux_audio_get_stream(audio_dev, device_idx, stream == 'p');
+    bool is_playback = stream == 'p';
+    audio_stream = __vsf_linux_audio_get_stream(audio_dev, device_idx, is_playback);
     if (NULL == audio_stream) {
         VSF_LINUX_ASSERT(false);
         errno = EINVAL;
@@ -1002,10 +1018,11 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         struct snd_pcm_info *info;              // SNDRV_PCM_IOCTL_INFO
         int *time_stamp;                        // SNDRV_PCM_IOCTL_TSTAMP
         int *user_version;                      // SNDRV_PCM_IOCTL_USER_PVERSION
-        struct snd_pcm_hw_params *hw_params;    // SNDRV_PCM_IOCTL_HW_REFINE && SNDRV_PCM_IOCTL_HW_PARAMS
+        struct snd_pcm_hw_params *hw_params;    // SNDRV_PCM_IOCTL_HW_REFINE/SNDRV_PCM_IOCTL_HW_PARAMS
         struct snd_pcm_sw_params *sw_params;    // SNDRV_PCM_IOCTL_SW_PARAMS
         struct snd_pcm_sync_ptr *sync_ptr;      // SNDRV_PCM_IOCTL_SYNC_PTR
         struct snd_pcm_channel_info *chinfo;    // SNDRV_PCM_IOCTL_CHANNEL_INFO
+        struct snd_xferi *xferi;                // SNDRV_PCM_IOCTL_WRITEI_FRAMES/SNDRV_PCM_IOCTL_READI_FRAMES
 
         uintptr_t arg;
     } u;
@@ -1125,8 +1142,25 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         break;
     case SNDRV_PCM_IOCTL_HW_PARAMS:
+        priv->hw_params = *u.hw_params;
+        // TODO: set audio format
         break;
     case SNDRV_PCM_IOCTL_HW_FREE:
+        if (is_playback) {
+            if (priv->stream_tx != NULL) {
+                __vsf_linux_tx_stream_fini(&priv->use_as__vsf_linux_stream_priv_t);
+                vsf_stream_fini(priv->stream_tx);
+            }
+        } else {
+            if (priv->stream_rx != NULL) {
+                __vsf_linux_rx_stream_fini(&priv->use_as__vsf_linux_stream_priv_t);
+                vsf_stream_fini(priv->stream_rx);
+            }
+        }
+        if (priv->buffer != NULL) {
+            vsf_linux_free_res(priv->buffer);
+            priv->buffer = NULL;
+        }
         break;
     case SNDRV_PCM_IOCTL_SW_PARAMS:
         break;
@@ -1145,15 +1179,46 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         break;
     case SNDRV_PCM_IOCTL_CHANNEL_INFO:
         break;
-    case SNDRV_PCM_IOCTL_PREPARE:
+    case SNDRV_PCM_IOCTL_PREPARE: {
+            struct snd_interval *interval = param_interval(priv->hw_params.intervals, SNDRV_PCM_HW_PARAM_BUFFER_BYTES);
+            if (!snd_interval_single(interval)) {
+                errno = EINVAL;
+                return -1;
+            }
+
+            priv->op = &vsf_fifo_stream_op;
+            priv->size = interval->min;
+            priv->buffer = vsf_linux_malloc_res(interval->min);
+
+            if (is_playback) {
+                priv->stream_tx = &priv->use_as__vsf_stream_t;
+                vsf_stream_init(priv->stream_tx);
+                __vsf_linux_tx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
+            } else {
+                priv->stream_rx = &priv->use_as__vsf_stream_t;
+                vsf_stream_init(priv->stream_rx);
+                __vsf_linux_rx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
+            }
+        }
         break;
     case SNDRV_PCM_IOCTL_RESET:
         break;
     case SNDRV_PCM_IOCTL_START:
+        if (!priv->is_started && !__vsf_linux_audio_play_start(audio_dev, audio_stream, priv->stream_tx)) {
+            priv->is_started = true;
+        }
         break;
     case SNDRV_PCM_IOCTL_DROP:
+        if (is_playback) {
+            __vsf_linux_tx_stream_drop(&priv->use_as__vsf_linux_stream_priv_t);
+        } else {
+            __vsf_linux_rx_stream_drop(&priv->use_as__vsf_linux_stream_priv_t);
+        }
         break;
     case SNDRV_PCM_IOCTL_DRAIN:
+        if (is_playback) {
+            __vsf_linux_tx_stream_drain(&priv->use_as__vsf_linux_stream_priv_t);
+        }
         break;
     case SNDRV_PCM_IOCTL_PAUSE:
         break;
@@ -1162,6 +1227,22 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
     case SNDRV_PCM_IOCTL_RESUME:
         break;
     case SNDRV_PCM_IOCTL_WRITEI_FRAMES:
+        if (!priv->is_started && !__vsf_linux_audio_play_start(audio_dev, audio_stream, priv->stream_tx)) {
+            priv->is_started = true;
+        }
+        {
+            uint8_t frame_size = VSF_AUDIO_DATA_TYPE_BITLEN(audio_stream->format.datatype.value) >> 3;
+            u.xferi->result = vsf_stream_write(priv->stream_tx, u.xferi->buf, u.xferi->frames * frame_size) / frame_size;
+        }
+        break;
+    case SNDRV_PCM_IOCTL_READI_FRAMES:
+        if (!priv->is_started && !__vsf_linux_audio_play_start(audio_dev, audio_stream, priv->stream_tx)) {
+            priv->is_started = true;
+        }
+        {
+            uint8_t frame_size = VSF_AUDIO_DATA_TYPE_BITLEN(audio_stream->format.datatype.value) >> 3;
+            u.xferi->result = vsf_stream_read(priv->stream_rx, u.xferi->buf, u.xferi->frames * frame_size) / frame_size;
+        }
         break;
     default:
         errno = EOPNOTSUPP;
@@ -1173,7 +1254,6 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
 static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_audio_control_priv_t *priv = (vsf_linux_audio_control_priv_t *)sfd->priv;
-    vk_audio_dev_t *audio_dev = (vk_audio_dev_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
     char *filename = ((vk_vfs_file_t *)(priv->file))->name;
     int card_idx;
 
