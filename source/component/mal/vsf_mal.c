@@ -174,7 +174,7 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_init, vk_mal_init)
 {
     vsf_peda_begin();
     vk_reentrant_mal_t *pthis = (vk_reentrant_mal_t *)&vsf_this;
-    vsf_mutex_init(&pthis->use_as__vsf_mutex_t);
+    vsf_eda_mutex_init(&pthis->use_as__vsf_mutex_t);
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }

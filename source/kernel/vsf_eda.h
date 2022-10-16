@@ -96,6 +96,9 @@ extern "C" {
 
 #define vsf_eda_mutex_leave(__pmtx)                                             \
             vsf_eda_sync_increase(&((__pmtx)->use_as__vsf_sync_t))
+#if VSF_SYNC_CFG_SUPPORT_ISR == ENABLED
+#   define vsf_eda_mutex_leave_isr(__pmtx)  vsf_eda_sync_increase_isr((__pmtx))
+#endif
 
 // CRIT
 #define vsf_eda_crit_init(__pcrit)                                              \

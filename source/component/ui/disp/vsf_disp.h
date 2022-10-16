@@ -24,6 +24,7 @@
 #if VSF_USE_UI == ENABLED
 
 #include "utilities/vsf_utilities.h"
+#include "kernel/vsf_kernel.h"
 
 #if     defined(__VSF_DISP_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
@@ -172,7 +173,26 @@ vsf_class(vk_disp_t) {
     )
 };
 
+vsf_class(vk_reentrant_disp_t) {
+    public_member(
+        implement(vk_disp_t)
+
+        // disp should be already initialized
+        vk_disp_t *disp;
+    )
+    private_member(
+        implement(vsf_mutex_t)
+        vsf_eda_t eda;
+
+        void *buffer;
+        vk_disp_area_t area;
+    )
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern const vk_disp_drv_t vk_reentrant_disp_drv;
+
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vk_disp_init(vk_disp_t *pthis);
