@@ -127,7 +127,22 @@ __vsf_component_peda_ifs(vk_mal_write,
 )
 #endif
 
+vsf_class(vk_reentrant_mal_t) {
+    public_member(
+        implement(vk_mal_t)
+
+        // mal should be initialized
+        vk_mal_t *mal;
+    )
+    private_member(
+        implement(vsf_mutex_t)
+    )
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern const vk_mal_drv_t vk_reentrant_mal_drv;
+
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vk_mal_init(vk_mal_t *pthis);
