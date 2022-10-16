@@ -99,8 +99,10 @@ static void __vk_reentrant_disp_on_ready(vk_disp_t *disp)
 {
     vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp;
     vk_disp_on_ready(&pthis->use_as__vk_disp_t);
-    // use vsf_eda_mutex_leave_isr in case __vk_reentrant_disp_on_ready is called in isr
-    vsf_eda_mutex_leave_isr(pthis->mutex);
+    if (pthis->mutex != NULL) {
+        // use vsf_eda_mutex_leave_isr in case __vk_reentrant_disp_on_ready is called in isr
+        vsf_eda_mutex_leave_isr(pthis->mutex);
+    }
 }
 
 static void __vk_reentrant_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -114,11 +116,13 @@ static void __vk_reentrant_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vk_disp_on_ready(&pthis->use_as__vk_disp_t);
         break;
     case VSF_EVT_REFRESH:
-        err = vsf_eda_mutex_enter(pthis->mutex);
-        if (err < 0) {
-            VSF_UI_ASSERT(false);
-        } else if (err != VSF_ERR_NONE) {
-            break;
+        if (pthis->mutex != NULL) {
+            err = vsf_eda_mutex_enter(pthis->mutex);
+            if (err < 0) {
+                VSF_UI_ASSERT(false);
+            } else if (err != VSF_ERR_NONE) {
+                break;
+            }
         }
         // fall througn
     case VSF_EVT_SYNC:

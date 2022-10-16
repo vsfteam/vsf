@@ -194,11 +194,13 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_read, vk_mal_read)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        err = vsf_eda_mutex_enter(pthis->mutex);
-        if (err < 0) {
-            vsf_eda_return(err);
-        } else if (err != VSF_ERR_NONE) {
-            break;
+        if (pthis->mutex != NULL) {
+            err = vsf_eda_mutex_enter(pthis->mutex);
+            if (err < 0) {
+                vsf_eda_return(err);
+            } else if (err != VSF_ERR_NONE) {
+                break;
+            }
         }
         // fall througn
     case VSF_EVT_SYNC:
@@ -208,7 +210,9 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_read, vk_mal_read)
         }
         break;
     case VSF_EVT_RETURN:
-        vsf_eda_mutex_leave(pthis->mutex);
+        if (pthis->mutex != NULL) {
+            vsf_eda_mutex_leave(pthis->mutex);
+        }
         vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
@@ -223,11 +227,13 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_write, vk_mal_write)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        err = vsf_eda_mutex_enter(pthis->mutex);
-        if (err < 0) {
-            vsf_eda_return(err);
-        } else if (err != VSF_ERR_NONE) {
-            break;
+        if (pthis->mutex != NULL) {
+            err = vsf_eda_mutex_enter(pthis->mutex);
+            if (err < 0) {
+                vsf_eda_return(err);
+            } else if (err != VSF_ERR_NONE) {
+                break;
+            }
         }
         // fall througn
     case VSF_EVT_SYNC:
@@ -237,7 +243,9 @@ __vsf_component_peda_ifs_entry(__vk_reentrant_mal_write, vk_mal_write)
         }
         break;
     case VSF_EVT_RETURN:
-        vsf_eda_mutex_leave(pthis->mutex);
+        if (pthis->mutex != NULL) {
+            vsf_eda_mutex_leave(pthis->mutex);
+        }
         vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
