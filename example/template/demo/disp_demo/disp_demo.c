@@ -108,7 +108,7 @@ static void __vk_disp_on_ready(vk_disp_t* disp)
     vsf_eda_t* eda = (vsf_eda_t*)disp->ui_data;
     VSF_ASSERT(NULL != eda);
 
-    vsf_eda_post_evt(eda, VSF_EVT_MESSAGE);
+    vsf_eda_post_evt(eda, VSF_EVT_USER);
 }
 
 static void __disp_demo_evthandler(vsf_eda_t* eda, vsf_evt_t evt)
@@ -136,10 +136,9 @@ static void __disp_demo_evthandler(vsf_eda_t* eda, vsf_evt_t evt)
 
         __disp_demo.buffer = vsf_heap_malloc(APP_DISP_DEMO_CFG_PIXEL_COUTNER * APP_DISP_DEMO_CFG_PIXEL_SIZE);
         VSF_ASSERT(__disp_demo.buffer != NULL);
-        vsf_trace_info("[%8d]disp demo, buffer: 0x%08x" VSF_TRACE_CFG_LINEEND, __disp_demo.buffer);
         break;
 
-    case VSF_EVT_MESSAGE:
+    case VSF_EVT_USER:
         __disp_demo_update_buffer((uint16_t *)__disp_demo.buffer, APP_DISP_DEMO_CFG_PIXEL_COUTNER);
         err = vk_disp_refresh(disp, &__disp_area, __disp_demo.buffer);
         VSF_ASSERT(err == VSF_ERR_NONE);
