@@ -34,6 +34,14 @@
 #   define APP_DISP_DEMO_CFG_HEIGHT         100
 #endif
 
+#ifndef APP_DISP_DEMO_CFG_PIXEL_COUTNER
+#   define APP_DISP_DEMO_CFG_PIXEL_COUTNER    (APP_DISP_DEMO_CFG_WIDTH * APP_DISP_DEMO_CFG_HEIGHT)
+#endif
+
+#ifndef APP_DISP_DEMO_CFG_PIXEL_SIZE
+#   define APP_DISP_DEMO_CFG_PIXEL_SIZE     sizeof(uint16_t)
+#endif
+
 #ifndef APP_DISP_DEMO_FPS_OUTPUT
 #   define APP_DISP_DEMO_FPS_OUTPUT         ENABLED
 #endif
@@ -44,10 +52,16 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef struct __disp_demo_t {
+    vsf_teda_t teda;
+    uint8_t *buffer;
+} __disp_demo_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vsf_teda_t __disp_task;
+__disp_demo_t __disp_demo;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -99,7 +113,6 @@ static void __vk_disp_on_ready(vk_disp_t* disp)
 
 static void __disp_demo_evthandler(vsf_eda_t* eda, vsf_evt_t evt)
 {
-    static uint16_t __color_buf[APP_DISP_DEMO_CFG_WIDTH * APP_DISP_DEMO_CFG_HEIGHT];
     static vk_disp_area_t __disp_area = {
         .pos = {
             .x = 0,
@@ -120,11 +133,15 @@ static void __disp_demo_evthandler(vsf_eda_t* eda, vsf_evt_t evt)
         disp->ui_data = eda;
         disp->ui_on_ready = __vk_disp_on_ready;
         vk_disp_init(disp);
+
+        __disp_demo.buffer = vsf_heap_malloc(APP_DISP_DEMO_CFG_PIXEL_COUTNER * APP_DISP_DEMO_CFG_PIXEL_SIZE);
+        VSF_ASSERT(__disp_demo.buffer != NULL);
+        vsf_trace_info("[%8d]disp demo, buffer: 0x%08x" VSF_TRACE_CFG_LINEEND, __disp_demo.buffer);
         break;
 
     case VSF_EVT_MESSAGE:
-        __disp_demo_update_buffer(__color_buf, dimof(__color_buf));
-        err = vk_disp_refresh(disp, &__disp_area, __color_buf);
+        __disp_demo_update_buffer((uint16_t *)__disp_demo.buffer, APP_DISP_DEMO_CFG_PIXEL_COUTNER);
+        err = vk_disp_refresh(disp, &__disp_area, __disp_demo.buffer);
         VSF_ASSERT(err == VSF_ERR_NONE);
         __disp_demo_fps_dump();
         break;
@@ -149,7 +166,7 @@ int VSF_USER_ENTRY(void)
         .fn.evthandler = __disp_demo_evthandler,
         .priority = APP_DISP_DEMO_PRIO,
     };
-    vsf_teda_start(&__disp_task, (vsf_eda_cfg_t*)&cfg);
+    vsf_teda_start(&__disp_demo.teda, (vsf_eda_cfg_t*)&cfg);
 
     return 0;
 }
