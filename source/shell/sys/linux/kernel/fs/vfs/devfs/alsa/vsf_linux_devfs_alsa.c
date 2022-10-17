@@ -990,6 +990,11 @@ static int __vsf_linux_audio_play_start(vk_audio_dev_t *audio_dev, vk_audio_stre
     return vk_audio_start(audio_dev, audio_stream->stream_index, stream, &audio_stream->format);
 }
 
+static int __vsf_linux_audio_play_stop(vk_audio_dev_t *audio_dev, vk_audio_stream_t *audio_stream)
+{
+    return vk_audio_stop(audio_dev, audio_stream->stream_index);
+}
+
 static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_audio_play_priv_t *priv = (vsf_linux_audio_play_priv_t *)sfd->priv;
@@ -1173,6 +1178,13 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         break;
     case SNDRV_PCM_IOCTL_HW_FREE:
+        if (priv->is_started) {
+            struct snd_interval *interval = param_interval(&priv->hw_params.intervals[0], SNDRV_PCM_HW_PARAM_BUFFER_TIME);
+            // wait to make sure the data is processed by hw
+            usleep(interval->max);
+            __vsf_linux_audio_play_stop(audio_dev, audio_stream);
+            priv->is_started = false;
+        }
         if (is_playback) {
             if (priv->stream_tx != NULL) {
                 __vsf_linux_tx_stream_fini(&priv->use_as__vsf_linux_stream_priv_t);
