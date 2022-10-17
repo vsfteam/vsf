@@ -92,7 +92,11 @@ int vsf_linux_create_fhs(void)
     fd = open("/fatfs", 0);
     if (fd >= 0) {
         close(fd);
-        mount(NULL, "fatfs", NULL, 0, &usrapp_common.mal.fakefat32.use_as__vk_mal_t);
+
+        vsf_linux_fsdata_auto_t fsdata = {
+            .mal = &usrapp_common.mal.fakefat32.use_as__vk_mal_t,
+        };
+        mount(NULL, "fatfs", NULL, 0, &fsdata);
     }
 #   else
 #       warning fat with non - 512 sector size, current driver is not supported
