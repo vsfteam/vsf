@@ -34,10 +34,10 @@ def vsh(pytestconfig):
 
     if platform.system() == 'Windows':
         import wexpect
-        vsh_subprocess = wexpect.spawn(cmd, encoding='utf-8')
+        vsh_subprocess = wexpect.spawn(cmd, encoding='utf-8', timeout=pytestconfig.getoption("vsf_timeout"))
     else:
         import pexpect
-        vsh_subprocess = pexpect.spawn(cmd, encoding='utf-8')
+        vsh_subprocess = pexpect.spawn(cmd, encoding='utf-8', timeout=pytestconfig.getoption("vsf_timeout"))
 
     vsf_vsh_started = pytestconfig.getoption("vsf_vsh_started")
     if not vsf_vsh_started:
