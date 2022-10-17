@@ -62,8 +62,8 @@ jobs:
         pip install pytest pytest-bdd wexpect simple-hexdump
       shell: bash
 
-    - name: Test
-      if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
-      run: |
-        pytest -m "base or windows-only" --verbose -o log_cli=true --log-cli-level="DEBUG" --vsf_template=${{github.workspace}}\example\template\project\vc\vsf_template_win\Debug\vsf_template_win.exe
-      working-directory: ${{github.workspace}}/test/pytest
+    #- name: Test
+    #  if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
+    #  run: |
+    #    pytest -m "base or windows-only" --verbose -o log_cli=true --log-cli-level="DEBUG" --vsf_template=${{github.workspace}}\example\template\project\vc\vsf_template_win\Debug\vsf_template_win.exe
+    #  working-directory: ${{github.workspace}}/test/pytest
