@@ -97,7 +97,7 @@ vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buf
 
 static void __vk_reentrant_disp_on_ready(vk_disp_t *disp)
 {
-    vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp;
+    vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp->ui_data;
     vk_disp_on_ready(&pthis->use_as__vk_disp_t);
     if (pthis->mutex != NULL) {
         // use vsf_eda_mutex_leave_isr in case __vk_reentrant_disp_on_ready is called in isr
@@ -113,6 +113,7 @@ static void __vk_reentrant_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_INIT:
         pthis->disp->ui_on_ready = __vk_reentrant_disp_on_ready;
+        pthis->disp->ui_data = pthis;
         vk_disp_on_ready(&pthis->use_as__vk_disp_t);
         break;
     case VSF_EVT_REFRESH:
@@ -152,9 +153,9 @@ static vsf_err_t __vk_reentrant_disp_refresh(vk_disp_t *disp, vk_disp_area_t *ar
 {
     vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp;
 
-    area->pos.x += pthis->pos.x;
-    area->pos.y += pthis->pos.y;
     pthis->area = *area;
+    pthis->area.pos.x += pthis->pos.x;
+    pthis->area.pos.y += pthis->pos.y;
     pthis->buffer = disp_buff;
     return vsf_eda_post_evt(&pthis->eda, VSF_EVT_REFRESH);
 }
