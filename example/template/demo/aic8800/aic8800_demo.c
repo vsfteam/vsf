@@ -106,6 +106,29 @@ void vsf_board_init(void)
         VSF_HAL_ASSERT(false);
     }
 
+    vsf_io_cfg_t cfgs[] = {
+        {VSF_PA10,  0x03,   0}, // PA10 as spi sck
+        {VSF_PA11,  0x03,   0}, // PA10 as spi sck
+        {VSF_PA12,  0x03,   0}, // PA10 as spi sck
+        {VSF_PA13,  0x03,   0}, // PA10 as spi sck
+
+#if VSF_DISP_USE_MIPI_LCD == ENABLED
+        {VSF_PA5,   0x00,   0},    // PA5 as LCD RESET
+        {VSF_PA6,   0x00,   0},    // PA6 as LCD DCS
+        {VSF_PA7,   0x00,   0},    // PA7 as LCD TE
+#endif
+
+#ifdef APP_USE_HAL_GPIO_DEMO
+        {VSF_PA10,  0x00,   IO_PULL_UP},
+        {VSF_PB3,   0x00,   IO_PULL_UP},
+#endif
+#if APP_USE_LINUX_TTY_DEMO == ENABLED
+        {VSF_PA10,  0x01,   0},
+        {VSF_PA11,  0x01,   0},
+#endif
+    };
+    vsf_io_config(cfgs, dimof(cfgs));
+
 #if AIC8800_APP_USE_WIFI_DEMO == ENABLED
     extern void aic8800_wifi_start(void);
     aic8800_wifi_start();
@@ -115,18 +138,6 @@ void vsf_board_init(void)
     aic8800_bt_start();
 #endif
 #if APP_USE_LINUX_TTY_DEMO == ENABLED
-    // PA10/PA11 is USART1
-    vsf_io_cfg_t cfg[] = {
-        {
-            .port_pin_index     = VSF_PA10,
-            .function           = 1,
-        },
-        {
-            .port_pin_index     = VSF_PA11,
-            .function           = 1,
-        },
-    };
-    vsf_hw_io_config(&vsf_hw_io0, (vsf_io_cfg_t *)&cfg, dimof(cfg));
     vsf_linux_fs_bind_uart("/dev/ttyS0", (vsf_usart_t *)&vsf_hw_usart1);
 
     extern int tty_main(int argc, char *argv[]);

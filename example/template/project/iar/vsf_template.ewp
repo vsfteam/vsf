@@ -6731,9 +6731,6 @@
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\aic8800\aic8800_demo.c</name>
                 </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\demo\aic8800\aic8800_driver_init.c</name>
-                </file>
             </group>
             <group>
                 <name>audio_demo</name>
