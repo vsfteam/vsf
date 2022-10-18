@@ -357,6 +357,7 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
 
+#if VSF_USE_INPUT == ENABLED
     if (is_event_triggered) {
         __vsf_arch_irq_start(irq_thread);
         switch (evt_type) {
@@ -389,6 +390,7 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         }
         __vsf_arch_irq_end(irq_thread, false);
     }
+#endif
 
     return 0;
 }
