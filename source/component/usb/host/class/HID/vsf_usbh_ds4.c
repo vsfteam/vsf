@@ -114,56 +114,40 @@ extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
 extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);
 extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
-
-extern void vsf_ds4u_on_new_dev(vk_input_ds4u_t *dev);
-extern void vsf_ds4u_on_free_dev(vk_input_ds4u_t *dev);
-extern void vsf_ds4u_on_report_parsed(vk_input_evt_t *evt);
-extern void vsf_ds4u_on_sensor(vk_sensor_evt_t *sensor_evt);
-extern void vsf_ds4u_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_DS4 == ENABLED
-#ifndef WEAK_VSF_DS4U_ON_NEW_DEV
 WEAK(vsf_ds4u_on_new_dev)
 void vsf_ds4u_on_new_dev(vk_input_ds4u_t *dev)
 {
     vsf_input_on_new_dev(VSF_INPUT_TYPE_DS4, dev);
 }
-#endif
 
-#ifndef WEAK_VSF_DS4U_ON_FREE_DEV
 WEAK(vsf_ds4u_on_free_dev)
 void vsf_ds4u_on_free_dev(vk_input_ds4u_t *dev)
 {
     vsf_input_on_free_dev(VSF_INPUT_TYPE_DS4, dev);
 }
-#endif
 
-#ifndef WEAK_VSF_DS4U_ON_REPORT_PARSED
 WEAK(vsf_ds4u_on_report_parsed)
 void vsf_ds4u_on_report_parsed(vk_input_evt_t *evt)
 {
     vsf_input_on_evt(VSF_INPUT_TYPE_SYNC, evt);
 }
-#endif
 
-#ifndef WEAK_VSF_DS4U_ON_GAMEPAD
 WEAK(vsf_ds4u_on_gamepad)
 void vsf_ds4u_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     vsf_input_on_gamepad(gamepad_evt);
 }
-#endif
 
-#ifndef WEAK_VSF_DS4U_ON_SENSOR
 WEAK(vsf_ds4u_on_sensor)
 void vsf_ds4u_on_sensor(vk_sensor_evt_t *sensor_evt)
 {
     vsf_input_on_sensor(sensor_evt);
 }
-#endif
 
 void vk_ds4u_new_dev(vk_input_ds4u_t *dev)
 {

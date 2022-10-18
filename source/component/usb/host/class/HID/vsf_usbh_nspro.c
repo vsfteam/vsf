@@ -86,13 +86,9 @@ const vk_usbh_class_drv_t vk_usbh_nspro_drv = {
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report);
-extern void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro);
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
 extern void vsf_nspro_on_report_parsed(vk_input_evt_t *evt);
 #endif
-extern void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro);
-extern void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -145,7 +141,6 @@ static void __vk_usbh_nspro_process_input(vk_usbh_nspro_t *dev, vsf_usb_nspro_ga
 }
 #endif
 
-#ifndef WEAK_VSF_USBH_NSPRO_ON_REPORT_INPUT
 WEAK(vsf_usbh_nspro_on_report_input)
 void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report)
 {
@@ -153,16 +148,12 @@ void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepa
     __vk_usbh_nspro_process_input(nspro, report);
 #   endif
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_NSPRO_ON_REPORT_OUTPUT
 WEAK(vsf_usbh_nspro_on_report_output)
 void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_NSPRO_ON_NEW
 WEAK(vsf_usbh_nspro_on_new)
 void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 {
@@ -170,9 +161,7 @@ void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
     vsf_nspro_on_new_dev(nspro);
 #   endif
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_NSPRO_ON_FREE
 WEAK(vsf_usbh_nspro_on_free)
 void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
 {
@@ -180,7 +169,6 @@ void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
     vsf_nspro_on_free_dev(nspro);
 #   endif
 }
-#endif
 
 static void __vk_usbh_nspro_send_cmd(vk_usbh_nspro_t *nspro, uint_fast8_t cmd)
 {

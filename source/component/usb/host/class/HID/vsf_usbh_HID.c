@@ -89,13 +89,6 @@ const vk_usbh_class_drv_t vk_usbh_hid_drv = {
 };
 
 /*============================ PROTOTYPES ====================================*/
-
-extern uint_fast8_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_buf, uint_fast32_t desc_len);
-extern bool vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid);
-extern void vsf_usbh_hid_input_on_free(vk_usbh_hid_input_t *hid);
-extern void vsf_usbh_hid_input_on_report_input(vk_usbh_hid_input_t *hid, uint8_t *report, uint_fast32_t len);
-extern void vsf_usbh_hid_input_on_report_output(vk_usbh_hid_input_t *hid, int_fast16_t status);
-
 /*============================ IMPLEMENTATION ================================*/
 
 static void __vk_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -298,7 +291,6 @@ vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer
 
 
 // hid input, which uses vsf_hid
-#ifndef WEAK_VSF_USBH_HID_INPUT_ON_DESC
 WEAK(vsf_usbh_hid_input_on_desc)
 uint_fast8_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_buf, uint_fast32_t desc_len)
 {
@@ -308,9 +300,7 @@ uint_fast8_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_
     return 64;
 #   endif
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_HID_INPUT_ON_REPORT_INPUT
 WEAK(vsf_usbh_hid_input_on_report_input)
 void vsf_usbh_hid_input_on_report_input(vk_usbh_hid_input_t *hid, uint8_t *report, uint_fast32_t len)
 {
@@ -318,16 +308,12 @@ void vsf_usbh_hid_input_on_report_input(vk_usbh_hid_input_t *hid, uint8_t *repor
     vk_hid_process_input(&hid->use_as__vk_input_hid_t, report, len);
 #   endif
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_HID_INPUT_ON_REPORT_OUTPUT
 WEAK(vsf_usbh_hid_input_on_report_output)
 void vsf_usbh_hid_input_on_report_output(vk_usbh_hid_input_t *hid, int_fast16_t status)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_HID_INPUT_ON_NEW
 WEAK(vsf_usbh_hid_input_on_new)
 bool vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid)
 {
@@ -336,9 +322,7 @@ bool vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid)
 #   endif
     return true;
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_HID_INPUT_ON_FREE
 WEAK(vsf_usbh_hid_input_on_free)
 void vsf_usbh_hid_input_on_free(vk_usbh_hid_input_t *hid)
 {
@@ -346,7 +330,6 @@ void vsf_usbh_hid_input_on_free(vk_usbh_hid_input_t *hid)
     vk_hid_free_dev(&hid->use_as__vk_input_hid_t);
 #   endif
 }
-#endif
 
 static void __vk_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
