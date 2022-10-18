@@ -205,18 +205,20 @@ static void __vsf_kernel_os_init(void)
 
 //#if __VSF_OS_SWI_NUM > 0
     {
-    //! configure systimer priority (using higest+1 or highest)
-    #if __VSF_OS_SWI_NUM > 0
-        vsf_arch_prio_t priorit =
+        vsf_arch_prio_t systimer_arch_priority;
+#ifdef VSF_OS_CFG_TIMER_ARCH_PRIORITY
+        systimer_arch_priority = VSF_OS_CFG_TIMER_ARCH_PRIORITY;
+#elif __VSF_OS_SWI_NUM > 0
+        systimer_arch_priority =
             __vsf_os.res_ptr->arch.os_swi_priorities_ptr[
                 __vsf_os.res_ptr->arch.swi_priority_cnt - 1];
-    #else
-        vsf_arch_prio_t priorit = vsf_arch_prio_highest;
-    #endif
+#else
+        systimer_arch_priority = vsf_arch_prio_highest;
+#endif
 
         vsf_kernel_cfg_t cfg = {
             __vsf_os.res_ptr->arch.sched_prio.highest,                          //!< highest priority
-            priorit,                                                            //!< systimer priority
+            systimer_arch_priority,                                             //!< systimer priority
         };
         vsf_kernel_init(&cfg);
     }
