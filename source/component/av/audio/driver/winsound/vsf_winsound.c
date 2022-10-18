@@ -95,16 +95,18 @@ __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
 {
     vsf_peda_begin();
     vk_winsound_dev_t *dev = container_of(&vsf_this, vk_winsound_dev_t, use_as__vk_audio_dev_t);
-    vk_winsound_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     uint_fast8_t stream_idx = 0;
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+    vk_winsound_playback_ctx_t *playback_ctx = &dev->playback_ctx;
+#endif
 
     switch (evt) {
     case VSF_EVT_INIT:
         if (!dev->is_inited) {
             dev->is_inited = true;
-            playback_ctx->hEvent = CreateEvent(NULL, 0, 0, NULL);
 
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
+            playback_ctx->hEvent = CreateEvent(NULL, 0, 0, NULL);
             dev->stream[stream_idx].dir_in1out0 = 0;
             dev->stream[stream_idx].format.value = 0;
             dev->stream[stream_idx].drv = &__vk_winsound_stream_drv_playback;

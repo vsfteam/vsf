@@ -171,5 +171,9 @@ extern vsf_err_t vk_audio_stop(vk_audio_dev_t *pthis, uint_fast8_t stream_idx);
 #   include "./decoder/wav/vsf_wav.h"
 #endif
 
+#if VSF_AUDIO_USE_WINSOUND == ENABLED
+#   include "./driver/winsound/vsf_winsound.h"
+#endif
+
 #endif      // VSF_USE_AUDIO
 #endif      // __VSF_AUDIO_H__
