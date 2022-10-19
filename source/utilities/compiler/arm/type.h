@@ -123,7 +123,7 @@ extern char * strcasestr(const char *str, const char *substr);
 }
 #endif
 
-#if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
+#if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED) && _DLIB_FILE_DESCRIPTOR
 #   include <stdio.h>
 #   ifdef __cplusplus
 extern "C" {

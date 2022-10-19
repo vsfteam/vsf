@@ -100,7 +100,7 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
 #       endif           // VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
 #   endif
 
-#if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED)
+#if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED) && _DLIB_FILE_DESCRIPTOR
 int fseeko(FILE *f, off_t offset, int whence)
 {
     return fseek(f, (long)offset, whence);
