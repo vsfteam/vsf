@@ -103,7 +103,7 @@ int vsf_linux_create_fhs(void)
 #   endif
 #endif
 
-#if VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
     if (mkdir("/memfs", 0)) {
         return -1;
     }
