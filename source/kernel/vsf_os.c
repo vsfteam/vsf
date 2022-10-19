@@ -213,8 +213,8 @@ static void __vsf_kernel_os_init(void)
  *!       So if systimer_arch_priority is lower than vsf_prio_highest, the systimer
  *!       irq will never have a change to run.
  *!         Basically, we don't recommend to use this design pattern, a task should
- *!       not takes all the CPU resources, which will deprive the chance for tasks
- *!       with lower pririty to run. If there is no such tasks, systimer_arch_priority
+ *!       not takes all the CPU resources, which will deprive the tasks with with lower
+ *!       priority of the chance to run. If there is no such tasks, systimer_arch_priority
  *!       can be lower than vsf_prio_highest. Please use VSF_OS_CFG_TIMER_ARCH_PRIORITY
  *!       to configure the priority of the systimer interrupt.
  */

@@ -1152,8 +1152,8 @@ vsf_err_t vsf_kernel_start(void)
  *!       So if priority of kernel task is lower than vsf_prio_highest, the kernel
  *!       task will never have a change to run.
  *!         Basically, we don't recommend to use this design pattern, a task should
- *!       not takes all the CPU resources, which will deprive the chance for tasks
- *!       with lower pririty to run. If there is no such tasks, priority of kernel
+ *!       not takes all the CPU resources, which will deprive tasks with lower priority
+ *!       of the chance to run. If there is no such tasks, priority of kernel
  *!       task can be lower than vsf_prio_highest. Please use VSF_KERNEL_CFG_KERNEL_TASK_PRIORITY
  *!       to configure the priority of the kernel task.
  */
