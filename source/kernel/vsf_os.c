@@ -206,6 +206,12 @@ static void __vsf_kernel_os_init(void)
 //#if __VSF_OS_SWI_NUM > 0
     {
         vsf_arch_prio_t systimer_arch_priority;
+        // normally, the systimer_arch_priority should be 1 level higher than the
+        //  highest priority of task, or if you call yield in a high higher priority
+        //  task and will never go to idle, timer event will never be processed.
+        //  If yield is not used, ignore this limitation,
+        //  VSF_OS_CFG_TIMER_ARCH_PRIORITY can be defined to set the arch priority
+        //  of systimer.
 #ifdef VSF_OS_CFG_TIMER_ARCH_PRIORITY
         systimer_arch_priority = VSF_OS_CFG_TIMER_ARCH_PRIORITY;
 #elif __VSF_OS_SWI_NUM > 0

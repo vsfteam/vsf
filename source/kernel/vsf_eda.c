@@ -1145,7 +1145,15 @@ vsf_err_t vsf_kernel_start(void)
 #   endif
 
     __vsf_eda.task.fn.evthandler = __vsf_kernel_evthandler;
+    // normally, the highest available task prority should be used, or if you call
+    //  yield in a high higher priority task and will never go to idle, timer event
+    //  will never be processed. If yield is not used, ignore this limitation,
+    //  VSF_KERNEL_CFG_KERNEL_TASK_PRIORITY can be defined to set the priority.
+#   ifdef VSF_KERNEL_CFG_KERNEL_TASK_PRIORITY
+    err = vsf_eda_init((vsf_eda_t *)&__vsf_eda.task, VSF_KERNEL_CFG_KERNEL_TASK_PRIORITY);
+#   else
     err = vsf_eda_init((vsf_eda_t *)&__vsf_eda.task, __vsf_eda.highest_prio);
+#   endif
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     if (VSF_ERR_NONE == err) {
