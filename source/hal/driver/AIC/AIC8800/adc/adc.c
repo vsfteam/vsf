@@ -25,6 +25,7 @@
 
 #if VSF_HAL_USE_ADC == ENABLED
 
+#define __VSF_EDA_CLASS_INHERIT__
 #include "./kernel/vsf_kernel.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/gpadc/gpadc_api.h"
 #include "./hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_msadc.h"
@@ -43,6 +44,14 @@
 #   define VSF_HW_ADC_CFG_MULTI_CLASS VSF_ADC_CFG_MULTI_CLASS
 #endif
 
+#ifndef VSF_AIC8800_ADC_CFG_EDA_PRIORITY
+#   warning AIC8800_ADC has no complete interrupt, so teda is used to poll result,\
+        VSF_AIC8800_ADC_CFG_EDA_PRIORITY can be used to confire the priority of the teda.\
+        Default value vsf_prio_0 is used since it's not defined by user.\
+        Note that callback_timer is avoided because priority can not be adjusted.
+#   define VSF_AIC8800_ADC_CFG_EDA_PRIORITY     vsf_prio_0
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_adc_request_t {
@@ -58,9 +67,9 @@ typedef struct vsf_hw_adc_t {
     vsf_adc_t vsf_adc;
 #endif
 
-    vsf_adc_cfg_t               cfg;
+    vsf_adc_cfg_t           cfg;
 
-    vsf_callback_timer_t    callback_timer;
+    vsf_teda_t              teda;
 
     struct {
         vsf_adc_channel_cfg_t  *current_channel;
@@ -203,35 +212,37 @@ static vsf_err_t __vsf_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_cha
     PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl0),
         AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
 
-    vsf_callback_timer_add_us(&hw_adc_ptr->callback_timer, __vsf_adc_get_callback_time_us(hw_adc_ptr));
-
-    return VSF_ERR_NONE;
+    return vsf_teda_set_timer_ex(&hw_adc_ptr->teda, vsf_systimer_us_to_tick(__vsf_adc_get_callback_time_us(hw_adc_ptr)));
 }
 
-static void __vk_adc_on_time(vsf_callback_timer_t *timer)
+static void __vk_adc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_hw_adc_t *hw_adc_ptr = container_of(timer, vsf_hw_adc_t, callback_timer);
+    vsf_hw_adc_t *hw_adc_ptr = container_of(eda, vsf_hw_adc_t, teda);
 
-    if (0x1 != PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw))) {
-        vsf_callback_timer_add_us(&hw_adc_ptr->callback_timer, __vsf_adc_get_callback_time_us(hw_adc_ptr));
-        return;
-    }
-    PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw), 0x1);
+    switch (evt) {
+    case VSF_EVT_TIMER:
+        if (0x1 != PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw))) {
+            vsf_teda_set_timer_ex(&hw_adc_ptr->teda, vsf_systimer_us_to_tick(__vsf_adc_get_callback_time_us(hw_adc_ptr)));
+            return;
+        }
+        PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw), 0x1);
 
-    int value = PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_ro_acc));
-    value = value * 1175 / 32896 - 1175;
-    if (hw_adc_ptr->current_channel->channel & 0x01) {
-        value = -value;
-    }
-    if (value < 0) {
-        value = 0;  //todo:
-    }
-    VSF_HAL_ASSERT(value <= 1175);
-    *(uint16_t *)hw_adc_ptr->buffer_ptr = value;
+        int value = PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_ro_acc));
+        value = value * 1175 / 32896 - 1175;
+        if (hw_adc_ptr->current_channel->channel & 0x01) {
+            value = -value;
+        }
+        if (value < 0) {
+            value = 0;  //todo:
+        }
+        VSF_HAL_ASSERT(value <= 1175);
+        *(uint16_t *)hw_adc_ptr->buffer_ptr = value;
 
-    hw_adc_ptr->status.is_busy = false;
-    if ((NULL != hw_adc_ptr->cfg.isr.handler_fn) && hw_adc_ptr->status.is_irq) {
-        hw_adc_ptr->cfg.isr.handler_fn(hw_adc_ptr->cfg.isr.target_ptr, (vsf_adc_t *)hw_adc_ptr);
+        hw_adc_ptr->status.is_busy = false;
+        if ((NULL != hw_adc_ptr->cfg.isr.handler_fn) && hw_adc_ptr->status.is_irq) {
+            hw_adc_ptr->cfg.isr.handler_fn(hw_adc_ptr->cfg.isr.target_ptr, (vsf_adc_t *)hw_adc_ptr);
+        }
+        break;
     }
 }
 
@@ -249,10 +260,11 @@ vsf_err_t vsf_hw_adc_init(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_cfg_t *cfg_ptr)
             AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_DENOM(temp_clock_div)
         |   AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_UPDATE);
 
-    hw_adc_ptr->callback_timer.on_timer = __vk_adc_on_time;
-    vsf_callback_timer_init(&hw_adc_ptr->callback_timer);
-
-    return VSF_ERR_NONE;
+    hw_adc_ptr->teda.fn.evthandler = __vk_adc_evthandler;
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    hw_adc_ptr->teda.on_terminate = NULL;
+#endif
+    return vsf_teda_init(&hw_adc_ptr->teda, VSF_AIC8800_ADC_CFG_EDA_PRIORITY);
 }
 
 fsm_rt_t vsf_hw_adc_enable(vsf_hw_adc_t *hw_adc_ptr)
