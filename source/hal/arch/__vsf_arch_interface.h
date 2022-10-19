@@ -70,7 +70,8 @@ extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
 /*----------------------------------------------------------------------------*
  * System Timer : Implement with Normal Timer (Count down or Count up)        *
  *----------------------------------------------------------------------------*/
-#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+#   if  (VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER)      \
+    ||  (VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE)
 
 /*-------------------------------------------*
  * APIs to be implemented by target arch     *
