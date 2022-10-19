@@ -75,6 +75,7 @@ extern "C" {
 
 #define __vsf_eda_sem_pend1(__psem, __timeout)  vsf_eda_sync_decrease((__psem), (__timeout))
 #define __vsf_eda_sem_pend0(__psem)         __vsf_eda_sem_pend1((__psem), -1)
+// prototype: vsf_err_t vsf_eda_sem_pend(vsf_sem_t *sem, vsf_timeout_tick_t timeout = -1);
 #define vsf_eda_sem_pend(__psem, ...)                                           \
             __PLOOC_EVAL(__vsf_eda_sem_pend, __VA_ARGS__)((__psem), ##__VA_ARGS__)
 
@@ -91,6 +92,7 @@ extern "C" {
 #define __vsf_eda_mutex_enter1(__pmtx, __timeout)                               \
             vsf_eda_sync_decrease(&((__pmtx)->use_as__vsf_sync_t), (__timeout))
 #define __vsf_eda_mutex_enter0(__pmtx)      __vsf_eda_mutex_enter1((__pmtx), -1)
+// prototype: vsf_err_t vsf_eda_mutex_enter(vsf_mutex_t *mutex, vsf_timeout_tick_t timeout = -1);
 #define vsf_eda_mutex_enter(__pmtx, ...)                                        \
             __PLOOC_EVAL(__vsf_eda_mutex_enter, __VA_ARGS__)((__pmtx), ##__VA_ARGS__)
 
@@ -107,6 +109,7 @@ extern "C" {
 #define __vsf_eda_crit_enter1(__pcrit, __timeout)                               \
             vsf_eda_mutex_enter((__pcrit), (__timeout))
 #define __vsf_eda_crit_enter0(__pcrit)      __vsf_eda_crit_enter1((__pcrit), -1)
+// prototype: vsf_err_t vsf_eda_crit_enter(vsf_crit_t *crit, vsf_timeout_tick_t timeout = -1);
 #define vsf_eda_crit_enter(__pcrit, ...)                                        \
             __PLOOC_EVAL(__vsf_eda_crit_enter, __VA_ARGS__)((__pcrit), ##__VA_ARGS__)
 
@@ -121,6 +124,8 @@ extern "C" {
 #define vsf_eda_trig_set0(__pevt)           vsf_eda_sync_increase((__pevt))
 #define vsf_eda_trig_set1(__pevt, __manual)                                     \
             __vsf_eda_sync_increase_ex((__pevt), NULL, (__manual))
+// prototype: vsf_err_t vsf_eda_trig_set(vsf_trig_t *trig, bool manual);
+// prototype: vsf_err_t vsf_eda_trig_set(vsf_trig_t *trig);
 #define vsf_eda_trig_set(__pevt, ...)                                           \
             __PLOOC_EVAL(vsf_eda_trig_set, __VA_ARGS__)((__pevt), ##__VA_ARGS__)
 
@@ -144,6 +149,7 @@ extern "C" {
 #define __vsf_eda_crit_npb_enter1(__pcrit, __timeout)                           \
             vsf_eda_sync_decrease((__pcrit), (__timeout))
 #define __vsf_eda_crit_npb_enter0(__pcrit)  __vsf_eda_crit_npb_enter1((__pcrit), -1)
+// prototype: vsf_err_t __vsf_eda_crit_npb_enter(__vsf_crit_npb_t *crit_npb, vsf_timeout_tick_t timeout = -1);
 #define __vsf_eda_crit_npb_enter(__pcrit, ...)                                  \
             __PLOOC_EVAL(__vsf_eda_crit_npb_enter, __VA_ARGS__)((__pcrit), ##__VA_ARGS__)
 
