@@ -1145,10 +1145,18 @@ vsf_err_t vsf_kernel_start(void)
 #   endif
 
     __vsf_eda.task.fn.evthandler = __vsf_kernel_evthandler;
-    // normally, the highest available task prority should be used, or if you call
-    //  yield in a high higher priority task and will never go to idle, timer event
-    //  will never be processed. If yield is not used, ignore this limitation,
-    //  VSF_KERNEL_CFG_KERNEL_TASK_PRIORITY can be defined to set the priority.
+/*! \note   Priority of kernel task generally should be the highest priority of
+ *!       tasks(__vsf_eda.highest_prio, or vsf_prio_highest).
+ *!         If a task with vsf_prio_highest priority will not exit, eg: call yield
+ *!       and never go to idle state(yield will yield to the same priority, not lower).
+ *!       So if priority of kernel task is lower than vsf_prio_highest, the kernel
+ *!       task will never have a change to run.
+ *!         Basically, we don't recommend to use this design pattern, a task should
+ *!       not takes all the CPU resources, which will deprive the chance for tasks
+ *!       with lower pririty to run. If there is no such tasks, priority of kernel
+ *!       task can be lower than vsf_prio_highest. Please use VSF_KERNEL_CFG_KERNEL_TASK_PRIORITY
+ *!       to configure the priority of the kernel task.
+ */
 #   ifdef VSF_KERNEL_CFG_KERNEL_TASK_PRIORITY
     err = vsf_eda_init((vsf_eda_t *)&__vsf_eda.task, VSF_KERNEL_CFG_KERNEL_TASK_PRIORITY);
 #   else

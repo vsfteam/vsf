@@ -139,11 +139,11 @@ typedef struct vsf_kernel_resource_t {
         struct {
             vsf_prio_t                      begin;
             vsf_prio_t                      highest;
-        }sched_prio;
+        } sched_prio;
     #else
         struct {
             vsf_prio_t                      highest;
-        }sched_prio;
+        } sched_prio;
     #endif
     } arch;
 

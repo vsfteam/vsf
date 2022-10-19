@@ -108,7 +108,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
         ||  (__VSF_OS_SWI_NUM == 1 && VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED))
 /*! \note including (vsf_prio_highest + 1) into the lookup table
  */
-#       define MFUNC_IN_U8_DEC_VALUE                   (__VSF_OS_SWI_NUM+1)
+#       define MFUNC_IN_U8_DEC_VALUE                   (__VSF_OS_SWI_NUM + 1)
 #   else
 #       define MFUNC_IN_U8_DEC_VALUE                   (__VSF_OS_SWI_NUM)
 #   endif

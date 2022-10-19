@@ -206,12 +206,18 @@ static void __vsf_kernel_os_init(void)
 //#if __VSF_OS_SWI_NUM > 0
     {
         vsf_arch_prio_t systimer_arch_priority;
-        // normally, the systimer_arch_priority should be 1 level higher than the
-        //  highest priority of task, or if you call yield in a high higher priority
-        //  task and will never go to idle, timer event will never be processed.
-        //  If yield is not used, ignore this limitation,
-        //  VSF_OS_CFG_TIMER_ARCH_PRIORITY can be defined to set the arch priority
-        //  of systimer.
+/*! \note   systimer_arch_priority generally should be at least the same as the
+ *!       highest priority of tasks(vsf_prio_highest).
+ *!         If a task with vsf_prio_highest priority will not exit, eg: call yield
+ *!       and never go to idle state(yield will yield to the same priority, not lower).
+ *!       So if systimer_arch_priority is lower than vsf_prio_highest, the systimer
+ *!       irq will never have a change to run.
+ *!         Basically, we don't recommend to use this design pattern, a task should
+ *!       not takes all the CPU resources, which will deprive the chance for tasks
+ *!       with lower pririty to run. If there is no such tasks, systimer_arch_priority
+ *!       can be lower than vsf_prio_highest. Please use VSF_OS_CFG_TIMER_ARCH_PRIORITY
+ *!       to configure the priority of the systimer interrupt.
+ */
 #ifdef VSF_OS_CFG_TIMER_ARCH_PRIORITY
         systimer_arch_priority = VSF_OS_CFG_TIMER_ARCH_PRIORITY;
 #elif __VSF_OS_SWI_NUM > 0
