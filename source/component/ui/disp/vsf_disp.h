@@ -173,6 +173,7 @@ vsf_class(vk_disp_t) {
     )
 };
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 // vk_reentrant_disp_t can be used to make a vk_disp_t reentrant
 //  by implementint multiple vk_reentrant_disp_t with same mutex
 vsf_class(vk_reentrant_disp_t) {
@@ -192,10 +193,13 @@ vsf_class(vk_reentrant_disp_t) {
         vk_disp_area_t area;
     )
 };
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 extern const vk_disp_drv_t vk_reentrant_disp_drv;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 

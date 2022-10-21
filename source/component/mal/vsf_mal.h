@@ -127,6 +127,7 @@ __vsf_component_peda_ifs(vk_mal_write,
 )
 #endif
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 // vk_reentrant_mal_t can be used to make a vk_mal_t reentrant
 //  by implementint multiple vk_reentrant_mal_t with same mutex
 vsf_class(vk_reentrant_mal_t) {
@@ -140,10 +141,13 @@ vsf_class(vk_reentrant_mal_t) {
         uint64_t offset;
     )
 };
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 extern const vk_mal_drv_t vk_reentrant_mal_drv;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 

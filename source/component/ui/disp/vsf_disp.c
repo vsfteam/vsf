@@ -40,15 +40,19 @@ enum {
 
 /*============================ PROTOTYPES ====================================*/
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 static vsf_err_t __vk_reentrant_disp_init(vk_disp_t *pthis);
 static vsf_err_t __vk_reentrant_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 const vk_disp_drv_t vk_reentrant_disp_drv = {
     .init                   = __vk_reentrant_disp_init,
     .refresh                = __vk_reentrant_disp_refresh,
 };
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -94,7 +98,7 @@ vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buf
 /*******************************************************************************
 * reentrant disp                                                               *
 *******************************************************************************/
-
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 static void __vk_reentrant_disp_on_ready(vk_disp_t *disp)
 {
     vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp->ui_data;
@@ -159,7 +163,7 @@ static vsf_err_t __vk_reentrant_disp_refresh(vk_disp_t *disp, vk_disp_area_t *ar
     pthis->buffer = disp_buff;
     return vsf_eda_post_evt(&pthis->eda, VSF_EVT_REFRESH);
 }
-
+#endif
 #endif
 
 /* EOF */
