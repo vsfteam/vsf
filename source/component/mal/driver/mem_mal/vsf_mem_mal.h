@@ -40,9 +40,8 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 vsf_class(vk_mem_mal_t) {
-    implement(vk_mal_t)
-
     public_member(
+        implement(vk_mal_t)
         vsf_mem_t mem;
         uint32_t blksz;
     )

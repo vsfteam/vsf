@@ -48,9 +48,8 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 vsf_class(vk_mmc_mal_t) {
-    implement(vk_mal_t)
-
     public_member(
+        implement(vk_mal_t)
         vsf_mmc_t              *mmc;
         vsf_arch_prio_t         hw_priority;
         implement(vsf_mmc_probe_t)
