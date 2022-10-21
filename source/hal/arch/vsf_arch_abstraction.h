@@ -28,6 +28,15 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+//! \name different models to implement systimer
+//! @{
+#define VSF_SYSTIMER_IMPL_REQUEST_RESPONSE                      0
+#define VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER                     1
+#define VSF_SYSTIMER_IMPL_WITH_COMP_TIMER                       2
+#define VSF_SYSTIMER_IMPL_TICK_MODE                             3
+//! @}
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #ifndef VSF_ARCH_ASSERT
@@ -320,6 +329,7 @@ extern uint_fast32_t vsf_arch_heap_size(void *buffer);
 /*----------------------------------------------------------------------------*
  * Architecture Infrastructure                                                *
  *----------------------------------------------------------------------------*/
+
 extern uint_fast16_t bswap_16(uint_fast16_t);
 extern uint_fast32_t bswap_32(uint_fast32_t);
 #ifdef UINT64_MAX
@@ -354,6 +364,7 @@ DECLARE_ENDIAN_FUNC(64)
 /*----------------------------------------------------------------------------*
  * SWI                                                                        *
  *----------------------------------------------------------------------------*/
+
 extern vsf_err_t vsf_swi_init(  uint_fast8_t idx,
                                 vsf_arch_prio_t priority,
                                 vsf_swi_handler_t *handler,
@@ -368,6 +379,7 @@ extern void vsf_arch_swi_trigger(uint_fast8_t idx);
 /*----------------------------------------------------------------------------*
  * System Timer                                                               *
  *----------------------------------------------------------------------------*/
+
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
 extern vsf_err_t vsf_systimer_start(void);
 extern vsf_systimer_tick_t vsf_systimer_get(void);
@@ -387,6 +399,7 @@ extern vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick);
 /*----------------------------------------------------------------------------*
  * Interrupt                                                                  *
  *----------------------------------------------------------------------------*/
+
 extern vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority);
 extern vsf_arch_prio_t vsf_get_base_priority(void);
 

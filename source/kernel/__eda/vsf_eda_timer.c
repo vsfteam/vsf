@@ -44,6 +44,20 @@
 /*============================ PROTOTYPES ====================================*/
 
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#       if      (VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS)   \
+            &&  (VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE)
+#           error systimer is in tick mode while tickless mode is required on kernel
+#       endif
+#       if      (VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICK)       \
+            &&  (VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE)
+#           warning systimer is not in tick mode while tick mode is required on kernel,\
+                ignore this warning if your arch does not support tick mode systimer,\
+                or set VSF_SYSTIMER_CFG_IMPL_MODE to VSF_SYSTIMER_IMPL_TICK_MODE\
+                for better optimization.
+#       endif
+#   endif
+
 #   if      VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS     \
         &&  !defined(VSF_SYSTIMER_CFG_IMPL_MODE)
 extern bool vsf_systimer_is_due(vsf_systimer_tick_t due);

@@ -31,15 +31,6 @@ extern "C" {
  ******************************************************************************/
 
 /*============================ MACROS ========================================*/
-
-//! \name different models to implement systimer
-//! @{
-#define VSF_SYSTIMER_IMPL_REQUEST_RESPONSE                      0
-#define VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER                     1
-#define VSF_SYSTIMER_IMPL_WITH_COMP_TIMER                       2
-#define VSF_SYSTIMER_IMPL_TICK_MODE                             3
-//!@}
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
