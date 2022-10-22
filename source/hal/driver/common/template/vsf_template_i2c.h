@@ -226,12 +226,12 @@ typedef void vsf_i2c_isr_handler_t(void *target_ptr,
  @brief i2c 中断配置
  */
 typedef struct vsf_i2c_isr_t {
-    vsf_i2c_isr_handler_t *handler_fn;        //!< \~english TODO
-                                              //!< \~chinese 中断回调函数
-    void                  *target_ptr;        //!< \~english pointer of user target
-                                              //!< \~chinese 用户传入的指针
-    vsf_arch_prio_t        prio;              //!< \~english interrupt priority
-                                              //!< \~chinesh 中断优先级
+    vsf_i2c_isr_handler_t *handler_fn;      //!< \~english TODO
+                                            //!< \~chinese 中断回调函数
+    void                  *target_ptr;      //!< \~english pointer of user target
+                                            //!< \~chinese 用户传入的指针
+    vsf_arch_prio_t        prio;            //!< \~english interrupt priority
+                                            //!< \~chinesh 中断优先级
 } vsf_i2c_isr_t;
 
 /**
@@ -242,14 +242,12 @@ typedef struct vsf_i2c_isr_t {
  @brief i2c 配置
  */
 typedef struct vsf_i2c_cfg_t {
-    vsf_i2c_feature_t mode;      //!< \~english i2c mode \ref vsf_i2c_feature_t
-                                //!< \~chinese i2c 模式 \ref vsf_i2c_feature_t
-
-    uint32_t clock_hz;          //!< \~english i2c clock (in Hz)
-                                //!< \~chinese i2c 时钟频率 (单位：Hz)
-
-    vsf_i2c_isr_t isr;          //!< \~english i2c interrupt
-                                //!< \~chinese i2c 中断
+    vsf_i2c_feature_t mode;                 //!< \~english i2c mode \ref vsf_i2c_feature_t
+                                            //!< \~chinese i2c 模式 \ref vsf_i2c_feature_t
+    uint32_t clock_hz;                      //!< \~english i2c clock (in Hz)
+                                            //!< \~chinese i2c 时钟频率 (单位：Hz)
+    vsf_i2c_isr_t isr;                      //!< \~english i2c interrupt
+                                            //!< \~chinese i2c 中断
 } vsf_i2c_cfg_t;
 
 typedef struct vsf_i2c_op_t {
