@@ -1233,7 +1233,7 @@ SECTION(".text.vsf.kernel.vsf_teda_set_timer")
 extern vsf_err_t vsf_teda_set_timer(vsf_systimer_tick_t tick);
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
-vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *pthis, vsf_systimer_tick_t tick);
+extern vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *pthis, vsf_systimer_tick_t tick);
 
 #   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 static inline vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms)
@@ -1257,20 +1257,20 @@ extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *pthis);
 
 #   if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 SECTION(".text.vsf.kernel.vsf_callback_timer_init")
-void vsf_callback_timer_init(vsf_callback_timer_t *timer);
+extern void vsf_callback_timer_init(vsf_callback_timer_t *timer);
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_add")
-vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick);
+extern vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick);
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_remove")
-vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer);
+extern vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer);
 
 #       if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED
 SECTION(".text.vsf.kernel.vsf_callback_timer_add_isr")
-vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick);
+extern vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick);
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_remove_isr")
-vsf_err_t vsf_callback_timer_remove_isr(vsf_callback_timer_t *timer);
+extern vsf_err_t vsf_callback_timer_remove_isr(vsf_callback_timer_t *timer);
 #       endif
 
 #       if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
@@ -1306,7 +1306,7 @@ extern vsf_err_t vsf_eda_sync_init(vsf_sync_t *pthis, uint_fast16_t cur_value,
 
 #if VSF_SYNC_CFG_SUPPORT_ISR == ENABLED
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_increase_isr(vsf_sync_t *pthis);
+extern vsf_err_t vsf_eda_sync_increase_isr(vsf_sync_t *pthis);
 #endif
 
 SECTION(".text.vsf.kernel.vsf_sync")
@@ -1315,9 +1315,9 @@ SECTION(".text.vsf.kernel.vsf_sync")
 extern vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda);
 
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t __vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda, bool manual);
+extern vsf_err_t __vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda, bool manual);
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t __vsf_eda_sync_decrease_ex(vsf_sync_t *pthis, vsf_timeout_tick_t timeout, vsf_eda_t *eda, bool manual);
+extern vsf_err_t __vsf_eda_sync_decrease_ex(vsf_sync_t *pthis, vsf_timeout_tick_t timeout, vsf_eda_t *eda, bool manual);
 
 SECTION(".text.vsf.kernel.vsf_sync")
 extern void vsf_eda_sync_force_reset(vsf_sync_t *pthis);
