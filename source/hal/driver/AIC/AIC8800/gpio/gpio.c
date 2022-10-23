@@ -121,7 +121,7 @@ void vsf_hw_gpio_write(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t value, uint32_t pin_
     temp_value = __hw_io_reg_read(is_pmic, &hw_gpio_ptr->GPIO->MR);
     __hw_io_reg_mask_write(is_pmic, &hw_gpio_ptr->GPIO->MR, pin_mask, ~(uint32_t)0);
     __hw_io_reg_mask_write(is_pmic, &hw_gpio_ptr->GPIO->VR, value, pin_mask);
-    __hw_io_reg_mask_write(hw_gpio_ptr, &hw_gpio_ptr->GPIO->MR, temp_value, ~(uint32_t)0);
+    __hw_io_reg_mask_write(is_pmic, &hw_gpio_ptr->GPIO->MR, temp_value, ~(uint32_t)0);
 
     vsf_protect_t orig = __vsf_gpio_protect();
     hw_gpio_ptr->output_reg &= ~pin_mask;
