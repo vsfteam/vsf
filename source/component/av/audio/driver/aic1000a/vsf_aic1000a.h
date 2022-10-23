@@ -15,19 +15,20 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_AUDIO_DUMMY_H__
-#define __VSF_AUDIO_DUMMY_H__
+#ifndef __VSF_AIC1000A_H__
+#define __VSF_AIC1000A_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "../../../vsf_av_cfg.h"
 
-#if VSF_USE_AUDIO == ENABLED && VSF_AUDIO_USE_DUMMY == ENABLED
+#if VSF_USE_AUDIO == ENABLED && VSF_AUDIO_USE_AIC1000A == ENABLED
 
 #include "component/av/vsf_av.h"
+#include "hal/vsf_hal.h"
 
-#if     defined(__VSF_AUDIO_DUMMY_CLASS_IMPLEMENT)
-#   undef __VSF_AUDIO_DUMMY_CLASS_IMPLEMENT
+#if     defined(__VSF_AIC1000A_CLASS_IMPLEMENT)
+#   undef __VSF_AIC1000A_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #endif
 
@@ -41,47 +42,29 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_AUDIO_USE_PLAYBACK == ENABLED
-
-typedef struct vk_audio_dummy_playback_buffer_t {
-    vsf_callback_timer_t timer;
-    void *param;
-} vk_audio_dummy_playback_buffer_t;
-
-typedef struct vk_audio_dummy_playback_ctx_t {
-    vk_audio_stream_t *audio_stream;
-    vk_audio_dummy_playback_buffer_t buffer[2];
-
-    bool is_playing;
-    bool fill_ticktock;
-    uint8_t buffer_taken;
-} vk_audio_dummy_playback_ctx_t;
-
-#endif
-
-vsf_class(vk_audio_dummy_dev_t) {
-    private_member(
-        bool is_inited;
-#if VSF_AUDIO_USE_PLAYBACK == ENABLED
-        vk_audio_dummy_playback_ctx_t playback_ctx;
-#endif
+vsf_class(vk_aic1000a_dev_t) {
+    public_member(
+        implement(vk_audio_dev_t)
+        vk_audio_stream_t __stream[1];
     )
 
     public_member(
-        implement(vk_audio_dev_t)
-        vk_audio_stream_t __stream[
-#if VSF_AUDIO_USE_PLAYBACK == ENABLED && VSF_AUDIO_USE_CAPTURE == ENABLED
-            2
-#else
-            1
-#endif
-        ];
+        vsf_i2c_t *i2s;
+        vsf_gpio_t *pwrkey_port;
+        vsf_gpio_t *psi_port;
+        uint8_t pwrkey_pin;
+        uint8_t psi_clk_pin;
+        uint8_t psi_dat_pin;
+    )
+
+    private_member(
+        bool is_inited;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vk_audio_drv_t vk_audio_dummy_drv;
+extern const vk_audio_drv_t vk_aic1000a_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -89,5 +72,5 @@ extern const vk_audio_drv_t vk_audio_dummy_drv;
 }
 #endif
 
-#endif      // VSF_USE_AUDIO && VSF_AUDIO_USE_DUMMY
-#endif      // __VSF_AUDIO_DUMMY_H__
+#endif      // VSF_USE_AUDIO && VSF_AUDIO_USE_AIC1000A
+#endif      // __VSF_AIC1000A_H__

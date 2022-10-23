@@ -192,28 +192,27 @@ __vsf_component_peda_ifs_entry(__vk_audio_dummy_playback_start, vk_audio_start)
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
 
     switch (evt) {
-    case VSF_EVT_INIT: {
-            if (playback_ctx->is_playing) {
-                VSF_AV_ASSERT(false);
-            do_return_fail:
-                vsf_eda_return(VSF_ERR_FAIL);
-                return;
-            }
-
-            playback_ctx->audio_stream = audio_stream;
-            playback_ctx->is_playing = true;
-            playback_ctx->fill_ticktock = false;
-            playback_ctx->buffer_taken = 0;
-            audio_stream->stream->rx.param = audio_stream;
-            audio_stream->stream->rx.evthandler = __vk_audio_dummy_playback_evthandler;
-            vsf_stream_connect_rx(audio_stream->stream);
-            if (vsf_stream_get_data_size(audio_stream->stream)) {
-                __vk_audio_dummy_playback_evthandler(audio_stream->stream, audio_stream, VSF_STREAM_ON_IN);
-            }
-
-            vsf_eda_return(VSF_ERR_NONE);
-            break;
+    case VSF_EVT_INIT:
+        if (playback_ctx->is_playing) {
+            VSF_AV_ASSERT(false);
+        do_return_fail:
+            vsf_eda_return(VSF_ERR_FAIL);
+            return;
         }
+
+        playback_ctx->audio_stream = audio_stream;
+        playback_ctx->is_playing = true;
+        playback_ctx->fill_ticktock = false;
+        playback_ctx->buffer_taken = 0;
+        audio_stream->stream->rx.param = audio_stream;
+        audio_stream->stream->rx.evthandler = __vk_audio_dummy_playback_evthandler;
+        vsf_stream_connect_rx(audio_stream->stream);
+        if (vsf_stream_get_data_size(audio_stream->stream)) {
+            __vk_audio_dummy_playback_evthandler(audio_stream->stream, audio_stream, VSF_STREAM_ON_IN);
+        }
+
+        vsf_eda_return(VSF_ERR_NONE);
+        break;
     }
     vsf_peda_end();
 }
