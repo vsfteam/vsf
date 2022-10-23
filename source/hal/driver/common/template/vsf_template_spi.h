@@ -29,18 +29,20 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+// multi-class support enabled by default for maximum availability.
+#ifndef VSF_SPI_CFG_MULTI_CLASS
+#   define VSF_SPI_CFG_MULTI_CLASS              ENABLED
+#endif
+
 // application code can redefine it
 #ifndef VSF_SPI_CFG_PREFIX
-#   if defined(VSF_HW_SPI_COUNT) && (VSF_HW_SPI_COUNT != 0)
+#   if VSF_SPI_CFG_MULTI_CLASS == ENABLED
+#       define VSF_SPI_CFG_PREFIX               vsf
+#   elif defined(VSF_HW_SPI_COUNT) && (VSF_HW_SPI_COUNT != 0)
 #       define VSF_SPI_CFG_PREFIX               vsf_hw
 #   else
 #       define VSF_SPI_CFG_PREFIX               vsf
 #   endif
-#endif
-
-// multi-class support enabled by default for maximum availability.
-#ifndef VSF_SPI_CFG_MULTI_CLASS
-#   define VSF_SPI_CFG_MULTI_CLASS              ENABLED
 #endif
 
 #ifndef VSF_SPI_CFG_FUNCTION_RENAME
