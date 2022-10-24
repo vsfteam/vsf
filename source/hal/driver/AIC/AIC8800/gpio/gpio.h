@@ -25,7 +25,6 @@
 #if VSF_HAL_USE_GPIO == ENABLED
 
 #   include "../io/io.h"
-#   include "./i_reg_gpio.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

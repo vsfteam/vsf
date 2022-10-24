@@ -24,6 +24,8 @@
 
 #if VSF_HAL_USE_IO == ENABLED
 
+#   include "../gpio/i_reg_gpio.h"
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HW_IO_CFG_MULTI_CLASS
@@ -40,7 +42,11 @@ typedef struct vsf_hw_io_t {
     vsf_io_t vsf_io;
 #endif
 
-    AIC_IOMUX_TypeDef *IOMUX[VSF_HW_IO_PORT_MAX];
+    struct {
+        AIC_IOMUX_TypeDef *IOMUX;
+        GPIO_REG_T *GPIO;
+        bool is_pmic;
+    } ports[VSF_HW_IO_PORT_MAX];
 } vsf_hw_io_t;
 
 /*============================ IMPLEMENTATION ================================*/
@@ -70,10 +76,16 @@ vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
         return VSF_ERR_NOT_SUPPORT;
     }
 
-    __hw_io_reg_mask_write(port_index != 0,
-                           &io_ptr->IOMUX[port_index]->GPCFG[pin_index],
-                           cfg_ptr->feature | cfg_ptr->function,
-                           __HW_IO_FEATURE_ALL_BITS | __VSF_HW_IO_FUNCTION_MASK);
+    bool is_pmic = io_ptr->ports[port_index].is_pmic;
+    volatile uint32_t *reg = &io_ptr->ports[port_index].IOMUX->GPCFG[pin_index];
+    uint32_t wdata = cfg_ptr->feature | cfg_ptr->function;
+    uint32_t wmask = __HW_IO_FEATURE_ALL_BITS | __VSF_HW_IO_FUNCTION_MASK;
+    if (is_pmic) {
+        PMIC_MEM_MASK_WRITE((unsigned int)reg, wdata, wmask);
+        PMIC_MEM_MASK_WRITE((unsigned int)&io_ptr->ports[pin_index].GPIO->MR,  (1 << pin_index), (1 << pin_index));
+    } else {
+        *reg = (*reg & ~wmask) | (wdata & wmask);
+    }
 
     return VSF_ERR_NONE;
 }
@@ -96,14 +108,17 @@ vsf_err_t vsf_hw_io_config(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSF_HW_IOMUX(__COUNT, __) \
-    ((AIC_IOMUX_TypeDef *) VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),
+
+#define __VSF_HW_IOMUX(__COUNT, __)                                                     \
+    .ports[__COUNT] = {                                                                 \
+        .is_pmic = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC,                               \
+        .IOMUX = ((AIC_IOMUX_TypeDef *) VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),  \
+        .GPIO = REG_GPIO ## __COUNT,                                                    \
+    },
 
 #define VSF_IO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                   \
     vsf_hw_io_t vsf_hw_io = {                                                   \
-        .IOMUX = {                                                              \
-            VSF_MREPEAT(VSF_HW_IO_PORT_MAX, __VSF_HW_IOMUX, NULL)               \
-        },                                                                      \
+        VSF_MREPEAT(VSF_HW_IO_PORT_MAX, __VSF_HW_IOMUX, NULL)                   \
         __HAL_OP                                                                \
     };
 

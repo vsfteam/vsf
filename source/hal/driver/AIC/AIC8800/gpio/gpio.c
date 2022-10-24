@@ -24,6 +24,7 @@
 
 #if VSF_HAL_USE_GPIO == ENABLED
 
+#include "./i_reg_gpio.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 
 // TODO: fixed gpio output_and_set
@@ -72,6 +73,9 @@ void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, uint_
         if (pin_mask & (1 << i)) {
             __hw_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->IOMUX->GPCFG[i],
                                   feature, __HW_IO_FEATURE_ALL_BITS);
+            if (hw_gpio_ptr->is_pmic) {
+                PMIC_MEM_MASK_WRITE((unsigned int)&hw_gpio_ptr->GPIO->MR, (1 << i), (1 << i));
+            }
         }
     }
 }
@@ -94,34 +98,36 @@ uint32_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask
 
 uint32_t vsf_hw_gpio_read(vsf_hw_gpio_t *hw_gpio_ptr)
 {
-    uint32_t pin_mask, pin_value;
-    uint32_t read_mask = ~(uint32_t)0;
-
+    uint32_t origin_pin_mask, pin_value;
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
 
-    bool is_pmic = hw_gpio_ptr->is_pmic;
-
-    pin_mask = __hw_io_reg_read(is_pmic, &hw_gpio_ptr->GPIO->MR);
-
-    __hw_io_reg_mask_write(is_pmic, &hw_gpio_ptr->GPIO->MR, read_mask, ~(uint32_t)0);
-    pin_value = __hw_io_reg_read(is_pmic, &hw_gpio_ptr->GPIO->VR);
-    __hw_io_reg_mask_write(is_pmic, &hw_gpio_ptr->GPIO->MR, pin_mask, ~(uint32_t)0);
+    if (!hw_gpio_ptr->is_pmic) {
+        origin_pin_mask = hw_gpio_ptr->GPIO->MR;
+        hw_gpio_ptr->GPIO->MR = ~(uint32_t)0;
+        pin_value = hw_gpio_ptr->GPIO->VR;
+        hw_gpio_ptr->GPIO->MR = origin_pin_mask;
+    } else {
+        pin_value = PMIC_MEM_READ((unsigned int)&hw_gpio_ptr->GPIO->VR);
+    }
 
     return pin_value;
 }
 
 void vsf_hw_gpio_write(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t value, uint32_t pin_mask)
 {
-    uint32_t temp_value;
+    uint32_t origin_pin_mask;
 
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
-    bool is_pmic = hw_gpio_ptr->is_pmic;
 
-    temp_value = __hw_io_reg_read(is_pmic, &hw_gpio_ptr->GPIO->MR);
-    __hw_io_reg_mask_write(is_pmic, &hw_gpio_ptr->GPIO->MR, pin_mask, ~(uint32_t)0);
-    __hw_io_reg_mask_write(is_pmic, &hw_gpio_ptr->GPIO->VR, value, pin_mask);
-    __hw_io_reg_mask_write(is_pmic, &hw_gpio_ptr->GPIO->MR, temp_value, ~(uint32_t)0);
+    if (!hw_gpio_ptr->is_pmic) {
+        origin_pin_mask = hw_gpio_ptr->GPIO->MR;
+        hw_gpio_ptr->GPIO->MR = pin_mask;
+        hw_gpio_ptr->GPIO->VR = value;
+        hw_gpio_ptr->GPIO->MR = origin_pin_mask;
+    } else {
+        PMIC_MEM_MASK_WRITE((unsigned int)&hw_gpio_ptr->GPIO->VR, value, pin_mask);
+    }
 
     vsf_protect_t orig = __vsf_gpio_protect();
     hw_gpio_ptr->output_reg &= ~pin_mask;
