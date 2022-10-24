@@ -116,7 +116,7 @@ vsf_err_t vsf_flash_read_one_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset
     return flash_ptr->op->read_one_sector(flash_ptr, offset, buffer, size);
 }
 
-vsf_err_t vsf_flash_read_mult_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
+vsf_err_t vsf_flash_read_multi_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
 {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(flash_ptr->op != NULL);
