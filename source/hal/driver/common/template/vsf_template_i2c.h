@@ -37,6 +37,7 @@ extern "C" {
 // application code can redefine it
 #ifndef VSF_I2C_CFG_PREFIX
 #   if VSF_I2C_CFG_MULTI_CLASS == ENABLED
+#       define VSF_I2C_CFG_PREFIX               vsf
 #   elif defined(VSF_HW_I2C_COUNT) && (VSF_HW_I2C_COUNT != 0)
 #       define VSF_I2C_CFG_PREFIX               vsf_hw
 #   else
