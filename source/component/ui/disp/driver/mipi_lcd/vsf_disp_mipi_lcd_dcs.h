@@ -191,7 +191,7 @@ extern "C" {
 // 0 = Normal Mode, column register is first increment
 // 1 = Reverse Mode, page register is first increment
 #define MIPI_DCS_PAGE_COLUMN_NORMAL_ORDER               (0 << 5)
-#define MIPI_DCS_PAGE_COLUMN_Reverse_ORDER              (1 << 5)
+#define MIPI_DCS_PAGE_COLUMN_REVERSE_ORDER              (1 << 5)
 // bits[4:0]: display module¡¯s frame memory to the display device
 // Display Device Line Refresh Order, 0 = Top line to Bottom line, 1 = Bottom line to Top line
 #define MIPI_DCS_DEVICE_REFRESH_TOP_TO_BOTTOM           (0 << 4)
@@ -231,26 +231,20 @@ extern "C" {
 // TODO
 // Defines how many bits per pixel are used in the interface.
 #define MIPI_DCS_CMD_HEX_CODE_SET_PIXEL_FORMAT          0x3A
-#define MIPI_DCS_PIXEL_FORMAT_3_BITS                    0x01
-#define MIPI_DCS_PIXEL_FORMAT_8_BITS                    0x02
-#define MIPI_DCS_PIXEL_FORMAT_12_BITS                   0x03
-#define MIPI_DCS_PIXEL_FORMAT_16_BITS                   0x05
-#define MIPI_DCS_PIXEL_FORMAT_18_BITS                   0x06
-#define MIPI_DCS_PIXEL_FORMAT_24_BITS                   0x07
+#define MIPI_DCS_PIXEL_FORMAT_BITS_3                    0x01
+#define MIPI_DCS_PIXEL_FORMAT_BITS_8                    0x02
+#define MIPI_DCS_PIXEL_FORMAT_BITS_12                   0x03
+#define MIPI_DCS_PIXEL_FORMAT_BITS_16                   0x05
+#define MIPI_DCS_PIXEL_FORMAT_BITS_18                   0x06
+#define MIPI_DCS_PIXEL_FORMAT_BITS_24                   0x07
+// __BITS IN [3, 8, 12, 16, 18, 24]
+#define MIPI_DCS_PIXEL_FORMAT_BITS(__BITS)              MIPI_DCS_PIXEL_FORMAT_BITS_ ## __BITS
 // DPI: Display Pixel Interface, or MCU Interface
-#define MIPI_DCS_PIXEL_FORMAT_DBI_3_BITS                MIPI_DCS_PIXEL_FORMAT_3_BITS
-#define MIPI_DCS_PIXEL_FORMAT_DBI_8_BITS                MIPI_DCS_PIXEL_FORMAT_8_BITS
-#define MIPI_DCS_PIXEL_FORMAT_DBI_12_BITS               MIPI_DCS_PIXEL_FORMAT_12_BITS
-#define MIPI_DCS_PIXEL_FORMAT_DBI_16_BITS               MIPI_DCS_PIXEL_FORMAT_16_BITS
-#define MIPI_DCS_PIXEL_FORMAT_DBI_18_BITS               MIPI_DCS_PIXEL_FORMAT_18_BITS
-#define MIPI_DCS_PIXEL_FORMAT_DBI_24_BITS               MIPI_DCS_PIXEL_FORMAT_24_BITS
+// __BITS IN [3, 8, 12, 16, 18, 24]
+#define MIPI_DCS_PIXEL_FORMAT_DBI_BITS(__BITS)          MIPI_DCS_PIXEL_FORMAT_BITS(__BITS)
 // DBI: Display Bus Interface, or System-80 interface
-#define MIPI_DCS_PIXEL_FORMAT_DPI_3_BITS                (MIPI_DCS_PIXEL_FORMAT_3_BITS  << 4)
-#define MIPI_DCS_PIXEL_FORMAT_DPI_8_BITS                (MIPI_DCS_PIXEL_FORMAT_8_BITS  << 4)
-#define MIPI_DCS_PIXEL_FORMAT_DPI_12_BITS               (MIPI_DCS_PIXEL_FORMAT_12_BITS << 4)
-#define MIPI_DCS_PIXEL_FORMAT_DPI_16_BITS               (MIPI_DCS_PIXEL_FORMAT_16_BITS << 4)
-#define MIPI_DCS_PIXEL_FORMAT_DPI_18_BITS               (MIPI_DCS_PIXEL_FORMAT_18_BITS << 4)
-#define MIPI_DCS_PIXEL_FORMAT_DPI_24_BITS               (MIPI_DCS_PIXEL_FORMAT_24_BITS << 4)
+// __BITS IN [3, 8, 12, 16, 18, 24]
+#define MIPI_DCS_PIXEL_FORMAT_DPI_BITS(__BITS)          (MIPI_DCS_PIXEL_FORMAT_BITS(__BITS) << 4)
 #define MIPI_DCS_CMD_SET_PIXEL_FORMAT(__PF) \
             VSF_DISP_MIPI_LCD_WRITE(MIPI_DCS_CMD_HEX_CODE_SET_PIXEL_FORMAT, 1, __PF)
 
