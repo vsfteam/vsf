@@ -391,8 +391,8 @@ extern void VSF_DEBUG_STREAM_POLL(void);
                 MIPI_DCS_COLUME_ADDRESS_LEFT_TO_RIGHT       |                   \
                 MIPI_DCS_PAGE_COLUMN_NORMAL_ORDER)
 #      define APP_DISP_DEMO_SEQ                         {                       \
-                VSF_DISP_MIPI_LCD_ST7789V_BASE,                                 \
-                VSF_DISP_MIPI_LCD_INIT_MODE_AND_FORMAT(                         \
+                VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,                             \
+                VSF_DISP_MIPI_SPI_LCD_INIT_MODE_AND_FORMAT(                     \
                     APP_DISP_DEMO_ADDRESS_MODE,                                 \
                     MIPI_DCS_PIXEL_FORMAT_DBI_16_BITS                           \
                 ),                                                              \
