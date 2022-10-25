@@ -86,7 +86,7 @@ vsf_err_t vk_audio_start(vk_audio_dev_t *pthis, uint_fast8_t stream_idx,
     VSF_AV_ASSERT(  (pthis != NULL)
                 &&  (format != NULL)
                 &&  (stream != NULL)
-                &&  (pthis->stream_num >= stream_idx)
+                &&  (pthis->stream_num > stream_idx)
                 &&  (audio_stream->drv != NULL)
                 &&  (audio_stream->drv->start != NULL)
                 &&  (NULL == audio_stream->stream));

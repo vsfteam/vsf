@@ -28,6 +28,7 @@
 #include "service/vsf_service.h"
 #include "./vsf_aic1000a.h"
 
+#include "audio_types.h"
 #include "aic1000Aud_iomux.h"
 #include "aic1000Aud_aud_codec.h"
 #include "aic1000Aud_aud_ctrl_reg.h"
@@ -482,6 +483,105 @@ static void __vk_aic1000a_reg_seq(vk_aic1000a_dev_t *dev, const vk_aic1000a_reg_
     }
 }
 
+static void __vk_aic1000a_clear_spk_mem(vk_aic1000a_dev_t *dev)
+{
+    if (!dev->dac.mem_cleared) {
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl),
+            AIC1000AUD_AUD_CODEC_SPK_MEM_CLKSEL, AIC1000AUD_AUD_CODEC_SPK_MEM_CLKSEL);
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl),
+            AIC1000AUD_AUD_CODEC_SPK_MEM_CLR, AIC1000AUD_AUD_CODEC_SPK_MEM_CLR);
+        while(!((__vk_aic1000a_reg_read(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl))) & AIC1000AUD_AUD_CODEC_SPK_MEM_CLR_DONE));
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl), 0, AIC1000AUD_AUD_CODEC_SPK_MEM_CLR);
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl), 0, AIC1000AUD_AUD_CODEC_SPK_MEM_CLKSEL);
+        dev->dac.mem_cleared = true;
+    }
+}
+
+static void __vk_aic1000a_clear_mic_mem(vk_aic1000a_dev_t *dev)
+{
+    if (!dev->adc.mem_cleared) {
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl),
+            AIC1000AUD_AUD_CODEC_MIC_MEM_CLKSEL, AIC1000AUD_AUD_CODEC_MIC_MEM_CLKSEL);
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl),
+            AIC1000AUD_AUD_CODEC_MIC_MEM_CLR, AIC1000AUD_AUD_CODEC_MIC_MEM_CLR);
+        while(!((__vk_aic1000a_reg_read(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl))) & AIC1000AUD_AUD_CODEC_MIC_MEM_CLR_DONE));
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl), 0, AIC1000AUD_AUD_CODEC_MIC_MEM_CLR);
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->mem_ctrl), 0, AIC1000AUD_AUD_CODEC_MIC_MEM_CLKSEL);
+        dev->adc.mem_cleared = true;
+    }
+}
+
+static void __vk_aic1000_dac_pu(vk_aic1000a_dev_t *dev, uint8_t ch_map)
+{
+    if ((dev->dac.ch_ana_pu & ch_map) == ch_map) {
+        return;
+    }
+
+    uint8_t l_pu = (ch_map & AUD_CH_MAP_CH_0) ? 1 : 0;
+    uint8_t r_pu = (ch_map & AUD_CH_MAP_CH_1) ? 1 : 0;
+
+    __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->abb_sdm_dac1),
+            AIC1000AUD_AUD_CODEC_ABB_SDM_DAC_ANA_RSTN
+        |   AIC1000AUD_AUD_CODEC_ABB_SDM_DAC_DIG_RSTN
+        |   (AIC1000AUD_AUD_CODEC_ABB_PU_SDM_DAC_R * r_pu)
+        |   (AIC1000AUD_AUD_CODEC_ABB_PU_SDM_DAC_L * l_pu),
+            AIC1000AUD_AUD_CODEC_ABB_SDM_DAC_ANA_RSTN
+        |   AIC1000AUD_AUD_CODEC_ABB_SDM_DAC_DIG_RSTN
+        |   (AIC1000AUD_AUD_CODEC_ABB_PU_SDM_DAC_R * r_pu)
+        |   (AIC1000AUD_AUD_CODEC_ABB_PU_SDM_DAC_L * l_pu)
+    );
+
+    if (l_pu == 1) {
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->abb_hp_l),
+            AIC1000AUD_AUD_CODEC_ABB_PU_HP_L_MPATH | AIC1000AUD_AUD_CODEC_ABB_PU_HP_L_BIAS,
+            AIC1000AUD_AUD_CODEC_ABB_PU_HP_L_MPATH | AIC1000AUD_AUD_CODEC_ABB_PU_HP_L_BIAS);
+    }
+
+    if (r_pu == 1) {
+        __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->abb_hp_r),
+            AIC1000AUD_AUD_CODEC_ABB_PU_HP_R_MPATH | AIC1000AUD_AUD_CODEC_ABB_PU_HP_R_BIAS,
+            AIC1000AUD_AUD_CODEC_ABB_PU_HP_R_MPATH | AIC1000AUD_AUD_CODEC_ABB_PU_HP_R_BIAS);
+    }
+
+    dev->dac.ch_ana_pu |= ch_map;
+}
+
+void __vk_aic1000_dac_start(vk_aic1000a_dev_t *dev, vk_audio_stream_t *audio_stream)
+{
+    uint8_t spk_sync_en = 0;
+#if VSF_AUDIO_USE_CAPTURE != ENABLED
+    uint8_t i2s0_trig_sel = 1;
+#else
+    uint8_t i2s0_trig_sel = !(dev->adc.ch_en & (AUD_CH_MAP_CH_0 | AUD_CH_MAP_CH_1));
+#endif
+    uint8_t channel_mask = 1 == audio_stream->format.channel_num ?
+            AUD_CH_MAP_CH_0 : AUD_CH_MAP_CH_0 | AUD_CH_MAP_CH_1;
+
+    __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->core_ctrl0),
+            AIC1000AUD_AUD_CODEC_AUD_CFG_POS
+        |   AIC1000AUD_AUD_CODEC_SPK_DAC_EN(channel_mask)
+        |   (AIC1000AUD_AUD_CODEC_SPK_SYNC_EN * spk_sync_en)
+        |   0,
+            AIC1000AUD_AUD_CODEC_AUD_CFG_POS
+        |   AIC1000AUD_AUD_CODEC_SPK_DAC_EN(3)
+        |   AIC1000AUD_AUD_CODEC_SPK_SYNC_EN
+        |   AIC1000AUD_AUD_CODEC_ADDA_DLY_EN);
+    __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->iis_ctrl1),
+            AIC1000AUD_AUD_CODEC_IIS0_IDAT_EN
+        |   (AIC1000AUD_AUD_CODEC_IIS0_TRIG_SEL * i2s0_trig_sel)
+        |   AIC1000AUD_AUD_CODEC_IIS0_TRIG_EN,
+            AIC1000AUD_AUD_CODEC_IIS0_IDAT_EN
+        |   AIC1000AUD_AUD_CODEC_IIS0_TRIG_SEL
+        |   AIC1000AUD_AUD_CODEC_IIS0_TRIG_EN);
+    __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->iis_ctrl0),
+        AIC1000AUD_AUD_CODEC_IIS_EN, AIC1000AUD_AUD_CODEC_IIS_EN);
+    __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->clk_ctrl),
+            AIC1000AUD_AUD_CODEC_CGEN_FIX(0x80)
+        |   AIC1000AUD_AUD_CODEC_CGEN_VAL(0x80),
+            AIC1000AUD_AUD_CODEC_CGEN_FIX(0x80)
+        |   AIC1000AUD_AUD_CODEC_CGEN_VAL(0x80));
+}
+
 __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
 {
     vsf_peda_begin();
@@ -502,6 +602,23 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         vsf_gpio_clear(dev->pwrkey_port, 1 << dev->pwrkey_pin);
         vsf_gpio_set_output(dev->psi_port, (1 << dev->psi_clk_pin) | (1 << dev->psi_dat_pin));
         __vk_aic1000a_reg_seq(dev, __vk_aic1000a_init_seq, dimof(__vk_aic1000a_init_seq));
+
+        dev->stream_num = 0;
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+        dev->stream[dev->stream_num].stream_index = 0;
+        dev->stream[dev->stream_num].dir_in1out0 = 0;
+        dev->stream[dev->stream_num].format.value = 0;
+        dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_playback;
+        dev->stream_num++;
+#endif
+#if VSF_AUDIO_CFG_USE_CATURE == ENABLED
+        dev->stream[dev->stream_num].stream_index = 1;
+        dev->stream[dev->stream_num].dir_in1out0 = 1;
+        dev->stream[dev->stream_num].format.value = 0;
+        dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_capture;
+        dev->stream_num++;
+#endif
+
         vsf_eda_return(VSF_ERR_NONE);
         break;
     }
@@ -512,85 +629,40 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
 __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_control, vk_audio_control)
 {
     vsf_peda_begin();
+    vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
-}
-
-static bool __vk_aic1000a_playback_buffer(vk_aic1000a_dev_t *dev, uint8_t *buffer, uint_fast32_t size)
-{
-    vk_aic1000a_playback_ctx_t *playback_ctx = &dev->playback_ctx;
-    vk_audio_format_t *audio_format = &playback_ctx->audio_stream->format;
-    if (playback_ctx->buffer_taken < dimof(playback_ctx->buffer)) {
-        vk_aic1000a_playback_buffer_t *aic1000a_buffer =
-            playback_ctx->fill_ticktock ? &playback_ctx->buffer[0] : &playback_ctx->buffer[1];
-
-        vsf_protect_t orig = vsf_protect_int();
-            playback_ctx->buffer_taken++;
-        vsf_unprotect_int(orig);
-
-        playback_ctx->fill_ticktock = !playback_ctx->fill_ticktock;
-
-        memset(&aic1000a_buffer->timer, 0, sizeof(aic1000a_buffer->timer));
-        aic1000a_buffer->timer.on_timer = __vk_aic1000a_ontimer;
-        aic1000a_buffer->param = playback_ctx;
-        uint_fast32_t nsamples = size / (audio_format->channel_num * audio_format->sample_bit_width >> 3);
-        vsf_callback_timer_add_us(&aic1000a_buffer->timer, nsamples * 1000000 / audio_format->sample_rate);
-
-        return true;
-    }
-    return false;
-}
-
-static void __vk_aic1000a_playback_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
-{
-    vk_audio_stream_t *audio_stream = param;
-    vk_audio_stream_t *audio_stream_base = audio_stream - audio_stream->stream_index;
-    vk_aic1000a_dev_t *dev = container_of(audio_stream_base, vk_aic1000a_dev_t, stream);
-    vk_aic1000a_playback_ctx_t *playback_ctx = &dev->playback_ctx;
-    uint_fast32_t datasize;
-    uint8_t *buff;
-
-    switch (evt) {
-    case VSF_STREAM_ON_CONNECT:
-    case VSF_STREAM_ON_IN:
-        while (playback_ctx->is_playing && (playback_ctx->buffer_taken < dimof(playback_ctx->buffer))) {
-            __vsf_aic1000a_trace(VSF_TRACE_DEBUG, "%d [aic1000a]: play stream evthandler\r\n", vsf_systimer_get_ms());
-            datasize = vsf_stream_get_rbuf(stream, &buff);
-            if (!datasize) { break; }
-
-            if (__vk_aic1000a_playback_buffer(dev, buff, datasize)) {
-                vsf_stream_read(stream, (uint8_t *)buff, datasize);
-            }
-        }
-        break;
-    }
 }
 
 __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_start, vk_audio_start)
 {
     vsf_peda_begin();
     vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
-    vk_aic1000a_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
+    uint8_t channel_num = audio_stream->format.channel_num;
+    uint8_t channel_mask;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (playback_ctx->is_playing) {
-            VSF_AV_ASSERT(false);
-        do_return_fail:
-            vsf_eda_return(VSF_ERR_FAIL);
+        if (!channel_num || (channel_num > 2)) {
+            vsf_eda_return(VSF_ERR_NOT_SUPPORT);
             return;
         }
 
-        playback_ctx->audio_stream = audio_stream;
-        playback_ctx->is_playing = true;
-        playback_ctx->fill_ticktock = false;
-        playback_ctx->buffer_taken = 0;
-        audio_stream->stream->rx.param = audio_stream;
-        audio_stream->stream->rx.evthandler = __vk_aic1000a_playback_evthandler;
-        vsf_stream_connect_rx(audio_stream->stream);
-        if (vsf_stream_get_data_size(audio_stream->stream)) {
-            __vk_aic1000a_playback_evthandler(audio_stream->stream, audio_stream, VSF_STREAM_ON_IN);
+        __vk_aic1000a_clear_spk_mem(dev);
+        if (1 == channel_num) {
+            channel_mask = AUD_CH_MAP_CH_0;
+            __vk_aic1000_dac_pu(dev, channel_mask);
+            __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->dac_sdm_ctrl),
+                AIC1000AUD_AUD_CODEC_DAC_SDM_MUX, AIC1000AUD_AUD_CODEC_DAC_SDM_MUX);
+        } else {
+            channel_mask = AUD_CH_MAP_CH_0 | AUD_CH_MAP_CH_1;
+            __vk_aic1000_dac_pu(dev, channel_mask);
+            __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->dac_sdm_ctrl),
+                0,  AIC1000AUD_AUD_CODEC_DAC_SDM_MUX);
         }
+
+        // TODO: configure and start I2S
+        __vk_aic1000_dac_start(dev, audio_stream);
 
         vsf_eda_return(VSF_ERR_NONE);
         break;
@@ -602,12 +674,10 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_stop, vk_audio_stop)
 {
     vsf_peda_begin();
     vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
-    vk_aic1000a_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        playback_ctx->is_playing = false;
         // TODO: make sure play.stream will not be used
         audio_stream->stream = NULL;
         vsf_eda_return(VSF_ERR_NONE);

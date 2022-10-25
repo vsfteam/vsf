@@ -45,7 +45,7 @@ extern "C" {
 vsf_class(vk_aic1000a_dev_t) {
     public_member(
         implement(vk_audio_dev_t)
-        vk_audio_stream_t __stream[1];
+        vk_audio_stream_t __stream[2];
     )
 
     public_member(
@@ -59,6 +59,18 @@ vsf_class(vk_aic1000a_dev_t) {
 
     private_member(
         bool is_inited;
+        struct {
+            bool mem_cleared;
+            uint8_t ch_en;
+            uint8_t ch_ana_pu;
+        } dac;
+        struct {
+            bool mem_cleared;
+            uint8_t ch_en;
+            uint8_t ch_ana_pu;
+            uint8_t ch_d36_en;
+            uint8_t ch_d36_d3;
+        } adc;
     )
 };
 
