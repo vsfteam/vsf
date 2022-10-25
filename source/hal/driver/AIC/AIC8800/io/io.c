@@ -37,6 +37,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef struct vsf_hw_io_gpio_map_t {
+    uint8_t funs[VSF_HW_IO_PIN_MAX];
+} vsf_hw_io_gpio_map_t;
+
 typedef struct vsf_hw_io_t {
 #if VSF_HW_IO_CFG_MULTI_CLASS == ENABLED
     vsf_io_t vsf_io;
@@ -46,6 +50,7 @@ typedef struct vsf_hw_io_t {
         AIC_IOMUX_TypeDef *IOMUX;
         GPIO_REG_T *GPIO;
         bool is_pmic;
+        vsf_hw_io_gpio_map_t *gpio_map;
     } ports[VSF_HW_IO_PORT_MAX];
 } vsf_hw_io_t;
 
@@ -82,7 +87,13 @@ vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
     uint32_t wmask = __HW_IO_FEATURE_ALL_BITS | __VSF_HW_IO_FUNCTION_MASK;
     if (is_pmic) {
         PMIC_MEM_MASK_WRITE((unsigned int)reg, wdata, wmask);
-        PMIC_MEM_MASK_WRITE((unsigned int)&io_ptr->ports[pin_index].GPIO->MR,  (1 << pin_index), (1 << pin_index));
+        if (   io_ptr->ports[port_index].gpio_map != NULL) {
+            uint8_t * funs = io_ptr->ports[port_index].gpio_map->funs;
+            if (funs[pin_index] == cfg_ptr->function) {
+                // MR register need to be set 1 when pmic port configured as GPIO
+                PMIC_MEM_MASK_WRITE((unsigned int)&io_ptr->ports[pin_index].GPIO->MR,  (1 << pin_index), (1 << pin_index));
+            }
+        }
     } else {
         *reg = (*reg & ~wmask) | (wdata & wmask);
     }
@@ -114,6 +125,7 @@ vsf_err_t vsf_hw_io_config(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast
         .is_pmic = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC,                               \
         .IOMUX = ((AIC_IOMUX_TypeDef *) VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),  \
         .GPIO = REG_GPIO ## __COUNT,                                                    \
+        .gpio_map = VSF_HW_IO_PORT ## __COUNT ## _MAP,                     \
     },
 
 #define VSF_IO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                   \

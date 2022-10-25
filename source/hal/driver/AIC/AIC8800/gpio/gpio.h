@@ -30,6 +30,9 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
+/*============================ PROTOTYPES ====================================*/
+
+extern void vsf_hw_aic8800_gpio_init(void);
 
 #define VSF_GPIO_CFG_DEC_PREFIX         vsf_hw
 #define VSF_GPIO_CFG_DEC_UPCASE_PREFIX  VSF_HW

@@ -71,8 +71,13 @@
 #define VSF_HW_IO_FUNCTION_MAX          10 // All Function 10 ~ Function 15 is invalid
 #define VSF_HW_IO_PORT0_IOMUX_REG_BASE  (0x40503000)
 #define VSF_HW_IO_PORT0_IS_PMIC         false
+#define VSF_HW_IO_PORT0_MAP             NULL
+#define VSF_HW_IO_PORT0_GPIO_PIN_MASK   (0x00000000)    // PORTA is not pmic port, only used to compile, ignore it's value
 #define VSF_HW_IO_PORT1_IOMUX_REG_BASE  (0x50012000)
 #define VSF_HW_IO_PORT1_IS_PMIC         true
+#define VSF_HW_IO_PORT1_MAP             &((vsf_hw_io_gpio_map_t){1, 1, 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0})
+#define VSF_HW_IO_PORT1_GPIO_PIN_MASK   (0x0000FFFC)    // GPIOB0 and GPIOB1 default function is not GPIO
+                                                        //GPIOB2 ~ GPIOB15 default function is GPIO
 
 #define VSF_HW_GPIO_COUNT               VSF_HW_IO_PORT_MAX
 #define VSF_HW_GPIO_PIN_MAX             VSF_HW_IO_PIN_MAX

@@ -103,9 +103,7 @@ bool vsf_driver_init(void)
     sysctrl_clock_cfg(CLK_CFG_D480S240P120F120);
     SystemCoreClockUpdate();
 
-    vsf_hw_gpio_config_pin(&vsf_hw_gpio1,
-                           VSF_HW_IO_CFG_PB_AS_GPIO_PIN_MASK,
-                           VSF_HW_IO_CFG_PB_AS_GPIO_FEATURE);
+    vsf_hw_aic8800_gpio_init();     // gpio pmic workround, more info in gpio.c:69
 
     stdio_uart_init();
     dbg_init();
