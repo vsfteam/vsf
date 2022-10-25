@@ -51,15 +51,6 @@
 #       include "./port/mbedtls/mbedtls_aic8800.h"
 
 /*============================ MACROS ========================================*/
-
-#   ifndef VSF_HW_IO_CFG_PB_AS_GPIO_PIN_MASK
-#       define VSF_HW_IO_CFG_PB_AS_GPIO_PIN_MASK    __VSF_HW_IO_PIN_MASK
-#   endif
-
-#   ifndef VSF_HW_IO_CFG_PB_AS_GPIO_FEATURE
-#       define VSF_HW_IO_CFG_PB_AS_GPIO_FEATURE     IO_OPEN_DRAIN
-#   endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
