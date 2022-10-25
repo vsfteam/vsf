@@ -106,13 +106,6 @@ vsf_err_t vsf_hw_mmc_init(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_cfg_t *cfg_ptr)
     cpusysctrl_oclkme_set(CSC_OCLKME_SDMMC_EN_BIT);
     cpusysctrl_hclk1me_set(CSC_HCLK1ME_SDMMC_EN_BIT | CSC_HCLK1ME_SDMMC_ALWAYS_EN_BIT);
 
-    iomux_gpio_config_sel_setf(10, 6);
-    iomux_gpio_config_sel_setf(11, 6);
-    iomux_gpio_config_sel_setf(12, 6);
-    iomux_gpio_config_sel_setf(13, 6);
-    iomux_gpio_config_sel_setf(14, 6);
-    iomux_gpio_config_sel_setf(15, 6);
-
     mmc_ptr->cfg = *cfg_ptr;
     NVIC_SetPriority(mmc_ptr->mmc_const->irqn, (uint32_t)cfg_ptr->isr.prio);
     NVIC_EnableIRQ(mmc_ptr->mmc_const->irqn);
