@@ -90,17 +90,18 @@ static app_gpio_demo_t __app_gpio_demo;
 
 static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
+    uint32_t read_pins;
+
     switch (evt) {
     case VSF_EVT_INIT:
         vsf_gpio_set_input(APP_GPIO_DEMO_CFG_INPUT_GPIO,  APP_GPIO_DEMO_CFG_INPUT_PIN_MASK);
         vsf_gpio_set_output(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
+        vsf_gpio_set(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
 
     case VSF_EVT_TIMER:
         vsf_gpio_toggle(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
-
-        uint32_t read_pins = vsf_gpio_read(APP_GPIO_DEMO_CFG_INPUT_GPIO) & APP_GPIO_DEMO_CFG_INPUT_PIN_MASK;
+        read_pins = vsf_gpio_read(APP_GPIO_DEMO_CFG_INPUT_GPIO) & APP_GPIO_DEMO_CFG_INPUT_PIN_MASK;
         vsf_trace_debug("read pin value: 0x%08x" VSF_TRACE_CFG_LINEEND, read_pins);
-
         vsf_teda_set_timer_ms(APP_GPIO_DEMO_DELAY_MS);
         break;
     }
