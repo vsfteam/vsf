@@ -22,6 +22,9 @@
 
 #include "hal/driver/driver.h"
 
+// in case mmc is not supported by current platform, include below to avoid compile error
+#include "hal/driver/common/template/vsf_template_mmc.h"
+
 #if VSF_HAL_USE_MMC == ENABLED && VSF_MMC_CFG_MULTI_CLASS == ENABLED
 
 /*============================ MACROS ========================================*/

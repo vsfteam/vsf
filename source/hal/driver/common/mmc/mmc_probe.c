@@ -25,6 +25,11 @@
 
 #include "hal/driver/driver.h"
 
+// in case mmc is not supported by current platform, include below to avoid compile error
+#include "hal/driver/common/template/vsf_template_mmc.h"
+
+#include "./mmc_probe.h"
+
 /*============================ MACROS ========================================*/
 
 #define MMC_SEND_IF_COND_CHECK_PATTERN          0xAA
