@@ -156,7 +156,7 @@ vsf_mmc_capability_t vsf_hw_mmc_capability(vsf_hw_mmc_t *mmc_ptr)
     return capability;
 }
 
-vsf_err_t vsf_hw_mmc_host_set_clock(vsf_hw_mmc_t *mmc_ptr, uint32_t clock_hz)
+vsf_err_t vsf_hw_mmc_set_clock(vsf_hw_mmc_t *mmc_ptr, uint32_t clock_hz)
 {
     AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
     extern uint32_t SystemCoreClock;
@@ -167,7 +167,7 @@ vsf_err_t vsf_hw_mmc_host_set_clock(vsf_hw_mmc_t *mmc_ptr, uint32_t clock_hz)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_mmc_host_set_bus_width(vsf_hw_mmc_t *mmc_ptr, uint8_t bus_width)
+vsf_err_t vsf_hw_mmc_set_bus_width(vsf_hw_mmc_t *mmc_ptr, uint8_t bus_width)
 {
     AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
     reg->DBWR = bus_width;

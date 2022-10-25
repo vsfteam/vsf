@@ -329,12 +329,13 @@ extern "C" {
 
 #define VSF_MMC_APIS(__prefix)                                                                                                                                  \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, init,                  VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, vsf_mmc_cfg_t *cfg_ptr)        \
+    __VSF_HAL_TEMPLATE_API(__prefix, void,                  mmc, fini,                  VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)                                \
     __VSF_HAL_TEMPLATE_API(__prefix, void,                  mmc, irq_enable,            VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, vsf_mmc_irq_mask_t irq_mask)   \
     __VSF_HAL_TEMPLATE_API(__prefix, void,                  mmc, irq_disable,           VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, vsf_mmc_irq_mask_t irq_mask)   \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_mmc_status_t,      mmc, status,                VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)                                \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_mmc_capability_t,  mmc, capability,            VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)                                \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, host_set_clock,        VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, uint32_t clock_hz)             \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, host_set_bus_width,    VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, uint8_t bus_width)             \
+    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, set_clock,             VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, uint32_t clock_hz)             \
+    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, set_bus_width,         VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, uint8_t bus_width)             \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             mmc, host_transact_start,   VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr, vsf_mmc_trans_t *trans)        \
     __VSF_HAL_TEMPLATE_API(__prefix, void,                  mmc, host_transact_stop,    VSF_MCONNECT(__prefix, _mmc_t) *mmc_ptr)
 
@@ -787,7 +788,7 @@ extern vsf_mmc_capability_t vsf_mmc_capability(vsf_mmc_t *mmc_ptr);
  @param[in] clock_hz: 时钟速度 (单位：赫兹)
  @return vsf_err_t: 如果 mmc 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
  */
-extern vsf_err_t vsf_mmc_host_set_clock(vsf_mmc_t *mmc_ptr, uint32_t clock_hz);
+extern vsf_err_t vsf_mmc_set_clock(vsf_mmc_t *mmc_ptr, uint32_t clock_hz);
 
 /**
  \~english
@@ -802,11 +803,11 @@ extern vsf_err_t vsf_mmc_host_set_clock(vsf_mmc_t *mmc_ptr, uint32_t clock_hz);
  @param[in] bus_width: 总线位宽，范围：1, 4, 8
  @return vsf_err_t: 如果 mmc 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
  */
-extern vsf_err_t vsf_mmc_host_set_bus_width(vsf_mmc_t *mmc_ptr, uint8_t bus_width);
+extern vsf_err_t vsf_mmc_set_bus_width(vsf_mmc_t *mmc_ptr, uint8_t bus_width);
 
 /**
  \~english
- @brief start mmc transaction.
+ @brief start mmc transaction in host mode.
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
  @param[in] trans: a pointer to mmc transaction structure
  @return vsf_err_t: VSF_ERR_NONE if mmc was initialized, or a negative error code
@@ -821,7 +822,7 @@ extern vsf_err_t vsf_mmc_host_transact_start(vsf_mmc_t *mmc_ptr, vsf_mmc_trans_t
 
 /**
  \~english
- @brief stop mmc transaction if not done.
+ @brief stop mmc transaction if not done in host mode.
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
  @return none.
 
@@ -835,18 +836,18 @@ extern void vsf_mmc_host_transact_stop(vsf_mmc_t *mmc_ptr);
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_MMC_CFG_FUNCTION_RENAME == ENABLED
-#   define __vsf_mmc_t                            VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_t)
-#   define vsf_mmc_init(__MMC, ...)               VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_init)               ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
-#   define vsf_mmc_enable(__MMC)                  VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_enable)             ((__vsf_mmc_t *)__MMC)
-#   define vsf_mmc_disable(__MMC)                 VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_disable)            ((__vsf_mmc_t *)__MMC)
-#   define vsf_mmc_irq_enable(__MMC, ...)         VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_irq_enable)         ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
-#   define vsf_mmc_irq_disable(__MMC, ...)        VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_irq_disable)        ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
-#   define vsf_mmc_status(__MMC)                  VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_status)             ((__vsf_mmc_t *)__MMC)
-#   define vsf_mmc_capability(__MMC)              VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_capability)         ((__vsf_mmc_t *)__MMC)
-#   define vsf_mmc_host_set_clock(__MMC, ...)     VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_set_clock)     ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
-#   define vsf_mmc_host_set_bus_width(__MMC, ...) VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_set_bus_width) ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
-#   define vsf_mmc_host_transact_start(__MMC, ...)VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_transact_start)((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
-#   define vsf_mmc_host_transact_stop(__MMC, ...) VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_transact_stop) ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
+#   define __vsf_mmc_t                              VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_t)
+#   define vsf_mmc_init(__MMC, ...)                 VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_init)                 ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
+#   define vsf_mmc_enable(__MMC)                    VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_enable)               ((__vsf_mmc_t *)__MMC)
+#   define vsf_mmc_disable(__MMC)                   VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_disable)              ((__vsf_mmc_t *)__MMC)
+#   define vsf_mmc_irq_enable(__MMC, ...)           VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_irq_enable)           ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
+#   define vsf_mmc_irq_disable(__MMC, ...)          VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_irq_disable)          ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
+#   define vsf_mmc_status(__MMC)                    VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_status)               ((__vsf_mmc_t *)__MMC)
+#   define vsf_mmc_capability(__MMC)                VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_capability)           ((__vsf_mmc_t *)__MMC)
+#   define vsf_mmc_set_clock(__MMC, ...)            VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_set_clock)            ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
+#   define vsf_mmc_set_bus_width(__MMC, ...)        VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_set_bus_width)        ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
+#   define vsf_mmc_host_transact_start(__MMC, ...)  VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_transact_start)  ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
+#   define vsf_mmc_host_transact_stop(__MMC, ...)   VSF_MCONNECT(VSF_MMC_CFG_PREFIX, _mmc_host_transact_stop)   ((__vsf_mmc_t *)__MMC, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

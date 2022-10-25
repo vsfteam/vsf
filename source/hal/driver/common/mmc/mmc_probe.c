@@ -93,8 +93,8 @@ vsf_err_t vsf_mmc_probe_start(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe)
     case 8: if (!(capability.mmc_capability.bus_width & MMC_CAP_BUS_WIDTH_8)) { return VSF_ERR_INVALID_PARAMETER; } break;
     }
 
-    vsf_mmc_host_set_clock(mmc, 400 * 1000);
-    vsf_mmc_host_set_bus_width(mmc, 1);
+    vsf_mmc_set_clock(mmc, 400 * 1000);
+    vsf_mmc_set_bus_width(mmc, 1);
     vsf_mmc_irq_enable(mmc, MMC_IRQ_MASK_HOST_RESP_DONE);
 
     probe->state = VSF_MMC_PROBE_STATE_GO_IDLE;
@@ -298,7 +298,7 @@ vsf_err_t vsf_mmc_probe_irqhandler(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe,
         probe->is_resp_r1 = true;
         break;
     case VSF_MMC_PROBE_STATE_SET_BUS_WIDTH_DONE:
-        vsf_mmc_host_set_bus_width(mmc, probe->bus_width);
+        vsf_mmc_set_bus_width(mmc, probe->bus_width);
 
         trans.cmd = MMC_SET_BLOCKLEN;
         trans.arg = 1 << probe->csd.sd_v2.READ_BL_LEN;
@@ -308,7 +308,7 @@ vsf_err_t vsf_mmc_probe_irqhandler(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe,
         probe->is_resp_r1 = true;
         break;
     case VSF_MMC_PROBE_STATE_SET_BLOCK_LEN:
-        vsf_mmc_host_set_clock(mmc, probe->working_clock_hz);
+        vsf_mmc_set_clock(mmc, probe->working_clock_hz);
         probe->delay_ms = 1;
         probe->state = VSF_MMC_PROBE_STATE_DONE;
         return VSF_ERR_NOT_READY;
