@@ -49,8 +49,8 @@ extern "C" {
 #   define VSF_TIMER_CFG_FUNCTION_RENAME            ENABLED
 #endif
 
-#ifndef VSF_TIMER_CFG_REIMPLEMENT_IRQ_TYPE
-#   define VSF_TIMER_CFG_REIMPLEMENT_IRQ_TYPE       DISABLED
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_TYPE
+#   define VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_TYPE  DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -68,7 +68,7 @@ extern "C" {
 
 // TODO: Add more feature support, for example match interrupt
 
-#if VSF_TIMER_CFG_REIMPLEMENT_CHANNEL_FEATURE == DISABLED
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_FEATURE == DISABLED
 typedef enum vsf_timer_mode_t {
     TIMER_MODE_ONESHOT,
     TIMER_MODE_CONTINUES,
@@ -77,7 +77,7 @@ typedef enum vsf_timer_mode_t {
 } vsf_timer_mode_t;
 #endif
 
-#if VSF_TIMER_CFG_REIMPLEMENT_IRQ_TYPE == DISABLED
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_TYPE == DISABLED
 typedef enum vsf_timer_irq_mask_t {
     VSF_TIMER_IRQ_MASK_OVERFLOW = (1 << 0),
 } vsf_timer_irq_mask_t;

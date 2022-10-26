@@ -70,68 +70,68 @@ extern "C" {
 
 /********************* REIMPLEMENT ***************************/
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_POWER_NUMBER
-#   define VSF_PM_CFG_REIMPLEMENT_POWER_NUMBER      DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER      DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_POWER_NUMBER_MASK
-#   define VSF_PM_CFG_REIMPLEMENT_POWER_NUMBER_MASK DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER_MASK
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER_MASK DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_SLEEP_MODE
-#   define VSF_PM_CFG_REIMPLEMENT_SLEEP_MODE        DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SLEEP_MODE
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_SLEEP_MODE        DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_PCLK_NUMBER
-#   define VSF_PM_CFG_REIMPLEMENT_PCLK_NUMBER       DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_NUMBER
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_NUMBER       DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_PCLK_CFG
-#   define VSF_PM_CFG_REIMPLEMENT_PCLK_CFG          DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_CFG
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_CFG          DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_SCLK_NUMBER
-#   define VSF_PM_CFG_REIMPLEMENT_SCLK_NUMBER       DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER       DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_SCLK_NUMBER_MASK
-#   define VSF_PM_CFG_REIMPLEMENT_SCLK_NUMBER_MASK  DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER_MASK
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER_MASK  DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_SCLK_SEL
-#   define VSF_PM_CFG_REIMPLEMENT_SCLK_SEL          DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_SEL
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_SEL          DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_SCLK_DIV
-#   define VSF_PM_CFG_REIMPLEMENT_SCLK_DIV          DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_DIV
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_DIV          DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_MCLK_CFG
-#   define VSF_PM_CFG_REIMPLEMENT_MCLK_CFG          DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_CFG
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_CFG          DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_MCLK_NO
-#   define VSF_PM_CFG_REIMPLEMENT_MCLK_NO           DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_NO
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_NO           DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_PLL_SEL
-#   define VSF_PM_CFG_REIMPLEMENT_PLL_SEL           DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_SEL
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_SEL           DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_PLL_CFG
-#   define VSF_PM_CFG_REIMPLEMENT_PLL_CFG           DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_CFG
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_CFG           DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_POST_DIV
-#   define VSF_PM_CFG_REIMPLEMENT_POST_DIV          DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_POST_DIV
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_POST_DIV          DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_LPOSC_SEL
-#   define VSF_PM_CFG_REIMPLEMENT_LPOSC_SEL         DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_LPOSC_SEL
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_LPOSC_SEL         DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_CLOCK_OUT_CFG
-#   define VSF_PM_CFG_REIMPLEMENT_CLOCK_OUT_CFG     DISABLED
+#ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_CLOCK_OUT_CFG
+#   define VSF_PM_CFG_REIMPLEMENT_TYPE_CLOCK_OUT_CFG     DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -196,13 +196,13 @@ extern "C" {
  * Power Domain Management                                                    *
  *----------------------------------------------------------------------------*/
 
-#if VSF_PM_CFG_REIMPLEMENT_POWER_NUMBER == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER == DISABLED
 typedef enum vsf_pm_power_cfg_no_t{
     POWER_IRC_IDX    = 1,
 } vsf_pm_power_cfg_no_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_POWER_NUMBER_MASK == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER_MASK == DISABLED
 typedef enum vsf_pm_power_cfg_msk_t {
     POWER_IRC_MSK    = 1UL << 0,
 } vsf_pm_power_cfg_msk_t;
@@ -214,7 +214,7 @@ typedef uint_fast32_t vsf_pm_power_status_t;
  * Sleep Management                                                           *
  *----------------------------------------------------------------------------*/
 
-#if VSF_PM_CFG_REIMPLEMENT_SLEEP_MODE == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_SLEEP_MODE == DISABLED
 typedef enum vsf_pm_sleep_mode_t {
     PM_WAIT       = 0,
     PM_SLEEP      = 1,
@@ -234,7 +234,7 @@ typedef struct vsf_pm_sleep_cfg_t {
  * AHB Clock Management                                                       *
  *----------------------------------------------------------------------------*/
 
-#if VSF_PM_CFG_REIMPLEMENT_SCLK_NUMBER == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER == DISABLED
 typedef enum vsf_pm_sclk_no_t {
     SCLK_CORE_IDX   = 0,
     SCLK_ROM0_IDX   = 1,
@@ -243,7 +243,7 @@ typedef enum vsf_pm_sclk_no_t {
 } vsf_pm_sclk_no_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_SCLK_NUMBER_MASK == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER_MASK == DISABLED
 typedef enum vsf_pm_sclk_msk_t {
     SCLK_CORE_MSK    = 0x1ul << SCLK_CORE_IDX,
     SCLK_ROM0_MSK    = 0x1ul << SCLK_ROM0_IDX,
@@ -258,7 +258,7 @@ typedef uint_fast32_t vsf_pm_sclk_status_t;
  * Main Clock Management                                                      *
  *----------------------------------------------------------------------------*/
 
-#if VSF_PM_CFG_REIMPLEMENT_SCLK_SEL == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_SEL == DISABLED
 typedef enum vsf_pm_clk_src_sel_t {
     AUTO_CLKSRC_IRC                 = 0x0,      //!< source clk is IRC
     AUTO_CLKSRC_SYSOSC0             = 0x1,      //!< source clk is System oscilator
@@ -286,7 +286,7 @@ typedef enum vsf_pm_clk_src_sel_t {
 #endif
 
 //! main clock prescaler
-#if VSF_PM_CFG_REIMPLEMENT_SCLK_DIV == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_DIV == DISABLED
 typedef enum vsf_pm_divider_t {
     VSF_MREPEAT(255, __PM_DIV_, MAIN)
 } vsf_pm_divider_t;
@@ -296,7 +296,7 @@ typedef enum vsf_pm_divider_t {
  * Peripheral Clock Management                                                *
  *----------------------------------------------------------------------------*/
 
-#if VSF_PM_CFG_REIMPLEMENT_PCLK_NUMBER == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_NUMBER == DISABLED
 typedef enum vsf_pm_pclk_no_t {
     PCLK_PM0_IDX    = 8,        //!< PM 0
     PCLK_SPI0_IDX   = 9,        //!< SPI 0
@@ -306,7 +306,7 @@ typedef enum vsf_pm_pclk_no_t {
 } vsf_pm_pclk_no_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_PCLK_CFG == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_CFG == DISABLED
 typedef struct vsf_pm_pclk_cfg_t {
     vsf_pm_clk_src_sel_t clk_src;
     uint16_t         div;
@@ -315,38 +315,38 @@ typedef struct vsf_pm_pclk_cfg_t {
 
 typedef int_fast16_t vsf_pm_pclk_status_t;
 
-#if VSF_PM_CFG_REIMPLEMENT_MCLK_CORE_DIV == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_CORE_DIV == DISABLED
 typedef enum vsf_pm_mclk_core_div_t {
     VSF_MREPEAT(255, __PM_DIV_, MCLK_CORE)
 } vsf_pm_mclk_core_div_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_MCLK_AXI_DIV == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_AXI_DIV == DISABLED
 typedef enum vsf_pm_mclk_axi_div_t {
     VSF_MREPEAT(255, __PM_DIV_, MCLK_AXI)
 } vsf_pm_mclk_axi_div_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_MCLK_AHB_DIV == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_AHB_DIV == DISABLED
 typedef enum vsf_pm_mclk_ahb_div_t {
     VSF_MREPEAT(255, __PM_DIV_, MCLK_AHB)
 } vsf_pm_mclk_ahb_div_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_MCLK_APB_DIV == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_APB_DIV == DISABLED
 typedef enum vsf_pm_mclk_apb_div_t {
     VSF_MREPEAT(255, __PM_DIV_, MCLK_APB)
 } vsf_pm_mclk_apb_div_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_MCLK_CFG == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_CFG == DISABLED
 typedef struct vsf_pm_mclk_cfg_t {
     vsf_pm_clk_src_sel_t                clk_src;                //!< main clock source
     uint32_t                        freq;                   //!< system oscilator frequency
 } vsf_pm_mclk_cfg_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_MCLK_NO == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_NO == DISABLED
 typedef enum vsf_pm_mclk_no_t {
     MCLK_CORE_IDX = 0,
     MCLK_CORE0_IDX = 0,
@@ -366,14 +366,14 @@ typedef enum vsf_pm_mclk_no_t {
  * PLL Control                                                                *
  *----------------------------------------------------------------------------*/
 
-#if VSF_PM_CFG_REIMPLEMENT_PLL_SEL == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_SEL == DISABLED
 typedef enum vsf_pm_pll_sel_t {
     PLL0_IDX,
     PLL1_IDX,
 } vsf_pm_pll_sel_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_PLL_CFG == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_CFG == DISABLED
 typedef struct vsf_pm_pll_cfg_t {
     vsf_pm_clk_src_sel_t pll_clk_src;//!< pll clock source
     uint32_t         freq;       //!< system oscilator frequency
@@ -382,7 +382,7 @@ typedef struct vsf_pm_pll_cfg_t {
 } vsf_pm_pll_cfg_t;
 #endif
 
-#if VSF_PM_CFG_REIMPLEMENT_POST_DIV == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_POST_DIV == DISABLED
 typedef enum vsf_pm_pll_post_div_t {
     PLL_POST_DIV_1                  = 0x00,     //!< pll post divider rate is 1
     PLL_POST_DIV_2                  = 0x01,     //!< pll post divider rate is 2
@@ -397,7 +397,7 @@ typedef enum vsf_pm_pll_post_div_t {
 
 typedef struct vsf_lposc_cfg_t vsf_lposc_cfg_t;
 
-#if VSF_PM_CFG_REIMPLEMENT_LPOSC_SEL == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_LPOSC_SEL == DISABLED
 typedef enum vsf_pm_lposc_sel_t {
     LPOSC_ALWAYS_ON,
     LPOSC_32K_OSC
@@ -410,7 +410,7 @@ typedef struct vsf_pm_lposc_cfg_t vsf_pm_lposc_cfg_t;
  * Clock Management                                                           *
  *----------------------------------------------------------------------------*/
 
-#if VSF_PM_CFG_REIMPLEMENT_CLOCK_OUT_CFG == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_TYPE_CLOCK_OUT_CFG == DISABLED
 typedef struct vsf_pm_clock_out_cfg_t {
     //! clk out source select
     vsf_pm_clk_src_sel_t                clk_src;    //!< clock source for output

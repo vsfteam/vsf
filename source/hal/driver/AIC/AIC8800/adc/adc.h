@@ -33,8 +33,8 @@
 #   define VSF_HW_ADC_CFG_CHANNEL_COUNT                             8
 #endif
 
-#define VSF_ADC_CFG_REIMPLEMENT_FEATURE                             ENABLED
-#define VSF_ADC_CFG_REIMPLEMENT_CHANNEL_FEATURE                     ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_TYPE_FEATURE                             ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_FEATURE                     ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

@@ -15,13 +15,13 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_GPIO_CFG_IMP_PREFIX                         vsf_hw
-#define VSF_GPIO_CFG_IMP_UPCASE_PREFIX                  VSF_HW
-#define VSF_GPIO_CFG_REIMPLEMENT_SET_INPUT          ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_SET_OUTPUT         ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_SWITCH_DIRECTION   ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_SET                ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_CLEAR              ENABLED
+#define VSF_GPIO_CFG_IMP_PREFIX                             vsf_hw
+#define VSF_GPIO_CFG_IMP_UPCASE_PREFIX                      VSF_HW
+#define VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT              ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT             ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION       ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_SET                    ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR                  ENABLED
 
 /*============================ INCLUDES ======================================*/
 #include "./io.h"

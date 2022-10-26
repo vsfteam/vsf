@@ -30,9 +30,9 @@
 /*============================ MACROS ========================================*/
 #define SPI_SSCTL_POS               21
 
-#define VSF_SPI_CFG_REIMPLEMENT_MODE            ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_STATUS          ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_IRQ_MASK        ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE            ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS          ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK        ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

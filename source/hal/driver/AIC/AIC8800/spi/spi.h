@@ -28,7 +28,7 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_SPI_CFG_REIMPLEMENT_MODE            ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE            ENABLED
 
 #define SPI_DATASIZE_TO_BYTE(__S)               \
     (((((__S) & SPI_DATASIZE_MASK) >> 2) + 7) / 8)

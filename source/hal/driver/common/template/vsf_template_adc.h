@@ -31,30 +31,30 @@ extern "C" {
 
 // multi-class support enabled by default for maximum availability.
 #ifndef VSF_ADC_CFG_MULTI_CLASS
-#   define VSF_ADC_CFG_MULTI_CLASS                  ENABLED
+#   define VSF_ADC_CFG_MULTI_CLASS                      ENABLED
 #endif
 
 // application code can redefine it
 #ifndef VSF_ADC_CFG_PREFIX
 #   if VSF_ADC_CFG_MULTI_CLASS == ENABLED
-#       define VSF_ADC_CFG_PREFIX                   vsf
+#       define VSF_ADC_CFG_PREFIX                       vsf
 #   elif defined(VSF_HW_ADC_COUNT) && (VSF_HW_ADC_COUNT != 0)
-#       define VSF_ADC_CFG_PREFIX                   vsf_hw
+#       define VSF_ADC_CFG_PREFIX                       vsf_hw
 #   else
-#       define VSF_ADC_CFG_PREFIX                   vsf
+#       define VSF_ADC_CFG_PREFIX                       vsf
 #   endif
 #endif
 
 #ifndef VSF_ADC_CFG_FUNCTION_RENAME
-#   define VSF_ADC_CFG_FUNCTION_RENAME              ENABLED
+#   define VSF_ADC_CFG_FUNCTION_RENAME                  ENABLED
 #endif
 
-#ifndef VSF_ADC_CFG_REIMPLEMENT_FEATURE
-#   define VSF_ADC_CFG_REIMPLEMENT_FEATURE          DISABLED
+#ifndef VSF_ADC_CFG_REIMPLEMENT_TYPE_FEATURE
+#   define VSF_ADC_CFG_REIMPLEMENT_TYPE_FEATURE         DISABLED
 #endif
 
-#ifndef VSF_ADC_CFG_REIMPLEMENT_CHANNEL_FEATURE
-#   define VSF_ADC_CFG_REIMPLEMENT_CHANNEL_FEATURE  DISABLED
+#ifndef VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_FEATURE
+#   define VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_FEATURE DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -72,7 +72,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-#if VSF_ADC_CFG_REIMPLEMENT_FEATURE == DISABLED
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_FEATURE == DISABLED
 typedef enum vsf_adc_feature_t {
     DATA_ALIGN_RIGHT        = (0 << 0),  //!< ADC data alignment to right
     DATA_ALIGN_LEFT         = (1 << 0),  //!< ADC data alignment to left
@@ -92,7 +92,7 @@ typedef enum vsf_adc_feature_t {
 } vsf_adc_feature_t;
 #endif
 
-#if VSF_ADC_CFG_REIMPLEMENT_CHANNEL_FEATURE == DISABLED
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_FEATURE == DISABLED
 typedef enum vsf_adc_channel_feature_t{
     ADC_CHANNEL_GAIN_1_6    = (0 << 0),
     ADC_CHANNEL_GAIN_1_5    = (1 << 0),

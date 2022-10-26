@@ -32,30 +32,30 @@ extern "C" {
 
 // multi-class support enabled by default for maximum availability.
 #ifndef VSF_FLASH_CFG_MULTI_CLASS
-#   define VSF_FLASH_CFG_MULTI_CLASS                    ENABLED
+#   define VSF_FLASH_CFG_MULTI_CLASS                        ENABLED
 #endif
 
 // application code can redefine it
 #ifndef VSF_FLASH_CFG_PREFIX
 #   if VSF_FLASH_CFG_MULTI_CLASS == ENABLED
-#       define VSF_FLASH_CFG_PREFIX                     vsf
+#       define VSF_FLASH_CFG_PREFIX                         vsf
 #   elif defined(VSF_HW_FLASH_COUNT) && (VSF_HW_FLASH_COUNT != 0)
-#       define VSF_FLASH_CFG_PREFIX                     vsf_hw
+#       define VSF_FLASH_CFG_PREFIX                         vsf_hw
 #   else
-#       define VSF_FLASH_CFG_PREFIX                     vsf
+#       define VSF_FLASH_CFG_PREFIX                         vsf
 #   endif
 #endif
 
 #ifndef VSF_FLASH_CFG_FUNCTION_RENAME
-#   define VSF_FLASH_CFG_FUNCTION_RENAME                ENABLED
+#   define VSF_FLASH_CFG_FUNCTION_RENAME                    ENABLED
 #endif
 
-#ifndef VSF_FLASH_CFG_REIMPLEMENT_IRQ_TYPE
-#   define VSF_FLASH_CFG_REIMPLEMENT_IRQ_TYPE           DISABLED
+#ifndef VSF_FLASH_CFG_REIMPLEMENT_TYPE_IRQ_TYPE
+#   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_IRQ_TYPE          DISABLED
 #endif
 
-#ifndef VSF_FLASH_CFG_REIMPLEMENT_FLASH_SIZE_TYPE
-#   define VSF_FLASH_CFG_REIMPLEMENT_FLASH_SIZE_TYPE    DISABLED
+#ifndef VSF_FLASH_CFG_REIMPLEMENT_TYPE_FLASH_SIZE_TYPE
+#   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_FLASH_SIZE_TYPE   DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -75,7 +75,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-#if VSF_FLASH_CFG_REIMPLEMENT_IRQ_TYPE == DISABLED
+#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_IRQ_TYPE == DISABLED
 typedef enum vsf_flash_irq_mask_t {
     VSF_FLASH_IRQ_ERASE_MASK        = (1 << 0),
     VSF_FLASH_IRQ_WRITE_MASK        = (1 << 1),
@@ -87,7 +87,7 @@ typedef enum vsf_flash_irq_mask_t {
 } vsf_flash_irq_mask_t;
 #endif
 
-#if VSF_FLASH_CFG_REIMPLEMENT_FLASH_SIZE_TYPE == DISABLED
+#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_FLASH_SIZE_TYPE == DISABLED
 typedef uint_fast32_t vsf_flash_size_t;
 #endif
 
