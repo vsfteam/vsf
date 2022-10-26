@@ -78,7 +78,7 @@ extern "C" {
 #define __VSF_IO_PORT_PIN_NUM(__PIN_NUM, __PORT_NUM)                            \
     VSF_P ## __PORT_NUM ## __PIN_NUM = (((uint32_t) VSF_PORT ##__PORT_NUM) << 8) | __PIN_NUM,
 #define __VSF_IO_PIN_NUM(__N, __NAME)       __NAME ## __N = __N,
-#define __VSF_IO_PIN_MSK(__N, __NAME)       __NAME ## __N ##_MSK = (1ul << (__N)),
+#define __VSF_IO_PIN_MASK(__N, __NAME)      __NAME ## __N ##_MASK = (1ul << (__N)),
 
 #define VSF_IO_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, io, config,         VSF_MCONNECT(__prefix_name, _io_t) *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast8_t count) \
@@ -124,7 +124,7 @@ typedef enum vsf_io_feature_t {
 #endif
 
 typedef enum vsf_io_pin_msk_t {
-    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_MSK, VSF_PIN)
+    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_MASK, VSF_PIN)
 } vsf_io_pin_msk_t;
 
 typedef enum vsf_io_pin_no_t {
