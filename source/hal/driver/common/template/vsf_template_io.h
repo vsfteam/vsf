@@ -76,7 +76,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_IO_PORT_PIN_NUM(__PIN_NUM, __PORT_NUM)                            \
-    VSF_P ## __PORT_NUM ## __PIN_NUM = (((uint32_t) PORT ##__PORT_NUM) << 8) | __PIN_NUM,
+    VSF_P ## __PORT_NUM ## __PIN_NUM = (((uint32_t) VSF_PORT ##__PORT_NUM) << 8) | __PIN_NUM,
 #define __VSF_IO_PIN_NUM(__N, __NAME)       __NAME ## __N = __N,
 #define __VSF_IO_PIN_MSK(__N, __NAME)       __NAME ## __N ##_MSK = (1ul << (__N)),
 
@@ -124,25 +124,25 @@ typedef enum vsf_io_feature_t {
 #endif
 
 typedef enum vsf_io_pin_msk_t {
-    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_MSK, PIN)
+    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_MSK, VSF_PIN)
 } vsf_io_pin_msk_t;
 
 typedef enum vsf_io_pin_no_t {
-    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_NUM, PIN)
+    VSF_MREPEAT(VSF_IO_CFG_PORT_MAX_PIN_NUM, __VSF_IO_PIN_NUM, VSF_PIN)
 } vsf_io_pin_no_t;
 
 typedef enum vsf_io_port_no_t {
 #if defined(VSF_IO_CFG_PORTA)
-    PORTA,
+    VSF_PORTA,
 #endif
 #if defined(VSF_IO_CFG_PORTB)
-    PORTB,
+    VSF_PORTB,
 #endif
 #if defined(VSF_IO_CFG_PORTC)
-    PORTC,
+    VSF_PORTC,
 #endif
 #if defined(VSF_IO_CFG_PORTD)
-    PORTD,
+    VSF_PORTD,
 #endif
 } vsf_io_port_no_t;
 
