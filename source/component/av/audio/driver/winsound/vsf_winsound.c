@@ -57,7 +57,7 @@ dcl_vsf_peda_methods(static, __vk_winsound_playback_stop)
 static void __vk_winsound_playback_irq_thread(void *arg);
 #endif
 
-#if VSF_AUDIO_CFG_USE_CATURE == ENABLED
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
 dcl_vsf_peda_methods(static, __vk_winsound_capture_control)
 dcl_vsf_peda_methods(static, __vk_winsound_capture_start)
 dcl_vsf_peda_methods(static, __vk_winsound_capture_stop)
@@ -81,7 +81,7 @@ static const vk_audio_stream_drv_t __vk_winsound_stream_drv_playback = {
 };
 #endif
 
-#if VSF_AUDIO_CFG_USE_CATURE == ENABLED
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
 static const vk_audio_stream_drv_t __vk_winsound_stream_drv_capture = {
     .control    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_capture_control),
     .start      = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_capture_start),
@@ -114,7 +114,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
             __vsf_arch_irq_init(&playback_ctx->irq_thread, "winsound_play",
                         __vk_winsound_playback_irq_thread, dev->hw_prio);
 #endif
-#if VSF_AUDIO_USE_CATURE == ENABLED
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
             dev->stream[stream_idx].dir_in1out0 = 1;
             dev->stream[stream_idx].drv = &__vk_winsound_stream_drv_capture;
             stream_idx++;

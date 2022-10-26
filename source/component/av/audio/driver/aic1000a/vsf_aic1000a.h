@@ -70,6 +70,7 @@ vsf_class(vk_aic1000a_dev_t) {
             uint8_t ch_ana_pu;
             uint8_t ch_d36_en;
             uint8_t ch_d36_d3;
+            uint8_t mic_matrix_type;
         } adc;
     )
 };
