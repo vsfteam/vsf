@@ -752,7 +752,7 @@ extern void vsf_mmc_irq_disable(vsf_mmc_t *mmc_ptr, vsf_mmc_irq_mask_t irq_mask)
  \~chinese
  @brief 获取 mmc 实例状态
  @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
- @return vsf_mmc_status_t: 返回当前mmc的所有状态
+ @return vsf_mmc_status_t: 返回当前 mmc 的所有状态
  */
 extern vsf_mmc_status_t vsf_mmc_status(vsf_mmc_t *mmc_ptr);
 
@@ -765,7 +765,7 @@ extern vsf_mmc_status_t vsf_mmc_status(vsf_mmc_t *mmc_ptr);
  \~chinese
  @brief 获取 mmc 实例能力
  @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
- @return vsf_mmc_capability_t: 返回当前mmc的所有能力 @ref vsf_mmc_capability_t
+ @return vsf_mmc_capability_t: 返回当前 mmc 的所有能力 @ref vsf_mmc_capability_t
  */
 extern vsf_mmc_capability_t vsf_mmc_capability(vsf_mmc_t *mmc_ptr);
 

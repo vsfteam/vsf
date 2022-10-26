@@ -190,13 +190,13 @@ typedef struct vsf_i2c_t vsf_i2c_t;
  @note 这个回调函数在中断发生之后被调用
 
  @param target_ptr 用户指针
- @param i2c_ptr i2c实例的指针
+ @param i2c_ptr i2c 实例的指针
  @param irq_mask 一个或者多个枚举 vsf_i2c_irq_mask_t 的值的按位或
  @return 无。
 
  \~
  \code {.c}
-    static void __user_i2c_irchandler(void *target_ptr, vsf_i2c_t *i2c_ptr, enum irq_mask)
+    static void __user_i2c_irqhandler(void *target_ptr, vsf_i2c_t *i2c_ptr, enum irq_mask)
     {
         if (irq_mask & I2C_IRQ_MASK_MASTER_STARTED) {
             // do something
@@ -214,7 +214,7 @@ typedef void vsf_i2c_isr_handler_t(void *target_ptr,
 
 /**
  \~english
- @brief i2c configuration
+ @brief i2c interrupt configuration
 
  \~chinese
  @brief i2c 中断配置
@@ -351,9 +351,9 @@ extern void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
  @return vsf_i2c_status_t: return all status of current i2c
 
  \~chinese
- @brief 获取 i2c 实例状态
+ @brief 获取 i2c 实例的状态
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- @return vsf_i2c_status_t: 返回当前i2c的所有状态
+ @return vsf_i2c_status_t: 返回当前 i2c 的所有状态
  */
 extern vsf_i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
 
@@ -364,9 +364,9 @@ extern vsf_i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr);
  @return vsf_i2c_capability_t: return all capability of current i2c @ref vsf_i2c_capability_t
 
  \~chinese
- @brief 获取 i2c 实例能力
+ @brief 获取 i2c 实例的能力
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- @return vsf_i2c_capability_t: 返回当前i2c的所有能力 @ref vsf_i2c_capability_t
+ @return vsf_i2c_capability_t: 返回当前 i2c 的所有能力 @ref vsf_i2c_capability_t
  */
 extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
 
