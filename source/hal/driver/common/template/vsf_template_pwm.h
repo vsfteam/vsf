@@ -49,10 +49,6 @@ extern "C" {
 #   define VSF_PWM_CFG_FUNCTION_RENAME          ENABLED
 #endif
 
-#ifndef VSF_PWM_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_PWM_CFG_REIMPLEMENT_CAPABILITY   DISABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_PWM_APIS(__prefix_name)                                                                                                                            \
@@ -75,11 +71,9 @@ typedef struct vsf_pwm_cfg_t {
     };
 } vsf_pwm_cfg_t;
 
-#if VSF_PWM_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_pwm_capability_t {
     inherit(vsf_peripheral_capability_t)
 } vsf_pwm_capability_t;
-#endif
 
 typedef struct vsf_pwm_t vsf_pwm_t;
 

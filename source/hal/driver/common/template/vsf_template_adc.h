@@ -57,11 +57,6 @@ extern "C" {
 #   define VSF_ADC_CFG_REIMPLEMENT_CHANNEL_FEATURE  DISABLED
 #endif
 
-
-#ifndef VSF_ADC_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_ADC_CFG_REIMPLEMENT_CAPABILITY       DISABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_ADC_APIS(__prefix_name) \
@@ -137,11 +132,9 @@ typedef struct vsf_adc_cfg_t {
     vsf_adc_isr_t isr;
 } vsf_adc_cfg_t;
 
-#if VSF_ADC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_adc_capability_t {
     inherit(vsf_peripheral_capability_t)
 } vsf_adc_capability_t;
-#endif
 
 typedef struct vsf_adc_op_t {
 #undef  __VSF_HAL_TEMPLATE_API

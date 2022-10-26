@@ -107,7 +107,6 @@ typedef struct vsf_flash_cfg_t {
     vsf_flash_isr_t isr;
 } vsf_flash_cfg_t;
 
-#if VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_flash_capability_t {
     inherit(vsf_peripheral_capability_t)
     vsf_flash_size_t base_address;
@@ -120,7 +119,6 @@ typedef struct vsf_flash_capability_t {
         uint8_t can_read_any_address  : 1;
     };
 } vsf_flash_capability_t;
-#endif
 
 typedef struct vsf_flash_op_t {
 #undef __VSF_HAL_TEMPLATE_API

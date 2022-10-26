@@ -236,11 +236,9 @@ typedef struct vsf_usart_status_t {
 } vsf_usart_status_t;
 #endif
 
-#if VSF_USART_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_usart_capability_t {
     inherit(vsf_peripheral_capability_t)
 } vsf_usart_capability_t;
-#endif
 
 typedef struct vsf_usart_op_t {
 #undef __VSF_HAL_TEMPLATE_API

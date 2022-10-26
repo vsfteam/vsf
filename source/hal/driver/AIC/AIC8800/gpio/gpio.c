@@ -28,8 +28,8 @@
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 
 // TODO: fixed gpio output_and_set
-#define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET     DISABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY         ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET     DISABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
 
 /*============================ MACROS ========================================*/
 

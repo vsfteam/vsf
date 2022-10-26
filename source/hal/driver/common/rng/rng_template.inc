@@ -30,7 +30,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_RNG_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 {
     vsf_rng_capability_t rng_capability = {

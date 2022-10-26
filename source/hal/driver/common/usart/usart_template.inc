@@ -20,8 +20,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_USART_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_USART_CFG_REIMPLEMENT_CAPABILITY   DISABLED
+#ifndef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
+#   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY   DISABLED
 #endif
 
 #define vsf_real_usart_t                    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)
@@ -138,7 +138,7 @@ int_fast32_t vsf_real_usart_get_tx_count(vsf_real_usart_t *usart_ptr)
 
 #endif
 
-#if VSF_USART_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 {
     vsf_usart_capability_t usart_capability = {
