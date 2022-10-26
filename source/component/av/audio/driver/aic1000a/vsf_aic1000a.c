@@ -518,6 +518,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         dev->stream[dev->stream_num].format.value = 0;
         dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_playback;
         dev->stream_num++;
+        memset(&dev->dac, 0, sizeof(dev->dac));
 #endif
 #if VSF_AUDIO_USE_CAPTURE == ENABLED
         dev->stream[dev->stream_num].stream_index = 1;
@@ -525,7 +526,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         dev->stream[dev->stream_num].format.value = 0;
         dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_capture;
         dev->stream_num++;
-        dev->adc.mic_matrix_type = 0;
+        memset(&dev->adc, 0, sizeof(dev->adc));
 #endif
 
         vsf_eda_return(VSF_ERR_NONE);
@@ -743,10 +744,12 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_start, vk_audio_start)
     vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
+    uint16_t sample_rate = audio_stream->format.sample_rate;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (!channel_num || (channel_num > 2)) {
+        if (    !channel_num || (channel_num > 2)
+            ||  ((sample_rate != 480) && (sample_rate != 960))) {
             vsf_eda_return(VSF_ERR_NOT_SUPPORT);
             return;
         }
@@ -940,9 +943,9 @@ void __vk_aic1000_adc_config(vk_aic1000a_dev_t *dev, vk_audio_format_t *format, 
     uint8_t d36_en = 0, d36_d3;
     uint8_t i2s1_hcyc = 0;
 
-    if (format->sample_rate != 48000) {
+    if (format->sample_rate != 480) {
         dev->adc.ch_d36_en |= channel_mask;
-        if (format->sample_rate == 16000) {
+        if (format->sample_rate == 160) {
             dev->adc.ch_d36_d3 |= channel_mask;
         } else {
             dev->adc.ch_d36_d3 &= ~channel_mask;
@@ -980,9 +983,9 @@ void __vk_aic1000_adc_config(vk_aic1000a_dev_t *dev, vk_audio_format_t *format, 
     }
     if ((channel_mask & AUD_CH_MAP_CH_2) != 0) {
         switch (format->sample_rate) {
-        case 8000:      i2s1_hcyc = I2S_HCYC_8K;    break;
-        case 16000:     i2s1_hcyc = I2S_HCYC_16K;   break;
-        case 48000:     i2s1_hcyc = I2S_HCYC_48K;   break;
+        case 80:        i2s1_hcyc = I2S_HCYC_8K;    break;
+        case 160:       i2s1_hcyc = I2S_HCYC_16K;   break;
+        case 480:       i2s1_hcyc = I2S_HCYC_48K;   break;
         default:        VSF_AV_ASSERT(false);       return;
         }
         __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(REG_AIC1000AUD_AUD_CODEC->iis_ctrl0),
@@ -1187,10 +1190,12 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_start, vk_audio_start)
     vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
+    uint16_t sample_rate = audio_stream->format.sample_rate;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (!channel_num || (channel_num > 2)) {
+        if (    !channel_num || (channel_num > 2)
+            ||  ((sample_rate != 80) && (sample_rate != 160) && (sample_rate != 480))) {
             vsf_eda_return(VSF_ERR_NOT_SUPPORT);
             return;
         }

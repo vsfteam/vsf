@@ -964,7 +964,7 @@ static void __vsf_linux_audio_play_init(vsf_linux_fd_t *sfd)
         interval->min = 8 * 1000;
         interval->max = 384 * 1000;
     } else {
-        interval->max = interval->min = audio_format.sample_rate;
+        interval->max = interval->min = audio_format.sample_rate * 100;
     }
     interval->integer = true;
 
@@ -1174,7 +1174,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
                 errno = EINVAL;
                 return -1;
             }
-            audio_stream->format.sample_rate = interval->min;
+            audio_stream->format.sample_rate = interval->min / 100;
         }
         break;
     case SNDRV_PCM_IOCTL_HW_FREE:

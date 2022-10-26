@@ -224,7 +224,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_playback_start, vk_audio_start)
             WAVEFORMATEX wfx    = {
                 .wFormatTag     = WAVE_FORMAT_PCM,
                 .nChannels      = audio_stream->format.channel_num,
-                .nSamplesPerSec = audio_stream->format.sample_rate,
+                .nSamplesPerSec = audio_stream->format.sample_rate * 100,
                 .wBitsPerSample = VSF_AUDIO_DATA_TYPE_BITLEN(audio_stream->format.datatype.value),
             };
 

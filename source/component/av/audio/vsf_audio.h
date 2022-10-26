@@ -113,7 +113,7 @@ typedef union vk_audio_format_t {
             uint8_t             value;
         } PACKED datatype;
         uint8_t                 channel_num;            // eg: 2
-        uint16_t                sample_rate;            // eg: 44100/48000
+        uint16_t                sample_rate;            // in 100Hz, eg: 441/480 means 44100/48000
     } PACKED;
     // if value is 0, means adaptive format(from format in vk_audio_start)
     uint32_t                    value;
