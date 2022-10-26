@@ -67,15 +67,16 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_I2S_APIS(__prefix_name)                                                                                                                        \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2s, init,           VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         i2s, enable,         VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         i2s, disable,        VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2s, irq_enable,     VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_irq_mask_t irq_mask)      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2s, irq_disable,    VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_irq_mask_t irq_mask)      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_status_t,     i2s, status,         VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_capability_t, i2s, capability,     VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2s, master_request, VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, uint16_t address, vsf_i2s_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)
+#define VSF_I2S_APIS(__prefix_name)                                                                                                                                     \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, init,          VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)               \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, enable,        VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                                       \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, disable,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                                       \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, irq_enable,    VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_irq_mask_t irq_mask)          \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, irq_disable,   VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_irq_mask_t irq_mask)          \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_status_t,     i2s, status,        VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                                       \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_capability_t, i2s, capability,    VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                                       \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, request_rx,    VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, void *buffer_ptr, uint_fast32_t count)\
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, request_tx,    VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, void *buffer_ptr, uint_fast32_t count)
 
 /*============================ TYPES =========================================*/
 
@@ -324,6 +325,40 @@ extern vsf_i2s_status_t vsf_i2s_status(vsf_i2s_t *i2s_ptr);
  @return vsf_i2s_capability_t: 返回当前 i2s 的所有能力 @ref vsf_i2s_capability_t
  */
 extern vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr);
+
+/**
+ \~english
+ @brief request rx on i2s instance.
+ @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
+ @param[in] buffer_ptr: a pointer to the buffer to be sent
+ @param[in] count: byte count of the buffer to be sent
+ @return vsf_err_t: VSF_ERR_NONE if rx is started, or a negative error code
+
+ \~chinese
+ @brief 获取 i2s 实例的能力
+ @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
+ @param[in] buffer_ptr: 发送缓冲指针
+ @param[in] count: 发送缓冲字节大小
+ @return vsf_err_t: 如果 i2s 开始接收返回 VSF_ERR_NONE , 否则返回负数。
+ */
+extern vsf_err_t vsf_i2s_request_rx(vsf_i2s_t *i2s_ptr, void *buffer_ptr, uint_fast32_t count);
+
+/**
+ \~english
+ @brief request tx on i2s instance.
+ @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
+ @param[in] buffer_ptr: a pointer to the buffer to be received
+ @param[in] count: byte count of the buffer to be received
+ @return vsf_err_t: VSF_ERR_NONE if tx is started, or a negative error code
+
+ \~chinese
+ @brief 获取 i2s 实例的能力
+ @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
+ @param[in] buffer_ptr: 接收缓冲指针
+ @param[in] count: 接受缓冲字节大小
+ @return vsf_err_t: 如果 i2s 开始发送返回 VSF_ERR_NONE , 否则返回负数。
+ */
+extern vsf_err_t vsf_i2s_request_tx(vsf_i2s_t *i2s_ptr, void *buffer_ptr, uint_fast32_t count);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

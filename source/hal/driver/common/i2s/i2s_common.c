@@ -97,5 +97,23 @@ vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr)
     return i2s_ptr->op->capability(i2s_ptr);
 }
 
+vsf_err_t vsf_i2s_request_rx(vsf_i2s_t *i2s_ptr, void *buffer_ptr, uint_fast32_t count)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->request_rx != NULL);
+
+    return i2s_ptr->op->request_rx(i2s_ptr, buffer_ptr, count);
+}
+
+vsf_err_t vsf_i2s_request_tx(vsf_i2s_t *i2s_ptr, void *buffer_ptr, uint_fast32_t count)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->request_tx != NULL);
+
+    return i2s_ptr->op->request_tx(i2s_ptr, buffer_ptr, count);
+}
+
 #endif /* VSF_I2S_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_I2S == ENABLED */
