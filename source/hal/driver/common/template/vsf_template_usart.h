@@ -82,10 +82,10 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              usart, init,                  VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               usart, enable,                VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               usart, disable,               VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_capability_t,     usart, capability,            VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_capability_t, usart, capability,            VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, irq_enable,            VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, irq_disable,           VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_status_t,         usart, status,                VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_status_t,     usart, status,                VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)
 
 #if VSF_USART_CFG_FIFO_API == ENABLED
 #   define __VSF_USART_FIFO_APIS(__prefix_name) \
@@ -121,34 +121,36 @@ typedef enum vsf_usart_mode_t {
     USART_NO_PARITY         = (0x0ul << 0),
     USART_EVEN_PARITY       = (0x1ul << 0),
     USART_ODD_PARITY        = (0x2ul << 0),
+    USART_FORCE_0_PARITY    = (0x3ul << 0),
+    USART_FORCE_1_PARITY    = (0x4ul << 0),
     USART_PARITY_MASK       = USART_NO_PARITY | USART_EVEN_PARITY | USART_ODD_PARITY,
 
-    USART_1_STOPBIT         = (0x0ul << 2),
-    USART_1_5_STOPBIT       = (0x1ul << 2),
-    USART_2_STOPBIT         = (0x2ul << 2),
+    USART_1_STOPBIT         = (0x0ul << 3),
+    USART_1_5_STOPBIT       = (0x1ul << 3),
+    USART_2_STOPBIT         = (0x2ul << 3),
     USART_STOPBIT_MASK      = USART_1_STOPBIT | USART_1_5_STOPBIT | USART_2_STOPBIT,
 
-    USART_5_BIT_LENGTH      = (0x0ul << 4),
-    USART_6_BIT_LENGTH      = (0x1ul << 4),
-    USART_7_BIT_LENGTH      = (0x2ul << 4),
-    USART_8_BIT_LENGTH      = (0x3ul << 4),
-    USART_9_BIT_LENGTH      = (0x4ul << 4),
+    USART_5_BIT_LENGTH      = (0x0ul << 5),
+    USART_6_BIT_LENGTH      = (0x1ul << 5),
+    USART_7_BIT_LENGTH      = (0x2ul << 5),
+    USART_8_BIT_LENGTH      = (0x3ul << 5),
+    USART_9_BIT_LENGTH      = (0x4ul << 5),
     USART_BIT_LENGTH_MASK   =  USART_5_BIT_LENGTH | USART_6_BIT_LENGTH
                              | USART_7_BIT_LENGTH | USART_8_BIT_LENGTH
                              | USART_9_BIT_LENGTH,
 
-    USART_NO_HWCONTROL      = 0x0000ul,
-    USART_RTS_HWCONTROL     = 0x0100ul,
-    USART_CTS_HWCONTROL     = 0x0200ul,
-    USART_RTS_CTS_HWCONTROL = 0x0300ul,
+    USART_NO_HWCONTROL      = (0x0ul << 8),
+    USART_RTS_HWCONTROL     = (0x1ul << 8),
+    USART_CTS_HWCONTROL     = (0x2ul << 8),
+    USART_RTS_CTS_HWCONTROL = (0x3ul << 8),
     USART_HWCONTROL_MASK    =   USART_NO_HWCONTROL
                               | USART_RTS_HWCONTROL
                               | USART_CTS_HWCONTROL
                               | USART_RTS_CTS_HWCONTROL,
 
-    USART_TX_ENABLE             = (0x1ul << 7),
-    USART_RX_ENABLE             = (0x1ul << 8),
-    USART_ENABLE_MASK           = USART_TX_ENABLE | USART_RX_ENABLE,
+    USART_TX_ENABLE         = (0x1ul << 10),
+    USART_RX_ENABLE         = (0x1ul << 11),
+    USART_ENABLE_MASK       = USART_TX_ENABLE | USART_RX_ENABLE,
 } vsf_usart_mode_t;
 #endif
 
