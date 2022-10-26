@@ -134,10 +134,6 @@ extern "C" {
 #   define VSF_PM_CFG_REIMPLEMENT_CLOCK_OUT_CFG     DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_PM_CFG_REIMPLEMENT_CAPABILITY        DISABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_PM_POWER_APIS(__prefix_name)                                                                                                \
@@ -423,11 +419,9 @@ typedef struct vsf_pm_clock_out_cfg_t {
 } vsf_pm_clock_out_cfg_t;
 #endif
 
-#if VSF_PWM_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_pm_capability_t {
     inherit(vsf_peripheral_capability_t)
 } vsf_pm_capability_t;
-#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

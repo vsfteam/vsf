@@ -21,16 +21,16 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_PWM_CFG_REIMPLEMENT_SET_MS
-#   define VSF_PWM_CFG_REIMPLEMENT_SET_MS       DISABLED
+#ifndef VSF_PWM_CFG_REIMPLEMENT_API_SET_MS
+#   define VSF_PWM_CFG_REIMPLEMENT_API_SET_MS       DISABLED
 #endif
 
-#ifndef VSF_PWM_CFG_REIMPLEMENT_SET_US
-#   define VSF_PWM_CFG_REIMPLEMENT_SET_US       DISABLED
+#ifndef VSF_PWM_CFG_REIMPLEMENT_API_SET_US
+#   define VSF_PWM_CFG_REIMPLEMENT_API_SET_US       DISABLED
 #endif
 
-#ifndef VSF_PWM_CFG_REIMPLEMENT_SET_NS
-#   define VSF_PWM_CFG_REIMPLEMENT_SET_NS       DISABLED
+#ifndef VSF_PWM_CFG_REIMPLEMENT_API_SET_NS
+#   define VSF_PWM_CFG_REIMPLEMENT_API_SET_NS       DISABLED
 #endif
 
 #define vsf_real_pwm_t          VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)
@@ -48,7 +48,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_PWM_CFG_REIMPLEMENT_SET_MS == DISABLED
+#if VSF_PWM_CFG_REIMPLEMENT_API_SET_MS == DISABLED
 vsf_err_t vsf_real_pwm_set_ms(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t period_ms, uint32_t pulse_ms)
 {
     VSF_HAL_ASSERT(NULL != pwm_ptr);
@@ -63,7 +63,7 @@ vsf_err_t vsf_real_pwm_set_ms(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t
 }
 #endif
 
-#if VSF_PWM_CFG_REIMPLEMENT_SET_US == DISABLED
+#if VSF_PWM_CFG_REIMPLEMENT_API_SET_US == DISABLED
 vsf_err_t vsf_real_pwm_set_us(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t period_us, uint32_t pulse_us)
 {
     VSF_HAL_ASSERT(NULL != pwm_ptr);
@@ -78,7 +78,7 @@ vsf_err_t vsf_real_pwm_set_us(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t
 }
 #endif
 
-#if VSF_PWM_CFG_REIMPLEMENT_SET_NS == DISABLED
+#if VSF_PWM_CFG_REIMPLEMENT_API_SET_NS == DISABLED
 vsf_err_t vsf_real_pwm_set_ns(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t period_ns, uint32_t pulse_ns)
 {
     VSF_HAL_ASSERT(NULL != pwm_ptr);
@@ -94,7 +94,7 @@ vsf_err_t vsf_real_pwm_set_ns(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t
 }
 #endif
 
-#if VSF_PWM_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 {
     vsf_pwm_capability_t pwm_capability = {

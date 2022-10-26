@@ -32,7 +32,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_IO_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_IO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 {
     vsf_io_capability_t io_capability = {

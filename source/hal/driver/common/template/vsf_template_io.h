@@ -179,11 +179,9 @@ typedef struct vsf_io_cfg_t {
     uint32_t        feature;                    //!< pin feature
 } vsf_io_cfg_t;
 
-#if VSF_IO_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_io_capability_t {
     inherit(vsf_peripheral_capability_t)
 } vsf_io_capability_t;
-#endif
 
 typedef struct vsf_io_t vsf_io_t;
 
@@ -228,7 +226,6 @@ extern vsf_err_t vsf_io_config_one_pin(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr);
 #   define __vsf_io_config_eval3(__IO, __CFGS, __CNT)   __vsf_io_config( (__vsf_io_t *) __IO, __CFGS, __CNT)
 #   define __vsf_io_config_eval2(__CFGS, __CNT)         __vsf_io_config( (__vsf_io_t *) &vsf_hw_io, __CFGS, __CNT)
 #   define vsf_io_config(...)                           __PLOOC_EVAL(__vsf_io_config_eval, __VA_ARGS__)(__VA_ARGS__)
-
 #endif
 
 #ifdef __cplusplus

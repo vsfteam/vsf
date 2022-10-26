@@ -65,10 +65,6 @@ extern "C" {
 #   define VSF_I2C_CFG_REIMPLEMENT_STATUS       DISABLED
 #endif
 
-#ifndef VSF_I2C_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_I2C_CFG_REIMPLEMENT_CAPABILITY   DISABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_I2C_APIS(__prefix_name)                                                                                                                        \
@@ -173,11 +169,9 @@ typedef struct vsf_i2c_status_t {
 } vsf_i2c_status_t;
 #endif
 
-#if VSF_I2C_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_i2c_capability_t {
     inherit(vsf_peripheral_capability_t)
 } vsf_i2c_capability_t;
-#endif
 
 typedef struct vsf_i2c_t vsf_i2c_t;
 

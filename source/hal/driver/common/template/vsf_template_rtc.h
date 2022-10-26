@@ -49,10 +49,6 @@ extern "C" {
 #   define VSF_RTC_CFG_FUNCTION_RENAME          ENABLED
 #endif
 
-#ifndef VSF_RTC_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_RTC_CFG_REIMPLEMENT_CAPABILITY   DISABLED
-#endif
-
 #ifndef VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE
 #   define VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE     DISABLED
 #endif
@@ -109,11 +105,9 @@ typedef struct vsf_rtc_cfg_t {
     vsf_rtc_isr_t isr;
 } vsf_rtc_cfg_t;
 
-#if VSF_RTC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_rtc_capability_t {
     inherit(vsf_peripheral_capability_t)
 } vsf_rtc_capability_t;
-#endif
 
 typedef struct vsf_rtc_op_t {
 #undef __VSF_HAL_TEMPLATE_API

@@ -52,7 +52,7 @@ vsf_err_t vsf_real_rtc_pwm_set(vsf_real_rtc_t *rtc_ptr, uint8_t channel, uint32_
 }
 #endif
 
-#if VSF_RTC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 {
     vsf_rtc_capability_t rtc_capability = {

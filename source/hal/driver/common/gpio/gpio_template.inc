@@ -23,32 +23,32 @@
 
 #if VSF_HAL_USE_GPIO == ENABLED
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_SET_INPUT
-#   define VSF_GPIO_CFG_REIMPLEMENT_SET_INPUT           DISABLED
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT           DISABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_SET_OUTPUT
-#   define VSF_GPIO_CFG_REIMPLEMENT_SET_OUTPUT          DISABLED
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT          DISABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_SWITCH_DIRECTION
-#   define VSF_GPIO_CFG_REIMPLEMENT_SWITCH_DIRECTION    DISABLED
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION    DISABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_SET
-#   define VSF_GPIO_CFG_REIMPLEMENT_SET                 DISABLED
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_SET
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_SET                 DISABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_CLEAR
-#   define VSF_GPIO_CFG_REIMPLEMENT_CLEAR               DISABLED
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR               DISABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET
-#   define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET      DISABLED
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET      DISABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_CLEAR
-#   define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_CLEAR    DISABLED
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR    DISABLED
 #endif
 
 #define vsf_real_gpio_t                 VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t)
@@ -70,7 +70,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_GPIO_CFG_REIMPLEMENT_SET_INPUT == DISALBED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT == DISABLED
 void vsf_real_gpio_set_input(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
@@ -79,7 +79,7 @@ void vsf_real_gpio_set_input(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 }
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_SET_OUTPUT == DISALBED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT == DISABLED
 void vsf_real_gpio_set_output(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
@@ -88,7 +88,7 @@ void vsf_real_gpio_set_output(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 }
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_SWITCH_DIRECTION == DISALBED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION == DISABLED
 void vsf_real_gpio_switch_direction(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
@@ -98,7 +98,7 @@ void vsf_real_gpio_switch_direction(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask
 }
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_SET == DISALBED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_SET == DISABLED
 void vsf_real_gpio_set(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
@@ -107,7 +107,7 @@ void vsf_real_gpio_set(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 }
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_CLEAR == DISALBED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR == DISABLED
 void vsf_real_gpio_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
@@ -116,7 +116,7 @@ void vsf_real_gpio_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 }
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET == DISALBED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET == DISABLED
 void vsf_real_gpio_output_and_set(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
@@ -126,7 +126,7 @@ void vsf_real_gpio_output_and_set(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 }
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_CLEAR == DISALBED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR == DISABLED
 void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
@@ -136,7 +136,7 @@ void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask
 }
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 {
     gpio_capability_t gpio_capability = {
@@ -156,7 +156,7 @@ gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 #   error "Please define VSF_GPIO_CFG_IMP_PREFIX in gpio driver"
 #endif
 
-#ifndef VSF_GPIO_CFG_IMP_UPCASE_PREFIX   
+#ifndef VSF_GPIO_CFG_IMP_UPCASE_PREFIX
 #   error "Please define VSF_GPIO_CFG_IMP_UPCASE_PREFIX    in gpio driver"
 #endif
 

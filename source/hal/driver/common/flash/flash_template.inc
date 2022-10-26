@@ -31,11 +31,11 @@
 #define vsf_real_flash_read_one_sector      VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_one_sector)
 #define vsf_real_flash_read_multi_sector    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
 
-#ifndef VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY         DISABLED
+#ifndef VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY
+#   define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY         DISABLED
 #endif
 
-#if VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 #   ifndef VSF_FLASH_CFG_BASE_ADDRESS
 #       define VSF_FLASH_CFG_BASE_ADDRESS               0
 #   endif
@@ -179,7 +179,7 @@ vsf_err_t vsf_real_flash_read_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf
 }
 #endif
 
-#if VSF_FLASH_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 {
     vsf_flash_capability_t flash_capability = {

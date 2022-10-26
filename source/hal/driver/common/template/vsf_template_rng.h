@@ -49,10 +49,6 @@ extern "C" {
 #   define VSF_RNG_CFG_FUNCTION_RENAME          ENABLED
 #endif
 
-#ifndef VSF_RNG_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_RNG_CFG_REIMPLEMENT_CAPABILITY   DISABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_RNG_APIS(__prefix_name)                                                                                              \
@@ -67,11 +63,9 @@ extern "C" {
 typedef struct vsf_rng_t vsf_rng_t;
 typedef void vsf_rng_on_ready_callback_t(void *param, uint32_t *buffer, uint32_t num);
 
-#if VSF_RNG_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_rng_capability_t {
     inherit(vsf_peripheral_capability_t)
 } vsf_rng_capability_t;
-#endif
 
 typedef struct vsf_rng_op_t {
 #undef  __VSF_HAL_TEMPLATE_API

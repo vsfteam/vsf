@@ -34,7 +34,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_SPI_CFG_REIMPLEMENT_CAPABILITY == DISABLED
+#if VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 {
     vsf_spi_capability_t spi_capability = {

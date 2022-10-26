@@ -65,10 +65,6 @@ extern "C" {
 #   define VSF_SPI_CFG_REIMPLEMENT_STATUS       DISABLED
 #endif
 
-#ifndef VSF_SPI_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_SPI_CFG_REIMPLEMENT_CAPABILITY   DISABLED
-#endif
-
 #ifndef VSF_SPI_DATASIZE_TO_BYTE
 #   define VSF_SPI_DATASIZE_TO_BYTE         (((((__S) & SPI_DATASIZE_MASK) >> __SPI_DATASIZE_OFFSET) + 8) / 8)
 #endif
@@ -191,12 +187,10 @@ typedef struct vsf_spi_status_t {
 } vsf_spi_status_t;
 #endif
 
-#if VSF_SPI_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_spi_capability_t {
     inherit(vsf_peripheral_capability_t)
     uint8_t cs_count;
 } vsf_spi_capability_t;
-#endif
 
 typedef struct vsf_spi_t vsf_spi_t;
 

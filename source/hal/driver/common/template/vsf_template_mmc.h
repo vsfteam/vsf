@@ -61,10 +61,6 @@ extern "C" {
 #   define VSF_MMC_CFG_REIMPLEMENT_STATUS       DISABLED
 #endif
 
-#ifndef VSF_MMC_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_MMC_CFG_REIMPLEMENT_CAPABILITY   DISABLED
-#endif
-
 /* SD commands                                  type  argument     response */
   /* class 0 */
 /* This is basically the same command as for MMC with some quirks. */
@@ -590,7 +586,6 @@ typedef struct vsf_mmc_status_t {
 } vsf_mmc_status_t;
 #endif
 
-#if VSF_MMC_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct vsf_mmc_capability_t {
     inherit(vsf_peripheral_capability_t)
     struct {
@@ -602,7 +597,6 @@ typedef struct vsf_mmc_capability_t {
         uint32_t max_freq_hz;
     } mmc_capability;
 } vsf_mmc_capability_t;
-#endif
 
 typedef struct vsf_mmc_t vsf_mmc_t;
 
