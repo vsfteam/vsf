@@ -49,10 +49,6 @@ extern "C" {
 #   define VSF_GPIO_CFG_FUNCTION_RENAME             ENABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY
-#   define VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY      DISABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_GPIO_APIS(__prefix_name)                                                                                                                                            \
@@ -73,12 +69,16 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-
-#if VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY == DISABLED
 typedef struct gpio_capability_t {
     inherit(vsf_peripheral_capability_t)
+
+    // Asynchronous GPIO
+    //  they are only guaranteed to be sequential when operating the current port consecutively.
+    //
+    //  When they are used together with other ports, they are not guaranteed to
+    //  be sequential for the operation of the pins of different ports.
+    uint8_t is_async;
 } gpio_capability_t;
-#endif
 
 typedef struct vsf_gpio_t vsf_gpio_t;
 

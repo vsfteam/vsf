@@ -28,7 +28,8 @@
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 
 // TODO: fixed gpio output_and_set
-#define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET         DISABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET     DISABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_CAPABILITY         ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -166,6 +167,15 @@ void vsf_hw_gpio_toggle(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask)
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
 
     vsf_hw_gpio_write(hw_gpio_ptr, ~hw_gpio_ptr->output_reg, pin_mask);
+}
+
+gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
+{
+    gpio_capability_t gpio_capability = {
+        .is_async = hw_gpio_ptr->is_pmic,
+    };
+
+    return gpio_capability;
 }
 
 #if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET == ENABLED
