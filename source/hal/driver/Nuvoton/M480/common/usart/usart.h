@@ -32,9 +32,9 @@
 #   define VSF_CFG_USART_CLOCK_SOURCE                           HXT
 #endif
 
-#define VSF_USART_CFG_REIMPLEMENT_MODE                          ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_IRQ_MASK                      ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_STATUS                        ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE                     ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK                 ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS                   ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

@@ -48,16 +48,16 @@ extern "C" {
 #   define VSF_USART_CFG_FUNCTION_RENAME            ENABLED
 #endif
 
-#ifndef VSF_USART_CFG_REIMPLEMENT_MODE
-#   define VSF_USART_CFG_REIMPLEMENT_MODE           DISABLED
+#ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_MODE
+#   define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE      DISABLED
 #endif
 
-#ifndef VSF_USART_CFG_REIMPLEMENT_IRQ_MASK
-#   define VSF_USART_CFG_REIMPLEMENT_IRQ_MASK       DISABLED
+#ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#   define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK  DISABLED
 #endif
 
-#ifndef VSF_USART_CFG_REIMPLEMENT_STATUS
-#   define VSF_USART_CFG_REIMPLEMENT_STATUS         DISABLED
+#ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS
+#   define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS    DISABLED
 #endif
 
 #ifndef VSF_USART_CFG_FIFO_TO_REQUEST
@@ -116,7 +116,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-#if VSF_USART_CFG_REIMPLEMENT_MODE == DISABLED
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 typedef enum vsf_usart_mode_t {
     USART_NO_PARITY         = (0x0ul << 0),
     USART_EVEN_PARITY       = (0x1ul << 0),
@@ -152,7 +152,7 @@ typedef enum vsf_usart_mode_t {
 } vsf_usart_mode_t;
 #endif
 
-#if VSF_USART_CFG_REIMPLEMENT_IRQ_MASK == DISABLED
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_usart_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     USART_IRQ_MASK_TX               = (0x1ul << 0),
@@ -225,7 +225,7 @@ typedef struct vsf_usart_cfg_t {
  *!       operation is request. E.g. When a Block.Read.Request is called,
  *!       then the bIsRXTimeOut bit should be cleared.
  */
-#if VSF_USART_CFG_REIMPLEMENT_STATUS == DISABLED
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_usart_status_t {
     union {
         inherit(peripheral_status_t)

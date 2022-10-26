@@ -178,7 +178,7 @@ gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
     return gpio_capability;
 }
 
-#if VSF_GPIO_CFG_REIMPLEMENT_OUTPUT_AND_SET == ENABLED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET == ENABLED
 void vsf_hw_gpio_output_and_set(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask)
 {
     // TODO

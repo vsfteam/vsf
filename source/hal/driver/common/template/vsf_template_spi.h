@@ -31,38 +31,38 @@ extern "C" {
 
 // multi-class support enabled by default for maximum availability.
 #ifndef VSF_SPI_CFG_MULTI_CLASS
-#   define VSF_SPI_CFG_MULTI_CLASS              ENABLED
+#   define VSF_SPI_CFG_MULTI_CLASS                  ENABLED
 #endif
 
 // application code can redefine it
 #ifndef VSF_SPI_CFG_PREFIX
 #   if VSF_SPI_CFG_MULTI_CLASS == ENABLED
-#       define VSF_SPI_CFG_PREFIX               vsf
+#       define VSF_SPI_CFG_PREFIX                   vsf
 #   elif defined(VSF_HW_SPI_COUNT) && (VSF_HW_SPI_COUNT != 0)
-#       define VSF_SPI_CFG_PREFIX               vsf_hw
+#       define VSF_SPI_CFG_PREFIX                   vsf_hw
 #   else
-#       define VSF_SPI_CFG_PREFIX               vsf
+#       define VSF_SPI_CFG_PREFIX                   vsf
 #   endif
 #endif
 
 #ifndef VSF_SPI_CFG_FUNCTION_RENAME
-#   define VSF_SPI_CFG_FUNCTION_RENAME          ENABLED
+#   define VSF_SPI_CFG_FUNCTION_RENAME              ENABLED
 #endif
 
 #ifndef VSF_SPI_CFG_MULTIPLEX_CS
-#   define VSF_SPI_CFG_MULTIPLEX_CS             DISABLED
+#   define VSF_SPI_CFG_MULTIPLEX_CS                 DISABLED
 #endif
 
-#ifndef VSF_SPI_CFG_REIMPLEMENT_MODE
-#   define VSF_SPI_CFG_REIMPLEMENT_MODE         DISABLED
+#ifndef VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE
+#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE        DISABLED
 #endif
 
-#ifndef VSF_SPI_CFG_REIMPLEMENT_IRQ_MASK
-#   define VSF_SPI_CFG_REIMPLEMENT_IRQ_MASK     DISABLED
+#ifndef VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK    DISABLED
 #endif
 
-#ifndef VSF_SPI_CFG_REIMPLEMENT_STATUS
-#   define VSF_SPI_CFG_REIMPLEMENT_STATUS       DISABLED
+#ifndef VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS
+#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
 #endif
 
 #ifndef VSF_SPI_DATASIZE_TO_BYTE
@@ -91,7 +91,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-#if VSF_SPI_CFG_REIMPLEMENT_MODE == DISABLED
+#if VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 //! spi working mode
 typedef enum vsf_spi_mode_t {
     SPI_MASTER                  = 0x00ul << 0,      //!< select master mode
@@ -149,7 +149,7 @@ typedef enum vsf_spi_mode_t {
 } vsf_spi_mode_t;
 #endif
 
-#if VSF_SPI_CFG_REIMPLEMENT_IRQ_MASK == DISABLED
+#if VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 /*! \brief vsf_spi_irq_mask_t
  *! \note vsf_spi_irq_mask_t should provide irq masks
  */
@@ -176,7 +176,7 @@ typedef enum vsf_spi_irq_mask_t {
 } vsf_spi_irq_mask_t;
 #endif
 
-#if VSF_SPI_CFG_REIMPLEMENT_STATUS == DISABLED
+#if VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_spi_status_t {
     union {
         inherit(peripheral_status_t)

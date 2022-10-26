@@ -31,34 +31,34 @@ extern "C" {
 
 // multi-class support enabled by default for maximum availability.
 #ifndef VSF_MMC_CFG_MULTI_CLASS
-#   define VSF_MMC_CFG_MULTI_CLASS              ENABLED
+#   define VSF_MMC_CFG_MULTI_CLASS                  ENABLED
 #endif
 
 // application code can redefine it
 #ifndef VSF_MMC_CFG_PREFIX
 #   if VSF_MMC_CFG_MULTI_CLASS == ENABLED
-#       define VSF_MMC_CFG_PREFIX               vsf
+#       define VSF_MMC_CFG_PREFIX                   vsf
 #   elif defined(VSF_HW_MMC_COUNT) && (VSF_HW_MMC_COUNT != 0)
-#       define VSF_MMC_CFG_PREFIX               vsf_hw
+#       define VSF_MMC_CFG_PREFIX                   vsf_hw
 #   else
-#       define VSF_MMC_CFG_PREFIX               vsf
+#       define VSF_MMC_CFG_PREFIX                   vsf
 #   endif
 #endif
 
 #ifndef VSF_MMC_CFG_FUNCTION_RENAME
-#   define VSF_MMC_CFG_FUNCTION_RENAME          ENABLED
+#   define VSF_MMC_CFG_FUNCTION_RENAME              ENABLED
 #endif
 
-#ifndef VSF_MMC_CFG_REIMPLEMENT_FEATURE
-#   define VSF_MMC_CFG_REIMPLEMENT_FEATURE      DISABLED
+#ifndef VSF_MMC_CFG_REIMPLEMENT_TYPE_FEATURE
+#   define VSF_MMC_CFG_REIMPLEMENT_TYPE_FEATURE     DISABLED
 #endif
 
-#ifndef VSF_MMC_CFG_REIMPLEMENT_IRQ_MASK
-#   define VSF_MMC_CFG_REIMPLEMENT_IRQ_MASK     DISABLED
+#ifndef VSF_MMC_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#   define VSF_MMC_CFG_REIMPLEMENT_TYPE_IRQ_MASK    DISABLED
 #endif
 
-#ifndef VSF_MMC_CFG_REIMPLEMENT_STATUS
-#   define VSF_MMC_CFG_REIMPLEMENT_STATUS       DISABLED
+#ifndef VSF_MMC_CFG_REIMPLEMENT_TYPE_STATUS
+#   define VSF_MMC_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
 #endif
 
 /* SD commands                                  type  argument     response */
@@ -513,7 +513,7 @@ typedef struct vsf_mmc_cid_t {
     uint64_t MID                    : 8;        //  120 Manufacturer ID
 } PACKED vsf_mmc_cid_t;
 
-#if VSF_MMC_CFG_REIMPLEMENT_FEATURE == DISABLED
+#if VSF_MMC_CFG_REIMPLEMENT_TYPE_FEATURE == DISABLED
 typedef enum vsf_mmc_feature_t {
     MMC_MODE_HOST               = (0x1ul << 0), // select host mode
     MMC_MODE_SLAVE              = (0x0ul << 0), // select slave mode
@@ -530,7 +530,7 @@ typedef enum vsf_mmc_feature_t {
  @brief mmc 传输操作的标志
  @note vsf_mmc_transop_t 由具体驱动实现。
  */
-#if VSF_MMC_CFG_REIMPLEMENT_CMDOP == DISABLED
+#if VSF_MMC_CFG_REIMPLEMENT_TYPE_CMDOP == DISABLED
 typedef enum vsf_mmc_transop_t {
     MMC_CMDOP_SINGLE_BLOCK      = (1ul << 0),
     MMC_CMDOP_MULTI_BLOCK       = (1ul << 1),
@@ -553,7 +553,7 @@ typedef struct vsf_mmc_trans_t {
     uint32_t count;
 } vsf_mmc_trans_t;
 
-#if VSF_MMC_CFG_REIMPLEMENT_IRQ_MASK == DISABLED
+#if VSF_MMC_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_mmc_irq_mask_t {
     MMC_IRQ_MASK_HOST_RESP_DONE                 = (0x1ul <<  0),
     MMC_IRQ_MASK_HOST_DATA_DONE                 = (0x1ul <<  1),
@@ -562,7 +562,7 @@ typedef enum vsf_mmc_irq_mask_t {
 } vsf_mmc_irq_mask_t;
 #endif
 
-#if VSF_MMC_CFG_REIMPLEMENT_TRANSACT_STATUS == DISABLED
+#if VSF_MMC_CFG_REIMPLEMENT_TYPE_TRANSACT_STATUS == DISABLED
 typedef enum vsf_mmc_transact_status_t {
     MMC_TRANSACT_STATUS_DONE                    = 0,
     MMC_TRANSACT_STATUS_ERR_RESP_NONE           = (0x1ul <<  0),
@@ -576,7 +576,7 @@ typedef enum vsf_mmc_transact_status_t {
 } vsf_mmc_transact_status_t;
 #endif
 
-#if VSF_MMC_CFG_REIMPLEMENT_STATUS == DISABLED
+#if VSF_MMC_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_mmc_status_t {
     union {
         inherit(peripheral_status_t)

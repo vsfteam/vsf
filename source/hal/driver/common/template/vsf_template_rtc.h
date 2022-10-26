@@ -31,30 +31,30 @@ extern "C" {
 
 // multi-class support enabled by default for maximum availability.
 #ifndef VSF_RTC_CFG_MULTI_CLASS
-#   define VSF_RTC_CFG_MULTI_CLASS              ENABLED
+#   define VSF_RTC_CFG_MULTI_CLASS                  ENABLED
 #endif
 
 // application code can redefine it
 #ifndef VSF_RTC_CFG_PREFIX
 #   if VSF_RTC_CFG_MULTI_CLASS == ENABLED
-#       define VSF_RTC_CFG_PREFIX               vsf
+#       define VSF_RTC_CFG_PREFIX                   vsf
 #   elif defined(VSF_HW_RTC_COUNT) && (VSF_HW_RTC_COUNT != 0)
-#       define VSF_RTC_CFG_PREFIX               vsf_hw
+#       define VSF_RTC_CFG_PREFIX                   vsf_hw
 #   else
-#       define VSF_RTC_CFG_PREFIX               vsf
+#       define VSF_RTC_CFG_PREFIX                   vsf
 #   endif
 #endif
 
 #ifndef VSF_RTC_CFG_FUNCTION_RENAME
-#   define VSF_RTC_CFG_FUNCTION_RENAME          ENABLED
+#   define VSF_RTC_CFG_FUNCTION_RENAME              ENABLED
 #endif
 
-#ifndef VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE
-#   define VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE     DISABLED
+#ifndef VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_TYPE
+#   define VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_TYPE    DISABLED
 #endif
 
 #ifndef VSF_RTC_CFG_TIME_TYPE
-#   define VSF_RTC_CFG_TIME_TYPE                uint64_t
+#   define VSF_RTC_CFG_TIME_TYPE                    uint64_t
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -71,7 +71,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-#if VSF_RTC_CFG_REIMPLEMENT_IRQ_TYPE == DISABLED
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_TYPE == DISABLED
 typedef enum vsf_rtc_irq_mask_t {
     VSF_RTC_IRQ_MASK_ALARM = (1 << 0),
 } vsf_rtc_irq_mask_t;
