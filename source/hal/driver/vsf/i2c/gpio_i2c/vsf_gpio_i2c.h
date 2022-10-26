@@ -37,7 +37,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_GPIO_I2C_CFG_CUSTOM_CALL_BACK_TIMER
-#   define VSF_GPIO_I2C_CFG_CUSTOM_CALL_BACK_TIMER          DISALBED
+#   define VSF_GPIO_I2C_CFG_CUSTOM_CALL_BACK_TIMER          DISABLED
 #endif
 
 #if VSF_GPIO_I2C_CFG_CUSTOM_CALL_BACK_TIMER == DISABLED
