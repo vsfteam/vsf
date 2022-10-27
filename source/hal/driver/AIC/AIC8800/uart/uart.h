@@ -52,9 +52,9 @@ typedef enum vsf_usart_mode_t {
     USART_NO_PARITY                 = (0x0ul << 3),
     USART_ODD_PARITY                = (0x1ul << 3),
     USART_EVEN_PARITY               = (0x2ul << 3),
-    USART_PARITY_MASK               =       USART_NO_PARITY
-                                        |   USART_ODD_PARITY
-                                        |   USART_EVEN_PARITY,
+    USART_PARITY_MASK               =   USART_NO_PARITY
+                                      | USART_ODD_PARITY
+                                      | USART_EVEN_PARITY,
 
     __USART_AIC8800_MASK            =   USART_BIT_LENGTH_MASK
                                       | USART_STOPBIT_MASK
