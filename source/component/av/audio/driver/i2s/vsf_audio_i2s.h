@@ -15,20 +15,21 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_AIC1000A_H__
-#define __VSF_AIC1000A_H__
+#ifndef __VSF_AUDIO_I2S_H__
+#define __VSF_AUDIO_I2S_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "../../../vsf_av_cfg.h"
-
-#if VSF_USE_AUDIO == ENABLED && VSF_AUDIO_USE_AIC1000A == ENABLED
-
-#include "component/av/vsf_av.h"
+// for VSF_HAL_USE_I2S
 #include "hal/vsf_hal.h"
 
-#if     defined(__VSF_AIC1000A_CLASS_IMPLEMENT)
-#   undef __VSF_AIC1000A_CLASS_IMPLEMENT
+#if VSF_USE_AUDIO == ENABLED && VSF_HAL_USE_I2S == ENABLED
+
+#include "component/av/vsf_av.h"
+
+#if     defined(__VSF_AUDIO_I2S_CLASS_IMPLEMENT)
+#   undef __VSF_AUDIO_I2S_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #endif
 
@@ -42,48 +43,18 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-vsf_class(vk_aic1000a_dev_t) {
+vsf_class(__vk_audio_i2s_dev_t) {
     public_member(
-        implement(vk_audio_dev_t)
-        vk_audio_stream_t __stream[2];
-    )
-
-    public_member(
-        implement(__vk_audio_i2s_dev_t)
-        vsf_gpio_t *pwrkey_port;
-        vsf_gpio_t *psi_port;
-        uint8_t pwrkey_pin;
-        uint8_t psi_clk_pin;
-        uint8_t psi_dat_pin;
-    )
-
-    private_member(
-        bool is_inited;
-        struct {
-            bool mem_cleared;
-            uint8_t ch_en;
-            uint8_t ch_ana_pu;
-        } dac;
-        struct {
-            bool mem_cleared;
-            uint8_t ch_en;
-            uint8_t ch_ana_pu;
-            uint8_t ch_d36_en;
-            uint8_t ch_d36_d3;
-            uint8_t mic_matrix_type;
-        } adc;
+        vsf_i2s_t *i2s;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
-
-extern const vk_audio_drv_t vk_aic1000a_drv;
-
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif      // VSF_USE_AUDIO && VSF_AUDIO_USE_AIC1000A
-#endif      // __VSF_AIC1000A_H__
+#endif      // VSF_USE_AUDIO && VSF_HAL_USE_I2S
+#endif      // __VSF_AUDIO_I2S_H__

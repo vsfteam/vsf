@@ -23,6 +23,8 @@
 #if VSF_USE_AUDIO == ENABLED
 
 #include "kernel/vsf_kernel.h"
+// for VSF_HAL_USE_I2S
+#include "hal/vsf_hal.h"
 
 #if     defined(__VSF_AUDIO_CLASS_IMPLEMENT)
 #   undef __VSF_AUDIO_CLASS_IMPLEMENT
@@ -175,8 +177,12 @@ extern vsf_err_t vk_audio_stop(vk_audio_dev_t *pthis, uint_fast8_t stream_idx);
 #   include "./driver/winsound/vsf_winsound.h"
 #endif
 
-#if VSF_AUDIO_USE_AIC1000A == ENABLED
-#   include "./driver/aic1000a/vsf_aic1000a.h"
+#if VSF_HAL_USE_I2S == ENABLED
+#   include "./driver/i2s/vsf_audio_i2s.h"
+
+#   if VSF_AUDIO_USE_AIC1000A == ENABLED
+#       include "./driver/aic1000a/vsf_aic1000a.h"
+#   endif
 #endif
 
 #endif      // VSF_USE_AUDIO
