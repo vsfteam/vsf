@@ -19,7 +19,7 @@
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_DISP_USE_MIPI_LCD == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_DISP_CLASS_INHERIT__
@@ -114,7 +114,7 @@ void vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_
 WEAK(vk_disp_mipi_spi_lcd_hw_reset_io_write)
 void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool level)
 {
-#if VSF_DISP_MIPI_LCD_USING_VSF_GPIO == ENABLED
+#if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
     vsf_gpio_write(disp_mipi_spi_lcd->reset.gpio,
                    level ? disp_mipi_spi_lcd->reset.pin_mask : 0,
                    disp_mipi_spi_lcd->reset.pin_mask);
@@ -126,7 +126,7 @@ void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_sp
 WEAK(vsf_disp_mipi_spi_lcd_dcx_io_write)
 void vsf_disp_mipi_spi_lcd_dcx_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool level)
 {
-#if VSF_DISP_MIPI_LCD_USING_VSF_GPIO == ENABLED
+#if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
     vsf_gpio_write(disp_mipi_spi_lcd->dcx.gpio,
                    level ? disp_mipi_spi_lcd->dcx.pin_mask : 0,
                    disp_mipi_spi_lcd->dcx.pin_mask);
@@ -138,7 +138,7 @@ void vsf_disp_mipi_spi_lcd_dcx_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lc
 WEAK(vsf_disp_mipi_spi_lcd_io_init)
 void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
-#if VSF_DISP_MIPI_LCD_USING_VSF_GPIO == ENABLED
+#if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
     vsf_gpio_config_pin(disp_mipi_spi_lcd->reset.gpio,
                         disp_mipi_spi_lcd->reset.pin_mask, IO_PULL_UP);
     vsf_gpio_set_output(disp_mipi_spi_lcd->reset.gpio,

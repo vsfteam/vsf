@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#if VSF_USE_UI == ENABLED && VSF_DISP_USE_MIPI_LCD == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
 
 #ifdef __cplusplus
 extern "C" {

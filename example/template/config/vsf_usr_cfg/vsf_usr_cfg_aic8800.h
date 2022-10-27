@@ -376,7 +376,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 
 #if APP_USE_DISP_DEMO == ENABLED
 #   define VSF_USE_UI                                   ENABLED
-#   define VSF_DISP_USE_MIPI_LCD                        ENABLED
+#   define VSF_DISP_USE_MIPI_SPI_LCD                        ENABLED
 #      define APP_DISP_DEMO_SPI                         (vsf_spi_t *)&vsf_hw_spi0
 #      define APP_DISP_DEMO_RESET_GPIO                  (vsf_gpio_t *)&vsf_hw_gpio1
 #      define APP_DISP_DEMO_RESET_PIN_MASK              (1 << 1)
@@ -390,11 +390,11 @@ extern void VSF_DEBUG_STREAM_POLL(void);
                (MIPI_DCS_PAGE_ADDRESS_TOP_TO_BOTTOM         |                   \
                 MIPI_DCS_COLUME_ADDRESS_LEFT_TO_RIGHT       |                   \
                 MIPI_DCS_PAGE_COLUMN_NORMAL_ORDER)
-#      define APP_DISP_DEMO_SEQ                         {                       \
+#      define APP_DISP_DEMO_MIPI_SPI_LCD_SEQ            {                       \
                 VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,                             \
                 VSF_DISP_MIPI_SPI_LCD_INIT_MODE_AND_FORMAT(                     \
                     APP_DISP_DEMO_ADDRESS_MODE,                                 \
-                    MIPI_DCS_PIXEL_FORMAT_DBI_16_BITS                           \
+                    MIPI_DCS_PIXEL_FORMAT_BITS_16                               \
                 ),                                                              \
         }
 #      define APP_DISP_DEMO_CLOCK_HZ                    (60ul * 1000ul * 1000ul)

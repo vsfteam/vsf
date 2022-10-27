@@ -21,7 +21,7 @@
 
 #if     VSF_USE_UI == ENABLED                                                   \
     &&  (   VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED          \
-        ||  VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED   \
+        ||  VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_SPI_LCD == ENABLED   \
         ||  VSF_DISP_USE_WINGDI == ENABLED || VSF_DISP_USE_USBD_UVC == ENABLED)
 
 #include "hal/vsf_hal.h"
@@ -111,13 +111,13 @@ usrapp_ui_common_t usrapp_ui_common = {
             .pixel_byte_size    = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR),
         },
     },
-#elif VSF_DISP_USE_MIPI_LCD == ENABLED
-    .disp                       = &usrapp_ui_common.disp_mipi_lcd.use_as__vk_disp_t,
-    .disp_mipi_lcd              = {
+#elif VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
+    .disp                       = &usrapp_ui_common.disp_mipi_spi_lcd.use_as__vk_disp_t,
+    .disp_mipi_spi_lcd          = {
         .param                  = {
             .height             = APP_DISP_DEMO_HEIGHT,
             .width              = APP_DISP_DEMO_WIDTH,
-            .drv                = &vk_disp_drv_mipi_lcd,
+            .drv                = &vk_disp_drv_mipi_spi_lcd,
             .color              = APP_DISP_DEMO_COLOR,
         },
         .spi                    = APP_DISP_DEMO_SPI,
@@ -130,8 +130,8 @@ usrapp_ui_common_t usrapp_ui_common = {
             .pin_mask           = APP_DISP_DEMO_DCX_PIN_MASK,
         },
         .clock_hz               = APP_DISP_DEMO_CLOCK_HZ,
-        .init_seq               = (const uint8_t [])APP_DISP_DEMO_SEQ,
-        .init_seq_len           = sizeof((const uint8_t [])APP_DISP_DEMO_SEQ),
+        .init_seq               = (const uint8_t [])APP_DISP_DEMO_MIPI_SPI_LCD_SEQ,
+        .init_seq_len           = sizeof((const uint8_t [])APP_DISP_DEMO_MIPI_SPI_LCD_SEQ),
     },
 #elif VSF_DISP_USE_WINGDI == ENABLED
     .disp                       = &usrapp_ui_common.disp_wingdi.use_as__vk_disp_t,
