@@ -118,39 +118,54 @@ extern "C" {
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 typedef enum vsf_usart_mode_t {
-    USART_NO_PARITY         = (0x0ul << 0),
-    USART_EVEN_PARITY       = (0x1ul << 0),
-    USART_ODD_PARITY        = (0x2ul << 0),
-    USART_FORCE_0_PARITY    = (0x3ul << 0),
-    USART_FORCE_1_PARITY    = (0x4ul << 0),
-    USART_PARITY_MASK       = USART_NO_PARITY | USART_EVEN_PARITY | USART_ODD_PARITY,
+    USART_NO_PARITY          = (0x0ul << 20),
+    USART_EVEN_PARITY        = (0x1ul << 20),
+    USART_ODD_PARITY         = (0x2ul << 20),
+    USART_FORCE_0_PARITY     = (0x3ul << 20),
+    USART_FORCE_1_PARITY     = (0x4ul << 20),
+    USART_PARITY_MASK        = USART_NO_PARITY |
+                               USART_EVEN_PARITY |
+                               USART_ODD_PARITY |
+                               USART_FORCE_0_PARITY |
+                               USART_FORCE_1_PARITY,
 
-    USART_1_STOPBIT         = (0x0ul << 3),
-    USART_1_5_STOPBIT       = (0x1ul << 3),
-    USART_2_STOPBIT         = (0x2ul << 3),
-    USART_STOPBIT_MASK      = USART_1_STOPBIT | USART_1_5_STOPBIT | USART_2_STOPBIT,
+    USART_1_STOPBIT          = (0x0ul << 23),
+    USART_1_5_STOPBIT        = (0x1ul << 23),
+    USART_2_STOPBIT          = (0x2ul << 23),
+    USART_STOPBIT_MASK       = USART_1_STOPBIT |
+                               USART_1_5_STOPBIT |
+                               USART_2_STOPBIT,
 
-    USART_5_BIT_LENGTH      = (0x0ul << 5),
-    USART_6_BIT_LENGTH      = (0x1ul << 5),
-    USART_7_BIT_LENGTH      = (0x2ul << 5),
-    USART_8_BIT_LENGTH      = (0x3ul << 5),
-    USART_9_BIT_LENGTH      = (0x4ul << 5),
-    USART_BIT_LENGTH_MASK   =  USART_5_BIT_LENGTH | USART_6_BIT_LENGTH
-                             | USART_7_BIT_LENGTH | USART_8_BIT_LENGTH
-                             | USART_9_BIT_LENGTH,
+    USART_5_BIT_LENGTH       = (0x0ul << 25),
+    USART_6_BIT_LENGTH       = (0x1ul << 25),
+    USART_7_BIT_LENGTH       = (0x2ul << 25),
+    USART_8_BIT_LENGTH       = (0x3ul << 25),
+    USART_9_BIT_LENGTH       = (0x4ul << 25),
+    USART_BIT_LENGTH_MASK    = USART_5_BIT_LENGTH |
+                               USART_6_BIT_LENGTH |
+                               USART_7_BIT_LENGTH |
+                               USART_8_BIT_LENGTH |
+                               USART_9_BIT_LENGTH,
 
-    USART_NO_HWCONTROL      = (0x0ul << 8),
-    USART_RTS_HWCONTROL     = (0x1ul << 8),
-    USART_CTS_HWCONTROL     = (0x2ul << 8),
-    USART_RTS_CTS_HWCONTROL = (0x3ul << 8),
-    USART_HWCONTROL_MASK    =   USART_NO_HWCONTROL
-                              | USART_RTS_HWCONTROL
-                              | USART_CTS_HWCONTROL
-                              | USART_RTS_CTS_HWCONTROL,
+    USART_NO_HWCONTROL       = (0x0ul << 28),
+    USART_RTS_HWCONTROL      = (0x1ul << 28),
+    USART_CTS_HWCONTROL      = (0x2ul << 28),
+    USART_RTS_CTS_HWCONTROL  = (0x3ul << 28),
+    USART_HWCONTROL_MASK     = USART_NO_HWCONTROL |
+                               USART_RTS_HWCONTROL |
+                               USART_CTS_HWCONTROL |
+                               USART_RTS_CTS_HWCONTROL,
 
-    USART_TX_ENABLE         = (0x1ul << 10),
-    USART_RX_ENABLE         = (0x1ul << 11),
-    USART_ENABLE_MASK       = USART_TX_ENABLE | USART_RX_ENABLE,
+    USART_TX_ENABLE          = (0x1ul << 30),
+    USART_RX_ENABLE          = (0x1ul << 31),
+    USART_ENABLE_MASK        = USART_TX_ENABLE |
+                               USART_RX_ENABLE,
+
+    USART_MODE_ALL_BITS_MASK = USART_PARITY_MASK |
+                               USART_STOPBIT_MASK |
+                               USART_BIT_LENGTH_MASK |
+                               USART_HWCONTROL_MASK |
+                               USART_ENABLE_MASK,
 } vsf_usart_mode_t;
 #endif
 
