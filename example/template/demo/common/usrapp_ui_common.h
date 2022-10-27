@@ -24,7 +24,7 @@
 
 #if     VSF_USE_UI == ENABLED                                                   \
     &&  (   VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED          \
-        ||  VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED   \
+        ||  VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_SPI_LCD == ENABLED   \
         ||  VSF_DISP_USE_WINGDI == ENABLED || VSF_DISP_USE_USBD_UVC == ENABLED)
 
 #if VSF_USE_LVGL == ENABLED
@@ -65,8 +65,8 @@ typedef struct usrapp_ui_common_t {
     vk_disp_sdl2_t disp_sdl2;
 #elif VSF_DISP_USE_FB == ENABLED
     vk_disp_fb_t disp_fb;
-#elif VSF_DISP_USE_MIPI_LCD == ENABLED
-    vk_disp_mipi_lcd_t disp_mipi_lcd;
+#elif VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
+    vk_disp_mipi_spi_lcd_t disp_mipi_spi_lcd;
 #elif VSF_DISP_USE_WINGDI == ENABLED
     vk_disp_wingdi_t disp_wingdi;
 #elif VSF_DISP_USE_USBD_UVC == ENABLED

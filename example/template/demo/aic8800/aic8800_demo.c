@@ -112,7 +112,7 @@ void vsf_board_init(void)
         {VSF_PA12,  0x03,   0}, // PA10 as spi sck
         {VSF_PA13,  0x03,   0}, // PA10 as spi sck
 
-#if VSF_DISP_USE_MIPI_LCD == ENABLED
+#if VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
         {VSF_PA5,   0x00,   0},    // PA5 as LCD RESET
         {VSF_PA6,   0x00,   0},    // PA6 as LCD DCS
         {VSF_PA7,   0x00,   0},    // PA7 as LCD TE

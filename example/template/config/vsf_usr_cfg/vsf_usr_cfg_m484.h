@@ -193,7 +193,7 @@
 
 #if APP_USE_DISP_DEMO == ENABLED
 #   define VSF_USE_UI                                      ENABLED
-#   define VSF_DISP_USE_MIPI_LCD                           ENABLED
+#   define VSF_DISP_USE_MIPI_SPI_LCD                       ENABLED
 #      define WEAK_VK_DISP_MIPI_TE_LINE_ISR_ENABLE_ONCE
 #      define WEAK_VK_DISP_MIPI_LCD_IO_INIT
 #      define VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET      ENABLED
