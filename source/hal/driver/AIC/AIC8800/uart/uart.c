@@ -85,7 +85,7 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_cfg_t *cfg_p
     reg->IRQCTL_REG = 0x0;                                                  // clean all interrupt
     reg->DBUFTH_REG = (1 << UART_RXTRIGTH) |  (0 << UART_TXTRIGTH);         // tx and rx data buffer trigger threshold
     reg->MDMCFG_REG |= UART_CLK_P_MSK;                                      // force 48M Clock
-    reg->DFMTCFG_REG = cfg_ptr->mode & __USART_AIC8800_MASK;
+    reg->DFMTCFG_REG = cfg_ptr->mode & __AIC8800_USART_MASK;
 
     uint32_t div = sysctrl_clock_get(usart_const->perclk) / cfg_ptr->baudrate;
     reg->DFMTCFG_REG |= UART_DIVAE_MSK;                                     // div reg access enable
