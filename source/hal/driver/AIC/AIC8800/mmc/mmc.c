@@ -237,18 +237,18 @@ void vsf_hw_mmc_host_transact_stop(vsf_hw_mmc_t *mmc_ptr)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_MMC_CFG_IMP_LV0(__count, __hal_op)                                  \
-    static const vsf_hw_mmc_const_t __vsf_hw_mmc ##__count ## _const = {        \
-        .reg  = VSF_HW_MMC ## __count ## _REG,                                  \
-        .irqn = VSF_HW_MMC ## __count ## _IRQ_IDX,                              \
+#define VSF_MMC_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
+    static const vsf_hw_mmc_const_t __vsf_hw_mmc ## __COUNT ## _const = {       \
+        .reg  = VSF_HW_MMC ## __COUNT ## _REG,                                  \
+        .irqn = VSF_HW_MMC ## __COUNT ## _IRQ_IDX,                              \
     };                                                                          \
-    vsf_hw_mmc_t vsf_hw_mmc ##__count = {                                       \
-        .mmc_const = &__vsf_hw_mmc ##__count ## _const,                         \
-        __hal_op                                                                \
+    vsf_hw_mmc_t vsf_hw_mmc ## __COUNT = {                                      \
+        .mmc_const = &__vsf_hw_mmc ## __COUNT ## _const,                        \
+        __HAL_OP                                                                \
     };                                                                          \
-    void VSF_HW_MMC ## __count ## _IRQ(void)                                    \
+    void VSF_HW_MMC ## __COUNT ## _IRQ(void)                                    \
     {                                                                           \
-        __vsf_hw_mmc_irq_handler(&vsf_hw_mmc##__count);                         \
+        __vsf_hw_mmc_irq_handler(&vsf_hw_mmc ## __COUNT);                       \
     }
 #include "hal/driver/common/mmc/mmc_template.inc"
 

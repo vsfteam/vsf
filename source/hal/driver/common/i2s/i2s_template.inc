@@ -15,20 +15,29 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_AIC8800_TRNG_H__
-#define __HAL_DRIVER_AIC8800_TRNG_H__
-
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
 
-#if VSF_HAL_USE_RNG == ENABLED
+#if VSF_HAL_USE_I2S == ENABLED
 
-/*============================ INCLUDES ======================================*/
+/*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ IMPLEMENTATION ================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_RNG_CFG_DEC_PREFIX          vsf_hw
-#define VSF_RNG_CFG_DEC_UPCASE_PREFIX   VSF_HW
-#include "hal/driver/common/rng/rng_template.h"
+#define __VSF_HAL_TEMPLATE_NAME                     _i2s
+#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _I2S
 
-#endif /* VSF_HAL_USE_RNG */
-#endif /* __HAL_DRIVER_AIC8800_TRNG_H__ */
+#ifndef VSF_I2S_CFG_IMP_PREFIX
+#   error "Please define VSF_I2S_CFG_IMP_PREFIX in i2s driver"
+#endif
+
+#ifndef VSF_I2S_CFG_IMP_UPCASE_PREFIX
+#   error "Please define VSF_I2S_CFG_IMP_UPCASE_PREFIX in i2s driver"
+#endif
+
+#include "hal/driver/common/template/vsf_template_implementation.h"
+
+#endif // VSF_HAL_USE_I2S == ENABLED

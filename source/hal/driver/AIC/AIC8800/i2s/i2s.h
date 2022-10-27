@@ -15,20 +15,42 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_AIC8800_TRNG_H__
-#define __HAL_DRIVER_AIC8800_TRNG_H__
+#ifndef __HAL_DRIVER_AIC8800_I2S_H__
+#define __HAL_DRIVER_AIC8800_I2S_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_RNG == ENABLED
+#if VSF_HAL_USE_I2S == ENABLED
+
+#include "../__device.h"
+
+/*============================ MACROS ========================================*/
+
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK   ENABLED
+
+/*============================ TYPES =========================================*/
+
+typedef enum vsf_i2s_irq_mask_t {
+    I2S_IRQ_MASK_TX_CPL         = (0x1ul <<  0),
+    I2S_IRQ_MASK_RX_CPL         = (0x1ul <<  1),
+
+    I2S_IRQ_MASK_ALL            = I2S_IRQ_MASK_TX_CPL | I2S_IRQ_MASK_RX_CPL,
+} vsf_i2s_irq_mask_t;
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_RNG_CFG_DEC_PREFIX          vsf_hw
-#define VSF_RNG_CFG_DEC_UPCASE_PREFIX   VSF_HW
-#include "hal/driver/common/rng/rng_template.h"
+#define VSF_I2S_CFG_DEC_PREFIX                  vsf_hw
+#define VSF_I2S_CFG_DEC_UPCASE_PREFIX           VSF_HW
+#include "hal/driver/common/i2s/i2s_template.h"
 
-#endif /* VSF_HAL_USE_RNG */
-#endif /* __HAL_DRIVER_AIC8800_TRNG_H__ */
+/*============================ TYPES =========================================*/
+/*============================ INCLUDES ======================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
+
+#endif /* __HAL_DRIVER_AIC8800_I2S_H__ */
+#endif /* EOF */

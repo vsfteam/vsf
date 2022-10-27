@@ -250,19 +250,19 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_I2C_CFG_IMP_LV0(__count, __hal_op)                                  \
-    static const vsf_hw_i2c_const_t __vsf_hw_i2c ##__count ## _const = {        \
-        .reg  = VSF_HW_I2C ## __count ## _REG,                                  \
-        .irqn = VSF_HW_I2C ## __count ## _IRQ_IDX,                              \
-        .pclk = VSF_HW_I2C ## __count ## _PCLKME_EN_BIT,                        \
+#define VSF_I2C_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
+    static const vsf_hw_i2c_const_t __vsf_hw_i2c ## __COUNT ## _const = {       \
+        .reg  = VSF_HW_I2C ## __COUNT ## _REG,                                  \
+        .irqn = VSF_HW_I2C ## __COUNT ## _IRQ_IDX,                              \
+        .pclk = VSF_HW_I2C ## __COUNT ## _PCLKME_EN_BIT,                        \
     };                                                                          \
-    vsf_hw_i2c_t vsf_hw_i2c ##__count = {                                       \
-        .i2c_const = &__vsf_hw_i2c ##__count ## _const,                         \
-        __hal_op                                                                \
+    vsf_hw_i2c_t vsf_hw_i2c ## __COUNT = {                                      \
+        .i2c_const = &__vsf_hw_i2c ## __COUNT ## _const,                        \
+        __HAL_OP                                                                \
     };                                                                          \
-    void VSF_HW_I2C ## __count ## _IRQ(void)                                    \
+    void VSF_HW_I2C ## __COUNT ## _IRQ(void)                                    \
     {                                                                           \
-        __vsf_hw_i2c_irq_handler(&vsf_hw_i2c##__count);                         \
+        __vsf_hw_i2c_irq_handler(&vsf_hw_i2c ## __COUNT);                       \
     }
 #include "hal/driver/common/i2c/i2c_template.inc"
 

@@ -46,6 +46,7 @@
 #       include "./uart/uart.h"
 #       include "./usb/usb.h"
 #       include "./mmc/mmc.h"
+#       include "./i2s/i2s.h"
 
 // mbedtls configurations ONLY in mbedtls_aic8800.h
 #       include "./port/mbedtls/mbedtls_aic8800.h"

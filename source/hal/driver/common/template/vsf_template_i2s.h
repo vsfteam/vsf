@@ -106,7 +106,7 @@ typedef enum vsf_i2s_irq_mask_t {
     I2S_IRQ_MASK_TX_CPL         = (0x1ul <<  0),
     I2S_IRQ_MASK_RX_CPL         = (0x1ul <<  1),
 
-    I2S_IRQ_MASK_ALL            =  I2S_IRQ_MASK_TX_CPL | I2S_IRQ_MASK_RX_CPL;
+    I2S_IRQ_MASK_ALL            =  I2S_IRQ_MASK_TX_CPL | I2S_IRQ_MASK_RX_CPL,
 } vsf_i2s_irq_mask_t;
 #endif
 

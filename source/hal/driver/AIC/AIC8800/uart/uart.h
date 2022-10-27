@@ -99,7 +99,7 @@ typedef enum vsf_usart_irq_mask_t {
 /*============================ INCLUDES ======================================*/
 
 #define VSF_USART_CFG_DEC_PREFIX            vsf_hw
-#define VSF_USART_CFG_DEC_UPCASE_PREFIX       VSF_HW
+#define VSF_USART_CFG_DEC_UPCASE_PREFIX     VSF_HW
 #include "hal/driver/common/usart/usart_template.h"
 
 /*============================ GLOBAL VARIABLES ==============================*/

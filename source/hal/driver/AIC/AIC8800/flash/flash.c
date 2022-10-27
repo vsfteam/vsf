@@ -204,8 +204,8 @@ vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_FLASH_CFG_IMP_LV0(__count, __hal_op)                                \
-    vsf_hw_flash_t vsf_hw_flash ## __count = {                                  \
+#define VSF_FLASH_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
+    vsf_hw_flash_t vsf_hw_flash ## __COUNT = {                                  \
         .cfg = {                                                                \
             .isr = {                                                            \
                 .handler_fn = NULL,                                             \
@@ -214,7 +214,7 @@ vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
         },                                                                      \
         .flash_size = 0,                                                        \
         .is_enabled = false,                                                    \
-        __hal_op                                                                \
+        __HAL_OP                                                                \
     };
 #include "hal/driver/common/flash/flash_template.inc"
 

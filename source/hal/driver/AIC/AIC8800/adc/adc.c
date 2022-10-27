@@ -405,7 +405,7 @@ vsf_err_t vsf_hw_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, void *buffer_ptr,
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_ADC_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
-    vsf_hw_adc_t vsf_hw_adc##__COUNT = {                                        \
+    vsf_hw_adc_t vsf_hw_adc ## __COUNT = {                                      \
         .buffer_ptr = NULL,                                                     \
         .chns.count = 0,                                                        \
         .chns.index = 0,                                                        \

@@ -277,22 +277,22 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 #   define __USART_REQUEST_IMP
 #endif
 
-#define VSF_USART_CFG_IMP_LV0(__count, __hal_op)                                \
-    static const vsf_hw_usart_const_t __vsf_hw_usart ## __count ## _clock = {   \
-        .reg    = UART ## __count,                                              \
-        .irqn   = UART ## __count ## _IRQn,                                     \
-        .hclk   = CSC_HCLKME_UART ## __count ## _EN_BIT,                        \
-        .oclk   = CSC_OCLKME_UART ## __count ## _EN_BIT,                        \
-        .perclk = PER_UART ## __count,                                          \
+#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
+    static const vsf_hw_usart_const_t __vsf_hw_usart ## __COUNT ## _clock = {   \
+        .reg    = UART ## __COUNT,                                              \
+        .irqn   = UART ## __COUNT ## _IRQn,                                     \
+        .hclk   = CSC_HCLKME_UART ## __COUNT ## _EN_BIT,                        \
+        .oclk   = CSC_OCLKME_UART ## __COUNT ## _EN_BIT,                        \
+        .perclk = PER_UART ## __COUNT,                                          \
     };                                                                          \
-    vsf_hw_usart_t vsf_hw_usart ## __count = {                                  \
-        .usart_const  = &__vsf_hw_usart ## __count ## _clock,                   \
+    vsf_hw_usart_t vsf_hw_usart ## __COUNT = {                                  \
+        .usart_const  = &__vsf_hw_usart ## __COUNT ## _clock,                   \
         __USART_REQUEST_IMP                                                     \
-        __hal_op                                                                \
+        __HAL_OP                                                                \
     };                                                                          \
-    void UART ## __count ## _IRQHandler(void)                                   \
+    void UART ## __COUNT ## _IRQHandler(void)                                   \
     {                                                                           \
-        __vsf_hw_usart_irq_handler(&vsf_hw_usart ## __count);                   \
+        __vsf_hw_usart_irq_handler(&vsf_hw_usart ## __COUNT);                   \
     }
 #include "hal/driver/common/usart/usart_template.inc"
 

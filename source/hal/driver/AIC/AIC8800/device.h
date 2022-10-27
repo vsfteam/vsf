@@ -121,6 +121,14 @@
 #define VSF_HW_MMC0_IRQ             SDMMC_IRQHandler
 #define VSF_HW_MMC0_REG             (AIC_SDMMC_TypeDef *)AIC_SDMMC_BASE
 
+#define VSF_HW_I2S_COUNT            2
+#define VSF_HW_I2S0_REG             (HWP_AUD_PROC_T *)REG_AUD_PROC_BASE
+#define VSF_HW_I2S0_IDX             0
+#define VSF_HW_I2S0_OCLK            (CSC_OCLKME_AUDIO_PROC_EN_BIT | CSC_OCLKME_BCK0_EN_BIT)
+#define VSF_HW_I2S1_REG             (HWP_AUD_PROC_T *)REG_AUD_PROC_BASE
+#define VSF_HW_I2S1_IDX             1
+#define VSF_HW_I2S1_OCLK            (CSC_OCLKME_AUDIO_PROC_EN_BIT | CSC_OCLKME_BCK1_EN_BIT)
+
 #define VSF_HW_ADC_COUNT            1
 
 #define VSF_HW_PWM_COUNT            1

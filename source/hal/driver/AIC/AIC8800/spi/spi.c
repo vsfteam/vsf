@@ -485,41 +485,41 @@ int_fast32_t vsf_hw_spi_get_transfered_count(vsf_hw_spi_t *hw_spi_ptr)
 /*============================ INCLUDES ======================================*/
 
 #define VSF_SPI_CFG_IMP_UPCASE_PREFIX               VSF_HW
-#define VSF_SPI_CFG_IMP_LV0(__count, __hal_op)                                  \
-    static const vsf_hw_spi_const_t __vsf_hw_spi ##__count ## _const = {        \
-        .reg = REG_SPI##__count,                                                \
+#define VSF_SPI_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
+    static const vsf_hw_spi_const_t __vsf_hw_spi ## __COUNT ## _const = {       \
+        .reg = REG_SPI ## __COUNT,                                              \
         .irqn = {                                                               \
-            .spi    = VSF_HW_SPI ## __count ## _IRQ_IDX,                        \
-            .dma_rx = VSF_HW_SPI ## __count ## _RXDMA_IRQ_IDX,                  \
-            .dma_tx = VSF_HW_SPI ## __count ## _TXDMA_IRQ_IDX,                  \
+            .spi    = VSF_HW_SPI ## __COUNT ## _IRQ_IDX,                        \
+            .dma_rx = VSF_HW_SPI ## __COUNT ## _RXDMA_IRQ_IDX,                  \
+            .dma_tx = VSF_HW_SPI ## __COUNT ## _TXDMA_IRQ_IDX,                  \
         },                                                                      \
         .request = {                                                            \
             .send = {                                                           \
-                .channel = VSF_HW_SPI ## __count ## _TXDMA_CH_IDX,              \
-                .cid     = VSF_HW_SPI ## __count ## _TXDMA_CID,                 \
+                .channel = VSF_HW_SPI ## __COUNT ## _TXDMA_CH_IDX,              \
+                .cid     = VSF_HW_SPI ## __COUNT ## _TXDMA_CID,                 \
             },                                                                  \
             .recv = {                                                           \
-                .channel = VSF_HW_SPI ## __count ## _RXDMA_CH_IDX,              \
-                .cid     = VSF_HW_SPI ## __count ## _RXDMA_CID,                 \
+                .channel = VSF_HW_SPI ## __COUNT ## _RXDMA_CH_IDX,              \
+                .cid     = VSF_HW_SPI ## __COUNT ## _RXDMA_CID,                 \
             },                                                                  \
         },                                                                      \
         .clock = {                                                              \
-            .hclk = VSF_HW_SPI ## __count ## _HCLKME_EN_BIT,                    \
-            .oclk = VSF_HW_SPI ## __count ## _OCLKME_EN_BIT,                    \
-            .pclk = VSF_HW_SPI ## __count ## _PCLKME_EN_BIT,                    \
+            .hclk = VSF_HW_SPI ## __COUNT ## _HCLKME_EN_BIT,                    \
+            .oclk = VSF_HW_SPI ## __COUNT ## _OCLKME_EN_BIT,                    \
+            .pclk = VSF_HW_SPI ## __COUNT ## _PCLKME_EN_BIT,                    \
         },                                                                      \
     };                                                                          \
-    vsf_hw_spi_t vsf_hw_spi ## __count = {                                      \
-        .spi_const = &__vsf_hw_spi ##__count ## _const,                         \
-        __hal_op                                                                \
+    vsf_hw_spi_t vsf_hw_spi ## __COUNT = {                                      \
+        .spi_const = &__vsf_hw_spi ## __COUNT ## _const,                        \
+        __HAL_OP                                                                \
     };                                                                          \
-    void VSF_HW_SPI ## __count ## _RXDMA_IRQ(void)                              \
+    void VSF_HW_SPI ## __COUNT ## _RXDMA_IRQ(void)                              \
     {                                                                           \
-        __irq_handler(&vsf_hw_spi ##__count, SPI_IRQ_MASK_CPL);                 \
+        __irq_handler(&vsf_hw_spi ## __COUNT, SPI_IRQ_MASK_CPL);                \
     }                                                                           \
-    void VSF_HW_SPI ## __count ## _TXDMA_IRQ(void)                              \
+    void VSF_HW_SPI ## __COUNT ## _TXDMA_IRQ(void)                              \
     {                                                                           \
-        __irq_handler(&vsf_hw_spi ##__count, SPI_IRQ_MASK_TX_CPL);              \
+        __irq_handler(&vsf_hw_spi ## __COUNT, SPI_IRQ_MASK_TX_CPL);             \
     }
 
 #include "hal/driver/common/spi/spi_template.inc"

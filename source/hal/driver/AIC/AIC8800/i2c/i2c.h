@@ -55,7 +55,7 @@ typedef enum vsf_i2c_cmd_t {
 /*============================ INCLUDES ======================================*/
 
 #define VSF_I2C_CFG_DEC_PREFIX          vsf_hw
-#define VSF_I2C_CFG_DEC_UPCASE_PREFIX     VSF_HW
+#define VSF_I2C_CFG_DEC_UPCASE_PREFIX   VSF_HW
 #include "hal/driver/common/i2c/i2c_template.h"
 
 /*============================ TYPES =========================================*/
