@@ -192,10 +192,10 @@ typedef struct vsf_i2s_isr_t {
 typedef struct vsf_i2s_cfg_t {
     vsf_i2s_mode_t mode;                    //!< \~english i2s mode \ref vsf_i2s_mode_t
                                             //!< \~chinese i2s 模式 \ref vsf_i2s_mode_t
-    uint32_t data_clock_hz;                 //!< \~english i2s clock of data (in Hz), valid only if is_src_supported capability is enabled, else ignored
-                                            //!< \~chinese i2s 数据的时钟频率 (单位：Hz)，支持 is_src_supported 特性的时候可用，否则忽略
-    uint32_t output_clock_hz;               //!< \~english i2s clock of output to codec (in Hz)
-                                            //!< \~chinese i2s 输出给 codec 的时钟频率 (单位：Hz)
+    uint32_t data_sample_rate;              //!< \~english i2s sample rate of audio data (in Hz), valid only if is_src_supported capability is enabled, else ignored
+                                            //!< \~chinese i2s 音频数据的时钟频率 (单位：Hz)，支持 is_src_supported 特性的时候可用，否则忽略
+    uint32_t hw_sample_rate;                //!< \~english i2s sample rate of hw audio data to codec (in Hz)
+                                            //!< \~chinese i2s codec 的硬件音频数据时钟频率 (单位：Hz)
     vsf_i2s_isr_t isr;                      //!< \~english i2s interrupt
                                             //!< \~chinese i2s 中断
 } vsf_i2s_cfg_t;
