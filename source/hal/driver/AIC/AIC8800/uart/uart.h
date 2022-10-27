@@ -39,31 +39,67 @@ typedef enum vsf_usart_mode_t {
     USART_7_BIT_LENGTH              = (0x2ul << 0),
     USART_6_BIT_LENGTH              = (0x1ul << 0),
     USART_5_BIT_LENGTH              = (0x0ul << 0),
-    USART_BIT_LENGTH_MASK           =   USART_8_BIT_LENGTH
-                                      | USART_7_BIT_LENGTH
-                                      | USART_6_BIT_LENGTH
-                                      | USART_5_BIT_LENGTH,
+    __AIC8800_USART_BIT_LENGTH_MASK = USART_8_BIT_LENGTH |
+                                      USART_7_BIT_LENGTH |
+                                      USART_6_BIT_LENGTH |
+                                      USART_5_BIT_LENGTH,
 
     USART_1_STOPBIT                 = (0x0ul << 2),
     USART_2_STOPBIT                 = (0x1ul << 2),
-    USART_STOPBIT_MASK              =   USART_1_STOPBIT
-                                      | USART_2_STOPBIT,
+    __AIC8800_USART_STOPBIT_MASK    = USART_1_STOPBIT |
+                                      USART_2_STOPBIT,
 
     USART_NO_PARITY                 = (0x0ul << 3),
     USART_ODD_PARITY                = (0x1ul << 3),
     USART_EVEN_PARITY               = (0x2ul << 3),
-    USART_PARITY_MASK               =   USART_NO_PARITY
-                                      | USART_ODD_PARITY
-                                      | USART_EVEN_PARITY,
+    __AIC8800_USART_PARITY_MASK     = USART_NO_PARITY   |
+                                      USART_ODD_PARITY  |
+                                      USART_EVEN_PARITY,
 
-    __USART_AIC8800_MASK            =   USART_BIT_LENGTH_MASK
-                                      | USART_STOPBIT_MASK
-                                      | USART_PARITY_MASK,
+    __AIC8800_USART_MASK            = __AIC8800_USART_BIT_LENGTH_MASK |
+                                      __AIC8800_USART_STOPBIT_MASK |
+                                      __AIC8800_USART_PARITY_MASK,
 
     // Not hardware, just keep for build
-    USART_TX_ENABLE                     = (0x1ul << 8),
-    USART_RX_ENABLE                     = (0x2ul << 8),
-    USART_ENABLE_MASK                   = (0x3ul << 8),
+    USART_FORCE_0_PARITY            = (0x3ul << 20),
+    USART_FORCE_1_PARITY            = (0x4ul << 20),
+    USART_PARITY_MASK               = USART_NO_PARITY |
+                                      USART_EVEN_PARITY |
+                                      USART_ODD_PARITY |
+                                      USART_FORCE_0_PARITY |
+                                      USART_FORCE_1_PARITY,
+
+    USART_1_5_STOPBIT               = (0x1ul << 23),
+    USART_STOPBIT_MASK              = USART_1_STOPBIT |
+                                      USART_1_5_STOPBIT |
+                                      USART_2_STOPBIT,
+
+    USART_9_BIT_LENGTH              = (0x4ul << 25),
+    USART_BIT_LENGTH_MASK           = USART_5_BIT_LENGTH |
+                                      USART_6_BIT_LENGTH |
+                                      USART_7_BIT_LENGTH |
+                                      USART_8_BIT_LENGTH |
+                                      USART_9_BIT_LENGTH,
+
+    USART_NO_HWCONTROL              = (0x0ul << 28),
+    USART_RTS_HWCONTROL             = (0x1ul << 28),
+    USART_CTS_HWCONTROL             = (0x2ul << 28),
+    USART_RTS_CTS_HWCONTROL         = (0x3ul << 28),
+    USART_HWCONTROL_MASK            = USART_NO_HWCONTROL |
+                                      USART_RTS_HWCONTROL |
+                                      USART_CTS_HWCONTROL |
+                                      USART_RTS_CTS_HWCONTROL,
+
+    USART_TX_ENABLE                 = (0x1ul << 30),
+    USART_RX_ENABLE                 = (0x1ul << 31),
+    USART_ENABLE_MASK               = USART_TX_ENABLE |
+                                      USART_RX_ENABLE,
+
+    USART_MODE_ALL_BITS_MASK        = USART_PARITY_MASK |
+                                      USART_STOPBIT_MASK |
+                                      USART_BIT_LENGTH_MASK |
+                                      USART_HWCONTROL_MASK |
+                                      USART_ENABLE_MASK,
 } vsf_usart_mode_t;
 
 typedef enum vsf_usart_irq_mask_t {
