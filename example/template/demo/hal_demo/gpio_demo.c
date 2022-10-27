@@ -45,11 +45,11 @@
 #endif
 
 #ifndef APP_GPIO_DEMO_CFG_INPUT_PIN_MASK
-#   define APP_GPIO_DEMO_CFG_INPUT_PIN_MASK             (1 << 10)
+#   define APP_GPIO_DEMO_CFG_INPUT_PIN_MASK             VSF_PIN10_MASK
 #endif
 
 #ifndef APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK
-#   define APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK            (1 << 3)
+#   define APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK            VSF_PIN3_MASK
 #endif
 
 #ifndef APP_GPIO_DEMO_CFG_INPUT_FEATURE
@@ -62,6 +62,10 @@
 
 #ifndef APP_GPIO_DEMO_DELAY_MS
 #   define APP_GPIO_DEMO_DELAY_MS                       500
+#endif
+
+#ifndef APP_GPIO_DEMO_TOGGLE_CNT
+#   define APP_GPIO_DEMO_TOGGLE_CNT                     10
 #endif
 
 #ifndef APP_GPIO_DEMO_PRIO
@@ -78,6 +82,7 @@
 
 typedef struct app_gpio_demo_t {
     vsf_teda_t teda;
+    uint32_t toggle_cnt;
 } app_gpio_demo_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -97,12 +102,15 @@ static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vsf_gpio_set_input(APP_GPIO_DEMO_CFG_INPUT_GPIO,  APP_GPIO_DEMO_CFG_INPUT_PIN_MASK);
         vsf_gpio_set_output(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
         vsf_gpio_set(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
+        __app_gpio_demo.toggle_cnt = 0;
 
     case VSF_EVT_TIMER:
         vsf_gpio_toggle(APP_GPIO_DEMO_CFG_OUTPUT_GPIO, APP_GPIO_DEMO_CFG_OUTPUT_PIN_MASK);
         read_pins = vsf_gpio_read(APP_GPIO_DEMO_CFG_INPUT_GPIO) & APP_GPIO_DEMO_CFG_INPUT_PIN_MASK;
         vsf_trace_debug("read pin value: 0x%08x" VSF_TRACE_CFG_LINEEND, read_pins);
-        vsf_teda_set_timer_ms(APP_GPIO_DEMO_DELAY_MS);
+        if (++__app_gpio_demo.toggle_cnt <= APP_GPIO_DEMO_TOGGLE_CNT) {
+            vsf_teda_set_timer_ms(APP_GPIO_DEMO_DELAY_MS);
+        }        
         break;
     }
 }
