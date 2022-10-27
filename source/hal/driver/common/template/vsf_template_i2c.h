@@ -67,15 +67,15 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_I2C_APIS(__prefix_name)                                                                                                                        \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2c, init,           VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         i2c, enable,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         i2c, disable,        VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2c, irq_enable,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             i2c, irq_disable,    VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_status_t,     i2c, status,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_capability_t, i2c, capability,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        i2c, master_request, VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, uint16_t address, vsf_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)
+#define VSF_I2C_APIS(__prefix_name)                                                                                                                             \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, init,           VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2c, enable,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2c, disable,        VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2c, irq_enable,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2c, irq_disable,    VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_status_t,     i2c, status,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_capability_t, i2c, capability,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, master_request, VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, uint16_t address, vsf_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)
 
 /*============================ TYPES =========================================*/
 
