@@ -52,15 +52,6 @@ vsf_err_t vsf_i2s_tx_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     return i2s_ptr->op->tx_init(i2s_ptr, cfg_ptr);
 }
 
-vsf_err_t vsf_i2s_rx_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
-{
-    VSF_HAL_ASSERT(i2s_ptr != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op->rx_init != NULL);
-
-    return i2s_ptr->op->rx_init(i2s_ptr, cfg_ptr);
-}
-
 void vsf_i2s_tx_fini(vsf_i2s_t *i2s_ptr)
 {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
@@ -70,6 +61,33 @@ void vsf_i2s_tx_fini(vsf_i2s_t *i2s_ptr)
     i2s_ptr->op->tx_fini(i2s_ptr);
 }
 
+vsf_err_t vsf_i2s_tx_start(vsf_i2s_t *i2s_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->tx_start != NULL);
+
+    return i2s_ptr->op->tx_start(i2s_ptr);
+}
+
+vsf_err_t vsf_i2s_tx_pause(vsf_i2s_t *i2s_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->tx_pause != NULL);
+
+    return i2s_ptr->op->tx_pause(i2s_ptr);
+}
+
+vsf_err_t vsf_i2s_rx_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->rx_init != NULL);
+
+    return i2s_ptr->op->rx_init(i2s_ptr, cfg_ptr);
+}
+
 void vsf_i2s_rx_fini(vsf_i2s_t *i2s_ptr)
 {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
@@ -77,6 +95,24 @@ void vsf_i2s_rx_fini(vsf_i2s_t *i2s_ptr)
     VSF_HAL_ASSERT(i2s_ptr->op->rx_fini != NULL);
 
     i2s_ptr->op->rx_fini(i2s_ptr);
+}
+
+vsf_err_t vsf_i2s_rx_start(vsf_i2s_t *i2s_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->rx_start != NULL);
+
+    return i2s_ptr->op->rx_start(i2s_ptr);
+}
+
+vsf_err_t vsf_i2s_rx_pause(vsf_i2s_t *i2s_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->rx_pause != NULL);
+
+    return i2s_ptr->op->rx_pause(i2s_ptr);
 }
 
 fsm_rt_t vsf_i2s_enable(vsf_i2s_t *i2s_ptr)

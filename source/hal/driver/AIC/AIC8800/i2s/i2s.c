@@ -27,6 +27,7 @@
 #include "../vendor/plf/aic8800/src/driver/sysctrl/reg_sysctrl.h"
 #include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
 #include "../vendor/plf/aic8800/src/driver/aud_proc/aud_proc.h"
+#include "../vendor/plf/aic8800/src/driver/dma/dma_api_bt.h"
 #include "../vendor/audio/common/audio_types.h"
 
 /*============================ MACROS ========================================*/
@@ -63,6 +64,8 @@ typedef struct vsf_hw_i2s_t {
     const vsf_hw_i2s_const_t *i2s_const;
     uint32_t feature;
     struct {
+        uint8_t             dma_ch;
+        bool                path_opened;
         vsf_i2s_isr_t       isr;
     } rx, tx;
 } vsf_hw_i2s_t;
@@ -271,11 +274,6 @@ static int __audio_get_dac_src_mode(uint32_t in_samp_rate, uint32_t out_samp_rat
     return i;
 }
 
-void vsf_hw_i2s_tx_fini(vsf_hw_i2s_t *hw_i2s_ptr)
-{
-    // TODO:
-}
-
 vsf_err_t vsf_hw_i2s_tx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
@@ -377,6 +375,74 @@ vsf_err_t vsf_hw_i2s_tx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
+void vsf_hw_i2s_tx_fini(vsf_hw_i2s_t *hw_i2s_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
+    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
+    VSF_HAL_ASSERT(NULL != hw_i2s_const);
+    HWP_AUD_PROC_T *reg = hw_i2s_const->reg;
+    VSF_HAL_ASSERT(NULL != reg);
+
+    hw_i2s_ptr->tx.path_opened = false;
+
+    uint32_t val = reg->aud_proc_dac_cfg2;
+    uint32_t mixer_mode = val & (AUD_PROC_DAC_MIXER_MODE_L(0x07) | AUD_PROC_DAC_MIXER_MODE_R(0x07));
+    val &= ~(AUD_PROC_DAC_MIXER_MODE_L(0x07) | AUD_PROC_DAC_MIXER_MODE_R(0x07));
+    val |= (AUD_PROC_DAC_MIXER_MODE_L(0x01) | AUD_PROC_DAC_MIXER_MODE_R(0x01));
+    reg->aud_proc_dac_cfg2 = val;
+
+    uint32_t delay = 0;
+    uint32_t delay_samples = 20;
+    //(HCLK / 1000000) * (1000 / 48) * (delay_samples / 10)
+    delay = sysctrl_clock_get(SYS_HCLK) / 1000000 * 1000 / 48 * delay_samples / 10;
+    for (uint32_t i = 0; i < delay; i++) {
+        __NOP(); __NOP(); __NOP(); __NOP();
+        __NOP(); __NOP(); __NOP();
+    }
+
+    if (!hw_i2s_ptr->tx.path_opened) {
+        if (0 == hw_i2s_const->idx) {
+            reg->aud_intf_i2s_cfg0 &= ~AUD_PROC_I2S_ENABLE_0;
+        } else {
+            reg->aud_intf_i2s_cfg1 &= ~AUD_PROC_I2S_ENABLE_1;
+        }
+    }
+
+    val = reg->aud_proc_dac_cfg2;
+    val &= ~(AUD_PROC_DAC_MIXER_MODE_L(0x07) | AUD_PROC_DAC_MIXER_MODE_R(0x07));
+    val |= mixer_mode;
+    reg->aud_proc_dac_cfg2 = val;
+
+    dma_cx_free(hw_i2s_ptr->tx.dma_ch);
+    dma_cx_set_lli_cntr(hw_i2s_ptr->tx.dma_ch, 0);
+}
+
+vsf_err_t vsf_hw_i2s_tx_start(vsf_hw_i2s_t *hw_i2s_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
+    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
+    VSF_HAL_ASSERT(NULL != hw_i2s_const);
+    HWP_AUD_PROC_T *reg = hw_i2s_const->reg;
+    VSF_HAL_ASSERT(NULL != reg);
+
+    dma_cx_halt_set(hw_i2s_ptr->tx.dma_ch, false);
+    dma_cx_enable_set(hw_i2s_ptr->tx.dma_ch, true);
+    if (AUD_PATH_TX01 == hw_i2s_const->tx_path) {
+        reg->aud_proc_tx_cfg_ch0 |= AUD_PROC_TX_EN_CH_0;
+    } else {
+        reg->aud_proc_tx_cfg_ch2 |= AUD_PROC_TX_EN_CH_2;
+    }
+    reg->aud_proc_cfg |= AUD_PROC_AUD_PROC_ENABLE;
+    hw_i2s_ptr->tx.path_opened = true;
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_i2s_tx_pause(vsf_hw_i2s_t *hw_i2s_ptr)
+{
+    return VSF_ERR_NONE;
+}
+
 //return audio src mode | audio src div
 //bit[7:4] correspond to aud_src_ctrl2[7:4](audio_src_mode)
 //bit[16:13] correspong to aud_src_ctrl2[16:13](audio_src_div)
@@ -410,11 +476,6 @@ static uint32_t __audio_get_aud_src_mode(uint32_t in_samp_rate, uint32_t out_sam
     VSF_HAL_ASSERT(found);
 
     return src_mode;
-}
-
-void vsf_hw_i2s_rx_fini(vsf_hw_i2s_t *hw_i2s_ptr)
-{
-    // TODO:
 }
 
 vsf_err_t vsf_hw_i2s_rx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
@@ -488,22 +549,83 @@ vsf_err_t vsf_hw_i2s_rx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
         }
 
         /* high speed mode, auto clock gating enable, rx01 lr fifo share enable, rxtx lr fifo share enable, rxtx burst mode, rx burst mode */
-        val = hwp_audProc->aud_proc_cfg;
+        val = reg->aud_proc_cfg;
         val &= ~(AUD_PROC_RX_LR_FIFO_SHARE_EN(0x02) | AUD_PROC_RXTX_LR_FIFO_SHARE_EN(0x02));
         val |= AUD_PROC_HIGH_SPEED_MODE | AUD_PROC_AUTO_CLOCK_GATING_EN | AUD_PROC_RXTX_BURST_MODE | AUD_PROC_RX_BURST_MODE;
         if (channel_num == 2) {
             val |= AUD_PROC_RX_LR_FIFO_SHARE_EN(0x02) | AUD_PROC_RXTX_LR_FIFO_SHARE_EN(0x02);
         }
-        hwp_audProc->aud_proc_cfg = val;
+        reg->aud_proc_cfg = val;
 
         /* Set channel mode(16 bits or 24 bits) */
         if (data_bitlen == AUD_BITS_24) {
-            hwp_audProc->aud_proc_rx_cfg_ch23 |= AUD_PROC_RX_MODE_CH_23;
+            reg->aud_proc_rx_cfg_ch23 |= AUD_PROC_RX_MODE_CH_23;
         } else {
-            hwp_audProc->aud_proc_rx_cfg_ch23 &= ~AUD_PROC_RX_MODE_CH_23;
+            reg->aud_proc_rx_cfg_ch23 &= ~AUD_PROC_RX_MODE_CH_23;
         }
     }
 
+    return VSF_ERR_NONE;
+}
+
+void vsf_hw_i2s_rx_fini(vsf_hw_i2s_t *hw_i2s_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
+    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
+    VSF_HAL_ASSERT(NULL != hw_i2s_const);
+    HWP_AUD_PROC_T *reg = hw_i2s_const->reg;
+    VSF_HAL_ASSERT(NULL != reg);
+
+    hw_i2s_ptr->rx.path_opened = false;
+
+    /* Disable AUD_PROC */
+    if (AUD_PATH_RX01 == hw_i2s_const->rx_path) {
+        reg->aud_proc_rx_cfg_ch01 &= ~AUD_PROC_RX_EN_CH_0;
+    } else {
+        reg->aud_proc_rx_cfg_ch23 &= ~AUD_PROC_RX_EN_CH_2;
+    }
+
+    /* Close I2S and AUD_PROC is tx is not opened */
+    if (!hw_i2s_ptr->tx.path_opened) {
+        if (0 == hw_i2s_const->idx) {
+            reg->aud_intf_i2s_cfg0 &= ~AUD_PROC_I2S_ENABLE_0;
+        } else {
+            reg->aud_intf_i2s_cfg1 &= ~AUD_PROC_I2S_ENABLE_1;
+        }
+        reg->aud_proc_cfg &= ~AUD_PROC_AUD_PROC_ENABLE;
+    }
+
+    /* Disable DMA_CX */
+    dma_cx_enable_set(hw_i2s_ptr->rx.dma_ch, false);
+
+    dma_cx_free(hw_i2s_ptr->rx.dma_ch);
+    dma_cx_set_lli_cntr(hw_i2s_ptr->rx.dma_ch, 0);
+}
+
+vsf_err_t vsf_hw_i2s_rx_start(vsf_hw_i2s_t *hw_i2s_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
+    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
+    VSF_HAL_ASSERT(NULL != hw_i2s_const);
+    HWP_AUD_PROC_T *reg = hw_i2s_const->reg;
+    VSF_HAL_ASSERT(NULL != reg);
+
+    dma_cx_halt_set(hw_i2s_ptr->rx.dma_ch, false);
+    dma_cx_enable_set(hw_i2s_ptr->rx.dma_ch, true);
+
+    if (AUD_PATH_RX01 == hw_i2s_const->rx_path) {
+        reg->aud_proc_rx_cfg_ch01 |= AUD_PROC_RX_EN_CH_0;
+    } else {
+        reg->aud_proc_rx_cfg_ch23 |= AUD_PROC_RX_EN_CH_2;
+    }
+    reg->aud_proc_cfg |= AUD_PROC_AUD_PROC_ENABLE;
+    hw_i2s_ptr->rx.path_opened = true;
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_i2s_rx_pause(vsf_hw_i2s_t *hw_i2s_ptr)
+{
     return VSF_ERR_NONE;
 }
 
