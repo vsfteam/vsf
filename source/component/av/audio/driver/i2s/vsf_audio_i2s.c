@@ -39,6 +39,29 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+vsf_err_t __vk_audio_i2s_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
+{
+    if (cfg != NULL) {
+        if ((cfg->data_sample_rate != 0) && (cfg->data_sample_rate != cfg->hw_sample_rate)) {
+            // make sure src(sample rate converter) is supported
+            vsf_i2s_capability_t capability = vsf_i2s_capability(audio_i2s->i2s);
+            if (!capability.i2s_capability.is_src_supported) {
+                return VSF_ERR_NOT_SUPPORT;
+            }
+        }
+        cfg->feature |= audio_i2s->i2s_feature;
+    }
+    return vsf_i2s_init(audio_i2s->i2s, cfg);
+}
 
+vsf_err_t __vk_audio_i2s_rx_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
+{
+    return vsf_i2s_rx_init(audio_i2s->i2s, cfg);
+}
+
+vsf_err_t __vk_audio_i2s_tx_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
+{
+    return vsf_i2s_tx_init(audio_i2s->i2s, cfg);
+}
 
 #endif

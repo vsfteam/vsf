@@ -45,12 +45,17 @@ extern "C" {
 
 vsf_class(__vk_audio_i2s_dev_t) {
     public_member(
-        vsf_i2s_t *i2s;
+        vsf_i2s_t           *i2s;
+        vsf_i2s_feature_t   i2s_feature;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern vsf_err_t __vk_audio_i2s_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg);
+extern vsf_err_t __vk_audio_i2s_rx_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg);
+extern vsf_err_t __vk_audio_i2s_tx_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg);
 
 #ifdef __cplusplus
 }

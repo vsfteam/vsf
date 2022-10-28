@@ -43,6 +43,24 @@ vsf_err_t vsf_i2s_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     return i2s_ptr->op->init(i2s_ptr, cfg_ptr);
 }
 
+vsf_err_t vsf_i2s_tx_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->tx_init != NULL);
+
+    return i2s_ptr->op->tx_init(i2s_ptr, cfg_ptr);
+}
+
+vsf_err_t vsf_i2s_rx_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->rx_init != NULL);
+
+    return i2s_ptr->op->rx_init(i2s_ptr, cfg_ptr);
+}
+
 fsm_rt_t vsf_i2s_enable(vsf_i2s_t *i2s_ptr)
 {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
@@ -61,24 +79,6 @@ fsm_rt_t vsf_i2s_disable(vsf_i2s_t *i2s_ptr)
     return i2s_ptr->op->disable(i2s_ptr);
 }
 
-void vsf_i2s_irq_enable(vsf_i2s_t *i2s_ptr, vsf_i2s_irq_mask_t irq_mask)
-{
-    VSF_HAL_ASSERT(i2s_ptr != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op->irq_enable != NULL);
-
-    i2s_ptr->op->irq_enable(i2s_ptr, irq_mask);
-}
-
-void vsf_i2s_irq_disable(vsf_i2s_t *i2s_ptr, vsf_i2s_irq_mask_t irq_mask)
-{
-    VSF_HAL_ASSERT(i2s_ptr != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op->irq_disable != NULL);
-
-    i2s_ptr->op->irq_disable(i2s_ptr, irq_mask);
-}
-
 vsf_i2s_status_t vsf_i2s_status(vsf_i2s_t *i2s_ptr)
 {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
@@ -95,24 +95,6 @@ vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr)
     VSF_HAL_ASSERT(i2s_ptr->op->capability != NULL);
 
     return i2s_ptr->op->capability(i2s_ptr);
-}
-
-vsf_err_t vsf_i2s_request_rx(vsf_i2s_t *i2s_ptr, void *buffer_ptr, uint_fast32_t count)
-{
-    VSF_HAL_ASSERT(i2s_ptr != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op->request_rx != NULL);
-
-    return i2s_ptr->op->request_rx(i2s_ptr, buffer_ptr, count);
-}
-
-vsf_err_t vsf_i2s_request_tx(vsf_i2s_t *i2s_ptr, void *buffer_ptr, uint_fast32_t count)
-{
-    VSF_HAL_ASSERT(i2s_ptr != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
-    VSF_HAL_ASSERT(i2s_ptr->op->request_tx != NULL);
-
-    return i2s_ptr->op->request_tx(i2s_ptr, buffer_ptr, count);
 }
 
 #endif /* VSF_I2S_CFG_MULTI_CLASS == ENABLED */

@@ -29,6 +29,7 @@
 /*============================ MACROS ========================================*/
 
 #define VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK   ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_FEATURE    ENABLED
 
 /*============================ TYPES =========================================*/
 
@@ -38,6 +39,41 @@ typedef enum vsf_i2s_irq_mask_t {
 
     I2S_IRQ_MASK_ALL            = I2S_IRQ_MASK_TX_CPL | I2S_IRQ_MASK_RX_CPL,
 } vsf_i2s_irq_mask_t;
+
+typedef enum vsf_i2s_feature_t {
+    I2S_MODE_MASTER             = (1 << 21),        // master mode not tested
+    I2S_MODE_SLAVE              = (0 << 21),
+    I2S_MODE_MASK               = (1 << 21),
+
+    // todo: how to support LSB mode?
+    I2S_STANDARD_MSB            = 0,
+    I2S_STANDARD_PHILIPS        = (1 << 20) | (1 << 17) | I2S_STANDARD_MSB,
+    I2S_STANDARD_MASK           = (1 << 17) | (1 << 18) | (1 << 20),
+
+    I2S_LRCK_POL                = (1 << 12),
+    I2S_BCK_POL                 = (1 << 13),
+    __I2S_HW_FEATURE_MASK       = I2S_MODE_MASK | I2S_STANDARD_MASK | I2S_LRCK_POL | I2S_BCK_POL,
+
+    // software bits below
+
+    __I2S_DATA_BITLEN_POS       = 24,
+    I2S_DATA_BITLEN_16          = (1 << __I2S_DATA_BITLEN_POS),
+    I2S_DATA_BITLEN_24          = (2 << __I2S_DATA_BITLEN_POS),
+    I2S_DATA_BITLEN_32          = (3 << __I2S_DATA_BITLEN_POS),     // not supported
+    I2S_DATA_BITLEN_MASK        = (3 << __I2S_DATA_BITLEN_POS),
+
+    __I2S_FRAME_BITLEN_POS      = 26,
+    I2S_FRAME_BITLEN_16         = (1 << __I2S_FRAME_BITLEN_POS),
+    I2S_FRAME_BITLEN_24         = (2 << __I2S_FRAME_BITLEN_POS),
+    I2S_FRAME_BITLEN_32         = (3 << __I2S_FRAME_BITLEN_POS),
+    I2S_FRAME_BITLEN_MASK       = (3 << __I2S_FRAME_BITLEN_POS),
+
+    I2S_MCLK_OUTPUT             = (1 << 28),
+
+    __I2S_SW_FEATURE_MASK       = I2S_MCLK_OUTPUT | I2S_DATA_BITLEN_MASK | I2S_FRAME_BITLEN_MASK,
+
+    I2S_FEATURE_MASK            = __I2S_HW_FEATURE_MASK | __I2S_SW_FEATURE_MASK,
+} vsf_i2s_feature_t;
 
 /*============================ INCLUDES ======================================*/
 

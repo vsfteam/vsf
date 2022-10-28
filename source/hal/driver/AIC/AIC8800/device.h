@@ -125,9 +125,21 @@
 #define VSF_HW_I2S0_REG             (HWP_AUD_PROC_T *)REG_AUD_PROC_BASE
 #define VSF_HW_I2S0_IDX             0
 #define VSF_HW_I2S0_OCLK            (CSC_OCLKME_AUDIO_PROC_EN_BIT | CSC_OCLKME_BCK0_EN_BIT)
+#ifndef VSF_HW_I2S0_RXPATH
+#   define VSF_HW_I2S0_RXPATH       AUD_PATH_RX01
+#endif
+#ifndef VSF_HW_I2S0_TXPATH
+#   define VSF_HW_I2S0_TXPATH       AUD_PATH_TX01
+#endif
 #define VSF_HW_I2S1_REG             (HWP_AUD_PROC_T *)REG_AUD_PROC_BASE
 #define VSF_HW_I2S1_IDX             1
 #define VSF_HW_I2S1_OCLK            (CSC_OCLKME_AUDIO_PROC_EN_BIT | CSC_OCLKME_BCK1_EN_BIT)
+#ifndef VSF_HW_I2S1_RXPATH
+#   define VSF_HW_I2S1_RXPATH       AUD_PATH_RX01
+#endif
+#ifndef VSF_HW_I2S1_TXPATH
+#   define VSF_HW_I2S1_TXPATH       AUD_PATH_TX01
+#endif
 
 #define VSF_HW_ADC_COUNT            1
 

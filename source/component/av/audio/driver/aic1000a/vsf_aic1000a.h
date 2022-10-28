@@ -59,12 +59,17 @@ vsf_class(vk_aic1000a_dev_t) {
 
     private_member(
         bool is_inited;
+
         struct {
+            bool is_started;
+
             bool mem_cleared;
             uint8_t ch_en;
             uint8_t ch_ana_pu;
         } dac;
         struct {
+            bool is_started;
+
             bool mem_cleared;
             uint8_t ch_en;
             uint8_t ch_ana_pu;

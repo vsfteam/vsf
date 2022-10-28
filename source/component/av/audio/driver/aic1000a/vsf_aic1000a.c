@@ -529,7 +529,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         memset(&dev->adc, 0, sizeof(dev->adc));
 #endif
 
-        vsf_eda_return(VSF_ERR_NONE);
+        vsf_eda_return(__vk_audio_i2s_init(&dev->use_as____vk_audio_i2s_dev_t, NULL));
         break;
     }
     vsf_peda_end();
@@ -745,11 +745,17 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_start, vk_audio_start)
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
     uint16_t sample_rate = audio_stream->format.sample_rate;
+    uint8_t bitlen = VSF_AUDIO_DATA_TYPE_BITLEN(audio_stream->format.datatype.value);
 
     switch (evt) {
     case VSF_EVT_INIT:
+        if (dev->dac.is_started) {
+            vsf_eda_return(VSF_ERR_NONE);
+            break;
+        }
         if (    !channel_num || (channel_num > 2)
-            ||  ((sample_rate != 480) && (sample_rate != 960))) {
+            ||  ((sample_rate > 480) && (sample_rate != 960))
+            ||  ((bitlen != 16) && (bitlen != 24))) {
             vsf_eda_return(VSF_ERR_NOT_SUPPORT);
             return;
         }
@@ -759,8 +765,21 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_start, vk_audio_start)
         __vk_aic1000a_clear_spk_mem(dev);
         __vk_aic1000_dac_pu(dev, channel_mask);
         __vk_aic1000_dac_config(dev, &audio_stream->format, channel_mask);
-        __vk_aic1000_dac_start(dev, audio_stream, channel_mask);
 
+        // set data_bitlen in feature
+        vsf_i2s_cfg_t i2s_cfg   = {
+            .feature            = 16 == bitlen ? I2S_DATA_BITLEN_16 : I2S_DATA_BITLEN_24,
+            .data_sample_rate   = sample_rate,
+            .hw_sample_rate     = sample_rate <= 480 ? 480 : 960,
+            .channel_num        = channel_num,
+        };
+        if (VSF_ERR_NONE != __vk_audio_i2s_tx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
+            vsf_eda_return(VSF_ERR_FAIL);
+            return;
+        }
+
+        __vk_aic1000_dac_start(dev, audio_stream, channel_mask);
+        dev->dac.is_started = true;
         vsf_eda_return(VSF_ERR_NONE);
         break;
     }
@@ -1191,11 +1210,17 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_start, vk_audio_start)
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
     uint16_t sample_rate = audio_stream->format.sample_rate;
+    uint8_t bitlen = VSF_AUDIO_DATA_TYPE_BITLEN(audio_stream->format.datatype.value);
 
     switch (evt) {
     case VSF_EVT_INIT:
+        if (dev->adc.is_started) {
+            vsf_eda_return(VSF_ERR_NONE);
+            break;
+        }
         if (    !channel_num || (channel_num > 2)
-            ||  ((sample_rate != 80) && (sample_rate != 160) && (sample_rate != 480))) {
+            ||  ((sample_rate != 80) && (sample_rate != 160) && (sample_rate != 480))
+            ||  ((bitlen != 16) && (bitlen != 24))) {
             vsf_eda_return(VSF_ERR_NOT_SUPPORT);
             return;
         }
@@ -1205,8 +1230,21 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_start, vk_audio_start)
         __vk_aic1000a_clear_mic_mem(dev);
         __vk_aic1000_adc_pu(dev, channel_mask);
         __vk_aic1000_adc_config(dev, &audio_stream->format, channel_mask);
-        __vk_aic1000_adc_start(dev, audio_stream, channel_mask);
 
+        // set data_bitlen in feature
+        vsf_i2s_cfg_t i2s_cfg   = {
+            .feature            = 16 == bitlen ? I2S_DATA_BITLEN_16 : I2S_DATA_BITLEN_24,
+            .data_sample_rate   = sample_rate,
+            .hw_sample_rate     = sample_rate <= 480 ? 480 : 960,
+            .channel_num        = channel_num,
+        };
+        if (VSF_ERR_NONE != __vk_audio_i2s_rx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
+            vsf_eda_return(VSF_ERR_FAIL);
+            return;
+        }
+
+        __vk_aic1000_adc_start(dev, audio_stream, channel_mask);
+        dev->adc.is_started = true;
         vsf_eda_return(VSF_ERR_NONE);
         break;
     }
