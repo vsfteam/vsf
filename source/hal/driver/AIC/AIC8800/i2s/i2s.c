@@ -440,11 +440,13 @@ vsf_err_t vsf_hw_i2s_tx_start(vsf_hw_i2s_t *hw_i2s_ptr)
 
 vsf_err_t vsf_hw_i2s_tx_pause(vsf_hw_i2s_t *hw_i2s_ptr)
 {
+    dma_cx_enable_set(hw_i2s_ptr->tx.dma_ch, false);
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_i2s_tx_resume(vsf_hw_i2s_t *hw_i2s_ptr)
 {
+    dma_cx_enable_set(hw_i2s_ptr->tx.dma_ch, true);
     return VSF_ERR_NONE;
 }
 
@@ -631,11 +633,13 @@ vsf_err_t vsf_hw_i2s_rx_start(vsf_hw_i2s_t *hw_i2s_ptr)
 
 vsf_err_t vsf_hw_i2s_rx_pause(vsf_hw_i2s_t *hw_i2s_ptr)
 {
+    dma_cx_enable_set(hw_i2s_ptr->rx.dma_ch, false);
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_i2s_rx_resume(vsf_hw_i2s_t *hw_i2s_ptr)
 {
+    dma_cx_enable_set(hw_i2s_ptr->rx.dma_ch, true);
     return VSF_ERR_NONE;
 }
 
