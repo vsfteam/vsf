@@ -271,6 +271,11 @@ static int __audio_get_dac_src_mode(uint32_t in_samp_rate, uint32_t out_samp_rat
     return i;
 }
 
+void vsf_hw_i2s_tx_fini(vsf_hw_i2s_t *hw_i2s_ptr)
+{
+    // TODO:
+}
+
 vsf_err_t vsf_hw_i2s_tx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
@@ -405,6 +410,11 @@ static uint32_t __audio_get_aud_src_mode(uint32_t in_samp_rate, uint32_t out_sam
     VSF_HAL_ASSERT(found);
 
     return src_mode;
+}
+
+void vsf_hw_i2s_rx_fini(vsf_hw_i2s_t *hw_i2s_ptr)
+{
+    // TODO:
 }
 
 vsf_err_t vsf_hw_i2s_rx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
