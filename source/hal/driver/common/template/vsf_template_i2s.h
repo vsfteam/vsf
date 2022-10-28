@@ -69,10 +69,12 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, tx_fini,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_start,      VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_pause,      VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_resume,     VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_init,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, rx_fini,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_start,      VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_pause,      VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_resume,     VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, enable,        VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, disable,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_status_t,     i2s, status,        VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
@@ -292,7 +294,7 @@ extern vsf_err_t vsf_i2s_tx_start(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
- @brief pause i2s tx channel, restart by calling vsf_i2s_tx_start.
+ @brief pause i2s tx channel, restart by calling vsf_i2s_tx_resume.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return vsf_err_t: VSF_ERR_NONE if i2s paused successfully, or a negative error code
 
@@ -302,6 +304,19 @@ extern vsf_err_t vsf_i2s_tx_start(vsf_i2s_t *i2s_ptr);
  @return vsf_err_t: 如果 i2s 暂停完成返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_i2s_tx_pause(vsf_i2s_t *i2s_ptr);
+
+/**
+ \~english
+ @brief resume i2s tx channel which is paused by calling vsf_i2s_tx_pause.
+ @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
+ @return vsf_err_t: VSF_ERR_NONE if i2s paused successfully, or a negative error code
+
+ \~chinese
+ @brief 继续之前被 vsf_i2s_tx_pause 暂停的 i2s 发送通道
+ @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
+ @return vsf_err_t: 如果 i2s 暂停完成返回 VSF_ERR_NONE , 否则返回负数。
+ */
+extern vsf_err_t vsf_i2s_tx_resume(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
@@ -346,7 +361,7 @@ extern vsf_err_t vsf_i2s_rx_start(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
- @brief pause i2s rx channel, restart by calling vsf_i2s_rx_start.
+ @brief pause i2s rx channel, restart by calling vsf_i2s_rx_resume.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return vsf_err_t: VSF_ERR_NONE if i2s paused successfully, or a negative error code
 
@@ -356,6 +371,19 @@ extern vsf_err_t vsf_i2s_rx_start(vsf_i2s_t *i2s_ptr);
  @return vsf_err_t: 如果 i2s 暂停完成返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_i2s_rx_pause(vsf_i2s_t *i2s_ptr);
+
+/**
+ \~english
+ @brief resume i2s rx channel which is paused by calling vsf_i2s_rx_pause.
+ @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
+ @return vsf_err_t: VSF_ERR_NONE if i2s paused successfully, or a negative error code
+
+ \~chinese
+ @brief 继续之前被 vsf_i2s_rx_pause 暂停的 i2s 接收通道
+ @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
+ @return vsf_err_t: 如果 i2s 暂停完成返回 VSF_ERR_NONE , 否则返回负数。
+ */
+extern vsf_err_t vsf_i2s_rx_resume(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
