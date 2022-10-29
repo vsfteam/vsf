@@ -536,17 +536,62 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
     vsf_peda_end();
 }
 
+void __vk_aic1000a_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_i2s_irq_mask_t irq_mask)
+{
+    vk_audio_stream_t *audio_stream = target_ptr;
+    vsf_stream_t *stream = audio_stream->stream;
+    vk_audio_stream_t *__stream = audio_stream - audio_stream->stream_index;
+    vk_aic1000a_dev_t *dev = container_of(__stream, vk_aic1000a_dev_t, __stream);
+    uint32_t buffsize = vsf_stream_get_buff_size(audio_stream->stream), buffer_size;
+    uint8_t *buffer;
+    vsf_protect_t orig;
+
+    if (audio_stream->dir_in1out0) {
+        // capture/rx
+        vsf_stream_write(stream, NULL, buffsize >> 1);
+
+        orig = vsf_protect_int();
+        buffer_size = vsf_stream_get_wbuf(stream, &buffer);
+        if (buffer_size < (buffsize >> 1)) {
+            dev->dac.stream_paused = true;
+            vsf_unprotect_int(orig);
+            __vk_audio_i2s_rx_pause(&dev->use_as____vk_audio_i2s_dev_t);
+            return;
+        } else {
+            vsf_unprotect_int(orig);
+        }
+    } else {
+        // player/tx
+        vsf_stream_read(stream, NULL, buffsize >> 1);
+
+        orig = vsf_protect_int();
+        buffer_size = vsf_stream_get_rbuf(stream, &buffer);
+        if (buffer_size < (buffsize >> 1)) {
+            dev->dac.stream_paused = true;
+            vsf_unprotect_int(orig);
+            __vk_audio_i2s_tx_pause(&dev->use_as____vk_audio_i2s_dev_t);
+            return;
+        } else {
+            vsf_unprotect_int(orig);
+        }
+    }
+}
+
 static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_audio_stream_t *audio_stream = param;
     vk_audio_stream_t *__stream = audio_stream - audio_stream->stream_index;
     vk_aic1000a_dev_t *dev = container_of(__stream, vk_aic1000a_dev_t, __stream);
+    uint32_t buffsize = vsf_stream_get_buff_size(audio_stream->stream), buffer_size;
+    uint8_t *buffer;
+    vsf_protect_t orig;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     __try_start_stream: {
             vsf_i2s_cfg_t i2s_cfg;
             if (audio_stream->dir_in1out0) {
+                // capture/rx
                 if (vsf_stream_get_data_size(stream) != 0) {
                     vsf_trace_error("stream for i2s_rx is not empty\n");
                     return;
@@ -555,6 +600,11 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
                 i2s_cfg.data_sample_rate = dev->adc.sample_rate;
                 i2s_cfg.hw_sample_rate = dev->adc.sample_rate <= 480 ? 480 : 960;
                 i2s_cfg.channel_num = dev->adc.channel_num;
+                i2s_cfg.buffer_size = vsf_stream_get_wbuf(stream, &i2s_cfg.buffer);
+                i2s_cfg.isr.handler_fn = __vk_aic1000a_isrhandler;
+                i2s_cfg.isr.target_ptr = audio_stream;
+                // TODO: fix priority
+                i2s_cfg.isr.prio = vsf_arch_prio_0;
                 if (VSF_ERR_NONE != __vk_audio_i2s_rx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
                     vsf_trace_error("fail to initialize i2s_rx\n");
                 } else {
@@ -562,6 +612,7 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
                     dev->adc.stream_started = true;
                 }
             } else {
+                // player/tx
                 // wait data to be filled for tick-tock operation
                 if (vsf_stream_get_free_size(stream) != 0) {
                     return;
@@ -571,6 +622,10 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
                 i2s_cfg.hw_sample_rate = dev->dac.sample_rate <= 480 ? 480 : 960;
                 i2s_cfg.channel_num = dev->dac.channel_num;
                 i2s_cfg.buffer_size = vsf_stream_get_rbuf(stream, &i2s_cfg.buffer);
+                i2s_cfg.isr.handler_fn = __vk_aic1000a_isrhandler;
+                i2s_cfg.isr.target_ptr = audio_stream;
+                // TODO: fix priority
+                i2s_cfg.isr.prio = vsf_arch_prio_0;
                 if (VSF_ERR_NONE != __vk_audio_i2s_tx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
                     vsf_trace_error("fail to initialize i2s_tx\n");
                 } else {
@@ -590,12 +645,35 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
         }
         break;
     case VSF_STREAM_ON_OUT:
+        orig = vsf_protect_int();
+        if (dev->adc.stream_paused) {
+            buffer_size = vsf_stream_get_wbuf(stream, &buffer);
+            if (buffer_size >= (buffsize >> 1)) {
+                dev->adc.stream_paused = false;
+                vsf_unprotect_int(orig);
+
+                __vk_audio_i2s_rx_resume(&dev->use_as____vk_audio_i2s_dev_t);
+            }
+        } else {
+            vsf_unprotect_int(orig);
+        }
         break;
     case VSF_STREAM_ON_IN:
         if (!dev->dac.stream_started) {
             goto __try_start_stream;
         } else {
+            orig = vsf_protect_int();
+            if (dev->dac.stream_paused) {
+                buffer_size = vsf_stream_get_rbuf(stream, &buffer);
+                if (buffer_size >= (buffsize >> 1)) {
+                    dev->dac.stream_paused = false;
+                    vsf_unprotect_int(orig);
 
+                    __vk_audio_i2s_tx_resume(&dev->use_as____vk_audio_i2s_dev_t);
+                }
+            } else {
+                vsf_unprotect_int(orig);
+            }
         }
         break;
     }

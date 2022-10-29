@@ -68,6 +68,7 @@ vsf_class(vk_aic1000a_dev_t) {
             uint8_t ch_ana_pu;
 
             bool stream_started;
+            bool stream_paused;
             uint8_t channel_num;
             uint8_t sample_bitlen;
             uint16_t sample_rate;
@@ -83,6 +84,7 @@ vsf_class(vk_aic1000a_dev_t) {
             uint8_t mic_matrix_type;
 
             bool stream_started;
+            bool stream_paused;
             uint8_t channel_num;
             uint8_t sample_bitlen;
             uint16_t sample_rate;
