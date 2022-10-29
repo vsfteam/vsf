@@ -54,14 +54,4 @@ vsf_err_t __vk_audio_i2s_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cf
     return vsf_i2s_init(audio_i2s->i2s, cfg);
 }
 
-vsf_err_t __vk_audio_i2s_rx_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
-{
-    return vsf_i2s_rx_init(audio_i2s->i2s, cfg);
-}
-
-vsf_err_t __vk_audio_i2s_tx_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
-{
-    return vsf_i2s_tx_init(audio_i2s->i2s, cfg);
-}
-
 #endif

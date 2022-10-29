@@ -396,6 +396,7 @@ const static vk_aic1000a_reg_seq_t __vk_aic1000a_init_seq[] = {
     // TODO: mic_signal_mode_config
 };
 
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
 static const uint8_t __aic1000a_mic_matrix_tbl[6][3] = {
     {0, 1, 2},
     {0, 2, 1},
@@ -404,6 +405,7 @@ static const uint8_t __aic1000a_mic_matrix_tbl[6][3] = {
     {2, 0, 1},
     {2, 1, 0}
 };
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -513,7 +515,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
 
         dev->stream_num = 0;
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
-        dev->stream[dev->stream_num].stream_index = 0;
+        dev->stream[dev->stream_num].stream_index = dev->stream_num;
         dev->stream[dev->stream_num].dir_in1out0 = 0;
         dev->stream[dev->stream_num].format.value = 0;
         dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_playback;
@@ -521,11 +523,10 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         memset(&dev->dac, 0, sizeof(dev->dac));
 #endif
 #if VSF_AUDIO_USE_CAPTURE == ENABLED
-        dev->stream[dev->stream_num].stream_index = 1;
+        dev->stream[dev->stream_num].stream_index = dev->stream_num;
         dev->stream[dev->stream_num].dir_in1out0 = 1;
         dev->stream[dev->stream_num].format.value = 0;
         dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_capture;
-        dev->stream_num++;
         memset(&dev->adc, 0, sizeof(dev->adc));
 #endif
 
@@ -533,6 +534,71 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         break;
     }
     vsf_peda_end();
+}
+
+static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
+{
+    vk_audio_stream_t *audio_stream = param;
+    vk_audio_stream_t *__stream = audio_stream - audio_stream->stream_index;
+    vk_aic1000a_dev_t *dev = container_of(__stream, vk_aic1000a_dev_t, __stream);
+
+    switch (evt) {
+    case VSF_STREAM_ON_CONNECT:
+    __try_start_stream: {
+            vsf_i2s_cfg_t i2s_cfg;
+            if (audio_stream->dir_in1out0) {
+                if (vsf_stream_get_data_size(stream) != 0) {
+                    vsf_trace_error("stream for i2s_rx is not empty\n");
+                    return;
+                }
+                i2s_cfg.feature = 16 == dev->adc.sample_bitlen ? I2S_DATA_BITLEN_16 : I2S_DATA_BITLEN_24;
+                i2s_cfg.data_sample_rate = dev->adc.sample_rate;
+                i2s_cfg.hw_sample_rate = dev->adc.sample_rate <= 480 ? 480 : 960;
+                i2s_cfg.channel_num = dev->adc.channel_num;
+                if (VSF_ERR_NONE != __vk_audio_i2s_rx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
+                    vsf_trace_error("fail to initialize i2s_rx\n");
+                } else {
+                    __vk_audio_i2s_rx_start(&dev->use_as____vk_audio_i2s_dev_t);
+                    dev->adc.stream_started = true;
+                }
+            } else {
+                // wait data to be filled for tick-tock operation
+                if (vsf_stream_get_free_size(stream) != 0) {
+                    return;
+                }
+                i2s_cfg.feature = 16 == dev->dac.sample_bitlen ? I2S_DATA_BITLEN_16 : I2S_DATA_BITLEN_24;
+                i2s_cfg.data_sample_rate = dev->dac.sample_rate;
+                i2s_cfg.hw_sample_rate = dev->dac.sample_rate <= 480 ? 480 : 960;
+                i2s_cfg.channel_num = dev->dac.channel_num;
+                i2s_cfg.buffer_size = vsf_stream_get_rbuf(stream, &i2s_cfg.buffer);
+                if (VSF_ERR_NONE != __vk_audio_i2s_tx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
+                    vsf_trace_error("fail to initialize i2s_tx\n");
+                } else {
+                    __vk_audio_i2s_tx_start(&dev->use_as____vk_audio_i2s_dev_t);
+                    dev->dac.stream_started = true;
+                }
+            }
+        }
+        break;
+    case VSF_STREAM_ON_DISCONNECT:
+        if (audio_stream->dir_in1out0) {
+            __vk_audio_i2s_rx_fini(&dev->use_as____vk_audio_i2s_dev_t);
+            dev->adc.stream_started = false;
+        } else {
+            __vk_audio_i2s_tx_fini(&dev->use_as____vk_audio_i2s_dev_t);
+            dev->dac.stream_started = false;
+        }
+        break;
+    case VSF_STREAM_ON_OUT:
+        break;
+    case VSF_STREAM_ON_IN:
+        if (!dev->dac.stream_started) {
+            goto __try_start_stream;
+        } else {
+
+        }
+        break;
+    }
 }
 
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
@@ -749,6 +815,10 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_start, vk_audio_start)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        if (NULL == audio_stream->stream) {
+            vsf_eda_return(VSF_ERR_INVALID_PARAMETER);
+            break;
+        }
         if (dev->dac.is_started) {
             vsf_eda_return(VSF_ERR_NONE);
             break;
@@ -765,21 +835,16 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_start, vk_audio_start)
         __vk_aic1000a_clear_spk_mem(dev);
         __vk_aic1000_dac_pu(dev, channel_mask);
         __vk_aic1000_dac_config(dev, &audio_stream->format, channel_mask);
-
-        // set data_bitlen in feature
-        vsf_i2s_cfg_t i2s_cfg   = {
-            .feature            = 16 == bitlen ? I2S_DATA_BITLEN_16 : I2S_DATA_BITLEN_24,
-            .data_sample_rate   = sample_rate,
-            .hw_sample_rate     = sample_rate <= 480 ? 480 : 960,
-            .channel_num        = channel_num,
-        };
-        if (VSF_ERR_NONE != __vk_audio_i2s_tx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
-            vsf_eda_return(VSF_ERR_FAIL);
-            return;
-        }
-
         __vk_aic1000_dac_start(dev, audio_stream, channel_mask);
         dev->dac.is_started = true;
+
+        dev->dac.channel_num = channel_num;
+        dev->dac.sample_bitlen = bitlen;
+        dev->dac.sample_rate = sample_rate;
+        audio_stream->stream->rx.evthandler = __vk_aic1000a_stream_evthandler;
+        audio_stream->stream->rx.param = audio_stream;
+        vsf_stream_connect_rx(audio_stream->stream);
+
         vsf_eda_return(VSF_ERR_NONE);
         break;
     }
@@ -1214,6 +1279,10 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_start, vk_audio_start)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        if (NULL == audio_stream->stream) {
+            vsf_eda_return(VSF_ERR_INVALID_PARAMETER);
+            break;
+        }
         if (dev->adc.is_started) {
             vsf_eda_return(VSF_ERR_NONE);
             break;
@@ -1230,21 +1299,16 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_start, vk_audio_start)
         __vk_aic1000a_clear_mic_mem(dev);
         __vk_aic1000_adc_pu(dev, channel_mask);
         __vk_aic1000_adc_config(dev, &audio_stream->format, channel_mask);
-
-        // set data_bitlen in feature
-        vsf_i2s_cfg_t i2s_cfg   = {
-            .feature            = 16 == bitlen ? I2S_DATA_BITLEN_16 : I2S_DATA_BITLEN_24,
-            .data_sample_rate   = sample_rate,
-            .hw_sample_rate     = sample_rate <= 480 ? 480 : 960,
-            .channel_num        = channel_num,
-        };
-        if (VSF_ERR_NONE != __vk_audio_i2s_rx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
-            vsf_eda_return(VSF_ERR_FAIL);
-            return;
-        }
-
         __vk_aic1000_adc_start(dev, audio_stream, channel_mask);
         dev->adc.is_started = true;
+
+        dev->adc.channel_num = channel_num;
+        dev->adc.sample_bitlen = bitlen;
+        dev->adc.sample_rate = sample_rate;
+        audio_stream->stream->tx.evthandler = __vk_aic1000a_stream_evthandler;
+        audio_stream->stream->tx.param = audio_stream;
+        vsf_stream_connect_tx(audio_stream->stream);
+
         vsf_eda_return(VSF_ERR_NONE);
         break;
     }

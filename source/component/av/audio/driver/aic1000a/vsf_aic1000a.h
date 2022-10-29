@@ -66,6 +66,11 @@ vsf_class(vk_aic1000a_dev_t) {
             bool mem_cleared;
             uint8_t ch_en;
             uint8_t ch_ana_pu;
+
+            bool stream_started;
+            uint8_t channel_num;
+            uint8_t sample_bitlen;
+            uint16_t sample_rate;
         } dac;
         struct {
             bool is_started;
@@ -76,6 +81,11 @@ vsf_class(vk_aic1000a_dev_t) {
             uint8_t ch_d36_en;
             uint8_t ch_d36_d3;
             uint8_t mic_matrix_type;
+
+            bool stream_started;
+            uint8_t channel_num;
+            uint8_t sample_bitlen;
+            uint16_t sample_rate;
         } adc;
     )
 };
