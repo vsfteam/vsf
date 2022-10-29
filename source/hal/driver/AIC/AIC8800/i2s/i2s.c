@@ -50,8 +50,12 @@
 typedef struct vsf_hw_i2s_const_t {
     HWP_AUD_PROC_T *reg;
     uint8_t idx;
-    AUD_PATH_T tx_path;
-    AUD_PATH_T rx_path;
+
+    struct {
+        AIC_DMA_CH_ENUM dma_ch;
+        uint8_t dma_irqn;
+        AUD_PATH_T path;
+    } tx, rx;
     // TODO: move to pm
     uint32_t oclk;
 } vsf_hw_i2s_const_t;
@@ -61,13 +65,14 @@ typedef struct vsf_hw_i2s_t {
     vsf_i2s_t vsf_i2s;
 #endif
 
-    const vsf_hw_i2s_const_t *i2s_const;
+    const vsf_hw_i2s_const_t    *i2s_const;
     uint32_t feature;
     struct {
-        uint8_t             dma_ch;
-        bool                path_opened;
-        vsf_i2s_isr_t       isr;
-    } rx, tx;
+        DMA_CX_DESC_T           dma_desc[2];
+        bool                    path_opened;
+        vsf_i2s_isr_handler_t   *isrhandler;
+        void                    *isr_param;
+    } ALIGN(8) rx, tx;
 } vsf_hw_i2s_t;
 
 /*============================ INCLUDES ======================================*/
@@ -174,16 +179,30 @@ static const uint8_t __aud_src_div[2][AUD_SRC_DIV_NB] = {
     {0x0A, 0x09, 0x06, 0x08, 0x05, 0x04},
 };
 
+static void * __vsf_hw_i2s_irq_param[5];
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_hw_i2s_irq_handler(vsf_hw_i2s_t *hw_i2s_ptr)
+static void __vsf_hw_i2s_dma_irqhandler(uint8_t dma_type, uint8_t ch, uint32_t int_status)
 {
+    VSF_HAL_ASSERT(ch < dimof(__vsf_hw_i2s_irq_param));
+    vsf_hw_i2s_t *hw_i2s_ptr = __vsf_hw_i2s_irq_param[ch];
     VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
     const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
     VSF_HAL_ASSERT(NULL != hw_i2s_const);
 
-
+    if (ch == hw_i2s_const->tx.dma_ch) {
+        if (hw_i2s_ptr->tx.isrhandler != NULL) {
+            hw_i2s_ptr->tx.isrhandler(hw_i2s_ptr->tx.isr_param, (vsf_i2s_t *)hw_i2s_ptr, I2S_IRQ_MASK_TX_TGL_BUFFER);
+        }
+    } else if (ch == hw_i2s_const->rx.dma_ch) {
+        if (hw_i2s_ptr->rx.isrhandler != NULL) {
+            hw_i2s_ptr->rx.isrhandler(hw_i2s_ptr->rx.isr_param, (vsf_i2s_t *)hw_i2s_ptr, I2S_IRQ_MASK_RX_TGL_BUFFER);
+        }
+    } else {
+        VSF_HAL_ASSERT(false);
+    }
 }
 
 vsf_err_t vsf_hw_i2s_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
@@ -287,6 +306,7 @@ vsf_err_t vsf_hw_i2s_tx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
         vsf_hw_i2s_init(hw_i2s_ptr, cfg_ptr);
     }
 
+    AUD_PATH_T path = hw_i2s_const->tx.path;
     uint32_t feature = cfg_ptr->feature;
     uint8_t data_bitlen;
     uint8_t channel_num = cfg_ptr->channel_num;
@@ -299,6 +319,44 @@ vsf_err_t vsf_hw_i2s_tx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
 //    bool src_en = cfg_ptr->data_sample_rate && (cfg_ptr->data_sample_rate != cfg_ptr->hw_sample_rate);
     bool src_en = true;     // src_en is always true for playback
 
+    DMA_CFG_T dma_cfg = { .dma_type = DMA_CX };
+    dma_get_default_config(dma_cfg.dma_type, &dma_cfg);
+    dma_cfg.src_periph = DMA_MEMORY;
+    dma_cfg.trans_type = DMA_TRANS_M2P;
+    dma_cfg.ch = hw_i2s_const->tx.dma_ch;
+    dma_cfg.handler = __vsf_hw_i2s_dma_irqhandler;
+    if (AUD_PATH_TX01 == path) {
+        dma_cfg.dest_periph = DMA_AUD_PROC_TX0;
+        dma_cfg.ext_req_cid = REQ_CID_AUD_PROC_TX0;
+    } else if (AUD_PATH_TX23 == path) {
+        dma_cfg.dest_periph = DMA_AUD_PROC_TX2;
+        dma_cfg.ext_req_cid = REQ_CID_AUD_PROC_TX2;
+    }
+    dma_cfg.dest_addr = dma_cx_get_periph_addr(dma_cfg.dest_periph);
+    dma_cfg.dest_size = AHB_WORD;
+    dma_cfg.addr_fix_type = FIX_ON_DEST;
+    dma_cfg.dest_tran_sz = 0;
+    if (16 == data_bitlen) {
+        dma_cfg.src_size = AHB_HWORD;
+        dma_cfg.src_tran_sz = 2;
+    } else {
+        dma_cfg.src_size = AHB_WORD;
+        dma_cfg.src_tran_sz = 4;
+    }
+
+    uint32_t desc_trans_size = cfg_ptr->buffer_size >> 1;
+    dma_cfg.tbl1_cnt = dma_cfg.tbl2_cnt = desc_trans_size;
+    dma_cfg.llist_dedicated_int_en = true;
+    dma_cfg.llist_en = true;
+    dma_cfg.llist_cfg_valid = false;
+    dma_cfg.nxt_addr = (uint32_t)&hw_i2s_ptr->tx.dma_desc[0];
+    dma_cfg.src_addr = (uint32_t)cfg_ptr->buffer;
+    dma_cx_desc_link(&dma_cfg, &hw_i2s_ptr->tx.dma_desc[0], &hw_i2s_ptr->tx.dma_desc[1]);
+    dma_cfg.src_addr = (uint32_t)((uint8_t *)cfg_ptr->buffer + desc_trans_size);
+    dma_cx_desc_link(&dma_cfg, &hw_i2s_ptr->tx.dma_desc[1], &hw_i2s_ptr->tx.dma_desc[0]);
+    dma_cfg.src_addr = (uint32_t)cfg_ptr->buffer;
+    dma_cx_config(dma_cfg.ch, &dma_cfg);
+
     if (0 == hw_i2s_const->idx) {
         reg->aud_proc_cfg &= ~AUD_PROC_I2S_CHN_OUT_SEL;
     } else {
@@ -306,7 +364,7 @@ vsf_err_t vsf_hw_i2s_tx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     }
 
     uint32_t val;
-    if (AUD_PATH_TX01 == hw_i2s_const->tx_path) {
+    if (AUD_PATH_TX01 == path) {
         uint32_t src_mode = 0;
         uint8_t src_ch_en = 0;
 
@@ -346,7 +404,7 @@ vsf_err_t vsf_hw_i2s_tx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
             reg->aud_proc_tx_cfg_ch0 &= ~AUD_PROC_TX_MODE_CH_0;
             reg->aud_proc_tx_cfg_ch1 &= ~AUD_PROC_TX_MODE_CH_1;
         }
-    } else if (AUD_PATH_TX23 == hw_i2s_const->tx_path) {
+    } else if (AUD_PATH_TX23 == path) {
         /* tx mux config, add tx ch2 to L, add tx ch3 to R  */
         val = reg->aud_proc_dac_cfg1;
         val &= ~(AUD_PROC_TX_MUX_MODE_L(0x3) | AUD_PROC_TX_MUX_MODE_R(0x3));
@@ -372,6 +430,15 @@ vsf_err_t vsf_hw_i2s_tx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
         }
     }
 
+    if (cfg_ptr->isr.handler_fn != NULL) {
+        hw_i2s_ptr->tx.isr_param = cfg_ptr->isr.target_ptr;
+        hw_i2s_ptr->tx.isrhandler = cfg_ptr->isr.handler_fn;
+        NVIC_SetPriority(hw_i2s_const->tx.dma_irqn, cfg_ptr->isr.prio);
+        NVIC_EnableIRQ(hw_i2s_const->tx.dma_irqn);
+    }
+
+    VSF_HAL_ASSERT(NULL == __vsf_hw_i2s_irq_param[hw_i2s_const->tx.dma_ch]);
+    __vsf_hw_i2s_irq_param[hw_i2s_const->tx.dma_ch] = hw_i2s_ptr;
     return VSF_ERR_NONE;
 }
 
@@ -413,8 +480,10 @@ void vsf_hw_i2s_tx_fini(vsf_hw_i2s_t *hw_i2s_ptr)
     val |= mixer_mode;
     reg->aud_proc_dac_cfg2 = val;
 
-    dma_cx_free(hw_i2s_ptr->tx.dma_ch);
-    dma_cx_set_lli_cntr(hw_i2s_ptr->tx.dma_ch, 0);
+    dma_cx_free(hw_i2s_const->tx.dma_ch);
+    dma_cx_set_lli_cntr(hw_i2s_const->tx.dma_ch, 0);
+
+    __vsf_hw_i2s_irq_param[hw_i2s_const->tx.dma_ch] = NULL;
 }
 
 vsf_err_t vsf_hw_i2s_tx_start(vsf_hw_i2s_t *hw_i2s_ptr)
@@ -425,14 +494,19 @@ vsf_err_t vsf_hw_i2s_tx_start(vsf_hw_i2s_t *hw_i2s_ptr)
     HWP_AUD_PROC_T *reg = hw_i2s_const->reg;
     VSF_HAL_ASSERT(NULL != reg);
 
-    dma_cx_halt_set(hw_i2s_ptr->tx.dma_ch, false);
-    dma_cx_enable_set(hw_i2s_ptr->tx.dma_ch, true);
-    if (AUD_PATH_TX01 == hw_i2s_const->tx_path) {
+    dma_cx_halt_set(hw_i2s_const->tx.dma_ch, false);
+    dma_cx_enable_set(hw_i2s_const->tx.dma_ch, true);
+    if (AUD_PATH_TX01 == hw_i2s_const->tx.path) {
         reg->aud_proc_tx_cfg_ch0 |= AUD_PROC_TX_EN_CH_0;
     } else {
         reg->aud_proc_tx_cfg_ch2 |= AUD_PROC_TX_EN_CH_2;
     }
     reg->aud_proc_cfg |= AUD_PROC_AUD_PROC_ENABLE;
+    if (0 == hw_i2s_const->idx) {
+        reg->aud_intf_i2s_cfg0 |= AUD_PROC_I2S_ENABLE_0;
+    } else {
+        reg->aud_intf_i2s_cfg1 |= AUD_PROC_I2S_ENABLE_1;
+    }
     hw_i2s_ptr->tx.path_opened = true;
 
     return VSF_ERR_NONE;
@@ -440,13 +514,21 @@ vsf_err_t vsf_hw_i2s_tx_start(vsf_hw_i2s_t *hw_i2s_ptr)
 
 vsf_err_t vsf_hw_i2s_tx_pause(vsf_hw_i2s_t *hw_i2s_ptr)
 {
-    dma_cx_enable_set(hw_i2s_ptr->tx.dma_ch, false);
+    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
+    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
+    VSF_HAL_ASSERT(NULL != hw_i2s_const);
+
+    dma_cx_enable_set(hw_i2s_const->tx.dma_ch, false);
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_i2s_tx_resume(vsf_hw_i2s_t *hw_i2s_ptr)
 {
-    dma_cx_enable_set(hw_i2s_ptr->tx.dma_ch, true);
+    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
+    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
+    VSF_HAL_ASSERT(NULL != hw_i2s_const);
+
+    dma_cx_enable_set(hw_i2s_const->tx.dma_ch, true);
     return VSF_ERR_NONE;
 }
 
@@ -498,6 +580,7 @@ vsf_err_t vsf_hw_i2s_rx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
         vsf_hw_i2s_init(hw_i2s_ptr, cfg_ptr);
     }
 
+    AUD_PATH_T path = hw_i2s_const->rx.path;
     uint32_t feature = cfg_ptr->feature;
     uint8_t data_bitlen;
     uint8_t channel_num = cfg_ptr->channel_num;
@@ -509,8 +592,51 @@ vsf_err_t vsf_hw_i2s_rx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     }
     bool src_en = cfg_ptr->data_sample_rate && (cfg_ptr->data_sample_rate != cfg_ptr->hw_sample_rate);
 
+    DMA_CFG_T dma_cfg = { .dma_type = DMA_CX };
+    dma_get_default_config(dma_cfg.dma_type, &dma_cfg);
+    dma_cfg.dest_periph = DMA_MEMORY;
+    dma_cfg.trans_type = DMA_TRANS_P2M;
+    dma_cfg.ch = hw_i2s_const->rx.dma_ch;
+    dma_cfg.handler = __vsf_hw_i2s_dma_irqhandler;
+    if (AUD_PATH_RX01 == path) {
+        if (src_en) {
+            dma_cfg.src_periph = DMA_AUD_SRC_RX;
+            dma_cfg.ext_req_cid = REQ_CID_AUD_SRC_RX;
+        } else {
+            dma_cfg.src_periph = DMA_AUD_PROC_RX01;
+            dma_cfg.ext_req_cid = REQ_CID_AUD_PROC_RX01;
+        }
+    } else if (AUD_PATH_RX23 == path) {
+        dma_cfg.src_periph = DMA_AUD_PROC_RX23;
+        dma_cfg.ext_req_cid = REQ_CID_AUD_PROC_RX23;
+    }
+    dma_cfg.src_addr = dma_cx_get_periph_addr(dma_cfg.src_periph);
+    dma_cfg.src_size = AHB_WORD;
+    dma_cfg.addr_fix_type = FIX_ON_SRC;
+    dma_cfg.src_tran_sz = 0;
+    if (16 == data_bitlen) {
+        dma_cfg.dest_size = AHB_HWORD;
+        dma_cfg.dest_tran_sz = 2;
+    } else {
+        dma_cfg.dest_size = AHB_WORD;
+        dma_cfg.dest_tran_sz = 4;
+    }
+
+    uint32_t desc_trans_size = cfg_ptr->buffer_size >> 1;
+    dma_cfg.tbl1_cnt = dma_cfg.tbl2_cnt = desc_trans_size;
+    dma_cfg.llist_dedicated_int_en = true;
+    dma_cfg.llist_en = true;
+    dma_cfg.llist_cfg_valid = false;
+    dma_cfg.nxt_addr = (uint32_t)&hw_i2s_ptr->tx.dma_desc[0];
+    dma_cfg.dest_addr = (uint32_t)cfg_ptr->buffer;
+    dma_cx_desc_link(&dma_cfg, &hw_i2s_ptr->tx.dma_desc[0], &hw_i2s_ptr->tx.dma_desc[1]);
+    dma_cfg.dest_addr = (uint32_t)((uint8_t *)cfg_ptr->buffer + desc_trans_size);
+    dma_cx_desc_link(&dma_cfg, &hw_i2s_ptr->tx.dma_desc[1], &hw_i2s_ptr->tx.dma_desc[0]);
+    dma_cfg.dest_addr = (uint32_t)cfg_ptr->buffer;
+    dma_cx_config(dma_cfg.ch, &dma_cfg);
+
     uint32_t val;
-    if (AUD_PATH_RX01 == hw_i2s_const->rx_path) {
+    if (AUD_PATH_RX01 == path) {
         if (0 == hw_i2s_const->idx) {
             reg->aud_proc_cfg &= ~AUD_PROC_I2S_CHN_IN_SEL;
         } else {
@@ -548,7 +674,7 @@ vsf_err_t vsf_hw_i2s_rx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
         } else {
             reg->aud_src_ctrl0 &= ~AUD_PROC_AUD_SRC_ENABLE;
         }
-    } else if (AUD_PATH_RX23 == hw_i2s_const->rx_path) {
+    } else if (AUD_PATH_RX23 == path) {
         if (0 == hw_i2s_const->idx) {
             reg->aud_proc_cfg |= AUD_PROC_I2S_CHN_IN_SEL;
         } else {
@@ -572,6 +698,15 @@ vsf_err_t vsf_hw_i2s_rx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
         }
     }
 
+    if (cfg_ptr->isr.handler_fn != NULL) {
+        hw_i2s_ptr->rx.isr_param = cfg_ptr->isr.target_ptr;
+        hw_i2s_ptr->rx.isrhandler = cfg_ptr->isr.handler_fn;
+        NVIC_SetPriority(hw_i2s_const->rx.dma_irqn, cfg_ptr->isr.prio);
+        NVIC_EnableIRQ(hw_i2s_const->rx.dma_irqn);
+    }
+
+    VSF_HAL_ASSERT(NULL == __vsf_hw_i2s_irq_param[hw_i2s_const->rx.dma_ch]);
+    __vsf_hw_i2s_irq_param[hw_i2s_const->rx.dma_ch] = hw_i2s_ptr;
     return VSF_ERR_NONE;
 }
 
@@ -586,7 +721,7 @@ void vsf_hw_i2s_rx_fini(vsf_hw_i2s_t *hw_i2s_ptr)
     hw_i2s_ptr->rx.path_opened = false;
 
     /* Disable AUD_PROC */
-    if (AUD_PATH_RX01 == hw_i2s_const->rx_path) {
+    if (AUD_PATH_RX01 == hw_i2s_const->rx.path) {
         reg->aud_proc_rx_cfg_ch01 &= ~AUD_PROC_RX_EN_CH_0;
     } else {
         reg->aud_proc_rx_cfg_ch23 &= ~AUD_PROC_RX_EN_CH_2;
@@ -603,10 +738,12 @@ void vsf_hw_i2s_rx_fini(vsf_hw_i2s_t *hw_i2s_ptr)
     }
 
     /* Disable DMA_CX */
-    dma_cx_enable_set(hw_i2s_ptr->rx.dma_ch, false);
+    dma_cx_enable_set(hw_i2s_const->rx.dma_ch, false);
 
-    dma_cx_free(hw_i2s_ptr->rx.dma_ch);
-    dma_cx_set_lli_cntr(hw_i2s_ptr->rx.dma_ch, 0);
+    dma_cx_free(hw_i2s_const->rx.dma_ch);
+    dma_cx_set_lli_cntr(hw_i2s_const->rx.dma_ch, 0);
+
+    __vsf_hw_i2s_irq_param[hw_i2s_const->rx.dma_ch] = NULL;
 }
 
 vsf_err_t vsf_hw_i2s_rx_start(vsf_hw_i2s_t *hw_i2s_ptr)
@@ -617,15 +754,20 @@ vsf_err_t vsf_hw_i2s_rx_start(vsf_hw_i2s_t *hw_i2s_ptr)
     HWP_AUD_PROC_T *reg = hw_i2s_const->reg;
     VSF_HAL_ASSERT(NULL != reg);
 
-    dma_cx_halt_set(hw_i2s_ptr->rx.dma_ch, false);
-    dma_cx_enable_set(hw_i2s_ptr->rx.dma_ch, true);
+    dma_cx_halt_set(hw_i2s_const->rx.dma_ch, false);
+    dma_cx_enable_set(hw_i2s_const->rx.dma_ch, true);
 
-    if (AUD_PATH_RX01 == hw_i2s_const->rx_path) {
+    if (AUD_PATH_RX01 == hw_i2s_const->rx.path) {
         reg->aud_proc_rx_cfg_ch01 |= AUD_PROC_RX_EN_CH_0;
     } else {
         reg->aud_proc_rx_cfg_ch23 |= AUD_PROC_RX_EN_CH_2;
     }
     reg->aud_proc_cfg |= AUD_PROC_AUD_PROC_ENABLE;
+    if (0 == hw_i2s_const->idx) {
+        reg->aud_intf_i2s_cfg0 |= AUD_PROC_I2S_ENABLE_0;
+    } else {
+        reg->aud_intf_i2s_cfg1 |= AUD_PROC_I2S_ENABLE_1;
+    }
     hw_i2s_ptr->rx.path_opened = true;
 
     return VSF_ERR_NONE;
@@ -633,13 +775,21 @@ vsf_err_t vsf_hw_i2s_rx_start(vsf_hw_i2s_t *hw_i2s_ptr)
 
 vsf_err_t vsf_hw_i2s_rx_pause(vsf_hw_i2s_t *hw_i2s_ptr)
 {
-    dma_cx_enable_set(hw_i2s_ptr->rx.dma_ch, false);
+    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
+    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
+    VSF_HAL_ASSERT(NULL != hw_i2s_const);
+
+    dma_cx_enable_set(hw_i2s_const->rx.dma_ch, false);
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_i2s_rx_resume(vsf_hw_i2s_t *hw_i2s_ptr)
 {
-    dma_cx_enable_set(hw_i2s_ptr->rx.dma_ch, true);
+    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
+    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
+    VSF_HAL_ASSERT(NULL != hw_i2s_const);
+
+    dma_cx_enable_set(hw_i2s_const->rx.dma_ch, true);
     return VSF_ERR_NONE;
 }
 
@@ -687,20 +837,20 @@ vsf_i2s_status_t vsf_hw_i2s_status(vsf_hw_i2s_t *hw_i2s_ptr)
 
 #define VSF_I2S_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
     static const vsf_hw_i2s_const_t __vsf_hw_i2s ## __COUNT ## _const = {       \
-        .reg        = VSF_HW_I2S ## __COUNT ## _REG,                            \
-        .idx        = VSF_HW_I2S ## __COUNT ## _IDX,                            \
-        .tx_path    = VSF_HW_I2S ## __COUNT ## _TXPATH,                         \
-        .rx_path    = VSF_HW_I2S ## __COUNT ## _RXPATH,                         \
-        .oclk       = VSF_HW_I2S ## __COUNT ## _OCLK,                           \
+        .reg            = VSF_HW_I2S ## __COUNT ## _REG,                        \
+        .idx            = VSF_HW_I2S ## __COUNT ## _IDX,                        \
+        .tx.path        = VSF_HW_I2S ## __COUNT ## _TXPATH,                     \
+        .tx.dma_ch      = VSF_HW_I2S ## __COUNT ## _TXDMA_CH,                   \
+        .tx.dma_irqn    = VSF_HW_I2S ## __COUNT ## _TXDMA_IRQN,                 \
+        .rx.path        = VSF_HW_I2S ## __COUNT ## _RXPATH,                     \
+        .rx.dma_ch      = VSF_HW_I2S ## __COUNT ## _RXDMA_CH,                   \
+        .rx.dma_irqn    = VSF_HW_I2S ## __COUNT ## _RXDMA_IRQN,                 \
+        .oclk           = VSF_HW_I2S ## __COUNT ## _OCLK,                       \
     };                                                                          \
     vsf_hw_i2s_t vsf_hw_i2s ## __COUNT = {                                      \
-        .i2s_const  = &__vsf_hw_i2s ## __COUNT ## _const,                       \
+        .i2s_const      = &__vsf_hw_i2s ## __COUNT ## _const,                   \
         __HAL_OP                                                                \
-    };                                                                          \
-    void VSF_HW_I2S ## __COUNT ## _IRQ(void)                                    \
-    {                                                                           \
-        __vsf_hw_i2s_irq_handler(&vsf_hw_i2s ## __COUNT);                       \
-    }
+    };
 #include "hal/driver/common/i2s/i2s_template.inc"
 
 #endif /* VSF_HAL_USE_I2S */

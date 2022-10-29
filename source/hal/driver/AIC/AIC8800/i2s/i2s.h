@@ -34,10 +34,10 @@
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_i2s_irq_mask_t {
-    I2S_IRQ_MASK_TX_CPL         = (0x1ul <<  0),
-    I2S_IRQ_MASK_RX_CPL         = (0x1ul <<  1),
+    I2S_IRQ_MASK_TX_TGL_BUFFER  = (0x1ul <<  0),
+    I2S_IRQ_MASK_RX_TGL_BUFFER  = (0x1ul <<  1),
 
-    I2S_IRQ_MASK_ALL            = I2S_IRQ_MASK_TX_CPL | I2S_IRQ_MASK_RX_CPL,
+    I2S_IRQ_MASK_ALL            = I2S_IRQ_MASK_TX_TGL_BUFFER | I2S_IRQ_MASK_RX_TGL_BUFFER,
 } vsf_i2s_irq_mask_t;
 
 typedef enum vsf_i2s_feature_t {

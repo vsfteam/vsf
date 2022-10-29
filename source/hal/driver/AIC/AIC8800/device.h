@@ -128,8 +128,16 @@
 #ifndef VSF_HW_I2S0_RXPATH
 #   define VSF_HW_I2S0_RXPATH       AUD_PATH_RX01
 #endif
+#ifndef VSF_HW_I2S0_RXDMA_CH
+#   define VSF_HW_I2S0_RXDMA_CH     DMA_CH_1
+#   define VSF_HW_I2S0_RXDMA_IRQN   DMA01_IRQn
+#endif
 #ifndef VSF_HW_I2S0_TXPATH
 #   define VSF_HW_I2S0_TXPATH       AUD_PATH_TX01
+#endif
+#ifndef VSF_HW_I2S0_TXDMA_CH
+#   define VSF_HW_I2S0_TXDMA_CH     DMA_CH_4
+#   define VSF_HW_I2S0_TXDMA_IRQN   DMA04_IRQn
 #endif
 #define VSF_HW_I2S1_REG             (HWP_AUD_PROC_T *)REG_AUD_PROC_BASE
 #define VSF_HW_I2S1_IDX             1
@@ -137,8 +145,16 @@
 #ifndef VSF_HW_I2S1_RXPATH
 #   define VSF_HW_I2S1_RXPATH       AUD_PATH_RX01
 #endif
+#ifndef VSF_HW_I2S1_RXDMA_CH
+#   define VSF_HW_I2S1_RXDMA_CH     DMA_CH_3
+#   define VSF_HW_I2S1_RXDMA_IRQN   DMA03_IRQn
+#endif
 #ifndef VSF_HW_I2S1_TXPATH
 #   define VSF_HW_I2S1_TXPATH       AUD_PATH_TX01
+#endif
+#ifndef VSF_HW_I2S1_TXDMA_CH
+#   define VSF_HW_I2S1_TXDMA_CH     DMA_CH_2
+#   define VSF_HW_I2S1_TXDMA_IRQN   DMA02_IRQn
 #endif
 
 #define VSF_HW_ADC_COUNT            1
