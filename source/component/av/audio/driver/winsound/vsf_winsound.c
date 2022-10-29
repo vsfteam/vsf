@@ -166,7 +166,7 @@ static void __vk_winsound_playback_evthandler(vsf_stream_t *stream, void *param,
     vk_audio_stream_t *audio_stream_base = audio_stream - audio_stream->stream_index;
     vk_winsound_dev_t *dev = container_of(audio_stream_base, vk_winsound_dev_t, stream);
     vk_winsound_playback_ctx_t *playback_ctx = &dev->playback_ctx;
-    uint_fast32_t datasize;
+    uint_fast32_t datasize, half_buffer_size;
     uint8_t *buff;
 
     switch (evt) {
@@ -177,6 +177,10 @@ static void __vk_winsound_playback_evthandler(vsf_stream_t *stream, void *param,
             datasize = vsf_stream_get_rbuf(stream, &buff);
             if (!datasize) { break; }
 
+            half_buffer_size = vsf_stream_get_buff_size(audio_stream->stream) / 2;
+            if (datasize > half_buffer_size) {
+                datasize = half_buffer_size;
+            }
             if (__vk_winsound_playback_buffer(dev, buff, datasize)) {
                 vsf_stream_read(stream, (uint8_t *)buff, datasize);
             }
