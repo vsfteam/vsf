@@ -65,6 +65,10 @@ extern "C" {
 #   define VSF_HAL_USE_I2C              ENABLED
 #endif
 
+#ifndef VSF_HAL_USE_I2S
+#   define VSF_HAL_USE_I2S              ENABLED
+#endif
+
 #ifndef VSF_HAL_USE_I2C_GPIO
 #   define VSF_HAL_USE_I2C_GPIO         ENABLED
 #endif

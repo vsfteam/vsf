@@ -530,7 +530,7 @@ typedef enum vsf_mmc_feature_t {
  @brief mmc 传输操作的标志
  @note vsf_mmc_transop_t 由具体驱动实现。
  */
-#if VSF_MMC_CFG_REIMPLEMENT_TYPE_CMDOP == DISABLED
+#if VSF_MMC_CFG_REIMPLEMENT_TYPE_TRANSOP == DISABLED
 typedef enum vsf_mmc_transop_t {
     MMC_CMDOP_SINGLE_BLOCK      = (1ul << 0),
     MMC_CMDOP_MULTI_BLOCK       = (1ul << 1),

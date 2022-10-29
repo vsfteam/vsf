@@ -28,7 +28,7 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_MMC_CFG_REIMPLEMENT_TYPE_CMDOP               ENABLED
+#define VSF_MMC_CFG_REIMPLEMENT_TYPE_TRANSOP             ENABLED
 #define VSF_MMC_CFG_REIMPLEMENT_TYPE_IRQ_MASK            ENABLED
 #define VSF_MMC_CFG_REIMPLEMENT_TYPE_TRANSACT_STATUS     ENABLED
 

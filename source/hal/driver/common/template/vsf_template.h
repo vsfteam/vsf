@@ -25,6 +25,8 @@
 #include "./vsf_template_adc.h"
 #include "./vsf_template_flash.h"
 #include "./vsf_template_i2c.h"
+#include "./vsf_template_i2s.h"
+#include "./vsf_template_mmc.h"
 #include "./vsf_template_pm.h"
 #include "./vsf_template_pwm.h"
 #include "./vsf_template_rng.h"
