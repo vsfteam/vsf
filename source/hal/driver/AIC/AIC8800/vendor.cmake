@@ -1,6 +1,6 @@
 # CMakeLists head
 
-if(VSF_USE_LWIP AND VSF_USE_LWIP_VENDOR)
+if(VSF_USE_LWIP AND VSF_LWIP_VENDOR)
     target_compile_definitions(${VSF_TARGET_NAME} PUBLIC
         # necessary for llvm to avoid compiler errors: redefinition u32_t etc.
         LWIP_NO_STDINT_H=1
