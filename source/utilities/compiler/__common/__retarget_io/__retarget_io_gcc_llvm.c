@@ -18,6 +18,9 @@
 #ifdef __USE_COMMON_RETARGET_IO_GCC_LLVM_C__
 #undef __USE_COMMON_RETARGET_IO_GCC_LLVM_C__
 
+// for vsf_thread_exit if thread is enabled
+#include "kernel/vsf_kernel.h"
+
 #if VSF_USE_POSIX == ENABLED
 // __assert_func is necessary because original function in newlib has dependency issue
 //  __assert_func in newlib depends on fprintf, which is not usable outside vsf linux
@@ -78,7 +81,7 @@ SECTION(".vsf.utilities.stdio.gcc._isatty")
 WEAK(_isatty)
 int _isatty(int fd)
 {
-    return 0;
+    return isatty(fd);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._unlink")
@@ -101,6 +104,30 @@ int _gettimeofday(struct timeval *tv, struct timezone *tz)
 {
     return gettimeofday(tv, tz);
 }
+#else
+SECTION(".vsf.utilities.stdio.gcc._close")
+WEAK(_close)
+void _close(int handle) {}
+
+SECTION(".vsf.utilities.stdio.gcc._lseek")
+WEAK(_lseek)
+off_t _lseek(int handle, off_t offset, int whence) { return (off_t)0; }
+
+SECTION(".vsf.utilities.stdio.gcc._kill")
+WEAK(_kill)
+int _kill(int pid, int sig) { return 0; }
+
+SECTION(".vsf.utilities.stdio.gcc._getpid")
+WEAK(_getpid)
+int _getpid(void) { return 0; }
+
+SECTION(".vsf.utilities.stdio.gcc._fstat")
+WEAK(_fstat)
+int _fstat(int fd, void *buf) { return -1; }
+
+SECTION(".vsf.utilities.stdio.gcc._isatty")
+WEAK(_isatty)
+int _isatty(int fd) { return 0; }
 #endif
 
 SECTION(".vsf.utilities.stdio.gcc._write")
