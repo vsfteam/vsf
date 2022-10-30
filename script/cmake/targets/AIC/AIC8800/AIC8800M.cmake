@@ -40,7 +40,10 @@ list(APPEND VSF_TARGET_INCLUDE_DIRECTORIES
     ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/time
     ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/bt
     ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/bt/patch/mcu
+    ${VSF_TARGET_PATH}/vendor/plf/aic8800/src/driver/aic1000aud_regs
 
     ${VSF_TARGET_PATH}/vendor/modules/common/api
     ${VSF_TARGET_PATH}/vendor/modules/dbg/api
+
+    ${VSF_TARGET_PATH}/vendor/audio/common
 )
