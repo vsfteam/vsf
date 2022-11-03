@@ -131,7 +131,17 @@ extern void vsf_usbh_free(void * buffer);
             .bInterfaceSubClass = (__SUB_CLASS),                                \
             .bInterfaceProtocol = (__PROTOCOL),
 
-
+#define VSF_USBH_MATCH_FLAGS_VENDOR         (1 << 0)
+#define VSF_USBH_MATCH_FLAGS_PRODUCT        (1 << 1)
+#define VSF_USBH_MATCH_FLAGS_DEV_LO         (1 << 2)
+#define VSF_USBH_MATCH_FLAGS_DEV_HI         (1 << 3)
+#define VSF_USBH_MATCH_FLAGS_DEV_CLASS      (1 << 4)
+#define VSF_USBH_MATCH_FLAGS_DEV_SUBCLASS   (1 << 5)
+#define VSF_USBH_MATCH_FLAGS_DEV_PROTOCOL   (1 << 6)
+#define VSF_USBH_MATCH_FLAGS_IFS_CLASS      (1 << 7)
+#define VSF_USBH_MATCH_FLAGS_IFS_SUBCLASS   (1 << 8)
+#define VSF_USBH_MATCH_FLAGS_IFS_PROTOCOL   (1 << 9)
+#define VSF_USBH_MATCH_FLAGS_IFS_NUM        (1 << 10)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -204,17 +214,23 @@ typedef struct vk_usbh_dev_parser_t {
 } vk_usbh_dev_parser_t;
 
 typedef struct vk_usbh_dev_id_t {
-    uint16_t match_vendor       : 1;
-    uint16_t match_product      : 1;
-    uint16_t match_dev_lo       : 1;
-    uint16_t match_dev_hi       : 1;
-    uint16_t match_dev_class    : 1;
-    uint16_t match_dev_subclass : 1;
-    uint16_t match_dev_protocol : 1;
-    uint16_t match_ifs_class    : 1;
-    uint16_t match_ifs_subclass : 1;
-    uint16_t match_ifs_protocol : 1;
-    uint16_t                    : 6;
+    union {
+        struct {
+            uint16_t match_vendor       : 1;
+            uint16_t match_product      : 1;
+            uint16_t match_dev_lo       : 1;
+            uint16_t match_dev_hi       : 1;
+            uint16_t match_dev_class    : 1;
+            uint16_t match_dev_subclass : 1;
+            uint16_t match_dev_protocol : 1;
+            uint16_t match_ifs_class    : 1;
+            uint16_t match_ifs_subclass : 1;
+            uint16_t match_ifs_protocol : 1;
+            uint16_t match_ifs_num      : 1;
+            uint16_t                    : 5;
+        };
+        uint16_t match_flags;
+    };
 
     // naming convention: usb documents
     uint16_t idVendor;
@@ -226,6 +242,7 @@ typedef struct vk_usbh_dev_id_t {
     uint8_t bInterfaceClass;
     uint8_t bInterfaceSubClass;
     uint8_t bInterfaceProtocol;
+    uint8_t bInterfaceNumber;
     //uint32_t driver_info;
 } vk_usbh_dev_id_t;
 

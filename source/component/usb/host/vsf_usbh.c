@@ -889,7 +889,9 @@ static bool __vk_usbh_match_id(vk_usbh_dev_parser_t *parser,
         ||  (dev_id->match_dev_protocol && (dev_id->bDeviceProtocol != parser->desc_device->bDeviceProtocol))
         ||  (dev_id->match_ifs_class && (dev_id->bInterfaceClass != desc_ifs->bInterfaceClass))
         ||  (dev_id->match_ifs_subclass && (dev_id->bInterfaceSubClass != desc_ifs->bInterfaceSubClass))
-        ||  (dev_id->match_ifs_protocol && (dev_id->bInterfaceProtocol != desc_ifs->bInterfaceProtocol))) {
+        ||  (dev_id->match_ifs_protocol && (dev_id->bInterfaceProtocol != desc_ifs->bInterfaceProtocol))
+        ||  (dev_id->match_ifs_num && (dev_id->bInterfaceNumber != desc_ifs->bInterfaceNumber))
+        ) {
         return false;
     }
     return true;
