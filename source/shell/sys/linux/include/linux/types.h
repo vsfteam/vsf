@@ -27,12 +27,6 @@ extern "C" {
 #ifndef __user
 #   define __user
 #endif
-//#ifndef __init
-//#   define __init
-//#endif
-//#ifndef __exit
-//#   define __exit
-//#endif
 
 #define EXPORT_SYMBOL_GPL(__SYMBOL)
 

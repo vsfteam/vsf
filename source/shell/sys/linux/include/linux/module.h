@@ -7,6 +7,13 @@
 extern "C" {
 #endif
 
+#ifndef __init
+#   define __init
+#endif
+#ifndef __exit
+#   define __exit
+#endif
+
 #define MODULE_DEVICE_TABLE(__DEV, __TABLE)
 #define MODULE_ALIAS(__ALIAS_STR)
 #define MODULE_AUTHOR(__AUTHOR_STR)
