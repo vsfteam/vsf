@@ -152,19 +152,23 @@ void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
 }
 #endif
 
+uint32_t __vk_usbh_get_pipe_value(vk_usbh_dev_t *dev,
+        uint8_t endpoint, uint8_t type, uint16_t size)
+{
+    return         1|   (size << 1)                         /* 11-bit size */
+                    |   ((endpoint & 0xF) << 12)            /* 4-bit endpoint */
+                    |   (type << 16)                        /* 2-bit type */
+                    |   (dev->speed << 18)                  /* 2-bit speed */
+                    |   (dev->devnum << 20)                 /* 7-bit address */
+                    |   ((endpoint & USB_DIR_MASK) << 20);  /* 1-bit direction */
+}
+
 vk_usbh_pipe_t __vk_usbh_get_pipe(vk_usbh_dev_t *dev,
         uint8_t endpoint, uint8_t type, uint16_t size, uint8_t interval)
 {
-    uint_fast8_t direction = endpoint & USB_DIR_MASK;
-    vk_usbh_pipe_t pipe = { 0 };
-
-    endpoint &= 0x0F;
-    pipe.value =   1|   (size << 1)             /* 11-bit size */
-                    |   (endpoint << 12)        /* 4-bit endpoint */
-                    |   (type << 16)            /* 2-bit type */
-                    |   (dev->speed << 18)      /* 2-bit speed */
-                    |   (dev->devnum << 20)     /* 7-bit address */
-                    |   (direction << 20);      /* 1-bit direction */
+    vk_usbh_pipe_t pipe = {
+        .value = __vk_usbh_get_pipe_value(dev, endpoint, type, size),
+    };
 
     if (    (USB_ENDPOINT_XFER_ISOC == type)
         ||  ((USB_ENDPOINT_XFER_INT == type) && (dev->speed >= USB_SPEED_HIGH))) {

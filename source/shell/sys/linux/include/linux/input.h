@@ -12,7 +12,8 @@
 #   include <sys/time.h>
 #   include <sys/ioctl.h>
 #endif
-#include <stdint.h>
+#include <linux/types.h>
+#include <linux/device.h>
 #include "component/input/vsf_input.h"
 
 #ifdef __cplusplus
@@ -20,6 +21,11 @@ extern "C" {
 #endif
 
 #define EV_VERSION                  0x010001
+
+#define BUS_PCI                     0x01
+#define BUS_USB                     0x03
+#define BUS_BLUETOOTH               0x05
+#define BUS_VIRTUAL                 0x06
 
 // event types
 #define EV_SYNC                     VSF_INPUT_TYPE_SYNC
@@ -159,6 +165,79 @@ extern "C" {
 #define KEY_KPEQUAL                 VSF_KP_EQUAL
 #define KEY_KPCOMMA                 VSF_KP_COMMA
 
+#define KEY_RECORD                  (VSF_KB_USER + 1)
+
+// btn
+#define BTN_GAMEPAD
+#define BTN_SOUTH                   GAMEPAD_ID_R_DOWN
+#define BTN_A                       BTN_SOUTH
+#define BTN_EAST                    GAMEPAD_ID_R_RIGHT
+#define BTN_B                       BTN_EAST
+#define BTN_NORTH                   GAMEPAD_ID_R_UP
+#define BTN_X                       BTN_NORTH
+#define BTN_WEST                    GAMEPAD_ID_R_LEFT
+#define BTN_Y                       BTN_WEST
+#define BTN_TL                      GAMEPAD_ID_LT
+#define BTN_TR                      GAMEPAD_ID_RT
+#define BTN_SELECT                  GAMEPAD_ID_MENU_LEFT
+#define BTN_MODE                    GAMEPAD_ID_MENU_MAIN
+#define BTN_START                   GAMEPAD_ID_MENU_RIGHT
+#define BTN_THUMBL                  (GAMEPAD_ID_USER + 0)
+#define BTN_THUMBR                  (GAMEPAD_ID_USER + 1)
+#define BTN_TRIGGER_HAPPY           (GAMEPAD_ID_USER + 2)
+#define BTN_TRIGGER_HAPPY1          (GAMEPAD_ID_USER + 2)
+#define BTN_TRIGGER_HAPPY2          (GAMEPAD_ID_USER + 3)
+#define BTN_TRIGGER_HAPPY3          (GAMEPAD_ID_USER + 4)
+#define BTN_TRIGGER_HAPPY4          (GAMEPAD_ID_USER + 5)
+#define BTN_TRIGGER_HAPPY5          (GAMEPAD_ID_USER + 6)
+#define BTN_TRIGGER_HAPPY6          (GAMEPAD_ID_USER + 7)
+#define BTN_TRIGGER_HAPPY7          (GAMEPAD_ID_USER + 8)
+#define BTN_TRIGGER_HAPPY8          (GAMEPAD_ID_USER + 9)
+#define BTN_TRIGGER_HAPPY9          (GAMEPAD_ID_USER + 10)
+#define BTN_TRIGGER_HAPPY10         (GAMEPAD_ID_USER + 11)
+
+#define ABS_X                       0x00
+#define ABS_Y                       0x01
+#define ABS_Z                       0x02
+#define ABS_RX                      0x03
+#define ABS_RY                      0x04
+#define ABS_RZ                      0x05
+#define ABS_THROTTLE                0x06
+#define ABS_RUDDER                  0x07
+#define ABS_WHEEL                   0x08
+#define ABS_GAS                     0x09
+#define ABS_BRAKE                   0x0a
+#define ABS_HAT0X                   0x10
+#define ABS_HAT0Y                   0x11
+#define ABS_HAT1X                   0x12
+#define ABS_HAT1Y                   0x13
+#define ABS_HAT2X                   0x14
+#define ABS_HAT2Y                   0x15
+#define ABS_HAT3X                   0x16
+#define ABS_HAT3Y                   0x17
+#define ABS_PRESSURE                0x18
+#define ABS_DISTANCE                0x19
+#define ABS_TILT_X                  0x1a
+#define ABS_TILT_Y                  0x1b
+#define ABS_TOOL_WIDTH              0x1c
+#define ABS_VOLUME                  0x20
+#define ABS_MISC                    0x28
+
+#define EV_SYN                      0x00
+#define EV_KEY                      0x01
+#define EV_REL                      0x02
+#define EV_ABS                      0x03
+#define EV_MSC                      0x04
+#define EV_SW                       0x05
+#define EV_LED                      0x11
+#define EV_SND                      0x12
+#define EV_REP                      0x14
+#define EV_FF                       0x15
+#define EV_PWR                      0x16
+#define EV_FF_STATUS                0x17
+#define EV_MAX                      0x1f
+#define EV_CNT                      (EV_MAX + 1)
+
 struct input_event {
     struct timeval time;
 #define input_event_sec             time.tv_sec
@@ -168,6 +247,110 @@ struct input_event {
     uint16_t code;
     int32_t value;
 };
+
+struct input_id {
+    __u16                           bustype;
+    __u16                           vendor;
+    __u16                           product;
+    __u16                           version;
+};
+
+struct input_dev {
+    const char                      *name;
+    const char                      *phys;
+    const char                      *uniq;
+    struct input_id                 id;
+
+    struct device                   dev;
+};
+
+// force feedback
+struct ff_replay {
+    __u16                           length;
+    __u16                           delay;
+};
+struct ff_trigger {
+    __u16                           button;
+    __u16                           interval;
+};
+struct ff_envelope {
+    __u16                           attack_length;
+    __u16                           attack_level;
+    __u16                           fade_length;
+    __u16                           fade_level;
+};
+struct ff_constant_effect {
+    __s16                           level;
+    struct ff_envelope              envelope;
+};
+struct ff_ramp_effect {
+    __s16                           start_level;
+    __s16                           end_level;
+    struct ff_envelope              envelope;
+};
+struct ff_condition_effect {
+    __u16                           right_saturation;
+    __u16                           left_saturation;
+    __s16                           right_coeff;
+    __s16                           left_coeff;
+    __u16                           deadband;
+    __s16                           center;
+};
+struct ff_periodic_effect {
+    __u16                           waveform;
+    __u16                           period;
+    __s16                           magnitude;
+    __s16                           offset;
+    __u16                           phase;
+    struct ff_envelope              envelope;
+    __u32                           custom_len;
+    __s16                           *custom_data;
+};
+struct ff_rumble_effect {
+    __u16                           strong_magnitude;
+    __u16                           weak_magnitude;
+};
+struct ff_effect {
+    __u16                           type;
+    __s16                           id;
+    __u16                           direction;
+    struct ff_trigger               trigger;
+    struct ff_replay                replay;
+
+    union {
+        struct ff_constant_effect constant;
+        struct ff_ramp_effect ramp;
+        struct ff_periodic_effect periodic;
+        struct ff_condition_effect condition[2];    // x/y
+        struct ff_rumble_effect rumble;
+    } u;
+};
+#define FF_RUMBLE                   0x50
+#define FF_PERIODIC                 0x51
+#define FF_CONSTANT                 0x52
+#define FF_SPRING                   0x53
+#define FF_FRICTION                 0x54
+#define FF_DAMPER                   0x55
+#define FF_INERTIA                  0x56
+#define FF_RAMP                     0x57
+#define FF_EFFECT_MIN               FF_RUMBLE
+#define FF_EFFECT_MAX               FF_RAMP
+
+#define FF_SQUARE                   0x58
+#define FF_TRIANGLE                 0x59
+#define FF_SINE                     0x5a
+#define FF_SAW_UP                   0x5b
+#define FF_SAW_DOWN                 0x5c
+#define FF_CUSTOM                   0x5d
+#define FF_WAVEFORM_MIN             FF_SQUARE
+#define FF_WAVEFORM_MAX             FF_CUSTOM
+
+#define FF_GAIN                     0x60
+#define FF_AUTOCENTER               0x61
+
+#define FF_MAX_EFFECTS              FF_GAIN
+#define FF_MAX                      0x7f
+#define FF_CNT                      (FF_MAX + 1)
 
 #ifdef __cplusplus
 }

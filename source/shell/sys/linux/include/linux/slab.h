@@ -1,0 +1,41 @@
+#ifndef __VSF_LINUX_SLAB_H__
+#define __VSF_LINUX_SLAB_H__
+
+#include "service/heap/vsf_heap.h"
+#include <linux/gfp.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+static inline void * kmalloc(size_t size, gfp_t flags)
+{
+    void * buff = vsf_heap_malloc(size);
+    if (buff != NULL) {
+        if (flags & __GFP_ZERO) {
+            memset(buff, 0, size);
+        }
+    }
+    return buff;
+}
+
+static inline void * kzalloc(size_t size, gfp_t flags)
+{
+    return kmalloc(size, flags | __GFP_ZERO);
+}
+
+static inline void kfree(const void *buff)
+{
+    vsf_heap_free(buff);
+}
+
+static inline size_t ksize(const void *buff)
+{
+    return (size_t)vsf_heap_size(buff);
+}
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

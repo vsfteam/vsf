@@ -775,7 +775,7 @@ static void * __vsf_linux_httpd_thread(void *param)
     fd_listen = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (fd_listen < 0) {
         vsf_trace_error(MODULE_NAME ": fail to cerate listen socket." VSF_TRACE_CFG_LINEEND);
-        goto __exit;
+        goto __exit_fail;
     }
 
     host_addr.sin_family = AF_INET;
@@ -950,7 +950,7 @@ __close_fd_and_exit:
     if (fd_listen >= 0) {
         close(fd_listen);
     }
-__exit:
+__exit_fail:
     return NULL;
 }
 

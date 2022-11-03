@@ -195,6 +195,8 @@ enum {
     VSF_KB_EJECT            = 281,
     VSF_KB_SLEEP            = 282,
 
+    VSF_KB_USER             = 283,
+
     VSF_KB_EXT              = 0x0200,
     // keycodes with SHIFT pressed
     VSF_KB_EXCLAM           = VSF_KB_1 | VSF_KB_EXT,

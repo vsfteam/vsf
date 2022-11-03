@@ -275,21 +275,23 @@ typedef struct vk_usbh_class_t {
     vsf_slist_node_t node;
 } vk_usbh_class_t;
 
-typedef struct vk_usbh_pipe_t {
-    union {
-        struct {
-            uint32_t is_pipe        : 1;
-            uint32_t size           : 11;
-            uint32_t endpoint       : 4;
-            uint32_t type           : 2;
-            uint32_t speed          : 2;
-            uint32_t address        : 7;
-            uint32_t dir_in1out0    : 1;
-            uint32_t toggle         : 1;
-            uint32_t is_submitted   : 1;
-        };
-        uint32_t value;
+typedef union vk_usbh_pipe_flag_t {
+    struct {
+        uint32_t is_pipe            : 1;
+        uint32_t size               : 11;
+        uint32_t endpoint           : 4;
+        uint32_t type               : 2;
+        uint32_t speed              : 2;
+        uint32_t address            : 7;
+        uint32_t dir_in1out0        : 1;
+        uint32_t toggle             : 1;
+        uint32_t is_submitted       : 1;
     };
+    uint32_t value;
+} vk_usbh_pipe_flag_t;
+
+typedef struct vk_usbh_pipe_t {
+    implement(vk_usbh_pipe_flag_t)
     uint16_t interval;
     uint16_t last_frame;
 } vk_usbh_pipe_t;
