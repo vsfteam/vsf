@@ -7,6 +7,9 @@
 #   include <stddef.h>
 #endif
 
+// for time_t
+#include <sys/types.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
