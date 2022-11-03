@@ -20,7 +20,7 @@ static inline void kref_init(struct kref *kref)
 
 static inline unsigned int kref_read(const struct kref *kref)
 {
-    return refcount_read(&kref->refcount);
+    return refcount_read((refcount_t *)&kref->refcount);
 }
 
 static inline void kref_get(struct kref *kref)

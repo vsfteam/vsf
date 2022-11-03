@@ -10,7 +10,6 @@
 #include <linux/spinlock.h>
 #include <linux/gfp.h>
 #include <linux/atomic.h>
-#include <linux/list.h>
 #include <linux/printk.h>
 #include <linux/bits.h>
 #include <linux/limits.h>
@@ -28,12 +27,12 @@ extern "C" {
 #ifndef __user
 #   define __user
 #endif
-#ifndef __init
-#   define __init
-#endif
-#ifndef __exit
-#   define __exit
-#endif
+//#ifndef __init
+//#   define __init
+//#endif
+//#ifndef __exit
+//#   define __exit
+//#endif
 
 #define EXPORT_SYMBOL_GPL(__SYMBOL)
 
@@ -85,8 +84,9 @@ typedef u64 blkcnt_t;
 
 typedef unsigned int slab_flags_t;
 typedef unsigned int fmode_t;
-typedef uintptr_t phys_addr_t;
-typedef uintptr_t dma_addr_t;
+// TODO: fix to real addr width
+typedef uint32_t phys_addr_t;
+typedef uint32_t dma_addr_t;
 
 struct hlist_head {
     struct hlist_node *first;
