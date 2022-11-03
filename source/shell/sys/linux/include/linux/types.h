@@ -73,11 +73,9 @@ typedef __s32 s32;
 typedef __u64 u64;
 typedef __s64 s64;
 
-typedef u64 sector_t;
-typedef u64 blkcnt_t;
-
 typedef unsigned int slab_flags_t;
 typedef unsigned int fmode_t;
+
 // TODO: fix to real addr width
 typedef uint32_t phys_addr_t;
 typedef uint32_t dma_addr_t;
