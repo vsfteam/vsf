@@ -20,22 +20,22 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
     list->prev = list;
 }
 
-static inline void list_insert(struct list_head *new, struct list_head *prev, struct list_head *next)
+static inline void list_insert(struct list_head *node, struct list_head *prev, struct list_head *next)
 {
-    next->prev = new;
-    new->next = next;
-    new->prev = prev;
-    prev->next = new;
+    next->prev = node;
+    node->next = next;
+    node->prev = prev;
+    prev->next = node;
 }
 
-static inline void list_add(struct list_head *new, struct list_head *head)
+static inline void list_add(struct list_head *node, struct list_head *head)
 {
-    list_insert(new, head, head->next);
+    list_insert(node, head, head->next);
 }
 
-static inline void list_add_tail(struct list_head *new, struct list_head *head)
+static inline void list_add_tail(struct list_head *node, struct list_head *head)
 {
-    list_insert(new, head->prev, head);
+    list_insert(node, head->prev, head);
 }
 
 static inline void list_del(struct list_head *entry)
