@@ -15,12 +15,6 @@ extern "C" {
 #   define HOST_NAME_MAX        64
 #endif
 
-#ifndef SIZE_MAX
-#   define SIZE_MAX             (~(size_t)0)
-#endif
-#ifndef SSIZE_MAX
-#   define SSIZE_MAX            ((ssize_t)(SIZE_MAX >> 1))
-#endif
 #define PHYS_ADDR_MAX           (~(phys_addr_t)0)
 
 #define U8_MAX                  ((u8)~0U)
