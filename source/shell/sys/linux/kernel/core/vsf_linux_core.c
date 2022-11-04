@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 #include <linux/types.h>
+#include <linux/atomic.h>
 #include <linux/kobject.h>
 #include <linux/slab.h>
 #include <linux/device.h>
@@ -39,6 +40,29 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
+
+/*******************************************************************************
+* linux/atomic                                                                 *
+*******************************************************************************/
+
+WEAK(atomic_inc)
+void atomic_inc(atomic_t *a)
+{
+    vsf_protect_t orig = vsf_protect_int();
+    a->counter++;
+    vsf_unprotect_int(orig);
+}
+
+WEAK(atomic_dec_and_test)
+int atomic_dec_and_test(atomic_t *a)
+{
+    int value;
+
+    vsf_protect_t orig = vsf_protect_int();
+    value = --a->counter;
+    vsf_unprotect_int(orig);
+    return !value;
+}
 
 /*******************************************************************************
 * kernel object                                                                *

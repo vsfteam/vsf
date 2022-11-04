@@ -20,9 +20,8 @@ static inline void atomic_set(atomic_t *a, int v)
     a->counter = v;
 }
 
-//static inline void atomic_inc(atomic_t *a)
-//{
-//}
+extern void atomic_inc(atomic_t *a);
+extern int atomic_dec_and_test(atomic_t *a);
 
 #ifdef __cplusplus
 }

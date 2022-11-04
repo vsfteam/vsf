@@ -12,6 +12,9 @@ struct firmware {
     const u8 *data;
 };
 
+extern int request_firmware(const struct firmware **fw, const char *name, struct device *device);
+extern void release_firmware(const struct firmware *fw);
+
 #ifdef __cplusplus
 }
 #endif
