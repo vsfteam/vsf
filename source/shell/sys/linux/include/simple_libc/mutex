@@ -1,0 +1,9 @@
+#ifndef __SIMPLE_LIBC_MUTEX__
+#define __SIMPLE_LIBC_MUTEX__
+
+namespace std {
+    class mutex {
+    };
+}
+
+#endif

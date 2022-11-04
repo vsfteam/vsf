@@ -1,1 +1,6 @@
 #include <stdio.h>
+
+namespace std {
+    using ::fputs;
+    using ::fprintf;
+}

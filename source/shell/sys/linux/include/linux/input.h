@@ -28,7 +28,7 @@ extern "C" {
 #define BUS_VIRTUAL                 0x06
 
 // event types
-#define EV_SYNC                     VSF_INPUT_TYPE_SYNC
+#define EV_SYN                      VSF_INPUT_TYPE_SYNC
 #define EV_KEY                      VSF_INPUT_TYPE_KEYBOARD
 #define EV_REL                      0x10
 #define EV_ABS                      0x11
@@ -42,6 +42,13 @@ extern "C" {
 #define EV_FF_STATUS                0x19
 #define EV_MAX                      0x1F
 #define EV_CNT                      (EV_MAX + 1)
+
+#define SYN_REPORT                  0
+#define SYN_CONFIG                  1
+#define SYN_MT_REPORT               2
+#define SYN_DROPPED                 3
+#define SYN_MAX                     0xf
+#define SYN_CNT                     (SYN_MAX + 1)
 
 // event codes
 // VSF_INPUT_TYPE_KEYBOARD
@@ -232,6 +239,15 @@ extern "C" {
 #define ABS_TOOL_WIDTH              0x1c
 #define ABS_VOLUME                  0x20
 #define ABS_MISC                    0x28
+
+struct input_absinfo {
+    __s32                           value;
+    __s32                           minimum;
+    __s32                           maximum;
+    __s32                           fuzz;
+    __s32                           flat;
+    __s32                           resolution;
+};
 
 struct input_event {
     struct timeval time;

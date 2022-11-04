@@ -1,0 +1,9 @@
+#ifndef __SIMPLE_LIBC_THREAD__
+#define __SIMPLE_LIBC_THREAD__
+
+namespace std {
+    class thread {
+    };
+}
+
+#endif

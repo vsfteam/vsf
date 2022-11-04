@@ -198,6 +198,11 @@ typedef struct vsf_linux_libc_stdio_vplt_t {
     int (*sscanf)(const char *str, const char *format, ...);
 
     int (*remove)(const char *filename);
+
+    void (*setbuf)(FILE *f, char *buf);
+    void (*setbuffer)(FILE *f, char *buf, size_t size);
+    void (*setlinebuf)(FILE *f);
+    int (*setvbuf)(FILE *f, char *buf, int mode, size_t size);
 } vsf_linux_libc_stdio_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt;
@@ -227,6 +232,18 @@ static inline FILE * __vsf_linux_stderr(void) {
 }
 static inline void perror(const char *str) {
     VSF_LINUX_APPLET_LIBC_STDIO_VPLT->perror(str);
+}
+static inline void setbuf(FILE *f, char *buf) {
+    VSF_LINUX_APPLET_LIBC_STDIO_VPLT->setbuf(f, buf);
+}
+static inline void setbuffer(FILE *f, char *buf, size_t size) {
+    VSF_LINUX_APPLET_LIBC_STDIO_VPLT->setbuffer(f, buf, size);
+}
+static inline void setlinebuf(FILE *f) {
+    VSF_LINUX_APPLET_LIBC_STDIO_VPLT->setlinebuf(f);
+}
+static inline int setvbuf(FILE *f, char *buf, int mode, size_t size) {
+    return VSF_LINUX_APPLET_LIBC_STDIO_VPLT->setvbuf(f, buf, mode, size);
 }
 static inline int putchar(int ch) {
     return VSF_LINUX_APPLET_LIBC_STDIO_VPLT->putchar(ch);
@@ -435,6 +452,11 @@ FILE * __vsf_linux_stdout(void);
 FILE * __vsf_linux_stderr(void);
 
 void perror(const char *str);
+
+void setbuf(FILE *f, char *buf);
+void setbuffer(FILE *f, char *buf, size_t size);
+void setlinebuf(FILE *f);
+int setvbuf(FILE *f, char *buf, int mode, size_t size);
 
 int putchar(int ch);
 int getchar(void);

@@ -1,0 +1,9 @@
+#ifndef __SIMPLE_LIBC_CONDITION_VARIABLE__
+#define __SIMPLE_LIBC_CONDITION_VARIABLE__
+
+namespace std {
+    class condition_variable {
+    };
+}
+
+#endif

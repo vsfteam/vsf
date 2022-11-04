@@ -608,7 +608,7 @@ namespace std {
                 ||  (first >= last)) {
                 return end();
             }
-            replace(pos, pos_end - pos, NULL, 0).begin();
+            replace(pos, pos_end - pos, nullptr, 0).begin();
             return c_str() + pos;
         }
 
@@ -818,7 +818,7 @@ namespace std {
         {
             size_t len = length();
             if (len > 0) {
-                array_base<T>::replace(len - 1, 1, NULL, 0);
+                array_base<T>::replace(len - 1, 1, nullptr, 0);
             }
         }
         const T * c_str() const

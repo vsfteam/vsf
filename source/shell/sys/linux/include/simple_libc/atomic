@@ -1,0 +1,10 @@
+#ifndef __SIMPLE_LIBC_ATOMIC__
+#define __SIMPLE_LIBC_ATOMIC__
+
+namespace std {
+    template <class T>
+    class atomic {
+    };
+}
+
+#endif
