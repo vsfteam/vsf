@@ -1,8 +1,33 @@
 #ifndef __SIMPLE_LIBC_CONDITION_VARIABLE__
 #define __SIMPLE_LIBC_CONDITION_VARIABLE__
 
+#include <pthread.h>
+#include <mutex>
+
 namespace std {
+    enum class cv_status { no_timeout, timeout };
+
     class condition_variable {
+    private:
+        pthread_cond_t __cond;
+    public:
+        condition_variable() noexcept {
+            pthread_cond_init(&__cond, NULL);
+        }
+        ~condition_variable() noexcept;
+
+        condition_variable(const condition_variable &) = delete;
+        condition_variable & operator=(const condition_variable &) = delete;
+
+        void notify_one() noexcept {
+            pthread_cond_signal(&__cond);
+        }
+        void notify_all() noexcept {
+            pthread_cond_broadcast(&__cond);
+        }
+        void wait(unique_lock<mutex> & lock) noexcept {
+            pthread_cond_wait(&__cond, lock.mutex()->native_handle());
+        }
     };
 }
 

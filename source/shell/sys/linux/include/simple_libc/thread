@@ -1,9 +1,49 @@
 #ifndef __SIMPLE_LIBC_THREAD__
 #define __SIMPLE_LIBC_THREAD__
 
+#include <pthread.h>
+
+#include <chrono>
+#include <tuple>
+
+
 namespace std {
     class thread {
+    public:
+        class id {
+        private:
+            pthread_t __thread_id;
+        public:
+            id() noexcept : __thread_id(-1) {}
+            explicit id(pthread_t id) noexcept : __thread_id(id) {}
+        };
+    private:
+        id __id;
+
+    public:
+        thread() noexcept = default;
+        thread(const thread &) = delete;
+        thread(thread && t) noexcept = delete;
+
+        template<typename Callable, typename... Args>
+        explicit thread(Callable && f, Args &&... args) {
+        }
+
+        ~thread() {
+        }
+
+        thread & operator=(const thread &) = delete;
+        thread & operator=(thread && t) noexcept = delete;
     };
+
+    namespace this_thread {
+        inline thread::id get_id() noexcept {
+            return thread::id(pthread_self());
+        }
+        inline void yield() noexcept {
+            vsf_thread_yield();
+        }
+    }
 }
 
 #endif

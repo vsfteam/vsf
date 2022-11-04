@@ -1,8 +1,92 @@
 #ifndef __SIMPLE_LIBC_MUTEX__
 #define __SIMPLE_LIBC_MUTEX__
 
+#include <pthread.h>
+
 namespace std {
     class mutex {
+    protected:
+        pthread_mutex_t __mutex;
+    public:
+        mutex() noexcept {
+            pthread_mutex_init(&__mutex, NULL);
+        }
+        ~mutex() = default;
+
+        void lock() {
+            pthread_mutex_lock(&__mutex);
+        }
+        bool try_lock() noexcept {
+            return !pthread_mutex_trylock(&__mutex);
+        }
+        void unlock() {
+            pthread_mutex_unlock(&__mutex);
+        }
+
+        pthread_mutex_t * native_handle() noexcept {
+            return &__mutex;
+        }
+    };
+
+    template<typename Mutex>
+    class lock_guard {
+    private:
+        Mutex & __device;
+    public:
+        explicit lock_guard(Mutex & m) : __device(m) {
+            __device.lock();
+        }
+        ~lock_guard() {
+            __device.unlock();
+        }
+
+        lock_guard(const lock_guard &) = delete;
+        lock_guard & operator=(const lock_guard &) = delete;
+    };
+
+    template<typename Mutex>
+    class unique_lock {
+    private:
+        Mutex * __device;
+        bool __owns;
+    public:
+        unique_lock() noexcept : __device(NULL), __owns(false) { }
+        explicit unique_lock(Mutex & m) : __device(std::addressof(m)), __owns(false) {
+            lock();
+            __owns = true;
+        }
+        unique_lock(const unique_lock &) = delete;
+
+        ~unique_lock() {
+            if (__owns) {
+                unlock();
+            }
+        }
+
+        unique_lock & operator=(const unique_lock &) = delete;
+
+        void lock() {
+            __device->lock();
+            __owns = true;
+        }
+        bool try_lock() {
+            return __owns = __device->try_lock();
+        }
+        void unlock() {
+            if (__owns) {
+                __device->unlock();
+                __owns = false;
+            }
+        }
+        bool owns_lock() const noexcept {
+            return __owns;
+        }
+        explicit operator bool() const noexcept {
+            return owns_lock();
+        }
+        Mutex * mutex() const noexcept {
+            return __device;
+        }
     };
 }
 
