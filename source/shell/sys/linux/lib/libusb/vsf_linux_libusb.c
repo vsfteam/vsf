@@ -522,6 +522,19 @@ libusb_device * libusb_get_device(libusb_device_handle *dev_handle)
     return (libusb_device *)dev_handle;
 }
 
+int libusb_reset_device(libusb_device_handle *dev_handle)
+{
+    vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)libusb_get_device(dev_handle);
+    vk_usbh_t *usbh = ldev->libusb_dev->usbh;
+    vk_usbh_dev_t *dev = ldev->libusb_dev->dev;
+
+    vk_usbh_reset_dev(usbh, dev);
+    while (vk_usbh_is_dev_resetting(usbh, dev)) {
+        usleep(20);
+    }
+    return 0;
+}
+
 libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx,
         uint16_t vendor_id, uint16_t product_id)
 {

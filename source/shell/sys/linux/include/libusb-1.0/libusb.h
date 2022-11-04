@@ -360,22 +360,22 @@ static inline void libusb_fill_control_transfer(
 }
 
 static inline void libusb_fill_control_setup(unsigned char *buffer,
-	uint8_t bRequestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex,
-	uint16_t wLength)
+    uint8_t bRequestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex,
+    uint16_t wLength)
 {
-	struct libusb_control_setup *setup = (struct libusb_control_setup *)(void *)buffer;
+    struct libusb_control_setup *setup = (struct libusb_control_setup *)(void *)buffer;
     // use use_as__usb_ctrlrequest_t in header for cpp
-	setup->use_as__usb_ctrlrequest_t.bRequestType = bRequestType;
-	setup->use_as__usb_ctrlrequest_t.bRequest = bRequest;
-	setup->use_as__usb_ctrlrequest_t.wValue = cpu_to_le16(wValue);
-	setup->use_as__usb_ctrlrequest_t.wIndex = cpu_to_le16(wIndex);
-	setup->use_as__usb_ctrlrequest_t.wLength = cpu_to_le16(wLength);
+    setup->use_as__usb_ctrlrequest_t.bRequestType = bRequestType;
+    setup->use_as__usb_ctrlrequest_t.bRequest = bRequest;
+    setup->use_as__usb_ctrlrequest_t.wValue = cpu_to_le16(wValue);
+    setup->use_as__usb_ctrlrequest_t.wIndex = cpu_to_le16(wIndex);
+    setup->use_as__usb_ctrlrequest_t.wLength = cpu_to_le16(wLength);
 }
 
 static inline unsigned char *libusb_control_transfer_get_data(
-	struct libusb_transfer *transfer)
+    struct libusb_transfer *transfer)
 {
-	return transfer->buffer + LIBUSB_CONTROL_SETUP_SIZE;
+    return transfer->buffer + LIBUSB_CONTROL_SETUP_SIZE;
 }
 
 static inline void libusb_fill_bulk_transfer(struct libusb_transfer *transfer,
@@ -540,6 +540,8 @@ typedef struct vsf_linux_libusb_vplt_t {
     int (*libusb_handle_events)(libusb_context *ctx);
     const struct libusb_pollfd ** (*libusb_get_pollfds)(libusb_context *ctx);
     void (*libusb_free_pollfds)(const struct libusb_pollfd **pollfds);
+
+    int (*libusb_reset_device)(libusb_device_handle *dev_handle);
 } vsf_linux_libusb_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libusb_vplt_t vsf_linux_libusb_vplt;
@@ -764,6 +766,9 @@ static inline const struct libusb_pollfd** libusb_get_pollfds(libusb_context *ct
 static inline void libusb_free_pollfds(const struct libusb_pollfd **pollfds) {
     VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_free_pollfds(pollfds);
 }
+static inline int libusb_reset_device(libusb_device_handle *dev_handle) {
+    return VSF_LINUX_APPLET_LIBUSB_VPLT->libusb_reset_device(dev_handle);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBUSB
 
@@ -860,6 +865,8 @@ const struct libusb_pollfd** libusb_get_pollfds(libusb_context *ctx);
 void libusb_free_pollfds(const struct libusb_pollfd **pollfds);
 
 void vsf_linux_libusb_startup(void);
+
+int libusb_reset_device(libusb_device_handle *dev_handle);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBUSB
 
