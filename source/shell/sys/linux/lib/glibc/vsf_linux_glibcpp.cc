@@ -1,5 +1,9 @@
 #include <thread>
 
+#ifdef __WIN__
+#   include <fstream>
+#endif
+
 namespace std {
     extern "C" void * __thread_routine(void *p) {
         thread::__impl_base * t = static_cast<thread::__impl_base *>(p);
@@ -20,4 +24,10 @@ namespace std {
             std::terminate();
         }
     }
+
+#ifdef __WIN__
+    FILE * _Fiopen(const char *filename, ios_base::openmode mode, int prot) {
+        return fopen(filename, "");
+    }
+#endif
 }

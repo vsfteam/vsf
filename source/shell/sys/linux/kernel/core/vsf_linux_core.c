@@ -73,7 +73,7 @@ int kobject_set_name_vargs(struct kobject *kobj, const char *fmt, va_list ap)
     int size = vsnprintf(NULL, 0, fmt, ap);
     if (size > 0) {
         if (kobj->name != NULL) {
-            vsf_heap_free(kobj->name);
+            vsf_heap_free((void *)kobj->name);
         }
         kobj->name = vsf_heap_malloc(size);
         if (NULL == kobj->name) {

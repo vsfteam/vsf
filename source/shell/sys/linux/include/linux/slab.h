@@ -26,12 +26,12 @@ static inline void * kzalloc(size_t size, gfp_t flags)
 
 static inline void kfree(const void *buff)
 {
-    vsf_heap_free(buff);
+    vsf_heap_free((void *)buff);
 }
 
 static inline size_t ksize(const void *buff)
 {
-    return (size_t)vsf_heap_size(buff);
+    return (size_t)vsf_heap_size((uint8_t *)buff);
 }
 
 #ifdef __cplusplus

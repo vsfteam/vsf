@@ -60,7 +60,6 @@ int usb_control_msg(struct usb_device *udev, unsigned int pipe, __u8 request, __
 
 int usb_interrupt_msg(struct usb_device *udev, unsigned int pipe, void *data, int len, int *actual_length, int timeout)
 {
-    struct usb_host_endpoint *ep;
     struct urb *urb = vsf_usbh_malloc(sizeof(*urb));
     if (NULL == urb) {
         return -ENOMEM;
