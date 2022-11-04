@@ -5,6 +5,8 @@
 
 namespace std {
     class mutex {
+    public:
+        typedef pthread_mutex_t * native_handle_type;
     protected:
         pthread_mutex_t __mutex;
     public:
@@ -23,7 +25,7 @@ namespace std {
             pthread_mutex_unlock(&__mutex);
         }
 
-        pthread_mutex_t * native_handle() noexcept {
+        native_handle_type native_handle() noexcept {
             return &__mutex;
         }
     };

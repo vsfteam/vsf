@@ -10,6 +10,10 @@ extern "C" {
 #define UINPUT_VERSION          5
 #define UINPUT_MAX_NAME_SIZE    80
 
+#define EV_UINPUT               0x0101
+#define UI_FF_UPLOAD            1
+#define UI_FF_ERASE             2
+
 struct uinput_ff_upload {
     __u32                       request_id;
     __s32                       retval;

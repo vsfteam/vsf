@@ -1,40 +1,108 @@
 #ifndef __SIMPLE_LIBC_THREAD__
 #define __SIMPLE_LIBC_THREAD__
 
+#include <unistd.h>
 #include <pthread.h>
 
 #include <chrono>
-#include <tuple>
-
+#include <memory>
 
 namespace std {
     class thread {
     public:
+        typedef pthread_t native_handle_type;
+        struct __impl_base;
+        typedef shared_ptr<__impl_base> __shared_base_type;
+
         class id {
         private:
-            pthread_t __thread_id;
+            native_handle_type __thread_id;
         public:
             id() noexcept : __thread_id(-1) {}
-            explicit id(pthread_t id) noexcept : __thread_id(id) {}
+            explicit id(native_handle_type id) noexcept : __thread_id(id) {}
+        private:
+            friend class thread;
+            friend bool operator==(thread::id id1, thread::id id2) noexcept;
+            friend bool operator!=(thread::id id1, thread::id id2) noexcept;
         };
+
+        struct __impl_base {
+            __shared_base_type __this_ptr;
+            inline virtual ~__impl_base();
+            virtual void __run() = 0;
+        };
+        template<typename Callable>
+        struct __impl : public __impl_base {
+            Callable __func;
+            __impl(Callable && f) : __func(std::forward<Callable>(f)) { }
+            void __run() { __func(); }
+        };
+
     private:
         id __id;
+
+        void __start_thread(__shared_base_type);
+
+        template<typename Callable>
+        shared_ptr<__impl<Callable>> __make_routine(Callable && f) {
+            return make_shared<__impl<Callable>>(std::forward<Callable>(f));
+        }
 
     public:
         thread() noexcept = default;
         thread(const thread &) = delete;
-        thread(thread && t) noexcept = delete;
+        thread(thread && t) noexcept {
+            swap(t);
+        }
 
         template<typename Callable, typename... Args>
         explicit thread(Callable && f, Args &&... args) {
+            __start_thread(__make_routine(std::bind(f, args...)));
         }
 
         ~thread() {
+            if (joinable()) {
+                VSF_ASSERT(false);
+                std::terminate();
+            }
         }
 
         thread & operator=(const thread &) = delete;
-        thread & operator=(thread && t) noexcept = delete;
+        thread & operator=(thread && t) noexcept {
+            if (joinable()) {
+                std::terminate();
+            }
+            swap(t);
+            return *this;
+        }
+
+        void swap(thread & t) noexcept {
+            std::swap(__id, t.__id);
+        }
+        thread::id get_id() const noexcept {
+            return __id;
+        }
+        bool joinable() const noexcept {
+            return __id != id();
+        }
+        void join() {
+            pthread_join(__id.__thread_id, NULL);
+        }
+        void detach() {
+            pthread_detach(__id.__thread_id);
+        }
+        native_handle_type native_handle() {
+            return __id.__thread_id;
+        }
     };
+    inline thread::__impl_base::~__impl_base() = default;
+
+    inline bool operator==(thread::id id1, thread::id id2) noexcept {
+        return id1.__thread_id == id2.__thread_id;
+    }
+    inline bool operator!=(thread::id id1, thread::id id2) noexcept {
+        return !(id1 == id2);
+    }
 
     namespace this_thread {
         inline thread::id get_id() noexcept {
@@ -42,6 +110,15 @@ namespace std {
         }
         inline void yield() noexcept {
             vsf_thread_yield();
+        }
+        template<typename Clock, typename Duration>
+        inline void sleep_until(const chrono::time_point<Clock, Duration> & atime) {
+            sleep_for(atime - Clock::now());
+        }
+        template<typename Rep, class Period>
+        inline void sleep_for(const chrono::duration<Rep, Period> & rtime) {
+            chrono::microseconds us = chrono::duration_cast<chrono::microseconds>(rtime);
+            usleep(static_cast<int>(us.count()));
         }
     }
 }
