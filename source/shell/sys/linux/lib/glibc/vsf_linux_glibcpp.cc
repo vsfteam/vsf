@@ -5,6 +5,10 @@
 #   include <fstream>
 #endif
 
+#ifndef __OOC_CPP__
+#   error Please define __OOC_CPP__ to support cpp
+#endif
+
 namespace std {
     extern "C" void * __thread_routine(void *p) {
         thread::__impl_base * t = static_cast<thread::__impl_base *>(p);
