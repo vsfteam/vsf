@@ -45,6 +45,7 @@ extern "C" {
 #define fileno              VSF_LINUX_LIBC_WRAPPER(fileno)
 #define fseek               VSF_LINUX_LIBC_WRAPPER(fseek)
 #define fseeko              VSF_LINUX_LIBC_WRAPPER(fseeko)
+#define fseeko64            VSF_LINUX_LIBC_WRAPPER(fseeko64)
 #define ftell               VSF_LINUX_LIBC_WRAPPER(ftell)
 #define ftello              VSF_LINUX_LIBC_WRAPPER(ftello)
 #define ftello64            VSF_LINUX_LIBC_WRAPPER(ftello64)
@@ -167,6 +168,7 @@ typedef struct vsf_linux_libc_stdio_vplt_t {
     int (*fileno)(FILE *f);
     int (*fseek)(FILE *f, long offset, int fromwhere);
     int (*fseeko)(FILE *f, off_t offset, int fromwhere);
+    int (*fseeko64)(FILE *f, off64_t offset, int fromwhere);
     long (*ftell)(FILE *f);
     off_t (*ftello)(FILE *f);
     off64_t (*ftello64)(FILE *f);
@@ -343,6 +345,9 @@ static inline int fseek(FILE *f, long offset, int fromwhere) {
 static inline int fseeko(FILE *f, off_t offset, int fromwhere) {
     return VSF_LINUX_APPLET_LIBC_STDIO_VPLT->fseeko(f, offset, fromwhere);
 }
+static inline int fseeko64(FILE *f, off64_t offset, int fromwhere) {
+    return VSF_LINUX_APPLET_LIBC_STDIO_VPLT->fseeko64(f, offset, fromwhere);
+}
 static inline long ftell(FILE *f) {
     return VSF_LINUX_APPLET_LIBC_STDIO_VPLT->ftell(f);
 }
@@ -486,6 +491,7 @@ int fclose(FILE *f);
 int fileno(FILE *f);
 int fseek(FILE *f, long offset, int fromwhere);
 int fseeko(FILE *f, off_t offset, int fromwhere);
+int fseeko64(FILE *f, off64_t offset, int fromwhere);
 long ftell(FILE *f);
 off_t ftello(FILE *f);
 off64_t ftello64(FILE *f);
@@ -527,6 +533,10 @@ ssize_t getline(char **lineptr, size_t *n, FILE *f);
 #endif
 
 #ifdef __WIN__
+// wrapper for original _lock_file/_unlock_file called in win c++ libs
+#define _lock_file                  VSF_LINUX_LIBC_WRAPPER(_lock_file)
+#define _unlock_file                VSF_LINUX_LIBC_WRAPPER(_unlock_file)
+#define _get_stream_buffer_pointers VSF_LINUX_LIBC_WRAPPER(_get_stream_buffer_pointers)
 void _lock_file(FILE *f);
 void _unlock_file(FILE *f);
 errno_t _get_stream_buffer_pointers(FILE *f, char ***base, char ***ptr, int **cnt);

@@ -1,17 +1,8 @@
 #include <unistd.h>
 #include <thread>
 
-#ifdef __WIN__
-#   include <fstream>
-#endif
-
 #ifndef __OOC_CPP__
 #   error Please define __OOC_CPP__ to support cpp
-#endif
-
-#if defined(__WIN__) && defined(_DEBUG)
-#   warning ********windows: In debug mode, some cpp class will overwrite new/delete,\
-        which may cause problems if new allocate memory from windows heap and delete call free. ********
 #endif
 
 namespace std {
@@ -34,13 +25,116 @@ namespace std {
             std::terminate();
         }
     }
+}
 
 #ifdef __WIN__
-    FILE * _Fiopen(const char *filename, ios_base::openmode mode, int prot) {
-        return fopen(filename, "");
-    }
-#endif
+#   include <fstream>
+
+#   if defined(_DEBUG)
+#       warning ********windows: In debug mode, some cpp class will overwrite new/delete,\
+        which may cause problems if new allocate memory from windows heap and delete call free. ********
+#   endif
+
+extern "C" int __cdecl _fseeki64(FILE *f, uint64_t offset, int origin)
+{
+    return fseeko64(f, offset, origin);
 }
+
+extern "C" void __cdecl _lock_file(FILE *f)
+{
+}
+
+extern "C" void __cdecl _unlock_file(FILE *f)
+{
+}
+
+extern "C" errno_t __cdecl _get_stream_buffer_pointers(FILE *f, char ***base, char ***ptr, int **cnt)
+{
+    // TODO: this function must be implemented for fstream in windows
+    return 0;
+}
+
+    // copy from https://github.com/microsoft/STL/blob/main/stl/src/fiopen.cpp
+    // Copyright (c) Microsoft Corporation.
+    // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+namespace std {
+    FILE* _Xfsopen(_In_z_ const char* filename, _In_ int mode, _In_ int prot) {
+        static const char* const mods[] = {// fopen mode strings corresponding to valid[i]
+            "r", "w", "w", "a", "rb", "wb", "wb", "ab", "r+", "w+", "a+", "r+b", "w+b", "a+b", nullptr};
+
+        return fopen(filename, mods[mode]);
+    }
+
+    template <class CharT>
+    FILE* _Xfiopen(const CharT* filename, ios_base::openmode mode, int prot) {
+        static const ios_base::openmode valid[] = {
+            // valid combinations of open flags
+            ios_base::in,
+            ios_base::out,
+            ios_base::out | ios_base::trunc,
+            ios_base::out | ios_base::app,
+            ios_base::in | ios_base::binary,
+            ios_base::out | ios_base::binary,
+            ios_base::out | ios_base::trunc | ios_base::binary,
+            ios_base::out | ios_base::app | ios_base::binary,
+            ios_base::in | ios_base::out,
+            ios_base::in | ios_base::out | ios_base::trunc,
+            ios_base::in | ios_base::out | ios_base::app,
+            ios_base::in | ios_base::out | ios_base::binary,
+            ios_base::in | ios_base::out | ios_base::trunc | ios_base::binary,
+            ios_base::in | ios_base::out | ios_base::app | ios_base::binary,
+        };
+
+        FILE* fp                     = nullptr;
+        ios_base::openmode atendflag = mode & ios_base::ate;
+        ios_base::openmode norepflag = mode & ios_base::_Noreplace;
+
+        if (mode & ios_base::_Nocreate) {
+            mode |= ios_base::in; // file must exist
+        }
+
+        if (mode & ios_base::app) {
+            mode |= ios_base::out; // extension -- app implies out
+        }
+
+        mode &= ~(ios_base::ate | ios_base::_Nocreate | ios_base::_Noreplace);
+
+        // look for a valid mode
+        int n = 0;
+        while (valid[n] != mode) {
+            if (++n == static_cast<int>(_STD size(valid))) {
+                return nullptr; // no valid mode
+            }
+        }
+
+        if (norepflag && (mode & (ios_base::out | ios_base::app))
+            && (fp = _Xfsopen(filename, 0, prot)) != nullptr) { // file must not exist, close and fail
+            fclose(fp);
+            return nullptr;
+        }
+
+        if (fp != nullptr && fclose(fp) != 0) {
+            return nullptr; // can't close after test open
+        }
+
+        if ((fp = _Xfsopen(filename, n, prot)) == nullptr) {
+            return nullptr; // open failed
+        }
+
+        if (atendflag && fseek(fp, 0, SEEK_END) != 0) {
+            fclose(fp); // can't position at end
+            return nullptr;
+        }
+
+        return fp; // no need to seek to end, or seek succeeded
+    }
+
+    _CRTIMP2_PURE FILE* __CLRCALL_PURE_OR_CDECL _Fiopen(
+        const char* filename, ios_base::openmode mode, int prot) { // open wide-named file with byte name
+        return _Xfiopen(filename, mode, prot);
+    }
+}
+#endif
 
 void *operator new(size_t size)
 {

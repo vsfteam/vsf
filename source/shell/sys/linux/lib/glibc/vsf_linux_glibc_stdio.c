@@ -189,6 +189,16 @@ int fileno(FILE *stream)
     return sfd->fd;
 }
 
+int fseeko64(FILE *f, off64_t offset, int fromwhere)
+{
+    int fd = ((vsf_linux_fd_t *)f)->fd;
+    if (fd < 0) {
+        return -1;
+    }
+    lseek64(fd, offset, fromwhere);
+    return 0;
+}
+
 int fseeko(FILE *f, off_t offset, int fromwhere)
 {
     int fd = ((vsf_linux_fd_t *)f)->fd;
@@ -834,6 +844,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt = {
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fileno),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fseek),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fseeko),
+    VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fseeko64),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(ftell),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(ftello),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(ftello64),
