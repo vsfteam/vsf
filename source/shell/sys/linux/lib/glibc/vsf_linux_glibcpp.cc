@@ -9,6 +9,11 @@
 #   error Please define __OOC_CPP__ to support cpp
 #endif
 
+#if defined(__WIN__) && defined(_DEBUG)
+#   warning ********windows: In debug mode, some cpp class will overwrite new/delete,\
+        which may cause problems if new allocate memory from windows heap and delete call free. ********
+#endif
+
 namespace std {
     extern "C" void * __thread_routine(void *p) {
         thread::__impl_base * t = static_cast<thread::__impl_base *>(p);

@@ -42,6 +42,11 @@
 #   include <string.h>
 #endif
 
+#if defined(__WIN__) && !defined(_DEBUG) && VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#   warning ********windows: In release mode, malloc will be called in some system APIs,\
+                and heap monitor will make it failed if not called in vsf_linux environment ********
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_ARCH_PROVIDE_HEAP
