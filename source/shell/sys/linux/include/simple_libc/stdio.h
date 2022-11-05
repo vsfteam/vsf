@@ -499,9 +499,6 @@ int fflush(FILE *f);
 FILE * popen(const char *command, const char *type);
 int pclose(FILE *stream);
 
-void setbuf(FILE *f, char *buf);
-int setvbuf(FILE *f, char *buffer, int mode, size_t size);
-
 int rename(const char *old_filename, const char *new_filename);
 int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath);
 

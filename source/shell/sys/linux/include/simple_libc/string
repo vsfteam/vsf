@@ -75,7 +75,7 @@ namespace std {
     T * __memset(T *dst, T t, size_t n)
     {
         T *tmp = dst;
-        while (n) {
+        while (n--) {
             *tmp++ = n;
         }
         return dst;
