@@ -63,8 +63,10 @@
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../include/sys/eventfd.h"
+#   include "../include/sys/signalfd.h"
 #else
 #   include <sys/eventfd.h>
+#   include <sys/signalfd.h>
 #endif
 
 #include "./vsf_linux_fs.h"
@@ -97,6 +99,11 @@ typedef struct vsf_linux_eventfd_priv_t {
     implement(vsf_linux_fd_priv_t)
     eventfd_t counter;
 } vsf_linux_eventfd_priv_t;
+
+typedef struct vsf_linux_signalfd_priv_t {
+    implement(vsf_linux_fd_priv_t)
+    sigset_t *sigset;
+} vsf_linux_signalfd_priv_t;
 
 typedef struct vsf_linux_fd_trigger_t {
     vsf_linux_trigger_t *trigger;
@@ -170,6 +177,10 @@ const vsf_linux_fd_op_t __vsf_linux_eventfd_fdop = {
     .fn_write           = __vsf_linux_eventfd_write,
     .fn_close           = __vsf_linux_eventfd_close,
     .fn_eof             = __vsf_linux_eventfd_eof,
+};
+
+const vsf_linux_fd_op_t __vsf_linux_signalfd_fdop = {
+    .priv_size          = sizeof(vsf_linux_signalfd_priv_t),
 };
 
 const vsf_linux_fd_op_t __vsf_linux_epollfd_fdop = {
@@ -294,6 +305,8 @@ static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd)
     return !(priv->file->size - vk_file_tell(priv->file));
 }
 
+// eventfd
+
 int eventfd(int count, int flags)
 {
     vsf_linux_fd_t *sfd = NULL;
@@ -392,7 +405,24 @@ static int __vsf_linux_eventfd_eof(vsf_linux_fd_t *sfd)
     return !counter;
 }
 
+// signalfd
+
+int signalfd(int fd, const sigset_t *mask, int flags)
+{
+    vsf_linux_fd_t *sfd = NULL;
+    if (vsf_linux_fd_create(&sfd, &__vsf_linux_signalfd_fdop) < 0) {
+        return -1;
+    }
+
+    vsf_linux_signalfd_priv_t *priv = (vsf_linux_signalfd_priv_t *)sfd->priv;
+    priv->sigset = (sigset_t *)mask;
+    priv->flags = flags;
+    vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
+    return sfd->fd;
+}
+
 // epoll
+
 static int __vsf_linux_epollfd_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_epollfd_priv_t *epoll_priv = (vsf_linux_epollfd_priv_t *)sfd->priv;

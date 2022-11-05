@@ -92,6 +92,14 @@ int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
     return 0;
 }
 
+void setbuffer(FILE *f, char *buf, size_t size)
+{
+}
+
+void setlinebuf(FILE *f)
+{
+}
+
 int ungetc(int ch, FILE *f)
 {
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
