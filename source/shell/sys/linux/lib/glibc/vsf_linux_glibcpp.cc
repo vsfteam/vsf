@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <thread>
 
 #ifdef __WIN__
@@ -30,4 +31,21 @@ namespace std {
         return fopen(filename, "");
     }
 #endif
+}
+
+void *operator new(size_t size)
+{
+    return malloc(size);
+}
+void *operator new[](size_t size)
+{
+    return malloc(size);
+}
+void operator delete(void *ptr)
+{
+    free(ptr);
+}
+void operator delete[](void *ptr)
+{
+    free(ptr);
 }
