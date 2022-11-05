@@ -810,6 +810,27 @@ ssize_t getline(char **lineptr, size_t *n, FILE *f)
     return -1;
 }
 
+#ifdef __WIN__
+int _fseeki64(FILE *f, uint64_t offset, int origin)
+{
+    return fseeko64(f, offset, origin);
+}
+
+void _lock_file(FILE *f)
+{
+}
+
+void _unlock_file(FILE *f)
+{
+}
+
+errno_t _get_stream_buffer_pointers(FILE *f, char ***base, char ***ptr, int **cnt)
+{
+    // TODO: this function must be implemented for fstream in windows
+    return 0;
+}
+#endif
+
 #if VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED && !defined(__VSF_APPLET__)
 #   define VSF_LINUX_APPLET_LIBC_STDIO_FUNC(__FUNC)     .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt = {

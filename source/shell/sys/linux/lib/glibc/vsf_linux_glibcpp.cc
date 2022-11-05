@@ -35,25 +35,6 @@ namespace std {
         which may cause problems if new allocate memory from windows heap and delete call free. ********
 #   endif
 
-extern "C" int __cdecl _fseeki64(FILE *f, uint64_t offset, int origin)
-{
-    return fseeko64(f, offset, origin);
-}
-
-extern "C" void __cdecl _lock_file(FILE *f)
-{
-}
-
-extern "C" void __cdecl _unlock_file(FILE *f)
-{
-}
-
-extern "C" errno_t __cdecl _get_stream_buffer_pointers(FILE *f, char ***base, char ***ptr, int **cnt)
-{
-    // TODO: this function must be implemented for fstream in windows
-    return 0;
-}
-
     // copy from https://github.com/microsoft/STL/blob/main/stl/src/fiopen.cpp
     // Copyright (c) Microsoft Corporation.
     // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
