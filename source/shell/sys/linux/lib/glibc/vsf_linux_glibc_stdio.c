@@ -826,7 +826,17 @@ void _unlock_file(FILE *f)
 
 errno_t _get_stream_buffer_pointers(FILE *f, char ***base, char ***ptr, int **cnt)
 {
-    // TODO: this function must be implemented for fstream in windows
+    static int __cnt = 0;
+    static char *__base = (char *)&__cnt;
+    if (base != NULL) {
+        *base = &__base;
+    }
+    if (ptr != NULL) {
+        *ptr = &__base;
+    }
+    if (cnt != NULL) {
+        *cnt = &__cnt;
+    }
     return 0;
 }
 #endif
