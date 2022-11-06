@@ -170,8 +170,6 @@ extern void vsf_linux_glibc_init(void);
 #endif
 
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb);
-static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
-        vsf_linux_main_entry_t entry, vsf_prio_t prio);
 extern int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd,
         vsf_linux_main_entry_t *entry);
 
@@ -702,7 +700,7 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     vsf_linux_term_fdop.fn_init(sfd);
 
     // create kernel process(pid0)
-    if (NULL != __vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, VSF_LINUX_CFG_PRIO_LOWEST)) {
+    if (NULL != vsf_linux_start_process_internal(__vsf_linux_kernel_thread)) {
         return VSF_ERR_NONE;
     }
     return VSF_ERR_FAIL;
@@ -1018,8 +1016,8 @@ void vsf_linux_set_process_reg(uintptr_t reg)
 #endif
 }
 
-static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
-        vsf_linux_main_entry_t entry, vsf_prio_t prio)
+vsf_linux_process_t * __vsf_linux_start_process_internal(
+        vsf_linux_main_entry_t entry, char * const * argv, int stack_size, vsf_prio_t prio)
 {
     VSF_LINUX_ASSERT((prio >= VSF_LINUX_CFG_PRIO_LOWEST) && (prio <= VSF_LINUX_CFG_PRIO_HIGHEST));
     vsf_linux_process_t *process = __vsf_linux_create_process(stack_size);
@@ -1030,6 +1028,9 @@ static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
         if (NULL == process->working_dir) {
             vsf_linux_delete_process(process);
             return NULL;
+        }
+        if (argv != NULL) {
+            __vsf_linux_process_parse_arg(process, argv);
         }
         vsf_linux_start_process(process);
     }

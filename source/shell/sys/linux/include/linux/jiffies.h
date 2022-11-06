@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#define jiffies                     vsf_systimer_get()
+#define jiffies                     vsf_systimer_get_tick()
 
 #ifdef __cplusplus
 }

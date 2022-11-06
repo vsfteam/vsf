@@ -4,7 +4,7 @@
 // for endian APIs
 #include "hal/arch/vsf_arch.h"
 #include <sys/types.h>
-#include <linux/errno.h>
+#include <linux/err.h>
 #include <linux/minmax.h>
 #include <linux/spinlock.h>
 #include <linux/gfp.h>

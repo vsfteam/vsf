@@ -773,7 +773,10 @@ vsf_class(vsf_eda_t) {
 
     protected_member(
 #   if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-        vsf_dlist_node_t        pending_node;
+        union {
+            vsf_dlist_node_t    pending_node;
+            vsf_slist_node_t    pending_snode;
+        };
 #   endif
 
 #   if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED

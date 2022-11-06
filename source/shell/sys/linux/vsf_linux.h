@@ -365,6 +365,21 @@ extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
 
 extern bool vsf_linux_is_inited(void);
 
+#define __vsf_linux_start_process_internal3(__entry, __argv, __stack_size, __prio)\
+            __vsf_linux_start_process_internal((__entry), (__argv), (__stack_size), (__prio))
+#define __vsf_linux_start_process_internal2(__entry, __argv, __stack_size)      \
+            __vsf_linux_start_process_internal3((__entry), (__argv), (__stack_size), VSF_LINUX_CFG_PRIO_LOWEST)
+#define __vsf_linux_start_process_internal1(__entry, __argv)                    \
+            __vsf_linux_start_process_internal2((__entry), (__argv), 0)
+#define __vsf_linux_start_process_internal0(__entry)                            \
+            __vsf_linux_start_process_internal1(__entry, NULL)
+// prototype: vsf_linux_process_t * vsf_linux_start_process_internal(vsf_linux_main_entry_t *entry,
+//        char * const * argv = NULL, int stack_size = 0, vsf_prio_t prio = VSF_LINUX_CFG_PRIO_LOWEST);
+#define vsf_linux_start_process_internal(__entry, ...)                          \
+            __PLOOC_EVAL(__vsf_linux_start_process_internal, __VA_ARGS__)((__entry), ##__VA_ARGS__)
+extern vsf_linux_process_t * __vsf_linux_start_process_internal(
+        vsf_linux_main_entry_t entry, char * const * argv, int stack_size, vsf_prio_t prio);
+
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 

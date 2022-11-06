@@ -405,7 +405,7 @@ extern "C" {
         }                                                                       \
     } while (0)
 #else
-#   define __vsf_dlist_insert(     __host_type,/* type of the host object */    \
+#   define __vsf_dlist_insert(  __host_type,/* type of the host object */       \
                                 __member,   /* the name of the list */          \
                                 __list_ptr, /* the address of the list */       \
                                 __item_ptr, /* the address of the new item */   \

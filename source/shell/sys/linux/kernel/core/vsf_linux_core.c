@@ -21,11 +21,14 @@
 
 #if VSF_USE_LINUX == ENABLED
 
+#define __VSF_LINUX_CLASS_INHERIT__
+#define __VSF_EDA_CLASS_INHERIT__
 #include <unistd.h>
 
 #include <linux/types.h>
 #include <linux/atomic.h>
 #include <linux/kobject.h>
+#include <linux/mutex.h>
 #include <linux/slab.h>
 #include <linux/device.h>
 
@@ -139,7 +142,145 @@ void kobject_del(struct kobject *kobj)
 * linux/workqueue.h                                                            *
 *******************************************************************************/
 
+struct workqueue_struct {
+    vsf_dlist_t                     work_list;
+    vsf_dlist_t                     dwork_list;
+    vsf_slist_t                     flush_list;
 
+    struct mutex                    mutex;
+    vsf_sem_t                       sem;
+
+    char                            name[16];
+
+    vsf_linux_process_t             *process;
+    bool                            is_to_exit;
+};
+
+static int __workqueue_thread(int argc, char **argv)
+{
+    VSF_LINUX_ASSERT(1 == argc);
+    struct workqueue_struct *wq = (struct workqueue_struct *)argv[0];
+    union {
+        struct delayed_work *dwork;
+        struct work_struct *work;
+    } u;
+    vsf_timeout_tick_t timeout;
+
+    while (!wq->is_to_exit) {
+        mutex_lock(&wq->mutex);
+            vsf_dlist_peek_head(struct work_struct, entry, &wq->dwork_list, u.work);
+            if (NULL == u.dwork) {
+                timeout = -1;
+            } else {
+                vsf_systimer_tick_t now = vsf_systimer_get_tick();
+                if (vsf_systimer_is_due(u.dwork->start_tick)) {
+                    vsf_dlist_remove_head(struct work_struct, entry, &wq->dwork_list, u.work);
+                    vsf_dlist_add_to_tail(struct work_struct, entry, &wq->work_list, u.work);
+                    timeout = 0;
+                } else {
+                    timeout = vsf_systimer_get_duration(now, u.dwork->start_tick);
+                }
+            }
+        mutex_unlock(&wq->mutex);
+
+        if (timeout != 0) {
+            vsf_thread_sem_pend(&wq->sem, timeout);
+        }
+
+        while (true) {
+            vsf_dlist_remove_head(struct work_struct, entry, &wq->work_list, u.work);
+            if (NULL == u.work) {
+                break;
+            }
+
+            u.work->func(u.work);
+        }
+    }
+    return 0;
+}
+
+struct workqueue_struct * alloc_workqueue(const char *fmt, unsigned int flags, int max_active, ...)
+{
+    struct workqueue_struct *wq = kzalloc(sizeof(*wq), GFP_KERNEL);
+    va_list ap;
+
+    va_start(ap, max_active);
+    vsnprintf(wq->name, sizeof(wq->name), fmt, ap);
+    va_end(ap);
+
+    vsf_dlist_init(&wq->work_list);
+    vsf_dlist_init(&wq->dwork_list);
+    vsf_slist_init(&wq->flush_list);
+    mutex_init(&wq->mutex);
+    vsf_eda_sem_init(&wq->sem);
+    wq->is_to_exit = false;
+
+    char * argv[] = {
+        (char *)wq,
+        NULL,
+    };
+    wq->process = vsf_linux_start_process_internal(__workqueue_thread, argv);
+    if (NULL == wq->process) {
+        kfree(wq);
+        return NULL;
+    }
+
+    return wq;
+}
+
+void destroy_workqueue(struct workqueue_struct *wq)
+{
+    wq->is_to_exit = true;
+    flush_workqueue(wq);
+    kfree(wq);
+}
+
+bool queue_work(struct workqueue_struct *wq, struct work_struct *work)
+{
+    if (vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, work)) {
+        return false;
+    } else {
+        mutex_lock(&wq->mutex);
+            vsf_dlist_add_to_tail(struct work_struct, entry, &wq->work_list, work);
+        mutex_unlock(&wq->mutex);
+        vsf_eda_sem_post(&wq->sem);
+        return true;
+    }
+}
+
+bool queue_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, unsigned long delay)
+{
+    if (0 == delay) {
+        return queue_work(wq, &dwork->work);
+    } else if (vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, &dwork->work)) {
+        return false;
+    } else {
+        dwork->start_tick = vsf_systimer_get_tick() + delay;
+        mutex_lock(&wq->mutex);
+            vsf_dlist_insert(struct work_struct, entry, &wq->dwork_list, &dwork->work,
+                ((struct delayed_work *)_)->start_tick >= dwork->start_tick);
+        mutex_unlock(&wq->mutex);
+        vsf_eda_sem_post(&wq->sem);
+        return true;
+    }
+}
+
+void flush_workqueue(struct workqueue_struct *wq)
+{
+    vsf_eda_t *eda = vsf_eda_get_cur();
+
+    mutex_lock(&wq->mutex);
+        if (vsf_dlist_is_empty(&wq->work_list) && vsf_dlist_is_empty(&wq->dwork_list)) {
+            eda = NULL;
+        } else {
+            vsf_slist_add_to_head(vsf_eda_t, pending_snode, &wq->flush_list, eda);
+        }
+    mutex_unlock(&wq->mutex);
+
+    if (eda != NULL) {
+        vsf_thread_wfe(VSF_EVT_USER);
+    }
+}
 
 /*******************************************************************************
 * linux/device.h                                                               *
