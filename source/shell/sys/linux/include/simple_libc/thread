@@ -87,9 +87,11 @@ namespace std {
         }
         void join() {
             pthread_join(__id.__thread_id, NULL);
+            __id.__thread_id = -1;
         }
         void detach() {
             pthread_detach(__id.__thread_id);
+            __id.__thread_id = -1;
         }
         native_handle_type native_handle() {
             return __id.__thread_id;
