@@ -1179,14 +1179,15 @@ void libusb_free_transfer(struct libusb_transfer *transfer)
 {
     if (transfer != NULL) {
         vsf_linux_libusb_transfer_t *ltransfer = container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
-        VSF_LINUX_ASSERT(!vk_usbh_urb_is_alloced(&ltransfer->urb));
+        vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
+        vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
+        VSF_LINUX_ASSERT(!vk_usbh_urb_is_alloced(&pipe->urb));
 
         if (ltransfer->transfer.flags & LIBUSB_TRANSFER_FREE_BUFFER) {
             free(ltransfer->transfer.buffer);
         }
         free(ltransfer);
 
-        vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
         if (ldev->is_to_free) {
             if (!ldev->refcnt) {
                 vk_usbh_free_urb(ldev->libusb_dev->usbh, &ldev->libusb_dev->urb);
