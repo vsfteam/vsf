@@ -290,12 +290,15 @@ static void * __vsf_libusb_libusb_user_thread(void *param)
         while (!vsf_dlist_is_empty(&__vsf_libusb.translist_done)) {
             orig = vsf_protect_sched();
                 vsf_dlist_remove_head(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
-                ((vsf_linux_libusb_dev_t *)(ltransfer->transfer.dev_handle))->refcnt--;
             vsf_unprotect_sched(orig);
 
             if (ltransfer->transfer.callback != NULL) {
                 ltransfer->transfer.callback(&ltransfer->transfer);
             }
+
+            orig = vsf_protect_sched();
+                ((vsf_linux_libusb_dev_t *)(ltransfer->transfer.dev_handle))->refcnt--;
+            vsf_unprotect_sched(orig);
 
             __vsf_linux_libusb_fd_trigger();
         }
