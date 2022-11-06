@@ -10,6 +10,8 @@
 #include <linux/device/class.h>
 #include <linux/device/driver.h>
 
+#include <linux/gfp.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,6 +85,9 @@ extern void device_unregister(struct device *dev);
 extern void device_initialize(struct device *dev);
 extern int device_add(struct device *dev);
 extern void device_del(struct device *dev);
+
+extern char * devm_kvasprintf(struct device *dev, gfp_t gfp, const char *fmt, va_list ap);
+extern char * devm_kasprintf(struct device *dev, gfp_t gfp, const char *fmt, ...);
 
 #ifdef __cplusplus
 }

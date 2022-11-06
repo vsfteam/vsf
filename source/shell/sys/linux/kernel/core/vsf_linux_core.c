@@ -31,6 +31,7 @@
 #include <linux/mutex.h>
 #include <linux/slab.h>
 #include <linux/device.h>
+#include <linux/firmware.h>
 
 #include <linux/skbuff.h>
 
@@ -136,6 +137,10 @@ void kobject_del(struct kobject *kobj)
         struct kobject *parent = kobj->parent;
         kobject_put(parent);
     }
+}
+
+int add_uevent_var(struct kobj_uevent_env *env, const char *format, ...)
+{
 }
 
 /*******************************************************************************
@@ -361,6 +366,180 @@ void device_unregister(struct device *dev)
     put_device(dev);
 }
 
+int driver_register(struct device_driver *drv)
+{
+    return 0;
+}
+
+void driver_unregister(struct device_driver *drv)
+{
+}
+
+/*******************************************************************************
+* linux/firmware.h                                                             *
+*******************************************************************************/
+
+WEAK(vsf_linux_firmware_read)
+int vsf_linux_firmware_read(struct firmware *fw, const char *name)
+{
+    int fd = open(name, 0);
+    if (fd < 0) {
+        return -1;
+    }
+
+    off_t orig = lseek(fd, 0, SEEK_END);
+    fw->size = lseek(fd, orig, SEEK_SET);
+    fw->data = kmalloc(fw->size, GFP_KERNEL);
+    if (NULL == fw->data) {
+        goto close_and_fail;
+    }
+    if (fw->size == read(fd, (void *)fw->data, fw->size)) {
+        return 0;
+    }
+
+    kfree(fw->data);
+    fw->data = NULL;
+close_and_fail:
+    close(fd);
+    return -1;
+}
+
+WEAK(vsf_linux_firmware_release)
+void vsf_linux_firmware_release(struct firmware *fw)
+{
+    if (fw->data != NULL) {
+        kfree(fw->data);
+        fw->data = NULL;
+    }
+}
+
+int request_firmware(const struct firmware **fw, const char *name, struct device *device)
+{
+    VSF_LINUX_ASSERT(fw != NULL);
+    *fw = kzalloc(sizeof(struct firmware), GFP_KERNEL);
+    if (NULL == *fw) {
+        return -1;
+    }
+
+    return vsf_linux_firmware_read(*fw, name);
+}
+
+void release_firmware(const struct firmware *fw)
+{
+    vsf_linux_firmware_release((struct firmware *)fw);
+    kfree(fw);
+}
+
+/*******************************************************************************
+* linux/power_supply.h                                                         *
+*******************************************************************************/
+
+struct power_supply * power_supply_register(struct device *parent,
+                const struct power_supply_desc *desc,
+                const struct power_supply_config *cfg)
+{
+}
+
+void power_supply_unregister(struct power_supply *psy)
+{
+}
+
+int power_supply_powers(struct power_supply *psy, struct device *dev)
+{
+}
+
+void * power_supply_get_drvdata(struct power_supply *psy)
+{
+}
+
+void power_supply_changed(struct power_supply *psy)
+{
+}
+
+/*******************************************************************************
+* linux/input.h                                                                *
+*******************************************************************************/
+
+struct input_dev * input_allocate_device(void)
+{
+}
+
+struct input_dev * devm_input_allocate_device(struct device *)
+{
+}
+
+void input_free_device(struct input_dev *dev)
+{
+}
+
+/*******************************************************************************
+* linux/leds.h                                                                 *
+*******************************************************************************/
+
+int devm_led_classdev_register(struct device *parent, struct led_classdev *led_cdev)
+{
+}
+
+/*******************************************************************************
+* linux/idr.h                                                                  *
+*******************************************************************************/
+
+int ida_alloc_range(struct ida *, unsigned int min, unsigned int max, gfp_t)
+{
+}
+
+void ida_free(struct ida *, unsigned int id)
+{
+}
+
+void ida_destroy(struct ida *ida)
+{
+}
+
+/*******************************************************************************
+* linux/kstrtox.h                                                              *
+*******************************************************************************/
+
+int kstrtou16(const char *s, unsigned int base, u16 *res)
+{
+    unsigned long long val = strtoull(s, NULL, base);
+    if (val != (u16)val) {
+        return -ERANGE;
+    }
+    *res = val;
+    return 0;
+}
+
+int kstrtos16(const char *s, unsigned int base, s16 *res)
+{
+    long long val = strtoll(s, NULL, base);
+    if (val != (s16)val) {
+        return -ERANGE;
+    }
+    *res = val;
+    return 0;
+}
+
+int kstrtou8(const char *s, unsigned int base, u8 *res)
+{
+    unsigned long long val = strtoull(s, NULL, base);
+    if (val != (u8)val) {
+        return -ERANGE;
+    }
+    *res = val;
+    return 0;
+}
+
+int kstrtos8(const char *s, unsigned int base, s8 *res)
+{
+    long long val = strtoll(s, NULL, base);
+    if (val != (s8)val) {
+        return -ERANGE;
+    }
+    *res = val;
+    return 0;
+}
+
 /*******************************************************************************
 * linux/skbuff.h                                                               *
 *******************************************************************************/
@@ -407,6 +586,47 @@ void kfree_skb(struct sk_buff *skb)
 void consume_skb(struct sk_buff *skb)
 {
     kfree_skb(skb);
+}
+
+/*******************************************************************************
+* devm                                                                         *
+*******************************************************************************/
+
+char * devm_kvasprintf(struct device *dev, gfp_t gfp, const char *fmt, va_list ap)
+{
+    va_list aq;
+    int len;
+    char *p;
+
+    va_copy(aq, ap);
+    len = vsnprintf(NULL, 0, fmt, aq);
+    va_end(aq);
+
+    p = kmalloc(len + 1, gfp);
+    if (NULL == p) {
+        return NULL;
+    }
+
+    vsnprintf(p, len + 1, fmt, ap);
+    return p;
+}
+
+char * devm_kasprintf(struct device *dev, gfp_t gfp, const char *fmt, ...)
+{
+    va_list ap;
+    char *p;
+
+    va_start(ap, fmt);
+    p = devm_kvasprintf(dev, gfp, fmt, ap);
+    va_end(ap);
+
+    return p;
+}
+
+struct power_supply * devm_power_supply_register(struct device *parent,
+                const struct power_supply_desc *desc,
+                const struct power_supply_config *cfg)
+{
 }
 
 #endif

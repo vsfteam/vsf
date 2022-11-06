@@ -37,6 +37,8 @@ extern struct kobject * kobject_get(struct kobject *kobj);
 extern void kobject_put(struct kobject *kobj);
 extern void kobject_del(struct kobject *kobj);
 
+extern int add_uevent_var(struct kobj_uevent_env *env, const char *format, ...);
+
 #ifdef __cplusplus
 }
 #endif

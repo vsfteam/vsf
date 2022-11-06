@@ -29,6 +29,8 @@ struct led_classdev {
     const struct attribute_group    **groups;
 };
 
+extern int devm_led_classdev_register(struct device *parent, struct led_classdev *led_cdev);
+
 #ifdef __cplusplus
 }
 #endif

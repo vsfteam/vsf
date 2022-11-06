@@ -80,6 +80,19 @@ struct power_supply {
     const struct power_supply_desc      *desc;
 };
 
+extern struct power_supply * power_supply_register(struct device *parent,
+                const struct power_supply_desc *desc,
+                const struct power_supply_config *cfg);
+extern struct power_supply * devm_power_supply_register(struct device *parent,
+                const struct power_supply_desc *desc,
+                const struct power_supply_config *cfg);
+
+extern void power_supply_unregister(struct power_supply *psy);
+extern int power_supply_powers(struct power_supply *psy, struct device *dev);
+
+extern void * power_supply_get_drvdata(struct power_supply *psy);
+extern void power_supply_changed(struct power_supply *psy);
+
 #ifdef __cplusplus
 }
 #endif

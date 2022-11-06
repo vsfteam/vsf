@@ -363,6 +363,10 @@ struct ff_effect {
 #define FF_MAX                      0x7f
 #define FF_CNT                      (FF_MAX + 1)
 
+extern struct input_dev * input_allocate_device(void);
+extern struct input_dev * devm_input_allocate_device(struct device *);
+extern void input_free_device(struct input_dev *dev);
+
 #ifdef __cplusplus
 }
 #endif

@@ -24,6 +24,9 @@ struct device_driver {
     int (*resume)(struct device *dev);
 };
 
+extern int driver_register(struct device_driver *drv);
+extern void driver_unregister(struct device_driver *drv);
+
 #ifdef __cplusplus
 }
 #endif
