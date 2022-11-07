@@ -31,6 +31,7 @@ extern struct workqueue_struct *system_wq;
 extern struct workqueue_struct * alloc_workqueue(const char *fmt, unsigned int flags, int max_active, ...);
 extern void destroy_workqueue(struct workqueue_struct *wq);
 extern bool queue_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, unsigned long delay);
+extern bool mod_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, unsigned long delay);
 extern bool queue_work(struct workqueue_struct *wq, struct work_struct *work);
 extern void flush_workqueue(struct workqueue_struct *wq);
 

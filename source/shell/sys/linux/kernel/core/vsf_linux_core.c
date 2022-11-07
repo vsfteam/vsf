@@ -241,7 +241,7 @@ struct workqueue_struct * alloc_workqueue(const char *fmt, unsigned int flags, i
 
     wq->process = vsf_linux_start_process_internal(__workqueue_thread);
     wq->process->ctx.arg.argc = 1;
-    wq->process->ctx.arg.argv[0] = wq;
+    wq->process->ctx.arg.argv[0] = (const char *)wq;
     if (NULL == wq->process) {
         kfree(wq);
         return NULL;
@@ -260,12 +260,13 @@ void destroy_workqueue(struct workqueue_struct *wq)
 bool queue_work(struct workqueue_struct *wq, struct work_struct *work)
 {
     VSF_LINUX_ASSERT((wq != NULL) && (work != NULL));
+    work->__wq = wq;
+    mutex_lock(&wq->mutex);
     if (vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, work)) {
+        mutex_unlock(&wq->mutex);
         return false;
     } else {
-        work->__wq = wq;
-        mutex_lock(&wq->mutex);
-            vsf_dlist_add_to_tail(struct work_struct, entry, &wq->work_list, work);
+        vsf_dlist_add_to_tail(struct work_struct, entry, &wq->work_list, work);
         mutex_unlock(&wq->mutex);
         vsf_eda_sem_post(&wq->sem);
         return true;
@@ -277,18 +278,41 @@ bool queue_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork,
     VSF_LINUX_ASSERT((wq != NULL) && (dwork != NULL));
     if (0 == delay) {
         return queue_work(wq, &dwork->work);
-    } else if (vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, &dwork->work)) {
+    }
+
+    dwork->work.__wq = wq;
+    mutex_lock(&wq->mutex);
+    if (vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, &dwork->work)) {
+        mutex_unlock(&wq->mutex);
         return false;
     } else {
-        dwork->work.__wq = wq;
-        dwork->start_tick = vsf_systimer_get_tick() + delay;
-        mutex_lock(&wq->mutex);
-            vsf_dlist_insert(struct work_struct, entry, &wq->dwork_list, &dwork->work,
+        vsf_dlist_insert(struct work_struct, entry, &wq->dwork_list, &dwork->work,
                 ((struct delayed_work *)_)->start_tick >= dwork->start_tick);
         mutex_unlock(&wq->mutex);
+        dwork->start_tick = vsf_systimer_get_tick() + delay;
         vsf_eda_sem_post(&wq->sem);
         return true;
     }
+}
+
+bool mod_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, unsigned long delay)
+{
+    bool result;
+    mutex_lock(&wq->mutex);
+    if (vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, &dwork->work)) {
+        vsf_dlist_remove(struct work_struct, entry, &wq->dwork_list, &dwork->work);
+        mutex_unlock(&wq->mutex);
+        result = false;
+    } else if (vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, &dwork->work)) {
+        vsf_dlist_remove(struct work_struct, entry, &wq->work_list, &dwork->work);
+        mutex_unlock(&wq->mutex);
+        result = true;
+    } else {
+        result = false;
+    }
+
+    queue_delayed_work(wq, dwork, delay);
+    return result;
 }
 
 void flush_workqueue(struct workqueue_struct *wq)
@@ -310,6 +334,7 @@ void flush_workqueue(struct workqueue_struct *wq)
 
 bool flush_work(struct work_struct *work)
 {
+    return false;
 }
 
 // __queue_cancel_work MUST be called locked
@@ -367,6 +392,7 @@ bool cancel_work_sync(struct work_struct *work)
 
 bool flush_delayed_work(struct delayed_work *dwork)
 {
+    return false;
 }
 
 bool cancel_delayed_work(struct delayed_work *dwork)
@@ -394,6 +420,70 @@ bool cancel_delayed_work_sync(struct delayed_work *dwork)
 /*******************************************************************************
 * linux/wait.h                                                                 *
 *******************************************************************************/
+
+int autoremove_wake_function(struct wait_queue_entry *wqe, unsigned mode, int sync, void *key)
+{
+    list_del_init(&wqe->entry);
+	return 1;
+}
+
+long prepare_to_wait_event(struct wait_queue_head *wqh, struct wait_queue_entry *wqe, int state)
+{
+    unsigned long flags;
+    spin_lock_irqsave(&wqh->lock, flags);
+    if (list_empty(&wqe->entry)) {
+        list_add_tail(&wqe->entry, &wqh->head);
+    }
+    spin_unlock_irqrestore(&wqh->lock, flags);
+    return 0;
+}
+
+void init_wait_entry(struct wait_queue_entry *wqe, int flags)
+{
+    wqe->__trig = NULL;
+    wqe->flags = flags;
+    wqe->func = autoremove_wake_function;
+    INIT_LIST_HEAD(&wqe->entry);
+}
+
+void finish_wait(struct wait_queue_head *wqh, struct wait_queue_entry *wqe)
+{
+    unsigned long flags;
+    spin_lock_irqsave(&wqh->lock, flags);
+    if (!list_empty(&wqe->entry)) {
+        list_del_init(&wqe->entry);
+    }
+    spin_unlock_irqrestore(&wqh->lock, flags);
+}
+
+void wake_up_nr(struct wait_queue_head *wqh, int nr)
+{
+    struct list_head tmp, *p, *n;
+    struct wait_queue_entry *wqe;
+    unsigned long flags;
+
+    INIT_LIST_HEAD(&tmp);
+
+    spin_lock_irqsave(&wqh->lock, flags);
+    list_for_each_safe(p, n, &wqh->head) {
+        if (!nr) break;
+        wqe = list_entry(p, struct wait_queue_entry, entry);
+        if (wqe->__trig != NULL) {
+            list_del_init(p);
+            list_add_tail(p, &tmp);
+            if (nr > 0) {
+                --nr;
+            }
+        }
+    }
+    spin_unlock_irqrestore(&wqh->lock, flags);
+
+    while (!list_empty(&tmp)) {
+        wqe = list_first_entry(&tmp, struct wait_queue_entry, entry);
+        list_del_init(&wqe->entry);
+        vsf_eda_trig_set(wqe->__trig);
+    }
+}
 
 void init_wait_queue_head(struct wait_queue_head *wqh)
 {

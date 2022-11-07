@@ -3,6 +3,8 @@
 
 #include "component/usb/vsf_usb.h"
 #include <linux/types.h>
+#include <linux/atomic.h>
+#include <linux/spinlock.h>
 #include <linux/list.h>
 #include <linux/wait.h>
 #include <linux/device.h>
@@ -76,18 +78,32 @@ struct usb_interface {
 #define	to_usb_interface(__d)       container_of(__d, struct usb_interface, dev)
 static inline void *usb_get_intfdata(struct usb_interface *intf)
 {
-	return dev_get_drvdata(&intf->dev);
+    return dev_get_drvdata(&intf->dev);
 }
 
 static inline void usb_set_intfdata(struct usb_interface *intf, void *data)
 {
-	dev_set_drvdata(&intf->dev, data);
+    dev_set_drvdata(&intf->dev, data);
 }
 
 struct usb_anchor {
     struct list_head                urb_list;
     wait_queue_head_t               wait;
+    atomic_t                        suspend_wakeups;
+    bool                            poisoned;
 };
+
+static inline void init_usb_anchor(struct usb_anchor *anchor)
+{
+    memset(anchor, 0, sizeof(*anchor));
+    INIT_LIST_HEAD(&anchor->urb_list);
+    init_waitqueue_head(&anchor->wait);
+}
+
+static inline int usb_anchor_empty(struct usb_anchor *anchor)
+{
+    return list_empty(&anchor->urb_list);
+}
 
 struct usb_iso_packet_descriptor {
     unsigned int                    offset;
@@ -120,7 +136,9 @@ typedef void (*usb_complete_t)(struct urb *);
 struct urb {
     vk_usbh_urb_t                   __urb;
 
+    struct kref                     kref;
     struct list_head                urb_list;
+    struct list_head                anchor_list;
     struct usb_anchor               *anchor;
     struct usb_device               *dev;
 
@@ -211,8 +229,8 @@ static inline struct usb_host_endpoint * usb_pipe_endpoint(struct usb_device *ud
 extern int usb_reset_device(struct usb_device *udev);
 #define usb_enable_autosuspend(__udev)
 #define usb_disable_autosuspend(__udev)
-#define usb_autopm_get_interface(__udev)                0
-#define usb_autopm_set_interface(__udev)                0
+#define usb_autopm_get_interface(__udev)            0
+#define usb_autopm_put_interface(__udev)            0
 
 static inline void * usb_alloc_coherent(struct usb_device *dev, size_t size, gfp_t mem_flags, dma_addr_t *dma)
 {
@@ -223,9 +241,17 @@ static inline void usb_free_coherent(struct usb_device *dev, size_t size, void *
     vsf_usbh_free(addr);
 }
 
+extern void usb_anchor_urb(struct urb *urb, struct usb_anchor *anchor);
+extern void usb_unanchor_urb(struct urb *urb);
+extern struct urb *usb_get_from_anchor(struct usb_anchor *anchor);
+extern void usb_kill_anchored_urbs(struct usb_anchor *anchor);
+extern void usb_unlink_anchored_urbs(struct usb_anchor *anchor);
+
 extern void usb_init_urb(struct urb *urb);
 extern struct urb * usb_alloc_urb(int iso_packets, gfp_t flags);
 extern void usb_free_urb(struct urb *urb);
+extern struct urb *usb_get_urb(struct urb *urb);
+#define usb_put_urb                                 usb_free_urb
 extern int usb_submit_urb(struct urb *urb, gfp_t flags);
 extern int usb_unlink_urb(struct urb *urb);
 extern void usb_kill_urb(struct urb *urb);

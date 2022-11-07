@@ -34,6 +34,7 @@
 
 struct usb_driver_adapter_vsf {
     vsf_dlist_node_t node;
+    vk_usbh_class_t drvclass;
     vk_usbh_class_drv_t vsf_drv;
     struct usb_driver *linux_drv;
 };
@@ -66,6 +67,91 @@ extern int usb_urb_dir_in(struct urb *urb)
 void vsf_linux_usb_init(vk_usbh_t *usbh)
 {
     __usbdrv_host = usbh;
+}
+
+static int __usb_anchor_check_wakeup(struct usb_anchor *anchor)
+{
+    return atomic_read(&anchor->suspend_wakeups) == 0 && list_empty(&anchor->urb_list);
+}
+
+void usb_anchor_urb(struct urb *urb, struct usb_anchor *anchor)
+{
+    vsf_protect_t orig = vsf_protect_int();
+        usb_get_urb(urb);
+        list_add_tail(&urb->anchor_list, &anchor->urb_list);
+        urb->anchor = anchor;
+    vsf_unprotect_int(orig);
+}
+
+static void __usb_unanchor_urb(vsf_protect_t orig, struct urb *urb, struct usb_anchor *anchor)
+{
+    urb->anchor = NULL;
+    list_del(&urb->anchor_list);
+    vsf_unprotect_int(orig);
+
+    usb_put_urb(urb);
+    if (__usb_anchor_check_wakeup(anchor)) {
+        wake_up(&anchor->wait);
+    }
+}
+
+void usb_unanchor_urb(struct urb *urb)
+{
+    VSF_LINUX_ASSERT((urb != NULL) && (urb->anchor != NULL));
+    __usb_unanchor_urb(vsf_protect_int(), urb, urb->anchor);    
+}
+
+struct urb *usb_get_from_anchor(struct usb_anchor *anchor)
+{
+    struct urb *victim;
+    vsf_protect_t orig = vsf_protect_int();
+    if (!list_empty(&anchor->urb_list)) {
+        victim = list_entry(anchor->urb_list.next, struct urb, anchor_list);
+        usb_get_urb(victim);
+        __usb_unanchor_urb(orig, victim, anchor);
+    } else {
+        vsf_unprotect_int(orig);
+        victim = NULL;
+    }
+    return victim;
+}
+
+void usb_kill_anchored_urbs(struct usb_anchor *anchor)
+{
+    struct urb *victim;
+    int is_empty;
+    vsf_protect_t orig;
+
+    do {
+        orig = vsf_protect_int();
+        while (!list_empty(&anchor->urb_list)) {
+            victim = list_entry(&anchor->urb_list.prev, struct urb, anchor_list);
+            usb_get_urb(victim);
+            vsf_unprotect_int(orig);
+
+            usb_kill_urb(victim);
+            usb_put_urb(victim);
+            orig = vsf_protect_int();
+        }
+        is_empty = __usb_anchor_check_wakeup(anchor);
+        vsf_unprotect_int(orig);
+    } while (!is_empty);
+}
+
+void usb_unlink_anchored_urbs(struct usb_anchor *anchor)
+{
+    struct urb *victim;
+    while ((victim = usb_get_from_anchor(anchor)) != NULL) {
+        usb_unlink_urb(victim);
+        usb_put_urb(victim);
+    }
+}
+
+int usb_wait_anchor_empty_timeout(struct usb_anchor *anchor, unsigned int timeout)
+{
+    return wait_event_timeout(anchor->wait,
+                __usb_anchor_check_wakeup(anchor),
+                msecs_to_jiffies(timeout));
 }
 
 static void __vsf_linux_usb_probe_work(struct work_struct *work)
@@ -121,7 +207,7 @@ void usb_register_driver(struct usb_driver *drv, struct module *mod, const char 
     vsf_dlist_init_node(struct usb_driver_adapter_vsf, node, adapter);
     adapter->linux_drv = drv;
 
-    struct usb_device_id *ids = adapter->vsf_drv.dev_ids = drv->id_table;;
+    const struct usb_device_id *ids = adapter->vsf_drv.dev_ids = drv->id_table;
     adapter->vsf_drv.dev_id_num = 0;
     while (ids->match_flags != 0) {
         adapter->vsf_drv.dev_id_num++;
@@ -133,7 +219,9 @@ void usb_register_driver(struct usb_driver *drv, struct module *mod, const char 
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_add_to_head(struct usb_driver_adapter_vsf, node, &__usbdrv_list, adapter);
     vsf_unprotect_sched(orig);
-    vk_usbh_register_class(__usbdrv_host, &adapter->vsf_drv);
+    adapter->drvclass.drv = &adapter->vsf_drv;
+    vsf_slist_init_node(vsf_usbh_class_t, node, &adapter->drvclass);
+    vk_usbh_register_class(__usbdrv_host, &adapter->drvclass);
 }
 
 void usb_deregister_driver(struct usb_driver *drv)
@@ -150,7 +238,7 @@ void usb_deregister_driver(struct usb_driver *drv)
     vsf_unprotect_sched(orig);
 
     if (adapter != NULL) {
-        vk_usbh_unregister_class(__usbdrv_host, &adapter->vsf_drv);
+        vk_usbh_unregister_class(__usbdrv_host, &adapter->drvclass);
         kfree(adapter);
     }
 }
@@ -179,7 +267,18 @@ void usb_init_urb(struct urb *urb)
 {
     if (urb) {
         memset(urb, 0, sizeof(*urb));
+        kref_init(&urb->kref);
+        INIT_LIST_HEAD(&urb->urb_list);
+        INIT_LIST_HEAD(&urb->anchor_list);
     }
+}
+
+struct urb *usb_get_urb(struct urb *urb)
+{
+    if (urb) {
+        kref_get(&urb->kref);
+    }
+    return urb;
 }
 
 struct urb * usb_alloc_urb(int iso_packets, gfp_t flags)
@@ -205,9 +304,20 @@ struct urb * usb_alloc_urb(int iso_packets, gfp_t flags)
     return urb;
 }
 
+static void urb_destroy(struct kref *kref)
+{
+    struct urb *urb = container_of(kref, struct urb, kref);
+    if (urb->transfer_flags & URB_FREE_BUFFER) {
+        vsf_usbh_free(urb->transfer_buffer);
+    }
+    vsf_usbh_free(urb);
+}
+
 void usb_free_urb(struct urb *urb)
 {
-    vk_usbh_free_urb(__usbdrv_host, &urb->__urb);
+    if (urb) {
+        kref_put(&urb->kref, urb_destroy);
+    }
 }
 
 int usb_submit_urb(struct urb *urb, gfp_t flags)
@@ -227,6 +337,7 @@ int usb_submit_urb(struct urb *urb, gfp_t flags)
 int usb_unlink_urb(struct urb *urb)
 {
     vk_usbh_free_urb(__usbdrv_host, &urb->__urb);
+    return 0;
 }
 
 void usb_kill_urb(struct urb *urb)
@@ -259,12 +370,14 @@ int usb_control_msg(struct usb_device *udev, unsigned int pipe, __u8 request, __
 
 int usb_control_msg_send(struct usb_device *udev, __u8 endpoint, __u8 request, __u8 requesttype, __u16 value, __u16 index, const void *data, __u16 size, int timeout, gfp_t memflags)
 {
-    int ret = usb_control_msg(udev, usb_sndctrlpipe(udev, endpoint), request, requesttype, value, index, data, size, timeout);
+    int ret = usb_control_msg(udev, usb_sndctrlpipe(udev, endpoint), request, requesttype, value, index, (void *)data, size, timeout);
     return ret < 0 ? ret : 0;
 }
 
 int usb_control_msg_recv(struct usb_device *udev, __u8 endpoint, __u8 request, __u8 requesttype, __u16 value, __u16 index, void *data, __u16 size, int timeout, gfp_t memflags)
 {
+    int ret = usb_control_msg(udev, usb_rcvctrlpipe(udev, endpoint), request, requesttype, value, index, (void *)data, size, timeout);
+    return ret < 0 ? ret : 0;
 }
 
 int usb_interrupt_msg(struct usb_device *udev, unsigned int pipe, void *data, int len, int *actual_length, int timeout)
@@ -296,8 +409,8 @@ int usb_bulk_msg(struct usb_device *udev, unsigned int pipe, void *data, int len
 
 int usb_reset_device(struct usb_device *udev)
 {
-    vk_usbh_reset_dev(udev->__host, &udev->__dev);
-    while (vk_usbh_is_dev_resetting(udev->__host, &udev->__dev)) {
+    vk_usbh_reset_dev(udev->__host, udev->__dev);
+    while (vk_usbh_is_dev_resetting(udev->__host, udev->__dev)) {
         usleep(20);
     }
     return 0;
