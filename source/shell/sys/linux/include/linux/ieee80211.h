@@ -75,6 +75,12 @@ extern "C" {
 #define IEEE80211_STYPE_DMG_BEACON      0x0000
 #define IEEE80211_STYPE_S1G_BEACON      0x0010
 
+#define IEEE80211_S1G_BCN_NEXT_TBTT     0x100
+
+#define IEEE80211_QOS_CTL_LEN           2
+
+#define IEEE80211_HT_CTL_LEN            4
+
 enum ieee80211_min_mpdu_spacing {
     IEEE80211_HT_MPDU_DENSITY_NONE      = 0,    /* No restriction */
     IEEE80211_HT_MPDU_DENSITY_0_25      = 1,    /* 1/4 usec */
@@ -400,6 +406,213 @@ struct ieee80211_mgmt {
         } __packed action;
     } u;
 } __packed __aligned(2);
+
+static inline bool ieee80211_has_tods(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_TODS)) != 0;
+}
+static inline bool ieee80211_has_fromds(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FROMDS)) != 0;
+}
+static inline bool ieee80211_has_a4(__le16 fc)
+{
+    __le16 tmp = cpu_to_le16(IEEE80211_FCTL_TODS | IEEE80211_FCTL_FROMDS);
+    return (fc & tmp) == tmp;
+}
+static inline bool ieee80211_has_morefrags(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_MOREFRAGS)) != 0;
+}
+static inline bool ieee80211_has_retry(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_RETRY)) != 0;
+}
+static inline bool ieee80211_has_pm(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_PM)) != 0;
+}
+static inline bool ieee80211_has_moredata(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_MOREDATA)) != 0;
+}
+static inline bool ieee80211_has_protected(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_PROTECTED)) != 0;
+}
+static inline bool ieee80211_has_order(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_ORDER)) != 0;
+}
+static inline bool ieee80211_is_mgmt(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE)) == cpu_to_le16(IEEE80211_FTYPE_MGMT);
+}
+static inline bool ieee80211_is_ctl(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE)) == cpu_to_le16(IEEE80211_FTYPE_CTL);
+}
+static inline bool ieee80211_is_data(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE)) == cpu_to_le16(IEEE80211_FTYPE_DATA);
+}
+static inline bool ieee80211_is_ext(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE)) == cpu_to_le16(IEEE80211_FTYPE_EXT);
+}
+static inline bool ieee80211_is_data_qos(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_STYPE_QOS_DATA)) ==
+            cpu_to_le16(IEEE80211_FTYPE_DATA | IEEE80211_STYPE_QOS_DATA);
+}
+static inline bool ieee80211_is_data_present(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | 0x40)) == cpu_to_le16(IEEE80211_FTYPE_DATA);
+}
+static inline bool ieee80211_is_assoc_req(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_ASSOC_REQ);
+}
+static inline bool ieee80211_is_assoc_resp(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_ASSOC_RESP);
+}
+static inline bool ieee80211_is_reassoc_req(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_REASSOC_REQ);
+}
+static inline bool ieee80211_is_reassoc_resp(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_REASSOC_RESP);
+}
+static inline bool ieee80211_is_probe_req(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_PROBE_REQ);
+}
+static inline bool ieee80211_is_probe_resp(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_PROBE_RESP);
+}
+static inline bool ieee80211_is_beacon(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_BEACON);
+}
+static inline bool ieee80211_is_s1g_beacon(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_EXT | IEEE80211_STYPE_S1G_BEACON);
+}
+static inline bool ieee80211_next_tbtt_present(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_EXT | IEEE80211_STYPE_S1G_BEACON) &&
+            fc & cpu_to_le16(IEEE80211_S1G_BCN_NEXT_TBTT);
+}
+static inline bool ieee80211_is_s1g_short_beacon(__le16 fc)
+{
+    return ieee80211_is_s1g_beacon(fc) && ieee80211_next_tbtt_present(fc);
+}
+static inline bool ieee80211_is_atim(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_ATIM);
+}
+static inline bool ieee80211_is_disassoc(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_DISASSOC);
+}
+static inline bool ieee80211_is_auth(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_AUTH);
+}
+static inline bool ieee80211_is_deauth(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_DEAUTH);
+}
+static inline bool ieee80211_is_action(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_ACTION);
+}
+static inline bool ieee80211_is_back_req(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_BACK_REQ);
+}
+static inline bool ieee80211_is_back(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_BACK);
+}
+static inline bool ieee80211_is_pspoll(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_PSPOLL);
+}
+static inline bool ieee80211_is_rts(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_RTS);
+}
+static inline bool ieee80211_is_cts(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_CTS);
+}
+static inline bool ieee80211_is_ack(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_ACK);
+}
+static inline bool ieee80211_is_cfend(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_CFEND);
+}
+static inline bool ieee80211_is_cfendack(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_CFENDACK);
+}
+static inline bool ieee80211_is_nullfunc(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_DATA | IEEE80211_STYPE_NULLFUNC);
+}
+static inline bool ieee80211_is_qos_nullfunc(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_DATA | IEEE80211_STYPE_QOS_NULLFUNC);
+}
+static inline bool ieee80211_is_trigger(__le16 fc)
+{
+    return (fc & cpu_to_le16(IEEE80211_FCTL_FTYPE | IEEE80211_FCTL_STYPE)) ==
+            cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_TRIGGER);
+}
+static inline bool ieee80211_is_any_nullfunc(__le16 fc)
+{
+    return (ieee80211_is_nullfunc(fc) || ieee80211_is_qos_nullfunc(fc));
+}
+static inline bool ieee80211_is_bufferable_mmpdu(__le16 fc)
+{
+    return ieee80211_is_mgmt(fc) && (ieee80211_is_action(fc) || ieee80211_is_disassoc(fc) || ieee80211_is_deauth(fc));
+}
+static inline bool ieee80211_is_first_frag(__le16 seq_ctrl)
+{
+    return (seq_ctrl & cpu_to_le16(IEEE80211_SCTL_FRAG)) == 0;
+}
+
+extern unsigned int ieee80211_get_hdrlen_from_skb(const struct sk_buff *skb);
 
 #ifdef __cplusplus
 }

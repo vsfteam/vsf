@@ -136,6 +136,26 @@ static inline int skb_tailroom(const struct sk_buff *skb)
     return skb->end - skb->tail;
 }
 
+static inline void skb_trim(struct sk_buff *skb, unsigned int len)
+{
+    if (skb->len > len) {
+        skb->len = len;
+        skb_set_tail_pointer(skb, len);
+    }
+}
+
+static inline struct sk_buff * netdev_alloc_skb(struct net_device *dev, unsigned int length)
+{
+    return alloc_skb(length, GFP_KERNEL);
+}
+
+#define dev_kfree_skb(__skb)        consume_skb(__skb)
+#define dev_consume_skb_any(__skb)  consume_skb(__skb)
+static inline struct sk_buff * dev_alloc_skb(unsigned int length)
+{
+    return netdev_alloc_skb(NULL, length);
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -424,7 +424,7 @@ bool cancel_delayed_work_sync(struct delayed_work *dwork)
 int autoremove_wake_function(struct wait_queue_entry *wqe, unsigned mode, int sync, void *key)
 {
     list_del_init(&wqe->entry);
-	return 1;
+    return 1;
 }
 
 long prepare_to_wait_event(struct wait_queue_head *wqh, struct wait_queue_entry *wqe, int state)
@@ -852,6 +852,65 @@ struct power_supply * devm_power_supply_register(struct device *parent,
                 const struct power_supply_config *cfg)
 {
     return NULL;
+}
+
+/*******************************************************************************
+* ieee80211, TODO: move to a dedicated ieee80211 source file                   *
+*******************************************************************************/
+
+#include <linux/ieee80211.h>
+
+unsigned int ieee80211_hdrlen(__le16 fc)
+{
+    unsigned int hdrlen = 24;
+
+    if (ieee80211_is_ext(fc)) {
+        return 4;
+    }
+
+    if (ieee80211_is_data(fc)) {
+        if (ieee80211_has_a4(fc)) {
+            hdrlen = 30;
+        }
+        if (ieee80211_is_data_qos(fc)) {
+            hdrlen += IEEE80211_QOS_CTL_LEN;
+            if (ieee80211_has_order(fc))
+                hdrlen += IEEE80211_HT_CTL_LEN;
+        }
+        return hdrlen;
+    }
+
+    if (ieee80211_is_mgmt(fc)) {
+        if (ieee80211_has_order(fc)) {
+            hdrlen += IEEE80211_HT_CTL_LEN;
+        }
+        return hdrlen;
+    }
+
+    if (ieee80211_is_ctl(fc)) {
+        if ((fc & cpu_to_le16(0x00E0)) == cpu_to_le16(0x00C0)) {
+            return 10;
+        } else {
+            return 16;
+        }
+    }
+
+    return hdrlen;
+}
+
+unsigned int ieee80211_get_hdrlen_from_skb(const struct sk_buff *skb)
+{
+    const struct ieee80211_hdr *hdr = (const struct ieee80211_hdr *)skb->data;
+    unsigned int hdrlen;
+
+    if (skb->len < 10) {
+        return 0;
+    }
+    hdrlen = ieee80211_hdrlen(hdr->frame_control);
+    if (hdrlen > skb->len) {
+        return 0;
+    }
+    return hdrlen;
 }
 
 #endif
