@@ -210,6 +210,7 @@ void usb_register_driver(struct usb_driver *drv, struct module *mod, const char 
     const struct usb_device_id *ids = adapter->vsf_drv.dev_ids = drv->id_table;
     adapter->vsf_drv.dev_id_num = 0;
     while (ids->match_flags != 0) {
+        ids++;
         adapter->vsf_drv.dev_id_num++;
     }
     adapter->vsf_drv.name = drv->name;
