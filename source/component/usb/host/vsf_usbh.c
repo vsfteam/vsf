@@ -923,6 +923,7 @@ __vk_usbh_match_interface_driver(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser,
             for (uint_fast8_t i = 0; i < ifs->num_of_alt; i++) {
                 ifs->cur_alt = i;
                 if (__vk_usbh_match_id(parser, parser_ifs, dev_id)) {
+                    parser_ifs->id = dev_id;
                     goto end;
                 }
             }
@@ -944,15 +945,18 @@ static vsf_err_t __vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
         c = __vk_usbh_match_interface_driver(usbh, parser, parser_ifs, c);
         if (c != NULL) {
             const vk_usbh_class_drv_t *drv = c->drv;
+            ifs->drv = drv;
             param = drv->probe(usbh, usbh->dev_new, parser_ifs);
             if (param != NULL) {
                 ifs->param = param;
-                ifs->drv = drv;
                 if (VSF_ERR_NONE != vsf_usbh_on_match_interface(parser, parser_ifs)) {
                     drv->disconnect(usbh, usbh->dev_new, param);
+                    ifs->drv = NULL;
                     continue;
                 }
                 return VSF_ERR_NONE;
+            } else {
+                ifs->drv = NULL;
             }
         }
     } while (c != NULL);
@@ -1301,6 +1305,16 @@ vsf_err_t vk_usbh_fini(vk_usbh_t *usbh)
 {
     // TODO
     return VSF_ERR_NONE;
+}
+
+void vk_usbh_unregister_class(vk_usbh_t *usbh, vk_usbh_class_t *c)
+{
+    __vsf_slist_foreach_next_unsafe(vk_usbh_class_t, node, &usbh->class_list) {
+        if (_ == c) {
+            vsf_slist_set_next(vk_usbh_class_t, node, __, (vk_usbh_class_t *)_->node.next);
+            break;
+        }
+    }
 }
 
 void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *c)

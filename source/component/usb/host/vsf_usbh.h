@@ -180,39 +180,6 @@ typedef struct vk_usbh_ifs_t {
     uint8_t cur_alt;
 } vk_usbh_ifs_t;
 
-typedef struct vk_usbh_ifs_alt_parser_t {
-    struct usb_interface_desc_t *desc_ifs;
-    struct usb_endpoint_desc_t *desc_ep;
-    uint16_t desc_size;
-    uint8_t num_of_ep;
-} vk_usbh_ifs_alt_parser_t;
-
-typedef struct vk_usbh_ifs_parser_t {
-    vk_usbh_ifs_alt_parser_t *parser_alt;
-    vk_usbh_ifs_t *ifs;
-} vk_usbh_ifs_parser_t;
-
-typedef struct vk_usbh_dev_parser_t {
-    struct usb_device_desc_t *desc_device;
-    struct usb_config_desc_t *desc_config;
-    vk_usbh_ifs_parser_t *parser_ifs;
-    uint8_t num_of_ifs;
-    uint8_t devnum_temp;
-    uint8_t is_to_retry             : 1;
-    uint8_t no_set_configuration    : 1;
-    enum {
-        VSF_USBH_PROBE_START,
-        VSF_USBH_PROBE_WAIT_DEVICE_DESC,
-        VSF_USBH_PROBE_WAIT_DEVICE_RESET = VSF_USBH_PROBE_WAIT_DEVICE_DESC,
-        VSF_USBH_PROBE_WAIT_SET_ADDRESS,
-        VSF_USBH_PROBE_WAIT_ADDRESS_STABLE,
-        VSF_USBH_PROBE_WAIT_FULL_DEVICE_DESC,
-        VSF_USBH_PROBE_WAIT_CONFIG_DESC_SIZE,
-        VSF_USBH_PROBE_WAIT_FULL_CONFIG_DESC,
-        VSF_USBH_PROBE_WAIT_SET_CONFIG,
-    } probe_state;
-} vk_usbh_dev_parser_t;
-
 typedef struct vk_usbh_dev_id_t {
     union {
         struct {
@@ -245,6 +212,40 @@ typedef struct vk_usbh_dev_id_t {
     uint8_t bInterfaceNumber;
     //uint32_t driver_info;
 } vk_usbh_dev_id_t;
+
+typedef struct vk_usbh_ifs_alt_parser_t {
+    struct usb_interface_desc_t *desc_ifs;
+    struct usb_endpoint_desc_t *desc_ep;
+    uint16_t desc_size;
+    uint8_t num_of_ep;
+} vk_usbh_ifs_alt_parser_t;
+
+typedef struct vk_usbh_ifs_parser_t {
+    vk_usbh_ifs_alt_parser_t *parser_alt;
+    vk_usbh_ifs_t *ifs;
+    const vk_usbh_dev_id_t *id;
+} vk_usbh_ifs_parser_t;
+
+typedef struct vk_usbh_dev_parser_t {
+    struct usb_device_desc_t *desc_device;
+    struct usb_config_desc_t *desc_config;
+    vk_usbh_ifs_parser_t *parser_ifs;
+    uint8_t num_of_ifs;
+    uint8_t devnum_temp;
+    uint8_t is_to_retry             : 1;
+    uint8_t no_set_configuration    : 1;
+    enum {
+        VSF_USBH_PROBE_START,
+        VSF_USBH_PROBE_WAIT_DEVICE_DESC,
+        VSF_USBH_PROBE_WAIT_DEVICE_RESET = VSF_USBH_PROBE_WAIT_DEVICE_DESC,
+        VSF_USBH_PROBE_WAIT_SET_ADDRESS,
+        VSF_USBH_PROBE_WAIT_ADDRESS_STABLE,
+        VSF_USBH_PROBE_WAIT_FULL_DEVICE_DESC,
+        VSF_USBH_PROBE_WAIT_CONFIG_DESC_SIZE,
+        VSF_USBH_PROBE_WAIT_FULL_CONFIG_DESC,
+        VSF_USBH_PROBE_WAIT_SET_CONFIG,
+    } probe_state;
+} vk_usbh_dev_parser_t;
 
 #ifdef __cplusplus
 }
@@ -535,6 +536,7 @@ vsf_class(vk_usbh_t) {
 extern vsf_err_t vk_usbh_init(vk_usbh_t *usbh);
 extern vsf_err_t vk_usbh_fini(vk_usbh_t *usbh);
 extern void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *c);
+extern void vk_usbh_unregister_class(vk_usbh_t *usbh, vk_usbh_class_t *c);
 
 #if defined(__VSF_USBH_CLASS_IMPLEMENT) || defined(__VSF_USBH_CLASS_IMPLEMENT_HCD__)
 // APIs to be called by hcd drivers
