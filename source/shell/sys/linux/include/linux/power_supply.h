@@ -1,6 +1,8 @@
 #ifndef __VSF_LINUX_POWER_SUPPLY_H__
 #define __VSF_LINUX_POWER_SUPPLY_H__
 
+#include <linux/device.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

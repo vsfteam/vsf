@@ -19,6 +19,11 @@ static inline void * kmalloc(size_t size, gfp_t flags)
     return buff;
 }
 
+static inline void * krealloc(const void *buff, size_t new_size, gfp_t flags)
+{
+    return vsf_heap_realloc((void *)buff, new_size);
+}
+
 static inline void * kzalloc(size_t size, gfp_t flags)
 {
     return kmalloc(size, flags | __GFP_ZERO);

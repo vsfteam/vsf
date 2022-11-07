@@ -29,6 +29,10 @@ struct bus_type {
     const struct dev_pm_ops         *pm;
 };
 
+extern int bus_register(struct bus_type *bus);
+extern void bus_unregister(struct bus_type *bus);
+extern int bus_rescan_devices(struct bus_type *bus);
+
 #ifdef __cplusplus
 }
 #endif

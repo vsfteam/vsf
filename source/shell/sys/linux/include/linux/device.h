@@ -4,6 +4,7 @@
 #include <linux/kobject.h>
 #include <linux/types.h>
 #include <linux/mutex.h>
+#include <linux/slab.h>
 #include <linux/sysfs.h>
 
 #include <linux/device/bus.h>
@@ -74,7 +75,27 @@ static inline void dev_set_drvdata(struct device *dev, void *data)
 #define dev_notice(__dev, __fmt, ...)       pr_notice(__fmt, ##__VA_ARGS__)
 #define dev_info(__dev, __fmt, ...)         pr_info(__fmt, ##__VA_ARGS__)
 
+#define dev_level_once(__level, __dev, __fmt, ...)                              \
+        do {                                                                    \
+            static bool __printed = false;                                      \
+            if (!__printed) {                                                   \
+                __printed = true;                                               \
+                __level(__dev, __fmt, ##__VA_ARGS__);                           \
+            }                                                                   \
+        } while (0)
+#define dev_dbg_once(__dev, __fmt, ...)     dev_level_once(dev_dbg, __dev, __fmt, ##__VA_ARGS__)
+#define dev_emerg_once(__dev, __fmt, ...)   dev_level_once(dev_emerg, __dev, __fmt, ##__VA_ARGS__)
+#define dev_crit_once(__dev, __fmt, ...)    dev_level_once(dev_crit, __dev, __fmt, ##__VA_ARGS__)
+#define dev_alert_once(__dev, __fmt, ...)   dev_level_once(dev_alert, __dev, __fmt, ##__VA_ARGS__)
+#define dev_err_once(__dev, __fmt, ...)     dev_level_once(dev_err, __dev, __fmt, ##__VA_ARGS__)
+#define dev_warn_once(__dev, __fmt, ...)    dev_level_once(dev_warn, __dev, __fmt, ##__VA_ARGS__)
+#define dev_notice_once(__dev, __fmt, ...)  dev_level_once(dev_notice, __dev, __fmt, ##__VA_ARGS__)
+#define dev_info_once(__dev, __fmt, ...)    dev_level_once(dev_info, __dev, __fmt, ##__VA_ARGS__)
+
 extern int dev_set_name(struct device *dev, const char *fmt, ...);
+
+#define device_wakeup_enable(__dev)
+#define device_wakeup_disable(__dev)
 
 static inline int device_is_registered(struct device *dev)
 {
@@ -85,6 +106,23 @@ extern void device_unregister(struct device *dev);
 extern void device_initialize(struct device *dev);
 extern int device_add(struct device *dev);
 extern void device_del(struct device *dev);
+
+static inline void * devm_kmalloc(struct device *dev, size_t size, gfp_t gfp)
+{
+    return kmalloc(size, gfp);
+}
+static inline void * devm_krealloc(struct device *dev, void *ptr, size_t size, gfp_t gfp)
+{
+    return krealloc(ptr, size, gfp);
+}
+static inline void *devm_kzalloc(struct device *dev, size_t size, gfp_t gfp)
+{
+    return devm_kmalloc(dev, size, gfp | __GFP_ZERO);
+}
+static inline void devm_kfree(struct device *dev, const void *p)
+{
+    return kfree(p);
+}
 
 extern char * devm_kvasprintf(struct device *dev, gfp_t gfp, const char *fmt, va_list ap);
 extern char * devm_kasprintf(struct device *dev, gfp_t gfp, const char *fmt, ...);

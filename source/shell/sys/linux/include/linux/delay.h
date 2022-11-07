@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-static inline msleep(unsigned int msecs)
+static inline void msleep(unsigned int msecs)
 {
     vsf_thread_delay_ms(msecs);
 }
 
-static inline usleep_range(unsigned long min, unsigned long max)
+static inline void usleep_range(unsigned long min, unsigned long max)
 {
     vsf_thread_delay_us(min);
 }

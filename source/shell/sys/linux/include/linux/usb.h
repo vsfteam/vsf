@@ -1,14 +1,13 @@
 #ifndef __VSF_LINUX_USB_H__
 #define __VSF_LINUX_USB_H__
 
-#define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #include "component/usb/vsf_usb.h"
 #include <linux/types.h>
 #include <linux/list.h>
 #include <linux/wait.h>
 #include <linux/device.h>
 #include <linux/pm.h>
-#include <linux/module.h>
+#include <linux/jiffies.h>
 
 #include <linux/usb/ch9.h>
 
@@ -16,7 +15,13 @@
 extern "C" {
 #endif
 
-#define module_usb_driver(__usb_driver)
+#define module_usb_driver(__usb_driver)                                         \
+            void __usb_driver ## _register(void) {                              \
+                usb_register(&__usb_driver);                                    \
+            }
+#define module_usb_driver_register(__usb_driver)                                \
+            extern void __usb_driver ## _register(void);                        \
+            __usb_driver ## _register()
 
 #define USB_DEVICE_ID_MATCH_VENDOR          VSF_USBH_MATCH_FLAGS_VENDOR
 #define USB_DEVICE_ID_MATCH_PRODUCT         VSF_USBH_MATCH_FLAGS_PRODUCT
@@ -68,6 +73,16 @@ struct usb_interface {
 
     unsigned needs_remote_wakeup    : 1;
 };
+#define	to_usb_interface(__d)       container_of(__d, struct usb_interface, dev)
+static inline void *usb_get_intfdata(struct usb_interface *intf)
+{
+	return dev_get_drvdata(&intf->dev);
+}
+
+static inline void usb_set_intfdata(struct usb_interface *intf, void *data)
+{
+	dev_set_drvdata(&intf->dev, data);
+}
 
 struct usb_anchor {
     struct list_head                urb_list;
@@ -95,6 +110,11 @@ struct usb_device {
 
     struct device                   dev;
 };
+#define	to_usb_device(__d)          container_of(__d, struct usb_device, dev)
+static inline struct usb_device * interface_to_usbdev(struct usb_interface *intf)
+{
+	return to_usb_device(intf->dev.parent);
+}
 
 typedef void (*usb_complete_t)(struct urb *);
 struct urb {
@@ -153,9 +173,21 @@ struct usb_driver {
 
 #define usb_pipein(__pipe)          (((vk_usbh_pipe_flag_t)(__pipe)).dir_in1out0)
 #define usb_pipeout(__pipe)         (!usb_pipein(__pipe))
-#define usb_pipedevice(__pipe)      (((vk_usbh_pipe_flag_t)(__pipe)).address)
-#define usb_pipeendpoint(__pipe)    (((vk_usbh_pipe_flag_t)(__pipe)).endpoint)
-#define usb_pipetype(__pipe)        (((vk_usbh_pipe_flag_t)(__pipe)).type)
+#define usb_pipedevice(__pipe)      ({                                          \
+            vk_usbh_pipe_flag_t flag;                                           \
+            flag.value = (__pipe);                                              \
+            flag.address;                                                       \
+        })
+#define usb_pipeendpoint(__pipe)    ({                                          \
+            vk_usbh_pipe_flag_t flag;                                           \
+            flag.value = (__pipe);                                              \
+            flag.endpoint;                                                      \
+        })
+#define usb_pipetype(__pipe)        ({                                          \
+            vk_usbh_pipe_flag_t flag;                                           \
+            flag.value = (__pipe);                                              \
+            flag.type;                                                          \
+        })
 #define usb_pipeisoc(__pipe)        (usb_pipetype(__pipe) == PIPE_ISOCHRONOUS)
 #define usb_pipeint(__pipe)         (usb_pipetype(__pipe) == PIPE_INTERRUPT)
 #define usb_pipeCONTROL(__pipe)     (usb_pipetype(__pipe) == PIPE_CONTROL)
@@ -176,25 +208,40 @@ static inline struct usb_host_endpoint * usb_pipe_endpoint(struct usb_device *ud
     return eps[usb_pipeendpoint(pipe)];
 }
 
+extern int usb_reset_device(struct usb_device *udev);
+#define usb_enable_autosuspend(__udev)
+#define usb_disable_autosuspend(__udev)
+#define usb_autopm_get_interface(__udev)                0
+#define usb_autopm_set_interface(__udev)                0
+
+static inline void * usb_alloc_coherent(struct usb_device *dev, size_t size, gfp_t mem_flags, dma_addr_t *dma)
+{
+    return vsf_usbh_malloc(size);
+}
+static inline void usb_free_coherent(struct usb_device *dev, size_t size, void *addr, dma_addr_t *dma)
+{
+    vsf_usbh_free(addr);
+}
+
 extern void usb_init_urb(struct urb *urb);
 extern struct urb * usb_alloc_urb(int iso_packets, gfp_t flags);
 extern void usb_free_urb(struct urb *urb);
 extern int usb_submit_urb(struct urb *urb, gfp_t flags);
 extern int usb_unlink_urb(struct urb *urb);
-static inline int usb_urb_dir_in(struct urb *urb)
-{
-    return vk_usbh_urb_get_pipe(&urb->__urb).dir_in1out0;
-}
+extern void usb_kill_urb(struct urb *urb);
+extern int usb_urb_dir_in(struct urb *urb);
 static inline int usb_urb_dir_out(struct urb *urb)
 {
-    return !vk_usbh_urb_get_pipe(&urb->__urb).dir_in1out0;
+    return !usb_urb_dir_in(urb);
 }
 
 extern int usb_control_msg(struct usb_device *udev, unsigned int pipe, __u8 request, __u8 requesttype, __u16 value, __u16 index, void *data, __u16 size, int timeout);
+extern int usb_control_msg_send(struct usb_device *udev, __u8 endpoint, __u8 request, __u8 requesttype, __u16 value, __u16 index, const void *data, __u16 size, int timeout, gfp_t memflags);
+extern int usb_control_msg_recv(struct usb_device *udev, __u8 endpoint, __u8 request, __u8 requesttype, __u16 value, __u16 index, void *data, __u16 size, int timeout, gfp_t memflags);
 extern int usb_interrupt_msg(struct usb_device *udev, unsigned int pipe, void *data, int len, int *actual_length, int timeout);
 extern int usb_bulk_msg(struct usb_device *udev, unsigned int pipe, void *data, int len, int *actual_length, int timeout);
 
-extern int usb_get_descriptor(struct usb_device *udev, unsigned char desctype, unsigned char descindex, void *buf, int size);
+extern int usb_get_descriptor(struct usb_device *udev, unsigned char type, unsigned char index, void *buf, int size);
 extern int usb_get_status(struct usb_device *udev, int recip, int type, int target, void *data);
 static inline int usb_get_std_status(struct usb_device *udev, int recip, int target, void *data)
 {
@@ -206,6 +253,20 @@ extern int usb_reset_configuration(struct usb_device *udev);
 extern int usb_set_interface(struct usb_device *udev, int ifnum, int alternate);
 extern int usb_reset_endpoint(struct usb_device *udev, unsigned int epaddr);
 extern int usb_set_configuration(struct usb_device *dev, int configuration);
+
+extern void usb_register_driver(struct usb_driver *drv, struct module *mod, const char *name);
+extern void usb_deregister_driver(struct usb_driver *drv);
+#define usb_register(__drv)                         usb_register_driver((__drv), NULL, NULL)
+#define usb_deregister(__drv)                       usb_deregister_driver((__drv), NULL, NULL)
+
+extern int usb_driver_claim_interface(struct usb_driver *driver, struct usb_interface *iface, void *data);
+extern void usb_driver_release_interface(struct usb_driver *driver, struct usb_interface *iface);
+static inline int usb_interface_claimed(struct usb_interface *iface)
+{
+    return (iface->dev.driver != NULL);
+}
+
+extern void vsf_linux_usb_init(vk_usbh_t *usbh);
 
 #ifdef __cplusplus
 }

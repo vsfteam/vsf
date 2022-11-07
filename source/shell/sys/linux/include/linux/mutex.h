@@ -31,6 +31,10 @@ static inline void mutex_unlock(struct mutex *lock)
     vsf_eda_mutex_leave(&lock->mutex);
 }
 
+static inline void mutex_destroy(struct mutex *lock)
+{
+}
+
 #ifdef __cplusplus
 }
 #endif

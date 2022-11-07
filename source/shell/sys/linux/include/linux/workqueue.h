@@ -1,6 +1,7 @@
 #ifndef __VSF_LINUX_WORKQUEUE_H__
 #define __VSF_LINUX_WORKQUEUE_H__
 
+#include "kernel/vsf_kernel.h"
 #include <linux/list.h>
 
 #ifdef __cplusplus
@@ -12,8 +13,12 @@ struct work_struct;
 typedef void (*work_func_t)(struct work_struct *work);
 
 struct work_struct {
-    vsf_dlist_node_t entry;
-    work_func_t func;
+    vsf_dlist_node_t            entry;
+    work_func_t                 func;
+
+    struct workqueue_struct     *__wq;
+    bool                        __is_running;
+    vsf_eda_t                   *__pending_eda;
 };
 
 struct delayed_work {
@@ -29,11 +34,12 @@ extern bool queue_delayed_work(struct workqueue_struct *wq, struct delayed_work 
 extern bool queue_work(struct workqueue_struct *wq, struct work_struct *work);
 extern void flush_workqueue(struct workqueue_struct *wq);
 
-#define INIT_WORK(__work, __func)                                               \
+#define INIT_WORK(__WORK, __FUNC)                                               \
         do {                                                                    \
-            (__work)->func = (__func);                                          \
-            vsf_dlist_init_node(struct work_struct, entry, (__work));           \
+            (__WORK)->func = (__FUNC);                                          \
+            vsf_dlist_init_node(struct work_struct, entry, (__WORK));           \
         } while (0)
+#define INIT_DELAYED_WORK(__DWORK, __FUNC)  INIT_WORK(&(__DWORK)->work, (__FUNC))
 #define alloc_ordered_workqueue(__fmt, __flags, ...)                            \
         alloc_workqueue(__fmt, __flags, 1, ##__VA_ARGS__)
 #define create_singlethread_workqueue(__name)                                   \
@@ -41,6 +47,10 @@ extern void flush_workqueue(struct workqueue_struct *wq);
 #define create_workqueue(__name)                                                \
         alloc_workqueue("%s", 0, 1, (__name))
 
+static inline struct delayed_work *to_delayed_work(struct work_struct *work)
+{
+    return container_of(work, struct delayed_work, work);
+}
 static inline bool schedule_work(struct work_struct *work)
 {
     return queue_work(system_wq, work);
@@ -50,6 +60,14 @@ static inline bool schedule_delayed_work(struct delayed_work *dwork, unsigned lo
 {
     return queue_delayed_work(system_wq, dwork, delay);
 }
+
+extern bool flush_work(struct work_struct *work);
+extern bool cancel_work(struct work_struct *work);
+extern bool cancel_work_sync(struct work_struct *work);
+
+extern bool flush_delayed_work(struct delayed_work *dwork);
+extern bool cancel_delayed_work(struct delayed_work *dwork);
+extern bool cancel_delayed_work_sync(struct delayed_work *dwork);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,8 @@ typedef struct wait_queue_head {
     struct list_head        head;
 } wait_queue_head_t;
 
+extern void init_wait_queue_head(struct wait_queue_head *wqh);
+
 #ifdef __cplusplus
 }
 #endif

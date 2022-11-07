@@ -19,6 +19,8 @@ typedef struct pm_message {
     int event;
 } pm_message_t;
 
+#define pm_runtime_set_autosuspend_delay(__dev, __delay)
+
 #ifdef __cplusplus
 }
 #endif

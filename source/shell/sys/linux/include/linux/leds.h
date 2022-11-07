@@ -2,6 +2,7 @@
 #define __VSF_LINUX_LEDS_H__
 
 #include <linux/types.h>
+#include <linux/device.h>
 
 #ifdef __cplusplus
 extern "C" {

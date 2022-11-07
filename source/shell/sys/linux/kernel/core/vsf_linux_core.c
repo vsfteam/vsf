@@ -141,6 +141,7 @@ void kobject_del(struct kobject *kobj)
 
 int add_uevent_var(struct kobj_uevent_env *env, const char *format, ...)
 {
+    return -1;
 }
 
 /*******************************************************************************
@@ -160,6 +161,8 @@ struct workqueue_struct {
     vsf_linux_process_t             *process;
     bool                            is_to_exit;
 };
+
+struct workqueue_struct *system_wq;
 
 static int __workqueue_thread(int argc, char **argv)
 {
@@ -193,12 +196,28 @@ static int __workqueue_thread(int argc, char **argv)
         }
 
         while (true) {
+            mutex_lock(&wq->mutex);
             vsf_dlist_remove_head(struct work_struct, entry, &wq->work_list, u.work);
             if (NULL == u.work) {
+                mutex_unlock(&wq->mutex);
                 break;
             }
 
+            u.work->__is_running = true;
+            mutex_unlock(&wq->mutex);
+
             u.work->func(u.work);
+
+            vsf_eda_t *pending_eda;
+            mutex_lock(&wq->mutex);
+            u.work->__is_running = false;
+            pending_eda = u.work->__pending_eda;
+            mutex_unlock(&wq->mutex);
+
+            if (pending_eda != NULL) {
+                vsf_eda_post_evt(pending_eda, VSF_EVT_USER);
+            }
+            
         }
     }
     return 0;
@@ -220,11 +239,9 @@ struct workqueue_struct * alloc_workqueue(const char *fmt, unsigned int flags, i
     vsf_eda_sem_init(&wq->sem);
     wq->is_to_exit = false;
 
-    char * argv[] = {
-        (char *)wq,
-        NULL,
-    };
-    wq->process = vsf_linux_start_process_internal(__workqueue_thread, argv);
+    wq->process = vsf_linux_start_process_internal(__workqueue_thread);
+    wq->process->ctx.arg.argc = 1;
+    wq->process->ctx.arg.argv[0] = wq;
     if (NULL == wq->process) {
         kfree(wq);
         return NULL;
@@ -242,9 +259,11 @@ void destroy_workqueue(struct workqueue_struct *wq)
 
 bool queue_work(struct workqueue_struct *wq, struct work_struct *work)
 {
+    VSF_LINUX_ASSERT((wq != NULL) && (work != NULL));
     if (vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, work)) {
         return false;
     } else {
+        work->__wq = wq;
         mutex_lock(&wq->mutex);
             vsf_dlist_add_to_tail(struct work_struct, entry, &wq->work_list, work);
         mutex_unlock(&wq->mutex);
@@ -255,11 +274,13 @@ bool queue_work(struct workqueue_struct *wq, struct work_struct *work)
 
 bool queue_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, unsigned long delay)
 {
+    VSF_LINUX_ASSERT((wq != NULL) && (dwork != NULL));
     if (0 == delay) {
         return queue_work(wq, &dwork->work);
     } else if (vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, &dwork->work)) {
         return false;
     } else {
+        dwork->work.__wq = wq;
         dwork->start_tick = vsf_systimer_get_tick() + delay;
         mutex_lock(&wq->mutex);
             vsf_dlist_insert(struct work_struct, entry, &wq->dwork_list, &dwork->work,
@@ -285,6 +306,99 @@ void flush_workqueue(struct workqueue_struct *wq)
     if (eda != NULL) {
         vsf_thread_wfe(VSF_EVT_USER);
     }
+}
+
+bool flush_work(struct work_struct *work)
+{
+}
+
+// __queue_cancel_work MUST be called locked
+static bool __queue_cancel_work(struct workqueue_struct *wq, struct work_struct *work, bool is_to_wait)
+{
+    vsf_eda_t *eda_cur = vsf_eda_get_cur();
+    if (vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, work)) {
+        vsf_dlist_remove(struct work_struct, entry, &wq->work_list, work);
+        mutex_unlock(&wq->mutex);
+        return true;
+    } else if (is_to_wait && work->__is_running) {
+        work->__pending_eda = eda_cur;
+        mutex_unlock(&wq->mutex);
+        vsf_thread_wfe(VSF_EVT_USER);
+        return true;
+    } else {
+        mutex_unlock(&wq->mutex);
+        return false;
+    }
+}
+
+static bool __queue_cancel_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, bool is_to_wait)
+{
+    if (vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, &dwork->work)) {
+        vsf_dlist_remove(struct work_struct, entry, &wq->dwork_list, &dwork->work);
+        mutex_unlock(&wq->mutex);
+        return true;
+    } else {
+        return __queue_cancel_work(wq, &dwork->work, is_to_wait);
+    }
+}
+
+bool cancel_work(struct work_struct *work)
+{
+    struct workqueue_struct *wq = work->__wq;
+    if (NULL == wq) {
+        return false;
+    }
+
+    mutex_lock(&wq->mutex);
+    return __queue_cancel_work(wq, work, false);
+}
+
+bool cancel_work_sync(struct work_struct *work)
+{
+    struct workqueue_struct *wq = work->__wq;
+    if (NULL == wq) {
+        return false;
+    }
+
+    mutex_lock(&wq->mutex);
+    return __queue_cancel_work(wq, work, true);
+    
+}
+
+bool flush_delayed_work(struct delayed_work *dwork)
+{
+}
+
+bool cancel_delayed_work(struct delayed_work *dwork)
+{
+    struct workqueue_struct *wq = dwork->work.__wq;
+    if (NULL == wq) {
+        return false;
+    }
+
+    mutex_lock(&wq->mutex);
+    return __queue_cancel_delayed_work(wq, dwork, false);
+}
+
+bool cancel_delayed_work_sync(struct delayed_work *dwork)
+{
+    struct workqueue_struct *wq = dwork->work.__wq;
+    if (NULL == wq) {
+        return false;
+    }
+
+    mutex_lock(&wq->mutex);
+    return __queue_cancel_delayed_work(wq, dwork, true);
+}
+
+/*******************************************************************************
+* linux/wait.h                                                                 *
+*******************************************************************************/
+
+void init_wait_queue_head(struct wait_queue_head *wqh)
+{
+    spin_lock_init(&wqh->lock);
+    INIT_LIST_HEAD(&wqh->head);
 }
 
 /*******************************************************************************
@@ -325,7 +439,6 @@ void device_initialize(struct device *dev)
 int device_add(struct device *dev)
 {
     struct device *parent;
-    struct kobject *kobj;
     VSF_LINUX_ASSERT(dev != NULL);
 
     dev = get_device(dev);
@@ -375,6 +488,20 @@ void driver_unregister(struct device_driver *drv)
 {
 }
 
+int bus_register(struct bus_type *bus)
+{
+    return 0;
+}
+
+void bus_unregister(struct bus_type *bus)
+{
+}
+
+int bus_rescan_devices(struct bus_type *bus)
+{
+    return 0;
+}
+
 /*******************************************************************************
 * linux/firmware.h                                                             *
 *******************************************************************************/
@@ -421,7 +548,7 @@ int request_firmware(const struct firmware **fw, const char *name, struct device
         return -1;
     }
 
-    return vsf_linux_firmware_read(*fw, name);
+    return vsf_linux_firmware_read((struct firmware *)*fw, name);
 }
 
 void release_firmware(const struct firmware *fw)
@@ -438,6 +565,7 @@ struct power_supply * power_supply_register(struct device *parent,
                 const struct power_supply_desc *desc,
                 const struct power_supply_config *cfg)
 {
+    return NULL;
 }
 
 void power_supply_unregister(struct power_supply *psy)
@@ -446,10 +574,12 @@ void power_supply_unregister(struct power_supply *psy)
 
 int power_supply_powers(struct power_supply *psy, struct device *dev)
 {
+    return -1;
 }
 
 void * power_supply_get_drvdata(struct power_supply *psy)
 {
+    return NULL;
 }
 
 void power_supply_changed(struct power_supply *psy)
@@ -462,10 +592,12 @@ void power_supply_changed(struct power_supply *psy)
 
 struct input_dev * input_allocate_device(void)
 {
+    return NULL;
 }
 
-struct input_dev * devm_input_allocate_device(struct device *)
+struct input_dev * devm_input_allocate_device(struct device *dev)
 {
+    return NULL;
 }
 
 void input_free_device(struct input_dev *dev)
@@ -478,17 +610,19 @@ void input_free_device(struct input_dev *dev)
 
 int devm_led_classdev_register(struct device *parent, struct led_classdev *led_cdev)
 {
+    return -1;
 }
 
 /*******************************************************************************
 * linux/idr.h                                                                  *
 *******************************************************************************/
 
-int ida_alloc_range(struct ida *, unsigned int min, unsigned int max, gfp_t)
+int ida_alloc_range(struct ida *ida, unsigned int min, unsigned int max, gfp_t gfp)
 {
+    return -1;
 }
 
-void ida_free(struct ida *, unsigned int id)
+void ida_free(struct ida *ida, unsigned int id)
 {
 }
 
@@ -627,6 +761,7 @@ struct power_supply * devm_power_supply_register(struct device *parent,
                 const struct power_supply_desc *desc,
                 const struct power_supply_config *cfg)
 {
+    return NULL;
 }
 
 #endif

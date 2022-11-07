@@ -25,15 +25,214 @@
 #include <unistd.h>
 
 #include <linux/types.h>
+#include <linux/slab.h>
 #include <linux/usb.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+struct usb_driver_adapter_vsf {
+    vsf_dlist_node_t node;
+    vk_usbh_class_drv_t vsf_drv;
+    struct usb_driver *linux_drv;
+};
+
+typedef struct vsf_usbh_adapter_linux_t {
+    vk_usbh_dev_id_t *id;
+
+    struct usb_device device;
+    struct usb_interface ifs;
+    struct work_struct probe_work;
+    struct work_struct disconnect_work;
+    struct usb_driver *linux_drv;
+} vsf_usbh_adapter_linux_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static vk_usbh_t *__usbdrv_host;
+static vsf_dlist_t __usbdrv_list;
+
 /*============================ IMPLEMENTATION ================================*/
+
+extern int usb_urb_dir_in(struct urb *urb)
+{
+    vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb->__urb);
+    return pipe.use_as__vk_usbh_pipe_flag_t.dir_in1out0;
+}
+
+void vsf_linux_usb_init(vk_usbh_t *usbh)
+{
+    __usbdrv_host = usbh;
+}
+
+static void __vsf_linux_usb_probe_work(struct work_struct *work)
+{
+    vsf_usbh_adapter_linux_t *usbh_linux = container_of(work, vsf_usbh_adapter_linux_t, probe_work);
+    if (usbh_linux->linux_drv->probe != NULL) {
+        usbh_linux->linux_drv->probe(&usbh_linux->ifs, usbh_linux->id);
+    }
+}
+
+static void __vsf_linux_usb_disconnect_work(struct work_struct *work)
+{
+    vsf_usbh_adapter_linux_t *usbh_linux = container_of(work, vsf_usbh_adapter_linux_t, probe_work);
+    if (usbh_linux->linux_drv->disconnect != NULL) {
+        usbh_linux->linux_drv->disconnect(&usbh_linux->ifs);
+    }
+}
+
+static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
+{
+    vk_usbh_ifs_t *ifs = parser_ifs->ifs;
+    struct usb_driver_adapter_vsf *adapter = container_of(ifs->drv, struct usb_driver_adapter_vsf, vsf_drv);
+    vsf_usbh_adapter_linux_t *usbh_linux = vsf_usbh_malloc(sizeof(*usbh_linux));
+    if (NULL == usbh_linux) {
+        return NULL;
+    }
+
+    usbh_linux->id = (vk_usbh_dev_id_t *)parser_ifs->id;
+    usbh_linux->device.__host = usbh;
+    usbh_linux->device.__dev = dev;
+    usbh_linux->ifs.dev.parent = &usbh_linux->device.dev;
+
+    usbh_linux->linux_drv = adapter->linux_drv;
+
+    ifs->param = usbh_linux;
+    INIT_WORK(&usbh_linux->probe_work, __vsf_linux_usb_probe_work);
+    schedule_work(&usbh_linux->probe_work);
+    return usbh_linux;
+}
+
+static void __usb_linux_usb_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
+{
+    vsf_usbh_adapter_linux_t *usbh_linux = param;
+    INIT_WORK(&usbh_linux->disconnect_work, __vsf_linux_usb_disconnect_work);
+    schedule_work(&usbh_linux->disconnect_work);
+}
+
+void usb_register_driver(struct usb_driver *drv, struct module *mod, const char *name)
+{
+    struct usb_driver_adapter_vsf *adapter = kzalloc(sizeof(*adapter), GFP_KERNEL);
+    VSF_LINUX_ASSERT(adapter != NULL);
+
+    vsf_dlist_init_node(struct usb_driver_adapter_vsf, node, adapter);
+    adapter->linux_drv = drv;
+
+    struct usb_device_id *ids = adapter->vsf_drv.dev_ids = drv->id_table;;
+    adapter->vsf_drv.dev_id_num = 0;
+    while (ids->match_flags != 0) {
+        adapter->vsf_drv.dev_id_num++;
+    }
+    adapter->vsf_drv.name = drv->name;
+    adapter->vsf_drv.probe = __vsf_linux_usb_probe;
+    adapter->vsf_drv.disconnect = __usb_linux_usb_disconnect;
+
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_dlist_add_to_head(struct usb_driver_adapter_vsf, node, &__usbdrv_list, adapter);
+    vsf_unprotect_sched(orig);
+    vk_usbh_register_class(__usbdrv_host, &adapter->vsf_drv);
+}
+
+void usb_deregister_driver(struct usb_driver *drv)
+{
+    struct usb_driver_adapter_vsf *adapter = NULL;
+
+    vsf_protect_t orig = vsf_protect_sched();
+        __vsf_slist_foreach_unsafe(struct usb_driver_adapter_vsf, node, &__usbdrv_list) {
+            if (_->linux_drv == drv) {
+                adapter = _;
+                break;
+            }
+        }
+    vsf_unprotect_sched(orig);
+
+    if (adapter != NULL) {
+        vk_usbh_unregister_class(__usbdrv_host, &adapter->vsf_drv);
+        kfree(adapter);
+    }
+}
+
+int usb_driver_claim_interface(struct usb_driver *driver, struct usb_interface *iface, void *data)
+{
+    struct device *dev = &iface->dev;
+    if (dev->driver) {
+        return -EBUSY;
+    }
+    dev->driver = &driver->drvwrap.driver;
+    usb_set_intfdata(iface, data);
+    return 0;
+}
+
+void usb_driver_release_interface(struct usb_driver *driver, struct usb_interface *iface)
+{
+    struct device *dev = &iface->dev;
+    if (!dev->driver || (dev->driver != &driver->drvwrap.driver)) {
+        return;
+    }
+    dev->driver = NULL;
+}
+
+void usb_init_urb(struct urb *urb)
+{
+    if (urb) {
+        memset(urb, 0, sizeof(*urb));
+    }
+}
+
+struct urb * usb_alloc_urb(int iso_packets, gfp_t flags)
+{
+#if VSF_USBH_CFG_ISO_EN != ENABLED
+    if (iso_packets != 0) {
+        VSF_LINUX_ASSERT(false);
+        return NULL;
+    }
+#else
+    if (iso_packets > VSF_USBH_CFG_ISO_PACKET_LIMIT) {
+        VSF_LINUX_ASSERT(false);
+        return NULL;
+    }
+#endif
+
+    struct urb *urb = vsf_usbh_malloc(sizeof(*urb));
+    if (NULL == urb) {
+        return NULL;
+    }
+
+    usb_init_urb(urb);
+    return urb;
+}
+
+void usb_free_urb(struct urb *urb)
+{
+    vk_usbh_free_urb(__usbdrv_host, &urb->__urb);
+}
+
+int usb_submit_urb(struct urb *urb, gfp_t flags)
+{
+    vsf_err_t err = vk_usbh_submit_urb(__usbdrv_host, &urb->__urb);
+    if (VSF_ERR_NONE != err) {
+        return -EIO;
+    }
+
+    vsf_thread_wfe(VSF_EVT_MESSAGE);
+    if (URB_OK != vk_usbh_urb_get_status(&urb->__urb)) {
+        return -EIO;
+    }
+    return vk_usbh_urb_get_actual_length(&urb->__urb);
+}
+
+int usb_unlink_urb(struct urb *urb)
+{
+    vk_usbh_free_urb(__usbdrv_host, &urb->__urb);
+}
+
+void usb_kill_urb(struct urb *urb)
+{
+    vk_usbh_free_urb(__usbdrv_host, &urb->__urb);
+}
 
 int usb_control_msg(struct usb_device *udev, unsigned int pipe, __u8 request, __u8 requesttype, __u16 value, __u16 index, void *data, __u16 size, int timeout)
 {
@@ -56,6 +255,16 @@ int usb_control_msg(struct usb_device *udev, unsigned int pipe, __u8 request, __
         return -EIO;
     }
     return vk_usbh_urb_get_actual_length(urb);
+}
+
+int usb_control_msg_send(struct usb_device *udev, __u8 endpoint, __u8 request, __u8 requesttype, __u16 value, __u16 index, const void *data, __u16 size, int timeout, gfp_t memflags)
+{
+    int ret = usb_control_msg(udev, usb_sndctrlpipe(udev, endpoint), request, requesttype, value, index, data, size, timeout);
+    return ret < 0 ? ret : 0;
+}
+
+int usb_control_msg_recv(struct usb_device *udev, __u8 endpoint, __u8 request, __u8 requesttype, __u16 value, __u16 index, void *data, __u16 size, int timeout, gfp_t memflags)
+{
 }
 
 int usb_interrupt_msg(struct usb_device *udev, unsigned int pipe, void *data, int len, int *actual_length, int timeout)
@@ -83,6 +292,54 @@ int usb_interrupt_msg(struct usb_device *udev, unsigned int pipe, void *data, in
 int usb_bulk_msg(struct usb_device *udev, unsigned int pipe, void *data, int len, int *actual_length, int timeout)
 {
     return usb_interrupt_msg(udev, pipe, data, len, actual_length, timeout);
+}
+
+int usb_reset_device(struct usb_device *udev)
+{
+    vk_usbh_reset_dev(udev->__host, &udev->__dev);
+    while (vk_usbh_is_dev_resetting(udev->__host, &udev->__dev)) {
+        usleep(20);
+    }
+    return 0;
+}
+
+int usb_get_descriptor(struct usb_device *udev, unsigned char type, unsigned char index, void *buf, int size)
+{
+    return usb_control_msg(udev, usb_rcvctrlpipe(udev, 0), USB_REQ_GET_DESCRIPTOR, USB_DIR_IN, (type << 8) + index, 0, buf, size, 5000);
+}
+int usb_get_status(struct usb_device *udev, int recip, int type, int target, void *data)
+{
+    int length;
+    switch (type) {
+    case USB_STATUS_TYPE_STANDARD:  length = 2; break;
+    case USB_STATUS_TYPE_PTM:       length = 4; break;
+    default:                        return -EINVAL;
+    }
+
+    uint8_t status[length];
+    int ret = usb_control_msg(udev, usb_rcvctrlpipe(udev, 0), USB_REQ_GET_STATUS, USB_DIR_IN | recip, USB_STATUS_TYPE_STANDARD, target, status, length, 5000);
+    switch (ret) {
+    case 2:                         *(u16 *)data = le16_to_cpu(*(__le16 *)status);  break;
+    case 4:                         *(u32 *)data = le32_to_cpu(*(__le32 *)status);  break;
+    default:                        return -EIO;
+    }
+    return 0;
+}
+
+int usb_clear_halt(struct usb_device *udev, int pipe)
+{
+    int endp = usb_pipeendpoint(pipe);
+    return usb_control_msg(udev, usb_sndctrlpipe(udev, 0), USB_REQ_CLEAR_FEATURE, USB_RECIP_ENDPOINT, USB_ENDPOINT_HALT, endp, NULL, 0, 5000);
+}
+
+int usb_set_interface(struct usb_device *udev, int ifnum, int alternate)
+{
+    return usb_control_msg(udev, usb_sndctrlpipe(udev, 0), USB_REQ_SET_INTERFACE, USB_RECIP_INTERFACE, alternate, ifnum, NULL, 0, 5000);
+}
+
+int usb_set_configuration(struct usb_device *udev, int configuration)
+{
+    return usb_control_msg(udev, usb_sndctrlpipe(udev, 0), USB_REQ_SET_CONFIGURATION, 0, configuration, 0, NULL, 0, 5000);
 }
 
 #endif
