@@ -9,6 +9,7 @@ extern "C" {
 
 #define USB_ENDPOINT_DIR_MASK       USB_DIR_MASK
 #define USB_ENDPOINT_MAXP_MASK      0x07FF
+#define USB_ENDPOINT_NUMBER_MASK    0x7F
 
 #define USB_STATUS_TYPE_STANDARD    0
 #define USB_STATUS_TYPE_PTM         1
@@ -73,6 +74,14 @@ struct usb_endpoint_descriptor {
     __u8  bSynchAddress;
 } __packed;
 
+static inline int usb_endpoint_num(const struct usb_endpoint_descriptor *epd)
+{
+    return epd->bEndpointAddress & USB_ENDPOINT_NUMBER_MASK;
+}
+static inline int usb_endpoint_type(const struct usb_endpoint_descriptor *epd)
+{
+    return epd->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK;
+}
 static inline int usb_endpoint_dir_in(const struct usb_endpoint_descriptor *epd)
 {
     return ((epd->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN);

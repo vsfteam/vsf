@@ -15,6 +15,9 @@ struct timer_list {
     u32                             flags;
 };
 
+#define from_timer(var, callback_timer, timer_fieldname)                        \
+        container_of(callback_timer, typeof(*var), timer_fieldname)
+
 #ifdef __cplusplus
 }
 #endif

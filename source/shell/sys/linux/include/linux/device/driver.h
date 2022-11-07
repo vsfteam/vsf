@@ -19,7 +19,7 @@ struct device_driver {
 
     int (*probe)(struct device *dev);
     int (*remove)(struct device *dev);
-    int (*shutdown)(struct device *dev);
+    void (*shutdown)(struct device *dev);
     int (*suspend)(struct device *dev);
     int (*resume)(struct device *dev);
 };

@@ -455,4 +455,160 @@ int usb_set_configuration(struct usb_device *udev, int configuration)
     return usb_control_msg(udev, usb_sndctrlpipe(udev, 0), USB_REQ_SET_CONFIGURATION, 0, configuration, 0, NULL, 0, 5000);
 }
 
+struct usb_interface * usb_ifnum_to_if(const struct usb_device *dev, unsigned ifnum)
+{
+    struct usb_host_config *config = dev->actconfig;
+    if (!config) {
+        return NULL;
+    }
+
+    for (int i = 0; i < config->desc.bNumInterfaces; i++) {
+        if (config->interface[i]->altsetting[0].desc.bInterfaceNumber == ifnum) {
+            return config->interface[i];
+        }
+    }
+
+    return NULL;
+}
+
+struct usb_host_interface * usb_altnum_to_altsetting(const struct usb_interface *intf, unsigned int altnum)
+{
+    for (int i = 0; i < intf->num_altsetting; i++) {
+        if (intf->altsetting[i].desc.bAlternateSetting == altnum) {
+            return &intf->altsetting[i];
+        }
+    }
+    return NULL;
+}
+
+struct usb_host_interface * usb_find_alt_setting(struct usb_host_config *config, unsigned int iface_num, unsigned int alt_num)
+{
+    struct usb_interface_cache *intf_cache = NULL;
+    if (!config) {
+        return NULL;
+    }
+
+    for (int i = 0; i < config->desc.bNumInterfaces; i++) {
+        if (config->intf_cache[i]->altsetting[0].desc.bInterfaceNumber == iface_num) {
+            intf_cache = config->intf_cache[i];
+            break;
+        }
+    }
+    if (!intf_cache) {
+        return NULL;
+    }
+
+    for (int i = 0; i < intf_cache->num_altsetting; i++) {
+        if (intf_cache->altsetting[i].desc.bAlternateSetting == alt_num) {
+            return &intf_cache->altsetting[i];
+        }
+    }
+
+    return NULL;
+}
+
+struct usb_interface * usb_find_interface(struct usb_driver *drv, int minor)
+{
+    return NULL;
+}
+
+static bool match_endpoint(struct usb_endpoint_descriptor *epd,
+        struct usb_endpoint_descriptor **bulk_in,
+        struct usb_endpoint_descriptor **bulk_out,
+        struct usb_endpoint_descriptor **int_in,
+        struct usb_endpoint_descriptor **int_out)
+{
+    switch (usb_endpoint_type(epd)) {
+    case USB_ENDPOINT_XFER_BULK:
+        if (usb_endpoint_dir_in(epd)) {
+            if (bulk_in && !*bulk_in) {
+                *bulk_in = epd;
+                break;
+            }
+        } else {
+            if (bulk_out && !*bulk_out) {
+                *bulk_out = epd;
+                break;
+            }
+        }
+
+        return false;
+    case USB_ENDPOINT_XFER_INT:
+        if (usb_endpoint_dir_in(epd)) {
+            if (int_in && !*int_in) {
+                *int_in = epd;
+                break;
+            }
+        } else {
+            if (int_out && !*int_out) {
+                *int_out = epd;
+                break;
+            }
+        }
+
+        return false;
+    default:
+        return false;
+    }
+
+    return (!bulk_in || *bulk_in) && (!bulk_out || *bulk_out)
+        && (!int_in || *int_in) && (!int_out || *int_out);
+}
+
+int usb_find_common_endpoints(struct usb_host_interface *alt,
+        struct usb_endpoint_descriptor **bulk_in,
+        struct usb_endpoint_descriptor **bulk_out,
+        struct usb_endpoint_descriptor **int_in,
+        struct usb_endpoint_descriptor **int_out)
+{
+    if (bulk_in) {
+        *bulk_in = NULL;
+    }
+    if (bulk_out) {
+        *bulk_out = NULL;
+    }
+    if (int_in) {
+        *int_in = NULL;
+    }
+    if (int_out) {
+        *int_out = NULL;
+    }
+
+    for (int i = 0; i < alt->desc.bNumEndpoints; ++i) {
+        if (match_endpoint(&alt->endpoint[i].desc, bulk_in, bulk_out, int_in, int_out)) {
+            return 0;
+        }
+    }
+
+    return -ENXIO;
+}
+
+int usb_find_common_endpoints_reverse(struct usb_host_interface *alt,
+        struct usb_endpoint_descriptor **bulk_in,
+        struct usb_endpoint_descriptor **bulk_out,
+        struct usb_endpoint_descriptor **int_in,
+        struct usb_endpoint_descriptor **int_out)
+{
+    if (bulk_in) {
+        *bulk_in = NULL;
+    }
+    if (bulk_out) {
+        *bulk_out = NULL;
+    }
+    if (int_in) {
+        *int_in = NULL;
+    }
+    if (int_out) {
+        *int_out = NULL;
+    }
+
+    for (int i = alt->desc.bNumEndpoints; i >= 0; --i) {;
+        if (match_endpoint(&alt->endpoint[i].desc, bulk_in, bulk_out, int_in, int_out)) {
+            return 0;
+        }
+    }
+
+    return -ENXIO;
+}
+
 #endif

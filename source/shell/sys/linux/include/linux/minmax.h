@@ -12,6 +12,7 @@ extern "C" {
 #define max(x, y)                       vsf_max(x, y)
 #define min_t(type, x, y)               vsf_min((type)x, (type)y)
 #define max_t(type, x, y)               vsf_max((type)x, (type)y)
+#define clamp(val, lo, hi)              min((typeof(val))max(val, lo), hi)
 
 #ifdef __cplusplus
 }
