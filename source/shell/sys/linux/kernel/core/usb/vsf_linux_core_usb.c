@@ -483,7 +483,7 @@ int usb_control_msg_recv(struct usb_device *udev, __u8 endpoint, __u8 request, _
 
 int usb_interrupt_msg(struct usb_device *udev, unsigned int pipe, void *data, int len, int *actual_length, int timeout)
 {
-    vk_usbh_urb_t urb;
+    vk_usbh_urb_t urb = { 0 };
     vk_usbh_urb_prepare(&urb, udev->__dev, (struct usb_endpoint_desc_t *)&(usb_pipe_endpoint(udev, pipe)->desc));
     vk_usbh_alloc_urb(udev->__host, udev->__dev, &urb);
     vk_usbh_urb_set_buffer(&urb, data, len);

@@ -12,7 +12,8 @@ extern "C" {
 #   define BIT_ULL(__NR)        (1ULL << (__NR))
 #endif
 
-#define GENMASK(__H, __L)       (1ULL << ((__H) + 1)) - (1ULL << ((__L) + 1))
+#define BITS_PER_LONG           (sizeof(long) << 3)
+#define GENMASK(__H, __L)       (((~0UL) << (__L)) & (~0UL >> (BITS_PER_LONG - 1 - (__H))))
 
 #ifdef __cplusplus
 }
