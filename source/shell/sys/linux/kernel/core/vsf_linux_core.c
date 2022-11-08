@@ -171,9 +171,10 @@ static int __workqueue_thread(int argc, char **argv)
         struct work_struct *work;
     } u;
     vsf_timeout_tick_t timeout;
+    vsf_protect_t orig;
 
     while (!wq->is_to_exit) {
-        mutex_lock(&wq->mutex);
+        orig = vsf_protect_int();
             vsf_dlist_peek_head(struct work_struct, entry, &wq->dwork_list, u.work);
             if (NULL == u.dwork) {
                 timeout = -1;
@@ -187,30 +188,30 @@ static int __workqueue_thread(int argc, char **argv)
                     timeout = vsf_systimer_get_duration(now, u.dwork->start_tick);
                 }
             }
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
 
         if (timeout != 0) {
             vsf_thread_sem_pend(&wq->sem, timeout);
         }
 
         while (true) {
-            mutex_lock(&wq->mutex);
+            orig = vsf_protect_int();
             vsf_dlist_remove_head(struct work_struct, entry, &wq->work_list, u.work);
             if (NULL == u.work) {
-                mutex_unlock(&wq->mutex);
+                vsf_unprotect_int(orig);
                 break;
             }
 
             u.work->__is_running = true;
-            mutex_unlock(&wq->mutex);
+            vsf_unprotect_int(orig);
 
             u.work->func(u.work);
 
             vsf_eda_t *pending_eda;
-            mutex_lock(&wq->mutex);
+            orig = vsf_protect_int();
             u.work->__is_running = false;
             pending_eda = u.work->__pending_eda;
-            mutex_unlock(&wq->mutex);
+            vsf_unprotect_int(orig);
 
             if (pending_eda != NULL) {
                 vsf_eda_post_evt(pending_eda, VSF_EVT_USER);
@@ -259,13 +260,13 @@ bool queue_work(struct workqueue_struct *wq, struct work_struct *work)
 {
     VSF_LINUX_ASSERT((wq != NULL) && (work != NULL));
     work->__wq = wq;
-    mutex_lock(&wq->mutex);
+    vsf_protect_t orig = vsf_protect_int();
     if (vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, work)) {
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         return false;
     } else {
         vsf_dlist_add_to_tail(struct work_struct, entry, &wq->work_list, work);
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         vsf_eda_sem_post(&wq->sem);
         return true;
     }
@@ -279,14 +280,14 @@ bool queue_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork,
     }
 
     dwork->work.__wq = wq;
-    mutex_lock(&wq->mutex);
+    vsf_protect_t orig = vsf_protect_int();
     if (vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, &dwork->work)) {
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         return false;
     } else {
         vsf_dlist_insert(struct work_struct, entry, &wq->dwork_list, &dwork->work,
                 ((struct delayed_work *)_)->start_tick >= dwork->start_tick);
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         dwork->start_tick = vsf_systimer_get_tick() + delay;
         vsf_eda_sem_post(&wq->sem);
         return true;
@@ -296,14 +297,14 @@ bool queue_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork,
 bool mod_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, unsigned long delay)
 {
     bool result;
-    mutex_lock(&wq->mutex);
+    vsf_protect_t orig = vsf_protect_int();
     if (vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, &dwork->work)) {
         vsf_dlist_remove(struct work_struct, entry, &wq->dwork_list, &dwork->work);
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         result = false;
     } else if (vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, &dwork->work)) {
         vsf_dlist_remove(struct work_struct, entry, &wq->work_list, &dwork->work);
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         result = true;
     } else {
         result = false;
@@ -317,13 +318,13 @@ void flush_workqueue(struct workqueue_struct *wq)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
 
-    mutex_lock(&wq->mutex);
+    vsf_protect_t orig = vsf_protect_int();
         if (vsf_dlist_is_empty(&wq->work_list) && vsf_dlist_is_empty(&wq->dwork_list)) {
             eda = NULL;
         } else {
             vsf_slist_add_to_head(vsf_eda_t, pending_snode, &wq->flush_list, eda);
         }
-    mutex_unlock(&wq->mutex);
+    vsf_unprotect_int(orig);
 
     if (eda != NULL) {
         vsf_thread_wfe(VSF_EVT_USER);
@@ -336,32 +337,32 @@ bool flush_work(struct work_struct *work)
 }
 
 // __queue_cancel_work MUST be called locked
-static bool __queue_cancel_work(struct workqueue_struct *wq, struct work_struct *work, bool is_to_wait)
+static bool __queue_cancel_work(struct workqueue_struct *wq, struct work_struct *work, bool is_to_wait, vsf_protect_t orig)
 {
     vsf_eda_t *eda_cur = vsf_eda_get_cur();
     if (vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, work)) {
         vsf_dlist_remove(struct work_struct, entry, &wq->work_list, work);
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         return true;
     } else if (is_to_wait && work->__is_running) {
         work->__pending_eda = eda_cur;
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         vsf_thread_wfe(VSF_EVT_USER);
         return true;
     } else {
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         return false;
     }
 }
 
-static bool __queue_cancel_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, bool is_to_wait)
+static bool __queue_cancel_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, bool is_to_wait, vsf_protect_t orig)
 {
     if (vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, &dwork->work)) {
         vsf_dlist_remove(struct work_struct, entry, &wq->dwork_list, &dwork->work);
-        mutex_unlock(&wq->mutex);
+        vsf_unprotect_int(orig);
         return true;
     } else {
-        return __queue_cancel_work(wq, &dwork->work, is_to_wait);
+        return __queue_cancel_work(wq, &dwork->work, is_to_wait, orig);
     }
 }
 
@@ -372,8 +373,7 @@ bool cancel_work(struct work_struct *work)
         return false;
     }
 
-    mutex_lock(&wq->mutex);
-    return __queue_cancel_work(wq, work, false);
+    return __queue_cancel_work(wq, work, false, vsf_protect_int());
 }
 
 bool cancel_work_sync(struct work_struct *work)
@@ -383,9 +383,7 @@ bool cancel_work_sync(struct work_struct *work)
         return false;
     }
 
-    mutex_lock(&wq->mutex);
-    return __queue_cancel_work(wq, work, true);
-    
+    return __queue_cancel_work(wq, work, true, vsf_protect_int());
 }
 
 bool flush_delayed_work(struct delayed_work *dwork)
@@ -400,8 +398,7 @@ bool cancel_delayed_work(struct delayed_work *dwork)
         return false;
     }
 
-    mutex_lock(&wq->mutex);
-    return __queue_cancel_delayed_work(wq, dwork, false);
+    return __queue_cancel_delayed_work(wq, dwork, false, vsf_protect_int());
 }
 
 bool cancel_delayed_work_sync(struct delayed_work *dwork)
@@ -411,8 +408,7 @@ bool cancel_delayed_work_sync(struct delayed_work *dwork)
         return false;
     }
 
-    mutex_lock(&wq->mutex);
-    return __queue_cancel_delayed_work(wq, dwork, true);
+    return __queue_cancel_delayed_work(wq, dwork, true, vsf_protect_int());
 }
 
 /*******************************************************************************
