@@ -599,13 +599,19 @@ int bus_rescan_devices(struct bus_type *bus)
 WEAK(vsf_linux_firmware_read)
 int vsf_linux_firmware_read(struct firmware *fw, const char *name)
 {
-    int fd = open(name, 0);
+    int dirfd = open(VSF_LINUX_CFG_FW_PATH, 0);
+    if (dirfd < 0) {
+        return -1;
+    }
+
+    int fd = openat(dirfd, name, 0);
+    close(dirfd);
     if (fd < 0) {
         return -1;
     }
 
-    off_t orig = lseek(fd, 0, SEEK_END);
-    fw->size = lseek(fd, orig, SEEK_SET);
+    fw->size = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
     fw->data = kmalloc(fw->size, GFP_KERNEL);
     if (NULL == fw->data) {
         goto close_and_fail;

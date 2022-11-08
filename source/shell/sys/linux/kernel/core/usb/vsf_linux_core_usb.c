@@ -22,6 +22,7 @@
 #if VSF_USE_LINUX == ENABLED
 
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
+#define __VSF_EDA_CLASS_INHERIT__
 #include <unistd.h>
 
 #include <linux/types.h>
@@ -29,6 +30,11 @@
 #include <linux/usb.h>
 
 /*============================ MACROS ========================================*/
+
+#if VSF_USBH_CFG_PIPE_HAS_EXTRA != ENABLED
+#   error VSF_USBH_CFG_PIPE_HAS_EXTRA is necessary for usb support in linux
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -55,18 +61,44 @@ typedef struct vsf_usbh_adapter_linux_t {
 
 static vk_usbh_t *__usbdrv_host;
 static vsf_dlist_t __usbdrv_list;
+static vsf_eda_t __usbdrv_done_task;
 
 /*============================ IMPLEMENTATION ================================*/
 
 extern int usb_urb_dir_in(struct urb *urb)
 {
     vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb->__urb);
-    return pipe.use_as__vk_usbh_pipe_flag_t.dir_in1out0;
+    return pipe.dir_in1out0;
+}
+
+static void __vsf_linux_usb_done_work(struct work_struct *work)
+{
+    struct urb *urb = container_of(work, struct urb, done_work);
+    if (urb->complete != NULL) {
+        urb->complete(urb);
+    }
+}
+
+static void __usbdrv_done_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    switch (evt) {
+    case VSF_EVT_MESSAGE: {
+            vk_usbh_urb_t vsfurb = { .urb_hcd = vsf_eda_get_cur_msg() };
+            vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&vsfurb);
+            struct urb *urb = pipe.extra;
+
+            VSF_LINUX_ASSERT(urb != NULL);
+            INIT_WORK(&urb->done_work, __vsf_linux_usb_done_work);
+            schedule_work(&urb->done_work);
+        }
+    }
 }
 
 void vsf_linux_usb_init(vk_usbh_t *usbh)
 {
     __usbdrv_host = usbh;
+    __usbdrv_done_task.fn.evthandler = __usbdrv_done_evthandler;
+    vsf_eda_init(&__usbdrv_done_task);
 }
 
 static int __usb_anchor_check_wakeup(struct usb_anchor *anchor)
@@ -164,7 +196,7 @@ static void __vsf_linux_usb_probe_work(struct work_struct *work)
 
 static void __vsf_linux_usb_disconnect_work(struct work_struct *work)
 {
-    vsf_usbh_adapter_linux_t *usbh_linux = container_of(work, vsf_usbh_adapter_linux_t, probe_work);
+    vsf_usbh_adapter_linux_t *usbh_linux = container_of(work, vsf_usbh_adapter_linux_t, disconnect_work);
     if (usbh_linux->linux_drv->disconnect != NULL) {
         usbh_linux->linux_drv->disconnect(&usbh_linux->ifs);
     }
@@ -173,15 +205,68 @@ static void __vsf_linux_usb_disconnect_work(struct work_struct *work)
 static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
 {
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
+    vk_usbh_ifs_alt_parser_t *parser_alt = &parser_ifs->parser_alt[ifs->cur_alt];
+    struct usb_interface_desc_t *desc_ifs = parser_alt->desc_ifs;
+    struct usb_endpoint_desc_t *desc_ep = parser_alt->desc_ep;
+
     struct usb_driver_adapter_vsf *adapter = container_of(ifs->drv, struct usb_driver_adapter_vsf, vsf_drv);
     vsf_usbh_adapter_linux_t *usbh_linux = vsf_usbh_malloc(sizeof(*usbh_linux));
     if (NULL == usbh_linux) {
         return NULL;
     }
+    memset(usbh_linux, 0, sizeof(*usbh_linux));
+
+    struct usb_host_endpoint *ep;
+    struct usb_host_config *actconfig = vsf_usbh_malloc(
+            sizeof(*actconfig)                                      // adapter->device.actconfig
+        +   sizeof(*ep) * (1 + parser_ifs->parser_alt->num_of_ep)   // adapter->device.ep_in/ep_out
+    );
+    if (NULL == actconfig) {
+        goto free_adapter_and_fail;
+    }
+    memset(actconfig, 0, sizeof(*actconfig));
+    ep = (struct usb_host_endpoint *)&actconfig[1];
 
     usbh_linux->id = (vk_usbh_dev_id_t *)parser_ifs->id;
     usbh_linux->device.__host = usbh;
     usbh_linux->device.__dev = dev;
+    usbh_linux->device.actconfig = actconfig;
+    usbh_linux->device.speed = dev->speed;
+
+    ep->desc = (usb_endpoint_descriptor){
+        .bLength            = USB_DT_ENDPOINT_SIZE,
+        .bDescriptorType    = USB_DT_ENDPOINT,
+        .bEndpointAddress   = 0,
+        .bmAttributes       = 0,
+        .wMaxPacketSize     = vk_usbh_urb_get_pipe(&dev->ep0.urb).size,
+        .bInterval          = 0,
+    };
+    usbh_linux->device.ep_in[0] = usbh_linux->device.ep_out[0] = ep++;
+
+    const struct usb_endpoint_descriptor *epd;
+    uint32_t size_remain;
+    for (int i = 0; i < desc_ifs->bNumEndpoints; i++, ep++) {
+        epd = (const struct usb_endpoint_descriptor *)desc_ep;
+        ep->desc = *epd;
+
+        if (usb_endpoint_dir_in(epd)) {
+            usbh_linux->device.ep_in[usb_endpoint_num(epd)] = ep;
+        } else {
+            usbh_linux->device.ep_out[usb_endpoint_num(epd)] = ep;
+        }
+
+        size_remain = parser_alt->desc_size - ((uint8_t *)desc_ep - (uint8_t *)desc_ifs);
+        desc_ep = vk_usbh_get_next_ep_descriptor(desc_ep, size_remain);
+
+        if ((NULL == desc_ep) && (size_remain > epd->bLength)) {
+            ep->extra = (unsigned char *)epd + epd->bLength;
+            ep->extralen = size_remain - epd->bLength;
+        } else if ((desc_ep != NULL) && (((uint8_t *)desc_ep - (uint8_t *)epd) > epd->bLength)) {
+            ep->extra = (unsigned char *)epd + epd->bLength;
+            ep->extralen = ((uint8_t *)desc_ep - (uint8_t *)epd) - epd->bLength;
+        }
+    }
+
     usbh_linux->ifs.dev.parent = &usbh_linux->device.dev;
 
     usbh_linux->linux_drv = adapter->linux_drv;
@@ -190,6 +275,10 @@ static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
     INIT_WORK(&usbh_linux->probe_work, __vsf_linux_usb_probe_work);
     schedule_work(&usbh_linux->probe_work);
     return usbh_linux;
+
+free_adapter_and_fail:
+    vsf_usbh_free(usbh_linux);
+    return NULL;
 }
 
 static void __usb_linux_usb_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
@@ -282,6 +371,22 @@ struct urb *usb_get_urb(struct urb *urb)
     return urb;
 }
 
+void __usb_init_vsfurb(struct urb *urb, struct usb_device *dev)
+{
+    if (!vk_usbh_urb_is_alloced(&urb->__urb)) {
+        urb->__urb.pipe.value = 1;
+        vk_usbh_alloc_urb(__usbdrv_host, dev->__dev, &urb->__urb);
+    }
+
+    vk_usbh_urb_set_pipe(&urb->__urb, (vk_usbh_pipe_t){
+        .value          = urb->pipe,
+        .interval       = urb->interval,
+        .last_frame     = urb->start_frame,
+        .extra          = urb,
+    });
+    vk_usbh_urb_set_buffer(&urb->__urb, urb->transfer_buffer, urb->transfer_buffer_length);
+}
+
 struct urb * usb_alloc_urb(int iso_packets, gfp_t flags)
 {
 #if VSF_USBH_CFG_ISO_EN != ENABLED
@@ -323,16 +428,11 @@ void usb_free_urb(struct urb *urb)
 
 int usb_submit_urb(struct urb *urb, gfp_t flags)
 {
-    vsf_err_t err = vk_usbh_submit_urb(__usbdrv_host, &urb->__urb);
+    vsf_err_t err = vk_usbh_submit_urb_ex(__usbdrv_host, &urb->__urb, 0, &__usbdrv_done_task);
     if (VSF_ERR_NONE != err) {
         return -EIO;
     }
-
-    vsf_thread_wfe(VSF_EVT_MESSAGE);
-    if (URB_OK != vk_usbh_urb_get_status(&urb->__urb)) {
-        return -EIO;
-    }
-    return vk_usbh_urb_get_actual_length(&urb->__urb);
+    return 0;
 }
 
 int usb_unlink_urb(struct urb *urb)
@@ -351,7 +451,7 @@ int usb_control_msg(struct usb_device *udev, unsigned int pipe, __u8 request, __
     vk_usbh_urb_t *urb = &udev->__dev->ep0.urb;
     vk_usbh_urb_set_buffer(urb, data, size);
     vsf_err_t err = vk_usbh_control_msg(udev->__host, udev->__dev, &(struct usb_ctrlrequest_t){
-        .bRequest       = requesttype,
+        .bRequestType   = requesttype,
         .bRequest       = request,
         .wValue         = value,
         .wIndex         = index,

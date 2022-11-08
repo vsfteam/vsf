@@ -1337,12 +1337,16 @@ int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
     if ((NULL == pathname) || ('\0' == *pathname)) {
         return -1;
     }
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
-        return -1;
+    if (NULL == dir) {
+        if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+            return -1;
+        }
+    } else {
+        strcpy(fullpath, pathname);
     }
 
 __open_again:
-    file = __vsf_linux_fs_get_file(fullpath);
+    file = __vsf_linux_fs_get_file_ex(dir, fullpath);
     if (!file) {
         if (flags & O_CREAT) {
             char *path_in_ram = strdup(pathname);

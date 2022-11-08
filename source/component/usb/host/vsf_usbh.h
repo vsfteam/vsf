@@ -68,6 +68,9 @@ extern "C" {
 #ifndef VSF_USBH_CFG_ISO_EN
 #   define VSF_USBH_CFG_ISO_EN          ENABLED
 #endif
+#ifndef VSF_USBH_CFG_PIPE_HAS_EXTRA
+#   define VSF_USBH_CFG_PIPE_HAS_EXTRA  ENABLED
+#endif
 
 #if VSF_USBH_CFG_ISO_EN == ENABLED
 #ifndef VSF_USBH_CFG_ISO_PACKET_LIMIT
@@ -295,6 +298,9 @@ typedef struct vk_usbh_pipe_t {
     implement(vk_usbh_pipe_flag_t)
     uint16_t interval;
     uint16_t last_frame;
+#if VSF_USBH_CFG_PIPE_HAS_EXTRA == ENABLED
+    void *extra;
+#endif
 } vk_usbh_pipe_t;
 
 #ifdef __cplusplus

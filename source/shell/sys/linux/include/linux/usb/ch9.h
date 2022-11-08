@@ -14,65 +14,11 @@ extern "C" {
 #define USB_STATUS_TYPE_STANDARD    0
 #define USB_STATUS_TYPE_PTM         1
 
-struct usb_descriptor_header {
-    __u8  bLength;
-    __u8  bDescriptorType;
-} __packed;
-
-struct usb_device_descriptor {
-    __u8  bLength;
-    __u8  bDescriptorType;
-
-    __le16 bcdUSB;
-    __u8  bDeviceClass;
-    __u8  bDeviceSubClass;
-    __u8  bDeviceProtocol;
-    __u8  bMaxPacketSize0;
-    __le16 idVendor;
-    __le16 idProduct;
-    __le16 bcdDevice;
-    __u8  iManufacturer;
-    __u8  iProduct;
-    __u8  iSerialNumber;
-    __u8  bNumConfigurations;
-} __packed;
-
-struct usb_config_descriptor {
-    __u8  bLength;
-    __u8  bDescriptorType;
-
-    __le16 wTotalLength;
-    __u8  bNumInterfaces;
-    __u8  bConfigurationValue;
-    __u8  iConfiguration;
-    __u8  bmAttributes;
-    __u8  bMaxPower;
-} __packed;
-
-struct usb_interface_descriptor {
-    __u8  bLength;
-    __u8  bDescriptorType;
-
-    __u8  bInterfaceNumber;
-    __u8  bAlternateSetting;
-    __u8  bNumEndpoints;
-    __u8  bInterfaceClass;
-    __u8  bInterfaceSubClass;
-    __u8  bInterfaceProtocol;
-    __u8  iInterface;
-} __packed;
-
-struct usb_endpoint_descriptor {
-    __u8  bLength;
-    __u8  bDescriptorType;
-
-    __u8  bEndpointAddress;
-    __u8  bmAttributes;
-    __le16 wMaxPacketSize;
-    __u8  bInterval;
-    __u8  bRefresh;
-    __u8  bSynchAddress;
-} __packed;
+#define usb_descriptor_header       usb_descriptor_header_t
+#define usb_device_descriptor       usb_device_desc_t
+#define usb_config_descriptor       usb_config_desc_t
+#define usb_interface_descriptor    usb_interface_desc_t
+#define usb_endpoint_descriptor     usb_endpoint_desc_t
 
 static inline int usb_endpoint_num(const struct usb_endpoint_descriptor *epd)
 {

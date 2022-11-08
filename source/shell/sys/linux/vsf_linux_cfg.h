@@ -78,6 +78,10 @@
 #ifndef VSF_LINUX_CFG_BIN_PATH
 #   define VSF_LINUX_CFG_BIN_PATH               "/bin"
 #endif
+#ifndef VSF_LINUX_CFG_FW_PATH
+#   define VSF_LINUX_CFG_FW_PATH                "/lib/firmware"
+#endif
+
 #ifndef VSF_LINUX_USE_TERMINFO
 #   define VSF_LINUX_USE_TERMINFO               ENABLED
 #endif
