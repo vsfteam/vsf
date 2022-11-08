@@ -18,12 +18,9 @@ extern "C" {
 #endif
 
 #define module_usb_driver(__usb_driver)                                         \
-            void __usb_driver ## _register(void) {                              \
-                usb_register(&__usb_driver);                                    \
-            }
-#define module_usb_driver_register(__usb_driver)                                \
-            extern void __usb_driver ## _register(void);                        \
-            __usb_driver ## _register()
+            module_driver(__usb_driver, usb_register, usb_deregister)
+#define module_usb_driver_init(__usb_driver)                                    \
+            module_driver_init(__usb_driver)
 
 #define USB_DEVICE_ID_MATCH_VENDOR          VSF_USBH_MATCH_FLAGS_VENDOR
 #define USB_DEVICE_ID_MATCH_PRODUCT         VSF_USBH_MATCH_FLAGS_PRODUCT
@@ -382,8 +379,8 @@ extern int usb_set_configuration(struct usb_device *dev, int configuration);
 
 extern void usb_register_driver(struct usb_driver *drv, struct module *mod, const char *name);
 extern void usb_deregister_driver(struct usb_driver *drv);
-#define usb_register(__drv)                         usb_register_driver((__drv), NULL, NULL)
-#define usb_deregister(__drv)                       usb_deregister_driver((__drv), NULL, NULL)
+#define usb_register(__drv)                         usb_register_driver((__drv), THIS_MODULE, KBUILD_MODNAME)
+#define usb_deregister(__drv)                       usb_deregister_driver((__drv))
 
 extern int usb_driver_claim_interface(struct usb_driver *driver, struct usb_interface *iface, void *data);
 extern void usb_driver_release_interface(struct usb_driver *driver, struct usb_interface *iface);

@@ -87,6 +87,9 @@ static void __usbdrv_done_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&vsfurb);
             struct urb *urb = pipe.extra;
 
+            urb->status = vk_usbh_urb_get_status(&vsfurb);
+            urb->actual_length = vk_usbh_urb_get_actual_length(&vsfurb);
+
             VSF_LINUX_ASSERT(urb != NULL);
             INIT_WORK(&urb->done_work, __vsf_linux_usb_done_work);
             schedule_work(&urb->done_work);

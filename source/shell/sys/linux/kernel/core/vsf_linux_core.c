@@ -806,8 +806,8 @@ struct sk_buff * alloc_skb(unsigned int size, gfp_t flags)
 void kfree_skb(struct sk_buff *skb)
 {
     if (skb_unref(skb)) {
-        if (skb->data) {
-            kfree(skb->data);
+        if (skb->head) {
+            kfree(skb->head);
         }
         kfree(skb);
     }

@@ -25,6 +25,8 @@ extern "C" {
 #define module_init(__init_func)
 #define module_exit(__exit_func)
 
+#define THIS_MODULE                     ((struct module *)NULL)
+#define KBUILD_MODNAME                  ((const char *)NULL)
 #define MODULE_NAME_LEN                 32
 
 struct module {
