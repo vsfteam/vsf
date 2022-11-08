@@ -483,24 +483,24 @@ int usb_control_msg_recv(struct usb_device *udev, __u8 endpoint, __u8 request, _
 
 int usb_interrupt_msg(struct usb_device *udev, unsigned int pipe, void *data, int len, int *actual_length, int timeout)
 {
-    struct urb *urb = vsf_usbh_malloc(sizeof(*urb));
-    if (NULL == urb) {
-        return -ENOMEM;
-    }
-    vk_usbh_urb_prepare(&urb->__urb, udev->__dev, (struct usb_endpoint_desc_t *)&(usb_pipe_endpoint(udev, pipe)->desc));
-    vk_usbh_alloc_urb(udev->__host, udev->__dev, &urb->__urb);
-    vk_usbh_urb_set_buffer(&urb->__urb, data, len);
-    if (VSF_ERR_NONE != vk_usbh_submit_urb(udev->__host, &urb->__urb)) {
-        vk_usbh_free_urb(udev->__host, &urb->__urb);
+    vk_usbh_urb_t urb;
+    vk_usbh_urb_prepare(&urb, udev->__dev, (struct usb_endpoint_desc_t *)&(usb_pipe_endpoint(udev, pipe)->desc));
+    vk_usbh_alloc_urb(udev->__host, udev->__dev, &urb);
+    vk_usbh_urb_set_buffer(&urb, data, len);
+    if (VSF_ERR_NONE != vk_usbh_submit_urb(udev->__host, &urb)) {
+        vk_usbh_free_urb(udev->__host, &urb);
         return -EIO;
     }
 
     vsf_thread_wfm();
 
-    if (URB_OK != vk_usbh_urb_get_status(&urb->__urb)) {
+    if (URB_OK != vk_usbh_urb_get_status(&urb)) {
         return -EIO;
     }
-    return vk_usbh_urb_get_actual_length(&urb->__urb);
+    if (actual_length != NULL) {
+        *actual_length = vk_usbh_urb_get_actual_length(&urb);
+    }
+    return 0;
 }
 
 int usb_bulk_msg(struct usb_device *udev, unsigned int pipe, void *data, int len, int *actual_length, int timeout)

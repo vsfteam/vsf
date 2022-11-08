@@ -784,7 +784,7 @@ struct sk_buff * alloc_skb(unsigned int size, gfp_t flags)
     }
 
     u8 *data = kmalloc(size + sizeof(struct skb_shared_info), flags);
-    if (NULL == skb->data) {
+    if (NULL == data) {
         kfree(skb);
         return NULL;
     }
