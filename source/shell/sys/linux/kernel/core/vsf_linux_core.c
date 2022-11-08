@@ -835,8 +835,10 @@ int kstrtos8(const char *s, unsigned int base, s8 *res)
 }
 
 /*******************************************************************************
-* linux/skbuff.h                                                               *
+* linux/timer.h                                                                *
 *******************************************************************************/
+
+#include <linux/timer.h>
 
 void add_timer(struct timer_list *timer)
 {
