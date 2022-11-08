@@ -267,7 +267,7 @@ bool queue_work(struct workqueue_struct *wq, struct work_struct *work)
     } else {
         vsf_dlist_add_to_tail(struct work_struct, entry, &wq->work_list, work);
         vsf_unprotect_int(orig);
-        vsf_eda_sem_post(&wq->sem);
+        vsf_eda_sem_post_isr(&wq->sem);
         return true;
     }
 }
@@ -289,7 +289,7 @@ bool queue_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork,
                 ((struct delayed_work *)_)->start_tick >= dwork->start_tick);
         vsf_unprotect_int(orig);
         dwork->start_tick = vsf_systimer_get_tick() + delay;
-        vsf_eda_sem_post(&wq->sem);
+        vsf_eda_sem_post_isr(&wq->sem);
         return true;
     }
 }
