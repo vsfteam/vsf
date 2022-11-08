@@ -69,6 +69,14 @@ struct hid_ll_driver {
 };
 
 extern struct hid_device *hid_allocate_device(void);
+extern void hid_destroy_device(struct hid_device *hdev);
+extern int hid_input_report(struct hid_device *hdev, int type, u8 *data, u32 size, int interrupt);
+
+extern bool hid_ignore(struct hid_device *hdev);
+extern int hid_add_device(struct hid_device *hdev);
+extern void hid_destroy_device(struct hid_device *hdev);
+
+extern int hid_parse_report(struct hid_device *hdev, __u8 *start, unsigned size);
 
 #ifdef __cplusplus
 }

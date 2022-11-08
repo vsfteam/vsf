@@ -92,6 +92,10 @@ static inline void dev_set_drvdata(struct device *dev, void *data)
 #define dev_notice_once(__dev, __fmt, ...)  dev_level_once(dev_notice, __dev, __fmt, ##__VA_ARGS__)
 #define dev_info_once(__dev, __fmt, ...)    dev_level_once(dev_info, __dev, __fmt, ##__VA_ARGS__)
 
+extern struct device *get_device(struct device *dev);
+extern void put_device(struct device *dev);
+extern bool kill_device(struct device *dev);
+
 extern int dev_set_name(struct device *dev, const char *fmt, ...);
 
 #define device_wakeup_enable(__dev)

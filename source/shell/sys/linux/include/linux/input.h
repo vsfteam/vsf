@@ -274,6 +274,31 @@ struct input_dev {
 
     struct device                   dev;
 };
+#define to_input_dev(__dev)         container_of((__dev), struct input_dev, dev)
+
+struct input_value {
+    __u16                           type;
+    __u16                           code;
+    __s32                           value;
+};
+
+struct input_handle;
+struct input_handler {
+    void (*event)(struct input_handle *handle, unsigned int type, unsigned int code, int value);
+    void (*events)(struct input_handle *handle, const struct input_value *vals, unsigned int count);
+    bool (*filter)(struct input_handle *handle, unsigned int type, unsigned int code, int value);
+    bool (*match)(struct input_handler *handler, struct input_dev *dev);
+//    int (*connect)(struct input_handler *handler, struct input_dev *dev, const struct input_device_id *id);
+    void (*disconnect)(struct input_handle *handle);
+    void (*start)(struct input_handle *handle);
+
+    const char                      *name;
+};
+struct input_handle {
+    const char                      *name;
+    struct input_dev                *dev;
+    struct input_handler            *handler;
+};
 
 // force feedback
 struct ff_replay {
@@ -363,14 +388,86 @@ struct ff_effect {
 #define FF_MAX                      0x7f
 #define FF_CNT                      (FF_MAX + 1)
 
+extern int input_ff_create(struct input_dev *dev, unsigned int max_effects);
+extern void input_ff_destroy(struct input_dev *dev);
+extern int input_ff_event(struct input_dev *dev, unsigned int type, unsigned int code, int value);
+//extern int input_ff_upload(struct input_dev *dev, struct ff_effect *effect, struct file *file);
+//extern int input_ff_erase(struct input_dev *dev, int effect_id, struct file *file);
+//extern int input_ff_flush(struct input_dev *dev, struct file *file);
+extern int input_ff_create_memless(struct input_dev *dev, void *data, int (*play_effect)(struct input_dev *, void *, struct ff_effect *));
+
+extern struct input_dev * input_allocate_device(void);
+extern struct input_dev * devm_input_allocate_device(struct device *);
+extern void input_free_device(struct input_dev *dev);
+
+static inline struct input_dev * input_get_device(struct input_dev *dev)
+{
+    return dev ? to_input_dev(get_device(&dev->dev)) : NULL;
+}
+
+static inline void input_put_device(struct input_dev *dev)
+{
+    if (dev) {
+        put_device(&dev->dev);
+    }
+}
+
 static inline void * input_get_drvdata(struct input_dev *dev)
 {
     return dev_get_drvdata(&dev->dev);
 }
 
-extern struct input_dev * input_allocate_device(void);
-extern struct input_dev * devm_input_allocate_device(struct device *);
-extern void input_free_device(struct input_dev *dev);
+static inline void input_set_drvdata(struct input_dev *dev, void *data)
+{
+    dev_set_drvdata(&dev->dev, data);
+}
+
+extern int input_register_device(struct input_dev *dev);
+extern void input_unregister_device(struct input_dev *dev);
+
+extern void input_event(struct input_dev *dev, unsigned int type, unsigned int code, int value);
+extern void input_inject_event(struct input_handle *handle, unsigned int type, unsigned int code, int value);
+
+static inline void input_report_key(struct input_dev *dev, unsigned int code, int value)
+{
+    input_event(dev, EV_KEY, code, !!value);
+}
+
+static inline void input_report_rel(struct input_dev *dev, unsigned int code, int value)
+{
+    input_event(dev, EV_REL, code, value);
+}
+
+static inline void input_report_abs(struct input_dev *dev, unsigned int code, int value)
+{
+    input_event(dev, EV_ABS, code, value);
+}
+
+static inline void input_report_ff_status(struct input_dev *dev, unsigned int code, int value)
+{
+    input_event(dev, EV_FF_STATUS, code, value);
+}
+
+static inline void input_report_switch(struct input_dev *dev, unsigned int code, int value)
+{
+    input_event(dev, EV_SW, code, !!value);
+}
+
+static inline void input_sync(struct input_dev *dev)
+{
+    input_event(dev, EV_SYN, SYN_REPORT, 0);
+}
+
+static inline void input_mt_sync(struct input_dev *dev)
+{
+    input_event(dev, EV_SYN, SYN_MT_REPORT, 0);
+}
+
+extern void input_set_capability(struct input_dev *dev, unsigned int type, unsigned int code);
+
+extern void input_alloc_absinfo(struct input_dev *dev);
+extern void input_set_abs_params(struct input_dev *dev, unsigned int axis, int min, int max, int fuzz, int flat);
+extern void input_copy_abs(struct input_dev *dst, unsigned int dst_axis, const struct input_dev *src, unsigned int src_axis);
 
 #ifdef __cplusplus
 }

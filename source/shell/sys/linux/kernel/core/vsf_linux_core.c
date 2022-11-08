@@ -26,14 +26,10 @@
 #include <unistd.h>
 
 #include <linux/types.h>
-#include <linux/atomic.h>
 #include <linux/kobject.h>
 #include <linux/mutex.h>
 #include <linux/slab.h>
 #include <linux/device.h>
-#include <linux/firmware.h>
-
-#include <linux/skbuff.h>
 
 #include <stdio.h>
 
@@ -48,6 +44,8 @@
 /*******************************************************************************
 * linux/atomic                                                                 *
 *******************************************************************************/
+
+#include <linux/atomic.h>
 
 WEAK(atomic_inc)
 void atomic_inc(atomic_t *a)
@@ -596,6 +594,8 @@ int bus_rescan_devices(struct bus_type *bus)
 * linux/firmware.h                                                             *
 *******************************************************************************/
 
+#include <linux/firmware.h>
+
 WEAK(vsf_linux_firmware_read)
 int vsf_linux_firmware_read(struct firmware *fw, const char *name)
 {
@@ -657,6 +657,8 @@ void release_firmware(const struct firmware *fw)
 * linux/power_supply.h                                                         *
 *******************************************************************************/
 
+#include <linux/power_supply.h>
+
 struct power_supply * power_supply_register(struct device *parent,
                 const struct power_supply_desc *desc,
                 const struct power_supply_config *cfg)
@@ -683,8 +685,19 @@ void power_supply_changed(struct power_supply *psy)
 }
 
 /*******************************************************************************
+* linux/uuid.h                                                                 *
+*******************************************************************************/
+
+#include <linux/uuid.h>
+
+const guid_t guid_null;
+const uuid_t uuid_null;
+
+/*******************************************************************************
 * linux/input.h                                                                *
 *******************************************************************************/
+
+#include <linux/input.h>
 
 struct input_dev * input_allocate_device(void)
 {
@@ -700,9 +713,60 @@ void input_free_device(struct input_dev *dev)
 {
 }
 
+int input_register_device(struct input_dev *dev)
+{
+    return -1;
+}
+
+void input_unregister_device(struct input_dev *dev)
+{
+}
+
+void input_set_capability(struct input_dev *dev, unsigned int type, unsigned int code)
+{
+}
+
+void input_event(struct input_dev *dev, unsigned int type, unsigned int code, int value)
+{
+}
+
+void input_alloc_absinfo(struct input_dev *dev)
+{
+}
+
+void input_set_abs_params(struct input_dev *dev, unsigned int axis, int min, int max, int fuzz, int flat)
+{
+}
+
+void input_copy_abs(struct input_dev *dst, unsigned int dst_axis, const struct input_dev *src, unsigned int src_axis)
+{
+}
+
+int input_ff_create(struct input_dev *dev, unsigned int max_effects)
+{
+    return -1;
+}
+
+void input_ff_destroy(struct input_dev *dev)
+{
+}
+
+int input_ff_event(struct input_dev *dev, unsigned int type, unsigned int code, int value)
+{
+    return -1;
+}
+
+int input_ff_create_memless(struct input_dev *dev, void *data, int (*play_effect)(struct input_dev *, void *, struct ff_effect *))
+{
+    return -1;
+}
+
+
 /*******************************************************************************
 * linux/leds.h                                                                 *
 *******************************************************************************/
+
+#include <linux/leds.h>
 
 int devm_led_classdev_register(struct device *parent, struct led_classdev *led_cdev)
 {
@@ -712,6 +776,8 @@ int devm_led_classdev_register(struct device *parent, struct led_classdev *led_c
 /*******************************************************************************
 * linux/idr.h                                                                  *
 *******************************************************************************/
+
+#include <linux/idr.h>
 
 int ida_alloc_range(struct ida *ida, unsigned int min, unsigned int max, gfp_t gfp)
 {
@@ -729,6 +795,8 @@ void ida_destroy(struct ida *ida)
 /*******************************************************************************
 * linux/kstrtox.h                                                              *
 *******************************************************************************/
+
+#include <linux/kstrtox.h>
 
 int kstrtou16(const char *s, unsigned int base, u16 *res)
 {
@@ -773,6 +841,40 @@ int kstrtos8(const char *s, unsigned int base, s8 *res)
 /*******************************************************************************
 * linux/skbuff.h                                                               *
 *******************************************************************************/
+
+void add_timer(struct timer_list *timer)
+{
+}
+
+int del_timer(struct timer_list *timer)
+{
+    return 0;
+}
+
+int del_timer_sync(struct timer_list *timer)
+{
+    return 0;
+}
+
+int mod_timer(struct timer_list *timer, unsigned long expires)
+{
+    return 0;
+}
+
+int timer_pending(const struct timer_list *timer)
+{
+    return -1;
+}
+
+void timer_setup(struct timer_list *timer, void (*func)(struct timer_list *), unsigned int flags)
+{
+}
+
+/*******************************************************************************
+* linux/skbuff.h                                                               *
+*******************************************************************************/
+
+#include <linux/skbuff.h>
 
 #define skb_shinfo(__skb)           ((struct skb_shared_info *)(skb_end_pointer(__skb)))
 
@@ -861,12 +963,38 @@ struct power_supply * devm_power_supply_register(struct device *parent,
 }
 
 /*******************************************************************************
-* linux/hid                                                                    *
+* linux/hid.h                                                                  *
 *******************************************************************************/
+
+#include <linux/hid.h>
 
 struct hid_device *hid_allocate_device(void)
 {
     return NULL;
+}
+
+void hid_destroy_device(struct hid_device *hdev)
+{
+}
+
+int hid_input_report(struct hid_device *hdev, int type, u8 *data, u32 size, int interrupt)
+{
+    return 0;
+}
+
+bool hid_ignore(struct hid_device *hdev)
+{
+    return true;
+}
+
+int hid_add_device(struct hid_device *hdev)
+{
+    return -1;
+}
+
+int hid_parse_report(struct hid_device *hdev, __u8 *start, unsigned size)
+{
+    return -1;
 }
 
 /*******************************************************************************

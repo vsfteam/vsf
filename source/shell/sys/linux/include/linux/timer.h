@@ -18,6 +18,13 @@ struct timer_list {
 #define from_timer(var, callback_timer, timer_fieldname)                        \
         container_of(callback_timer, typeof(*var), timer_fieldname)
 
+extern void add_timer(struct timer_list *timer);
+extern int del_timer(struct timer_list *timer);
+extern int del_timer_sync(struct timer_list *timer);
+extern int mod_timer(struct timer_list *timer, unsigned long expires);
+extern int timer_pending(const struct timer_list *timer);
+extern void timer_setup(struct timer_list *timer, void (*func)(struct timer_list *), unsigned int flags);
+
 #ifdef __cplusplus
 }
 #endif

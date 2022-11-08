@@ -196,6 +196,7 @@ char * strdup(const char *str);
 char * strndup(const char *str, size_t n);
 char * strcpy(char *dest, const char *src);
 char * strncpy(char *dest, const char *src, size_t n);
+size_t strscpy(char *dest, const char *src, size_t n);
 char * strcat(char *dest, const char *src);
 char * strncat(char *dest, const char *str, size_t n);
 int strcoll(const char *str1, const char *str2);
