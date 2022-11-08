@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#define __bf_shf(__mask)                (vsf_ffs32(__mask) - 1)
+#define __bf_shf(__mask)                vsf_ffs32(__mask)
 
 #define FIELD_GET(__MASK, __VAL)        (((__VAL) & (__MASK)) >> __bf_shf(__MASK))
 #define FIELD_PREP(__MASK, __VAL)       (((__VAL) << __bf_shf(__MASK)) & (__MASK))
