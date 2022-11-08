@@ -618,6 +618,7 @@ extern "C" {
         vsf_slist_peek_next(__host_type, __member, (__list_ptr), (__item_ref_ptr));\
         vsf_slist_discard_head(__host_type, __member, (__list_ptr));            \
     } while (0)
+#define vsf_slist_remove_head               vsf_slist_remove_from_head
 
 #define vsf_slist_peek_next(__host_type,    /* the type of the host type */     \
                             __member,       /* the member name of the list */   \

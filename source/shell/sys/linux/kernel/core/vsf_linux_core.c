@@ -34,6 +34,11 @@
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
+
+#if VSF_SYNC_CFG_SUPPORT_ISR != ENABLED
+#   error VSF_SYNC_CFG_SUPPORT_ISR is necessary for queuing work in isr
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -172,23 +177,38 @@ static int __workqueue_thread(int argc, char **argv)
     } u;
     vsf_timeout_tick_t timeout;
     vsf_protect_t orig;
+    vsf_eda_t *pending_eda;
 
     while (!wq->is_to_exit) {
         orig = vsf_protect_int();
-            vsf_dlist_peek_head(struct work_struct, entry, &wq->dwork_list, u.work);
-            if (NULL == u.dwork) {
-                timeout = -1;
+        vsf_dlist_peek_head(struct work_struct, entry, &wq->dwork_list, u.work);
+        if (NULL == u.dwork) {
+            timeout = vsf_dlist_is_empty(&wq->work_list) ? -1 : 0;
+        } else {
+            vsf_systimer_tick_t now = vsf_systimer_get_tick();
+            if (vsf_systimer_is_due(u.dwork->start_tick)) {
+                vsf_dlist_remove_head(struct work_struct, entry, &wq->dwork_list, u.work);
+                vsf_dlist_add_to_tail(struct work_struct, entry, &wq->work_list, u.work);
+                timeout = 0;
             } else {
-                vsf_systimer_tick_t now = vsf_systimer_get_tick();
-                if (vsf_systimer_is_due(u.dwork->start_tick)) {
-                    vsf_dlist_remove_head(struct work_struct, entry, &wq->dwork_list, u.work);
-                    vsf_dlist_add_to_tail(struct work_struct, entry, &wq->work_list, u.work);
-                    timeout = 0;
-                } else {
-                    timeout = vsf_systimer_get_duration(now, u.dwork->start_tick);
-                }
+                timeout = vsf_systimer_get_duration(now, u.dwork->start_tick);
             }
-        vsf_unprotect_int(orig);
+        }
+
+        if (timeout < 0) {
+            while (true) {
+                vsf_slist_remove_head(vsf_eda_t, pending_snode, &wq->flush_list, pending_eda);
+                vsf_unprotect_int(orig);
+                if (NULL == pending_eda) {
+                    break;
+                }
+
+                vsf_eda_post_evt(pending_eda, VSF_EVT_USER);
+                orig = vsf_protect_int();
+            }
+        } else {
+            vsf_unprotect_int(orig);
+        }
 
         if (timeout != 0) {
             vsf_thread_sem_pend(&wq->sem, timeout);
@@ -207,7 +227,6 @@ static int __workqueue_thread(int argc, char **argv)
 
             u.work->func(u.work);
 
-            vsf_eda_t *pending_eda;
             orig = vsf_protect_int();
             u.work->__is_running = false;
             pending_eda = u.work->__pending_eda;
@@ -333,7 +352,24 @@ void flush_workqueue(struct workqueue_struct *wq)
 
 bool flush_work(struct work_struct *work)
 {
-    return false;
+    struct workqueue_struct *wq = work->__wq;
+    if (NULL == wq) {
+        return false;
+    }
+
+    vsf_eda_t *eda_cur = vsf_eda_get_cur();
+    vsf_protect_t orig = vsf_protect_int();
+    if (    vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, work)
+        ||  vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, work)
+        ||  work->__is_running) {
+        work->__pending_eda = eda_cur;
+        vsf_unprotect_int(orig);
+        vsf_thread_wfe(VSF_EVT_USER);
+        return true;
+    } else {
+        vsf_unprotect_int(orig);
+        return false;
+    }
 }
 
 // __queue_cancel_work MUST be called locked
@@ -388,7 +424,7 @@ bool cancel_work_sync(struct work_struct *work)
 
 bool flush_delayed_work(struct delayed_work *dwork)
 {
-    return false;
+    return flush_work(&dwork->work);
 }
 
 bool cancel_delayed_work(struct delayed_work *dwork)

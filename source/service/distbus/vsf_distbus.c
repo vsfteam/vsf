@@ -101,7 +101,7 @@ static void __vsf_distbus_on_sent(void *p)
 send_next:
     vsf_distbus_free_msg(distbus, distbus->msg_tx);
     vsf_protect_t orig = vsf_protect_int();
-        vsf_slist_remove_from_head(vsf_distbus_msg_t, node, &distbus->msg_tx_list, distbus->msg_tx);
+        vsf_slist_remove_head(vsf_distbus_msg_t, node, &distbus->msg_tx_list, distbus->msg_tx);
     vsf_unprotect_int(orig);
 
     if (distbus->msg_tx != NULL) {
