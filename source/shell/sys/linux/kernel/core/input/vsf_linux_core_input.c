@@ -19,7 +19,7 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_USE_INPUT == ENABLED
 
 #include <linux/input.h>
 

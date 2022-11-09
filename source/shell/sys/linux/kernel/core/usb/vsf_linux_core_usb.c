@@ -19,7 +19,7 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_USE_USB_HOST == ENABLED
 
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #define __VSF_EDA_CLASS_INHERIT__

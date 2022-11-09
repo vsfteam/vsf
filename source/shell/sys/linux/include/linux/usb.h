@@ -206,7 +206,11 @@ struct usb_driver {
 #define PIPE_CONTROL                USB_ENDPOINT_XFER_CONTROL
 #define PIPE_BULK                   USB_ENDPOINT_XFER_BULK
 
-#define usb_pipein(__pipe)          (((vk_usbh_pipe_flag_t)(__pipe)).dir_in1out0)
+#define usb_pipein(__pipe)          ({                                          \
+            vk_usbh_pipe_flag_t flag;                                           \
+            flag.value = (__pipe);                                              \
+            flag.dir_in1out0;                                                   \
+        })
 #define usb_pipeout(__pipe)         (!usb_pipein(__pipe))
 #define usb_pipedevice(__pipe)      ({                                          \
             vk_usbh_pipe_flag_t flag;                                           \
