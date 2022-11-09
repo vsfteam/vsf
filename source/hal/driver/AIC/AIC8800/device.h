@@ -31,6 +31,9 @@
 
 // aic8800 rtoa_al need this
 #   define VSF_KERNEL_CFG_QUEUE_HAS_RX_NOTIFIED     ENABLED
+
+// aic8800 sdk defined dma_addr_t to uint32_t
+#   define VSF_ARCH_DMA_ADDR_T                      uint32_t
 #else
 
 #ifndef __HAL_DEVICE_AIC_AIC8800_H__

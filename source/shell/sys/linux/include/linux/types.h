@@ -75,9 +75,16 @@ typedef __s64 s64;
 typedef unsigned int slab_flags_t;
 typedef unsigned int fmode_t;
 
-// TODO: fix to real addr width
-typedef uint32_t phys_addr_t;
-typedef uint32_t dma_addr_t;
+#ifndef VSF_ARCH_PHYS_ADDR_T
+typedef uintptr_t phys_addr_t;
+#else
+typedef VSF_ARCH_PHYS_ADDR_T phys_addr_t;
+#endif
+#ifndef VSF_ARCH_DMA_ADDR_T
+typedef uintptr_t dma_addr_t;
+#else
+typedef VSF_ARCH_DMA_ADDR_T dma_addr_t;
+#endif
 
 struct hlist_head {
     struct hlist_node *first;
