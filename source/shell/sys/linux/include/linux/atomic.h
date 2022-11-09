@@ -1,12 +1,15 @@
 #ifndef __VSF_LINUX_ATOMIC_H__
 #define __VSF_LINUX_ATOMIC_H__
 
+// for uintalu_t
+#include "hal/arch/vsf_arch.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct {
-    volatile int counter;
+    volatile uintalu_t counter;
 } atomic_t;
 #define ATOMIC_INIT(__VALUE)            { (__VALUE) }
 
