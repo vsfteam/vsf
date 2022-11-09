@@ -76,12 +76,12 @@ typedef unsigned int slab_flags_t;
 typedef unsigned int fmode_t;
 
 #ifndef VSF_ARCH_PHYS_ADDR_T
-typedef uintptr_t phys_addr_t;
+typedef uintalu_t phys_addr_t;
 #else
 typedef VSF_ARCH_PHYS_ADDR_T phys_addr_t;
 #endif
 #ifndef VSF_ARCH_DMA_ADDR_T
-typedef uintptr_t dma_addr_t;
+typedef uintalu_t dma_addr_t;
 #else
 typedef VSF_ARCH_DMA_ADDR_T dma_addr_t;
 #endif
