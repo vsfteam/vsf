@@ -8,6 +8,7 @@
 #else
 #   include <sys/types.h>
 #endif
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
