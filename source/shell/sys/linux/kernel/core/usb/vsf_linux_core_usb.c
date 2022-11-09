@@ -513,7 +513,7 @@ int usb_reset_device(struct usb_device *udev)
 {
     vk_usbh_reset_dev(udev->__host, udev->__dev);
     while (vk_usbh_is_dev_resetting(udev->__host, udev->__dev)) {
-        usleep(20);
+        vsf_thread_delay_ms(20);
     }
     return 0;
 }

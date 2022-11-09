@@ -869,7 +869,6 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
         if (sfd != NULL) {
             // do not use close because it depends on current process
             //  and vsf_linux_delete_process can be called in other processes
-            extern int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd);
             __vsf_linux_fd_close_ex(process, sfd->fd);
         }
     } while (sfd != NULL);
