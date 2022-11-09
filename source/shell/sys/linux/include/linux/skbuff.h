@@ -3,6 +3,7 @@
 
 #include <linux/types.h>
 #include <linux/gfp.h>
+#include <linux/list.h>
 #include <linux/llist.h>
 #include <linux/refcount.h>
 
