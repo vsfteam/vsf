@@ -776,7 +776,8 @@ static bool __vk_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
         return true;
     } else {
         urb->status = URB_CANCELED;
-        vsf_eda_post_msg(&__vk_winusb_hcd.eda, urb);
+        vsf_eda_post_msg(urb->eda_caller, urb);
+        return true;
     }
 }
 

@@ -758,8 +758,13 @@ static bool __vk_libusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
         __vk_libusb_hcd_trace_urb(urb, "freed");
 #endif
-        vk_usbh_hcd_urb_free_buffer(urb);
-        vsf_usbh_free(urb);
+        if (urb->transfer_flags & __URB_NEED_FREE) {
+            vk_usbh_hcd_urb_free_buffer(urb);
+            vsf_usbh_free(urb);
+        } else {
+            urb->status = URB_CANCELED;
+            vsf_eda_post_msg(urb->eda_caller, urb);
+        }
         return true;
     }
 }

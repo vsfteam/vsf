@@ -253,8 +253,13 @@ static void __vk_dwcotg_hcd_init_regs(vk_dwcotg_hcd_t *dwcotg_hcd, void *regbase
 
 static void __vk_dwcotg_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
-    vk_usbh_hcd_urb_free_buffer(urb);
-    vsf_usbh_free(urb);
+    if (urb->transfer_flags & __URB_NEED_FREE) {
+        vk_usbh_hcd_urb_free_buffer(urb);
+        vsf_usbh_free(urb);
+    } else {
+        urb->status = URB_CANCELED;
+        vsf_eda_post_msg(urb->eda_caller, urb);
+    }
 }
 
 static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8_t channel_idx)

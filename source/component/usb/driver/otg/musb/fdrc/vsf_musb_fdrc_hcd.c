@@ -203,8 +203,13 @@ static void __vk_musb_fdrc_hcd_free_urb_do(vk_musb_fdrc_hcd_t *musb, vk_usbh_hcd
         vsf_unprotect_sched(orig);
     }
 
-    vk_usbh_hcd_urb_free_buffer(urb);
-    vsf_usbh_free(urb);
+    if (urb->transfer_flags & __URB_NEED_FREE) {
+        vk_usbh_hcd_urb_free_buffer(urb);
+        vsf_usbh_free(urb);
+    } else {
+        urb->status = URB_CANCELED;
+        vsf_eda_post_msg(urb->eda_caller, urb);
+    }
 }
 
 // TODO: verify ZLP indicated by urb->transfer_flags with URB_ZERO_PACKET

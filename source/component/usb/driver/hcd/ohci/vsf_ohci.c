@@ -1202,9 +1202,15 @@ static vk_usbh_hcd_urb_t * __ohci_alloc_urb(vk_usbh_hcd_t *hcd)
 
 static void __ohci_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
-    ohci_urb_t *urb_ohci = (ohci_urb_t *)urb->priv;
-    vk_usbh_hcd_urb_free_buffer(urb);
-    vsf_usbh_free(urb_ohci->ed);
+    if (urb->transfer_flags & __URB_NEED_FREE) {
+        ohci_urb_t *urb_ohci = (ohci_urb_t *)urb->priv;
+        vk_usbh_hcd_urb_free_buffer(urb);
+        vsf_usbh_free(urb_ohci->ed);
+        vsf_usbh_free(urb);
+    } else {
+        urb->status = URB_CANCELED;
+        vsf_eda_post_msg(urb->eda_caller, urb);
+    }
 }
 
 static void __ohci_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
