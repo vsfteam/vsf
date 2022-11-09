@@ -94,27 +94,11 @@ extern "C" {
 
 
 
-#define USB_CONFIG(__CONFIG, __INDEX, __IFS)                                    \
-        __CONFIG[(__INDEX)]     = {                                             \
-            .num_of_ifs         = dimof(__IFS),                                 \
-            .ifs                = &(__IFS),                                     \
-        },
-
-#define USB_DEVICE(__DEVICE, __CONFIG, __DESC, __SPEED, __DRV)                  \
-        __DEVICE                = {                                             \
-            .num_of_config      = dimof(__CONFIG),                              \
-            .config             = &(__CONFIG),                                  \
-            .num_of_desc        = dimof(__DESC),                                \
-            .desc               = &(__DESC),                                    \
-            .speed              = (__SPEED),                                    \
-            .drv                = (__DRV),                                      \
-        },
-
 // __USB_IFS is used for class drivers
 #define __USB_IFS(__DRV, __PARAM)                                               \
             {                                                                   \
-                .class_op       = __DRV,                                        \
-                .class_param    = __PARAM,                                      \
+                .class_op       = (__DRV),                                      \
+                .class_param    = (__PARAM),                                    \
             },
 #define USB_IFS(__DRV, __PARAM)                                                 \
             __USB_IFS((__DRV), (__PARAM))
