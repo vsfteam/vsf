@@ -730,17 +730,51 @@ const uuid_t uuid_null;
 
 #include <linux/idr.h>
 
-int ida_alloc_range(struct ida *ida, unsigned int min, unsigned int max, gfp_t gfp)
+int ida_alloc_range(struct ida *ida, unsigned int __min_to_avoid_conflict,
+                    unsigned int __max_to_avoid_conflict, gfp_t gfp)
 {
+    const int bits_in_value = sizeof(uintalu_t) << 3;
+    uintalu_t value;
+    unsigned int pos_in_map, pos, mask_bits_high;
+    vsf_protect_t orig;
+    int id;
+
+    pos = __min_to_avoid_conflict % bits_in_value;
+    pos_in_map = __min_to_avoid_conflict / bits_in_value;
+    if (pos) {
+        __min_to_avoid_conflict = roundup(__min_to_avoid_conflict, bits_in_value);
+
+        value = (1ULL << pos) - 1;
+        if (__min_to_avoid_conflict > __max_to_avoid_conflict) {
+            mask_bits_high = __min_to_avoid_conflict - __max_to_avoid_conflict - 1;
+            value |= ((1ULL << mask_bits_high) - 1) << (bits_in_value - mask_bits_high);
+        }
+
+        orig = vsf_protect_int();
+        value = ida->bitmap[pos_in_map] | value;
+        id = __vsf_arch_ffz(value);
+        if (id >= 0) {
+            ida->bitmap[pos_in_map] |= 1 << id;
+            vsf_unprotect_int(orig);
+            return pos_in_map * bits_in_value + id;
+        }
+        vsf_unprotect_int(orig);
+        pos_in_map++;
+    }
+
+    if (__min_to_avoid_conflict < __max_to_avoid_conflict) {
+        __max_to_avoid_conflict -= __min_to_avoid_conflict;
+        __min_to_avoid_conflict = VSF_LINUX_CFG_IDA_MAX - __min_to_avoid_conflict;
+        __max_to_avoid_conflict = vsf_min(__max_to_avoid_conflict, __min_to_avoid_conflict);
+        __max_to_avoid_conflict++;      // include min
+
+        orig = vsf_protect_int();
+        id = vsf_bitmap_ffz(&ida->bitmap[pos_in_map], __max_to_avoid_conflict);
+        vsf_unprotect_int(orig);
+        return id;
+    }
+
     return -1;
-}
-
-void ida_free(struct ida *ida, unsigned int id)
-{
-}
-
-void ida_destroy(struct ida *ida)
-{
 }
 
 /*******************************************************************************

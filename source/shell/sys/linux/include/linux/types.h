@@ -98,11 +98,11 @@ struct hlist_node {
 
 // some compiler does not support typeof
 #define roundup(__x, __y) ({                                                    \
-    (((__x) + (__y - 1)) / __y) * __y;                                          \
+    (((__x) + ((__y) - 1)) / (__y)) * (__y);                                    \
 })
 
 #define rounddown(__x, __y) ({                                                  \
-    __x - (__x % (__y));                                                        \
+    (__x) - ((__x) % (__y));                                                    \
 })
 
 #define round_up(__x, __y)  ((((__x) - 1) | ((__y) - 1)) + 1)
