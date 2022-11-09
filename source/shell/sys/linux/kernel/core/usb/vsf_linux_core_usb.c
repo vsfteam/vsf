@@ -75,6 +75,16 @@ static void __vsf_linux_usb_done_work(struct work_struct *work)
     if (urb->complete != NULL) {
         urb->complete(urb);
     }
+
+    vsf_eda_t *eda_pending;
+    vsf_protect_t orig = vsf_protect_sched();
+        urb->is_submitted = false;
+        eda_pending = urb->eda_pending;
+        urb->eda_pending = NULL;
+    vsf_unprotect_sched(orig);
+    if (eda_pending != NULL) {
+        vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
+    }
 }
 
 static void __usbdrv_done_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -85,7 +95,12 @@ static void __usbdrv_done_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&vsfurb);
             struct urb *urb = pipe.extra;
 
-            urb->status = vk_usbh_urb_get_status(&vsfurb);
+            switch (vk_usbh_urb_get_status(&vsfurb)) {
+            case URB_OK:        urb->status = 0;        break;
+            case URB_CANCELED:  urb->status = -ENOENT;  break;
+            default:
+            case URB_FAIL:      urb->status = -EIO;     break;
+            }
             urb->actual_length = vk_usbh_urb_get_actual_length(&vsfurb);
 
             VSF_LINUX_ASSERT(urb != NULL);
@@ -159,9 +174,9 @@ void usb_kill_anchored_urbs(struct usb_anchor *anchor)
         orig = vsf_protect_int();
         while (!list_empty(&anchor->urb_list)) {
             victim = list_entry(&anchor->urb_list.prev, struct urb, anchor_list);
-            usb_get_urb(victim);
             vsf_unprotect_int(orig);
 
+            usb_get_urb(victim);
             usb_kill_urb(victim);
             usb_put_urb(victim);
             orig = vsf_protect_int();
@@ -423,7 +438,7 @@ static void urb_destroy(struct kref *kref)
     if (urb->transfer_flags & URB_FREE_BUFFER) {
         kfree(urb->transfer_buffer);
     }
-    vsf_usbh_free(urb);
+    vk_usbh_free_urb(__usbdrv_host, &urb->__urb);
 }
 
 void usb_free_urb(struct urb *urb)
@@ -439,6 +454,10 @@ int usb_submit_urb(struct urb *urb, gfp_t flags)
         return -ENOMEM;
     }
 
+    vsf_protect_t orig = vsf_protect_sched();
+        urb->is_submitted = true;
+    vsf_unprotect_sched(orig);
+
     vsf_err_t err = vk_usbh_submit_urb_ex(__usbdrv_host, &urb->__urb, 0, &__usbdrv_done_task);
     if (VSF_ERR_NONE != err) {
         return -EIO;
@@ -448,13 +467,22 @@ int usb_submit_urb(struct urb *urb, gfp_t flags)
 
 int usb_unlink_urb(struct urb *urb)
 {
-    vk_usbh_free_urb(__usbdrv_host, &urb->__urb);
+    vk_usbh_unlink_urb(__usbdrv_host, &urb->__urb);
     return 0;
 }
 
 void usb_kill_urb(struct urb *urb)
 {
-    vk_usbh_free_urb(__usbdrv_host, &urb->__urb);
+    vsf_eda_t *eda_cur = vsf_eda_get_cur();
+    vsf_protect_t orig = vsf_protect_sched();
+    if (!urb->is_submitted) {
+        vsf_unprotect_sched(orig);
+        return;
+    }
+    urb->eda_pending = eda_cur;
+    vsf_unprotect_sched(orig);
+
+    vsf_thread_wfe(VSF_EVT_USER);
 }
 
 int usb_control_msg(struct usb_device *udev, unsigned int pipe, __u8 request, __u8 requesttype, __u16 value, __u16 index, void *data, __u16 size, int timeout)
@@ -506,11 +534,13 @@ int usb_interrupt_msg(struct usb_device *udev, unsigned int pipe, void *data, in
     vsf_thread_wfm();
 
     if (URB_OK != vk_usbh_urb_get_status(&urb)) {
+        vk_usbh_free_urb(udev->__host, &urb);
         return -EIO;
     }
     if (actual_length != NULL) {
         *actual_length = vk_usbh_urb_get_actual_length(&urb);
     }
+    vk_usbh_free_urb(udev->__host, &urb);
     return 0;
 }
 

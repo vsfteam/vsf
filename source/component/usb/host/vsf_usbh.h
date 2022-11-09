@@ -163,6 +163,7 @@ enum {
     URB_OK                  = VSF_ERR_NONE,
     URB_FAIL                = VSF_ERR_FAIL,
     URB_PENDING             = VSF_ERR_NOT_READY,
+    URB_CANCELED            = 2,
     URB_TIMEOUT             = VSF_ERR_TIMEOUT,
 };
 
@@ -171,6 +172,7 @@ enum {
     URB_SHORT_NOT_OK        = 0x01,
     URB_ISO_ASAP            = 0x02,
     URB_ZERO_PACKET         = 0x04,
+    __URB_NEED_FREE         = 0x08,
     URB_HCD_SPECIFIED_FLAGS = 0x10,
 };
 
@@ -576,6 +578,7 @@ extern bool vk_usbh_urb_is_alloced(vk_usbh_urb_t *urb);
 extern vk_usbh_pipe_t vk_usbh_urb_get_pipe(vk_usbh_urb_t *urb);
 extern void vk_usbh_urb_set_pipe(vk_usbh_urb_t *urb, vk_usbh_pipe_t pipe);
 extern vsf_err_t vk_usbh_alloc_urb(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_urb_t *urb);
+extern void vk_usbh_unlink_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb);
 extern void vk_usbh_free_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb);
 extern void * vk_usbh_urb_alloc_buffer(vk_usbh_urb_t *urb, uint_fast16_t size);
 extern void vk_usbh_urb_free_buffer(vk_usbh_urb_t *urb);

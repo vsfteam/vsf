@@ -770,10 +770,13 @@ static bool __vk_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
         VSF_USB_ASSERT(winusb_urb->is_to_free);
         __vsf_arch_irq_request_send(&winusb_urb->irq_request);
         return false;
-    } else {
+    } else if (urb->transfer_flags & __URB_NEED_FREE) {
         vk_usbh_hcd_urb_free_buffer(urb);
         vsf_usbh_free(urb);
         return true;
+    } else {
+        urb->status = URB_CANCELED;
+        vsf_eda_post_msg(&__vk_winusb_hcd.eda, urb);
     }
 }
 

@@ -172,7 +172,9 @@ struct urb {
 
     dma_addr_t                      transfer_dma;
 
-    int                             error_count;
+    short                           error_count;
+    bool                            is_submitted;
+    vsf_eda_t                       *eda_pending;
     void                            *context;
     usb_complete_t                  complete;
     struct work_struct              done_work;

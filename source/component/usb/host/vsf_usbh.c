@@ -403,12 +403,24 @@ vsf_err_t vk_usbh_alloc_urb(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_urb_t *
     }
 }
 
+
+void vk_usbh_unlink_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb)
+{
+    VSF_USB_ASSERT((usbh != NULL) && (urb != NULL));
+
+    if (vk_usbh_urb_is_alloced(urb)) {
+        urb->urb_hcd->transfer_flags &= ~__URB_NEED_FREE;
+        usbh->drv->free_urb(&usbh->use_as__vk_usbh_hcd_t, urb->urb_hcd);
+    }
+}
+
 void vk_usbh_free_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb)
 {
     VSF_USB_ASSERT((usbh != NULL) && (urb != NULL));
 
     if (vk_usbh_urb_is_alloced(urb)) {
         vk_usbh_pipe_t pipe = urb->urb_hcd->pipe;
+        urb->urb_hcd->transfer_flags |= __URB_NEED_FREE;
         usbh->drv->free_urb(&usbh->use_as__vk_usbh_hcd_t, urb->urb_hcd);
         pipe.is_submitted = false;
         urb->pipe = pipe;
