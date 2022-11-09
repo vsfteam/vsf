@@ -201,6 +201,9 @@ static void __vsf_linux_usb_disconnect_work(struct work_struct *work)
     if (usbh_linux->linux_drv->disconnect != NULL) {
         usbh_linux->linux_drv->disconnect(&usbh_linux->ifs);
     }
+    if (usbh_linux->device.actconfig != NULL) {
+        vsf_usbh_free(usbh_linux->device.actconfig);
+    }
 }
 
 static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
@@ -388,6 +391,7 @@ int __usb_init_vsfurb(struct urb *urb, struct usb_device *dev)
         .extra          = urb,
     });
     vk_usbh_urb_set_buffer(&urb->__urb, urb->transfer_buffer, urb->transfer_buffer_length);
+    return 0;
 }
 
 struct urb * usb_alloc_urb(int iso_packets, gfp_t flags)
@@ -417,7 +421,7 @@ static void urb_destroy(struct kref *kref)
 {
     struct urb *urb = container_of(kref, struct urb, kref);
     if (urb->transfer_flags & URB_FREE_BUFFER) {
-        vsf_usbh_free(urb->transfer_buffer);
+        kfree(urb->transfer_buffer);
     }
     vsf_usbh_free(urb);
 }
