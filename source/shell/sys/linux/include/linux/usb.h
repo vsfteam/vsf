@@ -247,7 +247,6 @@ static inline struct usb_host_endpoint * usb_pipe_endpoint(struct usb_device *ud
     return eps[usb_pipeendpoint(pipe)];
 }
 
-extern void __usb_init_vsfurb(struct urb *urb, struct usb_device *dev);
 static inline void usb_fill_control_urb(struct urb *urb,
                         struct usb_device *dev,
                         unsigned int pipe,
@@ -264,7 +263,6 @@ static inline void usb_fill_control_urb(struct urb *urb,
     urb->transfer_buffer_length = buffer_length;
     urb->complete               = complete_fn;
     urb->context                = context;
-    __usb_init_vsfurb(urb, dev);
 }
 
 static inline void usb_fill_bulk_urb(struct urb *urb,
@@ -281,7 +279,6 @@ static inline void usb_fill_bulk_urb(struct urb *urb,
     urb->transfer_buffer_length = buffer_length;
     urb->complete               = complete_fn;
     urb->context                = context;
-    __usb_init_vsfurb(urb, dev);
 }
 
 static inline void usb_fill_int_urb(struct urb *urb,
@@ -308,7 +305,6 @@ static inline void usb_fill_int_urb(struct urb *urb,
     }
 
     urb->start_frame = -1;
-    __usb_init_vsfurb(urb, dev);
 }
 
 extern int usb_reset_device(struct usb_device *udev);

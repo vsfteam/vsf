@@ -372,11 +372,13 @@ struct urb *usb_get_urb(struct urb *urb)
     return urb;
 }
 
-void __usb_init_vsfurb(struct urb *urb, struct usb_device *dev)
+int __usb_init_vsfurb(struct urb *urb, struct usb_device *dev)
 {
     if (!vk_usbh_urb_is_alloced(&urb->__urb)) {
         urb->__urb.pipe.value = 1;
-        vk_usbh_alloc_urb(__usbdrv_host, dev->__dev, &urb->__urb);
+        if (VSF_ERR_NONE != vk_usbh_alloc_urb(__usbdrv_host, dev->__dev, &urb->__urb)) {
+            return -1;
+        }
     }
 
     vk_usbh_urb_set_pipe(&urb->__urb, (vk_usbh_pipe_t){
@@ -429,6 +431,10 @@ void usb_free_urb(struct urb *urb)
 
 int usb_submit_urb(struct urb *urb, gfp_t flags)
 {
+    if (__usb_init_vsfurb(urb, urb->dev) < 0) {
+        return -ENOMEM;
+    }
+
     vsf_err_t err = vk_usbh_submit_urb_ex(__usbdrv_host, &urb->__urb, 0, &__usbdrv_done_task);
     if (VSF_ERR_NONE != err) {
         return -EIO;
