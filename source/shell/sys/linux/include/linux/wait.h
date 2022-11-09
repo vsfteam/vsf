@@ -21,7 +21,6 @@ typedef int (*wait_queue_func_t)(struct wait_queue_entry *wqe, unsigned mode, in
 
 typedef struct wait_queue_entry {
     unsigned int            flags;
-    void                    *private;
     wait_queue_func_t       func;
     struct list_head        entry;
 

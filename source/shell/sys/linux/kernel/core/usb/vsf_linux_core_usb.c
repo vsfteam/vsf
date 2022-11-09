@@ -23,8 +23,6 @@
 
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #define __VSF_EDA_CLASS_INHERIT__
-#include <unistd.h>
-
 #include <linux/types.h>
 #include <linux/slab.h>
 #include <linux/usb.h>

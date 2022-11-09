@@ -21,7 +21,6 @@ extern "C" {
 #define MODULE_VERSION(__VERSION_STR)
 #define MODULE_LICENSE(__LICENSE_STR)
 
-#define module_driver(__drv, __register, __unregister)
 #define module_init(__init_func)
 #define module_exit(__exit_func)
 

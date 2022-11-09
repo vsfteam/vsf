@@ -14,6 +14,7 @@ extern "C" {
 #define USB_STATUS_TYPE_STANDARD    0
 #define USB_STATUS_TYPE_PTM         1
 
+#define usb_device_speed            usb_device_speed_t
 #define usb_descriptor_header       usb_descriptor_header_t
 #define usb_device_descriptor       usb_device_desc_t
 #define usb_config_descriptor       usb_config_desc_t
