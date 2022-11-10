@@ -535,6 +535,9 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
     vk_usbh_pipe_t pipe = urb->pipe;
     ULONG real_size = 0;
 
+    if (NULL == winusb_dev) {
+        return -1;
+    }
     if (NULL == winusb_dev->hDev) {
         return VSF_ERR_INVALID_PARAMETER;
     }
@@ -810,6 +813,10 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 } else {
                     vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
                     vk_winusb_hcd_dev_t *winusb_dev = dev->dev_priv;
+
+                    if (NULL == winusb_dev) {
+                        goto wait_next_urb;
+                    }
 
                     if (USB_ENDPOINT_XFER_CONTROL == urb->pipe.type) {
                         struct usb_ctrlrequest_t *setup = &urb->setup_packet;
