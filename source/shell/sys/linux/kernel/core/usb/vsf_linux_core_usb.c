@@ -72,12 +72,18 @@ extern int usb_urb_dir_in(struct urb *urb)
 static void __vsf_linux_usb_done_work(struct work_struct *work)
 {
     struct urb *urb = container_of(work, struct urb, done_work);
+    vsf_protect_t orig = vsf_protect_int();
+        if (urb->anchor != NULL) {
+            usb_unanchor_urb(urb);
+        }
+    vsf_unprotect_int(orig);
+
     if (urb->complete != NULL) {
         urb->complete(urb);
     }
 
     vsf_eda_t *eda_pending;
-    vsf_protect_t orig = vsf_protect_sched();
+    orig = vsf_protect_sched();
         urb->is_submitted = false;
         eda_pending = urb->eda_pending;
         urb->eda_pending = NULL;
@@ -173,7 +179,8 @@ void usb_kill_anchored_urbs(struct usb_anchor *anchor)
     do {
         orig = vsf_protect_int();
         while (!list_empty(&anchor->urb_list)) {
-            victim = list_entry(&anchor->urb_list.prev, struct urb, anchor_list);
+            victim = list_first_entry(&anchor->urb_list, struct urb, anchor_list);
+            list_del(&victim->anchor_list);
             vsf_unprotect_int(orig);
 
             usb_get_urb(victim);
