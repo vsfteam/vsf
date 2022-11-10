@@ -94,14 +94,14 @@ static inline int list_is_last(const struct list_head *list, const struct list_h
     return list->next == head;
 }
 
-static inline int list_is_singular(const struct list_head *head)
-{
-    return !list_empty(head) && (head->next == head->prev);
-}
-
 static inline int list_empty(const struct list_head *head)
 {
     return head->next == head;
+}
+
+static inline int list_is_singular(const struct list_head *head)
+{
+    return !list_empty(head) && (head->next == head->prev);
 }
 
 static inline void list_insert(struct list_head *node, struct list_head *prev, struct list_head *next)
