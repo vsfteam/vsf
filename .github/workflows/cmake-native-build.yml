@@ -14,8 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         cc: [gcc, clang]
-        os: [ubuntu-latest, macos-12]
-        src: [linux, macos]
+        os: [ubuntu-latest] # [ubuntu-latest, macos-12]
+        src: [linux]        #[linux, macos]
         exclude:
           - os: ubuntu-latest
             src: macos
