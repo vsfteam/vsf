@@ -20,8 +20,18 @@
 
 #define __PRIVATE_HOST_N(m,n)
 
+#define PRIVATE_HOST_DECLARE(module, type, name)                                \
+    type backup_ ## name __PRIVATE_HOST_N(module, name)
+#define PRIVATE_HOST_EXT_STATEMENT(type, name)                                  \
+    extern type backup_ ## name
 #define PRIVATE_HOST_ARRAY_DECLARE(module, type, count, name)                   \
     type backup_ ## name[count] __PRIVATE_HOST_N(module, name)
+#define PRIVATE_HOST_ARRAY_EXT_STATEMENT(type, count, name)                     \
+    extern type backup_ ## name[count]
+#define PRIVATE_HOST_ARRAY2_DECLARE(module, type, count1, count2, name)         \
+    type backup_ ## name[count1][count2] __PRIVATE_HOST_N(module, name)
+#define PRIVATE_HOST_ARRAY2_EXT_STATEMENT(type, count1, count2, name)           \
+    extern type backup_ ## name[count1][count2]
 
 #define __SHAREDRAM             SECTION("SHAREDRAM")
 
