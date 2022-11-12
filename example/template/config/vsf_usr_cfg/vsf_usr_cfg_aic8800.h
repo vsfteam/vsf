@@ -90,7 +90,7 @@
 #define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
 #define APP_USE_SDL2_DEMO                               ENABLED
-#define APP_USE_DISP_DEMO                               DISABLED
+#define APP_USE_DISP_DEMO                               ENABLED
 // if using dl1x5, only RGB565 is supported
 #   define APP_SDL2_DEMO_CFG_COLOR_RGB565
 #   define APP_SDL2_DEMO_CFG_WIDTH                      256
