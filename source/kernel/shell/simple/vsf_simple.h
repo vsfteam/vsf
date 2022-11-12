@@ -223,6 +223,9 @@ extern "C" {
                     vsf_systimer_us_to_tick(__timeout)),                        \
                     (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
+#endif
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 
 /*----------------------------------------------------------------------------*
  * sub call                                                                   *
@@ -267,7 +270,6 @@ extern "C" {
                         sizeof(vsf_peda_local(__peda_name)),                    \
                         sizeof(vsf_peda_arg(__peda_name)),                      \
                         (uintptr_t)(__buff))
-
 
 #   define vsf_call_peda1( __peda_name,                                         \
                         __peda_param_addr)                                      \
