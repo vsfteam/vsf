@@ -97,6 +97,7 @@ void vsf_arch_shutdown(void)
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
+WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
     SystemInit();
