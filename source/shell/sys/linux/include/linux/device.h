@@ -125,7 +125,7 @@ static inline void *devm_kzalloc(struct device *dev, size_t size, gfp_t gfp)
 }
 static inline void devm_kfree(struct device *dev, const void *p)
 {
-    return kfree(p);
+    kfree(p);
 }
 
 extern char * devm_kvasprintf(struct device *dev, gfp_t gfp, const char *fmt, va_list ap);
