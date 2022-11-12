@@ -20,6 +20,8 @@
 #define __VSF_EDA_CLASS_INHERIT__
 #include "vsf.h"
 
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+
 #include "rtos.h"
 #include "rtos_al.h"
 
@@ -727,5 +729,7 @@ rtos_task_cfg_st get_task_cfg(uint8_t task_id)
 
     return cfg;
 }
+
+#endif      // VSF_KERNEL_CFG_SUPPORT_THREAD
 
 /* EOF */

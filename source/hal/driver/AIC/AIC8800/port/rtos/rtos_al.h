@@ -22,6 +22,8 @@
 
 #include "vsf.h"
 
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+
 #include "dbg_assert.h"
 
 #ifdef __cplusplus
@@ -153,5 +155,6 @@ extern void * rtos_timer_get_pvTimerID(TimerHandle_t xTimer);
 }
 #endif
 
+#endif      // VSF_KERNEL_CFG_SUPPORT_THREAD
 #endif
 /* EOF */
