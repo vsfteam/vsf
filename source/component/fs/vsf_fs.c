@@ -38,15 +38,22 @@
 #   error VSF_KERNEL_USE_SIMPLE_SHELL must be enabled
 #endif
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC != ENABLED
+#   warning Since VSF_KERNEL_CFG_SUPPORT_SYNC is not enabled, vk_file_open will \
+        be non-reentrant.
+#endif
+
 //#define VSF_FS_REF_TRACE            ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct __vk_fs_t {
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
     struct {
         vsf_crit_t lock;
     } open;
+#endif
     vk_vfs_file_t rootfs;
 } __vk_fs_t;
 
@@ -251,7 +258,9 @@ void vk_fs_init(void)
         __vk_fs.rootfs.fsop = &vk_vfs_op;
         __vk_fs.rootfs.fsinfo = (vk_fs_info_t *)&__vk_fs.rootfs;
         __vk_file_ref(&__vk_fs.rootfs.use_as__vk_file_t);
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
         vsf_eda_crit_init(&__vk_fs.open.lock);
+#endif
     }
 }
 
@@ -307,10 +316,12 @@ __vsf_component_peda_private_entry(__vk_file_open,
     switch (evt) {
     case VSF_EVT_INIT:
         vsf_local.err = VSF_ERR_NONE;
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
         if (VSF_ERR_NONE != vsf_eda_crit_enter(&__vk_fs.open.lock)) {
             break;
         }
     case VSF_EVT_SYNC:
+#endif
     do_lookup_child:
         if (vsf_local.name != NULL) {
             if (*vsf_local.name != '\0') {
@@ -344,7 +355,9 @@ __vsf_component_peda_private_entry(__vk_file_open,
         }
         break;
     do_return:
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
         vsf_eda_crit_leave(&__vk_fs.open.lock);
+#endif
         vsf_eda_return(vsf_local.err);
         break;
     case VSF_EVT_RETURN:
