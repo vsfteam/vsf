@@ -38,6 +38,7 @@ dcl_vsf_peda_methods(static, __vk_hw_flash_mal_init)
 dcl_vsf_peda_methods(static, __vk_hw_flash_mal_fini)
 dcl_vsf_peda_methods(static, __vk_hw_flash_mal_read)
 dcl_vsf_peda_methods(static, __vk_hw_flash_mal_write)
+dcl_vsf_peda_methods(static, __vk_hw_flash_mal_erase)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -53,6 +54,7 @@ const vk_mal_drv_t vk_hw_flash_mal_drv = {
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_read),
     .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_write),
+    .erase          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_erase),
 };
 
 #if     __IS_COMPILER_GCC__
