@@ -87,7 +87,7 @@ typedef enum vsf_io_feature_t {
                               IO_FILTER_CLK_SRC6 | IO_FILTER_CLK_SRC7 |
                               IO_HIGH_DRV,
 
-    __HW_IO_FEATURE_ALL_BITS  = IO_PULL_UP | IO_OPEN_DRAIN | IO_OPEN_DRAIN
+    __HW_IO_FEATURE_ALL_BITS  = IO_PULL_UP | IO_OPEN_DRAIN,
 
 } vsf_io_feature_t;
 
