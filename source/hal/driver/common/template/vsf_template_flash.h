@@ -94,7 +94,7 @@ typedef uint_fast32_t vsf_flash_size_t;
 typedef struct vsf_flash_t vsf_flash_t;
 
 typedef void vsf_flash_isr_handler_t(void *target_ptr,
-                                     vsf_flash_irq_mask_t type,
+                                     vsf_flash_irq_mask_t mask,
                                      vsf_flash_t *flash_ptr);
 
 typedef struct vsf_flash_isr_t {
