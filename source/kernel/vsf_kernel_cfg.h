@@ -292,8 +292,10 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #   endif
 #endif
 #if     VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE != ENABLED                           \
-    &&  (   VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED                       \
-        ||  VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED)
+    &&  (   (   VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED                \
+            &&  VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED)                  \
+        ||  (   VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE == ENABLED                     \
+            &&  VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED))
 #   error VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE MUST be enabled for callback_timer and/or queue isr APIs
 #endif
 
