@@ -236,7 +236,7 @@ vsf_err_t __vk_malfs_write(__vk_malfs_info_t *info, uint_fast64_t block_addr, ui
     return vk_mal_write(info->mal, info->block_size * block_addr, info->block_size * block_num, buff);
 }
 
-#if VSF_USE_HEAP == ENABLED
+#if VSF_USE_HEAP == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 void __vk_malfs_unmount(__vk_malfs_info_t *info)
 {
     if (info->total_cb != NULL) {
