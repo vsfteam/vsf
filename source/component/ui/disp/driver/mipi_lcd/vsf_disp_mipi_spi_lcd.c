@@ -23,7 +23,7 @@
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_DISP_CLASS_INHERIT__
-#define __VSF_DISP_MIPI_LCD_CLASS_IMPLEMENT
+#define __VSF_DISP_MIPI_SPI_LCD_CLASS_IMPLEMENT
 
 #include "kernel/vsf_kernel.h"
 #include "../../vsf_disp.h"
@@ -171,6 +171,7 @@ static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
     }
 }
 
+#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
 {
     vsf_err_t init_result;
@@ -201,6 +202,7 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
 
     return VSF_ERR_NONE;
 }
+#endif
 
 static void __lcd_update_cur_seq(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd,
                                  const uint8_t *buf,

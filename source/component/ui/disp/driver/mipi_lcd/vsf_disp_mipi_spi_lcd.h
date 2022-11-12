@@ -150,7 +150,7 @@ extern "C" {
     VSF_DISP_MIPI_LCD_WRITE(0xE0, 14, 0xD0, 0x03, 0x09, 0x0E, 0x11, 0x3D, 0x47, 0x55, 0x53, 0x1A, 0x16, 0x14, 0x1F, 0x22), /* Positive Voltage Gamma Control */ \
     VSF_DISP_MIPI_LCD_WRITE(0xE1, 14, 0xD0, 0x02, 0x08, 0x0D, 0x12, 0x2C, 0x43, 0x55, 0x53, 0x1E, 0x1B, 0x19, 0x20, 0x22)  /* Negative Voltage Gamma Control */
 
-#define VSF_DISP_ST7789V_INITSEQ(__MODE, __PIXEL_FORMAT)                        \
+#define VSF_DISP_ST7789V_SPI_INITSEQ(__MODE, __PIXEL_FORMAT)                    \
     VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,                                         \
     VSF_DISP_MIPI_SPI_LCD_INIT_MODE_AND_FORMAT(__MODE, __PIXEL_FORMAT)
 
