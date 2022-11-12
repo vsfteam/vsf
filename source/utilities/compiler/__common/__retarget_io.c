@@ -35,7 +35,7 @@
 
 void vsf_stdio_init(void)
 {
-    
+
 }
 
 SECTION(".vsf.utilities.stdio.__vsf_stdio_write")
@@ -58,6 +58,12 @@ extern int vsf_stdin_getchar(void);
 
 extern void vsf_stdout_init(void);
 extern void vsf_stdin_init(void);
+
+WEAK(vsf_stdout_putchar)
+int vsf_stdout_putchar(char ch)
+{
+    return 0;
+}
 
 WEAK(vsf_stderr_putchar)
 int vsf_stderr_putchar(char ch)
