@@ -108,7 +108,7 @@ vsf_class(__vk_malfs_info_t) {
     )
 };
 
-#if VSF_USE_HEAP == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#if VSF_USE_HEAP == ENABLED
 typedef enum vk_malfs_mount_state_t {
     VSF_MOUNT_STATE_READ_MBR,
     VSF_MOUNT_STATE_CREATE_ROOT,
@@ -126,8 +126,10 @@ typedef struct vk_malfs_mount_partition_t {
 vsf_class(vk_malfs_mounter_t) {
     public_member(
         vk_mal_t *mal;
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
         // set mutex if there is multiple volume in mal
         vsf_mutex_t *mutex;
+#endif
         vk_file_t *dir;
         public_const vsf_err_t err;
     )
@@ -152,7 +154,7 @@ extern vsf_err_t __vk_malfs_read(__vk_malfs_info_t *info, uint_fast64_t block_ad
 extern vsf_err_t __vk_malfs_write(__vk_malfs_info_t *info, uint_fast64_t block_addr, uint_fast32_t block_num, uint8_t *buff);
 extern void __vk_malfs_unmount(__vk_malfs_info_t *info);
 
-#if VSF_USE_HEAP == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#if VSF_USE_HEAP == ENABLED
 // user should set the mal and root in mounter, then call vk_malfs_mount and wait VSF_EVT_RETURN
 extern vsf_err_t vk_malfs_mount_mbr(vk_malfs_mounter_t *mounter);
 #endif

@@ -27,6 +27,12 @@
 #include "../../vsf_fs.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_KERNEL_CFG_SUPPORT_SYNC != ENABLED
+#   warning Since VSF_KERNEL_CFG_SUPPORT_SYNC is not eanbled, partitions will be\
+            non-reentrant.
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -236,7 +242,7 @@ vsf_err_t __vk_malfs_write(__vk_malfs_info_t *info, uint_fast64_t block_addr, ui
     return vk_mal_write(info->mal, info->block_size * block_addr, info->block_size * block_num, buff);
 }
 
-#if VSF_USE_HEAP == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#if VSF_USE_HEAP == ENABLED
 void __vk_malfs_unmount(__vk_malfs_info_t *info)
 {
     if (info->total_cb != NULL) {
@@ -265,9 +271,11 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
 
     switch (evt) {
     case VSF_EVT_INIT:
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
         if (mounter->mutex != NULL) {
             vsf_eda_mutex_init(mounter->mutex);
         }
+#endif
         mounter->mbr = vsf_heap_malloc(512);
         if (NULL == mounter->mbr) {
         return_not_enough_resources:
@@ -315,7 +323,11 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
             case VSF_MBR_PARTITION_TYPE_FAT32_LBA:
             case VSF_MBR_PARTITION_TYPE_FAT16_32_2G_LBA: {
                     typedef struct vk_malfs_fat_t {
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
                         vk_reentrant_mal_t fat_mal;
+#else
+                        vk_mim_mal_t fat_mal;
+#endif
                         char root_name[6];
                         implement_fatfs_info(512, 1);
                     } vk_malfs_fat_t;
@@ -331,9 +343,14 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
                     partition->malfs_info = &malfs_fat->use_as____vk_malfs_info_t;
                     partition->fsop = &vk_fatfs_op;
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
                     malfs_fat->fat_mal.mal = mal;
                     malfs_fat->fat_mal.mutex = mounter->mutex;
                     malfs_fat->fat_mal.drv = &vk_reentrant_mal_drv;
+#else
+                    malfs_fat->fat_mal.host_mal = mal;
+                    malfs_fat->fat_mal.drv = &vk_mim_mal_drv;
+#endif
                     malfs_fat->fat_mal.offset = le32_to_cpu(dpt->sectors_preceding) * 512;
                     malfs_fat->fat_mal.size = le32_to_cpu(dpt->sectors_in_partition) * 512;
                     malfs_fat->mal = &malfs_fat->fat_mal.use_as__vk_mal_t;
