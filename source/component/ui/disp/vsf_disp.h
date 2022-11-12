@@ -68,6 +68,8 @@ extern "C" {
 #define vsf_disp_get_pixel_format(__disp)                                       \
             ((vk_disp_t *)(__disp))->param.color
 
+#define vsf_disp_get_width(__disp)  ((__disp)->param.width)
+#define vsf_disp_get_height(__disp) ((__disp)->param.height)
 #define vsf_disp_get_pixel_bitsize(__disp)                                      \
             vsf_disp_get_pixel_format_bitsize(vsf_disp_get_pixel_format(__disp))
 #define vsf_disp_get_pixel_bytesize(__disp)                                     \
