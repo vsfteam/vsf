@@ -161,6 +161,7 @@ void vk_disp_mipi_te_line_isr_enable_once(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_
     vsf_disp_mipi_te_line_ready(disp_mipi_spi_lcd);
 }
 
+#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
                                            vsf_spi_t *spi_ptr,
                                            vsf_spi_irq_mask_t irq_mask)
@@ -171,7 +172,6 @@ static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
     }
 }
 
-#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
 {
     vsf_err_t init_result;
