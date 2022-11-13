@@ -63,7 +63,7 @@ typedef struct __vk_fs_t {
     } open;
 #endif
 #if VSF_FS_CFG_FILE_POOL == ENABLED
-    __vk_fs_file_t file_pool_buffer[VSF_FS_CFG_FILE_POOL_SIZE];
+    vsf_pool_item(__vk_fs_file_pool) file_pool_buffer[VSF_FS_CFG_FILE_POOL_SIZE];
     vsf_pool(__vk_fs_file_pool) file_pool;
 #endif
     vk_vfs_file_t rootfs;
