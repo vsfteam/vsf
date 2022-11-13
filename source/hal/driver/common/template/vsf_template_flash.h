@@ -158,6 +158,8 @@ extern fsm_rt_t vsf_flash_enable(vsf_flash_t *flash_ptr);
 
 extern fsm_rt_t vsf_flash_disable(vsf_flash_t *flash_ptr);
 
+extern vsf_flash_capability_t vsf_flash_capability(vsf_flash_t *flash_ptr);
+
 extern vsf_err_t vsf_flash_erase_one_sector(vsf_flash_t *flash_ptr,
                                             vsf_flash_size_t offset_of_bytes);
 
