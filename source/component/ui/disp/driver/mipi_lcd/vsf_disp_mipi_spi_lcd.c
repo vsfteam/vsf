@@ -426,10 +426,14 @@ static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
 static vsf_err_t __lcd_init(vk_disp_t *pthis)
 {
     vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = (vk_disp_mipi_spi_lcd_t *)pthis;
+    vsf_err_t err;
     VSF_UI_ASSERT(disp_mipi_spi_lcd != NULL);
 
     vsf_disp_mipi_spi_lcd_io_init(disp_mipi_spi_lcd);
-    __mipi_lcd_spi_init(disp_mipi_spi_lcd);
+    err = __mipi_lcd_spi_init(disp_mipi_spi_lcd);
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
 
 #if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
     disp_mipi_spi_lcd->teda.fn.evthandler = __lcd_hardware_reset_pin;
