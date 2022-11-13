@@ -54,14 +54,6 @@ extern "C" {
 #   define VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO             ENABLED
 #endif
 
-#ifndef VSF_DISP_MIPI_SPI_LCD_CFG_WIDTH
-#   define VSF_DISP_MIPI_SPI_LCD_CFG_WIDTH                  240
-#endif
-
-#ifndef VSF_DISP_MIPI_SPI_LCD_CFG_HEIGTH
-#   define VSF_DISP_MIPI_SPI_LCD_CFG_HEIGTH                 320
-#endif
-
 #define VSF_DISP_MIPI_SPI_LCD_SPI_8BITS_MODE                0
 #define VSF_DISP_MIPI_SPI_LCD_SPI_9BITS_MODE                1
 

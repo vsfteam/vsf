@@ -111,6 +111,7 @@ void vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_
     vsf_disp_mipi_te_line_ready(disp_mipi_spi_lcd);
 }
 
+#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 WEAK(vk_disp_mipi_spi_lcd_hw_reset_io_write)
 void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool level)
 {
@@ -118,10 +119,9 @@ void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_sp
     vsf_gpio_write(disp_mipi_spi_lcd->reset.gpio,
                    level ? disp_mipi_spi_lcd->reset.pin_mask : 0,
                    disp_mipi_spi_lcd->reset.pin_mask);
-#else
-#   error "Please implement hardware reset function"
 #endif
 }
+#endif
 
 WEAK(vsf_disp_mipi_spi_lcd_dcx_io_write)
 void vsf_disp_mipi_spi_lcd_dcx_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool level)
@@ -130,8 +130,6 @@ void vsf_disp_mipi_spi_lcd_dcx_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lc
     vsf_gpio_write(disp_mipi_spi_lcd->dcx.gpio,
                    level ? disp_mipi_spi_lcd->dcx.pin_mask : 0,
                    disp_mipi_spi_lcd->dcx.pin_mask);
-#else
-#   error "Please implement lcd dcx io function"
 #endif
 }
 
@@ -148,8 +146,6 @@ void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
                         disp_mipi_spi_lcd->dcx.pin_mask, IO_PULL_UP);
     vsf_gpio_set_output(disp_mipi_spi_lcd->dcx.gpio,
                         disp_mipi_spi_lcd->dcx.pin_mask);
-#else
-#   error "Please implement lcd io init function"
 #endif
 }
 
@@ -161,7 +157,6 @@ void vk_disp_mipi_te_line_isr_enable_once(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_
     vsf_disp_mipi_te_line_ready(disp_mipi_spi_lcd);
 }
 
-#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
                                            vsf_spi_t *spi_ptr,
                                            vsf_spi_irq_mask_t irq_mask)
@@ -202,7 +197,6 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
 
     return VSF_ERR_NONE;
 }
-#endif
 
 static void __lcd_update_cur_seq(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd,
                                  const uint8_t *buf,
@@ -313,9 +307,6 @@ static void __lcd_hardware_reset_pin(vsf_eda_t *teda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_INIT:
         VSF_UI_ASSERT(disp_mipi_spi_lcd->spi != NULL);
-
-        vsf_disp_mipi_spi_lcd_io_init(disp_mipi_spi_lcd);
-        __mipi_lcd_spi_init(disp_mipi_spi_lcd);
 
         vk_disp_mipi_spi_lcd_hw_reset_io_write(disp_mipi_spi_lcd, false);
         disp_mipi_spi_lcd->reset_state = 0;
@@ -428,7 +419,7 @@ static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
         vk_disp_on_ready(&disp_mipi_spi_lcd->use_as__vk_disp_t);
         break;
     default:
-        VSF_UI_ASSERT(0);
+        VSF_UI_ASSERT(false);
     }
 }
 
@@ -436,6 +427,9 @@ static vsf_err_t __lcd_init(vk_disp_t *pthis)
 {
     vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = (vk_disp_mipi_spi_lcd_t *)pthis;
     VSF_UI_ASSERT(disp_mipi_spi_lcd != NULL);
+
+    vsf_disp_mipi_spi_lcd_io_init(disp_mipi_spi_lcd);
+    __mipi_lcd_spi_init(disp_mipi_spi_lcd);
 
 #if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
     disp_mipi_spi_lcd->teda.fn.evthandler = __lcd_hardware_reset_pin;
@@ -458,7 +452,7 @@ static vsf_err_t __lcd_refresh(vk_disp_t *pthis,
     VSF_UI_ASSERT(disp_mipi_spi_lcd != NULL);
 
     if (disp_mipi_spi_lcd->teda.fn.evthandler != __lcd_refresh_evthandler) {
-        VSF_UI_ASSERT(0);
+        VSF_UI_ASSERT(false);
         return VSF_ERR_NOT_READY;
     }
 
@@ -466,7 +460,7 @@ static vsf_err_t __lcd_refresh(vk_disp_t *pthis,
         || (area->pos.y + area->size.y > disp_mipi_spi_lcd->param.height)) {
         vsf_trace_error("disp area [%d,%d], [%d,%d] out of bounds\r\n",
                     area->pos.x, area->pos.y, area->size.x, area->size.y);
-        VSF_UI_ASSERT(0);
+        VSF_UI_ASSERT(false);
         return VSF_ERR_INVALID_RANGE;
     }
 
