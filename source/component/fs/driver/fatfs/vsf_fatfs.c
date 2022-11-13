@@ -389,6 +389,7 @@ static bool __vk_fatfs_fat_entry_is_valid(__vk_fatfs_info_t *fsinfo, uint_fast32
     return (cluster >= 2) && (cluster <= mask);
 }
 
+#if VSF_USE_HEAP == ENABLED
 static uint_fast8_t __vk_fatfs_parse_file_attr(uint_fast8_t fat_attr)
 {
     uint_fast8_t attr = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE;
@@ -403,6 +404,7 @@ static uint_fast8_t __vk_fatfs_parse_file_attr(uint_fast8_t fat_attr)
     }
     return attr;
 }
+#endif
 
 static bool __vk_fatfs_fat_entry_is_eof(__vk_fatfs_info_t *fsinfo, uint_fast32_t cluster)
 {
@@ -1146,6 +1148,10 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
     implement(vk_fatfs_lookup_local)
 ) {
     vsf_peda_begin();
+#if VSF_USE_HEAP != ENABLED
+    VSF_FS_ASSERT(false);
+    vsf_eda_return(VSF_ERR_NOT_SUPPORT);
+#else
     enum {
         LOOKUP_STATE_READ_SECTOR,
         LOOKUP_STATE_PARSE_SECTOR,
@@ -1328,6 +1334,7 @@ __fail_and_exit:
         vsf_heap_free(vsf_local.filename);
     }
     vsf_eda_return(err);
+#endif
     vsf_peda_end();
 }
 
@@ -1339,6 +1346,10 @@ __fail_and_exit:
 __vsf_component_peda_ifs_entry(__vk_fatfs_close, vk_file_close)
 {
     vsf_peda_begin();
+#if VSF_USE_HEAP != ENABLED
+    VSF_FS_ASSERT(false);
+    vsf_eda_return(VSF_ERR_NOT_SUPPORT);
+#else
     vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)&vsf_this;
 
     // TODO: flush file buffer if enabled
@@ -1346,6 +1357,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_close, vk_file_close)
         vsf_heap_free(fatfs_file->name);
     }
     vsf_eda_return(VSF_ERR_NONE);
+#endif
     vsf_peda_end();
 }
 

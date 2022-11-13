@@ -58,6 +58,22 @@ extern "C" {
 #   define VSF_FS_CFG_VFS_FILE_HAS_OP   ENABLED
 #endif
 
+// VSF_FS_CFG_FILE_POOL_FILE_SIZE is file byte size in file pool
+// VSF_FS_CFG_FILE_POOL_SIZE is file number in file pool
+#if     (defined(VSF_FS_CFG_FILE_POOL_SIZE) && !defined(VSF_FS_CFG_FILE_POOL_FILE_SIZE))\
+    ||  (!defined(VSF_FS_CFG_FILE_POOL_SIZE) && defined(VSF_FS_CFG_FILE_POOL_FILE_SIZE))
+#   warning both VSF_FS_CFG_FILE_POOL_SIZE and VSF_FS_CFG_FILE_POOL_FILE_SIZE MUST\
+            be defined to enable file pool.
+#endif
+#if defined(VSF_FS_CFG_FILE_POOL_SIZE) && defined(VSF_FS_CFG_FILE_POOL_FILE_SIZE)
+#   define VSF_FS_CFG_FILE_POOL     ENABLED
+#endif
+#if VSF_FS_CFG_FILE_POOL == ENABLED && VSF_USE_POOL != ENABLED
+#   error please enable VSF_USE_POOL to use file_pool
+#endif
+
+#if VSF_FS_CFG_FILE_POOL != ENABLED
+// file pool not enabled, check VSF_FS_CFG_MALLOC and  VSF_FS_CFG_FREE
 #if defined(VSF_FS_CFG_MALLOC) && !defined(VSF_FS_CFG_FREE)
 #   error VSF_FS_CFG_FREE must be defined
 #endif
@@ -71,6 +87,7 @@ extern "C" {
 #   endif
 #   define VSF_FS_CFG_MALLOC            vsf_heap_malloc
 #   define VSF_FS_CFG_FREE              vsf_heap_free
+#endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
