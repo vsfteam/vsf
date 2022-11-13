@@ -231,6 +231,7 @@ extern vsf_err_t vsf_flash_read_multi_sector(vsf_flash_t *flash_ptr,
 #   define vsf_flash_init(__FLASH, ...)               VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_init)               ((__vsf_flash_t *)__FLASH, ##__VA_ARGS__)
 #   define vsf_flash_enable(__FLASH)                  VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_enable)             ((__vsf_flash_t *)__FLASH)
 #   define vsf_flash_disable(__FLASH)                 VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_disable)            ((__vsf_flash_t *)__FLASH)
+#   define vsf_flash_capability(__FLASH)              VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_capability)         ((__vsf_flash_t *)__FLASH)
 #   define vsf_flash_erase_one_sector(__FLASH, ...)   VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_erase_one_sector)   ((__vsf_flash_t *)__FLASH, ##__VA_ARGS__)
 #   define vsf_flash_erase_multi_sector(__FLASH, ...) VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_erase_multi_sector) ((__vsf_flash_t *)__FLASH, ##__VA_ARGS__)
 #   define vsf_flash_erase(__FLASH, ...)              VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_erase_multi_sector) ((__vsf_flash_t *)__FLASH, ##__VA_ARGS__)
