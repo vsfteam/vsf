@@ -52,8 +52,8 @@
 #   define MIPI_LCD_RESET_COMPLETION_TIME               120     // Reset completion time
 #endif
 
-#ifndef VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET
-#   define VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET      DISABLED
+#ifndef VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET
+#   define VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET     DISABLED
 #endif
 
 #define __MIPI_LCD_BUFFER_TYPE                          0xFF
@@ -77,13 +77,13 @@ static vsf_err_t __lcd_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *dis
 static void __lcd_exit_sleep_mode(vsf_eda_t *teda, vsf_evt_t evt);
 static void __lcd_init_param_seq(vsf_eda_t *teda, vsf_evt_t evt);
 static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt);
-#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 static void __lcd_hardware_reset_pin(vsf_eda_t *teda, vsf_evt_t evt);
 #endif
 
 extern void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
 extern void vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
-#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 extern void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool level);
 #endif
 
@@ -111,7 +111,7 @@ void vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_
     vsf_disp_mipi_te_line_ready(disp_mipi_spi_lcd);
 }
 
-#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 WEAK(vk_disp_mipi_spi_lcd_hw_reset_io_write)
 void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool level)
 {
@@ -298,7 +298,7 @@ static void __lcd_write_command_seq_start(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_
     vsf_eda_post_evt(&disp_mipi_spi_lcd->teda.use_as__vsf_eda_t, VSF_EVT_INIT);
 }
 
-#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 static void __lcd_hardware_reset_pin(vsf_eda_t *teda, vsf_evt_t evt)
 {
     VSF_UI_ASSERT(teda != NULL);
@@ -435,7 +435,7 @@ static vsf_err_t __lcd_init(vk_disp_t *pthis)
         return err;
     }
 
-#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
     disp_mipi_spi_lcd->teda.fn.evthandler = __lcd_hardware_reset_pin;
 #else
     disp_mipi_spi_lcd->teda.fn.evthandler = __lcd_exit_sleep_mode;
