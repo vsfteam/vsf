@@ -134,10 +134,9 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #   endif
 #endif
 
-#if     __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED \
-    &&  defined(VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE)
+#if     __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
     static NO_INIT vsf_pool_item(vsf_eda_frame_pool)
-        __vsf_eda_frame_buffer[VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE];
+        __vsf_eda_frame_buffer[VSF_OS_CFG_EDA_FRAME_POOL_SIZE];
 #endif
 
     static const vsf_kernel_resource_t __res = {
@@ -174,8 +173,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 
 #endif
 
-#if     __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED \
-    &&  defined(VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE)
+#if     __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
         {
             __vsf_eda_frame_buffer,                 // frame_buf_ptr
             dimof(__vsf_eda_frame_buffer),          // frame_cnt

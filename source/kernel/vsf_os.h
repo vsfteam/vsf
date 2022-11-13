@@ -127,8 +127,12 @@ def_vsf_pool(vsf_evt_node_pool, vsf_evt_node_t)
 #endif
 
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+typedef struct __vsf_eda_frame_buffer_t {
+    __vsf_eda_frame_t frame;
+    uint8_t extra[VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE];
+} __vsf_eda_frame_buffer_t;
 dcl_vsf_pool(vsf_eda_frame_pool)
-def_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
+def_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_buffer_t)
 #endif
 
 typedef struct vsf_kernel_resource_t {

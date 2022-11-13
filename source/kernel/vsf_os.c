@@ -108,12 +108,13 @@ const vsf_protect_region_t vsf_protect_region_sched = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
-//implement_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
+//implement_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_buffer_t)
 #define __name vsf_eda_frame_pool
-#define __type __vsf_eda_frame_t
+#define __type __vsf_eda_frame_buffer_t
 #include "service/pool/impl_vsf_pool.inc"
+#endif
 
-
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 SECTION(".text.vsf.kernel.vsf_eda_new_frame")
 WEAK(vsf_eda_new_frame)
 __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
@@ -121,8 +122,8 @@ __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
     //! make sure local_size is aligned with sizeof(uintalu_t);
     local_size = (local_size + sizeof(uintalu_t) - 1) & ~ (sizeof(uintalu_t) - 1);
     /* todo: add smart pool support in the future */
-#if 0
-    __vsf_eda_frame_t *frame =
+#if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+    __vsf_eda_frame_t *frame = (__vsf_eda_frame_t *)
             VSF_POOL_ALLOC(vsf_eda_frame_pool, &__vsf_os.eda_frame_pool);
 #else
     __vsf_eda_frame_t *frame =
@@ -152,13 +153,13 @@ WEAK(vsf_eda_free_frame)
 void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
 {
     /* todo: add smart pool support in the future */
-#if 0
-    VSF_POOL_FREE(vsf_eda_frame_pool, &__vsf_os.eda_frame_pool, frame);
+#if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+    VSF_POOL_FREE(vsf_eda_frame_pool, &__vsf_os.eda_frame_pool, (__vsf_eda_frame_buffer_t *)frame);
 #else
     vsf_heap_free(frame);
 #endif
 }
-#endif      // __VSF_KERNEL_CFG_EDA_FRAME_POOL
+#endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 
 #ifdef __VSF_OS_CFG_EVTQ_LIST
 //implement_vsf_pool( vsf_evt_node_pool, vsf_evt_node_t)

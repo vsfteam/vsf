@@ -109,10 +109,12 @@ static vsf_err_t __vsf_eda_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool for
 #endif
 
 //! should be provided by user
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 SECTION(".text.vsf.kernel.vsf_eda_new_frame")
 extern __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size);
 SECTION(".text.vsf.kernel.vsf_eda_free_frame")
 extern void vsf_eda_free_frame(__vsf_eda_frame_t *frame);
+#endif
 
 extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
 

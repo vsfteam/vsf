@@ -107,7 +107,14 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   ifndef __VSF_KERNEL_CFG_EDA_FRAME_POOL
+// VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE is extra frame byte size in frame pool
+// VSF_OS_CFG_EDA_FRAME_POOL_SIZE is frame number in frame pool
+#   if  (defined(VSF_OS_CFG_EDA_FRAME_POOL_SIZE) && !defined(VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE))\
+    ||  (!defined(VSF_OS_CFG_EDA_FRAME_POOL_SIZE) && defined(VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE))
+#       warning both VSF_OS_CFG_EDA_FRAME_POOL_SIZE and VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE MUST\
+            be defined to enable frame pool.
+#   endif
+#   if defined(VSF_OS_CFG_EDA_FRAME_POOL_SIZE) && defined(VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE)
 #       define __VSF_KERNEL_CFG_EDA_FRAME_POOL              ENABLED
 #   endif
 #   ifndef VSF_KERNEL_CFG_EDA_FAST_SUB_CALL
