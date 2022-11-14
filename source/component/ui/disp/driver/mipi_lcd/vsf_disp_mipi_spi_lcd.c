@@ -400,7 +400,7 @@ static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
             uint32_t address = (uint32_t)disp_mipi_spi_lcd->cur_buffer;
             uint8_t  seq[] = {
                 MIPI_DCS_CMD_SET_COLUMN_ADDRESS(x_start, x_end),
-                MIPI_DCS_CMD_SET_COLUMN_ADDRESS(y_start, y_end),
+                MIPI_DCS_CMD_SET_PAGE_ADDRESS(y_start, y_end),
                 MIPI_DCS_CMD_WRITE_MEMORY_START(__MIPI_LCD_BUFFER_TYPE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
             };
             put_unaligned_cpu32(size, &seq[6 + 6 + 2]);

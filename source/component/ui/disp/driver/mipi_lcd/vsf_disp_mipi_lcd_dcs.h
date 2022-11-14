@@ -126,7 +126,7 @@ extern "C" {
 // Set the page extent
 #define MIPI_DCS_CMD_HEX_CODE_SET_PAGE_ADDRESS          0x2B
 // SP: Start Page, EP: End Page, Address: closed interval [SP, EP]
-#define MIPI_DCS_CMD_SET_PAGE_ADDRESS(__SC, __EC)     \
+#define MIPI_DCS_CMD_SET_PAGE_ADDRESS(__SP, __EP)     \
             VSF_DISP_MIPI_LCD_WRITE(MIPI_DCS_CMD_HEX_CODE_SET_PAGE_ADDRESS, 4,  \
                                     ((uint16_t)__SP >> 8), (__SP & 0xFF),       \
                                     ((uint16_t)__EP >> 8), (__EP & 0xFF))
