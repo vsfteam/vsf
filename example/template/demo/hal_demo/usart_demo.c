@@ -25,61 +25,61 @@
 
 #ifdef APP_USART_DEMO_CFG_USART_PREFIX
 #   undef VSF_USART_CFG_PREFIX
-#   define VSF_USART_CFG_PREFIX                         APP_USART_DEMO_CFG_USART_PREFIX
+#   define VSF_USART_CFG_PREFIX                             APP_USART_DEMO_CFG_USART_PREFIX
 #endif
 
 #ifndef APP_USART_DEMO_CFG_DEBUG
-#   define APP_USART_DEMO_CFG_DEBUG                     ENABLED
+#   define APP_USART_DEMO_CFG_DEBUG                         ENABLED
 #endif
 
 // If the buffer is small (64 bytes) and the baudrate is big (921600),
 // then it may only need to be sent once
 #ifndef APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE
-#   define APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE      256
+#   define APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE          256
 #endif
 
 #ifndef APP_USART_DEMO_CFG_USART
-#   define APP_USART_DEMO_CFG_USART                     (vsf_usart_t *)&vsf_hw_usart0
-#endif
-
-#ifndef APP_USART_DEMO_CFG_FIFO_POLL_WRITE_TEST
-#   define APP_USART_DEMO_CFG_FIFO_POLL_WRITE_TEST      DISABLED
-#endif
-
-#ifndef APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST
-#   define APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST       DISABLED
-#endif
-
-#ifndef APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST
-#   define APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST        DISABLED
-#endif
-
-#ifndef APP_USART_DEMO_CFG_FIFO_ECHO_TEST
-#   define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            DISABLED
-#endif
-
-#ifndef APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ
-#   define APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ      DISABLED
+#   define APP_USART_DEMO_CFG_USART                         (vsf_usart_t *)&vsf_hw_usart0
+#endif  
+    
+#ifndef APP_USART_DEMO_CFG_FIFO_POLL_WRITE_TEST 
+#   define APP_USART_DEMO_CFG_FIFO_POLL_WRITE_TEST          DISABLED
+#endif  
+    
+#ifndef APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST  
+#   define APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST           DISABLED
+#endif  
+    
+#ifndef APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST   
+#   define APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST            DISABLED
+#endif  
+    
+#ifndef APP_USART_DEMO_CFG_FIFO_ECHO_TEST   
+#   define APP_USART_DEMO_CFG_FIFO_ECHO_TEST                DISABLED
+#endif  
+    
+#ifndef APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ_TEST    
+#   define APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ_TEST     DISABLED
 #endif
 
 #ifndef APP_USART_DEMO_CFG_REQUEST_ECHO_TEST
-#   define APP_USART_DEMO_CFG_REQUEST_ECHO_TEST         ENABLED
+#   define APP_USART_DEMO_CFG_REQUEST_ECHO_TEST             DISABLED
 #endif
 
-#ifndef APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ
-#   define APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ   DISABLED
+#ifndef APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ_TEST
+#   define APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ_TEST  ENABLED
 #endif
 
 #ifndef APP_USART_DEMO_CFG_BAUDRATE
-#   define APP_USART_DEMO_CFG_BAUDRATE                  115200
+#   define APP_USART_DEMO_CFG_BAUDRATE                      115200
 #endif
 
 #ifndef APP_USART_DEMO_CFG_MODE
-#   define APP_USART_DEMO_CFG_MODE                      (USART_8_BIT_LENGTH | USART_1_STOPBIT | USART_NO_PARITY | USART_TX_ENABLE | USART_RX_ENABLE)
+#   define APP_USART_DEMO_CFG_MODE                          (USART_8_BIT_LENGTH | USART_1_STOPBIT | USART_NO_PARITY | USART_TX_ENABLE | USART_RX_ENABLE)
 #endif
 
 #ifndef APP_USART_DEMO_IRQ_PRIO
-#   define APP_USART_DEMO_IRQ_PRIO                      vsf_arch_prio_2
+#   define APP_USART_DEMO_IRQ_PRIO                          vsf_arch_prio_2
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -96,8 +96,8 @@ typedef struct app_usart_demo_t {
         uint8_t txbuff[APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE];
     };
 
-#if    (APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ == ENABLED) \
-    || (APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ == ENABLED)
+#if    (APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ_TEST == ENABLED) \
+    || (APP_USART_DEMO_CFG_REQUEST_WRITE_THEN_READ_TEST == ENABLED)
     uint8_t rxbuff[APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE];
 #endif
 
@@ -256,7 +256,7 @@ static void __usart_read_isr_handler(void *target, vsf_usart_t *usart, vsf_usart
                                        dimof(demo->buff) - demo->cnt);
 
     if (demo->cnt >= dimof(demo->buff)) {
-        vsf_usart_irq_disable(usart, USART_IRQ_MASK_RX_CPL);
+        vsf_usart_irq_disable(usart, USART_IRQ_MASK_RX);
         demo->is_to_exit = true;
     }
 }
@@ -298,7 +298,7 @@ static void __usart_fifo_echo(vsf_usart_t * usart)
 }
 #endif
 
-#if APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ == ENABLED
+#if APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ_TEST == ENABLED
 static void __usart_txfifo_write_then_read(vsf_usart_t * usart)
 {
     uint_fast16_t cur_size = 0;
@@ -416,7 +416,7 @@ static void __usart_request_write_then_read(vsf_usart_t * usart)
     for (uint_fast16_t i = 0; i < sizeof(demo->rxbuff); i++) {
         demo->rxbuff[i] = demo->txbuff[i];
     }
-    __usart_isr_handler(demo, usart, USART_IRQ_MASK_TX_CPL);
+    __usart_isr_handler(demo, usart, USART_IRQ_MASK_RX_CPL);
 }
 #endif
 
