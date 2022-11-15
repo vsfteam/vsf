@@ -37,7 +37,7 @@
 #endif
 
 #ifndef APP_TIMER_DEMO_CFG_FREQ
-#   define APP_TIMER_DEMO_CFG_FREQ                      (1 * 1000 * 1000)   // 1us
+#   define APP_TIMER_DEMO_CFG_FREQ                      (1 * 1000 * 1000)   // 1MHz(1us)
 #endif
 
 #ifndef APP_TIMER_DEMO_CFG_MAX_COUNT
