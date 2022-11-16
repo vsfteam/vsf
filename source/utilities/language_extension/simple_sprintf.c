@@ -167,7 +167,6 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     flags.is_signed = 0;
                     radix = 8;
                     goto print_integer;
-                case 'X':
                 case 'P':
                     flags.is_upper = 1;
                 case 'p':
@@ -256,6 +255,8 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     radix = 16;
                     width = 0;
                     goto print_integer_do;
+                case 'X':
+                    flags.is_upper = 1;
                 case 'x':
                     flags.is_signed = 0;
                     radix = 16;
