@@ -109,6 +109,10 @@
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL MUST be enabled
 #endif
 
+#if VSF_LINUX_CFG_STACKSIZE < 512
+#   warning You sure use this stack size for linux?
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
