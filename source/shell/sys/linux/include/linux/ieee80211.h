@@ -281,7 +281,7 @@ struct ieee80211_mgmt {
         } __packed beacon;
         struct {
             /* only variable items: SSID, Supported rates */
-            u8 variable[0];
+            u8 variable[1];
         } __packed probe_req;
         struct {
             __le64 timestamp;
