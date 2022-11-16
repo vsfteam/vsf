@@ -200,6 +200,8 @@ typedef struct vsf_linux_socket_op_t {
     vsf_linux_fd_op_t fdop;
 
     int (*fn_init)(vsf_linux_fd_t *sfd);
+    int (*fn_socketpair)(vsf_linux_fd_t *rsfd, vsf_linux_fd_t *wsfd);
+
     int (*fn_fini)(vsf_linux_socket_priv_t *priv, int how);
     int (*fn_connect)(vsf_linux_socket_priv_t *priv, const struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t addrlen);
     int (*fn_listen)(vsf_linux_socket_priv_t *priv, int backlog);
