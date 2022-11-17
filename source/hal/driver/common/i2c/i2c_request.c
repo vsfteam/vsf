@@ -64,23 +64,22 @@ void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
     if (interrupt_mask & I2C_IRQ_MASK_MASTER_NACK_DETECT) {
         cur_interrupt_mask |= I2C_IRQ_MASK_MASTER_NACK_DETECT;
     } else {
-        i2c_request_ptr->idx++;
-        if (i2c_request_ptr->idx > i2c_request_ptr->count) {
-            cur_interrupt_mask = cur_interrupt_mask;
-        } else {
-            vsf_i2c_cmd_t temp_cmd = i2c_request_ptr->cmd & ~(I2C_CMD_START | I2C_CMD_RESTAR);
+        if (++i2c_request_ptr->idx <= i2c_request_ptr->count) {
+            vsf_i2c_cmd_t temp_cmd = i2c_request_ptr->cmd & ~(I2C_CMD_START | I2C_CMD_RESTART);
             if (i2c_request_ptr->idx != i2c_request_ptr->count) {
                 temp_cmd &= ~I2C_CMD_STOP;
             }
             uint16_t data = i2c_request_ptr->buffer_ptr[i2c_request_ptr->idx - 1];
             vsf_err_t ret = i2c_request_ptr->fn(i2c_ptr, data, temp_cmd);
             VSF_HAL_ASSERT(ret == VSF_ERR_NONE);
+        } else {
+            cur_interrupt_mask = I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
         }
     }
 
     if (cur_interrupt_mask) {
         if (NULL != cfg->isr.handler_fn) {
-            cfg->isr.handler_fn(cfg->isr.target_ptr, i2c_ptr, interrupt_mask);
+            cfg->isr.handler_fn(cfg->isr.target_ptr, i2c_ptr, cur_interrupt_mask);
         }
     }
 }

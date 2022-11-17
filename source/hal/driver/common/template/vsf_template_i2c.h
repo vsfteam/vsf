@@ -53,8 +53,8 @@ extern "C" {
 #   define VSF_I2C_CFG_REQUEST_TEMPLATE             DISABLED
 #endif
 
-#ifndef VSF_I2C_CFG_REIMPLEMENT_TYPE_FEATURE
-#   define VSF_I2C_CFG_REIMPLEMENT_TYPE_FEATURE     DISABLED
+#ifndef VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE
+#   define VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE     DISABLED
 #endif
 
 #ifndef VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK
@@ -79,27 +79,32 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-#if VSF_I2C_CFG_REIMPLEMENT_TYPE_FEATURE == DISABLED
-typedef enum vsf_i2c_feature_t {
-    I2C_MODE_MASTER           = (0x1ul << 0),  // select master mode
-    I2C_MODE_SLAVE            = (0x0ul << 0),  // select slave mode
-    I2C_MODE_MASK             = (0x1ul << 0),
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
+typedef enum vsf_i2c_mode_t {
+    I2C_MODE_MASTER           = (0x1ul << 28),  // select master mode
+    I2C_MODE_SLAVE            = (0x0ul << 28),  // select slave mode
+    I2C_MODE_MASK             = I2C_MODE_MASTER |
+                                I2C_MODE_SLAVE,
 
     // TODO: Ultra Fast-mode I2C-bus protocol
-    I2C_SPEED_STANDARD_MODE   = (0x0ul << 1),  // up to 100 kbit/s
-    I2C_SPEED_FAST_MODE       = (0x1ul << 1),  // up to 400 kbit/s
-    I2C_SPEED_FAST_MODE_PLUS  = (0x2ul << 1),  // up to 1 Mbit/s
-    I2C_SPEED_HIGH_SPEED_MODE = (0x3ul << 1),  // up to 3.4 Mbit/s
-    I2C_SPEED_MASK            = (0x3ul << 1),
+    I2C_SPEED_STANDARD_MODE   = (0x0ul << 29),  // up to 100 kbit/s
+    I2C_SPEED_FAST_MODE       = (0x1ul << 29),  // up to 400 kbit/s
+    I2C_SPEED_FAST_MODE_PLUS  = (0x2ul << 29),  // up to 1 Mbit/s
+    I2C_SPEED_HIGH_SPEED_MODE = (0x3ul << 29),  // up to 3.4 Mbit/s
+    I2C_SPEED_MASK            = I2C_SPEED_STANDARD_MODE   |
+                                I2C_SPEED_FAST_MODE       |
+                                I2C_SPEED_FAST_MODE_PLUS  |
+                                I2C_SPEED_HIGH_SPEED_MODE,
 
-    I2C_ADDR_7_BITS           = (0x0ul << 3),
-    I2C_ADDR_10_BITS          = (0x1ul << 3),
-    I2C_ADDR_MASK             = (0x1ul << 3),
+    I2C_ADDR_7_BITS           = (0x0ul << 31),
+    I2C_ADDR_10_BITS          = (0x1ul << 31),
+    I2C_ADDR_MASK             = I2C_ADDR_7_BITS |
+                                I2C_ADDR_10_BITS,
 
     I2C_FEATURE_MASK          =  I2C_MODE_MASK
                                | I2C_SPEED_MASK
                                | I2C_ADDR_MASK,
-} vsf_i2c_feature_t;
+} vsf_i2c_mode_t;
 #endif
 
 /**
@@ -117,27 +122,26 @@ typedef enum vsf_i2c_cmd_t {
     I2C_CMD_READ       = (0x01ul << 0),
     I2C_CMD_RW_MASK    = (0x01ul << 1),
 
-    I2C_CMD_START      = (0x01ul << 1),
-    I2C_CMD_STOP       = (0x01ul << 1),
-    I2C_CMD_RESTAR     = (0x01ul << 1),
-    I2C_CMD_MASK       =  I2C_CMD_START
-                        | I2C_CMD_STOP
-                        | I2C_CMD_RESTAR,
+    I2C_CMD_START      = (0x01ul << 28),
+    I2C_CMD_STOP       = (0x01ul << 29),
+    I2C_CMD_RESTART    = (0x01ul << 30),
 
-    I2C_CMD_7_BITS     = (0x00ul << 2),
-    I2C_CMD_10_BITS    = (0x01ul << 2),
+    I2C_CMD_7_BITS     = (0x00ul << 31),
+    I2C_CMD_10_BITS    = (0x01ul << 31),
     I2C_CMD_BITS_MASK  =  I2C_CMD_7_BITS
                         | I2C_CMD_10_BITS,
 
-    I2C_CMD_ALL_MASK   = I2C_CMD_RW_MASK | I2C_CMD_MASK | I2C_CMD_BITS_MASK,
+    I2C_CMD_ALL_MASK   = I2C_CMD_RW_MASK |
+                         I2C_CMD_START |
+                         I2C_CMD_STOP |
+                         I2C_CMD_RESTART |
+                         I2C_CMD_BITS_MASK,
 } vsf_i2c_cmd_t;
 #endif
 
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_i2c_irq_mask_t {
     I2C_IRQ_MASK_MASTER_STARTED                 = (0x1ul <<  0),
-    I2C_IRQ_MASK_MASTER_ADDRESS_SEND            = (0x1ul <<  1),
-    I2C_IRQ_MASK_MASTER_10_BITS_ADDRESS_SEND    = (0x1ul <<  2),
     I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul <<  3),
     I2C_IRQ_MASK_MASTER_NACK_DETECT             = (0x1ul <<  4),
     I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul <<  5),
@@ -148,8 +152,6 @@ typedef enum vsf_i2c_irq_mask_t {
     I2C_IRQ_MASK_MASTER_ADDRESS_NACK            = (0x1ul <<  9),
 
     I2C_IRQ_MASK_MASTER_ALL                     =  I2C_IRQ_MASK_MASTER_STARTED
-                                                 | I2C_IRQ_MASK_MASTER_ADDRESS_SEND
-                                                 | I2C_IRQ_MASK_MASTER_10_BITS_ADDRESS_SEND
                                                  | I2C_IRQ_MASK_MASTER_STOP_DETECT
                                                  | I2C_IRQ_MASK_MASTER_NACK_DETECT
                                                  | I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
@@ -171,6 +173,12 @@ typedef struct vsf_i2c_status_t {
 
 typedef struct vsf_i2c_capability_t {
     inherit(vsf_peripheral_capability_t)
+
+    uint8_t is_support_restart : 1;
+
+    // If manual control of the start/stop signal is not supported,
+    // then every transmission will generate a start/stop
+    uint8_t is_support_manual_start_stop  : 1;
 } vsf_i2c_capability_t;
 
 typedef struct vsf_i2c_t vsf_i2c_t;
@@ -236,8 +244,8 @@ typedef struct vsf_i2c_isr_t {
  @brief i2c 配置
  */
 typedef struct vsf_i2c_cfg_t {
-    vsf_i2c_feature_t mode;                 //!< \~english i2c mode \ref vsf_i2c_feature_t
-                                            //!< \~chinese i2c 模式 \ref vsf_i2c_feature_t
+    vsf_i2c_mode_t mode;                 //!< \~english i2c mode \ref vsf_i2c_mode_t
+                                            //!< \~chinese i2c 模式 \ref vsf_i2c_mode_t
     uint32_t clock_hz;                      //!< \~english i2c clock (in Hz)
                                             //!< \~chinese i2c 时钟频率 (单位：Hz)
     vsf_i2c_isr_t isr;                      //!< \~english i2c interrupt
@@ -274,19 +282,6 @@ struct vsf_i2c_t  {
  @return vsf_err_t: 如果 i2c 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr);
-
-/**
- \~english
- @brief finalize a i2c instance.
- @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @return none
-
- \~chinese
- @brief 结束一个 i2c 实例
- @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
- @return none
- */
-extern void vsf_i2c_fini(vsf_i2c_t *i2c_ptr);
 
 /**
  \~english

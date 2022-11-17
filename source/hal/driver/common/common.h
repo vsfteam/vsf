@@ -30,6 +30,7 @@ extern "C" {
 #include "template/vsf_template.h"
 
 #include "i2c/multiplex_i2c.h"
+#include "i2c/mrequest_i2c.h"
 #include "spi/multiplex_spi.h"
 
 /*============================ MACROS ========================================*/
