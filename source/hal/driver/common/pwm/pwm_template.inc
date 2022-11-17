@@ -115,7 +115,7 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #endif
 
 #ifndef VSF_PWM_CFG_IMP_UPCASE_PREFIX   
-#   error "Please define VSF_PWM_CFG_IMP_UPCASE_PREFIX    in pwm driver"
+#   error "Please define VSF_PWM_CFG_IMP_UPCASE_PREFIX in pwm driver"
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
