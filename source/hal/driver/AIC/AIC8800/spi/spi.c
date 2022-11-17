@@ -475,11 +475,17 @@ vsf_spi_status_t vsf_hw_spi_status(vsf_hw_spi_t *hw_spi_ptr)
     return status;
 }
 
-int_fast32_t vsf_hw_spi_get_transfered_count(vsf_hw_spi_t *hw_spi_ptr)
+void vsf_hw_spi_get_transfered_count(vsf_hw_spi_t *hw_spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 {
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
 
-    return hw_spi_ptr->request.recv.offset;
+    if (tx_count != NULL) {
+        *tx_count = hw_spi_ptr->request.send.offset;
+    }
+
+    if (rx_count != NULL) {
+        *rx_count = hw_spi_ptr->request.recv.offset;
+    }
 }
 
 /*============================ INCLUDES ======================================*/
