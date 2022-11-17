@@ -106,7 +106,7 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_
     vsf_multiplexer_i2c_t * multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
 
-    bool is_restart = m_i2c_ptr->request.cmd & I2C_CMD_RESTAR;
+    bool is_restart = m_i2c_ptr->request.cmd & I2C_CMD_RESTART;
     vsf_i2c_irq_mask_t cpl_irq_mask =  I2C_IRQ_MASK_MASTER_STOP_DETECT
                                     | I2C_IRQ_MASK_MASTER_NACK_DETECT
                                     | I2C_IRQ_MASK_MASTER_ADDRESS_NACK

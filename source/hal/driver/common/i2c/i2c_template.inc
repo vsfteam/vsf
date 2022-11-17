@@ -33,9 +33,7 @@
 #if VSF_I2C_CFG_REQUEST_TEMPLATE == ENABLED
 vsf_err_t vsf_real_i2c_master_request(vsf_real_i2c_t *i2c_ptr, uint16_t address, vsf_i2c_cmd_t cmd, uint16_t count, uint8_t *buffer_ptr)
 {
-#define VSF_I2C_TYPE VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)
-
-    VSF_I2C_TYPE * i2c_type_ptr = (VSF_I2C_TYPE *)i2c_ptr;
+    vsf_real_i2c_t * i2c_type_ptr = (vsf_real_i2c_t *)i2c_ptr;
     return vsf_i2c_request_master_request(i2c_ptr, &i2c_type_ptr->request, address, cmd, count, buffer_ptr);
 }
 #endif

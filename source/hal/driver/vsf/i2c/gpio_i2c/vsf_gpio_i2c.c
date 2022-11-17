@@ -89,7 +89,7 @@ static void __vsf_gpio_i2c_callback(vsf_gpio_i2c_callback_timer_t *on_timer)
         gpio_i2c_ptr->irq_mask |= I2C_IRQ_MASK_MASTER_STARTED;
         gpio_i2c_ptr->cmd &= ~I2C_CMD_START;
         goto label_address;
-    } else if (gpio_i2c_ptr->cmd & I2C_CMD_RESTAR) {
+    } else if (gpio_i2c_ptr->cmd & I2C_CMD_RESTART) {
         vsf_gpio_write(gpio_i2c_ptr->sda.gpio,
                        gpio_i2c_ptr->sda.pin_mask,
                        gpio_i2c_ptr->sda.pin_mask);
@@ -97,7 +97,7 @@ static void __vsf_gpio_i2c_callback(vsf_gpio_i2c_callback_timer_t *on_timer)
                        gpio_i2c_ptr->scl.pin_mask,
                        gpio_i2c_ptr->scl.pin_mask);
         gpio_i2c_ptr->irq_mask |= I2C_IRQ_MASK_MASTER_STARTED;
-        gpio_i2c_ptr->cmd &= ~I2C_CMD_RESTAR;
+        gpio_i2c_ptr->cmd &= ~I2C_CMD_RESTART;
         gpio_i2c_ptr->gpio_i2c_cmd |= I2C_CMD_RESTAR_1;
         goto label_return;
     } else if (gpio_i2c_ptr->gpio_i2c_cmd & I2C_CMD_RESTAR_1) {
@@ -319,7 +319,7 @@ vsf_err_t __vsf_i2c_send_cmd(vsf_i2c_t *i2c_ptr, uint16_t data, vsf_i2c_cmd_t co
     //todo: Check for unsupported
     if (    (command & I2C_CMD_RW_MASK)
         && !(command & I2C_CMD_START)
-        && !(command & I2C_CMD_RESTAR)) {
+        && !(command & I2C_CMD_RESTART)) {
         gpio_i2c_ptr->data = 0;
     } else {
         gpio_i2c_ptr->data = data;

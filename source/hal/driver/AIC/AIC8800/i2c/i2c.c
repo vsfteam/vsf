@@ -54,8 +54,8 @@ typedef struct vsf_hw_i2c_t {
     const vsf_hw_i2c_const_t *i2c_const;
     vsf_i2c_isr_t isr;
 
-    vsf_i2c_cfg_t           cfg;
-    vsf_i2c_irq_mask_t   irq_mask;
+    vsf_i2c_cfg_t       cfg;
+    vsf_i2c_irq_mask_t  irq_mask;
     uint8_t             is_enabled :1;
 
     struct {
@@ -214,7 +214,7 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
     //  2. start + restart
     bool is_start = (cmd & I2C_CMD_START) == I2C_CMD_START;
     bool is_stop = (cmd & I2C_CMD_STOP) == I2C_CMD_STOP;
-    bool is_restart = (cmd & I2C_CMD_RESTAR) == I2C_CMD_RESTAR;
+    bool is_restart = (cmd & I2C_CMD_RESTART) == I2C_CMD_RESTART;
     if (!is_start) {
         VSF_ASSERT(0);
         return VSF_ERR_NOT_SUPPORT;

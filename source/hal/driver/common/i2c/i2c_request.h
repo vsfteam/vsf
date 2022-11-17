@@ -30,9 +30,9 @@ typedef vsf_err_t vsf_i2c_request_send_cmd_fn(vsf_i2c_t *i2c_ptr,
                                               uint16_t data);
 
 typedef struct vsf_i2c_request_t {
-    vsf_i2c_cfg_t                       cfg;
+    vsf_i2c_cfg_t                   cfg;
     uint16_t                        address;
-    vsf_i2c_cmd_t                    cmd;
+    vsf_i2c_cmd_t                   cmd;
     uint16_t                        idx;
     uint16_t                        count;
     uint8_t                        *buffer_ptr;
