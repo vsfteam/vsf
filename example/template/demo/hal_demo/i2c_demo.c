@@ -32,16 +32,44 @@
 #   define APP_I2C_DEMO_CFG_I2C                         (vsf_i2c_t *)&vsf_hw_i2c0
 #endif
 
-#ifndef APP_I2C_DEMO_CFG_ADDRESS_START
-#   define APP_I2C_DEMO_CFG_ADDRESS_START               0x0C
+#ifndef APP_I2C_DEMO_CFG_SEARCH_DEVICE_DEMO
+#   define  APP_I2C_DEMO_CFG_SEARCH_DEVICE_DEMO         DISABLED
 #endif
 
-#ifndef APP_I2C_DEMO_CFG_ADDRESS_END
-#   define APP_I2C_DEMO_CFG_ADDRESS_END                 0x77
+#ifndef APP_I2C_DEMO_CFG_SEARCH_ADDRESS_START
+#   define APP_I2C_DEMO_CFG_SEARCH_ADDRESS_START        0x0C
+#endif
+
+#ifndef APP_I2C_DEMO_CFG_SEARCH_ADDRESS_END
+#   define APP_I2C_DEMO_CFG_SEARCH_ADDRESS_END          0x70
+#endif
+
+#ifndef APP_I2C_DEMO_CFG_EEPROM_DEMO
+#   define  APP_I2C_DEMO_CFG_EEPROM_DEMO                ENABLED
+#endif
+
+#ifndef APP_I2C_DEMO_CFG_EEPROM_DEVICE_ADDRESS
+#   define APP_I2C_DEMO_CFG_EEPROM_DEVICE_ADDRESS       0x50
+#endif
+
+#ifndef APP_I2C_DEMO_CFG_EEPROM_ADDRESS
+#   define APP_I2C_DEMO_CFG_EEPROM_ADDRESS              0x0001
+#endif
+
+#ifndef APP_I2C_DEMO_CFG_EEPROM_BUFFER_SIZE
+#   define APP_I2C_DEMO_CFG_EEPROM_BUFFER_SIZE          40
+#endif
+
+#ifndef APP_I2C_DEMO_CFG_EEPROM_DELAY_MS
+#   define APP_I2C_DEMO_CFG_EEPROM_DELAY_MS             10      // WriteCycleTiming
+#endif
+
+#ifndef APP_I2C_DEMO_ISR_PRIO
+#   define APP_I2C_DEMO_ISR_PRIO                        vsf_arch_prio_2
 #endif
 
 #ifndef APP_I2C_DEMO_PRIO
-#   define APP_I2C_DEMO_PRIO                            vsf_arch_prio_2
+#   define APP_I2C_DEMO_PRIO                           vsf_prio_0
 #endif
 
 #ifndef APP_I2C_DEMO_CFG_MODE
@@ -52,9 +80,6 @@
 #   define APP_I2C_DEMO_CLOCK_HZ                        1000
 #endif
 
-#ifndef APP_I2C_DEMO_TEST_DATA_CNT
-#   define APP_I2C_DEMO_TEST_DATA_CNT                   1
-#endif
 
 #ifndef APP_I2C_DEMO_TEST_DATA_ARRAY
 #   define APP_I2C_DEMO_TEST_DATA_ARRAY                 {0xFF}
@@ -63,15 +88,41 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef enum i2c_demo_evt_t {
+    VSF_EVT_EEPROM_WRTIE_ADDR_CPL       = VSF_EVT_USER + 0,
+    VSF_EVT_EEPROM_WRTIE_DATA_CPL       = VSF_EVT_USER + 1,
+    VSF_EVT_EEPROM_READ_DATA            = VSF_EVT_USER + 2,
+    VSF_EVT_EEPROM_READ_DATA_CPL        = VSF_EVT_USER + 3,
+} i2c_demo_evt_t;
+
 typedef struct app_i2c_demo_t {
+#if APP_I2C_DEMO_CFG_SEARCH_DEVICE_DEMO == ENABLED
     uint16_t start_address;
     uint16_t end_address;
+#endif
+
+#if APP_I2C_DEMO_CFG_EEPROM_DEMO == ENABLED
+    vsf_teda_t teda;
+    i2c_demo_evt_t next_evt;
+    uint8_t eeprom_address[2];
+    uint8_t send_buffer[APP_I2C_DEMO_CFG_EEPROM_BUFFER_SIZE];
+    uint8_t recv_buffer[APP_I2C_DEMO_CFG_EEPROM_BUFFER_SIZE];
+#endif
 } app_i2c_demo_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-app_i2c_demo_t __app_i2c_demo;
+app_i2c_demo_t __app_i2c_demo = {
+#if APP_I2C_DEMO_CFG_EEPROM_DEMO == ENABLED
+    .eeprom_address = {
+        APP_I2C_DEMO_CFG_EEPROM_ADDRESS >> 0x08,
+        APP_I2C_DEMO_CFG_EEPROM_ADDRESS & 0xFF
+    },
+#else
+    0
+#endif
+};
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -111,6 +162,7 @@ static void __i2c_demo_deinit(vsf_i2c_t *i2c_ptr)
     while (fsm_rt_cpl != vsf_i2c_disable(i2c_ptr));
 }
 
+#if APP_I2C_DEMO_CFG_SEARCH_DEVICE_DEMO == ENABLED
 static void __i2c_search_next(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_ptr)
 {
 #ifdef APP_I2C_DEMO_TEST_DATA_ARRAY
@@ -130,7 +182,7 @@ static void __i2c_search_next(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_ptr)
     }
 }
 
-static void __i2c_irq_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
+static void __i2c_search_irq_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     app_i2c_demo_t *i2c_demo_ptr = (app_i2c_demo_t *)target_ptr;
 
@@ -147,12 +199,12 @@ static void __i2c_address_search(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_pt
     VSF_ASSERT(i2c_demo_ptr != NULL);
     VSF_ASSERT(i2c_ptr != NULL);
 
-    vsf_trace_debug("i2c search address, range: 0x%02x, 0x%02x", i2c_demo_ptr->start_address, i2c_demo_ptr->end_address);
+    vsf_trace_debug("i2c search address, range: 0x%02x, 0x%02x" VSF_TRACE_CFG_LINEEND, i2c_demo_ptr->start_address, i2c_demo_ptr->end_address);
 
     vsf_i2c_isr_t isr = {
-        .handler_fn = __i2c_irq_handler,
+        .handler_fn = __i2c_search_irq_handler,
         .target_ptr = i2c_demo_ptr,
-        .prio = APP_I2C_DEMO_PRIO,
+        .prio = APP_I2C_DEMO_ISR_PRIO,
     };
 
     vsf_i2c_irq_mask_t mask =  I2C_IRQ_MASK_MASTER_ADDRESS_NACK
@@ -164,6 +216,84 @@ static void __i2c_address_search(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_pt
 
     __i2c_search_next(i2c_demo_ptr, i2c_ptr);
 }
+#endif
+
+volatile bool is_activity;
+
+#if APP_I2C_DEMO_CFG_EEPROM_DEMO == ENABLED
+static void __eeprom_irq_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
+{
+    app_i2c_demo_t *i2c_demo_ptr = (app_i2c_demo_t *)target_ptr;
+
+    if (irq_mask & I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
+        vsf_eda_post_evt(&i2c_demo_ptr->teda.use_as__vsf_eda_t, i2c_demo_ptr->next_evt);
+    }
+}
+
+static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    vsf_i2c_t * i2c_ptr = APP_I2C_DEMO_CFG_I2C;
+    uint16_t device_address = APP_I2C_DEMO_CFG_EEPROM_DEVICE_ADDRESS;
+    vsf_err_t result;
+
+    switch (evt) {
+    case VSF_EVT_INIT: {
+            vsf_i2c_isr_t isr = {
+                .handler_fn = __eeprom_irq_handler,
+                .target_ptr = &__app_i2c_demo,
+                .prio = APP_I2C_DEMO_ISR_PRIO,
+            };
+            result = __i2c_demo_init(i2c_ptr, &isr, I2C_IRQ_MASK_MASTER_ADDRESS_NACK |
+                                                    I2C_IRQ_MASK_MASTER_NACK_DETECT |
+                                                    I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE);
+            VSF_ASSERT(result == VSF_ERR_NONE);
+
+            for (int i = 0; i < dimof(__app_i2c_demo.send_buffer); i++) {
+                __app_i2c_demo.send_buffer[i] = dimof(__app_i2c_demo.send_buffer) - i;
+            }
+            __app_i2c_demo.next_evt = VSF_EVT_EEPROM_WRTIE_ADDR_CPL;
+            result = vsf_i2c_master_request(i2c_ptr, device_address, I2C_CMD_WRITE | I2C_CMD_START,
+                                            dimof(__app_i2c_demo.eeprom_address), __app_i2c_demo.eeprom_address);
+            VSF_ASSERT(result == VSF_ERR_NONE);
+        }
+        break;
+
+    case VSF_EVT_EEPROM_WRTIE_ADDR_CPL:
+        __app_i2c_demo.next_evt = VSF_EVT_EEPROM_WRTIE_DATA_CPL;
+        result = vsf_i2c_master_request(i2c_ptr, device_address, I2C_CMD_WRITE | I2C_CMD_STOP,
+                               dimof(__app_i2c_demo.send_buffer), __app_i2c_demo.send_buffer);
+        VSF_ASSERT(result == VSF_ERR_NONE);
+        break;
+
+    case VSF_EVT_EEPROM_WRTIE_DATA_CPL:
+        vsf_teda_set_timer_ms(APP_I2C_DEMO_CFG_EEPROM_DELAY_MS);
+        break;
+
+    case VSF_EVT_TIMER:
+        __app_i2c_demo.next_evt = VSF_EVT_EEPROM_READ_DATA;
+        result = vsf_i2c_master_request(i2c_ptr, device_address, I2C_CMD_WRITE | I2C_CMD_START, 2, __app_i2c_demo.eeprom_address);
+        VSF_ASSERT(result == VSF_ERR_NONE);
+        break;
+
+    case VSF_EVT_EEPROM_READ_DATA:
+        __app_i2c_demo.next_evt = VSF_EVT_EEPROM_READ_DATA_CPL;
+        result = vsf_i2c_master_request(i2c_ptr, device_address, I2C_CMD_READ | I2C_CMD_START | I2C_CMD_STOP, dimof(__app_i2c_demo.recv_buffer), __app_i2c_demo.recv_buffer);
+        VSF_ASSERT(result == VSF_ERR_NONE);
+        break;
+
+    case VSF_EVT_EEPROM_READ_DATA_CPL:
+        if(memcmp(__app_i2c_demo.send_buffer, __app_i2c_demo.recv_buffer, dimof(__app_i2c_demo.recv_buffer)) != 0) {
+            vsf_trace_debug("read data error ...\r\n");
+            for(int i = 0; i < dimof(__app_i2c_demo.recv_buffer); i++) {
+                vsf_trace_debug("send/recv[%d]:0x%02x/0x%02x\r\n", i, __app_i2c_demo.send_buffer[i], __app_i2c_demo.recv_buffer[i]);
+            }
+        } else {
+            vsf_trace_debug("read data completed ...\r\n");
+        }
+        break;
+    }
+}
+#endif
 
 
 #if APP_USE_LINUX_DEMO == ENABLED
@@ -180,9 +310,19 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
-    __app_i2c_demo.start_address = APP_I2C_DEMO_CFG_ADDRESS_START;
-    __app_i2c_demo.end_address = APP_I2C_DEMO_CFG_ADDRESS_END;
+#if APP_I2C_DEMO_CFG_SEARCH_DEVICE_DEMO == ENABLED
+    __app_i2c_demo.start_address = APP_I2C_DEMO_CFG_SEARCH_ADDRESS_START;
+    __app_i2c_demo.end_address = APP_I2C_DEMO_CFG_SEARCH_ADDRESS_END;
     __i2c_address_search(&__app_i2c_demo, APP_I2C_DEMO_CFG_I2C);
+#endif
+
+#if APP_I2C_DEMO_CFG_EEPROM_DEMO == ENABLED
+    const vsf_eda_cfg_t cfg = {
+        .fn.evthandler  = __i2c_eeprom_evthandler,
+        .priority       = APP_I2C_DEMO_PRIO,
+    };
+    return vsf_teda_start(&__app_i2c_demo.teda, (vsf_eda_cfg_t*)&cfg);
+#endif
 
     return 0;
 }
