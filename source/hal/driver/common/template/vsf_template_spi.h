@@ -65,10 +65,6 @@ extern "C" {
 #   define VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
 #endif
 
-#ifndef VSF_SPI_DATASIZE_TO_BYTE
-#   define VSF_SPI_DATASIZE_TO_BYTE         (((((__S) & SPI_DATASIZE_MASK) >> __SPI_DATASIZE_OFFSET) + 8) / 8)
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_SPI_APIS(__prefix_name) \
@@ -87,32 +83,41 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, request_transfer,     VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, void *out_buffer_ptr, \
                                                                                            void *in_buffer_ptr, uint_fast32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cancel_transfer,      VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, int_fast32_t,         spi, get_transfered_count, VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transfered_count, VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 
 /*============================ TYPES =========================================*/
 
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 //! spi working mode
 typedef enum vsf_spi_mode_t {
-    SPI_MASTER                  = 0x00ul << 0,      //!< select master mode
-    SPI_SLAVE                   = 0x01ul << 0,      //!< select slave mode
-    SPI_DIR_MODE_MASK           = 0x01ul << 0,
+    SPI_MASTER                  = 0x00ul << 21,      //!< select master mode
+    SPI_SLAVE                   = 0x01ul << 21,      //!< select slave mode
+    SPI_DIR_MODE_MASK           = SPI_MASTER  |
+                                  SPI_SLAVE,
 
-    SPI_MSB_FIRST               = 0x00ul << 1,      //!< default enable MSB
-    SPI_LSB_FIRST               = 0x01ul << 1,      //!< transfer LSB first
-    SPI_BIT_ORDER_MASK          = 0x01ul << 1,
+    SPI_MSB_FIRST               = 0x00ul << 22,      //!< default enable MSB
+    SPI_LSB_FIRST               = 0x01ul << 22,      //!< transfer LSB first
+    SPI_BIT_ORDER_MASK          = SPI_MSB_FIRST |
+                                  SPI_LSB_FIRST,
 
-    SPI_CPOL_LOW                = 0x00ul << 2,      //!< SCK clock polarity is low
-    SPI_CPOL_HIGH               = 0x01ul << 2,      //!< SCK clock polarity is high
-    SPI_CPHA_LOW                = 0x00ul << 3,      //!< SCK clock phase is low
-    SPI_CPHA_HIGH               = 0x01ul << 3,      //!< SCK clock phase is high
+    SPI_CPOL_LOW                = 0x00ul << 23,      //!< SCK clock polarity is low
+    SPI_CPOL_HIGH               = 0x01ul << 23,      //!< SCK clock polarity is high
+    SPI_CPHA_LOW                = 0x00ul << 24,      //!< SCK clock phase is low
+    SPI_CPHA_HIGH               = 0x01ul << 24,      //!< SCK clock phase is high
     SPI_CLOCK_MODE_0            = SPI_CPOL_LOW  | SPI_CPHA_LOW,
     SPI_CLOCK_MODE_1            = SPI_CPOL_LOW  | SPI_CPHA_HIGH,
     SPI_CLOCK_MODE_2            = SPI_CPOL_HIGH | SPI_CPHA_LOW,
     SPI_CLOCK_MODE_3            = SPI_CPOL_HIGH | SPI_CPHA_HIGH,
-    SPI_CLOCK_MODE_MASK         = SPI_CLOCK_MODE_3,
+    SPI_CLOCK_MODE_MASK         = SPI_CLOCK_MODE_0 |
+                                  SPI_CLOCK_MODE_1 |
+                                  SPI_CLOCK_MODE_2 |
+                                  SPI_CLOCK_MODE_3,
 
-    __SPI_DATASIZE_OFFSET       = 0x04,
+    __SPI_DATASIZE_OFFSET       = 25,
+    SPI_DATASIZE_4              = 0x03ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
+    SPI_DATASIZE_5              = 0x04ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
+    SPI_DATASIZE_6              = 0x05ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
+    SPI_DATASIZE_7              = 0x06ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
     SPI_DATASIZE_8              = 0x07ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
     SPI_DATASIZE_9              = 0x08ul << __SPI_DATASIZE_OFFSET,
     SPI_DATASIZE_10             = 0x09ul << __SPI_DATASIZE_OFFSET,
@@ -138,14 +143,28 @@ typedef enum vsf_spi_mode_t {
     SPI_DATASIZE_30             = 0x1Dul << __SPI_DATASIZE_OFFSET,
     SPI_DATASIZE_31             = 0x1Eul << __SPI_DATASIZE_OFFSET,
     SPI_DATASIZE_32             = 0x1Ful << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_MASK           = 0x1Ful << __SPI_DATASIZE_OFFSET,
+    SPI_DATASIZE_MASK           = SPI_DATASIZE_4  | SPI_DATASIZE_5  | SPI_DATASIZE_6  | SPI_DATASIZE_7  |
+                                  SPI_DATASIZE_8  | SPI_DATASIZE_9  | SPI_DATASIZE_10 | SPI_DATASIZE_11 |
+                                  SPI_DATASIZE_12 | SPI_DATASIZE_13 | SPI_DATASIZE_14 | SPI_DATASIZE_15 |
+                                  SPI_DATASIZE_16 | SPI_DATASIZE_17 | SPI_DATASIZE_18 | SPI_DATASIZE_19 |
+                                  SPI_DATASIZE_20 | SPI_DATASIZE_21 | SPI_DATASIZE_22 | SPI_DATASIZE_23 |
+                                  SPI_DATASIZE_24 | SPI_DATASIZE_25 | SPI_DATASIZE_26 | SPI_DATASIZE_27 |
+                                  SPI_DATASIZE_28 | SPI_DATASIZE_29 | SPI_DATASIZE_30 | SPI_DATASIZE_31,
 
 
-    SPI_AUTO_CS_DISABLE         = 0x00ul << 9,
-    SPI_AUTO_CS_ENABLE          = 0x01ul << 9,
-    SPI_AUTO_CS_MASK            = 0x01ul << 9,
+    SPI_AUTO_CS_DISABLE         = 0x00ul << 30,
+    SPI_AUTO_CS_ENABLE          = 0x01ul << 30,
+    SPI_AUTO_CS_MASK            = SPI_AUTO_CS_DISABLE |
+                                  SPI_AUTO_CS_ENABLE,
 
-    SPI_LOOP_BACK               = 0x01ul << 10,     //!< enable loop back
+    SPI_LOOP_BACK               = 0x01ul << 31,     //!< enable loop back
+
+    SPI_MODE_ALL_BITS_MASK      = SPI_DIR_MODE_MASK |
+                                  SPI_BIT_ORDER_MASK |
+                                  SPI_CLOCK_MODE_MASK |
+                                  SPI_DIR_MODE_MASK |
+                                  SPI_AUTO_CS_MASK |
+                                  SPI_LOOP_BACK,
 } vsf_spi_mode_t;
 #endif
 
@@ -189,6 +208,7 @@ typedef struct vsf_spi_status_t {
 
 typedef struct vsf_spi_capability_t {
     inherit(vsf_peripheral_capability_t)
+    uint8_t is_auto_cs; // some hardware support 
     uint8_t cs_count;
 } vsf_spi_capability_t;
 
@@ -356,9 +376,23 @@ extern vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_p
                                           void *in_buffer_ptr, uint_fast32_t count);
 
 extern vsf_err_t            vsf_spi_cancel_transfer(    vsf_spi_t *spi_ptr);
-extern int_fast32_t         vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
+extern void                 vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count);
 
 
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+
+static inline uint8_t vsf_spi_get_data_bytes_from_mode(vsf_spi_mode_t mode)
+{
+    uint8_t bits = (mode & SPI_DATASIZE_MASK);
+    if (bits <= SPI_DATASIZE_8) {
+        return 1;
+    } else if (bits <= SPI_DATASIZE_16) {
+        return 2;
+    } else {
+        return 4;
+    }
+}
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

@@ -41,12 +41,12 @@ typedef enum vsf_spi_mode_t {
     SPI_MASTER                       = 0x01ul << 11,
     SPI_DIR_MODE_MASK                = SPI_SLAVE | SPI_MASTER,
 
-    SPI_MODE_0                       = ((0x01ul << 0) |(0x01ul << 1) | (0x00ul << 13)),
-    SPI_MODE_1                       = ((0x00ul << 0) |(0x00ul << 1) | (0x00ul << 13)),
-    SPI_MODE_2                       = ((0x01ul << 0) |(0x01ul << 1) | (0x01ul << 13)),
-    SPI_MODE_3                       = ((0x00ul << 0) |(0x00ul << 1) | (0x01ul << 13)),
-    SPI_CLOCK_MODE_MASK              =  SPI_MODE_0 | SPI_MODE_1
-                                      | SPI_MODE_2 | SPI_MODE_3,
+    SPI_CLOCK_MODE_0                 = ((0x01ul << 0) |(0x01ul << 1) | (0x00ul << 13)),
+    SPI_CLOCK_MODE_1                 = ((0x00ul << 0) |(0x00ul << 1) | (0x00ul << 13)),
+    SPI_CLOCK_MODE_2                 = ((0x01ul << 0) |(0x01ul << 1) | (0x01ul << 13)),
+    SPI_CLOCK_MODE_3                 = ((0x00ul << 0) |(0x00ul << 1) | (0x01ul << 13)),
+    SPI_CLOCK_MODE_MASK              =  SPI_CLOCK_MODE_0 | SPI_CLOCK_MODE_1
+                                      | SPI_CLOCK_MODE_2 | SPI_CLOCK_MODE_3,
 
     SPI_DATASIZE_8                   = 0x08ul << 2,      //!< datasize is 8 bits
     SPI_DATASIZE_9                   = 0x09ul << 2,
@@ -89,7 +89,7 @@ typedef enum vsf_spi_mode_t {
                                       | SPI_BIT_ORDER_MASK
                                       | SPI_AUTO_CS_MASK,
 
-    SPI_MODE_MASK                    = __SPI_HW_MODE_MASK | SPI_DATASIZE_MASK,
+    SPI_IRQ_MASK_ALL_BITS            = __SPI_HW_MODE_MASK | SPI_DATASIZE_MASK,
 } vsf_spi_mode_t;
 
 /*============================ INCLUDES ======================================*/

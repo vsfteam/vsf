@@ -143,13 +143,13 @@ vsf_err_t vsf_spi_cancel_transfer(vsf_spi_t *spi_ptr)
     return spi_ptr->op->cancel_transfer(spi_ptr);
 }
 
-int_fast32_t vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr)
+void vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
     VSF_HAL_ASSERT(spi_ptr->op->get_transfered_count != NULL);
 
-    return spi_ptr->op->get_transfered_count(spi_ptr);
+    spi_ptr->op->get_transfered_count(spi_ptr, tx_count, rx_count);
 }
 
 vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr)
