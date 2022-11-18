@@ -45,7 +45,7 @@
 #   define APP_SPI_DEMO_CFG_AUTO_CS_EN                  DISABLED
 #endif
 
-#define __APP_SPI_DEMO_MODE                             (SPI_MASTER | SPI_MODE_0 | SPI_MSB_FIRST | APP_SPI_DEMO_CFG_DATASIZE)
+#define __APP_SPI_DEMO_MODE                             (SPI_MASTER | SPI_CLOCK_MODE_3 | SPI_MSB_FIRST | APP_SPI_DEMO_CFG_DATASIZE)
 #if APP_SPI_DEMO_CFG_AUTO_CS_EN == ENABLED
 #   define APP_SPI_DEMO_CFG_MODE                        (__APP_SPI_DEMO_MODE | SPI_AUTO_CS_ENABLE)
 #else
@@ -53,7 +53,7 @@
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_SPEED
-#   define APP_SPI_DEMO_CFG_SPEED                       (1ul * 100ul * 1000ul)
+#   define APP_SPI_DEMO_CFG_SPEED                       (1ul * 1000ul * 1000ul)
 #endif
 
 #ifndef APP_SPI_DEMO_IRQ_PRIO
@@ -104,8 +104,9 @@
 /*============================ TYPES =========================================*/
 
 typedef struct app_spi_demo_t {
-    uint8_t send_buff[APP_SPI_DEMO_CFG_BUFFER_SIZE * SPI_DATASIZE_TO_BYTE(APP_SPI_DEMO_CFG_DATASIZE)];
-    uint8_t recv_buff[APP_SPI_DEMO_CFG_BUFFER_SIZE * SPI_DATASIZE_TO_BYTE(APP_SPI_DEMO_CFG_DATASIZE)];
+    uint8_t * send_buff;
+    uint8_t * recv_buff;
+    size_t size;
 } app_spi_demo_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -193,7 +194,7 @@ static void __spi_demo_fifo_send_only(vsf_spi_t *spi)
     VSF_ASSERT(spi != NULL);
     app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
 
-    __spi_demo_fifo_poll(spi, demo->send_buff, NULL, dimof(demo->send_buff));
+    __spi_demo_fifo_poll(spi, demo->send_buf, NULL, demo->size);
 }
 #endif
 
@@ -203,7 +204,7 @@ static void __spi_demo_fifo_recv_only(vsf_spi_t *spi)
     VSF_ASSERT(spi != NULL);
     app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
 
-    __spi_demo_fifo_poll(spi, NULL, demo->recv_buff, dimof(demo->send_buff));
+    __spi_demo_fifo_poll(spi, NULL, demo->recv_buf, demo->size);
 }
 #endif
 
@@ -213,7 +214,7 @@ static void __spi_demo_fifo_send_recv(vsf_spi_t *spi)
     VSF_ASSERT(spi != NULL);
     app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
 
-    __spi_demo_fifo_poll(spi, demo->send_buff, demo->recv_buff, dimof(demo->send_buff));
+    __spi_demo_fifo_poll(spi, demo->send_buf, demo->recv_buf, demo->size);
 }
 #endif
 
@@ -234,9 +235,9 @@ static void __spi_request_isr_handler(void              *target,
 
         vsf_trace_debug("spi request finished" VSF_TRACE_CFG_LINEEND, __DATE__, __TIME__);
         vsf_trace_debug("send buff:" VSF_TRACE_CFG_LINEEND, __DATE__, __TIME__);
-        vsf_trace_buffer(VSF_TRACE_DEBUG, demo->send_buff, dimof(demo->send_buff));
+        vsf_trace_buffer(VSF_TRACE_DEBUG, demo->send_buff, demo->size);
         vsf_trace_debug("recv buff:" VSF_TRACE_CFG_LINEEND, __DATE__, __TIME__);
-        vsf_trace_buffer(VSF_TRACE_DEBUG, demo->recv_buff, dimof(demo->recv_buff));
+        vsf_trace_buffer(VSF_TRACE_DEBUG, demo->recv_buff, demo->size);
     }
 }
 
@@ -268,10 +269,10 @@ static void __spi_demo_request_send_only(vsf_spi_t *spi_ptr)
     VSF_ASSERT(spi_ptr != NULL);
 
     app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
-    for (int i = 0; i < sizeof(demo->send_buff); i++) {
-        demo->send_buff[i] = i;
+    for (int i = 0; i < demo->size; i++) {
+        demo->send_buf[i] = i;
     }
-    __spi_demo_request(demo, spi_ptr, demo->send_buff, NULL, dimof(demo->send_buff));
+    __spi_demo_request(demo, spi_ptr, demo->send_buf, NULL, demo->size);
 }
 #endif
 
@@ -281,7 +282,7 @@ static void __spi_demo_request_recv_only(vsf_spi_t *spi_ptr)
     VSF_ASSERT(spi_ptr != NULL);
 
     app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
-    __spi_demo_request(demo, spi_ptr, NULL, demo->recv_buff, dimof(demo->recv_buff));
+    __spi_demo_request(demo, spi_ptr, NULL, demo->recv_buf, demo->size);
 }
 #endif
 
@@ -291,16 +292,22 @@ static void __spi_demo_request_send_recv(vsf_spi_t *spi_ptr)
     VSF_ASSERT(spi_ptr != NULL);
 
     app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
-    for (int i = 0; i < dimof(demo->send_buff); i++) {
+    for (int i = 0; i < demo->size; i++) {
         demo->send_buff[i] = i;
     }
-    __spi_demo_request(demo, spi_ptr, demo->send_buff, demo->recv_buff, dimof(demo->send_buff));
+    __spi_demo_request(demo, spi_ptr, demo->send_buff, demo->recv_buff, demo->size);
 }
 #endif
 
 #if APP_USE_LINUX_DEMO == ENABLED
 int spi_main(int argc, char *argv[])
 {
+    size_t size;
+    if (argc >= 2) {
+        size = atoi(argv[1]);
+    } else {
+        size = APP_SPI_DEMO_CFG_BUFFER_SIZE;
+    }
 #else
 int VSF_USER_ENTRY(void)
 {
@@ -310,7 +317,20 @@ int VSF_USER_ENTRY(void)
 #   if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
 #   endif
+
+    size_t size = APP_SPI_DEMO_CFG_BUFFER_SIZE;
 #endif
+
+    size *= vsf_spi_get_data_bytes_from_mode(APP_SPI_DEMO_CFG_MODE);
+    __app_spi_demo.recv_buff = (uint8_t *)malloc(size);
+    if (__app_spi_demo.recv_buff == NULL) {
+        return -1;
+    }
+    __app_spi_demo.send_buff = (uint8_t *)malloc(size);
+    if (__app_spi_demo.send_buff == NULL) {
+        return -1;
+    }
+    __app_spi_demo.size = size;
 
 #if APP_SPI_DEMO_CFG_FIFO_SEND_TEST == ENABLED
     __spi_demo_fifo_send_only(APP_SPI_DEMO_CFG_SPI);
