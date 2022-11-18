@@ -21,7 +21,9 @@
 
 #if VSF_USE_LINUX == ENABLED
 
-#include <linux/ieee80211.h>
+#include <linux/slab.h>
+#include <net/mac80211.h>
+#include <net/cfg80211.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
