@@ -15,7 +15,7 @@ struct ieee80211_sta {
 };
 
 struct ieee80211_vif {
-
+    bool p2p;
 };
 
 struct ieee80211_tx_control {
