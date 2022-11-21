@@ -108,9 +108,9 @@ void vsf_board_init(void)
 
     vsf_io_cfg_t cfgs[] = {
         {VSF_PA10,  0x03,   0}, // PA10 as spi sck
-        {VSF_PA11,  0x03,   0}, // PA10 as spi sck
-        {VSF_PA12,  0x03,   0}, // PA10 as spi sck
-        {VSF_PA13,  0x03,   0}, // PA10 as spi sck
+        {VSF_PA11,  0x03,   0}, // PA10 as spi csn
+        {VSF_PA12,  0x03,   0}, // PA10 as spi di
+        {VSF_PA13,  0x03,   0}, // PA10 as spi do
 
 #if VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
         {VSF_PA5,   0x00,   0},    // PA5 as LCD RESET
@@ -125,6 +125,10 @@ void vsf_board_init(void)
 #if APP_USE_LINUX_TTY_DEMO == ENABLED
         {VSF_PA10,  0x01,   0},
         {VSF_PA11,  0x01,   0},
+#endif
+#ifdef APP_USE_HAL_I2C_DEMO
+        {VSF_PA14,  0x01,   IO_PULL_UP},
+        {VSF_PA15,  0x01,   IO_PULL_UP},
 #endif
     };
     vsf_io_config(cfgs, dimof(cfgs));
