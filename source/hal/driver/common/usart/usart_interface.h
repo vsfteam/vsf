@@ -15,38 +15,63 @@
  *                                                                           *
  ****************************************************************************/
 
-
+#ifndef __HAL_DRIVER_USART_INTERFACE_H__
+#define __HAL_DRIVER_USART_INTERFACE_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
-#ifndef __HAL_DRIVER_COMMON_H__
-#define __HAL_DRIVER_COMMON_H__
+#if VSF_HAL_USE_USART == ENABLED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "template/vsf_template.h"
-
-#include "adc/adc_interface.h"
-#include "flash/flash_interface.h"
-#include "spi/spi_interface.h"
-#include "usart/usart_interface.h"
-
-#include "i2c/multiplex_i2c.h"
-#include "i2c/mrequest_i2c.h"
-#include "spi/multiplex_spi.h"
+#include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
 
-#ifdef __cplusplus
-}
+//! \name class: usart_t
+//! @{
+def_interface(i_usart_t)
+    union {
+        implement(i_peripheral_t);
+        struct {
+            vsf_usart_status_t     (*Status)(void);
+            vsf_usart_capability_t (*Capability)(void);
+        } USART;
+    };
+    vsf_err_t (*Init)(vsf_usart_cfg_t *pCfg);
+
+    //! Irq
+    struct {
+        void (*Enable)(vsf_usart_irq_mask_t tEventMask);
+        void (*Disable)(vsf_usart_irq_mask_t tEventMask);
+    } Irq;
+
+    //! fifo access
+    struct {
+        //!< read from fifo
+        uint_fast16_t (*Read)(void *pBuffer, uint_fast16_t nCount);
+        //!< write to fifo
+        uint_fast16_t (*Write)(void *pBuffer, uint_fast16_t nCount);
+        //!< flush fifo
+        bool (*Flush)(void);
+    } FIFO;
+
+    struct {
+        vsf_async_block_access_t Read;
+        vsf_async_block_access_t Write;
+    } Block;
+
+end_def_interface(i_usart_t)
+//! @}
+
+
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ INCLUDES ======================================*/
+/*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
+
 #endif
 
 #endif

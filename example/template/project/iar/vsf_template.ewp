@@ -13921,6 +13921,12 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\adc\adc_common.c</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\adc\adc_interface.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\adc\adc_interface.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\adc\adc_template.h</name>
                         </file>
                         <file>
@@ -13937,6 +13943,12 @@
                         <name>flash</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\flash\flash_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\flash\flash_interface.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\flash\flash_interface.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\flash\flash_template.h</name>
@@ -14059,6 +14071,12 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_common.c</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_interface.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_interface.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\spi_template.h</name>
                         </file>
                         <file>
@@ -14153,6 +14171,12 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_interface.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_interface.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\usart_template.h</name>
