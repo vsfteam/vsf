@@ -15,38 +15,49 @@
  *                                                                           *
  ****************************************************************************/
 
-
+#ifndef __HAL_DRIVER_ADC_INTERFACE_H__
+#define __HAL_DRIVER_ADC_INTERFACE_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
-#ifndef __HAL_DRIVER_COMMON_H__
-#define __HAL_DRIVER_COMMON_H__
+#if VSF_HAL_USE_ADC == ENABLED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "template/vsf_template.h"
-
-#include "adc/adc_interface.h"
-#include "flash/flash_interface.h"
-#include "spi/spi_interface.h"
-#include "usart/usart_interface.h"
-
-#include "i2c/multiplex_i2c.h"
-#include "i2c/mrequest_i2c.h"
-#include "spi/multiplex_spi.h"
+#include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
 
-#ifdef __cplusplus
-}
+//! \name class: adc_t
+//! @{
+def_interface(i_adc_t)
+    implement(i_peripheral_t);
+
+    vsf_err_t (*Init)(vsf_adc_cfg_t *pCfg);
+
+    //! Irq
+    struct {
+        void (*Enable)(void);
+        void (*Disable)(void);
+    } Irq;
+
+    //! Channel
+    struct {
+        vsf_err_t (*Config)(vsf_adc_channel_cfg_t *ptChannelCfgs, uint32_t nCount);
+        vsf_err_t (*Request)(void *pBuffer, uint32_t nCount);
+    } Channel;
+
+end_def_interface(i_adc_t)
+//! @}
+
+
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ INCLUDES ======================================*/
+/*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
+
 #endif
 
 #endif

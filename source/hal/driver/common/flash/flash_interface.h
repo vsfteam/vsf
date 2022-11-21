@@ -15,38 +15,41 @@
  *                                                                           *
  ****************************************************************************/
 
-
+#ifndef __HAL_DRIVER_FLASH_INTERFACE_H__
+#define __HAL_DRIVER_FLASH_INTERFACE_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
-#ifndef __HAL_DRIVER_COMMON_H__
-#define __HAL_DRIVER_COMMON_H__
+#if VSF_HAL_USE_FLASH == ENABLED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "template/vsf_template.h"
-
-#include "adc/adc_interface.h"
-#include "flash/flash_interface.h"
-#include "spi/spi_interface.h"
-#include "usart/usart_interface.h"
-
-#include "i2c/multiplex_i2c.h"
-#include "i2c/mrequest_i2c.h"
-#include "spi/multiplex_spi.h"
+#include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
 
-#ifdef __cplusplus
-}
+//! \name class: flash_t
+//! @{
+def_interface(i_flash_t)
+    implement(i_peripheral_t);
+
+    vsf_err_t (*Init)(vsf_flash_cfg_t *pCfg);
+
+    // Provides byte-level random reads and writes
+    vsf_err_t (*Erase)(vsf_flash_size_t address, vsf_flash_size_t size);
+    vsf_err_t (*Write)(vsf_flash_size_t address, uint8_t* buffer, vsf_flash_size_t size);
+    vsf_err_t (*Read)(vsf_flash_size_t address, uint8_t* buffer, vsf_flash_size_t size);
+
+end_def_interface(i_flash_t)
+//! @}
+
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ INCLUDES ======================================*/
+/*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
+
 #endif
 
 #endif

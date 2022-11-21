@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Copyright(C)2009-2022 by VSF Team                                       *
+ *   Cop->right(C)2009-2019 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a copy of the License at                                  *
+ *  You may obtain a cop-> of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -16,27 +16,13 @@
  ****************************************************************************/
 
 
-
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
 
-#ifndef __HAL_DRIVER_COMMON_H__
-#define __HAL_DRIVER_COMMON_H__
+#define VSF_USART_CFG_FUNCTION_RENAME DISABLED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "hal/driver/driver.h"
 
-#include "template/vsf_template.h"
-
-#include "adc/adc_interface.h"
-#include "flash/flash_interface.h"
-#include "spi/spi_interface.h"
-#include "usart/usart_interface.h"
-
-#include "i2c/multiplex_i2c.h"
-#include "i2c/mrequest_i2c.h"
-#include "spi/multiplex_spi.h"
+#if VSF_HAL_USE_USART == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -44,10 +30,6 @@ extern "C" {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif
-/* EOF */
+#endif /* VSF_HAL_USE_USART == ENABLED */

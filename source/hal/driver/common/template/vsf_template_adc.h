@@ -149,29 +149,6 @@ struct vsf_adc_t  {
 };
 #endif
 
-
-//! \name class: adc_t
-//! @{
-def_interface(i_adc_t)
-    implement(i_peripheral_t);
-
-    vsf_err_t (*Init)(vsf_adc_cfg_t *pCfg);
-
-    //! Irq
-    struct {
-        void (*Enable)(void);
-        void (*Disable)(void);
-    } Irq;
-
-    //! Channel
-    struct {
-        vsf_err_t (*Config)(vsf_adc_channel_cfg_t *ptChannelCfgs, uint32_t nCount);
-        vsf_err_t (*Request)(void *pBuffer, uint32_t nCount);
-    } Channel;
-
-end_def_interface(i_adc_t)
-//! @}
-
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr);
