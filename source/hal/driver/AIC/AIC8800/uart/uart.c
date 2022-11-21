@@ -259,7 +259,7 @@ static vsf_usart_irq_mask_t __get_uart_irq_mask(vsf_hw_usart_t *hw_usart_ptr)
 static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 {
     vsf_usart_irq_mask_t irq_mask = __get_uart_irq_mask(hw_usart_ptr);
-    if (irq_mask & USART_IRQ_MASK) {
+    if (irq_mask & USART_IRQ_ALL_BITS_MASK) {
         if (NULL != hw_usart_ptr->isr.handler_fn) {
             hw_usart_ptr->isr.handler_fn(hw_usart_ptr->isr.target_ptr, (vsf_usart_t *)hw_usart_ptr, irq_mask);
         }

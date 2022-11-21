@@ -97,7 +97,7 @@ typedef enum vsf_usart_irq_mask_t {
     //todo: add rx timeout support
     USART_IRQ_MASK_RX_TIMEOUT       = VSF_BIT(6),
 
-    USART_IRQ_MASK                  =  USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
+    USART_IRQ_ALL_BITS_MASK         =  USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
                                      | USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL
                                      | USART_IRQ_MASK_ERROR    | USART_IRQ_MASK_RX_TIMEOUT,
 } vsf_usart_irq_mask_t;

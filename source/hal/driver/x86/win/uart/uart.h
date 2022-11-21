@@ -79,7 +79,7 @@ typedef enum vsf_usart_irq_mask_t {
     USART_IRQ_MASK_TX_ERR           = VSF_BIT(6),
     USART_IRQ_MASK_ERR              = USART_IRQ_MASK_RX_ERR | USART_IRQ_MASK_TX_ERR,
 
-    USART_IRQ_MASK                  =   USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
+    USART_IRQ_ALL_BITS_MASK         =   USART_IRQ_MASK_RX     | USART_IRQ_MASK_TX
                                       | USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL
                                       | USART_IRQ_MASK_ERR,
 } vsf_usart_irq_mask_t;
