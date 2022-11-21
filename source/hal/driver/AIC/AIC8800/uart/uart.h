@@ -126,7 +126,7 @@ typedef enum vsf_usart_irq_mask_t {
 
     USART_IRQ_MASK_RX_TIMEOUT       =  0x1 << 12,
 
-    USART_IRQ_MASK                  =  USART_IRQ_MASK_FIFO
+    USART_IRQ_ALL_BITS_MASK         =  USART_IRQ_MASK_FIFO
                                      | USART_IRQ_MASK_REQUEST
                                      | USART_IRQ_MASK_RX_TIMEOUT
                                      | USART_IRQ_MASK_ERROR,

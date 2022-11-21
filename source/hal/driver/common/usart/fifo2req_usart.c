@@ -83,7 +83,7 @@ static void __vsf_usart_fifo2req_isr_handler(void * target_ptr,
         }
     }
 
-    if (current_irq_mask & USART_IRQ_MASK) {
+    if (current_irq_mask & USART_IRQ_ALL_BITS_MASK) {
         vsf_usart_isr_t *isr_ptr = &request_ptr->isr;
         if (isr_ptr->handler_fn != NULL) {
             isr_ptr->handler_fn(isr_ptr->target_ptr, usart_ptr, current_irq_mask);
@@ -183,7 +183,7 @@ void vsf_usart_fifo2req_irq_enable(vsf_usart_fifo2req_t *request_ptr,
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr != NULL);
 
-    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_ALL_BITS_MASK) == 0);
     VSF_HAL_ASSERT(((irq_mask & USART_IRQ_MASK_RX) == 0) || ((request_ptr->irq_mask & USART_IRQ_MASK_RX_CPL) == 0));
     VSF_HAL_ASSERT(((irq_mask & USART_IRQ_MASK_TX) == 0) || ((request_ptr->irq_mask & USART_IRQ_MASK_TX_CPL) == 0));
 
@@ -202,7 +202,7 @@ void vsf_usart_fifo2req_irq_disable(vsf_usart_fifo2req_t *request_ptr,
                                     vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(request_ptr != NULL);
-    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_ALL_BITS_MASK) == 0);
 
     vsf_usart_irq_mask_t request_irq_mask = irq_mask & (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
     vsf_usart_irq_mask_t others_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);

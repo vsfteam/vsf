@@ -172,7 +172,7 @@ static vsf_err_t __usart_demo_init(vsf_usart_t * usart,
 
     while (fsm_rt_cpl != vsf_usart_enable(usart));
 
-    if (mask & USART_IRQ_MASK) {
+    if (mask & USART_IRQ_ALL_BITS_MASK) {
         vsf_usart_irq_enable(usart, mask);
     }
 
@@ -187,7 +187,7 @@ static vsf_err_t __usart_demo_init(vsf_usart_t * usart,
 
 static void __usart_demo_deinit(vsf_usart_t * usart, vsf_usart_irq_mask_t mask)
 {
-    if (mask & USART_IRQ_MASK) {
+    if (mask & USART_IRQ_ALL_BITS_MASK) {
         vsf_usart_irq_disable(usart, mask);
     }
 

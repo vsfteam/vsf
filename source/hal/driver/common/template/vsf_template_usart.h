@@ -109,9 +109,9 @@ extern "C" {
 #   define __VSF_USART_REQUEST_APIS(__prefix_name)
 #endif
 
-#define VSF_USART_APIS(__prefix_name) \
-    __VSF_USART_BASE_APIS(__prefix_name) \
-    __VSF_USART_FIFO_APIS(__prefix_name) \
+#define VSF_USART_APIS(__prefix_name)                                           \
+    __VSF_USART_BASE_APIS(__prefix_name)                                        \
+    __VSF_USART_FIFO_APIS(__prefix_name)                                        \
     __VSF_USART_REQUEST_APIS(__prefix_name)
 
 /*============================ TYPES =========================================*/
@@ -191,7 +191,7 @@ typedef enum vsf_usart_irq_mask_t {
                                       | USART_IRQ_MASK_BREAK_ERR
                                       | USART_IRQ_MASK_OVERFLOW_ERR,
 
-    USART_IRQ_MASK                  =   USART_IRQ_MASK_TX
+    USART_IRQ_ALL_BITS_MASK         =   USART_IRQ_MASK_TX
                                       | USART_IRQ_MASK_RX
                                       | USART_IRQ_MASK_RX_TIMEOUT
                                       | USART_IRQ_MASK_TX_CPL
