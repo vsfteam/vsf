@@ -105,6 +105,7 @@ typedef struct vk_input_notifier_t {
     vk_input_on_evt_t on_evt;
     void *dev;
     vk_input_mask_t mask;
+    void *param;
 } vk_input_notifier_t;
 #endif
 
