@@ -47,5 +47,9 @@ extern void vsf_lvgl_bind_disp(vk_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv,
 extern void vsf_lvgl_flush_disp(lv_disp_drv_t *disp_drv, const lv_area_t *area,
             lv_color_t *color_p);
 
+#if VSF_USE_INPUT == ENABLED
+extern uint32_t vsf_input_keycode_to_lvgl_keycode(uint16_t keycode);
+#endif
+
 #endif  // VSF_USE_UI && VSF_USE_LVGL
 #endif  // __VSF_LVGL_PORT_H___
