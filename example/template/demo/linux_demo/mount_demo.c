@@ -33,8 +33,10 @@ struct __fs_type_t {
     bool need_block_size;
 };
 
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FILE_MAL == ENABLED
 static void * __prepare_file_mal_fsdata(const __fs_type_t *fstype, __fs_param_t *param);
 static void __cleanup_file_mal_fsdata(void *fsdata);
+#endif
 #if VSF_FS_USE_MEMFS == ENABLED
 static void * __prepare_memfs_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
@@ -49,7 +51,7 @@ static void __cleanup_memfs_fsdata(void *fsdata)
 {
 }
 #endif
-#if VSF_FS_USE_LITTLEFS == ENABLED
+#if VSF_FS_USE_LITTLEFS == ENABLED && VSF_USE_MAL == ENABLED && VSF_MAL_USE_FILE_MAL == ENABLED
 static void * __prepare_lfs_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
     vk_file_mal_t *file_mal = __prepare_file_mal_fsdata(fstype, param);
@@ -129,6 +131,7 @@ static void __cleanup_linfs_fsdata(void *fsdata)
 #endif
 
 static const __fs_type_t __fs_types[] = {
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FILE_MAL == ENABLED
     {
         .fs                 = "auto",
         .fsop               = NULL,
@@ -136,6 +139,7 @@ static const __fs_type_t __fs_types[] = {
         .cleanup_fsdata     = __cleanup_file_mal_fsdata,
         .need_block_size    = true,
     },
+#endif
 #if VSF_FS_USE_MEMFS == ENABLED
     {
         .fs                 = "memfs",
@@ -145,7 +149,7 @@ static const __fs_type_t __fs_types[] = {
         .need_block_size    = false,
     },
 #endif
-#if VSF_FS_USE_FATFS == ENABLED
+#if VSF_FS_USE_FATFS == ENABLED && VSF_USE_MAL == ENABLED && VSF_MAL_USE_FILE_MAL == ENABLED
     {
         .fs                 = "fatfs",
         .fsop               = NULL,
@@ -183,6 +187,7 @@ static const __fs_type_t __fs_types[] = {
 #endif
 };
 
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FILE_MAL == ENABLED
 static void * __prepare_file_mal_fsdata(const __fs_type_t *fstype, __fs_param_t *param)
 {
     vsf_linux_fsdata_auto_t *fsdata = vsf_heap_calloc(1, sizeof(vsf_linux_fsdata_auto_t) + sizeof(vk_file_mal_t));
@@ -216,6 +221,7 @@ static void __cleanup_file_mal_fsdata(void *fsdata)
         vsf_heap_free(file_mal);
     }
 }
+#endif
 
 int mount_main(int argc, char *argv[])
 {
