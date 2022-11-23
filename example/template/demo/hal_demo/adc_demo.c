@@ -41,7 +41,7 @@
 #endif
 
 #ifndef APP_ADC_DEMO_CFG_FEATURE
-#   define APP_ADC_DEMO_CFG_FEATURE                 (SCAN_CONV_SEQUENCE_MODE | ADC_REF_VDD_1)
+#   define APP_ADC_DEMO_CFG_FEATURE                 (VSF_SCAN_CONV_SEQUENCE_MODE | VSF_ADC_REF_VDD_1)
 #endif
 
 #ifndef APP_ADC_DEMO_CFG_CLOCK

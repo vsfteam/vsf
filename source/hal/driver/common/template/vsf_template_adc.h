@@ -74,37 +74,37 @@ extern "C" {
 
 #if VSF_ADC_CFG_REIMPLEMENT_TYPE_FEATURE == DISABLED
 typedef enum vsf_adc_feature_t {
-    DATA_ALIGN_RIGHT        = (0 << 0),  //!< ADC data alignment to right
-    DATA_ALIGN_LEFT         = (1 << 0),  //!< ADC data alignment to left
+    VSF_DATA_ALIGN_RIGHT        = (0 << 0),  //!< ADC data alignment to right
+    VSF_DATA_ALIGN_LEFT         = (1 << 0),  //!< ADC data alignment to left
 
-    SCAN_CONV_SINGLE_MODE   = (0 << 1),  //!< Conversion is performed in single mode
-    SCAN_CONV_SEQUENCE_MODE = (1 << 1),  //!< Conversions are performed in sequence mode
+    VSF_SCAN_CONV_SINGLE_MODE   = (0 << 1),  //!< Conversion is performed in single mode
+    VSF_SCAN_CONV_SEQUENCE_MODE = (1 << 1),  //!< Conversions are performed in sequence mode
 
     //! Selects the external event used to trigger the conversion
-    EXTERN_TRIGGER_0        = (0 << 2),
-    EXTERN_TRIGGER_1        = (1 << 2),
-    EXTERN_TRIGGER_2        = (2 << 2),
+    VSF_EXTERN_TRIGGER_0        = (0 << 2),
+    VSF_EXTERN_TRIGGER_1        = (1 << 2),
+    VSF_EXTERN_TRIGGER_2        = (2 << 2),
 
-    ADC_REF_VDD_1           = (0 << 4),
-    ADC_REF_VDD_1_2         = (1 << 4),
-    ADC_REF_VDD_1_3         = (2 << 4),
-    ADC_REF_VDD_1_4         = (3 << 4),
+    VSF_ADC_REF_VDD_1           = (0 << 4),
+    VSF_ADC_REF_VDD_1_2         = (1 << 4),
+    VSF_ADC_REF_VDD_1_3         = (2 << 4),
+    VSF_ADC_REF_VDD_1_4         = (3 << 4),
 } vsf_adc_feature_t;
 #endif
 
 #if VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_FEATURE == DISABLED
 typedef enum vsf_adc_channel_feature_t{
-    ADC_CHANNEL_GAIN_1_6    = (0 << 0),
-    ADC_CHANNEL_GAIN_1_5    = (1 << 0),
-    ADC_CHANNEL_GAIN_1_4    = (2 << 0),
-    ADC_CHANNEL_GAIN_1_3    = (3 << 0),
-    ADC_CHANNEL_GAIN_1_2    = (4 << 0),
-    ADC_CHANNEL_GAIN_1      = (5 << 0),
+    VSF_ADC_CHANNEL_GAIN_1_6    = (0 << 0),
+    VSF_ADC_CHANNEL_GAIN_1_5    = (1 << 0),
+    VSF_ADC_CHANNEL_GAIN_1_4    = (2 << 0),
+    VSF_ADC_CHANNEL_GAIN_1_3    = (3 << 0),
+    VSF_ADC_CHANNEL_GAIN_1_2    = (4 << 0),
+    VSF_ADC_CHANNEL_GAIN_1      = (5 << 0),
 
-    ADC_CHANNEL_REF_VDD_1   = (0 << 4),
-    ADC_CHANNEL_REF_VDD_1_2 = (1 << 4),
-    ADC_CHANNEL_REF_VDD_1_3 = (2 << 4),
-    ADC_CHANNEL_REF_VDD_1_4 = (3 << 4),
+    VSF_ADC_CHANNEL_REF_VDD_1   = (0 << 4),
+    VSF_ADC_CHANNEL_REF_VDD_1_2 = (1 << 4),
+    VSF_ADC_CHANNEL_REF_VDD_1_3 = (2 << 4),
+    VSF_ADC_CHANNEL_REF_VDD_1_4 = (3 << 4),
 } vsf_adc_channel_feature_t;
 #endif
 
