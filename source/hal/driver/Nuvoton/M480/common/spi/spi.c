@@ -31,7 +31,7 @@
                                      | SPI_CTL_DATDIR_Msk | SPI_CTL_RXONLY_Msk )
 
 #define SPI_SSCTL_MASK              (  SPI_AUTO_SLAVE_SELECTION_ENABLE \
-                                     | SPI_SLAVE_SELECTION_ACTIVE_HIGH)
+                                     | VSF_SPI_SLAVE_SELECTION_ACTIVE_HIGH)
 
 
 
@@ -237,7 +237,7 @@ void vsf_hw_spi_irq_enable(vsf_hw_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
-    VSF_HAL_ASSERT((irq_mask & ~(SPI_IRQ_MASK_TX_CPL | SPI_IRQ_MASK_CPL)) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~(VSF_SPI_IRQ_MASK_TX_CPL | VSF_SPI_IRQ_MASK_CPL)) == 0);
 
     spi_ptr->irq_mask |= irq_mask;
 }
@@ -246,7 +246,7 @@ void vsf_hw_spi_irq_disable(vsf_hw_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->reg != NULL);
-    VSF_HAL_ASSERT((irq_mask & ~(SPI_IRQ_MASK_TX_CPL | SPI_IRQ_MASK_CPL)) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~(VSF_SPI_IRQ_MASK_TX_CPL | VSF_SPI_IRQ_MASK_CPL)) == 0);
 
     spi_ptr->irq_mask &= ~irq_mask;
 }
@@ -343,8 +343,8 @@ static void __m484_spi_tx_dma_done_handler(void *target_ptr, uint32_t dma_irq_ma
 {
     vsf_hw_spi_t *spi_ptr = (vsf_hw_spi_t *)target_ptr;
 
-    if (spi_ptr->isr.handler_fn != NULL && (spi_ptr->irq_mask & SPI_IRQ_MASK_TX_CPL)) {
-        spi_ptr->isr.handler_fn(spi_ptr->isr.target_ptr, (vsf_spi_t *)spi_ptr, SPI_IRQ_MASK_TX_CPL);
+    if (spi_ptr->isr.handler_fn != NULL && (spi_ptr->irq_mask & VSF_SPI_IRQ_MASK_TX_CPL)) {
+        spi_ptr->isr.handler_fn(spi_ptr->isr.target_ptr, (vsf_spi_t *)spi_ptr, VSF_SPI_IRQ_MASK_TX_CPL);
     }
 }
 
@@ -358,8 +358,8 @@ static void __m484_spi_rx_dma_done_handler(void *target_ptr, uint32_t dma_irq_ma
         return ;
     }
 
-    if (spi_ptr->isr.handler_fn != NULL && (spi_ptr->irq_mask & SPI_IRQ_MASK_CPL)) {
-        spi_ptr->isr.handler_fn(spi_ptr->isr.target_ptr, (vsf_spi_t *)spi_ptr, SPI_IRQ_MASK_CPL);
+    if (spi_ptr->isr.handler_fn != NULL && (spi_ptr->irq_mask & VSF_SPI_IRQ_MASK_CPL)) {
+        spi_ptr->isr.handler_fn(spi_ptr->isr.target_ptr, (vsf_spi_t *)spi_ptr, VSF_SPI_IRQ_MASK_CPL);
     }
 }
 

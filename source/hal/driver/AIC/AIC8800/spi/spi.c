@@ -113,19 +113,19 @@ static vsf_err_t __clock_init(vsf_hw_spi_t *hw_spi_ptr, uint32_t clock_hz)
 static vsf_err_t __cfg_check(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
     // TODO: support spi slave mode
-    if ((cfg_ptr->mode & SPI_DIR_MODE_MASK) != SPI_MASTER) {
+    if ((cfg_ptr->mode & VSF_SPI_DIR_MODE_MASK) != VSF_SPI_MASTER) {
         VSF_ASSERT(0);
         return VSF_ERR_NOT_SUPPORT;
     }
 
     // TODO: test spi datasize
-    if ((cfg_ptr->mode & SPI_DATASIZE_MASK) != SPI_DATASIZE_8) {
+    if ((cfg_ptr->mode & VSF_SPI_DATASIZE_MASK) != VSF_SPI_DATASIZE_8) {
         VSF_ASSERT(0);
         return VSF_ERR_NOT_SUPPORT;
     }
 
     // TODO: test spi msb
-    if ((cfg_ptr->mode & SPI_BIT_ORDER_MASK) == SPI_LSB_FIRST) {
+    if ((cfg_ptr->mode & VSF_SPI_BIT_ORDER_MASK) == VSF_SPI_LSB_FIRST) {
         VSF_ASSERT(0);
         return VSF_ERR_NOT_SUPPORT;
     }
@@ -154,13 +154,13 @@ vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(spi_const != NULL);
     REG_SPI_T *reg = spi_const->reg;
 
-    reg->MR0   = cfg_ptr->mode & SPI_DIR_MODE_MASK;
-    reg->CR[0] = (0x0Ful <<  8) | (cfg_ptr->mode & (SPI_CLOCK_MODE_MASK | SPI_DATASIZE_MASK));
+    reg->MR0   = cfg_ptr->mode & VSF_SPI_DIR_MODE_MASK;
+    reg->CR[0] = (0x0Ful <<  8) | (cfg_ptr->mode & (VSF_SPI_CLOCK_MODE_MASK | VSF_SPI_DATASIZE_MASK));
     reg->CR[1] = (0x03ul << 12) | (0x00ul << 6);
     reg->CR[2] = (0x01ul <<  6); // en dma
     reg->CR[3] = ((0x02ul << 8) | (0x01ul << 0));
 
-    hw_spi_ptr->is_auto_cs = ((cfg_ptr->mode & SPI_AUTO_CS_MASK) == SPI_AUTO_CS_ENABLE);
+    hw_spi_ptr->is_auto_cs = ((cfg_ptr->mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_ENABLE);
     hw_spi_ptr->isr = cfg_ptr->isr;
     if (hw_spi_ptr->isr.handler_fn != NULL) {
         uint32_t prio = (uint32_t)hw_spi_ptr->isr.prio;
@@ -370,7 +370,7 @@ static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_irq_mask_t irq_mask)
     VSF_HAL_ASSERT(spi_const != NULL);
     vsf_spi_irq_mask_t cb_irq_mask = 0;
 
-    if (irq_mask & SPI_IRQ_MASK_CPL) {
+    if (irq_mask & VSF_SPI_IRQ_MASK_CPL) {
         const int ch = spi_const->request.recv.channel;
         dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
 
@@ -379,7 +379,7 @@ static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_irq_mask_t irq_mask)
         VSF_HAL_ASSERT(hw_spi_ptr->request.count >= hw_spi_ptr->request.recv.offset);
 
         if (hw_spi_ptr->request.count == hw_spi_ptr->request.recv.offset) {
-            cb_irq_mask = SPI_IRQ_MASK_CPL;
+            cb_irq_mask = VSF_SPI_IRQ_MASK_CPL;
 
             if (hw_spi_ptr->is_auto_cs) {
                 vsf_hw_spi_cs_inactive(hw_spi_ptr, 0);
@@ -389,14 +389,14 @@ static void __irq_handler(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_irq_mask_t irq_mask)
         }
     }
 
-    if (irq_mask & SPI_IRQ_MASK_TX_CPL) {
+    if (irq_mask & VSF_SPI_IRQ_MASK_TX_CPL) {
         const int ch = spi_const->request.send.channel;
         dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL2_ICLR_BIT | DMA_CH_CE_ICLR_BIT));
 
          hw_spi_ptr->request.send.offset = vsf_min(hw_spi_ptr->request.send.offset + VSF_HW_SPI_CFG_DMA_BYTE_CNT_MAX,
                                                hw_spi_ptr->request.count);
         if (hw_spi_ptr->request.count == hw_spi_ptr->request.send.offset) {
-            cb_irq_mask = SPI_IRQ_MASK_TX_CPL;
+            cb_irq_mask = VSF_SPI_IRQ_MASK_TX_CPL;
         }
     }
 
@@ -521,11 +521,11 @@ void vsf_hw_spi_get_transfered_count(vsf_hw_spi_t *hw_spi_ptr, uint_fast32_t * t
     };                                                                          \
     void VSF_HW_SPI ## __COUNT ## _RXDMA_IRQ(void)                              \
     {                                                                           \
-        __irq_handler(&vsf_hw_spi ## __COUNT, SPI_IRQ_MASK_CPL);                \
+        __irq_handler(&vsf_hw_spi ## __COUNT, VSF_SPI_IRQ_MASK_CPL);                \
     }                                                                           \
     void VSF_HW_SPI ## __COUNT ## _TXDMA_IRQ(void)                              \
     {                                                                           \
-        __irq_handler(&vsf_hw_spi ## __COUNT, SPI_IRQ_MASK_TX_CPL);             \
+        __irq_handler(&vsf_hw_spi ## __COUNT, VSF_SPI_IRQ_MASK_TX_CPL);             \
     }
 
 #include "hal/driver/common/spi/spi_template.inc"

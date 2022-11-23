@@ -90,81 +90,81 @@ extern "C" {
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 //! spi working mode
 typedef enum vsf_spi_mode_t {
-    SPI_MASTER                  = 0x00ul << 21,      //!< select master mode
-    SPI_SLAVE                   = 0x01ul << 21,      //!< select slave mode
-    SPI_DIR_MODE_MASK           = SPI_MASTER  |
-                                  SPI_SLAVE,
+    VSF_SPI_MASTER                  = 0x00ul << 21,      //!< select master mode
+    VSF_SPI_SLAVE                   = 0x01ul << 21,      //!< select slave mode
+    VSF_SPI_DIR_MODE_MASK           = VSF_SPI_MASTER  |
+                                      VSF_SPI_SLAVE,
 
-    SPI_MSB_FIRST               = 0x00ul << 22,      //!< default enable MSB
-    SPI_LSB_FIRST               = 0x01ul << 22,      //!< transfer LSB first
-    SPI_BIT_ORDER_MASK          = SPI_MSB_FIRST |
-                                  SPI_LSB_FIRST,
+    VSF_SPI_MSB_FIRST               = 0x00ul << 22,      //!< default enable MSB
+    VSF_SPI_LSB_FIRST               = 0x01ul << 22,      //!< transfer LSB first
+    VSF_SPI_BIT_ORDER_MASK          = VSF_SPI_MSB_FIRST |
+                                      VSF_SPI_LSB_FIRST,
 
-    SPI_CPOL_LOW                = 0x00ul << 23,      //!< SCK clock polarity is low
-    SPI_CPOL_HIGH               = 0x01ul << 23,      //!< SCK clock polarity is high
-    SPI_CPHA_LOW                = 0x00ul << 24,      //!< SCK clock phase is low
-    SPI_CPHA_HIGH               = 0x01ul << 24,      //!< SCK clock phase is high
-    SPI_CLOCK_MODE_0            = SPI_CPOL_LOW  | SPI_CPHA_LOW,
-    SPI_CLOCK_MODE_1            = SPI_CPOL_LOW  | SPI_CPHA_HIGH,
-    SPI_CLOCK_MODE_2            = SPI_CPOL_HIGH | SPI_CPHA_LOW,
-    SPI_CLOCK_MODE_3            = SPI_CPOL_HIGH | SPI_CPHA_HIGH,
-    SPI_CLOCK_MODE_MASK         = SPI_CLOCK_MODE_0 |
-                                  SPI_CLOCK_MODE_1 |
-                                  SPI_CLOCK_MODE_2 |
-                                  SPI_CLOCK_MODE_3,
+    VSF_SPI_CPOL_LOW                = 0x00ul << 23,      //!< SCK clock polarity is low
+    VSF_SPI_CPOL_HIGH               = 0x01ul << 23,      //!< SCK clock polarity is high
+    VSF_SPI_CPHA_LOW                = 0x00ul << 24,      //!< SCK clock phase is low
+    VSF_SPI_CPHA_HIGH               = 0x01ul << 24,      //!< SCK clock phase is high
+    VSF_SPI_CLOCK_MODE_0            = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,
+    VSF_SPI_CLOCK_MODE_1            = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,
+    VSF_SPI_CLOCK_MODE_2            = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,
+    VSF_SPI_CLOCK_MODE_3            = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,
+    VSF_SPI_CLOCK_MODE_MASK         = VSF_SPI_CLOCK_MODE_0 |
+                                      VSF_SPI_CLOCK_MODE_1 |
+                                      VSF_SPI_CLOCK_MODE_2 |
+                                      VSF_SPI_CLOCK_MODE_3,
 
-    __SPI_DATASIZE_OFFSET       = 25,
-    SPI_DATASIZE_4              = 0x03ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    SPI_DATASIZE_5              = 0x04ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    SPI_DATASIZE_6              = 0x05ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    SPI_DATASIZE_7              = 0x06ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    SPI_DATASIZE_8              = 0x07ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    SPI_DATASIZE_9              = 0x08ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_10             = 0x09ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_11             = 0x0Aul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_12             = 0x0Bul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_13             = 0x0Cul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_14             = 0x0Dul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_15             = 0x0Eul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_16             = 0x0Ful << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_17             = 0x10ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_18             = 0x11ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_19             = 0x12ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_20             = 0x13ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_21             = 0x14ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_22             = 0x15ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_23             = 0x16ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_24             = 0x17ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_25             = 0x18ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_26             = 0x19ul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_27             = 0x1Aul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_28             = 0x1Bul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_29             = 0x1Cul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_30             = 0x1Dul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_31             = 0x1Eul << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_32             = 0x1Ful << __SPI_DATASIZE_OFFSET,
-    SPI_DATASIZE_MASK           = SPI_DATASIZE_4  | SPI_DATASIZE_5  | SPI_DATASIZE_6  | SPI_DATASIZE_7  |
-                                  SPI_DATASIZE_8  | SPI_DATASIZE_9  | SPI_DATASIZE_10 | SPI_DATASIZE_11 |
-                                  SPI_DATASIZE_12 | SPI_DATASIZE_13 | SPI_DATASIZE_14 | SPI_DATASIZE_15 |
-                                  SPI_DATASIZE_16 | SPI_DATASIZE_17 | SPI_DATASIZE_18 | SPI_DATASIZE_19 |
-                                  SPI_DATASIZE_20 | SPI_DATASIZE_21 | SPI_DATASIZE_22 | SPI_DATASIZE_23 |
-                                  SPI_DATASIZE_24 | SPI_DATASIZE_25 | SPI_DATASIZE_26 | SPI_DATASIZE_27 |
-                                  SPI_DATASIZE_28 | SPI_DATASIZE_29 | SPI_DATASIZE_30 | SPI_DATASIZE_31,
+    __SPI_DATASIZE_OFFSET           = 25,
+    VSF_SPI_DATASIZE_4              = 0x03ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
+    VSF_SPI_DATASIZE_5              = 0x04ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
+    VSF_SPI_DATASIZE_6              = 0x05ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
+    VSF_SPI_DATASIZE_7              = 0x06ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
+    VSF_SPI_DATASIZE_8              = 0x07ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
+    VSF_SPI_DATASIZE_9              = 0x08ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_10             = 0x09ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_11             = 0x0Aul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_12             = 0x0Bul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_13             = 0x0Cul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_14             = 0x0Dul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_15             = 0x0Eul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_16             = 0x0Ful << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_17             = 0x10ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_18             = 0x11ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_19             = 0x12ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_20             = 0x13ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_21             = 0x14ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_22             = 0x15ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_23             = 0x16ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_24             = 0x17ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_25             = 0x18ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_26             = 0x19ul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_27             = 0x1Aul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_28             = 0x1Bul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_29             = 0x1Cul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_30             = 0x1Dul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_31             = 0x1Eul << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_32             = 0x1Ful << __SPI_DATASIZE_OFFSET,
+    VSF_SPI_DATASIZE_MASK           = VSF_SPI_DATASIZE_4  | VSF_SPI_DATASIZE_5  | VSF_SPI_DATASIZE_6  | VSF_SPI_DATASIZE_7  |
+                                      VSF_SPI_DATASIZE_8  | VSF_SPI_DATASIZE_9  | VSF_SPI_DATASIZE_10 | VSF_SPI_DATASIZE_11 |
+                                      VSF_SPI_DATASIZE_12 | VSF_SPI_DATASIZE_13 | VSF_SPI_DATASIZE_14 | VSF_SPI_DATASIZE_15 |
+                                      VSF_SPI_DATASIZE_16 | VSF_SPI_DATASIZE_17 | VSF_SPI_DATASIZE_18 | VSF_SPI_DATASIZE_19 |
+                                      VSF_SPI_DATASIZE_20 | VSF_SPI_DATASIZE_21 | VSF_SPI_DATASIZE_22 | VSF_SPI_DATASIZE_23 |
+                                      VSF_SPI_DATASIZE_24 | VSF_SPI_DATASIZE_25 | VSF_SPI_DATASIZE_26 | VSF_SPI_DATASIZE_27 |
+                                      VSF_SPI_DATASIZE_28 | VSF_SPI_DATASIZE_29 | VSF_SPI_DATASIZE_30 | VSF_SPI_DATASIZE_31,
 
 
-    SPI_AUTO_CS_DISABLE         = 0x00ul << 30,
-    SPI_AUTO_CS_ENABLE          = 0x01ul << 30,
-    SPI_AUTO_CS_MASK            = SPI_AUTO_CS_DISABLE |
-                                  SPI_AUTO_CS_ENABLE,
+    VSF_SPI_AUTO_CS_DISABLE         = 0x00ul << 30,
+    VSF_SPI_AUTO_CS_ENABLE          = 0x01ul << 30,
+    VSF_SPI_AUTO_CS_MASK            = VSF_SPI_AUTO_CS_DISABLE |
+                                      VSF_SPI_AUTO_CS_ENABLE,
 
-    SPI_LOOP_BACK               = 0x01ul << 31,     //!< enable loop back
+    VSF_SPI_LOOP_BACK               = 0x01ul << 31,     //!< enable loop back
 
-    SPI_MODE_ALL_BITS_MASK      = SPI_DIR_MODE_MASK |
-                                  SPI_BIT_ORDER_MASK |
-                                  SPI_CLOCK_MODE_MASK |
-                                  SPI_DIR_MODE_MASK |
-                                  SPI_AUTO_CS_MASK |
-                                  SPI_LOOP_BACK,
+    VSF_SPI_MODE_ALL_BITS_MASK      = VSF_SPI_DIR_MODE_MASK |
+                                      VSF_SPI_BIT_ORDER_MASK |
+                                      VSF_SPI_CLOCK_MODE_MASK |
+                                      VSF_SPI_DIR_MODE_MASK |
+                                      VSF_SPI_AUTO_CS_MASK |
+                                      VSF_SPI_LOOP_BACK,
 } vsf_spi_mode_t;
 #endif
 
@@ -174,24 +174,24 @@ typedef enum vsf_spi_mode_t {
  */
 typedef enum vsf_spi_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
-    SPI_IRQ_MASK_TX             = 0x01ul << 0,
-    SPI_IRQ_MASK_RX             = 0x01ul << 1,
+    VSF_SPI_IRQ_MASK_TX             = 0x01ul << 0,
+    VSF_SPI_IRQ_MASK_RX             = 0x01ul << 1,
 
     // request_rx/request_tx complete
-    SPI_IRQ_MASK_TX_CPL         = 0x01ul << 2,
-    SPI_IRQ_MASK_CPL            = 0x01ul << 3,
+    VSF_SPI_IRQ_MASK_TX_CPL         = 0x01ul << 2,
+    VSF_SPI_IRQ_MASK_CPL            = 0x01ul << 3,
 
     // optional
     // FIFO
-    SPI_IRQ_MASK_RX_FIFO_FULL   = 0x01ul << 4,
-    SPI_IRQ_MASK_TX_FIFO_EMPTY  = 0x01ul << 5,
+    VSF_SPI_IRQ_MASK_RX_FIFO_FULL   = 0x01ul << 4,
+    VSF_SPI_IRQ_MASK_TX_FIFO_EMPTY  = 0x01ul << 5,
 
-    SPI_IRQ_MASK                =  SPI_IRQ_MASK_TX
-                                 | SPI_IRQ_MASK_RX
-                                 | SPI_IRQ_MASK_TX_CPL
-                                 | SPI_IRQ_MASK_CPL
-                                 | SPI_IRQ_MASK_RX_FIFO_FULL
-                                 | SPI_IRQ_MASK_TX_FIFO_EMPTY,
+    VSF_SPI_IRQ_MASK                = VSF_SPI_IRQ_MASK_TX |
+                                      VSF_SPI_IRQ_MASK_RX |
+                                      VSF_SPI_IRQ_MASK_TX_CPL |
+                                      VSF_SPI_IRQ_MASK_CPL |
+                                      VSF_SPI_IRQ_MASK_RX_FIFO_FULL |
+                                      VSF_SPI_IRQ_MASK_TX_FIFO_EMPTY,
 } vsf_spi_irq_mask_t;
 #endif
 
@@ -310,10 +310,10 @@ extern void                 vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr, uin
 
 static inline uint8_t vsf_spi_get_data_bytes_from_mode(vsf_spi_mode_t mode)
 {
-    uint8_t bits = (mode & SPI_DATASIZE_MASK);
-    if (bits <= SPI_DATASIZE_8) {
+    uint8_t bits = (mode & VSF_SPI_DATASIZE_MASK);
+    if (bits <= VSF_SPI_DATASIZE_8) {
         return 1;
-    } else if (bits <= SPI_DATASIZE_16) {
+    } else if (bits <= VSF_SPI_DATASIZE_16) {
         return 2;
     } else {
         return 4;
