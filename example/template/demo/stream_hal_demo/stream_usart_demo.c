@@ -114,7 +114,7 @@ int VSF_USER_ENTRY(void)
 
     {
         vsf_usart_cfg_t cfg = {
-            .mode       = USART_8_BIT_LENGTH | USART_NO_PARITY | USART_1_STOPBIT,
+            .mode       = VSF_USART_8_BIT_LENGTH | VSF_USART_NO_PARITY | VSF_USART_1_STOPBIT,
             .baudrate   = 115200,
         };
         vsf_usart_init(__stream_usart.usart, &cfg);

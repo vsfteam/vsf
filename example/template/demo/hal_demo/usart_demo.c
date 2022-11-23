@@ -40,25 +40,25 @@
 
 #ifndef APP_USART_DEMO_CFG_USART
 #   define APP_USART_DEMO_CFG_USART                         (vsf_usart_t *)&vsf_hw_usart0
-#endif  
-    
-#ifndef APP_USART_DEMO_CFG_FIFO_POLL_WRITE_TEST 
+#endif
+
+#ifndef APP_USART_DEMO_CFG_FIFO_POLL_WRITE_TEST
 #   define APP_USART_DEMO_CFG_FIFO_POLL_WRITE_TEST          DISABLED
-#endif  
-    
-#ifndef APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST  
+#endif
+
+#ifndef APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST
 #   define APP_USART_DEMO_CFG_FIFO_ISR_WRITE_TEST           DISABLED
-#endif  
-    
-#ifndef APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST   
+#endif
+
+#ifndef APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST
 #   define APP_USART_DEMO_CFG_FIFO_ISR_READ_TEST            DISABLED
-#endif  
-    
-#ifndef APP_USART_DEMO_CFG_FIFO_ECHO_TEST   
+#endif
+
+#ifndef APP_USART_DEMO_CFG_FIFO_ECHO_TEST
 #   define APP_USART_DEMO_CFG_FIFO_ECHO_TEST                DISABLED
-#endif  
-    
-#ifndef APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ_TEST    
+#endif
+
+#ifndef APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ_TEST
 #   define APP_USART_DEMO_CFG_FIFO_WRITE_THEN_READ_TEST     DISABLED
 #endif
 
@@ -75,7 +75,7 @@
 #endif
 
 #ifndef APP_USART_DEMO_CFG_MODE
-#   define APP_USART_DEMO_CFG_MODE                          (USART_8_BIT_LENGTH | USART_1_STOPBIT | USART_NO_PARITY | USART_TX_ENABLE | USART_RX_ENABLE)
+#   define APP_USART_DEMO_CFG_MODE                          (VSF_USART_8_BIT_LENGTH | VSF_USART_1_STOPBIT | VSF_USART_NO_PARITY | VSF_USART_TX_ENABLE | VSF_USART_RX_ENABLE)
 #endif
 
 #ifndef APP_USART_DEMO_IRQ_PRIO
@@ -172,7 +172,7 @@ static vsf_err_t __usart_demo_init(vsf_usart_t * usart,
 
     while (fsm_rt_cpl != vsf_usart_enable(usart));
 
-    if (mask & USART_IRQ_ALL_BITS_MASK) {
+    if (mask & VSF_USART_IRQ_ALL_BITS_MASK) {
         vsf_usart_irq_enable(usart, mask);
     }
 
@@ -187,7 +187,7 @@ static vsf_err_t __usart_demo_init(vsf_usart_t * usart,
 
 static void __usart_demo_deinit(vsf_usart_t * usart, vsf_usart_irq_mask_t mask)
 {
-    if (mask & USART_IRQ_ALL_BITS_MASK) {
+    if (mask & VSF_USART_IRQ_ALL_BITS_MASK) {
         vsf_usart_irq_disable(usart, mask);
     }
 
@@ -219,12 +219,12 @@ static void __usart_write_isr_handler(void *target, vsf_usart_t *usart,
     app_usart_demo_t * demo = (app_usart_demo_t *)target;
     VSF_ASSERT(demo != NULL);
 
-    if (irq_mask & USART_IRQ_MASK_TX) {
+    if (irq_mask & VSF_USART_IRQ_MASK_TX) {
         if (demo->cnt < dimof(demo->buff)) {
             demo->cnt += vsf_usart_txfifo_write(usart, (void *)&demo->buff[demo->cnt],
                                               dimof(demo->buff) - demo->cnt);
         } else {
-            vsf_usart_irq_disable(usart, USART_IRQ_MASK_TX);
+            vsf_usart_irq_disable(usart, VSF_USART_IRQ_MASK_TX);
             demo->is_to_exit = true;
         }
     }
@@ -236,10 +236,10 @@ static void __usart_demo_fifo_isr_write(vsf_usart_t * usart)
 
     app_usart_demo_t * demo = (app_usart_demo_t *)&__app_usart_demo;
     vsf_err_t err = __usart_demo_init(usart, __usart_write_isr_handler,
-                                      (void *)demo, APP_USART_DEMO_IRQ_PRIO, USART_IRQ_MASK_TX);
+                                      (void *)demo, APP_USART_DEMO_IRQ_PRIO, VSF_USART_IRQ_MASK_TX);
     VSF_ASSERT(err == VSF_ERR_NONE);
 
-    __usart_write_isr_handler((void *)demo, usart, USART_IRQ_MASK_TX);
+    __usart_write_isr_handler((void *)demo, usart, VSF_USART_IRQ_MASK_TX);
 
     while (!__app_usart_demo.is_to_exit);
     __usart_demo_deinit(usart, 0);
@@ -256,7 +256,7 @@ static void __usart_read_isr_handler(void *target, vsf_usart_t *usart, vsf_usart
                                        dimof(demo->buff) - demo->cnt);
 
     if (demo->cnt >= dimof(demo->buff)) {
-        vsf_usart_irq_disable(usart, USART_IRQ_MASK_RX);
+        vsf_usart_irq_disable(usart, VSF_USART_IRQ_MASK_RX);
         demo->is_to_exit = true;
     }
 }
@@ -268,7 +268,7 @@ static void __usart_demo_fifo_isr_read(vsf_usart_t * usart)
 
     demo->cnt = 0;
     vsf_err_t err = __usart_demo_init(usart, __usart_read_isr_handler,
-                                      (void *)demo, APP_USART_DEMO_IRQ_PRIO, USART_IRQ_MASK_RX);
+                                      (void *)demo, APP_USART_DEMO_IRQ_PRIO, VSF_USART_IRQ_MASK_RX);
     VSF_ASSERT(err == VSF_ERR_NONE);
 
     while (!demo->is_to_exit);
@@ -336,7 +336,7 @@ static void __usart_isr_handler(void *target,
     VSF_ASSERT(demo != NULL);
     VSF_ASSERT(usart != NULL);
 
-    if (irq_mask & USART_IRQ_MASK_RX_CPL) {
+    if (irq_mask & VSF_USART_IRQ_MASK_RX_CPL) {
         count = vsf_usart_get_rx_count(usart);
         if (count != 0) {
             err = vsf_usart_request_tx(usart, demo->buff, sizeof(demo->buff));
@@ -344,9 +344,9 @@ static void __usart_isr_handler(void *target,
         }
     }
 
-    if (irq_mask & USART_IRQ_MASK_TX_CPL) {
+    if (irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
         if (demo->is_to_exit) {
-            __usart_demo_deinit(usart, USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+            __usart_demo_deinit(usart, VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
         } else {
             err = vsf_usart_request_rx(usart, demo->buff, sizeof(demo->buff));
             VSF_ASSERT(VSF_ERR_NONE == err);
@@ -363,10 +363,10 @@ static void __usart_request_echo(vsf_usart_t * usart)
     VSF_ASSERT(usart != NULL);
 
     err = __usart_demo_init(usart, __usart_isr_handler, demo, APP_USART_DEMO_IRQ_PRIO,
-                            USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+                            VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
     VSF_ASSERT(VSF_ERR_NONE == err);
 
-    __usart_isr_handler(demo, usart, USART_IRQ_MASK_TX_CPL);
+    __usart_isr_handler(demo, usart, VSF_USART_IRQ_MASK_TX_CPL);
 }
 #endif
 
@@ -381,7 +381,7 @@ static void __usart_isr_handler(void *target,
     VSF_ASSERT(demo != NULL);
     VSF_ASSERT(usart != NULL);
 
-    if (irq_mask & USART_IRQ_MASK_RX_CPL) {
+    if (irq_mask & VSF_USART_IRQ_MASK_RX_CPL) {
         for (uint_fast16_t i = 0; i < sizeof(demo->rxbuff); i++) {
             if (demo->rxbuff[i] != demo->txbuff[i]) {
                 VSF_ASSERT(false);
@@ -393,9 +393,9 @@ static void __usart_isr_handler(void *target,
         err = vsf_usart_request_tx(usart, demo->txbuff, sizeof(demo->txbuff));
         VSF_ASSERT(VSF_ERR_NONE == err);
     }
-    if (irq_mask & USART_IRQ_MASK_TX_CPL) {
+    if (irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
         if (demo->is_to_exit) {
-            __usart_demo_deinit(usart, USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+            __usart_demo_deinit(usart, VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
         }
     }
 }
@@ -409,14 +409,14 @@ static void __usart_request_write_then_read(vsf_usart_t * usart)
     VSF_ASSERT(usart != NULL);
 
     err = __usart_demo_init(usart, __usart_isr_handler, demo, APP_USART_DEMO_IRQ_PRIO,
-                            USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+                            VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
     VSF_ASSERT(VSF_ERR_NONE == err);
 
     // generate fake rx data to bypass check
     for (uint_fast16_t i = 0; i < sizeof(demo->rxbuff); i++) {
         demo->rxbuff[i] = demo->txbuff[i];
     }
-    __usart_isr_handler(demo, usart, USART_IRQ_MASK_RX_CPL);
+    __usart_isr_handler(demo, usart, VSF_USART_IRQ_MASK_RX_CPL);
 }
 #endif
 

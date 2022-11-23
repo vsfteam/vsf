@@ -239,32 +239,32 @@ bool vsf_hw_usart_fifo_flush(vsf_hw_usart_t *usart_ptr)
 
 void vsf_hw_usart_irq_enable(vsf_hw_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
-    if (irq_mask & USART_IRQ_MASK_RX) {
+    if (irq_mask & VSF_USART_IRQ_MASK_RX) {
         usart_ptr->usart_const->usart->INTEN |= UART_INTEN_RDAIEN_Msk;
     }
-    if (irq_mask & USART_IRQ_MASK_TX) {
+    if (irq_mask & VSF_USART_IRQ_MASK_TX) {
         usart_ptr->usart_const->usart->INTEN |= UART_INTEN_THREIEN_Msk;
     }
     //todo:
-//    if (irq_mask & USART_IRQ_MASK_RX_CPL) {
+//    if (irq_mask & VSF_USART_IRQ_MASK_RX_CPL) {
 //
 //    }
-//    if (irq_mask & USART_IRQ_MASK_TX_CPL) {
+//    if (irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
 //
 //    }
-//    if (irq_mask & USART_IRQ_MASK_RX_ERROR) {
+//    if (irq_mask & VSF_USART_IRQ_MASK_RX_ERROR) {
 //
 //    }
-//    if (irq_mask & USART_IRQ_MASK_TX_ERROR) {
+//    if (irq_mask & VSF_USART_IRQ_MASK_TX_ERROR) {
 //
 //    }
 }
 void vsf_hw_usart_irq_disable(vsf_hw_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
-    if (irq_mask & USART_IRQ_MASK_RX) {
+    if (irq_mask & VSF_USART_IRQ_MASK_RX) {
         usart_ptr->usart_const->usart->INTEN &= ~(UART_INTEN_RDAIEN_Msk | 0xffffffff);
     }
-    if (irq_mask & USART_IRQ_MASK_TX) {
+    if (irq_mask & VSF_USART_IRQ_MASK_TX) {
         usart_ptr->usart_const->usart->INTEN &= ~(UART_INTEN_THREIEN_Msk | 0xffffffff);
     }
 }

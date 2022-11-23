@@ -40,23 +40,23 @@ extern "C" {
 
 enum vsf_usart_mode_t {
     // LINECTRL, bit 0-7
-    USART_5_BIT_LENGTH          = (0x0ul << 5),
-    USART_6_BIT_LENGTH          = (0x1ul << 5),
-    USART_7_BIT_LENGTH          = (0x2ul << 5),
-    USART_8_BIT_LENGTH          = (0x3ul << 5),
+    VSF_USART_5_BIT_LENGTH      = (0x0ul << 5),
+    VSF_USART_6_BIT_LENGTH      = (0x1ul << 5),
+    VSF_USART_7_BIT_LENGTH      = (0x2ul << 5),
+    VSF_USART_8_BIT_LENGTH      = (0x3ul << 5),
 
-    USART_1_STOPBIT             = 0,
-    USART_2_STOPBIT             = USART_LINECTRL_STP2,
+    VSF_USART_1_STOPBIT         = 0,
+    VSF_USART_2_STOPBIT         = USART_LINECTRL_STP2,
 
-    USART_NO_PARITY             = 0,
-    USART_EVEN_PARITY           = USART_LINECTRL_PEN | USART_LINECTRL_EPS,
-    USART_ODD_PARITY            = USART_LINECTRL_PEN,
-    USART_FORCE_0_PARITY        = USART_LINECTRL_PEN | USART_LINECTRL_EPS | USART_LINECTRL_SPS,
-    USART_FORCE_1_PARITY        = USART_LINECTRL_PEN | USART_LINECTRL_SPS,
+    VSF_USART_NO_PARITY         = 0,
+    VSF_USART_EVEN_PARITY       = USART_LINECTRL_PEN | USART_LINECTRL_EPS,
+    VSF_USART_ODD_PARITY        = USART_LINECTRL_PEN,
+    VSF_USART_FORCE_0_PARITY    = USART_LINECTRL_PEN | USART_LINECTRL_EPS | USART_LINECTRL_SPS,
+    VSF_USART_FORCE_1_PARITY    = USART_LINECTRL_PEN | USART_LINECTRL_SPS,
 
     // CTRL2: bit8 - 23
-    USART_TX_ENABLE                 = USART_CTRL2_TXE,
-    USART_RX_ENABLE                 = USART_CTRL2_RXE,
+    VSF_USART_TX_ENABLE         = USART_CTRL2_TXE,
+    VSF_USART_RX_ENABLE         = USART_CTRL2_RXE,
     USART_RTS_EN                = USART_CTRL2_RTSEN,
     USART_CTS_EN                = USART_CTRL2_CTSEN,
 
@@ -74,7 +74,7 @@ enum vsf_usart_mode_t {
     USART_RX_FIFO_THRES_7_8     = (4UL << 20),
 
     // CTRL3: bit24 - 31
-    USART_9_BIT_LENGTH          = (1ul << (0 + 24)),
+    VSF_USART_9_BIT_LENGTH      = (1ul << (0 + 24)),
     USART_SAMPLE_RATE_8X        = (1ul << (1 + 24)),
     USART_SAMPLE_RATE_16X       = 0,
     USART_SYNC_MODE             = 0,
@@ -100,26 +100,28 @@ struct vsf_usart_status_t {
 
 enum vsf_usart_irq_mask_t {
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
-    USART_IRQ_MASK_TX           = USART_INTR_TXIS,
-    USART_IRQ_MASK_RX           = USART_INTR_RXIS,
+    VSF_USART_IRQ_MASK_TX               = USART_INTR_TXIS,
+    VSF_USART_IRQ_MASK_RX               = USART_INTR_RXIS,
 
     // request_rx/request_tx complete, use higher 16-bits
-    //  USART_IRQ_MASK_TX_CPL and USART_IRQ_MASK_RX_CPL are issued from DMA interrupt
-    USART_IRQ_MASK_TX_CPL       = 0x00010000,
-    USART_IRQ_MASK_RX_CPL       = 0x00020000,
-    USART_IRQ_MASK_RX_TIMEOUT   = 0x00040000,
+    //  VSF_USART_IRQ_MASK_TX_CPL and VSF_USART_IRQ_MASK_RX_CPL are issued from DMA interrupt
+    VSF_USART_IRQ_MASK_TX_CPL       = 0x00010000,
+    VSF_USART_IRQ_MASK_RX_CPL       = 0x00020000,
+    VSF_USART_IRQ_MASK_RX_TIMEOUT   = 0x00040000,
 
     // optional
     // error
-    USART_IRQ_MASK_FRAME_ERR    = USART_INTR_FEIS,
-    USART_IRQ_MASK_PARITY_ERR   = USART_INTR_PEIS,
-    USART_IRQ_MASK_BREAK_ERR    = USART_INTR_BEIS,
-    USART_IRQ_MASK_OVERFLOW_ERR = USART_INTR_OEIS,
-    USART_IRQ_MASK_ERROR          = USART_IRQ_MASK_FRAME_ERR | USART_IRQ_MASK_PARITY_ERR
-                                | USART_IRQ_MASK_BREAK_ERR | USART_IRQ_MASK_OVERFLOW_ERR,
+    VSF_USART_IRQ_MASK_FRAME_ERR        = USART_INTR_FEIS,
+    VSF_USART_IRQ_MASK_PARITY_ERR       = USART_INTR_PEIS,
+    VSF_USART_IRQ_MASK_BREAK_ERR        = USART_INTR_BEIS,
+    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = USART_INTR_OEIS,
+    VSF_USART_IRQ_MASK_ERROR            = VSF_USART_IRQ_MASK_FRAME_ERR |
+                                          VSF_USART_IRQ_MASK_PARITY_ERR |
+                                          VSF_USART_IRQ_MASK_BREAK_ERR |
+                                          VSF_USART_IRQ_MASK_OVERFLOW_ERR,
 
     // FIFO
-    USART_IRQ_MASK_TX_FIFO_EMPTY= USART_INTR_TFEIS,
+    VSF_USART_IRQ_MASK_TX_FIFO_EMPTY    = USART_INTR_TFEIS,
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/

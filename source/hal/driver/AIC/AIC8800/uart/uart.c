@@ -231,16 +231,16 @@ static vsf_usart_irq_mask_t __get_uart_irq_mask(vsf_hw_usart_t *hw_usart_ptr)
         case UART_IRQTYP_RX_ERROR_INT:
             value = reg->IRQSTS_REG;        // TODO: report more specific rx error
             (void)value;
-            return USART_IRQ_MASK_RX_ERROR;
+            return VSF_USART_IRQ_MASK_RX_ERROR;
 
         case UART_IRQTYP_RX_INT:
-            return USART_IRQ_MASK_RX;
+            return VSF_USART_IRQ_MASK_RX;
 
         case UART_IRQTYP_TIMEOUT_INT:
             return 0;
 
         case UART_IRQTYP_TX_INT:
-            return USART_IRQ_MASK_TX;
+            return VSF_USART_IRQ_MASK_TX;
 
         case UART_IRQTYP_MODEM_INT:
             value = reg->MDMSTS_REG;        // TODO: report more specific moden line interrupt
@@ -259,7 +259,7 @@ static vsf_usart_irq_mask_t __get_uart_irq_mask(vsf_hw_usart_t *hw_usart_ptr)
 static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 {
     vsf_usart_irq_mask_t irq_mask = __get_uart_irq_mask(hw_usart_ptr);
-    if (irq_mask & USART_IRQ_ALL_BITS_MASK) {
+    if (irq_mask & VSF_USART_IRQ_ALL_BITS_MASK) {
         if (NULL != hw_usart_ptr->isr.handler_fn) {
             hw_usart_ptr->isr.handler_fn(hw_usart_ptr->isr.target_ptr, (vsf_usart_t *)hw_usart_ptr, irq_mask);
         }

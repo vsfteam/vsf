@@ -54,17 +54,17 @@ enum em_gpio_reg_rw_t {
 };
 
 enum vsf_usart_mode_t {
-    USART_5_BIT_LENGTH          = LCR_DLS_5,
-    USART_6_BIT_LENGTH          = LCR_DLS_6,
-    USART_7_BIT_LENGTH          = LCR_DLS_7,
-    USART_8_BIT_LENGTH          = LCR_DLS_8,
+    VSF_USART_5_BIT_LENGTH      = LCR_DLS_5,
+    VSF_USART_6_BIT_LENGTH      = LCR_DLS_6,
+    VSF_USART_7_BIT_LENGTH      = LCR_DLS_7,
+    VSF_USART_8_BIT_LENGTH      = LCR_DLS_8,
 
-    USART_1_STOPBIT             = LCR_STOP_1,
-    USART_2_STOPBIT             = LCR_STOP_2,
+    VSF_USART_1_STOPBIT         = LCR_STOP_1,
+    VSF_USART_2_STOPBIT         = LCR_STOP_2,
 
-    USART_NO_PARITY             = 0x0000U,
-    USART_EVEN_PARITY           = LCR_PEN | LCR_EPS_EVEN,
-    USART_ODD_PARITY            = LCR_PEN | LCR_EPS_ODD,
+    VSF_USART_NO_PARITY         = 0x0000U,
+    VSF_USART_EVEN_PARITY       = LCR_PEN | LCR_EPS_EVEN,
+    VSF_USART_ODD_PARITY        = LCR_PEN | LCR_EPS_ODD,
 
     USART_LOOP_BACK_MODE        = MCR_LOOP << 8,
     USART_AUTO_FLOW_CONTROL     = MCR_AFCE << 8,
@@ -81,17 +81,17 @@ enum vsf_usart_mode_t {
     USART_RX_FIFO_THRES_2_LESS  = FCR_RT_2_LESS   << 16,
 
     // TODO:
-    USART_TX_ENABLE             = 0,
-    USART_RX_ENABLE             = 0,
+    VSF_USART_TX_ENABLE             = 0,
+    VSF_USART_RX_ENABLE             = 0,
 };
 
 enum vsf_usart_irq_mask_t {
-    USART_IRQ_MASK_RX           = IER_ERBFI,
-    USART_IRQ_MASK_TX           = IER_ETBEI,
+    VSF_USART_IRQ_MASK_RX           = IER_ERBFI,
+    VSF_USART_IRQ_MASK_TX           = IER_ETBEI,
 
 #ifdef VSF_HAL_USART_IMP_REQUEST_BY_FIFO
-    USART_IRQ_MASK_TX_CPL       = (1UL << 2),
-    USART_IRQ_MASK_RX_CPL       = (1UL << 3),
+    VSF_USART_IRQ_MASK_TX_CPL       = (1UL << 2),
+    VSF_USART_IRQ_MASK_RX_CPL       = (1UL << 3),
 #endif
 };
 

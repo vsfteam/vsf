@@ -27,7 +27,7 @@
 /*============================ MACROS ========================================*/
 
 #define __USART_IRQ_MASK_REQUEST      \
-    (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL)
+    (VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -59,31 +59,31 @@ static void __vsf_usart_fifo2req_isr_handler(void * target_ptr,
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(request_ptr->disable_irq_fn != NULL);
 
-    vsf_usart_irq_mask_t current_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX | USART_IRQ_MASK_TX);
+    vsf_usart_irq_mask_t current_irq_mask = irq_mask & ~(VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX);
 
-    if (irq_mask & USART_IRQ_MASK_RX) {
-        if (request_ptr->irq_mask & USART_IRQ_MASK_RX_CPL) {
+    if (irq_mask & VSF_USART_IRQ_MASK_RX) {
+        if (request_ptr->irq_mask & VSF_USART_IRQ_MASK_RX_CPL) {
             if (__vsf_usart_fifo2req_process(&request_ptr->rx, usart_ptr)) {
-                request_ptr->disable_irq_fn(usart_ptr, USART_IRQ_MASK_RX);
-                current_irq_mask |= USART_IRQ_MASK_RX_CPL;
+                request_ptr->disable_irq_fn(usart_ptr, VSF_USART_IRQ_MASK_RX);
+                current_irq_mask |= VSF_USART_IRQ_MASK_RX_CPL;
             }
         } else {
-            current_irq_mask |= USART_IRQ_MASK_RX;
+            current_irq_mask |= VSF_USART_IRQ_MASK_RX;
         }
     }
 
-    if (irq_mask & USART_IRQ_MASK_TX) {
-        if (request_ptr->irq_mask & USART_IRQ_MASK_TX_CPL) {
+    if (irq_mask & VSF_USART_IRQ_MASK_TX) {
+        if (request_ptr->irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
             if (__vsf_usart_fifo2req_process(&request_ptr->tx, usart_ptr)) {
-                request_ptr->disable_irq_fn(usart_ptr, USART_IRQ_MASK_TX);
-                current_irq_mask |= USART_IRQ_MASK_TX_CPL;
+                request_ptr->disable_irq_fn(usart_ptr, VSF_USART_IRQ_MASK_TX);
+                current_irq_mask |= VSF_USART_IRQ_MASK_TX_CPL;
             }
         } else {
-            current_irq_mask |= USART_IRQ_MASK_TX;
+            current_irq_mask |= VSF_USART_IRQ_MASK_TX;
         }
     }
 
-    if (current_irq_mask & USART_IRQ_ALL_BITS_MASK) {
+    if (current_irq_mask & VSF_USART_IRQ_ALL_BITS_MASK) {
         vsf_usart_isr_t *isr_ptr = &request_ptr->isr;
         if (isr_ptr->handler_fn != NULL) {
             isr_ptr->handler_fn(isr_ptr->target_ptr, usart_ptr, current_irq_mask);
@@ -128,14 +128,14 @@ vsf_err_t vsf_usart_fifo2req_request_rx(vsf_usart_fifo2req_t *request_ptr, vsf_u
     VSF_HAL_ASSERT(count > 0);
 
     __vsf_usart_fifo2req_isr_init(&request_ptr->rx, buffer_ptr, count);
-    request_ptr->enable_irq_fn(usart_ptr, USART_IRQ_MASK_RX);
+    request_ptr->enable_irq_fn(usart_ptr, VSF_USART_IRQ_MASK_RX);
 
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_usart_fifo2req_cancel_rx(vsf_usart_fifo2req_t *request_ptr, vsf_usart_t *usart_ptr)
 {
-    request_ptr->disable_irq_fn(usart_ptr, USART_IRQ_MASK_RX);
+    request_ptr->disable_irq_fn(usart_ptr, VSF_USART_IRQ_MASK_RX);
     return VSF_ERR_NONE;
 }
 
@@ -154,10 +154,10 @@ vsf_err_t vsf_usart_fifo2req_request_tx(vsf_usart_fifo2req_t *request_ptr,
     VSF_HAL_ASSERT(count > 0);
 
     __vsf_usart_fifo2req_isr_init(&request_ptr->tx, buffer_ptr, count);
-    __vsf_usart_fifo2req_isr_handler(request_ptr, usart_ptr, USART_IRQ_MASK_TX);
+    __vsf_usart_fifo2req_isr_handler(request_ptr, usart_ptr, VSF_USART_IRQ_MASK_TX);
 
     if (request_ptr->tx.count < request_ptr->tx.max_count) {
-        request_ptr->enable_irq_fn(usart_ptr, USART_IRQ_MASK_TX);
+        request_ptr->enable_irq_fn(usart_ptr, VSF_USART_IRQ_MASK_TX);
     }
 
     return VSF_ERR_NONE;
@@ -165,7 +165,7 @@ vsf_err_t vsf_usart_fifo2req_request_tx(vsf_usart_fifo2req_t *request_ptr,
 
 vsf_err_t vsf_usart_fifo2req_cancel_tx(vsf_usart_fifo2req_t *request_ptr, vsf_usart_t *usart_ptr)
 {
-    request_ptr->disable_irq_fn(usart_ptr, USART_IRQ_MASK_TX);
+    request_ptr->disable_irq_fn(usart_ptr, VSF_USART_IRQ_MASK_TX);
     return VSF_ERR_NONE;
 }
 
@@ -183,12 +183,12 @@ void vsf_usart_fifo2req_irq_enable(vsf_usart_fifo2req_t *request_ptr,
     VSF_HAL_ASSERT(request_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr != NULL);
 
-    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_ALL_BITS_MASK) == 0);
-    VSF_HAL_ASSERT(((irq_mask & USART_IRQ_MASK_RX) == 0) || ((request_ptr->irq_mask & USART_IRQ_MASK_RX_CPL) == 0));
-    VSF_HAL_ASSERT(((irq_mask & USART_IRQ_MASK_TX) == 0) || ((request_ptr->irq_mask & USART_IRQ_MASK_TX_CPL) == 0));
+    VSF_HAL_ASSERT((irq_mask & ~VSF_USART_IRQ_ALL_BITS_MASK) == 0);
+    VSF_HAL_ASSERT(((irq_mask & VSF_USART_IRQ_MASK_RX) == 0) || ((request_ptr->irq_mask & VSF_USART_IRQ_MASK_RX_CPL) == 0));
+    VSF_HAL_ASSERT(((irq_mask & VSF_USART_IRQ_MASK_TX) == 0) || ((request_ptr->irq_mask & VSF_USART_IRQ_MASK_TX_CPL) == 0));
 
-    vsf_usart_irq_mask_t request_irq_mask = irq_mask & (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
-    vsf_usart_irq_mask_t others_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+    vsf_usart_irq_mask_t request_irq_mask = irq_mask & (VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
+    vsf_usart_irq_mask_t others_irq_mask = irq_mask & ~(VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
 
     request_ptr->irq_mask |= request_irq_mask;
     if (others_irq_mask) {
@@ -202,10 +202,10 @@ void vsf_usart_fifo2req_irq_disable(vsf_usart_fifo2req_t *request_ptr,
                                     vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(request_ptr != NULL);
-    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_ALL_BITS_MASK) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~VSF_USART_IRQ_ALL_BITS_MASK) == 0);
 
-    vsf_usart_irq_mask_t request_irq_mask = irq_mask & (USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
-    vsf_usart_irq_mask_t others_irq_mask = irq_mask & ~(USART_IRQ_MASK_RX_CPL | USART_IRQ_MASK_TX_CPL);
+    vsf_usart_irq_mask_t request_irq_mask = irq_mask & (VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
+    vsf_usart_irq_mask_t others_irq_mask = irq_mask & ~(VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
 
     request_ptr->irq_mask &= ~request_irq_mask;
     if (others_irq_mask) {
