@@ -150,12 +150,12 @@ static void __vsf_linux_uart_isrhandler(void *target, vsf_usart_t *uart,
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)target;
     vsf_eda_t *eda = NULL;
 
-    if (irq_mask & USART_IRQ_MASK_RX) {
+    if (irq_mask & VSF_USART_IRQ_MASK_RX) {
         if (__vsf_linux_uart_rx(uart, priv) > 0) {
             eda = &priv->use_as__vsf_eda_t;
         }
     }
-    if (irq_mask & USART_IRQ_MASK_TX_CPL) {
+    if (irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
         eda = priv->eda_pending_tx;
         VSF_LINUX_ASSERT(eda != NULL);
         priv->eda_pending_tx = NULL;
@@ -203,29 +203,29 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
     }
 
     switch (term->c_cflag & CSIZE) {
-    case CS5:   mode |= USART_5_BIT_LENGTH; break;
-    case CS6:   mode |= USART_6_BIT_LENGTH; break;
-    case CS7:   mode |= USART_7_BIT_LENGTH; break;
-    case CS8:   mode |= USART_8_BIT_LENGTH; break;
+    case CS5:   mode |= VSF_USART_5_BIT_LENGTH; break;
+    case CS6:   mode |= VSF_USART_6_BIT_LENGTH; break;
+    case CS7:   mode |= VSF_USART_7_BIT_LENGTH; break;
+    case CS8:   mode |= VSF_USART_8_BIT_LENGTH; break;
     default:    vsf_trace_error("term: bit length does not supported\n");  return;
     }
 
     if (term->c_cflag & PARENB) {
         if (term->c_cflag & PARODD) {
-            mode |= USART_ODD_PARITY;
+            mode |= VSF_USART_ODD_PARITY;
         } else {
-            mode |= USART_EVEN_PARITY;
+            mode |= VSF_USART_EVEN_PARITY;
         }
     } else {
-        mode |= USART_NO_PARITY;
+        mode |= VSF_USART_NO_PARITY;
     }
     if (term->c_cflag & CSTOPB) {
-        mode |= USART_2_STOPBIT;
+        mode |= VSF_USART_2_STOPBIT;
     } else {
-        mode |= USART_1_STOPBIT;
+        mode |= VSF_USART_1_STOPBIT;
     }
 
-    vsf_usart_irq_disable(uart, USART_IRQ_MASK_RX | USART_IRQ_MASK_TX_CPL);
+    vsf_usart_irq_disable(uart, VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX_CPL);
     vsf_usart_disable(uart);
     vsf_usart_init(uart, & (vsf_usart_cfg_t) {
         .mode               = mode,
@@ -238,7 +238,7 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
         },
     });
     vsf_usart_enable(uart);
-    vsf_usart_irq_enable(uart, USART_IRQ_MASK_RX | USART_IRQ_MASK_TX_CPL);
+    vsf_usart_irq_enable(uart, VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX_CPL);
 }
 
 static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)

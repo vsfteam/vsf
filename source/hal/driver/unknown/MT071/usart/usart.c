@@ -173,22 +173,22 @@ void vsf_usart_irq_enable(vsf_usart_t *usart, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != usart);
     USART_TypeDef *reg = usart->ip.reg;
-    reg->INTR_SET = irq_mask & ~(USART_IRQ_MASK_TX_CPL | USART_IRQ_MASK_RX_CPL);
-    if (irq_mask & USART_IRQ_MASK_RX_TIMEOUT) {
+    reg->INTR_SET = irq_mask & ~(VSF_USART_IRQ_MASK_TX_CPL | VSF_USART_IRQ_MASK_RX_CPL);
+    if (irq_mask & VSF_USART_IRQ_MASK_RX_TIMEOUT) {
         reg->RXTIMEOUT |= USART_RXTIMEROUT_IE;
     }
-    // TODO: DMA interrupt USART_IRQ_MASK_TX_CPL and USART_IRQ_MASK_RX_CPL
+    // TODO: DMA interrupt VSF_USART_IRQ_MASK_TX_CPL and VSF_USART_IRQ_MASK_RX_CPL
 }
 
 void vsf_usart_irq_disable(vsf_usart_t *usart, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != usart);
     USART_TypeDef *reg = usart->ip.reg;
-    reg->INTR_CLR = irq_mask & ~(USART_IRQ_MASK_TX_CPL | USART_IRQ_MASK_RX_CPL);
-    if (irq_mask & USART_IRQ_MASK_RX_TIMEOUT) {
+    reg->INTR_CLR = irq_mask & ~(VSF_USART_IRQ_MASK_TX_CPL | VSF_USART_IRQ_MASK_RX_CPL);
+    if (irq_mask & VSF_USART_IRQ_MASK_RX_TIMEOUT) {
         reg->RXTIMEOUT &= ~USART_RXTIMEROUT_IE;
     }
-    // TODO: DMA interrupt USART_IRQ_MASK_TX_CPL and USART_IRQ_MASK_RX_CPL
+    // TODO: DMA interrupt VSF_USART_IRQ_MASK_TX_CPL and VSF_USART_IRQ_MASK_RX_CPL
 }
 
 vsf_usart_status_t vsf_usart_status(vsf_usart_t *usart)
@@ -407,13 +407,13 @@ static void __vsf_usart_dma_irqhandler(void *param, __dma_channel_t *channel)
     if ((uintptr_t)param & 1) {
         // tx
         usart->dma.tx.channel = NULL;
-        irq_mask = USART_IRQ_MASK_TX_CPL;
+        irq_mask = VSF_USART_IRQ_MASK_TX_CPL;
         reg->CTRL2_CLR = USART_CTRL2_TXDMAE;
         reg->CTRL1_CLR = USART_CTRL1_RUN;
     } else {
         // rx
         usart->dma.rx.channel = NULL;
-        irq_mask = USART_IRQ_MASK_RX_CPL;
+        irq_mask = VSF_USART_IRQ_MASK_RX_CPL;
         reg->CTRL2_CLR = USART_CTRL2_RXDMAE;
         reg->CTRL0_CLR = USART_CTRL0_RUN;
     }
@@ -434,7 +434,7 @@ static void __vsf_usart_irqhandler(vsf_usart_t *usart)
     irq_mask &= irq_reg >> 16;
 
     if (reg->RXTIMEOUT & USART_RXTIMEROUT_IE) {
-        irq_mask |= USART_IRQ_MASK_RX_TIMEOUT;
+        irq_mask |= VSF_USART_IRQ_MASK_RX_TIMEOUT;
         reg->RXTIMEOUT &= ~0x00200000;
     }
 

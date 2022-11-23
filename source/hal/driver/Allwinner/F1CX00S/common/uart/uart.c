@@ -210,9 +210,9 @@ void vsf_usart_irqhandler(vsf_usart_t *usart_ptr)
     // usart rx
     reg32_t IID = usart_ptr->reg->IIR & IIR_IID_MASK;
     if (IID == IIR_IID_RECEIVED_DATA_AVAILABLE) {
-        irq_mask = USART_IRQ_MASK_RX;
+        irq_mask = VSF_USART_IRQ_MASK_RX;
     } else if (IID == IIR_IID_THR_EMPTY) {
-        irq_mask = USART_IRQ_MASK_TX;
+        irq_mask = VSF_USART_IRQ_MASK_TX;
     } else {
         return ;
     }
@@ -227,9 +227,9 @@ void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->reg != NULL);
     VSF_HAL_ASSERT(usart_ptr->isr.handler_fn != NULL);
-    VSF_HAL_ASSERT((irq_mask == USART_IRQ_MASK_RX) ||
-                   (irq_mask == USART_IRQ_MASK_TX) ||
-                   (irq_mask == (USART_IRQ_MASK_RX | USART_IRQ_MASK_TX)));
+    VSF_HAL_ASSERT((irq_mask == VSF_USART_IRQ_MASK_RX) ||
+                   (irq_mask == VSF_USART_IRQ_MASK_TX) ||
+                   (irq_mask == (VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX)));
     
     usart_ptr->reg->IER |= irq_mask;
 }
@@ -237,9 +237,9 @@ void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
-    VSF_HAL_ASSERT((irq_mask == USART_IRQ_MASK_RX) ||
-                   (irq_mask == USART_IRQ_MASK_TX) ||
-                   (irq_mask == (USART_IRQ_MASK_RX | USART_IRQ_MASK_TX)));
+    VSF_HAL_ASSERT((irq_mask == VSF_USART_IRQ_MASK_RX) ||
+                   (irq_mask == VSF_USART_IRQ_MASK_TX) ||
+                   (irq_mask == (VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX)));
     
     usart_ptr->reg->IER &= ~irq_mask;
 }

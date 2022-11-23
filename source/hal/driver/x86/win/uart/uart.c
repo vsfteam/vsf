@@ -238,8 +238,8 @@ static DWORD  __calculate_rx_timeout(vsf_hw_usart_t *hw_usart, uint32_t times)
     }
     uint8_t bits = 1;//start bit
     DWORD ret_timeout = 0;
-    bits += hw_usart->cfg.mode & USART_9_BIT_LENGTH ? 9 : 8;
-    bits += hw_usart->cfg.mode & USART_2_STOPBIT ? 2 : 1;
+    bits += hw_usart->cfg.mode & VSF_USART_9_BIT_LENGTH ? 9 : 8;
+    bits += hw_usart->cfg.mode & VSF_USART_2_STOPBIT ? 2 : 1;
     ret_timeout = (DWORD)(1000 / (double)(hw_usart->cfg.baudrate) * bits * times);
     return ret_timeout;
 }
@@ -389,18 +389,18 @@ static vsf_err_t __usart_init(vsf_hw_usart_t *hw_usart)
     }
     dcb.fAbortOnError = FALSE;
     dcb.BaudRate = hw_usart->cfg.baudrate;
-    dcb.ByteSize = USART_9_BIT_LENGTH & hw_usart->cfg.mode ? 9 : 8;
-    dcb.Parity = USART_ODD_PARITY & hw_usart->cfg.mode ? 1 :
-        (USART_EVEN_PARITY & hw_usart->cfg.mode ? 2 : 0);
-    dcb.StopBits = USART_2_STOPBIT & hw_usart->cfg.mode ? 2 : 0;
+    dcb.ByteSize = VSF_USART_9_BIT_LENGTH & hw_usart->cfg.mode ? 9 : 8;
+    dcb.Parity = VSF_USART_ODD_PARITY & hw_usart->cfg.mode ? 1 :
+        (VSF_USART_EVEN_PARITY & hw_usart->cfg.mode ? 2 : 0);
+    dcb.StopBits = VSF_USART_2_STOPBIT & hw_usart->cfg.mode ? 2 : 0;
     dcb.fRtsControl = FALSE;
     dcb.fOutxCtsFlow = FALSE;
-    if ((USART_RTS_CTS_HWCONTROL & hw_usart->cfg.mode) == USART_RTS_CTS_HWCONTROL) {
+    if ((VSF_USART_RTS_CTS_HWCONTROL & hw_usart->cfg.mode) == VSF_USART_RTS_CTS_HWCONTROL) {
         dcb.fRtsControl = TRUE;
         dcb.fOutxCtsFlow = TRUE;
-    } else if ((USART_CTS_HWCONTROL & hw_usart->cfg.mode) == USART_CTS_HWCONTROL) {
+    } else if ((VSF_USART_CTS_HWCONTROL & hw_usart->cfg.mode) == VSF_USART_CTS_HWCONTROL) {
         dcb.fOutxCtsFlow = TRUE;
-    } else if ((USART_RTS_HWCONTROL & hw_usart->cfg.mode) == USART_RTS_HWCONTROL) {
+    } else if ((VSF_USART_RTS_HWCONTROL & hw_usart->cfg.mode) == VSF_USART_RTS_HWCONTROL) {
         dcb.fRtsControl = TRUE;
     }
     res_bool = SetCommState(handle_com, &dcb);
@@ -478,8 +478,8 @@ static void __vk_usart_read_event_thread(void *arg)
                 // maybe handle is closed, and opened again, just ignore
                 //  eg: call vsf_hw_usart_init twice will
             } else {
-                if ((hw_usart->enable_flag & USART_IRQ_MASK_RX_ERR) && NULL != hw_usart->cfg.isr.handler_fn) {
-                    hw_usart->enable_flag &= ~USART_IRQ_MASK_TX_ERR;
+                if ((hw_usart->enable_flag & VSF_USART_IRQ_MASK_RX_ERR) && NULL != hw_usart->cfg.isr.handler_fn) {
+                    hw_usart->enable_flag &= ~VSF_USART_IRQ_MASK_TX_ERR;
                     CloseHandle(hw_usart->handle_com);
                     hw_usart->handle_com = INVALID_HANDLE_VALUE;
                     hw_usart->com_status &= (~USART_READ_IS_BUSY);
@@ -488,7 +488,7 @@ static void __vk_usart_read_event_thread(void *arg)
                     vsf_hw_usart_trace_irq(VSF_TRACE_POINTER_HEX"-->|com%d|  [%s]line(%d)read err call("VSF_TRACE_POINTER_HEX")",
                                         hw_usart, hw_usart->com_port, __FUNCTION__, __LINE__, hw_usart->cfg.isr.handler_fn);
                     __vsf_arch_irq_start(irq_thread);
-                    hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, USART_IRQ_MASK_ERR);
+                    hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_ERR);
                     __vsf_arch_irq_end(irq_thread, false);
                 } else {
                     vsf_trace_error(VSF_TRACE_POINTER_HEX"-->|com%d|  error with read!%s%d\n",
@@ -500,8 +500,8 @@ static void __vk_usart_read_event_thread(void *arg)
             if (!GetLastError()) {
                 vsf_hw_usart_trace_irq("read to the file eof!%s%d\n", __FILE__, __LINE__);
             } else {
-                if ((hw_usart->enable_flag & USART_IRQ_MASK_RX_ERR) && NULL != hw_usart->cfg.isr.handler_fn) {
-                    hw_usart->enable_flag &= ~USART_IRQ_MASK_TX_ERR;
+                if ((hw_usart->enable_flag & VSF_USART_IRQ_MASK_RX_ERR) && NULL != hw_usart->cfg.isr.handler_fn) {
+                    hw_usart->enable_flag &= ~VSF_USART_IRQ_MASK_TX_ERR;
                     CloseHandle(hw_usart->handle_com);
                     hw_usart->handle_com = INVALID_HANDLE_VALUE;
                     hw_usart->com_status &= (~USART_READ_IS_BUSY);
@@ -511,7 +511,7 @@ static void __vk_usart_read_event_thread(void *arg)
                     vsf_hw_usart_trace_irq(VSF_TRACE_POINTER_HEX"-->|com%d|  [%s]line(%d)read err call("VSF_TRACE_POINTER_HEX")",
                                         hw_usart, hw_usart->com_port, __FUNCTION__, __LINE__, hw_usart->cfg.isr.handler_fn);
                     __vsf_arch_irq_start(irq_thread);
-                    hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, USART_IRQ_MASK_ERR);
+                    hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_ERR);
                     __vsf_arch_irq_end(irq_thread, false);
                 } else {
                     vsf_trace_error(VSF_TRACE_POINTER_HEX"-->|com%d|  error with read!%s%d\n", hw_usart, hw_usart->com_port, __FILE__, __LINE__);
@@ -532,16 +532,16 @@ static void __vk_usart_read_event_thread(void *arg)
         hw_usart->com_status &= (~USART_READ_IS_BUSY);
         if (NULL != hw_usart->cfg.isr.handler_fn) {
             vsf_hw_usart_trace_irq("%s(%d) call %p\n", __FUNCTION__, __LINE__, hw_usart->cfg.isr.handler_fn);
-            if (hw_usart->enable_flag & USART_IRQ_MASK_RX_CPL) {
+            if (hw_usart->enable_flag & VSF_USART_IRQ_MASK_RX_CPL) {
                 __vsf_arch_irq_start(irq_thread);
                 hw_usart->cancel_status |= CANCEL_READ_CLP;
-                hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, USART_IRQ_MASK_RX_CPL);
+                hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_RX_CPL);
                 __vsf_arch_irq_end(irq_thread, false);
-            } else if (hw_usart->enable_flag & USART_IRQ_MASK_RX) {
+            } else if (hw_usart->enable_flag & VSF_USART_IRQ_MASK_RX) {
                 __vsf_arch_irq_start(irq_thread);
                 hw_usart->cancel_status |= CANCEL_READ_CLP;
                 hw_usart->rxfifo.cnt = read_len;
-                hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, USART_IRQ_MASK_RX);
+                hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_RX);
                 __vsf_arch_irq_end(irq_thread, false);
             }
         }
@@ -597,8 +597,8 @@ static void __vk_usart_write_event_thread(void *arg)
                 GetOverlappedResult(hw_usart->handle_com, &overLapped, &write_len, TRUE);
             }
         } else {
-            if ((hw_usart->enable_flag & USART_IRQ_MASK_TX_ERR) && NULL != hw_usart->cfg.isr.handler_fn) {
-                hw_usart->enable_flag &= ~USART_IRQ_MASK_RX_ERR;
+            if ((hw_usart->enable_flag & VSF_USART_IRQ_MASK_TX_ERR) && NULL != hw_usart->cfg.isr.handler_fn) {
+                hw_usart->enable_flag &= ~VSF_USART_IRQ_MASK_RX_ERR;
 
                 CloseHandle(hw_usart->handle_com);
                 hw_usart->handle_com = INVALID_HANDLE_VALUE;
@@ -609,7 +609,7 @@ static void __vk_usart_write_event_thread(void *arg)
                 vsf_hw_usart_trace_irq(VSF_TRACE_POINTER_HEX"-->|com%d|  [%s]line(%d)write err call("VSF_TRACE_POINTER_HEX")",
                                     hw_usart, hw_usart->com_port, __FUNCTION__, __LINE__, hw_usart->cfg.isr.handler_fn);
                 __vsf_arch_irq_start(irq_thread);
-                hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, USART_IRQ_MASK_ERR);
+                hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_ERR);
                 __vsf_arch_irq_end(irq_thread, false);
             }
             goto pend_write;
@@ -623,11 +623,11 @@ static void __vk_usart_write_event_thread(void *arg)
         }
         hw_usart->com_status &= (~USART_WRITE_IS_BUSY);
 
-        if ((hw_usart->enable_flag & USART_IRQ_MASK_TX_CPL) && (NULL != hw_usart->cfg.isr.handler_fn)) {
+        if ((hw_usart->enable_flag & VSF_USART_IRQ_MASK_TX_CPL) && (NULL != hw_usart->cfg.isr.handler_fn)) {
             vsf_hw_usart_trace_irq("%s(%d) call %p\n", __FUNCTION__, __LINE__, hw_usart->cfg.isr.handler_fn);
             __vsf_arch_irq_start(irq_thread);
             hw_usart->cancel_status |= CANCEL_WRITE_CLP;
-            hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, USART_IRQ_MASK_TX_CPL);
+            hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_TX_CPL);
             __vsf_arch_irq_end(irq_thread, false);
         }
         hw_usart->sended_buf_size = write_len;
@@ -695,7 +695,7 @@ void vsf_hw_usart_irq_enable(vsf_hw_usart_t *hw_usart, vsf_usart_irq_mask_t irq_
     VSF_HAL_ASSERT(hw_usart->cfg.isr.handler_fn != NULL);
     vsf_usart_irq_mask_t orig_irq_mask = hw_usart->enable_flag;
     hw_usart->enable_flag |= irq_mask;
-    if (!(orig_irq_mask & USART_IRQ_MASK_RX) && (irq_mask & USART_IRQ_MASK_RX)) {
+    if (!(orig_irq_mask & VSF_USART_IRQ_MASK_RX) && (irq_mask & VSF_USART_IRQ_MASK_RX)) {
         vsf_hw_usart_request_rx(hw_usart, &hw_usart->rxfifo.buffer, sizeof(hw_usart->rxfifo.buffer));
     }
     vsf_hw_usart_trace_function("%s exited", __FUNCTION__);
@@ -735,7 +735,7 @@ uint_fast16_t vsf_hw_usart_rxfifo_read(vsf_hw_usart_t *hw_usart, void *buffer_pt
     size = vsf_min(size, hw_usart->rxfifo.cnt);
     memcpy(buffer_ptr, &hw_usart->rxfifo.buffer, size);
     hw_usart->rxfifo.cnt -= size;
-    if ((0 == hw_usart->rxfifo.cnt) && (hw_usart->enable_flag & USART_IRQ_MASK_RX)) {
+    if ((0 == hw_usart->rxfifo.cnt) && (hw_usart->enable_flag & VSF_USART_IRQ_MASK_RX)) {
         vsf_hw_usart_request_rx(hw_usart, &hw_usart->rxfifo.buffer, sizeof(hw_usart->rxfifo.buffer));
     }
     return size;
