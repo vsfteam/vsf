@@ -73,7 +73,7 @@
 #endif
 
 #ifndef APP_I2C_DEMO_CFG_MODE
-#   define APP_I2C_DEMO_CFG_MODE                        (I2C_MODE_MASTER | I2C_SPEED_STANDARD_MODE | I2C_ADDR_7_BITS)
+#   define APP_I2C_DEMO_CFG_MODE                        (VSF_I2C_MODE_MASTER | VSF_I2C_SPEED_STANDARD_MODE | VSF_I2C_ADDR_7_BITS)
 #endif
 
 #ifndef APP_I2C_DEMO_CLOCK_HZ
@@ -133,7 +133,7 @@ static vsf_err_t __i2c_demo_init(vsf_i2c_t *i2c_ptr,
 {
     VSF_ASSERT(i2c_ptr != NULL);
     VSF_ASSERT(irs_ptr != NULL);
-    VSF_ASSERT((mask & ~I2C_IRQ_MASK_MASTER_ALL) == 0);
+    VSF_ASSERT((mask & ~VSF_I2C_IRQ_MASK_MASTER_ALL) == 0);
 
     vsf_i2c_cfg_t i2c_cfg = {
         .mode     = APP_I2C_DEMO_CFG_MODE,
@@ -148,7 +148,7 @@ static vsf_err_t __i2c_demo_init(vsf_i2c_t *i2c_ptr,
 
     while (fsm_rt_cpl != vsf_i2c_enable(i2c_ptr));
 
-    if (mask & I2C_IRQ_MASK_MASTER_ALL) {
+    if (mask & VSF_I2C_IRQ_MASK_MASTER_ALL) {
         vsf_i2c_irq_enable(i2c_ptr, mask);
     }
 
@@ -158,7 +158,7 @@ static vsf_err_t __i2c_demo_init(vsf_i2c_t *i2c_ptr,
 static void __i2c_demo_deinit(vsf_i2c_t *i2c_ptr)
 {
     VSF_ASSERT(i2c_ptr != NULL);
-    vsf_i2c_irq_disable(i2c_ptr, I2C_IRQ_MASK_MASTER_ALL);
+    vsf_i2c_irq_disable(i2c_ptr, VSF_I2C_IRQ_MASK_MASTER_ALL);
     while (fsm_rt_cpl != vsf_i2c_disable(i2c_ptr));
 }
 
@@ -175,7 +175,7 @@ static void __i2c_search_next(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_ptr)
 
     if (i2c_demo_ptr->start_address <= i2c_demo_ptr->end_address) {
         vsf_i2c_master_request(i2c_ptr, i2c_demo_ptr->start_address,
-                               I2C_CMD_START | I2C_CMD_WRITE | I2C_CMD_STOP,
+                               VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
                                request_data_len, __reqeust_data);
     } else {
         __i2c_demo_deinit(i2c_ptr);
@@ -186,7 +186,7 @@ static void __i2c_search_irq_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i
 {
     app_i2c_demo_t *i2c_demo_ptr = (app_i2c_demo_t *)target_ptr;
 
-    if (irq_mask & I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
+    if (irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
         vsf_trace_debug("i2c address :%d transfer complete interrutp" VSF_TRACE_CFG_LINEEND, i2c_demo_ptr->start_address);
     }
 
@@ -207,9 +207,9 @@ static void __i2c_address_search(app_i2c_demo_t *i2c_demo_ptr, vsf_i2c_t *i2c_pt
         .prio = APP_I2C_DEMO_ISR_PRIO,
     };
 
-    vsf_i2c_irq_mask_t mask =  I2C_IRQ_MASK_MASTER_ADDRESS_NACK
-                             | I2C_IRQ_MASK_MASTER_NACK_DETECT
-                             | I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+    vsf_i2c_irq_mask_t mask =  VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
+                             | VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT
+                             | VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
 
     vsf_err_t result = __i2c_demo_init(i2c_ptr, &isr, mask);
     VSF_ASSERT(result == VSF_ERR_NONE);
@@ -225,7 +225,7 @@ static void __eeprom_irq_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_i
 {
     app_i2c_demo_t *i2c_demo_ptr = (app_i2c_demo_t *)target_ptr;
 
-    if (irq_mask & I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
+    if (irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
         vsf_eda_post_evt(&i2c_demo_ptr->teda.use_as__vsf_eda_t, i2c_demo_ptr->next_evt);
     }
 }
@@ -243,16 +243,16 @@ static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 .target_ptr = &__app_i2c_demo,
                 .prio = APP_I2C_DEMO_ISR_PRIO,
             };
-            result = __i2c_demo_init(i2c_ptr, &isr, I2C_IRQ_MASK_MASTER_ADDRESS_NACK |
-                                                    I2C_IRQ_MASK_MASTER_NACK_DETECT |
-                                                    I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE);
+            result = __i2c_demo_init(i2c_ptr, &isr, VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK |
+                                                    VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT |
+                                                    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE);
             VSF_ASSERT(result == VSF_ERR_NONE);
 
             for (int i = 0; i < dimof(__app_i2c_demo.send_buffer); i++) {
                 __app_i2c_demo.send_buffer[i] = dimof(__app_i2c_demo.send_buffer) - i;
             }
             __app_i2c_demo.next_evt = VSF_EVT_EEPROM_WRTIE_ADDR_CPL;
-            result = vsf_i2c_master_request(i2c_ptr, device_address, I2C_CMD_WRITE | I2C_CMD_START,
+            result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_WRITE | VSF_I2C_CMD_START,
                                             dimof(__app_i2c_demo.eeprom_address), __app_i2c_demo.eeprom_address);
             VSF_ASSERT(result == VSF_ERR_NONE);
         }
@@ -260,7 +260,7 @@ static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     case VSF_EVT_EEPROM_WRTIE_ADDR_CPL:
         __app_i2c_demo.next_evt = VSF_EVT_EEPROM_WRTIE_DATA_CPL;
-        result = vsf_i2c_master_request(i2c_ptr, device_address, I2C_CMD_WRITE | I2C_CMD_STOP,
+        result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
                                dimof(__app_i2c_demo.send_buffer), __app_i2c_demo.send_buffer);
         VSF_ASSERT(result == VSF_ERR_NONE);
         break;
@@ -271,13 +271,13 @@ static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     case VSF_EVT_TIMER:
         __app_i2c_demo.next_evt = VSF_EVT_EEPROM_READ_DATA;
-        result = vsf_i2c_master_request(i2c_ptr, device_address, I2C_CMD_WRITE | I2C_CMD_START, 2, __app_i2c_demo.eeprom_address);
+        result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_WRITE | VSF_I2C_CMD_START, 2, __app_i2c_demo.eeprom_address);
         VSF_ASSERT(result == VSF_ERR_NONE);
         break;
 
     case VSF_EVT_EEPROM_READ_DATA:
         __app_i2c_demo.next_evt = VSF_EVT_EEPROM_READ_DATA_CPL;
-        result = vsf_i2c_master_request(i2c_ptr, device_address, I2C_CMD_READ | I2C_CMD_START | I2C_CMD_STOP, dimof(__app_i2c_demo.recv_buffer), __app_i2c_demo.recv_buffer);
+        result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_READ | VSF_I2C_CMD_START | VSF_I2C_CMD_STOP, dimof(__app_i2c_demo.recv_buffer), __app_i2c_demo.recv_buffer);
         VSF_ASSERT(result == VSF_ERR_NONE);
         break;
 

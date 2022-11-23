@@ -61,19 +61,19 @@ void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
     vsf_i2c_cfg_t *cfg = &i2c_request_ptr->cfg;
     uint32_t cur_interrupt_mask = 0;
 
-    if (interrupt_mask & I2C_IRQ_MASK_MASTER_NACK_DETECT) {
-        cur_interrupt_mask |= I2C_IRQ_MASK_MASTER_NACK_DETECT;
+    if (interrupt_mask & VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT) {
+        cur_interrupt_mask |= VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT;
     } else {
         if (++i2c_request_ptr->idx <= i2c_request_ptr->count) {
-            vsf_i2c_cmd_t temp_cmd = i2c_request_ptr->cmd & ~(I2C_CMD_START | I2C_CMD_RESTART);
+            vsf_i2c_cmd_t temp_cmd = i2c_request_ptr->cmd & ~(VSF_I2C_CMD_START | VSF_I2C_CMD_RESTART);
             if (i2c_request_ptr->idx != i2c_request_ptr->count) {
-                temp_cmd &= ~I2C_CMD_STOP;
+                temp_cmd &= ~VSF_I2C_CMD_STOP;
             }
             uint16_t data = i2c_request_ptr->buffer_ptr[i2c_request_ptr->idx - 1];
             vsf_err_t ret = i2c_request_ptr->fn(i2c_ptr, data, temp_cmd);
             VSF_HAL_ASSERT(ret == VSF_ERR_NONE);
         } else {
-            cur_interrupt_mask = I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+            cur_interrupt_mask = VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
         }
     }
 
@@ -102,7 +102,7 @@ vsf_err_t vsf_i2c_request_master_request(vsf_i2c_t *i2c_ptr,
     i2c_request_ptr->buffer_ptr = buffer_ptr;
 
     if (count > 0) {
-        cmd = cmd & ~I2C_CMD_STOP;
+        cmd = cmd & ~VSF_I2C_CMD_STOP;
     }
 
     vsf_protect_t orig = __vsf_i2c_protect();
