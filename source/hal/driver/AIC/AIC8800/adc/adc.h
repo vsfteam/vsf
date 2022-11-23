@@ -40,32 +40,32 @@
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_adc_feature_t{
-    ADC_REF_VDD_1           = 0,                //ADC_TYPE_VBAT
-    ADC_REF_VDD_1_2,                            //Not activated
-    ADC_REF_VDD_1_3,                            //ADC_TYPE_TEMP0
-    ADC_REF_VDD             = ADC_REF_VDD_1 | ADC_REF_VDD_1_2 | ADC_REF_VDD_1_3,
+    VSF_ADC_REF_VDD_1           = 0,                //ADC_TYPE_VBAT
+    VSF_ADC_REF_VDD_1_2,                            //Not activated
+    VSF_ADC_REF_VDD_1_3,                            //ADC_TYPE_TEMP0
+    ADC_REF_VDD             = VSF_ADC_REF_VDD_1 | VSF_ADC_REF_VDD_1_2 | VSF_ADC_REF_VDD_1_3,
 
-    DATA_ALIGN_RIGHT        = 0,                //Not activated
-    DATA_ALIGN_LEFT         = 0,                //Not activated
-    SCAN_CONV_SINGLE_MODE   = 0,                //Not activated
-    SCAN_CONV_SEQUENCE_MODE = 0,                //Not activated
-    EXTERN_TRIGGER_0        = 0,                //Not activated
-    EXTERN_TRIGGER_1        = 0,                //Not activated
-    EXTERN_TRIGGER_2        = 0,                //Not activated
+    VSF_DATA_ALIGN_RIGHT        = 0,                //Not activated
+    VSF_DATA_ALIGN_LEFT         = 0,                //Not activated
+    VSF_SCAN_CONV_SINGLE_MODE   = 0,                //Not activated
+    VSF_SCAN_CONV_SEQUENCE_MODE = 0,                //Not activated
+    VSF_EXTERN_TRIGGER_0        = 0,                //Not activated
+    VSF_EXTERN_TRIGGER_1        = 0,                //Not activated
+    VSF_EXTERN_TRIGGER_2        = 0,                //Not activated
 } vsf_adc_feature_t;
 
 typedef enum vsf_adc_channel_feature_t {
-    ADC_CHANNEL_GAIN_1_6    = (0 << 0),         //Not activated
-    ADC_CHANNEL_GAIN_1_5    = (1 << 0),         //Not activated
-    ADC_CHANNEL_GAIN_1_4    = (2 << 0),         //Not activated
-    ADC_CHANNEL_GAIN_1_3    = (3 << 0),         //Not activated
-    ADC_CHANNEL_GAIN_1_2    = (4 << 0),         //Not activated
-    ADC_CHANNEL_GAIN_1      = (5 << 0),         //Not activated
+    VSF_ADC_CHANNEL_GAIN_1_6    = (0 << 0),         //Not activated
+    VSF_ADC_CHANNEL_GAIN_1_5    = (1 << 0),         //Not activated
+    VSF_ADC_CHANNEL_GAIN_1_4    = (2 << 0),         //Not activated
+    VSF_ADC_CHANNEL_GAIN_1_3    = (3 << 0),         //Not activated
+    VSF_ADC_CHANNEL_GAIN_1_2    = (4 << 0),         //Not activated
+    VSF_ADC_CHANNEL_GAIN_1      = (5 << 0),         //Not activated
 
-    ADC_CHANNEL_REF_VDD_1   = (0 << 4),         //Not activated
-    ADC_CHANNEL_REF_VDD_1_2 = (1 << 4),         //Not activated
-    ADC_CHANNEL_REF_VDD_1_3 = (2 << 4),         //Not activated
-    ADC_CHANNEL_REF_VDD_1_4 = (3 << 4),         //Not activated
+    VSF_ADC_CHANNEL_REF_VDD_1   = (0 << 4),         //Not activated
+    VSF_ADC_CHANNEL_REF_VDD_1_2 = (1 << 4),         //Not activated
+    VSF_ADC_CHANNEL_REF_VDD_1_3 = (2 << 4),         //Not activated
+    VSF_ADC_CHANNEL_REF_VDD_1_4 = (3 << 4),         //Not activated
 } vsf_adc_channel_feature_t;
 
 /*============================ INCLUDES ======================================*/

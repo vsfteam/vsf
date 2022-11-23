@@ -107,7 +107,7 @@ static uint_fast32_t __vsf_adc_get_callback_time_us(vsf_hw_adc_t *hw_adc_ptr)
 
 static void __vsf_adc_measure(int type)
 {
-    if (type == ADC_REF_VDD_1) {
+    if (type == VSF_ADC_REF_VDD_1) {
         PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteRtcCore->rtc_rg_por_ctrl_cfg1),
             (AIC1000LITE_RTC_CORE_RTC_RG_PU_VRTC_SENSE
                 |   AIC1000LITE_RTC_CORE_RTC_RG_PU_VBAT_SENSE),
@@ -133,9 +133,9 @@ static void __vsf_adc_measure(int type)
 
         PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl0),
             AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
-    } else if (type == ADC_REF_VDD_1_2) {
+    } else if (type == VSF_ADC_REF_VDD_1_2) {
         VSF_HAL_ASSERT(false); //TODO:
-    } else if (type == ADC_REF_VDD_1_3) {
+    } else if (type == VSF_ADC_REF_VDD_1_3) {
         PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl1),
             (AIC1000LITE_MSADC_CFG_MSADC_SW_MUX_BITS(0x0)
                 |   AIC1000LITE_MSADC_CFG_MSADC_SW_DIFF_MODE),
