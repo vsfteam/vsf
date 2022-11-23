@@ -38,18 +38,18 @@
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_DATASIZE
-#   define APP_SPI_DEMO_CFG_DATASIZE                    SPI_DATASIZE_8
+#   define APP_SPI_DEMO_CFG_DATASIZE                    VSF_SPI_DATASIZE_8
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_AUTO_CS_EN
 #   define APP_SPI_DEMO_CFG_AUTO_CS_EN                  DISABLED
 #endif
 
-#define __APP_SPI_DEMO_MODE                             (SPI_MASTER | SPI_CLOCK_MODE_3 | SPI_MSB_FIRST | APP_SPI_DEMO_CFG_DATASIZE)
+#define __APP_SPI_DEMO_MODE                             (VSF_SPI_MASTER | VSF_SPI_CLOCK_MODE_3 | VSF_SPI_MSB_FIRST | APP_SPI_DEMO_CFG_DATASIZE)
 #if APP_SPI_DEMO_CFG_AUTO_CS_EN == ENABLED
-#   define APP_SPI_DEMO_CFG_MODE                        (__APP_SPI_DEMO_MODE | SPI_AUTO_CS_ENABLE)
+#   define APP_SPI_DEMO_CFG_MODE                        (__APP_SPI_DEMO_MODE | VSF_SPI_AUTO_CS_ENABLE)
 #else
-#   define APP_SPI_DEMO_CFG_MODE                        (__APP_SPI_DEMO_MODE | SPI_AUTO_CS_DISABLE)
+#   define APP_SPI_DEMO_CFG_MODE                        (__APP_SPI_DEMO_MODE | VSF_SPI_AUTO_CS_DISABLE)
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_SPEED
@@ -147,7 +147,7 @@ static vsf_err_t __spi_demo_init(vsf_spi_t * spi,
 
     while (fsm_rt_cpl != vsf_spi_enable(spi));
 
-    if (mask & SPI_IRQ_MASK) {
+    if (mask & VSF_SPI_IRQ_MASK) {
         vsf_spi_irq_enable(spi, mask);
     }
 
@@ -156,7 +156,7 @@ static vsf_err_t __spi_demo_init(vsf_spi_t * spi,
 
 static void __spi_demo_deinit(vsf_spi_t * spi, vsf_spi_irq_mask_t mask)
 {
-    if (mask & SPI_IRQ_MASK) {
+    if (mask & VSF_SPI_IRQ_MASK) {
         vsf_spi_irq_disable(spi, mask);
     }
 
@@ -226,7 +226,7 @@ static void __spi_request_isr_handler(void              *target,
     app_spi_demo_t * demo = (app_spi_demo_t *)target;
     VSF_ASSERT(demo != NULL);
 
-    if (irq_mask & SPI_IRQ_MASK_CPL) {
+    if (irq_mask & VSF_SPI_IRQ_MASK_CPL) {
 #if APP_SPI_DEMO_CFG_AUTO_CS_EN == DISABLED
         vsf_spi_cs_inactive(spi_ptr, 0);
 #endif
@@ -249,7 +249,7 @@ static void __spi_demo_request(app_spi_demo_t   *demo,
 {
 
     vsf_err_t err = __spi_demo_init(spi_ptr, __spi_request_isr_handler,
-                          demo, APP_SPI_DEMO_IRQ_PRIO, SPI_IRQ_MASK_CPL);
+                          demo, APP_SPI_DEMO_IRQ_PRIO, VSF_SPI_IRQ_MASK_CPL);
     VSF_ASSERT(err == VSF_ERR_NONE);
 
 #if APP_SPI_DEMO_CFG_AUTO_CS_EN == DISABLED

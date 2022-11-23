@@ -37,11 +37,11 @@
 
 #ifndef MIPI_LCD_SPI_CFG
 #   if VSF_DISP_MIPI_LCD_SPI_MODE == VSF_DISP_MIPI_LCD_SPI_8BITS_MODE
-#       define MIPI_LCD_SPI_CFG_DATA_SIZE               SPI_DATASIZE_8
+#       define MIPI_LCD_SPI_CFG_DATA_SIZE               VSF_SPI_DATASIZE_8
 #   elif VSF_DISP_MIPI_LCD_SPI_MODE == VSF_DISP_MIPI_LCD_SPI_9BITS_MODE
-#       define MIPI_LCD_SPI_CFG_DATA_SIZE               SPI_DATASIZE_9
+#       define MIPI_LCD_SPI_CFG_DATA_SIZE               VSF_SPI_DATASIZE_9
 #   endif
-#   define MIPI_LCD_SPI_CFG     (SPI_MASTER | SPI_CLOCK_MODE_3 | SPI_MSB_FIRST | MIPI_LCD_SPI_CFG_DATA_SIZE | SPI_AUTO_CS_DISABLE)
+#   define MIPI_LCD_SPI_CFG     (VSF_SPI_MASTER | VSF_SPI_CLOCK_MODE_3 | VSF_SPI_MSB_FIRST | MIPI_LCD_SPI_CFG_DATA_SIZE | VSF_SPI_AUTO_CS_DISABLE)
 #endif
 
 #ifndef MIPI_LCD_RESET_LOW_PULSE_TIME
@@ -161,7 +161,7 @@ static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
                                            vsf_spi_t *spi_ptr,
                                            vsf_spi_irq_mask_t irq_mask)
 {
-    if (irq_mask & SPI_IRQ_MASK_CPL) {
+    if (irq_mask & VSF_SPI_IRQ_MASK_CPL) {
         vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = (vk_disp_mipi_spi_lcd_t *)target_ptr;
         vsf_eda_post_evt(&disp_mipi_spi_lcd->teda.use_as__vsf_eda_t, VSF_EVT_SPI_CPL);
     }
@@ -193,7 +193,7 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
         enable_status = vsf_spi_enable(disp_mipi_spi_lcd->spi);
     } while (enable_status != fsm_rt_cpl);
 
-    vsf_spi_irq_enable(disp_mipi_spi_lcd->spi, SPI_IRQ_MASK_CPL);
+    vsf_spi_irq_enable(disp_mipi_spi_lcd->spi, VSF_SPI_IRQ_MASK_CPL);
 
     return VSF_ERR_NONE;
 }

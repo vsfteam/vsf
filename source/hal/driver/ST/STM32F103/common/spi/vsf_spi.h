@@ -34,8 +34,8 @@ enum vsf_spi_mode_t {
 };
 
 typedef enum {
-    SPI_DATASIZE_8BIT           = 0x0000,
-    SPI_DATASIZE_16BIT          = 0x0800,
+    VSF_SPI_DATASIZE_8BIT           = 0x0000,
+    VSF_SPI_DATASIZE_16BIT          = 0x0800,
 }em_spi_data_size_t;
 
 typedef enum {
