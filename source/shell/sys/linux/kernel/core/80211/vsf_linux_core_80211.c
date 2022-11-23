@@ -86,4 +86,14 @@ unsigned int ieee80211_get_hdrlen_from_skb(const struct sk_buff *skb)
     return hdrlen;
 }
 
+struct ieee80211_hw * ieee80211_alloc_hw(size_t priv_data_len, const struct ieee80211_ops *ops)
+{
+    struct ieee80211_local *local = kzalloc(sizeof(struct ieee80211_local) + priv_data_len, GFP_KERNEL);
+    if (NULL == local) { return NULL; }
+
+    local->ops = ops;
+    local->hw.priv = (void *)&local[1];
+    return &local->hw;
+}
+
 #endif

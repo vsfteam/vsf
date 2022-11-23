@@ -234,7 +234,6 @@ static int __workqueue_thread(int argc, char **argv)
             if (pending_eda != NULL) {
                 vsf_eda_post_evt(pending_eda, VSF_EVT_USER);
             }
-            
         }
     }
     return 0;
@@ -752,6 +751,7 @@ int ida_alloc_range(struct ida *ida, unsigned int __min_to_avoid_conflict,
 
         orig = vsf_protect_int();
         value = ida->bitmap[pos_in_map] | value;
+        extern int_fast8_t __vsf_arch_ffz(uintalu_t);
         id = __vsf_arch_ffz(value);
         if (id >= 0) {
             ida->bitmap[pos_in_map] |= 1 << id;
@@ -863,20 +863,44 @@ void timer_setup(struct timer_list *timer, void (*func)(struct timer_list *), un
 
 #include <linux/skbuff.h>
 
+#if defined(VSF_LINUX_CFG_SKB_SIZE) && defined(VSF_LINUX_CFG_SKB_NUM)
+#   define __VSF_LINUX_CFG_SKB_POOL ENABLED
+
+typedef struct vsf_ieee80211_skb_t {
+    struct skbuff skb;
+    uint8_t buffer[VSF_LINUX_CFG_SKB_SIZE];
+} vsf_ieee80211_skb_t;
+dcl_vsf_pool(vsf_ieee80211_skb_pool)
+def_vsf_pool(vsf_ieee80211_skb_pool, vsf_ieee80211_skb_t)
+imp_vsf_pool(vsf_ieee80211_skb_pool, vsf_ieee80211_skb_t)
+
+static vsf_pool(vsf_ieee80211_skb_pool) __vsf_ieee80211_skb_pool;
+static vsf_pool_item(vsf_ieee80211_skb_pool) __vsf_ieee80211_skb_pool_items[VSF_LINUX_CFG_SKB_NUM];
+#endif
+
 #define skb_shinfo(__skb)           ((struct skb_shared_info *)(skb_end_pointer(__skb)))
 
 struct sk_buff * alloc_skb(unsigned int size, gfp_t flags)
 {
-    struct sk_buff *skb = kmalloc(sizeof(*skb), 0);
+    struct sk_buff *skb;
+    u8 *data;
+#if __VSF_LINUX_CFG_SKB_POOL == ENABLED
+    vsf_protect_t orig = vsf_protect_int();
+        skb = VSF_POOL_ALLOC(vsf_ieee80211_skb_pool, &__vsf_ieee80211_skb_pool);
+    vsf_unprotect_int(orig);
+    data = (u8 *)&skb[1];
+#else
+    skb = kmalloc(sizeof(*skb), 0);
     if (NULL == skb) {
         return NULL;
     }
 
-    u8 *data = kmalloc(size + sizeof(struct skb_shared_info), flags);
+    data = kmalloc(size + sizeof(struct skb_shared_info), flags);
     if (NULL == data) {
         kfree(skb);
         return NULL;
     }
+#endif
 
     memset(skb, 0, sizeof(*skb));
     refcount_set(&skb->users, 1);
@@ -895,16 +919,31 @@ struct sk_buff * alloc_skb(unsigned int size, gfp_t flags)
 void kfree_skb(struct sk_buff *skb)
 {
     if (skb_unref(skb)) {
+#if __VSF_LINUX_CFG_SKB_POOL == ENABLED
+        vsf_protect_t orig = vsf_protect_int();
+            VSF_POOL_FREE(vsf_ieee80211_skb_pool, &__vsf_ieee80211_skb_pool, skb);
+        vsf_unprotect_int(orig);
+#else
         if (skb->head) {
             kfree(skb->head);
         }
         kfree(skb);
+#endif
     }
 }
 
 void consume_skb(struct sk_buff *skb)
 {
     kfree_skb(skb);
+}
+
+void skb_init(void)
+{
+#if __VSF_LINUX_CFG_SKB_POOL == ENABLED
+    VSF_POOL_PREPARE(vsf_ieee80211_skb_pool, &__vsf_ieee80211_skb_pool);
+    VSF_POOL_ADD_BUFFER(vsf_ieee80211_skb_pool, &__vsf_ieee80211_skb_pool,
+        __vsf_ieee80211_skb_pool_items, sizeof(__vsf_ieee80211_skb_pool_items));
+#endif
 }
 
 /*******************************************************************************

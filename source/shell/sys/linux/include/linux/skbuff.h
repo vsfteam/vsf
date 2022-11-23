@@ -6,6 +6,7 @@
 #include <linux/list.h>
 #include <linux/llist.h>
 #include <linux/refcount.h>
+#include <linux/spinlock.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +36,23 @@ struct sk_buff {
     sk_buff_data_t                  end;
     unsigned char                   *head, *data;
     refcount_t                      users;
+};
+
+struct sk_buff_list {
+    struct sk_buff                  *next;
+    struct sk_buff                  *prev;
+};
+
+struct sk_buff_head {
+    union {
+        struct {
+            struct sk_buff          *next;
+            struct sk_buff          *prev;
+        };
+        struct sk_buff_list         list;
+    };
+    __u32                           qlen;
+    spinlock_t                      lock;
 };
 
 struct sk_buff * alloc_skb(unsigned int size, gfp_t priority);
@@ -145,6 +163,133 @@ static inline void skb_trim(struct sk_buff *skb, unsigned int len)
     }
 }
 
+static inline int skb_queue_empty(const struct sk_buff_head *list)
+{
+    return list->next == (const struct sk_buff *)list;
+}
+
+static inline bool skb_queue_is_last(const struct sk_buff_head *list, const struct sk_buff *skb)
+{
+    return skb->next == (const struct sk_buff *)list;
+}
+
+static inline bool skb_queue_is_first(const struct sk_buff_head *list, const struct sk_buff *skb)
+{
+    return skb->prev == (const struct sk_buff *) list;
+}
+
+static inline struct sk_buff *skb_queue_next(const struct sk_buff_head *list, const struct sk_buff *skb)
+{
+    return skb->next;
+}
+
+static inline struct sk_buff *skb_queue_prev(const struct sk_buff_head *list, const struct sk_buff *skb)
+{
+    return skb->prev;
+}
+
+static inline void __skb_insert(struct sk_buff *newsk, struct sk_buff *prev, struct sk_buff *next, struct sk_buff_head *list)
+{
+    newsk->next = next;
+    newsk->prev = prev;
+    next->prev = newsk;
+    prev->next = newsk;
+    list->qlen++;
+}
+static inline void __skb_queue_after(struct sk_buff_head *list, struct sk_buff *prev, struct sk_buff *newsk)
+{
+    __skb_insert(newsk, prev, ((struct sk_buff_list *)prev)->next, list);
+}
+static inline void __skb_queue_before(struct sk_buff_head *list, struct sk_buff *next, struct sk_buff *newsk)
+{
+    __skb_insert(newsk, ((struct sk_buff_list *)next)->prev, next, list);
+}
+
+static inline void __skb_unlink(struct sk_buff *skb, struct sk_buff_head *list)
+{
+    struct sk_buff *next, *prev;
+
+    list->qlen--;
+    next        = skb->next;
+    prev        = skb->prev;
+    skb->next   = skb->prev = NULL;
+    next->prev  = prev;
+    prev->next  = next;
+}
+static inline void skb_unlink(struct sk_buff *skb, struct sk_buff_head *list)
+{
+    unsigned long flags;
+    spin_lock_irqsave(&list->lock, flags);
+        __skb_unlink(skb, list);
+    spin_unlock_irqrestore(&list->lock, flags);
+}
+
+static inline void skb_append(struct sk_buff *old, struct sk_buff *newsk, struct sk_buff_head *list)
+{
+    unsigned long flags;
+    spin_lock_irqsave(&list->lock, flags);
+        __skb_queue_after(list, old, newsk);
+    spin_unlock_irqrestore(&list->lock, flags);
+}
+
+static inline void skb_queue_head(struct sk_buff_head *list, struct sk_buff *newsk)
+{
+    unsigned long flags;
+    spin_lock_irqsave(&list->lock, flags);
+        __skb_queue_after(list, (struct sk_buff *)list, newsk);
+    spin_unlock_irqrestore(&list->lock, flags);
+}
+
+static inline void skb_queue_tail(struct sk_buff_head *list, struct sk_buff *newsk)
+{
+    unsigned long flags;
+    spin_lock_irqsave(&list->lock, flags);
+        __skb_queue_before(list, (struct sk_buff *)list, newsk);
+    spin_unlock_irqrestore(&list->lock, flags);
+}
+
+static inline struct sk_buff *skb_peek(const struct sk_buff_head *list)
+{
+    struct sk_buff *skb = list->next;
+    if (skb == (struct sk_buff *)list) {
+        skb = NULL;
+    }
+    return skb;
+}
+static inline struct sk_buff *skb_peek_tail(const struct sk_buff_head *list)
+{
+    struct sk_buff *skb = list->prev;
+    if (skb == (struct sk_buff *)list) {
+        skb = NULL;
+    }
+    return skb;
+}
+
+static inline struct sk_buff * skb_dequeue(struct sk_buff_head *list)
+{
+    unsigned long flags;
+    struct sk_buff *skb;
+    spin_lock_irqsave(&list->lock, flags);
+        skb = skb_peek(list);
+        if (skb != NULL) {
+            __skb_unlink(skb, list);
+        }
+    spin_unlock_irqrestore(&list->lock, flags);
+    return skb;
+}
+static inline struct sk_buff *skb_dequeue_tail(struct sk_buff_head *list)
+{
+    unsigned long flags;
+    struct sk_buff *skb;
+    spin_lock_irqsave(&list->lock, flags);
+        skb = skb_peek_tail(list);
+        if (skb != NULL) {
+            __skb_unlink(skb, list);
+        }
+    spin_unlock_irqrestore(&list->lock, flags);
+    return skb;
+}
+
 #define dev_kfree_skb(__skb)        consume_skb(__skb)
 #define dev_kfree_skb_any(__skb)    dev_kfree_skb(__skb)
 #define dev_consume_skb_any(__skb)  consume_skb(__skb)
@@ -152,6 +297,8 @@ static inline struct sk_buff * dev_alloc_skb(unsigned int length)
 {
     return alloc_skb(length, GFP_ATOMIC);
 }
+
+extern void skb_init(void);
 
 #ifdef __cplusplus
 }
