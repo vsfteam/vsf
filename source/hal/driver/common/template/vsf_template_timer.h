@@ -70,10 +70,10 @@ extern "C" {
 
 #if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_FEATURE == DISABLED
 typedef enum vsf_timer_mode_t {
-    TIMER_MODE_ONESHOT,
-    TIMER_MODE_CONTINUES,
+    VSF_TIMER_MODE_ONESHOT,
+    VSF_TIMER_MODE_CONTINUES,
 
-    TIMER_MODE_PWM,
+    VSF_TIMER_MODE_PWM,
 } vsf_timer_mode_t;
 #endif
 

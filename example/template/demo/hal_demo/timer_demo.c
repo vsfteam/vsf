@@ -33,7 +33,7 @@
 #endif
 
 #ifndef APP_TIMER_DEMO_CFG_MODE
-#   define APP_TIMER_DEMO_CFG_MODE                      TIMER_MODE_CONTINUES
+#   define APP_TIMER_DEMO_CFG_MODE                      VSF_TIMER_MODE_CONTINUES
 #endif
 
 #ifndef APP_TIMER_DEMO_CFG_FREQ

@@ -36,7 +36,7 @@ vsf_err_t vsf_hw_pwm_init(vsf_hw_pwm_t *hw_pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
     hw_pwm_ptr->cfg = *cfg_ptr;
 
     vsf_timer_cfg_t timer_cfg = {
-        .mode = TIMER_MODE_PWM,
+        .mode = VSF_TIMER_MODE_PWM,
         .min_freq = cfg_ptr->mini_clock_freq,
     };
 
