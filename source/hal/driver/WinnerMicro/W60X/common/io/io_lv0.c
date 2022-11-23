@@ -167,12 +167,12 @@ static bool vsf_gpio_config( vsf_io_cfg_t *cfg_ptr, uint_fast8_t count )
         GSP_IOCTRL.PIN[pin_index].Value = feature;
 
         //! but if we are not lucky enough, we can only use the following way
-        if (feature & IO_PULL_UP) {
+        if (feature & VSF_IO_PULL_UP) {
             IOCTRL_ENABLE_PULL_UP(pin_index);
         } else {
             IOCTRL_DISABLE_PULL_UP
         }
-        if (feature & IO_HIGH_DRV) {
+        if (feature & VSF_IO_HIGH_DRV) {
             IOCTRL_ENABLE_HIGH_DRIVER_STRENGH(pin_index);
         } else {
             IOCTRL_DISABLE_HIGH_DRIVER_STRENGH(pin_index);

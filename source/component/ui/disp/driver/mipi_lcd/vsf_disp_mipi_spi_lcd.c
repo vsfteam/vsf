@@ -138,12 +138,12 @@ void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
 #if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
     vsf_gpio_config_pin(disp_mipi_spi_lcd->reset.gpio,
-                        disp_mipi_spi_lcd->reset.pin_mask, IO_PULL_UP);
+                        disp_mipi_spi_lcd->reset.pin_mask, VSF_IO_PULL_UP);
     vsf_gpio_set_output(disp_mipi_spi_lcd->reset.gpio,
                         disp_mipi_spi_lcd->reset.pin_mask);
 
     vsf_gpio_config_pin(disp_mipi_spi_lcd->dcx.gpio,
-                        disp_mipi_spi_lcd->dcx.pin_mask, IO_PULL_UP);
+                        disp_mipi_spi_lcd->dcx.pin_mask, VSF_IO_PULL_UP);
     vsf_gpio_set_output(disp_mipi_spi_lcd->dcx.gpio,
                         disp_mipi_spi_lcd->dcx.pin_mask);
 #endif

@@ -48,29 +48,29 @@ typedef enum vsf_io_feature_t {
     IO_BIDIRECTION          = 0x03,
 
 
-    IO_DISABLE_INPUT        = (1<<8),           //!< disable input
+    VSF_IO_DISABLE_INPUT        = (1<<8),           //!< disable input
 /*
-    IO_INVERT_INPUT         = (1<<6),           //!< invert the input pin level
+    VSF_IO_INVERT_INPUT         = (1<<6),           //!< invert the input pin level
 
 
-    IO_FILTER_BYPASS        = (0<<11),          //!< filter is bypassed
-    IO_FILTER_2CLK          = (1<<11),          //!< levels should keep 2 clks
-    IO_FILTER_4CLK          = (2<<11),          //!< levels should keep 4 clks
-    IO_FILTER_8CLK          = (3<<11),          //!< levels should keep 8 clks
+    VSF_IO_FILTER_BYPASS        = (0<<11),          //!< filter is bypassed
+    VSF_IO_FILTER_2CLK          = (1<<11),          //!< levels should keep 2 clks
+    VSF_IO_FILTER_4CLK          = (2<<11),          //!< levels should keep 4 clks
+    VSF_IO_FILTER_8CLK          = (3<<11),          //!< levels should keep 8 clks
 
-    IO_FILTER_CLK_SRC0      = (0<<13),          //!< select clock src 0 for filter
-    IO_FILTER_CLK_SRC1      = (1<<13),          //!< select clock src 1 for filter
-    IO_FILTER_CLK_SRC2      = (2<<13),          //!< select clock src 2 for filter
-    IO_FILTER_CLK_SRC3      = (3<<13),          //!< select clock src 3 for filter
-    IO_FILTER_CLK_SRC4      = (4<<13),          //!< select clock src 4 for filter
-    IO_FILTER_CLK_SRC5      = (5<<13),          //!< select clock src 5 for filter
-    IO_FILTER_CLK_SRC6      = (6<<13),          //!< select clock src 6 for filter
-    IO_FILTER_CLK_SRC7      = (7<<13),          //!< select clock src 7 for filter
+    VSF_IO_FILTER_CLK_SRC0      = (0<<13),          //!< select clock src 0 for filter
+    VSF_IO_FILTER_CLK_SRC1      = (1<<13),          //!< select clock src 1 for filter
+    VSF_IO_FILTER_CLK_SRC2      = (2<<13),          //!< select clock src 2 for filter
+    VSF_IO_FILTER_CLK_SRC3      = (3<<13),          //!< select clock src 3 for filter
+    VSF_IO_FILTER_CLK_SRC4      = (4<<13),          //!< select clock src 4 for filter
+    VSF_IO_FILTER_CLK_SRC5      = (5<<13),          //!< select clock src 5 for filter
+    VSF_IO_FILTER_CLK_SRC6      = (6<<13),          //!< select clock src 6 for filter
+    VSF_IO_FILTER_CLK_SRC7      = (7<<13),          //!< select clock src 7 for filter
 
 
-    IO_HIGH_DRV             = (1<<9),           //!< enable high drive strength
-    IO_HIGH_DRIVE           = (1<<9),           //!< enable high drive strength
-    IO_HIGH_DRIVE_STRENGTH  = (1<<9),           //!< enable high drive strength
+    VSF_IO_HIGH_DRV             = (1<<9),           //!< enable high drive strength
+    VSF_IO_HIGH_DRIVE           = (1<<9),           //!< enable high drive strength
+    VSF_IO_HIGH_DRIVE_STRENGTH  = (1<<9),           //!< enable high drive strength
 */
 } vsf_io_feature_t;
 

@@ -100,7 +100,7 @@ void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, uint_
         uint32_t current_pin_mask = 1 << i;
         if (pin_mask & current_pin_mask) {
             __hw_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->IOMUX->GPCFG[i],
-                                  feature, __HW_IO_FEATURE_ALL_BITS);
+                                  feature, __VSF_HW_IO_FEATURE_ALL_BITS);
             if (hw_gpio_ptr->is_pmic) {
                 PMIC_MEM_MASK_WRITE((unsigned int)&hw_gpio_ptr->GPIO->MR, current_pin_mask, current_pin_mask);
             }
