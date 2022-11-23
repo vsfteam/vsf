@@ -238,8 +238,8 @@ vsf_err_t vsf_gpio_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
     }
 
 
-    vsf_gpio_config_pin(gpio_i2c_ptr->scl.gpio, gpio_i2c_ptr->scl.pin_mask, IO_PULL_UP);
-    vsf_gpio_config_pin(gpio_i2c_ptr->sda.gpio, gpio_i2c_ptr->sda.pin_mask, IO_PULL_UP);
+    vsf_gpio_config_pin(gpio_i2c_ptr->scl.gpio, gpio_i2c_ptr->scl.pin_mask, VSF_IO_PULL_UP);
+    vsf_gpio_config_pin(gpio_i2c_ptr->sda.gpio, gpio_i2c_ptr->sda.pin_mask, VSF_IO_PULL_UP);
     vsf_gpio_set_output(gpio_i2c_ptr->scl.gpio, gpio_i2c_ptr->scl.pin_mask);
     vsf_gpio_set_output(gpio_i2c_ptr->sda.gpio, gpio_i2c_ptr->sda.pin_mask);
 

@@ -119,16 +119,16 @@ void vsf_board_init(void)
 #endif
 
 #ifdef APP_USE_HAL_GPIO_DEMO
-        {VSF_PA10,  0x00,   IO_PULL_UP},
-        {VSF_PB3,   0x00,   IO_PULL_UP},
+        {VSF_PA10,  0x00,   VSF_IO_PULL_UP},
+        {VSF_PB3,   0x00,   VSF_IO_PULL_UP},
 #endif
 #if APP_USE_LINUX_TTY_DEMO == ENABLED
         {VSF_PA10,  0x01,   0},
         {VSF_PA11,  0x01,   0},
 #endif
 #ifdef APP_USE_HAL_I2C_DEMO
-        {VSF_PA14,  0x01,   IO_PULL_UP},
-        {VSF_PA15,  0x01,   IO_PULL_UP},
+        {VSF_PA14,  0x01,   VSF_IO_PULL_UP},
+        {VSF_PA15,  0x01,   VSF_IO_PULL_UP},
 #endif
     };
     vsf_io_config(cfgs, dimof(cfgs));
