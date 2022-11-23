@@ -54,7 +54,7 @@ extern "C" {
 #endif
 
 #ifndef VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE
-#   define VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE     DISABLED
+#   define VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE        DISABLED
 #endif
 
 #ifndef VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK
@@ -81,29 +81,29 @@ extern "C" {
 
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 typedef enum vsf_i2c_mode_t {
-    I2C_MODE_MASTER           = (0x1ul << 28),  // select master mode
-    I2C_MODE_SLAVE            = (0x0ul << 28),  // select slave mode
-    I2C_MODE_MASK             = I2C_MODE_MASTER |
-                                I2C_MODE_SLAVE,
+    VSF_I2C_MODE_MASTER           = (0x1ul << 28),  // select master mode
+    VSF_I2C_MODE_SLAVE            = (0x0ul << 28),  // select slave mode
+    VSF_I2C_MODE_MASK             = VSF_I2C_MODE_MASTER |
+                                    VSF_I2C_MODE_SLAVE,
 
     // TODO: Ultra Fast-mode I2C-bus protocol
-    I2C_SPEED_STANDARD_MODE   = (0x0ul << 29),  // up to 100 kbit/s
-    I2C_SPEED_FAST_MODE       = (0x1ul << 29),  // up to 400 kbit/s
-    I2C_SPEED_FAST_MODE_PLUS  = (0x2ul << 29),  // up to 1 Mbit/s
-    I2C_SPEED_HIGH_SPEED_MODE = (0x3ul << 29),  // up to 3.4 Mbit/s
-    I2C_SPEED_MASK            = I2C_SPEED_STANDARD_MODE   |
-                                I2C_SPEED_FAST_MODE       |
-                                I2C_SPEED_FAST_MODE_PLUS  |
-                                I2C_SPEED_HIGH_SPEED_MODE,
+    VSF_I2C_SPEED_STANDARD_MODE   = (0x0ul << 29),  // up to 100 kbit/s
+    VSF_I2C_SPEED_FAST_MODE       = (0x1ul << 29),  // up to 400 kbit/s
+    VSF_I2C_SPEED_FAST_MODE_PLUS  = (0x2ul << 29),  // up to 1 Mbit/s
+    VSF_I2C_SPEED_HIGH_SPEED_MODE = (0x3ul << 29),  // up to 3.4 Mbit/s
+    VSF_I2C_SPEED_MASK            = VSF_I2C_SPEED_STANDARD_MODE |
+                                    VSF_I2C_SPEED_FAST_MODE |
+                                    VSF_I2C_SPEED_FAST_MODE_PLUS |
+                                    VSF_I2C_SPEED_HIGH_SPEED_MODE,
 
-    I2C_ADDR_7_BITS           = (0x0ul << 31),
-    I2C_ADDR_10_BITS          = (0x1ul << 31),
-    I2C_ADDR_MASK             = I2C_ADDR_7_BITS |
-                                I2C_ADDR_10_BITS,
+    VSF_I2C_ADDR_7_BITS           = (0x0ul << 31),
+    VSF_I2C_ADDR_10_BITS          = (0x1ul << 31),
+    VSF_I2C_ADDR_MASK             = VSF_I2C_ADDR_7_BITS |
+                                    VSF_I2C_ADDR_10_BITS,
 
-    I2C_FEATURE_MASK          =  I2C_MODE_MASK
-                               | I2C_SPEED_MASK
-                               | I2C_ADDR_MASK,
+    VSF_I2C_FEATURE_MASK          = VSF_I2C_MODE_MASK |
+                                    VSF_I2C_SPEED_MASK |
+                                    VSF_I2C_ADDR_MASK,
 } vsf_i2c_mode_t;
 #endif
 
@@ -118,47 +118,47 @@ typedef enum vsf_i2c_mode_t {
  */
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD == DISABLED
 typedef enum vsf_i2c_cmd_t {
-    I2C_CMD_WRITE      = (0x00ul << 0),
-    I2C_CMD_READ       = (0x01ul << 0),
-    I2C_CMD_RW_MASK    = (0x01ul << 1),
+    VSF_I2C_CMD_WRITE      = (0x00ul << 0),
+    VSF_I2C_CMD_READ       = (0x01ul << 0),
+    VSF_I2C_CMD_RW_MASK    = (0x01ul << 1),
 
-    I2C_CMD_START      = (0x01ul << 28),
-    I2C_CMD_STOP       = (0x01ul << 29),
-    I2C_CMD_RESTART    = (0x01ul << 30),
+    VSF_I2C_CMD_START      = (0x01ul << 28),
+    VSF_I2C_CMD_STOP       = (0x01ul << 29),
+    VSF_I2C_CMD_RESTART    = (0x01ul << 30),
 
-    I2C_CMD_7_BITS     = (0x00ul << 31),
-    I2C_CMD_10_BITS    = (0x01ul << 31),
-    I2C_CMD_BITS_MASK  =  I2C_CMD_7_BITS
-                        | I2C_CMD_10_BITS,
+    VSF_I2C_CMD_7_BITS     = (0x00ul << 31),
+    VSF_I2C_CMD_10_BITS    = (0x01ul << 31),
+    VSF_I2C_CMD_BITS_MASK  = VSF_I2C_CMD_7_BITS |
+                             VSF_I2C_CMD_10_BITS,
 
-    I2C_CMD_ALL_MASK   = I2C_CMD_RW_MASK |
-                         I2C_CMD_START |
-                         I2C_CMD_STOP |
-                         I2C_CMD_RESTART |
-                         I2C_CMD_BITS_MASK,
+    VSF_I2C_CMD_ALL_MASK   = VSF_I2C_CMD_RW_MASK |
+                             VSF_I2C_CMD_START |
+                             VSF_I2C_CMD_STOP |
+                             VSF_I2C_CMD_RESTART |
+                             VSF_I2C_CMD_BITS_MASK,
 } vsf_i2c_cmd_t;
 #endif
 
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_i2c_irq_mask_t {
-    I2C_IRQ_MASK_MASTER_STARTED                 = (0x1ul <<  0),
-    I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul <<  3),
-    I2C_IRQ_MASK_MASTER_NACK_DETECT             = (0x1ul <<  4),
-    I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul <<  5),
-    I2C_IRQ_MASK_MASTER_TX_EMPTY                = (0x1ul <<  6),
-    I2C_IRQ_MASK_MASTER_ERROR                   = (0x1ul <<  7),
+    VSF_I2C_IRQ_MASK_MASTER_STARTED                 = (0x1ul <<  0),
+    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul <<  3),
+    VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT             = (0x1ul <<  4),
+    VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul <<  5),
+    VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY                = (0x1ul <<  6),
+    VSF_I2C_IRQ_MASK_MASTER_ERROR                   = (0x1ul <<  7),
 
-    I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE       = (0x1ul <<  8),
-    I2C_IRQ_MASK_MASTER_ADDRESS_NACK            = (0x1ul <<  9),
+    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE       = (0x1ul <<  8),
+    VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK            = (0x1ul <<  9),
 
-    I2C_IRQ_MASK_MASTER_ALL                     =  I2C_IRQ_MASK_MASTER_STARTED
-                                                 | I2C_IRQ_MASK_MASTER_STOP_DETECT
-                                                 | I2C_IRQ_MASK_MASTER_NACK_DETECT
-                                                 | I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
-                                                 | I2C_IRQ_MASK_MASTER_TX_EMPTY
-                                                 | I2C_IRQ_MASK_MASTER_ERROR
-                                                 | I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
-                                                 | I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
+    VSF_I2C_IRQ_MASK_MASTER_ALL                     = VSF_I2C_IRQ_MASK_MASTER_STARTED |
+                                                      VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT |
+                                                      VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT |
+                                                      VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST |
+                                                      VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY |
+                                                      VSF_I2C_IRQ_MASK_MASTER_ERROR |
+                                                      VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE |
+                                                      VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
 } vsf_i2c_irq_mask_t;
 #endif
 
@@ -206,7 +206,7 @@ typedef struct vsf_i2c_t vsf_i2c_t;
  \code {.c}
     static void __user_i2c_irqhandler(void *target_ptr, vsf_i2c_t *i2c_ptr, enum irq_mask)
     {
-        if (irq_mask & I2C_IRQ_MASK_MASTER_STARTED) {
+        if (irq_mask & VSF_I2C_IRQ_MASK_MASTER_STARTED) {
             // do something
         }
 

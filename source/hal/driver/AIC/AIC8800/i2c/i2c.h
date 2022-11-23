@@ -33,23 +33,23 @@
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_i2c_cmd_t {
-    I2C_CMD_WRITE       = (0x00ul << 3),
-    I2C_CMD_READ        = (0x01ul << 3),
-    I2C_CMD_RW_MASK     = I2C_CMD_WRITE | I2C_CMD_READ,
+    VSF_I2C_CMD_WRITE       = (0x00ul << 3),
+    VSF_I2C_CMD_READ        = (0x01ul << 3),
+    VSF_I2C_CMD_RW_MASK     = VSF_I2C_CMD_WRITE | VSF_I2C_CMD_READ,
 
-    I2C_CMD_START       = (0x01ul <<  0),
-    I2C_CMD_RESTART     = (0x01ul << 21),
+    VSF_I2C_CMD_START       = (0x01ul <<  0),
+    VSF_I2C_CMD_RESTART     = (0x01ul << 21),
 
-    I2C_CMD_7_BITS      = (0x00ul << 23),
-    I2C_CMD_10_BITS     = (0x01ul << 23),
-    I2C_CMD_BITS_MASK   =  I2C_CMD_7_BITS
-                         | I2C_CMD_10_BITS,
+    VSF_I2C_CMD_7_BITS      = (0x00ul << 23),
+    VSF_I2C_CMD_10_BITS     = (0x01ul << 23),
+    VSF_I2C_CMD_BITS_MASK   = VSF_I2C_CMD_7_BITS |
+                              VSF_I2C_CMD_10_BITS,
 
-    __I2C_CMD_HW_MASK   = I2C_CMD_RW_MASK | I2C_CMD_START | I2C_CMD_RESTART,
+    __I2C_CMD_HW_MASK       = VSF_I2C_CMD_RW_MASK | VSF_I2C_CMD_START | VSF_I2C_CMD_RESTART,
 
-    I2C_CMD_STOP        = (0x01ul << 22),
+    VSF_I2C_CMD_STOP        = (0x01ul << 22),
 
-    I2C_CMD_ALL_MASK    = __I2C_CMD_HW_MASK | I2C_CMD_STOP,
+    VSF_I2C_CMD_ALL_MASK    = __I2C_CMD_HW_MASK | VSF_I2C_CMD_STOP,
 } vsf_i2c_cmd_t;
 
 /*============================ INCLUDES ======================================*/

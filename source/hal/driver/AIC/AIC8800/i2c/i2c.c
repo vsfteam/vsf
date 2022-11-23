@@ -88,9 +88,9 @@ static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
 
     vsf_i2c_irq_mask_t irq_mask;
     if (0 != hw_i2c_const->reg->LR) {
-        irq_mask = I2C_IRQ_MASK_MASTER_NACK_DETECT;
+        irq_mask = VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT;
     } else {
-        irq_mask = I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+        irq_mask = VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
     }
 
     hw_i2c_const->reg->SR &= ~SR_INT_BIT;
@@ -163,7 +163,7 @@ fsm_rt_t vsf_hw_i2c_disable(vsf_hw_i2c_t *hw_i2c_ptr)
 void vsf_hw_i2c_irq_enable(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
-    VSF_HAL_ASSERT((irq_mask & ~I2C_IRQ_MASK_MASTER_ALL) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~VSF_I2C_IRQ_MASK_MASTER_ALL) == 0);
 
     hw_i2c_ptr->irq_mask |= irq_mask;
 }
@@ -173,7 +173,7 @@ void vsf_hw_i2c_irq_disable(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_irq_mask_t irq_mas
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
     VSF_HAL_ASSERT(NULL != hw_i2c_const);
-    VSF_HAL_ASSERT((irq_mask & ~I2C_IRQ_MASK_MASTER_ALL) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~VSF_I2C_IRQ_MASK_MASTER_ALL) == 0);
 
     hw_i2c_ptr->irq_mask &= ~irq_mask;
     if (hw_i2c_ptr->irq_mask == 0) {
@@ -212,9 +212,9 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
     // only support:
     //  1. start + stop
     //  2. start + restart
-    bool is_start = (cmd & I2C_CMD_START) == I2C_CMD_START;
-    bool is_stop = (cmd & I2C_CMD_STOP) == I2C_CMD_STOP;
-    bool is_restart = (cmd & I2C_CMD_RESTART) == I2C_CMD_RESTART;
+    bool is_start = (cmd & VSF_I2C_CMD_START) == VSF_I2C_CMD_START;
+    bool is_stop = (cmd & VSF_I2C_CMD_STOP) == VSF_I2C_CMD_STOP;
+    bool is_restart = (cmd & VSF_I2C_CMD_RESTART) == VSF_I2C_CMD_RESTART;
     if (!is_start) {
         VSF_ASSERT(0);
         return VSF_ERR_NOT_SUPPORT;
@@ -231,7 +231,7 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
                        | CR_DE_TH_FILED(0x1) | CR_DF_TH_FILED(0x1)
                        | (cmd & __I2C_CMD_HW_MASK);
 
-    if ((cmd & I2C_CMD_RW_MASK) == I2C_CMD_WRITE) {
+    if ((cmd & VSF_I2C_CMD_RW_MASK) == VSF_I2C_CMD_WRITE) {
         hw_i2c_ptr->rec.buffer = NULL;
         hw_i2c_ptr->rec.count = 0;
         for (int i = 0; i < count; i++) {
