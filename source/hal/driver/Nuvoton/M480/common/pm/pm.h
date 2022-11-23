@@ -77,17 +77,17 @@ typedef enum vsf_pm_power_cfg_msk_t {
 
 //! the lowpower mode
 typedef enum vsf_pm_sleep_mode_t{
-    PM_NPD              = 0,
-    PM_LLPD             = 1,
-    PM_FWPD             = 2,
-    PM_SPD0             = 4,
-    PM_SPD1             = 5,
-    PM_DPD              = 6,
+    VSF_PM_NPD              = 0,
+    VSF_PM_LLPD             = 1,
+    VSF_PM_FWPD             = 2,
+    VSF_PM_SPD0             = 4,
+    VSF_PM_SPD1             = 5,
+    VSF_PM_DPD              = 6,
 
-    PM_WAIT             = PM_NPD,
-    PM_SLEEP            = PM_NPD,
-    PM_DEEP_SLEEP       = PM_DPD,
-    PM_POWER_OFF        = PM_DPD,
+    VSF_PM_WAIT             = VSF_PM_NPD,
+    VSF_PM_SLEEP            = VSF_PM_NPD,
+    VSF_PM_DEEP_SLEEP       = VSF_PM_DPD,
+    VSF_PM_POWER_OFF        = VSF_PM_DPD,
 } vsf_pm_sleep_mode_t;
 
 typedef enum pm_periph_clksrc_t {
@@ -252,7 +252,7 @@ typedef enum vsf_pm_pclk_no_t{
 } vsf_pm_pclk_no_t;
 
 typedef enum vsf_pm_mclk_no_t {
-    MCLK_CORE_IDX = 0,
+    VSF_MCLK_CORE_IDX = 0,
 } vsf_pm_mclk_no_t;
 //! Peripheral AHB Clock Macros
 typedef enum vsf_pm_sclk_no_t {
@@ -543,7 +543,7 @@ typedef enum vsf_pm_clk_src_sel_t {
 } vsf_pm_clk_src_sel_t;
 
 typedef enum vsf_pm_pll_sel_t {
-    PLL0_IDX,
+    VSF_PLL0_IDX,
 } vsf_pm_pll_sel_t;
 
 typedef struct io_wakeup_cfg_t {

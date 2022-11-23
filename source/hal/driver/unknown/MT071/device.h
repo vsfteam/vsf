@@ -116,12 +116,12 @@ enum vsf_pm_power_cfg_msk_t {
 //! \name the lowpower mode
 //! @{
 enum vsf_pm_sleep_mode_t {
-    PM_SLEEP        = 1 << 8,
-    PM_DPD          = 1 << 1,
+    VSF_PM_SLEEP        = 1 << 8,
+    VSF_PM_DPD          = 1 << 1,
 
-    PM_WAIT         = PM_SLEEP,
-    PM_DEEP_SLEEP   = PM_DPD,
-    PM_POWER_OFF    = PM_DPD,
+    VSF_PM_WAIT         = VSF_PM_SLEEP,
+    VSF_PM_DEEP_SLEEP   = VSF_PM_DPD,
+    VSF_PM_POWER_OFF    = VSF_PM_DPD,
 } ;
 //! @}
 

@@ -38,7 +38,7 @@ extern "C" {
 #   endif
 #endif
 
-#define __PM_DIV_(_N, _D)     _D ## DIV_ ## _N = (_N),
+#define __PM_DIV_(_N, _D)     VSF ## _D ## DIV_ ## _N = (_N),
 
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PLL
 #   define VSF_HAL_DRV_PM_CFG_SUPPORT_PLL           ENABLED
@@ -198,13 +198,13 @@ extern "C" {
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER == DISABLED
 typedef enum vsf_pm_power_cfg_no_t{
-    POWER_IRC_IDX    = 1,
+    VSF_POWER_IRC_IDX    = 1,
 } vsf_pm_power_cfg_no_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER_MASK == DISABLED
 typedef enum vsf_pm_power_cfg_msk_t {
-    POWER_IRC_MSK    = 1UL << 0,
+    VSF_POWER_IRC_MSK    = 1UL << 0,
 } vsf_pm_power_cfg_msk_t;
 #endif
 
@@ -216,10 +216,10 @@ typedef uint_fast32_t vsf_pm_power_status_t;
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_SLEEP_MODE == DISABLED
 typedef enum vsf_pm_sleep_mode_t {
-    PM_WAIT       = 0,
-    PM_SLEEP      = 1,
-    PM_DEEP_SLEEP = 2,
-    PM_POWER_OFF  = 3,
+    VSF_PM_WAIT       = 0,
+    VSF_PM_SLEEP      = 1,
+    VSF_PM_DEEP_SLEEP = 2,
+    VSF_PM_POWER_OFF  = 3,
 } vsf_pm_sleep_mode_t;
 #endif
 
@@ -236,19 +236,19 @@ typedef struct vsf_pm_sleep_cfg_t {
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER == DISABLED
 typedef enum vsf_pm_sclk_no_t {
-    SCLK_CORE_IDX   = 0,
-    SCLK_ROM0_IDX   = 1,
-    SCLK_PM0_IDX    = 2,
-    SCLK_SRAM0_IDX  = 3,
+    VSF_SCLK_CORE_IDX   = 0,
+    VSF_SCLK_ROM0_IDX   = 1,
+    VSF_SCLK_PM0_IDX    = 2,
+    VSF_SCLK_SRAM0_IDX  = 3,
 } vsf_pm_sclk_no_t;
 #endif
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER_MASK == DISABLED
 typedef enum vsf_pm_sclk_msk_t {
-    SCLK_CORE_MSK    = 0x1ul << SCLK_CORE_IDX,
-    SCLK_ROM0_MSK    = 0x1ul << SCLK_ROM0_IDX,
-    SCLK_PM0_MSK     = 0x1ul << SCLK_ROM0_IDX,
-    SCLK_SRAM0_MSK   = 0x1ul << SCLK_SRAM0_IDX,
+    VSF_SCLK_CORE_MSK    = 0x1ul << VSF_SCLK_CORE_IDX,
+    VSF_SCLK_ROM0_MSK    = 0x1ul << VSF_SCLK_ROM0_IDX,
+    VSF_SCLK_PM0_MSK     = 0x1ul << VSF_SCLK_ROM0_IDX,
+    VSF_SCLK_SRAM0_MSK   = 0x1ul << VSF_SCLK_SRAM0_IDX,
 } vsf_pm_sclk_msk_t;
 #endif
 
@@ -260,28 +260,28 @@ typedef uint_fast32_t vsf_pm_sclk_status_t;
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_SEL == DISABLED
 typedef enum vsf_pm_clk_src_sel_t {
-    AUTO_CLKSRC_IRC                 = 0x0,      //!< source clk is IRC
-    AUTO_CLKSRC_SYSOSC0             = 0x1,      //!< source clk is System oscilator
-    AUTO_CLKSRC_SYSOSC1             = 0x2,      //!< source clock is WDTOSC
-    AUTO_CLKSRC_EXTCLK0             = 0x3,      //!< Source clk is extern clock0
-    AUTO_CLKSRC_EXTCLK1             = 0x4,      //!< source clk is extern clock1
+    VSF_AUTO_CLKSRC_IRC                 = 0x0,      //!< source clk is IRC
+    VSF_AUTO_CLKSRC_SYSOSC0             = 0x1,      //!< source clk is System oscilator
+    VSF_AUTO_CLKSRC_SYSOSC1             = 0x2,      //!< source clock is WDTOSC
+    VSF_AUTO_CLKSRC_EXTCLK0             = 0x3,      //!< Source clk is extern clock0
+    VSF_AUTO_CLKSRC_EXTCLK1             = 0x4,      //!< source clk is extern clock1
 
 
-    PLL_CLKSRC_IRC                  = 0x0,      //!< pll source clk is IRC
-    PLL_CLKSRC_SYSOSC0              = 0x1,      //!< pll source clk is System oscilator
-    PLL_CLKSRC_SYSOSC1              = 0x2,      //!< pll source clk is CLKIN
-    PLL_CLKSRC_EXTCLK0              = 0x3,      //!< pll source clk is extern clock0
-    PLL_CLKSRC_EXTCLK1              = 0x4,      //!< pll source clk is extern clock1
+    VSF_PLL_CLKSRC_IRC                  = 0x0,      //!< pll source clk is IRC
+    VSF_PLL_CLKSRC_SYSOSC0              = 0x1,      //!< pll source clk is System oscilator
+    VSF_PLL_CLKSRC_SYSOSC1              = 0x2,      //!< pll source clk is CLKIN
+    VSF_PLL_CLKSRC_EXTCLK0              = 0x3,      //!< pll source clk is extern clock0
+    VSF_PLL_CLKSRC_EXTCLK1              = 0x4,      //!< pll source clk is extern clock1
 
-    MAIN_CLKSRC_IRC                 = 0x0,      //!< Maniclk source is IRC
-    MAIN_CLKSRC_PLLIN               = 0x1,      //!< Maniclk source is System OSC0
-    MAIN_CLKSRC_LPOSC               = 0x2,      //!< Maniclk source is LPOSC
-    MAIN_CLKSRC_PLLOUT              = 0x3,      //!< Maniclk source is PLLOUT
+    VSF_MAIN_CLKSRC_IRC                 = 0x0,      //!< Maniclk source is IRC
+    VSF_MAIN_CLKSRC_PLLIN               = 0x1,      //!< Maniclk source is System OSC0
+    VSF_MAIN_CLKSRC_LPOSC               = 0x2,      //!< Maniclk source is LPOSC
+    VSF_MAIN_CLKSRC_PLLOUT              = 0x3,      //!< Maniclk source is PLLOUT
 
-    CLKOUT_CLKSRC_IRC               = 0x0,      //!< Clockout source is IRC
-    CLKOUT_CLKSRC_SYSOSC0           = 0x1,      //!< Clockout source is System Oscillator 0
-    CLKOUT_CLKSRC_LPOSC             = 0x2,      //!< Clockout source is LPOSC
-    CLKOUT_CLKSRC_MCLK              = 0x3,      //!< Clockout source is PLLOUT
+    VSF_CLKOUT_CLKSRC_IRC               = 0x0,      //!< Clockout source is IRC
+    VSF_CLKOUT_CLKSRC_SYSOSC0           = 0x1,      //!< Clockout source is System Oscillator 0
+    VSF_CLKOUT_CLKSRC_LPOSC             = 0x2,      //!< Clockout source is LPOSC
+    VSF_CLKOUT_CLKSRC_MCLK              = 0x3,      //!< Clockout source is PLLOUT
 } vsf_pm_clk_src_sel_t;
 #endif
 
@@ -348,17 +348,17 @@ typedef struct vsf_pm_mclk_cfg_t {
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_NO == DISABLED
 typedef enum vsf_pm_mclk_no_t {
-    MCLK_CORE_IDX = 0,
-    MCLK_CORE0_IDX = 0,
+    VSF_MCLK_CORE_IDX = 0,
+    VSF_MCLK_CORE0_IDX = 0,
 
-    MCLK_AXI0_IDX,
-    MCLK_AXI1_IDX,
+    VSF_MCLK_AXI0_IDX,
+    VSF_MCLK_AXI1_IDX,
 
-    MCLK_AHB0_IDX,
-    MCLK_AHB1_IDX,
+    VSF_MCLK_AHB0_IDX,
+    VSF_MCLK_AHB1_IDX,
 
-    MCLK_APB0_IDX,
-    MCLK_APB1_IDX,
+    VSF_MCLK_APB0_IDX,
+    VSF_MCLK_APB1_IDX,
 } vsf_pm_mclk_no_t;
 #endif
 
@@ -368,8 +368,8 @@ typedef enum vsf_pm_mclk_no_t {
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_SEL == DISABLED
 typedef enum vsf_pm_pll_sel_t {
-    PLL0_IDX,
-    PLL1_IDX,
+    VSF_PLL0_IDX,
+    VSF_PLL1_IDX,
 } vsf_pm_pll_sel_t;
 #endif
 
@@ -384,10 +384,10 @@ typedef struct vsf_pm_pll_cfg_t {
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_POST_DIV == DISABLED
 typedef enum vsf_pm_pll_post_div_t {
-    PLL_POST_DIV_1                  = 0x00,     //!< pll post divider rate is 1
-    PLL_POST_DIV_2                  = 0x01,     //!< pll post divider rate is 2
-    PLL_POST_DIV_4                  = 0x02,     //!< pll post divider rate is 4
-    PLL_POST_DIV_8                  = 0x03,     //!< pll post divider rate is 8
+    VSF_PLL_POST_DIV_1                  = 0x00,     //!< pll post divider rate is 1
+    VSF_PLL_POST_DIV_2                  = 0x01,     //!< pll post divider rate is 2
+    VSF_PLL_POST_DIV_4                  = 0x02,     //!< pll post divider rate is 4
+    VSF_PLL_POST_DIV_8                  = 0x03,     //!< pll post divider rate is 8
 } vsf_pm_pll_post_div_t;
 #endif
 
@@ -399,8 +399,8 @@ typedef struct vsf_lposc_cfg_t vsf_lposc_cfg_t;
 
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_LPOSC_SEL == DISABLED
 typedef enum vsf_pm_lposc_sel_t {
-    LPOSC_ALWAYS_ON,
-    LPOSC_32K_OSC
+    VSF_LPOSC_ALWAYS_ON,
+    VSF_LPOSC_32K_OSC
 } vsf_pm_lposc_sel_t;
 #endif
 
