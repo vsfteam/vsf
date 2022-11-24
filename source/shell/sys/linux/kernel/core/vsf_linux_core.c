@@ -867,7 +867,7 @@ void timer_setup(struct timer_list *timer, void (*func)(struct timer_list *), un
 #   define __VSF_LINUX_CFG_SKB_POOL ENABLED
 
 typedef struct vsf_ieee80211_skb_t {
-    struct skbuff skb;
+    struct sk_buff skb;
     uint8_t buffer[VSF_LINUX_CFG_SKB_SIZE];
 } vsf_ieee80211_skb_t;
 dcl_vsf_pool(vsf_ieee80211_skb_pool)
@@ -886,8 +886,12 @@ struct sk_buff * alloc_skb(unsigned int size, gfp_t flags)
     u8 *data;
 #if __VSF_LINUX_CFG_SKB_POOL == ENABLED
     vsf_protect_t orig = vsf_protect_int();
-        skb = VSF_POOL_ALLOC(vsf_ieee80211_skb_pool, &__vsf_ieee80211_skb_pool);
+        vsf_ieee80211_skb_t *ieee80211_skb = VSF_POOL_ALLOC(vsf_ieee80211_skb_pool, &__vsf_ieee80211_skb_pool);
     vsf_unprotect_int(orig);
+    if (NULL == ieee80211_skb) {
+        return NULL;
+    }
+    skb = &ieee80211_skb->skb;
     data = (u8 *)&skb[1];
 #else
     skb = kmalloc(sizeof(*skb), 0);
@@ -920,8 +924,9 @@ void kfree_skb(struct sk_buff *skb)
 {
     if (skb_unref(skb)) {
 #if __VSF_LINUX_CFG_SKB_POOL == ENABLED
+        vsf_ieee80211_skb_t *ieee80211_skb = container_of(skb, vsf_ieee80211_skb_t, skb);
         vsf_protect_t orig = vsf_protect_int();
-            VSF_POOL_FREE(vsf_ieee80211_skb_pool, &__vsf_ieee80211_skb_pool, skb);
+            VSF_POOL_FREE(vsf_ieee80211_skb_pool, &__vsf_ieee80211_skb_pool, ieee80211_skb);
         vsf_unprotect_int(orig);
 #else
         if (skb->head) {
@@ -930,11 +935,6 @@ void kfree_skb(struct sk_buff *skb)
         kfree(skb);
 #endif
     }
-}
-
-void consume_skb(struct sk_buff *skb)
-{
-    kfree_skb(skb);
 }
 
 void skb_init(void)

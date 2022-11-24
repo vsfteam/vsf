@@ -297,6 +297,12 @@ static inline struct sk_buff *skb_dequeue_tail(struct sk_buff_head *list)
     return skb;
 }
 
+extern void kfree_skb(struct sk_buff *skb);
+static inline void consume_skb(struct sk_buff *skb)
+{
+    kfree_skb(skb);
+}
+
 #define dev_kfree_skb(__skb)        consume_skb(__skb)
 #define dev_kfree_skb_any(__skb)    dev_kfree_skb(__skb)
 #define dev_consume_skb_any(__skb)  consume_skb(__skb)
