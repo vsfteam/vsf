@@ -163,6 +163,13 @@ static inline void skb_trim(struct sk_buff *skb, unsigned int len)
     }
 }
 
+static inline void skb_queue_head_init(struct sk_buff_head *list)
+{
+    spin_lock_init(&list->lock);
+    list->prev = list->next = (struct sk_buff *)list;
+    list->qlen = 0;
+}
+
 static inline int skb_queue_empty(const struct sk_buff_head *list)
 {
     return list->next == (const struct sk_buff *)list;
