@@ -310,7 +310,7 @@ extern void                 vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr, uin
 
 static inline uint8_t vsf_spi_get_data_bytes_from_mode(vsf_spi_mode_t mode)
 {
-    uint8_t bits = (mode & VSF_SPI_DATASIZE_MASK);
+    int bits = (mode & VSF_SPI_DATASIZE_MASK);
     if (bits <= VSF_SPI_DATASIZE_8) {
         return 1;
     } else if (bits <= VSF_SPI_DATASIZE_16) {
