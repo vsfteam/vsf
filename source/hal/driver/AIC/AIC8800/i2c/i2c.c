@@ -34,6 +34,14 @@
 #   define VSF_HW_I2C_CFG_MULTI_CLASS           VSF_I2C_CFG_MULTI_CLASS
 #endif
 
+#ifndef VSF_HW_I2C_REQEUST_BUFFER_SIZE
+#   define VSF_HW_I2C_REQEUST_BUFFER_SIZE       3
+#endif
+
+#ifndef VSF_HW_I2C_REQUEST_MAX_SIZE
+#   define VSF_HW_I2C_REQUEST_MAX_SIZE          16
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -56,12 +64,20 @@ typedef struct vsf_hw_i2c_t {
 
     vsf_i2c_cfg_t       cfg;
     vsf_i2c_irq_mask_t  irq_mask;
-    uint8_t             is_enabled :1;
 
     struct {
+        vsf_i2c_cmd_t cmd;
+        uint16_t address;
+        uint8_t buffer[VSF_HW_I2C_REQEUST_BUFFER_SIZE];
+        uint8_t count;
+    } write_request;
+
+    struct {
+        vsf_i2c_cmd_t cmd;
+        uint8_t *buffer_ptr;
         uint16_t count;
-        uint8_t *buffer;
-    } rec;
+        uint8_t is_pending;
+    } read_request;
 
 } vsf_hw_i2c_t;
 
@@ -69,7 +85,25 @@ typedef struct vsf_hw_i2c_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+static void __i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
+                                 uint16_t address,
+                                 vsf_i2c_cmd_t cmd,
+                                 uint16_t count,
+                                 uint8_t *buffer);
+
 /*============================ IMPLEMENTATION ================================*/
+
+static void __vsf_hw_i2c_irq_handler_cb(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
+
+    vsf_i2c_irq_mask_t real_irq_mask = irq_mask & hw_i2c_ptr->irq_mask;
+    vsf_i2c_isr_t *isr_ptr = &hw_i2c_ptr->cfg.isr;
+    if ((real_irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)hw_i2c_ptr, real_irq_mask);
+    }
+}
 
 static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
 {
@@ -77,12 +111,12 @@ static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
     const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
     VSF_HAL_ASSERT(NULL != hw_i2c_const);
 
-    uint16_t count = hw_i2c_ptr->rec.count;
-    if (count > 0) {
-        uint8_t *buffer = hw_i2c_ptr->rec.buffer;
-        VSF_HAL_ASSERT(NULL != buffer);
+    uint16_t count = hw_i2c_ptr->read_request.count;
+    if (!hw_i2c_ptr->read_request.is_pending && count > 0) {
+        uint8_t *buffer_ptr = hw_i2c_ptr->read_request.buffer_ptr;
+        VSF_HAL_ASSERT(NULL != buffer_ptr);
         for (int i = 0; i < count; i++) {
-            buffer[i] = (hw_i2c_const->reg->IR & 0xff);
+            buffer_ptr[i] = (hw_i2c_const->reg->IR & 0xff);
         }
     }
 
@@ -97,12 +131,18 @@ static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
     hw_i2c_const->reg->CR = 0;
     hw_i2c_const->reg->RR = RR_RST_BIT;
 
-    irq_mask &= hw_i2c_ptr->irq_mask;
-    if (irq_mask && (NULL != hw_i2c_ptr->cfg.isr.handler_fn)) {
-        hw_i2c_ptr->cfg.isr.handler_fn(hw_i2c_ptr->cfg.isr.target_ptr,
-                                       (vsf_i2c_t *)hw_i2c_ptr,
-                                       irq_mask);
+    if (hw_i2c_ptr->read_request.is_pending) {
+        hw_i2c_ptr->read_request.is_pending = false;
+        if (irq_mask == VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
+            __i2c_master_request(hw_i2c_ptr, hw_i2c_ptr->write_request.address,
+                                             hw_i2c_ptr->read_request.cmd,
+                                             hw_i2c_ptr->read_request.count,
+                                             hw_i2c_ptr->read_request.buffer_ptr);
+            return ;
+        }
     }
+
+    __vsf_hw_i2c_irq_handler_cb(hw_i2c_ptr, irq_mask);
 }
 
 vsf_err_t vsf_hw_i2c_init(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
@@ -111,7 +151,6 @@ vsf_err_t vsf_hw_i2c_init(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(NULL != cfg_ptr);
     const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
     VSF_HAL_ASSERT(NULL != hw_i2c_const);
-
 
     hw_i2c_ptr->cfg = *cfg_ptr;
 
@@ -128,7 +167,6 @@ vsf_err_t vsf_hw_i2c_init(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
     hw_i2c_const->reg->SCR   = 0x200;
 
     hw_i2c_ptr->isr = cfg_ptr->isr;
-    // always enable interrupt to support more than 16 bytes request
     NVIC_SetPriority(hw_i2c_const->irqn, (uint32_t)hw_i2c_ptr->isr.prio);
     NVIC_EnableIRQ(hw_i2c_const->irqn);
 
@@ -146,16 +184,12 @@ fsm_rt_t vsf_hw_i2c_enable(vsf_hw_i2c_t *hw_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
 
-    hw_i2c_ptr->is_enabled = true;
-
     return fsm_rt_cpl;
 }
 
 fsm_rt_t vsf_hw_i2c_disable(vsf_hw_i2c_t *hw_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
-
-    hw_i2c_ptr->is_enabled = false;
 
     return fsm_rt_cpl;
 }
@@ -184,12 +218,46 @@ void vsf_hw_i2c_irq_disable(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_irq_mask_t irq_mas
 vsf_i2c_status_t vsf_hw_i2c_status(vsf_hw_i2c_t *hw_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
+    const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
+
+    bool is_busy = (hw_i2c_ptr->write_request.count != 0) ||
+                   (hw_i2c_ptr->read_request.is_pending)  ||
+                   (hw_i2c_const->reg->SR & SR_BUSY_BIT);
 
     vsf_i2c_status_t status = {
-        .use_as__peripheral_status_t.is_busy = false,
+        .use_as__peripheral_status_t.is_busy = is_busy,
     };
 
     return status;
+}
+
+static void __i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
+                                 uint16_t address,
+                                 vsf_i2c_cmd_t cmd,
+                                 uint16_t count,
+                                 uint8_t *buffer)
+{
+    const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
+
+    hw_i2c_const->reg->SR &= ~(0x01UL << 1);
+    hw_i2c_const->reg->SAR = SAR_SLAVE_ADDR_FILED(address);
+
+    uint32_t cr_value =  CR_INT_ENABLE_BIT | CR_OMO_ENABLE_BIT | CR_ENABLE_BIT
+                       | CR_DE_TH_FILED(0x1) | CR_DF_TH_FILED(0x1)
+                       | (cmd & __I2C_CMD_HW_MASK);
+
+    if ((cmd & VSF_I2C_CMD_RW_MASK) == VSF_I2C_CMD_WRITE) {
+        for (int i = 0; i < hw_i2c_ptr->write_request.count; i++) {
+            hw_i2c_const->reg->OR = hw_i2c_ptr->write_request.buffer[i];
+        }
+        for (int i = 0; i < count; i++) {
+            hw_i2c_const->reg->OR = buffer[i];
+        }
+        count += hw_i2c_ptr->write_request.count;
+        hw_i2c_ptr->write_request.count = 0;
+    }
+    hw_i2c_const->reg->LR = count;
+    hw_i2c_const->reg->CR = cr_value;
 }
 
 vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
@@ -203,48 +271,70 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
     VSF_HAL_ASSERT(NULL != hw_i2c_const);
     VSF_HAL_ASSERT(0 != count);
 
-    VSF_HAL_ASSERT(hw_i2c_ptr->is_enabled);
-    if ((count == 0) || (count > 16)) {         // aic8800 hardware does not support
-        VSF_ASSERT(0);
+    if (count > VSF_HW_I2C_REQUEST_MAX_SIZE) {
+        // aic8800 hardware does not support
         return VSF_ERR_NOT_SUPPORT;
     }
 
-    // only support:
+    // hardware only support:
     //  1. start + stop
     //  2. start + restart
-    bool is_start = (cmd & VSF_I2C_CMD_START) == VSF_I2C_CMD_START;
-    bool is_stop = (cmd & VSF_I2C_CMD_STOP) == VSF_I2C_CMD_STOP;
-    bool is_restart = (cmd & VSF_I2C_CMD_RESTART) == VSF_I2C_CMD_RESTART;
-    if (!is_start) {
-        VSF_ASSERT(0);
-        return VSF_ERR_NOT_SUPPORT;
-    }
-    if (!is_stop && !is_restart) {
-        VSF_ASSERT(0);
-        return VSF_ERR_NOT_SUPPORT;
-    }
+    bool is_start = cmd & VSF_I2C_CMD_START;
+    bool is_stop = cmd & VSF_I2C_CMD_STOP;
+    bool is_restart = cmd & VSF_I2C_CMD_RESTART;
+    bool is_read = (cmd & VSF_I2C_CMD_RW_MASK) == VSF_I2C_CMD_READ;
 
-    hw_i2c_const->reg->SR &= ~(0x01UL << 1);
-    hw_i2c_const->reg->SAR = SAR_SLAVE_ADDR_FILED(address);
-
-    uint32_t cr_value =  CR_INT_ENABLE_BIT | CR_OMO_ENABLE_BIT | CR_ENABLE_BIT
-                       | CR_DE_TH_FILED(0x1) | CR_DF_TH_FILED(0x1)
-                       | (cmd & __I2C_CMD_HW_MASK);
-
-    if ((cmd & VSF_I2C_CMD_RW_MASK) == VSF_I2C_CMD_WRITE) {
-        hw_i2c_ptr->rec.buffer = NULL;
-        hw_i2c_ptr->rec.count = 0;
-        for (int i = 0; i < count; i++) {
-            hw_i2c_const->reg->OR = buffer[i];
+    if (hw_i2c_ptr->write_request.count == 0) {           // no unfinished request
+        if (!is_start) {
+            return VSF_ERR_NOT_SUPPORT;
         }
-    } else {
-        hw_i2c_ptr->rec.buffer = buffer;
-        hw_i2c_ptr->rec.count = count;
-    }
-    hw_i2c_const->reg->LR = count;
-    hw_i2c_const->reg->CR = cr_value;
 
-    return VSF_ERR_NONE;
+        if (is_stop || is_restart) {
+            __i2c_master_request(hw_i2c_ptr, address, cmd, count, buffer);
+            return VSF_ERR_NONE;
+        }
+
+        if (is_read) {
+            return VSF_ERR_NOT_SUPPORT;
+        }
+
+        if (count > dimof(hw_i2c_ptr->write_request.buffer)) {
+            return VSF_ERR_NOT_SUPPORT;
+        }
+
+        memcpy(hw_i2c_ptr->write_request.buffer, buffer, count);
+        hw_i2c_ptr->write_request.cmd = cmd;
+        hw_i2c_ptr->write_request.count = count;
+        hw_i2c_ptr->write_request.address = address;
+
+        __vsf_hw_i2c_irq_handler_cb(hw_i2c_ptr, VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE);
+
+        return VSF_ERR_NONE;
+    } else {                                    // last request is pending
+        if (!is_stop && !is_restart) {
+            return VSF_ERR_NOT_SUPPORT;
+        }
+
+        if (is_read) {                          // write then read
+            VSF_HAL_ASSERT(hw_i2c_ptr->write_request.address == address);
+            VSF_HAL_ASSERT(!hw_i2c_ptr->read_request.is_pending);
+
+            hw_i2c_ptr->read_request.is_pending = true;
+            hw_i2c_ptr->read_request.cmd = cmd;
+            hw_i2c_ptr->read_request.count = count;
+            hw_i2c_ptr->read_request.buffer_ptr = buffer;
+            __i2c_master_request(hw_i2c_ptr, address, hw_i2c_ptr->write_request.cmd | VSF_I2C_CMD_RESTART, 0, NULL);
+            return VSF_ERR_NONE;
+        } else {                                // write then write
+            if (hw_i2c_ptr->write_request.count + count > VSF_HW_I2C_REQUEST_MAX_SIZE) {
+                hw_i2c_ptr->write_request.count = 0;
+                return VSF_ERR_NOT_SUPPORT;
+            }
+
+            __i2c_master_request(hw_i2c_ptr, address, cmd | VSF_I2C_CMD_START, count, buffer);
+            return VSF_ERR_NONE;
+        }
+    }
 }
 
 
