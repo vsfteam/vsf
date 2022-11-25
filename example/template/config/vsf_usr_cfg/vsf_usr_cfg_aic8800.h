@@ -107,6 +107,7 @@
 #   define APP_USE_HAL_FLASH_DEMO                       ENABLED
 #   define APP_USE_HAL_GPIO_DEMO                        ENABLED
 #   define APP_USE_HAL_I2C_DEMO                         ENABLED
+#       define APP_I2C_DEMO_CFG_EEPROM_BUFFER_SIZE      14        // max size: 16 - 2
 #   define APP_USE_HAL_PWM_DEMO                         ENABLED
 #   define APP_USE_HAL_RTC_DEMO                         ENABLED
 #   define APP_USE_HAL_SPI_DEMO                         ENABLED
