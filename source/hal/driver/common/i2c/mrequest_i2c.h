@@ -81,7 +81,7 @@
 /*============================ INCLUDES ======================================*/
 /*============================ TYPES =========================================*/
 
-vsf_class(vsf_mrequest_i2c_t) {    
+vsf_class(vsf_mrequest_i2c_t) {
     public_member(
 #if VSF_HAL_MRQUEST_I2C_CFG_MULTI_CLASS == ENABLED
         vsf_i2c_t vsf_i2c;
@@ -93,12 +93,12 @@ vsf_class(vsf_mrequest_i2c_t) {
         vsf_i2c_cfg_t cfg;
         vsf_i2c_irq_mask_t irq_mask;
         uint8_t buffer[VSF_HAL_USE_MREQUEST_I2C_REQEUST_BUFFER_SIZE];
-    
+
         struct {
             vsf_i2c_cmd_t cmd;
             uint8_t *buffer_ptr;
             uint16_t address;
-            uint8_t count;
+            uint16_t count;
         } request;
     )
 };
