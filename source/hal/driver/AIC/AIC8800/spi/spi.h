@@ -90,7 +90,7 @@ typedef enum vsf_spi_mode_t {
                                            VSF_SPI_CLOCK_MODE_MASK |
                                            VSF_SPI_BIT_ORDER_MASK |
                                            VSF_SPI_AUTO_CS_MASK,
-    VSF_SPI_IRQ_MASK_ALL_BITS            = __SPI_HW_MODE_MASK | VSF_SPI_DATASIZE_MASK,
+    VSF_SPI_IRQ_ALL_BITS_MASK            = __SPI_HW_MODE_MASK | VSF_SPI_DATASIZE_MASK,
 } vsf_spi_mode_t;
 
 /*============================ INCLUDES ======================================*/
