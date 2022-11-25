@@ -57,7 +57,7 @@
 #endif
 
 #ifndef APP_I2C_DEMO_CFG_EEPROM_BUFFER_SIZE
-#   define APP_I2C_DEMO_CFG_EEPROM_BUFFER_SIZE          40
+#   define APP_I2C_DEMO_CFG_EEPROM_BUFFER_SIZE          12
 #endif
 
 #ifndef APP_I2C_DEMO_CFG_EEPROM_DELAY_MS
@@ -93,9 +93,12 @@ typedef enum i2c_demo_evt_t {
     VSF_EVT_EEPROM_WRTIE_DATA_CPL       = VSF_EVT_USER + 1,
     VSF_EVT_EEPROM_READ_DATA            = VSF_EVT_USER + 2,
     VSF_EVT_EEPROM_READ_DATA_CPL        = VSF_EVT_USER + 3,
+    VSF_EVT_EEPROM_NAK                  = VSF_EVT_USER + 4,
 } i2c_demo_evt_t;
 
 typedef struct app_i2c_demo_t {
+    uint16_t address;
+
 #if APP_I2C_DEMO_CFG_SEARCH_DEVICE_DEMO == ENABLED
     uint16_t start_address;
     uint16_t end_address;
@@ -227,14 +230,16 @@ static void __eeprom_irq_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_i
 
     if (irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
         vsf_eda_post_evt(&i2c_demo_ptr->teda.use_as__vsf_eda_t, i2c_demo_ptr->next_evt);
+    } else {
+        vsf_eda_post_evt(&i2c_demo_ptr->teda.use_as__vsf_eda_t, VSF_EVT_EEPROM_NAK);
     }
 }
 
+    vsf_err_t result;
 static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vsf_i2c_t * i2c_ptr = APP_I2C_DEMO_CFG_I2C;
-    uint16_t device_address = APP_I2C_DEMO_CFG_EEPROM_DEVICE_ADDRESS;
-    vsf_err_t result;
+    uint16_t device_address = __app_i2c_demo.address;
 
     switch (evt) {
     case VSF_EVT_INIT: {
@@ -277,19 +282,23 @@ static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     case VSF_EVT_EEPROM_READ_DATA:
         __app_i2c_demo.next_evt = VSF_EVT_EEPROM_READ_DATA_CPL;
-        result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_READ | VSF_I2C_CMD_START | VSF_I2C_CMD_STOP, dimof(__app_i2c_demo.recv_buffer), __app_i2c_demo.recv_buffer);
+        result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_START | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP, dimof(__app_i2c_demo.recv_buffer), __app_i2c_demo.recv_buffer);
         VSF_ASSERT(result == VSF_ERR_NONE);
         break;
 
     case VSF_EVT_EEPROM_READ_DATA_CPL:
         if(memcmp(__app_i2c_demo.send_buffer, __app_i2c_demo.recv_buffer, dimof(__app_i2c_demo.recv_buffer)) != 0) {
-            vsf_trace_debug("read data error ...\r\n");
+            vsf_trace_debug("read data error\r\n");
             for(int i = 0; i < dimof(__app_i2c_demo.recv_buffer); i++) {
                 vsf_trace_debug("send/recv[%d]:0x%02x/0x%02x\r\n", i, __app_i2c_demo.send_buffer[i], __app_i2c_demo.recv_buffer[i]);
             }
         } else {
-            vsf_trace_debug("read data completed ...\r\n");
+            vsf_trace_debug("read data completed\r\n");
         }
+        break;
+
+    case VSF_EVT_EEPROM_NAK:
+        vsf_trace_debug("eeprom read or write nak\r\n");
         break;
     }
 }
@@ -299,6 +308,11 @@ static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #if APP_USE_LINUX_DEMO == ENABLED
 int i2c_main(int argc, char *argv[])
 {
+    if (argc >= 2) {
+        __app_i2c_demo.address = atoi(argv[1]);
+    } else {
+        __app_i2c_demo.address = APP_I2C_DEMO_CFG_EEPROM_DEVICE_ADDRESS;
+    }
 #else
 int VSF_USER_ENTRY(void)
 {
