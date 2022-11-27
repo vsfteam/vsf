@@ -23,6 +23,8 @@
 #ifndef __VSF_FS_CFG_H__
 #define __VSF_FS_CFG_H__
 
+#if VSF_USE_FS == ENABLED
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_FS_ASSERT
@@ -112,6 +114,6 @@ typedef enum vk_file_whence_t {
 /*============================ PROTOTYPES ====================================*/
 
 
-
-#endif
+#endif      // VSF_USE_FS
+#endif      // __VSF_FS_CFG_H__
 /* EOF */
