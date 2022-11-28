@@ -3,6 +3,8 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
+#if VSF_USE_INPUT == ENABLED
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./sys/types.h"
 #   include "./sys/time.h"
@@ -473,4 +475,5 @@ extern void input_copy_abs(struct input_dev *dst, unsigned int dst_axis, const s
 }
 #endif
 
-#endif
+#endif      // VSF_USE_INPUT
+#endif      // __VSF_LINUX_INPUT_H__
