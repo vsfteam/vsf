@@ -57,11 +57,6 @@ struct timespec {
     long            tv_nsec;
 };
 
-struct itimerspec {
-    struct timespec it_interval;
-    struct timespec it_value;
-};
-
 #if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED
 typedef struct vsf_linux_libc_time_vplt_t {
     vsf_vplt_info_t info;

@@ -50,6 +50,11 @@ struct itimerval {
     struct timeval  it_interval;
 };
 
+struct itimerspec {
+    struct timespec it_interval;
+    struct timespec it_value;
+};
+
 #if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
 typedef struct vsf_linux_sys_time_vplt_t {
     vsf_vplt_info_t info;
