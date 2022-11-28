@@ -31,15 +31,15 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HW_I2C_CFG_MULTI_CLASS
-#   define VSF_HW_I2C_CFG_MULTI_CLASS           VSF_I2C_CFG_MULTI_CLASS
+#   define VSF_HW_I2C_CFG_MULTI_CLASS                       VSF_I2C_CFG_MULTI_CLASS
 #endif
 
 #ifndef VSF_HW_I2C_REQEUST_BUFFER_SIZE
-#   define VSF_HW_I2C_REQEUST_BUFFER_SIZE       3
+#   define VSF_HW_I2C_REQEUST_BUFFER_SIZE                   3
 #endif
 
-#ifndef VSF_HW_I2C_REQUEST_MAX_SIZE
-#   define VSF_HW_I2C_REQUEST_MAX_SIZE          16
+#ifndef VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE
+#   define VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE         16
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -271,7 +271,7 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
     VSF_HAL_ASSERT(NULL != hw_i2c_const);
     VSF_HAL_ASSERT(0 != count);
 
-    if (count > VSF_HW_I2C_REQUEST_MAX_SIZE) {
+    if (count > VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE) {
         // aic8800 hardware does not support
         return VSF_ERR_NOT_SUPPORT;
     }
@@ -326,7 +326,7 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
             __i2c_master_request(hw_i2c_ptr, address, hw_i2c_ptr->write_request.cmd | VSF_I2C_CMD_RESTART, 0, NULL);
             return VSF_ERR_NONE;
         } else {                                // write then write
-            if (hw_i2c_ptr->write_request.count + count > VSF_HW_I2C_REQUEST_MAX_SIZE) {
+            if (hw_i2c_ptr->write_request.count + count > VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE) {
                 hw_i2c_ptr->write_request.count = 0;
                 return VSF_ERR_NOT_SUPPORT;
             }

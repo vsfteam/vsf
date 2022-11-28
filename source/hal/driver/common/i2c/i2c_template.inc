@@ -26,6 +26,23 @@
 #define vsf_real_master_request VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
 #define vsf_real_i2c_capability VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
 
+#if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+
+#   ifndef VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_RESTART
+#       define VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_RESTART                1
+#   endif
+
+#   ifndef VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_MANUAL_START_STOP
+#       define VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_MANUAL_START_STOP      1
+#   endif
+
+#   ifndef VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE
+#       define VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE                 0xFFFF
+#   endif
+
+
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -41,8 +58,11 @@ vsf_err_t vsf_real_i2c_master_request(vsf_real_i2c_t *i2c_ptr, uint16_t address,
 #if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 {
-    // TODO: support capability
-    vsf_i2c_capability_t i2c_capability = { 0 };
+    vsf_i2c_capability_t i2c_capability = {
+        .is_support_restart = VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_RESTART,
+        .is_support_manual_start_stop = VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_MANUAL_START_STOP,
+        .max_transfer_size = VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE,
+    };
     return i2c_capability;
 }
 #endif
@@ -56,7 +76,7 @@ vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 #   error "Please define VSF_I2C_CFG_IMP_PREFIX in i2c driver"
 #endif
 
-#ifndef VSF_I2C_CFG_IMP_UPCASE_PREFIX   
+#ifndef VSF_I2C_CFG_IMP_UPCASE_PREFIX
 #   error "Please define VSF_I2C_CFG_IMP_UPCASE_PREFIX    in i2c driver"
 #endif
 
