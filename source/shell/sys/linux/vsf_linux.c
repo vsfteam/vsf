@@ -1100,7 +1100,11 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
     vsf_linux_process_t *process = thread->process;
     vsf_linux_sig_handler_t *handler;
     sighandler_t sighandler;
+#if _NSIG > 32
+    unsigned long long sig_mask;
+#else
     unsigned long sig_mask;
+#endif
     int sig;
     vsf_protect_t orig;
     bool is_all_done = false;
@@ -1112,8 +1116,18 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
                 process->sig.sighandler_thread = NULL;
                 is_all_done = true;
             } else {
+#if _NSIG > 32
+                sig = vsf_ffz32(~sig_mask);
+                if (sig < 0) {
+                    sig = vsf_ffz32(~(sig_mask >> 32)) + 32;
+                }
+                process->sig.pending.sig[0] &= ~(1ULL << sig);
+                sig++;
+#else
                 sig = vsf_ffz32(~sig_mask);
                 process->sig.pending.sig[0] &= ~(1 << sig);
+                sig++;
+#endif
             }
         vsf_unprotect_sched(orig);
         if (is_all_done) {
@@ -1480,6 +1494,11 @@ int pipe(int pipefd[2])
 int kill(pid_t pid, int sig)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    if (sig <= 0) {
+        return -1;
+    }
+    sig--;
+
     vsf_protect_t orig = vsf_protect_sched();
     vsf_linux_process_t *process = vsf_linux_get_process(pid);
     if ((NULL == process) || (process->thread_pending_exit != NULL)) {
@@ -1487,7 +1506,11 @@ int kill(pid_t pid, int sig)
         return -1;
     }
 
+#if _NSIG > 32
+    process->sig.pending.sig[0] |= 1ULL << sig;
+#else
     process->sig.pending.sig[0] |= 1 << sig;
+#endif
     if (NULL == process->sig.sighandler_thread) {
         process->sig.sighandler_thread = vsf_linux_create_raw_thread(&__vsf_linux_sighandler_op, 0, NULL);
         if (NULL == process->sig.sighandler_thread) {

@@ -477,10 +477,10 @@ int timer_create(clockid_t clockid, struct sigevent *sevp, timer_t *timerid)
     if (NULL == sevp) {
         linux_timer->evt.sigev_notify = SIGEV_SIGNAL;
         linux_timer->evt.sigev_signo = SIGALRM;
-        linux_timer->evt.sigev_notify_thread_id = process->id.pid;
     } else {
         linux_timer->evt = *sevp;
     }
+    linux_timer->evt.sigev_notify_thread_id = process->id.pid;
     *timerid = linux_timer;
     return 0;
 }

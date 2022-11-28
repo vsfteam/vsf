@@ -35,8 +35,6 @@ extern "C" {
 #define sigsetjmp(__j, __s) setjmp(__j)
 #endif
 
-#define _NSIG           32
-
 typedef void (*sighandler_t)(int);
 typedef int sig_atomic_t;
 
@@ -65,10 +63,6 @@ struct sigevent {
 };
 
 typedef struct {
-    unsigned long sig[_NSIG / (sizeof(unsigned long) << 3)];
-} sigset_t;
-
-typedef struct {
     int si_signo;
     int si_code;
     pid_t si_pid;
@@ -77,16 +71,6 @@ typedef struct {
     int si_status;
     int si_fd;
 } siginfo_t;
-
-struct sigaction {
-    union {
-        sighandler_t sa_handler;
-        void (*sa_sigaction)(int, siginfo_t *, void *);
-    };
-    sigset_t sa_mask;
-    int sa_flags;
-    void (*sa_restorer)(void);
-};
 
 #define SIGHUP          1   // hang up              terminate
 #define SIGINT          2   // interrupt            terminate
@@ -124,7 +108,8 @@ struct sigaction {
 #define SIGSYS          31  //                      coredump
 #define SIGRTMIN        34
 #define SIGRTMAX        64
-#define NSIG            65
+#define NSIG            64
+#define _NSIG           NSIG
 
 #define SIG_BLOCK       0
 #define SIG_UNBLOCK     1
@@ -140,6 +125,24 @@ struct sigaction {
 #define SA_SIGINFO      4
 #define SA_RESTART      0x10000000
 #define SA_NODEFER      0x40000000
+
+typedef struct {
+#if _NSIG > 32
+    unsigned long long sig[_NSIG / (sizeof(unsigned long long) << 3)];
+#else
+    unsigned long sig[_NSIG / (sizeof(unsigned long) << 3)];
+#endif
+} sigset_t;
+
+struct sigaction {
+    union {
+        sighandler_t sa_handler;
+        void (*sa_sigaction)(int, siginfo_t *, void *);
+    };
+    sigset_t sa_mask;
+    int sa_flags;
+    void (*sa_restorer)(void);
+};
 
 static inline int sigemptyset(sigset_t *set)
 {
