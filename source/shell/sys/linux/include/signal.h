@@ -40,6 +40,30 @@ extern "C" {
 typedef void (*sighandler_t)(int);
 typedef int sig_atomic_t;
 
+union sigval {
+    int sival_int;
+    void *sival_ptr;
+};
+
+enum {
+    SIGEV_SIGNAL = 0,
+#define SIGEV_SIGNAL    SIGEV_SIGNAL
+    SIGEV_NONE,
+#define SIGEV_NONE      SIGEV_NONE
+    SIGEV_THREAD,
+#define SIGEV_THREAD    SIGEV_THREAD
+};
+
+struct sigevent {
+    int sigev_notify;
+    int sigev_signo;
+    union sigval sigev_value;
+
+    void (*sigev_notify_function)(union sigval);
+    void *sigev_notify_attributes;
+    pid_t sigev_notify_thread_id;
+};
+
 typedef struct {
     unsigned long sig[_NSIG / (sizeof(unsigned long) << 3)];
 } sigset_t;
@@ -98,7 +122,9 @@ struct sigaction {
 #define SIGIO           29  //                      terminate
 #define SIGPWR          30  //                      terminate
 #define SIGSYS          31  //                      coredump
-#define NSIG            32
+#define SIGRTMIN        34
+#define SIGRTMAX        64
+#define NSIG            65
 
 #define SIG_BLOCK       0
 #define SIG_UNBLOCK     1

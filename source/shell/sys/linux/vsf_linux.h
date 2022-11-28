@@ -202,7 +202,10 @@ typedef struct vsf_linux_stdio_stream_t {
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 typedef struct vsf_linux_timer_t {
-    struct itimerval value;
+    struct itimerspec value;
+    struct sigevent evt;
+    int overrun;
+    vsf_callback_timer_t timer;
     vsf_systimer_tick_t start;
 } vsf_linux_timer_t;
 #endif
@@ -257,8 +260,7 @@ vsf_class(vsf_linux_process_t) {
             pid_t gid;
         } id;
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-        struct vsf_linux_timer_t timers[ITIMER_NUM];
-        vsf_callback_timer_t real_timer;
+        vsf_linux_timer_t timers[ITIMER_NUM];
 #endif
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\

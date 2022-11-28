@@ -1504,7 +1504,7 @@ int kill(pid_t pid, int sig)
         return 0;
     }
     vsf_unprotect_sched(orig);
-    // put a yield here to make sure sighandler will be runed?
+    // put a yield here to make sure sighandler will run?
     vsf_thread_yield();
     return 0;
 #else

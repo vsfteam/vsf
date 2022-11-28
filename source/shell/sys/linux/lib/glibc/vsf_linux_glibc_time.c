@@ -359,6 +359,12 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
     }
 }
 
+int clock_nanosleep(clockid_t clockid, int flags, const struct timespec *request,
+                    struct timespec *remain)
+{
+    return nanosleep(request, remain);
+}
+
 #if __IS_COMPILER_LLVM__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wvisibility"
@@ -367,68 +373,159 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
 #   pragma diag_suppress=pe111
 #endif
 
-int getitimer(int which, struct itimerval *curr_value)
+static void __vsf_linux_timespec2timeval(struct timespec *spec, struct timeval *val)
 {
-    VSF_LINUX_ASSERT(which < ITIMER_NUM);
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-
-    vsf_systimer_tick_t elapsed_value;
-    switch (which) {
-    case ITIMER_REAL:
-        elapsed_value = vsf_systimer_get_elapsed(process->timers[which].start);
-        break;
-    default:
-        elapsed_value = 0;
-        break;
-    }
-
-    if (curr_value != NULL) {
-        curr_value->it_interval = process->timers[which].value.it_interval;
-
-        elapsed_value = vsf_systimer_tick_to_us(elapsed_value);
-        curr_value->it_value.tv_sec = elapsed_value / (1000 * 1000);
-        curr_value->it_value.tv_usec = elapsed_value % (1000 * 1000);
-    }
-    return 0;
+    val->tv_sec = spec->tv_sec;
+    val->tv_usec = spec->tv_nsec / 1000;
 }
 
-static void __vsf_linux_prepare_real_timer(vsf_linux_process_t *process)
+static void __vsf_linux_itimerspec2itimerval(struct itimerspec *spec, struct itimerval *val)
 {
-    vsf_linux_timer_t *timer = &process->timers[ITIMER_REAL];
-    vsf_systimer_tick_t ticks = timer->value.it_value.tv_sec * 1000 * 1000 + timer->value.it_value.tv_usec;
+    __vsf_linux_timespec2timeval(&spec->it_interval, &val->it_interval);
+    __vsf_linux_timespec2timeval(&spec->it_value, &val->it_value);
+}
+
+static void __vsf_linux_timeval2timespec(struct timeval *val, struct timespec *spec)
+{
+    spec->tv_sec = val->tv_sec;
+    spec->tv_nsec = val->tv_usec * 1000;
+}
+
+static void __vsf_linux_itimerval2itimerspec(struct itimerval *val, struct itimerspec *spec)
+{
+    __vsf_linux_timeval2timespec(&val->it_interval, &spec->it_interval);
+    __vsf_linux_timeval2timespec(&val->it_value, &spec->it_value);
+}
+
+static void __vsf_linux_prepare_timer(vsf_linux_timer_t *linux_timer)
+{
+    vsf_systimer_tick_t ticks = linux_timer->value.it_value.tv_sec * 1000 * 1000
+                            +   linux_timer->value.it_value.tv_nsec / 1000;
     ticks = vsf_systimer_us_to_tick(ticks);
     if (ticks != 0) {
-        process->timers[ITIMER_REAL].start = vsf_systimer_get_tick();
-        vsf_callback_timer_add(&process->real_timer, ticks);
+        linux_timer->start = vsf_systimer_get_tick();
+        vsf_callback_timer_add(&linux_timer->timer, ticks);
     }
 }
 
-static void __vsf_linux_on_real_timer(vsf_callback_timer_t *timer)
+static void __vsf_linux_on_timer(vsf_callback_timer_t *timer)
 {
-    vsf_linux_process_t *process = container_of(timer, vsf_linux_process_t, real_timer);
-    kill(process->id.pid, SIGALRM);
-    process->timers[ITIMER_REAL].value.it_value = process->timers[ITIMER_REAL].value.it_interval;
-    __vsf_linux_prepare_real_timer(process);
+    vsf_linux_timer_t *linux_timer = container_of(timer, vsf_linux_timer_t, timer);
+    linux_timer->overrun++;
+
+    switch (linux_timer->evt.sigev_notify) {
+    case SIGEV_SIGNAL:
+        kill(linux_timer->evt.sigev_notify_thread_id, linux_timer->evt.sigev_signo);
+        break;
+    case SIGEV_THREAD:
+        // TODO: add support
+        VSF_LINUX_ASSERT(false);
+        break;
+    }
+
+    linux_timer->value.it_value = linux_timer->value.it_interval;
+    __vsf_linux_prepare_timer(linux_timer);
 }
 
 int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value)
 {
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
     VSF_LINUX_ASSERT(which < ITIMER_NUM);
+    vsf_linux_timer_t *linux_timer = &process->timers[which];
+
+    struct itimerspec new_spec;
+    struct itimerspec old_spec;
+    int result;
+
+    __vsf_linux_itimerval2itimerspec((struct itimerval *)new_value, &new_spec);
+    linux_timer->evt.sigev_notify = SIGEV_SIGNAL;
+    linux_timer->evt.sigev_signo = SIGALRM;
+    result = timer_settime((void *)linux_timer, 0, (const struct itimerspec *)&new_spec, &old_spec);
+
+    if (old_value != NULL) {
+        __vsf_linux_itimerspec2itimerval(&old_spec, old_value);
+    }
+    return result;
+}
+
+int getitimer(int which, struct itimerval *curr_value)
+{
+    if (curr_value != NULL) {
+        vsf_linux_process_t *process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(process != NULL);
+        VSF_LINUX_ASSERT(which < ITIMER_NUM);
+        vsf_linux_timer_t *linux_timer = &process->timers[which];
+
+        struct itimerspec curr_spec;
+        timer_gettime((void *)linux_timer, &curr_spec);
+        __vsf_linux_itimerspec2itimerval(&curr_spec, curr_value);
+    }
+    return 0;
+}
+
+int timer_create(clockid_t clockid, struct sigevent *sevp, timer_t *timerid)
+{
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
 
-    if (old_value != NULL) {
-        *old_value = process->timers[which].value;
+    vsf_linux_timer_t *linux_timer = malloc(sizeof(vsf_linux_timer_t));
+    if (NULL == linux_timer) {
+        return -1;
     }
-    process->timers[which].value = *new_value;
 
-    if (ITIMER_REAL == which) {
-        vsf_callback_timer_remove(&process->real_timer);
-        process->real_timer.on_timer = __vsf_linux_on_real_timer;
-        __vsf_linux_prepare_real_timer(process);
+    if (NULL == sevp) {
+        linux_timer->evt.sigev_notify = SIGEV_SIGNAL;
+        linux_timer->evt.sigev_signo = SIGALRM;
+        linux_timer->evt.sigev_notify_thread_id = process->id.pid;
+    } else {
+        linux_timer->evt = *sevp;
+    }
+    *timerid = linux_timer;
+    return 0;
+}
+
+int timer_settime(timer_t timerid, int flags, const struct itimerspec *new_value,
+        struct itimerspec *old_value)
+{
+    vsf_linux_timer_t *linux_timer = timerid;
+    if (old_value != NULL) {
+        *old_value = linux_timer->value;
+    }
+    linux_timer->value = *new_value;
+
+    vsf_callback_timer_init(&linux_timer->timer);
+    linux_timer->timer.on_timer = __vsf_linux_on_timer;
+    __vsf_linux_prepare_timer(linux_timer);
+    return 0;
+}
+
+int timer_gettime(timer_t timerid, struct itimerspec *curr_value)
+{
+    if (curr_value != NULL) {
+        vsf_linux_timer_t *linux_timer = timerid;
+        vsf_systimer_tick_t elapsed_value = vsf_systimer_get_elapsed(linux_timer->start);
+        elapsed_value = vsf_systimer_tick_to_us(elapsed_value);
+
+        curr_value->it_interval = linux_timer->value.it_interval;
+        curr_value->it_value.tv_sec = elapsed_value / (1000 * 1000);
+        curr_value->it_value.tv_nsec = (elapsed_value % (1000 * 1000)) * 1000;
     }
     return 0;
+}
+
+int timer_delete(timer_t timerid)
+{
+    vsf_linux_timer_t *linux_timer = timerid;
+    vsf_callback_timer_remove(&linux_timer->timer);
+    free(linux_timer);
+    return 0;
+}
+
+int timer_getoverrun(timer_t timerid)
+{
+    vsf_linux_timer_t *timer = timerid;
+    return timer->overrun;
 }
 
 #if __IS_COMPILER_LLVM__
@@ -443,6 +540,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(clock),
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(clock_gettime),
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(clock_getres),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(clock_nanosleep),
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(time),
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(difftime),
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(asctime),
@@ -456,6 +554,11 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(mktime),
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(strftime),
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(nanosleep),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(timer_create),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(timer_settime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(timer_gettime),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(timer_delete),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(timer_getoverrun),
 };
 #endif
 

@@ -60,6 +60,7 @@ typedef unsigned long       dev_t;
 typedef unsigned long       ino_t;
 typedef unsigned int        blksiz_t;
 typedef unsigned long long  blkcnt_t;
+typedef void *              timer_t;
 
 typedef enum {
     P_ALL,
