@@ -179,6 +179,10 @@ typedef struct vsf_i2c_capability_t {
     // If manual control of the start/stop signal is not supported,
     // then every transmission will generate a start/stop
     uint8_t is_support_manual_start_stop  : 1;
+
+    // maximum transfer size
+    // specifically, 0 is not a legal value
+    uint16_t max_transfer_size;
 } vsf_i2c_capability_t;
 
 typedef struct vsf_i2c_t vsf_i2c_t;
