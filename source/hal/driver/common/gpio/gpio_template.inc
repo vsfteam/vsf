@@ -64,6 +64,18 @@
 #define vsf_real_gpio_output_and_clear  VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_clear)
 #define vsf_real_gpio_capability        VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)
 
+#if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+
+#   ifndef VSF_GPIO_CFG_CAPABILITY_IS_ASYNC
+#       define VSF_GPIO_CFG_CAPABILITY_IS_ASYNC                 0
+#   endif
+
+#   ifndef VSF_GPIO_CFG_CAPABILITY_AVAIL_PIN_MASK
+#       define VSF_GPIO_CFG_CAPABILITY_AVAIL_PIN_MASK           0xFFFFFFFF
+#   endif
+
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -140,7 +152,8 @@ void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask
 gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 {
     gpio_capability_t gpio_capability = {
-        0,
+        .is_async = VSF_GPIO_CFG_CAPABILITY_IS_ASYNC,
+        .avail_pin_mask = VSF_GPIO_CFG_CAPABILITY_AVAIL_PIN_MASK,
     };
 
     return gpio_capability;

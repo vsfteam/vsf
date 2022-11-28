@@ -40,7 +40,6 @@
 #       define VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE                 0xFFFF
 #   endif
 
-
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
