@@ -78,6 +78,14 @@ typedef struct gpio_capability_t {
     //  When they are used together with other ports, they are not guaranteed to
     //  be sequential for the operation of the pins of different ports.
     uint8_t is_async;
+
+    // available pin mask
+    // may be:
+    //  0x000000FF (8  pins),
+    //  0x0000FFFF (16  pins),
+    //  0xFFFFFFFF (32 pins),
+    //  0xFFFFFFFE (32 pins, but pin0 cannot be used as GPIO)
+    uint32_t avail_pin_mask;
 } gpio_capability_t;
 
 typedef struct vsf_gpio_t vsf_gpio_t;
@@ -155,10 +163,13 @@ extern void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
 
 extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
 
+extern gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr);
+
 /*============================ MACROS ========================================*/
 
 #if VSF_GPIO_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_gpio_t                           VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t)
+#   define vsf_gpio_capability(__GPIO)            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_capability)       ((__vsf_gpio_t *)__GPIO)
 #   define vsf_gpio_config_pin(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_config_pin)       ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_set_direction(__GPIO, ...)    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_direction)    ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_get_direction(__GPIO, ...)    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_get_direction)    ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
