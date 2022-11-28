@@ -12,6 +12,7 @@
 // for sigevent
 #   include "../signal.h"
 #else
+#include <stddef.h>
 // for time_t
 #   include <sys/types.h>
 // for sigevent
