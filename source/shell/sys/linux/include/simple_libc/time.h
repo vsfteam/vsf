@@ -9,14 +9,12 @@
 #   endif
 // for time_t
 #   include "../sys/types.h"
-#   include "../sys/time.h"
 // for sigevent
 #   include "../signal.h"
 #else
 #include <stddef.h>
 // for time_t
 #   include <sys/types.h>
-#   include <sys/time.h>
 // for sigevent
 #   include <signal.h>
 #endif
@@ -52,6 +50,16 @@ struct tm {
     int tm_isdst;
     long int tm_gmtoff;
     const char *tm_zone;
+};
+
+struct timespec {
+    time_t          tv_sec;
+    long            tv_nsec;
+};
+
+struct itimerspec {
+    struct timespec it_interval;
+    struct timespec it_value;
 };
 
 #if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED

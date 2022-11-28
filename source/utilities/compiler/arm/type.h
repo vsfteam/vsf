@@ -153,6 +153,12 @@ typedef enum {
 } clockid_t;
 typedef unsigned long       useconds_t;
 extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
+
+struct itimerspec {
+    struct timespec it_interval;
+    struct timespec it_value;
+};
+
 #   ifdef __cplusplus
 }
 #   endif

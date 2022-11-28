@@ -8,6 +8,7 @@
 #else
 #   include <sys/types.h>
 #endif
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,19 +44,9 @@ struct timezone {
     int             tz_dsttime;
 };
 
-struct timespec {
-    time_t          tv_sec;
-    long            tv_nsec;
-};
-
 struct itimerval {
     struct timeval  it_value;
     struct timeval  it_interval;
-};
-
-struct itimerspec {
-    struct timespec it_interval;
-    struct timespec it_value;
 };
 
 #if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
