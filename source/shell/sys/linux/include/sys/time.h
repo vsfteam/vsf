@@ -5,10 +5,8 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED
 #   include "./types.h"
-#   include "../simple_libc/time.h"
 #else
 #   include <sys/types.h>
-#   include <time.h>
 #endif
 
 #ifdef __cplusplus
@@ -43,6 +41,11 @@ struct timeval {
 struct timezone {
     int             tz_minuteswest;
     int             tz_dsttime;
+};
+
+struct timespec {
+    time_t          tv_sec;
+    long            tv_nsec;
 };
 
 struct itimerval {

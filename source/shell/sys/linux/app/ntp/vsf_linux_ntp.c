@@ -25,12 +25,13 @@
 #include "./vsf_linux_ntp.h"
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-$   include "../../include/unistd.h"
+#   include "../../include/unistd.h"
 #   include "../../include/sys/time.h"
 #else
 #   include <unistd.h>
 #   include <sys/time.h>
 #endif
+#include <time.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

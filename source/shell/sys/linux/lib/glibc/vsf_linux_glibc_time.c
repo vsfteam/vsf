@@ -26,12 +26,12 @@
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
-#   include "../../include/simple_libc/time.h"
 #   include "../../include/sys/time.h"
+#   include "../../include/simple_libc/time.h"
 #else
 #   include <unistd.h>
-#   include <time.h>
 #   include <sys/time.h>
+#   include <time.h>
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
