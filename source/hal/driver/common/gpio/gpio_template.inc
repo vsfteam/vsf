@@ -70,6 +70,10 @@
 #       define VSF_GPIO_CFG_CAPABILITY_IS_ASYNC                 0
 #   endif
 
+#   ifndef VSF_GPIO_CFG_CAPABILITY_PIN_COUNT
+#       define VSF_GPIO_CFG_CAPABILITY_PIN_COUNT                32
+#   endif
+
 #   ifndef VSF_GPIO_CFG_CAPABILITY_AVAIL_PIN_MASK
 #       define VSF_GPIO_CFG_CAPABILITY_AVAIL_PIN_MASK           0xFFFFFFFF
 #   endif
@@ -153,6 +157,7 @@ gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 {
     gpio_capability_t gpio_capability = {
         .is_async = VSF_GPIO_CFG_CAPABILITY_IS_ASYNC,
+        .pin_count = VSF_GPIO_CFG_CAPABILITY_PIN_COUNT,
         .avail_pin_mask = VSF_GPIO_CFG_CAPABILITY_AVAIL_PIN_MASK,
     };
 

@@ -173,6 +173,7 @@ gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 {
     gpio_capability_t gpio_capability = {
         .is_async = hw_gpio_ptr->is_pmic,
+        .pin_count = VSF_HW_GPIO_PIN_MAX,
         .avail_pin_mask = VSF_HAL_MAX_COUT_TO_MASK(VSF_HW_GPIO_PIN_MAX),
     };
 
