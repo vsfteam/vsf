@@ -739,6 +739,15 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\flash\flash_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\i2c_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\i2s\i2s_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\mmc\mmc_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\pwm\pwm_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\rng\rng_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\spi_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\timer\timer_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\gpio\gpio_common.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.c" />
