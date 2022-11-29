@@ -924,12 +924,14 @@ static void __vsf_linux_gpio_init(vsf_linux_fd_t *sfd)
         for (uint8_t i = 0; i < gpio_chip->port_num; i++) {
             cap = vsf_gpio_capability(gpio_chip->ports[i]);
             if (pin < cap.pin_count) {
+                VSF_LINUX_ASSERT(cap.avail_pin_mask & (1 << pin));
                 gpio_priv->port = gpio_chip->ports[i];
                 gpio_priv->pin = pin;
                 break;
             }
             pin -= cap.pin_count;
         }
+        VSF_LINUX_ASSERT(gpio_priv->port != NULL);
     }
 }
 
