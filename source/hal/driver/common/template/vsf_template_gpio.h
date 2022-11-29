@@ -77,7 +77,12 @@ typedef struct gpio_capability_t {
     //
     //  When they are used together with other ports, they are not guaranteed to
     //  be sequential for the operation of the pins of different ports.
-    uint8_t is_async;
+    uint8_t is_async  : 1;
+
+    // total number of pins of hardware
+    // if some of the pins cannot be used as GPIO,the corresponding bit
+    // in avail_pin_mask is 0, otherwise is 1.
+    uint8_t pin_count : 7;
 
     // available pin mask
     // may be:
