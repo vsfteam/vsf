@@ -886,6 +886,214 @@ int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp)
 }
 #endif
 
+#if VSF_HAL_USE_GPIO == ENABLED
+
+typedef struct vsf_linux_gpio_priv_t {
+    implement(vsf_linux_fs_priv_t)
+
+    vsf_gpio_t *port;
+    uint8_t pin;
+} vsf_linux_gpio_priv_t;
+
+static const vsf_linux_fd_op_t __vsf_linux_gpio_fdop;
+
+static void __vsf_linux_gpio_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_gpio_priv_t *gpio_priv = (vsf_linux_gpio_priv_t *)sfd->priv;
+    vk_file_t *file = gpio_priv->file;
+
+    if (    !strcmp(file->name, "direction")
+        ||  !strcmp(file->name, "value")) {
+        // initialize hw and pin in gpio_priv
+        vk_file_t *export_file = vk_file_get_parent(file), *tmp_file;
+        VSF_LINUX_ASSERT(export_file != NULL);
+        int pin = atoi(&export_file->name[4]);
+        tmp_file = vk_file_get_parent(export_file);
+        vk_file_close(export_file);
+        VSF_LINUX_ASSERT(tmp_file != NULL);
+        vk_file_open(tmp_file, "export", &export_file);
+        if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
+            vk_file_close(tmp_file);
+            VSF_LINUX_ASSERT(false);
+            return;
+        }
+        vk_file_close(tmp_file);
+
+        vsf_linux_gpio_chip_t *gpio_chip = ((vk_vfs_file_t *)export_file)->f.param;
+        // TODO: prepare gpio_priv->port/gpio_priv->pin according to pin
+        gpio_priv->port = gpio_chip->ports[0];
+        gpio_priv->pin = pin;
+    }
+}
+
+static ssize_t __vsf_linux_gpio_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    vsf_linux_gpio_priv_t *gpio_priv = (vsf_linux_gpio_priv_t *)sfd->priv;
+    if (!strcmp(gpio_priv->file->name, "value")) {
+        uint32_t value = vsf_gpio_read(gpio_priv->port);
+        if (value & (1 << gpio_priv->pin)) {
+            ((char *)buf)[0] = '1';
+        } else {
+            ((char *)buf)[0] = '0';
+        }
+        return 1;
+    }
+    return 0;
+}
+
+static ssize_t __vsf_linux_gpio_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    extern vk_file_t * __vsf_linux_fs_get_file_ex(vk_file_t *dir, const char *pathname);
+
+    vsf_linux_gpio_priv_t *gpio_priv = (vsf_linux_gpio_priv_t *)sfd->priv;
+    vk_file_t *file = gpio_priv->file;
+
+    if (!strcmp(file->name, "export")) {
+        char path[4 + 3 + 1];
+        vk_file_t *dir = vk_file_get_parent(file), *gpio_dir;
+        int pathlen = strlen("gpio"), err;
+
+        strcpy(path, "gpio");
+        memcpy(&path[pathlen], buf, count);
+        path[pathlen + count] = '\0';
+
+        gpio_dir = __vsf_linux_fs_get_file_ex(dir, path);
+        if (gpio_dir != NULL) {
+            fprintf(stderr, "%s already exported\r\n", path);
+            goto fail_close_gpio_dir;
+        }
+
+        vk_file_create(dir, path, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE);
+        if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
+            fprintf(stderr, "fail to create dir %s\r\n", path);
+            goto fail_close_gpio_dir;
+        }
+        vk_file_open(dir, path, &gpio_dir);
+        if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
+            fprintf(stderr, "fail to open dir %s\r\n", path);
+            goto fail_close_dir;
+        }
+        vk_file_close(dir);
+
+        err = vsf_linux_fs_bind_target_relative((vk_vfs_file_t *)gpio_dir, "direction",
+                NULL, &__vsf_linux_gpio_fdop, VSF_FILE_ATTR_WRITE, 0);
+        if (err != 0) {
+            fprintf(stderr, "fail to bind %s\r\n", path);
+            goto fail_close_gpio_dir;
+        }
+        err = vsf_linux_fs_bind_target_relative((vk_vfs_file_t *)gpio_dir, "value",
+                NULL, &__vsf_linux_gpio_fdop, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+        if (err != 0) {
+            fprintf(stderr, "fail to bind %s\r\n", path);
+            goto fail_close_gpio_dir;
+        }
+        vk_file_close(gpio_dir);
+        return count;
+    fail_close_dir:
+        vk_file_close(dir);
+    fail_close_gpio_dir:
+        vk_file_close(gpio_dir);
+        return -1;
+    } else if (!strcmp(file->name, "unexport")) {
+        char path[4 + 3 + 1];
+        vk_file_t *dir = vk_file_get_parent(file), *gpio_dir;
+        int pathlen = strlen("gpio");
+
+        strcpy(path, "gpio");
+        memcpy(&path[pathlen], buf, count);
+        pathlen += count;
+        path[pathlen] = '\0';
+
+        gpio_dir = __vsf_linux_fs_get_file_ex(dir, path);
+        if (NULL == gpio_dir) {
+            fprintf(stderr, "%s not exists\r\n", path);
+            return -1;
+        }
+
+        vk_file_unlink(gpio_dir, "direction");
+        vk_file_unlink(gpio_dir, "value");
+        vk_file_unlink(gpio_dir, "edge");
+        vk_file_unlink(gpio_dir, "active_low");
+        vk_file_close(gpio_dir);
+        vk_file_unlink(dir, path);
+        vk_file_close(dir);
+        rmdir(path);
+    } else if (!strcmp(file->name, "direction")) {
+        if (!strcmp((char *)buf, "in")) {
+            vsf_gpio_set_input(gpio_priv->port, 1 << gpio_priv->pin);
+        } else if (!strcmp((char *)buf, "out")) {
+            vsf_gpio_set_output(gpio_priv->port, 1 << gpio_priv->pin);
+        } else if (!strcmp((char *)buf, "high")) {
+            vsf_gpio_set(gpio_priv->port, 1 << gpio_priv->pin);
+            vsf_gpio_set_output(gpio_priv->port, 1 << gpio_priv->pin);
+        } else if (!strcmp((char *)buf, "low")) {
+            vsf_gpio_clear(gpio_priv->port, 1 << gpio_priv->pin);
+            vsf_gpio_set_output(gpio_priv->port, 1 << gpio_priv->pin);
+        }
+    } else if (!strcmp(file->name, "value")) {
+        char value = *(char *)buf;
+        if ('0' == value) {
+            vsf_gpio_clear(gpio_priv->port, 1 << gpio_priv->pin);
+        } else {
+            vsf_gpio_set(gpio_priv->port, 1 << gpio_priv->pin);
+        }
+    }
+    return count;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_gpio_fdop = {
+    .priv_size          = sizeof(vsf_linux_gpio_priv_t),
+    .fn_init            = __vsf_linux_gpio_init,
+    .fn_read            = __vsf_linux_gpio_read,
+    .fn_write           = __vsf_linux_gpio_write,
+};
+
+int vsf_linux_fs_bind_gpio(char *path, vsf_linux_gpio_chip_t *gpio_chip)
+{
+    char pathbuf[MAX_PATH];
+    int pathlen = strlen(path), err;
+    memcpy(pathbuf, path, pathlen + 1);
+    pathbuf[pathlen++] = '/';
+
+    mkdirs(path, 0);
+    strcpy(&pathbuf[pathlen], "export");
+    err = vsf_linux_fs_bind_target_ex(pathbuf, gpio_chip,
+                &__vsf_linux_gpio_fdop, NULL, NULL, VSF_FILE_ATTR_WRITE, 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to bind %s\r\n", pathbuf);
+        return err;
+    }
+    strcpy(&pathbuf[pathlen], "unexport");
+    err = vsf_linux_fs_bind_target_ex(pathbuf, gpio_chip,
+                &__vsf_linux_gpio_fdop, NULL, NULL, VSF_FILE_ATTR_WRITE, 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to bind %s\r\n", pathbuf);
+        return err;
+    }
+    return 0;
+}
+
+#if VSF_HW_GPIO_COUNT > 0
+int vsf_linux_fs_bind_gpio_hw(char *path)
+{
+#define __VSF_LINUX_DEF_GPIO_PORT(__N, __UNUSED)                                \
+                (vsf_gpio_t *)&VSF_MCONNECT(vsf_hw_gpio, __N),
+#define describe_vsf_linux_gpio_chip_hw(__name)                                 \
+    struct VSF_MCONNECT(__name, _gpio_chip_t) {                                 \
+        uint8_t port_num;                                                       \
+        vsf_gpio_t * ports[VSF_HW_GPIO_COUNT];                                  \
+    } static const __name = {                                                   \
+        .port_num     = VSF_HW_GPIO_COUNT,                                      \
+        .ports        = {                                                       \
+            VSF_MREPEAT(VSF_HW_GPIO_COUNT, __VSF_LINUX_DEF_GPIO_PORT, NULL)     \
+        },                                                                      \
+    };
+    describe_vsf_linux_gpio_chip_hw(__vsf_linux_gpio_chip_hw)
+    return vsf_linux_fs_bind_gpio(path, (vsf_linux_gpio_chip_t *)&__vsf_linux_gpio_chip_hw);
+}
+#endif      // VSF_HW_GPIO_COUNT > 0
+#endif      // VSF_HAL_USE_GPIO
+
 __vsf_component_peda_ifs_entry(__vk_devfs_null_write, vk_file_write)
 {
     vsf_peda_begin();

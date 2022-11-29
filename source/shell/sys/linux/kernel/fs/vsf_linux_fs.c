@@ -223,7 +223,7 @@ const vsf_linux_fd_op_t vsf_linux_term_fdop = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-static vk_file_t * __vsf_linux_fs_get_file_ex(vk_file_t *dir, const char *pathname)
+vk_file_t * __vsf_linux_fs_get_file_ex(vk_file_t *dir, const char *pathname)
 {
     vk_file_t *file;
     vk_file_open(dir, pathname, &file);
@@ -2089,6 +2089,28 @@ int vsf_linux_fs_get_target(const char *pathname, void **target)
     int err = vsf_linux_fd_get_target(fd, target);
     close(fd);
     return err;
+}
+
+int vsf_linux_fs_bind_target_relative(vk_vfs_file_t *dir, const char *pathname,
+        void *target, const vsf_linux_fd_op_t *op,
+        uint_fast32_t feature, uint64_t size)
+{
+    VSF_LINUX_ASSERT(dir->attr & VSF_FILE_ATTR_DIRECTORY);
+    vk_file_create(&dir->use_as__vk_file_t, pathname, feature);
+    if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
+        return -1;
+    }
+    vk_file_t *f;
+    vk_file_open(&dir->use_as__vk_file_t, pathname, &f);
+    if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
+        return -1;
+    }
+
+    ((vk_vfs_file_t *)f)->size = size;
+    ((vk_vfs_file_t *)f)->f.op = (void *)op;
+    ((vk_vfs_file_t *)f)->f.param = target;
+    printf("%s bound under %s.\r\n", pathname, dir->name);
+    return 0;
 }
 
 int vsf_linux_fs_bind_target_ex(const char *pathname,

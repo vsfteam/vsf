@@ -24,6 +24,9 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_DEVFS == ENABLED
 
+// for hardware info
+#include "hal/vsf_hal.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,6 +34,14 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if VSF_HAL_USE_GPIO == ENABLED
+typedef struct vsf_linux_gpio_chip_t {
+    uint8_t port_num;
+    vsf_gpio_t * ports[0];
+} vsf_linux_gpio_chip_t;
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -53,6 +64,12 @@ extern int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier);
 #endif
 #if VSF_USE_UI == ENABLED
 extern int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp);
+#endif
+#if VSF_HAL_USE_GPIO == ENABLED
+extern int vsf_linux_fs_bind_gpio(char *path, vsf_linux_gpio_chip_t *gpio_chip);
+#   if VSF_HW_GPIO_COUNT > 0
+extern int vsf_linux_fs_bind_gpio_hw(char *path);
+#   endif
 #endif
 extern int vsf_linux_devfs_init(void);
 
