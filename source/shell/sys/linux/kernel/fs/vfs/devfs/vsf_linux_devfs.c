@@ -328,8 +328,45 @@ typedef struct vsf_linux_i2c_priv_t {
     struct {
         uint16_t addr;
         uint16_t flags;
+        vsf_eda_t *pending_eda;
+        vsf_i2c_cfg_t cfg;
+        vsf_i2c_irq_mask_t irq_mask;
     } i2c;
 } vsf_linux_i2c_priv_t;
+
+static ssize_t __vsf_linux_i2c_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    vsf_linux_i2c_priv_t *priv = (vsf_linux_i2c_priv_t *)sfd->priv;
+    vsf_i2c_t *i2c = (vsf_i2c_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    VSF_LINUX_ASSERT(NULL == priv->i2c.pending_eda);
+    priv->i2c.pending_eda = vsf_eda_get_cur();
+    vsf_i2c_master_request(i2c, priv->i2c.addr,
+            VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
+            count, (uint8_t *)buf);
+    vsf_thread_wfe(VSF_EVT_USER);
+    if (priv->i2c.irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
+        return count;
+    }
+    return -1;
+}
+
+static ssize_t __vsf_linux_i2c_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    vsf_linux_i2c_priv_t *priv = (vsf_linux_i2c_priv_t *)sfd->priv;
+    vsf_i2c_t *i2c = (vsf_i2c_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    VSF_LINUX_ASSERT(NULL == priv->i2c.pending_eda);
+    priv->i2c.pending_eda = vsf_eda_get_cur();
+    vsf_i2c_master_request(i2c, priv->i2c.addr,
+            VSF_I2C_CMD_START | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP,
+            count, (uint8_t *)buf);
+    vsf_thread_wfe(VSF_EVT_USER);
+    if (priv->i2c.irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
+        return count;
+    }
+    return -1;
+}
 
 static int __vsf_linux_i2c_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
@@ -352,18 +389,52 @@ static int __vsf_linux_i2c_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         break;
     case I2C_FUNCS:
         *(unsigned long *)arg = I2C_FUNC_I2C | I2C_FUNC_NOSTART;
+        // TODO
         break;
     case I2C_RDWR: {
             struct i2c_rdwr_ioctl_data *msgset = (struct i2c_rdwr_ioctl_data *)arg;
+            // TODO
         }
         break;
     }
     return 0;
 }
 
+static void __vsf_linux_i2c_isrhandler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
+{
+    vsf_linux_i2c_priv_t *priv = (vsf_linux_i2c_priv_t *)target_ptr;
+    vsf_eda_t *pending_eda = priv->i2c.pending_eda;
+
+    priv->i2c.irq_mask = irq_mask;
+    priv->i2c.pending_eda = NULL;
+    if (pending_eda != NULL) {
+        vsf_eda_post_evt(pending_eda, VSF_EVT_USER);
+    }
+}
+
+static void __vsf_linux_i2c_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_i2c_priv_t *priv = (vsf_linux_i2c_priv_t *)sfd->priv;
+    vsf_i2c_t *i2c = (vsf_i2c_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    priv->i2c.cfg.mode = VSF_I2C_MODE_MASTER | VSF_I2C_SPEED_STANDARD_MODE | VSF_I2C_ADDR_7_BITS;
+    priv->i2c.cfg.clock_hz = 100 * 1000;
+    priv->i2c.cfg.isr.handler_fn = __vsf_linux_i2c_isrhandler;
+    priv->i2c.cfg.isr.target_ptr = priv;
+    priv->i2c.cfg.isr.prio = vsf_arch_prio_0;
+    vsf_i2c_init(i2c, &priv->i2c.cfg);
+    while (fsm_rt_cpl != vsf_i2c_enable(i2c));
+    vsf_i2c_irq_enable(i2c, VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
+                        |   VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
+                        |   VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT);
+}
+
 static const vsf_linux_fd_op_t __vsf_linux_i2c_fdop = {
     .priv_size          = sizeof(vsf_linux_i2c_priv_t),
+    .fn_init            = __vsf_linux_i2c_init,
     .fn_fcntl           = __vsf_linux_i2c_fcntl,
+    .fn_read            = __vsf_linux_i2c_read,
+    .fn_write           = __vsf_linux_i2c_write,
 };
 
 int vsf_linux_fs_bind_i2c(char *path, vsf_i2c_t *i2c)
