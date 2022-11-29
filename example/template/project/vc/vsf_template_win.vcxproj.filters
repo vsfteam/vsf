@@ -5669,7 +5669,7 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp_stdio.cpp">
       <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\vsf.demo.evue\vsf\source\hal\driver\common\gpio\gpio_common.c">
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\gpio\gpio_common.c">
       <Filter>vsf\hal\driver\common\gpio</Filter>
     </ClCompile>
   </ItemGroup>
