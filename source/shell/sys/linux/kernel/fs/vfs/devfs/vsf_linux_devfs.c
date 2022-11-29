@@ -342,7 +342,7 @@ static ssize_t __vsf_linux_i2c_read(vsf_linux_fd_t *sfd, void *buf, size_t count
     VSF_LINUX_ASSERT(NULL == priv->i2c.pending_eda);
     priv->i2c.pending_eda = vsf_eda_get_cur();
     vsf_i2c_master_request(i2c, priv->i2c.addr,
-            VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
+            VSF_I2C_CMD_START | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP,
             count, (uint8_t *)buf);
     vsf_thread_wfe(VSF_EVT_USER);
     if (priv->i2c.irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
@@ -359,7 +359,7 @@ static ssize_t __vsf_linux_i2c_write(vsf_linux_fd_t *sfd, const void *buf, size_
     VSF_LINUX_ASSERT(NULL == priv->i2c.pending_eda);
     priv->i2c.pending_eda = vsf_eda_get_cur();
     vsf_i2c_master_request(i2c, priv->i2c.addr,
-            VSF_I2C_CMD_START | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP,
+            VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
             count, (uint8_t *)buf);
     vsf_thread_wfe(VSF_EVT_USER);
     if (priv->i2c.irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
