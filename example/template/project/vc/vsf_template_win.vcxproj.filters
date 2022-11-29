@@ -1099,6 +1099,9 @@
     <Filter Include="vsf\shell\sys\linux\include\linux\spi">
       <UniqueIdentifier>{93be5929-6391-48c8-a424-64d96daf0755}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\driver\common\gpio">
+      <UniqueIdentifier>{d0e05517-46e7-4c15-bc66-2abd61b2bbbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3266,30 +3269,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\serial.h">
       <Filter>vsf\shell\sys\linux\include\linux</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\epoll.h">
-      <Filter>vsf\shell\sys\linux\include\sys</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\eventfd.h">
-      <Filter>vsf\shell\sys\linux\include\sys</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\ioctl.h">
-      <Filter>vsf\shell\sys\linux\include\sys</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\mman.h">
-      <Filter>vsf\shell\sys\linux\include\sys</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\random.h">
-      <Filter>vsf\shell\sys\linux\include\sys</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\syscall.h">
-      <Filter>vsf\shell\sys\linux\include\sys</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\syslog.h">
-      <Filter>vsf\shell\sys\linux\include\sys</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\simon\Desktop\vsf_traning\vsf\source\shell\sys\linux\include\sys\utsname.h">
-      <Filter>vsf\shell\sys\linux\include\sys</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\fs.h">
       <Filter>vsf\shell\sys\linux\include\linux</Filter>
@@ -5689,6 +5668,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp_stdio.cpp">
       <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\vsf.demo.evue\vsf\source\hal\driver\common\gpio\gpio_common.c">
+      <Filter>vsf\hal\driver\common\gpio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

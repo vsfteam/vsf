@@ -739,6 +739,7 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\vsf.demo.evue\vsf\source\hal\driver\common\gpio\gpio_common.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\driver\hid\btstack_dev_hid.c" />
