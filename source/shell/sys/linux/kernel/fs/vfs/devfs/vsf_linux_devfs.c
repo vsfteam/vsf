@@ -920,9 +920,16 @@ static void __vsf_linux_gpio_init(vsf_linux_fd_t *sfd)
         vk_file_close(tmp_file);
 
         vsf_linux_gpio_chip_t *gpio_chip = ((vk_vfs_file_t *)export_file)->f.param;
-        // TODO: prepare gpio_priv->port/gpio_priv->pin according to pin
-        gpio_priv->port = gpio_chip->ports[0];
-        gpio_priv->pin = pin;
+        gpio_capability_t cap;
+        for (uint8_t i = 0; i < gpio_chip->port_num; i++) {
+            cap = vsf_gpio_capability(gpio_chip->ports[i]);
+            if (pin < cap.pin_count) {
+                gpio_priv->port = gpio_chip->ports[i];
+                gpio_priv->pin = pin;
+                break;
+            }
+            pin -= cap.pin_count;
+        }
     }
 }
 
