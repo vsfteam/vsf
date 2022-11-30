@@ -135,7 +135,7 @@ static void __vk_usbd_cfg_fini(vk_usbd_dev_t *dev)
     for (uint_fast8_t i = 0; i < config->num_of_ifs; i++, ifs++) {
         if (ifs->is_inited) {
             ifs->is_inited = false;
-            if (ifs->class_op->fini != NULL) {
+            if ((ifs->class_op != NULL) && (ifs->class_op->fini != NULL)) {
                 ifs->class_op->fini(dev, ifs);
             }
         }
@@ -449,7 +449,7 @@ static vsf_err_t __vk_usbd_stdctrl_prepare(vk_usbd_dev_t *dev)
             break;
         case USB_REQ_SET_INTERFACE:
             ifs->alternate_setting = request->wValue;
-            if (class_op->request_prepare != NULL) {
+            if ((class_op != NULL) && (class_op->request_prepare != NULL)) {
                 class_op->request_prepare(dev, ifs);
             }
             break;
@@ -489,7 +489,7 @@ static vsf_err_t __vk_usbd_stdctrl_prepare(vk_usbd_dev_t *dev)
                     const vk_usbd_class_op_t *class_op = ifs->class_op;
 
                     vk_usbd_drv_ep_clear_stall(ep);
-                    if (class_op->request_prepare != NULL) {
+                    if ((class_op != NULL) && (class_op->request_prepare != NULL)) {
                         class_op->request_prepare(dev, ifs);
                     }
                 }
@@ -575,7 +575,7 @@ static vsf_err_t __vk_usbd_stdctrl_process(vk_usbd_dev_t *dev)
 
         switch (request->bRequest) {
         case USB_REQ_SET_INTERFACE:
-            if (class_op->request_process != NULL) {
+            if ((class_op != NULL) && (class_op->request_process != NULL)) {
                 class_op->request_process(dev, ifs);
             }
             break;
@@ -627,7 +627,7 @@ static vsf_err_t __vk_usbd_ctrl_prepare(vk_usbd_dev_t *dev)
             VSF_USB_ASSERT(false);
             return VSF_ERR_FAIL;
         }
-        if (ifs && ifs->class_op->request_prepare != NULL) {
+        if (ifs && (ifs->class_op != NULL) && (ifs->class_op->request_prepare != NULL)) {
             err = ifs->class_op->request_prepare(dev, ifs);
         }
     } else if (USB_TYPE_VENDOR == type) {
@@ -663,7 +663,7 @@ static void __vk_usbd_ctrl_process(vk_usbd_dev_t *dev)
             VSF_USB_ASSERT(false);
             return;
         }
-        if (ifs && ifs->class_op->request_process != NULL) {
+        if (ifs && (ifs->class_op != NULL) && (ifs->class_op->request_process != NULL)) {
             ifs->class_op->request_process(dev, ifs);
         }
     } else if (USB_TYPE_VENDOR == type) {
