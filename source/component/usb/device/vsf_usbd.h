@@ -565,6 +565,8 @@ extern vk_usbd_desc_t * vk_usbd_get_descriptor(vk_usbd_desc_t *desc,
 
 extern vk_usbd_cfg_t * vk_usbd_get_cur_cfg(vk_usbd_dev_t *dev);
 extern vk_usbd_ifs_t * vk_usbd_get_ifs(vk_usbd_dev_t *dev, uint_fast8_t ifs_no);
+extern uint_fast8_t vk_usbd_get_ifs_no(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+extern void vk_usbd_ifs_add_ep(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs, uint_fast8_t ep);
 #endif
 
 extern vsf_err_t vk_usbd_ep_stall(vk_usbd_dev_t *dev, uint_fast8_t ep);

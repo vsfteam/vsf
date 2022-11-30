@@ -127,6 +127,13 @@ static vk_usbd_ifs_t * __vk_usbd_get_ifs_byep(vk_usbd_cfg_t *config, uint_fast8_
     return ifs >= 0 ? &config->ifs[ifs] : NULL;
 }
 
+void vk_usbd_ifs_add_ep(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs, uint_fast8_t ep)
+{
+    vk_usbd_cfg_t *config = vk_usbd_get_cur_cfg(dev);
+    ep = (ep & 0x0F) | ((ep & 0x80) >> 3);
+    config->ep_ifs_map[ep] = vk_usbd_get_ifs_no(dev, ifs);
+}
+
 static void __vk_usbd_cfg_fini(vk_usbd_dev_t *dev)
 {
     vk_usbd_cfg_t *config = vk_usbd_get_cur_cfg(dev);
@@ -141,7 +148,6 @@ static void __vk_usbd_cfg_fini(vk_usbd_dev_t *dev)
         }
     }
 }
-
 #endif
 
 static vk_usbd_trans_t * __vk_usbd_get_trans(vk_usbd_dev_t *dev, uint_fast8_t ep)
@@ -321,8 +327,7 @@ static vsf_err_t __vk_usbd_auto_init(vk_usbd_dev_t *dev)
                     return VSF_ERR_FAIL;
                 }
 
-                ep_addr = (ep_addr & 0x0F) | ((ep_addr & 0x80) >> 3);
-                config->ep_ifs_map[ep_addr] = cur_ifs;
+                vk_usbd_ifs_add_ep(dev, vk_usbd_get_ifs(dev, cur_ifs), ep_addr);
                 break;
             }
         }
@@ -951,6 +956,14 @@ vk_usbd_ifs_t * vk_usbd_get_ifs(vk_usbd_dev_t *dev, uint_fast8_t ifs_no)
         return &config->ifs[ifs_no];
     }
     return NULL;
+}
+
+uint_fast8_t vk_usbd_get_ifs_no(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+{
+    vk_usbd_cfg_t *config = vk_usbd_get_cur_cfg(dev);
+    uint_fast8_t ifs_no = ifs - config->ifs;
+    VSF_USB_ASSERT(ifs_no < config->num_of_ifs);
+    return ifs_no;
 }
 #endif
 
