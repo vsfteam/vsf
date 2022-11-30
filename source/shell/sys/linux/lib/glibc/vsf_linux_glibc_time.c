@@ -481,6 +481,8 @@ int timer_create(clockid_t clockid, struct sigevent *sevp, timer_t *timerid)
         linux_timer->evt = *sevp;
     }
     linux_timer->evt.sigev_notify_thread_id = process->id.pid;
+    vsf_callback_timer_init(&linux_timer->timer);
+    linux_timer->timer.on_timer = __vsf_linux_on_timer;
     *timerid = linux_timer;
     return 0;
 }
@@ -494,8 +496,7 @@ int timer_settime(timer_t timerid, int flags, const struct itimerspec *new_value
     }
     linux_timer->value = *new_value;
 
-    vsf_callback_timer_init(&linux_timer->timer);
-    linux_timer->timer.on_timer = __vsf_linux_on_timer;
+    vsf_callback_timer_remove(&linux_timer->timer);
     __vsf_linux_prepare_timer(linux_timer);
     return 0;
 }
