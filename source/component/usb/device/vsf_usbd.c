@@ -970,10 +970,12 @@ void vk_usbd_init(vk_usbd_dev_t *dev)
     dev->ctrl_handler.trans.param = dev;
 
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
-    vk_usbd_desc_t *desc;
     vk_usbd_cfg_t *config = dev->config;
     vk_usbd_ifs_t *ifs;
+#   if VSF_USBD_CFG_AUTOSETUP == ENABLED
+    vk_usbd_desc_t *desc;
     struct usb_config_desc_t *desc_config;
+#   endif
 
     for (uint_fast8_t i = 0; i < dev->num_of_config; i++, config++) {
 #   if VSF_USBD_CFG_AUTOSETUP == ENABLED
