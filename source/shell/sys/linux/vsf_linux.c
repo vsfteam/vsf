@@ -1076,6 +1076,7 @@ vsf_linux_process_t * vsf_linux_get_cur_process(void)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     vsf_linux_process_t *process = thread->process;
+    VSF_LINUX_ASSERT(process != NULL);
     return process->id.pid != (pid_t)0 || NULL == __vsf_linux.kernel_process ?
                 process : __vsf_linux.kernel_process;
 }
@@ -1170,6 +1171,7 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
             vsf_unprotect_sched(orig);
         }
     }
+    vsf_linux_detach_thread(thread);
 }
 #endif
 
@@ -1236,13 +1238,13 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         thread->thread_pending->retval = thread->retval;
         vsf_eda_post_evt(&thread->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
     } else {
-        vsf_unprotect_sched(orig);
-
         vsf_linux_process_t *process = thread->process;
         if (NULL == process) {
+            vsf_unprotect_sched(orig);
             vsf_heap_free(thread);
             return;
         }
+        vsf_unprotect_sched(orig);
     }
 }
 
@@ -1258,12 +1260,14 @@ void vsf_linux_detach_process(vsf_linux_process_t *process)
 
 void vsf_linux_detach_thread(vsf_linux_thread_t *thread)
 {
+    vsf_protect_t orig = vsf_protect_sched();
     vsf_linux_process_t *process = thread->process;
     if (process != NULL) {
-        vsf_protect_t orig = vsf_protect_sched();
-            vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
-        vsf_unprotect_sched(orig);
+        VSF_LINUX_ASSERT(NULL == thread->thread_pending);
+        thread->process = NULL;
+        vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
     }
+    vsf_unprotect_sched(orig);
 }
 
 int vsf_linux_wait_thread(int tid, int *retval)
