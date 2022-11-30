@@ -591,6 +591,8 @@ static void __vsf_linux_thread_on_run(vsf_thread_cb_t *cb)
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_process_t *process = thread->process;
 
+    // TODO: fix if thread is detached before on_run
+    VSF_LINUX_ASSERT(process != NULL);
     vsf_arch_set_thread_reg(process->reg);
     thread->op->on_run(cb);
 }
@@ -1263,6 +1265,7 @@ void vsf_linux_detach_thread(vsf_linux_thread_t *thread)
     vsf_protect_t orig = vsf_protect_sched();
     vsf_linux_process_t *process = thread->process;
     if (process != NULL) {
+        // if assert here, process exists before vsf_linux_detach_thread is called
         VSF_LINUX_ASSERT(NULL == thread->thread_pending);
         thread->process = NULL;
         vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
