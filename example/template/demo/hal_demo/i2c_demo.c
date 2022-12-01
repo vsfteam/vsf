@@ -64,6 +64,23 @@
 #   define APP_I2C_DEMO_CFG_EEPROM_DELAY_MS             10      // WriteCycleTiming
 #endif
 
+#ifndef APP_I2C_DEMO_CFG_EEPROM_SET_WRITE_ADDR_CMD
+#   define APP_I2C_DEMO_CFG_EEPROM_SET_WRITE_ADDR_CMD   (VSF_I2C_CMD_WRITE | VSF_I2C_CMD_START)
+#endif
+
+#ifndef APP_I2C_DEMO_CFG_EEPROM_WRITE_DATA_CMD
+#   define APP_I2C_DEMO_CFG_EEPROM_WRITE_DATA_CMD       (VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP)
+#endif
+
+#ifndef APP_I2C_DEMO_CFG_EEPROM_SET_READ_ADDR_CMD
+//#   define APP_I2C_DEMO_CFG_EEPROM_SET_READ_ADDR_CMD    (VSF_I2C_CMD_WRITE | VSF_I2C_CMD_START)
+#   define APP_I2C_DEMO_CFG_EEPROM_SET_READ_ADDR_CMD    (VSF_I2C_CMD_WRITE | VSF_I2C_CMD_START | VSF_I2C_CMD_STOP)
+#endif
+
+#ifndef APP_I2C_DEMO_CFG_EEPROM_READ_DATA_CMD
+#   define APP_I2C_DEMO_CFG_EEPROM_READ_DATA_CMD        (VSF_I2C_CMD_START | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP)
+#endif
+
 #ifndef APP_I2C_DEMO_ISR_PRIO
 #   define APP_I2C_DEMO_ISR_PRIO                        vsf_arch_prio_2
 #endif
@@ -256,8 +273,9 @@ static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             for (int i = 0; i < dimof(__app_i2c_demo.send_buffer); i++) {
                 __app_i2c_demo.send_buffer[i] = dimof(__app_i2c_demo.send_buffer) - i;
             }
+            memset(__app_i2c_demo.recv_buffer, 0, sizeof(__app_i2c_demo.recv_buffer));
             __app_i2c_demo.next_evt = VSF_EVT_EEPROM_WRTIE_ADDR_CPL;
-            result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_WRITE | VSF_I2C_CMD_START,
+            result = vsf_i2c_master_request(i2c_ptr, device_address, APP_I2C_DEMO_CFG_EEPROM_SET_WRITE_ADDR_CMD,
                                             dimof(__app_i2c_demo.eeprom_address), __app_i2c_demo.eeprom_address);
             VSF_ASSERT(result == VSF_ERR_NONE);
         }
@@ -265,7 +283,7 @@ static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     case VSF_EVT_EEPROM_WRTIE_ADDR_CPL:
         __app_i2c_demo.next_evt = VSF_EVT_EEPROM_WRTIE_DATA_CPL;
-        result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
+        result = vsf_i2c_master_request(i2c_ptr, device_address, APP_I2C_DEMO_CFG_EEPROM_WRITE_DATA_CMD,
                                dimof(__app_i2c_demo.send_buffer), __app_i2c_demo.send_buffer);
         VSF_ASSERT(result == VSF_ERR_NONE);
         break;
@@ -276,13 +294,13 @@ static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     case VSF_EVT_TIMER:
         __app_i2c_demo.next_evt = VSF_EVT_EEPROM_READ_DATA;
-        result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_WRITE | VSF_I2C_CMD_START, 2, __app_i2c_demo.eeprom_address);
+        result = vsf_i2c_master_request(i2c_ptr, device_address, APP_I2C_DEMO_CFG_EEPROM_SET_READ_ADDR_CMD, 2, __app_i2c_demo.eeprom_address);
         VSF_ASSERT(result == VSF_ERR_NONE);
         break;
 
     case VSF_EVT_EEPROM_READ_DATA:
         __app_i2c_demo.next_evt = VSF_EVT_EEPROM_READ_DATA_CPL;
-        result = vsf_i2c_master_request(i2c_ptr, device_address, VSF_I2C_CMD_START | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP, dimof(__app_i2c_demo.recv_buffer), __app_i2c_demo.recv_buffer);
+        result = vsf_i2c_master_request(i2c_ptr, device_address, APP_I2C_DEMO_CFG_EEPROM_READ_DATA_CMD, dimof(__app_i2c_demo.recv_buffer), __app_i2c_demo.recv_buffer);
         VSF_ASSERT(result == VSF_ERR_NONE);
         break;
 
@@ -295,9 +313,11 @@ static void __i2c_eeprom_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         } else {
             vsf_trace_debug("read data completed\r\n");
         }
+        __i2c_demo_deinit(i2c_ptr);
         break;
 
     case VSF_EVT_EEPROM_NAK:
+        __i2c_demo_deinit(i2c_ptr);
         vsf_trace_debug("eeprom read or write nak\r\n");
         break;
     }
