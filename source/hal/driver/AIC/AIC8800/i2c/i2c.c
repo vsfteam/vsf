@@ -255,6 +255,8 @@ static void __i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
         }
         count += hw_i2c_ptr->write_request.count;
         hw_i2c_ptr->write_request.count = 0;
+    } else {
+
     }
     hw_i2c_const->reg->LR = count;
     hw_i2c_const->reg->CR = cr_value;
@@ -290,6 +292,10 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
         }
 
         if (is_stop || is_restart) {
+            if (is_read) {
+                hw_i2c_ptr->read_request.count = count;
+                hw_i2c_ptr->read_request.buffer_ptr = buffer;
+            }
             __i2c_master_request(hw_i2c_ptr, address, cmd, count, buffer);
             return VSF_ERR_NONE;
         }
