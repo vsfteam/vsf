@@ -63,6 +63,8 @@
 #endif
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
 #   ifndef VSF_LINUX_CFG_PRIO_SIGNAL
+// Note that VSF_LINUX_CFG_PRIO_SIGNAL SHOULD be higher than priority of normal
+//  linux thread, VSF_LINUX_CFG_PRIO_HIGHEST should be defined to higher priority
 #       define VSF_LINUX_CFG_PRIO_SIGNAL        VSF_LINUX_CFG_PRIO_HIGHEST
 #   endif
 #endif

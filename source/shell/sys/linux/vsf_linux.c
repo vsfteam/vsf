@@ -1240,7 +1240,7 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         vsf_eda_post_evt(&thread->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
     } else {
         vsf_linux_process_t *process = thread->process;
-        if (    (NULL == process) || 
+        if (    (NULL == process) ||
                 !vsf_dlist_is_in(vsf_linux_thread_t, thread_node, &process->thread_list, thread)) {
             vsf_unprotect_sched(orig);
             vsf_heap_free(thread);
@@ -1533,8 +1533,10 @@ int kill(pid_t pid, int sig)
         return 0;
     }
     vsf_unprotect_sched(orig);
-    // put a yield here to make sure sighandler will run?
-    vsf_thread_yield();
+    // priority of sighandler which is defined by VSF_LINUX_CFG_PRIO_SIGNAL shoule
+    //  be higher than normal task, so no need to yield here, and thus kill can
+    //  be called in non-thread environment.
+//    vsf_thread_yield();
     return 0;
 #else
     return -1;
