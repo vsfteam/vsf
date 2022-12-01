@@ -35,44 +35,13 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_GPIO_I2C_CFG_CUSTOM_CALL_BACK_TIMER
-#   define VSF_GPIO_I2C_CFG_CUSTOM_CALL_BACK_TIMER          DISABLED
-#endif
-
-#if VSF_GPIO_I2C_CFG_CUSTOM_CALL_BACK_TIMER == DISABLED
-#   ifdef VSF_GPIO_I2C_INCLUDE_HEADER
-#       define VSF_GPIO_I2C_INCLUDE_HEADER                  "kernel/vsf_kernel.h"
-#   endif
-#endif
-
-#ifndef VSF_GPIO_I2C_CFG_MAX_CLOCK_HZ
-#   define VSF_GPIO_I2C_CFG_MAX_CLOCK_HZ                    1000000
-#endif
-
 /*============================ INCLUDES ======================================*/
-
-#ifdef VSF_GPIO_I2C_INCLUDE_HEADER
-#   include VSF_GPIO_I2C_INCLUDE_HEADER
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_GPIO_I2C_CFG_CUSTOM_CALL_BACK_TIMER == DISABLED
-typedef vsf_callback_timer_t vsf_gpio_i2c_callback_timer_t;
-#endif
+vsf_dcl_class(vsf_gpio_i2c_t)
 
-typedef void vsf_gpio_i2c_cb_fn(vsf_gpio_i2c_callback_timer_t *on_timer);
-
-/*============================ INCLUDES ======================================*/
-
-#define VSF_I2C_CFG_DEC_PREFIX              vsf_gpio
-
-
-#include "hal/driver/common/template/vsf_template_i2c.h"
-
-/*============================ TYPES =========================================*/
+typedef void (*vsf_gpio_i2c_delay)(vsf_gpio_i2c_t *gpio_i2c_ptr);
 
 vsf_class(vsf_gpio_i2c_t) {
     private_member(
@@ -80,48 +49,29 @@ vsf_class(vsf_gpio_i2c_t) {
         vsf_i2c_t vsf_i2c;
 #endif
 
-        vsf_i2c_request_t                   request;
-        uint8_t                             gpio_i2c_cmd;
-        uint16_t                            data;
+        vsf_i2c_cfg_t                       cfg;
+        vsf_i2c_irq_mask_t                  irq_mask;
+        vsf_i2c_irq_mask_t                  enabled_irq_mask;
+        uint16_t                            transfered_count;
 
-        vsf_i2c_cmd_t cmd;
-        vsf_i2c_irq_mask_t irq_mask;
-        vsf_i2c_irq_mask_t                   enabled_irq_mask;
-        uint16_t                            bit_mask;
-
-        vsf_gpio_i2c_callback_timer_t       callback_timer;
-
-        uint8_t is_busy     :1;
-        uint8_t is_enabled  :1;
+        bool                                is_busy;
+        bool                                is_enabled;
     )
 
     public_member(
-        struct {
-            vsf_gpio_t                     *gpio;
-            uint32_t                        pin_mask;
-        } scl, sda;
+        vsf_gpio_t                          *port;
+        vsf_gpio_i2c_delay                  fn_delay;
+        uint8_t                             scl_pin;
+        uint8_t                             sda_pin;
     )
 };
 
 
 /*============================ INCLUDES ======================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
 
-#if VSF_GPIO_I2C_CFG_CUSTOM_CALL_BACK_TIMER == DISABLED
-static inline void vsf_gpio_i2c_callback_timer_init(vsf_gpio_i2c_callback_timer_t *timer_ptr, vsf_gpio_i2c_cb_fn *fn)
-{
-    timer_ptr->on_timer = fn;
-    vsf_callback_timer_init(timer_ptr);
-}
-
-static inline void vsf_gpio_i2c_callback_timer_add_us(vsf_gpio_i2c_callback_timer_t *timer_ptr, uint_fast32_t us)
-{
-    vsf_callback_timer_add_us(timer_ptr, us);
-}
-#endif
+#define VSF_I2C_CFG_DEC_PREFIX              vsf_gpio
+#define VSF_I2C_CFG_DEC_UPCASE_PREFIX       VSF_GPIO
+#include "hal/driver/common/i2c/i2c_template.h"
 
 #ifdef __cplusplus
 }
