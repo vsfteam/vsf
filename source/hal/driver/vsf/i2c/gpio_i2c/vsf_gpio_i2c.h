@@ -40,8 +40,26 @@ extern "C" {
 #   define VSF_GPIO_I2C_CFG_MULTI_CLASS     VSF_I2C_CFG_MULTI_CLASS
 #endif
 
-/*============================ INCLUDES ======================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#if VSF_GPIO_I2C_CFG_MULTI_CLASS == ENABLED
+#   define __describe_gpio_i2c_op()         .op = &vsf_gpio_i2c_op,
+#else
+#   define __describe_gpio_i2c_op()
+#endif
+
+#define __describe_gpio_i2c(__name, __gpio_port, __fn_delay, __scl_pin, __sda_pin)\
+    vsf_gpio_i2c_t __name = {                                                   \
+        __describe_gpio_i2c_op()                                                \
+        .port           = (__gpio_port),                                        \
+        .fn_delay       = (__fn_delay),                                         \
+        .scl_pin        = (__scl_pin),                                          \
+        .sda_pin        = (__sda_pin),                                          \
+    };
+
+#define describe_gpio_i2c(__name, __gpio_port, __fn_delay, __scl_pin, __sda_pin)\
+            __describe_gpio_i2c(__name, (__gpio_port), (__fn_delay), (__scl_pin), (__sda_pin))
+
 /*============================ TYPES =========================================*/
 
 vsf_dcl_class(vsf_gpio_i2c_t)
@@ -49,11 +67,12 @@ vsf_dcl_class(vsf_gpio_i2c_t)
 typedef void (*vsf_gpio_i2c_delay)(vsf_gpio_i2c_t *gpio_i2c_ptr);
 
 vsf_class(vsf_gpio_i2c_t) {
-    private_member(
 #if VSF_GPIO_I2C_CFG_MULTI_CLASS == ENABLED
-        vsf_i2c_t vsf_i2c;
+    public_member(
+        implement(vsf_i2c_t)
+    )
 #endif
-
+    private_member(
         vsf_i2c_cfg_t                       cfg;
         vsf_i2c_irq_mask_t                  irq_mask;
         vsf_i2c_irq_mask_t                  enabled_irq_mask;

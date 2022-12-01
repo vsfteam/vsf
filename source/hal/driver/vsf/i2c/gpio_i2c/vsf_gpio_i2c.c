@@ -105,8 +105,7 @@ vsf_i2c_status_t vsf_gpio_i2c_status(vsf_gpio_i2c_t *gpio_i2c_ptr)
 
 static void __vsf_gpio_i2c_scl_dominant(vsf_gpio_i2c_t *gpio_i2c_ptr)
 {
-    vsf_gpio_set(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->scl_pin);
-    vsf_gpio_set_output(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->scl_pin);
+    vsf_gpio_output_and_set(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->scl_pin);
 }
 
 static void __vsf_gpio_i2c_scl_recessive(vsf_gpio_i2c_t *gpio_i2c_ptr)
@@ -220,6 +219,7 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
         vsf_gpio_set_input(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
     }
     gpio_i2c_ptr->transfered_count = transfered_count;
+    __vsf_gpio_i2c_isrhandler(gpio_i2c_ptr);
     return VSF_ERR_NONE;
 }
 
