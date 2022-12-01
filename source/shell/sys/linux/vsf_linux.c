@@ -1240,8 +1240,8 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         vsf_eda_post_evt(&thread->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
     } else {
         vsf_linux_process_t *process = thread->process;
-        VSF_LINUX_ASSERT(process != NULL);
-        if (!vsf_dlist_is_in(vsf_linux_thread_t, thread_node, &process->thread_list, thread)) {
+        if (    (NULL == process) || 
+                !vsf_dlist_is_in(vsf_linux_thread_t, thread_node, &process->thread_list, thread)) {
             vsf_unprotect_sched(orig);
             vsf_heap_free(thread);
             return;
