@@ -35,6 +35,11 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_GPIO_I2C_CFG_MULTI_CLASS
+#   define VSF_GPIO_I2C_CFG_MULTI_CLASS     VSF_I2C_CFG_MULTI_CLASS
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -45,7 +50,7 @@ typedef void (*vsf_gpio_i2c_delay)(vsf_gpio_i2c_t *gpio_i2c_ptr);
 
 vsf_class(vsf_gpio_i2c_t) {
     private_member(
-#if VSF_USART_CFG_MULTI_CLASS == ENABLED
+#if VSF_GPIO_I2C_CFG_MULTI_CLASS == ENABLED
         vsf_i2c_t vsf_i2c;
 #endif
 
@@ -71,6 +76,7 @@ vsf_class(vsf_gpio_i2c_t) {
 
 #define VSF_I2C_CFG_DEC_PREFIX              vsf_gpio
 #define VSF_I2C_CFG_DEC_UPCASE_PREFIX       VSF_GPIO
+#define VSF_I2C_CFG_DEC_EXTERN_OP           ENABLED
 #include "hal/driver/common/i2c/i2c_template.h"
 
 #ifdef __cplusplus
