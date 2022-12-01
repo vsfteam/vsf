@@ -1241,7 +1241,8 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         vsf_eda_post_evt(&thread->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
     } else {
         vsf_linux_process_t *process = thread->process;
-        if (NULL == process) {
+        VSF_LINUX_ASSERT(process != NULL);
+        if (!vsf_dlist_is_in(vsf_linux_thread_t, thread_node, &process->thread_list, thread)) {
             vsf_unprotect_sched(orig);
             vsf_heap_free(thread);
             return;
@@ -1267,7 +1268,6 @@ void vsf_linux_detach_thread(vsf_linux_thread_t *thread)
     if (process != NULL) {
         // if assert here, process exists before vsf_linux_detach_thread is called
         VSF_LINUX_ASSERT(NULL == thread->thread_pending);
-        thread->process = NULL;
         vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
     }
     vsf_unprotect_sched(orig);
