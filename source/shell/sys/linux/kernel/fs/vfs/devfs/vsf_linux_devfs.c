@@ -62,6 +62,11 @@
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_LINUX_I2C_CFG_ARCH_PRIO
+#   define VSF_LINUX_I2C_CFG_ARCH_PRIO          vsf_arch_prio_0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -421,7 +426,7 @@ static void __vsf_linux_i2c_init(vsf_linux_fd_t *sfd)
     priv->i2c.cfg.clock_hz = 100 * 1000;
     priv->i2c.cfg.isr.handler_fn = __vsf_linux_i2c_isrhandler;
     priv->i2c.cfg.isr.target_ptr = priv;
-    priv->i2c.cfg.isr.prio = vsf_arch_prio_0;
+    priv->i2c.cfg.isr.prio = VSF_LINUX_I2C_CFG_ARCH_PRIO;
     vsf_i2c_init(i2c, &priv->i2c.cfg);
     while (fsm_rt_cpl != vsf_i2c_enable(i2c));
     vsf_i2c_irq_enable(i2c, VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
