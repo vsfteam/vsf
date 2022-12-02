@@ -15,10 +15,13 @@
  *                                                                           *
  ****************************************************************************/
 
-
-/*============================ INCLUDES ======================================*/
+#define VSF_I2C_CFG_IMP_PREFIX              vsf_multiplex
+#define VSF_I2C_CFG_IMP_UPCASE_PREFIX       VSF_MULTIPLEX
+#define VSF_I2C_CFG_IMP_EXTERN_OP           ENABLED
 
 #define __VSF_I2C_MULTIPLEX_CLASS_IMPLEMENT
+
+/*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
@@ -124,9 +127,8 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_
     }
 }
 
-vsf_err_t vsf_multiplex_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
+vsf_err_t vsf_multiplex_i2c_init(vsf_multiplex_i2c_t *m_i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
 {
-    vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t * multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
@@ -150,9 +152,8 @@ vsf_err_t vsf_multiplex_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
     return result;
 }
 
-void vsf_multiplex_i2c_fini(vsf_i2c_t *i2c_ptr)
+void vsf_multiplex_i2c_fini(vsf_multiplex_i2c_t *m_i2c_ptr)
 {
-    vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t * multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
@@ -163,12 +164,10 @@ void vsf_multiplex_i2c_fini(vsf_i2c_t *i2c_ptr)
             vsf_i2c_fini(m_i2c_ptr->multiplexer->i2c_ptr);
         }
     vsf_multiplex_i2c_unprotect(state);
-
 }
 
-fsm_rt_t vsf_multiplex_i2c_enable(vsf_i2c_t *i2c_ptr)
+fsm_rt_t vsf_multiplex_i2c_enable(vsf_multiplex_i2c_t *m_i2c_ptr)
 {
-    vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t *multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
@@ -185,9 +184,8 @@ fsm_rt_t vsf_multiplex_i2c_enable(vsf_i2c_t *i2c_ptr)
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_multiplex_i2c_disable(vsf_i2c_t *i2c_ptr)
+fsm_rt_t vsf_multiplex_i2c_disable(vsf_multiplex_i2c_t *m_i2c_ptr)
 {
-    vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t *multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
@@ -206,9 +204,8 @@ fsm_rt_t vsf_multiplex_i2c_disable(vsf_i2c_t *i2c_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_multiplex_i2c_irq_enable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
+void vsf_multiplex_i2c_irq_enable(vsf_multiplex_i2c_t *m_i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
-    vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t *multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
@@ -225,9 +222,8 @@ void vsf_multiplex_i2c_irq_enable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mas
     vsf_multiplex_i2c_unprotect(state);
 }
 
-void vsf_multiplex_i2c_irq_disable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
+void vsf_multiplex_i2c_irq_disable(vsf_multiplex_i2c_t *m_i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
-    vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t *multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
@@ -244,9 +240,8 @@ void vsf_multiplex_i2c_irq_disable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_ma
     vsf_multiplex_i2c_unprotect(state);
 }
 
-vsf_i2c_status_t vsf_multiplex_i2c_status(vsf_i2c_t *i2c_ptr)
+vsf_i2c_status_t vsf_multiplex_i2c_status(vsf_multiplex_i2c_t *m_i2c_ptr)
 {
-    vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t *multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
@@ -265,13 +260,12 @@ vsf_i2c_status_t vsf_multiplex_i2c_status(vsf_i2c_t *i2c_ptr)
     return status;
 }
 
-vsf_err_t vsf_multiplex_i2c_master_request(vsf_i2c_t *i2c_ptr,
+vsf_err_t vsf_multiplex_i2c_master_request(vsf_multiplex_i2c_t *m_i2c_ptr,
                                            uint16_t address,
                                            vsf_i2c_cmd_t cmd,
                                            uint16_t count,
                                            uint8_t *buffer_ptr)
 {
-    vsf_multiplex_i2c_t *m_i2c_ptr = (vsf_multiplex_i2c_t *)i2c_ptr;
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t *multiplexer = m_i2c_ptr->multiplexer;
     VSF_HAL_ASSERT(NULL != multiplexer);
@@ -298,5 +292,8 @@ vsf_err_t vsf_multiplex_i2c_master_request(vsf_i2c_t *i2c_ptr,
 
     return result;
 }
+/*============================ GLOBAL VARIABLES ==============================*/
+
+#include "hal/driver/common/i2c/i2c_template.inc"
 
 #endif //!VSF_HAL_I2C_IMP_MULTIPLEX_I2C

@@ -176,7 +176,10 @@ vsf_err_t vsf_hw_i2c_init(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
 void vsf_hw_i2c_fini(vsf_hw_i2c_t *hw_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
+    const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
+    VSF_HAL_ASSERT(NULL != hw_i2c_const);
 
+    NVIC_DisableIRQ(hw_i2c_const->irqn);
     cpusysctrl_pclkmd_set(CSC_PCLKME_I2CM_EN_BIT);
 }
 

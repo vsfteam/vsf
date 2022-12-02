@@ -44,6 +44,15 @@ vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
     return i2c_ptr->op->init(i2c_ptr, cfg_ptr);
 }
 
+void vsf_i2c_fini(vsf_i2c_t *i2c_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->fini != NULL);
+
+    i2c_ptr->op->fini(i2c_ptr);
+}
+
 fsm_rt_t vsf_i2c_enable(vsf_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
