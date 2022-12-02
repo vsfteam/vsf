@@ -21,15 +21,14 @@
 #define __VSF_MULTIPLEX_SPI_CLASS_IMPLEMENT
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_SPI == ENABLED
-#if VSF_SPI_CFG_MULTIPLEX_CS == ENABLED
+#if VSF_HAL_USE_SPI == ENABLED && VSF_HAL_USE_MULTIPLEX_CS_SPI == ENABLED
 
 #include "hal/driver/driver.h"
 
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
-#   define VSF_SPI_CFG_IMP_PREFIX                       VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
+#   define VSF_SPI_CFG_IMP_PREFIX                   VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
 #endif
 
 #define VSF_MULTIPLEXER_SPI_MAX_CS_COUNT            (sizeof(SPI_MULTIPLEXER_MASK_TYPE) * 8)
@@ -198,9 +197,8 @@ static void __vsf_multiplex_spi_irq_handler(void *target_ptr, vsf_spi_t *spi_ptr
     }
 }
 
-vsf_err_t vsf_multiplex_spi_init(vsf_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr)
+vsf_err_t vsf_multiplex_spi_init(vsf_multiplex_spi_t *m_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -229,9 +227,8 @@ vsf_err_t vsf_multiplex_spi_init(vsf_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr)
     return result;
 }
 
-fsm_rt_t vsf_multiplex_spi_enable(vsf_spi_t *spi_ptr)
+fsm_rt_t vsf_multiplex_spi_enable(vsf_multiplex_spi_t *m_spi_ptr)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -251,9 +248,8 @@ fsm_rt_t vsf_multiplex_spi_enable(vsf_spi_t *spi_ptr)
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_multiplex_spi_disable(vsf_spi_t *spi_ptr)
+fsm_rt_t vsf_multiplex_spi_disable(vsf_multiplex_spi_t *m_spi_ptr)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -274,9 +270,8 @@ fsm_rt_t vsf_multiplex_spi_disable(vsf_spi_t *spi_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_multiplex_spi_irq_enable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
+void vsf_multiplex_spi_irq_enable(vsf_multiplex_spi_t *m_spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -296,9 +291,8 @@ void vsf_multiplex_spi_irq_enable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mas
     vsf_multiplex_spi_unprotect(state);
 }
 
-void vsf_multiplex_spi_irq_disable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
+void vsf_multiplex_spi_irq_disable(vsf_multiplex_spi_t *m_spi_ptr, vsf_spi_irq_mask_t irq_mask)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -318,9 +312,8 @@ void vsf_multiplex_spi_irq_disable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_ma
     vsf_multiplex_spi_unprotect(state);
 }
 
-void vsf_multiplex_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t cs_index)
+void vsf_multiplex_spi_cs_active(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t cs_index)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -338,9 +331,8 @@ void vsf_multiplex_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t cs_index)
     vsf_multiplex_spi_unprotect(state);
 }
 
-void vsf_multiplex_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t cs_index)
+void vsf_multiplex_spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t cs_index)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -367,7 +359,7 @@ void vsf_multiplex_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t cs_index)
 }
 
 
-void vsf_multiplex_spi_fifo_transfer(vsf_spi_t *spi_ptr,
+void vsf_multiplex_spi_fifo_transfer(vsf_multiplex_spi_t *m_spi_ptr,
                                      void *out_buffer_ptr,
                                      uint_fast32_t out_cnt,
                                      uint_fast32_t* out_offset_ptr,
@@ -379,12 +371,11 @@ void vsf_multiplex_spi_fifo_transfer(vsf_spi_t *spi_ptr,
     VSF_HAL_ASSERT(0);
 }
 
-vsf_err_t vsf_multiplex_spi_request_transfer(vsf_spi_t *spi_ptr,
+vsf_err_t vsf_multiplex_spi_request_transfer(vsf_multiplex_spi_t *m_spi_ptr,
                                              void *out_buffer_ptr,
                                              void *in_buffer_ptr,
                                              uint_fast32_t count)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -422,9 +413,8 @@ vsf_err_t vsf_multiplex_spi_request_transfer(vsf_spi_t *spi_ptr,
     return result;
 }
 
-vsf_err_t vsf_multiplex_spi_cancel_transfer(vsf_spi_t *spi_ptr)
+vsf_err_t vsf_multiplex_spi_cancel_transfer(vsf_multiplex_spi_t *m_spi_ptr)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -443,9 +433,8 @@ vsf_err_t vsf_multiplex_spi_cancel_transfer(vsf_spi_t *spi_ptr)
     return result;
 }
 
-vsf_spi_status_t vsf_multiplex_spi_status(vsf_spi_t *spi_ptr)
+vsf_spi_status_t vsf_multiplex_spi_status(vsf_multiplex_spi_t *m_spi_ptr)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -463,9 +452,9 @@ vsf_spi_status_t vsf_multiplex_spi_status(vsf_spi_t *spi_ptr)
     return result;
 }
 
-int_fast32_t vsf_multiplex_spi_get_transfered_count(vsf_spi_t *spi_ptr)
+void vsf_multiplex_spi_get_transfered_count(vsf_multiplex_spi_t *m_spi_ptr,
+                                            uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 {
-    vsf_multiplex_spi_t *m_spi_ptr = (vsf_multiplex_spi_t *)spi_ptr;
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
@@ -475,15 +464,16 @@ int_fast32_t vsf_multiplex_spi_get_transfered_count(vsf_spi_t *spi_ptr)
 
     if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
         vsf_protect_t state = vsf_multiplex_spi_protect();
-            result = vsf_spi_get_transfered_count(spi_info_ptr->spi);
+        vsf_spi_get_transfered_count(spi_info_ptr->spi, tx_count, rx_count);
         vsf_multiplex_spi_unprotect(state);
     } else {
-        result = m_spi_ptr->transfered_count;
+        if (tx_count != NULL) {
+            *tx_count = m_spi_ptr->transfered_count;
+        }
+        if (rx_count != NULL) {
+            *rx_count = m_spi_ptr->transfered_count;
+        }
     }
-
-    return result;
 }
 
-#endif  /* VSF_SPI_CFG_MULTIPLEX_CS */
-
-#endif  /* VSF_HAL_USE_SPI */
+#endif  /* VSF_HAL_USE_SPI && VSF_HAL_USE_MULTIPLEX_CS_SPI */
