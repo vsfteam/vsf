@@ -22,7 +22,7 @@
 #if APP_USE_HAL_DEMO == ENABLED && APP_USE_HAL_SPI_DEMO == ENABLED && VSF_HAL_USE_SPI == ENABLED
 
 /*============================ MACROS ========================================*/
-#if VSF_SPI_CFG_MULTIPLEX_CS == ENABLED
+#if VSF_HAL_USE_MULTIPLEX_CS_SPI == ENABLED
     extern vsf_multiplex_spi_t multiplex_spi1;
     #undef APP_SPI_DEMO_CFG_SPI
     #define APP_SPI_DEMO_CFG_SPI (vsf_spi_t *)&multiplex_spi1

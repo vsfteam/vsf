@@ -33,80 +33,92 @@ extern "C" {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #ifndef VSF_HAL_ASSERT
-#   define VSF_HAL_ASSERT(__CON)        VSF_ASSERT(__CON)
+#   define VSF_HAL_ASSERT(__CON)            VSF_ASSERT(__CON)
 #endif
 #else
 #ifndef VSF_HAL_ASSERT
-#   define VSF_HAL_ASSERT(...)          VSF_ASSERT(__VA_ARGS__)
+#   define VSF_HAL_ASSERT(...)              VSF_ASSERT(__VA_ARGS__)
 #endif
 #endif
 
 #ifndef VSF_HAL_USE_IO
-#   define VSF_HAL_USE_IO               ENABLED
+#   define VSF_HAL_USE_IO                   ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_GPIO
-#   define VSF_HAL_USE_GPIO             ENABLED
+#   define VSF_HAL_USE_GPIO                 ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_PM
-#   define VSF_HAL_USE_PM               ENABLED
+#   define VSF_HAL_USE_PM                   ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_USART
-#   define VSF_HAL_USE_USART            ENABLED
+#   define VSF_HAL_USE_USART                ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_SPI
-#   define VSF_HAL_USE_SPI              ENABLED
+#   define VSF_HAL_USE_SPI                  ENABLED
+#endif
+
+#ifndef VSF_HAL_USE_MULTIPLEX_CS_SPI
+#   define VSF_HAL_USE_MULTIPLEX_CS_SPI     ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_I2C
-#   define VSF_HAL_USE_I2C              ENABLED
+#   define VSF_HAL_USE_I2C                  ENABLED
+#endif
+
+#ifndef VSF_HAL_USE_MULTIPLEX_I2C
+#   define VSF_HAL_USE_MULTIPLEX_I2C        ENABLED
+#endif
+
+#ifndef VSF_HAL_USE_MERGER_REQUEST_I2C
+#   define VSF_HAL_USE_MERGER_REQUEST_I2C   ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_I2S
-#   define VSF_HAL_USE_I2S              ENABLED
+#   define VSF_HAL_USE_I2S                  ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_GPIO_I2C
-#   define VSF_HAL_USE_GPIO_I2C         ENABLED
+#   define VSF_HAL_USE_GPIO_I2C             ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_TIMER
-#   define VSF_HAL_USE_TIMER            ENABLED
+#   define VSF_HAL_USE_TIMER                ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_ADC
-#   define VSF_HAL_USE_ADC              ENABLED
+#   define VSF_HAL_USE_ADC                  ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_DAC
-#   define VSF_HAL_USE_DAC              ENABLED
+#   define VSF_HAL_USE_DAC                  ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_RTC
-#   define VSF_HAL_USE_RTC              ENABLED
+#   define VSF_HAL_USE_RTC                  ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_USBD
-#   define VSF_HAL_USE_USBD             VSF_USE_USB_DEVICE
+#   define VSF_HAL_USE_USBD                 VSF_USE_USB_DEVICE
 #endif
 
 #ifndef VSF_HAL_USE_USBH
-#   define VSF_HAL_USE_USBH             VSF_USE_USB_HOST
+#   define VSF_HAL_USE_USBH                 VSF_USE_USB_HOST
 #endif
 
 #ifndef VSF_HAL_USE_FLASH
-#   define VSF_HAL_USE_FLASH            ENABLED
+#   define VSF_HAL_USE_FLASH                ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_PWM
-#   define VSF_HAL_USE_PWM              ENABLED
+#   define VSF_HAL_USE_PWM                  ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_MMC
-#   define VSF_HAL_USE_MMC              ENABLED
+#   define VSF_HAL_USE_MMC                  ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
