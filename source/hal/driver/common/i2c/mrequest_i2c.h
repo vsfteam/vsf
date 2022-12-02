@@ -31,29 +31,14 @@
 
 #include "utilities/ooc_class.h"
 
-#define VSF_I2C_CFG_DEC_PREFIX              vsf_mrequest
-#include "hal/driver/common/template/vsf_template_i2c.h"
-
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_HAL_USE_MREQUEST_I2C_REQEUST_BUFFER_SIZE
-#   define VSF_HAL_USE_MREQUEST_I2C_REQEUST_BUFFER_SIZE     3
+#ifndef VSF_MREQUEST_I2C_CFG_REQEUST_BUFFER_SIZE
+#   define VSF_MREQUEST_I2C_CFG_REQEUST_BUFFER_SIZE     3
 #endif
 
-#ifndef VSF_HAL_MRQUEST_I2C_CFG_MULTI_CLASS
-#   define VSF_HAL_MRQUEST_I2C_CFG_MULTI_CLASS  VSF_I2C_CFG_MULTI_CLASS
-#endif
-
-#ifndef VSF_MREQUEST_I2C_CFG_INSTANCE
-#   define VSF_MREQUEST_I2C_CFG_INSTANCE                    DISABLED
-#endif
-
-#ifndef VSF_MREQUEST_I2C_CFG_INSTANCE_COUNT
-#   define VSF_MREQUEST_I2C_CFG_INSTANCE_COUNT              1
-#endif
-
-#ifndef VSF_MREQUEST_I2C_CFG_INSTANCE_PREFIX
-#   define VSF_MREQUEST_I2C_CFG_INSTANCE_PREFIX             vsf
+#ifndef VSF_MREQUEST_I2C_CFG_MULTI_CLASS
+#   define VSF_MREQUEST_I2C_CFG_MULTI_CLASS              VSF_I2C_CFG_MULTI_CLASS
 #endif
 
 #define VSF_MREQUEST_I2C_DEC(__CNT, __IGNORE)                                   \
@@ -77,6 +62,21 @@
         .i2c_ptr = (vsf_i2c_t *)__REAL_I2C,                                     \
     }
 #endif
+    
+#if VSF_MREQUEST_I2C_CFG_MULTI_CLASS == ENABLED
+#   define __describe_mrequest_op()         .op = &vsf_mrequest_op,
+#else
+#   define __describe_mrequest_op()
+#endif
+
+#define __describe_mrequest(__name, __real_i2c)\
+    vsf_mrequest_t __name = {                                                   \
+        __describe_mrequest_op()                                                \
+        .i2c_ptr           = __real_i2c,                                        \
+    };
+
+#define describe_mrequest(__name, __real_i2c)\
+            __describe_mrequest(__name, __real_i2c)
 
 /*============================ INCLUDES ======================================*/
 /*============================ TYPES =========================================*/
@@ -92,7 +92,7 @@ vsf_class(vsf_mrequest_i2c_t) {
     private_member(
         vsf_i2c_cfg_t cfg;
         vsf_i2c_irq_mask_t irq_mask;
-        uint8_t buffer[VSF_HAL_USE_MREQUEST_I2C_REQEUST_BUFFER_SIZE];
+        uint8_t buffer[VSF_MREQUEST_I2C_CFG_REQEUST_BUFFER_SIZE];
 
         struct {
             vsf_i2c_cmd_t cmd;
@@ -105,7 +105,10 @@ vsf_class(vsf_mrequest_i2c_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_i2c_op_t vsf_mreqeust_i2c_op;
+#define VSF_I2C_CFG_DEC_PREFIX              vsf_mrequest
+#define VSF_I2C_CFG_DEC_UPCASE_PREFIX       VSF_MREQUEST
+#define VSF_I2C_CFG_DEC_EXTERN_OP           ENABLED
+#include "hal/driver/common/i2c/i2c_template.h"
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

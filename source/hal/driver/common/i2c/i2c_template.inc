@@ -26,20 +26,20 @@
 #define vsf_real_master_request VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
 #define vsf_real_i2c_capability VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
 
-#if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#ifndef VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY
+#   define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY       DISABLED
+#endif
 
+#if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 #   ifndef VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_RESTART
 #       define VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_RESTART                1
 #   endif
-
 #   ifndef VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_MANUAL_START_STOP
 #       define VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_MANUAL_START_STOP      1
 #   endif
-
 #   ifndef VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE
 #       define VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE                 0xFFFF
 #   endif
-
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

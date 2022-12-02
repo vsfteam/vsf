@@ -69,6 +69,7 @@ extern "C" {
 
 #define VSF_I2C_APIS(__prefix_name)                                                                                                                             \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, init,           VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2c, fini,           VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2c, enable,         VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2c, disable,        VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2c, irq_enable,     VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask) \
@@ -278,25 +279,46 @@ struct vsf_i2c_t  {
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  @param[in] cfg_ptr: a pointer to structure @ref vsf_i2c_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if i2c was initialized, or a negative error code
+ @note Initializing an i2c instance should include turning on the corresponding
+       power gating, not including the pin multiplexing function.
 
  \~chinese
  @brief 初始化一个 i2c 实例
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
  @param[in] cfg_ptr: 结构体 vsf_i2c_cfg_t 的指针，参考 @ref vsf_i2c_cfg_t
  @return vsf_err_t: 如果 i2c 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
+ @note 初始化一个i2c实例应该包括开启对应的电源门控，不包括引脚复用功能
  */
 extern vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr);
+
+/**
+ \~english
+ @brief termination a i2c instance.
+ @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
+ @note Termination an i2c instance should include turning on the corresponding
+       power gating.
+ \~chinese
+ @brief 终止一个 i2c 实例
+ @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
+ @note 终止一个i2c实例应该包括关闭对应的电源门控
+ */
+extern void vsf_i2c_fini(vsf_i2c_t *i2c_ptr);
 
 /**
  \~english
  @brief enable i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  @return fsm_rt_t: fsm_rt_cpl if enable complete, else return fsm_rt_onging
+ @note vsf_i2c_enable() should be called after vsf_i2c_init().
+       The clock gating bit only needs to be ensured to be turned on after
+       vsf_i2c_enable().
 
  \~chinese
  @brief 使能 i2c 实例
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
  @return fsm_rt_t: 如果使能成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
+ @note vsf_i2c_enable() 应该在 vsf_i2c_init() 之后调用。时钟门控位只需要确保在
+       vsf_i2c_enable() 之后开启。
  */
 extern fsm_rt_t vsf_i2c_enable(vsf_i2c_t *i2c_ptr);
 
@@ -305,11 +327,15 @@ extern fsm_rt_t vsf_i2c_enable(vsf_i2c_t *i2c_ptr);
  @brief disable i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  @return fsm_rt_t: fsm_rt_cpl if disable complete, else return fsm_rt_onging
+ @note Need to make sure that calling vsf_i2c_enable() after vsf_i2c_disable()
+       is working without calling vsf_i2c_init()
 
  \~chinese
  @brief禁能 i2c 实例
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
  @return fsm_rt_t: 如果禁能成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
+ @note 需要确保在 vsf_i2c_disable() 之后调用 vsf_i2c_enable() 是可以正常工作的，
+       而不需要调用 vsf_i2c_init()
  */
 extern fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr);
 
@@ -405,6 +431,7 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
 #if VSF_I2C_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_i2c_t                       VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t)
 #   define vsf_i2c_init(__I2C, ...)          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)          ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
+#   define vsf_i2c_fini(__I2C)               VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_fini)          ((__vsf_i2c_t *)__I2C)
 #   define vsf_i2c_enable(__I2C)             VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)        ((__vsf_i2c_t *)__I2C)
 #   define vsf_i2c_disable(__I2C)            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)       ((__vsf_i2c_t *)__I2C)
 #   define vsf_i2c_irq_enable(__I2C, ...)    VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)    ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)

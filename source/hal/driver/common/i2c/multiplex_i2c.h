@@ -31,9 +31,6 @@
 
 #include "utilities/ooc_class.h"
 
-#define VSF_I2C_CFG_DEC_PREFIX              vsf_multiplex
-#include "hal/driver/common/template/vsf_template_i2c.h"
-
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_MULTIPLEXER_I2C_CFG_MASK_TYPE
@@ -56,7 +53,6 @@ vsf_class(vsf_multiplexer_i2c_t) {
     private_member(
         vsf_slist_queue_t slist_queue;
 
-
         vsf_multiplex_i2c_t *current_m_i2c;
         i2c_multi_mask_t init_mask;
         i2c_multi_mask_t en_mask;
@@ -69,6 +65,9 @@ vsf_class(vsf_multiplexer_i2c_t) {
 
 vsf_class(vsf_multiplex_i2c_t) {
     public_member(
+#if VSF_HAL_MRQUEST_I2C_CFG_MULTI_CLASS == ENABLED
+        vsf_i2c_t vsf_i2c;
+#endif
         uint8_t id;
         vsf_multiplexer_i2c_t *multiplexer;
     )
@@ -88,10 +87,15 @@ vsf_class(vsf_multiplex_i2c_t) {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#define VSF_I2C_CFG_DEC_PREFIX              vsf_multiplex
+#define VSF_I2C_CFG_DEC_UPCASE_PREFIX       VSF_MULTIPLEX
+#define VSF_I2C_CFG_DEC_EXTERN_OP           ENABLED
+#include "hal/driver/common/i2c/i2c_template.h"
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-
 
 #endif // VSF_HAL_I2C_IMP_REQUEST_BY_CMD
 #endif
