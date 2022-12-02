@@ -1662,15 +1662,16 @@ pid_t waitpid(pid_t pid, int *status, int options)
         vsf_unprotect_sched(orig);
         return -1;
     }
-    vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
     if (process->status & PID_STATUS_RUNNING) {
         process->thread_pending = cur_thread;
         vsf_unprotect_sched(orig);
         vsf_thread_wfe(VSF_EVT_USER);
+        orig = vsf_protect_sched();
     } else {
         cur_thread->retval = process->status;
-        vsf_unprotect_sched(orig);
     }
+    vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+    vsf_unprotect_sched(orig);
 
     if (status != NULL) {
         *status = cur_thread->retval;

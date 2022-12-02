@@ -474,6 +474,7 @@ int timer_create(clockid_t clockid, struct sigevent *sevp, timer_t *timerid)
         return -1;
     }
 
+    linux_timer->overrun = 0;
     if (NULL == sevp) {
         linux_timer->evt.sigev_notify = SIGEV_SIGNAL;
         linux_timer->evt.sigev_signo = SIGALRM;
