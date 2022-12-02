@@ -51,6 +51,10 @@
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR    DISABLED
 #endif
 
+#ifndef VSF_GPIO_CFG_CHNAGE_DIR_FIRST
+#   define VSF_GPIO_CFG_CHNAGE_DIR_FIRST                    ENABLED
+#endif
+
 #define vsf_real_gpio_t                 VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t)
 #define vsf_real_gpio_set_input         VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_input)
 #define vsf_real_gpio_set_output        VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_output)
@@ -137,8 +141,13 @@ void vsf_real_gpio_output_and_set(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
+#if VSF_GPIO_CFG_CHNAGE_DIR_FIRST == ENABLED
+    vsf_real_gpio_set_output(gpio_ptr, pin_mask);
+    vsf_real_gpio_set(gpio_ptr, pin_mask);
+#else
     vsf_real_gpio_set(gpio_ptr, pin_mask);
     vsf_real_gpio_set_output(gpio_ptr, pin_mask);
+#endif
 }
 #endif
 
@@ -147,8 +156,13 @@ void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
+#if VSF_GPIO_CFG_CHNAGE_DIR_FIRST == ENABLED
+    vsf_real_gpio_set_output(gpio_ptr, pin_mask);
+    vsf_real_gpio_clear(gpio_ptr, pin_mask);
+#else
     vsf_real_gpio_clear(gpio_ptr, pin_mask);
     vsf_real_gpio_set_output(gpio_ptr, pin_mask);
+#endif
 }
 #endif
 
