@@ -126,7 +126,7 @@ typedef enum {
         while(1);                                                               \
     }
 #   else
-#   `   define VSF_ASSERT                   assert
+#       define VSF_ASSERT                   assert
 #   endif
 #endif
 
