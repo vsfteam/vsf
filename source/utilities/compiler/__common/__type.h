@@ -118,7 +118,16 @@ typedef enum {
 
 //! \brief system macros
 #ifndef VSF_ASSERT
-#   define VSF_ASSERT                       assert
+#   if VSF_USE_TRACE == ENABLED
+#       define VSF_ASSERT(...)                                                  \
+    if (!(__VA_ARGS__)) {                                                       \
+        extern void vsf_trace_assert(const char *file, int line, const char *func);\
+        vsf_trace_assert(__FILE__, __LINE__, __FUNCTION__);                     \
+        while(1);                                                               \
+    }
+#   else
+#   `   define VSF_ASSERT                   assert
+#   endif
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L

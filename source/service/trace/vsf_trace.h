@@ -124,6 +124,7 @@ extern void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list a
 extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 
 extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);
+extern void vsf_trace_assert(const char *file, int line, const char *func);
 
 #else
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L

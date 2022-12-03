@@ -324,6 +324,11 @@ void vsf_trace(vsf_trace_level_t level, const char *format, ...)
     va_end(ap);
 }
 
+void vsf_trace_assert(const char *file, int line, const char *func)
+{
+    vsf_trace_error("%s:%d %s -- assertion failed\n", file, line, func);
+}
+
 // default retarget to vsf_trace
 WEAK(vsf_stdout_init)
 void vsf_stdout_init(void)
