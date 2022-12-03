@@ -41,6 +41,10 @@ extern "C" {
 #   define VSF_TRACE_CFG_LINEEND    "\r\n"
 #endif
 
+#ifndef VSF_TRACE_CFG_DEFAULT_LEVEL
+#   define VSF_TRACE_CFG_DEFAULT_LEVEL  VSF_TRACE_INFO
+#endif
+
 // display flag
 #define VSF_TRACE_DF_DS(n)          (((n) & 0xFF) << 0) // data size
 #define VSF_TRACE_DF_DPL(n)         (((n) & 0xFF) << 8) // data per line

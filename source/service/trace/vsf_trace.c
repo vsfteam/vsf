@@ -91,6 +91,9 @@ static const char *__vsf_trace_color[VSF_TRACE_LEVEL_NUM] = {
 #endif
 
 /*============================ PROTOTYPES ====================================*/
+
+static void __vsf_trace_set_level(vsf_trace_level_t level);
+
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED
@@ -115,6 +118,7 @@ void __vsf_trace_init(vsf_stream_t *stream)
         extern void vsf_trace_output_string(const char* str);
         vsf_trace_output_string("\033[40m");
 #endif
+        __vsf_trace_set_level(VSF_TRACE_CFG_DEFAULT_LEVEL);
     }
 }
 
@@ -231,10 +235,11 @@ void vsf_trace_string(vsf_trace_level_t level, const char *str)
 {
     __vsf_trace_set_level(level);
     vsf_trace_output_string(str);
+    __vsf_trace_set_level(VSF_TRACE_CFG_DEFAULT_LEVEL);
 }
 
 SECTION(".text.vsf.trace.__vsf_trace_buffer")
-void __vsf_trace_buffer(  vsf_trace_level_t level,
+void __vsf_trace_buffer(vsf_trace_level_t level,
                         void *buffer,
                         uint_fast16_t len,
                         uint_fast32_t flag)
@@ -263,6 +268,7 @@ void __vsf_trace_buffer(  vsf_trace_level_t level,
         for (uint_fast16_t i = 0; i < len; i += data_size * data_per_line) {
             if (disp_addr) {
                 vsf_trace(level, "%08X: ", i);
+                __vsf_trace_set_level(level);
             }
 
             ptr = linebuf;
@@ -304,6 +310,7 @@ void __vsf_trace_buffer(  vsf_trace_level_t level,
             vsf_trace_output_string(linebuf);
         }
     }
+    __vsf_trace_set_level(VSF_TRACE_CFG_DEFAULT_LEVEL);
 }
 
 
@@ -312,6 +319,7 @@ void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list arg)
 {
     __vsf_trace_set_level(level);
     __vsf_trace_arg(format, arg);
+    __vsf_trace_set_level(VSF_TRACE_CFG_DEFAULT_LEVEL);
 }
 
 void vsf_trace(vsf_trace_level_t level, const char *format, ...)
@@ -322,6 +330,7 @@ void vsf_trace(vsf_trace_level_t level, const char *format, ...)
     va_start(ap, format);
     __vsf_trace_arg(format, ap);
     va_end(ap);
+    __vsf_trace_set_level(VSF_TRACE_CFG_DEFAULT_LEVEL);
 }
 
 void vsf_trace_assert(const char *file, int line, const char *func)
