@@ -114,7 +114,7 @@ static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx)
 {
     int esclen = ctx->escpos;
     char type = ctx->cmd[ctx->pos];
-    char lastch = ctx->cmd[ctx->pos + esclen - 1];
+    char lastch = ctx->cmd[ctx->pos + esclen - 1], *esc;
 
     // esclen will be used for full support to escape strings
     VSF_UNUSED_PARAM(esclen);
@@ -137,7 +137,7 @@ static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx)
         return SHELL_STATE_ESC;
     }
 
-    char *esc = &ctx->cmd[ctx->pos + 1];
+    esc = &ctx->cmd[ctx->pos + 1];
     switch (type) {
     case '[':
         if (esclen == 2) {
@@ -341,6 +341,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     int ret;
     vsf_linux_main_entry_t entry;
     char *env[2], *arg_expanded;
+    vsf_linux_process_ctx_t *ctx;
 
     // skip spaces
     while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
@@ -381,7 +382,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
         goto delete_process_and_fail;
     }
 
-    vsf_linux_process_ctx_t *ctx = &process->ctx;
+    ctx = &process->ctx;
     arg_expanded = __strdup_ex(process, cmd);
     if (NULL == arg_expanded) {
         goto delete_process_and_fail;

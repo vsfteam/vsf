@@ -217,6 +217,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
 {
     vsf_linux_socket_unix_priv_t *priv = (vsf_linux_socket_unix_priv_t *)socket_priv;
     struct sockaddr_un *addr_un = (struct sockaddr_un *)addr;
+    vsf_linux_fd_t *sfd_tx;
     VSF_LINUX_ASSERT(!priv->is_listening);
     VSF_LINUX_ASSERT(!priv->remote);
 
@@ -253,7 +254,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     }
     VSF_LINUX_ASSERT(priv->remote->trig != NULL);
 
-    vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_rx_priv_t *)priv->rw.sfd_tx->priv);
+    sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_rx_priv_t *)priv->rw.sfd_tx->priv);
     if (NULL == sfd_tx) {
         priv->remote->remote = NULL;
         vsf_linux_trigger_signal(priv->remote->trig, 0);

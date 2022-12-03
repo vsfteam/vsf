@@ -367,8 +367,8 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                             pow *= 10;
                         }
 
-                        i_intpart = d_intpart;
-                        i_fractpart = d_fractpart * pow;
+                        i_intpart = (int)d_intpart;
+                        i_fractpart = (int)(d_fractpart * pow);
                         flags.is_signed = i_fractpart < 0;
                         if (flags.is_signed) {
                             i_fractpart = -i_fractpart;
@@ -427,7 +427,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         d_fractpart = modf(arg.d, &d_intpart);
 
                         exp = 0;
-                        i_intpart = d_intpart;
+                        i_intpart = (int)d_intpart;
                         if (i_intpart < 0) {
                             i_intpart = -i_intpart;
                         }

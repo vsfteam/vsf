@@ -138,6 +138,7 @@ vsf_err_t vsf_linux_ntp_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
         setsockopt(ntp_rtc_ptr->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
     }
 
+    time_t time;
     ssize_t ret;
     ntp_packet_header_t ntp_packet_header = {
         .LI_VN_Mode =   (2 << 6)    // LI:1 - last minute of the day has 59 seconds
@@ -161,7 +162,7 @@ vsf_err_t vsf_linux_ntp_rtc_get(vsf_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 
     // 32-bit seconds, will overflow in 2036
     // ntp time starts from 1900, while time_t starts from 1970
-    time_t time = ntohl(ntp_packet_header.TransmitTimestampSeconds) - 2208988800ULL;
+    time = ntohl(ntp_packet_header.TransmitTimestampSeconds) - 2208988800ULL;
     if (rtc_tm != NULL) {
         struct tm *t = localtime(&time);
 

@@ -44,6 +44,9 @@ $   include "../../include/unistd.h"
 
 void vsf_linux_telnetd_thread(vsf_linux_telnetd_t *telnetd)
 {
+    vsf_linux_process_t *process;
+    vsf_linux_fd_t *sfd, *sfd_from;
+
     telnetd->listener_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (telnetd->listener_sock < 0) {
         vsf_trace_error("telnetd: fail to create socket\n");
@@ -83,7 +86,7 @@ void vsf_linux_telnetd_thread(vsf_linux_telnetd_t *telnetd)
         }
 
         // implement shell process manually to avoid posix_spawn
-        vsf_linux_process_t *process = vsf_linux_create_process(0);
+        process = vsf_linux_create_process(0);
         if (NULL == process) {
             vsf_trace_error("telnetd: fail to create child process\n");
             goto close_client;
@@ -96,7 +99,7 @@ void vsf_linux_telnetd_thread(vsf_linux_telnetd_t *telnetd)
 
         extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
                 const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv);
-        vsf_linux_fd_t *sfd, *sfd_from = vsf_linux_fd_get(client_sock);
+        sfd_from = vsf_linux_fd_get(client_sock);
         if (STDIN_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, sfd_from->priv)) {
             goto delete_process_and_close_client;
         }

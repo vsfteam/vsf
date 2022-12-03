@@ -617,14 +617,16 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 
 int socketpair(int domain, int type, int protocol, int socket_vector[2])
 {
+    vsf_linux_fd_t *rsfd, *wsfd;
+
     socket_vector[0] = socket(domain, type, protocol);
     socket_vector[1] = socket(domain, type, protocol);
     if ((socket_vector[0] < 0) || (socket_vector[1] < 0)) {
         goto fail;
     }
 
-    vsf_linux_fd_t *rsfd = vsf_linux_fd_get(socket_vector[0]);
-    vsf_linux_fd_t *wsfd = vsf_linux_fd_get(socket_vector[1]);
+    rsfd = vsf_linux_fd_get(socket_vector[0]);
+    wsfd = vsf_linux_fd_get(socket_vector[1]);
     if (NULL == ((vsf_linux_socket_op_t *)rsfd->op)->fn_socketpair) {
         goto fail;
     }
