@@ -127,11 +127,18 @@ static vk_usbd_ifs_t * __vk_usbd_get_ifs_byep(vk_usbd_cfg_t *config, uint_fast8_
     return ifs >= 0 ? &config->ifs[ifs] : NULL;
 }
 
-void vk_usbd_ifs_add_ep(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs, uint_fast8_t ep)
+vsf_err_t vk_usbd_ifs_add_ep(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs, uint_fast8_t ep,
+        usb_ep_type_t type, uint_fast16_t size)
 {
+    VSF_USBD_DRV_PREPARE(dev);
+    if (VSF_ERR_NONE != vk_usbd_drv_ep_add(ep, type, size)) {
+        return VSF_ERR_FAIL;
+    }
+
     vk_usbd_cfg_t *config = vk_usbd_get_cur_cfg(dev);
     ep = (ep & 0x0F) | ((ep & 0x80) >> 3);
     config->ep_ifs_map[ep] = vk_usbd_get_ifs_no(dev, ifs);
+    return VSF_ERR_NONE;
 }
 
 static void __vk_usbd_cfg_fini(vk_usbd_dev_t *dev)
@@ -323,11 +330,10 @@ static vsf_err_t __vk_usbd_auto_init(vk_usbd_dev_t *dev)
                 uint_fast16_t ep_size = desc_ep->wMaxPacketSize;
 
                 VSF_USB_ASSERT((ep_attr & 0x03) <= 3);
-                if (VSF_ERR_NONE != vk_usbd_drv_ep_add(ep_addr, ep_attr & 0x03, ep_size)) {
+                if (VSF_ERR_NONE != vk_usbd_ifs_add_ep(dev, vk_usbd_get_ifs(dev, cur_ifs),
+                                ep_addr, ep_attr & 0x03, ep_size)) {
                     return VSF_ERR_FAIL;
                 }
-
-                vk_usbd_ifs_add_ep(dev, vk_usbd_get_ifs(dev, cur_ifs), ep_addr);
                 break;
             }
         }
