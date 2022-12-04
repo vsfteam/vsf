@@ -29,7 +29,7 @@ extern "C" {
 
 // internal usage
 #define PID_STATUS_RUNNING      (1 << 0)
-#define PID_STATUS_DADMON       (1 << 1)
+#define PID_STATUS_DAEMON       (1 << 1)
 
 #define WIFEXITED(__STATUS)     !((__STATUS) & 0xFF)
 #define WEXITSTATUS(__STATUS)   ((__STATUS) >> 8)

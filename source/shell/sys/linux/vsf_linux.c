@@ -1320,7 +1320,7 @@ int daemon(int nochdir, int noclose)
 
     vsf_linux_thread_t *thread_pending;
     vsf_protect_t orig = vsf_protect_sched();
-        process->status = PID_STATUS_DADMON;
+        process->status = PID_STATUS_DAEMON;
         thread_pending = process->thread_pending;
     vsf_unprotect_sched(orig);
     if (thread_pending != NULL) {
@@ -1655,6 +1655,7 @@ pid_t waitpid(pid_t pid, int *status, int options)
 
     vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
     VSF_LINUX_ASSERT(cur_thread != NULL);
+    bool is_daemon;
 
     vsf_protect_t orig = vsf_protect_sched();
     vsf_linux_process_t *process = vsf_linux_get_process(pid);
@@ -1671,13 +1672,16 @@ pid_t waitpid(pid_t pid, int *status, int options)
         cur_thread->retval = process->status;
     }
     vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+    is_daemon = process->status == PID_STATUS_DAEMON;
     vsf_unprotect_sched(orig);
 
     if (status != NULL) {
         *status = cur_thread->retval;
     }
-    vsf_linux_detach_process(process);
-    vsf_linux_free_res(process);
+    if (!is_daemon) {
+        vsf_linux_detach_process(process);
+        vsf_linux_free_res(process);
+    }
     return pid;
 }
 
