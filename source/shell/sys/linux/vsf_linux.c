@@ -1671,8 +1671,10 @@ pid_t waitpid(pid_t pid, int *status, int options)
     } else {
         cur_thread->retval = process->status;
     }
-    vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
     is_daemon = process->status == PID_STATUS_DAEMON;
+    if (!is_daemon) {
+        vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+    }
     vsf_unprotect_sched(orig);
 
     if (status != NULL) {
