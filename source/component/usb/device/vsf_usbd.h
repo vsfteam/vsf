@@ -472,6 +472,11 @@ vsf_class(vk_usbd_dev_t) {
 #ifdef __VSF_USBD_CFG_DRV_INTERFACE
         const i_usb_dc_t *drv;
 #endif
+
+        struct {
+            vsf_err_t (*prepare)(vk_usbd_dev_t *dev);
+            void (*process)(vk_usbd_dev_t *dev);
+        } vendor;
     )
 
 #if VSF_USBD_CFG_RAW_MODE == ENABLED

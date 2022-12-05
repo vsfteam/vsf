@@ -93,10 +93,6 @@ static const char * __vsf_usbd_trace_evts[] = {
 /*============================ PROTOTYPES ====================================*/
 
 static void __vk_usbd_hal_evthandler(void *, usb_evt_t, uint_fast8_t);
-
-extern vsf_err_t vsf_usbd_vendor_prepare(vk_usbd_dev_t *dev);
-extern void vsf_usbd_vendor_process(vk_usbd_dev_t *dev);
-
 extern vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param);
 
 /*============================ IMPLEMENTATION ================================*/
@@ -595,17 +591,6 @@ static vsf_err_t __vk_usbd_stdctrl_process(vk_usbd_dev_t *dev)
     return VSF_ERR_NONE;
 }
 
-WEAK(vsf_usbd_vendor_prepare)
-vsf_err_t vsf_usbd_vendor_prepare(vk_usbd_dev_t *dev)
-{
-    return VSF_ERR_FAIL;
-}
-
-WEAK(vsf_usbd_vendor_process)
-void vsf_usbd_vendor_process(vk_usbd_dev_t *dev)
-{
-}
-
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_suppress=pe111
@@ -621,7 +606,7 @@ static vsf_err_t __vk_usbd_ctrl_prepare(vk_usbd_dev_t *dev)
 
     if (USB_TYPE_STANDARD == type) {
         err = __vk_usbd_stdctrl_prepare(dev);
-    } else if (USB_TYPE_CLASS == type) {
+    } else {
         uint_fast8_t tmp = request->wIndex & 0xFF;
         vk_usbd_ifs_t *ifs = NULL;
 
@@ -635,14 +620,16 @@ static vsf_err_t __vk_usbd_ctrl_prepare(vk_usbd_dev_t *dev)
             ifs = __vk_usbd_get_ifs_byep(config, tmp);
             break;
         default:
-            VSF_USB_ASSERT(false);
-            return VSF_ERR_FAIL;
+            if ((USB_TYPE_VENDOR == type) && (dev->vendor.prepare != NULL)) {
+                err = dev->vendor.prepare(dev);
+            } else {
+                VSF_USB_ASSERT(false);
+                return VSF_ERR_FAIL;
+            }
         }
         if (ifs && (ifs->class_op != NULL) && (ifs->class_op->request_prepare != NULL)) {
             err = ifs->class_op->request_prepare(dev, ifs);
         }
-    } else if (USB_TYPE_VENDOR == type) {
-        err = vsf_usbd_vendor_prepare(dev);
     }
 
     return err;
@@ -657,7 +644,7 @@ static void __vk_usbd_ctrl_process(vk_usbd_dev_t *dev)
 
     if (USB_TYPE_STANDARD == type) {
         __vk_usbd_stdctrl_process(dev);
-    } else if (USB_TYPE_CLASS == type) {
+    } else {
         uint_fast8_t tmp = request->wIndex & 0xFF;
         vk_usbd_ifs_t *ifs = NULL;
 
@@ -671,14 +658,18 @@ static void __vk_usbd_ctrl_process(vk_usbd_dev_t *dev)
             ifs = __vk_usbd_get_ifs_byep(config, tmp);
             break;
         default:
-            VSF_USB_ASSERT(false);
-            return;
+            if (USB_TYPE_VENDOR == type) {
+                if (dev->vendor.process != NULL) {
+                    dev->vendor.process(dev);
+                }
+            } else {
+                VSF_USB_ASSERT(false);
+                return;
+            }
         }
         if (ifs && (ifs->class_op != NULL) && (ifs->class_op->request_process != NULL)) {
             ifs->class_op->request_process(dev, ifs);
         }
-    } else if (USB_TYPE_VENDOR == type) {
-        vsf_usbd_vendor_process(dev);
     }
 }
 
