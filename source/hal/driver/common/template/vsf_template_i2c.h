@@ -108,15 +108,6 @@ typedef enum vsf_i2c_mode_t {
 } vsf_i2c_mode_t;
 #endif
 
-/**
- \~english
- @brief flags of i2c tranfer messages
- @note vsf_i2c_cmd_t is implemented by specific driver.
-
- \~chinese
- @brief i2c 传输的标志
- @note vsf_i2c_cmd_t 由具体驱动实现。
- */
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD == DISABLED
 typedef enum vsf_i2c_cmd_t {
     VSF_I2C_CMD_WRITE      = (0x00ul << 0),
@@ -249,7 +240,7 @@ typedef struct vsf_i2c_isr_t {
  @brief i2c 配置
  */
 typedef struct vsf_i2c_cfg_t {
-    vsf_i2c_mode_t mode;                 //!< \~english i2c mode \ref vsf_i2c_mode_t
+    vsf_i2c_mode_t mode;                    //!< \~english i2c mode \ref vsf_i2c_mode_t
                                             //!< \~chinese i2c 模式 \ref vsf_i2c_mode_t
     uint32_t clock_hz;                      //!< \~english i2c clock (in Hz)
                                             //!< \~chinese i2c 时钟频率 (单位：Hz)
