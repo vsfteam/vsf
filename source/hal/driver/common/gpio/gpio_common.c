@@ -34,7 +34,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 
-void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
+void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, vsf_io_feature_t feature)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
