@@ -27,9 +27,10 @@
 #include "./i_reg_gpio.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 
-// TODO: fixed gpio output_and_set
-#define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET     DISABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
+#define VSF_GPIO_CFG_CHNAGE_DIR_FIRST                   ENABLED
+#define VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET       1
+#define VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR     1
 
 /*============================ MACROS ========================================*/
 
@@ -90,7 +91,7 @@ void vsf_hw_aic8800_gpio_init(void)
     }
 }
 
-void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, uint_fast32_t feature)
+void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, vsf_io_feature_t feature)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
@@ -173,20 +174,14 @@ gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 {
     gpio_capability_t gpio_capability = {
         .is_async = hw_gpio_ptr->is_pmic,
+        .is_support_output_and_set = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET,
+        .is_support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR,
         .pin_count = VSF_HW_GPIO_PIN_MAX,
         .avail_pin_mask = VSF_HAL_MAX_COUT_TO_MASK(VSF_HW_GPIO_PIN_MAX),
     };
 
     return gpio_capability;
 }
-
-#if VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET == ENABLED
-void vsf_hw_gpio_output_and_set(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask)
-{
-    // TODO
-    VSF_HAL_ASSERT(0);
-}
-#endif
 
 /*============================ INCLUDES ======================================*/
 
