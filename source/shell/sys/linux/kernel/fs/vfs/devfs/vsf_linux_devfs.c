@@ -349,6 +349,7 @@ static ssize_t __vsf_linux_i2c_read(vsf_linux_fd_t *sfd, void *buf, size_t count
     if (vsf_i2c_master_request(i2c, priv->i2c.addr,
             VSF_I2C_CMD_START | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP,
             count, (uint8_t *)buf) != VSF_ERR_NONE) {
+        priv->i2c.pending_eda = NULL;
         return -1;
     }
     vsf_thread_wfe(VSF_EVT_USER);
@@ -368,6 +369,7 @@ static ssize_t __vsf_linux_i2c_write(vsf_linux_fd_t *sfd, const void *buf, size_
     if (vsf_i2c_master_request(i2c, priv->i2c.addr,
             VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
             count, (uint8_t *)buf) != VSF_ERR_NONE) {
+        priv->i2c.pending_eda = NULL;
         return -1;
     }
     vsf_thread_wfe(VSF_EVT_USER);
