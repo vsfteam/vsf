@@ -41,36 +41,17 @@
 #   define VSF_MREQUEST_I2C_CFG_MULTI_CLASS              VSF_I2C_CFG_MULTI_CLASS
 #endif
 
-#define VSF_MREQUEST_I2C_DEC(__CNT, __IGNORE)                                   \
-    extern vsf_mrequest_i2c_t vsf_mrequest_i2c ## __CNT;
-
-#define VSF_MREQUEST_I2C_IMP(__CNT, __PREFIX)                                   \
-    vsf_mrequest_i2c_t vsf_mrequest_i2c ## __CNT =                              \
-        VSF_HAL_MRQUEST_I2C_INIT(& VSF_MCONNECT(__PREFIX, _i2c, __CNT));
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#if VSF_HAL_MRQUEST_I2C_CFG_MULTI_CLASS == ENABLED
-#define VSF_HAL_MRQUEST_I2C_INIT(__REAL_I2C)  {                                 \
-        .i2c_ptr = (vsf_i2c_t *)__REAL_I2C,                                     \
-        .vsf_i2c = {                                                            \
-            .op = &vsf_mreqeust_i2c_op                                          \
-        },                                                                      \
-    }
-#else
-#define VSF_HAL_MRQUEST_I2C_INIT(__REAL_I2C)  {                                 \
-        .i2c_ptr = (vsf_i2c_t *)__REAL_I2C,                                     \
-    }
-#endif
-    
 #if VSF_MREQUEST_I2C_CFG_MULTI_CLASS == ENABLED
-#   define __describe_mrequest_op()         .op = &vsf_mrequest_op,
+#   define __describe_mrequest_op()         .op = &vsf_mrequest_i2c_op,
 #else
 #   define __describe_mrequest_op()
 #endif
 
 #define __describe_mrequest(__name, __real_i2c)\
-    vsf_mrequest_t __name = {                                                   \
+    vsf_mrequest_i2c_t __name = {                                               \
         __describe_mrequest_op()                                                \
         .i2c_ptr           = __real_i2c,                                        \
     };
@@ -83,8 +64,8 @@
 
 vsf_class(vsf_mrequest_i2c_t) {
     public_member(
-#if VSF_HAL_MRQUEST_I2C_CFG_MULTI_CLASS == ENABLED
-        vsf_i2c_t vsf_i2c;
+#if VSF_MREQUEST_I2C_CFG_MULTI_CLASS == ENABLED
+        implement(vsf_i2c_t)
 #endif
         vsf_i2c_t *i2c_ptr;
     )
