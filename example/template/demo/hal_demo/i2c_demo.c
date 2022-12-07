@@ -133,16 +133,13 @@ typedef struct app_i2c_demo_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if 1 || APP_i2C_DEMO_CFG_USE_MREQUEST == ENABLED
+#if APP_i2C_DEMO_CFG_USE_MREQUEST == ENABLED
 #ifndef APP_i2C_DEMO_CFG_MREQUEST_NAME
 #   define APP_i2C_DEMO_CFG_MREQUEST_NAME   vsf_mrequest_i2c0
 #endif
-
-describe_mrequest(vsf_mrequest_i2c0, APP_I2C_DEMO_CFG_I2C);
-
+static describe_mrequest(vsf_mrequest_i2c0, APP_I2C_DEMO_CFG_I2C);
 #undef APP_I2C_DEMO_CFG_I2C
 #define APP_I2C_DEMO_CFG_I2C                (vsf_i2c_t *)&APP_i2C_DEMO_CFG_MREQUEST_NAME
-
 #endif
 
 app_i2c_demo_t __app_i2c_demo = {
@@ -157,9 +154,6 @@ app_i2c_demo_t __app_i2c_demo = {
 };
 
 /*============================ PROTOTYPES ====================================*/
-
-
-
 /*============================ IMPLEMENTATION ================================*/
 
 static vsf_err_t __i2c_demo_init(vsf_i2c_t *i2c_ptr,
