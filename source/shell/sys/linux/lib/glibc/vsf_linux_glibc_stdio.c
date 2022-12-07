@@ -385,7 +385,7 @@ int fputc(int ch, FILE *f)
 
 int fputs(const char *str, FILE *f)
 {
-    return fprintf(f, "%s\n", str);
+    return fprintf(f, "%s", str);
 }
 
 int puts(const char *str)
