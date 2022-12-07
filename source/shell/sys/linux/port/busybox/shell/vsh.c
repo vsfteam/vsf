@@ -556,6 +556,47 @@ cleanup:
     return -1;
 }
 
+char * __vsh_fdgets(int fd, char *str, int n)
+{
+    char *result = str;
+    int rsize = 0;
+
+    while (rsize < n - 1) {
+        if (read(fd, str, 1) != 1) {
+            break;
+        }
+
+        if (isatty(fd)) {
+#if     VSH_ENTER_CHAR == '\r'
+            if (VSH_ENTER_CHAR == *str) {
+               write(STDOUT_FILENO, "\n", 1);
+            } else if ('\n' == *str) {
+#elif   VSH_ENTER_CHAR == '\n'
+            if ('\r' == *str) {
+#endif
+                continue;
+            }
+            if (('\b' == *str) || (0x7F == *str)) {
+                int back_cnt = vsf_min(rsize, 1);
+                rsize -= back_cnt;
+                str -= back_cnt;
+                continue;
+            }
+        }
+
+        rsize++;
+        str++;
+        if (VSH_ENTER_CHAR == str[-1]) {
+            break;
+        }
+    }
+#if VSH_ENTER_CHAR == '\r'
+    str[-1] = '\n';
+#endif
+    str[0] = '\0';
+    return rsize > 0 ? result : NULL;
+}
+
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_suppress=pe111

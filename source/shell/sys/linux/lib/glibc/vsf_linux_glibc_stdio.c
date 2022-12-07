@@ -338,34 +338,10 @@ int fgetc(FILE *f)
 
 char * fgets(char *str, int n, FILE *f)
 {
-    char *result = str;
-    int rsize = 0;
-
-    while (rsize < n - 1) {
-        if (fread(str, 1, 1, f) != 1) {
-            break;
-        }
-
-        if (stdin == f) {
-            if ('\n' == *str) {
-                continue;
-            }
-            if (('\b' == *str) || (0x7F == *str)) {
-                int back_cnt = vsf_min(rsize, 1);
-                rsize -= back_cnt;
-                str -= back_cnt;
-                continue;
-            }
-        }
-
-        rsize++;
-        str++;
-        if ('\n' == str[-1]) {
-            break;
-        }
-    }
-    str[0] = '\0';
-    return rsize > 0 ? result : NULL;
+    int fd = ((vsf_linux_fd_t *)f)->fd;
+    // use __vsh_fdgets because of fgets depends on shell configuration for line end and echo
+    extern char * __vsh_fdgets(int fd, char *str, int n);
+    return __vsh_fdgets(fd, str, n);
 }
 
 // insecure
