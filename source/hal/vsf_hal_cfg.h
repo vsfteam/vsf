@@ -61,6 +61,10 @@ extern "C" {
 #   define VSF_HAL_USE_SPI                  ENABLED
 #endif
 
+#ifndef VSF_HAL_USE_FIFO2REQ_SPI
+#   define VSF_HAL_USE_FIFO2REQ_SPI         ENABLED
+#endif
+
 #ifndef VSF_HAL_USE_MULTIPLEX_CS_SPI
 #   define VSF_HAL_USE_MULTIPLEX_CS_SPI     ENABLED
 #endif
