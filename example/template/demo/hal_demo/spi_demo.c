@@ -22,11 +22,6 @@
 #if APP_USE_HAL_DEMO == ENABLED && APP_USE_HAL_SPI_DEMO == ENABLED && VSF_HAL_USE_SPI == ENABLED
 
 /*============================ MACROS ========================================*/
-#if VSF_SPI_CFG_MULTIPLEX_CS == ENABLED
-    extern vsf_multiplex_spi_t multiplex_spi1;
-    #undef APP_SPI_DEMO_CFG_SPI
-    #define APP_SPI_DEMO_CFG_SPI (vsf_spi_t *)&multiplex_spi1
-#endif
 
 #ifdef APP_SPI_DEMO_CFG_SPI_PREFIX
 #   undef VSF_SPI_CFG_PREFIX
@@ -117,7 +112,27 @@ typedef struct app_spi_demo_t {
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static app_spi_demo_t __app_spi_demo;
+#define APP_SPI_DEMO_CFG_USE_FIFO2REQ   ENABLED
+
+#if APP_SPI_DEMO_CFG_USE_FIFO2REQ == ENABLED
+#ifndef APP_SPI_DEMO_CFG_USE_FIFO2REQ_NAME
+#   define APP_SPI_DEMO_CFG_USE_FIFO2REQ_NAME       vsf_fifo2req_spi0
+#endif
+/*static*/ describe_fifo2req_spi(vsf_fifo2req_spi0, APP_SPI_DEMO_CFG_SPI);
+#undef APP_SPI_DEMO_CFG_SPI
+#define APP_SPI_DEMO_CFG_SPI                        (vsf_spi_t *)&APP_SPI_DEMO_CFG_USE_FIFO2REQ_NAME
+#endif
+
+#if APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS == ENABLED
+#ifndef APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS_NAME
+#   define APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS_NAME   vsf_multiplex_cs_spi0
+#endif
+/*static*/ describe_multiplex_cs_spi(vsf_multiplex_cs_spi0, APP_SPI_DEMO_CFG_SPI);
+#undef APP_SPI_DEMO_CFG_SPI
+#define APP_SPI_DEMO_CFG_SPI                        (vsf_spi_t *)&APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS_NAME
+#endif
+
+/*static*/ app_spi_demo_t __app_spi_demo;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -147,7 +162,7 @@ static vsf_err_t __spi_demo_init(vsf_spi_t * spi,
 
     while (fsm_rt_cpl != vsf_spi_enable(spi));
 
-    if (mask & VSF_SPI_IRQ_MASK) {
+    if (mask & VSF_SPI_IRQ_ALL_BITS_MASK) {
         vsf_spi_irq_enable(spi, mask);
     }
 
@@ -156,7 +171,7 @@ static vsf_err_t __spi_demo_init(vsf_spi_t * spi,
 
 static void __spi_demo_deinit(vsf_spi_t * spi, vsf_spi_irq_mask_t mask)
 {
-    if (mask & VSF_SPI_IRQ_MASK) {
+    if (mask & VSF_SPI_IRQ_ALL_BITS_MASK) {
         vsf_spi_irq_disable(spi, mask);
     }
 
