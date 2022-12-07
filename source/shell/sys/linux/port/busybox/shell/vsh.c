@@ -590,9 +590,6 @@ char * __vsh_fdgets(int fd, char *str, int n)
             break;
         }
     }
-#if VSH_ENTER_CHAR == '\r'
-    str[-1] = '\n';
-#endif
     str[0] = '\0';
     return rsize > 0 ? result : NULL;
 }
