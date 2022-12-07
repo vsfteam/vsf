@@ -21,6 +21,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "./vsf_template_hal_driver.h"
+#include "./vsf_template_io.h"
 #include "hal/arch/vsf_arch.h"
 
 #ifdef __cplusplus
@@ -101,6 +102,8 @@ typedef struct gpio_capability_t {
     //!  be sequential for the operation of the pins of different ports.
     uint8_t is_async                     : 1;
 
+    uint8_t is_support_config_pin        : 1;
+    
     uint8_t is_support_output_and_set    : 1;
     uint8_t is_support_output_and_clear  : 1;
 
