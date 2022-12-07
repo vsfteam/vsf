@@ -66,6 +66,17 @@ if(NOT (VSF_USE_EVM AND VSF_EVM_USE_LUA))
     add_library(lua_main STATIC
         ${VSF_LUA_PATH}/lua.c
     )
+    if(VSF_USE_LINUX)
+        target_include_directories(lua_main BEFORE PUBLIC
+            ${VSF_SRC_PATH}/shell/sys/linux/include
+        )
+        if(VSF_LINUX_USE_SIMPLE_LIBC)
+            target_include_directories(lua_main BEFORE PUBLIC
+                ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc
+            )
+        endif()
+    endif()
+
     vsf_add_libraries(
         lua_main
     )
