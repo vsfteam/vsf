@@ -40,7 +40,7 @@ extern "C" {
 #include "i2c/multiplex_i2c.h"
 #include "i2c/mrequest_i2c.h"
 #include "spi/multiplex_spi.h"
-
+#include "spi/fifo2req_spi.h"
     
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

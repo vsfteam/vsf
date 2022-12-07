@@ -181,17 +181,10 @@ typedef enum vsf_spi_irq_mask_t {
     VSF_SPI_IRQ_MASK_TX_CPL         = 0x01ul << 2,
     VSF_SPI_IRQ_MASK_CPL            = 0x01ul << 3,
 
-    // optional
-    // FIFO
-    VSF_SPI_IRQ_MASK_RX_FIFO_FULL   = 0x01ul << 4,
-    VSF_SPI_IRQ_MASK_TX_FIFO_EMPTY  = 0x01ul << 5,
-
-    VSF_SPI_IRQ_MASK                = VSF_SPI_IRQ_MASK_TX |
+    VSF_SPI_IRQ_ALL_BITS_MASK       = VSF_SPI_IRQ_MASK_TX |
                                       VSF_SPI_IRQ_MASK_RX |
                                       VSF_SPI_IRQ_MASK_TX_CPL |
-                                      VSF_SPI_IRQ_MASK_CPL |
-                                      VSF_SPI_IRQ_MASK_RX_FIFO_FULL |
-                                      VSF_SPI_IRQ_MASK_TX_FIFO_EMPTY,
+                                      VSF_SPI_IRQ_MASK_CPL,
 } vsf_spi_irq_mask_t;
 #endif
 
@@ -228,7 +221,7 @@ typedef struct vsf_spi_isr_t {
 //! spi configuration for api
 typedef struct vsf_spi_cfg_t {
     vsf_spi_mode_t   mode;               //!< spi working mode
-    uint32_t        clock_hz;
+    uint32_t         clock_hz;
     vsf_spi_isr_t   isr;
 } vsf_spi_cfg_t;
 
