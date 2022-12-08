@@ -72,9 +72,13 @@ static void __spi_cs_active(vsf_multiplex_spi_t *m_spi_ptr)
     if (__spi_cs_pin_is_hardware(m_spi_ptr)) {
         vsf_spi_cs_active(m_spi_ptr->spi_info_ptr->spi, m_spi_ptr->cs_index);
     } else {
+#if VSF_HAL_USE_GPIO == ENABLED
         VSF_HAL_ASSERT(m_spi_ptr->gpio != NULL);
         VSF_HAL_ASSERT(m_spi_ptr->pin_mask != 0);
         vsf_gpio_clear(m_spi_ptr->gpio, m_spi_ptr->pin_mask);
+#else
+        VSF_HAL_ASSERT(0);
+#endif
     }
 }
 
@@ -85,9 +89,13 @@ static void __spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr)
     if (__spi_cs_pin_is_hardware(m_spi_ptr)) {
         vsf_spi_cs_inactive(m_spi_ptr->spi_info_ptr->spi, m_spi_ptr->cs_index);
     } else {
+#if VSF_HAL_USE_GPIO == ENABLED
         VSF_HAL_ASSERT(m_spi_ptr->gpio != NULL);
         VSF_HAL_ASSERT(m_spi_ptr->pin_mask != 0);
         vsf_gpio_set(m_spi_ptr->gpio, m_spi_ptr->pin_mask);
+#else
+        VSF_HAL_ASSERT(0);
+#endif
     }
 }
 
@@ -95,11 +103,15 @@ static void __spi_cs_gpio_init(vsf_multiplex_spi_t *m_spi_ptr)
 {
     bool is_hardware = __spi_cs_pin_is_hardware(m_spi_ptr);
     if (!is_hardware) {
+#if VSF_HAL_USE_GPIO == ENABLED
         VSF_HAL_ASSERT(m_spi_ptr->gpio != NULL);
         VSF_HAL_ASSERT(m_spi_ptr->pin_mask != 0);
 
         vsf_gpio_config_pin(m_spi_ptr->gpio, m_spi_ptr->pin_mask, VSF_MULTIPLEXER_SPI_CFG_GPIO_FEATURE);
         vsf_gpio_output_and_set(m_spi_ptr->gpio, m_spi_ptr->pin_mask);
+#else
+        VSF_HAL_ASSERT(0);
+#endif
     }
 }
 
