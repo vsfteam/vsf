@@ -112,13 +112,11 @@ typedef struct app_spi_demo_t {
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#define APP_SPI_DEMO_CFG_USE_FIFO2REQ   ENABLED
-
 #if APP_SPI_DEMO_CFG_USE_FIFO2REQ == ENABLED
 #ifndef APP_SPI_DEMO_CFG_USE_FIFO2REQ_NAME
 #   define APP_SPI_DEMO_CFG_USE_FIFO2REQ_NAME       vsf_fifo2req_spi0
 #endif
-/*static*/ describe_fifo2req_spi(vsf_fifo2req_spi0, APP_SPI_DEMO_CFG_SPI);
+static describe_fifo2req_spi(vsf_fifo2req_spi0, APP_SPI_DEMO_CFG_SPI);
 #undef APP_SPI_DEMO_CFG_SPI
 #define APP_SPI_DEMO_CFG_SPI                        (vsf_spi_t *)&APP_SPI_DEMO_CFG_USE_FIFO2REQ_NAME
 #endif
@@ -127,12 +125,12 @@ typedef struct app_spi_demo_t {
 #ifndef APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS_NAME
 #   define APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS_NAME   vsf_multiplex_cs_spi0
 #endif
-/*static*/ describe_multiplex_cs_spi(vsf_multiplex_cs_spi0, APP_SPI_DEMO_CFG_SPI);
+static describe_multiplex_cs_spi(vsf_multiplex_cs_spi0, APP_SPI_DEMO_CFG_SPI);
 #undef APP_SPI_DEMO_CFG_SPI
 #define APP_SPI_DEMO_CFG_SPI                        (vsf_spi_t *)&APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS_NAME
 #endif
 
-/*static*/ app_spi_demo_t __app_spi_demo;
+static app_spi_demo_t __app_spi_demo;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
