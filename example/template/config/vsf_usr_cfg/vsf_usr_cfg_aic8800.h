@@ -226,23 +226,12 @@
 #       define VSF_LINUX_DEVFS_USE_RAND                 ENABLED
 
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
-#       if __IS_COMPILER_IAR__
-// IAR: to support CPP in linux-subsystem, define MACFOs below, and don't include the simple_libc path
-//  Note that __VSF_WORKAROUND_IAR_CPP__ MUST also be defined to support CPP
-#           define VSF_LINUX_LIBC_CFG_CPP               ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STDIO           DISABLED
-#           define VSF_LINUX_USE_SIMPLE_STRING          DISABLED
-#           define VSF_LINUX_USE_SIMPLE_TIME            DISABLED
-#           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_CTYPE           DISABLED
-#       else
-#           define VSF_LINUX_LIBC_CFG_CPP               ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STDIO           ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STRING          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_TIME            ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_CTYPE           ENABLED
-#       endif
+#       define VSF_LINUX_LIBC_CFG_CPP                   ENABLED
+#       define VSF_LINUX_USE_SIMPLE_STDIO               ENABLED
+#       define VSF_LINUX_USE_SIMPLE_STRING              ENABLED
+#       define VSF_LINUX_USE_SIMPLE_TIME                ENABLED
+#       define VSF_LINUX_USE_SIMPLE_STDLIB              ENABLED
+#       define VSF_LINUX_USE_SIMPLE_CTYPE               ENABLED
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0

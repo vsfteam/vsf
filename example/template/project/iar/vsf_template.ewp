@@ -4712,7 +4712,7 @@
                     <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
-                    <state>//$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
