@@ -14062,6 +14062,12 @@
                     <group>
                         <name>spi</name>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\fifo2req_spi.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\fifo2req_spi.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\spi\multiplex_spi.c</name>
                         </file>
                         <file>
