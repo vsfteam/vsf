@@ -25,7 +25,7 @@
 #define __VSF_HAL_TEMPLATE_UPCASE_NAME              _IO
 
 #ifndef VSF_IO_CFG_DEC_PREFIX
-#   error "Please define VSF_GPIO_CFG_DEC_PREFIX when using vsf_template_io.h"
+#   error "Please define VSF_IO_CFG_DEC_PREFIX when using vsf_template_io.h"
 #endif
 
 #ifdef VSF_IO_CFG_DEC_UPCASE_PREFIX
