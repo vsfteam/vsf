@@ -112,6 +112,8 @@ static vsf_err_t __clock_init(vsf_hw_spi_t *hw_spi_ptr, uint32_t clock_hz)
 
 static vsf_err_t __cfg_check(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
+    VSF_HAL_ASSERT((cfg_ptr->mode & ~__SPI_HW_MODE_MASK) == 0);
+
     // TODO: support spi slave mode
     if ((cfg_ptr->mode & VSF_SPI_DIR_MODE_MASK) != VSF_SPI_MASTER) {
         VSF_ASSERT(0);
@@ -155,7 +157,7 @@ vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
     REG_SPI_T *reg = spi_const->reg;
 
     reg->MR0   = cfg_ptr->mode & VSF_SPI_DIR_MODE_MASK;
-    reg->CR[0] = (0x0Ful <<  8) | (cfg_ptr->mode & (VSF_SPI_CLOCK_MODE_MASK | VSF_SPI_DATASIZE_MASK));
+    reg->CR[0] = (0x0Ful <<  8) | (cfg_ptr->mode & (VSF_SPI_CLOCK_MODE_MASK | __AIC8800_VSF_SPI_DATASIZE_MASK));
     reg->CR[1] = (0x03ul << 12) | (0x00ul << 6);
     reg->CR[2] = (0x01ul <<  6); // en dma
     reg->CR[3] = ((0x02ul << 8) | (0x01ul << 0));

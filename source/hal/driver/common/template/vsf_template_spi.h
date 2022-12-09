@@ -31,38 +31,50 @@ extern "C" {
 
 // multi-class support enabled by default for maximum availability.
 #ifndef VSF_SPI_CFG_MULTI_CLASS
-#   define VSF_SPI_CFG_MULTI_CLASS                  ENABLED
+#   define VSF_SPI_CFG_MULTI_CLASS                      ENABLED
 #endif
 
 // application code can redefine it
 #ifndef VSF_SPI_CFG_PREFIX
 #   if VSF_SPI_CFG_MULTI_CLASS == ENABLED
-#       define VSF_SPI_CFG_PREFIX                   vsf
+#       define VSF_SPI_CFG_PREFIX                       vsf
 #   elif defined(VSF_HW_SPI_COUNT) && (VSF_HW_SPI_COUNT != 0)
-#       define VSF_SPI_CFG_PREFIX                   vsf_hw
+#       define VSF_SPI_CFG_PREFIX                       vsf_hw
 #   else
-#       define VSF_SPI_CFG_PREFIX                   vsf
+#       define VSF_SPI_CFG_PREFIX                       vsf
 #   endif
 #endif
 
 #ifndef VSF_SPI_CFG_FUNCTION_RENAME
-#   define VSF_SPI_CFG_FUNCTION_RENAME              ENABLED
+#   define VSF_SPI_CFG_FUNCTION_RENAME                  ENABLED
 #endif
 
 #ifndef VSF_SPI_CFG_MULTIPLEX_CS
-#   define VSF_SPI_CFG_MULTIPLEX_CS                 DISABLED
+#   define VSF_SPI_CFG_MULTIPLEX_CS                     DISABLED
 #endif
 
 #ifndef VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE
-#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE        DISABLED
+#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE            DISABLED
 #endif
 
 #ifndef VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK
-#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK    DISABLED
+#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK        DISABLED
 #endif
 
 #ifndef VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS
-#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
+#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS          DISABLED
+#endif
+
+#ifndef VSF_SPI_CFG_REIMPLEMENT_MODE_TO_DATA_BITS
+#   define VSF_SPI_CFG_REIMPLEMENT_MODE_TO_DATA_BITS    DISABLED
+#endif
+
+#ifndef VSF_SPI_CFG_REIMPLEMENT_DATA_BITS_TO_MODE
+#   define VSF_SPI_CFG_REIMPLEMENT_DATA_BITS_TO_MODE    DISABLED
+#endif
+
+#ifndef VSF_SPI_CFG_REIMPLEMENT_DATA_BITS_TO_BYTES
+#   define VSF_SPI_CFG_REIMPLEMENT_DATA_BITS_TO_BYTES   DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -85,8 +97,6 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cancel_transfer,      VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transfered_count, VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 
-#define __VSF_SPI_DATASIZE(__N, __I)                                            \
-    VSF_SPI_DATASIZE_ ## __N = ((__N - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET),
 
 /*============================ TYPES =========================================*/
 
@@ -306,8 +316,23 @@ extern void                 vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr, uin
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#if VSF_SPI_CFG_REIMPLEMENT_MODE_TO_BITS == ENABLD
+static inline uint8_t vsf_spi_mode_to_data_bits(vsf_spi_mode_t mode)
+{
+    int bits = (mode & VSF_SPI_DATASIZE_MASK) >> VSF_SPI_DATASIZE_BIT_OFFSET;
+    return bits + VSF_SPI_DATASIZE_DIFF;
+}
+#endif
 
-static inline uint8_t vsf_spi_get_data_bytes_from_mode(vsf_spi_mode_t mode)
+#if VSF_SPI_CFG_REIMPLEMENT_BITS_TO_MODE == ENABLD
+static inline vsf_spi_mode_t vsf_spi_data_bits_to_mode(uint8_t bits)
+{
+    return (vsf_spi_mode_t)((bits - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET);
+}
+#endif
+
+#if VSF_SPI_CFG_REIMPLEMENT_MODE_TO_BYTES == ENABLD
+static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 {
     int bits = (mode & VSF_SPI_DATASIZE_MASK);
     if (bits <= VSF_SPI_DATASIZE_8) {
@@ -318,17 +343,7 @@ static inline uint8_t vsf_spi_get_data_bytes_from_mode(vsf_spi_mode_t mode)
         return 4;
     }
 }
-
-static inline uint8_t vsf_spi_get_bits_from_mode(vsf_spi_mode_t mode)
-{
-    int bits = (mode & VSF_SPI_DATASIZE_MASK) >> VSF_SPI_DATASIZE_BIT_OFFSET;
-    return bits + VSF_SPI_DATASIZE_DIFF;
-}
-
-static inline vsf_spi_mode_t vsf_spi_get_mode_from_bits(uint8_t bits)
-{
-    return (bits - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET;
-}
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
