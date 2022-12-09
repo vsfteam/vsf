@@ -29,6 +29,15 @@
 #define vsf_real_spi_t          VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)
 #define vsf_real_spi_capability VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)
 
+#if VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#   ifndef VSF_SPI_CFG_CAPABILITY_IS_SUPPORT_AUTO_CS
+#       define VSF_SPI_CFG_CAPABILITY_IS_SUPPORT_AUTO_CS                1
+#   endif
+#   ifndef VSF_SPI_CFG_CAPABILITY_CS_COUNT
+#       define VSF_SPI_CFG_CAPABILITY_CS_COUNT                          1
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -38,7 +47,8 @@
 vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 {
     vsf_spi_capability_t spi_capability = {
-        0,
+        .is_auto_cs = VSF_SPI_CFG_CAPABILITY_IS_SUPPORT_AUTO_CS,
+        .cs_count = VSF_SPI_CFG_CAPABILITY_CS_COUNT,
     };
 
     return spi_capability;
