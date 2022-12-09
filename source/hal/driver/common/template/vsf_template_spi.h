@@ -217,8 +217,8 @@ typedef struct vsf_spi_status_t {
 
 typedef struct vsf_spi_capability_t {
     inherit(vsf_peripheral_capability_t)
-    uint8_t is_auto_cs; // some hardware support
-    uint8_t cs_count;
+    uint8_t is_auto_cs : 1; // some hardware support
+    uint8_t cs_count   : 7;
 } vsf_spi_capability_t;
 
 typedef struct vsf_spi_t vsf_spi_t;
