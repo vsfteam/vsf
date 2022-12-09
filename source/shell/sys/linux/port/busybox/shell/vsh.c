@@ -943,7 +943,9 @@ int echo_main(int argc, char *argv[])
     while (argc-- > 0) {
         printf("%s%s", *argv++, argc > 0 ? " " : "");
     }
-    printf(VSH_LINEEND);
+    if (isatty(STDOUT_FILENO)) {
+        printf(VSH_LINEEND);
+    }
     return 0;
 }
 
