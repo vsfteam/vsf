@@ -9,11 +9,13 @@
 #   include "../../../include/errno.h"
 #   include "../../../include/sys/wait.h"
 #   include "../../../include/dirent.h"
+#   include "../../../include/fcntl.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
 #   include <sys/wait.h>
 #   include <dirent.h>
+#   include <fcntl.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_CTYPE == ENABLED
 #   include "../../../include/simple_libc/ctype.h"
@@ -342,6 +344,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     vsf_linux_main_entry_t entry;
     char *env[2], *arg_expanded;
     vsf_linux_process_ctx_t *ctx;
+    int redir_state = -1, redir_mask = 0, fd_err = -1;
 
     // skip spaces
     while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
@@ -390,7 +393,10 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     ctx->entry = entry;
     ctx->arg.argv[ctx->arg.argc++] = arg_expanded;
     ctx->arg.is_dyn_argv = true;
+
     char *nextnext;
+    bool is_out, is_append;
+    int redir_fd, cur_redir_mask;
     while ((*next != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
         nextnext = __vsh_get_next_arg(&next);
         arg_expanded = __vsh_expand_arg(process, next);
@@ -400,7 +406,89 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
             goto delete_process_and_fail;
         }
 
-        ctx->arg.argv[ctx->arg.argc++] = arg_expanded;
+        // check if redirect operations
+        if (    (redir_state < 0)
+            &&  (   ((arg_expanded[0] == '<') || (arg_expanded[1] == '<'))
+                ||  ((arg_expanded[0] == '>') || (arg_expanded[1] == '>'))
+                )
+           ) {
+            redir_state = 0;
+        }
+
+        if (redir_state >= 0) {
+            char *redir_str = arg_expanded;
+            if (!(redir_state & 1)) {
+                cur_redir_mask = 0;
+                // 1. check target: '1', '2', '&' for stdin, stdout, etderr, stdout | stderr
+                if ((redir_str[0] == '1') || (redir_str[0] == '2')) {
+                    cur_redir_mask |= 1 << (redir_str[0] - '0');
+                    redir_str++;
+                } else if (redir_str[0] == '&') {
+                    cur_redir_mask |= (1 << STDOUT_FILENO) | (1 << STDERR_FILENO);
+                    redir_str++;
+                }
+
+                // 2. check direction
+                if (redir_str[0] == '<') {
+                    is_out = false;
+                    if (!cur_redir_mask) {
+                        cur_redir_mask |= 1 << STDIN_FILENO;
+                    }
+                    redir_str++;
+                } else if (redir_str[0] == '>') {
+                    is_out = true;
+                    if (!cur_redir_mask) {
+                        cur_redir_mask |= 1 << STDOUT_FILENO;
+                    }
+                    redir_str++;
+                } else {
+                free_arg_and_delete_process_and_fail:
+                    __free_ex(process, arg_expanded);
+                    goto delete_process_and_fail;
+                }
+                if ((is_out && (fd_out >= 0)) || (!is_out && (fd_in >= 0))) {
+                    printf("invalid redirection" VSH_LINEEND);
+                    goto free_arg_and_delete_process_and_fail;
+                }
+
+                // 3. check append
+                is_append = is_out && (redir_str[0] == '>');
+                if (is_append) {
+                    redir_str++;
+                }
+                redir_mask |= cur_redir_mask;
+                redir_state++;
+                if (redir_str[0] != '\0') {
+                    goto redir_parse_file;
+                }
+            } else {
+            redir_parse_file:
+                redir_fd = open(redir_str,
+                                    (is_append ? O_APPEND : O_CREAT | O_TRUNC)
+                                |   (is_out ? O_WRONLY : O_RDONLY));
+                if (redir_fd < 0) {
+                    printf("fail to open redirection target" VSH_LINEEND);
+                    goto free_arg_and_delete_process_and_fail;
+                }
+                if (cur_redir_mask & (1 << STDOUT_FILENO)) {
+                    fd_out = redir_fd;
+                }
+                if (cur_redir_mask & (1 << STDERR_FILENO)) {
+                    if (redir_fd == fd_out) {
+                        fd_err = dup(redir_fd);
+                    } else {
+                        fd_err = redir_fd;
+                    }
+                }
+                if (cur_redir_mask & (1 << STDIN_FILENO)) {
+                    fd_in = redir_fd;
+                }
+                redir_state++;
+            }
+            __free_ex(process, arg_expanded);
+        } else {
+            ctx->arg.argv[ctx->arg.argc++] = arg_expanded;
+        }
         next = nextnext;
     }
 
@@ -415,6 +503,9 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
         if (STDIN_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, sfd_from->priv)) {
             goto delete_process_and_fail;
         }
+        if (redir_mask & (1 << STDIN_FILENO)) {
+            close(fd_in);
+        }
     }
     if (fd_out >= 0) {
         sfd_from = vsf_linux_fd_get(fd_out);
@@ -422,6 +513,20 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
 
         if (STDOUT_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, sfd_from->priv)) {
             goto delete_process_and_fail;
+        }
+        if (redir_mask & (1 << STDOUT_FILENO)) {
+            close(fd_out);
+        }
+    }
+    if (fd_err >= 0) {
+        sfd_from = vsf_linux_fd_get(fd_err);
+        VSF_LINUX_ASSERT(sfd_from != NULL);
+
+        if (STDERR_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDERR_FILENO, sfd_from->priv)) {
+            goto delete_process_and_fail;
+        }
+        if (redir_mask & (1 << STDERR_FILENO)) {
+            close(fd_err);
         }
     }
 

@@ -1700,8 +1700,11 @@ int ftruncate(int fd, off_t length)
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *file = priv->file;
 
-    vk_file_setsize(file, length);
-    return vsf_eda_get_return_value();
+    if (file->size != length) {
+        vk_file_setsize(file, length);
+        return vsf_eda_get_return_value();
+    }
+    return 0;
 }
 
 int truncate(const char *path, off_t length)
