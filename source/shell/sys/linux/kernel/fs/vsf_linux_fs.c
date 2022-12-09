@@ -131,6 +131,7 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd);
+static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off_t size);
 
 static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
@@ -166,6 +167,7 @@ const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
     .fn_write           = __vsf_linux_fs_write,
     .fn_close           = __vsf_linux_fs_close,
     .fn_eof             = __vsf_linux_fs_eof,
+    .fn_setsize         = __vsf_linux_fs_setsize,
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -303,6 +305,18 @@ static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     return !(priv->file->size - vk_file_tell(priv->file));
+}
+
+static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off_t size)
+{
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    vk_file_t *file = priv->file;
+
+    if (file->size != size) {
+        vk_file_setsize(file, size);
+        return vsf_eda_get_return_value();
+    }
+    return 0;
 }
 
 // eventfd
@@ -1696,15 +1710,11 @@ int fdatasync(int fd)
 int ftruncate(int fd, off_t length)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
-    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-    vk_file_t *file = priv->file;
-
-    if (file->size != length) {
-        vk_file_setsize(file, length);
-        return vsf_eda_get_return_value();
+    if (NULL == sfd->op->fn_setsize) {
+        return -ENOTSUP;
     }
-    return 0;
+
+    return sfd->op->fn_setsize(sfd, length);
 }
 
 int truncate(const char *path, off_t length)
@@ -2048,7 +2058,7 @@ int __vsf_linux_create_open_path(char *path)
     if (fd < 0) {
         fd = creat(path, 0);
         if (fd < 0) {
-            printf("fail to create %s.\r\n", path);
+            fprintf(stderr, "fail to create %s.\r\n", path);
         }
     }
     return fd;
@@ -2112,7 +2122,7 @@ int vsf_linux_fs_bind_target_relative(vk_vfs_file_t *dir, const char *pathname,
     ((vk_vfs_file_t *)f)->size = size;
     ((vk_vfs_file_t *)f)->f.op = (void *)op;
     ((vk_vfs_file_t *)f)->f.param = target;
-    printf("%s bound under %s.\r\n", pathname, dir->name);
+    vsf_trace_info("%s bound under %s.\r\n", pathname, dir->name);
     return 0;
 }
 
@@ -2132,7 +2142,7 @@ int vsf_linux_fs_bind_target_ex(const char *pathname,
             vfs_file->attr = feature;
             vfs_file->size = size;
             vfs_file->f.op = (void *)op;
-            printf("%s bound.\r\n", pathname);
+            vsf_trace_info("%s bound.\r\n", pathname);
         }
         close(fd);
         return err;

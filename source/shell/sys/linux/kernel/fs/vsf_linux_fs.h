@@ -63,6 +63,7 @@ typedef struct vsf_linux_fd_op_t {
     ssize_t (*fn_write)(vsf_linux_fd_t *sfd, const void *buf, size_t count);
     int (*fn_close)(vsf_linux_fd_t *sfd);
     int (*fn_eof)(vsf_linux_fd_t *sfd);
+    int (*fn_setsize)(vsf_linux_fd_t *sfd, off_t size);
 
     void * (*fn_mmap)(vsf_linux_fd_t *sfd, off_t offset, size_t len, uint_fast32_t feature);
     int (*fn_munmap)(vsf_linux_fd_t *sfd, void *buffer);
