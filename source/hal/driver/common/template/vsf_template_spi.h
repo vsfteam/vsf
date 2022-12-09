@@ -85,6 +85,9 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cancel_transfer,      VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transfered_count, VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 
+#define __VSF_SPI_DATASIZE(__N, __I)                                            \
+    VSF_SPI_DATASIZE_ ## __N = ((__N - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET),
+
 /*============================ TYPES =========================================*/
 
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
@@ -113,43 +116,46 @@ typedef enum vsf_spi_mode_t {
                                       VSF_SPI_CLOCK_MODE_2 |
                                       VSF_SPI_CLOCK_MODE_3,
 
-    __SPI_DATASIZE_OFFSET           = 25,
-    VSF_SPI_DATASIZE_4              = 0x03ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    VSF_SPI_DATASIZE_5              = 0x04ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    VSF_SPI_DATASIZE_6              = 0x05ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    VSF_SPI_DATASIZE_7              = 0x06ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    VSF_SPI_DATASIZE_8              = 0x07ul << __SPI_DATASIZE_OFFSET,      //!< datasize is 8 bits
-    VSF_SPI_DATASIZE_9              = 0x08ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_10             = 0x09ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_11             = 0x0Aul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_12             = 0x0Bul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_13             = 0x0Cul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_14             = 0x0Dul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_15             = 0x0Eul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_16             = 0x0Ful << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_17             = 0x10ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_18             = 0x11ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_19             = 0x12ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_20             = 0x13ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_21             = 0x14ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_22             = 0x15ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_23             = 0x16ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_24             = 0x17ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_25             = 0x18ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_26             = 0x19ul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_27             = 0x1Aul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_28             = 0x1Bul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_29             = 0x1Cul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_30             = 0x1Dul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_31             = 0x1Eul << __SPI_DATASIZE_OFFSET,
-    VSF_SPI_DATASIZE_32             = 0x1Ful << __SPI_DATASIZE_OFFSET,
+    //!< datasize is 8 bits
+    VSF_SPI_DATASIZE_BIT_OFFSET     = 25,
+    VSF_SPI_DATASIZE_DIFF           = 1,
+    VSF_SPI_DATASIZE_4              = ( 4ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_5              = ( 5ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_6              = ( 6ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_7              = ( 7ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_8              = ( 8ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_9              = ( 9ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_10             = (10ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_11             = (11ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_12             = (12ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_13             = (13ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_14             = (14ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_15             = (15ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_16             = (16ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_17             = (17ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_18             = (18ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_19             = (19ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_20             = (20ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_21             = (21ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_22             = (22ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_23             = (23ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_24             = (24ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_25             = (25ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_26             = (26ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_27             = (27ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_28             = (28ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_29             = (29ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_30             = (30ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_31             = (31ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_32             = (32ul - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET,
     VSF_SPI_DATASIZE_MASK           = VSF_SPI_DATASIZE_4  | VSF_SPI_DATASIZE_5  | VSF_SPI_DATASIZE_6  | VSF_SPI_DATASIZE_7  |
                                       VSF_SPI_DATASIZE_8  | VSF_SPI_DATASIZE_9  | VSF_SPI_DATASIZE_10 | VSF_SPI_DATASIZE_11 |
                                       VSF_SPI_DATASIZE_12 | VSF_SPI_DATASIZE_13 | VSF_SPI_DATASIZE_14 | VSF_SPI_DATASIZE_15 |
                                       VSF_SPI_DATASIZE_16 | VSF_SPI_DATASIZE_17 | VSF_SPI_DATASIZE_18 | VSF_SPI_DATASIZE_19 |
                                       VSF_SPI_DATASIZE_20 | VSF_SPI_DATASIZE_21 | VSF_SPI_DATASIZE_22 | VSF_SPI_DATASIZE_23 |
                                       VSF_SPI_DATASIZE_24 | VSF_SPI_DATASIZE_25 | VSF_SPI_DATASIZE_26 | VSF_SPI_DATASIZE_27 |
-                                      VSF_SPI_DATASIZE_28 | VSF_SPI_DATASIZE_29 | VSF_SPI_DATASIZE_30 | VSF_SPI_DATASIZE_31,
+                                      VSF_SPI_DATASIZE_28 | VSF_SPI_DATASIZE_29 | VSF_SPI_DATASIZE_30 | VSF_SPI_DATASIZE_31 |
+                                      VSF_SPI_DATASIZE_32,
 
 
     VSF_SPI_AUTO_CS_DISABLE         = 0x00ul << 30,
@@ -311,6 +317,17 @@ static inline uint8_t vsf_spi_get_data_bytes_from_mode(vsf_spi_mode_t mode)
     } else {
         return 4;
     }
+}
+
+static inline uint8_t vsf_spi_get_bits_from_mode(vsf_spi_mode_t mode)
+{
+    int bits = (mode & VSF_SPI_DATASIZE_MASK) >> VSF_SPI_DATASIZE_BIT_OFFSET;
+    return bits + VSF_SPI_DATASIZE_DIFF;
+}
+
+static inline vsf_spi_mode_t vsf_spi_get_mode_from_bits(uint8_t bits)
+{
+    return (bits - VSF_SPI_DATASIZE_DIFF) << VSF_SPI_DATASIZE_BIT_OFFSET;
 }
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
