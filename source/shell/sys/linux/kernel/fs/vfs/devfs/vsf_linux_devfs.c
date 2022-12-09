@@ -460,28 +460,206 @@ int vsf_linux_fs_bind_i2c(char *path, vsf_i2c_t *i2c)
 
 typedef struct vsf_linux_spi_priv_t {
     implement(vsf_linux_fs_priv_t)
+
+    uint32_t mode;
+    uint32_t speed;
+    uint8_t bits_per_word;
+    uint8_t cs_index;
+
+    uint8_t xfer_size;
+    uint8_t xfer_pos;
+    struct spi_ioc_transfer *xfer_ptr;
+    vsf_eda_t *xfer_eda;
 } vsf_linux_spi_priv_t;
+
+static bool __vsf_linux_spi_ioc_transfer(vsf_linux_spi_priv_t *priv)
+{
+    vsf_spi_t *spi = (vsf_spi_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    if (priv->xfer_pos < priv->xfer_size) {
+        struct spi_ioc_transfer *cur_trans = priv->xfer_ptr + priv->xfer_pos;
+        // TODO: support cur_trans->bits_per_word
+        // TODO: support cur_trans->speed_hz
+        VSF_HAL_ASSERT(priv->xfer_ptr != NULL);
+        vsf_err_t result = vsf_spi_request_transfer(spi, (void *)cur_trans->tx_buf, (void *)cur_trans->rx_buf, cur_trans->len);
+        VSF_LINUX_ASSERT(result == VSF_ERR_NONE);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static void __vsf_linux_spi_isrhandler(void *target, vsf_spi_t *spi,
+        vsf_spi_irq_mask_t irq_mask)
+{
+    if (irq_mask & VSF_SPI_IRQ_MASK_CPL) {
+        vsf_linux_spi_priv_t *priv = (vsf_linux_spi_priv_t *)target;
+        priv->xfer_pos++;        
+        // TODO: support cur_trans->delay_usecs
+        // TODO: support cur_trans->cs_change        
+        if (!__vsf_linux_spi_ioc_transfer(priv)) {
+            vsf_eda_t *eda = priv->xfer_eda;
+            VSF_LINUX_ASSERT(eda != NULL);
+            priv->xfer_eda = NULL;
+            vsf_spi_cs_inactive(spi, priv->cs_index);
+            vsf_eda_post_evt(eda, VSF_EVT_USER);
+        }
+    }
+}
+
+static vsf_err_t __vsf_linux_spi_config(vsf_linux_spi_priv_t *priv)
+{
+    vsf_err_t result;
+    vsf_spi_t *spi = (vsf_spi_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    vsf_spi_mode_t mode = 0;
+    switch (priv->mode & (SPI_CPOL | SPI_CPHA)) {
+    case SPI_MODE_0:
+        mode |= VSF_SPI_CLOCK_MODE_0;
+        break;
+    case SPI_MODE_1:
+        mode |= VSF_SPI_CLOCK_MODE_1;
+        break;
+    case SPI_MODE_2:
+        mode |= VSF_SPI_CLOCK_MODE_2;
+        break;
+    case SPI_MODE_3:
+        mode |= VSF_SPI_CLOCK_MODE_3;
+        break;
+    }
+    mode |= vsf_spi_data_bits_to_mode(priv->bits_per_word);
+    // TODO: Update when hal/i2c vsf_i2c_mode_t support lsb/msb
+    // TODO: Confirming the behavior of SPI_NO_CS
+    vsf_spi_cfg_t cfg    = {
+        .mode               = mode,
+        .clock_hz           = priv->speed,
+        .isr                = {
+            .handler_fn     = __vsf_linux_spi_isrhandler,
+            .target_ptr     = priv,
+            .prio           = VSF_LINUX_DEVFS_UART_CFG_PRIO,
+        },
+    };
+
+    vsf_spi_irq_disable(spi, VSF_SPI_IRQ_MASK_CPL);
+    vsf_spi_disable(spi);
+    result = vsf_spi_init(spi, &cfg);
+    vsf_spi_enable(spi);
+    vsf_spi_irq_enable(spi, VSF_SPI_IRQ_MASK_CPL);
+    
+    vsf_spi_capability_t cap = vsf_spi_capability(spi);
+    VSF_LINUX_ASSERT(priv->cs_index < cap.cs_count);
+
+    if (priv->mode & SPI_CS_HIGH) {
+        vsf_spi_cs_inactive(spi, priv->cs_index);
+    } else {
+        vsf_spi_cs_active(spi, priv->cs_index);
+    }
+
+    return result;
+}
+
+static void __vsf_linux_spi_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_spi_priv_t *priv = (vsf_linux_spi_priv_t *)sfd->priv;
+    vsf_spi_t *spi = (vsf_spi_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+
+    priv->mode = SPI_MODE_3 | SPI_LSB_FIRST | SPI_CS_HIGH;
+    priv->speed = 1 * 1000 * 1000;
+    priv->bits_per_word = 8;
+    
+    vk_file_t *file = priv->file;
+    char *cs_str = strchr(file->name, '.');
+    VSF_LINUX_ASSERT(cs_str != NULL);
+    priv->cs_index = atoi(cs_str + 1);
+
+    vsf_err_t result = __vsf_linux_spi_config(priv);
+    VSF_LINUX_ASSERT(result == VSF_ERR_NONE);
+}
 
 static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_spi_priv_t *priv = (vsf_linux_spi_priv_t *)sfd->priv;
     vsf_spi_t *spi = (vsf_spi_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
 
-    if (cmd >= SPI_IOC_MESSAGE(1)) {
-        int len = cmd - SPI_IOC_MESSAGE(0);
-        struct spi_ioc_transfer *transfer = (struct spi_ioc_transfer *)arg;
-    } else {
-        switch (cmd) {
-        case SPI_IOC_MESSAGE(0):
+    if (_IOC_TYPE(cmd) != SPI_IOC_MAGIC) {
+        return -1;
+    }
+
+    union {
+        uintptr_t arg;
+        uint8_t  *mode_u8;
+        uint32_t *mode_u32;
+        uint8_t  *lsb;
+        uint8_t  *bits_per_word;
+        uint32_t *speed;
+        struct spi_ioc_transfer *xfer_ptr;
+    } arg_union;
+    arg_union.arg = arg;
+
+    int cmd_nr = _IOC_NR(cmd);
+    switch (cmd) {
+    case SPI_IOC_RD_MODE:
+        *arg_union.mode_u8 = priv->mode;
+        break;
+    case SPI_IOC_RD_MODE32:
+        *arg_union.mode_u32 = priv->mode;
+        break;
+    case SPI_IOC_RD_LSB_FIRST:
+        *arg_union.lsb = (priv->mode & SPI_LSB_FIRST) ? 1 : 0;
+        break;
+    case SPI_IOC_RD_BITS_PER_WORD:
+        *arg_union.bits_per_word = priv->bits_per_word;
+        break;
+    case SPI_IOC_RD_MAX_SPEED_HZ:
+        *arg_union.speed = priv->speed;
+        break;
+
+    case SPI_IOC_WR_MODE:
+        priv->mode = *arg_union.mode_u8;
+        break;
+    case SPI_IOC_WR_MODE32:
+        priv->mode = *arg_union.mode_u32;
+        break;
+    case SPI_IOC_WR_LSB_FIRST:
+        if (arg_union.lsb) {
+            priv->mode |= SPI_LSB_FIRST;
+        } else {
+            priv->mode &= ~SPI_LSB_FIRST;
+        }
+        break;
+    case SPI_IOC_WR_BITS_PER_WORD:
+        priv->bits_per_word = *arg_union.bits_per_word;
+        break;
+    case SPI_IOC_WR_MAX_SPEED_HZ:
+        priv->speed = *arg_union.speed;
+        break;
+
+    default: {
+            uint8_t size = _IOC_SIZE(cmd);
+            if (size >= 1) {
+                VSF_LINUX_ASSERT(priv->xfer_ptr == NULL);
+                VSF_LINUX_ASSERT(priv->xfer_size == 0);
+
+                priv->xfer_pos = 0;
+                priv->xfer_size = size;
+                priv->xfer_ptr = arg_union.xfer_ptr;
+
+                priv->xfer_eda = vsf_eda_get_cur();
+
+                // TODO: support 
+                vsf_spi_cs_active(spi, 0);
+                __vsf_linux_spi_ioc_transfer(priv);
+                vsf_thread_wfe(VSF_EVT_USER);
+                return 0;
+            } else {
+                return -1;
+            }
+        }
+    }
+
+    if (_IOC_DIR(cmd) == _IOC_WRITE) {
+        if (VSF_ERR_NONE != __vsf_linux_spi_config(priv)) {
             return -1;
-        case SPI_IOC_RD_MODE:
-            break;
-        case SPI_IOC_RD_LSB_FIRST:
-            break;
-        case SPI_IOC_RD_BITS_PER_WORD:
-            break;
-        case SPI_IOC_RD_MAX_SPEED_HZ:
-            break;
         }
     }
     return 0;
@@ -489,6 +667,7 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 
 static const vsf_linux_fd_op_t __vsf_linux_spi_fdop = {
     .priv_size          = sizeof(vsf_linux_spi_priv_t),
+    .fn_init            = __vsf_linux_spi_init,
     .fn_fcntl           = __vsf_linux_spi_fcntl,
 };
 
