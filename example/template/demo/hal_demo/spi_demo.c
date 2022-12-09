@@ -334,7 +334,7 @@ int VSF_USER_ENTRY(void)
     size_t size = APP_SPI_DEMO_CFG_BUFFER_SIZE;
 #endif
 
-    size *= vsf_spi_get_data_bytes_from_mode(APP_SPI_DEMO_CFG_MODE);
+    size *= vsf_spi_mode_to_data_bytes(APP_SPI_DEMO_CFG_MODE);
     __app_spi_demo.recv_buff = (uint8_t *)malloc(size);
     if (__app_spi_demo.recv_buff == NULL) {
         return -1;

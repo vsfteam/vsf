@@ -50,6 +50,8 @@ typedef enum vsf_spi_mode_t {
                                            VSF_SPI_CLOCK_MODE_2 |
                                            VSF_SPI_CLOCK_MODE_3,
 
+    VSF_SPI_DATASIZE_BIT_OFFSET          = 2,
+    VSF_SPI_DATASIZE_DIFF                = 0,
     VSF_SPI_DATASIZE_8                   = 0x08ul << 2,      //!< datasize is 8 bits
     VSF_SPI_DATASIZE_9                   = 0x09ul << 2,
     VSF_SPI_DATASIZE_10                  = 0x0aul << 2,
@@ -75,7 +77,13 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_DATASIZE_30                  = 0x1Eul << 2,
     VSF_SPI_DATASIZE_31                  = 0x1Ful << 2,
     VSF_SPI_DATASIZE_32                  = 0x20ul << 2,
-    VSF_SPI_DATASIZE_MASK                = 0x3Ful << 2,
+    __AIC8800_VSF_SPI_DATASIZE_MASK      = VSF_SPI_DATASIZE_8  | VSF_SPI_DATASIZE_9  | VSF_SPI_DATASIZE_10 | VSF_SPI_DATASIZE_11 |
+                                           VSF_SPI_DATASIZE_12 | VSF_SPI_DATASIZE_13 | VSF_SPI_DATASIZE_14 | VSF_SPI_DATASIZE_15 |
+                                           VSF_SPI_DATASIZE_16 | VSF_SPI_DATASIZE_17 | VSF_SPI_DATASIZE_18 | VSF_SPI_DATASIZE_19 |
+                                           VSF_SPI_DATASIZE_20 | VSF_SPI_DATASIZE_21 | VSF_SPI_DATASIZE_22 | VSF_SPI_DATASIZE_23 |
+                                           VSF_SPI_DATASIZE_24 | VSF_SPI_DATASIZE_25 | VSF_SPI_DATASIZE_26 | VSF_SPI_DATASIZE_27 |
+                                           VSF_SPI_DATASIZE_28 | VSF_SPI_DATASIZE_29 | VSF_SPI_DATASIZE_30 | VSF_SPI_DATASIZE_31 |
+                                           VSF_SPI_DATASIZE_32,
 
     VSF_SPI_AUTO_CS_DISABLE              = 0x01ul << 8,
     VSF_SPI_AUTO_CS_ENABLE               = 0x00ul << 8,
@@ -90,6 +98,15 @@ typedef enum vsf_spi_mode_t {
                                            VSF_SPI_CLOCK_MODE_MASK |
                                            VSF_SPI_BIT_ORDER_MASK |
                                            VSF_SPI_AUTO_CS_MASK,
+
+    VSF_SPI_DATASIZE_4                   = 0x04ul << 16,      //!< datasize is 8 bits
+    VSF_SPI_DATASIZE_5                   = 0x05ul << 16,
+    VSF_SPI_DATASIZE_6                   = 0x06ul << 16,
+    VSF_SPI_DATASIZE_7                   = 0x07ul << 16,
+
+    VSF_SPI_DATASIZE_MASK                = VSF_SPI_DATASIZE_4  | VSF_SPI_DATASIZE_5  | VSF_SPI_DATASIZE_6  | VSF_SPI_DATASIZE_7 |
+                                           __AIC8800_VSF_SPI_DATASIZE_MASK,
+
     VSF_SPI_MODE_ALL_BITS_MASK           = __SPI_HW_MODE_MASK | VSF_SPI_DATASIZE_MASK,
 } vsf_spi_mode_t;
 
