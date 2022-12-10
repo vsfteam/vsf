@@ -36,9 +36,6 @@
 #   define VSF_FIFO2REQ_SPI_CFG_MULTI_CLASS     VSF_SPI_CFG_MULTI_CLASS
 #endif
 
-//#define VSF_SPI_FIFO2REQ_IMP_LV0(__PREFIX)                                                               \
-
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_FIFO2REQ_SPI_CFG_MULTI_CLASS == ENABLED
