@@ -472,7 +472,7 @@ typedef struct vsf_linux_spi_priv_t {
     vsf_eda_t *xfer_eda;
 } vsf_linux_spi_priv_t;
 
-static bool __vsf_linux_spi_ioc_transfer(vsf_linux_spi_priv_t *priv)
+static bool __vsf_linux_spi_transfer(vsf_linux_spi_priv_t *priv)
 {
     vsf_spi_t *spi = (vsf_spi_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
 
@@ -494,10 +494,10 @@ static void __vsf_linux_spi_isrhandler(void *target, vsf_spi_t *spi,
 {
     if (irq_mask & VSF_SPI_IRQ_MASK_CPL) {
         vsf_linux_spi_priv_t *priv = (vsf_linux_spi_priv_t *)target;
-        priv->xfer_pos++;        
+        priv->xfer_pos++;
         // TODO: support cur_trans->delay_usecs
-        // TODO: support cur_trans->cs_change        
-        if (!__vsf_linux_spi_ioc_transfer(priv)) {
+        // TODO: support cur_trans->cs_change
+        if (!__vsf_linux_spi_transfer(priv)) {
             vsf_eda_t *eda = priv->xfer_eda;
             VSF_LINUX_ASSERT(eda != NULL);
             priv->xfer_eda = NULL;
@@ -528,7 +528,7 @@ static vsf_err_t __vsf_linux_spi_config(vsf_linux_spi_priv_t *priv)
         break;
     }
     mode |= vsf_spi_data_bits_to_mode(priv->bits_per_word);
-    // TODO: Update when hal/i2c vsf_i2c_mode_t support lsb/msb
+    // TODO: Update when hal/spi vsf_spi_mode_t support lsb/msb
     // TODO: Confirming the behavior of SPI_NO_CS
     vsf_spi_cfg_t cfg    = {
         .mode               = mode,
@@ -545,7 +545,7 @@ static vsf_err_t __vsf_linux_spi_config(vsf_linux_spi_priv_t *priv)
     result = vsf_spi_init(spi, &cfg);
     vsf_spi_enable(spi);
     vsf_spi_irq_enable(spi, VSF_SPI_IRQ_MASK_CPL);
-    
+
     vsf_spi_capability_t cap = vsf_spi_capability(spi);
     VSF_LINUX_ASSERT(priv->cs_index < cap.cs_count);
 
@@ -566,7 +566,7 @@ static void __vsf_linux_spi_init(vsf_linux_fd_t *sfd)
     priv->mode = SPI_MODE_3 | SPI_LSB_FIRST | SPI_CS_HIGH;
     priv->speed = 1 * 1000 * 1000;
     priv->bits_per_word = 8;
-    
+
     vk_file_t *file = priv->file;
     char *cs_str = strchr(file->name, '.');
     VSF_LINUX_ASSERT(cs_str != NULL);
@@ -646,9 +646,8 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 
                 priv->xfer_eda = vsf_eda_get_cur();
 
-                // TODO: support 
-                vsf_spi_cs_active(spi, 0);
-                __vsf_linux_spi_ioc_transfer(priv);
+                vsf_spi_cs_active(spi, priv->cs_index);
+                __vsf_linux_spi_transfer(priv);
                 vsf_thread_wfe(VSF_EVT_USER);
                 return 0;
             } else {
