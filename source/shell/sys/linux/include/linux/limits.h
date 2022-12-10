@@ -15,6 +15,7 @@ extern "C" {
 #   define HOST_NAME_MAX        64
 #endif
 
+#define NAME_MAX                255
 #define PHYS_ADDR_MAX           (~(phys_addr_t)0)
 
 #define U8_MAX                  ((u8)~0U)
