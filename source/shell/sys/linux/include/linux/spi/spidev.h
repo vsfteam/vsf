@@ -21,24 +21,24 @@ extern "C" {
 #define SPI_READY                   0x80
 
 // IOCTL
-#define SPI_IOC_MAGIC			    'k'
+#define SPI_IOC_MAGIC               'k'
 
 #define SPI_IOC_MESSAGE(__N)        _IOC(_IOC_WRITE, SPI_IOC_MAGIC, 0, __N)
 
-#define SPI_IOC_RD_MODE			    _IOR(SPI_IOC_MAGIC, 1, uint8_t)
-#define SPI_IOC_WR_MODE			    _IOW(SPI_IOC_MAGIC, 1, uint8_t)
+#define SPI_IOC_RD_MODE             _IOR(SPI_IOC_MAGIC, 1, uint8_t)
+#define SPI_IOC_WR_MODE             _IOW(SPI_IOC_MAGIC, 1, uint8_t)
 
-#define SPI_IOC_RD_LSB_FIRST		_IOR(SPI_IOC_MAGIC, 2, uint8_t)
-#define SPI_IOC_WR_LSB_FIRST		_IOW(SPI_IOC_MAGIC, 2, uint8_t)
+#define SPI_IOC_RD_LSB_FIRST        _IOR(SPI_IOC_MAGIC, 2, uint8_t)
+#define SPI_IOC_WR_LSB_FIRST        _IOW(SPI_IOC_MAGIC, 2, uint8_t)
 
-#define SPI_IOC_RD_BITS_PER_WORD	_IOR(SPI_IOC_MAGIC, 3, uint8_t)
-#define SPI_IOC_WR_BITS_PER_WORD	_IOW(SPI_IOC_MAGIC, 3, uint8_t)
+#define SPI_IOC_RD_BITS_PER_WORD    _IOR(SPI_IOC_MAGIC, 3, uint8_t)
+#define SPI_IOC_WR_BITS_PER_WORD    _IOW(SPI_IOC_MAGIC, 3, uint8_t)
 
-#define SPI_IOC_RD_MAX_SPEED_HZ		_IOR(SPI_IOC_MAGIC, 4, uint32_t)
-#define SPI_IOC_WR_MAX_SPEED_HZ		_IOW(SPI_IOC_MAGIC, 4, uint32_t)
+#define SPI_IOC_RD_MAX_SPEED_HZ     _IOR(SPI_IOC_MAGIC, 4, uint32_t)
+#define SPI_IOC_WR_MAX_SPEED_HZ     _IOW(SPI_IOC_MAGIC, 4, uint32_t)
 
-#define SPI_IOC_RD_MODE32		    _IOR(SPI_IOC_MAGIC, 5, uint32_t)
-#define SPI_IOC_WR_MODE32		    _IOW(SPI_IOC_MAGIC, 5, uint32_t)
+#define SPI_IOC_RD_MODE32           _IOR(SPI_IOC_MAGIC, 5, uint32_t)
+#define SPI_IOC_WR_MODE32           _IOW(SPI_IOC_MAGIC, 5, uint32_t)
 
 struct spi_ioc_transfer {
     uintptr_t tx_buf;

@@ -10,7 +10,7 @@ extern "C" {
 
 struct serial_struct {
     int flags;
-    int	custom_divisor;
+    int custom_divisor;
     int baud_base;
 };
 
