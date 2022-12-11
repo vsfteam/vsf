@@ -11,20 +11,19 @@ extern "C" {
 #endif
 
 #define module_driver(__driver, __register, __unregister, ...)                  \
-void __init __driver##_init(void)                                               \
+static void __init __driver##_init(void)                                        \
 {                                                                               \
     __register(&(__driver) , ##__VA_ARGS__);                                    \
 }                                                                               \
 module_init(__driver##_init);                                                   \
-void __exit __driver##_exit(void)                                               \
+static void __exit __driver##_exit(void)                                        \
 {                                                                               \
     __unregister(&(__driver) , ##__VA_ARGS__);                                  \
 }                                                                               \
 module_exit(__driver##_exit);
 
 #define module_driver_init(__driver)                                            \
-extern int __driver##_init(void);                                               \
-__driver##_init()
+module_run_init(__driver##_init)
 
 struct device_driver {
     const char              *name;

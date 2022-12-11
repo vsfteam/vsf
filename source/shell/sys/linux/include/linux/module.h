@@ -21,8 +21,23 @@ extern "C" {
 #define MODULE_VERSION(__VERSION_STR)
 #define MODULE_LICENSE(__LICENSE_STR)
 
-#define module_init(__init_func)
-#define module_exit(__exit_func)
+#define module_init(__init_func)                                                \
+void __init __vsf_mod_##__init_func(void)                                       \
+{                                                                               \
+    __init_func();                                                              \
+}
+#define module_run_init(__init_func)                                            \
+extern int __vsf_mod_##__init_func(void);                                       \
+__vsf_mod_##__init_func()
+
+#define module_exit(__exit_func)                                                \
+void __init __vsf_mod_##__exit_func(void)                                       \
+{                                                                               \
+    __exit_func();                                                              \
+}
+#define module_run_exit(__exit_func)                                            \
+extern int __vsf_mod_##__exit_func(void);                                       \
+__vsf_mod_##__exit_func()
 
 #define THIS_MODULE                     ((struct module *)NULL)
 #define KBUILD_MODNAME                  ((const char *)NULL)
