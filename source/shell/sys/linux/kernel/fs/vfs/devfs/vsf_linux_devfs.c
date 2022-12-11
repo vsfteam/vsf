@@ -339,50 +339,46 @@ typedef struct vsf_linux_i2c_priv_t {
     } i2c;
 } vsf_linux_i2c_priv_t;
 
-static ssize_t __vsf_linux_i2c_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+static ssize_t __vsf_linux_i2c_master_request(vsf_linux_i2c_priv_t *priv,
+            vsf_i2c_cmd_t cmd, uint16_t count, uint8_t *buf)
 {
-    vsf_linux_i2c_priv_t *priv = (vsf_linux_i2c_priv_t *)sfd->priv;
     vsf_i2c_t *i2c = (vsf_i2c_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
-
     VSF_LINUX_ASSERT(NULL == priv->i2c.pending_eda);
     priv->i2c.pending_eda = vsf_eda_get_cur();
-    if (vsf_i2c_master_request(i2c, priv->i2c.addr,
-            VSF_I2C_CMD_START | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP,
-            count, (uint8_t *)buf) != VSF_ERR_NONE) {
+    if (vsf_i2c_master_request(i2c, priv->i2c.addr, cmd, count, buf) != VSF_ERR_NONE) {
         priv->i2c.pending_eda = NULL;
         return -1;
     }
     vsf_thread_wfe(VSF_EVT_USER);
     if (priv->i2c.irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
+        // TODO: get the actual transfered byte size
         return count;
     }
+    errno = EIO;
     return -1;
+}
+
+static ssize_t __vsf_linux_i2c_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    return __vsf_linux_i2c_master_request((vsf_linux_i2c_priv_t *)sfd->priv,
+        VSF_I2C_CMD_START | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP, count, (uint8_t *)buf);
 }
 
 static ssize_t __vsf_linux_i2c_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
-    vsf_linux_i2c_priv_t *priv = (vsf_linux_i2c_priv_t *)sfd->priv;
-    vsf_i2c_t *i2c = (vsf_i2c_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
-
-    VSF_LINUX_ASSERT(NULL == priv->i2c.pending_eda);
-    priv->i2c.pending_eda = vsf_eda_get_cur();
-    if (vsf_i2c_master_request(i2c, priv->i2c.addr,
-            VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
-            count, (uint8_t *)buf) != VSF_ERR_NONE) {
-        priv->i2c.pending_eda = NULL;
-        return -1;
-    }
-    vsf_thread_wfe(VSF_EVT_USER);
-    if (priv->i2c.irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
-        return count;
-    }
-    return -1;
+    return __vsf_linux_i2c_master_request((vsf_linux_i2c_priv_t *)sfd->priv,
+        VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP, count, (uint8_t *)buf);
 }
 
 static int __vsf_linux_i2c_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_i2c_priv_t *priv = (vsf_linux_i2c_priv_t *)sfd->priv;
-    vsf_i2c_t *i2c = (vsf_i2c_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+    union {
+        struct i2c_rdwr_ioctl_data *rdwr_arg;
+        struct i2c_smbus_ioctl_data *data_arg;
+    } u;
+    vsf_i2c_cmd_t i2c_cmd;
+    ssize_t size;
 
     switch (cmd) {
     case I2C_SLAVE:
@@ -399,12 +395,57 @@ static int __vsf_linux_i2c_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         }
         break;
     case I2C_FUNCS:
-        *(unsigned long *)arg = I2C_FUNC_I2C | I2C_FUNC_NOSTART;
+        *(unsigned long *)arg = I2C_FUNC_I2C | I2C_FUNC_NOSTART
+                            |   I2C_FUNC_SMBUS_QUICK
+                            |   I2C_FUNC_SMBUS_BYTE | I2C_FUNC_SMBUS_BYTE_DATA
+                            |   I2C_FUNC_SMBUS_I2C_BLOCK;
+        break;
+    case I2C_RDWR:
+        u.rdwr_arg = (struct i2c_rdwr_ioctl_data *)arg;
         // TODO
         break;
-    case I2C_RDWR: {
-            struct i2c_rdwr_ioctl_data *msgset = (struct i2c_rdwr_ioctl_data *)arg;
-            // TODO
+    case I2C_SMBUS:
+        u.data_arg = (struct i2c_smbus_ioctl_data*)arg;
+        i2c_cmd = VSF_I2C_CMD_START | VSF_I2C_CMD_STOP;
+        switch (u.data_arg->size) {
+        case I2C_SMBUS_QUICK:
+            // S Address R/W# A P
+            size = __vsf_linux_i2c_master_request(priv,
+                i2c_cmd | (u.data_arg->read_write ? VSF_I2C_CMD_READ : VSF_I2C_CMD_WRITE),
+                0, NULL);
+            return size < 0 ? size : 0;
+        case I2C_SMBUS_BYTE:
+            // S Address R/W# A byte N P
+            size = __vsf_linux_i2c_master_request(priv,
+                i2c_cmd | (u.data_arg->read_write ? VSF_I2C_CMD_READ : VSF_I2C_CMD_WRITE),
+                1, &u.data_arg->data->byte);
+            return size < 0 ? size : 0;
+        case I2C_SMBUS_BYTE_DATA:
+            // I2C_SMBUS_READ:  S Address W A command A Sr Address R A byte N P
+            // I2C_SMBUS_WRITE: S Address W A command A byte A P
+            break;
+        case I2C_SMBUS_WORD_DATA:
+            // I2C_SMBUS_READ:  S Address W A command A Sr Address R A low_byte A high_byte N P
+            // I2C_SMBUS_WRITE: S Address W A command A low_byte A high_byte A P
+            break;
+        case I2C_SMBUS_BLOCK_DATA:
+            // I2C_SMBUS_READ:  S Address W A command A Sr Address R A count A byte0 A .... N P
+            // I2C_SMBUS_WRITE: S Address W A command A count A byte0 A .... A P
+            break;
+        case I2C_SMBUS_I2C_BLOCK_BROKEN:
+        case I2C_SMBUS_I2C_BLOCK_DATA:
+            // I2C_SMBUS_READ:  S Address W A command A Sr Address R A byte0 A .... N P
+            // I2C_SMBUS_WRITE: S Address W A command A byte0 A .... A P
+            size = __vsf_linux_i2c_master_request(priv,
+                VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE,
+                1, &u.data_arg->command);
+            if (1 == size) {
+                size = __vsf_linux_i2c_master_request(priv,
+                    (u.data_arg->read_write ? VSF_I2C_CMD_READ : VSF_I2C_CMD_WRITE) | VSF_I2C_CMD_STOP,
+                    u.data_arg->data->block[0], &u.data_arg->data->block[1]);
+            }
+            return size < 0 ? size : 0;
+            break;
         }
         break;
     }
