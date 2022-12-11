@@ -121,6 +121,7 @@ static void __vsf_gpio_i2c_scl_recessive(vsf_gpio_i2c_t *gpio_i2c_ptr)
 
 static bool __vsf_gpio_i2c_out(vsf_gpio_i2c_t *gpio_i2c_ptr, uint32_t data, uint8_t bits)
 {
+    uint32_t value;
     vsf_gpio_set_output(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
     for (; bits > 0; bits--) {
         __vsf_gpio_i2c_scl_dominant(gpio_i2c_ptr);
@@ -139,7 +140,9 @@ static bool __vsf_gpio_i2c_out(vsf_gpio_i2c_t *gpio_i2c_ptr, uint32_t data, uint
     gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
     __vsf_gpio_i2c_scl_recessive(gpio_i2c_ptr);
     gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
-    return !(vsf_gpio_read(gpio_i2c_ptr->port) & (1 << gpio_i2c_ptr->sda_pin));
+    value = vsf_gpio_read(gpio_i2c_ptr->port);
+    __vsf_gpio_i2c_scl_dominant(gpio_i2c_ptr);
+    return !(value & (1 << gpio_i2c_ptr->sda_pin));
 }
 
 static uint8_t __vsf_gpio_i2c_in(vsf_gpio_i2c_t *gpio_i2c_ptr, bool ack)
@@ -165,6 +168,7 @@ static uint8_t __vsf_gpio_i2c_in(vsf_gpio_i2c_t *gpio_i2c_ptr, bool ack)
     gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
     __vsf_gpio_i2c_scl_recessive(gpio_i2c_ptr);
     gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
+    __vsf_gpio_i2c_scl_dominant(gpio_i2c_ptr);
     return data;
 }
 
@@ -173,6 +177,7 @@ static void __vsf_gpio_i2c_isrhandler(vsf_gpio_i2c_t *gpio_i2c_ptr)
     if (gpio_i2c_ptr->cfg.isr.handler_fn != NULL) {
         gpio_i2c_ptr->cfg.isr.handler_fn(gpio_i2c_ptr->cfg.isr.target_ptr,
                 (vsf_i2c_t *)gpio_i2c_ptr, gpio_i2c_ptr->irq_mask);
+        gpio_i2c_ptr->irq_mask = 0;
     }
 }
 
@@ -185,6 +190,8 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
     bool is_read = (cmd & VSF_I2C_CMD_RW_MASK) == VSF_I2C_CMD_READ;
     uint16_t transfered_count = 0;
     if ((cmd & VSF_I2C_CMD_START) || (cmd & VSF_I2C_CMD_RESTART)) {
+        __vsf_gpio_i2c_scl_recessive(gpio_i2c_ptr);
+        gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
         vsf_gpio_set_output(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
         vsf_gpio_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
         gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
@@ -195,8 +202,7 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
         gpio_i2c_ptr->irq_mask = VSF_I2C_IRQ_MASK_MASTER_STARTED;
         if (!acked) {
             gpio_i2c_ptr->irq_mask |= VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK;
-            __vsf_gpio_i2c_isrhandler(gpio_i2c_ptr);
-            return VSF_ERR_NONE;
+            goto check_stop;
         }
     }
 
@@ -210,8 +216,8 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
         }
     }
 
+check_stop:
     if (cmd & VSF_I2C_CMD_STOP) {
-        __vsf_gpio_i2c_scl_dominant(gpio_i2c_ptr);
         vsf_gpio_set_output(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
         vsf_gpio_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
         gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
@@ -219,7 +225,9 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
         vsf_gpio_set_input(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
     }
     gpio_i2c_ptr->transfered_count = transfered_count;
-    gpio_i2c_ptr->irq_mask |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+    if (!(gpio_i2c_ptr->irq_mask & VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK)) {
+        gpio_i2c_ptr->irq_mask |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+    }
     __vsf_gpio_i2c_isrhandler(gpio_i2c_ptr);
     return VSF_ERR_NONE;
 }
