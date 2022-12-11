@@ -663,25 +663,29 @@ cleanup:
 
 char * __vsh_fdgets(int fd, char *str, int n)
 {
-    char *result = str;
+    char ch, *result = str, *cur;
     int rsize = 0;
 
-    while (rsize < n - 1) {
-        if (read(fd, str, 1) != 1) {
+    while (true) {
+        if (read(fd, &ch, 1) != 1) {
             break;
+        }
+        if (rsize < n - 1) {
+            *str = ch;
+            cur = str;
         }
 
         if (isatty(fd)) {
 #if     VSH_ENTER_CHAR == '\r'
-            if (VSH_ENTER_CHAR == *str) {
+            if (VSH_ENTER_CHAR == ch) {
                write(STDOUT_FILENO, "\n", 1);
-            } else if ('\n' == *str) {
+            } else if ('\n' == ch) {
 #elif   VSH_ENTER_CHAR == '\n'
-            if ('\r' == *str) {
+            if ('\r' == ch) {
 #endif
                 continue;
             }
-            if (('\b' == *str) || (0x7F == *str)) {
+            if (('\b' == ch) || (0x7F == ch)) {
                 int back_cnt = vsf_min(rsize, 1);
                 rsize -= back_cnt;
                 str -= back_cnt;
@@ -691,11 +695,11 @@ char * __vsh_fdgets(int fd, char *str, int n)
 
         rsize++;
         str++;
-        if (VSH_ENTER_CHAR == str[-1]) {
+        if (VSH_ENTER_CHAR == ch) {
             break;
         }
     }
-    str[0] = '\0';
+    cur[1] = '\0';
     return rsize > 0 ? result : NULL;
 }
 
