@@ -63,6 +63,9 @@ struct i2c_msg {
     uint16_t flags;
 #define I2C_M_RD                        0x0001
 #define I2C_M_TEN                       0x0010
+#define I2C_M_RECV_LEN                  0x0400
+#define I2C_M_NO_RD_ACK                 0x0800
+#define I2C_M_IGNORE_NAK                0x1000
 #define I2C_M_NOSTART                   0x4000
     uint16_t len;
     uint8_t *buf;

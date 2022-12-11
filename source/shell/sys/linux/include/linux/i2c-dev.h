@@ -14,6 +14,7 @@ extern "C" {
 #define I2C_FUNCS               (('i' << 8) | 2)
 #define I2C_RDWR                (('i' << 8) | 3)
 #define I2C_SMBUS               (('i' << 8) | 4)
+#define I2C_PEC                 (('i' << 8) | 5)
 
 struct i2c_smbus_ioctl_data {
     __u8 read_write;
@@ -26,6 +27,9 @@ struct i2c_rdwr_ioctl_data {
     struct i2c_msg *msgs;
     __u32 nmsgs;
 };
+
+#define I2C_RDWR_IOCTL_MAX_MSGS 42
+#define I2C_RDRW_IOCTL_MAX_MSGS I2C_RDWR_IOCTL_MAX_MSGS
 
 #ifdef __cplusplus
 }
