@@ -967,9 +967,9 @@ ssize_t VSF_LINUX_SOCKET_WRAPPER(sendto)(int sockfd, const void *buffer, size_t 
                     const struct vsf_linux_socket_sockaddr *dst_addr, vsf_socklen_t addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    if (!sfd) {
+        return -1;
+    }
 
     return __vsf_linux_socket_inet_send((vsf_linux_socket_inet_priv_t *)sfd->priv,
                     buffer, size, flags, dst_addr, addrlen);

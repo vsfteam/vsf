@@ -126,7 +126,7 @@ libusb_device_handle * LIBUSB_CALL libusb_open_device_with_vid_pid(
 }
 
 int LIBUSB_CALL libusb_get_config_descriptor_by_value(libusb_device *dev,
-	uint8_t bConfigurationValue, struct libusb_config_descriptor **config)
+    uint8_t bConfigurationValue, struct libusb_config_descriptor **config)
 {
     *config = (struct libusb_config_descriptor *)dev->config;
     VSF_USB_ASSERT(bConfigurationValue == dev->config->bConfigurationValue);
@@ -134,14 +134,14 @@ int LIBUSB_CALL libusb_get_config_descriptor_by_value(libusb_device *dev,
 }
 
 void LIBUSB_CALL libusb_free_config_descriptor(
-	struct libusb_config_descriptor *config)
+    struct libusb_config_descriptor *config)
 {
     // config is not dynamically alloced
 }
 
 int LIBUSB_CALL libusb_bulk_transfer(libusb_device_handle *dev_handle,
-	unsigned char endpoint, unsigned char *data, int length,
-	int *actual_length, unsigned int timeout)
+    unsigned char endpoint, unsigned char *data, int length,
+    int *actual_length, unsigned int timeout)
 {
     int result;
     if (endpoint & 0x80) {
@@ -156,8 +156,8 @@ int LIBUSB_CALL libusb_bulk_transfer(libusb_device_handle *dev_handle,
 }
 
 int LIBUSB_CALL libusb_interrupt_transfer(libusb_device_handle *dev_handle,
-	unsigned char endpoint, unsigned char *data, int length,
-	int *actual_length, unsigned int timeout)
+    unsigned char endpoint, unsigned char *data, int length,
+    int *actual_length, unsigned int timeout)
 {
     int result;
     if (endpoint & 0x80) {

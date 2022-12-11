@@ -309,7 +309,7 @@ bool vsf_pool_add_buffer_ex(    vsf_pool_t *obj_ptr,
 
 
     VSF_SERVICE_ASSERT(     (this_ptr != NULL)
-            			&&  (buffer_ptr != 0));
+                        &&  (buffer_ptr != 0));
 
     /* Allowing multiple-layers of Pool management */
     if (    (item_size < sizeof(__vsf_pool_node_t))

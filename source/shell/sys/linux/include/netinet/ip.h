@@ -22,10 +22,10 @@ extern "C" {
 
 #define IPTOS_TOS_MASK      0x1E
 #define IPTOS_TOS(__TOS)    ((__TOS) & IPTOS_TOS_MASK)
-#define	IPTOS_LOWDELAY      0x10
-#define	IPTOS_THROUGHPUT    0x08
-#define	IPTOS_RELIABILITY   0x04
-#define	IPTOS_MINCOST       0x02
+#define IPTOS_LOWDELAY      0x10
+#define IPTOS_THROUGHPUT    0x08
+#define IPTOS_RELIABILITY   0x04
+#define IPTOS_MINCOST       0x02
 
 #ifdef __cplusplus
 }

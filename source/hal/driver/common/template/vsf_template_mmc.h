@@ -123,10 +123,10 @@ extern "C" {
 #define SD_OCR_VDD_HIGH                 0x00FF8000  /* VDD voltage 2.7 ~ 3.6 */
 #define SD_OCR_VDD_LOW                  0x00007F80  /* VDD voltage 1.65 ~ 2.7 */
 #define SD_OCR_VDD                      (SD_OCR_VDD_HIGH | SD_OCR_VDD_LOW)
-#define SD_OCR_S18R		                (1 << 24)   /* 1.8V switching request */
-#define SD_ROCR_S18A		            SD_OCR_S18R /* 1.8V switching accepted by card */
-#define SD_OCR_XPC		                (1 << 28)   /* SDXC power control */
-#define SD_OCR_CCS		                (1 << 30)   /* Card Capacity Status */
+#define SD_OCR_S18R                     (1 << 24)   /* 1.8V switching request */
+#define SD_ROCR_S18A                    SD_OCR_S18R /* 1.8V switching accepted by card */
+#define SD_OCR_XPC                      (1 << 28)   /* SDXC power control */
+#define SD_OCR_CCS                      (1 << 30)   /* Card Capacity Status */
 
 /* Standard MMC commands (4.1)                  type  argument     response */
    /* class 1 */
@@ -140,7 +140,7 @@ extern "C" {
 #define MMC_SET_RELATIVE_ADDR_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_SET_DSR                     4    /* bc   [31:16] RCA            */
 #define MMC_SET_DSR_OP                  0
-#define MMC_SLEEP_AWAKE		            5    /* ac   [31:16] RCA 15:flg R1b */
+#define MMC_SLEEP_AWAKE                 5    /* ac   [31:16] RCA 15:flg R1b */
 #define MMC_SLEEP_AWAKE_OP              (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_SWITCH                      6    /* ac   [31:0] See below   R1b */
 #define MMC_SWITCH_OP                   (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
@@ -177,7 +177,7 @@ extern "C" {
 #define MMC_READ_MULTIPLE_BLOCK_OP      (MMC_CMDOP_MULTI_BLOCK | MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 #define MMC_SEND_TUNING_BLOCK           19   /* adtc                    R1  */
 #define MMC_SEND_TUNING_BLOCK_OP        (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
-#define MMC_SEND_TUNING_BLOCK_HS200     21	 /* adtc R1  */
+#define MMC_SEND_TUNING_BLOCK_HS200     21   /* adtc R1  */
 #define MMC_SEND_TUNING_BLOCK_HS200_OP  (MMC_CMDOP_RESP | MMC_CMDOP_RESP_SHORT_CRC)
 
   /* class 3 */

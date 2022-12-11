@@ -42,7 +42,7 @@ extern "C" {
         struct TAG { MEMBERS } ATTRS NAME;                                      \
     }
 #define struct_group(NAME, MEMBERS...)                                          \
-	__struct_group(/* no tag */, NAME, /* no attrs */, MEMBERS)
+    __struct_group(/* no tag */, NAME, /* no attrs */, MEMBERS)
 
 typedef int8_t __s8;
 typedef uint8_t __u8;

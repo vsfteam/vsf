@@ -41,65 +41,65 @@
  * and relative field offsets for the Core Global registers.
  */
 struct dwcotg_core_global_regs_t {
-	/** OTG Control and Status Register.  <i>Offset: 000h</i> */
-	volatile uint32_t gotgctl;
-	/** OTG Interrupt Register.	 <i>Offset: 004h</i> */
-	volatile uint32_t gotgint;
-	/**Core AHB Configuration Register.	 <i>Offset: 008h</i> */
-	volatile uint32_t gahbcfg;
-	/**Core USB Configuration Register.	 <i>Offset: 00Ch</i> */
-	volatile uint32_t gusbcfg;
-	/**Core Reset Register.	 <i>Offset: 010h</i> */
-	volatile uint32_t grstctl;
-	/**Core Interrupt Register.	 <i>Offset: 014h</i> */
-	volatile uint32_t gintsts;
-	/**Core Interrupt Mask Register.  <i>Offset: 018h</i> */
-	volatile uint32_t gintmsk;
-	/**Receive Status Queue Read Register (Read Only).	<i>Offset: 01Ch</i> */
-	volatile uint32_t grxstsr;
-	/**Receive Status Queue Read & POP Register (Read Only).  <i>Offset: 020h</i>*/
-	volatile uint32_t grxstsp;
-	/**Receive FIFO Size Register.	<i>Offset: 024h</i> */
-	volatile uint32_t grxfsiz;
-	/**Non Periodic Transmit FIFO Size Register.  <i>Offset: 028h</i> */
-	volatile uint32_t gnptxfsiz;
-	/**Non Periodic Transmit FIFO/Queue Status Register (Read
-	 * Only). <i>Offset: 02Ch</i> */
-	volatile uint32_t gnptxsts;
-	/**I2C Access Register.	 <i>Offset: 030h</i> */
-	volatile uint32_t gi2cctl;
-	/**PHY Vendor Control Register.	 <i>Offset: 034h</i> */
-	volatile uint32_t gpvndctl;
-	/**General Purpose Input/Output Register.  <i>Offset: 038h</i> */
-	volatile uint32_t gccfg;
-	/**User ID Register.  <i>Offset: 03Ch</i> */
-	volatile uint32_t guid;
-	/**Synopsys ID Register (Read Only).  <i>Offset: 040h</i> */
-	volatile uint32_t gsnpsid;
-	/**User HW Config1 Register (Read Only).  <i>Offset: 044h</i> */
-	volatile uint32_t ghwcfg1;
-	/**User HW Config2 Register (Read Only).  <i>Offset: 048h</i> */
-	volatile uint32_t ghwcfg2;
-	/**User HW Config3 Register (Read Only).  <i>Offset: 04Ch</i> */
-	volatile uint32_t ghwcfg3;
-	/**User HW Config4 Register (Read Only).  <i>Offset: 050h</i>*/
-	volatile uint32_t ghwcfg4;
-	/** Core LPM Configuration register <i>Offset: 054h</i>*/
-	volatile uint32_t glpmcfg;
-	/** Global PowerDn Register <i>Offset: 058h</i> */
-	volatile uint32_t gpwrdn;
-	/** Global DFIFO SW Config Register  <i>Offset: 05Ch</i> */
-	volatile uint32_t gdfifocfg;
-	/** ADP Control Register  <i>Offset: 060h</i> */
-	volatile uint32_t adpctl;
-	/** Reserved  <i>Offset: 064h-0FFh</i> */
-	volatile uint32_t reserved39[39];
-	/** Host Periodic Transmit FIFO Size Register. <i>Offset: 100h</i> */
-	volatile uint32_t hptxfsiz;
-	/** Device Periodic Transmit FIFO#n Register if dedicated fifos are disabled,
-		otherwise Device Transmit FIFO#n Register.
-	 * <i>Offset: 104h + (FIFO_Number-1)*04h, 1 <= FIFO Number <= 15 (1<=n<=15).</i> */
-	volatile uint32_t dtxfsiz[15];
+    /** OTG Control and Status Register.  <i>Offset: 000h</i> */
+    volatile uint32_t gotgctl;
+    /** OTG Interrupt Register.     <i>Offset: 004h</i> */
+    volatile uint32_t gotgint;
+    /**Core AHB Configuration Register.     <i>Offset: 008h</i> */
+    volatile uint32_t gahbcfg;
+    /**Core USB Configuration Register.     <i>Offset: 00Ch</i> */
+    volatile uint32_t gusbcfg;
+    /**Core Reset Register.     <i>Offset: 010h</i> */
+    volatile uint32_t grstctl;
+    /**Core Interrupt Register.     <i>Offset: 014h</i> */
+    volatile uint32_t gintsts;
+    /**Core Interrupt Mask Register.  <i>Offset: 018h</i> */
+    volatile uint32_t gintmsk;
+    /**Receive Status Queue Read Register (Read Only).    <i>Offset: 01Ch</i> */
+    volatile uint32_t grxstsr;
+    /**Receive Status Queue Read & POP Register (Read Only).  <i>Offset: 020h</i>*/
+    volatile uint32_t grxstsp;
+    /**Receive FIFO Size Register.    <i>Offset: 024h</i> */
+    volatile uint32_t grxfsiz;
+    /**Non Periodic Transmit FIFO Size Register.  <i>Offset: 028h</i> */
+    volatile uint32_t gnptxfsiz;
+    /**Non Periodic Transmit FIFO/Queue Status Register (Read
+     * Only). <i>Offset: 02Ch</i> */
+    volatile uint32_t gnptxsts;
+    /**I2C Access Register.     <i>Offset: 030h</i> */
+    volatile uint32_t gi2cctl;
+    /**PHY Vendor Control Register.     <i>Offset: 034h</i> */
+    volatile uint32_t gpvndctl;
+    /**General Purpose Input/Output Register.  <i>Offset: 038h</i> */
+    volatile uint32_t gccfg;
+    /**User ID Register.  <i>Offset: 03Ch</i> */
+    volatile uint32_t guid;
+    /**Synopsys ID Register (Read Only).  <i>Offset: 040h</i> */
+    volatile uint32_t gsnpsid;
+    /**User HW Config1 Register (Read Only).  <i>Offset: 044h</i> */
+    volatile uint32_t ghwcfg1;
+    /**User HW Config2 Register (Read Only).  <i>Offset: 048h</i> */
+    volatile uint32_t ghwcfg2;
+    /**User HW Config3 Register (Read Only).  <i>Offset: 04Ch</i> */
+    volatile uint32_t ghwcfg3;
+    /**User HW Config4 Register (Read Only).  <i>Offset: 050h</i>*/
+    volatile uint32_t ghwcfg4;
+    /** Core LPM Configuration register <i>Offset: 054h</i>*/
+    volatile uint32_t glpmcfg;
+    /** Global PowerDn Register <i>Offset: 058h</i> */
+    volatile uint32_t gpwrdn;
+    /** Global DFIFO SW Config Register  <i>Offset: 05Ch</i> */
+    volatile uint32_t gdfifocfg;
+    /** ADP Control Register  <i>Offset: 060h</i> */
+    volatile uint32_t adpctl;
+    /** Reserved  <i>Offset: 064h-0FFh</i> */
+    volatile uint32_t reserved39[39];
+    /** Host Periodic Transmit FIFO Size Register. <i>Offset: 100h</i> */
+    volatile uint32_t hptxfsiz;
+    /** Device Periodic Transmit FIFO#n Register if dedicated fifos are disabled,
+        otherwise Device Transmit FIFO#n Register.
+     * <i>Offset: 104h + (FIFO_Number-1)*04h, 1 <= FIFO Number <= 15 (1<=n<=15).</i> */
+    volatile uint32_t dtxfsiz[15];
 };
 
 /********************  Bit definition for USB_OTG_GOTGCTL register  ********************/
@@ -121,8 +121,8 @@ struct dwcotg_core_global_regs_t {
 #define USB_OTG_GOTGCTL_ASVLD                   ((uint32_t)0x00040000)         /*!< A-session valid  */
 #define USB_OTG_GOTGCTL_BSESVLD                 ((uint32_t)0x00080000)         /*!< B-session valid */
 #define USB_OTG_GOTGCTL_OTGVER                  ((uint32_t)0x00100000)         /*!< OTG version  */
-#define USB_OTG_GOTGCTL_MULTVALIDBC				((uint32_t)0x07c00000)
-#define USB_OTG_GOTGCTL_CHIRPEN					((uint32_t)0x08000000)
+#define USB_OTG_GOTGCTL_MULTVALIDBC             ((uint32_t)0x07c00000)
+#define USB_OTG_GOTGCTL_CHIRPEN                 ((uint32_t)0x08000000)
 
 /********************  Bit definition for USB_OTG_GOTGINT register  ********************/
 #define USB_OTG_GOTGINT_SEDET                   ((uint32_t)0x00000004)            /*!< Session end detected                   */
@@ -143,9 +143,9 @@ struct dwcotg_core_global_regs_t {
 #define USB_OTG_GAHBCFG_DMAEN                   ((uint32_t)0x00000020)            /*!< DMA enable */
 #define USB_OTG_GAHBCFG_TXFELVL                 ((uint32_t)0x00000080)            /*!< TxFIFO empty level */
 #define USB_OTG_GAHBCFG_PTXFELVL                ((uint32_t)0x00000100)            /*!< Periodic TxFIFO empty level */
-#define USB_OTG_GAHBCFG_REMMEMSUPP				((uint32_t)0x00200000)
-#define USB_OTG_GAHBCFG_NOTIALLDMAWRIT			((uint32_t)0x00400000)
-#define USB_OTG_GAHBCFG_AHBSINGLE				((uint32_t)0x00800000)
+#define USB_OTG_GAHBCFG_REMMEMSUPP              ((uint32_t)0x00200000)
+#define USB_OTG_GAHBCFG_NOTIALLDMAWRIT          ((uint32_t)0x00400000)
+#define USB_OTG_GAHBCFG_AHBSINGLE               ((uint32_t)0x00800000)
 
 /********************  Bit definition for USB_OTG_GUSBCFG register  ********************/
 #define USB_OTG_GUSBCFG_TOCAL                   ((uint32_t)0x00000007)            /*!< FS timeout calibration */
@@ -351,55 +351,55 @@ struct dwcotg_core_global_regs_t {
  * accessed in Host mode, as the results are unknown.</i>
  */
 struct dwcotg_dev_global_regs_t {
-	/** Device Configuration Register. <i>Offset 800h</i> */
-	volatile uint32_t dcfg;
-	/** Device Control Register. <i>Offset: 804h</i> */
-	volatile uint32_t dctl;
-	/** Device Status Register (Read Only). <i>Offset: 808h</i> */
-	volatile uint32_t dsts;
-	/** Reserved. <i>Offset: 80Ch</i> */
-	uint32_t unused;
-	/** Device IN Endpoint Common Interrupt Mask
-	 * Register. <i>Offset: 810h</i> */
-	volatile uint32_t diepmsk;
-	/** Device OUT Endpoint Common Interrupt Mask
-	 * Register. <i>Offset: 814h</i> */
-	volatile uint32_t doepmsk;
-	/** Device All Endpoints Interrupt Register.  <i>Offset: 818h</i> */
-	volatile uint32_t daint;
-	/** Device All Endpoints Interrupt Mask Register.  <i>Offset:
-	 * 81Ch</i> */
-	volatile uint32_t daintmsk;
-	/** Device IN Token Queue Read Register-1 (Read Only).
-	 * <i>Offset: 820h</i> */
-	volatile uint32_t dtknqr1;
-	/** Device IN Token Queue Read Register-2 (Read Only).
-	 * <i>Offset: 824h</i> */
-	volatile uint32_t dtknqr2;
-	/** Device VBUS	 discharge Register.  <i>Offset: 828h</i> */
-	volatile uint32_t dvbusdis;
-	/** Device VBUS Pulse Register.	 <i>Offset: 82Ch</i> */
-	volatile uint32_t dvbuspulse;
-	/** Device IN Token Queue Read Register-3 (Read Only). /
-	 *	Device Thresholding control register (Read/Write)
-	 * <i>Offset: 830h</i> */
-	volatile uint32_t dtknqr3_dthrctl;
-	/** Device IN Token Queue Read Register-4 (Read Only). /
-	 *	Device IN EPs empty Inr. Mask Register (Read/Write)
-	 * <i>Offset: 834h</i> */
-	volatile uint32_t dtknqr4_fifoemptymsk;
-	/** Device Each Endpoint Interrupt Register (Read Only). /
-	 * <i>Offset: 838h</i> */
-	volatile uint32_t deachint;
-	/** Device Each Endpoint Interrupt mask Register (Read/Write). /
-	 * <i>Offset: 83Ch</i> */
-	volatile uint32_t deachintmsk;
-	/** Device Each In Endpoint Interrupt mask Register (Read/Write). /
-	 * <i>Offset: 840h</i> */
-	volatile uint32_t diepeachintmsk[MAX_EPS_CHANNELS];
-	/** Device Each Out Endpoint Interrupt mask Register (Read/Write). /
-	 * <i>Offset: 880h</i> */
-	volatile uint32_t doepeachintmsk[MAX_EPS_CHANNELS];
+    /** Device Configuration Register. <i>Offset 800h</i> */
+    volatile uint32_t dcfg;
+    /** Device Control Register. <i>Offset: 804h</i> */
+    volatile uint32_t dctl;
+    /** Device Status Register (Read Only). <i>Offset: 808h</i> */
+    volatile uint32_t dsts;
+    /** Reserved. <i>Offset: 80Ch</i> */
+    uint32_t unused;
+    /** Device IN Endpoint Common Interrupt Mask
+     * Register. <i>Offset: 810h</i> */
+    volatile uint32_t diepmsk;
+    /** Device OUT Endpoint Common Interrupt Mask
+     * Register. <i>Offset: 814h</i> */
+    volatile uint32_t doepmsk;
+    /** Device All Endpoints Interrupt Register.  <i>Offset: 818h</i> */
+    volatile uint32_t daint;
+    /** Device All Endpoints Interrupt Mask Register.  <i>Offset:
+     * 81Ch</i> */
+    volatile uint32_t daintmsk;
+    /** Device IN Token Queue Read Register-1 (Read Only).
+     * <i>Offset: 820h</i> */
+    volatile uint32_t dtknqr1;
+    /** Device IN Token Queue Read Register-2 (Read Only).
+     * <i>Offset: 824h</i> */
+    volatile uint32_t dtknqr2;
+    /** Device VBUS     discharge Register.  <i>Offset: 828h</i> */
+    volatile uint32_t dvbusdis;
+    /** Device VBUS Pulse Register.     <i>Offset: 82Ch</i> */
+    volatile uint32_t dvbuspulse;
+    /** Device IN Token Queue Read Register-3 (Read Only). /
+     *    Device Thresholding control register (Read/Write)
+     * <i>Offset: 830h</i> */
+    volatile uint32_t dtknqr3_dthrctl;
+    /** Device IN Token Queue Read Register-4 (Read Only). /
+     *    Device IN EPs empty Inr. Mask Register (Read/Write)
+     * <i>Offset: 834h</i> */
+    volatile uint32_t dtknqr4_fifoemptymsk;
+    /** Device Each Endpoint Interrupt Register (Read Only). /
+     * <i>Offset: 838h</i> */
+    volatile uint32_t deachint;
+    /** Device Each Endpoint Interrupt mask Register (Read/Write). /
+     * <i>Offset: 83Ch</i> */
+    volatile uint32_t deachintmsk;
+    /** Device Each In Endpoint Interrupt mask Register (Read/Write). /
+     * <i>Offset: 840h</i> */
+    volatile uint32_t diepeachintmsk[MAX_EPS_CHANNELS];
+    /** Device Each Out Endpoint Interrupt mask Register (Read/Write). /
+     * <i>Offset: 880h</i> */
+    volatile uint32_t doepeachintmsk[MAX_EPS_CHANNELS];
 };
 
 /********************  Bit definition for USB_OTG_DCFG register  ********************/
@@ -541,22 +541,22 @@ struct dwcotg_dev_global_regs_t {
  * Registers offsets 400h-7FFh.
 */
 struct dwcotg_host_global_regs_t {
-	/** Host Configuration Register.   <i>Offset: 400h</i> */
-	volatile uint32_t hcfg;
-	/** Host Frame Interval Register.	<i>Offset: 404h</i> */
-	volatile uint32_t hfir;
-	/** Host Frame Number / Frame Remaining Register. <i>Offset: 408h</i> */
-	volatile uint32_t hfnum;
-	/** Reserved.	<i>Offset: 40Ch</i> */
-	uint32_t reserved40C;
-	/** Host Periodic Transmit FIFO/ Queue Status Register. <i>Offset: 410h</i> */
-	volatile uint32_t hptxsts;
-	/** Host All Channels Interrupt Register. <i>Offset: 414h</i> */
-	volatile uint32_t haint;
-	/** Host All Channels Interrupt Mask Register. <i>Offset: 418h</i> */
-	volatile uint32_t haintmsk;
-	/** Host Frame List Base Address Register . <i>Offset: 41Ch</i> */
-	volatile uint32_t hflbaddr;
+    /** Host Configuration Register.   <i>Offset: 400h</i> */
+    volatile uint32_t hcfg;
+    /** Host Frame Interval Register.    <i>Offset: 404h</i> */
+    volatile uint32_t hfir;
+    /** Host Frame Number / Frame Remaining Register. <i>Offset: 408h</i> */
+    volatile uint32_t hfnum;
+    /** Reserved.    <i>Offset: 40Ch</i> */
+    uint32_t reserved40C;
+    /** Host Periodic Transmit FIFO/ Queue Status Register. <i>Offset: 410h</i> */
+    volatile uint32_t hptxsts;
+    /** Host All Channels Interrupt Register. <i>Offset: 414h</i> */
+    volatile uint32_t haint;
+    /** Host All Channels Interrupt Mask Register. <i>Offset: 418h</i> */
+    volatile uint32_t haintmsk;
+    /** Host Frame List Base Address Register . <i>Offset: 41Ch</i> */
+    volatile uint32_t hflbaddr;
 };
 
 /********************  Bit definition for USB_OTG_HCFG register  ********************/
@@ -633,21 +633,21 @@ struct dwcotg_host_global_regs_t {
  * Host Channel Specific Registers. <i>500h-5FCh</i>
  */
 struct dwcotg_hc_regs_t {
-	/** Host Channel 0 Characteristic Register. <i>Offset: 500h + (chan_num * 20h) + 00h</i> */
-	volatile uint32_t hcchar;
-	/** Host Channel 0 Split Control Register. <i>Offset: 500h + (chan_num * 20h) + 04h</i> */
-	volatile uint32_t hcsplt;
-	/** Host Channel 0 Interrupt Register. <i>Offset: 500h + (chan_num * 20h) + 08h</i> */
-	volatile uint32_t hcint;
-	/** Host Channel 0 Interrupt Mask Register. <i>Offset: 500h + (chan_num * 20h) + 0Ch</i> */
-	volatile uint32_t hcintmsk;
-	/** Host Channel 0 Transfer Size Register. <i>Offset: 500h + (chan_num * 20h) + 10h</i> */
-	volatile uint32_t hctsiz;
-	/** Host Channel 0 DMA Address Register. <i>Offset: 500h + (chan_num * 20h) + 14h</i> */
-	volatile uint32_t hcdma;
-	volatile uint32_t reserved;
-	/** Host Channel 0 DMA Buffer Address Register. <i>Offset: 500h + (chan_num * 20h) + 1Ch</i> */
-	volatile uint32_t hcdmab;
+    /** Host Channel 0 Characteristic Register. <i>Offset: 500h + (chan_num * 20h) + 00h</i> */
+    volatile uint32_t hcchar;
+    /** Host Channel 0 Split Control Register. <i>Offset: 500h + (chan_num * 20h) + 04h</i> */
+    volatile uint32_t hcsplt;
+    /** Host Channel 0 Interrupt Register. <i>Offset: 500h + (chan_num * 20h) + 08h</i> */
+    volatile uint32_t hcint;
+    /** Host Channel 0 Interrupt Mask Register. <i>Offset: 500h + (chan_num * 20h) + 0Ch</i> */
+    volatile uint32_t hcintmsk;
+    /** Host Channel 0 Transfer Size Register. <i>Offset: 500h + (chan_num * 20h) + 10h</i> */
+    volatile uint32_t hctsiz;
+    /** Host Channel 0 DMA Address Register. <i>Offset: 500h + (chan_num * 20h) + 14h</i> */
+    volatile uint32_t hcdma;
+    volatile uint32_t reserved;
+    /** Host Channel 0 DMA Buffer Address Register. <i>Offset: 500h + (chan_num * 20h) + 1Ch</i> */
+    volatile uint32_t hcdmab;
 };
 
 /********************  Bit definition for USB_OTG_HCCHAR register  ********************/
@@ -764,28 +764,28 @@ struct dwcotg_hc_regs_t {
  * accessed in Host mode, as the results are unknown.</i>
  */
 struct dwcotg_dev_in_ep_regs_t {
-	/** Device IN Endpoint Control Register. <i>Offset:900h +
-	 * (ep_num * 20h) + 00h</i> */
-	volatile uint32_t diepctl;
-	/** Reserved. <i>Offset:900h + (ep_num * 20h) + 04h</i> */
-	uint32_t reserved04;
-	/** Device IN Endpoint Interrupt Register. <i>Offset:900h +
-	 * (ep_num * 20h) + 08h</i> */
-	volatile uint32_t diepint;
-	/** Reserved. <i>Offset:900h + (ep_num * 20h) + 0Ch</i> */
-	uint32_t reserved0C;
-	/** Device IN Endpoint Transfer Size
-	 * Register. <i>Offset:900h + (ep_num * 20h) + 10h</i> */
-	volatile uint32_t dieptsiz;
-	/** Device IN Endpoint DMA Address Register. <i>Offset:900h +
-	 * (ep_num * 20h) + 14h</i> */
-	volatile uint32_t diepdma;
-	/** Device IN Endpoint Transmit FIFO Status Register. <i>Offset:900h +
-	 * (ep_num * 20h) + 18h</i> */
-	volatile uint32_t dtxfsts;
-	/** Device IN Endpoint DMA Buffer Register. <i>Offset:900h +
-	 * (ep_num * 20h) + 1Ch</i> */
-	volatile uint32_t diepdmab;
+    /** Device IN Endpoint Control Register. <i>Offset:900h +
+     * (ep_num * 20h) + 00h</i> */
+    volatile uint32_t diepctl;
+    /** Reserved. <i>Offset:900h + (ep_num * 20h) + 04h</i> */
+    uint32_t reserved04;
+    /** Device IN Endpoint Interrupt Register. <i>Offset:900h +
+     * (ep_num * 20h) + 08h</i> */
+    volatile uint32_t diepint;
+    /** Reserved. <i>Offset:900h + (ep_num * 20h) + 0Ch</i> */
+    uint32_t reserved0C;
+    /** Device IN Endpoint Transfer Size
+     * Register. <i>Offset:900h + (ep_num * 20h) + 10h</i> */
+    volatile uint32_t dieptsiz;
+    /** Device IN Endpoint DMA Address Register. <i>Offset:900h +
+     * (ep_num * 20h) + 14h</i> */
+    volatile uint32_t diepdma;
+    /** Device IN Endpoint Transmit FIFO Status Register. <i>Offset:900h +
+     * (ep_num * 20h) + 18h</i> */
+    volatile uint32_t dtxfsts;
+    /** Device IN Endpoint DMA Buffer Register. <i>Offset:900h +
+     * (ep_num * 20h) + 1Ch</i> */
+    volatile uint32_t diepdmab;
 };
 
 /********************  Bit definition for USB_OTG_DIEPCTL register  ********************/
@@ -844,27 +844,27 @@ struct dwcotg_dev_in_ep_regs_t {
  * accessed in Host mode, as the results are unknown.</i>
  */
 struct dwcotg_dev_out_ep_regs_t {
-	/** Device OUT Endpoint Control Register. <i>Offset:B00h +
-	 * (ep_num * 20h) + 00h</i> */
-	volatile uint32_t doepctl;
-	/** Reserved. <i>Offset:B00h + (ep_num * 20h) + 04h</i> */
-	uint32_t reserved04;
-	/** Device OUT Endpoint Interrupt Register. <i>Offset:B00h +
-	 * (ep_num * 20h) + 08h</i> */
-	volatile uint32_t doepint;
-	/** Reserved. <i>Offset:B00h + (ep_num * 20h) + 0Ch</i> */
-	uint32_t reserved0C;
-	/** Device OUT Endpoint Transfer Size Register. <i>Offset:
-	 * B00h + (ep_num * 20h) + 10h</i> */
-	volatile uint32_t doeptsiz;
-	/** Device OUT Endpoint DMA Address Register. <i>Offset:B00h
-	 * + (ep_num * 20h) + 14h</i> */
-	volatile uint32_t doepdma;
-	/** Reserved. <i>Offset:B00h + 	 * (ep_num * 20h) + 18h</i> */
-	uint32_t unused;
-	/** Device OUT Endpoint DMA Buffer Register. <i>Offset:B00h
-	 * + (ep_num * 20h) + 1Ch</i> */
-	uint32_t doepdmab;
+    /** Device OUT Endpoint Control Register. <i>Offset:B00h +
+     * (ep_num * 20h) + 00h</i> */
+    volatile uint32_t doepctl;
+    /** Reserved. <i>Offset:B00h + (ep_num * 20h) + 04h</i> */
+    uint32_t reserved04;
+    /** Device OUT Endpoint Interrupt Register. <i>Offset:B00h +
+     * (ep_num * 20h) + 08h</i> */
+    volatile uint32_t doepint;
+    /** Reserved. <i>Offset:B00h + (ep_num * 20h) + 0Ch</i> */
+    uint32_t reserved0C;
+    /** Device OUT Endpoint Transfer Size Register. <i>Offset:
+     * B00h + (ep_num * 20h) + 10h</i> */
+    volatile uint32_t doeptsiz;
+    /** Device OUT Endpoint DMA Address Register. <i>Offset:B00h
+     * + (ep_num * 20h) + 14h</i> */
+    volatile uint32_t doepdma;
+    /** Reserved. <i>Offset:B00h +      * (ep_num * 20h) + 18h</i> */
+    uint32_t unused;
+    /** Device OUT Endpoint DMA Buffer Register. <i>Offset:B00h
+     * + (ep_num * 20h) + 1Ch</i> */
+    uint32_t doepdmab;
 };
 
 /********************  Bit definition for USB_OTG_DOEPCTL register  ********************/

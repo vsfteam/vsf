@@ -434,8 +434,8 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackTyp
     static StackType_t uxIdleTaskStack[configMINIMAL_STACK_SIZE];
 
     *ppxIdleTaskTCBBuffer = &xIdleTaskTCB;
-	*ppxIdleTaskStackBuffer = uxIdleTaskStack;
-	*pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+    *ppxIdleTaskStackBuffer = uxIdleTaskStack;
+    *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
 }
 
 WEAK(vApplicationGetTimerTaskMemory)
@@ -444,9 +444,9 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackT
     static StaticTask_t xTimerTaskTCB;
     static StackType_t uxTimerTaskStack[configTIMER_TASK_STACK_DEPTH];
 
-	*ppxTimerTaskTCBBuffer = &xTimerTaskTCB;
-	*ppxTimerTaskStackBuffer = uxTimerTaskStack;
-	*pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
+    *ppxTimerTaskTCBBuffer = &xTimerTaskTCB;
+    *ppxTimerTaskStackBuffer = uxTimerTaskStack;
+    *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
 
 WEAK(vApplicationIdleHook)

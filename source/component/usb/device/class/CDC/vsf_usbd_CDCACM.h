@@ -140,4 +140,4 @@ extern vsf_err_t vk_usbd_cdcacm_init(vk_usbd_cdcacm_t *obj, const vk_usbd_cdcacm
 #endif
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USBD_USE_CDCACM
-#endif	// __VSF_USBD_CDCACM_H__
+#endif  // __VSF_USBD_CDCACM_H__

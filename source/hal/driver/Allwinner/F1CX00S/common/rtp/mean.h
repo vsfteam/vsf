@@ -6,11 +6,11 @@ extern "C" {
 #endif
 
 struct mean_filter_t {
-	int * buffer;
-	int length;
-	int index;
-	int count;
-	int sum;
+    int * buffer;
+    int length;
+    int index;
+    int count;
+    int sum;
 };
 
 struct mean_filter_t * mean_alloc(int length);

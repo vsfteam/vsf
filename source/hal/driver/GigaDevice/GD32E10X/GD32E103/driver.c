@@ -29,7 +29,7 @@
 
 bool vsf_driver_init(void)
 {
-	// TODO:
+    // TODO:
     RCU_CTL |= RCU_CTL_IRC8MEN;
     while (!(RCU_CTL & RCU_CTL_IRC8MSTB));
     RCU_CFG0 &= ~RCU_CFG0_SCS;
@@ -61,7 +61,7 @@ bool vsf_driver_init(void)
 
     RCU_CTL &= ~RCU_CTL_IRC8MEN;
     RCU_AHBEN |= RCU_AHBEN_DMA0EN | RCU_AHBEN_DMA1EN;
-	RCU_APB2EN |= RCU_APB2EN_AFEN;
+    RCU_APB2EN |= RCU_APB2EN_AFEN;
     return true;
 }
 

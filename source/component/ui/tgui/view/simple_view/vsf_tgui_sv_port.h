@@ -30,11 +30,11 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TGUI_HOR_MAX
-#	define VSF_TGUI_HOR_MAX					                    800
+#   define VSF_TGUI_HOR_MAX                         800
 #endif
 
 #ifndef VSF_TGUI_VER_MAX
-#	define VSF_TGUI_VER_MAX					                    600
+#   define VSF_TGUI_VER_MAX                         600
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

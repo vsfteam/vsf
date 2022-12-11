@@ -61,8 +61,8 @@ typedef struct                   /* Document SMM_M3.doc */
                                  /*                         Bit[31:0] : reload value for prescale counter */
   __IO uint32_t PSCNTR;          /* Offset: 0x024 (R/W)  32-bit Prescale counter */
                                  /*                         current value of the pre-scaler counter */
-								 /*                         The Cycle Up Counter increment when the prescale down counter reach 0 */
-								 /*                         The pre-scaler counter is reloaded with PRESCALE after reaching 0 */
+                                 /*                         The Cycle Up Counter increment when the prescale down counter reach 0 */
+                                 /*                         The pre-scaler counter is reloaded with PRESCALE after reaching 0 */
        uint32_t RESERVED3[9];
   __IO uint32_t MISC;            /* Offset: 0x04C (R/W)  Misc control */
                                  /*                         [31:7] : Reserved */

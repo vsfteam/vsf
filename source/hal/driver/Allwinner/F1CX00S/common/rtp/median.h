@@ -6,11 +6,11 @@ extern "C" {
 #endif
 
 struct median_filter_t {
-	int * buffer;
-	int * index;
-	int length;
-	int position;
-	int count;
+    int * buffer;
+    int * index;
+    int length;
+    int position;
+    int count;
 };
 
 struct median_filter_t * median_alloc(int length);

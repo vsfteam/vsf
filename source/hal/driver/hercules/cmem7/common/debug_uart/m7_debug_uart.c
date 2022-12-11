@@ -63,11 +63,11 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 
 static void __uart_config(void)
 {
-	UART_InitTypeDef init;
+    UART_InitTypeDef init;
 
-	UART_StructInit(&init);
-	UART_Init(PRINT_UART, &init);
-	UART_Cmd(PRINT_UART, TRUE);
+    UART_StructInit(&init);
+    UART_Init(PRINT_UART, &init);
+    UART_Cmd(PRINT_UART, TRUE);
 }
 
 static bool __uart_is_tx_full(void)

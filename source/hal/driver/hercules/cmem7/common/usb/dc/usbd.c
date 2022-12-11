@@ -52,13 +52,13 @@ void cmem7_usbd_fini(cmem7_usb_t *dc)
 
 static void __cmem7_usbd_phy_init(void *param)
 {
-//	// 2.13	usb_phy_control in glb_ctrl_spec.doc, GLBC_RW_REG_4, Address: 0x41007410
-//	GLOBAL_CTRL->USB_PHY_CTRL_b.CKISEL = 1;		// 0:Crystal   1:PLL
-//	udelay(0x100);
-//	GLOBAL_CTRL->USB_PHY_CTRL_b.RSTPRT = 1;
-//	udelay(0x100);
-//	GLOBAL_CTRL->USB_PHY_CTRL_b.RSTPRT = 0;
-//	udelay(0x100);
+//    // 2.13    usb_phy_control in glb_ctrl_spec.doc, GLBC_RW_REG_4, Address: 0x41007410
+//    GLOBAL_CTRL->USB_PHY_CTRL_b.CKISEL = 1;        // 0:Crystal   1:PLL
+//    udelay(0x100);
+//    GLOBAL_CTRL->USB_PHY_CTRL_b.RSTPRT = 1;
+//    udelay(0x100);
+//    GLOBAL_CTRL->USB_PHY_CTRL_b.RSTPRT = 0;
+//    udelay(0x100);
 }
 
 void cmem7_usbd_get_info(cmem7_usb_t *dc, usb_dc_ip_info_t *info)

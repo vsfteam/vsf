@@ -40,7 +40,7 @@ extern "C" {
 #   error "winusb_hcd does not support hub"
 #endif
 #if !defined(__CPU_X86__) && !defined(__CPU_X64__)
-#	error "winusb_hcd ONLY support x86/64"
+#   error "winusb_hcd ONLY support x86/64"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

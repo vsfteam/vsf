@@ -410,12 +410,12 @@ int32_t Touch_Initialize (void) {
   I2C_MasterReceive (TSC_I2C_ADDR, Touch_ChipID, 2, false);
 
   Touch_WriteReg(STMPE811_SYS_CTRL1,      0x02); /* Reset Touch-screen controller */
-	delay_ms(10);
+  delay_ms(10);
 
   Touch_WriteReg(STMPE811_SYS_CTRL2,      0x0C); /* Enable TSC and ADC */
   Touch_WriteReg(STMPE811_INT_EN,         0x07); /* Enable Touch detect, FIFO */
   Touch_WriteReg(STMPE811_ADC_CTRL1,      0x69); /* Set sample time , 12-bit mode */
-	delay_ms(10);
+  delay_ms(10);
 
   Touch_WriteReg(STMPE811_ADC_CTRL2,      0x01); /* ADC frequency 3.25 MHz */
   Touch_WriteReg(STMPE811_TSC_CFG,        0xC2); /* Detect delay 10us, Settle time 500us */

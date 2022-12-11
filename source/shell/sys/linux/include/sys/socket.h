@@ -39,7 +39,7 @@ extern "C" {
 
 // socket types
 // refer: https://code.woboq.org/gtk/include/bits/socket_type.h.html
-#define SOCK_STREAM	    1
+#define SOCK_STREAM     1
 #define SOCK_DGRAM      2
 
 #define INVALID_SOCKET  -1
@@ -163,11 +163,11 @@ static inline struct cmsghdr * CMSG_NXTHDR(struct msghdr *__msg, struct cmsghdr 
 {
     struct cmsghdr * __ptr;
 
-	__ptr = (struct cmsghdr*)(((unsigned char *) __cmsg) +  CMSG_ALIGN(__cmsg->cmsg_len));
-	if ((unsigned long)((char*)(__ptr+1) - (char *)__msg->msg_control) > __msg->msg_controllen)
-		return (struct cmsghdr *)0;
+    __ptr = (struct cmsghdr*)(((unsigned char *) __cmsg) +  CMSG_ALIGN(__cmsg->cmsg_len));
+    if ((unsigned long)((char*)(__ptr+1) - (char *)__msg->msg_control) > __msg->msg_controllen)
+        return (struct cmsghdr *)0;
 
-	return __ptr;
+    return __ptr;
 }
 
 // how for shutdown

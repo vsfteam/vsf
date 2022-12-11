@@ -9,9 +9,9 @@ extern "C" {
 #include "./mean.h"
 
 struct tsfilter_t {
-	struct median_filter_t * mx, * my;
-	struct mean_filter_t * nx, * ny;
-	int cal[7];
+    struct median_filter_t * mx, * my;
+    struct mean_filter_t * nx, * ny;
+    int cal[7];
 };
 
 struct tsfilter_t * tsfilter_alloc(int ml, int nl);

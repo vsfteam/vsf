@@ -33,10 +33,10 @@
     .reg = USB_BASE,                                                            \
     .use_as__vsf_dwcotg_hw_info_t.buffer_word_size = 0x800 >> 2,                \
     .use_as__vsf_dwcotg_hw_info_t.speed = USB_SPEED_HIGH,                       \
-	.use_as__vsf_dwcotg_hw_info_t.dma_en = false,                               \
-	.use_as__vsf_dwcotg_hw_info_t.ulpi_en = false,                              \
-	.use_as__vsf_dwcotg_hw_info_t.utmi_en = true,                               \
-	.use_as__vsf_dwcotg_hw_info_t.vbus_en = false,
+    .use_as__vsf_dwcotg_hw_info_t.dma_en = false,                               \
+    .use_as__vsf_dwcotg_hw_info_t.ulpi_en = false,                              \
+    .use_as__vsf_dwcotg_hw_info_t.utmi_en = true,                               \
+    .use_as__vsf_dwcotg_hw_info_t.vbus_en = false,
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

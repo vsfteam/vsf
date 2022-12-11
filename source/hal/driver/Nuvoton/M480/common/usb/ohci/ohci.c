@@ -49,8 +49,8 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
 //        vsf_pm_sclk_enable(SCLK_OTG_IDX);
 
         // TODO: use vsf_gpio_config instead
-#define SYS_GPA_MFPH_PA13MFP_USB_D_N		(0x0EUL<<SYS_GPA_MFPH_PA13MFP_Pos) /*!< USB Full speed differential signal D-. \hideinitializer */
-#define SYS_GPA_MFPH_PA14MFP_USB_D_P		(0x0EUL<<SYS_GPA_MFPH_PA14MFP_Pos) /*!< USB Full speed differential signal D+. \hideinitializer */
+#define SYS_GPA_MFPH_PA13MFP_USB_D_N        (0x0EUL<<SYS_GPA_MFPH_PA13MFP_Pos) /*!< USB Full speed differential signal D-. \hideinitializer */
+#define SYS_GPA_MFPH_PA14MFP_USB_D_P        (0x0EUL<<SYS_GPA_MFPH_PA14MFP_Pos) /*!< USB Full speed differential signal D+. \hideinitializer */
         SYS->GPA_MFPH &= ~(SYS_GPA_MFPH_PA13MFP_Msk | SYS_GPA_MFPH_PA14MFP_Msk);
         SYS->GPA_MFPH |= SYS_GPA_MFPH_PA13MFP_USB_D_N | SYS_GPA_MFPH_PA14MFP_USB_D_P;
         // vsf_gpio_config(&hc_cfg->dp, 2);

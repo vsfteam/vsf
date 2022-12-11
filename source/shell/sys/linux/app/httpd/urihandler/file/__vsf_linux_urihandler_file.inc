@@ -29,7 +29,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_serve(vsf_linux_httpd_request
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vsf_linux_httpd_urihandler_op_t __vsf_linux_httpd_urihandler_file_op = {
-	.init_fn        = __vsf_linux_httpd_urihandler_file_init,
+    .init_fn        = __vsf_linux_httpd_urihandler_file_init,
     .fini_fn        = __vsf_linux_httpd_urihandler_file_fini,
     .serve_fn       = __vsf_linux_httpd_urihandler_file_serve,
 };

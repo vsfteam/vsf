@@ -40,16 +40,16 @@ uint_fast32_t vsf_crc(const vsf_crc_t *crc, uint_fast32_t initial, uint8_t *buff
     uint_fast8_t shift = crc->bitlen - 8;
     uint_fast32_t msb = 1UL << (crc->bitlen - 1);
 
-	while (bytesize--) {
+    while (bytesize--) {
         initial ^= *buff++ << shift;
-		for (uint_fast8_t i = 0; i < 8; i++) {
+        for (uint_fast8_t i = 0; i < 8; i++) {
             if (initial & msb) {
                 initial = (initial << 1) ^ crc->poly;
             } else {
                 initial <<= 1;
             }
-		}
-	}
+        }
+    }
     return initial & ((1UL << crc->bitlen) - 1);
 }
 

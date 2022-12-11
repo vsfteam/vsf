@@ -55,10 +55,10 @@
     .reg = (void *)USBFS_BASE,                                                  \
     .buffer_word_size = 0x500 >> 2,                                             \
     .speed = USB_SPEED_FULL,                                                    \
-	.dma_en = false,                                                            \
-	.ulpi_en = false,                                                           \
-	.utmi_en = false,                                                           \
-	.vbus_en = false,
+    .dma_en = false,                                                            \
+    .ulpi_en = false,                                                           \
+    .utmi_en = false,                                                           \
+    .vbus_en = false,
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

@@ -46,7 +46,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE
-#   define VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE	    1
+#   define VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE        1
 #endif
 #ifndef VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE
 #   define VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE    0

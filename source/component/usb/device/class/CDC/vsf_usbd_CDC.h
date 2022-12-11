@@ -110,4 +110,4 @@ extern void vk_usbd_cdc_data_connect(vk_usbd_cdc_t *cdc);
 #endif
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USBD_USE_CDC
-#endif	// __VSF_USBD_CDC_H__
+#endif  // __VSF_USBD_CDC_H__

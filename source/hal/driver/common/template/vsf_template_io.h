@@ -89,7 +89,7 @@ extern "C" {
 #if VSF_IO_REIMPLEMENT_FEATURE == DISABLED
 typedef enum vsf_io_feature_t {
     VSF_IO_PULL_UP              = (1<<3),           //!< enable pull-up resistor
-	VSF_IO_PULL_DOWN            = (1<<4),           //!< enable pull-up resistor
+    VSF_IO_PULL_DOWN            = (1<<4),           //!< enable pull-up resistor
     VSF_IO_OPEN_DRAIN           = (1<<10),          //!< enable open-drain mode
 
     VSF_IO_DISABLE_INPUT        = (1<<7),           //!< disable input

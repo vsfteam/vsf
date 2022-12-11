@@ -40,7 +40,7 @@ extern "C" {
 #   error "libusb_hcd does not support hub"
 #endif
 #if !defined(__WIN__) && !defined(__LINUX__) && !defined(__MACOS__)
-#	error "libusb_hcd ONLY support win/linux/macos"
+#   error "libusb_hcd ONLY support win/linux/macos"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

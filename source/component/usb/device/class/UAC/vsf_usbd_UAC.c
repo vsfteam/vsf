@@ -118,7 +118,7 @@ static void __vk_usbd_uac_trace_request_prepare(vk_usbd_uac_ac_t *uac_ac, vk_usb
     uint_fast8_t entity = (request->wIndex >> 8) & 0xFF;
     uint_fast8_t cs = (request->wValue >> 8) & 0xFF;
     uint_fast8_t channel = (request->wValue >> 0) & 0xFF;
-	bool is_get = __vk_usbd_uac_is_get(uac_ac, ctrl_handler);
+    bool is_get = __vk_usbd_uac_is_get(uac_ac, ctrl_handler);
 
     if (    (USB_RECIP_INTERFACE == (request->bRequestType & USB_RECIP_MASK))
         &&  (USB_TYPE_CLASS == (request->bRequestType & USB_TYPE_MASK))) {
@@ -279,7 +279,7 @@ static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
                         // 3: MIN(n), MAX(n), RES(n)
                         size = sizeof(info2->range->number) + size * info2->range->number * 3;
                         break;
-                    case USB_UAC2_REQ_MEM:	//TODO: support request memory
+                    case USB_UAC2_REQ_MEM:      //TODO: support request memory
                     default:
                         VSF_USB_ASSERT(0);
                         return VSF_ERR_FAIL;

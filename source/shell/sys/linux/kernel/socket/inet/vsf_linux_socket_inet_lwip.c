@@ -882,9 +882,9 @@ ssize_t sendto(int sockfd, const void *buffer, size_t size, int flags,
                     const struct sockaddr *dst_addr, socklen_t addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
-	if (!sfd) {
-		return -1;
-	}
+    if (!sfd) {
+        return -1;
+    }
 
     return __vsf_linux_socket_inet_send((vsf_linux_socket_inet_priv_t *)sfd->priv,
                     buffer, size, flags, dst_addr, addrlen);

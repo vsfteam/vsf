@@ -27,7 +27,7 @@
 /*============================ INCLUDES ======================================*/
 #       include "hal/vsf_hal_cfg.h"
 #       include "./device.h"
-#		    include "./Vendor/gd32vf103_libopt.h"		//!< official driver
+#       include "./Vendor/gd32vf103_libopt.h"       //!< official driver
 #       include "../common/usb/usb.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -653,7 +653,7 @@ int libusb_control_transfer(libusb_device_handle *dev_handle,
 
     vsf_thread_wfe(VSF_EVT_USER);
     if ((bRequestType & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN) {
-		memcpy(data, libusb_control_transfer_get_data(ltransfer), ltransfer->actual_length);
+        memcpy(data, libusb_control_transfer_get_data(ltransfer), ltransfer->actual_length);
     }
 
     result = ltransfer->status == LIBUSB_TRANSFER_COMPLETED ? ltransfer->actual_length : LIBUSB_ERROR_IO;
@@ -1007,14 +1007,14 @@ int libusb_get_config_descriptor_by_value(libusb_device *dev, uint8_t value,
 }
 
 void libusb_free_ss_endpoint_companion_descriptor(
-	struct libusb_ss_endpoint_companion_descriptor *ep_comp)
+    struct libusb_ss_endpoint_companion_descriptor *ep_comp)
 {
 }
 
 int libusb_get_ss_endpoint_companion_descriptor(
-	struct libusb_context *ctx,
-	const struct libusb_endpoint_descriptor *endpoint,
-	struct libusb_ss_endpoint_companion_descriptor **ep_comp)
+    struct libusb_context *ctx,
+    const struct libusb_endpoint_descriptor *endpoint,
+    struct libusb_ss_endpoint_companion_descriptor **ep_comp)
 {
     return -1;
 }

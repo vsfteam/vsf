@@ -54,8 +54,8 @@ vsf_err_t __cmem7_usb_init(cmem7_usb_t *usb, vsf_arch_prio_t priority,
     NVIC_InitStructure.NVIC_IRQChannelCmd = TRUE;
     NVIC_Init(&NVIC_InitStructure);
     
-    // 2.13	usb_phy_control in glb_ctrl_spec.doc, GLBC_RW_REG_4, Address: 0x41007410
-    GLOBAL_CTRL->USB_PHY_CTRL_b.CKISEL = 1;		// 0:Crystal   1:PLL
+    // 2.13    usb_phy_control in glb_ctrl_spec.doc, GLBC_RW_REG_4, Address: 0x41007410
+    GLOBAL_CTRL->USB_PHY_CTRL_b.CKISEL = 1;        // 0:Crystal   1:PLL
     udelay(0x100);
     GLOBAL_CTRL->USB_PHY_CTRL_b.RSTPRT = 1;
     udelay(0x100);

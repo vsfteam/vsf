@@ -29,8 +29,8 @@
 /*============================ MACROS ========================================*/
 #       include "hal/vsf_hal_cfg.h"
 #       include "./device.h"
-#		include "../common/Vendor/Driver/inc/cmem7.h"		//!< official driver
-#		include "../common/usb/usb.h"
+#       include "../common/Vendor/Driver/inc/cmem7.h"       //!< official driver
+#       include "../common/usb/usb.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

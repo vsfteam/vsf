@@ -34,36 +34,36 @@
 #endif
 
 #if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
-#   define __VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)	((vsf_tgui_sv_color_t){.red = __R, .green = __G, .blue = __B, .alpha = __A})
+#   define __VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)    ((vsf_tgui_sv_color_t){.red = __R, .green = __G, .blue = __B, .alpha = __A})
 #else
-#   define __VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)	((vsf_tgui_sv_color_t){.red = __R, .green = __G, .blue = __B,})
+#   define __VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)    ((vsf_tgui_sv_color_t){.red = __R, .green = __G, .blue = __B,})
 #endif
 
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-#   define VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)	    __VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)
+#   define VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)      __VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB16_565
-#   define VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)	        __VSF_TGUI_COLOR_RGBA(__R >> 3, __G >> 2, __B >> 3, __A)
+#   define VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)      __VSF_TGUI_COLOR_RGBA(__R >> 3, __G >> 2, __B >> 3, __A)
 #else
-#	error "TODO: add more color support"
+#   error "TODO: add more color support"
 #endif
-#define VSF_TGUI_COLOR_RGB(__R, __G, __B)	            VSF_TGUI_COLOR_RGBA(__R, __G, __B, 0xFF)
+#define VSF_TGUI_COLOR_RGB(__R, __G, __B)               VSF_TGUI_COLOR_RGBA(__R, __G, __B, 0xFF)
 
-#define VSF_TGUI_COLOR_WHITE	                        VSF_TGUI_COLOR_RGB(0xFF, 0xFF, 0xFF)    //  Red:100%  Green:100%  Blue:100%
-#define VSF_TGUI_COLOR_SILVER	                        VSF_TGUI_COLOR_RGB(0xC0, 0xC0, 0xC0)    //  Red: 75%  Green: 75%  Blue: 75%
-#define VSF_TGUI_COLOR_GRAY		                        VSF_TGUI_COLOR_RGB(0x80, 0x80, 0x80)    //  Red: 50%  Green: 50%  Blue: 50%
-#define VSF_TGUI_COLOR_BLACK	                        VSF_TGUI_COLOR_RGB(0x00, 0x00, 0x00)    //  Red:  0%  Green: 0%   Blue:  0%
+#define VSF_TGUI_COLOR_WHITE                            VSF_TGUI_COLOR_RGB(0xFF, 0xFF, 0xFF)    //  Red:100%  Green:100%  Blue:100%
+#define VSF_TGUI_COLOR_SILVER                           VSF_TGUI_COLOR_RGB(0xC0, 0xC0, 0xC0)    //  Red: 75%  Green: 75%  Blue: 75%
+#define VSF_TGUI_COLOR_GRAY                             VSF_TGUI_COLOR_RGB(0x80, 0x80, 0x80)    //  Red: 50%  Green: 50%  Blue: 50%
+#define VSF_TGUI_COLOR_BLACK                            VSF_TGUI_COLOR_RGB(0x00, 0x00, 0x00)    //  Red:  0%  Green: 0%   Blue:  0%
 #define VSF_TGUI_COLOR_RED                              VSF_TGUI_COLOR_RGB(0xFF, 0x00, 0x00)    //  Red:100%  Green: 0%   Blue:  0%
-#define VSF_TGUI_COLOR_MAROON	                        VSF_TGUI_COLOR_RGB(0x80, 0x00, 0x00)    //  Red: 50%  Green: 0%   Blue:  0%
-#define VSF_TGUI_COLOR_YELLOW	                        VSF_TGUI_COLOR_RGB(0xFF, 0xFF, 0x00)    //  Red:100%  Green:100%  Blue:  0%
-#define VSF_TGUI_COLOR_OLIVE	                        VSF_TGUI_COLOR_RGB(0x80, 0x80, 0x00)    //  Red: 50%  Green: 50%  Blue:  0%
-#define VSF_TGUI_COLOR_LIME		                        VSF_TGUI_COLOR_RGB(0x00, 0xFF, 0x00)    //  Red:  0%  Green:100%  Blue:  0%
-#define VSF_TGUI_COLOR_GREEN	                        VSF_TGUI_COLOR_RGB(0x00, 0x80, 0x00)    //  Red:  0%  Green: 50%  Blue:  0%
-#define VSF_TGUI_COLOR_AQUA		                        VSF_TGUI_COLOR_RGB(0x00, 0xFF, 0xFF)    //  Red:  0%  Green:100%  Blue:100%
-#define VSF_TGUI_COLOR_TEAL		                        VSF_TGUI_COLOR_RGB(0x00, 0x80, 0x80)    //  Red:  0%  Green: 50%  Blue: 50%
-#define VSF_TGUI_COLOR_BLUE		                        VSF_TGUI_COLOR_RGB(0x00, 0x00, 0xFF)    //  Red:  0%  Green: 0%   Blue:100%
-#define VSF_TGUI_COLOR_NAVY		                        VSF_TGUI_COLOR_RGB(0x00, 0x00, 0x80)    //  Red:  0%  Green: 0%   Blue: 50%
-#define VSF_TGUI_COLOR_FUCHSIA	                        VSF_TGUI_COLOR_RGB(0xFF, 0x00, 0xFF)    //  Red:100%  Green: 0%   Blue:100%
-#define VSF_TGUI_COLOR_PURPLE	                        VSF_TGUI_COLOR_RGB(0x80, 0x00, 0x80)    //  Red: 50%  Green: 0%   Blue: 50%
+#define VSF_TGUI_COLOR_MAROON                           VSF_TGUI_COLOR_RGB(0x80, 0x00, 0x00)    //  Red: 50%  Green: 0%   Blue:  0%
+#define VSF_TGUI_COLOR_YELLOW                           VSF_TGUI_COLOR_RGB(0xFF, 0xFF, 0x00)    //  Red:100%  Green:100%  Blue:  0%
+#define VSF_TGUI_COLOR_OLIVE                            VSF_TGUI_COLOR_RGB(0x80, 0x80, 0x00)    //  Red: 50%  Green: 50%  Blue:  0%
+#define VSF_TGUI_COLOR_LIME                             VSF_TGUI_COLOR_RGB(0x00, 0xFF, 0x00)    //  Red:  0%  Green:100%  Blue:  0%
+#define VSF_TGUI_COLOR_GREEN                            VSF_TGUI_COLOR_RGB(0x00, 0x80, 0x00)    //  Red:  0%  Green: 50%  Blue:  0%
+#define VSF_TGUI_COLOR_AQUA                             VSF_TGUI_COLOR_RGB(0x00, 0xFF, 0xFF)    //  Red:  0%  Green:100%  Blue:100%
+#define VSF_TGUI_COLOR_TEAL                             VSF_TGUI_COLOR_RGB(0x00, 0x80, 0x80)    //  Red:  0%  Green: 50%  Blue: 50%
+#define VSF_TGUI_COLOR_BLUE                             VSF_TGUI_COLOR_RGB(0x00, 0x00, 0xFF)    //  Red:  0%  Green: 0%   Blue:100%
+#define VSF_TGUI_COLOR_NAVY                             VSF_TGUI_COLOR_RGB(0x00, 0x00, 0x80)    //  Red:  0%  Green: 0%   Blue: 50%
+#define VSF_TGUI_COLOR_FUCHSIA                          VSF_TGUI_COLOR_RGB(0xFF, 0x00, 0xFF)    //  Red:100%  Green: 0%   Blue:100%
+#define VSF_TGUI_COLOR_PURPLE                           VSF_TGUI_COLOR_RGB(0x80, 0x00, 0x80)    //  Red: 50%  Green: 0%   Blue: 50%
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

@@ -113,7 +113,7 @@ typedef enum vk_disp_color_idx_t {
 
 typedef enum vk_disp_color_type_t {
     // avoid vk_disp_color_type_t to be optimized to 8bit
-    __VSF_DISP_COLOR_LEAST_MAX	= INT16_MAX,
+    __VSF_DISP_COLOR_LEAST_MAX  = INT16_MAX,
     __VSF_DISP_COLOR_LEAST_MIN  = INT16_MIN,
     VSF_DISP_COLOR_DEF(INVALID, 0, 0, 0),
     VSF_DISP_COLOR_DEF(RGB332, 8, 1, 0),

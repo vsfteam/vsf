@@ -1,5 +1,5 @@
-/*	$OpenBSD: getopt.h,v 1.3 2013/11/22 21:32:49 millert Exp $	*/
-/*	$NetBSD: getopt.h,v 1.4 2000/07/07 10:43:54 ad Exp $	*/
+/*  $OpenBSD: getopt.h,v 1.3 2013/11/22 21:32:49 millert Exp $    */
+/*  $NetBSD: getopt.h,v 1.4 2000/07/07 10:43:54 ad Exp $    */
 
 /*-
  * Copyright (c) 2000 The NetBSD Foundation, Inc.
@@ -51,17 +51,17 @@
 #define optional_argument  2
 
 struct option {
-	/* name of long option */
-	const char *name;
-	/*
-	 * one of no_argument, required_argument, and optional_argument:
-	 * whether option takes an argument
-	 */
-	int has_arg;
-	/* if not NULL, set *flag to val when option found */
-	int *flag;
-	/* if flag not NULL, value to set *flag to; else return value */
-	int val;
+    /* name of long option */
+    const char *name;
+    /*
+     * one of no_argument, required_argument, and optional_argument:
+     * whether option takes an argument
+     */
+    int has_arg;
+    /* if not NULL, set *flag to val when option found */
+    int *flag;
+    /* if flag not NULL, value to set *flag to; else return value */
+    int val;
 };
 
 __BEGIN_DECLS
@@ -98,7 +98,7 @@ static inline int getopt_long(int a0, char * const *a1, const char *a2,
     return VSF_LINUX_APPLET_LIBGETOPT_VPLT->getopt_long(a0, a1, a2, a3, a4);
 }
 static inline int getopt_long_only(int a0, char * const *a1, const char *a2,
-	    const struct option *a3, int *a4) {
+        const struct option *a3, int *a4) {
     return VSF_LINUX_APPLET_LIBGETOPT_VPLT->getopt_long_only(a0, a1, a2, a3, a4);
 }
 static inline int getopt(int a0, char * const *a1, const char *a2) {
@@ -118,31 +118,31 @@ int getopt(int, char * const *, const char *);
 #ifndef _GETOPT_DEFINED_
 #define _GETOPT_DEFINED_
 
-#	if VSF_LINUX_USE_GETOPT == ENABLED
+#   if VSF_LINUX_USE_GETOPT == ENABLED
 // for vsf linux, put these variable in process context and implement them as macro
-#		include "shell/sys/linux/vsf_linux.h"
+#       include "shell/sys/linux/vsf_linux.h"
 extern int __getopt_lib_idx;
 extern const vsf_linux_dynlib_mod_t __getopt_long_mod;
 struct __getopt_lib_ctx_t {
-	char *__optarg;
-	int __opterr;
-	int __optind;
-	int __optopt;
-	int __optreset;
+    char *__optarg;
+    int __opterr;
+    int __optind;
+    int __optopt;
+    int __optreset;
 };
-#		define getopt_ctx		((struct __getopt_lib_ctx_t *)vsf_linux_dynlib_ctx(&__getopt_long_mod))
-#		define opterr			(getopt_ctx->__opterr)
-#		define optind			(getopt_ctx->__optind)
-#		define optopt			(getopt_ctx->__optopt)
-#		define optarg			(getopt_ctx->__optarg)
-#		define optreset			(getopt_ctx->__optreset)
-#	else
+#       define getopt_ctx       ((struct __getopt_lib_ctx_t *)vsf_linux_dynlib_ctx(&__getopt_long_mod))
+#       define opterr           (getopt_ctx->__opterr)
+#       define optind           (getopt_ctx->__optind)
+#       define optopt           (getopt_ctx->__optopt)
+#       define optarg           (getopt_ctx->__optarg)
+#       define optreset         (getopt_ctx->__optreset)
+#   else
 extern   char *optarg;                  /* getopt(3) external variables */
 extern   int opterr;
 extern   int optind;
 extern   int optopt;
 extern   int optreset;
-#	endif
+#   endif
 #endif
 __END_DECLS
 

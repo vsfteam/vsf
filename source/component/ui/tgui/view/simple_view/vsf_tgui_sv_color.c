@@ -83,7 +83,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_color_argb8888_t r
     color.alpha = rgba888_color.alpha;
 #endif
 #else
-#	error "TODO: add more color support"
+#   error "TODO: add more color support"
 #endif
 
     return color;
@@ -105,7 +105,7 @@ vsf_tgui_sv_color_argb8888_t vsf_tgui_sv_color_to_argb8888(vsf_tgui_sv_color_t c
 #endif
     return argb8888_color;
 #else
-#	error "TODO: add more color support"
+#   error "TODO: add more color support"
 #endif
 }
 
@@ -132,7 +132,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_rgb565_to_color(vsf_tgui_sv_color_rgb565_t rgb56
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
     return rgb565_color;
 #else
-#	error "TODO: add more color support"
+#   error "TODO: add more color support"
 #endif
 }
 
@@ -161,7 +161,7 @@ vsf_tgui_sv_color_rgb565_t vsf_tgui_sv_color_to_rgb565(vsf_tgui_sv_color_t color
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
     return color;
 #else
-#	error "TODO: add more color support"
+#   error "TODO: add more color support"
 #endif
 }
 
@@ -188,7 +188,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_bgr565_to_color(vsf_tgui_sv_color_bgr565_t bgr56
     };
     return color;
 #else
-#	error "TODO: add more color support"
+#   error "TODO: add more color support"
 #endif
 }
 
@@ -217,7 +217,7 @@ vsf_tgui_sv_color_bgr565_t vsf_tgui_sv_color_to_bgr565(vsf_tgui_sv_color_t color
     };
     return bgr565_color;
 #else
-#	error "TODO: add more color support"
+#   error "TODO: add more color support"
 #endif
 }
 #endif

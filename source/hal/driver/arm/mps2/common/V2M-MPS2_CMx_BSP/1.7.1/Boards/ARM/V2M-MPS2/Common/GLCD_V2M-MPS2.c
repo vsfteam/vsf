@@ -250,9 +250,9 @@ int32_t GLCD_Initialize (void) {
 
   // Reset CLCD screen
   MPS2_FPGAIO_PORT->MISC &= ~(1ul <<  3);     /* assert Reset */
-	delay_ms(1);
+  delay_ms(1);
   MPS2_FPGAIO_PORT->MISC |=  (1ul <<  3);     /* deassert Reset */
-	delay_ms(10);
+  delay_ms(10);
 
 //  if (driverCode == 0x47) {             /* LCD with HX8347-D LCD Controller   */
 //    Himax = 1;                          /* Set Himax LCD controller flag      */
