@@ -423,15 +423,15 @@ static int __vsf_linux_i2c_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         case I2C_SMBUS_BYTE_DATA:
             // I2C_SMBUS_READ:  S Address W A command A Sr Address R A byte N P
             // I2C_SMBUS_WRITE: S Address W A command A byte A P
-            break;
+            return -ENOTSUPP;
         case I2C_SMBUS_WORD_DATA:
             // I2C_SMBUS_READ:  S Address W A command A Sr Address R A low_byte A high_byte N P
             // I2C_SMBUS_WRITE: S Address W A command A low_byte A high_byte A P
-            break;
+            return -ENOTSUPP;
         case I2C_SMBUS_BLOCK_DATA:
             // I2C_SMBUS_READ:  S Address W A command A Sr Address R A count A byte0 A .... N P
             // I2C_SMBUS_WRITE: S Address W A command A count A byte0 A .... A P
-            break;
+            return -ENOTSUPP;
         case I2C_SMBUS_I2C_BLOCK_BROKEN:
         case I2C_SMBUS_I2C_BLOCK_DATA:
             // I2C_SMBUS_READ:  S Address W A command A Sr Address R A byte0 A .... N P
@@ -441,13 +441,16 @@ static int __vsf_linux_i2c_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
                 1, &u.data_arg->command);
             if (1 == size) {
                 size = __vsf_linux_i2c_master_request(priv,
-                    (u.data_arg->read_write ? VSF_I2C_CMD_READ : VSF_I2C_CMD_WRITE) | VSF_I2C_CMD_STOP,
+                    VSF_I2C_CMD_STOP | (u.data_arg->read_write ?
+                        VSF_I2C_CMD_RESTART | VSF_I2C_CMD_READ
+                    :   VSF_I2C_CMD_WRITE),
                     u.data_arg->data->block[0], &u.data_arg->data->block[1]);
             }
             return size < 0 ? size : 0;
-            break;
         }
         break;
+    case I2C_PEC:
+        return -ENOTSUPP;
     }
     return 0;
 }
