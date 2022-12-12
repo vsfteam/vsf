@@ -120,6 +120,14 @@ vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
     return i2c_ptr->op->master_request(i2c_ptr, address, cmd, count, buffer_ptr);
 }
 
+uint_fast32_t vsf_i2c_get_transfered_count(vsf_i2c_t *i2c_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->get_transfered_count!= NULL);
+
+    return i2c_ptr->op->get_transfered_count(i2c_ptr);
+}
 
 #endif /* VSF_I2C_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_I2C == ENABLED */

@@ -346,6 +346,14 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
     }
 }
 
+uint_fast32_t vsf_hw_i2c_get_transfered_count(vsf_hw_i2c_t *hw_i2c_ptr)
+{
+    VSF_HAL_ASSERT(hw_i2c_ptr != NULL);
+
+	// TODO
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
