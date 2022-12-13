@@ -232,15 +232,9 @@ check_stop:
     return VSF_ERR_NONE;
 }
 
-uint_fast32_t vsf_gpio_i2c_get_transfered_count(vsf_gpio_i2c_t *i2c_ptr)
+uint_fast32_t vsf_gpio_i2c_get_transfered_count(vsf_gpio_i2c_t *gpio_i2c_ptr)
 {
-    VSF_HAL_ASSERT(i2c_ptr != NULL);
-    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
-    VSF_HAL_ASSERT(i2c_ptr->op->get_transfered_count!= NULL);
-
-	// TODO
-    VSF_HAL_ASSERT(0);
-    return 0;
+    return gpio_i2c_ptr->transfered_count;
 }
 
 /*============================ TYPES =========================================*/
