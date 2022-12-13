@@ -477,7 +477,7 @@ vsf_spi_status_t vsf_hw_spi_status(vsf_hw_spi_t *hw_spi_ptr)
     return status;
 }
 
-void vsf_hw_spi_get_transfered_count(vsf_hw_spi_t *hw_spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
+void vsf_hw_spi_get_transferred_count(vsf_hw_spi_t *hw_spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 {
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
 

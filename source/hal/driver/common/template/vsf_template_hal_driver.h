@@ -134,7 +134,7 @@ def_interface(vsf_async_block_access_t)
     /*! \brief cancel on going communication */
     vsf_err_t               (*Cancel) (void);
 
-    /*! \brief get transfered count */
+    /*! \brief get transferred count */
     int_fast32_t            (*GetTransferredCount)(void);
 end_def_interface(vsf_async_block_access_t)
 

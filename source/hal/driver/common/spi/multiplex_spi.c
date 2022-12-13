@@ -190,7 +190,7 @@ static void __vsf_multiplex_spi_irq_handler(void *target_ptr, vsf_spi_t *spi_ptr
     VSF_HAL_ASSERT(spi_info_ptr != NULL);
 
     if (irq_mask & VSF_SPI_IRQ_MASK_CPL) {
-        m_spi_ptr->transfered_count = m_spi_ptr->request.count;
+        m_spi_ptr->transferred_count = m_spi_ptr->request.count;
         m_spi_ptr->request.count = 0;
         m_spi_ptr->request.in_buffer_ptr = NULL;
         m_spi_ptr->request.out_buffer_ptr = NULL;
@@ -464,7 +464,7 @@ vsf_spi_status_t vsf_multiplex_spi_status(vsf_multiplex_spi_t *m_spi_ptr)
     return result;
 }
 
-void vsf_multiplex_spi_get_transfered_count(vsf_multiplex_spi_t *m_spi_ptr,
+void vsf_multiplex_spi_get_transferred_count(vsf_multiplex_spi_t *m_spi_ptr,
                                             uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 {
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
@@ -476,14 +476,14 @@ void vsf_multiplex_spi_get_transfered_count(vsf_multiplex_spi_t *m_spi_ptr,
 
     if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
         vsf_protect_t state = vsf_multiplex_spi_protect();
-        vsf_spi_get_transfered_count(spi_info_ptr->spi, tx_count, rx_count);
+        vsf_spi_get_transferred_count(spi_info_ptr->spi, tx_count, rx_count);
         vsf_multiplex_spi_unprotect(state);
     } else {
         if (tx_count != NULL) {
-            *tx_count = m_spi_ptr->transfered_count;
+            *tx_count = m_spi_ptr->transferred_count;
         }
         if (rx_count != NULL) {
-            *rx_count = m_spi_ptr->transfered_count;
+            *rx_count = m_spi_ptr->transferred_count;
         }
     }
 }

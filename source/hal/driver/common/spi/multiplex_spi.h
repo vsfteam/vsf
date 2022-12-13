@@ -91,7 +91,7 @@ vsf_class(vsf_multiplex_spi_t) {
         vsf_slist_node_t node;
         vsf_spi_cfg_t spi_cfg;              // init and re-init
         vsf_spi_irq_mask_t irq_mask;     // enable/disable interrupt
-        uint_fast32_t transfered_count;
+        uint_fast32_t transferred_count;
         multiplex_spi_request_t request;
     )
 };

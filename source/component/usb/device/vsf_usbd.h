@@ -517,7 +517,7 @@ vsf_class(vk_usbd_ep_stream_t) {
         implement(vk_usbd_trans_t)
         vk_usbd_dev_t *dev;
         uint32_t total_size;
-        uint32_t transfered_size;
+        uint32_t transferred_size;
         uint32_t cur_size       : 31;
         uint32_t zlp_save       : 1;
     )

@@ -1042,7 +1042,7 @@ static void __vk_usbd_stream_tx_recv(vk_usbd_ep_stream_t *stream_ep, uint_fast16
     uint_fast32_t size, wbuf_size = vsf_stream_get_wbuf(stream_ep->stream, &buffer);
 
     if (stream_ep->total_size > 0) {
-        uint_fast32_t remain_size = stream_ep->total_size - stream_ep->transfered_size;
+        uint_fast32_t remain_size = stream_ep->total_size - stream_ep->transferred_size;
         size = vsf_min(wbuf_size, remain_size);
     } else {
         size = wbuf_size;
@@ -1084,9 +1084,9 @@ static void __vk_usbd_stream_tx_on_trans_finish(void *param)
     }
 
     vsf_stream_write(stream, NULL, pkg_size);
-    stream_ep->transfered_size += pkg_size;
+    stream_ep->transferred_size += pkg_size;
 
-    if (!stream_ep->total_size || (stream_ep->transfered_size < stream_ep->total_size)) {
+    if (!stream_ep->total_size || (stream_ep->transferred_size < stream_ep->total_size)) {
         if (vsf_stream_get_free_size(stream) >= ep_size) {
             __vk_usbd_stream_tx_recv(stream_ep, ep_size);
         } else {
@@ -1109,7 +1109,7 @@ static void __vk_usbd_stream_tx_evthandler(vsf_stream_t *stream, void *param, vs
     case VSF_STREAM_ON_OUT:
         if (    (NULL == stream_ep->on_finish)
             &&  (   !stream_ep->total_size
-                ||  (stream_ep->transfered_size < stream_ep->total_size))) {
+                ||  (stream_ep->transferred_size < stream_ep->total_size))) {
             if (vsf_stream_get_free_size(stream) >= ep_size) {
                 stream_ep->use_as__vk_usbd_trans_t.on_finish = __vk_usbd_stream_tx_on_trans_finish;
                 __vk_usbd_stream_tx_recv(stream_ep, ep_size);
@@ -1125,7 +1125,7 @@ vsf_err_t vk_usbd_ep_recv_stream(vk_usbd_ep_stream_t *stream_ep, uint_fast32_t s
     vsf_stream_t *stream = stream_ep->stream;
 
     stream_ep->total_size = size;
-    stream_ep->transfered_size = 0;
+    stream_ep->transferred_size = 0;
     stream->tx.param = stream_ep;
     stream->tx.evthandler = __vk_usbd_stream_tx_evthandler;
     trans->param = stream_ep;
@@ -1143,12 +1143,12 @@ static void __vk_usbd_stream_rx_on_trans_finish(void *param)
     vsf_stream_t *stream = stream_ep->stream;
 
     if (stream_ep->cur_size > 0) {
-        stream_ep->transfered_size += stream_ep->cur_size;
+        stream_ep->transferred_size += stream_ep->cur_size;
         vsf_stream_read(stream_ep->stream, NULL, stream_ep->cur_size);
         stream_ep->cur_size = 0;
     }
 
-    if (!stream_ep->total_size || (stream_ep->transfered_size < stream_ep->total_size)) {
+    if (!stream_ep->total_size || (stream_ep->transferred_size < stream_ep->total_size)) {
         stream_ep->size = vsf_stream_get_rbuf(stream, &stream_ep->buffer);
         if (stream_ep->size > 0) {
             stream_ep->cur_size = stream_ep->size;
@@ -1171,7 +1171,7 @@ static void __vk_usbd_stream_rx_evthandler(vsf_stream_t *stream, void *param, vs
     case VSF_STREAM_ON_RX:
         if (    (NULL == stream_ep->on_finish)
             &&  (   !stream_ep->total_size
-                ||  (stream_ep->transfered_size < stream_ep->total_size))) {
+                ||  (stream_ep->transferred_size < stream_ep->total_size))) {
             stream_ep->size = vsf_stream_get_rbuf(stream, &stream_ep->buffer);
             if (stream_ep->size > 0) {
                 stream_ep->cur_size = stream_ep->size;
@@ -1191,7 +1191,7 @@ vsf_err_t vk_usbd_ep_send_stream(vk_usbd_ep_stream_t *stream_ep, uint_fast32_t s
 
     stream_ep->zlp_save = trans->zlp;
     stream_ep->total_size = size;
-    stream_ep->transfered_size = 0;
+    stream_ep->transferred_size = 0;
     stream->rx.param = stream_ep;
     stream->rx.evthandler = __vk_usbd_stream_rx_evthandler;
     trans->param = stream_ep;

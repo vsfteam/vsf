@@ -95,7 +95,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, request_transfer,     VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, void *out_buffer_ptr, \
                                                                                            void *in_buffer_ptr, uint_fast32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cancel_transfer,      VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transfered_count, VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transferred_count, VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 
 
 /*============================ TYPES =========================================*/
@@ -311,7 +311,7 @@ extern vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_p
                                           void *in_buffer_ptr, uint_fast32_t count);
 
 extern vsf_err_t            vsf_spi_cancel_transfer(    vsf_spi_t *spi_ptr);
-extern void                 vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count);
+extern void                 vsf_spi_get_transferred_count(vsf_spi_t *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count);
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -361,7 +361,7 @@ static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 #   define vsf_spi_fifo_transfer(__SPI, ...)            VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_fifo_transfer)        ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
 #   define vsf_spi_request_transfer(__SPI, ...)         VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_request_transfer)     ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
 #   define vsf_spi_cancel_transfer(__SPI)               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cancel_transfer)      ((__vsf_spi_t *)__SPI)
-#   define vsf_spi_get_transfered_count(__SPI, ...)     VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_transfered_count) ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
+#   define vsf_spi_get_transferred_count(__SPI, ...)     VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_transferred_count) ((__vsf_spi_t *)__SPI, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

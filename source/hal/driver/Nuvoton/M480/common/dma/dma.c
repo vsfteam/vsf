@@ -129,9 +129,9 @@ vsf_err_t m484_dma_cancel_transfer(int8_t channel)
     return VSF_ERR_NOT_SUPPORT;
 }
 
-int_fast32_t m484_dma_get_transfered_count(int8_t channel)
+int_fast32_t m484_dma_get_transferred_count(int8_t channel)
 {
-    //TODO: test transfered count
+    //TODO: test transferred count
     uint32_t transfer_count = (PDMA->DSCT[channel].CTL & PDMA_DSCT_CTL_TXCNT_Msk) >> PDMA_DSCT_CTL_TXCNT_Pos;
     return __channals[channel].count - transfer_count - 1;
 }

@@ -155,7 +155,7 @@ vsf_err_t m484_dma_init(m484_dma_cfg_t *cfg_ptr);
 vsf_err_t m484_dma_channel_config(uint8_t channel, m484_dma_channel_cfg_t *cfg_ptr);
 bool m484_dma_channel_is_done(uint8_t channel);
 vsf_err_t m484_dma_cancel_transfer(int8_t channel);
-int_fast32_t m484_dma_get_transfered_count(int8_t channel);
+int_fast32_t m484_dma_get_transferred_count(int8_t channel);
 
 vsf_err_t m484_dma_channel_irq_enable(uint8_t channel, uint32_t irq_mask);
 vsf_err_t m484_dma_channel_irq_disable(uint8_t channel, uint32_t irq_mask);

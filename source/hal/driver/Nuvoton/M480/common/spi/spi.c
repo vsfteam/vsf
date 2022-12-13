@@ -460,7 +460,7 @@ vsf_err_t vsf_hw_spi_cancel_transfer(vsf_hw_spi_t *spi_ptr)
     return VSF_ERR_NOT_SUPPORT;
 }
 
-int_fast32_t vsf_hw_spi_get_transfered_count(vsf_hw_spi_t *spi_ptr)
+int_fast32_t vsf_hw_spi_get_transferred_count(vsf_hw_spi_t *spi_ptr)
 {
     return 0;
 }
