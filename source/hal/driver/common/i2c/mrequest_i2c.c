@@ -212,11 +212,11 @@ vsf_err_t vsf_mrequest_i2c_master_request(vsf_mrequest_i2c_t *m_i2c_ptr,
     return VSF_ERR_NOT_SUPPORT;
 }
 
-uint_fast32_t vsf_mrequest_i2c_get_transfered_count(vsf_mrequest_i2c_t *i2c_ptr)
+uint_fast32_t vsf_mrequest_i2c_get_transferred_count(vsf_mrequest_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
-    VSF_HAL_ASSERT(i2c_ptr->op->get_transfered_count!= NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->get_transferred_count!= NULL);
 
 	// TODO
     VSF_HAL_ASSERT(0);

@@ -232,7 +232,7 @@ check_stop:
     return VSF_ERR_NONE;
 }
 
-uint_fast32_t vsf_gpio_i2c_get_transfered_count(vsf_gpio_i2c_t *gpio_i2c_ptr)
+uint_fast32_t vsf_gpio_i2c_get_transferred_count(vsf_gpio_i2c_t *gpio_i2c_ptr)
 {
     return gpio_i2c_ptr->transferred_count;
 }

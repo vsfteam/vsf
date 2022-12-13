@@ -95,7 +95,7 @@ def_interface(i_spi_t)
         /*! \brief cancel on going communication */
         vsf_err_t               (*Cancel)(void);
 
-        /*! \brief get transfered count */
+        /*! \brief get transferred count */
         int_fast32_t            (*GetTransferedCount)(void);
     } Block;
 

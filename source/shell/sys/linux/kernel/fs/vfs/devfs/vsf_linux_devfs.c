@@ -351,7 +351,7 @@ static ssize_t __vsf_linux_i2c_master_request(vsf_linux_i2c_priv_t *priv,
     }
     vsf_thread_wfe(VSF_EVT_USER);
     if (priv->i2c.irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
-        return vsf_i2c_get_transfered_count(i2c);
+        return vsf_i2c_get_transferred_count(i2c);
     }
     errno = EIO;
     return -1;

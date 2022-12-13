@@ -358,7 +358,7 @@ def_interface(i_usb_dc_t)
         vsf_err_t       (*ClearStall)       (uint_fast8_t ep);
 
         //! get the data size in hw-buffer in transaction mode
-        //! get the all transfered data size in transfer mode
+        //! get the all transferred data size in transfer mode
         uint_fast32_t   (*GetDataSize)      (uint_fast8_t ep);
 
         struct {

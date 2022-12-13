@@ -76,7 +76,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2c, irq_disable,           VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_status_t,     i2c, status,                VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_capability_t, i2c, capability,            VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,        i2c, get_transfered_count,  VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,        i2c, get_transferred_count,  VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr)                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, master_request,        VSF_MCONNECT(__prefix_name, _i2c_t) *i2c_ptr, uint16_t address, vsf_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)
 
 /*============================ TYPES =========================================*/
@@ -418,7 +418,7 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
  \~english
  @brief get the couter of transfers for current request  by the i2c master
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @return uint_fast32_t: counter of transfered
+ @return uint_fast32_t: counter of transferred
  @note This API can be used after the slave NAK and until the next transmission
 
  \~chinese
@@ -427,7 +427,7 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
  @return uint_fast32_t: 已传输的数量
  @note 在从机 NAK 的后到下一次传输之前都可以使用这个API
  */
-extern uint_fast32_t vsf_i2c_get_transfered_count(vsf_i2c_t *i2c_ptr);
+extern uint_fast32_t vsf_i2c_get_transferred_count(vsf_i2c_t *i2c_ptr);
 
 /*============================ INCLUDES ======================================*/
 
@@ -447,7 +447,7 @@ extern uint_fast32_t vsf_i2c_get_transfered_count(vsf_i2c_t *i2c_ptr);
 #   define vsf_i2c_capability(__I2C)                VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)           ((__vsf_i2c_t *)__I2C)
 #   define vsf_i2c_cs_active(__I2C, ...)            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_cs_active)            ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
 #   define vsf_i2c_master_request(__I2C, ...)       VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)       ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
-#   define vsf_i2c_get_transfered_count(__I2C, ...) VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_get_transfered_count) ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
+#   define vsf_i2c_get_transferred_count(__I2C, ...) VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_get_transferred_count) ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

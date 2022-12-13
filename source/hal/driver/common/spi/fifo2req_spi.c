@@ -226,7 +226,7 @@ vsf_err_t vsf_fifo2req_spi_cancel_transfer(vsf_fifo2req_spi_t *fifo2req_spi_ptr)
     return VSF_ERR_NONE;
 }
 
-void vsf_fifo2req_spi_get_transfered_count(vsf_fifo2req_spi_t *fifo2req_spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
+void vsf_fifo2req_spi_get_transferred_count(vsf_fifo2req_spi_t *fifo2req_spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
 {
     VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
