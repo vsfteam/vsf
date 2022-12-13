@@ -88,7 +88,7 @@ vsf_err_t vsf_stream_src_init(  vsf_stream_src_t *obj_ptr,
     class_internal(obj_ptr, this_ptr, vsf_stream_src_t);
     vsf_err_t result = VSF_ERR_INVALID_PARAMETER;
 
-    /*! \note check them seperately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right 
               diagnosis info
      */
     VSF_SERVICE_ASSERT(     (NULL != this_ptr)
@@ -111,7 +111,7 @@ vsf_err_t vsf_stream_src_init(  vsf_stream_src_t *obj_ptr,
     #   if VSF_STREAM_CFG_SUPPORT_RESOURCE_LIMITATION == ENABLED
             if (0 == this.hwpbufPoolReserve) {
                 /*! \note non-privileged user of general pbuf pool will reserve 
-                 *        specific count of pbuf for priviliged (0xFF) users 
+                 *        specific count of pbuf for privileged (0xFF) users 
                  *        by default (hwpbufPoolReserve equals 0x00)
                  */
                 this.hwpbufPoolReserve = GENERAL_PBUF_POLL_PRIV_USER_COUNT;
@@ -137,7 +137,7 @@ vsf_pbuf_t *vsf_stream_src_new_pbuf (      vsf_stream_src_t *obj_ptr,
                                            int_fast32_t nBestSize)
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_src_t);
-    /*! \note check them seperately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right 
               diagnosis info
      */
     VSF_SERVICE_ASSERT(NULL != obj_ptr);
@@ -198,7 +198,7 @@ vsf_err_t vsf_stream_src_send_pbuf (vsf_stream_src_t *obj_ptr,
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_src_t);
 
-    /*! \note check them seperately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right 
               diagnosis info
      */
     VSF_SERVICE_ASSERT(NULL != obj_ptr);
@@ -226,7 +226,7 @@ vsf_err_t vsf_stream_usr_init(  vsf_stream_usr_t *obj_ptr,
     class_internal(obj_ptr, this_ptr, vsf_stream_usr_t);
     vsf_err_t result = VSF_ERR_INVALID_PARAMETER;
 
-    /*! \note check them seperately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right 
               diagnosis info
      */
     VSF_SERVICE_ASSERT(     (NULL != this_ptr)
@@ -256,7 +256,7 @@ vsf_pbuf_t *vsf_stream_usr_fetch_pbuf ( vsf_stream_usr_t *obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_usr_t);
 
-    /*! \note check them seperately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right 
               diagnosis info
      */
     VSF_SERVICE_ASSERT(NULL != obj_ptr);

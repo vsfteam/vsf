@@ -23,7 +23,7 @@
 /*! \note i_reg_xxxx.h header files must be standalong and assume following
  *!       conditions:
  *!       a. stdint.h exists
- *!       b. anonymouse structures and unions are supported
+ *!       b. anonymous structures and unions are supported
  */
 #include "./utilities/compiler/__common/__type.h"
 

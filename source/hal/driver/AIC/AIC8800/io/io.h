@@ -44,8 +44,8 @@
 
 
 // TODO: add io function mode tables
-//#defin VSF_PA0_AS_GPIO                  0
-//#defin VSF_PA0_AS_SWCLK                 1
+//#define VSF_PA0_AS_GPIO                  0
+//#define VSF_PA0_AS_SWCLK                 1
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

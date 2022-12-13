@@ -46,7 +46,7 @@
 #   error VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB support is not ready now
 #endif
 
-// If high speed bulk in transaction alway NAK, it will take all the USB bandwidth.
+// If high speed bulk in transaction always NAK, it will take all the USB bandwidth.
 //  Define VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF to hold off these transactions.
 #ifndef VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF
 #   define VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF    0
@@ -1122,7 +1122,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
 #if VSF_DWCOTG_HCD_CFG_TRACE_CHANNEL == ENABLED
             vsf_trace_error("dwcotg_hcd.channel%d: no event" VSF_TRACE_CFG_LINEEND, channel_idx);
 #endif
-            // seems disconnect dievice while urb commited will maybe run here
+            // seems disconnect dievice while urb committed will maybe run here
 //            VSF_USB_ASSERT(false);
             goto urb_fail;
         }

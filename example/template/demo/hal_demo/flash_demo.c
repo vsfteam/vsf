@@ -67,7 +67,7 @@ static void __flash_demo(void)
 
     for (int i = 0; i < dimof(buffer); i++) {
         if (buffer[i] != (uint8_t)i) {
-            vsf_trace_debug("veriy flash erase/write/read faild, "
+            vsf_trace_debug("veriy flash erase/write/read failed, "
                             "buffer[%d] is 0x%02x, expected: 0x%02x" VSF_TRACE_CFG_LINEEND,
                             i, buffer[i], i & 0xFF);
             return ;

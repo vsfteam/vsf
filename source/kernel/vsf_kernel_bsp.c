@@ -382,7 +382,7 @@ void __cmain(void)
         //  some cpp instances if eg. file stream(including stdout/stdin/stderr)
         //  is used, this will need malloc.
         // So if malloc is implemented in VSF simple libc, define __VSF_WORKAROUND_IAR_CPP__
-        // Note that if headers of simple libc is used, malloc is acutally __vsf_linux_malloc
+        // Note that if headers of simple libc is used, malloc is actually __vsf_linux_malloc
 #ifdef __VSF_WORKAROUND_IAR_CPP__
         vsf_disable_interrupt();
         vsf_heap_init();

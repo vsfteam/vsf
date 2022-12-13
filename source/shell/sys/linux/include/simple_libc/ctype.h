@@ -13,7 +13,7 @@ extern "C" {
 
 #define CTYPE_U             0x01        // upper
 #define CTYPE_L             0x02        // lower
-#define CTYPE_N             0x04        // numberic
+#define CTYPE_N             0x04        // numeric
 #define CTYPE_S             0x08        // white space(space/lf/tab)
 #define CTYPE_P             0x10        // punct
 #define CTYPE_C             0x20        // control

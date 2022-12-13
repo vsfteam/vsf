@@ -1533,7 +1533,7 @@ int kill(pid_t pid, int sig)
         return 0;
     }
     vsf_unprotect_sched(orig);
-    // priority of sighandler which is defined by VSF_LINUX_CFG_PRIO_SIGNAL shoule
+    // priority of sighandler which is defined by VSF_LINUX_CFG_PRIO_SIGNAL should
     //  be higher than normal task, so no need to yield here, and thus kill can
     //  be called in non-thread environment.
 //    vsf_thread_yield();

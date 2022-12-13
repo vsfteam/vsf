@@ -149,7 +149,7 @@ struct vsf_loader_target_t {
     bool is_epi;
 
     /**
-     \~english function to read taget to memory.
+     \~english function to read target to memory.
      @param loader loader instance, cannot be NULL.
      @param offset offset in target.
      @param buffer memory buffer for the read data.

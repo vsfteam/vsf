@@ -22,7 +22,7 @@
 #ifndef __VSF_OSA_SERVICE_CFG_H__
 #define __VSF_OSA_SERVICE_CFG_H__
 
-//! all service modules use this configuation file
+//! all service modules use this configuration file
 
 /*============================ INCLUDES ======================================*/
 

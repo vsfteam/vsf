@@ -126,7 +126,7 @@ implement_vsf_fsm(user_fsm_task_t)
             init_vsf_fsm(   user_fsm_sub_task_t,
                             &vsf_this.print_task,
                             vsf_args(vsf_this.cnt));    //!< init sub fsm
-            transfer_to(CALL_SUB_TO_PRINT);                                     //!< tranfer to next vsf_state
+            transfer_to(CALL_SUB_TO_PRINT);                                     //!< transfer to next vsf_state
         }
     }
 

@@ -70,7 +70,7 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-// TODO: add more patameters
+// TODO: add more parameters
 #if VSF_SSD1306_CFG_PORT == VSF_SSD1306_PORT_IIC
 #   define VSF_DISP_SSD1306_IIC_INIT_SEQ(__LINE, __CONTRAST, __INVERSE, __DIRECTION)\
             VSF_DISP_SOLOMON_SYSTECH_IIC_WRITE_I(SSD1306_SET_DISPLAY_ON(0)),    \

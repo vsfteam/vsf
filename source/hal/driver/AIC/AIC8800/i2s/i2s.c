@@ -173,7 +173,7 @@ static const uint32_t __aud_src_mode_ratio[AUD_SRC_DIV_NB][SRC_MODE_NB] = {
 };
 
 // 1st row is real divider
-// 2nd row is corresponding vaule in aud_src_ctrl2[16:13]
+// 2nd row is corresponding value in aud_src_ctrl2[16:13]
 static const uint8_t __aud_src_div[2][AUD_SRC_DIV_NB] = {
     {1, 2, 3, 4, 6, 12},
     {0x0A, 0x09, 0x06, 0x08, 0x05, 0x04},

@@ -240,7 +240,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     vsf_linux_trigger_init(&trig);
     priv->trig = &trig;
 
-    // 1. setup sfd_rx and trigger remote for conection request
+    // 1. setup sfd_rx and trigger remote for connection request
     priv->rw.sfd_rx = sfd_rx;
     VSF_LINUX_ASSERT(!priv->remote->remote);
     vsf_protect_t orig = vsf_protect_sched();
@@ -263,7 +263,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     fcntl(sfd_tx->fd, F_SETFL, priv->flags);
     priv->rw.sfd_tx = sfd_tx;
 
-    // 3. trigger remote again to complete conection
+    // 3. trigger remote again to complete connection
     vsf_linux_trigger_signal(priv->remote->trig, 0);
     vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
     return 0;

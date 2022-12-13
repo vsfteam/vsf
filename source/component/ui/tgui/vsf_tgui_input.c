@@ -108,7 +108,7 @@ vsf_err_t vsf_tgui_send_touch_evt(  vsf_tgui_t *tgui_ptr,
                             position);
         }
         
-        //! update postion
+        //! update position
         tgui_ptr->input.finger.location_pre[finger_idx] = position;
 
     } else {

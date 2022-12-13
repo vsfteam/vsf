@@ -419,7 +419,7 @@ extern void vsf_linux_free_env(vsf_linux_process_t *process);
 extern void vsf_linux_trigger_init(vsf_linux_trigger_t *trig);
 // return value:
 //  < 0 : triggered by signals, returns the minus signal
-//  0   : triggered normaly
+//  0   : triggered normally
 //  > 0 : triggered because of timeout
 extern int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout);
 extern int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig);

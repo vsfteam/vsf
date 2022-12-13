@@ -387,7 +387,7 @@ void vsf_xboot_bind(vk_disp_t *disp)
     __xboot.wm.disp = disp;
 
     if (__xboot.wm.disp != NULL) {
-        // unsecure code to set color because param maybe really const
+        // insecure code to set color because param maybe really const
         *(vk_disp_color_type_t *)&__xboot.wm.disp->param.color = VSF_DISP_COLOR_ARGB8888;
         __xboot.wm.disp->ui_on_ready = __xboot_disp_on_ready;
         vk_disp_init(__xboot.wm.disp);

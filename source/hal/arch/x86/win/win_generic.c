@@ -360,7 +360,7 @@ static bool __vsf_arch_can_preempt(vsf_arch_irq_thread_t *irq_thread, bool no_cu
     } else {
         // interrupt activated
         // __vsf_x86.cur_thread can be irq_thread, consider this:
-        //      threadA(background_running) activated self and wait to be preemptable
+        //      threadA(background_running) activated self and wait to be preemptible
         //          threadB running
         //          threadB yield to threadA(set __vsf_x86.cur_thread to threadA)
         // irq_thread->is_running is checked in __vsf_arch_irq_activate

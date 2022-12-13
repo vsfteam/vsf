@@ -913,7 +913,7 @@ void freeifaddrs(struct ifaddrs *ifaddrs)
 }
 
 // netdb.h
-// none thread safty
+// none thread safety
 typedef struct gethostbyname_param_t {
     ip_addr_t ipaddr;
     vsf_eda_t *eda;

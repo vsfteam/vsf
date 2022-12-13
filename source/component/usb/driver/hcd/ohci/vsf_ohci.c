@@ -221,7 +221,7 @@ typedef struct ohci_hcca_t {
     //uint8_t reserved_for_hc[116];
 } ohci_hcca_t;
 
-/* OHCI register defination */
+/* OHCI register definition */
 typedef struct ohci_regs_t {
     /* control and status registers */
     uint32_t revision;

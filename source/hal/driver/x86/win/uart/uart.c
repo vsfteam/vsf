@@ -524,7 +524,7 @@ static void __vk_usart_read_event_thread(void *arg)
             hw_usart->reced_buf_size = read_real_len;
             goto rec_buf_lenth_insufficient;
         }
-        vsf_hw_usart_trace_irq("read_thread onece!the recbuf:\n");
+        vsf_hw_usart_trace_irq("read_thread once!the recbuf:\n");
         for (int temp = 0; temp < hw_usart->rec_buf_size; temp++) {
             VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->rec_buf + temp));
         }

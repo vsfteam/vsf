@@ -118,7 +118,7 @@ vsf_class(vk_fatfs_file_t) {
 //  | |-------------------| |  |
 //  | ||__vk_malfs_info_t|| |  |
 //  | ||-----------------|| |  |
-//  | ||    total_cb     ||-|--- if __vk_fatfs_info_t is dynamicly allocated,
+//  | ||    total_cb     ||-|--- if __vk_fatfs_info_t is dynamically allocated,
 //  | ||-----------------|| | total_cb in __vk_malfs_info_t points to the __vk_fatfs_info_t.
 //  |-----------------------| so in __vk_malfs_unmount, can free total_cb
 //  | vk_malfs_cache_t[num] |

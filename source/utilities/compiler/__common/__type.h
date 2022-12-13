@@ -88,7 +88,7 @@ typedef enum {
 /*============================ INCLUDES ======================================*/
 
 /*! \note IMPORTANT
- *!       - Everytime when you try to add some 'common' header file including
+ *!       - Every time when you try to add some 'common' header file including
  *!         into __type.h, please take more time to think your decision, and
  *!         make sure that the header file is available in all the compiler
  *!         environment and platforms.
@@ -101,7 +101,7 @@ typedef enum {
  *!         standard) and you haven't encounter any known case where the header
  *!         file is absent, we can assume that it is safe to put it in __type.h.
  *!         If you do encounter scenarios where the header files is missing,
- *!         please move it to the plaform specific type.h
+ *!         please move it to the platform specific type.h
  */
 
 #if !defined(__USE_LOCAL_LIBC__)
@@ -265,7 +265,7 @@ typedef volatile uint32_t           reg32_t;
 #define REG8_RSVD_1M                REG8_RSVD_B(1024 * 1024)
 
 #define REG16_RSVD_N(__N)           REG_RSVD_U16N(__N)
-// __BYTE_CNT MUST be mutiple of 2
+// __BYTE_CNT MUST be multiple of 2
 #define REG16_RSVD_B(__BYTE_CNT)    REG16_RSVD_N(__BYTE_CNT >> 1)
 #define REG16_RSVD_8B               REG16_RSVD_B(8)
 #define REG16_RSVD_16B              REG16_RSVD_B(16)
@@ -287,7 +287,7 @@ typedef volatile uint32_t           reg32_t;
 #define REG16_RSVD_1M               REG16_RSVD_B(1024 * 1024)
 
 #define REG32_RSVD_N(__N)           REG_RSVD_U32N(__N)
-// __BYTE_CNT MUST be mutiple of 4
+// __BYTE_CNT MUST be multiple of 4
 #define REG32_RSVD_B(__BYTE_CNT)    REG_RSVD_U32N(__BYTE_CNT >> 2)
 #define REG32_RSVD_8B               REG32_RSVD_B(8)
 #define REG32_RSVD_16B              REG32_RSVD_B(16)
@@ -324,7 +324,7 @@ typedef volatile uint32_t           reg32_t;
 
 /*============================ Multiple-Entry ================================*/
 
-/*! \note it is forseeable that in certain platform or compiler, people might
+/*! \note it is foreseeable that in certain platform or compiler, people might
  *!       have their own version of those system header files listed below
  */
 

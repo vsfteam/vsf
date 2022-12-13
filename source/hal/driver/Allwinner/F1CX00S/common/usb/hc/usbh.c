@@ -614,7 +614,7 @@ static vsf_err_t __f1cx00s_usbh_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
             musb_hcd->teda.fn.evthandler = __f1cx00s_usbh_hcd_evthandler;
             vsf_teda_init(&musb_hcd->teda);
 
-            // if device is already connected on startup, Connect interupt will not issue
+            // if device is already connected on startup, Connect interrupt will not issue
             if (MUSB_BASE->Common.DevCtl & (MUSB_DevCtl_LSDev | MUSB_DevCtl_FSDev)) {
                 vsf_eda_post_evt(&musb_hcd->teda.use_as__vsf_eda_t, HCD_EVT_CONN);
             }

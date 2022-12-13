@@ -441,7 +441,7 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 break;
             }
 
-            // run here means no error, will send control requet
+            // run here means no error, will send control request
             if (uac->is_ep0_busy) {
                 break;
             }

@@ -100,7 +100,7 @@ const struct {
     .Minor =                        0x20,
 };
 
-/*! Kernal Version Log:
+/*! Kernel Version Log:
  *!     v1.20       Introduce param_eda and the concept of local, arg and param
  *!     v1.1x       Introduce cross call among different types of tasks
  *!     v1.0x       First stable release

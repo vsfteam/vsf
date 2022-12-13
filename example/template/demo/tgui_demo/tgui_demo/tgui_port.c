@@ -422,7 +422,7 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* location_ptr,
     VSF_TGUI_ASSERT(face != NULL);
 
     if (FT_Err_Ok != FT_Load_Char(face, char_u32, FREETYPE_LOAD_FLAGS)) {
-        VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port] freetype load char faild: %d" VSF_TRACE_CFG_LINEEND, char_u32);
+        VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port] freetype load char failed: %d" VSF_TRACE_CFG_LINEEND, char_u32);
         VSF_TGUI_ASSERT(0);
         return;
     }
@@ -483,7 +483,7 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* location_ptr,
  *! \retval NULL    No need to refresh (or rendering service is not ready)
  *! \retval !NULL   The actual refresh region
  *!
- *! \note When NULL is returned, current refresh iteration (i.e. a refresh activites
+ *! \note When NULL is returned, current refresh iteration (i.e. a refresh activities
  *!       between vsf_tgui_v_refresh_loop_begin and vsf_tgui_v_refresh_loop_end )
  *!       will be ignored and vsf_tgui_v_refresh_loop_end is called immediately
  **********************************************************************************/

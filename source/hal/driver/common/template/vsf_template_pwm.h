@@ -103,11 +103,11 @@ extern fsm_rt_t vsf_pwm_disable(vsf_pwm_t *pwm_ptr);
 extern vsf_pwm_capability_t vsf_pwm_capability(vsf_pwm_t *pwm_ptr);
 
 /**
- *  Set the period width and pluse width for a channel
+ *  Set the period width and pulse width for a channel
  *
  * @param[in] pwm_ptr pwm instance
  * @param[in] period pwm period width (in clock counter)
- * @param[in] pulse pwm pluse width (in clock counter)
+ * @param[in] pulse pwm pulse width (in clock counter)
  */
 extern vsf_err_t vsf_pwm_set(vsf_pwm_t *pwm_ptr,
                              uint8_t    channel,
@@ -115,11 +115,11 @@ extern vsf_err_t vsf_pwm_set(vsf_pwm_t *pwm_ptr,
                              uint32_t   pulse);
 
 /**
- *  Set the period width(ms) and pluse width(ms) for a channel
+ *  Set the period width(ms) and pulse width(ms) for a channel
  *
  * @param[in] pwm_ptr pwm instance
  * @param[in] period pwm period width (in milli-second)
- * @param[in] pulse pwm pluse width (in milli-second)
+ * @param[in] pulse pwm pulse width (in milli-second)
  */
 extern vsf_err_t vsf_pwm_set_ms(vsf_pwm_t *pwm_ptr,
                                 uint8_t    channel,
@@ -127,11 +127,11 @@ extern vsf_err_t vsf_pwm_set_ms(vsf_pwm_t *pwm_ptr,
                                 uint32_t   pulse);
 
 /**
- *  Set the period width(us) and pluse width(us) for a channel
+ *  Set the period width(us) and pulse width(us) for a channel
  *
  * @param[in] pwm_ptr pwm instance
  * @param[in] period pwm period width (in micro-seconds)
- * @param[in] pulse pwm pluse width (in micro-seconds)
+ * @param[in] pulse pwm pulse width (in micro-seconds)
  */
 extern vsf_err_t vsf_pwm_set_us(vsf_pwm_t *pwm_ptr,
                                 uint8_t    channel,
@@ -139,11 +139,11 @@ extern vsf_err_t vsf_pwm_set_us(vsf_pwm_t *pwm_ptr,
                                 uint32_t   pulse);
 
 /**
- *  Set the period width(ns) and pluse width(ns) for a channel
+ *  Set the period width(ns) and pulse width(ns) for a channel
  *
  * @param[in] pwm_ptr pwm instance
  * @param[in] period pwm period width (in nano second)
- * @param[in] pulse pwm pluse width (in nano second)
+ * @param[in] pulse pwm pulse width (in nano second)
  */
 extern vsf_err_t vsf_pwm_set_ns(vsf_pwm_t *pwm_ptr,
                                 uint8_t    channel,

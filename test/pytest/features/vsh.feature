@@ -1,5 +1,5 @@
 Feature: vsh: vsf shell
-    TODO: Add more infomation
+    TODO: Add more information
 
     @base
     Scenario Outline: vsh base

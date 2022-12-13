@@ -45,7 +45,7 @@ extern "C" {
 #define VSF_USBIP_DCD_CFG_BACKEND_LWIP      3
 
 #ifndef VSF_USBIP_DCD_CFG_BACKEND
-// 1. paltform related backend
+// 1. platform related backend
 // 2. tcpip stack related backend
 // 3. vsf socket backend
 #   if      defined(__WIN__)

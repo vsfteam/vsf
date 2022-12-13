@@ -76,9 +76,9 @@
                         <address of ring buffer var>, 
                         <address of item pointer>);
 
-    NOTE: Peek returns a refrence to existing data in the ring buffer, there is no copy access
+    NOTE: Peek returns a reference to existing data in the ring buffer, there is no copy access
 
-    // 8. Use following macro for enqueue, dequeue and peek multile items:
+    // 8. Use following macro for enqueue, dequeue and peek multiple items:
     vsf_rng_buf_send(  <ring buffer name>, 
                         <address of ring buffer var>, 
                         <address of item buffer>, 
@@ -92,7 +92,7 @@
                         <address of item pointer>, 
                         <number of Items>);
 
-    NOTE: Peek returns a refrence to existing data in the ring buffer, there is no copy access
+    NOTE: Peek returns a reference to existing data in the ring buffer, there is no copy access
 
     // 9. You can get the number of items within a ring buffer:
     vsf_rng_buf_count( <ring buffer name>, <address of ring buffer var> )

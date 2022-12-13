@@ -40,7 +40,7 @@
 
 //  <h> Kernel Resource Configuration
 
-//      <h> Kernal event-driven system configuration
+//      <h> Kernel event-driven system configuration
 //          <o>Maximum event pool size
 //          <i>Simon, please add description here...
 //#define VSF_OS_CFG_EVTQ_POOL_SIZE                     16

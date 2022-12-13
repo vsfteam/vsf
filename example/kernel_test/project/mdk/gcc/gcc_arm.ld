@@ -222,7 +222,7 @@ SECTIONS
    * Secondary data section, optional
    *
    * Remember to add each additional data section
-   * to the .copy.table above to asure proper
+   * to the .copy.table above to assure proper
    * initialization during startup.
    */
 /*
@@ -255,7 +255,7 @@ SECTIONS
    * Secondary bss section, optional
    *
    * Remember to add each additional bss section
-   * to the .zero.table above to asure proper
+   * to the .zero.table above to assure proper
    * initialization during startup.
    */
 /*

@@ -533,7 +533,7 @@ typedef struct vsf_tgui_gesture_evt_t {
 
 typedef struct vsf_tgui_key_evt_t {
     implement(vsf_tgui_msg_t)
-    uint16_t hwKeyValue;                                                        //!< control, alt, shift, Fn and etc can be encoded wit
+    uint16_t hwKeyValue;                                                        //!< control, alt, shift, Fn and etc can be encoded with
 } vsf_tgui_key_evt_t;
 
 typedef union vsf_tgui_evt_t {

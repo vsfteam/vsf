@@ -33,13 +33,13 @@ Full name of VSF is "Versaloon Software Framework". VSF is an open-source softwa
 |  &emsp;kernel      | VSF pre-emptive/collaborative kernel                      |
 |  &emsp;osa_service | software services based on kernel                         |
 |  &emsp;service     | software services                                         |
-|  &emsp;shell       | shell to use application softwares for other systems      |
+|  &emsp;shell       | shell to use application software for other systems      |
 |  &emsp;utilities   | base software utilities(preprocessor, compiler, list, etc)|
 
 ## Kernel
 Pre-emptive kernel based on event-driven architecture, supporting mcs51, 8bit MCU, 32/64 bit ARM, riscv, x86, etc.
 
-- event-driven architecture, sleep if no event occured, lower-power naturally
+- event-driven architecture, sleep if no event occurred, lower-power naturally
 - in pre-emptive mode, task switch is implemented by hardware swi(software interrupt), priority of task is the priority of the swi.
 - pre-emptive scheduling for tasks with different priority, collaborative scheduling for tasks with the same priority
 - can run in other RTOS as a task, or as swi ISR

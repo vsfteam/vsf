@@ -161,7 +161,7 @@ int lwip_main(int argc, char *argv[])
     {
         static bool __is_lwip_inited = false;
         // tcpip_init MUST be called first,
-        //  bacause netdrv callback will need buffer inistialized by tcpip_init.
+        //  because netdrv callback will need buffer inistialized by tcpip_init.
         if (!__is_lwip_inited) {
             __is_lwip_inited = true;
             tcpip_init(NULL, NULL);

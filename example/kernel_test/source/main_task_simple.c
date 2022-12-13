@@ -105,7 +105,7 @@ implement_vsf_task(user_task_t)
             prepare_vsf_task(user_sub_task_t, &vsf_this.print_task);
             vsf_this.print_task.cnt = vsf_this.cnt;                                     //!< passing parameter
         #endif
-            vsf_task_state = CALL_SUB_TO_PRINT;                                 //!< tranfer to next state
+            vsf_task_state = CALL_SUB_TO_PRINT;                                 //!< transfer to next state
             break;
             
         case CALL_SUB_TO_PRINT:

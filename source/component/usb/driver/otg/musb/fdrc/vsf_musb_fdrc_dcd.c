@@ -495,7 +495,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
                 VSF_USB_ASSERT(false);
             }
         }
-        // MUSBD_CSR0_TXPKTRDY is cleared by hardare
+        // MUSBD_CSR0_TXPKTRDY is cleared by hardware
         if (    (MUSB_FDRC_USBD_EP0_DATA_IN == usbd->ep0_state)
             &&  !(csr1 & MUSBD_CSR0_TXPKTRDY)) {
 

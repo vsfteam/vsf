@@ -23,7 +23,7 @@
 #   include "utilities/vsf_utilities.h"
 #endif
 
-/*! \note User can define VSF_DRIVER_HEADER to specify the targer device driver
+/*! \note User can define VSF_DRIVER_HEADER to specify the target device driver
  *!       header file. If it is not specified, this driver abstraction header
  *!       file will use predefined device-specific macros to decide which device
  *!       driver header file should be included.

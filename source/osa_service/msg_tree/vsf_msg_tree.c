@@ -431,7 +431,7 @@ const vsf_msgt_node_t *vsf_msgt_backward_propagate_msg_get_last_node(
 }
 
 /*----------------------------------------------------------------------------*
- * Forward Message Propagation using Pre-Order Travesal Algorithm             *
+ * Forward Message Propagation using Pre-Order Traversal Algorithm             *
  *----------------------------------------------------------------------------*/
 SECTION(".text.vsf.osa_service.msg_tree"
         ".vsf_msgt_forward_propagate_msg_pre_order_traversal_init")
@@ -941,13 +941,13 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* obj_ptr,
             } else if (VSF_MSGT_ERR_REQUEST_VISIT_PARENT == fsm_rt) {
                 THIS_FSM_STATE = FETCH_ITEM;
 
-                //! visit parent is requrested
+                //! visit parent is requested
                 const vsf_msgt_node_t* temp_ptr = NULL;
                 if (NULL != vsf_this.FWBFS.msg_handling.node_ptr->parent_ptr) {
                     temp_ptr = (const vsf_msgt_node_t *)
                                 vsf_this.FWBFS.msg_handling.node_ptr->parent_ptr;
                 } else {
-                    /* no parent, revisit itself again to maitain the same behaviour*/
+                    /* no parent, revisit itself again to maintain the same behaviour*/
                     temp_ptr = vsf_this.FWBFS.msg_handling.node_ptr;
                 }
 

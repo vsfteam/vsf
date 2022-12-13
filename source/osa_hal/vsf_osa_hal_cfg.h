@@ -22,7 +22,7 @@
 #ifndef __VSF_OSA_HAL_CFG_H__
 #define __VSF_OSA_HAL_CFG_H__
 
-//! all hal modules use this configuation file
+//! all hal modules use this configuration file
 
 /*============================ INCLUDES ======================================*/
 

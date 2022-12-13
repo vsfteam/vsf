@@ -182,7 +182,7 @@ typedef void vsf_i2s_isr_handler_t(void *target_ptr,
 
 /**
  \~english
- @brief i2s interrut configuration
+ @brief i2s interrupt configuration
 
  \~chinese
  @brief i2s 中断配置

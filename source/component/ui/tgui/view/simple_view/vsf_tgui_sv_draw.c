@@ -131,7 +131,7 @@ static bool __sv_place_resource_with_absolute( const vsf_tgui_control_t* control
 
 #if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_DEBUG,
-                 "[Simple View]%s relative region (%d, %d, %d, %d) after in dirty region(%d, %d, %d, %d), resouce region(%d, %d, %d, %d)" VSF_TRACE_CFG_LINEEND,
+                 "[Simple View]%s relative region (%d, %d, %d, %d) after in dirty region(%d, %d, %d, %d), resource region(%d, %d, %d, %d)" VSF_TRACE_CFG_LINEEND,
                  __sv_get_node_name(control_ptr),
                  control_relative_dirty_region.tLocation.iX,
                  control_relative_dirty_region.tLocation.iY,
@@ -180,7 +180,7 @@ static bool __sv_place_resource_with_absolute( const vsf_tgui_control_t* control
 
 #if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_DEBUG,
-                 "[Simple View]%s absolute region(%d, %d, %d, %d) in screen(%d, %d, %d, %d), resouce region(%d, %d, %d, %d)" VSF_TRACE_CFG_LINEEND,
+                 "[Simple View]%s absolute region(%d, %d, %d, %d) in screen(%d, %d, %d, %d), resource region(%d, %d, %d, %d)" VSF_TRACE_CFG_LINEEND,
                  __sv_get_node_name(control_ptr),
                  absolute_region_in_screen.tLocation.iX,
                  absolute_region_in_screen.tLocation.iY,
@@ -218,7 +218,7 @@ static bool __sv_update_place_resouce_with_align(const vsf_tgui_control_t* contr
         return false;
     }
 
-    // place resouce region in control
+    // place resource region in control
     VSF_TGUI_ASSERT(resource_region_ptr->tSize.iWidth > 0 && resource_region_ptr->tSize.iHeight > 0);
     vsf_tgui_region_update_with_align(&contrl_relative_region, resource_region_ptr, mode);
 

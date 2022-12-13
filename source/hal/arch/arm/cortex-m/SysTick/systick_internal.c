@@ -43,7 +43,7 @@
 
 // TODO: should em_systick_cfg_mode_t and systick_cfg_t here be removed?
 #if 0
-//! \name SysTick initialization arguments defination
+//! \name SysTick initialization arguments definition
 //! @{
 typedef enum {
     //! Enable the SysTick

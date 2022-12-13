@@ -513,7 +513,7 @@ static int __vk_libusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 #ifndef __WIN__
                 return libusb_set_configuration(libusb_dev->handle, setup->wValue);
 #else
-                // TODO; libusb_set_configuration will fail on windows paltform
+                // TODO; libusb_set_configuration will fail on windows platform
                 return 0;
 #endif
             } else if ( ((USB_RECIP_INTERFACE | USB_DIR_OUT) == setup->bRequestType)

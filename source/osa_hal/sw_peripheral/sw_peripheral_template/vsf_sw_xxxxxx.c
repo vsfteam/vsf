@@ -21,7 +21,7 @@
 
 #if VSF_USE_SW_XXXX == ENABLED
 
-#include "kernal/vsf_kernal.h"
+#include "kernel/vsf_kernal.h"
 #include "hal/vsf_hal.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

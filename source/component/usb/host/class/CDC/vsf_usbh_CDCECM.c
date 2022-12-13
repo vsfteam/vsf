@@ -314,7 +314,7 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *slot, v
     if (err != VSF_ERR_NONE) {
         ocb->netbuf = NULL;
     } else {
-        // IMPORTANT: DO NOT use ocb->netbuf here, becase there is racing condition
+        // IMPORTANT: DO NOT use ocb->netbuf here, because there is racing condition
         //  in __vk_usbh_ecm_on_cdc_evt, maybe ocb->netbuf is cleared here
 //        vk_netdrv_on_netbuf_outputted(netdrv, ocb->netbuf);
         vk_netdrv_on_netbuf_outputted(netdrv, netbuf);

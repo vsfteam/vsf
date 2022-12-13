@@ -101,7 +101,7 @@ extern "C" {
     VSF_DISP_MIPI_LCD_WRITE(0xC0, 2,  0x10, 0x10),                /* Power Control 1 */ \
     VSF_DISP_MIPI_LCD_WRITE(0xC1, 1,  0x41),                      /* Power Control 2 */ \
     VSF_DISP_MIPI_LCD_WRITE(0xC5, 3,  0x00, 0x22, 0x80),          /* VCOM Control */ \
-    VSF_DISP_MIPI_LCD_WRITE(0xB0, 1,  0x00),                      /* Interface Mode Contro */ \
+    VSF_DISP_MIPI_LCD_WRITE(0xB0, 1,  0x00),                      /* Interface Mode Control */ \
     VSF_DISP_MIPI_LCD_WRITE(0xB1, 2,  0x60, 0x11),                /* frame rate control */ \
     VSF_DISP_MIPI_LCD_WRITE(0xB4, 1,  0x02),                      /* Display Inversion Control */ \
     VSF_DISP_MIPI_LCD_WRITE(0xB6, 2,  0x02, 0x02),                /* Display Function Control */ \

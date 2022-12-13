@@ -1,4 +1,4 @@
-name: repository dispath
+name: repository dispatch
 
 on:
   push:

@@ -194,7 +194,7 @@ static int vsfvm_module_require_lib_imp(vsfvm_compiler_t *compiler, char *path)
         if (err < 0) {
             err = -err;
             printf("command line compile error: %s\r\n",
-                (err >= VSFVM_ERRCODE_END) ? "unknwon error" : __vsfvm_errcode_str[err]);
+                (err >= VSFVM_ERRCODE_END) ? "unknown error" : __vsfvm_errcode_str[err]);
             printf("compile error around line %d column %d\r\n",
                     compiler->script.lexer.curctx.line + 1, compiler->script.lexer.curctx.col + 1);
             return -err;
@@ -242,7 +242,7 @@ int vsfvm_main(int argc, char *argv[])
             if (err < 0) {
                 err = -err;
                 printf("command line compile error: %s\r\n",
-                    (err >= VSFVM_ERRCODE_END) ? "unknwon error" : __vsfvm_errcode_str[err]);
+                    (err >= VSFVM_ERRCODE_END) ? "unknown error" : __vsfvm_errcode_str[err]);
                 printf("compile error around line %d column %d\r\n",
                     compiler->script.lexer.curctx.line + 1, compiler->script.lexer.curctx.col + 1);
             }
