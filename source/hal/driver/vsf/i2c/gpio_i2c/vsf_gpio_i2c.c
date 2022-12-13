@@ -188,7 +188,7 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
                                     uint8_t *buffer)
 {
     bool is_read = (cmd & VSF_I2C_CMD_RW_MASK) == VSF_I2C_CMD_READ;
-    uint16_t transfered_count = 0;
+    uint16_t transferred_count = 0;
     if ((cmd & VSF_I2C_CMD_START) || (cmd & VSF_I2C_CMD_RESTART)) {
         __vsf_gpio_i2c_scl_recessive(gpio_i2c_ptr);
         gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
@@ -207,11 +207,11 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
     }
 
     if (is_read) {
-        for (; transfered_count < count; transfered_count++) {
-            *buffer++ = __vsf_gpio_i2c_in(gpio_i2c_ptr, transfered_count < (count - 1));
+        for (; transferred_count < count; transferred_count++) {
+            *buffer++ = __vsf_gpio_i2c_in(gpio_i2c_ptr, transferred_count < (count - 1));
         }
     } else {
-        for (bool ack = true; ack && (transfered_count < count); transfered_count++) {
+        for (bool ack = true; ack && (transferred_count < count); transferred_count++) {
             ack = __vsf_gpio_i2c_out(gpio_i2c_ptr, *buffer++, 8);
         }
     }
@@ -224,7 +224,7 @@ check_stop:
         __vsf_gpio_i2c_scl_recessive(gpio_i2c_ptr);
         vsf_gpio_set_input(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
     }
-    gpio_i2c_ptr->transfered_count = transfered_count;
+    gpio_i2c_ptr->transferred_count = transferred_count;
     if (!(gpio_i2c_ptr->irq_mask & VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK)) {
         gpio_i2c_ptr->irq_mask |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
     }
@@ -234,7 +234,7 @@ check_stop:
 
 uint_fast32_t vsf_gpio_i2c_get_transfered_count(vsf_gpio_i2c_t *gpio_i2c_ptr)
 {
-    return gpio_i2c_ptr->transfered_count;
+    return gpio_i2c_ptr->transferred_count;
 }
 
 /*============================ TYPES =========================================*/

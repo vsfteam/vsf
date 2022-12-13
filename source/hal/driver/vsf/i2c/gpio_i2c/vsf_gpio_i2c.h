@@ -76,7 +76,7 @@ vsf_class(vsf_gpio_i2c_t) {
         vsf_i2c_cfg_t                       cfg;
         vsf_i2c_irq_mask_t                  irq_mask;
         vsf_i2c_irq_mask_t                  enabled_irq_mask;
-        uint16_t                            transfered_count;
+        uint16_t                            transferred_count;
 
         bool                                is_busy;
         bool                                is_enabled;
