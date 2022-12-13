@@ -23,7 +23,7 @@
 #ifndef __VSF_HAL_CFG_H__
 #define __VSF_HAL_CFG_H__
 
-//! all hal modules use this configuation file
+//! all hal modules use this configuration file
 
 #ifdef __cplusplus
 extern "C" {

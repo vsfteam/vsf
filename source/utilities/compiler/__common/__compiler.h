@@ -286,7 +286,7 @@ extern "C" {
 //! use of address of unaligned structure member
 #pragma diag_suppress=pa039
 
-//! declaration is not visable outside of function
+//! declaration is not visible outside of function
 #pragma diag_suppress=pe231
 
 //! expression has no effect

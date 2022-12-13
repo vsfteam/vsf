@@ -31,7 +31,7 @@ extern "C" {
 /*! \note Example of systick configuration using systick_cfg()
 
      systick_cfg (
-        ENABLE_SYSTICK              |       //!< enable systick immediatly 
+        ENABLE_SYSTICK              |       //!< enable systick immediately 
         SYSTICK_SOURCE_SYSCLK       |       //!< using system clock as clock source
         ENABLE_SYSTICK_INTERRUPT,           //!< enable exception generation
         (VSF_GET_MAIN_CLK() / frequency)    //!< generate desired frequency
@@ -48,7 +48,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 /* defined in systick_internal.h
-//! \name SysTick initialization arguments defination
+//! \name SysTick initialization arguments definition
 //! @{
 typedef enum {
     //! Enable the SysTick

@@ -176,7 +176,7 @@ typedef struct vsf_io_cfg_t {
 #endif
         };
     };
-    uint16_t        function;                   //!< io Funcitons
+    uint16_t        function;                   //!< io Functions
     uint32_t        feature;                    //!< pin feature
 } vsf_io_cfg_t;
 

@@ -988,7 +988,7 @@ ssize_t VSF_LINUX_SOCKET_WRAPPER(recvfrom)(int sockfd, void *buffer, size_t size
 }
 
 // netdb.h
-// none thread safty
+// none thread safety
 int __inet_gethostbyname(const char *name, vsf_in_addr_t *addr)
 {
     __vsf_linux_hostsock_init();

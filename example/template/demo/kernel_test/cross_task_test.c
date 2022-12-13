@@ -106,7 +106,7 @@ imp_vsf_pt(user_pt_called_by_thread_t)
 {
     vsf_pt_begin();
 
-    vsf_trace_info("\t\t\trun pt task: delay 1000ms\r\n");
+    vsf_trace_info("\t\t\turn pt task: delay 1000ms\r\n");
     vsf_pt_wait_until(vsf_delay_ms(100));
     vsf_this.cnt++;
     vsf_trace_info("\t\t\tdelay complete [0x%08x]\r\n", vsf_this.cnt);
@@ -117,7 +117,7 @@ imp_vsf_pt(user_pt_called_by_thread_t)
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 imp_vsf_thread(user_thread_b_t)
 {
-    vsf_trace_info("\trun thread...delay 100ms...");
+    vsf_trace_info("\turn thread...delay 100ms...");
     vsf_delay_ms(100);
     vsf_trace_info("\tcpl\r\n");
 

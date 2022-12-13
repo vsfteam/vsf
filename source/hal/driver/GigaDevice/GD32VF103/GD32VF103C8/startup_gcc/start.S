@@ -182,16 +182,16 @@ _start0800:
     li t0, 0x200
     csrs CSR_MMISC_CTL, t0
 
-    /* Intial the mtvt*/
+    /* Initial the mtvt*/
     la t0, vector_base
     csrw CSR_MTVT, t0
 
-    /* Intial the mtvt2 and enable it*/
+    /* Initial the mtvt2 and enable it*/
     la t0, irq_entry
     csrw CSR_MTVT2, t0
     csrs CSR_MTVT2, 0x1
 
-    /* Intial the CSR MTVEC for the Trap ane NMI base addr*/
+    /* Initial the CSR MTVEC for the Trap and NMI base addr*/
     la t0, trap_entry
     csrw CSR_MTVEC, t0
 

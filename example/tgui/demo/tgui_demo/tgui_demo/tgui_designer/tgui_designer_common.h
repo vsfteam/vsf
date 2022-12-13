@@ -38,9 +38,9 @@
 #define TGUI_CONTAINER_TYPE_TEXT \
     "Plane\n" \
     "Stream Horizontal\n" \
-    "Stream Verical\n" \
+    "Stream Vertical\n" \
     "Line Stream Horizontal\n" \
-    "Line Stream Verical"
+    "Line Stream Vertical"
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

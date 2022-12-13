@@ -1294,7 +1294,7 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_vertical(  vsf_tgui_container_t
         container_ptr->chVisibleItemCount++;
 
         if (iAllowedLineHeight <= 0) {
-            //! user doesn't give a resonable value
+            //! user doesn't give a reasonable value
             iAllowedLineHeight = item_ptr->iHeight;
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
             tSize.iHeight = iAllowedLineHeight + item_ptr->tMargin.chTop + item_ptr->tMargin.chBottom;
@@ -1322,7 +1322,7 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_vertical(  vsf_tgui_container_t
         //! update iY in the same line
         tLocation.iY += iHeight;
 
-        //! DO **NOT** calculate the miminal required height
+        //! DO **NOT** calculate the minimal required height
         // tSize.iHeight = vsf_max(tLocation.iY, tSize.iHeight);
 
         if (tLocation.iY >= iAllowedLineHeight) {
@@ -1380,7 +1380,7 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_horizontal(vsf_tgui_container_t
         container_ptr->chVisibleItemCount++;
 
         if (iAllowedLineWidth <= 0) {
-            //! user doesn't give a resonable value
+            //! user doesn't give a reasonable value
             iAllowedLineWidth = item_ptr->iWidth;
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
             tSize.iWidth = iAllowedLineWidth + item_ptr->tMargin.chLeft + item_ptr->tMargin.chRight;
@@ -1408,7 +1408,7 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_horizontal(vsf_tgui_container_t
         //! update iX in the same line
         tLocation.iX += iWidth;
 
-        //! DO **NOT** calculate the miminal required width
+        //! DO **NOT** calculate the minimal required width
         // tSize.iWidth = vsf_max(tLocation.iX, tSize.iWidth);
 
         if (tLocation.iX >= iAllowedLineWidth) {

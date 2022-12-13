@@ -43,7 +43,7 @@
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#    error tGUI requies ANSI-C99 and above
+#    error tGUI requires ANSI-C99 and above
 #endif
 
 
@@ -122,7 +122,7 @@
 on VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING, but it is set to DISABLED. \
 In order to continue the compilation process, this macro \
 VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING is forced to be ENABLED. Please \
-enable it in vsf_usr_cfg.h or top vsf_tgui_cfg.h to supress this \
+enable it in vsf_usr_cfg.h or top vsf_tgui_cfg.h to suppress this \
 warning."
 #       undef VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING
 #       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING             ENABLED

@@ -416,7 +416,7 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
 
 /**
  \~english
- @brief get the couter of transfers for current request  by the i2c master
+ @brief get the counter of transfers for current request  by the i2c master
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  @return uint_fast32_t: counter of transferred
  @note This API can be used after the slave NAK and until the next transmission

@@ -110,7 +110,7 @@ typedef enum vsf_adc_channel_feature_t{
 
 //! adc channel configuration
 typedef struct vsf_adc_channel_cfg_t {
-    vsf_adc_feature_t feature;  // Channle Feature
+    vsf_adc_feature_t feature;  // Channel Feature
     uint16_t sample_cycles;
     uint8_t  channel;       // Channel Index
 } vsf_adc_channel_cfg_t;

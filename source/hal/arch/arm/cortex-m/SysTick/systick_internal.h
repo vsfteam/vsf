@@ -24,14 +24,14 @@
 /*! \note you can access systick register directly through ARM_SYSTICK
  *!       e.g.   ARM_SYSTICK.SYST_CSR.ENABLE = true;
  *!
- *!     NOTE: the register name defined by Armv7-M Architecture Reference Mannual
+ *!     NOTE: the register name defined by Armv7-M Architecture Reference Manual
  */
 #include "./i_io_systick.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-//! \name SysTick initialization arguments defination
+//! \name SysTick initialization arguments definition
 //! @{
 typedef enum {
     //! Enable the SysTick

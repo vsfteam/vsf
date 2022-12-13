@@ -261,14 +261,14 @@ typedef uint_fast32_t vsf_pm_sclk_status_t;
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_SEL == DISABLED
 typedef enum vsf_pm_clk_src_sel_t {
     VSF_AUTO_CLKSRC_IRC                 = 0x0,      //!< source clk is IRC
-    VSF_AUTO_CLKSRC_SYSOSC0             = 0x1,      //!< source clk is System oscilator
+    VSF_AUTO_CLKSRC_SYSOSC0             = 0x1,      //!< source clk is System oscillator
     VSF_AUTO_CLKSRC_SYSOSC1             = 0x2,      //!< source clock is WDTOSC
     VSF_AUTO_CLKSRC_EXTCLK0             = 0x3,      //!< Source clk is extern clock0
     VSF_AUTO_CLKSRC_EXTCLK1             = 0x4,      //!< source clk is extern clock1
 
 
     VSF_PLL_CLKSRC_IRC                  = 0x0,      //!< pll source clk is IRC
-    VSF_PLL_CLKSRC_SYSOSC0              = 0x1,      //!< pll source clk is System oscilator
+    VSF_PLL_CLKSRC_SYSOSC0              = 0x1,      //!< pll source clk is System oscillator
     VSF_PLL_CLKSRC_SYSOSC1              = 0x2,      //!< pll source clk is CLKIN
     VSF_PLL_CLKSRC_EXTCLK0              = 0x3,      //!< pll source clk is extern clock0
     VSF_PLL_CLKSRC_EXTCLK1              = 0x4,      //!< pll source clk is extern clock1
@@ -342,7 +342,7 @@ typedef enum vsf_pm_mclk_apb_div_t {
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_CFG == DISABLED
 typedef struct vsf_pm_mclk_cfg_t {
     vsf_pm_clk_src_sel_t                clk_src;                //!< main clock source
-    uint32_t                        freq;                   //!< system oscilator frequency
+    uint32_t                        freq;                   //!< system oscillator frequency
 } vsf_pm_mclk_cfg_t;
 #endif
 
@@ -376,7 +376,7 @@ typedef enum vsf_pm_pll_sel_t {
 #if VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_CFG == DISABLED
 typedef struct vsf_pm_pll_cfg_t {
     vsf_pm_clk_src_sel_t pll_clk_src;//!< pll clock source
-    uint32_t         freq;       //!< system oscilator frequency
+    uint32_t         freq;       //!< system oscillator frequency
     uint8_t          msel;       //!< PLL Feedback divider value
     uint8_t          ssel;       //!< pll Feedback divider value
 } vsf_pm_pll_cfg_t;

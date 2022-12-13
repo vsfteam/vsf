@@ -37,7 +37,7 @@ jobs:
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install gcc llvm sdl2 libusb ninja
 
-            echo "" >> ~/.bash_profile # fixed last line withou line break
+            echo "" >> ~/.bash_profile # fixed last line without line break
             echo "export LIBRARY_PATH=/usr/local/lib" >> ~/.bash_profile
             echo "export C_INCLUDE_PATH=/usr/local/include" >> ~/.bash_profile
 

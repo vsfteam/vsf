@@ -44,7 +44,7 @@
 
 
 
-/* output enconding for each layer */
+/* output encoding for each layer */
 #define INPUT_1_OUTPUT_SHIFT 7
 #define CONV2D_1_OUTPUT_SHIFT 6
 #define RE_LU_1_OUTPUT_SHIFT 6

@@ -408,7 +408,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
             goto __not_implement;
         } else if (!strcasecmp((const char *)tmp_ptr, "Connection")) {
             if (!strcasecmp((const char *)cur_ptr, "close")) {
-                // no need to set to false, becasue it's default value
+                // no need to set to false, because it's default value
             } else if (!strcasecmp((const char *)cur_ptr, "Keep-Alive")) {
                 request->keep_alive = true;
             } else {
@@ -774,7 +774,7 @@ static void * __vsf_linux_httpd_thread(void *param)
 
     fd_listen = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (fd_listen < 0) {
-        vsf_trace_error(MODULE_NAME ": fail to cerate listen socket." VSF_TRACE_CFG_LINEEND);
+        vsf_trace_error(MODULE_NAME ": fail to create listen socket." VSF_TRACE_CFG_LINEEND);
         goto __exit_fail;
     }
 

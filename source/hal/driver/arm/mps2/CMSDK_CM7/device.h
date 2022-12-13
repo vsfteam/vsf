@@ -193,7 +193,7 @@ struct pm_periph_asyn_clk_cfg_t {
 //! @{
 struct pm_main_clk_cfg_t {
     vsf_pm_clk_src_sel_t clk_src;                //!< main clock source
-    uint32_t             freq;                   //!< system oscilator frequency
+    uint32_t             freq;                   //!< system oscillator frequency
     uint16_t             core_div[1];            //!< system core clock divider
     uint16_t             ahb_div[1];             //!< system AHB clock divider
     uint16_t             apb_div[2];             //!< system APB clock divider

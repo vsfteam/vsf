@@ -481,10 +481,10 @@ extern vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr);
 
 /**
  \~english
- @brief get the number of current recevie requests that have been received
+ @brief get the number of current receive requests that have been received
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
  @return int_fast32_t: number already received
- @note: only valid until the current recevie request is completed.
+ @note: only valid until the current receive request is completed.
 
  \~chinese
  @brief 获取接收请求已经接收到的数量

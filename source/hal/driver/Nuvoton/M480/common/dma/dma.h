@@ -120,7 +120,7 @@ typedef enum m484_dma_transfer_mode_t {
 typedef enum m484_dma_irq_mask_t {
     M484_DMA_TRANSFER_DONE_INTERRUPT    = 1 << 0,
     /*
-    TODO: add talbe and timeout interrupt support
+    TODO: add table and timeout interrupt support
     M484_DMA_TABLE_EMPTY_INTERRUPT      = 1 << 1,
     M484_DMA_TIMEOUT_INTERRUPT          = 1 << 2,
     */

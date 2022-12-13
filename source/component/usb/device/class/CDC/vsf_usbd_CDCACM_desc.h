@@ -25,7 +25,7 @@ extern "C" {
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-// __IFS_START + 0:     Conrol interface
+// __IFS_START + 0:     Control interface
 // __IFS_START + 1:     Data interface
 // __INT_EP_INTERVAL:   HS 0x10, otherwise 0xFF
 #define USB_DESC_CDC_ACM(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
@@ -35,7 +35,7 @@ extern "C" {
             0x24,                               /* bDescriptorType: CS_INTERFACE */\
             0x00,                               /* bDescriptorSubtype: Header Func Desc */\
             USB_DESC_WORD(0x0110),              /* bcdCDC: spec release number */\
-                                                /* Call Managment Functional Descriptor */\
+                                                /* Call Management Functional Descriptor */\
             0x05,                               /* bFunctionLength */\
             0x24,                               /* bDescriptorType: CS_INTERFACE */\
             0x01,                               /* bDescriptorSubtype: Call Management Func Desc */\

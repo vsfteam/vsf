@@ -58,7 +58,7 @@ extern "C" {
 #elif   defined(__CPU_X64__)
 // x64 stack alignment is 16bytes
 #   define VSF_ARCH_STACK_ALIGN_BIT     4
-// longjmp in x64_win will issue execption if stack is switched to task thread
+// longjmp in x64_win will issue exception if stack is switched to task thread
 //  to support x64_win, please include setjmp_x64.asm from intel,
 //  and with MACRO below, setjmp/longjmp in setjmp_x64.asm will be used
 #   define VSF_ARCH_SETJMP              SetJumpUser

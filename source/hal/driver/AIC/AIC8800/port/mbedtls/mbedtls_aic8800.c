@@ -220,7 +220,7 @@ int mbedtls_gcm_crypt_and_tag( mbedtls_gcm_context *ctx,
     mbedtls_aes_context *aes_ctx = (mbedtls_aes_context *)(ctx->cipher_ctx.cipher_ctx);
 
     if(iv_len != 12) {
-        dbg("HW unsupport iv_len %d \r\n", iv_len);
+        dbg("HW unsupported iv_len %d \r\n", iv_len);
         return -1;
     }
 

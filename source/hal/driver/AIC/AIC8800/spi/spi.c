@@ -172,7 +172,7 @@ vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
         //NVIC_SetPriority(spi_const->irqn.spi, prio);
 
         // Because the hardware only support up to 64 bytes at a time
-        // So the DMA interrupt of spi needs to be enalbe for the relay function
+        // So the DMA interrupt of spi needs to be enable for the relay function
         NVIC_SetPriority(spi_const->irqn.dma_rx, prio);
         NVIC_SetPriority(spi_const->irqn.dma_tx, prio);
         NVIC_EnableIRQ(spi_const->irqn.dma_rx);

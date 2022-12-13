@@ -199,16 +199,16 @@ extern "C" {
         if ((__evt) == evt)
 
 
-/*! \note IMPORTENT
+/*! \note IMPORTANT
  *        For anything you want to wait, which is coming from vsf
  *        system, you can use vsf_task_wait_until() optionally.
- *        Those includues: VSF_EVT_XXXXX, sempahore, mutex and etc.
+ *        Those includues: VSF_EVT_XXXXX, semaphore, mutex and etc.
  *
  *        For VSF_EVT_XXXX, please use:
  *        vsf_task_wait_until(  on_vsf_task_evt(VSF_EVT_XXXXX) ) ;
  *
  *
- *        For sempahore, please use:
+ *        For semaphore, please use:
  *        vsf_task_wait_until( vsf_sem_pend(...) ) ;
  *
  *

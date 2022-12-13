@@ -191,7 +191,7 @@ bool vk_tgui_refresh_ex(   vsf_tgui_t *gui_ptr,
  *! \retval NULL    No need to refresh (or rendering service is not ready)
  *! \retval !NULL   The actual refresh region
  *!
- *! \note When NULL is returned, current refresh iteration (i.e. a refresh activites
+ *! \note When NULL is returned, current refresh iteration (i.e. a refresh activities
  *!       between vsf_tgui_v_refresh_loop_begin and vsf_tgui_v_refresh_loop_end )
  *!       will be ignored and vsf_tgui_v_refresh_loop_end is called immediately
  */

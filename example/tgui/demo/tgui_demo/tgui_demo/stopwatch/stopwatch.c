@@ -110,7 +110,7 @@ describ_tgui_panel(popup_t, pupup_panel_descriptor,
 #endif
 
     tgui_label(tInformation, tgui_null_parent(popup_t), tInformation, tOK,
-        tgui_text(tLabel, "This is a popup messsage. \nPlease click the OK button to close", false, VSF_TGUI_ALIGN_MID_LEFT),
+        tgui_text(tLabel, "This is a popup message. \nPlease click the OK button to close", false, VSF_TGUI_ALIGN_MID_LEFT),
         tgui_region(0, 56, 400, 80),
         tgui_sv_tile_show_corner(false),
         tgui_sv_font_color(VSF_TGUI_COLOR_BLACK),

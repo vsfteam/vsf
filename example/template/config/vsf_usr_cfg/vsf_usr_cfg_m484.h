@@ -139,7 +139,7 @@
 
 #   if APP_USE_CPP_DEMO != ENABLED
 // simple_libc does not compatible with cpp, so if cpp is used, DO NOT use simple_libc
-//  make sure in inclue path, simple_libc is removed if cpp is used
+//  make sure in include path, simple_libc is removed if cpp is used
 #       define VSF_LINUX_USE_SIMPLE_LIBC                ENABLED
 #           define VSF_LINUX_USE_SIMPLE_STDIO           ENABLED
 #           define VSF_LINUX_USE_SIMPLE_STRING          ENABLED

@@ -184,9 +184,9 @@ typedef struct
     uint16_t aon_max_ke_env_len;
     /// Maximum elements of sch_arb_env supported by aon
     uint16_t aon_max_nb_sch_arb_elt;
-    /// Maximun elements of sch_plan_env supported by aon
+    /// Maximum elements of sch_plan_env supported by aon
     uint16_t aon_max_nb_sch_plan_elt;
-    /// Maximun elements of sch_alarm_env supported by aon
+    /// Maximum elements of sch_alarm_env supported by aon
     uint16_t aon_max_nb_sch_alarm_elt;
     /// Minimum advertising interval in slots(625 us) supported by aon
     uint32_t aon_min_ble_adv_intv;
@@ -213,10 +213,10 @@ typedef struct
     /// Time to cancel sch arbiter elements in advance when switching to cpus (in hus)
     uint16_t aon_sch_arb_cancel_in_advance_time;
     /// Duration of sleep and wake-up algorithm (depends on CPU speed) expressed in half us on cpus side
-    /// should also contian deep_sleep_on rising edge to finecnt halt (max 4 lp cycles) and finecnt resume to dm_slp_irq (0.5 lp cycles)
+    /// should also contain deep_sleep_on rising edge to finecnt halt (max 4 lp cycles) and finecnt resume to dm_slp_irq (0.5 lp cycles)
     uint16_t aon_sleep_algo_dur_cpus;
     /// Duration of sleep and wake-up algorithm (depends on CPU speed) expressed in half us on aon side
-    /// should also contian deep_sleep_on rising edge to finecnt halt (max 4 lp cycles) and finecnt resume to dm_slp_irq (0.5 lp cycles)
+    /// should also contain deep_sleep_on rising edge to finecnt halt (max 4 lp cycles) and finecnt resume to dm_slp_irq (0.5 lp cycles)
     uint16_t aon_sleep_algo_dur_aon;
     /// Threshold that treat fractional part of restore time (in hus) as 1hs on cpus side
     uint16_t aon_restore_time_ceil_cpus;

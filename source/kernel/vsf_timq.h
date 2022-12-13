@@ -27,7 +27,7 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 
 #   include "./vsf_timq_dlist.h"
-// todo: impelement vsf_timq_rbtree.h
+// todo: implement vsf_timq_rbtree.h
 
 #endif
 

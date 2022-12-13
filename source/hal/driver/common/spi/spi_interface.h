@@ -79,7 +79,7 @@ def_interface(i_spi_t)
     } FIFO;
 
     struct {
-        /*! \brief request a block exchaging access
+        /*! \brief request a block exchanging access
          *! \param pOutput      address of output buffer
          *! \param pInput       address of input buffer
          *! \param nCount       the count of data in the two buffers

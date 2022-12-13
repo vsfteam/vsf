@@ -694,7 +694,7 @@ static vsf_err_t __vk_fakefat32_read(vk_fakefat32_mal_t *pthis, uint_fast64_t ad
         // must be computed.
         // Any other value can be used, but is not necessarily correct.
         // Is should be range checked at least to make sure it is <= volume
-        // cluser count.
+        // cluster count.
         put_unaligned_le32(0xFFFFFFFF, &buff[488]);
         // This trail signature is used to validate that this is in fact
         // an FSInfo sector.

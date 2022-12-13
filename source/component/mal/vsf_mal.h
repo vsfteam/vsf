@@ -203,7 +203,7 @@ __vsf_component_peda_ifs(vk_mal_write,
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 /**
  \~english reentrant mal class
- @note Normally, a mal instance is not reentrant. Follow the steps to get mutiple 
+ @note Normally, a mal instance is not reentrant. Follow the steps to get multiple 
         mal instance which is protect with a common mutex.
         1. prepare a common mutex instance for malA
         2. in each task which will asscess malA, implement a vk_reentrant_mal_t instance.

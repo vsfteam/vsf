@@ -1198,7 +1198,7 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         case VSF_USBH_PROBE_WAIT_CONFIG_DESC_SIZE:
             parser->desc_config = vk_usbh_urb_take_buffer(urb);
-            // get full configuation
+            // get full configuration
             err = vk_usbh_get_descriptor(usbh, dev, USB_DT_CONFIG,
                     dev->cur_config, parser->desc_config->wTotalLength);
             break;

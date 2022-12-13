@@ -182,7 +182,7 @@ static const usbd_uac_const_t __user_usbd_uac_const = {
             2,                      // bSourceID
             0,                      // iTerminal
 
-            // Intput Terminal Descriptor
+            // Input Terminal Descriptor
             12,                     // bLength
             0x24,                   // bDescriptorType: CS_INTERFACE
             0x02,                   // bDescriptorSubtype: AC_INPUT_TERMINAL

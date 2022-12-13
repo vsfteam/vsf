@@ -23,7 +23,7 @@ typedef struct {
     uint32_t no_stretch_mode;    
 }iic_cfg_t;
 
-//! \name i2c send request erro state
+//! \name i2c send request error state
 //! @{
 typedef enum {
     IIC_REQ_ON_GOING                    = 0,

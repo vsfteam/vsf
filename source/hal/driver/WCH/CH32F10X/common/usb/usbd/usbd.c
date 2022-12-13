@@ -384,13 +384,13 @@ void ch32f10x_usbd_reset(ch32f10x_usbd_t *usbd, usb_dc_cfg_t *cfg)
 
 void ch32f10x_usbd_connect(ch32f10x_usbd_t *usbd)
 {
-    // set USBDPU, TODO: use MACRO when avialable
+    // set USBDPU, TODO: use MACRO when available
     EXTEN->EXTEN_CTR |= 1 << 1;
 }
 
 void ch32f10x_usbd_disconnect(ch32f10x_usbd_t *usbd)
 {
-    // clear USBDPU, TODO: use MACRO when avialable
+    // clear USBDPU, TODO: use MACRO when available
     EXTEN->EXTEN_CTR &= ~(1 << 1);
 }
 
@@ -691,7 +691,7 @@ void ch32f10x_usbd_irq(ch32f10x_usbd_t *usbd)
     }
     if (status & USB_ISTR_WKUP) {
         reg->ISTR = ~USB_ISTR_WKUP;
-        // TODO: notify wakup
+        // TODO: notify wakeup
     }
     if (status & USB_ISTR_SUSP) {
         reg->ISTR = ~USB_ISTR_SUSP;

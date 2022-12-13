@@ -523,7 +523,7 @@ typedef enum vsf_mmc_feature_t {
 
 /**
  \~english
- @brief flags of mmc tranfer operations
+ @brief flags of mmc transfer operations
  @note vsf_mmc_transop_t is implemented by specific driver.
 
  \~chinese

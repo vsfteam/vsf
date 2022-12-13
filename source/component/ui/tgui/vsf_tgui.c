@@ -775,7 +775,7 @@ loop_start:
                      *             tGUI is mainly designed to support touch screen
                      *             rather than a device with a mouse. So when you
                      *             use PC to simulate a touchscreen, a right click
-                     *             won't change the actived controls. It is a *KNOWN
+                     *             won't change the activated controls. It is a *KNOWN
                      *             ISSUE* and we will *NOT* fix vsf_this, because designing
                      *             an application with normal mouse support is out of
                      *             original scope.

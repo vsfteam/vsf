@@ -257,7 +257,7 @@ struct vsf_pm_pclk_cfg_t {
 //! @{
 struct vsf_pm_mclk_cfg_t {
     vsf_pm_clk_src_sel_t    clk_src;                //!< main clock source
-    uint32_t            freq;                   //!< system oscilator frequency
+    uint32_t            freq;                   //!< system oscillator frequency
     uint16_t            core_div[1];            //!< system core clock divider
     uint16_t            sclk_div[1];            //!< system sync clock divider
 };

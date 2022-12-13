@@ -1384,7 +1384,7 @@ static fsm_rt_t __on_tool_button_click(vsf_tgui_control_t* control_ptr, vsf_msgt
                                    __declaration_buffer, sizeof(__declaration_buffer),
                                    __definition_buffer, sizeof(__definition_buffer));
 
-        printf("%s\n/****** declaration lenght: %8d bytes ******/\n", __declaration_buffer, strlen(__declaration_buffer));
+        printf("%s\n/****** declaration length: %8d bytes ******/\n", __declaration_buffer, strlen(__declaration_buffer));
         printf("%s\n/******  definition length: %8d bytes ******/\n", __definition_buffer, strlen(__definition_buffer));
 
         for (int i = 0; i <= __designer_ptr->ops.current; i++) {
