@@ -24,6 +24,8 @@
 #include "../lovevsf.h"
 
 #include <unistd.h>
+// for MAX_PATH
+#include <linux/limits.h>
 #include <sys/stat.h>
 #include <stdio.h>
 
