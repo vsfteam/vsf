@@ -35,6 +35,7 @@
 #   include "../../include/fcntl.h"
 #   include "../../include/errno.h"
 #   include "../../include/termios.h"
+#   include "../../include/linux/limits.h"
 #else
 #   include <unistd.h>
 #   include <sys/stat.h>
@@ -44,6 +45,8 @@
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
+// for MAX_PATH
+#   include <linux/limits.h>
 #endif
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED

@@ -5,7 +5,7 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./simple_libc/stddef.h"
-#   include "./linux/limits.h"
+//#   include "./linux/limits.h"
 #   include "./sys/types.h"
 #   include "./sys/select.h"
 #   include "./pwd.h"
@@ -15,7 +15,10 @@
 #   define __USE_LOCAL_STDIO__
 #else
 #   include <stddef.h>
-#   include <linux/limits.h>
+// avoid to include <linux/xxx.h>, because it will introduce kernel structures,
+//  which will maybe conflict with user structures with the same name.
+//  include <linux/limits.h> in source file for MAX_PATH
+//#   include <linux/limits.h>
 #   include <sys/types.h>
 #   include <sys/select.h>
 #   include <pwd.h>

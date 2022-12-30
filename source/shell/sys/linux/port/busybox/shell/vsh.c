@@ -10,12 +10,15 @@
 #   include "../../../include/sys/wait.h"
 #   include "../../../include/dirent.h"
 #   include "../../../include/fcntl.h"
+#   include "../../../include/linux/limits.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
 #   include <sys/wait.h>
 #   include <dirent.h>
 #   include <fcntl.h>
+// for MAX_PATH
+#   include <linux/limits.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_CTYPE == ENABLED
 #   include "../../../include/simple_libc/ctype.h"

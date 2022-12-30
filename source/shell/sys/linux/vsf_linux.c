@@ -48,6 +48,7 @@
 #   include "./include/spawn.h"
 #   include "./include/langinfo.h"
 #   include "./include/poll.h"
+#   include "./include/linux/limits.h"
 #else
 #   include <unistd.h>
 #   include <sched.h>
@@ -69,6 +70,8 @@
 #   include <spawn.h>
 #   include <langinfo.h>
 #   include <poll.h>
+// for MAX_PATH
+#   include <linux/limits.h>
 #endif
 #include <stdarg.h>
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED

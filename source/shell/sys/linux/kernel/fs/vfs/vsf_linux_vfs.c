@@ -24,8 +24,11 @@
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../include/unistd.h"
+#   include "../../../include/linux/limits.h"
 #else
 #   include <unistd.h>
+// for MAX_PATH
+#   include <linux/limits.h>
 #endif
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
