@@ -325,6 +325,9 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                 ip_reset_option(conn->pcb.ip, optname);
             }
             break;
+        case SO_SNDBUF:
+            // ignore without error
+            break;
         case SO_RCVBUF:
             netconn_set_recvbufsize(conn, *(const int *)optval);
             break;
@@ -384,6 +387,9 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             } else {
                 tcp_nagle_enable(conn->pcb.tcp);
             }
+            break;
+        case TCP_MAXSEG:
+            // TODO: add support
             break;
         case TCP_KEEPALIVE:
             conn->pcb.tcp->keep_idle = (u32_t)(*(const int *)optval);

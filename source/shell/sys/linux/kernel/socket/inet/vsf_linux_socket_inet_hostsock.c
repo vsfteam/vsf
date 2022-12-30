@@ -149,6 +149,7 @@ enum {
 #define VSF_LINUX_SOCKET_SO_REUSEADDR   2
 #define VSF_LINUX_SOCKET_SO_ERROR       4
 #define VSF_LINUX_SOCKET_SO_BROADCAST   6
+#define VSF_LINUX_SOCKET_SO_SNDBUF      7
 #define VSF_LINUX_SOCKET_SO_RCVBUF      8
 #define VSF_LINUX_SOCKET_SO_KEEPALIVE   9
 #define VSF_LINUX_SOCKET_SO_LINGER      13
@@ -191,6 +192,7 @@ struct vsf_linux_socket_sockaddr_in {
 
 // from netinet/tcp.h
 #define VSF_LINUX_SOCKET_TCP_NODELAY    1
+#define VSF_LINUX_SOCKET_TCP_MAXSEG     2
 #define VSF_LINUX_SOCKET_TCP_KEEPALIVE  100
 
 // from vsf_linux_socket.h
@@ -634,6 +636,7 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
         switch (optname) {
         case VSF_LINUX_SOCKET_SO_BROADCAST:     optname = SO_BROADCAST;     break;
         case VSF_LINUX_SOCKET_SO_KEEPALIVE:     optname = SO_KEEPALIVE;     break;
+        case VSF_LINUX_SOCKET_SO_SNDBUF:        optname = SO_SNDBUF;        break;
         case VSF_LINUX_SOCKET_SO_RCVBUF:        optname = SO_RCVBUF;        break;
         case VSF_LINUX_SOCKET_SO_REUSEADDR:     optname = SO_REUSEADDR;     break;
         case VSF_LINUX_SOCKET_SO_RCVTIMEO: {
@@ -675,6 +678,7 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
         level = IPPROTO_TCP;
         switch (optname) {
         case VSF_LINUX_SOCKET_TCP_NODELAY:      optname = TCP_NODELAY;      break;
+        case VSF_LINUX_SOCKET_TCP_MAXSEG:       return 0;
         case VSF_LINUX_SOCKET_TCP_KEEPALIVE:    optname = SO_KEEPALIVE;     break;
         default:                                VSF_LINUX_ASSERT(false);    break;
         }
@@ -704,6 +708,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
         switch (optname) {
         case VSF_LINUX_SOCKET_SO_BROADCAST:     optname = SO_BROADCAST;     break;
         case VSF_LINUX_SOCKET_SO_KEEPALIVE:     optname = SO_KEEPALIVE;     break;
+        case VSF_LINUX_SOCKET_SO_SNDBUF:        optname = SO_SNDBUF;        break;
         case VSF_LINUX_SOCKET_SO_RCVBUF:        optname = SO_RCVBUF;        break;
         case VSF_LINUX_SOCKET_SO_REUSEADDR:     optname = SO_REUSEADDR;     break;
         case VSF_LINUX_SOCKET_SO_ERROR:         optname = SO_ERROR;         break;
