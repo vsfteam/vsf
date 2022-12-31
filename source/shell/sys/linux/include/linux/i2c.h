@@ -40,9 +40,9 @@ extern "C" {
 
 #define I2C_SMBUS_BLOCK_MAX             32
 union i2c_smbus_data {
-    __u8 byte;
-    __u16 word;
-    __u8 block[I2C_SMBUS_BLOCK_MAX + 2];
+    uint8_t byte;
+    uint16_t word;
+    uint8_t block[I2C_SMBUS_BLOCK_MAX + 2];
 };
 
 #define I2C_SMBUS_READ                  1
