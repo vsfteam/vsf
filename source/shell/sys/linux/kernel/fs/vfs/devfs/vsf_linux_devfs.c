@@ -28,6 +28,7 @@
 #define __VSF_DISP_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
+#   include "shell/sys/linux/include/linux/types.h"
 #   include "shell/sys/linux/include/errno.h"
 #   include "shell/sys/linux/include/poll.h"
 #   include "shell/sys/linux/include/termios.h"
@@ -42,6 +43,7 @@
 #   include "shell/sys/linux/include/linux/spi/spidev.h"
 #else
 #   include <unistd.h>
+#   include <linux/types.h>
 #   include <errno.h>
 #   include <poll.h>
 #   include <termios.h>
