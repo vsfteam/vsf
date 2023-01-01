@@ -470,6 +470,8 @@ static vsf_err_t __vk_dwcotg_dcd_ep_out_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, ui
     struct dwcotg_dev_out_ep_regs_t *out_regs = &dwcotg_dcd->reg.dev.ep.out_regs[ep_idx];
     vk_dwcotg_dcd_trans_t *trans = &dwcotg_dcd->trans[ep_idx];
     uint_fast32_t size = trans->remain, max_size;
+
+    VSF_USB_ASSERT(ep_size != 0);
     if (0 == ep_idx) {
         // pkt_cnt can only be 1(has only 1 bit) for EP0
         max_size = ep_size;
@@ -540,8 +542,9 @@ static vsf_err_t __vk_dwcotg_dcd_ep_in_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, uin
     volatile uint32_t *ep_ctrl = __vk_dwcotg_dcd_get_ep_ctrl(dwcotg_dcd, ep_idx | 0x80);
     struct dwcotg_dev_in_ep_regs_t *in_regs = &dwcotg_dcd->reg.dev.ep.in_regs[ep_idx];
     vk_dwcotg_dcd_trans_t *trans = &dwcotg_dcd->trans[VSF_DWCOTG_DCD_CFG_EP_NUM + ep_idx];
-
     uint_fast32_t size = trans->remain, max_size;
+
+    VSF_USB_ASSERT(ep_size != 0);
     if (0 == ep_idx) {
         // pkt_cnt can only be 1(has only 1 bit) for EP0
         max_size = ep_size;
