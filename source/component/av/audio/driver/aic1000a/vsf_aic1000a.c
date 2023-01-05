@@ -615,6 +615,8 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
                 // player/tx
                 // wait data to be filled for tick-tock operation
                 if (vsf_stream_get_free_size(stream) != 0) {
+                    // dummy read to accept next VSF_STREAM_ON_IN event
+                    vsf_stream_read(stream, NULL, 0);
                     return;
                 }
                 i2s_cfg.feature = 16 == dev->dac.sample_bitlen ? I2S_DATA_BITLEN_16 : I2S_DATA_BITLEN_24;
