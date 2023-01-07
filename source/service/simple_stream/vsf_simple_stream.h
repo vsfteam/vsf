@@ -80,6 +80,30 @@ extern "C" {
 #   define VSF_STREAM_CFG_THRESHOLD                     ENABLED
 #endif
 
+// stream adapter
+
+#define __VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX)                     \
+            .stream_tx          = (vsf_stream_t *)(__STREAM_TX),                \
+            .stream_rx          = (vsf_stream_t *)(__STREAM_RX),
+#define VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX)                       \
+            __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX))
+
+#define __declare_stream_adapter(__name)                                        \
+            vsf_dcl_class(vsf_stream_adapter_t)
+
+#define declare_stream_adapter(__name)                                          \
+            __declare_stream_adapter(__name)
+#define dcl_stream_adapter(__name)                                              \
+            declare_stream_adapter(__name)
+
+#define __describe_stream_adapter(__name, __stream_tx, __stream_rx)             \
+            vsf_stream_adapter_t __name = {                                     \
+                VSF_STREAM_ADAPTER_INIT(__stream_tx, __stream_rx)               \
+            };
+
+#define describe_stream_adapter(__name, __stream_tx, __stream_rx)               \
+            __describe_stream_adapter(__name, (__stream_tx), (__stream_rx))
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 // VSF_STREAM_XXX in upper case is compatible with all stream classes
@@ -181,6 +205,13 @@ vsf_class(vsf_stream_op_t) {
     )
 };
 
+/**
+ * \~english vsf steam terminal class, each stream has a tx terminal and a rx terminal
+ * @note TODO
+ *
+ * \~chinese vsf 流终端类, 每个流都有收发 2 个终端
+ * @note TODO
+ */
 vsf_class(vsf_stream_terminal_t) {
 
     public_member(
@@ -197,6 +228,13 @@ vsf_class(vsf_stream_terminal_t) {
     )
 };
 
+/**
+ * \~english vsf steam class
+ * @note TODO
+ *
+ * \~chinese vsf 流类
+ * @note TODO
+ */
 vsf_class(vsf_stream_t) {
 
     public_member(
@@ -215,6 +253,20 @@ vsf_class(vsf_stream_t) {
             };
             vsf_stream_terminal_t terminal[2];
         };
+    )
+};
+
+/**
+ * \~english vsf steam adapter class, used to connect 2 streams
+ * @note stream terminal connection: stream_tx.rx <==> stream_rx.tx
+ *
+ * \~chinese vsf 流适配器类, 用于连接 2 个流
+ * @note 流终端连接方式: stream_tx.rx <==> stream_rx.tx
+ */
+vsf_class(vsf_stream_adapter_t) {
+    public_member(
+        vsf_stream_t *stream_tx;
+        vsf_stream_t *stream_rx;
     )
 };
 
@@ -276,6 +328,8 @@ extern bool vsf_stream_is_tx_connected(vsf_stream_t *stream);
 extern void __vsf_stream_on_read(vsf_stream_t *stream);
 extern void __vsf_stream_on_write(vsf_stream_t *stream);
 #endif
+
+extern void vsf_stream_adapter_init(vsf_stream_adapter_t *adapter);
 
 #ifdef __cplusplus
 }

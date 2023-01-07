@@ -242,4 +242,38 @@ vsf_err_t vsf_stream_fini(vsf_stream_t *stream)
     return VSF_ERR_NONE;
 }
 
+static void __vsf_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
+{
+    vsf_stream_adapter_t *adapter = param;
+    uint_fast32_t in_size, out_size, all_size = 0;
+    uint8_t *buffer;
+
+    if (    (VSF_STREAM_ON_DISCONNECT == evt)
+        ||  ((stream == adapter->stream_rx) && (VSF_STREAM_ON_CONNECT == evt))) {
+        return;
+    }
+
+    while ((in_size = vsf_stream_get_rbuf(adapter->stream_tx, &buffer)) > 0) {
+        out_size = vsf_stream_write(adapter->stream_rx, buffer, in_size);
+        all_size += out_size;
+        if (out_size < in_size) {
+            if (all_size > 0) {
+                vsf_stream_read(adapter->stream_tx, NULL, all_size);
+            }
+            break;
+        }
+    }
+}
+
+void vsf_stream_adapter_init(vsf_stream_adapter_t *adapter)
+{
+    adapter->stream_rx->tx.evthandler = __vsf_stream_adapter_evthandler;
+    adapter->stream_rx->tx.param = adapter;
+    vsf_stream_connect_tx(adapter->stream_rx);
+
+    adapter->stream_tx->rx.evthandler = __vsf_stream_adapter_evthandler;
+    adapter->stream_tx->rx.param = adapter;
+    vsf_stream_connect_rx(adapter->stream_tx);
+}
+
 #endif      // VSF_USE_SIMPLE_STREAM
