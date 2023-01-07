@@ -453,12 +453,24 @@ extern vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr);
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_I2S_CFG_FUNCTION_RENAME == ENABLED
-#   define __vsf_i2s_t                       VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_t)
-#   define vsf_i2s_init(__i2s, ...)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_init)          ((__vsf_i2s_t *)__i2s, ##__VA_ARGS__)
-#   define vsf_i2s_enable(__i2s)             VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_enable)        ((__vsf_i2s_t *)__i2s)
-#   define vsf_i2s_disable(__i2s)            VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_disable)       ((__vsf_i2s_t *)__i2s)
-#   define vsf_i2s_status(__i2s)             VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_status)        ((__vsf_i2s_t *)__i2s)
-#   define vsf_i2s_capability(__i2s)         VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_capability)    ((__vsf_i2s_t *)__i2s)
+#   define __vsf_i2s_t                      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_t)
+#   define vsf_i2s_init(__i2s, ...)         VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_init)         ((__vsf_i2s_t *)__i2s, ##__VA_ARGS__)
+#   define vsf_i2s_enable(__i2s)            VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_enable)       ((__vsf_i2s_t *)__i2s)
+#   define vsf_i2s_disable(__i2s)           VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_disable)      ((__vsf_i2s_t *)__i2s)
+#   define vsf_i2s_status(__i2s)            VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_status)       ((__vsf_i2s_t *)__i2s)
+#   define vsf_i2s_capability(__i2s)        VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_capability)   ((__vsf_i2s_t *)__i2s)
+
+#   define vsf_i2s_tx_init(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_init)      ((__vsf_i2s_t *)__i2s, ##__VA_ARGS__)
+#   define vsf_i2s_tx_fini(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_fini)      ((__vsf_i2s_t *)__i2s, ##__VA_ARGS__)
+#   define vsf_i2s_tx_start(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_start)     ((__vsf_i2s_t *)__i2s)
+#   define vsf_i2s_tx_pause(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_pause)     ((__vsf_i2s_t *)__i2s)
+#   define vsf_i2s_tx_resume(__i2s)         VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_resume)    ((__vsf_i2s_t *)__i2s)
+
+#   define vsf_i2s_rx_init(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_init)      ((__vsf_i2s_t *)__i2s, ##__VA_ARGS__)
+#   define vsf_i2s_rx_fini(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_fini)      ((__vsf_i2s_t *)__i2s, ##__VA_ARGS__)
+#   define vsf_i2s_rx_start(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_start)     ((__vsf_i2s_t *)__i2s)
+#   define vsf_i2s_rx_pause(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_pause)     ((__vsf_i2s_t *)__i2s)
+#   define vsf_i2s_rx_resume(__i2s)         VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_resume)    ((__vsf_i2s_t *)__i2s)
 #endif
 
 #ifdef __cplusplus
