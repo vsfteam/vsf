@@ -527,6 +527,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         dev->stream[dev->stream_num].dir_in1out0 = 1;
         dev->stream[dev->stream_num].format.value = 0;
         dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_capture;
+        dev->stream_num++;
         memset(&dev->adc, 0, sizeof(dev->adc));
 #endif
 
