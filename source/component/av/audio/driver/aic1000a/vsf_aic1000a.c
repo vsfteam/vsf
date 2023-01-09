@@ -554,7 +554,7 @@ void __vk_aic1000a_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_i2s_irq_
         orig = vsf_protect_int();
         buffer_size = vsf_stream_get_wbuf(stream, &buffer);
         if (buffer_size < (buffsize >> 1)) {
-            dev->dac.stream_paused = true;
+            dev->adc.stream_paused = true;
             vsf_unprotect_int(orig);
             __vk_audio_i2s_rx_pause(&dev->use_as____vk_audio_i2s_dev_t);
             return;
