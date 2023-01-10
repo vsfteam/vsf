@@ -113,6 +113,10 @@ void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t direction_ma
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
+    // GPIOB0 can only be used in the input direction
+    VSF_HAL_ASSERT(   (hw_gpio_ptr->is_pmic != 1)
+                   || ((pin_mask & VSF_PIN0_MASK) != VSF_PIN0_MASK)
+                   || ((direction_mask & VSF_PIN0_MASK) != VSF_PIN0_MASK));
 
     __hw_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->GPIO->DR, direction_mask, pin_mask);
 }
