@@ -103,7 +103,7 @@ void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *pthis, uint32_t pin_mask, uint32_t fe
     vsf_hw_gpio_unprotect(state);
 }
 
-void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *pthis, uint32_t direction_mask, uint32_t pin_mask)
+void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *pthis, uint32_t pin_mask, uint32_t direction_mask)
 {
     GPIO_T *reg = pthis->reg;
 
@@ -160,7 +160,7 @@ uint32_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *pthis, uint32_t pin_mask)
 
 void vsf_hw_gpio_set_input(vsf_hw_gpio_t *pthis, uint32_t pin_mask)
 {
-    vsf_hw_gpio_set_direction(pthis, 0, pin_mask);
+    vsf_hw_gpio_set_direction(pthis, pin_mask, 0);
 }
 
 void vsf_hw_gpio_set_output(vsf_hw_gpio_t *pthis, uint32_t pin_mask)
@@ -171,7 +171,7 @@ void vsf_hw_gpio_set_output(vsf_hw_gpio_t *pthis, uint32_t pin_mask)
 void vsf_hw_gpio_switch_direction(vsf_hw_gpio_t *pthis, uint32_t pin_mask)
 {
     uint32_t direction = vsf_hw_gpio_get_direction(pthis, pin_mask);
-    vsf_hw_gpio_set_direction(pthis, pin_mask ^ direction, pin_mask);
+    vsf_hw_gpio_set_direction(pthis, pin_mask, pin_mask ^ direction);
 }
 
 uint32_t vsf_hw_gpio_read(vsf_hw_gpio_t *pthis)
@@ -180,7 +180,7 @@ uint32_t vsf_hw_gpio_read(vsf_hw_gpio_t *pthis)
     return reg->PIN;
 }
 
-void vsf_hw_gpio_write(vsf_hw_gpio_t *pthis, uint32_t value, uint32_t pin_mask)
+void vsf_hw_gpio_write(vsf_hw_gpio_t *pthis, uint32_t pin_mask, uint32_t value)
 {
     GPIO_T *reg = pthis->reg;
     uint32_t mask = reg->DATMSK;

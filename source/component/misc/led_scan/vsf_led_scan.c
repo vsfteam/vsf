@@ -89,7 +89,7 @@ void vsf_led_scan_config_pin(vsf_led_scan_t *scan, uint32_t pin_mask, uint32_t f
 {
 }
 
-void vsf_led_scan_set_direction(vsf_led_scan_t *scan, uint32_t direction_mask, uint32_t pin_mask)
+void vsf_led_scan_set_direction(vsf_led_scan_t *scan, uint32_t pin_mask, uint32_t direction_mask)
 {
     VSF_HAL_ASSERT((direction_mask & pin_mask) == pin_mask);
 

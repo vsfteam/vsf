@@ -77,13 +77,13 @@ extern "C" {
 #define VSF_GPIO_APIS(__prefix_name)                                                                                                                                                \
     __VSF_HAL_TEMPLATE_API(__prefix_name, gpio_capability_t, gpio, capability,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                                \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, config_pin,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask, vsf_io_feature_t feature)   \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask)    \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask, uint32_t direction_mask)    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,          gpio, get_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_input,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set_output,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, switch_direction, VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,          gpio, read,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, write,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t value, uint32_t pin_mask)             \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, write,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask, uint32_t value)             \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, set,              VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, clear,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,              gpio, toggle,           VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
@@ -103,7 +103,7 @@ typedef struct gpio_capability_t {
     uint8_t is_async                     : 1;
 
     uint8_t is_support_config_pin        : 1;
-    
+
     uint8_t is_support_output_and_set    : 1;
     uint8_t is_support_output_and_clear  : 1;
 
@@ -179,12 +179,12 @@ extern void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
  \~chinese
  @brief 设置 gpio 实例的一个或者多个引脚的方向
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
- @param[in] direction_mask: 方向掩码，1 表示输出，0 表示输入
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，该bit的值位1表示需要配置
+ @param[in] direction_mask: 方向掩码，1 表示输出，0 表示输入
  */
 extern void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr,
-                                   uint32_t direction_mask,
-                                   uint32_t pin_mask);
+                                   uint32_t pin_mask,
+                                   uint32_t direction_mask);
 
 /**
  \~english
@@ -269,12 +269,12 @@ extern uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
  \~chinese
  @brief 设置 gpio 实例的一个或者多个的值
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
- @param[in] value: 引脚的值，每一个引脚对应一个位，1 表示高电平，0 表示高电平
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要写入，0表示该位不需要更新
+ @param[in] value: 引脚的值，每一个引脚对应一个位，1 表示高电平，0 表示高电平
  */
 extern void vsf_gpio_write( vsf_gpio_t *gpio_ptr,
-                                uint32_t value,
-                                uint32_t pin_mask);
+                            uint32_t pin_mask,
+                            uint32_t value);
 
 /**
  \~english

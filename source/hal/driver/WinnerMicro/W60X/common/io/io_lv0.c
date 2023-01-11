@@ -65,12 +65,12 @@ void vsf_gpio_config_pin(       vsf_gpio_t *pthis,
 {
     w600_gpio_reg_t *reg = (w600_gpio_reg_t *)pthis->reg;
 
-    
+
 }
 
 void vsf_gpio_set_direction(    vsf_gpio_t *pthis,
-                                uint_fast32_t direction_mask,
-                                uint32_t pin_mask)
+                                uint32_t pin_mask,
+                                uint_fast32_t direction_mask)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();
@@ -112,14 +112,14 @@ uint_fast32_t vsf_hal_gpio_read(vsf_gpio_t *pthis)
     return pthis->reg->IN;
 }
 
-void vsf_gpio_write(vsf_gpio_t *pthis, uint_fast32_t value, uint32_t pin_mask)
+void vsf_gpio_write(vsf_gpio_t *pthis, uint32_t pin_mask, uint_fast32_t value)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();
         reg->OUT = (reg->OUT & ~pin_mask) | (value & pin_mask);
     vsf_gpio_unprotect(state);
 }
-     
+
 void vsf_gpio_set(vsf_gpio_t *pthis, uint32_t pin_mask)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
@@ -144,7 +144,7 @@ void vsf_gpio_toggle(vsf_gpio_t *pthis, uint32_t pin_mask)
     vsf_gpio_unprotect(state);
 }
 
-/*! \brief gpio batch configuration 
+/*! \brief gpio batch configuration
            an implementation example:
 
 static bool vsf_gpio_config( vsf_io_cfg_t *cfg_ptr, uint_fast8_t count )
@@ -161,7 +161,7 @@ static bool vsf_gpio_config( vsf_io_cfg_t *cfg_ptr, uint_fast8_t count )
 
         //! get pin feature and make sure pin-input is enabled by default
         //! this is an example to enable some feature to be default.
-        uint_fast8_t feature = cfg_ptr->feature ^ IOCTRL_PIN_IE_MSK;   
+        uint_fast8_t feature = cfg_ptr->feature ^ IOCTRL_PIN_IE_MSK;
 
         //! set pin feature: this is the most optimal solution
         GSP_IOCTRL.PIN[pin_index].Value = feature;
@@ -180,9 +180,9 @@ static bool vsf_gpio_config( vsf_io_cfg_t *cfg_ptr, uint_fast8_t count )
         ...
 
         //! I know this is ugly, but some times, the two methods aforementioned
-        //! can be combined. So you should fully use the 32 bit of the 
+        //! can be combined. So you should fully use the 32 bit of the
         //! cfg_ptr->feature
-                
+
         //! set pin function selection
         IOCTRL_FUNCTION_SELECT(pin_index, function);
 
