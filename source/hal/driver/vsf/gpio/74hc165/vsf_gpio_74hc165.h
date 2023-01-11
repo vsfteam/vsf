@@ -83,13 +83,13 @@ vsf_class(vsf_74hc165_gpio_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_74hc165_gpio_config_pin(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask, uint_fast32_t feature);
-extern void vsf_74hc165_gpio_set_direction(vsf_74hc165_gpio_t *gpio_ptr, uint32_t direction_mask, uint32_t pin_mask);
+extern void vsf_74hc165_gpio_set_direction(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t direction_mask);
 extern uint32_t vsf_74hc165_gpio_get_direction(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask);
 extern void vsf_74hc165_gpio_set_input(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask);
 extern void vsf_74hc165_gpio_set_output(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask);
 extern void vsf_74hc165_gpio_switch_direction(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask);
 extern uint32_t vsf_74hc165_gpio_read(vsf_74hc165_gpio_t *gpio_ptr);
-extern void vsf_74hc165_gpio_write(vsf_74hc165_gpio_t *gpio_ptr, uint32_t value, uint32_t pin_mask);
+extern void vsf_74hc165_gpio_write(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t value);
 extern void vsf_74hc165_gpio_set(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask);
 extern void vsf_74hc165_gpio_clear(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask);
 extern void vsf_74hc165_gpio_toggle(vsf_74hc165_gpio_t *gpio_ptr, uint32_t pin_mask);

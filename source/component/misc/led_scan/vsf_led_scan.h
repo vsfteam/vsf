@@ -100,7 +100,7 @@ vsf_class(vsf_led_scan_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_led_scan_config_pin(vsf_led_scan_t *scan, uint32_t pin_mask, uint32_t feature);
-extern void vsf_led_scan_set_direction(vsf_led_scan_t *scan, uint32_t direction_mask, uint32_t pin_mask);
+extern void vsf_led_scan_set_direction(vsf_led_scan_t *scan, uint32_t pin_mask, uint32_t direction_mask);
 extern uint32_t vsf_led_scan_get_direction(vsf_led_scan_t *scan, uint32_t pin_mask);
 extern void vsf_led_scan_switch_direction(vsf_led_scan_t *scan, uint32_t pin_mask);
 extern void vsf_led_scan_set_input(vsf_led_scan_t *scan, uint32_t pin_mask);

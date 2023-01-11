@@ -117,8 +117,8 @@ void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_sp
 {
 #if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
     vsf_gpio_write(disp_mipi_spi_lcd->reset.gpio,
-                   level ? disp_mipi_spi_lcd->reset.pin_mask : 0,
-                   disp_mipi_spi_lcd->reset.pin_mask);
+                   disp_mipi_spi_lcd->reset.pin_mask,
+                   level ? disp_mipi_spi_lcd->reset.pin_mask : 0);
 #endif
 }
 #endif
@@ -128,8 +128,8 @@ void vsf_disp_mipi_spi_lcd_dcx_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lc
 {
 #if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
     vsf_gpio_write(disp_mipi_spi_lcd->dcx.gpio,
-                   level ? disp_mipi_spi_lcd->dcx.pin_mask : 0,
-                   disp_mipi_spi_lcd->dcx.pin_mask);
+                   disp_mipi_spi_lcd->dcx.pin_mask,
+                   level ? disp_mipi_spi_lcd->dcx.pin_mask : 0);
 #endif
 }
 

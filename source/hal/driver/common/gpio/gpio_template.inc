@@ -100,7 +100,7 @@ void vsf_real_gpio_set_input(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
 
-    vsf_real_gpio_set_direction(gpio_ptr, 0, pin_mask);
+    vsf_real_gpio_set_direction(gpio_ptr, pin_mask, 0);
 }
 #endif
 
@@ -121,7 +121,7 @@ void vsf_real_gpio_switch_direction(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask
     VSF_HAL_ASSERT(0 != pin_mask);
 
     uint32_t ret = ~vsf_real_gpio_get_direction(gpio_ptr, pin_mask);
-    vsf_real_gpio_set_direction(gpio_ptr, ret, pin_mask);
+    vsf_real_gpio_set_direction(gpio_ptr, pin_mask, ret);
 }
 #endif
 
@@ -141,7 +141,7 @@ void vsf_real_gpio_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
 
-    vsf_real_gpio_write(gpio_ptr, 0, pin_mask);
+    vsf_real_gpio_write(gpio_ptr, pin_mask, 0);
 }
 #endif
 
