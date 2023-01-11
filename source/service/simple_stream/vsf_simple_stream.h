@@ -82,11 +82,20 @@ extern "C" {
 
 // stream adapter
 
-#define __VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX)                     \
+#define __VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX, __THRESHOLD, __BLOCK_SIZE)\
             .stream_tx          = (vsf_stream_t *)(__STREAM_TX),                \
-            .stream_rx          = (vsf_stream_t *)(__STREAM_RX),
-#define VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX)                       \
-            __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX))
+            .stream_rx          = (vsf_stream_t *)(__STREAM_RX),                \
+            .threshold          = (__THRESHOLD),                                \
+            .block_size         = (__BLOCK_SIZE),
+#define VSF_STREAM_ADAPTER_INIT0(__STREAM_TX, __STREAM_RX)                      \
+            __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX), 0, 0)
+#define VSF_STREAM_ADAPTER_INIT1(__STREAM_TX, __STREAM_RX, __THRESHOLD)         \
+            __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX), (__THRESHOLD), 0)
+#define VSF_STREAM_ADAPTER_INIT2(__STREAM_TX, __STREAM_RX, __THRESHOLD, __BLOCK_SIZE)\
+            __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX), (__THRESHOLD), (__BLOCK_SIZE))
+// prototype: VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX, __THRESHOLD = 0, __BLOCK_SIZE = 0)
+#define VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX, ...)                  \
+            __PLOOC_EVAL(VSF_STREAM_ADAPTER_INIT, __VA_ARGS__)((__STREAM_TX), (__STREAM_RX), ##__VA_ARGS__)
 
 #define __declare_stream_adapter(__name)                                        \
             vsf_dcl_class(vsf_stream_adapter_t)
@@ -96,13 +105,20 @@ extern "C" {
 #define dcl_stream_adapter(__name)                                              \
             declare_stream_adapter(__name)
 
-#define __describe_stream_adapter(__name, __stream_tx, __stream_rx)             \
+#define __describe_stream_adapter(__name, __stream_tx, __stream_rx, __threshold, __block_size)\
             vsf_stream_adapter_t __name = {                                     \
-                VSF_STREAM_ADAPTER_INIT(__stream_tx, __stream_rx)               \
+                VSF_STREAM_ADAPTER_INIT((__stream_tx), (__stream_rx), (__threshold), (__block_size))\
             };
 
-#define describe_stream_adapter(__name, __stream_tx, __stream_rx)               \
-            __describe_stream_adapter(__name, (__stream_tx), (__stream_rx))
+#define describe_stream_adapter0(__name, __stream_tx, __stream_rx)              \
+            __describe_stream_adapter(__name, (__stream_tx), (__stream_rx), 0, 0)
+#define describe_stream_adapter1(__name, __stream_tx, __stream_rx, __threshold) \
+            __describe_stream_adapter(__name, (__stream_tx), (__stream_rx), (__threshold), 0)
+#define describe_stream_adapter2(__name, __stream_tx, __stream_rx, __threshold, __block_size) \
+            __describe_stream_adapter(__name, (__stream_tx), (__stream_rx), (__threshold), __block_size)
+// prototype: describe_stream_adapter(__name, __stream_tx, __stream_rx, __threshold = 0, __block_size = 0)
+#define describe_stream_adapter(__name, __stream_tx, __stream_rx, ...)          \
+            __PLOOC_EVAL(describe_stream_adapter, __VA_ARGS__)(__name, (__stream_tx), (__stream_rx), ##__VA_ARGS__)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -267,6 +283,9 @@ vsf_class(vsf_stream_adapter_t) {
     public_member(
         vsf_stream_t *stream_tx;
         vsf_stream_t *stream_rx;
+
+        uint32_t threshold;
+        uint32_t block_size;
     )
 };
 

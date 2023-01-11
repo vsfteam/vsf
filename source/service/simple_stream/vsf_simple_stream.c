@@ -245,7 +245,7 @@ vsf_err_t vsf_stream_fini(vsf_stream_t *stream)
 static void __vsf_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vsf_stream_adapter_t *adapter = param;
-    uint_fast32_t in_size, out_size, all_size = 0;
+    uint_fast32_t in_size, out_size, all_size = 0, threshold = adapter->threshold > 0 ? adapter->threshold-- : 0;
     uint8_t *buffer;
 
     if (    (VSF_STREAM_ON_DISCONNECT == evt)
@@ -253,7 +253,10 @@ static void __vsf_stream_adapter_evthandler(vsf_stream_t *stream, void *param, v
         return;
     }
 
-    while ((in_size = vsf_stream_get_rbuf(adapter->stream_tx, &buffer)) > 0) {
+    while ((in_size = vsf_stream_get_rbuf(adapter->stream_tx, &buffer)) > threshold) {
+        if (adapter->block_size > 0) {
+            in_size -= in_size % adapter->block_size;
+        }
         out_size = vsf_stream_write(adapter->stream_rx, buffer, in_size);
         all_size += out_size;
         if (out_size < in_size) {
