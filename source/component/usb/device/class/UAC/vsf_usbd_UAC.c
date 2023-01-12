@@ -454,7 +454,7 @@ static void __vk_usbd_uac_as_on_finish(void *param)
         orig = vsf_protect_int();
             uac_as->is_submitted = false;
         vsf_unprotect_int(orig);
-        __vk_usbd_uac_as_evthandler(uac_as->stream, uac_as, VSF_STREAM_ON_RX);
+        __vk_usbd_uac_as_evthandler(stream, uac_as, VSF_STREAM_ON_RX);
     } else {
         if (!uac_as->trans.size) {
             vsf_stream_write(stream, NULL, uac_as->packet_size);
@@ -462,7 +462,7 @@ static void __vk_usbd_uac_as_on_finish(void *param)
         orig = vsf_protect_int();
             uac_as->is_submitted = false;
         vsf_unprotect_int(orig);
-        __vk_usbd_uac_as_evthandler(uac_as->stream, uac_as, VSF_STREAM_ON_TX);
+        __vk_usbd_uac_as_evthandler(stream, uac_as, VSF_STREAM_ON_TX);
     }
 }
 
