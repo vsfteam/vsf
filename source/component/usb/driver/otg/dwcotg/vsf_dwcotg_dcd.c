@@ -494,10 +494,10 @@ static vsf_err_t __vk_dwcotg_dcd_ep_out_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, ui
         out_regs->doepdma = (uint32_t)trans->buffer;
     }
 
-    // TODO: seems for iso ep OUT, code below is not necessary
-    //  report to author if any problem
-    if (0) {
-        // set odd/even frame for iso IN endpoint
+    // set odd/even frame for iso IN endpoint, necessary in non-high speed mode
+    // TODO: need test
+    struct dwcotg_dev_global_regs_t *dev_global_regs = dwcotg_dcd->reg.dev.global_regs;
+    if (dev_global_regs->dsts & USB_OTG_DSTS_ENUMSPD) {
         if (1 == ((*ep_ctrl >> 18) & 0x03)) {
             if (vk_dwcotg_dcd_get_frame_number(dwcotg_dcd) & 1) {
                 out_regs->doepctl |= USB_OTG_DOEPCTL_SD0PID_SEVNFRM;
