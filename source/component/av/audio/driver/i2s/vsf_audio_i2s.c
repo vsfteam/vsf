@@ -39,7 +39,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t __vk_audio_i2s_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
+vsf_err_t __vk_audio_i2s_init(vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
 {
     if (cfg != NULL) {
         if ((cfg->data_sample_rate != 0) && (cfg->data_sample_rate != cfg->hw_sample_rate)) {

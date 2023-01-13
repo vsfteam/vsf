@@ -94,6 +94,7 @@ __vsf_component_peda_ifs_entry(__vk_audio_dummy_init, vk_audio_init)
         if (!dev->is_inited) {
             dev->is_inited = true;
 
+            dev->stream = dev->__stream;
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
             dev->stream[stream_idx].dir_in1out0 = 0;
             dev->stream[stream_idx].format.value = 0;

@@ -43,8 +43,9 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-vsf_class(__vk_audio_i2s_dev_t) {
+vsf_class(vk_audio_i2s_dev_t) {
     public_member(
+        implement(vk_audio_dev_t)
         vsf_i2s_t           *i2s;
         vsf_i2s_feature_t   i2s_feature;
     )
@@ -53,54 +54,54 @@ vsf_class(__vk_audio_i2s_dev_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t __vk_audio_i2s_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg);
+extern vsf_err_t __vk_audio_i2s_init(vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg);
 
-static inline vsf_err_t __vk_audio_i2s_rx_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
+static inline vsf_err_t __vk_audio_i2s_rx_init(vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
 {
     return vsf_i2s_rx_init(audio_i2s->i2s, cfg);
 }
 
-static inline void __vk_audio_i2s_rx_fini(__vk_audio_i2s_dev_t *audio_i2s)
+static inline void __vk_audio_i2s_rx_fini(vk_audio_i2s_dev_t *audio_i2s)
 {
     vsf_i2s_rx_fini(audio_i2s->i2s);
 }
 
-static inline vsf_err_t __vk_audio_i2s_rx_start(__vk_audio_i2s_dev_t *audio_i2s)
+static inline vsf_err_t __vk_audio_i2s_rx_start(vk_audio_i2s_dev_t *audio_i2s)
 {
     return vsf_i2s_rx_start(audio_i2s->i2s);
 }
 
-static inline vsf_err_t __vk_audio_i2s_rx_pause(__vk_audio_i2s_dev_t *audio_i2s)
+static inline vsf_err_t __vk_audio_i2s_rx_pause(vk_audio_i2s_dev_t *audio_i2s)
 {
     return vsf_i2s_rx_pause(audio_i2s->i2s);
 }
 
-static inline vsf_err_t __vk_audio_i2s_rx_resume(__vk_audio_i2s_dev_t *audio_i2s)
+static inline vsf_err_t __vk_audio_i2s_rx_resume(vk_audio_i2s_dev_t *audio_i2s)
 {
     return vsf_i2s_rx_resume(audio_i2s->i2s);
 }
 
-static inline vsf_err_t __vk_audio_i2s_tx_init(__vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
+static inline vsf_err_t __vk_audio_i2s_tx_init(vk_audio_i2s_dev_t *audio_i2s, vsf_i2s_cfg_t *cfg)
 {
     return vsf_i2s_tx_init(audio_i2s->i2s, cfg);
 }
 
-static inline void __vk_audio_i2s_tx_fini(__vk_audio_i2s_dev_t *audio_i2s)
+static inline void __vk_audio_i2s_tx_fini(vk_audio_i2s_dev_t *audio_i2s)
 {
     vsf_i2s_tx_fini(audio_i2s->i2s);
 }
 
-static inline vsf_err_t __vk_audio_i2s_tx_start(__vk_audio_i2s_dev_t *audio_i2s)
+static inline vsf_err_t __vk_audio_i2s_tx_start(vk_audio_i2s_dev_t *audio_i2s)
 {
     return vsf_i2s_tx_start(audio_i2s->i2s);
 }
 
-static inline vsf_err_t __vk_audio_i2s_tx_pause(__vk_audio_i2s_dev_t *audio_i2s)
+static inline vsf_err_t __vk_audio_i2s_tx_pause(vk_audio_i2s_dev_t *audio_i2s)
 {
     return vsf_i2s_tx_pause(audio_i2s->i2s);
 }
 
-static inline vsf_err_t __vk_audio_i2s_tx_resume(__vk_audio_i2s_dev_t *audio_i2s)
+static inline vsf_err_t __vk_audio_i2s_tx_resume(vk_audio_i2s_dev_t *audio_i2s)
 {
     return vsf_i2s_tx_resume(audio_i2s->i2s);
 }

@@ -81,15 +81,15 @@ typedef struct vk_winsound_playback_ctx_t {
 #endif
 
 vsf_class(vk_winsound_dev_t) {
+    public_member(
+        implement(vk_audio_dev_t)
+    )
+
     private_member(
         bool is_inited;
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
         vk_winsound_playback_ctx_t playback_ctx;
 #endif
-    )
-
-    public_member(
-        implement(vk_audio_dev_t)
         vk_audio_stream_t __stream[
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED && VSF_AUDIO_USE_CAPTURE == ENABLED
             2

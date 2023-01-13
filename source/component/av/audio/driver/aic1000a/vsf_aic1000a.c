@@ -514,6 +514,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         __vk_aic1000a_reg_seq(dev, __vk_aic1000a_init_seq, dimof(__vk_aic1000a_init_seq));
 
         dev->stream_num = 0;
+        dev->stream = dev->__stream;
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
         dev->stream[dev->stream_num].stream_index = dev->stream_num;
         dev->stream[dev->stream_num].dir_in1out0 = 0;
@@ -531,7 +532,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         memset(&dev->adc, 0, sizeof(dev->adc));
 #endif
 
-        vsf_eda_return(__vk_audio_i2s_init(&dev->use_as____vk_audio_i2s_dev_t, NULL));
+        vsf_eda_return(__vk_audio_i2s_init(&dev->use_as__vk_audio_i2s_dev_t, NULL));
         break;
     }
     vsf_peda_end();
@@ -556,7 +557,7 @@ void __vk_aic1000a_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_i2s_irq_
         if (buffer_size < (buffsize >> 1)) {
             dev->adc.stream_paused = true;
             vsf_unprotect_int(orig);
-            __vk_audio_i2s_rx_pause(&dev->use_as____vk_audio_i2s_dev_t);
+            __vk_audio_i2s_rx_pause(&dev->use_as__vk_audio_i2s_dev_t);
             return;
         } else {
             vsf_unprotect_int(orig);
@@ -570,7 +571,7 @@ void __vk_aic1000a_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_i2s_irq_
         if (buffer_size < (buffsize >> 1)) {
             dev->dac.stream_paused = true;
             vsf_unprotect_int(orig);
-            __vk_audio_i2s_tx_pause(&dev->use_as____vk_audio_i2s_dev_t);
+            __vk_audio_i2s_tx_pause(&dev->use_as__vk_audio_i2s_dev_t);
             return;
         } else {
             vsf_unprotect_int(orig);
@@ -606,10 +607,10 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
                 i2s_cfg.isr.target_ptr = audio_stream;
                 // TODO: fix priority
                 i2s_cfg.isr.prio = vsf_arch_prio_0;
-                if (VSF_ERR_NONE != __vk_audio_i2s_rx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
+                if (VSF_ERR_NONE != __vk_audio_i2s_rx_init(&dev->use_as__vk_audio_i2s_dev_t, &i2s_cfg)) {
                     vsf_trace_error("fail to initialize i2s_rx\n");
                 } else {
-                    __vk_audio_i2s_rx_start(&dev->use_as____vk_audio_i2s_dev_t);
+                    __vk_audio_i2s_rx_start(&dev->use_as__vk_audio_i2s_dev_t);
                     dev->adc.stream_started = true;
                 }
             } else {
@@ -629,10 +630,10 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
                 i2s_cfg.isr.target_ptr = audio_stream;
                 // TODO: fix priority
                 i2s_cfg.isr.prio = vsf_arch_prio_0;
-                if (VSF_ERR_NONE != __vk_audio_i2s_tx_init(&dev->use_as____vk_audio_i2s_dev_t, &i2s_cfg)) {
+                if (VSF_ERR_NONE != __vk_audio_i2s_tx_init(&dev->use_as__vk_audio_i2s_dev_t, &i2s_cfg)) {
                     vsf_trace_error("fail to initialize i2s_tx\n");
                 } else {
-                    __vk_audio_i2s_tx_start(&dev->use_as____vk_audio_i2s_dev_t);
+                    __vk_audio_i2s_tx_start(&dev->use_as__vk_audio_i2s_dev_t);
                     dev->dac.stream_started = true;
                 }
             }
@@ -640,10 +641,10 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
         break;
     case VSF_STREAM_ON_DISCONNECT:
         if (audio_stream->dir_in1out0) {
-            __vk_audio_i2s_rx_fini(&dev->use_as____vk_audio_i2s_dev_t);
+            __vk_audio_i2s_rx_fini(&dev->use_as__vk_audio_i2s_dev_t);
             dev->adc.stream_started = false;
         } else {
-            __vk_audio_i2s_tx_fini(&dev->use_as____vk_audio_i2s_dev_t);
+            __vk_audio_i2s_tx_fini(&dev->use_as__vk_audio_i2s_dev_t);
             dev->dac.stream_started = false;
         }
         break;
@@ -655,7 +656,7 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
                 dev->adc.stream_paused = false;
                 vsf_unprotect_int(orig);
 
-                __vk_audio_i2s_rx_resume(&dev->use_as____vk_audio_i2s_dev_t);
+                __vk_audio_i2s_rx_resume(&dev->use_as__vk_audio_i2s_dev_t);
             }
         } else {
             vsf_unprotect_int(orig);
@@ -672,7 +673,7 @@ static void __vk_aic1000a_stream_evthandler(vsf_stream_t *stream, void *param, v
                     dev->dac.stream_paused = false;
                     vsf_unprotect_int(orig);
 
-                    __vk_audio_i2s_tx_resume(&dev->use_as____vk_audio_i2s_dev_t);
+                    __vk_audio_i2s_tx_resume(&dev->use_as__vk_audio_i2s_dev_t);
                 }
             } else {
                 vsf_unprotect_int(orig);

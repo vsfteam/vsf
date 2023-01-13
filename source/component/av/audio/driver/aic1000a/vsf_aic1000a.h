@@ -44,12 +44,7 @@ extern "C" {
 
 vsf_class(vk_aic1000a_dev_t) {
     public_member(
-        implement(vk_audio_dev_t)
-        vk_audio_stream_t __stream[2];
-    )
-
-    public_member(
-        implement(__vk_audio_i2s_dev_t)
+        implement(vk_audio_i2s_dev_t)
         vsf_gpio_t *pwrkey_port;
         vsf_gpio_t *psi_port;
         uint8_t pwrkey_pin;
@@ -89,6 +84,13 @@ vsf_class(vk_aic1000a_dev_t) {
             uint8_t sample_bitlen;
             uint16_t sample_rate;
         } adc;
+        vk_audio_stream_t __stream[
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED && VSF_AUDIO_USE_CAPTURE == ENABLED
+            2
+#else
+            1
+#endif
+        ];
     )
 };
 

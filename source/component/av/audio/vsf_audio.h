@@ -135,7 +135,7 @@ vsf_class(vk_audio_dev_t) {
         const vk_audio_drv_t    *drv;
         vsf_arch_prio_t         hw_prio;
         uint8_t                 stream_num;
-        vk_audio_stream_t       stream[0];
+        vk_audio_stream_t       *stream;
     )
 };
 
