@@ -72,13 +72,6 @@ vsf_class(vk_aic1000a_dev_t) {
             uint8_t ch_d36_d3;
             uint8_t mic_matrix_type;
         } adc;
-        vk_audio_stream_t __stream[
-#if VSF_AUDIO_USE_PLAYBACK == ENABLED && VSF_AUDIO_USE_CAPTURE == ENABLED
-            2
-#else
-            1
-#endif
-        ];
     )
 };
 

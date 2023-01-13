@@ -73,6 +73,13 @@ vsf_class(vk_audio_i2s_dev_t) {
             uint16_t hw_sample_rate;
         } capture;
 #endif
+        vk_audio_stream_t __stream[
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED && VSF_AUDIO_USE_CAPTURE == ENABLED
+            2
+#else
+            1
+#endif
+        ];
     )
 };
 

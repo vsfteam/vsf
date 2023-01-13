@@ -219,6 +219,28 @@ __vsf_component_peda_ifs_entry(__vk_audio_i2s_init, vk_audio_init)
 {
     vsf_peda_begin();
     vk_audio_i2s_dev_t *dev = container_of(&vsf_this, vk_audio_i2s_dev_t, use_as__vk_audio_dev_t);
+
+    if (0 == dev->stream_num) {
+        dev->stream_num = 0;
+        dev->stream = dev->__stream;
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+        dev->stream[dev->stream_num].stream_index = dev->stream_num;
+        dev->stream[dev->stream_num].dir_in1out0 = 0;
+        dev->stream[dev->stream_num].format.value = 0;
+        dev->stream[dev->stream_num].drv = &vk_audio_i2s_stream_drv_playback;
+        dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
+        dev->stream_num++;
+#endif
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
+        dev->stream[dev->stream_num].stream_index = dev->stream_num;
+        dev->stream[dev->stream_num].dir_in1out0 = 1;
+        dev->stream[dev->stream_num].format.value = 0;
+        dev->stream[dev->stream_num].drv = &vk_audio_i2s_stream_drv_capture;
+        dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
+        dev->stream_num++;
+#endif
+    }
+
     vsf_eda_return(vsf_i2s_init(dev->i2s, NULL));
     vsf_peda_end();
 }

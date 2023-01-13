@@ -513,34 +513,25 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
         vsf_gpio_set_output(dev->psi_port, (1 << dev->psi_clk_pin) | (1 << dev->psi_dat_pin));
         __vk_aic1000a_reg_seq(dev, __vk_aic1000a_init_seq, dimof(__vk_aic1000a_init_seq));
 
-        dev->stream_num = 0;
-        dev->stream = dev->__stream;
-#if VSF_AUDIO_USE_PLAYBACK == ENABLED
-        dev->stream[dev->stream_num].stream_index = dev->stream_num;
-        dev->stream[dev->stream_num].dir_in1out0 = 0;
-        dev->stream[dev->stream_num].format.value = 0;
-        dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_playback;
-        dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
-        dev->stream_num++;
-        memset(&dev->dac, 0, sizeof(dev->dac));
-#endif
-#if VSF_AUDIO_USE_CAPTURE == ENABLED
-        dev->stream[dev->stream_num].stream_index = dev->stream_num;
-        dev->stream[dev->stream_num].dir_in1out0 = 1;
-        dev->stream[dev->stream_num].format.value = 0;
-        dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_capture;
-        dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
-        dev->stream_num++;
-        memset(&dev->adc, 0, sizeof(dev->adc));
-#endif
-
         vsf_err_t err;
+        dev->stream_num = 0;
         __vsf_component_call_peda_ifs(vk_audio_init, err, vk_audio_i2s_drv.init, 0, &dev->use_as__vk_audio_dev_t);
         if (err != VSF_ERR_NONE) {
             vsf_eda_return(err);
         }
         break;
     case VSF_EVT_RETURN:
+        dev->stream_num = 0;
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+        dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_playback;
+        dev->stream_num++;
+        memset(&dev->dac, 0, sizeof(dev->dac));
+#endif
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
+        dev->stream[dev->stream_num].drv = &__vk_aic1000a_stream_drv_capture;
+        dev->stream_num++;
+        memset(&dev->adc, 0, sizeof(dev->adc));
+#endif
         vsf_eda_return(vsf_eda_get_return_value());
     }
     vsf_peda_end();
