@@ -121,6 +121,7 @@ typedef union vk_audio_format_t {
     uint32_t                    value;
 } vk_audio_format_t;
 
+vsf_dcl_class(vk_audio_dev_t)
 typedef struct vk_audio_stream_t {
     uint8_t                     stream_index;           // index start from 0
     uint8_t                     dir_in1out0;            // 1 for capture, 0 for playback
@@ -128,6 +129,7 @@ typedef struct vk_audio_stream_t {
     vk_audio_format_t           format;                 // format of audio stream buffer
     const vk_audio_stream_drv_t *drv;
     vsf_stream_t                *stream;
+    vk_audio_dev_t              *dev;
 } vk_audio_stream_t;
 
 vsf_class(vk_audio_dev_t) {

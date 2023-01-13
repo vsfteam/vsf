@@ -99,11 +99,13 @@ __vsf_component_peda_ifs_entry(__vk_audio_dummy_init, vk_audio_init)
             dev->stream[stream_idx].dir_in1out0 = 0;
             dev->stream[stream_idx].format.value = 0;
             dev->stream[stream_idx].drv = &__vk_audio_dummy_stream_drv_playback;
+            dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
             stream_idx++;
 #endif
 #if VSF_AUDIO_USE_CATURE == ENABLED
             dev->stream[stream_idx].dir_in1out0 = 1;
             dev->stream[stream_idx].drv = &__vk_audio_dummy_stream_drv_capture;
+            dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
             stream_idx++;
 #endif
             dev->stream_num = stream_idx;

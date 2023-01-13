@@ -111,6 +111,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
             dev->stream[stream_idx].dir_in1out0 = 0;
             dev->stream[stream_idx].format.value = 0;
             dev->stream[stream_idx].drv = &__vk_winsound_stream_drv_playback;
+            dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
             stream_idx++;
             __vsf_arch_irq_init(&playback_ctx->irq_thread, "winsound_play",
                         __vk_winsound_playback_irq_thread, dev->hw_prio);
@@ -118,6 +119,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
 #if VSF_AUDIO_USE_CAPTURE == ENABLED
             dev->stream[stream_idx].dir_in1out0 = 1;
             dev->stream[stream_idx].drv = &__vk_winsound_stream_drv_capture;
+            dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
             stream_idx++;
 #endif
             dev->stream_num = stream_idx;
