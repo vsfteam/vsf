@@ -240,33 +240,6 @@ __vsf_component_peda_ifs_entry(__vk_audio_i2s_playback_stop, vk_audio_stop)
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
-
-static void __vsf_audio_i2s_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
-{
-    if (!vsf_stream_adapter_evthandler(stream, param, evt)) {
-        return;
-    }
-
-    uint_fast32_t bufsize = vsf_stream_get_buff_size(stream), halfsize = bufsize >> 1;
-    if (vsf_stream_get_data_size(stream) < bufsize) {
-        uint8_t *buf;
-        uint_fast32_t size = vsf_stream_get_wbuf(stream, &buf);
-        VSF_AV_ASSERT(size >= halfsize);
-        memset(buf, 0, halfsize);
-        vsf_stream_write(stream, NULL, halfsize);
-    }
-}
-
-void vsf_audio_i2s_stream_adapter_init(vsf_stream_adapter_t *adapter)
-{
-    adapter->stream_rx->tx.evthandler = __vsf_audio_i2s_stream_adapter_evthandler;
-    adapter->stream_rx->tx.param = adapter;
-    vsf_stream_connect_tx(adapter->stream_rx);
-
-    adapter->stream_tx->rx.evthandler = __vsf_audio_i2s_stream_adapter_evthandler;
-    adapter->stream_tx->rx.param = adapter;
-    vsf_stream_connect_rx(adapter->stream_tx);
-}
 #endif
 
 #if VSF_AUDIO_USE_CAPTURE == ENABLED
