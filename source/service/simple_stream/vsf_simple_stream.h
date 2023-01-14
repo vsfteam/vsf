@@ -277,7 +277,7 @@ vsf_class(vsf_stream_t) {
  * @note stream terminal connection: stream_tx.rx <==> stream_rx.tx
  *
  * \~chinese vsf 流适配器类, 用于连接 2 个流
- * @note 流终端连接方式: stream_tx.rx <==> stream_rx.tx
+ * @note 流终端连接方式: stream_tx.rx <==> stream_rx.tx(stream_tx => stream_rx)
  */
 vsf_class(vsf_stream_adapter_t) {
     public_member(

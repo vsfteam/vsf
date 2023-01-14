@@ -122,13 +122,14 @@ vsf_err_t vk_audio_stop(vk_audio_dev_t *pthis, uint_fast8_t stream_idx)
 static void __vsf_audio_playback_ticktock_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     if (vsf_stream_adapter_evthandler(stream, param, evt)) {
-        uint_fast32_t bufsize = vsf_stream_get_buff_size(stream), halfsize = bufsize >> 1;
-        if (vsf_stream_get_data_size(stream) < bufsize) {
+        vsf_stream_adapter_t *adapter = param;
+        uint_fast32_t bufsize = vsf_stream_get_buff_size(adapter->stream_rx), halfsize = bufsize >> 1;
+        if (vsf_stream_get_data_size(adapter->stream_rx) < bufsize) {
             uint8_t *buf;
-            uint_fast32_t size = vsf_stream_get_wbuf(stream, &buf);
+            uint_fast32_t size = vsf_stream_get_wbuf(adapter->stream_rx, &buf);
             VSF_AV_ASSERT(size >= halfsize);
             memset(buf, 0, halfsize);
-            vsf_stream_write(stream, NULL, halfsize);
+            vsf_stream_write(adapter->stream_rx, NULL, halfsize);
         }
     }
 }
@@ -149,9 +150,10 @@ void vsf_audio_playback_ticktock_stream_adapter_init(vsf_stream_adapter_t *adapt
 static void __vsf_audio_capture_ticktock_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     if (!vsf_stream_adapter_evthandler(stream, param, evt)) {
-        uint_fast32_t bufsize = vsf_stream_get_buff_size(stream), halfsize = bufsize >> 1;
-        if (vsf_stream_get_data_size(stream) >= bufsize) {
-            vsf_stream_read(stream, NULL, halfsize);
+        vsf_stream_adapter_t *adapter = param;
+        uint_fast32_t bufsize = vsf_stream_get_buff_size(adapter->stream_tx), halfsize = bufsize >> 1;
+        if (vsf_stream_get_data_size(adapter->stream_tx) >= bufsize) {
+            vsf_stream_read(adapter->stream_tx, NULL, halfsize);
         }
     }
 }
