@@ -100,7 +100,6 @@ static void __vk_audio_i2s_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_
             memset(buffer, 0, buffsize >> 1);
             vsf_stream_write(stream, NULL, buffsize >> 1);
             vsf_unprotect_int(orig);
-            vsf_gpio_toggle((vsf_gpio_t *)&vsf_hw_gpio1, 1 << 13);
             return;
         } else {
             vsf_unprotect_int(orig);
