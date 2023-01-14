@@ -166,8 +166,11 @@ extern vsf_err_t vk_audio_start(vk_audio_dev_t *pthis, uint_fast8_t stream_idx,
 extern vsf_err_t vk_audio_stop(vk_audio_dev_t *pthis, uint_fast8_t stream_idx);
 
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
-// for playback only
-extern void vsf_audio_ticktock_stream_adapter_init(vsf_stream_adapter_t *adapter);
+extern void vsf_audio_playback_ticktock_stream_adapter_init(vsf_stream_adapter_t *adapter);
+#endif
+
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
+extern void vsf_audio_capture_ticktock_stream_adapter_init(vsf_stream_adapter_t *adapter);
 #endif
 
 #ifdef __cplusplus
