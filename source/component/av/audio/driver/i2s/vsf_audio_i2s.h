@@ -56,7 +56,6 @@ vsf_class(vk_audio_i2s_dev_t) {
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
         struct {
             bool stream_started;
-            bool stream_paused;
             uint8_t channel_num;
             uint8_t sample_bitlen;
             uint16_t sample_rate;
@@ -66,7 +65,6 @@ vsf_class(vk_audio_i2s_dev_t) {
 #if VSF_AUDIO_USE_CAPTURE == ENABLED
         struct {
             bool stream_started;
-            bool stream_paused;
             uint8_t channel_num;
             uint8_t sample_bitlen;
             uint16_t sample_rate;

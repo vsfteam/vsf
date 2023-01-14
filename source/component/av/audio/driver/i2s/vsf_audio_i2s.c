@@ -85,17 +85,6 @@ static void __vk_audio_i2s_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_
         // capture/rx
 #if VSF_AUDIO_USE_CAPTURE == ENABLED
         vsf_stream_write(stream, NULL, buffsize >> 1);
-
-        orig = vsf_protect_int();
-        buffer_size = vsf_stream_get_wbuf(stream, &buffer);
-        if (buffer_size < (buffsize >> 1)) {
-            dev->capture.stream_paused = true;
-            vsf_unprotect_int(orig);
-            vsf_i2s_rx_pause(dev->i2s);
-            return;
-        } else {
-            vsf_unprotect_int(orig);
-        }
 #endif
     } else {
         // playback/tx
@@ -105,9 +94,13 @@ static void __vk_audio_i2s_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_
         orig = vsf_protect_int();
         buffer_size = vsf_stream_get_rbuf(stream, &buffer);
         if (buffer_size < (buffsize >> 1)) {
-            dev->playback.stream_paused = true;
+            // TODO: check if src is enabled in i2s, src can be used to sync
+            buffer_size = vsf_stream_get_wbuf(stream, &buffer);
+            VSF_AV_ASSERT(buffer_size >= (buffsize >> 1));
+            memset(buffer, 0, buffsize >> 1);
+            vsf_stream_write(stream, NULL, buffsize >> 1);
             vsf_unprotect_int(orig);
-            vsf_i2s_tx_pause(dev->i2s);
+            vsf_gpio_toggle((vsf_gpio_t *)&vsf_hw_gpio1, 1 << 13);
             return;
         } else {
             vsf_unprotect_int(orig);
@@ -196,38 +189,11 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
         }
         break;
     case VSF_STREAM_ON_OUT:
-#if VSF_AUDIO_USE_CAPTURE == ENABLED
-        orig = vsf_protect_int();
-        if (dev->capture.stream_paused) {
-            buffer_size = vsf_stream_get_wbuf(stream, &buffer);
-            if (buffer_size >= (buffsize >> 1)) {
-                dev->capture.stream_paused = false;
-                vsf_unprotect_int(orig);
-
-                vsf_i2s_rx_resume(dev->i2s);
-            }
-        } else {
-            vsf_unprotect_int(orig);
-        }
-#endif
         break;
     case VSF_STREAM_ON_IN:
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
         if (!dev->playback.stream_started) {
             goto __try_start_stream;
-        } else {
-            orig = vsf_protect_int();
-            if (dev->playback.stream_paused) {
-                buffer_size = vsf_stream_get_rbuf(stream, &buffer);
-                if (buffer_size >= (buffsize >> 1)) {
-                    dev->playback.stream_paused = false;
-                    vsf_unprotect_int(orig);
-
-                    vsf_i2s_tx_resume(dev->i2s);
-                }
-            } else {
-                vsf_unprotect_int(orig);
-            }
         }
 #endif
         break;

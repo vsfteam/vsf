@@ -512,26 +512,6 @@ vsf_err_t vsf_hw_i2s_tx_start(vsf_hw_i2s_t *hw_i2s_ptr)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_i2s_tx_pause(vsf_hw_i2s_t *hw_i2s_ptr)
-{
-    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
-    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
-    VSF_HAL_ASSERT(NULL != hw_i2s_const);
-
-    dma_cx_enable_set(hw_i2s_const->tx.dma_ch, false);
-    return VSF_ERR_NONE;
-}
-
-vsf_err_t vsf_hw_i2s_tx_resume(vsf_hw_i2s_t *hw_i2s_ptr)
-{
-    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
-    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
-    VSF_HAL_ASSERT(NULL != hw_i2s_const);
-
-    dma_cx_enable_set(hw_i2s_const->tx.dma_ch, true);
-    return VSF_ERR_NONE;
-}
-
 //return audio src mode | audio src div
 //bit[7:4] correspond to aud_src_ctrl2[7:4](audio_src_mode)
 //bit[16:13] correspong to aud_src_ctrl2[16:13](audio_src_div)
@@ -770,26 +750,6 @@ vsf_err_t vsf_hw_i2s_rx_start(vsf_hw_i2s_t *hw_i2s_ptr)
     }
     hw_i2s_ptr->rx.path_opened = true;
 
-    return VSF_ERR_NONE;
-}
-
-vsf_err_t vsf_hw_i2s_rx_pause(vsf_hw_i2s_t *hw_i2s_ptr)
-{
-    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
-    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
-    VSF_HAL_ASSERT(NULL != hw_i2s_const);
-
-    dma_cx_enable_set(hw_i2s_const->rx.dma_ch, false);
-    return VSF_ERR_NONE;
-}
-
-vsf_err_t vsf_hw_i2s_rx_resume(vsf_hw_i2s_t *hw_i2s_ptr)
-{
-    VSF_HAL_ASSERT(NULL != hw_i2s_ptr);
-    const vsf_hw_i2s_const_t * hw_i2s_const = hw_i2s_ptr->i2s_const;
-    VSF_HAL_ASSERT(NULL != hw_i2s_const);
-
-    dma_cx_enable_set(hw_i2s_const->rx.dma_ch, true);
     return VSF_ERR_NONE;
 }
 
