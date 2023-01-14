@@ -39,6 +39,10 @@
 #   error VSF_KERNEL_USE_SIMPLE_SHELL must be enabled
 #endif
 
+#if VSF_AUDIO_USE_PLAYBACK != ENABLED && VSF_AUDIO_USE_CAPTURE != ENABLED
+#   error at least one of VSF_AUDIO_USE_PLAYBACK/VSF_AUDIO_USE_CAPTURE must be enabled
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

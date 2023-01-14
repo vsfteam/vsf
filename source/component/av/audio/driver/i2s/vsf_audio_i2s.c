@@ -83,6 +83,7 @@ static void __vk_audio_i2s_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_
 
     if (audio_stream->dir_in1out0) {
         // capture/rx
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
         vsf_stream_write(stream, NULL, buffsize >> 1);
 
         orig = vsf_protect_int();
@@ -95,8 +96,10 @@ static void __vk_audio_i2s_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_
         } else {
             vsf_unprotect_int(orig);
         }
+#endif
     } else {
-        // player/tx
+        // playback/tx
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
         vsf_stream_read(stream, NULL, buffsize >> 1);
 
         orig = vsf_protect_int();
@@ -109,6 +112,7 @@ static void __vk_audio_i2s_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_
         } else {
             vsf_unprotect_int(orig);
         }
+#endif
     }
 }
 
@@ -122,10 +126,14 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
-    __try_start_stream: {
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+    __try_start_stream:
+#endif
+        {
             vsf_i2s_cfg_t i2s_cfg;
             if (audio_stream->dir_in1out0) {
                 // capture/rx
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
                 if (vsf_stream_get_data_size(stream) != 0) {
                     vsf_trace_error("stream for i2s_rx is not empty\n");
                     return;
@@ -145,8 +153,10 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
                     vsf_i2s_rx_start(dev->i2s);
                     dev->capture.stream_started = true;
                 }
+#endif
             } else {
-                // player/tx
+                // playback/tx
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
                 // wait data to be filled for tick-tock operation
                 if (vsf_stream_get_free_size(stream) != 0) {
                     // dummy read to accept next VSF_STREAM_ON_IN event
@@ -168,19 +178,25 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
                     vsf_i2s_tx_start(dev->i2s);
                     dev->playback.stream_started = true;
                 }
+#endif
             }
         }
         break;
     case VSF_STREAM_ON_DISCONNECT:
         if (audio_stream->dir_in1out0) {
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
             vsf_i2s_rx_fini(dev->i2s);
             dev->capture.stream_started = false;
+#endif
         } else {
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
             vsf_i2s_tx_fini(dev->i2s);
             dev->playback.stream_started = false;
+#endif
         }
         break;
     case VSF_STREAM_ON_OUT:
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
         orig = vsf_protect_int();
         if (dev->capture.stream_paused) {
             buffer_size = vsf_stream_get_wbuf(stream, &buffer);
@@ -193,8 +209,10 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
         } else {
             vsf_unprotect_int(orig);
         }
+#endif
         break;
     case VSF_STREAM_ON_IN:
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
         if (!dev->playback.stream_started) {
             goto __try_start_stream;
         } else {
@@ -211,6 +229,7 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
                 vsf_unprotect_int(orig);
             }
         }
+#endif
         break;
     }
 }
