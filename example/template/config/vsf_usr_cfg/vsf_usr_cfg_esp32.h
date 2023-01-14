@@ -87,7 +87,7 @@
 #define VSF_USE_VIDEO                                   DISABLED
 #define VSF_USE_AUDIO                                   DISABLED
 #   define VSF_AUDIO_USE_DECODER_WAV                    ENABLED
-#   define VSF_AUDIO_USE_PLAY                           ENABLED
+#   define VSF_AUDIO_USE_PLAYBACK                       ENABLED
 #   define VSF_AUDIO_USE_CATURE                         DISABLED
 
 #define VSF_USE_INPUT                                   DISABLED

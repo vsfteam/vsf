@@ -72,7 +72,7 @@
 #define VSF_USE_VIDEO                                   DISABLED
 #define VSF_USE_AUDIO                                   DISABLED
 #   define VSF_AUDIO_USE_DECODER_WAV                    DISABLED
-#   define VSF_AUDIO_USE_PLAY                           DISABLED
+#   define VSF_AUDIO_USE_PLAYBACK                       DISABLED
 #   define VSF_AUDIO_USE_CATURE                         DISABLED
 
 // UI runs in vsf_prio_0, other modules runs above vsf_prio_1
