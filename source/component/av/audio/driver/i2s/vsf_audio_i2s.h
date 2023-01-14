@@ -89,6 +89,11 @@ extern const vk_audio_stream_drv_t vk_audio_i2s_stream_drv_capture;
 
 /*============================ PROTOTYPES ====================================*/
 
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+// for playback only
+extern void vsf_audio_i2s_stream_adapter_init(vsf_stream_adapter_t *adapter);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

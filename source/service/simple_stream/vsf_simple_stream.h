@@ -348,6 +348,8 @@ extern void __vsf_stream_on_read(vsf_stream_t *stream);
 extern void __vsf_stream_on_write(vsf_stream_t *stream);
 #endif
 
+// vsf_stream_adapter_evthandler is only for classes derived from vsf_stream_adapter_t
+extern uint_fast32_t vsf_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt);
 extern void vsf_stream_adapter_init(vsf_stream_adapter_t *adapter);
 
 #ifdef __cplusplus

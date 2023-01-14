@@ -76,10 +76,7 @@ static void __vk_audio_i2s_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_
 {
     vk_audio_stream_t *audio_stream = target_ptr;
     vsf_stream_t *stream = audio_stream->stream;
-    vk_audio_i2s_dev_t *dev = (vk_audio_i2s_dev_t *)audio_stream->dev;
-    uint32_t buffsize = vsf_stream_get_buff_size(audio_stream->stream), buffer_size;
-    uint8_t *buffer;
-    vsf_protect_t orig;
+    uint32_t buffsize = vsf_stream_get_buff_size(audio_stream->stream);
 
     if (audio_stream->dir_in1out0) {
         // capture/rx
@@ -90,20 +87,6 @@ static void __vk_audio_i2s_isrhandler(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_
         // playback/tx
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
         vsf_stream_read(stream, NULL, buffsize >> 1);
-
-        orig = vsf_protect_int();
-        buffer_size = vsf_stream_get_rbuf(stream, &buffer);
-        if (buffer_size < (buffsize >> 1)) {
-            // TODO: check if src is enabled in i2s, src can be used to sync
-            buffer_size = vsf_stream_get_wbuf(stream, &buffer);
-            VSF_AV_ASSERT(buffer_size >= (buffsize >> 1));
-            memset(buffer, 0, buffsize >> 1);
-            vsf_stream_write(stream, NULL, buffsize >> 1);
-            vsf_unprotect_int(orig);
-            return;
-        } else {
-            vsf_unprotect_int(orig);
-        }
 #endif
     }
 }
@@ -112,9 +95,6 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
 {
     vk_audio_stream_t *audio_stream = param;
     vk_audio_i2s_dev_t *dev = (vk_audio_i2s_dev_t *)audio_stream->dev;
-    uint32_t buffsize = vsf_stream_get_buff_size(audio_stream->stream), buffer_size;
-    uint8_t *buffer;
-    vsf_protect_t orig;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
@@ -259,6 +239,33 @@ __vsf_component_peda_ifs_entry(__vk_audio_i2s_playback_stop, vk_audio_stop)
     audio_stream->stream = NULL;
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
+}
+
+static void __vsf_audio_i2s_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
+{
+    if (!vsf_stream_adapter_evthandler(stream, param, evt)) {
+        return;
+    }
+
+    uint_fast32_t bufsize = vsf_stream_get_buff_size(stream), halfsize = bufsize >> 1;
+    if (vsf_stream_get_data_size(stream) < bufsize) {
+        uint8_t *buf;
+        uint_fast32_t size = vsf_stream_get_wbuf(stream, &buf);
+        VSF_AV_ASSERT(size >= halfsize);
+        memset(buf, 0, halfsize);
+        vsf_stream_write(stream, NULL, halfsize);
+    }
+}
+
+void vsf_audio_i2s_stream_adapter_init(vsf_stream_adapter_t *adapter)
+{
+    adapter->stream_rx->tx.evthandler = __vsf_audio_i2s_stream_adapter_evthandler;
+    adapter->stream_rx->tx.param = adapter;
+    vsf_stream_connect_tx(adapter->stream_rx);
+
+    adapter->stream_tx->rx.evthandler = __vsf_audio_i2s_stream_adapter_evthandler;
+    adapter->stream_tx->rx.param = adapter;
+    vsf_stream_connect_rx(adapter->stream_tx);
 }
 #endif
 
