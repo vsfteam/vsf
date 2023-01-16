@@ -273,7 +273,6 @@ static int16_t __vk_usbd_get_config(vk_usbd_dev_t *dev, uint_fast8_t value)
 static vsf_err_t __vk_usbd_auto_init(vk_usbd_dev_t *dev)
 {
     VSF_USB_ASSERT(dev != NULL);
-    VSF_USBD_DRV_PREPARE(dev);
     vk_usbd_cfg_t *config;
     vk_usbd_desc_t *desc;
     struct usb_config_desc_t *desc_config;
