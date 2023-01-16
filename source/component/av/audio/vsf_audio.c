@@ -21,15 +21,18 @@
 
 #if VSF_USE_AUDIO == ENABLED
 
-#if VSF_USE_SIMPLE_STREAM == ENABLED
-#   define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
-#endif
+#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #define __VSF_AUDIO_CLASS_IMPLEMENT
+#define __VSF_EDA_CLASS_INHERIT__
 
 #include "utilities/vsf_utilities.h"
 #include "component/av/vsf_av.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_USE_SIMPLE_STREAM != ENABLED
+#   error VSF_USE_SIMPLE_STREAM must be enabled for audio
+#endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is needed to use scsi
@@ -118,53 +121,94 @@ vsf_err_t vk_audio_stop(vk_audio_dev_t *pthis, uint_fast8_t stream_idx)
     return err;
 }
 
-#if VSF_AUDIO_USE_PLAYBACK == ENABLED
-static void __vsf_audio_playback_ticktock_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED || VSF_AUDIO_USE_CAPTURE == ENABLED
+static void __vsf_audio_ticktock_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
-    vsf_stream_adapter_evthandler(stream, param, evt);
+    vsf_audio_ticktock_stream_adapter_t *adapter = param;
+    vsf_eda_post_evt(&adapter->eda, (evt << 1) + (stream == adapter->stream_tx ? 0 : 1) + VSF_EVT_USER);
+}
+#endif
 
-    vsf_stream_adapter_t *adapter = param;
-    uint_fast32_t bufsize = vsf_stream_get_buff_size(adapter->stream_rx), halfsize = bufsize >> 1;
-    while (vsf_stream_get_data_size(adapter->stream_rx) < bufsize) {
+#if VSF_AUDIO_USE_PLAYBACK == ENABLED
+static void __vsf_audio_playback_ticktock_stream_adapter_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    vsf_audio_ticktock_stream_adapter_t *adapter = container_of(eda, vsf_audio_ticktock_stream_adapter_t, eda);
+
+    if (evt >= VSF_EVT_USER) {
+        evt -= VSF_EVT_USER;
+
+        vsf_stream_evt_t stream_evt = evt >> 1;
+        vsf_stream_t *stream = evt & 1 ? adapter->stream_rx : adapter->stream_tx;
+        uint_fast32_t bufsize = vsf_stream_get_buff_size(adapter->stream_rx), halfsize = bufsize >> 1;
+        uint_fast32_t size;
         uint8_t *buf;
-        uint_fast32_t size = vsf_stream_get_wbuf(adapter->stream_rx, &buf);
-        VSF_AV_ASSERT(size >= halfsize);
-        memset(buf, 0, halfsize);
-        vsf_stream_write(adapter->stream_rx, NULL, halfsize);
+
+        vsf_stream_adapter_evthandler(stream, adapter, stream_evt);
+        while (vsf_stream_get_data_size(adapter->stream_rx) < bufsize) {
+            size = vsf_stream_get_wbuf(adapter->stream_rx, &buf);
+            VSF_AV_ASSERT(size >= halfsize);
+            memset(buf, 0, halfsize);
+            vsf_stream_write(adapter->stream_rx, NULL, halfsize);
+        }
     }
 }
 
-void vsf_audio_playback_ticktock_stream_adapter_init(vsf_stream_adapter_t *adapter)
+void vsf_audio_playback_ticktock_stream_adapter_init(vsf_audio_ticktock_stream_adapter_t *adapter)
 {
-    adapter->stream_rx->tx.evthandler = __vsf_audio_playback_ticktock_stream_adapter_evthandler;
+    adapter->eda.fn.evthandler = __vsf_audio_playback_ticktock_stream_adapter_evthandler;
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    adapter->eda.on_terminate = NULL;
+#   endif
+    vsf_eda_init(&adapter->eda, VSF_AUDIO_CFG_EDA_PRIORITY);
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&adapter->eda, "audio_playback", NULL, 0);
+#   endif
+
+    adapter->stream_rx->tx.evthandler = __vsf_audio_ticktock_stream_adapter_evthandler;
     adapter->stream_rx->tx.param = adapter;
     vsf_stream_connect_tx(adapter->stream_rx);
 
-    adapter->stream_tx->rx.evthandler = __vsf_audio_playback_ticktock_stream_adapter_evthandler;
+    adapter->stream_tx->rx.evthandler = __vsf_audio_ticktock_stream_adapter_evthandler;
     adapter->stream_tx->rx.param = adapter;
     vsf_stream_connect_rx(adapter->stream_tx);
 }
 #endif
 
 #if VSF_AUDIO_USE_CAPTURE == ENABLED
-static void __vsf_audio_capture_ticktock_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
+static void __vsf_audio_capture_ticktock_stream_adapter_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_stream_adapter_evthandler(stream, param, evt);
+    vsf_audio_ticktock_stream_adapter_t *adapter = container_of(eda, vsf_audio_ticktock_stream_adapter_t, eda);
 
-    vsf_stream_adapter_t *adapter = param;
-    uint_fast32_t bufsize = vsf_stream_get_buff_size(adapter->stream_tx), halfsize = bufsize >> 1;
-    if (vsf_stream_get_data_size(adapter->stream_tx) >= bufsize) {
-        vsf_stream_read(adapter->stream_tx, NULL, halfsize);
+    if (evt >= VSF_EVT_USER) {
+        evt -= VSF_EVT_USER;
+
+        vsf_stream_evt_t stream_evt = evt >> 1;
+        vsf_stream_t *stream = evt & 1 ? adapter->stream_rx : adapter->stream_tx;
+        uint_fast32_t bufsize = vsf_stream_get_buff_size(adapter->stream_tx), halfsize = bufsize >> 1;
+
+        vsf_stream_adapter_evthandler(stream, adapter, stream_evt);
+        if (vsf_stream_get_data_size(adapter->stream_tx) >= bufsize) {
+            vsf_stream_read(adapter->stream_tx, NULL, halfsize);
+        }
     }
 }
 
-void vsf_audio_capture_ticktock_stream_adapter_init(vsf_stream_adapter_t *adapter)
+void vsf_audio_capture_ticktock_stream_adapter_init(vsf_audio_ticktock_stream_adapter_t *adapter)
 {
-    adapter->stream_rx->tx.evthandler = __vsf_audio_capture_ticktock_stream_adapter_evthandler;
+    adapter->eda.fn.evthandler = __vsf_audio_capture_ticktock_stream_adapter_evthandler;
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    adapter->eda.on_terminate = NULL;
+#   endif
+    vsf_eda_init(&adapter->eda, VSF_AUDIO_CFG_EDA_PRIORITY);
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&adapter->eda, "audio_capture", NULL, 0);
+#   endif
+
+    adapter->stream_rx->tx.evthandler = __vsf_audio_ticktock_stream_adapter_evthandler;
     adapter->stream_rx->tx.param = adapter;
     vsf_stream_connect_tx(adapter->stream_rx);
 
-    adapter->stream_tx->rx.evthandler = __vsf_audio_capture_ticktock_stream_adapter_evthandler;
+    adapter->stream_tx->rx.evthandler = __vsf_audio_ticktock_stream_adapter_evthandler;
     adapter->stream_tx->rx.param = adapter;
     vsf_stream_connect_rx(adapter->stream_tx);
 }

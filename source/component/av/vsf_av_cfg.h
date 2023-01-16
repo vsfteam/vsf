@@ -29,6 +29,10 @@
 #   define VSF_AV_ASSERT                            VSF_ASSERT
 #endif
 
+#ifndef VSF_AUDIO_CFG_EDA_PRIORITY
+#   define VSF_AUDIO_CFG_EDA_PRIORITY               vsf_prio_0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

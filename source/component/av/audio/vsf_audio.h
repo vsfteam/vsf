@@ -154,6 +154,16 @@ __vsf_component_peda_ifs(vk_audio_stop,
     vk_audio_stream_t           *audio_stream;
 )
 
+vsf_class(vsf_audio_ticktock_stream_adapter_t) {
+    public_member(
+        implement(vsf_stream_adapter_t)
+    )
+    private_member(
+        // use eda to prevent pre-emptive of stream_adapter
+        vsf_eda_t eda;
+    )
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
@@ -166,11 +176,11 @@ extern vsf_err_t vk_audio_start(vk_audio_dev_t *pthis, uint_fast8_t stream_idx,
 extern vsf_err_t vk_audio_stop(vk_audio_dev_t *pthis, uint_fast8_t stream_idx);
 
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
-extern void vsf_audio_playback_ticktock_stream_adapter_init(vsf_stream_adapter_t *adapter);
+extern void vsf_audio_playback_ticktock_stream_adapter_init(vsf_audio_ticktock_stream_adapter_t *adapter);
 #endif
 
 #if VSF_AUDIO_USE_CAPTURE == ENABLED
-extern void vsf_audio_capture_ticktock_stream_adapter_init(vsf_stream_adapter_t *adapter);
+extern void vsf_audio_capture_ticktock_stream_adapter_init(vsf_audio_ticktock_stream_adapter_t *adapter);
 #endif
 
 #ifdef __cplusplus

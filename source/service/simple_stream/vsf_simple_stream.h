@@ -275,7 +275,7 @@ vsf_class(vsf_stream_t) {
 /**
  * \~english vsf steam adapter class, used to connect 2 streams
  * @note stream terminal connection: stream_tx.rx <==> stream_rx.tx
- *          IMPORTANT: tx of stream_tx and rx of stream_rx can not be pre-empted each other
+ *          IMPORTANT: tx of stream_tx and rx of stream_rx can not be pre-empted by each other
  *
  * \~chinese vsf 流适配器类, 用于连接 2 个流
  * @note 流终端连接方式: stream_tx.rx <==> stream_rx.tx(stream_tx => stream_rx)
@@ -351,6 +351,7 @@ extern void __vsf_stream_on_write(vsf_stream_t *stream);
 #endif
 
 // vsf_stream_adapter_evthandler is only for classes derived from vsf_stream_adapter_t
+//  IMPORTANT: vsf_stream_adapter_evthandler for stream_tx and stream_rx can not be pre-empted by each other
 extern uint_fast32_t vsf_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt);
 extern void vsf_stream_adapter_init(vsf_stream_adapter_t *adapter);
 
