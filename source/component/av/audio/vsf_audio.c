@@ -125,17 +125,12 @@ static void __vsf_audio_playback_ticktock_stream_adapter_evthandler(vsf_stream_t
 
     vsf_stream_adapter_t *adapter = param;
     uint_fast32_t bufsize = vsf_stream_get_buff_size(adapter->stream_rx), halfsize = bufsize >> 1;
-    bool is_to_toggle = false;
     while (vsf_stream_get_data_size(adapter->stream_rx) < bufsize) {
         uint8_t *buf;
         uint_fast32_t size = vsf_stream_get_wbuf(adapter->stream_rx, &buf);
         VSF_AV_ASSERT(size >= halfsize);
         memset(buf, 0, halfsize);
         vsf_stream_write(adapter->stream_rx, NULL, halfsize);
-        is_to_toggle = true;
-    }
-    if (is_to_toggle) {
-        vsf_gpio_toggle(&vsf_hw_gpio1, 1 << 13);
     }
 }
 
