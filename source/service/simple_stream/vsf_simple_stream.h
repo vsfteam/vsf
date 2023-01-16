@@ -275,9 +275,11 @@ vsf_class(vsf_stream_t) {
 /**
  * \~english vsf steam adapter class, used to connect 2 streams
  * @note stream terminal connection: stream_tx.rx <==> stream_rx.tx
+ *          IMPORTANT: tx of stream_tx and rx of stream_rx can not be pre-empted each other
  *
  * \~chinese vsf 流适配器类, 用于连接 2 个流
  * @note 流终端连接方式: stream_tx.rx <==> stream_rx.tx(stream_tx => stream_rx)
+ *          重要: stream_tx 的发送端和 stream_rx 的接收端不能互相抢占
  */
 vsf_class(vsf_stream_adapter_t) {
     public_member(
