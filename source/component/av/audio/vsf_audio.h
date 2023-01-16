@@ -42,6 +42,16 @@ extern "C" {
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#define __describe_audio_ticktock_stream_adapter(__name, __stream_tx, __stream_rx, __frame_size)\
+            vsf_audio_ticktock_stream_adapter_t __name = {                      \
+                VSF_STREAM_ADAPTER_INIT((__stream_tx), (__stream_rx), (__frame_size), (__frame_size))\
+            };
+
+// prototype: describe_audio_ticktock_stream_adapter(__name, __stream_tx, __stream_rx, __frame_size)
+#define describe_audio_ticktock_stream_adapter(__name, __stream_tx, __stream_rx, __frame_size)\
+            __describe_audio_ticktock_stream_adapter(__name, (__stream_tx), (__stream_rx), __frame_size)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
