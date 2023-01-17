@@ -245,8 +245,8 @@ void vsf_distbus_register_service(vsf_distbus_t *distbus, vsf_distbus_service_t 
 {
     if (!vsf_slist_is_in(vsf_distbus_service_t, node, &distbus->service_list, service)) {
         service->addr_start = distbus->cur_addr;
-        if (service->mtu < service->info->mtu) {
-            service->mtu = service->info->mtu;
+        if (distbus->mtu < service->info->mtu) {
+            distbus->mtu = service->info->mtu;
         }
         distbus->cur_addr += service->info->addr_range;
 
