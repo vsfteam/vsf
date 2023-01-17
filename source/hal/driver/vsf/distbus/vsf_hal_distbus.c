@@ -109,13 +109,13 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
             case VSF_HAL_DISTBUS_USBD:
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
                 {
-                    vsf_hal_distbus_usbd_t *usbd = vsf_heap_malloc(data[0] * sizeof(vsf_hal_distbus_usbd_t));
+                    vsf_hal_distbus_usbd_t *usbd = vsf_heap_malloc(dev_num * sizeof(vsf_hal_distbus_usbd_t));
                     VSF_HAL_ASSERT(usbd != NULL);
 
                     hal_distbus->usbd.dev_num = dev_num;
                     hal_distbus->usbd.dev = usbd;
 
-                    for (uint8_t i = 0; i < hal_distbus->usbd.dev_num; i++) {
+                    for (uint8_t i = 0; i < dev_num; i++) {
                         vsf_hal_distbus_usbd_register_service(hal_distbus->distbus, &hal_distbus->usbd.dev[i]);
                     }
                     devs = usbd;
