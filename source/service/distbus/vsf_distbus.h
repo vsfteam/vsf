@@ -143,6 +143,7 @@ extern void vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_service_t *
 #endif
 
 extern vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus);
+extern vsf_err_t vsf_distbus_start(vsf_distbus_t *distbus);
 extern void vsf_distbus_register_service(vsf_distbus_t *distbus, vsf_distbus_service_t *service);
 
 #ifdef __cplusplus

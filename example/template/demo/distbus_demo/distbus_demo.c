@@ -132,6 +132,7 @@ int distbus_main(int argc, char *argv[])
         goto print_help;
     }
 
+    vsf_distbus_init(&__user_distbus.distbus);
     if (__user_distbus_is_master()) {
 #if APP_USE_DISTBUS_HAL_DEMO == ENABLED
         usrapp_usbd_common.hal_distbus.distbus = &__user_distbus.distbus;
@@ -146,7 +147,7 @@ int distbus_main(int argc, char *argv[])
 
     VSF_POOL_INIT(__user_distbus_msg_pool, &__user_distbus.msg_pool, APP_DISTBUS_DEMO_CFG_POOL_NUM);
     __user_distbus.distbus.on_connected = __user_distbus_on_connected;
-    vsf_distbus_init(&__user_distbus.distbus);
+    vsf_distbus_start(&__user_distbus.distbus);
 
     return 0;
 }

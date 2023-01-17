@@ -217,19 +217,18 @@ vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus)
     VSF_SERVICE_ASSERT(distbus->op.bus.recv != NULL);
     VSF_SERVICE_ASSERT(distbus->op.bus.send != NULL);
 
-    distbus->cur_addr = 0;
-
+    vsf_slist_init(&distbus->service_list);
     vsf_slist_init(&distbus->msg_tx_list);
     distbus->msg_tx = distbus->msg_rx = NULL;
-
     distbus->mtu = 0;
-    __vsf_slist_foreach_unsafe(vsf_distbus_service_t, node, &distbus->service_list) {
-        VSF_SERVICE_ASSERT((_->info != NULL) && (_->info->mtu > 0));
-        if (_->info->mtu > distbus->mtu) {
-            distbus->mtu = _->info->mtu;
-        }
-    }
-    VSF_SERVICE_ASSERT(distbus->mtu > 0);
+    distbus->cur_addr = 0;
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_distbus_start(vsf_distbus_t *distbus)
+{
+    VSF_SERVICE_ASSERT(distbus != NULL);
 
     if (distbus->op.bus.init != NULL) {
         if (distbus->op.bus.init(distbus, __vsf_distbus_on_inited)) {
@@ -246,6 +245,9 @@ void vsf_distbus_register_service(vsf_distbus_t *distbus, vsf_distbus_service_t 
 {
     if (!vsf_slist_is_in(vsf_distbus_service_t, node, &distbus->service_list, service)) {
         service->addr_start = distbus->cur_addr;
+        if (service->mtu < service->info->mtu) {
+            service->mtu = service->info->mtu;
+        }
         distbus->cur_addr += service->info->addr_range;
 
         vsf_slist_append(vsf_distbus_service_t, node, &distbus->service_list, service);
