@@ -50,7 +50,7 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *bus,
     uint8_t addr = msg->header.addr;
     bool retain_msg = false;
 
-#if VSF_HAL_USE_DISTBUS_USBD == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
     if ((addr >= VSF_HAL_DISTBUS_USBD_CMD_BEGIN) && (addr <= VSF_HAL_DISTBUS_USBD_CMD_END)) {
         extern bool __vsf_hal_distbus_usbd_msghandler(vsf_distbus_t *bus,
                         vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);

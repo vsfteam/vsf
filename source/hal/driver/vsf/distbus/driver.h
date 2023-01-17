@@ -22,12 +22,12 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_DISTBUS == ENABLED
+#if VSF_USE_DISTBUS == ENABLED && VSF_HAL_USE_DISTBUS == ENABLED
 
 // for distbus
 #include "service/vsf_service.h"
 
-#if VSF_HAL_USE_DISTBUS_USBD == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
 #   include "./usbd/vsf_hal_distbus_usbd.h"
 #endif
 
@@ -55,7 +55,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 enum {
-#if VSF_HAL_USE_DISTBUS_USBD == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
     VSF_HAL_DISTBUS_USBD_CMD_BEGIN,
     VSF_HAL_DISTBUS_USBD_CMD_INIT = VSF_HAL_DISTBUS_USBD_CMD_BEGIN,
     VSF_HAL_DISTBUS_USBD_CMD_FINI,
@@ -88,13 +88,12 @@ vsf_class(vsf_hal_distbus_t) {
     protected_member(
         vsf_distbus_service_t       service;
 
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
         struct {
+            vsf_hal_distbus_usbd_t  dev;
             usb_dc_evthandler_t     evthandler;
             void                    *param;
-        } callback;
-
-#if VSF_HAL_USE_DISTBUS_USBD == ENABLED
-        vsf_hal_distbus_usbd_t      usbd;
+        } usbd;
 #endif
     )
 };

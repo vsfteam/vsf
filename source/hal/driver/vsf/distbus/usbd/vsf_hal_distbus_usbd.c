@@ -39,8 +39,8 @@
 
 static void __vsf_hal_distbus_usbd_notify(vsf_hal_distbus_t *hal_distbus, usb_evt_t evt, uint_fast8_t value)
 {
-    if (hal_distbus->callback.evthandler != NULL) {
-        hal_distbus->callback.evthandler(hal_distbus->callback.param, evt, value);
+    if (hal_distbus->usbd.evthandler != NULL) {
+        hal_distbus->usbd.evthandler(hal_distbus->usbd.param, evt, value);
     }
 }
 
@@ -49,9 +49,9 @@ static vsf_hal_distbus_usbd_ep_t * __vsf_hal_distbus_usbd_get_ep(vsf_hal_distbus
     vsf_hal_distbus_usbd_ep_t *dcd_ep;
     if ((ep & USB_DIR_MASK) == USB_DIR_IN) {
         ep &= ~USB_DIR_MASK;
-        dcd_ep = hal_distbus->usbd.ep_in;
+        dcd_ep = hal_distbus->usbd.dev.ep_in;
     } else {
-        dcd_ep = hal_distbus->usbd.ep_out;
+        dcd_ep = hal_distbus->usbd.dev.ep_out;
     }
     VSF_USB_ASSERT(ep < 16);
     return &dcd_ep[ep];
@@ -71,11 +71,11 @@ bool __vsf_hal_distbus_usbd_msghandler(vsf_distbus_t *bus, vsf_distbus_service_t
             // for USB_ON_RESET, value returned is ep_feature
             switch (evt) {
             case USB_ON_RESET:
-                hal_distbus->usbd.ep_feature = value;
+                hal_distbus->usbd.dev.ep_feature = value;
                 value = 0;
                 break;
             case USB_ON_SETUP:
-                memcpy(&hal_distbus->usbd.setup, &data[2], 8);
+                memcpy(&hal_distbus->usbd.dev.setup, &data[2], 8);
                 break;
             case USB_ON_OUT: {
                     vsf_hal_distbus_usbd_ep_t *dcd_ep = __vsf_hal_distbus_usbd_get_ep(hal_distbus, value);
@@ -99,8 +99,8 @@ vsf_err_t vsf_hal_distbus_usbd_init(vsf_hal_distbus_t *hal_distbus, usb_dc_cfg_t
 {
     VSF_USB_ASSERT((hal_distbus != NULL) && (cfg != NULL));
 
-    hal_distbus->callback.param = cfg->param;
-    hal_distbus->callback.evthandler = cfg->evthandler;
+    hal_distbus->usbd.param = cfg->param;
+    hal_distbus->usbd.evthandler = cfg->evthandler;
 
     uint8_t *data;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(hal_distbus->distbus, 1, &data);
@@ -127,8 +127,8 @@ void vsf_hal_distbus_usbd_fini(vsf_hal_distbus_t *hal_distbus)
 
 void vsf_hal_distbus_usbd_reset(vsf_hal_distbus_t *hal_distbus, usb_dc_cfg_t *cfg)
 {
-    memset(hal_distbus->usbd.ep, 0, sizeof(hal_distbus->usbd.ep));
-    hal_distbus->usbd.address = 0;
+    memset(hal_distbus->usbd.dev.ep, 0, sizeof(hal_distbus->usbd.dev.ep));
+    hal_distbus->usbd.dev.address = 0;
 
     uint8_t *data;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(hal_distbus->distbus, 1, &data);
@@ -176,7 +176,7 @@ void vsf_hal_distbus_usbd_wakeup(vsf_hal_distbus_t *hal_distbus)
 
 void vsf_hal_distbus_usbd_set_address(vsf_hal_distbus_t *hal_distbus, uint_fast8_t addr)
 {
-    hal_distbus->usbd.address = addr;
+    hal_distbus->usbd.dev.address = addr;
 
     uint8_t *data;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(hal_distbus->distbus, 1, &data);
@@ -191,22 +191,22 @@ void vsf_hal_distbus_usbd_set_address(vsf_hal_distbus_t *hal_distbus, uint_fast8
 
 uint_fast8_t vsf_hal_distbus_usbd_get_address(vsf_hal_distbus_t *hal_distbus)
 {
-    return hal_distbus->usbd.address;
+    return hal_distbus->usbd.dev.address;
 }
 
 uint_fast16_t vsf_hal_distbus_usbd_get_frame_number(vsf_hal_distbus_t *hal_distbus)
 {
-    return hal_distbus->usbd.frame_number;
+    return hal_distbus->usbd.dev.frame_number;
 }
 
 extern uint_fast8_t vsf_hal_distbus_usbd_get_mframe_number(vsf_hal_distbus_t *hal_distbus)
 {
-    return hal_distbus->usbd.mframe_number;
+    return hal_distbus->usbd.dev.mframe_number;
 }
 
 void vsf_hal_distbus_usbd_get_setup(vsf_hal_distbus_t *hal_distbus, uint8_t *buffer)
 {
-    memcpy(buffer, (uint8_t *)&hal_distbus->usbd.setup, sizeof(hal_distbus->usbd.setup));
+    memcpy(buffer, (uint8_t *)&hal_distbus->usbd.dev.setup, sizeof(hal_distbus->usbd.dev.setup));
 }
 
 void vsf_hal_distbus_usbd_status_stage(vsf_hal_distbus_t *hal_distbus, bool is_in)
@@ -224,7 +224,7 @@ void vsf_hal_distbus_usbd_status_stage(vsf_hal_distbus_t *hal_distbus, bool is_i
 
 uint_fast8_t vsf_hal_distbus_usbd_ep_get_feature(vsf_hal_distbus_t *hal_distbus, uint_fast8_t ep, uint_fast8_t feature)
 {
-    return hal_distbus->usbd.ep_feature;
+    return hal_distbus->usbd.dev.ep_feature;
 }
 
 vsf_err_t vsf_hal_distbus_usbd_ep_add(vsf_hal_distbus_t *hal_distbus, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
