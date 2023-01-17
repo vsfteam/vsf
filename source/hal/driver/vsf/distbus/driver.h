@@ -54,45 +54,27 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum {
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
-    VSF_HAL_DISTBUS_USBD_CMD_BEGIN,
-    VSF_HAL_DISTBUS_USBD_CMD_INIT = VSF_HAL_DISTBUS_USBD_CMD_BEGIN,
-    VSF_HAL_DISTBUS_USBD_CMD_FINI,
-    VSF_HAL_DISTBUS_USBD_CMD_RESET,
-    VSF_HAL_DISTBUS_USBD_CMD_CONNECT,
-    VSF_HAL_DISTBUS_USBD_CMD_DISCONNECT,
-    VSF_HAL_DISTBUS_USBD_CMD_WAKEUP,
-    VSF_HAL_DISTBUS_USBD_CMD_SET_ADDRESS,
-    VSF_HAL_DISTBUS_USBD_CMD_STATUS_STAGE,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_ADD,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_SET_STALL,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_CLEAR_STALL,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_ENABLE_OUT,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_SET_DATA_SIZE,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_WRITE_BUFFER,
-    VSF_HAL_DISTBUS_USBD_CMD_TRANSFER_SEND,
-    VSF_HAL_DISTBUS_USBD_CMD_TRANSFER_RECV,
-    VSF_HAL_DISTBUS_USBD_CMD_ON_EVT,
-    VSF_HAL_DISTBUS_USBD_CMD_END = VSF_HAL_DISTBUS_USBD_CMD_ON_EVT,
-#endif
-
-    VSF_HAL_DISTBUS_ADDR_RANGE,
-};
+typedef enum vsf_hal_distbus_type_t {
+    VSF_HAL_DISTBUS_GPIO = 0,
+    VSF_HAL_DISTBUS_I2C,
+    VSF_HAL_DISTBUS_SPI,
+    VSF_HAL_DISTBUS_USART,
+    VSF_HAL_DISTBUS_MMC,
+    VSF_HAL_DISTBUS_ADC,
+    VSF_HAL_DISTBUS_PWM,
+    VSF_HAL_DISTBUS_USBD,
+    VSF_HAL_DISTBUS_USBH,
+} vsf_hal_distbus_type_t;
 
 vsf_class(vsf_hal_distbus_t) {
-    public_member(
-        vsf_distbus_t               *distbus;
-    )
-
     protected_member(
         vsf_distbus_service_t       service;
+        vsf_distbus_t               *distbus;
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
         struct {
-            vsf_hal_distbus_usbd_t  dev;
-            usb_dc_evthandler_t     evthandler;
-            void                    *param;
+            uint8_t                 dev_num;
+            vsf_hal_distbus_usbd_t  *dev;
         } usbd;
 #endif
     )
@@ -101,6 +83,8 @@ vsf_class(vsf_hal_distbus_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern void vsf_hal_distbus_register(vsf_distbus_t *distbus, vsf_hal_distbus_t *hal_distbus);
 
 #ifdef __cplusplus
 }
