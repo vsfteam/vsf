@@ -692,7 +692,7 @@ static void __vk_usbd_setup_status_callback(void *param)
 {
     vk_usbd_dev_t *dev = (vk_usbd_dev_t *)param;
     VSF_USBD_DRV_PREPARE(dev);
-    vsf_err_t err = vsf_usbd_notify_user(dev, USB_ON_STATUS_QUERY, NULL);
+    vsf_err_t err = vsf_usbd_notify_user(dev, (usb_evt_t)USB_ON_STATUS_QUERY, NULL);
     if (err > 0) { return; } else if (err < 0) {
         vk_usbd_drv_ep_set_stall(0 | USB_DIR_OUT);
         vk_usbd_drv_ep_set_stall(0 | USB_DIR_IN);
