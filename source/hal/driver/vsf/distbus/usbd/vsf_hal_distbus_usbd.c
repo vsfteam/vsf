@@ -18,11 +18,12 @@
 /*============================ INCLUDES ======================================*/
 
 #include "component/usb/vsf_usb_cfg.h"
+#include "hal/vsf_hal_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_USBD == ENABLED && VSF_HAL_DISTBUS_USE_USBD == ENABLED
 
 #define __VSF_DISTBUS_CLASS_INHERIT__
-#define __VSF_HAL_DISTBUS_DCD_CLASS_IMPLEMENT
+#define __VSF_HAL_DISTBUS_USBD_CLASS_IMPLEMENT
 
 #include "component/usb/common/usb_common.h"
 #include "../driver.h"

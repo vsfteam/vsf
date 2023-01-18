@@ -15,19 +15,19 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_DISTBUS_DCD_H__
-#define __VSF_DISTBUS_DCD_H__
+#ifndef __VSF_HAL_DISTBUS_USBD_H__
+#define __VSF_HAL_DISTBUS_USBD_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_DISTBUS_USBD == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_USBD == ENABLED &&VSF_HAL_DISTBUS_USE_USBD == ENABLED
 
 #include "hal/driver/common/template/vsf_template_usb.h"
 
-#if     defined(__VSF_HAL_DISTBUS_DCD_CLASS_IMPLEMENT)
-#   undef __VSF_HAL_DISTBUS_DCD_CLASS_IMPLEMENT
+#if     defined(__VSF_HAL_DISTBUS_USBD_CLASS_IMPLEMENT)
+#   undef __VSF_HAL_DISTBUS_USBD_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #endif
 
