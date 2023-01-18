@@ -81,12 +81,12 @@ extern "C" {
 #   define VSF_HAL_USE_MERGER_REQUEST_I2C   ENABLED
 #endif
 
-#ifndef VSF_HAL_USE_I2S
-#   define VSF_HAL_USE_I2S                  ENABLED
+#ifndef VSF_HAL_USE_GPIO_I2C
+#   define VSF_HAL_USE_GPIO_I2C             VSF_HAL_USE_I2C
 #endif
 
-#ifndef VSF_HAL_USE_GPIO_I2C
-#   define VSF_HAL_USE_GPIO_I2C             ENABLED
+#ifndef VSF_HAL_USE_I2S
+#   define VSF_HAL_USE_I2S                  ENABLED
 #endif
 
 #ifndef VSF_HAL_USE_TIMER
