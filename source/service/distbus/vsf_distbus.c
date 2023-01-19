@@ -59,7 +59,7 @@ static void __vsf_distbus_on_sent(void *p);
 vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t size, uint8_t **buf)
 {
     VSF_SERVICE_ASSERT(distbus != NULL);
-    vsf_distbus_msg_t *msg = distbus->op.mem.alloc_msg(size + sizeof(vsf_distbus_msg_t));
+    vsf_distbus_msg_t *msg = distbus->op.mem.alloc_msg(size);
     if (msg != NULL) {
         msg->pos = 0;
         vsf_slist_init_node(vsf_distbus_msg_t, node, msg);
@@ -153,6 +153,9 @@ recv_next:
         }
 
         msg->pos = sizeof(msg->header);
+        if (0 == msg->header.datalen) {
+            goto process_msg;
+        }
         if (distbus->op.bus.recv(distbus->op.bus.transport, (uint8_t *)&msg->header + msg->pos, msg->header.datalen, distbus, __vsf_distbus_on_recv)) {
             goto recv_next;
         }
@@ -168,6 +171,7 @@ recv_next:
             return;
         }
 
+    process_msg:
         __vsf_distbus_trace_msg_rx(msg);
         __vsf_slist_foreach_unsafe(vsf_distbus_service_t, node, &distbus->service_list) {
             if ((msg->header.addr >= _->addr_start) && (msg->header.addr < (_->addr_start + _->info->addr_range))) {
