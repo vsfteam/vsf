@@ -297,12 +297,15 @@ void vsf_hal_distbus_register(vsf_distbus_t *distbus, vsf_hal_distbus_t *hal_dis
     hal_distbus->distbus = distbus;
     hal_distbus->service.info = &__vsf_hal_distbus_info;
     vsf_distbus_register_service(distbus, &hal_distbus->service);
+}
 
-    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus, 0, NULL);
+void vsf_hal_distbus_start(vsf_hal_distbus_t *hal_distbus)
+{
+    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(hal_distbus->distbus, 0, NULL);
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_CMD_CONNECT;
-    vsf_distbus_send_msg(distbus, &hal_distbus->service, msg);
+    vsf_distbus_send_msg(hal_distbus->distbus, &hal_distbus->service, msg);
 }
 
 #endif
