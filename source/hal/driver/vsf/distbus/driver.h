@@ -27,48 +27,22 @@
 // for distbus
 #include "service/vsf_service.h"
 
-#if VSF_HAL_USE_IO == ENABLED && VSF_HAL_DISTBUS_USE_IO == ENABLED
-#   include "./io/vsf_hal_distbus_io.h"
-#endif
-#if VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_DISTBUS_USE_GPIO == ENABLED
-#   include "./gpio/vsf_hal_distbus_gpio.h"
-#endif
-#if VSF_HAL_USE_I2C == ENABLED && VSF_HAL_DISTBUS_USE_I2C == ENABLED
-#   include "./i2c/vsf_hal_distbus_i2c.h"
-#endif
-#if VSF_HAL_USE_SPI == ENABLED && VSF_HAL_DISTBUS_USE_SPI == ENABLED
-#   include "./spi/vsf_hal_distbus_spi.h"
-#endif
-#if VSF_HAL_USE_USART == ENABLED && VSF_HAL_DISTBUS_USE_USART == ENABLED
-#   include "./usart/vsf_hal_distbus_usart.h"
-#endif
-#if VSF_HAL_USE_MMC == ENABLED && VSF_HAL_DISTBUS_USE_MMC == ENABLED
-#   include "./mmc/vsf_hal_distbus_mmc.h"
-#endif
-#if VSF_HAL_USE_ADC == ENABLED && VSF_HAL_DISTBUS_USE_ADC == ENABLED
-#   include "./adc/vsf_hal_distbus_adc.h"
-#endif
-#if VSF_HAL_USE_DAC == ENABLED && VSF_HAL_DISTBUS_USE_DAC == ENABLED
-#   include "./dac/vsf_hal_distbus_dac.h"
-#endif
-#if VSF_HAL_USE_PWM == ENABLED && VSF_HAL_DISTBUS_USE_PWM == ENABLED
-#   include "./pwm/vsf_hal_distbus_pwm.h"
-#endif
-#if VSF_HAL_USE_I2S == ENABLED && VSF_HAL_DISTBUS_USE_I2S == ENABLED
-#   include "./i2s/vsf_hal_distbus_i2s.h"
-#endif
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_USBD == ENABLED && VSF_HAL_DISTBUS_USE_USBD == ENABLED
-#   include "./usbd/vsf_hal_distbus_usbd.h"
-#endif
-#if VSF_USE_USB_HOST == ENABLED && VSF_HAL_USE_USBH == ENABLED && VSF_HAL_DISTBUS_USE_USBH == ENABLED
-#   include "./usbh/vsf_hal_distbus_usbh.h"
-#endif
+#include "./io/vsf_hal_distbus_io.h"
+#include "./gpio/vsf_hal_distbus_gpio.h"
+#include "./i2c/vsf_hal_distbus_i2c.h"
+#include "./spi/vsf_hal_distbus_spi.h"
+#include "./usart/vsf_hal_distbus_usart.h"
+#include "./mmc/vsf_hal_distbus_mmc.h"
+#include "./adc/vsf_hal_distbus_adc.h"
+#include "./dac/vsf_hal_distbus_dac.h"
+#include "./pwm/vsf_hal_distbus_pwm.h"
+#include "./i2s/vsf_hal_distbus_i2s.h"
+#include "./usbd/vsf_hal_distbus_usbd.h"
+#include "./usbh/vsf_hal_distbus_usbh.h"
 
 #if     defined(__VSF_HAL_DISTBUS_CLASS_IMPLEMENT)
-#   undef __VSF_HAL_DISTBUS_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HAL_DISTBUS_CLASS_INHERIT__)
-#   undef __VSF_HAL_DISTBUS_CLASS_INHERIT__
 #   define __VSF_CLASS_INHERIT__
 #endif
 
@@ -101,6 +75,15 @@ typedef enum vsf_hal_distbus_type_t {
     VSF_HAL_DISTBUS_USBD,
     VSF_HAL_DISTBUS_USBH,
 } vsf_hal_distbus_type_t;
+
+#if defined(__VSF_HAL_DISTBUS_CLASS_INHERIT__) || defined(__VSF_HAL_DISTBUS_CLASS_IMPLEMENT)
+typedef enum vsf_hal_distbus_cmd_t {
+    VSF_HAL_DISTBUS_CMD_CONNECT = 0,
+    VSF_HAL_DISTBUS_CMD_DECLARE,
+
+    VSF_HAL_DISTBUS_CMD_ADDR_RANGE,
+} vsf_hal_distbus_cmd_t;
+#endif
 
 vsf_class(vsf_hal_distbus_t) {
     protected_member(
@@ -190,6 +173,9 @@ extern void vsf_hal_distbus_register(vsf_distbus_t *distbus, vsf_hal_distbus_t *
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_HAL_DISTBUS_CLASS_IMPLEMENT
+#undef __VSF_HAL_DISTBUS_CLASS_INHERIT__
 
 #endif
 #endif

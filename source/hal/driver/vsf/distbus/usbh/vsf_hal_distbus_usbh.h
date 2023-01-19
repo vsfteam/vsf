@@ -21,14 +21,16 @@
 /*============================ INCLUDES ======================================*/
 
 #include "component/usb/vsf_usb_cfg.h"
+#include "hal/vsf_hal_cfg.h"
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_HAL_USE_USBH == ENABLED && VSF_HAL_DISTBUS_USE_USBH == ENABLED
 
 #include "hal/driver/common/template/vsf_template_usb.h"
 
 #if     defined(__VSF_HAL_DISTBUS_USBH_CLASS_IMPLEMENT)
-#   undef __VSF_HAL_DISTBUS_USBH_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_HAL_DISTBUS_USBH_CLASS_INHERIT__)
+#   define __VSF_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -40,6 +42,12 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if defined(__VSF_HAL_DISTBUS_USBH_CLASS_IMPLEMENT) || defined(__VSF_HAL_DISTBUS_USBH_CLASS_INHERIT__)
+enum {
+    VSF_HAL_DISTBUS_USBH_CMD_ADDR_RANGE,
+};
+#endif
 
 vsf_class(vsf_hal_distbus_usbh_t) {
     protected_member(
@@ -59,6 +67,9 @@ extern void vsf_hal_distbus_usbh_register_service(vsf_distbus_t *distbus, vsf_ha
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_HAL_DISTBUS_USBH_CLASS_IMPLEMENT
+#undef __VSF_HAL_DISTBUS_USBH_CLASS_INHERIT__
 
 #endif
 #endif

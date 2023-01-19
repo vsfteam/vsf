@@ -27,14 +27,9 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-enum {
-    VSF_HAL_DISTBUS_MMC_CMD_ADDR_RANGE,
-};
-
 /*============================ PROTOTYPES ====================================*/
 
-static bool __vsf_hal_distbus_mmc_msghandler(vsf_distbus_t *bus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
+static bool __vsf_hal_distbus_mmc_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

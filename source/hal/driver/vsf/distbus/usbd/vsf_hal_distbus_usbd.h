@@ -21,14 +21,16 @@
 /*============================ INCLUDES ======================================*/
 
 #include "component/usb/vsf_usb_cfg.h"
+#include "hal/vsf_hal_cfg.h"
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_USBD == ENABLED &&VSF_HAL_DISTBUS_USE_USBD == ENABLED
 
 #include "hal/driver/common/template/vsf_template_usb.h"
 
 #if     defined(__VSF_HAL_DISTBUS_USBD_CLASS_IMPLEMENT)
-#   undef __VSF_HAL_DISTBUS_USBD_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_HAL_DISTBUS_USBD_CLASS_INHERIT__)
+#   define __VSF_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -44,6 +46,30 @@ extern "C" {
         __USB_DC_FROM_IP(__n, (__obj), __drv_name, vsf_hal_distbus_usbd)
 
 /*============================ TYPES =========================================*/
+
+#if defined(__VSF_HAL_DISTBUS_USBD_CLASS_IMPLEMENT) || defined(__VSF_HAL_DISTBUS_USBD_CLASS_INHERIT__)
+enum {
+    VSF_HAL_DISTBUS_USBD_CMD_INIT = 0,
+    VSF_HAL_DISTBUS_USBD_CMD_FINI,
+    VSF_HAL_DISTBUS_USBD_CMD_RESET,
+    VSF_HAL_DISTBUS_USBD_CMD_CONNECT,
+    VSF_HAL_DISTBUS_USBD_CMD_DISCONNECT,
+    VSF_HAL_DISTBUS_USBD_CMD_WAKEUP,
+    VSF_HAL_DISTBUS_USBD_CMD_SET_ADDRESS,
+    VSF_HAL_DISTBUS_USBD_CMD_STATUS_STAGE,
+    VSF_HAL_DISTBUS_USBD_CMD_EP_ADD,
+    VSF_HAL_DISTBUS_USBD_CMD_EP_SET_STALL,
+    VSF_HAL_DISTBUS_USBD_CMD_EP_CLEAR_STALL,
+    VSF_HAL_DISTBUS_USBD_CMD_EP_ENABLE_OUT,
+    VSF_HAL_DISTBUS_USBD_CMD_EP_SET_DATA_SIZE,
+    VSF_HAL_DISTBUS_USBD_CMD_EP_WRITE_BUFFER,
+    VSF_HAL_DISTBUS_USBD_CMD_TRANSFER_SEND,
+    VSF_HAL_DISTBUS_USBD_CMD_TRANSFER_RECV,
+    VSF_HAL_DISTBUS_USBD_CMD_ON_EVT,
+
+    VSF_HAL_DISTBUS_USBD_CMD_ADDR_RANGE,
+};
+#endif
 
 typedef struct vsf_hal_distbus_usbd_ep_t {
     uint16_t                                size;
@@ -129,6 +155,9 @@ extern void vsf_hal_distbus_usbd_irq(vsf_hal_distbus_usbd_t *usbd);
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_HAL_DISTBUS_USBD_CLASS_IMPLEMENT
+#undef __VSF_HAL_DISTBUS_USBD_CLASS_INHERIT__
 
 #endif
 #endif

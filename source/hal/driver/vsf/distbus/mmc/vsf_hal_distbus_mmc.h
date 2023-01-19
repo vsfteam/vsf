@@ -20,15 +20,16 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/usb/vsf_usb_cfg.h"
+#include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_MMC == ENABLED && VSF_HAL_DISTBUS_USE_MMC == ENABLED
 
 #include "hal/driver/common/template/vsf_template_mmc.h"
 
 #if     defined(__VSF_HAL_DISTBUS_MMC_CLASS_IMPLEMENT)
-#   undef __VSF_HAL_DISTBUS_MMC_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_HAL_DISTBUS_MMC_CLASS_INHERIT__)
+#   define __VSF_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -40,6 +41,12 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if defined(__VSF_HAL_DISTBUS_MMC_CLASS_IMPLEMENT) || defined(__VSF_HAL_DISTBUS_MMC_CLASS_INHERIT__)
+enum {
+    VSF_HAL_DISTBUS_MMC_CMD_ADDR_RANGE,
+};
+#endif
 
 vsf_class(vsf_hal_distbus_mmc_t) {
     protected_member(
@@ -65,6 +72,9 @@ extern void vsf_hal_distbus_mmc_register_service(vsf_distbus_t *distbus, vsf_hal
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_HAL_DISTBUS_MMC_CLASS_IMPLEMENT
+#undef __VSF_HAL_DISTBUS_MMC_CLASS_INHERIT__
 
 #endif
 #endif

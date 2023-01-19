@@ -31,32 +31,9 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-enum {
-    VSF_HAL_DISTBUS_USBD_CMD_INIT = 0,
-    VSF_HAL_DISTBUS_USBD_CMD_FINI,
-    VSF_HAL_DISTBUS_USBD_CMD_RESET,
-    VSF_HAL_DISTBUS_USBD_CMD_CONNECT,
-    VSF_HAL_DISTBUS_USBD_CMD_DISCONNECT,
-    VSF_HAL_DISTBUS_USBD_CMD_WAKEUP,
-    VSF_HAL_DISTBUS_USBD_CMD_SET_ADDRESS,
-    VSF_HAL_DISTBUS_USBD_CMD_STATUS_STAGE,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_ADD,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_SET_STALL,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_CLEAR_STALL,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_ENABLE_OUT,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_SET_DATA_SIZE,
-    VSF_HAL_DISTBUS_USBD_CMD_EP_WRITE_BUFFER,
-    VSF_HAL_DISTBUS_USBD_CMD_TRANSFER_SEND,
-    VSF_HAL_DISTBUS_USBD_CMD_TRANSFER_RECV,
-    VSF_HAL_DISTBUS_USBD_CMD_ON_EVT,
-
-    VSF_HAL_DISTBUS_USBD_CMD_ADDR_RANGE,
-};
-
 /*============================ PROTOTYPES ====================================*/
 
-static bool __vsf_hal_distbus_usbd_msghandler(vsf_distbus_t *bus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
+static bool __vsf_hal_distbus_usbd_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
