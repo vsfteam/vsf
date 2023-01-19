@@ -94,11 +94,12 @@ vsf_class(vsf_distbus_service_t) {
 };
 
 typedef struct vsf_distbus_bus_op_t {
-    bool (*init)(void *p, void (*on_inited)(void *p));
+    void *transport;
+    bool (*init)(void *transport, void *p, void (*on_inited)(void *p));
     // returns true if sent
-    bool (*send)(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_sent)(void *p));
+    bool (*send)(void *transport, uint8_t *buffer, uint_fast32_t size, void *p, void (*on_sent)(void *p));
     // returns true if received
-    bool (*recv)(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_recv)(void *p));
+    bool (*recv)(void *transport, uint8_t *buffer, uint_fast32_t size, void *p, void (*on_recv)(void *p));
 } vsf_distbus_bus_op_t;
 
 typedef struct vsf_distbus_mem_op_t {

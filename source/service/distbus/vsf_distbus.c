@@ -91,7 +91,7 @@ static bool __vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_msg_t *ms
     VSF_SERVICE_ASSERT((distbus != NULL) && (msg != NULL));
     uint_fast32_t size = msg->header.datalen + sizeof(msg->header);
     __vsf_distbus_trace_msg_tx(msg);
-    return distbus->op.bus.send((uint8_t *)&msg->header, size, distbus, __vsf_distbus_on_sent);
+    return distbus->op.bus.send(distbus->op.bus.transport, (uint8_t *)&msg->header, size, distbus, __vsf_distbus_on_sent);
 }
 
 static void __vsf_distbus_on_sent(void *p)
@@ -153,7 +153,7 @@ recv_next:
         }
 
         msg->pos = sizeof(msg->header);
-        if (distbus->op.bus.recv((uint8_t *)&msg->header + msg->pos, msg->header.datalen, distbus, __vsf_distbus_on_recv)) {
+        if (distbus->op.bus.recv(distbus->op.bus.transport, (uint8_t *)&msg->header + msg->pos, msg->header.datalen, distbus, __vsf_distbus_on_recv)) {
             goto recv_next;
         }
     } else if (sizeof(msg->header) == msg->pos) {
@@ -182,7 +182,7 @@ recv_next:
         }
 
         msg->pos = 0;
-        if (distbus->op.bus.recv((uint8_t *)&msg->header, sizeof(msg->header), distbus, __vsf_distbus_on_recv)) {
+        if (distbus->op.bus.recv(distbus->op.bus.transport, (uint8_t *)&msg->header, sizeof(msg->header), distbus, __vsf_distbus_on_recv)) {
             goto recv_next;
         }
     } else {
@@ -204,7 +204,7 @@ static void __vsf_distbus_on_inited(void *p)
 
     distbus->msg_rx = msg;
     msg->pos = 0;
-    if (distbus->op.bus.recv((uint8_t *)&msg->header, sizeof(msg->header), distbus, __vsf_distbus_on_recv)) {
+    if (distbus->op.bus.recv(distbus->op.bus.transport, (uint8_t *)&msg->header, sizeof(msg->header), distbus, __vsf_distbus_on_recv)) {
         __vsf_distbus_on_recv(distbus);
     }
 }
@@ -231,7 +231,7 @@ vsf_err_t vsf_distbus_start(vsf_distbus_t *distbus)
     VSF_SERVICE_ASSERT(distbus != NULL);
 
     if (distbus->op.bus.init != NULL) {
-        if (distbus->op.bus.init(distbus, __vsf_distbus_on_inited)) {
+        if (distbus->op.bus.init(distbus->op.bus.transport, distbus, __vsf_distbus_on_inited)) {
             __vsf_distbus_on_inited(distbus);
         }
     } else {
