@@ -69,7 +69,11 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
 
     switch (msg->header.addr) {
     case VSF_HAL_DISTBUS_CMD_CONNECT:
-        // nothing to declare
+        msg = vsf_distbus_alloc_msg(hal_distbus->distbus, 0, NULL);
+        VSF_HAL_ASSERT(msg != NULL);
+
+        msg->header.addr = VSF_HAL_DISTBUS_CMD_CONNECT;
+        vsf_distbus_send_msg(hal_distbus->distbus, &hal_distbus->service, msg);
         break;
     case VSF_HAL_DISTBUS_CMD_DECLARE:
         while (datalen > 0) {
@@ -116,15 +120,6 @@ void vsf_hal_distbus_register(vsf_distbus_t *distbus, vsf_hal_distbus_t *hal_dis
     hal_distbus->distbus = distbus;
     hal_distbus->service.info = &__vsf_hal_distbus_info;
     vsf_distbus_register_service(distbus, &hal_distbus->service);
-}
-
-void vsf_hal_distbus_start(vsf_hal_distbus_t *hal_distbus)
-{
-    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(hal_distbus->distbus, 0, NULL);
-    VSF_HAL_ASSERT(msg != NULL);
-
-    msg->header.addr = VSF_HAL_DISTBUS_CMD_CONNECT;
-    vsf_distbus_send_msg(hal_distbus->distbus, &hal_distbus->service, msg);
 }
 
 #endif

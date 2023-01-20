@@ -121,7 +121,6 @@ vsf_class(vsf_hal_distbus_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_hal_distbus_register(vsf_distbus_t *distbus, vsf_hal_distbus_t *hal_distbus);
-extern void vsf_hal_distbus_start(vsf_hal_distbus_t *hal_distbus);
 
 #ifdef __cplusplus
 }
