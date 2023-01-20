@@ -61,7 +61,7 @@ vsf_class(vsf_hal_distbus_pwm_t) {
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_hal_distbus_pwm_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_pwm_t *pwm);
+extern uint32_t vsf_hal_distbus_pwm_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_pwm_t *pwm, void *info, uint32_t infolen);
 
 /*============================ INCLUDES ======================================*/
 

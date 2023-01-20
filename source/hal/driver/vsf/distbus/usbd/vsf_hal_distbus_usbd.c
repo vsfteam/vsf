@@ -417,11 +417,12 @@ void vsf_hal_distbus_usbd_irq(vsf_hal_distbus_usbd_t *usbd)
 
 }
 
-void vsf_hal_distbus_usbd_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_usbd_t *usbd)
+uint32_t vsf_hal_distbus_usbd_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_usbd_t *usbd, void *info, uint32_t infolen)
 {
     usbd->distbus = distbus;
     usbd->service.info = &__vsf_hal_distbus_usbd_info;
     vsf_distbus_register_service(distbus, &usbd->service);
+    return 0;
 }
 
 #endif

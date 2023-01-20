@@ -57,11 +57,15 @@ static bool __vsf_hal_distbus_gpio_msghandler(vsf_distbus_t *distbus, vsf_distbu
     return retain_msg;
 }
 
-void vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_gpio_t *gpio)
+uint32_t vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_gpio_t *gpio, void *info, uint32_t infolen)
 {
-    gpio->distbus = distbus;
-    gpio->service.info = &__vsf_hal_distbus_gpio_info;
-    vsf_distbus_register_service(distbus, &gpio->service);
+    if (infolen >= sizeof(vsf_hal_distbus_gpio_info_t)) {
+        gpio->distbus = distbus;
+        gpio->service.info = &__vsf_hal_distbus_gpio_info;
+        gpio->info = *(vsf_hal_distbus_gpio_info_t *)info;
+        vsf_distbus_register_service(distbus, &gpio->service);
+    }
+    return sizeof(vsf_hal_distbus_gpio_info_t);
 }
 
 #endif

@@ -62,7 +62,7 @@ vsf_class(vsf_hal_distbus_usbh_t) {
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_hal_distbus_usbh_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_usbh_t *usbh);
+extern uint32_t vsf_hal_distbus_usbh_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_usbh_t *usbh, void *info, uint32_t infolen);
 
 #ifdef __cplusplus
 }

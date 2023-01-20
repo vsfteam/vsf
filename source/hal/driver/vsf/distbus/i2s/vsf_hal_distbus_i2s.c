@@ -57,11 +57,12 @@ static bool __vsf_hal_distbus_i2s_msghandler(vsf_distbus_t *distbus, vsf_distbus
     return retain_msg;
 }
 
-void vsf_hal_distbus_i2s_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_i2s_t *i2s)
+uint32_t vsf_hal_distbus_i2s_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_i2s_t *i2s, void *info, uint32_t infolen)
 {
     i2s->distbus = distbus;
     i2s->service.info = &__vsf_hal_distbus_i2s_info;
     vsf_distbus_register_service(distbus, &i2s->service);
+    return 0;
 }
 
 #endif

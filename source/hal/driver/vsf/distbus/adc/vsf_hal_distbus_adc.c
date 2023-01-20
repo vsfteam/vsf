@@ -57,11 +57,12 @@ static bool __vsf_hal_distbus_adc_msghandler(vsf_distbus_t *distbus, vsf_distbus
     return retain_msg;
 }
 
-void vsf_hal_distbus_adc_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_adc_t *adc)
+uint32_t vsf_hal_distbus_adc_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_adc_t *adc, void *info, uint32_t infolen)
 {
     adc->distbus = distbus;
     adc->service.info = &__vsf_hal_distbus_adc_info;
     vsf_distbus_register_service(distbus, &adc->service);
+    return 0;
 }
 
 #endif

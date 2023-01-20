@@ -57,11 +57,12 @@ static bool __vsf_hal_distbus_spi_msghandler(vsf_distbus_t *distbus, vsf_distbus
     return retain_msg;
 }
 
-void vsf_hal_distbus_spi_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_spi_t *spi)
+uint32_t vsf_hal_distbus_spi_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_spi_t *spi, void *info, uint32_t infolen)
 {
     spi->distbus = distbus;
     spi->service.info = &__vsf_hal_distbus_spi_info;
     vsf_distbus_register_service(distbus, &spi->service);
+    return 0;
 }
 
 #endif

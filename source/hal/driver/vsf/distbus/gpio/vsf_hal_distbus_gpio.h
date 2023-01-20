@@ -48,12 +48,26 @@ enum {
 };
 #endif
 
+typedef struct vsf_hal_distbus_gpio_info_t {
+    uint8_t support_config_pin;
+    uint8_t support_output_and_set;
+    uint8_t support_output_and_clear;
+    uint8_t pin_count;
+    uint32_t avail_pin_mask;
+} PACKED vsf_hal_distbus_gpio_info_t;
+
 vsf_class(vsf_hal_distbus_gpio_t) {
+#if VSF_GPIO_I2C_CFG_MULTI_CLASS == ENABLED
+    public_member(
+        implement(vsf_gpio_t)
+    )
+#endif
     protected_member(
         vsf_distbus_service_t               service;
     )
     private_member(
         vsf_distbus_t                       *distbus;
+        vsf_hal_distbus_gpio_info_t         info;
     )
 };
 
@@ -61,7 +75,7 @@ vsf_class(vsf_hal_distbus_gpio_t) {
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_gpio_t *gpio);
+extern uint32_t vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_gpio_t *gpio, void *info, uint32_t infolen);
 
 /*============================ INCLUDES ======================================*/
 

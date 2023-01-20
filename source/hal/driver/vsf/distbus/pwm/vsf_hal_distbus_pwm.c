@@ -57,11 +57,12 @@ static bool __vsf_hal_distbus_pwm_msghandler(vsf_distbus_t *distbus, vsf_distbus
     return retain_msg;
 }
 
-void vsf_hal_distbus_pwm_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_pwm_t *pwm)
+uint32_t vsf_hal_distbus_pwm_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_pwm_t *pwm, void *info, uint32_t infolen)
 {
     pwm->distbus = distbus;
     pwm->service.info = &__vsf_hal_distbus_pwm_info;
     vsf_distbus_register_service(distbus, &pwm->service);
+    return 0;
 }
 
 #endif

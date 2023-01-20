@@ -61,11 +61,12 @@ static bool __vsf_hal_distbus_usbh_msghandler(vsf_distbus_t *distbus, vsf_distbu
     return retain_msg;
 }
 
-void vsf_hal_distbus_usbh_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_usbh_t *usbh)
+uint32_t vsf_hal_distbus_usbh_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_usbh_t *usbh, void *info, uint32_t infolen)
 {
     usbh->distbus = distbus;
     usbh->service.info = &__vsf_hal_distbus_usbh_info;
     vsf_distbus_register_service(distbus, &usbh->service);
+    return 0;
 }
 
 #endif

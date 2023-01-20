@@ -57,11 +57,12 @@ static bool __vsf_hal_distbus_usart_msghandler(vsf_distbus_t *distbus, vsf_distb
     return retain_msg;
 }
 
-void vsf_hal_distbus_usart_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_usart_t *usart)
+uint32_t vsf_hal_distbus_usart_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_usart_t *usart, void *info, uint32_t infolen)
 {
     usart->distbus = distbus;
     usart->service.info = &__vsf_hal_distbus_usart_info;
     vsf_distbus_register_service(distbus, &usart->service);
+    return 0;
 }
 
 #endif

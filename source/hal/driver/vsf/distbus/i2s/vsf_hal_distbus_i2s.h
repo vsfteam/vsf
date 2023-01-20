@@ -61,7 +61,7 @@ vsf_class(vsf_hal_distbus_i2s_t) {
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_hal_distbus_i2s_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_i2s_t *i2s);
+extern uint32_t vsf_hal_distbus_i2s_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_i2s_t *i2s, void *info, uint32_t infolen);
 
 /*============================ INCLUDES ======================================*/
 
