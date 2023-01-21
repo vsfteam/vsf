@@ -99,59 +99,23 @@ typedef enum vsf_hal_distbus_cmd_t {
 } vsf_hal_distbus_cmd_t;
 #endif
 
-vsf_class(vsf_hal_distbus_t) {
-    protected_member(
-        vsf_distbus_service_t       service;
-        vsf_distbus_t               *distbus;
-
+typedef struct __vsf_hal_distbus_enum {
 #define VSF_HAL_DISTBUS_DEFINE(__TYPE)                                          \
         struct {                                                                \
             uint8_t                 dev_num;                                    \
             VSF_MCONNECT(vsf_hal_distbus_, __TYPE, _t) *dev;                    \
         } __TYPE;
-#if 0
-        // some compiler doesnot support include directive within macro arguments
-        VSF_MFOREACH(VSF_HAL_DISTBUS_DEFINE,
+
+#define __VSF_HAL_DISTBUS_ENUM      VSF_HAL_DISTBUS_DEFINE
 #include "vsf_hal_distbus_enum.inc"
-        )
-#else
-#if VSF_HAL_USE_IO == ENABLED && VSF_HAL_DISTBUS_USE_IO == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(io)
-#endif
-#if VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_DISTBUS_USE_GPIO == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(gpio)
-#endif
-#if VSF_HAL_USE_I2C == ENABLED && VSF_HAL_DISTBUS_USE_I2C == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(i2c)
-#endif
-#if VSF_HAL_USE_SPI == ENABLED && VSF_HAL_DISTBUS_USE_SPI == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(spi)
-#endif
-#if VSF_HAL_USE_USART == ENABLED && VSF_HAL_DISTBUS_USE_USART == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(usart)
-#endif
-#if VSF_HAL_USE_MMC == ENABLED && VSF_HAL_DISTBUS_USE_MMC == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(mmc)
-#endif
-#if VSF_HAL_USE_ADC == ENABLED && VSF_HAL_DISTBUS_USE_ADC == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(adc)
-#endif
-#if VSF_HAL_USE_DAC == ENABLED && VSF_HAL_DISTBUS_USE_DAC == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(dac)
-#endif
-#if VSF_HAL_USE_PWM == ENABLED && VSF_HAL_DISTBUS_USE_PWM == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(pwm)
-#endif
-#if VSF_HAL_USE_I2S == ENABLED && VSF_HAL_DISTBUS_USE_I2S == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(i2s)
-#endif
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_USBD == ENABLED && VSF_HAL_DISTBUS_USE_USBD == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(usbd)
-#endif
-#if VSF_USE_USB_HOST == ENABLED && VSF_HAL_USE_USBH == ENABLED && VSF_HAL_DISTBUS_USE_USBH == ENABLED
-        VSF_HAL_DISTBUS_DEFINE(usbh)
-#endif
-#endif
+} __vsf_hal_distbus_enum;
+
+vsf_class(vsf_hal_distbus_t) {
+    protected_member(
+        vsf_distbus_service_t       service;
+        vsf_distbus_t               *distbus;
+
+        implement(__vsf_hal_distbus_enum)
     )
 };
 
