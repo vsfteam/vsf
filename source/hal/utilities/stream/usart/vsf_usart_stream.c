@@ -31,7 +31,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_usart_tx(vsf_usart_stream_t *usart_stream, vsf_protect_t orig)
+static void __vsf_usart_stream_tx(vsf_usart_stream_t *usart_stream, vsf_protect_t orig)
 {
     uint8_t *buf;
 
@@ -42,7 +42,7 @@ static void __vsf_usart_tx(vsf_usart_stream_t *usart_stream, vsf_protect_t orig)
     }
 }
 
-static void __vsf_usart_rx(vsf_usart_stream_t *usart_stream, vsf_protect_t orig)
+static void __vsf_usart_stream_rx(vsf_usart_stream_t *usart_stream, vsf_protect_t orig)
 {
     uint8_t *buf;
 
@@ -73,7 +73,7 @@ static void __vsf_usart_stream_evthandler(vsf_stream_t *stream, void *param, vsf
             vsf_unprotect_int(orig);
             break;
         }
-        __vsf_usart_tx(usart_stream, orig);
+        __vsf_usart_stream_tx(usart_stream, orig);
         break;
     case VSF_STREAM_ON_OUT:
     check_rx:
@@ -82,7 +82,7 @@ static void __vsf_usart_stream_evthandler(vsf_stream_t *stream, void *param, vsf
             vsf_unprotect_int(orig);
             break;
         }
-        __vsf_usart_rx(usart_stream, orig);
+        __vsf_usart_stream_rx(usart_stream, orig);
         break;
     }
 }
@@ -94,11 +94,11 @@ static void vsf_usart_stream_isrhandler(void *target, vsf_usart_t *usart, vsf_us
     if (irq_mask & VSF_USART_IRQ_MASK_RX_CPL) {
         VSF_HAL_ASSERT(usart_stream->rx.size > 0);
         vsf_stream_write(usart_stream->stream_rx, NULL, usart_stream->rx.size);
-        __vsf_usart_rx(usart_stream, vsf_protect_int());
+        __vsf_usart_stream_rx(usart_stream, vsf_protect_int());
     } else {
         VSF_HAL_ASSERT(usart_stream->tx.size > 0);
         vsf_stream_read(usart_stream->stream_tx, NULL, usart_stream->tx.size);
-        __vsf_usart_tx(usart_stream, vsf_protect_int());
+        __vsf_usart_stream_tx(usart_stream, vsf_protect_int());
     }
 }
 
