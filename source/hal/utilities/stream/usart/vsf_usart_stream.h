@@ -15,56 +15,64 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
+#ifndef __VSF_USART_STREAM_H__
+#define __VSF_USART_STREAM_H__
 
-#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#include "hal/vsf_hal_cfg.h"
 
-#   include "./driver/driver.h"
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#if VSF_HAL_USE_USART == ENABLED && VSF_USE_SIMPLE_STREAM == ENABLED
 
-#else
+// for vsf_usart_t
+#include "hal/vsf_hal.h"
+// for stream
+#include "service/vsf_service.h"
 
-#   ifndef __VSF_HAL_H__
-#   define __VSF_HAL_H__
+#if     defined(__VSF_USART_STREAM_CLASS_IMPLEMENT)
+#   undef __VSF_USART_STREAM_CLASS_IMPLEMENT
+#   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_USART_STREAM_CLASS_INHERIT__)
+#   undef __VSF_USART_STREAM_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
+#endif
 
-#   include "hal/vsf_hal_cfg.h"
-#   include "./arch/vsf_arch.h"
-#   include "./driver/driver.h"
-// DO NOT INCLUDE COMMON.h, so that use can use their own hal API standard
-//#   include "./driver/common/common.h"
+#include "utilities/ooc_class.h"
 
-#   include "./utilities/io_mapper/vsf_io_mapper.h"
-#   include "./utilities/stream/usart/vsf_usart_stream.h"
-
-#   ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#   endif
+#endif
 
+/*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+vsf_class(vsf_usart_stream_t) {
+    public_member(
+        vsf_usart_t *usart;
+        // dataflow:
+        // usart_rx --> stream_rx.tx
+        // usart_tx <-- stream_tx.rx
+        vsf_stream_t *stream_rx;
+        vsf_stream_t *stream_tx;
+    )
+    private_member(
+        struct {
+            uint32_t size;
+        } rx;
+        struct {
+            uint32_t size;
+        } tx;
+    )
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-/*! \note initialize level 0/1 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_hal_init(void);
+extern vsf_err_t vsf_usart_stream_init(vsf_usart_stream_t *usart_stream, vsf_usart_cfg_t *cfg);
 
-/*! \note initialize level 2 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_osa_hal_init(void);
-
-#   ifdef __cplusplus
+#ifdef __cplusplus
 }
-#   endif
+#endif
 
-#endif      // __VSF_HAL_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-/* EOF */
+#endif      // VSF_HAL_USE_USART && VSF_USE_SIMPLE_STREAM
+#endif      // __VSF_USART_STREAM_H__
