@@ -99,7 +99,7 @@ typedef enum vsf_hal_distbus_cmd_t {
 } vsf_hal_distbus_cmd_t;
 #endif
 
-typedef struct __vsf_hal_distbus_enum {
+typedef struct __vsf_hal_distbus_enum_t {
 #define VSF_HAL_DISTBUS_DEFINE(__TYPE)                                          \
         struct {                                                                \
             uint8_t                 dev_num;                                    \
@@ -108,14 +108,14 @@ typedef struct __vsf_hal_distbus_enum {
 
 #define __VSF_HAL_DISTBUS_ENUM      VSF_HAL_DISTBUS_DEFINE
 #include "vsf_hal_distbus_enum.inc"
-} __vsf_hal_distbus_enum;
+} __vsf_hal_distbus_enum_t;
 
 vsf_class(vsf_hal_distbus_t) {
     protected_member(
         vsf_distbus_service_t       service;
         vsf_distbus_t               *distbus;
 
-        implement(__vsf_hal_distbus_enum)
+        implement(__vsf_hal_distbus_enum_t)
     )
 };
 
