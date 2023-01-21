@@ -60,9 +60,49 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
         void *ptr;
 #define VSF_HAL_DISTBUS_DEFINE_PARAM(__TYPE)                                    \
         VSF_MCONNECT(vsf_hal_distbus_, __TYPE, _t) *__TYPE;
+#if 0
+        // some compiler doesnot support include directive within macro arguments
         VSF_MFOREACH(VSF_HAL_DISTBUS_DEFINE_PARAM,
 #include "vsf_hal_distbus_enum.inc"
         )
+#else
+#if VSF_HAL_USE_IO == ENABLED && VSF_HAL_DISTBUS_USE_IO == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(io)
+#endif
+#if VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_DISTBUS_USE_GPIO == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(gpio)
+#endif
+#if VSF_HAL_USE_I2C == ENABLED && VSF_HAL_DISTBUS_USE_I2C == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(i2c)
+#endif
+#if VSF_HAL_USE_SPI == ENABLED && VSF_HAL_DISTBUS_USE_SPI == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(spi)
+#endif
+#if VSF_HAL_USE_USART == ENABLED && VSF_HAL_DISTBUS_USE_USART == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(usart)
+#endif
+#if VSF_HAL_USE_MMC == ENABLED && VSF_HAL_DISTBUS_USE_MMC == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(mmc)
+#endif
+#if VSF_HAL_USE_ADC == ENABLED && VSF_HAL_DISTBUS_USE_ADC == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(adc)
+#endif
+#if VSF_HAL_USE_DAC == ENABLED && VSF_HAL_DISTBUS_USE_DAC == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(dac)
+#endif
+#if VSF_HAL_USE_PWM == ENABLED && VSF_HAL_DISTBUS_USE_PWM == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(pwm)
+#endif
+#if VSF_HAL_USE_I2S == ENABLED && VSF_HAL_DISTBUS_USE_I2S == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(i2s)
+#endif
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_USBD == ENABLED && VSF_HAL_DISTBUS_USE_USBD == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(usbd)
+#endif
+#if VSF_USE_USB_HOST == ENABLED && VSF_HAL_USE_USBH == ENABLED && VSF_HAL_DISTBUS_USE_USBH == ENABLED
+        VSF_HAL_DISTBUS_DEFINE_PARAM(usbh)
+#endif
+#endif
     } u_devs;
     uint8_t dev_type;
     uint8_t dev_num;
@@ -99,9 +139,49 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
                 }                                                               \
                 break;
 
+#if 0
+            // some compiler doesnot support include directive within macro arguments
             VSF_MFOREACH(VSF_HAL_DISTBUS_PROCESS_DECLARE,
 #include "vsf_hal_distbus_enum.inc"
             )
+#else
+#if VSF_HAL_USE_IO == ENABLED && VSF_HAL_DISTBUS_USE_IO == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(io)
+#endif
+#if VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_DISTBUS_USE_GPIO == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(gpio)
+#endif
+#if VSF_HAL_USE_I2C == ENABLED && VSF_HAL_DISTBUS_USE_I2C == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(i2c)
+#endif
+#if VSF_HAL_USE_SPI == ENABLED && VSF_HAL_DISTBUS_USE_SPI == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(spi)
+#endif
+#if VSF_HAL_USE_USART == ENABLED && VSF_HAL_DISTBUS_USE_USART == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(usart)
+#endif
+#if VSF_HAL_USE_MMC == ENABLED && VSF_HAL_DISTBUS_USE_MMC == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(mmc)
+#endif
+#if VSF_HAL_USE_ADC == ENABLED && VSF_HAL_DISTBUS_USE_ADC == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(adc)
+#endif
+#if VSF_HAL_USE_DAC == ENABLED && VSF_HAL_DISTBUS_USE_DAC == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(dac)
+#endif
+#if VSF_HAL_USE_PWM == ENABLED && VSF_HAL_DISTBUS_USE_PWM == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(pwm)
+#endif
+#if VSF_HAL_USE_I2S == ENABLED && VSF_HAL_DISTBUS_USE_I2S == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(i2s)
+#endif
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_USBD == ENABLED && VSF_HAL_DISTBUS_USE_USBD == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(usbd)
+#endif
+#if VSF_USE_USB_HOST == ENABLED && VSF_HAL_USE_USBH == ENABLED && VSF_HAL_DISTBUS_USE_USBH == ENABLED
+            VSF_HAL_DISTBUS_PROCESS_DECLARE(usbh)
+#endif
+#endif
 
             default:
                 VSF_HAL_ASSERT(false);
