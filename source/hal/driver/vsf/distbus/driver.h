@@ -40,10 +40,15 @@
 #include "./usbd/vsf_hal_distbus_usbd.h"
 #include "./usbh/vsf_hal_distbus_usbh.h"
 
+#undef PUBLIC_CONST
 #if     defined(__VSF_HAL_DISTBUS_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
+#   define PUBLIC_CONST
 #elif   defined(__VSF_HAL_DISTBUS_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
+#   define PUBLIC_CONST
+#else
+#   define PUBLIC_CONST                     const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -111,11 +116,13 @@ typedef struct __vsf_hal_distbus_enum_t {
 } __vsf_hal_distbus_enum_t;
 
 vsf_class(vsf_hal_distbus_t) {
+    public_member(
+        implement(__vsf_hal_distbus_enum_t)
+        PUBLIC_CONST bool           remote_connected;
+    )
     protected_member(
         vsf_distbus_service_t       service;
         vsf_distbus_t               *distbus;
-
-        implement(__vsf_hal_distbus_enum_t)
     )
 };
 
@@ -124,6 +131,7 @@ vsf_class(vsf_hal_distbus_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_hal_distbus_register(vsf_distbus_t *distbus, vsf_hal_distbus_t *hal_distbus);
+extern void vsf_hal_distbus_start(vsf_hal_distbus_t *hal_distbus);
 
 #ifdef __cplusplus
 }

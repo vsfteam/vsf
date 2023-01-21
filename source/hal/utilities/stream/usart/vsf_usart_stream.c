@@ -47,6 +47,9 @@ static void __vsf_usart_stream_rx(vsf_usart_stream_t *usart_stream, vsf_protect_
     uint8_t *buf;
 
     usart_stream->rx.size = vsf_stream_get_wbuf(usart_stream->stream_rx, &buf);
+    if (usart_stream->rx.size > 0) {
+        usart_stream->rx.size = 1;
+    }
     vsf_unprotect_int(orig);
     if (usart_stream->rx.size > 0) {
         vsf_usart_request_rx(usart_stream->usart, buf, usart_stream->rx.size);

@@ -72,10 +72,15 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
         msg = vsf_distbus_alloc_msg(hal_distbus->distbus, 0, NULL);
         VSF_HAL_ASSERT(msg != NULL);
 
-        msg->header.addr = VSF_HAL_DISTBUS_CMD_CONNECT;
+        msg->header.addr = VSF_HAL_DISTBUS_CMD_DECLARE;
         vsf_distbus_send_msg(hal_distbus->distbus, &hal_distbus->service, msg);
         break;
     case VSF_HAL_DISTBUS_CMD_DECLARE:
+        if (hal_distbus->remote_connected) {
+            break;
+        }
+
+        hal_distbus->remote_connected = true;
         while (datalen > 0) {
             VSF_HAL_ASSERT(datalen >= 2);
             dev_type = *data++;
@@ -116,9 +121,19 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
 
 void vsf_hal_distbus_register(vsf_distbus_t *distbus, vsf_hal_distbus_t *hal_distbus)
 {
+    hal_distbus->remote_connected = false;
     hal_distbus->distbus = distbus;
     hal_distbus->service.info = &__vsf_hal_distbus_info;
     vsf_distbus_register_service(distbus, &hal_distbus->service);
+}
+
+void vsf_hal_distbus_start(vsf_hal_distbus_t *hal_distbus)
+{
+    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(hal_distbus->distbus, 0, NULL);
+    VSF_HAL_ASSERT(msg != NULL);
+
+    msg->header.addr = VSF_HAL_DISTBUS_CMD_CONNECT;
+    vsf_distbus_send_msg(hal_distbus->distbus, &hal_distbus->service, msg);
 }
 
 #endif
