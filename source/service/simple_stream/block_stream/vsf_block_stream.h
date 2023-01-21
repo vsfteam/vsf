@@ -66,6 +66,7 @@ extern "C" {
 #define __define_block_stream(__name, __block_num, __block_size)                \
             typedef struct __name##_block_stream_item_t {                       \
                 vsf_block_stream_size_t size;                                   \
+                vsf_block_stream_size_t pos;                                    \
                 uint32_t buffer[(__block_size + 3) >> 2];                       \
             } __name##_block_stream_item_t;                                     \
             def_vsf_fifo(__name, __name##_block_stream_item_t, (__block_num))   \

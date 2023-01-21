@@ -32,6 +32,7 @@
 
 typedef struct vsf_block_item_t {
     vsf_block_stream_size_t size;
+    vsf_block_stream_size_t pos;
     uint32_t buffer[0];
 } vsf_block_item_t;
 
@@ -85,12 +86,14 @@ static uint_fast32_t __vsf_block_stream_get_buff_length(vsf_stream_t *stream)
 
 static uint_fast32_t __vsf_block_stream_get_data_length(vsf_stream_t *stream)
 {
+    // TODO: fix real data length
     __vsf_block_stream_t *block_stream = (__vsf_block_stream_t *)stream;
     return vsf_fifo_get_number((vsf_fifo_t *)&block_stream->__fifo) * block_stream->block_size;
 }
 
 static uint_fast32_t __vsf_block_stream_get_avail_length(vsf_stream_t *stream)
 {
+    // TODO: fix real avail length
     return __vsf_block_stream_get_buff_length(stream) - __vsf_block_stream_get_data_length(stream);
 }
 
@@ -117,9 +120,9 @@ static uint_fast32_t __vsf_block_stream_get_rbuf(vsf_stream_t *stream, uint8_t *
 
     if (item != NULL) {
         if (ptr != NULL) {
-            *ptr = (uint8_t *)item->buffer;
+            *ptr = (uint8_t *)item->buffer + item->pos;
         }
-        return item->size;
+        return item->size - item->pos;
     }
     return 0;
 }
@@ -136,6 +139,7 @@ static uint_fast32_t __vsf_block_stream_write(vsf_stream_t *stream, uint8_t *buf
             memcpy(item->buffer, buf, size);
         }
         item->size = size;
+        item->pos = 0;
         vsf_fifo_push((vsf_fifo_t *)&block_stream->__fifo, (uintptr_t)NULL, block_stream->block_size + sizeof(item->size));
         return size;
     }
@@ -154,7 +158,12 @@ static uint_fast32_t __vsf_block_stream_read(vsf_stream_t *stream, uint8_t *buf,
         if (buf != NULL) {
             memcpy(buf, item->buffer, size);
         }
-        vsf_fifo_pop((vsf_fifo_t *)&block_stream->__fifo, (uintptr_t)NULL, block_stream->block_size + sizeof(item->size));
+
+        item->pos += size;
+        VSF_SERVICE_ASSERT(item->pos <= item->size);
+        if (item->pos == item->size) {
+            vsf_fifo_pop((vsf_fifo_t *)&block_stream->__fifo, (uintptr_t)NULL, block_stream->block_size + sizeof(item->size));
+        }
         return size;
     }
     return 0;
