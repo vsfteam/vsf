@@ -86,9 +86,13 @@ static bool __vsf_hal_distbus_gpio_msghandler(vsf_distbus_t *distbus, vsf_distbu
 uint32_t vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_gpio_t *gpio, void *info, uint32_t infolen)
 {
     if (infolen >= sizeof(vsf_hal_distbus_gpio_info_t)) {
+        gpio->info = *(vsf_hal_distbus_gpio_info_t *)info;
+        gpio->info.pin_mask = le32_to_cpu(gpio->info.pin_mask);
+        gpio->info.direction = le32_to_cpu(gpio->info.direction);
+        gpio->info.value = le32_to_cpu(gpio->info.value);
+
         gpio->distbus = distbus;
         gpio->service.info = &__vsf_hal_distbus_gpio_info;
-        gpio->info = *(vsf_hal_distbus_gpio_info_t *)info;
 #if VSF_HAL_DISTBUS_GPIO_CFG_MULTI_CLASS == ENABLED
         gpio->op = &__vsf_hal_distbus_gpio_op;
 #endif
@@ -118,8 +122,8 @@ void vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_CONFIG_PIN;
-    param->pin_mask = pin_mask;
-    param->feature = vsf_generic_io_feature_to_hal_distbus_io_feature(feature);
+    param->pin_mask = cpu_to_le32(pin_mask);
+    param->feature = cpu_to_le32(vsf_generic_io_feature_to_hal_distbus_io_feature(feature));
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
@@ -133,8 +137,8 @@ void vsf_hal_distbus_gpio_set_direction(vsf_hal_distbus_gpio_t *gpio, uint32_t p
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_SET_DIRECTION;
-    param->pin_mask = pin_mask;
-    param->direction_mask = direction_mask;
+    param->pin_mask = cpu_to_le32(pin_mask);
+    param->direction_mask = cpu_to_le32(direction_mask);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 
     vsf_protect_t orig = __vsf_gpio_protect();
@@ -184,8 +188,8 @@ void vsf_hal_distbus_gpio_write(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask,
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_WRITE;
-    param->pin_mask = pin_mask;
-    param->value = value;
+    param->pin_mask = cpu_to_le32(pin_mask);
+    param->value = cpu_to_le32(value);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
@@ -199,7 +203,7 @@ void vsf_hal_distbus_gpio_toggle(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_TOGGLE;
-    param->pin_mask = pin_mask;
+    param->pin_mask = cpu_to_le32(pin_mask);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
@@ -213,7 +217,7 @@ void vsf_hal_distbus_gpio_set(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_SET;
-    param->pin_mask = pin_mask;
+    param->pin_mask = cpu_to_le32(pin_mask);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
@@ -227,7 +231,7 @@ void vsf_hal_distbus_gpio_clear(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_CLEAR;
-    param->pin_mask = pin_mask;
+    param->pin_mask = cpu_to_le32(pin_mask);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
@@ -242,7 +246,7 @@ void vsf_hal_distbus_gpio_output_and_set(vsf_hal_distbus_gpio_t *gpio, uint32_t 
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_OUTPUT_AND_SET;
-    param->pin_mask = pin_mask;
+    param->pin_mask = cpu_to_le32(pin_mask);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
@@ -257,7 +261,7 @@ void vsf_hal_distbus_gpio_output_and_clear(vsf_hal_distbus_gpio_t *gpio, uint32_
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_OUTPUT_AND_CLEAR;
-    param->pin_mask = pin_mask;
+    param->pin_mask = cpu_to_le32(pin_mask);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 

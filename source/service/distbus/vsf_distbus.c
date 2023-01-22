@@ -63,7 +63,7 @@ vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t 
     if (msg != NULL) {
         msg->pos = 0;
         vsf_slist_init_node(vsf_distbus_msg_t, node, msg);
-        msg->header.datalen = size;
+        msg->header.datalen = cpu_to_le32(size);
         if (buf != NULL) {
             *buf = (uint8_t *)&msg->header + sizeof(msg->header);
         }
@@ -120,6 +120,11 @@ void vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_service_t *service
     msg->header.hash_header = 0;
     msg->header.hash_header = __vsf_distbus_hash((uint8_t *)&msg->header, sizeof(msg->header));
 
+    msg->header.hash_header = cpu_to_le32(msg->header.hash_header);
+    msg->header.hash_data = cpu_to_le32(msg->header.hash_data);
+    msg->header.addr = cpu_to_le16(msg->header.addr);
+    msg->header.flag = cpu_to_le16(msg->header.flag);
+
     bool is_to_send_now;
     vsf_protect_t orig = vsf_protect_int();
         is_to_send_now = (NULL == distbus->msg_tx);
@@ -146,6 +151,11 @@ recv_next:
 
     if (0 == msg->pos) {
         // header receviced
+        msg->header.hash_header = le32_to_cpu(msg->header.hash_header);
+        msg->header.hash_data = le32_to_cpu(msg->header.hash_data);
+        msg->header.addr = le16_to_cpu(msg->header.addr);
+        msg->header.flag = le16_to_cpu(msg->header.flag);
+
         uint_fast16_t hash = msg->header.hash_header;
         msg->header.hash_header = 0;
         if (hash != __vsf_distbus_hash((uint8_t *)&msg->header, sizeof(msg->header))) {
