@@ -125,31 +125,31 @@
 /*============================ TYPES =========================================*/
 
 typedef enum em_usart_status_t {
-    USART_INIT_IS_BUSY                  = 0X80U,
-    USART_READ_IS_BUSY                  = 0X40U,
-    USART_WRITE_IS_BUSY                 = 0X20U,
-    USART_RESET                         = 0X10U,
+    USART_INIT_IS_BUSY                  = 0x80U,
+    USART_READ_IS_BUSY                  = 0x40U,
+    USART_WRITE_IS_BUSY                 = 0x20U,
+    USART_RESET                         = 0x10U,
 
-    USART_ENABLE                        = 0X08U,
-    USART_DISABLE                       = 0XF7U,
+    USART_ENABLE                        = 0x08U,
+    USART_DISABLE                       = 0xF7U,
 
-    USART_SEND_BLOCK                    = 0X02U,
-    USART_SEND_BYTE                     = 0X00U,
-    USART_READ_BLOCK                    = 0X01U,
-    USART_READ_BYTE                     = 0X00U,
+    USART_SEND_BLOCK                    = 0x02U,
+    USART_SEND_BYTE                     = 0x00U,
+    USART_READ_BLOCK                    = 0x01U,
+    USART_READ_BYTE                     = 0x00U,
 } em_usart_status_t;
 
 typedef enum usart_cancel_status_t {
-    WILL_CANCEL_WRITE                   = 0X80U,
-    CANCELED_WRITE                      = 0X40U,
+    WILL_CANCEL_WRITE                   = 0x80U,
+    CANCELED_WRITE                      = 0x40U,
 
-    WILL_CANCEL_READ                    = 0X20U,
-    CANCELED_READ                       = 0X10U,
+    WILL_CANCEL_READ                    = 0x20U,
+    CANCELED_READ                       = 0x10U,
 
-    CANCEL_READ_CLP                     = 0X08U,
-    CANCEL_WRITE_CLP                    = 0X04U,
+    CANCEL_READ_CLP                     = 0x08U,
+    CANCEL_WRITE_CLP                    = 0x04U,
 
-    CANCEL_INIT                         = 0X00U,
+    CANCEL_INIT                         = 0x00U,
 } usart_cancel_status_t;
 
 typedef struct vsf_hw_usart_t {
@@ -162,24 +162,42 @@ typedef struct vsf_hw_usart_t {
     uint8_t                             cancel_status;
     uint8_t                             init_flag : 1;
     vsf_usart_cfg_t                     cfg;
-    uint8_t                             *buf;
-    uint_fast32_t                       buf_size;
-    int_fast32_t                        sended_buf_size;
-    uint8_t                             *rec_buf;
-    uint_fast32_t                       rec_buf_size;
-    int_fast32_t                        reced_buf_size;
     vsf_arch_irq_thread_t               irq_init_thread;
     HANDLE                              handle_com;
     struct {
         uint8_t                         buffer;
         uint8_t                         cnt;
     } rxfifo;
-    vsf_arch_irq_thread_t               irq_read_thread;
-    vsf_arch_irq_thread_t               irq_write_thread;
-    vsf_arch_irq_request_t              irq_read_request;
-    vsf_arch_irq_request_t              irq_write_request;
-    vsf_arch_irq_request_t              *irp_cancel_read_request;
-    vsf_arch_irq_request_t              *irp_cancel_write_request;
+    struct {
+        vsf_arch_irq_thread_t           irq_thread;
+        vsf_arch_irq_request_t          irq_request;
+        vsf_arch_irq_request_t          *irq_cancel_request;
+
+        uint8_t                         *buf;
+        uint_fast32_t                   buf_size;
+        int_fast32_t                    ret_buf_size;
+
+        OVERLAPPED                      overLapped;
+        DWORD                           total_len;
+        DWORD                           cur_len;
+        DWORD                           last_error;
+        BOOL                            ret;
+    } read;
+    struct {
+        vsf_arch_irq_thread_t           irq_thread;
+        vsf_arch_irq_request_t          irq_request;
+        vsf_arch_irq_request_t          *irq_cancel_request;
+
+        uint8_t                         *buf;
+        uint_fast32_t                   buf_size;
+        uint_fast32_t                   cur_size;
+        int_fast32_t                    ret_buf_size;
+
+        OVERLAPPED                      overLapped;
+        DWORD                           total_len;
+        DWORD                           last_error;
+        BOOL                            ret;
+    } write;
 } vsf_hw_usart_t;
 
 typedef struct x86_usart_win_t {
@@ -423,13 +441,13 @@ static vsf_err_t __usart_init(vsf_hw_usart_t *hw_usart)
 
     if (hw_usart->init_flag) {
         hw_usart->init_flag = 0;
-        __vsf_arch_irq_request_init(&hw_usart->irq_write_request);
-        __vsf_arch_irq_request_init(&hw_usart->irq_read_request);
+        __vsf_arch_irq_request_init(&hw_usart->write.irq_request);
+        __vsf_arch_irq_request_init(&hw_usart->read.irq_request);
         /* start read */
-        __vsf_arch_irq_init(&hw_usart->irq_read_thread, "vsf_usart_event\n",
+        __vsf_arch_irq_init(&hw_usart->read.irq_thread, "vsf_usart_event\n",
                             __vk_usart_read_event_thread, hw_usart->cfg.isr.prio);
         /* start write */
-        __vsf_arch_irq_init(&hw_usart->irq_write_thread, "vsf_usart_event\n",
+        __vsf_arch_irq_init(&hw_usart->write.irq_thread, "vsf_usart_event\n",
                             __vk_usart_write_event_thread, hw_usart->cfg.isr.prio);
     } else {
         hw_usart->com_status &= ~USART_RESET;
@@ -442,39 +460,39 @@ static void __vk_usart_read_event_thread(void *arg)
 {
     vsf_hw_usart_trace_irq("%s(0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, arg);
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_hw_usart_t *hw_usart = container_of(irq_thread, vsf_hw_usart_t, irq_read_thread);
+    vsf_hw_usart_t *hw_usart = container_of(irq_thread, vsf_hw_usart_t, read.irq_thread);
 
     __vsf_arch_irq_set_background(irq_thread);
 
-    BOOL read_ret = false;
-    DWORD read_len = 0;
-    DWORD read_real_len = 0;
-    OVERLAPPED overLapped;
-
+    int round;
     while (1) {
     pend_read:
         vsf_hw_usart_trace_irq(VSF_USART_CFG_TRACE_IRQ_PEND"[%s]line(%d)", __FUNCTION__, __LINE__);
-        __vsf_arch_irq_request_pend(&hw_usart->irq_read_request);
+        __vsf_arch_irq_request_pend(&hw_usart->read.irq_request);
         vsf_hw_usart_trace_irq(VSF_USART_CFG_TRACE_IRQ_GOING"[%s]line(%d)", __FUNCTION__, __LINE__);
-        read_real_len = 0;
-        hw_usart->reced_buf_size = read_real_len;
+        round = 0;
+
     rec_buf_lenth_insufficient:
-        if (NULL != hw_usart->irp_cancel_read_request) {
-            __vsf_arch_irq_request_send(hw_usart->irp_cancel_read_request);
+        if (NULL != hw_usart->read.irq_cancel_request) {
+            __vsf_arch_irq_request_send(hw_usart->read.irq_cancel_request);
             vsf_hw_usart_trace_irq("[%s]line(%d)read will cancel", __FUNCTION__, __LINE__);
             goto pend_read;
         }
-        memset(&overLapped, 0, sizeof(OVERLAPPED));
-        read_len = 0;
-        overLapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-        read_ret = ReadFile(hw_usart->handle_com, hw_usart->rec_buf + read_real_len,
-                            hw_usart->rec_buf_size - read_real_len, &read_len, &overLapped);
-        if (!read_ret) {
-            DWORD rres = GetLastError();
-            vsf_hw_usart_trace_irq("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, rres);
-            if (rres == ERROR_IO_PENDING) {
-                GetOverlappedResult(hw_usart->handle_com, &overLapped, &read_len, TRUE);
-            } else if (rres == ERROR_INVALID_HANDLE) {
+
+        if (round > 0) {
+            hw_usart->read.cur_len = 0;
+            memset(&hw_usart->read.overLapped, 0, sizeof(OVERLAPPED));
+            hw_usart->read.overLapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+            hw_usart->read.ret = ReadFile(hw_usart->handle_com, hw_usart->read.buf + hw_usart->read.total_len,
+                hw_usart->read.buf_size - hw_usart->read.total_len, &hw_usart->read.cur_len, &hw_usart->read.overLapped);
+            hw_usart->read.last_error = GetLastError();
+        }
+
+        if (!hw_usart->read.ret) {
+            vsf_hw_usart_trace_irq("[%s]line(%d)GetLastError(%lu)", __FUNCTION__, __LINE__, hw_usart->read.last_error);
+            if (hw_usart->read.last_error == ERROR_IO_PENDING) {
+                GetOverlappedResult(hw_usart->handle_com, &hw_usart->read.overLapped, &hw_usart->read.cur_len, TRUE);
+            } else if (hw_usart->read.last_error == ERROR_INVALID_HANDLE) {
                 // maybe handle is closed, and opened again, just ignore
                 //  eg: call vsf_hw_usart_init twice will
             } else {
@@ -483,7 +501,7 @@ static void __vk_usart_read_event_thread(void *arg)
                     CloseHandle(hw_usart->handle_com);
                     hw_usart->handle_com = INVALID_HANDLE_VALUE;
                     hw_usart->com_status &= (~USART_READ_IS_BUSY);
-                    vsf_hw_usart_irq_disable(hw_usart, 0XFF);
+                    vsf_hw_usart_irq_disable(hw_usart, 0xFF);
                     vsf_hw_usart_disable(hw_usart);
                     vsf_hw_usart_trace_irq(VSF_TRACE_POINTER_HEX"-->|com%d|  [%s]line(%d)read err call("VSF_TRACE_POINTER_HEX")",
                                         hw_usart, hw_usart->com_port, __FUNCTION__, __LINE__, hw_usart->cfg.isr.handler_fn);
@@ -497,7 +515,7 @@ static void __vk_usart_read_event_thread(void *arg)
                 goto pend_read;
             }
         } else {
-            if (!GetLastError()) {
+            if (!hw_usart->read.last_error) {
                 vsf_hw_usart_trace_irq("read to the file eof!%s%d\n", __FILE__, __LINE__);
             } else {
                 if ((hw_usart->enable_flag & VSF_USART_IRQ_MASK_RX_ERR) && NULL != hw_usart->cfg.isr.handler_fn) {
@@ -506,7 +524,7 @@ static void __vk_usart_read_event_thread(void *arg)
                     hw_usart->handle_com = INVALID_HANDLE_VALUE;
                     hw_usart->com_status &= (~USART_READ_IS_BUSY);
 
-                    vsf_hw_usart_irq_disable(hw_usart, 0XFF);
+                    vsf_hw_usart_irq_disable(hw_usart, 0xFF);
                     vsf_hw_usart_disable(hw_usart);
                     vsf_hw_usart_trace_irq(VSF_TRACE_POINTER_HEX"-->|com%d|  [%s]line(%d)read err call("VSF_TRACE_POINTER_HEX")",
                                         hw_usart, hw_usart->com_port, __FUNCTION__, __LINE__, hw_usart->cfg.isr.handler_fn);
@@ -519,14 +537,15 @@ static void __vk_usart_read_event_thread(void *arg)
                 goto pend_read;
             }
         }
-        read_real_len += read_len;
-        if (hw_usart->rec_buf_size != read_real_len) {
-            hw_usart->reced_buf_size = read_real_len;
+        hw_usart->read.total_len += hw_usart->read.cur_len;
+        if (hw_usart->read.buf_size != hw_usart->read.total_len) {
+            hw_usart->read.ret_buf_size = hw_usart->read.total_len;
+            round++;
             goto rec_buf_lenth_insufficient;
         }
         vsf_hw_usart_trace_irq("read_thread once!the recbuf:\n");
-        for (int temp = 0; temp < hw_usart->rec_buf_size; temp++) {
-            VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->rec_buf + temp));
+        for (int temp = 0; temp < hw_usart->read.buf_size; temp++) {
+            VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->read.buf + temp));
         }
         VSF_HW_USART_CFG_TRACE_FUNC("\n");
         hw_usart->com_status &= (~USART_READ_IS_BUSY);
@@ -540,14 +559,14 @@ static void __vk_usart_read_event_thread(void *arg)
             } else if (hw_usart->enable_flag & VSF_USART_IRQ_MASK_RX) {
                 __vsf_arch_irq_start(irq_thread);
                 hw_usart->cancel_status |= CANCEL_READ_CLP;
-                hw_usart->rxfifo.cnt = read_len;
+                hw_usart->rxfifo.cnt = hw_usart->read.cur_len;
                 hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_RX);
                 __vsf_arch_irq_end(irq_thread, false);
             }
         }
-        hw_usart->reced_buf_size = read_real_len;
-        if (NULL != hw_usart->irp_cancel_read_request) {
-            __vsf_arch_irq_request_send(hw_usart->irp_cancel_read_request);
+        hw_usart->read.ret_buf_size = hw_usart->read.total_len;
+        if (NULL != hw_usart->read.irq_cancel_request) {
+            __vsf_arch_irq_request_send(hw_usart->read.irq_cancel_request);
             vsf_hw_usart_trace_irq("[%s]line(%d)read will cancel", __FUNCTION__, __LINE__);
             goto pend_read;
         }
@@ -559,42 +578,33 @@ static void __vk_usart_write_event_thread(void *arg)
 {
     vsf_hw_usart_trace_irq("%s(0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, arg);
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_hw_usart_t *hw_usart = container_of(irq_thread, vsf_hw_usart_t, irq_write_thread);
+    vsf_hw_usart_t *hw_usart = container_of(irq_thread, vsf_hw_usart_t, write.irq_thread);
 
     __vsf_arch_irq_set_background(irq_thread);
-
-    BOOL write_ret;
-    unsigned long write_len = 0;
-    OVERLAPPED overLapped;
 
     while (1) {
     pend_write:
         vsf_hw_usart_trace_irq(VSF_USART_CFG_TRACE_IRQ_PEND"[%s]line(%d)", __FUNCTION__, __LINE__);
-        __vsf_arch_irq_request_pend(&hw_usart->irq_write_request);
+        __vsf_arch_irq_request_pend(&hw_usart->write.irq_request);
         vsf_hw_usart_trace_irq(VSF_USART_CFG_TRACE_IRQ_GOING"[%s]line(%d)", __FUNCTION__, __LINE__);
-        write_len = 0;
-        hw_usart->sended_buf_size = write_len;
 
-        if (NULL != hw_usart->irp_cancel_write_request) {
-            __vsf_arch_irq_request_send(hw_usart->irp_cancel_write_request);
+        if (NULL != hw_usart->write.irq_cancel_request) {
+            __vsf_arch_irq_request_send(hw_usart->write.irq_cancel_request);
             vsf_hw_usart_trace_irq("[%s]line(%d)write will cancel", __FUNCTION__, __LINE__);
             goto pend_write;
         }
         vsf_hw_usart_trace_irq("The data to be write(%p) is:\n", hw_usart->buf);
-        if (NULL != hw_usart->buf) {
-            for (int temp = 0; temp < hw_usart->buf_size; temp++) {
-                VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->buf + temp));
+        if (NULL != hw_usart->write.buf) {
+            for (int temp = 0; temp < hw_usart->write.buf_size; temp++) {
+                VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->write.buf + temp));
             }
             VSF_HW_USART_CFG_TRACE_FUNC("\n");
         }
-        memset(&overLapped, 0, sizeof(OVERLAPPED));
-        overLapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-        write_ret = WriteFile(hw_usart->handle_com, hw_usart->buf,
-                              hw_usart->buf_size, &write_len, &overLapped);
-        if (!write_ret) {
-            if (GetLastError() == ERROR_IO_PENDING) {
-            //tips: some virtual serial ports will be stuck in the following api
-                GetOverlappedResult(hw_usart->handle_com, &overLapped, &write_len, TRUE);
+
+        if (!hw_usart->write.ret) {
+            if (hw_usart->write.last_error == ERROR_IO_PENDING) {
+                //tips: some virtual serial ports will be stuck in the following api
+                GetOverlappedResult(hw_usart->handle_com, &hw_usart->write.overLapped, &hw_usart->write.total_len, TRUE);
             }
         } else {
             if ((hw_usart->enable_flag & VSF_USART_IRQ_MASK_TX_ERR) && NULL != hw_usart->cfg.isr.handler_fn) {
@@ -603,7 +613,7 @@ static void __vk_usart_write_event_thread(void *arg)
                 CloseHandle(hw_usart->handle_com);
                 hw_usart->handle_com = INVALID_HANDLE_VALUE;
                 hw_usart->com_status &= (~USART_WRITE_IS_BUSY);
-                vsf_hw_usart_irq_disable(hw_usart, 0XFF);
+                vsf_hw_usart_irq_disable(hw_usart, 0xFF);
                 vsf_hw_usart_disable(hw_usart);
 
                 vsf_hw_usart_trace_irq(VSF_TRACE_POINTER_HEX"-->|com%d|  [%s]line(%d)write err call("VSF_TRACE_POINTER_HEX")",
@@ -614,10 +624,10 @@ static void __vk_usart_write_event_thread(void *arg)
             }
             goto pend_write;
         }
-        vsf_hw_usart_trace_irq("The data  writed(%p) is:\n", hw_usart->buf);
-        if (NULL != hw_usart->buf) {
-            for (int temp = 0; temp < hw_usart->buf_size; temp++) {
-                VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->buf + temp));
+        vsf_hw_usart_trace_irq("The data  writed(%p) is:\n", hw_usart->write.buf);
+        if (NULL != hw_usart->write.buf) {
+            for (int temp = 0; temp < hw_usart->write.buf_size; temp++) {
+                VSF_HW_USART_CFG_TRACE_FUNC("%x  ", *(hw_usart->write.buf + temp));
             }
             VSF_HW_USART_CFG_TRACE_FUNC("\n");
         }
@@ -630,9 +640,9 @@ static void __vk_usart_write_event_thread(void *arg)
             hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_TX_CPL);
             __vsf_arch_irq_end(irq_thread, false);
         }
-        hw_usart->sended_buf_size = write_len;
-        if (NULL != hw_usart->irp_cancel_write_request) {
-            __vsf_arch_irq_request_send(hw_usart->irp_cancel_write_request);
+        hw_usart->write.ret_buf_size = hw_usart->write.total_len;
+        if (NULL != hw_usart->write.irq_cancel_request) {
+            __vsf_arch_irq_request_send(hw_usart->write.irq_cancel_request);
             vsf_hw_usart_trace_irq("[%s]line(%d)write will cancel", __FUNCTION__, __LINE__);
             goto pend_write;
         }
@@ -663,9 +673,10 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart, vsf_usart_cfg_t *cfg)
     }
     hw_usart->handle_com = INVALID_HANDLE_VALUE;
 
-    hw_usart->buf = NULL;
+    hw_usart->write.buf = NULL;
+    hw_usart->read.buf = NULL;
     hw_usart->cfg = *cfg;
-    hw_usart->enable_flag = 0X00;
+    hw_usart->enable_flag = 0x00;
 
     return __usart_init(hw_usart);
 }
@@ -798,9 +809,19 @@ vsf_err_t vsf_hw_usart_request_rx(vsf_hw_usart_t *hw_usart, void *buffer, uint_f
     }
     hw_usart->com_status |= USART_READ_IS_BUSY;
 
-    hw_usart->rec_buf = buffer;
-    hw_usart->rec_buf_size = size;
-    __vsf_arch_irq_request_send(&hw_usart->irq_read_request);
+    hw_usart->read.buf = buffer;
+    hw_usart->read.buf_size = size;
+    hw_usart->read.total_len = 0;
+    hw_usart->read.ret_buf_size = hw_usart->read.total_len;
+    hw_usart->read.cur_len = 0;
+
+    memset(&hw_usart->read.overLapped, 0, sizeof(OVERLAPPED));
+    hw_usart->read.overLapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    hw_usart->read.ret = ReadFile(hw_usart->handle_com, hw_usart->read.buf,
+            hw_usart->read.buf_size, &hw_usart->read.cur_len, &hw_usart->read.overLapped);
+    hw_usart->read.last_error = GetLastError();
+
+    __vsf_arch_irq_request_send(&hw_usart->read.irq_request);
     vsf_hw_usart_trace_function("%s exited VSF_ERR_NONE", __FUNCTION__);
     return VSF_ERR_NONE;
 }
@@ -819,9 +840,18 @@ vsf_err_t vsf_hw_usart_request_tx(vsf_hw_usart_t *hw_usart, void *buffer, uint_f
     }
     hw_usart->com_status |= USART_WRITE_IS_BUSY;
 
-    hw_usart->buf = buffer;
-    hw_usart->buf_size = size;
-    __vsf_arch_irq_request_send(&hw_usart->irq_write_request);
+    hw_usart->write.buf = buffer;
+    hw_usart->write.buf_size = size;
+    hw_usart->write.total_len = 0;
+    hw_usart->write.ret_buf_size = hw_usart->write.total_len;
+
+    memset(&hw_usart->write.overLapped, 0, sizeof(OVERLAPPED));
+    hw_usart->write.overLapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    hw_usart->write.ret = WriteFile(hw_usart->handle_com, hw_usart->write.buf,
+            hw_usart->write.buf_size, &hw_usart->write.total_len, &hw_usart->write.overLapped);
+    hw_usart->write.last_error = GetLastError();
+
+    __vsf_arch_irq_request_send(&hw_usart->write.irq_request);
     vsf_hw_usart_trace_function("%s exited VSF_ERR_NONE", __FUNCTION__);
     return VSF_ERR_NONE;
 }
@@ -894,7 +924,7 @@ vsf_err_t vsf_hw_usart_cancel_rx(vsf_hw_usart_t *hw_usart)
         vsf_hw_usart_trace_function("%s exited VSF_ERR_NOT_AVAILABLE", __FUNCTION__);
         return VSF_ERR_NONE;
     }
-    if (NULL != hw_usart->irp_cancel_read_request) {
+    if (NULL != hw_usart->read.irq_cancel_request) {
         vsf_hw_usart_trace_function("%s exited VSF_ERR_NOT_ACCESSABLE", __FUNCTION__);
         return VSF_ERR_NOT_ACCESSABLE;
     }
@@ -914,10 +944,10 @@ vsf_err_t vsf_hw_usart_cancel_rx(vsf_hw_usart_t *hw_usart)
     vsf_arch_irq_request_t read_cancel_request = {0};
     __vsf_arch_irq_request_init(&read_cancel_request);
 
-    hw_usart->irp_cancel_read_request = &read_cancel_request;
+    hw_usart->read.irq_cancel_request = &read_cancel_request;
 
-    __vsf_arch_irq_request_pend(hw_usart->irp_cancel_read_request);
-    hw_usart->irp_cancel_read_request = NULL;
+    __vsf_arch_irq_request_pend(hw_usart->read.irq_cancel_request);
+    hw_usart->read.irq_cancel_request = NULL;
     vsf_hw_usart_trace_function("%s exited VSF_ERR_NONE", __FUNCTION__);
     return VSF_ERR_NONE;
 }
@@ -930,7 +960,7 @@ vsf_err_t vsf_hw_usart_cancel_tx(vsf_hw_usart_t *hw_usart)
         vsf_hw_usart_trace_function("%s line(%d) exited VSF_ERR_NOT_AVAILABLE", __FUNCTION__, __LINE__);
         return VSF_ERR_NONE;
     }
-    if (NULL != hw_usart->irp_cancel_write_request) {
+    if (NULL != hw_usart->write.irq_cancel_request) {
         vsf_hw_usart_trace_function("%s line(%d) exited VSF_ERR_NOT_ACCESSABLE", __FUNCTION__, __LINE__);
         return VSF_ERR_NOT_ACCESSABLE;
     }
@@ -949,10 +979,10 @@ vsf_err_t vsf_hw_usart_cancel_tx(vsf_hw_usart_t *hw_usart)
     }
     vsf_arch_irq_request_t write_cancel_request = {0};
     __vsf_arch_irq_request_init(&write_cancel_request);
-    hw_usart->irp_cancel_write_request = &write_cancel_request;
+    hw_usart->write.irq_cancel_request = &write_cancel_request;
 
-    __vsf_arch_irq_request_pend(hw_usart->irp_cancel_write_request);
-    hw_usart->irp_cancel_write_request = NULL;
+    __vsf_arch_irq_request_pend(hw_usart->write.irq_cancel_request);
+    hw_usart->write.irq_cancel_request = NULL;
     vsf_hw_usart_trace_function("%s exited VSF_ERR_NONE", __FUNCTION__);
     return VSF_ERR_NONE;
 }
@@ -962,7 +992,7 @@ int_fast32_t vsf_hw_usart_get_rx_count(vsf_hw_usart_t *hw_usart)
     vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, hw_usart);
     VSF_HAL_ASSERT(hw_usart != NULL);
     vsf_hw_usart_trace_function("%s exited reced buffer size(%d)", __FUNCTION__, hw_usart->reced_buf_size);
-    return hw_usart->reced_buf_size;
+    return hw_usart->read.ret_buf_size;
 }
 
 int_fast32_t vsf_hw_usart_get_tx_count(vsf_hw_usart_t *hw_usart)
@@ -970,7 +1000,7 @@ int_fast32_t vsf_hw_usart_get_tx_count(vsf_hw_usart_t *hw_usart)
     vsf_hw_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, hw_usart);
     VSF_HAL_ASSERT(hw_usart != NULL);
     vsf_hw_usart_trace_function("%s exited sended buffer size(%d)", __FUNCTION__, hw_usart->sended_buf_size);
-    return hw_usart->sended_buf_size;
+    return hw_usart->write.ret_buf_size;
 }
 
 /*============================ INCLUDES ======================================*/
@@ -980,9 +1010,9 @@ int_fast32_t vsf_hw_usart_get_tx_count(vsf_hw_usart_t *hw_usart)
         .com_port                          = __count,                           \
         .com_status                        = USART_INIT_IS_BUSY,                \
         .handle_com                        = NULL,                              \
-        .irp_cancel_read_request           = NULL,                              \
-        .irp_cancel_write_request          = NULL,                              \
-        .cancel_status                     = 0X00,                              \
+        .read.irq_cancel_request           = NULL,                              \
+        .write.irq_cancel_request          = NULL,                              \
+        .cancel_status                     = 0x00,                              \
         .init_flag                         = 1,                                 \
         __hal_op                                                                \
     };

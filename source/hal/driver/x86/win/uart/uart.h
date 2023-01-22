@@ -38,29 +38,29 @@
 typedef enum vsf_usart_mode_t {
     VSF_USART_8_BIT_LENGTH              = 0x0000ul,
     VSF_USART_9_BIT_LENGTH              = 0x1000ul,
-    VSF_USART_BIT_LENGTH_MASK           = VSF_USART_8_BIT_LENGTH |
-                                          VSF_USART_9_BIT_LENGTH,
+    VSF_USART_BIT_LENGTH_MASK           = VSF_USART_8_BIT_LENGTH
+                                        | VSF_USART_9_BIT_LENGTH,
 
     VSF_USART_1_STOPBIT                 = 0x0000ul,
     VSF_USART_2_STOPBIT                 = 0x2000ul,
-    VSF_USART_STOPBIT_MASK              = VSF_USART_1_STOPBIT |
-                                          VSF_USART_2_STOPBIT,
+    VSF_USART_STOPBIT_MASK              = VSF_USART_1_STOPBIT
+                                        | VSF_USART_2_STOPBIT,
 
     VSF_USART_NO_PARITY                 = 0x0000ul,
     VSF_USART_EVEN_PARITY               = 0x0400ul,
     VSF_USART_ODD_PARITY                = 0x0600ul,
-    VSF_USART_PARITY_MASK               = VSF_USART_NO_PARITY |
-                                          VSF_USART_EVEN_PARITY |
-                                          VSF_USART_ODD_PARITY,
+    VSF_USART_PARITY_MASK               = VSF_USART_NO_PARITY
+                                        | VSF_USART_EVEN_PARITY
+                                        | VSF_USART_ODD_PARITY,
 
     VSF_USART_NO_HWCONTROL              = 0x0000ul,
     VSF_USART_RTS_HWCONTROL             = 0x0100ul,
     VSF_USART_CTS_HWCONTROL             = 0x0200ul,
     VSF_USART_RTS_CTS_HWCONTROL         = 0x0300ul,
-    VSF_USART_HWCONTROL_MASK            = VSF_USART_NO_HWCONTROL |
-                                          VSF_USART_RTS_HWCONTROL |
-                                          VSF_USART_CTS_HWCONTROL |
-                                          VSF_USART_RTS_CTS_HWCONTROL,
+    VSF_USART_HWCONTROL_MASK            = VSF_USART_NO_HWCONTROL
+                                        | VSF_USART_RTS_HWCONTROL
+                                        | VSF_USART_CTS_HWCONTROL
+                                        | VSF_USART_RTS_CTS_HWCONTROL,
 
     VSF_USART_TX_ENABLE                 = 0x0010ul,
     VSF_USART_RX_ENABLE                 = 0x0020ul,
@@ -75,35 +75,35 @@ typedef enum vsf_usart_mode_t {
 typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_RX               = VSF_BIT(0),
     VSF_USART_IRQ_MASK_TX               = VSF_BIT(1),
-    VSF_USART_IRQ_MASK_RX_TIMEOUT   = VSF_BIT(2),
+    VSF_USART_IRQ_MASK_RX_TIMEOUT       = VSF_BIT(2),
 
-    VSF_USART_IRQ_MASK_RX_CPL       = VSF_BIT(3),
-    VSF_USART_IRQ_MASK_TX_CPL       = VSF_BIT(4),
+    VSF_USART_IRQ_MASK_RX_CPL           = VSF_BIT(3),
+    VSF_USART_IRQ_MASK_TX_CPL           = VSF_BIT(4),
 
     // optional
     VSF_USART_IRQ_MASK_RX_ERR           = VSF_BIT(5),
     VSF_USART_IRQ_MASK_TX_ERR           = VSF_BIT(6),
     VSF_USART_IRQ_MASK_ERR              = VSF_USART_IRQ_MASK_RX_ERR | VSF_USART_IRQ_MASK_TX_ERR,
 
-    VSF_USART_IRQ_ALL_BITS_MASK         = VSF_USART_IRQ_MASK_RX |
-                                          VSF_USART_IRQ_MASK_TX |
-                                          VSF_USART_IRQ_MASK_RX_CPL |
-                                          VSF_USART_IRQ_MASK_TX_CPL |
-                                          VSF_USART_IRQ_MASK_ERR,
+    VSF_USART_IRQ_ALL_BITS_MASK         = VSF_USART_IRQ_MASK_RX
+                                        | VSF_USART_IRQ_MASK_TX
+                                        | VSF_USART_IRQ_MASK_RX_CPL
+                                        | VSF_USART_IRQ_MASK_TX_CPL
+                                        | VSF_USART_IRQ_MASK_ERR,
 } vsf_usart_irq_mask_t;
 
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_USART_CFG_DEC_PREFIX          vsf_hw
-#define VSF_USART_CFG_DEC_UPCASE_PREFIX   VSF_HW
+#define VSF_USART_CFG_DEC_PREFIX        vsf_hw
+#define VSF_USART_CFG_DEC_UPCASE_PREFIX VSF_HW
 #include "hal/driver/common/usart/usart_template.h"
 
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_usart_win_device_t {
-    vsf_usart_t *instance;
-    uint8_t      port;
+    vsf_usart_t                         *instance;
+    uint8_t                             port;
 } vsf_usart_win_device_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
