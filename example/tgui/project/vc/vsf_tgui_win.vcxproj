@@ -211,8 +211,6 @@
     <ClInclude Include="..\..\..\..\source\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\..\source\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\..\source\kernel\vsf_timq_dlist.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h" />
     <ClInclude Include="..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.h" />
     <ClInclude Include="..\..\..\..\source\osa_service\vsf_osa_service.h" />
     <ClInclude Include="..\..\..\..\source\osa_service\vsf_osa_service_cfg.h" />
@@ -394,7 +392,6 @@
     <ClCompile Include="..\..\..\..\source\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_os.c" />
-    <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.c" />
     <ClCompile Include="..\..\..\..\source\osa_service\vsf_osa_service.c" />
     <ClCompile Include="..\..\..\..\source\service\fifo\vsf_fifo.c" />

@@ -265,9 +265,6 @@
     <Filter Include="vsf\hal\driver\x86">
       <UniqueIdentifier>{6839995b-5b02-421e-b703-23f6b9c984d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\hal\interface">
-      <UniqueIdentifier>{41094f8b-289b-4758-876d-d5b08a45d435}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usrapp\demo\tgui_demo">
       <UniqueIdentifier>{dc60e992-f62b-421c-8610-457f1521f8b6}</UniqueIdentifier>
     </Filter>
@@ -520,18 +517,6 @@
     <Filter Include="vsf\component\ui\disp\driver\sitronix\st7735">
       <UniqueIdentifier>{1a410a60-5e30-4bed-b826-834a6b89f308}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\osa_hal">
-      <UniqueIdentifier>{1dc6c90f-692e-4ff1-8809-e679083175d0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\osa_hal\sw_peripheral">
-      <UniqueIdentifier>{aa098814-5755-45ca-a7ee-f586329dfcd5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\osa_hal\sw_peripheral\io_peripheral">
-      <UniqueIdentifier>{38fb795d-5786-476a-8522-6e435af5fa9f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\osa_hal\sw_peripheral\io_peripheral\spi">
-      <UniqueIdentifier>{91b2a5b0-be9a-49bf-bb39-4de688c8d8a8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\utilities\3rd-party\PLOOC\raw">
       <UniqueIdentifier>{e924b090-6ba3-4758-9d59-044c4e8fe96b}</UniqueIdentifier>
     </Filter>
@@ -709,9 +694,6 @@
     <Filter Include="vsf\component\usb\driver\hcd\libusb_hcd">
       <UniqueIdentifier>{1beb2733-c0d0-40b0-9c12-9846527d12fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\osa_hal\driver">
-      <UniqueIdentifier>{37c12579-0964-4709-9417-4db21ef55fc1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\hal\driver\x86\win">
       <UniqueIdentifier>{d0f9b226-2086-4c83-a362-a34fcbc01344}</UniqueIdentifier>
     </Filter>
@@ -744,15 +726,6 @@
     </Filter>
     <Filter Include="usrapp\demo\hal_demo">
       <UniqueIdentifier>{4b85f110-bac8-47f4-9db7-9949521981bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\osa_hal\driver\customised">
-      <UniqueIdentifier>{9c096bd0-f1a0-4e67-b7a8-f8844a51f163}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\osa_hal\driver\customised\stream_hal">
-      <UniqueIdentifier>{daeef2ac-ac18-4f94-9c38-746faad78cc4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\osa_hal\driver\customised\stream_hal\usart">
-      <UniqueIdentifier>{c530968a-2a9b-4a37-8e37-b9f7d85994a9}</UniqueIdentifier>
     </Filter>
     <Filter Include="usrapp\demo\stream_hal_demo">
       <UniqueIdentifier>{8331a6b9-fa8d-4d71-bc4e-5e1bdad1e9d8}</UniqueIdentifier>
@@ -1129,6 +1102,15 @@
     <Filter Include="vsf\hal\driver\common\timer">
       <UniqueIdentifier>{dab10961-bfdf-49ee-b8c7-cb6b1e36bde7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\utilities">
+      <UniqueIdentifier>{66b729be-3195-406a-85a3-50e7cc0c19b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\utilities\stream">
+      <UniqueIdentifier>{0f042b8a-3585-475d-8909-efb05cb1e2d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\utilities\stream\usart">
+      <UniqueIdentifier>{f3a96d71-264f-4562-8b3a-6e694852dadf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -1196,21 +1178,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\driver.h">
       <Filter>vsf\hal\driver</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_common.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_io.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_pm.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usart.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usb.h">
-      <Filter>vsf\hal\interface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\service\vsf_service.h">
       <Filter>vsf\service</Filter>
@@ -2094,27 +2061,6 @@
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\sitronix\st7735\vsf_disp_st7735.h">
       <Filter>vsf\component\ui\disp\driver\sitronix\st7735</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal.h">
-      <Filter>vsf\osa_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h">
-      <Filter>vsf\osa_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\sw_periperhal_cfg.h">
-      <Filter>vsf\osa_hal\sw_peripheral</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\sw_peripheral.h">
-      <Filter>vsf\osa_hal\sw_peripheral</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h">
-      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral\spi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h">
-      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h">
-      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\utilities\language_extension\delegate.h">
       <Filter>vsf\utilities\language_externsion</Filter>
     </ClInclude>
@@ -2313,9 +2259,6 @@
     <ClInclude Include="..\..\..\..\source\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
       <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\driver\device_specific\driver.h">
-      <Filter>vsf\osa_hal\driver</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\device.h">
       <Filter>vsf\hal\driver\x86\win</Filter>
     </ClInclude>
@@ -2352,20 +2295,8 @@
     <ClInclude Include="..\..\..\..\source\utilities\vsf_utilities_cfg.h">
       <Filter>vsf\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_spi.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\crypto\hash\vsf_hash.h">
       <Filter>vsf\component\crypto\hash</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\driver\customised\driver.h">
-      <Filter>vsf\osa_hal\driver\customised</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\driver.h">
-      <Filter>vsf\osa_hal\driver\customised\stream_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.h">
-      <Filter>vsf\osa_hal\driver\customised\stream_hal\usart</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\service\simple_stream\vsf_simple_stream.h">
       <Filter>vsf\service\simple_stream</Filter>
@@ -3309,6 +3240,9 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\spi\spidev.h">
       <Filter>vsf\shell\sys\linux\include\linux\spi</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\utilities\stream\usart\vsf_usart_stream.h">
+      <Filter>vsf\hal\utilities\stream\usart</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -3938,12 +3872,6 @@
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\sitronix\st7735\vsf_disp_st7735.c">
       <Filter>vsf\component\ui\disp\driver\sitronix\st7735</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c">
-      <Filter>vsf\osa_hal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c">
-      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral\spi</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\utilities\language_extension\delegate.c">
       <Filter>vsf\utilities\language_externsion</Filter>
     </ClCompile>
@@ -4210,9 +4138,6 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\hal_demo\usart_demo.c">
       <Filter>usrapp\demo\hal_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.c">
-      <Filter>vsf\osa_hal\driver\customised\stream_hal\usart</Filter>
     </ClCompile>
     <ClCompile Include="..\..\demo\stream_hal_demo\stream_usart_demo.c">
       <Filter>usrapp\demo\stream_hal_demo</Filter>
@@ -5725,6 +5650,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\common\timer\timer_common.c">
       <Filter>vsf\hal\driver\common\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\utilities\stream\usart\vsf_usart_stream.c">
+      <Filter>vsf\hal\utilities\stream\usart</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -2866,15 +2866,21 @@
                         <group>
                             <name>common</name>
                             <group>
+                                <name>dma</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\dma\dma.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\dma\dma.h</name>
+                                </file>
+                            </group>
+                            <group>
                                 <name>io</name>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\io\io.c</name>
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\io\io.h</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\io\io_lv0.c</name>
                                 </file>
                             </group>
                             <group>
@@ -2885,8 +2891,14 @@
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\pm\pm.h</name>
                                 </file>
+                            </group>
+                            <group>
+                                <name>spi</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\pm\pm_lv0.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\spi\spi.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\spi\spi.h</name>
                                 </file>
                             </group>
                             <group>
@@ -2896,9 +2908,6 @@
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usart\usart.h</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usart\usart_lv0.c</name>
                                 </file>
                             </group>
                             <group>
@@ -3477,93 +3486,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\source\kernel\vsf_timq_dlist.h</name>
-            </file>
-        </group>
-        <group>
-            <name>osa_hal</name>
-            <group>
-                <name>driver</name>
-                <group>
-                    <name>customised</name>
-                    <group>
-                        <name>multiplex_hal</name>
-                        <group>
-                            <name>iic</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\driver\customised\multiplex_hal\iic\vsf_multiplex_iic.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\driver\customised\multiplex_hal\iic\vsf_multiplex_iic.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>spi</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\driver\customised\multiplex_hal\spi\vsf_multiplex_spi.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\driver\customised\multiplex_hal\spi\vsf_multiplex_spi.h</name>
-                            </file>
-                        </group>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\driver\customised\multiplex_hal\driver.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\driver\customised\multiplex_hal\vsf_multiplex_hal_common.h</name>
-                        </file>
-                    </group>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\driver\customised\driver.h</name>
-                    </file>
-                </group>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\driver\driver.h</name>
-                </file>
-            </group>
-            <group>
-                <name>sw_peripheral</name>
-                <group>
-                    <name>io_peripheral</name>
-                    <group>
-                        <name>iic</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\iic\vsf_io_iic.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\iic\vsf_io_iic.h</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>spi</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h</name>
-                        </file>
-                    </group>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h</name>
-                    </file>
-                </group>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\sw_peripheral\sw_periperhal_cfg.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\sw_peripheral\sw_peripheral.h</name>
-                </file>
-            </group>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\vsf_osa_hal.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\vsf_osa_hal.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h</name>
             </file>
         </group>
         <group>

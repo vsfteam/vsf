@@ -42,8 +42,6 @@
 
 #include "osa_service/vsf_osa_service.h"
 #include "hal/vsf_hal.h"
-// TODO: remove later
-#include "osa_hal/vsf_osa_hal.h"
 #include "component/vsf_component.h"
 
 #ifdef __cplusplus

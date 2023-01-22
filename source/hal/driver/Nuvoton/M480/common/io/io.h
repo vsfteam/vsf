@@ -19,6 +19,7 @@
 #define __HAL_DRIVER_NUVOTON_M480_IO_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
 
@@ -79,7 +80,7 @@ typedef enum vsf_io_feature_t {
 /*============================ INCLUDES ======================================*/
 
 #define VSF_GPIO_CFG_DEC_PREFIX         vsf_hw
-#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX    VSF_HW
+#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX  VSF_HW
 #include "hal/driver/common/io/io_template.h"
 
 /*============================ PROTOTYPES ====================================*/

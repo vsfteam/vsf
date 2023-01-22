@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\utilities\stream\usart\vsf_usart_stream.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.h" />
@@ -519,12 +520,6 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\driver.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_common.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_io.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_pm.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_spi.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usart.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usb.h" />
     <ClInclude Include="..\..\..\..\source\hal\vsf_hal.h" />
     <ClInclude Include="..\..\..\..\source\hal\vsf_hal_cfg.h" />
     <ClInclude Include="..\..\..\..\source\kernel\shell\simple\vsf_simple.h" />
@@ -544,17 +539,6 @@
     <ClInclude Include="..\..\..\..\source\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\..\source\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\..\source\kernel\vsf_timq_dlist.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\driver\customised\driver.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\driver.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\driver\device_specific\driver.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\sw_periperhal_cfg.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\sw_peripheral\sw_peripheral.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h" />
     <ClInclude Include="..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.h" />
     <ClInclude Include="..\..\..\..\source\osa_service\vsf_osa_service.h" />
     <ClInclude Include="..\..\..\..\source\osa_service\vsf_osa_service_cfg.h" />
@@ -739,6 +723,7 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\utilities\stream\usart\vsf_usart_stream.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\flash\flash_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\i2c_common.c" />
@@ -1405,9 +1390,6 @@
     <ClCompile Include="..\..\..\..\source\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_os.c" />
-    <ClCompile Include="..\..\..\..\source\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.c" />
-    <ClCompile Include="..\..\..\..\source\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c" />
-    <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.c" />
     <ClCompile Include="..\..\..\..\source\osa_service\vsf_osa_service.c" />
     <ClCompile Include="..\..\..\..\source\service\distbus\vsf_distbus.c" />

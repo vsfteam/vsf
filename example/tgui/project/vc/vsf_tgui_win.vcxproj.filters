@@ -277,9 +277,6 @@
     <Filter Include="vsf\component\3rd-party\freetype\raw\src\base">
       <UniqueIdentifier>{27a4bfa8-97ec-417a-8fd9-c60242a440c8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\osa_hal">
-      <UniqueIdentifier>{e6b39a58-d367-426b-951a-bee64b9519ae}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usrapp\demo\freetype_demo">
       <UniqueIdentifier>{1eda3354-9a50-4176-adf7-1db1b325840a}</UniqueIdentifier>
     </Filter>
@@ -1071,12 +1068,6 @@
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\raw\include\freetype\tttags.h">
       <Filter>vsf\component\3rd-party\freetype\raw\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal.h">
-      <Filter>vsf\osa_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h">
-      <Filter>vsf\osa_hal</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\demo\fakefat32.h">
       <Filter>usrapp\demo</Filter>
     </ClInclude>
@@ -1525,9 +1516,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\winfonts\winfnt.c">
       <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c">
-      <Filter>vsf\osa_hal</Filter>
     </ClCompile>
     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c">
       <Filter>usrapp\demo\freetype_demo</Filter>

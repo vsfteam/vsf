@@ -20,13 +20,17 @@
 #define __HAL_DRIVER_NUVOTON_M480_DMA_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
+
 /*============================ MACROS ========================================*/
- #define M484_DMA_REQUEST_MAX_SIZE    65536
+
+#define M484_DMA_REQUEST_MAX_SIZE    65536
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
 typedef struct m484_dma_cfg_t {
     vsf_arch_prio_t prio;
 } m484_dma_cfg_t;

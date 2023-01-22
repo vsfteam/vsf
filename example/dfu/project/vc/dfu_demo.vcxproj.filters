@@ -199,9 +199,6 @@
     <Filter Include="usrapp\common">
       <UniqueIdentifier>{52f4f59f-efeb-4640-9bea-f6fc2688c057}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\osa_hal">
-      <UniqueIdentifier>{a6231902-c6ce-44c2-aa19-4f78d0cb1c02}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\usb\driver\dcd">
       <UniqueIdentifier>{4ed0570a-300a-4172-83f7-fadb9caaad6b}</UniqueIdentifier>
     </Filter>
@@ -246,6 +243,9 @@
     </Filter>
     <Filter Include="vsf\component\usb\driver\dcd\usbip_dcd\backend">
       <UniqueIdentifier>{efd940c8-aed9-4fea-9386-ea9041d213fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\x86\win\rtc">
+      <UniqueIdentifier>{65982826-a2c8-43db-be4b-9221931497bc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -570,12 +570,6 @@
     <ClInclude Include="..\..\..\template\demo\common\usrapp_usbd_common.h">
       <Filter>usrapp\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal.h">
-      <Filter>vsf\osa_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h">
-      <Filter>vsf\osa_hal</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.h">
       <Filter>vsf\component\usb\driver\dcd\usbip_dcd</Filter>
     </ClInclude>
@@ -638,6 +632,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_bmpevt.h">
       <Filter>vsf\kernel\shell\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\driver\x86\win\rtc\rtc.h">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -808,9 +805,6 @@
     <ClCompile Include="..\..\..\template\demo\common\usrapp_usbd_common.c">
       <Filter>usrapp\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c">
-      <Filter>vsf\osa_hal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.c">
       <Filter>vsf\component\usb\driver\dcd\usbip_dcd</Filter>
     </ClCompile>
@@ -864,6 +858,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
       <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\driver\x86\win\rtc\rtc.c">
+      <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

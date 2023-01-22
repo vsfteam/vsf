@@ -15,11 +15,11 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
 #ifndef __HAL_DRIVER_NUVOTON_M480_SPI_H__
 #define __HAL_DRIVER_NUVOTON_M480_SPI_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
 
@@ -28,6 +28,7 @@
 #include "hal/driver/common/template/vsf_template_hal_driver.h"
 
 /*============================ MACROS ========================================*/
+
 #define SPI_SSCTL_POS               21
 
 #define VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE            ENABLED
@@ -119,7 +120,7 @@ typedef struct vsf_spi_status_t {
 /*============================ INCLUDES ======================================*/
 
 #define VSF_SPI_CFG_DEC_PREFIX          vsf_hw
-#define VSF_SPI_CFG_DEC_UPCASE_PREFIX     VSF_HW
+#define VSF_SPI_CFG_DEC_UPCASE_PREFIX   VSF_HW
 #include "hal/driver/common/spi/spi_template.h"
 
 /*============================ TYPES =========================================*/

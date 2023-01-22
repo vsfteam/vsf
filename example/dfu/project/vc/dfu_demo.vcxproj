@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\driver\x86\win\rtc\rtc.h" />
     <ClInclude Include="..\..\..\..\source\component\fs\driver\fatfs\vsf_fatfs.h" />
     <ClInclude Include="..\..\..\..\source\component\fs\driver\malfs\vsf_malfs.h" />
     <ClInclude Include="..\..\..\..\source\component\fs\driver\memfs\vsf_memfs.h" />
@@ -96,8 +97,6 @@
     <ClInclude Include="..\..\..\..\source\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\..\source\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\..\source\kernel\vsf_timq_dlist.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h" />
     <ClInclude Include="..\..\..\..\source\service\fifo\vsf_fifo.h" />
     <ClInclude Include="..\..\..\..\source\service\heap\vsf_heap.h" />
     <ClInclude Include="..\..\..\..\source\service\pbuf\vsf_pbuf.h" />
@@ -146,6 +145,7 @@
     <None Include="..\..\..\..\source\utilities\3rd-party\PLOOC\README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\driver\x86\win\rtc\rtc.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\fatfs\vsf_fatfs.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\malfs\vsf_malfs.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\memfs\vsf_memfs.c" />
@@ -195,7 +195,6 @@
     <ClCompile Include="..\..\..\..\source\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_os.c" />
-    <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\..\source\service\fifo\vsf_fifo.c" />
     <ClCompile Include="..\..\..\..\source\service\heap\vsf_heap.c" />
     <ClCompile Include="..\..\..\..\source\service\pbuf\vsf_pbuf.c" />

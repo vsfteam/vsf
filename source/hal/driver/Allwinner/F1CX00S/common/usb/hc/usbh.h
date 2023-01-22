@@ -15,12 +15,12 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __OSA_HAL_DRIVER_ALLWINNER_F1X00S_USBH_H__
-#define __OSA_HAL_DRIVER_ALLWINNER_F1X00S_USBH_H__
+#ifndef __VSF_HAL_DRIVER_ALLWINNER_F1X00S_USBH_H__
+#define __VSF_HAL_DRIVER_ALLWINNER_F1X00S_USBH_H__
 
 /*============================ INCLUDES ======================================*/
 
-#include "osa_hal/vsf_osa_hal_cfg.h"
+#include "hal/vsf_hal_cfg.h"
 
 #if VSF_USE_USB_HOST == ENABLED
 
@@ -51,5 +51,5 @@ extern const vk_usbh_hcd_drv_t vsf_usb_hcd_drv;
 #endif
 
 #endif      // VSF_USE_USB_HOST
-#endif      // __OSA_HAL_DRIVER_ALLWINNER_F1X00S_USBH_H__
+#endif      // __VSF_HAL_DRIVER_ALLWINNER_F1X00S_USBH_H__
 /* EOF */

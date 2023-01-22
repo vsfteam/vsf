@@ -650,7 +650,6 @@ void __vsf_kernel_os_start(void)
     }
 #endif
 
-    vsf_osa_hal_init();
     __post_vsf_kernel_init();
 }
 

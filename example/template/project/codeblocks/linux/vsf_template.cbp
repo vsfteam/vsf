@@ -1525,12 +1525,6 @@
 		<Unit filename="../../../../../source/kernel/vsf_os.h" />
 		<Unit filename="../../../../../source/kernel/vsf_timq.h" />
 		<Unit filename="../../../../../source/kernel/vsf_timq_dlist.h" />
-		<Unit filename="../../../../../source/osa_hal/driver/device_specific/x86/linux/driver.h" />
-		<Unit filename="../../../../../source/osa_hal/vsf_osa_hal.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../../../../source/osa_hal/vsf_osa_hal.h" />
-		<Unit filename="../../../../../source/osa_hal/vsf_osa_hal_cfg.h" />
 		<Unit filename="../../../../../source/service/dynarr/vsf_dynarr.c">
 			<Option compilerVar="CC" />
 		</Unit>

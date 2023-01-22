@@ -139,8 +139,6 @@
     <ClInclude Include="..\..\..\..\source\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\..\source\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\..\source\kernel\vsf_timq_dlist.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal.h" />
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h" />
     <ClInclude Include="..\..\..\..\source\service\heap\vsf_heap.h" />
     <ClInclude Include="..\..\..\..\source\service\pool\vsf_pool.h" />
     <ClInclude Include="..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.h" />
@@ -273,7 +271,6 @@
     <ClCompile Include="..\..\..\..\source\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\..\source\kernel\vsf_os.c" />
-    <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\..\source\service\heap\vsf_heap.c" />
     <ClCompile Include="..\..\..\..\source\service\pool\vsf_pool.c" />
     <ClCompile Include="..\..\..\..\source\service\simple_stream\mem_stream\vsf_mem_stream.c" />

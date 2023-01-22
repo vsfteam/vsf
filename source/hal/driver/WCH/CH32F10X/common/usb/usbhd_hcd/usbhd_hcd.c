@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "osa_hal/vsf_osa_hal_cfg.h"
+#include "hal/vsf_hal_cfg.h"
 
 #if VSF_USE_USB_HOST == ENABLED
 

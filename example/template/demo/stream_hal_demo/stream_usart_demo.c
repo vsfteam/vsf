@@ -80,7 +80,7 @@ describe_usbd(__usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USB_DC_SPEED_FULL)
         usbd_cdc_acm_ifs(__usbd, 0)
 end_describe_usbd(__usbd, VSF_USB_DC0)
 
-static vsf_stream_usart_t __stream_usart = {
+static vsf_usart_stream_t __stream_usart = {
     .usart = (vsf_usart_t *)&APP_STREAM_USART_DEMO_CFG_USART,
     .stream_tx = &__stream_usart_tx.use_as__vsf_stream_t,
     .stream_rx = &__stream_usart_rx.use_as__vsf_stream_t,
@@ -112,15 +112,10 @@ int VSF_USER_ENTRY(void)
     vk_usbd_init(&__usbd);
     vk_usbd_connect(&__usbd);
 
-    {
-        vsf_usart_cfg_t cfg = {
-            .mode       = VSF_USART_8_BIT_LENGTH | VSF_USART_NO_PARITY | VSF_USART_1_STOPBIT,
-            .baudrate   = 115200,
-        };
-        vsf_usart_init(__stream_usart.usart, &cfg);
-        vsf_usart_enable(__stream_usart.usart);
-    }
-    vsf_stream_usart_init(&__stream_usart);
+    vsf_usart_stream_init(&__stream_usart, &(vsf_usart_cfg_t) {
+        .mode       = VSF_USART_8_BIT_LENGTH | VSF_USART_NO_PARITY | VSF_USART_1_STOPBIT,
+        .baudrate   = 115200,
+    });
     return 0;
 }
 

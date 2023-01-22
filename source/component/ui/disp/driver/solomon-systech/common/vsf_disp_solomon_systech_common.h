@@ -25,6 +25,7 @@
     &&  (   (VSF_DISP_USE_SSD1306 == ENABLED)                                   \
         ||  (VSF_DISP_USE_SSD1316 == ENABLED))
 
+// TODO: osa_hal has been removed, update below
 #include "osa_hal/driver/customised/multiplex_hal/iic/vsf_multiplex_iic.h"
 
 #ifdef __cplusplus

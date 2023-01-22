@@ -64,7 +64,7 @@ vk_fakefat32_file_t fakefat32_root[2] = {
 /*============================ IMPLEMENTATION ================================*/
 
 static void __flash_isrhandler(     void *target_ptr,
-                                    vsf_flash_irq_type_t type,
+                                    vsf_flash_irq_mask_t mask,
                                     vsf_flash_t *flash_ptr)
 {
     VSF_ASSERT(__eda != NULL);

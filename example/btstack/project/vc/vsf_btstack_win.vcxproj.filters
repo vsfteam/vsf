@@ -277,9 +277,6 @@
     <Filter Include="usrapp\common">
       <UniqueIdentifier>{6c31c1fc-edc3-4f0a-a6f8-3c19cd8eb478}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\osa_hal">
-      <UniqueIdentifier>{8ea2520c-1d59-40a2-84b6-1c903c0daa33}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\service\simple_stream">
       <UniqueIdentifier>{4ebaba56-587e-4150-98cb-67e6aa19b44e}</UniqueIdentifier>
     </Filter>
@@ -783,12 +780,6 @@
     <ClInclude Include="..\..\..\template\demo\common\usrapp_usbh_common.h">
       <Filter>usrapp\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal.h">
-      <Filter>vsf\osa_hal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h">
-      <Filter>vsf\osa_hal</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\service\simple_stream\vsf_simple_stream.h">
       <Filter>vsf\service\simple_stream</Filter>
     </ClInclude>
@@ -1117,9 +1108,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\template\demo\common\usrapp_usbh_common.c">
       <Filter>usrapp\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c">
-      <Filter>vsf\osa_hal</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\service\simple_stream\vsf_simple_stream.c">
       <Filter>vsf\service\simple_stream</Filter>

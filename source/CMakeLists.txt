@@ -12,7 +12,6 @@ vsf_add_include_directories(
 add_subdirectory(component)
 add_subdirectory(hal)
 add_subdirectory(kernel)
-add_subdirectory(osa_hal)
 add_subdirectory(osa_service)
 add_subdirectory(service)
 add_subdirectory(shell)
