@@ -118,7 +118,9 @@ typedef struct __vsf_hal_distbus_enum_t {
 vsf_class(vsf_hal_distbus_t) {
     public_member(
         implement(__vsf_hal_distbus_enum_t)
+        void (*on_remote_connected)(vsf_hal_distbus_t *hal_distbus);
         PUBLIC_CONST bool           remote_connected;
+        PUBLIC_CONST bool           remote_declared;
     )
     protected_member(
         vsf_distbus_service_t       service;
