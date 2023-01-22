@@ -715,6 +715,11 @@ void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
     vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
+vsf_arch_irq_thread_t * __vsf_arch_irq_get_cur(void)
+{
+    return __vsf_arch_get_cur_irq_thread();
+}
+
 void __vsf_arch_irq_set_background(vsf_arch_irq_thread_t *irq_thread)
 {
     vsf_arch_trace_function("%s(irq_thread: 0x" VSF_TRACE_POINTER_HEX ")" VSF_TRACE_CFG_LINEEND,

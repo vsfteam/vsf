@@ -220,7 +220,7 @@ void vsf_arch_sleep(uint_fast32_t mode)
     // vsf_arch_sleep can be called with interrupt disabled
 //    VSF_HAL_ASSERT(__vsf_arch_common.gint_state);
     __vsf_arch_common.irq_end_from_por = true;
-    __vsf_arch_irq_end(&__vsf_arch_common.por_thread, true);
+    __vsf_arch_irq_end(&__vsf_arch_common.por_thread, false);
     __vsf_arch_irq_request_pend(&__vsf_arch_common.wakeup_request);
     __vsf_arch_irq_start(&__vsf_arch_common.por_thread);
 }

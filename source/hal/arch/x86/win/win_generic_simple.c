@@ -61,6 +61,7 @@ typedef struct vsf_arch_systimer_ctx_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
+static NO_INIT DWORD __vsf_arch_tls_thread_ctx;
 static NO_INIT vsf_arch_systimer_ctx_t __vsf_arch_systimer;
 
 /*============================ IMPLEMENTATION ================================*/
@@ -98,6 +99,7 @@ void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 static DWORD __stdcall __vsf_arch_irq_entry(LPVOID lpThreadParameter)
 {
     vsf_arch_irq_thread_t *irq_thread = lpThreadParameter;
+    TlsSetValue(__vsf_arch_tls_thread_ctx, irq_thread);
     if (irq_thread->entry != NULL) {
         irq_thread->entry(irq_thread);
     }
@@ -115,6 +117,11 @@ static vsf_err_t __vsf_arch_create_irq_thread(vsf_arch_irq_thread_t *irq_thread,
     }
     irq_thread->thread_id = GetThreadId(irq_thread->thread);
     return VSF_ERR_NONE;
+}
+
+vsf_arch_irq_thread_t * __vsf_arch_irq_get_cur(void)
+{
+    return TlsGetValue(__vsf_arch_tls_thread_ctx);
 }
 
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
@@ -164,6 +171,11 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
  */
 bool vsf_arch_low_level_init(void)
 {
+    // TODO: free __vsf_arch_tls_thread_ctx on exit
+    __vsf_arch_tls_thread_ctx = TlsAlloc();
+    VSF_ASSERT(__vsf_arch_tls_thread_ctx != TLS_OUT_OF_INDEXES);
+    TlsSetValue(__vsf_arch_tls_thread_ctx, &__vsf_arch_common.por_thread);
+
     memset(&__vsf_arch_systimer, 0, sizeof(__vsf_arch_systimer));
     strcpy((char *)__vsf_arch_common.por_thread.name, "por");
     __vsf_arch_common.por_thread.thread_id = GetCurrentThreadId();

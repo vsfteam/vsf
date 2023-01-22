@@ -223,6 +223,7 @@ extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request);
 
+extern vsf_arch_irq_thread_t * __vsf_arch_irq_get_cur(void);
 extern void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
     vsf_arch_irq_entry_t entry, vsf_arch_prio_t priority);
 extern void __vsf_arch_irq_fini(vsf_arch_irq_thread_t *irq_thread);
