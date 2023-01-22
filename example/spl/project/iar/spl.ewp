@@ -2004,24 +2004,6 @@
                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\driver.h</name>
                 </file>
             </group>
-            <group>
-                <name>interface</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_common.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_io.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_pm.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_usart.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_usb.h</name>
-                </file>
-            </group>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\source\hal\vsf_hal.c</name>
             </file>

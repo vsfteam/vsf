@@ -186,12 +186,6 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\driver.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_common.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_io.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_pm.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_spi.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usart.h" />
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usb.h" />
     <ClInclude Include="..\..\..\..\source\hal\vsf_hal.h" />
     <ClInclude Include="..\..\..\..\source\hal\vsf_hal_cfg.h" />
     <ClInclude Include="..\..\..\..\source\kernel\shell\simple\vsf_simple.h" />

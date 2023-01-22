@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\utilities\stream\usart\vsf_usart_stream.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\stream\usart\vsf_usart_stream.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo_cfg.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\device\btstack_dev.h" />
@@ -723,7 +723,7 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\utilities\stream\usart\vsf_usart_stream.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\stream\usart\vsf_usart_stream.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\flash\flash_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\i2c_common.c" />

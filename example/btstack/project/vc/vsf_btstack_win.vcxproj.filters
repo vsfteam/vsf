@@ -109,9 +109,6 @@
     <Filter Include="vsf\hal\driver\x86">
       <UniqueIdentifier>{6839995b-5b02-421e-b703-23f6b9c984d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\hal\interface">
-      <UniqueIdentifier>{41094f8b-289b-4758-876d-d5b08a45d435}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\usb">
       <UniqueIdentifier>{e1328ffc-17be-4ff7-b12c-411991ea4b4a}</UniqueIdentifier>
     </Filter>
@@ -380,21 +377,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\driver.h">
       <Filter>vsf\hal\driver</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_common.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_io.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_pm.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usart.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usb.h">
-      <Filter>vsf\hal\interface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\service\vsf_service.h">
       <Filter>vsf\service</Filter>
@@ -704,9 +686,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\utilities\vsf_utilities_cfg.h">
       <Filter>vsf\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_spi.h">
-      <Filter>vsf\hal\interface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.h">
       <Filter>vsf\hal\driver\x86\win\usart</Filter>

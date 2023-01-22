@@ -40,9 +40,6 @@
     <Filter Include="vsf\hal\driver">
       <UniqueIdentifier>{c9df9a5d-4876-4ef7-a01d-db95b9f5073f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\hal\interface">
-      <UniqueIdentifier>{41094f8b-289b-4758-876d-d5b08a45d435}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\service">
       <UniqueIdentifier>{352c5383-f2d5-4508-b6bc-e08fe3e2b8b6}</UniqueIdentifier>
     </Filter>
@@ -339,21 +336,6 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\driver.h">
       <Filter>vsf\hal\driver</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_common.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_io.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_pm.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usart.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\interface\vsf_interface_usb.h">
-      <Filter>vsf\hal\interface</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\service\vsf_service.h">
       <Filter>vsf\service</Filter>
     </ClInclude>
@@ -633,7 +615,7 @@
     <ClInclude Include="..\..\..\..\source\kernel\shell\simple\vsf_simple_bmpevt.h">
       <Filter>vsf\kernel\shell\simple</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\driver\x86\win\rtc\rtc.h">
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClInclude>
   </ItemGroup>
@@ -859,7 +841,7 @@
     <ClCompile Include="..\..\..\..\source\kernel\task\vsf_task.c">
       <Filter>vsf\kernel\task</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\driver\x86\win\rtc\rtc.c">
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c">
       <Filter>vsf\hal\driver\x86\win\rtc</Filter>
     </ClCompile>
   </ItemGroup>

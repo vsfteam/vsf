@@ -3240,7 +3240,7 @@
     <ClInclude Include="..\..\..\..\source\shell\sys\linux\include\linux\spi\spidev.h">
       <Filter>vsf\shell\sys\linux\include\linux\spi</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\utilities\stream\usart\vsf_usart_stream.h">
+    <ClInclude Include="..\..\..\..\source\hal\utilities\stream\usart\vsf_usart_stream.h">
       <Filter>vsf\hal\utilities\stream\usart</Filter>
     </ClInclude>
   </ItemGroup>
@@ -5651,7 +5651,7 @@
     <ClCompile Include="..\..\..\..\source\hal\driver\common\timer\timer_common.c">
       <Filter>vsf\hal\driver\common\timer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\vsf.demo\vsf\source\hal\utilities\stream\usart\vsf_usart_stream.c">
+    <ClCompile Include="..\..\..\..\source\hal\utilities\stream\usart\vsf_usart_stream.c">
       <Filter>vsf\hal\utilities\stream\usart</Filter>
     </ClCompile>
   </ItemGroup>
