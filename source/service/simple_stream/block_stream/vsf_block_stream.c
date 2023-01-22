@@ -27,15 +27,29 @@
 #include "kernel/vsf_kernel.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_BLOCK_STREAM_CFG_PROTECT_LEVEL
+/*! \note   By default, the driver tries to make all APIs interrupt-safe,
+ *!
+ *!         in the case when you want to disable it,
+ *!         please use following macro:
+ *!         #define VSF_BLOCK_STREAM_CFG_PROTECT_LEVEL  none
+ *!
+ *!         in the case when you want to use scheduler-safe,
+ *!         please use following macro:
+ *!         #define VSF_BLOCK_STREAM_CFG_PROTECT_LEVEL  scheduler
+ *!
+ *!         NOTE: This macro should be defined in vsf_usr_cfg.h
+ */
+#   define VSF_BLOCK_STREAM_CFG_PROTECT_LEVEL   interrupt
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __vsf_block_stream_protect              vsf_protect(VSF_BLOCK_STREAM_CFG_PROTECT_LEVEL)
+#define __vsf_block_stream_unprotect            vsf_unprotect(VSF_BLOCK_STREAM_CFG_PROTECT_LEVEL)
+
 /*============================ TYPES =========================================*/
-
-typedef struct vsf_block_item_t {
-    vsf_block_stream_size_t size;
-    vsf_block_stream_size_t pos;
-    uint32_t buffer[0];
-} vsf_block_item_t;
-
 /*============================ PROTOTYPES ====================================*/
 
 static void __vsf_block_stream_init(vsf_stream_t *stream);
@@ -75,6 +89,7 @@ const vsf_stream_op_t vsf_block_stream_op = {
 static void __vsf_block_stream_init(vsf_stream_t *stream)
 {
     __vsf_block_stream_t *block_stream = (__vsf_block_stream_t *)stream;
+    block_stream->data_size = 0;
     vsf_fifo_init((vsf_fifo_t *)&block_stream->__fifo, block_stream->block_num);
 }
 
@@ -86,26 +101,25 @@ static uint_fast32_t __vsf_block_stream_get_buff_length(vsf_stream_t *stream)
 
 static uint_fast32_t __vsf_block_stream_get_data_length(vsf_stream_t *stream)
 {
-    // TODO: fix real data length
     __vsf_block_stream_t *block_stream = (__vsf_block_stream_t *)stream;
-    return vsf_fifo_get_number((vsf_fifo_t *)&block_stream->__fifo) * block_stream->block_size;
+    return block_stream->data_size;
 }
 
 static uint_fast32_t __vsf_block_stream_get_avail_length(vsf_stream_t *stream)
 {
-    // TODO: fix real avail length
-    return __vsf_block_stream_get_buff_length(stream) - __vsf_block_stream_get_data_length(stream);
+    __vsf_block_stream_t *block_stream = (__vsf_block_stream_t *)stream;
+    return (block_stream->block_num - vsf_fifo_get_number((vsf_fifo_t *)&block_stream->__fifo)) * block_stream->block_size;
 }
 
 static uint_fast32_t __vsf_block_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     __vsf_block_stream_t *block_stream = (__vsf_block_stream_t *)stream;
-    vsf_block_item_t *item = (vsf_block_item_t *)vsf_fifo_get_head((vsf_fifo_t *)&block_stream->__fifo,
-                        block_stream->block_size + sizeof(vsf_block_stream_size_t));
+    vsf_block_stream_item_t *item = (vsf_block_stream_item_t *)vsf_fifo_get_head((vsf_fifo_t *)&block_stream->__fifo,
+                        block_stream->block_size + sizeof(vsf_block_stream_item_t));
 
     if (item != NULL) {
         if (ptr != NULL) {
-            *ptr = (uint8_t *)item->buffer;
+            *ptr = (uint8_t *)&item[1];
         }
         return block_stream->block_size;
     }
@@ -115,12 +129,12 @@ static uint_fast32_t __vsf_block_stream_get_wbuf(vsf_stream_t *stream, uint8_t *
 static uint_fast32_t __vsf_block_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     __vsf_block_stream_t *block_stream = (__vsf_block_stream_t *)stream;
-    vsf_block_item_t *item = (vsf_block_item_t *)vsf_fifo_get_tail((vsf_fifo_t *)&block_stream->__fifo,
-                        block_stream->block_size + sizeof(vsf_block_stream_size_t));
+    vsf_block_stream_item_t *item = (vsf_block_stream_item_t *)vsf_fifo_get_tail((vsf_fifo_t *)&block_stream->__fifo,
+                        block_stream->block_size + sizeof(vsf_block_stream_item_t));
 
     if (item != NULL) {
         if (ptr != NULL) {
-            *ptr = (uint8_t *)item->buffer + item->pos;
+            *ptr = (uint8_t *)&item[1] + item->pos;
         }
         return item->size - item->pos;
     }
@@ -130,17 +144,21 @@ static uint_fast32_t __vsf_block_stream_get_rbuf(vsf_stream_t *stream, uint8_t *
 static uint_fast32_t __vsf_block_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
     __vsf_block_stream_t *block_stream = (__vsf_block_stream_t *)stream;
-    vsf_block_item_t *item = (vsf_block_item_t *)vsf_fifo_get_head((vsf_fifo_t *)&block_stream->__fifo,
-                        block_stream->block_size + sizeof(vsf_block_stream_size_t));
+    vsf_block_stream_item_t *item = (vsf_block_stream_item_t *)vsf_fifo_get_head((vsf_fifo_t *)&block_stream->__fifo,
+                        block_stream->block_size + sizeof(vsf_block_stream_item_t));
 
     VSF_SERVICE_ASSERT(size <= block_stream->block_size);
     if (item != NULL) {
         if (buf != NULL) {
-            memcpy(item->buffer, buf, size);
+            memcpy(&item[1], buf, size);
         }
         item->size = size;
         item->pos = 0;
         vsf_fifo_push((vsf_fifo_t *)&block_stream->__fifo, (uintptr_t)NULL, block_stream->block_size + sizeof(item->size));
+
+        vsf_protect_t orig = __vsf_block_stream_protect();
+        block_stream->data_size += size;
+        __vsf_block_stream_unprotect(orig);
         return size;
     }
     return 0;
@@ -149,14 +167,14 @@ static uint_fast32_t __vsf_block_stream_write(vsf_stream_t *stream, uint8_t *buf
 static uint_fast32_t __vsf_block_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
     __vsf_block_stream_t *block_stream = (__vsf_block_stream_t *)stream;
-    vsf_block_item_t *item = (vsf_block_item_t *)vsf_fifo_get_tail((vsf_fifo_t *)&block_stream->__fifo,
-                        block_stream->block_size + sizeof(vsf_block_stream_size_t));
+    vsf_block_stream_item_t *item = (vsf_block_stream_item_t *)vsf_fifo_get_tail((vsf_fifo_t *)&block_stream->__fifo,
+                        block_stream->block_size + sizeof(vsf_block_stream_item_t));
 
     VSF_SERVICE_ASSERT(size <= block_stream->block_size);
     if (item != NULL) {
         size = vsf_min(size, item->size);
         if (buf != NULL) {
-            memcpy(buf, item->buffer, size);
+            memcpy(buf, &item[1], size);
         }
 
         item->pos += size;
@@ -164,6 +182,10 @@ static uint_fast32_t __vsf_block_stream_read(vsf_stream_t *stream, uint8_t *buf,
         if (item->pos == item->size) {
             vsf_fifo_pop((vsf_fifo_t *)&block_stream->__fifo, (uintptr_t)NULL, block_stream->block_size + sizeof(item->size));
         }
+
+        vsf_protect_t orig = __vsf_block_stream_protect();
+        block_stream->data_size -= size;
+        __vsf_block_stream_unprotect(orig);
         return size;
     }
     return 0;

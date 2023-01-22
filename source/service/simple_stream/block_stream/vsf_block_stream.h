@@ -29,10 +29,8 @@
 
 #if     defined(__VSF_BLOCK_STREAM_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
-#   undef __VSF_BLOCK_STREAM_CLASS_IMPLEMENT
 #elif   defined(__VSF_BLOCK_STREAM_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
-#   undef __VSF_BLOCK_STREAM_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -51,7 +49,7 @@ extern "C" {
 
 #define __VSF_BLOCK_STREAM_INIT(__BLOCK_NUM, __BLOCK_SIZE)                      \
             .op                 = &vsf_block_stream_op,                         \
-            .block_size         = (vsf_fifo_item_size_t)(__BLOCK_SIZE),         \
+            .block_size         = (vsf_fifo_item_size_t)(((__BLOCK_SIZE) + 3) & ~3),\
             .block_num          = (vsf_fifo_index_t)(__BLOCK_NUM),
 #define VSF_BLOCK_STREAM_INIT(__BLOCK_NUM, __BLOCK_SIZE)                        \
             __VSF_BLOCK_STREAM_INIT((__BLOCK_NUM), (__BLOCK_SIZE))
@@ -65,9 +63,8 @@ extern "C" {
 
 #define __define_block_stream(__name, __block_num, __block_size)                \
             typedef struct __name##_block_stream_item_t {                       \
-                vsf_block_stream_size_t size;                                   \
-                vsf_block_stream_size_t pos;                                    \
-                uint32_t buffer[(__block_size + 3) >> 2];                       \
+                implement(vsf_block_stream_item_t)                              \
+                uint32_t __buffer[(__block_size + 3) >> 2];                     \
             } __name##_block_stream_item_t;                                     \
             def_vsf_fifo(__name, __name##_block_stream_item_t, (__block_num))   \
             vsf_class(vsf_block_stream_type(__name)) {                          \
@@ -101,11 +98,19 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef struct vsf_block_stream_item_t {
+    vsf_block_stream_size_t size;
+    vsf_block_stream_size_t pos;
+} vsf_block_stream_item_t;
+
 vsf_class(__vsf_block_stream_base_t) {
     public_member(
         implement(vsf_stream_t)
         vsf_fifo_item_size_t block_size;
         vsf_fifo_index_t block_num;
+    )
+    private_member(
+        vsf_fifo_item_size_t data_size;
     )
 };
 
@@ -126,6 +131,9 @@ extern const vsf_stream_op_t vsf_block_stream_op;
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_BLOCK_STREAM_CLASS_IMPLEMENT
+#undef __VSF_BLOCK_STREAM_CLASS_INHERIT__
 
 #endif      // VSF_USE_SIMPLE_STREAM
 #endif      // __VSF_BLOCK_STREAM_H__
