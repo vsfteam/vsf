@@ -64,6 +64,7 @@ static const vsf_gpio_op_t __vsf_hal_distbus_gpio_op = {
 static bool __vsf_hal_distbus_gpio_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vsf_hal_distbus_gpio_t *gpio = container_of(service, vsf_hal_distbus_gpio_t, service);
+    uint32_t datalen = msg->header.datalen;
     bool retain_msg = false;
 
     union {
@@ -74,6 +75,7 @@ static bool __vsf_hal_distbus_gpio_msghandler(vsf_distbus_t *distbus, vsf_distbu
     u_arg.ptr = (uint8_t *)&msg->header + sizeof(msg->header);
     switch (msg->header.addr) {
     case VSF_HAL_DISTBUS_GPIO_CMD_SYNC:
+        VSF_HAL_ASSERT(datalen == sizeof(*u_arg.sync));
         gpio->info.value = le32_to_cpu(u_arg.sync->value);
         break;
     default:
