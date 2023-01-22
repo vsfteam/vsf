@@ -31,66 +31,70 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HW_USART_CFG_MULTI_CLASS
-#   define VSF_HW_USART_CFG_MULTI_CLASS VSF_USART_CFG_MULTI_CLASS
+#   define VSF_HW_USART_CFG_MULTI_CLASS                 VSF_USART_CFG_MULTI_CLASS
+#endif
+
+#ifndef VSF_WIN_USART_CFG_TX_BLOCK
+#   define VSF_WIN_USART_CFG_TX_BLOCK                   DISABLED
 #endif
 
 #ifndef VSF_HW_USART_CFG_TRACE_EN
-#   define VSF_HW_USART_CFG_TRACE_EN                   DISABLED
+#   define VSF_HW_USART_CFG_TRACE_EN                    DISABLED
 #endif
 
 #ifndef VSF_HW_USART_CFG_TRACE_FUNCTION
-#   define    VSF_HW_USART_CFG_TRACE_FUNCTION          DISABLED
+#   define    VSF_HW_USART_CFG_TRACE_FUNCTION           DISABLED
 #endif
 
 #ifndef VSF_HW_USART_CFG_TRACE_IRQ
-#   define VSF_HW_USART_CFG_TRACE_IRQ                  DISABLED
+#   define VSF_HW_USART_CFG_TRACE_IRQ                   DISABLED
 #endif
 
 #ifndef VSF_HW_USART_CFG_TRACE_CALLSTACK
-#   define VSF_HW_USART_CFG_TRACE_CALLSTACK            DISABLED
+#   define VSF_HW_USART_CFG_TRACE_CALLSTACK             DISABLED
 #endif
 
 #ifndef VSF_HW_USART_CFG_TRACE_SYSTIMER
-#   define VSF_HW_USART_CFG_TRACE_SYSTIMER             DISABLED
+#   define VSF_HW_USART_CFG_TRACE_SYSTIMER              DISABLED
 #endif
 
 #ifndef VSF_HW_USART_CFG_TRACE_STATUS
-#   define VSF_HW_USART_CFG_TRACE_STATUS               DISABLED
+#   define VSF_HW_USART_CFG_TRACE_STATUS                DISABLED
 #endif
 
 #ifndef VSF_HW_USART_CFG_START_PORT
-#   define VSF_HW_USART_CFG_START_PORT                 1
+#   define VSF_HW_USART_CFG_START_PORT                  1
 #endif
 
 #ifndef VSF_HW_USART_CFG_END_PORT
-#   define VSF_HW_USART_CFG_END_PORT                   255
+#   define VSF_HW_USART_CFG_END_PORT                    255
 #endif
 
 #ifndef VSF_HW_USART_CFG_INPUT_BUFFER
-#   define VSF_HW_USART_CFG_INPUT_BUFFER               1024
+#   define VSF_HW_USART_CFG_INPUT_BUFFER                1024
 #endif
 
 #ifndef VSF_HW_USART_CFG_OUTPUT_BUFFER
-#   define VSF_HW_USART_CFG_OUTPUT_BUFFER              1024
+#   define VSF_HW_USART_CFG_OUTPUT_BUFFER               1024
 #endif
 
 #ifndef VSF_HW_USART_CFG_TRACE_IRQ_PEND
-#   define VSF_HW_USART_CFG_TRACE_IRQ_PEND             "irq_request_pend:"
+#   define VSF_HW_USART_CFG_TRACE_IRQ_PEND              "irq_request_pend:"
 #endif
 
 #ifndef VSF_HW_USART_CFG_TRACE_IRQ_GOING
-#   define VSF_HW_USART_CFG_TRACE_IRQ_GOING            "irq_request_going:"
+#   define VSF_HW_USART_CFG_TRACE_IRQ_GOING             "irq_request_going:"
 #endif
 
 #undef VSF_HW_USART_CFG_TRACE_FUNC
 #if VSF_HW_USART_CFG_TRACE_EN == ENABLED
-#   define VSF_HW_USART_CFG_TRACE_FUNC(...)            printf(__VA_ARGS__)
+#   define VSF_HW_USART_CFG_TRACE_FUNC(...)             printf(__VA_ARGS__)
 #else
 #   define VSF_HW_USART_CFG_TRACE_FUNC(...)
 #endif
 
 #undef VSF_HW_USART_TRACE_HEADER
-#define VSF_HW_USART_TRACE_HEADER                      "[x86/x64]:"
+#define VSF_HW_USART_TRACE_HEADER                       "[x86/x64]:"
 
 #undef vsf_hw_usart_trace_function
 #if VSF_HW_USART_CFG_TRACE_FUNCTION == ENABLED
@@ -187,6 +191,7 @@ typedef struct vsf_hw_usart_t {
         vsf_arch_irq_thread_t           irq_thread;
         vsf_arch_irq_request_t          irq_request;
         vsf_arch_irq_request_t          *irq_cancel_request;
+        vsf_arch_irq_request_t          *irq_request_notifier;
 
         uint8_t                         *buf;
         uint_fast32_t                   buf_size;
@@ -269,7 +274,7 @@ static void __vk_usart_scan_event_thread(void *arg)
     __vsf_arch_irq_set_background(irq_thread);
 
     HANDLE hCom;
-    char file[16] = {0};
+    char file[16] = { 0 };
     uint8_t i, j;
 
     memset(__x86_usart_win.port, 0, sizeof(__x86_usart_win.port));
@@ -336,7 +341,7 @@ static vsf_err_t __usart_init(vsf_hw_usart_t *hw_usart)
 #if VSF_HW_USART_CFG_TRACE_EN == ENABLED
     DWORD res_dword = 0;
 #endif
-    char file[16] = {0};
+    char file[16] = { 0 };
 
     sprintf(file, "\\\\.\\com%d", __x86_usart_win.port[hw_usart->com_port]);
     VSF_HW_USART_CFG_TRACE_FUNC("[%s]line(%d)file(%s)", __FUNCTION__, __LINE__, file);
@@ -621,6 +626,10 @@ static void __vk_usart_write_event_thread(void *arg)
                 __vsf_arch_irq_start(irq_thread);
                 hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_ERR);
                 __vsf_arch_irq_end(irq_thread, false);
+
+                if (hw_usart->write.irq_request_notifier != NULL) {
+                    __vsf_arch_irq_request_send(hw_usart->write.irq_request_notifier);
+                }
             }
             goto pend_write;
         }
@@ -639,6 +648,10 @@ static void __vk_usart_write_event_thread(void *arg)
             hw_usart->cancel_status |= CANCEL_WRITE_CLP;
             hw_usart->cfg.isr.handler_fn(hw_usart->cfg.isr.target_ptr, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_TX_CPL);
             __vsf_arch_irq_end(irq_thread, false);
+
+            if (hw_usart->write.irq_request_notifier != NULL) {
+                __vsf_arch_irq_request_send(hw_usart->write.irq_request_notifier);
+            }
         }
         hw_usart->write.ret_buf_size = hw_usart->write.total_len;
         if (NULL != hw_usart->write.irq_cancel_request) {
@@ -850,9 +863,23 @@ vsf_err_t vsf_hw_usart_request_tx(vsf_hw_usart_t *hw_usart, void *buffer, uint_f
     hw_usart->write.ret = WriteFile(hw_usart->handle_com, hw_usart->write.buf,
             hw_usart->write.buf_size, &hw_usart->write.total_len, &hw_usart->write.overLapped);
     hw_usart->write.last_error = GetLastError();
+#if VSF_WIN_USART_CFG_TX_BLOCK == ENABLED
+    vsf_arch_irq_request_t notifier_request = { 0 };
+    __vsf_arch_irq_request_init(&notifier_request);
+    hw_usart->write.irq_request_notifier = &notifier_request;
+#endif
 
     __vsf_arch_irq_request_send(&hw_usart->write.irq_request);
     vsf_hw_usart_trace_function("%s exited VSF_ERR_NONE", __FUNCTION__);
+
+#if VSF_WIN_USART_CFG_TX_BLOCK == ENABLED
+    vsf_arch_irq_thread_t *irq_thread = __vsf_arch_irq_get_cur();
+    __vsf_arch_irq_end(irq_thread, false);
+    __vsf_arch_irq_request_pend(hw_usart->write.irq_request_notifier);
+    __vsf_arch_irq_start(irq_thread);
+    __vsf_arch_irq_request_fini(hw_usart->write.irq_request_notifier);
+    hw_usart->write.irq_request_notifier = NULL;
+#endif
     return VSF_ERR_NONE;
 }
 
@@ -941,12 +968,16 @@ vsf_err_t vsf_hw_usart_cancel_rx(vsf_hw_usart_t *hw_usart)
         vsf_hw_usart_trace_function("%s exited VSF_ERR_NONE", __FUNCTION__);
         return VSF_ERR_NONE;
     }
-    vsf_arch_irq_request_t read_cancel_request = {0};
+    vsf_arch_irq_request_t read_cancel_request = { 0 };
     __vsf_arch_irq_request_init(&read_cancel_request);
 
     hw_usart->read.irq_cancel_request = &read_cancel_request;
 
+    vsf_arch_irq_thread_t *irq_thread = __vsf_arch_irq_get_cur();
+    __vsf_arch_irq_end(irq_thread, false);
     __vsf_arch_irq_request_pend(hw_usart->read.irq_cancel_request);
+    __vsf_arch_irq_start(irq_thread);
+    __vsf_arch_irq_request_fini(hw_usart->read.irq_cancel_request);
     hw_usart->read.irq_cancel_request = NULL;
     vsf_hw_usart_trace_function("%s exited VSF_ERR_NONE", __FUNCTION__);
     return VSF_ERR_NONE;
@@ -977,11 +1008,15 @@ vsf_err_t vsf_hw_usart_cancel_tx(vsf_hw_usart_t *hw_usart)
         vsf_hw_usart_trace_function("%s line(%d) exited VSF_ERR_NONE", __FUNCTION__, __LINE__);
         return VSF_ERR_NONE;
     }
-    vsf_arch_irq_request_t write_cancel_request = {0};
+    vsf_arch_irq_request_t write_cancel_request = { 0 };
     __vsf_arch_irq_request_init(&write_cancel_request);
     hw_usart->write.irq_cancel_request = &write_cancel_request;
 
+    vsf_arch_irq_thread_t *irq_thread = __vsf_arch_irq_get_cur();
+    __vsf_arch_irq_end(irq_thread, false);
     __vsf_arch_irq_request_pend(hw_usart->write.irq_cancel_request);
+    __vsf_arch_irq_start(irq_thread);
+    __vsf_arch_irq_request_fini(hw_usart->write.irq_cancel_request);
     hw_usart->write.irq_cancel_request = NULL;
     vsf_hw_usart_trace_function("%s exited VSF_ERR_NONE", __FUNCTION__);
     return VSF_ERR_NONE;
