@@ -149,7 +149,7 @@ static bool __vsf_hal_distbus_usart_msghandler(vsf_distbus_t *distbus, vsf_distb
     case VSF_HAL_DISTBUS_USART_CMD_ISR:
         VSF_HAL_ASSERT(datalen == sizeof(*u_arg.isr));
         if (usart->irq.handler != NULL) {
-            usart->irq.handler(usart->irq.target, &usart->use_as__vsf_usart_t,
+            usart->irq.handler(usart->irq.target, (vsf_usart_t *)&usart,
                 usart->irq.mask & vsf_hal_distbus_usart_irqmask_to_generic_usart_irqmask(le32_to_cpu(u_arg.isr->irq_mask)));
         }
         break;
@@ -174,7 +174,7 @@ uint32_t vsf_hal_distbus_usart_register_service(vsf_distbus_t *distbus, vsf_hal_
 
     usart->distbus = distbus;
     usart->service.info = &__vsf_hal_distbus_usart_info;
-#if VSF_HAL_DISTBUS_GPIO_CFG_MULTI_CLASS == ENABLED
+#if VSF_HAL_DISTBUS_USART_CFG_MULTI_CLASS == ENABLED
     usart->op = &__vsf_hal_distbus_usart_op;
 #endif
 
