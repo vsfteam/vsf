@@ -34,12 +34,6 @@ extern bool vsf_driver_init(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_driver_init)
-bool vsf_driver_init(void)
-{
-    return true;
-}
-
 WEAK(vsf_app_driver_init)
 bool vsf_app_driver_init(void)
 {
