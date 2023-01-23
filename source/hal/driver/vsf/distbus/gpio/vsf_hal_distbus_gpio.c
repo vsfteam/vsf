@@ -32,8 +32,8 @@
 #   define VSF_HAL_DISTBUS_GPIO_CFG_PROTECT_LEVEL   interrupt
 #endif
 
-#define __vsf_gpio_protect                          vsf_protect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
-#define __vsf_gpio_unprotect                        vsf_unprotect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
+#define __vsf_gpio_protect                          vsf_protect(VSF_HAL_DISTBUS_GPIO_CFG_PROTECT_LEVEL)
+#define __vsf_gpio_unprotect                        vsf_unprotect(VSF_HAL_DISTBUS_GPIO_CFG_PROTECT_LEVEL)
 
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
