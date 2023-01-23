@@ -238,6 +238,14 @@ void vsf_hal_distbus_usart_irq_enable(vsf_hal_distbus_usart_t *usart, vsf_usart_
     VSF_HAL_ASSERT(NULL != usart);
     VSF_HAL_ASSERT(0 != irq_mask);
     usart->irq.mask |= irq_mask;
+
+    vsf_hal_distbus_usart_isr_t *param;
+    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usart->distbus, sizeof(*param), (uint8_t **)&param);
+    VSF_HAL_ASSERT(msg != NULL);
+
+    msg->header.addr = VSF_HAL_DISTBUS_USART_CMD_IRQ_ENABLE;
+    param->irq_mask = cpu_to_le32(irq_mask);
+    vsf_distbus_send_msg(usart->distbus, &usart->service, msg);
 }
 
 void vsf_hal_distbus_usart_irq_disable(vsf_hal_distbus_usart_t *usart, vsf_usart_irq_mask_t irq_mask)
@@ -245,6 +253,14 @@ void vsf_hal_distbus_usart_irq_disable(vsf_hal_distbus_usart_t *usart, vsf_usart
     VSF_HAL_ASSERT(NULL != usart);
     VSF_HAL_ASSERT(0 != irq_mask);
     usart->irq.mask &= ~irq_mask;
+
+    vsf_hal_distbus_usart_isr_t *param;
+    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usart->distbus, sizeof(*param), (uint8_t **)&param);
+    VSF_HAL_ASSERT(msg != NULL);
+
+    msg->header.addr = VSF_HAL_DISTBUS_USART_CMD_IRQ_DISABLE;
+    param->irq_mask = cpu_to_le32(irq_mask);
+    vsf_distbus_send_msg(usart->distbus, &usart->service, msg);
 }
 
 vsf_usart_status_t vsf_hal_distbus_usart_status(vsf_hal_distbus_usart_t *usart)
