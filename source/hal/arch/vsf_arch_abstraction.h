@@ -56,6 +56,7 @@ typedef struct vsf_protect_region_t {
 } vsf_protect_region_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
 extern const vsf_protect_region_t vsf_protect_region_int;
 extern const vsf_protect_region_t vsf_protect_region_none;
 

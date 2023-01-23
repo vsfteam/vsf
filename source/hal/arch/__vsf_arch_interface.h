@@ -19,12 +19,14 @@
 #define __VSF_ARCH_INTERFACE_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "vsf_arch_abstraction.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /******************************************************************************
  * IMPORTANT: This header file can only be included by source code files      *
  *            within arch                                                     *

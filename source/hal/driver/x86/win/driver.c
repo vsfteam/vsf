@@ -94,7 +94,7 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-int __vsf_arch_printf(const char *format, ...)
+int __vsf_arch_trace(int level, const char *format, ...)
 {
 #if VSF_ARCH_CFG_HIDE_CONSOLE != ENABLED
     char buff[4096];
