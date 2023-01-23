@@ -28,12 +28,12 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#ifndef VSF_HW_GPIO_CFG_PROTECT_LEVEL
-#   define VSF_HW_GPIO_CFG_PROTECT_LEVEL    interrupt
+#ifndef VSF_HAL_DISTBUS_GPIO_CFG_PROTECT_LEVEL
+#   define VSF_HAL_DISTBUS_GPIO_CFG_PROTECT_LEVEL   interrupt
 #endif
 
-#define __vsf_gpio_protect                  vsf_protect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
-#define __vsf_gpio_unprotect                vsf_unprotect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
+#define __vsf_gpio_protect                          vsf_protect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
+#define __vsf_gpio_unprotect                        vsf_unprotect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
 
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
@@ -61,6 +61,16 @@ static const vsf_gpio_op_t __vsf_hal_distbus_gpio_op = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+// TODO:
+vsf_io_feature_t vsf_hal_distbus_io_feature_to_generic_io_feature(uint32_t hal_distbus_io_feature)
+{
+    return (vsf_io_feature_t)0;
+}
+uint32_t vsf_generic_io_feature_to_hal_distbus_io_feature(vsf_io_feature_t generic_io_feature)
+{
+    return 0;
+}
+
 static bool __vsf_hal_distbus_gpio_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vsf_hal_distbus_gpio_t *gpio = container_of(service, vsf_hal_distbus_gpio_t, service);
@@ -87,30 +97,20 @@ static bool __vsf_hal_distbus_gpio_msghandler(vsf_distbus_t *distbus, vsf_distbu
 
 uint32_t vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_gpio_t *gpio, void *info, uint32_t infolen)
 {
-    if (infolen >= sizeof(vsf_hal_distbus_gpio_info_t)) {
-        gpio->info = *(vsf_hal_distbus_gpio_info_t *)info;
-        gpio->info.pin_mask = le32_to_cpu(gpio->info.pin_mask);
-        gpio->info.direction = le32_to_cpu(gpio->info.direction);
-        gpio->info.value = le32_to_cpu(gpio->info.value);
+    VSF_HAL_ASSERT(infolen >= sizeof(vsf_hal_distbus_gpio_info_t));
 
-        gpio->distbus = distbus;
-        gpio->service.info = &__vsf_hal_distbus_gpio_info;
+    gpio->info = *(vsf_hal_distbus_gpio_info_t *)info;
+    gpio->info.pin_mask = le32_to_cpu(gpio->info.pin_mask);
+    gpio->info.direction = le32_to_cpu(gpio->info.direction);
+    gpio->info.value = le32_to_cpu(gpio->info.value);
+
+    gpio->distbus = distbus;
+    gpio->service.info = &__vsf_hal_distbus_gpio_info;
 #if VSF_HAL_DISTBUS_GPIO_CFG_MULTI_CLASS == ENABLED
-        gpio->op = &__vsf_hal_distbus_gpio_op;
+    gpio->op = &__vsf_hal_distbus_gpio_op;
 #endif
-        vsf_distbus_register_service(distbus, &gpio->service);
-    }
+    vsf_distbus_register_service(distbus, &gpio->service);
     return sizeof(vsf_hal_distbus_gpio_info_t);
-}
-
-// TODO:
-vsf_io_feature_t vsf_hal_distbus_io_feature_to_generic_io_feature(uint32_t hal_distbus_io_feature)
-{
-    return (vsf_io_feature_t)0;
-}
-uint32_t vsf_generic_io_feature_to_hal_distbus_io_feature(vsf_io_feature_t generic_io_feature)
-{
-    return 0;
 }
 
 void vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask, vsf_io_feature_t feature)

@@ -75,9 +75,11 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
         msg->header.addr = VSF_HAL_DISTBUS_CMD_DECLARE;
         vsf_distbus_send_msg(hal_distbus->distbus, &hal_distbus->service, msg);
 
-        hal_distbus->remote_connected = true;
-        if (hal_distbus->on_remote_connected != NULL) {
-            hal_distbus->on_remote_connected(hal_distbus);
+        if (!hal_distbus->remote_connected) {
+            hal_distbus->remote_connected = true;
+            if (hal_distbus->on_remote_connected != NULL) {
+                hal_distbus->on_remote_connected(hal_distbus);
+            }
         }
         break;
     case VSF_HAL_DISTBUS_CMD_DECLARE:
@@ -95,7 +97,7 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
 
             switch (dev_type) {
 
-#define VSF_HAL_DISTBUS_PROCESS_DECLARE(__TYPE)                                 \
+#define VSF_HAL_DISTBUS_PROCESS_DECLARE_CMD(__TYPE)                             \
             case VSF_MCONNECT(VSF_HAL_DISTBUS_, __TYPE):                        \
                 u_devs.__TYPE = vsf_heap_malloc(dev_num * sizeof(VSF_MCONNECT(vsf_hal_distbus_, __TYPE, _t)));\
                 VSF_HAL_ASSERT(u_devs.__TYPE != NULL);                          \
@@ -109,7 +111,7 @@ static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
                 }                                                               \
                 break;
 
-#define __VSF_HAL_DISTBUS_ENUM      VSF_HAL_DISTBUS_PROCESS_DECLARE
+#define __VSF_HAL_DISTBUS_ENUM      VSF_HAL_DISTBUS_PROCESS_DECLARE_CMD
 #include "vsf_hal_distbus_enum.inc"
 
             default:

@@ -21,6 +21,7 @@
 
 #if VSF_HAL_USE_IO == ENABLED && VSF_HAL_DISTBUS_USE_IO == ENABLED
 
+#define __VSF_DISTBUS_CLASS_INHERIT__
 #define __VSF_HAL_DISTBUS_IO_CLASS_IMPLEMENT
 #include "../driver.h"
 

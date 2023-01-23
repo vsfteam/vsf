@@ -40,6 +40,11 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HAL_DISTBUS_USBH_CFG_MULTI_CLASS
+#   define VSF_HAL_DISTBUS_USBH_CFG_MULTI_CLASS     VSF_USBH_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

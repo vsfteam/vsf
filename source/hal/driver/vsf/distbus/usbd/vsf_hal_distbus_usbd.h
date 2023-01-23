@@ -40,6 +40,11 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HAL_DISTBUS_USBD_CFG_MULTI_CLASS
+#   define VSF_HAL_DISTBUS_USBD_CFG_MULTI_CLASS     VSF_USBD_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_usb_dc_from_distbus_ip(__n, __obj, __drv_name)                      \
