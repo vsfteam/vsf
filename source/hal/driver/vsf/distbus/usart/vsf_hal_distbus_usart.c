@@ -190,6 +190,8 @@ uint32_t vsf_hal_distbus_usart_register_service(vsf_distbus_t *distbus, vsf_hal_
     usart->fifo.tx.stream.size = dimof(usart->fifo.tx.buffer);
     usart->fifo.tx.stream.rx.evthandler = __vsf_hal_distbus_usart_txfifo_evthandler;
     usart->fifo.tx.stream.rx.param = usart;
+    vsf_stream_init(&usart->fifo.rx.stream.use_as__vsf_stream_t);
+    vsf_stream_init(&usart->fifo.tx.stream.use_as__vsf_stream_t);
     vsf_stream_connect_rx(&usart->fifo.tx.stream.use_as__vsf_stream_t);
 
     vsf_distbus_register_service(distbus, &usart->service);
