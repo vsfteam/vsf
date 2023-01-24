@@ -71,6 +71,7 @@ typedef struct vsf_hw_usart_t {
     vsf_usart_t                         vsf_usart;
 #endif
 
+    HANDLE                              handle;
     uint8_t                             port_idx;
     bool                                irq_started;
     bool                                is_to_exit;
@@ -78,7 +79,10 @@ typedef struct vsf_hw_usart_t {
     vsf_arch_prio_t                     prio;
     uint32_t                            irq_mask;
 
-    HANDLE                              handle;
+    struct {
+        void                            *param;
+        vsf_usart_isr_handler_t         *isrhandler;
+    } irq;
     struct {
         vsf_arch_irq_thread_t           irq_thread;
         vsf_arch_irq_request_t          irq_request;
@@ -281,6 +285,9 @@ static void __vsf_hw_usart_rx_thread(void *arg)
 
         __vsf_arch_irq_start(irq_thread);
         vsf_stream_write(&hw_usart->rx.stream.use_as__vsf_stream_t, NULL, actual_size);
+        if ((hw_usart->irq.isrhandler != NULL) && (hw_usart->irq_mask & VSF_USART_IRQ_MASK_RX)) {
+            hw_usart->irq.isrhandler(hw_usart->irq.param, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_RX);
+        }
         __vsf_arch_irq_end(irq_thread, false);
     }
 
@@ -350,6 +357,8 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart, vsf_usart_cfg_t *cfg)
     }
 
     hw_usart->prio = cfg->isr.prio;
+    hw_usart->irq.param = cfg->isr.target_ptr;
+    hw_usart->irq.isrhandler = cfg->isr.handler_fn;
 
     DCB dcb;
     if (!GetCommState(hw_usart->handle, &dcb)) {
