@@ -42,20 +42,6 @@ static void __vsf_usart_stream_tx(vsf_usart_stream_t *usart_stream, vsf_protect_
     }
 }
 
-static void __vsf_usart_stream_rx(vsf_usart_stream_t *usart_stream, vsf_protect_t orig)
-{
-    uint8_t *buf;
-
-    usart_stream->rx.size = vsf_stream_get_wbuf(usart_stream->stream_rx, &buf);
-    if (usart_stream->rx.size > 0) {
-        usart_stream->rx.size = 1;
-    }
-    vsf_unprotect_int(orig);
-    if (usart_stream->rx.size > 0) {
-        vsf_usart_request_rx(usart_stream->usart, buf, usart_stream->rx.size);
-    }
-}
-
 static void __vsf_usart_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vsf_usart_stream_t *usart_stream = param;
@@ -63,29 +49,13 @@ static void __vsf_usart_stream_evthandler(vsf_stream_t *stream, void *param, vsf
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
-        if (stream == usart_stream->stream_rx) {
-            goto check_rx;
-        } else {
-            goto check_tx;
-        }
-        break;
     case VSF_STREAM_ON_IN:
-    check_tx:
         orig = vsf_protect_int();
         if (usart_stream->tx.size > 0) {
             vsf_unprotect_int(orig);
             break;
         }
         __vsf_usart_stream_tx(usart_stream, orig);
-        break;
-    case VSF_STREAM_ON_OUT:
-    check_rx:
-        orig = vsf_protect_int();
-        if (usart_stream->rx.size > 0) {
-            vsf_unprotect_int(orig);
-            break;
-        }
-        __vsf_usart_stream_rx(usart_stream, orig);
         break;
     }
 }
@@ -94,10 +64,32 @@ static void vsf_usart_stream_isrhandler(void *target, vsf_usart_t *usart, vsf_us
 {
     vsf_usart_stream_t *usart_stream = target;
 
-    if (irq_mask & VSF_USART_IRQ_MASK_RX_CPL) {
-        VSF_HAL_ASSERT(usart_stream->rx.size > 0);
-        vsf_stream_write(usart_stream->stream_rx, NULL, usart_stream->rx.size);
-        __vsf_usart_stream_rx(usart_stream, vsf_protect_int());
+    if (irq_mask & VSF_USART_IRQ_MASK_RX) {
+        uint32_t size, total_size, cur_size;
+        uint8_t *buffer;
+        uint32_t bufsize;
+
+        while (true) {
+            total_size = 0;
+            bufsize = vsf_stream_get_wbuf(usart_stream->stream_rx, &buffer);
+            while (bufsize > 0) {
+                size = vsf_usart_rxfifo_get_data_count(usart_stream->usart);
+                if (0 == size) {
+                    break;
+                }
+
+                size = min(bufsize, size);
+                cur_size = vsf_usart_rxfifo_read(usart_stream->usart, buffer, size);
+                total_size += cur_size;
+                buffer += cur_size;
+                bufsize -= cur_size;
+            }
+
+            if (0 == total_size) {
+                break;
+            }
+            vsf_stream_write(usart_stream->stream_rx, NULL, total_size);
+        }
     } else {
         VSF_HAL_ASSERT(usart_stream->tx.size > 0);
         vsf_stream_read(usart_stream->stream_tx, NULL, usart_stream->tx.size);
@@ -113,16 +105,13 @@ vsf_err_t vsf_usart_stream_init(vsf_usart_stream_t *usart_stream, vsf_usart_cfg_
     VSF_HAL_ASSERT((usart_stream->stream_rx != NULL));
 
     usart_stream->tx.size = 0;
-    usart_stream->rx.size = 0;
 
     cfg->isr.handler_fn = vsf_usart_stream_isrhandler;
     cfg->isr.target_ptr = usart_stream;
     vsf_usart_init(usart_stream->usart, cfg);
-    vsf_usart_irq_enable(usart_stream->usart, VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
+    vsf_usart_irq_enable(usart_stream->usart, VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX_CPL);
     vsf_usart_enable(usart_stream->usart);
 
-    usart_stream->stream_rx->tx.param = usart_stream;
-    usart_stream->stream_rx->tx.evthandler = __vsf_usart_stream_evthandler;
     VSF_STREAM_CONNECT_TX(usart_stream->stream_rx);
 
     usart_stream->stream_tx->rx.param = usart_stream;

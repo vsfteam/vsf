@@ -58,9 +58,6 @@ vsf_class(vsf_usart_stream_t) {
     private_member(
         struct {
             uint32_t size;
-        } rx;
-        struct {
-            uint32_t size;
         } tx;
     )
 };
