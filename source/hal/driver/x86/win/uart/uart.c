@@ -28,9 +28,9 @@
 
 #if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
 #   include "hal/driver/common/usart/fifo2req_usart.h"
-#   define  vsf_hw_usart_init           __vsf_hw_usart_init
-#   define  vsf_hw_usart_irq_enable     __vsf_hw_usart_irq_enable
-#   define  vsf_hw_usart_irq_disable    __vsf_hw_usart_irq_disable
+#   define  vsf_hw_usart_init                       __vsf_hw_usart_init
+#   define  vsf_hw_usart_irq_enable                 __vsf_hw_usart_irq_enable
+#   define  vsf_hw_usart_irq_disable                __vsf_hw_usart_irq_disable
 #endif
 
 // for vsf_trace
@@ -470,10 +470,11 @@ uint_fast16_t vsf_hw_usart_txfifo_write(vsf_hw_usart_t *hw_usart, void *buffer, 
 #   define __USART_REQUEST_IMP
 #endif
 
-#define VSF_USART_CFG_IMP_LV0(__count, __hal_op)                                \
-    vsf_hw_usart_t vsf_hw_usart ## __count = {                                  \
+#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
+    vsf_hw_usart_t vsf_hw_usart ## __COUNT = {                                  \
         .handle                            = INVALID_HANDLE_VALUE,              \
-        __hal_op                                                                \
+        __USART_REQUEST_IMP                                                     \
+        __HAL_OP                                                                \
     };
 #include "hal/driver/common/usart/usart_template.inc"
 
