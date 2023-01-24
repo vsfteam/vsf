@@ -182,9 +182,11 @@ uint32_t vsf_hal_distbus_usart_register_service(vsf_distbus_t *distbus, vsf_hal_
     usart->op = &__vsf_hal_distbus_usart_op;
 #endif
 
+    usart->fifo.rx.stream.align = 0;
     usart->fifo.rx.stream.op = &vsf_mem_stream_op;
     usart->fifo.rx.stream.buffer = usart->fifo.rx.buffer;
     usart->fifo.rx.stream.size = dimof(usart->fifo.rx.buffer);
+    usart->fifo.tx.stream.align = 0;
     usart->fifo.tx.stream.op = &vsf_mem_stream_op;
     usart->fifo.tx.stream.buffer = usart->fifo.tx.buffer;
     usart->fifo.tx.stream.size = dimof(usart->fifo.tx.buffer);
