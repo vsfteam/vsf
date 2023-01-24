@@ -306,8 +306,11 @@ static void __vsf_hw_usart_tx_thread(void *arg)
     vsf_arch_irq_thread_t *irq_thread = arg;
     vsf_hw_usart_t *hw_usart = container_of(irq_thread, vsf_hw_usart_t, tx.irq_thread);
 
+    OVERLAPPED overlapped = {
+        .hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL),
+    };
     BOOL result;
-    DWORD size;
+    DWORD size, actual_size, last_error;
     uint8_t *buffer;
 
     __vsf_arch_irq_set_background(irq_thread);
@@ -319,15 +322,45 @@ static void __vsf_hw_usart_tx_thread(void *arg)
         __vsf_arch_irq_end(irq_thread, false);
 
         if (size > 0) {
-            result = WriteFile(hw_usart->handle, buffer, size, NULL, NULL);
-            if (!result) {
-                vsf_trace_error("hw_usart: failed while sending data\n");
-                vsf_hw_usart_scan_devices(NULL, VSF_HW_USART_COUNT);
-                goto exit_tx;
+            ResetEvent(overlapped.hEvent);
+            overlapped.Internal = 0;
+            overlapped.InternalHigh = 0;
+            overlapped.Offset = 0;
+            overlapped.OffsetHigh = 0;
+            result = WriteFile(hw_usart->handle, buffer, size, &actual_size, &overlapped);
+            if (!result && (GetLastError() != ERROR_IO_PENDING)) {
+                goto fail_and_exit;
             }
+            while (true) {
+                result = GetOverlappedResultEx(hw_usart->handle, &overlapped, &actual_size, 100, FALSE);
+                if (hw_usart->is_to_exit) {
+                    goto exit_tx;
+                }
+
+                if (result != 0) {
+                    break;
+                } else {
+                    last_error = GetLastError();
+                    if (    (ERROR_IO_INCOMPLETE != last_error)
+                        &&  (WAIT_IO_COMPLETION != last_error)
+                        &&  (WAIT_TIMEOUT != last_error)) {
+                        goto fail_and_exit;
+                    }
+                }
+            }
+
+            __vsf_arch_irq_start(irq_thread);
+            vsf_stream_read(&hw_usart->tx.stream.use_as__vsf_stream_t, NULL, actual_size);
+            if ((hw_usart->irq.isrhandler != NULL) && (hw_usart->irq_mask & VSF_USART_IRQ_MASK_TX)) {
+                hw_usart->irq.isrhandler(hw_usart->irq.param, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_TX);
+            }
+            __vsf_arch_irq_end(irq_thread, false);
         }
     }
 
+fail_and_exit:
+    vsf_trace_error("hw_usart: failed while sending data\n");
+    vsf_hw_usart_scan_devices(NULL, VSF_HW_USART_COUNT);
 exit_tx:
     hw_usart->tx.exited = true;
     hw_usart->is_to_exit = true;
