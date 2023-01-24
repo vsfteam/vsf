@@ -29,8 +29,8 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE                  ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK              ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -38,12 +38,21 @@
 typedef enum vsf_usart_mode_t {
     VSF_USART_8_BIT_LENGTH              = 0x0000ul,
     VSF_USART_9_BIT_LENGTH              = 0x1000ul,
+    // not supported by hw, but necessary
+    VSF_USART_5_BIT_LENGTH              = 0x10000,
+    VSF_USART_6_BIT_LENGTH              = 0x20000,
+    VSF_USART_7_BIT_LENGTH              = 0x30000,
     VSF_USART_BIT_LENGTH_MASK           = VSF_USART_8_BIT_LENGTH
-                                        | VSF_USART_9_BIT_LENGTH,
+                                        | VSF_USART_9_BIT_LENGTH
+                                        | VSF_USART_5_BIT_LENGTH
+                                        | VSF_USART_6_BIT_LENGTH
+                                        | VSF_USART_7_BIT_LENGTH,
 
     VSF_USART_1_STOPBIT                 = 0x0000ul,
+    VSF_USART_1_5_STOPBIT               = 0x1000ul,
     VSF_USART_2_STOPBIT                 = 0x2000ul,
     VSF_USART_STOPBIT_MASK              = VSF_USART_1_STOPBIT
+                                        | VSF_USART_1_5_STOPBIT
                                         | VSF_USART_2_STOPBIT,
 
     VSF_USART_NO_PARITY                 = 0x0000ul,
@@ -65,11 +74,6 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_TX_ENABLE                 = 0x0010ul,
     VSF_USART_RX_ENABLE                 = 0x0020ul,
     VSF_USART_ENABLE_MASK               = VSF_USART_TX_ENABLE | VSF_USART_RX_ENABLE,
-
-    // not supported by hw, but necessary, simply using used bits
-    VSF_USART_5_BIT_LENGTH              = 0x0800,
-    VSF_USART_6_BIT_LENGTH              = 0x4000,
-    VSF_USART_7_BIT_LENGTH              = 0x8000,
 } vsf_usart_mode_t;
 
 typedef enum vsf_usart_irq_mask_t {
@@ -92,7 +96,6 @@ typedef enum vsf_usart_irq_mask_t {
                                         | VSF_USART_IRQ_MASK_ERR,
 } vsf_usart_irq_mask_t;
 
-
 /*============================ INCLUDES ======================================*/
 
 #define VSF_USART_CFG_DEC_PREFIX        vsf_hw
@@ -107,12 +110,9 @@ typedef struct vsf_usart_win_device_t {
 } vsf_usart_win_device_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
-
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_hw_usart_scan_devices(void);
-extern bool vsf_hw_usart_is_scanning(uint8_t *device_num);
-extern bool vsf_hw_usart_get_devices(vsf_usart_win_device_t *devices, uint8_t size);
+extern uint8_t vsf_hw_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t device_num);
 
 #endif
 #endif      // __OSA_HAL_X86_WIN_USART_H__
