@@ -201,8 +201,9 @@ static void __vsf_hw_usart_rx_thread(void *arg)
     OVERLAPPED overlapped = {
         .hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL),
     };
+    COMSTAT comstat;
     BOOL result;
-    DWORD size, actual_size, last_error;
+    DWORD size, actual_size, last_error, evt_mask;
     uint8_t *buffer;
 
     __vsf_arch_irq_set_background(irq_thread);
@@ -210,15 +211,56 @@ static void __vsf_hw_usart_rx_thread(void *arg)
         __vsf_arch_irq_start(irq_thread);
         size = vsf_stream_get_wbuf(&hw_usart->rx.stream.use_as__vsf_stream_t, &buffer);
         __vsf_arch_irq_end(irq_thread, false);
-
-        ResetEvent(overlapped.hEvent);
-        result = ReadFile(hw_usart->handle, buffer, size, &actual_size, &overlapped);
-        if (!result && (GetLastError() != ERROR_IO_PENDING)) {
-        fail_and_exit:
-            vsf_hw_usart_scan_devices(NULL, VSF_HW_USART_COUNT);
-            goto exit_rx;
+        if (0 == size) {
+            __vsf_arch_irq_request_send(&hw_usart->rx.irq_request);
+            continue;
         }
 
+        ResetEvent(overlapped.hEvent);
+        overlapped.Internal = 0;
+        overlapped.InternalHigh = 0;
+        overlapped.Offset = 0;
+        overlapped.OffsetHigh = 0;
+
+    check_comm_stat:
+        if (!ClearCommError(hw_usart->handle, NULL, &comstat)) {
+            goto fail_and_exit;
+        }
+        if (0 == comstat.cbInQue) {
+            result = WaitCommEvent(hw_usart->handle, &evt_mask, &overlapped);
+            if (!result && (GetLastError() != ERROR_IO_PENDING)) {
+                goto fail_and_exit;
+            }
+            while (true) {
+                result = GetOverlappedResultEx(hw_usart->handle, &overlapped, &actual_size, 100, FALSE);
+                if (hw_usart->is_to_exit) {
+                    goto exit_rx;
+                }
+
+                if (result != 0) {
+                    break;
+                } else {
+                    last_error = GetLastError();
+                    if (    (ERROR_IO_INCOMPLETE != last_error)
+                        &&  (WAIT_IO_COMPLETION != last_error)
+                        &&  (WAIT_TIMEOUT != last_error)) {
+                        goto fail_and_exit;
+                    }
+                }
+            }
+            goto check_comm_stat;
+        }
+
+        size = vsf_min(size, comstat.cbInQue);
+        ResetEvent(overlapped.hEvent);
+        overlapped.Internal = 0;
+        overlapped.InternalHigh = 0;
+        overlapped.Offset = 0;
+        overlapped.OffsetHigh = 0;
+        result = ReadFile(hw_usart->handle, buffer, size, &actual_size, &overlapped);
+        if (!result && (GetLastError() != ERROR_IO_PENDING)) {
+            goto fail_and_exit;
+        }
         while (true) {
             result = GetOverlappedResultEx(hw_usart->handle, &overlapped, &actual_size, 100, FALSE);
             if (hw_usart->is_to_exit) {
@@ -242,6 +284,9 @@ static void __vsf_hw_usart_rx_thread(void *arg)
         __vsf_arch_irq_end(irq_thread, false);
     }
 
+fail_and_exit:
+    vsf_trace_error("hw_usart: failed while receiving data\n");
+    vsf_hw_usart_scan_devices(NULL, VSF_HW_USART_COUNT);
 exit_rx:
     CloseHandle(overlapped.hEvent);
     hw_usart->rx.exited = true;
@@ -269,6 +314,7 @@ static void __vsf_hw_usart_tx_thread(void *arg)
         if (size > 0) {
             result = WriteFile(hw_usart->handle, buffer, size, NULL, NULL);
             if (!result) {
+                vsf_trace_error("hw_usart: failed while sending data\n");
                 vsf_hw_usart_scan_devices(NULL, VSF_HW_USART_COUNT);
                 goto exit_tx;
             }
@@ -339,6 +385,7 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart, vsf_usart_cfg_t *cfg)
 
     PurgeComm(hw_usart->handle, PURGE_TXCLEAR | PURGE_RXCLEAR);
     ClearCommError(hw_usart->handle, NULL, NULL);
+    SetCommMask(hw_usart->handle, EV_RXCHAR);
     return VSF_ERR_NONE;
 
 close_and_fail:
@@ -372,6 +419,7 @@ fsm_rt_t vsf_hw_usart_enable(vsf_hw_usart_t *hw_usart)
         hw_usart->irq_started = true;
         hw_usart->tx.exited = false;
         hw_usart->rx.exited = false;
+        __vsf_arch_irq_request_init(&hw_usart->rx.irq_request);
         __vsf_arch_irq_request_init(&hw_usart->tx.irq_request);
         __vsf_arch_irq_init(&hw_usart->rx.irq_thread, "win_usart_rx", __vsf_hw_usart_rx_thread, hw_usart->prio);
         __vsf_arch_irq_init(&hw_usart->tx.irq_thread, "win_usart_tx", __vsf_hw_usart_tx_thread, hw_usart->prio);
