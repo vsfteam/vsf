@@ -46,6 +46,7 @@ typedef enum {
     VSF_ERR_NOT_SUPPORT                     =-2,    //!< function not supported
     VSF_ERR_NOT_AVAILABLE                   =-4,    //!< service not available
     VSF_ERR_NOT_ACCESSABLE                  =-5,    //!< target not acceesable
+    VSF_ERR_NOT_ACCESSIBLE                  = VSF_ERR_NOT_ACCESSABLE,
     VSF_ERR_NOT_ENOUGH_RESOURCES            =-6,    //!< no enough resources
     VSF_ERR_FAIL                            =-7,    //!< failed
     VSF_ERR_INVALID_PARAMETER               =-8,    //!< invalid parameter
