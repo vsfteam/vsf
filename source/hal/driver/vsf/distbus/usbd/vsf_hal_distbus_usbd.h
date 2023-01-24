@@ -88,6 +88,11 @@ typedef struct vsf_hal_distbus_usbd_ep_t {
 } vsf_hal_distbus_usbd_ep_t;
 
 vsf_class(vsf_hal_distbus_usbd_t) {
+#if VSF_HAL_DISTBUS_USBD_CFG_MULTI_CLASS == ENABLED
+    public_member(
+        implement(vsf_usbd_t)
+    )
+#endif
     protected_member(
         vsf_distbus_service_t               service;
     )

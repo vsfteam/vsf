@@ -54,6 +54,11 @@ enum {
 #endif
 
 vsf_class(vsf_hal_distbus_dac_t) {
+#if VSF_HAL_DISTBUS_DAC_CFG_MULTI_CLASS == ENABLED
+    public_member(
+        implement(vsf_dac_t)
+    )
+#endif
     protected_member(
         vsf_distbus_service_t               service;
     )

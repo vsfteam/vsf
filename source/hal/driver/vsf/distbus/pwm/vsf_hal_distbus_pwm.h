@@ -54,6 +54,11 @@ enum {
 #endif
 
 vsf_class(vsf_hal_distbus_pwm_t) {
+#if VSF_HAL_DISTBUS_PWM_CFG_MULTI_CLASS == ENABLED
+    public_member(
+        implement(vsf_pwm_t)
+    )
+#endif
     protected_member(
         vsf_distbus_service_t               service;
     )

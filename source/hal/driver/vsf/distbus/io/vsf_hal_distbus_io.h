@@ -39,6 +39,11 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HAL_DISTBUS_IO_CFG_MULTI_CLASS
+#   define VSF_HAL_DISTBUS_IO_CFG_MULTI_CLASS       VSF_IO_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -49,6 +54,11 @@ enum {
 #endif
 
 vsf_class(vsf_hal_distbus_io_t) {
+#if VSF_HAL_DISTBUS_IO_CFG_MULTI_CLASS == ENABLED
+    public_member(
+        implement(vsf_io_t)
+    )
+#endif
     protected_member(
         vsf_distbus_service_t               service;
     )
