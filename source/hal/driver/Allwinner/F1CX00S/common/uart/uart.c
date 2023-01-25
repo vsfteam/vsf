@@ -192,15 +192,6 @@ uint_fast16_t vsf_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, u
     return i;
 }
 
-bool vsf_usart_fifo_flush(vsf_usart_t *usart_ptr)
-{
-    VSF_HAL_ASSERT(usart_ptr != NULL);
-    VSF_HAL_ASSERT(usart_ptr->reg != NULL);
-
-    while (__vsf_usart_rx_is_no_empty(usart_ptr->reg) || __vsf_usart_tx_is_no_full(usart_ptr->reg));
-    return true;
-}
-
 void vsf_usart_irqhandler(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);

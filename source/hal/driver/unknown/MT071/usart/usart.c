@@ -265,11 +265,6 @@ uint_fast16_t vsf_usart_txfifo_write(vsf_usart_t *usart, void *buffer, uint_fast
     return actual_count;
 }
 
-bool vsf_usart_fifo_flush(vsf_usart_t *usart)
-{
-    return !(usart->ip.reg->STAT & (USART_STAT_RXFE | USART_STAT_TXFE));
-}
-
 vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart, void *buffer, uint_fast32_t count)
 {
     VSF_HAL_ASSERT((NULL != usart) && (NULL != buffer) && (count > 0));
