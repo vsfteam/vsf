@@ -103,10 +103,6 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
-#ifdef __WIN__
-    vsf_hw_usart_scan_devices();
-#endif
-
     VSF_STREAM_INIT(&__stream_usart_tx);
     VSF_STREAM_INIT(&__stream_usart_rx);
     vk_usbd_init(&__usbd);

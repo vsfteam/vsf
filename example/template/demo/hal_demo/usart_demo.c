@@ -132,11 +132,7 @@ static void __update_vsf_usart_win(void)
 
     vsf_usart_win_device_t com_vsf_usart[VSF_HW_USART_COUNT] = {0};
     uint8_t port_number;
-    vsf_hw_usart_scan_devices();
-    while (!vsf_hw_usart_is_scanning(&port_number)) {
-        vsf_delay_ms(10);
-    }
-    vsf_hw_usart_get_devices(com_vsf_usart, dimof(com_vsf_usart));
+    vsf_hw_usart_scan_devices((vsf_usart_win_device_t *)com_vsf_usart, dimof(com_vsf_usart));
 
     for (int i = 0; i < port_number; i++) {
         if (com_vsf_usart[i].port != 0) {
