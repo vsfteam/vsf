@@ -104,7 +104,7 @@ void vsf_remapped_spi_fifo_transfer(vsf_remapped_spi_t *spi,
         void *in_buffer, uint_fast32_t in_cnt, uint_fast32_t *in_offset)
 {
     VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));
-    return vsf_spi_fifo_transfer(spi->target, out_buffer, out_cnt, out_offset,
+    vsf_spi_fifo_transfer(spi->target, out_buffer, out_cnt, out_offset,
         in_buffer, in_cnt, in_offset);
 }
 
