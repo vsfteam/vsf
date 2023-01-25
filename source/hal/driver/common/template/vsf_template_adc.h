@@ -152,6 +152,7 @@ struct vsf_adc_t  {
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr);
+extern vsf_adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr);
 
 extern fsm_rt_t vsf_adc_enable(vsf_adc_t *adc_ptr);
 extern fsm_rt_t vsf_adc_disable(vsf_adc_t *adc_ptr);

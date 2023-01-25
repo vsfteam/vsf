@@ -108,5 +108,14 @@ vsf_err_t vsf_pwm_set_ms(vsf_pwm_t *pwm_ptr, uint8_t channel, uint32_t period, u
     return pwm_ptr->op->set_ms(pwm_ptr, channel, period, pulse);
 }
 
+uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr)
+{
+    VSF_HAL_ASSERT(pwm_ptr != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op->get_freq != NULL);
+
+    return pwm_ptr->op->get_freq(pwm_ptr);
+}
+
 #endif /* VSF_PWM_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_PWM == ENABLED */
