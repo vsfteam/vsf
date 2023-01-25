@@ -78,7 +78,7 @@ static void vsf_usart_stream_isrhandler(void *target, vsf_usart_t *usart, vsf_us
                     break;
                 }
 
-                size = min(bufsize, size);
+                size = vsf_min(bufsize, size);
                 cur_size = vsf_usart_rxfifo_read(usart_stream->usart, buffer, size);
                 total_size += cur_size;
                 buffer += cur_size;

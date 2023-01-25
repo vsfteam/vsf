@@ -37,7 +37,6 @@
 #include "service/vsf_service.h"
 #include <Windows.h>
 #include <SetupAPI.h>
-#include <tchar.h>
 
 #pragma comment (lib, "SetupAPI.lib")
 
