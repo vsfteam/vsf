@@ -47,7 +47,11 @@
 #endif
 
 #ifndef VSF_WIN_USART_CFG_TX_BLOCK
-#   define VSF_WIN_USART_CFG_TX_BLOCK               DISABLED
+#   ifdef VSF_USART_CFG_TX_BLOCK
+#       define VSF_WIN_USART_CFG_TX_BLOCK           VSF_USART_CFG_TX_BLOCK
+#   else
+#       define VSF_WIN_USART_CFG_TX_BLOCK           DISABLED
+#   endif
 #endif
 
 #ifndef VSF_WIN_USART_CFG_FIFO_SIZE
@@ -92,6 +96,7 @@ typedef struct vsf_hw_usart_t {
     struct {
         vsf_arch_irq_thread_t           irq_thread;
         vsf_arch_irq_request_t          irq_request;
+        vsf_arch_irq_request_t          *irq_request_notifier;
         vsf_mem_stream_t                stream;
         uint8_t                         buffer[VSF_WIN_USART_CFG_FIFO_SIZE];
         bool                            is_pending;
@@ -316,6 +321,7 @@ static void __vsf_hw_usart_tx_thread(void *arg)
     while (!hw_usart->is_to_exit) {
         __vsf_arch_irq_request_pend(&hw_usart->tx.irq_request);
 
+    get_rbuf:
         __vsf_arch_irq_start(irq_thread);
         size = vsf_stream_get_rbuf(&hw_usart->tx.stream.use_as__vsf_stream_t, &buffer);
         __vsf_arch_irq_end(irq_thread, false);
@@ -347,13 +353,18 @@ static void __vsf_hw_usart_tx_thread(void *arg)
                     }
                 }
             }
-
             __vsf_arch_irq_start(irq_thread);
             vsf_stream_read(&hw_usart->tx.stream.use_as__vsf_stream_t, NULL, actual_size);
+            __vsf_arch_irq_end(irq_thread, false);
+
+            goto get_rbuf;
+        } else if (hw_usart->tx.irq_request_notifier != NULL) {
+            __vsf_arch_irq_start(irq_thread);
             if ((hw_usart->irq.isrhandler != NULL) && (hw_usart->irq_mask & VSF_USART_IRQ_MASK_TX)) {
                 hw_usart->irq.isrhandler(hw_usart->irq.param, (vsf_usart_t *)hw_usart, VSF_USART_IRQ_MASK_TX);
             }
             __vsf_arch_irq_end(irq_thread, false);
+            __vsf_arch_irq_request_send(hw_usart->tx.irq_request_notifier);
         }
     }
 
@@ -545,7 +556,30 @@ uint_fast16_t vsf_hw_usart_txfifo_write(vsf_hw_usart_t *hw_usart, void *buffer, 
     if (0 == hw_usart->port_idx) {
         return 0;
     }
+
+#if VSF_WIN_USART_CFG_TX_BLOCK == ENABLED
+    vsf_arch_irq_request_t notifier_request = { 0 };
+    __vsf_arch_irq_request_init(&notifier_request);
+    hw_usart->tx.irq_request_notifier = &notifier_request;
+
+    vsf_arch_irq_thread_t *irq_thread = __vsf_arch_irq_get_cur();
+    uint_fast16_t total_written_size = 0, cur_written_size;
+    while (size > 0) {
+        cur_written_size = vsf_stream_write(&hw_usart->tx.stream.use_as__vsf_stream_t, buffer, size);
+        buffer += cur_written_size;
+        size -= cur_written_size;
+        total_written_size += cur_written_size;
+
+        __vsf_arch_irq_end(irq_thread, false);
+        __vsf_arch_irq_request_pend(hw_usart->tx.irq_request_notifier);
+        __vsf_arch_irq_start(irq_thread);
+    }
+    __vsf_arch_irq_request_fini(hw_usart->tx.irq_request_notifier);
+    hw_usart->tx.irq_request_notifier = NULL;
+    return total_written_size;
+#else
     return vsf_stream_write(&hw_usart->tx.stream.use_as__vsf_stream_t, buffer, size);
+#endif
 }
 
 /*============================ INCLUDES ======================================*/
