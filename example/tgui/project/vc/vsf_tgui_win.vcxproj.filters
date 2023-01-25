@@ -295,6 +295,9 @@
     <Filter Include="vsf\component\ui\disp\driver\wingdi">
       <UniqueIdentifier>{5ae22d12-7836-45f7-9009-dd6abe6be455}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\driver\common\usart">
+      <UniqueIdentifier>{e9ffba60-1a03-4d47-a250-1dedac066609}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -1068,6 +1071,9 @@
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h">
       <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.h">
+      <Filter>vsf\hal\driver\common\usart</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -1534,6 +1540,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c">
       <Filter>vsf\component\ui\disp\driver\wingdi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.c">
+      <Filter>vsf\hal\driver\common\usart</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\vsf\source\hal\driver\common\usart\fifo2req_usart.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\ft2build.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\vsf_config\ftconfig.h" />
@@ -270,6 +271,7 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\autofit\autofit.c" />
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\base\ftbase.c" />
