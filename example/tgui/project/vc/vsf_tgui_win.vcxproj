@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\vsf\source\hal\driver\common\usart\fifo2req_usart.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\usart\fifo2req_usart.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\disp\driver\wingdi\vsf_disp_wingdi.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\ft2build.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\vsf_config\ftconfig.h" />
