@@ -589,7 +589,7 @@ static void __vsf_arch_irq_activate(vsf_arch_irq_thread_t *irq_thread)
 
         vsf_dlist_insert(vsf_arch_irq_thread_t, rdy_node,
             &__vsf_x86.irq_rdy_list, irq_thread,
-            _->priority < irq_thread->priority);
+            _->priority <= irq_thread->priority);
 
         vsf_arch_trace_irq("%s activated\r\n", irq_thread->name);
         __vsf_arch_bg_trace(VSF_ARCH_TRACE_ACTIVATED, NULL, irq_thread, 0, 0);
@@ -651,7 +651,7 @@ static void __vsf_arch_irq_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_a
         if (is_in) {
             vsf_dlist_insert(vsf_arch_irq_thread_t, rdy_node,
                 &__vsf_x86.irq_rdy_list, irq_thread,
-                _->priority < irq_thread->priority);
+                _->priority <= irq_thread->priority);
         }
     __vsf_arch_unlock();
 }
@@ -922,7 +922,7 @@ bool vsf_arch_low_level_init(void)
     vsf_dlist_init(&__vsf_x86.irq_rdy_list);
     vsf_dlist_insert(vsf_arch_irq_thread_t, rdy_node,
         &__vsf_x86.irq_rdy_list, &__vsf_x86.por_thread,
-        _->priority < vsf_arch_prio_invalid);
+        _->priority <= vsf_arch_prio_invalid);
     vsf_dlist_add_to_head(vsf_arch_irq_thread_t, irq_node, &__vsf_x86.irq_list, &__vsf_x86.por_thread);
 
     return true;
