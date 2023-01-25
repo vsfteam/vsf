@@ -97,8 +97,9 @@ extern "C" {
 #   define VSF_HAL_USE_ADC                  ENABLED
 #endif
 
+// TODO: enable VSF_HAL_USE_DAC after supported
 #ifndef VSF_HAL_USE_DAC
-#   define VSF_HAL_USE_DAC                  ENABLED
+#   define VSF_HAL_USE_DAC                  DISABLED
 #endif
 
 #ifndef VSF_HAL_USE_RTC

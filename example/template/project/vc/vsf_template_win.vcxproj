@@ -11,6 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\io\io_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\dac\vsf_remapped_dac.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\gpio\vsf_remapped_gpio.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\i2c\vsf_remapped_i2c.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\stream\usart\vsf_usart_stream.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo.h" />
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\extension\btstack_oo\btstack_oo_cfg.h" />
@@ -723,6 +734,17 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\io\io_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\dac\vsf_remapped_dac.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\gpio\vsf_remapped_gpio.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\i2c\vsf_remapped_i2c.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\stream\usart\vsf_usart_stream.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\flash\flash_common.c" />
@@ -1538,6 +1560,7 @@
     <ClCompile Include="..\..\demo\vsfvm_demo\vsfvm_demo.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\source\hal\driver\common\io\io_template.inc" />
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\usart\usart_template.inc" />
