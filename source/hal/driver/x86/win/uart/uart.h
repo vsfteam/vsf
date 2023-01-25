@@ -32,6 +32,10 @@
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 
+#ifndef VSF_WIN_USART_CFG_USE_AS_HW_USART
+#   define VSF_WIN_USART_CFG_USE_AS_HW_USART        ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -98,9 +102,25 @@ typedef enum vsf_usart_irq_mask_t {
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_USART_CFG_DEC_PREFIX        vsf_hw
-#define VSF_USART_CFG_DEC_UPCASE_PREFIX VSF_HW
+#undef VSF_USART_CFG_DEC_PREFIX
+#undef VSF_USART_CFG_DEC_UPCASE_PREFIX
+#define VSF_USART_CFG_DEC_PREFIX                    vsf_win
+#define VSF_USART_CFG_DEC_UPCASE_PREFIX             VSF_WIN
 #include "hal/driver/common/usart/usart_template.h"
+
+#if VSF_WIN_USART_CFG_USE_AS_HW_USART == ENABLED
+#   include "hal/utilities/remap/usart/vsf_remapped_usart.h"
+#   define VSF_HAL_HW_USART_DECLARE(__N, __VALUE)                               \
+        extern vsf_remapped_usart_t VSF_MCONNECT(vsf_hw_usart, __N);
+#   define VSF_HAL_HW_USART_DECLARE_MULTI()                                     \
+        VSF_MREPEAT(VSF_HW_USART_COUNT, VSF_HAL_HW_USART_DECLARE, NULL)
+
+#   ifndef VSF_HW_USART_COUNT
+#       define VSF_HW_USART_COUNT               32
+#   endif
+VSF_HAL_HW_USART_DECLARE_MULTI()
+#endif
+
 
 /*============================ TYPES =========================================*/
 
@@ -112,7 +132,7 @@ typedef struct vsf_usart_win_device_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint8_t vsf_hw_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t device_num);
+extern uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t device_num);
 
 #endif
 #endif      // __OSA_HAL_X86_WIN_USART_H__

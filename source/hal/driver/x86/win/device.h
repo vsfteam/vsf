@@ -30,9 +30,8 @@
 
 #define VSF_HW_RTC_COUNT                        1
 
-// for windows, maybe redefine it
-#ifndef VSF_HW_USART_COUNT
-#   define VSF_HW_USART_COUNT                   32
+#ifndef VSF_WIN_USART_COUNT
+#   define VSF_WIN_USART_COUNT                  32
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

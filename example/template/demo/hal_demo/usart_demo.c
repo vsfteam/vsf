@@ -131,7 +131,7 @@ static void __update_vsf_usart_win(void)
     __app_usart_demo.is_inited = true;
 
     vsf_usart_win_device_t com_vsf_usart[VSF_HW_USART_COUNT] = {0};
-    uint8_t port_number = vsf_hw_usart_scan_devices((vsf_usart_win_device_t *)com_vsf_usart, dimof(com_vsf_usart));
+    uint8_t port_number = vsf_win_usart_scan_devices((vsf_usart_win_device_t *)com_vsf_usart, dimof(com_vsf_usart));
 
     for (int i = 0; i < port_number; i++) {
         if (com_vsf_usart[i].port != 0) {
