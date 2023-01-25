@@ -17,55 +17,45 @@
 
 /*============================ INCLUDES ======================================*/
 
-#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#include "hal/vsf_hal_cfg.h"
 
-#   include "./driver/driver.h"
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#if VSF_HAL_USE_IO == ENABLED
 
-#else
+#define __VSF_DISTBUS_CLASS_INHERIT__
+#define __VSF_REMAPPED_IO_CLASS_IMPLEMENT
+#include "./vsf_remapped_io.h"
 
-#   ifndef __VSF_HAL_H__
-#   define __VSF_HAL_H__
-
-#   include "hal/vsf_hal_cfg.h"
-#   include "./arch/vsf_arch.h"
-#   include "./driver/driver.h"
-// DO NOT INCLUDE COMMON.h, so that use can use their own hal API standard
-//#   include "./driver/common/common.h"
-
-#   include "./utilities/io_mapper/vsf_io_mapper.h"
-#   include "./utilities/stream/vsf_hal_stream.h"
-#   include "./utilities/remap/vsf_hal_remap.h"
-
-#   ifdef __cplusplus
-extern "C" {
-#   endif
+#if VSF_IO_CFG_MULTI_CLASS == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
 
-/*! \note initialize level 0/1 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_hal_init(void);
+#if VSF_REMAPPED_IO_CFG_MULTI_CLASS == ENABLED
+const vsf_io_op_t vsf_remapped_io_op = {
+#   undef __VSF_HAL_TEMPLATE_API
+#   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-/*! \note initialize level 2 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_osa_hal_init(void);
+    VSF_IO_APIS(vsf_remapped)
+};
+#endif
 
-#   ifdef __cplusplus
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ IMPLEMENTATION ================================*/
+
+vsf_err_t vsf_remapped_io_config(vsf_remapped_io_t *io, vsf_io_cfg_t *cfg, uint_fast8_t count)
+{
+    VSF_HAL_ASSERT((io != NULL) && (io->target != NULL));
+    return vsf_io_config(io->target, cfg, count);
 }
-#   endif
 
-#endif      // __VSF_HAL_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-/* EOF */
+vsf_err_t vsf_remapped_io_config_one_pin(vsf_remapped_io_t *io, vsf_io_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT((io != NULL) && (io->target != NULL));
+    return vsf_io_config_one_pin(io->target, cfg);
+}
+
+#endif
+#endif

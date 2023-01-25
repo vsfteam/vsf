@@ -17,29 +17,14 @@
 
 /*============================ INCLUDES ======================================*/
 
-#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#ifndef __VSF_HAL_STREAM_H__
+#define __VSF_HAL_STREAM_H__
 
-#   include "./driver/driver.h"
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#include "./usart/vsf_usart_stream.h"
 
-#else
-
-#   ifndef __VSF_HAL_H__
-#   define __VSF_HAL_H__
-
-#   include "hal/vsf_hal_cfg.h"
-#   include "./arch/vsf_arch.h"
-#   include "./driver/driver.h"
-// DO NOT INCLUDE COMMON.h, so that use can use their own hal API standard
-//#   include "./driver/common/common.h"
-
-#   include "./utilities/io_mapper/vsf_io_mapper.h"
-#   include "./utilities/stream/vsf_hal_stream.h"
-#   include "./utilities/remap/vsf_hal_remap.h"
-
-#   ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#   endif
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -48,24 +33,10 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-/*! \note initialize level 0/1 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_hal_init(void);
 
-/*! \note initialize level 2 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_osa_hal_init(void);
-
-#   ifdef __cplusplus
+#ifdef __cplusplus
 }
-#   endif
+#endif
 
-#endif      // __VSF_HAL_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#endif      // __VSF_HAL_STREAM_H__
 /* EOF */

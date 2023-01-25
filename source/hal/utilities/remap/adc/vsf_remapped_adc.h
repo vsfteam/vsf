@@ -15,57 +15,73 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __VSF_REMAPPED_ADC_H__
+#define __VSF_REMAPPED_ADC_H__
+
 /*============================ INCLUDES ======================================*/
 
-#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#include "hal/vsf_hal_cfg.h"
 
-#   include "./driver/driver.h"
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#if VSF_HAL_USE_ADC == ENABLED
 
-#else
+#include "hal/driver/common/template/vsf_template_adc.h"
 
-#   ifndef __VSF_HAL_H__
-#   define __VSF_HAL_H__
+#if VSF_ADC_CFG_MULTI_CLASS == ENABLED
 
-#   include "hal/vsf_hal_cfg.h"
-#   include "./arch/vsf_arch.h"
-#   include "./driver/driver.h"
-// DO NOT INCLUDE COMMON.h, so that use can use their own hal API standard
-//#   include "./driver/common/common.h"
+#if     defined(__VSF_REMAPPED_ADC_CLASS_IMPLEMENT)
+#   undef __VSF_REMAPPED_ADC_CLASS_IMPLEMENT
+#   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_REMAPPED_ADC_CLASS_INHERIT__)
+#   undef __VSF_REMAPPED_ADC_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
+#endif
 
-#   include "./utilities/io_mapper/vsf_io_mapper.h"
-#   include "./utilities/stream/vsf_hal_stream.h"
-#   include "./utilities/remap/vsf_hal_remap.h"
+#include "utilities/ooc_class.h"
 
-#   ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#   endif
+#endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_REMAPPED_ADC_CFG_MULTI_CLASS
+#   define VSF_REMAPPED_ADC_CFG_MULTI_CLASS     VSF_ADC_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+vsf_class(vsf_remapped_adc_t) {
+#if VSF_REMAPPED_ADC_CFG_MULTI_CLASS == ENABLED
+    public_member(
+        implement(vsf_adc_t)
+    )
+#endif
+    public_member(
+        vsf_adc_t                           *target;
+    )
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+
+#if VSF_REMAPPED_ADC_CFG_MULTI_CLASS == ENABLED
+extern const vsf_adc_op_t vsf_remapped_adc_op;
+#endif
+
 /*============================ PROTOTYPES ====================================*/
+/*============================ INCLUDES ======================================*/
 
-/*! \note initialize level 0/1 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_hal_init(void);
 
-/*! \note initialize level 2 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-extern bool vsf_osa_hal_init(void);
+#define VSF_ADC_CFG_DEC_PREFIX              vsf_remapped
+#define VSF_ADC_CFG_DEC_UPCASE_PREFIX       VSF_REMAPPED
+#include "hal/driver/common/adc/adc_template.h"
 
-#   ifdef __cplusplus
+#ifdef __cplusplus
 }
-#   endif
+#endif
 
-#endif      // __VSF_HAL_H__
-#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#endif      // VSF_ADC_CFG_MULTI_CLASS
+#endif      // VSF_HAL_USE_ADC
+#endif
 /* EOF */
+
