@@ -36,7 +36,39 @@
 #include "./vsf_usbd_drv_ifs.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_USBD_CFG_STREAM_EN == ENABLED && VSF_USE_SIMPLE_STREAM == ENABLED && defined(VSF_USBD_CFG_PROTECT_LEVEL)
+#   warning ******** ep_stream of usb device is enabled, and VSF_USBD_CFG_PROTECT_LEVEL is re-defined.\
+VSF_USBD_CFG_PROTECT_LEVEL MUST be set to the level suitable for stream evthandler(maybe called in interrupt) ********
+#endif
+
+#ifndef VSF_USBD_CFG_PROTECT_LEVEL
+/*! \note     If ep_stream is enabled, default protect level will be interrupt,
+ *!         because vk_usbd_ep_recv and vk_usbd_ep_send will be called in
+ *!         evthandler of stream, which is maybe called in interrupt.
+ *!           If ep_stream is not enabled, default protect level will be none.
+ *!
+ *!         in the case when you want to disable it,
+ *!         please use following macro:
+ *!         #define VSF_USBD_CFG_PROTECT_LEVEL  none
+ *!
+ *!         in the case when you want to use scheduler-safe,
+ *!         please use following macro:
+ *!         #define VSF_USBD_CFG_PROTECT_LEVEL  scheduler
+ *!
+ *!         NOTE: This macro should be defined in vsf_usr_cfg.h
+ */
+#   if VSF_USBD_CFG_STREAM_EN == ENABLED && VSF_USE_SIMPLE_STREAM == ENABLED
+#       define VSF_USBD_CFG_PROTECT_LEVEL           interrupt
+#   else
+#       define VSF_USBD_CFG_PROTECT_LEVEL           none
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __vsf_usbd_protect                          vsf_protect(VSF_USBD_CFG_PROTECT_LEVEL)
+#define __vsf_usbd_unprotect                        vsf_unprotect(VSF_USBD_CFG_PROTECT_LEVEL)
 
 #if VSF_USBD_CFG_TRACE == ENABLED
 #   define __vsf_usbd_trace(...)                    vsf_trace_debug(__VA_ARGS__)
@@ -156,6 +188,7 @@ static void __vk_usbd_cfg_fini(vk_usbd_dev_t *dev)
 static vk_usbd_trans_t * __vk_usbd_get_trans(vk_usbd_dev_t *dev, uint_fast8_t ep)
 {
     vk_usbd_trans_t *trans;
+    vsf_protect_t orig = __vsf_usbd_protect();
 
     vsf_slist_peek_next(vk_usbd_trans_t, node, &dev->trans_list, trans);
     while (trans != NULL) {
@@ -164,6 +197,7 @@ static vk_usbd_trans_t * __vk_usbd_get_trans(vk_usbd_dev_t *dev, uint_fast8_t ep
         }
         vsf_slist_peek_next(vk_usbd_trans_t, node, &trans->node, trans);
     }
+    __vsf_usbd_unprotect(orig);
     return trans;
 }
 
@@ -172,7 +206,9 @@ static void __vk_usbd_trans_finish(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans)
     vsf_usbd_notify_user(dev,
         (usb_evt_t)(trans->ep & USB_DIR_MASK ? USB_ON_IN : USB_ON_OUT), trans);
 
+    vsf_protect_t orig = __vsf_usbd_protect();
     vsf_slist_remove(vk_usbd_trans_t, node, &dev->trans_list, trans);
+    __vsf_usbd_unprotect(orig);
 #if VSF_USE_KERNEL == ENABLED
     if (trans->notify_eda) {
         vsf_eda_post_msg(trans->eda, trans);
@@ -196,10 +232,13 @@ vsf_err_t vk_usbd_ep_recv(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans)
     VSF_USB_ASSERT((dev != NULL) && (trans != NULL));
     VSF_USBD_DRV_PREPARE(dev);
     vsf_err_t err;
+    vsf_protect_t orig;
 
     trans->ep &= ~USB_DIR_MASK;
     vsf_slist_init_node(vk_usbd_trans_t, node, trans);
+    orig = __vsf_usbd_protect();
     vsf_slist_add_to_head(vk_usbd_trans_t, node, &dev->trans_list, trans);
+    __vsf_usbd_unprotect(orig);
 
     if (vk_usbd_drv_ep_get_feature(trans->ep, trans->feature) & USB_DC_FEATURE_TRANSFER) {
         err = vk_usbd_drv_ep_transfer_recv(trans->ep, trans->use_as__vsf_mem_t.buffer,
@@ -209,7 +248,9 @@ vsf_err_t vk_usbd_ep_recv(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans)
         err = vk_usbd_drv_ep_transaction_enable_out(trans->ep);
     }
     if (VSF_ERR_NONE != err) {
+        orig = __vsf_usbd_protect();
         vsf_slist_remove(vk_usbd_trans_t, node, &dev->trans_list, trans);
+        __vsf_usbd_unprotect(orig);
     }
     return err;
 }
@@ -236,10 +277,13 @@ vsf_err_t vk_usbd_ep_send(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans)
     VSF_USB_ASSERT((dev != NULL) && (trans != NULL));
     VSF_USBD_DRV_PREPARE(dev);
     vsf_err_t err;
+    vsf_protect_t orig;
 
     trans->ep |= USB_DIR_MASK;
     vsf_slist_init_node(vk_usbd_trans_t, node, trans);
+    orig = __vsf_usbd_protect();
     vsf_slist_add_to_head(vk_usbd_trans_t, node, &dev->trans_list, trans);
+    __vsf_usbd_unprotect(orig);
 
     if (vk_usbd_drv_ep_get_feature(trans->ep, trans->feature) & USB_DC_FEATURE_TRANSFER) {
         uint_fast32_t size = trans->use_as__vsf_mem_t.size;
@@ -252,7 +296,9 @@ vsf_err_t vk_usbd_ep_send(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans)
         err = __vk_usbd_ep_send_imp(dev, trans);
     }
     if (VSF_ERR_NONE != err) {
+        orig = __vsf_usbd_protect();
         vsf_slist_remove(vk_usbd_trans_t, node, &dev->trans_list, trans);
+        __vsf_usbd_unprotect(orig);
     }
     return err;
 }
