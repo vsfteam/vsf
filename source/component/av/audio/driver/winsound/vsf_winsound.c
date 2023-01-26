@@ -166,8 +166,7 @@ static bool __vk_winsound_playback_buffer(vk_winsound_dev_t *dev, uint8_t *buffe
 static void __vk_winsound_playback_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_audio_stream_t *audio_stream = param;
-    vk_audio_stream_t *audio_stream_base = audio_stream - audio_stream->stream_index;
-    vk_winsound_dev_t *dev = container_of(audio_stream_base, vk_winsound_dev_t, stream);
+    vk_winsound_dev_t *dev = container_of(audio_stream->dev, vk_winsound_dev_t, use_as__vk_audio_dev_t);
     vk_winsound_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     uint_fast32_t datasize, half_buffer_size;
     uint8_t *buff;
