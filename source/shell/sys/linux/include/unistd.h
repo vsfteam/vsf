@@ -49,6 +49,7 @@ extern "C" {
 #define pipe                VSF_LINUX_WRAPPER(pipe)
 #define alarm               VSF_LINUX_WRAPPER(alarm)
 #define ualarm              VSF_LINUX_WRAPPER(ualarm)
+#define fork                VSF_LINUX_WRAPPER(fork)
 
 #define isatty              VSF_LINUX_WRAPPER(isatty)
 #define symlink             VSF_LINUX_WRAPPER(symlink)
