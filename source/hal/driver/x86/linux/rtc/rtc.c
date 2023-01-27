@@ -28,6 +28,8 @@
 #include "utilities/vsf_utilities.h"
 
 #include <sys/time.h>
+// for localtime and struct tm
+#include <time.h>
 
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
