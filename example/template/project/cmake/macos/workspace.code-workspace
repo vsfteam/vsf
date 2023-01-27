@@ -16,7 +16,7 @@
 			"name": "vsf",
 //			it's good to support environment variable here, but vscode doesn't
 //			"path": "${env:VSF_PATH}/source"
-//			TODO: set to read path to VSF if env:VSF_PATH is used
+//			TODO: set to real path of VSF if env:VSF_PATH is used
 			"path": "../../../../../source"
 		},
 	],
