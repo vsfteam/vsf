@@ -81,6 +81,9 @@ extern "C" {
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
 #define VSF_ARCH_PROVIDE_HEAP
 
+//! vsf_systimer_get implementation has 1us resolution, which is 1MHz
+#define VSF_ARCH_SYSTIMER_FREQ          (1 * 1000 * 1000)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_ARCH_PRI(__N, __BIT)                                              \
