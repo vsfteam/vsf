@@ -469,4 +469,52 @@ bool vsf_arch_low_level_init(void)
     return true;
 }
 
+void * vsf_arch_heap_malloc(uint_fast32_t size)
+{
+    uint32_t *new_mcb = aligned_alloc(16, (size_t)size + 16);
+    if (new_mcb != NULL) {
+        new_mcb[0] = size;
+        new_mcb[1] = size;
+    }
+    return (void *)&new_mcb[4];
+}
+
+void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size)
+{
+    uint32_t *old_mcb = (uint32_t *)buffer - 4;
+
+    if (old_mcb[0] >= size) {
+        old_mcb[1] = size;
+        return buffer;
+    }
+
+    uint32_t *new_buffer = vsf_arch_heap_malloc(size);
+    if (NULL == new_buffer) {
+        vsf_arch_heap_free(buffer);
+        return NULL;
+    }
+
+    size = vsf_min(size, old_mcb[1]);
+    memcpy(new_buffer, buffer, size);
+    vsf_arch_heap_free(buffer);
+    return new_buffer;
+}
+
+void vsf_arch_heap_free(void *buffer)
+{
+    uint32_t *mcb = (uint32_t *)buffer - 4;
+    free(mcb);
+}
+
+unsigned int vsf_arch_heap_alignment(void)
+{
+    return 16;
+}
+
+uint_fast32_t vsf_arch_heap_size(void *buffer)
+{
+    uint32_t *mcb = (uint32_t *)buffer - 4;
+    return mcb[0];
+}
+
 /* EOF */
