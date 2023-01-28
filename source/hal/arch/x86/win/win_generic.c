@@ -1213,14 +1213,14 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
 
 int vsf_arch_argu(char ***argv)
 {
-    static int __argc = 0;
-    static char **__argv = NULL;
+    static int __vsf_arch_argc = 0;
+    static char **__vsf_arch_argv = NULL;
 
-    if (__argc != 0) {
+    if (__vsf_arch_argc != 0) {
         if (argv != NULL) {
-            *argv = __argv;
+            *argv = __vsf_arch_argv;
         }
-        return __argc;
+        return __vsf_arch_argc;
     }
 
     LPWSTR cmdline = GetCommandLineW();
@@ -1230,22 +1230,22 @@ int vsf_arch_argu(char ***argv)
     WCHAR realcmdline[size];
     ExpandEnvironmentStringsW(cmdline, realcmdline, size);
 
-    LPWSTR * unicode_str = CommandLineToArgvW(realcmdline, &__argc);
+    LPWSTR * unicode_str = CommandLineToArgvW(realcmdline, &__vsf_arch_argc);
     VSF_ARCH_ASSERT(unicode_str != NULL);
 
-    int multibyte_len[__argc], alllen = 0;
-    for (int i = 0; i < __argc; i++) {
+    int multibyte_len[__vsf_arch_argc], alllen = 0;
+    for (int i = 0; i < __vsf_arch_argc; i++) {
         multibyte_len[i] = WideCharToMultiByte(CP_UTF8, 0, unicode_str[i], -1, NULL, 0, 0, false);
         alllen += multibyte_len[i];
     }
 
-    __argv = vsf_arch_heap_malloc(__argc * sizeof(char *) + alllen);
-    VSF_ARCH_ASSERT(__argv != NULL);
+    __vsf_arch_argv = vsf_arch_heap_malloc(__vsf_arch_argc * sizeof(char *) + alllen);
+    VSF_ARCH_ASSERT(__vsf_arch_argv != NULL);
 
-    char *tmp = (char *)&(__argv[__argc]);
-    for (int i = 0; i < __argc; i++) {
+    char *tmp = (char *)&(__vsf_arch_argv[__vsf_arch_argc]);
+    for (int i = 0; i < __vsf_arch_argc; i++) {
         WideCharToMultiByte(CP_UTF8, 0, unicode_str[i], -1, tmp, multibyte_len[i], 0, false);
-        __argv[i] = tmp;
+        __vsf_arch_argv[i] = tmp;
         tmp += multibyte_len[i];
     }
 
