@@ -217,6 +217,7 @@ vsf_class(vsf_arch_irq_thread_t) {
 extern int __vsf_arch_trace(int level, const char *format, ...);
 
 extern void __vsf_arch_irq_sleep(uint_fast32_t ms);
+extern int vsf_arch_argu(char ***argv);
 
 extern void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);

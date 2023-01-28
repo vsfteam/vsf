@@ -1208,6 +1208,52 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
 }
 
 /*----------------------------------------------------------------------------*
+ * Argument                                                                   *
+ *----------------------------------------------------------------------------*/
+
+int vsf_arch_argu(char ***argv)
+{
+    static int __argc = 0;
+    static char **__argv = NULL;
+
+    if (__argc != 0) {
+        if (argv != NULL) {
+            *argv = __argv;
+        }
+        return __argc;
+    }
+
+    LPWSTR cmdline = GetCommandLineW();
+    DWORD size = ExpandEnvironmentStringsW(cmdline, NULL, 0);
+    VSF_ARCH_ASSERT(size > 0);
+
+    WCHAR realcmdline[size];
+    ExpandEnvironmentStringsW(cmdline, realcmdline, size);
+
+    LPWSTR * unicode_str = CommandLineToArgvW(realcmdline, &__argc);
+    VSF_ARCH_ASSERT(unicode_str != NULL);
+
+    int multibyte_len[__argc], alllen = 0;
+    for (int i = 0; i < __argc; i++) {
+        multibyte_len[i] = WideCharToMultiByte(CP_UTF8, 0, unicode_str[i], -1, NULL, 0, 0, false);
+        alllen += multibyte_len[i];
+    }
+
+    __argv = vsf_arch_heap_malloc(__argc * sizeof(char *) + alllen);
+    VSF_ARCH_ASSERT(__argv != NULL);
+
+    char *tmp = (char *)&(__argv[__argc]);
+    for (int i = 0; i < __argc; i++) {
+        WideCharToMultiByte(CP_UTF8, 0, unicode_str[i], -1, tmp, multibyte_len[i], 0, false);
+        __argv[i] = tmp;
+        tmp += multibyte_len[i];
+    }
+
+    LocalFree(unicode_str);
+    return vsf_arch_argu(argv);
+}
+
+/*----------------------------------------------------------------------------*
  * dummy WinMain, Just make some compiler happy                               *
  *----------------------------------------------------------------------------*/
 WEAK(WinMain)
