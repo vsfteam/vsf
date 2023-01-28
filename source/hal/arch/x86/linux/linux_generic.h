@@ -141,6 +141,7 @@ vsf_class(vsf_arch_irq_thread_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern void __vsf_arch_irq_sleep(uint32_t ms);
+extern int vsf_arch_argu(char ***argv);
 
 extern void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);

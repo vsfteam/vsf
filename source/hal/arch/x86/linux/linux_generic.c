@@ -26,6 +26,8 @@
 #include <time.h>
 #include <pthread.h>
 #include <setjmp.h>
+// for open called in vsf_arch_argu
+#include <fcntl.h>
 
 /*============================ MACROS ========================================*/
 
@@ -515,6 +517,56 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
 {
     uint32_t *mcb = (uint32_t *)buffer - 4;
     return mcb[0];
+}
+
+int vsf_arch_argu(char ***argv)
+{
+    static char *__argv_str, **__argv;
+    static int __argc;
+
+    if (__argv != NULL) {
+        if (argv != NULL) {
+            *argv = __argv;
+        }
+        return __argc;
+    }
+
+    int fd = open("/proc/self/cmdline", 0);
+    if (fd < 0) {
+        return -1;
+    }
+
+    int pos = 0, ret;
+    while(true) {
+        __argv_str = vsf_arch_heap_realloc(__argv_str, pos + 1024);
+        ret = read(fd, __argv_str + pos, 1024);
+        if (ret < 0) {
+            break;
+        }
+        pos += ret;
+        if (ret < 1024) {
+            break;
+        }
+    }
+
+    for (int i = 0; i < pos; i++) {
+        if (__argv_str[i] == '\0') {
+            __argc++;
+        }
+    }
+    VSF_ARCH_ASSERT(__argc > 0);
+    __argv = vsf_arch_heap_malloc(__argc * sizeof(char *));
+    VSF_ARCH_ASSERT(__argv != NULL);
+
+    for (int i = 0, argv_pos = 0; i < pos; i++) {
+        if (    !argv_pos
+            ||  (   (__argv_str[i] != '\0')
+                &&  (__argv_str[i - 1] == '\0'))) {
+            __argv[argv_pos++] = &__argv_str[i];
+        }
+    }
+
+    return vsf_arch_argu(argv);
 }
 
 /* EOF */
