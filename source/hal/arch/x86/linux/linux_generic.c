@@ -483,6 +483,10 @@ void * vsf_arch_heap_malloc(uint_fast32_t size)
 
 void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size)
 {
+    if (NULL == buffer) {
+        return vsf_arch_heap_malloc(size);
+    }
+
     uint32_t *old_mcb = (uint32_t *)buffer - 4;
 
     if (old_mcb[0] >= size) {
