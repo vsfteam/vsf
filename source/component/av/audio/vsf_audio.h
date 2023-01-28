@@ -139,8 +139,8 @@ typedef union vk_audio_format_t {
 vsf_dcl_class(vk_audio_dev_t)
 vsf_class(vk_audio_stream_t) {
     public_member(
-        uint8_t                 stream_index;           // index start from 0
-        uint8_t                 dir_in1out0;            // 1 for capture, 0 for playback
+        PUBLIC_CONST uint8_t    stream_index;           // index start from 0
+        PUBLIC_CONST uint8_t    dir_in1out0;            // 1 for capture, 0 for playback
         PUBLIC_CONST vk_audio_format_t format;          // format of audio stream buffer
     )
     protected_member(
