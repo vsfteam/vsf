@@ -973,6 +973,9 @@ int cat_main(int argc, char *argv[])
     ssize_t size;
     while ((size = read(fd, buf, sizeof(buf))) > 0) {
         write(STDOUT_FILENO, buf, size);
+        if (size < sizeof(buf)) {
+            break;
+        }
     }
     printf(VSH_LINEEND);
     close(fd);
