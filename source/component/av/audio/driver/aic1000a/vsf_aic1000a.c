@@ -736,6 +736,36 @@ void __vk_aic1000_dac_stop(vk_aic1000a_dev_t *dev, vk_audio_stream_t *audio_stre
 __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_control, vk_audio_control)
 {
     vsf_peda_begin();
+
+    vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
+    uint16_t gain;
+
+    switch (vsf_local.type) {
+    case VSF_AUDIO_CTRL_VOLUME_DB:
+        // db: [-58db, +31db]
+        // TODO: add support by setting gain and goto apply_gain
+        VSF_AV_ASSERT(false);
+        goto apply_gain;
+    case VSF_AUDIO_CTRL_VOLUME_PERCENTAGE:
+        // gain: [0, 0x7FFF]
+        gain = vsf_local.value.uval16 >> 1;
+
+    apply_gain: {
+            uint8_t l = (dev->adc.ch_en & AUD_CH_MAP_CH_0) ? 1 : 0;
+            uint8_t r = (dev->adc.ch_en & AUD_CH_MAP_CH_1) ? 1 : 0;
+
+            __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(aic1000audAudCodec->spk_gain),
+                    ((l * AIC1000AUD_AUD_CODEC_SPK_GAIN0(gain))
+                |   (r * AIC1000AUD_AUD_CODEC_SPK_GAIN1(gain))),
+                    ((l * AIC1000AUD_AUD_CODEC_SPK_GAIN0(0x7FFF))
+                |   (r * AIC1000AUD_AUD_CODEC_SPK_GAIN1(0x7FFF)))
+            );
+        }
+        break;
+    case VSF_AUDIO_CTRL_MUTE:
+        // TODO: add support
+        break;
+    }
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
@@ -1214,6 +1244,39 @@ void __vk_aic1000_adc_stop(vk_aic1000a_dev_t *dev, vk_audio_stream_t *audio_stre
 __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_control, vk_audio_control)
 {
     vsf_peda_begin();
+
+    vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
+    uint8_t gain;
+
+    switch (vsf_local.type) {
+    case VSF_AUDIO_CTRL_VOLUME_DB:
+        // db: [-30db, +18db]
+        // TODO: add support by setting gain and goto apply_gain
+        VSF_AV_ASSERT(false);
+        goto apply_gain;
+    case VSF_AUDIO_CTRL_VOLUME_PERCENTAGE:
+        // gain: [0, 0xFF]
+        gain = vsf_local.value.uval16 >> 8;
+
+    apply_gain: {
+            uint8_t adc_1 = (dev->adc.ch_en & AUD_CH_MAP_CH_0) ? 1 : 0;
+            uint8_t adc_2 = (dev->adc.ch_en & AUD_CH_MAP_CH_1) ? 1 : 0;
+            uint8_t adc_3 = (dev->adc.ch_en & AUD_CH_MAP_CH_2) ? 1 : 0;
+
+            __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(aic1000audAudCodec->mic_gain),
+                    ((adc_1 * AIC1000AUD_AUD_CODEC_MIC_GAIN0(gain))
+                |   (adc_2 * AIC1000AUD_AUD_CODEC_MIC_GAIN1(gain))
+                |   (adc_3 * AIC1000AUD_AUD_CODEC_MIC_GAIN2(gain))),
+                    ((adc_1 * AIC1000AUD_AUD_CODEC_MIC_GAIN0(gain))
+                |   (adc_2 * AIC1000AUD_AUD_CODEC_MIC_GAIN1(gain))
+                |   (adc_3 * AIC1000AUD_AUD_CODEC_MIC_GAIN2(gain)))
+            );
+        }
+        break;
+    case VSF_AUDIO_CTRL_MUTE:
+        // TODO: add support
+        break;
+    }
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
