@@ -44,11 +44,11 @@ typedef struct vk_av_control_value_t {
     union {
         void *buffer;
         uint8_t uval8;
-        int8_t ival8;
+        int8_t sval8;
         uint16_t uval16;
-        int16_t ival16;
+        int16_t sval16;
         uint32_t uval32;
-        int32_t ival32;
+        int32_t sval32;
         bool enable;
     };
 } vk_av_control_value_t;
