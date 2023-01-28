@@ -26,12 +26,17 @@
 // for VSF_HAL_USE_I2S
 #include "hal/vsf_hal.h"
 
+#undef PUBLIC_CONST
 #if     defined(__VSF_AUDIO_CLASS_IMPLEMENT)
 #   undef __VSF_AUDIO_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
+#   define PUBLIC_CONST
 #elif   defined(__VSF_AUDIO_CLASS_INHERIT__)
 #   undef __VSF_AUDIO_CLASS_INHERIT__
 #   define __VSF_CLASS_INHERIT__
+#   define PUBLIC_CONST
+#else
+#   define PUBLIC_CONST         const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -133,11 +138,12 @@ typedef union vk_audio_format_t {
 
 vsf_dcl_class(vk_audio_dev_t)
 vsf_class(vk_audio_stream_t) {
-    protected_member(
+    public_member(
         uint8_t                 stream_index;           // index start from 0
         uint8_t                 dir_in1out0;            // 1 for capture, 0 for playback
-
-        vk_audio_format_t       format;                 // format of audio stream buffer
+        PUBLIC_CONST vk_audio_format_t format;          // format of audio stream buffer
+    )
+    protected_member(
         const vk_audio_stream_drv_t *drv;
         vsf_stream_t            *stream;
         vk_audio_dev_t          *dev;
