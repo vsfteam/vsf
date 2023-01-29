@@ -74,9 +74,9 @@ static bool __vk_usbd_uac_is_get(vk_usbd_uac_ac_t *uac_ac, vk_usbd_ctrl_handler_
 #if VSF_USBD_UAC_CFG_UAC2_EN == ENABLED
     if (uac_ac->version == VK_USB_UAC2) {
         return (request->bRequestType & USB_DIR_MASK) == USB_DIR_IN;
-    }
+    } else
 #endif
-    else {
+    {
         VSF_USB_ASSERT(0);
         return false;
     }
@@ -102,9 +102,9 @@ static char * __vk_usbd_uac_trace_get_request(vk_usbd_uac_ac_t *uac_ac, uint_fas
         case USB_UAC2_REQ_RANGE:    return "RANGE";
         case USB_UAC2_REQ_MEM:      return "MEM";
         }
-    }
+    } else
 #endif
-    else {
+    {
         VSF_USB_ASSERT(0);
     }
 
@@ -208,9 +208,9 @@ static vk_av_control_value_t *__vk_usbd_uac_get_value(vk_usbd_uac_ac_t *uac_ac,
         case USB_UAC2_REQ_RANGE: value = (vk_av_control_value_t *)&control->info->res; break;
         case USB_UAC2_REQ_MEM:   VSF_USB_ASSERT(0); break;  // TODO: support req memory
         }
-    }
+    } else
 #endif
-    else {
+    {
         VSF_USB_ASSERT(0);
     }
     return value;
@@ -284,9 +284,9 @@ static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
                         VSF_USB_ASSERT(0);
                         return VSF_ERR_FAIL;
                     }
-                }
+                } else
 #endif
-                else {
+                {
                     VSF_USB_ASSERT(0);
                     return VSF_ERR_FAIL;
                 }
