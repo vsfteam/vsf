@@ -741,6 +741,9 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_control, vk_audio_control)
     uint16_t gain;
 
     switch (vsf_local.type) {
+    case VSF_AUDIO_CTRL_MUTE:
+        gain = 0;
+        goto apply_gain;
     case VSF_AUDIO_CTRL_VOLUME_DB:
         // db: [-58db, +31db]
         // TODO: add support by setting gain and goto apply_gain
@@ -761,9 +764,6 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_control, vk_audio_control)
                 |   (r * AIC1000AUD_AUD_CODEC_SPK_GAIN1(0x7FFF)))
             );
         }
-        break;
-    case VSF_AUDIO_CTRL_MUTE:
-        // TODO: add support
         break;
     }
     vsf_eda_return(VSF_ERR_NONE);
@@ -1249,6 +1249,9 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_control, vk_audio_control)
     uint8_t gain;
 
     switch (vsf_local.type) {
+    case VSF_AUDIO_CTRL_MUTE:
+        gain = 0;
+        goto apply_gain;
     case VSF_AUDIO_CTRL_VOLUME_DB:
         // db: [-30db, +18db]
         // TODO: add support by setting gain and goto apply_gain
@@ -1272,9 +1275,6 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_control, vk_audio_control)
                 |   (adc_3 * AIC1000AUD_AUD_CODEC_MIC_GAIN2(gain)))
             );
         }
-        break;
-    case VSF_AUDIO_CTRL_MUTE:
-        // TODO: add support
         break;
     }
     vsf_eda_return(VSF_ERR_NONE);
