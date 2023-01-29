@@ -754,8 +754,8 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_control, vk_audio_control)
         gain = vsf_local.value.uval16 >> 1;
 
     apply_gain: {
-            uint8_t l = (dev->adc.ch_en & AUD_CH_MAP_CH_0) ? 1 : 0;
-            uint8_t r = (dev->adc.ch_en & AUD_CH_MAP_CH_1) ? 1 : 0;
+            uint8_t l = (dev->dac.ch_en & AUD_CH_MAP_CH_0) ? 1 : 0;
+            uint8_t r = (dev->dac.ch_en & AUD_CH_MAP_CH_1) ? 1 : 0;
 
             __vk_aic1000a_reg_mask_write(dev, (unsigned int)&(aic1000audAudCodec->spk_gain),
                     ((l * AIC1000AUD_AUD_CODEC_SPK_GAIN0(gain))
