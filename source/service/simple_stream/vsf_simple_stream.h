@@ -82,18 +82,18 @@ extern "C" {
 
 // stream adapter
 
-#define __VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX, __THRESHOLD, __BLOCK_SIZE)\
+#define __VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX, __THRESHOLD_TX, __THRESHOLD_RX)\
             .stream_tx          = (vsf_stream_t *)(__STREAM_TX),                \
             .stream_rx          = (vsf_stream_t *)(__STREAM_RX),                \
-            .threshold          = (__THRESHOLD),                                \
-            .block_size         = (__BLOCK_SIZE),
+            .threshold_tx       = (__THRESHOLD_TX),                             \
+            .threshold_rx       = (__THRESHOLD_RX),
 #define VSF_STREAM_ADAPTER_INIT0(__STREAM_TX, __STREAM_RX)                      \
             __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX), 0, 0)
-#define VSF_STREAM_ADAPTER_INIT1(__STREAM_TX, __STREAM_RX, __THRESHOLD)         \
-            __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX), (__THRESHOLD), 0)
-#define VSF_STREAM_ADAPTER_INIT2(__STREAM_TX, __STREAM_RX, __THRESHOLD, __BLOCK_SIZE)\
-            __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX), (__THRESHOLD), (__BLOCK_SIZE))
-// prototype: VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX, __THRESHOLD = 0, __BLOCK_SIZE = 0)
+#define VSF_STREAM_ADAPTER_INIT1(__STREAM_TX, __STREAM_RX, __THRESHOLD_TX)      \
+            __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX), (__THRESHOLD_TX), 0)
+#define VSF_STREAM_ADAPTER_INIT2(__STREAM_TX, __STREAM_RX, __THRESHOLD_TX, __THRESHOLD_RX)\
+            __VSF_STREAM_ADAPTER_INIT((__STREAM_TX), (__STREAM_RX), (__THRESHOLD_TX), (__THRESHOLD_RX))
+// prototype: VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX, __THRESHOLD_TX = 0, __THRESHOLD_RX = 0)
 #define VSF_STREAM_ADAPTER_INIT(__STREAM_TX, __STREAM_RX, ...)                  \
             __PLOOC_EVAL(VSF_STREAM_ADAPTER_INIT, __VA_ARGS__)((__STREAM_TX), (__STREAM_RX), ##__VA_ARGS__)
 
@@ -105,18 +105,18 @@ extern "C" {
 #define dcl_stream_adapter(__name)                                              \
             declare_stream_adapter(__name)
 
-#define __describe_stream_adapter(__name, __stream_tx, __stream_rx, __threshold, __block_size)\
+#define __describe_stream_adapter(__name, __stream_tx, __stream_rx, __threshold_tx, __threshold_rx)\
             vsf_stream_adapter_t __name = {                                     \
-                VSF_STREAM_ADAPTER_INIT((__stream_tx), (__stream_rx), (__threshold), (__block_size))\
+                VSF_STREAM_ADAPTER_INIT((__stream_tx), (__stream_rx), (__threshold_tx), (__threshold_rx))\
             };
 
 #define describe_stream_adapter0(__name, __stream_tx, __stream_rx)              \
             __describe_stream_adapter(__name, (__stream_tx), (__stream_rx), 0, 0)
-#define describe_stream_adapter1(__name, __stream_tx, __stream_rx, __threshold) \
-            __describe_stream_adapter(__name, (__stream_tx), (__stream_rx), (__threshold), 0)
-#define describe_stream_adapter2(__name, __stream_tx, __stream_rx, __threshold, __block_size) \
-            __describe_stream_adapter(__name, (__stream_tx), (__stream_rx), (__threshold), __block_size)
-// prototype: describe_stream_adapter(__name, __stream_tx, __stream_rx, __threshold = 0, __block_size = 0)
+#define describe_stream_adapter1(__name, __stream_tx, __stream_rx, __threshold_tx)\
+            __describe_stream_adapter(__name, (__stream_tx), (__stream_rx), (__threshold_tx), 0)
+#define describe_stream_adapter2(__name, __stream_tx, __stream_rx, __threshold_tx, __threshold_rx) \
+            __describe_stream_adapter(__name, (__stream_tx), (__stream_rx), (__threshold_tx), __threshold_rx)
+// prototype: describe_stream_adapter(__name, __stream_tx, __stream_rx, __threshold_tx = 0, __threshold_rx = 0)
 #define describe_stream_adapter(__name, __stream_tx, __stream_rx, ...)          \
             __PLOOC_EVAL(describe_stream_adapter, __VA_ARGS__)(__name, (__stream_tx), (__stream_rx), ##__VA_ARGS__)
 
@@ -275,19 +275,23 @@ vsf_class(vsf_stream_t) {
 /**
  * \~english vsf steam adapter class, used to connect 2 streams
  * @note stream terminal connection: stream_tx.rx <==> stream_rx.tx
+ *       data flow: stream_tx ==> adapter ==> stream_rx
  *          IMPORTANT: tx of stream_tx and rx of stream_rx can not be pre-empted by each other
  *
  * \~chinese vsf 流适配器类, 用于连接 2 个流
  * @note 流终端连接方式: stream_tx.rx <==> stream_rx.tx(stream_tx => stream_rx)
+ *       数据流: stream_tx ==> adapter ==> stream_rx
  *          重要: stream_tx 的发送端和 stream_rx 的接收端不能互相抢占
  */
 vsf_class(vsf_stream_adapter_t) {
     public_member(
         vsf_stream_t *stream_tx;
         vsf_stream_t *stream_rx;
-
-        uint32_t threshold;
-        uint32_t block_size;
+        uint32_t threshold_tx;      // threshold of data_size of stream_tx
+        uint32_t threshold_rx;      // threshold of free_size of stream_rx
+        // user can read data from stream_tx and write to stream_rx in on_data callback,
+        //  and return the actual size write to stream_rx
+        uint_fast32_t (*on_data)(vsf_stream_adapter_t *adapter, uint_fast32_t tx_data_size, uint_fast32_t rx_free_size);
     )
 };
 

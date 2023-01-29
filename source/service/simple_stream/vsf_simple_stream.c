@@ -245,26 +245,31 @@ vsf_err_t vsf_stream_fini(vsf_stream_t *stream)
 uint_fast32_t vsf_stream_adapter_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vsf_stream_adapter_t *adapter = param;
-    uint_fast32_t in_size, out_size, all_size = 0, threshold = adapter->threshold > 0 ? adapter->threshold-- : 0;
-    uint8_t *buffer;
+    uint_fast32_t tx_size, rx_size, all_size = 0;
+    uint_fast32_t threshold_tx = adapter->threshold_tx > 0 ? adapter->threshold_tx-- : 0;
+    uint_fast32_t threshold_rx = adapter->threshold_rx > 0 ? adapter->threshold_rx-- : 0;
+    bool user_callback = adapter->on_data != NULL;
 
     if (    (VSF_STREAM_ON_DISCONNECT == evt)
         ||  ((stream == adapter->stream_rx) && (VSF_STREAM_ON_CONNECT == evt))) {
         return 0;
     }
 
-    while ((in_size = vsf_stream_get_rbuf(adapter->stream_tx, &buffer)) > threshold) {
-        if (adapter->block_size > 0) {
-            in_size -= in_size % adapter->block_size;
+    while ( ((tx_size = vsf_stream_get_data_size(adapter->stream_tx)) > threshold_tx)
+        &&  ((rx_size = vsf_stream_get_free_size(adapter->stream_rx)) > threshold_rx)) {
+
+        if (user_callback) {
+            all_size += adapter->on_data(adapter, tx_size, rx_size);
+        } else {
+            uint8_t *buffer;
+            tx_size = vsf_stream_get_rbuf(adapter->stream_tx, &buffer);
+            rx_size = vsf_stream_write(adapter->stream_rx, buffer, tx_size);
+            vsf_stream_read(adapter->stream_tx, NULL, rx_size);
+            all_size += rx_size;
+            if (rx_size < tx_size) {
+                break;
+            }
         }
-        out_size = vsf_stream_write(adapter->stream_rx, buffer, in_size);
-        all_size += out_size;
-        if (out_size < in_size) {
-            break;
-        }
-    }
-    if (all_size > 0) {
-        vsf_stream_read(adapter->stream_tx, NULL, all_size);
     }
     return all_size;
 }
