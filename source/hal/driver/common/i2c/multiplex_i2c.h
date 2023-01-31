@@ -33,15 +33,42 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_MULTIPLEX_I2C_CFG_MULTI_CLASS
+#   define VSF_MULTIPLEX_I2C_CFG_MULTI_CLASS        VSF_I2C_CFG_MULTI_CLASS
+#endif
+
 #ifndef VSF_MULTIPLEXER_I2C_CFG_MASK_TYPE
 #   define VSF_MULTIPLEXER_I2C_CFG_MASK_TYPE        uint8_t
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ INCLUDES ======================================*/
+
+#if VSF_MULTIPLEX_I2C_CFG_MULTI_CLASS == ENABLED
+#   define __describe_multiplex_i2c_op()        .op = &vsf_multiplex_i2c_op,
+#else
+#   define __describe_multiplex_i2c_op()
+#endif
+
+#define __describe_multiplex_i2c(__cnt, __name)                                 \
+    vsf_multiplex_i2c_t __name ## _ ## __cnt = {                                \
+        __describe_multiplex_i2c_op()                                           \
+        .multiplexer = & __vsf_multiplexer_i2c_ ## __name,                      \
+        .id = __cnt,                                                            \
+    };
+
+#define __describe_multiplexer_i2c(__name, __i2c, __cnt)                        \
+    vsf_multiplexer_i2c_t __vsf_multiplexer_i2c_ ## __name = {                  \
+        .i2c_ptr = __i2c,                                                       \
+    };                                                                          \
+    VSF_MREPEAT(__cnt, __describe_multiplex_i2c, __name)
+
+#define describe_multiplexer_i2c(__name, __i2c, __cnt)                          \
+    __describe_multiplexer_i2c(__name, __i2c, __cnt)
+
 /*============================ TYPES =========================================*/
 
-typedef VSF_MULTIPLEXER_I2C_CFG_MASK_TYPE i2c_multi_mask_t;
+typedef VSF_MULTIPLEXER_I2C_CFG_MASK_TYPE vsf_i2c_multiplex_mask_t;
 
 vsf_declare_class(vsf_multiplex_i2c_t)
 
@@ -53,9 +80,10 @@ vsf_class(vsf_multiplexer_i2c_t) {
     private_member(
         vsf_slist_queue_t slist_queue;
 
-        vsf_multiplex_i2c_t *current_m_i2c;
-        i2c_multi_mask_t init_mask;
-        i2c_multi_mask_t en_mask;
+        vsf_multiplex_i2c_t *req_m_i2c;
+        vsf_multiplex_i2c_t *inited_m_i2c;
+        vsf_i2c_multiplex_mask_t init_mask;
+        vsf_i2c_multiplex_mask_t en_mask;
         // irq mask
         vsf_i2c_irq_mask_t irq_mask;     // All CS IRQ Mask Wire-OR
 
@@ -65,8 +93,8 @@ vsf_class(vsf_multiplexer_i2c_t) {
 
 vsf_class(vsf_multiplex_i2c_t) {
     public_member(
-#if VSF_HAL_MRQUEST_I2C_CFG_MULTI_CLASS == ENABLED
-        vsf_i2c_t vsf_i2c;
+#if VSF_MULTIPLEX_I2C_CFG_MULTI_CLASS == ENABLED
+        implement(vsf_i2c_t)
 #endif
         uint8_t id;
         vsf_multiplexer_i2c_t *multiplexer;
