@@ -117,8 +117,7 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
                 i2s_cfg.buffer_size = vsf_stream_get_wbuf(stream, &i2s_cfg.buffer);
                 i2s_cfg.isr.handler_fn = __vk_audio_i2s_isrhandler;
                 i2s_cfg.isr.target_ptr = audio_stream;
-                // TODO: fix priority
-                i2s_cfg.isr.prio = vsf_arch_prio_0;
+                i2s_cfg.isr.prio = dev->arch_prio;
                 if (VSF_ERR_NONE != vsf_i2s_rx_init(dev->i2s, &i2s_cfg)) {
                     vsf_trace_error("fail to initialize i2s_rx\n");
                 } else {
@@ -142,8 +141,7 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
                 i2s_cfg.buffer_size = vsf_stream_get_rbuf(stream, &i2s_cfg.buffer);
                 i2s_cfg.isr.handler_fn = __vk_audio_i2s_isrhandler;
                 i2s_cfg.isr.target_ptr = audio_stream;
-                // TODO: fix priority
-                i2s_cfg.isr.prio = vsf_arch_prio_0;
+                i2s_cfg.isr.prio = dev->arch_prio;
                 if (VSF_ERR_NONE != vsf_i2s_tx_init(dev->i2s, &i2s_cfg)) {
                     vsf_trace_error("fail to initialize i2s_tx\n");
                 } else {

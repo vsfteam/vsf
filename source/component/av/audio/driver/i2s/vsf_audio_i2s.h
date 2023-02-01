@@ -51,6 +51,7 @@ vsf_class(vk_audio_i2s_dev_t) {
         implement(vk_audio_dev_t)
         vsf_i2s_t           *i2s;
         vsf_i2s_feature_t   i2s_feature;
+        vsf_arch_prio_t     arch_prio;
     )
     protected_member(
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
