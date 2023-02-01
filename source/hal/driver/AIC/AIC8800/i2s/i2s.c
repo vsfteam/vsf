@@ -607,11 +607,11 @@ vsf_err_t vsf_hw_i2s_rx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     dma_cfg.llist_dedicated_int_en = true;
     dma_cfg.llist_en = true;
     dma_cfg.llist_cfg_valid = false;
-    dma_cfg.nxt_addr = (uint32_t)&hw_i2s_ptr->tx.dma_desc[0];
+    dma_cfg.nxt_addr = (uint32_t)&hw_i2s_ptr->rx.dma_desc[0];
     dma_cfg.dest_addr = (uint32_t)cfg_ptr->buffer;
-    dma_cx_desc_link(&dma_cfg, &hw_i2s_ptr->tx.dma_desc[0], &hw_i2s_ptr->tx.dma_desc[1]);
+    dma_cx_desc_link(&dma_cfg, &hw_i2s_ptr->rx.dma_desc[0], &hw_i2s_ptr->rx.dma_desc[1]);
     dma_cfg.dest_addr = (uint32_t)((uint8_t *)cfg_ptr->buffer + desc_trans_size);
-    dma_cx_desc_link(&dma_cfg, &hw_i2s_ptr->tx.dma_desc[1], &hw_i2s_ptr->tx.dma_desc[0]);
+    dma_cx_desc_link(&dma_cfg, &hw_i2s_ptr->rx.dma_desc[1], &hw_i2s_ptr->rx.dma_desc[0]);
     dma_cfg.dest_addr = (uint32_t)cfg_ptr->buffer;
     dma_cx_config(dma_cfg.ch, &dma_cfg);
 
