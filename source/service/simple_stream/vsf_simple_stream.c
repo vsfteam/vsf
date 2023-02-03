@@ -271,6 +271,12 @@ uint_fast32_t vsf_stream_adapter_evthandler(vsf_stream_t *stream, void *param, v
             }
         }
     }
+
+    // clear stream_tx->rx.data_notified if vsf_stream_read is not called,
+    //  or VSF_STREAM_ON_IN will never be called again.
+    if ((stream == adapter->stream_tx) && stream->rx.data_notified) {
+        stream->rx.data_notified = false;
+    }
     return all_size;
 }
 
