@@ -16,17 +16,21 @@
  ****************************************************************************/
 
 // for example:
-//  #define __VSF_HAL_TEMPLATE_PREFIX            vsf_hw
-//  #define __VSF_HAL_TEMPLATE_UPCASE_PREFIX     VSF_HW
-//  #define __VSF_HAL_TEMPLATE_NAME              adc
-//  #define __VSF_HAL_TEMPLATE_UPCASE_NAME       ADC
+//  #define __VSF_HAL_TEMPLATE_PREFIX           vsf_hw
+//  #define __VSF_HAL_TEMPLATE_UPCASE_PREFIX    VSF_HW
+//  #define __VSF_HAL_TEMPLATE_NAME             adc
+//  #define __VSF_HAL_TEMPLATE_UPCASE_NAME      ADC
 
-#define __VSF_HAL_TEMPLATE_PREFIX                VSF_MCONNECT(VSF, __VSF_HAL_TEMPLATE_UPCASE_NAME, _CFG_DEC_PREFIX)
-#define __VSF_HAL_TEMPLATE_EXTERN_OP             VSF_MCONNECT(VSF, __VSF_HAL_TEMPLATE_UPCASE_NAME, _CFG_DEC_EXTERN_OP)
+#define __VSF_HAL_TEMPLATE_PREFIX               VSF_MCONNECT(VSF, __VSF_HAL_TEMPLATE_UPCASE_NAME, _CFG_DEC_PREFIX)
+#define __VSF_HAL_TEMPLATE_EXTERN_OP            VSF_MCONNECT(VSF, __VSF_HAL_TEMPLATE_UPCASE_NAME, _CFG_DEC_EXTERN_OP)
+
+#ifndef __VSF_HAL_TEMPLATE_TYPE_PREFIX
+#   define __VSF_HAL_TEMPLATE_TYPE_PREFIX       __VSF_HAL_TEMPLATE_PREFIX
+#endif
 
 #if defined(__VSF_HAL_TEMPLATE_PREFIX)
 #   undef __VSF_HAL_TEMPLATE_API
-#   define __VSF_HAL_TEMPLATE_API  VSF_HAL_TEMPLATE_API_EXTERN
+#   define __VSF_HAL_TEMPLATE_API               VSF_HAL_TEMPLATE_API_EXTERN
 
 // expand to:
 //  typedef vsf_xxx_adc_t vsf_xxx_adc_t;
@@ -63,7 +67,7 @@ extern const VSF_MCONNECT(vsf, __VSF_HAL_TEMPLATE_NAME, _op_t)
 //  #define __VSF_HAL_TEMPLATE_DEC_LV0  vsf_hw_adc_t vsf_hw_adc_0;
 #   ifndef __VSF_HAL_TEMPLATE_DEC_LV0
 #       define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                             \
-            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)     \
+            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_TYPE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)     \
                 VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
 #   endif
 
@@ -166,6 +170,7 @@ extern const VSF_MCONNECT(vsf, __VSF_HAL_TEMPLATE_NAME, _op_t)
 #endif
 
 #undef __VSF_HAL_TEMPLATE_PREFIX
+#undef __VSF_HAL_TEMPLATE_TYPE_PREFIX
 #undef __VSF_HAL_TEMPLATE_UPCASE_PREFIX
 #undef __VSF_HAL_TEMPLATE_EXTERN_OP
 #undef __VSF_HAL_TEMPLATE_NAME
