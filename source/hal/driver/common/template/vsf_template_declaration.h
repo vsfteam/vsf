@@ -24,9 +24,6 @@
 #define __VSF_HAL_TEMPLATE_PREFIX               VSF_MCONNECT(VSF, __VSF_HAL_TEMPLATE_UPCASE_NAME, _CFG_DEC_PREFIX)
 #define __VSF_HAL_TEMPLATE_EXTERN_OP            VSF_MCONNECT(VSF, __VSF_HAL_TEMPLATE_UPCASE_NAME, _CFG_DEC_EXTERN_OP)
 
-#ifndef __VSF_HAL_TEMPLATE_TYPE_PREFIX
-#   define __VSF_HAL_TEMPLATE_TYPE_PREFIX       __VSF_HAL_TEMPLATE_PREFIX
-#endif
 
 #if defined(__VSF_HAL_TEMPLATE_PREFIX)
 #   undef __VSF_HAL_TEMPLATE_API
@@ -63,12 +60,23 @@ extern const VSF_MCONNECT(vsf, __VSF_HAL_TEMPLATE_NAME, _op_t)
 #       define __VSF_HAL_TEMPLATE_DEC_MASK   ((1ul << __VSF_HAL_TEMPLATE_DEC_COUNT) - 1)
 #   endif
 
-// expand to:
-//  #define __VSF_HAL_TEMPLATE_DEC_LV0  vsf_hw_adc_t vsf_hw_adc_0;
+
 #   ifndef __VSF_HAL_TEMPLATE_DEC_LV0
-#       define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                             \
-            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_TYPE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)     \
+#ifndef __VSF_HAL_TEMPLATE_TYPE_PREFIX
+// expand to:
+//  #define __VSF_HAL_TEMPLATE_DEC_LV0  vsf_hw_usart_t vsf_hw_usart_0;
+#       define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                                 \
+            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)         \
                 VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
+#else
+// expand to:
+//  #define __VSF_HAL_TEMPLATE_DEC_LV0  vsf_hw_usart_t __vsf_hw_usart_0; vsf_fifo2req_usart_t vsf_hw_usart_0;
+#       define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                                 \
+            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)         \
+                VSF_MCONNECT(__, __VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);  \
+            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_TYPE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)    \
+                VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
+#endif
 #   endif
 
 #   if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 0)
