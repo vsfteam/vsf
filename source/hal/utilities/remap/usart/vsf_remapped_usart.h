@@ -48,6 +48,21 @@ extern "C" {
 #   define VSF_REMAPPED_USART_CFG_MULTI_CLASS   VSF_USART_CFG_MULTI_CLASS
 #endif
 
+#if VSF_REMAPPED_USART_CFG_MULTI_CLASS == ENABLED
+#   define __describe_remapped_usart_op()       .op = &vsf_remapped_usart_op,
+#else
+#   define __describe_remapped_usart_op()
+#endif
+
+#define __describe_remapped_usart(__name, __usart)                              \
+    vsf_remapped_usart_t __name = {                                             \
+        __describe_remapped_usart_op()                                          \
+        .target = (vsf_usart_t *) & __usart,                                    \
+    };
+
+#define describe_remapped_usart(__name, __usart)                                \
+            __describe_remapped_usart(__name, __usart)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
