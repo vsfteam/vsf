@@ -28,8 +28,8 @@ extern "C" {
 #endif
 
 #include "template/vsf_template.h"
-    
-/*============================ MACROS ========================================*/    
+
+/*============================ MACROS ========================================*/
 /*============================ INCLUDES ======================================*/
 
 #include "adc/adc_interface.h"
@@ -41,7 +41,8 @@ extern "C" {
 #include "i2c/mrequest_i2c.h"
 #include "spi/multiplex_spi.h"
 #include "spi/fifo2req_spi.h"
-    
+#include "usart/fifo2req_usart.h"
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

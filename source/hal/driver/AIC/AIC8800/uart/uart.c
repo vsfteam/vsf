@@ -17,7 +17,7 @@
 
 #define VSF_USART_CFG_IMP_PREFIX                vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HW
-#define VSF_USART_CFG_FIFO_TO_REQUEST           ENABLED
+#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST       ENABLED
 
 /*============================ INCLUDES ======================================*/
 
@@ -29,13 +29,6 @@
 #include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/ipc/reg_ipc_comreg.h"
 #include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
-
-#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-#   include "hal/driver/common/usart/fifo2req_usart.h"
-#   define  vsf_hw_usart_init           __vsf_hw_usart_init
-#   define  vsf_hw_usart_irq_enable     __vsf_hw_usart_irq_enable
-#   define  vsf_hw_usart_irq_disable    __vsf_hw_usart_irq_disable
-#endif
 
 /*============================ MACROS ========================================*/
 
@@ -60,10 +53,6 @@ typedef struct vsf_hw_usart_t {
     vsf_usart_t vsf_usart;
 #endif
     const vsf_hw_usart_const_t *usart_const;
-
-#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-    vsf_usart_fifo2req_t request;
-#endif
 
     vsf_usart_isr_t         isr;
 } vsf_hw_usart_t;
@@ -268,15 +257,6 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 
 /*============================ INCLUDES ======================================*/
 
-#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-#   define __USART_REQUEST_IMP      VSF_USART_FIFO2REQ_IMP_LV0(VSF_USART_CFG_IMP_PREFIX)
-#   undef  vsf_hw_usart_init
-#   undef  vsf_hw_usart_irq_enable
-#   undef  vsf_hw_usart_irq_disable
-#else
-#   define __USART_REQUEST_IMP
-#endif
-
 #define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
     static const vsf_hw_usart_const_t __vsf_hw_usart ## __COUNT ## _clock = {   \
         .reg    = UART ## __COUNT,                                              \
@@ -285,14 +265,14 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
         .oclk   = CSC_OCLKME_UART ## __COUNT ## _EN_BIT,                        \
         .perclk = PER_UART ## __COUNT,                                          \
     };                                                                          \
-    vsf_hw_usart_t vsf_hw_usart ## __COUNT = {                                  \
+    vsf_hw_usart_t __vsf_hw_usart ## __COUNT = {                                \
         .usart_const  = &__vsf_hw_usart ## __COUNT ## _clock,                   \
-        __USART_REQUEST_IMP                                                     \
         __HAL_OP                                                                \
     };                                                                          \
+    describe_fifo2req_usart(vsf_hw_usart ## __COUNT, __vsf_hw_usart ## __COUNT) \
     void UART ## __COUNT ## _IRQHandler(void)                                   \
     {                                                                           \
-        __vsf_hw_usart_irq_handler(&vsf_hw_usart ## __COUNT);                   \
+        __vsf_hw_usart_irq_handler(&__vsf_hw_usart ## __COUNT);                 \
     }
 #include "hal/driver/common/usart/usart_template.inc"
 

@@ -17,7 +17,7 @@
 
 #define VSF_USART_CFG_IMP_PREFIX                    vsf_win
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_WIN
-#define VSF_USART_CFG_FIFO_TO_REQUEST               ENABLED
+#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST           ENABLED
 
 /*============================ INCLUDES ======================================*/
 
@@ -25,13 +25,6 @@
 #include "./uart.h"
 
 #if VSF_HAL_USE_USART == ENABLED
-
-#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-#   include "hal/driver/common/usart/fifo2req_usart.h"
-#   define  vsf_win_usart_init                      __vsf_win_usart_init
-#   define  vsf_win_usart_irq_enable                __vsf_win_usart_irq_enable
-#   define  vsf_win_usart_irq_disable               __vsf_win_usart_irq_disable
-#endif
 
 // for vsf_trace
 #include "service/vsf_service.h"
@@ -102,10 +95,6 @@ typedef struct vsf_win_usart_t {
         bool                            is_pending;
         bool                            exited;
     } tx;
-
-#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-    vsf_usart_fifo2req_t request;
-#endif
 } vsf_win_usart_t;
 
 typedef struct vsf_win_usart_port_t {
@@ -121,7 +110,7 @@ static vsf_win_usart_port_t __vsf_win_usart_port = {
     .port_mask                          = 0,
     .port                               = {
 #define VSF_WIN_USART_INIT_PORT(__N, __VALUE)                                   \
-            [(__N)]                     = &VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _, usart, __N),
+            [(__N)]                     = &VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _, usart, __N),
         VSF_MREPEAT(VSF_WIN_USART_COUNT, VSF_WIN_USART_INIT_PORT, NULL)
     },
 };
@@ -584,28 +573,22 @@ uint_fast16_t vsf_win_usart_txfifo_write(vsf_win_usart_t *win_usart, void *buffe
 
 /*============================ INCLUDES ======================================*/
 
-#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-#   define __USART_REQUEST_IMP                      VSF_USART_FIFO2REQ_IMP_LV0(VSF_USART_CFG_IMP_PREFIX)
-#   undef  vsf_win_usart_init
-#   undef  vsf_win_usart_irq_enable
-#   undef  vsf_win_usart_irq_disable
-#else
-#   define __USART_REQUEST_IMP
-#endif
+#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                    \
+    vsf_win_usart_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT) = { \
+        .handle                            = INVALID_HANDLE_VALUE,                  \
+        __HAL_OP                                                                    \
+    };                                                                              \
+    describe_fifo2req_usart(                                                        \
+        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT),                    \
+        VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT))
 
-#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
-    vsf_win_usart_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT) = { \
-        .handle                            = INVALID_HANDLE_VALUE,              \
-        __USART_REQUEST_IMP                                                     \
-        __HAL_OP                                                                \
-    };
 #include "hal/driver/common/usart/usart_template.inc"
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_WIN_USART_CFG_USE_AS_HW_USART == ENABLED
 #   define VSF_HAL_HW_USART_IMPLEMENT(__N, __VALUE)                             \
-        vsf_remapped_usart_t VSF_MCONNECT(vsf_hw_usart, __N);
+        describe_remapped_usart(VSF_MCONNECT(vsf_hw_usart, __N), VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __N))
 #   define VSF_HAL_HW_USART_IMPLEMENT_ARRAY(__N, __VALUE)                       \
         &VSF_MCONNECT(vsf_hw_usart, __N),
 #   define VSF_HAL_HW_USART_IMPLEMENT_MULTI()                                   \
