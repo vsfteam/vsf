@@ -33,7 +33,7 @@ jobs:
       run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt-get update
-            sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libusb-dev libusb-1.0 python3 python3-pip
+            sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libbsd-dev libusb-dev libusb-1.0 python3 python3-pip
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install gcc llvm sdl2 libusb ninja
 
