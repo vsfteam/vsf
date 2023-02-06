@@ -102,10 +102,11 @@ typedef enum vsf_usart_irq_mask_t {
 
 /*============================ INCLUDES ======================================*/
 
-#undef VSF_USART_CFG_DEC_PREFIX
-#undef VSF_USART_CFG_DEC_UPCASE_PREFIX
+#include "hal/driver/common/usart/fifo2req_usart.h"
+
 #define VSF_USART_CFG_DEC_PREFIX                    vsf_win
 #define VSF_USART_CFG_DEC_UPCASE_PREFIX             VSF_WIN
+#define VSF_USART_CFG_DEC_FIFO_TO_REQUEST
 #include "hal/driver/common/usart/usart_template.h"
 
 #if VSF_WIN_USART_CFG_USE_AS_HW_USART == ENABLED

@@ -24,95 +24,71 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 
+#if defined(__VSF_HAL_USE_FIFO2REQ_USART_CLASS_IMPLEMENT)
+#   define __VSF_CLASS_IMPLEMENT__
+#endif
+
 #include "utilities/ooc_class.h"
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ INCLUDES ======================================*/
+
+#define VSF_USART_CFG_DEC_PREFIX              vsf_fifo2req
+#define VSF_USART_CFG_DEC_UPCASE_PREFIX       VSF_FIFO2REQ
+#define VSF_USART_CFG_DEC_EXTERN_OP           ENABLED
+#include "hal/driver/common/usart/usart_template.h"
 
 /*============================ MACROS ========================================*/
 
-#define VSF_USART_FIFO2REQ_IMP_LV0(__PREFIX)                                                                \
-    .request = {                                                                                            \
-        .enable_irq_fn  = (vsf_usart_fifo2req_irq_fn_t *) VSF_MCONNECT(__, __PREFIX, _usart_irq_enable),    \
-        .disable_irq_fn = (vsf_usart_fifo2req_irq_fn_t *) VSF_MCONNECT(__, __PREFIX, _usart_irq_disable),   \
-        .rx = {                                                                                             \
-            .fifo_fn    = (vsf_usart_fifo2req_fifo_fn_t *)VSF_MCONNECT(__PREFIX, _usart_rxfifo_read),       \
-        },                                                                                                  \
-        .tx = {                                                                                             \
-            .fifo_fn    = (vsf_usart_fifo2req_fifo_fn_t *)VSF_MCONNECT(__PREFIX, _usart_txfifo_write),      \
-        },                                                                                                  \
-    },
+#ifndef VSF_FIFO2REQ_USART_CFG_MULTI_CLASS
+#   define VSF_FIFO2REQ_USART_CFG_MULTI_CLASS   VSF_USART_CFG_MULTI_CLASS
+#endif
 
-/*============================ MACROFIED FUNCTIONS ===========================*/
+#if VSF_FIFO2REQ_USART_CFG_MULTI_CLASS == ENABLED
+#   define __describe_fifo2req_usart_op()       .op = &vsf_fifo2req_usart_op,
+#else
+#   define __describe_fifo2req_usart_op()
+#endif
+
+#define __describe_fifo2req_usart(__name, __usart)                              \
+    vsf_fifo2req_usart_t __name = {                                             \
+        __describe_fifo2req_usart_op()                                          \
+        .usart = (vsf_usart_t *) & __usart,                                     \
+    };
+
+#define describe_fifo2req_usart(__name, __usart)                                \
+            __describe_fifo2req_usart(__name, __usart)
+
 /*============================ TYPES =========================================*/
 
 // TODO: add usart rx idle or timeout support
 // TODO: support 9 bit mode
 
-typedef uint_fast16_t vsf_usart_fifo2req_fifo_fn_t(vsf_usart_t *usart_ptr,
-                                                   void *buffer_ptr,
-                                                   uint_fast16_t count);
+typedef struct vsf_fifo2req_usart_item_t {
+    void     * buffer;
+    uint32_t   max_count;
+    uint32_t   count;
+} vsf_fifo2req_usart_item_t;
 
-typedef void vsf_usart_fifo2req_irq_fn_t(vsf_usart_t *usart_ptr,
-                                         vsf_usart_irq_mask_t irq_mask);
+vsf_class(vsf_fifo2req_usart_t) {
+    public_member(
+#if VSF_FIFO2REQ_USART_CFG_MULTI_CLASS == ENABLED
+        implement(vsf_usart_t)
+#endif
+        vsf_usart_t * usart;
+    )
 
-typedef vsf_err_t vsf_usart_fifo2req_init_fn_t(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr);
+    private_member(
+        vsf_fifo2req_usart_item_t rx;
+        vsf_fifo2req_usart_item_t tx;
 
+        vsf_usart_isr_t isr;
+        vsf_usart_irq_mask_t irq_mask;
+    )
+};
 
-typedef struct vsf_usart_fifo2req_item_t {
-    vsf_usart_fifo2req_fifo_fn_t  * fifo_fn;
-    void                          * buffer;
-    uint32_t                        max_count;
-    uint32_t                        count;
-} vsf_usart_fifo2req_item_t;
-
-typedef struct vsf_usart_fifo2req_t {
-    vsf_usart_fifo2req_item_t rx;
-    vsf_usart_fifo2req_item_t tx;
-
-    vsf_usart_isr_t isr;
-    vsf_usart_irq_mask_t irq_mask;
-
-    vsf_usart_fifo2req_irq_fn_t * enable_irq_fn;
-    vsf_usart_fifo2req_irq_fn_t * disable_irq_fn;
-
-} vsf_usart_fifo2req_t;
-
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
-
-vsf_err_t vsf_usart_fifo2req_init(vsf_usart_fifo2req_t *request_ptr,
-                                  vsf_usart_fifo2req_init_fn_t  * init_fn,
-                                  vsf_usart_t *usart_ptr,
-                                  vsf_usart_cfg_t *cfg_ptr);
-
-vsf_err_t vsf_usart_fifo2req_request_rx(vsf_usart_fifo2req_t *request_ptr,
-                                        vsf_usart_t *usart_ptr,
-                                        void *buffer_ptr,
-                                        uint_fast32_t count);
-
-vsf_err_t vsf_usart_fifo2req_cancel_rx(vsf_usart_fifo2req_t *request_ptr,
-                                       vsf_usart_t *usart_ptr);
-
-int_fast32_t vsf_usart_fifo2req_get_rx_count(vsf_usart_fifo2req_t *request_ptr,
-                                             vsf_usart_t *usart_ptr);
-
-vsf_err_t vsf_usart_fifo2req_request_tx(vsf_usart_fifo2req_t *request_ptr,
-                                        vsf_usart_t *usart_ptr,
-                                        void *buffer_ptr, uint_fast32_t count);
-
-vsf_err_t vsf_usart_fifo2req_cancel_tx(vsf_usart_fifo2req_t *request_ptr,
-                                       vsf_usart_t *usart_ptr);
-
-int_fast32_t vsf_usart_fifo2req_get_tx_count(vsf_usart_fifo2req_t *request_ptr,
-                                             vsf_usart_t *usart_ptr);
-
-void vsf_usart_fifo2req_irq_enable(vsf_usart_fifo2req_t *request_ptr,
-                                   vsf_usart_t *usart_ptr,
-                                   vsf_usart_irq_mask_t irq_mask);
-
-void vsf_usart_fifo2req_irq_disable(vsf_usart_fifo2req_t *request_ptr,
-                                    vsf_usart_t *usart_ptr,
-                                    vsf_usart_irq_mask_t irq_mask);
-
 /*============================ IMPLEMENTATION ================================*/
 
 #endif

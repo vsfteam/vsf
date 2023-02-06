@@ -18,10 +18,17 @@
 #if VSF_HAL_USE_USART == ENABLED
 
 /*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/usart/fifo2req_usart.h"
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
-#   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY   DISABLED
+#   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY     DISABLED
+#endif
+
+#ifndef VSF_USART_CFG_IMP_FIFO_TO_REQUEST
+#   define VSF_USART_CFG_IMP_FIFO_TO_REQUEST            DISABLED
 #endif
 
 #define vsf_real_usart_t                    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)
@@ -38,67 +45,12 @@
 #define vsf_real_usart_get_tx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)
 #define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
 
-#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-#   define __vsf_real_usart_init            VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_init)
-#   define __vsf_real_usart_irq_enable      VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irq_enable)
-#   define __vsf_real_usart_irq_disable     VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USART_CFG_FIFO_TO_REQUEST == ENABLED
-
-vsf_err_t vsf_real_usart_init(vsf_real_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)
-{
-    return vsf_usart_fifo2req_init(&usart_ptr->request,
-                                   (vsf_usart_fifo2req_init_fn_t *)__vsf_real_usart_init,
-                                   (vsf_usart_t *)usart_ptr, cfg_ptr);
-}
-
-vsf_err_t vsf_real_usart_request_rx(vsf_real_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
-{
-    return vsf_usart_fifo2req_request_rx(&usart_ptr->request, (vsf_usart_t *)usart_ptr, buffer_ptr, count);
-}
-
-vsf_err_t vsf_real_usart_cancel_rx(vsf_real_usart_t *usart_ptr)
-{
-    return vsf_usart_fifo2req_cancel_rx(&usart_ptr->request, (vsf_usart_t *)usart_ptr);
-}
-
-int_fast32_t vsf_real_usart_get_rx_count(vsf_real_usart_t *usart_ptr)
-{
-    return vsf_usart_fifo2req_get_rx_count(&usart_ptr->request, (vsf_usart_t *)usart_ptr);
-}
-
-vsf_err_t vsf_real_usart_request_tx(vsf_real_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
-{
-    return vsf_usart_fifo2req_request_tx(&usart_ptr->request, (vsf_usart_t *)usart_ptr, buffer_ptr, count);
-}
-
-vsf_err_t vsf_real_usart_cancel_tx(vsf_real_usart_t *usart_ptr)
-{
-    return vsf_usart_fifo2req_cancel_tx(&usart_ptr->request, (vsf_usart_t *)usart_ptr);;
-}
-
-int_fast32_t vsf_real_usart_get_tx_count(vsf_real_usart_t *usart_ptr)
-{
-    return vsf_usart_fifo2req_get_tx_count(&usart_ptr->request, (vsf_usart_t *)usart_ptr);
-}
-
-void vsf_real_usart_irq_enable(vsf_real_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
-{
-    vsf_usart_fifo2req_irq_enable(&usart_ptr->request, (vsf_usart_t *)usart_ptr, irq_mask);
-}
-
-void vsf_real_usart_irq_disable(vsf_real_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
-{
-    vsf_usart_fifo2req_irq_disable(&usart_ptr->request, (vsf_usart_t *)usart_ptr, irq_mask);
-}
-
-#elif VSF_USART_CFG_REQUEST_EMPTY_IMPL == ENABLED
+#if VSF_USART_CFG_IMP_FIFO_TO_REQUEST == ENABLED
 
 vsf_err_t vsf_real_usart_request_rx(vsf_real_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
@@ -160,6 +112,10 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 
 #ifndef VSF_USART_CFG_IMP_UPCASE_PREFIX
 #   error "Please define VSF_USART_CFG_IMP_UPCASE_PREFIX    in usart driver"
+#endif
+
+#ifdef VSF_USART_CFG_IMP_FIFO_TO_REQUEST
+#
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
