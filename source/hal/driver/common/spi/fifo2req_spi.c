@@ -32,7 +32,6 @@
 
 /*============================ MACROS ========================================*/
 
-    
 #ifdef VSF_FIFO2REQ_SPI_CFG_CALL_PREFIX
 #   undef VSF_SPI_CFG_IMP_PREFIX
 #   define VSF_SPI_CFG_IMP_PREFIX                   VSF_FIFO2REQ_SPI_CFG_CALL_PREFIX
@@ -51,7 +50,7 @@ static void __vsf_fifo2req_spi_isr_handler(void * target_ptr, vsf_spi_t *spi_ptr
     vsf_fifo2req_spi_t * fifo2req_spi_ptr = (vsf_fifo2req_spi_t *)target_ptr;
     VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
-    
+
     vsf_spi_irq_mask_t current_irq_mask = (irq_mask & ~(VSF_SPI_IRQ_MASK_RX | VSF_SPI_IRQ_MASK_TX));
 
     if (irq_mask & VSF_SPI_IRQ_MASK_RX) {
@@ -60,13 +59,13 @@ static void __vsf_fifo2req_spi_isr_handler(void * target_ptr, vsf_spi_t *spi_ptr
             vsf_spi_fifo_transfer(fifo2req_spi_ptr->spi,
                                   NULL, 0, NULL,
                                   fifo2req_spi_ptr->in.buffer_ptr, fifo2req_spi_ptr->in.cnt, &fifo2req_spi_ptr->in.offset);
-        } 
-        
+        }
+
         if (fifo2req_spi_ptr->in.offset >= fifo2req_spi_ptr->in.cnt) {
             vsf_spi_irq_disable(fifo2req_spi_ptr->spi, VSF_SPI_IRQ_MASK_RX);
             memset(&fifo2req_spi_ptr->in, 0, sizeof(fifo2req_spi_ptr->in));
             current_irq_mask |= VSF_SPI_IRQ_MASK_CPL;
-        }            
+        }
     }
 
     if (irq_mask & VSF_SPI_IRQ_MASK_TX) {
@@ -76,13 +75,13 @@ static void __vsf_fifo2req_spi_isr_handler(void * target_ptr, vsf_spi_t *spi_ptr
                                   fifo2req_spi_ptr->out.buffer_ptr, fifo2req_spi_ptr->out.cnt, &fifo2req_spi_ptr->out.offset,
                                   NULL, 0, NULL);
         }
-        
+
         if (fifo2req_spi_ptr->out.offset >= fifo2req_spi_ptr->out.cnt) {
             vsf_spi_irq_disable(fifo2req_spi_ptr->spi, VSF_SPI_IRQ_MASK_TX);
             memset(&fifo2req_spi_ptr->out, 0, sizeof(fifo2req_spi_ptr->out));
             current_irq_mask |= VSF_SPI_IRQ_MASK_TX_CPL;
-        }    
-    }    
+        }
+    }
 
     current_irq_mask &= fifo2req_spi_ptr->irq_mask;
     if (current_irq_mask & VSF_SPI_IRQ_ALL_BITS_MASK) {
@@ -202,16 +201,16 @@ vsf_err_t vsf_fifo2req_spi_request_transfer(vsf_fifo2req_spi_t *fifo2req_spi_ptr
     VSF_HAL_ASSERT(count != 0);
     VSF_HAL_ASSERT(fifo2req_spi_ptr->in.cnt == 0);
     VSF_HAL_ASSERT(fifo2req_spi_ptr->out.cnt == 0);
-    
+
     fifo2req_spi_ptr->in.cnt = count;
     fifo2req_spi_ptr->in.offset = 0;
     fifo2req_spi_ptr->in.buffer_ptr = in_buffer_ptr;
     fifo2req_spi_ptr->out.cnt = count;
     fifo2req_spi_ptr->out.offset = 0;
-    fifo2req_spi_ptr->out.buffer_ptr = out_buffer_ptr;    
+    fifo2req_spi_ptr->out.buffer_ptr = out_buffer_ptr;
 
     __vsf_fifo2req_spi_isr_handler((void *)fifo2req_spi_ptr, NULL, VSF_SPI_IRQ_MASK_TX);
-    
+
     vsf_spi_irq_enable(fifo2req_spi_ptr->spi, VSF_SPI_IRQ_MASK_RX | VSF_SPI_IRQ_MASK_TX);
     return VSF_ERR_NONE;
 }
@@ -234,7 +233,7 @@ void vsf_fifo2req_spi_get_transferred_count(vsf_fifo2req_spi_t *fifo2req_spi_ptr
     if (tx_count != NULL) {
         *tx_count = fifo2req_spi_ptr->out.offset;
     }
-    
+
     if (rx_count != NULL) {
         *rx_count = fifo2req_spi_ptr->in.offset;
     }
