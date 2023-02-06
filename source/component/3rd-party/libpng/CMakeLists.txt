@@ -25,4 +25,9 @@ vsf_add_sources(
     ${VSF_LIBPNG_PATH}/pngwrite.c
     ${VSF_LIBPNG_PATH}/pngwtran.c
     ${VSF_LIBPNG_PATH}/pngwutil.c
+
+    # arm neon support source code if protected by PNG_ARM_NEON_OPT, so it's safe to include here
+    ${VSF_LIBPNG_PATH}/arm/arm_init.c
+    ${VSF_LIBPNG_PATH}/arm/filter_neon_intrinsics.c
+    ${VSF_LIBPNG_PATH}/arm/palette_neon_intrinsics.c
 )
