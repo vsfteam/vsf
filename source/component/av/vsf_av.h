@@ -36,16 +36,18 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 typedef enum vk_av_control_type_t {
-    // sval16:
+    // vk_av_control_value_t.sval16:
     // 32767:   127.9961db
     // ......
     // -32767:  -127.9961db
     VSF_AUDIO_CTRL_VOLUME_DB,
-    // uval16
+
+    // vk_av_control_value_t.uval16
     // 65535
     // 0
     VSF_AUDIO_CTRL_VOLUME_PERCENTAGE,
-    // enable
+
+    // vk_av_control_value_t.enable
     VSF_AUDIO_CTRL_MUTE,
 } vk_av_control_type_t;
 
