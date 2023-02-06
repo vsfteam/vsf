@@ -66,6 +66,10 @@ extern "C" {
 
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
+#define VSF_ARCH_PROVIDE_HEAP
+
+//! vsf_systimer_get implementation has 1us resolution, which is 1MHz
+#define VSF_ARCH_SYSTIMER_FREQ          (1 * 1000 * 1000)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -120,6 +124,7 @@ vsf_class(vsf_arch_irq_thread_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern void __vsf_arch_irq_sleep(uint32_t ms);
+extern int vsf_arch_argu(char ***argv);
 
 extern void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);

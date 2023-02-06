@@ -460,4 +460,106 @@ bool vsf_arch_low_level_init(void)
     return true;
 }
 
+void * vsf_arch_heap_malloc(uint_fast32_t size)
+{
+    uint32_t *new_mcb = aligned_alloc(16, (size_t)size + 16);
+    if (new_mcb != NULL) {
+        new_mcb[0] = size;
+        new_mcb[1] = size;
+    }
+    return (void *)&new_mcb[4];
+}
+
+void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size)
+{
+    if (NULL == buffer) {
+        return vsf_arch_heap_malloc(size);
+    }
+
+    uint32_t *old_mcb = (uint32_t *)buffer - 4;
+
+    if (old_mcb[0] >= size) {
+        old_mcb[1] = size;
+        return buffer;
+    }
+
+    uint32_t *new_buffer = vsf_arch_heap_malloc(size);
+    if (NULL == new_buffer) {
+        vsf_arch_heap_free(buffer);
+        return NULL;
+    }
+
+    size = vsf_min(size, old_mcb[1]);
+    memcpy(new_buffer, buffer, size);
+    vsf_arch_heap_free(buffer);
+    return new_buffer;
+}
+
+void vsf_arch_heap_free(void *buffer)
+{
+    uint32_t *mcb = (uint32_t *)buffer - 4;
+    free(mcb);
+}
+
+unsigned int vsf_arch_heap_alignment(void)
+{
+    return 16;
+}
+
+uint_fast32_t vsf_arch_heap_size(void *buffer)
+{
+    uint32_t *mcb = (uint32_t *)buffer - 4;
+    return mcb[0];
+}
+
+int vsf_arch_argu(char ***argv)
+{
+    static char *__vsf_arch_argv_str, **__vsf_arch_argv;
+    static int __vsf_arch_argc;
+
+    if (__vsf_arch_argv != NULL) {
+        if (argv != NULL) {
+            *argv = __vsf_arch_argv;
+        }
+        return __vsf_arch_argc;
+    }
+
+    int fd = open("/proc/self/cmdline", 0);
+    if (fd < 0) {
+        return -1;
+    }
+
+    int pos = 0, ret;
+    while(true) {
+        __vsf_arch_argv_str = vsf_arch_heap_realloc(__vsf_arch_argv_str, pos + 1024);
+        ret = read(fd, __vsf_arch_argv_str + pos, 1024);
+        if (ret < 0) {
+            break;
+        }
+        pos += ret;
+        if (ret < 1024) {
+            break;
+        }
+    }
+
+    for (int i = 0; i < pos; i++) {
+        if (__vsf_arch_argv_str[i] == '\0') {
+            __vsf_arch_argc++;
+        }
+    }
+    VSF_ARCH_ASSERT(__vsf_arch_argc > 0);
+    __vsf_arch_argv = vsf_arch_heap_malloc(__vsf_arch_argc * sizeof(char *));
+    VSF_ARCH_ASSERT(__vsf_arch_argv != NULL);
+
+    for (int i = 0, argv_pos = 0; i < pos; i++) {
+        if (    !argv_pos
+            ||  (   (__vsf_arch_argv_str[i] != '\0')
+                &&  (__vsf_arch_argv_str[i - 1] == '\0'))) {
+            __vsf_arch_argv[argv_pos++] = &__vsf_arch_argv_str[i];
+        }
+    }
+
+    return vsf_arch_argu(argv);
+}
+
 /* EOF */
