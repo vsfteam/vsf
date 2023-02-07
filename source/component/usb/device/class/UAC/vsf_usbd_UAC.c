@@ -403,7 +403,7 @@ static void __vk_usbd_uac_as_evthandler(vsf_stream_t *stream, void *param, vsf_s
             goto check_tx;
         }
         break;
-    case VSF_STREAM_ON_RX:
+    case VSF_STREAM_ON_IN:
         VSF_USB_ASSERT(is_in);
     check_rx:
         orig = vsf_protect_int();
@@ -420,7 +420,7 @@ static void __vk_usbd_uac_as_evthandler(vsf_stream_t *stream, void *param, vsf_s
             }
         vsf_unprotect_int(orig);
         break;
-    case VSF_STREAM_ON_TX:
+    case VSF_STREAM_ON_OUT:
         VSF_USB_ASSERT(!is_in);
     check_tx:
         orig = vsf_protect_int();
@@ -454,7 +454,7 @@ static void __vk_usbd_uac_as_on_finish(void *param)
         orig = vsf_protect_int();
             uac_as->is_submitted = false;
         vsf_unprotect_int(orig);
-        __vk_usbd_uac_as_evthandler(stream, uac_as, VSF_STREAM_ON_RX);
+        __vk_usbd_uac_as_evthandler(stream, uac_as, VSF_STREAM_ON_IN);
     } else {
         if (!uac_as->trans.size) {
             vsf_stream_write(stream, NULL, uac_as->packet_size);
@@ -462,7 +462,7 @@ static void __vk_usbd_uac_as_on_finish(void *param)
         orig = vsf_protect_int();
             uac_as->is_submitted = false;
         vsf_unprotect_int(orig);
-        __vk_usbd_uac_as_evthandler(stream, uac_as, VSF_STREAM_ON_TX);
+        __vk_usbd_uac_as_evthandler(stream, uac_as, VSF_STREAM_ON_OUT);
     }
 }
 
