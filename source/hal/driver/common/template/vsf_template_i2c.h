@@ -287,7 +287,7 @@ extern vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr);
  \~english
  @brief termination a i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @note Termination an i2c instance should include turning on the corresponding
+ @note Termination an i2c instance should include turning off the corresponding
        power gating.
  \~chinese
  @brief 终止一个 i2c 实例

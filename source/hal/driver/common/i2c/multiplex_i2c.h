@@ -77,7 +77,7 @@ vsf_class(vsf_multiplexer_i2c_t) {
     )
 
     private_member(
-        vsf_slist_queue_t slist_queue;
+        vsf_slist_queue_t waiting_queue;
 
         vsf_multiplex_i2c_t *req_m_i2c;
         vsf_multiplex_i2c_t *inited_m_i2c;
@@ -86,8 +86,7 @@ vsf_class(vsf_multiplexer_i2c_t) {
 
         vsf_i2c_multiplex_mask_t init_mask;
         vsf_i2c_multiplex_mask_t en_mask;
-        vsf_i2c_multiplex_mask_t id_mask;
-        bool is_busy;
+        //vsf_i2c_multiplex_mask_t id_mask;
     )
 };
 
@@ -96,7 +95,7 @@ vsf_class(vsf_multiplex_i2c_t) {
 #if VSF_MULTIPLEX_I2C_CFG_MULTI_CLASS == ENABLED
         implement(vsf_i2c_t)
 #endif
-        vsf_multiplexer_i2c_t *multiplexer;
+        vsf_multiplexer_i2c_t * const multiplexer;
     )
 
     private_member(
@@ -104,7 +103,6 @@ vsf_class(vsf_multiplex_i2c_t) {
         vsf_i2c_cfg_t cfg;
         vsf_i2c_irq_mask_t irq_mask;
         uint8_t id;
-        bool id_allocated;
 
         struct {
             vsf_i2c_cmd_t cmd;
