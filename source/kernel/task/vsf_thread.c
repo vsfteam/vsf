@@ -179,7 +179,7 @@ void vsf_thread_wait_for_evt(vsf_evt_t evt)
     vsf_evt_t rcv_evt = vsf_thread_wait();
     VSF_UNUSED_PARAM(rcv_evt);
     /*! \note make sure there is no message ignored */
-    VSF_KERNEL_ASSERT( rcv_evt == evt);
+    VSF_KERNEL_ASSERT(rcv_evt == evt);
     //while(evt != vsf_thread_wait());
 }
 

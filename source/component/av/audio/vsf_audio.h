@@ -172,6 +172,10 @@ __vsf_component_peda_ifs(vk_audio_stop,
     vk_audio_stream_t           *audio_stream;
 )
 
+// for playback, stream_tx should be stream of audio buffer,
+//  stream_rx should be stream of ticktock buffer.
+// for capture, stream_tx should be stream of ticktock buffer,
+//  stream_rx should be stream of audio buffer.
 vsf_class(vsf_audio_ticktock_stream_adapter_t) {
     public_member(
         implement(vsf_stream_adapter_t)

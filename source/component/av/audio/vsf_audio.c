@@ -144,7 +144,13 @@ static void __vsf_audio_playback_ticktock_stream_adapter_evthandler(vsf_eda_t *e
         uint8_t *buf;
 
         vsf_stream_adapter_evthandler(stream, adapter, stream_evt);
-        while (vsf_stream_get_data_size(adapter->stream_rx) < bufsize) {
+
+        // check stream_rx(ticktock buffer) is not full, and stream_tx(audio buffer)
+        //  has no date. Because stream_rx can be read(in task/interrupt of higher priority)
+        //  before the check below, in which case stream_rx is not full. So in such
+        //  context, stream_tx must be check.
+        while ( (vsf_stream_get_data_size(adapter->stream_rx) < bufsize)
+            &&  (0 == vsf_stream_get_data_size(adapter->stream_tx))) {
             size = vsf_stream_get_wbuf(adapter->stream_rx, &buf);
             VSF_AV_ASSERT(size >= halfsize);
             memset(buf, 0, halfsize);
