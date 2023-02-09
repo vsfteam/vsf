@@ -74,8 +74,8 @@ extern const VSF_MCONNECT(vsf, __VSF_HAL_TEMPLATE_NAME, _op_t)
 #       define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                                     \
             extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)             \
                 VSF_MCONNECT(__, __VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);      \
-            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)             \
-                VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, _, __VSF_HAL_TEMPLATE_TYPE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
+            extern VSF_MCONNECT(vsf_, __VSF_HAL_TEMPLATE_TYPE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)  \
+                VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
 #       endif
 #   endif
 
