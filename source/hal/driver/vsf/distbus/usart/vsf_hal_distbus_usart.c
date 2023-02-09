@@ -56,14 +56,11 @@ static const vsf_distbus_service_info_t __vsf_hal_distbus_usart_info = {
     .handler            = __vsf_hal_distbus_usart_msghandler,
 };
 
-#if VSF_HAL_DISTBUS_USART_CFG_MULTI_CLASS == ENABLED
-static const vsf_usart_op_t __vsf_hal_distbus_usart_op = {
-#   undef __VSF_HAL_TEMPLATE_API
-#   define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_OP
+#define VSF_USART_CFG_IMP_PREFIX                vsf_hal_distbus
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HAL_DISTBUS
+#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST       ENABLED
+#include "hal/driver/common/usart/usart_template.inc"
 
-    VSF_USART_APIS(vsf_hal_distbus)
-};
-#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -179,7 +176,7 @@ uint32_t vsf_hal_distbus_usart_register_service(vsf_distbus_t *distbus, vsf_hal_
     usart->distbus = distbus;
     usart->service.info = &__vsf_hal_distbus_usart_info;
 #if VSF_HAL_DISTBUS_USART_CFG_MULTI_CLASS == ENABLED
-    usart->op = &__vsf_hal_distbus_usart_op;
+    usart->op = &vsf_fifo2req_usart_op;
 #endif
 
     usart->fifo.rx.stream.align = 0;

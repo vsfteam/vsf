@@ -223,6 +223,7 @@ extern uint32_t vsf_generic_usart_irqmask_to_hal_distbus_usart_irqmask(vsf_usart
 
 #define VSF_USART_CFG_DEC_PREFIX                vsf_hal_distbus
 #define VSF_USART_CFG_DEC_UPCASE_PREFIX         VSF_HAL_DISTBUS
+#define VSF_USART_CFG_DEC_FIFO_TO_REQUEST
 #include "hal/driver/common/usart/usart_template.h"
 
 #ifdef __cplusplus
