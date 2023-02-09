@@ -9,7 +9,7 @@
  *                                                                           *
  *  Unless required by applicable law or agreed to in writing, software      *
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or DEClied. *
  *  See the License for the specific language governing permissions and      *
  *  limitations under the License.                                           *
  *                                                                           *
@@ -62,21 +62,21 @@ extern const VSF_MCONNECT(vsf, __VSF_HAL_TEMPLATE_NAME, _op_t)
 
 
 #   ifndef __VSF_HAL_TEMPLATE_DEC_LV0
-#ifndef __VSF_HAL_TEMPLATE_TYPE_PREFIX
+#       ifndef __VSF_HAL_TEMPLATE_TYPE_PREFIX
 // expand to:
 //  #define __VSF_HAL_TEMPLATE_DEC_LV0  vsf_hw_usart_t vsf_hw_usart_0;
-#       define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                                 \
-            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)         \
-                VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
+#           define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                                 \
+                extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)         \
+                    VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
 #else
 // expand to:
 //  #define __VSF_HAL_TEMPLATE_DEC_LV0  vsf_hw_usart_t __vsf_hw_usart_0; vsf_fifo2req_usart_t vsf_hw_usart_0;
-#       define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                                 \
-            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)         \
-                VSF_MCONNECT(__, __VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);  \
-            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_TYPE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)    \
-                VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
-#endif
+#       define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                                     \
+            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)             \
+                VSF_MCONNECT(__, __VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);      \
+            extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t)             \
+                VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, _, __VSF_HAL_TEMPLATE_TYPE_PREFIX, __VSF_HAL_TEMPLATE_NAME, __COUNT);
+#       endif
 #   endif
 
 #   if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 0)
@@ -175,6 +175,18 @@ extern const VSF_MCONNECT(vsf, __VSF_HAL_TEMPLATE_NAME, _op_t)
 #   if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 31)
         __VSF_HAL_TEMPLATE_DEC_LV0(31, NULL)
 #   endif
+#endif
+
+#if !defined(__VSF_HAL_TEMPLATE_CFG_REMOVE_ARRAY) && (__VSF_HAL_TEMPLATE_DEC_MASK != 0)
+#   ifndef __VSF_HAL_TEMPLATE_TYPE_PREFIX
+extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t) *                           \
+    VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, s)[__VSF_HAL_TEMPLATE_DEC_COUNT];
+#   else
+extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t) *                           \
+    VSF_MCONNECT(__, __VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, s)[__VSF_HAL_TEMPLATE_DEC_COUNT];
+extern VSF_MCONNECT(vsf_, __VSF_HAL_TEMPLATE_TYPE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t) *                \
+    VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, s)[__VSF_HAL_TEMPLATE_DEC_COUNT];
+#endif
 #endif
 
 #undef __VSF_HAL_TEMPLATE_PREFIX
