@@ -115,7 +115,7 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #endif
 
 #ifdef VSF_USART_CFG_IMP_FIFO_TO_REQUEST
-#
+#   define __VSF_HAL_TEMPLATE_TYPE_PREFIX           fifo2req
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"

@@ -33,7 +33,7 @@
 #endif
 
 #ifdef VSF_USART_CFG_DEC_FIFO_TO_REQUEST
-#   define __VSF_HAL_TEMPLATE_TYPE_PREFIX           vsf_fifo2req
+#   define __VSF_HAL_TEMPLATE_TYPE_PREFIX           fifo2req
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
