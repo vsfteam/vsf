@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+#define SOMAXCONN       256
+
 #define SCM_RIGHTS      0x01
 #define SCM_CREDENTIALS 0x02
 #define SCM_SECURITY    0x03

@@ -65,11 +65,12 @@ extern "C" {
 #define S_ISGID                 0002000
 #define S_ISVTX                 0001000
 
-#define S_ISLNK(__MODE) (((__MODE) & S_IFMT) == S_IFLNK)
-#define S_ISREG(__MODE) (((__MODE) & S_IFMT) == S_IFREG)
-#define S_ISDIR(__MODE) (((__MODE) & S_IFMT) == S_IFDIR)
-#define S_ISFIFO(__MODE)(((__MODE) & S_IFMT) == S_IFIFO)
-#define S_ISSOCK(__MODE)(((__MODE) & S_IFMT) == S_IFSOCK)
+#define S_ISLNK(__MODE)         (((__MODE) & S_IFMT) == S_IFLNK)
+#define S_ISREG(__MODE)         (((__MODE) & S_IFMT) == S_IFREG)
+#define S_ISDIR(__MODE)         (((__MODE) & S_IFMT) == S_IFDIR)
+#define S_ISFIFO(__MODE)        (((__MODE) & S_IFMT) == S_IFIFO)
+#define S_ISSOCK(__MODE)        (((__MODE) & S_IFMT) == S_IFSOCK)
+#define S_ISCHR(__MODE)         (((__MODE) & S_IFMT) == S_IFCHR)
 
 struct stat {
     dev_t           st_dev;

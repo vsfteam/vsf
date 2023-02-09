@@ -62,6 +62,8 @@ typedef unsigned int        blksiz_t;
 typedef unsigned long long  blkcnt_t;
 typedef void *              timer_t;
 
+typedef char *              caddr_t;
+
 typedef enum {
     P_ALL,
     P_PGID,
