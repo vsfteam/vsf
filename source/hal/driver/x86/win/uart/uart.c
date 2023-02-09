@@ -15,10 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_USART_CFG_IMP_PREFIX                    vsf_win
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_WIN
-#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST           ENABLED
-
 /*============================ INCLUDES ======================================*/
 
 #define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
@@ -98,21 +94,36 @@ typedef struct vsf_win_usart_t {
 } vsf_win_usart_t;
 
 typedef struct vsf_win_usart_port_t {
-    uint32_t                            port_mask;
-    // TODO: remove vsf_win_usart_t if vsf_hal has device array
-    vsf_win_usart_t                     *port[VSF_WIN_USART_COUNT];
+    uint32_t                        ports_mask;
+    vsf_win_usart_t                 *(*ports)[VSF_WIN_USART_COUNT];
+    vsf_fifo2req_usart_t            *(*fifo2req_ports)[VSF_WIN_USART_COUNT];
 } vsf_win_usart_port_t;
 
 /*============================ PROTOTYPES ====================================*/
+
+/*============================ INCLUDES ======================================*/
+
+
+#define VSF_USART_CFG_IMP_PREFIX                    vsf_win
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_WIN
+#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST           ENABLED
+#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                    \
+    vsf_win_usart_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT) = { \
+        .handle                            = INVALID_HANDLE_VALUE,                  \
+        __HAL_OP                                                                    \
+    };                                                                              \
+    describe_fifo2req_usart(                                                        \
+        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT),                    \
+        VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT))
+
+#include "hal/driver/common/usart/usart_template.inc"
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static vsf_win_usart_port_t __vsf_win_usart_port = {
-    .port_mask                          = 0,
-    .port                               = {
-#define VSF_WIN_USART_INIT_PORT(__N, __VALUE)                                   \
-            [(__N)]                     = &VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _, usart, __N),
-        VSF_MREPEAT(VSF_WIN_USART_COUNT, VSF_WIN_USART_INIT_PORT, NULL)
-    },
+    .ports_mask = 0,
+    .ports = &__vsf_win_usarts,
+    .fifo2req_ports = &vsf_win_usarts,
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -136,6 +147,8 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
     char portFriendlyName[256];
     uint32_t mask = 0;
 
+    vsf_win_usart_t *(*ports)[VSF_WIN_USART_COUNT] = __vsf_win_usart_port.ports;
+
     while ((result < device_num) && SetupDiEnumDeviceInfo(hDevInfo, result, &devInfoData)) {
         hDevKey = SetupDiOpenDevRegKey(hDevInfo, &devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_READ);
         if (hDevKey != INVALID_HANDLE_VALUE) {
@@ -145,16 +158,16 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
             SetupDiGetDeviceRegistryPropertyA(hDevInfo, &devInfoData, SPDRP_FRIENDLYNAME, NULL, (PBYTE)portFriendlyName, sizeof(portFriendlyName), NULL);
 
             if (    (1 == sscanf(portName, "COM%d", &port_idx))
-                &&  (port_idx != 0) && (port_idx < dimof(__vsf_win_usart_port.port))) {
+                &&  (port_idx != 0) && (port_idx < dimof(*ports))) {
 
                 mask |= 1 << port_idx;
-                if (0 == __vsf_win_usart_port.port[port_idx]->port_idx) {
-                    __vsf_win_usart_port.port[port_idx]->port_idx = port_idx;
-                    __vsf_arch_trace(0, "[hal_win] usart%-2d 0x%p %s\n", port_idx, __vsf_win_usart_port.port[port_idx], portFriendlyName);
+                if (0 == (*ports)[port_idx]->port_idx) {
+                     (*ports)[port_idx]->port_idx = port_idx;
+                    __vsf_arch_trace(0, "[hal_win] usart%-2d 0x%p %s\n", port_idx,  (*ports)[port_idx], portFriendlyName);
                 }
 
                 if (devices != NULL) {
-                    devices[result].instance = (vsf_usart_t *)__vsf_win_usart_port.port[port_idx];
+                    devices[result].instance = (vsf_usart_t *)(*__vsf_win_usart_port.fifo2req_ports)[port_idx];
                     devices[result].port = port_idx;
                 }
                 result++;
@@ -163,20 +176,20 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
     }
     SetupDiDestroyDeviceInfoList(hDevInfo);
 
-    uint32_t changed_mask = __vsf_win_usart_port.port_mask ^ mask;
+    uint32_t changed_mask = __vsf_win_usart_port.ports_mask ^ mask;
     while (changed_mask) {
         port_idx = vsf_ffs32(changed_mask);
         changed_mask &= ~(1 << port_idx);
 
         if (!((1 << port_idx) & mask)) {
-            __vsf_win_usart_port.port[port_idx]->port_idx = 0;
-            if (__vsf_win_usart_port.port[port_idx]->handle != INVALID_HANDLE_VALUE) {
-                CloseHandle(__vsf_win_usart_port.port[port_idx]->handle);
-                __vsf_win_usart_port.port[port_idx]->handle = INVALID_HANDLE_VALUE;
+             (*ports)[port_idx]->port_idx = 0;
+            if ( (*ports)[port_idx]->handle != INVALID_HANDLE_VALUE) {
+                CloseHandle( (*ports)[port_idx]->handle);
+                 (*ports)[port_idx]->handle = INVALID_HANDLE_VALUE;
             }
         }
     }
-    __vsf_win_usart_port.port_mask = mask;
+    __vsf_win_usart_port.ports_mask = mask;
     return result;
 }
 
@@ -570,19 +583,6 @@ uint_fast16_t vsf_win_usart_txfifo_write(vsf_win_usart_t *win_usart, void *buffe
     return vsf_stream_write(&win_usart->tx.stream.use_as__vsf_stream_t, buffer, size);
 #endif
 }
-
-/*============================ INCLUDES ======================================*/
-
-#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                    \
-    vsf_win_usart_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT) = { \
-        .handle                            = INVALID_HANDLE_VALUE,                  \
-        __HAL_OP                                                                    \
-    };                                                                              \
-    describe_fifo2req_usart(                                                        \
-        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT),                    \
-        VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT))
-
-#include "hal/driver/common/usart/usart_template.inc"
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
