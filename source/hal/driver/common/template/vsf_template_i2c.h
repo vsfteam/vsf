@@ -113,7 +113,7 @@ typedef enum vsf_i2c_mode_t {
 typedef enum vsf_i2c_cmd_t {
     VSF_I2C_CMD_WRITE      = (0x00ul << 0),
     VSF_I2C_CMD_READ       = (0x01ul << 0),
-    VSF_I2C_CMD_RW_MASK    = (0x01ul << 1),
+    VSF_I2C_CMD_RW_MASK    = VSF_I2C_CMD_WRITE | VSF_I2C_CMD_READ,
 
     VSF_I2C_CMD_START      = (0x01ul << 28),
     VSF_I2C_CMD_STOP       = (0x01ul << 29),
