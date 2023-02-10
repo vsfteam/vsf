@@ -1236,11 +1236,13 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
 {
     vsf_protect_t orig = vsf_protect_sched();
+    vsf_linux_thread_t *thread_pending = thread->thread_pending;
     thread->op = NULL;
-    if (thread->thread_pending != NULL) {
+    if (thread_pending != NULL) {
+        thread->thread_pending = NULL;
         vsf_unprotect_sched(orig);
-        thread->thread_pending->retval = thread->retval;
-        vsf_eda_post_evt(&thread->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
+        thread_pending->retval = thread->retval;
+        vsf_eda_post_evt(&thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
     } else {
         vsf_linux_process_t *process = thread->process;
         if (    (NULL == process) ||
@@ -1328,7 +1330,7 @@ int daemon(int nochdir, int noclose)
     vsf_unprotect_sched(orig);
     if (thread_pending != NULL) {
         thread_pending->retval = process->status;
-        vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
+        vsf_eda_post_evt(&thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
     }
     return 0;
 }
