@@ -15,10 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_USART_CFG_IMP_PREFIX                vsf_hw
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HW
-#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST       ENABLED
-
 /*============================ INCLUDES ======================================*/
 
 #include "./uart.h"
@@ -257,6 +253,9 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_USART_CFG_IMP_PREFIX                vsf_hw
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HW
+#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST       ENABLED
 #define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
     static const vsf_hw_usart_const_t __vsf_hw_usart ## __COUNT ## _clock = {   \
         .reg    = UART ## __COUNT,                                              \
