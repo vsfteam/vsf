@@ -81,7 +81,7 @@ vsf_err_t vsf_hw_rtc_set_second(vsf_hw_rtc_t *rtc_ptr, time_t second)
 vsf_err_t vsf_hw_rtc_get(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 {
     if (hw_rtc_ptr->is_enabled) {
-        vsf_trace_warning("rtc_get is called before enabled, but OK for windows. Just a warning!!!");
+        vsf_trace_warning("rtc_get is called before enabled, but OK for windows. Just a warning!!!" VSF_TRACE_CFG_LINEEND);
     }
 
     SYSTEMTIME system_time;
