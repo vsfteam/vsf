@@ -208,10 +208,12 @@ char * strpbrk(const char *str1, const char *str2);
 char * strerror(int errnum);
 
 #if defined(__WIN__)
-#   ifdef __cplusplus
-#       define _CONST_RETURN    const
-#   else
-#       define _CONST_RETURN
+#   ifndef _CONST_RETURN
+#       ifdef __cplusplus
+#           define _CONST_RETURN    const
+#       else
+#           define _CONST_RETURN
+#       endif
 #   endif
 
 int stricmp(const char *s1, const char *s2);
@@ -238,10 +240,10 @@ size_t strlcpy(char *dest, const char *src, size_t n);
 _CONST_RETURN char * strstr(const char *str1, const char *str2);
 _CONST_RETURN char * strchr(const char *str, int c);
 _CONST_RETURN char * strrchr(const char *str, int c);
+_CONST_RETURN void * memchr(const void *buf, int ch, size_t count);
 
 void * memmove(void *dest, const void *src, size_t n);
 int memcmp(const void *str1, const void *str2, size_t n);
-_CONST_RETURN void * memchr(const void *buf, int ch, size_t count);
 
 char * strsignal(int sig);
 const char * sigdescr_np(int sig);
