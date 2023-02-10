@@ -432,7 +432,7 @@ vsf_err_t vsf_multiplex_spi_cancel_transfer(vsf_multiplex_spi_t *m_spi_ptr)
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
     VSF_HAL_ASSERT(spi_info_ptr != NULL);
 
-    vsf_err_t result;
+    vsf_err_t result = VSF_ERR_NONE;
 
     if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
         vsf_protect_t state = vsf_multiplex_spi_protect();
@@ -471,8 +471,6 @@ void vsf_multiplex_spi_get_transferred_count(vsf_multiplex_spi_t *m_spi_ptr,
 
     vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
     VSF_HAL_ASSERT(spi_info_ptr != NULL);
-
-    int_fast32_t result;
 
     if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
         vsf_protect_t state = vsf_multiplex_spi_protect();
