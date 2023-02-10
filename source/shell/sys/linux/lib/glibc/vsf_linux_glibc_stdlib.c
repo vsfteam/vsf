@@ -763,6 +763,11 @@ int unsetenv(const char *name)
 }
 #endif
 
+void abort(void)
+{
+    VSF_LINUX_ASSERT(false);
+}
+
 #if VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED && !defined(__VSF_APPLET__)
 #   define VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(__FUNC)    .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt = {
