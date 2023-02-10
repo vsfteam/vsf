@@ -1615,8 +1615,12 @@ useconds_t ualarm(useconds_t usecs, useconds_t interval)
 
 unsigned int alarm(unsigned int seconds)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    const struct itimerval it_new = {
+        .it_value.tv_sec = seconds,
+    };
+    setitimer(ITIMER_REAL, &it_new, NULL);
+    // TODO: return remaining timer of previous scheduled alarm
+    return 0;
 }
 
 pid_t wait(int *status)
