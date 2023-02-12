@@ -146,6 +146,17 @@ vsf_err_t vsf_multiplex_i2c_init(vsf_multiplex_i2c_t *m_i2c_ptr, vsf_i2c_cfg_t *
             result = __m_i2c_init(m_i2c_ptr);
             VSF_HAL_ASSERT(result == VSF_ERR_NONE);
         }
+        if (!m_i2c_ptr->id_allocated) {
+            int_fast8_t id = vsf_ffz32(multiplexer->id_mask);
+            if (id < 0) {
+                vsf_multiplex_i2c_unprotect(state);
+                return VSF_ERR_NOT_ENOUGH_RESOURCES;
+            }
+
+            multiplexer->id_mask |= 1 << id;
+            m_i2c_ptr->id = id;
+            m_i2c_ptr->id_allocated = true;
+        }
         if (result == VSF_ERR_NONE) {
             multiplexer->init_mask |= (1 << m_i2c_ptr->id);
         }
@@ -161,6 +172,10 @@ void vsf_multiplex_i2c_fini(vsf_multiplex_i2c_t *m_i2c_ptr)
     VSF_HAL_ASSERT(NULL != multiplexer);
 
     vsf_protect_t state = vsf_multiplex_i2c_protect();
+        if (m_i2c_ptr->id_allocated) {
+            multiplexer->id_mask &= ~(1 << m_i2c_ptr->id);
+            m_i2c_ptr->id_allocated = false;
+        }
         multiplexer->init_mask &= ~(1 << m_i2c_ptr->id);
         if (multiplexer->init_mask == 0) {
             vsf_i2c_fini(m_i2c_ptr->multiplexer->i2c_ptr);
