@@ -50,7 +50,7 @@ extern "C" {
 
 vsf_class(vsf_linux_ntp_rtc_t) {
     public_member(
-#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
+#if VSF_RTC_CFG_MULTI_CLASS == ENABLED
         vsf_rtc_t vsf_rtc;
 #endif
         struct sockaddr_in host_addr;
