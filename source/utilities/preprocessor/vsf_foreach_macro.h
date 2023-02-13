@@ -38,12 +38,12 @@ extern "C" {
 #define __VSF_MEXPAND5(...)                     __VA_ARGS__
 
 
-#define ____VSF_IS_EMPTY(__A, __B, __SIZE, ...) __SIZE
-#define __VSF_IS_EMPTY(...)                     ____VSF_IS_EMPTY(, ##__VA_ARGS__, 0, 1)
-#define VSF_IS_EMPTY(__X, ...)                  __VSF_IS_EMPTY(__X)
+#define ____VSF_MISEMPTY(__A, __B, __SIZE, ...) __SIZE
+#define __VSF_MISEMPTY(...)                     ____VSF_MISEMPTY(, ##__VA_ARGS__, 0, 1)
+#define VSF_MISEMPTY(__X, ...)                  __VSF_MISEMPTY(__X)
 
 #define __VSF_MFOREACH(__MACRO, __MACRO_LAST, __X, ...)                          \
-            VSF_MCAT2(__VSF_MFOREACH_, VSF_IS_EMPTY(__VA_ARGS__))(__MACRO, __MACRO_LAST, __X, __VA_ARGS__)
+            VSF_MCAT2(__VSF_MFOREACH_, VSF_MISEMPTY(__VA_ARGS__))(__MACRO, __MACRO_LAST, __X, __VA_ARGS__)
 #define __VSF_MFOREACH_0(__MACRO, __MACRO_LAST, __X, ...)                        \
             __MACRO(__X) __VSF_MOBSTRUCT(__VSF_MFOREACH_I)()(__MACRO, __MACRO_LAST, __VA_ARGS__)
 #define __VSF_MFOREACH_1(__MACRO, __MACRO_LAST, __X, ...)                        \

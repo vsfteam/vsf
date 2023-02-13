@@ -50,17 +50,29 @@
 #   define __describe_multiplex_i2c_op()
 #endif
 
-#define __describe_multiplex_i2c(__name)                                        \
+#define __VSF_MULTIPLEX_I2C_MFOREACH(__MACRO, __MULTIPLEXER, __X, ...)          \
+            VSF_MCAT2(__VSF_MULTIPLEX_I2C_MFOREACH_, VSF_MISEMPTY(__VA_ARGS__))(__MACRO, __MULTIPLEXER, __X, __VA_ARGS__)
+#define __VSF_MULTIPLEX_I2C_MFOREACH_0(__MACRO, __MULTIPLEXER, __X, ...)        \
+            __MACRO(__MULTIPLEXER, __X) __VSF_MOBSTRUCT(__VSF_MULTIPLEX_I2C_MFOREACH_I)()(__MACRO, __MULTIPLEXER, __VA_ARGS__)
+#define __VSF_MULTIPLEX_I2C_MFOREACH_1(__MACRO, __MULTIPLEXER, __X, ...)        \
+            __MACRO(__MULTIPLEXER, __X)
+#define __VSF_MULTIPLEX_I2C_MFOREACH_I()    __VSF_MULTIPLEX_I2C_MFOREACH
+#define __VSF_MULTIPLEX_I2C_MFOREACH_EX(__MACRO, __MULTIPLEXER, ...)            \
+            __VSF_MEXPAND(__VSF_MULTIPLEX_I2C_MFOREACH(__MACRO, __MULTIPLEXER, __VA_ARGS__))
+#define VSF_MULTIPLEX_I2C_MFOREACH(__MACRO, __MULTIPLEXER, ...)               \
+            __VSF_MULTIPLEX_I2C_MFOREACH_EX(__MACRO, __MULTIPLEXER, __VA_ARGS__)
+
+#define __describe_multiplex_i2c(__multiplexer, __name)                         \
     vsf_multiplex_i2c_t __name = {                                              \
         __describe_multiplex_i2c_op()                                           \
-        .multiplexer = & __vsf_multiplexer_i2c_ ## __name,                      \
+        .multiplexer = &(__multiplexer),                                        \
     };
 
 #define __describe_multiplexer_i2c(__name, __i2c, ...)                          \
-    vsf_multiplexer_i2c_t __vsf_multiplexer_i2c_ ## __name = {                  \
+    vsf_multiplexer_i2c_t __name = {                                            \
         .i2c_ptr = __i2c,                                                       \
     };                                                                          \
-    VSF_MFOREACH(__describe_multiplex_i2c, __VA_ARGS__)
+    VSF_MULTIPLEX_I2C_MFOREACH(__describe_multiplex_i2c, __name, __VA_ARGS__)
 
 #define describe_multiplexer_i2c(__name, __i2c, ...)                            \
     __describe_multiplexer_i2c(__name, __i2c, __VA_ARGS__)
