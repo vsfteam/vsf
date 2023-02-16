@@ -84,7 +84,7 @@ enum vsf_usart_mode_t {
 
 struct vsf_usart_status_t {
     union {
-        inherit(peripheral_status_t)
+        inherit(vsf_peripheral_status_t)
         struct {
             uint32_t            dummy               : 24;
             uint32_t            is_rx_fifo_empty    : 1;

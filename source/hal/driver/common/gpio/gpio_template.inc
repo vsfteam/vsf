@@ -186,9 +186,9 @@ void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
-gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
+vsf_gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 {
-    gpio_capability_t gpio_capability = {
+    vsf_gpio_capability_t gpio_capability = {
         .is_async = VSF_GPIO_CFG_CAPABILITY_IS_ASYNC,
         .is_support_output_and_set = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET,
         .is_support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR,

@@ -579,7 +579,7 @@ typedef enum vsf_mmc_transact_status_t {
 #if VSF_MMC_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_mmc_status_t {
     union {
-        inherit(peripheral_status_t)
+        inherit(vsf_peripheral_status_t)
         vsf_mmc_transact_status_t transact_status;
         vsf_mmc_irq_mask_t irq_status;
     };

@@ -83,7 +83,7 @@ enum em_usart_reg_rw_t {
 
 struct vsf_usart_status_t {
     union {
-        inherit(peripheral_status_t)
+        inherit(vsf_peripheral_status_t)
         struct {
             uint32_t    ip_is_busy   : 1;
             uint32_t    bw_is_busy   : 1;

@@ -123,7 +123,7 @@ void vsf_remapped_gpio_output_and_clear(vsf_remapped_gpio_t *gpio, uint32_t pin_
     vsf_gpio_output_and_clear(gpio->target, pin_mask);
 }
 
-gpio_capability_t vsf_remapped_gpio_capability(vsf_remapped_gpio_t *gpio)
+vsf_gpio_capability_t vsf_remapped_gpio_capability(vsf_remapped_gpio_t *gpio)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
     return vsf_gpio_capability(gpio->target);

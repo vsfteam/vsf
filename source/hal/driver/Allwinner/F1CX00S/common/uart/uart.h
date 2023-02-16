@@ -106,7 +106,7 @@ enum vsf_usart_irq_mask_t {
 
 struct vsf_usart_status_t {
     union {
-        inherit(peripheral_status_t)
+        inherit(vsf_peripheral_status_t)
         struct {
             uint32_t        is_busy : 1;
             uint32_t        ir      : 8;

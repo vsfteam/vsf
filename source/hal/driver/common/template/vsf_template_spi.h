@@ -207,7 +207,7 @@ typedef enum vsf_spi_irq_mask_t {
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_spi_status_t {
     union {
-        inherit(peripheral_status_t)
+        inherit(vsf_peripheral_status_t)
         struct {
             uint32_t is_busy : 1;
         };

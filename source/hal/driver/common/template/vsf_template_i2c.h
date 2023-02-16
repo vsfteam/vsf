@@ -158,7 +158,7 @@ typedef enum vsf_i2c_irq_mask_t {
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_i2c_status_t {
     union {
-        inherit(peripheral_status_t)
+        inherit(vsf_peripheral_status_t)
         uint32_t value;
     };
 } vsf_i2c_status_t;

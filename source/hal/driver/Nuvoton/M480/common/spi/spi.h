@@ -112,7 +112,7 @@ typedef enum vsf_spi_mode_t {
 
 typedef struct vsf_spi_status_t {
     union {
-        inherit(peripheral_status_t)
+        inherit(vsf_peripheral_status_t)
         uint32_t                value;
     };
 } vsf_spi_status_t;

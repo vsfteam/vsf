@@ -228,7 +228,7 @@ vsf_i2c_status_t vsf_hw_i2c_status(vsf_hw_i2c_t *hw_i2c_ptr)
                    (hw_i2c_const->reg->SR & SR_BUSY_BIT);
 
     vsf_i2c_status_t status = {
-        .use_as__peripheral_status_t.is_busy = is_busy,
+        .use_as__vsf_peripheral_status_t.is_busy = is_busy,
     };
 
     return status;
