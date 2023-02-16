@@ -1,0 +1,317 @@
+#ifndef __SIMPLE_LIBC_STRING_VIEW__
+#define __SIMPLE_LIBC_STRING_VIEW__
+
+#include <compare>
+
+namespace std {
+    template <class T, class Traits = char_traits<T>>
+    class basic_string_view : public array_base<T> {
+    public:
+        typedef Traits traits_type;
+
+        typedef T value_type;
+        typedef size_t size_type;
+        typedef ptrdiff_t difference_type;
+        typedef T * pointer;
+        typedef const T * const_pointer;
+        typedef T & reference;
+        typedef const T & const_reference;
+
+        typedef T * iterator;
+        typedef const T * const_iterator;
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+
+        static const size_t npos = -1;
+
+        basic_string_view<T, Traits>(const T *str)
+            : array_base<T>(str, nullptr == str ? 0 : __strlen(str) + 1, false) { }
+        basic_string_view<T, Traits>(const basic_string_view<T, Traits> &s)
+            : array_base<T>(s, false) { }
+        basic_string_view<T, Traits>()
+            : array_base<T>(nullptr, 0, false) { }
+        basic_string_view<T, Traits>(const T *arr, size_t num)
+            : array_base<T>(arr, num, false) { }
+
+        iterator begin() const
+        {
+            return array_base<T>::begin();
+        }
+        iterator end() const
+        {
+            iterator it = array_base<T>::end();
+            return it != NULL ? it - 1 : NULL;
+        }
+        const_iterator cbegin() const
+        {
+            return (const_iterator)begin();
+        }
+        const_iterator cend() const
+        {
+            return (const_iterator)end();
+        }
+        iterator rbegin() const
+        {
+            iterator it = array_base<T>::rbegin();
+            return it != NULL ? it - 1 : NULL;
+        }
+        iterator rend() const
+        {
+            return array_base<T>::rend();
+        }
+        const_iterator crbegin() const
+        {
+            return (const_iterator)rbegin();
+        }
+        const_iterator crend() const
+        {
+            return (const_iterator)rend();
+        }
+
+        size_t size() const
+        {
+            return length();
+        }
+        size_t length() const
+        {
+            size_t len = array_base<T>::length();
+            return len > 0 ? len - 1 : 0;
+        }
+        bool empty() const
+        {
+            return (0 == length());
+        }
+        const T * data() const
+        {
+            return array_base<T>::cbegin();
+        }
+        basic_string_view<T, Traits> & assign(const T *arr, size_t num)
+        {
+            array_base<T>::assign(arr, num);
+            return (*this);
+        }
+        basic_string_view<T, Traits> & assign(const basic_string_view<T, Traits> &str)
+        {
+            return assign(str.c_str(), str.length());
+        }
+        basic_string_view<T, Traits> & assign(const T *str)
+        {
+            if (str != nullptr) {
+                return assign(str, __strlen(str));
+            }
+            return (*this);
+        }
+        int compare(const basic_string_view<T, Traits> & right) const
+        {
+            size_t lsize = length(), rsize = right.length();
+            size_t len = vsf_min(lsize, rsize) + 1;
+            return Traits::compare(c_str(), right.c_str(), len);
+        }
+        basic_string_view<T, Traits> & substr(size_t start = 0, size_t count = npos) const
+        {
+            size_t len = length();
+            if (start >= len) {
+                count = 0;
+            }
+            if ((count == npos) || (start + count > len)) {
+                count = len - start;
+            }
+
+            const T *sub = array_base<T>::cbegin();
+            basic_string_view<T, Traits> *newstr = new basic_string_view<T, Traits>(&sub[start], count + 1);
+            return (*newstr);
+        }
+        size_t find(const T *str, size_t pos = 0) const
+        {
+            const T *start = cbegin();
+            if (pos < length()) {
+                T *found = __strstr(start + pos, str);
+                if (found) {
+                    return (found - start) / sizeof(T);
+                }
+            }
+            return npos;
+        }
+        size_t find(const basic_string_view<T, Traits> &str, size_t pos = 0) const
+        {
+            return find(str.c_str(), pos);
+        }
+        size_t find(T c, size_t pos = 0) const
+        {
+            T str[2] = { c, T(0) };
+            return find(str, pos);
+        }
+
+        size_t find_first_of(const T *str, size_t pos = 0) const
+        {
+            const T *start = cbegin();
+            ssize_t curpos = pos, slen = length();
+            if (pos >= slen) {
+                return npos;
+            }
+
+            while (curpos < slen) {
+                if (__strchr(str, start[curpos])) {
+                    break;
+                }
+                curpos++;
+            }
+            return curpos < slen ? curpos : npos;
+        }
+        size_t find_first_of(const basic_string_view<T, Traits> & str, size_t pos = 0) const
+        {
+            return find_first_of(str.cbegin(), pos);
+        }
+        size_t find_first_of(char c, size_t pos = 0) const
+        {
+            const T str[2] = { c, T(0) };
+            return find_first_of(str, pos);
+        }
+        size_t find_first_not_of(const T *str, size_t pos = 0) const
+        {
+            const T *start = cbegin();
+            ssize_t curpos = pos, slen = length();
+            if (pos >= slen) {
+                return npos;
+            }
+
+            while (curpos < slen) {
+                if (!__strchr(str, start[curpos])) {
+                    break;
+                }
+                curpos++;
+            }
+            return curpos < slen ? curpos : npos;
+        }
+        size_t find_first_not_of(const basic_string_view<T, Traits> & str, size_t pos = 0) const
+        {
+            return find_first_not_of(str.cbegin(), pos);
+        }
+        size_t find_first_not_of(char c, size_t pos = 0) const
+        {
+            const T str[2] = { c, T(0) };
+            return find_first_not_of(str, pos);
+        }
+
+        size_t find_last_of(const T *str, size_t pos = npos) const
+        {
+            const T *start = cbegin();
+            if (nullptr == start) {
+                assert(false);
+            }
+
+            ssize_t curpos = length() - 1;
+            if (pos > curpos) {
+                pos = curpos;
+            }
+
+            while (curpos >= 0) {
+                if (__strchr(str, start[curpos])) {
+                    break;
+                }
+                curpos--;
+            }
+            return curpos >= 0 ? curpos : npos;
+        }
+        size_t find_last_of(const basic_string_view<T, Traits> & str, size_t pos = npos) const
+        {
+            return find_last_of(str.cbegin(), pos);
+        }
+        size_t find_last_of(char c, size_t pos = npos) const
+        {
+            const T str[2] = { c, T(0) };
+            return find_last_of(str, pos);
+        }
+        size_t find_last_not_of(const T *str, size_t pos = npos) const
+        {
+            const T *start = cbegin();
+            if (nullptr == start) {
+                return npos;
+            }
+
+            ssize_t curpos = length() - 1;
+            if (pos > curpos) {
+                pos = curpos;
+            }
+
+            while (curpos >= 0) {
+                if (!__strchr(str, start[curpos])) {
+                    break;
+                }
+                curpos--;
+            }
+            return curpos >= 0 ? curpos : npos;
+        }
+        size_t find_last_not_of(const basic_string_view<T, Traits> & str, size_t pos = npos) const
+        {
+            return find_last_not_of(str.cbegin(), pos);
+        }
+        size_t find_last_not_of(char c, size_t pos = npos) const
+        {
+            const T str[2] = { c, T(0) };
+            return find_last_not_of(str, pos);
+        }
+
+        basic_string_view<T, Traits> & operator =(const T *s)
+        {
+            size_t size = (nullptr == s) ? 1 : __strlen(s) + 1;
+            return (basic_string_view<T, Traits> &)(array_base<T>::assign(s, size));
+        }
+        basic_string_view<T, Traits> & operator =(const basic_string_view<T, Traits> &s)
+        {
+            return operator =(s.cbegin());
+        }
+        bool operator ==(const T *str) const
+        {
+            size_t arrlen = str != nullptr ? __strlen(str) : 0;
+            return (length() == arrlen) && !__memcmp(cbegin(), str, arrlen);
+        }
+        bool operator ==(const basic_string_view<T, Traits> &str) const
+        {
+            return operator ==(str.cbegin());
+        }
+        bool operator !=(const T *str) const
+        {
+            return !operator ==(str);
+        }
+        bool operator !=(const basic_string_view<T, Traits> &str) const
+        {
+            return !operator ==(str);
+        }
+        bool operator >(const T *str) const
+        {
+            size_t slen = str != nullptr ? __strlen(str) : 0;
+            size_t arrlen = vsf_min(slen, length());
+            return __memcmp(cbegin(), str, arrlen) > 0;
+        }
+        bool operator >(const basic_string_view<T, Traits> &str) const
+        {
+            return operator >(str.cbegin());
+        }
+        bool operator <(const T *str) const
+        {
+            size_t slen = str != nullptr ? __strlen(str) : 0;
+            size_t arrlen = vsf_min(slen, length());
+            return __memcmp(cbegin(), str, arrlen) < 0;
+        }
+        bool operator <(const basic_string_view<T, Traits> &str) const
+        {
+            return operator <(str.cbegin());
+        }
+        T & operator [](size_t pos)
+        {
+            return (T &)array_base<T>::operator [](pos);
+        }
+        const T & operator [](size_t pos) const
+        {
+            return array_base<T>::operator [](pos);
+        }
+    };
+
+    typedef basic_string_view<char, char_traits<char>> string_view;
+    typedef basic_string_view<wchar_t, char_traits<wchar_t>> wstring_view;
+    typedef basic_string_view<char16_t, char_traits<char16_t>> u16string_view;
+    typedef basic_string_view<char32_t, char_traits<char32_t>> u32string_view;
+}
+
+#endif      // __SIMPLE_LIBC_STRING_VIEW__
