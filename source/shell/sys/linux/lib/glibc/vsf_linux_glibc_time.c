@@ -324,6 +324,14 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
     return 0;
 }
 
+int timespec_get(struct timespec *ts, int base)
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    __vsf_linux_timeval2timespec(&tv, ts);
+    return base;
+}
+
 clock_t clock(void)
 {
     return vsf_systimer_get_ms();

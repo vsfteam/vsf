@@ -204,26 +204,206 @@ extern long double sqrtl(long double);
 }
 
 namespace std {
-    using ::acos;
-    using ::asin;
-    using ::tan;
     using ::atan;
-    using ::atan2;
     using ::cos;
-    using ::cosh;
     using ::sin;
-    using ::sinh;
+    using ::tan;
     using ::tanh;
-    using ::exp;
     using ::frexp;
-    using ::ldexp;
-    using ::log;
-    using ::log10;
     using ::modf;
-    using ::pow;
-    using ::sqrt;
     using ::ceil;
     using ::fabs;
     using ::floor;
+
+    using ::acos;
+    using ::asin;
+    using ::atan2;
+    using ::cosh;
+    using ::sinh;
+    using ::exp;
+    using ::ldexp;
+    using ::log;
+    using ::log10;
+    using ::pow;
+    using ::sqrt;
     using ::fmod;
+
+    using ::infinity;
+    using ::nan;
+    using ::copysign;
+    using ::logb;
+    using ::ilogb;
+
+    using ::asinh;
+    using ::cbrt;
+    using ::nextafter;
+    using ::rint;
+    using ::scalbn;
+
+    using ::exp2;
+    using ::scalbln;
+    using ::tgamma;
+    using ::nearbyint;
+    using ::lrint;
+    using ::llrint;
+    using ::round;
+    using ::lround;
+    using ::llround;
+    using ::trunc;
+    using ::remquo;
+    using ::fdim;
+    using ::fmax;
+    using ::fmin;
+    using ::fma;
+
+    using ::log1p;
+    using ::expm1;
+
+    using ::acosh;
+    using ::atanh;
+    using ::remainder;
+    using ::gamma;
+    using ::lgamma;
+    using ::erf;
+    using ::erfc;
+    using ::log2;
+
+    using ::hypot;
+
+    using ::atanf;
+    using ::cosf;
+    using ::sinf;
+    using ::tanf;
+    using ::tanhf;
+    using ::frexpf;
+    using ::modff;
+    using ::ceilf;
+    using ::fabsf;
+    using ::floorf;
+
+    using ::acosf;
+    using ::asinf;
+    using ::atan2f;
+    using ::coshf;
+    using ::sinhf;
+    using ::expf;
+    using ::ldexpf;
+    using ::logf;
+    using ::log10f;
+    using ::powf;
+    using ::sqrtf;
+    using ::fmodf;
+
+    using ::exp2f;
+    using ::scalblnf;
+    using ::tgammaf;
+    using ::nearbyintf;
+    using ::lrintf;
+    using ::llrintf;
+    using ::roundf;
+    using ::lroundf;
+    using ::llroundf;
+    using ::truncf;
+    using ::remquof;
+    using ::fdimf;
+    using ::fmaxf;
+    using ::fminf;
+    using ::fmaf;
+
+    using ::infinityf;
+    using ::nanf;
+    using ::copysignf;
+    using ::logbf;
+    using ::ilogbf;
+
+    using ::asinhf;
+    using ::cbrtf;
+    using ::nextafterf;
+    using ::rintf;
+    using ::scalbnf;
+    using ::log1pf;
+    using ::expm1f;
+
+    using ::acoshf;
+    using ::atanhf;
+    using ::remainderf;
+    using ::gammaf;
+    using ::lgammaf;
+    using ::erff;
+    using ::erfcf;
+    using ::log2f;
+    using ::hypotf;
+
+    using ::atanl;
+    using ::cosl;
+    using ::sinl;
+    using ::tanl;
+    using ::tanhl;
+    using ::frexpl;
+    using ::modfl;
+    using ::ceill;
+    using ::fabsl;
+    using ::floorl;
+    using ::log1pl;
+    using ::expm1l;
+
+    using ::acosl;
+    using ::asinl;
+    using ::atan2l;
+    using ::coshl;
+    using ::sinhl;
+    using ::expl;
+    using ::ldexpl;
+    using ::logl;
+    using ::log10l;
+    using ::powl;
+    using ::sqrtl;
+    using ::fmodl;
+    using ::hypotl;
+
+    using ::copysignl;
+    using ::nanl;
+    using ::ilogbl;
+    using ::asinhl;
+    using ::cbrtl;
+    using ::nextafterl;
+    using ::nexttowardf;
+    using ::nexttoward;
+    using ::nexttowardl;
+    using ::logbl;
+    using ::log2l;
+    using ::rintl;
+    using ::scalbnl;
+    using ::exp2l;
+    using ::scalblnl;
+    using ::tgammal;
+    using ::nearbyintl;
+    using ::lrintl;
+    using ::llrintl;
+    using ::roundl;
+    using ::lroundl;
+    using ::llroundl;
+    using ::truncl;
+    using ::remquol;
+    using ::fdiml;
+    using ::fmaxl;
+    using ::fminl;
+    using ::fmal;
+
+    using ::acoshl;
+    using ::atanhl;
+    using ::remainderl;
+    using ::lgammal;
+    using ::erfl;
+    using ::erfcl;
+
+    using ::hypotl;
+    using ::sqrtl;
+
+    float hypot(float x, float y, float z) {
+        return sqrtf(x * x + y * y + z * z);
+    }
+    double hypot(double x, double y, double z) {
+        return sqrt(x * x + y * y + z * z);
+    }
 }

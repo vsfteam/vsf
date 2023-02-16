@@ -34,6 +34,7 @@ extern "C" {
 #define timer_getoverrun    VSF_LINUX_LIBC_WRAPPER(timer_getoverrun)
 #define nanosleep           VSF_LINUX_LIBC_WRAPPER(nanosleep)
 #define clock               VSF_LINUX_LIBC_WRAPPER(clock)
+#define timespec_get        VSF_LINUX_LIBC_WRAPPER(timespec_get)
 #endif
 
 #define TIMER_ABSTIME       1
@@ -91,6 +92,8 @@ typedef struct vsf_linux_libc_time_vplt_t {
             struct itimerspec *old_value);
     int (*timer_gettime)(timer_t timerid, struct itimerspec *curr_value);
     int (*timer_getoverrun)(timer_t timerid);
+
+    int (*timespec_get)(struct timespec *ts, int base);
 
 } vsf_linux_libc_time_vplt_t;
 #   ifndef __VSF_APPLET__
@@ -175,6 +178,9 @@ static inline int timer_settime(timer_t timerid, int flags, const struct itimers
 static inline int timer_gettime(timer_t timerid, struct itimerspec *curr_value) {
     return VSF_LINUX_APPLET_LIBC_TIME_VPLT->timer_gettime(timerid, curr_value);
 }
+static inline int timespec_get(struct timespec *ts, int base) {
+    return VSF_LINUX_APPLET_LIBC_TIME_VPLT->timespec_get(ts, base);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_TIME
 
@@ -210,6 +216,8 @@ time_t mktime(struct tm *tm);
 size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm);
 
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining);
+
+int timespec_get(struct timespec *ts, int base);
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_TIME
 
 #ifdef __cplusplus
