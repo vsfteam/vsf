@@ -228,7 +228,6 @@ vsf_i2c_capability_t vsf_mrequest_i2c_capability(vsf_mrequest_i2c_t *m_i2c_ptr)
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_i2c_t * real_i2c_ptr = m_i2c_ptr->i2c_ptr;
     VSF_HAL_ASSERT(NULL != real_i2c_ptr);
-    vsf_err_t result = VSF_ERR_NONE;
 
     vsf_i2c_capability_t i2c_capability = vsf_i2c_capability(real_i2c_ptr);
     i2c_capability.is_support_manual_start_stop = 1;

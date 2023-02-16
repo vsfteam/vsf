@@ -361,7 +361,6 @@ void vsf_multiplex_spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t 
 
     vsf_spi_t *spi = spi_info_ptr->spi;
     VSF_HAL_ASSERT(spi != 0);
-    bool is_hardware = __spi_cs_pin_is_hardware(m_spi_ptr);
 
     vsf_protect_t state = vsf_multiplex_spi_protect();
         __spi_cs_inactive(m_spi_ptr);
