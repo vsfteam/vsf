@@ -9,9 +9,10 @@ namespace std {
     struct atomic_base {
         using value_type = T;
 
-    private:
+    protected:
         T __base;
 
+    private:
         T __exchange(T val, memory_order sync = memory_order_seq_cst) volatile noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
