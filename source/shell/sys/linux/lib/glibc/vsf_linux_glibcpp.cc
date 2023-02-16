@@ -117,6 +117,7 @@ namespace std {
 }
 #endif
 
+// math
 namespace std {
     float hypot(float x, float y, float z)
     {
@@ -125,6 +126,13 @@ namespace std {
     double hypot(double x, double y, double z)
     {
         return sqrt(x * x + y * y + z * z);
+    }
+}
+
+// atomic
+namespace std {
+    void atomic_thread_fence(std::memory_order order) noexcept
+    {
     }
 }
 

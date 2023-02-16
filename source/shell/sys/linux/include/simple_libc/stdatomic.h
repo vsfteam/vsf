@@ -51,7 +51,14 @@ typedef _Atomic(ptrdiff_t)          atomic_ptrdiff_t;
 typedef _Atomic(intmax_t)           atomic_intmax_t;
 typedef _Atomic(uintmax_t)          atomic_uintmax_t;
 
-
+enum memory_order {
+    memory_order_relaxed,
+    memory_order_consume,
+    memory_order_acquire,
+    memory_order_release,
+    memory_order_acq_rel,
+    memory_order_seq_cst,
+};
 
 #define atomic_store(object, desired)                                           \
             ({                                                                  \

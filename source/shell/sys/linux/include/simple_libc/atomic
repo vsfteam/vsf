@@ -288,6 +288,8 @@ namespace std {
     inline T atomic_exchange(atomic<T> *obj, T val) {
         return obj->exchange(val);
     }
+
+    void atomic_thread_fence(std::memory_order order) noexcept;
 }
 
 #endif

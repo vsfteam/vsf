@@ -12,6 +12,7 @@ extern "C" {
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define mmap                VSF_LINUX_WRAPPER(mmap)
+#define mmap64              VSF_LINUX_WRAPPER(mmap64)
 #define munmap              VSF_LINUX_WRAPPER(munmap)
 #define mprotect            VSF_LINUX_WRAPPER(mprotect)
 #endif
@@ -60,6 +61,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_mmap_vplt_t vsf_linux_sys_mmap_vplt;
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_MMAP
 
 void * mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off);
+void * mmap64(void *addr, size_t len, int prot, int flags, int fildes, off64_t off);
 int munmap(void *addr, size_t len);
 int mprotect(void *addr, size_t len, int prot);
 int msync(void *addr, size_t len, int flags);

@@ -32,6 +32,11 @@ typedef int nfds_t;
 #define POLLERR         (1 << 4)
 #define POLLNVAL        (1 << 5)
 
+#define POLLRDNORM      (1 << 6)
+#define POLLRDBAND      (1 << 7)
+#define POLLWRNORM      (1 << 8)
+#define POLLWRBAND      (1 << 9)
+
 struct pollfd {
     int fd;
     short events;

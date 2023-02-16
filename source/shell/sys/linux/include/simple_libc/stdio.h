@@ -92,6 +92,8 @@ extern "C" {
 #define fprintf             VSF_LINUX_LIBC_WRAPPER(fprintf)
 #endif
 
+#define fopen64             fopen
+
 #ifdef __WIN__
 #   define sprintf_s        snprintf
 #   define _scprintf        printf

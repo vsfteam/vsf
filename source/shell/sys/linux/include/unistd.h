@@ -93,6 +93,8 @@ extern "C" {
 #endif
 #endif
 
+#define open64              open
+
 #define STDIN_FILENO        0
 #define STDOUT_FILENO       1
 #define STDERR_FILENO       2
