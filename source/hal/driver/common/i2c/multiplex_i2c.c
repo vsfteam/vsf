@@ -92,7 +92,7 @@ static vsf_err_t __m_i2c_request(vsf_multiplex_i2c_t *m_i2c_ptr, bool is_init, b
                                         m_i2c_ptr->request.buffer_ptr);
     }
 
-    return VSF_ERR_NONE;
+    return result;
 }
 
 static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
@@ -127,7 +127,9 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_
             vsf_multiplex_i2c_unprotect(state);
 
             if (is_need) {
-                __m_i2c_request(new_m_i2c_ptr, true, true, true);
+                vsf_err_t result = __m_i2c_request(new_m_i2c_ptr, true, true, true);
+                (void) result;
+                VSF_ASSERT(result == VSF_ERR_NONE);
             }
         }
     }
@@ -324,7 +326,7 @@ vsf_err_t vsf_multiplex_i2c_master_request(vsf_multiplex_i2c_t *m_i2c_ptr,
     m_i2c_ptr->request.count = count;
     m_i2c_ptr->request.buffer_ptr = buffer_ptr;
 
-    vsf_err_t result;
+    vsf_err_t result = VSF_ERR_NONE;
     bool need_init;
     bool need_enable;
     bool need_req = false;
@@ -345,7 +347,6 @@ vsf_err_t vsf_multiplex_i2c_master_request(vsf_multiplex_i2c_t *m_i2c_ptr,
                 need_req = true;
             } else {
                 vsf_slist_queue_enqueue(vsf_multiplex_i2c_t, slist_node, &multiplexer->waiting_queue, m_i2c_ptr);
-                result = VSF_ERR_NONE;
             }
         }
 
@@ -353,7 +354,9 @@ vsf_err_t vsf_multiplex_i2c_master_request(vsf_multiplex_i2c_t *m_i2c_ptr,
         need_enable = (multiplexer->en_mask != 0);
     vsf_multiplex_i2c_unprotect(state);
 
-    __m_i2c_request(m_i2c_ptr, need_init, need_enable, need_req);
+    if (need_req) {
+        __m_i2c_request(m_i2c_ptr, need_init, need_enable, need_req);
+    }
 
     return result;
 }
