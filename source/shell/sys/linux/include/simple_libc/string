@@ -8,7 +8,42 @@
 
 namespace std {
     template <class T>
-    size_t __strlen(const T *str)
+    T * __memcpy(T *dst, const T *src, size_t count)
+    {
+        return (T *)memcpy((void *)dst, (void *)src, count * sizeof(T));
+    }
+
+    template <class T>
+    T * __memmove(T *dst, const T *src, size_t count)
+    {
+        return (T *)memmove((void *)dst, (void *)src, count * sizeof(T));
+    }
+
+    template <class T>
+    // avoid to use memcmp in constexpr function
+    constexpr int __memcmp(const T *dst, const T *src, size_t count)
+    {
+        int res = 0;
+        for (; count > 0; dst++, src++, count--) {
+            if ((res = *dst - *src) != 0) {
+                break;
+            }
+        }
+        return res;
+    }
+
+    template <class T>
+    T * __memset(T *dst, T t, size_t n)
+    {
+        T *tmp = dst;
+        while (n--) {
+            *tmp++ = n;
+        }
+        return dst;
+    }
+
+    template <class T>
+    constexpr size_t __strlen(const T *str)
     {
         size_t result = 0;
         for (; str[result]; result++);
@@ -24,7 +59,7 @@ namespace std {
     }
 
     template <class T>
-    T * __strchr(const T *str, T c)
+    constexpr T * __strchr(const T *str, T c)
     {
         T ch;
         while ((ch = *str) != '\0') {
@@ -37,7 +72,7 @@ namespace std {
     }
 
     template <class T>
-    static T * __strstr(const T *s1, const T *s2)
+    constexpr static T * __strstr(const T *s1, const T *s2)
     {
         size_t l1, l2;
         l2 = __strlen(s2);
@@ -51,34 +86,6 @@ namespace std {
             s1++;
         }
         return nullptr;
-    }
-
-    template <class T>
-    T * __memcpy(T *dst, const T *src, size_t count)
-    {
-        return (T *)memcpy((void *)dst, (void *)src, count * sizeof(T));
-    }
-
-    template <class T>
-    T * __memmove(T *dst, const T *src, size_t count)
-    {
-        return (T *)memmove((void *)dst, (void *)src, count * sizeof(T));
-    }
-
-    template <class T>
-    int __memcmp(const T *dst, const T *src, size_t count)
-    {
-        return memcmp((const void *)dst, (const void *)src, count * sizeof(T));
-    }
-
-    template <class T>
-    T * __memset(T *dst, T t, size_t n)
-    {
-        T *tmp = dst;
-        while (n--) {
-            *tmp++ = n;
-        }
-        return dst;
     }
 
     template <class T>

@@ -52,7 +52,9 @@ extern "C" {
 #   define FALSE                    0
 #endif
 
-#define offsetof(__type, __member)  (uintptr_t)(&(((__type *)0)->__member))
+#ifndef offsetof
+#   define offsetof(__type, __member)   (uintptr_t)(&(((__type *)0)->__member))
+#endif
 
 // define max_align_t, can not depend on uintalu_t because of circular depoendency
 #if     __IS_COMPILER_GCC__
