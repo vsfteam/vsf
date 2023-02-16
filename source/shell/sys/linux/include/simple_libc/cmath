@@ -1,8 +1,15 @@
 #include <cstdlib>
 
 // on some platform, math.h depends on cmath, so DO NOT include math.h
-//#include <math.h>
+#if 1
+#   include <math.h>
 
+// APIs not in math.h
+extern double infinity(void);
+extern float infinityf(void);
+extern double gamma(double);
+extern float gammaf(float);
+#else
 extern "C" {
 
 extern double atan(double);
@@ -202,6 +209,7 @@ extern long double hypotl(long double, long double);
 extern long double sqrtl(long double);
 
 }
+#endif
 
 namespace std {
     using ::atan;
@@ -399,6 +407,11 @@ namespace std {
 
     using ::hypotl;
     using ::sqrtl;
+
+    using ::fpclassify;
+    using ::isnan;
+    using ::isinf;
+    using ::isfinite;
 
     float hypot(float x, float y, float z);
     double hypot(double x, double y, double z);
