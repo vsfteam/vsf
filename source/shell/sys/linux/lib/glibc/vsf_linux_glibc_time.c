@@ -324,14 +324,6 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
     return 0;
 }
 
-int timespec_get(struct timespec *ts, int base)
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    __vsf_linux_timeval2timespec(&tv, ts);
-    return base;
-}
-
 clock_t clock(void)
 {
     return vsf_systimer_get_ms();
@@ -542,6 +534,14 @@ int timer_getoverrun(timer_t timerid)
 #   pragma clang diagnostic pop
 #endif
 
+int timespec_get(struct timespec *ts, int base)
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    __vsf_linux_timeval2timespec(&tv, ts);
+    return base;
+}
+
 #if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED && !defined(__VSF_APPLET__)
 #   define VSF_LINUX_APPLET_LIBC_TIME_FUNC(__FUNC)          .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
@@ -569,6 +569,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(timer_gettime),
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(timer_delete),
     VSF_LINUX_APPLET_LIBC_TIME_FUNC(timer_getoverrun),
+    VSF_LINUX_APPLET_LIBC_TIME_FUNC(timespec_get);
 };
 #endif
 
