@@ -104,19 +104,20 @@ namespace std {
     struct atomic : public atomic_base<T> {
         using value_type = T;
 
+    private:
         T __fetch_add(T val, memory_order sync = memory_order_seq_cst) noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
-                tmp = __base;
-                __base += val;
+                tmp = atomic_base<T>::__base;
+                atomic_base<T>::__base += val;
             vsf_unprotect_int(orig);
             return tmp;
         }
         T __fetch_sub(T val, memory_order sync = memory_order_seq_cst) noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
-                tmp = __base;
-                __base -= val;
+                tmp = atomic_base<T>::__base;
+                atomic_base<T>::__base -= val;
             vsf_unprotect_int(orig);
             return tmp;
         }
@@ -131,18 +132,34 @@ namespace std {
         T __fetch_or(T val, memory_order sync = memory_order_seq_cst) noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
-                tmp = __base;
-                __base |= val;
+                tmp = atomic_base<T>::__base;
+                atomic_base<T>::__base |= val;
             vsf_unprotect_int(orig);
             return tmp;
         }
         T __fetch_xor(T val, memory_order sync = memory_order_seq_cst) noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
-                tmp = __base;
-                __base ^= val;
+                tmp = atomic_base<T>::__base;
+                atomic_base<T>::__base ^= val;
             vsf_unprotect_int(orig);
             return tmp;
+        }
+
+        bool __compare_exchange(T &expected, T desired) noexcept
+        {
+            T tmp;
+            bool res;
+
+            vsf_protect_t orig = vsf_protect_int();
+                tmp = atomic_base<T>::__base;
+                if ((res = (tmp == expected))) {
+                    atomic_base<T>::__base = desired;
+                } else {
+                    expected = tmp;
+                }
+            vsf_unprotect_int(orig);
+            return res;
         }
 
     public:
@@ -231,6 +248,39 @@ namespace std {
         }
         T fetch_xor(T val, memory_order sync = memory_order_seq_cst) volatile noexcept {
             return __fetch_xor(val, sync);
+        }
+
+        bool compare_exchange_strong(T &expected, T desired, std::memory_order success, std::memory_order failure) noexcept
+        {
+            return __compare_exchange(expected, desired);
+        }
+        bool compare_exchange_strong(T &expected, T desired, std::memory_order success, std::memory_order failure) volatile noexcept
+        {
+            return __compare_exchange(expected, desired);
+        }
+        bool compare_exchange_strong(T &expected, T desired, std::memory_order order = std::memory_order_seq_cst) noexcept
+        {
+            return __compare_exchange(expected, desired);
+        }
+        bool compare_exchange_strong(T &expected, T desired, std::memory_order order = std::memory_order_seq_cst) volatile noexcept
+        {
+            return __compare_exchange(expected, desired);
+        }
+        bool compare_exchange_weak(T &expected, T desired, std::memory_order success, std::memory_order failure) noexcept
+        {
+            return compare_exchange_strong(expected, desired, success, failure);
+        }
+        bool compare_exchange_weak(T &expected, T desired, std::memory_order success, std::memory_order failure) volatile noexcept
+        {
+            return compare_exchange_strong(expected, desired, success, failure);
+        }
+        bool compare_exchange_weak(T &expected, T desired, std::memory_order order = std::memory_order_seq_cst) noexcept
+        {
+            return compare_exchange_strong(expected, desired, order);
+        }
+        bool compare_exchange_weak(T &expected, T desired, std::memory_order order = std::memory_order_seq_cst) volatile noexcept
+        {
+            return compare_exchange_strong(expected, desired, order);
         }
     };
 

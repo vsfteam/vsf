@@ -74,7 +74,7 @@ namespace std {
     template <class T>
     constexpr static T * __strstr(const T *s1, const T *s2)
     {
-        size_t l1, l2;
+        size_t l1 = 0, l2 = 0;
         l2 = __strlen(s2);
         if (!l2) { return (T *)s1; }
         l1 = __strlen(s1);
