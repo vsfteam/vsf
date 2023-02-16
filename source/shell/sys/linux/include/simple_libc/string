@@ -399,6 +399,10 @@ namespace std {
     struct char_traits<char> : _char_traits<char, int> {};
     template <>
     struct char_traits<wchar_t> : _char_traits<wchar_t, wint_t> {};
+    template <>
+    struct char_traits<char16_t> : _char_traits<char16_t, uint_least16_t> {};
+    template <>
+    struct char_traits<char32_t> : _char_traits<char32_t, uint_least32_t> {};
 
     template <class T, class Traits = char_traits<T>, class Alloc = allocator<T>>
     class basic_string : public array_base<T> {
