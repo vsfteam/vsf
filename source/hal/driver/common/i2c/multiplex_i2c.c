@@ -103,6 +103,14 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_
     VSF_HAL_ASSERT(NULL != multiplexer);
 
     // TODO: make sure some interrupts(stop/nak/cpl) are enabled
+
+    // UM10204 p10:
+    //   When SDA remains HIGH during this ninth clock pulse, this is defined as the Not
+    //   Acknowledge signal. The master can then generate either a STOP condition to abort the
+    //   transfer, or a repeated START condition to start a new transfer.
+    //
+    // The current request may end without generating a STOP when the NAK is received.
+    // So the next request must have START.
     vsf_i2c_irq_mask_t cpl_irq_mask = VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
                                     | VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT
                                     | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
