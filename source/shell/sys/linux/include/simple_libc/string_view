@@ -5,7 +5,11 @@
 
 namespace std {
     template <class T, class Traits = char_traits<T>>
-    class basic_string_view : public array_base<T> {
+    class basic_string_view {
+    private:
+        const T *__str;
+        size_t __length;
+
     public:
         typedef Traits traits_type;
 
@@ -24,23 +28,18 @@ namespace std {
 
         static const size_t npos = -1;
 
-        basic_string_view<T, Traits>(const T *str)
-            : array_base<T>(str, nullptr == str ? 0 : __strlen(str) + 1, false) { }
-        basic_string_view<T, Traits>(const basic_string_view<T, Traits> &s)
-            : array_base<T>(s, false) { }
-        basic_string_view<T, Traits>()
-            : array_base<T>(nullptr, 0, false) { }
-        basic_string_view<T, Traits>(const T *arr, size_t num)
-            : array_base<T>(arr, num, false) { }
+        constexpr basic_string_view<T, Traits>(const T *str) : __str(str), __length(__strlen(str)) { }
+        constexpr basic_string_view<T, Traits>(const basic_string_view<T, Traits> &s) : __str(s.cbegin()), __length(s.length) { }
+        constexpr basic_string_view<T, Traits>() : __str(nullptr), __length(0) { }
+        constexpr basic_string_view<T, Traits>(const T *str, size_t num) : __str(str), __length(num) { }
 
         iterator begin() const
         {
-            return array_base<T>::begin();
+            return __str == nullptr ? (iterator)nullptr : (iterator)&__str[0];
         }
         iterator end() const
         {
-            iterator it = array_base<T>::end();
-            return it != NULL ? it - 1 : NULL;
+            return __str == nullptr ? (iterator)nullptr : (iterator)&__str[__length];
         }
         const_iterator cbegin() const
         {
@@ -52,12 +51,11 @@ namespace std {
         }
         iterator rbegin() const
         {
-            iterator it = array_base<T>::rbegin();
-            return it != NULL ? it - 1 : NULL;
+            return __length > 0 ? &__str[__length - 1] : nullptr;
         }
         iterator rend() const
         {
-            return array_base<T>::rend();
+            return __length > 0 ? &__str[-1] : nullptr;
         }
         const_iterator crbegin() const
         {
@@ -68,38 +66,48 @@ namespace std {
             return (const_iterator)rend();
         }
 
+        bool empty() const
+        {
+            return (0 == __length);
+        }
+        const T & at(size_t pos) const
+        {
+            VSF_ASSERT(pos < __length);
+            return __str[pos];
+        }
+        const T & back() const
+        {
+            return at(__length);
+        }
+        const T & front() const
+        {
+            return at(0);
+        }
         size_t size() const
         {
-            return length();
+            return __length;
         }
         size_t length() const
         {
-            size_t len = array_base<T>::length();
-            return len > 0 ? len - 1 : 0;
-        }
-        bool empty() const
-        {
-            return (0 == length());
+            return __length;
         }
         const T * data() const
         {
-            return array_base<T>::cbegin();
+            return cbegin();
         }
-        basic_string_view<T, Traits> & assign(const T *arr, size_t num)
+        basic_string_view<T, Traits> & assign(const T *str, size_t num)
         {
-            array_base<T>::assign(arr, num);
+            __array = str;
+            __length = num;
             return (*this);
         }
         basic_string_view<T, Traits> & assign(const basic_string_view<T, Traits> &str)
         {
-            return assign(str.c_str(), str.length());
+            return assign(str.cbegin(), str.length());
         }
         basic_string_view<T, Traits> & assign(const T *str)
         {
-            if (str != nullptr) {
-                return assign(str, __strlen(str));
-            }
-            return (*this);
+            return assign(str, __strlen(str));
         }
         int compare(const basic_string_view<T, Traits> & right) const
         {
@@ -117,7 +125,7 @@ namespace std {
                 count = len - start;
             }
 
-            const T *sub = array_base<T>::cbegin();
+            const T *sub = cbegin();
             basic_string_view<T, Traits> *newstr = new basic_string_view<T, Traits>(&sub[start], count + 1);
             return (*newstr);
         }
@@ -255,7 +263,7 @@ namespace std {
         basic_string_view<T, Traits> & operator =(const T *s)
         {
             size_t size = (nullptr == s) ? 1 : __strlen(s) + 1;
-            return (basic_string_view<T, Traits> &)(array_base<T>::assign(s, size));
+            return (basic_string_view<T, Traits> &)(assign(s, size));
         }
         basic_string_view<T, Traits> & operator =(const basic_string_view<T, Traits> &s)
         {
@@ -298,13 +306,9 @@ namespace std {
         {
             return operator <(str.cbegin());
         }
-        T & operator [](size_t pos)
-        {
-            return (T &)array_base<T>::operator [](pos);
-        }
         const T & operator [](size_t pos) const
         {
-            return array_base<T>::operator [](pos);
+            return at(pos);
         }
     };
 

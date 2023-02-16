@@ -33,7 +33,7 @@ namespace std {
             }
             str++;
         }
-        return NULL;
+        return nullptr;
     }
 
     template <class T>
@@ -50,7 +50,7 @@ namespace std {
             }
             s1++;
         }
-        return NULL;
+        return nullptr;
     }
 
     template <class T>
@@ -90,31 +90,27 @@ namespace std {
         typedef const T &const_reference;
         typedef size_t size_type;
 
-        array_base<T>(const T *arr, size_t num, bool has_alloc = true)
-            : __length(num), __has_alloc(has_alloc)
+        array_base<T>(const T *arr, size_t num)
+            : __length(num)
         {
             if (__length > 0) {
-                if (__has_alloc) {
-                    __array = (T *)malloc(__length * sizeof(T));
-                    VSF_ASSERT(__array != nullptr);
-                    if (arr != nullptr) {
-                        __memcpy<T>(__array, arr, __length);
-                    }
-                } else {
-                    __array = (T *)arr;
+                __array = (T *)malloc(__length * sizeof(T));
+                VSF_ASSERT(__array != nullptr);
+                if (arr != nullptr) {
+                    __memcpy<T>(__array, arr, __length);
                 }
             } else {
                 __array = nullptr;
             }
         }
-        array_base<T>(size_t num, bool has_alloc = true)
-            : array_base<T>(nullptr, num, has_alloc) { }
-        array_base<T>(const array_base &arr, bool has_alloc = true)
-            : array_base<T>(arr.__array, arr.__length, has_alloc) { }
+        array_base<T>(size_t num)
+            : array_base<T>(nullptr, num) { }
+        array_base<T>(const array_base &arr)
+            : array_base<T>(arr.__array, arr.__length) { }
         ~array_base<T>()
         {
             __length = 0;
-            if (__has_alloc && (__array != nullptr)) {
+            if (__array != nullptr) {
                 free(__array);
                 __array = nullptr;
             }
@@ -139,7 +135,7 @@ namespace std {
         }
         size_t size() const
         {
-            return __length * sizeof(T);
+            return __length;
         }
         size_t length() const
         {
@@ -147,12 +143,10 @@ namespace std {
         }
         size_t capacity() const
         {
-            VSF_ASSERT(__has_alloc);
             return malloc_usable_size(__array);
         }
         void resize(size_t n)
         {
-            VSF_ASSERT(__has_alloc);
             if (__length != n) {
                 __array = (T *)realloc(__array, n * sizeof(T));
                 if (n > 0) {
@@ -163,14 +157,12 @@ namespace std {
         }
         void reserve(size_t n = 0)
         {
-            VSF_ASSERT(__has_alloc);
             if (capacity() < n) {
                 __array = realloc(n);
             }
         }
         array_base<T> & append(const T *arr, size_t num)
         {
-            VSF_ASSERT(__has_alloc);
             if (arr != nullptr && num != 0) {
                 __array = (T *)realloc(__array, (__length + num) * sizeof(T));
                 VSF_ASSERT(__array != nullptr);
@@ -187,17 +179,12 @@ namespace std {
         {
             if (this->__array == arr) { return (*this); }
 
-            if (__has_alloc) {
-                __array = (T *)realloc(__array, num * sizeof(T));
-                if (num > 0) {
-                    VSF_ASSERT(__array != nullptr);
-                }
-                __length = num;
-                __memcpy(__array, arr, __length);
-            } else {
-                __array = arr;
-                __length = num;
+            __array = (T *)realloc(__array, num * sizeof(T));
+            if (num > 0) {
+                VSF_ASSERT(__array != nullptr);
             }
+            __length = num;
+            __memcpy(__array, arr, __length);
             return (*this);
         }
         array_base<T> & assign(const array_base<T> &arr)
@@ -220,7 +207,6 @@ namespace std {
         }
         array_base<T> & replace(size_t pos, size_t len, const T *arr, size_t sublen)
         {
-            VSF_ASSERT(__has_alloc);
             if (sublen && !arr) {
                 assert(false);
             }
@@ -248,7 +234,6 @@ namespace std {
         }
         array_base<T> & replace(size_t pos, size_t len, size_t n, T t)
         {
-            VSF_ASSERT(__has_alloc);
             size_t newlen = __length + n - len;
             if (pos + len > __length) {
                 len = __length - pos;
@@ -299,11 +284,11 @@ namespace std {
         }
         iterator rbegin() const
         {
-            return __length > 0 ? &__array[__length - 1] : NULL;
+            return __length > 0 ? &__array[__length - 1] : nullptr;
         }
         iterator rend() const
         {
-            return __length > 0 ? &__array[-1] : NULL;
+            return __length > 0 ? &__array[-1] : nullptr;
         }
         const_iterator crbegin() const
         {
@@ -324,7 +309,6 @@ namespace std {
         }
 
     private:
-        bool __has_alloc;
         T * __array;
         size_t __length;
     };
@@ -455,7 +439,7 @@ namespace std {
         iterator end() const
         {
             iterator it = array_base<T>::end();
-            return it != NULL ? it - 1 : NULL;
+            return it != nullptr ? it - 1 : nullptr;
         }
         const_iterator cbegin() const
         {
@@ -468,7 +452,7 @@ namespace std {
         iterator rbegin() const
         {
             iterator it = array_base<T>::rbegin();
-            return it != NULL ? it - 1 : NULL;
+            return it != nullptr ? it - 1 : nullptr;
         }
         iterator rend() const
         {
