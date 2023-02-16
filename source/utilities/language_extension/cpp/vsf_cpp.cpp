@@ -34,6 +34,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_USE_LINUX != ENABLED && VSF_LINUX_USE_SIMPLE_LIBC != ENABLED
 void *operator new(size_t size)
 {
     return vsf_heap_malloc(size);
@@ -43,5 +44,6 @@ void operator delete(void *ptr)
 {
     vsf_heap_free(ptr);
 }
+#endif
 
 /* EOF */

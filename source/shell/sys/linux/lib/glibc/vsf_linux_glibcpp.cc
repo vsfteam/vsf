@@ -117,6 +117,17 @@ namespace std {
 }
 #endif
 
+namespace std {
+    float hypot(float x, float y, float z)
+    {
+        return sqrtf(x * x + y * y + z * z);
+    }
+    double hypot(double x, double y, double z)
+    {
+        return sqrt(x * x + y * y + z * z);
+    }
+}
+
 void *operator new(size_t size)
 {
     return malloc(size);

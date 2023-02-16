@@ -400,10 +400,6 @@ namespace std {
     using ::hypotl;
     using ::sqrtl;
 
-    float hypot(float x, float y, float z) {
-        return sqrtf(x * x + y * y + z * z);
-    }
-    double hypot(double x, double y, double z) {
-        return sqrt(x * x + y * y + z * z);
-    }
+    float hypot(float x, float y, float z);
+    double hypot(double x, double y, double z);
 }
