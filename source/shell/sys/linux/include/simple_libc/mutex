@@ -90,6 +90,71 @@ namespace std {
             return __device;
         }
     };
+
+    template <class Mutex>
+    class scoped_lock {
+    public:
+        typedef Mutex mutex_type;
+
+        scoped_lock() : __mutex(nullptr), __locked(false) { }
+        explicit scoped_lock(Mutex &m) : __mutex(&m), __locked(false)
+        {
+            __mutex->lock();
+            __locked = true;
+        }
+
+        ~scoped_lock()
+        {
+            if (__locked && (__mutex != nullptr)) {
+                __mutex->unlock();
+            }
+        }
+
+        void lock()
+        {
+            if ((nullptr == __mutex) || __locked) {
+                VSF_ASSERT(false);
+            }
+            __mutex->lock();
+            __locked = true;
+        }
+        bool try_lock()
+        {
+            if ((nullptr == __mutex) || __locked) {
+                VSF_ASSERT(false);
+            }
+            __locked = __mutex->try_lock();
+            return __locked;
+        }
+        void unlock()
+        {
+            if ((nullptr == __mutex) || !__locked) {
+                VSF_ASSERT(false);
+            }
+            __mutex->unlock();
+            __locked = false;
+        }
+        bool owns() const
+        {
+            return __locked && (__mutex != nullptr);
+        }
+
+        Mutex * mutex() const
+        {
+            return __mutex;
+        }
+        Mutex * release()
+        {
+            Mutex *res = __mutex;
+            __mutex = nullptr;
+            __locked = false;
+            return res;
+        }
+
+    private:
+        mutex_type *__mutex;
+        bool __locked;
+    };
 }
 
 #endif
