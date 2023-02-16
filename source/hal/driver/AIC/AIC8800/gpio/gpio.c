@@ -174,9 +174,9 @@ void vsf_hw_gpio_toggle(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask)
     vsf_hw_gpio_write(hw_gpio_ptr, pin_mask, ~hw_gpio_ptr->output_reg);
 }
 
-gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
+vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 {
-    gpio_capability_t gpio_capability = {
+    vsf_gpio_capability_t gpio_capability = {
         .is_async = hw_gpio_ptr->is_pmic,
         .is_support_output_and_set = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET,
         .is_support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR,

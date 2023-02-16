@@ -267,9 +267,9 @@ void vsf_hal_distbus_gpio_output_and_clear(vsf_hal_distbus_gpio_t *gpio, uint32_
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
-gpio_capability_t vsf_hal_distbus_gpio_capability(vsf_hal_distbus_gpio_t *gpio)
+vsf_gpio_capability_t vsf_hal_distbus_gpio_capability(vsf_hal_distbus_gpio_t *gpio)
 {
-    return (gpio_capability_t) {
+    return (vsf_gpio_capability_t) {
         .is_async                       = true,
         .is_support_config_pin          = gpio->info.support_config_pin,
         .is_support_output_and_set      = gpio->info.support_output_and_set,

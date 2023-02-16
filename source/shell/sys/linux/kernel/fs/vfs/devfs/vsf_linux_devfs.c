@@ -1223,7 +1223,7 @@ static void __vsf_linux_gpio_init(vsf_linux_fd_t *sfd)
         vk_file_close(tmp_file);
 
         vsf_linux_gpio_chip_t *gpio_chip = ((vk_vfs_file_t *)export_file)->f.param;
-        gpio_capability_t cap;
+        vsf_gpio_capability_t cap;
         for (uint8_t i = 0; i < gpio_chip->port_num; i++) {
             cap = vsf_gpio_capability(gpio_chip->ports[i]);
             if (pin < cap.pin_count) {

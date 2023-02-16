@@ -53,8 +53,8 @@ extern "C" {
  *    vsf_xxx_disable before re-initializing(by calling vsf_xxx_init).
  */
 
-typedef struct peripheral_status_t peripheral_status_t;
-struct peripheral_status_t {
+typedef struct vsf_peripheral_status_t vsf_peripheral_status_t;
+struct vsf_peripheral_status_t {
     uint32_t    is_busy                 : 1;
     uint32_t                            : 31;
 };
@@ -104,7 +104,7 @@ struct vsf_peripheral_capability_t {
 //! \name interface: i_peripheral_t
 //! @{
 def_interface(i_peripheral_t)
-    peripheral_status_t     (*Status)       (void);
+    vsf_peripheral_status_t (*Status)       (void);
     vsf_peripheral_capability_t (*Capability)   (void);
     fsm_rt_t                (*Uninit)       (void);
     union {

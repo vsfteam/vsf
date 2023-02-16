@@ -97,7 +97,7 @@ vsf_i2c_status_t vsf_gpio_i2c_status(vsf_gpio_i2c_t *gpio_i2c_ptr)
     VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
 
     vsf_i2c_status_t status = {
-        .use_as__peripheral_status_t.is_busy = gpio_i2c_ptr->is_busy,
+        .use_as__vsf_peripheral_status_t.is_busy = gpio_i2c_ptr->is_busy,
     };
 
     return status;
