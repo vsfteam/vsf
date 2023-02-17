@@ -23,6 +23,10 @@
     &&  VSF_LINUX_SOCKET_USE_INET == ENABLED                                    \
     && (defined(__WIN__) || defined(__LINUX__) || defined(__linux__) || defined(__MACOS__))
 
+#if defined(__LINUX__) || defined(__linux)
+#   define _LARGEFILE64_SOURCE
+#endif
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../include/sys/types.h"
 #else
@@ -35,6 +39,14 @@
 struct dirent {
     long d_ino;
     off_t d_off;
+    unsigned short d_reclen;
+    unsigned char d_type;
+    char *d_name;
+};
+
+struct dirent64 {
+    ino64_t d_ino;
+    off64_t d_off;
     unsigned short d_reclen;
     unsigned char d_type;
     char *d_name;
