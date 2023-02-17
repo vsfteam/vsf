@@ -27,10 +27,6 @@
 #   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY     DISABLED
 #endif
 
-#ifndef VSF_USART_CFG_IMP_FIFO_TO_REQUEST
-#   define VSF_USART_CFG_IMP_FIFO_TO_REQUEST            DISABLED
-#endif
-
 #define vsf_real_usart_t                    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)
 #define vsf_real_usart_init                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)
 #define vsf_real_usart_rxfifo_read          VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_read)
