@@ -50,13 +50,13 @@
 #   define __describe_mrequest_i2c_op()
 #endif
 
-#define __describe_mrequest_i2c(__name, __real_i2c)\
+#define __describe_mrequest_i2c(__name, __real_i2c)                             \
     vsf_mrequest_i2c_t __name = {                                               \
         __describe_mrequest_i2c_op()                                            \
         .i2c_ptr           = __real_i2c,                                        \
     };
 
-#define describe_mrequest_i2c(__name, __real_i2c)\
+#define describe_mrequest_i2c(__name, __real_i2c)                               \
             __describe_mrequest_i2c(__name, __real_i2c)
 
 /*============================ INCLUDES ======================================*/
