@@ -1138,7 +1138,7 @@ static int __vsf_linux_fb_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
-static void * __vsf_linux_fb_mmap(vsf_linux_fd_t *sfd, off_t offset, size_t len, uint_fast32_t feature)
+static void * __vsf_linux_fb_mmap(vsf_linux_fd_t *sfd, off64_t offset, size_t len, uint_fast32_t feature)
 {
     vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
     vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);

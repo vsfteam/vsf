@@ -134,7 +134,7 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd);
-static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off_t size);
+static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off64_t size);
 
 static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
@@ -310,7 +310,7 @@ static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd)
     return !(priv->file->size - vk_file_tell(priv->file));
 }
 
-static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off_t size)
+static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off64_t size)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *file = priv->file;
@@ -1737,6 +1737,33 @@ int truncate(const char *path, off_t length)
     return ret;
 }
 
+int ftruncate64(int fd, off64_t length)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    if (NULL == sfd->op->fn_setsize) {
+        return -ENOTSUP;
+    }
+
+    return sfd->op->fn_setsize(sfd, length);
+}
+
+int truncate64(const char *path, off64_t length)
+{
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)path)) {
+        return -1;
+    }
+
+    int fd = open(fullpath, O_WRONLY);
+    if (fd < 0) {
+        return -1;
+    }
+
+    int ret = ftruncate64(fd, length);
+    close(fd);
+    return ret;
+}
+
 int fstat(int fd, struct stat *buf)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
@@ -1897,6 +1924,32 @@ DIR * opendir(const char *name)
     return fdopendir(fd);
 }
 
+struct dirent64 * readdir64(DIR *dir)
+{
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)dir->priv;
+    vk_file_t *file = priv->file, *child;
+    off_t offset = vk_file_tell(file);
+
+    if (priv->child != NULL) {
+        vk_file_close(priv->child);
+        priv->child = NULL;
+    }
+
+    vk_file_open(file, NULL, &priv->child);
+    if (NULL == priv->child) {
+        return NULL;
+    }
+    priv->dir64.d_ino++;
+
+    child = priv->child;
+    priv->dir64.d_name = child->name;
+    priv->dir64.d_off = offset;
+    priv->dir64.d_reclen = sizeof(struct dirent);
+    priv->dir64.d_type = child->attr & VSF_FILE_ATTR_DIRECTORY ? DT_DIR :
+                child->attr & VSF_FILE_ATTR_EXECUTE ? DT_EXE : DT_REG;
+    return &priv->dir64;
+}
+
 struct dirent * readdir(DIR *dir)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)dir->priv;
@@ -1921,6 +1974,18 @@ struct dirent * readdir(DIR *dir)
     priv->dir.d_type = child->attr & VSF_FILE_ATTR_DIRECTORY ? DT_DIR :
                 child->attr & VSF_FILE_ATTR_EXECUTE ? DT_EXE : DT_REG;
     return &priv->dir;
+}
+
+int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int readdir64_r(DIR *dirp, struct dirent64 *entry, struct dirent64 **result)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 int scandir(const char *dir, struct dirent ***namelist,
@@ -2763,6 +2828,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt = {
     VSF_LINUX_APPLET_DIRENT_FUNC(opendir),
     VSF_LINUX_APPLET_DIRENT_FUNC(fdopendir),
     VSF_LINUX_APPLET_DIRENT_FUNC(readdir),
+    VSF_LINUX_APPLET_DIRENT_FUNC(readdir64),
+    VSF_LINUX_APPLET_DIRENT_FUNC(readdir_r),
+    VSF_LINUX_APPLET_DIRENT_FUNC(readdir64_r),
     VSF_LINUX_APPLET_DIRENT_FUNC(rewinddir),
     VSF_LINUX_APPLET_DIRENT_FUNC(telldir),
     VSF_LINUX_APPLET_DIRENT_FUNC(seekdir),

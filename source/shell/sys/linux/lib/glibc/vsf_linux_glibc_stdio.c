@@ -214,37 +214,15 @@ int fseek(FILE *f, long offset, int fromwhere)
     return fseeko(f, offset, fromwhere);
 }
 
-#if __IS_COMPILER_GCC__
-#   pragma GCC diagnostic push
-#   pragma GCC diagnostic ignored "-Wcast-align"
-#elif __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wcast-align"
-#endif
-
 off64_t ftello64(FILE *f)
 {
-    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
-    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
-    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    int fd = ((vsf_linux_fd_t *)f)->fd;
+    if (fd < 0) {
+        return -1;
+    }
 
-    return vk_file_tell(priv->file);
+    return lseek64(fd, 0, SEEK_CUR);
 }
-
-void rewind(FILE *f)
-{
-    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
-    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
-    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-
-    vk_file_seek(priv->file, 0, VSF_FILE_SEEK_SET);
-}
-
-#if __IS_COMPILER_GCC__
-#   pragma GCC diagnostic pop
-#elif __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
-#   pragma clang diagnostic pop
-#endif
 
 off_t ftello(FILE *f)
 {
@@ -256,17 +234,40 @@ long ftell(FILE *f)
     return (long)ftello(f);
 }
 
+void rewind(FILE *f)
+{
+    int fd = ((vsf_linux_fd_t *)f)->fd;
+    lseek(fd, 0, SEEK_SET);
+}
+
+int fgetpos64(FILE *f, fpos_t *pos)
+{
+    off64_t off64 = ftello64(f);
+    if (pos != NULL) {
+        *pos = off64;
+    }
+    return 0;
+}
+
+int fsetpos64(FILE *f, const fpos_t *pos)
+{
+    fseeko64(f, *pos, SEEK_SET);
+    return 0;
+}
+
 int fgetpos(FILE *f, fpos_t *pos)
 {
+    off_t off = ftell(f);
     if (pos != NULL) {
-        *pos = ftell(f);
+        *pos = off;
     }
     return 0;
 }
 
 int fsetpos(FILE *f, const fpos_t *pos)
 {
-    return fseek(f, *pos, SEEK_SET);
+    fseek(f, *pos, SEEK_SET);
+    return 0;
 }
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
@@ -858,6 +859,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt = {
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(rewind),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fgetpos),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fsetpos),
+    VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fgetpos64),
+    VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fsetpos64),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fread),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fwrite),
     VSF_LINUX_APPLET_LIBC_STDIO_FUNC(fflush),

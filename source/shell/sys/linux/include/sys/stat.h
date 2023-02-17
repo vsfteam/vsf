@@ -26,7 +26,6 @@ extern "C" {
 #define chmod                   VSF_LINUX_WRAPPER(chmod)
 #define fchmod                  VSF_LINUX_WRAPPER(fchmod)
 #endif
-#define lstat                   stat
 
 // TODO: assert extension attr is fit in vk_file_attr_t
 #define VSF_FILE_ATTR_BLK       (VSF_FILE_ATTR_USER << 0)
@@ -72,17 +71,40 @@ extern "C" {
 #define S_ISSOCK(__MODE)        (((__MODE) & S_IFMT) == S_IFSOCK)
 #define S_ISCHR(__MODE)         (((__MODE) & S_IFMT) == S_IFCHR)
 
+// struct stat is actually stat64
 struct stat {
     dev_t           st_dev;
     dev_t           st_rdev;
-    ino_t           st_ino;
+    ino64_t         st_ino;
     mode_t          st_mode;
     nlink_t         st_nlink;
     uid_t           st_uid;
     gid_t           st_gid;
-    off_t           st_size;
+    off64_t         st_size;
     blksiz_t        st_blksize;
-    blkcnt_t        st_blocks;
+    blkcnt64_t      st_blocks;
+    mode_t          st_attr;
+
+    struct timespec st_atim;
+    struct timespec st_mtim;
+    struct timespec st_ctim;
+#define st_atime    st_atim.tv_sec
+#define st_mtime    st_mtim.tv_sec
+#define st_ctime    st_ctim.tv_sec
+};
+
+struct stat64 {
+    dev_t           st_dev;
+    dev_t           st_rdev;
+    ino64_t         st_ino;
+    mode_t          st_mode;
+    nlink_t         st_nlink;
+    uid_t           st_uid;
+    gid_t           st_gid;
+    off64_t         st_size;
+    blksiz_t        st_blksize;
+    blkcnt64_t      st_blocks;
+    mode_t          st_attr;
 
     struct timespec st_atim;
     struct timespec st_mtim;
@@ -143,7 +165,23 @@ static inline int fchmod(int fd, mode_t mode) {
 
 mode_t umask(mode_t mask);
 int stat(const char *pathname, struct stat *buf);
+static inline int stat64(const char *pathname, struct stat64 *buf)
+{
+    return stat(pathname, (struct stat *)buf);
+}
+static inline int lstat(const char *pathname, struct stat *buf)
+{
+    return stat(pathname, buf);
+}
+static inline int lstat64(const char *pathname, struct stat64 *buf)
+{
+    return stat(pathname, (struct stat *)buf);
+}
 int fstat(int fd, struct stat *buf);
+static inline int fstat64(int fd, struct stat64 *buf)
+{
+    return fstat(fd, (struct stat *)buf);
+}
 int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
 int chmod(const char *pathname, mode_t mode);
 int fchmod(int fd, mode_t mode);

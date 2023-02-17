@@ -218,6 +218,8 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining);
 
 int timespec_get(struct timespec *ts, int base);
+void tzset(void);
+
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_TIME
 
 #ifdef __cplusplus

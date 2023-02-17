@@ -4,9 +4,11 @@
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
-#   include "../sys/types.h"
+#   include "./types.h"
+#   include "./time.h"
 #else
 #   include <sys/types.h>
+#   include <sys/time.h>
 #endif
 
 #ifdef __cplusplus
@@ -32,6 +34,21 @@ extern "C" {
 #define RLIM_NLIMITS        16
 
 #define RLIM_INFINITY       (~0UL)
+
+enum {
+    RUSAGE_SELF             = 0,
+    RUSAGE_CHILDREN,
+    RUSAGE_THREAD,
+};
+struct rusage {
+    struct timeval          ru_utime;
+    struct timeval          ru_stime;
+};
+
+static inline int getrusage(int who, struct rusage *usage)
+{
+    return 0;
+}
 
 typedef unsigned long       rlim_t;
 struct rlimit {

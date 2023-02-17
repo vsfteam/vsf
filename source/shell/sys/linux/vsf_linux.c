@@ -2034,7 +2034,7 @@ int sethostname(const char *name, size_t len)
 }
 
 // sys/mman.h
-void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
+void * mmap64(void *addr, size_t len, int prot, int flags, int fd, off64_t off)
 {
     if (fd >= 0) {
         vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
@@ -2050,6 +2050,11 @@ void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
     }
 
     return malloc(len);
+}
+
+void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
+{
+    return mmap64(addr, len, prot, flags, fd, (off64_t)off);
 }
 
 int msync(void *addr, size_t len, int flags)
@@ -2733,6 +2738,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_LINUX_APPLET_UNISTD_FUNC(getpagesize),
     VSF_LINUX_APPLET_UNISTD_FUNC(symlink),
     VSF_LINUX_APPLET_UNISTD_FUNC(ftruncate),
+    VSF_LINUX_APPLET_UNISTD_FUNC(truncate),
+    VSF_LINUX_APPLET_UNISTD_FUNC(ftruncate64),
+    VSF_LINUX_APPLET_UNISTD_FUNC(truncate64),
     VSF_LINUX_APPLET_UNISTD_FUNC(readlink),
     VSF_LINUX_APPLET_UNISTD_FUNC(tcgetpgrp),
     VSF_LINUX_APPLET_UNISTD_FUNC(tcsetpgrp),

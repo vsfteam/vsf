@@ -52,6 +52,8 @@ extern "C" {
 #define rewind              VSF_LINUX_LIBC_WRAPPER(rewind)
 #define fgetpos             VSF_LINUX_LIBC_WRAPPER(fgetpos)
 #define fsetpos             VSF_LINUX_LIBC_WRAPPER(fsetpos)
+#define fgetpos64           VSF_LINUX_LIBC_WRAPPER(fgetpos64)
+#define fsetpos64           VSF_LINUX_LIBC_WRAPPER(fsetpos64)
 #define fwrite              VSF_LINUX_LIBC_WRAPPER(fwrite)
 #define fread               VSF_LINUX_LIBC_WRAPPER(fread)
 #define fflush              VSF_LINUX_LIBC_WRAPPER(fflush)
@@ -94,6 +96,9 @@ extern "C" {
 
 #define fopen64             fopen
 
+typedef off64_t             fpos_t;
+typedef off64_t             fpos64_t;
+
 #ifdef __WIN__
 #   define sprintf_s        snprintf
 #   define _scprintf        printf
@@ -125,8 +130,6 @@ typedef int FILE;
 #   define PATH_MAX         255
 #endif
 #define EOF                 -1
-
-typedef intmax_t            fpos_t;
 
 #define _IOFBF              0x0000
 #define _IOLBF              0x0040
@@ -177,6 +180,8 @@ typedef struct vsf_linux_libc_stdio_vplt_t {
     void (*rewind)(FILE *f);
     int (*fgetpos)(FILE *f, fpos_t *pos);
     int (*fsetpos)(FILE *f, const fpos_t *pos);
+    int (*fgetpos64)(FILE *f, fpos64_t *pos);
+    int (*fsetpos64)(FILE *f, const fpos64_t *pos);
     size_t (*fread)(void *ptr, size_t size, size_t nmemb, FILE *f);
     size_t (*fwrite)(const void *ptr, size_t size, size_t nmemb, FILE *f);
     int (*fflush)(FILE *f);
@@ -368,6 +373,12 @@ static inline int fgetpos(FILE *f, fpos_t *pos) {
 static inline int fsetpos(FILE *f, const fpos_t *pos) {
     return VSF_LINUX_APPLET_LIBC_STDIO_VPLT->fsetpos(f, pos);
 }
+static inline int fgetpos64(FILE *f, fpos64_t *pos) {
+    return VSF_LINUX_APPLET_LIBC_STDIO_VPLT->fgetpos64(f, pos);
+}
+static inline int fsetpos64(FILE *f, const fpos64_t *pos) {
+    return VSF_LINUX_APPLET_LIBC_STDIO_VPLT->fsetpos64(f, pos);
+}
 static inline size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f) {
     return VSF_LINUX_APPLET_LIBC_STDIO_VPLT->fread(ptr, size, nmemb, f);
 }
@@ -498,11 +509,13 @@ long ftell(FILE *f);
 off_t ftello(FILE *f);
 off64_t ftello64(FILE *f);
 void rewind(FILE *f);
-int fgetpos(FILE *f, fpos_t *pos);
-int fsetpos(FILE *f, const fpos_t *pos);
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f);
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f);
 int fflush(FILE *f);
+int fgetpos(FILE *f, fpos_t *pos);
+int fsetpos(FILE *f, const fpos_t *pos);
+int fgetpos64(FILE *f, fpos_t *pos);
+int fsetpos64(FILE *f, const fpos_t *pos);
 
 FILE * popen(const char *command, const char *type);
 int pclose(FILE *stream);

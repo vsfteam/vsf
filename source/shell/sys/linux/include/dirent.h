@@ -17,6 +17,9 @@ extern "C" {
 #define opendir         VSF_LINUX_WRAPPER(opendir)
 #define fdopendir       VSF_LINUX_WRAPPER(fdopendir)
 #define readdir         VSF_LINUX_WRAPPER(readdir)
+#define readdir64       VSF_LINUX_WRAPPER(readdir64)
+#define readdir_r       VSF_LINUX_WRAPPER(readdir_r)
+#define readdir64_r     VSF_LINUX_WRAPPER(readdir64_r)
 #define rewinddir       VSF_LINUX_WRAPPER(rewinddir)
 #define telldir         VSF_LINUX_WRAPPER(telldir)
 #define seekdir         VSF_LINUX_WRAPPER(seekdir)
@@ -26,8 +29,15 @@ extern "C" {
 #endif
 
 struct dirent {
-    long d_ino;
+    ino_t d_ino;
     off_t d_off;
+    unsigned short d_reclen;
+    unsigned char d_type;
+    char *d_name;
+};
+struct dirent64 {
+    ino64_t d_ino;
+    off64_t d_off;
     unsigned short d_reclen;
     unsigned char d_type;
     char *d_name;
@@ -41,6 +51,9 @@ typedef struct vsf_linux_dirent_vplt_t {
     DIR * (*opendir)(const char *name);
     DIR * (*fdopendir)(int fd);
     struct dirent * (*readdir)(DIR *dir);
+    struct dirent64 * (*readdir64)(DIR *dir);
+    int (*readdir_r)(DIR *dirp, struct dirent *entry, struct dirent **result);
+    int (*readdir64_r)(DIR *dirp, struct dirent64 *entry, struct dirent64 **result);
     void (*rewinddir)(DIR *dir);
     long (*telldir)(DIR *dir);
     void (*seekdir)(DIR *dir, long loc);
@@ -77,6 +90,15 @@ static inline DIR * fdopendir(int fd) {
 static inline struct dirent * readdir(DIR *dir) {
     return VSF_LINUX_APPLET_DIRENT_VPLT->readdir(dir);
 }
+static inline struct dirent64 * readdir64(DIR *dir) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->readdir64(dir);
+}
+static inline int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->readdir_r(dirp, entry, result);
+}
+static inline int (*readdir64_r)(DIR *dirp, struct dirent64 *entry, struct dirent64 **result) {
+    return VSF_LINUX_APPLET_DIRENT_VPLT->readdir64_r(dirp, entry, result);
+}
 static inline void rewinddir(DIR *dir) {
     VSF_LINUX_APPLET_DIRENT_VPLT->rewinddir(dir);
 }
@@ -106,6 +128,9 @@ static inline int versionsort(const struct dirent **a, const struct dirent **b) 
 DIR * opendir(const char *name);
 DIR * fdopendir(int fd);
 struct dirent * readdir(DIR *dir);
+struct dirent64 * readdir64(DIR *dir);
+int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result);
+int readdir64_r(DIR *dirp, struct dirent64 *entry, struct dirent64 **result);
 void rewinddir(DIR *dir);
 long telldir(DIR *dir);
 void seekdir(DIR *dir, long loc);

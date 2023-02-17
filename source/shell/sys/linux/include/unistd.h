@@ -55,6 +55,9 @@ extern "C" {
 #define symlink             VSF_LINUX_WRAPPER(symlink)
 #define getpagesize         VSF_LINUX_WRAPPER(getpagesize)
 #define ftruncate           VSF_LINUX_WRAPPER(ftruncate)
+#define truncate            VSF_LINUX_WRAPPER(truncate)
+#define ftruncate64         VSF_LINUX_WRAPPER(ftruncate64)
+#define truncate64          VSF_LINUX_WRAPPER(truncate64)
 #define readlink            VSF_LINUX_WRAPPER(readlink)
 #define tcgetpgrp           VSF_LINUX_WRAPPER(tcgetpgrp)
 #define tcsetpgrp           VSF_LINUX_WRAPPER(tcsetpgrp)
@@ -92,6 +95,8 @@ extern "C" {
 #   define fdatasync        VSF_LINUX_WRAPPER(fdatasync)
 #endif
 #endif
+
+#define _POSIX_VERSION      200112L
 
 #define open64              open
 
@@ -210,6 +215,9 @@ typedef struct vsf_linux_unistd_vplt_t {
     size_t (*getpagesize)(void);
     int (*symlink)(const char *target, const char *linkpath);
     int (*ftruncate)(int fd, off_t length);
+    int (*truncate)(const char *pathname, off_t length);
+    int (*ftruncate64)(int fd, off64_t length);
+    int (*truncate64)(const char *pathname, off64_t length);
     ssize_t (*readlink)(const char *pathname, char *buf, size_t bufsiz);
     pid_t (*tcgetpgrp)(int fd);
     int (*tcsetpgrp)(int fd, pid_t pgrp);
@@ -419,6 +427,15 @@ static inline int symlink(const char *target, const char *linkpath) {
 static inline int ftruncate(int fd, off_t length) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->ftruncate(fd, length);
 }
+static inline int truncate(const char *pathname, off_t length) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->truncate(fd, length);
+}
+static inline int ftruncate64(int fd, off64_t length) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->ftruncate64(fd, length);
+}
+static inline int truncate64(const char *pathname, off64_t length) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->truncate64(fd, length);
+}
 static inline ssize_t readlink(const char *pathname, char *buf, size_t bufsiz) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->readlink(pathname, buf, bufsiz);
 }
@@ -526,7 +543,10 @@ int fdatasync(int fd);
 int isatty(int fd);
 size_t getpagesize(void);
 int symlink(const char *target, const char *linkpath);
+int truncate(const char *pathname, off_t length);
 int ftruncate(int fd, off_t length);
+int truncate64(const char *pathname, off64_t length);
+int ftruncate64(int fd, off64_t length);
 ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
 pid_t tcgetpgrp(int fd);
 int tcsetpgrp(int fd, pid_t pgrp);

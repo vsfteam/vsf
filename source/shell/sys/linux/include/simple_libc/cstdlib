@@ -30,4 +30,6 @@ namespace std {
 
     using ::srand;
     using ::rand;
+
+    using ::abort;
 }

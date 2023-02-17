@@ -1,1 +1,72 @@
 #include <wchar.h>
+
+namespace std {
+    using ::mbsinit;
+    using ::mbrlen;
+    using ::mbrtowc;
+    using ::mbsrtowcs;
+    using ::wcrtomb;
+    using ::wcsrtombs;
+    using ::wctob;
+
+    using ::btowc;
+
+    using ::ungetwc;
+    using ::putwchar;
+    using ::putwc;
+    using ::fputwc;
+    using ::getwchar;
+    using ::getwc;
+    using ::fgetwc;
+    using ::fgetws;
+    using ::fputws;
+    using ::fwide;
+
+    using ::wprintf;
+    using ::wscanf;
+    using ::vwprintf;
+    using ::vwscanf;
+    using ::fwscanf;
+    using ::fwprintf;
+    using ::vfwprintf;
+    using ::vfwscanf;
+
+    using ::swscanf;
+    using ::vswscanf;
+    using ::swprintf;
+    using ::vswprintf;
+
+    using ::wcslen;
+    using ::wcscat;
+    using ::wcsncat;
+    using ::wcschr;
+    using ::wcsrchr;
+    using ::wcscmp;
+    using ::wcsncmp;
+    using ::wcscoll;
+    using ::wcscpy;
+    using ::wcsncpy;
+    using ::wcsstr;
+    using ::wcstok;
+
+    using ::wmemset;
+    using ::wmemchr;
+    using ::wmemcmp;
+    using ::wmemcpy;
+    using ::wmemmove;
+
+    using ::wcstol;
+    using ::wcstof;
+    using ::wcstod;
+    using ::wcstold;
+    using ::wcstoll;
+    using ::wcstoull;
+    using ::wcstoul;
+
+    using ::wcspbrk;
+    using ::wcsspn;
+    using ::wcscspn;
+    using ::wcsxfrm;
+
+    using ::wcsftime;
+};

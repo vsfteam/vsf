@@ -60,23 +60,32 @@ enum memory_order {
     memory_order_seq_cst,
 };
 
+#define ATOMIC_VAR_INIT(__VALUE)            (__VALUE)
+
+#define atomic_init(object, value)                                              \
+            atomic_store_explicit(object, value, memory_order_relaxed)
+
+#define atomic_store_explicit(object, desired, order)                           \
+            ({                                                                  \
+                vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
+                    *(object) = desired;                                        \
+                vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
+            })
 #define atomic_store(object, desired)                                           \
-            ({                                                                  \
-                vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
-                    *(object) = desired;                                        \
-                vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
-            })
+            atomic_store_explicit(object, desired, memory_order_seq_cst)
 
+#define atomic_load_explicit(object, order)                                     \
+            ({                                                                  \
+                typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
+                vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
+                    VSF_MACRO_SAFE_NAME(tmp) = *(object);                       \
+                vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
+                VSF_MACRO_SAFE_NAME(tmp);                                       \
+            })
 #define atomic_load(object)                                                     \
-            ({                                                                  \
-                typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
-                vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
-                    VSF_MACRO_SAFE_NAME(tmp) = *(object);                       \
-                vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
-                VSF_MACRO_SAFE_NAME(tmp);                                       \
-            })
+            atomic_load_explicit(object, memory_order_seq_cst)
 
-#define atomic_exchange(object, desired)                                        \
+#define atomic_exchange_explicit(object, desired, order)                        \
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
@@ -85,8 +94,23 @@ enum memory_order {
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
+#define atomic_exchange(object, desired)                                        \
+            atomic_exchange_explicit(object, desired, memory_order_seq_cst)
 
+#define atomic_compare_exchange_strong_explicit(object, expected, desired, order_success, order_fail)\
+            ({                                                                  \
+                vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
+                    if (*(object) == *(expected)) {                             \
+                        *(object) = desired;                                    \
+                    } else {                                                    \
+                        *(expected) = *(object);                                \
+                    }                                                           \
+                vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
+            })
 #define atomic_compare_exchange_strong(object, expected, desired)               \
+            atomic_compare_exchange_strong_explicit(object, expected, desired, memory_order_seq_cst, memory_order_seq_cst)
+
+#define atomic_compare_exchange_weak_explicit(object, expected, desired, order_success, order_fail)\
             ({                                                                  \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
                     if (*(object) == *(expected)) {                             \
@@ -96,19 +120,10 @@ enum memory_order {
                     }                                                           \
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
             })
-
 #define atomic_compare_exchange_weak(object, expected, desired)                 \
-            ({                                                                  \
-                vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
-                    if (*(object) == *(expected)) {                             \
-                        *(object) = desired;                                    \
-                    } else {                                                    \
-                        *(expected) = *(object);                                \
-                    }                                                           \
-                vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
-            })
+            atomic_compare_exchange_weak_explicit(object, expected, desired, memory_order_seq_cst, memory_order_seq_cst)
 
-#define atomic_fetch_add(object, operand)                                       \
+#define atomic_fetch_add_explicit(object, operand, order)                       \
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(__tmp);                     \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
@@ -117,8 +132,10 @@ enum memory_order {
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(__tmp);                                     \
             })
+#define atomic_fetch_add(object, operand)                                       \
+            atomic_fetch_add_explicit(object, operand, memory_order_seq_cst)
 
-#define atomic_fetch_sub(object, operand)                                       \
+#define atomic_fetch_sub_explicit(object, operand, order)                       \
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
@@ -127,8 +144,10 @@ enum memory_order {
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
+#define atomic_fetch_sub(object, operand)                                       \
+            atomic_fetch_sub_explicit(object, operand, memory_order_seq_cst)
 
-#define atomic_fetch_or(object, operand)                                        \
+#define atomic_fetch_or_explicit(object, operand, order)                        \
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
@@ -137,8 +156,10 @@ enum memory_order {
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
+#define atomic_fetch_or(object, operand)                                        \
+            atomic_fetch_or_explicit(object, operand, memory_order_seq_cst)
 
-#define atomic_fetch_xor(object, operand)                                       \
+#define atomic_fetch_xor_explicit(object, operand, order)                       \
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
@@ -147,8 +168,10 @@ enum memory_order {
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
+#define atomic_fetch_xor(object, operand)                                       \
+            atomic_fetch_xor_explicit(object, operand, memory_order_seq_cst)
 
-#define atomic_fetch_and(object, operand)                                       \
+#define atomic_fetch_and_explicit(object, operand, order)                       \
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
@@ -157,6 +180,8 @@ enum memory_order {
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
+#define atomic_fetch_and(object, operand)                                       \
+            atomic_fetch_and_explicit(object, operand, memory_order_seq_cst)
 
 #ifdef __cplusplus
 }

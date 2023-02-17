@@ -78,6 +78,11 @@ time_t time(time_t *t)
     return tv.tv_sec;
 }
 
+void tzset(void)
+{
+    // TODO
+}
+
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
