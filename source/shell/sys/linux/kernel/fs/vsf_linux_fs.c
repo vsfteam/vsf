@@ -1292,6 +1292,15 @@ int dup2(int oldfd, int newfd)
     return fcntl(oldfd, F_DUPFD, newfd);
 }
 
+int dup3(int oldfd, int newfd, int flags)
+{
+    int res = dup2(oldfd, newfd);
+    if (0 == res) {
+        fcntl(newfd, F_SETFD, flags);
+    }
+    return res;
+}
+
 int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
 {
     VSF_LINUX_ASSERT(process != NULL);

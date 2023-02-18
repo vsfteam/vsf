@@ -47,6 +47,7 @@ extern "C" {
 #define realpath            VSF_LINUX_WRAPPER(realpath)
 #define sysconf             VSF_LINUX_WRAPPER(sysconf)
 #define pipe                VSF_LINUX_WRAPPER(pipe)
+#define pipe2               VSF_LINUX_WRAPPER(pipe2)
 #define alarm               VSF_LINUX_WRAPPER(alarm)
 #define ualarm              VSF_LINUX_WRAPPER(ualarm)
 #define fork                VSF_LINUX_WRAPPER(fork)
@@ -178,6 +179,7 @@ typedef struct vsf_linux_unistd_vplt_t {
     long (*sysconf)(int name);
     char * (*realpath)(const char *path, char *resolved_path);
     int (*pipe)(int pipefd[2]);
+    int (*pipe2)(int pipefd[2], int flags);
 
     int (*creat)(const char *pathname, mode_t mode);
     int (*__open_va)(const char *pathname, int flags, va_list ap);
@@ -193,6 +195,7 @@ typedef struct vsf_linux_unistd_vplt_t {
     int (*rmdir)(const char *pathname);
     int (*dup)(int oldfd);
     int (*dup2)(int oldfd, int newfd);
+    int (*dup3)(int oldfd, int newfd, int flags);
 
     int (*chroot)(const char *path);
     int (*chdir)(const char *pathname);
@@ -318,6 +321,9 @@ static inline char *realpath(const char *path, char *resolved_path) {
 static inline int pipe(int pipefd[2]) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->pipe(pipefd);
 }
+static inline int pipe2(int pipefd[2], int flags) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->pipe2(pipefd, flags);
+}
 
 static inline int creat(const char *pathname, mode_t mode) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->creat(pathname, mode);
@@ -366,6 +372,9 @@ static inline int dup(int oldfd) {
 }
 static inline int dup2(int oldfd, int newfd) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->dup2(oldfd, newfd);
+}
+static inline int dup3(int oldfd, int newfd, int flags) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->dup3(oldfd, newfd, flags);
 }
 
 static inline int chroot(const char *path) {
@@ -505,6 +514,7 @@ pid_t fork(void);
 long sysconf(int name);
 char *realpath(const char *path, char *resolved_path);
 int pipe(int pipefd[2]);
+int pipe2(int pipefd[2], int flags);
 
 int creat(const char *pathname, mode_t mode);
 int __open_va(const char *pathname, int flags, va_list ap);
@@ -521,6 +531,7 @@ int mkdirs(const char *pathname, mode_t mode);
 int rmdir(const char *pathname);
 int dup(int oldfd);
 int dup2(int oldfd, int newfd);
+int dup3(int oldfd, int newfd, int flags);
 
 int chroot(const char *path);
 int chdir(const char *pathname);

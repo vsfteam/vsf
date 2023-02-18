@@ -1502,6 +1502,22 @@ int pipe(int pipefd[2])
     return 0;
 }
 
+int pipe2(int pipefd[2], int flags)
+{
+    int res = pipe(pipefd);
+    if (0 == res) {
+        if (flags & O_CLOEXEC) {
+            fcntl(pipefd[0], F_SETFD, FD_CLOEXEC);
+            fcntl(pipefd[1], F_SETFD, FD_CLOEXEC);
+        }
+        if (flags & O_NONBLOCK) {
+            fcntl(pipefd[0], F_SETFD, O_NONBLOCK);
+            fcntl(pipefd[1], F_SETFD, O_NONBLOCK);
+        }
+    }
+    return res;
+}
+
 int kill(pid_t pid, int sig)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
@@ -2705,6 +2721,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_LINUX_APPLET_UNISTD_FUNC(sysconf),
     VSF_LINUX_APPLET_UNISTD_FUNC(realpath),
     VSF_LINUX_APPLET_UNISTD_FUNC(pipe),
+    VSF_LINUX_APPLET_UNISTD_FUNC(pipe2),
     VSF_LINUX_APPLET_UNISTD_FUNC(creat),
     VSF_LINUX_APPLET_UNISTD_FUNC(__open_va),
     VSF_LINUX_APPLET_UNISTD_FUNC(open),
@@ -2719,6 +2736,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_LINUX_APPLET_UNISTD_FUNC(rmdir),
     VSF_LINUX_APPLET_UNISTD_FUNC(dup),
     VSF_LINUX_APPLET_UNISTD_FUNC(dup2),
+    VSF_LINUX_APPLET_UNISTD_FUNC(dup3),
     VSF_LINUX_APPLET_UNISTD_FUNC(chroot),
     VSF_LINUX_APPLET_UNISTD_FUNC(chdir),
     VSF_LINUX_APPLET_UNISTD_FUNC(getcwd),
