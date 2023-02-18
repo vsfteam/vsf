@@ -1848,6 +1848,11 @@ int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags)
     return ret;
 }
 
+int futimens(int fd, const struct timespec times[2])
+{
+    return 0;
+}
+
 int chmod(const char *pathname, mode_t mode)
 {
     return 0;

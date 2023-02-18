@@ -34,6 +34,9 @@ extern "C" {
 #define VSF_FILE_ATTR_SOCK      (VSF_FILE_ATTR_USER << 3)
 #define VSF_FILE_ATTR_TTY       (VSF_FILE_ATTR_USER << 4)
 
+#define UTIME_NOW	            ((1l << 30) - 1l)
+#define UTIME_OMIT	            ((1l << 30) - 2l)
+
 #define S_IFDIR                 0040000
 #define S_IFREG                 0100000
 #define S_IFLNK                 0120000
@@ -183,6 +186,7 @@ static inline int fstat64(int fd, struct stat64 *buf)
     return fstat(fd, (struct stat *)buf);
 }
 int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
+int futimens(int fd, const struct timespec times[2]);
 int chmod(const char *pathname, mode_t mode);
 int fchmod(int fd, mode_t mode);
 
