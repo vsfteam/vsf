@@ -42,6 +42,7 @@ extern "C" {
 #define __VSF_MISEMPTY(...)                     ____VSF_MISEMPTY(, ##__VA_ARGS__, 0, 1)
 #define VSF_MISEMPTY(__X, ...)                  __VSF_MISEMPTY(__X)
 
+
 #define __VSF_MFOREACH(__MACRO, __MACRO_LAST, __X, ...)                          \
             VSF_MCAT2(__VSF_MFOREACH_, VSF_MISEMPTY(__VA_ARGS__))(__MACRO, __MACRO_LAST, __X, __VA_ARGS__)
 #define __VSF_MFOREACH_0(__MACRO, __MACRO_LAST, __X, ...)                        \
@@ -52,6 +53,18 @@ extern "C" {
 #define VSF_MFOREACH_EX(__MACRO, __MACRO_LAST, ...)                             \
             __VSF_MEXPAND(__VSF_MFOREACH(__MACRO, __MACRO_LAST, __VA_ARGS__))
 #define VSF_MFOREACH(__MACRO, ...)              VSF_MFOREACH_EX(__MACRO, __MACRO, __VA_ARGS__)
+
+
+#define __VSF_MFOREACH_ARG1(__MACRO, __MACRO_LAST, __ARG0, __X, ...)            \
+            VSF_MCAT2(__VSF_MFOREACH_ARG1_, VSF_MISEMPTY(__VA_ARGS__))(__MACRO, __MACRO_LAST, __ARG0, __X, __VA_ARGS__)
+#define __VSF_MFOREACH_ARG1_0(__MACRO, __MACRO_LAST, __ARG0, __X, ...)          \
+            __MACRO(__ARG0, __X) __VSF_MOBSTRUCT(__VSF_MFOREACH_ARG0_I)()(__MACRO, __MACRO_LAST, __ARG0, __VA_ARGS__)
+#define __VSF_MFOREACH_ARG1_1(__MACRO, __MACRO_LAST, __ARG0, __X, ...)          \
+            __MACRO_LAST(__ARG0, __X)
+#define __VSF_MFOREACH_ARG1_I()                 __VSF_MFOREACH_ARG1
+#define VSF_MFOREACH_ARG1_EX(__MACRO, __MACRO_LAST, __ARG0, ...)                \
+            __VSF_MEXPAND(__VSF_MFOREACH_ARG1(__MACRO, __MACRO_LAST, __ARG0, __VA_ARGS__))
+#define VSF_MFOREACH_ARG1(__MACRO, __ARG0, ...) VSF_MFOREACH_ARG1_EX(__MACRO, __MACRO, __ARG0, __VA_ARGS__)
 
 
 
