@@ -73,6 +73,7 @@ extern "C" {
 #define S_ISFIFO(__MODE)        (((__MODE) & S_IFMT) == S_IFIFO)
 #define S_ISSOCK(__MODE)        (((__MODE) & S_IFMT) == S_IFSOCK)
 #define S_ISCHR(__MODE)         (((__MODE) & S_IFMT) == S_IFCHR)
+#define S_ISBLK(__MODE)         (((__MODE) & S_IFMT) == S_IFBLK)
 
 // struct stat is actually stat64
 struct stat {
