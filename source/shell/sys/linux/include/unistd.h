@@ -36,8 +36,15 @@ extern "C" {
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define usleep              VSF_LINUX_WRAPPER(usleep)
 #define sleep               VSF_LINUX_WRAPPER(sleep)
+
+#define getgid              VSF_LINUX_WRAPPER(getgid)
+#define getegid             VSF_LINUX_WRAPPER(getegid)
+#define getuid              VSF_LINUX_WRAPPER(getuid)
+#define geteuid             VSF_LINUX_WRAPPER(geteuid)
 #define getpid              VSF_LINUX_WRAPPER(getpid)
 #define getppid             VSF_LINUX_WRAPPER(getppid)
+#define gettid              VSF_LINUX_WRAPPER(gettid)
+
 #define execl               VSF_LINUX_WRAPPER(execl)
 #define execlp              VSF_LINUX_WRAPPER(execlp)
 #define execv               VSF_LINUX_WRAPPER(execv)
@@ -119,18 +126,6 @@ enum {
     DT_EXE,
 };
 
-#define setgid(__uid)               (0)
-#define getgid()                    ((gid_t)0)
-#define getegid()                   ((gid_t)0)
-#define initgroups(__user, __gid)   (0)
-#define getpgid(__pid)              (__pid)
-#define getpgrp()                   ((pid_t)0)
-#define setpgrp()                   (0)
-#define getuid()                    ((uid_t)0)
-#define setuid(__uid)               (0)
-#define geteuid()                   ((uid_t)0)
-#define setsid()                    ((pid_t)0)
-
 enum {
     _SC_PAGESIZE,
     _SC_OPEN_MAX,
@@ -163,8 +158,13 @@ typedef struct vsf_linux_unistd_vplt_t {
     unsigned int (*alarm)(unsigned int seconds);
     useconds_t (*ualarm)(useconds_t usecs, useconds_t interval);
 
+    git_t (*getgid)(void);
+    git_t (*getegid)(void);
+    uit_t (*getuid)(void);
+    uit_t (*geteuid)(void);
     pid_t (*getpid)(void);
     pid_t (*getppid)(void);
+    pid_t (*gettid)(void);
 
     int (*__execl_va)(const char *pathname, const char *arg, va_list ap);
     int (*execl)(const char *pathname, const char *arg, ...);
@@ -271,11 +271,26 @@ static inline useconds_t ualarm(useconds_t usecs, useconds_t interval) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->ualarm(usecs, interval);
 }
 
+static inline uid_t getuid(void) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->getuid();
+}
+static inline uid_t geteuid(void) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->geteuid();
+}
+static inline gid_t getgid(void) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->getgid();
+}
+static inline gid_t getegid(void) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->getegid();
+}
 static inline pid_t getpid(void) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->getpid();
 }
 static inline pid_t getppid(void) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->getppid();
+}
+static inline pid_t gettid(void) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->gettid();
 }
 
 static inline int execl(const char *pathname, const char *arg, ...) {
@@ -493,6 +508,13 @@ unsigned sleep(unsigned seconds);
 unsigned int alarm(unsigned int seconds);
 useconds_t ualarm(useconds_t usecs, useconds_t interval);
 
+gid_t getgid(void);
+gid_t getegid(void);
+uid_t getuid(void);
+uid_t geteuid(void);
+
+pid_t gettid(void);
+#define SYS_gettid              gettid
 pid_t getpid(void);
 pid_t getppid(void);
 

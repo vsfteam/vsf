@@ -170,7 +170,7 @@ vsf_class(vsf_linux_thread_t) {
     protected_member(
         pid_t pid_exited;     // used in wait
         int retval;
-        int tid;
+        pid_t tid;
         vsf_linux_thread_t *thread_pending;
 #if VSF_LINUX_CFG_TLS_NUM > 0
         vsf_linux_localstorage_t tls[VSF_LINUX_CFG_TLS_NUM];

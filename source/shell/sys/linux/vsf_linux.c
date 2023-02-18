@@ -1720,6 +1720,24 @@ int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options)
     }
 }
 
+gid_t getgid(void)
+{
+    return (gid_t)0;
+}
+gid_t getegid(void)
+{
+    return (gid_t)0;
+}
+
+uid_t getuid(void)
+{
+    return (uid_t)0;
+}
+uid_t geteuid(void)
+{
+    return (uid_t)0;
+}
+
 pid_t getpid(void)
 {
     return vsf_linux_get_cur_process()->id.pid;
@@ -1728,6 +1746,11 @@ pid_t getpid(void)
 pid_t getppid(void)
 {
     return vsf_linux_get_cur_process()->id.ppid;
+}
+
+pid_t gettid(void)
+{
+    return vsf_linux_get_cur_thread()->tid;
 }
 
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
@@ -2707,8 +2730,13 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_LINUX_APPLET_UNISTD_FUNC(sleep),
     VSF_LINUX_APPLET_UNISTD_FUNC(alarm),
     VSF_LINUX_APPLET_UNISTD_FUNC(ualarm),
+    VSF_LINUX_APPLET_UNISTD_FUNC(getgid),
+    VSF_LINUX_APPLET_UNISTD_FUNC(getegid),
+    VSF_LINUX_APPLET_UNISTD_FUNC(getuid),
+    VSF_LINUX_APPLET_UNISTD_FUNC(geteuid),
     VSF_LINUX_APPLET_UNISTD_FUNC(getpid),
     VSF_LINUX_APPLET_UNISTD_FUNC(getppid),
+    VSF_LINUX_APPLET_UNISTD_FUNC(gettid),
     VSF_LINUX_APPLET_UNISTD_FUNC(__execl_va),
     VSF_LINUX_APPLET_UNISTD_FUNC(execl),
     VSF_LINUX_APPLET_UNISTD_FUNC(__execlp_va),
