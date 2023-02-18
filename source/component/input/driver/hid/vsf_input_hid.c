@@ -250,9 +250,9 @@ static vsf_err_t __vk_hid_parse_item(vk_input_hid_t *dev,
     if (size == 1) {
         value = *buf;
     } else if (size == 2) {
-        value = *(uint16_t *)buf;
+        value = get_unaligned_le16(buf);
     } else if (size == 4) {
-        value = *(uint32_t *)buf;
+        value = get_unaligned_le32(buf);
     }
 
     switch (tag) {

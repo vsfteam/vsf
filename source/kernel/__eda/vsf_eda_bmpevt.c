@@ -76,6 +76,9 @@ static void __vsf_eda_bmpevt_adapter_sync_evthander(vsf_eda_t *eda, vsf_evt_t ev
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
 SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_init")
@@ -151,6 +154,8 @@ static vsf_err_t __vsf_eda_bmpevt_adapter_bmpevt_reset(vsf_bmpevt_adapter_t *thi
 }
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
 #endif
 
 SECTION(".data.vsf.kernel.vsf_eda_bmpevt_adapter_bmpevt_op")
