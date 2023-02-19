@@ -1,6 +1,8 @@
 #ifndef __SIMPLE_LIBC_WCHAR_H__
 #define __SIMPLE_LIBC_WCHAR_H__
 
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./stdio.h"
 #   include "./time.h"

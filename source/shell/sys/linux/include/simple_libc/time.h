@@ -219,6 +219,9 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
 
 int timespec_get(struct timespec *ts, int base);
 void tzset(void);
+extern char *taname[2];
+extern long timezong;
+extern int daylight;
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_TIME
 

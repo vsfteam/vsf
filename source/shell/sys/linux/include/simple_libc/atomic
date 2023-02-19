@@ -124,8 +124,8 @@ namespace std {
         T __fetch_and(T val, memory_order sync = memory_order_seq_cst) noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
-                tmp = __base;
-                __base &= val;
+                tmp = atomic_base<T>::__base;
+                atomic_base<T>::__base &= val;
             vsf_unprotect_int(orig);
             return tmp;
         }
