@@ -28,11 +28,11 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#define __when(__cond)                          (__cond)
-#define when(__cond)                            __when(__cond)
+#define __vsf_when(__cond)                      (__cond)
+#define vsf_when(__cond)                        __vsf_when(__cond)
 #else
-#define __when(...)                             (__VA_ARGS__)
-#define when(...)                               __when(__VA_ARGS__)
+#define __vsf_when(...)                         (__VA_ARGS__)
+#define vsf_when(...)                           __vsf_when(__VA_ARGS__)
 #endif
 
 #define __vsf_list_tmp_name(__head)             VSF_MCONNECT2(__head, __LINE__)
