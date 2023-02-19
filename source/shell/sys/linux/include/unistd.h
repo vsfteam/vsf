@@ -132,6 +132,7 @@ enum {
     _SC_CLK_TCK,
     _SC_GETGR_R_SIZE_MAX,
     _SC_SYMLOOP_MAX,
+    _SC_NPROCESSORS_ONLN,
 
     _SC_PAGE_SIZE = _SC_PAGESIZE,
 };

@@ -30,10 +30,13 @@ extern "C" {
 #define pthread_cancel                  VSF_LINUX_WRAPPER(pthread_cancel)
 #define pthread_kill                    VSF_LINUX_WRAPPER(pthread_kill)
 #define pthread_once                    VSF_LINUX_WRAPPER(pthread_once)
+#define pthread_testcancel              VSF_LINUX_WRAPPER(pthread_testcancel)
 #define pthread_setcancelstate          VSF_LINUX_WRAPPER(pthread_setcancelstate)
 #define pthread_setcanceltype           VSF_LINUX_WRAPPER(pthread_setcanceltype)
 #define pthread_setschedparam           VSF_LINUX_WRAPPER(pthread_setschedparam)
 #define pthread_getschedparam           VSF_LINUX_WRAPPER(pthread_getschedparam)
+#define pthread_cleanup_push            VSF_LINUX_WRAPPER(pthread_cleanup_push)
+#define pthread_cleanup_pop             VSF_LINUX_WRAPPER(pthread_cleanup_pop)
 #define pthread_attr_init               VSF_LINUX_WRAPPER(pthread_attr_init)
 #define pthread_attr_destroy            VSF_LINUX_WRAPPER(pthread_attr_destroy)
 #define pthread_attr_setstack           VSF_LINUX_WRAPPER(pthread_attr_setstack)
@@ -181,8 +184,8 @@ typedef struct pthread_once_t {
                                         }
 #else
 #define PTHREAD_ONCE_INIT               (pthread_once_t) {                      \
-                                            .mutex.max_union.max_value = 1 | VSF_SYNC_AUTO_RST,\
-                                            .mutex.cur_union.cur_value = 1 | VSF_SYNC_HAS_OWNER,\
+                                            .mutex.use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 | VSF_SYNC_AUTO_RST,\
+                                            .mutex.use_as__vsf_mutex_t.use_as__vsf_sync_t.cur_union.cur_value = 1 | VSF_SYNC_HAS_OWNER,\
                                             .is_inited = false,                 \
                                         }
 #endif
@@ -265,10 +268,13 @@ typedef struct vsf_linux_pthread_vplt_t {
     int (*pthread_cancel)(pthread_t thread);
     int (*pthread_kill)(pthread_t thread, int sig);
     int (*pthread_once)(pthread_once_t *once_control, void (*init_routine)(void));
+    void (*pthread_testcancel)(void);
     int (*pthread_setcancelstate)(int state, int *oldstate);
     int (*pthread_setcanceltype)(int type, int *oldtype);
     int (*pthread_setschedparam)(pthread_t thread, int policy, const struct sched_param *param);
     int (*pthread_getschedparam)(pthread_t thread, int *policy, struct sched_param *param);
+    void (*pthread_cleanup_push)(void (*routine)(void *), void *arg);
+    void (*pthread_cleanup_pop)(int execute);
 
     int (*pthread_attr_init)(pthread_attr_t *attr);
     int (*pthread_attr_destroy)(pthread_attr_t *attr);
@@ -451,6 +457,9 @@ static inline int pthread_kill(pthread_t thread, int sig) {
 static inline int pthread_once(pthread_once_t *once_control, void (*init_routine)(void)) {
     return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_once(once_control, init_routine);
 }
+static inline void pthread_testcancel(void) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_testcancel();
+}
 static inline int pthread_setcancelstate(int state, int *oldstate) {
     return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_setcancelstate(state, oldstate);
 }
@@ -462,6 +471,12 @@ static inline int pthread_setschedparam(pthread_t thread, int policy, const stru
 }
 static inline int pthread_getschedparam(pthread_t thread, int *policy, struct sched_param *param) {
     return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_getschedparam(thread, policy, param);
+}
+static inline void pthread_cleanup_push(void (*routine)(void *), void *arg) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cleanup_push(rountine, arg);
+}
+static inline void pthread_cleanup_pop(int execute) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cleanup_pop(execute);
 }
 
 static inline int pthread_attr_init(pthread_attr_t *attr) {
@@ -580,10 +595,13 @@ void pthread_exit(void *retval);
 int pthread_cancel(pthread_t thread);
 int pthread_kill(pthread_t thread, int sig);
 int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
+void pthread_testcancel(void);
 int pthread_setcancelstate(int state, int *oldstate);
 int pthread_setcanceltype(int type, int *oldtype);
 int pthread_setschedparam(pthread_t thread, int policy, const struct sched_param *param);
 int pthread_getschedparam(pthread_t thread, int *policy, struct sched_param *param);
+void pthread_cleanup_push(void (*routine)(void *), void *arg);
+void pthread_cleanup_pop(int execute);
 
 int pthread_attr_init(pthread_attr_t *attr);
 int pthread_attr_destroy(pthread_attr_t *attr);

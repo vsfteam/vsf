@@ -218,6 +218,16 @@ int pthread_getschedparam(pthread_t thread, int *policy, struct sched_param *par
     return -1;
 }
 
+void pthread_cleanup_push(void (*routine)(void *), void *arg)
+{
+    VSF_LINUX_ASSERT(false);
+}
+
+void pthread_cleanup_pop(int execute)
+{
+    VSF_LINUX_ASSERT(false);
+}
+
 int pthread_attr_init(pthread_attr_t *attr)
 {
     if (attr != NULL) {
@@ -682,6 +692,12 @@ int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset)
     return 0;
 }
 
+void pthread_testcancel(void)
+{
+    // TODO:
+    VSF_LINUX_ASSERT(false);
+}
+
 int pthread_setcancelstate(int state, int *oldstate)
 {
     return 0;
@@ -912,12 +928,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt = {
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_detach),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_exit),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_cancel),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_testcancel),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_kill),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_once),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_setcancelstate),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_setcanceltype),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_setschedparam),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_getschedparam),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_cleanup_push),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_cleanup_pop),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_attr_init),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_attr_destroy),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_attr_setstack),
