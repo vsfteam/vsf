@@ -26,6 +26,8 @@ extern "C" {
 #define sem_getvalue        VSF_LINUX_WRAPPER(sem_getvalue)
 #endif
 
+#define SEM_FAILED          ((sem_t *)NULL)
+
 typedef vsf_sem_t sem_t;
 
 #if VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED
@@ -90,6 +92,10 @@ int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);
 #endif
 int sem_post(sem_t *sem);
 int sem_getvalue(sem_t *sem, int *value);
+
+sem_t * sem_open(const char *name, int oflag, mode_t mode, unsigned int value);
+int sem_close(sem_t *sem);
+int sem_unlink(const char *name);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SEMAPHORE
 

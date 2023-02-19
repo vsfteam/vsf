@@ -3,6 +3,12 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../sys/types.h"
+#else
+#   include <sys/types.h>
+#endif
+
 // for VSF_FILE_ATTR_XXXX
 #include "component/fs/vsf_fs_cfg.h"
 
@@ -59,6 +65,9 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_mmap_vplt_t vsf_linux_sys_mmap_vplt;
 #endif
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_MMAP
+
+int shm_open(const char *name, int oflag, mode_t mode);
+int shm_unlink(const char *name);
 
 void * mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off);
 void * mmap64(void *addr, size_t len, int prot, int flags, int fildes, off64_t off);

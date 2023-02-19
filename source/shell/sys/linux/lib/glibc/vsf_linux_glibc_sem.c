@@ -116,6 +116,24 @@ int sem_getvalue(sem_t *sem, int *value)
     return 0;
 }
 
+sem_t * sem_open(const char *name, int oflag, mode_t mode, unsigned int value)
+{
+    VSF_LINUX_ASSERT(false);
+    return SEM_FAILED;
+}
+
+int sem_unlink(const char *name)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int sem_close(sem_t *sem)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout)
 {
