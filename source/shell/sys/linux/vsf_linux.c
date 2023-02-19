@@ -1458,6 +1458,28 @@ long sysconf(int name)
     return 0;
 }
 
+long fpathconf(int fd, int name)
+{
+    switch (name) {
+    case _PC_NAME_MAX:      return MAX_PATH;
+    default:                return -1;
+    }
+}
+
+long pathconf(const char *path, int name)
+{
+    if ((NULL == path) || ('\0' == *path)) {
+        return -1;
+    }
+
+    int fd = open(path, 0);
+    if (fd < 0) { return -1; }
+
+    long res = fpathconf(fd, name);
+    close(fd);
+    return res;
+}
+
 char *realpath(const char *path, char *resolved_path)
 {
     bool is_allocated = false;
@@ -2747,6 +2769,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_LINUX_APPLET_UNISTD_FUNC(execvpe),
     VSF_LINUX_APPLET_UNISTD_FUNC(daemon),
     VSF_LINUX_APPLET_UNISTD_FUNC(sysconf),
+    VSF_LINUX_APPLET_UNISTD_FUNC(pathconf),
+    VSF_LINUX_APPLET_UNISTD_FUNC(fpathconf),
     VSF_LINUX_APPLET_UNISTD_FUNC(realpath),
     VSF_LINUX_APPLET_UNISTD_FUNC(pipe),
     VSF_LINUX_APPLET_UNISTD_FUNC(pipe2),

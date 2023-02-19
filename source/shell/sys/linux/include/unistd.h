@@ -53,6 +53,8 @@ extern "C" {
 #define execvpe             VSF_LINUX_WRAPPER(execvpe)
 #define realpath            VSF_LINUX_WRAPPER(realpath)
 #define sysconf             VSF_LINUX_WRAPPER(sysconf)
+#define pathconf            VSF_LINUX_WRAPPER(pathconf)
+#define fpathconf           VSF_LINUX_WRAPPER(fpathconf)
 #define pipe                VSF_LINUX_WRAPPER(pipe)
 #define pipe2               VSF_LINUX_WRAPPER(pipe2)
 #define alarm               VSF_LINUX_WRAPPER(alarm)
@@ -137,6 +139,14 @@ enum {
     _SC_PAGE_SIZE = _SC_PAGESIZE,
 };
 
+enum {
+    _PC_LINK_MAX,
+    _PC_MAX_CANON,
+    _PC_MAX_INPUT,
+    _PC_NAME_MAX,
+    _PC_PATH_MAX,
+};
+
 // workaround while using lwip, which will check iovec MACRO and define iovec if not defined
 #define iovec iovec
 struct iovec {
@@ -179,6 +189,8 @@ typedef struct vsf_linux_unistd_vplt_t {
     int (*daemon)(int nochdir, int noclose);
 
     long (*sysconf)(int name);
+    long (*pathconf)(const char *path, int name);
+    long (*fpathconf)(int fd, int name);
     char * (*realpath)(const char *path, char *resolved_path);
     int (*pipe)(int pipefd[2]);
     int (*pipe2)(int pipefd[2], int flags);
@@ -331,6 +343,12 @@ static inline int daemon(int nochdir, int noclose) {
 
 static inline long sysconf(int name) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->sysconf(name);
+}
+static inline long pathconf(const char *path, int name) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->pathconf(path, name);
+}
+static inline long fpathconf(int fd, int name) {
+    return VSF_LINUX_APPLET_UNISTD_VPLT->fpathconf(fd, name);
 }
 static inline char *realpath(const char *path, char *resolved_path) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->realpath(path, resolved_path);
@@ -536,6 +554,8 @@ int daemon(int nochdir, int noclose);
 
 pid_t fork(void);
 long sysconf(int name);
+long pathconf(const char *path, int name);
+long fpathconf(int fd, int name);
 char *realpath(const char *path, char *resolved_path);
 int pipe(int pipefd[2]);
 int pipe2(int pipefd[2], int flags);
