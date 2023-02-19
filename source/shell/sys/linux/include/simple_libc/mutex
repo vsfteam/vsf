@@ -4,6 +4,10 @@
 #include <pthread.h>
 
 namespace std {
+    struct defer_lock_t {};
+    struct try_to_lock_t {};
+    struct adopt_lock_t {};
+
     class mutex {
     public:
         typedef pthread_mutex_t * native_handle_type;
@@ -57,7 +61,9 @@ namespace std {
             lock();
             __owns = true;
         }
-        unique_lock(const unique_lock &) = delete;
+        unique_lock(Mutex &m, defer_lock_t) noexcept : __device(std::addressof(m)), __owns(false) { }
+        unique_lock(Mutex &m, try_to_lock_t) : __device(std::addressof(m)), __owns(__device->try_lock()) { }
+        unique_lock(Mutex &m, adopt_lock_t) noexcept : __device(std::addressof(m)), __owns(true) { }
 
         ~unique_lock() {
             if (__owns) {
@@ -65,7 +71,9 @@ namespace std {
             }
         }
 
-        unique_lock & operator=(const unique_lock &) = delete;
+        // some applications like QT will need methods below
+//        unique_lock(const unique_lock &) = delete;
+//        unique_lock & operator=(const unique_lock &) = delete;
 
         void lock() {
             __device->lock();
