@@ -63,6 +63,10 @@ typedef unsigned int        blksiz_t;
 typedef unsigned long       blkcnt_t;
 typedef unsigned long long  blkcnt64_t;
 typedef void *              timer_t;
+typedef blkcnt_t            fsblkcnt_t;
+typedef blkcnt64_t          fsblkcnt64_t;
+typedef unsigned long       fsfilcnt_t;
+typedef unsigned long long  fsfilcnt64_t;
 
 typedef char *              caddr_t;
 
