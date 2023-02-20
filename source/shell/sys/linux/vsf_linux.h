@@ -407,7 +407,7 @@ extern vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process
 extern int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority);
 
 extern void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread);
-extern vsf_linux_thread_t * vsf_linux_get_thread(int tid);
+extern vsf_linux_thread_t * vsf_linux_get_thread(pid_t pid, int tid);
 extern vsf_linux_process_t * vsf_linux_get_process(pid_t pid);
 
 extern void __vsf_linux_process_free_arg(vsf_linux_process_t *process);

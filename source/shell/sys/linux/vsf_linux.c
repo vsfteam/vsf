@@ -1057,9 +1057,9 @@ vsf_linux_process_t * vsf_linux_get_process(pid_t pid)
     return NULL;
 }
 
-vsf_linux_thread_t * vsf_linux_get_thread(int tid)
+vsf_linux_thread_t * vsf_linux_get_thread(pid_t pid, int tid)
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    vsf_linux_process_t *process = pid < 0 ? vsf_linux_get_cur_process() : vsf_linux_get_process(pid);
     vsf_protect_t orig = vsf_protect_sched();
     __vsf_dlist_foreach_unsafe(vsf_linux_thread_t, thread_node, &process->thread_list) {
         if (_->tid == tid) {
@@ -1280,7 +1280,7 @@ void vsf_linux_detach_thread(vsf_linux_thread_t *thread)
 int vsf_linux_wait_thread(int tid, int *retval)
 {
     vsf_protect_t orig = vsf_protect_sched();
-    vsf_linux_thread_t *thread = vsf_linux_get_thread(tid);
+    vsf_linux_thread_t *thread = vsf_linux_get_thread(-1, tid);
     if (NULL == thread) {
         vsf_unprotect_sched(orig);
         return -1;
@@ -2050,6 +2050,40 @@ int sched_get_priority_max(int policy)
 int sched_get_priority_min(int policy)
 {
     return VSF_LINUX_CFG_PRIO_LOWEST;
+}
+
+int sched_getparam(pid_t pid, struct sched_param *param)
+{
+    vsf_linux_process_t *process = vsf_linux_get_process(pid);
+    if (NULL == process) { return -1; }
+
+    vsf_linux_thread_t *thread;
+    vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
+    if (NULL == thread) { return -1; }
+
+    param->sched_priority = __vsf_eda_get_cur_priority(&thread->use_as__vsf_eda_t);
+    return 0;
+}
+
+int sched_setparam(pid_t pid, const struct sched_param *param)
+{
+    vsf_linux_process_t *process = vsf_linux_get_process(pid);
+    if (NULL == process) { return -1; }
+
+    __vsf_dlist_foreach_unsafe(vsf_linux_thread_t, thread_node, &process->thread_list) {
+        __vsf_eda_set_priority(&_->use_as__vsf_eda_t, param->sched_priority);
+    }
+    return 0;
+}
+
+int sched_getscheduler(pid_t pid)
+{
+    return 0;
+}
+
+int sched_setscheduler(pid_t pid, int policy, const struct sched_param *param)
+{
+    return sched_setparam(pid, param);
 }
 
 int sched_yield(void)

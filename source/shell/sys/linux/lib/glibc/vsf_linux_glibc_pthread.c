@@ -102,7 +102,7 @@ static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
 
 int pthread_detach(pthread_t tid)
 {
-    vsf_linux_thread_t *thread = vsf_linux_get_thread(tid);
+    vsf_linux_thread_t *thread = vsf_linux_get_thread(-1, tid);
     if (thread != NULL) {
         vsf_linux_detach_thread(thread);
     }
