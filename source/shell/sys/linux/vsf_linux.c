@@ -1974,7 +1974,9 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 clock_t times(struct tms *buf)
 {
-    memset(buf, 0, sizeof(*buf));
+    if (buf != NULL) {
+        memset(buf, 0, sizeof(*buf));
+    }
     return (clock_t)(vsf_systimer_get_tick() * sysconf(_SC_CLK_TCK) / vsf_systimer_get_freq());
 }
 
