@@ -1485,6 +1485,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\zlib\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
