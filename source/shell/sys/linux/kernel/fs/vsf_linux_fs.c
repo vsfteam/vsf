@@ -1687,6 +1687,12 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
     return size;
 }
 
+ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
+{
+    VSF_LINUX_ASSERT(false);
+    return (ssize_t)-1;
+}
+
 off64_t lseek64(int fd, off64_t offset, int whence)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
@@ -2135,6 +2141,30 @@ int umount(const char *target)
         return -1;
     }
     return 0;
+}
+
+int fstatvfs(int fd, struct statvfs *buf)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int statvfs(const char *path, struct statvfs *buf)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int fstatvfs64(int fd, struct statvfs64 *buf)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int statvfs64(const char *path, struct statvfs64 *buf)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 int __vsf_linux_create_open_path(char *path)

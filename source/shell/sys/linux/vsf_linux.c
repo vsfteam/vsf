@@ -1970,6 +1970,24 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 }
 #endif
 
+clock_t times(struct tms *buf)
+{
+    VSF_LINUX_ASSERT(false);
+    return (clock_t)-1;
+}
+
+long syscall_futex(uint32_t *uaddr, int futex_op, uint32_t val, uint32_t val2, uint32_t *uaddr2, uint32_t val3)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int prctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 #if VSF_LINUX_CFG_SHM_NUM > 0
 // shm.h
 int shmget(key_t key, size_t size, int shmflg)
@@ -2183,6 +2201,16 @@ int mprotect(void *addr, size_t len, int prot)
     return 0;
 }
 
+int shm_open(const char *name, int oflag, mode_t mode)
+{
+    return open(name, oflag, mode);
+}
+
+int shm_unlink(const char *name)
+{
+    return unlink(name);
+}
+
 // sys/random.h
 #if VSF_HAL_USE_RNG == ENABLED && VSF_HW_RNG_COUNT > 0
 static void __getrandom_on_ready(void *param, uint32_t *buffer, uint32_t num)
@@ -2216,6 +2244,24 @@ pid_t fork(void)
 {
     VSF_LINUX_ASSERT(false);
     return -1;
+}
+
+// sysmacros
+dev_t makedev(unsigned int maj, unsigned int min)
+{
+    return (dev_t)0;
+}
+
+unsigned int major(dev_t dev)
+{
+    VSF_LINUX_ASSERT(false);
+    return 0;
+}
+
+unsigned int minor(dev_t dev)
+{
+    VSF_LINUX_ASSERT(false);
+    return 0;
 }
 
 // spawn.h

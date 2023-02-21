@@ -38,6 +38,43 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+// mntent
+FILE * setmntent(const char *filename, const char *type)
+{
+    VSF_LINUX_ASSERT(false);
+    return (FILE *)NULL;
+}
+
+struct mntent * getmntent(FILE *stream)
+{
+    VSF_LINUX_ASSERT(false);
+    return (struct mntent *)NULL;
+}
+
+int addmntent(FILE *stream, const struct mntent *mnt)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int endmntent(FILE *stream)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+char * hasmntopt(const struct mntent *mnt, const char *opt)
+{
+    VSF_LINUX_ASSERT(false);
+    return (char *)NULL;
+}
+
+struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int buflen)
+{
+    VSF_LINUX_ASSERT(false);
+    return (struct mntent *)NULL;
+}
+
 void vsf_linux_glibc_init(void)
 {
 
