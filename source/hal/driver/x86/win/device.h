@@ -29,6 +29,8 @@
 /*============================ MACROS ========================================*/
 
 #define VSF_HW_RTC_COUNT                        1
+#define VSF_HW_RNG_COUNT                        1
+#   define VSF_HW_RNG_BITLEN                    8
 
 #ifndef VSF_WIN_USART_COUNT
 #   define VSF_WIN_USART_COUNT                  32

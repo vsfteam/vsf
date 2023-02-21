@@ -27,6 +27,7 @@
 #endif
 #include "hal/arch/vsf_arch.h"
 #include "./rtc/rtc.h"
+#include "./rng/rng.h"
 
 #include <Windows.h>
 
@@ -204,6 +205,9 @@ bool vsf_driver_init(void)
 #if VSF_HAL_USE_RTC == ENABLED
     vsf_hw_rtc_init(&vsf_hw_rtc0, NULL);
     vsf_hw_rtc_enable(&vsf_hw_rtc0);
+#endif
+#if VSF_HAL_USE_RNG == ENABLED
+    vsf_hw_rng_init(&vsf_hw_rng0);
 #endif
     return true;
 }
