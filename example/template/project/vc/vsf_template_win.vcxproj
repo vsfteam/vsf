@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\hal\driver\common\io\io_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\dac\vsf_remapped_dac.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\gpio\vsf_remapped_gpio.h" />
@@ -735,6 +736,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\hal\driver\common\io\io_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\dac\vsf_remapped_dac.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\gpio\vsf_remapped_gpio.c" />

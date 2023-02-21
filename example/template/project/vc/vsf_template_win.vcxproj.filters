@@ -1147,6 +1147,9 @@
     <Filter Include="vsf\hal\driver\common\io">
       <UniqueIdentifier>{96b65b31-903f-4efe-85fc-965bff6e9c26}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\driver\x86\win\rng">
+      <UniqueIdentifier>{19fbc2cb-69d7-4255-bad1-888d1ca4ad5e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3311,6 +3314,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\common\io\io_template.h">
       <Filter>vsf\hal\driver\common\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.h">
+      <Filter>vsf\hal\driver\x86\win\rng</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5755,6 +5761,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\common\io\io_common.c">
       <Filter>vsf\hal\driver\common\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.c">
+      <Filter>vsf\hal\driver\x86\win\rng</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

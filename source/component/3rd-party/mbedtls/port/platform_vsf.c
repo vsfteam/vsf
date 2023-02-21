@@ -57,7 +57,7 @@ void __vsf_mbedtls_exit(int status)
     vsf_thread_exit();
 }
 
-#if VSF_HW_RNG_COUNT > 0
+#if VSF_HAL_USE_RNG == ENABLED && VSF_HW_RNG_COUNT > 0
 static void __vsf_mbedtls_hardware_poll_on_ready(void *param, uint32_t *buffer, uint32_t num)
 {
     vsf_eda_t *eda = param;
