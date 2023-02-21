@@ -39,6 +39,7 @@
 #   include "./include/sys/shm.h"
 #   include "./include/sys/random.h"
 #   include "./include/sys/stat.h"
+#   include "./include/sys/times.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -61,6 +62,7 @@
 #   include <sys/shm.h>
 #   include <sys/random.h>
 #   include <sys/stat.h>
+#   include <sys/times.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
