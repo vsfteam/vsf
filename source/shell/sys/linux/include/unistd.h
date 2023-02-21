@@ -170,8 +170,8 @@ typedef struct vsf_linux_unistd_vplt_t {
     unsigned int (*alarm)(unsigned int seconds);
     useconds_t (*ualarm)(useconds_t usecs, useconds_t interval);
 
-    git_t (*getgid)(void);
-    git_t (*getegid)(void);
+    gid_t (*getgid)(void);
+    gid_t (*getegid)(void);
     uit_t (*getuid)(void);
     uit_t (*geteuid)(void);
     pid_t (*getpid)(void);
