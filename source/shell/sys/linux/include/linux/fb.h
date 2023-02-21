@@ -8,17 +8,24 @@ extern "C" {
 #endif
 
 // for ioctrl
-#define FBIOGET_VSCREENINFO     (('f' << 8) | 0)
-#define FBIOPUT_VSCREENINFO     (('f' << 8) | 1)
-#define FBIOGET_FSCREENINFO     (('f' << 8) | 2)
-#define FBIOPAN_DISPLAY         (('f' << 8) | 3)
-#define FBIO_WAITFORVSYNC       (('f' << 8) | 4)
+#define FBIOGET_VSCREENINFO     (('F' << 8) | 0)
+#define FBIOPUT_VSCREENINFO     (('F' << 8) | 1)
+#define FBIOGET_FSCREENINFO     (('F' << 8) | 2)
+#define FBIOPAN_DISPLAY         (('F' << 8) | 3)
+#define FBIO_WAITFORVSYNC       (('F' << 8) | 4)
+#define FBIOBLANK               (('F' << 8) | 5)
+
+#define VESA_NO_BLANKING        0
+#define VESA_VSYNC_SUSPEND      1
+#define VESA_HSYNC_SUSPEND      2
+#define VESA_POWERDOWN          3
 
 struct fb_fix_screeninfo {
     char id[16];
 
     uintptr_t smem_start;
     uint32_t smem_len;
+    uint32_t line_length;
 };
 
 struct fb_bitfield {
@@ -40,6 +47,9 @@ struct fb_var_screeninfo {
     struct fb_bitfield green;
     struct fb_bitfield blue;
     struct fb_bitfield transp;
+
+    uint32_t height;
+    uint32_t width;
 };
 
 #ifdef __cplusplus

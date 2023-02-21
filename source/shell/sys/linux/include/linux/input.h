@@ -22,6 +22,33 @@
 extern "C" {
 #endif
 
+#define EVIOCGMTSLOTS(len)          _IOC(_IOC_READ, 'E', 0x0a, len)
+#define EVIOCGKEY(len)              _IOC(_IOC_READ, 'E', 0x18, len)
+#define EVIOCGLED(len)              _IOC(_IOC_READ, 'E', 0x19, len)
+#define EVIOCGSND(len)              _IOC(_IOC_READ, 'E', 0x1a, len)
+#define EVIOCGSW(len)               _IOC(_IOC_READ, 'E', 0x1b, len)
+#define EVIOCGBIT(ev, len)          _IOC(_IOC_READ, 'E', 0x20 + (ev), len)
+#define EVIOCGABS(abs)              _IOR('E', 0x40 + (abs), struct input_absinfo)
+#define EVIOCSABS(abs)              _IOW('E', 0xc0 + (abs), struct input_absinfo)
+#define EVIOCSFF                    _IOC(_IOC_WRITE, 'E', 0x80, sizeof(struct ff_effect))
+#define EVIOCRMFF                   _IOW('E', 0x81, int)
+#define EVIOCGEFFECTS               _IOR('E', 0x84, int)
+#define EVIOCGRAB                   _IOW('E', 0x90, int)
+#define EVIOCREVOKE                 _IOW('E', 0x91, int)
+#define EVIOCSCLOCKID               _IOW('E', 0xa0, int)
+#define EVIOCGVERSION               _IOR('E', 0x01, int)
+#define EVIOCGID                    _IOR('E', 0x02, struct input_id)
+#define EVIOCGREP                   _IOR('E', 0x03, unsigned int[2])
+#define EVIOCSREP                   _IOW('E', 0x03, unsigned int[2])
+#define EVIOCGKEYCODE               _IOR('E', 0x04, unsigned int[2])
+#define EVIOCGKEYCODE_V2            _IOR('E', 0x04, struct input_keymap_entry)
+#define EVIOCSKEYCODE               _IOW('E', 0x04, unsigned int[2])
+#define EVIOCSKEYCODE_V2            _IOW('E', 0x04, struct input_keymap_entry)
+#define EVIOCGNAME(len)             _IOC(_IOC_READ, 'E', 0x06, len)
+#define EVIOCGPHYS(len)             _IOC(_IOC_READ, 'E', 0x07, len)
+#define EVIOCGUNIQ(len)             _IOC(_IOC_READ, 'E', 0x08, len)
+#define EVIOCGPROP(len)             _IOC(_IOC_READ, 'E', 0x09, len)
+
 #define EV_VERSION                  0x010001
 
 #define BUS_PCI                     0x01
@@ -30,6 +57,7 @@ extern "C" {
 #define BUS_VIRTUAL                 0x06
 
 // event types
+
 #define EV_SYN                      VSF_INPUT_TYPE_SYNC
 #define EV_KEY                      VSF_INPUT_TYPE_KEYBOARD
 #define EV_REL                      0x10
@@ -54,6 +82,7 @@ extern "C" {
 
 // event codes
 // VSF_INPUT_TYPE_KEYBOARD
+
 #define KEY_RESERVED                VSF_KB_UNKNOWN
 #define KEY_ESC                     VSF_KB_ESCAPE
 #define KEY_1                       VSF_KB_1
@@ -185,8 +214,46 @@ extern "C" {
 #define KEY_KPCOMMA                 VSF_KP_COMMA
 
 #define KEY_RECORD                  (VSF_KB_USER + 1)
+#define KEY_SETUP                   (VSF_KB_USER + 2)
+#define KEY_REWIND                  (VSF_KB_USER + 3)
+#define KEY_PLAYPAUSE               (VSF_KB_USER + 4)
+#define KEY_PLAY                    (VSF_KB_USER + 5)
+#define KEY_FASTFORWARD             (VSF_KB_USER + 6)
+#define KEY_CANCEL                  (VSF_KB_USER + 7)
+#define KEY_SELECT                  (VSF_KB_USER + 8)
+#define KEY_CLEAR                   (VSF_KB_USER + 9)
+#define KEY_EXIT                    (VSF_KB_USER + 10)
+#define KEY_INFO                    (VSF_KB_USER + 11)
+#define KEY_PROGRAM                 (VSF_KB_USER + 12)
+#define KEY_CALENDAR                (VSF_KB_USER + 13)
+#define KEY_RED                     (VSF_KB_USER + 14)
+#define KEY_GREEN                   (VSF_KB_USER + 15)
+#define KEY_YELLOW                  (VSF_KB_USER + 16)
+#define KEY_BLUE                    (VSF_KB_USER + 17)
+#define KEY_CHANNELUP               (VSF_KB_USER + 18)
+#define KEY_CHANNELDOWN             (VSF_KB_USER + 19)
+
+#define KEY_MAX                     0x2ff
+#define KEY_CNT                     (KEY_MAX + 1)
+
+// rel
+
+#define REL_X                       0x00
+#define REL_Y                       0x01
+#define REL_Z                       0x02
+#define REL_RX                      0x03
+#define REL_RY                      0x04
+#define REL_RZ                      0x05
+#define REL_HWHEEL                  0x06
+#define REL_DIAL                    0x07
+#define REL_WHEEL                   0x08
+#define REL_MISC                    0x09
+
+#define REL_MAX                     0x0f
+#define REL_CNT                     (REL_MAX + 1)
 
 // btn
+
 #define BTN_GAMEPAD
 #define BTN_SOUTH                   GAMEPAD_ID_R_DOWN
 #define BTN_A                       BTN_SOUTH
@@ -215,6 +282,22 @@ extern "C" {
 #define BTN_TRIGGER_HAPPY9          (GAMEPAD_ID_USER + 10)
 #define BTN_TRIGGER_HAPPY10         (GAMEPAD_ID_USER + 11)
 
+#define BTN_MOUSE                   0x110
+#define BTN_LEFT                    (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_LEFT)
+#define BTN_RIGHT                   (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_RIGHT)
+#define BTN_MIDDLE                  (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_MIDDLE)
+
+#define BTN_JOYSTICK                0x120
+#define BTN_TRIGGER                 BTN_JOYSTICK
+
+#define BTN_DIGI                    0x140
+#define BTN_TOOL_PEN                0x140
+#define BTN_TOOL_FINGER             0x145
+#define BTN_TOUCH                   0x14a
+#define BTN_STYLUS                  0x14b
+
+// abs
+
 #define ABS_X                       0x00
 #define ABS_Y                       0x01
 #define ABS_Z                       0x02
@@ -241,6 +324,36 @@ extern "C" {
 #define ABS_TOOL_WIDTH              0x1c
 #define ABS_VOLUME                  0x20
 #define ABS_MISC                    0x28
+
+#define ABS_MAX                     0x3f
+#define ABS_CNT                     (ABS_MAX + 1)
+
+// LED
+
+#define LED_NUML                    0x00
+#define LED_CAPSL                   0x01
+#define LED_SCROLLL                 0x02
+#define LED_COMPOSE                 0x03
+#define LED_KANA                    0x04
+#define LED_SLEEP                   0x05
+#define LED_SUSPEND                 0x06
+#define LED_MUTE                    0x07
+#define LED_MISC                    0x08
+#define LED_MAIL                    0x09
+#define LED_CHARGING                0x0a
+#define LED_MAX                     0x0f
+#define LED_CNT                     (LED_MAX + 1)
+
+// msc
+
+#define MSC_SERIAL                  0x00
+#define MSC_PULSELED                0x01
+#define MSC_GESTURE                 0x02
+#define MSC_RAW                     0x03
+#define MSC_SCAN                    0x04
+#define MSC_TIMESTAMP               0x05
+#define MSC_MAX                     0x07
+#define MSC_CNT                     (MSC_MAX + 1)
 
 struct input_absinfo {
     __s32                           value;

@@ -1016,7 +1016,9 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 #if VSF_DISP_USE_FB == ENABLED
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)disp;
 #endif
-    uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
+    // TODO: add pitch to disp_fb
+    uint_fast32_t pitch_size = disp->param.width * vsf_disp_get_pixel_bytesize(disp);
+    uint_fast32_t frame_size = disp->param.height * pitch_size;
 
     switch (cmd) {
     case FBIOGET_VSCREENINFO: {
@@ -1055,6 +1057,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
                 info->smem_start = (uintptr_t)fb_priv->front_buffer;
                 info->smem_len = frame_size;
             }
+            info->line_length = pitch_size;
         }
         break;
     case FBIOPAN_DISPLAY: {
