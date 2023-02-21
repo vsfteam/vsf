@@ -1455,7 +1455,7 @@ long sysconf(int name)
     switch (name) {
     case _SC_PAGESIZE:      return 256;
     case _SC_OPEN_MAX:      return 65535;
-    case _SC_CLK_TCK:       return vsf_systimer_get_freq();
+    case _SC_CLK_TCK:       return 100;
     }
     return 0;
 }
@@ -1974,8 +1974,8 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 clock_t times(struct tms *buf)
 {
-    VSF_LINUX_ASSERT(false);
-    return (clock_t)-1;
+    memset(buf, 0, sizeof(*buf));
+    return (clock_t)(vsf_systimer_get_tick() * sysconf(_SC_CLK_TCK) / vsf_systimer_get_freq());
 }
 
 long syscall_futex(uint32_t *uaddr, int futex_op, uint32_t val, uint32_t val2, uint32_t *uaddr2, uint32_t val3)
