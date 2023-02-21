@@ -172,8 +172,8 @@ typedef struct vsf_linux_unistd_vplt_t {
 
     gid_t (*getgid)(void);
     gid_t (*getegid)(void);
-    uit_t (*getuid)(void);
-    uit_t (*geteuid)(void);
+    uid_t (*getuid)(void);
+    uid_t (*geteuid)(void);
     pid_t (*getpid)(void);
     pid_t (*getppid)(void);
     pid_t (*gettid)(void);
