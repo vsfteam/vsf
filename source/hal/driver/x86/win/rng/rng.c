@@ -79,7 +79,7 @@ vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint3
             void *param, vsf_rng_on_ready_callback_t *on_ready)
 {
     VSF_HAL_ASSERT(rng->hProv != (HCRYPTPROV)0);
-    if (!CryptGenRandom(rng->hProv, num, buffer)) {
+    if (!CryptGenRandom(rng->hProv, num, (BYTE *)buffer)) {
         DWORD error = GetLastError();
         vsf_trace_error("Fail to generate RNG, errcode is %d" VSF_TRACE_CFG_LINEEND, error);
         return VSF_ERR_FAIL;
