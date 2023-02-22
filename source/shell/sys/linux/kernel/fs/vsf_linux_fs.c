@@ -168,6 +168,7 @@ static int __vsf_linux_term_close(vsf_linux_fd_t *sfd);
 
 const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
     .priv_size          = sizeof(vsf_linux_fs_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_fcntl           = __vsf_linux_fs_fcntl,
     .fn_read            = __vsf_linux_fs_read,
     .fn_write           = __vsf_linux_fs_write,
@@ -198,6 +199,7 @@ const vsf_linux_fd_op_t __vsf_linux_epollfd_fdop = {
 
 const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
     .priv_size          = sizeof(vsf_linux_stream_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_fcntl           = __vsf_linux_stream_fcntl,
     .fn_read            = __vsf_linux_stream_read,
     .fn_write           = __vsf_linux_stream_write,
@@ -206,6 +208,7 @@ const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
 
 const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop = {
     .priv_size          = sizeof(vsf_linux_pipe_rx_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_fcntl           = __vsf_linux_pipe_fcntl,
     .fn_read            = __vsf_linux_stream_read,
     .fn_close           = __vsf_linux_pipe_close,
@@ -214,6 +217,7 @@ const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop = {
 
 const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
     .priv_size          = sizeof(vsf_linux_pipe_tx_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_fcntl           = __vsf_linux_pipe_fcntl,
     .fn_write           = __vsf_linux_stream_write,
     .fn_close           = __vsf_linux_pipe_close,
@@ -222,6 +226,7 @@ const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
 
 const vsf_linux_fd_op_t vsf_linux_term_fdop = {
     .priv_size          = sizeof(vsf_linux_term_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_term_init,
     .fn_fcntl           = __vsf_linux_term_fcntl,
     .fn_read            = __vsf_linux_term_read,
@@ -680,7 +685,7 @@ vsf_linux_fd_t * vsf_linux_fd_get(int fd)
 vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd)
 {
     vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
-    if ((NULL == sfd) || (sfd->op != &__vsf_linux_fs_fdop)) {
+    if ((NULL == sfd) || !(sfd->op->feature & VSF_LINUX_FDOP_FEATURE_FS)) {
         return NULL;
     }
 

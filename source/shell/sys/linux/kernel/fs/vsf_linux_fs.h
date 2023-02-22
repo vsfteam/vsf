@@ -55,8 +55,13 @@ vsf_dcl_class(vsf_linux_fd_t)
 vsf_dcl_class(vsf_linux_trigger_t)
 vsf_dcl_class(vsf_linux_process_t)
 
+enum {
+    VSF_LINUX_FDOP_FEATURE_FS       = 1 << 0,
+};
+
 typedef struct vsf_linux_fd_op_t {
     int priv_size;
+    int feature;
     void (*fn_init)(vsf_linux_fd_t *sfd);
     int (*fn_fcntl)(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
     ssize_t (*fn_read)(vsf_linux_fd_t *sfd, void *buf, size_t count);

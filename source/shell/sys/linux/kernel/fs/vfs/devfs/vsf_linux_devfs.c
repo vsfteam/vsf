@@ -311,6 +311,7 @@ static ssize_t __vsf_linux_uart_write(vsf_linux_fd_t *sfd, const void *buf, size
 extern ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static const vsf_linux_fd_op_t __vsf_linux_uart_fdop = {
     .priv_size          = sizeof(vsf_linux_uart_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_uart_init,
     .fn_fcntl           = __vsf_linux_uart_fcntl,
     .fn_read            = __vsf_linux_stream_read,
@@ -485,6 +486,7 @@ static void __vsf_linux_i2c_init(vsf_linux_fd_t *sfd)
 
 static const vsf_linux_fd_op_t __vsf_linux_i2c_fdop = {
     .priv_size          = sizeof(vsf_linux_i2c_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_i2c_init,
     .fn_fcntl           = __vsf_linux_i2c_fcntl,
     .fn_read            = __vsf_linux_i2c_read,
@@ -709,6 +711,7 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 
 static const vsf_linux_fd_op_t __vsf_linux_spi_fdop = {
     .priv_size          = sizeof(vsf_linux_spi_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_spi_init,
     .fn_fcntl           = __vsf_linux_spi_fcntl,
 };
@@ -782,6 +785,7 @@ static ssize_t __vsf_linux_mal_write(vsf_linux_fd_t *sfd, const void *buf, size_
 
 static const vsf_linux_fd_op_t __vsf_linux_mal_fdop = {
     .priv_size          = sizeof(vsf_linux_mal_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_fcntl           = __vsf_linux_mal_fcntl,
     .fn_read            = __vsf_linux_mal_read,
     .fn_write           = __vsf_linux_mal_write,
@@ -957,6 +961,7 @@ static int __vsf_linux_input_close(vsf_linux_fd_t *sfd)
 
 static const vsf_linux_fd_op_t __vsf_linux_input_fdop = {
     .priv_size          = sizeof(vsf_linux_input_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_input_init,
     .fn_fcntl           = __vsf_linux_input_fcntl,
     .fn_read            = __vsf_linux_input_read,
@@ -1176,6 +1181,7 @@ static int __vsf_linux_fb_msync(vsf_linux_fd_t *sfd, void *buffer)
 
 static const vsf_linux_fd_op_t __vsf_linux_fb_fdop = {
     .priv_size          = sizeof(vsf_linux_fb_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_fb_init,
     .fn_fcntl           = __vsf_linux_fb_fcntl,
     .fn_read            = __vsf_linux_fb_read,
@@ -1188,7 +1194,8 @@ static const vsf_linux_fd_op_t __vsf_linux_fb_fdop = {
 int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp)
 {
     return vsf_linux_fs_bind_target_ex(
-                path, disp, &__vsf_linux_fb_fdop, NULL, NULL, 0, 0);
+                path, disp, &__vsf_linux_fb_fdop, NULL, NULL,
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
 #endif
 
@@ -1358,6 +1365,7 @@ static ssize_t __vsf_linux_gpio_write(vsf_linux_fd_t *sfd, const void *buf, size
 
 static const vsf_linux_fd_op_t __vsf_linux_gpio_fdop = {
     .priv_size          = sizeof(vsf_linux_gpio_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_gpio_init,
     .fn_read            = __vsf_linux_gpio_read,
     .fn_write           = __vsf_linux_gpio_write,
