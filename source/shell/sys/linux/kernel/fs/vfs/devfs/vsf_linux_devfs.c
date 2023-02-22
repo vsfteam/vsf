@@ -1028,11 +1028,33 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     switch (cmd) {
     case FBIOGET_VSCREENINFO: {
             struct fb_var_screeninfo *info = (struct fb_var_screeninfo *)arg;
+            const struct fb_bitfield *bitfields = NULL;
             memset(info, 0, sizeof(*info));
             info->xres = disp->param.width;
             info->yres = disp->param.height;
             info->xres_virtual = info->xres;
             info->yres_virtual = info->yres;
+            switch (disp->param.color) {
+            case VSF_DISP_COLOR_RGB565: {
+                    static const struct fb_bitfield __bitfiled_rgb565[4] = {{11, 5, 0}, {5, 6, 0}, {0, 5, 0}, {0, 0, 0}};
+                    bitfields = __bitfiled_rgb565;
+                }
+                break;
+            case VSF_DISP_COLOR_ARGB8888: {
+                    static const struct fb_bitfield __bitfield_arg8888[4] = {{16, 8, 0}, {8, 8, 0}, {0, 8, 0}, {24, 8, 0}};
+                    bitfields = __bitfield_arg8888;
+                }
+                break;
+            default:
+                vsf_trace_warning("fb: color not supported" VSF_TRACE_CFG_LINEEND);
+                break;
+            }
+            if (bitfields != NULL) {
+                info->red = bitfields[0];
+                info->green = bitfields[1];
+                info->blue = bitfields[2];
+                info->transp = bitfields[3];
+            }
 #if VSF_DISP_USE_FB == ENABLED
             if (fb_priv->is_disp_fb) {
                 info->yres_virtual *= disp_fb->fb.num;
