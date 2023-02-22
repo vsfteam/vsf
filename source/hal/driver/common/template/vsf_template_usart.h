@@ -171,17 +171,15 @@ typedef enum vsf_usart_mode_t {
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_usart_irq_mask_t {
-    // must be implemented
     // request_rx/request_tx complete
-    VSF_USART_IRQ_MASK_TX_CPL       = (0x1ul << 23),
-    VSF_USART_IRQ_MASK_RX_CPL       = (0x1ul << 24),
+    VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 23),
+    VSF_USART_IRQ_MASK_RX_CPL           = (0x1ul << 24),
 
     // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     VSF_USART_IRQ_MASK_TX               = (0x1ul << 25),
     VSF_USART_IRQ_MASK_RX               = (0x1ul << 26),
-    VSF_USART_IRQ_MASK_RX_TIMEOUT   = (0x1ul << 27),
+    VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 27),
 
-    // optional implementation
     // error
     VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 28),
     VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 29),

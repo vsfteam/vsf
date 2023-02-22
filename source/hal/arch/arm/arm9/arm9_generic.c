@@ -57,7 +57,7 @@ static NO_INIT vsf_arm9_swi_t __vsf_arm9_swi;
 /*----------------------------------------------------------------------------*
  * Infrastructure                                                             *
  *----------------------------------------------------------------------------*/
-/*! \note initialize architecture specific service 
+/*! \note initialize architecture specific service
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
@@ -76,13 +76,13 @@ bool vsf_arch_low_level_init(void)
 #if VSF_ARCH_SWI_NUM > 0
 ROOT ISR(SWI_Handler)
 {
-    /*!  loop until there is no enabled pending swi whose priority is higher 
+    /*!  loop until there is no enabled pending swi whose priority is higher
      *!  than base
      */
     while (!__vsf_arm9_swi.swi_mask_bit) {
         //! find the highest enabled pending swi
         uint32_t mask = __vsf_arm9_swi.pending & __vsf_arm9_swi.enable;
-        int_fast8_t idx = vsf_ffz32(~(    mask 
+        int_fast8_t idx = vsf_ffz32(~(    mask
                                     &   ~((1 << __vsf_arm9_swi.base) - 1)));
         if (idx >= 0) {
             if (__vsf_arm9_swi.vectors[idx].handler != NULL) {
@@ -92,7 +92,7 @@ ROOT ISR(SWI_Handler)
         } else {
             break;
         }
-    }    
+    }
 }
 
 #if __IS_COMPILER_IAR__
@@ -105,9 +105,9 @@ ROOT ISR(SWI_Handler)
  *! \param param_ptr idx the index of the software interrupt
  *! \return initialization result in vsf_err_t
  */
-vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, 
+vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
                             vsf_arch_prio_t priority,
-                            vsf_swi_handler_t *handler, 
+                            vsf_swi_handler_t *handler,
                             void *param_ptr)
 {
 #if VSF_ARCH_SWI_NUM > 0
@@ -161,26 +161,26 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  *----------------------------------------------------------------------------*/
 
 
-vsf_arch_prio_t vsf_get_interrupt(void)
+vsf_gint_state_t vsf_get_interrupt(void)
 {
     return GET_GLOBAL_INTERRUPT_STATE();
 }
 
-vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t level)
+vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level)
 {
-    vsf_arch_prio_t orig = vsf_get_interrupt();
+    vsf_gint_state_t orig = vsf_get_interrupt();
     SET_GLOBAL_INTERRUPT_STATE(level);
     return orig;
 }
 
-vsf_arch_prio_t vsf_disable_interrupt(void)
+vsf_gint_state_t vsf_disable_interrupt(void)
 {
     return DISABLE_GLOBAL_INTERRUPT();
 }
 
-vsf_arch_prio_t vsf_enable_interrupt(void)
+vsf_gint_state_t vsf_enable_interrupt(void)
 {
-    vsf_arch_prio_t orig = vsf_get_interrupt();
+    vsf_gint_state_t orig = vsf_get_interrupt();
     ENABLE_GLOBAL_INTERRUPT();
     return orig;
 }
