@@ -46,14 +46,22 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef struct vsf_linux_pthread_cleanup_handler_t {
+    vsf_slist_node_t node;
+    void (*routine)(void *);
+    void *arg;
+} vsf_linux_pthread_cleanup_handler_t;
+
 typedef struct vsf_linux_pthread_priv_t {
     void *param;
     void * (*entry)(void *param);
+    vsf_slist_t cleanup_handler_list;
 } vsf_linux_pthread_priv_t;
 
 /*============================ PROTOTYPES ====================================*/
 
 static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb);
+static void __vsf_linux_pthread_on_terminate(vsf_linux_thread_t *thread);
 
 SECTION(".text.vsf.kernel.vsf_sync")
 void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout);
@@ -64,7 +72,7 @@ void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t ti
 static const vsf_linux_thread_op_t __vsf_linux_pthread_op = {
     .priv_size          = sizeof(vsf_linux_pthread_priv_t),
     .on_run             = __vsf_linux_pthread_on_run,
-    .on_terminate       = vsf_linux_thread_on_terminate,
+    .on_terminate       = __vsf_linux_pthread_on_terminate,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -98,6 +106,26 @@ static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
     thread->retval = (int)(uintptr_t)priv->entry(priv->param);
+}
+
+static void __vsf_linux_pthread_on_terminate(vsf_linux_thread_t *thread)
+{
+    vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+    vsf_linux_pthread_cleanup_handler_t *cleanup_handler;
+    vsf_protect_t orig;
+
+    while (true) {
+        vsf_protect_t orig = vsf_protect_sched();
+            vsf_slist_remove_from_head(vsf_linux_pthread_cleanup_handler_t, node, &priv->cleanup_handler_list, cleanup_handler);
+        vsf_unprotect_sched(orig);
+        if (NULL == cleanup_handler) {
+            break;
+        }
+
+        free(cleanup_handler);
+    }
+
+    vsf_linux_thread_on_terminate(thread);
 }
 
 int pthread_detach(pthread_t tid)
@@ -220,12 +248,37 @@ int pthread_getschedparam(pthread_t thread, int *policy, struct sched_param *par
 
 void pthread_cleanup_push(void (*routine)(void *), void *arg)
 {
-    VSF_LINUX_ASSERT(false);
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+
+    vsf_linux_pthread_cleanup_handler_t *cleanup_handler = malloc(sizeof(vsf_linux_pthread_cleanup_handler_t));
+    VSF_LINUX_ASSERT(cleanup_handler != NULL);
+
+    vsf_slist_init_node(vsf_linux_pthread_cleanup_handler_t, node, cleanup_handler);
+    cleanup_handler->arg = arg;
+    cleanup_handler->routine = routine;
+
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_slist_add_to_head(vsf_linux_pthread_cleanup_handler_t, node, &priv->cleanup_handler_list, cleanup_handler);
+    vsf_unprotect_sched(orig);
 }
 
 void pthread_cleanup_pop(int execute)
 {
-    VSF_LINUX_ASSERT(false);
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+
+    vsf_linux_pthread_cleanup_handler_t *cleanup_handler;
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_slist_remove_from_head(vsf_linux_pthread_cleanup_handler_t, node, &priv->cleanup_handler_list, cleanup_handler);
+    vsf_unprotect_sched(orig);
+
+    if (cleanup_handler != NULL) {
+        if (execute) {
+            cleanup_handler->routine(cleanup_handler->arg);
+        }
+        free(cleanup_handler);
+    }
 }
 
 int pthread_attr_init(pthread_attr_t *attr)
