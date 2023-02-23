@@ -21,6 +21,7 @@
 
 #if VSF_USE_INPUT == ENABLED
 
+#define __VSF_INPUT_CLASS_IMPLEMENT
 #include "./vsf_input.h"
 #include "kernel/vsf_kernel.h"
 #include "utilities/vsf_utilities.h"

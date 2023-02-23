@@ -25,6 +25,16 @@
 
 #if VSF_USE_INPUT == ENABLED
 
+#if     defined(__VSF_INPUT_CLASS_IMPLEMENT)
+#   undef __VSF_INPUT_CLASS_IMPLEMENT
+#   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_INPUT_CLASS_INHERIT__)
+#   undef __VSF_INPUT_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
+#endif
+
+#include "utilities/ooc_class.h"
+
 #include "./vsf_input_get_type.h"
 
 #ifdef __cplusplus
@@ -98,15 +108,20 @@ typedef struct vk_input_parser_t {
 } vk_input_parser_t;
 
 #if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
-typedef struct vk_input_notifier_t vk_input_notifier_t;
+vsf_dcl_class(vk_input_notifier_t)
 typedef void (*vk_input_on_evt_t)(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt);
-typedef struct vk_input_notifier_t {
-    vsf_slist_node_t notifier_node;
-    vk_input_on_evt_t on_evt;
-    void *dev;
-    vk_input_mask_t mask;
-    void *param;
-} vk_input_notifier_t;
+
+vsf_class(vk_input_notifier_t) {
+    public_member(
+        vk_input_on_evt_t on_evt;
+        void *dev;
+        vk_input_mask_t mask;
+        void *param;
+    )
+    private_member(
+        vsf_slist_node_t notifier_node;
+    )
+};
 #endif
 
 #ifdef __cplusplus
