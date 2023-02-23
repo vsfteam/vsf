@@ -22,6 +22,8 @@
 // in order to use color format and vk_disp_fb_drv_t
 #include "component/ui/disp/vsf_disp.h"
 
+#if VSF_USE_UI == ENABLED
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -209,3 +211,5 @@ vsf_err_t f1cx00s_fb_present(f1cx00s_fb_t *fb, void *pixel_buffer)
     DEBE_BASE->LAY_FB_ADDR1[0] = (uint32_t)pixel_buffer >> 29;
     return VSF_ERR_NONE;
 }
+
+#endif
