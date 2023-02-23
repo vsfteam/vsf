@@ -9352,6 +9352,15 @@
                                 </file>
                             </group>
                             <group>
+                                <name>apps</name>
+                                <group>
+                                    <name>mdns</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\apps\mdns\mdns.c</name>
+                                    </file>
+                                </group>
+                            </group>
+                            <group>
                                 <name>core</name>
                                 <group>
                                     <name>ipv4</name>

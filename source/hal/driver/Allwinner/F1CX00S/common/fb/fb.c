@@ -27,10 +27,11 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const vk_disp_fb_drv_t VSF_FB = {
-    .init       = (vsf_err_t (*)(void *, int, void *))f1cx00s_fb_init,
-    .fini       = (vsf_err_t (*)(void *))f1cx00s_fb_fini,
-    .present    = (vsf_err_t (*)(void *, void *))f1cx00s_fb_present,
+const vk_disp_fb_drv_t vk_disp_fb_drv_f1cx00s = {
+    .init       = NULL,
+    .fb.init    = (vsf_err_t (*)(void *, int, void *))f1cx00s_fb_init,
+    .fb.fini    = (vsf_err_t (*)(void *))f1cx00s_fb_fini,
+    .fb.present = (vsf_err_t (*)(void *, void *))f1cx00s_fb_present,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/

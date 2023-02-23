@@ -185,6 +185,7 @@ typedef int vsf_systimer_cnt_signed_t;
 #define USRAPP_CFG_USBD_DEV                             VSF_USB_DC0
 
 #define VSF_DISP_USE_FB                                 ENABLED
+#   define APP_DISP_FB_DRV                              vk_disp_fb_drv_f1cx00s
 #   define VSF_DISP_FB_CFG_COPY_FRAME                   true
 #   define APP_DISP_FB_COLOR                            VSF_DISP_COLOR_RGB666_32
 #   define APP_DISP_FB_NUM                              3

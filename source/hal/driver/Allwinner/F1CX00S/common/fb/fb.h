@@ -76,7 +76,7 @@ typedef struct f1cx00s_fb_t {
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t f1cx00s_fb_init(f1cx00s_fb_t *fb, void *initial_pixel_buffer);
+extern vsf_err_t f1cx00s_fb_init(f1cx00s_fb_t *fb, int color_format, void *initial_pixel_buffer);
 extern vsf_err_t f1cx00s_fb_fini(f1cx00s_fb_t *fb);
 extern vsf_err_t f1cx00s_fb_present(f1cx00s_fb_t *fb, void *pixel_buffer);
 
