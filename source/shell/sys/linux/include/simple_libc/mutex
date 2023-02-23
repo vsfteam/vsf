@@ -56,6 +56,8 @@ namespace std {
         Mutex * __device;
         bool __owns;
     public:
+        typedef Mutex mutex_type;
+
         unique_lock() noexcept : __device(NULL), __owns(false) { }
         explicit unique_lock(Mutex & m) : __device(std::addressof(m)), __owns(false) {
             lock();
@@ -72,8 +74,28 @@ namespace std {
         }
 
         // some applications like QT will need methods below
-//        unique_lock(const unique_lock &) = delete;
-//        unique_lock & operator=(const unique_lock &) = delete;
+        unique_lock(const unique_lock &) = delete;
+        unique_lock & operator=(const unique_lock &) = delete;
+
+        unique_lock(unique_lock && l) noexcept: __device(l.__device), __owns(l.__owns)
+        {
+            l.__device = nullptr;
+            l.__owns = false;
+        }
+
+        unique_lock& operator=(unique_lock && l) noexcept
+        {
+            if(__owns) {
+                unlock();
+            }
+
+            unique_lock(std::move(l)).swap(*this);
+
+            l.__device = 0;
+            l.__owns = false;
+
+            return *this;
+        }
 
         void lock() {
             __device->lock();
@@ -87,6 +109,18 @@ namespace std {
                 __device->unlock();
                 __owns = false;
             }
+        }
+        Mutex * release() noexcept
+        {
+            Mutex *ret = __device;
+            __device = 0;
+            __owns = false;
+            return ret;
+        }
+        void swap(unique_lock & l) noexcept
+        {
+            std::swap(__device, l.__device);
+            std::swap(__owns, l.__owns);
         }
         bool owns_lock() const noexcept {
             return __owns;
