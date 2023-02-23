@@ -56,6 +56,9 @@ typedef struct vsf_linux_pthread_priv_t {
     void *param;
     void * (*entry)(void *param);
     vsf_slist_t cleanup_handler_list;
+    int cancel_state;
+    int cancel_type;
+    bool is_cancelled;
 } vsf_linux_pthread_priv_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -115,7 +118,7 @@ static void __vsf_linux_pthread_on_terminate(vsf_linux_thread_t *thread)
     vsf_protect_t orig;
 
     while (true) {
-        vsf_protect_t orig = vsf_protect_sched();
+        orig = vsf_protect_sched();
             vsf_slist_remove_from_head(vsf_linux_pthread_cleanup_handler_t, node, &priv->cleanup_handler_list, cleanup_handler);
         vsf_unprotect_sched(orig);
         if (NULL == cleanup_handler) {
@@ -205,13 +208,6 @@ int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_r
 
     vsf_prio_t priority = attr->inheritsched ? vsf_prio_inherit : attr->schedparam.sched_priority;
     vsf_linux_start_thread(thread, priority);
-    return 0;
-}
-
-int pthread_cancel(pthread_t thread)
-{
-    VSF_LINUX_ASSERT(false);
-    // TODO:
     return 0;
 }
 
@@ -745,19 +741,71 @@ int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset)
     return 0;
 }
 
+static void __vsf_linux_pthread_do_cancel(vsf_linux_thread_t *thread)
+{
+    vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+
+    vsf_linux_pthread_cleanup_handler_t *cleanup_handler;
+    vsf_protect_t orig;
+    while (true) {
+        orig = vsf_protect_sched();
+            vsf_slist_remove_from_head(vsf_linux_pthread_cleanup_handler_t, node, &priv->cleanup_handler_list, cleanup_handler);
+        vsf_unprotect_sched(orig);
+        if (NULL == cleanup_handler) {
+            break;
+        }
+
+        cleanup_handler->routine(cleanup_handler->arg);
+        free(cleanup_handler);
+    }
+
+    pthread_exit(NULL);
+}
+
+int pthread_cancel(pthread_t tid)
+{
+    vsf_linux_thread_t *thread = vsf_linux_get_thread(-1, tid);
+    vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+    priv->is_cancelled = true;
+    if (    (PTHREAD_CANCEL_ENABLE == priv->cancel_state)
+        &&  (PTHREAD_CANCEL_ASYNCHRONOUS == priv->cancel_type)) {
+        // TODO: when to call __vsf_linux_pthread_do_cancel in thread?
+        VSF_LINUX_ASSERT(false);
+    }
+    return 0;
+}
+
 void pthread_testcancel(void)
 {
-    // TODO:
-    VSF_LINUX_ASSERT(false);
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+
+    if (priv->is_cancelled) {
+        __vsf_linux_pthread_do_cancel(thread);
+    }
 }
 
 int pthread_setcancelstate(int state, int *oldstate)
 {
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+
+    if (oldstate != NULL) {
+        *oldstate = priv->cancel_state;
+    }
+    priv->cancel_state = state;
     return 0;
 }
 
 int pthread_setcanceltype(int type, int *oldtype)
 {
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+
+    if (oldtype != NULL) {
+        *oldtype = priv->cancel_type;
+    }
+    priv->cancel_type = type;
     return 0;
 }
 

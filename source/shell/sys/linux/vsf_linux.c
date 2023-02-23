@@ -40,6 +40,7 @@
 #   include "./include/sys/random.h"
 #   include "./include/sys/stat.h"
 #   include "./include/sys/times.h"
+#   include "./include/sys/prctl.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -63,6 +64,7 @@
 #   include <sys/random.h>
 #   include <sys/stat.h>
 #   include <sys/times.h>
+#   include <sys/prctl.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -376,6 +378,12 @@ void vsf_linux_tls_free(int idx)
         VSF_LINUX_ASSERT(vsf_bitmap_get(&process->tls.bitmap, idx));
         vsf_bitmap_clear(&process->tls.bitmap, idx);
     vsf_unprotect_sched(orig);
+
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+
+    thread->tls[idx].destructor = NULL;
+    thread->tls[idx].data = NULL;
 }
 
 vsf_linux_localstorage_t * vsf_linux_tls_get(int idx)
@@ -1239,6 +1247,15 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
 {
     vsf_protect_t orig = vsf_protect_sched();
     vsf_linux_thread_t *thread_pending = thread->thread_pending;
+
+    for (int i = 0; i < dimof(thread->tls); i++) {
+        if ((thread->tls[i].destructor != NULL) && (thread->tls[i].data != NULL)) {
+            thread->tls[i].destructor(thread->tls[i].data);
+            thread->tls[i].destructor = NULL;
+            thread->tls[i].data = NULL;
+        }
+    }
+
     thread->op = NULL;
     if (thread_pending != NULL) {
         thread->thread_pending = NULL;
@@ -1785,13 +1802,15 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
         *oldset = process->sig.mask;
     }
 
-    vsf_protect_t orig = vsf_protect_sched();
-        switch (how) {
-        case SIG_BLOCK:     sigaddsetmask(&process->sig.mask, set->sig[0]); break;
-        case SIG_UNBLOCK:   sigdelsetmask(&process->sig.mask, set->sig[0]); break;
-        case SIG_SETMASK:   process->sig.mask = *set;                       break;
-        }
-    vsf_unprotect_sched(orig);
+    if (set != NULL) {
+        vsf_protect_t orig = vsf_protect_sched();
+            switch (how) {
+            case SIG_BLOCK:     sigaddsetmask(&process->sig.mask, set->sig[0]); break;
+            case SIG_UNBLOCK:   sigdelsetmask(&process->sig.mask, set->sig[0]); break;
+            case SIG_SETMASK:   process->sig.mask = *set;                       break;
+            }
+        vsf_unprotect_sched(orig);
+    }
     return 0;
 }
 
@@ -1988,6 +2007,10 @@ long syscall_futex(uint32_t *uaddr, int futex_op, uint32_t val, uint32_t val2, u
 
 int prctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5)
 {
+    switch (option) {
+    case PR_SET_NAME:
+        return 0;
+    }
     VSF_LINUX_ASSERT(false);
     return -1;
 }

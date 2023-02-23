@@ -201,12 +201,12 @@ typedef struct {
 } pthread_attr_t;
 
 enum {
-    PTHREAD_CANCEL_ENABLE,
+    PTHREAD_CANCEL_ENABLE,              // default
     PTHREAD_CANCEL_DISABLE,
 };
 enum {
-  PTHREAD_CANCEL_DEFERRED,
-  PTHREAD_CANCEL_ASYNCHRONOUS,
+    PTHREAD_CANCEL_DEFERRED,            // default
+    PTHREAD_CANCEL_ASYNCHRONOUS,
 };
 
 #ifndef PTHREAD_STACK_MIN
