@@ -135,7 +135,10 @@ bool f1cx00s_usb_irq(f1cx00s_usb_otg_t *usb)
     return true;
 }
 
-__arm void USBOTG_Handler(void) 
+#if __IS_COMPILER_IAR__
+__arm
+#endif
+void USBOTG_Handler(void)
 {
     f1cx00s_usb_irq(&USB_OTG0);
 }

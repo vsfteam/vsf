@@ -190,7 +190,7 @@ vsf_gint_state_t vsf_enable_interrupt(void)
  * Others: sleep, reset, etc                                                  *
  *----------------------------------------------------------------------------*/
 
-void vsf_arch_sleep(uint32_t mode)
+void vsf_arch_sleep(uint_fast32_t mode)
 {
     mode = 0;
     ENABLE_GLOBAL_INTERRUPT();

@@ -38,7 +38,11 @@ void vsf_hal_on_rtp(vsf_rtp_t *rtp, uint_fast8_t id, bool is_down, uint_fast16_t
 {
 }
 
-__arm void TouchPanel_Handler(void) 
+
+#if __IS_COMPILER_IAR__
+__arm
+#endif
+void TouchPanel_Handler(void) 
 {
     int x, y;
     uint_fast32_t val;

@@ -80,7 +80,9 @@ __STATIC_INLINE bool intc_is_irq_enabled(IRQn_Type IRQn)
   \param [in]      IRQn  Device specific interrupt number.
   \note    IRQn must not be negative.
  */
-__arm 
+#if __IS_COMPILER_IAR__
+__arm
+#endif
 extern void intc_disable_irq(IRQn_Type IRQn);
 
 

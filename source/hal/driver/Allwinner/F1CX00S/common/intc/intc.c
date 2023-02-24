@@ -103,7 +103,10 @@ void intc_init(void)
   \param [in]      IRQn  Device specific interrupt number.
   \note    IRQn must not be negative.
  */
-__arm void intc_disable_irq(IRQn_Type IRQn)
+#if __IS_COMPILER_IAR__
+__arm
+#endif
+void intc_disable_irq(IRQn_Type IRQn)
 {
 
     if (IRQn >= 64) {
