@@ -1,0 +1,63 @@
+{
+	"folders": [
+		{
+			"name": "project",
+			"path": "."
+		},
+		{
+			"name": "config",
+			"path": "../../../config"
+		},
+		{
+			"name": "demo",
+			"path": "../../../demo"
+		},
+		{
+			"name": "vsf",
+//			it's good to support environment variable here, but vscode doesn't
+//			"path": "${env:VSF_PATH}/source"
+			"path": "../../../../../source"
+		},
+	],
+	"settings": {
+		"C_Cpp.default.defines": [
+			"__AIC__",
+			"__AIC8800__",
+		],
+		"C_Cpp.default.cStandard": "c11",
+		"C_Cpp.default.cppStandard": "c++14",
+		"C_Cpp.default.includePath": [
+			"../../../config",
+			"${env:VSF_PATH}/source",
+
+//			include below is corresponding module is enabled
+			"${env:VSF_PATH}/source/shell/sys/linux/include",
+			"${env:VSF_PATH}/source/shell/sdl2/include",
+			"${env:VSF_PATH}/source/shell/sdl2/include/SDL2",
+			"${env:VSF_PATH}/source/shell/sdl2/3rd-party/SDL_ttf",
+			"${env:VSF_PATH}/source/shell/sdl2/3rd-party/SDL_image",
+			"${env:VSF_PATH}/source/component/3rd-party/lvgl/raw",
+			"${env:VSF_PATH}/source/component/3rd-party/evm/port",
+			"${env:VSF_PATH}/source/component/3rd-party/evm/extension/oo",
+			"${env:VSF_PATH}/source/component/3rd-party/evm/raw/include",
+			"${env:VSF_PATH}/source/component/3rd-party/evm/raw/modules/eluaos/include",
+			"${env:VSF_PATH}/source/component/3rd-party/btstack/raw/src",
+			"${env:VSF_PATH}/source/component/3rd-party/btstack/raw/chipset",
+			"${env:VSF_PATH}/source/component/3rd-party/freetype/port",
+			"${env:VSF_PATH}/source/component/3rd-party/freetype/raw/include",
+			"${env:VSF_PATH}/source/component/3rd-party/coremark/port",
+			"${env:VSF_PATH}/source/component/3rd-party/coremark/raw",
+			"${env:VSF_PATH}/source/component/3rd-party/lua/extension/oo",
+			"${env:VSF_PATH}/source/component/3rd-party/lua/extension/lovevsf",
+//			"${env:VSF_PATH}/source/component/3rd-party/lua/raw",
+			"${env:VSF_PATH}/source/component/3rd-party/libjpeg-turbo/port",
+			"${env:VSF_PATH}/source/component/3rd-party/libjpeg-turbo/raw",
+			"${env:VSF_PATH}/source/component/3rd-party/libpng/port",
+			"${env:VSF_PATH}/source/component/3rd-party/libpng/raw",
+			"${env:VSF_PATH}/source/component/3rd-party/zlib/raw",
+
+			"../../../demo",
+		],
+		"files.associations": {},
+	}
+}
