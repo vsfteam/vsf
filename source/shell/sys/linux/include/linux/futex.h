@@ -26,9 +26,9 @@ extern "C" {
 #define FUTEX_CMD_MASK          ~(FUTEX_PRIVATE_FLAG | FUTEX_CLOCK_REALTIME)
 
 
-long syscall_futex(uint32_t *uaddr, int futex_op, uint32_t val, uint32_t val2, uint32_t *uaddr2, uint32_t val3);
+long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint32_t *futex2, uint32_t val3);
 #define __NR_futex(__p0, __p1, __p2, __p3, __p4, __p5)                          \
-            syscall_futex((uint32_t *)(__p0), (__p1), (__p2), (__p3), (uint32_t *)(__p4), (__p5))
+            sys_futex((uint32_t *)(__p0), (__p1), (__p2), (__p3), (uint32_t *)(__p4), (__p5))
 #define __NR_futex_time64       __NR_futex
 #define SYS_futex               __NR_futex
 

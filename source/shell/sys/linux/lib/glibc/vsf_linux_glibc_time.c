@@ -54,6 +54,19 @@ struct vsf_linux_glibc_time_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+vsf_systimer_tick_t vsf_linux_timespec2tick(const struct timespec *ts)
+{
+    vsf_systimer_tick_t us = 1000ULL * 1000 * ts->tv_sec + ts->tv_nsec / 1000;
+    return vsf_systimer_us_to_tick(us);
+}
+
+void vsf_linux_tick2timespec(struct timespec *ts, vsf_systimer_tick_t tick)
+{
+    vsf_systimer_tick_t us = vsf_systimer_tick_to_us(tick);
+    ts->tv_sec = us / (1000 * 1000);
+    ts->tv_nsec = (us % (1000 * 1000)) * 1000;
+}
+
 time_t mktime(struct tm *tm)
 {
     static const uint16_t __yday_month[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
@@ -320,16 +333,11 @@ struct tm * localtime(const time_t *timep)
 
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
 {
-    vsf_timeout_tick_t ticks;
-    ticks = 1000ULL * 1000 * requested_time->tv_sec + requested_time->tv_nsec / 1000;
-    ticks = vsf_systimer_us_to_tick(ticks);
-
+    vsf_systimer_tick_t ticks = vsf_linux_timespec2tick(requested_time);
     vsf_systimer_tick_t remain_ticks = vsf_linux_sleep(ticks);
 
     if (remaining != NULL) {
-        vsf_timeout_tick_t us = vsf_systimer_tick_to_us(remain_ticks);
-        remaining->tv_sec = us / (1000 * 1000);
-        remaining->tv_nsec = (us % (1000 * 1000)) * 1000;
+        vsf_linux_tick2timespec(remaining, remain_ticks);
     }
     return 0;
 }

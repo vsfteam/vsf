@@ -51,6 +51,7 @@
 #   include "./include/langinfo.h"
 #   include "./include/poll.h"
 #   include "./include/linux/limits.h"
+#   include "./include/linux/futex.h"
 #else
 #   include <unistd.h>
 #   include <sched.h>
@@ -76,6 +77,7 @@
 #   include <poll.h>
 // for MAX_PATH
 #   include <linux/limits.h>
+#   include <linux/futex.h>
 #endif
 #include <stdarg.h>
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
@@ -1999,11 +2001,88 @@ clock_t times(struct tms *buf)
     return (clock_t)(vsf_systimer_get_tick() * sysconf(_SC_CLK_TCK) / vsf_systimer_get_freq());
 }
 
-long syscall_futex(uint32_t *uaddr, int futex_op, uint32_t val, uint32_t val2, uint32_t *uaddr2, uint32_t val3)
+// futex.h
+// TODO: use hasp map instead of vsf_dlist for better performance at the cost of resources taken
+// TODO: use vsf_linux_trigger_t so that wait operation can be interrupted by signals
+
+typedef struct vsf_linux_futex_t {
+    vsf_dlist_node_t node;
+    uint32_t *futex;
+    vsf_trig_t trig;
+} vsf_linux_futex_t;
+
+// do not put into __vsf_linux structure because if futex is not used, compiler can optimize this
+static vsf_dlist_t __vsf_linux_futex_list = { 0 };
+
+static vsf_linux_futex_t * __vsf_linux_futex_get(uint32_t *futex, vsf_linux_futex_t *local_futex, vsf_protect_t *orig)
 {
-    VSF_LINUX_ASSERT(false);
+    VSF_LINUX_ASSERT((futex != NULL) && (local_futex != NULL));
+
+    vsf_linux_futex_t *pfutex = NULL;
+    __vsf_dlist_foreach_unsafe(vsf_linux_futex_t, node, &__vsf_linux_futex_list) {
+        if (_->futex == futex) {
+            pfutex = _;
+            break;
+        }
+    }
+    if (NULL == pfutex) {
+        pfutex = local_futex;
+    }
+    if (orig != NULL) {
+        vsf_unprotect_sched(*orig);
+    }
+    return pfutex;
+}
+
+long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint32_t *futex2, uint32_t val3)
+{
+    vsf_linux_futex_t local_futex, *pfutex;
+    vsf_timeout_tick_t timeout_ticks;
+    vsf_sync_reason_t reason;
+    vsf_protect_t orig;
+
+    // prepare local_futex out of protect
+    vsf_dlist_init_node(vsf_linux_futex_t, node, &local_futex);
+    local_futex.futex = futex;
+    vsf_eda_trig_init(&local_futex.trig, false, true);
+
+    switch (futex_op & FUTEX_CMD_MASK) {
+    case FUTEX_WAIT:
+        timeout_ticks = !val2 ? -1 : vsf_linux_timespec2tick((const struct timespec *)val2);
+        orig = vsf_protect_sched();
+        if (*futex != val) {
+            vsf_unprotect_sched(orig);
+            break;
+        }
+        pfutex = __vsf_linux_futex_get(futex, &local_futex, NULL);
+        extern void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout);
+        __vsf_eda_sync_pend(&pfutex->trig, NULL, timeout_ticks);
+        vsf_unprotect_sched(orig);
+
+        do {
+            reason = vsf_eda_sync_get_reason(&pfutex->trig, vsf_thread_wait());
+        } while (reason == VSF_SYNC_PENDING);
+        switch (reason) {
+        case VSF_SYNC_GET:          return 0;
+        case VSF_SYNC_TIMEOUT:      return -ETIMEDOUT;
+        default:                    VSF_LINUX_ASSERT(false);
+        }
+        break;
+    case FUTEX_WAKE:
+        orig = vsf_protect_sched();
+        pfutex = __vsf_linux_futex_get(futex, NULL, &orig);
+        VSF_LINUX_ASSERT(pfutex != NULL);
+        vsf_eda_trig_set(&pfutex->trig);
+        break;
+    default:
+        // TODO: add support to futex_op if assert here
+        VSF_LINUX_ASSERT(false);
+        return -1;
+    }
     return -1;
 }
+
+// prctl.h
 
 int prctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5)
 {
@@ -2017,6 +2096,7 @@ int prctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4
 
 #if VSF_LINUX_CFG_SHM_NUM > 0
 // shm.h
+
 int shmget(key_t key, size_t size, int shmflg)
 {
     VSF_LINUX_ASSERT((IPC_PRIVATE == key) || (shmflg & IPC_CREAT));
@@ -2087,6 +2167,7 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf)
 #endif      // VSF_LINUX_CFG_SHM_NUM
 
 // sched
+
 int sched_get_priority_max(int policy)
 {
     return VSF_LINUX_CFG_PRIO_HIGHEST;
