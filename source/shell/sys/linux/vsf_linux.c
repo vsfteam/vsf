@@ -138,6 +138,17 @@ typedef struct vsf_linux_shm_mem_t {
 dcl_vsf_bitmap(vsf_linux_pls_bitmap, VSF_LINUX_CFG_PLS_NUM);
 #endif
 
+#if VSF_LINUX_CFG_FUTEX_NUM > 0
+typedef struct vsf_linux_futex_t {
+    vsf_dlist_node_t node;
+    uint32_t *futex;
+    vsf_trig_t trig;
+} vsf_linux_futex_t;
+
+dcl_vsf_pool(vsf_linux_futex_pool)
+def_vsf_pool(vsf_linux_futex_pool, vsf_linux_futex_t)
+#endif
+
 typedef struct vsf_linux_t {
     int cur_tid;
     int cur_pid;
@@ -157,6 +168,13 @@ typedef struct vsf_linux_t {
     struct {
         vsf_bitmap(vsf_linux_pls_bitmap) bitmap;
     } pls;
+#endif
+
+#if VSF_LINUX_CFG_FUTEX_NUM > 0
+    struct {
+        vsf_dlist_t list;
+        vsf_pool(vsf_linux_futex_pool) pool;
+    } futex;
 #endif
 
     char hostname[HOST_NAME_MAX + 1];
@@ -402,6 +420,13 @@ vsf_linux_localstorage_t * vsf_linux_tls_get(int idx)
 
     return &thread->tls[idx];
 }
+#endif
+
+#if VSF_LINUX_CFG_FUTEX_NUM > 0
+//implement_vsf_pool(vsf_linux_futex_pool, vsf_linux_futex_t)
+#define __name vsf_linux_futex_pool
+#define __type vsf_linux_futex_t
+#include "service/pool/impl_vsf_pool.inc"
 #endif
 
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
@@ -676,6 +701,9 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
     vsf_linux_glibc_init();
+#endif
+#if VSF_LINUX_CFG_FUTEX_NUM > 0
+    VSF_POOL_INIT(vsf_linux_futex_pool, &__vsf_linux.futex.pool, VSF_LINUX_CFG_FUTEX_NUM);
 #endif
 
     sethostname(VSF_LINUX_CFG_HOSTNAME, strlen(VSF_LINUX_CFG_HOSTNAME));
@@ -2005,46 +2033,33 @@ clock_t times(struct tms *buf)
 // TODO: use hasp map instead of vsf_dlist for better performance at the cost of resources taken
 // TODO: use vsf_linux_trigger_t so that wait operation can be interrupted by signals
 
-typedef struct vsf_linux_futex_t {
-    vsf_dlist_node_t node;
-    uint32_t *futex;
-    vsf_trig_t trig;
-} vsf_linux_futex_t;
-
-// do not put into __vsf_linux structure because if futex is not used, compiler can optimize this
-static vsf_dlist_t __vsf_linux_futex_list = { 0 };
-
-static vsf_linux_futex_t * __vsf_linux_futex_get(uint32_t *futex, vsf_linux_futex_t *local_futex, vsf_protect_t *orig)
+static vsf_linux_futex_t * __vsf_linux_futex_get(uint32_t *futex, bool is_to_alloc)
 {
-    VSF_LINUX_ASSERT((futex != NULL) && (local_futex != NULL));
-
-    vsf_linux_futex_t *pfutex = NULL;
-    __vsf_dlist_foreach_unsafe(vsf_linux_futex_t, node, &__vsf_linux_futex_list) {
+    vsf_linux_futex_t *linux_futex = NULL;
+    __vsf_dlist_foreach_unsafe(vsf_linux_futex_t, node, &__vsf_linux.futex.list) {
         if (_->futex == futex) {
-            pfutex = _;
+            linux_futex = _;
             break;
         }
     }
-    if (NULL == pfutex) {
-        pfutex = local_futex;
+    if ((NULL == linux_futex) && is_to_alloc) {
+        linux_futex = VSF_POOL_ALLOC(vsf_linux_futex_pool, &__vsf_linux.futex.pool);
+        if (linux_futex != NULL) {
+            vsf_dlist_init_node(vsf_linux_futex_t, node, linux_futex);
+            linux_futex->futex = futex;
+            vsf_eda_trig_init(&linux_futex->trig, false, true);
+        }
     }
-    if (orig != NULL) {
-        vsf_unprotect_sched(*orig);
-    }
-    return pfutex;
+    return linux_futex;
 }
 
 long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint32_t *futex2, uint32_t val3)
 {
-    vsf_linux_futex_t local_futex, *pfutex;
+    VSF_LINUX_ASSERT(futex != NULL);
+    vsf_linux_futex_t *linux_futex;
     vsf_timeout_tick_t timeout_ticks;
     vsf_sync_reason_t reason;
     vsf_protect_t orig;
-
-    // prepare local_futex out of protect
-    vsf_dlist_init_node(vsf_linux_futex_t, node, &local_futex);
-    local_futex.futex = futex;
-    vsf_eda_trig_init(&local_futex.trig, false, true);
 
     switch (futex_op & FUTEX_CMD_MASK) {
     case FUTEX_WAIT:
@@ -2054,13 +2069,15 @@ long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint
             vsf_unprotect_sched(orig);
             break;
         }
-        pfutex = __vsf_linux_futex_get(futex, &local_futex, NULL);
+        linux_futex = __vsf_linux_futex_get(futex, true);
+        VSF_LINUX_ASSERT(linux_futex != NULL);
+
         extern void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout);
-        __vsf_eda_sync_pend(&pfutex->trig, NULL, timeout_ticks);
+        __vsf_eda_sync_pend(&linux_futex->trig, NULL, timeout_ticks);
         vsf_unprotect_sched(orig);
 
         do {
-            reason = vsf_eda_sync_get_reason(&pfutex->trig, vsf_thread_wait());
+            reason = vsf_eda_sync_get_reason(&linux_futex->trig, vsf_thread_wait());
         } while (reason == VSF_SYNC_PENDING);
         switch (reason) {
         case VSF_SYNC_GET:          return 0;
@@ -2070,9 +2087,17 @@ long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint
         break;
     case FUTEX_WAKE:
         orig = vsf_protect_sched();
-        pfutex = __vsf_linux_futex_get(futex, NULL, &orig);
-        VSF_LINUX_ASSERT(pfutex != NULL);
-        vsf_eda_trig_set(&pfutex->trig);
+        linux_futex = __vsf_linux_futex_get(futex, false);
+        vsf_unprotect_sched(orig);
+
+        VSF_LINUX_ASSERT(linux_futex != NULL);
+        vsf_eda_trig_set(&linux_futex->trig);
+
+        orig = vsf_protect_sched();
+        if (vsf_dlist_is_empty(&linux_futex->trig.pending_list)) {
+            VSF_POOL_FREE(vsf_linux_futex_pool, &__vsf_linux.futex.pool, linux_futex);
+        }
+        vsf_unprotect_sched(orig);
         break;
     default:
         // TODO: add support to futex_op if assert here

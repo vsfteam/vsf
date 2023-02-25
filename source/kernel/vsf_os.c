@@ -162,7 +162,7 @@ void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 
 #ifdef __VSF_OS_CFG_EVTQ_LIST
-//implement_vsf_pool( vsf_evt_node_pool, vsf_evt_node_t)
+//implement_vsf_pool(vsf_evt_node_pool, vsf_evt_node_t)
 #define __name vsf_evt_node_pool
 #define __type vsf_evt_node_t
 #include "service/pool/impl_vsf_pool.inc"

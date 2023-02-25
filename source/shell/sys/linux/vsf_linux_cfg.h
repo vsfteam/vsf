@@ -50,6 +50,10 @@
 #   define VSF_LINUX_CFG_TLS_NUM                8
 #endif
 
+#ifndef VSF_LINUX_CFG_FUTEX_NUM
+#   define VSF_LINUX_CFG_FUTEX_NUM              8
+#endif
+
 #ifndef VSF_LINUX_CFG_PRIO_LOWEST
 #   define VSF_LINUX_CFG_PRIO_LOWEST            vsf_prio_0
 #endif
