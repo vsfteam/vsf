@@ -176,6 +176,13 @@ in_addr_t inet_network(const char *cp)
     return ntohl(inet_addr(cp));
 }
 
+int inet_pton(int af, const char *src, void *dst)
+{
+    // TODO: add implementation
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
 {
     switch (af) {

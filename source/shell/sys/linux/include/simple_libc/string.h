@@ -206,6 +206,8 @@ size_t strspn(const char *str1, const char *str2);
 size_t strcspn(const char *str1, const char *str2);
 char * strpbrk(const char *str1, const char *str2);
 char * strerror(int errnum);
+// XSI-compliant
+int strerror_r(int errnum, char *buf, size_t buflen);
 
 #if defined(__WIN__)
 #   ifndef _CONST_RETURN

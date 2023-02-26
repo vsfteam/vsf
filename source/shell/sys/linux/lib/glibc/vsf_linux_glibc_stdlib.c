@@ -645,6 +645,17 @@ char * itoa(int num, char *str, int radix)
     return str;
 }
 
+int posix_memalign(void **memptr, size_t alignment, size_t size)
+{
+    VSF_LINUX_ASSERT(memptr != NULL);
+    void *ptr = memalign(alignment, size);
+    if (NULL == ptr) {
+        return ENOMEM;
+    }
+    *memptr = ptr;
+    return 0;
+}
+
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
 int __putenv_ex(vsf_linux_process_t *process, char *string)
 {

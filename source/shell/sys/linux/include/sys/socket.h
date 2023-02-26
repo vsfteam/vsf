@@ -43,6 +43,7 @@ extern "C" {
 // refer: https://code.woboq.org/gtk/include/bits/socket_type.h.html
 #define SOCK_STREAM     1
 #define SOCK_DGRAM      2
+#define SOCK_SEQPACKET  3
 
 #define INVALID_SOCKET  -1
 #define SOCKET_ERROR    -1
@@ -123,6 +124,12 @@ struct linger {
 #define SO_RCVTIMEO     20
 #define SO_SNDTIMEO     21
 #define SO_NONBLOCK     100
+
+// IP options
+#define IP_TOS          1
+#define IP_TTL          2
+#define IP_HDRINCL      3
+#define IP_OPTIONS      4
 
 // flags for send/recv
 enum {

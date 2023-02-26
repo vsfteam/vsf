@@ -24,6 +24,7 @@ extern "C" {
 #define inet_network        VSF_LINUX_SOCKET_WRAPPER(inet_network)
 #define inet_aton           VSF_LINUX_SOCKET_WRAPPER(inet_aton)
 #define inet_ntoa           VSF_LINUX_SOCKET_WRAPPER(inet_ntoa)
+#define inet_pton           VSF_LINUX_SOCKET_WRAPPER(inet_pton)
 #define inet_ntop           VSF_LINUX_SOCKET_WRAPPER(inet_ntop)
 #endif
 
@@ -62,6 +63,7 @@ in_addr_t inet_netof(struct in_addr in);
 in_addr_t inet_network(const char *cp);
 int inet_aton(const char *cp, struct in_addr *addr);
 char * inet_ntoa(struct in_addr in);
+int inet_pton(int af, const char *src, void *dst);
 const char * inet_ntop(int af, const void *src, char *dst, socklen_t size);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_ARPA_INET
