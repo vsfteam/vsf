@@ -31,6 +31,7 @@
 #   include "../../include/sys/stat.h"
 #   include "../../include/sys/mount.h"
 #   include "../../include/sys/epoll.h"
+#   include "../../include/sys/statvfs.h"
 #   include "../../include/poll.h"
 #   include "../../include/fcntl.h"
 #   include "../../include/errno.h"
@@ -41,6 +42,7 @@
 #   include <sys/stat.h>
 #   include <sys/mount.h>
 #   include <sys/epoll.h>
+#   include <sys/statvfs.h>
 #   include <poll.h>
 #   include <fcntl.h>
 #   include <errno.h>
