@@ -578,13 +578,7 @@ void vsf_heap_statistics(vsf_heap_statistics_t *statistics)
 void * vsf_heap_malloc_aligned_imp(uint_fast32_t size, uint_fast32_t alignment)
 {
 #ifdef VSF_ARCH_PROVIDE_HEAP
-    void *buffer;
-    if (alignment > vsf_arch_heap_alignment()) {
-        VSF_SERVICE_ASSERT(false);
-        buffer = NULL;
-    } else {
-        buffer = vsf_arch_heap_malloc(size);
-    }
+    void *buffer = vsf_arch_heap_malloc(size, alignment);
     if (NULL == buffer) {
         vsf_trace_error("fail to allocate %d bytes with %d alignment" VSF_TRACE_CFG_LINEEND, size, alignment);
     }
@@ -597,7 +591,7 @@ void * vsf_heap_malloc_aligned_imp(uint_fast32_t size, uint_fast32_t alignment)
 void * vsf_heap_malloc_imp(uint_fast32_t size)
 {
 #ifdef VSF_ARCH_PROVIDE_HEAP
-    void *buffer = vsf_arch_heap_malloc(size);
+    void *buffer = vsf_arch_heap_malloc(size, 0);
     if (NULL == buffer) {
         vsf_trace_error("fail to allocate %d bytes with %d alignment" VSF_TRACE_CFG_LINEEND, size, 0);
     }

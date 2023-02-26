@@ -1182,19 +1182,65 @@ void vsf_arch_reset(void)
  * Heap Implementation                                                        *
  *----------------------------------------------------------------------------*/
 
-void * vsf_arch_heap_malloc(uint_fast32_t size)
+typedef struct vsf_arch_heap_mcb_t {
+    void *ptr;
+    uint_fast32_t alignment;
+    uint_fast32_t size;             // size of memory allocated, smaller than memory_size
+    uint_fast32_t memory_size;      // total memory size
+} vsf_arch_heap_mcb_t;
+
+void * vsf_arch_heap_malloc(uint_fast32_t size, uint_fast32_t alignment)
 {
-    return HeapAlloc(GetProcessHeap(), 0, (SIZE_T)size);
+    void *buffer, *aligned_buffer;
+    vsf_arch_heap_mcb_t *mcb;
+    uint_fast32_t offset;
+
+    if (!alignment) {
+        alignment = 1;
+    }
+    offset = alignment - 1 + sizeof(vsf_arch_heap_mcb_t);
+    if ((buffer = HeapAlloc(GetProcessHeap(), 0, (SIZE_T)(size + offset))) == NULL) {
+        return NULL;
+    }
+
+    aligned_buffer = (void *)(((uintptr_t)buffer + offset) & ~(alignment - 1));
+    mcb = &((vsf_arch_heap_mcb_t *)aligned_buffer)[-1];
+    mcb->ptr = buffer;
+    mcb->alignment = alignment;
+    mcb->size = size;
+    mcb->memory_size = HeapSize(GetProcessHeap(), 0, buffer) - (aligned_buffer - buffer);
+    return aligned_buffer;
 }
 
 void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size)
 {
-    return HeapReAlloc(GetProcessHeap(), 0, buffer, (SIZE_T)size);
+    if (NULL == buffer) {
+        return vsf_arch_heap_malloc(size, 0);
+    }
+
+    vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
+
+    if (mcb->memory_size >= size) {
+        mcb->size = size;
+        return buffer;
+    }
+
+    uint32_t *new_buffer = vsf_arch_heap_malloc(size, mcb->alignment);
+    if (NULL == new_buffer) {
+        vsf_arch_heap_free(buffer);
+        return NULL;
+    }
+
+    size = vsf_min(size, mcb->size);
+    memcpy(new_buffer, buffer, size);
+    vsf_arch_heap_free(buffer);
+    return new_buffer;
 }
 
 void vsf_arch_heap_free(void *buffer)
 {
-    HeapFree(GetProcessHeap(), 0, buffer);
+    vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
+    HeapFree(GetProcessHeap(), 0, mcb->ptr);
 }
 
 unsigned int vsf_arch_heap_alignment(void)
@@ -1204,7 +1250,8 @@ unsigned int vsf_arch_heap_alignment(void)
 
 uint_fast32_t vsf_arch_heap_size(void *buffer)
 {
-    return HeapSize(GetProcessHeap(), 0, buffer);
+    vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
+    return mcb->memory_size;
 }
 
 /*----------------------------------------------------------------------------*
@@ -1239,7 +1286,7 @@ int vsf_arch_argu(char ***argv)
         alllen += multibyte_len[i];
     }
 
-    __vsf_arch_argv = vsf_arch_heap_malloc(__vsf_arch_argc * sizeof(char *) + alllen);
+    __vsf_arch_argv = vsf_arch_heap_malloc(__vsf_arch_argc * sizeof(char *) + alllen, 0);
     VSF_ARCH_ASSERT(__vsf_arch_argv != NULL);
 
     char *tmp = (char *)&(__vsf_arch_argv[__vsf_arch_argc]);

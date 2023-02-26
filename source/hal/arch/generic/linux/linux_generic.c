@@ -460,36 +460,60 @@ bool vsf_arch_low_level_init(void)
     return true;
 }
 
-void * vsf_arch_heap_malloc(uint_fast32_t size)
+/*----------------------------------------------------------------------------*
+ * Heap Implementation                                                        *
+ *----------------------------------------------------------------------------*/
+
+typedef struct vsf_arch_heap_mcb_t {
+    void *ptr;
+    uint_fast32_t alignment;
+    uint_fast32_t size;             // size of memory allocated, smaller than memory_size
+    uint_fast32_t memory_size;      // total memory size
+} vsf_arch_heap_mcb_t;
+
+void * vsf_arch_heap_malloc(uint_fast32_t size, uint_fast32_t alignment)
 {
-    uint32_t *new_mcb = aligned_alloc(16, (size_t)size + 16);
-    if (new_mcb != NULL) {
-        new_mcb[0] = size;
-        new_mcb[1] = size;
+    void *buffer, *aligned_buffer;
+    vsf_arch_heap_mcb_t *mcb;
+    uint_fast32_t offset;
+
+    if (!alignment) {
+        alignment = 1;
     }
-    return (void *)&new_mcb[4];
+    offset = alignment - 1 + sizeof(vsf_arch_heap_mcb_t);
+    if ((buffer = malloc(size + offset)) == NULL) {
+        return NULL;
+    }
+
+    aligned_buffer = (void *)(((uintptr_t)buffer + offset) & ~(alignment - 1));
+    mcb = &((vsf_arch_heap_mcb_t *)aligned_buffer)[-1];
+    mcb->ptr = buffer;
+    mcb->alignment = alignment;
+    mcb->size = size;
+    mcb->memory_size = size;
+    return aligned_buffer;
 }
 
 void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size)
 {
     if (NULL == buffer) {
-        return vsf_arch_heap_malloc(size);
+        return vsf_arch_heap_malloc(size, 0);
     }
 
-    uint32_t *old_mcb = (uint32_t *)buffer - 4;
+    vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
 
-    if (old_mcb[0] >= size) {
-        old_mcb[1] = size;
+    if (mcb->memory_size >= size) {
+        mcb->size = size;
         return buffer;
     }
 
-    uint32_t *new_buffer = vsf_arch_heap_malloc(size);
+    uint32_t *new_buffer = vsf_arch_heap_malloc(size, mcb->alignment);
     if (NULL == new_buffer) {
         vsf_arch_heap_free(buffer);
         return NULL;
     }
 
-    size = vsf_min(size, old_mcb[1]);
+    size = vsf_min(size, mcb->size);
     memcpy(new_buffer, buffer, size);
     vsf_arch_heap_free(buffer);
     return new_buffer;
@@ -497,8 +521,8 @@ void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size)
 
 void vsf_arch_heap_free(void *buffer)
 {
-    uint32_t *mcb = (uint32_t *)buffer - 4;
-    free(mcb);
+    vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
+    free(mcb->ptr);
 }
 
 unsigned int vsf_arch_heap_alignment(void)
@@ -508,8 +532,8 @@ unsigned int vsf_arch_heap_alignment(void)
 
 uint_fast32_t vsf_arch_heap_size(void *buffer)
 {
-    uint32_t *mcb = (uint32_t *)buffer - 4;
-    return mcb[0];
+    vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
+    return mcb->memory_size;
 }
 
 int vsf_arch_argu(char ***argv)
@@ -548,7 +572,7 @@ int vsf_arch_argu(char ***argv)
         }
     }
     VSF_ARCH_ASSERT(__vsf_arch_argc > 0);
-    __vsf_arch_argv = vsf_arch_heap_malloc(__vsf_arch_argc * sizeof(char *));
+    __vsf_arch_argv = vsf_arch_heap_malloc(__vsf_arch_argc * sizeof(char *), 0);
     VSF_ARCH_ASSERT(__vsf_arch_argv != NULL);
 
     for (int i = 0, argv_pos = 0; i < pos; i++) {
