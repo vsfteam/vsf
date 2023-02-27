@@ -1566,7 +1566,7 @@ int __fcntl_va(int fd, int cmd, va_list ap)
     case F_SETFD: {
             long tmp_arg = arg;
             arg = arg ^ sfd->fd_flags;
-            sfd->fd_flags = tmp_arg;
+            sfd->fd_flags |= tmp_arg;
         }
         break;
     case F_GETFL:

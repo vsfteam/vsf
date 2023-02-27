@@ -31,16 +31,32 @@ namespace std {
         constexpr atomic_base(T val) noexcept : __base(val) { }
 
         T store(T val, memory_order sync = memory_order_seq_cst) noexcept {
-            return __base = val;
+            T tmp;
+            vsf_protect_t orig = vsf_protect_int();
+                tmp = __base = val;
+            vsf_unprotect_int(orig);
+            return tmp;
         }
         T store(T val, memory_order sync = memory_order_seq_cst) volatile noexcept {
-            return __base = val;
+            T tmp;
+            vsf_protect_t orig = vsf_protect_int();
+                tmp = __base = val;
+            vsf_unprotect_int(orig);
+            return tmp;
         }
         T load(memory_order sync = memory_order_seq_cst) const noexcept {
-            return __base;
+            T tmp;
+            vsf_protect_t orig = vsf_protect_int();
+                tmp = __base;
+            vsf_unprotect_int(orig);
+            return tmp;
         }
         T load(memory_order sync = memory_order_seq_cst) const volatile noexcept {
-            return __base;
+            T tmp;
+            vsf_protect_t orig = vsf_protect_int();
+                tmp = __base;
+            vsf_unprotect_int(orig);
+            return tmp;
         }
 
         T exchange(T val, memory_order sync = memory_order_seq_cst) noexcept {
@@ -308,27 +324,29 @@ namespace std {
     template<class T>
     T atomic_load(const atomic<T> *obj) noexcept
     {
-        return (T)nullptr;
+        return obj->load();
     }
     template<class T>
     T atomic_load_explicit(const atomic<T> *obj, memory_order order) noexcept
     {
-        return (T)nullptr;
+        return obj->load();
     }
 
     template<class T>
     void atomic_store(atomic<T> *obj, typename atomic<T>::value_type value) noexcept
     {
+        obj->store(value);
     }
     template<class T>
     void atomic_store_explicit(atomic<T> *obj, typename atomic<T>::value_type value, memory_order order) noexcept
     {
+        obj->store(value);
     }
 
     template<class T>
     T atomic_fetch_add_explicit(atomic<T> *obj, typename atomic<T>::difference_type value, memory_order order) noexcept
     {
-        return (T)nullptr;
+        return obj->fetch_add(value, order);
     }
     template<class T>
     T atomic_fetch_add(atomic<T> *obj, typename atomic<T>::difference_type value) noexcept
@@ -339,7 +357,7 @@ namespace std {
     template<class T>
     T atomic_fetch_sub_explicit(atomic<T> *obj, typename atomic<T>::difference_type value, memory_order order) noexcept
     {
-        return (T)nullptr;
+        return obj->fetch_sub(value, order);
     }
     template<class T>
     T atomic_fetch_sub(atomic<T> *obj, typename atomic<T>::difference_type value) noexcept
@@ -350,7 +368,7 @@ namespace std {
     template<class T>
     T atomic_fetch_and_explicit(atomic<T> *obj, typename atomic<T>::value_type value, memory_order order) noexcept
     {
-        return (T)nullptr;
+        return obj->fetch_and(value, order);
     }
     template<class T>
     T atomic_fetch_and(atomic<T> *obj, typename atomic<T>::value_type value) noexcept
@@ -361,7 +379,7 @@ namespace std {
     template<class T>
     T atomic_fetch_or_explicit(atomic<T> *obj, typename atomic<T>::value_type value, memory_order order) noexcept
     {
-        return (T)nullptr;
+        return obj->fetch_or(value, order);
     }
     template<class T>
     T atomic_fetch_or(atomic<T> *obj, typename atomic<T>::value_type value) noexcept
@@ -372,7 +390,7 @@ namespace std {
     template<class T>
     T atomic_fetch_xor_explicit(atomic<T> *obj, typename atomic<T>::value_type value, memory_order order) noexcept
     {
-        return (T)nullptr;
+        return obj->fetch_xor(value, order);
     }
     template<class T>
     T atomic_fetch_xor(atomic<T> *obj, typename atomic<T>::value_type value) noexcept
