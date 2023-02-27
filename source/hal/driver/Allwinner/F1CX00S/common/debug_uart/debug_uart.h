@@ -24,7 +24,7 @@
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 
-#if VSF_USE_SIMPLE_STREAM == ENABLED 
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 #   include "service/vsf_service.h"
 #elif VSF_USE_STREAM == ENABLED
 #   include "service/stream/vsf_stream.h"
@@ -48,7 +48,7 @@ extern "C" {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if     VSF_USE_SIMPLE_STREAM == ENABLED
-extern vsf_mem_stream_t VSF_DEBUG_STREAM_TX;
+extern vsf_stream_t VSF_DEBUG_STREAM_TX;
 extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
 #elif   VSF_USE_STREAM == ENABLED
 #endif

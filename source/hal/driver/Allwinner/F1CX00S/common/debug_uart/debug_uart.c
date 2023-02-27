@@ -45,16 +45,11 @@
 
 #if     VSF_USE_SIMPLE_STREAM == ENABLED
 static uint8_t __vsf_debug_stream_rx_buff[VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE];
-static uint8_t __vsf_debug_stream_tx_buff[VSF_DEBUG_STREAM_CFG_TX_BUF_SIZE];
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
 #if     VSF_USE_SIMPLE_STREAM == ENABLED
-vsf_mem_stream_t VSF_DEBUG_STREAM_TX = {
-    .op         = &vsf_mem_stream_op,
-    .buffer     = __vsf_debug_stream_tx_buff,
-    .size       = sizeof(__vsf_debug_stream_tx_buff),
-};
 
 vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
     .op         = &vsf_mem_stream_op,
@@ -71,16 +66,8 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 // TODO: use interrupt mode
 void VSF_DEBUG_STREAM_POLL(void)
 {
-    uint_fast32_t tx_size = VSF_STREAM_GET_DATA_SIZE(&VSF_DEBUG_STREAM_TX);
     uint_fast32_t rx_free_size = VSF_STREAM_GET_FREE_SIZE(&VSF_DEBUG_STREAM_RX);
     uint8_t ch;
-
-    while (tx_size && (UART0_BASE->USR & USR_TFNF)) {
-        tx_size--;
-
-        VSF_STREAM_READ(&VSF_DEBUG_STREAM_TX, &ch, 1);
-        UART0_BASE->THR = ch;
-    }
 
     while (rx_free_size && (UART0_BASE->USR & USR_RFNE)) {
         rx_free_size--;
@@ -89,6 +76,24 @@ void VSF_DEBUG_STREAM_POLL(void)
         VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, &ch, 1);
     }
 }
+
+static void __VSF_DEBUG_STREAM_TX_INIT(void)
+{
+    vsf_stream_connect_tx(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t);
+}
+
+static void __VSF_DEBUG_STREAM_TX_WRITE_BLOCKED(uint8_t *buf, uint_fast32_t size)
+{
+    while (size > 0) {
+        if (UART0_BASE->USR & USR_TFNF) {
+            size--;
+            UART0_BASE->THR = *buf++;
+        }
+    }
+}
+
+#include "hal/driver/common/debug_stream/debug_stream_tx_blocked.inc"
+
 #elif   VSF_USE_STREAM == ENABLED
 #endif
 
