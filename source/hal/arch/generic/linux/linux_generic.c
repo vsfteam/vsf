@@ -574,7 +574,7 @@ int vsf_arch_argu(char ***argv)
         }
     }
     VSF_ARCH_ASSERT(__vsf_arch_argc > 0);
-    __vsf_arch_argv = malloc(__vsf_arch_argc * sizeof(char *), 0);
+    __vsf_arch_argv = malloc(__vsf_arch_argc * sizeof(char *));
     VSF_ARCH_ASSERT(__vsf_arch_argv != NULL);
 
     for (int i = 0, argv_pos = 0; i < pos; i++) {
