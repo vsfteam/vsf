@@ -66,7 +66,9 @@ extern "C" {
 #endif
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
-#define VSF_ARCH_PROVIDE_HEAP
+#ifndef VSF_ARCH_PROVIDE_HEAP
+#   define VSF_ARCH_PROVIDE_HEAP        ENABLED
+#endif
 // define VSF_ARCH_LIMIT_NO_SET_STACK to remove dependency of setjmp/longjmp
 //  and use stack of thread in windows for the best compatibility
 //  note that VSF_ARCH_PRI_NUM MUST defined to 1 and VSF_ARCH_SWI_NUM to 0

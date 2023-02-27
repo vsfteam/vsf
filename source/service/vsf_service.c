@@ -53,7 +53,7 @@ extern vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void);
 WEAK(vsf_service_init)
 void vsf_service_init(void)
 {
-#if VSF_USE_HEAP == ENABLED && !defined(VSF_ARCH_PROVIDE_HEAP)
+#if VSF_USE_HEAP == ENABLED && VSF_ARCH_PROVIDE_HEAP != ENABLED
 #   if !__IS_COMPILER_IAR__ || !defined(__VSF_WORKAROUND_IAR_CPP__)
     vsf_heap_init();
     vsf_heap_add_memory(vsf_service_req___heap_memory_buffer___from_usr());

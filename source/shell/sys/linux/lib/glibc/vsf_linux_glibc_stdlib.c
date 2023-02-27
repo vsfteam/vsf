@@ -49,7 +49,7 @@
 
 /*============================ MACROS ========================================*/
 
-#ifdef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
 #   define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN           vsf_arch_heap_alignment()
 #else
 #   define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN           VSF_HEAP_ALIGN

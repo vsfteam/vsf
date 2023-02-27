@@ -1182,6 +1182,7 @@ void vsf_arch_reset(void)
  * Heap Implementation                                                        *
  *----------------------------------------------------------------------------*/
 
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
 typedef struct vsf_arch_heap_mcb_t {
     void *ptr;
     uint_fast32_t alignment;
@@ -1253,6 +1254,7 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
     vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
     return mcb->memory_size;
 }
+#endif
 
 /*----------------------------------------------------------------------------*
  * Argument                                                                   *
@@ -1286,7 +1288,7 @@ int vsf_arch_argu(char ***argv)
         alllen += multibyte_len[i];
     }
 
-    __vsf_arch_argv = vsf_arch_heap_malloc(__vsf_arch_argc * sizeof(char *) + alllen, 0);
+    __vsf_arch_argv = HeapAlloc(GetProcessHeap(), 0, __vsf_arch_argc * sizeof(char *) + alllen);
     VSF_ARCH_ASSERT(__vsf_arch_argv != NULL);
 
     char *tmp = (char *)&(__vsf_arch_argv[__vsf_arch_argc]);
@@ -1301,7 +1303,7 @@ int vsf_arch_argu(char ***argv)
 }
 
 /*----------------------------------------------------------------------------*
- * dummy WinMain, Just make some compiler happy                               *
+ * dummy WinMain, Just make some compilers happy                              *
  *----------------------------------------------------------------------------*/
 WEAK(WinMain)
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)

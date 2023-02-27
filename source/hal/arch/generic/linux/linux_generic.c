@@ -464,6 +464,7 @@ bool vsf_arch_low_level_init(void)
  * Heap Implementation                                                        *
  *----------------------------------------------------------------------------*/
 
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
 typedef struct vsf_arch_heap_mcb_t {
     void *ptr;
     uint_fast32_t alignment;
@@ -535,6 +536,7 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
     vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
     return mcb->memory_size;
 }
+#endif
 
 int vsf_arch_argu(char ***argv)
 {
@@ -555,7 +557,7 @@ int vsf_arch_argu(char ***argv)
 
     int pos = 0, ret;
     while(true) {
-        __vsf_arch_argv_str = vsf_arch_heap_realloc(__vsf_arch_argv_str, pos + 1024);
+        __vsf_arch_argv_str = realloc(__vsf_arch_argv_str, pos + 1024);
         ret = read(fd, __vsf_arch_argv_str + pos, 1024);
         if (ret < 0) {
             break;
@@ -572,7 +574,7 @@ int vsf_arch_argu(char ***argv)
         }
     }
     VSF_ARCH_ASSERT(__vsf_arch_argc > 0);
-    __vsf_arch_argv = vsf_arch_heap_malloc(__vsf_arch_argc * sizeof(char *), 0);
+    __vsf_arch_argv = malloc(__vsf_arch_argc * sizeof(char *), 0);
     VSF_ARCH_ASSERT(__vsf_arch_argv != NULL);
 
     for (int i = 0, argv_pos = 0; i < pos; i++) {

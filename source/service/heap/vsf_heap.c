@@ -96,7 +96,7 @@ typedef struct vsf_heap_mcb_t {
     vsf_dlist_node_t list;
 } vsf_heap_mcb_t;
 
-#ifndef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP != ENABLED
 typedef struct vsf_default_heap_t {
     implement(vsf_heap_t)
     // one more as terminator
@@ -107,7 +107,7 @@ typedef struct vsf_default_heap_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const i_heap_t VSF_HEAP = {
-#ifndef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP != ENABLED
     .Init           = &vsf_heap_init,
     .AddBuffer      = &vsf_heap_add_buffer,
     .AddMemory      = &vsf_heap_add_memory,
@@ -117,14 +117,14 @@ const i_heap_t VSF_HEAP = {
     .ReallocAligned = &vsf_heap_realloc_aligned_imp,
     .Realloc        = &vsf_heap_realloc_imp,
     .Free           = &vsf_heap_free_imp,
-#if !defined(VSF_ARCH_PROVIDE_HEAP) && VSF_HEAP_CFG_STATISTICS == ENABLED
+#if VSF_ARCH_PROVIDE_HEAP != ENABLED && VSF_HEAP_CFG_STATISTICS == ENABLED
     .Statistics     = &vsf_heap_statistics,
 #endif
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#ifndef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP != ENABLED
 static NO_INIT vsf_default_heap_t __vsf_heap;
 #endif
 
@@ -543,7 +543,7 @@ vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist
 }
 #endif
 
-#ifndef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP != ENABLED
 // MUST NOT return NULL;
 static vsf_dlist_t * __vsf_heap_get_freelist(uint_fast32_t size)
 {
@@ -577,7 +577,7 @@ void vsf_heap_statistics(vsf_heap_statistics_t *statistics)
 
 void * vsf_heap_malloc_aligned_imp(uint_fast32_t size, uint_fast32_t alignment)
 {
-#ifdef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
     void *buffer = vsf_arch_heap_malloc(size, alignment);
     if (NULL == buffer) {
         vsf_trace_error("fail to allocate %d bytes with %d alignment" VSF_TRACE_CFG_LINEEND, size, alignment);
@@ -590,7 +590,7 @@ void * vsf_heap_malloc_aligned_imp(uint_fast32_t size, uint_fast32_t alignment)
 
 void * vsf_heap_malloc_imp(uint_fast32_t size)
 {
-#ifdef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
     void *buffer = vsf_arch_heap_malloc(size, 0);
     if (NULL == buffer) {
         vsf_trace_error("fail to allocate %d bytes with %d alignment" VSF_TRACE_CFG_LINEEND, size, 0);
@@ -614,7 +614,7 @@ void * vsf_heap_realloc_aligned_imp(void *buffer, uint_fast32_t size, uint_fast3
         }
         return NULL;
     }
-#ifdef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
     VSF_SERVICE_ASSERT(false);
     vsf_heap_free(buffer);
     return NULL;
@@ -626,7 +626,7 @@ void * vsf_heap_realloc_aligned_imp(void *buffer, uint_fast32_t size, uint_fast3
 //Adjust the allocated memory size(aligned to sizeof(uintalu_t))
 void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size)
 {
-#ifdef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
     if (NULL == buffer) {
         if (size > 0) {
             return vsf_heap_malloc(size);
@@ -651,7 +651,7 @@ void * vsf_heap_realloc_imp(void *buffer, uint_fast32_t size)
 
 uint_fast32_t vsf_heap_size(uint8_t *buffer)
 {
-#ifdef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
     return vsf_arch_heap_size(buffer);
 #else
     return __vsf_heap_size(&__vsf_heap.use_as__vsf_heap_t, buffer);
@@ -661,7 +661,7 @@ uint_fast32_t vsf_heap_size(uint8_t *buffer)
 void vsf_heap_free_imp(void *buffer)
 {
     if (buffer != NULL) {
-#ifdef VSF_ARCH_PROVIDE_HEAP
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
     return vsf_arch_heap_free(buffer);
 #else
         __vsf_heap_free(&__vsf_heap.use_as__vsf_heap_t, buffer);

@@ -306,7 +306,7 @@ will be forced to DISABLED.
 #endif
 }
 
-#if VSF_USE_HEAP == ENABLED && !defined(VSF_ARCH_PROVIDE_HEAP)
+#if VSF_USE_HEAP == ENABLED && VSF_ARCH_PROVIDE_HEAP != ENABLED
 #ifndef WEAK_VSF_SERVICE_REQ___HEAP_MEMORY_BUFFER___FROM_USR
 WEAK(vsf_service_req___heap_memory_buffer___from_usr)
 vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void)
