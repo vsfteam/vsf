@@ -142,8 +142,8 @@ enum memory_order {
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
-                    *(object) -= operand;                                       \
                     VSF_MACRO_SAFE_NAME(tmp) = *(object);                       \
+                    *(object) -= operand;                                       \
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
@@ -154,8 +154,8 @@ enum memory_order {
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
-                    *(object) |= operand;                                       \
                     VSF_MACRO_SAFE_NAME(tmp) = *(object);                       \
+                    *(object) |= operand;                                       \
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
@@ -166,8 +166,8 @@ enum memory_order {
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
-                    *(object) ^= operand;                                       \
                     VSF_MACRO_SAFE_NAME(tmp) = *(object);                       \
+                    *(object) ^= operand;                                       \
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
@@ -178,8 +178,8 @@ enum memory_order {
             ({                                                                  \
                 typeof(*object) VSF_MACRO_SAFE_NAME(tmp);                       \
                 vsf_protect_t VSF_MACRO_SAFE_NAME(protect) = vsf_protect_int(); \
-                    *(object) &= operand;                                       \
                     VSF_MACRO_SAFE_NAME(tmp) = *(object);                       \
+                    *(object) &= operand;                                       \
                 vsf_unprotect_int(VSF_MACRO_SAFE_NAME(protect));                \
                 VSF_MACRO_SAFE_NAME(tmp);                                       \
             })
