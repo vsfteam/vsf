@@ -1011,7 +1011,7 @@ int time_main(int argc, char *argv[])
     return ret;
 }
 
-#if !defined(VSF_ARCH_PROVIDE_HEAP) && VSF_HEAP_CFG_STATISTICS == ENABLED
+#if VSF_ARCH_PROVIDE_HEAP != ENABLED && VSF_HEAP_CFG_STATISTICS == ENABLED
 int free_main(int argc, char *argv[])
 {
     vsf_heap_statistics_t statistics;
