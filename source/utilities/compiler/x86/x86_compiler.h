@@ -22,30 +22,9 @@
 
 /*============================ MACROS ========================================*/
 
-//! \name The macros to identify the compiler
-//! @{
-
-// TODO: detect __IS_COMPILER_MSVC__
-
-#ifdef __IS_COMPILER_LLVM__
-#   undef  __IS_COMPILER_LLVM__
-#endif
-#if defined(__clang__)
-#   define __IS_COMPILER_LLVM__                1
-#else
-//! \note for gcc
-#ifdef __IS_COMPILER_GCC__
-#   undef __IS_COMPILER_GCC__
-#endif
-#if defined(__GNUC__) && !__IS_COMPILER_LLVM__
-#   define __IS_COMPILER_GCC__                 1
-#endif
-//! @}
-#endif
-//! @}
+#include "./x86_compiler_detect.h"
 
 #endif /* end of __USE_X86_COMPILER_H_PART_1__ */
-
 
 /*========================== Multiple-Entry Start ============================*/
 

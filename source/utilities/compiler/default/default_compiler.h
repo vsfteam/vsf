@@ -20,34 +20,13 @@
 
 /*============================ INCLUDES ======================================*/
 
-//! default compiler supports only gcc/clang
-
-//! \name The macros to identify the compiler
-//! @{
-
-#ifdef __IS_COMPILER_LLVM__
-#   undef  __IS_COMPILER_LLVM__
-#endif
-#if defined(__clang__)
-#   define __IS_COMPILER_LLVM__                1
-#else
-//! \note for gcc
-#ifdef __IS_COMPILER_GCC__
-#   undef __IS_COMPILER_GCC__
-#endif
-#if defined(__GNUC__) && !__IS_COMPILER_LLVM__
-#   define __IS_COMPILER_GCC__                 1
-#endif
-//! @}
-#endif
-//! @}
+#include "./default_compiler_detect.h"
 
 #if !__IS_COMPILER_LLVM__ && !__IS_COMPILER_GCC__
 #   error compiler not supported
 #endif
 
 #endif /* end of __USE_DEFAULT_COMPILER_H_PART_1__ */
-
 
 /*========================== Multiple-Entry Start ============================*/
 

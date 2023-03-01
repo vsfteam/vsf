@@ -30,8 +30,8 @@ typedef unsigned short              wchar_t;
 #endif
 typedef unsigned short              wint_t;
 
-// TODO: utilities.h CANNOT be included here, if need something, re-implement here
-//#include "utilities/vsf_utilities.h"
+// include compiler detect only, do not include compiler.h
+#include "utilities/compiler/compiler_detect.h"
 
 #ifdef __cplusplus
 extern "C" {

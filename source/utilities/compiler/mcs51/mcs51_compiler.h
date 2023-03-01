@@ -20,29 +20,9 @@
 
 /*============================ INCLUDES ======================================*/
 
-//! \name The macros to identify the compiler
-//! @{
-
-//! \note for IAR
-#ifdef __IS_COMPILER_IAR__
-#   undef __IS_COMPILER_IAR__
-#endif
-#if defined(__IAR_SYSTEMS_ICC__)
-#   define __IS_COMPILER_IAR__          1
-#endif
-
-
-//! \note for KEIL51
-#ifdef __IS_COMPILER_51_KEIL__
-#   undef __IS_COMPILER_51_KEIL__
-#endif
-#if defined(__C51__) || defined(__CX51__)
-#   define __IS_COMPILER_51_KEIL__      1
-#endif
-//! @}
+#include "./msc51_compiler_detect.h"
 
 #endif /* __USE_MCS51_COMPILER_H_PART_1__ */
-
 
 /*========================== Multiple-Entry Start ============================*/
 
