@@ -155,7 +155,12 @@ typedef enum {
 #endif
 
 #ifndef offset_of
-#   define offset_of(__s, __m)              (uintptr_t)(&(((__s *)0)->__m))
+// use offsetof from compiler if available for constexpr feature in cpp
+#   if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+#       define offset_of(__type, __member)  __builtin_offsetof(__type, __member)
+#   else
+#       define offset_of(__type, __member)  (uintptr_t)(&(((__type *)0)->__member))
+#   endif
 #endif
 #ifndef container_of
 #   define container_of(__ptr, __type, __member)                                \

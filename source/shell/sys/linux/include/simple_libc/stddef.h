@@ -53,7 +53,12 @@ extern "C" {
 #endif
 
 #ifndef offsetof
-#   define offsetof(__type, __member)   (uintptr_t)(&(((__type *)0)->__member))
+// use offsetof from compiler if available for constexpr feature in cpp
+#   if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+#       define offsetof(__type, __member)   __builtin_offsetof(__type, __member)
+#   else
+#       define offsetof(__type, __member)   (uintptr_t)(&(((__type *)0)->__member))
+#   endif
 #endif
 
 // define max_align_t, can not depend on uintalu_t because of circular depoendency
