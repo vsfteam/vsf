@@ -481,6 +481,7 @@ int usb_unlink_urb(struct urb *urb)
 void usb_kill_urb(struct urb *urb)
 {
     vsf_eda_t *eda_cur = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda_cur != NULL);
     vsf_protect_t orig = vsf_protect_sched();
     if (!urb->is_submitted) {
         vsf_unprotect_sched(orig);

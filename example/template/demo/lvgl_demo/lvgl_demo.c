@@ -330,6 +330,7 @@ void * __lvgl_thread(void *arg)
 {
 #if APP_LVGL_DEMO_CFG_ANIMINATION != ENABLED
     usrapp_ui_common.lvgl.eda_poll = vsf_eda_get_cur();
+    VSF_ASSERT(usrapp_ui_common.lvgl.eda_poll != NULL);
 #endif
 
     __lvgl_input_init();
@@ -428,6 +429,7 @@ int VSF_USER_ENTRY(void)
 
 #if APP_USE_LINUX_DEMO == ENABLED
     __lvgl_demo_evt_to_notify = vsf_eda_get_cur();
+    VSF_ASSERT(__lvgl_demo_evt_to_notify != NULL);
 #else
     __lvgl_is_disp_inited = false;
 #endif

@@ -940,6 +940,7 @@ int __inet_gethostbyname(const char *name, in_addr_t *addr)
     gethostbyname_param_t param = {
         .eda    = vsf_eda_get_cur(),
     };
+    VSF_LINUX_ASSERT(param.eda != NULL);
     err_t err;
 
     LOCK_TCPIP_CORE();

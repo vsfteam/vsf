@@ -136,6 +136,7 @@ vsf_err_t vk_usbd_uvc_send_packet(vk_usbd_uvc_t *uvc, uint8_t *buffer, uint_fast
     trans->use_as__vsf_mem_t.size = size;
     trans->zlp = false;
     trans->eda = vsf_eda_get_cur();
+    VSF_USB_ASSERT(trans->eda != NULL);
     trans->notify_eda = true;
     return vk_usbd_ep_send(uvc->dev, trans);
 }

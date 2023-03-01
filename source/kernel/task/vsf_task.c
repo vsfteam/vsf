@@ -51,6 +51,7 @@ fsm_rt_t __vsf_eda_call_task(   vsf_task_entry_t entry,
                                 size_t local_size)
 {
     vsf_eda_t *pthis = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
     fsm_rt_t subcall_return_value = pthis->subcall_return_value;
     __vsf_eda_frame_state_t state   = {

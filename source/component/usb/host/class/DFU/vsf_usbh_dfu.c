@@ -260,6 +260,7 @@ vsf_err_t __vk_usbh_dfu_operate(void *dfu_ptr, uint8_t *buffer, uint_fast32_t si
     }
 
     dfu->eda_notify = vsf_eda_get_cur();
+    VSF_USB_ASSERT(dfu->eda_notify != NULL);
     dfu->request = request;
     dfu->buffer = buffer;
     dfu->size = size;

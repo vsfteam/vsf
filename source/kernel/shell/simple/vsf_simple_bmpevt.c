@@ -88,6 +88,7 @@ vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *bmpevt_ptr,
 
     do {
         vsf_eda_t *peda = vsf_eda_get_cur();
+        VSF_KERNEL_ASSERT(peda != NULL);
         if (vsf_eda_polling_state_get(peda)) {
             /* VSF_APP_STATE_POLL */
             if (time_out < 0) {

@@ -334,6 +334,7 @@ bool mod_delayed_work(struct workqueue_struct *wq, struct delayed_work *dwork, u
 void flush_workqueue(struct workqueue_struct *wq)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda != NULL);
 
     vsf_protect_t orig = vsf_protect_int();
         if (vsf_dlist_is_empty(&wq->work_list) && vsf_dlist_is_empty(&wq->dwork_list)) {
@@ -356,6 +357,7 @@ bool flush_work(struct work_struct *work)
     }
 
     vsf_eda_t *eda_cur = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda_cur != NULL);
     vsf_protect_t orig = vsf_protect_int();
     if (    vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, work)
         ||  vsf_dlist_is_in(struct work_struct, entry, &wq->dwork_list, work)
@@ -374,6 +376,7 @@ bool flush_work(struct work_struct *work)
 static bool __queue_cancel_work(struct workqueue_struct *wq, struct work_struct *work, bool is_to_wait, vsf_protect_t orig)
 {
     vsf_eda_t *eda_cur = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda_cur != NULL);
     if (vsf_dlist_is_in(struct work_struct, entry, &wq->work_list, work)) {
         vsf_dlist_remove(struct work_struct, entry, &wq->work_list, work);
         vsf_unprotect_int(orig);

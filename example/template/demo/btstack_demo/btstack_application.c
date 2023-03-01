@@ -104,6 +104,7 @@ int btstack_scan_main(int argc, char *argv[])
         gap_inquiry_start(5);
 
         __eda = vsf_eda_get_cur();
+        VSF_ASSERT(__eda != NULL);
         vsf_thread_wfe(VSF_EVT_USER);
         __eda = NULL;
     } else {

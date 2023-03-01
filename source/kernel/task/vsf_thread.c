@@ -57,6 +57,7 @@ SECTION(".text.vsf.kernel.vsf_thread_get_cur")
 vsf_thread_t *vsf_thread_get_cur(void)
 {
     vsf_thread_t *thread_obj = (vsf_thread_t *)vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(thread_obj != NULL);
 #   if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
     VSF_KERNEL_ASSERT(thread_obj->flag.feature.is_stack_owner);
 #   endif
@@ -739,6 +740,7 @@ vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx)
 
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
     vsf_eda_t *eda_self = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(eda_self != NULL);
     // switch to original evtq right now if mutex boost priority of current task,
     //  or current task will switch to the original priority after current event is processed and returned
     if (eda_self->flag.state.is_new_prio) {

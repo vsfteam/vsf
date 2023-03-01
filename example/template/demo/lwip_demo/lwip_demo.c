@@ -132,6 +132,7 @@ static int __lwip_nslookup(int argc, char *argv[])
     }
 
     vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_ASSERT(eda != NULL);
 
     LOCK_TCPIP_CORE();
         err = dns_gethostbyname(argv[1], &ipaddr, dns_found, eda);

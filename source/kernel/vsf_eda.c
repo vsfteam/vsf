@@ -407,7 +407,6 @@ vsf_eda_t * vsf_eda_get_cur(void)
     if (ctx_cur != NULL) {
         return ctx_cur->eda;
     } else {
-        vsf_kernel_err_report(VSF_KERNEL_ERR_NULL_EDA_PTR);
         return NULL;
     }
 }
@@ -447,21 +446,16 @@ SECTION(".text.vsf.kernel.vsf_eda_get_cur_evt")
 vsf_evt_t vsf_eda_get_cur_evt(void)
 {
     vsf_evtq_ctx_t *ctx_cur = __vsf_evtq_get_cur_ctx();
-    if (ctx_cur != NULL) {
-        return ctx_cur->evt;
-    }
-    return VSF_EVT_INVALID;
+    VSF_KERNEL_ASSERT(ctx_cur != NULL);
+    return ctx_cur->evt;
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_get_cur_msg")
 void * vsf_eda_get_cur_msg(void)
 {
     vsf_evtq_ctx_t *ctx_cur = __vsf_evtq_get_cur_ctx();
-    if (ctx_cur != NULL) {
-        return (void *)ctx_cur->msg;
-    } else {
-        return NULL;
-    }
+    VSF_KERNEL_ASSERT(ctx_cur != NULL);
+    return (void *)ctx_cur->msg;
 }
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
@@ -469,6 +463,7 @@ SECTION(".text.vsf.kernel.vsf_eda_get_return_value")
 uintptr_t vsf_eda_get_return_value(void)
 {
     vsf_eda_t *pthis = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(pthis != NULL);
     return pthis->return_value;
 }
 #endif
@@ -477,6 +472,7 @@ SECTION(".text.vsf.kernel.vsf_eda_return")
 bool __vsf_eda_return(uintptr_t return_value)
 {
     vsf_eda_t *pthis = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(pthis != NULL);
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     __vsf_eda_frame_t *frame = NULL;
     pthis->return_value = return_value;
@@ -531,6 +527,7 @@ SECTION(".text.vsf.kernel.__vsf_eda_yield")
 void __vsf_eda_yield(void)
 {
     vsf_eda_t *pthis = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(pthis != NULL);
     vsf_eda_post_evt(pthis, VSF_EVT_YIELD);
 }
 
@@ -689,6 +686,7 @@ vsf_err_t __vsf_eda_call_eda_ex(uintptr_t func,
     vsf_err_t err = __vsf_eda_call_eda_ex_prepare(func, param, state, is_sub_call);
     if (VSF_ERR_NONE == err) {
         vsf_eda_t *eda = vsf_eda_get_cur();
+        VSF_KERNEL_ASSERT(eda != NULL);
 #if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
         __vsf_dispatch_evt(eda, VSF_EVT_INIT);
 #else
@@ -750,6 +748,7 @@ vsf_err_t vsf_eda_go_to(uintptr_t evthandler)
 {
     vsf_err_t err;
     vsf_eda_t *pthis = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
     err = vsf_eda_set_evthandler(pthis, (vsf_eda_evthandler_t) evthandler);
 
@@ -959,6 +958,7 @@ vsf_err_t vsf_eda_post_evt_msg(vsf_eda_t *pthis, vsf_evt_t evt, void *msg)
 void vsf_eda_cpu_usage_start(vsf_eda_t *pthis, vsf_cpu_usage_ctx_t *ctx)
 {
     pthis = __vsf_eda_get_valid_eda(pthis);
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
     vsf_protect_t origlevel = vsf_protect_int();
         ctx->ticks = 0;
@@ -972,6 +972,7 @@ void vsf_eda_cpu_usage_start(vsf_eda_t *pthis, vsf_cpu_usage_ctx_t *ctx)
 void vsf_eda_cpu_usage_stop(vsf_eda_t *pthis)
 {
     pthis = __vsf_eda_get_valid_eda(pthis);
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
     vsf_protect_t origlevel = vsf_protect_int();
         vsf_cpu_usage_ctx_t  *ctx = pthis->usage.ctx;

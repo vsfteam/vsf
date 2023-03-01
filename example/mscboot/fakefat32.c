@@ -98,6 +98,7 @@ vsf_component_peda_ifs_entry(__mscboot_on_firmware_read, vk_memfs_callback_read)
         vsf_local.offset += MSCBOOT_CFG_FW_ADDR;
         vsf_local.rsize = 0;
         __eda = vsf_eda_get_cur();
+        VSF_ASSERT(__eda != NULL);
         // fall through
     case VSF_EVT_USER:
         if (!vsf_local.size) {
@@ -139,6 +140,7 @@ vsf_component_peda_ifs_entry(__mscboot_on_firmware_write, vk_memfs_callback_writ
         vsf_local.offset += MSCBOOT_CFG_FW_ADDR;
         vsf_local.wsize = 0;
         __eda = vsf_eda_get_cur();
+        VSF_ASSERT(__eda != NULL);
         // fall through
     case VSF_EVT_USER:
         if (!vsf_local.size) {

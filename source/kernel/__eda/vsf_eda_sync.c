@@ -103,6 +103,7 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason( vsf_sync_t *sync,
                                                     bool dequeue_eda)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(eda != NULL);
     vsf_sync_reason_t reason = VSF_SYNC_FAIL;
 
     VSF_KERNEL_ASSERT((sync != NULL) && (eda != NULL));

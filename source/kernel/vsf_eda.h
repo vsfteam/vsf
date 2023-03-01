@@ -1063,7 +1063,7 @@ typedef struct vsf_bmpevt_adapter_bmpevt_t {
 
 typedef enum vsf_kernel_error_t {
     VSF_KERNEL_ERR_NONE = 0,
-    VSF_KERNEL_ERR_NULL_EDA_PTR,
+    VSF_KERNEL_ERR_INVALID_CONTEXT,
     VSF_KERNEL_ERR_INVALID_USAGE,
     VSF_KERNEL_ERR_EDA_DOES_NOT_SUPPORT_TIMER,
     VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR
@@ -1123,6 +1123,7 @@ extern vsf_err_t vsf_eda_go_to(uintptr_t evthandler);
 SECTION(".text.vsf.kernel.vsf_eda_start")
 vsf_err_t vsf_eda_start(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg);
 
+// if vsf_eda_get_cur return NULL, means not in task context
 SECTION(".text.vsf.kernel.eda")
 extern vsf_eda_t *vsf_eda_get_cur(void);
 

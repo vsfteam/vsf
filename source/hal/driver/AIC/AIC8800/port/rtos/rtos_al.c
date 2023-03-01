@@ -343,6 +343,7 @@ uint32_t rtos_task_wait_notification(int timeout)
 {
     // rtos_task_wait maybe called in user thread, not rtos_task
     vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_HAL_ASSERT(eda != NULL);
     uint32_t ret;
 
     vsf_protect_t orig = vsf_protect_int();

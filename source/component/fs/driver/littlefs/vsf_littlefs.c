@@ -226,6 +226,7 @@ __vsf_component_peda_ifs_entry(__vk_lfs_mount, vk_fs_mount)
     switch (evt) {
     case VSF_EVT_INIT:
         fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
 
         vsf_eda_crit_init(&fsinfo->crit);
         vsf_eda_sem_init(&fsinfo->sem);
@@ -264,6 +265,7 @@ __vsf_component_peda_ifs_entry(__vk_lfs_unmount, vk_fs_unmount)
         // fall through
     case VSF_EVT_SYNC:
         fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
 
         fsinfo->op = VK_LFS_UNMOUNT;
         vsf_eda_sem_post(&fsinfo->sem);
@@ -294,6 +296,7 @@ __vsf_component_peda_ifs_entry(__vk_lfs_lookup, vk_file_lookup)
         // fall through
     case VSF_EVT_SYNC:
         fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
 
         fsinfo->param.open.dir = dir;
         fsinfo->param.open.name = name;
@@ -330,6 +333,7 @@ __vsf_component_peda_ifs_entry(__vk_lfs_close, vk_file_close)
         // fall through
     case VSF_EVT_SYNC:
         fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
 
         if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
             fsinfo->param.close_dir.dir = &file->lfs_dir;
@@ -368,6 +372,7 @@ __vsf_component_peda_ifs_entry(__vk_lfs_read, vk_file_read)
         // fall through
     case VSF_EVT_SYNC:
         fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
 
         fsinfo->param.read_file.file = &file->lfs_file;
         fsinfo->param.read_file.buffer = vsf_local.buff;
@@ -400,6 +405,7 @@ __vsf_component_peda_ifs_entry(__vk_lfs_write, vk_file_write)
         // fall through
     case VSF_EVT_SYNC:
         fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
 
         fsinfo->param.write_file.file = &file->lfs_file;
         fsinfo->param.write_file.buffer = vsf_local.buff;

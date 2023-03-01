@@ -1113,7 +1113,9 @@ vsf_linux_thread_t * vsf_linux_get_thread(pid_t pid, int tid)
 
 vsf_linux_thread_t * vsf_linux_get_cur_thread(void)
 {
-    return (vsf_linux_thread_t *)vsf_eda_get_cur();
+    vsf_linux_thread_t *thread = (vsf_linux_thread_t *)vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(thread != NULL);
+    return thread;
 }
 
 vsf_linux_process_t * vsf_linux_get_cur_process(void)
@@ -2355,8 +2357,10 @@ static void __getrandom_on_ready(void *param, uint32_t *buffer, uint32_t num)
 ssize_t getrandom(void *buf, size_t buflen, unsigned int flags)
 {
 #if VSF_HAL_USE_RNG == ENABLED && VSF_HW_RNG_COUNT > 0
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda != NULL);
     if (VSF_ERR_NONE == vsf_hw_rng_generate_request(&vsf_hw_rng0, buf, buflen / (VSF_HW_RNG_BITLEN >> 3),
-            vsf_eda_get_cur(), __getrandom_on_ready)) {
+            eda, __getrandom_on_ready)) {
         vsf_thread_wfe(VSF_EVT_USER);
         return buflen;
     }

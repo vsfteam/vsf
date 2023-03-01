@@ -241,6 +241,7 @@ void window_present(struct window_t * window, struct color_t * c, void * o, void
 {
     draw(window, o);
     __xboot.wm.disp->ui_data = vsf_eda_get_cur();
+    VSF_XBOOT_ASSERT(__xboot.wm.disp->ui_data != NULL);
     vk_disp_refresh(__xboot.wm.disp, NULL, window->s->pixels);
     vsf_thread_wfe(VSF_EVT_RETURN);
 }
@@ -370,7 +371,9 @@ void task_resume(struct task_t * task)
 
 void task_yield(void)
 {
-    vsf_eda_post_evt(vsf_eda_get_cur(), VSF_EVT_RETURN);
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_XBOOT_ASSERT(eda != NULL);
+    vsf_eda_post_evt(eda, VSF_EVT_RETURN);
     vsf_thread_wfe(VSF_EVT_RETURN);
 }
 

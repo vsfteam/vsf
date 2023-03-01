@@ -166,6 +166,7 @@ int vsfip_main(int argc, char *argv[])
     }
 
     __usrapp_vsfip.eda = vsf_eda_get_cur();
+    VSF_ASSERT(__usrapp_vsfip.eda != NULL);
     vsfip_init();
     vsfip_dnsc_init();
 

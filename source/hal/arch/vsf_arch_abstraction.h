@@ -313,7 +313,9 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
         } while (0)
 #define vsf_arch_host_invoke_in_thread(__name, __ctx_ptr)                       \
         do {                                                                    \
-            vsf_arch_host_invoke_nb(__name, vsf_eda_get_cur(), (__ctx_ptr));    \
+            vsf_eda_t VSF_MACRO_SAFE_NAME(eda) = vsf_eda_get_cur();             \
+            VSF_ARCH_ASSERT(VSF_MACRO_SAFE_NAME(eda) != NULL);                  \
+            vsf_arch_host_invoke_nb(__name, VSF_MACRO_SAFE_NAME(eda), (__ctx_ptr));\
             vsf_thread_wfe(VSF_EVT_USER);                                       \
             vsf_arch_host_invoke_get_result_nb(__name, __ctx_ptr);              \
         } while (0)

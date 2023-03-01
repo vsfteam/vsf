@@ -142,6 +142,7 @@ __vsf_component_peda_ifs_entry(__vk_mmc_mal_init, vk_mal_init)
 
         pthis->is_probing = true;
         pthis->eda = vsf_eda_get_cur();
+        VSF_FS_ASSERT(pthis->eda != NULL);
         vsf_mmc_init(pthis->mmc, &(vsf_mmc_cfg_t) {
             .mode   = MMC_MODE_HOST,
             .isr    = {
@@ -183,6 +184,7 @@ __vsf_component_peda_ifs_entry(__vk_mmc_mal_read, vk_mal_read)
     switch (evt) {
     case VSF_EVT_INIT:
         pthis->eda = vsf_eda_get_cur();
+        VSF_FS_ASSERT(pthis->eda != NULL);
         vsf_mmc_host_transact_start(pthis->mmc, &(vsf_mmc_trans_t){
             .cmd                = block_num > 1 ? MMC_READ_MULTIPLE_BLOCK : MMC_READ_SINGLE_BLOCK,
             .arg                = pthis->high_capacity ? block_start : vsf_local.addr,
@@ -214,6 +216,7 @@ __vsf_component_peda_ifs_entry(__vk_mmc_mal_write, vk_mal_write)
     switch (evt) {
     case VSF_EVT_INIT:
         pthis->eda = vsf_eda_get_cur();
+        VSF_FS_ASSERT(pthis->eda != NULL);
         vsf_mmc_host_transact_start(pthis->mmc, &(vsf_mmc_trans_t){
             .cmd                = block_num > 1 ? MMC_WRITE_MULTIPLE_BLOCK : MMC_WRITE_BLOCK,
             .arg                = pthis->high_capacity ? block_start : vsf_local.addr,

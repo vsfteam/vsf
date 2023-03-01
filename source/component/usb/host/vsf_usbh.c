@@ -675,6 +675,7 @@ static vsf_err_t __vk_usbh_submit_urb_imp(vk_usbh_t *usbh, vk_usbh_urb_t *urb, v
     urb_hcd = urb->urb_hcd;
     if (NULL == eda) {
         urb_hcd->eda_caller = vsf_eda_get_cur();
+        VSF_USB_ASSERT(urb_hcd->eda_caller != NULL);
     } else {
         urb_hcd->eda_caller = eda;
     }

@@ -417,6 +417,7 @@ SDL_bool SDL_IntersectRect(const SDL_Rect * rect0, const SDL_Rect * rect1, SDL_R
 static void __vsf_sdl2_disp_refresh(vk_disp_area_t *area, void *pixels)
 {
     __vsf_sdl2.disp->ui_data = vsf_eda_get_cur();
+    VSF_SDL2_ASSERT(__vsf_sdl2.disp->ui_data != NULL);
     vk_disp_refresh(__vsf_sdl2.disp, area, pixels);
     vsf_thread_wfe(VSF_EVT_RETURN);
 }
@@ -458,6 +459,7 @@ int SDL_InitSubSystem(uint32_t flags)
 
     if (flags & SDL_INIT_VIDEO) {
         __vsf_sdl2.disp->ui_data = vsf_eda_get_cur();
+        VSF_SDL2_ASSERT(__vsf_sdl2.disp->ui_data != NULL);
         __vsf_sdl2.disp->ui_on_ready = __vsf_sdl2_disp_on_ready;
         vk_disp_init(__vsf_sdl2.disp);
         vsf_thread_wfe(VSF_EVT_RETURN);

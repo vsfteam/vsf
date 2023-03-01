@@ -303,6 +303,7 @@ static ssize_t __vsf_linux_uart_write(vsf_linux_fd_t *sfd, const void *buf, size
 
     VSF_LINUX_ASSERT(priv->eda_pending_tx == NULL);
     priv->eda_pending_tx = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(priv->eda_pending_tx != NULL);
     vsf_usart_request_tx(uart, (void *)buf, count);
     vsf_thread_wfe(VSF_EVT_USER);
     return count;
@@ -346,6 +347,7 @@ static ssize_t __vsf_linux_i2c_master_request(vsf_linux_i2c_priv_t *priv,
     vsf_i2c_t *i2c = (vsf_i2c_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
     VSF_LINUX_ASSERT(NULL == priv->i2c.pending_eda);
     priv->i2c.pending_eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(priv->i2c.pending_eda != NULL);
     if (vsf_i2c_master_request(i2c, priv->i2c.addr, cmd, count, buf) != VSF_ERR_NONE) {
         priv->i2c.pending_eda = NULL;
         return -1;
@@ -690,6 +692,7 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
                 priv->xfer_ptr = arg_union.xfer_ptr;
 
                 priv->xfer_eda = vsf_eda_get_cur();
+                VSF_LINUX_ASSERT(priv->xfer_eda != NULL);
 
                 vsf_spi_cs_active(spi, priv->cs_index);
                 __vsf_linux_spi_transfer(priv);
@@ -1030,6 +1033,7 @@ static void __vsf_linux_fb_init(vsf_linux_fd_t *sfd)
 
     disp->ui_on_ready = __vsf_linux_disp_on_ready;
     disp->ui_data = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(disp->ui_data != NULL);
     vk_disp_init(disp);
     vsf_thread_wfe(VSF_EVT_USER);
 
@@ -1145,6 +1149,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             {
                 VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
                 fb_priv->eda_pending = vsf_eda_get_cur();
+                VSF_LINUX_ASSERT(fb_priv->eda_pending != NULL);
                 vsf_thread_wfe(VSF_EVT_USER);
             }
         }
@@ -1189,6 +1194,7 @@ static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t
     {
         VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
         fb_priv->eda_pending = vsf_eda_get_cur();
+        VSF_LINUX_ASSERT(fb_priv->eda_pending != NULL);
         vsf_thread_wfe(VSF_EVT_USER);
     }
     return count;
@@ -1240,6 +1246,7 @@ static int __vsf_linux_fb_msync(vsf_linux_fd_t *sfd, void *buffer)
         VSF_LINUX_ASSERT(buffer == fb_priv->front_buffer);
         VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
         fb_priv->eda_pending = vsf_eda_get_cur();
+        VSF_LINUX_ASSERT(fb_priv->eda_pending != NULL);
         vsf_thread_wfe(VSF_EVT_USER);
     }
     return 0;

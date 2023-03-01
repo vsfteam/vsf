@@ -94,6 +94,7 @@ void sys_lock_tcpip_core(void)
 {
     sys_mutex_lock(&lock_tcpip_core);
     __lwip_core_lock_holder_thread = vsf_eda_get_cur();
+    VSF_ASSERT(__lwip_core_lock_holder_thread != NULL);
 }
 
 void sys_unlock_tcpip_core(void)
@@ -108,6 +109,7 @@ static vsf_eda_t *__lwip_tcpip_thread;
 void sys_mark_tcpip_thread(void)
 {
     __lwip_tcpip_thread = vsf_eda_get_cur();
+    VSF_ASSERT(__lwip_tcpip_thread != NULL);
 }
 
 void sys_check_core_locking(void)
@@ -116,6 +118,7 @@ void sys_check_core_locking(void)
 
     if (__lwip_tcpip_thread != 0) {
         vsf_eda_t *current_thread = vsf_eda_get_cur();
+        VSF_ASSERT(current_thread != NULL);
         if (current_thread != __lwip_core_lock_holder_thread) {
             __asm("nop");
         }

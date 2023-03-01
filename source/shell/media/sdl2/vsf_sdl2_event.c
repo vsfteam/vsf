@@ -816,6 +816,7 @@ poll_next:
 int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_SDL2_ASSERT(eda != NULL);
     bool is_empty;
 
     vsf_protect_t orig = vsf_protect_int();
@@ -825,6 +826,7 @@ int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
             vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout);
 
             __vsf_sdl2_event.eda_pending = vsf_eda_get_cur();
+            VSF_SDL2_ASSERT(__vsf_sdl2_event.eda_pending != NULL);
             __vsf_eda_set_timeout(eda, vsf_systimer_ms_to_tick(timeout));
         }
     vsf_unprotect_int(orig);

@@ -85,6 +85,7 @@ static void __vsf_lvgl_flush_disp(lv_disp_drv_t *disp_drv, const lv_area_t *area
 
 #if VSF_LVGL_IMP_WAIT_CB == ENABLED
     eda_pending = vsf_eda_get_cur();
+    VSF_UI_ASSERT(eda_pending != NULL);
 #endif
 
     disp_area.pos.x = area->x1;

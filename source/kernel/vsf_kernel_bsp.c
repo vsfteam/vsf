@@ -207,13 +207,14 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
 {
     switch (err) {
 
-        case VSF_KERNEL_ERR_NULL_EDA_PTR:
+        case VSF_KERNEL_ERR_INVALID_CONTEXT:
             /*! \note
             This should not happen. Two possible reasons could be:
             1. Forgeting to set VSF_OS_CFG_MAIN_MODE to VSF_OS_CFG_MAIN_MODE_THREAD
                and using vsf kernel APIs, e.g. vsf_delay_ms, vsf_sem_pend and etc.
             2. When VSF_OS_CFG_MAIN_MODE is not VSF_OS_CFG_MAIN_MODE_THREAD, using
                any vsf_eda_xxxx APIs.
+            3. call APIs depends on eda context in non-eda context
             */
 
         case VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR:

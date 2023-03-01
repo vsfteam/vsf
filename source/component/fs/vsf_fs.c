@@ -1417,6 +1417,7 @@ __vsf_component_peda_private_entry(__vk_file_read_stream)
     case VSF_EVT_INIT:
         pthis->rw_size = 0;
         pthis->cur_eda = vsf_eda_get_cur();
+        VSF_FS_ASSERT(pthis->cur_eda != NULL);
         stream->tx.param = pthis;
         stream->tx.evthandler = __vk_file_stream_tx_evthandler;
         vsf_stream_connect_tx(stream);
@@ -1454,6 +1455,7 @@ __vsf_component_peda_private_entry(__vk_file_write_stream)
     case VSF_EVT_INIT:
         pthis->rw_size = 0;
         pthis->cur_eda = vsf_eda_get_cur();
+        VSF_FS_ASSERT(pthis->cur_eda != NULL);
         stream->rx.param = pthis;
         stream->rx.evthandler = __vk_file_stream_rx_evthandler;
         vsf_stream_connect_rx(stream);

@@ -359,7 +359,9 @@ vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, vsf_systimer_tick_t tick)
 SECTION(".text.vsf.kernel.vsf_teda_set_timer")
 vsf_err_t vsf_teda_set_timer(vsf_systimer_tick_t tick)
 {
-    return vsf_teda_set_timer_ex((vsf_teda_t *)vsf_eda_get_cur(), tick);
+    vsf_teda_t *teda = (vsf_teda_t *)vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(teda != NULL);
+    return vsf_teda_set_timer_ex(teda, tick);
 }
 
 #if __IS_COMPILER_ARM_COMPILER_6__

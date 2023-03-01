@@ -78,6 +78,7 @@ void* tk_thread_get_args(tk_thread_t* thread) {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 static void tk_thread_entry(vsf_thread_cb_t *cb) {
   tk_thread_t* thread = (tk_thread_t*)vsf_eda_get_cur();
+  VSF_UI_ASSERT(thread != NULL);
 
   tk_mutex_lock(thread->mutex);
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED

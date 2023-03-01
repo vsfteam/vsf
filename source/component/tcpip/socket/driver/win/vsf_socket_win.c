@@ -154,6 +154,7 @@ vsf_err_t vk_socket_win_init(void)
 
     vsf_thread_mutex_enter(&__vk_socket_win.mutex, -1);
         __vk_socket_win.eda = vsf_eda_get_cur();
+        VSF_TCPIP_ASSERT(__vk_socket_win.eda != NULL);
         __vk_socket_win.request = VSF_SOCKET_WIN_REQ_STARTUP;
         __vsf_arch_irq_request_send(&__vk_socket_win.irq_request);
         vsf_thread_wfe(VSF_EVT_USER);
@@ -174,6 +175,7 @@ vsf_err_t vk_socket_win_fini(void)
 
     vsf_thread_mutex_enter(&__vk_socket_win.mutex, -1);
         __vk_socket_win.eda = vsf_eda_get_cur();
+        VSF_TCPIP_ASSERT(__vk_socket_win.eda != NULL);
         __vk_socket_win.request = VSF_SOCKET_WIN_REQ_CLEANUP;
         __vsf_arch_irq_request_send(&__vk_socket_win.irq_request);
         vsf_thread_wfe(VSF_EVT_USER);
@@ -397,12 +399,14 @@ static vsf_err_t __vk_socket_win_close(vk_socket_t *s)
     vsf_unprotect_sched(orig);
 
     socket_win->tx.eda = vsf_eda_get_cur();
+    VSF_TCPIP_ASSERT(socket_win->tx.eda != NULL);
     socket_win->tx.request = VSF_SOCKET_WIN_CLOSE;
     __vsf_arch_irq_request_send(&socket_win->tx.irq_request);
     vsf_thread_wfe(VSF_EVT_USER);
     __vsf_arch_irq_fini(&socket_win->tx.irq_thread);
 
     socket_win->rx.eda = vsf_eda_get_cur();
+    VSF_TCPIP_ASSERT(socket_win->rx.eda != NULL);
     socket_win->rx.request = VSF_SOCKET_WIN_CLOSE;
     __vsf_arch_irq_request_send(&socket_win->rx.irq_request);
     vsf_thread_wfe(VSF_EVT_USER);
@@ -423,6 +427,7 @@ static vsf_err_t __vk_socket_win_bind(vk_socket_t *s, const vk_socket_addr_t *ad
     vsf_unprotect_sched(orig);
 
     socket_win->tx.eda = vsf_eda_get_cur();
+    VSF_TCPIP_ASSERT(socket_win->tx.eda != NULL);
     socket_win->tx.request = VSF_SOCKET_WIN_BIND;
     socket_win->tx.args.bind.addr = addr;
     __vsf_arch_irq_request_send(&socket_win->tx.irq_request);
@@ -442,6 +447,7 @@ static vsf_err_t __vk_socket_win_listen(vk_socket_t *s, int backlog)
     vsf_unprotect_sched(orig);
 
     socket_win->tx.eda = vsf_eda_get_cur();
+    VSF_TCPIP_ASSERT(socket_win->tx.eda != NULL);
     socket_win->tx.request = VSF_SOCKET_WIN_LISTEN;
     socket_win->tx.args.listen.backlog = backlog;
     __vsf_arch_irq_request_send(&socket_win->tx.irq_request);
@@ -461,6 +467,7 @@ static vsf_err_t __vk_socket_win_connect(vk_socket_t *s, const vk_socket_addr_t 
     vsf_unprotect_sched(orig);
 
     socket_win->tx.eda = vsf_eda_get_cur();
+    VSF_TCPIP_ASSERT(socket_win->tx.eda != NULL);
     socket_win->tx.request = VSF_SOCKET_WIN_CONNECT;
     socket_win->tx.args.connect.remote_addr = remote_addr;
     __vsf_arch_irq_request_send(&socket_win->tx.irq_request);
@@ -480,6 +487,7 @@ static vsf_err_t __vk_socket_win_accept(vk_socket_t *s, vk_socket_addr_t *remote
     vsf_unprotect_sched(orig);
 
     socket_win->tx.eda = vsf_eda_get_cur();
+    VSF_TCPIP_ASSERT(socket_win->tx.eda != NULL);
     socket_win->tx.request = VSF_SOCKET_WIN_ACCEPT;
     socket_win->tx.args.accept.remote_addr = remote_addr;
     __vsf_arch_irq_request_send(&socket_win->tx.irq_request);
@@ -500,6 +508,7 @@ static vsf_err_t __vk_socket_win_send(vk_socket_t *s, const void *buf, size_t le
     vsf_unprotect_sched(orig);
 
     socket_win->tx.eda = vsf_eda_get_cur();
+    VSF_TCPIP_ASSERT(socket_win->tx.eda != NULL);
     socket_win->tx.request = VSF_SOCKET_WIN_SEND;
     socket_win->tx.args.send.buf = (void *)buf;
     socket_win->tx.args.send.len = len;
@@ -523,6 +532,7 @@ static vsf_err_t __vk_socket_win_recv(vk_socket_t *s, void *buf, size_t len, int
     vsf_unprotect_sched(orig);
 
     socket_win->rx.eda = vsf_eda_get_cur();
+    VSF_TCPIP_ASSERT(socket_win->rx.eda != NULL);
     socket_win->rx.request = VSF_SOCKET_WIN_RECV;
     socket_win->rx.args.recv.buf = buf;
     socket_win->rx.args.recv.len = len;
@@ -541,6 +551,7 @@ static vsf_err_t __vk_dns_win_gethostbyname(const char *name, vk_netdrv_addr_t *
 
     vsf_thread_mutex_enter(&__vk_socket_win.mutex, -1);
         __vk_socket_win.eda = vsf_eda_get_cur();
+        VSF_TCPIP_ASSERT(__vk_socket_win.eda != NULL);
         __vk_socket_win.request = VSF_SOCKET_WIN_REQ_GETHOSTBYNAME;
         __vk_socket_win.param.gethostbyname.name = name;
         __vsf_arch_irq_request_send(&__vk_socket_win.irq_request);

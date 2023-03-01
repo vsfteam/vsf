@@ -223,6 +223,7 @@ extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
         }
 
         vsf_eda_t *eda = vsf_eda_get_cur();
+        VSF_KERNEL_ASSERT(eda != NULL);
 #if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
         extern void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
         __vsf_dispatch_evt(eda, VSF_EVT_INIT);

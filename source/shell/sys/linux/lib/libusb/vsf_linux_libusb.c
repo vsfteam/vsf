@@ -643,7 +643,10 @@ int libusb_control_transfer(libusb_device_handle *dev_handle,
     if ((bRequestType & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_OUT) {
         memcpy(buffer + LIBUSB_CONTROL_SETUP_SIZE, data, wLength);
     }
-    libusb_fill_control_transfer(ltransfer, dev_handle, buffer, __libusb_transfer_cb, vsf_eda_get_cur(), timeout);
+
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda != NULL);
+    libusb_fill_control_transfer(ltransfer, dev_handle, buffer, __libusb_transfer_cb, eda, timeout);
     ltransfer->flags = LIBUSB_TRANSFER_FREE_BUFFER;
     int result = libusb_submit_transfer(ltransfer);
     if (result < 0) {
@@ -670,7 +673,9 @@ static int __libusb_bulk_interrupt_transfer(libusb_device_handle *dev_handle,
         return LIBUSB_ERROR_NO_MEM;
     }
 
-    libusb_fill_bulk_transfer(ltransfer, dev_handle, endpoint, data, length, __libusb_transfer_cb, vsf_eda_get_cur(), timeout);
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda != NULL);
+    libusb_fill_bulk_transfer(ltransfer, dev_handle, endpoint, data, length, __libusb_transfer_cb, eda, timeout);
     ltransfer->type = type;
 
     int result = libusb_submit_transfer(ltransfer);

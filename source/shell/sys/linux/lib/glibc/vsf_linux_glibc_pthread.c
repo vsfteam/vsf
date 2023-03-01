@@ -492,8 +492,9 @@ int pthread_mutex_destroy(pthread_mutex_t *mutex)
 
 int pthread_mutex_lock(pthread_mutex_t *mutex)
 {
-    if (    (mutex->attr & PTHREAD_MUTEX_RECURSIVE)
-        &&  (vsf_eda_get_cur() == mutex->eda_owner)) {
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda != NULL);
+    if ((mutex->attr & PTHREAD_MUTEX_RECURSIVE) && (eda == mutex->eda_owner)) {
         mutex->recursive_cnt++;
         return 0;
     }
@@ -510,8 +511,9 @@ int pthread_mutex_lock(pthread_mutex_t *mutex)
 
 int pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
-    if (    (mutex->attr & PTHREAD_MUTEX_RECURSIVE)
-        &&  (vsf_eda_get_cur() == mutex->eda_owner)) {
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda != NULL);
+    if ((mutex->attr & PTHREAD_MUTEX_RECURSIVE) && (eda == mutex->eda_owner)) {
         mutex->recursive_cnt++;
         return 0;
     }
@@ -846,6 +848,7 @@ static vsf_sync_reason_t __pthread_rwlock_pend(vsf_sync_t *sync)
 static int __pthread_rwlock_rdlock(pthread_rwlock_t *rwlock, vsf_timeout_tick_t timeout)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda != NULL);
     bool need_pend;
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -892,6 +895,7 @@ int pthread_rwlock_timedrdlock(pthread_rwlock_t *rwlock, const struct timespec *
 static int __pthread_rwlock_wrlock(pthread_rwlock_t *rwlock, vsf_timeout_tick_t timeout)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda != NULL);
     bool need_pend;
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -939,6 +943,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 {
     vsf_sync_t *sync = NULL;
     vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_LINUX_ASSERT(eda != NULL);
 
     vsf_protect_t orig = vsf_protect_sched();
         if (vsf_dlist_is_in(vsf_eda_t, pending_node, &rwlock->rdlist, eda)) {
