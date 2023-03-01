@@ -131,6 +131,20 @@ static vsf_evtq_ctx_t * __vsf_evtq_get_cur_ctx(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
+SECTION(".text.vsf.kernel.vsf_irq_enter")
+uintptr_t vsf_irq_enter(void)
+{
+    uintptr_t ctx = (uintptr_t)__vsf_eda.evtq.cur;
+    __vsf_eda.evtq.cur = NULL;
+    return ctx;
+}
+
+SECTION(".text.vsf.kernel.vsf_irq_leave")
+void vsf_irq_leave(uintptr_t ctx)
+{
+    __vsf_eda.evtq.cur = (vsf_evtq_t *)ctx;
+}
+
 SECTION(".text.vsf.kernel.eda")
 void __vsf_eda_on_terminate(vsf_eda_t *pthis)
 {

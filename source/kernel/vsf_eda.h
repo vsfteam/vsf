@@ -1289,6 +1289,12 @@ static inline vsf_err_t vsf_callback_timer_add_us(vsf_callback_timer_t *timer, u
 #   endif
 #endif
 
+SECTION(".text.vsf.kernel.vsf_irq_enter")
+extern uintptr_t vsf_irq_enter(void);
+
+SECTION(".text.vsf.kernel.vsf_irq_leave")
+extern void vsf_irq_leave(uintptr_t ctx);
+
 SECTION(".text.vsf.kernel.eda")
 extern vsf_err_t vsf_eda_post_evt(vsf_eda_t *pthis, vsf_evt_t evt);
 
