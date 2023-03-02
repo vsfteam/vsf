@@ -59,6 +59,14 @@ typedef struct aic8800_usb_t {
         void *param;
     } callback;
     const aic8800_usb_const_t *param;
+
+    union {
+        struct {
+            usb_ip_irqhandler_t irqhandler;
+            void *param;
+            usb_dc_speed_t speed;
+        } device;
+    };
 } aic8800_usb_t;
 
 /*============================ INCLUDES ======================================*/

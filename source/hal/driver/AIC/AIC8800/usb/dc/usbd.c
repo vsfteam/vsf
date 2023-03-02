@@ -36,11 +36,35 @@ extern vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority
 
 /*============================ IMPLEMENTATION ================================*/
 
+static void __aic8800_usbd_ip_irqhandler(void *param)
+{
+    aic8800_usb_t *dc = (aic8800_usb_t *)param;
+    const aic8800_usb_const_t *dc_param = dc->param;
+
+    // check enumdne in gintmsk in global_regs, reg offset 0x18
+    if (    (((uint32_t *)dc_param->reg)[6] & 0x00002000)
+        &&  (dc->device.speed == USB_DC_SPEED_HIGH)) {
+
+        // get dsts reg, offset 0x808
+        uint8_t speed = (((uint32_t *)dc_param->reg)[514] & 0x00000006) >> 1;
+        if (speed == 1) {
+            // high speed phy emulated as full speed
+            PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteAnalogReg->cfg_ana_usb_ctrl1),
+                AIC1000LITE_ANALOG_REG_CFG_ANA_USB_FSLS_DRV_BIT(3),
+                AIC1000LITE_ANALOG_REG_CFG_ANA_USB_FSLS_DRV_BIT(3));
+        }
+    }
+    dc->device.irqhandler(dc->device.param);
+}
+
 vsf_err_t aic8800_usbd_init(aic8800_usb_t *dc, usb_dc_ip_cfg_t *cfg)
 {
     bool is_fs_phy = cfg->speed == USB_DC_SPEED_FULL;
     dc->is_host = false;
-    return __aic8800_usb_init(dc, cfg->priority, is_fs_phy, cfg->irqhandler, cfg->param);
+    dc->device.irqhandler = cfg->irqhandler;
+    dc->device.param = cfg->param;
+    dc->device.speed = cfg->speed;
+    return __aic8800_usb_init(dc, cfg->priority, is_fs_phy, __aic8800_usbd_ip_irqhandler, dc);
 }
 
 void aic8800_usbd_fini(aic8800_usb_t *dc)
