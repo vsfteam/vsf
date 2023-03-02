@@ -650,11 +650,13 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
         global_regs->gintsts = USB_OTG_GINTSTS_USBRST;
     }
     if (intsts & USB_OTG_GINTSTS_ENUMDNE) {
-        uint8_t speed = (dev_global_regs->dsts & USB_OTG_DSTS_ENUMSPD) >> 1;
+        bool is_highspeed = 0 == ((dev_global_regs->dsts & USB_OTG_DSTS_ENUMSPD) >> 1);
         global_regs->gusbcfg &= ~USB_OTG_GUSBCFG_TRDT;
-        global_regs->gusbcfg |= ((0/* USB_SPEED_HIGH*/ == speed) ? 0x09U : 0x05U) << 10;
+        global_regs->gusbcfg |= (is_highspeed ? 0x09U : 0x05U) << 10;
         dev_global_regs->dctl |= USB_OTG_DCTL_CGINAK;
         global_regs->gintsts = USB_OTG_GINTSTS_ENUMDNE;
+
+        __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_ATTACH, is_highspeed ? USB_DC_SPEED_HIGH : USB_DC_SPEED_FULL);
     }
     if (intsts & USB_OTG_GINTSTS_USBSUSP) {
         __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_SUSPEND, 0);
