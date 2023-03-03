@@ -1031,7 +1031,7 @@ void __vsf_systimer_thread(void *arg)
 
             vsf_systimer_tick_t tick = vsf_systimer_get();
             vsf_arch_trace_systimer("systimer triggered: %lld\r\n", tick);
-            vsf_systimer_timeout_evt_hanlder(tick);
+            vsf_systimer_timeout_evt_handler(tick);
 
         __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
     }

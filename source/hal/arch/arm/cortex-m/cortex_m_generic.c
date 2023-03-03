@@ -130,7 +130,7 @@ ROOT
 #endif
 ISR(SysTick_Handler)
 {
-    vsf_systimer_ovf_evt_hanlder();
+    vsf_systimer_ovf_evt_handler();
 }
 
 

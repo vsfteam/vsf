@@ -49,8 +49,8 @@ static void __isr_mchtmr(void)
 {
     HPM_MCHTMR->MTIMECMP = 0xFFFFFFFFFFFFFFFF;
 
-    extern void vsf_systimer_match_evthanlder(void);
-    vsf_systimer_match_evthanlder();
+    extern void vsf_systimer_match_evthandler(void);
+    vsf_systimer_match_evthandler();
 }
 SDK_DECLARE_MCHTMR_ISR(__isr_mchtmr)
 
@@ -77,7 +77,7 @@ vsf_systimer_tick_t vsf_systimer_low_level_get_current(void)
 }
 
 /*! \brief set match value, will be triggered when current >= match,
-        vsf_systimer_match_evthanlder will be called if triggered.
+        vsf_systimer_match_evthandler will be called if triggered.
  */
 void vsf_systimer_low_level_set_match(vsf_systimer_tick_t match)
 {

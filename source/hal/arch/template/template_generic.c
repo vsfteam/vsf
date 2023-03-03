@@ -113,7 +113,7 @@ void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 
 ROOT ISR(SysTick_Handler)
 {   
-    vsf_systimer_ovf_evt_hanlder();
+    vsf_systimer_ovf_evt_handler();
 }
 
 

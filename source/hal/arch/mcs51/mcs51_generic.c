@@ -169,7 +169,7 @@ ISR(1)
 {
     __vsf_mcs51.tf0 = 1;
     vsf_systimer_reset_counter_value();
-    vsf_systimer_ovf_evt_hanlder();
+    vsf_systimer_ovf_evt_handler();
 }
 
 #warning "todo: implement vsf_systimer_prio_set()"
@@ -262,8 +262,8 @@ void vsf_arch_sleep(uint32_t mode)
 
     // PCON.1 : Setting this bit activates the Stop Mode. This bit is always read as 0
     //          Both clocks for the CPU and peripherals are stopped in this mode.
-    //          The CPU can exit this state with an external interrupt (°∞int0°± or °∞int1°±) or reset.
-    //          Internally generated interrupts (timer, serial port°≠) cannot be used since they require clock activity to operate
+    //          The CPU can exit this state with an external interrupt (‚Äúint0‚Äù or ‚Äúint1‚Äù) or reset.
+    //          Internally generated interrupts (timer, serial port‚Ä¶) cannot be used since they require clock activity to operate
 
     PCON = (PCON & 0xFC ) | 0x01;
 }

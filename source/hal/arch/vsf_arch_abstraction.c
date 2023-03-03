@@ -598,7 +598,7 @@ static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
 /*! \brief systimer overflow event handler which is called by target timer
  *!        interrupt handler
  */
-void vsf_systimer_ovf_evt_hanlder(void)
+void vsf_systimer_ovf_evt_handler(void)
 {
     vsf_systimer_tick_t tick;
     vsf_systimer_low_level_int_disable();
@@ -731,7 +731,7 @@ bool vsf_systimer_is_due(vsf_systimer_tick_t due)
  *----------------------------------------------------------------------------*/
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 
-void vsf_systimer_match_evthanlder(void)
+void vsf_systimer_match_evthandler(void)
 {
     vsf_systimer_evthandler(vsf_systimer_low_level_get_current());
 }
@@ -858,7 +858,7 @@ vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 /*! \brief systimer overflow event handler which is called by target timer
  *!        interrupt handler
  */
-void vsf_systimer_ovf_evt_hanlder(void)
+void vsf_systimer_ovf_evt_handler(void)
 {
     __systimer.tick ++;
     if (on_arch_systimer_tick_evt(__systimer.tick)) {
@@ -956,7 +956,7 @@ bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 /*! \brief systimer timeout event handler which is called by request response
  *!        service.
  */
-void vsf_systimer_timeout_evt_hanlder(vsf_systimer_tick_t tick)
+void vsf_systimer_timeout_evt_handler(vsf_systimer_tick_t tick)
 {
     if (on_arch_systimer_tick_evt(tick)) {
         vsf_systimer_evthandler(tick);

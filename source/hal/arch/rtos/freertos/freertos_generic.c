@@ -318,7 +318,7 @@ vsf_systimer_tick_t vsf_systimer_get(void)
 
 static void __vsf_systimer_callback(TimerHandle_t xTimer)
 {
-    vsf_systimer_timeout_evt_hanlder(vsf_systimer_get());
+    vsf_systimer_timeout_evt_handler(vsf_systimer_get());
 }
 
 /*! \brief initialise SysTick to generate a system timer

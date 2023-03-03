@@ -108,7 +108,7 @@ extern vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void);
  *!        software bit to simulate a flag which will be cleared by calling
  *!        vsf_systimer_low_level_disable().
  */
-extern void vsf_systimer_ovf_evt_hanlder(void);
+extern void vsf_systimer_ovf_evt_handler(void);
 
 /*----------------------------------------------------------------------------*
  * System Timer : Implement with timer with compare match, trigger when       *
@@ -133,7 +133,7 @@ extern void vsf_systimer_low_level_enable(void);
 extern vsf_systimer_tick_t vsf_systimer_low_level_get_current(void);
 
 /*! \brief set match value, will be triggered when current >= match,
-        vsf_systimer_match_evthanlder will be called if triggered.
+        vsf_systimer_match_handler will be called if triggered.
  */
 extern void vsf_systimer_low_level_set_match(vsf_systimer_tick_t match);
 
@@ -143,7 +143,7 @@ extern void vsf_systimer_low_level_set_match(vsf_systimer_tick_t match);
 /*! \brief systimer compare match event handler which is called by target timer
  *!        interrupt handler
  */
-extern void vsf_systimer_match_evthanlder(void);
+extern void vsf_systimer_match_evthandler(void);
 
 /*----------------------------------------------------------------------------*
  * System Timer : Implement with request / response model                     *
@@ -173,7 +173,7 @@ extern vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick);
 /*! \brief systimer timeout event handler which is called by request response
  *!        service.
  */
-extern void vsf_systimer_timeout_evt_hanlder(vsf_systimer_tick_t tick);
+extern void vsf_systimer_timeout_evt_handler(vsf_systimer_tick_t tick);
 
 #   endif
 #endif      // VSF_SYSTIMER_CFG_IMPL_MODE
