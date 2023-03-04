@@ -246,6 +246,14 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
     case WM_SIZE:
         __vk_disp_wingdi.bmi.bmiHeader.biWidth  = LOWORD(lParam);
         __vk_disp_wingdi.bmi.bmiHeader.biHeight = HIWORD(lParam);
+        if (    (__vk_disp_wingdi.bmi.bmiHeader.biWidth != disp_wingdi->param.width)
+            ||  (__vk_disp_wingdi.bmi.bmiHeader.biHeight != disp_wingdi->param.height)) {
+            vsf_trace_warning("disp_wingdi: actual client size(%d, %d) is not the size(%d, %d) required" VSF_TRACE_CFG_LINEEND,
+                __vk_disp_wingdi.bmi.bmiHeader.biWidth, __vk_disp_wingdi.bmi.bmiHeader.biHeight,
+                disp_wingdi->param.width, disp_wingdi->param.height);
+            ((vk_disp_param_t *)&disp_wingdi->param)->width = __vk_disp_wingdi.bmi.bmiHeader.biWidth;
+            ((vk_disp_param_t *)&disp_wingdi->param)->height = __vk_disp_wingdi.bmi.bmiHeader.biHeight;
+        }
 
         if (__vk_disp_wingdi.hFrameBitmap) {
             DeleteObject(__vk_disp_wingdi.hFrameBitmap);
@@ -434,7 +442,7 @@ static void __vk_disp_wingdi_thread(void *arg)
         .right  = disp_wingdi->param.width,
         .bottom = disp_wingdi->param.height,
     };
-    AdjustWindowRect(&rect, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE, false);
+    AdjustWindowRect(&rect, WS_CAPTION | WS_SYSMENU | WS_VISIBLE, false);
     __vk_disp_wingdi.hWnd = CreateWindow(__ClassName,
         TEXT(VSF_DISP_WINGDI_CFG_WINDOW_TITLE),
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE,
