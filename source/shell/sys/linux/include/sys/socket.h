@@ -97,6 +97,13 @@ struct linger {
 #define socketpair      VSF_LINUX_SOCKET_WRAPPER(socketpair)
 #endif
 
+// syscalls
+
+#define __NR_connect    connect
+#define __NR_accept     accept
+#define __NR_accept4    accept4
+#define __NR_bind       bind
+
 // level for sockopt
 #define SOL_SOCKET      0xFFFF
 // sock options

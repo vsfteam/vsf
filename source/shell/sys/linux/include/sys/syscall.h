@@ -4,8 +4,14 @@
 #include "shell/sys/linux/vsf_linux_cfg.h"
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../sys/random.h"
+#   include "../sys/eventfd.h"
+#   include "../sys/epoll.h"
+#   include "../sys/stat.h"
 #else
 #   include <sys/random.h>
+#   include <sys/eventfd.h>
+#   include <sys/epoll.h>
+#   include <sys/stat.h>
 #endif
 
 #ifdef __cplusplus

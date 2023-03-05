@@ -1866,6 +1866,11 @@ int futimens(int fd, const struct timespec times[2])
     return 0;
 }
 
+int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags)
+{
+    return 0;
+}
+
 int chmod(const char *pathname, mode_t mode)
 {
     return 0;

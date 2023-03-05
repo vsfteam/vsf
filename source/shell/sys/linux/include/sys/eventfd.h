@@ -22,6 +22,11 @@ extern "C" {
 #define eventfd_write           VSF_LINUX_WRAPPER(eventfd_write)
 #endif
 
+// syscalls
+
+#define __NR_eventfd            eventfd
+#define __NR_eventfd2           eventfd2
+
 #define EFD_SEMAPHORE           (1 << 0)
 #define EFD_CLOEXEC             O_CLOEXEC
 #define EFD_NONBLOCK            O_NONBLOCK

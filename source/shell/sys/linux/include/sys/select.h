@@ -24,6 +24,10 @@ extern "C" {
 #   define pselect              VSF_LINUX_WRAPPER(pselect)
 #endif
 
+// syscalls
+
+#define __NR_select             select
+
 #ifndef FD_SETSIZE
 #   define FD_SETSIZE           1024
 #endif

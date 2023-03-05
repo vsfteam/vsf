@@ -45,7 +45,7 @@ typedef union epoll_data {
 struct epoll_event {
     uint32_t     events;
     epoll_data_t data;
-};
+} PACKED;
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define epoll_create        VSF_LINUX_WRAPPER(epoll_create)
@@ -55,6 +55,15 @@ struct epoll_event {
 #define epoll_pwait         VSF_LINUX_WRAPPER(epoll_pwait)
 #define epoll_pwait2        VSF_LINUX_WRAPPER(epoll_pwait2)
 #endif
+
+// syscalls
+
+#define __NR_epoll_create   epoll_create
+#define __NR_epoll_create1  epoll_create1
+#define __NR_epoll_ctl      epoll_ctl
+#define __NR_epoll_wait     epoll_wait
+#define __NR_epoll_pwait(__epfd, __events, __maxevents, __timeout, __set, __set_size)\
+                            epoll_pwait((__epfd), (__events), (__maxevents), (__timeout), (__set))
 
 #if VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED
 typedef struct vsf_linux_sys_epoll_vplt_t {

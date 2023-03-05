@@ -106,6 +106,42 @@ extern "C" {
 #endif
 #endif
 
+// syscalls
+
+#define __NR_creat          creat
+#define __NR_close          close
+#define __NR_dup            dup
+#define __NR_dup2           dup2
+#define __NR_dup3           dup3
+#define __NR_access         access
+#define __NR_write          write
+#define __NR_writev         writev
+#define __NR_read           read
+#define __NR_readv          readv
+#define __NR_truncate       truncate
+#define __NR_rtruncate      ftruncate
+#define __NR_faccessat      faccessat
+#define __NR_unlink         unlink
+#define __NR_unlinkat       unlinkat
+#define __NR_sync           sync
+#define __NR_fsync          fsync
+#define __NR_chdir          chdir
+#define __NR_fchdir         fchdir
+#define __NR_chown          chown
+#define __NR_fchown         fchown
+#define __NR_fchownat       fchownat
+#define __NR_chroot         chroot
+#define __NR_pipe           pipe
+#define __NR_pipe2          pipe2
+#define __NR_alarm          alarm
+#define __NR_execve         execve
+#define __NR_wait4          wait4
+
+#define __NR_preadv(__fd, __vec, __vlen, __pos_l, __pos_h)                      \
+                            preadv((__fd), (__vec), (__vlen), ((off_t)(__pos_l) << 32) + (__pos_h))
+#define __NR_pwritev(__fd, __vec, __vlen, __pos_l, __pos_h)                     \
+                            pwritev((__fd), (__vec), (__vlen), ((off_t)(__pos_l) << 32) + (__pos_h))
+
 #define _POSIX_VERSION      200112L
 
 #define open64              open

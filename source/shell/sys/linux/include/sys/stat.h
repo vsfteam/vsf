@@ -25,7 +25,20 @@ extern "C" {
 #define umask                   VSF_LINUX_WRAPPER(umask)
 #define chmod                   VSF_LINUX_WRAPPER(chmod)
 #define fchmod                  VSF_LINUX_WRAPPER(fchmod)
+#define utimensat               VSF_LINUX_WRAPPER(utimensat)
 #endif
+
+// syscalls
+
+#define __NR_stat               stat
+#define __NR_fstat              fstat
+#define __NR_fstatat            fstatat
+#define __NR_umask              umask
+#define __NR_chmod              chmod
+#define __NR_fchmod             fchmod
+#define __NR_fchmodat           fchmodat
+#define __NR_futimesat          futimesat
+#define __NR_utimensat          utimensat
 
 // TODO: assert extension attr is fit in vk_file_attr_t
 #define VSF_FILE_ATTR_BLK       (VSF_FILE_ATTR_USER << 0)
@@ -188,6 +201,7 @@ static inline int fstat64(int fd, struct stat64 *buf)
 }
 int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
 int futimens(int fd, const struct timespec times[2]);
+int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags);
 int chmod(const char *pathname, mode_t mode);
 int fchmod(int fd, mode_t mode);
 

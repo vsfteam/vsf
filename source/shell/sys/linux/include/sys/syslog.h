@@ -31,6 +31,10 @@ enum {
 #define vsyslog(priotiry, format, ap)       vsf_trace_arg(priority, format, ap)
 #define closelog()
 
+// syscalls
+
+#define __NR_syslog                         syslog
+
 #ifdef __cplusplus
 }
 #endif

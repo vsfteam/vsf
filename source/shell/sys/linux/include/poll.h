@@ -23,6 +23,11 @@ extern "C" {
 #define ppoll           VSF_LINUX_WRAPPER(ppoll)
 #endif
 
+// syscalls
+
+#define __NR_poll       poll
+#define __NR_ppoll      ppoll
+
 typedef int nfds_t;
 
 #define POLLIN          (1 << 0)

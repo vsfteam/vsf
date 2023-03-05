@@ -47,6 +47,10 @@ extern "C" {
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
 #endif
 
+// syscalls
+
+#define __NR_exit           exit
+
 #ifndef RAND_MAX
 #   ifdef __WIN__
 #       define RAND_MAX     0x7FFF

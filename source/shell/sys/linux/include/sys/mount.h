@@ -12,6 +12,12 @@ extern "C" {
 #define umount              VSF_LINUX_WRAPPER(umount)
 #endif
 
+// syscalls
+
+#define __NR_mount          mount
+#define __NR_umount         umount
+#define __NR_umount2        umount2
+
 #if VSF_USE_MAL != ENABLED
 #   error VSF_USE_MAL MUST be enabled to support mount
 #endif

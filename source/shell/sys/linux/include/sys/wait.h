@@ -19,6 +19,10 @@ extern "C" {
 #define waitpid                 VSF_LINUX_WRAPPER(waitpid)
 #endif
 
+// syscalls
+
+#define __NR_waitpid            waitpid
+
 // options of waitpid
 #define WEXITED                 1
 #define WSTOPPED                2

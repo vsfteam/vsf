@@ -72,4 +72,6 @@ enum {
 }
 #endif
 
+#include <asm/ioctls.h>
+
 #endif      // __VSF_LINUX_IOCTL_H__
