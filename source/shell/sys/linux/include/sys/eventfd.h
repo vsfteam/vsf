@@ -24,8 +24,8 @@ extern "C" {
 
 // syscalls
 
-#define __NR_eventfd            eventfd
-#define __NR_eventfd2           eventfd2
+#define __NR_eventfd(__count)   eventfd((__count), 0)
+#define __NR_eventfd2           eventfd
 
 #define EFD_SEMAPHORE           (1 << 0)
 #define EFD_CLOEXEC             O_CLOEXEC

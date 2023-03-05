@@ -136,11 +136,13 @@ extern "C" {
 #define __NR_alarm          alarm
 #define __NR_execve         execve
 #define __NR_wait4          wait4
+#define __NR_gettid         gettid
+#define SYS_gettid          __NR_gettid
 
 #define __NR_preadv(__fd, __vec, __vlen, __pos_l, __pos_h)                      \
-                            preadv((__fd), (__vec), (__vlen), (__pos_l))
+                            preadv64((__fd), (__vec), (__vlen), ((off64_t)(__pos_l) << 32) + (__pos_h))
 #define __NR_pwritev(__fd, __vec, __vlen, __pos_l, __pos_h)                     \
-                            pwritev((__fd), (__vec), (__vlen), (__pos_l))
+                            pwritev64((__fd), (__vec), (__vlen), ((off64_t)(__pos_l) << 32) + (__pos_h))
 
 #define _POSIX_VERSION      200112L
 
@@ -570,7 +572,6 @@ uid_t getuid(void);
 uid_t geteuid(void);
 
 pid_t gettid(void);
-#define SYS_gettid              gettid
 pid_t getpid(void);
 pid_t getppid(void);
 
@@ -625,13 +626,17 @@ ssize_t write(int fd, const void *buf, size_t count);
 ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
 ssize_t writev(int fd, const struct iovec *iov, int iovcnt);
 ssize_t pread(int fd, void *buf, size_t count, off_t offset);
-ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
 ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, off_t offset);
+ssize_t preadv64 (int fd, const struct iovec *vector, int iovcnt, off64_t offset);
+ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
 ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset);
+ssize_t pwritev64 (int fd, const struct iovec *vector, int iovcnt, off64_t offset);
 int fsync(int fd);
 int fdatasync(int fd);
 
 int isatty(int fd);
+char *ttyname(int fd);
+int ttyname_r(int fd, char *buf, size_t buflen);
 size_t getpagesize(void);
 int symlink(const char *target, const char *linkpath);
 int truncate(const char *pathname, off_t length);

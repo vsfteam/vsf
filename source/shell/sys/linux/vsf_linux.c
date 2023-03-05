@@ -761,6 +761,25 @@ int isatty(int fd)
     return sfd->op == &vsf_linux_term_fdop;
 }
 
+int ttyname_r(int fd, char *buf, size_t buflen)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    if ((NULL == sfd) || (sfd->op != &vsf_linux_term_fdop)) {
+        return -1;
+    }
+
+    vsf_linux_fs_priv_t *fs_priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    strlcpy(buf, fs_priv->file->name, buflen);
+    return 0;
+}
+
+char *ttyname(int fd)
+{
+    static char *__ttyname[64];
+    ttyname_r(fd, __ttyname, sizeof(__ttyname));
+    return __ttyname;
+}
+
 vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op,
             int stack_size, void *stack)
 {

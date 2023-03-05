@@ -1642,46 +1642,61 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
     return size;
 }
 
-ssize_t pread(int fd, void *buf, size_t count, off_t offset)
+ssize_t pread64(int fd, void *buf, size_t count, off64_t offset)
 {
     off_t orig = lseek(fd, 0, SEEK_CUR);
-    lseek(fd, offset, SEEK_SET);
+    lseek64(fd, offset, SEEK_SET);
     ssize_t size = read(fd, buf, count);
-    lseek(fd, orig, SEEK_SET);
+    lseek64(fd, orig, SEEK_SET);
+    return size;
+}
+
+ssize_t pread(int fd, void *buf, size_t count, off_t offset)
+{
+    return pread64(fd, buf, count, (off64_t)offset);
+}
+
+ssize_t preadv64(int fd, const struct iovec *iov, int iovcnt, off64_t offset)
+{
+    ssize_t size = 0, cur_size;
+    for (int i = 0; i < iovcnt; i++) {
+        cur_size = pread64(fd, iov->iov_base, iov->iov_len, offset);
+        if (cur_size > 0) {
+            size += cur_size;
+            offset += cur_size;
+        }
+        if (cur_size != iov->iov_len) {
+            return 0 == size ? cur_size : size;
+        }
+        iov++;
+    }
     return size;
 }
 
 ssize_t preadv(int fd, const struct iovec *iov, int iovcnt, off_t offset)
 {
-    ssize_t size = 0, cur_size;
-    for (int i = 0; i < iovcnt; i++) {
-        cur_size = pread(fd, iov->iov_base, iov->iov_len, offset);
-        if (cur_size > 0) {
-            size += cur_size;
-            offset += cur_size;
-        }
-        if (cur_size != iov->iov_len) {
-            return 0 == size ? cur_size : size;
-        }
-        iov++;
-    }
+    return preadv64(fd, iov, iovcnt, (off64_t)offset);
+}
+
+ssize_t pwrite64(int fd, const void *buf, size_t count, off64_t offset)
+{
+    off_t orig = lseek(fd, 0, SEEK_CUR);
+    lseek64(fd, offset, SEEK_SET);
+    ssize_t size = write(fd, buf, count);
+    lseek64(fd, orig, SEEK_SET);
     return size;
 }
 
 ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
 {
-    off_t orig = lseek(fd, 0, SEEK_CUR);
-    lseek(fd, offset, SEEK_SET);
-    ssize_t size = write(fd, buf, count);
-    lseek(fd, orig, SEEK_SET);
-    return size;
+    return pwrite64(fd, buf, count, (off64_t)offset);
 }
 
-ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+ssize_t pwritev64(int fd, const struct iovec *iov, int iovcnt, off64_t offset)
 {
     ssize_t size = 0, cur_size;
     for (int i = 0; i < iovcnt; i++) {
-        cur_size = pwrite(fd, iov->iov_base, iov->iov_len, offset);
+        cur_size = pwrite64(fd, iov->iov_base, iov->iov_len, offset);
         if (cur_size > 0) {
             size += cur_size;
             offset += cur_size;
@@ -1692,6 +1707,11 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
         iov++;
     }
     return size;
+}
+
+ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+{
+    return pwritev64(fd, iov, iovcnt, (off64_t)offset);
 }
 
 ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)

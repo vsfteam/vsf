@@ -77,6 +77,7 @@ struct linger {
 #define getsockname     VSF_LINUX_SOCKET_WRAPPER(getsockname)
 
 #define accept          VSF_LINUX_SOCKET_WRAPPER(accept)
+#define accept4         VSF_LINUX_SOCKET_WRAPPER(accept4)
 #define bind            VSF_LINUX_SOCKET_WRAPPER(bind)
 #define connect         VSF_LINUX_SOCKET_WRAPPER(connect)
 #define listen          VSF_LINUX_SOCKET_WRAPPER(listen)
@@ -340,6 +341,7 @@ int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+int accept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags);
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int listen(int sockfd, int backlog);

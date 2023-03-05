@@ -36,6 +36,7 @@
 #       include "../../include/netdb.h"
 #       include "../../include/ifaddrs.h"
 #   endif
+#   include "../../include/errno.h"
 #else
 #   include <unistd.h>
 #   include <stdio.h>
@@ -46,6 +47,7 @@
 #       include <netdb.h>
 #       include <ifaddrs.h>
 #   endif
+#   include <errno.h>
 #endif
 #include "./vsf_linux_socket.h"
 
@@ -428,6 +430,20 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     return priv->sockop->fn_accept(priv, addr, addrlen);
 }
 
+int accept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags)
+{
+    int sock = accept(sockfd, addr, addrlen);
+    if (INVALID_SOCKET == sock) {
+        return INVALID_SOCKET;
+    }
+    if (fcntl(sock, F_SETFL, flags) < 0) {
+        close(sock);
+        errno = EINVAL;
+        return INVALID_SOCKET;
+    }
+    return sock;
+}
+
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(sockfd);
@@ -664,6 +680,17 @@ int getifaddrs(struct ifaddrs **ifaddrs)
 WEAK(freeifaddrs)
 void freeifaddrs(struct ifaddrs *ifaddrs)
 {
+}
+
+// net/if.h
+unsigned int if_nametoindex(const char *ifname)
+{
+    return 0;
+}
+
+char *if_indextoname(unsigned int ifindex, char *ifname)
+{
+    return "vsf_netif";
 }
 
 #if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED && !defined(__VSF_APPLET__)
