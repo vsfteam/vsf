@@ -48,12 +48,6 @@ extern "C" {
 #define INVALID_SOCKET  -1
 #define SOCKET_ERROR    -1
 
-enum {
-    IPPROTO_IP          = 0,
-    IPPROTO_TCP         = 6,
-    IPPROTO_UDP         = 17,
-};
-
 typedef uint32_t        socklen_t;
 #define __socklen_t_defined
 
@@ -133,10 +127,28 @@ struct linger {
 #define SO_NONBLOCK     100
 
 // IP options
-#define IP_TOS          1
-#define IP_TTL          2
-#define IP_HDRINCL      3
-#define IP_OPTIONS      4
+#define IP_TOS              1
+#define IP_TTL              2
+#define IP_HDRINCL          3
+#define IP_OPTIONS          4
+#define IP_MULTICAST_TTL    5
+#define IP_MULTICAST_LOOP   6
+
+// multicast
+// in.h
+#define IP_MULTICAST_IF         0
+#define IP_MULTICAST_TTL        1
+#define IP_MULTICAST_LOOP       2
+#define IP_ADD_MEMBERSHIP       3
+#define IP_DROP_MEMBERSHIP      4
+#define IP_MULTICAST_ALL        31
+// in6.h
+#define IPV6_UNICAST_HOPS       16
+#define IPV6_MULTICAST_IF       17
+#define IPV6_MULTICAST_HOPS     18
+#define IPV6_MULTICAST_LOOP     19
+#define IPV6_ADD_MEMBERSHIP     20
+#define IPV6_DROP_MEMBERSHIP    21
 
 // flags for send/recv
 enum {
@@ -150,6 +162,8 @@ enum {
 #define MSG_NOSIGNAL    MSG_NOSIGNAL
     MSG_DONTWAIT        = 1 << 4,
 #define MSG_DONTWAIT    MSG_DONTWAIT
+    MSG_TRUNC           = 1 << 5
+#define MSG_TRUNC       MSG_TRUNC
 };
 
 struct msghdr {

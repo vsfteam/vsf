@@ -138,9 +138,9 @@ extern "C" {
 #define __NR_wait4          wait4
 
 #define __NR_preadv(__fd, __vec, __vlen, __pos_l, __pos_h)                      \
-                            preadv((__fd), (__vec), (__vlen), ((off_t)(__pos_l) << 32) + (__pos_h))
+                            preadv((__fd), (__vec), (__vlen), (__pos_l))
 #define __NR_pwritev(__fd, __vec, __vlen, __pos_l, __pos_h)                     \
-                            pwritev((__fd), (__vec), (__vlen), ((off_t)(__pos_l) << 32) + (__pos_h))
+                            pwritev((__fd), (__vec), (__vlen), (__pos_l))
 
 #define _POSIX_VERSION      200112L
 

@@ -19,6 +19,13 @@ extern "C" {
 typedef uint16_t            in_port_t;
 typedef uint32_t            in_addr_t;
 
+enum {
+    IPPROTO_IP              = 0,
+    IPPROTO_TCP             = 6,
+    IPPROTO_UDP             = 17,
+    IPPROTO_IPV6            = 41,
+};
+
 #define INADDR_ANY          (in_addr_t)0x00000000
 #define INADDR_NONE         (in_addr_t)0xFFFFFFFF
 #define INADDR_BROADCAST    (in_addr_t)0xFFFFFFFF
@@ -106,8 +113,16 @@ struct sockaddr_in {
     char                    sin_zero[SIN_ZERO_LEN];
 };
 
-#define INET6_ADDRSTRLEN    46
-#define IN6ADDR_ANY_INIT    { 0 }
+struct ip_mreq {
+    struct in_addr          imr_multiaddr;
+    struct in_addr          imr_interface;
+};
+
+#define INET6_ADDRSTRLEN        46
+#define IN6ADDR_ANY_INIT        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+#define IN6ADDR_LOOPBACK_INIT   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }
+extern const struct in6_addr    in6addr_any;
+extern const struct in6_addr    in6addr_loopback;
 struct in6_addr {
     uint8_t                 s6_addr[16];
 };
@@ -117,6 +132,11 @@ struct sockaddr_in6 {
     uint32_t                sin6_flowinfo;
     struct in6_addr         sin6_addr;
     uint32_t                sin6_scope_id;
+};
+
+struct ipv6_mreq {
+    struct in6_addr         ipv6mr_multiaddr;
+    unsigned int            ipv6mr_interface;
 };
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
