@@ -23,8 +23,6 @@
 
 #if     defined(__WIN__)
 #   define  VSF_X86_DRIVER_HEADER           "./win/driver.h"
-#elif   defined(__LINUX__) || defined(__MACOS__)
-#   define  VSF_X86_DRIVER_HEADER           "./linux/driver.h"
 #else
 #   error No supported device found.
 #endif
