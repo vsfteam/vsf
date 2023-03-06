@@ -23,8 +23,10 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
+#   include "shell/sys/linux/include/fcntl.h"
 #else
 #   include <unistd.h>
+#   include <fcntl.h>
 #endif
 
 #include "../common/usrapp_common.h"
