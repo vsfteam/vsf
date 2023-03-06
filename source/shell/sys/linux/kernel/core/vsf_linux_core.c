@@ -24,6 +24,7 @@
 #define __VSF_LINUX_CLASS_INHERIT__
 #define __VSF_EDA_CLASS_INHERIT__
 #include <unistd.h>
+#include <fcntl.h>
 #include <linux/types.h>
 #include <linux/kobject.h>
 #include <linux/mutex.h>

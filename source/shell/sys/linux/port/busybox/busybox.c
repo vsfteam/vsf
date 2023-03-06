@@ -4,8 +4,10 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
+#   include "../../include/fcntl.h"
 #else
 #   include <unistd.h>
+#   include <fcntl.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
 #   include "../../include/simple_libc/stdio.h"
