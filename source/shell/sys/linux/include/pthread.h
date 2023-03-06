@@ -97,6 +97,14 @@ extern "C" {
 #define pthread_rwlock_trywrlock        VSF_LINUX_WRAPPER(pthread_rwlock_trywrlock)
 #define pthread_rwlock_timedwrlock      VSF_LINUX_WRAPPER(pthread_rwlock_timedwrlock)
 #define pthread_rwlock_unlock           VSF_LINUX_WRAPPER(pthread_rwlock_unlock)
+
+#define pthread_barrier_init            VSF_LINUX_WRAPPER(pthread_barrier_init)
+#define pthread_barrier_destroy         VSF_LINUX_WRAPPER(pthread_barrier_destroy)
+#define pthread_barrier_wait            VSF_LINUX_WRAPPER(pthread_barrier_wait)
+#define pthread_barrierattr_init        VSF_LINUX_WRAPPER(pthread_barrierattr_init)
+#define pthread_barrierattr_destroy     VSF_LINUX_WRAPPER(pthread_barrierattr_destroy)
+#define pthread_barrierattr_getpshared  VSF_LINUX_WRAPPER(pthread_barrierattr_getpshared)
+#define pthread_barrierattr_setpshared  VSF_LINUX_WRAPPER(pthread_barrierattr_setpshared)
 #endif
 
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
@@ -170,6 +178,18 @@ typedef struct pthread_rwlock_t {
 typedef struct {
     int                                 attr;
 } pthread_rwlockattr_t;
+
+typedef struct {
+    int                                 attr;
+} pthread_barrierattr_t;
+typedef struct {
+    pthread_mutex_t                     mutex;
+    pthread_cond_t                      cond;
+    unsigned                            threshold;
+    unsigned                            in;
+    unsigned                            out;
+} pthread_barrier_t;
+#define PTHREAD_BARRIER_SERIAL_THREAD   (-2)
 
 typedef int pthread_t;
 typedef struct pthread_once_t {
@@ -296,6 +316,14 @@ typedef struct vsf_linux_pthread_vplt_t {
     int (*pthread_attr_getschedpolicy)(const pthread_attr_t *attr, int *policy);
     int (*pthread_attr_setscope)(pthread_attr_t *attr, int contentionscope);
     int (*pthread_attr_getscope)(const pthread_attr_t *attr, int *contentionscope);
+
+    int (*pthread_barrier_init)(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count);
+    int (*pthread_barrier_destroy)(pthread_barrier_t *barrier);
+    int (*pthread_barrier_wait)(pthread_barrier_t *barrier);
+    int (*pthread_barrierattr_init)(pthread_barrierattr_t *attr);
+    int (*pthread_barrierattr_destroy)(pthread_barrierattr_t *attr);
+    int (*pthread_barrierattr_getpshared)(const pthread_barrierattr_t *attr, int *pshared);
+    int (*pthread_barrierattr_setpshared)(pthread_barrierattr_t *attr, int pshared);
 } vsf_linux_pthread_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt;
@@ -540,6 +568,28 @@ static inline int pthread_attr_getscope(const pthread_attr_t *attr, int *content
     return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getscope(attr, contentionscope);
 }
 
+static inline int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrier_init(barrier, attr, count);
+}
+static inline int pthread_barrier_destroy(pthread_barrier_t *barrier) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrier_destroy(barrier);
+}
+static inline int pthread_barrier_wait(pthread_barrier_t *barrier) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrier_wait(barrier);
+}
+static inline int pthread_barrierattr_init(pthread_barrierattr_t *attr) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrierattr_init(attr);
+}
+static inline int pthread_barrierattr_destroy(pthread_barrierattr_t *attr) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrierattr_destroy(attr);
+}
+static inline int pthread_barrierattr_getpshared(const pthread_barrierattr_t *attr, int *pshared) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrierattr_getpshared(attr, pshared);
+}
+static inline int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared) {
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrierattr_setpshared(attr, pshared);
+}
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_PTHREAD
 
 #if VSF_LINUX_CFG_TLS_NUM > 0
@@ -623,6 +673,14 @@ int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy);
 int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy);
 int pthread_attr_setscope(pthread_attr_t *attr, int contentionscope);
 int pthread_attr_getscope(const pthread_attr_t *attr, int *contentionscope);
+
+int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count);
+int pthread_barrier_destroy(pthread_barrier_t *barrier);
+int pthread_barrier_wait(pthread_barrier_t *barrier);
+int pthread_barrierattr_init(pthread_barrierattr_t *battr);
+int pthread_barrierattr_destroy(pthread_barrierattr_t *battr);
+int pthread_barrierattr_getpshared(const pthread_barrierattr_t *battr, int *pshared);
+int pthread_barrierattr_setpshared(pthread_barrierattr_t *battr, int pshared);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_PTHREAD
 

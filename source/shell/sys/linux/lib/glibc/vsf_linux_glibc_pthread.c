@@ -985,6 +985,119 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
     return 0;
 }
 
+int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count)
+{
+    int rc;
+
+    barrier->in = barrier->out = 0;
+    barrier->threshold = count;
+
+    if ((rc = pthread_mutex_init(&barrier->mutex, NULL)) != 0) {
+        goto __exit;
+    }
+    if ((rc = pthread_cond_init(&barrier->cond, NULL)) != 0) {
+        goto __free_mutex_and_exit;
+    }
+
+    return 0;
+
+__free_mutex_and_exit:
+    pthread_mutex_destroy(&barrier->mutex);
+__exit:
+    return rc;
+}
+
+int pthread_barrier_destroy(pthread_barrier_t *barrier)
+{
+    int rc;
+
+    if (NULL == barrier) {
+        return EINVAL;
+    }
+
+    if ((rc = pthread_mutex_lock(&barrier->mutex)) != 0) {
+        return rc;
+    }
+
+    if ((barrier->in > 0) || (barrier->out > 0)) {
+        rc = EBUSY;
+    }
+
+    pthread_mutex_unlock(&barrier->mutex);
+    if (rc) { return rc; }
+
+    pthread_cond_destroy(&barrier->cond);
+    pthread_mutex_destroy(&barrier->mutex);
+    return 0;
+}
+
+int pthread_barrier_wait(pthread_barrier_t *barrier)
+{
+    int rc;
+
+    if (NULL == barrier) {
+        return EINVAL;
+    }
+
+    if ((rc = pthread_mutex_lock(&barrier->mutex)) != 0) {
+        return rc;
+    }
+
+    if (++barrier->in == barrier->threshold) {
+        barrier->in = 0;
+        barrier->out = barrier->threshold - 1;
+        VSF_LINUX_ASSERT(pthread_cond_signal(&barrier->cond) == 0);
+
+        pthread_mutex_unlock(&barrier->mutex);
+        return PTHREAD_BARRIER_SERIAL_THREAD;
+    }
+
+    do {
+        if ((rc = pthread_cond_wait(&barrier->cond, &barrier->mutex)) != 0) {
+            break;
+        }
+    } while (barrier->in != 0);
+
+    barrier->out--;
+    pthread_cond_signal(&barrier->cond);
+    pthread_mutex_unlock(&barrier->mutex);
+    return rc;
+}
+
+int pthread_barrierattr_init(pthread_barrierattr_t *battr)
+{
+    if (battr != NULL) {
+        battr->attr = 0;
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_barrierattr_destroy(pthread_barrierattr_t *battr)
+{
+    return 0;
+}
+
+int pthread_barrierattr_getpshared(const pthread_barrierattr_t *battr, int *pshared)
+{
+    if (battr != NULL) {
+        if (pshared != NULL) {
+            *pshared = battr->attr & (PTHREAD_PROCESS_PRIVATE | PTHREAD_PROCESS_SHARED);
+        }
+        return 0;
+    }
+    return EINVAL;
+}
+
+int pthread_barrierattr_setpshared(pthread_barrierattr_t *battr, int pshared)
+{
+    if (battr != NULL) {
+        battr->attr |= pshared;
+        return 0;
+    }
+    return EINVAL;
+}
+
 #if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED && !defined(__VSF_APPLET__)
 #   define VSF_LINUX_APPLET_PTHREAD_FUNC(__FUNC)            .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt = {
@@ -1063,6 +1176,13 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt = {
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_attr_getschedpolicy),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_attr_setscope),
     VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_attr_getscope),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_barrier_init),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_barrier_destroy),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_barrier_wait),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_barrierattr_init),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_barrierattr_destroy),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_barrierattr_getpshared),
+    VSF_LINUX_APPLET_PTHREAD_FUNC(pthread_barrierattr_setpshared),
 };
 #endif
 

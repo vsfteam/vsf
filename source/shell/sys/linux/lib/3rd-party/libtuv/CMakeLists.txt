@@ -35,7 +35,6 @@ vsf_add_sources(
     ${VSF_LIBTUV_PATH}/src/unix/pipe.c
     ${VSF_LIBTUV_PATH}/src/unix/poll.c
     ${VSF_LIBTUV_PATH}/src/unix/process.c
-    ${VSF_LIBTUV_PATH}/src/unix/pthread-barrier.c
     ${VSF_LIBTUV_PATH}/src/unix/pthread-fixes.c
     ${VSF_LIBTUV_PATH}/src/unix/signal.c
     ${VSF_LIBTUV_PATH}/src/unix/stream.c
