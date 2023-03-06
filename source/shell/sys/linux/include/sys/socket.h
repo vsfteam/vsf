@@ -132,16 +132,14 @@ struct linger {
 #define IP_TTL              2
 #define IP_HDRINCL          3
 #define IP_OPTIONS          4
-#define IP_MULTICAST_TTL    5
-#define IP_MULTICAST_LOOP   6
 
 // multicast
 // in.h
-#define IP_MULTICAST_IF         0
-#define IP_MULTICAST_TTL        1
-#define IP_MULTICAST_LOOP       2
-#define IP_ADD_MEMBERSHIP       3
-#define IP_DROP_MEMBERSHIP      4
+#define IP_MULTICAST_IF         5
+#define IP_MULTICAST_TTL        6
+#define IP_MULTICAST_LOOP       7
+#define IP_ADD_MEMBERSHIP       8
+#define IP_DROP_MEMBERSHIP      9
 #define IP_MULTICAST_ALL        31
 // in6.h
 #define IPV6_UNICAST_HOPS       16

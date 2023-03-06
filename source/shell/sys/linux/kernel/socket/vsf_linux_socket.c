@@ -61,10 +61,9 @@ extern const vsf_linux_socket_op_t vsf_linux_socket_unix_op;
 #endif
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED
 extern const vsf_linux_socket_op_t vsf_linux_socket_inet_op;
-#endif
-
 const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
 const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
