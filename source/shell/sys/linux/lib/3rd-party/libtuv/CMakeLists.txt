@@ -31,6 +31,7 @@ vsf_add_sources(
     ${VSF_LIBTUV_PATH}/src/unix/linux-core.c
     ${VSF_LIBTUV_PATH}/src/unix/linux-syscalls.c
     ${VSF_LIBTUV_PATH}/src/unix/loop.c
+    ${VSF_LIBTUV_PATH}/src/unix/loop-watcher.c
     ${VSF_LIBTUV_PATH}/src/unix/pipe.c
     ${VSF_LIBTUV_PATH}/src/unix/poll.c
     ${VSF_LIBTUV_PATH}/src/unix/process.c
