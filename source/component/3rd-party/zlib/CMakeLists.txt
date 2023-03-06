@@ -5,7 +5,7 @@ endif()
 vsf_add_include_directories(
     ${VSF_ZLIB_PATH}
 )
-vsf_add_include_directories(
+vsf_add_compile_definitions(
     Z_HAVE_UNISTD_H
 )
 
