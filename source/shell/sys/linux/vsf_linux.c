@@ -2084,8 +2084,10 @@ long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint
 
     switch (futex_op & FUTEX_CMD_MASK) {
     case FUTEX_WAIT:
-        extern vsf_systimer_tick_t vsf_linux_timespec2tick(const struct timespec *ts);
-        timeout_ticks = !val2 ? -1 : vsf_linux_timespec2tick((const struct timespec *)val2);
+        {
+            extern vsf_systimer_tick_t vsf_linux_timespec2tick(const struct timespec *ts);
+            timeout_ticks = !val2 ? -1 : vsf_linux_timespec2tick((const struct timespec *)val2);
+        }
         orig = vsf_protect_sched();
         if (*futex != val) {
             vsf_unprotect_sched(orig);
