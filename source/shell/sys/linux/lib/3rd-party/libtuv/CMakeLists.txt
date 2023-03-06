@@ -24,7 +24,6 @@ vsf_add_sources(
     ${VSF_LIBTUV_PATH}/src/version.c
 
     ${VSF_LIBTUV_PATH}/src/unix/async.c
-    ${VSF_LIBTUV_PATH}/src/unix/core.c
     ${VSF_LIBTUV_PATH}/src/unix/fs.c
     ${VSF_LIBTUV_PATH}/src/unix/getaddrinfo.c
     ${VSF_LIBTUV_PATH}/src/unix/getnameinfo.c
