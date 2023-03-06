@@ -15,12 +15,18 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define fcntl           VSF_LINUX_WRAPPER(fcntl)
+#   define fcntl        VSF_LINUX_WRAPPER(fcntl)
+#   define creat        VSF_LINUX_WRAPPER(creat)
+#   define open         VSF_LINUX_WRAPPER(open)
+#   define openat       VSF_LINUX_WRAPPER(openat)
 #endif
+
+#define open64          open
 
 // syscalls
 
 #define __NR_fcntl      fcntl
+#define __NR_creat      creat
 
 #define O_RDONLY        0x0000
 #define O_WRONLY        0x0001
@@ -78,6 +84,11 @@ typedef struct vsf_linux_fcntl_vplt_t {
 
     int (*__fcntl_va)(int fd, int cmd, va_list ap);
     int (*fcntl)(int fd, int cmd, ...);
+    int (*creat)(const char *pathname, mode_t mode);
+    int (*__open_va)(const char *pathname, int flags, va_list ap);
+    int (*open)(const char *pathname, int flags, ...);
+    int (*__openat_va)(int dirfd, const char *pathname, int flags, va_list ap);
+    int (*openat)(int dirfd, const char *pathname, int flags, ...);
 } vsf_linux_fcntl_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt;
@@ -105,10 +116,36 @@ static inline int fcntl(int fd, int cmd, ...) {
     va_end(ap);
     return ret;
 }
+static inline int creat(const char *pathname, mode_t mode) {
+    return VSF_LINUX_APPLET_FCNTL_VPLT->creat(pathname, mode);
+}
+static inline int open(const char *pathname, int flags, ...) {
+    int ret;
+
+    va_list ap;
+    va_start(ap, flags);
+        ret = VSF_LINUX_APPLET_FCNTL_VPLT->__open_va(pathname, flags, ap);
+    va_end(ap);
+    return ret;
+}
+static inline int openat(int dirfd, const char *pathname, int flags, ...) {
+    int ret;
+
+    va_list ap;
+    va_start(ap, flags);
+        ret = VSF_LINUX_APPLET_FCNTL_VPLT->__openat_va(dirfd, pathname, flags, ap);
+    va_end(ap);
+    return ret;
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_FCNTL
 
 int fcntl(int fd, int cmd, ...);
+int creat(const char *pathname, mode_t mode);
+int __open_va(const char *pathname, int flags, va_list ap);
+int open(const char *pathname, int flags, ...);
+int __openat_va(int dirfd, const char *pathname, int flags, va_list ap);
+int openat(int dirfd, const char *pathname, int flags, ...);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_FCNTL
 

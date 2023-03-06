@@ -2898,6 +2898,11 @@ __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt = {
 
     VSF_LINUX_APPLET_FCNTL_FUNC(__fcntl_va),
     VSF_LINUX_APPLET_FCNTL_FUNC(fcntl),
+    VSF_LINUX_APPLET_FCNTL_FUNC(creat),
+    VSF_LINUX_APPLET_FCNTL_FUNC(__open_va),
+    VSF_LINUX_APPLET_FCNTL_FUNC(open),
+    VSF_LINUX_APPLET_FCNTL_FUNC(__openat_va),
+    VSF_LINUX_APPLET_FCNTL_FUNC(openat),
 };
 #endif
 

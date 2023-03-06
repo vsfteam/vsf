@@ -79,9 +79,6 @@ extern "C" {
 
 #if __IS_COMPILER_IAR__
 #else
-#   define creat            VSF_LINUX_WRAPPER(creat)
-#   define open             VSF_LINUX_WRAPPER(open)
-#   define openat           VSF_LINUX_WRAPPER(openat)
 #   define access           VSF_LINUX_WRAPPER(access)
 #   define unlink           VSF_LINUX_WRAPPER(unlink)
 #   define unlinkat         VSF_LINUX_WRAPPER(unlinkat)
@@ -108,7 +105,6 @@ extern "C" {
 
 // syscalls
 
-#define __NR_creat          creat
 #define __NR_close          close
 #define __NR_dup            dup
 #define __NR_dup2           dup2
@@ -145,8 +141,6 @@ extern "C" {
                             pwritev64((__fd), (__vec), (__vlen), ((off64_t)(__pos_l) << 32) + (__pos_h))
 
 #define _POSIX_VERSION      200112L
-
-#define open64              open
 
 #define STDIN_FILENO        0
 #define STDOUT_FILENO       1
@@ -233,11 +227,6 @@ typedef struct vsf_linux_unistd_vplt_t {
     int (*pipe)(int pipefd[2]);
     int (*pipe2)(int pipefd[2], int flags);
 
-    int (*creat)(const char *pathname, mode_t mode);
-    int (*__open_va)(const char *pathname, int flags, va_list ap);
-    int (*open)(const char *pathname, int flags, ...);
-    int (*__openat_va)(int dirfd, const char *pathname, int flags, va_list ap);
-    int (*openat)(int dirfd, const char *pathname, int flags, ...);
     int (*access)(const char *pathname, int mode);
     int (*unlink)(const char *pathname);
     int (*unlinkat)(int dirfd, const char *pathname, int flags);
@@ -398,27 +387,6 @@ static inline int pipe2(int pipefd[2], int flags) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->pipe2(pipefd, flags);
 }
 
-static inline int creat(const char *pathname, mode_t mode) {
-    return VSF_LINUX_APPLET_UNISTD_VPLT->creat(pathname, mode);
-}
-static inline int open(const char *pathname, int flags, ...) {
-    int ret;
-
-    va_list ap;
-    va_start(ap, flags);
-        ret = VSF_LINUX_APPLET_UNISTD_VPLT->__open_va(pathname, flags, ap);
-    va_end(ap);
-    return ret;
-}
-static inline int openat(int dirfd, const char *pathname, int flags, ...) {
-    int ret;
-
-    va_list ap;
-    va_start(ap, flags);
-        ret = VSF_LINUX_APPLET_UNISTD_VPLT->__openat_va(dirfd, pathname, flags, ap);
-    va_end(ap);
-    return ret;
-}
 static inline int access(const char *pathname, int mode) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->access(pathname, mode);
 }
@@ -597,11 +565,6 @@ char *realpath(const char *path, char *resolved_path);
 int pipe(int pipefd[2]);
 int pipe2(int pipefd[2], int flags);
 
-int creat(const char *pathname, mode_t mode);
-int __open_va(const char *pathname, int flags, va_list ap);
-int open(const char *pathname, int flags, ...);
-int __openat_va(int dirfd, const char *pathname, int flags, va_list ap);
-int openat(int dirfd, const char *pathname, int flags, ...);
 int access(const char *pathname, int mode);
 int unlink(const char *pathname);
 int unlinkat(int dirfd, const char *pathname, int flags);
