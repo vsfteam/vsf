@@ -790,6 +790,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(aligned_alloc),
     VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(calloc),
     VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(memalign),
+    VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(posix_memalign),
     // malloc_usable_size should be in malloc.h
     VSF_LINUX_APPLET_LIBC_STDLIB_FUNC(malloc_usable_size),
 #if VSF_LINUX_LIBC_USE_ENVIRON
