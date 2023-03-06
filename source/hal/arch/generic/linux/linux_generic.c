@@ -22,6 +22,7 @@
 #include "hal/arch/__vsf_arch_interface.h"
 
 #include <unistd.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <time.h>
 #include <pthread.h>
