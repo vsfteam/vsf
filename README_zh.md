@@ -134,5 +134,6 @@ VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开�
 | littlefs          | source/component/3rd-party/littlefs/raw                       | BSD        | https://github.com/littlefs-project/littlefs   |
 | getopt_long       | source/shell/sys/linux/lib/glibc/3rd-party                    | OpenBSD    | https://github.com/openbsd/src                 |
 | setjmp            | source/hal/arch/x86/win                                       | BSD        |                                                |
+| libtuv            | source/shell/sys/linux/lib/3rd-party/libtuv/raw               | Apache 2.0 | https://github.com/Samsung/libtuv              |
 
 ## [文档](document/README_zh.md)

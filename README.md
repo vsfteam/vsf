@@ -137,3 +137,4 @@ To use applications from other system, shell can be used.
 | littlefs          | source/component/3rd-party/littlefs/raw                       | BSD        | https://github.com/littlefs-project/littlefs   |
 | getopt_long       | source/shell/sys/linux/lib/glibc/3rd-party                    | OpenBSD    | https://github.com/openbsd/src                 |
 | setjmp            | source/hal/arch/x86/win                                       | BSD        |                                                |
+| libtuv            | source/shell/sys/linux/lib/3rd-party/libtuv/raw               | Apache 2.0 | https://github.com/Samsung/libtuv              |
