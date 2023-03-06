@@ -254,6 +254,14 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
     vsf_usart_irq_enable(uart, VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX_CPL);
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
@@ -1443,6 +1451,12 @@ static ssize_t __vsf_linux_gpio_write(vsf_linux_fd_t *sfd, const void *buf, size
     }
     return count;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 static const vsf_linux_fd_op_t __vsf_linux_gpio_fdop = {
     .priv_size          = sizeof(vsf_linux_gpio_priv_t),

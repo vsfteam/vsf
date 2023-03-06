@@ -434,10 +434,10 @@ static vsfvm_ret_t __vsfvm_ext_pointer_set(vsfvm_thread_t *thread)
         ((uint8_t *)inst->buffer)[offset->uval32] = value->uval8;
         break;
     case 2:
-        ((uint16_t *)inst->buffer)[offset->uval32] = value->uval16;
+        put_unaligned_cpu16(value->uval16, inst->buffer + 2 * offset->uval16);
         break;
     case 4:
-        ((uint32_t *)inst->buffer)[offset->uval32] = value->uval32;
+        put_unaligned_cpu32(value->uval32, inst->buffer + 4 * offset->uval32);
         break;
     default:
         return VSFVM_RET_INVALID_PARAM;
@@ -463,10 +463,10 @@ static vsfvm_ret_t __vsfvm_ext_pointer_get(vsfvm_thread_t *thread)
         value = ((uint8_t *)inst->buffer)[offset->uval32];
         break;
     case 2:
-        value = ((uint16_t *)inst->buffer)[offset->uval32];
+        value = get_unaligned_cpu16(inst->buffer+ 2 * offset->uval32);
         break;
     case 4:
-        value = ((uint32_t *)inst->buffer)[offset->uval32];
+        value = get_unaligned_cpu32(inst->buffer+ 4 * offset->uval32);
         break;
     default:
         return VSFVM_RET_INVALID_PARAM;

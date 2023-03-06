@@ -696,6 +696,14 @@ bool vsf_linux_is_inited(void)
     return __vsf_linux.cur_pid >= 0;
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 {
     VSF_LINUX_ASSERT(stdio_stream != NULL);
@@ -756,6 +764,13 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     }
     return VSF_ERR_FAIL;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 int isatty(int fd)
 {
@@ -1577,6 +1592,14 @@ char *realpath(const char *path, char *resolved_path)
 #   pragma diag_suppress=pe546
 #endif
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 int pipe(int pipefd[2])
 {
     vsf_linux_fd_t *sfd_rx = NULL, *sfd_tx = NULL;
@@ -1596,6 +1619,12 @@ int pipe(int pipefd[2])
     pipefd[1] = sfd_tx->fd;
     return 0;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 int pipe2(int pipefd[2], int flags)
 {
@@ -2775,6 +2804,14 @@ int tcsendbreak(int fd, int duration)
     return 0;
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 int tcdrain(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
@@ -2805,6 +2842,12 @@ int tcflush(int fd, int queue_selector)
     }
     return 0;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 int tcflow(int fd, int action)
 {
