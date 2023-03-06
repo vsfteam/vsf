@@ -58,3 +58,6 @@
 [submodule "source/shell/media/sdl2/3rd-party/SDL_mixer"]
 	path = source/shell/media/sdl2/3rd-party/SDL_mixer
 	url = ../SDL_mixer
+[submodule "source/component/3rd-party/libtuv/raw"]
+	path = source/component/3rd-party/libtuv/raw
+	url = ../libtuv
