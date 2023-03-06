@@ -1,5 +1,5 @@
 if(NOT VSF_LIBTUV_PATH)
-    set(VSF_LIBTUV_PATH ${VSF_SRC_PATH}/component/3rd-party/libtuv/raw)
+    set(VSF_LIBTUV_PATH ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/libtuv/raw)
 endif()
 
 if(NOT VSF_USE_LINUX)
