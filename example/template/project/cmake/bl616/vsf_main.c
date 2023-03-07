@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "bflb_uart.h"
+
 // debug stream
 
 #define VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE        32
@@ -14,8 +16,7 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 
 static void __vsf_debug_stream_on_rx(char ch)
 {
-    uint_fast32_t rx_free_size = VSF_STREAM_GET_FREE_SIZE(&VSF_DEBUG_STREAM_RX);
-    VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, &ch, 1);
+    VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, (uint8_t *)&ch, 1);
 }
 
 static void __VSF_DEBUG_STREAM_TX_INIT(void)

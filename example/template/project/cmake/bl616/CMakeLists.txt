@@ -23,7 +23,7 @@ set(VSF_TARGET_NAME         app)
 # modules
 set(VSF_USE_LINUX 1)
     set(VSF_LINUX_USE_SIMPLE_LIBC 1)
-set(VSF_USE_ZLIB 1)
+    set(VSF_LINUX_USE_LIBTUV 1)
 
 function(vsf_add_sources)
     target_sources(app PRIVATE ${ARGN})
@@ -42,6 +42,7 @@ vsf_add_compile_definitions(
     __BouffaloLab__ __BL616__
     __OOC_CPP__
     __VSF__
+    __linux__
 )
 include($ENV{VSF_PATH}/script/cmake/extensions.cmake)
 add_subdirectory($ENV{VSF_PATH}/source vsf_bin)
