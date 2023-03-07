@@ -53,6 +53,7 @@ extern "C" {
 
 #define VSF_PWM_APIS(__prefix_name)                                                                                                                            \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, init,           VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  pwm, fini,           VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr)                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, enable,         VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr)                                                  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, disable,        VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr)                                                  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pwm_capability_t,  pwm, capability,     VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr)                                                                \
@@ -95,6 +96,20 @@ struct vsf_pwm_t  {
 
 
 extern vsf_err_t vsf_pwm_init(vsf_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr);
+
+/**
+ \~english
+ @brief finalize a pwm instance.
+ @param[in] pwm_ptr: a pointer to structure @ref vsf_pwm_t
+ @return none
+
+ \~chinese
+ @brief 终止一个 pwm 实例
+ @param[in] pwm_ptr: 结构体 vsf_pwm_t 的指针，参考 @ref vsf_pwm_t
+ @param[in] cfg_ptr: 结构体 vsf_pwm_cfg_t 的指针，参考 @ref vsf_pwm_cfg_t
+ @return 无。
+ */
+extern void vsf_pwm_fini(vsf_pwm_t *pwm_ptr);
 
 extern fsm_rt_t vsf_pwm_enable(vsf_pwm_t *pwm_ptr);
 
@@ -167,6 +182,7 @@ extern uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr);
 #if VSF_PWM_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_pwm_t               VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t)
 #   define vsf_pwm_init(__PM, ...)   VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_init)       ((__vsf_pwm_t *)__PM, ##__VA_ARGS__)
+#   define vsf_pwm_fini(__PM)        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_fini)       ((__vsf_pwm_t *)__PM)
 #   define vsf_pwm_enable(__PM)      VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_enable)     ((__vsf_pwm_t *)__PM)
 #   define vsf_pwm_disable(__PM)     VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_disable)    ((__vsf_pwm_t *)__PM)
 #   define vsf_pwm_capability(__PM)  VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_capability) ((__vsf_pwm_t *)__PM)

@@ -186,6 +186,12 @@ vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
+void vsf_hw_spi_fini(vsf_hw_spi_t *hw_spi_ptr)
+{
+    VSF_HAL_ASSERT(hw_spi_ptr != NULL);
+    // TODO: close all clock
+}
+
 fsm_rt_t vsf_hw_spi_enable(vsf_hw_spi_t *hw_spi_ptr)
 {
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);

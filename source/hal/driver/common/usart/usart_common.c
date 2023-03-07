@@ -44,6 +44,15 @@ vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)
     return usart_ptr->op->init(usart_ptr, cfg_ptr);
 }
 
+void vsf_usart_fini(vsf_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(usart_ptr != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op->init != NULL);
+
+    usart_ptr->op->fini(usart_ptr);
+}
+
 fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);

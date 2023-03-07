@@ -55,6 +55,10 @@ vsf_err_t vsf_hw_rtc_init(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
+void vsf_hw_rtc_fini(vsf_hw_rtc_t *hw_rtc_ptr)
+{
+}
+
 fsm_rt_t vsf_hw_rtc_enable(vsf_hw_rtc_t *hw_rtc_ptr)
 {
     hw_rtc_ptr->is_enabled = true;

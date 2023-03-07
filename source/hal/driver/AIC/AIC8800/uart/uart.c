@@ -94,6 +94,11 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_cfg_t *cfg_p
     return VSF_ERR_NONE;
 }
 
+void vsf_hw_usart_fini(vsf_hw_usart_t *hw_usart_ptr)
+{
+    VSF_HAL_ASSERT(hw_usart_ptr != NULL);
+}
+
 fsm_rt_t vsf_hw_usart_enable(vsf_hw_usart_t *usart_ptr)
 {
     return fsm_rt_cpl;

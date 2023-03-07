@@ -51,6 +51,12 @@ vsf_err_t vsf_remapped_usart_init(vsf_remapped_usart_t *usart, vsf_usart_cfg_t *
     return vsf_usart_init(usart->target, cfg);
 }
 
+void vsf_remapped_usart_fini(vsf_remapped_usart_t *usart)
+{
+    VSF_HAL_ASSERT((usart != NULL) && (usart->target != NULL));
+    vsf_usart_fini(usart->target);
+}
+
 fsm_rt_t vsf_remapped_usart_enable(vsf_remapped_usart_t *usart)
 {
     VSF_HAL_ASSERT((usart != NULL) && (usart->target != NULL));

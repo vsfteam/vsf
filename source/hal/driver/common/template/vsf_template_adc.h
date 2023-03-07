@@ -61,6 +61,7 @@ extern "C" {
 
 #define VSF_ADC_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,        adc, init,                 VSF_MCONNECT(__prefix_name, _adc_t) *adc_ptr, vsf_adc_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,             adc, fini,                 VSF_MCONNECT(__prefix_name, _adc_t) *adc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         adc, enable,               VSF_MCONNECT(__prefix_name, _adc_t) *adc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,         adc, disable,              VSF_MCONNECT(__prefix_name, _adc_t) *adc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_adc_capability_t, adc, capability,       VSF_MCONNECT(__prefix_name, _adc_t) *adc_ptr) \
@@ -152,6 +153,21 @@ struct vsf_adc_t  {
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr);
+
+/**
+ \~english
+ @brief finalize a adc instance.
+ @param[in] adc_ptr: a pointer to structure @ref vsf_adc_t
+ @return none
+
+ \~chinese
+ @brief 终止一个 adc 实例
+ @param[in] adc_ptr: 结构体 vsf_adc_t 的指针，参考 @ref vsf_adc_t
+ @param[in] cfg_ptr: 结构体 vsf_adc_cfg_t 的指针，参考 @ref vsf_adc_cfg_t
+ @return 无。
+ */
+extern void vsf_adc_fini(vsf_adc_t *adc_ptr);
+
 extern vsf_adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr);
 
 extern fsm_rt_t vsf_adc_enable(vsf_adc_t *adc_ptr);
@@ -177,6 +193,7 @@ extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
 #if VSF_ADC_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_adc_t                              VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t)
 #   define vsf_adc_init(__ADC, ...)                 VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_init)                 ((__vsf_adc_t *)__ADC, ##__VA_ARGS__)
+#   define vsf_adc_fini(__ADC)                      VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_fini)                 ((__vsf_adc_t *)__ADC)
 #   define vsf_adc_enable(__ADC)                    VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_enable)               ((__vsf_adc_t *)__ADC)
 #   define vsf_adc_disable(__ADC)                   VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_disable)              ((__vsf_adc_t *)__ADC)
 #   define vsf_adc_capability(__ADC)                VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_capability)           ((__vsf_adc_t *)__ADC)

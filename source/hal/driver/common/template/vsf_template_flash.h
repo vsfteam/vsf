@@ -62,6 +62,7 @@ extern "C" {
 
 #define VSF_FLASH_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, init,                  VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, fini,                  VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptrr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, enable,                VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, disable,               VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_flash_capability_t, flash, capability,            VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr) \
@@ -137,6 +138,20 @@ struct vsf_flash_t {
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, vsf_flash_cfg_t *cfg_ptr);
+
+/**
+ \~english
+ @brief finalize a flash instance.
+ @param[in] flash_ptr: a pointer to structure @ref vsf_flash_t
+ @return none
+
+ \~chinese
+ @brief 终止一个 flash 实例
+ @param[in] flash_ptr: 结构体 vsf_flash_t 的指针，参考 @ref vsf_flash_t
+ @param[in] cfg_ptr: 结构体 vsf_flash_cfg_t 的指针，参考 @ref vsf_flash_cfg_t
+ @return 无。
+ */
+extern void vsf_flash_fini(vsf_flash_t *flash_ptr);
 
 extern fsm_rt_t vsf_flash_enable(vsf_flash_t *flash_ptr);
 
@@ -215,6 +230,7 @@ extern vsf_err_t vsf_flash_read_multi_sector(vsf_flash_t *flash_ptr,
 #if VSF_FLASH_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_flash_t                              VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_t)
 #   define vsf_flash_init(__FLASH, ...)               VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_init)               ((__vsf_flash_t *)__FLASH, ##__VA_ARGS__)
+#   define vsf_flash_fini(__FLASH)                    VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_fini)               ((__vsf_flash_t *)__FLASH)
 #   define vsf_flash_enable(__FLASH)                  VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_enable)             ((__vsf_flash_t *)__FLASH)
 #   define vsf_flash_disable(__FLASH)                 VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_disable)            ((__vsf_flash_t *)__FLASH)
 #   define vsf_flash_capability(__FLASH)              VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_capability)         ((__vsf_flash_t *)__FLASH)

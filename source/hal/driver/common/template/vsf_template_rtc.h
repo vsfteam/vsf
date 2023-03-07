@@ -61,6 +61,7 @@ extern "C" {
 
 #define VSF_RTC_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, init,       VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 rtc, fini,       VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             rtc, enable,     VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             rtc, disable,    VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_rtc_capability_t, rtc, capability, VSF_MCONNECT(__prefix_name, _rtc_t) *rtc_ptr) \
@@ -126,6 +127,21 @@ struct vsf_rtc_t  {
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_rtc_init(vsf_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr);
+
+/**
+ \~english
+ @brief finalize a rtc instance.
+ @param[in] rtc_ptr: a pointer to structure @ref vsf_rtc_t
+ @return none
+
+ \~chinese
+ @brief 终止一个 rtc 实例
+ @param[in] rtc_ptr: 结构体 vsf_rtc_t 的指针，参考 @ref vsf_rtc_t
+ @param[in] cfg_ptr: 结构体 vsf_rtc_cfg_t 的指针，参考 @ref vsf_rtc_cfg_t
+ @return 无。
+ */
+extern void vsf_rtc_fini(vsf_rtc_t *rtc_ptr);
+
 extern fsm_rt_t vsf_rtc_enable(vsf_rtc_t *rtc_ptr);
 extern fsm_rt_t vsf_rtc_disable(vsf_rtc_t *rtc_ptr);
 extern vsf_rtc_capability_t vsf_rtc_capability(vsf_rtc_t *rtc_ptr);

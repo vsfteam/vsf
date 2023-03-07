@@ -107,6 +107,14 @@ vsf_err_t vsf_fifo2req_spi_init(vsf_fifo2req_spi_t *fifo2req_spi_ptr, vsf_spi_cf
     return vsf_spi_init(fifo2req_spi_ptr->spi, &request_cfg);
 }
 
+void vsf_fifo2req_spi_fini(vsf_fifo2req_spi_t *fifo2req_spi_ptr)
+{
+    VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
+    VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
+
+    vsf_spi_fini(fifo2req_spi_ptr->spi);
+}
+
 fsm_rt_t vsf_fifo2req_spi_enable(vsf_fifo2req_spi_t *fifo2req_spi_ptr)
 {
     VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);

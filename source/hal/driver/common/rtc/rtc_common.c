@@ -46,6 +46,15 @@ vsf_err_t vsf_rtc_init(vsf_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr)
     return rtc_ptr->op->init(rtc_ptr, cfg_ptr);
 }
 
+void vsf_rtc_fini(vsf_rtc_t *rtc_ptr)
+{
+    VSF_HAL_ASSERT(rtc_ptr != NULL);
+    VSF_HAL_ASSERT(rtc_ptr->op != NULL);
+    VSF_HAL_ASSERT(rtc_ptr->op->init != NULL);
+
+    rtc_ptr->op->fini(rtc_ptr);
+}
+
 fsm_rt_t vsf_rtc_enable(vsf_rtc_t *rtc_ptr)
 {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
