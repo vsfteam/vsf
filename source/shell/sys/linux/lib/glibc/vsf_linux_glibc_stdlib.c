@@ -178,6 +178,7 @@ void * __calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, ...)
 }
 #endif
 
+#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
 void * malloc(size_t size)
 {
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
@@ -249,6 +250,7 @@ void * calloc(size_t n, size_t size)
     return result;
 #endif
 }
+#endif
 
 void exit(int status)
 {

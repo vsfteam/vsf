@@ -2005,10 +2005,12 @@ int fchownat(int dirfd, const char *pathname, uid_t owner, gid_t group, int flag
 
 
 // malloc.h
+#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
 void * memalign(size_t alignment, size_t size)
 {
     return aligned_alloc(alignment, size);
 }
+#endif
 
 // ipc.h
 key_t ftok(const char *pathname, int id)
