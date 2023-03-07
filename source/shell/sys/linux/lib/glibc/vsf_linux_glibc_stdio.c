@@ -437,6 +437,16 @@ int fprintf(FILE *f, const char *format, ...)
     return size;
 }
 
+int fiprintf(FILE *f, const char *format, ...)
+{
+    int size;
+    va_list ap;
+    va_start(ap, format);
+        size = vfprintf(f, format, ap);
+    va_end(ap);
+    return size;
+}
+
 static bool __is_in_seq(char ch, const char *seq, int seq_len)
 {
     for (int i = 0; i < seq_len; i++) {
