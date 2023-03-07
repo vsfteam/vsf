@@ -765,13 +765,6 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     return VSF_ERR_FAIL;
 }
 
-#if __IS_COMPILER_GCC__
-#   pragma GCC diagnostic pop
-#   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
-#   pragma clang diagnostic pop
-#endif
-
 int isatty(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
@@ -790,6 +783,12 @@ int ttyname_r(int fd, char *buf, size_t buflen)
     strlcpy(buf, fs_priv->file->name, buflen);
     return 0;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 char *ttyname(int fd)
 {
