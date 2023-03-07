@@ -190,7 +190,7 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  * Others: sleep, reset, etc                                                  *
  *----------------------------------------------------------------------------*/
 
-void vsf_arch_sleep(uint32_t mode)
+void vsf_arch_sleep(uint_fast32_t mode)
 {
     VSF_UNUSED_PARAM(mode);
     vsf_enable_interrupt();
