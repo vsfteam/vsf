@@ -210,11 +210,11 @@ void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread,
         const char * const name, vsf_arch_irq_thread_entry_t entry, vsf_arch_prio_t priority,
         VSF_ARCH_RTOS_STACK_T *stack, uint_fast32_t stack_depth)
 {
-    irq_thread->name = name;
-    irq_thread->entry = entry;
-    irq_thread->priority = priority;
-    irq_thread->stack = stack;
-    irq_thread->stack_depth = stack_depth;
+    irq_thread->thread_param.name = name;
+    irq_thread->thread_param.entry = entry;
+    irq_thread->thread_param.priority = priority;
+    irq_thread->thread_param.stack = stack;
+    irq_thread->thread_param.stack_depth = stack_depth;
 
     UBaseType_t rtos_priority;
     if (priority < 0) {
@@ -256,9 +256,9 @@ void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread,
     VSF_ARCH_ASSERT(irq_thread->thread_handle != NULL);
 }
 
-void __vsf_arch_irq_exit(void)
+void __vsf_arch_irq_exit(vsf_arch_irq_thread_t *irq_thread)
 {
-    vTaskDelete(NULL);
+    vTaskDelete(irq_thread->thread_handle);
 }
 
 void __vsf_arch_irq_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_arch_prio_t priority)
@@ -268,8 +268,8 @@ void __vsf_arch_irq_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_arch_pri
 
 vsf_err_t __vsf_arch_irq_restart(vsf_arch_irq_thread_t *irq_thread, vsf_arch_irq_request_t *request_pending)
 {
-    __vsf_arch_irq_init(irq_thread, irq_thread->name, irq_thread->entry, irq_thread->priority,
-        irq_thread->stack, irq_thread->stack_depth);
+    __vsf_arch_irq_init(irq_thread, irq_thread->thread_param.name, irq_thread->thread_param.entry,
+        irq_thread->thread_param.priority, irq_thread->thread_param.stack, irq_thread->thread_param.stack_depth);
     return VSF_ERR_NONE;
 }
 

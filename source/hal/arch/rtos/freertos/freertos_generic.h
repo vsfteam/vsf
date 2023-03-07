@@ -48,6 +48,8 @@ extern "C" {
 //#define VSF_ARCH_RTOS_STACK_T           StackType_t
 #define VSF_ARCH_RTOS_STACK_T           uint32_t
 
+#define VSF_ARCH_IRQ_SUPPORT_STACK
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -71,11 +73,13 @@ vsf_class(vsf_arch_irq_thread_t) {
         // should be TaskHandle_t thread, but avoid to expose header(s) of host os
         void                        *thread_handle;
 
-        const char                  *name;
-        vsf_arch_irq_thread_entry_t entry;
-        vsf_arch_prio_t             priority;
-        VSF_ARCH_RTOS_STACK_T       *stack;
-        uint_fast32_t               stack_depth;
+        struct {
+            const char                  *name;
+            vsf_arch_irq_thread_entry_t entry;
+            vsf_arch_prio_t             priority;
+            VSF_ARCH_RTOS_STACK_T       *stack;
+            uint_fast32_t               stack_depth;
+        } thread_param;
     )
 };
 

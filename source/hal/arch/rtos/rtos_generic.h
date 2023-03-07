@@ -79,6 +79,8 @@ typedef enum vsf_arch_prio_t {
     vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
 } vsf_arch_prio_t;
 
+typedef void (*vsf_arch_irq_thread_entry_t)(void*);
+
 /*============================ INCLUDES ======================================*/
 
 #if !defined(VSF_ARCH_RTOS_MODEL_HEADER)
@@ -126,8 +128,6 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-typedef void (*vsf_arch_irq_thread_entry_t)(void*);
-
 vsf_class(vsf_arch_irq_thread_with_stack_t) {
     private_member(
         implement(vsf_arch_irq_thread_t)
@@ -156,16 +156,18 @@ extern void __vsf_arch_irq_enter(void);
 extern void __vsf_arch_irq_leave(void);
 
 // if priority < 0, then inherit from current priority
-extern void __vsf_arch_irq_thread_start(vsf_arch_irq_thread_t *irq_thread,
+extern void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread,
         const char * const name, vsf_arch_irq_thread_entry_t entry, vsf_arch_prio_t priority,
         VSF_ARCH_RTOS_STACK_T *stack, uint_fast32_t stack_depth);
-extern void __vsf_arch_irq_thread_exit(void);
-extern void __vsf_arch_irq_thread_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_arch_prio_t priority);
+extern vsf_err_t __vsf_arch_irq_restart(vsf_arch_irq_thread_t *irq_thread,
+        vsf_arch_irq_request_t *request_pending);
+extern void __vsf_arch_irq_exit(vsf_arch_irq_thread_t *irq_thread);
+extern void __vsf_arch_irq_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_arch_prio_t priority);
 
 #if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
-extern void __vsf_arch_irq_thread_suspend(vsf_arch_irq_thread_t *irq_thread);
-extern void __vsf_arch_irq_thread_resume(vsf_arch_irq_thread_t *irq_thread);
-extern vsf_arch_prio_t __vsf_arch_irq_thread_get_priority(vsf_arch_irq_thread_t *irq_thread);
+extern void __vsf_arch_irq_suspend(vsf_arch_irq_thread_t *irq_thread);
+extern void __vsf_arch_irq_resume(vsf_arch_irq_thread_t *irq_thread);
+extern vsf_arch_prio_t __vsf_arch_irq_get_priority(vsf_arch_irq_thread_t *irq_thread);
 #endif
 
 // for rtos support, vsf_arch_wakeup is used to wakeup vsf thread
