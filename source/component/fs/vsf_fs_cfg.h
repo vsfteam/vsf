@@ -81,7 +81,7 @@
 
 #ifndef VSF_FS_CFG_MALLOC
 #   if VSF_USE_HEAP != ENABLED
-#       error heap is used if VSF_FS_CFG_MALLOC is not defined
+#       error heap is used if VSF_FS_CFG_MALLOC is not defined, please enable VSF_USE_HEAP
 #   endif
 #   define VSF_FS_CFG_MALLOC            vsf_heap_malloc
 #   define VSF_FS_CFG_FREE              vsf_heap_free
