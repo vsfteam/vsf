@@ -68,6 +68,8 @@
 #       define  VSF_DRIVER_HEADER       "./Geehy/driver.h"
 #   elif    defined(__Artery__)
 #       define  VSF_DRIVER_HEADER       "./Artery/driver.h"
+#   elif    defined(__BouffaloLab__)
+#       define  VSF_DRIVER_HEADER       "./BouffaloLab/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"

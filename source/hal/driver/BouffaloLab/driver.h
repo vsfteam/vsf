@@ -22,7 +22,7 @@
 #undef VSF_BL_DRIVER_HEADER
 
 #if     defined(__BL616__)
-#   define  VSF_BL_DRIVER_HEADER        "./BK61X/BL616/driver.h"
+#   define  VSF_BL_DRIVER_HEADER        "./BL61X/BL616/driver.h"
 #else
 #   error No supported device found.
 #endif

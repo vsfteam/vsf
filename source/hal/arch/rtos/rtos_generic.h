@@ -56,6 +56,8 @@ extern "C" {
 #   define VSF_USER_ENTRY                   vsf_main
 #endif
 
+#define VSF_ARCH_IRQ_REQUEST_SUPPORT_MANUAL_RESET
+
 #define VSF_ARCH_RTOS_MODE_SUSPEND_RESUME   1
 #define VSF_ARCH_RTOS_MODE_REQUEST          2
 
