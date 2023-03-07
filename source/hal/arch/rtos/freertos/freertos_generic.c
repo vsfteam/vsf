@@ -72,7 +72,7 @@ typedef struct __vsf_freertos_t {
         int8_t                      pos;
     } irq;
     struct {
-        vsf_arch_prio_t             state;
+        vsf_gint_state_t            state;
         UBaseType_t                 os_state;
     } gint;
 } __vsf_freertos_t;
@@ -89,14 +89,14 @@ static NO_INIT __vsf_freertos_t __vsf_freertos;
  * interrupt                                                                  *
  *----------------------------------------------------------------------------*/
 
-vsf_arch_prio_t vsf_get_interrupt(void)
+vsf_gint_state_t vsf_get_interrupt(void)
 {
     return __vsf_freertos.gint.state;
 }
 
-vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t level)
+vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level)
 {
-    vsf_arch_prio_t orig = vsf_get_interrupt();
+    vsf_gint_state_t orig = vsf_get_interrupt();
     if (__vsf_freertos.gint.state != level) {
         if (level) {
             __vsf_freertos.gint.state = level;
@@ -109,16 +109,16 @@ vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t level)
     return orig;
 }
 
-vsf_arch_prio_t vsf_disable_interrupt(void)
+vsf_gint_state_t vsf_disable_interrupt(void)
 {
-    vsf_arch_prio_t orig = vsf_get_interrupt();
+    vsf_gint_state_t orig = vsf_get_interrupt();
     vsf_set_interrupt(false);
     return orig;
 }
 
-vsf_arch_prio_t vsf_enable_interrupt(void)
+vsf_gint_state_t vsf_enable_interrupt(void)
 {
-    vsf_arch_prio_t orig = vsf_get_interrupt();
+    vsf_gint_state_t orig = vsf_get_interrupt();
     vsf_set_interrupt(true);
     return orig;
 }
@@ -413,12 +413,6 @@ void vsf_freertos_start(void)
                         tskIDLE_PRIORITY + VSF_ARCH_RTOS_CFG_BASE_PRIORITY,
                                                                 /* Priority of the task. */
                         NULL);                                  /* The pointer to the task_id. */
-}
-
-WEAK(vAssertCalled)
-void vAssertCalled(unsigned long ulLine, const char * const pcFileName)
-{
-    VSF_ARCH_ASSERT(false);
 }
 
 WEAK(vApplicationMallocFailedHook)
