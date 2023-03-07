@@ -80,6 +80,11 @@ vsf_err_t vsf_hw_pwm_init(vsf_hw_pwm_t *hw_pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
+void vsf_hw_pwm_fini(vsf_hw_pwm_t *hw_pwm_ptr)
+{
+    VSF_HAL_ASSERT(hw_pwm_ptr != NULL);
+}
+
 fsm_rt_t vsf_hw_pwm_enable(vsf_hw_pwm_t *hw_pwm_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr);

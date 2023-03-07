@@ -130,6 +130,15 @@ vsf_err_t vsf_fifo2req_usart_init(vsf_fifo2req_usart_t * fifo2req_usart_ptr,
     return vsf_usart_init(fifo2req_usart_ptr->usart, &request_cfg);
 }
 
+void vsf_fifo2req_usart_fini(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
+{
+    VSF_HAL_ASSERT(fifo2req_usart_ptr != NULL);
+    VSF_HAL_ASSERT(fifo2req_usart_ptr->usart != NULL);
+
+    vsf_usart_fini(fifo2req_usart_ptr->usart);
+}
+
+
 fsm_rt_t vsf_fifo2req_usart_enable(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
 {
     VSF_HAL_ASSERT(fifo2req_usart_ptr != NULL);

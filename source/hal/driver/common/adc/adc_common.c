@@ -44,6 +44,15 @@ vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr)
     return adc_ptr->op->init(adc_ptr, cfg_ptr);
 }
 
+void vsf_adc_fini(vsf_adc_t *adc_ptr)
+{
+    VSF_HAL_ASSERT(adc_ptr != NULL);
+    VSF_HAL_ASSERT(adc_ptr->op != NULL);
+    VSF_HAL_ASSERT(adc_ptr->op->init != NULL);
+
+    adc_ptr->op->fini(adc_ptr);
+}
+
 fsm_rt_t vsf_adc_enable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(adc_ptr != NULL);

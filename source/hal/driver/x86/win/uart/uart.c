@@ -448,6 +448,11 @@ close_and_fail:
     return VSF_ERR_FAIL;
 }
 
+void vsf_win_usart_fini(vsf_win_usart_t *win_usart)
+{
+
+}
+
 fsm_rt_t vsf_win_usart_enable(vsf_win_usart_t *win_usart)
 {
     VSF_HAL_ASSERT(win_usart != NULL);
@@ -593,7 +598,7 @@ uint_fast16_t vsf_win_usart_txfifo_write(vsf_win_usart_t *win_usart, void *buffe
         &VSF_MCONNECT(vsf_hw_usart, __N),
 #   define VSF_HAL_HW_USART_IMPLEMENT_MULTI()                                   \
         VSF_MREPEAT(VSF_HW_USART_COUNT, VSF_HAL_HW_USART_IMPLEMENT, NULL)       \
-        vsf_remapped_usart_t *vsf_hw_usart[VSF_HW_USART_COUNT] = {              \
+        vsf_remapped_usart_t *vsf_hw_usarts[VSF_HW_USART_COUNT] = {             \
             VSF_MREPEAT(VSF_HW_USART_COUNT, VSF_HAL_HW_USART_IMPLEMENT_ARRAY, NULL)\
         };
 

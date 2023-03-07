@@ -81,6 +81,7 @@ extern "C" {
 
 #define VSF_SPI_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, init,                 VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, vsf_spi_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fini,                 VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, enable,               VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, disable,              VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_enable,           VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
@@ -258,6 +259,20 @@ struct vsf_spi_t  {
 
 extern vsf_err_t            vsf_spi_init(               vsf_spi_t *spi_ptr,
                                                         vsf_spi_cfg_t *cfg_ptr);
+
+/**
+ \~english
+ @brief finalize a spi instance.
+ @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
+ @return none
+
+ \~chinese
+ @brief 终止一个 spi 实例
+ @param[in] spi_ptr: 结构体 vsf_spi_t 的指针，参考 @ref vsf_spi_t
+ @param[in] cfg_ptr: 结构体 vsf_spi_cfg_t 的指针，参考 @ref vsf_spi_cfg_t
+ @return 无。
+ */
+extern void vsf_spi_fini(vsf_spi_t *spi_ptr);
 
 extern fsm_rt_t             vsf_spi_enable(             vsf_spi_t *spi_ptr);
 extern fsm_rt_t             vsf_spi_disable(            vsf_spi_t *spi_ptr);

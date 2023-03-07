@@ -267,6 +267,11 @@ vsf_err_t vsf_hw_adc_init(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_cfg_t *cfg_ptr)
     return vsf_teda_init(&hw_adc_ptr->teda, VSF_AIC8800_ADC_CFG_EDA_PRIORITY);
 }
 
+void vsf_hw_adc_fini(vsf_hw_adc_t *hw_adc_ptr)
+{
+    VSF_HAL_ASSERT(hw_adc_ptr != NULL);
+}
+
 fsm_rt_t vsf_hw_adc_enable(vsf_hw_adc_t *hw_adc_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_adc_ptr);

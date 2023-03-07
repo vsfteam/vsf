@@ -103,6 +103,11 @@ vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_cfg_t *cfg_p
     return VSF_ERR_NONE;
 }
 
+void vsf_hw_flash_fini(vsf_hw_flash_t *hw_flash_ptr)
+{
+    VSF_HAL_ASSERT(hw_flash_ptr != NULL);
+}
+
 fsm_rt_t vsf_hw_flash_enable(vsf_hw_flash_t *hw_flash_ptr)
 {
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);

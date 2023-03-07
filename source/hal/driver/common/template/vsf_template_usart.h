@@ -60,14 +60,6 @@ extern "C" {
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS    DISABLED
 #endif
 
-#ifndef VSF_USART_CFG_FIFO_TO_REQUEST
-#   define VSF_USART_CFG_FIFO_TO_REQUEST            DISABLED
-#endif
-
-#ifndef VSF_USART_CFG_REQUEST_EMPTY_IMPL
-#   define VSF_USART_CFG_REQUEST_EMPTY_IMPL         DISABLED
-#endif
-
 #ifndef VSF_USART_CFG_REQUEST_API
 #   define VSF_USART_CFG_REQUEST_API                ENABLED
 #endif
@@ -80,6 +72,7 @@ extern "C" {
 
 #define __VSF_USART_BASE_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              usart, init,                  VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, fini,                  VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               usart, enable,                VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               usart, disable,               VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_capability_t, usart, capability,            VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr) \
@@ -263,6 +256,20 @@ struct vsf_usart_t  {
  @return vsf_err_t: »Áπ˚ usart ≥ı ºªØÕÍ≥…∑µªÿ VSF_ERR_NONE , ∑Ò‘Ú∑µªÿ∏∫ ˝°£
  */
 extern vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr);
+
+/**
+ \~english
+ @brief finalize a usart instance.
+ @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
+ @return none
+
+ \~chinese
+ @brief ÁªàÊ≠¢‰∏Ä‰∏™ usart ÂÆû‰æã
+ @param[in] usart_ptr: ÁªìÊûÑ‰Ωì vsf_usart_t ÁöÑÊåáÈíàÔºåÂèÇËÄÉ @ref vsf_usart_t
+ @param[in] cfg_ptr: ÁªìÊûÑ‰Ωì vsf_usart_cfg_t ÁöÑÊåáÈíàÔºåÂèÇËÄÉ @ref vsf_usart_cfg_t
+ @return Êó†„ÄÇ
+ */
+extern void vsf_usart_fini(vsf_usart_t *usart_ptr);
 
 /**
  \~english
@@ -510,6 +517,7 @@ extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
 #if VSF_USART_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_usart_t                                 VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t)
 #   define vsf_usart_init(__USART, ...)                  VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_init)                  ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_fini(__USART)                       VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fini)                  ((__vsf_usart_t *)__USART)
 #   define vsf_usart_enable(__USART)                     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_enable)                ((__vsf_usart_t *)__USART)
 #   define vsf_usart_disable(__USART)                    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)               ((__vsf_usart_t *)__USART)
 #   define vsf_usart_irq_enable(__USART, ...)            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_enable)            ((__vsf_usart_t *)__USART, ##__VA_ARGS__)

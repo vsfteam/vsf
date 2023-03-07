@@ -44,6 +44,15 @@ vsf_err_t vsf_pwm_init(vsf_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
     return pwm_ptr->op->init(pwm_ptr, cfg_ptr);
 }
 
+void vsf_pwm_fini(vsf_pwm_t *pwm_ptr)
+{
+    VSF_HAL_ASSERT(pwm_ptr != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op->init != NULL);
+
+    pwm_ptr->op->fini(pwm_ptr);
+}
+
 fsm_rt_t vsf_pwm_enable(vsf_pwm_t *pwm_ptr)
 {
     VSF_HAL_ASSERT(pwm_ptr != NULL);

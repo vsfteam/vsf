@@ -51,6 +51,12 @@ vsf_err_t vsf_remapped_adc_init(vsf_remapped_adc_t *adc, vsf_adc_cfg_t *cfg)
     return vsf_adc_init(adc->target, cfg);
 }
 
+void vsf_remapped_adc_fini(vsf_remapped_adc_t *adc)
+{
+    VSF_HAL_ASSERT((adc != NULL) && (adc->target != NULL));
+    vsf_adc_fini(adc->target);
+}
+
 vsf_adc_capability_t vsf_remapped_adc_capability(vsf_remapped_adc_t *adc)
 {
     VSF_HAL_ASSERT((adc != NULL) && (adc->target != NULL));
