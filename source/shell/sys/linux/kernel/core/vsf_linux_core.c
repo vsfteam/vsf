@@ -882,15 +882,6 @@ void timer_setup(struct timer_list *timer, void (*func)(struct timer_list *), un
 #include <linux/skbuff.h>
 
 #if defined(VSF_LINUX_CFG_SKB_SIZE) && defined(VSF_LINUX_CFG_SKB_NUM)
-
-#if __IS_COMPILER_GCC__
-#   pragma GCC diagnostic push
-#   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wcast-align"
-#endif
-
 #   define __VSF_LINUX_CFG_SKB_POOL ENABLED
 
 typedef struct vsf_ieee80211_skb_t {
@@ -903,6 +894,14 @@ imp_vsf_pool(vsf_ieee80211_skb_pool, vsf_ieee80211_skb_t)
 
 static vsf_pool(vsf_ieee80211_skb_pool) __vsf_ieee80211_skb_pool;
 static vsf_pool_item(vsf_ieee80211_skb_pool) __vsf_ieee80211_skb_pool_items[VSF_LINUX_CFG_SKB_NUM];
+#endif
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
 #define skb_shinfo(__skb)           ((struct skb_shared_info *)(skb_end_pointer(__skb)))

@@ -666,7 +666,7 @@ cleanup:
 
 char * __vsh_fdgets(int fd, char *str, int n)
 {
-    char ch, *result = str, *cur;
+    char ch, *result = str, *cur = NULL;
     int rsize = 0;
 
     while (true) {
@@ -702,7 +702,9 @@ char * __vsh_fdgets(int fd, char *str, int n)
             break;
         }
     }
-    cur[1] = '\0';
+    if (cur != NULL) {
+        cur[1] = '\0';
+    }
     return rsize > 0 ? result : NULL;
 }
 
