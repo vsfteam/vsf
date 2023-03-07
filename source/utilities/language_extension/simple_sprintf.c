@@ -36,6 +36,16 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#   pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wmaybe-uninitialized"
+#   pragma clang diagnostic ignored "-Wpointer-to-int-cast"
+#endif
+
 #ifdef __WIN__
 // TODO: fixme. to avoid conflict with libvcruntime(undname.obj) in the latest Visual Studio 2022
 WEAK(vsnprintf)
@@ -527,6 +537,12 @@ end:
     }
     return realsize;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 #ifdef __WIN__
 // TODO: fixme. to avoid conflict with libvcruntime(undname.obj) in the latest Visual Studio 2022

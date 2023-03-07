@@ -167,6 +167,14 @@ struct workqueue_struct {
 
 struct workqueue_struct *system_wq;
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 static int __workqueue_thread(int argc, char **argv)
 {
     VSF_LINUX_ASSERT(1 == argc);
@@ -239,6 +247,12 @@ static int __workqueue_thread(int argc, char **argv)
     }
     return 0;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 struct workqueue_struct * alloc_workqueue(const char *fmt, unsigned int flags, int max_active, ...)
 {
@@ -868,6 +882,15 @@ void timer_setup(struct timer_list *timer, void (*func)(struct timer_list *), un
 #include <linux/skbuff.h>
 
 #if defined(VSF_LINUX_CFG_SKB_SIZE) && defined(VSF_LINUX_CFG_SKB_NUM)
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 #   define __VSF_LINUX_CFG_SKB_POOL ENABLED
 
 typedef struct vsf_ieee80211_skb_t {
@@ -923,6 +946,12 @@ struct sk_buff * alloc_skb(unsigned int size, gfp_t flags)
 
     return skb;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 void kfree_skb(struct sk_buff *skb)
 {

@@ -2779,12 +2779,6 @@ vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_rx_priv_t *priv_rx)
     return sfd_tx;
 }
 
-#if __IS_COMPILER_GCC__
-#   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
-#   pragma clang diagnostic pop
-#endif
-
 // term
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
 {
@@ -2866,6 +2860,12 @@ static int __vsf_linux_term_close(vsf_linux_fd_t *sfd)
     }
     return 0;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 #if VSF_LINUX_APPLET_USE_POLL == ENABLED && !defined(__VSF_APPLET__)
 #   define VSF_LINUX_APPLET_POLL_FUNC(__FUNC)           .__FUNC = __FUNC

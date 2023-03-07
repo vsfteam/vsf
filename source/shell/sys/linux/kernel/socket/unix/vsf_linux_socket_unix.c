@@ -213,6 +213,14 @@ static void __vsf_linux_socket_unix_pipe_on_rx_evt(vsf_linux_stream_priv_t *priv
     }
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen)
 {
     vsf_linux_socket_unix_priv_t *priv = (vsf_linux_socket_unix_priv_t *)socket_priv;
@@ -426,5 +434,11 @@ static int __vsf_linux_socket_unix_socketpair(vsf_linux_fd_t *rsfd, vsf_linux_fd
     priv_tx->rw.sfd_rx = sfd_rx;
     return 0;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SOCKET

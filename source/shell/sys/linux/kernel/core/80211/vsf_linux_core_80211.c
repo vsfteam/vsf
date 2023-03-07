@@ -71,6 +71,14 @@ unsigned int ieee80211_hdrlen(__le16 fc)
     return hdrlen;
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 unsigned int ieee80211_get_hdrlen_from_skb(const struct sk_buff *skb)
 {
     const struct ieee80211_hdr *hdr = (const struct ieee80211_hdr *)skb->data;
@@ -85,6 +93,12 @@ unsigned int ieee80211_get_hdrlen_from_skb(const struct sk_buff *skb)
     }
     return hdrlen;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 struct ieee80211_hw * ieee80211_alloc_hw(size_t priv_data_len, const struct ieee80211_ops *ops)
 {
