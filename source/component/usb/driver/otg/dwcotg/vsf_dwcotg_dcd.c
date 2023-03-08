@@ -657,6 +657,7 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
         global_regs->gintsts = USB_OTG_GINTSTS_ENUMDNE;
 
         __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_ATTACH, is_highspeed ? USB_DC_SPEED_HIGH : USB_DC_SPEED_FULL);
+        global_regs->gintmsk |= USB_OTG_GINTMSK_USBSUSPM;
     }
     if (intsts & USB_OTG_GINTSTS_USBSUSP) {
         __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_SUSPEND, 0);
@@ -669,6 +670,11 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
     if (intsts & USB_OTG_GINTSTS_SOF) {
         __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_SOF, vk_dwcotg_dcd_get_frame_number(dwcotg_dcd));
         global_regs->gintsts = USB_OTG_GINTSTS_SOF;
+    }
+    if (intsts & USB_OTG_GINTSTS_USBSUSP) {
+        __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_DETACH, 0);
+        global_regs->gintsts = USB_OTG_GINTSTS_USBSUSP;
+        global_regs->gintmsk &= ~USB_OTG_GINTMSK_USBSUSPM;
     }
 
     if (intsts & USB_OTG_GINTSTS_IEPINT) {

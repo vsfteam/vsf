@@ -827,7 +827,6 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
 
     switch (evt) {
     case USB_ON_ATTACH:
-    case USB_ON_DETACH:
     case USB_ON_SUSPEND:
     case USB_ON_RESUME:
     case USB_ON_UNDERFLOW:
@@ -837,6 +836,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
     case USB_ON_NAK:
         vsf_usbd_notify_user(dev, evt, (void *)(uintptr_t)value);
         break;
+    case USB_ON_DETACH:
     case USB_ON_RESET: {
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
             vk_usbd_cfg_t *config;
@@ -852,28 +852,30 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             dev->feature = 0;
 #endif
 
-            // reset usb hw
-            __vk_usbd_hw_init_reset(dev, true);
+            if (USB_ON_RESET == evt) {
+                // reset usb hw
+                __vk_usbd_hw_init_reset(dev, true);
 
 #if VSF_USBD_CFG_AUTOSETUP == ENABLED
-            uint_fast16_t ep_size;
-            struct usb_device_desc_t *desc_dev;
-            vk_usbd_desc_t *desc = vk_usbd_get_descriptor(dev->desc, dev->num_of_desc, USB_DT_DEVICE, 0, 0);
-            VSF_USB_ASSERT(desc != NULL);
-            desc_dev = (struct usb_device_desc_t *)desc->buffer;
-            VSF_USB_ASSERT(     (desc->size == USB_DT_DEVICE_SIZE)
-                   &&   (desc_dev->bLength == USB_DT_DEVICE_SIZE)
-                   &&   (desc_dev->bDescriptorType == USB_DT_DEVICE)
-                   &&   (desc_dev->bNumConfigurations == dev->num_of_config));
+                uint_fast16_t ep_size;
+                struct usb_device_desc_t *desc_dev;
+                vk_usbd_desc_t *desc = vk_usbd_get_descriptor(dev->desc, dev->num_of_desc, USB_DT_DEVICE, 0, 0);
+                VSF_USB_ASSERT(desc != NULL);
+                desc_dev = (struct usb_device_desc_t *)desc->buffer;
+                VSF_USB_ASSERT(     (desc->size == USB_DT_DEVICE_SIZE)
+                        &&   (desc_dev->bLength == USB_DT_DEVICE_SIZE)
+                        &&   (desc_dev->bDescriptorType == USB_DT_DEVICE)
+                        &&   (desc_dev->bNumConfigurations == dev->num_of_config));
 
-            // config ep0
-            ep_size = desc_dev->bMaxPacketSize0;
-            if (    vk_usbd_drv_ep_add(0 | USB_DIR_OUT, USB_EP_TYPE_CONTROL, ep_size)
-                ||  vk_usbd_drv_ep_add(0 | USB_DIR_IN, USB_EP_TYPE_CONTROL, ep_size)) {
-                // TODO:
-                return;
-            }
+                // config ep0
+                ep_size = desc_dev->bMaxPacketSize0;
+                if (    vk_usbd_drv_ep_add(0 | USB_DIR_OUT, USB_EP_TYPE_CONTROL, ep_size)
+                    ||  vk_usbd_drv_ep_add(0 | USB_DIR_IN, USB_EP_TYPE_CONTROL, ep_size)) {
+                    // TODO:
+                    return;
+                }
 #endif
+            }
 
             vsf_usbd_notify_user(dev, evt, NULL);
             vk_usbd_drv_set_address(0);
