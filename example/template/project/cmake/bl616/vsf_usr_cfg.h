@@ -37,7 +37,6 @@
 #define VSF_USE_FIFO                                    ENABLED
 #define VSF_USE_SIMPLE_STREAM                           ENABLED
 #define VSF_USE_HEAP                                    ENABLED
-#   define VSF_HEAP_SIZE                                (32 * 1024)
 
 #define VSF_USE_MAL                                     ENABLED
 #   define VSF_MAL_USE_MEM_MAL                          ENABLED
@@ -48,7 +47,7 @@
 
 #define VSF_USE_LINUX                                   ENABLED
 #   define VSF_KERNEL_CFG_THREAD_STACK_LARGE            ENABLED
-#   define VSF_LINUX_CFG_STACKSIZE                      (16 * 1024)
+#   define VSF_LINUX_CFG_STACKSIZE                      (4 * 1024)
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
 #       define VSF_LINUX_LIBC_CFG_CPP                   ENABLED
 #       define VSF_LINUX_USE_SIMPLE_STDIO               ENABLED
