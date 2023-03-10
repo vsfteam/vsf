@@ -94,7 +94,7 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
 }
 
 #   if VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED
-void vsf_arch_heap_statistics(vsf_heap_statistics_t *statistics)
+void vsf_arch_heap_statistics(vsf_arch_heap_statistics_t *statistics)
 {
     struct meminfo info;
     bflb_mem_usage(KMEM_HEAP, &info);
