@@ -822,7 +822,11 @@ vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op
         alignment = 0;
     }
 
+#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
     thread = (vsf_linux_thread_t *)vsf_heap_malloc_aligned(all_size, alignment);
+#else
+    thread = (vsf_linux_thread_t *)memalign(alignment, all_size);
+#endif
     if (thread != NULL) {
         memset(thread, 0, thread_size);
 
@@ -1335,7 +1339,11 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         if (    (NULL == process) ||
                 !vsf_dlist_is_in(vsf_linux_thread_t, thread_node, &process->thread_list, thread)) {
             vsf_unprotect_sched(orig);
+#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
             vsf_heap_free(thread);
+#else
+            free(thread);
+#endif
             return;
         }
         vsf_unprotect_sched(orig);
@@ -1385,7 +1393,11 @@ int vsf_linux_wait_thread(int tid, int *retval)
         *retval = thread->retval;
     }
     vsf_linux_detach_thread(thread);
+#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
     vsf_heap_free(thread);
+#else
+    free(thread);
+#endif
     return 0;
 }
 

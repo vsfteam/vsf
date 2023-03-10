@@ -3,6 +3,7 @@
 
 #include <FreeRTOS.h>
 #include "board.h"
+#include "mem.h"
 #include "bflb_uart.h"
 
 struct bflb_device_s *console;
@@ -27,6 +28,11 @@ void bflb_uart_set_console(struct bflb_device_s *dev)
     bflb_uart_rxint_mask(console, false);
     bflb_irq_attach(console->irq_num, console_receive_isr, console);
     bflb_irq_enable(console->irq_num);
+}
+
+size_t malloc_size(const void *ptr)
+{
+    return tlsf_block_size(ptr);
 }
 
 int main(void)
