@@ -1,6 +1,7 @@
 #define __BouffaloLab__
 #define __BL616__
 
+#include <FreeRTOS.h>
 #include "board.h"
 #include "bflb_uart.h"
 
@@ -34,4 +35,8 @@ int main(void)
 
     extern void vsf_freertos_start(void);
     vsf_freertos_start();
+
+    vTaskStartScheduler();
+    while (1) {
+    }
 }
