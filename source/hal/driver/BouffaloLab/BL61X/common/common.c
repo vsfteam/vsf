@@ -1,6 +1,7 @@
 #define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 #include "../__device.h"
 #include "service/simple_stream/vsf_simple_stream.h"
+#include "service/heap/vsf_heap.h"
 
 #include "mem.h"
 #include "bflb_uart.h"
@@ -91,4 +92,15 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
 {
     return tlsf_block_size(buffer);
 }
+
+#   if VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED
+void vsf_arch_heap_statistics(vsf_heap_statistics_t *statistics)
+{
+    struct meminfo info;
+    bflb_mem_usage(KMEM_HEAP, &info);
+
+    statistics->all_size = info.total_size;
+    statistics->used_size = info.used_size;
+}
+#   endif
 #endif

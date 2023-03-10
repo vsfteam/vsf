@@ -23,6 +23,11 @@
 #include "hal/vsf_hal_cfg.h"
 #include "utilities/vsf_utilities.h"
 
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED && VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED
+// for vsf_heap_statistics_t
+#   include "service/heap/vsf_heap.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -328,6 +333,9 @@ extern void * vsf_arch_heap_realloc(void *buffer, uint_fast32_t size);
 extern void vsf_arch_heap_free(void *buffer);
 extern unsigned int vsf_arch_heap_alignment(void);
 extern uint_fast32_t vsf_arch_heap_size(void *buffer);
+#   if VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED
+extern void vsf_arch_heap_statistics(vsf_heap_statistics_t *statistics);
+#   endif
 #endif
 
 /*----------------------------------------------------------------------------*

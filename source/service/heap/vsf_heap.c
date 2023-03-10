@@ -117,7 +117,9 @@ const i_heap_t VSF_HEAP = {
     .ReallocAligned = &vsf_heap_realloc_aligned_imp,
     .Realloc        = &vsf_heap_realloc_imp,
     .Free           = &vsf_heap_free_imp,
-#if VSF_ARCH_PROVIDE_HEAP != ENABLED && VSF_HEAP_CFG_STATISTICS == ENABLED
+#if     (VSF_HEAP_CFG_STATISTICS == ENABLED)                                    \
+    &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                                  \
+        ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED))
     .Statistics     = &vsf_heap_statistics,
 #endif
 };
@@ -568,10 +570,18 @@ void vsf_heap_add_memory(vsf_mem_t mem)
 {
     vsf_heap_add_buffer(mem.buffer, (uint_fast32_t)mem.size);
 }
+#endif
 
+#if     (VSF_HEAP_CFG_STATISTICS == ENABLED)                                    \
+    &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                                  \
+        ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED))
 void vsf_heap_statistics(vsf_heap_statistics_t *statistics)
 {
+#   if VSF_ARCH_PROVIDE_HEAP == ENABLED
+    vsf_arch_heap_statistics(statistics);
+#   else
     __vsf_heap_statistics(&__vsf_heap.use_as__vsf_heap_t, statistics);
+#   endif
 }
 #endif
 

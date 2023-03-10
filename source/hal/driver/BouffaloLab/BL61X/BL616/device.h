@@ -35,6 +35,7 @@
 #define VSF_ARCH_FREERTOS_CFG_IS_IN_ISR         xPortIsInsideInterrupt
 #ifndef VSF_ARCH_PROVIDE_HEAP
 #   define VSF_ARCH_PROVIDE_HEAP                ENABLED
+#   define VSF_ARCH_HEAP_HAS_STATISTICS         ENABLED
 #endif
 
 // there is malloc/free/realloc/calloc/memalign in bl_sdk

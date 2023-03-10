@@ -137,7 +137,9 @@ def_interface(i_heap_t)
     void *(*ReallocAligned) (void *buffer, uint_fast32_t size, uint_fast32_t alignment);
     void *(*Realloc)        (void *buffer, uint_fast32_t size);
     void (*Free)            (void *buffer);
-#if VSF_ARCH_PROVIDE_HEAP != ENABLED && VSF_HEAP_CFG_STATISTICS == ENABLED
+#if     (VSF_HEAP_CFG_STATISTICS == ENABLED)                                    \
+    &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                                  \
+        ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED))
     void (*Statistics)      (vsf_heap_statistics_t *statistics);
 #endif
 end_def_interface(i_heap_t)
@@ -168,6 +170,10 @@ extern void vsf_heap_init(void);
 */
 extern void vsf_heap_add_buffer(uint8_t *buffer, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);
+#endif
+#if     (VSF_HEAP_CFG_STATISTICS == ENABLED)                                    \
+    &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                                  \
+        ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED))
 extern void vsf_heap_statistics(vsf_heap_statistics_t *statistics);
 #endif
 extern uint_fast32_t vsf_heap_size(uint8_t *buffer);
