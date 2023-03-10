@@ -1,5 +1,6 @@
 #define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 #include "../__device.h"
+#include "service/simple_stream/vsf_simple_stream.h"
 
 #include "mem.h"
 #include "bflb_uart.h"
