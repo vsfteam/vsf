@@ -579,9 +579,9 @@ void vsf_heap_statistics(vsf_heap_statistics_t *statistics)
 {
 #   if VSF_ARCH_PROVIDE_HEAP == ENABLED
     vsf_arch_heap_statistics_t arch_heap_statistics;
-    vsf_arch_heap_statistics(arch_heap_statistics);
+    vsf_arch_heap_statistics(&arch_heap_statistics);
     statistics->all_size = arch_heap_statistics.all_size;
-    statistics->used_size = arch_heap_statistics.used_size
+    statistics->used_size = arch_heap_statistics.used_size;
 #   else
     __vsf_heap_statistics(&__vsf_heap.use_as__vsf_heap_t, statistics);
 #   endif
