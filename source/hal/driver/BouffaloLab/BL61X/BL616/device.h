@@ -33,6 +33,9 @@
 #endif
 
 #define VSF_ARCH_FREERTOS_CFG_IS_IN_ISR         xPortIsInsideInterrupt
+#ifndef VSF_ARCH_PROVIDE_HEAP
+#   define VSF_ARCH_PROVIDE_HEAP                ENABLED
+#endif
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM                         0
