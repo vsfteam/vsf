@@ -71,14 +71,27 @@ size_t strscpy(char *dest, const char *src, size_t n)
 
 char * strdup(const char *str)
 {
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     return __strdup_ex(NULL, str);
-#else
+#   else
     char *result = vsf_heap_strdup(str);
     if (NULL == result) {
         errno = ENOMEM;
     }
     return result;
+#   endif
+#else
+    if (str != NULL) {
+        int str_len = strlen(str);
+        char *new_str = malloc(str_len + 1);
+        if (new_str != NULL) {
+            memcpy(new_str, str, str_len);
+            new_str[str_len] = '\0';
+        }
+        return new_str;
+    }
+    return NULL;
 #endif
 }
 
