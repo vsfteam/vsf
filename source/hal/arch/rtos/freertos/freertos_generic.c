@@ -242,10 +242,8 @@ void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread,
     VSF_ARCH_ASSERT(sizeof(VSF_ARCH_RTOS_STACK_T) >= sizeof(StackType_t));
     VSF_ARCH_ASSERT((stack != NULL) && (stack_depth * sizeof(VSF_ARCH_RTOS_STACK_T) > reserved_stack_depth));
     StaticTask_t *static_task = (StaticTask_t *)stack;
-
-    reserved_stack_depth /= sizeof(StackType_t);
-    stack_depth = stack_depth * sizeof(VSF_ARCH_RTOS_STACK_T) / sizeof(StackType_t) - reserved_stack_depth;
     stack = (VSF_ARCH_RTOS_STACK_T *)((uintptr_t)stack + reserved_stack_depth);
+    stack_depth = (stack_depth * sizeof(VSF_ARCH_RTOS_STACK_T) - reserved_stack_depth) / sizeof(StackType_t);
 
     // if thread is restarted, delete first
     if (irq_thread->thread_handle != NULL) {
