@@ -115,11 +115,7 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, 
 void * __malloc_ex(vsf_linux_process_t *process, size_t size, ...)
 {
     size += VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
-#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
     size_t *i = vsf_heap_malloc(size);
-#else
-    size_t *i = malloc(size);
-#endif
     if (i != NULL) {
         void *buffer = (void *)((char *)i + VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN);
 
@@ -149,13 +145,8 @@ void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...)
     } else {
         void *new_buff = __malloc_ex(process, size);
         if (new_buff != NULL) {
-#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
             size_t copy_size = vsf_heap_size((uint8_t *)p - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN)
                                     - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
-#else
-            size_t copy_size = malloc_size((uint8_t *)p - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN)
-                                    - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
-#endif
             copy_size = vsf_min(size, copy_size);
             memcpy(new_buff, p, copy_size);
         }
@@ -172,11 +163,7 @@ void __free_ex(vsf_linux_process_t *process, void *ptr, ...)
         va_start(ap, ptr);
             __vsf_linux_heap_trace_free(process, *i, ptr, ap);
         va_end(ap);
-#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
         vsf_heap_free(i);
-#else
-        free(i);
-#endif
     }
 }
 
@@ -191,7 +178,7 @@ void * __calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, ...)
 }
 #endif
 
-#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
+#if VSF_LINUX_SIMPLE_LIBC_CFG_NO_MM != ENABLED
 void * malloc(size_t size)
 {
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED

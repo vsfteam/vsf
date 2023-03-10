@@ -167,11 +167,7 @@ static void __vsf_linux_libusb_on_event(void *param, vk_usbh_libusb_dev_t *dev, 
 
     if (VSF_USBH_LIBUSB_EVT_ON_ARRIVED == evt) {
         vk_usbh_libusb_open(dev);
-#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
         ldev = vsf_heap_malloc(sizeof(vsf_linux_libusb_dev_t));
-#else
-        ldev = malloc(sizeof(vsf_linux_libusb_dev_t));
-#endif
         if (ldev != NULL) {
             memset(ldev, 0, sizeof(*ldev));
             ldev->libusb_dev = dev;
@@ -265,11 +261,7 @@ static void * __vsf_libusb_libusb_core_thread(void *param)
             if (!ldev->refcnt) {
                 vk_usbh_free_urb(ldev->libusb_dev->usbh, &ldev->libusb_dev->urb);
                 vk_usbh_libusb_close(ldev->libusb_dev);
-#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
                 vsf_heap_free(ldev);
-#else
-                free(ldev);
-#endif
             }
         }
         while (!vsf_dlist_is_empty(&__vsf_libusb.devlist_new)) {
@@ -1208,11 +1200,7 @@ void libusb_free_transfer(struct libusb_transfer *transfer)
             if (!ldev->refcnt) {
                 vk_usbh_free_urb(ldev->libusb_dev->usbh, &ldev->libusb_dev->urb);
                 vk_usbh_libusb_close(ldev->libusb_dev);
-#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
                 vsf_heap_free(ldev);
-#else
-                free(ldev);
-#endif
             }
         }
     }

@@ -80,17 +80,9 @@ int kobject_set_name_vargs(struct kobject *kobj, const char *fmt, va_list ap)
     int size = vsnprintf(NULL, 0, fmt, ap);
     if (size > 0) {
         if (kobj->name != NULL) {
-#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
             vsf_heap_free((void *)kobj->name);
-#else
-            free((void *)kobj->name);
-#endif
         }
-#if VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM != ENABLED
         kobj->name = vsf_heap_malloc(size);
-#else
-        kobj->name = malloc(size);
-#endif
         if (NULL == kobj->name) {
             return -ENOMEM;
         }

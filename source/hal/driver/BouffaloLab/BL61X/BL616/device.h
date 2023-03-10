@@ -37,6 +37,9 @@
 #   define VSF_ARCH_PROVIDE_HEAP                ENABLED
 #endif
 
+// there is malloc/free/realloc/calloc/memalign in bl_sdk
+#define VSF_LINUX_SIMPLE_LIBC_CFG_NO_MM         ENABLED
+
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM                         0
 

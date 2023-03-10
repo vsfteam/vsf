@@ -50,7 +50,6 @@
 #   define VSF_KERNEL_CFG_THREAD_STACK_LARGE            ENABLED
 #   define VSF_LINUX_CFG_STACKSIZE                      (16 * 1024)
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
-#       define VSF_LINUX_SIMPLE_LIBC_CFG_SKIP_MM        ENABLED
 #       define VSF_LINUX_LIBC_CFG_CPP                   ENABLED
 #       define VSF_LINUX_USE_SIMPLE_STDIO               ENABLED
 #       define VSF_LINUX_USE_SIMPLE_STRING              ENABLED
