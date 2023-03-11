@@ -11,18 +11,29 @@
  *----------------------------------------------------------------------------*/
 
 struct bflb_device_s *console;
-void (*console_on_rx)(char ch);
+static void (*__console_on_rx)(char ch);
+
 void console_receive_isr(int irq, void *arg)
 {
-    unsigned int intstatus = bflb_uart_get_intstatus(console);
+    uint32_t intstatus = bflb_uart_get_intstatus(console);
     char ch;
 
-    if (intstatus & (UART_INTSTS_RX_FIFO | UART_INTSTS_RTO)) {
-        while (bflb_uart_rxavailable(console)) {
-            ch = bflb_uart_getchar(console);
-            if (console_on_rx != NULL) {
-                console_on_rx(ch);
-            }
+    if (intstatus & UART_INTSTS_RX_FIFO) {
+        goto console_rx;
+    }
+
+    if (intstatus & UART_INTSTS_RTO) {
+        bflb_uart_int_clear(console, UART_INTCLR_RTO);
+        goto console_rx;
+    }
+
+    return;
+
+console_rx:
+    while (bflb_uart_rxavailable(console)) {
+        ch = bflb_uart_getchar(console);
+        if (__console_on_rx != NULL) {
+            __console_on_rx(ch);
         }
     }
 }
@@ -30,6 +41,7 @@ void bflb_uart_set_console(struct bflb_device_s *dev)
 {
     console = dev;
     bflb_uart_rxint_mask(console, false);
+    bflb_uart_txint_mask(console, true);
     bflb_irq_attach(console->irq_num, console_receive_isr, console);
     bflb_irq_enable(console->irq_num);
 }
@@ -50,8 +62,7 @@ static void __vsf_debug_stream_on_rx(char ch)
 static void __VSF_DEBUG_STREAM_TX_INIT(void)
 {
     vsf_stream_connect_tx(&VSF_DEBUG_STREAM_RX.use_as__vsf_stream_t);
-    extern void (*console_on_rx)(char ch);
-    console_on_rx = __vsf_debug_stream_on_rx;
+    __console_on_rx = __vsf_debug_stream_on_rx;
 }
 
 static void __VSF_DEBUG_STREAM_TX_WRITE_BLOCKED(uint8_t *buf, uint_fast32_t size)
