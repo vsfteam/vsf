@@ -32,7 +32,14 @@
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_hw_aic8800_gpio_init(void);
+/**
+ \~english
+ @brief To ensure that the GPIO is working properly, it needs to be called inside vsf_driver_init()
+
+ \~chinese
+ @brief 为了确保 AIC8800 的 GPIO 工作正常，需要在 vsf_driver_init() 里调用这个 API
+ */
+extern void __vsf_hw_aic8800_gpio_init(void);
 
 #define VSF_GPIO_CFG_DEC_PREFIX         vsf_hw
 #define VSF_GPIO_CFG_DEC_UPCASE_PREFIX  VSF_HW

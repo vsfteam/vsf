@@ -66,7 +66,7 @@ typedef struct vsf_hw_gpio_t {
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_hw_aic8800_gpio_init(vsf_hw_gpio_t *hw_gpio_ptr)
+static void __aic8800_gpio_init(vsf_hw_gpio_t *hw_gpio_ptr)
 {
     // When the PMIC is used to access the GPIO,
     // critical area protection is already provided,
@@ -80,14 +80,10 @@ static void __vsf_hw_aic8800_gpio_init(vsf_hw_gpio_t *hw_gpio_ptr)
     }
 }
 
-void vsf_hw_aic8800_gpio_init(void)
+void __vsf_hw_aic8800_gpio_init(void)
 {
-#define __VSF_HW_GPIO_NAME(__N, __I)  &vsf_hw_gpio ## __N,
-    vsf_hw_gpio_t* gpios[] = {
-        VSF_MREPEAT(VSF_HW_GPIO_COUNT, __VSF_HW_GPIO_NAME, NULL)
-    };
-    for (int i = 0; i < dimof(gpios); i++) {
-        __vsf_hw_aic8800_gpio_init(gpios[i]);
+    for (int i = 0; i < dimof(vsf_hw_gpios); i++) {
+        __aic8800_gpio_init(vsf_hw_gpios[i]);
     }
 }
 
