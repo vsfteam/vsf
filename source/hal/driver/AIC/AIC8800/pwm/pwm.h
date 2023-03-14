@@ -24,6 +24,8 @@
 
 #if VSF_HAL_USE_PWM == ENABLED
 
+#include "../__device.h"
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HAL_PWM_IMP_TIME_SETTING
@@ -34,8 +36,8 @@
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 
-#define VSF_PWM_CFG_DEC_PREFIX          vsf_hw
-#define VSF_PWM_CFG_DEC_UPCASE_PREFIX     VSF_HW
+#define VSF_PWM_CFG_DEC_PREFIX              vsf_hw
+#define VSF_PWM_CFG_DEC_UPCASE_PREFIX       VSF_HW
 #include "hal/driver/common/pwm/pwm_template.h"
 
 #endif /* VSF_HAL_USE_PWM */

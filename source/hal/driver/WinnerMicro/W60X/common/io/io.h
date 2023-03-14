@@ -61,7 +61,7 @@ struct vsf_gpio_t {
     gpio_reg_t *reg;
 };
 
-//! \name PIN name 
+//! \name PIN name
 //! @{
 enum vsf_io_pin_no_t {
 #if defined(PIO_PORTA)
@@ -73,7 +73,7 @@ enum vsf_io_pin_no_t {
 };
 //! @}
 
-//! \name PIN name 
+//! \name PIN name
 //! @{
 enum vsf_io_pin_msk_t{
 #if defined(PIO_PORTA)
@@ -117,7 +117,7 @@ enum io_model_t{
 
     VSF_IO_DISABLE_INPUT        = (1<<8),           //!< disable input
 /*
-    VSF_IO_INVERT_INPUT         = (1<<6),           //!< invert the input pin level 
+    VSF_IO_INVERT_INPUT         = (1<<6),           //!< invert the input pin level
 
 
     VSF_IO_FILTER_BYPASS        = (0<<11),          //!< filter is bypassed

@@ -77,7 +77,7 @@ int vsf_linux_create_fhs(void)
 
     // 1. hardware driver related demo
     vsf_board_init();
-#if VSF_HW_GPIO_COUNT > 0
+#if VSF_HW_GPIO_PORT_MASK > 0
     vsf_linux_fs_bind_gpio_hw("/sys/class/gpio");
 #endif
 #if APP_USE_USBH_DEMO == ENABLED

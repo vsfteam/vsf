@@ -33,11 +33,9 @@
 
 #define __VSF_HW_IO_FUNCTION_MASK       IOMUX_GPIO_CONFIG_SEL_MASK
 
-#define __VSF_HW_IO_PIN_MASK            ((1ul << VSF_HW_IO_PIN_MAX) - 1)
-
 #define __VSF_HW_IO_IS_VAILID_PIN(__P)                                          \
-    (((__P &  __VSF_HW_IO_PIN_MASK) != 0) &&                                    \
-     ((__P & ~__VSF_HW_IO_PIN_MASK) == 0))
+    (((__P &  VSF_HW_IO_PIN_MASK) != 0) &&                                      \
+     ((__P & ~VSF_HW_IO_PIN_MASK) == 0))
 
 #define __VSF_HW_IO_IS_VAILID_FEATURE(__F)                                      \
     ((__F & ~(uint32_t)__VSF_HW_IO_FEATURE_ALL_BITS) == 0)

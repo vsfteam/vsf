@@ -58,6 +58,7 @@ vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 
 #define __VSF_HAL_TEMPLATE_CFG_REMOVE_ARRAY
 #define __VSF_HAL_TEMPLATE_IMP_COUNT                1
+#define __VSF_HAL_TEMPLATE_IMP_MASK                 1
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 

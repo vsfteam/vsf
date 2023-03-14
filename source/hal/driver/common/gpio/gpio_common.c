@@ -34,7 +34,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 
-void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, vsf_io_feature_t feature)
+void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -43,7 +43,7 @@ void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, vsf_io_feature
     gpio_ptr->op->config_pin(gpio_ptr, pin_mask, feature);
 }
 
-void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t direction_mask)
+void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -52,7 +52,7 @@ void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t di
     gpio_ptr->op->set_direction(gpio_ptr, direction_mask, pin_mask);
 }
 
-uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+vsf_gpio_pin_mask_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -61,7 +61,7 @@ uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     return gpio_ptr->op->get_direction(gpio_ptr, pin_mask);
 }
 
-void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -70,7 +70,7 @@ void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     gpio_ptr->op->set_input(gpio_ptr, pin_mask);
 }
 
-void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -79,7 +79,7 @@ void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     gpio_ptr->op->set_output(gpio_ptr, pin_mask);
 }
 
-void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -88,7 +88,7 @@ void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     gpio_ptr->op->switch_direction(gpio_ptr, pin_mask);
 }
 
-uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr)
+vsf_gpio_pin_mask_t vsf_gpio_read(vsf_gpio_t *gpio_ptr)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -97,7 +97,7 @@ uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr)
     return gpio_ptr->op->read(gpio_ptr);
 }
 
-void vsf_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t value)
+void vsf_gpio_write(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -106,7 +106,7 @@ void vsf_gpio_write(vsf_gpio_t *gpio_ptr, uint32_t pin_mask, uint32_t value)
     gpio_ptr->op->write(gpio_ptr, pin_mask, value);
 }
 
-void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_set(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -115,7 +115,7 @@ void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     gpio_ptr->op->set(gpio_ptr, pin_mask);
 }
 
-void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -124,7 +124,7 @@ void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     gpio_ptr->op->clear(gpio_ptr, pin_mask);
 }
 
-void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -133,7 +133,7 @@ void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     gpio_ptr->op->toggle(gpio_ptr, pin_mask);
 }
 
-void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -142,7 +142,7 @@ void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
     gpio_ptr->op->output_and_set(gpio_ptr, pin_mask);
 }
 
-void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);

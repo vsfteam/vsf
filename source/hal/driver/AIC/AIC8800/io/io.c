@@ -38,7 +38,7 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_io_gpio_map_t {
-    uint8_t funs[VSF_HW_IO_PIN_MAX];
+    uint8_t funs[VSF_HW_IO_PIN_COUNT];
 } vsf_hw_io_gpio_map_t;
 
 typedef struct vsf_hw_io_t {
@@ -51,7 +51,7 @@ typedef struct vsf_hw_io_t {
         GPIO_REG_T *GPIO;
         bool is_pmic;
         vsf_hw_io_gpio_map_t *gpio_map;
-    } ports[VSF_HW_IO_PORT_MAX];
+    } ports[VSF_HW_IO_PORT_COUNT];
 } vsf_hw_io_t;
 
 /*============================ IMPLEMENTATION ================================*/
@@ -62,12 +62,12 @@ vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(cfg_ptr != NULL);
 
     uint8_t port_index = cfg_ptr->port_index;
-    if (port_index >= VSF_HW_IO_PORT_MAX) {
+    if (port_index >= VSF_HW_IO_PORT_COUNT) {
         VSF_ASSERT(0);
         return VSF_ERR_INVALID_RANGE;
     }
     uint8_t pin_index = cfg_ptr->pin_index;
-    if (pin_index >= VSF_HW_IO_PIN_MAX) {
+    if (pin_index >= VSF_HW_IO_PIN_COUNT) {
         VSF_ASSERT(0);
         return VSF_ERR_INVALID_RANGE;
     }
@@ -125,12 +125,12 @@ vsf_err_t vsf_hw_io_config(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast
         .is_pmic = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC,                               \
         .IOMUX = ((AIC_IOMUX_TypeDef *) VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),  \
         .GPIO = REG_GPIO ## __COUNT,                                                    \
-        .gpio_map = VSF_HW_IO_PORT ## __COUNT ## _MAP,                     \
+        .gpio_map = VSF_HW_IO_PORT ## __COUNT ## _MAP,                     			    \
     },
 
 #define VSF_IO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                   \
     vsf_hw_io_t vsf_hw_io = {                                                   \
-        VSF_MREPEAT(VSF_HW_IO_PORT_MAX, __VSF_HW_IOMUX, NULL)                   \
+        VSF_MREPEAT(VSF_HW_IO_PORT_COUNT, __VSF_HW_IOMUX, NULL)                 \
         __HAL_OP                                                                \
     };
 

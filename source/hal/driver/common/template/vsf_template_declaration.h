@@ -46,18 +46,218 @@ extern const VSF_MCONNECT(vsf, __VSF_HAL_TEMPLATE_NAME, _op_t)
 #endif
 
 #if defined(__VSF_HAL_TEMPLATE_PREFIX) && defined(__VSF_HAL_TEMPLATE_UPCASE_PREFIX)
+
 // expand to:
 //  #define __VSF_HAL_TEMPLATE_DEC_COUNT VSF_HW_ADC_COUNT
-#   if VSF_MCONNECT(__VSF_HAL_TEMPLATE_UPCASE_PREFIX, __VSF_HAL_TEMPLATE_UPCASE_NAME, _COUNT)
+#   if !defined(__VSF_HAL_TEMPLATE_DEC_COUNT) && VSF_MCONNECT(__VSF_HAL_TEMPLATE_UPCASE_PREFIX, __VSF_HAL_TEMPLATE_UPCASE_NAME, _COUNT)
 #       define __VSF_HAL_TEMPLATE_DEC_COUNT  VSF_MCONNECT(__VSF_HAL_TEMPLATE_UPCASE_PREFIX, __VSF_HAL_TEMPLATE_UPCASE_NAME, _COUNT)
 #   endif
 
-#   if VSF_MCONNECT(__VSF_HAL_TEMPLATE_UPCASE_PREFIX, __VSF_HAL_TEMPLATE_UPCASE_NAME, _MASK)
+#   if !defined(__VSF_HAL_TEMPLATE_DEC_MASK) &&VSF_MCONNECT(__VSF_HAL_TEMPLATE_UPCASE_PREFIX, __VSF_HAL_TEMPLATE_UPCASE_NAME, _MASK)
 // expand to:
-//  #define __VSF_HAL_TEMPLATE_DEC_COUNT     VSF_HW_ADC_MASK
+//  #define __VSF_HAL_TEMPLATE_DEC_MASK     VSF_HW_ADC_MASK
 #       define __VSF_HAL_TEMPLATE_DEC_MASK   VSF_MCONNECT(__VSF_HAL_TEMPLATE_UPCASE_PREFIX, __VSF_HAL_TEMPLATE_UPCASE_NAME, _MASK)
-#   else
-#       define __VSF_HAL_TEMPLATE_DEC_MASK   ((1ul << __VSF_HAL_TEMPLATE_DEC_COUNT) - 1)
+#   endif
+
+#   ifndef __VSF_HAL_TEMPLATE_DEC_COUNT
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 0)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK0 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK0 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 1)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK1 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK1 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 2)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK2 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK2 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 3)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK3 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK3 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 4)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK4 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK4 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 5)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK5 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK5 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 6)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK6 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK6 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 7)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK7 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK7 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 8)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK8 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK8 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 9)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK9 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK9 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 10)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK10 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK10 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 11)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK11 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK11 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 12)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK12 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK12 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 13)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK13 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK13 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 14)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK14 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK14 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 15)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK15 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK15 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 16)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK16 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK16 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 17)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK17 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK17 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 18)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK18 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK18 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 19)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK19 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK19 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 20)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK20 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK20 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 21)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK21 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK21 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 22)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK22 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK22 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 23)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK23 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK23 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 24)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK24 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK24 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 25)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK25 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK25 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 26)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK26 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK26 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 27)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK27 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK27 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 28)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK28 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK28 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 29)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK29 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK29 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 30)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK30 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK30 0
+#       endif
+#       if __VSF_HAL_TEMPLATE_DEC_MASK & (1 << 31)
+#           define __VSF_HAL_TEMPLATE_DEC_MASK31 1
+#       else
+#           define __VSF_HAL_TEMPLATE_DEC_MASK31 0
+#       endif
+#       define __VSF_HAL_TEMPLATE_DEC_COUNT (                                   \
+            __VSF_HAL_TEMPLATE_DEC_MASK0 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK1 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK2 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK3 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK4 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK5 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK6 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK7 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK8 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK9 +                                      \
+            __VSF_HAL_TEMPLATE_DEC_MASK10 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK11 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK12 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK13 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK14 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK15 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK16 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK17 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK18 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK19 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK20 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK21 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK22 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK23 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK24 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK25 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK26 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK27 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK28 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK29 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK30 +                                     \
+            __VSF_HAL_TEMPLATE_DEC_MASK31                                       \
+    )
+#   endif
+
+#   ifndef __VSF_HAL_TEMPLATE_DEC_MASK
+#       define __VSF_HAL_TEMPLATE_DEC_MASK   ((1ull << __VSF_HAL_TEMPLATE_DEC_COUNT) - 1)
 #   endif
 
 
@@ -198,4 +398,36 @@ extern VSF_MCONNECT(vsf_, __VSF_HAL_TEMPLATE_TYPE_PREFIX, __VSF_HAL_TEMPLATE_NAM
 #undef __VSF_HAL_TEMPLATE_APIS
 #undef __VSF_HAL_TEMPLATE_DEC_COUNT
 #undef __VSF_HAL_TEMPLATE_DEC_MASK
+#undef __VSF_HAL_TEMPLATE_DEC_MASK0
+#undef __VSF_HAL_TEMPLATE_DEC_MASK1
+#undef __VSF_HAL_TEMPLATE_DEC_MASK2
+#undef __VSF_HAL_TEMPLATE_DEC_MASK3
+#undef __VSF_HAL_TEMPLATE_DEC_MASK4
+#undef __VSF_HAL_TEMPLATE_DEC_MASK5
+#undef __VSF_HAL_TEMPLATE_DEC_MASK6
+#undef __VSF_HAL_TEMPLATE_DEC_MASK7
+#undef __VSF_HAL_TEMPLATE_DEC_MASK8
+#undef __VSF_HAL_TEMPLATE_DEC_MASK9
+#undef __VSF_HAL_TEMPLATE_DEC_MASK10
+#undef __VSF_HAL_TEMPLATE_DEC_MASK11
+#undef __VSF_HAL_TEMPLATE_DEC_MASK12
+#undef __VSF_HAL_TEMPLATE_DEC_MASK13
+#undef __VSF_HAL_TEMPLATE_DEC_MASK14
+#undef __VSF_HAL_TEMPLATE_DEC_MASK15
+#undef __VSF_HAL_TEMPLATE_DEC_MASK16
+#undef __VSF_HAL_TEMPLATE_DEC_MASK17
+#undef __VSF_HAL_TEMPLATE_DEC_MASK18
+#undef __VSF_HAL_TEMPLATE_DEC_MASK19
+#undef __VSF_HAL_TEMPLATE_DEC_MASK20
+#undef __VSF_HAL_TEMPLATE_DEC_MASK21
+#undef __VSF_HAL_TEMPLATE_DEC_MASK22
+#undef __VSF_HAL_TEMPLATE_DEC_MASK23
+#undef __VSF_HAL_TEMPLATE_DEC_MASK24
+#undef __VSF_HAL_TEMPLATE_DEC_MASK25
+#undef __VSF_HAL_TEMPLATE_DEC_MASK26
+#undef __VSF_HAL_TEMPLATE_DEC_MASK27
+#undef __VSF_HAL_TEMPLATE_DEC_MASK28
+#undef __VSF_HAL_TEMPLATE_DEC_MASK29
+#undef __VSF_HAL_TEMPLATE_DEC_MASK30
+#undef __VSF_HAL_TEMPLATE_DEC_MASK31
 #undef __VSF_HAL_TEMPLATE_DEC_LV0
