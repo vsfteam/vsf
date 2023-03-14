@@ -95,7 +95,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT == DISABLED
-void vsf_real_gpio_set_input(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_real_gpio_set_input(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -105,7 +105,7 @@ void vsf_real_gpio_set_input(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT == DISABLED
-void vsf_real_gpio_set_output(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_real_gpio_set_output(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -115,7 +115,7 @@ void vsf_real_gpio_set_output(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION == DISABLED
-void vsf_real_gpio_switch_direction(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_real_gpio_switch_direction(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -126,7 +126,7 @@ void vsf_real_gpio_switch_direction(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_SET == DISABLED
-void vsf_real_gpio_set(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_real_gpio_set(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -136,7 +136,7 @@ void vsf_real_gpio_set(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR == DISABLED
-void vsf_real_gpio_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_real_gpio_clear(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -146,7 +146,7 @@ void vsf_real_gpio_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET == DISABLED
-void vsf_real_gpio_output_and_set(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_real_gpio_output_and_set(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -166,7 +166,7 @@ void vsf_real_gpio_output_and_set(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR == DISABLED
-void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, uint32_t pin_mask)
+void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);

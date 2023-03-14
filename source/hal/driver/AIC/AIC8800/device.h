@@ -69,8 +69,8 @@
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
 
-#define VSF_HW_IO_PORT_MAX              2
-#define VSF_HW_IO_PIN_MAX               16
+#define VSF_HW_IO_PORT_COUNT            2
+#define VSF_HW_IO_PIN_COUNT             16
 #define VSF_HW_IO_FUNCTION_MAX          10 // All Function 10 ~ Function 15 is invalid
 #define VSF_HW_IO_PORT0_IOMUX_REG_BASE  (0x40503000)
 #define VSF_HW_IO_PORT0_IS_PMIC         false
@@ -82,10 +82,8 @@
 #define VSF_HW_IO_PORT1_GPIO_PIN_MASK   (0x0000FFFC)    // GPIOB0 and GPIOB1 default function is not GPIO
                                                         //GPIOB2 ~ GPIOB15 default function is GPIO
 
-#define VSF_HW_GPIO_COUNT               VSF_HW_IO_PORT_MAX
-#define VSF_HW_GPIO_PIN_MAX             VSF_HW_IO_PIN_MAX
-
-
+#define VSF_HW_GPIO_PORT_COUNT          VSF_HW_IO_PORT_COUNT
+#define VSF_HW_GPIO_PIN_COUNT           VSF_HW_IO_PIN_COUNT
 
 #define VSF_HW_RNG_COUNT            1
 #define VSF_HW_RNG_BITLEN           32

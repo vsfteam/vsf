@@ -35,6 +35,18 @@ extern "C" {
 #   define VSF_GPIO_CFG_MULTI_CLASS                 ENABLED
 #endif
 
+#ifdef VSF_HW_GPIO_PORT_COUNT
+#	define VSF_HW_GPIO_COUNT                        VSF_HW_GPIO_PORT_COUNT
+#endif
+
+#ifdef VSF_HW_GPIO_PORT_MASK
+#	define VSF_HW_GPIO_MASK                         VSF_HW_GPIO_PORT_MASK
+#endif
+
+#if defined(VSF_HW_GPIO_PIN_COUNT) && !defined(VSF_HW_GPIO_PIN_MASK)
+#	define VSF_HW_GPIO_PIN_MASK                     ((1ul << VSF_HW_GPIO_PIN_COUNT) - 1)
+#endif
+
 /**
  \~english
  VSF_GPIO_CFG_PREFIX is used to set the actual API call when calling the vsf_gpio_*().
@@ -45,23 +57,23 @@ extern "C" {
  then it can be configured in front of the .c:
 
  \~chinese
- VSF_GPIO_CFG_PREFIX 是用来配置调用vsf_gpio_*()的时候实际调用的API。
+ VSF_GPIO_CFG_PREFIX 是用来配置调用 vsf_gpio_*() 的时候实际调用的API。
  例如，当 VSF_GPIO_CFG_PREFIX 配置成 vsf_hw 的时候，调用 vsf_gpio_init()
  实际调用的是 vsf_hw_gpio_init()
 
- 如果我们想要 xxxx.c 里调用 vsf_gpio_init() 实际调用的是 vsf_extern_gpio_init()，
+ 如果我们想要 xxxx.c 里调用 vsf_gpio_init() 实际调用的是 vsf_example_gpio_init()，
  那么可以在 xxxx.c 源码前面配置：
 
  \~
  \code {.c}
     #undef  VSF_GPIO_CFG_PREFIX
-    #define VSF_GPIO_CFG_PREFIX     vsf_extern
+    #define VSF_GPIO_CFG_PREFIX     vsf_example
  \endcode
  */
 #ifndef VSF_GPIO_CFG_PREFIX
 #   if VSF_GPIO_CFG_MULTI_CLASS == ENABLED
 #       define VSF_GPIO_CFG_PREFIX                  vsf
-#   elif defined(VSF_HW_GPIO_COUNT) && (VSF_HW_GPIO_COUNT != 0)
+#   elif defined(VSF_HW_GPIO_PIN_MASK) && (VSF_HW_GPIO_PIN_MASK != 0)
 #       define VSF_GPIO_CFG_PREFIX                  vsf_hw
 #   else
 #       define VSF_GPIO_CFG_PREFIX                  vsf
@@ -72,23 +84,31 @@ extern "C" {
 #   define VSF_GPIO_CFG_FUNCTION_RENAME             ENABLED
 #endif
 
+#ifndef vsf_gpio_pin_mask_t
+#   if defined(VSF_HW_GPIO_PIN_MASK) && (VSF_HW_GPIO_PIN_MASK & 0xFFFFFFFF00000000)
+#	    define vsf_gpio_pin_mask_t uint64_t
+#   else
+#	    define vsf_gpio_pin_mask_t uint32_t
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_GPIO_APIS(__prefix_name)                                                                                                                                                    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_capability_t, gpio, capability,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, config_pin,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask, vsf_io_feature_t feature)   \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask, uint32_t direction_mask)    \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              gpio, get_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_input,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_output,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, switch_direction, VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              gpio, read,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, write,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask, uint32_t value)             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set,              VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, clear,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, toggle,           VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_set,   VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_clear, VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint32_t pin_mask)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, config_pin,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)            \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, get_direction,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_input,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_output,       VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, switch_direction, VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, read,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                                                    \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, write,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set,              VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, clear,            VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, toggle,           VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_set,   VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_clear, VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 
 /*============================ TYPES =========================================*/
 
@@ -118,7 +138,7 @@ typedef struct vsf_gpio_capability_t {
     //!  0x0000FFFF (16  pins),
     //!  0xFFFFFFFF (32 pins),
     //!  0xFFFFFFFE (32 pins, but pin0 cannot be used as GPIO)
-    uint32_t avail_pin_mask;
+    vsf_gpio_pin_mask_t avail_pin_mask;
 } vsf_gpio_capability_t;
 
 typedef struct vsf_gpio_t vsf_gpio_t;
@@ -165,7 +185,7 @@ struct vsf_gpio_t  {
  @note TODO
  */
 extern void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
-                                uint32_t pin_mask,
+                                vsf_gpio_pin_mask_t pin_mask,
                                 vsf_io_feature_t feature);
 
 /**
@@ -183,8 +203,8 @@ extern void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
  @param[in] direction_mask: 方向掩码，1 表示输出，0 表示输入
  */
 extern void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr,
-                                   uint32_t pin_mask,
-                                   uint32_t direction_mask);
+                                   vsf_gpio_pin_mask_t pin_mask,
+                                   vsf_gpio_pin_mask_t direction_mask);
 
 /**
  \~english
@@ -192,16 +212,16 @@ extern void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr,
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
  @param[in] pin_mask: pin mask, each pin corresponds to one bit, the value of
             this bit 1 means configuration is required
- @return uint32_t: The value of all pin_mask directions, 1 for output, 0 for input
+ @return vsf_gpio_pin_mask_t: The value of all pin_mask directions, 1 for output, 0 for input
 
  \~chinese
  @brief 获取 gpio 实例的一个或者多个引脚的方向
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，该bit的值位1表示需要获取
- @return uint32_t: 所有pin_mask的方向的值，1 表示输出，0 表示输入
+ @return vsf_gpio_pin_mask_t: 所有pin_mask的方向的值，1 表示输出，0 表示输入
  */
-extern uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr,
-                                       uint32_t pin_mask);
+extern vsf_gpio_pin_mask_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr,
+                                                  vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english
@@ -215,7 +235,7 @@ extern uint32_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr,
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，该bit的值位1表示需要设置成输入
  */
-extern void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
+extern void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english
@@ -229,7 +249,7 @@ extern void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，该bit的值位1表示需要设置成输出
  */
-extern void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
+extern void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english
@@ -243,20 +263,20 @@ extern void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，该bit的值位1表示需要反转
  */
-extern void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
+extern void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english
  @brief Read the values of all pins of the gpio instance
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @return uint32_t: Value of all pins, 1 for output, 0 for input
+ @return vsf_gpio_pin_mask_t: Value of all pins, 1 for output, 0 for input
 
  \~chinese
  @brief 读取 gpio 实例的所有引脚的值
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
- @return uint32_t: 所有引脚的值，1 表示输出，0 表示输入
+ @return vsf_gpio_pin_mask_t: 所有引脚的值，1 表示输出，0 表示输入
  */
-extern uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
+extern vsf_gpio_pin_mask_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
 
 /**
  \~english
@@ -272,9 +292,8 @@ extern uint32_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要写入，0表示该位不需要更新
  @param[in] value: 引脚的值，每一个引脚对应一个位，1 表示高电平，0 表示高电平
  */
-extern void vsf_gpio_write( vsf_gpio_t *gpio_ptr,
-                            uint32_t pin_mask,
-                            uint32_t value);
+extern void vsf_gpio_write(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
+                           vsf_gpio_pin_mask_t value);
 
 /**
  \~english
@@ -288,7 +307,7 @@ extern void vsf_gpio_write( vsf_gpio_t *gpio_ptr,
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要写入，0表示该位不需要更新
  */
-extern void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
+extern void vsf_gpio_set(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english
@@ -302,7 +321,7 @@ extern void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要写入，0表示该位不需要更新
  */
-extern void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
+extern void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english
@@ -316,7 +335,7 @@ extern void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要写入，0表示该位不需要更新
  */
-extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
+extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english
@@ -337,7 +356,7 @@ extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
        需要注意的是，并不是所有硬件都支持。可以通过 vsf_gpio_capability() 获取是否支持该特性
       （ is_support_output_and_set ）
  */
-extern void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
+extern void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english
@@ -358,7 +377,7 @@ extern void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
        需要注意的是，并不是所有硬件都支持。可以通过 vsf_gpio_capability() 获取是否支持该特性
       （ is_support_output_and_set ）
  */
-extern void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
+extern void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english

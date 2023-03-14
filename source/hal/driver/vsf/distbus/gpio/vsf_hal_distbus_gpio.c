@@ -113,7 +113,7 @@ uint32_t vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_d
     return sizeof(vsf_hal_distbus_gpio_info_t);
 }
 
-void vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask, vsf_io_feature_t feature)
+void vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -129,7 +129,7 @@ void vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
-void vsf_hal_distbus_gpio_set_direction(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask, uint32_t direction_mask)
+void vsf_hal_distbus_gpio_set_direction(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -149,13 +149,13 @@ void vsf_hal_distbus_gpio_set_direction(vsf_hal_distbus_gpio_t *gpio, uint32_t p
     __vsf_gpio_unprotect(orig);
 }
 
-uint32_t vsf_hal_distbus_gpio_get_direction(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
+vsf_gpio_pin_mask_t vsf_hal_distbus_gpio_get_direction(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     return gpio->info.direction & pin_mask;
 }
 
-void vsf_hal_distbus_gpio_switch_direction(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
+void vsf_hal_distbus_gpio_switch_direction(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -164,12 +164,12 @@ void vsf_hal_distbus_gpio_switch_direction(vsf_hal_distbus_gpio_t *gpio, uint32_
     vsf_hal_distbus_gpio_set_direction(gpio, pin_mask, ret);
 }
 
-void vsf_hal_distbus_gpio_set_input(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
+void vsf_hal_distbus_gpio_set_input(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     vsf_hal_distbus_gpio_set_direction(gpio, pin_mask, 0);
 }
 
-void vsf_hal_distbus_gpio_set_output(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
+void vsf_hal_distbus_gpio_set_output(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     vsf_hal_distbus_gpio_set_direction(gpio, pin_mask, pin_mask);
 }
@@ -180,7 +180,7 @@ uint32_t vsf_hal_distbus_gpio_read(vsf_hal_distbus_gpio_t *gpio)
     return gpio->info.value;
 }
 
-void vsf_hal_distbus_gpio_write(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask, uint32_t value)
+void vsf_hal_distbus_gpio_write(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -195,7 +195,7 @@ void vsf_hal_distbus_gpio_write(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask,
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
-void vsf_hal_distbus_gpio_toggle(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
+void vsf_hal_distbus_gpio_toggle(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -209,7 +209,7 @@ void vsf_hal_distbus_gpio_toggle(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
-void vsf_hal_distbus_gpio_set(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
+void vsf_hal_distbus_gpio_set(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -223,7 +223,7 @@ void vsf_hal_distbus_gpio_set(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
-void vsf_hal_distbus_gpio_clear(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
+void vsf_hal_distbus_gpio_clear(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -237,7 +237,7 @@ void vsf_hal_distbus_gpio_clear(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
-void vsf_hal_distbus_gpio_output_and_set(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
+void vsf_hal_distbus_gpio_output_and_set(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -252,7 +252,7 @@ void vsf_hal_distbus_gpio_output_and_set(vsf_hal_distbus_gpio_t *gpio, uint32_t 
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
 }
 
-void vsf_hal_distbus_gpio_output_and_clear(vsf_hal_distbus_gpio_t *gpio, uint32_t pin_mask)
+void vsf_hal_distbus_gpio_output_and_clear(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);

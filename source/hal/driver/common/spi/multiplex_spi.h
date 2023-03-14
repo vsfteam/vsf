@@ -84,7 +84,7 @@ vsf_class(vsf_multiplex_spi_t) {
         vsf_multiplex_spi_info_t *spi_info_ptr;
         int8_t cs_index;
         vsf_gpio_t *gpio;
-        uint32_t pin_mask;
+        vsf_gpio_pin_mask_t pin_mask;
     )
 
     private_member(

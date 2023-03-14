@@ -95,8 +95,8 @@ typedef struct vsf_win_usart_t {
 
 typedef struct vsf_win_usart_port_t {
     uint32_t                        ports_mask;
-    vsf_win_usart_t                 *(*ports)[VSF_WIN_USART_COUNT];
-    vsf_fifo2req_usart_t            *(*fifo2req_ports)[VSF_WIN_USART_COUNT];
+    vsf_win_usart_t               * const (*ports)[VSF_WIN_USART_COUNT];
+    vsf_fifo2req_usart_t          * const(*fifo2req_ports)[VSF_WIN_USART_COUNT];
 } vsf_win_usart_port_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -147,7 +147,7 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
     char portFriendlyName[256];
     uint32_t mask = 0;
 
-    vsf_win_usart_t *(*ports)[VSF_WIN_USART_COUNT] = __vsf_win_usart_port.ports;
+    vsf_win_usart_t * const (*ports)[VSF_WIN_USART_COUNT] = __vsf_win_usart_port.ports;
 
     while ((result < device_num) && SetupDiEnumDeviceInfo(hDevInfo, result, &devInfoData)) {
         hDevKey = SetupDiOpenDevRegKey(hDevInfo, &devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_READ);

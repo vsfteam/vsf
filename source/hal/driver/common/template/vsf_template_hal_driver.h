@@ -40,10 +40,6 @@ extern "C" {
 #define VSF_HAL_TEMPLATE_API_DEFINE(__prefix_name, __return, __module__, __name, __first_args, ...)       \
     __return VSF_MCONNECT(__prefix_name, _, __module__, _, __name)( __first_args, ##__VA_ARGS__ )
 
-#define VSF_HAL_MAX_COUT_TO_MASK(__CNT)                                         \
-            (uint32_t)(((uint64_t)1 << __CNT) - 1)
-
-
 /*============================ TYPES =========================================*/
 
 /*

@@ -114,7 +114,7 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #   error "Please define VSF_PWM_CFG_IMP_PREFIX in pwm driver"
 #endif
 
-#ifndef VSF_PWM_CFG_IMP_UPCASE_PREFIX   
+#ifndef VSF_PWM_CFG_IMP_UPCASE_PREFIX
 #   error "Please define VSF_PWM_CFG_IMP_UPCASE_PREFIX in pwm driver"
 #endif
 

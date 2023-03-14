@@ -60,7 +60,7 @@ typedef struct w600_gpio_reg_t w600_gpio_reg_t;
 /*============================ IMPLEMENTATION ================================*/
 
 void vsf_gpio_config_pin(       vsf_gpio_t *pthis,
-                                uint32_t pin_mask,
+                                vsf_gpio_pin_mask_t pin_mask,
                                 uint_fast32_t feature)
 {
     w600_gpio_reg_t *reg = (w600_gpio_reg_t *)pthis->reg;
@@ -69,8 +69,8 @@ void vsf_gpio_config_pin(       vsf_gpio_t *pthis,
 }
 
 void vsf_gpio_set_direction(    vsf_gpio_t *pthis,
-                                uint32_t pin_mask,
-                                uint_fast32_t direction_mask)
+                                vsf_gpio_pin_mask_t pin_mask,
+                                vsf_gpio_pin_mask_t direction_mask)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();
@@ -78,12 +78,12 @@ void vsf_gpio_set_direction(    vsf_gpio_t *pthis,
     vsf_gpio_unprotect(state);
 }
 
-uint_fast32_t vsf_gpio_get_direction(vsf_gpio_t *pthis, uint32_t pin_mask)
+uint_fast32_t vsf_gpio_get_direction(vsf_gpio_t *pthis, vsf_gpio_pin_mask_t pin_mask)
 {
     return pthis->reg->DIR & pin_mask;
 }
 
-void vsf_gpio_set_input(vsf_gpio_t *pthis, uint32_t pin_mask)
+void vsf_gpio_set_input(vsf_gpio_t *pthis, vsf_gpio_pin_mask_t pin_mask)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();
@@ -91,7 +91,7 @@ void vsf_gpio_set_input(vsf_gpio_t *pthis, uint32_t pin_mask)
     vsf_gpio_unprotect(state);
 }
 
-void vsf_gpio_set_output(vsf_gpio_t *pthis, uint32_t pin_mask)
+void vsf_gpio_set_output(vsf_gpio_t *pthis, vsf_gpio_pin_mask_t pin_mask)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();
@@ -99,7 +99,7 @@ void vsf_gpio_set_output(vsf_gpio_t *pthis, uint32_t pin_mask)
     vsf_gpio_unprotect(state);
 }
 
-void vsf_gpio_switch_direction(vsf_gpio_t *pthis, uint32_t pin_mask)
+void vsf_gpio_switch_direction(vsf_gpio_t *pthis, vsf_gpio_pin_mask_t pin_mask)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();
@@ -112,7 +112,7 @@ uint_fast32_t vsf_hal_gpio_read(vsf_gpio_t *pthis)
     return pthis->reg->IN;
 }
 
-void vsf_gpio_write(vsf_gpio_t *pthis, uint32_t pin_mask, uint_fast32_t value)
+void vsf_gpio_write(vsf_gpio_t *pthis, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();
@@ -120,7 +120,7 @@ void vsf_gpio_write(vsf_gpio_t *pthis, uint32_t pin_mask, uint_fast32_t value)
     vsf_gpio_unprotect(state);
 }
 
-void vsf_gpio_set(vsf_gpio_t *pthis, uint32_t pin_mask)
+void vsf_gpio_set(vsf_gpio_t *pthis, vsf_gpio_pin_mask_t pin_mask)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();
@@ -128,7 +128,7 @@ void vsf_gpio_set(vsf_gpio_t *pthis, uint32_t pin_mask)
     vsf_gpio_unprotect(state);
 }
 
-void vsf_gpio_clear(vsf_gpio_t *pthis, uint32_t pin_mask)
+void vsf_gpio_clear(vsf_gpio_t *pthis, vsf_gpio_pin_mask_t pin_mask)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();
@@ -136,7 +136,7 @@ void vsf_gpio_clear(vsf_gpio_t *pthis, uint32_t pin_mask)
     vsf_gpio_unprotect(state);
 }
 
-void vsf_gpio_toggle(vsf_gpio_t *pthis, uint32_t pin_mask)
+void vsf_gpio_toggle(vsf_gpio_t *pthis, vsf_gpio_pin_mask_t pin_mask)
 {
     gpio_reg_t *reg = (gpio_reg_t *)pthis->reg;
     vsf_protect_t state = vsf_gpio_protect();

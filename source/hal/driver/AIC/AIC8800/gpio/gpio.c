@@ -87,13 +87,13 @@ void __vsf_hw_aic8800_gpio_init(void)
     }
 }
 
-void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, vsf_io_feature_t feature)
+void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_FEATURE(feature));
 
-    for (int i = 0; i < VSF_HW_IO_PIN_MAX; i++) {
+    for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
         uint32_t current_pin_mask = 1 << i;
         if (pin_mask & current_pin_mask) {
             __hw_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->IOMUX->GPCFG[i],
@@ -105,7 +105,7 @@ void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, vsf_i
     }
 }
 
-void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, uint32_t direction_mask)
+void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
@@ -117,7 +117,7 @@ void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, ui
     __hw_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->GPIO->DR, direction_mask, pin_mask);
 }
 
-uint32_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask)
+vsf_gpio_pin_mask_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
@@ -125,14 +125,14 @@ uint32_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask
     return __hw_io_reg_read(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->GPIO->DR) & pin_mask;
 }
 
-uint32_t vsf_hw_gpio_read(vsf_hw_gpio_t *hw_gpio_ptr)
+vsf_gpio_pin_mask_t vsf_hw_gpio_read(vsf_hw_gpio_t *hw_gpio_ptr)
 {
     uint32_t origin_pin_mask, pin_value;
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
 
     if (!hw_gpio_ptr->is_pmic) {
         origin_pin_mask = hw_gpio_ptr->GPIO->MR;
-        hw_gpio_ptr->GPIO->MR = __VSF_HW_IO_PIN_MASK;
+        hw_gpio_ptr->GPIO->MR = VSF_HW_GPIO_PIN_MASK;
         pin_value = hw_gpio_ptr->GPIO->VR;
         hw_gpio_ptr->GPIO->MR = origin_pin_mask;
     } else {
@@ -142,7 +142,7 @@ uint32_t vsf_hw_gpio_read(vsf_hw_gpio_t *hw_gpio_ptr)
     return pin_value;
 }
 
-void vsf_hw_gpio_write(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, uint32_t value)
+void vsf_hw_gpio_write(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)
 {
     uint32_t origin_pin_mask;
 
@@ -163,7 +163,7 @@ void vsf_hw_gpio_write(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask, uint32_t v
     __vsf_gpio_unprotect(orig);
 }
 
-void vsf_hw_gpio_toggle(vsf_hw_gpio_t *hw_gpio_ptr, uint32_t pin_mask)
+void vsf_hw_gpio_toggle(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
 
@@ -176,8 +176,8 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
         .is_async = hw_gpio_ptr->is_pmic,
         .is_support_output_and_set = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET,
         .is_support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR,
-        .pin_count = VSF_HW_GPIO_PIN_MAX,
-        .avail_pin_mask = VSF_HAL_MAX_COUT_TO_MASK(VSF_HW_GPIO_PIN_MAX),
+        .pin_count = VSF_HW_GPIO_PIN_COUNT,
+        .avail_pin_mask = VSF_HW_GPIO_PIN_MASK,
     };
 
     return gpio_capability;
