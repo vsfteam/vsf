@@ -124,16 +124,16 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority, vsf_swi_
 
             sprintf(swi_name, "vsf_swi%d", idx);
             __vsf_arch_irq_request_init(&ctx->use_as__vsf_arch_irq_request_t, true);
-            __vsf_arch_irq_thread_start((vsf_arch_irq_thread_t *)&ctx->thread, swi_name,
+            __vsf_arch_irq_init((vsf_arch_irq_thread_t *)&ctx->thread, swi_name,
                     __vsf_arch_swi_thread, priority, ctx->thread.stack, dimof(ctx->thread.stack));
 #if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
             if (ctx->priority <= __vsf_rtos.prio_base) {
-                __vsf_arch_irq_thread_suspend((vsf_arch_irq_thread_t *)&ctx->thread);
+                __vsf_arch_irq_suspend((vsf_arch_irq_thread_t *)&ctx->thread);
             }
 #endif
         } else if (priority != ctx->priority) {
             ctx->priority = priority;
-            __vsf_arch_irq_thread_set_priority((vsf_arch_irq_thread_t *)&ctx->thread, priority);
+            __vsf_arch_irq_set_priority((vsf_arch_irq_thread_t *)&ctx->thread, priority);
         }
 
         return VSF_ERR_NONE;
@@ -168,12 +168,12 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
             if (    ctx->is_inited
                 // do not process current irq_thread, which has same priority as current thread
                 && (    __vsf_arch_model_get_current_priority()
-                    !=  __vsf_arch_irq_thread_get_priority((vsf_arch_irq_thread_t *)&ctx->thread))) {
+                    !=  __vsf_arch_irq_get_priority((vsf_arch_irq_thread_t *)&ctx->thread))) {
 
                 if (ctx->priority > priority) {
-                    __vsf_arch_irq_thread_resume((vsf_arch_irq_thread_t *)&ctx->thread);
+                    __vsf_arch_irq_resume((vsf_arch_irq_thread_t *)&ctx->thread);
                 } else {
-                    __vsf_arch_irq_thread_suspend((vsf_arch_irq_thread_t *)&ctx->thread);
+                    __vsf_arch_irq_suspend((vsf_arch_irq_thread_t *)&ctx->thread);
                 }
             }
         }
