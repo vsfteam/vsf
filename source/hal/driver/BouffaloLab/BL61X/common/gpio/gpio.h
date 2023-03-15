@@ -24,7 +24,8 @@
 
 #if VSF_HAL_USE_GPIO == ENABLED
 
-#include "../__device.h"
+#include "../../__device.h"
+#include "../io/io.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

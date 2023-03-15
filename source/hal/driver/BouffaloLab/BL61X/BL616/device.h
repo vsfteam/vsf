@@ -74,6 +74,7 @@ typedef int                                     intalu_t;
 
 #define VSF_HW_IO_PORT_COUNT            1
 #define VSF_HW_IO_PIN_COUNT             35
+#define VSF_HW_IO_FUNCTION_MAX          32
 #define VSF_HW_IO_PORT0_DEVNAME         "gpio"
 
 #define VSF_HW_GPIO_COUNT               VSF_HW_IO_PORT_COUNT

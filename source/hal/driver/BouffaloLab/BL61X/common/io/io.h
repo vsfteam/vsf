@@ -24,7 +24,7 @@
 
 #if VSF_HAL_USE_IO == ENABLED
 
-#include "../__device.h"
+#include "../../__device.h"
 #include "bflb_gpio.h"
 
 /*============================ MACROS ========================================*/
@@ -36,7 +36,7 @@
      ((__P & ~VSF_HW_IO_PIN_MASK) == 0))
 
 #define __VSF_HW_IO_IS_VAILID_FEATURE(__F)                                      \
-    ((__F & ~(uint32_t)VSF_HW_IO_FEATURE_ALL_BITS) == 0)
+    ((__F & ~(uint32_t)__VSF_HW_IO_FEATURE_ALL_BITS) == 0)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -52,7 +52,10 @@ typedef enum vsf_io_feature_t {
     VSF_IO_ALERNATE             = GPIO_ALTERNATE,
 
     VSF_IO_FEATURE_ALL_BITS     = GPIO_MODE_MASK | GPIO_PUPD_MASK
-                                | GPIO_SMT_MASK | GPIO_DRV_MASK;
+                                | GPIO_SMT_MASK | GPIO_DRV_MASK,
+
+    // for hw_io
+    __VSF_HW_IO_FEATURE_ALL_BITS= VSF_IO_FEATURE_ALL_BITS,
 } vsf_io_feature_t;
 
 /*============================ PROTOTYPES ====================================*/

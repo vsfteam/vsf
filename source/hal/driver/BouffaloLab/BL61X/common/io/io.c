@@ -58,7 +58,7 @@ vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
         VSF_ASSERT(0);
         return VSF_ERR_INVALID_RANGE;
     }
-    if (cfg_ptr->feature & ~VSF_HW_IO_FEATURE_ALL_BITS) {
+    if (cfg_ptr->feature & ~__VSF_HW_IO_FEATURE_ALL_BITS) {
         VSF_ASSERT(0);
         return VSF_ERR_NOT_SUPPORT;
     }
