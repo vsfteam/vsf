@@ -18,12 +18,6 @@ int vsf_linux_create_fhs(void)
 // TODO: SDL require that main need argc and argv
 int VSF_USER_ENTRY(int argc, char *argv[])
 {
-    VSF_STREAM_INIT(&VSF_DEBUG_STREAM_RX);
-    VSF_STREAM_INIT(&VSF_DEBUG_STREAM_TX);
-
-#if VSF_USE_TRACE == ENABLED
-    vsf_start_trace();
-#endif
     vsf_trace_info("start linux..." VSF_TRACE_CFG_LINEEND);
 
     vsf_stream_t *stream_tx, *stream_rx;

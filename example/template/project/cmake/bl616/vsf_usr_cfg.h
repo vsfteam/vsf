@@ -24,6 +24,9 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
+// arch & hal
+#define VSF_ARCH_SWI_NUM                                2
+#define VSF_ARCH_RTOS_CFG_STACK_DEPTH                   512         // 512 * 4 = 2KBytes
 #define VSF_SYSTIMER_FREQ                               (0ul)
 
 #define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
