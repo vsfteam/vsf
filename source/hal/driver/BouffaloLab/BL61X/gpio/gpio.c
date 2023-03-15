@@ -24,6 +24,8 @@
 
 #if VSF_HAL_USE_GPIO == ENABLED
 
+#include "../__device.h"
+#include "bflb_gpio.h"
 #include "hardware/gpio_reg.h"
 
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
@@ -76,7 +78,7 @@ void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_FEATURE(feature));
 
-    for (int i = 0; i < VSF_HW_IO_PIN_MAX; i++) {
+    for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
         if (pin_mask & (1 << i)) {
             bflb_gpio_init(hw_gpio_ptr->dev, i, (uint32_t)feature);
         }
@@ -90,12 +92,12 @@ void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t p
 
     vsf_gpio_pin_mask_t mask = pin_mask & direction_mask;
     if (mask) {
-        vsf_hw_gpio_config_pin(hw_gpio_ptr, pin_mask, mask, GPIO_OUTPUT);
+        vsf_hw_gpio_config_pin(hw_gpio_ptr, mask, GPIO_OUTPUT);
         hw_gpio_ptr->direction |= mask;
     }
     mask = pin_mask & ~direction_mask;
     if (mask) {
-        vsf_hw_gpio_config_pin(hw_gpio_ptr, pin_mask, mask, GPIO_OUTPUT);
+        vsf_hw_gpio_config_pin(hw_gpio_ptr, mask, GPIO_OUTPUT);
         hw_gpio_ptr->direction &= ~mask;
     }
 }
@@ -108,27 +110,27 @@ vsf_gpio_pin_mask_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gp
     return hw_gpio_ptr->direction;
 }
 
-void vsf_hw_gpio_set(vsf_hw_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
+void vsf_hw_gpio_set(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
 
 #if VSF_HW_IO_PIN_COUNT > 32
-    putreg64(pin_mask, gpio_ptr->dev->reg_base + GLB_GPIO_CFG138_OFFSET);
+    putreg64(pin_mask, hw_gpio_ptr->dev->reg_base + GLB_GPIO_CFG138_OFFSET);
 #else
-    putreg32(pin_mask, gpio_ptr->dev->reg_base + GLB_GPIO_CFG138_OFFSET);
+    putreg32(pin_mask, hw_gpio_ptr->dev->reg_base + GLB_GPIO_CFG138_OFFSET);
 #endif
 }
 
-void vsf_hw_gpio_clear(vsf_hw_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
+void vsf_hw_gpio_clear(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
     VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
 
 #if VSF_HW_IO_PIN_COUNT > 32
-    putreg64(pin_mask, gpio_ptr->dev->reg_base + GLB_GPIO_CFG140_OFFSET);
+    putreg64(pin_mask, hw_gpio_ptr->dev->reg_base + GLB_GPIO_CFG140_OFFSET);
 #else
-    putreg32(pin_mask, gpio_ptr->dev->reg_base + GLB_GPIO_CFG140_OFFSET);
+    putreg32(pin_mask, hw_gpio_ptr->dev->reg_base + GLB_GPIO_CFG140_OFFSET);
 #endif
 }
 
@@ -137,9 +139,9 @@ vsf_gpio_pin_mask_t vsf_hw_gpio_read(vsf_hw_gpio_t *hw_gpio_ptr)
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
 
 #if VSF_HW_IO_PIN_COUNT > 32
-    return getreg64(gpio_ptr->dev->reg_base + GLB_GPIO_CFG128_OFFSET);
+    return getreg64(hw_gpio_ptr->dev->reg_base + GLB_GPIO_CFG128_OFFSET);
 #else
-    return getreg32(gpio_ptr->dev->reg_base + GLB_GPIO_CFG128_OFFSET);
+    return getreg32(hw_gpio_ptr->dev->reg_base + GLB_GPIO_CFG128_OFFSET);
 #endif
 }
 
@@ -150,11 +152,11 @@ void vsf_hw_gpio_write(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
 
     vsf_gpio_pin_mask_t mask = pin_mask & value;
     if (mask) {
-        vsf_hw_gpio_set(hw_gpio_ptr, pin_mask, mask);
+        vsf_hw_gpio_set(hw_gpio_ptr, mask);
     }
     mask = pin_mask & ~value;
     if (mask) {
-        vsf_hw_gpio_clear(hw_gpio_ptr, pin_mask, mask);
+        vsf_hw_gpio_clear(hw_gpio_ptr, mask);
     }
 }
 
@@ -179,7 +181,7 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 
 #define VSF_GPIO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                 \
     vsf_hw_gpio_t vsf_hw_gpio ## __COUNT = {                                    \
-        .dev_name       = VSF_HW_IO_PORT ## __COUNT ## _DEV_NAME,               \
+        .dev_name       = VSF_HW_IO_PORT ## __COUNT ## _DEVNAME,                \
         __HAL_OP                                                                \
     };
 
