@@ -131,6 +131,11 @@ static void __vsf_linux_pthread_on_terminate(vsf_linux_thread_t *thread)
     vsf_linux_thread_on_terminate(thread);
 }
 
+bool __vsf_linux_is_pthread_ctx(vsf_linux_thread_t *linux_thread)
+{
+    return linux_thread->on_terminate == (vsf_eda_on_terminate_t)__vsf_linux_pthread_on_terminate;
+}
+
 int pthread_detach(pthread_t tid)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_thread(-1, tid);

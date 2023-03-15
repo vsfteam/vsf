@@ -126,10 +126,14 @@
 #   endif
 #endif
 
+// VSF_LINUX_CFG_STDIO_FALLBACK is used while user want to access stdio outside linux environment
+#ifndef VSF_LINUX_CFG_STDIO_FALLBACK
+#   define VSF_LINUX_CFG_STDIO_FALLBACK         ENABLED
+#endif
+
 // to use simple libc
 //  1. enable VSF_LINUX_USE_SIMPLE_LIBC
 //  2. add "shell/sys/linux/include/simple_libc to include path
-//  IMPORTANT: c++ is not supported if simple libc enabled
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 #   ifndef VSF_LINUX_USE_SIMPLE_STDIO
 #       define VSF_LINUX_USE_SIMPLE_STDIO       ENABLED

@@ -165,7 +165,11 @@ static ssize_t __vsf_linux_term_read(vsf_linux_fd_t *sfd, void *buf, size_t coun
 static ssize_t __vsf_linux_term_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_term_close(vsf_linux_fd_t *sfd);
 
-/*============================ LOCAL VARIABLES ===============================*/
+#if VSF_LINUX_CFG_STDIO_FALLBACK == ENABLED
+ssize_t __vsf_linux_stdio_fallback_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+ssize_t __vsf_linux_stdio_fallback_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
@@ -178,8 +182,6 @@ const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
     .fn_eof             = __vsf_linux_fs_eof,
     .fn_setsize         = __vsf_linux_fs_setsize,
 };
-
-/*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_linux_fd_op_t __vsf_linux_eventfd_fdop = {
     .priv_size          = sizeof(vsf_linux_eventfd_priv_t),
@@ -236,7 +238,61 @@ const vsf_linux_fd_op_t vsf_linux_term_fdop = {
     .fn_close           = __vsf_linux_term_close,
 };
 
+/*============================ LOCAL VARIABLES ===============================*/
+
+#if VSF_LINUX_CFG_STDIO_FALLBACK == ENABLED
+const vsf_linux_fd_op_t __vsf_linux_stdio_fallback_fdop = {
+    .priv_size          = sizeof(vsf_linux_fd_priv_t),
+    .fn_read            = __vsf_linux_stdio_fallback_read,
+    .fn_write           = __vsf_linux_stdio_fallback_write,
+};
+
+static vsf_linux_fd_priv_t __vsf_linux_stdio_fallback_priv[3] = {
+    [STDIN_FILENO]      = {
+        .flags          = O_RDONLY,
+    },
+    [STDOUT_FILENO]     = {
+        .flags          = O_WRONLY,
+    },
+    [STDERR_FILENO]     = {
+        .flags          = O_RDWR,
+    },
+};
+static vsf_linux_fd_t __vsf_linux_stdio_fallback[3] = {
+    [STDIN_FILENO]      = {
+        .fd             = STDIN_FILENO,
+        .op             = &__vsf_linux_stdio_fallback_fdop,
+        .priv           = &__vsf_linux_stdio_fallback_priv[STDIN_FILENO],
+    },
+    [STDOUT_FILENO]     = {
+        .fd             = STDOUT_FILENO,
+        .op             = &__vsf_linux_stdio_fallback_fdop,
+        .priv           = &__vsf_linux_stdio_fallback_priv[STDOUT_FILENO],
+    },
+    [STDERR_FILENO]     = {
+        .fd             = STDERR_FILENO,
+        .op             = &__vsf_linux_stdio_fallback_fdop,
+        .priv           = &__vsf_linux_stdio_fallback_priv[STDERR_FILENO],
+    },
+};
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_LINUX_CFG_STDIO_FALLBACK == ENABLED
+WEAK(__vsf_linux_stdio_fallback_read)
+ssize_t __vsf_linux_stdio_fallback_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    VSF_LINUX_ASSERT(false);
+}
+
+WEAK(__vsf_linux_stdio_fallback_write)
+ssize_t __vsf_linux_stdio_fallback_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);
+    __vsf_trace_output(buf, count);
+}
+#endif
 
 vk_file_t * __vsf_linux_fs_get_file_ex(vk_file_t *dir, const char *pathname)
 {
@@ -666,9 +722,14 @@ vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd)
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
     }
+#if VSF_LINUX_CFG_STDIO_FALLBACK == ENABLED
     if (NULL == process) {
-        return NULL;
+        VSF_LINUX_ASSERT(fd <= 2);
+        return &__vsf_linux_stdio_fallback[fd];
     }
+#else
+    VSF_LINUX_ASSERT(process != NULL);
+#endif
 
     vsf_dlist_t *fd_list = &process->fd_list;
     vsf_protect_t orig = vsf_protect_sched();

@@ -1152,10 +1152,27 @@ vsf_linux_thread_t * vsf_linux_get_thread(pid_t pid, int tid)
     return NULL;
 }
 
+bool vsf_linux_is_linux_ctx(vsf_linux_thread_t *thread)
+{
+    if (NULL == thread) {
+        thread = (vsf_linux_thread_t *)vsf_eda_get_cur();
+    }
+    if (NULL == thread) {
+        return false;
+    }
+
+    extern bool __vsf_linux_is_pthread_ctx(vsf_linux_thread_t *thread);
+    return  (thread->on_terminate == (vsf_eda_on_terminate_t)vsf_linux_thread_on_terminate)
+        ||  __vsf_linux_is_pthread_ctx(thread);
+}
+
 vsf_linux_thread_t * vsf_linux_get_cur_thread(void)
 {
     vsf_linux_thread_t *thread = (vsf_linux_thread_t *)vsf_eda_get_cur();
-    return thread != NULL ? thread : NULL;
+    if ((thread != NULL) && thread->flag.feature.is_stack_owner && vsf_linux_is_linux_ctx(thread)) {
+        return thread;
+    }
+    return NULL;
 }
 
 vsf_linux_process_t * vsf_linux_get_cur_process(void)
