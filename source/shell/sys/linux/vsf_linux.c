@@ -651,11 +651,13 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
 {
 #if VSF_KERNEL_CFG_TRACE == ENABLED
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
     vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, "linux_kernel_thread",
                                 thread->stack, thread->stack_size);
 #endif
 
     __vsf_linux.kernel_process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(__vsf_linux.kernel_process != NULL);
     __vsf_linux_init_thread(argc, argv);
     return 0;
 }
@@ -854,6 +856,7 @@ vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process,
     if (thread != NULL) {
         if (!process) {
             process = vsf_linux_get_cur_process();
+            VSF_LINUX_ASSERT(process != NULL);
         }
         thread->process = process;
         vsf_protect_t orig = vsf_protect_sched();
@@ -1010,6 +1013,7 @@ void vsf_linux_exit_process(int status)
     vsf_linux_thread_t *thread2wait;
     vsf_linux_process_t *process2wait;
     vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(cur_thread != NULL);
     vsf_linux_process_t *process = cur_thread->process;
     VSF_LINUX_ASSERT(process != NULL);
     vsf_protect_t orig;
@@ -1136,6 +1140,7 @@ vsf_linux_process_t * vsf_linux_get_process(pid_t pid)
 vsf_linux_thread_t * vsf_linux_get_thread(pid_t pid, int tid)
 {
     vsf_linux_process_t *process = pid < 0 ? vsf_linux_get_cur_process() : vsf_linux_get_process(pid);
+    VSF_LINUX_ASSERT(process != NULL);
     vsf_protect_t orig = vsf_protect_sched();
     __vsf_dlist_foreach_unsafe(vsf_linux_thread_t, thread_node, &process->thread_list) {
         if (_->tid == tid) {
@@ -1150,13 +1155,16 @@ vsf_linux_thread_t * vsf_linux_get_thread(pid_t pid, int tid)
 vsf_linux_thread_t * vsf_linux_get_cur_thread(void)
 {
     vsf_linux_thread_t *thread = (vsf_linux_thread_t *)vsf_eda_get_cur();
-    VSF_LINUX_ASSERT(thread != NULL);
-    return thread;
+    return thread != NULL ? thread : NULL;
 }
 
 vsf_linux_process_t * vsf_linux_get_cur_process(void)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    if (NULL == thread) {
+        return NULL;
+    }
+
     vsf_linux_process_t *process = thread->process;
     VSF_LINUX_ASSERT(process != NULL);
     return process->id.pid != (pid_t)0 || NULL == __vsf_linux.kernel_process ?
@@ -1433,6 +1441,7 @@ exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
     close(exefd);
 
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_thread_t *thread;
 
@@ -1480,6 +1489,7 @@ exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
     close(exefd);
 
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_thread_t *thread;
     const char *args;
@@ -1767,6 +1777,7 @@ unsigned int alarm(unsigned int seconds)
 pid_t wait(int *status)
 {
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(cur_process != NULL);
     vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
     VSF_LINUX_ASSERT(cur_thread != NULL);
 
@@ -1863,17 +1874,23 @@ uid_t geteuid(void)
 
 pid_t getpid(void)
 {
-    return vsf_linux_get_cur_process()->id.pid;
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    return process->id.pid;
 }
 
 pid_t getppid(void)
 {
-    return vsf_linux_get_cur_process()->id.ppid;
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    return process->id.ppid;
 }
 
 pid_t gettid(void)
 {
-    return vsf_linux_get_cur_thread()->tid;
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+    return thread->tid;
 }
 
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)

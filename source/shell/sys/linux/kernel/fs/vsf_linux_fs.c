@@ -666,6 +666,9 @@ vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd)
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
     }
+    if (NULL == process) {
+        return NULL;
+    }
 
     vsf_dlist_t *fd_list = &process->fd_list;
     vsf_protect_t orig = vsf_protect_sched();
