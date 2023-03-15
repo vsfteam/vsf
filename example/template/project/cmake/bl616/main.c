@@ -4,6 +4,8 @@
 #include <FreeRTOS.h>
 #include "board.h"
 
+#include <vsf.h>
+
 int main(void)
 {
     // initialize debug stream before board_init,
