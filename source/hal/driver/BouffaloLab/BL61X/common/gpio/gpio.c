@@ -24,7 +24,7 @@
 
 #if VSF_HAL_USE_GPIO == ENABLED
 
-#include "../__device.h"
+#include "../io/io.h"
 #include "bflb_gpio.h"
 #include "hardware/gpio_reg.h"
 

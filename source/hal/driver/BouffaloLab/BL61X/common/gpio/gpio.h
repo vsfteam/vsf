@@ -15,30 +15,36 @@
  *                                                                           *
  ****************************************************************************/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-
-#   include "../__device.h"
-
-#else
-
-#   ifndef __HAL_DRIVER_BL_BL616_H__
-#       define __HAL_DRIVER_BL_BL616_H__
+#ifndef __HAL_DRIVER_BL61X_HW_GPIO_H__
+#define __HAL_DRIVER_BL61X_HW_GPIO_H__
 
 /*============================ INCLUDES ======================================*/
 
-#       include "hal/vsf_hal_cfg.h"
-#       include "./device.h"
-// include common drivers
-#       include "../common/io/io.h"
-#       include "../common/gpio/gpio.h"
+#include "hal/vsf_hal_cfg.h"
+
+#if VSF_HAL_USE_GPIO == ENABLED
+
+#include "../__device.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
-#   endif
 
-#endif
-/* EOF */
+/**
+ \~english
+ @brief To ensure that the GPIO is working properly, it needs to be called inside vsf_driver_init()
+ \~chinese
+ @brief 为了确保 BL61X 的 GPIO 工作正常，需要在 vsf_driver_init() 里调用这个 API
+ */
+extern void __vsf_hw_bl61x_gpio_init(void);
+
+/*============================ INCLUDES ======================================*/
+
+#define VSF_GPIO_CFG_DEC_PREFIX         vsf_hw
+#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX  VSF_HW
+#include "hal/driver/common/gpio/gpio_template.h"
+
+#endif /* VSF_HAL_USE_GPIO */
+#endif /* __HAL_DRIVER_BL61X_HW_GPIO_H__ */

@@ -15,32 +15,52 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_BL61X_HW_GPIO_H__
-#define __HAL_DRIVER_BL61X_HW_GPIO_H__
+#ifndef __HAL_DRIVER_BL61X_HW_IO_H__
+#define __HAL_DRIVER_BL61X_HW_IO_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_GPIO == ENABLED
+#if VSF_HAL_USE_IO == ENABLED
+
+#include "../__device.h"
+#include "bflb_gpio.h"
 
 /*============================ MACROS ========================================*/
+
+#define VSF_IO_REIMPLEMENT_FEATURE      ENABLED
+
+#define __VSF_HW_IO_IS_VAILID_PIN(__P)                                          \
+    (((__P &  VSF_HW_IO_PIN_MASK) != 0) &&                                      \
+     ((__P & ~VSF_HW_IO_PIN_MASK) == 0))
+
+#define __VSF_HW_IO_IS_VAILID_FEATURE(__F)                                      \
+    ((__F & ~(uint32_t)VSF_HW_IO_FEATURE_ALL_BITS) == 0)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ INCLUDES ======================================*/
+
+typedef enum vsf_io_feature_t {
+    VSF_IO_OPEN_DRAIN           = GPIO_FLOAT,
+    VSF_IO_PULL_UP              = GPIO_PULLUP,
+    VSF_IO_PULL_DOWN            = GPIO_PULLDOWN,
+
+    VSF_IO_INPUT                = GPIO_INPUT,
+    VSF_IO_OUTPUT               = GPIO_OUTPUT,
+    VSF_IO_ANALOG               = GPIO_ANALOG,
+    VSF_IO_ALERNATE             = GPIO_ALTERNATE,
+
+    VSF_IO_FEATURE_ALL_BITS     = GPIO_MODE_MASK | GPIO_PUPD_MASK
+                                | GPIO_SMT_MASK | GPIO_DRV_MASK;
+} vsf_io_feature_t;
+
 /*============================ PROTOTYPES ====================================*/
+/*============================ INCLUDES ======================================*/
 
-/**
- \~english
- @brief To ensure that the GPIO is working properly, it needs to be called inside vsf_driver_init()
- \~chinese
- @brief 为了确保 BL61X 的 GPIO 工作正常，需要在 vsf_driver_init() 里调用这个 API
- */
-extern void __vsf_hw_bl61x_gpio_init(void);
+#define VSF_IO_CFG_DEC_PREFIX              vsf_hw
+#define VSF_IO_CFG_DEC_UPCASE_PREFIX       VSF_HW
+#include "hal/driver/common/io/io_template.h"
 
-#define VSF_GPIO_CFG_DEC_PREFIX         vsf_hw
-#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX  VSF_HW
-#include "hal/driver/common/gpio/gpio_template.h"
-
-#endif /* VSF_HAL_USE_GPIO */
-#endif /* __HAL_DRIVER_BL61X_HW_GPIO_H__ */
+#endif /* VSF_HAL_USE_IO */
+#endif /* __HAL_DRIVER_BL61X_HW_IO_H__ */
