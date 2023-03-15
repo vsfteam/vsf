@@ -71,6 +71,14 @@ typedef int                                     intalu_t;
 #include "../common/__common.h"
 
 /*============================ MACROS ========================================*/
+
+#define VSF_HW_IO_PORT_COUNT            1
+#define VSF_HW_IO_PIN_COUNT             35
+#define VSF_HW_IO_PORT0_DEVNAME         "gpio"
+
+#define VSF_HW_GPIO_COUNT               VSF_HW_IO_PORT_COUNT
+#define VSF_HW_GPIO_PIN_COUNT           VSF_HW_IO_PIN_COUNT
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -30,6 +30,9 @@
 
 bool vsf_driver_init(void)
 {
+#if VSF_HAL_USE_GPIO == ENABLED
+    __vsf_hw_bl61x_gpio_init();
+#endif
     return true;
 }
 
