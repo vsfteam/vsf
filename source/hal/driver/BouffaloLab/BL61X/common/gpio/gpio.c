@@ -74,8 +74,8 @@ void __vsf_hw_bl61x_gpio_init(void)
 void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_FEATURE(feature));
+    VSF_HAL_ASSERT(__BL61X_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__BL61X_IO_IS_VAILID_FEATURE(feature));
 
     for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
         if (pin_mask & (1 << i)) {
@@ -87,7 +87,7 @@ void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_
 void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__BL61X_IO_IS_VAILID_PIN(pin_mask));
 
     vsf_gpio_pin_mask_t mask = pin_mask & direction_mask;
     if (mask) {
@@ -104,7 +104,7 @@ void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t p
 vsf_gpio_pin_mask_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__BL61X_IO_IS_VAILID_PIN(pin_mask));
 
     return hw_gpio_ptr->direction;
 }
@@ -112,7 +112,7 @@ vsf_gpio_pin_mask_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gp
 void vsf_hw_gpio_set(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__BL61X_IO_IS_VAILID_PIN(pin_mask));
 
 #if VSF_HW_IO_PIN_COUNT > 32
     putreg64(pin_mask, hw_gpio_ptr->dev->reg_base + GLB_GPIO_CFG138_OFFSET);
@@ -124,7 +124,7 @@ void vsf_hw_gpio_set(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 void vsf_hw_gpio_clear(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__BL61X_IO_IS_VAILID_PIN(pin_mask));
 
 #if VSF_HW_IO_PIN_COUNT > 32
     putreg64(pin_mask, hw_gpio_ptr->dev->reg_base + GLB_GPIO_CFG140_OFFSET);
@@ -147,7 +147,7 @@ vsf_gpio_pin_mask_t vsf_hw_gpio_read(vsf_hw_gpio_t *hw_gpio_ptr)
 void vsf_hw_gpio_write(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__BL61X_IO_IS_VAILID_PIN(pin_mask));
 
     vsf_gpio_pin_mask_t mask = pin_mask & value;
     if (mask) {

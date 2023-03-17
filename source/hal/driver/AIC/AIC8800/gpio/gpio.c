@@ -25,12 +25,14 @@
 #if VSF_HAL_USE_GPIO == ENABLED
 
 #include "./i_reg_gpio.h"
+
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
+#include "../io/io.h"
 
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
 #define VSF_GPIO_CFG_CHNAGE_DIR_FIRST                   ENABLED
-#define VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET       1
-#define VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR     1
+#define VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET      1
+#define VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_CLEAR    1
 
 /*============================ MACROS ========================================*/
 
@@ -90,14 +92,14 @@ void __vsf_hw_aic8800_gpio_init(void)
 void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_FEATURE(feature));
+    VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_FEATURE(feature));
 
     for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
         uint32_t current_pin_mask = 1 << i;
         if (pin_mask & current_pin_mask) {
             __hw_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->IOMUX->GPCFG[i],
-                                  feature, __VSF_HW_IO_FEATURE_ALL_BITS);
+                                  feature, __AIC8800_IO_FEATURE_ALL_BITS);
             if (hw_gpio_ptr->is_pmic) {
                 PMIC_MEM_MASK_WRITE((unsigned int)&hw_gpio_ptr->GPIO->MR, current_pin_mask, current_pin_mask);
             }
@@ -108,7 +110,7 @@ void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_
 void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_PIN(pin_mask));
     // GPIOB0 can only be used in the input direction
     VSF_HAL_ASSERT(   (hw_gpio_ptr->is_pmic != 1)
                    || ((pin_mask & VSF_PIN0_MASK) != VSF_PIN0_MASK)
@@ -120,7 +122,7 @@ void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t p
 vsf_gpio_pin_mask_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_PIN(pin_mask));
 
     return __hw_io_reg_read(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->GPIO->DR) & pin_mask;
 }
@@ -147,7 +149,7 @@ void vsf_hw_gpio_write(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
     uint32_t origin_pin_mask;
 
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
-    VSF_HAL_ASSERT(__VSF_HW_IO_IS_VAILID_PIN(pin_mask));
+    VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_PIN(pin_mask));
 
     if (!hw_gpio_ptr->is_pmic) {
         origin_pin_mask = hw_gpio_ptr->GPIO->MR;
@@ -174,8 +176,8 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 {
     vsf_gpio_capability_t gpio_capability = {
         .is_async = hw_gpio_ptr->is_pmic,
-        .is_support_output_and_set = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET,
-        .is_support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR,
+        .is_support_output_and_set = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET,
+        .is_support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_CLEAR,
         .pin_count = VSF_HW_GPIO_PIN_COUNT,
         .avail_pin_mask = VSF_HW_GPIO_PIN_MASK,
     };
