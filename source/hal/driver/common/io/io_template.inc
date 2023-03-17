@@ -17,13 +17,15 @@
 
 /*============================ INCLUDES ======================================*/
 
+#if VSF_HAL_USE_IO == ENABLED
+
 #include "hal/driver/common/template/vsf_template_hal_driver.h"
 
 /*============================ MACROS ========================================*/
-
-#if VSF_HAL_USE_IO == ENABLED
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+// TODO: When the IO multiplexing function is in GPIO, we need a
+//       vsf_io_config_one_pin template based on the vsf_gpio_config_pin implementation
 
 #define vsf_real_io_t   VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_t)
 

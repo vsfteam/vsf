@@ -31,14 +31,14 @@
 
 #define VSF_IO_REIMPLEMENT_FEATURE      ENABLED
 
-#define __VSF_HW_IO_FUNCTION_MASK       IOMUX_GPIO_CONFIG_SEL_MASK
+#define __AIC8800_IO_FUNCTION_MASK       IOMUX_GPIO_CONFIG_SEL_MASK
 
-#define __VSF_HW_IO_IS_VAILID_PIN(__P)                                          \
+#define __AIC8800_IO_IS_VAILID_PIN(__P)                                          \
     (((__P &  VSF_HW_IO_PIN_MASK) != 0) &&                                      \
      ((__P & ~VSF_HW_IO_PIN_MASK) == 0))
 
-#define __VSF_HW_IO_IS_VAILID_FEATURE(__F)                                      \
-    ((__F & ~(uint32_t)__VSF_HW_IO_FEATURE_ALL_BITS) == 0)
+#define __AIC8800_IO_IS_VAILID_FEATURE(__F)                                      \
+    ((__F & ~(uint32_t)__AIC8800_IO_FEATURE_ALL_BITS) == 0)
 
 
 // TODO: add io function mode tables
@@ -85,7 +85,7 @@ typedef enum vsf_io_feature_t {
                                   VSF_IO_FILTER_CLK_SRC6 | VSF_IO_FILTER_CLK_SRC7 |
                                   VSF_IO_HIGH_DRV,
 
-    __VSF_HW_IO_FEATURE_ALL_BITS
+    __AIC8800_IO_FEATURE_ALL_BITS
                                 = VSF_IO_PULL_UP | VSF_IO_OPEN_DRAIN,
 
 } vsf_io_feature_t;

@@ -31,11 +31,11 @@
 
 #define VSF_IO_REIMPLEMENT_FEATURE      ENABLED
 
-#define __VSF_HW_IO_IS_VAILID_PIN(__P)                                          \
+#define __BL61X_IO_IS_VAILID_PIN(__P)                                           \
     (((__P &  VSF_HW_IO_PIN_MASK) != 0) &&                                      \
      ((__P & ~VSF_HW_IO_PIN_MASK) == 0))
 
-#define __VSF_HW_IO_IS_VAILID_FEATURE(__F)                                      \
+#define __BL61X_IO_IS_VAILID_FEATURE(__F)                                       \
     ((__F & ~(uint32_t)__VSF_HW_IO_FEATURE_ALL_BITS) == 0)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
