@@ -167,7 +167,7 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
         for (uint_fast8_t i = 0; i < dimof(__vsf_rtos.swi); i++, ctx++) {
             if (    ctx->is_inited
                 // do not process current irq_thread, which has same priority as current thread
-                && (    __vsf_arch_model_get_current_priority()
+                && (    __vsf_arch_get_current_priority()
                     !=  __vsf_arch_irq_get_priority((vsf_arch_irq_thread_t *)&ctx->thread))) {
 
                 if (ctx->priority > priority) {

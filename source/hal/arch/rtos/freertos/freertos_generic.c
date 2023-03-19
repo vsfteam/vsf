@@ -309,7 +309,7 @@ void __vsf_arch_delay_ms(uint_fast32_t ms)
 }
 
 #if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
-vsf_arch_prio_t __vsf_arch_model_get_current_priority(void)
+vsf_arch_prio_t __vsf_arch_get_current_priority(void)
 {
     UBaseType_t rtos_priority = uxTaskPriorityGet(xTaskGetCurrentTaskHandle());
     return (vsf_arch_prio_t)rtos_prio_to_arch_prio(rtos_priority);

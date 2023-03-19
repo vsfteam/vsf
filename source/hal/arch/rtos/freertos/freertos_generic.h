@@ -92,7 +92,7 @@ extern void vsf_freertos_start(void);
 extern bool __vsf_arch_model_low_level_init(void);
 
 #if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
-extern vsf_arch_prio_t __vsf_arch_model_get_current_priority(void);
+extern vsf_arch_prio_t __vsf_arch_get_current_priority(void);
 #endif
 
 #ifdef __cplusplus
