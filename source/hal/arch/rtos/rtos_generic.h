@@ -126,6 +126,11 @@ extern "C" {
 #   error too many SWI to support in the current rtos configuration
 #endif
 
+// if stack is supported, and stack_depth is 0, means using dynamic stack
+#if defined(VSF_ARCH_IRQ_SUPPORT_STACK) && (VSF_ARCH_RTOS_CFG_STACK_DEPTH == 0)
+#   define VSF_ARCH_RTOS_DYNAMIC_STACK              ENABLED
+#endif
+
 /*============================ TYPES =========================================*/
 
 vsf_class(vsf_arch_irq_thread_with_stack_t) {
