@@ -294,6 +294,7 @@ static void __vk_socket_win_socket_tx_thread(void *arg)
 
         socket_win->tx.is_busy = false;
     }
+    __vsf_arch_irq_fini(irq_thread);
 }
 
 static void __vk_socket_win_socket_rx_thread(void *arg)
@@ -351,6 +352,7 @@ static void __vk_socket_win_socket_rx_thread(void *arg)
 
         socket_win->rx.is_busy = false;
     }
+    __vsf_arch_irq_fini(irq_thread);
 }
 
 static vsf_err_t __vk_socket_win_socket(vk_socket_t *s, int family, int protocol)
@@ -403,14 +405,12 @@ static vsf_err_t __vk_socket_win_close(vk_socket_t *s)
     socket_win->tx.request = VSF_SOCKET_WIN_CLOSE;
     __vsf_arch_irq_request_send(&socket_win->tx.irq_request);
     vsf_thread_wfe(VSF_EVT_USER);
-    __vsf_arch_irq_fini(&socket_win->tx.irq_thread);
 
     socket_win->rx.eda = vsf_eda_get_cur();
     VSF_TCPIP_ASSERT(socket_win->rx.eda != NULL);
     socket_win->rx.request = VSF_SOCKET_WIN_CLOSE;
     __vsf_arch_irq_request_send(&socket_win->rx.irq_request);
     vsf_thread_wfe(VSF_EVT_USER);
-    __vsf_arch_irq_fini(&socket_win->rx.irq_thread);
 
     return VSF_ERR_NONE;
 }

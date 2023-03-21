@@ -342,6 +342,7 @@ static void __vsf_systimer_thread(void *arg)
             vsf_systimer_timeout_evt_handler(tick);
         __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
     }
+    __vsf_arch_irq_fini(&ctx->use_as__vsf_arch_irq_thread_t);
 }
 
 /*! \brief initialise SysTick to generate a system timer
@@ -365,7 +366,6 @@ vsf_err_t vsf_systimer_init(void)
 #endif
     if (timer_create(CLOCK_MONOTONIC, &evp, &ctx->timer)) {
         VSF_HAL_ASSERT(false);
-        __vsf_arch_irq_fini(&ctx->use_as__vsf_arch_irq_thread_t);
         return VSF_ERR_FAIL;
     }
     __vsf_arch_irq_request_init(&__vsf_arch.systimer.due_request);

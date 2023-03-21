@@ -683,6 +683,7 @@ void __vsf_arch_irq_fini(vsf_arch_irq_thread_t *irq_thread)
     __vsf_arch_lock();
         vsf_dlist_remove(vsf_arch_irq_thread_t, irq_node, &__vsf_x86.irq_list, irq_thread);
     __vsf_arch_unlock();
+    irq_thread->thread = NULL;
 
     vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
