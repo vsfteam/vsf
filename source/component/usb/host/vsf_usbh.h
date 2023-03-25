@@ -589,6 +589,7 @@ extern void vk_usbh_urb_set_buffer(vk_usbh_urb_t *urb, void *buffer,
 extern int_fast16_t vk_usbh_urb_get_status(vk_usbh_urb_t *urb);
 extern uint_fast32_t vk_usbh_urb_get_actual_length(vk_usbh_urb_t *urb);
 
+extern enum usb_device_speed_t vk_usbh_get_dev_speed(vk_usbh_dev_t *dev);
 extern void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
 extern bool vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
 extern void vk_usbh_update_address(vk_usbh_dev_t *dev, uint_fast8_t address);

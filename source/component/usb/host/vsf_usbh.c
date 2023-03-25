@@ -334,6 +334,11 @@ static void __vk_usbh_clean_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
     }
 }
 
+enum usb_device_speed_t vk_usbh_get_dev_speed(vk_usbh_dev_t *dev)
+{
+    return (enum usb_device_speed_t)dev->speed;
+}
+
 void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 {
     vk_usbh_update_address(dev, 0);
