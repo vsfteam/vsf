@@ -1903,6 +1903,11 @@ pid_t getppid(void)
     return process->id.ppid;
 }
 
+pid_t getpgid(pid_t pid)
+{
+    return pid;
+}
+
 pid_t gettid(void)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();

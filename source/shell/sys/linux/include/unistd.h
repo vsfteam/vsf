@@ -542,6 +542,7 @@ uid_t geteuid(void);
 pid_t gettid(void);
 pid_t getpid(void);
 pid_t getppid(void);
+pid_t getpgid(pid_t pid);
 
 
 #if defined(__WIN__) && defined(__CPU_X64__)
