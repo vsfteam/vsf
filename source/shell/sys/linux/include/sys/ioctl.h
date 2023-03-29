@@ -62,7 +62,8 @@ enum {
     TIOCGWINSZ      = F_IO,
     TIOCGSERIAL     = F_IO + 1,
     TIOCSSERIAL     = F_IO + 2,
-    FIONREAD        = F_IO + 3,
+    TIOCSCTTY       = F_IO + 3,
+    FIONREAD        = F_IO + 4,
 };
 
 //int ioctl(int fd, unsigned long request, ...);

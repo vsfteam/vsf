@@ -54,7 +54,11 @@ typedef unsigned short      umode_t;
 typedef unsigned int        nlink_t;
 typedef unsigned int        uid_t;
 typedef unsigned int        gid_t;
+#ifdef __VSF64__
+typedef long long           off_t;
+#else
 typedef long                off_t;
+#endif
 typedef long long           off64_t;
 typedef unsigned long       dev_t;
 typedef unsigned long       ino_t;

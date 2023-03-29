@@ -44,6 +44,8 @@ extern "C" {
 #define SOCK_STREAM     1
 #define SOCK_DGRAM      2
 #define SOCK_SEQPACKET  3
+#define SOCK_RDM        4
+#define SOCK_RAW        5
 
 #define INVALID_SOCKET  -1
 #define SOCKET_ERROR    -1

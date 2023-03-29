@@ -22,6 +22,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifdef __CPU_X64__
+#   define __VSF64__
+#endif
+
 #include "./x86_compiler_detect.h"
 
 #endif /* end of __USE_X86_COMPILER_H_PART_1__ */

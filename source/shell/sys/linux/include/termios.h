@@ -68,6 +68,11 @@ typedef unsigned int speed_t;
 #define ECHONL      0000100
 #define NOFLSH      0000200
 #define TOSTOP      0000400
+#define ECHOCTL     0001000
+#define ECHOPRT     0002000
+#define ECHOKE      0004000
+#define FLUSHO      0010000
+#define PENDIN      0040000
 #define IEXTEN      0100000
 
 /* tcflow() and TCXONC use these */
@@ -172,17 +177,20 @@ enum {
 #define B4000000    B4000000
 };
 
-#define CSIZE       0x0030
+#define CSIZE       0x0060
 #define CS5         0x0000
-#define CS6         0x0010
-#define CS7         0x0020
-#define CS8         0x0030
+#define CS6         0x0020
+#define CS7         0x0040
+#define CS8         0x0060
 
-#define CSTOPB      0x0040
-#define CREAD       0x0080
-#define PARENB      0x0100
-#define PARODD      0x0200
-#define CLOCAL      0X0400
+#define CSTOPB      0x0100
+#define CREAD       0x0200
+#define PARENB      0x0400
+#define PARODD      0x0800
+
+#define HUPCL       0x1000
+#define CLOCAL      0x2000
+#define CBAUDEX     0x4000
 
 #define CRTSCTS     0x0400
 
