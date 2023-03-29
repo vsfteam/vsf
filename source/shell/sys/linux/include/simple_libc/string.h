@@ -242,6 +242,7 @@ size_t strlcpy(char *dest, const char *src, size_t n);
 _CONST_RETURN char * strstr(const char *str1, const char *str2);
 _CONST_RETURN char * strchr(const char *str, int c);
 _CONST_RETURN char * strrchr(const char *str, int c);
+_CONST_RETURN char * strchrnul(const char *str, int c);
 _CONST_RETURN void * memchr(const void *buf, int ch, size_t count);
 
 void * memmove(void *dest, const void *src, size_t n);
