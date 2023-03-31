@@ -33,6 +33,12 @@
 extern "C" {
 #endif
 
+#if defined(__WIN__) && defined(__CPU_X64__)
+#   define exec_ret_t           intptr_t
+#else
+#   define exec_ret_t           int
+#endif
+
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define usleep              VSF_LINUX_WRAPPER(usleep)
 #define sleep               VSF_LINUX_WRAPPER(sleep)
@@ -210,14 +216,14 @@ typedef struct vsf_linux_unistd_vplt_t {
     pid_t (*getppid)(void);
     pid_t (*gettid)(void);
 
-    int (*__execl_va)(const char *pathname, const char *arg, va_list ap);
-    int (*execl)(const char *pathname, const char *arg, ...);
-    int (*__execlp_va)(const char *pathname, const char *arg, va_list ap);
-    int (*execlp)(const char *file, const char *arg, ...);
-    int (*execv)(const char *pathname, char * const * argv);
-    int (*execve)(const char *pathname, char * const * argv, char * const * envp);
-    int (*execvp)(const char *file, char * const * argv);
-    int (*execvpe)(const char *file, char * const * argv, char * const * envp);
+    exec_ret_t (*__execl_va)(const char *pathname, const char *arg, va_list ap);
+    exec_ret_t (*execl)(const char *pathname, const char *arg, ...);
+    exec_ret_t (*__execlp_va)(const char *pathname, const char *arg, va_list ap);
+    exec_ret_t (*execlp)(const char *file, const char *arg, ...);
+    exec_ret_t (*execv)(const char *pathname, char * const * argv);
+    exec_ret_t (*execve)(const char *pathname, char * const * argv, char * const * envp);
+    exec_ret_t (*execvp)(const char *file, char * const * argv);
+    exec_ret_t (*execvpe)(const char *file, char * const * argv, char * const * envp);
     int (*daemon)(int nochdir, int noclose);
 
     long (*sysconf)(int name);
@@ -334,8 +340,8 @@ static inline pid_t gettid(void) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->gettid();
 }
 
-static inline int execl(const char *pathname, const char *arg, ...) {
-    int ret;
+static inline exec_ret_t execl(const char *pathname, const char *arg, ...) {
+    exec_ret_t ret;
 
     va_list ap;
     va_start(ap, arg);
@@ -343,7 +349,7 @@ static inline int execl(const char *pathname, const char *arg, ...) {
     va_end(ap);
     return ret;
 }
-static inline int execlp(const char *file, const char *arg, ...) {
+static inline exec_ret_t execlp(const char *file, const char *arg, ...) {
     int ret;
 
     va_list ap;
@@ -352,16 +358,16 @@ static inline int execlp(const char *file, const char *arg, ...) {
     va_end(ap);
     return ret;
 }
-static inline int execv(const char *pathname, char * const * argv) {
+static inline exec_ret_t execv(const char *pathname, char * const * argv) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->execv(pathname, argv);
 }
-static inline int execve(const char *pathname, char * const * argv, char * const * envp) {
+static inline exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->execve(pathname, argv, envp);
 }
-static inline int execvp(const char *file, char * const * argv) {
+static inline exec_ret_t execvp(const char *file, char * const * argv) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->execvp(file, argv);
 }
-static inline int execvpe(const char *file, char * const * argv, char * const * envp) {
+static inline exec_ret_t execvpe(const char *file, char * const * argv, char * const * envp) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->execvpe(file, argv, envp);
 }
 static inline int daemon(int nochdir, int noclose) {
@@ -545,11 +551,6 @@ pid_t getppid(void);
 pid_t getpgid(pid_t pid);
 
 
-#if defined(__WIN__) && defined(__CPU_X64__)
-#   define exec_ret_t           intptr_t
-#else
-#   define exec_ret_t           int
-#endif
 exec_ret_t execl(const char *pathname, const char *arg, ...);
 exec_ret_t execlp(const char *file, const char *arg, ...);
 exec_ret_t execv(const char *pathname, char * const * argv);
