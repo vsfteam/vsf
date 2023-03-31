@@ -207,6 +207,23 @@ extern const vsf_loader_heap_op_t vsf_loader_default_heap_op;
 */
 extern uint32_t vsf_loader_xip_read(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size);
 
+/**
+ \~english read function for xip target, set to fn_read member of vsf_loader_target_t.
+ @param target loader target, object of target MUST be the file opened with FILE * type.
+ @param offset offset in image.
+ @param buffer buffer to hold the data read.
+ @param size size to read.
+ @return the actual data size read.
+
+ \~chinese xip目标的读取函数，设置给vsf_loader_target_t的fn_read参数。
+ @param target 载入目标，target的object参数必须是已经打开的 FILE *f。
+ @param offset 镜像中的偏移
+ @param buffer 读取缓存。
+ @param size 读取大小。
+ @return 实际读取大小。
+*/
+extern uint32_t vsf_loader_stdio_read(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size);
+
 #if defined(__VSF_LOADER_CLASS_IMPLEMENT) || defined(__VSF_LOADER_CLASS_INHERIT__)
 extern void * vsf_loader_link(vsf_loader_t *loader, const char *name);
 #endif

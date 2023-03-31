@@ -105,9 +105,9 @@ extern void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader);
 
 // can be called before vsf_elfloader_load
 extern int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
-        int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf32_Shdr *header, char *name, int index, void *param));
+        int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Shdr *header, char *name, int index, void *param));
 extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader,
-        vsf_loader_target_t *target, const char *name, Elf32_Shdr *header);
+        vsf_loader_target_t *target, const char *name, Elf_Shdr *header);
 
 // CAN NOT be called before vsf_elfloader_load
 extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,

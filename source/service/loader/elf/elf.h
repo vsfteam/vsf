@@ -5,11 +5,15 @@
 
 // http://www.skyfree.org/linux/references/ELF_Format.pdf
 
-typedef uint32_t Elf32_Addr;
-typedef uint32_t Elf32_Off;
-typedef uint32_t Elf32_Word;
-typedef int32_t Elf32_Sword;
-typedef uint16_t Elf32_Half;
+/*----------------------------------------------------------------------------*
+ * ELF32                                                                      *
+ *----------------------------------------------------------------------------*/
+
+typedef uint32_t        Elf32_Addr;
+typedef uint32_t        Elf32_Off;
+typedef uint32_t        Elf32_Word;
+typedef int32_t         Elf32_Sword;
+typedef uint16_t        Elf32_Half;
 
 typedef struct Elf32_Hdr {
 #define EI_MAG0         0
@@ -210,6 +214,138 @@ typedef struct Elf32_Dyn {
         Elf32_Addr      d_ptr;
     } d_un;
 } Elf32_Dyn;
+
+/*----------------------------------------------------------------------------*
+ * ELF64                                                                      *
+ *----------------------------------------------------------------------------*/
+
+typedef uint64_t        Elf64_Addr;
+typedef uint16_t        Elf64_Half;
+typedef uint64_t        Elf64_Off;
+typedef int32_t         Elf64_Sword;
+typedef int64_t         Elf64_Sxword;
+typedef uint32_t        Elf64_Word;
+typedef uint64_t        Elf64_Lword;
+typedef uint64_t        Elf64_Xword;
+
+typedef struct {
+    unsigned char       e_ident[EI_NIDENT]; /* File identification. */
+    Elf64_Half          e_type;             /* File type. */
+    Elf64_Half          e_machine;          /* Machine architecture. */
+    Elf64_Word          e_version;          /* ELF format version. */
+    Elf64_Addr          e_entry;            /* Entry point. */
+    Elf64_Off           e_phoff;            /* Program header file offset. */
+    Elf64_Off           e_shoff;            /* Section header file offset. */
+    Elf64_Word          e_flags;            /* Architecture-specific flags. */
+    Elf64_Half          e_ehsize;           /* Size of ELF header in bytes. */
+    Elf64_Half          e_phentsize;        /* Size of program header entry. */
+    Elf64_Half          e_phnum;            /* Number of program header entries. */
+    Elf64_Half          e_shentsize;        /* Size of section header entry. */
+    Elf64_Half          e_shnum;            /* Number of section header entries. */
+    Elf64_Half          e_shstrndx;         /* Section name strings section. */
+} Elf64_Hdr;
+
+typedef struct {
+    Elf64_Word          sh_name;            /* Section name (index into the section header string table). */
+    Elf64_Word          sh_type;            /* Section type. */
+    Elf64_Xword         sh_flags;           /* Section flags. */
+    Elf64_Addr          sh_addr;            /* Address in memory image. */
+    Elf64_Off           sh_offset;          /* Offset in file. */
+    Elf64_Xword         sh_size;            /* Size in bytes. */
+    Elf64_Word          sh_link;            /* Index of a related section. */
+    Elf64_Word          sh_info;            /* Depends on section type. */
+    Elf64_Xword         sh_addralign;       /* Alignment in bytes. */
+    Elf64_Xword         sh_entsize;         /* Size of each entry in section. */
+} Elf64_Shdr;
+
+typedef struct {
+    Elf64_Word          p_type;             /* Entry type. */
+    Elf64_Word          p_flags;            /* Access permission flags. */
+    Elf64_Off           p_offset;           /* File offset of contents. */
+    Elf64_Addr          p_vaddr;            /* Virtual address in memory image. */
+    Elf64_Addr          p_paddr;            /* Physical address (not used). */
+    Elf64_Xword         p_filesz;           /* Size of contents in file. */
+    Elf64_Xword         p_memsz;            /* Size of contents in memory. */
+    Elf64_Xword         p_align;            /* Alignment in memory and file. */
+} Elf64_Phdr;
+
+typedef struct {
+    Elf64_Sxword        d_tag;              /* Entry type. */
+    union {
+        Elf64_Xword     d_val;              /* Integer value. */
+        Elf64_Addr      d_ptr;              /* Address value. */
+    } d_un;
+} Elf64_Dyn;
+
+typedef struct {
+    Elf64_Addr          r_offset;           /* Location to be relocated. */
+
+#define	ELF64_R_SYM(__INFO)             ((__INFO) >> 32)
+#define	ELF64_R_TYPE(__INFO)            ((__INFO) & 0xffffffffL)
+#define	ELF64_R_INFO(__SYM, __TYPE)     (((__SYM) << 32) + ((__TYPE) & 0xffffffffL))
+    Elf64_Xword         r_info;             /* Relocation type and symbol index. */
+} Elf64_Rel;
+
+typedef struct {
+    Elf64_Addr          r_offset;           /* Location to be relocated. */
+    Elf64_Xword         r_info;             /* Relocation type and symbol index. */
+    Elf64_Sxword        r_addend;           /* Addend. */
+} Elf64_Rela;
+
+typedef struct {
+    Elf64_Word          st_name;            /* String table index of name. */
+    unsigned char       st_info;            /* Type and binding information. */
+    unsigned char       st_other;           /* Reserved (not used). */
+    Elf64_Half          st_shndx;           /* Section index of symbol. */
+    Elf64_Addr          st_value;           /* Symbol value. */
+    Elf64_Xword         st_size;            /* Size of associated object. */
+} Elf64_Sym;
+
+/*----------------------------------------------------------------------------*
+ * Common                                                                     *
+ *----------------------------------------------------------------------------*/
+
+#ifdef __VSF64__
+#   define Elf_Addr     Elf64_Addr
+#   define Elf_Off      Elf64_Off
+#   define Elf_Word     Elf64_Word
+#   define Elf_Sword    Elf64_Sword
+#   define Elf_Half     Elf64_Half
+
+#   define Elf_Hdr      Elf64_Hdr
+#   define Elf_Shdr     Elf64_Shdr
+#   define Elf_Sym      Elf64_Sym
+#   define Elf_Rel      Elf64_Rel
+#   define Elf_Rela     Elf64_Rela
+#   define Elf_Phdr     Elf64_Phdr
+#   define Elf_Dyn      Elf64_Dyn
+
+#   define ELF_R_SYM    ELF64_R_SYM
+#   define ELF_R_TYPE   ELF64_R_TYPE
+#   define ELF_R_INFO   ELF64_R_INFO
+#else
+#   define Elf_Addr     Elf32_Addr
+#   define Elf_Off      Elf32_Off
+#   define Elf_Word     Elf32_Word
+#   define Elf_Sword    Elf32_Sword
+#   define Elf_Half     Elf32_Half
+
+#   define Elf_Hdr      Elf32_Hdr
+#   define Elf_Shdr     Elf32_Shdr
+#   define Elf_Sym      Elf32_Sym
+#   define Elf_Rel      Elf32_Rel
+#   define Elf_Rela     Elf32_Rela
+#   define Elf_Phdr     Elf32_Phdr
+#   define Elf_Dyn      Elf32_Dyn
+
+#   define ELF_R_SYM    ELF32_R_SYM
+#   define ELF_R_TYPE   ELF32_R_TYPE
+#   define ELF_R_INFO   ELF32_R_INFO
+#endif
+
+/*----------------------------------------------------------------------------*
+ * ARCH related                                                               *
+ *----------------------------------------------------------------------------*/
 
 // Relocation codes for ARM
 #define R_ARM_NONE               0             /* No relocation */

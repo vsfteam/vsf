@@ -59,6 +59,15 @@ static void __vsf_loader_heap_free(vsf_loader_t *loader, vsf_loader_mem_attr_t a
 }
 #endif
 
+uint32_t vsf_loader_stdio_read(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size)
+{
+    FILE *f = (FILE *)target->object;
+    if (fseek(f, offset, SEEK_SET) != 0) {
+        return 0;
+    }
+    return fread(buffer, 1, size, f);
+}
+
 uint32_t vsf_loader_xip_read(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size)
 {
     memcpy(buffer, (void *)(target->object + offset), size);
