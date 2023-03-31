@@ -27,7 +27,12 @@ int elfloader_main(int argc, char **argv)
     void *entry = vsf_elfloader_load(&elfloader, &elftarget);
     if (entry != NULL) {
         vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
-        int result = ((int (*)(int, char **, const void **))entry)(argc, argv, (const void **)&vsf_linux_vplt);
+        int result = ((int (*)(int, char **, vsf_applet_ctx_t*))entry)(argc, argv, &(vsf_applet_ctx_t) {
+            .target     = &elfloader,
+            .fn_init    = (int (*)(void *))vsf_elfloader_call_init_array,
+            .fn_fini    = (void (*)(void *))vsf_elfloader_call_fini_array,
+            .vplt       = &vsf_linux_vplt,
+        });
         vsf_elfloader_cleanup(&elfloader);
         return result;
     }

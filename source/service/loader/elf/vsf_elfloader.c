@@ -64,8 +64,6 @@ typedef struct vsf_elfloader_section_loader_t {
 } vsf_elfloader_section_loader_t;
 
 struct vsf_elfloader_info_t {
-    void *initarr;
-    Elf_Word initarr_sz;
     Elf_Word ram_sz;
 
     struct {
@@ -310,15 +308,18 @@ static vsf_err_t __vsf_elfloader_plt_loader(vsf_elfloader_t *elfloader, vsf_load
 static vsf_err_t __vsf_elfloader_initarr_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
         Elf_Shdr *header, vsf_elfloader_info_t *linfo)
 {
-    linfo->sinfo.buffer = &linfo->initarr;
-    linfo->initarr_sz = header->sh_size;
+    linfo->sinfo.buffer = &elfloader->initarr;
+    elfloader->initarr_off = header->sh_offset;
+    elfloader->initarr_sz = header->sh_size;
     return VSF_ERR_NONE;
 }
 
 static vsf_err_t __vsf_elfloader_finiarr_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
         Elf_Shdr *header, vsf_elfloader_info_t *linfo)
 {
-    linfo->sinfo.buffer = &elfloader->finiarr;
+    linfo->sinfo.buffer = &elfloader->initarr;
+    elfloader->initarr_off = header->sh_offset;
+    elfloader->initarr_sz = header->sh_size;
     return VSF_ERR_NONE;
 }
 
@@ -348,6 +349,10 @@ void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
     if (elfloader->text != NULL) {
         vsf_loader_free(elfloader, VSF_LOADER_MEM_X, elfloader->text);
         elfloader->text = NULL;
+    }
+    if (elfloader->initarr != NULL) {
+        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->initarr);
+        elfloader->initarr = NULL;
     }
     if (elfloader->finiarr != NULL) {
         vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->finiarr);
@@ -529,6 +534,29 @@ static int __vsf_elfloader_link_cb(vsf_elfloader_t *elfloader, vsf_loader_target
     return VSF_ELFLOADER_CB_GOON;
 }
 
+int vsf_elfloader_call_init_array(vsf_elfloader_t *elfloader)
+{
+    if (elfloader->initarr != 0) {
+        // TODO: call init
+        VSF_SERVICE_ASSERT(false);
+
+        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->initarr);
+        elfloader->initarr = NULL;
+    }
+    return -1;
+}
+
+void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader)
+{
+    if (elfloader->initarr != 0) {
+        // TODO: call fini
+        VSF_SERVICE_ASSERT(false);
+
+        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->finiarr);
+        elfloader->finiarr = NULL;
+    }
+}
+
 void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target)
 {
     VSF_SERVICE_ASSERT((elfloader != NULL) && (target != NULL));
@@ -566,13 +594,6 @@ second_round_for_ram_base:
     if (vsf_elfloader_foreach_section(elfloader, target, &linfo, __vsf_elfloader_link_cb) < 0) {
         vsf_elfloader_trace(VSF_TRACE_ERROR, "link elf failed" VSF_TRACE_CFG_LINEEND);
         goto cleanup_and_fail;
-    }
-
-    if (linfo.initarr != 0) {
-        // TODO: call init
-        VSF_SERVICE_ASSERT(false);
-
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, linfo.initarr);
     }
 
     entry_sinfo = __vsf_elfloader_get_section_by_addr(&linfo, elf_hdr.e_entry);

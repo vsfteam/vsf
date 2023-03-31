@@ -107,6 +107,17 @@ typedef struct vsf_vplt_t {
 extern __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt;
 #endif
 
+#ifndef __VSF_APPLET_CTX_DEFINED__
+#define __VSF_APPLET_CTX_DEFINED__
+typedef struct vsf_applet_ctx_t {
+    void *target;
+    int (*fn_init)(void *);
+    void (*fn_fini)(void *);
+
+    void *vplt;
+} vsf_applet_ctx_t;
+#endif
+
 #ifdef __VSF_APPLET__
 #   if VSF_USE_APPLET == ENABLED && !defined(VSF_APPLET_VPLT)
 #       define VSF_APPLET_VPLT              ((vsf_vplt_t *)vsf_vplt((void *)0))
@@ -115,10 +126,21 @@ extern __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt;
 extern void * vsf_vplt(void *);
 extern int main(int, char **);
 #   define main(...)                                                            \
-        _start(int argc, char **argv, void *vplt)                               \
+        _start(int argc, char **argv, vsf_applet_ctx_t *ctx)                    \
         {                                                                       \
-            vsf_vplt(vplt);                                                     \
-            return main(argc, argv);                                            \
+            int result;                                                         \
+            vsf_vplt(ctx->vplt);                                                \
+            if (ctx->fn_init != NULL) {                                         \
+                result = ctx->fn_init(ctx->target);                             \
+                if (result) {                                                   \
+                    return result;                                              \
+                }                                                               \
+            }                                                                   \
+            result = main(argc, argv);                                          \
+            if (ctx->fn_fini != NULL) {                                         \
+                ctx->fn_fini(ctx->target);                                      \
+            }                                                                   \
+            return result;                                                      \
         }                                                                       \
         void * vsf_vplt(void *vplt)                                             \
         {                                                                       \

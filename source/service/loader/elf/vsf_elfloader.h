@@ -67,6 +67,7 @@ vsf_class(vsf_elfloader_t) {
         void *plt;
 
         void *text;
+        void *initarr;
         void *finiarr;
         void *bss;
         void *data;
@@ -78,6 +79,8 @@ vsf_class(vsf_elfloader_t) {
         uint32_t symtbl_sz;
         uint32_t symstrtbl_off;
         uint32_t symstrtbl_sz;
+        uint32_t initarr_off;
+        uint32_t initarr_sz;
         uint32_t finiarr_off;
         uint32_t finiarr_sz;
     )
@@ -102,6 +105,8 @@ enum {
 
 extern void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target);
 extern void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader);
+extern int vsf_elfloader_call_init_array(vsf_elfloader_t *elfloader);
+extern void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader);
 
 // can be called before vsf_elfloader_load
 extern int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
