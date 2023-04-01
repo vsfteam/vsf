@@ -37,9 +37,9 @@
 #elif __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
 // strtoxxx in newlib has dependency issues, implement in simple_stdlib
 #   define VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX          ENABLED
-#   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
-#   define VSF_USE_SIMPLE_SSCANF                        ENABLED
 #endif
+#define VSF_USE_SIMPLE_SPRINTF                          ENABLED
+#define VSF_USE_SIMPLE_SSCANF                           ENABLED
 
 //extern uint32_t SystemCoreClock;
 // DO NOT use SystemCoreClock for VSF_SYSTIMER_FREQ, because systimer is initialized
@@ -250,7 +250,7 @@
 #define APP_USE_LINUX_ELFLOADER_DEMO                    ENABLED
 #define VSF_USE_LOADER                                  ENABLED
 #   define VSF_LOADER_USE_ELF                           ENABLED
-#       define VSF_ELFLOADER_CFG_DEBUG                  ENABLED
+//#       define VSF_ELFLOADER_CFG_DEBUG                  ENABLED
 // CortexM uses thread_reg to support xip dynamic load
 #   define VSF_ARCH_USE_THREAD_REG                      ENABLED
 
