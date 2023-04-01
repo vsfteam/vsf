@@ -23,7 +23,7 @@
 #define __VSF_ELFLOADER_CLASS_IMPLEMENT
 #define __VSF_LOADER_CLASS_INHERIT__
 #include "../vsf_loader.h"
-
+#define VSF_ELFLOADER_CFG_DEBUG ENABLED
 #if VSF_ELFLOADER_CFG_DEBUG == ENABLED
 #   include "service/vsf_service.h"
 #endif
@@ -38,7 +38,7 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#ifdef VSF_ELFLOADER_CFG_DEBUG
+#if VSF_ELFLOADER_CFG_DEBUG == ENABLED
 #   define vsf_elfloader_trace(...)             vsf_trace(__VA_ARGS__)
 #   define vsf_elfloader_trace_buffer(...)      vsf_trace_buffer(__VA_ARGS__)
 #else
@@ -84,6 +84,8 @@ static vsf_err_t __vsf_elfloader_bss_loader(vsf_elfloader_t *elfloader, vsf_load
 static vsf_err_t __vsf_elfloader_data_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
 static vsf_err_t __vsf_elfloader_rodata_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
 static vsf_err_t __vsf_elfloader_noinit_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
+static vsf_err_t __vsf_elfloader_symtab_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
+static vsf_err_t __vsf_elfloader_strtab_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
 static vsf_err_t __vsf_elfloader_dynsym_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
 static vsf_err_t __vsf_elfloader_dynstr_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
 static vsf_err_t __vsf_elfloader_plt_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
@@ -105,6 +107,8 @@ static const vsf_elfloader_section_loader_t __vsf_elfloader_section_loaders[] = 
     {".rodata",         __vsf_elfloader_rodata_loader},
 
     // non-loadable sections
+    {".symtab",         __vsf_elfloader_symtab_loader},
+    {".strtab",         __vsf_elfloader_strtab_loader},
     {".dynsym",         __vsf_elfloader_dynsym_loader},
     {".dynstr",         __vsf_elfloader_dynstr_loader},
     {".init_array",     __vsf_elfloader_initarr_loader},
@@ -278,6 +282,26 @@ static vsf_err_t __vsf_elfloader_noinit_loader(vsf_elfloader_t *elfloader, vsf_l
 {
     linfo->sinfo.is_ram = true;
     linfo->sinfo.buffer = &elfloader->noinit;
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vsf_elfloader_symtab_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
+        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
+{
+    if (0 == elfloader->symtbl_off) {
+        elfloader->symtbl_off = header->sh_offset;
+        elfloader->symtbl_sz = header->sh_size;
+    }
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vsf_elfloader_strtab_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
+        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
+{
+    if (0 == elfloader->symstrtbl_off) {
+        elfloader->symstrtbl_off = header->sh_offset;
+        elfloader->symstrtbl_sz = header->sh_size;
+    }
     return VSF_ERR_NONE;
 }
 

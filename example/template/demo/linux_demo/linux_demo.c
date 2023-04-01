@@ -328,6 +328,10 @@ int vsf_linux_create_fhs(void)
     extern int distbus_main(int argc, char *argv[]);
     busybox_bind(VSF_LINUX_CFG_BIN_PATH "/distbus", distbus_main);
 #endif
+#if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED && APP_USE_LINUX_ELFLOADER_DEMO == ENABLED
+    extern int elfloader_main(int argc, char *argv[]);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/loadelf", elfloader_main);
+#endif
 
     return 0;
 }
