@@ -23,7 +23,7 @@
 #define __VSF_ELFLOADER_CLASS_IMPLEMENT
 #define __VSF_LOADER_CLASS_INHERIT__
 #include "../vsf_loader.h"
-#define VSF_ELFLOADER_CFG_DEBUG ENABLED
+
 #if VSF_ELFLOADER_CFG_DEBUG == ENABLED
 #   include "service/vsf_service.h"
 #endif
@@ -581,6 +581,40 @@ void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader)
     }
 }
 
+static int __vsf_elfloader_load_by_sections(vsf_elfloader_t *elfloader,
+        vsf_loader_target_t *target, vsf_elfloader_info_t *linfo)
+{
+second_round_for_ram_base:
+    if (vsf_elfloader_foreach_section(elfloader, target, linfo, __vsf_elfloader_load_cb) < 0) {
+        vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to load elf" VSF_TRACE_CFG_LINEEND);
+        return -1;
+    }
+
+    if (target->is_epi && (NULL == elfloader->ram_base)) {
+        vsf_elfloader_trace(VSF_TRACE_DEBUG, "loading ram" VSF_TRACE_CFG_LINEEND);
+        elfloader->ram_base = vsf_loader_malloc(elfloader, VSF_LOADER_MEM_RW, linfo->ram_sz, 0);
+        if (NULL == elfloader->ram_base) {
+            vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to allocate ram_base" VSF_TRACE_CFG_LINEEND);
+            return -1;
+        }
+        memset(elfloader->ram_base, 0, linfo->ram_sz);
+        linfo->ram_sz = 0;
+        goto second_round_for_ram_base;
+    }
+
+    if (vsf_elfloader_foreach_section(elfloader, target, linfo, __vsf_elfloader_link_cb) < 0) {
+        vsf_elfloader_trace(VSF_TRACE_ERROR, "link elf failed" VSF_TRACE_CFG_LINEEND);
+        return -1;
+    }
+    return 0;
+}
+
+static int __vsf_elfloader_load_by_program_header(vsf_elfloader_t *elfloader,
+        vsf_loader_target_t *target, vsf_elfloader_info_t *linfo)
+{
+    return -1;
+}
+
 void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target)
 {
     VSF_SERVICE_ASSERT((elfloader != NULL) && (target != NULL));
@@ -597,27 +631,14 @@ void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *targe
     }
 
     vsf_elfloader_info_t linfo = { 0 };
-second_round_for_ram_base:
-    if (vsf_elfloader_foreach_section(elfloader, target, &linfo, __vsf_elfloader_load_cb) < 0) {
-        vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to load elf" VSF_TRACE_CFG_LINEEND);
-        goto cleanup_and_fail;
-    }
-
-    if (target->is_epi && (NULL == elfloader->ram_base)) {
-        vsf_elfloader_trace(VSF_TRACE_DEBUG, "loading ram" VSF_TRACE_CFG_LINEEND);
-        elfloader->ram_base = vsf_loader_malloc(elfloader, VSF_LOADER_MEM_RW, linfo.ram_sz, 0);
-        if (NULL == elfloader->ram_base) {
-            vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to allocate ram_base" VSF_TRACE_CFG_LINEEND);
+    if (0 == elf_hdr.e_phnum) {
+        if (__vsf_elfloader_load_by_sections(elfloader, target, &linfo) != 0) {
             goto cleanup_and_fail;
         }
-        memset(elfloader->ram_base, 0, linfo.ram_sz);
-        linfo.ram_sz = 0;
-        goto second_round_for_ram_base;
-    }
-
-    if (vsf_elfloader_foreach_section(elfloader, target, &linfo, __vsf_elfloader_link_cb) < 0) {
-        vsf_elfloader_trace(VSF_TRACE_ERROR, "link elf failed" VSF_TRACE_CFG_LINEEND);
-        goto cleanup_and_fail;
+    } else {
+        if (__vsf_elfloader_load_by_program_header(elfloader, target, &linfo) != 0) {
+            goto cleanup_and_fail;
+        }
     }
 
     entry_sinfo = __vsf_elfloader_get_section_by_addr(&linfo, elf_hdr.e_entry);
