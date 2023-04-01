@@ -3162,6 +3162,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
 #       include "./include/libusb/libusb.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
+#       include "./include/ifaddrs.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
+#       include "./include/getopt.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
+#       include "./include/libgen.h"
+#   endif
 #else
 #   if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
 #       include <pthread.h>
@@ -3177,6 +3186,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
 #       include <libusb/libusb.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
+#       include <ifaddrs.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
+#       include <getopt.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
+#       include <libgen.h>
 #   endif
 #endif
 
@@ -3208,7 +3226,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_SELECT == ENABLED
     .sys_select     = (void *)&vsf_linux_sys_select_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED
+#   if VSF_LINUX_APPLET_USE_SYS_SHM == ENABLED
     .sys_shm        = (void *)&vsf_linux_sys_shm_vplt,
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED
@@ -3236,13 +3254,13 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED
     .semaphore      = (void *)&vsf_linux_semaphore_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_DIRENT == EANBLED
+#   if VSF_LINUX_APPLET_USE_DIRENT == ENABLED
     .dirent         = (void *)&vsf_linux_dirent_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_FCNTL == EANBLED
+#   if VSF_LINUX_APPLET_USE_FCNTL == ENABLED
     .fcntl          = (void *)&vsf_linux_fcntl_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_IFADDRS == EANBLED
+#   if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
     .ifaddrs        = (void *)&vsf_linux_ifaddrs_vplt,
 #   endif
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED
@@ -3252,10 +3270,10 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_USE_LIBUSB == ENABLED && VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
     .libusb         = (void *)&vsf_linux_libusb_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_LIBGETOPT == EANBLED
+#   if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
     .libgetopt      = (void *)&vsf_linux_libgetopt_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_LIBGEN == EANBLED
+#   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
     .libgen         = (void *)&vsf_linux_libgen_vplt,
 #   endif
 };

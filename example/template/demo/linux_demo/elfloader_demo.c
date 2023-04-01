@@ -31,7 +31,7 @@ int elfloader_main(int argc, char **argv)
             .target     = &elfloader,
             .fn_init    = (int (*)(void *))vsf_elfloader_call_init_array,
             .fn_fini    = (void (*)(void *))vsf_elfloader_call_fini_array,
-            .vplt       = &vsf_linux_vplt,
+            .vplt       = (void *)&vsf_linux_vplt,
         });
         vsf_elfloader_cleanup(&elfloader);
         return result;

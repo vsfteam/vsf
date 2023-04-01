@@ -224,6 +224,7 @@
 #       define VSF_LINUX_SOCKET_USE_UNIX                ENABLED
 #   define VSF_LINUX_USE_DEVFS                          ENABLED
 #       define VSF_LINUX_DEVFS_USE_RAND                 ENABLED
+#   define VSF_LINUX_USE_APPLET                         ENABLED
 
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
 #       define VSF_LINUX_LIBC_CFG_CPP                   ENABLED
@@ -245,6 +246,10 @@
 
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 #   define USRAPP_FAKEFAT32_CFG_FONT                    ENABLED
+
+#define APP_USE_LINUX_ELFLOADER_DEMO                    ENABLED
+#define VSF_USE_LOADER                                  ENABLED
+#   define VSF_LOADER_USE_ELF                           ENABLED
 
 // VSF_HAL_USE_DEBUG_STREAM for hardware debug uart
 // VSF_DEBUGGER_CFG_CONSOLE for debug console from debugger

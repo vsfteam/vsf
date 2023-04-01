@@ -7180,6 +7180,9 @@
             <group>
                 <name>linux_demo</name>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\linux_demo\elfloader_demo.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\linux_demo\httpd_demo.c</name>
                 </file>
                 <file>
@@ -15304,6 +15307,27 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\service\json\vsf_json.h</name>
+                </file>
+            </group>
+            <group>
+                <name>loader</name>
+                <group>
+                    <name>elf</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\loader\elf\elf.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\loader\elf\vsf_elfloader.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\loader\elf\vsf_elfloader.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\service\loader\vsf_loader.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\service\loader\vsf_loader.h</name>
                 </file>
             </group>
             <group>
