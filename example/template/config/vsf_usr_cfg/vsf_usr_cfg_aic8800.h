@@ -250,6 +250,9 @@
 #define APP_USE_LINUX_ELFLOADER_DEMO                    ENABLED
 #define VSF_USE_LOADER                                  ENABLED
 #   define VSF_LOADER_USE_ELF                           ENABLED
+#       define VSF_ELFLOADER_CFG_DEBUG                  ENABLED
+// CortexM uses thread_reg to support xip dynamic load
+#   define VSF_ARCH_USE_THREAD_REG                      ENABLED
 
 // VSF_HAL_USE_DEBUG_STREAM for hardware debug uart
 // VSF_DEBUGGER_CFG_CONSOLE for debug console from debugger

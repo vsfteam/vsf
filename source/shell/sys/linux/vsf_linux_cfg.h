@@ -169,21 +169,6 @@
 #   endif
 #endif
 
-#if VSF_LINUX_APPLET_USE_LIBC == ENABLED
-#   ifndef VSF_LINUX_APPLET_USE_LIBC_STDIO
-#       define VSF_LINUX_APPLET_USE_LIBC_STDIO  ENABLED
-#   endif
-#   ifndef VSF_LINUX_APPLET_USE_LIBC_STDLIB
-#       define VSF_LINUX_APPLET_USE_LIBC_STDLIB ENABLED
-#   endif
-#   ifndef VSF_LINUX_APPLET_USE_LIBC_STRING
-#       define VSF_LINUX_APPLET_USE_LIBC_STRING ENABLED
-#   endif
-#   ifndef VSF_LINUX_APPLET_USE_LIBC_TIME
-#       define VSF_LINUX_APPLET_USE_LIBC_TIME   ENABLED
-#   endif
-#endif
-
 #if VSF_LINUX_USE_APPLET == ENABLED
 #   ifndef VSF_LINUX_APPLET_USE_SYS_EPOLL
 #       define VSF_LINUX_APPLET_USE_SYS_EPOLL   ENABLED
@@ -249,6 +234,24 @@
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_SHM
 #       define VSF_LINUX_APPLET_USE_SYS_SHM     ENABLED
+#   endif
+
+#   ifndef VSF_LINUX_APPLET_USE_LIBC
+#       define VSF_LINUX_APPLET_USE_LIBC        ENABLED
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC == ENABLED
+#       ifndef VSF_LINUX_APPLET_USE_LIBC_STDIO
+#           define VSF_LINUX_APPLET_USE_LIBC_STDIO  ENABLED
+#       endif
+#       ifndef VSF_LINUX_APPLET_USE_LIBC_STDLIB
+#           define VSF_LINUX_APPLET_USE_LIBC_STDLIB ENABLED
+#       endif
+#       ifndef VSF_LINUX_APPLET_USE_LIBC_STRING
+#           define VSF_LINUX_APPLET_USE_LIBC_STRING ENABLED
+#       endif
+#       ifndef VSF_LINUX_APPLET_USE_LIBC_TIME
+#           define VSF_LINUX_APPLET_USE_LIBC_TIME   ENABLED
+#       endif
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_VPLT

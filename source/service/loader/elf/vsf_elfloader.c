@@ -566,8 +566,9 @@ int vsf_elfloader_call_init_array(vsf_elfloader_t *elfloader)
 
         vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->initarr);
         elfloader->initarr = NULL;
+        return -1;
     }
-    return -1;
+    return 0;
 }
 
 void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader)
@@ -632,11 +633,11 @@ void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *targe
 
     vsf_elfloader_info_t linfo = { 0 };
     if (0 == elf_hdr.e_phnum) {
-        if (__vsf_elfloader_load_by_sections(elfloader, target, &linfo) != 0) {
+        if (__vsf_elfloader_load_by_program_header(elfloader, target, &linfo) != 0) {
             goto cleanup_and_fail;
         }
     } else {
-        if (__vsf_elfloader_load_by_program_header(elfloader, target, &linfo) != 0) {
+        if (__vsf_elfloader_load_by_sections(elfloader, target, &linfo) != 0) {
             goto cleanup_and_fail;
         }
     }

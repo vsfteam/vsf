@@ -15976,6 +15976,12 @@
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\language_extension\simple_sprintf.c</name>
                 </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\language_extension\simple_sscanf.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\language_extension\simple_swprintf.c</name>
+                </file>
             </group>
             <group>
                 <name>preprocessor</name>
