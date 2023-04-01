@@ -180,7 +180,7 @@ static inline const char * sigdescr_np(int sig) {
     return VSF_LINUX_APPLET_LIBC_STRING_VPLT->sigdescr_np(sig);
 }
 static inline const char * sigabbrev_np(int sig) {
-    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->sigabbrev_np(str, n);
+    return VSF_LINUX_APPLET_LIBC_STRING_VPLT->sigabbrev_np(sig);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STRING
