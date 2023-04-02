@@ -86,7 +86,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libgetopt_vplt_t vsf_linux_libgetopt_vpl
 #ifndef VSF_LINUX_APPLET_LIBGETOPT_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_LIBGETOPT_VPLT                                  \
-            ((vsf_linux_libgetopt_vplt_t *)(VSF_LINUX_APPLET_VPLT->libgetopt))
+            ((vsf_linux_libgetopt_vplt_t *)(VSF_LINUX_APPLET_VPLT->libgetopt_vplt))
 #   else
 #       define VSF_LINUX_APPLET_LIBGETOPT_VPLT                                  \
             ((vsf_linux_libgetopt_vplt_t *)vsf_vplt((void *)0))

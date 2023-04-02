@@ -57,7 +57,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_mmap_vplt_t vsf_linux_sys_mmap_vplt;
 #ifndef VSF_LINUX_APPLET_SYS_MMAP_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SYS_MMAP_VPLT                                   \
-            ((vsf_linux_sys_mmap_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_mmap))
+            ((vsf_linux_sys_mmap_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_mmap_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SYS_MMAP_VPLT                                   \
             ((vsf_linux_sys_mmap_vplt_t *)vsf_vplt((void *)0))

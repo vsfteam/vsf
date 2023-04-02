@@ -53,7 +53,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_ipc_vplt_t vsf_linux_sys_ipc_vplt;
 #ifndef VSF_LINUX_APPLET_SYS_IPC_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SYS_IPC_VPLT                                    \
-            ((vsf_linux_sys_ipc_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_ipc))
+            ((vsf_linux_sys_ipc_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_ipc_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SYS_IPC_VPLT                                    \
             ((vsf_linux_sys_ipc_vplt_t *)vsf_vplt((void *)0))

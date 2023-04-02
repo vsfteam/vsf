@@ -42,7 +42,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_mount_vplt_t vsf_linux_sys_mount_vpl
 #ifndef VSF_LINUX_APPLET_SYS_MOUNT_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SYS_MOUNT_VPLT                                  \
-            ((vsf_linux_sys_mount_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_mount))
+            ((vsf_linux_sys_mount_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_mount_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SYS_MOUNT_VPLT                                  \
             ((vsf_linux_sys_mount_vplt_t *)vsf_vplt((void *)0))

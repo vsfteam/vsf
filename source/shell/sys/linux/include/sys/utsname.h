@@ -48,7 +48,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_utsname_vplt_t vsf_linux_sys_utsname
 #ifndef VSF_LINUX_APPLET_SYS_UTSNAME_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SYS_UTSNAME_VPLT                                \
-            ((vsf_linux_sys_utsname_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_utsname))
+            ((vsf_linux_sys_utsname_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_utsname_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SYS_UTSNAME_VPLT                                \
             ((vsf_linux_sys_utsname_vplt_t *)vsf_vplt((void *)0))

@@ -56,7 +56,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt;
 #ifndef VSF_LINUX_APPLET_SYS_SHM_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SYS_SHM_VPLT                                    \
-            ((vsf_linux_sys_shm_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_shm))
+            ((vsf_linux_sys_shm_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_shm_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SYS_SHM_VPLT                                    \
             ((vsf_linux_sys_shm_vplt_t *)vsf_vplt((void *)0))

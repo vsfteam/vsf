@@ -197,7 +197,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt;
 #ifndef VSF_LINUX_APPLET_SIGNAL_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SIGNAL_VPLT                                     \
-            ((vsf_linux_signal_vplt_t *)(VSF_LINUX_APPLET_VPLT->signal))
+            ((vsf_linux_signal_vplt_t *)(VSF_LINUX_APPLET_VPLT->signal_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SIGNAL_VPLT                                     \
             ((vsf_linux_signal_vplt_t *)vsf_vplt((void *)0))

@@ -74,7 +74,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt;
 #ifndef VSF_LINUX_APPLET_DIRENT_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_DIRENT_VPLT                                     \
-            ((vsf_linux_dirent_vplt_t *)(VSF_LINUX_APPLET_VPLT->dirent))
+            ((vsf_linux_dirent_vplt_t *)(VSF_LINUX_APPLET_VPLT->dirent_vplt))
 #   else
 #       define VSF_LINUX_APPLET_DIRENT_VPLT                                     \
             ((vsf_linux_dirent_vplt_t *)vsf_vplt((void *)0))

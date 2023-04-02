@@ -66,7 +66,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt;
 #ifndef VSF_LINUX_APPLET_IFADDRS_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_IFADDRS_VPLT                                    \
-            ((vsf_linux_ifaddrs_vplt_t *)(VSF_LINUX_APPLET_VPLT->ifaddrs))
+            ((vsf_linux_ifaddrs_vplt_t *)(VSF_LINUX_APPLET_VPLT->ifaddrs_vplt))
 #   else
 #       define VSF_LINUX_APPLET_IFADDRS_VPLT                                    \
             ((vsf_linux_ifaddrs_vplt_t *)vsf_vplt((void *)0))

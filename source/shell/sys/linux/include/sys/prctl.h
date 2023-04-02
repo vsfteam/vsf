@@ -28,7 +28,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_prctl_vplt_t vsf_linux_sys_prctl_vpl
 #ifndef VSF_LINUX_APPLET_SYS_PRCTL_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SYS_PRCTL_VPLT                                  \
-            ((vsf_linux_sys_prctl_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_prctl))
+            ((vsf_linux_sys_prctl_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_prctl_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SYS_PRCTL_VPLT                                  \
             ((vsf_linux_sys_prctl_vplt_t *)vsf_vplt((void *)0))

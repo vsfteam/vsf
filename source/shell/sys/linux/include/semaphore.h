@@ -52,7 +52,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_semaphore_vplt_t vsf_linux_semaphore_vpl
 #ifndef VSF_LINUX_APPLET_SEMAPHORE_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SEMAPHORE_VPLT                                  \
-            ((vsf_linux_semaphore_vplt_t *)(VSF_LINUX_APPLET_VPLT->semaphore))
+            ((vsf_linux_semaphore_vplt_t *)(VSF_LINUX_APPLET_VPLT->semaphore_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SEMAPHORE_VPLT                                  \
             ((vsf_linux_semaphore_vplt_t *)vsf_vplt((void *)0))

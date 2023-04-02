@@ -145,7 +145,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib
 #ifndef VSF_LINUX_APPLET_LIBC_STDLIB_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_LIBC_STDLIB_VPLT                                \
-            ((vsf_linux_libc_stdlib_vplt_t *)(VSF_LINUX_APPLET_VPLT->libc_stdlib))
+            ((vsf_linux_libc_stdlib_vplt_t *)(VSF_LINUX_APPLET_VPLT->libc_stdlib_vplt))
 #   else
 #       define VSF_LINUX_APPLET_LIBC_STDLIB_VPLT                                \
             ((vsf_linux_libc_stdlib_vplt_t *)vsf_vplt((void *)0))

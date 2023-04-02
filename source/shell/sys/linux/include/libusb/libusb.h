@@ -553,7 +553,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libusb_vplt_t vsf_linux_libusb_vplt;
 #ifndef VSF_LINUX_APPLET_LIBUSB_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_LIBUSB_VPLT                                     \
-            ((vsf_linux_libusb_vplt_t *)(VSF_LINUX_APPLET_VPLT->libusb))
+            ((vsf_linux_libusb_vplt_t *)(VSF_LINUX_APPLET_VPLT->libusb_vplt))
 #   else
 #       define VSF_LINUX_APPLET_LIBUSB_VPLT                                     \
             ((vsf_linux_libusb_vplt_t *)vsf_vplt((void *)0))

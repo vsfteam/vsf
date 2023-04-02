@@ -335,7 +335,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt;
 #ifndef VSF_LINUX_APPLET_PTHREAD_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_PTHREAD_VPLT                                    \
-            ((vsf_linux_pthread_vplt_t *)(VSF_LINUX_APPLET_VPLT->pthread))
+            ((vsf_linux_pthread_vplt_t *)(VSF_LINUX_APPLET_VPLT->pthread_vplt))
 #   else
 #       define VSF_LINUX_APPLET_PTHREAD_VPLT                                    \
             ((vsf_linux_pthread_vplt_t *)vsf_vplt((void *)0))

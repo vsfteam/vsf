@@ -106,7 +106,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vpl
 #ifndef VSF_LINUX_APPLET_LIBC_TIME_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_LIBC_TIME_VPLT                                  \
-            ((vsf_linux_libc_time_vplt_t *)(VSF_LINUX_APPLET_VPLT->libc_time))
+            ((vsf_linux_libc_time_vplt_t *)(VSF_LINUX_APPLET_VPLT->libc_time_vplt))
 #   else
 #       define VSF_LINUX_APPLET_LIBC_TIME_VPLT                                  \
             ((vsf_linux_libc_time_vplt_t *)vsf_vplt((void *)0))

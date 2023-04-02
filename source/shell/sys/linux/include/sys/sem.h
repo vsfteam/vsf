@@ -58,7 +58,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_sem_vplt_t vsf_linux_sys_sem_vplt;
 #ifndef VSF_LINUX_APPLET_SYS_SEM_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SYS_SEM_VPLT                                    \
-            ((vsf_linux_sys_sem_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_sem))
+            ((vsf_linux_sys_sem_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_sem_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SYS_SEM_VPLT                                    \
             ((vsf_linux_sys_sem_vplt_t *)vsf_vplt((void *)0))

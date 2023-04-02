@@ -48,7 +48,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sched_vplt_t vsf_linux_sched_vplt;
 #ifndef VSF_LINUX_APPLET_SCHED_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SCHED_VPLT                                      \
-            ((vsf_linux_sched_vplt_t *)(VSF_LINUX_APPLET_VPLT->sched))
+            ((vsf_linux_sched_vplt_t *)(VSF_LINUX_APPLET_VPLT->sched_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SCHED_VPLT                                      \
             ((vsf_linux_sched_vplt_t *)vsf_vplt((void *)0))

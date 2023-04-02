@@ -59,7 +59,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_wait_vplt_t vsf_linux_sys_wait_vplt;
 #ifndef VSF_LINUX_APPLET_SYS_WAIT_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_SYS_WAIT_VPLT                                   \
-            ((vsf_linux_sys_wait_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_wait))
+            ((vsf_linux_sys_wait_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_wait_vplt))
 #   else
 #       define VSF_LINUX_APPLET_SYS_WAIT_VPLT                                   \
             ((vsf_linux_sys_wait_vplt_t *)vsf_vplt((void *)0))

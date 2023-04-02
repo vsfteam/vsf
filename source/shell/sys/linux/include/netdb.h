@@ -120,7 +120,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
 #ifndef VSF_LINUX_APPLET_NETDB_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_NETDB_VPLT                                      \
-            ((vsf_linux_netdb_vplt_t *)(VSF_LINUX_APPLET_VPLT->netdb))
+            ((vsf_linux_netdb_vplt_t *)(VSF_LINUX_APPLET_VPLT->netdb_vplt))
 #   else
 #       define VSF_LINUX_APPLET_NETDB_VPLT                                      \
             ((vsf_linux_netdb_vplt_t *)vsf_vplt((void *)0))

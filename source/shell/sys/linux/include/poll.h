@@ -69,7 +69,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_poll_vplt_t vsf_linux_poll_vplt;
 #ifndef VSF_LINUX_APPLET_POLL_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_POLL_VPLT                                       \
-            ((vsf_linux_poll_vplt_t *)(VSF_LINUX_APPLET_VPLT->poll))
+            ((vsf_linux_poll_vplt_t *)(VSF_LINUX_APPLET_VPLT->poll_vplt))
 #   else
 #       define VSF_LINUX_APPLET_POLL_VPLT                                       \
             ((vsf_linux_poll_vplt_t *)vsf_vplt((void *)0))

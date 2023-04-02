@@ -76,7 +76,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string
 #ifndef VSF_LINUX_APPLET_LIBC_STRING_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_LIBC_STRING_VPLT                                \
-            ((vsf_linux_libc_string_vplt_t *)(VSF_LINUX_APPLET_VPLT->libc_string))
+            ((vsf_linux_libc_string_vplt_t *)(VSF_LINUX_APPLET_VPLT->libc_string_vplt))
 #   else
 #       define VSF_LINUX_APPLET_LIBC_STRING_VPLT                                \
             ((vsf_linux_libc_string_vplt_t *)vsf_vplt((void *)0))
