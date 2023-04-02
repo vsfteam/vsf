@@ -27,6 +27,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <setjmp.h>
+#include <sys/mman.h>
 
 /*============================ MACROS ========================================*/
 
