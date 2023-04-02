@@ -501,7 +501,7 @@ static inline int pthread_getschedparam(pthread_t thread, int *policy, struct sc
     return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_getschedparam(thread, policy, param);
 }
 static inline void pthread_cleanup_push(void (*routine)(void *), void *arg) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cleanup_push(rountine, arg);
+    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cleanup_push(routine, arg);
 }
 static inline void pthread_cleanup_pop(int execute) {
     return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cleanup_pop(execute);

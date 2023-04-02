@@ -484,13 +484,13 @@ static inline int ftruncate(int fd, off_t length) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->ftruncate(fd, length);
 }
 static inline int truncate(const char *pathname, off_t length) {
-    return VSF_LINUX_APPLET_UNISTD_VPLT->truncate(fd, length);
+    return VSF_LINUX_APPLET_UNISTD_VPLT->truncate(pathname, length);
 }
 static inline int ftruncate64(int fd, off64_t length) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->ftruncate64(fd, length);
 }
 static inline int truncate64(const char *pathname, off64_t length) {
-    return VSF_LINUX_APPLET_UNISTD_VPLT->truncate64(fd, length);
+    return VSF_LINUX_APPLET_UNISTD_VPLT->truncate64(pathname, length);
 }
 static inline ssize_t readlink(const char *pathname, char *buf, size_t bufsiz) {
     return VSF_LINUX_APPLET_UNISTD_VPLT->readlink(pathname, buf, bufsiz);

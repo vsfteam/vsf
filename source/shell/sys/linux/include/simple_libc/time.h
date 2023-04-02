@@ -124,7 +124,7 @@ static inline int clock_getres(clockid_t clk_id, struct timespec *res) {
 }
 static inline int clock_nanosleep(clockid_t clockid, int flags,
         const struct timespec *request, struct timespec *remain) {
-    return VSF_LINUX_APPLET_LIBC_TIME_VPLT->clock_nanosleep(clk_id, res);
+    return VSF_LINUX_APPLET_LIBC_TIME_VPLT->clock_nanosleep(clockid, flags, request, remain);
 }
 static inline time_t time(time_t *t) {
     return VSF_LINUX_APPLET_LIBC_TIME_VPLT->time(t);
