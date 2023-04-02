@@ -37,6 +37,7 @@
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    DISABLED
 #   define APP_USE_LINUX_MOUNT_DEMO                     ENABLED
+#   define APP_USE_LINUX_ELFLOADER_DEMO                 ENABLED
 #define APP_USE_USBH_DEMO                               ENABLED
 #   define APP_USE_DFU_HOST_DEMO                        DISABLED
 #define APP_USE_USBD_DEMO                               DISABLED
