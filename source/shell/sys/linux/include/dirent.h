@@ -96,7 +96,7 @@ static inline struct dirent64 * readdir64(DIR *dir) {
 static inline int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result) {
     return VSF_LINUX_APPLET_DIRENT_VPLT->readdir_r(dirp, entry, result);
 }
-static inline int (*readdir64_r)(DIR *dirp, struct dirent64 *entry, struct dirent64 **result) {
+static inline int readdir64_r(DIR *dirp, struct dirent64 *entry, struct dirent64 **result) {
     return VSF_LINUX_APPLET_DIRENT_VPLT->readdir64_r(dirp, entry, result);
 }
 static inline void rewinddir(DIR *dir) {
