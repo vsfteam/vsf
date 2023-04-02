@@ -16,6 +16,7 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
+
 #include "service/vsf_service_cfg.h"
 
 #if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
@@ -76,12 +77,6 @@ typedef struct vsf_elfloader_info_t {
 WEAK(vsf_elfloader_relocate_sym)
 vsf_err_t vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
 {
-    switch (type) {
-    case R_ARM_JUMP_SLOT:
-    case R_ARM_RELATIVE:
-        *(uint32_t *)tgtaddr = tgtvalue;
-        return VSF_ERR_NONE;
-    }
     return VSF_ERR_FAIL;
 }
 

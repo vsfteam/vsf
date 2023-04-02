@@ -15313,6 +15313,12 @@
                 <name>loader</name>
                 <group>
                     <name>elf</name>
+                    <group>
+                        <name>arch</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\service\loader\elf\arch\vsf_elfloader_arm.c</name>
+                        </file>
+                    </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\service\loader\elf\elf.h</name>
                     </file>
