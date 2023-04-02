@@ -7,5 +7,4 @@ set(VSF_HOST_SYSTEM64       1)
 set(VSF_TARGET_DEFINITIONS
     "__WIN__"
     "__CPU_X64__"
-    "__VSF64__"
 )

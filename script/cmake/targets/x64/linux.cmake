@@ -8,5 +8,4 @@ set(VSF_HOST_HAS_LIBUSB     1)
 set(VSF_TARGET_DEFINITIONS
     "__LINUX__"
     "__CPU_X64__"
-    "__VSF64__"
 )
