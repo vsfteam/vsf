@@ -64,7 +64,6 @@ typedef struct vsf_elfloader_info_t {
         Elf_Addr jmprel;
     } dynamic;
 
-    uintptr_t entry_offset_in_mem;
     uintptr_t entry_offset_in_file;
     bool load_zero_addr;
 } vsf_elfloader_info_t;
@@ -210,7 +209,6 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
 
         if (    (linfo->elf_hdr.e_entry >= header->p_vaddr)
             &&  (linfo->elf_hdr.e_entry < (header->p_vaddr + header->p_memsz))) {
-            linfo->entry_offset_in_mem = header->p_vaddr + linfo->elf_hdr.e_entry;
             linfo->entry_offset_in_file = header->p_offset + linfo->elf_hdr.e_entry;
         }
         if (0 == header->p_vaddr) {
@@ -350,7 +348,7 @@ second_round_for_ram_base:
     if (target->is_xip) {
         return (void *)(target->object + linfo.entry_offset_in_file);
     } else {
-        return (void *)((uintptr_t)elfloader->ram_base + linfo.entry_offset_in_mem);
+        return (void *)((uintptr_t)elfloader->ram_base + linfo.elf_hdr.e_entry);
     }
 
 cleanup_and_fail:
