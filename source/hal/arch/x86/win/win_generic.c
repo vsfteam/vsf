@@ -1258,6 +1258,20 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
 #endif
 
 /*----------------------------------------------------------------------------*
+ * Execute                                                                    *
+ *----------------------------------------------------------------------------*/
+
+void * vsf_arch_alloc_exe(uint_fast32_t size)
+{
+    return VirtualAlloc(NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+}
+
+void vsf_arch_free_exe(void *ptr)
+{
+    VirtualFree(ptr, 0, MEM_RELEASE);
+}
+
+/*----------------------------------------------------------------------------*
  * Argument                                                                   *
  *----------------------------------------------------------------------------*/
 

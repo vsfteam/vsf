@@ -69,6 +69,8 @@ extern "C" {
 #ifndef VSF_ARCH_PROVIDE_HEAP
 #   define VSF_ARCH_PROVIDE_HEAP        ENABLED
 #endif
+#define VSF_ARCH_PROVIDE_ARGU           ENABLED
+#define VSF_ARCH_PROVIDE_EXE            ENABLED
 // define VSF_ARCH_LIMIT_NO_SET_STACK to remove dependency of setjmp/longjmp
 //  and use stack of thread in windows for the best compatibility
 //  note that VSF_ARCH_PRI_NUM MUST defined to 1 and VSF_ARCH_SWI_NUM to 0
@@ -220,6 +222,8 @@ extern int __vsf_arch_trace(int level, const char *format, ...);
 
 extern void __vsf_arch_irq_sleep(uint_fast32_t ms);
 extern int vsf_arch_argu(char ***argv);
+extern void * vsf_arch_alloc_exe(uint_fast32_t size);
+extern void vsf_arch_free_exe(void *ptr);
 
 extern void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);
