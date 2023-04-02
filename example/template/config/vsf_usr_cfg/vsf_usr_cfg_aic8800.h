@@ -227,7 +227,6 @@
 #       define VSF_LINUX_SOCKET_USE_UNIX                ENABLED
 #   define VSF_LINUX_USE_DEVFS                          ENABLED
 #       define VSF_LINUX_DEVFS_USE_RAND                 ENABLED
-#   define VSF_LINUX_USE_APPLET                         ENABLED
 
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
 #       define VSF_LINUX_LIBC_CFG_CPP                   ENABLED
