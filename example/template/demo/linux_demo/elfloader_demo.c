@@ -60,7 +60,7 @@ int elfloader_main(int argc, char **argv)
     }
 #endif
 
-    return -1;
+    return result;
 }
 
 #endif
