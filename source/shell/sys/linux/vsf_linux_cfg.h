@@ -119,7 +119,7 @@
 #   ifndef VSF_LINUX_SOCKET_USE_INET
 #       if VSF_USE_LWIP == ENABLED
 #           define VSF_LINUX_SOCKET_USE_INET    ENABLED
-#       elif (defined(__WIN__) || defined(__LINUX__) || defined(__linux__) || defined(__MACOS__))
+#       elif (defined(__WIN__) || defined(__LINUX__) || defined(__linux__) || defined(__MACOS__)) && !defined(__VSF_APPLET__)
 #           define VSF_LINUX_SOCKET_USE_INET    ENABLED
 #           define VSF_LINUX_SOCKET_CFG_WRAPPER ENABLED
 #       endif
