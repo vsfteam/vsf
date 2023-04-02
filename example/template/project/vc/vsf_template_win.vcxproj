@@ -560,6 +560,9 @@
     <ClInclude Include="..\..\..\..\source\service\fifo\vsf_fifo.h" />
     <ClInclude Include="..\..\..\..\source\service\heap\vsf_heap.h" />
     <ClInclude Include="..\..\..\..\source\service\json\vsf_json.h" />
+    <ClInclude Include="..\..\..\..\source\service\loader\elf\elf.h" />
+    <ClInclude Include="..\..\..\..\source\service\loader\elf\vsf_elfloader.h" />
+    <ClInclude Include="..\..\..\..\source\service\loader\vsf_loader.h" />
     <ClInclude Include="..\..\..\..\source\service\pbuf\vsf_pbuf.h" />
     <ClInclude Include="..\..\..\..\source\service\pbuf\vsf_pbuf_pool.h" />
     <ClInclude Include="..\..\..\..\source\service\pool\vsf_pool.h" />
@@ -1422,6 +1425,10 @@
     <ClCompile Include="..\..\..\..\source\service\fifo\vsf_fifo.c" />
     <ClCompile Include="..\..\..\..\source\service\heap\vsf_heap.c" />
     <ClCompile Include="..\..\..\..\source\service\json\vsf_json.c" />
+    <ClCompile Include="..\..\..\..\source\service\loader\elf\arch\vsf_elfloader_arm.c" />
+    <ClCompile Include="..\..\..\..\source\service\loader\elf\arch\vsf_elfloader_x64.c" />
+    <ClCompile Include="..\..\..\..\source\service\loader\elf\vsf_elfloader.c" />
+    <ClCompile Include="..\..\..\..\source\service\loader\vsf_loader.c" />
     <ClCompile Include="..\..\..\..\source\service\pbuf\vsf_pbuf.c" />
     <ClCompile Include="..\..\..\..\source\service\pbuf\vsf_pbuf_pool.c" />
     <ClCompile Include="..\..\..\..\source\service\pool\vsf_pool.c" />
@@ -1527,6 +1534,7 @@
     <ClCompile Include="..\..\demo\kernel_test\eda_test.c" />
     <ClCompile Include="..\..\demo\kernel_test\fsm_test.c" />
     <ClCompile Include="..\..\demo\kernel_test\sem_test.c" />
+    <ClCompile Include="..\..\demo\linux_demo\elfloader_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\httpd_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\libusb_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\linux_demo.c" />

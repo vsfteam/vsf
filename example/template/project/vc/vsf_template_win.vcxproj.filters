@@ -1150,6 +1150,15 @@
     <Filter Include="vsf\hal\driver\x86\win\rng">
       <UniqueIdentifier>{19fbc2cb-69d7-4255-bad1-888d1ca4ad5e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\loader">
+      <UniqueIdentifier>{21bbbf02-adb7-4103-9f44-b05bad907d26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\loader\elf">
+      <UniqueIdentifier>{a1ebf83a-76bd-4e7c-8a56-c98c7438774c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\loader\elf\arch">
+      <UniqueIdentifier>{5a88f52c-7dc2-4d84-8515-3e10ad026cc2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3317,6 +3326,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.h">
       <Filter>vsf\hal\driver\x86\win\rng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\service\loader\vsf_loader.h">
+      <Filter>vsf\service\loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\service\loader\elf\elf.h">
+      <Filter>vsf\service\loader\elf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\service\loader\elf\vsf_elfloader.h">
+      <Filter>vsf\service\loader\elf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5764,6 +5782,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.c">
       <Filter>vsf\hal\driver\x86\win\rng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\service\loader\vsf_loader.c">
+      <Filter>vsf\service\loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\service\loader\elf\vsf_elfloader.c">
+      <Filter>vsf\service\loader\elf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\service\loader\elf\arch\vsf_elfloader_arm.c">
+      <Filter>vsf\service\loader\elf\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\service\loader\elf\arch\vsf_elfloader_x64.c">
+      <Filter>vsf\service\loader\elf\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\linux_demo\elfloader_demo.c">
+      <Filter>usrapp\demo\linux_demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

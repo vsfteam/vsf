@@ -41,7 +41,7 @@ int elfloader_main(int argc, char **argv)
 #endif
     };
 
-    int result;
+    int result = -1;
     void *entry = vsf_elfloader_load(&elfloader, &elftarget);
     if (entry != NULL) {
         vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
