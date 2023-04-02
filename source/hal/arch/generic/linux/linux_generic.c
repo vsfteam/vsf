@@ -539,6 +539,24 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
 }
 #endif
 
+/*----------------------------------------------------------------------------*
+ * Execute                                                                    *
+ *----------------------------------------------------------------------------*/
+
+void * vsf_arch_alloc_exe(uint_fast32_t size)
+{
+    return mmap(0, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+}
+
+void vsf_arch_free_exe(void *ptr)
+{
+    munmap(ptr, 0);
+}
+
+/*----------------------------------------------------------------------------*
+ * Argument                                                                   *
+ *----------------------------------------------------------------------------*/
+
 int vsf_arch_argu(char ***argv)
 {
     static char *__vsf_arch_argv_str, **__vsf_arch_argv;

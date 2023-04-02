@@ -69,6 +69,8 @@ extern "C" {
 #ifndef VSF_ARCH_PROVIDE_HEAP
 #   define VSF_ARCH_PROVIDE_HEAP        ENABLED
 #endif
+#define VSF_ARCH_PROVIDE_ARGU           ENABLED
+#define VSF_ARCH_PROVIDE_EXE            ENABLED
 
 //! vsf_systimer_get implementation has 1us resolution, which is 1MHz
 #define VSF_ARCH_SYSTIMER_FREQ          (1 * 1000 * 1000)
@@ -127,6 +129,8 @@ vsf_class(vsf_arch_irq_thread_t) {
 
 extern void __vsf_arch_irq_sleep(uint32_t ms);
 extern int vsf_arch_argu(char ***argv);
+extern void * vsf_arch_alloc_exe(uint_fast32_t size);
+extern void vsf_arch_free_exe(void *ptr);
 
 extern void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);
