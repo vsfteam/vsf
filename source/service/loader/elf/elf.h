@@ -176,6 +176,9 @@ typedef struct Elf32_Phdr {
     Elf32_Addr          p_paddr;
     Elf32_Word          p_filesz;
     Elf32_Word          p_memsz;
+#define PF_R            0x4
+#define PF_W            0x2
+#define PF_X            0x1
     Elf32_Word          p_flags;
     Elf32_Word          p_align;
 } Elf32_Phdr;

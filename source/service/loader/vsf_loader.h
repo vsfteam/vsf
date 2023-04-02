@@ -79,6 +79,7 @@ typedef enum vsf_loader_mem_attr_t {
     VSF_LOADER_MEM_W    = 1 << 1,
     VSF_LOADER_MEM_X    = 1 << 2,
     VSF_LOADER_MEM_RW   = VSF_LOADER_MEM_R | VSF_LOADER_MEM_W,
+    VSF_LOADER_MEM_RWX  = VSF_LOADER_MEM_X | VSF_LOADER_MEM_RW,
 } vsf_loader_mem_attr_t;
 
 /**
@@ -137,16 +138,6 @@ struct vsf_loader_target_t {
      \~chinese 是否支持xip。对于XIP的话，target是镜像地址。
     */
     bool is_xip;
-
-    /**
-     \~english whether to use embedded position independency.
-     @note Usually, epi is ABI for ropi/rwpi options, supported by clang and IAR.
-            While -fPIC option will generate GOT-base position independent code.
-
-     \~chinese 是否支持epi。
-     @note 同样epi是clang和IAR的ropi/rwpi选项对应的ABI规范。而-fPIC选项会产生基于GOT的地址无关代码。
-    */
-    bool is_epi;
 
     /**
      \~english function to read target to memory.

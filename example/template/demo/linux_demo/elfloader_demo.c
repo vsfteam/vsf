@@ -22,7 +22,6 @@ int elfloader_main(int argc, char **argv)
         .is_xip     = true,
         .fn_read    = vsf_loader_xip_read,
     };
-    elftarget.is_epi = 0 == vsf_elfloader_get_section(&elfloader, &elftarget, ".got", NULL);
 
     void *entry = vsf_elfloader_load(&elfloader, &elftarget);
     if (entry != NULL) {

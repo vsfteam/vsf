@@ -24,9 +24,8 @@
 #define __VSF_LOADER_CLASS_INHERIT__
 #include "../vsf_loader.h"
 
-#if VSF_ELFLOADER_CFG_DEBUG == ENABLED
-#   include "service/vsf_service.h"
-#endif
+// for vsf_trace
+#include "service/vsf_service.h"
 
 /*============================ MACROS ========================================*/
 
@@ -34,13 +33,11 @@
 #   define VSF_ELFLOADER_CFG_MAX_SYM_LEN        (32 + 1)
 #endif
 
-#define VSF_ELFLOADER_LOADABLE_SECNUM           7
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_ELFLOADER_CFG_DEBUG == ENABLED
-#   define vsf_elfloader_trace(...)             vsf_trace(__VA_ARGS__)
-#   define vsf_elfloader_trace_buffer(...)      vsf_trace_buffer(__VA_ARGS__)
+#   define vsf_elfloader_trace(...)             vsf_trace_debug(__VA_ARGS__)
+#   define vsf_elfloader_trace_buffer(...)      vsf_trace_buffer(VSF_TRACE_DEBUG, __VA_ARGS__)
 #else
 #   define vsf_elfloader_trace(...)
 #   define vsf_elfloader_trace_buffer(...)
@@ -48,97 +45,19 @@
 
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_elfloader_info_t vsf_elfloader_info_t;
+typedef struct vsf_elfloader_info_t {
+    Elf_Hdr elf_hdr;
+    Elf_Word memsz;
 
-typedef struct vsf_elfloader_section_info_t {
-    int index;
-    Elf_Off offset;
-    Elf_Word size;
-    Elf_Addr addr;
-    void *buffer;
-} vsf_elfloader_section_info_t;
-
-typedef struct vsf_elfloader_section_loader_t {
-    char *name;
-    vsf_err_t (*load)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Shdr *, vsf_elfloader_info_t *);
-} vsf_elfloader_section_loader_t;
-
-struct vsf_elfloader_info_t {
-    Elf_Word ram_sz;
-
-    struct {
-        int loader_index;               // index in __vsf_elfloader_section_loaders
-        void **buffer;                  // buffer to load
-        uint32_t align;                 // alignment of the buffer
-        vsf_loader_mem_attr_t attr;     // attribute of the buffer
-        bool is_to_load_section;
-        bool is_ram;
-    } sinfo;
-    vsf_elfloader_section_info_t sinfos[VSF_ELFLOADER_LOADABLE_SECNUM];
-};
+    uintptr_t entry_offset_in_mem;
+    uintptr_t entry_offset_in_file;
+    bool load_zero_addr;
+} vsf_elfloader_info_t;
 
 /*============================ PROTOTYPES ====================================*/
-
-static vsf_err_t __vsf_elfloader_text_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_bss_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_data_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_rodata_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_noinit_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_symtab_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_strtab_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_dynsym_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_dynstr_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_plt_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_initarr_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_finiarr_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-static vsf_err_t __vsf_elfloader_got_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Shdr *header, vsf_elfloader_info_t *linfo);
-
 /*============================ LOCAL VARIABLES ===============================*/
-
-static const vsf_elfloader_section_loader_t __vsf_elfloader_section_loaders[] = {
-    // loadable sections
-    {".bss",            __vsf_elfloader_bss_loader},
-    {".data P2",        __vsf_elfloader_data_loader},
-    {".noinit",         __vsf_elfloader_noinit_loader},
-    {".got",            __vsf_elfloader_got_loader},
-
-    {".text P1",        __vsf_elfloader_text_loader},
-    {".plt",            __vsf_elfloader_plt_loader},
-    {".rodata",         __vsf_elfloader_rodata_loader},
-
-    // non-loadable sections
-    {".symtab",         __vsf_elfloader_symtab_loader},
-    {".strtab",         __vsf_elfloader_strtab_loader},
-    {".dynsym",         __vsf_elfloader_dynsym_loader},
-    {".dynstr",         __vsf_elfloader_dynstr_loader},
-    {".init_array",     __vsf_elfloader_initarr_loader},
-    {".fini_array",     __vsf_elfloader_finiarr_loader},
-};
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
-
-static vsf_elfloader_section_info_t * __vsf_elfloader_get_section_by_index(vsf_elfloader_info_t *linfo, int idx)
-{
-    vsf_elfloader_section_info_t *sinfo = linfo->sinfos;
-    for (int i = 0; i < dimof(linfo->sinfos); i++, sinfo++) {
-        if (sinfo->index == idx) {
-            return sinfo;
-        }
-    }
-    return NULL;
-}
-
-static vsf_elfloader_section_info_t * __vsf_elfloader_get_section_by_addr(vsf_elfloader_info_t *linfo, Elf_Addr addr)
-{
-    vsf_elfloader_section_info_t *sinfo = linfo->sinfos;
-    for (int i = 0; i < dimof(linfo->sinfos); i++, sinfo++) {
-        if ((sinfo->addr <= addr) && (sinfo->addr + sinfo->size > addr)) {
-            return sinfo;
-        }
-    }
-    return NULL;
-}
 
 WEAK(vsf_elfloader_relocate_sym)
 vsf_err_t vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
@@ -152,6 +71,7 @@ vsf_err_t vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtval
     return VSF_ERR_FAIL;
 }
 
+#if 0
 static vsf_err_t __vsf_elfloader_relocate(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
         Elf_Shdr *header, vsf_elfloader_info_t *linfo)
 {
@@ -180,7 +100,7 @@ static vsf_err_t __vsf_elfloader_relocate(vsf_elfloader_t *elfloader, vsf_loader
         reltype = ELF_R_TYPE(rel.r_info);
         tgt_sinfo = __vsf_elfloader_get_section_by_addr(linfo, rel.r_offset);
         if (NULL == tgt_sinfo) {
-            vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to get rel target" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_error("fail to get rel target" VSF_TRACE_CFG_LINEEND);
             return VSF_ERR_FAIL;
         }
 
@@ -189,7 +109,7 @@ static vsf_err_t __vsf_elfloader_relocate(vsf_elfloader_t *elfloader, vsf_loader
                 tgtvalue = *(Elf_Addr *)((Elf_Addr)tgt_sinfo->buffer + rel.r_offset - tgt_sinfo->addr);
                 sym_sinfo = __vsf_elfloader_get_section_by_addr(linfo, tgtvalue);
                 if (NULL == sym_sinfo) {
-                    vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to get rel value" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_error("fail to get rel value" VSF_TRACE_CFG_LINEEND);
                     return VSF_ERR_FAIL;
                 }
 
@@ -198,11 +118,11 @@ static vsf_err_t __vsf_elfloader_relocate(vsf_elfloader_t *elfloader, vsf_loader
                 } else if (target->is_xip) {
                     tgtvalue = (Elf_Addr)target->object + tgtvalue;
                 } else {
-                    vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to get rel value" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_error("fail to get rel value" VSF_TRACE_CFG_LINEEND);
                     return VSF_ERR_FAIL;
                 }
             } else {
-                vsf_elfloader_trace(VSF_TRACE_ERROR, "unknown rel" VSF_TRACE_CFG_LINEEND);
+                vsf_trace_error("unknown rel" VSF_TRACE_CFG_LINEEND);
                 return VSF_ERR_FAIL;
             }
         } else {
@@ -213,18 +133,18 @@ static vsf_err_t __vsf_elfloader_relocate(vsf_elfloader_t *elfloader, vsf_loader
                 return VSF_ERR_FAIL;
             }
 
-            vsf_elfloader_trace(VSF_TRACE_DEBUG, "relocate %s" VSF_TRACE_CFG_LINEEND, symname);
+            vsf_elfloader_trace("relocate %s" VSF_TRACE_CFG_LINEEND, symname);
 
             if (SHN_UNDEF == sym.st_shndx) {
                 tgtvalue = (Elf_Addr)vsf_loader_link((vsf_loader_t *)elfloader, symname);
                 if (0 == tgtvalue) {
-                    vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to get %s" VSF_TRACE_CFG_LINEEND, symname);
+                    vsf_trace_error("fail to get %s" VSF_TRACE_CFG_LINEEND, symname);
                     return VSF_ERR_FAIL;
                 }
             } else {
                 sym_sinfo = __vsf_elfloader_get_section_by_index(linfo, sym.st_shndx);
                 if (NULL == sym_sinfo) {
-                    vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to get section of %s" VSF_TRACE_CFG_LINEEND, symname);
+                    vsf_trace_error("fail to get section of %s" VSF_TRACE_CFG_LINEEND, symname);
                     return VSF_ERR_FAIL;
                 }
                 if (sym_sinfo->buffer != NULL) {
@@ -232,172 +152,23 @@ static vsf_err_t __vsf_elfloader_relocate(vsf_elfloader_t *elfloader, vsf_loader
                 } else if (target->is_xip) {
                     tgtvalue = (Elf_Addr)target->object + sym.st_value;
                 } else {
-                    vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to get rel value" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_error("fail to get rel value" VSF_TRACE_CFG_LINEEND);
                     return VSF_ERR_FAIL;
                 }
             }
         }
 
         if (VSF_ERR_NONE != vsf_elfloader_relocate_sym((Elf_Addr)tgt_sinfo->buffer + rel.r_offset - tgt_sinfo->addr, reltype, tgtvalue)) {
-            vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to link rel" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_error("fail to link rel" VSF_TRACE_CFG_LINEEND);
         }
     }
     return VSF_ERR_NONE;
 }
-
-static vsf_err_t __vsf_elfloader_text_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    linfo->sinfo.is_to_load_section = !target->is_xip;
-    linfo->sinfo.buffer = &elfloader->text;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_bss_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    linfo->sinfo.is_ram = true;
-    linfo->sinfo.buffer = &elfloader->bss;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_data_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    linfo->sinfo.is_ram = true;
-    linfo->sinfo.buffer = &elfloader->data;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_rodata_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    linfo->sinfo.is_to_load_section = !target->is_xip;
-    linfo->sinfo.buffer = &elfloader->rodata;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_noinit_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    linfo->sinfo.is_ram = true;
-    linfo->sinfo.buffer = &elfloader->noinit;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_symtab_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    if (0 == elfloader->symtbl_off) {
-        elfloader->symtbl_off = header->sh_offset;
-        elfloader->symtbl_sz = header->sh_size;
-    }
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_strtab_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    if (0 == elfloader->symstrtbl_off) {
-        elfloader->symstrtbl_off = header->sh_offset;
-        elfloader->symstrtbl_sz = header->sh_size;
-    }
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_dynsym_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    elfloader->symtbl_off = header->sh_offset;
-    elfloader->symtbl_sz = header->sh_size;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_dynstr_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    elfloader->symstrtbl_off = header->sh_offset;
-    elfloader->symstrtbl_sz = header->sh_size;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_plt_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    linfo->sinfo.is_to_load_section = !target->is_xip;
-    linfo->sinfo.buffer = &elfloader->plt;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_initarr_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    linfo->sinfo.buffer = &elfloader->initarr;
-    elfloader->initarr_off = header->sh_offset;
-    elfloader->initarr_sz = header->sh_size;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_finiarr_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    linfo->sinfo.buffer = &elfloader->initarr;
-    elfloader->initarr_off = header->sh_offset;
-    elfloader->initarr_sz = header->sh_size;
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __vsf_elfloader_got_loader(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, vsf_elfloader_info_t *linfo)
-{
-    linfo->sinfo.buffer = &elfloader->got;
-    return VSF_ERR_NONE;
-}
+#endif
 
 void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
 {
-    if (elfloader->finiarr_off != 0) {
-        // TODO: call fini
-        VSF_SERVICE_ASSERT(false);
-    }
-
     elfloader->target = NULL;
-    if (elfloader->plt != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_X, elfloader->plt);
-        elfloader->plt = NULL;
-    }
-    if (elfloader->got != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->got);
-        elfloader->got = NULL;
-    }
-    if (elfloader->text != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_X, elfloader->text);
-        elfloader->text = NULL;
-    }
-    if (elfloader->initarr != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->initarr);
-        elfloader->initarr = NULL;
-    }
-    if (elfloader->finiarr != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->finiarr);
-        elfloader->finiarr = NULL;
-    }
-    if (elfloader->bss != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->bss);
-        elfloader->bss = NULL;
-    }
-    if (elfloader->data != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->data);
-        elfloader->data = NULL;
-    }
-    if (elfloader->rodata != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->rodata);
-        elfloader->rodata = NULL;
-    }
-    if (elfloader->noinit != NULL) {
-        vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->noinit);
-        elfloader->noinit = NULL;
-    }
     if (elfloader->ram_base != NULL) {
         vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->ram_base);
         elfloader->ram_base = NULL;
@@ -407,7 +178,7 @@ void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
 static vsf_err_t __vsf_elfloader_load_elfhdr(vsf_loader_target_t *target, Elf_Hdr *header)
 {
     if (vsf_loader_read(target, 0, header, sizeof(*header)) != sizeof(*header)) {
-        vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to read elf header" VSF_TRACE_CFG_LINEEND);
+        vsf_trace_error("fail to read elf header" VSF_TRACE_CFG_LINEEND);
         return VSF_ERR_FAIL;
     }
 
@@ -415,7 +186,7 @@ static vsf_err_t __vsf_elfloader_load_elfhdr(vsf_loader_target_t *target, Elf_Hd
     if (    memcmp(&header->e_ident, Elf_Magic, sizeof(Elf_Magic))
         ||  (header->e_version != EV_CURRENT)
         ||  (header->e_shentsize != sizeof(Elf_Shdr))) {
-        vsf_elfloader_trace(VSF_TRACE_ERROR, "invalid elf header" VSF_TRACE_CFG_LINEEND);
+        vsf_trace_error("invalid elf header" VSF_TRACE_CFG_LINEEND);
         return VSF_ERR_FAIL;
     }
     return VSF_ERR_NONE;
@@ -439,14 +210,14 @@ int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_
     Elf_Shdr elf_shdr;
     if (vsf_loader_read(target, elf_hdr.e_shoff + elf_hdr.e_shstrndx * elf_hdr.e_shentsize,
             &elf_shdr, sizeof(elf_shdr)) != sizeof(elf_shdr)) {
-        vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to read string section" VSF_TRACE_CFG_LINEEND);
+        vsf_trace_error("fail to read string section" VSF_TRACE_CFG_LINEEND);
         return -1;
     }
     Elf_Word shstrtbl_off = elf_shdr.sh_offset;
 
     char section_name[VSF_ELFLOADER_CFG_MAX_SYM_LEN];
     int result;
-    for (int i = 1; i < elf_hdr.e_shnum; i++) {
+    for (Elf_Half i = 1; i < elf_hdr.e_shnum; i++) {
         if (vsf_loader_read(target, elf_hdr.e_shoff + i * elf_hdr.e_shentsize,
                 &elf_shdr, sizeof(elf_shdr)) != sizeof(elf_shdr)) {
             return -1;
@@ -462,100 +233,32 @@ int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_
     return 0;
 }
 
-static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, char *name, int index, void *param)
+int vsf_elfloader_foreach_program_header(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
+        int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Phdr *pheader, int index, void *param))
 {
-    vsf_elfloader_info_t *linfo = (vsf_elfloader_info_t *)param;
-    if (!strncmp(name, ".rel.", 5)) {
-        return VSF_ELFLOADER_CB_GOON;
+    VSF_SERVICE_ASSERT(callback != NULL);
+    VSF_SERVICE_ASSERT(elfloader != NULL);
+    if (NULL == target) {
+        target = elfloader->target;
+    }
+    VSF_SERVICE_ASSERT(target != NULL);
+
+    Elf_Hdr elf_hdr;
+    if (VSF_ERR_NONE != __vsf_elfloader_load_elfhdr(target, &elf_hdr)) {
+        return -1;
     }
 
-    vsf_elfloader_trace(VSF_TRACE_DEBUG, "parsing section %s" VSF_TRACE_CFG_LINEEND, name);
-
-    memset(&linfo->sinfo, 0, sizeof(linfo->sinfo));
-    linfo->sinfo.is_to_load_section = header->sh_flags & SHF_ALLOC;
-    if (header->sh_flags & SHF_EXECINSTR) {
-        linfo->sinfo.attr = VSF_LOADER_MEM_X;
-    } else if (header->sh_flags & SHF_WRITE) {
-        linfo->sinfo.attr = VSF_LOADER_MEM_RW;
-    } else {
-        linfo->sinfo.attr = VSF_LOADER_MEM_R;
-    }
-
-    vsf_elfloader_section_loader_t *sloader = NULL;
-    for (linfo->sinfo.loader_index = 0; linfo->sinfo.loader_index < dimof(__vsf_elfloader_section_loaders); linfo->sinfo.loader_index++) {
-        char *match_start = strstr(__vsf_elfloader_section_loaders[linfo->sinfo.loader_index].name, name);
-        if (match_start != NULL) {
-            char ch_end = *(match_start + strlen(name));
-            if (    ((ch_end == '\0') || (ch_end == ' '))
-                &&  ((match_start == __vsf_elfloader_section_loaders[linfo->sinfo.loader_index].name) || (match_start[-1] == ' '))) {
-                sloader = (vsf_elfloader_section_loader_t *)&__vsf_elfloader_section_loaders[linfo->sinfo.loader_index];
-                break;
-            }
+    Elf_Phdr phdr;
+    int result;
+    for (Elf_Half i = 0; i < elf_hdr.e_phnum; i++) {
+        if (vsf_loader_read(target, elf_hdr.e_phoff + i * elf_hdr.e_phentsize, &phdr, sizeof(phdr)) != sizeof(phdr)) {
+            return -1;
         }
-    }
 
-    if (sloader != NULL) {
-        if (linfo->sinfo.loader_index < dimof(linfo->sinfos)) {
-            linfo->sinfos[linfo->sinfo.loader_index].index = index;
-            linfo->sinfos[linfo->sinfo.loader_index].offset = header->sh_offset;
-            linfo->sinfos[linfo->sinfo.loader_index].size = header->sh_size;
-            linfo->sinfos[linfo->sinfo.loader_index].addr = header->sh_addr;
-        }
-        if ((sloader->load != NULL) && (VSF_ERR_NONE != sloader->load(elfloader, target, header, linfo))) {
-            vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to load section %s" VSF_TRACE_CFG_LINEEND, name);
-            return VSF_ELFLOADER_CB_FAIL;
-        }
+        result = callback(elfloader, target, &phdr, i, param);
+        if (result < 0) { return result; } else if (result > 0) { break; }
     }
-
-    if (linfo->sinfo.is_to_load_section && (linfo->sinfo.buffer != NULL) && (header->sh_size > 0)) {
-        if (target->is_epi && linfo->sinfo.is_ram) {
-            if (    (elfloader->ram_base != NULL)
-                &&  (header->sh_type != SHT_NOBITS)
-                &&  (vsf_loader_read(target, header->sh_offset, (uint8_t *)elfloader->ram_base + linfo->ram_sz,
-                            header->sh_size) != header->sh_size)) {
-                vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to read section %s" VSF_TRACE_CFG_LINEEND, name);
-                return VSF_ELFLOADER_CB_FAIL;
-            }
-            linfo->ram_sz += header->sh_size;
-        } else if (NULL == *linfo->sinfo.buffer) {
-            vsf_elfloader_trace(VSF_TRACE_DEBUG, "loading section %s" VSF_TRACE_CFG_LINEEND, name);
-            *linfo->sinfo.buffer = vsf_loader_malloc(elfloader, linfo->sinfo.attr,
-                    header->sh_size, header->sh_addralign);
-            if (NULL == *linfo->sinfo.buffer) {
-                vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to allocate section buffer for %s" VSF_TRACE_CFG_LINEEND, name);
-                return VSF_ELFLOADER_CB_FAIL;
-            }
-            if (header->sh_type != SHT_NOBITS) {
-                if (vsf_loader_read(target, header->sh_offset, *linfo->sinfo.buffer, header->sh_size) != header->sh_size) {
-                    vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to read section %s" VSF_TRACE_CFG_LINEEND, name);
-                    return VSF_ELFLOADER_CB_FAIL;
-                }
-            } else {
-                memset(*linfo->sinfo.buffer, 0, header->sh_size);
-            }
-            if ((sloader != NULL) && (linfo->sinfo.loader_index < dimof(linfo->sinfos))) {
-                linfo->sinfos[linfo->sinfo.loader_index].buffer = *linfo->sinfo.buffer;
-            }
-        }
-    }
-    return VSF_ELFLOADER_CB_GOON;
-}
-
-static int __vsf_elfloader_link_cb(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        Elf_Shdr *header, char *name, int index, void *param)
-{
-    vsf_elfloader_info_t *linfo = (vsf_elfloader_info_t *)param;
-    if (strncmp(name, ".rel.", 5)) {
-        return VSF_ELFLOADER_CB_GOON;
-    }
-
-    vsf_elfloader_trace(VSF_TRACE_DEBUG, "relocating section %s" VSF_TRACE_CFG_LINEEND, name);
-    if (VSF_ERR_NONE != __vsf_elfloader_relocate(elfloader, target, header, linfo)) {
-        vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to relocate section %s" VSF_TRACE_CFG_LINEEND, name);
-        return VSF_ELFLOADER_CB_FAIL;
-    }
-    return VSF_ELFLOADER_CB_GOON;
+    return 0;
 }
 
 int vsf_elfloader_call_init_array(vsf_elfloader_t *elfloader)
@@ -582,38 +285,47 @@ void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader)
     }
 }
 
-static int __vsf_elfloader_load_by_sections(vsf_elfloader_t *elfloader,
-        vsf_loader_target_t *target, vsf_elfloader_info_t *linfo)
+static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
+        Elf_Phdr *header, int index, void *param)
 {
-second_round_for_ram_base:
-    if (vsf_elfloader_foreach_section(elfloader, target, linfo, __vsf_elfloader_load_cb) < 0) {
-        vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to load elf" VSF_TRACE_CFG_LINEEND);
-        return -1;
-    }
-
-    if (target->is_epi && (NULL == elfloader->ram_base)) {
-        vsf_elfloader_trace(VSF_TRACE_DEBUG, "loading ram" VSF_TRACE_CFG_LINEEND);
-        elfloader->ram_base = vsf_loader_malloc(elfloader, VSF_LOADER_MEM_RW, linfo->ram_sz, 0);
-        if (NULL == elfloader->ram_base) {
-            vsf_elfloader_trace(VSF_TRACE_ERROR, "fail to allocate ram_base" VSF_TRACE_CFG_LINEEND);
-            return -1;
+    vsf_elfloader_info_t *linfo = param;
+    if (header->p_type == PT_LOAD) {
+        if (header->p_memsz < header->p_filesz) {
+            return VSF_ELFLOADER_CB_FAIL;
         }
-        memset(elfloader->ram_base, 0, linfo->ram_sz);
-        linfo->ram_sz = 0;
-        goto second_round_for_ram_base;
-    }
 
-    if (vsf_elfloader_foreach_section(elfloader, target, linfo, __vsf_elfloader_link_cb) < 0) {
-        vsf_elfloader_trace(VSF_TRACE_ERROR, "link elf failed" VSF_TRACE_CFG_LINEEND);
-        return -1;
-    }
-    return 0;
-}
+        if (    (linfo->elf_hdr.e_entry >= header->p_vaddr)
+            &&  (linfo->elf_hdr.e_entry < (header->p_vaddr + header->p_memsz))) {
+            linfo->entry_offset_in_mem = header->p_vaddr + linfo->elf_hdr.e_entry;
+            linfo->entry_offset_in_file = header->p_offset + linfo->elf_hdr.e_entry;
+        }
+        if (0 == header->p_vaddr) {
+            linfo->load_zero_addr = true;
+        }
 
-static int __vsf_elfloader_load_by_program_header(vsf_elfloader_t *elfloader,
-        vsf_loader_target_t *target, vsf_elfloader_info_t *linfo)
-{
-    return -1;
+        if (target->is_xip && !(header->p_flags & PF_W)) {
+            return VSF_ELFLOADER_CB_GOON;
+        }
+
+        if (elfloader->ram_base != NULL) {
+            if (0 == header->p_filesz) {
+                return VSF_ELFLOADER_CB_GOON;
+            }
+
+            if (vsf_loader_read(target, header->p_offset, (uint8_t *)elfloader->ram_base + header->p_vaddr, header->p_filesz) != header->p_filesz) {
+                return VSF_ELFLOADER_CB_FAIL;
+            }
+        } else {
+            Elf_Word mem_max = header->p_vaddr + header->p_memsz;
+            if (linfo->memsz < mem_max) {
+                linfo->memsz = mem_max;
+            }
+        }
+    } else if (header->p_type == PT_DYNAMIC) {
+        vsf_trace_error("relocating is not supported yet" VSF_TRACE_CFG_LINEEND);
+        return VSF_ELFLOADER_CB_FAIL;
+    }
+    return VSF_ELFLOADER_CB_GOON;
 }
 
 void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target)
@@ -621,43 +333,41 @@ void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *targe
     VSF_SERVICE_ASSERT((elfloader != NULL) && (target != NULL));
     VSF_SERVICE_ASSERT(NULL == elfloader->target);
     VSF_SERVICE_ASSERT(target->fn_read != NULL);
-    if (target->is_epi) {
-        VSF_SERVICE_ASSERT(target->is_xip);
-    }
 
-    vsf_elfloader_section_info_t *entry_sinfo;
-    Elf_Hdr elf_hdr;
-    if (VSF_ERR_NONE != __vsf_elfloader_load_elfhdr(target, &elf_hdr)) {
+    vsf_elfloader_info_t linfo;
+    if (VSF_ERR_NONE != __vsf_elfloader_load_elfhdr(target, &linfo.elf_hdr)) {
         return NULL;
     }
 
-    vsf_elfloader_info_t linfo = { 0 };
-    if (0 == elf_hdr.e_phnum) {
-        if (__vsf_elfloader_load_by_program_header(elfloader, target, &linfo) != 0) {
-            goto cleanup_and_fail;
-        }
-    } else {
-        if (__vsf_elfloader_load_by_sections(elfloader, target, &linfo) != 0) {
-            goto cleanup_and_fail;
-        }
-    }
+    linfo.memsz = 0;
+    linfo.load_zero_addr = false;
 
-    entry_sinfo = __vsf_elfloader_get_section_by_addr(&linfo, elf_hdr.e_entry);
-    if (NULL == entry_sinfo) {
-        vsf_elfloader_trace(VSF_TRACE_ERROR, "invalid entry" VSF_TRACE_CFG_LINEEND);
+second_round_for_ram_base:
+    if (vsf_elfloader_foreach_program_header(elfloader, target, &linfo, __vsf_elfloader_load_cb) < 0) {
+        goto cleanup_and_fail;
+    }
+    if (!linfo.load_zero_addr) {
+        vsf_trace_error("is the image position independent?" VSF_TRACE_CFG_LINEEND);
         goto cleanup_and_fail;
     }
 
-    if (target->is_epi) {
-        elfloader->static_base = elfloader->ram_base;
-    } else {
-        elfloader->static_base = elfloader->got;
+    if ((linfo.memsz > 0) && (NULL == elfloader->ram_base)) {
+        elfloader->ram_base = vsf_loader_malloc(elfloader, VSF_LOADER_MEM_RWX, linfo.memsz, 0);
+        if (NULL == elfloader->ram_base) {
+            vsf_trace_error("fail to allocate ram_base" VSF_TRACE_CFG_LINEEND);
+            goto cleanup_and_fail;
+        }
+        memset(elfloader->ram_base, 0, linfo.memsz);
+        goto second_round_for_ram_base;
     }
+
+    // todo: when should static_base be set to got base?
+    elfloader->static_base = elfloader->ram_base;
     elfloader->target = target;
     if (target->is_xip) {
-        return (void *)(target->object + entry_sinfo->offset + elf_hdr.e_entry - entry_sinfo->addr);
+        return (void *)(target->object + linfo.entry_offset_in_file);
     } else {
-        return (void *)((uintptr_t)elfloader->text + elf_hdr.e_entry - entry_sinfo->addr);
+        return (void *)((uintptr_t)elfloader->ram_base + linfo.entry_offset_in_mem);
     }
 
 cleanup_and_fail:

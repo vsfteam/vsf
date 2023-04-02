@@ -63,25 +63,11 @@ vsf_class(vsf_elfloader_t) {
     )
 
     private_member(
-        void *got;
-        void *plt;
-
-        void *text;
-        void *initarr;
-        void *finiarr;
-        void *bss;
-        void *data;
-        void *rodata;
-        void *noinit;
         void *ram_base;
 
-        uint32_t symtbl_off;
-        uint32_t symtbl_sz;
-        uint32_t symstrtbl_off;
-        uint32_t symstrtbl_sz;
-        uint32_t initarr_off;
+        void *initarr;
+        void *finiarr;
         uint32_t initarr_sz;
-        uint32_t finiarr_off;
         uint32_t finiarr_sz;
     )
 };
@@ -109,10 +95,11 @@ extern int vsf_elfloader_call_init_array(vsf_elfloader_t *elfloader);
 extern void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader);
 
 // can be called before vsf_elfloader_load
+extern int vsf_elfloader_foreach_program_header(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
+        int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Phdr *header, int index, void *param));
 extern int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
         int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Shdr *header, char *name, int index, void *param));
-extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader,
-        vsf_loader_target_t *target, const char *name, Elf_Shdr *header);
+extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, const char *name, Elf_Shdr *header);
 
 // CAN NOT be called before vsf_elfloader_load
 extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,
