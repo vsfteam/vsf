@@ -142,6 +142,24 @@
 #           define VSF_LOADER_USE_ELF                   ENABLED
 //#           define VSF_ELFLOADER_CFG_DEBUG              ENABLED
 #   endif
+
+#   if      defined(__WIN__)
+#   define VSF_LINUX_HOSTFS_INIT_SCRIPTS                                        \
+            "mkdir -p /mnt/hostfs",                                             \
+            "mount -t winfs . /mnt/hostfs",                                     \
+            "cd /mnt/hostfs",
+#   elif    defined(__LINUX__)
+#   define VSF_LINUX_HOSTFS_INIT_SCRIPTS                                        \
+            "mkdir -p /mnt/hostfs",                                             \
+            "mount -t linfs . /mnt/hostfs",                                     \
+            "cd /mnt/hostfs",
+#   else
+#   define VSF_LINUX_HOSTFS_INIT_SCRIPTS
+#   endif
+
+#   define VSF_LINUX_CFG_INIT_SCRIPTS                                           \
+            "echo \"vsf build on " __DATE__ "\"",                               \
+            VSF_LINUX_HOSTFS_INIT_SCRIPTS
 #endif
 
 #if APP_USE_EVM_DEMO == ENABLED
