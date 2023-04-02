@@ -250,6 +250,9 @@ vsf_class(vsf_linux_process_t) {
     )
 
     protected_member(
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+        uintptr_t reg;
+#endif
         int status;
         vsf_linux_process_t *shell_process;
         // thread pending child process
@@ -271,9 +274,6 @@ vsf_class(vsf_linux_process_t) {
     )
 
     private_member(
-#if VSF_ARCH_USE_THREAD_REG == ENABLED
-        uintptr_t reg;
-#endif
         char *working_dir;
 
         vsf_dlist_node_t process_node;
