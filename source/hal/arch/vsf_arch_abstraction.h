@@ -90,7 +90,7 @@ extern const vsf_protect_region_t vsf_protect_region_none;
 # elif  (defined(__CPU_X86__) || defined(__CPU_X64__)) && defined(__WIN__)
 #   define  VSF_ARCH_HEADER     "./x86/win/win_generic.h"
 # elif  (defined(__CPU_X86__) || defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)) && defined(__LINUX__)
-#   define  VSF_ARCH_HEADER     "./x86/linux/linux_generic.h"
+#   define  VSF_ARCH_HEADER     "./generic/linux/linux_generic.h"
 # elif  defined(__CPU_MCS51__)
 #   define  VSF_ARCH_HEADER     "./mcs51/mcs51_generic.h"
 # elif  defined(__CPU_RV__)
