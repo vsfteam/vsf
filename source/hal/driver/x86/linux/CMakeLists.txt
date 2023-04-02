@@ -1,1 +1,1 @@
-add_subdirectory(../../generic/linux)
+add_subdirectory(../../generic/linux driver_generic_linux)

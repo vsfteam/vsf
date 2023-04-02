@@ -1,1 +1,1 @@
-add_subdirectory(../../generic/linux)
+add_subdirectory(../../generic/linux arch_generic_linux)
