@@ -136,6 +136,11 @@
 #   define VSF_USE_POSIX                                ENABLED
 #   define VSF_LINUX_USE_GETOPT                         ENABLED
 #   define VSF_LINUX_USE_TERMIOS                        ENABLED
+#   if APP_USE_LINUX_ELFLOADER_DEMO == ENABLED
+#       define VSF_USE_LOADER                           ENABLED
+#           define VSF_LOADER_USE_ELF                   ENABLED
+//#           define VSF_ELFLOADER_CFG_DEBUG              ENABLED
+#   endif
 #endif
 
 #if APP_USE_EVM_DEMO == ENABLED

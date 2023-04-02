@@ -7,6 +7,10 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#if defined(__WIN__) || defined(__LINUX__)
+#   define ELFLOADER_CFG_STDIO
+#endif
+
 int elfloader_main(int argc, char **argv)
 {
     if (argc != 2) {
@@ -14,27 +18,48 @@ int elfloader_main(int argc, char **argv)
         return -1;
     }
 
+#ifdef ELFLOADER_CFG_STDIO
+    FILE *f = fopen(argv[1], "r");
+    if (NULL == f) {
+        printf("fail to open %s\n", argv[1]);
+        return -1;
+    }
+#endif
+
     vsf_elfloader_t elfloader = {
         .heap_op    = &vsf_loader_default_heap_op,
     };
     vsf_loader_target_t elftarget = {
+#ifdef ELFLOADER_CFG_STDIO
+        .object     = (uintptr_t)f,
+        .is_xip     = false,
+        .fn_read    = vsf_loader_stdio_read,
+#else
         .object     = strtoul((const char *)argv[1], NULL, 0),
         .is_xip     = true,
         .fn_read    = vsf_loader_xip_read,
+#endif
     };
 
+    int result;
     void *entry = vsf_elfloader_load(&elfloader, &elftarget);
     if (entry != NULL) {
         vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
-        int result = ((int (*)(int, char **, vsf_applet_ctx_t*))entry)(argc, argv, &(vsf_applet_ctx_t) {
+        result = ((int (*)(int, char **, vsf_applet_ctx_t*))entry)(argc, argv, &(vsf_applet_ctx_t) {
             .target     = &elfloader,
             .fn_init    = (int (*)(void *))vsf_elfloader_call_init_array,
             .fn_fini    = (void (*)(void *))vsf_elfloader_call_fini_array,
             .vplt       = (void *)&vsf_linux_vplt,
         });
         vsf_elfloader_cleanup(&elfloader);
-        return result;
     }
+
+#ifdef ELFLOADER_CFG_STDIO
+    if (f != NULL) {
+        fclose(f);
+    }
+#endif
+
     return -1;
 }
 
