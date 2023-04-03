@@ -73,10 +73,20 @@ typedef struct vsf_elfloader_info_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+// vsf_elfloader_relocate_sym will be over-written by the same function in
+//  the source code for specified arch.
 WEAK(vsf_elfloader_relocate_sym)
 vsf_err_t vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
 {
     return VSF_ERR_FAIL;
+}
+
+// vsf_elfloader_link should be over-written by user to do syjmbol linking
+WEAK(vsf_elfloader_link)
+int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
+{
+    vsf_trace_error("relocating is not supported yet" VSF_TRACE_CFG_LINEEND);
+    return -1;
 }
 
 void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
@@ -258,12 +268,6 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
     return VSF_ELFLOADER_CB_GOON;
 }
 
-static int __vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
-{
-    vsf_trace_error("relocating is not supported yet" VSF_TRACE_CFG_LINEEND);
-    return -1;
-}
-
 static int __vsf_elfloader_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t *linfo, Elf_Rela *rela, Elf_Addr size)
 {
     Elf_Word relsym, reltype;
@@ -277,10 +281,11 @@ static int __vsf_elfloader_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t
 
         sym = ((Elf_Sym *)linfo->dynamic.symtbl)[relsym];
         strncpy(symname, (const char *)(linfo->dynamic.strtbl + sym.st_name), sizeof(symname));
+        vsf_elfloader_debug("locate %s" VSF_TRACE_CFG_LINEEND, symname);
 
         if (0 == sym.st_value) {
-            if (__vsf_elfloader_link(elfloader, symname, &tgtvalue) < 0) {
-                vsf_trace_error("fail to link %s" VSF_TRACE_CFG_LINEEND, symname);
+            if (vsf_elfloader_link(elfloader, symname, &tgtvalue) < 0) {
+                vsf_trace_error("fail to locate %s" VSF_TRACE_CFG_LINEEND, symname);
                 return -1;
             }
         } else {
@@ -331,7 +336,7 @@ second_round_for_ram_base:
     }
 
     // relocating
-    if (linfo.dynamic.pltrelsz > 0) {
+    if ((linfo.dynamic.pltrelsz > 0) || (linfo.dynamic.relasz > 0)) {
         linfo.dynamic.jmprel += (Elf_Addr)elfloader->ram_base;
         linfo.dynamic.symtbl += (Elf_Addr)elfloader->ram_base;
         linfo.dynamic.strtbl += (Elf_Addr)elfloader->ram_base;
