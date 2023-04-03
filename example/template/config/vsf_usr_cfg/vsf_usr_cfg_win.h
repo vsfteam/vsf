@@ -220,10 +220,6 @@
 #   pragma clang diagnostic ignored "-Wimplicit-function-declaration"
 #endif
 
-#ifdef __CPU_X64__
-#   error x64 is currently not supported
-#endif
-
 #define VSF_ASSERT(...)                                 assert(__VA_ARGS__)
 //#define VSF_ASSERT(...)
 

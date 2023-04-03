@@ -280,7 +280,7 @@ static int __vsf_elfloader_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t
 
         if (0 == sym.st_value) {
             if (__vsf_elfloader_link(elfloader, symname, &tgtvalue) < 0) {
-                vsf_trace_error("fail to relocate %s" VSF_TRACE_CFG_LINEEND, symname);
+                vsf_trace_error("fail to link %s" VSF_TRACE_CFG_LINEEND, symname);
                 return -1;
             }
         } else {
@@ -288,7 +288,10 @@ static int __vsf_elfloader_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t
         }
 
         vsf_elfloader_debug("relocate %s to 0x%X" VSF_TRACE_CFG_LINEEND, symname, tgtvalue);
-        vsf_elfloader_relocate_sym((Elf_Addr)elfloader->ram_base + rela->r_offset, reltype, tgtvalue);
+        if (vsf_elfloader_relocate_sym((Elf_Addr)elfloader->ram_base + rela->r_offset, reltype, tgtvalue) < 0) {
+            vsf_trace_error("fail to relocate %s" VSF_TRACE_CFG_LINEEND, symname);
+            return -1;
+        }
     }
     return 0;
 }
