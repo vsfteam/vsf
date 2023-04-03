@@ -56,6 +56,7 @@ vsf_err_t vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtval
     case R_X86_64_GLOB_DAT:
     case R_X86_64_JUMP_SLOT:
         *(uint64_t *)tgtaddr = tgtvalue;
+        return VSF_ERR_NONE;
     }
     return VSF_ERR_FAIL;
 }
