@@ -13,8 +13,8 @@
 
 int elfloader_main(int argc, char **argv)
 {
-    if (argc != 2) {
-        printf("format: %s ADDRESS\n", argv[0]);
+    if (argc < 2) {
+        printf("format: %s ADDRESS/FILE [ARGUS]\n", argv[0]);
         return -1;
     }
 
@@ -45,7 +45,7 @@ int elfloader_main(int argc, char **argv)
     void *entry = vsf_elfloader_load(&elfloader, &elftarget);
     if (entry != NULL) {
         vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
-        result = ((int (*)(int, char **, vsf_applet_ctx_t*))entry)(argc, argv, &(vsf_applet_ctx_t) {
+        result = ((int (*)(int, char **, vsf_applet_ctx_t*))entry)(argc - 1, argv + 1, &(vsf_applet_ctx_t) {
             .target     = &elfloader,
             .fn_init    = (int (*)(void *))vsf_elfloader_call_init_array,
             .fn_fini    = (void (*)(void *))vsf_elfloader_call_fini_array,
