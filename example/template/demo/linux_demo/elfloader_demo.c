@@ -11,6 +11,25 @@
 #   define ELFLOADER_CFG_STDIO
 #endif
 
+int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
+{
+    void *fn = vsf_vplt_link(symname);
+    *target = (Elf_Addr)fn;
+    return NULL == fn ? -1 : 0;
+}
+
+#if VSF_APPLET_CFG_VOID_ENTRY == ENABLED
+static int pls_applet_ctx = -1;
+vsf_applet_ctx_t * vsf_applet_ctx(void)
+{
+    vsf_linux_localstorage_t *pls;
+    if ((pls_applet_ctx < 0) || (NULL == (pls = vsf_linux_pls_get(pls_applet_ctx)))) {
+        return NULL;
+    }
+    return (vsf_applet_ctx_t *)pls->data;
+}
+#endif
+
 int elfloader_main(int argc, char **argv)
 {
     if (argc < 2) {
@@ -44,13 +63,29 @@ int elfloader_main(int argc, char **argv)
     int result = -1;
     void *entry = vsf_elfloader_load(&elfloader, &elftarget);
     if (entry != NULL) {
-        vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
-        result = ((int (*)(int, char **, vsf_applet_ctx_t*))entry)(argc - 1, argv + 1, &(vsf_applet_ctx_t) {
+        vsf_applet_ctx_t applet_ctx = {
             .target     = &elfloader,
             .fn_init    = (int (*)(void *))vsf_elfloader_call_init_array,
             .fn_fini    = (void (*)(void *))vsf_elfloader_call_fini_array,
+            .argc       = argc - 1,
+            .argv       = argv + 1,
             .vplt       = (void *)&vsf_linux_vplt,
-        });
+        };
+
+        vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
+#if VSF_APPLET_CFG_VOID_ENTRY == ENABLED
+        if (pls_applet_ctx < 0) {
+            pls_applet_ctx = vsf_linux_pls_alloc();
+        }
+        VSF_LINUX_ASSERT(pls_applet_ctx >= 0);
+        vsf_linux_localstorage_t *pls = vsf_linux_pls_get(pls_applet_ctx);
+        VSF_LINUX_ASSERT(pls != NULL);
+        pls->data = &applet_ctx;
+
+        result = ((int (*)(void))entry)();
+#else
+        result = ((int (*)(vsf_applet_ctx_t*))entry)(&applet_ctx);
+#endif
         vsf_elfloader_cleanup(&elfloader);
     }
 

@@ -95,16 +95,24 @@ __VSF_HAL_SWI_NUM and its value must at least be 1.
 typedef struct vsf_vplt_info_t {
     unsigned char major;
     unsigned char minor;
-    unsigned short entry_num;
+    unsigned short final : 1;
+    unsigned short entry_num : 15;
 } vsf_vplt_info_t;
 
 #if VSF_USE_APPLET == ENABLED
+#   ifndef VSF_APPLET_CFG_LINKABLE
+#       define VSF_APPLET_CFG_LINKABLE          ENABLED
+#   endif
+
 typedef struct vsf_vplt_t {
     vsf_vplt_info_t info;
 
     void *linux;
 } vsf_vplt_t;
 extern __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt;
+#   if VSF_APPLET_CFG_LINKABLE == ENABLED
+extern void * vsf_vplt_link(char *symname);
+#   endif
 #endif
 
 #ifndef __VSF_APPLET_CTX_DEFINED__
@@ -114,43 +122,57 @@ typedef struct vsf_applet_ctx_t {
     int (*fn_init)(void *);
     void (*fn_fini)(void *);
 
+    int argc;
+    char **argv;
     void *vplt;
 } vsf_applet_ctx_t;
 #endif
 
+#if !defined(VSF_APPLET_CFG_VOID_ENTRY) && defined(__WIN__)
+#   define VSF_APPLET_CFG_VOID_ENTRY        ENABLED
+#endif
 #ifdef __VSF_APPLET__
 #   if VSF_USE_APPLET == ENABLED && !defined(VSF_APPLET_VPLT)
 #       define VSF_APPLET_VPLT              ((vsf_vplt_t *)vsf_vplt((void *)0))
 #   endif
 
-extern void * vsf_vplt(void *);
+#   ifndef applet_entry
+#       if VSF_APPLET_CFG_VOID_ENTRY == ENABLED
+#           define applet_entry                                                 \
+                _start(void) { vsf_applet_ctx_t *ctx = vsf_applet_ctx();
+#       else
+#           define applet_entry                                                 \
+                _start(vsf_applet_ctx_t *ctx) {
+#       endif
+#   endif
+
 extern int main(int, char **);
+extern void * vsf_vplt(void *vplt);
 #   define main(...)                                                            \
-        _start(int argc, char **argv, vsf_applet_ctx_t *ctx)                    \
-        {                                                                       \
-            int result;                                                         \
-            vsf_vplt(ctx->vplt);                                                \
-            if (ctx->fn_init != NULL) {                                         \
-                result = ctx->fn_init(ctx->target);                             \
-                if (result) {                                                   \
-                    return result;                                              \
-                }                                                               \
+    applet_entry                                                                \
+        int result;                                                             \
+        vsf_vplt(ctx->vplt);                                                    \
+        if (ctx->fn_init != NULL) {                                             \
+            result = ctx->fn_init(ctx->target);                                 \
+            if (result) {                                                       \
+                return result;                                                  \
             }                                                                   \
-            result = main(argc, argv);                                          \
-            if (ctx->fn_fini != NULL) {                                         \
-                ctx->fn_fini(ctx->target);                                      \
-            }                                                                   \
-            return result;                                                      \
         }                                                                       \
-        void * vsf_vplt(void *vplt)                                             \
-        {                                                                       \
-            static void *__vplt;                                                \
-            if (vplt != (void *)0) {                                            \
-                __vplt = vplt;                                                  \
-            }                                                                   \
-            return __vplt;                                                      \
+        result = main(ctx->argc, ctx->argv);                                    \
+        if (ctx->fn_fini != NULL) {                                             \
+            ctx->fn_fini(ctx->target);                                          \
         }                                                                       \
-        int main(__VA_ARGS__)
+        return result;                                                          \
+    }                                                                           \
+    void * vsf_vplt(void *vplt)                                                 \
+    {                                                                           \
+        static void *__vplt;                                                    \
+        if (vplt != (void *)0) {                                                \
+            __vplt = vplt;                                                      \
+        }                                                                       \
+        return __vplt;                                                          \
+    }                                                                           \
+    int main(__VA_ARGS__)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
