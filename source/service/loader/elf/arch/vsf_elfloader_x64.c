@@ -50,15 +50,15 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
+int vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
 {
     switch (type) {
     case R_X86_64_GLOB_DAT:
     case R_X86_64_JUMP_SLOT:
         *(uint64_t *)tgtaddr = tgtvalue;
-        return VSF_ERR_NONE;
+        return 0;
     }
-    return VSF_ERR_FAIL;
+    return -1;
 }
 
 #endif      // VSF_USE_LOADER && VSF_LOADER_USE_ELF && defined(__ARM_ARCH_PROFILE)

@@ -76,9 +76,16 @@ typedef struct vsf_elfloader_info_t {
 // vsf_elfloader_relocate_sym will be over-written by the same function in
 //  the source code for specified arch.
 WEAK(vsf_elfloader_relocate_sym)
-vsf_err_t vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
+int vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
 {
-    return VSF_ERR_FAIL;
+    return -1;
+}
+
+// vsf_elfloader_prepare_plt is used to allocate necessary resources before linking
+WEAK(vsf_elfloader_prepare_plt)
+int vsf_elfloader_prepare_plt(vsf_elfloader_t *elfloader, int num)
+{
+    return -1;
 }
 
 // vsf_elfloader_link should be over-written by user to do syjmbol linking
@@ -98,11 +105,11 @@ void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
     }
 }
 
-static vsf_err_t __vsf_elfloader_load_elfhdr(vsf_loader_target_t *target, Elf_Hdr *header)
+static int __vsf_elfloader_load_elfhdr(vsf_loader_target_t *target, Elf_Hdr *header)
 {
     if (vsf_loader_read(target, 0, header, sizeof(*header)) != sizeof(*header)) {
         vsf_trace_error("fail to read elf header" VSF_TRACE_CFG_LINEEND);
-        return VSF_ERR_FAIL;
+        return -1;
     }
 
     const char Elf_Magic[4] = {ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3};
@@ -110,9 +117,9 @@ static vsf_err_t __vsf_elfloader_load_elfhdr(vsf_loader_target_t *target, Elf_Hd
         ||  (header->e_version != EV_CURRENT)
         ||  (header->e_shentsize != sizeof(Elf_Shdr))) {
         vsf_trace_error("invalid elf header" VSF_TRACE_CFG_LINEEND);
-        return VSF_ERR_FAIL;
+        return -1;
     }
-    return VSF_ERR_NONE;
+    return 0;
 }
 
 int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
@@ -268,16 +275,23 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
     return VSF_ELFLOADER_CB_GOON;
 }
 
-static int __vsf_elfloader_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t *linfo, Elf_Rela *rela, Elf_Addr size)
+static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t *linfo, int type, void *rel_rela, Elf_Addr size)
 {
     Elf_Word relsym, reltype;
     Elf_Sym sym;
     Elf_Addr tgtvalue;
     char symname[VSF_ELFLOADER_CFG_MAX_SYM_LEN];
+    union {
+        Elf_Rel *rel;
+        Elf_Rela *rela;
+        uint8_t *ptr;
+    } u;
+    int ent = (type == DT_REL) ? sizeof(Elf_Rel) : sizeof(Elf_Rela);
+    u.ptr = rel_rela;
 
-    for (Elf_Addr i = 0; i < size; i += sizeof(Elf_Rela), rela++) {
-        relsym = ELF_R_SYM(rela->r_info);
-        reltype = ELF_R_TYPE(rela->r_info);
+    for (Elf_Addr i = 0; i < size; i += sizeof(Elf_Rela), u.ptr += ent) {
+        relsym = ELF_R_SYM(u.rel->r_info);
+        reltype = ELF_R_TYPE(u.rel->r_info);
 
         sym = ((Elf_Sym *)linfo->dynamic.symtbl)[relsym];
         strncpy(symname, (const char *)(linfo->dynamic.strtbl + sym.st_name), sizeof(symname));
@@ -292,8 +306,11 @@ static int __vsf_elfloader_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t
             tgtvalue = (Elf_Addr)elfloader->ram_base + sym.st_value;
         }
 
+        if (type == DT_RELA) {
+            tgtvalue += u.rela->r_addend;
+        }
         vsf_elfloader_debug("relocate %s to 0x%X" VSF_TRACE_CFG_LINEEND, symname, tgtvalue);
-        if (vsf_elfloader_relocate_sym((Elf_Addr)elfloader->ram_base + rela->r_offset, reltype, tgtvalue) < 0) {
+        if (vsf_elfloader_relocate_sym((Elf_Addr)elfloader->ram_base + u.rel->r_offset, reltype, tgtvalue) < 0) {
             vsf_trace_error("fail to relocate %s" VSF_TRACE_CFG_LINEEND, symname);
             return -1;
         }
@@ -336,16 +353,25 @@ second_round_for_ram_base:
     }
 
     // relocating
-    if ((linfo.dynamic.pltrelsz > 0) || (linfo.dynamic.relasz > 0)) {
+    linfo.dynamic.symtbl += (Elf_Addr)elfloader->ram_base;
+    linfo.dynamic.strtbl += (Elf_Addr)elfloader->ram_base;
+    if (linfo.dynamic.pltrelsz > 0) {
         linfo.dynamic.jmprel += (Elf_Addr)elfloader->ram_base;
-        linfo.dynamic.symtbl += (Elf_Addr)elfloader->ram_base;
-        linfo.dynamic.strtbl += (Elf_Addr)elfloader->ram_base;
+        int ent = (linfo.dynamic.pltrel == DT_REL) ? sizeof(Elf_Rel) : sizeof(Elf_Rela);
+        if (    (vsf_elfloader_prepare_plt(elfloader, linfo.dynamic.pltrelsz / ent) < 0)
+            ||  (__vsf_elfloader_rel_rela(elfloader, &linfo, linfo.dynamic.pltrel, (void *)linfo.dynamic.jmprel, linfo.dynamic.pltrelsz) < 0)) {
+            goto cleanup_and_fail;
+        }
+    }
+    if (linfo.dynamic.relasz > 0) {
         linfo.dynamic.rela += (Elf_Addr)elfloader->ram_base;
-
-        if (    (    (linfo.dynamic.pltrelsz > 0)
-                &&  (__vsf_elfloader_rela(elfloader, &linfo, (Elf_Rela *)linfo.dynamic.jmprel, linfo.dynamic.pltrelsz) < 0))
-            ||  (    (linfo.dynamic.relasz > 0)
-                &&  (__vsf_elfloader_rela(elfloader, &linfo, (Elf_Rela *)linfo.dynamic.rela, linfo.dynamic.relasz) < 0))) {
+        if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_RELA, (void *)linfo.dynamic.rela, linfo.dynamic.relasz) < 0) {
+            goto cleanup_and_fail;
+        }
+    }
+    if (linfo.dynamic.relsz > 0) {
+        linfo.dynamic.rel += (Elf_Addr)elfloader->ram_base;
+        if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_REL, (void *)linfo.dynamic.rel, linfo.dynamic.relsz) < 0) {
             goto cleanup_and_fail;
         }
     }
