@@ -74,6 +74,10 @@ void * vsf_vplt_link(void *vplt, char *symname)
 {
     if (!strcmp(symname, "vsf_applet_ctx")) {
         return vsf_applet_ctx;
+    } else if (!strcmp(symname, "vsf_vplt_init_array")) {
+        return vsf_vplt_init_array;
+    } else if (!strcmp(symname, "vsf_vplt_fini_array")) {
+        return vsf_vplt_fini_array;
     }
     return __vsf_vplt_link(vplt, symname);
 }

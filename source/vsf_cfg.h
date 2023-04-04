@@ -184,7 +184,7 @@ extern void vsf_vplt_fini_array(void *target);
 #           define applet_entry                                                 \
                 _start(void) { vsf_applet_ctx_t *ctx = vsf_applet_ctx();
 #           define applet_init_array        vsf_vplt_init_array
-#           define applet_init_array        vsf_vplt_fini_array
+#           define applet_fini_array        vsf_vplt_fini_array
 #       else
 #           define applet_entry                                                 \
                 _start(vsf_applet_ctx_t *ctx) {
