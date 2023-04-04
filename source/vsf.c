@@ -34,11 +34,27 @@ WEAK(vsf_vplt_link)
 void * vsf_vplt_link(void *vplt, char *symname)
 {
     vsf_vplt_info_t *vplt_info = vplt;
-    void *subentry = &vplt_info[1];
+    unsigned short entry_num = vplt_info->entry_num;
 
     if (vplt_info->final) {
-
+        vsf_vplt_entry_t *entry = (vsf_vplt_entry_t *)&vplt_info[1];
+        for (unsigned short i = 0; i < entry_num; i++, entry++) {
+            if ((entry->name != NULL) && (!strcmp(entry->name, symname))) {
+                return entry->ptr;
+            }
+        }
+    } else {
+        void **subvplt = (void **)&vplt_info[1], *result;
+        for (unsigned short i = 0; i < entry_num; i++, subvplt++) {
+            if (*subvplt != NULL) {
+                result = vsf_vplt_link(*subvplt, symname);
+                if (result != NULL) {
+                    return result;
+                }
+            }
+        }
     }
+
     return NULL;
 }
 #   endif

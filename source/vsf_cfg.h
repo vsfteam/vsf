@@ -92,11 +92,14 @@ __VSF_HAL_SWI_NUM and its value must at least be 1.
 #ifndef __VSF_VPLT_DECORATE__
 #   define __VSF_VPLT_DECORATOR__               const
 #endif
-typedef struct vsf_vplt_info_t {
-    unsigned char major;
-    unsigned char minor;
-    unsigned short final : 1;
-    unsigned short entry_num : 15;
+typedef union vsf_vplt_info_t {
+    struct {
+        unsigned char major;
+        unsigned char minor;
+        unsigned short final : 1;
+        unsigned short entry_num : 15;
+    };
+    void *__make_vplt_info_aligned;
 } vsf_vplt_info_t;
 
 #if VSF_USE_APPLET == ENABLED
