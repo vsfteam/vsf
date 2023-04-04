@@ -29,9 +29,15 @@
 
 #if VSF_USE_APPLET == ENABLED
 
+WEAK(vsf_applet_ctx)
+vsf_applet_ctx_t * vsf_applet_ctx(void)
+{
+    return NULL;
+}
+
 #   if VSF_APPLET_CFG_LINKABLE == ENABLED
-WEAK(vsf_vplt_link)
-void * vsf_vplt_link(void *vplt, char *symname)
+
+static void * __vsf_vplt_link(void *vplt, char *symname)
 {
     vsf_vplt_info_t *vplt_info = vplt;
     unsigned short entry_num = vplt_info->entry_num;
@@ -47,7 +53,7 @@ void * vsf_vplt_link(void *vplt, char *symname)
         void **subvplt = (void **)&vplt_info[1], *result;
         for (unsigned short i = 0; i < entry_num; i++, subvplt++) {
             if (*subvplt != NULL) {
-                result = vsf_vplt_link(*subvplt, symname);
+                result = __vsf_vplt_link(*subvplt, symname);
                 if (result != NULL) {
                     return result;
                 }
@@ -57,13 +63,16 @@ void * vsf_vplt_link(void *vplt, char *symname)
 
     return NULL;
 }
-#   endif
 
-WEAK(vsf_applet_ctx)
-vsf_applet_ctx_t * vsf_applet_ctx(void)
+WEAK(vsf_vplt_link)
+void * vsf_vplt_link(void *vplt, char *symname)
 {
-    return NULL;
+    if (!strcmp(symname, "vsf_applet_ctx")) {
+        return vsf_applet_ctx;
+    }
+    return __vsf_vplt_link(vplt, symname);
 }
+#   endif
 
 #endif
 
