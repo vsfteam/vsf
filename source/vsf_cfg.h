@@ -167,8 +167,9 @@ typedef struct vsf_applet_ctx_t {
 } vsf_applet_ctx_t;
 #endif
 
-#if !defined(VSF_APPLET_CFG_VOID_ENTRY) && defined(__WIN__)
-#   define VSF_APPLET_CFG_VOID_ENTRY        ENABLED
+#if !defined(VSF_APPLET_CFG_ABI_PATCH) && defined(__WIN__)
+// Windows ABI is different from SystemV, enable abi patch
+#   define VSF_APPLET_CFG_ABI_PATCH        ENABLED
 #endif
 #ifdef __VSF_APPLET__
 #   if VSF_USE_APPLET == ENABLED && !defined(VSF_APPLET_VPLT)
@@ -176,13 +177,19 @@ typedef struct vsf_applet_ctx_t {
 #   endif
 
 #   ifndef applet_entry
-#       if VSF_APPLET_CFG_VOID_ENTRY == ENABLED
+#       if VSF_APPLET_CFG_ABI_PATCH == ENABLED
 extern vsf_applet_ctx_t * vsf_applet_ctx(void);
+extern int vsf_vplt_init_array(void *target);
+extern void vsf_vplt_fini_array(void *target);
 #           define applet_entry                                                 \
                 _start(void) { vsf_applet_ctx_t *ctx = vsf_applet_ctx();
+#           define applet_init_array        vsf_vplt_init_array
+#           define applet_init_array        vsf_vplt_fini_array
 #       else
 #           define applet_entry                                                 \
                 _start(vsf_applet_ctx_t *ctx) {
+#           define applet_init_array        ctx->fn_init
+#           define applet_fini_array        ctx->fn_fini
 #       endif
 #   endif
 
@@ -192,15 +199,15 @@ extern void * vsf_vplt(void *vplt);
     applet_entry                                                                \
         int result;                                                             \
         vsf_vplt(ctx->vplt);                                                    \
-        if (ctx->fn_init != NULL) {                                             \
-            result = ctx->fn_init(ctx->target);                                 \
+        if (applet_init_array != NULL) {                                        \
+            result = applet_init_array(ctx->target);                            \
             if (result) {                                                       \
                 return result;                                                  \
             }                                                                   \
         }                                                                       \
         result = main(ctx->argc, ctx->argv);                                    \
-        if (ctx->fn_fini != NULL) {                                             \
-            ctx->fn_fini(ctx->target);                                          \
+        if (applet_fini_array != NULL) {                                        \
+            applet_fini_array(ctx->target);                                     \
         }                                                                       \
         return result;                                                          \
     }                                                                           \

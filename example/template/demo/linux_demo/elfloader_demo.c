@@ -20,7 +20,7 @@ int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *targ
 }
 #endif
 
-#if VSF_APPLET_CFG_VOID_ENTRY == ENABLED
+#if VSF_APPLET_CFG_ABI_PATCH == ENABLED
 static int pls_applet_ctx = -1;
 vsf_applet_ctx_t * vsf_applet_ctx(void)
 {
@@ -29,6 +29,14 @@ vsf_applet_ctx_t * vsf_applet_ctx(void)
         return NULL;
     }
     return (vsf_applet_ctx_t *)pls->data;
+}
+int vsf_vplt_init_array(void *target)
+{
+    return vsf_elfloader_call_init_array(target);
+}
+void vsf_vplt_fini_array(void *target)
+{
+    vsf_elfloader_call_fini_array(target);
 }
 #endif
 
@@ -75,7 +83,7 @@ int elfloader_main(int argc, char **argv)
         };
 
         vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
-#if VSF_APPLET_CFG_VOID_ENTRY == ENABLED
+#if VSF_APPLET_CFG_ABI_PATCH == ENABLED
         if (pls_applet_ctx < 0) {
             pls_applet_ctx = vsf_linux_pls_alloc();
         }

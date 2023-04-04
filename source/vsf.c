@@ -29,6 +29,11 @@
 
 #if VSF_USE_APPLET == ENABLED
 
+WEAK(vsf_vplt_init_array)
+int vsf_vplt_init_array(void *target) { return -1; }
+WEAK(vsf_vplt_fini_array)
+void vsf_vplt_fini_array(void *target) { }
+
 WEAK(vsf_applet_ctx)
 vsf_applet_ctx_t * vsf_applet_ctx(void)
 {
