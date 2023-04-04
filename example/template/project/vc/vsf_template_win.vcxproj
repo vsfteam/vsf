@@ -1502,6 +1502,7 @@
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c" />
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_list.c" />
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_queue.c" />
+    <ClCompile Include="..\..\..\..\source\vsf.c" />
     <ClCompile Include="..\..\demo\audio_demo\audio_demo.c" />
     <ClCompile Include="..\..\demo\btstack_demo\btstack_application.c" />
     <ClCompile Include="..\..\demo\btstack_demo\btstack_demo.c" />

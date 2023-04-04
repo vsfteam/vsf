@@ -11,12 +11,14 @@
 #   define ELFLOADER_CFG_STDIO
 #endif
 
+#if VSF_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
 int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
 {
     void *fn = vsf_vplt_link((void *)&vsf_linux_vplt, symname);
     *target = (Elf_Addr)fn;
     return NULL == fn ? -1 : 0;
 }
+#endif
 
 #if VSF_APPLET_CFG_VOID_ENTRY == ENABLED
 static int pls_applet_ctx = -1;
