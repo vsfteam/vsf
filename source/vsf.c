@@ -31,8 +31,14 @@
 
 #   if VSF_APPLET_CFG_LINKABLE == ENABLED
 WEAK(vsf_vplt_link)
-void * vsf_vplt_link(char *symname)
+void * vsf_vplt_link(void *vplt, char *symname)
 {
+    vsf_vplt_info_t *vplt_info = vplt;
+    void *subentry = &vplt_info[1];
+
+    if (vplt_info->final) {
+
+    }
     return NULL;
 }
 #   endif

@@ -111,8 +111,42 @@ typedef struct vsf_vplt_t {
 } vsf_vplt_t;
 extern __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt;
 #   if VSF_APPLET_CFG_LINKABLE == ENABLED
-extern void * vsf_vplt_link(char *symname);
+extern void * vsf_vplt_link(void *vplt, char *symname);
 #   endif
+#endif
+
+typedef struct vsf_vplt_entry_t {
+#if VSF_APPLET_CFG_LINKABLE == ENABLED
+    // TODO: implement hash for link performance
+    const char *name;
+#endif
+    void *ptr;
+} vsf_vplt_entry_t;
+
+#define VSF_APPLET_VPLT_INFO(__TYPE, __MAJOR, __MINOR, __FINAL)                 \
+    .info = {                                                                   \
+        .major = (__MAJOR),                                                     \
+        .minor = (__MINOR),                                                     \
+        .final = (__FINAL),                                                     \
+        .entry_num = (sizeof(__TYPE) - sizeof(vsf_vplt_info_t)) / sizeof(void *),\
+    }
+#define VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__NAME)                                  \
+    vsf_vplt_entry_t VSF_MCONNECT(fn_, __NAME)
+#define VSF_APPLET_VPLT_ENTRY_FUNC_IMP(__VPLT, __NAME, __RET, ...)              \
+    static inline __RET __NAME(__VA_ARGS__) {                                   \
+        return ((__RET (*)(__VA_ARGS__))((__VPLT)->VSF_MCONNECT(fn_, __NAME).ptr))(__VA_ARGS__);\
+    }
+#if VSF_APPLET_CFG_LINKABLE == ENABLED
+#   define VSF_APPLET_VPLT_ENTRY_FUNC(__NAME)                                   \
+    .VSF_MCONNECT(fn_, __NAME) = {                                              \
+        .name = VSF_STR(__NAME),                                                \
+        .ptr = (__NAME),                                                        \
+    }
+#else
+#   define VSF_APPLET_VPLT_ENTRY_FUNC(__NAME)                                   \
+    .VSF_MCONNECT(fn_, __NAME) = {                                              \
+        .ptr = (__NAME),                                                        \
+    }
 #endif
 
 #ifndef __VSF_APPLET_CTX_DEFINED__

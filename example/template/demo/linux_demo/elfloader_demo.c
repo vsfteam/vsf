@@ -13,7 +13,7 @@
 
 int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
 {
-    void *fn = vsf_vplt_link(symname);
+    void *fn = vsf_vplt_link((void *)&vsf_linux_vplt, symname);
     *target = (Elf_Addr)fn;
     return NULL == fn ? -1 : 0;
 }
