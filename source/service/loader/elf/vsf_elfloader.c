@@ -85,7 +85,7 @@ int vsf_elfloader_arch_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalu
 WEAK(vsf_elfloader_arch_init_plt)
 int vsf_elfloader_arch_init_plt(vsf_elfloader_t *elfloader, int num)
 {
-    return -1;
+    return 0;
 }
 
 // vsf_elfloader_arch_fini_plt is used to free necessary resources after linking
@@ -98,6 +98,12 @@ int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *targ
 {
     vsf_trace_error("relocating is not supported yet" VSF_TRACE_CFG_LINEEND);
     return -1;
+}
+
+WEAK(vsf_elfloader_arch_link)
+int vsf_elfloader_arch_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
+{
+    return vsf_elfloader_link(elfloader, symname, target);
 }
 
 void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
@@ -303,7 +309,7 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_in
         vsf_elfloader_debug("locate %s" VSF_TRACE_CFG_LINEEND, symname);
 
         if (0 == sym.st_value) {
-            if (vsf_elfloader_link(elfloader, symname, &tgtvalue) < 0) {
+            if (vsf_elfloader_arch_link(elfloader, symname, &tgtvalue) < 0) {
                 vsf_trace_error("fail to locate %s" VSF_TRACE_CFG_LINEEND, symname);
                 return -1;
             }

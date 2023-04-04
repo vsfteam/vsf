@@ -22,7 +22,8 @@
 #if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED && defined(__CPU_X64__)
 
 #include "utilities/vsf_utilities.h"
-#include "../elf.h"
+#define __VSF_ELFLOADER_CLASS_INHERIT__
+#include "../../vsf_loader.h"
 
 /*============================ MACROS ========================================*/
 
@@ -60,5 +61,114 @@ int vsf_elfloader_arch_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalu
     }
     return -1;
 }
+
+#ifdef __WIN__
+// refer to https://github.com/303248153/HelloElfLoader
+// 把System V AMD64 ABI转换为Microsoft x64 calling convention
+static const char generic_func_loader[] = {
+    // 让参数连续排列在栈上
+    // [第一个参数] [第二个参数] [第三个参数] ...
+    0x58, // pop %rax 暂存原返回地址
+    0x41, 0x51, // push %r9 入栈第六个参数，之后的参数都在后续的栈上
+    0x41, 0x50, // push %r8 入栈第五个参数
+    0x51, // push %rcx 入栈第四个参数
+    0x52, // push %rdx 入栈第三个参数
+    0x56, // push %rsi 入栈第二个参数
+    0x57, // push %rdi 入栈第一个参数
+
+    // 调用setOriginalReturnAddress保存原返回地址
+    0x48, 0x89, 0xc1, // mov %rax, %rcx 第一个参数是原返回地址
+    0x48, 0x83, 0xec, 0x20, // sub $0x20, %rsp 预留32位的影子空间
+    0x48, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // movabs $0, %rax
+    0xff, 0xd0, // callq *%rax 调用setOriginalReturnAddress
+    0x48, 0x83, 0xc4, 0x20, // add %0x20, %rsp 释放影子空间
+
+    // 转换到Microsoft x64 calling convention
+    0x59, // pop %rcx 出栈第一个参数
+    0x5a, // pop %rdx 出栈第二个参数
+    0x41, 0x58, // pop %r8 // 出栈第三个参数
+    0x41, 0x59, // pop %r9 // 出栈第四个参数
+
+    // 调用目标函数
+    0x48, 0x83, 0xec, 0x20, // sub $0x20, %esp 预留32位的影子空间
+    0x48, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // movabs 0, %rax
+    0xff, 0xd0, // callq *%rax 调用模拟的函数
+    0x48, 0x83, 0xc4, 0x30, // add $0x30, %rsp 释放影子空间和参数(影子空间32 + 参数8*2)
+    0x50, // push %rax 保存返回值
+
+    // 调用getOriginalReturnAddress获取原返回地址
+    0x48, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // movabs $0, %rax
+    0xff, 0xd0, // callq *%rax 调用getOriginalReturnAddress
+    0x48, 0x89, 0xc1, // mov %rax, %rcx 原返回地址存到rcx
+    0x58, // 恢复返回值
+    0x51, // 原返回地址入栈顶
+    0xc3 // 返回
+};
+static const int generic_func_loader_set_addr_offset = 18;
+static const int generic_func_loader_target_offset = 44;
+static const int generic_func_loader_get_addr_offset = 61;
+
+void *originalReturnAddress = NULL;
+void* getOriginalReturnAddress() {
+    return originalReturnAddress;
+}
+void setOriginalReturnAddress(void* address) {
+    originalReturnAddress = address;
+}
+
+typedef struct vsf_elfloader_arch_data_t {
+    int pos;
+    int num;
+    char *entries;
+} vsf_elfloader_arch_data_t;
+
+int vsf_elfloader_arch_init_plt(vsf_elfloader_t *elfloader, int num)
+{
+    int entry_size = (sizeof(generic_func_loader) + 0xF) & ~0xF;
+    vsf_elfloader_arch_data_t *arch_data = vsf_loader_malloc(elfloader, VSF_LOADER_MEM_RWX,
+        sizeof(vsf_elfloader_arch_data_t) + num * entry_size, 0);
+    if (NULL == arch_data) {
+        return -1;
+    }
+
+    arch_data->pos = 0;
+    arch_data->num = num;
+    arch_data->entries = (char *)&arch_data[1];
+    char *ptr = arch_data->entries;
+    while (num-- > 0) {
+        memcpy(ptr, generic_func_loader, sizeof(generic_func_loader));
+        ptr += entry_size;
+    }
+    elfloader->arch_data = arch_data;
+    return 0;
+}
+
+void vsf_elfloader_arch_fini_plt(vsf_elfloader_t *elfloader)
+{
+    if (elfloader->arch_data != NULL) {
+        vsf_loader_free(elfloader, VSF_LOADER_MEM_RWX, elfloader->arch_data);
+        elfloader->arch_data = NULL;
+    }
+}
+
+int vsf_elfloader_arch_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
+{
+    vsf_elfloader_arch_data_t *arch_data = elfloader->arch_data;
+    VSF_SERVICE_ASSERT((arch_data != NULL) && (arch_data->pos < arch_data->num));
+
+    Elf_Addr link_tgt;
+    if (vsf_elfloader_link(elfloader, symname, &link_tgt) < 0) {
+        return -1;
+    }
+
+    int entry_size = (sizeof(generic_func_loader) + 0xF) & ~0xF;
+    char *ptr = arch_data->entries + arch_data->pos++ * entry_size;
+    *(uint64_t *)(ptr + generic_func_loader_set_addr_offset) = (uint64_t)setOriginalReturnAddress;
+    *(uint64_t *)(ptr + generic_func_loader_target_offset) = (uint64_t)link_tgt;
+    *(uint64_t *)(ptr + generic_func_loader_get_addr_offset) = (uint64_t)getOriginalReturnAddress;
+    *target = (Elf_Addr)ptr;
+    return 0;
+}
+#endif
 
 #endif      // VSF_USE_LOADER && VSF_LOADER_USE_ELF && defined(__ARM_ARCH_PROFILE)

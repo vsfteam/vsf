@@ -22,7 +22,8 @@
 #if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED && defined(__ARM_ARCH_PROFILE)
 
 #include "utilities/vsf_utilities.h"
-#include "../elf.h"
+#define __VSF_ELFLOADER_CLASS_INHERIT__
+#include "../../vsf_loader.h"
 
 /*============================ MACROS ========================================*/
 
