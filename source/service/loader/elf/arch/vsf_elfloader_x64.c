@@ -108,11 +108,14 @@ static const int generic_func_loader_set_addr_offset = 18;
 static const int generic_func_loader_target_offset = 44;
 static const int generic_func_loader_get_addr_offset = 61;
 
-void *originalReturnAddress = NULL;
-void* getOriginalReturnAddress() {
-    return originalReturnAddress;
+void * originalReturnAddress = NULL;
+void * getOriginalReturnAddress() {
+    void *result = originalReturnAddress;
+    originalReturnAddress = NULL;
+    return result;
 }
 void setOriginalReturnAddress(void* address) {
+    VSF_SERVICE_ASSERT(NULL == originalReturnAddress);
     originalReturnAddress = address;
 }
 
