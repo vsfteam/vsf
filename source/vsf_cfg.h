@@ -131,7 +131,8 @@ typedef struct vsf_vplt_entry_t {
         .major = (__MAJOR),                                                     \
         .minor = (__MINOR),                                                     \
         .final = (__FINAL),                                                     \
-        .entry_num = (sizeof(__TYPE) - sizeof(vsf_vplt_info_t)) / sizeof(void *),\
+        .entry_num =    (sizeof(__TYPE) - sizeof(vsf_vplt_info_t))              \
+                    /   ((__FINAL) ? sizeof(vsf_vplt_entry_t) : sizeof(void *)),\
     }
 #define VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__NAME)                                  \
     vsf_vplt_entry_t fn_##__NAME
@@ -176,6 +177,7 @@ typedef struct vsf_applet_ctx_t {
 
 #   ifndef applet_entry
 #       if VSF_APPLET_CFG_VOID_ENTRY == ENABLED
+extern vsf_applet_ctx_t * vsf_applet_ctx(void);
 #           define applet_entry                                                 \
                 _start(void) { vsf_applet_ctx_t *ctx = vsf_applet_ctx();
 #       else
