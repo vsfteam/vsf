@@ -73,20 +73,24 @@ typedef struct vsf_elfloader_info_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-// vsf_elfloader_relocate_sym will be over-written by the same function in
+// vsf_elfloader_arch_relocate_sym will be over-written by the same function in
 //  the source code for specified arch.
-WEAK(vsf_elfloader_relocate_sym)
-int vsf_elfloader_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
+WEAK(vsf_elfloader_arch_relocate_sym)
+int vsf_elfloader_arch_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
 {
     return -1;
 }
 
-// vsf_elfloader_prepare_plt is used to allocate necessary resources before linking
-WEAK(vsf_elfloader_prepare_plt)
-int vsf_elfloader_prepare_plt(vsf_elfloader_t *elfloader, int num)
+// vsf_elfloader_arch_init_plt is used to allocate necessary resources before linking
+WEAK(vsf_elfloader_arch_init_plt)
+int vsf_elfloader_arch_init_plt(vsf_elfloader_t *elfloader, int num)
 {
     return -1;
 }
+
+// vsf_elfloader_arch_fini_plt is used to free necessary resources after linking
+WEAK(vsf_elfloader_arch_fini_plt)
+void vsf_elfloader_arch_fini_plt(vsf_elfloader_t *elfloader) { }
 
 // vsf_elfloader_link should be over-written by user to do syjmbol linking
 WEAK(vsf_elfloader_link)
@@ -99,6 +103,7 @@ int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *targ
 void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
 {
     elfloader->target = NULL;
+    vsf_elfloader_arch_fini_plt(elfloader);
     if (elfloader->ram_base != NULL) {
         vsf_loader_free(elfloader, VSF_LOADER_MEM_RW, elfloader->ram_base);
         elfloader->ram_base = NULL;
@@ -310,7 +315,7 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_in
             tgtvalue += u.rela->r_addend;
         }
         vsf_elfloader_debug("relocate %s to 0x%X" VSF_TRACE_CFG_LINEEND, symname, tgtvalue);
-        if (vsf_elfloader_relocate_sym((Elf_Addr)elfloader->ram_base + u.rel->r_offset, reltype, tgtvalue) < 0) {
+        if (vsf_elfloader_arch_relocate_sym((Elf_Addr)elfloader->ram_base + u.rel->r_offset, reltype, tgtvalue) < 0) {
             vsf_trace_error("fail to relocate %s" VSF_TRACE_CFG_LINEEND, symname);
             return -1;
         }
@@ -358,7 +363,7 @@ second_round_for_ram_base:
     if (linfo.dynamic.pltrelsz > 0) {
         linfo.dynamic.jmprel += (Elf_Addr)elfloader->ram_base;
         int ent = (linfo.dynamic.pltrel == DT_REL) ? sizeof(Elf_Rel) : sizeof(Elf_Rela);
-        if (    (vsf_elfloader_prepare_plt(elfloader, linfo.dynamic.pltrelsz / ent) < 0)
+        if (    (vsf_elfloader_arch_init_plt(elfloader, linfo.dynamic.pltrelsz / ent) < 0)
             ||  (__vsf_elfloader_rel_rela(elfloader, &linfo, linfo.dynamic.pltrel, (void *)linfo.dynamic.jmprel, linfo.dynamic.pltrelsz) < 0)) {
             goto cleanup_and_fail;
         }

@@ -60,7 +60,10 @@ vsf_class(vsf_elfloader_t) {
     public_member(
         implement(vsf_loader_t)
         void *static_base;
-        void *user_data;
+    )
+
+    protected_member(
+        void *arch_data;
     )
 
     private_member(
