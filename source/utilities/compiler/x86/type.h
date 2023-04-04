@@ -102,7 +102,11 @@ extern "C" {
 
 #       ifndef __VSF_COMPILER_STDIO_H__
 #       define __VSF_COMPILER_STDIO_H__
+#           ifdef __CPU_X64__
+typedef long long           off_t;
+#           else
 typedef long                off_t;
+#           endif
 typedef long long           off64_t;
 #       endif
 
