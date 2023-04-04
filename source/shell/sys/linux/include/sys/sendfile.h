@@ -21,7 +21,7 @@ extern "C" {
 typedef struct vsf_linux_sys_sendfile_vplt_t {
     vsf_vplt_info_t info;
 
-    ssize_t (*sendfile)(int out_fd, int in_fd, off_t *offset, size_t count);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sendfile);
 } vsf_linux_sys_sendfile_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_sendfile_vplt_t vsf_linux_sys_sendfile_vplt;
@@ -40,8 +40,13 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_sendfile_vplt_t vsf_linux_sys_sendfi
 #   endif
 #endif
 
-static inline ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count) {
-    return VSF_LINUX_APPLET_SYS_SENDFILE_VPLT->sendfile(out_fd, in_fd, offset, count);
+#define VSF_LINUX_APPLET_SYS_SENDFILE_ENTRY(__NAME)                             \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_SENDFILE_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_SENDFILE_IMP(...)                                  \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_SENDFILE_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_SENDFILE_IMP(sendfile, ssize_t, int out_fd, int in_fd, off_t *offset, size_t count) {
+    return VSF_LINUX_APPLET_SYS_SENDFILE_ENTRY(sendfile)(out_fd, in_fd, offset, count);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SENDFILE

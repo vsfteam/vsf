@@ -43,28 +43,33 @@ extern "C" {
 #define MS_SYNC         2
 #define MS_INVALIDATE   4
 
-#if VSF_LINUX_APPLET_USE_SYS_MMAP == ENABLED
-typedef struct vsf_linux_sys_mmap_vplt_t {
+#if VSF_LINUX_APPLET_USE_SYS_MMAN == ENABLED
+typedef struct vsf_linux_sys_mman_vplt_t {
     vsf_vplt_info_t info;
-} vsf_linux_sys_mmap_vplt_t;
+} vsf_linux_sys_mman_vplt_t;
 #   ifndef __VSF_APPLET__
-extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_mmap_vplt_t vsf_linux_sys_mmap_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_mman_vplt_t vsf_linux_sys_mman_vplt;
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_MMAP == ENABLED
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_MMAN == ENABLED
 
-#ifndef VSF_LINUX_APPLET_SYS_MMAP_VPLT
+#ifndef VSF_LINUX_APPLET_SYS_MMAN_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
-#       define VSF_LINUX_APPLET_SYS_MMAP_VPLT                                   \
-            ((vsf_linux_sys_mmap_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_mmap_vplt))
+#       define VSF_LINUX_APPLET_SYS_MMAN_VPLT                                   \
+            ((vsf_linux_sys_mman_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_mman_vplt))
 #   else
-#       define VSF_LINUX_APPLET_SYS_MMAP_VPLT                                   \
-            ((vsf_linux_sys_mmap_vplt_t *)vsf_vplt((void *)0))
+#       define VSF_LINUX_APPLET_SYS_MMAN_VPLT                                   \
+            ((vsf_linux_sys_mman_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
 
-#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_MMAP
+#define VSF_LINUX_APPLET_SYS_MMAN_ENTRY(__NAME)                                 \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_MMAN_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_MMAN_IMP(...)                                      \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_MMAN_VPLT, __VA_ARGS__)
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_MMAN
 
 int shm_open(const char *name, int oflag, mode_t mode);
 int shm_unlink(const char *name);
@@ -75,7 +80,7 @@ int munmap(void *addr, size_t len);
 int mprotect(void *addr, size_t len, int prot);
 int msync(void *addr, size_t len, int flags);
 
-#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_MMAP
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_MMAN
 
 static inline int mlock(const void *addr, size_t len) { return 0; }
 static inline int mlock2(const void *addr, size_t len, unsigned int flags) { return 0; }

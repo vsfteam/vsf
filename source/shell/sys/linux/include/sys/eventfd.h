@@ -37,9 +37,9 @@ typedef uint64_t                eventfd_t;
 typedef struct vsf_linux_sys_eventfd_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*eventfd)(int count, int flags);
-    int (*eventfd_read)(int fd, eventfd_t *value);
-    int (*eventfd_write)(int fd, eventfd_t value);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(eventfd);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(eventfd_read);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(eventfd_write);
 } vsf_linux_sys_eventfd_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_eventfd_vplt_t vsf_linux_sys_eventfd_vplt;
@@ -58,14 +58,19 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_eventfd_vplt_t vsf_linux_sys_eventfd
 #   endif
 #endif
 
-static inline int eventfd(int count, int flags) {
-    return VSF_LINUX_APPLET_SYS_EVENTFD_VPLT->eventfd(count, flags);
+#define VSF_LINUX_APPLET_SYS_EVENTFD_ENTRY(__NAME)                              \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_EVENTFD_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_EVENTFD_IMP(...)                                   \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_EVENTFD_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_EVENTFD_IMP(eventfd, int, int count, int flags) {
+    return VSF_LINUX_APPLET_SYS_EVENTFD_ENTRY(eventfd)(count, flags);
 }
-static inline int eventfd_read(int fd, eventfd_t *value) {
-    return VSF_LINUX_APPLET_SYS_EVENTFD_VPLT->eventfd_read(fd, value);
+VSF_LINUX_APPLET_SYS_EVENTFD_IMP(eventfd_read, int, int fd, eventfd_t *value) {
+    return VSF_LINUX_APPLET_SYS_EVENTFD_ENTRY(eventfd_read)(fd, value);
 }
-static inline int eventfd_write(int fd, eventfd_t value) {
-    return VSF_LINUX_APPLET_SYS_EVENTFD_VPLT->eventfd_write(fd, value);
+VSF_LINUX_APPLET_SYS_EVENTFD_IMP(eventfd_write, int, int fd, eventfd_t value) {
+    return VSF_LINUX_APPLET_SYS_EVENTFD_ENTRY(eventfd_write)(fd, value);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_EVENTFD

@@ -56,8 +56,8 @@ struct pollfd {
 typedef struct vsf_linux_poll_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*poll)(struct pollfd *fds, nfds_t nfds, int timeout);
-    int (*ppoll)(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(poll);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ppoll);
 } vsf_linux_poll_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_poll_vplt_t vsf_linux_poll_vplt;
@@ -76,11 +76,16 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_poll_vplt_t vsf_linux_poll_vplt;
 #   endif
 #endif
 
-static inline int poll(struct pollfd *fds, nfds_t nfds, int timeout) {
-    return VSF_LINUX_APPLET_POLL_VPLT->poll(fds, nfds, timeout);
+#define VSF_LINUX_APPLET_POLL_ENTRY(__NAME)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_POLL_VPLT, __NAME)
+#define VSF_LINUX_APPLET_POLL_IMP(...)                                          \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_POLL_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_POLL_IMP(poll, int, struct pollfd *fds, nfds_t nfds, int timeout) {
+    return VSF_LINUX_APPLET_POLL_ENTRY(poll)(fds, nfds, timeout);
 }
-int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask) {
-    return VSF_LINUX_APPLET_POLL_VPLT->ppoll(fds, nfds, timeout_ts, sigmask);
+VSF_LINUX_APPLET_POLL_IMP(ppoll, int, struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask) {
+    return VSF_LINUX_APPLET_POLL_ENTRY(ppoll)(fds, nfds, timeout_ts, sigmask);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_POLL

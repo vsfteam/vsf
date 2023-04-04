@@ -36,7 +36,7 @@ struct utsname {
 typedef struct vsf_linux_sys_utsname_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*uname)(struct utsname *name);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(uname);
 } vsf_linux_sys_utsname_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_utsname_vplt_t vsf_linux_sys_utsname_vplt;
@@ -55,8 +55,13 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_utsname_vplt_t vsf_linux_sys_utsname
 #   endif
 #endif
 
-static inline int uname(struct utsname *name) {
-    return VSF_LINUX_APPLET_SYS_UTSNAME_VPLT->uname(name);
+#define VSF_LINUX_APPLET_SYS_UTSNAME_ENTRY(__NAME)                              \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_UTSNAME_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_UTSNAME_IMP(...)                                   \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_UTSNAME_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_UTSNAME_IMP(uname, int, struct utsname *name) {
+    return VSF_LINUX_APPLET_SYS_UTSNAME_ENTRY(uname)(name);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_UTSNAME

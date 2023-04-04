@@ -70,11 +70,9 @@ __BEGIN_DECLS
 typedef struct vsf_linux_libgetopt_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*getopt_long)(int, char * const *, const char *,
-        const struct option *, int *);
-    int (*getopt_long_only)(int, char * const *, const char *,
-        const struct option *, int *);
-    int (*getopt)(int, char * const *, const char *);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getopt_long);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getopt_long_only);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getopt);
 } vsf_linux_libgetopt_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libgetopt_vplt_t vsf_linux_libgetopt_vplt;
@@ -93,16 +91,19 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libgetopt_vplt_t vsf_linux_libgetopt_vpl
 #   endif
 #endif
 
-static inline int getopt_long(int a0, char * const *a1, const char *a2,
-        const struct option *a3, int *a4) {
-    return VSF_LINUX_APPLET_LIBGETOPT_VPLT->getopt_long(a0, a1, a2, a3, a4);
+#define VSF_LINUX_APPLET_LIBGETOPT_ENTRY(__NAME)                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_LIBGETOPT_VPLT, __NAME)
+#define VSF_LINUX_APPLET_LIBGETOPT_IMP(...)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBGETOPT_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_LIBGETOPT_IMP(getopt_long, int, int a0, char * const *a1, const char *a2, const struct option *a3, int *a4) {
+    return VSF_LINUX_APPLET_LIBGETOPT_ENTRY(getopt_long)(a0, a1, a2, a3, a4);
 }
-static inline int getopt_long_only(int a0, char * const *a1, const char *a2,
-        const struct option *a3, int *a4) {
-    return VSF_LINUX_APPLET_LIBGETOPT_VPLT->getopt_long_only(a0, a1, a2, a3, a4);
+VSF_LINUX_APPLET_LIBGETOPT_IMP(getopt_long_only, int, int a0, char * const *a1, const char *a2, const struct option *a3, int *a4) {
+    return VSF_LINUX_APPLET_LIBGETOPT_ENTRY(getopt_long_only)(a0, a1, a2, a3, a4);
 }
-static inline int getopt(int a0, char * const *a1, const char *a2) {
-    return VSF_LINUX_APPLET_LIBGETOPT_VPLT->getopt(a0, a1, a2);
+VSF_LINUX_APPLET_LIBGETOPT_IMP(getopt, int, int a0, char * const *a1, const char *a2) {
+    return VSF_LINUX_APPLET_LIBGETOPT_ENTRY(getopt)(a0, a1, a2);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBGETOPT

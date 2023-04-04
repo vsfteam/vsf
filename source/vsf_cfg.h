@@ -131,20 +131,21 @@ typedef struct vsf_vplt_entry_t {
         .entry_num = (sizeof(__TYPE) - sizeof(vsf_vplt_info_t)) / sizeof(void *),\
     }
 #define VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__NAME)                                  \
-    vsf_vplt_entry_t VSF_MCONNECT(fn_, __NAME)
+    vsf_vplt_entry_t fn_##__NAME
+#define VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(__VPLT, __NAME)                        \
+    ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
 #define VSF_APPLET_VPLT_ENTRY_FUNC_IMP(__VPLT, __NAME, __RET, ...)              \
-    static inline __RET __NAME(__VA_ARGS__) {                                   \
-        return ((__RET (*)(__VA_ARGS__))((__VPLT)->VSF_MCONNECT(fn_, __NAME).ptr))(__VA_ARGS__);\
-    }
+    typedef __RET (*__##__NAME##_prototype_t)(__VA_ARGS__);                     \
+    static inline __RET __NAME(__VA_ARGS__)
 #if VSF_APPLET_CFG_LINKABLE == ENABLED
 #   define VSF_APPLET_VPLT_ENTRY_FUNC(__NAME)                                   \
-    .VSF_MCONNECT(fn_, __NAME) = {                                              \
+    .fn_##__NAME = {                                                            \
         .name = VSF_STR(__NAME),                                                \
         .ptr = (__NAME),                                                        \
     }
 #else
 #   define VSF_APPLET_VPLT_ENTRY_FUNC(__NAME)                                   \
-    .VSF_MCONNECT(fn_, __NAME) = {                                              \
+    .fn_##__NAME = {                                                            \
         .ptr = (__NAME),                                                        \
     }
 #endif

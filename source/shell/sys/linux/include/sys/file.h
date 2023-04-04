@@ -25,7 +25,7 @@ extern "C" {
 typedef struct vsf_linux_sys_file_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*flock)(int fd, int operation);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(flock);
 } vsf_linux_sys_file_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_file_vplt_t vsf_linux_sys_file_vplt;
@@ -44,8 +44,13 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_file_vplt_t vsf_linux_sys_file_vplt;
 #   endif
 #endif
 
-static inline int flock(int fd, int operation) {
-    return VSF_LINUX_APPLET_SYS_FILE_VPLT->flock(fd, operation);
+#define VSF_LINUX_APPLET_SYS_FILE_ENTRY(__NAME)                                 \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_FILE_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_FILE_IMP(...)                                      \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_FILE_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_FILE_IMP(flock, int, int fd, int operation) {
+    return VSF_LINUX_APPLET_SYS_FILE_ENTRY(flock)(fd, operation);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_FILE

@@ -34,7 +34,7 @@ struct signalfd_siginfo {
 typedef struct vsf_linux_sys_signalfd_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*signalfd)(int fd, const sigset_t *mask, int flags);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(signalfd);
 } vsf_linux_sys_signalfd_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_signalfd_vplt_t vsf_linux_sys_signalfd_vplt;
@@ -53,8 +53,13 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_signalfd_vplt_t vsf_linux_sys_signal
 #   endif
 #endif
 
-static inline int signalfd(int fd, const sigset_t *mask, int flags) {
-    return VSF_LINUX_APPLET_SYS_SIGNALFD_VPLT->signalfd(fd, mask, flags);
+#define VSF_LINUX_APPLET_SYS_SIGNALFD_ENTRY(__NAME)                             \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_SIGNALFD_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_SIGNALFD_IMP(...)                                  \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_SIGNALFD_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_SIGNALFD_IMP(signalfd, int, int fd, const sigset_t *mask, int flags) {
+    return VSF_LINUX_APPLET_SYS_SIGNALFD_ENTRY(signalfd)(fd, mask, flags);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SIGNALFD

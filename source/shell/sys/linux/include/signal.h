@@ -204,6 +204,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt;
 #   endif
 #endif
 
+#define VSF_LINUX_APPLET_SIGNAL_ENTRY(__NAME)                                   \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SIGNAL_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SIGNAL_IMP(...)                                        \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SIGNAL_VPLT, __VA_ARGS__)
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SIGNAL
 
 int kill(pid_t pid, int sig);

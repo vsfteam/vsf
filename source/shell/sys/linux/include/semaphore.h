@@ -34,13 +34,13 @@ typedef vsf_sem_t sem_t;
 typedef struct vsf_linux_semaphore_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*sem_init)(sem_t *sem, int pshared, unsigned int value);
-    int (*sem_destroy)(sem_t *sem);
-    int (*sem_wait)(sem_t *sem);
-    int (*sem_trywait)(sem_t *sem);
-    int (*sem_timedwait)(sem_t *sem, const struct timespec *abs_timeout);
-    int (*sem_post)(sem_t *sem);
-    int (*sem_getvalue)(sem_t *sem, int *value);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sem_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sem_destroy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sem_wait);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sem_trywait);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sem_timedwait);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sem_post);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sem_getvalue);
 } vsf_linux_semaphore_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_semaphore_vplt_t vsf_linux_semaphore_vplt;
@@ -59,26 +59,31 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_semaphore_vplt_t vsf_linux_semaphore_vpl
 #   endif
 #endif
 
-static inline int sem_init(sem_t *sem, int pshared, unsigned int value) {
-    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_init(sem, pshared, value);
+#define VSF_LINUX_APPLET_SEMAPHORE_ENTRY(__NAME)                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SEMAPHORE_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SEMAPHORE_IMP(...)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SEMAPHORE_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_init, int, sem_t *sem, int pshared, unsigned int value) {
+    return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_init)(sem, pshared, value);
 }
-static inline int sem_destroy(sem_t *sem) {
-    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_destroy(sem);
+VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_destroy, int, sem_t *sem) {
+    return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_destroy)(sem);
 }
-static inline int sem_wait(sem_t *sem) {
-    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_wait(sem);
+VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_wait, int, sem_t *sem) {
+    return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_wait)(sem);
 }
-static inline int sem_trywait(sem_t *sem) {
-    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_trywait(sem);
+VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_trywait, int, sem_t *sem) {
+    return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_trywait)(sem);
 }
-static inline int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout) {
-    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_timedwait(sem, abs_timeout);
+VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_timedwait, int, sem_t *sem, const struct timespec *abs_timeout) {
+    return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_timedwait)(sem, abs_timeout);
 }
-static inline int sem_post(sem_t *sem) {
-    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_post(sem);
+VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_post, int, sem_t *sem) {
+    return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_post)(sem);
 }
-static inline int sem_getvalue(sem_t *sem, int *value) {
-    return VSF_LINUX_APPLET_SEMAPHORE_VPLT->sem_getvalue(sem, value);
+VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_getvalue, int, sem_t *sem, int *value) {
+    return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_getvalue)(sem, value);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SEMAPHORE

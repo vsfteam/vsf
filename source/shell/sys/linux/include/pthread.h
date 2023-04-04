@@ -237,93 +237,92 @@ enum {
 typedef struct vsf_linux_pthread_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*pthread_key_create)(pthread_key_t *key, void (*destructor)(void*));
-    int (*pthread_key_delete)(pthread_key_t key);
-    int (*pthread_setspecific)(pthread_key_t key, const void *value);
-    void * (*pthread_getspecific)(pthread_key_t key);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_key_create);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_key_delete);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_setspecific);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_getspecific);
 
-    int (*pthread_mutex_init)(pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr);
-    int (*pthread_mutex_destroy)(pthread_mutex_t *mutex);
-    int (*pthread_mutex_lock)(pthread_mutex_t *mutex);
-    int (*pthread_mutex_trylock)(pthread_mutex_t *mutex);
-    int (*pthread_mutex_unlock)(pthread_mutex_t *mutex);
-    int (*pthread_mutexattr_init)(pthread_mutexattr_t *mattr);
-    int (*pthread_mutexattr_destroy)(pthread_mutexattr_t *mattr);
-    int (*pthread_mutexattr_setpshared)(pthread_mutexattr_t *mattr, int pshared);
-    int (*pthread_mutexattr_getpshared)(pthread_mutexattr_t *mattr, int *pshared);
-    int (*pthread_mutexattr_settype)(pthread_mutexattr_t *mattr , int type);
-    int (*pthread_mutexattr_gettype)(pthread_mutexattr_t *mattr , int *type);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_destroy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_lock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_trylock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_unlock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutexattr_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutexattr_destroy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutexattr_setpshared);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutexattr_getpshared);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutexattr_settype);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutexattr_gettype);
 
-    int (*pthread_cond_init)(pthread_cond_t *cond, const pthread_condattr_t *attr);
-    int (*pthread_cond_destroy)(pthread_cond_t *cond);
-    int (*pthread_cond_signal)(pthread_cond_t *cond);
-    int (*pthread_cond_broadcast)(pthread_cond_t *cond);
-    int (*pthread_cond_wait)(pthread_cond_t *cond, pthread_mutex_t *mutex);
-    int (*pthread_cond_timedwait)(pthread_cond_t *cond, pthread_mutex_t *mutex,
-        const struct timespec *abstime);
-    int (*pthread_condattr_init)(pthread_condattr_t *cattr);
-    int (*pthread_condattr_destroy)(pthread_condattr_t *cattr);
-    int (*pthread_condattr_setpshared)(pthread_condattr_t *cattr, int pshared);
-    int (*pthread_condattr_getpshared)(pthread_condattr_t *cattr, int *pshared);
-    int (*pthread_condattr_getclock)(const pthread_condattr_t *cattr, clockid_t *clock_id);
-    int (*pthread_condattr_setclock)(pthread_condattr_t *cattr, clockid_t clock_id);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_cond_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_cond_destroy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_cond_signal);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_cond_broadcast);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_cond_wait);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_cond_timedwait);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_condattr_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_condattr_destroy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_condattr_setpshared);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_condattr_getpshared);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_condattr_getclock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_condattr_setclock);
 
-    int (*pthread_rwlock_init)(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr);
-    int (*pthread_rwlock_destroy)(pthread_rwlock_t *rwlock);
-    int (*pthread_rwlock_rdlock)(pthread_rwlock_t *rwlock);
-    int (*pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock);
-    int (*pthread_rwlock_timedrdlock)(pthread_rwlock_t *rwlock, const struct timespec *abstime);
-    int (*pthread_rwlock_wrlock)(pthread_rwlock_t *rwlock);
-    int (*pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock);
-    int (*pthread_rwlock_timedwrlock)(pthread_rwlock_t *rwlock, const struct timespec *abstime);
-    int (*pthread_rwlock_unlock)(pthread_rwlock_t *rwlock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_rwlock_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_rwlock_destroy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_rwlock_rdlock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_rwlock_tryrdlock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_rwlock_timedrdlock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_rwlock_wrlock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_rwlock_trywrlock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_rwlock_timedwrlock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_rwlock_unlock);
 
-    int (*pthread_atfork)(void (*prepare)(void), void (*parent)(void), void (*child)(void));
-    pthread_t (*pthread_self)(void);
-    int (*pthread_equal)(pthread_t t1, pthread_t t2);
-    int (*pthread_create)(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg);
-    int (*pthread_join)(pthread_t tid, void **retval);
-    int (*pthread_detach)(pthread_t thread);
-    void (*pthread_exit)(void *retval);
-    int (*pthread_cancel)(pthread_t thread);
-    int (*pthread_kill)(pthread_t thread, int sig);
-    int (*pthread_once)(pthread_once_t *once_control, void (*init_routine)(void));
-    void (*pthread_testcancel)(void);
-    int (*pthread_setcancelstate)(int state, int *oldstate);
-    int (*pthread_setcanceltype)(int type, int *oldtype);
-    int (*pthread_setschedparam)(pthread_t thread, int policy, const struct sched_param *param);
-    int (*pthread_getschedparam)(pthread_t thread, int *policy, struct sched_param *param);
-    void (*pthread_cleanup_push)(void (*routine)(void *), void *arg);
-    void (*pthread_cleanup_pop)(int execute);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_atfork);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_self);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_equal);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_create);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_join);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_detach);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_exit);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_cancel);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_kill);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_once);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_testcancel);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_setcancelstate);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_setcanceltype);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_setschedparam);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_getschedparam);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_cleanup_push);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_cleanup_pop);
 
-    int (*pthread_attr_init)(pthread_attr_t *attr);
-    int (*pthread_attr_destroy)(pthread_attr_t *attr);
-    int (*pthread_attr_setstack)(pthread_attr_t *attr, void *stackaddr, size_t stacksize);
-    int (*pthread_attr_getstack)(const pthread_attr_t *attr, void **stackaddr, size_t *stacksize);
-    int (*pthread_attr_setstackaddr)(pthread_attr_t *attr, void *stackaddr);
-    int (*pthread_attr_getstackaddr)(const pthread_attr_t *attr, void **stackaddr);
-    int (*pthread_attr_setstacksize)(pthread_attr_t *attr, size_t stacksize);
-    int (*pthread_attr_getstacksize)(const pthread_attr_t *attr, size_t *stacksize);
-    int (*pthread_attr_setguardsize)(pthread_attr_t *attr, size_t guardsize);
-    int (*pthread_attr_getguardsize)(const pthread_attr_t *attr, size_t *guardsize);
-    int (*pthread_attr_setdetachstate)(pthread_attr_t *attr, int detachstate);
-    int (*pthread_attr_getdetachstate)(const pthread_attr_t *attr, int *detachstate);
-    int (*pthread_attr_setinheritsched)(pthread_attr_t *attr, int inheritsched);
-    int (*pthread_attr_getinheritsched)(const pthread_attr_t *attr, int *inheritsched);
-    int (*pthread_attr_setschedparam)(pthread_attr_t *attr, const struct sched_param *param);
-    int (*pthread_attr_getschedparam)(pthread_attr_t *attr, struct sched_param *param);
-    int (*pthread_attr_setschedpolicy)(pthread_attr_t *attr, int policy);
-    int (*pthread_attr_getschedpolicy)(const pthread_attr_t *attr, int *policy);
-    int (*pthread_attr_setscope)(pthread_attr_t *attr, int contentionscope);
-    int (*pthread_attr_getscope)(const pthread_attr_t *attr, int *contentionscope);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_destroy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_setstack);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_getstack);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_setstackaddr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_getstackaddr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_setstacksize);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_getstacksize);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_setguardsize);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_getguardsize);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_setdetachstate);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_getdetachstate);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_setinheritsched);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_getinheritsched);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_setschedparam);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_getschedparam);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_setschedpolicy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_getschedpolicy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_setscope);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_attr_getscope);
 
-    int (*pthread_barrier_init)(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count);
-    int (*pthread_barrier_destroy)(pthread_barrier_t *barrier);
-    int (*pthread_barrier_wait)(pthread_barrier_t *barrier);
-    int (*pthread_barrierattr_init)(pthread_barrierattr_t *attr);
-    int (*pthread_barrierattr_destroy)(pthread_barrierattr_t *attr);
-    int (*pthread_barrierattr_getpshared)(const pthread_barrierattr_t *attr, int *pshared);
-    int (*pthread_barrierattr_setpshared)(pthread_barrierattr_t *attr, int pshared);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrier_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrier_destroy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrier_wait);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrierattr_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrierattr_destroy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrierattr_getpshared);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrierattr_setpshared);
 } vsf_linux_pthread_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt;
@@ -342,252 +341,250 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt;
 #   endif
 #endif
 
-static inline int pthread_key_create(pthread_key_t *key, void (*destructor)(void*)) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_key_create(key, destructor);
-}
-static inline int pthread_key_delete(pthread_key_t key) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_key_delete(key);
-}
-static inline int pthread_setspecific(pthread_key_t key, const void *value) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_setspecific(key, value);
-}
-static inline void * pthread_getspecific(pthread_key_t key) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_getspecific(key);
-}
+#define VSF_LINUX_APPLET_PTHREAD_ENTRY(__NAME)                                  \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_PTHREAD_VPLT, __NAME)
+#define VSF_LINUX_APPLET_PTHREAD_IMP(...)                                       \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_PTHREAD_VPLT, __VA_ARGS__)
 
-static inline int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutex_init(mutex, mattr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_key_create, int, pthread_key_t *key, void (*destructor)(void*)) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_key_create)(key, destructor);
 }
-static inline int pthread_mutex_destroy(pthread_mutex_t *mutex) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutex_destroy(mutex);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_key_delete, int, pthread_key_t key) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_key_delete)(key);
 }
-static inline int pthread_mutex_lock(pthread_mutex_t *mutex) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutex_lock(mutex);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setspecific, int, pthread_key_t key, const void *value) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_setspecific)(key, value);
 }
-static inline int pthread_mutex_trylock(pthread_mutex_t *mutex) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutex_trylock(mutex);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_getspecific, void *, pthread_key_t key) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_getspecific)(key);
 }
-static inline int pthread_mutex_unlock(pthread_mutex_t *mutex) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutex_unlock(mutex);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_init, int, pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_init)(mutex, mattr);
 }
-static inline int pthread_mutexattr_init(pthread_mutexattr_t *mattr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutexattr_init(mattr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_destroy, int, pthread_mutex_t *mutex) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_destroy)(mutex);
 }
-static inline int pthread_mutexattr_destroy(pthread_mutexattr_t *mattr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutexattr_destroy(mattr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_lock, int, pthread_mutex_t *mutex) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_lock)(mutex);
 }
-static inline int pthread_mutexattr_setpshared(pthread_mutexattr_t *mattr, int pshared) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutexattr_setpshared(mattr, pshared);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_trylock, int, pthread_mutex_t *mutex) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_trylock)(mutex);
 }
-static inline int pthread_mutexattr_getpshared(pthread_mutexattr_t *mattr, int *pshared) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutexattr_getpshared(mattr, pshared);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_unlock, int, pthread_mutex_t *mutex) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_unlock)(mutex);
 }
-static inline int pthread_mutexattr_settype(pthread_mutexattr_t *mattr , int type) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutexattr_settype(mattr, type);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_init, int, pthread_mutexattr_t *mattr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_init)(mattr);
 }
-static inline int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr , int *type) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_mutexattr_gettype(mattr, type);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_destroy, int, pthread_mutexattr_t *mattr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_destroy)(mattr);
 }
-
-static inline int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cond_init(cond, attr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_setpshared, int, pthread_mutexattr_t *mattr, int pshared) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_setpshared)(mattr, pshared);
 }
-static inline int pthread_cond_destroy(pthread_cond_t *cond) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cond_destroy(cond);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_getpshared, int, pthread_mutexattr_t *mattr, int *pshared) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_getpshared)(mattr, pshared);
 }
-static inline int pthread_cond_signal(pthread_cond_t *cond) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cond_signal(cond);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_settype, int, pthread_mutexattr_t *mattr , int type) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_settype)(mattr, type);
 }
-static inline int pthread_cond_broadcast(pthread_cond_t *cond) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cond_broadcast(cond);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_gettype, int, pthread_mutexattr_t *mattr , int *type) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_gettype)(mattr, type);
 }
-static inline int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cond_wait(cond, mutex);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_init, int, pthread_cond_t *cond, const pthread_condattr_t *cattr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_init)(cond, cattr);
 }
-static inline int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
-        const struct timespec *abstime) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cond_timedwait(cond, mutex, abstime);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_destroy, int, pthread_cond_t *cond) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_destroy)(cond);
 }
-static inline int pthread_condattr_init(pthread_condattr_t *cattr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_condattr_init(cattr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_signal, int, pthread_cond_t *cond) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_signal)(cond);
 }
-static inline int pthread_condattr_destroy(pthread_condattr_t *cattr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_condattr_destroy(cattr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_broadcast, int, pthread_cond_t *cond) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_broadcast)(cond);
 }
-static inline int pthread_condattr_setpshared(pthread_condattr_t *cattr, int pshared) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_condattr_setpshared(cattr, pshared);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_wait, int, pthread_cond_t *cond, pthread_mutex_t *mutex) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_wait)(cond, mutex);
 }
-static inline int pthread_condattr_getpshared(pthread_condattr_t *cattr, int *pshared) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_condattr_getpshared(cattr, pshared);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_timedwait, int, pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_timedwait)(cond, mutex, abstime);
 }
-static inline int pthread_condattr_getclock(const pthread_condattr_t *cattr, clockid_t *clock_id) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_condattr_getclock(cattr, clock_id);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_init, int, pthread_condattr_t *cattr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_init)(cattr);
 }
-static inline int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clock_id) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_condattr_setclock(cattr, clock_id);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_destroy, int, pthread_condattr_t *cattr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_destroy)(cattr);
 }
-
-static inline int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_rwlock_init(rwlock, attr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_setpshared, int, pthread_condattr_t *cattr, int pshared) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_setpshared)(cattr, pshared);
 }
-static inline int pthread_rwlock_destroy(pthread_rwlock_t *rwlock) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_rwlock_destroy(rwlock);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_getpshared, int, pthread_condattr_t *cattr, int *pshared) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_getpshared)(cattr, pshared);
 }
-static inline int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_rwlock_rdlock(rwlock);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_getclock, int, const pthread_condattr_t *cattr, clockid_t *clockid) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_getclock)(cattr, clockid);
 }
-static inline int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_rwlock_tryrdlock(rwlock);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_setclock, int, pthread_condattr_t *cattr, clockid_t clockid) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_setclock)(cattr, clockid);
 }
-static inline int pthread_rwlock_timedrdlock(pthread_rwlock_t *rwlock, const struct timespec *abstime) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_rwlock_timedrdlock(rwlock, abstime);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_init, int, pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_init)(rwlock, attr);
 }
-static inline int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_rwlock_wrlock(rwlock);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_destroy, int, pthread_rwlock_t *rwlock) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_destroy)(rwlock);
 }
-static inline int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_rwlock_trywrlock(rwlock);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_rdlock, int, pthread_rwlock_t *rwlock) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_rdlock)(rwlock);
 }
-static inline int pthread_rwlock_timedwrlock(pthread_rwlock_t *rwlock, const struct timespec *abstime) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_rwlock_timedwrlock(rwlock, abstime);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_tryrdlock, int, pthread_rwlock_t *rwlock) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_tryrdlock)(rwlock);
 }
-static inline int pthread_rwlock_unlock(pthread_rwlock_t *rwlock) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_rwlock_unlock(rwlock);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_timedrdlock, int, pthread_rwlock_t *rwlock, const struct timespec *abstime) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_timedrdlock)(rwlock, abstime);
 }
-
-static inline int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void)) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_atfork(prepare, parent, child);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_wrlock, int, pthread_rwlock_t *rwlock) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_wrlock)(rwlock);
 }
-static inline pthread_t pthread_self(void) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_self();
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_trywrlock, int, pthread_rwlock_t *rwlock) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_trywrlock)(rwlock);
 }
-static inline int pthread_equal(pthread_t t1, pthread_t t2) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_equal(t1, t2);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_timedwrlock, int, pthread_rwlock_t *rwlock, const struct timespec *abstime) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_timedwrlock)(rwlock, abstime);
 }
-static inline int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_create(tidp, attr, start_rtn, arg);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_unlock, int, pthread_rwlock_t *rwlock) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_unlock)(rwlock);
 }
-static inline int pthread_join(pthread_t tid, void **retval) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_join(tid, retval);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_atfork, int, void (*prepare)(void), void (*parent)(void), void (*child)(void)) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_atfork)(prepare, parent, child);
 }
-static inline int pthread_detach(pthread_t thread) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_detach(thread);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_self, pthread_t, void) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_self)();
 }
-static inline void pthread_exit(void *retval) {
-    VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_exit(retval);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_equal, int, pthread_t t1, pthread_t t2) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_equal)(t1, t2);
 }
-static inline int pthread_cancel(pthread_t thread) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cancel(thread);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_create, int, pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_create)(tidp, attr, start_rtn, arg);
 }
-static inline int pthread_kill(pthread_t thread, int sig) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_kill(thread, sig);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_join, int, pthread_t tid, void **retval) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_join)(tid, retval);
 }
-static inline int pthread_once(pthread_once_t *once_control, void (*init_routine)(void)) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_once(once_control, init_routine);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_detach, int, pthread_t thread) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_detach)(thread);
 }
-static inline void pthread_testcancel(void) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_testcancel();
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_exit, void, void *retval) {
+    VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_exit)(retval);
 }
-static inline int pthread_setcancelstate(int state, int *oldstate) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_setcancelstate(state, oldstate);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cancel, int, pthread_t thread) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cancel)(thread);
 }
-static inline int pthread_setcanceltype(int type, int *oldtype) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_setcanceltype(type, oldtype);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_kill, int, pthread_t thread, int sig) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_kill)(thread, sig);
 }
-static inline int pthread_setschedparam(pthread_t thread, int policy, const struct sched_param *param) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_setschedparam(thread, policy, param);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_once, int, pthread_once_t *once_control, void (*init_routine)(void)) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_once)(once_control, init_routine);
 }
-static inline int pthread_getschedparam(pthread_t thread, int *policy, struct sched_param *param) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_getschedparam(thread, policy, param);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_testcancel, void, void) {
+    VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_testcancel)();
 }
-static inline void pthread_cleanup_push(void (*routine)(void *), void *arg) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cleanup_push(routine, arg);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setcancelstate, int, int state, int *oldstate) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_setcancelstate)(state, oldstate);
 }
-static inline void pthread_cleanup_pop(int execute) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_cleanup_pop(execute);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setcanceltype, int, int type, int *oldtype) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_setcanceltype)(type, oldtype);
 }
-
-static inline int pthread_attr_init(pthread_attr_t *attr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_init(attr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setschedparam, int, pthread_t thread, int policy, const struct sched_param *param) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_setschedparam)(thread, policy, param);
 }
-static inline int pthread_attr_destroy(pthread_attr_t *attr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_destroy(attr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_getschedparam, int, pthread_t thread, int *policy, struct sched_param *param) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_getschedparam)(thread, policy, param);
 }
-static inline int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksize) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_setstack(attr, stackaddr, stacksize);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cleanup_push, void, void (*routine)(void *), void *arg) {
+    VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cleanup_push)(routine, arg);
 }
-static inline int pthread_attr_getstack(const pthread_attr_t *attr, void **stackaddr, size_t *stacksize) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getstack(attr, stackaddr, stacksize);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cleanup_pop, void, int execute) {
+    VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cleanup_pop)(execute);
 }
-static inline int pthread_attr_setstackaddr(pthread_attr_t *attr, void *stackaddr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_setstackaddr(attr, stackaddr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_init, int, pthread_attr_t *attr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_init)(attr);
 }
-static inline int pthread_attr_getstackaddr(const pthread_attr_t *attr, void **stackaddr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getstackaddr(attr, stackaddr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_destroy, int, pthread_attr_t *attr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_destroy)(attr);
 }
-static inline int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_setstacksize(attr, stacksize);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setstack, int, pthread_attr_t *attr, void *stackaddr, size_t stacksize) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setstack)(attr, stackaddr, stacksize);
 }
-static inline int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getstacksize(attr, stacksize);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getstack, int, const pthread_attr_t *attr, void **stackaddr, size_t *stacksize) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getstack)(attr, stackaddr, stacksize);
 }
-static inline int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_setguardsize(attr, guardsize);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setstackaddr, int, pthread_attr_t *attr, void *stackaddr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setstackaddr)(attr, stackaddr);
 }
-static inline int pthread_attr_getguardsize(const pthread_attr_t *attr, size_t *guardsize) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getguardsize(attr, guardsize);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getstackaddr, int, const pthread_attr_t *attr, void **stackaddr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getstackaddr)(attr, stackaddr);
 }
-static inline int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_setdetachstate(attr, detachstate);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setstacksize, int, pthread_attr_t *attr, size_t stacksize) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setstacksize)(attr, stacksize);
 }
-static inline int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getdetachstate(attr, detachstate);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getstacksize, int, const pthread_attr_t *attr, size_t *stacksize) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getstacksize)(attr, stacksize);
 }
-static inline int pthread_attr_setinheritsched(pthread_attr_t *attr, int inheritsched) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_setinheritsched(attr, inheritsched);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setguardsize, int, pthread_attr_t *attr, size_t guardsize) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setguardsize)(attr, guardsize);
 }
-static inline int pthread_attr_getinheritsched(const pthread_attr_t *attr, int *inheritsched) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getinheritsched(attr, inheritsched);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getguardsize, int, const pthread_attr_t *attr, size_t *guardsize) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getguardsize)(attr, guardsize);
 }
-static inline int pthread_attr_setschedparam(pthread_attr_t *attr, const struct sched_param *param) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_setschedparam(attr, param);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setdetachstate, int, pthread_attr_t *attr, int detachstate) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setdetachstate)(attr, detachstate);
 }
-static inline int pthread_attr_getschedparam(pthread_attr_t *attr, struct sched_param *param) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getschedparam(attr, param);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getdetachstate, int, const pthread_attr_t *attr, int *detachstate) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getdetachstate)(attr, detachstate);
 }
-static inline int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_setschedpolicy(attr, policy);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setinheritsched, int, pthread_attr_t *attr, int inheritsched) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setinheritsched)(attr, inheritsched);
 }
-static inline int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getschedpolicy(attr, policy);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getinheritsched, int, const pthread_attr_t *attr, int *inheritsched) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getinheritsched)(attr, inheritsched);
 }
-static inline int pthread_attr_setscope(pthread_attr_t *attr, int contentionscope) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_setscope(attr, contentionscope);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setschedparam, int, pthread_attr_t *attr, const struct sched_param *param) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setschedparam)(attr, param);
 }
-static inline int pthread_attr_getscope(const pthread_attr_t *attr, int *contentionscope) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_attr_getscope(attr, contentionscope);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getschedparam, int, pthread_attr_t *attr, struct sched_param *param) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getschedparam)(attr, param);
 }
-
-static inline int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrier_init(barrier, attr, count);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setschedpolicy, int, pthread_attr_t *attr, int policy) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setschedpolicy)(attr, policy);
 }
-static inline int pthread_barrier_destroy(pthread_barrier_t *barrier) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrier_destroy(barrier);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getschedpolicy, int, const pthread_attr_t *attr, int *policy) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getschedpolicy)(attr, policy);
 }
-static inline int pthread_barrier_wait(pthread_barrier_t *barrier) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrier_wait(barrier);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setscope, int, pthread_attr_t *attr, int contentionscope) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setscope)(attr, contentionscope);
 }
-static inline int pthread_barrierattr_init(pthread_barrierattr_t *attr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrierattr_init(attr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getscope, int, const pthread_attr_t *attr, int *contentionscope) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getscope)(attr, contentionscope);
 }
-static inline int pthread_barrierattr_destroy(pthread_barrierattr_t *attr) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrierattr_destroy(attr);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrier_init, int, pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrier_init)(barrier, attr, count);
 }
-static inline int pthread_barrierattr_getpshared(const pthread_barrierattr_t *attr, int *pshared) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrierattr_getpshared(attr, pshared);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrier_destroy, int, pthread_barrier_t *barrier) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrier_destroy)(barrier);
 }
-static inline int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared) {
-    return VSF_LINUX_APPLET_PTHREAD_VPLT->pthread_barrierattr_setpshared(attr, pshared);
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrier_wait, int, pthread_barrier_t *barrier) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrier_wait)(barrier);
+}
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrierattr_init, int, pthread_barrierattr_t *attr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrierattr_init)(attr);
+}
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrierattr_destroy, int, pthread_barrierattr_t *attr) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrierattr_destroy)(attr);
+}
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrierattr_getpshared, int, const pthread_barrierattr_t *attr, int *pshared) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrierattr_getpshared)(attr, pshared);
+}
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrierattr_setpshared, int, pthread_barrierattr_t *attr, int pshared) {
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrierattr_setpshared)(attr, pshared);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_PTHREAD
@@ -611,7 +608,7 @@ int pthread_mutexattr_getpshared(pthread_mutexattr_t *mattr, int *pshared);
 int pthread_mutexattr_settype(pthread_mutexattr_t *mattr , int type);
 int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr , int *type);
 
-int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
+int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *cattr);
 int pthread_cond_destroy(pthread_cond_t *cond);
 int pthread_cond_signal(pthread_cond_t *cond);
 int pthread_cond_broadcast(pthread_cond_t *cond);
@@ -622,8 +619,8 @@ int pthread_condattr_init(pthread_condattr_t *cattr);
 int pthread_condattr_destroy(pthread_condattr_t *cattr);
 int pthread_condattr_setpshared(pthread_condattr_t *cattr, int pshared);
 int pthread_condattr_getpshared(pthread_condattr_t *cattr, int *pshared);
-int pthread_condattr_getclock(const pthread_condattr_t *cattr, clockid_t *clock_id);
-int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clock_id);
+int pthread_condattr_getclock(const pthread_condattr_t *cattr, clockid_t *clockid);
+int pthread_condattr_setclock(pthread_condattr_t *cattr, clockid_t clockid);
 
 int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr);
 int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);

@@ -42,10 +42,8 @@ __vsf_declare_bitmap_ex(fd_set, FD_SETSIZE)
 typedef struct vsf_linux_sys_select_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*select)(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-        struct timeval *timeout);
-    int (*pselect)(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-        const struct timespec *timeout_ts, const sigset_t *sigmask);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(select);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pselect);
 } vsf_linux_sys_select_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_select_vplt_t vsf_linux_sys_select_vplt;
@@ -64,13 +62,16 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_select_vplt_t vsf_linux_sys_select_v
 #   endif
 #endif
 
-static inline int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-        struct timeval *timeout) {
-    return VSF_LINUX_APPLET_SYS_SELECT_VPLT->select(nfds, readfds, writefds, exceptfds, timeout);
+#define VSF_LINUX_APPLET_SYS_SELECT_ENTRY(__NAME)                               \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_SELECT_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_SELECT_IMP(...)                                    \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_SELECT_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_SELECT_IMP(select, int, int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout) {
+    return VSF_LINUX_APPLET_SYS_SELECT_ENTRY(select)(nfds, readfds, writefds, exceptfds, timeout);
 }
-static inline int pselect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-        const struct timespec *timeout_ts, const sigset_t *sigmask) {
-    return VSF_LINUX_APPLET_SYS_SELECT_VPLT->pselect(nfds, readfds, writefds, exceptfds, timeout_ts, sigmask);
+VSF_LINUX_APPLET_SYS_SELECT_IMP(pselect, int, int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timespec *timeout_ts, const sigset_t *sigmask) {
+    return VSF_LINUX_APPLET_SYS_SELECT_ENTRY(pselect)(nfds, readfds, writefds, exceptfds, timeout_ts, sigmask);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SELECT

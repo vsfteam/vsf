@@ -29,7 +29,7 @@ struct tms {
 typedef struct vsf_linux_sys_times_vplt_t {
     vsf_vplt_info_t info;
 
-    clock_t (*times)(struct tms *buf);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(times);
 } vsf_linux_sys_times_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_times_vplt_t vsf_linux_sys_times_vplt;
@@ -40,16 +40,21 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_times_vplt_t vsf_linux_sys_times_vpl
 
 #ifndef VSF_LINUX_APPLET_SYS_TIMES_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
-#       define VSF_LINUX_APPLET_SYS_TIMES_VPLT                                   \
+#       define VSF_LINUX_APPLET_SYS_TIMES_VPLT                                  \
             ((vsf_linux_sys_times_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_times_vplt))
 #   else
-#       define VSF_LINUX_APPLET_SYS_TIMES_VPLT                                   \
+#       define VSF_LINUX_APPLET_SYS_TIMES_VPLT                                  \
             ((vsf_linux_sys_times_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
 
-static inline clock_t times(struct tms *buf) {
-    return VSF_LINUX_APPLET_SYS_TIMES_VPLT->times(buf);
+#define VSF_LINUX_APPLET_SYS_TIMES_ENTRY(__NAME)                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_TIMES_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_TIMES_IMP(...)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_TIMES_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_TIMES_IMP(times, clock_t, struct tms *buf) {
+    return VSF_LINUX_APPLET_SYS_TIMES_ENTRY(times)(buf);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_TIMES

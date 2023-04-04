@@ -54,6 +54,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vpl
 #   endif
 #endif
 
+#define VSF_LINUX_APPLET_ARPA_INET_ENTRY(__NAME)                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_ARPA_INET_VPLT, __NAME)
+#define VSF_LINUX_APPLET_ARPA_INET_IMP(...)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_ARPA_INET_VPLT, __VA_ARGS__)
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_ARPA_INET
 
 in_addr_t inet_addr(const char *cp);

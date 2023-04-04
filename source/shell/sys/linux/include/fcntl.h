@@ -82,13 +82,13 @@ struct flock {
 typedef struct vsf_linux_fcntl_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*__fcntl_va)(int fd, int cmd, va_list ap);
-    int (*fcntl)(int fd, int cmd, ...);
-    int (*creat)(const char *pathname, mode_t mode);
-    int (*__open_va)(const char *pathname, int flags, va_list ap);
-    int (*open)(const char *pathname, int flags, ...);
-    int (*__openat_va)(int dirfd, const char *pathname, int flags, va_list ap);
-    int (*openat)(int dirfd, const char *pathname, int flags, ...);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__fcntl_va);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fcntl);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(creat);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__open_va);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(open);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__openat_va);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(openat);
 } vsf_linux_fcntl_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt;
@@ -107,24 +107,39 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt;
 #   endif
 #endif
 
+#define VSF_LINUX_APPLET_FCNTL_ENTRY(__NAME)                                    \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_FCNTL_VPLT, __NAME)
+#define VSF_LINUX_APPLET_FCNTL_IMP(...)                                         \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_FCNTL_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_FCNTL_IMP(__fcntl_va, int, int fd, int cmd, va_list ap) {
+    return VSF_LINUX_APPLET_FCNTL_ENTRY(__fcntl_va)(fd, cmd, ap);
+}
+VSF_LINUX_APPLET_FCNTL_IMP(__open_va, int, const char *pathname, int flags, va_list ap) {
+    return VSF_LINUX_APPLET_FCNTL_ENTRY(__open_va)(pathname, flags, ap);
+}
+VSF_LINUX_APPLET_FCNTL_IMP(__openat_va, int, int dirfd, const char *pathname, int flags, va_list ap) {
+    return VSF_LINUX_APPLET_FCNTL_ENTRY(__openat_va)(dirfd, pathname, flags, ap);
+}
+VSF_LINUX_APPLET_FCNTL_IMP(creat, int, const char *pathname, mode_t mode) {
+    return VSF_LINUX_APPLET_FCNTL_ENTRY(creat)(pathname, mode);
+}
+
 static inline int fcntl(int fd, int cmd, ...) {
     int ret;
 
     va_list ap;
     va_start(ap, cmd);
-        ret = VSF_LINUX_APPLET_FCNTL_VPLT->__fcntl_va(fd, cmd, ap);
+        ret = ((int (*)(int fd, int cmd, va_list ap))VSF_LINUX_APPLET_FCNTL_ENTRY(__fcntl_va))(fd, cmd, ap);
     va_end(ap);
     return ret;
-}
-static inline int creat(const char *pathname, mode_t mode) {
-    return VSF_LINUX_APPLET_FCNTL_VPLT->creat(pathname, mode);
 }
 static inline int open(const char *pathname, int flags, ...) {
     int ret;
 
     va_list ap;
     va_start(ap, flags);
-        ret = VSF_LINUX_APPLET_FCNTL_VPLT->__open_va(pathname, flags, ap);
+        ret = ((int (*)(const char *pathname, int flags, va_list ap))VSF_LINUX_APPLET_FCNTL_ENTRY(__open_va))(pathname, flags, ap);
     va_end(ap);
     return ret;
 }
@@ -133,7 +148,7 @@ static inline int openat(int dirfd, const char *pathname, int flags, ...) {
 
     va_list ap;
     va_start(ap, flags);
-        ret = VSF_LINUX_APPLET_FCNTL_VPLT->__openat_va(dirfd, pathname, flags, ap);
+        ret = ((int (*)(int dirfd, const char *pathname, int flags, va_list ap))VSF_LINUX_APPLET_FCNTL_ENTRY(__openat_va))(dirfd, pathname, flags, ap);
     va_end(ap);
     return ret;
 }

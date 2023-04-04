@@ -60,6 +60,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_ipc_vplt_t vsf_linux_sys_ipc_vplt;
 #   endif
 #endif
 
+#define VSF_LINUX_APPLET_SYS_IPC_ENTRY(__NAME)                                  \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_IPC_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_IPC_IMP(...)                                       \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_IPC_VPLT, __VA_ARGS__)
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_IPC
 
 key_t ftok(const char *pathname, int id);

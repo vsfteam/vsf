@@ -80,60 +80,60 @@ typedef struct {
 typedef struct vsf_linux_libc_stdlib_vplt_t {
     vsf_vplt_info_t info;
 
-    void * (*malloc)(size_t size);
-    void * (*realloc)(void *p, size_t size);
-    void (*free)(void *p);
-    void * (*aligned_alloc)(size_t alignment, size_t size);
-    void * (*calloc)(size_t n, size_t size);
-    void * (*memalign)(size_t alignment, size_t size);
-    int (*posix_memalign)(void **memptr, size_t alignment, size_t size);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(malloc);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(realloc);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(free);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(aligned_alloc);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(calloc);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memalign);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(posix_memalign);
     // malloc_usable_size should be in malloc.h
-    size_t (*malloc_usable_size)(void *p);
-    int (*putenv)(char *string);
-    char * (*getenv)(const char *name);
-    int (*setenv)(const char *name, const char *value, int replace);
-    int (*unsetenv)(const char *name);
-    char * (*mktemps)(char *template_str, int suffixlen);
-    char * (*mktemp)(char *template_str);
-    int (*mkstemp)(char *template_str);
-    int (*mkostemp)(char *template_str, int flags);
-    int (*mkstemps)(char *template_str, int suffixlen);
-    int (*mkostemps)(char *template_str, int suffixlen, int flags);
-    char * (*mkdtemp)(char *template_str);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(malloc_usable_size);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(putenv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getenv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setenv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(unsetenv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mktemps);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mktemp);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkstemp);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkostemp);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkstemps);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkostemps);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkdtemp);
 
-    div_t (*div)(int numer, int denom);
-    ldiv_t (*ldiv)(long int numer, long int denom);
-    lldiv_t (*lldiv)(long long int numer, long long int denom);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(div);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ldiv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(lldiv);
 
-    char * (*itoa)(int num, char *str, int radix);
-    int (*atoi)(const char * str);
-    long int (*atol)(const char *str);
-    long long int (*atoll)(const char *str);
-    double (*atof)(const char *str);
-    long (*strtol)(const char *str, char **endptr, int base);
-    unsigned long (*strtoul)(const char *str, char **endptr, int base);
-    long long (*strtoll)(const char *str, char **endptr, int base);
-    unsigned long long (*strtoull)(const char *str, char **endptr, int base);
-    float (*strtof)(const char *str, char **endptr);
-    double (*strtod)(const char *str, char **endptr);
-    long double (*strtold)(const char *str, char **endptr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(itoa);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(atoi);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(atol);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(atoll);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(atof);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strtol);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strtoul);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strtoll);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strtoull);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strtof);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strtod);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strtold);
 
-    void * (*bsearch)(const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *));
-    void (*qsort)(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*));
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(bsearch);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(qsort);
 
-    int (*rand)(void);
-    void (*srand)(unsigned int seed);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(rand);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(srand);
 
-    void (*abort)(void);
-    int (*system)(const char *command);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(abort);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(system);
 
-    void (*exit)(int status);
-    int (*atexit)(void (*func)(void));
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(exit);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(atexit);
 
-    int (*abs)(int j);
-    long (*labs)(long j);
-    long long (*llabs)(long long j);
-    intmax_t (*imaxabs)(intmax_t j);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(abs);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(labs);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(llabs);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(imaxabs);
 } vsf_linux_libc_stdlib_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt;
@@ -152,162 +152,158 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib
 #   endif
 #endif
 
-static inline void * malloc(size_t size) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->malloc(size);
-}
-static inline void * realloc(void *p, size_t size) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->realloc(p, size);
-}
-static inline void free(void *p) {
-    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->free(p);
-}
+#define VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(__NAME)                              \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_LIBC_STDLIB_VPLT, __NAME)
+#define VSF_LINUX_APPLET_LIBC_STDLIB_IMP(...)                                   \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_STDLIB_VPLT, __VA_ARGS__)
 
-static inline void * aligned_alloc(size_t alignment, size_t size) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->aligned_alloc(alignment, size);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(malloc, void *, size_t size) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(malloc)(size);
 }
-static inline void * calloc(size_t n, size_t size) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->calloc(n, size);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(realloc, void *, void *p, size_t size) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(realloc)(p, size);
 }
-static inline void * memalign(size_t alignment, size_t size) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->memalign(alignment, size);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(free, void, void *p) {
+    VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(free)(p);
 }
-static inline int posix_memalign(void **memptr, size_t alignment, size_t size) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->posix_memalign(memptr, alignment, size);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(aligned_alloc, void *, size_t alignment, size_t size) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(aligned_alloc)(alignment, size);
 }
-
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(calloc, void *, size_t n, size_t size) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(calloc)(n, size);
+}
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(memalign, void *, size_t alignment, size_t size) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(memalign)(alignment, size);
+}
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(posix_memalign, int, void **memptr, size_t alignment, size_t size) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(posix_memalign)(memptr, alignment, size);
+}
 // malloc_usable_size should be in malloc.h
-static inline size_t malloc_usable_size(void *p) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->malloc_usable_size(p);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(malloc_usable_size, size_t, void *p) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(malloc_usable_size)(p);
 }
 
 #if VSF_LINUX_LIBC_USE_ENVIRON
-static inline int putenv(char *string) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->putenv(string);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(putenv, int, char *string) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(putenv)(string);
 }
-static inline char * getenv(const char *name) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->getenv(name);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(getenv, char *, const char *name) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(getenv)(name);
 }
-static inline int setenv(const char *name, const char *value, int replace) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->setenv(name, value, replace);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(setenv, int, const char *name, const char *value, int replace) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(setenv)(name, value, replace);
 }
-static inline int unsetenv(const char *name) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->unsetenv(name);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(unsetenv, int, const char *name) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(unsetenv)(name);
 }
 #endif
-static inline char * mktemps(char *template_str, int suffixlen) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mktemps(template_str, suffixlen);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mktemps, char *, char *template_str, int suffixlen) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mktemps)(template_str, suffixlen);
 }
-static inline char * mktemp(char *template_str) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mktemp(template_str);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mktemp, char *, char *template_str) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mktemp)(template_str);
 }
-static inline int mkstemp(char *template_str) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkstemp(template_str);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkstemp, int, char *template_str) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkstemp)(template_str);
 }
-static inline int mkostemp(char *template_str, int flags) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkostemp(template_str, flags);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkostemp, int, char *template_str, int flags) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkostemp)(template_str, flags);
 }
-static inline int mkstemps(char *template_str, int suffixlen) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkstemps(template_str, suffixlen);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkstemps, int, char *template_str, int suffixlen) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkstemps)(template_str, suffixlen);
 }
-static inline int mkostemps(char *template_str, int suffixlen, int flags) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkostemps(template_str, suffixlen, flags);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkostemps, int, char *template_str, int suffixlen, int flags) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkostemps)(template_str, suffixlen, flags);
 }
-static inline char * mkdtemp(char *template_str) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->mkdtemp(template_str);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkdtemp, char *, char *template_str) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkdtemp)(template_str);
 }
-
-static inline div_t div(int numer, int denom) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->div(numer, denom);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(div, div_t, int numer, int denom) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(div)(numer, denom);
 }
-static inline ldiv_t ldiv(long int numer, long int denom) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->ldiv(numer, denom);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(ldiv, ldiv_t, long int numer, long int denom) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(ldiv)(numer, denom);
 }
-static inline lldiv_t lldiv(long long int numer, long long int denom) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->lldiv(numer, denom);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(lldiv, lldiv_t, long long int numer, long long int denom) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(lldiv)(numer, denom);
 }
-
-static inline char * itoa(int num, char *str, int radix) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->itoa(num, str, radix);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(itoa, char *, int num, char *str, int radix) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(itoa)(num, str, radix);
 }
-static inline int atoi(const char * str) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atoi(str);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atoi, int, const char * str) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atoi)(str);
 }
-static inline long int atol(const char *str) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atol(str);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atol, long int, const char *str) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atol)(str);
 }
-static inline long long int atoll(const char *str) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atoll(str);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atoll, long long int, const char *str) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atoll)(str);
 }
-static inline double atof(const char *str) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atof(str);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atof, double, const char *str) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atof)(str);
 }
-static inline long strtol(const char *str, char **endptr, int base) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtol(str, endptr, base);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtol, long, const char *str, char **endptr, int base) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtol)(str, endptr, base);
 }
-static inline unsigned long strtoul(const char *str, char **endptr, int base) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtoul(str, endptr, base);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtoul, unsigned long, const char *str, char **endptr, int base) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtoul)(str, endptr, base);
 }
-static inline long long strtoll(const char *str, char **endptr, int base) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtoll(str, endptr, base);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtoll, long long, const char *str, char **endptr, int base) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtoll)(str, endptr, base);
 }
-static inline unsigned long long strtoull(const char *str, char **endptr, int base) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtoull(str, endptr, base);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtoull, unsigned long long, const char *str, char **endptr, int base) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtoull)(str, endptr, base);
 }
-static inline float strtof(const char *str, char **endptr) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtof(str, endptr);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtof, float, const char *str, char **endptr) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtof)(str, endptr);
 }
-static inline double strtod(const char *str, char **endptr) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtod(str, endptr);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtod, double, const char *str, char **endptr) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtod)(str, endptr);
 }
-//static inline long double strtold(const char *str, char **endptr) {
-//    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->strtold(str, endptr);
+//VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtold, long double, const char *str, char **endptr) {
+//    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtold)(str, endptr);
 //}
-
-static inline void * bsearch(const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *)) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->bsearch(key, base, nitems, size, compar);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(bsearch, void *, const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *)) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(bsearch)(key, base, nitems, size, compar);
 }
-static inline void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)) {
-    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->qsort(base, nitems, size, compar);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(qsort, void, void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)) {
+    VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(qsort)(base, nitems, size, compar);
 }
-
-static inline int rand(void) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->rand();
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(rand, int, void) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(rand)();
 }
-static inline void srand(unsigned int seed) {
-    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->srand(seed);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(srand, void, unsigned int seed) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(srand)(seed);
 }
-static inline void srandom(unsigned int seed) {
-    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->srand(seed);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(srandom, void, unsigned int seed) {
+    VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(srand)(seed);
 }
-static inline long int random(void) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->rand();
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(random, long int, void) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(rand)();
 }
-
-static inline void abort(void) {
-    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->abort();
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(abort, void, void) {
+    VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(abort)();
 }
-static inline int system(const char *command) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->system(command);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(system, int, const char *command) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(system)(command);
 }
-
-static inline void exit(int status) {
-    VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->exit(status);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(exit, void, int status) {
+    VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(exit)(status);
 }
-static inline int atexit(void (*func)(void)) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->atexit(func);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atexit, int, void (*func)(void)) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atexit)(func);
 }
-
-static inline int abs(int j) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->abs(j);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(abs, int, int j) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(abs)(j);
 }
-static inline long labs(long j) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->labs(j);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(labs, long, long j) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(labs)(j);
 }
-static inline long long llabs(long long j) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->llabs(j);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(llabs, long long, long long j) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(llabs)(j);
 }
-static inline intmax_t imaxabs(intmax_t j) {
-    return VSF_LINUX_APPLET_LIBC_STDLIB_VPLT->imaxabs(j);
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(imaxabs, intmax_t, intmax_t j) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(imaxabs)(j);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB

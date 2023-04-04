@@ -539,13 +539,12 @@ getopt_long_only(int nargc, char * const *nargv, const char *options,
 }
 
 #if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_LIBGETOPT_FUNC(__FUNC)      .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_libgetopt_vplt_t vsf_linux_libgetopt_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_libgetopt_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_libgetopt_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_LIBGETOPT_FUNC(getopt_long),
-    VSF_LINUX_APPLET_LIBGETOPT_FUNC(getopt_long_only),
-    VSF_LINUX_APPLET_LIBGETOPT_FUNC(getopt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getopt_long),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getopt_long_only),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getopt),
 };
 #endif
 

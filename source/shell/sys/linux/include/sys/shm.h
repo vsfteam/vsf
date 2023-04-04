@@ -41,10 +41,10 @@ struct shmid_ds {
 typedef struct vsf_linux_sys_shm_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*shmget)(key_t key, size_t size, int shmflg);
-    void * (*shmat)(int shmid, const void *shmaddr, int shmflg);
-    int (*shmdt)(const void *shmaddr);
-    int (*shmctl)(int shmid, int cmd, struct shmid_ds *buf);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(shmget);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(shmat);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(shmdt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(shmctl);
 } vsf_linux_sys_shm_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt;
@@ -63,17 +63,22 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt;
 #   endif
 #endif
 
-static inline int shmget(key_t key, size_t size, int shmflg) {
-    return VSF_LINUX_APPLET_SYS_SHM_VPLT->shmget(key, size, shmflg);
+#define VSF_LINUX_APPLET_SYS_SHM_ENTRY(__NAME)                                  \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_SHM_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_SHM_IMP(...)                                       \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_SHM_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_SHM_IMP(shmget, int, key_t key, size_t size, int shmflg) {
+    return VSF_LINUX_APPLET_SYS_SHM_ENTRY(shmget)(key, size, shmflg);
 }
-static inline void * shmat(int shmid, const void *shmaddr, int shmflg) {
-    return VSF_LINUX_APPLET_SYS_SHM_VPLT->shmat(shmid, shmaddr, shmflg);
+VSF_LINUX_APPLET_SYS_SHM_IMP(shmat, void *, int shmid, const void *shmaddr, int shmflg) {
+    return VSF_LINUX_APPLET_SYS_SHM_ENTRY(shmat)(shmid, shmaddr, shmflg);
 }
-static inline int shmdt(const void *shmaddr) {
-    return VSF_LINUX_APPLET_SYS_SHM_VPLT->shmdt(shmaddr);
+VSF_LINUX_APPLET_SYS_SHM_IMP(shmdt, int, const void *shmaddr) {
+    return VSF_LINUX_APPLET_SYS_SHM_ENTRY(shmdt)(shmaddr);
 }
-static inline int shmctl(int shmid, int cmd, struct shmid_ds *buf) {
-    return VSF_LINUX_APPLET_SYS_SHM_VPLT->shmctl(shmid, cmd, buf);
+VSF_LINUX_APPLET_SYS_SHM_IMP(shmctl, int, int shmid, int cmd, struct shmid_ds *buf) {
+    return VSF_LINUX_APPLET_SYS_SHM_ENTRY(shmctl)(shmid, cmd, buf);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SHM

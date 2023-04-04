@@ -693,53 +693,50 @@ char *if_indextoname(unsigned int ifindex, char *ifname)
 }
 
 #if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_IFADDRS_FUNC(__FUNC)        .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_ifaddrs_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_ifaddrs_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_IFADDRS_FUNC(getifaddrs),
-    VSF_LINUX_APPLET_IFADDRS_FUNC(freeifaddrs),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getifaddrs),
+    VSF_APPLET_VPLT_ENTRY_FUNC(freeifaddrs),
 };
 #endif
 #endif
 
 #if VSF_LINUX_APPLET_USE_NETDB == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_NETDB_FUNC(__FUNC)          .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_netdb_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_netdb_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_NETDB_FUNC(gethostbyaddr),
-    VSF_LINUX_APPLET_NETDB_FUNC(gethostbyname),
-    VSF_LINUX_APPLET_NETDB_FUNC(gai_strerror),
-    VSF_LINUX_APPLET_NETDB_FUNC(getnameinfo),
-    VSF_LINUX_APPLET_NETDB_FUNC(getaddrinfo),
-    VSF_LINUX_APPLET_NETDB_FUNC(freeaddrinfo),
+    VSF_APPLET_VPLT_ENTRY_FUNC(gethostbyaddr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(gethostbyname),
+    VSF_APPLET_VPLT_ENTRY_FUNC(gai_strerror),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getnameinfo),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getaddrinfo),
+    VSF_APPLET_VPLT_ENTRY_FUNC(freeaddrinfo),
 };
 #endif
 
 #if VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_SYS_SOCKET_FUNC(__FUNC)     .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_sys_socket_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_socket_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(setsockopt),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(getsockopt),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(getpeername),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(getsockname),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(accept),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(bind),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(connect),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(listen),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(recv),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(recvmsg),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(recvfrom),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(send),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(sendmsg),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(sendto),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(shutdown),
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(socket),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setsockopt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getsockopt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getpeername),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getsockname),
+    VSF_APPLET_VPLT_ENTRY_FUNC(accept),
+    VSF_APPLET_VPLT_ENTRY_FUNC(bind),
+    VSF_APPLET_VPLT_ENTRY_FUNC(connect),
+    VSF_APPLET_VPLT_ENTRY_FUNC(listen),
+    VSF_APPLET_VPLT_ENTRY_FUNC(recv),
+    VSF_APPLET_VPLT_ENTRY_FUNC(recvmsg),
+    VSF_APPLET_VPLT_ENTRY_FUNC(recvfrom),
+    VSF_APPLET_VPLT_ENTRY_FUNC(send),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sendmsg),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sendto),
+    VSF_APPLET_VPLT_ENTRY_FUNC(shutdown),
+    VSF_APPLET_VPLT_ENTRY_FUNC(socket),
     // TODO: add socketpair if supported
-    VSF_LINUX_APPLET_SYS_SOCKET_FUNC(socketpair),
+    VSF_APPLET_VPLT_ENTRY_FUNC(socketpair),
 };
 #endif
 

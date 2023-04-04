@@ -100,15 +100,12 @@ extern int * __vsf_linux_h_errno(void);
 typedef struct vsf_linux_netdb_vplt_t {
     vsf_vplt_info_t info;
 
-    struct hostent * (*gethostbyaddr)(const void *addr, size_t len, int type);
-    struct hostent * (*gethostbyname)(const char *name);
-    const char * (*gai_strerror)(int errcode);
-    int (*getnameinfo)(const struct sockaddr *addr, socklen_t addrlen,
-                        char *host, socklen_t hostlen,
-                        char *serv, socklen_t servlen, int flags);
-    int (*getaddrinfo)(const char *name, const char *service, const struct addrinfo *hints,
-                        struct addrinfo **pai);
-    void (*freeaddrinfo)(struct addrinfo *ai);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gethostbyaddr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gethostbyname);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gai_strerror);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getnameinfo);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getaddrinfo);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(freeaddrinfo);
 } vsf_linux_netdb_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
@@ -127,26 +124,28 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
 #   endif
 #endif
 
-static inline struct hostent * gethostbyaddr(const void *addr, size_t len, int type) {
-    return VSF_LINUX_APPLET_NETDB_VPLT->gethostbyaddr(addr, len, type);
+#define VSF_LINUX_APPLET_NETDB_ENTRY(__NAME)                                    \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_NETDB_VPLT, __NAME)
+#define VSF_LINUX_APPLET_NETDB_IMP(...)                                         \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_NETDB_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_NETDB_IMP(gethostbyaddr, struct hostent *, const void *addr, size_t len, int type) {
+    return VSF_LINUX_APPLET_NETDB_ENTRY(gethostbyaddr)(addr, len, type);
 }
-static inline struct hostent * gethostbyname(const char *name) {
-    return VSF_LINUX_APPLET_NETDB_VPLT->gethostbyname(name);
+VSF_LINUX_APPLET_NETDB_IMP(gethostbyname, struct hostent *, const char *name) {
+    return VSF_LINUX_APPLET_NETDB_ENTRY(gethostbyname)(name);
 }
-static inline const char * gai_strerror(int errcode) {
-    return VSF_LINUX_APPLET_NETDB_VPLT->gai_strerror(errcode);
+VSF_LINUX_APPLET_NETDB_IMP(gai_strerror, const char *, int errcode) {
+    return VSF_LINUX_APPLET_NETDB_ENTRY(gai_strerror)(errcode);
 }
-static inline int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
-                        char *host, socklen_t hostlen,
-                        char *serv, socklen_t servlen, int flags) {
-    return VSF_LINUX_APPLET_NETDB_VPLT->getnameinfo(addr, addrlen, host, hostlen, serv, servlen, flags);
+VSF_LINUX_APPLET_NETDB_IMP(getnameinfo, int, const struct sockaddr *addr, socklen_t addrlen, char *host, socklen_t hostlen, char *serv, socklen_t servlen, int flags) {
+    return VSF_LINUX_APPLET_NETDB_ENTRY(getnameinfo)(addr, addrlen, host, hostlen, serv, servlen, flags);
 }
-static inline int getaddrinfo(const char *name, const char *service,
-                        const struct addrinfo *hints, struct addrinfo **pai) {
-    return VSF_LINUX_APPLET_NETDB_VPLT->getaddrinfo(name, service, hints, pai);
+VSF_LINUX_APPLET_NETDB_IMP(getaddrinfo, int, const char *name, const char *service, const struct addrinfo *hints, struct addrinfo **pai) {
+    return VSF_LINUX_APPLET_NETDB_ENTRY(getaddrinfo)(name, service, hints, pai);
 }
-static inline void freeaddrinfo(struct addrinfo *ai) {
-    return VSF_LINUX_APPLET_NETDB_VPLT->freeaddrinfo(ai);
+VSF_LINUX_APPLET_NETDB_IMP(freeaddrinfo, void, struct addrinfo *pai) {
+    VSF_LINUX_APPLET_NETDB_ENTRY(freeaddrinfo)(pai);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_NETDB
@@ -161,7 +160,7 @@ int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
                         char *serv, socklen_t servlen, int flags);
 int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
                         struct addrinfo **pai);
-void freeaddrinfo(struct addrinfo *ai);
+void freeaddrinfo(struct addrinfo *pai);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_NETDB
 

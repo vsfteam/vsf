@@ -39,13 +39,12 @@ struct mntent {
 typedef struct vsf_linux_libc_mntent_vplt_t {
     vsf_vplt_info_t info;
 
-    FILE * (*setmntent)(const char *filename, const char *type);
-    struct mntent * (*getmntent)(FILE *stream);
-    int (*addmntent)(FILE *stream, const struct mntent *mnt);
-    int (*endmntent)(FILE *stream);
-    char * (*hasmntopt)(const struct mntent *mnt, const char *opt);
-
-    struct mntent * (*getmntent_r)(FILE *stream, struct mntent *mntbuf, char *buf, int buflen);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setmntent);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getmntent);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(addmntent);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(endmntent);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(hasmntopt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getmntent_r);
 } vsf_linux_libc_mntent_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_mntent_vplt_t vsf_linux_libc_mntent_vplt;
@@ -64,24 +63,28 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_mntent_vplt_t vsf_linux_libc_mntent
 #   endif
 #endif
 
-static inline FILE * setmntent(const char *filename, const char *type) {
-    return VSF_LINUX_APPLET_LIBC_MNTENT_VPLT->setmntent(filename, type);
-}
-static inline struct mntent * getmntent(FILE *stream) {
-    return VSF_LINUX_APPLET_LIBC_MNTENT_VPLT->getmntent(filename);
-}
-static inline int addmntent(FILE *stream, const struct mntent *mnt) {
-    return VSF_LINUX_APPLET_LIBC_MNTENT_VPLT->addmntent(filename, mnt);
-}
-static inline int endmntent(FILE *stream) {
-    return VSF_LINUX_APPLET_LIBC_MNTENT_VPLT->endmntent(stream);
-}
-static inline char * hasmntopt(const struct mntent *mnt, const char *opt) {
-    return VSF_LINUX_APPLET_LIBC_MNTENT_VPLT->hasmntopt(mnt, opt);
-}
+#define VSF_LINUX_APPLET_LIBC_MNTENT_ENTRY(__NAME)                              \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_LIBC_MNTENT_VPLT, __NAME)
+#define VSF_LINUX_APPLET_LIBC_MNTENT_IMP(...)                                   \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_MNTENT_VPLT, __VA_ARGS__)
 
-static inline struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int buflen) {
-    return VSF_LINUX_APPLET_LIBC_MNTENT_VPLT->getmntent_r(stream, mntbuf, buf, buflen);
+VSF_LINUX_APPLET_LIBC_MNTENT_IMP(setmntent, FILE *, const char *filename, const char *type) {
+    return VSF_LINUX_APPLET_LIBC_MNTENT_ENTRY(setmntent)(filename, type);
+}
+VSF_LINUX_APPLET_LIBC_MNTENT_IMP(getmntent, struct mntent *, FILE *stream) {
+    return VSF_LINUX_APPLET_LIBC_MNTENT_ENTRY(getmntent)(stream);
+}
+VSF_LINUX_APPLET_LIBC_MNTENT_IMP(addmntent, int, FILE *stream, const struct mntent *mnt) {
+    return VSF_LINUX_APPLET_LIBC_MNTENT_ENTRY(addmntent)(stream, mnt);
+}
+VSF_LINUX_APPLET_LIBC_MNTENT_IMP(endmntent, int, FILE *stream) {
+    return VSF_LINUX_APPLET_LIBC_MNTENT_ENTRY(endmntent)(stream);
+}
+VSF_LINUX_APPLET_LIBC_MNTENT_IMP(hasmntopt, char *, const struct mntent *mnt, const char *opt) {
+    return VSF_LINUX_APPLET_LIBC_MNTENT_ENTRY(hasmntopt)(mnt, opt);
+}
+VSF_LINUX_APPLET_LIBC_MNTENT_IMP(getmntent_r, struct mntent *, FILE *stream, struct mntent *mntbuf, char *buf, int buflen) {
+    return VSF_LINUX_APPLET_LIBC_MNTENT_ENTRY(getmntent_r)(stream, mntbuf, buflen);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_MNTENT

@@ -20,7 +20,7 @@ extern "C" {
 typedef struct vsf_linux_sys_random_vplt_t {
     vsf_vplt_info_t info;
 
-    ssize_t (*getrandom)(void *buf, size_t buflen, unsigned int flags);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getrandom);
 } vsf_linux_sys_random_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_vplt;
@@ -39,8 +39,13 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_v
 #   endif
 #endif
 
-ssize_t getrandom(void *buf, size_t buflen, unsigned int flags) {
-    return VSF_LINUX_APPLET_SYS_RANDOM_VPLT->getrandom(buf, buflen, flags);
+#define VSF_LINUX_APPLET_SYS_RANDOM_ENTRY(__NAME)                               \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_RANDOM_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_RANDOM_IMP(...)                                    \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_RANDOM_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_RANDOM_IMP(getrandom, ssize_t, void *buf, size_t buflen, unsigned int flags) {
+    return VSF_LINUX_APPLET_SYS_RANDOM_ENTRY(getrandom)(buf, buflen, flags);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_RANDOM

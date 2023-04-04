@@ -53,8 +53,8 @@ struct ifaddrs {
 typedef struct vsf_linux_ifaddrs_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*getifaddrs)(struct ifaddrs **ifa);
-    void (*freeifaddrs)(struct ifaddrs *ifa);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getifaddrs);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(freeifaddrs);
 } vsf_linux_ifaddrs_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt;
@@ -73,11 +73,16 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt;
 #   endif
 #endif
 
-static inline int getifaddrs(struct ifaddrs **ifa) {
-    return VSF_LINUX_APPLET_IFADDRS_VPLT->getifaddrs(ifa);
+#define VSF_LINUX_APPLET_IFADDRS_ENTRY(__NAME)                                  \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_IFADDRS_VPLT, __NAME)
+#define VSF_LINUX_APPLET_IFADDRS_IMP(...)                                       \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_IFADDRS_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_IFADDRS_IMP(getifaddrs, int, struct ifaddrs **ifa) {
+    return VSF_LINUX_APPLET_IFADDRS_ENTRY(getifaddrs)(ifa);
 }
-static inline void freeifaddrs(struct ifaddrs *ifa) {
-    VSF_LINUX_APPLET_IFADDRS_VPLT->freeifaddrs(ifa);
+VSF_LINUX_APPLET_IFADDRS_IMP(freeifaddrs, void, struct ifaddrs *ifa) {
+    VSF_LINUX_APPLET_IFADDRS_ENTRY(freeifaddrs)(ifa);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_IFADDRS

@@ -48,21 +48,19 @@ typedef struct vsf_linux_fd_t DIR;
 typedef struct vsf_linux_dirent_vplt_t {
     vsf_vplt_info_t info;
 
-    DIR * (*opendir)(const char *name);
-    DIR * (*fdopendir)(int fd);
-    struct dirent * (*readdir)(DIR *dir);
-    struct dirent64 * (*readdir64)(DIR *dir);
-    int (*readdir_r)(DIR *dirp, struct dirent *entry, struct dirent **result);
-    int (*readdir64_r)(DIR *dirp, struct dirent64 *entry, struct dirent64 **result);
-    void (*rewinddir)(DIR *dir);
-    long (*telldir)(DIR *dir);
-    void (*seekdir)(DIR *dir, long loc);
-    int (*closedir)(DIR *dir);
-    int (*scandir)(const char *dir, struct dirent ***namelist,
-              int (*filter)(const struct dirent *),
-              int (*compare)(const struct dirent **, const struct dirent **));
-    int (*alphasort)(const struct dirent **a, const struct dirent **b);
-    int (*versionsort)(const struct dirent **a, const struct dirent **b);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(opendir);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fdopendir);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(readdir);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(readdir64);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(readdir_r);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(readdir64_r);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(rewinddir);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(telldir);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(seekdir);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(closedir);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(scandir);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(alphasort);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(versionsort);
 } vsf_linux_dirent_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt;
@@ -81,46 +79,49 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt;
 #   endif
 #endif
 
-static inline DIR * opendir(const char *name) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->opendir(name);
+#define VSF_LINUX_APPLET_DIRENT_ENTRY(__NAME)                                   \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_DIRENT_VPLT, __NAME)
+#define VSF_LINUX_APPLET_DIRENT_IMP(...)                                        \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_DIRENT_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_DIRENT_IMP(opendir, DIR *, const char *name) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(opendir)(name);
 }
-static inline DIR * fdopendir(int fd) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->fdopendir(fd);
+VSF_LINUX_APPLET_DIRENT_IMP(fdopendir, DIR *, int fd) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(fdopendir)(fd);
 }
-static inline struct dirent * readdir(DIR *dir) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->readdir(dir);
+VSF_LINUX_APPLET_DIRENT_IMP(readdir, struct dirent *, DIR *dir) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(readdir)(dir);
 }
-static inline struct dirent64 * readdir64(DIR *dir) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->readdir64(dir);
+VSF_LINUX_APPLET_DIRENT_IMP(readdir64, struct dirent64 *, DIR *dir) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(readdir64)(dir);
 }
-static inline int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->readdir_r(dirp, entry, result);
+VSF_LINUX_APPLET_DIRENT_IMP(readdir_r, int, DIR *dirp, struct dirent *entry, struct dirent **result) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(readdir_r)(dirp, entry, result);
 }
-static inline int readdir64_r(DIR *dirp, struct dirent64 *entry, struct dirent64 **result) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->readdir64_r(dirp, entry, result);
+VSF_LINUX_APPLET_DIRENT_IMP(readdir64_r, int, DIR *dirp, struct dirent64 *entry, struct dirent64 **result) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(readdir64_r)(dirp, entry, result);
 }
-static inline void rewinddir(DIR *dir) {
-    VSF_LINUX_APPLET_DIRENT_VPLT->rewinddir(dir);
+VSF_LINUX_APPLET_DIRENT_IMP(rewinddir, void, DIR *dir) {
+    VSF_LINUX_APPLET_DIRENT_ENTRY(rewinddir)(dir);
 }
-static inline long telldir(DIR *dir) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->telldir(dir);
+VSF_LINUX_APPLET_DIRENT_IMP(telldir, long, DIR *dir) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(telldir)(dir);
 }
-static inline void seekdir(DIR *dir, long loc) {
-    VSF_LINUX_APPLET_DIRENT_VPLT->seekdir(dir, loc);
+VSF_LINUX_APPLET_DIRENT_IMP(seekdir, void, DIR *dir, long loc) {
+    VSF_LINUX_APPLET_DIRENT_ENTRY(seekdir)(dir, loc);
 }
-static inline int closedir(DIR *dir) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->closedir(dir);
+VSF_LINUX_APPLET_DIRENT_IMP(closedir, int, DIR *dir) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(closedir)(dir);
 }
-static inline int scandir(const char *dir, struct dirent ***namelist,
-              int (*filter)(const struct dirent *),
-              int (*compare)(const struct dirent **, const struct dirent **)) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->scandir(dir, namelist, filter, compare);
+VSF_LINUX_APPLET_DIRENT_IMP(scandir, int, const char *dir, struct dirent ***namelist, int (*filter)(const struct dirent *), int (*compare)(const struct dirent **, const struct dirent **)) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(scandir)(dir, namelist, filter, compare);
 }
-static inline int alphasort(const struct dirent **a, const struct dirent **b) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->alphasort(a, b);
+VSF_LINUX_APPLET_DIRENT_IMP(alphasort, int, const struct dirent **a, const struct dirent **b) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(alphasort)(a, b);
 }
-static inline int versionsort(const struct dirent **a, const struct dirent **b) {
-    return VSF_LINUX_APPLET_DIRENT_VPLT->versionsort(a, b);
+VSF_LINUX_APPLET_DIRENT_IMP(versionsort, int, const struct dirent **a, const struct dirent **b) {
+    return VSF_LINUX_APPLET_DIRENT_ENTRY(versionsort)(a, b);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_DIRENT

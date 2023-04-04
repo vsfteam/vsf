@@ -28,7 +28,7 @@ extern "C" {
 typedef struct vsf_linux_sys_reboot_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*reboot)(int howto);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(reboot);
 } vsf_linux_sys_reboot_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_reboot_vplt_t vsf_linux_sys_reboot_vplt;
@@ -47,8 +47,13 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_reboot_vplt_t vsf_linux_sys_reboot_v
 #   endif
 #endif
 
-int reboot(int howto) {
-    return VSF_LINUX_APPLET_SYS_REBOOT_VPLT->reboot(howto);
+#define VSF_LINUX_APPLET_SYS_REBOOT_ENTRY(__NAME)                               \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_REBOOT_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_REBOOT_IMP(...)                                    \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_REBOOT_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_REBOOT_IMP(reboot, int, int howto) {
+    return VSF_LINUX_APPLET_SYS_REBOOT_ENTRY(reboot)(howto);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_REBOOT

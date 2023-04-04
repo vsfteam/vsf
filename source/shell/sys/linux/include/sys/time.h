@@ -53,12 +53,12 @@ struct itimerval {
 typedef struct vsf_linux_sys_time_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*gettimeofday)(struct timeval * tv, struct timezone * tz);
-    int (*getitimer)(int which, struct itimerval *curr_value);
-    int (*setitimer)(int which, const struct itimerval *new_value, struct itimerval *old_value);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gettimeofday);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getitimer);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setitimer);
 
-    int (*futimes)(int fd, const struct timeval tv[2]);
-    int (*utimes)(const char *filename, const struct timeval times[2]);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(futimes);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(utimes);
 } vsf_linux_sys_time_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt;
@@ -77,26 +77,30 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt;
 #   endif
 #endif
 
-static inline int gettimeofday(struct timeval * tv, struct timezone * tz) {
-    return VSF_LINUX_APPLET_SYS_TIME_VPLT->gettimeofday(tv, tz);
-}
-static inline int getitimer(int which, struct itimerval *curr_value) {
-    return VSF_LINUX_APPLET_SYS_TIME_VPLT->getitimer(which, curr_value);
-}
-static inline int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value) {
-    return VSF_LINUX_APPLET_SYS_TIME_VPLT->setitimer(which, new_value, old_value);
-}
+#define VSF_LINUX_APPLET_SYS_TIME_ENTRY(__NAME)                                 \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_TIME_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_TIME_IMP(...)                                      \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_TIME_VPLT, __VA_ARGS__)
 
-static inline int futimes(int fd, const struct timeval tv[2]) {
-    return VSF_LINUX_APPLET_SYS_TIME_VPLT->futimes(fd, tv);
+VSF_LINUX_APPLET_SYS_TIME_IMP(gettimeofday, int, struct timeval *tv, struct timezone *tz) {
+    return VSF_LINUX_APPLET_SYS_TIME_ENTRY(gettimeofday)(tv, tz);
 }
-static inline int utimes(const char *filename, const struct timeval times[2]) {
-    return VSF_LINUX_APPLET_SYS_TIME_VPLT->utimes(filename, times);
+VSF_LINUX_APPLET_SYS_TIME_IMP(getitimer, int, int which, struct itimerval *curr_value) {
+    return VSF_LINUX_APPLET_SYS_TIME_ENTRY(getitimer)(which, curr_value);
+}
+VSF_LINUX_APPLET_SYS_TIME_IMP(setitimer, int, int which, const struct itimerval *new_value, struct itimerval *old_value) {
+    return VSF_LINUX_APPLET_SYS_TIME_ENTRY(setitimer)(which, new_value, old_value);
+}
+VSF_LINUX_APPLET_SYS_TIME_IMP(futimes, int, int fd, const struct timeval tv[2]) {
+    return VSF_LINUX_APPLET_SYS_TIME_ENTRY(futimes)(fd, tv);
+}
+VSF_LINUX_APPLET_SYS_TIME_IMP(utimes, int, const char *filename, const struct timeval times[2]) {
+    return VSF_LINUX_APPLET_SYS_TIME_ENTRY(utimes)(filename, times);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_TIME
 
-int gettimeofday(struct timeval * tv, struct timezone * tz);
+int gettimeofday(struct timeval *tv, struct timezone *tz);
 int getitimer(int which, struct itimerval *curr_value);
 int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);
 

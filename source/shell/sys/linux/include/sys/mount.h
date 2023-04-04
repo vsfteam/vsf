@@ -49,6 +49,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_mount_vplt_t vsf_linux_sys_mount_vpl
 #   endif
 #endif
 
+#define VSF_LINUX_APPLET_SYS_MOUNT_ENTRY(__NAME)                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_MOUNT_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_MOUNT_IMP(...)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_MOUNT_VPLT, __VA_ARGS__)
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_MOUNT
 
 // TODO: implement standard mount after device mapping is implemented

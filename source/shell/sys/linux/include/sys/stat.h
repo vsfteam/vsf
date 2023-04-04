@@ -135,12 +135,12 @@ struct stat64 {
 typedef struct vsf_linux_sys_stat_vplt_t {
     vsf_vplt_info_t info;
 
-    mode_t (*umask)(mode_t mask);
-    int (*stat)(const char *pathname, struct stat *buf);
-    int (*fstat)(int fd, struct stat *buf);
-    int (*fstatat)(int dirfd, const char *pathname, struct stat *buf, int flags);
-    int (*chmod)(const char *pathname, mode_t mode);
-    int (*fchmod)(int fd, mode_t mode);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(umask);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(stat);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fstat);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fstatat);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(chmod);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fchmod);
 } vsf_linux_sys_stat_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
@@ -159,23 +159,28 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
 #   endif
 #endif
 
-static inline mode_t umask(mode_t mask) {
-    return VSF_LINUX_APPLET_SYS_STAT_VPLT->umask(mask);
+#define VSF_LINUX_APPLET_SYS_STAT_ENTRY(__NAME)                                 \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_STAT_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_STAT_IMP(...)                                      \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_STAT_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_STAT_IMP(umask, mode_t, mode_t mask) {
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(umask)(mask);
 }
-static inline int stat(const char *pathname, struct stat *buf) {
-    return VSF_LINUX_APPLET_SYS_STAT_VPLT->stat(pathname, buf);
+VSF_LINUX_APPLET_SYS_STAT_IMP(stat, int, const char *pathname, struct stat *buf) {
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(stat)(pathname, buf);
 }
-static inline int fstat(int fd, struct stat *buf) {
-    return VSF_LINUX_APPLET_SYS_STAT_VPLT->fstat(fd, buf);
+VSF_LINUX_APPLET_SYS_STAT_IMP(fstat, int, int fd, struct stat *buf) {
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(fstat)(fd, buf);
 }
-static inline int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags) {
-    return VSF_LINUX_APPLET_SYS_STAT_VPLT->fstatat(dirfd, pathname, buf, flags);
+VSF_LINUX_APPLET_SYS_STAT_IMP(fstatat, int, int dirfd, const char *pathname, struct stat *buf, int flags) {
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(fstatat)(dirfd, pathname, buf, flags);
 }
-static inline int chmod(const char *pathname, mode_t mode) {
-    return VSF_LINUX_APPLET_SYS_STAT_VPLT->chmod(pathname, mode);
+VSF_LINUX_APPLET_SYS_STAT_IMP(chmod, int, const char *pathname, mode_t mode) {
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(chmod)(pathname, mode);
 }
-static inline int fchmod(int fd, mode_t mode) {
-    return VSF_LINUX_APPLET_SYS_STAT_VPLT->fchmod(fd, mode);
+VSF_LINUX_APPLET_SYS_STAT_IMP(fchmod, int, int fd, mode_t mode) {
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(fchmod)(fd, mode);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT

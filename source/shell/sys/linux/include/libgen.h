@@ -18,8 +18,8 @@ extern "C" {
 typedef struct vsf_linux_libgen_vplt_t {
     vsf_vplt_info_t info;
 
-    char * (*basename)(char *);
-    char * (*dirname)(char *);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(basename);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dirname);
 } vsf_linux_libgen_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt;
@@ -38,11 +38,16 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt;
 #   endif
 #endif
 
-static inline char * basename(char *path) {
-    return VSF_LINUX_APPLET_LIBGEN_VPLT->basename(path);
+#define VSF_LINUX_APPLET_LIBGEN_ENTRY(__NAME)                                   \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_LIBGEN_VPLT, __NAME)
+#define VSF_LINUX_APPLET_LIBGEN_IMP(...)                                        \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBGEN_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_LIBGEN_IMP(basename, char *, char *path) {
+    return VSF_LINUX_APPLET_LIBGEN_ENTRY(basename)(path);
 }
-static inline char * dirname(char *path) {
-    return VSF_LINUX_APPLET_LIBGEN_VPLT->basename(path);
+VSF_LINUX_APPLET_LIBGEN_IMP(dirname, char *, char *path) {
+    return VSF_LINUX_APPLET_LIBGEN_ENTRY(dirname)(path);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBGEN

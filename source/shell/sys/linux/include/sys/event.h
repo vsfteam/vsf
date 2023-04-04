@@ -78,10 +78,8 @@ struct kevent {
 typedef struct vsf_linux_sys_event_vplt_t {
     vsf_vplt_info_t info;
 
-    int (*kqueue)(void);
-    int (*kevent)(int kq, const struct kevent *changelist, int nchanges,
-        struct kevent *eventlist, int nevents,
-        const struct timespec *timeout);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(kqueue);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(kevent);
 } vsf_linux_sys_event_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_event_vplt_t vsf_linux_sys_event_vplt;
@@ -100,13 +98,16 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_event_vplt_t vsf_linux_sys_event_vpl
 #   endif
 #endif
 
-static inline int kqueue(void) {
-    return VSF_LINUX_APPLET_SYS_EVENT_VPLT->kqueue();
+#define VSF_LINUX_APPLET_SYS_EVENT_ENTRY(__NAME)                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_EVENT_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_EVENT_IMP(...)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_EVENT_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_EVENT_IMP(kqueue, int, void) {
+    return VSF_LINUX_APPLET_SYS_EVENT_ENTRY(kqueue)();
 }
-static inline int kevent(int kq, const struct kevent *changelist, int nchanges,
-        struct kevent *eventlist, int nevents,
-        const struct timespec *timeout) {
-    return VSF_LINUX_APPLET_SYS_EVENT_VPLT->kevent(kq, changelist, nchanges, eventlist nevents, timeout);
+VSF_LINUX_APPLET_SYS_EVENT_IMP(kevent, int, int kq, const struct kevent *changelist, int nchanges, struct kevent *eventlist, int nevents, const struct timespec *timeout) {
+    return VSF_LINUX_APPLET_SYS_EVENT_ENTRY(kevent)(kq, changelist, nchanges, eventlist, nevents, timeout);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_EVENT

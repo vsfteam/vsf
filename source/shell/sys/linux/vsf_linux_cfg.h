@@ -188,7 +188,7 @@
 #   ifndef VSF_LINUX_APPLET_USE_SYS_STAT
 #       define VSF_LINUX_APPLET_USE_SYS_STAT    ENABLED
 #   endif
-#   if !defined(VSF_LINUX_APPLET_USE_SYS_TIME) && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   ifndef VSF_LINUX_APPLET_USE_SYS_TIME
 #       define VSF_LINUX_APPLET_USE_SYS_TIME    ENABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_UTSNAME
@@ -199,6 +199,30 @@
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_WAIT
 #       define VSF_LINUX_APPLET_USE_SYS_WAIT    ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_SENDFILE
+#       define VSF_LINUX_APPLET_USE_SYS_SENDFILE    ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_REBOOT
+#       define VSF_LINUX_APPLET_USE_SYS_REBOOT  DISABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_FILE
+#       define VSF_LINUX_APPLET_USE_SYS_FILE    DISABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_PRCTL
+#       define VSF_LINUX_APPLET_USE_SYS_PRCTL   DISABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_EVENT
+#       define VSF_LINUX_APPLET_USE_SYS_EVENT   DISABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_SEM
+#       define VSF_LINUX_APPLET_USE_SYS_SEM     DISABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_SIGNALFD
+#       define VSF_LINUX_APPLET_USE_SYS_SIGNALFD    DISABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_TIMES
+#       define VSF_LINUX_APPLET_USE_SYS_TIMES   DISABLED
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_UNISTD
@@ -221,6 +245,9 @@
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_IFADDRS
 #       define VSF_LINUX_APPLET_USE_IFADDRS     ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_ARPA_INET
+#       define VSF_LINUX_APPLET_USE_ARPA_INET   DISABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_NETDB
 #       define VSF_LINUX_APPLET_USE_NETDB       ENABLED
@@ -252,6 +279,9 @@
 #       ifndef VSF_LINUX_APPLET_USE_LIBC_TIME
 #           define VSF_LINUX_APPLET_USE_LIBC_TIME   ENABLED
 #       endif
+#       ifndef VSF_LINUX_APPLET_USE_LIBC_MNTENT
+#           define VSF_LINUX_APPLET_USE_LIBC_MNTENT DISABLED
+#       endif
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_VPLT
@@ -278,6 +308,7 @@ typedef struct vsf_linux_vplt_t {
     void *libc_setjmp_vplt;
     void *libc_assert_vplt;
     void *libc_math_vplt;
+    void *libc_mntent_vplt;
     void *libc_res0_vplt;
     void *libc_res1_vplt;
     void *libc_res2_vplt;
@@ -285,7 +316,6 @@ typedef struct vsf_linux_vplt_t {
     void *libc_res4_vplt;
     void *libc_res5_vplt;
     void *libc_res6_vplt;
-    void *libc_res7_vplt;
 
     // sys
     void *sys_epoll_vplt;
@@ -303,14 +333,14 @@ typedef struct vsf_linux_vplt_t {
     void *sys_ipc_vplt;
     void *sys_syslog_vplt;
     void *sys_random_vplt;
+    void *sys_sendfile_vplt;
+    void *sys_reboot_vplt;
+    void *sys_file_vplt;
+    void *sys_prctl_vplt;
+    void *sys_event_vplt;
     void *sys_res0_vplt;
     void *sys_res1_vplt;
     void *sys_res2_vplt;
-    void *sys_res3_vplt;
-    void *sys_res4_vplt;
-    void *sys_res5_vplt;
-    void *sys_res6_vplt;
-    void *sys_res7_vplt;
 
     // unix
     void *unistd_vplt;

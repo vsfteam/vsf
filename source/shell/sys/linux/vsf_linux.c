@@ -114,11 +114,15 @@
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
-#   error VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE MUST be enbled
+#   error VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE MUST be enbled for linux
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
-#   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL MUST be enabled
+#   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL MUST be enabled for linux
+#endif
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
+#   error VSF_KERNEL_CFG_EDA_SUPPORT_TIMER MUST be enabled for linux
 #endif
 
 #if VSF_LINUX_CFG_STACKSIZE < 512
@@ -3012,136 +3016,130 @@ char * nl_langinfo(nl_item item)
 
 // vplt
 #if VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_SYS_RANDOM_FUNC(__FUNC)     .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_sys_random_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_random_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_SYS_RANDOM_FUNC(getrandom),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getrandom),
 };
 #endif
 
 #if VSF_LINUX_APPLET_USE_SYS_SHM == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_SYS_SHM_FUNC(__FUNC)        .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_sys_shm_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_shm_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_SYS_SHM_FUNC(shmget),
-    VSF_LINUX_APPLET_SYS_SHM_FUNC(shmat),
-    VSF_LINUX_APPLET_SYS_SHM_FUNC(shmdt),
-    VSF_LINUX_APPLET_SYS_SHM_FUNC(shmctl),
+    VSF_APPLET_VPLT_ENTRY_FUNC(shmget),
+    VSF_APPLET_VPLT_ENTRY_FUNC(shmat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(shmdt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(shmctl),
 };
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 #if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_SYS_TIME_FUNC(__FUNC)       .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_sys_time_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_time_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_SYS_TIME_FUNC(gettimeofday),
-    VSF_LINUX_APPLET_SYS_TIME_FUNC(getitimer),
-    VSF_LINUX_APPLET_SYS_TIME_FUNC(setitimer),
-    VSF_LINUX_APPLET_SYS_TIME_FUNC(futimes),
-    VSF_LINUX_APPLET_SYS_TIME_FUNC(utimes),
+    VSF_APPLET_VPLT_ENTRY_FUNC(gettimeofday),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getitimer),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setitimer),
+    VSF_APPLET_VPLT_ENTRY_FUNC(futimes),
+    VSF_APPLET_VPLT_ENTRY_FUNC(utimes),
 };
 #endif
 #endif
 
 #if VSF_LINUX_APPLET_USE_SYS_UTSNAME == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_SYS_UTSNAME_FUNC(__FUNC)    .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_utsname_vplt_t vsf_linux_sys_utsname_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_sys_utsname_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_utsname_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_SYS_UTSNAME_FUNC(uname),
+    VSF_APPLET_VPLT_ENTRY_FUNC(uname),
 };
 #endif
 
 #if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_SYS_WAIT_FUNC(__FUNC)       .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_wait_vplt_t vsf_linux_sys_wait_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_sys_wait_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_wait_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_SYS_WAIT_FUNC(wait),
-    VSF_LINUX_APPLET_SYS_WAIT_FUNC(waitpid),
-    VSF_LINUX_APPLET_SYS_WAIT_FUNC(waitid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wait),
+    VSF_APPLET_VPLT_ENTRY_FUNC(waitpid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(waitid),
 };
 #endif
 
 #if VSF_LINUX_APPLET_USE_UNISTD == ENABLED && !defined(__VSF_APPLET__)
-#   define VSF_LINUX_APPLET_UNISTD_FUNC(__FUNC)         .__FUNC = __FUNC
 __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_unistd_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_unistd_vplt_t, 0, 0, true),
 
-    VSF_LINUX_APPLET_UNISTD_FUNC(__vsf_linux_errno),
-    VSF_LINUX_APPLET_UNISTD_FUNC(usleep),
-    VSF_LINUX_APPLET_UNISTD_FUNC(sleep),
-    VSF_LINUX_APPLET_UNISTD_FUNC(alarm),
-    VSF_LINUX_APPLET_UNISTD_FUNC(ualarm),
-    VSF_LINUX_APPLET_UNISTD_FUNC(getgid),
-    VSF_LINUX_APPLET_UNISTD_FUNC(getegid),
-    VSF_LINUX_APPLET_UNISTD_FUNC(getuid),
-    VSF_LINUX_APPLET_UNISTD_FUNC(geteuid),
-    VSF_LINUX_APPLET_UNISTD_FUNC(getpid),
-    VSF_LINUX_APPLET_UNISTD_FUNC(getppid),
-    VSF_LINUX_APPLET_UNISTD_FUNC(gettid),
-    VSF_LINUX_APPLET_UNISTD_FUNC(__execl_va),
-    VSF_LINUX_APPLET_UNISTD_FUNC(execl),
-    VSF_LINUX_APPLET_UNISTD_FUNC(__execlp_va),
-    VSF_LINUX_APPLET_UNISTD_FUNC(execlp),
-    VSF_LINUX_APPLET_UNISTD_FUNC(execv),
-    VSF_LINUX_APPLET_UNISTD_FUNC(execve),
-    VSF_LINUX_APPLET_UNISTD_FUNC(execvp),
-    VSF_LINUX_APPLET_UNISTD_FUNC(execvpe),
-    VSF_LINUX_APPLET_UNISTD_FUNC(daemon),
-    VSF_LINUX_APPLET_UNISTD_FUNC(sysconf),
-    VSF_LINUX_APPLET_UNISTD_FUNC(pathconf),
-    VSF_LINUX_APPLET_UNISTD_FUNC(fpathconf),
-    VSF_LINUX_APPLET_UNISTD_FUNC(realpath),
-    VSF_LINUX_APPLET_UNISTD_FUNC(pipe),
-    VSF_LINUX_APPLET_UNISTD_FUNC(pipe2),
-    VSF_LINUX_APPLET_UNISTD_FUNC(access),
-    VSF_LINUX_APPLET_UNISTD_FUNC(unlink),
-    VSF_LINUX_APPLET_UNISTD_FUNC(unlinkat),
-    VSF_LINUX_APPLET_UNISTD_FUNC(link),
-    VSF_LINUX_APPLET_UNISTD_FUNC(mkdir),
-    VSF_LINUX_APPLET_UNISTD_FUNC(mkdirat),
-    VSF_LINUX_APPLET_UNISTD_FUNC(rmdir),
-    VSF_LINUX_APPLET_UNISTD_FUNC(dup),
-    VSF_LINUX_APPLET_UNISTD_FUNC(dup2),
-    VSF_LINUX_APPLET_UNISTD_FUNC(dup3),
-    VSF_LINUX_APPLET_UNISTD_FUNC(chroot),
-    VSF_LINUX_APPLET_UNISTD_FUNC(chdir),
-    VSF_LINUX_APPLET_UNISTD_FUNC(getcwd),
-    VSF_LINUX_APPLET_UNISTD_FUNC(close),
-    VSF_LINUX_APPLET_UNISTD_FUNC(lseek),
-    VSF_LINUX_APPLET_UNISTD_FUNC(read),
-    VSF_LINUX_APPLET_UNISTD_FUNC(write),
-    VSF_LINUX_APPLET_UNISTD_FUNC(readv),
-    VSF_LINUX_APPLET_UNISTD_FUNC(writev),
-    VSF_LINUX_APPLET_UNISTD_FUNC(pread),
-    VSF_LINUX_APPLET_UNISTD_FUNC(pwrite),
-    VSF_LINUX_APPLET_UNISTD_FUNC(preadv),
-    VSF_LINUX_APPLET_UNISTD_FUNC(pwritev),
-    VSF_LINUX_APPLET_UNISTD_FUNC(fsync),
-    VSF_LINUX_APPLET_UNISTD_FUNC(fdatasync),
-    VSF_LINUX_APPLET_UNISTD_FUNC(isatty),
-    VSF_LINUX_APPLET_UNISTD_FUNC(getpagesize),
-    VSF_LINUX_APPLET_UNISTD_FUNC(symlink),
-    VSF_LINUX_APPLET_UNISTD_FUNC(ftruncate),
-    VSF_LINUX_APPLET_UNISTD_FUNC(truncate),
-    VSF_LINUX_APPLET_UNISTD_FUNC(ftruncate64),
-    VSF_LINUX_APPLET_UNISTD_FUNC(truncate64),
-    VSF_LINUX_APPLET_UNISTD_FUNC(readlink),
-    VSF_LINUX_APPLET_UNISTD_FUNC(tcgetpgrp),
-    VSF_LINUX_APPLET_UNISTD_FUNC(tcsetpgrp),
-    VSF_LINUX_APPLET_UNISTD_FUNC(getpass),
-    VSF_LINUX_APPLET_UNISTD_FUNC(gethostname),
-    VSF_LINUX_APPLET_UNISTD_FUNC(sethostname),
-    VSF_LINUX_APPLET_UNISTD_FUNC(chown),
-    VSF_LINUX_APPLET_UNISTD_FUNC(fchown),
-    VSF_LINUX_APPLET_UNISTD_FUNC(lchown),
-    VSF_LINUX_APPLET_UNISTD_FUNC(fchownat),
-    VSF_LINUX_APPLET_UNISTD_FUNC(getentropy),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_errno),
+    VSF_APPLET_VPLT_ENTRY_FUNC(usleep),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sleep),
+    VSF_APPLET_VPLT_ENTRY_FUNC(alarm),
+    VSF_APPLET_VPLT_ENTRY_FUNC(ualarm),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getgid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getegid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getuid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(geteuid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getpid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getppid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(gettid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__execl_va),
+    VSF_APPLET_VPLT_ENTRY_FUNC(execl),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__execlp_va),
+    VSF_APPLET_VPLT_ENTRY_FUNC(execlp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(execv),
+    VSF_APPLET_VPLT_ENTRY_FUNC(execve),
+    VSF_APPLET_VPLT_ENTRY_FUNC(execvp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(execvpe),
+    VSF_APPLET_VPLT_ENTRY_FUNC(daemon),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sysconf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pathconf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fpathconf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(realpath),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pipe),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pipe2),
+    VSF_APPLET_VPLT_ENTRY_FUNC(access),
+    VSF_APPLET_VPLT_ENTRY_FUNC(unlink),
+    VSF_APPLET_VPLT_ENTRY_FUNC(unlinkat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(link),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mkdir),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mkdirat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(rmdir),
+    VSF_APPLET_VPLT_ENTRY_FUNC(dup),
+    VSF_APPLET_VPLT_ENTRY_FUNC(dup2),
+    VSF_APPLET_VPLT_ENTRY_FUNC(dup3),
+    VSF_APPLET_VPLT_ENTRY_FUNC(chroot),
+    VSF_APPLET_VPLT_ENTRY_FUNC(chdir),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getcwd),
+    VSF_APPLET_VPLT_ENTRY_FUNC(close),
+    VSF_APPLET_VPLT_ENTRY_FUNC(lseek),
+    VSF_APPLET_VPLT_ENTRY_FUNC(read),
+    VSF_APPLET_VPLT_ENTRY_FUNC(write),
+    VSF_APPLET_VPLT_ENTRY_FUNC(readv),
+    VSF_APPLET_VPLT_ENTRY_FUNC(writev),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pread),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pwrite),
+    VSF_APPLET_VPLT_ENTRY_FUNC(preadv),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pwritev),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fsync),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fdatasync),
+    VSF_APPLET_VPLT_ENTRY_FUNC(isatty),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getpagesize),
+    VSF_APPLET_VPLT_ENTRY_FUNC(symlink),
+    VSF_APPLET_VPLT_ENTRY_FUNC(ftruncate),
+    VSF_APPLET_VPLT_ENTRY_FUNC(truncate),
+    VSF_APPLET_VPLT_ENTRY_FUNC(ftruncate64),
+    VSF_APPLET_VPLT_ENTRY_FUNC(truncate64),
+    VSF_APPLET_VPLT_ENTRY_FUNC(readlink),
+    VSF_APPLET_VPLT_ENTRY_FUNC(tcgetpgrp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(tcsetpgrp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getpass),
+    VSF_APPLET_VPLT_ENTRY_FUNC(gethostname),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sethostname),
+    VSF_APPLET_VPLT_ENTRY_FUNC(chown),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fchown),
+    VSF_APPLET_VPLT_ENTRY_FUNC(lchown),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fchownat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getentropy),
 };
 #endif
 
@@ -3156,6 +3154,21 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_EVENTFD == ENABLED
 #       include "./include/sys/eventfd.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_SYS_SENDFILE == ENABLED
+#       include "./include/sys/sendfile.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
+#       include "./include/sys/reboot.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
+#       include "./include/sys/file.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_PRCTL == ENABLED
+#       include "./include/sys/prctl.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_EVENT == ENABLED
+#       include "./include/sys/event.h"
+#   endif
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED
 #       include "./include/netdb.h"
 #   endif
@@ -3165,11 +3178,17 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
 #       include "./include/ifaddrs.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+#       include "./include/arpa/inet.h"
+#   endif
 #   if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
 #       include "./include/getopt.h"
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 #       include "./include/libgen.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_MNTENT == ENABLED
+#       include "./include/simple_libc/mntent.h"
 #   endif
 #else
 #   if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
@@ -3181,6 +3200,21 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_EVENTFD == ENABLED
 #       include <sys/eventfd.h>
 #   endif
+#   if VSF_LINUX_APPLET_USE_SYS_SENDFILE == ENABLED
+#       include <sys/sendfile.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
+#       include <sys/reboot.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
+#       include <sys/file.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_PRCTL == ENABLED
+#       include <sys/prctl.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_EVENT == ENABLED
+#       include <sys/event.h>
+#   endif
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED
 #       include <netdb.h>
 #   endif
@@ -3190,16 +3224,22 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
 #       include <ifaddrs.h>
 #   endif
+#   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+#       include <arpa/inet.h>
+#   endif
 #   if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
 #       include <getopt.h>
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 #       include <libgen.h>
 #   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_MNTENT == ENABLED
+#       include <mntent.h>
+#   endif
 #endif
 
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
-    .info.entry_num = (sizeof(vsf_linux_vplt_t) - sizeof(vsf_vplt_info_t)) / sizeof(void *),
+    VSF_APPLET_VPLT_INFO(vsf_linux_vplt_t, 0, 0, false),
 
 #   if VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED
     .libc_stdio_vplt    = (void *)&vsf_linux_libc_stdio_vplt,
@@ -3212,6 +3252,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED
     .libc_time_vplt     = (void *)&vsf_linux_libc_time_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_MNTENT == ENABLED
+    .libc_mntent_vplt   = (void *)&vsf_linux_libc_mntent_vplt,
 #   endif
 
 #   if VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED
@@ -3241,6 +3284,21 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED
     .sys_socket_vplt    = (void *)&vsf_linux_sys_socket_vplt,
 #   endif
+#   if VSF_LINUX_APPLET_USE_SYS_SENDFILE == ENABLED
+    .sys_sendfile_vplt  = (void *)&vsf_linux_sys_sendfile_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
+    .sys_reboot_vplt    = (void *)&vsf_linux_sys_reboot_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
+    .sys_file_vplt      = (void *)&vsf_linux_sys_file_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_PRCTL == ENABLED
+    .sys_prctl_vplt     = (void *)&vsf_linux_sys_prctl_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_EVENT == ENABLED
+    .sys_event_vplt     = (void *)&vsf_linux_sys_event_vplt,
+#   endif
 
 #   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
     .unistd_vplt        = (void *)&vsf_linux_unistd_vplt,
@@ -3262,6 +3320,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
     .ifaddrs_vplt       = (void *)&vsf_linux_ifaddrs_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+    .arpa_inet_vplt     = (void *)&vsf_linux_arpa_inet_vplt,
 #   endif
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED
     .netdb_vplt         = (void *)&vsf_linux_netdb_vplt,

@@ -55,6 +55,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sched_vplt_t vsf_linux_sched_vplt;
 #   endif
 #endif
 
+#define VSF_LINUX_APPLET_SCHED_ENTRY(__NAME)                                    \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SCHED_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SCHED_IMP(...)                                         \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SCHED_VPLT, __VA_ARGS__)
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SCHED
 
 int sched_get_priority_max(int policy);
