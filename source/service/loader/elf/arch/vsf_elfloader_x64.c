@@ -54,6 +54,7 @@
 int vsf_elfloader_arch_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
 {
     switch (type) {
+    case R_X86_64_64:
     case R_X86_64_GLOB_DAT:
     case R_X86_64_JUMP_SLOT:
         *(uint64_t *)tgtaddr = tgtvalue;
