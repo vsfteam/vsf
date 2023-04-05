@@ -27,6 +27,9 @@
 #   include "service/heap/vsf_heap.h"
 #endif
 
+// for file operation in vsf_loader_stdio_read
+#include <stdio.h>
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
