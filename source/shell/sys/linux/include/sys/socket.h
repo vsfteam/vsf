@@ -254,7 +254,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_v
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED
+#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED
 
 #ifndef VSF_LINUX_APPLET_SYS_SOCKET_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

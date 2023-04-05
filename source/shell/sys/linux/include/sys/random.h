@@ -27,7 +27,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_v
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED
+#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED
 
 #ifndef VSF_LINUX_APPLET_SYS_RANDOM_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

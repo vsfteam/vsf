@@ -32,7 +32,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_file_vplt_t vsf_linux_sys_file_vplt;
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
+#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
 
 #ifndef VSF_LINUX_APPLET_SYS_FILE_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

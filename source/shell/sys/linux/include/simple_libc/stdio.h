@@ -219,7 +219,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_v
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED
+#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED
 
 #ifndef VSF_LINUX_APPLET_LIBC_STDIO_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

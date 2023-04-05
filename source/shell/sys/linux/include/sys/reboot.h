@@ -35,7 +35,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_reboot_vplt_t vsf_linux_sys_reboot_v
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
+#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
 
 #ifndef VSF_LINUX_APPLET_SYS_REBOOT_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

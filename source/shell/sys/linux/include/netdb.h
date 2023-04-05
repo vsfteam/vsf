@@ -112,7 +112,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_NETDB == ENABLED
+#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_NETDB == ENABLED
 
 #ifndef VSF_LINUX_APPLET_NETDB_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
