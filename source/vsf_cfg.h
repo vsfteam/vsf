@@ -145,12 +145,12 @@ typedef struct vsf_vplt_entry_t {
 #   define VSF_APPLET_VPLT_ENTRY_FUNC(__NAME)                                   \
     .fn_##__NAME = {                                                            \
         .name = VSF_STR(__NAME),                                                \
-        .ptr = (__NAME),                                                        \
+        .ptr = (void *)(__NAME),                                                \
     }
 #else
 #   define VSF_APPLET_VPLT_ENTRY_FUNC(__NAME)                                   \
     .fn_##__NAME = {                                                            \
-        .ptr = (__NAME),                                                        \
+        .ptr = (void *)(__NAME),                                                \
     }
 #endif
 
