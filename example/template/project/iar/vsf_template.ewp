@@ -16045,6 +16045,9 @@
             </file>
         </group>
         <file>
+            <name>$PROJ_DIR$\..\..\..\..\source\vsf.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\..\..\source\vsf.h</name>
         </file>
         <file>
