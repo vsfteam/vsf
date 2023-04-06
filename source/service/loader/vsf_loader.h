@@ -133,11 +133,13 @@ struct vsf_loader_target_t {
     uintptr_t object;
 
     /**
-     \~english whether xip is supported. For xip, target is the address of image.
+     \~english whether xip is supported. Whether to use xip is detected in loader.
+                If support_xip is true, target should be the address of the image.
 
-     \~chinese 是否支持xip。对于XIP的话，target是镜像地址。
+     \~chinese 是否支持 xip。是否能够使用 xip 会在加载的时候自动检测。
+                如果 support_xip 是 true 的话， target 必须是镜像地址。
     */
-    bool is_xip;
+    bool support_xip;
 
     /**
      \~english function to read target to memory.

@@ -60,13 +60,13 @@ int elfloader_main(int argc, char **argv)
     };
     vsf_loader_target_t elftarget = {
 #ifdef ELFLOADER_CFG_STDIO
-        .object     = (uintptr_t)f,
-        .is_xip     = false,
-        .fn_read    = vsf_loader_stdio_read,
+        .object         = (uintptr_t)f,
+        .support_xip    = false,
+        .fn_read        = vsf_loader_stdio_read,
 #else
-        .object     = strtoul((const char *)argv[1], NULL, 0),
-        .is_xip     = 0 == vsf_elfloader_get_section(&elfloader, &elftarget, "got"),
-        .fn_read    = vsf_loader_xip_read,
+        .object         = strtoul((const char *)argv[1], NULL, 0),
+        .support_xip    = true,
+        .fn_read        = vsf_loader_xip_read,
 #endif
     };
 
