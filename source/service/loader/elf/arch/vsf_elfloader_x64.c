@@ -78,7 +78,7 @@ static const char generic_func_loader[] = {
     0x57, // push %rdi 入栈第一个参数
 
     // 调用setOriginalReturnAddress保存原返回地址
-    0x48, 0xb9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // movabs $0, %rcx 第一个参数是原返回暂存地址
+    0x48, 0x8d, 0x0D, 0x4B, 0x00, 0x00, 0x00, // mov 0x4B(%rip), %rcx 第一个参数是原返回地址的暂存地址
     0x48, 0x89, 0xc2, // mov %rax, %rdx 第二个参数是原返回地址
     0x48, 0x83, 0xec, 0x20, // sub $0x20, %rsp 预留32字节的影子空间
     0x48, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // movabs $0, %rax
@@ -99,7 +99,7 @@ static const char generic_func_loader[] = {
     0x50, // push %rax 保存返回值
 
     // 调用getOriginalReturnAddress获取原返回地址
-    0x48, 0xb9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // movabs $0, %rcx 第一个参数是原返回暂存地址
+    0x48, 0x8d, 0x0D, 0x12, 0x00, 0x00, 0x00, // mov 0x12(%rip), %rcx 第一个参数是原返回地址的暂存地址
     0x48, 0xb8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // movabs $0, %rax
     0xff, 0xd0, // callq *%rax 调用getOriginalReturnAddress
     0x48, 0x89, 0xc1, // mov %rax, %rcx 原返回地址存到rcx
@@ -108,12 +108,9 @@ static const char generic_func_loader[] = {
     0xc3, // 返回
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00  // 暂存返回值空间
 };
-static const int generic_func_loader_ra_set_slot_offset = 11;
-static const int generic_func_loader_set_addr_offset = 28;
-static const int generic_func_loader_target_offset = 54;
-static const int generic_func_loader_ra_get_slot_offset = 71;
-static const int generic_func_loader_get_addr_offset = 81;
-static const int generic_func_loader_ra_slot_offset = 97;
+static const int generic_func_loader_set_addr_offset = 25;
+static const int generic_func_loader_target_offset = 51;
+static const int generic_func_loader_get_addr_offset = 75;
 
 void * getOriginalReturnAddress(void **slot) {
     void *result = *slot;
@@ -172,10 +169,8 @@ int vsf_elfloader_arch_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr 
 
     int entry_size = (sizeof(generic_func_loader) + 0xF) & ~0xF;
     char *ptr = arch_data->entries + arch_data->pos++ * entry_size;
-    *(uint64_t *)(ptr + generic_func_loader_ra_set_slot_offset) = (uint64_t)ptr + generic_func_loader_ra_slot_offset;
     *(uint64_t *)(ptr + generic_func_loader_set_addr_offset) = (uint64_t)setOriginalReturnAddress;
     *(uint64_t *)(ptr + generic_func_loader_target_offset) = (uint64_t)link_tgt;
-    *(uint64_t *)(ptr + generic_func_loader_ra_get_slot_offset) = (uint64_t)ptr + generic_func_loader_ra_slot_offset;
     *(uint64_t *)(ptr + generic_func_loader_get_addr_offset) = (uint64_t)getOriginalReturnAddress;
     *target = (Elf_Addr)ptr;
     return 0;
