@@ -364,10 +364,19 @@ second_round_for_ram_base:
         goto cleanup_and_fail;
     }
 
+    Elf_Word memsz;
+    vsf_loader_mem_attr_t memattr;
     bool is_xip = target->support_xip && !linfo.has_dynamic;
-    Elf_Word memsz = is_xip ? linfo.memsz_xip : linfo.memsz;
+    if (is_xip) {
+        memsz = linfo.memsz_xip;
+        memattr = VSF_LOADER_MEM_RW;
+    } else {
+        memsz = linfo.memsz;
+        memattr = VSF_LOADER_MEM_RWX;
+    }
+
     if ((memsz > 0) && (NULL == elfloader->ram_base)) {
-        elfloader->ram_base = vsf_loader_malloc(elfloader, VSF_LOADER_MEM_RWX, memsz, 0);
+        elfloader->ram_base = vsf_loader_malloc(elfloader, memattr, memsz, 0);
         if (NULL == elfloader->ram_base) {
             vsf_trace_error("fail to allocate ram_base" VSF_TRACE_CFG_LINEEND);
             goto cleanup_and_fail;
