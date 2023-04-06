@@ -65,7 +65,7 @@ int elfloader_main(int argc, char **argv)
         .fn_read    = vsf_loader_stdio_read,
 #else
         .object     = strtoul((const char *)argv[1], NULL, 0),
-        .is_xip     = true,
+        .is_xip     = 0 == vsf_elfloader_get_section(&elfloader, &elftarget, "got"),
         .fn_read    = vsf_loader_xip_read,
 #endif
     };
@@ -82,7 +82,6 @@ int elfloader_main(int argc, char **argv)
             .vplt       = (void *)&vsf_linux_vplt,
         };
 
-        vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
 #if VSF_APPLET_CFG_ABI_PATCH == ENABLED
         if (pls_applet_ctx < 0) {
             pls_applet_ctx = vsf_linux_pls_alloc();
@@ -92,8 +91,10 @@ int elfloader_main(int argc, char **argv)
         VSF_LINUX_ASSERT(pls != NULL);
         pls->data = &applet_ctx;
 
+        vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
         result = ((int (*)(void))entry)();
 #else
+        vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
         result = ((int (*)(vsf_applet_ctx_t*))entry)(&applet_ctx);
 #endif
         vsf_elfloader_cleanup(&elfloader);

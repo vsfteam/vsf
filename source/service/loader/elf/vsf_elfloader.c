@@ -423,7 +423,7 @@ static int __vsf_elfloader_get_section_cb(vsf_elfloader_t *elfloader, vsf_loader
 }
 
 uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        const char *name, Elf_Shdr *header)
+        const char *name)
 {
     __vsf_elfloader_get_section_t param = {
         .name = name,
