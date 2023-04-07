@@ -581,8 +581,11 @@ int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char
         strcat(path_out, path_in);
     }
 
-    // process .. an .
+    // process .. an ., process . first
     char *tmp, *tmp_replace;
+    while ((tmp = (char *)strstr(path_out, "/./")) != NULL) {
+        strcpy(tmp, &tmp[2]);
+    }
     while ((tmp = (char *)strstr(path_out, "/..")) != NULL) {
         tmp[0] = '\0';
         tmp_replace = (char *)strrchr(path_out, '/');
@@ -590,9 +593,6 @@ int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char
             return -ENOENT;
         }
         strcpy(tmp_replace, &tmp[3]);
-    }
-    while ((tmp = (char *)strstr(path_out, "/./")) != NULL) {
-        strcpy(tmp, &tmp[2]);
     }
 
     // fix surfix "/."
