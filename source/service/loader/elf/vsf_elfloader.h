@@ -36,17 +36,18 @@
 #if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
 
 #include <stdint.h>
-#include "./elf.h"
 
 #if     defined(__VSF_ELFLOADER_CLASS_IMPLEMENT)
-#   undef __VSF_ELFLOADER_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_ELFLOADER_CLASS_INHERIT__)
-#   undef __VSF_ELFLOADER_CLASS_INHERIT__
 #   define __VSF_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
+
+#ifdef __VSF_ELFLOADER_CLASS_INHERIT__
+#   include "./elf.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,10 +100,12 @@ extern int vsf_elfloader_call_init_array(vsf_elfloader_t *elfloader);
 extern void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader);
 
 // can be called before vsf_elfloader_load
+#if defined(__VSF_ELFLOADER_CLASS_INHERIT__) || defined(__VSF_ELFLOADER_CLASS_IMPLEMENT)
 extern int vsf_elfloader_foreach_program_header(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
         int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Phdr *header, int index, void *param));
 extern int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
         int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Shdr *header, char *name, int index, void *param));
+#endif
 extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, const char *name);
 
 // CAN NOT be called before vsf_elfloader_load
@@ -112,6 +115,9 @@ extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_ELFLOADER_CLASS_IMPLEMENT
+#undef __VSF_ELFLOADER_CLASS_INHERIT__
 
 /** @} */   // vsf_loader
 

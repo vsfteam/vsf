@@ -4,6 +4,8 @@
     &&  VSF_USE_LINUX == ENABLED && APP_USE_LINUX_ELFLOADER_DEMO == ENABLED
 
 #define __VSF_LINUX_CLASS_INHERIT__
+// Elf related constants, types and structures
+#define __VSF_ELFLOADER_CLASS_INHERIT__
 #include <unistd.h>
 #include <stdio.h>
 
