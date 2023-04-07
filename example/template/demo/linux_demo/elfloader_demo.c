@@ -100,6 +100,8 @@ int elfloader_main(int argc, char **argv)
         result = ((int (*)(vsf_applet_ctx_t*))entry)(&applet_ctx);
 #endif
         vsf_elfloader_cleanup(&elfloader);
+    } else {
+        printf("fail to parse %s\n", argv[1]);
     }
 
 #ifdef ELFLOADER_CFG_STDIO
