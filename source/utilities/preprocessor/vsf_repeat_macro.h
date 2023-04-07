@@ -37,6 +37,7 @@
 
 #include "./vsf_connect_macro.h"
 
+#include "../compiler/compiler_detect.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,7 +45,8 @@ extern "C" {
 
 #define VSF_MREPEAT_LIMIT                       256
 
-#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
+// BUG in tcc compiler, remove __IS_COMPILER_TCC__ and compiler_detect.h after the bug fixed
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) || __IS_COMPILER_TCC__
 
 #define VSF_MREPEAT(__COUNT, __MACRO, __PARAM)  VSF_MCONNECT(VSF_MREPEAT, __COUNT)(__MACRO, __PARAM)
 
