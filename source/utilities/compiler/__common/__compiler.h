@@ -124,17 +124,17 @@ extern "C" {
 #   define __COMPILER_WRAPPER(__API)    __wrap_ ## __API
 
 #elif  __IS_COMPILER_GCC__
-#   define NO_INIT              __attribute__((section( ".bss.noinit")))
+#   define NO_INIT              __attribute__((section(".bss.noinit")))
 #   define ROOT                 __attribute__((used))
 #   define INLINE               inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        inline __attribute__((always_inline))
 #   define WEAK(...)            __attribute__((weak))
-#   define RAMFUNC              __attribute__((section (".textrw")))
+#   define RAMFUNC              __attribute__((section(".textrw")))
 #   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((aligned (__N)))
+#   define __ALIGN(__N)         __attribute__((aligned(__N)))
 #   define __AT_ADDR(__ADDR)    Not Supported by GCC
-#   define __SECTION(__SEC)     __attribute__((section (__SEC)))
+#   define __SECTION(__SEC)     __attribute__((section(__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                 __attribute__((weakref(__VSF_STR(__ALIAS))))
 
@@ -157,7 +157,7 @@ extern "C" {
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N)))
 #   define __AT_ADDR(__ADDR)    Not Supported by TCC
-#   define __SECTION(__SEC)     __attribute__((section (__SEC)))
+#   define __SECTION(__SEC)
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                 __attribute__((weakref(__VSF_STR(__ALIAS))))
 
