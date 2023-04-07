@@ -25,9 +25,13 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/errno.h"
+#   include "../../include/simple_libc/mntent.h"
+#   include "../../include/simple_libc/dlfcn.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
+#   include <mntent.h>
+#   include <dlfcn.h>
 #endif
 #include <stdio.h>
 
@@ -40,6 +44,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 // mntent
+
 FILE * setmntent(const char *filename, const char *type)
 {
     VSF_LINUX_ASSERT(false);
@@ -74,6 +79,20 @@ struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int 
 {
     VSF_LINUX_ASSERT(false);
     return (struct mntent *)NULL;
+}
+
+// dlfcn
+
+void * dlsym(void *handle, const char *name)
+{
+    if (RTLD_DEFAULT == handle) {
+#if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
+        return __vsf_vplt_link(vsf_vplt, name);
+#else
+    } else {
+        // TODO: load from elf
+        return NULL;
+    }
 }
 
 void vsf_linux_glibc_init(void)
