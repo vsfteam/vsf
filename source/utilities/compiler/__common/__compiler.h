@@ -52,10 +52,6 @@ extern "C" {
 
 #endif      // __REG_MACRO__
 
-
-//! \brief The mcu memory align mode
-#define MCU_MEM_ALIGN_SIZE      sizeof(uintalu_t)
-
 #ifndef __volatile__
 #   define __volatile__         volatile
 #endif
@@ -77,6 +73,10 @@ extern "C" {
 #   define __IS_COMPILER_IAR__  0
 #endif
 
+#ifndef __IS_COMPILER_TCC__
+#   define __IS_COMPILER_TCC__  0
+#endif
+
 #ifndef MAX_CONSTRUCTOR_PRIORITY
 #   if __IS_COMPILER_GCC__
 #       define MAX_CONSTRUCTOR_PRIORITY                 65535
@@ -90,17 +90,17 @@ extern "C" {
 #   ifdef __APPLE__
 #       define NO_INIT          
 #   else
-#       define NO_INIT          __attribute__(( __section__( ".bss.noinit")))
+#       define NO_INIT          __attribute__((__section__(".bss.noinit")))
 #   endif
 #   define ROOT                 __attribute__((__used__))
 #   define INLINE               __inline__
-#   define NO_INLINE            __attribute__ ((__noinline__))
+#   define NO_INLINE            __attribute__((__noinline__))
 #   define ALWAYS_INLINE        __inline__ __attribute__((__always_inline__))
 #   define WEAK(...)            __attribute__((__weak__))
 #   ifdef __APPLE__
 #       define RAMFUNC          Not Supported by Apple LLVM
 #   else
-#       define RAMFUNC          __attribute__((__section__ (".textrw")))
+#       define RAMFUNC          __attribute__((__section__(".textrw")))
 #   endif
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((__aligned__(__N)))
@@ -124,7 +124,7 @@ extern "C" {
 #   define __COMPILER_WRAPPER(__API)    __wrap_ ## __API
 
 #elif  __IS_COMPILER_GCC__
-#   define NO_INIT              __attribute__(( section( ".bss.noinit")))
+#   define NO_INIT              __attribute__((section( ".bss.noinit")))
 #   define ROOT                 __attribute__((used))
 #   define INLINE               inline
 #   define NO_INLINE            __attribute__((noinline))
@@ -141,6 +141,28 @@ extern "C" {
 #   define PACKED               __attribute__((packed))
 //#   define UNALIGNED            __attribute__((packed))
 #   undef UNALIGNED                                                             //! gcc doesn't support this
+#   define TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
+
+#   define __ISR(__VEC)         void __VEC(void)
+#   define __COMPILER_WRAPPER(__API)    __wrap_ ## __API
+
+#elif  __IS_COMPILER_TCC__
+#   define NO_INIT              __attribute__((section( ".bss.noinit")))
+#   define ROOT                 __attribute__((used))
+#   define INLINE               inline
+#   define NO_INLINE            __attribute__((noinline))
+#   define ALWAYS_INLINE        inline __attribute__((always_inline))
+#   define WEAK(...)            __attribute__((weak))
+#   define __asm__              __asm
+#   define __ALIGN(__N)         __attribute__((aligned (__N)))
+#   define __AT_ADDR(__ADDR)    Not Supported by TCC
+#   define __SECTION(__SEC)     __attribute__((section (__SEC)))
+#   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
+                                __attribute__((weakref(__VSF_STR(__ALIAS))))
+
+#   define PACKED               __attribute__((packed))
+#   define UNALIGNED            __attribute__((packed))
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 

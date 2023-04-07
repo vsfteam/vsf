@@ -35,8 +35,15 @@
 #endif
 #if defined(__GNUC__) && !__IS_COMPILER_LLVM__
 #   define __IS_COMPILER_GCC__                 1
+#else
+//! \note for tcc
+#ifdef __IS_COMPILER_TCC__
+#   undef __IS_COMPILER_TCC__
 #endif
-//! @}
+#if defined(__TINYC__)
+#   define __IS_COMPILER_TCC__                 1
+#endif
+#endif
 #endif
 //! @}
 
