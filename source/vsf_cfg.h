@@ -110,7 +110,7 @@ typedef union vsf_vplt_info_t {
 typedef struct vsf_vplt_t {
     vsf_vplt_info_t info;
 
-    void *linux;
+    void *linux_vplt;
 } vsf_vplt_t;
 extern __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt;
 #   if VSF_APPLET_CFG_LINKABLE == ENABLED

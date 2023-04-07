@@ -31,7 +31,7 @@ __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_vplt_t, 0, 0, false),
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED
-    .linux      = (void *)&vsf_linux_vplt,
+    .linux_vplt     = (void *)&vsf_linux_vplt,
 #endif
 };
 #endif
