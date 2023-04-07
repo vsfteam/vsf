@@ -137,6 +137,7 @@
 #   define VSF_LINUX_USE_GETOPT                         ENABLED
 #   define VSF_LINUX_USE_TERMIOS                        ENABLED
 #   if APP_USE_LINUX_ELFLOADER_DEMO == ENABLED
+#       define VSF_USE_APPLET                           ENABLED
 #       define VSF_LINUX_USE_APPLET                     ENABLED
 #       define VSF_USE_LOADER                           ENABLED
 #           define VSF_LOADER_USE_ELF                   ENABLED
