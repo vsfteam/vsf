@@ -139,6 +139,11 @@ typedef struct Elf32_Sym {
 #define ELF32_ST_INFO(__BIND, __TYPE)   (((__BIND) << 4) + ((__TYPE) & 0xF))
     unsigned char       st_info;
 
+#define STV_DEFAULT     0
+#define STV_INTERNAL    1
+#define STV_HIDDEN      2
+#define STV_PROTECTED   3
+#define ELF32_ST_VIS(__OTHER)           ((__OTHER) & 3)
     unsigned char       st_other;
 
     Elf32_Half          st_shndx;
@@ -297,7 +302,13 @@ typedef struct {
 
 typedef struct {
     Elf64_Word          st_name;            /* String table index of name. */
+
+#define ELF64_ST_BIND(__INFO)           ((__INFO) >> 4)
+#define ELF64_ST_TYPE(__INFO)           ((__UNFO) & 0xF)
+#define ELF64_ST_INFO(__BIND, __TYPE)   (((__BIND) << 4) + ((__TYPE) & 0xF))
     unsigned char       st_info;            /* Type and binding information. */
+
+#define ELF64_ST_VIS(__OTHER)           ((__OTHER) & 3)
     unsigned char       st_other;           /* Reserved (not used). */
     Elf64_Half          st_shndx;           /* Section index of symbol. */
     Elf64_Addr          st_value;           /* Symbol value. */
@@ -326,6 +337,10 @@ typedef struct {
 #   define ELF_R_SYM    ELF64_R_SYM
 #   define ELF_R_TYPE   ELF64_R_TYPE
 #   define ELF_R_INFO   ELF64_R_INFO
+
+#   define ELF_ST_BIND  ELF64_ST_BIND
+#   define ELF_ST_TYPE  ELF64_ST_TYPE
+#   define ELF_ST_VIS   ELF64_ST_VIS
 #else
 #   define Elf_Addr     Elf32_Addr
 #   define Elf_Off      Elf32_Off
@@ -344,6 +359,10 @@ typedef struct {
 #   define ELF_R_SYM    ELF32_R_SYM
 #   define ELF_R_TYPE   ELF32_R_TYPE
 #   define ELF_R_INFO   ELF32_R_INFO
+
+#   define ELF_ST_BIND  ELF32_ST_BIND
+#   define ELF_ST_TYPE  ELF32_ST_TYPE
+#   define ELF_ST_VIS   ELF32_ST_VIS
 #endif
 
 #endif      // __ELF_H__
