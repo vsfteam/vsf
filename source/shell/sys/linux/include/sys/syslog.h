@@ -1,5 +1,5 @@
-#ifndef __VSF_LINUX_SYSLOG_H__
-#define __VSF_LINUX_SYSLOG_H__
+#ifndef __VSF_LINUX_SYS_SYSLOG_H__
+#define __VSF_LINUX_SYS_SYSLOG_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

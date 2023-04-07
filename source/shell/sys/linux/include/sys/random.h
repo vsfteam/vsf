@@ -1,5 +1,5 @@
-#ifndef __VSF_LINUX_RANDOM_H__
-#define __VSF_LINUX_RANDOM_H__
+#ifndef __VSF_LINUX_SYS_RANDOM_H__
+#define __VSF_LINUX_SYS_RANDOM_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED

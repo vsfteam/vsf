@@ -1,5 +1,5 @@
-#ifndef __VSF_LINUX_IOCTL_H__
-#define __VSF_LINUX_IOCTL_H__
+#ifndef __VSF_LINUX_SYS_IOCTL_H__
+#define __VSF_LINUX_SYS_IOCTL_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

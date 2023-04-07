@@ -1,5 +1,5 @@
-#ifndef __VSF_LINUX_SHM_H__
-#define __VSF_LINUX_SHM_H__
+#ifndef __VSF_LINUX_SYS_SHM_H__
+#define __VSF_LINUX_SYS_SHM_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

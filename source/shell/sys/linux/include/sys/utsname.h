@@ -1,5 +1,5 @@
-#ifndef __VSF_LINUX_UTSNAME_H__
-#define __VSF_LINUX_UTSNAME_H__
+#ifndef __VSF_LINUX_SYS_UTSNAME_H__
+#define __VSF_LINUX_SYS_UTSNAME_H__
 
 #ifdef __cplusplus
 extern "C" {

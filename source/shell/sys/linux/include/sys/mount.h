@@ -1,5 +1,5 @@
-#ifndef __VSF_LINUX_MOUNT_H__
-#define __VSF_LINUX_MOUNT_H__
+#ifndef __VSF_LINUX_SYS_MOUNT_H__
+#define __VSF_LINUX_SYS_MOUNT_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
