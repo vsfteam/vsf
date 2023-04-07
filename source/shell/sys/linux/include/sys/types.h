@@ -19,10 +19,11 @@ extern "C" {
 #endif
 
 #if defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)
-typedef long long           ssize_t;
 #   ifdef __WIN__
+typedef long long           ssize_t;
 typedef unsigned long long  size_t;
 #   else
+typedef long                ssize_t;
 typedef unsigned long int   size_t;
 #   endif
 #else
