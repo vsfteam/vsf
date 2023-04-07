@@ -45,7 +45,7 @@
 
 #include "utilities/ooc_class.h"
 
-#ifdef __VSF_ELFLOADER_CLASS_INHERIT__
+#if defined(__VSF_ELFLOADER_CLASS_INHERIT__) || defined(__VSF_ELFLOADER_CLASS_IMPLEMENT)
 #   include "./elf.h"
 #endif
 

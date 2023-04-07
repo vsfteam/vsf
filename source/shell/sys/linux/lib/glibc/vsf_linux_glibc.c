@@ -87,8 +87,10 @@ void * dlsym(void *handle, const char *name)
 {
     if (RTLD_DEFAULT == handle) {
 #if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
-        return __vsf_vplt_link(vsf_vplt, name);
+        return vsf_vplt_link((void *)&vsf_vplt, (char *)name);
 #else
+        return NULL;
+#endif
     } else {
         // TODO: load from elf
         return NULL;
