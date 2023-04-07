@@ -316,7 +316,7 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_in
         strncpy(symname, (const char *)(linfo->dynamic.strtbl + sym.st_name), sizeof(symname));
         vsf_elfloader_debug("locate %s" VSF_TRACE_CFG_LINEEND, symname);
 
-        if (0 == sym.st_value) {
+        if (0 == sym.st_shndx) {
             if (vsf_elfloader_arch_link(elfloader, symname, &tgtvalue) < 0) {
                 vsf_trace_error("fail to locate %s" VSF_TRACE_CFG_LINEEND, symname);
                 return -1;

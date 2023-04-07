@@ -143,6 +143,9 @@ typedef struct Elf32_Sym {
 #define STV_INTERNAL    1
 #define STV_HIDDEN      2
 #define STV_PROTECTED   3
+#define STV_EXPORTED    4
+#define STV_SINGLETON   5
+#define STV_ELIMINATE   6
 #define ELF32_ST_VIS(__OTHER)           ((__OTHER) & 3)
     unsigned char       st_other;
 
