@@ -4662,7 +4662,7 @@
                 </option>
                 <option>
                     <name>IExtraOptions</name>
-                    <state>--no_unaligned_access</state>
+                    <state>--no_unaligned_access --lock_regs=r9</state>
                 </option>
                 <option>
                     <name>CCLangConformance</name>
