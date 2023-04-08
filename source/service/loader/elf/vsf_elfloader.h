@@ -65,7 +65,8 @@ vsf_class(vsf_elfloader_t) {
 
         void *vplt;
         void *vplt_out;
-        void * (*allocate_vplt)(int num);
+        void * (*alloc_vplt)(int num);
+        void (*free_vplt)(void *vplt);
     )
 
     protected_member(
@@ -111,7 +112,8 @@ extern int vsf_elfloader_foreach_program_header(vsf_elfloader_t *elfloader, vsf_
 extern int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
         int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Shdr *header, char *name, int index, void *param));
 #endif
-extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, const char *name);
+// vsf_elfloader_get_section returns size of the section if found, returns 0 if not found
+extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, const char *name, uint32_t *offset);
 
 // CAN NOT be called before vsf_elfloader_load
 extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,

@@ -18,6 +18,11 @@ extern "C" {
 #define dlsym               VSF_LINUX_LIBC_WRAPPER(dlsym)
 #endif
 
+#define RTLD_LAZY           0
+#define RTLD_NOW            1
+#define RTLD_GLOBAL         2
+#define RTLD_LOCAL          3
+
 #define RTLD_DEFAULT        ((void *)0)
 
 #if VSF_LINUX_APPLET_USE_LIBC_DLFCN == ENABLED
@@ -54,7 +59,10 @@ VSF_LINUX_APPLET_LIBC_DLFCN_IMP(dlsym, void *, void *handle, const char *name) {
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_DLFCN
 
+void * dlopen(const char *pathname, int mode);
+int dlclose(void *handle);
 void * dlsym(void *handle, const char *name);
+char * dlerror(void);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_DLFCN
 

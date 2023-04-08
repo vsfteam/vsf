@@ -38,6 +38,14 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
+typedef struct vsf_linux_elfloader_t {
+    vsf_elfloader_t loader;
+    vsf_loader_target_t target;
+} vsf_linux_elfloader_t;
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -83,18 +91,86 @@ struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int 
 
 // dlfcn
 
-void * dlsym(void *handle, const char *name)
+static void * __dlmalloc(int size)
 {
-    if (RTLD_DEFAULT == handle) {
-#if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
-        return vsf_vplt_link((void *)&vsf_vplt, (char *)name);
-#else
-        return NULL;
-#endif
-    } else {
-        // TODO: load from elf
+    return malloc((size_t)size);
+}
+
+void * dlopen(const char *pathname, int mode)
+{
+#if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
+    FILE *f = fopen(pathname, "r");
+    if (NULL == f) {
         return NULL;
     }
+
+    vsf_linux_elfloader_t *linux_elfloader = calloc(1, sizeof(vsf_linux_elfloader_t));
+    if (NULL == linux_elfloader) {
+        goto close_and_fail;
+    }
+
+    linux_elfloader->loader.heap_op         = &vsf_loader_default_heap_op;
+    linux_elfloader->loader.vplt            = (void *)&vsf_linux_vplt;
+    linux_elfloader->loader.alloc_vplt      = __dlmalloc;
+    linux_elfloader->loader.free_vplt       = free;
+    linux_elfloader->target.object          = (uintptr_t)f;
+    linux_elfloader->target.support_xip     = false;
+    linux_elfloader->target.fn_read         = vsf_loader_stdio_read;
+
+    if (!vsf_elfloader_load(&linux_elfloader->loader, &linux_elfloader->target)) {
+        return linux_elfloader;
+    }
+
+    vsf_elfloader_cleanup(&linux_elfloader->loader);
+    free(linux_elfloader);
+close_and_fail:
+    fclose(f);
+    return NULL;
+#else
+    return NULL;
+#endif
+}
+
+int dlclose(void *handle)
+{
+#if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
+    vsf_linux_elfloader_t *linux_elfloader = handle;
+    vsf_elfloader_cleanup(&linux_elfloader->loader);
+    free(linux_elfloader);
+    return 0;
+#else
+    return -1;
+#endif
+}
+
+void * dlsym(void *handle, const char *name)
+{
+    void *vplt = NULL;
+
+    if (RTLD_DEFAULT == handle) {
+#if VSF_USE_APPLET == ENABLED
+        vplt = (void *)&vsf_vplt;
+#endif
+    } else {
+#if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
+        vsf_linux_elfloader_t *linux_elfloader = handle;
+        vplt = linux_elfloader->loader.vplt_out;
+#endif
+    }
+    if (NULL == vplt) {
+        return NULL;
+    }
+
+#if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
+    return vsf_vplt_link(vplt, (char *)name);
+#else
+    return NULL;
+#endif
+}
+
+char * dlerror(void)
+{
+    return "known";
 }
 
 void vsf_linux_glibc_init(void)
