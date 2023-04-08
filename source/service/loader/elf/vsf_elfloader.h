@@ -64,7 +64,8 @@ vsf_class(vsf_elfloader_t) {
         void *entry;
 
         void *vplt;
-        void **vplt_out;
+        void *vplt_out;
+        void * (*allocate_vplt)(int num);
     )
 
     protected_member(

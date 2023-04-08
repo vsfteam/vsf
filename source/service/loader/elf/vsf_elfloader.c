@@ -64,6 +64,12 @@ typedef struct vsf_elfloader_info_t {
         Elf_Addr relsz;
         Elf_Addr pltrel;
         Elf_Addr jmprel;
+
+        uint32_t external_fn_num;
+        uint32_t export_num;
+        uint32_t export_strlen;
+        vsf_vplt_entry_t *export_vplt_entry;
+        char *export_str;
     } dynamic;
 
     uintptr_t entry_offset_in_file;
@@ -304,12 +310,12 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
     return VSF_ELFLOADER_CB_GOON;
 }
 
-static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t *linfo, int type, void *rel_rela, Elf_Addr size)
+static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t *linfo, int type, void *rel_rela, Elf_Addr size, bool parse_only)
 {
     Elf_Word relsym, reltype;
     Elf_Sym sym;
     Elf_Addr tgtvalue;
-    char symname[VSF_ELFLOADER_CFG_MAX_SYM_LEN];
+    char *symname;
     union {
         Elf_Rel *rel;
         Elf_Rela *rela;
@@ -321,23 +327,46 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_in
     for (Elf_Addr i = 0; i < size; i += sizeof(Elf_Rela), u.ptr += ent) {
         relsym = ELF_R_SYM(u.rel->r_info);
         reltype = ELF_R_TYPE(u.rel->r_info);
-
         sym = ((Elf_Sym *)linfo->dynamic.symtbl)[relsym];
-        strncpy(symname, (const char *)(linfo->dynamic.strtbl + sym.st_name), sizeof(symname));
-        vsf_elfloader_debug("locate %s" VSF_TRACE_CFG_LINEEND, symname);
+        symname = (char *)(linfo->dynamic.strtbl + sym.st_name);
 
         if (0 == sym.st_shndx) {
+            if (STT_FUNC != ELF_ST_TYPE(sym.st_info)) {
+                vsf_trace_error("only support relocate external functions" VSF_TRACE_CFG_LINEEND);
+                return -1;
+            }
+            linfo->dynamic.external_fn_num++;
+            if (parse_only) { continue; }
+
             if (vsf_elfloader_arch_link(elfloader, symname, &tgtvalue) < 0) {
                 vsf_trace_error("fail to locate %s" VSF_TRACE_CFG_LINEEND, symname);
                 return -1;
             }
+            if (type == DT_RELA) {
+                tgtvalue += u.rela->r_addend;
+            }
         } else {
             tgtvalue = (Elf_Addr)elfloader->ram_base + sym.st_value;
+            if (type == DT_RELA) {
+                tgtvalue += u.rela->r_addend;
+            }
+
+            if (STB_GLOBAL == ELF_ST_BIND(sym.st_info)) {
+                int symnamelen = strlen(symname) + 1;
+                linfo->dynamic.export_num++;
+                linfo->dynamic.export_strlen += symnamelen;
+
+                if ((linfo->dynamic.export_vplt_entry != NULL) && (linfo->dynamic.export_str != NULL)) {
+                    linfo->dynamic.export_vplt_entry->name = linfo->dynamic.export_str;
+                    linfo->dynamic.export_vplt_entry->ptr = (void *)tgtvalue;
+                    strcpy(linfo->dynamic.export_str, symname);
+                    linfo->dynamic.export_str += symnamelen;
+                    linfo->dynamic.export_vplt_entry++;
+                }
+            }
+            if (parse_only) { continue; }
         }
 
-        if (type == DT_RELA) {
-            tgtvalue += u.rela->r_addend;
-        }
         vsf_elfloader_debug("relocate %s to 0x%X" VSF_TRACE_CFG_LINEEND, symname, tgtvalue);
         if (vsf_elfloader_arch_relocate_sym((Elf_Addr)elfloader->ram_base + u.rel->r_offset, reltype, tgtvalue) < 0) {
             vsf_trace_error("fail to relocate %s" VSF_TRACE_CFG_LINEEND, symname);
@@ -401,21 +430,57 @@ second_round_for_ram_base:
         linfo.dynamic.strtbl += (Elf_Addr)elfloader->ram_base;
         if (linfo.dynamic.pltrelsz > 0) {
             linfo.dynamic.jmprel += (Elf_Addr)elfloader->ram_base;
-            int ent = (linfo.dynamic.pltrel == DT_REL) ? sizeof(Elf_Rel) : sizeof(Elf_Rela);
-            if (    (vsf_elfloader_arch_init_plt(elfloader, linfo.dynamic.pltrelsz / ent) < 0)
-                ||  (__vsf_elfloader_rel_rela(elfloader, &linfo, linfo.dynamic.pltrel, (void *)linfo.dynamic.jmprel, linfo.dynamic.pltrelsz) < 0)) {
+            if (__vsf_elfloader_rel_rela(elfloader, &linfo, linfo.dynamic.pltrel, (void *)linfo.dynamic.jmprel, linfo.dynamic.pltrelsz, true) < 0) {
                 goto cleanup_and_fail;
             }
         }
         if (linfo.dynamic.relasz > 0) {
             linfo.dynamic.rela += (Elf_Addr)elfloader->ram_base;
-            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_RELA, (void *)linfo.dynamic.rela, linfo.dynamic.relasz) < 0) {
+            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_RELA, (void *)linfo.dynamic.rela, linfo.dynamic.relasz, true) < 0) {
                 goto cleanup_and_fail;
             }
         }
         if (linfo.dynamic.relsz > 0) {
             linfo.dynamic.rel += (Elf_Addr)elfloader->ram_base;
-            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_REL, (void *)linfo.dynamic.rel, linfo.dynamic.relsz) < 0) {
+            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_REL, (void *)linfo.dynamic.rel, linfo.dynamic.relsz, true) < 0) {
+                goto cleanup_and_fail;
+            }
+        }
+
+        if (vsf_elfloader_arch_init_plt(elfloader, linfo.dynamic.external_fn_num) < 0) {
+            goto cleanup_and_fail;
+        }
+        if ((linfo.dynamic.export_num > 0) && (elfloader->allocate_vplt != NULL)) {
+            int total_byte_size = sizeof(vsf_vplt_info_t) + linfo.dynamic.export_num * sizeof(vsf_vplt_entry_t) + linfo.dynamic.export_strlen;
+            elfloader->vplt_out = elfloader->allocate_vplt(total_byte_size);
+            if (NULL == elfloader->vplt_out) {
+                goto cleanup_and_fail;
+            }
+
+            vsf_vplt_info_t *vplt_info = elfloader->vplt_out;
+            vplt_info->entry_num = linfo.dynamic.export_num;
+            vplt_info->final = true;
+            vplt_info->major = 0;
+            vplt_info->minor = 0;
+            linfo.dynamic.export_vplt_entry = (vsf_vplt_entry_t *)&vplt_info[1];
+            linfo.dynamic.export_str = (char *)linfo.dynamic.export_vplt_entry + linfo.dynamic.export_num * sizeof(vsf_vplt_entry_t);
+        }
+        linfo.dynamic.export_num = 0;
+        linfo.dynamic.external_fn_num = 0;
+        linfo.dynamic.export_strlen = 0;
+
+        if (linfo.dynamic.pltrelsz > 0) {
+            if (__vsf_elfloader_rel_rela(elfloader, &linfo, linfo.dynamic.pltrel, (void *)linfo.dynamic.jmprel, linfo.dynamic.pltrelsz, false) < 0) {
+                goto cleanup_and_fail;
+            }
+        }
+        if (linfo.dynamic.relasz > 0) {
+            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_RELA, (void *)linfo.dynamic.rela, linfo.dynamic.relasz, false) < 0) {
+                goto cleanup_and_fail;
+            }
+        }
+        if (linfo.dynamic.relsz > 0) {
+            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_REL, (void *)linfo.dynamic.rel, linfo.dynamic.relsz, false) < 0) {
                 goto cleanup_and_fail;
             }
         }

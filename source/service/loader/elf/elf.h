@@ -135,7 +135,7 @@ typedef struct Elf32_Sym {
 #define STT_LOPROC      13
 #define STT_HIPROC      15
 #define ELF32_ST_BIND(__INFO)           ((__INFO) >> 4)
-#define ELF32_ST_TYPE(__INFO)           ((__UNFO) & 0xF)
+#define ELF32_ST_TYPE(__INFO)           ((__INFO) & 0xF)
 #define ELF32_ST_INFO(__BIND, __TYPE)   (((__BIND) << 4) + ((__TYPE) & 0xF))
     unsigned char       st_info;
 
@@ -307,7 +307,7 @@ typedef struct {
     Elf64_Word          st_name;            /* String table index of name. */
 
 #define ELF64_ST_BIND(__INFO)           ((__INFO) >> 4)
-#define ELF64_ST_TYPE(__INFO)           ((__UNFO) & 0xF)
+#define ELF64_ST_TYPE(__INFO)           ((__INFO) & 0xF)
 #define ELF64_ST_INFO(__BIND, __TYPE)   (((__BIND) << 4) + ((__TYPE) & 0xF))
     unsigned char       st_info;            /* Type and binding information. */
 

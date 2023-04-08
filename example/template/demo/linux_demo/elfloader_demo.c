@@ -49,8 +49,8 @@ int elfloader_main(int argc, char **argv)
 #endif
 
     vsf_elfloader_t elfloader = {
-        .heap_op    = &vsf_loader_default_heap_op,
-        .vplt       = (void *)&vsf_linux_vplt,
+        .heap_op        = &vsf_loader_default_heap_op,
+        .vplt           = (void *)&vsf_linux_vplt,
     };
     vsf_loader_target_t elftarget = {
 #ifdef ELFLOADER_CFG_STDIO
