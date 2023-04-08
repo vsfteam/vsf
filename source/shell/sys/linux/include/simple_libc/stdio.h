@@ -5,8 +5,12 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 #   include "./stddef.h"
+// for off64_t
+#   include "../sys/types.h"
 #else
 #   include <stddef.h>
+// for off64_t
+#   include <sys/types.h>
 #endif
 
 #include <stdarg.h>
