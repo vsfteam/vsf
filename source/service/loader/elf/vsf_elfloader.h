@@ -61,6 +61,10 @@ vsf_class(vsf_elfloader_t) {
     public_member(
         implement(vsf_loader_t)
         void *static_base;
+        void *entry;
+
+        void *vplt;
+        void **vplt_out;
     )
 
     protected_member(
@@ -94,7 +98,7 @@ enum {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target);
+extern int vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target);
 extern void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader);
 extern int vsf_elfloader_call_init_array(vsf_elfloader_t *elfloader);
 extern void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader);

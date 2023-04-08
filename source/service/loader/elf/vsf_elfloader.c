@@ -99,8 +99,18 @@ void vsf_elfloader_arch_fini_plt(vsf_elfloader_t *elfloader) { }
 WEAK(vsf_elfloader_link)
 int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
 {
+#if VSF_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
+    if (NULL == elfloader->vplt) {
+        return -1;
+    }
+
+    void *fn = vsf_vplt_link(elfloader->vplt, symname);
+    *target = (Elf_Addr)fn;
+    return NULL == fn ? -1 : 0;
+#else
     vsf_trace_error("relocating is not supported yet" VSF_TRACE_CFG_LINEEND);
     return -1;
+#endif
 }
 
 WEAK(vsf_elfloader_arch_link)
@@ -337,7 +347,7 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_in
     return 0;
 }
 
-void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target)
+int vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target)
 {
     VSF_SERVICE_ASSERT((elfloader != NULL) && (target != NULL));
     VSF_SERVICE_ASSERT(NULL == elfloader->target);
@@ -345,7 +355,7 @@ void * vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *targe
 
     vsf_elfloader_info_t linfo;
     if (VSF_ERR_NONE != __vsf_elfloader_load_elfhdr(target, &linfo.elf_hdr)) {
-        return NULL;
+        return -1;
     }
 
     linfo.memsz = 0;
@@ -414,15 +424,13 @@ second_round_for_ram_base:
     // todo: when should static_base be set to got base?
     elfloader->static_base = elfloader->ram_base;
     elfloader->target = target;
-    if (is_xip) {
-        return (void *)(target->object + linfo.entry_offset_in_file);
-    } else {
-        return (void *)((uintptr_t)elfloader->ram_base + linfo.elf_hdr.e_entry);
-    }
+    elfloader->entry = is_xip ? (void *)(target->object + linfo.entry_offset_in_file)
+                            :   (void *)((uintptr_t)elfloader->ram_base + linfo.elf_hdr.e_entry);
+    return 0;
 
 cleanup_and_fail:
     vsf_elfloader_cleanup(elfloader);
-    return NULL;
+    return -1;
 }
 
 // vsf_elfloader_get_section

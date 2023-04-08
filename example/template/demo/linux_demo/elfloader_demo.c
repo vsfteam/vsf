@@ -13,15 +13,6 @@
 #   define ELFLOADER_CFG_STDIO
 #endif
 
-#if VSF_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
-int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
-{
-    void *fn = vsf_vplt_link((void *)&vsf_linux_vplt, symname);
-    *target = (Elf_Addr)fn;
-    return NULL == fn ? -1 : 0;
-}
-#endif
-
 #if VSF_APPLET_CFG_ABI_PATCH == ENABLED
 static int pls_applet_ctx = -1;
 vsf_applet_ctx_t * vsf_applet_ctx(void)
@@ -59,6 +50,7 @@ int elfloader_main(int argc, char **argv)
 
     vsf_elfloader_t elfloader = {
         .heap_op    = &vsf_loader_default_heap_op,
+        .vplt       = (void *)&vsf_linux_vplt,
     };
     vsf_loader_target_t elftarget = {
 #ifdef ELFLOADER_CFG_STDIO
@@ -73,8 +65,7 @@ int elfloader_main(int argc, char **argv)
     };
 
     int result = -1;
-    void *entry = vsf_elfloader_load(&elfloader, &elftarget);
-    if (entry != NULL) {
+    if (!vsf_elfloader_load(&elfloader, &elftarget) && (elfloader.entry != NULL)) {
         vsf_applet_ctx_t applet_ctx = {
             .target     = &elfloader,
             .fn_init    = (int (*)(void *))vsf_elfloader_call_init_array,
@@ -94,14 +85,14 @@ int elfloader_main(int argc, char **argv)
         pls->data = &applet_ctx;
 
         vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
-        result = ((int (*)(void))entry)();
+        result = ((int (*)(void))elfloader.entry)();
 #else
         vsf_linux_set_process_reg((uintptr_t)elfloader.static_base);
-        result = ((int (*)(vsf_applet_ctx_t*))entry)(&applet_ctx);
+        result = ((int (*)(vsf_applet_ctx_t*))elfloader.entry)(&applet_ctx);
 #endif
         vsf_elfloader_cleanup(&elfloader);
     } else {
-        printf("fail to parse %s\n", argv[1]);
+        printf("fail to parse %s or no entry found\n", argv[1]);
     }
 
 #ifdef ELFLOADER_CFG_STDIO
