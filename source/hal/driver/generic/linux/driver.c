@@ -68,6 +68,8 @@ static vsf_arch_irq_thread_t __vsf_linux_debug_stream_rx_irq;
 #   endif
 #endif
 
+static struct termios __vsf_linux_original_term;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
@@ -114,6 +116,11 @@ static uint_fast32_t __vsf_linux_debug_stream_tx_get_avail_length(vsf_stream_t *
     return 0xFFFFFFFF;
 }
 
+static void __vsf_linux_debug_stream_at_exit(void)
+{
+    tcsetattr(STDIN_FILENO, TCSANOW, &__vsf_linux_original_term);
+}
+
 static void __vsf_linux_debug_stream_rx_irqhandler(void *arg)
 {
     vsf_arch_irq_thread_t *thread = arg;
@@ -126,10 +133,14 @@ static void __vsf_linux_debug_stream_rx_irqhandler(void *arg)
         struct termios term;
         int ret = tcgetattr(STDIN_FILENO, &term);
         VSF_HAL_ASSERT(0 == ret);
+        __vsf_linux_original_term = term;
+
         cfmakeraw(&term);
         term.c_oflag |= ONLCR | OPOST;
         ret = tcsetattr(STDIN_FILENO, TCSANOW, &term);
         VSF_HAL_ASSERT(0 == ret);
+
+        atexit(__vsf_linux_debug_stream_at_exit);
     }
 
     while (1) {
