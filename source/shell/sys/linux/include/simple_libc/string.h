@@ -223,14 +223,17 @@ int strerror_r(int errnum, char *buf, size_t buflen);
 #       endif
 #   endif
 
+#   ifndef __VSF_APPLET__
 int stricmp(const char *str1, const char *str2);
 int strnicmp(const char *str1, const char *str2, size_t n);
-#   ifndef strcasecmp
-#       define strcasecmp   stricmp
+#       ifndef strcasecmp
+#           define strcasecmp   stricmp
+#       endif
+#       ifndef strncasecmp
+#           define strncasecmp  strnicmp
+#       endif
 #   endif
-#   ifndef strncasecmp
-#       define strncasecmp  strnicmp
-#   endif
+
 #   if defined(__CPU_X64__)
 void * memcpy(void *dest, const void *src, unsigned long long n);
 #   else

@@ -102,22 +102,19 @@ typedef union vsf_vplt_info_t {
     void *__make_vplt_info_aligned;
 } vsf_vplt_info_t;
 
-#if VSF_USE_APPLET == ENABLED
-#   ifndef VSF_APPLET_CFG_LINKABLE
-#       define VSF_APPLET_CFG_LINKABLE          ENABLED
-#   endif
-
 typedef struct vsf_vplt_t {
     vsf_vplt_info_t info;
 
     void *linux_vplt;
 } vsf_vplt_t;
-extern __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt;
-#   if VSF_APPLET_CFG_LINKABLE == ENABLED
-extern void * vsf_vplt_link(void *vplt, char *symname);
-#   endif
-#endif
 
+#ifndef VSF_APPLET_CFG_LINKABLE
+#   define VSF_APPLET_CFG_LINKABLE              ENABLED
+#endif
+#if VSF_APPLET_CFG_LINKABLE == ENABLED && !defined(__VSF_APPLET__)
+extern void * vsf_vplt_link(void *vplt, char *symname);
+extern __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt;
+#endif
 typedef struct vsf_vplt_entry_t {
 #if VSF_APPLET_CFG_LINKABLE == ENABLED
     // TODO: implement hash for link performance

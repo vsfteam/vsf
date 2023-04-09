@@ -132,8 +132,10 @@ typedef long long           off64_t;
 #   define M_SQRT1_2        0.707106781186547524401  // 1/sqrt(2)
 
 // __WIN__ uses stricmp instead of strcasecmp in strings.h
-#   define strcasecmp       stricmp
-#   define strncasecmp      strnicmp
+#   ifndef __VSF_APPLET__
+#       define strcasecmp   stricmp
+#       define strncasecmp  strnicmp
+#   endif
 // __WIN__ uses _alloca instead of alloca in alloca.h
 #   define alloca _alloca
 extern void * _alloca(size_t);
