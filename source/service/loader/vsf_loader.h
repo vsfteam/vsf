@@ -162,6 +162,7 @@ struct vsf_loader_target_t {
 vsf_class(vsf_loader_t) {
     public_member(
         const vsf_loader_heap_op_t *heap_op;
+        void *static_base;
         void *entry;
 
         void *vplt;

@@ -60,7 +60,6 @@ extern "C" {
 vsf_class(vsf_elfloader_t) {
     public_member(
         implement(vsf_loader_t)
-        void *static_base;
     )
 
     protected_member(
