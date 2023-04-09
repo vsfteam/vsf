@@ -61,12 +61,6 @@ vsf_class(vsf_elfloader_t) {
     public_member(
         implement(vsf_loader_t)
         void *static_base;
-        void *entry;
-
-        void *vplt;
-        void *vplt_out;
-        void * (*alloc_vplt)(int num);
-        void (*free_vplt)(void *vplt);
     )
 
     protected_member(
