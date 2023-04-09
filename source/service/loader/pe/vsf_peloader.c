@@ -33,7 +33,6 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_PELOADER_CFG_DEBUG ENABLED
 #if VSF_PELOADER_CFG_DEBUG == ENABLED
 #   define vsf_peloader_debug(...)              vsf_trace_debug(__VA_ARGS__)
 #   define vsf_peloader_debug_buffer(...)       vsf_trace_buffer(VSF_TRACE_DEBUG, __VA_ARGS__)
