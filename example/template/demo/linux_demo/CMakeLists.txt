@@ -6,7 +6,7 @@ target_sources(${CMAKE_PROJECT_NAME} PUBLIC
     mount_demo.c
     httpd_demo.c
     tty_demo.c
-    elfloader_demo.c
+    dynloader_demo.c
     ntpdate_demo.c
     telnetd_demo.c
 )
