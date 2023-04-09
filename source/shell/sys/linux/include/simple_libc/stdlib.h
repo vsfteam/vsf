@@ -39,7 +39,7 @@ extern "C" {
 #define mkstemps            VSF_LINUX_LIBC_WRAPPER(mkstemps)
 #define mkostemps           VSF_LINUX_LIBC_WRAPPER(mkostemps)
 #define mkdtemp             VSF_LINUX_LIBC_WRAPPER(mkdtemp)
-#elif defined(__WIN__)
+#elif defined(__WIN__) && !defined(__VSF_APPLET__)
 // avoid conflicts with APIs in ucrt
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)

@@ -85,7 +85,7 @@ extern "C" {
 #if defined(_GNU_SOURCE)
 #define getline             VSF_LINUX_LIBC_WRAPPER(getline)
 #endif
-#elif defined(__WIN__)
+#elif defined(__WIN__) && !defined(__VSF_APPLET__)
 // avoid conflicts with APIs in ucrt
 #define fopen               VSF_LINUX_LIBC_WRAPPER(fopen)
 #define freopen             VSF_LINUX_LIBC_WRAPPER(freopen)
@@ -550,7 +550,7 @@ char * tmpnam(char *str);
 ssize_t getline(char **lineptr, size_t *n, FILE *f);
 #endif
 
-#ifdef __WIN__
+#if defined(__WIN__) && !defined(__VSF_APPLET__)
 // wrapper for original _lock_file/_unlock_file called in win c++ libs
 #define _lock_file                  VSF_LINUX_LIBC_WRAPPER(_lock_file)
 #define _unlock_file                VSF_LINUX_LIBC_WRAPPER(_unlock_file)
