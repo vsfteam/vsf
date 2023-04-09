@@ -59,22 +59,6 @@ int dynloader_main(int argc, char **argv)
     loader.generic.heap_op  = &vsf_loader_default_heap_op;
     loader.generic.vplt     = (void *)&vsf_linux_vplt;
 
-    int result = -1;
-    uint8_t header[16];
-    size_t size = fread(header, 16, 1, f);
-#if VSF_LOADER_USE_PE == ENABLED
-    if ((size >= 2) && (header[0] == 'M') && (header[1] == 'Z')) {
-        loader.generic.op = &vsf_peloader_op;
-    } else
-#endif
-    if ((size >= 4) && (header[0] == 0x7F) && (header[1] == 'E') && (header[2] == 'L') && (header[3] == 'F')) {
-        loader.generic.op = &vsf_elfloader_op;
-    } else {
-        printf("unsupported file format\n");
-        goto close_and_exit;
-    }
-    rewind(f);
-
     vsf_loader_target_t target = {
 #ifdef LOADER_DEMO_CFG_STDIO
         .object         = (uintptr_t)f,
@@ -86,6 +70,21 @@ int dynloader_main(int argc, char **argv)
         .fn_read        = vsf_loader_xip_read,
 #endif
     };
+
+    int result = -1;
+    uint8_t header[16];
+    uint32_t size = vsf_loader_read(&target, 0, header, 16);
+#if VSF_LOADER_USE_PE == ENABLED
+    if ((size >= 2) && (header[0] == 'M') && (header[1] == 'Z')) {
+        loader.generic.op = &vsf_peloader_op;
+    } else
+#endif
+    if ((size >= 4) && (header[0] == 0x7F) && (header[1] == 'E') && (header[2] == 'L') && (header[3] == 'F')) {
+        loader.generic.op = &vsf_elfloader_op;
+    } else {
+        printf("unsupported file format\n");
+        goto close_and_exit;
+    }
 
     if (!vsf_loader_load(&loader.generic, &target) && (loader.generic.entry != NULL)) {
         vsf_applet_ctx_t applet_ctx = {
