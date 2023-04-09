@@ -39,11 +39,19 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
-typedef struct vsf_linux_elfloader_t {
-    vsf_elfloader_t loader;
+#if VSF_USE_LOADER == ENABLED
+typedef struct vsf_linux_dynloader_t {
+    union {
+#if VSF_LOADER_USE_ELF == ENABLED
+        vsf_elfloader_t elfloader;
+#endif
+#if VSF_LOADER_USE_PE == ENABLED
+        vsf_peloader_t peloader;
+#endif
+        vsf_loader_t generic;
+    } loader;
     vsf_loader_target_t target;
-} vsf_linux_elfloader_t;
+} vsf_linux_dynloader_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -98,31 +106,46 @@ static void * __dlmalloc(int size)
 
 void * dlopen(const char *pathname, int mode)
 {
-#if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
+#if VSF_USE_LOADER == ENABLED
     FILE *f = fopen(pathname, "r");
     if (NULL == f) {
         return NULL;
     }
 
-    vsf_linux_elfloader_t *linux_elfloader = calloc(1, sizeof(vsf_linux_elfloader_t));
-    if (NULL == linux_elfloader) {
+    vsf_linux_dynloader_t *linux_loader = calloc(1, sizeof(vsf_linux_dynloader_t));
+    if (NULL == linux_loader) {
         goto close_and_fail;
     }
 
-    linux_elfloader->loader.heap_op         = &vsf_loader_default_heap_op;
-    linux_elfloader->loader.vplt            = (void *)&vsf_linux_vplt;
-    linux_elfloader->loader.alloc_vplt      = __dlmalloc;
-    linux_elfloader->loader.free_vplt       = free;
-    linux_elfloader->target.object          = (uintptr_t)f;
-    linux_elfloader->target.support_xip     = false;
-    linux_elfloader->target.fn_read         = vsf_loader_stdio_read;
+    linux_loader->loader.generic.heap_op    = &vsf_loader_default_heap_op;
+    linux_loader->loader.generic.vplt       = (void *)&vsf_linux_vplt;
+    linux_loader->loader.generic.alloc_vplt = __dlmalloc;
+    linux_loader->loader.generic.free_vplt  = free;
+    linux_loader->target.object             = (uintptr_t)f;
+    linux_loader->target.support_xip        = false;
+    linux_loader->target.fn_read            = vsf_loader_stdio_read;
 
-    if (!vsf_elfloader_load(&linux_elfloader->loader, &linux_elfloader->target)) {
-        return linux_elfloader;
+    uint8_t header[16];
+    uint32_t size = vsf_loader_read(&linux_loader->target, 0, header, sizeof(header));
+#if VSF_LOADER_USE_PE == ENABLED
+    if ((size >= 2) && (header[0] == 'M') && (header[1] == 'Z')) {
+        linux_loader->loader.generic.op     = &vsf_peloader_op;
+    } else
+#endif
+    if ((size >= 4) && (header[0] == 0x7F) && (header[1] == 'E') && (header[2] == 'L') && (header[3] == 'F')) {
+        linux_loader->loader.generic.op     = &vsf_elfloader_op;
+    } else {
+        printf("unsupported file format\n");
+        goto close_and_fail;
     }
 
-    vsf_elfloader_cleanup(&linux_elfloader->loader);
-    free(linux_elfloader);
+    if (!vsf_loader_load(&linux_loader->loader.generic, &linux_loader->target)) {
+        return linux_loader;
+    }
+
+    vsf_loader_cleanup(&linux_loader->loader.generic);
+    free(linux_loader);
+
 close_and_fail:
     fclose(f);
     return NULL;
@@ -133,10 +156,10 @@ close_and_fail:
 
 int dlclose(void *handle)
 {
-#if VSF_USE_LOADER == ENABLED && VSF_LOADER_USE_ELF == ENABLED
-    vsf_linux_elfloader_t *linux_elfloader = handle;
-    vsf_elfloader_cleanup(&linux_elfloader->loader);
-    free(linux_elfloader);
+#if VSF_USE_LOADER == ENABLED
+    vsf_linux_dynloader_t *linux_loader = handle;
+    vsf_loader_cleanup(&linux_loader->loader.generic);
+    free(linux_loader);
     return 0;
 #else
     return -1;
@@ -153,8 +176,8 @@ void * dlsym(void *handle, const char *name)
 #endif
     } else {
 #if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
-        vsf_linux_elfloader_t *linux_elfloader = handle;
-        vplt = (void*)linux_elfloader->loader.vplt_out;
+        vsf_linux_dynloader_t *linux_loader = handle;
+        vplt = (void*)linux_loader->loader.generic.vplt_out;
 #endif
     }
     if (NULL == vplt) {
