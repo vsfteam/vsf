@@ -141,11 +141,20 @@ int vsf_peloader_load(vsf_peloader_t *peloader, vsf_loader_target_t *target)
 
 free_and_fail:
     vsf_loader_free(peloader, VSF_LOADER_MEM_RWX, peloader->ram_base);
+    peloader->ram_base = NULL;
     return -1;
 }
 
 void vsf_peloader_cleanup(vsf_peloader_t *peloader)
 {
+    peloader->target = NULL;
+    if (peloader->ram_base != NULL) {
+        vsf_loader_free(peloader, VSF_LOADER_MEM_RWX, peloader->ram_base);
+        peloader->ram_base = NULL;
+    }
+    if ((peloader->vplt_out != NULL) && (peloader->free_vplt != NULL)) {
+        peloader->free_vplt(peloader->vplt_out);
+    }
 }
 
 int vsf_peloader_call_init_array(vsf_peloader_t *peloader)
