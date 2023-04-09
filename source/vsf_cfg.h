@@ -167,27 +167,31 @@ typedef struct vsf_applet_ctx_t {
 } vsf_applet_ctx_t;
 #endif
 
-#if !defined(VSF_APPLET_CFG_ABI_PATCH) && defined(__WIN__)
-// Windows ABI is different from SystemV, enable abi patch
-#   define VSF_APPLET_CFG_ABI_PATCH        ENABLED
-#endif
 #ifdef __VSF_APPLET__
 #   if VSF_USE_APPLET == ENABLED && !defined(VSF_APPLET_VPLT)
 #       define VSF_APPLET_VPLT              ((vsf_vplt_t *)vsf_vplt((void *)0))
 #   endif
 
 #   ifndef applet_entry
+#       ifdef __WIN__
+#           define applet_entry             _dllstart
+#       else
+#           define applet_entry             _start
+#       endif
+#   endif
+
+#   ifndef applet_entry_with_ctx
 #       if VSF_APPLET_CFG_ABI_PATCH == ENABLED
 extern vsf_applet_ctx_t * vsf_applet_ctx(void);
 extern int vsf_vplt_init_array(void *target);
 extern void vsf_vplt_fini_array(void *target);
-#           define applet_entry                                                 \
-                _start(void) { vsf_applet_ctx_t *ctx = vsf_applet_ctx();
+#           define applet_entry_with_ctx                                        \
+                applet_entry(void) { vsf_applet_ctx_t *ctx = vsf_applet_ctx();
 #           define applet_init_array        vsf_vplt_init_array
 #           define applet_fini_array        vsf_vplt_fini_array
 #       else
-#           define applet_entry                                                 \
-                _start(vsf_applet_ctx_t *ctx) {
+#           define applet_entry_with_ctx                                        \
+                applet_entry(vsf_applet_ctx_t *ctx) {
 #           define applet_init_array        ctx->fn_init
 #           define applet_fini_array        ctx->fn_fini
 #       endif
@@ -196,7 +200,7 @@ extern void vsf_vplt_fini_array(void *target);
 extern int main(int, char **);
 extern void * vsf_vplt(void *vplt);
 #   define main(...)                                                            \
-    applet_entry                                                                \
+    applet_entry_with_ctx                                                       \
         int result;                                                             \
         vsf_vplt(ctx->vplt);                                                    \
         if (applet_init_array != NULL) {                                        \
