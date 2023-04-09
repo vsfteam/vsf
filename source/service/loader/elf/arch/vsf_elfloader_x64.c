@@ -63,7 +63,7 @@ int vsf_elfloader_arch_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalu
     return -1;
 }
 
-#ifdef __WIN__
+#if defined(__WIN__) && (VSF_APPLET_CFG_ABI_PATCH == ENABLED)
 // refer to https://github.com/303248153/HelloElfLoader
 // °ÑSystem V AMD64 ABI×ª»»ÎªMicrosoft x64 calling convention
 static const char generic_func_loader[] = {
