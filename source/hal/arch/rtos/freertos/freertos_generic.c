@@ -199,7 +199,11 @@ void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 void __vsf_arch_irq_request_reset(vsf_arch_irq_request_t *request)
 {
     VSF_ARCH_ASSERT(!request->is_auto_reset);
-    xEventGroupClearBits(request->event, 1);
+    if (VSF_ARCH_FREERTOS_CFG_IS_IN_ISR()) {
+        xEventGroupClearBitsFromISR(request->event, 1);
+    } else {
+        xEventGroupClearBits(request->event, 1);
+    }
 }
 
 /*----------------------------------------------------------------------------*
@@ -324,7 +328,11 @@ vsf_arch_prio_t __vsf_arch_get_current_priority(void)
 
 vsf_systimer_tick_t vsf_systimer_get(void)
 {
-    return xTaskGetTickCount();
+    if (VSF_ARCH_FREERTOS_CFG_IS_IN_ISR()) {
+        return xTaskGetTickCountFromISR();
+    } else {
+        return xTaskGetTickCount();
+    }
 }
 
 static void __vsf_systimer_callback(TimerHandle_t xTimer)
