@@ -154,7 +154,7 @@ void * dlsym(void *handle, const char *name)
     } else {
 #if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
         vsf_linux_elfloader_t *linux_elfloader = handle;
-        vplt = linux_elfloader->loader.vplt_out;
+        vplt = (void*)linux_elfloader->loader.vplt_out;
 #endif
     }
     if (NULL == vplt) {
