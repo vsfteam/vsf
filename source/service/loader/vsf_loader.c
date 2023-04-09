@@ -105,4 +105,28 @@ void * vsf_loader_link(vsf_loader_t *loader, const char *name)
     return NULL;
 }
 
+int vsf_loader_load(vsf_loader_t *loader, vsf_loader_target_t *target)
+{
+    VSF_SERVICE_ASSERT((loader != NULL) && (loader->op != NULL) && (loader->op->fn_load != NULL));
+    return loader->op->fn_load(loader, target);
+}
+
+void vsf_loader_cleanup(vsf_loader_t *loader)
+{
+    VSF_SERVICE_ASSERT((loader != NULL) && (loader->op != NULL) && (loader->op->fn_cleanup != NULL));
+    loader->op->fn_cleanup(loader);
+}
+
+int vsf_loader_call_init_array(vsf_loader_t *loader)
+{
+    VSF_SERVICE_ASSERT((loader != NULL) && (loader->op != NULL) && (loader->op->fn_call_init_array != NULL));
+    return loader->op->fn_call_init_array(loader);
+}
+
+void vsf_loader_call_fini_array(vsf_loader_t *loader)
+{
+    VSF_SERVICE_ASSERT((loader != NULL) && (loader->op != NULL) && (loader->op->fn_call_fini_array != NULL));
+    return loader->op->fn_call_fini_array(loader);
+}
+
 #endif      // VSF_USE_LOADER

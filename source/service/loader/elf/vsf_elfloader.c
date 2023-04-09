@@ -83,6 +83,14 @@ typedef struct vsf_elfloader_info_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+const struct vsf_loader_op_t vsf_elfloader_op = {
+    .fn_load                = (int (*)(vsf_loader_t *, vsf_loader_target_t *))vsf_elfloader_load,
+    .fn_cleanup             = (void (*)(vsf_loader_t *))vsf_elfloader_cleanup,
+    .fn_call_init_array     = (int (*)(vsf_loader_t *))vsf_elfloader_call_init_array,
+    .fn_call_fini_array     = (void (*)(vsf_loader_t *))vsf_elfloader_call_fini_array,
+};
+
 /*============================ IMPLEMENTATION ================================*/
 
 // vsf_elfloader_arch_relocate_sym will be over-written by the same function in
@@ -468,7 +476,6 @@ second_round_for_ram_base:
 
         if ((dynsym_size > 0) && (dynstr_size > 0)) {
             char symbol_name[VSF_ELFLOADER_CFG_MAX_SYM_LEN];
-            Elf_Word relsym, reltype;
             Elf_Sym sym;
             uint32_t pos;
 

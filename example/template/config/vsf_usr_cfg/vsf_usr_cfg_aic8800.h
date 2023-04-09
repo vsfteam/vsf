@@ -79,7 +79,7 @@
 #   define APP_USE_LINUX_HTTPD_DEMO                     ENABLED
 #       define APP_LINUX_HTTPD_DEMO_CFG_ROOT            "/memfs/webroot"
 #   define APP_USE_LINUX_TTY_DEMO                       ENABLED
-#   define APP_USE_LINUX_ELFLOADER_DEMO                 ENABLED
+#   define APP_USE_LINUX_DYNLOADER_DEMO                 ENABLED
 // CortexM uses thread_reg to support xip dynamic load
 #       define VSF_ARCH_USE_THREAD_REG                  ENABLED
 #define APP_USE_USBH_DEMO                               ENABLED

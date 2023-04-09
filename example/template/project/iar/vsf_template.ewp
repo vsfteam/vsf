@@ -7180,7 +7180,7 @@
             <group>
                 <name>linux_demo</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\demo\linux_demo\elfloader_demo.c</name>
+                    <name>$PROJ_DIR$\..\..\demo\linux_demo\dynloader_demo.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\linux_demo\httpd_demo.c</name>
@@ -15327,6 +15327,15 @@
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\service\loader\elf\vsf_elfloader.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>pe</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\loader\pe\vsf_peloader.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\service\loader\pe\vsf_peloader.h</name>
                     </file>
                 </group>
                 <file>

@@ -42,8 +42,12 @@
 
 #if     defined(__VSF_LOADER_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
+#   define PUBLIC_CONST
 #elif   defined(__VSF_LOADER_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
+#   define PUBLIC_CONST
+#else
+#   define PUBLIC_CONST                 const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -159,14 +163,24 @@ struct vsf_loader_target_t {
     uint32_t (*fn_read)(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size);
 };
 
+typedef struct vsf_loader_op_t {
+    int (*fn_load)(vsf_loader_t *loader, vsf_loader_target_t *target);
+    void (*fn_cleanup)(vsf_loader_t *loader);
+    int (*fn_call_init_array)(vsf_loader_t *loader);
+    void (*fn_call_fini_array)(vsf_loader_t *loader);
+} vsf_loader_op_t;
+
+
 vsf_class(vsf_loader_t) {
     public_member(
         const vsf_loader_heap_op_t *heap_op;
-        void *static_base;
-        void *entry;
+        const vsf_loader_op_t *op;
+
+        PUBLIC_CONST void *static_base;
+        PUBLIC_CONST void *entry;
+        PUBLIC_CONST void *vplt_out;
 
         void *vplt;
-        void *vplt_out;
         void * (*alloc_vplt)(int num);
         void (*free_vplt)(void *vplt);
     )
@@ -228,6 +242,11 @@ extern uint32_t vsf_loader_stdio_read(vsf_loader_target_t *target, uint32_t offs
 extern void * vsf_loader_link(vsf_loader_t *loader, const char *name);
 #endif
 
+extern int vsf_loader_load(vsf_loader_t *loader, vsf_loader_target_t *target);
+extern void vsf_loader_cleanup(vsf_loader_t *loader);
+extern int vsf_loader_call_init_array(vsf_loader_t *loader);
+extern void vsf_loader_call_fini_array(vsf_loader_t *loader);
+
 #ifdef __cplusplus
 }
 #endif
@@ -239,6 +258,9 @@ extern void * vsf_loader_link(vsf_loader_t *loader, const char *name);
 
 #if VSF_LOADER_USE_ELF == ENABLED
 #   include "./elf/vsf_elfloader.h"
+#endif
+#if VSF_LOADER_USE_PE == ENABLED
+#   include "./pe/vsf_peloader.h"
 #endif
 
 /** @} */   // vsf_loader

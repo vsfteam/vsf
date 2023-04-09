@@ -22,7 +22,7 @@
  * provides a elf loader implementation
  */
 
-/** @ingroup vsf_loader
+/** @ingroup vsf_elfloader
  *  @{
  */
 
@@ -91,6 +91,9 @@ enum {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern const struct vsf_loader_op_t vsf_elfloader_op;
+
 /*============================ PROTOTYPES ====================================*/
 
 extern int vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target);
@@ -119,7 +122,7 @@ extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,
 #undef __VSF_ELFLOADER_CLASS_IMPLEMENT
 #undef __VSF_ELFLOADER_CLASS_INHERIT__
 
-/** @} */   // vsf_loader
+/** @} */   // vsf_elfloader
 
 #endif      // VSF_USE_ELFLOADER
 #endif      // __VSF_ELFLOADER_H__
