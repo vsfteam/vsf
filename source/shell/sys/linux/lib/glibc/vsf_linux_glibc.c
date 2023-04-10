@@ -140,6 +140,7 @@ void * dlopen(const char *pathname, int mode)
     }
 
     if (!vsf_loader_load(&linux_loader->loader.generic, &linux_loader->target)) {
+        vsf_loader_call_init_array(&linux_loader->loader.generic);
         return linux_loader;
     }
 
@@ -158,6 +159,7 @@ int dlclose(void *handle)
 {
 #if VSF_USE_LOADER == ENABLED
     vsf_linux_dynloader_t *linux_loader = handle;
+    vsf_loader_call_fini_array(&linux_loader->loader.generic);
     vsf_loader_cleanup(&linux_loader->loader.generic);
     free(linux_loader);
     return 0;
