@@ -19,7 +19,7 @@ extern "C" {
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #   define select               VSF_LINUX_WRAPPER(select)
-#elif defined(__WIN__)
+#elif defined(__WIN__) && !defined(__VSF_APPLET__)
 #   define select               VSF_LINUX_WRAPPER(select)
 #   define pselect              VSF_LINUX_WRAPPER(pselect)
 #endif
