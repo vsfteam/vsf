@@ -17,13 +17,13 @@ typedef setjmp_float128 jmp_buf[16];
 #   error not supported, do not add to path, use setjmp from libc instead
 #endif
 
-#ifdef VSF_ARCH_SETJMP
+#if defined(VSF_ARCH_SETJMP) && !defined(__VSF_APPLET__)
 #   define setjmp               VSF_ARCH_SETJMP
 #else
 int setjmp(jmp_buf env);
 #endif
 
-#ifdef VSF_ARCH_LONGJMP
+#if defined(VSF_ARCH_LONGJMP) && !defined(__VSF_APPLET__)
 #   define longjmp              VSF_ARCH_LONGJMP
 #else
 void longjmp(jmp_buf env, int val);
