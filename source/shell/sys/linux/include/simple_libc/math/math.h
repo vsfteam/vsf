@@ -736,7 +736,7 @@ VSF_LINUX_APPLET_LIBC_MATH_IMP(log10l, long double, long double a0) {
     return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log10l)(a0);
 }
 
-#elif   !defined(__SIMPLE_LIBC_MATH_VPLT_ONLY___)
+#elif   !defined(__SIMPLE_LIBC_MATH_VPLT_ONLY__)
 
 extern double atan(double);
 extern double cos(double);
