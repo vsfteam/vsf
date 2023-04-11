@@ -57,7 +57,7 @@ VSF_LINUX_APPLET_LIBC_SETJMP_IMP(longjmp, void, jmp_buf env, int val) {
     VSF_LINUX_APPLET_LIBC_SETJMP_ENTRY(longjmp)(env, val);
 }
 
-#elif   !defined(__SIMPLE_LIBC_SETJMP_VPLT_ONLY__)
+#else
 
 #if defined(VSF_ARCH_SETJMP) && !defined(__VSF_APPLET__)
 #   define setjmp               VSF_ARCH_SETJMP
