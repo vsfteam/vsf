@@ -292,6 +292,12 @@
 #       if !defined(VSF_LINUX_APPLET_USE_LIBC_DLFCN) && VSF_LINUX_USE_SIMPLE_DLFCN == ENABLED
 #           define VSF_LINUX_APPLET_USE_LIBC_DLFCN  ENABLED
 #       endif
+#       ifndef VSF_LINUX_APPLET_USE_LIBC_SETJMP
+#           define VSF_LINUX_APPLET_USE_LIBC_SETJMP ENABLED
+#       endif
+#       ifndef VSF_LINUX_APPLET_USE_LIBC_MATH
+#           define VSF_LINUX_APPLET_USE_LIBC_MATH   ENABLED
+#       endif
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_VPLT

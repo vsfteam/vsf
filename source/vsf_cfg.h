@@ -139,12 +139,21 @@ typedef struct vsf_vplt_entry_t {
     typedef __RET (*__##__NAME##_prototype_t)(__VA_ARGS__);                     \
     static inline __RET __NAME(__VA_ARGS__)
 #if VSF_APPLET_CFG_LINKABLE == ENABLED
+#   define VSF_APPLET_VPLT_ENTRY_FUNC_EX(__ENTRY, __NAME, __PTR)                \
+    .__ENTRY = {                                                                \
+        .name = (__NAME),                                                       \
+        .ptr = (void *)(__PTR),                                                 \
+    }
 #   define VSF_APPLET_VPLT_ENTRY_FUNC(__NAME)                                   \
     .fn_##__NAME = {                                                            \
         .name = VSF_STR(__NAME),                                                \
         .ptr = (void *)(__NAME),                                                \
     }
 #else
+#   define VSF_APPLET_VPLT_ENTRY_FUNC_EX(__ENTRY, __NAME, __PTR)                \
+    .__ENTRY = {                                                                \
+        .ptr = (void *)(__PTR),                                                 \
+    }
 #   define VSF_APPLET_VPLT_ENTRY_FUNC(__NAME)                                   \
     .fn_##__NAME = {                                                            \
         .ptr = (void *)(__NAME),                                                \
