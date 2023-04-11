@@ -59,6 +59,21 @@ VSF_LINUX_APPLET_LIBC_DLFCN_IMP(dlsym, void *, void *handle, const char *name) {
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_DLFCN
 
+#if VSF_USE_LOADER == ENABLED
+typedef struct vsf_linux_dynloader_t {
+    union {
+#if VSF_LOADER_USE_ELF == ENABLED
+        vsf_elfloader_t elfloader;
+#endif
+#if VSF_LOADER_USE_PE == ENABLED
+        vsf_peloader_t peloader;
+#endif
+        vsf_loader_t generic;
+    } loader;
+    vsf_loader_target_t target;
+} vsf_linux_dynloader_t;
+#endif
+
 void * dlopen(const char *pathname, int mode);
 int dlclose(void *handle);
 void * dlsym(void *handle, const char *name);

@@ -40,6 +40,9 @@
 #else
 #   include <string.h>
 #endif
+#if VSF_LINUX_USE_APPLET == ENABLED && VSF_LINUX_USE_SIMPLE_DLFCN == ENABLED
+#   include <dlfcn.h>
+#endif
 
 #define VSH_PROMPT                  ">>>"
 
@@ -322,6 +325,37 @@ static char * __vsh_expand_arg(vsf_linux_process_t *process, char *arg)
     return NULL == real_arg ? arg : real_arg;
 }
 
+#if VSF_LINUX_USE_APPLET == ENABLED && VSF_LINUX_USE_SIMPLE_DLFCN == ENABLED
+int __vsh_dynloader_main(int argc, char **argv)
+{
+    vsf_linux_dynloader_t *loader = dlopen(argv[0], 0);
+    if (NULL == loader) {
+        printf("fail to open %s\n", argv[0]);
+        return -1;
+    }
+
+    int result = -1;
+    if (loader->loader.generic.entry != NULL) {
+        vsf_applet_ctx_t applet_ctx = {
+            .target     = &loader->loader.generic,
+            .fn_init    = NULL,     // fn_init has already been called in dlopen
+            .fn_fini    = NULL,     // fn_fini will be called in dlclose
+            .argc       = argc,
+            .argv       = argv,
+            .vplt       = loader->loader.generic.vplt,
+        };
+
+        vsf_linux_set_process_reg((uintptr_t)loader->loader.generic.static_base);
+        result = ((int (*)(vsf_applet_ctx_t*))loader->loader.generic.entry)(&applet_ctx);
+    } else {
+        printf("no entry found for %s\n", argv[0]);
+    }
+
+    dlclose(loader);
+    return result;
+}
+#endif
+
 static int __vsh_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry)
 {
     int exefd = -1;
@@ -333,7 +367,12 @@ static int __vsh_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry)
     if (exefd < 0) {
         exefd = vsf_linux_fs_get_executable(cmd, entry);
         if (exefd < 0) {
+#if VSF_LINUX_USE_APPLET == ENABLED && VSF_LINUX_USE_SIMPLE_DLFCN == ENABLED
+            *entry = __vsh_dynloader_main;
+            return 0;
+#else
             return -1;
+#endif
         }
     }
     close(exefd);

@@ -49,22 +49,6 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-#if VSF_USE_LOADER == ENABLED
-typedef struct vsf_linux_dynloader_t {
-    union {
-#if VSF_LOADER_USE_ELF == ENABLED
-        vsf_elfloader_t elfloader;
-#endif
-#if VSF_LOADER_USE_PE == ENABLED
-        vsf_peloader_t peloader;
-#endif
-        vsf_loader_t generic;
-    } loader;
-    vsf_loader_target_t target;
-} vsf_linux_dynloader_t;
-#endif
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
