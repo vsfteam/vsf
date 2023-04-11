@@ -326,11 +326,43 @@ static char * __vsh_expand_arg(vsf_linux_process_t *process, char *arg)
 }
 
 #if VSF_LINUX_USE_APPLET == ENABLED && VSF_LINUX_USE_SIMPLE_DLFCN == ENABLED
-int __vsh_dynloader_main(int argc, char **argv)
+static int __vsh_dynloader_main(int argc, char **argv)
 {
-    vsf_linux_dynloader_t *loader = dlopen(argv[0], 0);
+    char pathname_local[PATH_MAX], pathname_dir[PATH_MAX], *path, *path_end;
+    int pathlen, found = 0;
+
+#if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
+    path = __vsh_path;
+#else
+    path = getenv("PATH");
+#endif
+
+    while (*path != '\0') {
+        path_end = strchr(path, ':');
+        pathlen = (path_end != NULL) ?  path_end - path : strlen(path);
+        VSF_LINUX_ASSERT(pathlen < sizeof(pathname_dir) - 1);
+        memcpy(pathname_dir, path, pathlen);
+        pathname_dir[pathlen] = '\0';
+        path += pathlen;
+        if (*path == ':') {
+            path++;
+        }
+
+        if (!vsf_linux_generate_path(pathname_local, sizeof(pathname_local), pathname_dir, argv[0])) {
+            if (!access(pathname_local, 0)) {
+                found = 1;
+                break;
+            }
+        }
+    }
+    if (!found) {
+        printf("fail to find %s\n", argv[0]);
+        return -1;
+    }
+
+    vsf_linux_dynloader_t *loader = dlopen(pathname_local, 0);
     if (NULL == loader) {
-        printf("fail to open %s\n", argv[0]);
+        printf("fail to open %s\n", pathname_local);
         return -1;
     }
 
@@ -348,7 +380,7 @@ int __vsh_dynloader_main(int argc, char **argv)
         vsf_linux_set_process_reg((uintptr_t)loader->loader.generic.static_base);
         result = ((int (*)(vsf_applet_ctx_t*))loader->loader.generic.entry)(&applet_ctx);
     } else {
-        printf("no entry found for %s\n", argv[0]);
+        printf("no entry found for %s\n", pathname_local);
     }
 
     dlclose(loader);
