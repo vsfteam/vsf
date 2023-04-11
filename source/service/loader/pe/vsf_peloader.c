@@ -152,20 +152,25 @@ int vsf_peloader_load(vsf_peloader_t *peloader, vsf_loader_target_t *target)
         IMAGE_BASE_RELOCATION *reloc = (IMAGE_BASE_RELOCATION *)(ram_base + vaddr);
         IMAGE_RELOC *rel_info = (IMAGE_RELOC *)&reloc[1];
         char *ptr = ram_base + reloc->VirtualAddress;
+        DWORD entry_num = (reloc->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(IMAGE_RELOC);
 
         while (reloc->VirtualAddress != 0) {
-            for (DWORD i = 0; i < ((reloc->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(IMAGE_RELOC)); i++, rel_info++) {
+            for (DWORD i = 0; i < entry_num; i++, rel_info++) {
                 switch (rel_info->type) {
-                case IMAGE_REL_BASED_DIR64:     *((ULONG_PTR*)(ptr + rel_info->offset)) += vaddr_offset;    break;
-                case IMAGE_REL_BASED_HIGHLOW:   *((DWORD*)(ptr + rel_info->offset)) += (DWORD)vaddr_offset; break;
                 case IMAGE_REL_BASED_HIGH:      *((WORD*)(ptr + rel_info->offset)) += HIWORD(vaddr_offset); break;
                 case IMAGE_REL_BASED_LOW:       *((WORD*)(ptr + rel_info->offset)) += LOWORD(vaddr_offset); break;
+                case IMAGE_REL_BASED_HIGHLOW:   *((DWORD*)(ptr + rel_info->offset)) += (DWORD)vaddr_offset; break;
+                case IMAGE_REL_BASED_DIR64:     *((ULONG_PTR*)(ptr + rel_info->offset)) += vaddr_offset;    break;
                 case IMAGE_REL_BASED_ABSOLUTE:                                                              break;
-                default:                                                                                    break;
+                default:
+                    vsf_trace_error("unsupported relocate type %d" VSF_TRACE_CFG_LINEEND, rel_info->type);
+                    goto free_and_fail;
                 }
             }
             reloc = (IMAGE_BASE_RELOCATION *)((char *)reloc + reloc->SizeOfBlock);
             ptr = ram_base + reloc->VirtualAddress;
+            entry_num = (reloc->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(IMAGE_RELOC);
+            rel_info = (IMAGE_RELOC *)&reloc[1];
         }
     }
 
