@@ -27,6 +27,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_APPLET == ENABLED
+WEAK(vsf_vplt)
 __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_vplt_t, 0, 0, false),
 

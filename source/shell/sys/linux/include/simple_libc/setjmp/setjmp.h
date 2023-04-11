@@ -8,15 +8,17 @@
 // for ALIGN and stdint.h
 #include "utilities/compiler/compiler.h"
 
-#if     defined(__CPU_X64__)
+#ifndef __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
+#   if  defined(__CPU_X64__)
 
 typedef struct {
     uint64_t part[2];
 } ALIGN(16) setjmp_float128;
 typedef setjmp_float128 jmp_buf[16];
 
-#else
+#   else
 #   error not supported, do not add to path, use setjmp from libc instead
+#   endif
 #endif
 
 #if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
@@ -55,7 +57,7 @@ VSF_LINUX_APPLET_LIBC_SETJMP_IMP(longjmp, void, jmp_buf env, int val) {
     VSF_LINUX_APPLET_LIBC_SETJMP_ENTRY(longjmp)(env, val);
 }
 
-#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_SETJMP
+#elif   !defined(__SIMPLE_LIBC_SETJMP_VPLT_ONLY__)
 
 #if defined(VSF_ARCH_SETJMP) && !defined(__VSF_APPLET__)
 #   define setjmp               VSF_ARCH_SETJMP

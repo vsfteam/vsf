@@ -35,11 +35,14 @@
 #endif
 #include <stdio.h>
 
-#include <math.h>
 #if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED && !defined(__VSF_APPLET__)
+#   include <setjmp.h>
+#   define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
 #   include "../../include/simple_libc/setjmp/setjmp.h"
 #endif
 #if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED && !defined(__VSF_APPLET__)
+#   include <math.h>
+#   define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #   include "../../include/simple_libc/math/math.h"
 #endif
 
@@ -210,8 +213,16 @@ char * dlerror(void)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_setjmp_vplt_t vsf_linux_libc_setjmp_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_setjmp_vplt_t, 0, 0, true),
 
+#ifdef VSF_ARCH_SETJMP
+    VSF_APPLET_VPLT_ENTRY_FUNC_EX(fn_setjmp, "setjmp", VSF_ARCH_SETJMP),
+#else
     VSF_APPLET_VPLT_ENTRY_FUNC(setjmp),
+#endif
+#ifdef VSF_ARCH_LONGJMP
+    VSF_APPLET_VPLT_ENTRY_FUNC_EX(fn_longjmp, "longjmp", VSF_ARCH_LONGJMP),
+#else
     VSF_APPLET_VPLT_ENTRY_FUNC(longjmp),
+#endif
 };
 #endif
 
@@ -383,12 +394,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(erfl),
     VSF_APPLET_VPLT_ENTRY_FUNC(erfcl),
 
-#if 0
     VSF_APPLET_VPLT_ENTRY_FUNC(frexpf),
-    VSF_APPLET_VPLT_ENTRY_FUNC(infinity),
-    VSF_APPLET_VPLT_ENTRY_FUNC(gamma),
-    VSF_APPLET_VPLT_ENTRY_FUNC(infinityf),
-    VSF_APPLET_VPLT_ENTRY_FUNC(gammaf),
     VSF_APPLET_VPLT_ENTRY_FUNC(log10l),
     VSF_APPLET_VPLT_ENTRY_FUNC(tanhl),
     VSF_APPLET_VPLT_ENTRY_FUNC(modfl),
@@ -396,7 +402,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(floorl),
     VSF_APPLET_VPLT_ENTRY_FUNC(acosl),
     VSF_APPLET_VPLT_ENTRY_FUNC(asinl),
-#endif
 };
 #endif
 

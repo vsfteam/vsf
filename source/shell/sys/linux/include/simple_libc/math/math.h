@@ -191,12 +191,7 @@ typedef struct vsf_linux_libc_math_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(erfl);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(erfcl);
 
-#if 0
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(infinity);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gamma);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(frexpf);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(infinityf);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gammaf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tanhl);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(modfl);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ceill);
@@ -204,7 +199,6 @@ typedef struct vsf_linux_libc_math_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(acosl);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(asinl);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(log10l);
-#endif
 } vsf_linux_libc_math_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt;
@@ -234,491 +228,515 @@ VSF_LINUX_APPLET_LIBC_MATH_IMP(atan, double, double a0) {
 VSF_LINUX_APPLET_LIBC_MATH_IMP(cos, double, double a0) {
     return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double sin(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(sin, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(sin)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double tan(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(tan, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(tan)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double tanh(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(tanh, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(tanh)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double frexp(double, int *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(frexp, double, double a0, int *a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(frexp)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double modf(double, double *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(modf, double, double a0, double *a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(modf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double ceil(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(ceil, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(ceil)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double fabs(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fabs, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fabs)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double floor(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(floor, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(floor)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double acos(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(acos, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(acos)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double asin(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(asin, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(asin)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double atan2(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(atan2, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(atan2)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double cosh(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(cosh, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cosh)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double sinh(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(sinh, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(sinh)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double exp(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(exp, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(exp)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double ldexp(double, int) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(ldexp, double, double a0, int a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(ldexp)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double log(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double log10(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log10, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log10)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double pow(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(pow, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(pow)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double sqrt(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(sqrt, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(sqrt)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double fmod(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fmod, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fmod)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double nan(const char *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nan, double, const char *a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nan)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double copysign(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(copysign, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(copysign)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double logb(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(logb, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(logb)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(int ilogb(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(ilogb, int, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(ilogb)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double asinh(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(asinh, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(asinh)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double cbrt(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(cbrt, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cbrt)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double nextafter(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nextafter, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nextafter)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double rint(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(rint, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(rint)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double scalbn(double, int) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(scalbn, double, double a0, int a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(scalbn)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double exp2(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(exp2, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(exp2)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double scalbln(double, long int) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(scalbln, double, double a0, long int a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(scalbln)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double tgamma(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(tgamma, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(tgamma)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double nearbyint(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nearbyint, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nearbyint)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long int lrint(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(lrint, long int, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(lrint)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long long int llrint(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(llrint, long long int, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(llrint)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double round(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(round, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(round)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long int lround(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(lround, long int, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(lround)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long long int llround(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(llround, long long int, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(llround)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double trunc(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(trunc, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(trunc)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double remquo(double, double, int *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(remquo, double, double a0, double a1, int *a2) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(remquo)(a0, a1, a2);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double fdim(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fdim, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fdim)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double fmax(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fmax, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fmax)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double fmin(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fmin, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fmin)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double fma(double, double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fma, double, double a0, double a1, double a2) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fma)(a0, a1, a2);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double log1p(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log1p, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log1p)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double expm1(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(expm1, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(expm1)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double acosh(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(acosh, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(acosh)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double atanh(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(atanh, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(atanh)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double remainder(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(remainder, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(remainder)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double lgamma(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(lgamma, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(lgamma)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double erf(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(erf, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(erf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double erfc(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(erfc, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(erfc)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double log2(double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log2, double, double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log2)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double hypot(double, double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(hypot, double, double a0, double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(hypot)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float atanf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(atanf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(atanf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float cosf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(cosf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cosf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float sinf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(sinf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(sinf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float tanf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(tanf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(tanf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float tanhf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(tanhf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(tanhf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float modff(float, float *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(modff, float, float a0, float *a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(modff)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float ceilf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(ceilf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(ceilf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float fabsf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fabsf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fabsf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float floorf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(floorf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(floorf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float acosf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(acosf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(acosf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float asinf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(asinf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(asinf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float atan2f(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(atan2f, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(atan2f)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float coshf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(coshf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(coshf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float sinhf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(sinhf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(sinhf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float expf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(expf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(expf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float ldexpf(float, int) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(ldexpf, float, float a0, int a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(ldexpf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float logf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(logf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(logf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float log10f(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log10f, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log10f)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float powf(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(powf, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(powf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float sqrtf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(sqrtf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(sqrtf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float fmodf(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fmodf, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fmodf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float exp2f(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(exp2f, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(exp2f)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float scalblnf(float, long int) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(scalblnf, float, float a0, long int a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(scalblnf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float tgammaf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(tgammaf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(tgammaf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float nearbyintf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nearbyintf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nearbyintf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long int lrintf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(lrintf, long int, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(lrintf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long long int llrintf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(llrintf, long long int, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(llrintf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float roundf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(roundf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(roundf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long int lroundf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(lroundf, long int, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(lroundf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long long int llroundf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(llroundf, long long int, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(llroundf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float truncf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(truncf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(truncf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float remquof(float, float, int *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(remquof, float, float a0, float a1, int *a2) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(remquof)(a0, a1, a2);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float fdimf(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fdimf, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fdimf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float fmaxf(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fmaxf, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fmaxf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float fminf(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fminf, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fminf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float fmaf(float, float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fmaf, float, float a0, float a1, float a2) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fmaf)(a0, a1, a2);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float nanf(const char *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nanf, float, const char *a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nanf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float copysignf(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(copysignf, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(copysignf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float logbf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(logbf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(logbf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(int ilogbf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(ilogbf, int, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(ilogbf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float asinhf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(asinhf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(asinhf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float cbrtf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(cbrtf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cbrtf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float nextafterf(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nextafterf, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nextafterf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float rintf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(rintf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(rintf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float scalbnf(float, int) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(scalbnf, float, float a0, int a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(scalbnf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float log1pf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log1pf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log1pf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float expm1f(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(expm1f, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(expm1f)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float acoshf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(acoshf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(acoshf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float atanhf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(atanhf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(atanhf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float remainderf(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(remainderf, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(remainderf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float lgammaf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(lgammaf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(lgammaf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float erff(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(erff, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(erff)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float erfcf(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(erfcf, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(erfcf)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float log2f(float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log2f, float, float a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log2f)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float hypotf(float, float) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(hypotf, float, float a0, float a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(hypotf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double atanl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(atanl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(atanl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double cosl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(cosl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cosl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double sinl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(sinl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(sinl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double tanl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(tanl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(tanl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double frexpl(long double, int *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(frexpl, long double, long double a0, int *a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(frexpl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double fabsl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fabsl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fabsl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double log1pl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log1pl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log1pl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double expm1l(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(expm1l, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(expm1l)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double atan2l(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(atan2l, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(atan2l)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double coshl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(coshl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(coshl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double sinhl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(sinhl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(sinhl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double expl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(expl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(expl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double ldexpl(long double, int) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(ldexpl, long double, long double a0, int a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(ldexpl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double logl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(logl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(logl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double powl(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(powl, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(powl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double sqrtl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(sqrtl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(sqrtl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double fmodl(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fmodl, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fmodl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double hypotl(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(hypotl, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(hypotl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double copysignl(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(copysignl, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(copysignl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double nanl(const char *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nanl, long double, const char *a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nanl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(int ilogbl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(ilogbl, int, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(ilogbl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double asinhl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(asinhl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(asinhl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double cbrtl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(cbrtl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cbrtl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double nextafterl(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nextafterl, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nextafterl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(float nexttowardf(float, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nexttowardf, float, float a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nexttowardf)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(double nexttoward(double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nexttoward, double, double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nexttoward)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double nexttowardl(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nexttowardl, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nexttowardl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double logbl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(logbl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(logbl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double log2l(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log2l, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log2l)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double rintl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(rintl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(rintl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double scalbnl(long double, int) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(scalbnl, long double, long double a0, int a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(scalbnl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double exp2l(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(exp2l, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(exp2l)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double scalblnl(long double, long) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(scalblnl, long double, long double a0, long a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(scalblnl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double tgammal(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(tgammal, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(tgammal)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double nearbyintl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(nearbyintl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(nearbyintl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long int lrintl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(lrintl, long int, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(lrintl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long long int llrintl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(llrintl, long long int, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(llrintl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double roundl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(roundl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(roundl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long lroundl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(lroundl, long, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(lroundl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long long int llroundl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(llroundl, long long int, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(llroundl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double truncl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(truncl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(truncl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double remquol(long double, long double, int *) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(remquol, long double, long double a0, long double a1, int *a2) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(remquol)(a0, a1, a2);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double fdiml(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fdiml, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fdiml)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double fmaxl(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fmaxl, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fmaxl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double fminl(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fminl, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fminl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double fmal(long double, long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(fmal, long double, long double a0, long double a1, long double a2) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(fmal)(a0, a1, a2);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double acoshl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(acoshl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(acoshl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double atanhl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(atanhl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(atanhl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double remainderl(long double, long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(remainderl, long double, long double a0, long double a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(remainderl)(a0, a1);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double lgammal(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(lgammal, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(lgammal)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double erfl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(erfl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(erfl)(a0);
 }
-VSF_LINUX_APPLET_LIBC_MATH_IMP(long double erfcl(long double) {
-    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(cos)(a0);
+VSF_LINUX_APPLET_LIBC_MATH_IMP(erfcl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(erfcl)(a0);
+}
+VSF_LINUX_APPLET_LIBC_MATH_IMP(frexpf, float, float a0, int *a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(frexpf)(a0, a1);
+}
+VSF_LINUX_APPLET_LIBC_MATH_IMP(tanhl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(tanhl)(a0);
+}
+VSF_LINUX_APPLET_LIBC_MATH_IMP(modfl, long double, long double a0, long double *a1) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(modfl)(a0, a1);
+}
+VSF_LINUX_APPLET_LIBC_MATH_IMP(ceill, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(ceill)(a0);
+}
+VSF_LINUX_APPLET_LIBC_MATH_IMP(floorl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(floorl)(a0);
+}
+VSF_LINUX_APPLET_LIBC_MATH_IMP(acosl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(acosl)(a0);
+}
+VSF_LINUX_APPLET_LIBC_MATH_IMP(asinl, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(asinl)(a0);
+}
+VSF_LINUX_APPLET_LIBC_MATH_IMP(log10l, long double, long double a0) {
+    return VSF_LINUX_APPLET_LIBC_MATH_ENTRY(log10l)(a0);
 }
 
-#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_MATH
+#elif   !defined(__SIMPLE_LIBC_MATH_VPLT_ONLY___)
 
 extern double atan(double);
 extern double cos(double);
@@ -901,12 +919,7 @@ extern long double lgammal(long double);
 extern long double erfl(long double);
 extern long double erfcl(long double);
 
-#if 0
-extern double infinity(void);
-extern double gamma(double);
 extern float frexpf(float, int *);
-extern float infinityf(void);
-extern float gammaf(float);
 extern long double tanhl(long double);
 extern long double modfl(long double, long double *);
 extern long double ceill(long double);
@@ -914,7 +927,6 @@ extern long double floorl(long double);
 extern long double acosl(long double);
 extern long double asinl(long double);
 extern long double log10l(long double);
-#endif
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_MATH
 
