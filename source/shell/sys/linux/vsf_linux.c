@@ -3304,7 +3304,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     .sys_time_vplt      = (void *)&vsf_linux_sys_time_vplt,
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_UTSNAME == ENABLED
-    .sys_stat_vplt      = (void *)&vsf_linux_sys_utsname_vplt,
+    .sys_utsname_vplt   = (void *)&vsf_linux_sys_utsname_vplt,
 #   endif
 #   if VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED
     .sys_socket_vplt    = (void *)&vsf_linux_sys_socket_vplt,
