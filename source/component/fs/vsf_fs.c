@@ -923,6 +923,9 @@ __vsf_component_peda_ifs_entry(__vk_vfs_mount, vk_fs_mount)
             dir->attr |= VSF_VFS_FILE_ATTR_MOUNTED;
             root->attr |= VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ;
             root->fsop = dir->subfs.op;
+        } else {
+            dir->subfs.op = NULL;
+            dir->subfs.data = NULL;
         }
         vsf_eda_return(err);
         break;
