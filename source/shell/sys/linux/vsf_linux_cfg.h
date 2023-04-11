@@ -91,18 +91,6 @@
 #ifndef VSF_LINUX_USE_TERMINFO
 #   define VSF_LINUX_USE_TERMINFO               ENABLED
 #endif
-#if VSF_LINUX_USE_TERMINFO == ENABLED
-#   ifndef VSF_LINUX_CFG_TERMINFO_PATH
-#       define VSF_LINUX_CFG_TERMINFO_PATH      "/usr/share/terminfo"
-#   endif
-#   ifndef VSF_LINUX_CFG_TERMINFO_TYPE
-// A terminfo file will be needed for a dedicated type.
-//  Convert the real file by bin2array, and add a the path to the include path.
-// There is some terminfo files copied from ubuntu, to use them,
-//  add vsf/source/shell/sys/linux/kernel/fs/vfs/files/terminfo to include path.
-#       define VSF_LINUX_CFG_TERMINFO_TYPE      "vt100"
-#   endif
-#endif
 
 #ifndef VSF_LINUX_USE_BUSYBOX
 #   define VSF_LINUX_USE_BUSYBOX                ENABLED

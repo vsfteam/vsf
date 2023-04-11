@@ -47,8 +47,11 @@ extern int vsf_linux_init_main(int argc, char *argv[]);
 WEAK(vsf_linux_init_main)
 int vsf_linux_init_main(int argc, char *argv[])
 {
+#ifndef VSF_LINUX_CFG_PATH
+#   define VSF_LINUX_CFG_PATH               VSF_LINUX_CFG_BIN_PATH
+#endif
     // GCC: -Wcast-align
-    vsh_set_path((char **)VSF_LINUX_CFG_BIN_PATH);
+    vsh_set_path((char **)VSF_LINUX_CFG_PATH);
 
     // run init scripts first
 #ifdef VSF_LINUX_CFG_INIT_SCRIPTS
