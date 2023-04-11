@@ -165,6 +165,7 @@ int vsf_peloader_load(vsf_peloader_t *peloader, vsf_loader_target_t *target)
                 }
             }
             reloc = (IMAGE_BASE_RELOCATION *)((char *)reloc + reloc->SizeOfBlock);
+            ptr = ram_base + reloc->VirtualAddress;
         }
     }
 
@@ -207,7 +208,6 @@ int vsf_peloader_load(vsf_peloader_t *peloader, vsf_loader_target_t *target)
             vplt_info->minor = 0;
             vsf_vplt_entry_t *vplt_entry = (vsf_vplt_entry_t *)&vplt_info[1];
             char *cur_name = (char *)vplt_entry + export->NumberOfNames * sizeof(vsf_vplt_entry_t);
-            DWORD func_ord;
             for (DWORD i = 0; i < export->NumberOfNames; i++) {
                 name = ram_base + *(DWORD *)(ram_base + name_vaddr + i * sizeof(DWORD));
                 nameidx = *(WORD *)(ram_base + ord_vaddr + i * sizeof(WORD));
