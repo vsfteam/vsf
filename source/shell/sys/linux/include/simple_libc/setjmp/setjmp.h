@@ -71,4 +71,6 @@ void longjmp(jmp_buf env, int val);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_SETJMP
 
+#undef __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
+
 #endif

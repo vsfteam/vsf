@@ -3190,6 +3190,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_LIBC_MNTENT == ENABLED
 #       include "./include/simple_libc/mntent.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
+#       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
+#       include "./include/simple_libc/setjmp/setjmp.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
+#       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
+#       include "./include/simple_libc/math/math.h"
+#   endif
 #else
 #   if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
 #       include <pthread.h>
@@ -3236,6 +3244,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_LIBC_MNTENT == ENABLED
 #       include <mntent.h>
 #   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
+#       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
+#       include <setjmp/setjmp.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
+#       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
+#       include <math/math.h>
+#   endif
 #endif
 
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
@@ -3252,6 +3268,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED
     .libc_time_vplt     = (void *)&vsf_linux_libc_time_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
+    .libc_setjmp_vplt   = (void *)&vsf_linux_libc_setjmp_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_ASSERT == ENABLED
+    .libc_assert_vplt   = (void *)&vsf_linux_libc_assert_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
+    .libc_math_vplt     = (void *)&vsf_linux_libc_math_vplt,
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_MNTENT == ENABLED
     .libc_mntent_vplt   = (void *)&vsf_linux_libc_mntent_vplt,

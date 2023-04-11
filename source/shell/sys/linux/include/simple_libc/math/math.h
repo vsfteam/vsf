@@ -930,4 +930,6 @@ extern long double log10l(long double);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_MATH
 
+#undef __SIMPLE_LIBC_MATH_VPLT_ONLY__
+
 #endif
