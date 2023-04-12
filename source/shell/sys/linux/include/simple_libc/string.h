@@ -60,6 +60,7 @@ typedef struct vsf_linux_libc_string_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memmove);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memcmp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memchr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memrchr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strverscmp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strndup);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strsignal);
@@ -172,6 +173,9 @@ VSF_LINUX_APPLET_LIBC_STRING_IMP(memcmp, int, const void *str1, const void *str2
 VSF_LINUX_APPLET_LIBC_STRING_IMP(memchr, void *, const void *buf, int ch, size_t count) {
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(memchr)(buf, ch, count);
 }
+VSF_LINUX_APPLET_LIBC_STRING_IMP(memrchr, void *, const void *buf, int ch, size_t count) {
+    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(memrchr)(buf, ch, count);
+}
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strverscmp, int, const char *str1, const char *str2) {
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strverscmp)(str1, str2);
 }
@@ -252,6 +256,7 @@ _CONST_RETURN char * strchr(const char *str, int c);
 _CONST_RETURN char * strrchr(const char *str, int c);
 _CONST_RETURN char * strchrnul(const char *str, int c);
 _CONST_RETURN void * memchr(const void *buf, int ch, size_t count);
+_CONST_RETURN void * memrchr(const void *buf, int ch, size_t count);
 
 void * memmove(void *dest, const void *src, size_t n);
 int memcmp(const void *str1, const void *str2, size_t n);

@@ -175,6 +175,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(memmove),
     VSF_APPLET_VPLT_ENTRY_FUNC(memcmp),
     VSF_APPLET_VPLT_ENTRY_FUNC(memchr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(memrchr),
     VSF_APPLET_VPLT_ENTRY_FUNC(strsignal),
     VSF_APPLET_VPLT_ENTRY_FUNC(sigdescr_np),
     VSF_APPLET_VPLT_ENTRY_FUNC(sigabbrev_np),

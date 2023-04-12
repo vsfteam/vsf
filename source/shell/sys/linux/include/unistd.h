@@ -43,6 +43,9 @@ extern "C" {
 #define usleep              VSF_LINUX_WRAPPER(usleep)
 #define sleep               VSF_LINUX_WRAPPER(sleep)
 
+#define getlogin            VSF_LINUX_WRAPPER(getlogin)
+#define getlogin_r          VSF_LINUX_WRAPPER(getlogin_r)
+
 #define getgid              VSF_LINUX_WRAPPER(getgid)
 #define getegid             VSF_LINUX_WRAPPER(getegid)
 #define getuid              VSF_LINUX_WRAPPER(getuid)
@@ -208,6 +211,9 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(alarm);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ualarm);
 
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getlogin);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getlogin_r);
+
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getgid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getegid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getuid);
@@ -326,6 +332,12 @@ VSF_LINUX_APPLET_UNISTD_IMP(alarm, unsigned int, unsigned int seconds) {
 }
 VSF_LINUX_APPLET_UNISTD_IMP(ualarm, useconds_t, useconds_t usecs, useconds_t interval) {
     return VSF_LINUX_APPLET_UNISTD_ENTRY(ualarm)(usecs, interval);
+}
+VSF_LINUX_APPLET_UNISTD_IMP(getlogin, char *, void) {
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(getlogin)();
+}
+VSF_LINUX_APPLET_UNISTD_IMP(getlogin_r, int, char *buf, size_t bufsize) {
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(getlogin_r)(buf, bufsize);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getuid, uid_t, void) {
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getuid)();
@@ -540,6 +552,9 @@ unsigned sleep(unsigned seconds);
 
 unsigned int alarm(unsigned int seconds);
 useconds_t ualarm(useconds_t usecs, useconds_t interval);
+
+char * getlogin(void);
+int getlogin_r(char *buf, size_t bufsize);
 
 gid_t getgid(void);
 gid_t getegid(void);

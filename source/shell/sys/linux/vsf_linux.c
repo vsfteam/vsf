@@ -1875,6 +1875,17 @@ int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options)
     }
 }
 
+char * getlogin(void)
+{
+    return "root";
+}
+
+int getlogin_r(char *buf, size_t bufsize)
+{
+    strncpy(buf, getlogin(), bufsize);
+    return 0;
+}
+
 gid_t getgid(void)
 {
     return (gid_t)0;
@@ -3075,6 +3086,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(sleep),
     VSF_APPLET_VPLT_ENTRY_FUNC(alarm),
     VSF_APPLET_VPLT_ENTRY_FUNC(ualarm),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getlogin),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getlogin_r),
     VSF_APPLET_VPLT_ENTRY_FUNC(getgid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getegid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getuid),
