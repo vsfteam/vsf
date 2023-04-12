@@ -37,6 +37,7 @@
 #   include "../../include/fcntl.h"
 #   include "../../include/errno.h"
 #   include "../../include/termios.h"
+#   include "../../include/mntent.h"
 #   include "../../include/linux/limits.h"
 #else
 #   include <unistd.h>
@@ -49,6 +50,7 @@
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
+#   include <mntent.h>
 // for MAX_PATH
 #   include <linux/limits.h>
 #endif
@@ -2938,10 +2940,61 @@ static int __vsf_linux_term_close(vsf_linux_fd_t *sfd)
     return 0;
 }
 
+// mntent
+
+FILE * setmntent(const char *filename, const char *type)
+{
+    VSF_LINUX_ASSERT(false);
+    return (FILE *)NULL;
+}
+
+struct mntent * getmntent(FILE *stream)
+{
+    VSF_LINUX_ASSERT(false);
+    return (struct mntent *)NULL;
+}
+
+int addmntent(FILE *stream, const struct mntent *mnt)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int endmntent(FILE *stream)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+char * hasmntopt(const struct mntent *mnt, const char *opt)
+{
+    VSF_LINUX_ASSERT(false);
+    return (char *)NULL;
+}
+
+struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int buflen)
+{
+    VSF_LINUX_ASSERT(false);
+    return (struct mntent *)NULL;
+}
+
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
 #elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
+#endif
+
+#if VSF_LINUX_APPLET_USE_MNTENT == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_mntent_vplt_t vsf_linux_mntent_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_mntent_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(setmntent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getmntent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(addmntent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(endmntent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(hasmntopt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getmntent_r),
+};
 #endif
 
 #if VSF_LINUX_APPLET_USE_POLL == ENABLED && !defined(__VSF_APPLET__)

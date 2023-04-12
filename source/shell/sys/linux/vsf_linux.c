@@ -50,6 +50,7 @@
 #   include "./include/spawn.h"
 #   include "./include/langinfo.h"
 #   include "./include/poll.h"
+#   include "./include/dlfcn.h"
 #   include "./include/linux/limits.h"
 #   include "./include/linux/futex.h"
 #else
@@ -75,6 +76,7 @@
 #   include <spawn.h>
 #   include <langinfo.h>
 #   include <poll.h>
+#   include <dlfcn.h>
 // for MAX_PATH
 #   include <linux/limits.h>
 #   include <linux/futex.h>
@@ -3029,6 +3031,107 @@ char * nl_langinfo(nl_item item)
     }
 }
 
+// dlfcn
+
+static void * __dlmalloc(int size)
+{
+    return malloc((size_t)size);
+}
+
+void * dlopen(const char *pathname, int mode)
+{
+#if VSF_USE_LOADER == ENABLED
+    FILE *f = fopen(pathname, "r");
+    if (NULL == f) {
+        return NULL;
+    }
+
+    vsf_linux_dynloader_t *linux_loader = calloc(1, sizeof(vsf_linux_dynloader_t));
+    if (NULL == linux_loader) {
+        goto close_and_fail;
+    }
+
+    linux_loader->loader.generic.heap_op    = &vsf_loader_default_heap_op;
+    linux_loader->loader.generic.vplt       = (void *)&vsf_linux_vplt;
+    linux_loader->loader.generic.alloc_vplt = __dlmalloc;
+    linux_loader->loader.generic.free_vplt  = free;
+    linux_loader->target.object             = (uintptr_t)f;
+    linux_loader->target.support_xip        = false;
+    linux_loader->target.fn_read            = vsf_loader_stdio_read;
+
+    uint8_t header[16];
+    uint32_t size = vsf_loader_read(&linux_loader->target, 0, header, sizeof(header));
+#if VSF_LOADER_USE_PE == ENABLED
+    if ((size >= 2) && (header[0] == 'M') && (header[1] == 'Z')) {
+        linux_loader->loader.generic.op     = &vsf_peloader_op;
+    } else
+#endif
+    if ((size >= 4) && (header[0] == 0x7F) && (header[1] == 'E') && (header[2] == 'L') && (header[3] == 'F')) {
+        linux_loader->loader.generic.op     = &vsf_elfloader_op;
+    } else {
+        printf("unsupported file format\n");
+        goto close_and_fail;
+    }
+
+    if (!vsf_loader_load(&linux_loader->loader.generic, &linux_loader->target)) {
+        vsf_loader_call_init_array(&linux_loader->loader.generic);
+        return linux_loader;
+    }
+
+    vsf_loader_cleanup(&linux_loader->loader.generic);
+    free(linux_loader);
+
+close_and_fail:
+    fclose(f);
+    return NULL;
+#else
+    return NULL;
+#endif
+}
+
+int dlclose(void *handle)
+{
+#if VSF_USE_LOADER == ENABLED
+    vsf_linux_dynloader_t *linux_loader = handle;
+    vsf_loader_call_fini_array(&linux_loader->loader.generic);
+    vsf_loader_cleanup(&linux_loader->loader.generic);
+    free(linux_loader);
+    return 0;
+#else
+    return -1;
+#endif
+}
+
+void * dlsym(void *handle, const char *name)
+{
+    void *vplt = NULL;
+
+    if (RTLD_DEFAULT == handle) {
+#if VSF_USE_APPLET == ENABLED
+        vplt = (void *)&vsf_vplt;
+#endif
+    } else {
+#if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
+        vsf_linux_dynloader_t *linux_loader = handle;
+        vplt = (void*)linux_loader->loader.generic.vplt_out;
+#endif
+    }
+    if (NULL == vplt) {
+        return NULL;
+    }
+
+#if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
+    return vsf_vplt_link(vplt, (char *)name);
+#else
+    return NULL;
+#endif
+}
+
+char * dlerror(void)
+{
+    return "known";
+}
+
 // vplt
 #if VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_vplt = {
@@ -3205,8 +3308,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 #       include "./include/libgen.h"
 #   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_MNTENT == ENABLED
-#       include "./include/simple_libc/mntent.h"
+#   if VSF_LINUX_APPLET_USE_MNTENT == ENABLED
+#       include "./include/mntent.h"
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
 #       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
@@ -3259,7 +3362,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 #       include <libgen.h>
 #   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_MNTENT == ENABLED
+#   if VSF_LINUX_APPLET_USE_MNTENT == ENABLED
 #       include <mntent.h>
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
@@ -3296,10 +3399,10 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
     .libc_math_vplt     = (void *)&vsf_linux_libc_math_vplt,
 #   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_MNTENT == ENABLED
-    .libc_mntent_vplt   = (void *)&vsf_linux_libc_mntent_vplt,
-#   endif
 
+#   if VSF_LINUX_APPLET_USE_MNTENT == ENABLED
+    .mntent_vplt        = (void *)&vsf_linux_mntent_vplt,
+#   endif
 #   if VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED
     .sys_epoll_vplt     = (void *)&vsf_linux_sys_epoll_vplt,
 #   endif
