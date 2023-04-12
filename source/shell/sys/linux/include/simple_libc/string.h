@@ -41,6 +41,7 @@ typedef struct vsf_linux_libc_string_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strdup);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strncpy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(stpcpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strncat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcoll);
@@ -112,6 +113,9 @@ VSF_LINUX_APPLET_LIBC_STRING_IMP(strdup, char *, const char *str) {
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcpy, char *, char *dest, const char *src) {
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcpy)(dest, src);
+}
+VSF_LINUX_APPLET_LIBC_STRING_IMP(stpcpy, char *, char *dest, const char *src) {
+    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(stpcpy)(dest, src);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strncpy, char *, char *dest, const char *src, size_t n) {
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strncpy)(dest, src, n);
@@ -206,6 +210,7 @@ char * strndup(const char *str, size_t n);
 char * strcpy(char *dest, const char *src);
 char * strncpy(char *dest, const char *src, size_t n);
 size_t strscpy(char *dest, const char *src, size_t n);
+char * stpcpy(char *dest, const char *src);
 char * strcat(char *dest, const char *src);
 char * strncat(char *dest, const char *str, size_t n);
 int strcoll(const char *str1, const char *str2);

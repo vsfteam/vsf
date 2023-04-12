@@ -126,6 +126,12 @@ void * memrchr(const void *str, int ch, size_t len)
     return (void *)end;
 }
 
+char * stpcpy(char *dest, const char *src)
+{
+  size_t len = strlen(src);
+  return memcpy(dest, src, len + 1) + len;
+}
+
 char * strerror(int errnum)
 {
     return "unknown";
@@ -174,6 +180,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(strdup),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncpy),
+    VSF_APPLET_VPLT_ENTRY_FUNC(stpcpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcat),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncat),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcoll),
