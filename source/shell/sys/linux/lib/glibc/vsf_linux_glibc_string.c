@@ -108,6 +108,24 @@ char * strndup(const char *str, size_t n)
     return r;
 }
 
+void * memrchr(const void *str, int ch, size_t len)
+{
+    const char *end = (const char *)str + len - 1;
+
+    if (len == 0) {
+        return NULL;
+    }
+
+    while (*end != ch) {
+        if (end == (const char *)str) {
+            return NULL;
+        }
+        --end;
+    }
+
+    return (void *)end;
+}
+
 char * strerror(int errnum)
 {
     return "unknown";
