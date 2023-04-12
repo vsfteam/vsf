@@ -159,10 +159,14 @@
 
 // do not check VSF_USE_APPLET
 #if VSF_LINUX_USE_APPLET == ENABLED
-#   if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
-#       ifndef VSF_LINUX_USE_SIMPLE_DLFCN
-#           define VSF_LINUX_USE_SIMPLE_DLFCN   ENABLED
-#       endif
+#   ifndef VSF_LINUX_APPLET_USE_DLFCN
+#       define VSF_LINUX_APPLET_USE_DLFCN       ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_GLOB
+#       define VSF_LINUX_APPLET_USE_GLOB        ENABLED
+#   endif
+#   if VSF_LINUX_APPLET_USE_MNTENT
+#       define VSF_LINUX_APPLET_USE_MNTENT      DISABLED
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_SYS_EPOLL
@@ -274,15 +278,6 @@
 #       if !defined(VSF_LINUX_APPLET_USE_LIBC_TIME) && VSF_LINUX_USE_SIMPLE_TIME == ENABLED
 #           define VSF_LINUX_APPLET_USE_LIBC_TIME   ENABLED
 #       endif
-#       if !defined(VSF_LINUX_APPLET_USE_LIBC_MNTENT) && VSF_LINUX_USE_SIMPLE_MNTENT == ENABLED
-#           define VSF_LINUX_APPLET_USE_LIBC_MNTENT DISABLED
-#       endif
-#       if !defined(VSF_LINUX_APPLET_USE_LIBC_DLFCN) && VSF_LINUX_USE_SIMPLE_DLFCN == ENABLED
-#           define VSF_LINUX_APPLET_USE_LIBC_DLFCN  ENABLED
-#       endif
-#       ifndef VSF_LINUX_APPLET_USE_LIBC_GLOB
-#           define VSF_LINUX_APPLET_USE_LIBC_GLOB   ENABLED
-#       endif
 #       ifndef VSF_LINUX_APPLET_USE_LIBC_SETJMP
 #           define VSF_LINUX_APPLET_USE_LIBC_SETJMP ENABLED
 #       endif
@@ -315,7 +310,6 @@ typedef struct vsf_linux_vplt_t {
     void *libc_setjmp_vplt;
     void *libc_assert_vplt;
     void *libc_math_vplt;
-    void *libc_mntent_vplt;
     void *libc_res0_vplt;
     void *libc_res1_vplt;
     void *libc_res2_vplt;
@@ -365,8 +359,9 @@ typedef struct vsf_linux_vplt_t {
     void *sched_vplt;
     void *ifaddrs_vplt;
     void *arpa_inet_vplt;
-    void *res0_vplt;
-    void *res1_vplt;
+    void *dlfcn_vplt;
+    void *glob_vplt;
+    void *mntent_vplt;
     void *res2_vplt;
     void *res3_vplt;
     void *res4_vplt;

@@ -1,5 +1,5 @@
-#ifndef __SIMPLE_LIBC_GLOB_H__
-#define __SIMPLE_LIBC_GLOB_H__
+#ifndef __VSF_LINUX_GLOB_H__
+#define __VSF_LINUX_GLOB_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
@@ -13,9 +13,9 @@
 extern "C" {
 #endif
 
-#if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
-#define glob                VSF_LINUX_LIBC_WRAPPER(glob)
-#define globfree            VSF_LINUX_LIBC_WRAPPER(globfree)
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
+#define glob                VSF_LINUX_WRAPPER(glob)
+#define globfree            VSF_LINUX_WRAPPER(globfree)
 #endif
 
 // flags
@@ -56,48 +56,48 @@ typedef struct {
     int (*gl_stat)(const char *, struct stat *);
 } glob_t;
 
-#if VSF_LINUX_APPLET_USE_LIBC_GLOB == ENABLED
-typedef struct vsf_linux_libc_glob_vplt_t {
+#if VSF_LINUX_APPLET_USE_GLOB == ENABLED
+typedef struct vsf_linux_glob_vplt_t {
     vsf_vplt_info_t info;
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(glob);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(globfree);
-} vsf_linux_libc_glob_vplt_t;
+} vsf_linux_glob_vplt_t;
 #   ifndef __VSF_APPLET__
-extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_glob_vplt_t vsf_linux_libc_glob_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_glob_vplt_t vsf_linux_glob_vplt;
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_LIBC_GLOB == ENABLED
+#if defined(__VSF_APPLET__) && VSF_LINUX_APPLET_USE_GLOB == ENABLED
 
-#ifndef VSF_LINUX_APPLET_LIBC_GLOB_VPLT
+#ifndef VSF_LINUX_APPLET_GLOB_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
-#       define VSF_LINUX_APPLET_LIBC_GLOB_VPLT                                  \
-            ((vsf_linux_libc_glob_vplt_t *)(VSF_LINUX_APPLET_VPLT->libc_glob))
+#       define VSF_LINUX_APPLET_GLOB_VPLT                                       \
+            ((vsf_linux_glob_vplt_t *)(VSF_LINUX_APPLET_VPLT->glob_vplt))
 #   else
-#       define VSF_LINUX_APPLET_LIBC_GLOB_VPLT                                  \
-            ((vsf_linux_libc_glob_vplt_t *)vsf_vplt((void *)0))
+#       define VSF_LINUX_APPLET_GLOB_VPLT                                       \
+            ((vsf_linux_glob_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
 
-#define VSF_LINUX_APPLET_LIBC_GLOB_ENTRY(__NAME)                                \
-            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_LIBC_GLOB_VPLT, __NAME)
-#define VSF_LINUX_APPLET_LIBC_GLOB_IMP(...)                                     \
-            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_GLOB_VPLT, __VA_ARGS__)
+#define VSF_LINUX_APPLET_GLOB_ENTRY(__NAME)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_GLOB_VPLT, __NAME)
+#define VSF_LINUX_APPLET_GLOB_IMP(...)                                          \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_GLOB_VPLT, __VA_ARGS__)
 
-VSF_LINUX_APPLET_LIBC_GLOB_IMP(glob, int, const char *path, int flags, int (*errfunc)(const char *path, int err), glob_t *g) {
-    return VSF_LINUX_APPLET_LIBC_GLOB_ENTRY(glob)(path, flags, errfunc, g);
+VSF_LINUX_APPLET_GLOB_IMP(glob, int, const char *path, int flags, int (*errfunc)(const char *path, int err), glob_t *g) {
+    return VSF_LINUX_APPLET_GLOB_ENTRY(glob)(path, flags, errfunc, g);
 }
-VSF_LINUX_APPLET_LIBC_GLOB_IMP(globfree, int, glob_t *g) {
-    return VSF_LINUX_APPLET_LIBC_GLOB_ENTRY(globfree)(g);
+VSF_LINUX_APPLET_GLOB_IMP(globfree, int, glob_t *g) {
+    return VSF_LINUX_APPLET_GLOB_ENTRY(globfree)(g);
 }
 
-#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_GLOB
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_GLOB
 
 int glob(const char *path, int flags, int (*errfunc)(const char *path, int err), glob_t *g);
 void globfree(glob_t *g);
 
-#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_GLOB
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_GLOB
 
 #ifdef __cplusplus
 }
