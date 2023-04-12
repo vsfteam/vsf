@@ -2057,6 +2057,10 @@ int fchownat(int dirfd, const char *pathname, uid_t owner, gid_t group, int flag
     return 0;
 }
 
+size_t confstr(int name, char *buf, size_t len)
+{
+    return -1;
+}
 
 // malloc.h
 #if VSF_LINUX_SIMPLE_LIBC_CFG_NO_MM != ENABLED
@@ -3082,6 +3086,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_unistd_vplt_t, 0, 0, true),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_errno),
+    VSF_APPLET_VPLT_ENTRY_FUNC(confstr),
     VSF_APPLET_VPLT_ENTRY_FUNC(usleep),
     VSF_APPLET_VPLT_ENTRY_FUNC(sleep),
     VSF_APPLET_VPLT_ENTRY_FUNC(alarm),

@@ -40,6 +40,8 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
+#define confstr             VSF_LINUX_WRAPPER(confstr)
+
 #define usleep              VSF_LINUX_WRAPPER(usleep)
 #define sleep               VSF_LINUX_WRAPPER(sleep)
 
@@ -157,6 +159,17 @@ extern "C" {
 
 #define environ             (vsf_linux_get_cur_process()->__environ)
 
+// confstr
+
+enum {
+    _CS_PATH,
+#define _CS_PATH                    _CS_PATH
+    _CS_GNU_LIBC_VERSION,
+#define _CS_GNU_LIBC_VERSION        _CS_GNU_LIBC_VERSION
+    _CS_GNU_LIBPTHREAD_VERSION,
+#define _CS_GNU_LIBPTHREAD_VERSION  _CS_GNU_LIBPTHREAD_VERSION
+};
+
 enum {
     DT_UNKNOWN,
     DT_REG,
@@ -206,6 +219,7 @@ typedef struct vsf_linux_unistd_vplt_t {
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_errno);
 
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(confstr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(usleep);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sleep);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(alarm);
@@ -320,6 +334,9 @@ VSF_LINUX_APPLET_UNISTD_IMP(__execlp_va, exec_ret_t, const char *pathname, const
 }
 VSF_LINUX_APPLET_UNISTD_IMP(__vsf_linux_errno, int *, void) {
     return VSF_LINUX_APPLET_UNISTD_ENTRY(__vsf_linux_errno)();
+}
+VSF_LINUX_APPLET_UNISTD_IMP(confstr, size_t, int name, char *buf, size_t len) {
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(confstr)(name, buf, len);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(usleep, int, int micro_seconds) {
     return VSF_LINUX_APPLET_UNISTD_ENTRY(usleep)(micro_seconds);
@@ -546,6 +563,8 @@ static inline exec_ret_t execlp(const char *file, const char *arg, ...) {
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_UNISTD
+
+size_t confstr(int name, char *buf, size_t len);
 
 int usleep(int micro_seconds);
 unsigned sleep(unsigned seconds);

@@ -2846,6 +2846,16 @@ vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_rx_priv_t *priv_rx)
     return sfd_tx;
 }
 
+int mkfifo(const char *pathname, mode_t mode)
+{
+    return -1;
+}
+
+int mkfifoat(int dirfd, const char *pathname, mode_t mode)
+{
+    return -1;
+}
+
 // term
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
 {
@@ -3018,6 +3028,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(fstatat),
     VSF_APPLET_VPLT_ENTRY_FUNC(chmod),
     VSF_APPLET_VPLT_ENTRY_FUNC(fchmod),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mkfifo),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mkfifoat),
 };
 #endif
 

@@ -26,6 +26,8 @@ extern "C" {
 #define chmod                   VSF_LINUX_WRAPPER(chmod)
 #define fchmod                  VSF_LINUX_WRAPPER(fchmod)
 #define utimensat               VSF_LINUX_WRAPPER(utimensat)
+#define mkfifo                  VSF_LINUX_WRAPPER(mkfifo)
+#define mkfifoat                VSF_LINUX_WRAPPER(mkfifoat)
 #endif
 
 // syscalls
@@ -141,6 +143,8 @@ typedef struct vsf_linux_sys_stat_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fstatat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(chmod);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fchmod);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkfifo);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkfifoat);
 } vsf_linux_sys_stat_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
@@ -182,6 +186,12 @@ VSF_LINUX_APPLET_SYS_STAT_IMP(chmod, int, const char *pathname, mode_t mode) {
 VSF_LINUX_APPLET_SYS_STAT_IMP(fchmod, int, int fd, mode_t mode) {
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(fchmod)(fd, mode);
 }
+VSF_LINUX_APPLET_SYS_STAT_IMP(mkfifo, int, const char *pathname, mode_t mode) {
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mkfifo)(pathname, mode);
+}
+VSF_LINUX_APPLET_SYS_STAT_IMP(mkfifoat, int, int dirfd, const char *pathname, mode_t mode) {
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mkfifo)(dirfd, pathname, mode);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT
 
@@ -209,6 +219,8 @@ int futimens(int fd, const struct timespec times[2]);
 int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags);
 int chmod(const char *pathname, mode_t mode);
 int fchmod(int fd, mode_t mode);
+int mkfifo(const char *pathname, mode_t mode);
+int mkfifoat(int dirfd, const char *pathname, mode_t mode);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT
 
