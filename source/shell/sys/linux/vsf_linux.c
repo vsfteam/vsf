@@ -788,7 +788,11 @@ int ttyname_r(int fd, char *buf, size_t buflen)
     }
 
     vsf_linux_fs_priv_t *fs_priv = (vsf_linux_fs_priv_t *)sfd->priv;
-    strlcpy(buf, fs_priv->file->name, buflen);
+    if (NULL == fs_priv->file) {
+        buf[0] = '\0';
+    } else {
+        strlcpy(buf, fs_priv->file->name, buflen);
+    }
     return 0;
 }
 
