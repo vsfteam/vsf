@@ -1337,7 +1337,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 
     vsf_linux_process_arg_t arg = ctx->arg;
     VSF_LINUX_ASSERT(ctx->entry != NULL);
-    thread->retval = ctx->entry(arg.argc, (char **)arg.argv);
+    thread->retval = ((int (*)(int, char **, char **))ctx->entry)(arg.argc, (char **)arg.argv, process->__environ);
 
     vsf_linux_exit_process(thread->retval);
 }
