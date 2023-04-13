@@ -38,6 +38,7 @@
 #   include "../../include/errno.h"
 #   include "../../include/termios.h"
 #   include "../../include/mntent.h"
+#   include "../../include/glob.h"
 #   include "../../include/linux/limits.h"
 #else
 #   include <unistd.h>
@@ -51,6 +52,7 @@
 #   include <errno.h>
 #   include <termios.h>
 #   include <mntent.h>
+#   include <glob.h>
 // for MAX_PATH
 #   include <linux/limits.h>
 #endif
@@ -2976,6 +2978,18 @@ struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int 
 {
     VSF_LINUX_ASSERT(false);
     return (struct mntent *)NULL;
+}
+
+// glob
+
+int glob(const char *path, int flags, int (*errfunc)(const char *path, int err), glob_t *g)
+{
+    return -1;
+}
+
+void globfree(glob_t *g)
+{
+    
 }
 
 #if __IS_COMPILER_GCC__
