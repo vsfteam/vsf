@@ -134,6 +134,7 @@ typedef struct vsf_linux_libc_stdlib_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(labs);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(llabs);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(imaxabs);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getloadavg);
 } vsf_linux_libc_stdlib_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt;
@@ -305,6 +306,9 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(llabs, long long, long long j) {
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(imaxabs, intmax_t, intmax_t j) {
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(imaxabs)(j);
 }
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(getloadavg, int, double loadavg[], int nelem) {
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(getloadavg)(loadavg, nelem);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB
 
@@ -370,6 +374,9 @@ int abs(int j);
 long labs(long j);
 long long llabs(long long j);
 intmax_t imaxabs(intmax_t j);
+
+int getloadavg(double loadavg[], int nelem);
+
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB
 
 int at_quick_exit(void (*func)(void));

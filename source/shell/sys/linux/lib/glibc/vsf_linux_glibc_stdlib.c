@@ -381,6 +381,11 @@ intmax_t imaxabs(intmax_t j)
     return (j < 0 ? -j : j);
 }
 
+int getloadavg(double loadavg[], int nelem)
+{
+    return -1;
+}
+
 #if VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX == ENABLED
 static int __strtoradix(const char *str, char **endptr, int base)
 {
@@ -841,6 +846,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(labs),
     VSF_APPLET_VPLT_ENTRY_FUNC(llabs),
     VSF_APPLET_VPLT_ENTRY_FUNC(imaxabs),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getloadavg),
 };
 #endif
 
