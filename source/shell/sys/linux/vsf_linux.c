@@ -189,6 +189,11 @@ typedef struct vsf_linux_t {
     char hostname[HOST_NAME_MAX + 1];
 } vsf_linux_t;
 
+typedef struct vsf_linux_process_heap_t {
+    vsf_heap_t heap;
+    vsf_dlist_t freelist[2];
+} vsf_linux_process_heap_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const struct passwd __vsf_default_passwd = {
@@ -886,9 +891,116 @@ int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority)
     return 0;
 }
 
-static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
+static vsf_dlist_t * __vsf_linux_process_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size)
 {
-    vsf_linux_process_t *process = vsf_linux_malloc_res(sizeof(vsf_linux_process_t));
+    vsf_linux_process_heap_t *process_heap = container_of(heap, vsf_linux_process_heap_t, heap);
+    return &process_heap->freelist[0];
+}
+
+size_t vsf_linux_process_heap_size(vsf_linux_process_t *process, void *buffer)
+{
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    if (NULL == process->heap) {
+        return vsf_heap_size(buffer);
+    } else {
+        return __vsf_heap_size(process->heap, buffer);
+    }
+}
+
+void * vsf_linux_process_heap_realloc(vsf_linux_process_t *process, void *buffer, uint_fast32_t size)
+{
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    if (NULL == process->heap) {
+        return vsf_heap_realloc(buffer, size);
+    } else {
+        if (NULL == buffer) {
+            if (size > 0) {
+                return vsf_linux_process_heap_malloc(process, size);
+            }
+            return NULL;
+        } else if (0 == size) {
+            if (buffer != NULL) {
+                vsf_linux_process_heap_free(process, buffer);
+            }
+        }
+        return __vsf_heap_realloc_aligned(process->heap, buffer, size, 0);
+    }
+}
+
+void * vsf_linux_process_heap_malloc_aligned(vsf_linux_process_t *process, uint_fast32_t size, uint_fast32_t alignment)
+{
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    if (NULL == process->heap) {
+        return vsf_heap_malloc_aligned(size, alignment);
+    } else {
+        return __vsf_heap_malloc_aligned(process->heap, size, alignment);
+    }
+}
+
+void * vsf_linux_process_heap_malloc(vsf_linux_process_t *process, size_t size)
+{
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    if (NULL == process->heap) {
+        return vsf_heap_malloc(size);
+    } else {
+        return __vsf_heap_malloc_aligned(process->heap, size, 0);
+    }
+}
+
+void * vsf_linux_process_heap_calloc(vsf_linux_process_t *process, size_t n, size_t size)
+{
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    size *= n;
+
+    void *buffer = vsf_linux_process_heap_malloc(process, size);
+    if (buffer != NULL) {
+        memset(buffer, 0, size);
+    }
+    return buffer;
+}
+
+void vsf_linux_process_heap_free(vsf_linux_process_t *process, void *buffer)
+{
+    if (buffer != NULL) {
+        if (NULL == process) {
+            process = vsf_linux_get_cur_process();
+        }
+        if (NULL == process->heap) {
+            vsf_heap_free(buffer);
+        } else {
+            __vsf_heap_free(process->heap, buffer);
+        }
+    }
+}
+
+char * vsf_linux_process_heap_strdup(vsf_linux_process_t *process, char *str)
+{
+    if (str != NULL) {
+        int str_len = strlen(str);
+        char *new_str = vsf_linux_process_heap_malloc(process, str_len + 1);
+        if (new_str != NULL) {
+            memcpy(new_str, str, str_len);
+            new_str[str_len] = '\0';
+        }
+        return new_str;
+    }
+    return NULL;
+}
+
+static vsf_linux_process_t * __vsf_linux_create_process(int stack_size, int heap_size)
+{
+    heap_size += heap_size > 0 ? sizeof(vsf_linux_process_heap_t) : 0;
+    vsf_linux_process_t *process = vsf_linux_malloc_res(sizeof(vsf_linux_process_t) + heap_size);
     if (process != NULL) {
         memset(process, 0, sizeof(*process));
         process->prio = vsf_prio_inherit;
@@ -907,13 +1019,21 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
         if (process->id.pid) {
             process->id.ppid = getpid();
         }
+
+        if (heap_size > 0) {
+            vsf_linux_process_heap_t *process_heap = (vsf_linux_process_heap_t *)&process[1];
+            memset(process_heap, 0, sizeof(*process_heap));
+            process_heap->heap.get_freelist = __vsf_linux_process_heap_get_freelist;
+            process->heap = &process_heap->heap;
+            __vsf_heap_add_buffer(&process_heap->heap, (uint8_t *)&process_heap[1], heap_size);
+        }
     }
     return process;
 }
 
-vsf_linux_process_t * vsf_linux_create_process(int stack_size)
+vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size)
 {
-    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size);
+    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size, heap_size);
     if (process != NULL) {
         vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
         VSF_LINUX_ASSERT(cur_process != NULL);
@@ -1119,7 +1239,7 @@ vsf_linux_process_t * __vsf_linux_start_process_internal(
         vsf_linux_main_entry_t entry, char * const * argv, int stack_size, vsf_prio_t prio)
 {
     VSF_LINUX_ASSERT((prio >= VSF_LINUX_CFG_PRIO_LOWEST) && (prio <= VSF_LINUX_CFG_PRIO_HIGHEST));
-    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size);
+    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size, 0);
     if (process != NULL) {
         process->prio = prio;
         process->ctx.entry = entry;
@@ -1526,10 +1646,10 @@ exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
     __vsf_linux_process_free_arg(process);
 
     ctx->arg.argc = 1;
-    ctx->arg.argv[0] = __strdup_ex(process, arg);
+    ctx->arg.argv[0] = (const char *)__strdup_ex(process, arg);
     args = va_arg(ap, const char *);
     while ((args != NULL) && (ctx->arg.argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
-        ctx->arg.argv[ctx->arg.argc++] = __strdup_ex(process, args);
+        ctx->arg.argv[ctx->arg.argc++] = (const char *)__strdup_ex(process, args);
         args = va_arg(ap, const char *);
     }
     ctx->entry = entry;
@@ -2539,7 +2659,7 @@ int posix_spawnp(pid_t *pid, const char *file,
     close(exefd);
     VSF_LINUX_ASSERT(entry != NULL);
 
-    vsf_linux_process_t *process = vsf_linux_create_process(0);
+    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE);
     if (NULL == process) { return -ENOMEM; }
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     ctx->entry = entry;

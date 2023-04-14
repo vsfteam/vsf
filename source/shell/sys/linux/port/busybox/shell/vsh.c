@@ -426,7 +426,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     next = &cmd[strlen(cmd) - 1];
     while (isspace((int)*next)) { *next-- = '\0'; }
 
-    vsf_linux_process_t *process = vsf_linux_create_process(0);
+    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE);
     if (NULL == process) { return NULL; }
 
     env[1] = NULL;

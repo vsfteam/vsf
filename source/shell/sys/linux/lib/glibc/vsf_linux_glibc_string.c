@@ -71,15 +71,7 @@ size_t strscpy(char *dest, const char *src, size_t n)
 
 char * strdup(const char *str)
 {
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     return __strdup_ex(NULL, str);
-#else
-    char *result = vsf_heap_strdup(str);
-    if (NULL == result) {
-        errno = ENOMEM;
-    }
-    return result;
-#endif
 }
 
 char * strndup(const char *str, size_t n)

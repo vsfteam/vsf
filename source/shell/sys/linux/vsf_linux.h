@@ -304,6 +304,7 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_CFG_PLS_NUM > 0
         vsf_linux_localstorage_t pls[VSF_LINUX_CFG_PLS_NUM];
 #endif
+        vsf_heap_t *heap;
 
 #if VSF_LINUX_CFG_TLS_NUM > 0
         struct {
@@ -324,6 +325,15 @@ extern vsf_systimer_tick_t vsf_linux_sleep(vsf_systimer_tick_t ticks);
 
 // used for dynamic libraries, allocate/free memory from resources_process
 extern vsf_linux_process_t * vsf_linux_resources_process(void);
+
+extern size_t vsf_linux_process_heap_size(vsf_linux_process_t *process, void *buffer);
+extern void * vsf_linux_process_heap_realloc(vsf_linux_process_t *process, void *buffer, uint_fast32_t size);
+extern void * vsf_linux_process_heap_malloc_aligned(vsf_linux_process_t *process, uint_fast32_t size, uint_fast32_t alignment);
+extern void * vsf_linux_process_heap_malloc(vsf_linux_process_t *process, size_t size);
+extern void * vsf_linux_process_heap_calloc(vsf_linux_process_t *process, size_t n, size_t size);
+extern void vsf_linux_process_heap_free(vsf_linux_process_t *process, void *buffer);
+extern char * vsf_linux_process_heap_strdup(vsf_linux_process_t *process, char *str);
+
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 // can not put in clib headers because of dependency, so put them here
 extern void * __malloc_ex(vsf_linux_process_t *process, size_t size, ...);
@@ -332,11 +342,11 @@ extern void __free_ex(vsf_linux_process_t *process, void *ptr, ...);
 extern void * __realloc_ex(vsf_linux_process_t *process, void *p, size_t size, ...);
 extern char * __strdup_ex(vsf_linux_process_t *process, const char *str);
 #else
-#   define __malloc_ex(__process, __size, ...)          malloc(__size)
-#   define __calloc_ex(__process, __n, __size, ...)     calloc((__n), (__size))
-#   define __free_ex(__process, __ptr, ...)             free(__ptr)
-#   define __realloc_ex(__process, __ptr, __size, ...)  realloc((__ptr), (__size))
-#   define __strdup_ex(__process, __str)                strdup(__str)
+#   define __malloc_ex(__process, __size, ...)          vsf_linux_process_heap_malloc((__process), (__size))
+#   define __calloc_ex(__process, __n, __size, ...)     vsf_linux_process_heap_calloc((__process), (__n), (__size))
+#   define __free_ex(__process, __ptr, ...)             vsf_linux_process_heap_free((__process), (__ptr))
+#   define __realloc_ex(__process, __ptr, __size, ...)  vsf_linux_process_heap_realloc((__process), (__ptr), (__size))
+#   define __strdup_ex(__process, __str)                vsf_linux_process_heap_strdup((__process), (char *)(__str))
 #endif
 
 extern void * vsf_linux_malloc_res(size_t size);
@@ -390,7 +400,7 @@ extern vsf_linux_process_t * __vsf_linux_start_process_internal(
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
-extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
+extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size);
 // delete unstarted/existed process
 extern void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
