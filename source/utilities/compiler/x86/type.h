@@ -137,7 +137,9 @@ typedef long long           off64_t;
 #       define strncasecmp  strnicmp
 #   endif
 // __WIN__ uses _alloca instead of alloca in alloca.h
-#   define alloca _alloca
+
+#   ifndef __VSF_APPLET__
+#       define alloca _alloca
 extern void * _alloca(size_t);
 extern int stricmp(const char *s1, const char *s2);
 extern int strnicmp(const char *s1, const char *s2, size_t n);
@@ -149,6 +151,7 @@ extern char * strtok_r(char *str, const char *delim, char **saveptr);
 
 extern void srandom(unsigned int seed);
 extern long int random(void);
+#   endif
 
 #include <time.h>
 #   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
