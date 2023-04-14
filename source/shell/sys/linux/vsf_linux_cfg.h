@@ -269,6 +269,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_LIBGEN
 #       define VSF_LINUX_APPLET_USE_LIBGEN      ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_FINDPROG
+#       define VSF_LINUX_APPLET_USE_FINDPROG    ENABLED
+#   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_LIBC
 #       define VSF_LINUX_APPLET_USE_LIBC        ENABLED

@@ -216,8 +216,8 @@ extern void vsf_linux_glibc_init(void);
 #endif
 
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb);
-extern int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd,
-        vsf_linux_main_entry_t *entry);
+extern int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
+extern int __vsh_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
 
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
 static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb);
@@ -1580,16 +1580,8 @@ int daemon(int nochdir, int noclose)
     return 0;
 }
 
-exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
+static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const * argv, char  * const * envp)
 {
-    // fd will be closed after entry return
-    vsf_linux_main_entry_t entry;
-    int exefd = vsf_linux_fs_get_executable(file, &entry);
-    if (exefd < 0) {
-        return -1;
-    }
-    close(exefd);
-
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
     vsf_linux_process_ctx_t *ctx = &process->ctx;
@@ -1606,6 +1598,15 @@ exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
     return 0;
 }
 
+exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
+{
+    vsf_linux_main_entry_t entry;
+    if (__vsh_get_exe_entry((char *)file, &entry, true) < 0) {
+        return -1;
+    }
+    return __vsf_linux_execvpe(entry, argv, envp);
+}
+
 exec_ret_t execvp(const char *file, char * const * argv)
 {
     return execvpe(file, argv, NULL);
@@ -1613,14 +1614,11 @@ exec_ret_t execvp(const char *file, char * const * argv)
 
 exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp)
 {
-    char fullpath[MAX_PATH];
-    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), (char *)pathname, NULL);
-    if (fd < 0) {
+    vsf_linux_main_entry_t entry;
+    if (__vsh_get_exe_entry((char *)pathname, &entry, false) < 0) {
         return -1;
     }
-    close(fd);
-
-    return execvpe(fullpath, argv, envp);
+    return __vsf_linux_execvpe(entry, argv, envp);
 }
 
 exec_ret_t execv(const char *pathname, char * const * argv)
@@ -1628,16 +1626,8 @@ exec_ret_t execv(const char *pathname, char * const * argv)
     return execve(pathname, argv, NULL);
 }
 
-exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
+exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, va_list ap)
 {
-    // fd will be closed after entry return
-    vsf_linux_main_entry_t entry;
-    int exefd = vsf_linux_fs_get_executable(pathname, &entry);
-    if (exefd < 0) {
-        return -1;
-    }
-    close(exefd);
-
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
     vsf_linux_process_ctx_t *ctx = &process->ctx;
@@ -1661,6 +1651,15 @@ exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
     return 0;
 }
 
+exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
+{
+    vsf_linux_main_entry_t entry;
+    if (__vsh_get_exe_entry((char *)pathname, &entry, true) < 0) {
+        return -1;
+    }
+    return __vsf_linux_execlp_va(entry, arg, ap);
+}
+
 exec_ret_t execlp(const char *pathname, const char *arg, ...)
 {
     exec_ret_t ret;
@@ -1674,14 +1673,11 @@ exec_ret_t execlp(const char *pathname, const char *arg, ...)
 
 exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
 {
-    char fullpath[MAX_PATH];
-    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), (char *)pathname, NULL);
-    if (fd < 0) {
+    vsf_linux_main_entry_t entry;
+    if (__vsh_get_exe_entry((char *)pathname, &entry, false) < 0) {
         return -1;
     }
-    close(fd);
-
-    return __execlp_va(pathname, arg, ap);
+    return __vsf_linux_execlp_va(entry, arg, ap);
 }
 
 exec_ret_t execl(const char *pathname, const char *arg, ...)
@@ -2644,22 +2640,11 @@ unsigned int minor(dev_t dev)
 }
 
 // spawn.h
-int posix_spawnp(pid_t *pid, const char *file,
+static int __vsf_linux_spawn(pid_t *pid, vsf_linux_main_entry_t entry,
                 const posix_spawn_file_actions_t *actions,
                 const posix_spawnattr_t *attr,
                 char * const argv[], char * const env[])
 {
-    vsf_linux_main_entry_t entry;
-    int exefd = vsf_linux_fs_get_executable(file, &entry);
-    if (exefd < 0) {
-        if (pid != NULL) {
-            *pid = -1;
-        }
-        return -1;
-    }
-    close(exefd);
-    VSF_LINUX_ASSERT(entry != NULL);
-
     vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE);
     if (NULL == process) { return -ENOMEM; }
     vsf_linux_process_ctx_t *ctx = &process->ctx;
@@ -2780,22 +2765,34 @@ delete_process_and_fail:
     return -1;
 }
 
-int posix_spawn(pid_t *pid, const char *path,
+int posix_spawnp(pid_t *pid, const char *file,
                 const posix_spawn_file_actions_t *actions,
                 const posix_spawnattr_t *attr,
                 char * const argv[], char * const env[])
 {
-    char fullpath[MAX_PATH];
-    int fd = __vsh_get_exe(fullpath, sizeof(fullpath), (char *)path, NULL);
-    if (fd < 0) {
+    vsf_linux_main_entry_t entry;
+    if (__vsh_get_exe_entry((char *)file, &entry, true) < 0) {
         if (pid != NULL) {
             *pid = -1;
         }
         return -1;
     }
-    close(fd);
+    return __vsf_linux_spawn(pid, entry, actions, attr, argv, env);
+}
 
-    return posix_spawnp(pid, fullpath, actions, attr, argv, env);
+int posix_spawn(pid_t *pid, const char *path,
+                const posix_spawn_file_actions_t *actions,
+                const posix_spawnattr_t *attr,
+                char * const argv[], char * const env[])
+{
+    vsf_linux_main_entry_t entry;
+    if (__vsh_get_exe_entry((char *)path, &entry, false) < 0) {
+        if (pid != NULL) {
+            *pid = -1;
+        }
+        return -1;
+    }
+    return __vsf_linux_spawn(pid, entry, actions, attr, argv, env);
 }
 
 int posix_spawnattr_init(posix_spawnattr_t *attr)
