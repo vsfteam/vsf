@@ -770,6 +770,21 @@ char * __vsh_fdgets(int fd, char *str, int n)
         rsize++;
         str++;
         if (VSH_ENTER_CHAR == ch) {
+#if     VSH_ENTER_CHAR == '\r'
+            if (rsize >= n - 1) {
+                break;
+            }
+            if (read(fd, &ch, 1) != 1) {
+                break;
+            }
+            if ('\n' == ch) {
+                *str = ch;
+                cur = str;
+            } else {
+                vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+                sfd->unget_buff = ch;
+            }
+#endif
             break;
         }
     }
