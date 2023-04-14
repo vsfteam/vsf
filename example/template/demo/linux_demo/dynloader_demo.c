@@ -93,6 +93,7 @@ int dynloader_main(int argc, char **argv)
             .fn_fini    = (void (*)(void *))vsf_loader_call_fini_array,
             .argc       = argc - 1,
             .argv       = argv + 1,
+            .envp       = environ,
             .vplt       = loader.generic.vplt,
         };
 

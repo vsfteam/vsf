@@ -205,6 +205,7 @@ static int __vsh_dynloader_main(int argc, char **argv)
             .fn_fini    = NULL,     // fn_fini will be called in dlclose
             .argc       = argc,
             .argv       = argv,
+            .envp       = environ,
             .vplt       = loader->loader.generic.vplt,
         };
 

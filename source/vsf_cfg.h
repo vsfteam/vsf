@@ -169,6 +169,7 @@ typedef struct vsf_applet_ctx_t {
 
     int argc;
     char **argv;
+    char **envp;
     void *vplt;
 } vsf_applet_ctx_t;
 #endif
@@ -203,7 +204,12 @@ extern void vsf_vplt_fini_array(void *target);
 #       endif
 #   endif
 
+#if VSF_APPLET_MAIN_HAS_ENVP == ENABLED
+extern int main(int, char **, char **);
+#else
 extern int main(int, char **);
+#endif
+
 extern void * vsf_vplt(void *vplt);
 #   define main(...)                                                            \
     applet_entry_with_ctx                                                       \
@@ -215,7 +221,7 @@ extern void * vsf_vplt(void *vplt);
                 return result;                                                  \
             }                                                                   \
         }                                                                       \
-        result = main(ctx->argc, ctx->argv);                                    \
+        result = ((int (*)(int, char **, char **))main)(ctx->argc, ctx->argv, ctx->envp);\
         if (applet_fini_array != NULL) {                                        \
             applet_fini_array(ctx->target);                                     \
         }                                                                       \
