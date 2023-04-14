@@ -53,7 +53,7 @@ struct __usbh_heap_t {
     vsf_dlist_t freelist[2];
 } static __usbh_heap;
 
-static vsf_dlist_t * __usbh_heap_get_freelist(uint_fast32_t size)
+static vsf_dlist_t * __usbh_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size)
 {
     return &__usbh_heap.freelist[0];
 }

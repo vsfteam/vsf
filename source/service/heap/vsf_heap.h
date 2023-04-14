@@ -113,7 +113,7 @@ typedef struct vsf_heap_statistics_t {
 
 vsf_class(vsf_heap_t) {
     protected_member(
-        vsf_dlist_t * (*get_freelist)(uint_fast32_t size);
+        vsf_dlist_t * (*get_freelist)(vsf_heap_t *heap, uint_fast32_t size);
     )
 #if VSF_HEAP_CFG_STATISTICS == ENABLED
     private_member(

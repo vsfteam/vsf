@@ -192,7 +192,7 @@ static vsf_heap_mcb_t * __vsf_heap_mcb_get_prev(vsf_heap_mcb_t *mcb)
 static bool __vsf_heap_mcb_is_allocated(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 {
     uint_fast32_t size = __vsf_heap_mcb_get_size(mcb);
-    vsf_dlist_t *freelist = heap->get_freelist(size);
+    vsf_dlist_t *freelist = heap->get_freelist(heap, size);
 
     return !vsf_dlist_is_in(vsf_heap_mcb_t, list, freelist, mcb);
 }
@@ -200,7 +200,7 @@ static bool __vsf_heap_mcb_is_allocated(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 static void __vsf_heap_mcb_remove_from_freelist(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 {
     uint_fast32_t size = __vsf_heap_mcb_get_size(mcb);
-    vsf_dlist_t *freelist = heap->get_freelist(size);
+    vsf_dlist_t *freelist = heap->get_freelist(heap, size);
 
     vsf_dlist_remove(vsf_heap_mcb_t, list, freelist, mcb);
 }
@@ -208,7 +208,7 @@ static void __vsf_heap_mcb_remove_from_freelist(vsf_heap_t *heap, vsf_heap_mcb_t
 static void __vsf_heap_mcb_add_to_freelist(vsf_heap_t *heap, vsf_heap_mcb_t *mcb)
 {
     uint_fast32_t size = __vsf_heap_mcb_get_size(mcb);
-    vsf_dlist_t *freelist = heap->get_freelist(size);
+    vsf_dlist_t *freelist = heap->get_freelist(heap, size);
 
     vsf_dlist_add_to_head(vsf_heap_mcb_t, list, freelist, mcb);
 }
@@ -406,7 +406,7 @@ void __vsf_heap_add_buffer(vsf_heap_t *heap, uint8_t *buffer, uint_fast32_t size
 
     offset <<= VSF_HEAP_CFG_MCB_ALIGN_BIT;
     vsf_dlist_add_to_tail(  vsf_heap_mcb_t, list,
-                            heap->get_freelist(offset),
+                            heap->get_freelist(heap, offset),
                             mcb);
 
 #if VSF_HEAP_CFG_STATISTICS == ENABLED
@@ -417,7 +417,7 @@ void __vsf_heap_add_buffer(vsf_heap_t *heap, uint8_t *buffer, uint_fast32_t size
 
 void * __vsf_heap_malloc_aligned(vsf_heap_t *heap, uint_fast32_t size, uint_fast32_t alignment)
 {
-    vsf_dlist_t *freelist = heap->get_freelist(size + sizeof(vsf_heap_mcb_t));
+    vsf_dlist_t *freelist = heap->get_freelist(heap, size + sizeof(vsf_heap_mcb_t));
     void *buffer;
 
     if (alignment) {
@@ -441,8 +441,11 @@ void * __vsf_heap_realloc_aligned(vsf_heap_t *heap, void *buffer, uint_fast32_t 
     vsf_heap_mcb_t *mcb;
     uint_fast32_t memory_size, mcb_size;
 
-    VSF_SERVICE_ASSERT((buffer != NULL) && (alignment >= 4) && !(alignment & (alignment - 1)));
-    VSF_SERVICE_ASSERT(!((uintptr_t)buffer & (alignment - 1)));
+    VSF_SERVICE_ASSERT(buffer != NULL);
+    if (alignment > 0) {
+        VSF_SERVICE_ASSERT((alignment >= 4) && !(alignment & (alignment - 1)));
+        VSF_SERVICE_ASSERT(!((uintptr_t)buffer & (alignment - 1)));
+    }
 
     mcb = __vsf_heap_get_mcb((uint8_t *)buffer);
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
@@ -499,7 +502,7 @@ uint_fast32_t __vsf_heap_size(vsf_heap_t *heap, void *buffer)
 
     VSF_SERVICE_ASSERT(buffer != NULL);
     mcb = __vsf_heap_get_mcb((uint8_t *)buffer);
-    VSF_SERVICE_ASSERT( __vsf_heap_mcb_is_allocated(heap, mcb)
+    VSF_SERVICE_ASSERT(__vsf_heap_mcb_is_allocated(heap, mcb)
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
         &&  mcb->magic == VSF_HEAP_MCB_MAGIC
 #endif
@@ -513,7 +516,7 @@ void __vsf_heap_free(vsf_heap_t *heap, void *buffer)
 
     VSF_SERVICE_ASSERT(buffer != NULL);
     mcb = __vsf_heap_get_mcb((uint8_t *)buffer);
-    VSF_SERVICE_ASSERT( __vsf_heap_mcb_is_allocated(heap, mcb)
+    VSF_SERVICE_ASSERT(__vsf_heap_mcb_is_allocated(heap, mcb)
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
         &&  mcb->magic == VSF_HEAP_MCB_MAGIC
 #endif
@@ -547,9 +550,10 @@ vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist
 
 #if VSF_ARCH_PROVIDE_HEAP != ENABLED
 // MUST NOT return NULL;
-static vsf_dlist_t * __vsf_heap_get_freelist(uint_fast32_t size)
+static vsf_dlist_t * __vsf_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size)
 {
-    return vsf_heap_get_freelist(&__vsf_heap.freelist[0], VSF_HEAP_CFG_FREELIST_NUM, size);
+    vsf_default_heap_t *defheap = container_of(heap, vsf_default_heap_t, use_as__vsf_heap_t);
+    return vsf_heap_get_freelist(&defheap->freelist[0], VSF_HEAP_CFG_FREELIST_NUM, size);
 }
 
 void vsf_heap_init(void)
