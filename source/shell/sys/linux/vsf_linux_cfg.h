@@ -73,6 +73,10 @@
 #   endif
 #endif
 
+#ifndef VSF_LINUX_CFG_ATEXIT_NUM
+#   define VSF_LINUX_CFG_ATEXIT_NUM             32
+#endif
+
 #ifndef VSF_LINUX_CFG_HOSTNAME
 #   define VSF_LINUX_CFG_HOSTNAME               "vsf"
 #endif

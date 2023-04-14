@@ -263,7 +263,11 @@ int atexit(void (*func)(void))
     if (vsf_linux_is_inited()) {
         vsf_linux_process_t *process = vsf_linux_get_cur_process();
         VSF_LINUX_ASSERT(process != NULL);
-        process->fn_atexit = func;
+
+        if (process->fn_atexit_num >= dimof(process->fn_atexit)) {
+            return -1;
+        }
+        process->fn_atexit[process->fn_atexit_num++] = func;
     }
     return 0;
 }

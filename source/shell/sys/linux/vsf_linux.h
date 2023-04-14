@@ -270,7 +270,8 @@ vsf_class(vsf_linux_process_t) {
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
         vsf_linux_heap_monitor_t heap_monitor;
 #endif
-        void (*fn_atexit)(void);
+        int fn_atexit_num;
+        void (*fn_atexit[VSF_LINUX_CFG_ATEXIT_NUM])(void);
     )
 
     private_member(

@@ -1042,8 +1042,10 @@ void vsf_linux_exit_process(int status)
     vsf_unprotect_sched(orig);
 
     // 2. call atexit, some resources maybe freed by user
-    if (process->fn_atexit != NULL) {
-        process->fn_atexit();
+    for (int i = 0; i < process->fn_atexit_num; i++) {
+        if (process->fn_atexit[i] != NULL) {
+            process->fn_atexit[i]();
+        }
     }
 
     // 3. wait child threads and processes
