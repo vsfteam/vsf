@@ -8,7 +8,11 @@
 extern "C" {
 #endif
 
-#define assert              VSF_ASSERT
+#ifdef NDEBUG
+#   define assert(...)          ((void)0)
+#else
+#   define assert               VSF_ASSERT
+#endif
 
 #ifdef __cplusplus
 }

@@ -197,6 +197,17 @@ VSF_LINUX_APPLET_SYS_STAT_IMP(mkfifoat, int, int dirfd, const char *pathname, mo
 
 mode_t umask(mode_t mask);
 int stat(const char *pathname, struct stat *buf);
+int fstat(int fd, struct stat *buf);
+int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
+int futimens(int fd, const struct timespec times[2]);
+int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags);
+int chmod(const char *pathname, mode_t mode);
+int fchmod(int fd, mode_t mode);
+int mkfifo(const char *pathname, mode_t mode);
+int mkfifoat(int dirfd, const char *pathname, mode_t mode);
+
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT
+
 static inline int stat64(const char *pathname, struct stat64 *buf)
 {
     return stat(pathname, (struct stat *)buf);
@@ -209,20 +220,10 @@ static inline int lstat64(const char *pathname, struct stat64 *buf)
 {
     return stat(pathname, (struct stat *)buf);
 }
-int fstat(int fd, struct stat *buf);
 static inline int fstat64(int fd, struct stat64 *buf)
 {
     return fstat(fd, (struct stat *)buf);
 }
-int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
-int futimens(int fd, const struct timespec times[2]);
-int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags);
-int chmod(const char *pathname, mode_t mode);
-int fchmod(int fd, mode_t mode);
-int mkfifo(const char *pathname, mode_t mode);
-int mkfifoat(int dirfd, const char *pathname, mode_t mode);
-
-#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT
 
 #ifdef __cplusplus
 }
