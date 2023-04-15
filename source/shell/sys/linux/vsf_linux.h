@@ -327,6 +327,10 @@ typedef struct vsf_linux_fundmental_vplt_t {
 #endif
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_get_cur_process);
+
+#if VSF_USE_TRACE == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_trace_arg);
+#endif
 } vsf_linux_fundmental_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt;
@@ -360,6 +364,12 @@ VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_get_cur_process, vsf_linux_process_t *
     return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_get_cur_process)();
 }
 
+#if VSF_USE_TRACE == ENABLED
+VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_trace_arg, void, vsf_trace_level_t level, const char *format, va_list arg) {
+    ((__vsf_trace_arg_prototype_t)((VSF_LINUX_APPLET_FUNDMENTAL_VPLT)->fn_vsf_trace_arg.ptr))(level, format, arg);
+}
+#endif
+
 #else
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
@@ -369,6 +379,18 @@ extern void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod);
 // open vsf_linux_get_cur_process for process-related variables like optarg, etc
 extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
 
+#endif
+
+// linux trace
+#if VSF_USE_TRACE == ENABLED
+static void vsf_linux_trace(vsf_trace_level_t level, const char *format, ...)
+{
+    va_list ap;
+
+    va_start(ap, format);
+    vsf_trace_arg(level, format, ap);
+    va_end(ap);
+}
 #endif
 
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities

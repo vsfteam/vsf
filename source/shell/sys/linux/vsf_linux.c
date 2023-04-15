@@ -3275,7 +3275,13 @@ struct passwd * getpwnam(const char *name)
 __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_fundmental_vplt_t, 0, 0, true),
 
+#if VSF_LINUX_CFG_PLS_NUM > 0
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_dynlib_ctx),
+#endif
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_get_cur_process),
+#if VSF_USE_TRACE == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_trace_arg),
+#endif
 };
 #endif
 

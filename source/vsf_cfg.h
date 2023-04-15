@@ -133,8 +133,14 @@ typedef struct vsf_vplt_entry_t {
     }
 #define VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__NAME)                                  \
     vsf_vplt_entry_t fn_##__NAME
-#define VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(__VPLT, __NAME)                        \
+#if VSF_APPLET_CFG_DEBUG_VPLT == ENABLED
+#   define VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(__VPLT, __NAME)                     \
+    vsf_linux_trace(VSF_TRACE_DEBUG, "call vplt API: %s\n", #__NAME);           \
     ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
+#else
+#   define VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(__VPLT, __NAME)                     \
+    ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
+#endif
 #define VSF_APPLET_VPLT_ENTRY_FUNC_IMP(__VPLT, __NAME, __RET, ...)              \
     typedef __RET (*__##__NAME##_prototype_t)(__VA_ARGS__);                     \
     static inline __RET __NAME(__VA_ARGS__)
