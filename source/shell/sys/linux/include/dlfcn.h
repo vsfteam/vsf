@@ -29,7 +29,10 @@ extern "C" {
 typedef struct vsf_linux_dlfcn_vplt_t {
     vsf_vplt_info_t info;
 
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dlopen);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dlclose);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dlsym);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dlerror);
 } vsf_linux_dlfcn_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_dlfcn_vplt_t vsf_linux_dlfcn_vplt;
@@ -53,8 +56,17 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_dlfcn_vplt_t vsf_linux_dlfcn_vplt;
 #define VSF_LINUX_APPLET_DLFCN_IMP(...)                                         \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_DLFCN_VPLT, __VA_ARGS__)
 
+VSF_LINUX_APPLET_DLFCN_IMP(dlopen, void *, const char *pathname, int mode) {
+    return VSF_LINUX_APPLET_DLFCN_ENTRY(dlopen)(pathname, mode);
+}
+VSF_LINUX_APPLET_DLFCN_IMP(dlclose, int, void *handle) {
+    return VSF_LINUX_APPLET_DLFCN_ENTRY(dlclose)(handle);
+}
 VSF_LINUX_APPLET_DLFCN_IMP(dlsym, void *, void *handle, const char *name) {
     return VSF_LINUX_APPLET_DLFCN_ENTRY(dlsym)(handle, name);
+}
+VSF_LINUX_APPLET_DLFCN_IMP(dlerror, char *, void) {
+    return VSF_LINUX_APPLET_DLFCN_ENTRY(dlerror)();
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_DLFCN

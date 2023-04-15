@@ -60,6 +60,11 @@ char * __strdup_ex(vsf_linux_process_t *process, const char *str)
 }
 #endif
 
+void * mempcpy(void *dest, const void *src, size_t len)
+{
+    return memcpy(dest, src, len) + len;
+}
+
 size_t strscpy(char *dest, const char *src, size_t n)
 {
     size_t srclen = strlen(src);
@@ -120,8 +125,19 @@ void * memrchr(const void *str, int ch, size_t len)
 
 char * stpcpy(char *dest, const char *src)
 {
-  size_t len = strlen(src);
-  return memcpy(dest, src, len + 1) + len;
+    size_t len = strlen(src);
+    return memcpy(dest, src, len + 1) + len;
+}
+
+char *stpncpy(char *dest, const char *src, size_t n)
+{
+    size_t size = strnlen(src, n);
+    memcpy(dest, src, size);
+    dest += size;
+    if (size == n) {
+        return dest;
+    }
+    return memset(dest, '\0', n - size);
 }
 
 char * strerror(int errnum)
@@ -173,6 +189,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(strcpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(stpcpy),
+    VSF_APPLET_VPLT_ENTRY_FUNC(stpncpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcat),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncat),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcoll),
@@ -185,6 +202,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(strcasecmp),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncasecmp),
     VSF_APPLET_VPLT_ENTRY_FUNC(memcpy),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mempcpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strlcpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strstr),
     VSF_APPLET_VPLT_ENTRY_FUNC(strchr),

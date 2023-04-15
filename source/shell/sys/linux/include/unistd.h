@@ -303,6 +303,8 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getentropy);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(lseek64);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ttyname);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ttyname_r);
 } vsf_linux_unistd_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt;
@@ -542,6 +544,12 @@ VSF_LINUX_APPLET_UNISTD_IMP(getentropy, int, void *buffer, size_t length) {
 VSF_LINUX_APPLET_UNISTD_IMP(lseek64, off64_t, int fd, off64_t offset, int whence) {
     return VSF_LINUX_APPLET_UNISTD_ENTRY(lseek64)(fd, offset, whence);
 }
+VSF_LINUX_APPLET_UNISTD_IMP(ttyname, char *, int fd) {
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(ttyname)(fd);
+}
+VSF_LINUX_APPLET_UNISTD_IMP(ttyname_r, int, int fd, char *buf, size_t buflen) {
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(ttyname_r)(fd, buf, buflen);
+}
 
 static inline exec_ret_t execl(const char *pathname, const char *arg, ...) {
     exec_ret_t ret;
@@ -635,7 +643,7 @@ int fsync(int fd);
 int fdatasync(int fd);
 
 int isatty(int fd);
-char *ttyname(int fd);
+char * ttyname(int fd);
 int ttyname_r(int fd, char *buf, size_t buflen);
 size_t getpagesize(void);
 int symlink(const char *target, const char *linkpath);

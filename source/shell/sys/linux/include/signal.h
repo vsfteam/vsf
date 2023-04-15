@@ -186,6 +186,13 @@ static inline int sigtestsetmask(sigset_t *set, unsigned long mask)
 #if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED
 typedef struct vsf_linux_signal_vplt_t {
     vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(kill);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sigprocmask);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(signal);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sigaction);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(raise);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_sigmask);
 } vsf_linux_signal_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt;
@@ -208,6 +215,25 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SIGNAL_VPLT, __NAME)
 #define VSF_LINUX_APPLET_SIGNAL_IMP(...)                                        \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SIGNAL_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SIGNAL_IMP(kill, int, pid_t pid, int sig) {
+    return VSF_LINUX_APPLET_SIGNAL_ENTRY(kill)(pid, sig);
+}
+VSF_LINUX_APPLET_SIGNAL_IMP(sigprocmask, int, int how, const sigset_t *set, sigset_t *oldset) {
+    return VSF_LINUX_APPLET_SIGNAL_ENTRY(sigprocmask)(how, set, oldset);
+}
+VSF_LINUX_APPLET_SIGNAL_IMP(signal, sighandler_t, int signum, sighandler_t handler) {
+    return VSF_LINUX_APPLET_SIGNAL_ENTRY(signal)(signum, handler);
+}
+VSF_LINUX_APPLET_SIGNAL_IMP(sigaction, int, int signum, const struct sigaction *act, struct sigaction *oldact) {
+    return VSF_LINUX_APPLET_SIGNAL_ENTRY(sigaction)(signum, act, oldact);
+}
+VSF_LINUX_APPLET_SIGNAL_IMP(raise, int, int sig) {
+    return VSF_LINUX_APPLET_SIGNAL_ENTRY(raise)(sig);
+}
+VSF_LINUX_APPLET_SIGNAL_IMP(pthread_sigmask, int, int how, const sigset_t *set, sigset_t *oldset) {
+    return VSF_LINUX_APPLET_SIGNAL_ENTRY(pthread_sigmask)(how, set, oldset);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SIGNAL
 

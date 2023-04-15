@@ -217,6 +217,9 @@ typedef struct vsf_linux_libc_stdio_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setbuffer);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setlinebuf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setvbuf);
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tmpfile);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tmpnam);
 } vsf_linux_libc_stdio_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt;
@@ -399,6 +402,12 @@ VSF_LINUX_APPLET_LIBC_STDIO_IMP(vsnscanf, int, const char *str, size_t size, con
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(remove, int, const char *filename) {
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(remove)(filename);
 }
+VSF_LINUX_APPLET_LIBC_STDIO_IMP(tmpfile, FILE *, void) {
+    return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(tmpfile)();
+}
+VSF_LINUX_APPLET_LIBC_STDIO_IMP(tmpnam, char *, char *str) {
+    return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(tmpnam)(str);
+}
 
 static inline int scanf(const char *format, ...) {
     int result;
@@ -541,10 +550,10 @@ int snscanf(const char *str, size_t size, const char *format, ...);
 int sscanf(const char *str, const char *format, ...);
 
 int remove(const char *filename);
-#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDIO
 
 FILE * tmpfile(void);
 char * tmpnam(char *str);
+#endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDIO
 
 #if defined(_GNU_SOURCE)
 ssize_t getline(char **lineptr, size_t *n, FILE *f);

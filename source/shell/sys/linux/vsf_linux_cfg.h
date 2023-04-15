@@ -146,6 +146,12 @@
 #   ifndef VSF_LINUX_USE_SIMPLE_CTYPE
 #       define VSF_LINUX_USE_SIMPLE_CTYPE       ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_SCHED
+#       define VSF_LINUX_APPLET_USE_SCHED       ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SPAWN
+#       define VSF_LINUX_APPLET_USE_SPAWN       ENABLED
+#   endif
 
 #   if VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
 #       ifndef VSF_LINUX_LIBC_USE_ENVIRON
@@ -175,6 +181,9 @@
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_MNTENT
 #       define VSF_LINUX_APPLET_USE_MNTENT      ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SIGNAL
+#       define VSF_LINUX_APPLET_USE_SIGNAL      ENABLED
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_SYS_EPOLL

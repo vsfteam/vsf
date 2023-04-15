@@ -37,6 +37,14 @@ struct sched_param {
 #if VSF_LINUX_APPLET_USE_SCHED == ENABLED
 typedef struct vsf_linux_sched_vplt_t {
     vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_get_priority_max);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_get_priority_min);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_getparam);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_getscheduler);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_setparam);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_setscheduler);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_yield);
 } vsf_linux_sched_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sched_vplt_t vsf_linux_sched_vplt;
@@ -59,6 +67,28 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sched_vplt_t vsf_linux_sched_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SCHED_VPLT, __NAME)
 #define VSF_LINUX_APPLET_SCHED_IMP(...)                                         \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SCHED_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SCHED_IMP(sched_get_priority_max, int, int policy) {
+    return VSF_LINUX_APPLET_SCHED_ENTRY(sched_get_priority_max)(policy);
+}
+VSF_LINUX_APPLET_SCHED_IMP(sched_get_priority_min, int, int policy) {
+    return VSF_LINUX_APPLET_SCHED_ENTRY(sched_get_priority_min)(policy);
+}
+VSF_LINUX_APPLET_SCHED_IMP(sched_getparam, int, pid_t pid, struct sched_param *param) {
+    return VSF_LINUX_APPLET_SCHED_ENTRY(sched_getparam)(pid, param);
+}
+VSF_LINUX_APPLET_SCHED_IMP(sched_getscheduler, int, pid_t pid) {
+    return VSF_LINUX_APPLET_SCHED_ENTRY(sched_getscheduler)(pid);
+}
+VSF_LINUX_APPLET_SCHED_IMP(sched_setparam, int, pid_t pid, const struct sched_param *param) {
+    return VSF_LINUX_APPLET_SCHED_ENTRY(sched_setparam)(pid, param);
+}
+VSF_LINUX_APPLET_SCHED_IMP(sched_setscheduler, int, pid_t pid, int policy, const struct sched_param *param) {
+    return VSF_LINUX_APPLET_SCHED_ENTRY(sched_setscheduler)(pid, policy, param);
+}
+VSF_LINUX_APPLET_SCHED_IMP(sched_yield, int, void) {
+    return VSF_LINUX_APPLET_SCHED_ENTRY(sched_yield)();
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SCHED
 

@@ -42,6 +42,7 @@ typedef struct vsf_linux_libc_string_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strncpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(stpcpy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(stpncpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strncat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcoll);
@@ -54,6 +55,7 @@ typedef struct vsf_linux_libc_string_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcasecmp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strncasecmp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memcpy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mempcpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strlcpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strstr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strchr);
@@ -114,11 +116,14 @@ VSF_LINUX_APPLET_LIBC_STRING_IMP(strdup, char *, const char *str) {
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcpy, char *, char *dest, const char *src) {
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcpy)(dest, src);
 }
+VSF_LINUX_APPLET_LIBC_STRING_IMP(strncpy, char *, char *dest, const char *src, size_t n) {
+    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strncpy)(dest, src, n);
+}
 VSF_LINUX_APPLET_LIBC_STRING_IMP(stpcpy, char *, char *dest, const char *src) {
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(stpcpy)(dest, src);
 }
-VSF_LINUX_APPLET_LIBC_STRING_IMP(strncpy, char *, char *dest, const char *src, size_t n) {
-    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strncpy)(dest, src, n);
+VSF_LINUX_APPLET_LIBC_STRING_IMP(stpncpy, char *, char *dest, const char *src, size_t n) {
+    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(stpncpy)(dest, src, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcat, char *, char *dest, const char *src) {
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcat)(dest, src);
@@ -155,6 +160,9 @@ VSF_LINUX_APPLET_LIBC_STRING_IMP(strncasecmp, int, const char *str1, const char 
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(memcpy, void *, void *dest, const void *src, size_t n) {
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(memcpy)(dest, src, n);
+}
+VSF_LINUX_APPLET_LIBC_STRING_IMP(mempcpy, void *, void *dest, const void *src, size_t n) {
+    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(mempcpy)(dest, src, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strlcpy, size_t, char *dest, const char *src, size_t n) {
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strlcpy)(dest, src, n);
@@ -211,6 +219,7 @@ char * strcpy(char *dest, const char *src);
 char * strncpy(char *dest, const char *src, size_t n);
 size_t strscpy(char *dest, const char *src, size_t n);
 char * stpcpy(char *dest, const char *src);
+char * stpncpy(char *dest, const char *src, size_t n);
 char * strcat(char *dest, const char *src);
 char * strncat(char *dest, const char *str, size_t n);
 int strcoll(const char *str1, const char *str2);
@@ -255,6 +264,7 @@ int strncasecmp(const char *str1, const char *str2, size_t n);
 void * memcpy(void *dest, const void *src, size_t n);
 size_t strlcpy(char *dest, const char *src, size_t n);
 #endif
+void * mempcpy(void *dest, const void *src, size_t n);
 
 _CONST_RETURN char * strstr(const char *str1, const char *str2);
 _CONST_RETURN char * strchr(const char *str, int c);

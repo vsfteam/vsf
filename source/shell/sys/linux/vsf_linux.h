@@ -318,6 +318,59 @@ vsf_class(vsf_linux_process_t) {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#if VSF_LINUX_USE_APPLET == ENABLED
+typedef struct vsf_linux_fundmental_vplt_t {
+    vsf_vplt_info_t info;
+
+#if VSF_LINUX_CFG_PLS_NUM > 0
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_dynlib_ctx);
+#endif
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_get_cur_process);
+} vsf_linux_fundmental_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_USE_APPLET == ENABLED
+
+#ifndef VSF_LINUX_APPLET_FUNDMENTAL_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_FUNDMENTAL_VPLT                                \
+            ((vsf_linux_fundmental_vplt_t *)(VSF_LINUX_APPLET_VPLT->fundmental_vplt))
+#   else
+#       define VSF_LINUX_APPLET_FUNDMENTAL_VPLT                                \
+            ((vsf_linux_fundmental_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#define VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(__NAME)                               \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_FUNDMENTAL_VPLT, __NAME)
+#define VSF_LINUX_APPLET_FUNDMENTAL_IMP(...)                                   \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_FUNDMENTAL_VPLT, __VA_ARGS__)
+
+#if VSF_LINUX_CFG_PLS_NUM > 0
+VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_dynlib_ctx, void *, const vsf_linux_dynlib_mod_t *mod) {
+    return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_dynlib_ctx)(mod);
+}
+#endif
+
+VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_get_cur_process, vsf_linux_process_t *, void) {
+    return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_get_cur_process)();
+}
+
+#else
+
+#if VSF_LINUX_CFG_PLS_NUM > 0
+extern void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod);
+#endif
+
+// open vsf_linux_get_cur_process for process-related variables like optarg, etc
+extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
+
+#endif
+
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 
@@ -364,7 +417,6 @@ extern vsf_err_t vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*dest
 extern void * vsf_linux_library_ctx(int lib_idx);
 
 extern vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int bss_size);
-extern void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod);
 #endif
 
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
@@ -438,9 +490,6 @@ extern int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig);
 
 // open vsf_linux_get_cur_thread for thread-related variables like errno, etc
 extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);
-
-// open vsf_linux_get_cur_process for process-related variables like optarg, etc
-extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
 
 extern int vsf_linux_get_errno(void);
 extern void vsf_linux_set_errno(int err);
