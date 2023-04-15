@@ -889,6 +889,10 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(snscanf),
     VSF_APPLET_VPLT_ENTRY_FUNC(sscanf),
     VSF_APPLET_VPLT_ENTRY_FUNC(remove),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setbuf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setbuffer),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setlinebuf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setvbuf),
     VSF_APPLET_VPLT_ENTRY_FUNC(tmpfile),
     VSF_APPLET_VPLT_ENTRY_FUNC(tmpnam),
 };

@@ -1228,6 +1228,11 @@ end_no_return:
     vsf_thread_exit();
 }
 
+void _exit(int status)
+{
+    vsf_linux_exit_process(status, true);
+}
+
 void vsf_linux_set_process_reg(uintptr_t reg)
 {
 #if VSF_ARCH_USE_THREAD_REG == ENABLED
@@ -3492,6 +3497,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(getentropy),
     VSF_APPLET_VPLT_ENTRY_FUNC(ttyname),
     VSF_APPLET_VPLT_ENTRY_FUNC(ttyname_r),
+    VSF_APPLET_VPLT_ENTRY_FUNC(_exit),
 };
 #endif
 

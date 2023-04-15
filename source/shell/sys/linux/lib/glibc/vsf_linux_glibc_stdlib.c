@@ -240,7 +240,7 @@ int atexit(void (*func)(void))
     return 0;
 }
 
-void _exit(int status)
+void _Exit(int status)
 {
     vsf_linux_exit_process(status, true);
 }
@@ -818,7 +818,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
 
     VSF_APPLET_VPLT_ENTRY_FUNC(exit),
     VSF_APPLET_VPLT_ENTRY_FUNC(atexit),
-    VSF_APPLET_VPLT_ENTRY_FUNC(_exit),
+    VSF_APPLET_VPLT_ENTRY_FUNC(_Exit),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(abs),
     VSF_APPLET_VPLT_ENTRY_FUNC(labs),

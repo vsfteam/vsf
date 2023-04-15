@@ -112,6 +112,8 @@ extern "C" {
 #   define fsync            VSF_LINUX_WRAPPER(fsync)
 #   define fdatasync        VSF_LINUX_WRAPPER(fdatasync)
 #endif
+#elif defined(__WIN__) && !defined(__VSF_APPLET__)
+#define _exit               VSF_LINUX_WRAPPER(_exit)
 #endif
 
 // syscalls
@@ -305,6 +307,7 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(lseek64);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ttyname);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ttyname_r);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(_exit);
 } vsf_linux_unistd_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt;
@@ -624,6 +627,10 @@ VSF_LINUX_APPLET_UNISTD_IMP(ttyname_r, int, int fd, char *buf, size_t buflen) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(ttyname_r)(fd, buf, buflen);
 }
+VSF_LINUX_APPLET_UNISTD_IMP(_exit, void, int status) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(_exit)(status);
+}
 
 static inline exec_ret_t execl(const char *pathname, const char *arg, ...) {
     exec_ret_t ret;
@@ -677,6 +684,7 @@ exec_ret_t execvpe(const char *file, char * const * argv, char * const * envp);
 int daemon(int nochdir, int noclose);
 
 pid_t fork(void);
+void _exit(int status);
 long sysconf(int name);
 long pathconf(const char *path, int name);
 long fpathconf(int fd, int name);
