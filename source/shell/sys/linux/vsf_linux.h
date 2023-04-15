@@ -254,6 +254,7 @@ vsf_class(vsf_linux_process_t) {
         uintptr_t reg;
 #endif
         int status;
+        int exit_status;
         vsf_linux_process_t *shell_process;
         // thread pending child process
         vsf_linux_thread_t *thread_pending_child;

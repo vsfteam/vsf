@@ -1157,13 +1157,13 @@ void vsf_linux_exit_process(int status, bool _exit)
         process->thread_pending_exit = cur_thread;
 
     // WIFEXITED
-        process->status = status << 8;
+        process->exit_status = status << 8;
     // 1. dequeue cur_thread and wait all other threads
         vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, cur_thread);
     vsf_unprotect_sched(orig);
 
     // 2. call atexit, some resources maybe freed by user
-    if (_exit) {
+    if (!_exit) {
         for (int i = 0; i < process->fn_atexit_num; i++) {
             if (process->fn_atexit[i] != NULL) {
                 process->fn_atexit[i]();
@@ -1206,7 +1206,7 @@ void vsf_linux_exit_process(int status, bool _exit)
     process->status &= ~PID_STATUS_RUNNING;
     if (process->thread_pending != NULL) {
         vsf_unprotect_sched(orig);
-        process->thread_pending->retval = process->status;
+        process->thread_pending->retval = process->exit_status;
         vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
     } else {
         vsf_linux_process_t *parent_process = process->parent_process;
@@ -1214,7 +1214,7 @@ void vsf_linux_exit_process(int status, bool _exit)
             vsf_linux_thread_t *thread_pending = parent_process->thread_pending_child;
             parent_process->thread_pending_child = NULL;
             vsf_unprotect_sched(orig);
-            thread_pending->retval = process->status;
+            thread_pending->retval = process->exit_status;
             thread_pending->pid_exited = process->id.pid;
             vsf_eda_post_evt(&thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
         } else {
@@ -1223,6 +1223,9 @@ void vsf_linux_exit_process(int status, bool _exit)
     }
 
     // 7. exit current thread
+    if (PID_STATUS_DAEMON == process->status) {
+        vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+    }
     cur_thread->process = NULL;
 end_no_return:
     vsf_thread_exit();
@@ -1579,9 +1582,10 @@ int daemon(int nochdir, int noclose)
     vsf_protect_t orig = vsf_protect_sched();
         process->status = PID_STATUS_DAEMON;
         thread_pending = process->thread_pending;
+        process->thread_pending = NULL;
     vsf_unprotect_sched(orig);
     if (thread_pending != NULL) {
-        thread_pending->retval = process->status;
+        thread_pending->retval = process->exit_status;
         vsf_eda_post_evt(&thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
     }
     return 0;
@@ -1950,6 +1954,7 @@ pid_t wait(int *status)
     }
     vsf_linux_process_t *process = vsf_linux_get_process(cur_thread->pid_exited);
     vsf_linux_detach_process(process);
+    vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
     vsf_linux_free_res(process);
     return cur_thread->pid_exited;
 }
@@ -1981,7 +1986,7 @@ pid_t waitpid(pid_t pid, int *status, int options)
         vsf_thread_wfe(VSF_EVT_USER);
         orig = vsf_protect_sched();
     } else {
-        cur_thread->retval = process->status;
+        cur_thread->retval = process->exit_status;
     }
     is_daemon = process->status == PID_STATUS_DAEMON;
     if (!is_daemon) {
