@@ -185,6 +185,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_SIGNAL
 #       define VSF_LINUX_APPLET_USE_SIGNAL      ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_PWD
+#       define VSF_LINUX_APPLET_USE_PWD         ENABLED
+#   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_SYS_EPOLL
 #       define VSF_LINUX_APPLET_USE_SYS_EPOLL   ENABLED
@@ -271,9 +274,6 @@
 
 #   if !defined(VSF_LINUX_APPLET_USE_LIBUSB) && VSF_LINUX_USE_LIBUSB == ENABLED
 #       define VSF_LINUX_APPLET_USE_LIBUSB      ENABLED
-#   endif
-#   ifndef VSF_LINUX_APPLET_USE_LIBGETOPT
-#       define VSF_LINUX_APPLET_USE_LIBGETOPT   ENABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_LIBGEN
 #       define VSF_LINUX_APPLET_USE_LIBGEN      ENABLED
@@ -382,7 +382,7 @@ typedef struct vsf_linux_vplt_t {
     void *dlfcn_vplt;
     void *glob_vplt;
     void *mntent_vplt;
-    void *res2_vplt;
+    void *pwd_vplt;
     void *res3_vplt;
     void *res4_vplt;
     void *res5_vplt;
@@ -392,7 +392,6 @@ typedef struct vsf_linux_vplt_t {
     // libraries
     void *libusb_vplt;
     void *libgen_vplt;
-    void *libgetopt_vplt;
     void *libsdl2_vplt;
     void *libncurses_vplt;
     void *libcurl_vplt;

@@ -197,7 +197,7 @@ typedef struct vsf_linux_process_heap_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const struct passwd __vsf_default_passwd = {
+static const struct passwd __vsf_linux_default_passwd = {
     .pw_name            = "vsf",
     .pw_passwd          = "vsf",
     .pw_uid             = (uid_t)0,
@@ -1139,7 +1139,7 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
     }
 }
 
-void vsf_linux_exit_process(int status)
+void vsf_linux_exit_process(int status, bool _exit)
 {
     vsf_linux_thread_t *thread2wait;
     vsf_linux_process_t *process2wait;
@@ -1163,9 +1163,11 @@ void vsf_linux_exit_process(int status)
     vsf_unprotect_sched(orig);
 
     // 2. call atexit, some resources maybe freed by user
-    for (int i = 0; i < process->fn_atexit_num; i++) {
-        if (process->fn_atexit[i] != NULL) {
-            process->fn_atexit[i]();
+    if (_exit) {
+        for (int i = 0; i < process->fn_atexit_num; i++) {
+            if (process->fn_atexit[i] != NULL) {
+                process->fn_atexit[i]();
+            }
         }
     }
 
@@ -1466,7 +1468,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     VSF_LINUX_ASSERT(ctx->entry != NULL);
     thread->retval = ((int (*)(int, char **, char **))ctx->entry)(arg.argc, (char **)arg.argv, process->__environ);
 
-    vsf_linux_exit_process(thread->retval);
+    vsf_linux_exit_process(thread->retval, false);
 }
 
 void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
@@ -3256,6 +3258,18 @@ char * dlerror(void)
     return "known";
 }
 
+// pwd
+
+struct passwd * getpwuid(uid_t uid)
+{
+    return (struct passwd *)&__vsf_linux_default_passwd;
+}
+
+struct passwd * getpwnam(const char *name)
+{
+    return (struct passwd *)&__vsf_linux_default_passwd;
+}
+
 // vplt
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt = {
@@ -3384,6 +3398,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_dlfcn_vplt_t vsf_linux_dlfcn_vplt = {
 };
 #endif
 
+#if VSF_LINUX_APPLET_USE_PWD == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_pwd_vplt_t vsf_linux_pwd_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_pwd_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(getpwuid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getpwnam),
+};
+#endif
+
 #if VSF_LINUX_APPLET_USE_UNISTD == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_unistd_vplt_t, 0, 0, true),
@@ -3504,9 +3527,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
 #       include "./include/arpa/inet.h"
 #   endif
-#   if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
-#       include "./include/getopt.h"
-#   endif
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 #       include "./include/libgen.h"
 #   endif
@@ -3557,9 +3577,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
 #       include <arpa/inet.h>
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
-#       include <getopt.h>
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 #       include <libgen.h>
@@ -3689,12 +3706,12 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED
     .netdb_vplt         = (void *)&vsf_linux_netdb_vplt,
 #   endif
+#   if VSF_LINUX_APPLET_USE_PWD == ENABLED
+    .pwd_vplt           = (void *)&vsf_linux_pwd_vplt,
+#   endif
 
 #   if VSF_LINUX_USE_LIBUSB == ENABLED && VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
     .libusb_vplt        = (void *)&vsf_linux_libusb_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBGETOPT == ENABLED
-    .libgetopt_vplt     = (void *)&vsf_linux_libgetopt_vplt,
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
     .libgen_vplt        = (void *)&vsf_linux_libgen_vplt,

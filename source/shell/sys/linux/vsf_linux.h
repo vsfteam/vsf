@@ -456,7 +456,7 @@ extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_s
 // delete unstarted/existed process
 extern void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
-extern void vsf_linux_exit_process(int status);
+extern void vsf_linux_exit_process(int status, bool _exit);
 extern void vsf_linux_set_process_reg(uintptr_t reg);
 
 extern void vsf_linux_cleanup_process(vsf_linux_process_t *process);

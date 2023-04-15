@@ -222,7 +222,7 @@ void * calloc(size_t n, size_t size)
 
 void exit(int status)
 {
-    vsf_linux_exit_process(status);
+    vsf_linux_exit_process(status, false);
 }
 
 int atexit(void (*func)(void))
@@ -238,6 +238,11 @@ int atexit(void (*func)(void))
         process->fn_atexit[process->fn_atexit_num++] = func;
     }
     return 0;
+}
+
+void _exit(int status)
+{
+    vsf_linux_exit_process(status, true);
 }
 
 int system(const char * cmd)
@@ -813,6 +818,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
 
     VSF_APPLET_VPLT_ENTRY_FUNC(exit),
     VSF_APPLET_VPLT_ENTRY_FUNC(atexit),
+    VSF_APPLET_VPLT_ENTRY_FUNC(_exit),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(abs),
     VSF_APPLET_VPLT_ENTRY_FUNC(labs),

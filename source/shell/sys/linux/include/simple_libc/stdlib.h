@@ -25,6 +25,7 @@ extern "C" {
 #define malloc_usable_size  VSF_LINUX_LIBC_WRAPPER(malloc_usable_size)
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
+#define _exit               VSF_LINUX_LIBC_WRAPPER(_exit)
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
 #   if VSF_LINUX_LIBC_USE_ENVIRON
 #define getenv              VSF_LINUX_LIBC_WRAPPER(getenv)
@@ -43,6 +44,7 @@ extern "C" {
 // avoid conflicts with APIs in ucrt
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
 #define atexit              VSF_LINUX_LIBC_WRAPPER(atexit)
+#define _exit               VSF_LINUX_LIBC_WRAPPER(_exit)
 #define getenv              VSF_LINUX_LIBC_WRAPPER(getenv)
 // system("chcp 65001"); will be called in debug_stream driver, wrapper here
 #define system              VSF_LINUX_LIBC_WRAPPER(system)
@@ -129,6 +131,7 @@ typedef struct vsf_linux_libc_stdlib_vplt_t {
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(exit);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(atexit);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(_exit);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(abs);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(labs);
@@ -294,6 +297,9 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(exit, void, int status) {
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atexit, int, void (*func)(void)) {
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atexit)(func);
 }
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(_exit, void, int status) {
+    VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(_exit)(status);
+}
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(abs, int, int j) {
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(abs)(j);
 }
@@ -369,6 +375,7 @@ int system(const char *command);
 
 void exit(int status);
 int atexit(void (*func)(void));
+void _exit(int status);
 
 int abs(int j);
 long labs(long j);

@@ -13,9 +13,6 @@
 extern "C" {
 #endif
 
-#define getpwuid(__uid)     ((struct passwd *)&__vsf_default_passwd)
-#define getpwnam(__name)    ((struct passwd *)&__vsf_default_passwd)
-
 struct passwd {
     char *pw_name;
     char *pw_passwd;
@@ -26,7 +23,48 @@ struct passwd {
     char *pw_shell;
 };
 
-extern const struct passwd __vsf_default_passwd;
+#if VSF_LINUX_APPLET_USE_PWD == ENABLED
+typedef struct vsf_linux_pwd_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getpwuid);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getpwnam);
+} vsf_linux_pwd_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_pwd_vplt_t vsf_linux_pwd_vplt;
+#   endif
+#endif
+
+#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_PWD == ENABLED
+
+#ifndef VSF_LINUX_APPLET_PWD_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_PWD_VPLT                                        \
+            ((vsf_linux_pwd_vplt_t *)(VSF_LINUX_APPLET_VPLT->pwd_vplt))
+#   else
+#       define VSF_LINUX_APPLET_PWD_VPLT                                        \
+            ((vsf_linux_pwd_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#define VSF_LINUX_APPLET_PWD_ENTRY(__NAME)                                      \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_PWD_VPLT, __NAME)
+#define VSF_LINUX_APPLET_PWD_IMP(...)                                           \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_PWD_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_PWD_IMP(getpwuid, struct passwd *, uid_t uid) {
+    return VSF_LINUX_APPLET_PWD_ENTRY(getpwuid)(uid);
+}
+VSF_LINUX_APPLET_PWD_IMP(getpwnam, struct passwd *, const char *name) {
+    return VSF_LINUX_APPLET_PWD_ENTRY(getpwnam)(name);
+}
+
+#else
+
+struct passwd * getpwuid(uid_t uid);
+struct passwd * getpwnam(const char *name);
+
+#endif
 
 static inline int getpwuid_r(uid_t uid, struct passwd *pwd,
         char *buffer, size_t bufsize, struct passwd **result)

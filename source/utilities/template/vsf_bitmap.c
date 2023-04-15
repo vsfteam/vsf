@@ -33,18 +33,6 @@ extern int_fast8_t __vsf_arch_ffs(uintalu_t);
 
 /*============================ IMPLEMENTATION ================================*/
 
-
-
-/*! \brief reset a bitmap
- *! \param this_ptr    address of the target bitmap
- *! \param biesize  the size of the bitmap in bits
- */
-void __vsf_bitmap_reset(uintalu_t *this_ptr, int_fast32_t bit_size)
-{
-    memset(this_ptr, 0, ((uint_fast32_t)bit_size + 7) >> 3);
-}
-
-
 int_fast32_t __vsf_bitmap_ffz(uintalu_t *bitmap_ptr, int_fast32_t bit_size)
 {
     int_fast32_t word_size =    (bit_size + (int_fast32_t)__optimal_bit_sz - 1) 

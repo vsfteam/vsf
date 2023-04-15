@@ -111,7 +111,7 @@ extern "C" {
             __vsf_bitmap_clear((uintalu_t *)(__bitmap_ptr), (__bit))
 
 #define vsf_bitmap_reset(__bitmap_ptr, __bit_size)                              \
-            __vsf_bitmap_reset((uintalu_t *)(__bitmap_ptr), (__bit_size))
+            memset(__bitmap_ptr, 0, ((uint_fast32_t)__bit_size + 7) >> 3);
 
 #define vsf_bitmap_ffz(__bitmap_ptr, __bit_size)                                \
             __vsf_bitmap_ffz((uintalu_t *)(__bitmap_ptr), (__bit_size))
@@ -124,7 +124,6 @@ extern "C" {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void __vsf_bitmap_reset(uintalu_t * this_ptr, int_fast32_t bit_size);
 extern int_fast32_t __vsf_bitmap_ffz(uintalu_t * bitmap_ptr, int_fast32_t bit_size);
 extern int_fast32_t __vsf_bitmap_ffs(uintalu_t * bitmap_ptr, int_fast32_t bit_size);
 
