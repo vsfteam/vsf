@@ -3657,6 +3657,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED && VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
     .sys_time_vplt      = (void *)&vsf_linux_sys_time_vplt,
 #   endif
+#   if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED
+    .sys_wait_vplt      = (void *)&vsf_linux_sys_wait_vplt,
+#   endif
 #   if VSF_LINUX_APPLET_USE_SYS_UTSNAME == ENABLED
     .sys_utsname_vplt   = (void *)&vsf_linux_sys_utsname_vplt,
 #   endif
