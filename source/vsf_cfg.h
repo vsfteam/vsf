@@ -133,13 +133,13 @@ typedef struct vsf_vplt_entry_t {
     }
 #define VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__NAME)                                  \
     vsf_vplt_entry_t fn_##__NAME
+#define VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(__VPLT, __NAME)                        \
+    ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
 #if VSF_APPLET_CFG_DEBUG_VPLT == ENABLED
-#   define VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(__VPLT, __NAME)                     \
-    vsf_linux_trace(VSF_TRACE_DEBUG, "call vplt API: %s\n", #__NAME);           \
-    ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
+#   define VSF_APPLET_VPLT_ENTRY_FUNC_TRACE(__NAME)                             \
+    vsf_linux_trace(VSF_TRACE_DEBUG, "call vplt API: %s\n", #__NAME)
 #else
-#   define VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(__VPLT, __NAME)                     \
-    ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
+#   define VSF_APPLET_VPLT_ENTRY_FUNC_TRACE(__NAME)
 #endif
 #define VSF_APPLET_VPLT_ENTRY_FUNC_IMP(__VPLT, __NAME, __RET, ...)              \
     typedef __RET (*__##__NAME##_prototype_t)(__VA_ARGS__);                     \
@@ -237,6 +237,7 @@ extern void * vsf_vplt(void *vplt);
     {                                                                           \
         static void *__vplt;                                                    \
         if (vplt != (void *)0) {                                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_TRACE(vsf_vplt);                         \
             __vplt = vplt;                                                      \
         }                                                                       \
         return __vplt;                                                          \
