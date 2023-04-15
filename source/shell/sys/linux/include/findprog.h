@@ -13,14 +13,14 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
-typedef struct vsf_linux_libgen_vplt_t {
+typedef struct vsf_linux_findprog_vplt_t {
     vsf_vplt_info_t info;
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(find_in_path);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(find_in_given_path);
-} vsf_linux_libgen_vplt_t;
+} vsf_linux_findprog_vplt_t;
 #   ifndef __VSF_APPLET__
-extern __VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_linux_findprog_vplt_t vsf_linux_findprog_vplt;
 #   endif
 #endif
 
@@ -29,10 +29,10 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt;
 #ifndef VSF_LINUX_APPLET_FINDPROG_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_FINDPROG_VPLT                                   \
-            ((vsf_linux_libgen_vplt_t *)(VSF_LINUX_APPLET_VPLT->libgen_vplt))
+            ((vsf_linux_findprog_vplt_t *)(VSF_LINUX_APPLET_VPLT->findprog_vplt))
 #   else
 #       define VSF_LINUX_APPLET_FINDPROG_VPLT                                   \
-            ((vsf_linux_libgen_vplt_t *)vsf_vplt((void *)0))
+            ((vsf_linux_findprog_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
 

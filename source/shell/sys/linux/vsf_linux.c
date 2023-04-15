@@ -3550,6 +3550,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_MNTENT == ENABLED
 #       include "./include/mntent.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
+#       include "./include/findprog.h"
+#   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
 #       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
 #       include "./include/simple_libc/setjmp/setjmp.h"
@@ -3601,6 +3604,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_MNTENT == ENABLED
 #       include <mntent.h>
 #   endif
+#   if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
+#       include <findprog.h>
+#   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
 #       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
 #       include <setjmp/setjmp.h>
@@ -3609,6 +3615,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #       include <math/math.h>
 #   endif
+#endif
+
+#if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_findprog_vplt_t vsf_linux_findprog_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_findprog_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(find_in_path),
+    VSF_APPLET_VPLT_ENTRY_FUNC(find_in_given_path),
+};
 #endif
 
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
@@ -3728,6 +3743,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_PWD == ENABLED
     .pwd_vplt           = (void *)&vsf_linux_pwd_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
+    .findprog_vplt      = (void *)&vsf_linux_findprog_vplt,
 #   endif
 
 #   if VSF_LINUX_USE_LIBUSB == ENABLED && VSF_LINUX_APPLET_USE_LIBUSB == ENABLED

@@ -383,7 +383,7 @@ typedef struct vsf_linux_vplt_t {
     void *glob_vplt;
     void *mntent_vplt;
     void *pwd_vplt;
-    void *res3_vplt;
+    void *findprog_vplt;
     void *res4_vplt;
     void *res5_vplt;
     void *res6_vplt;
