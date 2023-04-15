@@ -68,9 +68,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_select_vplt_t vsf_linux_sys_select_v
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_SELECT_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_SELECT_IMP(select, int, int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SELECT_ENTRY(select)(nfds, readfds, writefds, exceptfds, timeout);
 }
 VSF_LINUX_APPLET_SYS_SELECT_IMP(pselect, int, int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timespec *timeout_ts, const sigset_t *sigmask) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SELECT_ENTRY(pselect)(nfds, readfds, writefds, exceptfds, timeout_ts, sigmask);
 }
 

@@ -65,24 +65,31 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_semaphore_vplt_t vsf_linux_semaphore_vpl
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SEMAPHORE_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_init, int, sem_t *sem, int pshared, unsigned int value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_init)(sem, pshared, value);
 }
 VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_destroy, int, sem_t *sem) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_destroy)(sem);
 }
 VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_wait, int, sem_t *sem) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_wait)(sem);
 }
 VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_trywait, int, sem_t *sem) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_trywait)(sem);
 }
 VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_timedwait, int, sem_t *sem, const struct timespec *abs_timeout) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_timedwait)(sem, abs_timeout);
 }
 VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_post, int, sem_t *sem) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_post)(sem);
 }
 VSF_LINUX_APPLET_SEMAPHORE_IMP(sem_getvalue, int, sem_t *sem, int *value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SEMAPHORE_ENTRY(sem_getvalue)(sem, value);
 }
 

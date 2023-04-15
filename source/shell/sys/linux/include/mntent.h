@@ -69,21 +69,27 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_mntent_vplt_t vsf_linux_mntent_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_MNTENT_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_MNTENT_IMP(setmntent, FILE *, const char *filename, const char *type) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_MNTENT_ENTRY(setmntent)(filename, type);
 }
 VSF_LINUX_APPLET_MNTENT_IMP(getmntent, struct mntent *, FILE *stream) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_MNTENT_ENTRY(getmntent)(stream);
 }
 VSF_LINUX_APPLET_MNTENT_IMP(addmntent, int, FILE *stream, const struct mntent *mnt) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_MNTENT_ENTRY(addmntent)(stream, mnt);
 }
 VSF_LINUX_APPLET_MNTENT_IMP(endmntent, int, FILE *stream) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_MNTENT_ENTRY(endmntent)(stream);
 }
 VSF_LINUX_APPLET_MNTENT_IMP(hasmntopt, char *, const struct mntent *mnt, const char *opt) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_MNTENT_ENTRY(hasmntopt)(mnt, opt);
 }
 VSF_LINUX_APPLET_MNTENT_IMP(getmntent_r, struct mntent *, FILE *stream, struct mntent *mntbuf, char *buf, int buflen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_MNTENT_ENTRY(getmntent_r)(stream, mntbuf, buflen);
 }
 

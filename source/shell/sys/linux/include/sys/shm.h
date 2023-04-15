@@ -69,15 +69,19 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_shm_vplt_t vsf_linux_sys_shm_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_SHM_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_SHM_IMP(shmget, int, key_t key, size_t size, int shmflg) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SHM_ENTRY(shmget)(key, size, shmflg);
 }
 VSF_LINUX_APPLET_SYS_SHM_IMP(shmat, void *, int shmid, const void *shmaddr, int shmflg) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SHM_ENTRY(shmat)(shmid, shmaddr, shmflg);
 }
 VSF_LINUX_APPLET_SYS_SHM_IMP(shmdt, int, const void *shmaddr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SHM_ENTRY(shmdt)(shmaddr);
 }
 VSF_LINUX_APPLET_SYS_SHM_IMP(shmctl, int, int shmid, int cmd, struct shmid_ds *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SHM_ENTRY(shmctl)(shmid, cmd, buf);
 }
 

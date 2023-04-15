@@ -72,12 +72,15 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_wait_vplt_t vsf_linux_sys_wait_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_WAIT_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_WAIT_IMP(wait, pid_t, int *status) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_WAIT_ENTRY(wait)(status);
 }
 VSF_LINUX_APPLET_SYS_WAIT_IMP(waitpid, pid_t, pid_t pid, int *status, int options) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_WAIT_ENTRY(waitpid)(pid, status, options);
 }
 VSF_LINUX_APPLET_SYS_WAIT_IMP(waitid, int, idtype_t idtype, id_t id, siginfo_t *infop, int options) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_WAIT_ENTRY(waitid)(idtype, id, infop, options);
 }
 

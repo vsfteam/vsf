@@ -347,243 +347,323 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_PTHREAD_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_key_create, int, pthread_key_t *key, void (*destructor)(void*)) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_key_create)(key, destructor);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_key_delete, int, pthread_key_t key) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_key_delete)(key);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setspecific, int, pthread_key_t key, const void *value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_setspecific)(key, value);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_getspecific, void *, pthread_key_t key) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_getspecific)(key);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_init, int, pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_init)(mutex, mattr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_destroy, int, pthread_mutex_t *mutex) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_destroy)(mutex);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_lock, int, pthread_mutex_t *mutex) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_lock)(mutex);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_trylock, int, pthread_mutex_t *mutex) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_trylock)(mutex);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_unlock, int, pthread_mutex_t *mutex) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_unlock)(mutex);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_init, int, pthread_mutexattr_t *mattr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_init)(mattr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_destroy, int, pthread_mutexattr_t *mattr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_destroy)(mattr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_setpshared, int, pthread_mutexattr_t *mattr, int pshared) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_setpshared)(mattr, pshared);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_getpshared, int, pthread_mutexattr_t *mattr, int *pshared) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_getpshared)(mattr, pshared);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_settype, int, pthread_mutexattr_t *mattr , int type) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_settype)(mattr, type);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutexattr_gettype, int, pthread_mutexattr_t *mattr , int *type) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutexattr_gettype)(mattr, type);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_init, int, pthread_cond_t *cond, const pthread_condattr_t *cattr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_init)(cond, cattr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_destroy, int, pthread_cond_t *cond) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_destroy)(cond);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_signal, int, pthread_cond_t *cond) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_signal)(cond);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_broadcast, int, pthread_cond_t *cond) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_broadcast)(cond);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_wait, int, pthread_cond_t *cond, pthread_mutex_t *mutex) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_wait)(cond, mutex);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cond_timedwait, int, pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cond_timedwait)(cond, mutex, abstime);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_init, int, pthread_condattr_t *cattr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_init)(cattr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_destroy, int, pthread_condattr_t *cattr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_destroy)(cattr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_setpshared, int, pthread_condattr_t *cattr, int pshared) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_setpshared)(cattr, pshared);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_getpshared, int, pthread_condattr_t *cattr, int *pshared) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_getpshared)(cattr, pshared);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_getclock, int, const pthread_condattr_t *cattr, clockid_t *clockid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_getclock)(cattr, clockid);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_condattr_setclock, int, pthread_condattr_t *cattr, clockid_t clockid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_condattr_setclock)(cattr, clockid);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_init, int, pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_init)(rwlock, attr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_destroy, int, pthread_rwlock_t *rwlock) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_destroy)(rwlock);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_rdlock, int, pthread_rwlock_t *rwlock) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_rdlock)(rwlock);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_tryrdlock, int, pthread_rwlock_t *rwlock) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_tryrdlock)(rwlock);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_timedrdlock, int, pthread_rwlock_t *rwlock, const struct timespec *abstime) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_timedrdlock)(rwlock, abstime);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_wrlock, int, pthread_rwlock_t *rwlock) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_wrlock)(rwlock);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_trywrlock, int, pthread_rwlock_t *rwlock) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_trywrlock)(rwlock);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_timedwrlock, int, pthread_rwlock_t *rwlock, const struct timespec *abstime) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_timedwrlock)(rwlock, abstime);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_rwlock_unlock, int, pthread_rwlock_t *rwlock) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_rwlock_unlock)(rwlock);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_atfork, int, void (*prepare)(void), void (*parent)(void), void (*child)(void)) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_atfork)(prepare, parent, child);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_self, pthread_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_self)();
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_equal, int, pthread_t t1, pthread_t t2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_equal)(t1, t2);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_create, int, pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_create)(tidp, attr, start_rtn, arg);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_join, int, pthread_t tid, void **retval) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_join)(tid, retval);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_detach, int, pthread_t thread) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_detach)(thread);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_exit, void, void *retval) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_exit)(retval);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cancel, int, pthread_t thread) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cancel)(thread);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_kill, int, pthread_t thread, int sig) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_kill)(thread, sig);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_once, int, pthread_once_t *once_control, void (*init_routine)(void)) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_once)(once_control, init_routine);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_testcancel, void, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_testcancel)();
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setcancelstate, int, int state, int *oldstate) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_setcancelstate)(state, oldstate);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setcanceltype, int, int type, int *oldtype) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_setcanceltype)(type, oldtype);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setschedparam, int, pthread_t thread, int policy, const struct sched_param *param) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_setschedparam)(thread, policy, param);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_getschedparam, int, pthread_t thread, int *policy, struct sched_param *param) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_getschedparam)(thread, policy, param);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cleanup_push, void, void (*routine)(void *), void *arg) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cleanup_push)(routine, arg);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_cleanup_pop, void, int execute) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_cleanup_pop)(execute);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_init, int, pthread_attr_t *attr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_init)(attr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_destroy, int, pthread_attr_t *attr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_destroy)(attr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setstack, int, pthread_attr_t *attr, void *stackaddr, size_t stacksize) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setstack)(attr, stackaddr, stacksize);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getstack, int, const pthread_attr_t *attr, void **stackaddr, size_t *stacksize) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getstack)(attr, stackaddr, stacksize);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setstackaddr, int, pthread_attr_t *attr, void *stackaddr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setstackaddr)(attr, stackaddr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getstackaddr, int, const pthread_attr_t *attr, void **stackaddr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getstackaddr)(attr, stackaddr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setstacksize, int, pthread_attr_t *attr, size_t stacksize) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setstacksize)(attr, stacksize);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getstacksize, int, const pthread_attr_t *attr, size_t *stacksize) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getstacksize)(attr, stacksize);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setguardsize, int, pthread_attr_t *attr, size_t guardsize) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setguardsize)(attr, guardsize);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getguardsize, int, const pthread_attr_t *attr, size_t *guardsize) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getguardsize)(attr, guardsize);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setdetachstate, int, pthread_attr_t *attr, int detachstate) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setdetachstate)(attr, detachstate);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getdetachstate, int, const pthread_attr_t *attr, int *detachstate) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getdetachstate)(attr, detachstate);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setinheritsched, int, pthread_attr_t *attr, int inheritsched) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setinheritsched)(attr, inheritsched);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getinheritsched, int, const pthread_attr_t *attr, int *inheritsched) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getinheritsched)(attr, inheritsched);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setschedparam, int, pthread_attr_t *attr, const struct sched_param *param) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setschedparam)(attr, param);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getschedparam, int, pthread_attr_t *attr, struct sched_param *param) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getschedparam)(attr, param);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setschedpolicy, int, pthread_attr_t *attr, int policy) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setschedpolicy)(attr, policy);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getschedpolicy, int, const pthread_attr_t *attr, int *policy) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getschedpolicy)(attr, policy);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_setscope, int, pthread_attr_t *attr, int contentionscope) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_setscope)(attr, contentionscope);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_attr_getscope, int, const pthread_attr_t *attr, int *contentionscope) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_attr_getscope)(attr, contentionscope);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrier_init, int, pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrier_init)(barrier, attr, count);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrier_destroy, int, pthread_barrier_t *barrier) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrier_destroy)(barrier);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrier_wait, int, pthread_barrier_t *barrier) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrier_wait)(barrier);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrierattr_init, int, pthread_barrierattr_t *attr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrierattr_init)(attr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrierattr_destroy, int, pthread_barrierattr_t *attr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrierattr_destroy)(attr);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrierattr_getpshared, int, const pthread_barrierattr_t *attr, int *pshared) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrierattr_getpshared)(attr, pshared);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrierattr_setpshared, int, pthread_barrierattr_t *attr, int pshared) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrierattr_setpshared)(attr, pshared);
 }
 

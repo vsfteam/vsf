@@ -82,9 +82,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_poll_vplt_t vsf_linux_poll_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_POLL_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_POLL_IMP(poll, int, struct pollfd *fds, nfds_t nfds, int timeout) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_POLL_ENTRY(poll)(fds, nfds, timeout);
 }
 VSF_LINUX_APPLET_POLL_IMP(ppoll, int, struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_POLL_ENTRY(ppoll)(fds, nfds, timeout_ts, sigmask);
 }
 

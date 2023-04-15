@@ -61,6 +61,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_utsname_vplt_t vsf_linux_sys_utsname
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_UTSNAME_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_UTSNAME_IMP(uname, int, struct utsname *name) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_UTSNAME_ENTRY(uname)(name);
 }
 

@@ -69,24 +69,31 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sched_vplt_t vsf_linux_sched_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SCHED_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SCHED_IMP(sched_get_priority_max, int, int policy) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SCHED_ENTRY(sched_get_priority_max)(policy);
 }
 VSF_LINUX_APPLET_SCHED_IMP(sched_get_priority_min, int, int policy) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SCHED_ENTRY(sched_get_priority_min)(policy);
 }
 VSF_LINUX_APPLET_SCHED_IMP(sched_getparam, int, pid_t pid, struct sched_param *param) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SCHED_ENTRY(sched_getparam)(pid, param);
 }
 VSF_LINUX_APPLET_SCHED_IMP(sched_getscheduler, int, pid_t pid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SCHED_ENTRY(sched_getscheduler)(pid);
 }
 VSF_LINUX_APPLET_SCHED_IMP(sched_setparam, int, pid_t pid, const struct sched_param *param) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SCHED_ENTRY(sched_setparam)(pid, param);
 }
 VSF_LINUX_APPLET_SCHED_IMP(sched_setscheduler, int, pid_t pid, int policy, const struct sched_param *param) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SCHED_ENTRY(sched_setscheduler)(pid, policy, param);
 }
 VSF_LINUX_APPLET_SCHED_IMP(sched_yield, int, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SCHED_ENTRY(sched_yield)();
 }
 

@@ -130,21 +130,27 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_NETDB_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_NETDB_IMP(gethostbyaddr, struct hostent *, const void *addr, size_t len, int type) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_NETDB_ENTRY(gethostbyaddr)(addr, len, type);
 }
 VSF_LINUX_APPLET_NETDB_IMP(gethostbyname, struct hostent *, const char *name) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_NETDB_ENTRY(gethostbyname)(name);
 }
 VSF_LINUX_APPLET_NETDB_IMP(gai_strerror, const char *, int errcode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_NETDB_ENTRY(gai_strerror)(errcode);
 }
 VSF_LINUX_APPLET_NETDB_IMP(getnameinfo, int, const struct sockaddr *addr, socklen_t addrlen, char *host, socklen_t hostlen, char *serv, socklen_t servlen, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_NETDB_ENTRY(getnameinfo)(addr, addrlen, host, hostlen, serv, servlen, flags);
 }
 VSF_LINUX_APPLET_NETDB_IMP(getaddrinfo, int, const char *name, const char *service, const struct addrinfo *hints, struct addrinfo **pai) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_NETDB_ENTRY(getaddrinfo)(name, service, hints, pai);
 }
 VSF_LINUX_APPLET_NETDB_IMP(freeaddrinfo, void, struct addrinfo *pai) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_NETDB_ENTRY(freeaddrinfo)(pai);
 }
 

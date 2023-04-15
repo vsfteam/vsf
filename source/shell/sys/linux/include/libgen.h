@@ -44,9 +44,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBGEN_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_LIBGEN_IMP(basename, char *, char *path) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBGEN_ENTRY(basename)(path);
 }
 VSF_LINUX_APPLET_LIBGEN_IMP(dirname, char *, char *path) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBGEN_ENTRY(dirname)(path);
 }
 

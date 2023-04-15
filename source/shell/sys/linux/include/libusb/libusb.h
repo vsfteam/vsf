@@ -538,165 +538,219 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libusb_vplt_t vsf_linux_libusb_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBUSB_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_strerror, const char *, int code) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_strerror)(code);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_version, const struct libusb_version *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_version)();
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_init, int, libusb_context **ctx) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_init)(ctx);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_exit, void, libusb_context *ctx) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_exit)(ctx);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_set_debug, void, libusb_context *ctx, int level) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_set_debug)(ctx, level);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_error_name, const char *, int errcode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_error_name)(errcode);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_device_list, ssize_t, libusb_context *ctx, libusb_device ***list) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_device_list)(ctx, list);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_free_device_list, void, libusb_device **list, int unref_devices) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_free_device_list)(list, unref_devices);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_device_descriptor, int, libusb_device *dev, struct libusb_device_descriptor *desc) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_device_descriptor)(dev, desc);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_open, int, libusb_device *dev, libusb_device_handle **dev_handle) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_open)(dev, dev_handle);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_device, libusb_device *, libusb_device_handle *dev_handle) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_device)(dev_handle);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_open_device_with_vid_pid, libusb_device_handle *, libusb_context *ctx, uint16_t vendor_id, uint16_t product_id) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_open_device_with_vid_pid)(ctx, vendor_id, product_id);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_close, void, libusb_device_handle *dev_handle) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_close)(dev_handle);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_device_address, uint8_t, libusb_device *dev) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_device_address)(dev);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_bus_number, uint8_t, libusb_device *dev) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_bus_number)(dev);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_release_interface, int, libusb_device_handle *dev_handle, int interface_number) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_release_interface)(dev_handle, interface_number);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_claim_interface, int, libusb_device_handle *dev_handle, int interface_number) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_claim_interface)(dev_handle, interface_number);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_alloc_transfer, struct libusb_transfer *, int iso_packets) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_alloc_transfer)(iso_packets);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_free_transfer, void, struct libusb_transfer *transfer) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_free_transfer)(transfer);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_submit_transfer, int, struct libusb_transfer *transfer) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_submit_transfer)(transfer);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_cancel_transfer, int, struct libusb_transfer *transfer) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_cancel_transfer)(transfer);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_control_transfer, int, libusb_device_handle *dev_handle, uint8_t bRequestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex, unsigned char *data, uint16_t wLength, unsigned int timeout) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_control_transfer)(dev_handle, bRequestType, bRequest, wValue, wIndex, data, wLength ,timeout);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_bulk_transfer, int, libusb_device_handle *dev_handle, unsigned char endpoint, unsigned char *data, int length, int *actual_length, unsigned int timeout) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_bulk_transfer)(dev_handle, endpoint, data, length, actual_length, timeout);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_interrupt_transfer, int, libusb_device_handle *dev_handle, unsigned char endpoint, unsigned char *data, int length, int *actual_length, unsigned int timeout) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_interrupt_transfer)(dev_handle, endpoint, data, length, actual_length, timeout);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_hotplug_register_callback, int, libusb_context *ctx, libusb_hotplug_event events, libusb_hotplug_flag flags, int vendor_id, int product_id, int dev_class, libusb_hotplug_callback_fn cb_fn, void *user_data, libusb_hotplug_callback_handle *callback_handle) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_hotplug_register_callback)(ctx, events, flags, vendor_id, product_id, dev_class, cb_fn, user_data, callback_handle);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_hotplug_deregister_callback, void, libusb_context *ctx, libusb_hotplug_callback_handle callback_handle) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_hotplug_deregister_callback)(ctx, callback_handle);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_string_descriptor_ascii, int, libusb_device_handle *dev_handle, uint8_t desc_index, unsigned char *data, int length) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_string_descriptor_ascii)(dev_handle, desc_index, data, length);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_config_descriptor, int, libusb_device *dev, uint8_t config_index, struct libusb_config_descriptor **config) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_config_descriptor)(dev, config_index, config);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_config_descriptor_by_value, int, libusb_device *dev, uint8_t value, struct libusb_config_descriptor **config) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_config_descriptor_by_value)(dev, value, config);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_active_config_descriptor, int, libusb_device *dev, struct libusb_config_descriptor **config) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_active_config_descriptor)(dev, config);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_free_config_descriptor, void, struct libusb_config_descriptor *config) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_free_config_descriptor)(config);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_descriptor, int, libusb_device_handle *dev_handle, uint8_t desc_type, uint8_t desc_index, unsigned char *data, int length) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_descriptor)(dev_handle, desc_type, desc_index, data, length);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_string_descriptor, int, libusb_device_handle *dev_handle, uint8_t desc_index, uint16_t langid, unsigned char *data, int length) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_string_descriptor)(dev_handle, desc_index, langid, data, length);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_set_interface_alt_setting, int, libusb_device_handle *dev_handle, int interface_number, int alternate_setting) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_set_interface_alt_setting)(dev_handle, interface_number, alternate_setting);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_ss_endpoint_companion_descriptor, int, struct libusb_context *ctx, const struct libusb_endpoint_descriptor *endpoint, struct libusb_ss_endpoint_companion_descriptor **ep_comp) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_ss_endpoint_companion_descriptor)(ctx, endpoint, ep_comp);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_free_ss_endpoint_companion_descriptor, void, struct libusb_ss_endpoint_companion_descriptor *ep_comp) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_free_ss_endpoint_companion_descriptor)(ep_comp);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_next_timeout, int, libusb_context *ctx, struct timeval *tv) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_next_timeout)(ctx, tv);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_has_capability, int, uint32_t capability) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_has_capability)(capability);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_attach_kernel_driver, int, libusb_device_handle *dev_handle, int interface_number) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_attach_kernel_driver)(dev_handle, interface_number);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_detach_kernel_driver, int, libusb_device_handle *dev_handle, int interface_number) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_detach_kernel_driver)(dev_handle, interface_number);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_kernel_driver_active, int, libusb_device_handle *dev_handle, int interface_number) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_kernel_driver_active)(dev_handle, interface_number);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_ref_device, libusb_device *, libusb_device *dev) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_ref_device)(dev);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_unref_device, void, libusb_device *dev) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_unref_device)(dev);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_max_packet_size, int, libusb_device *dev, unsigned char endpoint) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_max_packet_size)(dev, endpoint);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_device_speed, int, libusb_device *dev) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_device_speed)(dev);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_set_configuration, int, libusb_device_handle *dev_handle, int configuration) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_set_configuration)(dev_handle, configuration);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_configuration, int, libusb_device_handle *dev_handle, int *config) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_configuration)(dev_handle, config);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_handle_events_timeout_completed, int, libusb_context *ctx, struct timeval *tv, int *completed) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_handle_events_timeout_completed)(ctx, tv, completed);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_handle_events_completed, int, libusb_context *ctx, int *completed) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_handle_events_completed)(ctx, completed);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_handle_events_timeout, int, libusb_context *ctx, struct timeval *tv) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_handle_events_timeout)(ctx, tv);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_handle_events, int, libusb_context *ctx) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_handle_events)(ctx);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_pollfds, const struct libusb_pollfd**, libusb_context *ctx) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_pollfds)(ctx);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_free_pollfds, void, const struct libusb_pollfd **pollfds) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_free_pollfds)(pollfds);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_reset_device, int, libusb_device_handle *dev_handle) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_reset_device)(dev_handle);
 }
 

@@ -59,6 +59,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_signalfd_vplt_t vsf_linux_sys_signal
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_SIGNALFD_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_SIGNALFD_IMP(signalfd, int, int fd, const sigset_t *mask, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SIGNALFD_ENTRY(signalfd)(fd, mask, flags);
 }
 

@@ -79,9 +79,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_IFADDRS_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_IFADDRS_IMP(getifaddrs, int, struct ifaddrs **ifa) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_IFADDRS_ENTRY(getifaddrs)(ifa);
 }
 VSF_LINUX_APPLET_IFADDRS_IMP(freeifaddrs, void, struct ifaddrs *ifa) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_IFADDRS_ENTRY(freeifaddrs)(ifa);
 }
 

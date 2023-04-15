@@ -86,9 +86,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_glob_vplt_t vsf_linux_glob_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_GLOB_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_GLOB_IMP(glob, int, const char *path, int flags, int (*errfunc)(const char *path, int err), glob_t *g) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_GLOB_ENTRY(glob)(path, flags, errfunc, g);
 }
 VSF_LINUX_APPLET_GLOB_IMP(globfree, int, glob_t *g) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_GLOB_ENTRY(globfree)(g);
 }
 

@@ -117,69 +117,91 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vpl
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_TIME_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_LIBC_TIME_IMP(clock, clock_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(clock)();
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(clock_gettime, int, clockid_t clockid, struct timespec *ts) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(clock_gettime)(clockid, ts);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(clock_getres, int, clockid_t clockid, struct timespec *res) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(clock_getres)(clockid, res);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(clock_nanosleep, int, clockid_t clockid, int flags, const struct timespec *request, struct timespec *remain) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(clock_nanosleep)(clockid, flags, request, remain);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(time, time_t, time_t *t) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(time)(t);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(difftime, double, time_t time1, time_t time2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(difftime)(time1, time2);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(asctime, char *, const struct tm *tm) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(asctime)(tm);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(asctime_r, char *, const struct tm *tm, char *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(asctime_r)(tm, buf);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(ctime, char *, const time_t *t) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(ctime)(t);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(ctime_r, char *, const time_t *t, char *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(ctime_r)(t, buf);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(gmtime, struct tm *, const time_t *t) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(gmtime)(t);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(gmtime_r, struct tm *, const time_t *t, struct tm *result) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(gmtime_r)(t, result);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(localtime, struct tm *, const time_t *t) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(localtime)(t);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(localtime_r, struct tm *, const time_t *t, struct tm *result) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(localtime_r)(t, result);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(mktime, time_t, struct tm *tm) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(mktime)(tm);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(strftime, size_t, char *str, size_t maxsize, const char *format, const struct tm *tm) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(strftime)(str, maxsize, format, tm);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(nanosleep, int, const struct timespec *requested_time, struct timespec *remaining) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(nanosleep)(requested_time, remaining);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(timer_create, int, clockid_t clockid, struct sigevent *sevp, timer_t *timerid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(timer_create)(clockid, sevp, timerid);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(timer_delete, int, timer_t timerid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(timer_delete)(timerid);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(timer_settime, int, timer_t timerid, int flags, const struct itimerspec *new_value, struct itimerspec *old_value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(timer_settime)(timerid, flags, new_value, old_value);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(timer_gettime, int, timer_t timerid, struct itimerspec *curr_value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(timer_gettime)(timerid, curr_value);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(timespec_get, int, struct timespec *ts, int base) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(timespec_get)(ts, base);
 }
 

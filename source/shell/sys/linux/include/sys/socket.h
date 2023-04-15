@@ -272,54 +272,71 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_v
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_SOCKET_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(setsockopt, int, int sockfd, int level, int optname, const void *optval, socklen_t optlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(setsockopt)(sockfd, level, optname, optval, optlen);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(getsockopt, int, int sockfd, int level, int optname, void *optval, socklen_t *optlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(getsockopt)(sockfd, level, optname, optval, optlen);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(getpeername, int, int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(getpeername)(sockfd, addr, addrlen);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(getsockname, int, int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(getsockname)(sockfd, addr, addrlen);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(accept, int, int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(accept)(sockfd, addr, addrlen);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(bind, int, int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(bind)(sockfd, addr, addrlen);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(connect, int, int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(connect)(sockfd, addr, addrlen);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(listen, int, int sockfd, int backlog) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(listen)(sockfd, backlog);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(recv, ssize_t, int sockfd, void *buffer, size_t length, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(recv)(sockfd, buffer, length, flags);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(recvmsg, ssize_t, int sockfd, struct msghdr *msg, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(recvmsg)(sockfd, msg, flags);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(recvfrom, ssize_t, int sockfd, void *buffer, size_t length, int flags, struct sockaddr *src_addr, socklen_t *addrlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(recvfrom)(sockfd, buffer, length, flags, src_addr, addrlen);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(send, ssize_t, int sockfd, const void *buffer, size_t length, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(send)(sockfd, buffer, length, flags);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(sendmsg, ssize_t, int sockfd, const struct msghdr *msg, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(sendmsg)(sockfd, msg, flags);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(sendto, ssize_t, int sockfd, const void *buffer, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t addrlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(sendto)(sockfd, buffer, length, flags, dest_addr, addrlen);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(shutdown, int, int sockfd, int how) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(shutdown)(sockfd, how);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(socket, int, int domain, int type, int protocol) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(socket)(domain, type, protocol);
 }
 VSF_LINUX_APPLET_SYS_SOCKET_IMP(socketpair, int, int domain, int type, int protocol, int socket_vector[2]) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_SOCKET_ENTRY(socketpair)(domain, type, protocol, socket_vector);
 }
 

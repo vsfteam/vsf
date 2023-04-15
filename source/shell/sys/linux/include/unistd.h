@@ -329,225 +329,299 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_UNISTD_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_UNISTD_IMP(__execl_va, exec_ret_t, const char *pathname, const char *arg, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(__execl_va)(pathname, arg, ap);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(__execlp_va, exec_ret_t, const char *pathname, const char *arg, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(__execlp_va)(pathname, arg, ap);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(__vsf_linux_errno, int *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(__vsf_linux_errno)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(confstr, size_t, int name, char *buf, size_t len) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(confstr)(name, buf, len);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(usleep, int, int micro_seconds) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(usleep)(micro_seconds);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(sleep, unsigned, unsigned seconds) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(sleep)(seconds);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(alarm, unsigned int, unsigned int seconds) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(alarm)(seconds);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(ualarm, useconds_t, useconds_t usecs, useconds_t interval) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(ualarm)(usecs, interval);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getlogin, char *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getlogin)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getlogin_r, int, char *buf, size_t bufsize) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getlogin_r)(buf, bufsize);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getuid, uid_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getuid)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(geteuid, uid_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(geteuid)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getgid, gid_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getgid)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getegid, gid_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getegid)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getpid, pid_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getpid)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getppid, pid_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getppid)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(gettid, pid_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(gettid)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(execv, exec_ret_t, const char *pathname, char * const * argv) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(execv)(pathname, argv);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(execve, exec_ret_t, const char *pathname, char * const * argv, char * const * envp) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(execve)(pathname, argv, envp);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(execvp, exec_ret_t, const char *file, char * const * argv) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(execvp)(file, argv);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(execvpe, exec_ret_t, const char *file, char * const * argv, char * const * envp) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(execvpe)(file, argv, envp);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(daemon, int, int nochdir, int noclose) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(daemon)(nochdir, noclose);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(sysconf, long, int name) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(sysconf)(name);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(pathconf, long, const char *path, int name) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(pathconf)(path, name);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(fpathconf, long, int fd, int name) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(fpathconf)(fd, name);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(realpath, char *, const char *path, char *resolved_path) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(realpath)(path, resolved_path);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(pipe, int, int pipefd[2]) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(pipe)(pipefd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(pipe2, int, int pipefd[2], int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(pipe2)(pipefd, flags);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(access, int, const char *pathname, int mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(access)(pathname, mode);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(unlink, int, const char *pathname) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(unlink)(pathname);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(unlinkat, int, int dirfd, const char *pathname, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(unlinkat)(dirfd, pathname, flags);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(link, int, const char *oldpath, const char *newpath) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(link)(oldpath, newpath);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(mkdir, int, const char *pathname, mode_t mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(mkdir)(pathname, mode);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(mkdirat, int, int dirfd, const char *pathname, mode_t mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(mkdirat)(dirfd, pathname, mode);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(rmdir, int, const char *pathname) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(rmdir)(pathname);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(dup, int, int oldfd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(dup)(oldfd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(dup2, int, int oldfd, int newfd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(dup2)(oldfd, newfd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(dup3, int, int oldfd, int newfd, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(dup3)(oldfd, newfd, flags);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(chroot, int, const char *path) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(chroot)(path);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(chdir, int, const char *pathname) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(chdir)(pathname);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getcwd, char *, char *buffer, size_t maxlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getcwd)(buffer, maxlen);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(close, int, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(close)(fd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(lseek, off_t, int fd, off_t offset, int whence) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(lseek)(fd, offset, whence);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(read, ssize_t, int fd, void *buf, size_t count) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(read)(fd, buf, count);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(write, ssize_t, int fd, const void *buf, size_t count) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(write)(fd, buf, count);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(readv, ssize_t, int fd, const struct iovec *iov, int iovcnt) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(readv)(fd, iov, iovcnt);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(writev, ssize_t, int fd, const struct iovec *iov, int iovcnt) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(writev)(fd, iov, iovcnt);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(pread, ssize_t, int fd, void *buf, size_t count, off_t offset) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(pread)(fd, buf, count, offset);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(pwrite, ssize_t, int fd, const void *buf, size_t count, off_t offset) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(pwrite)(fd, buf, count, offset);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(preadv, ssize_t, int fd, const struct iovec *iov, int iovcnt, off_t offset) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(preadv)(fd, iov, iovcnt, offset);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(pwritev, ssize_t, int fd, const struct iovec *iov, int iovcnt, off_t offset) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(pwritev)(fd, iov, iovcnt, offset);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(fsync, int, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(fsync)(fd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(fdatasync, int, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(fdatasync)(fd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(isatty, int, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(isatty)(fd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getpagesize, size_t, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getpagesize)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(symlink, int, const char *target, const char *linkpath) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(symlink)(target, linkpath);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(ftruncate, int, int fd, off_t length) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(ftruncate)(fd, length);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(truncate, int, const char *pathname, off_t length) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(truncate)(pathname, length);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(ftruncate64, int, int fd, off64_t length) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(ftruncate64)(fd, length);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(truncate64, int, const char *pathname, off64_t length) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(truncate64)(pathname, length);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(readlink, ssize_t, const char *pathname, char *buf, size_t bufsiz) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(readlink)(pathname, buf, bufsiz);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(tcgetpgrp, pid_t, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(tcgetpgrp)(fd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(tcsetpgrp, int, int fd, pid_t pgrp) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(tcsetpgrp)(fd, pgrp);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getpass, char *, const char *prompt) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getpass)(prompt);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(gethostname, int, char *name, size_t len) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(gethostname)(name, len);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(sethostname, int, const char *name, size_t len) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(sethostname)(name, len);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(chown, int, const char *pathname, uid_t owner, gid_t group) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(chown)(pathname, owner, group);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(fchown, int, int fd, uid_t owner, gid_t group) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(fchown)(fd, owner, group);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(lchown, int, const char *pathname, uid_t owner, gid_t group) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(lchown)(pathname, owner, group);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(fchownat, int, int dirfd, const char *pathname, uid_t owner, gid_t group, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(fchownat)(dirfd, pathname, owner, group, flags);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getentropy, int, void *buffer, size_t length) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getentropy)(buffer, length);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(lseek64, off64_t, int fd, off64_t offset, int whence) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(lseek64)(fd, offset, whence);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(ttyname, char *, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(ttyname)(fd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(ttyname_r, int, int fd, char *buf, size_t buflen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(ttyname_r)(fd, buf, buflen);
 }
 

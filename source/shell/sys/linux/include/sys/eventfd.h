@@ -64,12 +64,15 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_eventfd_vplt_t vsf_linux_sys_eventfd
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_EVENTFD_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_EVENTFD_IMP(eventfd, int, int count, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_EVENTFD_ENTRY(eventfd)(count, flags);
 }
 VSF_LINUX_APPLET_SYS_EVENTFD_IMP(eventfd_read, int, int fd, eventfd_t *value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_EVENTFD_ENTRY(eventfd_read)(fd, value);
 }
 VSF_LINUX_APPLET_SYS_EVENTFD_IMP(eventfd_write, int, int fd, eventfd_t value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_EVENTFD_ENTRY(eventfd_write)(fd, value);
 }
 

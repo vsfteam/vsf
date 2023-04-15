@@ -53,9 +53,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_pwd_vplt_t vsf_linux_pwd_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_PWD_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_PWD_IMP(getpwuid, struct passwd *, uid_t uid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PWD_ENTRY(getpwuid)(uid);
 }
 VSF_LINUX_APPLET_PWD_IMP(getpwnam, struct passwd *, const char *name) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PWD_ENTRY(getpwnam)(name);
 }
 

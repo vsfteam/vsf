@@ -93,114 +93,151 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_STRING_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_LIBC_STRING_IMP(ffs, int, int i) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(ffs)(i);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(memset, void *, void *s, int ch, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(memset)(s, ch, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strlen, size_t, const char *str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strlen)(str);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strnlen, size_t, const char *str, size_t maxlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strnlen)(str, maxlen);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcmp, int, const char *str1, const char *str2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcmp)(str1, str2);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strncmp, int, const char *str1, const char *str2, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strncmp)(str1, str2, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strdup, char *, const char *str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strdup)(str);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcpy, char *, char *dest, const char *src) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcpy)(dest, src);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strncpy, char *, char *dest, const char *src, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strncpy)(dest, src, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(stpcpy, char *, char *dest, const char *src) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(stpcpy)(dest, src);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(stpncpy, char *, char *dest, const char *src, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(stpncpy)(dest, src, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcat, char *, char *dest, const char *src) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcat)(dest, src);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strncat, char *, char *dest, const char *str, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strncat)(dest, str, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcoll, int, const char *str1, const char *str2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcoll)(str1, str2);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strtok, char *, char *str, const char *delim) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strtok)(str, delim);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strxfrm, size_t, char *dest, const char *src, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strxfrm)(dest, src, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strspn, size_t, const char *str1, const char *str2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strspn)(str1, str2);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcspn, size_t, const char *str1, const char *str2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcspn)(str1, str2);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strpbrk, char *, const char *str1, const char *str2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strpbrk)(str1, str2);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strerror, char *, int errnum) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strerror)(errnum);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcasecmp, int, const char *str1, const char *str2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcasecmp)(str1, str2);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strncasecmp, int, const char *str1, const char *str2, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strncasecmp)(str1, str2, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(memcpy, void *, void *dest, const void *src, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(memcpy)(dest, src, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(mempcpy, void *, void *dest, const void *src, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(mempcpy)(dest, src, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strlcpy, size_t, char *dest, const char *src, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strlcpy)(dest, src, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strstr, char *, const char *str1, const char *str2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strstr)(str1, str2);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strchr, char *, const char *str, int c) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strchr)(str, c);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strrchr, char *, const char *str, int c) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strrchr)(str, c);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(memmove, void *, void *dest, const void *src, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(memmove)(dest, src, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(memcmp, int, const void *str1, const void *str2, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(memcmp)(str1, str2, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(memchr, void *, const void *buf, int ch, size_t count) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(memchr)(buf, ch, count);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(memrchr, void *, const void *buf, int ch, size_t count) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(memrchr)(buf, ch, count);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strverscmp, int, const char *str1, const char *str2) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strverscmp)(str1, str2);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strndup, char *, const char *str, size_t n) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strndup)(str, n);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strsignal, char *, int sig) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strsignal)(sig);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(sigdescr_np, const char *, int sig) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(sigdescr_np)(sig);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(sigabbrev_np, const char *, int sig) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(sigabbrev_np)(sig);
 }
 

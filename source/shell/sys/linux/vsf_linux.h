@@ -356,17 +356,19 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_v
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
 VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_dynlib_ctx, void *, const vsf_linux_dynlib_mod_t *mod) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_dynlib_ctx)(mod);
 }
 #endif
 
 VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_get_cur_process, vsf_linux_process_t *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_get_cur_process)();
 }
 
 #if VSF_USE_TRACE == ENABLED
 VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_trace_arg, void, vsf_trace_level_t level, const char *format, va_list arg) {
-    ((__vsf_trace_arg_prototype_t)((VSF_LINUX_APPLET_FUNDMENTAL_VPLT)->fn_vsf_trace_arg.ptr))(level, format, arg);
+    VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_trace_arg)(level, format, arg);
 }
 #endif
 

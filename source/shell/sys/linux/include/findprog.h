@@ -42,9 +42,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libgen_vplt_t vsf_linux_libgen_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_FINDPROG_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_FINDPROG_IMP(find_in_path, const char *, const char *progname) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FINDPROG_ENTRY(find_in_path)(progname);
 }
 VSF_LINUX_APPLET_FINDPROG_IMP(find_in_given_path, const char *, const char *progname, const char *path, const char *directory, bool optimize_for_exec) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FINDPROG_ENTRY(find_in_given_path)(progname, path, directory, optimize_for_exec);
 }
 

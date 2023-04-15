@@ -45,6 +45,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_random_vplt_t vsf_linux_sys_random_v
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_RANDOM_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_RANDOM_IMP(getrandom, ssize_t, void *buf, size_t buflen, unsigned int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_RANDOM_ENTRY(getrandom)(buf, buflen, flags);
 }
 

@@ -169,27 +169,35 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_STAT_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_STAT_IMP(umask, mode_t, mode_t mask) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(umask)(mask);
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(stat, int, const char *pathname, struct stat *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(stat)(pathname, buf);
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(fstat, int, int fd, struct stat *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(fstat)(fd, buf);
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(fstatat, int, int dirfd, const char *pathname, struct stat *buf, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(fstatat)(dirfd, pathname, buf, flags);
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(chmod, int, const char *pathname, mode_t mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(chmod)(pathname, mode);
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(fchmod, int, int fd, mode_t mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(fchmod)(fd, mode);
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(mkfifo, int, const char *pathname, mode_t mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mkfifo)(pathname, mode);
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(mkfifoat, int, int dirfd, const char *pathname, mode_t mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mkfifo)(dirfd, pathname, mode);
 }
 

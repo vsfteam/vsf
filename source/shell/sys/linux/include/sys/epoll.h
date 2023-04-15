@@ -99,21 +99,27 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_epoll_vplt_t vsf_linux_sys_epoll_vpl
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_EPOLL_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_EPOLL_IMP(epoll_create, int, int size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_EPOLL_ENTRY(epoll_create)(size);
 }
 VSF_LINUX_APPLET_SYS_EPOLL_IMP(epoll_create1, int, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_EPOLL_ENTRY(epoll_create1)(flags);
 }
 VSF_LINUX_APPLET_SYS_EPOLL_IMP(epoll_ctl, int, int epfd, int op, int fd, struct epoll_event *event) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_EPOLL_ENTRY(epoll_ctl)(epfd, op, fd, event);
 }
 VSF_LINUX_APPLET_SYS_EPOLL_IMP(epoll_wait, int, int epfd, struct epoll_event *events, int maxevents, int timeout) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_EPOLL_ENTRY(epoll_wait)(epfd, events, maxevents, timeout);
 }
 VSF_LINUX_APPLET_SYS_EPOLL_IMP(epoll_pwait, int, int epfd, struct epoll_event *events, int maxevents, int timeout, const sigset_t *sigmask) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_EPOLL_ENTRY(epoll_pwait)(epfd, events, maxevents, timeout, sigmask);
 }
 VSF_LINUX_APPLET_SYS_EPOLL_IMP(epoll_pwait2, int, int epfd, struct epoll_event *events, int maxevents, const struct timespec *timeout, const sigset_t *sigmask) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_EPOLL_ENTRY(epoll_pwait2)(epfd, events, maxevents, timeout, sigmask);
 }
 

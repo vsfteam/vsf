@@ -54,6 +54,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_times_vplt_t vsf_linux_sys_times_vpl
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_TIMES_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_TIMES_IMP(times, clock_t, struct tms *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_TIMES_ENTRY(times)(buf);
 }
 

@@ -162,157 +162,207 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_STDLIB_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(malloc, void *, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(malloc)(size);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(realloc, void *, void *p, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(realloc)(p, size);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(free, void, void *p) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(free)(p);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(aligned_alloc, void *, size_t alignment, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(aligned_alloc)(alignment, size);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(calloc, void *, size_t n, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(calloc)(n, size);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(memalign, void *, size_t alignment, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(memalign)(alignment, size);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(posix_memalign, int, void **memptr, size_t alignment, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(posix_memalign)(memptr, alignment, size);
 }
 // malloc_usable_size should be in malloc.h
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(malloc_usable_size, size_t, void *p) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(malloc_usable_size)(p);
 }
 
 #if VSF_LINUX_LIBC_USE_ENVIRON
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(putenv, int, char *string) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(putenv)(string);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(getenv, char *, const char *name) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(getenv)(name);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(setenv, int, const char *name, const char *value, int replace) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(setenv)(name, value, replace);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(unsetenv, int, const char *name) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(unsetenv)(name);
 }
 #endif
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mktemps, char *, char *template_str, int suffixlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mktemps)(template_str, suffixlen);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mktemp, char *, char *template_str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mktemp)(template_str);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkstemp, int, char *template_str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkstemp)(template_str);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkostemp, int, char *template_str, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkostemp)(template_str, flags);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkstemps, int, char *template_str, int suffixlen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkstemps)(template_str, suffixlen);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkostemps, int, char *template_str, int suffixlen, int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkostemps)(template_str, suffixlen, flags);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mkdtemp, char *, char *template_str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(mkdtemp)(template_str);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(div, div_t, int numer, int denom) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(div)(numer, denom);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(ldiv, ldiv_t, long int numer, long int denom) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(ldiv)(numer, denom);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(lldiv, lldiv_t, long long int numer, long long int denom) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(lldiv)(numer, denom);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(itoa, char *, int num, char *str, int radix) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(itoa)(num, str, radix);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atoi, int, const char * str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atoi)(str);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atol, long int, const char *str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atol)(str);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atoll, long long int, const char *str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atoll)(str);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atof, double, const char *str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atof)(str);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtol, long, const char *str, char **endptr, int base) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtol)(str, endptr, base);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtoul, unsigned long, const char *str, char **endptr, int base) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtoul)(str, endptr, base);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtoll, long long, const char *str, char **endptr, int base) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtoll)(str, endptr, base);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtoull, unsigned long long, const char *str, char **endptr, int base) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtoull)(str, endptr, base);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtof, float, const char *str, char **endptr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtof)(str, endptr);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtod, double, const char *str, char **endptr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtod)(str, endptr);
 }
 //VSF_LINUX_APPLET_LIBC_STDLIB_IMP(strtold, long double, const char *str, char **endptr) {
+//    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
 //    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(strtold)(str, endptr);
 //}
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(bsearch, void *, const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *)) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(bsearch)(key, base, nitems, size, compar);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(qsort, void, void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(qsort)(base, nitems, size, compar);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(rand, int, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(rand)();
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(srand, void, unsigned int seed) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(srand)(seed);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(srandom, void, unsigned int seed) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(srand)(seed);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(random, long int, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(rand)();
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(abort, void, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(abort)();
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(system, int, const char *command) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(system)(command);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(exit, void, int status) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(exit)(status);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atexit, int, void (*func)(void)) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atexit)(func);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(_exit, void, int status) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(_exit)(status);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(abs, int, int j) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(abs)(j);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(labs, long, long j) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(labs)(j);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(llabs, long long, long long j) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(llabs)(j);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(imaxabs, intmax_t, intmax_t j) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(imaxabs)(j);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(getloadavg, int, double loadavg[], int nelem) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(getloadavg)(loadavg, nelem);
 }
 

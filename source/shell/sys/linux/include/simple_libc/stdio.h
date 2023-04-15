@@ -244,168 +244,223 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_v
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_STDIO_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(__vsf_linux_stdin, FILE *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(__vsf_linux_stdin)();
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(__vsf_linux_stdout, FILE *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(__vsf_linux_stdout)();
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(__vsf_linux_stderr, FILE *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(__vsf_linux_stderr)();
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(perror, void, const char *str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(perror)(str);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(setbuf, void, FILE *f, char *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(setbuf)(f, buf);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(setbuffer, void, FILE *f, char *buf, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(setbuffer)(f, buf, size);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(setlinebuf, void, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(setlinebuf)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(setvbuf, int, FILE *f, char *buf, int mode, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(setvbuf)(f, buf, mode, size);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(putchar, int, int ch) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(putchar)(ch);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(getchar, int, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(getchar)();
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fgetc, int, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fgetc)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fputc, int, int ch, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fputc)(ch, f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(getc, int, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(getc)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(putc, int, int ch, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(putc)(ch, f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(ungetc, int, int c, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(ungetc)(c, f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(puts, int, const char *str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(puts)(str);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fputs, int, const char *str, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fputs)(str, f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fgets, char *, char *str, int n, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fgets)(str, n, f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vscanf, int, const char *format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vscanf)(format, ap);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vfscanf, int, FILE *f, const char *format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vfscanf)(f, format, ap);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vfprintf, int, FILE *f, const char *format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vfprintf)(f, format, ap);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vprintf, int, const char *format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vprintf)(format, ap);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fopen, FILE *, const char *filename, const char *mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fopen)(filename, mode);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fdopen, FILE *, int fildes, const char *mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fdopen)(fildes, mode);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(freopen, FILE *, const char *filename, const char *mode, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(freopen)(filename, mode, f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fclose, int, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fclose)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fileno, int, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fileno)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fseek, int, FILE *f, long offset, int fromwhere) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fseek)(f, offset, fromwhere);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fseeko, int, FILE *f, off_t offset, int fromwhere) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fseeko)(f, offset, fromwhere);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fseeko64, int, FILE *f, off64_t offset, int fromwhere) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fseeko64)(f, offset, fromwhere);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(ftell, long, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(ftell)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(ftello, off_t, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(ftello)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(ftello64, off64_t, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(ftello64)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(rewind, void, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(rewind)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fgetpos, int, FILE *f, fpos_t *pos) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fgetpos)(f, pos);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fsetpos, int, FILE *f, const fpos_t *pos) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fsetpos)(f, pos);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fgetpos64, int, FILE *f, fpos64_t *pos) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fgetpos64)(f, pos);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fsetpos64, int, FILE *f, const fpos64_t *pos) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fsetpos64)(f, pos);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fread, size_t, void *ptr, size_t size, size_t nmemb, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fread)(ptr, size, nmemb, f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fwrite, size_t, const void *ptr, size_t size, size_t nmemb, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fwrite)(ptr, size, nmemb, f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fflush, int, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fflush)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(popen, FILE *, const char *command, const char *type) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(popen)(command, type);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(pclose, int, FILE *stream) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(pclose)(stream);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(rename, int, const char *old_filename, const char *new_filename) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(rename)(old_filename, new_filename);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(renameat, int, int olddirfd, const char *oldpath, int newdirfd, const char *newpath) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(renameat)(olddirfd, oldpath, newdirfd, newpath);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(ferror, int, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(ferror)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(clearerr, void, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(clearerr)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(feof, int, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(feof)(f);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vsprintf, int, char *str, const char *format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vsprintf)(str, format, ap);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vsnprintf, int, char *str, size_t size, const char* format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vsnprintf)(str, size, format, ap);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vsscanf, int, const char *str, const char *format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vsscanf)(str, format, ap);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vsnscanf, int, const char *str, size_t size, const char *format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vsnscanf)(str, size, format, ap);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(remove, int, const char *filename) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(remove)(filename);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(tmpfile, FILE *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(tmpfile)();
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(tmpnam, char *, char *str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(tmpnam)(str);
 }
 

@@ -217,21 +217,27 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SIGNAL_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SIGNAL_IMP(kill, int, pid_t pid, int sig) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SIGNAL_ENTRY(kill)(pid, sig);
 }
 VSF_LINUX_APPLET_SIGNAL_IMP(sigprocmask, int, int how, const sigset_t *set, sigset_t *oldset) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SIGNAL_ENTRY(sigprocmask)(how, set, oldset);
 }
 VSF_LINUX_APPLET_SIGNAL_IMP(signal, sighandler_t, int signum, sighandler_t handler) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SIGNAL_ENTRY(signal)(signum, handler);
 }
 VSF_LINUX_APPLET_SIGNAL_IMP(sigaction, int, int signum, const struct sigaction *act, struct sigaction *oldact) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SIGNAL_ENTRY(sigaction)(signum, act, oldact);
 }
 VSF_LINUX_APPLET_SIGNAL_IMP(raise, int, int sig) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SIGNAL_ENTRY(raise)(sig);
 }
 VSF_LINUX_APPLET_SIGNAL_IMP(pthread_sigmask, int, int how, const sigset_t *set, sigset_t *oldset) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SIGNAL_ENTRY(pthread_sigmask)(how, set, oldset);
 }
 

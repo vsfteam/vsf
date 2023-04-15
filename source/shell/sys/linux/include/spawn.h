@@ -110,72 +110,95 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_spawn_vplt_t vsf_linux_spawn_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SPAWN_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawn, int, pid_t *pid, const char *path, const posix_spawn_file_actions_t *actions, const posix_spawnattr_t *attr, char * const argv[], char * const env[]) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawn)(pid, path, actions, attr, argv, env);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnp, int, pid_t *pid, const char *file, const posix_spawn_file_actions_t *actions, const posix_spawnattr_t *attr, char * const argv[], char * const env[]) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnp)(pid, file, actions, attr, argv, env);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_init, int, posix_spawnattr_t *attr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_init)(attr);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_destroy, int, posix_spawnattr_t *attr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_destroy)(attr);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_getsigdefault, int, const posix_spawnattr_t *attr, sigset_t *sigdefault) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_getsigdefault)(attr, sigdefault);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_setsigdefault, int, posix_spawnattr_t *attr, const sigset_t *sigdefault) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_setsigdefault)(attr, sigdefault);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_getsigmask, int, const posix_spawnattr_t *attr, sigset_t *sigmask) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_getsigmask)(attr, sigmask);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_setsigmask, int, posix_spawnattr_t *attr, const sigset_t *sigmask) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_setsigmask)(attr, sigmask);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_getflags, int, const posix_spawnattr_t *attr, short int *flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_getflags)(attr, flags);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_setflags, int, posix_spawnattr_t *attr, short int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_setflags)(attr, flags);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_getpgroup, int, const posix_spawnattr_t *attr, pid_t *pgroup) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_getpgroup)(attr, pgroup);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_setpgroup, int, posix_spawnattr_t *attr, pid_t pgroup) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_setpgroup)(attr, pgroup);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_getschedpolicy, int, const posix_spawnattr_t *attr, int *schedpolicy) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_getschedpolicy)(attr, schedpolicy);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_setschedpolicy, int, posix_spawnattr_t *attr, int schedpolicy) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_setschedpolicy)(attr, schedpolicy);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_getschedparam, int, const posix_spawnattr_t *attr, struct sched_param *schedparam) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_getschedparam)(attr, schedparam);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawnattr_setschedparam, int, posix_spawnattr_t *attr, const struct sched_param *schedparam) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawnattr_setschedparam)(attr, schedparam);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawn_file_actions_init, int, posix_spawn_file_actions_t *actions) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawn_file_actions_init)(actions);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawn_file_actions_destroy, int, posix_spawn_file_actions_t *actions) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawn_file_actions_destroy)(actions);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawn_file_actions_addopen, int, posix_spawn_file_actions_t *actions, int fd, const char *path, int oflag, mode_t mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawn_file_actions_addopen)(actions, fd, path, oflag, mode);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawn_file_actions_addclose, int, posix_spawn_file_actions_t *actions, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawn_file_actions_addclose)(actions, fd);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawn_file_actions_adddup2, int, posix_spawn_file_actions_t *actions, int fd, int newfd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawn_file_actions_adddup2)(actions, fd, newfd);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawn_file_actions_addchdir_np, int, posix_spawn_file_actions_t *actions, const char *path) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawn_file_actions_addchdir_np)(actions, path);
 }
 VSF_LINUX_APPLET_SPAWN_IMP(posix_spawn_file_actions_addfchdir_np, int, posix_spawn_file_actions_t *actions, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SPAWN_ENTRY(posix_spawn_file_actions_addfchdir_np)(actions, fd);
 }
 

@@ -113,15 +113,19 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_fcntl_vplt_t vsf_linux_fcntl_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_FCNTL_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_FCNTL_IMP(__fcntl_va, int, int fd, int cmd, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FCNTL_ENTRY(__fcntl_va)(fd, cmd, ap);
 }
 VSF_LINUX_APPLET_FCNTL_IMP(__open_va, int, const char *pathname, int flags, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FCNTL_ENTRY(__open_va)(pathname, flags, ap);
 }
 VSF_LINUX_APPLET_FCNTL_IMP(__openat_va, int, int dirfd, const char *pathname, int flags, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FCNTL_ENTRY(__openat_va)(dirfd, pathname, flags, ap);
 }
 VSF_LINUX_APPLET_FCNTL_IMP(creat, int, const char *pathname, mode_t mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FCNTL_ENTRY(creat)(pathname, mode);
 }
 
