@@ -15825,13 +15825,16 @@
                     <group>
                         <name>lib</name>
                         <group>
-                            <name>glibc</name>
+                            <name>3rd-party</name>
                             <group>
-                                <name>3rd-party</name>
+                                <name>getopt</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\3rd-party\getopt_long.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\3rd-party\getopt\getopt_long.c</name>
                                 </file>
                             </group>
+                        </group>
+                        <group>
+                            <name>glibc</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c</name>
                             </file>

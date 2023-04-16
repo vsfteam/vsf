@@ -62,7 +62,7 @@ char * __strdup_ex(vsf_linux_process_t *process, const char *str)
 
 void * mempcpy(void *dest, const void *src, size_t len)
 {
-    return memcpy(dest, src, len) + len;
+    return (void *)((char *)memcpy(dest, src, len) + len);
 }
 
 size_t strscpy(char *dest, const char *src, size_t n)
@@ -126,7 +126,7 @@ void * memrchr(const void *str, int ch, size_t len)
 char * stpcpy(char *dest, const char *src)
 {
     size_t len = strlen(src);
-    return memcpy(dest, src, len + 1) + len;
+    return (char *)memcpy(dest, src, len + 1) + len;
 }
 
 char *stpncpy(char *dest, const char *src, size_t n)
