@@ -230,6 +230,11 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
     *str_cur = '\0';
     return str_cur - str;
 }
+
+char * strptime(const char *str, const char *format, struct tm *tm)
+{
+    return NULL
+}
 #endif
 
 #if __IS_COMPILER_GCC__
@@ -580,6 +585,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(localtime_r),
     VSF_APPLET_VPLT_ENTRY_FUNC(mktime),
     VSF_APPLET_VPLT_ENTRY_FUNC(strftime),
+    VSF_APPLET_VPLT_ENTRY_FUNC(strptime),
     VSF_APPLET_VPLT_ENTRY_FUNC(nanosleep),
     VSF_APPLET_VPLT_ENTRY_FUNC(timer_create),
     VSF_APPLET_VPLT_ENTRY_FUNC(timer_settime),

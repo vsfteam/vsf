@@ -67,6 +67,9 @@ extern "C" {
 // for ioctrl
 #define F_IO            16
 
+#define AT_FDCWD        -100
+#define AT_SYMLINK_NOFOLLOW 0x100
+
 #define FD_CLOEXEC      1
 // __FD_READALL is used internally to indicate to read all data
 #define __FD_READALL    2

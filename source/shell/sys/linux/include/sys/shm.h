@@ -99,4 +99,4 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf);
 #endif
 
 #endif      // VSF_LINUX_CFG_SHM_NUM
-#endif      // __VSF_LINUX_SHM_H__
+#endif      // __VSF_LINUX_SYS_SHM_H__

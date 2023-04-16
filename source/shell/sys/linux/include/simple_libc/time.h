@@ -83,6 +83,7 @@ typedef struct vsf_linux_libc_time_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(localtime_r);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mktime);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strftime);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strptime);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(nanosleep);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(timer_create);
@@ -180,6 +181,10 @@ VSF_LINUX_APPLET_LIBC_TIME_IMP(strftime, size_t, char *str, size_t maxsize, cons
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(strftime)(str, maxsize, format, tm);
 }
+VSF_LINUX_APPLET_LIBC_TIME_IMP(strptime, char *£¬ const char *str, const char *format, struct tm *tm) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(strptime)(str, format, tm);
+}
 VSF_LINUX_APPLET_LIBC_TIME_IMP(nanosleep, int, const struct timespec *requested_time, struct timespec *remaining) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(nanosleep)(requested_time, remaining);
@@ -237,6 +242,7 @@ struct tm *localtime_r(const time_t *t, struct tm *result);
 
 time_t mktime(struct tm *tm);
 size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm);
+char * strptime(const char *str, const char *format, struct tm *tm);
 
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining);
 

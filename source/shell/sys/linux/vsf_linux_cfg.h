@@ -243,6 +243,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_SYS_TIMES
 #       define VSF_LINUX_APPLET_USE_SYS_TIMES   DISABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_STATFS
+#       define VSF_LINUX_APPLET_USE_SYS_STATFS  ENABLED
+#   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_UNISTD
 #       define VSF_LINUX_APPLET_USE_UNISTD      ENABLED
@@ -362,7 +365,7 @@ typedef struct vsf_linux_vplt_t {
     void *sys_file_vplt;
     void *sys_prctl_vplt;
     void *sys_event_vplt;
-    void *sys_res0_vplt;
+    void *sys_statfs_vplt;
     void *sys_res1_vplt;
     void *sys_res2_vplt;
 

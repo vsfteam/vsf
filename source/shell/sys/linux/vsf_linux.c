@@ -3532,6 +3532,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_EVENT == ENABLED
 #       include "./include/sys/event.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
+#       include "./include/sys/statfs.h"
+#   endif
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED
 #       include "./include/netdb.h"
 #   endif
@@ -3589,6 +3592,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_EVENT == ENABLED
 #       include <sys/event.h>
 #   endif
+#   if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
+#       include <sys/statfs.h>
+#   endif
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED
 #       include <netdb.h>
 #   endif
@@ -3621,6 +3627,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #       include <math/math.h>
 #   endif
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_statfs_vplt_t vsf_linux_sys_statfs_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_statfs_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(statfs),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fstatfs),
+};
 #endif
 
 #if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED && !defined(__VSF_APPLET__)
@@ -3714,6 +3729,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_EVENT == ENABLED
     .sys_event_vplt     = (void *)&vsf_linux_sys_event_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
+    .sys_statfs_vplt    = (void *)&vsf_linux_sys_statfs_vplt,
 #   endif
 
 #   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
