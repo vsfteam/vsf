@@ -31,7 +31,7 @@ typedef unsigned long long      uint_fast64_t;
 typedef long long               intmax_t;
 typedef unsigned long long      uintmax_t;
 
-#if !defined ( __cplusplus) 
+//#if !defined(__cplusplus) 
 
 #define INT8_MIN                (-128)
 #define INT16_MIN               (-32768)
@@ -102,6 +102,6 @@ typedef unsigned long long      uintmax_t;
 #   define SIZE_MAX             UINT32_MAX
 #endif
 
-#endif
+//#endif
 
 #endif

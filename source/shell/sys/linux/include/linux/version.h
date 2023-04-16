@@ -7,7 +7,7 @@ extern "C" {
 
 #define KERNEL_VERSION(__MAJOR, __MINOR, __PATCH)       (((__MAJOR) << 16) + ((__MINOR) << 8) + (__PATCH))
 
-#define LINUX_VERSION_CODE                              KERNEL_VERSION(0, 0, 0)
+#define LINUX_VERSION_CODE                              KERNEL_VERSION(2, 6, 0)
 
 #ifdef __cplusplus
 }

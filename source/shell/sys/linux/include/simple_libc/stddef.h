@@ -92,10 +92,12 @@ typedef __PTRDIFF_TYPE__            ptrdiff_t;
 typedef unsigned int                size_t;
 typedef int                         ptrdiff_t;
 typedef int                         intptr_t;
+typedef unsigned int                uintptr_t;
 #   elif defined(__CPU_X64__)
 typedef unsigned __int64            size_t;
 typedef __int64                     ptrdiff_t;
 typedef __int64                     intptr_t;
+typedef unsigned __int64            uintptr_t;
 #   endif
 #else
 typedef long int                    ptrdiff_t;

@@ -3,6 +3,9 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
+// for __BEGIN_DECLS and __END_DECLS etc
+#include "./~cdefs.h"
+
 // do not include vsf_utilities.h, because type.h is actually belong to compiler layer,
 //  and compiler layer can not include vsf_utilities.h directly
 //#include "utilities/vsf_utilities.h"

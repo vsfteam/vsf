@@ -171,6 +171,12 @@ VSF_LINUX_APPLET_NETDB_IMP(hstrerror, const char *, int err) {
 struct hostent * gethostbyaddr(const void *addr, size_t len, int type);
 struct hostent * gethostbyname(const char *name);
 
+void setservent(int stayopen);
+void endservent(void);
+struct servent * getservent(void);
+struct servent * getservbyname(const char *name, const char *proto);
+struct servent * getservbyport(int port, const char *proto);
+
 const char * gai_strerror(int errcode);
 
 int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,

@@ -14,4 +14,8 @@
 #define __NTH(Fct)          fct
 #define __NTHNL(fct)        fct
 
+#ifndef DEF_WEAK
+#   define DEF_WEAK(x)
+#endif
+
 #endif      // __VSF_LINUX_CDEFS_H__
