@@ -42,6 +42,7 @@ extern "C" {
 #define O_CLOEXEC       0x1000
 #define O_SYNC          0x2000
 #define O_ASYNC         0x4000
+#define O_NOFOLLOW      0x8000
 #define O_LARGEFILE     0
 
 #define O_NOCTTY        0x2000

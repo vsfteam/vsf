@@ -39,6 +39,7 @@
 #   include "../../include/termios.h"
 #   include "../../include/mntent.h"
 #   include "../../include/glob.h"
+#   include "../../include/fnmatch.h"
 #   include "../../include/linux/limits.h"
 #else
 #   include <unistd.h>
@@ -53,6 +54,7 @@
 #   include <termios.h>
 #   include <mntent.h>
 #   include <glob.h>
+#   include <fnmatch.h>
 // for MAX_PATH
 #   include <linux/limits.h>
 #endif
@@ -2978,6 +2980,13 @@ struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int 
 {
     VSF_LINUX_ASSERT(false);
     return (struct mntent *)NULL;
+}
+
+// fnmatch
+
+int fnmatch(const char *pattern, const char *string, int flags)
+{
+    return -1;
 }
 
 // glob

@@ -281,6 +281,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_FINDPROG
 #       define VSF_LINUX_APPLET_USE_FINDPROG    ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_FNMATCH
+#       define VSF_LINUX_APPLET_USE_FNMATCH     ENABLED
+#   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_LIBC
 #       define VSF_LINUX_APPLET_USE_LIBC        ENABLED
@@ -384,7 +387,7 @@ typedef struct vsf_linux_vplt_t {
     void *mntent_vplt;
     void *pwd_vplt;
     void *findprog_vplt;
-    void *res4_vplt;
+    void *fnmatch_vplt;
     void *res5_vplt;
     void *res6_vplt;
     void *res7_vplt;
