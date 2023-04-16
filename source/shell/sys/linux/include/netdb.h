@@ -84,6 +84,8 @@ struct servent {
 #define gethostbyname       VSF_LINUX_SOCKET_WRAPPER(gethostbyname)
 #define getaddrinfo         VSF_LINUX_SOCKET_WRAPPER(getaddrinfo)
 #define freeaddrinfo        VSF_LINUX_SOCKET_WRAPPER(freeaddrinfo)
+#define herror              VSF_LINUX_SOCKET_WRAPPER(herror)
+#define hstrerror           VSF_LINUX_SOCKET_WRAPPER(hstrerror)
 #endif
 
 extern int * __vsf_linux_h_errno(void);
@@ -106,6 +108,8 @@ typedef struct vsf_linux_netdb_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getnameinfo);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getaddrinfo);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(freeaddrinfo);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(herror);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(hstrerror);
 } vsf_linux_netdb_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
@@ -153,6 +157,14 @@ VSF_LINUX_APPLET_NETDB_IMP(freeaddrinfo, void, struct addrinfo *pai) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_NETDB_ENTRY(freeaddrinfo)(pai);
 }
+VSF_LINUX_APPLET_NETDB_IMP(herror, void, const char *s) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_NETDB_ENTRY(herror)(s);
+}
+VSF_LINUX_APPLET_NETDB_IMP(hstrerror, const char *, int err) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_NETDB_ENTRY(hstrerror)(err);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_NETDB
 
@@ -167,6 +179,9 @@ int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
 int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
                         struct addrinfo **pai);
 void freeaddrinfo(struct addrinfo *pai);
+
+void herror(const char *s);
+const char * hstrerror(int err);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_NETDB
 

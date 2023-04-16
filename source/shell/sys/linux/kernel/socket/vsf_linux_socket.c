@@ -712,6 +712,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(getnameinfo),
     VSF_APPLET_VPLT_ENTRY_FUNC(getaddrinfo),
     VSF_APPLET_VPLT_ENTRY_FUNC(freeaddrinfo),
+    VSF_APPLET_VPLT_ENTRY_FUNC(herror);
+    VSF_APPLET_VPLT_ENTRY_FUNC(hstrerror);
 };
 #endif
 
