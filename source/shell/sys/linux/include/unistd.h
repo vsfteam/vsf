@@ -71,6 +71,7 @@ extern "C" {
 #define alarm               VSF_LINUX_WRAPPER(alarm)
 #define ualarm              VSF_LINUX_WRAPPER(ualarm)
 #define fork                VSF_LINUX_WRAPPER(fork)
+#define _exit               VSF_LINUX_WRAPPER(_exit)
 
 #define isatty              VSF_LINUX_WRAPPER(isatty)
 #define symlink             VSF_LINUX_WRAPPER(symlink)

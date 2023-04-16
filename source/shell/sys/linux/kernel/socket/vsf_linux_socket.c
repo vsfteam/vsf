@@ -222,6 +222,15 @@ int * __vsf_linux_h_errno(void)
     return &thread->__h_errno;
 }
 
+void herror(const char *s)
+{
+}
+
+const char * hstrerror(int err)
+{
+    return (const char *)"unknown error";
+}
+
 const char * gai_strerror(int errcode)
 {
     return (const char *)"unknown error";
@@ -712,8 +721,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(getnameinfo),
     VSF_APPLET_VPLT_ENTRY_FUNC(getaddrinfo),
     VSF_APPLET_VPLT_ENTRY_FUNC(freeaddrinfo),
-    VSF_APPLET_VPLT_ENTRY_FUNC(herror);
-    VSF_APPLET_VPLT_ENTRY_FUNC(hstrerror);
+    VSF_APPLET_VPLT_ENTRY_FUNC(herror),
+    VSF_APPLET_VPLT_ENTRY_FUNC(hstrerror),
 };
 #endif
 

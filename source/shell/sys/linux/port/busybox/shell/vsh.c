@@ -10,6 +10,7 @@
 #   include "../../../include/sys/wait.h"
 #   include "../../../include/dirent.h"
 #   include "../../../include/fcntl.h"
+#   include "../../../include/findprog.h"
 #   include "../../../include/linux/limits.h"
 #else
 #   include <unistd.h>
@@ -17,6 +18,7 @@
 #   include <sys/wait.h>
 #   include <dirent.h>
 #   include <fcntl.h>
+#   include <findprog.h>
 // for MAX_PATH
 #   include <linux/limits.h>
 #endif
