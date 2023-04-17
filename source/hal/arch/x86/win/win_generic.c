@@ -1161,8 +1161,13 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 #endif
 
 /*----------------------------------------------------------------------------*
- * Reset                                                                      *
+ * Reset/Shutdown                                                             *
  *----------------------------------------------------------------------------*/
+
+void vsf_arch_shutdown(void)
+{
+    ExitProcess(0);
+}
 
 void vsf_arch_reset(void)
 {
