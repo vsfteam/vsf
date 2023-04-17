@@ -412,6 +412,25 @@ int vfprintf(FILE *f, const char *format, va_list ap)
     return size;
 }
 
+int vdprintf(int fd, const char *format, va_list ap)
+{
+    FILE *f = vsf_linux_fd_get(fd);
+    if (NULL == f) {
+        return -1;
+    }
+    return vfprintf(f, format, ap);
+}
+
+int dprintf(int fd, const char *format, ...)
+{
+    int size;
+    va_list ap;
+    va_start(ap, format);
+        size = vdprintf(fd, format, ap);
+    va_end(ap);
+    return size;
+}
+
 int vprintf(const char *format, va_list arg)
 {
     return vfprintf(stdout, format, arg);
@@ -853,6 +872,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(printf),
     VSF_APPLET_VPLT_ENTRY_FUNC(fprintf),
     VSF_APPLET_VPLT_ENTRY_FUNC(vfprintf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(dprintf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vdprintf),
     VSF_APPLET_VPLT_ENTRY_FUNC(vprintf),
     VSF_APPLET_VPLT_ENTRY_FUNC(fopen),
     VSF_APPLET_VPLT_ENTRY_FUNC(fdopen),

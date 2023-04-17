@@ -123,6 +123,14 @@ void * memrchr(const void *str, int ch, size_t len)
     return (void *)end;
 }
 
+char * strchrnul(const char *s, int c)
+{
+    while (*s != '\0' && *s != c) {
+        s++;
+    }
+    return (char *)s;
+}
+
 char * stpcpy(char *dest, const char *src)
 {
     size_t len = strlen(src);

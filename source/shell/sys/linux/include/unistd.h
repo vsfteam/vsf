@@ -89,6 +89,9 @@ extern "C" {
 
 #define getentropy          VSF_LINUX_WRAPPER(getentropy)
 
+#define gethostid           VSF_LINUX_WRAPPER(gethostid)
+#define sethostid           VSF_LINUX_WRAPPER(sethostid)
+
 #if __IS_COMPILER_IAR__
 #else
 #   define access           VSF_LINUX_WRAPPER(access)
@@ -281,6 +284,8 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pwrite);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(preadv);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pwritev);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sync);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(syncfs);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fsync);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fdatasync);
 
@@ -304,6 +309,8 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fchownat);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getentropy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gethostid);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sethostid);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(lseek64);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ttyname);
@@ -536,6 +543,14 @@ VSF_LINUX_APPLET_UNISTD_IMP(pwritev, ssize_t, int fd, const struct iovec *iov, i
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(pwritev)(fd, iov, iovcnt, offset);
 }
+VSF_LINUX_APPLET_UNISTD_IMP(sync, void, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_UNISTD_ENTRY(sync)();
+}
+VSF_LINUX_APPLET_UNISTD_IMP(syncfs, int, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(syncfs)(fd);
+}
 VSF_LINUX_APPLET_UNISTD_IMP(fsync, int, int fd) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(fsync)(fd);
@@ -615,6 +630,14 @@ VSF_LINUX_APPLET_UNISTD_IMP(fchownat, int, int dirfd, const char *pathname, uid_
 VSF_LINUX_APPLET_UNISTD_IMP(getentropy, int, void *buffer, size_t length) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getentropy)(buffer, length);
+}
+VSF_LINUX_APPLET_UNISTD_IMP(gethostid, long, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(gethostid)();
+}
+VSF_LINUX_APPLET_UNISTD_IMP(sethostid, int, long hostid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(sethostid)(hostid);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(lseek64, off64_t, int fd, off64_t offset, int whence) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -722,6 +745,9 @@ ssize_t preadv64 (int fd, const struct iovec *vector, int iovcnt, off64_t offset
 ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
 ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset);
 ssize_t pwritev64 (int fd, const struct iovec *vector, int iovcnt, off64_t offset);
+
+void sync(void);
+int syncfs(int fd);
 int fsync(int fd);
 int fdatasync(int fd);
 
@@ -747,6 +773,9 @@ int lchown(const char *pathname, uid_t owner, gid_t group);
 int fchownat(int dirfd, const char *pathname, uid_t owner, gid_t group, int flags);
 
 int getentropy(void *buffer, size_t length);
+
+long gethostid(void);
+int sethostid(long hostid);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_UNISTD
 

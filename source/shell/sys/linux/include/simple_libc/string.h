@@ -60,6 +60,7 @@ typedef struct vsf_linux_libc_string_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strstr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strchr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strrchr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strchrnul);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memmove);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memcmp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memchr);
@@ -203,6 +204,10 @@ VSF_LINUX_APPLET_LIBC_STRING_IMP(strchr, char *, const char *str, int c) {
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strrchr, char *, const char *str, int c) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strrchr)(str, c);
+}
+VSF_LINUX_APPLET_LIBC_STRING_IMP(strchrnul, char *, const char *str, int c) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strchrnul)(str, c);
 }
 VSF_LINUX_APPLET_LIBC_STRING_IMP(memmove, void *, void *dest, const void *src, size_t n) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();

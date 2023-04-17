@@ -1818,6 +1818,15 @@ int utimes(const char *filename, const struct timeval times[2])
     return 0;
 }
 
+void sync(void)
+{
+}
+
+int syncfs(int fd)
+{
+    return 0;
+}
+
 int fsync(int fd)
 {
     return 0;

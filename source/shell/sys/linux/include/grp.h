@@ -25,7 +25,11 @@ struct group {
 #   define getgrgid(__gid)          (NULL)
 #   define getgrnam_r(...)          (-1)
 #   define getgrgid_r(...)          (-1)
+#   define setgroups(...)           (-1)
+#   define getgroups(...)           (-1)
 #else
+int getgroups(size_t size, gid_t list[]);
+int setgroups(size_t size, const gid_t *list);
 struct group * getgrnam(const char *name);
 struct group * getgrgid(gid_t gid);
 int getgrnam_r(const char *name, struct group *grp,

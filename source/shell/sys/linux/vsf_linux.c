@@ -42,6 +42,7 @@
 #   include "./include/sys/stat.h"
 #   include "./include/sys/times.h"
 #   include "./include/sys/prctl.h"
+#   include "./include/sys/reboot.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -68,6 +69,7 @@
 #   include <sys/stat.h>
 #   include <sys/times.h>
 #   include <sys/prctl.h>
+#   include <sys/reboot.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -187,6 +189,7 @@ typedef struct vsf_linux_t {
     } futex;
 #endif
 
+    long hostid;
     char hostname[HOST_NAME_MAX + 1];
 } vsf_linux_t;
 
@@ -2278,6 +2281,27 @@ clock_t times(struct tms *buf)
     return (clock_t)(vsf_systimer_get_tick() * sysconf(_SC_CLK_TCK) / vsf_systimer_get_freq());
 }
 
+// sys/reboot.h
+
+int reboot(int howto)
+{
+    switch (howto) {
+    case RB_POWER_OFF:
+        printf("Power down.");
+        vsf_arch_shutdown();
+        break;
+    case RB_HALT_SYSTEM:
+        printf("System halted.");
+        vsf_arch_shutdown();
+        break;
+    case RB_AUTOBOOT:
+        printf("Restarting system.");
+        vsf_arch_reset();
+        break;
+    }
+    return 0;
+}
+
 // futex.h
 // TODO: use hasp map instead of vsf_dlist for better performance at the cost of resources taken
 // TODO: use vsf_linux_trigger_t so that wait operation can be interrupted by signals
@@ -2625,6 +2649,23 @@ int getentropy(void *buf, size_t length)
 {
     ssize_t length_ret = getrandom(buf, length, 0);
     return (length_ret == length) ? 0 : -1;
+}
+
+long gethostid(void)
+{
+    return __vsf_linux.hostid;
+}
+
+int sethostid(long hostid)
+{
+    __vsf_linux.hostid = hostid;
+    return 0;
+}
+
+pid_t vfork(void)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 pid_t fork(void)
@@ -3480,6 +3521,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(pwrite),
     VSF_APPLET_VPLT_ENTRY_FUNC(preadv),
     VSF_APPLET_VPLT_ENTRY_FUNC(pwritev),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sync),
+    VSF_APPLET_VPLT_ENTRY_FUNC(syncfs),
     VSF_APPLET_VPLT_ENTRY_FUNC(fsync),
     VSF_APPLET_VPLT_ENTRY_FUNC(fdatasync),
     VSF_APPLET_VPLT_ENTRY_FUNC(isatty),
@@ -3500,6 +3543,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(lchown),
     VSF_APPLET_VPLT_ENTRY_FUNC(fchownat),
     VSF_APPLET_VPLT_ENTRY_FUNC(getentropy),
+    VSF_APPLET_VPLT_ENTRY_FUNC(gethostid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sethostid),
     VSF_APPLET_VPLT_ENTRY_FUNC(ttyname),
     VSF_APPLET_VPLT_ENTRY_FUNC(ttyname_r),
     VSF_APPLET_VPLT_ENTRY_FUNC(_exit),
@@ -3519,9 +3564,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_SENDFILE == ENABLED
 #       include "./include/sys/sendfile.h"
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
-#       include "./include/sys/reboot.h"
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
 #       include "./include/sys/file.h"
@@ -3580,9 +3622,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_SENDFILE == ENABLED
 #       include <sys/sendfile.h>
 #   endif
-#   if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
-#       include <sys/reboot.h>
-#   endif
 #   if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
 #       include <sys/file.h>
 #   endif
@@ -3627,6 +3666,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #       include <math/math.h>
 #   endif
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_reboot_vplt_t vsf_linux_sys_reboot_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_reboot_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(reboot),
+};
 #endif
 
 #if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED && !defined(__VSF_APPLET__)

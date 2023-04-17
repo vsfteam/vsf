@@ -70,7 +70,9 @@ extern "C" {
 #define printf              VSF_LINUX_LIBC_WRAPPER(printf)
 #define vprintf             VSF_LINUX_LIBC_WRAPPER(vprintf)
 #define vfprintf            VSF_LINUX_LIBC_WRAPPER(vfprintf)
+#define vdprintf            VSF_LINUX_LIBC_WRAPPER(vdprintf)
 #define fprintf             VSF_LINUX_LIBC_WRAPPER(fprintf)
+#define dprintf             VSF_LINUX_LIBC_WRAPPER(dprintf)
 #define fiprintf            VSF_LINUX_LIBC_WRAPPER(fiprintf)
 #define fscanf              VSF_LINUX_LIBC_WRAPPER(fscanf)
 #define vfscanf             VSF_LINUX_LIBC_WRAPPER(vfscanf)
@@ -184,6 +186,8 @@ typedef struct vsf_linux_libc_stdio_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(printf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fprintf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vfprintf);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dprintf);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vdprintf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vprintf);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fopen);
@@ -341,6 +345,10 @@ VSF_LINUX_APPLET_LIBC_STDIO_IMP(vfscanf, int, FILE *f, const char *format, va_li
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vfprintf, int, FILE *f, const char *format, va_list ap) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vfprintf)(f, format, ap);
+}
+VSF_LINUX_APPLET_LIBC_STDIO_IMP(vdprintf, int, int fd, const char *format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vdprintf)(fd, format, ap);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vprintf, int, const char *format, va_list ap) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -511,6 +519,14 @@ static inline int fprintf(FILE *f, const char *format, ...) {
     va_end(ap);
     return result;
 }
+static inline int dprintf(int fd, const char *format, ...) {
+    int result;
+    va_list ap;
+    va_start(ap, format);
+        result = vfprintf(fd, format, ap);
+    va_end(ap);
+    return result;
+}
 static inline int sprintf(char *str, const char *format, ...) {
     int result;
     va_list ap;
@@ -575,8 +591,10 @@ int vfscanf(FILE *f, const char *format, va_list ap);
 
 int printf(const char *format, ...);
 int fprintf(FILE *f, const char *format, ...);
-int fiprintf(FILE *f, const char *format, ...);
 int vfprintf(FILE *f, const char *format, va_list ap);
+int dprintf(int fd, const char *format, ...);
+int vdprintf(int fd, const char *format, va_list ap);
+int fiprintf(FILE *f, const char *format, ...);
 int vprintf(const char *format, va_list ap);
 
 FILE * fopen(const char *filename, const char *mode);
