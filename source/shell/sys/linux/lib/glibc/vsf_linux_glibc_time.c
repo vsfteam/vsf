@@ -578,6 +578,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
 
     VSF_APPLET_VPLT_ENTRY_FUNC(clock),
     VSF_APPLET_VPLT_ENTRY_FUNC(clock_gettime),
+    VSF_APPLET_VPLT_ENTRY_FUNC(clock_settime),
     VSF_APPLET_VPLT_ENTRY_FUNC(clock_getres),
     VSF_APPLET_VPLT_ENTRY_FUNC(clock_nanosleep),
     VSF_APPLET_VPLT_ENTRY_FUNC(time),

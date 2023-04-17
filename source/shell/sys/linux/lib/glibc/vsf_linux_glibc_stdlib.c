@@ -737,6 +737,26 @@ int __setenv_ex(vsf_linux_process_t *process, const char *name, const char *valu
     return __putenv_ex(process, env_str);
 }
 
+int __clearenv_ex(vsf_linux_process_t *process)
+{
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    VSF_LINUX_ASSERT(process != NULL);
+
+    char **env = process->__environ;
+
+    if (env != NULL) {
+        for (; *env != NULL; env++) {
+            __free_ex(process, *env);
+            *env = NULL;
+        }
+        __free_ex(process, env);
+        process->__environ = NULL;
+    }
+    return 0;
+}
+
 int putenv(char *string)
 {
     return __putenv_ex(NULL, string);
@@ -755,6 +775,11 @@ int setenv(const char *name, const char *value, int replace)
 int unsetenv(const char *name)
 {
     return putenv((char *)name);
+}
+
+int clearenv(void)
+{
+    return __clearenv_ex(NULL);
 }
 #endif
 
@@ -781,6 +806,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(getenv),
     VSF_APPLET_VPLT_ENTRY_FUNC(setenv),
     VSF_APPLET_VPLT_ENTRY_FUNC(unsetenv),
+    VSF_APPLET_VPLT_ENTRY_FUNC(clearenv),
 #endif
     VSF_APPLET_VPLT_ENTRY_FUNC(mktemps),
     VSF_APPLET_VPLT_ENTRY_FUNC(mktemp),

@@ -32,6 +32,7 @@ extern "C" {
 #define putenv              VSF_LINUX_LIBC_WRAPPER(putenv)
 #define setenv              VSF_LINUX_LIBC_WRAPPER(setenv)
 #define unsetenv            VSF_LINUX_LIBC_WRAPPER(unsetenv)
+#define clearenv            VSF_LINUX_LIBC_WRAPPER(clearenv)
 #   endif
 #define mktemps             VSF_LINUX_LIBC_WRAPPER(mktemps)
 #define mktemp              VSF_LINUX_LIBC_WRAPPER(mktemp)
@@ -95,6 +96,7 @@ typedef struct vsf_linux_libc_stdlib_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getenv);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setenv);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(unsetenv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(clearenv);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mktemps);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mktemp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkstemp);
@@ -211,6 +213,10 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(setenv, int, const char *name, const char *valu
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(unsetenv, int, const char *name) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(unsetenv)(name);
+}
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(clearenv, int, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(clearenv)();
 }
 #endif
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(mktemps, char *, char *template_str, int suffixlen) {
@@ -385,6 +391,7 @@ int putenv(char *string);
 char * getenv(const char *name);
 int setenv(const char *name, const char *value, int replace);
 int unsetenv(const char *name);
+int clearenv(void);
 #endif
 char * mktemps(char *template_str, int suffixlen);
 char * mktemp(char *template_str);
