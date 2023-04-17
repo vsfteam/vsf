@@ -64,6 +64,7 @@ enum {
     TIOCSSERIAL     = F_IO + 2,
     TIOCSCTTY       = F_IO + 3,
     FIONREAD        = F_IO + 4,
+    TIOCSERCONFIG   = F_IO + 5,
 };
 
 //int ioctl(int fd, unsigned long request, ...);

@@ -27,6 +27,8 @@
 #define LONG_LONG_MIN                   LLONG_MIN
 #define ULONG_LONG_MAX                  ULLONG_MAX
 
+#define SSIZE_MAX                       _POSIX_SSIZE_MAX
+
 #define MB_LEN_MAX                      16
 
 // POSIX.1
