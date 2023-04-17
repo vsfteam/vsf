@@ -33,6 +33,15 @@ typedef struct {
 } mbstate_t;
 #endif
 
+#define getwc_unlocked          getwc
+#define getwchar_unlocked       getwchar
+#define fgetwc_unlocked         fgetwc
+#define fputwc_unlocked         fputwc
+#define putwc_unlocked          putwc
+#define putwchar_unlocked       putwchar
+#define fgetws_unlocked         fgetws
+#define fputws_unlocked         fputws
+
 int mbsinit(const mbstate_t *ps);
 size_t mbrlen(const char *str, size_t n, mbstate_t *ps);
 size_t mbrtowc(wchar_t *pwc, const char *str, size_t n, mbstate_t *ps);

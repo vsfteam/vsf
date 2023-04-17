@@ -99,6 +99,21 @@ extern "C" {
 #define fprintf             VSF_LINUX_LIBC_WRAPPER(fprintf)
 #endif
 
+#define getc_unlocked       getc
+#define getchar_unlocked    getchar
+#define putc_unlocked       putc
+#define putchar_unlocked    putchar
+#define clearerr_unlocked   clearerr
+#define feof_unlocked       feof
+#define ferror_unlocked     ferror
+#define fileno_unlocked     fileno
+#define fflush_unlocked     fflush
+#define fgetc_unlocked      fgetc
+#define fputc_unlocked      fputc
+#define fread_unlocked      fread
+#define fwrite_unlocked     fwrite
+#define fgets_unlocked      fgets
+#define fputs_unlocked      fputs
 #define fopen64             fopen
 
 typedef off64_t             fpos_t;

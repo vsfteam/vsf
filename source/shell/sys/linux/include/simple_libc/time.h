@@ -25,6 +25,7 @@ extern "C" {
 
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
 #define clock_gettime       VSF_LINUX_LIBC_WRAPPER(clock_gettime)
+#define clock_settime       VSF_LINUX_LIBC_WRAPPER(clock_settime)
 #define clock_getres        VSF_LINUX_LIBC_WRAPPER(clock_getres)
 #define clock_nanosleep     VSF_LINUX_LIBC_WRAPPER(clock_nanosleep)
 #define timer_create        VSF_LINUX_LIBC_WRAPPER(timer_create)
@@ -69,6 +70,7 @@ typedef struct vsf_linux_libc_time_vplt_t {
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(clock);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(clock_gettime);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(clock_settime);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(clock_getres);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(clock_nanosleep);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(time);
@@ -124,6 +126,10 @@ VSF_LINUX_APPLET_LIBC_TIME_IMP(clock, clock_t, void) {
 VSF_LINUX_APPLET_LIBC_TIME_IMP(clock_gettime, int, clockid_t clockid, struct timespec *ts) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(clock_gettime)(clockid, ts);
+}
+VSF_LINUX_APPLET_LIBC_TIME_IMP(clock_settime, int, clockid_t clockid, const struct timespec *ts) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(clock_settime)(clockid, ts);
 }
 VSF_LINUX_APPLET_LIBC_TIME_IMP(clock_getres, int, clockid_t clockid, struct timespec *res) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -214,6 +220,7 @@ VSF_LINUX_APPLET_LIBC_TIME_IMP(timespec_get, int, struct timespec *ts, int base)
 
 clock_t clock(void);
 int clock_gettime(clockid_t clockid, struct timespec *ts);
+int clock_settime(clockid_t clockid, const struct timespec *ts);
 int clock_getres(clockid_t clockid, struct timespec *res);
 int clock_nanosleep(clockid_t clockid, int flags, const struct timespec *request,
                         struct timespec *remain);

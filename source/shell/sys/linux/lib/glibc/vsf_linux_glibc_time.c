@@ -230,12 +230,13 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
     *str_cur = '\0';
     return str_cur - str;
 }
+#endif
 
 char * strptime(const char *str, const char *format, struct tm *tm)
 {
-    return NULL
+    VSF_LINUX_ASSERT(false);
+    return NULL;
 }
-#endif
 
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
@@ -352,9 +353,9 @@ clock_t clock(void)
     return vsf_systimer_get_ms();
 }
 
-int clock_getres(clockid_t clk_id, struct timespec *res)
+int clock_getres(clockid_t clockid, struct timespec *res)
 {
-    switch (clk_id) {
+    switch (clockid) {
     case CLOCK_MONOTONIC:
         if (res != NULL) {
             res->tv_sec = 0;
@@ -366,9 +367,9 @@ int clock_getres(clockid_t clk_id, struct timespec *res)
     }
 }
 
-int clock_gettime(clockid_t clk_id, struct timespec *tp)
+int clock_gettime(clockid_t clockid, struct timespec *tp)
 {
-    switch (clk_id) {
+    switch (clockid) {
     case CLOCK_MONOTONIC: {
             vsf_systimer_tick_t us = vsf_systimer_get_us();
             time_t sec = us / 1000000;
@@ -380,6 +381,12 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
     default:
         return -1;
     }
+}
+
+int clock_settime(clockid_t clockid, const struct timespec *ts)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 int clock_nanosleep(clockid_t clockid, int flags, const struct timespec *request,
