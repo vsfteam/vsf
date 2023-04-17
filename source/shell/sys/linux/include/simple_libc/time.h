@@ -12,12 +12,16 @@
 // for sigevent
 #   include "../signal.h"
 #else
-#include <stddef.h>
+#   include <stddef.h>
 // for time_t
 #   include <sys/types.h>
 // for sigevent
 #   include <signal.h>
 #endif
+
+// Note:
+//  libc/time.h can not include timeval, so can not include sys/time.h,
+//      or it will conflict with timeval in winsock.h.
 
 #ifdef __cplusplus
 extern "C" {

@@ -26,6 +26,8 @@ extern "C" {
 #define sigdelsetmask       VSF_LINUX_WRAPPER(sigdelsetmask)
 #define sigtestsetmask      VSF_LINUX_WRAPPER(sigtestsetmask)
 #define pthread_sigmask     VSF_LINUX_WRAPPER(pthread_sigmask)
+#define sigwaitinfo         VSF_LINUX_WRAPPER(sigwaitinfo);
+#define sigtimedwait        VSF_LINUX_WRAPPER(sigtimedwait);
 #endif
 
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
@@ -183,6 +185,15 @@ static inline int sigtestsetmask(sigset_t *set, unsigned long mask)
     return (set->sig[0] & mask) != 0;
 }
 
+// ugly, but seems no choice, because:
+//  1. libc/time.h can not include timeval, so can not include sys/time.h,
+//      or it will conflict with timeval in winsock.h
+//  2. signal.h can not include libc/time.h, because libc/time.h will include signal.h for sigevent
+struct signal_timespec {
+    time_t          tv_sec;
+    long            tv_nsec;
+};
+
 #if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED
 typedef struct vsf_linux_signal_vplt_t {
     vsf_vplt_info_t info;
@@ -193,6 +204,8 @@ typedef struct vsf_linux_signal_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sigaction);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(raise);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_sigmask);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sigwaitinfo);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sigtimedwait);
 } vsf_linux_signal_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt;
@@ -240,6 +253,14 @@ VSF_LINUX_APPLET_SIGNAL_IMP(pthread_sigmask, int, int how, const sigset_t *set, 
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SIGNAL_ENTRY(pthread_sigmask)(how, set, oldset);
 }
+VSF_LINUX_APPLET_SIGNAL_IMP(sigwaitinfo, int, const sigset_t *set, siginfo_t *info) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SIGNAL_ENTRY(sigwaitinfo)(set, info);
+}
+VSF_LINUX_APPLET_SIGNAL_IMP(sigtimedwait, int, const sigset_t *set, siginfo_t *info, const struct signal_timespec *timeout) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SIGNAL_ENTRY(sigtimedwait)(set, info, timeout);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SIGNAL
 
@@ -250,6 +271,9 @@ int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
 int raise(int sig);
 
 int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
+
+int sigwaitinfo(const sigset_t *set, siginfo_t *info);
+int sigtimedwait(const sigset_t *set, siginfo_t *info, const struct signal_timespec *timeout);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SIGNAL
 

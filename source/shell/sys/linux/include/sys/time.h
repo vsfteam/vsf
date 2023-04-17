@@ -8,6 +8,10 @@
 #else
 #   include <sys/types.h>
 #endif
+
+// ugly, but seems no choice, because:
+//  libc/time.h can not include timeval, so can not include sys/time.h,
+//      or it will conflict with timeval in winsock.h.
 #include <time.h>
 
 #ifdef __cplusplus

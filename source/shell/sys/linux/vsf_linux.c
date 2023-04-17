@@ -1239,6 +1239,11 @@ void _exit(int status)
     vsf_linux_exit_process(status, true);
 }
 
+int acct(const char *filename)
+{
+    return -1;
+}
+
 void vsf_linux_set_process_reg(uintptr_t reg)
 {
 #if VSF_ARCH_USE_THREAD_REG == ENABLED
@@ -1811,6 +1816,8 @@ int pipe2(int pipefd[2], int flags)
     return res;
 }
 
+// signal.h
+
 int kill(pid_t pid, int sig)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
@@ -1892,6 +1899,16 @@ int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
 #else
     return -1;
 #endif
+}
+
+int sigwaitinfo(const sigset_t *set, siginfo_t *info)
+{
+    return -1;
+}
+
+int sigtimedwait(const sigset_t *set, siginfo_t *info, const struct signal_timespec *timeout)
+{
+    return -1;
 }
 
 #if !defined(__WIN__) || VSF_LINUX_CFG_WRAPPER == ENABLED
@@ -2026,6 +2043,11 @@ int getlogin_r(char *buf, size_t bufsize)
     return 0;
 }
 
+int setgid(gid_t git)
+{
+    return 0;
+}
+
 gid_t getgid(void)
 {
     return (gid_t)0;
@@ -2033,6 +2055,11 @@ gid_t getgid(void)
 gid_t getegid(void)
 {
     return (gid_t)0;
+}
+
+int setuid(uid_t uid)
+{
+    return 0;
 }
 
 uid_t getuid(void)
@@ -2058,9 +2085,44 @@ pid_t getppid(void)
     return process->id.ppid;
 }
 
+pid_t setsid(void)
+{
+    return 0;
+}
+
+pid_t getsid(pid_t pid)
+{
+    return 0;
+}
+
+int setpgid(pid_t pid, pid_t pgid)
+{
+    return 0;
+}
+
 pid_t getpgid(pid_t pid)
 {
-    return pid;
+    return 0;
+}
+
+int setpgrp(void)
+{
+    return 0;
+}
+
+pid_t getpgrp(void)
+{
+   return 0;
+}
+
+int setresuid(uid_t ruid, uid_t euid, uid_t suid)
+{
+    return 0;
+}
+
+int setresgid(gid_t rgid, gid_t egid, gid_t sgid)
+{
+    return 0;
 }
 
 pid_t gettid(void)
@@ -3397,6 +3459,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(sigaction),
     VSF_APPLET_VPLT_ENTRY_FUNC(raise),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_sigmask),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sigwaitinfo),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sigtimedwait),
 };
 #endif
 
@@ -3476,13 +3540,23 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(ualarm),
     VSF_APPLET_VPLT_ENTRY_FUNC(getlogin),
     VSF_APPLET_VPLT_ENTRY_FUNC(getlogin_r),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setgid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getgid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getegid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setuid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getuid),
     VSF_APPLET_VPLT_ENTRY_FUNC(geteuid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getpid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getppid),
     VSF_APPLET_VPLT_ENTRY_FUNC(gettid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setsid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getsid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setpgid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getpgid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setpgrp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getpgrp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setresuid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setresgid),
     VSF_APPLET_VPLT_ENTRY_FUNC(__execl_va),
     VSF_APPLET_VPLT_ENTRY_FUNC(execl),
     VSF_APPLET_VPLT_ENTRY_FUNC(__execlp_va),
@@ -3548,6 +3622,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(ttyname),
     VSF_APPLET_VPLT_ENTRY_FUNC(ttyname_r),
     VSF_APPLET_VPLT_ENTRY_FUNC(_exit),
+    VSF_APPLET_VPLT_ENTRY_FUNC(acct),
 };
 #endif
 
