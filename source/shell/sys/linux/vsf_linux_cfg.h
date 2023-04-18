@@ -277,6 +277,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_NETDB
 #       define VSF_LINUX_APPLET_USE_NETDB       ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_GRP
+#       define VSF_LINUX_APPLET_USE_GRP         ENABLED
+#   endif
 
 #   if !defined(VSF_LINUX_APPLET_USE_LIBUSB) && VSF_LINUX_USE_LIBUSB == ENABLED
 #       define VSF_LINUX_APPLET_USE_LIBUSB      ENABLED
@@ -394,7 +397,7 @@ typedef struct vsf_linux_vplt_t {
     void *pwd_vplt;
     void *findprog_vplt;
     void *fnmatch_vplt;
-    void *res5_vplt;
+    void *grp_vplt;
     void *res6_vplt;
     void *res7_vplt;
 

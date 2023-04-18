@@ -54,6 +54,7 @@
 #   include "./include/langinfo.h"
 #   include "./include/poll.h"
 #   include "./include/dlfcn.h"
+#   include "./include/grp.h"
 #   include "./include/linux/limits.h"
 #   include "./include/linux/futex.h"
 #else
@@ -82,6 +83,7 @@
 #   include <langinfo.h>
 #   include <poll.h>
 #   include <dlfcn.h>
+#   include <grp.h>
 // for MAX_PATH
 #   include <linux/limits.h>
 #   include <linux/futex.h>
@@ -208,8 +210,18 @@ static const struct passwd __vsf_linux_default_passwd = {
     .pw_uid             = (uid_t)0,
     .pw_gid             = (gid_t)0,
     .pw_gecos           = "vsf",
-    .pw_dir             = "/home",
-    .pw_shell           = "vsh",
+    .pw_dir             = "/home/root",
+    .pw_shell           = "sh",
+};
+
+static const char *__vsf_linux_default_group_users[] = {
+    "vsf",
+    NULL,
+};
+static const struct group __vsf_linux_default_group = {
+    .gr_name            = "vsfteam",
+    .gr_gid             = (gid_t)0,
+    .gr_mem             = (char **)__vsf_linux_default_group_users,
 };
 
 /*============================ PROTOTYPES ====================================*/
@@ -3579,6 +3591,46 @@ struct passwd * getpwnam(const char *name)
     return (struct passwd *)&__vsf_linux_default_passwd;
 }
 
+// grp
+
+int getgroups(size_t size, gid_t list[])
+{
+    return -1;
+}
+
+int setgroups(size_t size, const gid_t *list)
+{
+    return -1;
+}
+
+struct group * getgrnam(const char *name)
+{
+    if (!strcmp(__vsf_linux_default_group.gr_name, name)) {
+        return (struct group *)&__vsf_linux_default_group;
+    }
+    return NULL;
+}
+
+struct group * getgrgid(gid_t gid)
+{
+    if (gid == __vsf_linux_default_group.gr_gid) {
+        return (struct group *)&__vsf_linux_default_group;
+    }
+    return NULL;
+}
+
+int getgrnam_r(const char *name, struct group *grp,
+          char *buf, size_t buflen, struct group **result)
+{
+    return -1;
+}
+
+int getgrgid_r(gid_t gid, struct group *grp,
+          char *buf, size_t buflen, struct group **result)
+{
+    return -1;
+}
+
 // vplt
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt = {
@@ -3723,6 +3775,19 @@ __VSF_VPLT_DECORATOR__ vsf_linux_dlfcn_vplt_t vsf_linux_dlfcn_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(dlclose),
     VSF_APPLET_VPLT_ENTRY_FUNC(dlsym),
     VSF_APPLET_VPLT_ENTRY_FUNC(dlerror),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_GRP == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_grp_vplt_t vsf_linux_grp_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_grp_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(getgroups),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setgroups),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getgrnam),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getgrgid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getgrnam_r),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getgrgid_r),
 };
 #endif
 
@@ -4116,6 +4181,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_FNMATCH == ENABLED
     .fnmatch_vplt       = (void *)&vsf_linux_fnmatch_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_GRP == ENABLED
+    .grp_vplt           = (void *)&vsf_linux_grp_vplt,
 #   endif
 
 #   if VSF_LINUX_USE_LIBUSB == ENABLED && VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
