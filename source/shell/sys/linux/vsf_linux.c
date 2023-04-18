@@ -1378,7 +1378,7 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
     vsf_linux_process_t *process = thread->process;
     vsf_linux_sig_handler_t *handler;
     sighandler_t sighandler;
-#if _NSIG > 32
+#if _NSIG >= 32
     unsigned long long sig_mask;
 #else
     unsigned long sig_mask;
@@ -1394,7 +1394,7 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
                 process->sig.sighandler_thread = NULL;
                 is_all_done = true;
             } else {
-#if _NSIG > 32
+#if _NSIG >= 32
                 sig = vsf_ffz32(~sig_mask);
                 if (sig < 0) {
                     sig = vsf_ffz32(~(sig_mask >> 32)) + 32;
@@ -1982,10 +1982,9 @@ int pipe2(int pipefd[2], int flags)
 int kill(pid_t pid, int sig)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
-    if (sig <= 0) {
+    if ((sig <= 0) || (sig > _NSIG) || (sig >= 64)) {
         return -1;
     }
-    sig--;
 
     vsf_protect_t orig = vsf_protect_sched();
     vsf_linux_process_t *process = vsf_linux_get_process(pid);
@@ -1994,7 +1993,7 @@ int kill(pid_t pid, int sig)
         return -1;
     }
 
-#if _NSIG > 32
+#if _NSIG >= 32
     process->sig.pending.sig[0] |= 1ULL << sig;
 #else
     process->sig.pending.sig[0] |= 1 << sig;
@@ -2070,7 +2069,6 @@ int sigwaitinfo(const sigset_t *set, siginfo_t *info)
 
 int sigtimedwait(const sigset_t *set, siginfo_t *info, const struct signal_timespec *timeout)
 {
-    VSF_LINUX_ASSERT(false);
     return -1;
 }
 
@@ -2151,8 +2149,7 @@ pid_t wait(int *status)
 pid_t waitpid(pid_t pid, int *status, int options)
 {
     if (pid <= 0) {
-        VSF_LINUX_ASSERT(false);
-        return -1;
+        return wait(status);
     }
     if (options != 0) {
         VSF_LINUX_ASSERT(false);
@@ -2968,7 +2965,7 @@ unsigned int minor(dev_t dev)
 }
 
 // spawn.h
-static int __vsf_linux_spawn(pid_t *pid, vsf_linux_main_entry_t entry,
+int __vsf_linux_spawn(pid_t *pid, vsf_linux_main_entry_t entry,
                 const posix_spawn_file_actions_t *actions,
                 const posix_spawnattr_t *attr,
                 char * const argv[], char * const env[])

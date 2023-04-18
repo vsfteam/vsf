@@ -129,7 +129,7 @@ typedef struct {
 #define SA_NODEFER      0x40000000
 
 typedef struct {
-#if _NSIG > 32
+#if _NSIG >= 32
     unsigned long long sig[_NSIG / (sizeof(unsigned long long) << 3)];
 #else
     unsigned long sig[_NSIG / (sizeof(unsigned long) << 3)];
