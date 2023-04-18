@@ -555,7 +555,9 @@ WEAK(vsf_linux_create_fhs)
 int vsf_linux_create_fhs(void)
 {
     vsf_linux_vfs_init();
+#if VSF_LINUX_USE_BUSYBOX == ENABLED
     busybox_install();
+#endif
     return vsf_linux_create_fhs_user();
 }
 
