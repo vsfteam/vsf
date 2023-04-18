@@ -482,7 +482,7 @@ int vfprintf(FILE *f, const char *format, va_list ap)
 
 int vdprintf(int fd, const char *format, va_list ap)
 {
-    FILE *f = vsf_linux_fd_get(fd);
+    FILE *f = (FILE *)vsf_linux_fd_get(fd);
     if (NULL == f) {
         return -1;
     }

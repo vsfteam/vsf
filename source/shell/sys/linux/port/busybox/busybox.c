@@ -92,20 +92,7 @@ int vsf_linux_init_main(int argc, char *argv[])
 
 int busybox_bind(char *path, vsf_linux_main_entry_t entry)
 {
-    int fd = open(path, 0);
-    if (fd < 0) {
-        fd = creat(path, 0);
-        if (fd < 0) {
-            printf("fail to install %s.\r\n", path);
-            return fd;
-        }
-    }
-    if (fd >= 0) {
-        vsf_linux_fd_bind_executable(fd, entry);
-        close(fd);
-    }
-    printf("%s installed.\r\n", path);
-    return fd;
+    return vsf_linux_fs_bind_executable(path, entry);
 }
 
 int busybox_install(void)

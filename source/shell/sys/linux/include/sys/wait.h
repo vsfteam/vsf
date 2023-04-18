@@ -40,6 +40,8 @@ extern "C" {
 // TODO: implement WIFSIGNALED
 #define WIFSIGNALED(__STATUS)   0
 #define WTERMSIG(__STATUS)      ((__STATUS) & 0x7F)
+#define WIFSTOPPED(__STATUS)    0
+#define WSTOPSIG(__STATUS)      0
 
 #if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED
 typedef struct vsf_linux_sys_wait_vplt_t {

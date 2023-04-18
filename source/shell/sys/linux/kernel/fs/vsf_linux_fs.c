@@ -2911,6 +2911,16 @@ int mkfifoat(int dirfd, const char *pathname, mode_t mode)
     return -1;
 }
 
+int mknod(const char *pathname, mode_t mode, dev_t dev)
+{
+    return -1;
+}
+
+int mknodat(int dirfd, const char *pathname, mode_t mode, dev_t dev)
+{
+    return -1;
+}
+
 // term
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
 {
@@ -3155,6 +3165,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(fchmod),
     VSF_APPLET_VPLT_ENTRY_FUNC(mkfifo),
     VSF_APPLET_VPLT_ENTRY_FUNC(mkfifoat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mknod),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mknodat),
 };
 #endif
 

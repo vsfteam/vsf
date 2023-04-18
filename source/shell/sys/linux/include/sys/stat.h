@@ -28,6 +28,8 @@ extern "C" {
 #define utimensat               VSF_LINUX_WRAPPER(utimensat)
 #define mkfifo                  VSF_LINUX_WRAPPER(mkfifo)
 #define mkfifoat                VSF_LINUX_WRAPPER(mkfifoat)
+#define mknod                   VSF_LINUX_WRAPPER(mknod)
+#define mknodat                 VSF_LINUX_WRAPPER(mknodat)
 #endif
 
 // syscalls
@@ -145,6 +147,8 @@ typedef struct vsf_linux_sys_stat_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fchmod);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkfifo);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkfifoat);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mknod);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mknodat);
 } vsf_linux_sys_stat_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
@@ -200,6 +204,14 @@ VSF_LINUX_APPLET_SYS_STAT_IMP(mkfifoat, int, int dirfd, const char *pathname, mo
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mkfifo)(dirfd, pathname, mode);
 }
+VSF_LINUX_APPLET_SYS_STAT_IMP(mknod, int, const char *pathname, mode_t mode, dev_t dev) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mknod)(pathname, mode, dev);
+}
+VSF_LINUX_APPLET_SYS_STAT_IMP(mknodat, int, int dirfd, const char *pathname, mode_t mode, dev_t dev) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mknodat)(dirfd, pathname, mode, dev);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT
 
@@ -213,6 +225,8 @@ int chmod(const char *pathname, mode_t mode);
 int fchmod(int fd, mode_t mode);
 int mkfifo(const char *pathname, mode_t mode);
 int mkfifoat(int dirfd, const char *pathname, mode_t mode);
+int mknod(const char *pathname, mode_t mode, dev_t dev);
+int mknodat(int dirfd, const char *pathname, mode_t mode, dev_t dev);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT
 
