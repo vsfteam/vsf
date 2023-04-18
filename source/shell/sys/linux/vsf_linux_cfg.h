@@ -246,6 +246,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_SYS_STATFS
 #       define VSF_LINUX_APPLET_USE_SYS_STATFS  ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_CAPABILITY
+#       define VSF_LINUX_APPLET_USE_SYS_CAPABILITY  ENABLED
+#   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_UNISTD
 #       define VSF_LINUX_APPLET_USE_UNISTD      ENABLED
@@ -366,7 +369,7 @@ typedef struct vsf_linux_vplt_t {
     void *sys_prctl_vplt;
     void *sys_event_vplt;
     void *sys_statfs_vplt;
-    void *sys_res1_vplt;
+    void *sys_capability_vplt;
     void *sys_res2_vplt;
 
     // unix

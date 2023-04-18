@@ -3630,6 +3630,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_wait_vplt_t vsf_linux_sys_wait_vplt = {
 };
 #endif
 
+#if VSF_LINUX_APPLET_USE_SYS_CAPABILITY == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_capability_vplt_t vsf_linux_sys_capability_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_capability_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(capget),
+    VSF_APPLET_VPLT_ENTRY_FUNC(capset),
+};
+#endif
+
 #if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_signal_vplt_t, 0, 0, true),
@@ -4039,6 +4048,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
     .sys_statfs_vplt    = (void *)&vsf_linux_sys_statfs_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_CAPABILITY == ENABLED
+    .sys_capability_vplt    = (void *)&vsf_linux_sys_capability_vplt,
 #   endif
 
 #   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
