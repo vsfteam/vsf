@@ -673,6 +673,11 @@ static int __vsf_linux_init_thread(int argc, char *argv[])
 {
     int err = vsf_linux_create_fhs();
     if (err) { return err; }
+
+    // init shall be called in pid1
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    process->id.pid = 1;
+    __vsf_linux.cur_pid = 2;
     return execlp(VSF_LINUX_CFG_BIN_PATH "/init", "init", NULL);
 }
 
