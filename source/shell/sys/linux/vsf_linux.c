@@ -2942,13 +2942,11 @@ dev_t makedev(unsigned int maj, unsigned int min)
 
 unsigned int major(dev_t dev)
 {
-    VSF_LINUX_ASSERT(false);
     return 0;
 }
 
 unsigned int minor(dev_t dev)
 {
-    VSF_LINUX_ASSERT(false);
     return 0;
 }
 

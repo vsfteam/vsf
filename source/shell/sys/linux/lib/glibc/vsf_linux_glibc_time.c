@@ -106,7 +106,6 @@ void tzset(void)
 #   pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
-#ifndef __WIN__
 size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm)
 {
     static const char *__day_name[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
@@ -227,10 +226,10 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
             *str_cur++ = ch;
         }
     }
+    *str_cur++ = '\n';
     *str_cur = '\0';
     return str_cur - str;
 }
-#endif
 
 char * strptime(const char *str, const char *format, struct tm *tm)
 {

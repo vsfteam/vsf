@@ -438,6 +438,9 @@ int vasprintf(char **strp, const char *format, va_list ap)
         return -1;
     }
 
+    if (strp != NULL) {
+        *strp = buff;
+    }
     return vsnprintf(buff, size + 1, format, ap);
 }
 
